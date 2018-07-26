@@ -33,14 +33,10 @@ foam.CLASS({
     'onObjDrop'
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-        ^ { white-space: nowrap; margin-left:16px; }
-        ^selected { outline: 2px solid #dddd00; }
-      */}
-    })
-  ],
+  css: `
+    ^ { white-space: nowrap; margin-left:16px; }
+    ^selected { outline: 2px solid #dddd00; }
+  `,
 
   properties: [
     {
@@ -198,9 +194,8 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      var M  = this.ExpressionsSingleton.create();
-      var of = this.lookup(this.relationship.sourceModel);
-
+      var M   = this.ExpressionsSingleton.create();
+      var of  = this.lookup(this.relationship.sourceModel);
       var dao = this.data$proxy.where(
         M.NOT(M.HAS(of.getAxiomByName(this.relationship.inverseName))));
 

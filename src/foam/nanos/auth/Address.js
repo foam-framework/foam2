@@ -23,15 +23,18 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'type'
+      name: 'type',
+      documentation: 'Address type.'
     },
     {
       class: 'Boolean',
-      name: 'verified'
+      name: 'verified',
+      documentation: 'Identifies if address has been verified.'
     },
     {
       class: 'Boolean',
-      name: 'deleted'
+      name: 'deleted',
+      documentation: 'Marks address as deleted.'
     },
     {
       class: 'Boolean',
@@ -45,41 +48,86 @@ foam.CLASS({
       //required: true
       width: 70,
       displayWidth: 50,
-      documentation: 'for an unstructured address, use this as a main address field.'
+      documentation: 'for an unstructured address, use this as a main address field.',
+      validateObj: function(address1) {
+        var address1Regex = /^[a-zA-Z0-9 ]{1,70}$/;
+
+        if ( address1.length > 0 && ! address1Regex.test(address1) ) {
+          return 'Invalid address line.';
+        }
+      }
     },
     {
       class: 'String',
       name: 'address2',
       width: 70,
       displayWidth: 50,
-      documentation: 'for an unstructured address, use this as a sub address field.'
+      documentation: 'for an unstructured address, use this as a sub address field.',
+      validateObj: function(address2) {
+        var address2Regex = /^[a-zA-Z0-9 ]{1,70}$/;
+
+        if ( address2.length > 0 && ! address2Regex.test(address2) ) {
+          return 'Invalid address line.';
+        }
+      }
     },
     {
       class: 'String',
       name: 'suite',
-      width: 16
+      documentation: 'Suite pertaining to address.',
+      width: 16,
+      validateObj: function (suite) {
+        var suiteRegex = /^[a-zA-Z0-9 ]{1,70}$/;
+
+        if ( suite.length > 0 && ! suiteRegex.test(suite) ) {
+          return 'Invalid address line.';
+        }
+      }
     },
     {
       class: 'String',
       name: 'city',
-      required: true
+      documentation: 'City pertaining to address.',
+      required: true,
+      validateObj: function (city) {
+        var cityRegex = /^[a-zA-Z ]{1,35}$/;
+
+        if ( ! cityRegex.test(city) ) {
+          return 'Invalid city name.';
+        }
+      }
     },
     {
       class: 'String',
       name: 'postalCode',
-      required: true
+      documentation: 'Postal code pertaining to address.',
+      required: true,
+      validateObj: function (postalCode) {
+        var postalCodeRegex = /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i;
+        if ( ! postalCodeRegex.test(postalCode) ) {
+          return 'Invalid postal code.';
+        }
+      },
+      preSet: function(oldValue, newValue){
+        return newValue.toUpperCase();
+      },
+      javaSetter:
+        `postalCode_ = val.toUpperCase();
+        postalCodeIsSet_ = true;`
     },
     {
       class: 'Reference',
       targetDAOKey: 'countryDAO',
       name: 'countryId',
-      of: 'foam.nanos.auth.Country'
+      of: 'foam.nanos.auth.Country',
+      documentation: 'Country address.'
     },
     {
       class: 'Reference',
       targetDAOKey: 'regionDAO',
       name: 'regionId',
       of: 'foam.nanos.auth.Region',
+      documentation: 'Region address.',
       view: function (_, X) {
         var choices = X.data.slot(function (countryId) {
           return X.regionDAO.where(X.data.EQ(X.data.Region.COUNTRY_ID, countryId || ""));
@@ -94,27 +142,44 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'encrypted'
+      name: 'encrypted',
+      documentation: 'Determines if address should be or is encrypted.'
     },
     {
       class: 'Double',
-      name: 'latitude'
+      name: 'latitude',
+      documentation: 'Latitude of address location.'
     },
     {
       class: 'Double',
-      name: 'longitude'
+      name: 'longitude',
+      documentation: 'Longitude of address location.'
     },
     {
       class: 'String',
       name: 'streetNumber',
       width: 16,
-      documentation: 'for an structured address, use this field.'
+      documentation: 'for an structured address, use this field.',
+      validateObj: function (streetNumber) {
+        var streetNumberRegex = /^[0-9]{1,16}$/;
+
+        if ( ! streetNumberRegex.test(streetNumber) ) {
+          return 'Invalid street number.';
+        }
+      }
     },
     {
       class: 'String',
       name: 'streetName',
       width: 70,
-      documentation: 'for an structured address, use this field.'
+      documentation: 'for an structured address, use this field.',
+      validateObj: function (streetName) {
+        var streetNameRegex = /^[a-zA-Z0-9 ]{1,70}$/;
+
+        if ( ! streetNameRegex.test(streetName) ) {
+          return 'Invalid street name.'
+        }
+      }
     },
     {
       class: 'FObjectArray',
@@ -132,6 +197,6 @@ foam.CLASS({
       javaReturns: 'String',
       code: function() { return this.structured ? this.streetNumber + ' ' + this.streetName : this.address1; },
       javaCode: `return getStructured() ? getStreetNumber() + " " + getStreetName() : getAddress1();`
-   }
+    }
   ]
 });

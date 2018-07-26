@@ -51,8 +51,12 @@ public class MapDAO
     if ( key == null ) {
       throw new RuntimeException("Missing Primary Key in " + this.getOf().getId() + ".put()");
     }
+    obj = obj.fclone();
+    obj.freeze();
+    
     getData().put(key, obj);
-    onPut(obj.fclone());
+    onPut(obj);
+    
     return obj;
   }
 

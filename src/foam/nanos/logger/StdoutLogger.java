@@ -8,24 +8,23 @@ package foam.nanos.logger;
 
 import foam.nanos.logger.Logger;
 import foam.nanos.NanoService;
-import java.util.logging.*;
-import java.text.SimpleDateFormat;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.logging.*;
 
 public class StdoutLogger
   extends AbstractLogger
-  implements NanoService
 {
-  protected java.util.logging.Logger logger;
+  protected java.util.logging.Logger logger_;
 
-  public void start() {
-    logger = java.util.logging.Logger.getAnonymousLogger();
-    logger.setUseParentHandlers(false);
-    logger.setLevel(Level.ALL);
+  public StdoutLogger() {
+    logger_ = java.util.logging.Logger.getAnonymousLogger();
+    logger_.setUseParentHandlers(false);
+    logger_.setLevel(Level.ALL);
     Handler handler = new ConsoleHandler();
     handler.setLevel(Level.ALL);
     handler.setFormatter(new CustomFormatter());
-    logger.addHandler(handler);
+    logger_.addHandler(handler);
   }
 
   protected class CustomFormatter extends Formatter {
@@ -60,23 +59,23 @@ public class StdoutLogger
   }
 
   public void log(Object... args) {
-    logger.info(combine(args));
+    logger_.info(combine(args));
   }
 
   public void info(Object... args) {
-    logger.info(combine(args));
+    logger_.info(combine(args));
   }
 
   public void warning(Object... args) {
-    logger.warning(combine(args));
+    logger_.warning(combine(args));
   }
 
   public void error(Object... args) {
-    logger.severe(combine(args));
+    logger_.severe(combine(args));
   }
 
   // can't normally do .debug() with custom formatter: use fine instead
   public void debug(Object...  args) {
-    logger.fine(combine(args));
+    logger_.fine(combine(args));
   }
 }

@@ -44,6 +44,8 @@ foam.INTERFACE({
   package: 'foam.blob',
   name: 'Blob',
 
+  javaExtends: [ 'java.io.Closeable' ],
+
   methods: [
     {
       name: 'read',
@@ -53,7 +55,7 @@ foam.INTERFACE({
           name: 'buffer',
         },
         {
-          class: 'Long',
+          of: 'Long',
           swiftType: 'Int',
           name: 'offset'
         }
@@ -79,7 +81,7 @@ foam.INTERFACE({
       returns: 'Promise',
       args: [
         {
-          class: 'Blob',
+          of: 'Blob',
           name: 'blob'
         }
       ]
@@ -93,7 +95,7 @@ foam.INTERFACE({
           of: 'foam.core.X'
         },
         {
-          class: 'Blob',
+          of: 'Blob',
           name: 'blob'
         }
       ]
@@ -103,7 +105,7 @@ foam.INTERFACE({
       returns: 'Promise',
       args: [
         {
-          class: 'String',
+          of: 'String',
           name: 'id'
         }
       ]
@@ -117,7 +119,7 @@ foam.INTERFACE({
           of: 'foam.core.X'
         },
         {
-          class: 'String',
+          of: 'String',
           name: 'id'
         }
       ]
@@ -127,7 +129,7 @@ foam.INTERFACE({
       returns: 'String',
       args: [
         {
-          class: 'Blob',
+          of: 'Blob',
           name: 'blob'
         }
       ]
@@ -141,7 +143,7 @@ foam.INTERFACE({
           of: 'foam.core.X'
         },
         {
-          class: 'Blob',
+          of: 'Blob',
           name: 'blob'
         }
       ]
@@ -346,7 +348,7 @@ foam.CLASS({
   package: 'foam.blob',
   name: 'IdentifiedBlob',
   extends: 'foam.blob.ProxyBlob',
-  
+
   imports: [
     'blobStore?',
     'blobService'
@@ -358,12 +360,15 @@ foam.CLASS({
       name: 'id'
     },
     {
+      class: 'NOPBlob',
       name: 'delegate',
       transient: true,
       factory: function() {
         return this.blobService.find(this.id);
       },
-      javaFactory: 'return ((BlobService) getBlobStore()).find(getId());'
+      javaFactory: `
+        return ((BlobService) getBlobStore()).find(getId());
+      `
     }
   ],
 
@@ -390,6 +395,31 @@ foam.CLASS({
     [ 'of', 'foam.blob.Blob' ],
     [ 'tableCellView', function() {} ],
     [ 'view', { class: 'foam.u2.view.BlobView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'NOPBlob',
+  extends: 'foam.core.Blob',
+  documentation: 'Blob property with clone, diff, and compare disabled',
+
+  properties: [
+    [ 'cloneProperty', function () {} ],
+    [ 'diffProperty', function () {} ],
+    [ 'javaCloneProperty', '// noop' ],
+    [ 'javaDiffProperty', '// noop' ]
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      info.getMethod('compare').body = `return 0;`
+      info.getMethod('comparePropertyToObject').body = `return 0;`
+      info.getMethod('comparePropertyToValue').body = `return 0;`
+      return info;
+    }
   ]
 });
 
@@ -473,12 +503,15 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'root'
+      name: 'root',
+      generateJava: false,
+      documentation: 'Root directory of where files are stored'
     },
     {
       class: 'String',
       name: 'tmp',
       transient: true,
+      documentation: 'Temp directory of where files are stored before hashing',
       expression: function(root) {
         return root + '/tmp';
       }
@@ -487,6 +520,7 @@ foam.CLASS({
       class: 'String',
       name: 'sha256',
       transient: true,
+      documentation: 'Directory of where files are stored after hashing',
       expression: function(root) {
         return root + '/sha256';
       }
@@ -685,7 +719,7 @@ foam.CLASS({
       class: 'String',
       name: 'address',
       factory: function() {
-        return window.location.origin + '/' + this.serviceName
+        return window.location.origin + '/' + this.serviceName;
       }
     }
   ],
@@ -697,8 +731,15 @@ foam.CLASS({
         return Promise.resolve(blob);
       }
 
+      var url = this.address;
+      var sessionId = localStorage['defaultSession'];
+      // attach session id if available
+      if ( sessionId ) {
+        url += '?sessionId=' + sessionId;
+      }
+
       var req = this.HTTPRequest.create();
-      req.fromUrl(this.address);
+      req.fromUrl(url);
       req.method = 'PUT';
       req.payload = blob;
 
@@ -716,12 +757,25 @@ foam.CLASS({
         return null;
       }
 
-      return this.address + '/' + blob.id;
+      var url = this.address + '/' + blob.id;
+      var sessionId = localStorage['defaultSession'];
+      // attach session id if available
+      if ( sessionId ) {
+        url += '?sessionId=' + sessionId;
+      }
+      return url;
     },
 
     function find_(x, id) {
+      var url = this.address + '/' + id;
+      var sessionId = localStorage['defaultSession'];
+      // attach session id if available
+      if ( sessionId ) {
+        url += '?sessionId=' + sessionId;
+      }
+
       var req = this.HTTPRequest.create();
-      req.fromUrl(this.address + '/' + id);
+      req.fromUrl(url);
       req.method = 'GET';
       req.responseType = 'blob';
 
@@ -767,7 +821,7 @@ foam.CLASS({
 
         var blob = prop.f(obj);
 
-        if ( ! blob ) return obj;
+        if ( ! blob ) return a();
 
         return self.blobService.put(blob).then(function(b) {
           prop.set(obj, b);
@@ -813,7 +867,7 @@ foam.CLASS({
                              this.BlobBlob.create({ blob: this.blobs[id] }) :
                              null);
     },
-    
+
     function urlFor_(x, blob) {
       if ( this.IdentifiedBlob.isInstance(blob) ) {
         return URL.createObjectURL(this.blobs[blob.id]);

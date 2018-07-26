@@ -1001,6 +1001,10 @@ foam.CLASS({
           this.cls_.prototype === this ? 'Proto' : '');
     },
 
+    function toJSON() {
+      return foam.json.stringify(this);
+    },
+
     function dot(name) {
       // Behaves just like Slot.dot().  Makes it easy for creating sub-slots
       // without worrying if you're holding an FObject or a slot.

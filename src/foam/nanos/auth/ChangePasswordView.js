@@ -137,6 +137,19 @@ foam.CLASS({
       display: inline-block;
     }
   `,
+
+  messages: [
+    { name: 'noSpaces', message: 'Password cannot contain spaces' },
+    { name: 'noNumbers', message: 'Password must have one numeric character' },
+    { name: 'noSpecial', message: 'Password must not contain: !@#$%^&*()_+' },
+    { name: 'emptyOriginal', message: 'Please enter your original password'},
+    { name: 'emptyPassword', message: 'Please enter your new password' },
+    { name: 'emptyConfirmation', message: 'Please re-enter your new password' },
+    { name: 'invalidLength', message: 'Password must be 7-32 characters long' },
+    { name: 'passwordMismatch', message: 'Passwords do not match' },
+    { name: 'passwordSuccess', message: 'Password successfully updated' }
+  ],
+
   properties: [
     {
       class: 'String',
@@ -154,6 +167,7 @@ foam.CLASS({
       view: { class: 'foam.u2.view.PasswordView' }
     }
   ],
+
   methods: [
     function initE(){
       this.SUPER();
@@ -176,17 +190,6 @@ foam.CLASS({
         .start(this.UPDATE_PASSWORD).addClass('update-BTN').end()
       .end()
     }
-  ],
-  messages: [
-    { name: 'noSpaces', message: 'Password cannot contain spaces' },
-    { name: 'noNumbers', message: 'Password must have one numeric character' },
-    { name: 'noSpecial', message: 'Password must not contain: !@#$%^&*()_+' },
-    { name: 'emptyOriginal', message: 'Please enter your original password'},
-    { name: 'emptyPassword', message: 'Please enter your new password' },
-    { name: 'emptyConfirmation', message: 'Please re-enter your new password' },
-    { name: 'invalidLength', message: 'Password must be 7-32 characters long' },
-    { name: 'passwordMismatch', message: 'Passwords do not match' },
-    { name: 'passwordSuccess', message: 'Password successfully updated' }
   ],
 
   actions: [
@@ -255,4 +258,4 @@ foam.CLASS({
       }
     }
   ]
-})
+});

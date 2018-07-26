@@ -116,7 +116,7 @@ return super.find_(null, id);
         if ( ! this.Serializable.isInstance(sink) ) {
           var self = this;
 
-          return this.SUPER(null, null, skip, limit, order, predicate).then(function(result) {
+          return this.SUPER(null, foam.dao.ArraySink.create(), skip, limit, order, predicate).then(function(result) {
             var items = result.array;
 
             if ( ! sink ) return result;
@@ -143,10 +143,10 @@ return super.find_(null, id);
 return super.select_(null, sink, skip, limit, order, predicate);
 `,
       swiftCode: `
-if sink is Serializable {
+if sink is foam_core_Serializable {
   return try super.select_(nil, sink, skip, limit, order, predicate)
 }
-let result = try super.select_(nil, ArraySink_create(), skip, limit, order, predicate) as! ArraySink
+let result = try super.select_(nil, ArraySink_create(), skip, limit, order, predicate) as! foam_dao_ArraySink
 var detached = false
 let sub = Subscription { detached = true }
 for o in result.array {

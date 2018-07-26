@@ -23,6 +23,18 @@ foam.CLASS({
   properties: [
     ['anonymous', true],
     'propName',
+    'propShortName',
+    'propAliases',
+    {
+      name: 'getAliasesBody',
+      expression: function() {
+      var b = 'new String[] {';
+        for (var i = 0; i < this.propAliases.length; i++) {
+          b+= '"'+ this.propAliases[i]+'"' + (i < this.propAliases.length-1 ? ', ' : '');
+        }
+        return b+'};';
+      }
+    },
     {
       class: 'Boolean',
       name: 'networkTransient'
@@ -30,6 +42,16 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'storageTransient'
+    },
+    {
+      class: 'Boolean',
+      documentation: 'define a property is a XML attribute. eg <foo id="XMLAttribute"></foo>',
+      name: 'xmlAttribute'
+    },
+    {
+      class: 'Boolean',
+      documentation: 'define a property is a XML textNode. eg <foo id="1">textNode</foo>',
+      name: 'xmlTextNode'
     },
     {
       class: 'String',
@@ -47,6 +69,14 @@ foam.CLASS({
         return 'set' + foam.String.capitalize(propName);
       }
     },
+    {
+      class: 'Boolean',
+      name: 'includeInDigest'
+    },
+    {
+      class: 'Boolean',
+      name: 'includeInSignature'
+    },
     'sourceCls',
     'propType',
     'propValue',
@@ -54,6 +84,8 @@ foam.CLASS({
     'jsonParser',
     'csvParser',
     'cloneProperty',
+    'queryParser',
+    'diffProperty',
     {
       name: 'methods',
       factory: function() {
@@ -63,6 +95,18 @@ foam.CLASS({
             visibility: 'public',
             type: 'String',
             body: 'return "' + this.propName + '";'
+          },
+          {
+            name: 'getShortName',
+            visibility: 'public',
+            type: 'String',
+            body:  this.propShortName ? 'return "' +this.propShortName+'";' : 'return null;'
+          },
+          {
+            name: 'getAliases',
+            visibility: 'public',
+            type: 'String[]',
+            body: 'return ' + this.getAliasesBody
           },
           {
             name: 'get',
@@ -120,6 +164,12 @@ foam.CLASS({
             body: 'return ' +  (this.jsonParser ? this.jsonParser : null) + ';'
           },
           {
+            name: 'queryParser',
+            type: 'foam.lib.parse.Parser',
+            visibility: 'public',
+            body: 'return ' +  (this.queryParser ? this.queryParser : null) + ';'
+          },
+          {
             name: 'csvParser',
             type: 'foam.lib.parse.Parser',
             visibility: 'public',
@@ -138,6 +188,18 @@ foam.CLASS({
             type: 'boolean',
             visibility: 'public',
             body: 'return ' + this.storageTransient + ';'
+          },
+          {
+            name: 'getXMLAttribute',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.xmlAttribute + ';'
+          },
+          {
+            name: 'getXMLTextNode',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.xmlTextNode + ';'
           },
           {
             name: 'getRequired',
@@ -177,6 +239,18 @@ foam.CLASS({
             args: [ { name: 'o', type: 'Object' } ],
             /* TODO: revise when/if expression support is added to Java */
             body: `return foam.util.SafetyUtil.compare(get_(o), ${this.propValue}) == 0;`
+          },
+          {
+            name: 'includeInDigest',
+            visibility: 'public',
+            type: 'boolean',
+            body: `return ${this.includeInDigest};`
+          },
+          {
+            name: 'includeInSignature',
+            visibility: 'public',
+            type: 'boolean',
+            body: `return ${this.includeInSignature};`
           }
         ];
 
@@ -190,6 +264,20 @@ foam.CLASS({
             body: this.cloneProperty
           });
         }
+
+        if ( this.diffProperty != null ) {
+          m.push({
+            name: 'diff',
+            visibility: 'public',
+            type: 'void',
+            args: [ { type: 'foam.core.FObject',      name: 'o1'   },
+                    { type: 'foam.core.FObject',      name: 'o2'   },
+                    { type: 'java.util.Map',          name: 'diff' },
+                    { type: 'foam.core.PropertyInfo', name: 'prop' }],
+            body: this.diffProperty
+          });
+        }
+
         return m;
       }
     }

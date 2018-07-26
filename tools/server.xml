@@ -149,7 +149,6 @@
             unpackWARs="true" autoDeploy="true">
 
             <Context docBase="/Library/Tomcat/bin" path="/static" />
-            <Context docBase="/Users/marcroopchand/nanopay" path="/dev" />
 
         <!-- SingleSignOn valve, share authentication between web applications
              Documentation at: /docs/config/valve.html -->

@@ -7,6 +7,13 @@ foam.CLASS({
   package: 'foam.nanos.boot',
   name: 'NSpec',
 
+  requires: [
+    {
+      path: 'foam.comics.BrowserView',
+      flags: ['web'],
+    },
+  ],
+
   javaImports: [
     'bsh.EvalError',
     'bsh.Interpreter',
@@ -23,6 +30,11 @@ foam.CLASS({
       class: 'String',
       name: 'name',
       tableWidth: 460
+    },
+    {
+      class: 'String',
+      name: 'description',
+      width: 80
     },
     {
       class: 'Boolean',
@@ -57,6 +69,34 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'authenticate',
+      value: true,
+      tableCellFormatter: function(value, obj, property) {
+        this
+          .start()
+            .call(function() {
+              if ( value ) { this.style({color: 'green'}); }
+            })
+            .add(value ? ' Y' : '-')
+          .end();
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'parameters',
+      value: false,
+      tableCellFormatter: function(value, obj, property) {
+        this
+          .start()
+            .call(function() {
+              if ( value ) { this.style({color: 'green'}); }
+            })
+            .add(value ? ' Y' : '-')
+          .end();
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'pm',
       value: true,
       tableCellFormatter: function(value, obj, property) {
         this

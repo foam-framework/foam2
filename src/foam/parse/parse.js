@@ -1055,6 +1055,13 @@ foam.CLASS({
     {
       class: 'Array',
       name: 'actions'
+    },
+    {
+      class: 'Boolean',
+      documentation: `When true, use foam.Function.withArgs() to evaluate
+          symbols function in its original script closure context. Otherwise,
+          use with(language) { eval(symbols()); }.`,
+      name: 'withArgs'
     }
   ],
   methods: [
@@ -1079,11 +1086,17 @@ foam.CLASS({
       var symbols;
 
       if ( typeof this.symbols == 'function' ) {
-        with(obj.lookup(this.language).create()) {
-          symbols = eval('(' + this.symbols.toString() + ')()');
+        var language = obj.lookup(this.language).create();
+        if (this.withArgs) {
+          symbols = foam.Function.withArgs(this.symbols, language);
+        } else {
+          with(obj.lookup(this.language).create()) {
+            symbols = eval('(' + this.symbols.toString() + ')()');
+          }
         }
-      } else
+      } else {
         symbols = this.symbols;
+      }
 
       for ( var key in symbols ) {
         g.addSymbol(key, symbols[key]);

@@ -19,7 +19,7 @@ foam.CLASS({
         cls,
         this.name,
         {
-          value: this.value,
+          value: this.code,
           configurable: false
         });
     },

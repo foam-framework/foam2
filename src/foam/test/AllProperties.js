@@ -166,10 +166,10 @@ foam.CLASS({
       class: 'foam.mlang.predicate.PredicateArray',
       name: 'predicateArray'
     },
-    {
-      class: 'foam.dao.RelationshipProperty',
-      name: 'relationshipProperty'
-    },
+    // {
+    //   class: 'foam.dao.RelationshipProperty',
+    //   name: 'relationshipProperty'
+    // },
     {
       class: 'foam.core.Blob',
       name: 'blob'
@@ -365,11 +365,11 @@ foam.CLASS({
       transient: true,
       name: 'transientPredicateArray'
     },
-    {
-      class: 'foam.dao.RelationshipProperty',
-      transient: true,
-      name: 'transientRelationshipProperty'
-    },
+    // {
+    //   class: 'foam.dao.RelationshipProperty',
+    //   transient: true,
+    //   name: 'transientRelationshipProperty'
+    // },
     {
       class: 'foam.core.Blob',
       transient: true,

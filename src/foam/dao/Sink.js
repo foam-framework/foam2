@@ -123,6 +123,12 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'PipeSink',
   extends: 'foam.dao.ProxySink',
+  axioms: [
+    {
+      class: 'foam.box.Remote',
+      clientClass: 'foam.dao.ClientSink'
+    }
+  ],
   properties: [
     'dao'
   ],
@@ -524,7 +530,7 @@ array.sort(by: {
 var detached = false
 let sub = Subscription { detached = true }
 for obj in array {
-  delegate.put(obj as! FObject, sub)
+  delegate.put(obj as! foam_core_FObject, sub)
   if detached { break }
 }
       */}
@@ -723,7 +729,7 @@ foam.CLASS({
         this.dao.put(o);
       },
       javaCode: `getDao().put((foam.core.FObject)obj);`,
-      swiftCode: '_ = try? dao?.put(obj as! FObject)',
+      swiftCode: '_ = try? dao?.put(obj as! foam_core_FObject)',
     },
     {
       name: 'remove',
@@ -731,7 +737,7 @@ foam.CLASS({
         this.dao.remove(o);
       },
       javaCode: `getDao().remove((foam.core.FObject)obj);`,
-      swiftCode: '_ = try? dao?.remove(obj as! FObject)',
+      swiftCode: '_ = try? dao?.remove(obj as! foam_core_FObject)',
     },
     {
       name: 'eof',

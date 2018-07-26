@@ -33,7 +33,7 @@
     },
     {
       class: 'foam.dao.DAOProperty',
-      name: 'scrolledDao',
+      name: 'scrolledDAO',
       expression: function(data, limit, skip) {
         return data.limit(limit).skip(skip);
       },
@@ -52,8 +52,8 @@
 
   methods: [
     function init() {
-      this.onDetach(this.data$proxy.listen(this.FnSink.create({fn:this.onDaoUpdate})));
-      this.onDaoUpdate();
+      this.onDetach(this.data$proxy.listen(this.FnSink.create({fn:this.onDAOUpdate})));
+      this.onDAOUpdate();
     },
 
     function initE() {
@@ -77,7 +77,7 @@
               value$: this.skip$,
               extent$: this.limit$,
               height: 40*18+41, // TODO use window height.
-              width: 15,
+              width: 18,
               size$: this.daoCount$,
             })).
           end().
@@ -93,13 +93,13 @@
         var negative = e.deltaY < 0;
         // Convert to rows, rounding up. (Therefore minumum 1.)
         var rows = Math.ceil(Math.abs(e.deltaY) / /*self.rowHeight*/ 40);
-        this.skip += negative ? -rows : rows;
+        this.skip = Math.max(0, this.skip + (negative ? -rows : rows));
         e.preventDefault();
       }
     },
     {
-      // TODO Avoid onDaoUpdate approaches.
-      name: 'onDaoUpdate',
+      // TODO: Avoid onDAOUpdate approaches.
+      name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
         var self = this;

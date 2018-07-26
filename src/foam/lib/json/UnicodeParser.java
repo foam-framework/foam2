@@ -13,8 +13,7 @@ public class UnicodeParser extends ProxyParser {
     super(new Seq(new Whitespace(),
                   new Literal("\\"),
                   new Literal("u"),
-                  new Repeat(new HexCharParser(), null, 4, 4),
-                  new Whitespace()));
+                  new Repeat(new HexCharParser(), null, 4, 4)));
   }
 
   public PStream parse(PStream ps, ParserContext x) {

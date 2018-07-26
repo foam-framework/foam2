@@ -8,6 +8,7 @@ package foam.blob;
 
 import foam.core.X;
 import foam.lib.json.JSONParser;
+import foam.util.SafetyUtil;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -18,17 +19,36 @@ import java.nio.CharBuffer;
 public class RestBlobService
     extends AbstractBlobService
 {
-  public static final int BUFFER_SIZE = 8192;
+  protected static final int BUFFER_SIZE = 8192;
+  protected static final ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
+    @Override
+    protected StringBuilder initialValue() {
+      return new StringBuilder();
+    }
+
+    @Override
+    public StringBuilder get() {
+      StringBuilder b = super.get();
+      b.setLength(0);
+      return b;
+    }
+  };
 
   protected String address_;
+  protected String sessionId_;
 
-  public RestBlobService(foam.core.X x, String address) {
-    setX(x);
-    address_ = address;
+  public RestBlobService(X x, String address) {
+    this(x, address, null);
   }
 
-  public String getAddress() {
-    return address_;
+  public RestBlobService(X x, String address, String sessionId) {
+    setX(x);
+    address_ = address;
+    sessionId_ = sessionId;
+  }
+
+  public void setSessionId(String sessionId) {
+    sessionId_ = sessionId;
   }
 
   @Override
@@ -42,7 +62,12 @@ public class RestBlobService
     InputStream is = null;
 
     try {
-      URL url = new URL(address_);
+      StringBuilder builder = sb.get().append(address_);
+      if ( ! SafetyUtil.isEmpty(sessionId_) ) {
+        builder.append("?sessionId=").append(sessionId_);
+      }
+
+      URL url = new URL(builder.toString());
       connection = (HttpURLConnection) url.openConnection();
 
       //configure HttpURLConnection
@@ -93,7 +118,13 @@ public class RestBlobService
     HttpURLConnection connection = null;
 
     try {
-      URL url = new URL(this.address_ + "/" + id.toString());
+      StringBuilder builder = sb.get().append(address_)
+          .append("/").append(id.toString());
+      if ( ! SafetyUtil.isEmpty(sessionId_) ) {
+        builder.append("?sessionId=").append(sessionId_);
+      }
+
+      URL url = new URL(builder.toString());
       connection = (HttpURLConnection) url.openConnection();
 
       connection.setRequestMethod("GET");
@@ -128,6 +159,12 @@ public class RestBlobService
     if ( ! (blob instanceof IdentifiedBlob) ) {
       return null;
     }
-    return this.address_ + "/" + ((IdentifiedBlob) blob).getId();
+
+    StringBuilder builder = sb.get().append(address_)
+        .append("/").append(((IdentifiedBlob) blob).getId());
+    if ( ! SafetyUtil.isEmpty(sessionId_) ) {
+      builder.append("?sessionId=").append(sessionId_);
+    }
+    return builder.toString();
   }
 }

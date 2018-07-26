@@ -57,6 +57,8 @@
     var caller = flags.src || __filename;
     var path = caller.substring(0, caller.lastIndexOf('src/')+4);
 
+    if ( typeof global !== 'undefined' ) global.FOAM_ROOT = path;
+
     return function (filename) {
       require(path + filename + '.js');
     }

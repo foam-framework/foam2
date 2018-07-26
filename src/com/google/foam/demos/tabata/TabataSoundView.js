@@ -20,9 +20,12 @@ foam.CLASS({
 
   requires: [
     {
-      name: 'Beep',
       path: 'foam.audio.Beep',
-      swiftPath: 'foam.swift.ui.MidiNote',
+      flags: ['js'],
+    },
+    {
+      path: 'foam.swift.ui.MidiNote',
+      flags: ['swift'],
     },
   ],
 
@@ -39,7 +42,7 @@ foam.CLASS({
       factory: function() {
         return this.Beep.create({duration: 150, frequency: 330, type: 'triangle'});
       },
-      swiftFactory: 'return Beep_create(["note": 65, "duration": Float(0.15)])',
+      swiftFactory: 'return MidiNote_create(["note": 65, "duration": Float(0.15)])',
     },
     {
       swiftType: 'MidiNote',
@@ -47,7 +50,7 @@ foam.CLASS({
       factory: function() {
         return this.Beep.create({duration: 700, frequency: 500, type: 'square'});
       },
-      swiftFactory: 'return Beep_create(["note": 75, "duration": Float(0.7)])',
+      swiftFactory: 'return MidiNote_create(["note": 75, "duration": Float(0.7)])',
     }
   ],
 

@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'PopupMenu',
   extends: 'foam.u2.Element',
 
+  imports: [ 'lastMenuLaunchedListener?' ],
+
   css: `
     ^ {
       // align-items: center;
@@ -76,6 +78,7 @@ foam.CLASS({
 
   listeners: [
     function close() {
+      this.lastMenuLaunchedListener && this.lastMenuLaunchedListener('');
       this.remove();
     }
   ]

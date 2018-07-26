@@ -79,6 +79,7 @@ describe('ConteXt object', function() {
   it('describes', function() {
     foam.createSubContext({}).describe();
     foam.createSubContext({ hello: 'thing', wee: foam.core.Property.create() }, 'namey').describe();
+    expect().nothing();
   });
 });
 

@@ -15,27 +15,6 @@
  * limitations under the License.
  */
 
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'IDBInternalException',
-  extends: 'foam.dao.InternalException',
-
-  // TODO: Which errors are internal (system problems) vs. external
-  // (i.e. invalid data for clone, but you can try again with different data)
-  properties: [
-    'id',
-    'error',
-    {
-      name: 'message',
-      expression: function(id, error) {
-        return "IndexedDB Error for " + id +
-          ( error ? ": " + error.toString() : "" );
-      }
-    }
-  ]
-});
-
-
 /*
 TODO:
 -verify that multi part keys work properly
@@ -46,7 +25,6 @@ foam.CLASS({
   extends: 'foam.dao.AbstractDAO',
 
   requires: [
-    'foam.dao.FlowControl',
     'foam.dao.ArraySink',
     'foam.dao.IDBInternalException',
     'foam.mlang.predicate.True',
@@ -188,7 +166,7 @@ foam.CLASS({
 
     function find_(x, obj) {
       var self = this;
-      var key = this.serializeId(obj.id !== undefined ? obj.id : obj);
+      var key  = this.serializeId(obj.id !== undefined ? obj.id : obj);
 
       return new Promise(function(resolve, reject) {
         self.withStore("readwrite", function(store) {
@@ -196,7 +174,7 @@ foam.CLASS({
           request.transaction.addEventListener(
             'complete',
             function() {
-              if (!request.result) {
+              if ( ! request.result ) {
                 resolve(null);
                 return;
               }
@@ -212,7 +190,7 @@ foam.CLASS({
 
     function remove_(x, obj) {
       var self = this;
-      var key = this.serializeId(obj.id !== undefined ? obj.id : obj);
+      var key  = this.serializeId(obj.id !== undefined ? obj.id : obj);
       return new Promise(function(resolve, reject) {
         self.withStore("readwrite", function(store) {
           var getRequest = store.get(key);
@@ -259,44 +237,43 @@ foam.CLASS({
             };
           });
         });
-      } else {
-        // send items to the sink and remove one by one
-        return new Promise(function(resolve, reject) {
-          self.withStore('readwrite', function(store) {
-            var request = store.openCursor();
-            request.onsuccess = function(e) {
-              var cursor = e.target.result;
-              if (cursor) {
-                var value = self.deserialize(cursor.value);
-                if (query.f(value)) {
-                  var deleteReq = cursor.delete();
-                  deleteReq.addEventListener(
-                    'success',
-                    function() {
-                      self.pub('on','remove', value);
-                    });
-                  deleteReq.onerror = function(e) {
-                  };
-                }
-                cursor.continue();
-              }
-            };
-            request.transaction.addEventListener('complete', function() {
-              resolve();
-            });
-            request.onerror = function(e) {
-              reject(self.IDBInternalException.create({ id: 'remove_all', error: e }));
-            };
-          });
-        });
       }
+      // send items to the sink and remove one by one
+      return new Promise(function(resolve, reject) {
+        self.withStore('readwrite', function(store) {
+          var request = store.openCursor();
+          request.onsuccess = function(e) {
+            var cursor = e.target.result;
+            if (cursor) {
+              var value = self.deserialize(cursor.value);
+              if (query.f(value)) {
+                var deleteReq = cursor.delete();
+                deleteReq.addEventListener(
+                  'success',
+                  function() {
+                    self.pub('on','remove', value);
+                  });
+                deleteReq.onerror = function(e) {
+                };
+              }
+              cursor.continue();
+            }
+          };
+          request.transaction.addEventListener('complete', function() {
+            resolve();
+          });
+          request.onerror = function(e) {
+            reject(self.IDBInternalException.create({ id: 'remove_all', error: e }));
+          };
+        });
+      });
     },
 
     function select_(x, sink, skip, limit, order, predicate) {
       var resultSink = sink || this.ArraySink.create();
       sink = this.decorateSink_(resultSink, skip, limit, order, predicate);
 
-      var sub = foam.core.FObject.create();
+      var sub      = foam.core.FObject.create();
       var detached = false;
       sub.onDetach(function() { detached = true; });
 
@@ -329,6 +306,7 @@ foam.CLASS({
             sink.put(value, sub);
             cursor.continue();
           };
+
           request.onerror = function(e) {
             reject(self.IDBInternalException.create({ id: 'select', error: e }));
           };

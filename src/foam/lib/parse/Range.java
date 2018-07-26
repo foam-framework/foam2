@@ -12,14 +12,14 @@ public class Range implements Parser {
 
   public Range(char from, char to) {
     this.from = from;
-    this.to = to;
+    this.to   = to;
   }
 
   public PStream parse(PStream ps, ParserContext x) {
     if ( ps.valid() && ( ps.head() >= from ) && ( ps.head() <= to ) ) {
       return ps.tail().setValue(ps.head());
     }
-    
+
     return null;
   }
 }

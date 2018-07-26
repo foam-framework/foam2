@@ -24,6 +24,11 @@ foam.CLASS({
     {
       class: 'Float',
       name: 'cost'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.nanos.demo.relationship.CourseType',
+      name: 'type'
     }
   ]
 });

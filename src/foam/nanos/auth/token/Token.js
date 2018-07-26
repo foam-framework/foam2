@@ -34,6 +34,11 @@ foam.CLASS({
       class: 'String',
       name: 'data',
       documentation: 'The token data'
+    },
+    {
+      class: 'Map',
+      name: 'parameters',
+      documentation: 'Additional token parameters'
     }
   ]
 });

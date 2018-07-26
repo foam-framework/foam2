@@ -15,6 +15,7 @@ foam.CLASS({
 
   imports: [
     'currentMenu',
+    'lastMenuLaunched',
     'menuDAO',
     'window'
   ],
@@ -23,20 +24,19 @@ foam.CLASS({
 
   css: `
     ^ {
-      display: inline-block;
       vertical-align: top;
     }
-    ^ ul{
+    ^ ul {
       margin-top: 20px;
       font-size: 13px;
       list-style-type: none;
     }
-    ^ li{
+    ^ li {
       margin-left: 25px;
       display: inline-block;
       cursor: pointer;
     }
-    ^ .foam-nanos-menu-SubMenuView-inner{
+    ^ .foam-nanos-menu-SubMenuView-inner {
       z-index: 10001;
     }
   `,
@@ -45,8 +45,7 @@ foam.CLASS({
     {
       name: 'menuName',
       value: '' // The root menu
-    },
-    'selected'
+    }
   ],
 
   methods: [
@@ -61,10 +60,14 @@ foam.CLASS({
               this.start('li')
                 .call(function() {
                   var e = this;
-                  if ( ! self.selected ) self.selected = menu;
                   this.start()
                     .addClass('menuItem')
-                    .enableClass('selected', self.currentMenu$.map(function (value) { return self.isSelected(value, menu); }))
+                    .enableClass('hovered', self.lastMenuLaunched$.map(function (value) { return value ? value.id === menu.id : false; }))
+                    .enableClass('selected', self.currentMenu$.map(function (value) {
+                      // only show selected menu if user settings sub menu item has not been selected
+                      if ( self.window.location.hash.includes('#set') ) return false;
+                      return self.isSelected(value, menu);
+                    }))
                     .add(menu.label)
                     .on('click', function() {
                       menu.launch_(self.__context__, e);
@@ -81,25 +84,14 @@ foam.CLASS({
     function isSelected(current, menu) {
       if ( ! current ) return false;
 
+      if ( this.window.location.hash.includes('#' + menu.id) ) {
+        return true;
+      }
+
       if ( current.parent ) {
         if ( current.parent === menu.id ) {
-          this.selected = current.parent;
           return true;
         }
-        return false;
-      }
-
-      // only show selected menu if user settings sub menu item has not been selected
-      if ( this.selected === menu.id && ! this.window.location.hash.includes('#set') ) {
-        return true;
-      }
-
-      // selected menu is a submenu. Do not change selection yet.
-      if ( ! current.handler.view ) return false;
-
-      if ( current.id === menu.id ) {
-        this.selected = current.id;
-        return true;
       }
 
       return false;

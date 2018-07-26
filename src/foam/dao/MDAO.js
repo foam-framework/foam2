@@ -28,7 +28,6 @@ foam.CLASS({
     'foam.dao.ExternalException',
     'foam.dao.InternalException',
     'foam.dao.InvalidArgumentException',
-    'foam.dao.ObjectNotFoundException',
     'foam.dao.index.AltIndex',
     'foam.dao.index.AutoIndex',
     'foam.dao.index.SetIndex',

@@ -136,13 +136,5 @@ foam.CLASS({
       this.addClass(this.myClass());
       this.addClass(this.myClass(this.action.name));
     }
-  ],
-
-  listeners: [
-    function click(e) {
-      e.stopPropagation();
-      e.preventDefault();
-      this.action && this.action.maybeCall(this.__subContext__, this.data);
-    }
   ]
 });

@@ -13,7 +13,7 @@ import foam.dao.ProxyDAO;
 import foam.nanos.auth.User;
 
 public class EmailVerificationDAO
-    extends ProxyDAO
+  extends ProxyDAO
 {
   EmailTokenService emailToken;
 
@@ -30,7 +30,7 @@ public class EmailVerificationDAO
     // send email verification if new user
     User result = (User) super.put_(x, obj);
     if ( result != null && newUser && ! result.getEmailVerified() ) {
-      emailToken.generateToken(result);
+      emailToken.generateToken(x, result);
     }
 
     return result;

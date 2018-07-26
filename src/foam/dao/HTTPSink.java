@@ -10,7 +10,7 @@ import foam.core.Detachable;
 import foam.core.FObject;
 import foam.lib.Outputter;
 import foam.lib.json.OutputterMode;
-import foam.nanos.dig.Format;
+import foam.nanos.http.Format;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletResponse;

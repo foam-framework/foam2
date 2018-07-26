@@ -16,13 +16,7 @@ foam.CLASS({
   ],
 
   javaImports: [
-     'foam.dao.DAO',
-     'foam.dao.ListSink',
-     'foam.dao.Sink',
-     'foam.mlang.MLang',
      'java.util.Calendar',
-     'java.util.List',
-     'java.util.UUID'
   ],
 
   methods: [
@@ -33,6 +27,11 @@ foam.CLASS({
 `Calendar calendar = Calendar.getInstance();
 calendar.add(java.util.Calendar.DAY_OF_MONTH, 1);
 return calendar.getTime();`
+    },
+
+    {
+      name: 'generateToken',
+      javaCode: `return this.generateTokenWithParameters(x, user, null);`
     }
   ]
 });

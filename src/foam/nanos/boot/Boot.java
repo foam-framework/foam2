@@ -6,13 +6,21 @@
 
 package foam.nanos.boot;
 
-import foam.core.*;
-import foam.dao.*;
-import foam.nanos.auth.*;
+import foam.core.Detachable;
+import foam.core.ProxyX;
+import foam.core.SingletonFactory;
+import foam.core.X;
+import foam.dao.AbstractSink;
+import foam.dao.DAO;
+import foam.dao.JDAO;
+import foam.dao.ProxyDAO;
+import foam.nanos.auth.User;
+import foam.nanos.logger.Logger;
+import foam.nanos.logger.ProxyLogger;
+import foam.nanos.logger.StdoutLogger;
+import foam.nanos.script.Script;
 import foam.nanos.session.Session;
-import foam.nanos.script.*;
-import java.io.IOException;
-import static foam.mlang.MLang.*;
+import static foam.mlang.MLang.EQ;
 
 public class Boot {
   protected DAO serviceDAO_;
@@ -23,11 +31,18 @@ public class Boot {
   }
 
   public Boot(String datadir) {
+    Logger logger = new ProxyLogger(new StdoutLogger());
+    root_.put("logger", logger);
+
+    if ( datadir == null || datadir == "" ) {
+      datadir = System.getProperty("JOURNAL_HOME");
+    }
+
     root_.put(foam.nanos.fs.Storage.class,
-              new foam.nanos.fs.Storage(datadir));
+        new foam.nanos.fs.Storage(datadir));
 
     // Used for all the services that will be required when Booting
-    serviceDAO_ = new JDAO(((foam.core.ProxyX)root_).getX(), NSpec.getOwnClassInfo(), "services");
+    serviceDAO_ = new JDAO(((foam.core.ProxyX) root_).getX(), NSpec.getOwnClassInfo(), "services");
 
     installSystemUser();
 
@@ -35,7 +50,7 @@ public class Boot {
       @Override
       public void put(Object obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
-        System.out.println("Registering: " + sp.getName());
+        logger.info("Registering:", sp.getName());
         root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory((ProxyX) root_, sp)));
       }
     });
@@ -48,13 +63,16 @@ public class Boot {
     // Export the ServiceDAO
     ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(
         new foam.dao.PMDAO(new foam.dao.AuthenticatedDAO("service", false, serviceDAO_)));
+    // 'read' authenticated version - for dig and docs
+    ((ProxyDAO) root_.get("AuthenticatedNSpecDAO")).setDelegate(
+        new foam.dao.PMDAO(new foam.dao.AuthenticatedDAO("service", true, (DAO) root_.get("nSpecDAO"))));
 
     serviceDAO_.where(EQ(NSpec.LAZY, false)).select(new AbstractSink() {
       @Override
       public void put(Object obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
 
-        System.out.println("Starting: " + sp.getName());
+        logger.info("Starting:", sp.getName());
         root_.get(sp.getName());
       }
     });
@@ -86,7 +104,7 @@ public class Boot {
   public X getX() { return root_; }
 
   public static void main (String[] args)
-      throws java.lang.Exception
+    throws java.lang.Exception
   {
     System.out.println("Starting Nanos Server");
 

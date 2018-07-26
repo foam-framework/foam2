@@ -61,7 +61,6 @@ externalFile.blacklist.forEach(function(cls) {
 
   // These have hand written java impls so we don't want to clobber them.
   // TODO: Change gen.sh to prefer hand written java files over generated.
-  'foam.dao.FilteredDAO',
   'foam.dao.LimitedDAO',
   'foam.dao.OrderedDAO',
   'foam.dao.SkipDAO',
@@ -91,7 +90,6 @@ externalFile.blacklist.forEach(function(cls) {
   'foam.dao.DecoratedDAO',
   'foam.dao.DeDupDAO',
   'foam.dao.IDBDAO',
-  'foam.dao.JDAO',
   'foam.dao.LoggingDAO',
   'foam.dao.MDAO',
   'foam.dao.PromisedDAO',
@@ -255,30 +253,34 @@ var addDepsToClasses = function() {
 
   console.log(Object.keys(paths));
 
-  var X = foam.classloader.NodeJsModelExecutor.create({
-    classpaths: Object.keys(paths)
-  }).__subContext__;
-    return Promise.all(classes.map(function(cls) {
-      return X.arequire(cls);
-    })).then(function() {
-      var classMap = {};
-      var classQueue = classes.slice(0);
-      while ( classQueue.length ) {
-        var cls = classQueue.pop();
-        if ( ! classMap[cls] && ! blacklist[cls] ) {
-          classMap[cls] = true;
-          cls = foam.lookup(cls);
-          cls.getAxiomsByClass(foam.core.Requires).forEach(function(r) {
-            r.javaPath && classQueue.push(r.javaPath);
-          });
-          cls.getAxiomsByClass(foam.core.Implements).forEach(function(r) {
-            classQueue.push(r.path);
-          });
-          if ( cls.model_.extends ) classQueue.push(cls.model_.extends);
-        }
+  var flagFilter = foam.util.flagFilter(['java']);
+
+  var classloader = foam.__context__.classloader;
+  Object.keys(paths).forEach(function(p) {
+    classloader.addClassPath(p);
+  });
+
+  return Promise.all(classes.map(function(cls) {
+    return classloader.load(cls);
+  })).then(function() {
+    var classMap = {};
+    var classQueue = classes.slice(0);
+    while ( classQueue.length ) {
+      var cls = classQueue.pop();
+      if ( ! classMap[cls] && ! blacklist[cls] ) {
+        classMap[cls] = true;
+        cls = foam.lookup(cls);
+        cls.getAxiomsByClass(foam.core.Requires).filter(flagFilter).forEach(function(r) {
+          r.javaPath && classQueue.push(r.javaPath);
+        });
+        cls.getAxiomsByClass(foam.core.Implements).filter(flagFilter).forEach(function(r) {
+          classQueue.push(r.path);
+        });
+        if ( cls.model_.extends ) classQueue.push(cls.model_.extends);
       }
-      classes = Object.keys(classMap);
-    });
+    }
+    classes = Object.keys(classMap);
+  });
 };
 
 addDepsToClasses().then(function() {

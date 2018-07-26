@@ -6,6 +6,7 @@
 
 foam.INTERFACE({
   refines: 'foam.blob.Blob',
+  flags: ['java'],
 
   methods: [
     {
@@ -29,12 +30,18 @@ foam.INTERFACE({
     {
       name: 'getSize',
       javaReturns: 'long'
+    },
+    {
+      name: 'close',
+      javaReturns: 'void',
+      javaThrows: [ 'java.io.IOException' ]
     }
   ]
 });
 
 foam.INTERFACE({
   refines: 'foam.blob.BlobService',
+  flags: ['java'],
 
   methods: [
     {
@@ -114,6 +121,7 @@ foam.INTERFACE({
 
 foam.CLASS({
   refines: 'foam.blob.AbstractBlob',
+  flags: ['java'],
 
   methods: [
     {
@@ -134,12 +142,17 @@ foam.CLASS({
         }
       ],
       javaCode: 'return new SubBlob(this, offset, length);'
+    },
+    {
+      name: 'close',
+      javaCode: 'return;'
     }
   ]
 });
 
 foam.CLASS({
   refines: 'foam.blob.AbstractBlobService',
+  flags: ['java'],
 
   methods: [
     {
@@ -159,6 +172,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.blob.SubBlob',
+  flags: ['java'],
 
   methods: [
     {
@@ -176,12 +190,14 @@ return getParent().read(out, offset, length);`
 
 foam.CLASS({
   refines: 'foam.blob.BlobStore',
+  flags: ['java'],
 
   javaImports: [
     'org.apache.commons.io.IOUtils',
-    'org.apache.geronimo.mail.util.Hex',
+    'org.apache.commons.codec.binary.Hex',
     'java.io.File',
-    'java.io.FileOutputStream'
+    'java.io.FileOutputStream',
+    'foam.nanos.fs.Storage'
   ],
 
   constants: [
@@ -193,9 +209,8 @@ foam.CLASS({
   ],
 
   properties: [
-    { class: 'String', name: 'root', javaFactory: 'return System.getProperty(\"user.dir\");'},
-    { class: 'String', name: 'tmp', javaFactory: 'return getRoot() + File.separator + "tmp";' },
-    { class: 'String', name: 'sha256', javaFactory: 'return getRoot() + File.separator + "sha256";' }
+    { class: 'String', name: 'tmp', javaFactory: 'return File.separator + "tmp";' },
+    { class: 'String', name: 'sha256', javaFactory: 'return File.separator + "sha256";' }
   ],
 
   methods: [
@@ -206,19 +221,18 @@ foam.CLASS({
   return blob;
 }
 
-this.setup();
-
+this.setup(x);
 HashingOutputStream os = null;
 
 try {
   long size = blob.getSize();
-  File tmp = allocateTmp(1);
+  File tmp = allocateTmp(x, 1);
   os = new HashingOutputStream(new FileOutputStream(tmp));
   blob.read(os, 0, size);
   os.close();
 
-  String digest = new String(Hex.encode(os.digest()));
-  File dest = new File(sha256_ + File.separator + digest);
+  String digest = new String(Hex.encodeHexString(os.digest()));
+  File dest = x.get(Storage.class).get(getSha256() + File.separator + digest);
   tmp.renameTo(dest);
 
   IdentifiedBlob result = new IdentifiedBlob();
@@ -235,12 +249,12 @@ try {
       name: 'find_',
       javaCode:
 `try {
-  this.setup();
+  this.setup(x);
   if ( ((String) id).indexOf(File.separatorChar) != -1 ) {
     throw new RuntimeException("Invalid file name");
   }
 
-  File file = new File(getSha256() + File.separator + id);
+  File file = x.get(Storage.class).get(getSha256() + File.separator + id);
   if ( ! file.exists() ) {
     throw new RuntimeException("File does not exist");
   }
@@ -261,12 +275,17 @@ try {
     {
       name: 'setup',
       javaReturns: 'void',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        }
+      ],
       javaCode:
 `if ( this.getIsSet() )
   return;
-ensureDir(getRoot());
-ensureDir(getTmp());
-ensureDir(getSha256());
+ensureDir(x, getTmp());
+ensureDir(x, getSha256());
 setIsSet(true);`
     },
     {
@@ -274,12 +293,16 @@ setIsSet(true);`
       javaReturns: 'void',
       args: [
         {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
           name: 'path',
           javaType: 'String'
         }
       ],
       javaCode:
-`File parsed = new File(path);
+`File parsed = x.get(Storage.class).get(path);
 if ( parsed.exists() && parsed.isDirectory() ) {
   return;
 }
@@ -293,15 +316,19 @@ if ( ! parsed.mkdirs() ) {
       javaReturns: 'File',
       args: [
         {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
           name: 'name',
           javaType: 'long'
         }
       ],
       javaCode:
 `String path = this.tmp_ + File.separator + (name++);
-File file = new File(path);
+File file = x.get(Storage.class).get(path);
 if ( file.exists() ) {
-  return allocateTmp(name);
+  return allocateTmp(x, name);
 }
 return file;`
     }

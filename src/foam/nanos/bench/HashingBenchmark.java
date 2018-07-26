@@ -8,7 +8,7 @@ package foam.nanos.bench;
 
 import foam.core.X;
 import foam.dao.DAO;
-import foam.dao.ListSink;
+import foam.dao.ArraySink;
 import foam.dao.Sink;
 import foam.nanos.auth.User;
 
@@ -24,9 +24,9 @@ public class HashingBenchmark
   public void setup(X x) {
     userDAO_ = (DAO) x.get("localUserDAO");
 
-    Sink sink = new ListSink();
+    Sink sink = new ArraySink();
     sink = userDAO_.select(sink);
-    users = ((ListSink) sink).getData();
+    users = ((ArraySink) sink).getArray();
   }
 
   @Override

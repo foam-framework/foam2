@@ -17,29 +17,28 @@
 
 package foam.lib.parse;
 
-public class Literal implements Parser {
-  private String string;
-  private Object value;
+public class Literal
+  implements Parser
+{
+  protected String string_;
+  protected Object value_;
 
   public Literal(String s) {
     this(s, s);
   }
 
   public Literal(String s, Object v) {
-    string = s;
-    value = v;
+    string_ = s;
+    value_  = v;
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    for ( int i = 0 ; i < string.length() ; i++ ) {
-      if ( ! ps.valid() ||
-           ps.head() != string.charAt(i) ) {
-        return null;
-      }
+    for ( int i = 0 ; i < string_.length() ; i++ ) {
+      if ( ! ps.valid() || ps.head() != string_.charAt(i) ) return null;
 
       ps = ps.tail();
     }
 
-    return ps.setValue(value);
+    return ps.setValue(value_);
   }
 }

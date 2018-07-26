@@ -21,19 +21,15 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
+    'foam.dao.FnSink',
     'foam.mlang.Constant',
     'foam.mlang.predicate.True',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.GroupBy',
-    'foam.dao.FnSink',
     'foam.u2.view.ChoiceView'
   ],
 
-  css: `
-    ^ select {
-      min-width: 220px;
-    }
-  `,
+  css: "^ select { min-width: 220px; }",
 
   properties: [
     {
@@ -123,10 +119,8 @@ foam.CLASS({
           } catch(x) {}
         })
         .on('mouseout', function(e) {
-          if ( e.relatedTarget && e.relatedTarget.nodeName === 'OPTION' ) return;
-          self.view.data   = self.hardData;
-          self.hardData    = undefined;
-          self.previewMode = false;
+          self.view.data = self.hardData;
+          if ( ! self.hardData ) self.view.data = '';
         })
         .onDetach(
           this.dao$proxy.listen(

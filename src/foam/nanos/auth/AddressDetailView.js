@@ -17,12 +17,12 @@ foam.CLASS({
     ^ {
       height: auto;
     }
-    
+
     ^ .address-container{
       background: white;
       padding: 4px 25px;
       margin-bottom: 20px;
-    } 
+    }
     ^ .input-container-half{
       width: 46%;
       display: inline-block;
@@ -81,8 +81,7 @@ foam.CLASS({
       margin-top: 10px;
     }
 
-    
-    ^ p{
+    ^ p {
       font-size: 10px;
       color: #093649;
       font-weight: 300;
@@ -101,6 +100,7 @@ foam.CLASS({
       color: #093649;
     }
   `,
+
   properties: [
     {
       class: 'Boolean',
@@ -113,6 +113,7 @@ foam.CLASS({
       value: true
     }
   ],
+
   methods: [
     function initE() {
       this.SUPER();
@@ -173,12 +174,12 @@ foam.CLASS({
           .start().addClass('input-container-half')
             .start('label').add('Province').end()
             .start(this.Address.REGION_ID).end()
-          .end()    
+          .end()
           .start().addClass('input-container-half')
             .start('label').add('Postal Code').end()
             .start(this.Address.POSTAL_CODE).end()
           .end()
-        .end()
+        .end();
     }
   ]
 });

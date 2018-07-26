@@ -80,7 +80,7 @@ foam.CLASS({
       .endContext()
       */
       this.
-      addClass(this.myCls()).
+      addClass(this.myClass()).
       start('table').
         start('tr').
           start('td').style({'vertical-align': 'top', 'width': '100%'}).

@@ -20,6 +20,15 @@ public class SkipDAO
   public SkipDAO(long skip, DAO delegate) {
     skip_ = skip;
     setDelegate(delegate);
+    if ( delegate instanceof ProxyDAO ) {
+      setX(((ProxyDAO)delegate).getX());
+    }
+  }
+
+  public SkipDAO(X x, long skip, DAO delegate) {
+    skip_ = skip;
+    setDelegate(delegate);
+    setX(x);
   }
 
   public SkipDAO setSkip(long skip) {

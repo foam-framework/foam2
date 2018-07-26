@@ -250,8 +250,8 @@ foam.CLASS({
 
   methods: [
     function toDatastoreOrder(opt_orderDirection) {
-      var order1 = this.arg1.toDatastoreOrder(opt_orderDirection);
-      var order2 = this.arg2.toDatastoreOrder(opt_orderDirection);
+      var order1 = this.head.toDatastoreOrder(opt_orderDirection);
+      var order2 = this.tail.toDatastoreOrder(opt_orderDirection);
       return order1.concat(order2);
     }
   ]

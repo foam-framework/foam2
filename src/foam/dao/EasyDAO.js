@@ -111,6 +111,13 @@ if ( getContextualize() ) {
     build();
 }
 
+if ( getAuthenticate() ) {
+  delegate = new foam.dao.AuthenticatedDAO(
+    getName(),
+    getAuthenticateRead(),
+    delegate);
+}
+
 if ( getPm() ) {
   delegate = new foam.dao.PMDAO(delegate);
 }
@@ -155,6 +162,18 @@ return delegate;
       name: 'cache',
       generateJava: false,
       value: false
+    },
+    {
+      /** Enable standard authentication. */
+      class: 'Boolean',
+      name: 'authenticate',
+      value: true
+    },
+    {
+      /** Enable standard read authentication. */
+      class: 'Boolean',
+      name: 'authenticateRead',
+      value: true
     },
     {
       /** Enable value de-duplication to save memory when caching. */

@@ -183,7 +183,6 @@ foam.CLASS({
 
   requires: [
     'foam.dao.DedupSink',
-    'foam.dao.FlowControl',
     'foam.dao.LimitedSink',
     'foam.dao.OrderedSink',
     'foam.dao.SkipSink'

@@ -20,20 +20,25 @@ foam.CLASS({
 
   requires: [
     {
-      name: 'Parser',
       path: 'foam.json.Parser',
-      swiftPath: 'foam.swift.parse.json.FObjectParser',
+      flags: ['js'],
     },
     {
-      name: 'HTTPRequest',
       path: 'foam.net.web.HTTPRequest',
-      swiftPath: '',
+      flags: ['js'],
     },
     {
-      name: 'Outputter',
       path: 'foam.json.Outputter',
-      swiftPath: 'foam.swift.parse.json.output.Outputter',
-      javaPath: '',
+      flags: ['js'],
+    },
+    {
+      path: 'foam.swift.parse.json.FObjectParser',
+      flags: ['swift'],
+    },
+    {
+      name: 'SwiftOutputter',
+      path: 'foam.swift.parse.json.output.Outputter',
+      flags: ['swift'],
     },
     'foam.box.HTTPReplyBox',
   ],
@@ -61,7 +66,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.json.Parser',
-      swiftType: 'FObjectParser',
+      swiftType: 'foam_swift_parse_json_FObjectParser',
       name: 'parser',
       generateJava: false,
       factory: function() {
@@ -74,14 +79,15 @@ foam.CLASS({
             this.creationContext
         });
       },
-      swiftFactory: 'return Parser_create()',
+      swiftFactory: 'return FObjectParser_create()',
     },
     {
       class: 'FObjectProperty',
       of: 'foam.json.Outputter',
+      swiftType: 'foam_swift_parse_json_output_Outputter',
       name: 'outputter',
       generateJava: false,
-      swiftFactory: 'return Outputter_create()',
+      swiftFactory: 'return SwiftOutputter_create()',
       factory: function() {
         return this.Outputter.create().copyFrom(foam.json.Network);
       }
@@ -162,12 +168,12 @@ protected class ResponseThread implements Runnable {
         });
       },
       swiftCode: function() {/*
-let replyBox = msg.attributes["replyBox"] as? Box
+let replyBox = msg.attributes["replyBox"] as? foam_box_Box
 msg.attributes["replyBox"] = HTTPReplyBox_create()
 
 var request = URLRequest(url: Foundation.URL(string: self.url)!)
 request.httpMethod = "POST"
-request.httpBody = outputter?.swiftStringify(msg).data(using: .utf8)
+request.httpBody = outputter.swiftStringify(msg).data(using: .utf8)
 
 msg.attributes["replyBox"] = replyBox
 
@@ -177,12 +183,12 @@ let task = URLSession.shared.dataTask(with: request) { data, response, error in
       throw FoamError("HTTPBox no response")
     }
     guard let str = String(data: data, encoding: .utf8),
-          let obj = self.parser.parseString(str) as? Message else {
+          let obj = self.parser.parseString(str) as? foam_box_Message else {
       throw FoamError("Failed to parse HTTPBox response")
     }
     try replyBox?.send(obj)
   } catch let e {
-    try? replyBox?.send(self.__context__.create(Message.self, args: ["object": e])!)
+    try? replyBox?.send(self.__context__.create(foam_box_Message.self, args: ["object": e])!)
   }
 }
 task.resume()

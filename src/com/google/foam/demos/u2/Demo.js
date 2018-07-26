@@ -5,44 +5,6 @@
  */
 
 foam.CLASS({
-  name: 'AddressDetailView',
-  extends: 'foam.u2.View',
-
-  requires: [ 'foam.nanos.auth.Address' ],
-
-  css: `
-    ^ {
-      background: white;
-      width: 200px;
-      border: 2px solid gray;
-    }
-  `,
-
-  methods: [
-    function initE() {
-      this.SUPER();
-
-      this.
-        addClass(this.myClass()).
-        add('My Custom Address View').
-        add(this.data.SUITE.label, this.data.SUITE).
-        add(this.data.CITY.label, this.data.CITY).
-        add(this.data.POSTAL_CODE.label, this.data.POSTAL_CODE).
-        add(this.data.COUNTRY_ID.label, this.data.COUNTRY_ID).
-        add(this.data.REGION_ID.label, this.data.REGION_ID);
-//        add(this.data.ADDRESS.label, this.data.ADDRESS);
-    }
-  ]
-});
-
-var address = foam.nanos.auth.Address.create();
-var dv1 = foam.u2.DetailView.create({data: address});
-var dv2 = AddressDetailView.create({data: address});
-
-dv1.write(document);
-dv2.write(document);
-
-foam.CLASS({
   name: 'Something',
 
   requires: [

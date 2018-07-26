@@ -13,7 +13,8 @@
    properties: [
      {
        class: 'String',
-       name: 'id'
+       name: 'id',
+       tableWidth: 400
      },
      {
        class: 'String',

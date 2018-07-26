@@ -9,7 +9,7 @@ package foam.box;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.auth.AuthService;
-import foam.nanos.auth.Group;
+import foam.nanos.auth.*;
 import foam.nanos.boot.NSpec;
 import foam.nanos.logger.*;
 import foam.nanos.session.Session;
@@ -47,16 +47,15 @@ public class SessionServerBox
           session.setContext(getX().put(Session.class, session));
         }
 
-        X x = session.getContext().put(
+        User user = (User) session.getContext().get("user");
+        X    x    = session.getContext().put(
             "logger",
             new PrefixLogger(
-                new Object[] { "[Service]", spec.getName() },
+                new Object[] { user == null ? "" : user.getId() + " - " + user.label(), "[Service]", spec.getName() },
                 (Logger) session.getContext().get("logger")));
 
         session.setLastUsed(new Date());
         session.setUses(session.getUses()+1);
-
-        sessionDAO.put(session);
 
         if ( authenticate_ && session.getUserId() == 0 ) {
           msg.replyWithException(new AccessControlException("Not logged in"));
@@ -64,11 +63,15 @@ public class SessionServerBox
         }
 
         if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
-          Group group = x.get(Group.class);
-          ((Logger) x.get("logger")).debug("missing permission", group.getId(), "service." + spec.getName());
+          DAO    groupDAO = (DAO) x.get("groupDAO");
+          Group  group    = (Group) groupDAO.find(user.getGroup());
+          Logger logger   = (Logger) x.get("logger");
+          logger.debug("missing permission", group.getId(), "service." + spec.getName());
           // msg.replyWithException(new NoPermissionException("No permission"));
           // return;
         }
+
+        if ( user != null ) sessionDAO.put(session);
 
         msg.getLocalAttributes().put("x", x);
       }

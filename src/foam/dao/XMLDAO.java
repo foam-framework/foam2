@@ -72,14 +72,14 @@ public class XMLDAO
   }
 
   public synchronized void saveToXML () {
-    ListSink ls = (ListSink) select(new ListSink());
+    ArraySink ls = (ArraySink) select(new ArraySink());
 
     try {
       DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
       DocumentBuilder        dBuilder  = dbFactory.newDocumentBuilder();
       Document               doc       = dBuilder.newDocument();
 
-      XMLSupport.toXML(ls.getData(), doc, null);
+      XMLSupport.toXML(ls.getArray(), doc, null);
       XMLSupport.toXMLFile(doc, fileName);
     } catch (ParserConfigurationException ex) {
     }

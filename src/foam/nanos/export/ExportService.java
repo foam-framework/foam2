@@ -11,7 +11,6 @@ import foam.dao.JDAO;
 import foam.dao.MapDAO;
 import foam.dao.ProxyDAO;
 import foam.nanos.NanoService;
-import java.io.IOException;
 
 public class ExportService
   extends    ProxyDAO

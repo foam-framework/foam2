@@ -1,21 +1,5 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-/**
- * @license
  * Copyright 2018 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
@@ -142,7 +126,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function init() {
+    function initRelationship() {
       var sourceProp;
       var targetProp;
       var cardinality   = this.cardinality;
@@ -246,6 +230,8 @@ foam.CLASS({
         };
       }
       */
+      foam.package.registerClass(this);
+      return this;
     }
   ]
 });
@@ -256,10 +242,8 @@ foam.LIB({
   methods: [
     function RELATIONSHIP(m, opt_ctx) {
       var r = foam.dao.Relationship.create(m, opt_ctx);
-
       r.validate && r.validate();
-      foam.package.registerClass(r);
-
+      r.initRelationship();
       return r;
     }
   ]
@@ -273,6 +257,8 @@ foam.INTERFACE({
       name: 'add',
       returns: 'Promise',
       javaReturns: 'void',
+      swiftReturns: 'Void',
+      swiftThrows: true,
       args: [
         { name: 'target', of: 'foam.core.FObject' }
       ]
@@ -281,20 +267,28 @@ foam.INTERFACE({
       name: 'remove',
       returns: 'Promise',
       javaReturns: 'void',
+      swiftReturns: 'Void',
+      swiftThrows: true,
       args: [
         { name: 'target', of: 'foam.core.FObject' }
       ]
     },
+    // TODO: These should really be properties.
     {
       name: 'getDAO',
-      returns: 'foam.dao.DAO',
-      javaReturns: 'foam.dao.DAO'
+      javaReturns: 'foam.dao.DAO',
+      swiftReturns: 'foam_dao_DAO'
     },
     {
       name: 'getJunctionDAO',
-      returns: 'foam.dao.DAO',
-      javaReturns: 'foam.dao.DAO'
-    }
+      javaReturns: 'foam.dao.DAO',
+      swiftReturns: 'foam_dao_DAO'
+    },
+    {
+      name: 'getTargetDAO',
+      javaReturns: 'foam.dao.DAO',
+      swiftReturns: 'foam_dao_DAO'
+    },
   ]
 });
 
@@ -326,12 +320,14 @@ foam.CLASS({
     {
       class: 'Object',
       javaType: 'foam.core.PropertyInfo',
+      swiftType: 'PropertyInfo',
       name: 'targetProperty',
       hidden: true
     },
     {
       class: 'Object',
       javaType: 'foam.core.PropertyInfo',
+      swiftType: 'PropertyInfo',
       name: 'sourceProperty',
       hidden: true
     },
@@ -352,7 +348,15 @@ foam.CLASS({
     setRelationship(this).
     setDelegate((foam.dao.DAO)getX().get(getTargetDAOKey())).
     build()).
-  build();`
+  build();`,
+
+      swiftFactory:
+`return __context__.create(foam_dao_ReadOnlyDAO.self, args: [
+  "delegate": __context__.create(foam_dao_ManyToManyRelationshipDAO.self, args: [
+    "relationship": self,
+    "delegate": __context__[targetDAOKey]
+  ])
+])`
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -361,28 +365,42 @@ foam.CLASS({
       factory: function() {
         return this.__context__[this.junctionDAOKey];
       },
-      javaFactory: 'return (foam.dao.DAO)getX().get(getJunctionDAOKey());'
+      javaFactory: 'return (foam.dao.DAO)getX().get(getJunctionDAOKey());',
+      swiftFactory: 'return __context__[junctionDAOKey] as? (foam_dao_DAO & foam_core_FObject)'
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'targetDAO',
+      hidden: true,
+      factory: function() {
+        return this.__context__[this.targetDAOKey];
+      },
+      javaFactory: 'return (foam.dao.DAO)getX().get(getTargetDAOKey());',
+      swiftFactory: 'return __context__[targetDAOKey] as? (foam_dao_DAO & foam_core_FObject)'
     }
   ],
+
   methods: [
     {
       name: 'add',
       args: [ { name: 'target', of: 'foam.core.FObject' } ],
       javaCode: 'getJunctionDAO().put(createJunction(((foam.core.Identifiable)target).getPrimaryKey()));',
+      swiftCode: 'try junctionDAO!.put(createJunction((target as? foam_core_Identifiable)?.getPrimaryKey()))',
       code: function add(target) {
         return this.junctionDAO.put(this.createJunction(target.id));
       }
     },
     {
       name: 'remove',
-      javaCode: 'getJunctionDAO().put(createJunction(((foam.core.Identifiable)target).getPrimaryKey()));',
+      javaCode: 'getJunctionDAO().remove(createJunction(((foam.core.Identifiable)target).getPrimaryKey()));',
+      swiftCode: 'try junctionDAO!.remove(createJunction((target as? foam_core_Identifiable)?.getPrimaryKey()))',
       code: function remove(target) {
         return this.junctionDAO.remove(this.createJunction(target.id));
       }
     },
     {
       name: 'createJunction',
-      args: [ { name: 'targetId', of: 'Object' } ],
+      args: [ { name: 'targetId', javaType: 'Object' } ],
       returns: 'foam.core.FObject',
       javaReturns: 'foam.core.FObject',
       code: function createJunction(targetId) {
@@ -397,14 +415,19 @@ foam.CLASS({
       javaCode: `foam.core.FObject junction = (foam.core.FObject)getX().create(getJunction().getObjClass());
 getTargetProperty().set(junction, targetId);
 getSourceProperty().set(junction, getSourceId());
-return junction;
-`
+return junction;`,
+
+      swiftCode: `let junction: foam_core_FObject = self.junction.create(x: __context__) as! foam_core_FObject
+targetProperty.set(junction, value: targetId)
+sourceProperty.set(junction, value: sourceId)
+return junction`
     },
     {
       // TODO: Should we remove this, or maybe just the java portion?
       name: 'getDAO',
       returns: 'foam.dao.DAO',
       javaCode: 'return getDao();',
+      swiftCode: 'return dao!',
       code: function getDAO() { return this.dao; }
     }
   ],
@@ -467,6 +490,7 @@ foam.CLASS({
     ['tableCellFormatter', null],
     ['cloneProperty', function(value, map){}],
     ['javaCloneProperty', '//noop'],
+    ['javaDiffProperty', '//noop'],
     {
       class: 'String',
       name: 'targetPropertyName',
@@ -519,9 +543,11 @@ foam.CLASS({
   properties: [
     ['of', 'foam.dao.ManyToManyRelationship'],
     ['transient', true],
+    ['javaInfoType', 'foam.core.AbstractFObjectRelationshipPropertyInfo'],
     ['tableCellFormatter', null],
     ['cloneProperty', function(value, map) {}],
     ['javaCloneProperty', '//noop'],
+    ['javaDiffProperty', '//noop'],
     ['view', { class: 'foam.u2.DetailView', showActions: true } ],
     {
       class: 'Class',
@@ -546,9 +572,9 @@ foam.CLASS({
       factory: function() {
         var sourceProperty = this.sourceProperty;
         var targetProperty = this.targetProperty;
-        var targetDAOKey = this.targetDAOKey;
+        var targetDAOKey   = this.targetDAOKey;
         var junctionDAOKey = this.junctionDAOKey;
-        var junction = this.junction;
+        var junction       = this.junction;
 
         return function(id) {
           return foam.dao.ManyToManyRelationshipImpl.create({
@@ -575,6 +601,28 @@ foam.CLASS({
   build();
 `;
       }
+    },
+    {
+      name: 'swiftFactory',
+      factory: function () {
+        return `return __context__.create(foam_dao_ManyToManyRelationshipImpl.self, args: [
+      "sourceId": id,
+      "sourceProperty": ${this.sourceProperty.sourceCls_.model_.swiftName}.${foam.String.constantize(this.sourceProperty.name)}(),
+      "targetProperty": ${this.sourceProperty.sourceCls_.model_.swiftName}.${foam.String.constantize(this.targetProperty.name)}(),
+      "targetDAOKey": "${this.targetDAOKey}",
+      "junctionDAOKey": "${this.junctionDAOKey}",
+      "junction": ${this.sourceProperty.sourceCls_.model_.swiftName}.classInfo()
+    ]);
+`;
+      }
+    }
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      info.getMethod('compare').body = `return 0;`
+      return info;
     }
   ]
 });

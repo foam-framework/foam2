@@ -16,7 +16,7 @@ import java.security.*;
 public class SigningOutputStream
     extends OutputStream
 {
-  protected Signature sig_;
+  protected Signature    sig_;
   protected OutputStream out_;
 
   /**

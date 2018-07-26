@@ -57,10 +57,21 @@ foam.CLASS({
       installInClass: function(c) {
         var oldCreate = c.create;
         c.create = function(args, X) {
-          var cls = args.forClass_;
+          var clsName = args.forClass_;
           var name = args.name;
 
-          var prop = X.lookup(cls).getAxiomByName(name);
+          var cls = X.lookup(clsName, true);
+
+          // If we failed to find the class, try to deserialize the old format
+          // where forClass_ contains the full path to the property: foo.bar.Pereson.lastName
+          if ( ! cls ) {
+            clsName = args.forClass_.substring(0, args.forClass_.lastIndexOf('.'));
+            name = args.forClass_.substring(args.forClass_.lastIndexOf('.') + 1);
+
+            cls = X.lookup(clsName);
+          }
+
+          var prop = cls.getAxiomByName(name);
 
           foam.assert(prop, 'Could not find property "', args.forClass_ + '.' + name, '"');
 
@@ -70,6 +81,19 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.CLASS({
+  name: '__Class__',
+  package: 'foam.core',
+  axioms: [
+    {
+      name: 'create',
+      installInClass: function(clsName) { return X.lookup(clsName, true); }
+    }
+  ]
+});
+
 
 /** Add toJSON() method to FObject. **/
 foam.CLASS({
@@ -707,7 +731,13 @@ foam.LIB({
 
               o[key] = json.name;
               continue;
-            } else if ( ( key === 'of' || key === 'class' || key == 'view' ) &&
+            } else if ( (
+                key === 'of' ||
+                key === 'class' ||
+                key == 'view' ||
+                key == 'sourceModel' ||
+                key == 'targetModel' ||
+                key == 'refines' ) &&
                         foam.String.isInstance(o[key]) ) {
               r.push(x.classloader.maybeLoad(o[key]));
               continue;

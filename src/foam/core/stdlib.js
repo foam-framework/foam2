@@ -265,7 +265,7 @@ foam.LIB({
       var str = f.
           toString().
           replace(/(\r\n|\n|\r)/gm,'');
-      var isArrowFunction = str.indexOf('function') !== 0;
+      var isArrowFunction = !/(async )?function/.test(str);
 
       var match = isArrowFunction ?
           // (...args...) => ...
@@ -273,14 +273,14 @@ foam.LIB({
           // arg => ...
           match = str.match(/^(\(([^)]*)\)[^=]*|([^=]+))=>/) :
           // function (...args...) { ...body... }
-          match = str.match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
+          match = str.match(/^(async )?function(\s+[_$\w]+|\s*)\((.*?)\)/);
 
       if ( ! match ) {
         /* istanbul ignore next */
         throw new TypeError("foam.Function.argsStr could not parse input function:\n" + ( f ? f.toString() : 'undefined' ) );
       }
 
-      return isArrowFunction ? (match[2] || match[1] || '') : (match[2] || '');
+      return isArrowFunction ? (match[2] || match[1] || '') : (match[3] || '');
     },
 
     function argNames(f) {
@@ -756,7 +756,7 @@ foam.LIB({
     function is(a, b) { return a === b; },
     function isInstance(o) {
       return typeof o === 'object' && ! Array.isArray(o) &&
-          ! foam.core.FObject.isInstance(o);
+          ! foam.core.FObject.isInstance(o) && ! foam.Null.isInstance(o);
     },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
@@ -837,7 +837,7 @@ foam.LIB({
       var uid = '__mmethod__' + foam.next$UID() + '__';
 
       var first = true;
-      return function(arg1) {
+      var f = function(arg1) {
         if ( first ) {
           for ( var key in map ) {
             var type = key === 'FObject' ?
@@ -863,6 +863,26 @@ foam.LIB({
         }
         return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
       };
+      // The native toString on the function that's returned will never work on
+      // its own because the args and vars declared above it won't exist so
+      // toString is overwritten to output a call to foam.mmethod with the
+      // original args.
+      f.toString = function() {
+        var mapString = '{';
+        var first = true;
+        for ( var key in map ) {
+          if ( ! first ) mapString += ',';
+          mapString += `"${key}":${map[key].toString()}`;
+          first = false;
+        }
+        mapString += '}';
+
+        var defaultMethodStr = opt_defaultMethod ?
+          opt_defaultMethod.toString() : 'null';
+
+        return `foam.mmethod(${mapString}, ${defaultMethodStr})`;
+      };
+      return f;
     }
   ]
 });
@@ -894,7 +914,17 @@ foam.LIB({
       function diff(a, b)    {
         var t = typeOf(a);
         return t.diff ? t.diff(a, b) : undefined;
-      }
+      },
+      function flagFilter(flags) {
+        return function(a) {
+          if ( ! flags ) return true;
+          if ( ! a.flags ) return true;
+          for ( var i = 0, f; f = flags[i]; i++ ) {
+            if ( a.flags.indexOf(f) != -1 ) return true;
+          }
+          return false;
+        }
+      },
     ]
   });
 })();
@@ -1026,6 +1056,7 @@ foam.LIB({
              c ;
     },
 
+    // Gets replaced in mlang.js
     function compound(args) {
       /* Create a compound comparator from an array of comparators. */
       var cs = args.map(foam.compare.toCompare);

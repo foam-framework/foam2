@@ -40,30 +40,44 @@ public class CompositeLogger
   public void log(Object... args) {
     for ( Logger logger : childLoggers ) {
       logger.log(args);
-    };
+    }
   }
 
   public void info(Object... args) {
     for ( Logger logger : childLoggers ) {
       logger.info(args);
-    };
+    }
   }
 
   public void warning(Object... args) {
     for ( Logger logger : childLoggers ) {
       logger.warning(args);
-    };
+    }
   }
 
   public void error(Object... args) {
     for ( Logger logger : childLoggers ) {
       logger.error(args);
-    };
+    }
   }
 
   public void debug(Object...  args) {
     for ( Logger logger : childLoggers ) {
       logger.debug(args);
-    };
+    }
+  }
+
+  public String toString() {
+    StringBuilder sb = new StringBuilder("CompositeLogger(");
+
+    for ( Logger logger : childLoggers ) {
+      sb.append(logger);
+      sb.append(",");
+    }
+
+    // remove trailing ,
+    sb.setLength(sb.length()-1);
+
+    return sb.append(")").toString();
   }
 }

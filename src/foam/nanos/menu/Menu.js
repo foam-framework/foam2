@@ -8,9 +8,11 @@ foam.CLASS({
   package: 'foam.nanos.menu',
   name: 'Menu',
 
-  imports: [ 'menuListener?' ],
-
   tableColumns: [ 'id', 'parent', 'label', 'order' ],
+
+  imports: [
+    'lastMenuLaunchedListener?'
+  ],
 
   properties: [
     {
@@ -20,24 +22,27 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'label'
+      name: 'label',
+      documentation: 'Menu label.'
     },
     {
       class: 'FObjectProperty',
       name: 'handler',
+      documentation: 'View initialized when menu is launched.',
       view: { class: 'foam.u2.view.FObjectView' }
     },
     {
       class: 'Int',
       name: 'order',
+      documentation: 'Used to order the menu list.',
       value: 1000
     }
   ],
 
   methods: [
     function launch_(X, e) {
+      this.lastMenuLaunchedListener && this.lastMenuLaunchedListener(this);
       this.handler && this.handler.launch(X, this, e);
-      this.menuListener && this.menuListener(this);
     }
   ],
 

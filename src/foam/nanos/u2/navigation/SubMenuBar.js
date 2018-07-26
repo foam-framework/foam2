@@ -23,27 +23,23 @@ foam.CLASS({
 
   documentation: 'Childrens menu dropdown',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^ {
-          width: 100px;
-          vertical-align: top;
-        }
-        ^ ul{
-          margin-top: 20px;
-          font-size: 13px;
-          list-style-type: none;
-        }
-        ^ li{
-          margin-top: 25px;
-        }
-        .highlight{
-          background: blue;
-        }
-      */}
-    })
-  ],
+  css: `
+    ^ {
+      width: 100px;
+      vertical-align: top;
+    }
+    ^ ul{
+      margin-top: 20px;
+      font-size: 13px;
+      list-style-type: none;
+    }
+    ^ li{
+      margin-top: 25px;
+    }
+    .highlight{
+      background: blue;
+    }
+  `,
 
   properties: [
     'data',

@@ -22,7 +22,6 @@ foam.CLASS({
   ],
 
   css:`
-
     ^{
       width: 490px;
       margin: auto;
@@ -113,6 +112,15 @@ foam.CLASS({
     }
   `,
 
+  messages: [
+    { name: 'noSpaces', message: 'Password cannot contain spaces' },
+    { name: 'noNumbers', message: 'Password must have one numeric character' },
+    { name: 'noSpecial', message: 'Password must not contain: !@#$%^&*()_+' },
+    { name: 'emptyPassword', message: 'Please enter new your password' },
+    { name: 'emptyConfirmation', message: 'Please re-enter your new password' },
+    { name: 'invalidLength', message: 'Password must be 7-32 characters long' },
+    { name: 'passwordMismatch', message: 'Passwords do not match' }
+  ],
 
   properties: [
     {
@@ -175,16 +183,6 @@ foam.CLASS({
     }
   ],
 
-  messages: [
-    { name: 'noSpaces', message: 'Password cannot contain spaces' },
-    { name: 'noNumbers', message: 'Password must have one numeric character' },
-    { name: 'noSpecial', message: 'Password must not contain: !@#$%^&*()_+' },
-    { name: 'emptyPassword', message: 'Please enter new your password' },
-    { name: 'emptyConfirmation', message: 'Please re-enter your new password' },
-    { name: 'invalidLength', message: 'Password must be 7-32 characters long' },
-    { name: 'passwordMismatch', message: 'Passwords do not match' }
-  ],
-
   actions: [
     {
       name: 'confirm',
@@ -229,10 +227,10 @@ foam.CLASS({
         }
 
         var user = this.User.create({
-          password: this.newPassword
+          desiredPassword: this.newPassword
         });
 
-        this.resetPasswordToken.processToken(user, this.token).then(function (result) {
+        this.resetPasswordToken.processToken(null, user, this.token).then(function (result) {
           self.stack.push({ class: 'foam.nanos.auth.resetPassword.SuccessView' });
         }).catch(function (err) {
           self.add(self.NotificationMessage.create({ message: err.message, type: 'error' }));

@@ -27,17 +27,14 @@ foam.CLASS({
 
   exports: [ 'as data' ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-      ^ { padding: 10px; }
-      ^ .error { border: 2px solid red; }
-      ^title { font-size: 18px; }
-      ^title, ^ button, ^ input, ^ select {
-        width: 160px; height: 24px; margin: 5px;
-      */}
-    })
-  ],
+  css: `
+    ^ { padding: 10px; }
+    ^ .error { border: 2px solid red; }
+    ^title { font-size: 18px; }
+    ^title, ^ button, ^ input, ^ select {
+      width: 160px; height: 24px; margin: 5px;
+    }
+  `,
 
   properties: [
     {
@@ -81,11 +78,11 @@ foam.CLASS({
       this.SUPER();
       this.nodeName = 'div';
       this.
-          start('div').addClass('^title').add('Book Flight').end().
-          add(this.ONE_WAY).tag('br').
-          add(this.DEPART_DATE).tag('br').
-          start(this.RETURN_DATE).attrs({mode: this.returnDateMode$}).end().tag('br').
-          add(this.BOOK);
+        start('div').addClass('^title').add('Book Flight').end().
+        add(this.ONE_WAY).tag('br').
+        add(this.DEPART_DATE).tag('br').
+        start(this.RETURN_DATE).attrs({mode: this.returnDateMode$}).end().tag('br').
+        add(this.BOOK);
     }
   ],
 

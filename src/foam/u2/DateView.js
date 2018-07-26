@@ -24,10 +24,10 @@ foam.CLASS({
 
   documentation: 'View for editing Date values.',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: '^:read-only { border: none; background: rgba(0,0,0,0); }'
-    })
+  css: '^:read-only { border: none; background: rgba(0,0,0,0); }',
+
+  properties: [
+    [ 'placeholder', 'yyyy-mm-dd' ]
   ],
 
   methods: [

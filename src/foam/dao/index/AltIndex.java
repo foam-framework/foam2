@@ -65,9 +65,10 @@ public class AltIndex
 
 
   public FindPlan planFind(Object state, Object key) {
-    Object[] s = toObjectArray(state);
-    FindPlan bestPlan = NoPlan.instance();
-    Object bestState = null;
+    Object[] s         = toObjectArray(state);
+    FindPlan bestPlan  = NoPlan.instance();
+    Object   bestState = null;
+
     for ( int i = 0 ; i < delegates_.size() ; i++ ) {
       FindPlan plan = delegates_.get(i).planFind(s[i], key);
 
@@ -83,19 +84,23 @@ public class AltIndex
   }
 
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    Object[] s = toObjectArray(state);
-    SelectPlan bestPlan = NoPlan.instance();
-    Object bestState = null;
-    Predicate originPredicate = null;
+    Object[]     s                 = toObjectArray(state);
+    SelectPlan   bestPlan          = NoPlan.instance();
+    Object       bestState         = null;
+    Predicate    originalPredicate = null;
 
     for ( int i = 0; i < delegates_.size(); i++ ) {
-      // To keep the origin predicate, because in our next operate the predicate will be changed
-      if ( predicate != null )
-        originPredicate = (Predicate) ( (FObject) predicate ).deepClone();
-      SelectPlan plan = delegates_.get(i).planSelect(s[i], sink, skip, limit, order, originPredicate);
+      // ???: Why is this?
+      // To keep the original predicate, because in our next operate the predicate will be changed
+      if ( predicate != null ) {
+        originalPredicate = (Predicate) ((FObject) predicate).deepClone();
+      }
+
+      SelectPlan plan = delegates_.get(i).planSelect(s[i], sink, skip, limit, order, originalPredicate);
       bestState = s[i];
+
       if ( plan.cost() < bestPlan.cost() ) {
-        bestPlan = plan;
+        bestPlan  = plan;
         bestState = s[i];
         if ( bestPlan.cost() <= GOOD_ENOUGH_PLAN_COST ) break;
       }

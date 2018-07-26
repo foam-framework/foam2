@@ -1005,13 +1005,18 @@ foam.CLASS({
       x.beginPath();
       x.arc(0, 0, this.radius, this.start, this.end);
 
+      if ( this.start != 0 || this.end != Math.PI*2 ) {
+        x.lineTo(0,0);
+        x.lineTo(this.radius*Math.cos(this.start)+0.5,this.radius*Math.sin(this.start));
+      }
+
       if ( this.color ) x.fill();
 
       if ( this.border ) {
         x.lineWidth = this.arcWidth;
         x.stroke();
       }
-    },
+   },
 
     function toE(X) {
       return this.Canvas.create({ cview: this }, X).attrs({

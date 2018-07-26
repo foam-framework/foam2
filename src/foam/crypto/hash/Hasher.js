@@ -12,6 +12,11 @@ foam.INTERFACE({
 
   methods: [
     {
+      name: 'includeInDigest',
+      javaReturns: 'boolean',
+      documentation: 'Flag to determine if we should include this property as part of the message digest'
+    },
+    {
       name: 'updateDigest',
       args: [
         {

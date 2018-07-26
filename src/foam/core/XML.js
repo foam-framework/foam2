@@ -14,6 +14,11 @@ foam.CLASS({
       value: false
     },
     {
+      class: 'Boolean',
+      name: 'xmlTextNode',
+      value: false
+    },
+    {
       name: 'fromXML',
       value: function fromXML(value, ctx, prop, xml) {
         return foam.xml.parse(value, null, ctx);
@@ -34,6 +39,8 @@ foam.CLASS({
 
 /** Add toXML() method to FObject. **/
 foam.CLASS({
+  package: 'foam.core',
+  name: 'FObjectXMLStringify',
   refines: 'foam.core.FObject',
 
   methods: [

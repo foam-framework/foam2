@@ -17,13 +17,16 @@
 
 package foam.lib.parse;
 
-public class NotChar implements Parser {
-  private char ch;
+public class NotChar
+  implements Parser
+{
+  protected char c_;
+
   public NotChar(char c) {
-    ch = c;
+    c_ = c;
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    return ps.valid() && ps.head() != ch ? ps.tail().setValue(ps.head()) : null;
+    return ps.valid() && ps.head() != c_ ? ps.tail().setValue(ps.head()) : null;
   }
 }

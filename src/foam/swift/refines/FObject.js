@@ -6,8 +6,11 @@
 
 foam.LIB({
   name: 'foam.core.FObject',
+  flags: ['swift'],
   methods: [
     function toSwiftClass() {
+      var axiomFilter = foam.util.flagFilter(['swift']);
+
       if ( !this.model_.generateSwift ) return foam.swift.EmptyClass.create()
       var templates = foam.swift.FObjectTemplates.create();
 
@@ -36,29 +39,16 @@ foam.LIB({
         visibility: 'public',
         code: this.model_.swiftCode,
       });
-      this.getOwnAxioms().forEach(function(axiom) {
-        if ( axiom.writeToSwiftClass ) axiom.writeToSwiftClass(cls, this.getSuperAxiomByName(axiom.name), this);
+      this.getOwnAxioms().filter(axiomFilter).forEach(function(axiom) {
+        if ( axiom.writeToSwiftClass ) axiom.writeToSwiftClass(cls, this);
       }.bind(this));
 
-      var properties = this.getOwnAxiomsByClass(foam.core.Property)
-          .filter(function(p) {
-            return !this.getSuperAxiomByName(p.name);
-          }.bind(this));
-      var methods = this.getOwnAxiomsByClass(foam.core.Method)
-          .filter(function(p) {
-            return p.name != 'init';
-          }.bind(this))
-          .filter(function(p) {
-            return !!p.getSwiftSupport(this);
-          }.bind(this));
-      var actions = this.getOwnAxiomsByClass(foam.core.Action)
-          .filter(function(p) {
-            return !this.getSuperAxiomByName(p.name);
-          }.bind(this));
-
-      var multiton = this.getOwnAxiomsByClass(foam.pattern.Multiton);
+      var multiton = this.getAxiomsByClass(foam.pattern.Multiton);
       multiton = multiton.length ? multiton[0] : null;
-      var singleton = this.getOwnAxiomsByClass(foam.pattern.Singleton)
+      if ( multiton && ! this.hasOwnAxiom(multiton.property) ) {
+        this.getAxiomByName(multiton.property).writeToSwiftClass(cls, this);
+      }
+      var singleton = this.getAxiomsByClass(foam.pattern.Singleton)
       singleton = singleton.length ? singleton[0] : null;
 
       var classInfo = foam.swift.SwiftClass.create({
@@ -103,6 +93,7 @@ foam.LIB({
             type: '[Axiom]',
             defaultValue: '[' +
               this.getOwnAxioms()
+                .filter(axiomFilter)
                 .filter(function(a) {
                   return a.getSwiftSupport ?
                       a.getSwiftSupport(this) : a.swiftSupport
@@ -134,7 +125,7 @@ foam.LIB({
                 type: 'Context',
               }),
             ],
-            body: templates.classInfoCreate(this.model_.swiftName, multiton, singleton),
+            body: templates.classInfoCreate(this.model_.swiftName, multiton, singleton, this),
           }),
           foam.swift.Method.create({
             name: 'axiom',
@@ -148,13 +139,25 @@ foam.LIB({
             ],
             body: 'return nameAxiomMap_[name]',
           }),
+          foam.swift.Method.create({
+            name: 'instanceOf',
+            returnType: 'Bool',
+            args: [
+              foam.swift.Argument.create({
+                externalName: '_',
+                localName: 'o',
+                type: 'Any?',
+              }),
+            ],
+            body: `return o is ${this.model_.swiftName}`,
+          }),
         ],
       });
       if (multiton) {
         classInfo.fields.push(foam.swift.Field.create({
           defaultValue: '[:]',
           lazy: true,
-          type: '[String:FObject]',
+          type: `[${this.getAxiomByName(multiton.property).swiftType}:${foam.core.FObject.model_.swiftName}]`,
           name: 'multitonMap',
         }));
         classInfo.fields.push(foam.swift.Field.create({
@@ -166,7 +169,7 @@ foam.LIB({
       } else if (singleton) {
         classInfo.fields.push(foam.swift.Field.create({
           visibility: 'private',
-          type: 'FObject?',
+          type: foam.core.FObject.model_.swiftName + '?',
           name: 'instance',
         }));
       }
@@ -207,6 +210,17 @@ foam.LIB({
         }));
       }
 
+      // make implement identifiable if has id property
+      if ( this.hasOwnAxiom('id') ) {
+        cls.implements = cls.implements.concat(foam.core.Identifiable.model_.swiftName);
+        cls.methods.push(foam.swift.Method.create({
+          name: 'getPrimaryKey',
+          visibility: 'public',
+          returnType: 'Any?',
+          body: 'return id'
+        }));
+      }
+
       return cls;
     },
   ],
@@ -215,6 +229,7 @@ foam.LIB({
 foam.CLASS({
   package: 'foam.swift',
   name: 'FObjectTemplates',
+  flags: ['swift'],
   templates: [
     {
       name: 'exportsBody',
@@ -229,15 +244,15 @@ return args
     },
     {
       name: 'classInfoCreate',
-      args: ['swiftName', 'multiton', 'singleton',],
+      args: ['swiftName', 'multiton', 'singleton', 'cls'],
       template: function() {/*
 <% if ( multiton ) { %>
-if let key = args[multitonProperty.name] as? String,
+if let key = args[multitonProperty.name] as? <%=cls.getAxiomByName(multiton.property).swiftType%>,
    let value = multitonMap[key] {
   return value
 } else {
   let value = <%=swiftName%>(args, x)
-  if let key = multitonProperty.get(value) as? String {
+  if let key = multitonProperty.get(value) as? <%=cls.getAxiomByName(multiton.property).swiftType%> {
     multitonMap[key] = value
   }
   return value
@@ -280,4 +295,4 @@ return map
       */}
     },
   ],
-})
+});

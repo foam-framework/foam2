@@ -22,9 +22,8 @@ foam.CLASS({
 
   requires: [
     {
-      name: 'RawSocketBox',
+      flags: ['js'],
       path: 'foam.box.RawSocketBox',
-      swiftPath: 'foam.swift.net.RawSocketBox',
     },
   ],
 

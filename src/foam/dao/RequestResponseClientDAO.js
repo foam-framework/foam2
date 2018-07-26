@@ -56,7 +56,7 @@ Suitable for usage against backends that don't support listen(), such as plain H
       if ( ! this.Serializable.isInstance(sink) ) {
         var self = this;
 
-        return this.SUPER(null, null, skip, limit, order, predicate).then(function(result) {
+        return this.SUPER(null, foam.dao.ArraySink.create(), skip, limit, order, predicate).then(function(result) {
           var items = result.array;
 
           if ( ! sink ) return result;

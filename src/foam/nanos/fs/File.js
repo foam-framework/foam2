@@ -35,6 +35,20 @@ foam.CLASS({
       class: 'Blob',
       name: 'data',
       documentation: 'File data'
+    },
+    {
+      class: 'String',
+      name: 'address',
+      transient: true,
+      expression: function (id) {
+        var sessionId = localStorage['defaultSession'];
+        var url = window.location.origin + '/service/httpFileService/' + id
+        // attach session id if available
+        if ( sessionId ) {
+          url += '?sessionId=' + sessionId;
+        }
+        return url;
+      }
     }
   ]
 });

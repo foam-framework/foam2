@@ -7,12 +7,11 @@
 package foam.core;
 
 import foam.util.SafetyUtil;
-
-import javax.xml.stream.XMLStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.Signature;
 import java.security.SignatureException;
+import javax.xml.stream.XMLStreamReader;
 
 public abstract class AbstractStringPropertyInfo
   extends AbstractPropertyInfo
@@ -20,7 +19,7 @@ public abstract class AbstractStringPropertyInfo
   public int compareValues(String o1, String o2) {
     return o1.compareTo(o2);
   }
-  
+
   public abstract int getWidth();
 
   // public void setFromString(Object obj, String value) {
@@ -39,6 +38,7 @@ public abstract class AbstractStringPropertyInfo
 
   @Override
   public void updateDigest(FObject obj, MessageDigest md) {
+    if ( ! includeInDigest() ) return;
     String val = (String) get(obj);
     if ( SafetyUtil.isEmpty(val) ) return;
     md.update(val.getBytes(StandardCharsets.UTF_8));
@@ -46,6 +46,7 @@ public abstract class AbstractStringPropertyInfo
 
   @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {
+    if ( ! includeInSignature() ) return;
     String val = (String) get(obj);
     if ( SafetyUtil.isEmpty(val) ) return;
     sig.update(val.getBytes(StandardCharsets.UTF_8));

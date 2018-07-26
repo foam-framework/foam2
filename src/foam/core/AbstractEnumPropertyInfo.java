@@ -7,19 +7,18 @@
 package foam.core;
 
 import foam.nanos.logger.Logger;
+import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.SignatureException;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.nio.ByteBuffer;
-import java.security.MessageDigest;
-import java.security.Signature;
-import java.security.SignatureException;
-
 public abstract class AbstractEnumPropertyInfo
-    extends AbstractObjectPropertyInfo
+  extends AbstractObjectPropertyInfo
 {
   protected static final ThreadLocal<ByteBuffer> bb = new ThreadLocal<ByteBuffer>() {
     @Override
@@ -79,14 +78,15 @@ public abstract class AbstractEnumPropertyInfo
 
   @Override
   public void updateDigest(FObject obj, MessageDigest md) {
+    if ( ! includeInDigest() ) return;
     int val = getOrdinal(get(obj));
     md.update((ByteBuffer) bb.get().putInt(val).flip());
   }
 
   @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {
+    if ( ! includeInSignature() ) return;
     int val = getOrdinal(get(obj));
     sig.update((ByteBuffer) bb.get().putInt(val).flip());
   }
 }
-

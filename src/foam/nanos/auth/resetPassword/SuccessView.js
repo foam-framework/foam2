@@ -65,7 +65,7 @@ foam.CLASS({
       margin-right: 288px;
       margin-bottom: 20px;
     }
-    
+
     ^ .Back-Button{
       width: 450px;
       height: 40px;
@@ -80,7 +80,7 @@ foam.CLASS({
       margin-top: 10px;
     }
   `,
-  
+
   messages: [
     { name: 'Instructions', message: "Successfully reset password!"}
   ],
@@ -98,13 +98,13 @@ foam.CLASS({
             .start().addClass('success-Text').add(this.Instructions).end()
             .start().addClass('Back-Button')
               .add("Back to Sign In")
-              .on('click', function(){ 
+              .on('click', function(){
                 window.location.href = '#';
                 self.stack.push({ class: 'foam.nanos.auth.SignInView' })
               })
-            .end()         
+            .end()
           .end()
-        .end()
+        .end();
 
       this.add(self.NotificationMessage.create({ message: this.Instructions }));
     }
