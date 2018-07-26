@@ -237,6 +237,10 @@ public protocol foam_core_FObject: class, Detachable, Topic, JSONOutputter {
 
 public class AbstractFObject: NSObject, foam_core_FObject, ContextAware {
 
+  lazy var propertyChange: BasicTopic = {
+    fatalError()
+  }()
+
   public var __context__: Context = Context.GLOBAL
   private var ___subContext___: Context!
   public var __subContext__: Context { get { return self.___subContext___ } }

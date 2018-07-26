@@ -191,6 +191,7 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
   ],
   methods: [
     function writeToSwiftClass(cls, parentCls) {
+      if ( ! parentCls.hasOwnAxiom(this.name) ) return;
       if ( ! this.swiftSupport ) return;
 
       if ( foam.core.AbstractInterface.isSubClass(parentCls) ) {
@@ -204,7 +205,7 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
         return;
       }
 
-      var isOverride = !!parentCls.getSuperClass().getAxiomByName(this.name);
+      var isOverride = !!parentCls.getSuperAxiomByName(this.name);
       cls.fields.push(this.Field.create({
         visibility: 'public',
         override: isOverride,

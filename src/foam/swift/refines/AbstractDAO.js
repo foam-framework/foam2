@@ -20,6 +20,7 @@ foam.CLASS({
   ],
   methods: [
     function writeToSwiftClass(cls, parentCls) {
+      if ( ! parentCls.hasOwnAxiom(this.name) ) return;
       this.SUPER(cls, parentCls);
       cls.fields.push(
         foam.swift.Field.create({

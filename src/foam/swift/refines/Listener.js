@@ -46,6 +46,7 @@ foam.CLASS({
   ],
   methods: [
     function writeToSwiftClass(cls, parentCls) {
+      if ( ! parentCls.hasOwnAxiom(this.name) ) return;
       if ( !this.swiftCode ) return;
       var superAxiom = parentCls.getSuperClass().getAxiomByName(this.name);
       var override = !!(superAxiom && superAxiom.swiftCode)

@@ -11,7 +11,7 @@ foam.CLASS({
     {
       installInClass: function(cls) {
         var toSwiftClass = cls.toSwiftClass;
-        cls.toSwiftClass =  function() {
+        cls.toSwiftClass = function() {
           var self = this;
           var cls = toSwiftClass.bind(self)()
           self.VALUES.forEach(function(v) {
