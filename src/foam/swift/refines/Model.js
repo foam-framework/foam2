@@ -42,7 +42,7 @@ foam.CLASS({
       name: 'swiftImplements',
     },
     {
-      name: 'swiftImplementsCode_',
+      name: 'swiftAllImplements',
       expression: function(swiftImplements) {
         return this.swiftImplements.concat(
           ( this.implements || [] )
