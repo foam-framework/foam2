@@ -204,7 +204,7 @@ public class UserAndGroupAuthService
         }
 
         // check parent group
-        groupId = group.getParent();
+        groupId = group.getParent().toString();
       }
     } catch (Throwable t) {
     }

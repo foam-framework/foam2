@@ -35,8 +35,10 @@ foam.CLASS({
       documentation: 'Description of the Group.'
     },
     {
-      class: 'String',
+      class: 'Reference',
       name: 'parent',
+      targetDAOKey: 'groupDAO',
+      of: 'foam.nanos.auth.Group',
       documentation: 'Parent group to inherit permissions from.'
     },
     {
