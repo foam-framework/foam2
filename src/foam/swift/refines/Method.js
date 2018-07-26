@@ -123,6 +123,10 @@ foam.CLASS({
   ],
   methods: [
     function writeToSwiftClass(cls, parentCls) {
+      if ( ! parentCls.hasOwnAxiom(this.name) ) return;
+      this.writeToSwiftClass_(cls, parentCls);
+    },
+    function writeToSwiftClass_(cls, parentCls) {
       if ( ! this.getSwiftSupport(parentCls) ) return;
       if ( ! this.getSwiftOverride(parentCls) ) {
         cls.fields.push(this.Field.create({

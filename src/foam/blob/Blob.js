@@ -360,9 +360,9 @@ foam.CLASS({
       name: 'id'
     },
     {
+      class: 'NOPBlob',
       name: 'delegate',
       transient: true,
-      javaInfoType: 'foam.blob.AbstractIdentifiedBlobPropertyInfo',
       factory: function() {
         return this.blobService.find(this.id);
       },
@@ -395,6 +395,31 @@ foam.CLASS({
     [ 'of', 'foam.blob.Blob' ],
     [ 'tableCellView', function() {} ],
     [ 'view', { class: 'foam.u2.view.BlobView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'NOPBlob',
+  extends: 'foam.core.Blob',
+  documentation: 'Blob property with clone, diff, and compare disabled',
+
+  properties: [
+    [ 'cloneProperty', function () {} ],
+    [ 'diffProperty', function () {} ],
+    [ 'javaCloneProperty', '// noop' ],
+    [ 'javaDiffProperty', '// noop' ]
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      info.getMethod('compare').body = `return 0;`
+      info.getMethod('comparePropertyToObject').body = `return 0;`
+      info.getMethod('comparePropertyToValue').body = `return 0;`
+      return info;
+    }
   ]
 });
 
