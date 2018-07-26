@@ -39,8 +39,9 @@ foam.CLASS({
   refines: 'foam.core.ProxySub',
   flags: ['swift'],
   methods: [
-    function writeToSwiftClass(cls) {
-      return
+    function writeToSwiftClass(cls, parentCls) {
+      return;
+      if ( ! parentCls.hasOwnAxiom(this.name) ) return;
       cls.fields.push(
         foam.swift.Field.create({
           name: `${this.prop}EventProxy_`,

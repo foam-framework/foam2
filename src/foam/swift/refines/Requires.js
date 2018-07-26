@@ -20,7 +20,8 @@ foam.CLASS({
     },
   ],
   methods: [
-    function writeToSwiftClass(cls) {
+    function writeToSwiftClass(cls, parentCls) {
+      if ( ! parentCls.hasOwnAxiom(this.name) ) return;
       if (foam.core.InterfaceModel.isInstance(this.lookup(this.path).model_)) {
         return;
       }
