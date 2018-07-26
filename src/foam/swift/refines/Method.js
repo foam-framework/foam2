@@ -253,7 +253,7 @@ return <%=foam.swift.core.ConstantSlot.model_.swiftName%>([
     if self == nil { fatalError() }
 <% this.swiftArgs.forEach(function(a, i) { %>
     <%=isMutable(a) ? 'var' : 'let' %> <%
-  %><%=a.localName%> = args[<%=i%>]<%if(a.type!='Any?'){%> as! <%=a.type%><%}%>
+  %><%=a.localName%> = args[<%=i%>] as<%=!a.type.match(/^Any\??$/) ? '!' : ''%> <%=a.type%>
 <% }) %>
 
     return <%=this.swiftThrows ? 'try ' : ''%>self!.`<%=this.swiftName%>`(
