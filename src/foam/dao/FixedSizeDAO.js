@@ -14,8 +14,7 @@ foam.CLASS({
   javaImports: [
     'foam.dao.Sink',
     // why am I using a ReentractLock ?
-    'java.util.concurrent.locks.ReentrantLock',
-    'java.util.concurrent.locks.Lock'
+    'java.util.concurrent.locks.ReentrantLock'  
   ],
 
   properties: [
@@ -83,15 +82,13 @@ return delegatedObject;
       name: 'select_',
       javaReturns: 'foam.dao.Sink',
       javaCode: `
-if (sink == null){
-  sink = new ArraySink();
-}
+if ( sink == null ) sink = new ArraySink();
 sink = prepareSink(sink);
 Sink decorated = decorateSink_(sink, skip, limit, order, predicate);
 
 Integer backCounter;
 
-if (getNextIndex() == 0 ) {
+if ( getNextIndex() == 0 ) {
   backCounter = ( getInternalArraySize() - 1 ); 
 } else {
   backCounter = ( getNextIndex() - 1 );
@@ -102,13 +99,13 @@ for ( int i = 0; i < getFixedArraySize() ; i++ ) {
    if ( getFixedSizeArray()[backCounter] == null ){
       break;
     }
-    decorated.put ( getFixedSizeArray()[backCounter] ,null );
-    if (backCounter == 0 ) {
+    decorated.put ( getFixedSizeArray()[backCounter], null );
+    if ( backCounter == 0 ) {
       backCounter = getInternalArraySize();
     } 
     backCounter--;
   } catch (Exception e) {
-    System.err.print(" FSD select_ returned an NPE \\n" ) ;
+    e.printStackTrace();
     break;
   }
 }
