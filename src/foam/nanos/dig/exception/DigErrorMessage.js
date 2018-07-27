@@ -4,7 +4,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.box',
+  package: 'foam.nanos.dig.exception',
   name: 'DigErrorMessage',
   implements: ['foam.core.Exception'],
 

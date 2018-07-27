@@ -46,7 +46,7 @@ public class CSVSupport
         if ( propertyInfos[i] == null )
           throw new RuntimeException("CSV head format error");
         Parser p = propertyInfos[i].csvParser();
-        System.out.println(p);
+
         if ( i < column - 1) {
           propertyParsers[i] = new Seq1(0, p, new Literal(","));
         } else {

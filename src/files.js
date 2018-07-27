@@ -304,7 +304,6 @@ FOAM_FILES([
   { name: "foam/box/SubscribeMessage" },
   { name: "foam/box/RPCReturnBox" },
   { name: "foam/box/RPCMessage" },
-  { name: "foam/box/DigErrorMessage" },
   { name: "foam/dao/BaseClientDAO" },
   { name: "foam/dao/MergeBox" },
   { name: "foam/dao/ClientDAO" },
@@ -525,5 +524,6 @@ FOAM_FILES([
   { name: "foam/crypto/sign/Signable" },
   { name: "foam/crypto/sign/SignableTest" },
   { name: "foam/test/TestObj" },
-  { name: "foam/core/FObjectTest" }
+  { name: "foam/core/FObjectTest" },
+  { name: "foam/nanos/dig/exception/DigErrorMessage" },
 ]);

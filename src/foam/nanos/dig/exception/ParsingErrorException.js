@@ -6,7 +6,7 @@
 foam.CLASS({
   package: 'foam.nanos.dig.exception',
   name: 'ParsingErrorException',
-  extends: 'foam.box.DigErrorMessage',
+  extends: 'foam.nanos.dig.exception.DigErrorMessage',
 
   properties: [
     {
