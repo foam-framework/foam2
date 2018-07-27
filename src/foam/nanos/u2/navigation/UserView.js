@@ -47,11 +47,11 @@ foam.CLASS({
 
   css: `
     ^ {
-      align-items: center;
       display: flex;
-      margin: 0 40px;
+      margin: 10 40px;
     }
     ^ .icon-container {
+      margin-top: 4;
       position: relative;
     }
     ^ .icon-container.selected {
@@ -181,15 +181,13 @@ foam.CLASS({
       this
         .addClass(this.myClass())
 
-        //currency menu
+         //currency menu
         .start().addClass('currency-container')
-          .select(this.menuDAO.where(this.EQ(this.Menu.ID, 'currency')), function(menu) {
-            return menu.handler;
-          })
-        this.end().
+          .tag({ class: 'net.nanopay.ui.topNavigation.CurrencyChoiceView' })
+        .end()
 
         // The notifications container
-        start('div')
+        this.start('div')
           .addClass('icon-container')
 
           // Show blue underline if user is on notifications page.

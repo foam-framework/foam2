@@ -44,7 +44,6 @@ foam.CLASS({
   ],
 
   imports: [
-    'getElementById',
     'installCSS',
     'sessionSuccess',
     'window'

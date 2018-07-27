@@ -32,7 +32,7 @@ foam.CLASS({
       swiftCode: function() {/*
 var first = true
 var ps = ps
-var result: PStream?
+var result: foam_swift_parse_PStream?
 
 var i = 0
 while max == -1 || i < max {

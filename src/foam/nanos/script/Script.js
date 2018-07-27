@@ -8,14 +8,14 @@ foam.CLASS({
   package: 'foam.nanos.script',
   name: 'Script',
 
-  implements: [ 'foam.nanos.auth.EnabledAware' ],
+  implements: ['foam.nanos.auth.EnabledAware'],
 
   requires: [
     'foam.nanos.script.ScriptStatus',
     'foam.nanos.notification.notifications.ScriptRunNotification'
   ],
 
-  imports: [ 
+  imports: [
     'notificationDAO',
     'scriptDAO',
     'user'
@@ -38,34 +38,87 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'id', 'enabled', 'server', 'description', 'lastDuration', 'status', 'run'
+    'id', 'server', 'description', 'lastDuration', 'status', 'run'
   ],
 
-  searchColumns: [],
+  searchColumns: ['id', 'description'],
+
+  constants: [
+    {
+      type: 'int',
+      name: 'MAX_OUTPUT_CHARS',
+      value: 20000,
+    },
+    {
+      type: 'int',
+      name: 'MAX_NOTIFICATION_OUTPUT_CHARS',
+      value: 200,
+    }
+  ],
 
   properties: [
     {
       class: 'String',
-      name: 'id'
+      name: 'id',
+      tableCellFormatter: function(value) {
+        this.start()
+          .style({
+            'overflow': 'hidden',
+            'max-width': '25ch',
+            'min-width': '25ch',
+            'text-overflow': 'ellipsis'
+          }).add(value)
+        .end();
+      }
     },
     {
       class: 'Boolean',
-      name: 'enabled'
+      name: 'enabled',
+      documentation: 'Enables script.',
+      tableCellFormatter: function(value) {
+        this.start()
+          .style({ color: value ? 'green' : 'gray' })
+          .add(value ? 'Y' : 'N')
+        .end();
+      },
+      value: true
     },
     {
       class: 'String',
       name: 'description',
-      displayWidth: 80
+      documentation: 'Description of the script.',
+      tableCellFormatter: function(value) {
+        this.start()
+          .style({
+            'overflow': 'hidden',
+            'max-width': '25ch',
+            'min-width': '25ch',
+            'text-overflow': 'ellipsis'
+          }).add(value)
+        .end();
+      }
     },
     {
       class: 'DateTime',
       name: 'lastRun',
+      documentation: 'Date and time the script ran last.',
       visibility: 'RO'
     },
     {
       class: 'Long',
       name: 'lastDuration',
-      visibility: 'RO'
+      documentation: 'Date and time the script took to complete.',
+      visibility: 'RO',
+      tableCellFormatter: function(value) {
+        this.start()
+          .style({
+            'overflow': 'hidden',
+            'max-width': '5ch',
+            'min-width': '5ch',
+            'text-overflow': 'ellipsis'
+          }).add(value)
+        .end();
+      }
     },
     /*
     {
@@ -80,12 +133,14 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'server',
+      documentation: 'Runs on server side if enabled.',
       value: true
     },
     {
       class: 'foam.core.Enum',
       of: 'foam.nanos.script.ScriptStatus',
       name: 'status',
+      documentation: 'Status of script.',
       visibility: 'RO',
       value: 'UNSCHEDULED',
       javaValue: 'ScriptStatus.UNSCHEDULED'
@@ -93,13 +148,36 @@ foam.CLASS({
     {
       class: 'String',
       name: 'code',
-      view: { class: 'foam.u2.tag.TextArea', rows: 20, cols: 80, css: {"font-family": "monospace"} }
+      view: {
+        class: 'foam.u2.tag.TextArea',
+        rows: 20, cols: 80,
+        css: { 'font-family': 'monospace' }
+      }
     },
     {
       class: 'String',
       name: 'output',
       visibility: 'RO',
-      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 80, css: {"font-family": "monospace"}  }
+      view: {
+        class: 'foam.u2.tag.TextArea',
+        rows: 12, cols: 80,
+        css: { 'font-family': 'monospace' }
+      },
+      preSet: function(_, newVal) {
+        // for client side scripts
+        if ( newVal.length > this.MAX_OUTPUT_CHARS ) {
+          newVal = newVal.substring(0, this.MAX_OUTPUT_CHARS) + '...';
+        }
+        return newVal;
+      },
+      javaSetter: `
+      // for server side scripts
+      if (val.length() > MAX_OUTPUT_CHARS) {
+        val = val.substring(0, MAX_OUTPUT_CHARS) + "...";
+      }
+      output_ = val;
+      outputIsSet_ = true;
+      `
     },
     {
       class: 'String',
@@ -122,7 +200,7 @@ foam.CLASS({
           shell.set("currentScript", this);
           shell.set("x", x);
           shell.eval("runScript(String name) { script = x.get(\\"scriptDAO\\").find(name); if ( script != null ) eval(script.code); }");
-          shell.eval("sudo(String user) { foam.util.Auth.sudo(x, user); }");
+          shell.eval("foam.core.X sudo(String user) { foam.util.Auth.sudo(x, (String) user); }");
         } catch (EvalError e) {}
 
         return shell;
@@ -130,6 +208,13 @@ foam.CLASS({
     },
     {
       name: 'runScript',
+      code: function() {
+        var log = function() {
+          this.output += Array.from(arguments).join('') + '\n';
+        }.bind(this);
+        with ( { log: log, print: log, x: this.__context__ } )
+          return Promise.resolve(eval(this.code));
+      },
       args: [
         {
           name: 'x', javaType: 'foam.core.X'
@@ -175,9 +260,11 @@ foam.CLASS({
                 var notification = self.ScriptRunNotification.create({
                   userId: self.user.id,
                   scriptId: script.id,
-                  notificationType: "Script Execution",
+                  notificationType: 'Script Execution',
                   body: `Status: ${script.status}
-                        Script Output: ${script.output}
+                        Script Output: ${script.length > self.MAX_NOTIFICATION_OUTPUT_CHARS ?
+                          script.output.substring(0, self.MAX_NOTIFICATION_OUTPUT_CHARS) + '...' :
+                          script.output }
                         LastDuration: ${script.lastDuration}`
                 });
                 self.notificationDAO.put(notification);
@@ -205,17 +292,11 @@ foam.CLASS({
               }
           });
         } else {
-          var log = function() { this.output = this.output + Array.prototype.join.call(arguments, '') + '\n'; }.bind(this);
-
-          with ( { log: log, print: log, x: self.__context__ } ) {
-            this.status = this.ScriptStatus.RUNNING;
-            var ret = eval(this.code);
-            var self = this;
-            Promise.resolve(ret).then(function() {
-              self.status = self.ScriptStatus.UNSCHEDULED;
-              self.scriptDAO.put(self);
-            });
-          }
+          this.status = this.ScriptStatus.RUNNING;
+          this.runScript().then(() => {
+            this.status = this.ScriptStatus.UNSCHEDULED;
+            this.scriptDAO.put(this);
+          });
         }
       }
     }

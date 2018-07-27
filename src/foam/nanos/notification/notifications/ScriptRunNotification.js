@@ -11,8 +11,8 @@ foam.CLASS({
 
   properties: [
     {
-      class: "String",
-      name: "scriptId"
+      class: 'String',
+      name: 'scriptId'
     }
   ]
-})
+});

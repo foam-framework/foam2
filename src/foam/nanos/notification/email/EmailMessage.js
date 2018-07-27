@@ -10,7 +10,26 @@ foam.CLASS({
 
   documentation: 'Email message',
 
+  implements: [
+    'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.CreatedByAware'
+  ],
+
   properties: [
+    {
+      class: 'Long',
+      name: 'id',
+    },
+    {
+      class: 'DateTime',
+      name: 'created',
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdBy',
+      documentation: 'User who created the entry',
+    },
     {
       class: 'StringArray',
       name: 'to'

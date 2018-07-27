@@ -25,13 +25,14 @@ public class SimpleFacetManager
     try {
       // Automatically load FooImpl if Foo is abstract.
       // KGR: Why/where do we do this?
+      // KGR: I Think this is wrong. If Foo is Abstract it should be called AbstractFoos
       if ( java.lang.reflect.Modifier.isAbstract(type.getModifiers()) ) {
         type = (Class<T>) Class.forName(type.getName() + "Impl");
       }
 
       try {
         java.lang.reflect.Method method = type.getMethod("getOwnClassInfo");
-        ClassInfo classInfo = (ClassInfo)method.invoke(null);
+        ClassInfo classInfo = (ClassInfo) method.invoke(null);
 
         // First check the context for a custom factory for this type of object.
         // If there's nothing in the context, check the ClassInfo for an axiom
@@ -45,19 +46,19 @@ public class SimpleFacetManager
         }
 
         if ( f != null ) {
-          return ((XArgsFactory<T>)f).getInstance(args, x);
+          return ((XArgsFactory<T>) f).getInstance(args, x);
         }
 
-      } catch (NoSuchMethodException e) { }
+      } catch (NoSuchMethodException e) {
+      }
 
       T obj = type.newInstance();
 
-      if ( obj instanceof ContextAware ) ((ContextAware)obj).setX(x);
+      if ( obj instanceof ContextAware ) ((ContextAware) obj).setX(x);
 
       if ( obj instanceof FObject ) {
-        for (Map.Entry<String, Object> entry : args.entrySet()) {
+        for ( Map.Entry<String, Object> entry : args.entrySet() )
           ((FObject) obj).setProperty(entry.getKey(), entry.getValue());
-        }
       }
 
       return obj;

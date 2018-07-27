@@ -1,21 +1,5 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-/**
- * @license
  * Copyright 2018 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
@@ -293,17 +277,17 @@ foam.INTERFACE({
     {
       name: 'getDAO',
       javaReturns: 'foam.dao.DAO',
-      swiftReturns: 'DAO'
+      swiftReturns: 'foam_dao_DAO'
     },
     {
       name: 'getJunctionDAO',
       javaReturns: 'foam.dao.DAO',
-      swiftReturns: 'DAO'
+      swiftReturns: 'foam_dao_DAO'
     },
     {
       name: 'getTargetDAO',
       javaReturns: 'foam.dao.DAO',
-      swiftReturns: 'DAO'
+      swiftReturns: 'foam_dao_DAO'
     },
   ]
 });
@@ -367,8 +351,8 @@ foam.CLASS({
   build();`,
 
       swiftFactory:
-`return __context__.create(ReadOnlyDAO.self, args: [
-  "delegate": __context__.create(ManyToManyRelationshipDAO.self, args: [
+`return __context__.create(foam_dao_ReadOnlyDAO.self, args: [
+  "delegate": __context__.create(foam_dao_ManyToManyRelationshipDAO.self, args: [
     "relationship": self,
     "delegate": __context__[targetDAOKey]
   ])
@@ -382,7 +366,7 @@ foam.CLASS({
         return this.__context__[this.junctionDAOKey];
       },
       javaFactory: 'return (foam.dao.DAO)getX().get(getJunctionDAOKey());',
-      swiftFactory: 'return __context__[junctionDAOKey] as? (DAO & FObject)'
+      swiftFactory: 'return __context__[junctionDAOKey] as? (foam_dao_DAO & foam_core_FObject)'
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -392,15 +376,16 @@ foam.CLASS({
         return this.__context__[this.targetDAOKey];
       },
       javaFactory: 'return (foam.dao.DAO)getX().get(getTargetDAOKey());',
-      swiftFactory: 'return __context__[targetDAOKey] as? (DAO & FObject)'
+      swiftFactory: 'return __context__[targetDAOKey] as? (foam_dao_DAO & foam_core_FObject)'
     }
   ],
+
   methods: [
     {
       name: 'add',
       args: [ { name: 'target', of: 'foam.core.FObject' } ],
       javaCode: 'getJunctionDAO().put(createJunction(((foam.core.Identifiable)target).getPrimaryKey()));',
-      swiftCode: 'try junctionDAO!.put(createJunction((target as? Identifiable)?.getPrimaryKey()))',
+      swiftCode: 'try junctionDAO!.put(createJunction((target as? foam_core_Identifiable)?.getPrimaryKey()))',
       code: function add(target) {
         return this.junctionDAO.put(this.createJunction(target.id));
       }
@@ -408,14 +393,14 @@ foam.CLASS({
     {
       name: 'remove',
       javaCode: 'getJunctionDAO().remove(createJunction(((foam.core.Identifiable)target).getPrimaryKey()));',
-      swiftCode: 'try junctionDAO!.remove(createJunction((target as? Identifiable)?.getPrimaryKey()))',
+      swiftCode: 'try junctionDAO!.remove(createJunction((target as? foam_core_Identifiable)?.getPrimaryKey()))',
       code: function remove(target) {
         return this.junctionDAO.remove(this.createJunction(target.id));
       }
     },
     {
       name: 'createJunction',
-      args: [ { name: 'targetId', of: 'Object' } ],
+      args: [ { name: 'targetId', javaType: 'Object' } ],
       returns: 'foam.core.FObject',
       javaReturns: 'foam.core.FObject',
       code: function createJunction(targetId) {
@@ -432,7 +417,7 @@ getTargetProperty().set(junction, targetId);
 getSourceProperty().set(junction, getSourceId());
 return junction;`,
 
-      swiftCode: `let junction: FObject = self.junction.create(x: __context__) as! FObject
+      swiftCode: `let junction: foam_core_FObject = self.junction.create(x: __context__) as! foam_core_FObject
 targetProperty.set(junction, value: targetId)
 sourceProperty.set(junction, value: sourceId)
 return junction`
@@ -587,9 +572,9 @@ foam.CLASS({
       factory: function() {
         var sourceProperty = this.sourceProperty;
         var targetProperty = this.targetProperty;
-        var targetDAOKey = this.targetDAOKey;
+        var targetDAOKey   = this.targetDAOKey;
         var junctionDAOKey = this.junctionDAOKey;
-        var junction = this.junction;
+        var junction       = this.junction;
 
         return function(id) {
           return foam.dao.ManyToManyRelationshipImpl.create({
@@ -620,13 +605,13 @@ foam.CLASS({
     {
       name: 'swiftFactory',
       factory: function () {
-        return `return __context__.create(ManyToManyRelationshipImpl.self, args: [
+        return `return __context__.create(foam_dao_ManyToManyRelationshipImpl.self, args: [
       "sourceId": id,
-      "sourceProperty": ${this.sourceProperty.sourceCls_.name}.${foam.String.constantize(this.sourceProperty.name)}(),
-      "targetProperty": ${this.sourceProperty.sourceCls_.name}.${foam.String.constantize(this.targetProperty.name)}(),
+      "sourceProperty": ${this.sourceProperty.sourceCls_.model_.swiftName}.${foam.String.constantize(this.sourceProperty.name)}(),
+      "targetProperty": ${this.sourceProperty.sourceCls_.model_.swiftName}.${foam.String.constantize(this.targetProperty.name)}(),
       "targetDAOKey": "${this.targetDAOKey}",
       "junctionDAOKey": "${this.junctionDAOKey}",
-      "junction": ${this.sourceProperty.sourceCls_.name}.classInfo()
+      "junction": ${this.sourceProperty.sourceCls_.model_.swiftName}.classInfo()
     ]);
 `;
       }

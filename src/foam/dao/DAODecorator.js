@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+// TODO: the name of this is confusing because it overloads the term
+// "DAO Decorator". Rename to DAOFilter or EasyDAODecorator or something else.
 foam.INTERFACE({
   package: 'foam.dao',
   name: 'DAODecorator',

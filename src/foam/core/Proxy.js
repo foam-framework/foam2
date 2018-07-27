@@ -88,6 +88,11 @@ foam.CLASS({
   name: 'Proxy',
   extends: 'Property',
 
+  requires: [
+    'foam.core.ProxiedMethod',
+    'foam.core.ProxySub',
+  ],
+
   properties: [
     { name: 'of', required: true },
     {
@@ -140,7 +145,7 @@ foam.CLASS({
       var axioms = [];
       for ( var i = 0 ; i < forwards.length ; i++ ) {
         var method = forwards[i];
-        axioms.push(foam.core.ProxiedMethod.create({
+        axioms.push(this.ProxiedMethod.create({
           name: method.name,
           returns: method.returns,
           property: name,
@@ -150,7 +155,7 @@ foam.CLASS({
 
       for ( var i = 0 ; i < delegates.length ; i++ ) {
         var method = delegates[i];
-        axioms.push(foam.core.ProxiedMethod.create({
+        axioms.push(this.ProxiedMethod.create({
           name: method.name,
           returns: method.returns,
           property: name,
@@ -160,7 +165,7 @@ foam.CLASS({
       }
 
       if ( ! this.topics || this.topics.length ) {
-        axioms.push(foam.core.ProxySub.create({
+        axioms.push(this.ProxySub.create({
           topics: this.topics,
           prop:   this.name
         }));
@@ -260,14 +265,14 @@ if (oldValue as? Bool ?? false) != newValue {
     },
     {
       name: 'parent',
-      swiftType: 'EventProxy?',
+      swiftType: 'foam_core_EventProxy?',
     },
     {
       name: 'children',
       factory: function() {
         return {};
       },
-      swiftType: '[String:EventProxy]',
+      swiftType: '[String:foam_core_EventProxy]',
       swiftFactory: 'return [:]',
     },
     {
@@ -341,7 +346,7 @@ if let src = src as? Topic {
       args: [
         {
           name: 'c',
-          swiftType: 'EventProxy',
+          of: 'foam.core.EventProxy',
         },
       ],
       code: function removeChild(c) {
@@ -370,7 +375,7 @@ for (key, child) in children {
           swiftType: 'String',
         },
       ],
-      swiftReturns: 'EventProxy',
+      swiftReturns: 'foam_core_EventProxy',
       code: function getChild(key) {
         if ( ! this.children[key] ) {
           this.children[key] = this.cls_.create({
@@ -384,7 +389,7 @@ for (key, child) in children {
       },
       swiftCode: `
 if children[key] == nil {
-  children[key] = __context__.create(EventProxy.self, args: [
+  children[key] = __context__.create(foam_core_EventProxy.self, args: [
     "parent": self,
     "dest": dest,
     "src": src,

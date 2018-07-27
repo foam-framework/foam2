@@ -33,6 +33,10 @@ foam.CLASS({
       expression: function(firstName) { return firstName },
     },
     {
+      class: 'String',
+      name: 'description',
+    },
+    {
       name: 'anyProp',
     },
     {
