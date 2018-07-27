@@ -13,7 +13,6 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.Sink',
-    // why am I using a ReentractLock ?
     'java.util.concurrent.locks.ReentrantLock'  
   ],
 
@@ -24,14 +23,18 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'fixedArraySize',
-      value: 10000
+      name: 'fixedDAOSize',
+      value: 10000,
+      documentation: `Desired size of the fixedSizeDAO`
     },
     {
       class: 'Int',
       name: 'internalArraySize',
       private: true,
-      javaFactory: `return ( (int)  (1.1 *  (double) getFixedArraySize() ) ); `
+      javaFactory: `return ((int)  (1.1 *  (double) getFixedDAOSize() )); `,
+      documentation: `array larger than FixedDAOSize, to allow for a point in 
+                      time view without blocking write access.
+      `
     },
     {
       class: 'Array',
@@ -94,7 +97,7 @@ if ( getNextIndex() == 0 ) {
   backCounter = ( getNextIndex() - 1 );
 }
 
-for ( int i = 0; i < getFixedArraySize() ; i++ ) {
+for ( int i = 0; i < getFixedDAOSize() ; i++ ) {
   try {
    if ( getFixedSizeArray()[backCounter] == null ){
       break;
