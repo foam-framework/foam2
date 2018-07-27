@@ -83,6 +83,21 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'javaCompare',
+      value: 'return foam.util.SafetyUtil.compare(get_(o1), get_(o2));'
+    },
+    {
+      class: 'String',
+      name: 'javaComparePropertyToObject',
+      value: 'return foam.util.SafetyUtil.compare(cast(key), get_(o));'
+    },
+    {
+      class: 'String',
+      name: 'javaComparePropertyToValue',
+      value: 'return foam.util.SafetyUtil.compare(cast(key), cast(value));'
+    },
+    {
+      class: 'String',
       name: 'javaAssertValue'
     },
     {
@@ -110,26 +125,29 @@ foam.CLASS({
   methods: [
     function createJavaPropertyInfo_(cls) {
       return foam.java.PropertyInfo.create({
-        sourceCls:          cls,
-        propName:           this.name,
-        propShortName:      this.shortName,
-        propAliases:        this.aliases,
-        propType:           this.javaType,
-        propValue:          this.javaValue,
-        propRequired:       this.required,
-        cloneProperty:      this.javaCloneProperty,
-        diffProperty:       this.javaDiffProperty,
-        jsonParser:         this.javaJSONParser,
-        queryParser:        this.javaQueryParser,
-        csvParser:          this.javaCSVParser,
-        extends:            this.javaInfoType,
-        networkTransient:   this.networkTransient,
-        storageTransient:   this.storageTransient,
-        xmlAttribute:       this.xmlAttribute,
-        xmlTextNode:        this.xmlTextNode,
-        sqlType:            this.sqlType,
-        includeInDigest:    this.includeInDigest,
-        includeInSignature: this.includeInSignature
+        sourceCls:               cls,
+        propName:                this.name,
+        propShortName:           this.shortName,
+        propAliases:             this.aliases,
+        propType:                this.javaType,
+        propValue:               this.javaValue,
+        propRequired:            this.required,
+        cloneProperty:           this.javaCloneProperty,
+        diffProperty:            this.javaDiffProperty,
+        compare:                 this.javaCompare,
+        comparePropertyToValue:  this.javaComparePropertyToValue,
+        comparePropertyToObject: this.javaComparePropertyToObject,
+        jsonParser:              this.javaJSONParser,
+        queryParser:             this.javaQueryParser,
+        csvParser:               this.javaCSVParser,
+        extends:                 this.javaInfoType,
+        networkTransient:        this.networkTransient,
+        storageTransient:        this.storageTransient,
+        xmlAttribute:            this.xmlAttribute,
+        xmlTextNode:             this.xmlTextNode,
+        sqlType:                 this.sqlType,
+        includeInDigest:         this.includeInDigest,
+        includeInSignature:      this.includeInSignature
       });
     },
 
