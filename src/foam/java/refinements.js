@@ -1419,37 +1419,41 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'javaType',
+      name: 'referencedProperty',
+      transient: true,
       factory: function() {
-        // TODO: instead of creating reference properties as Object type, match
-        // the primary key of the target class/model
-        /*
         var idProp = this.of.ID.cls_ == foam.core.IDAlias ? this.of.ID.targetProperty : this.of.ID;
-        console.log('******************************************************', this.of.id, idProp.javaType);
-        */
 
-        return 'Object';
+        idProp = idProp.clone();
+        idProp.name = this.name;
+
+        return idProp;
       }
     },
-    [ 'javaJSONParser',  'foam.lib.json.AnyParser.instance()' ],
-    [ 'javaQueryParser', 'foam.lib.query.AnyParser.instance()' ],
-    [ 'javaInfoType',    'foam.core.AbstractObjectPropertyInfo' ]
+    { name: 'javaType',        factory: function() { return this.referencedProperty.javaType; } },
+    { name: 'javaJSONParser',  factory: function() { return this.referencedProperty.javaJSONParser; } },
+    { name: 'javaQueryParser', factory: function() { return this.referencedProperty.javaQueryParser; } },
+    { name: 'javaInfoType',    factory: function() { return this.referencedProperty.javaInfoType; } }
   ],
 
   methods: [
     function buildJavaClass(cls) {
-      this.SUPER(cls);
+      // Disable super behaviour on purpose.
+      // this.SUPER(cls);
+
+      // Install a renamed copy of the refernced model's id property instead
+      this.referencedProperty.buildJavaClass(cls);
+
       cls.method({
         name: `find${foam.String.capitalize(this.name)}`,
         visibility: 'public',
         type: this.of.id,
         args: [ { name: 'x', type: 'foam.core.X' } ],
-        body: `return (${this.of.id})((foam.dao.DAO) x.get("${this.targetDAOKey}")).find_(x, get${foam.String.capitalize(this.name)}());`
+        body: `return (${this.of.id})((foam.dao.DAO) x.get("${this.targetDAOKey}")).find_(x, (Object) get${foam.String.capitalize(this.name)}());`
       });
     }
   ]
 });
-
 
 foam.CLASS({
   refines: 'foam.pattern.Multiton',
