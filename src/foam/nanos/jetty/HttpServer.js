@@ -22,12 +22,14 @@ foam.CLASS({
     {
       class: 'FObjectArray',
       of: 'foam.nanos.servlet.ServletMapping',
-      name: 'servletMappings'
+      name: 'servletMappings',
+      javaFactory: `return new foam.nanos.servlet.ServletMapping[0];`
     },
     {
       class: 'FObjectArray',
       of: 'foam.nanos.servlet.ErrorPageMapping',
-      name: 'errorMappings'
+      name: 'errorMappings',
+      javaFactory: `return new foam.nanos.servlet.ErrorPageMapping[0];`
     },
   ],
   methods: [
