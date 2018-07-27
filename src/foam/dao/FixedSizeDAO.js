@@ -13,22 +13,33 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.Sink',
-    'org.apache.commons.collections.buffer.CircularFifoBuffer',
-    'org.apache.commons.collections.Buffer',
-    'org.apache.commons.collections.BufferUtils'
+    'java.util.concurrent.locks.ReentrantReadWriteLock',
+    'java.util.concurrent.locks.ReentrantLock',
+    'java.util.concurrent.locks.Lock'
   ],
 
   properties: [
     {
       class: 'Int',
+      name: 'nextIndex'
+    },
+    {
+      class: 'Int',
       name: 'fixedArraySize',
-      value: 10000
+      value: 150
+    },
+    {
+      class: 'Array',
+      of: 'foam.core.FObject',
+      name: 'fixedSizeArray',
+      javaFactory: `return new foam.core.FObject[getFixedArraySize()];`
     },
     {
       class: 'Object',
-      name: 'FixedSizeArray',
-      javaType: 'org.apache.commons.collections.Buffer',
-      javaFactory: `return BufferUtils.synchronizedBuffer(new org.apache.commons.collections.buffer.CircularFifoBuffer(getFixedArraySize())); `
+      name: 'lock',  
+      javaType: 'java.util.concurrent.locks.ReentrantLock',
+      javaFactory: `return new java.util.concurrent.locks.ReentrantLock();`
+
     }
   ],
 
@@ -46,8 +57,19 @@ foam.CLASS({
         }
       ],
       javaCode: `
+Integer insertAt;
 foam.core.FObject delegatedObject = getDelegate().put_(x, obj);
-getFixedSizeArray().add(delegatedObject);
+getLock().lock();
+try {
+  insertAt = getNextIndex();  
+  if ( insertAt == getFixedArraySize() ) {
+    insertAt = 0;
+  }
+  setNextIndex( insertAt + 1 );
+} finally {
+  getLock().unlock();
+}
+getFixedSizeArray()[insertAt] = delegatedObject;
 return delegatedObject;
   `
     },
@@ -55,11 +77,17 @@ return delegatedObject;
       name: 'select_',
       javaReturns: 'foam.dao.Sink',
       javaCode: `
+if (sink == null){
+  sink = new ArraySink();
+}
 sink = prepareSink(sink);
 Sink decorated = decorateSink_(sink, skip, limit, order, predicate);
-Object[] arrayObject = getFixedSizeArray().toArray();
-for ( int i = 0; i < arrayObject.length; i++ ) {
-  decorated.put( arrayObject[i], null );
+for ( int i = 0; i < 100; i++ ) {
+  try {
+    decorated.put ( getFixedSizeArray()[i] ,null )   ;
+  } catch (Exception e) {
+    System.err.print(" FSD select_ returned an NPE \\n" ) ;
+  }
 }
 decorated.eof();
 return sink;
@@ -67,3 +95,4 @@ return sink;
     }
   ]
 });
+
