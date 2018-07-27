@@ -6,8 +6,6 @@
 
 package foam.core;
 
-import freemarker.template.SimpleDate;
-
 import javax.xml.stream.XMLStreamReader;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
