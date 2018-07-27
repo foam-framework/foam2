@@ -20,39 +20,35 @@ foam.CLASS({
   name: 'MNRowFormatter',
   implements: [ 'foam.u2.RowFormatter' ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        .mn-row {
-          height: 100%;
-          display: flex;
-        }
-        .mn-row .row-id {
-          flex-grow: 1;
-        }
-        .mn-row .row-data {
-          display: flex;
-          flex-grow: 3;
-        }
-        .mn-row .row-value {
-          flex-grow: 1;
-          background-color: #ddd;
-          justify-content: center;
-          align-items: center;
-          display: flex;
-        }
-        .mn-row .row-value.yes {
-          background-color: #0f0;
-        }
-        .mn-row .row-value.no {
-          background-color: #f00;
-        }
-        .mn-row .row-value * {
-          background-color: inherit;
-        }
-    */}
-    })
-  ],
+  css: `
+    .mn-row {
+      height: 100%;
+      display: flex;
+    }
+    .mn-row .row-id {
+      flex-grow: 1;
+    }
+    .mn-row .row-data {
+      display: flex;
+      flex-grow: 3;
+    }
+    .mn-row .row-value {
+      flex-grow: 1;
+      background-color: #ddd;
+      justify-content: center;
+      align-items: center;
+      display: flex;
+    }
+    .mn-row .row-value.yes {
+      background-color: #0f0;
+    }
+    .mn-row .row-value.no {
+      background-color: #f00;
+    }
+    .mn-row .row-value * {
+      background-color: inherit;
+    }
+  `,
 
   methods: [
     function format(data) {

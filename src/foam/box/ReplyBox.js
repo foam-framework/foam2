@@ -54,7 +54,7 @@ foam.CLASS({
         this.delegate.send(msg);
       },
       swiftCode: function() {/*
-(registry as! BoxRegistry).unregister(id)
+(registry as! foam_box_BoxRegistry).unregister(id)
 try delegate.send(msg)
       */},
       javaCode: `

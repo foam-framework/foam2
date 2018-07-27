@@ -20,18 +20,20 @@ foam.CLASS({
   name: 'ChoiceView',
   extends: 'foam.u2.View',
 
-  documentation: 'Wraps a tag that represents a singular choice. That is, ' +
-      'this controller shows the user a fixed, probably small set of ' +
-      'choices, and the user picks one. ' +
-      'The choices are [value, label] pairs. this.choice is the current ' +
-      'pair, this.data the current value. this.text is the current label, ' +
-      'this.label is the label for the whole view (eg. "Medal Color", not ' +
-      '"Gold"). ' +
-      'The choices can be provided either as an array (this.choices) or as ' +
-      'a DAO plus the function this.objToChoice which turns objects from the ' +
-      'DAO into [value, label] pairs. ' +
-      'this.selectSpec is a ViewSpec for the inner view. It defaults to ' +
-      'foam.u2.tag.Select.',
+  documentation: `
+    Wraps a tag that represents a singular choice. That is,
+    this controller shows the user a fixed, probably small set of
+    choices, and the user picks one.
+    The choices are [value, label] pairs. this.choice is the current
+    pair, this.data the current value. this.text is the current label,
+    this.label is the label for the whole view (eg. "Medal Color", not
+    "Gold").
+    The choices can be provided either as an array (this.choices) or as
+    a DAO plus the function this.objToChoice which turns objects from the
+    DAO into [value, label] pairs.
+    this.selectSpec is a ViewSpec for the inner view. It defaults to
+    foam.u2.tag.Select.
+  `,
 
   properties: [
     {

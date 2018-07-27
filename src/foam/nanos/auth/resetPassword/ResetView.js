@@ -227,7 +227,7 @@ foam.CLASS({
         }
 
         var user = this.User.create({
-          password: this.newPassword
+          desiredPassword: this.newPassword
         });
 
         this.resetPasswordToken.processToken(null, user, this.token).then(function (result) {

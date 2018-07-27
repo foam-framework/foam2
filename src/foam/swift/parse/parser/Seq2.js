@@ -28,7 +28,7 @@ foam.CLASS({
       name: 'parse',
       swiftCode: function() {/*
 var values = [Any?](repeating: nil, count: 2)
-var ps: PStream? = ps
+var ps: foam_swift_parse_PStream? = ps
 for (i, parser) in parsers.enumerated() {
   ps = parser.parse(ps!, x)
   if ps == nil { return nil }

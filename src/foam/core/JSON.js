@@ -82,6 +82,19 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  name: '__Class__',
+  package: 'foam.core',
+  axioms: [
+    {
+      name: 'create',
+      installInClass: function(clsName) { return X.lookup(clsName, true); }
+    }
+  ]
+});
+
+
 /** Add toJSON() method to FObject. **/
 foam.CLASS({
   refines: 'foam.core.FObject',
@@ -718,7 +731,13 @@ foam.LIB({
 
               o[key] = json.name;
               continue;
-            } else if ( ( key === 'of' || key === 'class' || key == 'view' || key == 'refines' ) &&
+            } else if ( (
+                key === 'of' ||
+                key === 'class' ||
+                key == 'view' ||
+                key == 'sourceModel' ||
+                key == 'targetModel' ||
+                key == 'refines' ) &&
                         foam.String.isInstance(o[key]) ) {
               r.push(x.classloader.maybeLoad(o[key]));
               continue;

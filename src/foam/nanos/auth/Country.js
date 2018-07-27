@@ -15,11 +15,13 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'code'
+      name: 'code',
+      documentation: 'Country code.'
     },
     {
       class: 'String',
-      name: 'name'
+      name: 'name',
+      documentation: 'Country name.'
     }
   ],
   methods: [{

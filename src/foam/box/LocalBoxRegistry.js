@@ -105,7 +105,7 @@ return ((Registration)registration).getExportBox();
       swiftCode: function() {/*
 let name: String = name ?? UUID().uuidString
 
-var exportBox: Box = SubBox_create([
+var exportBox: foam_box_Box = SubBox_create([
   "name": name,
   "delegate": me
 ])

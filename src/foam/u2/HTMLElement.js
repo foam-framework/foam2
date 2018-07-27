@@ -31,6 +31,8 @@ foam.CLASS({
   name: 'HTMLElement',
   extends: 'foam.u2.Element',
 
+  requires: [ 'foam.u2.HTMLValidator' ],
+
   exports: [ 'validator as elementValidator' ],
 
   properties: [
@@ -38,7 +40,11 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.u2.DefaultValidator',
       name: 'validator',
-      value: foam.u2.HTMLValidator.create()
+      factory: function() {
+        // Note that HTMLValidator is a singleton so only one instance of
+        // HTMLValidator should ever be created here.
+        return this.HTMLValidator.create()
+      }
     }
   ]
 });

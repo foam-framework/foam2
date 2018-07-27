@@ -23,13 +23,13 @@ class ParserTests: XCTestCase {
   }
 
   func testCharsParse() {
-    let parser = Alt([
+    let parser = foam_swift_parse_parser_Alt([
       "parsers": [
-        Chars(["chars": "A"]),
-        Chars(["chars": " "]),
+        foam_swift_parse_parser_Chars(["chars": "A"]),
+        foam_swift_parse_parser_Chars(["chars": " "]),
       ],
       ])
-    var ps: PStream! = StringPStream(["str": "A string"])
+    var ps: foam_swift_parse_PStream! = foam_swift_parse_StringPStream(["str": "A string"])
 
     // Parsing first character.
     ps = parser.parse(ps, x)
@@ -45,8 +45,8 @@ class ParserTests: XCTestCase {
   }
 
   func testAnyCharParse() {
-    let parser = AnyChar()
-    var ps: PStream! = StringPStream(["str": "123"])
+    let parser = foam_swift_parse_parser_AnyChar()
+    var ps: foam_swift_parse_PStream! = foam_swift_parse_StringPStream(["str": "123"])
 
     ps = parser.parse(ps, x) // 1
     XCTAssertNotNil(ps)
@@ -62,133 +62,133 @@ class ParserTests: XCTestCase {
   }
 
 
-  func testLiteralParse() {
-    let parser = Literal(["string": "myLiteral"])
-    XCTAssertNil(parser.parse(StringPStream(["str": "hello"]), x))
-    XCTAssertNotNil(parser.parse(StringPStream(["str": "myLiteralHello"]), x))
+  func testfoam_swift_parse_parser_LiteralParse() {
+    let parser = foam_swift_parse_parser_Literal(["string": "myfoam_swift_parse_parser_Literal"])
+    XCTAssertNil(parser.parse(foam_swift_parse_StringPStream(["str": "hello"]), x))
+    XCTAssertNotNil(parser.parse(foam_swift_parse_StringPStream(["str": "myfoam_swift_parse_parser_LiteralHello"]), x))
   }
 
-  func testNotCharsParse() {
-    let parser = NotChars(["chars": "ABC"])
-    XCTAssertNil(parser.parse(StringPStream(["str": "AHello"]), x))
-    XCTAssertNotNil(parser.parse(StringPStream(["str": "Hello"]), x))
+  func testfoam_swift_parse_parser_NotCharsParse() {
+    let parser = foam_swift_parse_parser_NotChars(["chars": "ABC"])
+    XCTAssertNil(parser.parse(foam_swift_parse_StringPStream(["str": "AHello"]), x))
+    XCTAssertNotNil(parser.parse(foam_swift_parse_StringPStream(["str": "Hello"]), x))
   }
 
   func testRepeat() {
-    let parser = Repeat([
-      "delegate": Chars(["chars": "A"]),
-      "delim": Chars(["chars": ","]),
+    let parser = foam_swift_parse_parser_Repeat([
+      "delegate": foam_swift_parse_parser_Chars(["chars": "A"]),
+      "delim": foam_swift_parse_parser_Chars(["chars": ","]),
       "min": 3,
       "max": 5,
       ])
-    XCTAssertNil(parser.parse(StringPStream(["str": "A,A"]), x))
-    XCTAssertNotNil(parser.parse(StringPStream(["str": "A,A,A"]), x))
-    XCTAssertNotNil(parser.parse(StringPStream(["str": "A,A,A,A"]), x))
-    XCTAssertNotNil(parser.parse(StringPStream(["str": "A,A,A,A,A"]), x))
+    XCTAssertNil(parser.parse(foam_swift_parse_StringPStream(["str": "A,A"]), x))
+    XCTAssertNotNil(parser.parse(foam_swift_parse_StringPStream(["str": "A,A,A"]), x))
+    XCTAssertNotNil(parser.parse(foam_swift_parse_StringPStream(["str": "A,A,A,A"]), x))
+    XCTAssertNotNil(parser.parse(foam_swift_parse_StringPStream(["str": "A,A,A,A,A"]), x))
     XCTAssertEqual(parser.parse(
-      StringPStream(["str": "A,A,A"]), x)!.value()! as! [Character],
+      foam_swift_parse_StringPStream(["str": "A,A,A"]), x)!.value()! as! [Character],
                    ["A","A","A"] as [Character])
   }
 
-  func testRepeat0() {
-    let parser = Repeat0([
-      "delegate": Chars(["chars": "A"]),
-      "delim": Chars(["chars": ","]),
+  func testfoam_swift_parse_parser_Repeat0() {
+    let parser = foam_swift_parse_parser_Repeat0([
+      "delegate": foam_swift_parse_parser_Chars(["chars": "A"]),
+      "delim": foam_swift_parse_parser_Chars(["chars": ","]),
       "min": 3,
       "max": 5,
       ])
-    XCTAssertNil(parser.parse(StringPStream(["str": "A,A"]), x))
-    XCTAssertNotNil(parser.parse(StringPStream(["str": "A,A,A"]), x))
-    XCTAssertNotNil(parser.parse(StringPStream(["str": "A,A,A,A"]), x))
-    XCTAssertNotNil(parser.parse(StringPStream(["str": "A,A,A,A,A"]), x))
+    XCTAssertNil(parser.parse(foam_swift_parse_StringPStream(["str": "A,A"]), x))
+    XCTAssertNotNil(parser.parse(foam_swift_parse_StringPStream(["str": "A,A,A"]), x))
+    XCTAssertNotNil(parser.parse(foam_swift_parse_StringPStream(["str": "A,A,A,A"]), x))
+    XCTAssertNotNil(parser.parse(foam_swift_parse_StringPStream(["str": "A,A,A,A,A"]), x))
     XCTAssertEqual(parser.parse(
-      StringPStream(["str": "A,A,A,A,A"]), x)!.value()! as! Character,
+      foam_swift_parse_StringPStream(["str": "A,A,A,A,A"]), x)!.value()! as! Character,
                    "A")
   }
 
-  func testSeq() {
-    let parser = Seq([
+  func testfoam_swift_parse_parser_Seq() {
+    let parser = foam_swift_parse_parser_Seq([
       "parsers": [
-        Chars(["chars": "A"]),
-        Chars(["chars": "B"]),
+        foam_swift_parse_parser_Chars(["chars": "A"]),
+        foam_swift_parse_parser_Chars(["chars": "B"]),
       ]
       ])
-    XCTAssertNil(parser.parse(StringPStream(["str": "AAB"]), x))
+    XCTAssertNil(parser.parse(foam_swift_parse_StringPStream(["str": "AAB"]), x))
     XCTAssertEqual(
-      parser.parse(StringPStream(["str": "ABB"]), x)!.value()! as! [Character],
+      parser.parse(foam_swift_parse_StringPStream(["str": "ABB"]), x)!.value()! as! [Character],
       ["A", "B"])
   }
 
-  func testSeq0() {
-    let parser = Seq0([
+  func testfoam_swift_parse_parser_Seq0() {
+    let parser = foam_swift_parse_parser_Seq0([
       "parsers": [
-        Chars(["chars": "A"]),
-        Chars(["chars": "B"]),
+        foam_swift_parse_parser_Chars(["chars": "A"]),
+        foam_swift_parse_parser_Chars(["chars": "B"]),
       ]
       ])
-    XCTAssertNil(parser.parse(StringPStream(["str": "AAB"]), x))
-    XCTAssertEqual(parser.parse(StringPStream(["str": "ABC"]), x)!.value()! as! Character, "B")
+    XCTAssertNil(parser.parse(foam_swift_parse_StringPStream(["str": "AAB"]), x))
+    XCTAssertEqual(parser.parse(foam_swift_parse_StringPStream(["str": "ABC"]), x)!.value()! as! Character, "B")
   }
 
-  func testSeq1() {
-    let parser = Seq1([
+  func testfoam_swift_parse_parser_Seq1() {
+    let parser = foam_swift_parse_parser_Seq1([
       "parsers": [
-        Chars(["chars": "A"]),
-        Chars(["chars": "B"]),
+        foam_swift_parse_parser_Chars(["chars": "A"]),
+        foam_swift_parse_parser_Chars(["chars": "B"]),
       ],
       "index": 0,
       ])
-    XCTAssertNil(parser.parse(StringPStream(["str": "AAB"]), x))
-    XCTAssertEqual(parser.parse(StringPStream(["str": "ABC"]), x)!.value()! as! Character, "A")
+    XCTAssertNil(parser.parse(foam_swift_parse_StringPStream(["str": "AAB"]), x))
+    XCTAssertEqual(parser.parse(foam_swift_parse_StringPStream(["str": "ABC"]), x)!.value()! as! Character, "A")
   }
 
-  func testSeq2() {
-    let parser = Seq2([
+  func testfoam_swift_parse_parser_Seq2() {
+    let parser = foam_swift_parse_parser_Seq2([
       "parsers": [
-        Chars(["chars": "A"]),
-        Chars(["chars": "B"]),
-        Chars(["chars": "C"]),
+        foam_swift_parse_parser_Chars(["chars": "A"]),
+        foam_swift_parse_parser_Chars(["chars": "B"]),
+        foam_swift_parse_parser_Chars(["chars": "C"]),
       ],
       "index1": 0,
       "index2": 2,
       ])
-    XCTAssertNil(parser.parse(StringPStream(["str": "AB"]), x))
+    XCTAssertNil(parser.parse(foam_swift_parse_StringPStream(["str": "AB"]), x))
     XCTAssertEqual(
-      parser.parse(StringPStream(["str": "ABCD"]), x)!.value()! as! [Character],
+      parser.parse(foam_swift_parse_StringPStream(["str": "ABCD"]), x)!.value()! as! [Character],
       ["A", "C"])
   }
 
   func testSubstring() {
-    let parser = Substring([
-      "delegate": Repeat([
-        "delegate": Chars(["chars": "BA"]),
+    let parser = foam_swift_parse_parser_Substring([
+      "delegate": foam_swift_parse_parser_Repeat([
+        "delegate": foam_swift_parse_parser_Chars(["chars": "BA"]),
         ])
       ])
-    XCTAssertEqual(parser.parse(StringPStream(["str": "ABCDEFG"]), x)!.value()! as! String, "AB")
+    XCTAssertEqual(parser.parse(foam_swift_parse_StringPStream(["str": "ABCDEFG"]), x)!.value()! as! String, "AB")
   }
 
   func testAnyKeyParser() {
-    let parser = X.create(AnyKeyParser.self)!
-    XCTAssertEqual(parser.parse(StringPStream(["str": "KEY"]), x)!.value()! as! String, "KEY")
-    XCTAssertEqual(parser.parse(StringPStream(["str": "\"KEY\": "]), x)!.value()! as! String, "KEY")
+    let parser = X.create(foam_swift_parse_json_AnyKeyParser.self)!
+    XCTAssertEqual(parser.parse(foam_swift_parse_StringPStream(["str": "KEY"]), x)!.value()! as! String, "KEY")
+    XCTAssertEqual(parser.parse(foam_swift_parse_StringPStream(["str": "\"KEY\": "]), x)!.value()! as! String, "KEY")
   }
 
   func testFloatParser() {
-    let parser = FloatParser()
-    XCTAssertNil(parser.parse(StringPStream(["str": "KEY"]), x))
-    XCTAssertEqual(parser.parse(StringPStream(["str": "52.5"]), x)!.value()! as! Float, 52.5)
-    XCTAssertEqual(parser.parse(StringPStream(["str": "0.1"]), x)!.value()! as! Float, 0.1)
-    XCTAssertEqual(parser.parse(StringPStream(["str": "1."]), x)!.value()! as! Float, 1.0)
-    XCTAssertEqual(parser.parse(StringPStream(["str": "-0.1123"]), x)!.value()! as! Float, -0.1123)
-    XCTAssertNil(parser.parse(StringPStream(["str": "-50"]), x))
+    let parser = foam_swift_parse_json_FloatParser()
+    XCTAssertNil(parser.parse(foam_swift_parse_StringPStream(["str": "KEY"]), x))
+    XCTAssertEqual(parser.parse(foam_swift_parse_StringPStream(["str": "52.5"]), x)!.value()! as! Float, 52.5)
+    XCTAssertEqual(parser.parse(foam_swift_parse_StringPStream(["str": "0.1"]), x)!.value()! as! Float, 0.1)
+    XCTAssertEqual(parser.parse(foam_swift_parse_StringPStream(["str": "1."]), x)!.value()! as! Float, 1.0)
+    XCTAssertEqual(parser.parse(foam_swift_parse_StringPStream(["str": "-0.1123"]), x)!.value()! as! Float, -0.1123)
+    XCTAssertNil(parser.parse(foam_swift_parse_StringPStream(["str": "-50"]), x))
   }
 
   func testIntParser() {
-    let parser = IntParser()
-    XCTAssertNil(parser.parse(StringPStream(["str": "KEY"]), x))
-    XCTAssertEqual(parser.parse(StringPStream(["str": "0.1"]), x)!.value()! as! Int, 0)
-    XCTAssertEqual(parser.parse(StringPStream(["str": "1."]), x)!.value()! as! Int, 1)
-    XCTAssertEqual(parser.parse(StringPStream(["str": "-0.1123"]), x)!.value()! as! Int, 0)
-    XCTAssertEqual(parser.parse(StringPStream(["str": "-50"]), x)!.value()! as! Int, -50)
+    let parser = foam_swift_parse_json_IntParser()
+    XCTAssertNil(parser.parse(foam_swift_parse_StringPStream(["str": "KEY"]), x))
+    XCTAssertEqual(parser.parse(foam_swift_parse_StringPStream(["str": "0.1"]), x)!.value()! as! Int, 0)
+    XCTAssertEqual(parser.parse(foam_swift_parse_StringPStream(["str": "1."]), x)!.value()! as! Int, 1)
+    XCTAssertEqual(parser.parse(foam_swift_parse_StringPStream(["str": "-0.1123"]), x)!.value()! as! Int, 0)
+    XCTAssertEqual(parser.parse(foam_swift_parse_StringPStream(["str": "-50"]), x)!.value()! as! Int, -50)
   }
 }

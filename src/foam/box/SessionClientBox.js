@@ -113,11 +113,11 @@ return uuid;`
         this.delegate.send(msg);
       },
       swiftCode: `
-msg.attributes[SessionClientBox.SESSION_KEY] = sessionID
+msg.attributes[foam_box_SessionClientBox.SESSION_KEY] = sessionID
 msg.attributes["replyBox"] = SessionReplyBox_create([
   "msg": msg,
   "clientBox": self,
-  "delegate": msg.attributes["replyBox"] as? Box,
+  "delegate": msg.attributes["replyBox"] as? foam_box_Box,
 ])
 try delegate.send(msg)
       `,

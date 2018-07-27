@@ -23,7 +23,18 @@ foam.CLASS({
 have multiple classloaders running alongside eachother`
 ],*/
   requires: [
-    'foam.classloader.OrDAO'
+    'foam.classloader.OrDAO',
+    'foam.core.Script',
+    'foam.dao.Relationship',
+    'foam.apploader.SubClassLoader',
+    {
+      path: 'foam.apploader.WebModelFileDAO',
+      flags: ['web'],
+    },
+    {
+      path: 'foam.apploader.NodeModelFileDAO',
+      flags: ['node'],
+    },
   ],
   properties: [
     {
@@ -43,9 +54,7 @@ have multiple classloaders running alongside eachother`
     {
       name: 'addClassPath',
       code: function(path, json2) {
-        var cls = foam.lookup(foam.isServer ?
-            'foam.apploader.NodeModelFileDAO' :
-            'foam.apploader.WebModelFileDAO');
+        var cls = this[foam.isServer ? 'NodeModelFileDAO' : 'WebModelFileDAO'];
         var modelDAO = cls.create({root: path, json2: json2}, this);
 
         if ( this.modelDAO ) {
@@ -78,7 +87,7 @@ have multiple classloaders running alongside eachother`
       name: 'maybeLoad_',
       returns: 'Promise',
       args: [ { name: 'id', of: 'String' },
-              { name: 'path', of: 'Array' } ],
+              { name: 'path', of: 'StringArray' } ],
       code: function(id, path) {
         return this.load_(id, path).catch(function() { return null; });
       }
@@ -108,7 +117,7 @@ have multiple classloaders running alongside eachother`
           // dependency to something that this class depends upon then
           // we can just resolve right away.
           for ( var i = 0 ; i < path.length ; i++ ) {
-            if ( path[i].id === id ) return Promise.resolve();
+            if ( path[i] === id ) return Promise.resolve();
           }
 
           if ( this.pending[id] ) return this.pending[id];
@@ -133,9 +142,21 @@ have multiple classloaders running alongside eachother`
 
           if ( foam.lookup(id, true) ) return Promise.resolve(foam.lookup(id));
 
-          return this.pending[id] = this.modelDAO.find(id).then(function(m) {
-            if ( ! m ) return Promise.reject(new Error('Class Not Found: ' + id));
-
+          path = path.concat(id);
+          var x2 = self.SubClassLoader.create({delegate: self, path: path});
+          return this.pending[id] = this.modelDAO.inX(x2).find(id).then(function(m) {
+            if ( ! m ) return Promise.reject(new Error('Model Not Found: ' + id));
+            if ( self.Relationship.isInstance(m) ) {
+              return m.initRelationship();
+            }
+            if ( self.Script.isInstance(m) ) {
+              return Promise.all(m.requires.map(function(r) {
+                return self.load(r)
+              })).then(function() {
+                m.code()
+                return m;
+              });
+            }
             return this.buildClass_(m, path);
           }.bind(this), function() {
             throw new Error("Failed to load class " + id);
@@ -163,11 +184,9 @@ have multiple classloaders running alongside eachother`
     {
       name: 'buildClass_',
       args: [ { name: 'model', of: 'foam.core.Model' },
-              { name: 'path', of: 'Array' } ],
+              { name: 'path', of: 'StringArray' } ],
       code: function(model, path) {
         var self = this;
-
-        path = path.concat(model);
 
         var deps = this.modelDeps_(model, path);
 

@@ -20,6 +20,10 @@ foam.CLASS({
   name: 'OrDAO',
   extends: 'foam.dao.ProxyDAO',
 
+  requires: [
+    'foam.dao.DedupSink',
+  ],
+
   documentation: 'DAO composite which performs find() in second delegate if not found in first.',
 
   properties: [
@@ -35,6 +39,16 @@ foam.CLASS({
       return this.primary.find_(x, id).then(function(o) {
         return o || self.delegate.find_(x, id);
       });
-    }
+    },
+    function select_(x, sink, skip, limit, order, predicate) {
+      var self = this;
+      sink = sink || self.ArraySink.create();
+      var ddSink = self.DedupSink.create({delegate: sink})
+      return self.primary.select_(x, ddSink, skip, limit, order, predicate).then(function() {
+        return self.delegate.select_(x, ddSink, skip, limit, order, predicate)
+      }).then(function() {
+        return sink;
+      });
+    },
   ]
 });

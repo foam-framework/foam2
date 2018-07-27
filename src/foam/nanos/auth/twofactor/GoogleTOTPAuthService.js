@@ -83,4 +83,4 @@ user = (User) userDAO.find(user.getId());
 return checkCode(BaseEncoding.base32().decode(user.getTwoFactorSecret()), code, STEP_SIZE, WINDOW);`
     }
   ]
-})
+});

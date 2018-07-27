@@ -212,15 +212,12 @@ foam.LIB({
 
           // Register the class in the global package path.
           foam.package.registerClass(cls);
-        } else if ( m.name ) {
+        } else {
           // Register refinement id in global context.
-          foam.register(cls, ( m.package || 'foam.core' ) + '.' + m.name);
+          // If duplicate names are being registered and the system complains,
+          // find the offending refinement and give it a package and name.
+          foam.register(cls, model.id);
         }
-        // TODO(markdittmer): Identify and name anonymous refinements with:
-        // else {
-        //   console.warn('Refinement without unique id', cls);
-        //   debugger;
-        // }
 
         return cls;
       };
