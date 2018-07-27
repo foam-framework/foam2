@@ -11,6 +11,8 @@ foam.CLASS({
 
   imports: [ 'window' ],
 
+  documentation: 'A menu item which links to an external URL.',
+
   properties: [
     {
       class: 'URL',
