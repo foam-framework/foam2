@@ -11,7 +11,9 @@ import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 public abstract class AbstractDatePropertyInfo
     extends AbstractPropertyInfo
@@ -27,6 +29,15 @@ public abstract class AbstractDatePropertyInfo
       ByteBuffer bb = super.get();
       bb.clear();
       return bb;
+    }
+  };
+
+  protected static final ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
+    @Override
+    protected SimpleDateFormat initialValue() {
+      SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
+      df.setTimeZone(TimeZone.getTimeZone("UTC"));
+      return df;
     }
   };
 
@@ -57,6 +68,7 @@ public abstract class AbstractDatePropertyInfo
 
   @Override
   public void updateDigest(FObject obj, MessageDigest md) {
+    if ( ! includeInDigest() ) return;
     Date date = (Date) get(obj);
     if ( date == null ) return;
 
@@ -66,6 +78,7 @@ public abstract class AbstractDatePropertyInfo
 
   @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {
+    if ( ! includeInSignature() ) return;
     Date date = (Date) get(obj);
     if ( date == null ) return;
 

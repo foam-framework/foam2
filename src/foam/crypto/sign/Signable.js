@@ -14,6 +14,11 @@ foam.INTERFACE({
     {
       name: 'sign',
       javaReturns: 'byte[]',
+      javaThrows: [
+        'java.security.NoSuchAlgorithmException',
+        'java.security.InvalidKeyException',
+        'java.security.SignatureException'
+      ],
       args: [
         {
           name: 'algorithm',
@@ -30,6 +35,11 @@ foam.INTERFACE({
     {
       name: 'verify',
       javaReturns: 'boolean',
+      javaThrows: [
+        'java.security.NoSuchAlgorithmException',
+        'java.security.InvalidKeyException',
+        'java.security.SignatureException'
+      ],
       args: [
         {
           name: 'signature',

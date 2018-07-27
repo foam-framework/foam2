@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.AbstractMethod',
+  flags: ['swift'],
   requires: [
     'foam.core.Argument',
     'foam.swift.Argument as SwiftArgument',
@@ -64,11 +65,10 @@ foam.CLASS({
     {
       name: 'swiftArgs',
       expression: function(args) {
-        var swiftArgs = [];
-        args.forEach(function(a) {
-          swiftArgs.push(this.Argument.create(a).toSwiftArg());
+       return args.map(function(a) {
+          if ( ! a.toSwiftArg ) debugger;
+          return this.Argument.create(a).toSwiftArg()
         }.bind(this));
-        return swiftArgs;
       },
       adapt: function(_, n) {
         var self = this;
@@ -101,13 +101,17 @@ foam.CLASS({
       name: 'swiftSupport',
     },
     {
+      class: 'Boolean',
+      name: 'swiftReturnsOptional',
+    },
+    {
       class: 'String',
       name: 'swiftReturns',
-      expression: function(returns) {
+      expression: function(returns, swiftReturnsOptional) {
         if (!returns) return '';
         var cls = foam.lookup(returns, true)
         if (cls) {
-          return cls.model_.swiftName
+          return cls.model_.swiftName + (swiftReturnsOptional ? '?' : '')
         }
         return 'Any?';
       },
@@ -118,14 +122,18 @@ foam.CLASS({
     },
   ],
   methods: [
-    function writeToSwiftClass(cls, superAxiom, parentCls) {
+    function writeToSwiftClass(cls, parentCls) {
+      if ( ! parentCls.hasOwnAxiom(this.name) ) return;
+      this.writeToSwiftClass_(cls, parentCls);
+    },
+    function writeToSwiftClass_(cls, parentCls) {
       if ( ! this.getSwiftSupport(parentCls) ) return;
       if ( ! this.getSwiftOverride(parentCls) ) {
         cls.fields.push(this.Field.create({
           lazy: true,
           name: this.swiftSlotName,
           initializer: this.slotInit(),
-          type: 'Slot',
+          type: foam.swift.core.Slot.model_.swiftName,
         }));
       }
       cls.fields.push(this.Field.create({
@@ -240,12 +248,12 @@ foam.CLASS({
 <%
 var isMutable = function(a) { return a.annotations.indexOf('inout') != -1 };
 %>
-return ConstantSlot([
+return <%=foam.swift.core.ConstantSlot.model_.swiftName%>([
   "value": { [weak self] (args: [Any?]) throws -> Any? in
     if self == nil { fatalError() }
 <% this.swiftArgs.forEach(function(a, i) { %>
     <%=isMutable(a) ? 'var' : 'let' %> <%
-  %><%=a.localName%> = args[<%=i%>]<%if(a.type!='Any?'){%> as! <%=a.type%><%}%>
+  %><%=a.localName%> = args[<%=i%>] as<%=!a.type.match(/^Any\??$/) ? '!' : ''%> <%=a.type%>
 <% }) %>
 
     return <%=this.swiftThrows ? 'try ' : ''%>self!.`<%=this.swiftName%>`(
@@ -279,7 +287,7 @@ class MInfo: MethodInfo {
   let args: [MethodArg] = [] //TODO
   let classInfo: ClassInfo
   init(_ ci: ClassInfo) { classInfo = ci }
-  public func getSlot(_ obj: FObject) -> Slot {
+  public func getSlot(_ obj: <%=foam.core.FObject.model_.swiftName%>) -> <%=foam.swift.core.Slot.model_.swiftName%> {
     let obj = obj as! <%=parentCls.model_.swiftName%>
     return obj.<%=this.swiftSlotName%>
   }

@@ -29,7 +29,9 @@ return newValue as! [Character]
       name: 'pos',
     },
     {
-      swiftType: 'StringPStream?',
+      class: 'FObjectProperty',
+      of: 'foam.swift.parse.StringPStream',
+      required: false,
       name: 'tail_',
     },
   ],
@@ -50,7 +52,7 @@ return pos < str.count
       name: 'tail',
       swiftCode: function() {/*
 if tail_ == nil {
-  tail_ = StringPStream([
+  tail_ = foam_swift_parse_StringPStream([
     "str": str,
     "pos": pos + 1,
   ])
@@ -62,7 +64,7 @@ return tail_!
       name: 'substring',
       swiftCode: function() {/*
 let startIndex = pos
-let endIndex = (end as! StringPStream).pos
+let endIndex = (end as! foam_swift_parse_StringPStream).pos
 return String(str[startIndex..<endIndex])
       */},
     },
@@ -76,7 +78,7 @@ return value_
     {
       name: 'setValue',
       swiftCode: function() {/*
-let ps = StringPStream([
+let ps = foam_swift_parse_StringPStream([
   "str": str,
   "pos": pos,
   "value_": value,

@@ -54,10 +54,10 @@ public class AuthenticatedUserDAO
     AuthService auth    = (AuthService) x.get("auth");
 
     User toPut = (User) obj;
-    if ( toPut != null && toPut.getId() != user.getId() &&
-        ! auth.check(x, GLOBAL_USER_UPDATE) &&
-        ! auth.check(x, GLOBAL_SPID_UPDATE) &&
-        ! auth.check(x, "spid.update." + user.getSpid()) ) {
+    if ( toPut != null && ! SafetyUtil.equals(toPut.getId(), user.getId()) &&
+      ! auth.check(x, GLOBAL_USER_UPDATE) &&
+      ! auth.check(x, GLOBAL_SPID_UPDATE) &&
+      ! auth.check(x, "spid.update." + user.getSpid()) ) {
       throw new RuntimeException("Unable to update user");
     }
 
@@ -82,7 +82,7 @@ public class AuthenticatedUserDAO
 
     // find user and check if current user has permission to read
     User result = (User) super.find_(x, id);
-    if ( result != null && result.getId() != user.getId() &&
+    if ( result != null && ! SafetyUtil.equals(result.getId(), user.getId()) &&
         ! auth.check(x, GLOBAL_USER_READ) &&
         ! auth.check(x, GLOBAL_SPID_READ) &&
         ! auth.check(x, "spid.read." + result.getSpid()) ) {
@@ -128,7 +128,7 @@ public class AuthenticatedUserDAO
 
     // check if current user has permission to delete
     User toRemove = (User) obj;
-    if ( toRemove != null && toRemove.getId() != user.getId() &&
+    if ( toRemove != null && ! SafetyUtil.equals(toRemove.getId(), user.getId()) &&
         ! auth.check(x, GLOBAL_USER_DELETE) &&
         ! auth.check(x, GLOBAL_SPID_DELETE) &&
         ! auth.check(x, "spid.delete." + toRemove.getSpid()) ) {

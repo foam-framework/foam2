@@ -19,6 +19,11 @@ public class PMDAO
   public PMDAO(DAO delegate) {
     super();
     setDelegate(delegate);
+    System.err.println("*************************** WARNING: FAILURE TO SET PMDAO CONTEXT IN CONSTRUCTOR!");
+  }
+
+  public PMDAO(X x, DAO delegate) {
+    super(x, delegate);
   }
 
   @Override

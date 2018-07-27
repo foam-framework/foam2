@@ -33,7 +33,7 @@ foam.CLASS({
 
         var file = prop.f(obj);
 
-        if ( ! file ) return obj;
+        if ( ! file ) return a();
 
         return self.fileDAO.put(file).then(function (b) {
           prop.set(obj, b);

@@ -15,7 +15,10 @@
  * limitations under the License.
  */
 
-(function() {
+foam.SCRIPT({
+  package: 'foam.parser.html',
+  name: 'LibScript',
+  code: function() {
   // By decree of:
   // http://xahlee.info/js/html5_non-closing_tag.html
   var selfClosingNodeNames = {
@@ -553,4 +556,5 @@
       }
     ]
   });
-})();
+  }
+});

@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.apploader',
   name: 'WebModelFileFetcher',
@@ -5,7 +11,15 @@ foam.CLASS({
     'foam.net.HTTPRequest'
   ],
   properties: [
-    'root',
+    {
+      name: 'root',
+      preSet: function(_, a) {
+        if ( a.endsWith('/') )
+          a = a.substring(0, a.lastIndexOf('/'));
+        
+        return a;
+      }
+    }
   ],
   methods: [
     function getFile(id) {

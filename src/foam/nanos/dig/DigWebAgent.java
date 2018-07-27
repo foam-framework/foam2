@@ -57,21 +57,21 @@ public class DigWebAgent
   public DigWebAgent() {}
 
   public void execute(X x) {
-    Logger              logger      = (Logger) x.get("logger");
-    HttpServletResponse resp        = x.get(HttpServletResponse.class);
-    HttpParameters      p           = x.get(HttpParameters.class);
-    final PrintWriter   out         = x.get(PrintWriter.class);
-    CharBuffer          buffer_     = CharBuffer.allocate(65535);
-    String              data        = p.getParameter("data");
-    String              daoName     = p.getParameter("dao");
-    Command             command     = (Command) p.get(Command.class);
-    Format              format      = (Format) p.get(Format.class);
-    String              id          = p.getParameter("id");
-    String              q           = p.getParameter("q");
-    DAO                 nSpecDAO    = (DAO) x.get("AuthenticatedNSpecDAO");
-    String[]            email       = p.getParameterValues("email");
-    boolean             emailSet    = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
-    String              subject     = p.getParameter("subject");
+    Logger              logger   = (Logger) x.get("logger");
+    HttpServletResponse resp     = x.get(HttpServletResponse.class);
+    HttpParameters      p        = x.get(HttpParameters.class);
+    final PrintWriter   out      = x.get(PrintWriter.class);
+    CharBuffer          buffer_  = CharBuffer.allocate(65535);
+    String              data     = p.getParameter("data");
+    String              daoName  = p.getParameter("dao");
+    Command             command  = (Command) p.get(Command.class);
+    Format              format   = (Format) p.get(Format.class);
+    String              id       = p.getParameter("id");
+    String              q        = p.getParameter("q");
+    DAO                 nSpecDAO = (DAO) x.get("AuthenticatedNSpecDAO");
+    String[]            email    = p.getParameterValues("email");
+    boolean             emailSet = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
+    String              subject  = p.getParameter("subject");
 
     //
     // FIXME/TODO: ensuring XML and CSV flows return proper response objects and codes has not been completed since the switch to HttpParameters.
@@ -111,13 +111,14 @@ public class DigWebAgent
       dao = dao.where(pred);
 
       if ( Command.put == command ) {
+        String returnMessage = "success";
         if ( Format.JSON == format ) {
           JSONParser jsonParser = new JSONParser();
           jsonParser.setX(x);
           foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
           outputterJson.setOutputDefaultValues(true);
           outputterJson.setOutputClassNames(false);
-          //let FObjectArray parse first
+          // let FObjectArray parse first
           if ( SafetyUtil.isEmpty(data) ) {
               resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "PUT|POST expecting data, non received.");
               return;
@@ -158,10 +159,12 @@ public class DigWebAgent
                   resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
                   return;
                 }
+
                 obj = (FObject) o;
                 obj = dao.put(obj);
                 results[i] = obj;
               }
+
               outputterJson.output(results);
               out.println(outputterJson);
               resp.setStatus(HttpServletResponse.SC_OK);
@@ -196,6 +199,8 @@ public class DigWebAgent
             obj = (FObject)i.next();
             obj = dao.put(obj);
           }
+
+          //returnMessage = "<objects>" + success + "</objects>";
         } else if ( Format.CSV == format ) {
           CSVSupport csvSupport = new CSVSupport();
           csvSupport.setX(x);
@@ -223,96 +228,110 @@ public class DigWebAgent
           resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Unsupported Accept");
           return;
         }
-        out.println("Success");
+        out.println(returnMessage);
       } else if ( Command.select == command ) {
         ArraySink sink = (ArraySink) dao.select(new ArraySink());
-        if ( sink.getArray().size() == 0 ) {
-          out.println("No data");
+
+        if ( sink != null ) {
+          if ( sink.getArray().size() == 0 ) {
+            if (Format.XML == format) {
+              resp.setContentType("text/html");
+            }
+            out.println("[]");
+            resp.setStatus(HttpServletResponse.SC_OK);
+            return;
+          }
+          logger.debug(this.getClass().getSimpleName(), "objects selected: " + sink.getArray().size());
+
+          if ( Format.JSON == format ) {
+            foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+            outputterJson.setOutputDefaultValues(true);
+            outputterJson.setOutputClassNames(false);
+            outputterJson.output(sink.getArray().toArray());
+
+            //resp.setContentType("application/json");
+            if ( emailSet ) {
+              output(x, outputterJson.toString());
+            } else {
+              out.println(outputterJson.toString());
+            }
+          } else if ( Format.XML == format ) {
+            XMLSupport xmlSupport = new XMLSupport();
+
+            if ( emailSet ) {
+              String xmlData = "<textarea style=\"width:700;height:400;\" rows=10 cols=120>" + xmlSupport.toXMLString(sink.getArray()) + "</textarea>";
+
+              output(x, xmlData);
+            } else {
+              //resp.setContentType("application/xml");
+              out.println(xmlSupport.toXMLString(sink.getArray()));
+            }
+          } else if ( Format.CSV == format ) {
+            foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);
+            outputterCsv.output(sink.getArray().toArray());
+
+            List a = sink.getArray();
+            for ( int i = 0; i < a.size(); i++ ) {
+              outputterCsv.put((FObject) a.get(i), null);
+            }
+
+            //resp.setContentType("text/plain");
+            //if ( email.length != 0 && ! email[0].equals("")  && email[0] != null ) {
+            if ( emailSet ) {
+              output(x, outputterCsv.toString());
+            } else {
+              out.println(outputterCsv.toString());
+            }
+          } else if ( Format.HTML == format ) {
+            foam.lib.html.Outputter outputterHtml = new foam.lib.html.Outputter(OutputterMode.NETWORK);
+
+            outputterHtml.outputStartHtml();
+            outputterHtml.outputStartTable();
+            List a = sink.getArray();
+
+            for ( int i = 0; i < a.size(); i++ ) {
+              if ( i == 0 ) {
+                outputterHtml.outputHead((FObject) a.get(i));
+              }
+              outputterHtml.put((FObject) a.get(i), null);
+            }
+            outputterHtml.outputEndTable();
+            outputterHtml.outputEndHtml();
+
+            if ( emailSet ) {
+              output(x, outputterHtml.toString());
+            } else {
+              out.println(outputterHtml.toString());
+            }
+          } else if ( Format.JSONJ == format ) {
+            foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+            List a = sink.getArray();
+            String dataToString = "";
+
+            //resp.setContentType("application/json");
+            for ( int i = 0; i < a.size(); i++ ) {
+              outputterJson.output(a.get(i));
+            }
+            String dataArray[] = outputterJson.toString().split("\\{\"class\":\"" + cInfo.getId());
+            for (int k = 1; k < dataArray.length; k++) {
+              dataToString += "p({\"class\":\"" + cInfo.getId() + dataArray[k] + ")\n";
+            }
+
+            if ( emailSet ) {
+              output(x, dataToString);
+            } else {
+              out.println(dataToString);
+            }
+          }
+        } else {
+          if ( Format.XML == format ) {
+            resp.setContentType("text/html");
+          }
+          out.println("unsuported DAO");
           resp.setStatus(HttpServletResponse.SC_OK);
           return;
         }
-        logger.debug(this.getClass().getSimpleName(), "objects selected: " + sink.getArray().size());
-
-        if ( Format.JSON == format ) {
-          foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
-          outputterJson.setOutputDefaultValues(true);
-          outputterJson.setOutputClassNames(false);
-          outputterJson.output(sink.getArray().toArray());
-
-          //resp.setContentType("application/json");
-          if ( emailSet ) {
-            output(x, outputterJson.toString());
-          } else {
-            out.println(outputterJson.toString());
-          }
-        } else if ( Format.XML == format ) {
-          XMLSupport xmlSupport = new XMLSupport();
-
-          if ( emailSet ) {
-            String xmlData = "<textarea style=\"width:700;height:400;\" rows=10 cols=120>" + xmlSupport.toXMLString(sink.getArray()) + "</textarea>";
-
-            output(x, xmlData);
-          } else {
-            //resp.setContentType("application/xml");
-            out.println(xmlSupport.toXMLString(sink.getArray()));
-          }
-        } else if ( Format.CSV == format) {
-          foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);
-          outputterCsv.output(sink.getArray().toArray());
-
-          List a = sink.getArray();
-          for ( int i = 0 ; i < a.size() ; i++ ) {
-            outputterCsv.put((FObject) a.get(i), null);
-          }
-
-          //resp.setContentType("text/plain");
-          //if ( email.length != 0 && ! email[0].equals("")  && email[0] != null ) {
-          if (emailSet) {
-            output(x, outputterCsv.toString());
-          } else {
-            out.println(outputterCsv.toString());
-          }
-        } else if ( Format.HTML == format ) {
-          foam.lib.html.Outputter outputterHtml = new foam.lib.html.Outputter(OutputterMode.NETWORK);
-
-          outputterHtml.outputStartHtml();
-          outputterHtml.outputStartTable();
-          List a = sink.getArray();
-          for ( int i = 0 ; i < a.size() ; i++ ) {
-            if ( i == 0 ) {
-              outputterHtml.outputHead((FObject) a.get(i));
-            }
-            outputterHtml.put((FObject) a.get(i), null);
-          }
-          outputterHtml.outputEndTable();
-          outputterHtml.outputEndHtml();
-
-          if ( emailSet ) {
-            output(x, outputterHtml.toString());
-          } else {
-            out.println(outputterHtml.toString());
-          }
-        }  else if ( Format.JSONJ == format) {
-          foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
-          List a = sink.getArray();
-          String dataToString = "";
-
-          //resp.setContentType("application/json");
-          for ( int i = 0 ; i < a.size() ; i++ ) {
-              outputterJson.output(a.get(i));
-          }
-          String dataArray[] = outputterJson.toString().split("\\{\"class\":\"" + cInfo.getId());
-          for ( int k = 1 ; k < dataArray.length; k++ ) {
-            dataToString += "p({\"class\":\"" + cInfo.getId() + dataArray[k] + ")\n";
-          }
-
-          if ( emailSet ) {
-            output(x, dataToString);
-          } else {
-            out.println(dataToString);
-          }
-        }
-      } else if ( Command.help == command) {
+      } else if ( Command.help == command ) {
         out.println("Help: <br><br>" );
         /*List<PropertyInfo> props = cInfo.getAxiomsByClass(PropertyInfo.class);
         out.println(daoName + "<br><br>");
@@ -366,9 +385,9 @@ public class DigWebAgent
   }
 
   protected void output(X x, String data) {
-    HttpParameters      p       = x.get(HttpParameters.class);
-    String []           email   = p.getParameterValues("email");
-    String              subject = p.getParameter("subject");
+    HttpParameters p       = x.get(HttpParameters.class);
+    String[]       email   = p.getParameterValues("email");
+    String         subject = p.getParameter("subject");
 
     if ( email.length == 0 ) {
       PrintWriter out = x.get(PrintWriter.class);
@@ -407,9 +426,9 @@ public class DigWebAgent
   }
 
   protected void outputPage(X x) {
-    final PrintWriter   out         = x.get(PrintWriter.class);
-    DAO                 nSpecDAO    = (DAO) x.get("AuthenticatedNSpecDAO");
-    Logger              logger      = (Logger) x.get("logger");
+    final PrintWriter out      = x.get(PrintWriter.class);
+    DAO               nSpecDAO = (DAO) x.get("AuthenticatedNSpecDAO");
+    Logger            logger   = (Logger) x.get("logger");
 
     out.println("<form method=post><span>DAO:</span>");
     out.println("<span><select name=dao id=dao style=margin-left:35 onchange=changeUrl()>");

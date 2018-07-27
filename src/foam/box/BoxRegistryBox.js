@@ -40,7 +40,7 @@ foam.CLASS({
       // TODO check if this leaks.
       swiftFactory: 'return SkeletonBox_create(["data": self])',
       swiftPostSet: function() {/*
-if let oldValue = oldValue as? SkeletonBox {
+if let oldValue = oldValue as? foam_box_SkeletonBox {
   oldValue.clearProperty("data")
 }
       */},
@@ -53,7 +53,7 @@ if let oldValue = oldValue as? SkeletonBox {
       swiftCode: function() {/*
 self.onDetach(Subscription(detach: {
   if self.hasOwnProperty("registrySkeleton") {
-    (self.registrySkeleton as? FObject)?.clearProperty("data")
+    (self.registrySkeleton as? foam_core_FObject)?.clearProperty("data")
   }
 }))
       */},
@@ -62,21 +62,21 @@ self.onDetach(Subscription(detach: {
     {
       name: 'send',
       swiftCode: function() {/*
-if let object = msg.object as? SubBoxMessage {
+if let object = msg.object as? foam_box_SubBoxMessage {
   let name = object.name
 
   if let reg = registry_[name] as? Registration {
     msg.object = object.object;
     try reg.localBox.send(msg);
   } else {
-    if let errorBox = msg.attributes["errorBox"] as? Box {
+    if let errorBox = msg.attributes["errorBox"] as? foam_box_Box {
       try errorBox.send(
         Message_create([
           "object": NoSuchNameException_create(["name": name ])
         ]))
     }
   }
-} else if let _ = msg.object as? HelloMessage {
+} else if let _ = msg.object as? foam_box_HelloMessage {
 } else {
   try registrySkeleton!.send(msg)
 }

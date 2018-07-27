@@ -23,18 +23,18 @@ public class HttpParametersWebAgent
   public static final int BUFFER_SIZE = 4096;
 
   protected static ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
-      @Override
-      protected StringBuilder initialValue() {
-        return new StringBuilder();
-      }
+    @Override
+    protected StringBuilder initialValue() {
+      return new StringBuilder();
+    }
 
-      @Override
-      public StringBuilder get() {
-        StringBuilder b = super.get();
-        b.setLength(0);
-        return b;
-      }
-    };
+    @Override
+    public StringBuilder get() {
+      StringBuilder b = super.get();
+      b.setLength(0);
+      return b;
+    }
+  };
 
   protected Class parametersClass = DefaultHttpParameters.class;
 
@@ -42,6 +42,7 @@ public class HttpParametersWebAgent
   public HttpParametersWebAgent(WebAgent delegate) {
     setDelegate(delegate);
   }
+
   public HttpParametersWebAgent(String parametersClassName, WebAgent delegate) {
     setParametersClass(parametersClassName);
     setDelegate(delegate);
@@ -56,9 +57,9 @@ public class HttpParametersWebAgent
   }
 
   public void execute(X x) {
-    Logger              logger     = (Logger) x.get("logger");
-    HttpServletRequest  req        = x.get(HttpServletRequest.class);
-    HttpServletResponse resp       = x.get(HttpServletResponse.class);
+    Logger              logger = (Logger) x.get("logger");
+    HttpServletRequest  req    = x.get(HttpServletRequest.class);
+    HttpServletResponse resp   = x.get(HttpServletResponse.class);
 
     logger = new PrefixLogger(new Object[] { this.getClass().getSimpleName() }, logger);
 
@@ -67,12 +68,15 @@ public class HttpParametersWebAgent
       return;
     }
 
-    String              methodName  = req.getMethod();
-    String              accept      = req.getHeader("Accept");
-    String              contentType = req.getHeader("Content-Type");
-    HttpParameters      parameters  = null;
-    Class               parametersClass = null;
-    Command             command     = Command.select;
+    String         methodName      = req.getMethod();
+    String         accept          = req.getHeader("Accept");
+    String         contentType     = req.getHeader("Content-Type");
+    HttpParameters parameters      = null;
+    Class          parametersClass = null;
+    Command        command         = Command.select;
+    String         cmd             = req.getParameter("cmd");
+
+    logger.debug("methodName", methodName);
 
     try {
       parameters = (HttpParameters) x.create(this.parametersClass);
@@ -81,8 +85,11 @@ public class HttpParametersWebAgent
     }
 
     // Capture 'data' on all requests
-    if ( !SafetyUtil.isEmpty(req.getParameter("data")) ) {
+    if ( ! SafetyUtil.isEmpty(req.getParameter("data")) ) {
       logger.debug("data", req.getParameter("data"));
+      logger.debug("cmd", req.getParameter("cmd"));
+      logger.debug("format", req.getParameter("format"));
+
       parameters.set("data", req.getParameter("data"));
     } else {
       //
@@ -95,12 +102,12 @@ public class HttpParametersWebAgent
       //
       try {
 
-        int read = 0;
-        int count = 0;
+        int read   = 0;
+        int count  = 0;
         int length = req.getContentLength();
 
-        BufferedReader reader = req.getReader();
-        StringBuilder builder = sb.get();
+        BufferedReader reader  = req.getReader();
+        StringBuilder  builder = sb.get();
         char[] cbuffer = new char[BUFFER_SIZE];
         while ( ( read = reader.read(cbuffer, 0, BUFFER_SIZE)) != -1 && count < length ) {
           builder.append(cbuffer, 0, read);
@@ -131,10 +138,33 @@ public class HttpParametersWebAgent
       case "DELETE":
         command = Command.remove;
         break;
-        // defauts to SELECT
+//      case "HELP":
+//        command = Command.help;
+//        resp.setContentType("text/html");
+//        break;
+      case "GET":
+        if ( ! SafetyUtil.isEmpty(cmd) ) {
+          switch ( cmd.toLowerCase() ) {
+            case "put":
+              command = Command.put;
+              break;
+            case "remove":
+              command = Command.remove;
+              break;
+            case "help":
+              command = Command.help;
+              resp.setContentType("text/html");
+              break;
+            // defaults to SELECT
+          }
+        } else {
+          logger.warning("cmd/method could not be determined, defaulting to SELECT.");
+        }
+       break;
+       // defauts to SELECT
       }
     } else {
-      String cmd = req.getParameter("cmd");
+      cmd = req.getParameter("cmd");
       logger.debug("command", cmd);
       if ( ! SafetyUtil.isEmpty(cmd) ) {
         switch ( cmd.toLowerCase() ) {
@@ -146,6 +176,7 @@ public class HttpParametersWebAgent
           break;
         case "help":
           command = Command.help;
+          resp.setContentType("text/html");
           break;
           // defaults to SELECT
         }
@@ -158,32 +189,9 @@ public class HttpParametersWebAgent
 
     Format format = Format.JSON;
     resp.setContentType("text/html");
-    if ( ! SafetyUtil.isEmpty(accept) && ! "application/x-www-form-urlencoded".equals(contentType) ) {
-      logger.debug("accept", accept);
-      String[] formats = accept.split(";");
-      for ( int i = 0; i < formats.length; i++ ) {
-        String f = formats[i].trim();
-        if ( "application/json".equals(f) ) {
-          format = Format.JSON;
-          resp.setContentType(f);
-          break;
-        }
-        if ( "application/jsonj".equals(f) ) {
-          format = Format.JSONJ;
-          resp.setContentType("application/json");
-          break;
-        }
-        if ( "application/xml".equals(f) ) {
-          format = Format.XML;
-          resp.setContentType(f);
-          break;
-        }
-      }
-    } else {
+    if ( req.getParameter("format") != null && ! "".equals(req.getParameter("format").trim()) && command != Command.help ) {
       String f = req.getParameter("format");
-      logger.debug("format", format);
-      if ( ! SafetyUtil.isEmpty(f) ) {
-        switch ( f.toUpperCase() ) {
+      switch ( f.toUpperCase() ) {
         case "XML":
           format = Format.XML;
           resp.setContentType("application/xml");
@@ -204,10 +212,43 @@ public class HttpParametersWebAgent
           format = Format.HTML;
           resp.setContentType("text/html");
           break;
+        default:
+          logger.warning("accept/format could not be determined, default to JSON.");
+      }
+    }
+    else if ( ! SafetyUtil.isEmpty(accept) && ! "application/x-www-form-urlencoded".equals(contentType)  ) {
+      logger.debug("accept", accept);
+      String[] formats = accept.split(";");
+      int i;
+      for ( i = 0 ; i < formats.length; i++ ) {
+        String f = formats[i].trim();
+
+        if ( f.contains("application/json") ) {
+          format = Format.JSON;
+          resp.setContentType("application/json");
+          break;
         }
-      } else {
+        if ( f.contains("application/jsonj") ) {
+          format = Format.JSONJ;
+          resp.setContentType("application/jsonj");
+          break;
+        }
+        if ( f.contains("application/xml") ) {
+          format = Format.XML;
+          resp.setContentType("application/xml");
+          break;
+        }
+        if ( f.contains("text/html") ) {
+          format = Format.HTML;
+          resp.setContentType("text/html");
+          break;
+        }
+      }
+      if ( i == formats.length ) {
         logger.warning("accept/format could not be determined, default to JSON.");
       }
+    } else {
+      logger.warning("accept/format could not be determined, default to JSON.");
     }
     parameters.set("format", format);
     parameters.set(Format.class, format);

@@ -15,17 +15,17 @@ foam.CLASS({
     {
       name: 'code',
       factory: function() {
-        var returns         = foam.String.isInstance(this.returns) ?
+        var returns           = foam.String.isInstance(this.returns) ?
             this.returns :
             this.returns && this.returns.typeName;
-        var replyPolicyName = this.replyPolicyName;
-        var boxPropName     = this.boxPropName;
-        var name            = this.name;
+        var isContextOriented =  this.args.length >= 1 && this.args[0].javaType == 'foam.core.X'
+        var replyPolicyName   = this.replyPolicyName;
+        var boxPropName       = this.boxPropName;
+        var name              = this.name;
 
         return function() {
-          var replyBox = this.RPCReturnBox.create()
-
-          var ret = replyBox.promise;
+          var replyBox = this.RPCReturnBox.create();
+          var ret      = replyBox.promise;
 
           // Automatically wrap RPCs that return a "PromisedAbc" or similar
           // TODO: Move this into RPCReturnBox ?
@@ -33,10 +33,16 @@ foam.CLASS({
             ret = this.lookup(returns).create({ delegate: ret });
           }
 
+          var args = Array.from(arguments);
+
+          // Don't try to marshal context across network
+          // It will be re-added on the Server by the Skeleton
+          if ( isContextOriented ) args[0] = null;
+
           var msg = this.Message.create({
             object: this.RPCMessage.create({
               name: name,
-              args: Array.from(arguments)
+              args: args
             })
           });
 
@@ -79,6 +85,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function installInProto(proto) {
       proto[this.name] = this.stubMethod.code;
@@ -113,25 +120,28 @@ foam.CLASS({
         return (
           methods ?
             methods.map(function(m) { return cls.getAxiomByName(m); }) :
-          cls.getAxiomsByClass(foam.core.Method).filter(function (m) { return cls.hasOwnAxiom(m.name); }) ).
-          map(function(m) {
-            var returns = foam.String.isInstance(m.returns) ? m.returns :
-                m.returns && m.returns.typeName;
-            if ( returns && returns !== 'Promise' ) {
-              var id = returns.split('.');
-              id[id.length - 1] = 'Promised' + id[id.length - 1];
-              returns = id.join('.');
-            }
+            cls.getAxiomsByClass(foam.core.Method).filter(function (m) { return cls.hasOwnAxiom(m.name); }) ).
+              map(function(m) {
+                var returns = foam.String.isInstance(m.returns) ?
+                    m.returns :
+                    m.returns && m.returns.typeName ;
 
-            return foam.core.StubMethod.create({
-              name: m.name,
-              replyPolicyName: replyPolicyName,
-              boxPropName: name,
-              swiftReturns: m.swiftReturns,
-              args: m.args,
-              returns: returns
-            });
-          });
+                if ( returns && returns !== 'Promise' ) {
+                  var id = returns.split('.');
+                  id[id.length - 1] = 'Promised' + id[id.length - 1];
+                  returns = id.join('.');
+                }
+
+                return foam.core.StubMethod.create({
+                  name: m.name,
+                  replyPolicyName: replyPolicyName,
+                  boxPropName: name,
+                  // javaReturns: m.javaReturns, TODO Should we do this?
+                  swiftReturns: m.swiftReturns,
+                  args: m.args,
+                  returns: returns
+                });
+              });
       }
     },
     {

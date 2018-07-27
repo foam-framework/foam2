@@ -11,7 +11,7 @@ import foam.core.ContextAware;
 import foam.core.X;
 import foam.core.XFactory;
 import foam.dao.DAO;
-import foam.dao.DAOSkeleton;
+import foam.dao.SessionDAOSkeleton;
 import foam.nanos.boot.NSpec;
 import foam.nanos.boot.NSpecAware;
 import foam.nanos.logger.Logger;
@@ -40,6 +40,14 @@ public class NanoRouter
   protected X x_;
 
   protected Map<String, WebAgent> handlerMap_ = new ConcurrentHashMap<>();
+
+  @Override
+  public void init(javax.servlet.ServletConfig config) throws javax.servlet.ServletException {
+    Object x = config.getServletContext().getAttribute("X");
+    if ( x != null && x instanceof foam.core.X ) x_ = (foam.core.X)x;
+    
+    super.init(config);
+  }
 
   @Override
   protected void service(final HttpServletRequest req, final HttpServletResponse resp)
@@ -101,7 +109,7 @@ public class NanoRouter
       try {
         Class cls = spec.getBoxClass() != null && spec.getBoxClass().length() > 0 ?
             Class.forName(spec.getBoxClass()) :
-            DAOSkeleton.class ;
+            SessionDAOSkeleton.class ;
         Skeleton skeleton = (Skeleton) cls.newInstance();
 
         // TODO: create using Context, which should do this automatically

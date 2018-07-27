@@ -40,6 +40,14 @@ foam.CLASS({
     'selectionQuery'
   ],
 
+  css: `
+    ^link {
+      color: #00c;
+      margin: 0 8px;
+      text-decoration: none;
+    }
+  `,
+
   properties: [
     {
       name: 'data',
@@ -164,17 +172,5 @@ foam.CLASS({
             .then(function(c) { self.filteredCount_ = c.value; });
       }
     }
-  ],
-
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^link {
-          color: #00c;
-          margin: 0 8px;
-          text-decoration: none;
-        }
-      */}
-    })
   ]
 });
