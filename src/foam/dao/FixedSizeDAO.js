@@ -97,6 +97,8 @@ if ( getNextIndex() == 0 ) {
   backCounter = ( getNextIndex() - 1 );
 }
 
+if ( getNextIndex() < 0 ) backCounter = ( getInternalArraySize() - 1 );
+
 for ( int i = 0; i < getFixedDAOSize() ; i++ ) {
   try {
    if ( getFixedSizeArray()[backCounter] == null ){
