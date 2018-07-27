@@ -41,16 +41,16 @@ foam.CLASS({
       swiftFactory: function() {/*
 return UITableViewRowAction(style: .destructive, title: "Delete") { (_, indexPath) in
   _ = try? self.dataSource?.dao?.remove(
-      self.dataSource?.daoContents[indexPath.row] as! FObject)
+      self.dataSource?.daoContents[indexPath.row] as! foam_core_FObject)
 }
       */},
     },
     {
-      swiftType: '((FObject) -> UIViewController)',
+      swiftType: '((foam_core_FObject) -> UIViewController)',
       swiftRequiresEscaping: true,
       name: 'updateVcFactory',
       swiftFactory: function() {/*
-return { (o: FObject) -> UIViewController in
+return { (o: foam_core_FObject) -> UIViewController in
   let v = self.DetailView_create([
     "data": o,
   ])
@@ -70,7 +70,7 @@ return { (o: FObject) -> UIViewController in
   ],
   swiftCode: function() {/*
 public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-  let data = (dataSource!.daoContents[indexPath.row] as! FObject) // TODO: Clone?
+  let data = (dataSource!.daoContents[indexPath.row] as! foam_core_FObject) // TODO: Clone?
 
   let vc = updateVcFactory(data)
   (stack as? UINavigationController)?.pushViewController(vc, animated: true)

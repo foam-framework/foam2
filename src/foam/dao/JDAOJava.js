@@ -11,7 +11,9 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.ClassInfo',
+    'foam.core.FObject',
     'foam.core.X',
+    'foam.nanos.auth.LastModifiedByAware',
     'java.text.SimpleDateFormat',
     'java.util.Calendar',
     'java.util.TimeZone'
@@ -92,18 +94,24 @@ foam.CLASS({
   methods: [
     {
       name: 'put_',
+      synchronized: true,
       javaCode: `
-        writeComment((foam.nanos.auth.User) x.get("user"));
+        if ( ! ( obj instanceof LastModifiedByAware ) || ((LastModifiedByAware) obj).getLastModifiedBy() == null ) {
+          writeComment((foam.nanos.auth.User) x.get("user"));
+        }
         journal_.put(obj, null);
-        return getDelegate().put_(x, obj);
+        return super.put_(x, obj);
       `
     },
     {
       name: 'remove_',
+      synchronized: true,
       javaCode: `
-        writeComment((foam.nanos.auth.User) x.get("user"));
+        if ( ! ( obj instanceof LastModifiedByAware ) || ((LastModifiedByAware) obj).getLastModifiedBy() == null ) {
+          writeComment((foam.nanos.auth.User) x.get("user"));
+        }
         journal_.remove(obj, null);
-        return getDelegate().remove_(x, obj);
+        return super.remove_(x, obj);
       `
     },
     {
@@ -114,6 +122,7 @@ foam.CLASS({
     },
     {
       name: 'writeComment',
+      synchronized: true,
       documentation: 'Writes comment explaining who modified entry',
       args: [
         {

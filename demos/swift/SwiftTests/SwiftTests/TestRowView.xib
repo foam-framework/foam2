@@ -1,23 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13174"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
-    <customFonts key="customFonts">
-        <array key="Courier.ttc">
-            <string>Courier</string>
-        </array>
-    </customFonts>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="TestDetailView" customModule="SwiftTests" customModuleProvider="target">
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="somepackage_TestDetailView" customModule="SwiftTests" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="419" height="106"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
@@ -53,9 +48,9 @@
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <connections>
-                <outlet property="Test_exprProp" destination="txK-vA-dhC" id="Mrm-U9-tmH"/>
-                <outlet property="Test_firstName" destination="uCJ-nA-3un" id="QPp-dK-XUw"/>
-                <outlet property="Test_lastName" destination="8cn-ZX-yKm" id="d4D-9c-62n"/>
+                <outlet property="somepackage_Test_exprProp" destination="txK-vA-dhC" id="kNN-LX-vm3"/>
+                <outlet property="somepackage_Test_firstName" destination="uCJ-nA-3un" id="9lm-o0-v3u"/>
+                <outlet property="somepackage_Test_lastName" destination="8cn-ZX-yKm" id="aeu-Rg-c5G"/>
             </connections>
             <point key="canvasLocation" x="55.5" y="213"/>
         </view>

@@ -14,6 +14,9 @@ foam.INTERFACE({
     {
       name: 'hash',
       javaReturns: 'byte[]',
+      javaThrows: [
+        'java.security.NoSuchAlgorithmException',
+      ],
       args: [
         {
           name: 'algorithm',

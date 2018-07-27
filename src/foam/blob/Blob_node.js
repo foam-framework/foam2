@@ -17,6 +17,7 @@
 
 foam.CLASS({
   refines: 'foam.blob.Buffer',
+  flags: ['node'],
 
   properties: [
     {

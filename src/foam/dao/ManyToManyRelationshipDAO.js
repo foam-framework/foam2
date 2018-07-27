@@ -70,21 +70,21 @@ foam.CLASS({
     x, sink, skip, limit, order, predicate);`,
 
       swiftCode: function () {
-        /* let pred = __context__.create(Eq.self, args: [
+        /* let pred = __context__.create(foam_mlang_predicate_Eq.self, args: [
           "arg1": relationship?.sourceProperty,
           "arg2": relationship?.sourceId
         ])
 
-        let map = __context__.create(Map.self, args: [
+        let map = __context__.create(foam_mlang_sink_Map.self, args: [
           "arg1": relationship?.targetProperty,
-          "delegate": __context__.create(ArraySink.self)
+          "delegate": __context__.create(foam_dao_ArraySink.self)
         ])
 
-        let junction: Map = try relationship!.junctionDAO!.`where`(pred).select(map!) as! Map
-        return try delegate.`where`(__context__.create(In.self, args: [
+        let junction: foam_mlang_sink_Map = try relationship!.junctionDAO!.`where`(pred).select(map!) as! foam_mlang_sink_Map
+        return try delegate.`where`(__context__.create(foam_mlang_predicate_In.self, args: [
           "arg1": primaryKey,
-          "arg2": __context__.create(ArrayConstant.self, args: [
-            "value": (junction.delegate as? ArraySink)?.array
+          "arg2": __context__.create(foam_mlang_ArrayConstant.self, args: [
+            "value": (junction.delegate as? foam_dao_ArraySink)?.array
           ])
         ])).select_(x, sink, skip, limit, order, predicate)  */
       }

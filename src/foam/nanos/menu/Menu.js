@@ -22,16 +22,19 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'label'
+      name: 'label',
+      documentation: 'Menu label.'
     },
     {
       class: 'FObjectProperty',
       name: 'handler',
+      documentation: 'View initialized when menu is launched.',
       view: { class: 'foam.u2.view.FObjectView' }
     },
     {
       class: 'Int',
       name: 'order',
+      documentation: 'Used to order the menu list.',
       value: 1000
     }
   ],
