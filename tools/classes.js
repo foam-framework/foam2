@@ -178,6 +178,7 @@ var classes = [
   'foam.nanos.logger.LogsView',
   'foam.nanos.menu.Menu',
   'foam.nanos.menu.DAOMenu',
+  'foam.nanos.menu.LinkMenu',
   'foam.nanos.menu.ListMenu',
   'foam.nanos.menu.MenuBar',
   'foam.nanos.menu.PopupMenu',
