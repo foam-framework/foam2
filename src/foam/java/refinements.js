@@ -961,11 +961,18 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = `if ( o instanceof String ) {
-        java.util.Date date = new java.util.Date((String) o);
-        return date;
-        }
-        return (java.util.Date) o;`;
+      m.body = `
+        try {
+          if ( o instanceof Number ) {
+            return new java.util.Date(((Number) o).longValue());
+          } else if ( o instanceof String ) {
+            return sdf.get().parse((String) o);
+          } else {
+            return (java.util.Date) o;
+          }
+        } catch ( Throwable t ) {
+          throw new RuntimeException(t);
+        }`;
 
       return info;
   }
@@ -990,11 +997,18 @@ foam.CLASS({
      function createJavaPropertyInfo_(cls) {
        var info = this.SUPER(cls);
        var m = info.getMethod('cast');
-       m.body = `if ( o instanceof String ) {
-         java.util.Date date = new java.util.Date((String) o);
-         return date;
-         }
-         return (java.util.Date)o;`;
+      m.body = `
+        try {
+          if ( o instanceof Number ) {
+            return new java.util.Date(((Number) o).longValue());
+          } else if ( o instanceof String ) {
+            return sdf.get().parse((String) o);
+          } else {
+            return (java.util.Date) o;
+          }
+        } catch ( Throwable t ) {
+          throw new RuntimeException(t);
+        }`;
 
        return info;
      }
