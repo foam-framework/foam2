@@ -13,7 +13,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.Sink',
-    'java.util.concurrent.locks.ReentrantReadWriteLock',
+    // why am I using a ReentractLock ?
     'java.util.concurrent.locks.ReentrantLock',
     'java.util.concurrent.locks.Lock'
   ],
@@ -26,13 +26,19 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'fixedArraySize',
-      value: 150
+      value: 10000
+    },
+    {
+      class: 'Int',
+      name: 'internalArraySize',
+      private: true,
+      javaFactory: `return ( (int)  (1.1 *  (double) getFixedArraySize() ) ); `
     },
     {
       class: 'Array',
       of: 'foam.core.FObject',
       name: 'fixedSizeArray',
-      javaFactory: `return new foam.core.FObject[getFixedArraySize()];`
+      javaFactory: `return new foam.core.FObject[ getInternalArraySize() ];`
     },
     {
       class: 'Object',
@@ -62,7 +68,7 @@ foam.core.FObject delegatedObject = getDelegate().put_(x, obj);
 getLock().lock();
 try {
   insertAt = getNextIndex();  
-  if ( insertAt == getFixedArraySize() ) {
+  if ( insertAt == getInternalArraySize() ) {
     insertAt = 0;
   }
   setNextIndex( insertAt + 1 );
@@ -82,18 +88,28 @@ if (sink == null){
 }
 sink = prepareSink(sink);
 Sink decorated = decorateSink_(sink, skip, limit, order, predicate);
-Integer backCounter = getNextIndex() - 1 ;
-for ( int i = 0; i < 100; i++ ) {
+
+Integer backCounter;
+
+if (getNextIndex() == 0 ) {
+  backCounter = ( getInternalArraySize() - 1 ); 
+} else {
+  backCounter = ( getNextIndex() - 1 );
+}
+
+for ( int i = 0; i < getFixedArraySize() ; i++ ) {
   try {
+   if ( getFixedSizeArray()[backCounter] == null ){
+      break;
+    }
     decorated.put ( getFixedSizeArray()[backCounter] ,null );
     if (backCounter == 0 ) {
-      backCounter = getFixedArraySize();
-    }
+      backCounter = getInternalArraySize();
+    } 
     backCounter--;
   } catch (Exception e) {
-    // is there a better way to handle this? if the array has nothing in it, you
-    // need ths catch to catch an NPE
     System.err.print(" FSD select_ returned an NPE \\n" ) ;
+    break;
   }
 }
 decorated.eof();
