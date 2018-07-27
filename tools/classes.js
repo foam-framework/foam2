@@ -75,7 +75,6 @@ var classes = [
   'foam.box.CheckAuthenticationBox',
   'foam.box.SessionReplyBox',
   'foam.box.SessionClientBox',
-  'foam.box.DigErrorMessage',
   'foam.dao.DAO',
   'foam.dao.JDAO',
   'foam.dao.FilteredDAO',
@@ -272,6 +271,7 @@ var classes = [
   'foam.test.TestObj',
   'foam.core.FObjectTest',
 
+  'foam.nanos.dig.exception.DigErrorMessage',
   'foam.nanos.dig.exception.DaoNoFoundException',
   'foam.nanos.dig.exception.ParsingErrorException',
   'foam.nanos.dig.exception.DaoPutException',

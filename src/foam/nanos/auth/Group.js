@@ -39,12 +39,6 @@ foam.CLASS({
       name: 'parent',
       documentation: 'Parent group to inherit permissions from.'
     },
-//    {
-//      class: 'Reference',
-//      name: 'parent',
-//      of: 'foam.nanos.auth.Group',
-//      documentation: 'Parent group to inherit permissions from.'
-//    },
     {
       class: 'FObjectArray',
       of: 'foam.nanos.auth.Permission',

@@ -6,7 +6,7 @@
 foam.CLASS({
   package: 'foam.nanos.dig.exception',
   name: 'EmptyDataException',
-  extends: 'foam.box.DigErrorMessage',
+  extends: 'foam.nanos.dig.exception.DigErrorMessage',
 
   properties: [
     {

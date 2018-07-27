@@ -50,7 +50,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
-import foam.box.DigErrorMessage;
 import foam.nanos.dig.exception.*;
 
 public class DigWebAgent
@@ -62,7 +61,7 @@ public class DigWebAgent
     Logger              logger   = (Logger) x.get("logger");
     HttpServletResponse resp     = x.get(HttpServletResponse.class);
     HttpParameters      p        = x.get(HttpParameters.class);
-    PrintWriter   out      = x.get(PrintWriter.class);
+    PrintWriter   out            = x.get(PrintWriter.class);
     CharBuffer          buffer_  = CharBuffer.allocate(65535);
     String              data     = p.getParameter("data");
     String              daoName  = p.getParameter("dao");
@@ -328,8 +327,12 @@ public class DigWebAgent
           if ( Format.XML == format ) {
             resp.setContentType("text/html");
           }
-          out.println("Unsupported DAO");
-          resp.setStatus(HttpServletResponse.SC_OK);
+
+          DigErrorMessage error = new ParsingErrorException.Builder(x)
+            .setMessage("Unsupported DAO")
+            .build();
+          outputException(x, resp, format, out, error);
+
           return;
         }
       } else if ( Command.help == command ) {
@@ -359,9 +362,6 @@ public class DigWebAgent
           out.println("Success");
         }
       } else {
-        //out.println("Unknown command: " + command);
-        resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Unsupported method: "+command);
-
         DigErrorMessage error = new ParsingErrorException.Builder(x)
                                   .setMessage("Unsupported method: "+command)
                                   .build();
@@ -457,7 +457,7 @@ public class DigWebAgent
       outputterCsv.output(error);
       out.println(outputterCsv.toString());
 
-    } else if ( format == Format.HTML) {
+    } else if ( format == Format.HTML ) {
       foam.lib.html.Outputter outputterHtml = new foam.lib.html.Outputter(OutputterMode.NETWORK);
 
       outputterHtml.outputStartHtml();
@@ -468,7 +468,7 @@ public class DigWebAgent
       outputterHtml.outputEndHtml();
       out.println(outputterHtml.toString());
     } else {
-      //TODO
+      // TODO
     }
   }
 
