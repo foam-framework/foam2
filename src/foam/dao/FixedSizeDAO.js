@@ -82,10 +82,17 @@ if (sink == null){
 }
 sink = prepareSink(sink);
 Sink decorated = decorateSink_(sink, skip, limit, order, predicate);
+Integer backCounter = getNextIndex() - 1 ;
 for ( int i = 0; i < 100; i++ ) {
   try {
-    decorated.put ( getFixedSizeArray()[i] ,null )   ;
+    decorated.put ( getFixedSizeArray()[backCounter] ,null );
+    if (backCounter == 0 ) {
+      backCounter = getFixedArraySize();
+    }
+    backCounter--;
   } catch (Exception e) {
+    // is there a better way to handle this? if the array has nothing in it, you
+    // need ths catch to catch an NPE
     System.err.print(" FSD select_ returned an NPE \\n" ) ;
   }
 }
