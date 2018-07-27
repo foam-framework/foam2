@@ -270,6 +270,12 @@ var classes = [
   'foam.util.PasswordTest',
   'foam.test.TestObj',
   'foam.core.FObjectTest',
+
+  'foam.nanos.dig.exception.DaoNoFoundException',
+  'foam.nanos.dig.exception.ParsingErrorException',
+  'foam.nanos.dig.exception.DaoPutException',
+  'foam.nanos.dig.exception.EmptyDataException',
+  'foam.nanos.dig.exception.UnsupportException'
 ];
 
 var abstractClasses = [
