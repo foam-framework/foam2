@@ -20,7 +20,8 @@ foam.CLASS({
     },
   ],
   methods: [
-    function writeToSwiftClass(cls) {
+    function writeToSwiftClass(cls, parentCls) {
+      if ( ! parentCls.hasOwnAxiom(this.name) ) return;
       if (foam.core.InterfaceModel.isInstance(this.lookup(this.path).model_)) {
         return;
       }
@@ -36,6 +37,11 @@ foam.CLASS({
             defaultValue: '[:]',
             type: '[String:Any?]',
           }),
+          this.Argument.create({
+            localName: 'x',
+            defaultValue: 'nil',
+            type: 'Context?',
+          }),
         ],
       }));
     },
@@ -45,7 +51,7 @@ foam.CLASS({
       name: 'swiftInitializer',
       args: [],
       template: function() {/*
-return __subContext__.create(<%=this.swiftReturns%>.self, args: args)!
+return (x ?? __subContext__).create(<%=this.swiftReturns%>.self, args: args)!
       */},
     },
   ],

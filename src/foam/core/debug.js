@@ -368,6 +368,9 @@ foam.CLASS({
 foam.SCRIPT({
   package: 'foam.core',
   name: 'DebugContextScript',
+  requires: [
+    'foam.debug.Window',
+  ],
   flags: ['debug'],
   code: function() {
 foam.__context__ = foam.debug.Window.create(null, foam.__context__).__subContext__;
