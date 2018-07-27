@@ -100,7 +100,7 @@ foam.CLASS({
             name: 'getShortName',
             visibility: 'public',
             type: 'String',
-            body:  this.propShortName ? 'return "' +this.propShortName+'";' : 'return null;'
+            body:  this.propShortName ? 'return "' +this.propShortName + '";' : 'return null;'
           },
           {
             name: 'getAliases',
