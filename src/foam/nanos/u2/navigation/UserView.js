@@ -181,12 +181,10 @@ foam.CLASS({
       this
         .addClass(this.myClass())
 
-        //currency menu
+         //currency menu
         .start().addClass('currency-container')
-          .select(this.menuDAO.where(this.EQ(this.Menu.ID, 'currency')), function(menu) {
-            return menu.handler;
-          })
-        this.end()
+          .tag({ class: 'net.nanopay.ui.topNavigation.CurrencyChoiceView' })
+        .end()
 
         // The notifications container
         this.start('div')
