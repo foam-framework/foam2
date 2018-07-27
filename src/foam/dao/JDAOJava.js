@@ -96,9 +96,12 @@ foam.CLASS({
       name: 'put_',
       synchronized: true,
       javaCode: `
-        if ( ! ( obj instanceof LastModifiedByAware ) || ((LastModifiedByAware) obj).getLastModifiedBy() == null ) {
+      try {
+        if (!(obj instanceof LastModifiedByAware) || ((LastModifiedByAware) obj).findLastModifiedBy(x) == null) {
           writeComment((foam.nanos.auth.User) x.get("user"));
         }
+      } catch (Throwable t) {
+        t.printStackTrace();}
         journal_.put(obj, null);
         return super.put_(x, obj);
       `
@@ -107,9 +110,12 @@ foam.CLASS({
       name: 'remove_',
       synchronized: true,
       javaCode: `
-        if ( ! ( obj instanceof LastModifiedByAware ) || ((LastModifiedByAware) obj).getLastModifiedBy() == null ) {
+      try {
+        if (!(obj instanceof LastModifiedByAware) || ((LastModifiedByAware) obj).findLastModifiedBy(x) == null) {
           writeComment((foam.nanos.auth.User) x.get("user"));
         }
+      } catch (Throwable t) {
+        t.printStackTrace();}
         journal_.remove(obj, null);
         return super.remove_(x, obj);
       `
