@@ -1,9 +1,10 @@
 <html>
   <body>
     <script src="src/foam.js"></script>
-    <script src="src/foam/classloader/WebModelDisplayer.js"></script>
     <script>
-      foam.classloader.WebModelDisplayer.create().fromQuery().execute();
+      foam.__context__.classloader.load('foam.classloader.WebModelDisplayer').then(function(cls) {
+        cls.create().fromQuery().execute();
+      });
     </script>
   </body>
 </html>

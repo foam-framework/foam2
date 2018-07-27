@@ -22,6 +22,15 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id'
+    },
+    {
+      class: 'String',
+      name: 'description',
+      documentation: `
+        This property is available so that you can write tests that need you to
+        be able to update a TestObj. If the only property was 'id', you wouldn't
+        be able to update a TestObj.
+      `
     }
   ]
 });
