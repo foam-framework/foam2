@@ -83,6 +83,21 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'javaCompare',
+      value: 'return foam.util.SafetyUtil.compare(get_(o1), get_(o2));'
+    },
+    {
+      class: 'String',
+      name: 'javaComparePropertyToObject',
+      value: 'return foam.util.SafetyUtil.compare(cast(key), get_(o));'
+    },
+    {
+      class: 'String',
+      name: 'javaComparePropertyToValue',
+      value: 'return foam.util.SafetyUtil.compare(cast(key), cast(value));'
+    },
+    {
+      class: 'String',
       name: 'javaAssertValue'
     },
     {
@@ -110,26 +125,29 @@ foam.CLASS({
   methods: [
     function createJavaPropertyInfo_(cls) {
       return foam.java.PropertyInfo.create({
-        sourceCls:          cls,
-        propName:           this.name,
-        propShortName:      this.shortName,
-        propAliases:        this.aliases,
-        propType:           this.javaType,
-        propValue:          this.javaValue,
-        propRequired:       this.required,
-        cloneProperty:      this.javaCloneProperty,
-        diffProperty:       this.javaDiffProperty,
-        jsonParser:         this.javaJSONParser,
-        queryParser:        this.javaQueryParser,
-        csvParser:          this.javaCSVParser,
-        extends:            this.javaInfoType,
-        networkTransient:   this.networkTransient,
-        storageTransient:   this.storageTransient,
-        xmlAttribute:       this.xmlAttribute,
-        xmlTextNode:        this.xmlTextNode,
-        sqlType:            this.sqlType,
-        includeInDigest:    this.includeInDigest,
-        includeInSignature: this.includeInSignature
+        sourceCls:               cls,
+        propName:                this.name,
+        propShortName:           this.shortName,
+        propAliases:             this.aliases,
+        propType:                this.javaType,
+        propValue:               this.javaValue,
+        propRequired:            this.required,
+        cloneProperty:           this.javaCloneProperty,
+        diffProperty:            this.javaDiffProperty,
+        compare:                 this.javaCompare,
+        comparePropertyToValue:  this.javaComparePropertyToValue,
+        comparePropertyToObject: this.javaComparePropertyToObject,
+        jsonParser:              this.javaJSONParser,
+        queryParser:             this.javaQueryParser,
+        csvParser:               this.javaCSVParser,
+        extends:                 this.javaInfoType,
+        networkTransient:        this.networkTransient,
+        storageTransient:        this.storageTransient,
+        xmlAttribute:            this.xmlAttribute,
+        xmlTextNode:             this.xmlTextNode,
+        sqlType:                 this.sqlType,
+        includeInDigest:         this.includeInDigest,
+        includeInSignature:      this.includeInSignature
       });
     },
 
@@ -943,11 +961,18 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = `if ( o instanceof String ) {
-        java.util.Date date = new java.util.Date((String) o);
-        return date;
-        }
-        return (java.util.Date) o;`;
+      m.body = `
+        try {
+          if ( o instanceof Number ) {
+            return new java.util.Date(((Number) o).longValue());
+          } else if ( o instanceof String ) {
+            return sdf.get().parse((String) o);
+          } else {
+            return (java.util.Date) o;
+          }
+        } catch ( Throwable t ) {
+          throw new RuntimeException(t);
+        }`;
 
       return info;
   }
@@ -972,11 +997,18 @@ foam.CLASS({
      function createJavaPropertyInfo_(cls) {
        var info = this.SUPER(cls);
        var m = info.getMethod('cast');
-       m.body = `if ( o instanceof String ) {
-         java.util.Date date = new java.util.Date((String) o);
-         return date;
-         }
-         return (java.util.Date)o;`;
+      m.body = `
+        try {
+          if ( o instanceof Number ) {
+            return new java.util.Date(((Number) o).longValue());
+          } else if ( o instanceof String ) {
+            return sdf.get().parse((String) o);
+          } else {
+            return (java.util.Date) o;
+          }
+        } catch ( Throwable t ) {
+          throw new RuntimeException(t);
+        }`;
 
        return info;
      }
@@ -1387,37 +1419,41 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'javaType',
+      name: 'referencedProperty',
+      transient: true,
       factory: function() {
-        // TODO: instead of creating reference properties as Object type, match
-        // the primary key of the target class/model
-        /*
         var idProp = this.of.ID.cls_ == foam.core.IDAlias ? this.of.ID.targetProperty : this.of.ID;
-        console.log('******************************************************', this.of.id, idProp.javaType);
-        */
 
-        return 'Object';
+        idProp = idProp.clone();
+        idProp.name = this.name;
+
+        return idProp;
       }
     },
-    [ 'javaJSONParser',  'foam.lib.json.AnyParser.instance()' ],
-    [ 'javaQueryParser', 'foam.lib.query.AnyParser.instance()' ],
-    [ 'javaInfoType',    'foam.core.AbstractObjectPropertyInfo' ]
+    { name: 'javaType',        factory: function() { return this.referencedProperty.javaType; } },
+    { name: 'javaJSONParser',  factory: function() { return this.referencedProperty.javaJSONParser; } },
+    { name: 'javaQueryParser', factory: function() { return this.referencedProperty.javaQueryParser; } },
+    { name: 'javaInfoType',    factory: function() { return this.referencedProperty.javaInfoType; } }
   ],
 
   methods: [
     function buildJavaClass(cls) {
-      this.SUPER(cls);
+      // Disable super behaviour on purpose.
+      // this.SUPER(cls);
+
+      // Install a renamed copy of the refernced model's id property instead
+      this.referencedProperty.buildJavaClass(cls);
+
       cls.method({
         name: `find${foam.String.capitalize(this.name)}`,
         visibility: 'public',
         type: this.of.id,
         args: [ { name: 'x', type: 'foam.core.X' } ],
-        body: `return (${this.of.id})((foam.dao.DAO) x.get("${this.targetDAOKey}")).find_(x, get${foam.String.capitalize(this.name)}());`
+        body: `return (${this.of.id})((foam.dao.DAO) x.get("${this.targetDAOKey}")).find_(x, (Object) get${foam.String.capitalize(this.name)}());`
       });
     }
   ]
 });
-
 
 foam.CLASS({
   refines: 'foam.pattern.Multiton',

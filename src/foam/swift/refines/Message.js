@@ -12,7 +12,8 @@ foam.CLASS({
     'foam.i18n.TranslationFormatStringParser',
   ],
   methods: [
-    function writeToSwiftClass(cls) {
+    function writeToSwiftClass(cls, parentCls) {
+      if ( ! parentCls.hasOwnAxiom(this.name) ) return;
       var parser = this.TranslationFormatStringParser.create({
         value: this.message,
         translationHint: this.description,

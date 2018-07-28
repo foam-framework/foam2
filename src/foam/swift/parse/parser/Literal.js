@@ -24,7 +24,7 @@ foam.CLASS({
       name: 'parse',
       swiftCode: function() {/*
 var ps = ps
-for i in 0..<string.characters.count {
+for i in 0..<string.count {
   if !ps.valid() || ps.head() != string.char(at: i) {
     return nil
   }

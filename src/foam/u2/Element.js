@@ -1601,7 +1601,7 @@ foam.CLASS({
         },
         cleanup: function() {
           for ( var key in es ) {
-            es[key].remove();
+            es[key] && es[key].remove();
           }
 
           es = {};

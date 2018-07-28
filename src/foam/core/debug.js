@@ -368,6 +368,9 @@ foam.CLASS({
 foam.SCRIPT({
   package: 'foam.core',
   name: 'DebugContextScript',
+  requires: [
+    'foam.debug.Window',
+  ],
   flags: ['debug'],
   code: function() {
 foam.__context__ = foam.debug.Window.create(null, foam.__context__).__subContext__;
@@ -399,7 +402,13 @@ foam.LIB({
       if ( fn.isTypeChecker__ ) return fn;
 
       // parse out the arguments and their types
-      var args = foam.Function.args(fn);
+      try {
+        var args = foam.Function.args(fn);
+      } catch (e) {
+        // Could not parse args so don't bother decorating.
+        console.warn('Unable to parse args:', e);
+        return fn;
+      }
 
       // check if no checkable arguments
       var checkable = false;

@@ -68,10 +68,14 @@ foam.CLASS({
       return this;
     },
     function getMethod(name) {
-      var m = this.methods.find(function(m) {
+      return this.methods.find(function(m) {
         return m.name === name;
       });
-      return m;
+    },
+    function getClass(name) {
+      return this.classes.find(function(m) {
+        return m.name === name;
+      });
     },
     function field(f) {
       this.fields.push(f);
