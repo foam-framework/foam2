@@ -121,6 +121,6 @@ public class Email {
    * @return true if valid, false otherwise
    */
   public static boolean isValid(String email) {
-    return EMAIL_PATTERN.matcher(email).matches();
+    return ! SafetyUtil.isEmpty(email) && EMAIL_PATTERN.matcher(email).matches();
   }
 }

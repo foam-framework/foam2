@@ -42,8 +42,11 @@ foam.CLASS({
 
   Count count = new Count();
   count = (Count) ((DAO) getX().get("localUserDAO"))
-      .where(MLang.EQ(User.EMAIL, user.getEmail()))
-      .limit(1).select(count);
+      .where(MLang.AND(
+        MLang.EQ(User.EMAIL, user.getEmail()),
+        MLang.NEQ(User.ID,  user.getId())
+      )).limit(1).select(count);
+
   if ( count.getValue() == 1 ) {
     throw new RuntimeException("User with same email address already exists: " + user.getEmail());
   }
