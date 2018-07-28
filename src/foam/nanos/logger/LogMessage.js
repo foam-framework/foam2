@@ -50,13 +50,14 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
       value: '1',
       transient: true,
       hidden: true,
-      documentation: 'Added to suppress journal comments regarding "modified by". Also, a non-null value is required.'
+      documentation: 'Added to suppress journal comments regarding "modified by". Also, a non-null value is required.',
+      javaFactory: 'return 1L;'
     },
     {
       name: 'message',
       class: 'String',
       label: 'Log Message',
-      visibility: foam.u2.Visibility.RO      
+      visibility: foam.u2.Visibility.RO
     },
     // TODO: implement via an additional method on Logger logger.flag(x, y).log(message)
     // {
