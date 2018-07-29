@@ -12,8 +12,9 @@ foam.CLASS({
 
   implements: [
     'foam.nanos.auth.CreatedAware',
-    'foam.nanos.auth.CreatedByAware'
-  ],
+    'foam.nanos.auth.CreatedByAware',
+    'foam.nanos.auth.LastModifiedByAware'
+ ],
 
   properties: [
     {
@@ -49,6 +50,16 @@ foam.CLASS({
     {
       class: 'String',
       name: 'body'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedBy',
+      value: '1',
+      transient: true,
+      hidden: true,
+      documentation: 'Added to suppress journal comments regarding "modified by". Also, a non-null value is required.',
+      javaFactory: 'return 1L;'
     }
   ]
 });

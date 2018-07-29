@@ -89,7 +89,7 @@ public class UserAndGroupAuthServiceTest
       int randomGroup = ThreadLocalRandom.current().nextInt(0, sink.getArray().size());
       Group group = (Group) sink.getArray().get(randomGroup);
 
-      user.setGroup(group);
+      user.setGroup(group.getId());
       userDAO_.put(user);
     }
 

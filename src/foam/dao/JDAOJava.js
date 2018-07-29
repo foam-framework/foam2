@@ -96,22 +96,32 @@ foam.CLASS({
       name: 'put_',
       synchronized: true,
       javaCode: `
-        if ( ! ( obj instanceof LastModifiedByAware ) || ((LastModifiedByAware) obj).getLastModifiedBy() == null ) {
+      //TODO: since this shouldn't be happening.
+      try {
+        if ( ! ( obj instanceof LastModifiedByAware ) || ((LastModifiedByAware) obj).getLastModifiedBy() == 0L ) {
           writeComment((foam.nanos.auth.User) x.get("user"));
         }
-        journal_.put(obj, null);
-        return super.put_(x, obj);
+      } catch (Throwable t) {
+        t.printStackTrace();
+      }
+      journal_.put(obj, null);
+      return super.put_(x, obj);
       `
     },
     {
       name: 'remove_',
       synchronized: true,
       javaCode: `
-        if ( ! ( obj instanceof LastModifiedByAware ) || ((LastModifiedByAware) obj).getLastModifiedBy() == null ) {
+      //TODO: since this shouldn't be happening.
+      try {
+        if ( ! ( obj instanceof LastModifiedByAware ) || ((LastModifiedByAware) obj).getLastModifiedBy() == 0L ) {
           writeComment((foam.nanos.auth.User) x.get("user"));
         }
-        journal_.remove(obj, null);
-        return super.remove_(x, obj);
+      } catch (Throwable t) {
+        t.printStackTrace();
+      }
+      journal_.remove(obj, null);
+      return super.remove_(x, obj);
       `
     },
     {
