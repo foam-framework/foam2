@@ -61,7 +61,7 @@ public class DigWebAgent
     Logger              logger   = (Logger) x.get("logger");
     HttpServletResponse resp     = x.get(HttpServletResponse.class);
     HttpParameters      p        = x.get(HttpParameters.class);
-    PrintWriter   out            = x.get(PrintWriter.class);
+    PrintWriter         out      = x.get(PrintWriter.class);
     CharBuffer          buffer_  = CharBuffer.allocate(65535);
     String              data     = p.getParameter("data");
     String              daoName  = p.getParameter("dao");
@@ -97,8 +97,8 @@ public class DigWebAgent
       DAO dao = (DAO) x.get(daoName);
 
       if ( dao == null ) {
-        DigErrorMessage error = new DaoNoFoundException.Builder(x)
-                                      .setMessage("DAO can not found: " + daoName)
+        DigErrorMessage error = new DAONotFoundException.Builder(x)
+                                      .setMessage("DAO not found: " + daoName)
                                       .build();
         outputException(x, resp, format, out, error);
         return;
@@ -124,7 +124,6 @@ public class DigWebAgent
           outputterJson.setOutputClassNames(false);
           // let FObjectArray parse first
           if ( SafetyUtil.isEmpty(data) ) {
-            //TODO: return exception
               DigErrorMessage error = new EmptyDataException.Builder(x)
                                             .build();
               outputException(x, resp, format, out, error);
@@ -135,7 +134,7 @@ public class DigWebAgent
             Object o1 = jsonParser.parseString(data, objClass);
             if ( o == null && o1 == null ) {
               DigErrorMessage error = new ParsingErrorException.Builder(x)
-                                            .setMessage("Invalid Json Format")
+                                            .setMessage("Invalid JSON Format")
                                             .build();
               outputException(x, resp, format, out, error);
               return;
@@ -161,7 +160,7 @@ public class DigWebAgent
 
           } catch (Exception e) {
             logger.error(e);
-            DigErrorMessage error = new DaoPutException.Builder(x)
+            DigErrorMessage error = new DAOPutException.Builder(x)
                                           .setMessage(e.getMessage())
                                           .build();
             outputException(x, resp, format, out, error);
@@ -222,7 +221,7 @@ public class DigWebAgent
           }
         } else if ( Format.HTML == format ) {
           DigErrorMessage error = new UnsupportException.Builder(x)
-                                        .setMessage("This" + format + "is not supported.")
+                                        .setMessage("Unsupported Format: " + format)
                                         .build();
           outputException(x, resp, format, out, error);
 
@@ -329,7 +328,7 @@ public class DigWebAgent
           }
 
           DigErrorMessage error = new ParsingErrorException.Builder(x)
-            .setMessage("Unsupported DAO")
+            .setMessage("Unsupported DAO : " + daoName)
             .build();
           outputException(x, resp, format, out, error);
 

@@ -5,7 +5,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.dig.exception',
-  name: 'DaoNoFoundException',
+  name: 'DAONotFoundException',
   extends: 'foam.nanos.dig.exception.DigErrorMessage',
 
   properties: [
@@ -22,7 +22,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'type',
-      value: 'NoFound'
+      value: 'NotFound'
     }
   ]
 })

@@ -272,9 +272,9 @@ var classes = [
   'foam.core.FObjectTest',
 
   'foam.nanos.dig.exception.DigErrorMessage',
-  'foam.nanos.dig.exception.DaoNoFoundException',
+  'foam.nanos.dig.exception.DAONotFoundException',
   'foam.nanos.dig.exception.ParsingErrorException',
-  'foam.nanos.dig.exception.DaoPutException',
+  'foam.nanos.dig.exception.DAOPutException',
   'foam.nanos.dig.exception.EmptyDataException',
   'foam.nanos.dig.exception.UnsupportException'
 ];
