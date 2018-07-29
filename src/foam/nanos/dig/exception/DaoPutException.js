@@ -5,7 +5,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.dig.exception',
-  name: 'DaoPutException',
+  name: 'DAOPutException',
   extends: 'foam.nanos.dig.exception.DigErrorMessage',
 
   properties: [
