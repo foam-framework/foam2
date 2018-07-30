@@ -101,8 +101,8 @@ foam.CLASS({
 
 
 foam.CLASS({
-  name: '__Class__',
   package: 'foam.core',
+  name: '__Class__',
 
   axioms: [
     {
