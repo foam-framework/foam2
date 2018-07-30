@@ -86,22 +86,6 @@ foam.CLASS({
 
 
 foam.CLASS({
-  refines: 'foam.core.Class',
-
-  methods: [
-    function outputJSON(o) {
-      if ( o.passClassesByReference ) {
-        o.output({ class: '__Class__', forClass_: this.name });
-      } else {
-        o.outputFObject_(this);
-      }
-
-    }
-  ]
-});
-
-
-foam.CLASS({
   package: 'foam.core',
   name: '__Class__',
 
