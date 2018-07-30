@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.box.Remote',
+  flags: ['swift'],
   requires: [
     'foam.swift.Method',
     'foam.swift.Argument',
@@ -18,7 +19,8 @@ foam.CLASS({
     }
   ],
   methods: [
-    function writeToSwiftClass(cls) {
+    function writeToSwiftClass(cls, parentCls) {
+      if ( ! parentCls.hasOwnAxiom(this.name) ) return;
       cls.method(this.Method.create({
         visibility: 'public',
         override: true,

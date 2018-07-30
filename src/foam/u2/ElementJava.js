@@ -73,12 +73,6 @@ foam.CLASS({
 });
 foam.CLASS({
   package: 'foam.u2',
-  name: 'MethodElementJavaRefine',
-  refines: 'foam.core.Method',
-  properties: [ 'javaCode' ]
-});
-foam.CLASS({
-  package: 'foam.u2',
   name: 'ModelElementJavaRefine',
   refines: 'foam.core.Model',
   properties: [ 'tableProperties', 'tableColumns', 'generateJava', 'searchColumns', 'tableCellFormatter', 'css', 'import', 'description' ]

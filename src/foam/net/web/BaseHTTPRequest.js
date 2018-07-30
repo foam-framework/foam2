@@ -17,7 +17,8 @@
 
 
 foam.SCRIPT({
-  id: 'foam.net.web.HTTPRequestScript',
+  package: 'foam.net.web',
+  name: 'HTTPRequestScript',
   requires: [
     'foam.net.web.HTTPRequest',
   ],

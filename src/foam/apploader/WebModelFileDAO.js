@@ -33,10 +33,10 @@ foam.CLASS({
     'json2',
     {
       name: 'delegate',
-      factory: function() {
-        var cls = this.json2 ? this.JSON2ModelFileDAO : this.ModelFileDAO;
+      expression: function(root, json2) {
+        var cls = json2 ? this.JSON2ModelFileDAO : this.ModelFileDAO;
         return cls.create({
-          fetcher: this.WebModelFileFetcher.create({root: this.root}), });
+          fetcher: this.WebModelFileFetcher.create({root: root}), });
       },
     },
   ],

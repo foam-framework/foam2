@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.Property',
+  flags: ['swift'],
   requires: [
     'foam.swift.Argument',
     'foam.swift.Field',
@@ -190,6 +191,7 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
   ],
   methods: [
     function writeToSwiftClass(cls, parentCls) {
+      if ( ! parentCls.hasOwnAxiom(this.name) ) return;
       if ( ! this.swiftSupport ) return;
 
       if ( foam.core.AbstractInterface.isSubClass(parentCls) ) {
@@ -203,6 +205,8 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
         return;
       }
 
+      // We don't use getSuperAxiomByName here because that will pull in axioms
+      // from implements and those aren't overrides in swift.
       var isOverride = !!parentCls.getSuperClass().getAxiomByName(this.name);
       cls.fields.push(this.Field.create({
         visibility: 'public',
@@ -489,6 +493,7 @@ return PInfo(classInfo())
 
 foam.CLASS({
   refines: 'foam.core.FObjectProperty',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -502,6 +507,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Class',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -512,6 +518,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.List',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -526,6 +533,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Boolean',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -533,15 +541,14 @@ foam.CLASS({
     },
     {
       name: 'swiftValue',
-      expression: function(value) {
-        return '' + value;
-      },
+      expression: function(value) { return foam.swift.stringify(value) },
     },
   ],
 });
 
 foam.CLASS({
   refines: 'foam.core.Map',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -556,6 +563,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.StringArray',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -636,6 +644,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.DateTime',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -664,6 +673,7 @@ return Date()
 
 foam.CLASS({
   refines: 'foam.core.Enum',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
