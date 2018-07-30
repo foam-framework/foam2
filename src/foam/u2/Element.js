@@ -1640,8 +1640,6 @@ foam.CLASS({
       this.onDetach(dao.listen(listener));
       listener.delegate.paint();
 
-      dao.sub('on', 'reset', listener.delegate.paint);
-
       return this;
     },
 
