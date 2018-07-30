@@ -92,7 +92,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          of: 'foam.core.X'
+          javaType: 'foam.core.X'
         },
         {
           of: 'Blob',
@@ -116,7 +116,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          of: 'foam.core.X'
+          javaType: 'foam.core.X'
         },
         {
           of: 'String',
@@ -140,7 +140,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          of: 'foam.core.X'
+          javaType: 'foam.core.X'
         },
         {
           of: 'Blob',
