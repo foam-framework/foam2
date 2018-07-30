@@ -312,8 +312,7 @@ foam.CLASS({
 
         return c;
       }
-    ],
-    ['toJSON', function(value) { return value ? value.id : value; } ]
+    ]
   ],
 
   methods: [
