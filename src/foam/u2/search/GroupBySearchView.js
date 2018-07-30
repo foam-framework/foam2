@@ -29,7 +29,11 @@ foam.CLASS({
     'foam.u2.view.ChoiceView'
   ],
 
-  css: "^ select { min-width: 220px; }",
+  css: `
+    ^ select {
+      min-width: 220px;
+    }
+  `,
 
   properties: [
     {
@@ -51,7 +55,9 @@ foam.CLASS({
     },
     {
       name: 'name',
-      expression: function(property) { return property.name; }
+      expression: function(property) {
+        return property.name;
+      }
     },
     {
       class: 'Class',
@@ -79,7 +85,9 @@ foam.CLASS({
     {
       class: 'Function',
       name: 'aFormatLabel',
-      value: function(key) { return Promise.resolve(''+key); }
+      value: function(key) {
+        return Promise.resolve('' + key);
+      }
     },
     'previewMode',
     'hardData'
@@ -102,9 +110,9 @@ foam.CLASS({
         .on('click', function(e) {
           try {
             self.previewMode = false;
-            var data         = self.view.choices[e.target.value][0];
-            self.hardData    = data;
-          } catch(x) {}
+            var data = self.view.choices[e.target.value][0];
+            self.hardData = data;
+          } catch (x) {}
         })
         .on('mouseover', function(e) {
           try {
@@ -116,7 +124,7 @@ foam.CLASS({
             }
 
             self.view.data = data;
-          } catch(x) {}
+          } catch (x) {}
         })
         .on('mouseout', function(e) {
           self.view.data = self.hardData;
@@ -124,7 +132,7 @@ foam.CLASS({
         })
         .onDetach(
           this.dao$proxy.listen(
-            this.FnSink.create({fn: this.updateDAO})
+            this.FnSink.create({ fn: this.updateDAO })
           )
         );
 
@@ -160,7 +168,7 @@ foam.CLASS({
           var options = [];
           var selected;
           var sortedKeys = groups.sortedKeys();
-          self.formatLabels(sortedKeys).then(function (labels) {
+          self.formatLabels(sortedKeys).then(function(labels) {
             for ( var i = 0 ; i < sortedKeys.length ; i++ ) {
               var key = sortedKeys[i];
               if ( typeof key === 'undefined' ) continue;
@@ -186,7 +194,7 @@ foam.CLASS({
               ]);
             }
 
-            options.splice(0, 0, [ '', '--' ]);
+            options.splice(0, 0, ['', '--']);
 
             self.view.choices = options;
             if ( typeof selected !== 'undefined' ) {
