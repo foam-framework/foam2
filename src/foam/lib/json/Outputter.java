@@ -193,6 +193,8 @@ public class Outputter
       outputFObject((FObject) value);
     } else if ( value instanceof PropertyInfo) {
       outputPropertyInfo((PropertyInfo) value);
+    } else if ( value instanceof ClassInfo ) {
+      outputClassInfo((ClassInfo) value);
     } else if ( value instanceof Number ) {
       outputNumber((Number) value);
     } else if ( isArray(value) ) {
@@ -321,6 +323,18 @@ public class Outputter
     outputString("name");
     writer_.append(":");
     outputString(prop.getName());
+    writer_.append("}");
+  }
+
+  protected void outputClassInfo(ClassInfo info) {
+    writer_.append("{");
+    outputString("class");
+    writer_.append(":");
+    outputString("__Class__");
+    writer_.append(",");
+    outputString("forClass_");
+    writer_.append(":");
+    outputString(info.getId());
     writer_.append("}");
   }
 
