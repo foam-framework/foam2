@@ -9,10 +9,12 @@ foam.CLASS({
   name: 'TabsMenu',
   extends: 'foam.nanos.menu.AbstractMenu',
 
+  documentation: 'Menu for displaying all sub-menus as tabs.',
+
   requires: [
     {
       path: 'foam.u2.Tabs',
-      javaPath: '',
+      javaPath: ''
     },
   ],
 
