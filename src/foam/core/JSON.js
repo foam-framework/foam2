@@ -170,12 +170,6 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'passClassesByReference',
-      help: 'If true, Class objects are passed as __Class__ references rather than by value.',
-      value: true,
-    },
-    {
-      class: 'Boolean',
       name: 'formatDatesAsNumbers',
       value: false
     },
