@@ -8,7 +8,8 @@ foam.CLASS({
   refines: 'foam.core.Topic',
   flags: ['swift'],
   methods: [
-    function writeToSwiftClass(cls, superAxiom, parentCls) {
+    function writeToSwiftClass(cls, parentCls) {
+      if ( ! parentCls.hasOwnAxiom(this.name) ) return;
       if (! foam.swift.SwiftClass.isInstance(cls) ) return;
       cls.fields.push(foam.swift.Field.create({
         visibility: 'public',

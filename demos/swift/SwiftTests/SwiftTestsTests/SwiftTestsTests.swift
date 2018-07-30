@@ -589,4 +589,9 @@ class SwiftTestsTests: XCTestCase {
     t.set(key: "dateProp", value: Date(timeIntervalSince1970: 1234))
     XCTAssertEqual(t.dateProp, Date(timeIntervalSince1970: 1234))
   }
+
+  func testInstanceOf() {
+    let o = x.create(somepackage_Test.self)!
+    XCTAssertTrue(somepackage_Test.classInfo().instanceOf(o))
+  }
 }

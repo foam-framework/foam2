@@ -362,13 +362,19 @@ foam.CLASS({
     {
       name: 'delegate',
       transient: true,
-      javaInfoType: 'foam.blob.AbstractIdentifiedBlobPropertyInfo',
       factory: function() {
         return this.blobService.find(this.id);
       },
       javaFactory: `
         return ((BlobService) getBlobStore()).find(getId());
-      `
+      `,
+      cloneProperty: function () {},
+      diffProperty: function () {},
+      javaCloneProperty: '// noop',
+      javaDiffProperty: '// noop',
+      javaCompare: 'return 0;',
+      javaComparePropertyToObject: 'return 0;',
+      javaComparePropertyToValue: 'return 0;',
     }
   ],
 

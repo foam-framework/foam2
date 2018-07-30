@@ -33,6 +33,7 @@ FOAM_FILES([
   { name: "foam/core/FObject" },
   { name: "foam/core/Model" },
   { name: "foam/core/Property" },
+  { name: "foam/core/Simple" },
   { name: "foam/core/Method" },
   { name: "foam/core/Boolean" },
   { name: "foam/core/AxiomArray" },
@@ -108,6 +109,8 @@ FOAM_FILES([
   { name: "foam/swift/refines/Requires", flags: ['swift'] },
   { name: "foam/swift/refines/IntProperty", flags: ['swift'] },
   { name: "foam/swift/refines/String", flags: ['swift'] },
+  { name: "foam/swift/refines/Multiton", flags: ['swift'] },
+  { name: "foam/swift/refines/Singleton", flags: ['swift'] },
   { name: "foam/swift/SwiftJava", flags: ['java'] },
   { name: "foam/swift/Field", flags: ['swift']},
   { name: "foam/swift/Method", flags: ['swift']},
@@ -521,4 +524,6 @@ FOAM_FILES([
   { name: "foam/crypto/sign/Signable" },
   { name: "foam/crypto/sign/SignableTest" },
   { name: "foam/test/TestObj" },
+  { name: "foam/core/FObjectTest" },
+  { name: "foam/nanos/dig/exception/DigErrorMessage" },
 ]);
