@@ -48,6 +48,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   name: '__Property__',
   package: 'foam.core',
@@ -457,7 +458,9 @@ foam.CLASS({
           this.end(']');
         },
         Object: function(o) {
-          if ( o.outputJSON ) {
+          if ( o.isSubClass ) {
+            this.output({ class: '__Class__', forClass_: o.id });
+          } else if ( o.outputJSON ) {
             o.outputJSON(this);
           } else {
             this.start('{');
