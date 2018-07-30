@@ -49,8 +49,9 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  name: '__Property__',
   package: 'foam.core',
+  name: '__Property__',
+
   axioms: [
     {
       name: 'create',
@@ -84,8 +85,25 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Class',
+
+  methods: [
+    function outputJSON(o) {
+      if ( o.passClassesByReference ) {
+        o.output({ class: '__Class__', forClass_: this.forClass_ });
+      } else {
+        o.outputFObject_(this);
+      }
+
+    }
+  ]
+});
+
+
+foam.CLASS({
   name: '__Class__',
   package: 'foam.core',
+
   axioms: [
     {
       name: 'create',
@@ -162,6 +180,12 @@ foam.CLASS({
       name: 'passPropertiesByReference',
       help: 'If true, Property objects are passed as __Property__ references rather than by value.',
       value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'passClassesByReference',
+      help: 'If true, Class objects are passed as __Class__ references rather than by value.',
+      value: true,
     },
     {
       class: 'Boolean',
