@@ -90,7 +90,7 @@ foam.CLASS({
   methods: [
     function outputJSON(o) {
       if ( o.passClassesByReference ) {
-        o.output({ class: '__Class__', forClass_: this.forClass_ });
+        o.output({ class: '__Class__', forClass_: this.name });
       } else {
         o.outputFObject_(this);
       }
@@ -107,7 +107,9 @@ foam.CLASS({
   axioms: [
     {
       name: 'create',
-      installInClass: function(clsName) { return X.lookup(clsName, true); }
+      installInClass: function(clsName) {
+        return X.lookup(clsName, true);
+      }
     }
   ]
 });
