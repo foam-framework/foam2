@@ -10,7 +10,8 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
-    'foam.u2.search.SearchManager'
+    'foam.u2.search.SearchManager',
+    'foam.u2.view.SearchViewWrapper'
   ],
 
   imports: [
@@ -25,7 +26,9 @@ foam.CLASS({
   // TODO: CSS classname shouldn't be .net-nanopay-ui-ActionView, fix.
   css: `
     ^ {
-      min-width: 180px;
+      background-color: white;
+      border-radius: 2px;
+      min-width: 300px;
       font-size: medium;
     }
 
@@ -36,14 +39,25 @@ foam.CLASS({
     ^count {
       font-size: 14pt;
       color: #555;
+      margin: 20px 20px 0 20px;
     }
 
     ^ .net-nanopay-ui-ActionView-clear {
-      background: #59aadd;
-      color: white;
-      margin-top: 14px;
-      padding: 12px;
-      width: auto;
+      background-color: rgba(164, 179, 184, 0.1);
+      border: solid 1px rgba(164, 179, 184, 0.5);
+      border-radius: 2px;
+      color: #093649;
+      font-family: Roboto;
+      font-size: 14px;
+      font-stretch: normal;
+      font-style: normal;
+      font-weight: normal;
+      height: 40px;
+      letter-spacing: 0.2px;
+      line-height: 2.86;
+      text-align: center;
+      width: 60px;
+      margin: 20px;
     }
   `,
 
@@ -125,11 +139,10 @@ foam.CLASS({
 
             searchManager.add(view);
             this
-              .start()
-                .addClass(self.myClass('filter-header'))
-                .add(axiom.label)
-              .end()
-              .start(view)
+              .start(self.SearchViewWrapper, {
+                searchView: view,
+                predicate$: view.predicate$
+              })
                 .addClass(self.myClass('filter'))
               .end();
           });
