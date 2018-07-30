@@ -28,10 +28,11 @@ public abstract class AbstractFObject
 
   public FObject shallowClone() {
     try {
-      FObject ret = (FObject) getClass().newInstance();
+      FObject ret = getClass().newInstance();
       List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
-      for ( PropertyInfo pi : props ) {
-        pi.set(ret, pi.get(this));
+      for ( PropertyInfo prop : props ) {
+        if ( ! prop.isSet(this) ) continue;
+        prop.set(ret, prop.get(this));
       }
       return ret;
     } catch (IllegalAccessException | InstantiationException e) {
@@ -41,10 +42,11 @@ public abstract class AbstractFObject
 
   public FObject fclone() {
     try {
-      FObject ret = (FObject) getClass().newInstance();
+      FObject ret = getClass().newInstance();
       List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
-      for( PropertyInfo pi : props ) {
-        pi.cloneProperty(this, ret);
+      for( PropertyInfo prop : props ) {
+        if ( ! prop.isSet(this) ) continue;
+        prop.cloneProperty(this, ret);
       }
       return ret;
     } catch (IllegalAccessException | InstantiationException e) {

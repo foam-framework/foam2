@@ -19,7 +19,8 @@ foam.CLASS({
     }
   ],
   methods: [
-    function writeToSwiftClass(cls) {
+    function writeToSwiftClass(cls, parentCls) {
+      if ( ! parentCls.hasOwnAxiom(this.name) ) return;
       cls.method(this.Method.create({
         visibility: 'public',
         override: true,
