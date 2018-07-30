@@ -149,10 +149,10 @@ foam.CLASS({
         // Add if requested
         if ( data ) permissions.push(p_);
 
-        group.permissions = permissions; //Array.from(permissions);
+        group.permissions = permissions;
         dao.put(group);
 
-        self.updateChildrenPermission(group.parent, permissions);
+        self.updateChildrenPermission(g_.id, permissions);
       });
     },
 
