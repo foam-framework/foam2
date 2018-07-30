@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'DAOMenu',
   extends: 'foam.nanos.menu.AbstractMenu',
 
+  documentation: 'Menu for displaying standard DAO controller.',
+
   properties: [
     {
       class: 'String',
@@ -28,7 +30,7 @@ foam.CLASS({
   methods: [
     function createView(X) {
       if ( ! X[this.daoKey] ) {
-        throw new Error("No dao found for " + this.daoKey);
+        throw new Error("No DAO found for " + this.daoKey);
       }
 
       var view = { class: 'foam.comics.BrowserView', data: X[this.daoKey] };
