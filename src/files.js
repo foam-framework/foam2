@@ -524,5 +524,6 @@ FOAM_FILES([
   { name: "foam/crypto/sign/Signable" },
   { name: "foam/crypto/sign/SignableTest" },
   { name: "foam/test/TestObj" },
-  { name: "foam/core/FObjectTest" }
+  { name: "foam/core/FObjectTest" },
+  { name: "foam/nanos/dig/exception/DigErrorMessage" },
 ]);
