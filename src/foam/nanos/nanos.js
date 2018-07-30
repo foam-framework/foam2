@@ -139,4 +139,6 @@ FOAM_FILES([
   { name: 'foam/demos/net/nap/web/RegulatoryNoticeForm', flags: ['web'] },
   { name: 'foam/demos/net/nap/web/RegulatoryNoticeList', flags: ['web'] },
   { name: 'foam/demos/net/nap/web/EditRegulatoryNotice', flags: ['web'] }
+
+
 ]);
