@@ -64,17 +64,17 @@ foam.CLASS({
 
         if ( ! of ) return [];
 
-        if ( of.model_.searchColumns )
-          return of.model_.searchColumns;
+        if ( of.model_.searchColumns ) return of.model_.searchColumns;
 
-        if ( of.model_.tableColumns )
+        if ( of.model_.tableColumns ) {
           return of.model_.tableColumns.filter(function(c) {
             var axiom = of.getAxiomByName(c);
             return axiom && axiom.searchView;
           });
+        }
 
         return of.getAxiomsByClass(foam.core.Property)
-            .filter(function(p) { return p.searchView && ! p.hidden })
+            .filter((prop) => prop.searchView && ! prop.hidden)
             .map(foam.core.Property.NAME.f);
       }
     },
@@ -105,20 +105,23 @@ foam.CLASS({
             predicate$: self.data$
           });
 
-//          searchManager.filteredDAO.on.sub(self.updateSelectedCount);
           searchManager.filteredDAO$.sub(self.updateSelectedCount);
-          self.updateSelectedCount(0,0,0,searchManager.filteredDAO$);
+          self.updateSelectedCount(0, 0, 0, searchManager.filteredDAO$);
 
           var e = this.E('div');
 
           e.onDetach(searchManager);
 
           e.forEach(filters, function(f) {
-            // TODO: See if this can be cleaned up somehow, if searchView didn't require the proprety explicitly, or
-            // could find the search manager via the context and add itself to that.
+            // TODO: See if this can be cleaned up somehow, if searchView didn't
+            // require the proprety explicitly, or could find the search manager
+            // via the context and add itself to that.
             var axiom = self.dao.of.getAxiomByName(f);
-            var spec  = axiom.searchView;
-            var view  = foam.u2.ViewSpec.createView(spec, { property: axiom, dao: self.dao }, this, this.__subSubContext__);
+            var spec = axiom.searchView;
+            var view = foam.u2.ViewSpec.createView(spec, {
+              property: axiom,
+              dao: self.dao
+            }, this, this.__subSubContext__);
 
             searchManager.add(view);
             this
@@ -136,11 +139,15 @@ foam.CLASS({
         .start()
           .addClass(self.myClass('count'))
           // TODO: move formatting function to stdlib
-          .add(self.selectedCount$.map(function(a) { return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }))
+          .add(self.selectedCount$.map(function(a) {
+            return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          }))
           .entity('nbsp')
           .add('of')
           .entity('nbsp')
-          .add(self.totalCount$.map(function(a) { return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }))
+          .add(self.totalCount$.map(function(a) {
+            return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          }))
           .entity('nbsp')
           .add('selected')
         .end()
@@ -167,12 +174,6 @@ foam.CLASS({
       }
     }
   ],
-
-  /*
-  reactions: [
-    [ 'data', 'on', 'updateTotalCount' ]
-  ],
-  */
 
   listeners: [
     {
