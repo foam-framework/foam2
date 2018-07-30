@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'ReciprocalSearch',
-  extends: 'foam.u2.Element', // TODO: make be a View
+  extends: 'foam.u2.View',
 
   requires: [
     'foam.u2.search.SearchManager'
