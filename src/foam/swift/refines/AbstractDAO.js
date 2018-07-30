@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.dao.DAOProperty',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -19,6 +20,7 @@ foam.CLASS({
   ],
   methods: [
     function writeToSwiftClass(cls, parentCls) {
+      if ( ! parentCls.hasOwnAxiom(this.name) ) return;
       this.SUPER(cls, parentCls);
       cls.fields.push(
         foam.swift.Field.create({

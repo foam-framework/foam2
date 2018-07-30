@@ -95,7 +95,12 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      javaCode: 'if ( getPredicate().f(obj) ) getDelegate().put(obj, sub);'
+      javaCode: `
+        try {
+          if ( getPredicate().f(obj) ) getDelegate().put(obj, sub);
+        } catch (ClassCastException exp) {
+        }
+      `
     },
     {
       name: 'remove',

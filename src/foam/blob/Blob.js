@@ -365,7 +365,16 @@ foam.CLASS({
       factory: function() {
         return this.blobService.find(this.id);
       },
-      javaFactory: 'return ((BlobService) getBlobStore()).find(getId());'
+      javaFactory: `
+        return ((BlobService) getBlobStore()).find(getId());
+      `,
+      cloneProperty: function () {},
+      diffProperty: function () {},
+      javaCloneProperty: '// noop',
+      javaDiffProperty: '// noop',
+      javaCompare: 'return 0;',
+      javaComparePropertyToObject: 'return 0;',
+      javaComparePropertyToValue: 'return 0;',
     }
   ],
 
@@ -391,21 +400,7 @@ foam.CLASS({
   properties: [
     [ 'of', 'foam.blob.Blob' ],
     [ 'tableCellView', function() {} ],
-    [ 'view', { class: 'foam.u2.view.BlobView' } ],
-    [ 'cloneProperty', function () {} ],
-    [ 'diffProperty', function () {} ],
-    [ 'javaCloneProperty', '// noop' ],
-    [ 'javaDiffProperty', '// noop' ]
-  ],
-
-  methods: [
-    function createJavaPropertyInfo_(cls) {
-      var info = this.SUPER(cls);
-      info.getMethod('compare').body = `return 0;`
-      info.getMethod('comparePropertyToObject').body = `return 0;`
-      info.getMethod('comparePropertyToValue').body = `return 0;`
-      return info;
-    }
+    [ 'view', { class: 'foam.u2.view.BlobView' } ]
   ]
 });
 

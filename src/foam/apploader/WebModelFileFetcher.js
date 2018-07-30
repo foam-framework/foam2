@@ -11,7 +11,15 @@ foam.CLASS({
     'foam.net.HTTPRequest'
   ],
   properties: [
-    'root',
+    {
+      name: 'root',
+      preSet: function(_, a) {
+        if ( a.endsWith('/') )
+          a = a.substring(0, a.lastIndexOf('/'));
+        
+        return a;
+      }
+    }
   ],
   methods: [
     function getFile(id) {

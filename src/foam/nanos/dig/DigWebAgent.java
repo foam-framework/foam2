@@ -111,6 +111,7 @@ public class DigWebAgent
       dao = dao.where(pred);
 
       if ( Command.put == command ) {
+        String returnMessage = "success";
         if ( Format.JSON == format ) {
           JSONParser jsonParser = new JSONParser();
           jsonParser.setX(x);
@@ -158,10 +159,12 @@ public class DigWebAgent
                   resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
                   return;
                 }
+
                 obj = (FObject) o;
                 obj = dao.put(obj);
                 results[i] = obj;
               }
+
               outputterJson.output(results);
               out.println(outputterJson);
               resp.setStatus(HttpServletResponse.SC_OK);
@@ -196,6 +199,8 @@ public class DigWebAgent
             obj = (FObject)i.next();
             obj = dao.put(obj);
           }
+
+          //returnMessage = "<objects>" + success + "</objects>";
         } else if ( Format.CSV == format ) {
           CSVSupport csvSupport = new CSVSupport();
           csvSupport.setX(x);
@@ -223,96 +228,110 @@ public class DigWebAgent
           resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Unsupported Accept");
           return;
         }
-        out.println("Success");
+        out.println(returnMessage);
       } else if ( Command.select == command ) {
         ArraySink sink = (ArraySink) dao.select(new ArraySink());
-        if ( sink.getArray().size() == 0 ) {
-          out.println("No data");
+
+        if ( sink != null ) {
+          if ( sink.getArray().size() == 0 ) {
+            if (Format.XML == format) {
+              resp.setContentType("text/html");
+            }
+            out.println("[]");
+            resp.setStatus(HttpServletResponse.SC_OK);
+            return;
+          }
+          logger.debug(this.getClass().getSimpleName(), "objects selected: " + sink.getArray().size());
+
+          if ( Format.JSON == format ) {
+            foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+            outputterJson.setOutputDefaultValues(true);
+            outputterJson.setOutputClassNames(false);
+            outputterJson.output(sink.getArray().toArray());
+
+            //resp.setContentType("application/json");
+            if ( emailSet ) {
+              output(x, outputterJson.toString());
+            } else {
+              out.println(outputterJson.toString());
+            }
+          } else if ( Format.XML == format ) {
+            XMLSupport xmlSupport = new XMLSupport();
+
+            if ( emailSet ) {
+              String xmlData = "<textarea style=\"width:700;height:400;\" rows=10 cols=120>" + xmlSupport.toXMLString(sink.getArray()) + "</textarea>";
+
+              output(x, xmlData);
+            } else {
+              //resp.setContentType("application/xml");
+              out.println(xmlSupport.toXMLString(sink.getArray()));
+            }
+          } else if ( Format.CSV == format ) {
+            foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);
+            outputterCsv.output(sink.getArray().toArray());
+
+            List a = sink.getArray();
+            for ( int i = 0; i < a.size(); i++ ) {
+              outputterCsv.put((FObject) a.get(i), null);
+            }
+
+            //resp.setContentType("text/plain");
+            //if ( email.length != 0 && ! email[0].equals("")  && email[0] != null ) {
+            if ( emailSet ) {
+              output(x, outputterCsv.toString());
+            } else {
+              out.println(outputterCsv.toString());
+            }
+          } else if ( Format.HTML == format ) {
+            foam.lib.html.Outputter outputterHtml = new foam.lib.html.Outputter(OutputterMode.NETWORK);
+
+            outputterHtml.outputStartHtml();
+            outputterHtml.outputStartTable();
+            List a = sink.getArray();
+
+            for ( int i = 0; i < a.size(); i++ ) {
+              if ( i == 0 ) {
+                outputterHtml.outputHead((FObject) a.get(i));
+              }
+              outputterHtml.put((FObject) a.get(i), null);
+            }
+            outputterHtml.outputEndTable();
+            outputterHtml.outputEndHtml();
+
+            if ( emailSet ) {
+              output(x, outputterHtml.toString());
+            } else {
+              out.println(outputterHtml.toString());
+            }
+          } else if ( Format.JSONJ == format ) {
+            foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+            List a = sink.getArray();
+            String dataToString = "";
+
+            //resp.setContentType("application/json");
+            for ( int i = 0; i < a.size(); i++ ) {
+              outputterJson.output(a.get(i));
+            }
+            String dataArray[] = outputterJson.toString().split("\\{\"class\":\"" + cInfo.getId());
+            for (int k = 1; k < dataArray.length; k++) {
+              dataToString += "p({\"class\":\"" + cInfo.getId() + dataArray[k] + ")\n";
+            }
+
+            if ( emailSet ) {
+              output(x, dataToString);
+            } else {
+              out.println(dataToString);
+            }
+          }
+        } else {
+          if ( Format.XML == format ) {
+            resp.setContentType("text/html");
+          }
+          out.println("unsuported DAO");
           resp.setStatus(HttpServletResponse.SC_OK);
           return;
         }
-        logger.debug(this.getClass().getSimpleName(), "objects selected: " + sink.getArray().size());
-
-        if ( Format.JSON == format ) {
-          foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
-          outputterJson.setOutputDefaultValues(true);
-          outputterJson.setOutputClassNames(false);
-          outputterJson.output(sink.getArray().toArray());
-
-          //resp.setContentType("application/json");
-          if ( emailSet ) {
-            output(x, outputterJson.toString());
-          } else {
-            out.println(outputterJson.toString());
-          }
-        } else if ( Format.XML == format ) {
-          XMLSupport xmlSupport = new XMLSupport();
-
-          if ( emailSet ) {
-            String xmlData = "<textarea style=\"width:700;height:400;\" rows=10 cols=120>" + xmlSupport.toXMLString(sink.getArray()) + "</textarea>";
-
-            output(x, xmlData);
-          } else {
-            //resp.setContentType("application/xml");
-            out.println(xmlSupport.toXMLString(sink.getArray()));
-          }
-        } else if ( Format.CSV == format) {
-          foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);
-          outputterCsv.output(sink.getArray().toArray());
-
-          List a = sink.getArray();
-          for ( int i = 0 ; i < a.size() ; i++ ) {
-            outputterCsv.put((FObject) a.get(i), null);
-          }
-
-          //resp.setContentType("text/plain");
-          //if ( email.length != 0 && ! email[0].equals("")  && email[0] != null ) {
-          if (emailSet) {
-            output(x, outputterCsv.toString());
-          } else {
-            out.println(outputterCsv.toString());
-          }
-        } else if ( Format.HTML == format ) {
-          foam.lib.html.Outputter outputterHtml = new foam.lib.html.Outputter(OutputterMode.NETWORK);
-
-          outputterHtml.outputStartHtml();
-          outputterHtml.outputStartTable();
-          List a = sink.getArray();
-          for ( int i = 0 ; i < a.size() ; i++ ) {
-            if ( i == 0 ) {
-              outputterHtml.outputHead((FObject) a.get(i));
-            }
-            outputterHtml.put((FObject) a.get(i), null);
-          }
-          outputterHtml.outputEndTable();
-          outputterHtml.outputEndHtml();
-
-          if ( emailSet ) {
-            output(x, outputterHtml.toString());
-          } else {
-            out.println(outputterHtml.toString());
-          }
-        }  else if ( Format.JSONJ == format) {
-          foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
-          List a = sink.getArray();
-          String dataToString = "";
-
-          //resp.setContentType("application/json");
-          for ( int i = 0 ; i < a.size() ; i++ ) {
-              outputterJson.output(a.get(i));
-          }
-          String dataArray[] = outputterJson.toString().split("\\{\"class\":\"" + cInfo.getId());
-          for ( int k = 1 ; k < dataArray.length; k++ ) {
-            dataToString += "p({\"class\":\"" + cInfo.getId() + dataArray[k] + ")\n";
-          }
-
-          if ( emailSet ) {
-            output(x, dataToString);
-          } else {
-            out.println(dataToString);
-          }
-        }
-      } else if ( Command.help == command) {
+      } else if ( Command.help == command ) {
         out.println("Help: <br><br>" );
         /*List<PropertyInfo> props = cInfo.getAxiomsByClass(PropertyInfo.class);
         out.println(daoName + "<br><br>");

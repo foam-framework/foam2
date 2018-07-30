@@ -24,8 +24,17 @@ have multiple classloaders running alongside eachother`
 ],*/
   requires: [
     'foam.classloader.OrDAO',
+    'foam.core.Script',
     'foam.dao.Relationship',
     'foam.apploader.SubClassLoader',
+    {
+      path: 'foam.apploader.WebModelFileDAO',
+      flags: ['web'],
+    },
+    {
+      path: 'foam.apploader.NodeModelFileDAO',
+      flags: ['node'],
+    },
   ],
   properties: [
     {
@@ -45,9 +54,7 @@ have multiple classloaders running alongside eachother`
     {
       name: 'addClassPath',
       code: function(path, json2) {
-        var cls = foam.lookup(foam.isServer ?
-            'foam.apploader.NodeModelFileDAO' :
-            'foam.apploader.WebModelFileDAO');
+        var cls = this[foam.isServer ? 'NodeModelFileDAO' : 'WebModelFileDAO'];
         var modelDAO = cls.create({root: path, json2: json2}, this);
 
         if ( this.modelDAO ) {
@@ -142,7 +149,14 @@ have multiple classloaders running alongside eachother`
             if ( self.Relationship.isInstance(m) ) {
               return m.initRelationship();
             }
-
+            if ( self.Script.isInstance(m) ) {
+              return Promise.all(m.requires.map(function(r) {
+                return self.load(r)
+              })).then(function() {
+                m.code()
+                return m;
+              });
+            }
             return this.buildClass_(m, path);
           }.bind(this), function() {
             throw new Error("Failed to load class " + id);

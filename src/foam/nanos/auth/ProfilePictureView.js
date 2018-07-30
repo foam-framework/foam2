@@ -67,9 +67,9 @@ foam.CLASS({
       outline: none;
     }
     ^ .uploadDescContainer{
-      position: absolute;
-      left: 132px;
-      bottom: 9px;
+      position: relative;
+      left: 26%;
+      bottom: 24%;
     }
     ^ .uploadDescription {
       margin-top: 9px;
@@ -88,17 +88,15 @@ foam.CLASS({
     ^ .box-for-drag-drop {
       border: dashed 4px #edf0f5;
       background:white;
-      height: 110px;
+      height: 100px;
       padding: 10px 10px;
-      position: relative;
     }
 
     ^ .boxless-for-drag-drop {
       border: solid 4px white;
       background:white;
-      height: 110px;
+      height: 100px;
       padding: 10px 10px;
-      position: relative;
     }
   `,
 

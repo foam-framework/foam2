@@ -8,13 +8,10 @@ package foam.lib.json;
 
 import foam.lib.parse.*;
 import foam.core.*;
-import java.util.ArrayList;
-import java.util.*;
 
 public class JSONParser
   extends foam.core.ContextAwareSupport
 {
-  protected Parser        idParser = new IdParser();
   protected Parser        parser   = new ExprParser();
   protected StringPStream stringps = new StringPStream();
 
@@ -43,11 +40,4 @@ public class JSONParser
     return ps == null ? null : (Object[]) ps.value();
   }
 
-  public Object parseStringForId(String data) {
-    StringPStream ps = stringps;
-    ps.setString(data);
-    ParserContext x = new ParserContextImpl();
-    ps = (StringPStream) ps.apply(idParser, x);
-    return ps == null ? null : ps.value();
-  }
 }
