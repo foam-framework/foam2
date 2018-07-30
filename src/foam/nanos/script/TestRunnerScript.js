@@ -72,6 +72,9 @@ foam.CLASS({
         for ( int i = 0; i < testArray.size(); i ++ ) {
           Test test = (Test) testArray.get(i);
           test = (Test) test.fclone();
+          if ( ! test.getEnabled() ) {
+            continue;
+          }
           if ( test.getServer() ) {
             runServerSideTest(x, test);
           } else {
