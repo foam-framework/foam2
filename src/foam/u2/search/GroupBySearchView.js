@@ -96,6 +96,7 @@ foam.CLASS({
   methods: [
     function clear() {
       this.view.data = '';
+      this.hardData = undefined;
     },
 
     function initE() {
@@ -128,7 +129,7 @@ foam.CLASS({
         })
         .on('mouseout', function(e) {
           self.view.data = self.hardData;
-          if ( ! self.hardData ) self.view.data = '';
+          if ( self.hardData === undefined ) self.view.data = '';
         })
         .onDetach(
           this.dao$proxy.listen(
