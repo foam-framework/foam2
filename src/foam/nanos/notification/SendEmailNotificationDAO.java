@@ -1,4 +1,11 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.notification;
+
 import foam.core.FObject;
 import foam.core.X;
 import foam.dao.DAO;
@@ -8,6 +15,7 @@ import foam.nanos.auth.User;
 import foam.nanos.notification.email.EmailMessage;
 import foam.nanos.notification.email.EmailService;
 import java.util.Arrays;
+import java.util.List;
 
 // If notification's emailEnabled is true, the decorator creates an email based on provided or default emailTemplate, sets the reciever based on notification userId/groupId/broadcasted
 public class SendEmailNotificationDAO extends ProxyDAO {
@@ -35,8 +43,12 @@ public class SendEmailNotificationDAO extends ProxyDAO {
     if ( ! notif.getEmailIsEnabled() )
       return super.put_(x, obj);
 
-    if ( Arrays.asList(user.getDisabledTopicsEmail()).contains(notif.getNotificationType()) )
-      return super.put_(x,obj);
+    if ( user.getDisabledTopicsEmail() != null ) {
+      List disabledTopics = Arrays.asList(user.getDisabledTopicsEmail());
+      if ( disabledTopics.contains(notif.getNotificationType()) ) {
+        return super.put_(x,obj);
+      }
+    }
 
     if ( "notification".equals(notif.getEmailName()) ) {
       notif.getEmailArgs().put("type", notif.getNotificationType());
