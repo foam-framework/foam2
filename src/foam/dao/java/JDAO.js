@@ -5,11 +5,12 @@
  */
 
 foam.CLASS({
-  package: 'foam.dao',
+  package: 'foam.dao.java',
   name: 'JDAO',
   extends: 'foam.dao.ProxyDAO',
 
   javaImports: [
+    'foam.dao.*',
     'foam.core.ClassInfo',
     'foam.core.FObject',
     'foam.core.X',
