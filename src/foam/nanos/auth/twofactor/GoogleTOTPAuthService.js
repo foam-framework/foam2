@@ -69,7 +69,7 @@ if ( ! generateQrCode ) {
 
 AppConfig config = (AppConfig) x.get("appConfig");
 String url = String.format(URI, config.getName(), user.getEmail(), key, config.getName(), getAlgorithm());
-return "data:image/svg+xml;charset=UTF-8," + QrCode.encodeText(url, QrCode.Ecc.MEDIUM).toSvgString(2);`
+return "data:image/svg+xml;charset=UTF-8," + QrCode.encodeText(url, QrCode.Ecc.MEDIUM).toSvgString(0);`
     },
     {
       name: 'verifyToken',
