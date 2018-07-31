@@ -20,7 +20,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.Sink',
-    'java.util.concurrent.locks.ReentrantLock'  
+    'java.util.concurrent.locks.ReentrantLock'
   ],
 
   properties: [
@@ -51,10 +51,9 @@ foam.CLASS({
     },
     {
       class: 'Object',
-      name: 'lock',  
+      name: 'lock',
       javaType: 'java.util.concurrent.locks.ReentrantLock',
       javaFactory: `return new java.util.concurrent.locks.ReentrantLock();`
-
     }
   ],
 
@@ -108,10 +107,10 @@ if ( getNextIndex() < 0 ) backCounter = ( getInternalArraySize() - 1 );
 
 for ( int i = 0; i < getFixedDAOSize() ; i++ ) {
   try {
-   if ( getFixedSizeArray()[backCounter] == null ){
+    if ( getFixedSizeArray()[backCounter] == null ) {
       break;
     }
-    decorated.put ( getFixedSizeArray()[backCounter], null );
+    decorated.put(getFixedSizeArray()[backCounter], null);
     if ( backCounter == 0 ) {
       backCounter = getInternalArraySize();
     } 
