@@ -297,31 +297,3 @@ return MInfo(classInfo())
     }
   ],
 });
-
-foam.CLASS({
-  refines: 'foam.core.AbstractMethod',
-  package: 'foam.swift.refines',
-  name: 'CreateChildRefines',
-  flags: ['swift'],
-  methods: [
-    function createChildMethod_(child) {
-      var result = child.clone();
-      var props = child.cls_.getAxiomsByClass(foam.core.Property);
-      for ( var i = 0 ; i < props.length ; i++ ) {
-        var prop = props[i];
-        if ( this.hasOwnProperty(prop.name) && ! child.hasOwnProperty(prop.name) ) {
-          prop.set(result, prop.get(this));
-        }
-      }
-
-      // Special merging behaviour for args.
-      var i = 0;
-      var resultArgs = [];
-      for ( ; i < this.args.length ; i++ ) resultArgs.push(this.args[i].clone().copyFrom(child.args[i]));
-      for ( ; i < child.args.length ; i++ ) resultArgs.push(child.args[i]);
-      result.args = resultArgs; // To trigger the adaptArrayElement
-
-      return result;
-    },
-  ]
-});
