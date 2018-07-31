@@ -52,6 +52,26 @@ foam.CLASS({
       padding: 0 21px 0 38px;
       width: 100%;
     }
+
+    ^ .foam-u2-tag-Select {
+      background-color: rgba(0, 0, 0, 0);
+      border: 0;
+      width: 100%;
+    }
+
+    ^ option:hover {
+      background-color: rgba(164, 179, 184, 0.3);
+    }
+
+    ^ .foam-u2-tag-Select > option {
+      color: #093649;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.6;
+      letter-spacing: 0.2px;
+      padding: 0 21px;
+    }
   `,
 
   properties: [
