@@ -22,10 +22,15 @@ foam.CLASS({
 
   documentation: 'View for editing Float Properties.',
 
-  css: '^:read-only { border: none; background: rgba(0,0,0,0); }',
-   
+  css: `
+    ^:read-only {
+      border: none;
+      background: rgba(0,0,0,0);
+    }
+  `,
+
   properties: [
-    [ 'type', 'number' ],
+    ['type', 'number'],
     { class: 'Float', name: 'data' },
     'precision',
     'min',
@@ -51,22 +56,22 @@ foam.CLASS({
       this.SUPER(p);
 
       this.precision = p.precision;
-      this.min       = p.min;
-      this.max       = p.max;
+      this.min = p.min;
+      this.max = p.max;
     },
 
     function formatNumber(val) {
       if ( ! val ) return '0';
       val = val.toFixed(this.precision);
       var i = val.length - 1;
-      for ( ; i > 0 && val.charAt(i) === '0' ; i-- ) {}
+      for ( ; i > 0 && val.charAt(i) === '0'; i -- ) {}
       return val.substring(0, val.charAt(i) === '.' ? i : i + 1);
     },
 
     function dataToText(val) {
       return this.precision !== undefined ?
-        this.formatNumber(val) :
-        '' + val ;
+          this.formatNumber(val) :
+          '' + val;
     },
 
     function textToData(text) {
