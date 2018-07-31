@@ -66,7 +66,9 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Promised',
   extends: 'Property',
-
+  requires: [
+    'foam.core.PromisedMethod',
+  ],
   properties: [
     {
       name: 'of',

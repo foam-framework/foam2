@@ -82,7 +82,7 @@ public class TestUtils {
       Class exceptionType
   ) {
     boolean wasCorrectExceptionType = false;
-    boolean threw = true;
+    boolean threw = false;
     String returnedMessage = "";
     try {
       fn.run();
@@ -91,6 +91,11 @@ public class TestUtils {
       threw = true;
       returnedMessage = t.getMessage();
       if ( ! wasCorrectExceptionType ) t.printStackTrace();
+    }
+    if ( ! returnedMessage.equals(expectedExceptionMessage) ) {
+      System.out.println("Error message was not correct.");
+      System.out.println("EXPECTED: \"" + expectedExceptionMessage + "\"");
+      System.out.println("ACTUAL  : \"" + returnedMessage + "\"");
     }
     return wasCorrectExceptionType && threw && returnedMessage.equals(expectedExceptionMessage);
   }

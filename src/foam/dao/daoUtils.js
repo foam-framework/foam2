@@ -58,16 +58,13 @@ if let oldValue = oldValue as? foam_dao_AbstractDAO {
 
   methods: [
     {
-      name: 'listen',
-      code: function listen(sink) {
-        if ( ! foam.core.FObject.isInstance(sink) ) {
-          sink = foam.dao.AnonymousSink.create({ sink: sink }, this);
-        }
-
+      name: 'listen_',
+      code: function listen_(context, sink, predicate) {
         var listener = this.ProxyListener.create({
           delegate: sink,
+          predicate: predicate,
           dao: this
-        });
+        }, context);
 
         listener.onDetach(this.sub('propertyChange', 'delegate', listener.update));
         listener.update();
@@ -76,8 +73,9 @@ if let oldValue = oldValue as? foam_dao_AbstractDAO {
       },
       swiftCode: `
 let listener = ProxyListener_create([
-  "delegate": sink
-])
+  "delegate": sink,
+  "predicate": predicate
+], x)
 
 listener.onDetach(listener.dao$.follow(delegate$))
 
@@ -85,7 +83,7 @@ return listener
       `,
       javaCode: `
 // TODO: Support changing of delegate
-super.listen(sink, predicate);
+super.listen_(getX(), sink, predicate);
 `
     }
   ],
@@ -114,7 +112,10 @@ foam.CLASS({
   implements: ['foam.dao.Sink'],
 
   properties: [
-    'args',
+    {
+      name: 'predicate',
+      swiftType: 'foam_mlang_predicate_Predicate?'
+    },
     {
       class: 'Proxy',
       of: 'foam.dao.Sink',
@@ -133,7 +134,7 @@ foam.CLASS({
       swiftType: 'foam_dao_DAO?',
       swiftPostSet: `
 self.innerSub?.detach()
-try? self.innerSub = newValue?.listen(self, args as? foam_mlang_predicate_Predicate)
+try? self.innerSub = newValue?.listen_(__context__, self, predicate)
 if oldValue != nil {
   self.reset(Subscription(detach: {}))
 }
@@ -176,7 +177,9 @@ if oldValue != nil {
       code: function() {
         var old = this.innerSub;
         old && old.detach();
-        this.innerSub = this.dao && this.dao.listen_(this.dao.__context__, this);
+        this.innerSub = this.dao &&
+          this.dao.delegate &&
+          this.dao.delegate.listen_(this.__context__, this, this.predicate);
         this.reset();
       }
     }

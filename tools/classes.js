@@ -76,7 +76,7 @@ var classes = [
   'foam.box.SessionReplyBox',
   'foam.box.SessionClientBox',
   'foam.dao.DAO',
-  'foam.dao.JDAO',
+  'foam.dao.java.JDAO',
   'foam.dao.FilteredDAO',
   'foam.dao.Journal',
   'foam.dao.ProxyJournal',
@@ -178,6 +178,7 @@ var classes = [
   'foam.nanos.logger.LogsView',
   'foam.nanos.menu.Menu',
   'foam.nanos.menu.DAOMenu',
+  'foam.nanos.menu.LinkMenu',
   'foam.nanos.menu.ListMenu',
   'foam.nanos.menu.MenuBar',
   'foam.nanos.menu.PopupMenu',
@@ -211,12 +212,13 @@ var classes = [
   'foam.nanos.export.ExportDriverRegistry',
   'foam.dao.pg.ConnectionPool',
   'foam.lib.Outputter',
-  'foam.lib.json.OutputterMode',
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
   'foam.lib.json.OutputJSON',
+  'foam.lib.json.OutputterMode',
   'foam.lib.json.UnknownFObject',
   'foam.lib.json.UnknownFObjectArray',
+  'foam.lib.json.ClassReferenceParserTest',
   'foam.blob.Buffer',
   'foam.blob.Blob',
   'foam.blob.BlobService',
@@ -268,6 +270,14 @@ var classes = [
   'foam.util.EmailTest',
   'foam.util.PasswordTest',
   'foam.test.TestObj',
+  'foam.core.FObjectTest',
+
+  'foam.nanos.dig.exception.DigErrorMessage',
+  'foam.nanos.dig.exception.DAONotFoundException',
+  'foam.nanos.dig.exception.ParsingErrorException',
+  'foam.nanos.dig.exception.DAOPutException',
+  'foam.nanos.dig.exception.EmptyDataException',
+  'foam.nanos.dig.exception.UnsupportException'
 ];
 
 var abstractClasses = [
