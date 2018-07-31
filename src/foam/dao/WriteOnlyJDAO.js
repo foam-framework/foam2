@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.dao',
   name: 'WriteOnlyJDAO',
-  extends: 'foam.dao.JDAO',
+  extends: 'foam.dao.java.JDAO',
   
   javaImports: [
     'foam.core.ClassInfo',

@@ -42,6 +42,18 @@
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'Index',
+  requires: [
+    'foam.dao.index.TreeNode',
+    'foam.dao.index.AutoIndexNode',
+    'foam.dao.index.AltIndexNode',
+    'foam.dao.index.ValueIndexNode',
+    'foam.dao.index.TreeIndexNode',
+    'foam.dao.index.CITreeIndexNode',
+    'foam.dao.index.IndexNode',
+    'foam.dao.index.SetIndexNode',
+    'foam.dao.index.NullTreeNode',
+    'foam.dao.index.ProxyIndexNode',
+  ],
 
   properties: [
     {

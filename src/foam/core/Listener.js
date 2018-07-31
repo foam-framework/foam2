@@ -118,7 +118,8 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Model',
-
+  package: 'foam.core',
+  name: 'ListenerModelRefine',
   properties: [
     {
       class: 'AxiomArray',

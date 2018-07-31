@@ -54,13 +54,13 @@ foam.CLASS({
       name: 'generateKey',
       javaCode:
 `User user = (User) x.get("user");
+user = (User) user.fclone();
 DAO userDAO = (DAO) getLocalUserDAO();
 
 // generate secret key, encode as base32 and store
 String key = BaseEncoding.base32().encode(generateSecret(KEY_SIZE));
 key = key.replaceFirst("[=]*$", "");
 user.setTwoFactorSecret(key);
-user.setTwoFactorEnabled(true);
 userDAO.put(user);
 
 if ( ! generateQrCode ) {
@@ -69,7 +69,7 @@ if ( ! generateQrCode ) {
 
 AppConfig config = (AppConfig) x.get("appConfig");
 String url = String.format(URI, config.getName(), user.getEmail(), key, config.getName(), getAlgorithm());
-return QrCode.encodeText(url, QrCode.Ecc.MEDIUM).toSvgString(2);`
+return "data:image/svg+xml;charset=UTF-8," + QrCode.encodeText(url, QrCode.Ecc.MEDIUM).toSvgString(2);`
     },
     {
       name: 'verifyToken',
@@ -80,7 +80,16 @@ DAO userDAO = (DAO) getLocalUserDAO();
 
 // fetch from user dao to get secret key
 user = (User) userDAO.find(user.getId());
-return checkCode(BaseEncoding.base32().decode(user.getTwoFactorSecret()), code, STEP_SIZE, WINDOW);`
+if ( checkCode(BaseEncoding.base32().decode(user.getTwoFactorSecret()), code, STEP_SIZE, WINDOW) ) {
+  if ( user.getTwoFactorEnabled() ) {
+    user = (User) user.fclone();
+    user.setTwoFactorEnabled(true);
+    userDAO.put(user);
+  }
+  return true;
+}
+
+return false;`
     }
   ]
 });

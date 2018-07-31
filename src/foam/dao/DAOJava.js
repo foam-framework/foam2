@@ -17,6 +17,7 @@
 
 foam.INTERFACE({
   refines: 'foam.dao.DAO',
+  flags: ['java'],
 
   methods: [
     {
