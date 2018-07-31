@@ -9,7 +9,14 @@ foam.CLASS({
   name: 'FixedSizeDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: 'DAO that stores a fixed number of objects',
+  documentation: `
+    DAO that stores a fixed number of objects. Does not limit its delegate's
+    storage. Rather, it is intended to be used in situations where the delegate
+    does not store any data due to the amount of data being stored being
+    prohibitively large. Instead, this DAO will store some of that data in
+    memory, but it will start to replace old data after a certain point to
+    prevent infinite growth.
+  `,
 
   javaImports: [
     'foam.dao.Sink',
