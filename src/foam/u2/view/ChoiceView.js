@@ -58,8 +58,8 @@ foam.CLASS({
           this.text = this.placeholder;
           this.index = -1;
         } else {
-          this.data  = n && n[0];
-          this.text  = n && n[1];
+          this.data = n && n[0];
+          this.text = n && n[1];
           this.index = this.findIndexOfChoice(n);
         }
         this.feedback_ = false;
@@ -135,7 +135,7 @@ foam.CLASS({
     {
       name: 'data',
       postSet: function(o, n) {
-        if ( o !== n ) this.choice = this.findChoiceByData(n) || [ n, n ];
+        if ( o !== n ) this.choice = this.findChoiceByData(n) || [n, n];
       }
     },
     {
