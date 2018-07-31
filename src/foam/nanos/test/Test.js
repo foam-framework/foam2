@@ -12,8 +12,9 @@ foam.CLASS({
   imports: [ 'testDAO as scriptDAO' ],
 
   javaImports: [
-    'bsh.EvalError',
     'bsh.Interpreter',
+    'foam.nanos.app.AppConfig',
+    'foam.nanos.app.Mode',
     'foam.nanos.pm.PM',
     'java.io.ByteArrayOutputStream',
     'java.io.PrintStream',
@@ -123,7 +124,7 @@ foam.CLASS({
             this.output += ( condition ? 'SUCCESS: ' : 'FAILURE: ' ) +
                 message + '\n';
           };
-          with ( { log: log, print: log, x: self.__context__, test: test } )
+          with ( { log: log, print: log, x: this.__context__, test: test } )
             ret = Promise.resolve(eval(this.code));
         } catch (err) {
           this.failed += 1;
@@ -147,6 +148,11 @@ foam.CLASS({
       ],
       javaReturns: 'void',
       javaCode: `
+        // disable tests in production
+        if ( ((AppConfig) x.get("appConfig")).getMode() == Mode.PRODUCTION ) {
+          return;
+        }
+
         ByteArrayOutputStream baos  = new ByteArrayOutputStream();
         PrintStream           ps    = new PrintStream(baos);
         Interpreter           shell = createInterpreter(x);
