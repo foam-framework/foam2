@@ -69,16 +69,12 @@ foam.CLASS({
             Math.floor(amount * 100) :
             0;
         if ( qualifier ) {
-          var rtn = foam.mlang.predicate[qualifier].create({
+          return foam.mlang.predicate[qualifier].create({
             arg1: this.property,
             arg2: amount
           });
-          console.log(rtn.toString());
-          return rtn;
         }
-        var rtn = this.True.create();
-        console.log(rtn.toString());
-        return rtn;
+        return this.True.create();
       }
     },
     {
