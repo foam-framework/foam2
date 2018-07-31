@@ -354,6 +354,8 @@ foam.CLASS({
           ret = of[foam.String.constantize(n)];
         } else if ( type === foam.Number ) {
           ret = of.create({ordinal: n}, foam.__context__);
+        } else if ( type === foam.Object ) {
+          ret = of.create(n, foam.__context__);
         }
 
         if ( ret ) return ret;
