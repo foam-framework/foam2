@@ -1114,6 +1114,7 @@ foam.CLASS({
     ['javaType', 'String[]'],
     ['javaInfoType', 'foam.core.AbstractArrayPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.StringArrayParser()'],
+    ['javaFactory', 'return new String[0];'],
     {
       name: 'javaValue',
       expression: function(value) {

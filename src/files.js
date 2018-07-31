@@ -207,7 +207,7 @@ FOAM_FILES([
   { name: "foam/dao/Journal" },
   { name: "foam/dao/JournalJava", flags: ['java'] },
   { name: "foam/dao/JDAO", flags: ['web'] },
-  { name: "foam/dao/JDAOJava", flags: ['java'] },
+  { name: "foam/dao/java/JDAO", flags: ['java'] },
   { name: "foam/dao/Relationship" },
   { name: "foam/dao/RelationshipDAO" },
   { name: "foam/dao/ManyToManyRelationshipDAO" },
@@ -515,6 +515,7 @@ FOAM_FILES([
   { name: "foam/dao/pg/ConnectionPool" },
   { name: "foam/lib/Outputter" },
   { name: "foam/lib/json/OutputterMode" },
+  { name: "foam/lib/json/ClassReferenceParserTest" },
   { name: "foam/lib/parse/Parser" },
   { name: "foam/lib/parse/PStream" },
   { name: "foam/crypto/hash/Hasher" },
@@ -524,5 +525,6 @@ FOAM_FILES([
   { name: "foam/crypto/sign/Signable" },
   { name: "foam/crypto/sign/SignableTest" },
   { name: "foam/test/TestObj" },
-  { name: "foam/core/FObjectTest" }
+  { name: "foam/core/FObjectTest" },
+  { name: "foam/nanos/dig/exception/DigErrorMessage" },
 ]);
