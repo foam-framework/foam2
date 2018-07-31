@@ -34,7 +34,14 @@ foam.CLASS({
     { class: 'Float', name: 'data' },
     'precision',
     'min',
-    'max'
+    'max',
+    {
+      class: 'Float',
+      name: 'step',
+      documentation: `The amount that the value should increment or decrement by
+          when the arrow buttons in the input are clicked.`,
+      value: 0.01
+    }
   ],
 
   methods: [
@@ -43,6 +50,7 @@ foam.CLASS({
       this.addClass(this.myClass());
       if ( this.min != undefined ) this.setAttribute('min', this.min);
       if ( this.max != undefined ) this.setAttribute('max', this.max);
+      if ( this.step != undefined ) this.setAttribute('step', this.step);
     },
 
     function link() {
