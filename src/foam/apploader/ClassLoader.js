@@ -121,6 +121,7 @@ have multiple classloaders running alongside eachother`
           }
 
           if ( this.pending[id] ) return this.pending[id];
+          path = path.concat(id);
 
           // Latched models come from when someone defines a class
           // with foam.CLASS during regular execution (like a script
@@ -142,7 +143,6 @@ have multiple classloaders running alongside eachother`
 
           if ( foam.lookup(id, true) ) return Promise.resolve(foam.lookup(id));
 
-          path = path.concat(id);
           var x2 = self.SubClassLoader.create({delegate: self, path: path});
           return this.pending[id] = this.modelDAO.inX(x2).find(id).then(function(m) {
             if ( ! m ) return Promise.reject(new Error('Model Not Found: ' + id));
