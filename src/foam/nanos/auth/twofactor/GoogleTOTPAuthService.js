@@ -54,6 +54,7 @@ foam.CLASS({
       name: 'generateKey',
       javaCode:
 `User user = (User) x.get("user");
+user = (User) user.fclone();
 DAO userDAO = (DAO) getLocalUserDAO();
 
 // generate secret key, encode as base32 and store
@@ -68,7 +69,7 @@ if ( ! generateQrCode ) {
 
 AppConfig config = (AppConfig) x.get("appConfig");
 String url = String.format(URI, config.getName(), user.getEmail(), key, config.getName(), getAlgorithm());
-return QrCode.encodeText(url, QrCode.Ecc.MEDIUM).toSvgString(2);`
+return "data:image/svg+xml;charset=UTF-8," + QrCode.encodeText(url, QrCode.Ecc.MEDIUM).toSvgString(2);`
     },
     {
       name: 'verifyToken',
