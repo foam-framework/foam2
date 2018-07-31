@@ -57,7 +57,7 @@ foam.CLASS({
       args: [
         {
           name: 'x',
-          of: 'foam.core.X'
+          javaType: 'foam.core.X'
         },
         {
           name: 'obj',
