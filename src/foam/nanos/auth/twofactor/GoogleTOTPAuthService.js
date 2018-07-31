@@ -60,7 +60,6 @@ DAO userDAO = (DAO) getLocalUserDAO();
 String key = BaseEncoding.base32().encode(generateSecret(KEY_SIZE));
 key = key.replaceFirst("[=]*$", "");
 user.setTwoFactorSecret(key);
-user.setTwoFactorEnabled(true);
 userDAO.put(user);
 
 if ( ! generateQrCode ) {
@@ -80,7 +79,16 @@ DAO userDAO = (DAO) getLocalUserDAO();
 
 // fetch from user dao to get secret key
 user = (User) userDAO.find(user.getId());
-return checkCode(BaseEncoding.base32().decode(user.getTwoFactorSecret()), code, STEP_SIZE, WINDOW);`
+if ( checkCode(BaseEncoding.base32().decode(user.getTwoFactorSecret()), code, STEP_SIZE, WINDOW) ) {
+  if ( user.getTwoFactorEnabled() ) {
+    user = (User) user.fclone();
+    user.setTwoFactorEnabled(true);
+    userDAO.put(user);
+  }
+  return true;
+}
+
+return false;`
     }
   ]
 });
