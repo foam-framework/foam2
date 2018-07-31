@@ -94,22 +94,14 @@ foam.CLASS({
                         .start('td').style({'text-align': 'left', 'width': '480', 'padding-left': '8px'}).add(p.id).end()
                           .select(self.groupDAO.orderBy(self.Group.ID), function(g) {
                               var cb = foam.u2.md.CheckBox.create({data: self.checkPermissionForGroup(p.id, g)});
-                              cb.data$.sub(function() { self.updateGroup(p, g, cb.data); });
-                              //cb.data$.sub(function() { self.updateInheritedPermissions(p, g, self); });
-                              this.start('td').show(groups[g.id].data$.map(function() {return groups[g.id].data;}))
+                              cb.data$.sub(function() { self.updateGroup(p, g, cb.data, self); });
+                              this.start('td').show(groups[g.id].data$.map(function() { return groups[g.id].data; }))
                                     .style({'text-align': 'center', 'width': '100'}).tag(cb).call(function() {
-                                      self.groupDAO.find(g.parent).then(function(a){
+                                      self.groupDAO.find(g.parent).then(function(a) {
                                         if ( a != undefined && a.implies(p.id) ) {
                                           cb.setAttribute('title', g.parent + ': ' + p.id);
-                                          cb.style({'border-color': '#40C75B'})
-                                          cb.data$.sub(function() { self.updateGroup(p, g, cb.data, self); });
-                                          this.start('td').show(groups[g.id].data$.map(function() { return groups[g.id].data; }))
-                                                .style({'text-align': 'center', 'width': '100'}).tag(cb).call(function() {
-                                                  self.groupDAO.find(g.parent).then(function(a) {
-                                                    if ( a != undefined && a.implies(p.id) ) {
-                                                      cb.setAttribute('title', g.parent + ': ' + p.id);
-                                                      cb.style({'border-color': '#40C75B'});
-                                                    }
+                                          cb.style({'border-color': '#40C75B'});
+                                        }
                                       });
 
                                       if ( g.implies(p.id) ) {
