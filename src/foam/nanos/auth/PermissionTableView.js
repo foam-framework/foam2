@@ -24,6 +24,9 @@ foam.CLASS({
     ^ table > tbody:nth-child(odd) {
       background: #f6f9f9;
     }
+    ^ .foam-u2-md-CheckBox:hover {
+      background: #FFCCCC;
+    }
   `,
 
   properties: [
@@ -81,7 +84,7 @@ foam.CLASS({
                     .start('tr').style({'background': '#D4E3EB'})
                       .tag('td').style({'text-align': 'left', 'width': '480', 'height': '35'})
                       .select(this.groupDAO.orderBy(this.Group.ID), function(g) {
-                        this.start('td').show(groups[g.id].data$.map(function() {return groups[g.id].data;}))
+                        this.start('td').show(groups[g.id].data$.map(function() { return groups[g.id].data;} ))
                           .addClass(g.id).start().style({'text-align': 'center', 'width': '100'}).add(g.id).end().end();
                       }).end()
                     .end()
@@ -99,7 +102,14 @@ foam.CLASS({
                                         if ( a != undefined && a.implies(p.id) ) {
                                           cb.setAttribute('title', g.parent + ': ' + p.id);
                                           cb.style({'border-color': '#40C75B'})
-                                        }
+                                          cb.data$.sub(function() { self.updateGroup(p, g, cb.data, self); });
+                                          this.start('td').show(groups[g.id].data$.map(function() { return groups[g.id].data; }))
+                                                .style({'text-align': 'center', 'width': '100'}).tag(cb).call(function() {
+                                                  self.groupDAO.find(g.parent).then(function(a) {
+                                                    if ( a != undefined && a.implies(p.id) ) {
+                                                      cb.setAttribute('title', g.parent + ': ' + p.id);
+                                                      cb.style({'border-color': '#40C75B'});
+                                                    }
                                       });
 
                                       if ( g.implies(p.id) ) {
