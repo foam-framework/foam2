@@ -427,6 +427,7 @@ FOAM_FILES([
   { name: "foam/u2/search/GroupBySearchView", flags: ['web'] },
   { name: "foam/u2/search/SearchManager", flags: ['web'] },
   { name: "foam/u2/search/TextSearchView", flags: ['web'] },
+  { name: 'foam/u2/search/CurrencySearchView', flags: ['web'] },
   { name: "foam/u2/stack/Stack", flags: ['web'] },
   { name: "foam/u2/stack/StackView", flags: ['web'] },
   { name: "foam/apploader/ModelRefines" },

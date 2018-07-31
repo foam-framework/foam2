@@ -505,3 +505,18 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.CLASS({
+  package: 'foam.u2.search',
+  name: 'CurrencyRefinement',
+  refines: 'foam.core.Currency',
+
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'searchView',
+      value: { class: 'foam.u2.search.CurrencySearchView' }
+    }
+  ]
+});
