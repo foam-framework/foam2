@@ -43,7 +43,7 @@ public class DAOResourceLoader
       }
 
       Group group = (Group) groupDAO.find(groupId);
-      groupId = ( group != null && ! SafetyUtil.isEmpty(group.getParent()) ) ? group.getParent() : "*";
+      groupId = ( group != null && ! SafetyUtil.isEmpty(group.getParent().toString()) ) ? group.getParent().toString() : "*";
     } while ( ! SafetyUtil.isEmpty(groupId) );
 
     return null;
