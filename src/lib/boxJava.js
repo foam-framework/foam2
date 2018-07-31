@@ -17,6 +17,7 @@
 
 foam.INTERFACE({
   refines: 'foam.box.Box',
+  flags: ['java'],
   methods: [
     {
       name: 'send',
@@ -32,6 +33,7 @@ foam.INTERFACE({
 
 foam.CLASS({
   refines: 'foam.box.SubBox',
+  flags: ['java'],
   methods: [
     {
       name: 'send',
@@ -48,6 +50,7 @@ getDelegate().send(message);*/
 
 foam.CLASS({
   refines: 'foam.box.NullBox',
+  flags: ['java'],
   methods: [
     {
       name: 'send',
@@ -58,6 +61,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.box.HTTPReplyBox',
+  flags: ['java'],
   methods: [
     {
       name: 'send',
@@ -78,6 +82,7 @@ try {
 
 foam.CLASS({
   refines: 'foam.box.CheckAuthenticationBox',
+  flags: ['java'],
   methods: [
     {
       name: 'send',
@@ -104,6 +109,7 @@ try {
 
 foam.CLASS({
   refines: 'foam.box.SessionReplyBox',
+  flags: ['java'],
 
   javaImports: [
     'java.security.AccessControlException'
@@ -141,6 +147,7 @@ if ( object instanceof RPCErrorMessage && ((RPCErrorMessage) object).getData() i
 
 foam.CLASS({
   refines: 'foam.box.SessionClientBox',
+  flags: ['java'],
 
   methods: [
     {

@@ -17,6 +17,7 @@
 
 foam.INTERFACE({
   refines: 'foam.dao.Sink',
+  flags: ['java'],
 
   methods: [
     {
@@ -67,6 +68,7 @@ foam.INTERFACE({
 
 foam.CLASS({
   refines: 'foam.dao.AbstractSink',
+  flags: ['java'],
   methods: [
     // TODO: have a method of put() that doesn't include the Detachable argument
     {
@@ -91,6 +93,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.dao.PredicatedSink',
+  flags: ['java'],
 
   methods: [
     {
@@ -112,6 +115,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.dao.LimitedSink',
+  flags: ['java'],
 
   methods: [
     {
@@ -138,6 +142,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.dao.SkipSink',
+  flags: ['java'],
   methods: [
     {
       name: 'put',
@@ -161,6 +166,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.dao.OrderedSink',
+  flags: ['java'],
 
   methods: [
     {
@@ -185,6 +191,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.dao.DedupSink',
+  flags: ['java'],
 
   methods: [
     {
