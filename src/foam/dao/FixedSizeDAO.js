@@ -97,13 +97,11 @@ Sink decorated = decorateSink_(sink, skip, limit, order, predicate);
 
 Integer backCounter;
 
-if ( getNextIndex() == 0 ) {
+if ( getNextIndex() <= 0 ) {
   backCounter = ( getInternalArraySize() - 1 ); 
 } else {
   backCounter = ( getNextIndex() - 1 );
 }
-
-if ( getNextIndex() < 0 ) backCounter = ( getInternalArraySize() - 1 );
 
 for ( int i = 0; i < getFixedDAOSize() ; i++ ) {
   try {
