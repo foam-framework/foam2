@@ -12,7 +12,8 @@ foam.CLASS({
   requires: [
     'foam.blob.BlobBlob',
     'foam.nanos.fs.File',
-    'foam.u2.dialog.NotificationMessage'
+    'foam.u2.dialog.NotificationMessage',
+    'foam.u2.tag.Input'
   ],
 
   imports: [
@@ -115,7 +116,8 @@ foam.CLASS({
       value: false
     },
     [ 'uploadHidden', false ],
-    [ 'boxHidden', false ]
+    [ 'boxHidden', false ],
+    [ 'attachmentInputValue', null ]
   ],
 
   messages: [
@@ -162,7 +164,8 @@ foam.CLASS({
           .on('dragover', this.onDragOver)
           .on('drop', this.onDrop)
           .start().addClass('uploadButtonContainer').hide(this.uploadHidden)
-            .start('input').addClass('attachment-input')
+            .start(this.Input, { data$: this.attachmentInputValue$ })
+              .addClass('attachment-input')
               .attrs({
                 type: 'file',
                 accept: 'image/jpg,image/gif,image/jpeg,image/bmp,image/png'
@@ -191,13 +194,14 @@ foam.CLASS({
   ],
 
   listeners: [
-    function onAddAttachmentClicked (e) {
+    function onAddAttachmentClicked(e) {
       this.document.querySelector('.attachment-input').click();
     },
 
-    function onRemoveClicked (e) {
+    function onRemoveClicked(e) {
       this.dragActive = false;
       this.ProfilePictureImage= null;
+      this.attachmentInputValue = null;
     },
 
     function onDragOver(e) {
@@ -233,13 +237,13 @@ foam.CLASS({
       return file.type === "image/jpg" || file.type === "image/jpeg" || file.type === "image/png";
     },
 
-    function onChange (e) {
+    function onChange(e) {
       this.dragActive = false;
       var file = e.target.files[0];
       this.addFile(file);
     },
 
-    function addFile (file) {
+    function addFile(file) {
       if ( file.size > ( 2 * 1024 * 1024 ) ) {
         this.add(this.NotificationMessage.create({ message: this.ErrorMessage, type: 'error' }));
         return;
