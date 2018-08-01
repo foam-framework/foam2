@@ -53,17 +53,17 @@ foam.CLASS({
       width: 100%;
     }
 
-    ^ .foam-u2-tag-Select {
+    ^ .foam-u2-search-GroupBySearchView .foam-u2-tag-Select {
       background-color: rgba(0, 0, 0, 0);
       border: 0;
       width: 100%;
     }
 
-    ^ option:hover {
+    ^ .foam-u2-search-GroupBySearchView .foam-u2-tag-Select > option:hover {
       background-color: rgba(164, 179, 184, 0.3);
     }
 
-    ^ .foam-u2-tag-Select > option {
+    ^ .foam-u2-search-GroupBySearchView .foam-u2-tag-Select > option {
       color: #093649;
       font-weight: normal;
       font-style: normal;
