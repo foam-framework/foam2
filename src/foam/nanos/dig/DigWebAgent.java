@@ -311,8 +311,15 @@ public class DigWebAgent
             for ( int i = 0; i < a.size(); i++ ) {
               outputterJson.output(a.get(i));
             }
+
             String dataArray[] = outputterJson.toString().split("\\{\"class\":\"" + cInfo.getId());
-            for (int k = 1; k < dataArray.length; k++) {
+
+            int k_ = 0;
+            if ( a.size() > 0 && dataArray.length > 1 ) {
+              k_ = 1;
+            }
+
+            for ( int k = k_; k < dataArray.length; k++ ) {
               dataToString += "p({\"class\":\"" + cInfo.getId() + dataArray[k] + ")\n";
             }
 

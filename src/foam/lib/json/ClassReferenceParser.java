@@ -7,7 +7,6 @@
 package foam.lib.json;
 
 import foam.lib.parse.*;
-import foam.core.ClassInfo;
 
 public class ClassReferenceParser
   extends ProxyParser
@@ -42,38 +41,16 @@ public class ClassReferenceParser
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    ps = super.parse(ps, x);
-
-    if ( ps != null ) {
-      String classId  = (String) x.get("forClass_");
-      String propName = (String) x.get("name");
-
-      Class cls;
-      try {
-        cls = Class.forName(classId);
-      } catch(ClassNotFoundException e) {
-        throw new RuntimeException(e);
+    try {
+      if ( ( ps = super.parse(ps, x)) == null ) {
+        return null;
       }
 
-      // TODO(adamvy): Use the context to resolve the class rather than reflection
-      // TODO(adamvy): Better handle errors.
-
-      ClassInfo info;
-      try {
-        info = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
-      } catch(Exception e) {
-        throw new RuntimeException(e);
-      }
-
-      Object axiom = info.getAxiomByName(propName);
-
-      if ( axiom == null ) {
-        System.err.println("Unknown Property Reference: " + classId + "." + propName);
-      }
-
-      return ps.setValue(axiom);
+      String classId = (String) x.get("forClass_");
+      Class cls = Class.forName(classId);
+      return cls != null ? ps.setValue(cls) : null;
+    } catch ( Throwable t ) {
+      return null;
     }
-
-    return ps;
   }
 }

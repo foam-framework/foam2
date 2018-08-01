@@ -6,8 +6,7 @@
 
 package foam.lib.json;
 
-import foam.core.*;
-import foam.lib.parse.*;
+import foam.lib.parse.Alt;
 
 public class ExprParser
     extends foam.lib.parse.ProxyParser
@@ -17,6 +16,9 @@ public class ExprParser
   }
 
   public ExprParser(final Class defaultClass) {
-    super(new Alt(new PropertyReferenceParser(), new FObjectParser(defaultClass)));
+    super(new Alt(
+      new PropertyReferenceParser(),
+      new ClassReferenceParser(),
+      new FObjectParser(defaultClass)));
   }
 }
