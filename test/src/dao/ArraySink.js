@@ -61,7 +61,7 @@ describe('ArraySink', function() {
         ]
       });
       var str = stringifier.stringify(sink);
-      expect(str).toBe('{"class":"foam.dao.ArraySink","of":"test.Item","array":[{"id":0},{"class":"test.Item2","id":1}]}');
+      expect(str).toBe('{"class":"foam.dao.ArraySink","of":{"class":"__Class__","forClass_":"test.Item"},"array":[{"id":0},{"class":"test.Item2","id":1}]}');
       var sink2 = parser.parseString(str);
       expect(foam.util.equals(sink, sink2)).toBe(true);
     });

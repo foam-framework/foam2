@@ -7,8 +7,7 @@ import foam.dao.AbstractSink;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
 import foam.nanos.auth.User;
-import java.util.ArrayList;
-import java.util.Arrays;
+import foam.util.SafetyUtil;
 import static foam.mlang.MLang.EQ;
 
 public class SendNotificationDAO extends ProxyDAO {
@@ -31,7 +30,7 @@ public class SendNotificationDAO extends ProxyDAO {
           send(user, notif, x);
         }
       });
-    } else if ( notif.getGroupId() != null ) {
+    } else if ( ! SafetyUtil.isEmpty(notif.getGroupId()) ) {
       userDAO.where(EQ(User.GROUP, notif.getGroupId())).select(new AbstractSink() {
         @Override
         public void put(Object o, Detachable d) {
@@ -41,7 +40,7 @@ public class SendNotificationDAO extends ProxyDAO {
       });
     }
 
-    if ( notif.getGroupId() == null && ! notif.getBroadcasted() ) {
+    if ( SafetyUtil.isEmpty(notif.getGroupId()) && ! notif.getBroadcasted() ) {
       return super.put_(x, notif);
     }
     return obj;

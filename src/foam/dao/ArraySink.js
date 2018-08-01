@@ -15,7 +15,7 @@ foam.CLASS({
     // TODO(markdittmer): Turn into static method: "parseJSON" once
     // https://github.com/foam-framework/foam2/issues/613 is fixed.
     PARSE_JSON: function(json, opt_cls, opt_ctx) {
-      var cls = json.of || opt_cls;
+      var cls = json.of && json.of.forClass_ || opt_cls;
       var array = json.array;
       if ( ! array ) return foam.dao.ArraySink.create({ of: cls }, opt_ctx);
       if ( foam.typeOf(cls) === foam.String )

@@ -1972,6 +1972,7 @@ foam.CLASS({
     'foam.mlang.predicate.Neq',
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
+    'foam.mlang.predicate.IsInstanceOf',
     'foam.mlang.predicate.StartsWith',
     'foam.mlang.predicate.StartsWithIC',
     'foam.mlang.predicate.EndsWith',
@@ -2037,7 +2038,7 @@ foam.CLASS({
     function DESC(a) { return this._unary_("Desc", a); },
     function THEN_BY(a, b) { return this.ThenBy.create({head: a, tail: b}); },
 
-    function INSTANCE_OF(cls) { return this.IsInstanceOf({targetClass: cls}); }
+    function INSTANCE_OF(cls) { return this.IsInstanceOf.create({ targetClass: cls }); }
   ]
 });
 
