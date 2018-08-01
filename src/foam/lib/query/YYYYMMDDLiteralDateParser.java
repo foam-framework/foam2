@@ -28,37 +28,37 @@ public class YYYYMMDDLiteralDateParser extends ProxyParser {
     super(
         new Alt(
 
-            //YYYY-MM-DDTHH:MM
-            new Seq(
-              new IntParser(),
-              new Alt(
-                new Literal("-"),
-                new Literal("/")),
-              new IntParser(),
-              new Alt(
-                new Literal("-"),
-                new Literal("/")),
-              new IntParser(),
-              new Literal("T"),
-              new IntParser(),
-              new Literal(":"),
-              new IntParser()),
+          //YYYY-MM-DDTHH:MM
+          new Seq(
+            new IntParser(),
+            new Alt(
+              new Literal("-"),
+              new Literal("/")),
+            new IntParser(),
+            new Alt(
+              new Literal("-"),
+              new Literal("/")),
+            new IntParser(),
+            new Literal("T"),
+            new IntParser(),
+            new Literal(":"),
+            new IntParser()),
 
-            //YYYY-MM-DDTHH
-            new Seq(
-              new IntParser(),
-              new Alt(
-                new Literal("-"),
-                new Literal("/")),
-              new IntParser(),
-              new Alt(
-                new Literal("-"),
-                new Literal("/")),
-              new IntParser(),
-              new Literal("T"),
-              new IntParser()),
+          //YYYY-MM-DDTHH
+          new Seq(
+            new IntParser(),
+            new Alt(
+              new Literal("-"),
+              new Literal("/")),
+            new IntParser(),
+            new Alt(
+              new Literal("-"),
+              new Literal("/")),
+            new IntParser(),
+            new Literal("T"),
+            new IntParser()),
 
-        //YYYY-MM-DD
+          //YYYY-MM-DD
           new Seq(
             //new Literal("\""),
             new IntParser(),
@@ -71,18 +71,18 @@ public class YYYYMMDDLiteralDateParser extends ProxyParser {
                 new Literal("/")),
             new IntParser()),
 
-        //YYYY-MM
+          //YYYY-MM
           new Seq(
-              new IntParser(),
-              new Alt(
-                  new Literal("-"),
-                  new Literal("/")),
-              new IntParser(),
-              new Whitespace()),
+            new IntParser(),
+            new Alt(
+              new Literal("-"),
+              new Literal("/")),
+            new IntParser(),
+            new Whitespace()),
 
-        //YYYY
+          //YYYY
           new Seq(
-              new IntParser())//,new Whitespace()
+            new IntParser())//,new Whitespace()
           ));
 
   }
