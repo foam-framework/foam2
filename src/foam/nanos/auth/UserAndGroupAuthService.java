@@ -71,7 +71,7 @@ public class UserAndGroupAuthService
     }
 
     // check for two-factor authentication
-    if ( user.getTwoFactorEnabled() && ! session.getContext().getBoolean("twoFactorSuccess", false) ) {
+    if ( user.getTwoFactorEnabled() && ! session.getContext().getBoolean("twoFactorSuccess") ) {
       throw new AuthenticationException("User requires two-factor authentication");
     }
 
