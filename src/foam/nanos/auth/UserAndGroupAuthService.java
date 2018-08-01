@@ -6,24 +6,23 @@
 
 package foam.nanos.auth;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import foam.core.ContextAware;
 import foam.core.ContextAwareSupport;
 import foam.core.X;
-import foam.dao.DAO;
 import foam.dao.ArraySink;
+import foam.dao.DAO;
 import foam.dao.Sink;
 import foam.mlang.MLang;
 import foam.nanos.NanoService;
 import foam.nanos.session.Session;
 import foam.util.Email;
-import foam.util.LRULinkedHashMap;
 import foam.util.Password;
 import foam.util.SafetyUtil;
-import java.security.Permission;
-import java.util.*;
+
 import javax.naming.AuthenticationException;
 import javax.security.auth.AuthPermission;
+import java.security.Permission;
+import java.util.Calendar;
+import java.util.List;
 
 public class UserAndGroupAuthService
   extends    ContextAwareSupport
