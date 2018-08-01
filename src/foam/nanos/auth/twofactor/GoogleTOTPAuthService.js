@@ -91,7 +91,7 @@ DAO userDAO = (DAO) x.get("localUserDAO");
 user = (User) userDAO.find(user.getId());
 
 if ( checkCode(BaseEncoding.base32().decode(user.getTwoFactorSecret()), code, STEP_SIZE, WINDOW) ) {
-  if ( user.getTwoFactorEnabled() ) {
+  if ( ! user.getTwoFactorEnabled() ) {
     user = (User) user.fclone();
     user.setTwoFactorEnabled(true);
     userDAO.put(user);
