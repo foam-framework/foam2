@@ -154,14 +154,9 @@ public abstract class AbstractFObject
 
   public byte[] hash(String algorithm, byte[] hash) throws NoSuchAlgorithmException {
       MessageDigest md = MessageDigest.getInstance(algorithm);
-
-      // update with previous hash
-      if ( hash != null && hash.length != 0 ) {
-        md.update(hash, 0, hash.length);
-      }
-
       List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
       Iterator i = props.iterator();
+
       while ( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
         if ( ! prop.includeInDigest() ) continue;
@@ -171,6 +166,15 @@ public abstract class AbstractFObject
         prop.updateDigest(this, md);
       }
 
+      // no chaining so return digest
+      if ( hash == null || hash.length == 0 ) {
+        return md.digest();
+      }
+
+      // calculate digest, update with previous hash and current hash
+      byte[] digest = md.digest();
+      md.update(hash);
+      md.update(digest);
       return md.digest();
   }
 

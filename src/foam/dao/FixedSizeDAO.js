@@ -9,11 +9,18 @@ foam.CLASS({
   name: 'FixedSizeDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: 'DAO that stores a fixed number of objects',
+  documentation: `
+    DAO that stores a fixed number of objects. Does not limit its delegate's
+    storage. Rather, it is intended to be used in situations where the delegate
+    does not store any data due to the amount of data being stored being
+    prohibitively large. Instead, this DAO will store some of that data in
+    memory, but it will start to replace old data after a certain point to
+    prevent infinite growth.
+  `,
 
   javaImports: [
     'foam.dao.Sink',
-    'java.util.concurrent.locks.ReentrantLock'  
+    'java.util.concurrent.locks.ReentrantLock'
   ],
 
   properties: [
@@ -44,10 +51,9 @@ foam.CLASS({
     },
     {
       class: 'Object',
-      name: 'lock',  
+      name: 'lock',
       javaType: 'java.util.concurrent.locks.ReentrantLock',
       javaFactory: `return new java.util.concurrent.locks.ReentrantLock();`
-
     }
   ],
 
@@ -91,20 +97,18 @@ Sink decorated = decorateSink_(sink, skip, limit, order, predicate);
 
 Integer backCounter;
 
-if ( getNextIndex() == 0 ) {
+if ( getNextIndex() <= 0 ) {
   backCounter = ( getInternalArraySize() - 1 ); 
 } else {
   backCounter = ( getNextIndex() - 1 );
 }
 
-if ( getNextIndex() < 0 ) backCounter = ( getInternalArraySize() - 1 );
-
 for ( int i = 0; i < getFixedDAOSize() ; i++ ) {
   try {
-   if ( getFixedSizeArray()[backCounter] == null ){
+    if ( getFixedSizeArray()[backCounter] == null ) {
       break;
     }
-    decorated.put ( getFixedSizeArray()[backCounter], null );
+    decorated.put(getFixedSizeArray()[backCounter], null);
     if ( backCounter == 0 ) {
       backCounter = getInternalArraySize();
     } 
