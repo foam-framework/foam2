@@ -95,6 +95,7 @@ foam.CLASS({
     }
 
     ^ .property-qualifier {
+      flex-grow: 2;
       position: relative;
     }
 
@@ -108,13 +109,18 @@ foam.CLASS({
       z-index: 1;
     }
 
-    ^ .foam-u2-tag-Select {
+    ^ input, select {
       background-color: white;
       border-radius: 2px;
       border: 1px solid #dce0e7;
       color: #093649;
       height: 40px;
+      padding: 0 8px;
+    }
+
+    ^ .foam-u2-tag-Select {
       padding: 0 20px 0 8px;
+      width: 100%;
       -webkit-appearance: none; /* Fix rounded corners in Chrome on OS X */
     }
   `
