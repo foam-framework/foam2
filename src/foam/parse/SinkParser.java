@@ -18,6 +18,7 @@ import java.util.List;
  *   firstName, lastName
  *   MIN(age), AVG(age), MAX(age)
  *   SUM(amount), COUNT(*)
+ *   ???: GROUP BY
  **/
 public class SinkParser
   extends Alt
