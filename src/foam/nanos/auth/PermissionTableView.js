@@ -156,7 +156,7 @@ foam.CLASS({
       });
     },
 
-    function updateChildrenPermission(gp, permissions) {
+    function updateChildrenPermission(gp, permissions) { // update chileren Permissions
       var self = this;
       var dao = this.groupDAO;
       var e = foam.mlang.Expressions.create();
