@@ -104,14 +104,13 @@ foam.CLASS({
             .start(this.TWO_FACTOR_TOKEN).addClass('full-width-input').end()
             .start(this.VERIFY).addClass('full-width-button').end()
           .end()
-        .end()
+        .end();
     }
   ],
 
   actions: [
     {
       name: 'verify',
-      label: 'Verify',
       code: function (X) {
         var self = this;
 
