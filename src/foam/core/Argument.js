@@ -41,7 +41,7 @@ foam.LIB({
         if ( cls ) return cls;
 
         // could not resolve
-        throw new TypeError('foam.Function.args could not resolve type ' +
+        throw new TypeError('foam.Function.resolveTypeString could not resolve type ' +
           typeStr);
       };
       ret.isTypeChecked__ = true;
@@ -315,6 +315,17 @@ foam.CLASS({
           foam.String.isInstance(e) ? cls.create({ name: e }) :
           cls.create(e, obj);
       }
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Listener',
+  properties: [
+    {
+      class: 'FObjectArray',
+      of: 'foam.core.Argument',
+      name: 'args',
     }
   ]
 });
