@@ -136,7 +136,7 @@ foam.CLASS({
     },
 
     function createChildMethod_(child) {
-      // Overwritten after boot2
+      // Overwritten after foam.core.Argument is created.
       return child;
     },
 
