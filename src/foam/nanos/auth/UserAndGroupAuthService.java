@@ -6,6 +6,8 @@
 
 package foam.nanos.auth;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import foam.core.ContextAware;
 import foam.core.ContextAwareSupport;
 import foam.core.X;
 import foam.dao.DAO;
@@ -67,6 +69,12 @@ public class UserAndGroupAuthService
     Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
     if ( group != null && ! group.getEnabled() ) {
       throw new AuthenticationException("User group disabled");
+    }
+
+    // check for two-factor authentication
+    Object twoFactorSuccess = session.getContext().get("twoFactorSuccess");
+    if ( user.getTwoFactorEnabled() && ( ! ( twoFactorSuccess instanceof Boolean ) || ! ((boolean) twoFactorSuccess) ) ) {
+      throw new AuthenticationException("User requires two-factor authentication");
     }
 
     return user;
