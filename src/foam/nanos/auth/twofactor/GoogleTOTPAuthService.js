@@ -9,25 +9,17 @@ foam.CLASS({
   name: 'GoogleTOTPAuthService',
   extends: 'foam.nanos.auth.twofactor.AbstractTOTPAuthService',
 
-  imports: [
-    'appConfig',
-    'localUserDAO'
-  ],
-
   javaImports: [
     'com.google.common.io.BaseEncoding',
     'foam.dao.DAO',
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.User',
-    'io.nayuki.qrcodegen.QrCode'
+    'foam.util.SafetyUtil',
+    'io.nayuki.qrcodegen.QrCode',
+    'java.net.URI'
   ],
 
   constants: [
-    {
-      name: 'URI',
-      value: 'otpauth://totp/%s:%s?secret=%s&issuer=%s&algorithm=%s',
-      type: 'String'
-    },
     {
       name: 'KEY_SIZE',
       value: 10,
@@ -54,33 +46,60 @@ foam.CLASS({
       name: 'generateKey',
       javaCode:
 `User user = (User) x.get("user");
-DAO userDAO = (DAO) getLocalUserDAO();
+DAO userDAO = (DAO) x.get("localUserDAO");
 
-// generate secret key, encode as base32 and store
-String key = BaseEncoding.base32().encode(generateSecret(KEY_SIZE));
-key = key.replaceFirst("[=]*$", "");
-user.setTwoFactorSecret(key);
-user.setTwoFactorEnabled(true);
-userDAO.put(user);
+// fetch from user dao to get secret key
+user = (User) userDAO.find(user.getId());
+
+String key;
+if ( SafetyUtil.isEmpty(user.getTwoFactorSecret()) ) {
+  // generate secret key, encode as base32 and store
+  key = BaseEncoding.base32().encode(generateSecret(KEY_SIZE));
+  key = key.replaceFirst("[=]*$", "");
+
+  // update user with secret key
+  user = (User) user.fclone();
+  user.setTwoFactorSecret(key);
+  userDAO.put_(x, user);
+} else {
+  // use stored secret key
+  key = user.getTwoFactorSecret();
+}
 
 if ( ! generateQrCode ) {
   return key;
 }
 
-AppConfig config = (AppConfig) x.get("appConfig");
-String url = String.format(URI, config.getName(), user.getEmail(), key, config.getName(), getAlgorithm());
-return QrCode.encodeText(url, QrCode.Ecc.MEDIUM).toSvgString(2);`
+try {
+  AppConfig config = (AppConfig) x.get("appConfig");
+  String path = String.format("/%s:%s", config.getName(), user.getEmail());
+  String query = String.format("secret=%s&issuer=%s&algorithm=%s", key, config.getName(), getAlgorithm());
+  URI uri = new URI("otpauth", "totp", path, query, null);
+  return "data:image/svg+xml;charset=UTF-8," + QrCode.encodeText(uri.toASCIIString(), QrCode.Ecc.MEDIUM).toSvgString(0);
+} catch ( Throwable t ) {
+  throw new RuntimeException(t);
+}`
     },
     {
       name: 'verifyToken',
       javaCode:
 `long code = Long.parseLong(token, 10);
 User user = (User) x.get("user");
-DAO userDAO = (DAO) getLocalUserDAO();
+DAO userDAO = (DAO) x.get("localUserDAO");
 
 // fetch from user dao to get secret key
 user = (User) userDAO.find(user.getId());
-return checkCode(BaseEncoding.base32().decode(user.getTwoFactorSecret()), code, STEP_SIZE, WINDOW);`
+
+if ( checkCode(BaseEncoding.base32().decode(user.getTwoFactorSecret()), code, STEP_SIZE, WINDOW) ) {
+  if ( user.getTwoFactorEnabled() ) {
+    user = (User) user.fclone();
+    user.setTwoFactorEnabled(true);
+    userDAO.put(user);
+  }
+  return true;
+}
+
+return false;`
     }
   ]
 });
