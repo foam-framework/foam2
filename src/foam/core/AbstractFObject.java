@@ -171,6 +171,15 @@ public abstract class AbstractFObject
         prop.updateDigest(this, md);
       }
 
+      // no chaining so return digest
+      if ( hash == null || hash.length == 0 ) {
+        return md.digest();
+      }
+
+      // calculate digest, update with previous hash and current hash
+      byte[] digest = md.digest();
+      md.update(hash);
+      md.update(digest);
       return md.digest();
   }
 
