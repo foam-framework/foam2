@@ -121,7 +121,17 @@ for ( int i = 0; i < getFixedDAOSize() ; i++ ) {
 decorated.eof();
 return sink;
 `
+    },
+    {
+      name: 'find_',
+      javaCode:
+      `
+      System.err.print("find called");
+      return null;
+      `
+
     }
+
   ]
 });
 
