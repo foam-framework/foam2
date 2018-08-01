@@ -182,9 +182,7 @@ foam.CLASS({
         .addClass(this.myClass())
 
          //currency menu
-//        .start().addClass('currency-container')
-//          .tag({ class: 'net.nanopay.ui.topNavigation.CurrencyChoiceView' })
-//        .end()
+         this.otherViews();
 
         // The notifications container
         this.start('div')
@@ -240,6 +238,9 @@ foam.CLASS({
             notificationMenu.launch();
           })
           .catch((err) => console.error(err));
+    },
+    function otherViews() {
+     
     }
   ],
 

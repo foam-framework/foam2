@@ -559,8 +559,10 @@ foam.CLASS({
   `,
 
   requires: [
+    'foam.dao.MergedResetSink',
     'foam.u2.AttrSlot',
     'foam.u2.Entity',
+    'foam.u2.RenderSink',
     'foam.u2.ViewSpec'
   ],
 
@@ -1575,7 +1577,7 @@ foam.CLASS({
       var es   = {};
       var self = this;
 
-      var listener = foam.u2.RenderSink.create({
+      var listener = this.RenderSink.create({
         dao: dao,
         addRow: function(o) {
           if ( update ) o = o.clone();
@@ -1608,7 +1610,7 @@ foam.CLASS({
         }
       }, this);
 
-      listener = foam.dao.MergedResetSink.create({
+      listener = this.MergedResetSink.create({
         delegate: listener
       }, this);
 
