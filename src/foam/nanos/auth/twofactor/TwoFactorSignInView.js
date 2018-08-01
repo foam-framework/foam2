@@ -79,9 +79,9 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'TwoFactorNoTokenError', 'Please enter a verification token.' },
-    { name: 'TwoFactorSuccess', 'Login successful.' },
-    { name: 'TwoFactorError', 'Login failed. Please try again.' }
+    { name: 'TwoFactorNoTokenError', message: 'Please enter a verification token.' },
+    { name: 'TwoFactorSuccess', message: 'Login successful.' },
+    { name: 'TwoFactorError', message: 'Login failed. Please try again.' }
   ],
 
   methods: [
@@ -114,18 +114,15 @@ foam.CLASS({
           return;
         }
 
-        this.twofactor.verifyToken(null. this.twoFactorToken)
+        this.twofactor.verifyToken(null, this.twoFactorToken)
         .then(function (result) {
-          if ( ! result ) {
+          if ( result ) {
+            self.loginSuccess = true;
+            self.add(self.NotificationMessage.create({ message: self.TwoFactorSuccess }));
+          } else {
+            self.loginSuccess = false;
             self.add(self.NotificationMessage.create({ message: self.TwoFactorError, type: 'error' }));
-            return;
           }
-
-          self.loginSuccess = user ? true : false;
-          self.add(self.NotificationMessage.create({ message: self.TwoFactorSuccess }));
-        })
-        .catch(function (err) {
-          self.add(self.NotificationMessage.create({ message: self.TwoFactorError, type: 'error' }));
         });
       }
     }
