@@ -52,20 +52,14 @@ DAO userDAO = (DAO) x.get("localUserDAO");
 // fetch from user dao to get secret key
 user = (User) userDAO.find(user.getId());
 
-String key;
-if ( SafetyUtil.isEmpty(user.getTwoFactorSecret()) ) {
-  // generate secret key, encode as base32 and store
-  key = BaseEncoding.base32().encode(generateSecret(KEY_SIZE));
-  key = key.replaceFirst("[=]*$", "");
+// generate secret key, encode as base32 and store
+String key = BaseEncoding.base32().encode(generateSecret(KEY_SIZE));
+key = key.replaceFirst("[=]*$", "");
 
-  // update user with secret key
-  user = (User) user.fclone();
-  user.setTwoFactorSecret(key);
-  userDAO.put_(x, user);
-} else {
-  // use stored secret key
-  key = user.getTwoFactorSecret();
-}
+// update user with secret key
+user = (User) user.fclone();
+user.setTwoFactorSecret(key);
+userDAO.put_(x, user);
 
 if ( ! generateQrCode ) {
   return key;
