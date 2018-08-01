@@ -2,42 +2,9 @@
 p({"class":"foam.nanos.boot.NSpec", "name":"repeatLogMessageDAO",           "lazy":false,  "serve":false,  "serviceScript":"","service":{"class":"foam.nanos.logger.RepeatLogMessageDAO"}})
 p({"class":"foam.nanos.boot.NSpec", "name":"notificationLogMessageDAO",     "lazy":false,  "serve":false,  "serviceScript":"","service":{"class":"foam.nanos.logger.NotificationLogMessageDAO"}})
 
-
-//p({"class":"foam.nanos.boot.NSpec", "name":"notificationLogMessageDAO",                    "lazy":false,  "serve":true,  "serviceScript":"return new foam.nanos.logger.NotificationLogMessageDAO.Builder(x).setDelegate(new foam.dao.WriteOnlyJDAO(x, foam.nanos.logger.LogMessage.getOwnClassInfo(), "../logs/logs")).build();"})
-
 p({"class":"foam.nanos.boot.NSpec", "name":"writeOnlyJDAO",                  "lazy":false,  "serve":false,  "serviceScript":"return new foam.dao.WriteOnlyJDAO(x, foam.nanos.logger.LogMessage.getOwnClassInfo(),\"../logs/logs\");" })
 
-
 p({"class":"foam.nanos.boot.NSpec", "name":"logMessageDAO",                    "lazy":false,  "serve":true,  "serviceScript":"import foam.dao.ProxyDAO; ProxyDAO nl = (ProxyDAO) x.get(\"notificationLogMessageDAO\"); nl.setX(x);  wo = x.get(\"writeOnlyJDAO\"); nl.setDelegate(wo); return new foam.nanos.logger.RepeatLogMessageDAO.Builder(x).setDelegate( new foam.nanos.auth.CreatedAwareDAO.Builder(x).setDelegate( new foam.nanos.auth.CreatedByAwareDAO.Builder(x).setDelegate(new foam.dao.SequenceNumberDAO( new foam.dao.FixedSizeDAO.Builder(x).setDelegate(nl).build())).build()).build()).build(); ", "client":"{\"of\":\"foam.nanos.logger.LogMessage\"}"})
-
-
-/////////
-
-
-//p({"class":"foam.nanos.boot.NSpec", "name":"logMessageDAO",                    "lazy":false,  "serve":true,  "serviceScript":" import foam.dao.ProxyDAO;  ProxyDAO repeatLogMessageDAO = (ProxyDAO) x.get(\"repeatLogMessageDAO\"); ProxyDAO notificationLogMessageDAO = x.get(\"notificationLogMessageDAO\") ; return new foam.nanos.logger.RepeatLogMessageDAO.Builder(x).setDelegate( new foam.nanos.auth.CreatedAwareDAO.Builder(x).setDelegate( new foam.nanos.auth.CreatedByAwareDAO.Builder(x).setDelegate(new foam.dao.SequenceNumberDAO( new foam.dao.FixedSizeDAO.Builder(x).setDelegate(nl).build())).build()).build()).build();", "client":"{\"of\":\"foam.nanos.logger.LogMessage\"}"})
-
-
-//p({"class":"foam.nanos.boot.NSpec", "name":"logMessageDAO",                    "lazy":false,  "serve":true,  "serviceScript":" import foam.dao.ProxyDAO;  ProxyDAO repeatLogMessageDAO = (ProxyDAO) x.get(\"repeatLogMessageDAO\"); ProxyDAO notificationLogMessageDAO = x.get(\"notificationLogMessageDAO\") ; return new foam.nanos.logger.RepeatLogMessageDAO.Builder(x).setDelegate( new foam.nanos.auth.CreatedAwareDAO.Builder(x).setDelegate( new foam.nanos.auth.CreatedByAwareDAO.Builder(x).setDelegate(new foam.dao.SequenceNumberDAO( new foam.dao.FixedSizeDAO.Builder(x).setDelegate(new foam.nanos.logger.NotificationLogMessageDAO.Builder(x).setDelegate(new foam.dao.WriteOnlyJDAO(x, foam.nanos.logger.LogMessage.getOwnClassInfo(), \"logs\")).build()).build())).build()).build()).build();", "client":"{\"of\":\"foam.nanos.logger.LogMessage\"}"})
-
-
-//p({"class":"foam.nanos.boot.NSpec", "name":"decoyLogMessageDAO",                    "lazy":false,  "serve":false,  "serviceScript":"return new foam.nanos.auth.CreatedAwareDAO.Builder(x).setDelegate( new foam.nanos.auth.CreatedByAwareDAO.Builder(x).setDelegate(new foam.dao.SequenceNumberDAO( new foam.dao.FixedSizeDAO.Builder(x).setDelegate(new foam.nanos.logger.NotificationLogMessageDAO.Builder(x).setDelegate(new foam.dao.WriteOnlyJDAO(x, foam.nanos.logger.LogMessage.getOwnClassInfo(), \"logs\")).build()).build())).build()).build();" })
-
-//p({"class":"foam.nanos.boot.NSpec", "name":"logMessageDAO",                    "lazy":false,  "serve":true,  "serviceScript":"ProxyLogger logLevelFilterLogger = new LogLevelFilterLogger(x) return new foam.dao.PMDAO(x, x.get(\"repeatLogMessageDAO\")).build();", "client":"{\"of\":\"foam.nanos.logger.LogMessage\"}" })
- 
-
-
-//p({"class":"foam.nanos.boot.NSpec", "name":"logMessageDAO",                    "lazy":false,  "serve":true,  "serviceScript":"return new foam.dao.PMDAO(x, x.get(\"repeatLogMessageDAO\").setDelegate(x.get(\"decoyLogMessageDAO\")) .build();", "client":"{\"of\":\"foam.nanos.logger.LogMessage\"}" })
-
-
-//unmodified
-//p({"class":"foam.nanos.boot.NSpec", "name":"logMessageDAO",                    "lazy":false,  "serve":true,  "serviceScript":"return new foam.nanos.logger.RepeatLogMessageDAO.Builder(x).setDelegate( new foam.nanos.auth.CreatedAwareDAO.Builder(x).setDelegate( new foam.nanos.auth.CreatedByAwareDAO.Builder(x).setDelegate(new foam.dao.SequenceNumberDAO( new foam.dao.FixedSizeDAO.Builder(x).setDelegate(new foam.nanos.logger.NotificationLogMessageDAO.Builder(x).setDelegate(new foam.dao.WriteOnlyJDAO(x, foam.nanos.logger.LogMessage.getOwnClassInfo(), \"logs\")).build()).build())).build()).build()).build();", "client":"{\"of\":\"foam.nanos.logger.LogMessage\"}"})
-
-
-
-// updated
-//p({"class":"foam.nanos.boot.NSpec", "name":"logMessageDAO",                    "lazy":false,  "serve":true,  "serviceScript":"return new foam.nanos.logger.RepeatLogMessageDAO.Builder(x).setDelegate( new foam.nanos.auth.CreatedAwareDAO.Builder(x).setDelegate( new foam.nanos.auth.CreatedByAwareDAO.Builder(x).setDelegate(new foam.dao.SequenceNumberDAO( new foam.dao.FixedSizeDAO.Builder(x).setDelegate(new foam.nanos.logger.NotificationLogMessageDAO.Builder(x).setDelegate(new foam.dao.WriteOnlyJDAO(x, foam.nanos.logger.LogMessage.getOwnClassInfo(), \"../logs/logs\")).build()).build())).build()).build()).build();", "client":"{\"of\":\"foam.nanos.logger.LogMessage\"}"})
-
-// -----------------------------------------
 
 
 p({"class":"foam.nanos.boot.NSpec", "name":"logger",                           "lazy":false,  "serve":false, "serviceScript":"import foam.nanos.logger.CompositeLogger; import foam.nanos.logger.StdoutLogger; import foam.nanos.logger.FileLogger; import foam.nanos.logger.ProxyLogger; import foam.nanos.logger.LogLevelFilterLogger; import foam.nanos.logger.DAOLogger; CompositeLogger log = new CompositeLogger(); StdoutLogger stdOut = new StdoutLogger(); FileLogger fileOut = new FileLogger(); fileOut.start(); ProxyLogger logLevelFilterLogger = new LogLevelFilterLogger(x); logLevelFilterLogger.setDelegate(log); DAOLogger daoLogger = new DAOLogger(x); log.add(stdOut).add(fileOut).add(daoLogger); return logLevelFilterLogger;"})
