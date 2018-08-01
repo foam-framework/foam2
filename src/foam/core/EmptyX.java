@@ -47,6 +47,19 @@ abstract class AbstractX
     return i == null ? defaultValue : i.intValue();
   }
 
+  public boolean getBoolean(Object key) {
+    return getBoolean(key, false);
+  }
+
+  public boolean getBoolean(Object key, boolean defaultValue) {
+    return getBoolean(this, key, defaultValue);
+  }
+
+  public boolean getBoolean(X x, Object key, boolean defaultValue) {
+    Boolean b = (Boolean) x.get(key);
+    return b == null ? defaultValue : b;
+  }
+
   public Object getInstanceOf(Object value, Class type) {
     return ((FacetManager) get("facetManager")).getInstanceOf(value, type, this);
   }
