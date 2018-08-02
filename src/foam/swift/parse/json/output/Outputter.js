@@ -205,6 +205,8 @@ out.append("\"\(formatter.string(from: data))\"")
       swiftCode: function() {/*
 if let data = data as? JSONOutputter {
   data.toJSON(outputter: self, out: &out)
+} else if let data = data as? ClassInfo {
+  outputClassInfo(&out, data)
 } else if let data = data as? PropertyInfo {
   outputPropertyInfo(&out, data)
 } else if let data = data as? String {
@@ -225,6 +227,31 @@ if let data = data as? JSONOutputter {
   NSLog("Unable to output %@", (data as AnyObject).description)
   outputNil(&out)
 }
+      */},
+    },
+    {
+      name: 'outputClassInfo',
+      args: [
+        {
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
+          name: 'out',
+        },
+        {
+          swiftType: 'ClassInfo',
+          name: 'data',
+        },
+      ],
+      swiftCode: function() {/*
+out.append("{");
+outputString(&out, "class");
+out.append(":");
+outputString(&out, "__Class__");
+out.append(",");
+outputString(&out, "forClass_");
+out.append(":");
+outputString(&out, data.id);
+out.append("}");
       */},
     },
     {
