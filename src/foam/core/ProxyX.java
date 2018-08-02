@@ -47,6 +47,18 @@ public class ProxyX
     return getX().getInt(x, key, defaultValue);
   }
 
+  public boolean getBoolean(Object key) {
+    return getBoolean(key, false);
+  }
+
+  public boolean getBoolean(Object key, boolean defaultValue) {
+    return getBoolean(this, key, defaultValue);
+  }
+
+  public boolean getBoolean(X x, Object key, boolean defaultValue) {
+    return getX().getBoolean(x, key, defaultValue);
+  }
+
   public X put(Object name, Object value) {
     setX(getX().put(name, value));
 

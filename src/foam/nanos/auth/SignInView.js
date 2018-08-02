@@ -178,10 +178,16 @@ foam.CLASS({
           return;
         }
 
-        this.auth.loginByEmail(null, this.email, this.password).then(function(user){
-          self.loginSuccess = user ? true : false;
-          self.user.copyFrom(user);
-          self.add(self.NotificationMessage.create({ message: 'Login Successful.' }));
+        this.auth.loginByEmail(null, this.email, this.password).then(function(user) {
+          if ( user && user.twoFactorEnabled ) {
+            self.loginSuccess = false;
+            self.user.copyFrom(user);
+            self.stack.push({ class: 'foam.nanos.auth.twofactor.TwoFactorSignInView' });
+          } else {
+            self.loginSuccess = user ? true : false;
+            self.user.copyFrom(user);
+            self.add(self.NotificationMessage.create({ message: 'Login Successful.' }));
+          }
         }).catch(function(a) {
           self.add(self.NotificationMessage.create({ message: a.message + '. Please try again.', type: 'error' }));
         });

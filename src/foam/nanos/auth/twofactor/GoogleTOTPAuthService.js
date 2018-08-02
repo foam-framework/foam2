@@ -14,6 +14,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.User',
+    'foam.nanos.session.Session',
     'foam.util.SafetyUtil',
     'io.nayuki.qrcodegen.QrCode',
     'java.net.URI'
@@ -51,20 +52,14 @@ DAO userDAO = (DAO) x.get("localUserDAO");
 // fetch from user dao to get secret key
 user = (User) userDAO.find(user.getId());
 
-String key;
-if ( SafetyUtil.isEmpty(user.getTwoFactorSecret()) ) {
-  // generate secret key, encode as base32 and store
-  key = BaseEncoding.base32().encode(generateSecret(KEY_SIZE));
-  key = key.replaceFirst("[=]*$", "");
+// generate secret key, encode as base32 and store
+String key = BaseEncoding.base32().encode(generateSecret(KEY_SIZE));
+key = key.replaceFirst("[=]*$", "");
 
-  // update user with secret key
-  user = (User) user.fclone();
-  user.setTwoFactorSecret(key);
-  userDAO.put_(x, user);
-} else {
-  // use stored secret key
-  key = user.getTwoFactorSecret();
-}
+// update user with secret key
+user = (User) user.fclone();
+user.setTwoFactorSecret(key);
+userDAO.put_(x, user);
 
 if ( ! generateQrCode ) {
   return key;
@@ -86,6 +81,7 @@ try {
 `long code = Long.parseLong(token, 10);
 User user = (User) x.get("user");
 DAO userDAO = (DAO) x.get("localUserDAO");
+DAO sessionDAO = (DAO) x.get("sessionDAO");
 
 // fetch from user dao to get secret key
 user = (User) userDAO.find(user.getId());
@@ -96,6 +92,12 @@ if ( checkCode(BaseEncoding.base32().decode(user.getTwoFactorSecret()), code, ST
     user.setTwoFactorEnabled(true);
     userDAO.put(user);
   }
+
+  // update session with two factor success set to true
+  Session session = x.get(Session.class);
+  session.setUserId(user.getId());
+  session.setContext(session.getContext().put("user", user).put("twoFactorSuccess", true));
+  sessionDAO.put(session);
   return true;
 }
 
