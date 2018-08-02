@@ -444,10 +444,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'javaReturns',
-      expression: function(returns) {
-        var of = foam.lookup(returns, true);
-        return of ? of.id : '';
-      },
+      expression: function(returns) { return returns || '' },
     },
     {
       class: 'Boolean',
