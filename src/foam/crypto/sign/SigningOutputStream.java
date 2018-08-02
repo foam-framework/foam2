@@ -6,6 +6,8 @@
 
 package foam.crypto.sign;
 
+import foam.util.SecurityUtil;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.*;
@@ -29,7 +31,7 @@ public class SigningOutputStream
     try {
       Signature signature = Signature.getInstance(algorithm);
       if ( key instanceof PrivateKey ) {
-        signature.initSign((PrivateKey) key, SecureRandom.getInstance("SHA1PRNG"));
+        signature.initSign((PrivateKey) key, SecurityUtil.GetSecureRandom());
       } else if ( key instanceof PublicKey) {
         signature.initVerify((PublicKey) key);
       }

@@ -26,7 +26,7 @@ foam.CLASS({
       javaCode: `throw new UnsupportedOperationException("Cannot put into ReadOnlyDAO");`,
       swiftCode: `throw FoamError("Cannot put into ReadOnlyDAO")`,
       code: function put_(x, obj) {
-      return Promise.reject('Cannot put into ReadOnlyDAO');
+        return Promise.reject('Cannot put into ReadOnlyDAO');
       }
     },
     {

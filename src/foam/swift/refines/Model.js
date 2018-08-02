@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.Model',
+  flags: ['swift'],
   requires: [
     'foam.swift.SwiftClass',
   ],
@@ -13,7 +14,9 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftName',
-      expression: function(name) { return name; },
+      expression: function(id) {
+        return id.replace(/\./g, '_')
+      },
     },
     {
       class: 'Boolean',
@@ -37,6 +40,19 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'swiftImplements',
+    },
+    {
+      name: 'swiftAllImplements',
+      expression: function(swiftImplements) {
+        return this.swiftImplements.concat(
+          ( this.implements || [] )
+            .map(function(i) { return foam.lookup(i.path).model_ })
+            .filter(function(i) {
+              return foam.core.InterfaceModel.isInstance(i);
+            })
+            .map(function(i) { return i.swiftName })
+        );
+      },
     },
     {
       class: 'String',

@@ -93,7 +93,8 @@ foam.CLASS({
 synchronized (this) {
   if ( ! isPropertySet("value") ) calcDelegateMax_();
 
-  if ( ! getAxiom().isSet(obj) ) {
+  //if ( ! getAxiom().isSet(obj) ) {
+  if ( (Long) getAxiom().get(obj) == 0 ) {
     getAxiom().set(obj, getValue());
     setValue(getValue() + 1);
   }

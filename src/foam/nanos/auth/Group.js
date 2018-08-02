@@ -26,7 +26,8 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'enabled'
+      name: 'enabled',
+      value: true
     },
     {
       class: 'String',
@@ -41,15 +42,30 @@ foam.CLASS({
     {
       class: 'FObjectArray',
       of: 'foam.nanos.auth.Permission',
-      name: 'permissions'
+      name: 'permissions',
+      documentation: 'Permissions set on group.'
     },
     {
       class: 'Reference',
       targetDAOKey: 'menuDAO',
       name: 'defaultMenu',
+      documentation: 'Menu user redirects to after login.',
       of: 'foam.nanos.menu.Menu'
     },
-    { class: 'URL', name: 'logo' },
+    {
+      class: 'URL',
+      name: 'logo',
+      documentation: 'Group logo.'
+    },
+    {
+      class: 'String',
+      name: 'primaryColor',
+      documentation: 'The following color properties can determine the color scheme of the GUI.'
+    },
+    { class: 'String', name: 'secondaryColor' },
+    { class: 'String', name: 'tableColor' },
+    { class: 'String', name: 'tableHoverColor' },
+    { class: 'String', name: 'accentColor' },
 /*    {
       class: 'FObjectProperty',
       of: 'foam.nanos.app.AppConfig',

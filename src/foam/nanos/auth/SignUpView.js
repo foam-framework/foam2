@@ -241,7 +241,7 @@ foam.CLASS({
           lastName: self.lastName,
           email: self.email,
           phone: self.phone,
-          password: self.password,
+          desiredPassword: self.password,
           organization: self.organization,
           department: self.department
         });
@@ -250,11 +250,6 @@ foam.CLASS({
           self.user = user;
           X.stack.push({ class: 'foam.nanos.auth.SignInView' });
         });
-        // self.emailUserRegistration.register(user).then(function (user) {
-        //   // Setting controller user as the one created here. May need tuning once auth & email verfication come to play.
-        //   self.user = user;
-        //   X.stack.push({ class: 'foam.nanos.auth.SignInView' });
-        // });
       }
     }
   ]

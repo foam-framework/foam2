@@ -9,9 +9,9 @@ foam.CLASS({
   name: 'User',
 
   implements: [
+    'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.EnabledAware',
-    'foam.nanos.auth.LastModifiedAware',
-    'foam.nanos.auth.LastModifiedByAware'
+    'foam.nanos.auth.LastModifiedAware'
   ],
 
   requires: [
@@ -33,23 +33,25 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'id',
-      max: 999,
       tableWidth: 45
     },
     {
       class: 'Boolean',
       name: 'enabled',
+      documentation: 'Enables user to permit certain actions.',
       value: true
     },
     {
       class: 'DateTime',
-      name: 'lastLogin'
+      name: 'lastLogin',
+      documentation: 'Date and time user last logged in.'
     },
     {
       class: 'String',
       name: 'firstName',
       tableWidth: 160,
-      validateObj: function (firstName) {
+      documentation: 'First name of user.',
+      validateObj: function(firstName) {
         if ( firstName.length > 70 ) {
           return 'First name cannot exceed 70 characters.';
         }
@@ -62,7 +64,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'middleName',
-      validateObj: function (middleName) {
+      documentation: 'Middle name of user.',
+      validateObj: function(middleName) {
         if ( middleName.length > 70 ) {
           return 'Middle name cannot exceed 70 characters.';
         }
@@ -75,8 +78,9 @@ foam.CLASS({
     {
       class: 'String',
       name: 'lastName',
+      documentation: 'Last name of user.',
       tableWidth: 160,
-      validateObj: function (lastName) {
+      validateObj: function(lastName) {
         if ( lastName.length > 70 ) {
           return 'Last name cannot exceed 70 characters.';
         }
@@ -89,18 +93,25 @@ foam.CLASS({
     {
       class: 'String',
       name: 'legalName',
+      documentation: 'Full legal name of user. Appends first, middle & last name.',
       transient: true,
-      expression: function ( firstName, middleName, lastName ) {
+      expression: function(firstName, middleName, lastName) {
         return middleName != '' ? firstName + ' ' + middleName + ' ' + lastName : firstName + ' ' + lastName;
-      }
+      },
+      javaGetter: `
+        return ! getMiddleName().equals("")
+          ? getFirstName() + " " + getMiddleName() + " " + getLastName()
+          : getFirstName() + " " + getLastName();
+      `,
     },
     {
       class: 'String',
       name: 'organization',
+      documentation: 'Organization/Business the user is accompanied to.',
       displayWidth: 80,
       width: 100,
       tableWidth: 160,
-      validateObj: function (organization) {
+      validateObj: function(organization) {
         if ( organization.length > 35 ) {
           return 'Organization name cannot exceed 35 characters.';
         }
@@ -109,15 +120,17 @@ foam.CLASS({
     {
       class: 'String',
       name: 'department',
+      documentation: 'Department the user is accompanied to within the organization.',
       width: 50
     },
     {
       class: 'EMail',
       name: 'email',
       label: 'Email Address',
+      documentation: 'Email address of user.',
       displayWidth: 80,
       width: 100,
-      preSet: function (_, val) {
+      preSet: function(_, val) {
         return val.toLowerCase();
       },
       javaSetter:
@@ -140,14 +153,18 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'phone',
-      factory: function () { return this.Phone.create(); },
+      documentation: 'Personal phone number of user.',
+      factory: function() {
+        return this.Phone.create();
+      },
       view: { class: 'foam.nanos.auth.PhoneDetailView' }
     },
     {
       class: 'String',
       name: 'phoneNumber',
       transient: true,
-      expression: function (phone) {
+      documentation: 'Omits properties of phone number object and returns the number.',
+      expression: function(phone) {
         return phone.number;
       }
     },
@@ -155,12 +172,16 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'mobile',
-      factory: function () { return this.Phone.create(); },
+      documentation: 'Mobile phone number of user.',
+      factory: function() {
+        return this.Phone.create();
+      },
       view: { class: 'foam.nanos.auth.PhoneDetailView' }
     },
     {
       class: 'String',
       name: 'type',
+      documentation: 'Type of user. (Business, Personal etc.)',
       tableWidth: 91,
       view: {
         class: 'foam.u2.view.ChoiceView',
@@ -169,43 +190,47 @@ foam.CLASS({
     },
     {
       class: 'Date',
-      name: 'birthday'
+      name: 'birthday',
+      documentation: 'User\' birthday.'
     },
     {
       class: 'foam.nanos.fs.FileProperty',
       name: 'profilePicture',
+      documentation: 'User\' profile picture.',
       view: { class: 'foam.nanos.auth.ProfilePictureView' }
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Address',
       name: 'address',
-      factory: function () { return this.Address.create(); },
+      documentation: 'User\' Address.',
+      factory: function() {
+        return this.Address.create();
+      },
       view: { class: 'foam.nanos.auth.AddressDetailView' }
-    },
-    {
-      class: 'FObjectArray',
-      of: 'foam.core.FObject',
-      name: 'accounts',
-      hidden: true
     },
     {
       class: 'Reference',
       name: 'language',
+      documentation: 'User\' default language. Can be used to determine displayed language.',
       of: 'foam.nanos.auth.Language',
       value: 'en'
     },
     {
       class: 'String',
       name: 'timeZone',
+      documentation: 'User\' preferred timezone.',
       width: 5
       // TODO: create custom view or DAO
     },
     {
       class: 'Password',
-      name: 'password',
+      name: 'desiredPassword',
+      label: 'Password',
+      documentation: 'A password user would like to have during registration process.',
       displayWidth: 30,
       width: 100,
+      storageTransient: true,
       validateObj: function (password) {
         var re = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{7,32}$/;
 
@@ -216,24 +241,32 @@ foam.CLASS({
     },
     {
       class: 'Password',
+      name: 'password',
+      hidden: true,
+      networkTransient: true
+    },
+    {
+      class: 'Password',
       name: 'previousPassword',
       hidden: true,
-      displayWidth: 30,
-      width: 100
+      networkTransient: true
     },
     {
       class: 'DateTime',
-      name: 'passwordLastModified'
+      name: 'passwordLastModified',
+      documentation: 'Date and time password was last modified.'
     },
     {
       class: 'DateTime',
-      name: 'passwordExpiry'
+      name: 'passwordExpiry',
+      documentation: 'Date and time password expires.'
     },
     // TODO: startDate, endDate,
     // TODO: do we want to replace 'note' with a simple ticket system?
     {
       class: 'String',
       name: 'note',
+      documentation: 'Note appended to user.',
       displayWidth: 70,
       view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 }
     },
@@ -241,9 +274,9 @@ foam.CLASS({
     {
       class: 'String',
       name: 'businessName',
-      documentation: 'Name of the business',
+      documentation: 'Name of business user is accompanied to.',
       width: 50,
-      validateObj: function (businessName) {
+      validateObj: function(businessName) {
         if ( businessName.length > 35 ) {
           return 'Business name cannot be greater than 35 characters.';
         }
@@ -258,11 +291,23 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'businessHoursEnabled',
+      documentation: 'Enables business hours.',
       value: false
+    },
+    {
+      class: 'StringArray',
+      name: 'disabledTopics',
+      documentation: 'disabled types for notifications'
+    },
+    {
+      class: 'StringArray',
+      name: 'disabledTopicsEmail',
+      documentation: 'disabled types for Email notifications'
     },
     {
       class: 'URL',
       name: 'website',
+      documentation: 'User\' website.',
       displayWidth: 80,
       width: 2048,
       validateObj: function (website) {
@@ -274,9 +319,14 @@ foam.CLASS({
       }
     },
     {
-      class: 'Date',
+      class: 'DateTime',
+      name: 'created',
+      documentation: 'Creation date.'
+    },
+    {
+      class: 'DateTime',
       name: 'lastModified',
-      documentation: 'Last modified date'
+      documentation: 'Last modified date.'
     }
   ],
 

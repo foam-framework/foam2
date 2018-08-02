@@ -80,6 +80,7 @@ public abstract class AbstractFObjectArrayPropertyInfo
 
   @Override
   public void updateDigest(FObject obj, MessageDigest md) {
+    if ( ! includeInDigest() ) return;
     FObject[] val = (FObject[]) this.get(obj);
     if ( val == null || val.length == 0 ) return;
 
@@ -88,6 +89,7 @@ public abstract class AbstractFObjectArrayPropertyInfo
       Iterator i = props.iterator();
       while ( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
+        if ( ! prop.includeInDigest() ) continue;
         if ( ! prop.isSet(o) ) continue;
         if ( prop.isDefaultValue(o) ) continue;
         md.update(prop.getNameAsByteArray());
@@ -98,6 +100,7 @@ public abstract class AbstractFObjectArrayPropertyInfo
 
   @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {
+    if ( ! includeInSignature() ) return;
     FObject[] val = (FObject[]) this.get(obj);
     if ( val == null || val.length == 0 ) return;
 
@@ -106,6 +109,7 @@ public abstract class AbstractFObjectArrayPropertyInfo
       Iterator i = props.iterator();
       while ( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
+        if ( ! prop.includeInSignature() ) continue;
         if ( ! prop.isSet(o) ) continue;
         if ( prop.isDefaultValue(o) ) continue;
         sig.update(prop.getNameAsByteArray());

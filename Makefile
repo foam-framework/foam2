@@ -15,6 +15,10 @@ foam2_MAVEN_DEPS = \
 	org.apache.commons:commons-text:1.1 \
 	org.apache.commons:commons-dbcp2:2.0.1 \
 	org.apache.commons:commons-lang3:3.6 \
+	commons-collections:commons-collections:3.2.2 \
+	org.apache.httpcomponents:httpcore:4.4.10 \
+	org.apache.httpcomponents:httpclient:4.5.6 \
+	commons-codec:commons-codec:1.11 \
 	commons-io:commons-io:2.6 \
 	org.apache-extras.beanshell:bsh:2.0b6 \
 	com.google.api-client:google-api-client:1.22.0 \

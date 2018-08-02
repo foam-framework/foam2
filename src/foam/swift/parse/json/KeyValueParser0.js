@@ -22,7 +22,7 @@ foam.CLASS({
 return 
   Seq0_create(["parsers": [
     Whitespace_create(),
-    AnyKeyParser(),
+    AnyKeyParser_create(),
     Whitespace_create(),
     Literal_create(["string": ":"]),
     AnyParser_create(),

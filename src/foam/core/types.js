@@ -312,8 +312,7 @@ foam.CLASS({
 
         return c;
       }
-    ],
-    ['toJSON', function(value) { return value ? value.id : value; } ]
+    ]
   ],
 
   methods: [
@@ -491,7 +490,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'targetDAOKey',
-      expression: function(of) { return foam.String.daoize(of.name); }
+      expression: function(of) {
+        if ( ! of ) {
+          console.error("invalid 'of' for property with targetDAOKey", this.name);
+        }
+        return foam.String.daoize(of.name);
+      }
     },
     {
       name: 'adapt',

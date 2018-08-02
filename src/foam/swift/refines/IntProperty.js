@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.Int',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -41,6 +42,7 @@ return 0
 
 foam.CLASS({
   refines: 'foam.core.Long',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftAdapt',
@@ -58,6 +60,7 @@ return 0
 
 foam.CLASS({
   refines: 'foam.core.Float',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',

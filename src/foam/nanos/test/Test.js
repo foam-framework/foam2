@@ -3,6 +3,7 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 foam.CLASS({
   package: 'foam.nanos.test',
   name: 'Test',
@@ -11,8 +12,9 @@ foam.CLASS({
   imports: [ 'testDAO as scriptDAO' ],
 
   javaImports: [
-    'bsh.EvalError',
     'bsh.Interpreter',
+    'foam.nanos.app.AppConfig',
+    'foam.nanos.app.Mode',
     'foam.nanos.pm.PM',
     'java.io.ByteArrayOutputStream',
     'java.io.PrintStream',
@@ -20,10 +22,19 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'id', 'enabled', 'description', 'server', 'passed', 'failed', 'lastRun', 'lastDuration', 'run'
+    'id', 'enabled', 'description', 'server',
+    'passed', 'failed', 'lastRun', 'lastDuration',
+    'status', 'run'
   ],
 
-  searchColumns: [ ],
+  searchColumns: ['id', 'description'],
+
+  documentation: `
+    A scriptable Unit Test.
+    Tests can be run on either the server in BeanShell or on the client in Javascript.
+    Call test(boolean exp, String message) for each test, where 'exp' evaluates to
+    true if the test passed and false if it failed.
+  `,
 
   properties: [
     {
@@ -31,7 +42,7 @@ foam.CLASS({
       name: 'passed',
       visibility: foam.u2.Visibility.RO,
       tableCellFormatter: function(value) {
-        if ( value ) this.start().style({color: '#0f0'}).add(value).end();
+        if ( value ) this.start().style({ color: '#0f0' }).add(value).end();
       }
     },
     {
@@ -39,7 +50,7 @@ foam.CLASS({
       name: 'failed',
       visibility: foam.u2.Visibility.RO,
       tableCellFormatter: function(value) {
-        if ( value ) this.start().style({color: '#f00'}).add(value).end();
+        if ( value ) this.start().style({ color: '#f00' }).add(value).end();
       }
     }
   ],
@@ -48,6 +59,14 @@ foam.CLASS({
     {
       /** Template method used to add additional code in subclasses. */
       name: 'runTest',
+      code: function(x) {
+        return eval(this.code);
+      },
+      args: [
+        {
+          name: 'x', javaType: 'foam.core.X'
+        }
+      ],
       javaReturns: 'void',
       javaCode: '/* NOOP */'
     },
@@ -85,6 +104,43 @@ foam.CLASS({
     },
     {
       name: 'runScript',
+      code: function() {
+        var ret;
+        var startTime = Date.now();
+
+        try {
+          this.passed = 0;
+          this.failed = 0;
+          this.output = '';
+          var log = function() {
+            this.output += Array.from(arguments).join('') + '\n';
+          }.bind(this);
+          var test = (condition, message) => {
+            if ( condition ) {
+              this.passed += 1;
+            } else {
+              this.failed += 1;
+            }
+            this.output += ( condition ? 'SUCCESS: ' : 'FAILURE: ' ) +
+                message + '\n';
+          };
+          with ( { log: log, print: log, x: this.__context__, test: test } )
+            ret = Promise.resolve(eval(this.code));
+        } catch (err) {
+          this.failed += 1;
+          this.output += err;
+        }
+
+        ret.then(() => {
+          var endTime = Date.now();
+          var duration = endTime - startTime; // Unit: milliseconds
+          this.lastRun = new Date();
+          this.lastDuration = duration;
+          this.scriptDAO.put(this);
+        });
+
+        return ret;
+      },
       args: [
         {
           name: 'x', javaType: 'foam.core.X'
@@ -92,6 +148,11 @@ foam.CLASS({
       ],
       javaReturns: 'void',
       javaCode: `
+        // disable tests in production
+        if ( ((AppConfig) x.get("appConfig")).getMode() == Mode.PRODUCTION ) {
+          return;
+        }
+
         ByteArrayOutputStream baos  = new ByteArrayOutputStream();
         PrintStream           ps    = new PrintStream(baos);
         Interpreter           shell = createInterpreter(x);
@@ -106,7 +167,7 @@ foam.CLASS({
           // creates the testing method
           shell.eval("test(boolean exp, String message) { if ( exp ) { currentScript.setPassed(currentScript.getPassed()+1); } else { currentScript.setFailed(currentScript.getFailed()+1); } print((exp ? \\"SUCCESS: \\" : \\"FAILURE: \\")+message);}");
           shell.eval(getCode());
-          runTest();
+          runTest(x);
         } catch (Throwable e) {
           setFailed(getFailed()+1);
           ps.println();

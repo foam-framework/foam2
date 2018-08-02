@@ -77,15 +77,21 @@ public class NanoServiceRouter
     informService(service, spec);
 
     try {
+      foam.box.Box result = null;
       Class cls = spec.getBoxClass() != null && spec.getBoxClass().length() > 0 ?
         Class.forName(spec.getBoxClass()) :
         DAOSkeleton.class ;
       Skeleton skeleton = (Skeleton)getX().create(cls);
+      result = skeleton;
 
       informService(skeleton, spec);
       skeleton.setDelegateObject(service);
 
-      return skeleton;
+      foam.core.X x = getX().put(NSpec.class, spec);
+
+      result = new foam.box.SessionServerBox(x, result, spec.getAuthenticate());
+
+      return result;
     } catch (ClassNotFoundException ex) {
       logger.error(this.getClass(), "Unable to create NSpec servlet: ", spec.getName(), "error: ", ex);
     }

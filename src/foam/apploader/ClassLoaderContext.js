@@ -21,15 +21,23 @@ foam.CLASS({
     }
   ]
 });
-(function() {
-  var classLoaderContext = foam.apploader.ClassLoaderContext.create(
-      null, foam.__context__);
-  classLoaderContext.classloader.addClassPath(global.FOAM_ROOT);
-  foam.__context__ = classLoaderContext.__subContext__;
 
-  var CLASS = foam.CLASS;
-  foam.CLASS = function(m) {
-    foam.__context__.classloader.latch(m);
-    CLASS(m);
-  };
-})();
+foam.SCRIPT({
+  package: 'foam.apploader',
+  name: 'ClassLoaderContextScript',
+  requires: [
+    'foam.apploader.ClassLoaderContext',
+  ],
+  code: function() {
+    var classLoaderContext = foam.apploader.ClassLoaderContext.create(
+        null, foam.__context__);
+    classLoaderContext.classloader.addClassPath(global.FOAM_ROOT);
+    foam.__context__ = classLoaderContext.__subContext__;
+
+    var CLASS = foam.CLASS;
+    foam.CLASS = function(m) {
+      foam.__context__.classloader.latch(m);
+      CLASS(m);
+    };
+  },
+});
