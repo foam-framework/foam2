@@ -634,7 +634,7 @@ foam.CLASS({
     function writeToSwiftClass(cls, parentCls) {
       cls.method(foam.swift.Method.create({
         name: this.name,
-        returnType: 'foam.dao.ManyToManyRelationship',
+        returnType: 'foam_dao_ManyToManyRelationship',
         args: [
           foam.swift.Argument.create({
             type: 'Context',
