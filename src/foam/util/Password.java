@@ -19,13 +19,6 @@ public class Password {
   // Min 8 characters, at least one uppercase, one lowercase, one number
   private static Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$");
 
-  private static ThreadLocal<SecureRandom> secureRandom = new ThreadLocal<SecureRandom>() {
-    @Override
-    protected SecureRandom initialValue() {
-      return new SecureRandom();
-    }
-  };
-
   /**
    * Generates random salt given a size
    * @param size size of the salt
@@ -33,7 +26,7 @@ public class Password {
    */
   private static byte[] salt(int size) {
     byte[] salt = new byte[size];
-    secureRandom.get().nextBytes(salt);
+    SecurityUtil.GetSecureRandom().nextBytes(salt);
     return salt;
   }
 
