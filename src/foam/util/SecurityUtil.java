@@ -78,6 +78,10 @@ public class SecurityUtil {
       return bigInteger.get();
     }
 
+    /**
+     * Increments the BigInteger reference by one and returns it
+     * @return BigInteger reference
+     */
     public BigInteger incrementAndGet() {
       return bigInteger.accumulateAndGet(BigInteger.ONE, new BinaryOperator<BigInteger>() {
         @Override
@@ -85,9 +89,12 @@ public class SecurityUtil {
           return o1.add(o2);
         }
       });
-
     }
 
+    /**
+     * Returns the BigInteger reference and then increments by one
+     * @return BigInteger reference
+     */
     public BigInteger getAndIncrement() {
       return bigInteger.getAndAccumulate(BigInteger.ONE, new BinaryOperator<BigInteger>() {
         @Override
