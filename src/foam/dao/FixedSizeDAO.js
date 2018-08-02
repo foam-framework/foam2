@@ -125,9 +125,16 @@ return sink;
     {
       name: 'find_',
       javaCode:
-      `
-      System.err.print("find called");
-      return null;
+        `
+        try {
+          Integer arrID = Integer.parseInt(id.toString());
+          return getFixedSizeArray()[arrID - 1];
+        }
+        catch (Exception e ){
+          // the find was called by CreatedAwareDAO
+          return getDelegate().find_(x,id);
+        }
+  
       `
 
     }
