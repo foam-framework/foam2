@@ -97,16 +97,17 @@ foam.CLASS({
                               cb.data$.sub(function() { self.updateGroup(p, g, cb.data, self); });
                               this.start('td').show(groups[g.id].data$.map(function() { return groups[g.id].data; }))
                                     .style({'text-align': 'center', 'width': '100'}).tag(cb).call(function() {
-                                      self.groupDAO.find(g.parent).then(function(a) {
-                                        if ( a != undefined && a.implies(p.id) ) {
-                                          cb.setAttribute('title', g.parent + ': ' + p.id);
-                                          cb.style({'border-color': '#40C75B'});
-                                        }
-                                      });
-
                                       if ( g.implies(p.id) ) {
                                         cb.setAttribute('title', g.id + ': ' + p.id);
                                         cb.style({'border-color': '#40C75B'});
+                                      } else {
+                                        //self.groupDAO.find(g.parent).then(function(a) {
+                                        g.parent$find.then(function(a) {
+                                          if ( a != undefined && a.implies(p.id) ) {
+                                            cb.setAttribute('title', g.parent + ': ' + p.id);
+                                            cb.style({'border-color': '#40C75B'});
+                                          }
+                                        });
                                       }
                                     }).end()
                           })
@@ -138,7 +139,8 @@ foam.CLASS({
         });
 
         //parents' permissions
-        dao.find(group.parent).then(function(groupParent) {
+        //dao.find(group.parent).then(function(groupParent) {
+        group.parent$find.then(function(groupParent) {
           if ( groupParent != undefined ) {
               permissions += groupParent.permissions.filter(function(gp) {
                 return gp.id == p_.id;
