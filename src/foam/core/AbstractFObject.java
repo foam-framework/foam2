@@ -7,6 +7,8 @@
 package foam.core;
 
 import foam.lib.json.Outputter;
+import foam.util.SecurityUtil;
+
 import java.security.*;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -184,7 +186,7 @@ public abstract class AbstractFObject
 
   public byte[] sign(String algorithm, PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
     Signature signer = Signature.getInstance(algorithm);
-    signer.initSign(key, SecureRandom.getInstance("SHA1PRNG"));
+    signer.initSign(key, SecurityUtil.GetSecureRandom());
 
     List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
     Iterator i = props.iterator();
