@@ -320,17 +320,6 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  refines: 'foam.core.Listener',
-  properties: [
-    {
-      class: 'FObjectArray',
-      of: 'foam.core.Argument',
-      name: 'args',
-    }
-  ]
-});
-
-foam.CLASS({
   refines: 'foam.core.AbstractMethod',
   package: 'foam.core',
   name: 'CreateChildRefines',
