@@ -71,57 +71,69 @@ foam.CLASS({
         }
       ],
       javaCode: `
-Integer insertAt;
-foam.core.FObject delegatedObject = getDelegate().put_(x, obj);
-getLock().lock();
-try {
-  insertAt = getNextIndex();  
-  if ( insertAt == getInternalArraySize() ) {
-    insertAt = 0;
+  Integer insertAt;
+  foam.core.FObject delegatedObject = getDelegate().put_(x, obj);
+  getLock().lock();
+  try {
+    insertAt = getNextIndex();  
+    if ( insertAt == getInternalArraySize() ) {
+      insertAt = 0;
+    }
+    setNextIndex( insertAt + 1 );
+  } finally {
+    getLock().unlock();
   }
-  setNextIndex( insertAt + 1 );
-} finally {
-  getLock().unlock();
-}
-getFixedSizeArray()[insertAt] = delegatedObject;
-return delegatedObject;
+  getFixedSizeArray()[insertAt] = delegatedObject;
+  return delegatedObject;
   `
     },
     {
       name: 'select_',
       javaReturns: 'foam.dao.Sink',
       javaCode: `
-if ( sink == null ) sink = new ArraySink();
-sink = prepareSink(sink);
-Sink decorated = decorateSink_(sink, skip, limit, order, predicate);
+  if ( sink == null ) sink = new ArraySink();
+  sink = prepareSink(sink);
+  Sink decorated = decorateSink_(sink, skip, limit, order, predicate);
 
-Integer backCounter;
+  Integer backCounter;
 
-if ( getNextIndex() <= 0 ) {
-  backCounter = ( getInternalArraySize() - 1 ); 
-} else {
-  backCounter = ( getNextIndex() - 1 );
-}
+  if ( getNextIndex() <= 0 ) {
+    backCounter = ( getInternalArraySize() - 1 ); 
+  } else {
+    backCounter = ( getNextIndex() - 1 );
+  }
 
-for ( int i = 0; i < getFixedDAOSize() ; i++ ) {
-  try {
-    if ( getFixedSizeArray()[backCounter] == null ) {
+  for ( int i = 0; i < getFixedDAOSize() ; i++ ) {
+    try {
+      if ( getFixedSizeArray()[backCounter] == null ) {
+        break;
+      }
+      decorated.put(getFixedSizeArray()[backCounter], null);
+      if ( backCounter == 0 ) {
+        backCounter = getInternalArraySize();
+      } 
+      backCounter--;
+    } catch (Exception e) {
+      e.printStackTrace();
       break;
     }
-    decorated.put(getFixedSizeArray()[backCounter], null);
-    if ( backCounter == 0 ) {
-      backCounter = getInternalArraySize();
-    } 
-    backCounter--;
-  } catch (Exception e) {
-    e.printStackTrace();
-    break;
   }
-}
-decorated.eof();
-return sink;
+  decorated.eof();
+  return sink;
 `
+    },
+    {
+      name: 'find_',
+      javaCode: `
+  try {
+    Integer arrID = Integer.parseInt(id.toString());
+    return getFixedSizeArray()[ (arrID - 1) % getFixedSizeArray().length ];
+  } catch (Exception e ){
+    return getDelegate().find_(x,id);
+  }
+  `
     }
+
   ]
 });
 
