@@ -101,7 +101,6 @@ foam.CLASS({
                                         cb.setAttribute('title', g.id + ': ' + p.id);
                                         cb.style({'border-color': '#40C75B'});
                                       } else {
-                                        //self.groupDAO.find(g.parent).then(function(a) {
                                         g.parent$find.then(function(a) {
                                           if ( a != undefined && a.implies(p.id) ) {
                                             cb.setAttribute('title', g.parent + ': ' + p.id);
@@ -139,7 +138,6 @@ foam.CLASS({
         });
 
         //parents' permissions
-        //dao.find(group.parent).then(function(groupParent) {
         group.parent$find.then(function(groupParent) {
           if ( groupParent != undefined ) {
               permissions += groupParent.permissions.filter(function(gp) {
@@ -158,7 +156,7 @@ foam.CLASS({
       });
     },
 
-    function updateChildrenPermission(gp, permissions) { // update chileren Permissions
+    function updateChildrenPermission(gp, permissions) {
       var self = this;
       var dao = this.groupDAO;
       var e = foam.mlang.Expressions.create();
