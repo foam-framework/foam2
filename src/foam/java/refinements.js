@@ -443,7 +443,11 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'javaReturns'
+      name: 'javaReturns',
+      expression: function(returns) {
+        var of = foam.lookup(returns, true);
+        return of ? of.id : '';
+      },
     },
     {
       class: 'Boolean',
