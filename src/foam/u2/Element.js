@@ -731,6 +731,13 @@ foam.CLASS({
     }
   `,
 
+  messages: [
+    {
+      name: 'SelectBadUsage',
+      message: `You're using Element.select() wrong. The function passed to it must return an Element. Don't try to modify the view by side effects.`
+    }
+  ],
+
   properties: [
     {
       name: 'id',
@@ -1587,9 +1594,7 @@ foam.CLASS({
           var e = f.call(self, o);
 
           if ( e === undefined ) {
-            throw new Error('You\'re using Element.select() wrong. The ' +
-                'function passed to it must return an Element. Don\'t try to ' +
-                'modify the view by side effects.');
+            throw new Error(self.SelectBadUsage);
           }
 
           if ( update ) {
