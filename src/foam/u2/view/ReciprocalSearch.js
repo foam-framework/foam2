@@ -54,6 +54,10 @@ foam.CLASS({
       border: 1px solid #59a5d5;
     }
 
+    ^ .general-query {
+      padding: 20px;
+    }
+
     ^count {
       font-size: 14pt;
       color: #555;
@@ -143,6 +147,18 @@ foam.CLASS({
           var e = this.E('div');
 
           e.onDetach(searchManager);
+
+          var generalQueryView = foam.u2.ViewSpec.createView(
+              { class: 'foam.u2.search.TextSearchView' },
+              {
+                richSearch: true,
+                of: self.dao.of.id,
+                onKey: true
+              },
+              this,
+              this.__subSubContext__);
+          searchManager.add(generalQueryView);
+          e.start(generalQueryView).addClass('general-query').end();
 
           e.forEach(filters, function(f) {
             // TODO: See if this can be cleaned up somehow, if searchView didn't
