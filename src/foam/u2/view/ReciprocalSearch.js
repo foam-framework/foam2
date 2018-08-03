@@ -173,10 +173,7 @@ foam.CLASS({
 
             searchManager.add(view);
             this
-              .start(self.SearchViewWrapper, {
-                searchView: view,
-                predicate$: view.predicate$
-              })
+              .start(self.SearchViewWrapper, { searchView: view })
                 .addClass(self.myClass('filter'))
               .end();
           });
