@@ -64,6 +64,15 @@ foam.CLASS({
           right: 5px;
           top: 10px;
         }
+        ^ .foam-u2-UnstyledActionView-close{
+          width: 30px;
+          height: 30px;
+          position: absolute;
+          left: 0px;
+          top: -5px;
+          z-index: 101;
+          opacity: 0.01;
+        }
         ^ .foam-u2-ActionView-close{
           width: 30px;
           height: 30px;
