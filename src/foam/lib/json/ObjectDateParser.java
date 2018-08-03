@@ -46,20 +46,6 @@ import java.util.Date;
 public class ObjectDateParser
   extends ProxyParser
 {
-  protected static ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
-    @Override
-    protected StringBuilder initialValue() {
-      return new StringBuilder();
-    }
-
-    @Override
-    public StringBuilder get() {
-      StringBuilder b = super.get();
-      b.setLength(0);
-      return b;
-    }
-  };
-
   public ObjectDateParser() {
     super(new Seq0(
       new Whitespace(),
