@@ -165,8 +165,7 @@ foam.CLASS({
     },
 
     async function updateTableView() {
-      var data = this.data;
-      var permissioned = await this.auth.check(null, data.id + '.properties.permissioned');
+      var permissioned = await this.auth.check(null, this.data.id + '.properties.permissioned');
       var axs = await this.permittedAxioms(permissioned);
 
       this.classPropertyTableView = this.TableView.create({
