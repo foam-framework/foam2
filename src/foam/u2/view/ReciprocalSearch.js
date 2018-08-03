@@ -49,7 +49,7 @@ foam.CLASS({
       width: 100%;
     }
 
-    ^ input:focus, ^ select:focus {
+    ^ input:not([type="checkbox"]):focus, ^ select:focus {
       outline: none;
       border: 1px solid #59a5d5;
     }
