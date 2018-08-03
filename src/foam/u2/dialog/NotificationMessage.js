@@ -103,7 +103,6 @@ foam.CLASS({
   methods: [
     function initE(){
       var self = this;
-
       this
         .addClass(this.myClass()).enableClass(this.myClass('error-background'), this.type === 'error')
         .start()
@@ -111,7 +110,7 @@ foam.CLASS({
         .end()
         .startContext({ data: this })
           .start().addClass('close-x').add(this.CLOSE).end()
-        .endContext()
+        .endContext();
 
         setTimeout(function(){ self.remove() }, 3900);
     }

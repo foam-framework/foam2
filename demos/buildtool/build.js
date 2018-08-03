@@ -2,10 +2,12 @@
 
 var dir = __dirname;
 var root = dir + '/../..';
+console.log(`dir = ${dir} and root = ${root}`);
 
 require(root + '/src/foam.js');
 
 var classloader = foam.__context__.classloader;
+
 
 classloader.addClassPath(dir + '/src');
 
