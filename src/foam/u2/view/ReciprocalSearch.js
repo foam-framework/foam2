@@ -49,6 +49,11 @@ foam.CLASS({
       width: 100%;
     }
 
+    ^ input:focus, ^ select:focus {
+      outline: none;
+      border: 1px solid #59a5d5;
+    }
+
     ^count {
       font-size: 14pt;
       color: #555;
