@@ -146,9 +146,6 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var data = this.data;
-      this.showInherited$.sub(this.updateTableView);
-      this.showOnlyProperties$.sub(this.updateTableView);
-
       this.updateTableView();
 
       this.
@@ -167,17 +164,39 @@ foam.CLASS({
       this.add(this.classPropertyTableView$);
     },
 
-    async function permittedAxioms() {
+    async function updateTableView() {
       var data = this.data;
-      var showInherited = this.showInherited;
-      var showOnlyProperties = this.showOnlyProperties;
+      var permissioned = await this.auth.check(null, data.id + '.properties.permissioned');
+      var axs = await this.permittedAxioms(permissioned);
+
+      this.classPropertyTableView = this.TableView.create({
+        of: this.PropertyInfo,
+        data: this.ArrayDAO.create({ array: axs })
+      });
+    },
+
+    async function permittedAxioms(permissioned) {
+      var data = this.data;
       var axs = [];
 
       for ( var key in data.axiomMap_ ) {
-        if ( showInherited || Object.hasOwnProperty.call(data.axiomMap_, key) ) {
+        if ( Object.hasOwnProperty.call(data.axiomMap_, key) ) {
           var a = data.axiomMap_[key];
-          if ( ( ! showOnlyProperties ) || foam.core.Property.isInstance(a) ) {
-            if ( await this.auth.check(null, data.id + '.property.' + a.name ) ) {
+          if ( foam.core.Property.isInstance(a) ) {
+            if ( permissioned ) {
+              if ( await this.auth.check(null, data.id + '.property.' + a.name ) ) {
+                var ai = foam.doc.PropertyInfo.create({
+                  axiom: a,
+                  type: a.cls_,
+                  required: a.required,
+                  of: a.of,
+                  documentation: a.documentation,
+                  name: a.name
+                });
+
+                axs.push(ai);
+              }
+            } else {
               var ai = foam.doc.PropertyInfo.create({
                 axiom: a,
                 type: a.cls_,
@@ -193,46 +212,6 @@ foam.CLASS({
         }
       }
       return axs;
-    },
-
-    function nonPermissionedAxioms() {
-      var data = this.data;
-      var showInherited = this.showInherited;
-      var showOnlyProperties = this.showOnlyProperties;
-      var axs = [];
-
-      for ( var key in data.axiomMap_ ) {
-        if ( showInherited || Object.hasOwnProperty.call(data.axiomMap_, key) ) {
-          var a = data.axiomMap_[key];
-          if ( ( ! showOnlyProperties ) || foam.core.Property.isInstance(a) ) {
-              var ai = foam.doc.PropertyInfo.create({
-                axiom: a,
-                type: a.cls_,
-                required: a.required,
-                of: a.of,
-                documentation: a.documentation,
-                name: a.name
-              });
-
-              axs.push(ai);
-          }
-        }
-      }
-      return axs;
-    }
-  ],
-
-  listeners: [
-    async function updateTableView() {
-      var data = this.data;
-      var permissioned = await this.auth.check(null, data.id + '.properties.permissioned');
-      var axs = permissioned ? await this.permittedAxioms() :
-          this.nonPermissionedAxioms();
-
-      this.classPropertyTableView = this.TableView.create({
-        of: this.PropertyInfo,
-        data: this.ArrayDAO.create({ array: axs })
-      });
     }
   ]
 });
