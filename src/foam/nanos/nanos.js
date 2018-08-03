@@ -61,6 +61,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/twofactor/AbstractOTPAuthService" },
   { name: "foam/nanos/auth/twofactor/AbstractTOTPAuthService" },
   { name: "foam/nanos/auth/twofactor/ClientOTPAuthService" },
+  { name: "foam/nanos/auth/twofactor/TwoFactorSignInView" },
   { name: "foam/nanos/auth/twofactor/refinements" },
   { name: "foam/nanos/bench/Benchmark" },
   { name: "foam/nanos/boot/NSpec" },
