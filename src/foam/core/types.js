@@ -302,11 +302,12 @@ foam.CLASS({
 
         // Upgrade Strings to actual classes, if available.
         if ( foam.String.isInstance(c) ) {
-          c = this.lookup(c, true);
+          var className = c;
+          c = this.lookup(className, true);
           if ( c ) {
             this.instance_[prop.name] = c;
           } else {
-            console.error('Unknown class: ' + c);
+            console.error(`Property '${this.name}' of type '${this.model_.name}' was set to '${className}', which isn't a valid class.`);
           }
         }
 
