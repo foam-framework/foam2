@@ -1593,9 +1593,9 @@ foam.CLASS({
 
           var e = f.call(self, o);
 
-          if ( e === undefined ) {
-            throw new Error(self.SELECT_BAD_USAGE);
-          }
+          // By checking for undefined, f can still return null if it doesn't
+          // want anything to be added.
+          if ( e === undefined ) throw new Error(self.SELECT_BAD_USAGE);
 
           if ( update ) {
             o.propertyChange.sub(function(_,__,prop,slot) {
@@ -1613,9 +1613,7 @@ foam.CLASS({
           es[o.id] = e;
         },
         cleanup: function() {
-          for ( var key in es ) {
-            es[key] && es[key].remove();
-          }
+          for ( var key in es ) es[key] && es[key].remove();
 
           es = {};
         }
