@@ -1595,7 +1595,8 @@ foam.CLASS({
 
           // By checking for undefined, f can still return null if it doesn't
           // want anything to be added.
-          if ( e === undefined ) throw new Error(self.SELECT_BAD_USAGE);
+          if ( e === undefined )
+            this.warn(self.SELECT_BAD_USAGE);
 
           if ( update ) {
             o.propertyChange.sub(function(_,__,prop,slot) {
