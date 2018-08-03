@@ -13,7 +13,7 @@ foam.CLASS({
     predicate.`,
 
   requires: [
-    'foam.mlang.predicate.True',
+    'foam.mlang.predicate.True'
   ],
 
   css: `
@@ -77,8 +77,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'active',
       documentation: `Tracks whether the property is being used as part of the
-        filter criteria or not.`,
-      value: false
+        filter criteria or not.`
     }
   ],
 
@@ -104,17 +103,13 @@ foam.CLASS({
         .end();
 
       this.checkbox.data$.sub(this.checkboxChanged);
-    },
-
-    function toggleActive() {
-      if ( this.active ) this.searchView.clear();
-      this.active = ! this.active;
     }
   ],
 
   listeners: [
     function checkboxChanged() {
-      this.toggleActive();
+      if ( this.active ) this.searchView.clear();
+      this.active = ! this.active;
     }
   ]
 });
