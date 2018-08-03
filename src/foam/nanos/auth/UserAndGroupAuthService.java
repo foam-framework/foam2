@@ -8,20 +8,21 @@ package foam.nanos.auth;
 
 import foam.core.ContextAwareSupport;
 import foam.core.X;
-import foam.dao.DAO;
 import foam.dao.ArraySink;
+import foam.dao.DAO;
 import foam.dao.Sink;
 import foam.mlang.MLang;
 import foam.nanos.NanoService;
 import foam.nanos.session.Session;
 import foam.util.Email;
-import foam.util.LRULinkedHashMap;
 import foam.util.Password;
 import foam.util.SafetyUtil;
-import java.security.Permission;
-import java.util.*;
+
 import javax.naming.AuthenticationException;
 import javax.security.auth.AuthPermission;
+import java.security.Permission;
+import java.util.Calendar;
+import java.util.List;
 
 public class UserAndGroupAuthService
   extends    ContextAwareSupport
@@ -30,7 +31,6 @@ public class UserAndGroupAuthService
   protected DAO userDAO_;
   protected DAO groupDAO_;
   protected DAO sessionDAO_;
-  protected Map challengeMap; // TODO: let's store in Session Context instead
 
   // pattern used to check if password has only alphanumeric characters
   java.util.regex.Pattern alphanumeric = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");
@@ -44,7 +44,6 @@ public class UserAndGroupAuthService
     userDAO_     = (DAO) getX().get("localUserDAO");
     groupDAO_    = (DAO) getX().get("groupDAO");
     sessionDAO_  = (DAO) getX().get("sessionDAO");
-    challengeMap = new LRULinkedHashMap<Long, Challenge>(20000);
   }
 
   public User getCurrentUser(X x) throws AuthenticationException {
@@ -60,7 +59,23 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found: " + session.getUserId());
     }
 
-    return (User) Password.sanitize(user);
+    // check if user enabled
+    if ( ! user.getEnabled() ) {
+      throw new AuthenticationException("User disabled");
+    }
+
+    // check if user group enabled
+    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
+    if ( group != null && ! group.getEnabled() ) {
+      throw new AuthenticationException("User group disabled");
+    }
+
+    // check for two-factor authentication
+    if ( user.getTwoFactorEnabled() && ! session.getContext().getBoolean("twoFactorSuccess") ) {
+      throw new AuthenticationException("User requires two-factor authentication");
+    }
+
+    return user;
   }
 
   /**
@@ -68,20 +83,7 @@ public class UserAndGroupAuthService
    * This is saved in a LinkedHashMap with ttl of 5
    */
   public String generateChallenge(long userId) throws AuthenticationException {
-    if ( userId < 1 ) {
-      throw new AuthenticationException("Invalid User Id");
-    }
-
-    if ( userDAO_.find(userId) == null ) {
-      throw new AuthenticationException("User not found");
-    }
-
-    String   generatedChallenge = UUID.randomUUID() + String.valueOf(userId);
-    Calendar calendar           = Calendar.getInstance();
-    calendar.add(Calendar.SECOND, 5);
-
-    challengeMap.put(userId, new Challenge(generatedChallenge, calendar.getTime()));
-    return generatedChallenge;
+    throw new UnsupportedOperationException("Unsupported operation: generateChallenge");
   }
 
   /**
@@ -91,36 +93,7 @@ public class UserAndGroupAuthService
    * How often should we purge this map for challenges that have expired?
    */
   public User challengedLogin(X x, long userId, String challenge) throws AuthenticationException {
-    if ( userId < 1 || "".equals(challenge) ) {
-      throw new AuthenticationException("Invalid Parameters");
-    }
-
-    Challenge c = (Challenge) challengeMap.get(userId);
-    if ( c == null ) {
-      throw new AuthenticationException("Invalid userId");
-    }
-
-    if ( ! c.getChallenge().equals(challenge) ) {
-      throw new AuthenticationException("Invalid Challenge");
-    }
-
-    if ( new Date().after(c.getTtl()) ) {
-      challengeMap.remove(userId);
-      throw new AuthenticationException("Challenge expired");
-    }
-
-    User user = (User) userDAO_.find(userId);
-    if ( user == null ) {
-      throw new AuthenticationException("User not found");
-    }
-
-    challengeMap.remove(userId);
-
-    Session session = x.get(Session.class);
-    session.setUserId(user.getId());
-    session.setContext(session.getContext().put("user", user));
-    sessionDAO_.put(session);
-    return (User) Password.sanitize(user);
+    throw new UnsupportedOperationException("Unsupported operation: challengedLogin");
   }
 
   /**
@@ -137,6 +110,17 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found.");
     }
 
+    // check if user enabled
+    if ( ! user.getEnabled() ) {
+      throw new AuthenticationException("User disabled");
+    }
+
+    // check if user group enabled
+    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
+    if ( group != null && ! group.getEnabled() ) {
+      throw new AuthenticationException("User group disabled");
+    }
+
     if ( ! Password.verify(password, user.getPassword()) ) {
       throw new AuthenticationException("Invalid Password");
     }
@@ -145,7 +129,7 @@ public class UserAndGroupAuthService
     session.setUserId(user.getId());
     session.setContext(session.getContext().put("user", user));
     sessionDAO_.put(session);
-    return (User) Password.sanitize(user);
+    return user;
   }
 
   public User loginByEmail(X x, String email, String password) throws AuthenticationException {
@@ -162,6 +146,17 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found");
     }
 
+    // check if user enabled
+    if ( ! user.getEnabled() ) {
+      throw new AuthenticationException("User disabled");
+    }
+
+    // check if user group enabled
+    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
+    if ( group != null && ! group.getEnabled() ) {
+      throw new AuthenticationException("User group disabled");
+    }
+
     if ( ! Password.verify(password, user.getPassword()) ) {
       throw new AuthenticationException("Incorrect password");
     }
@@ -170,7 +165,7 @@ public class UserAndGroupAuthService
     session.setUserId(user.getId());
     session.setContext(session.getContext().put("user", user));
     sessionDAO_.put(session);
-    return (User) Password.sanitize(user);
+    return user;
   }
 
   /**
@@ -187,8 +182,9 @@ public class UserAndGroupAuthService
       return false;
     }
 
+    // check if user exists and is enabled
     User user = (User) userDAO_.find(session.getUserId());
-    if ( user == null ) {
+    if ( user == null || ! user.getEnabled() ) {
       return false;
     }
 
@@ -198,9 +194,22 @@ public class UserAndGroupAuthService
       while ( ! SafetyUtil.isEmpty(groupId) ) {
         Group group = (Group) groupDAO_.find(groupId);
 
-        if ( group == null ) break;
+        // if group is null break
+        if ( group == null ) {
+          break;
+        }
 
-        if ( group.implies(permission) ) return true;
+        // check if group is enabled
+        if ( ! group.getEnabled() ) {
+          return false;
+        }
+
+        // check permission
+        if ( group.implies(permission) ) {
+          return true;
+        }
+
+        // check parent group
         groupId = group.getParent();
       }
     } catch (Throwable t) {
@@ -232,6 +241,17 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found");
     }
 
+    // check if user enabled
+    if ( ! user.getEnabled() ) {
+      throw new AuthenticationException("User disabled");
+    }
+
+    // check if user group enabled
+    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
+    if ( group != null && ! group.getEnabled() ) {
+      throw new AuthenticationException("User group disabled");
+    }
+
     int length = newPassword.length();
     if ( length < 7 || length > 32 ) {
       throw new RuntimeException("Password must be 7-32 characters long");
@@ -260,12 +280,15 @@ public class UserAndGroupAuthService
     }
 
     // store new password in DAO and put in context
+    user = (User) user.fclone();
     user.setPasswordLastModified(Calendar.getInstance().getTime());
     user.setPreviousPassword(user.getPassword());
     user.setPassword(Password.hash(newPassword));
+    // TODO: modify line to allow actual setting of password expiry in cases where users are required to periodically update their passwords
+    user.setPasswordExpiry(null);
     user = (User) userDAO_.put(user);
     session.setContext(session.getContext().put("user", user));
-    return (User) Password.sanitize(user);
+    return user;
   }
 
   /**

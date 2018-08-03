@@ -17,6 +17,7 @@ foam.CLASS({
         window.location.hash = id;
       }
     },
+
     function launch(X, menu) {
       this.setMenuId(menu.id);
       this.menuListener && this.menuListener(menu);

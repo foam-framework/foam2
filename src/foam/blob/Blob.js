@@ -55,7 +55,7 @@ foam.INTERFACE({
           name: 'buffer',
         },
         {
-          class: 'Long',
+          of: 'Long',
           swiftType: 'Int',
           name: 'offset'
         }
@@ -81,7 +81,7 @@ foam.INTERFACE({
       returns: 'Promise',
       args: [
         {
-          class: 'Blob',
+          of: 'Blob',
           name: 'blob'
         }
       ]
@@ -92,10 +92,10 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          of: 'foam.core.X'
+          javaType: 'foam.core.X'
         },
         {
-          class: 'Blob',
+          of: 'Blob',
           name: 'blob'
         }
       ]
@@ -105,7 +105,7 @@ foam.INTERFACE({
       returns: 'Promise',
       args: [
         {
-          class: 'String',
+          of: 'String',
           name: 'id'
         }
       ]
@@ -116,10 +116,10 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          of: 'foam.core.X'
+          javaType: 'foam.core.X'
         },
         {
-          class: 'String',
+          of: 'String',
           name: 'id'
         }
       ]
@@ -129,7 +129,7 @@ foam.INTERFACE({
       returns: 'String',
       args: [
         {
-          class: 'Blob',
+          of: 'Blob',
           name: 'blob'
         }
       ]
@@ -140,10 +140,10 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          of: 'foam.core.X'
+          javaType: 'foam.core.X'
         },
         {
-          class: 'Blob',
+          of: 'Blob',
           name: 'blob'
         }
       ]
@@ -362,12 +362,19 @@ foam.CLASS({
     {
       name: 'delegate',
       transient: true,
-      cloneProperty: function(){},
-      javaCloneProperty: '//nop',
       factory: function() {
         return this.blobService.find(this.id);
       },
-      javaFactory: 'return ((BlobService) getBlobStore()).find(getId());'
+      javaFactory: `
+        return ((BlobService) getBlobStore()).find(getId());
+      `,
+      cloneProperty: function () {},
+      diffProperty: function () {},
+      javaCloneProperty: '// noop',
+      javaDiffProperty: '// noop',
+      javaCompare: 'return 0;',
+      javaComparePropertyToObject: 'return 0;',
+      javaComparePropertyToValue: 'return 0;',
     }
   ],
 
@@ -477,12 +484,15 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'root'
+      name: 'root',
+      generateJava: false,
+      documentation: 'Root directory of where files are stored'
     },
     {
       class: 'String',
       name: 'tmp',
       transient: true,
+      documentation: 'Temp directory of where files are stored before hashing',
       expression: function(root) {
         return root + '/tmp';
       }
@@ -491,6 +501,7 @@ foam.CLASS({
       class: 'String',
       name: 'sha256',
       transient: true,
+      documentation: 'Directory of where files are stored after hashing',
       expression: function(root) {
         return root + '/sha256';
       }
@@ -791,7 +802,7 @@ foam.CLASS({
 
         var blob = prop.f(obj);
 
-        if ( ! blob ) return obj;
+        if ( ! blob ) return a();
 
         return self.blobService.put(blob).then(function(b) {
           prop.set(obj, b);

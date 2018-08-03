@@ -45,7 +45,15 @@ foam.CLASS({
     'foam.dao.DeDupDAO',
     'foam.dao.GUIDDAO',
     'foam.dao.IDBDAO',
-    'foam.dao.JDAO',
+    {
+      path: 'foam.dao.JDAO',
+      flags: ['js'],
+    },
+    {
+      name: 'JDAOJava',
+      path: 'foam.dao.java.JDAO',
+      flags: ['java'],
+    },
     'foam.dao.LoggingDAO',
     'foam.dao.MDAO',
     'foam.dao.PromisedDAO',
@@ -87,7 +95,7 @@ foam.dao.DAO delegate = getInnerDAO() == null ?
 if ( delegate instanceof foam.dao.MDAO ) setMdao((foam.dao.MDAO)delegate);
 
 if ( getJournaled() ) {
-  delegate = new foam.dao.JDAO(getX(), delegate, getJournalName());
+  delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
 }
 
 if ( getGuid() && getSeqNo() ) {

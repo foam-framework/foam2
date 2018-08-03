@@ -5,18 +5,14 @@
  */
 
 foam.CLASS({
-  name: 'RPCReturnBox',
-  package: 'foam.swift.box',
+  refines: 'foam.box.RPCReturnBox',
+  flags: ['swift'],
   implements: [ 'foam.box.Box' ],
-
-  requires: [
-    'foam.box.RPCReturnMessage'
-  ],
 
   properties: [
     {
       swiftType: 'Future<Any?>',
-      name: 'future',
+      name: 'promise',
       swiftFactory: 'return Future()'
     }
   ],
@@ -25,11 +21,11 @@ foam.CLASS({
     {
       name: 'send',
       swiftCode: `
-if let o = msg.object as? RPCReturnMessage {
-  future.set(o.data)
+if let o = msg.object as? foam_box_RPCReturnMessage {
+  promise.set(o.data)
   return
 }
-future.error(FoamError(msg.object))
+promise.error(FoamError(msg.object))
       `
     }
   ]

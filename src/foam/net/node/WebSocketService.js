@@ -12,7 +12,6 @@ foam.CLASS({
 
   requires: [
     'foam.net.node.WebSocket',
-    'foam.box.ClientNameMessage',
     'foam.box.HelloMessage'
   ],
 

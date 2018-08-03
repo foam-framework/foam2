@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.ProxiedMethod',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftCode',
@@ -23,6 +24,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Proxy',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -35,17 +37,18 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.ProxySub',
+  flags: ['swift'],
   methods: [
-    function writeToSwiftClass(cls, superAxiom, parentCls) {
+    function writeToSwiftClass(cls) {
       return
       cls.fields.push(
         foam.swift.Field.create({
           name: `${this.prop}EventProxy_`,
           visibility: 'private',
-          type: 'EventProxy',
+          type: foam.core.EventProxy.model_.swiftName,
           lazy: true,
           initializer: `
-return __context__.create(EventProxy.self, args: [
+return __context__.create(foam_core_EventProxy.self, args: [
   "dest": self,
   "src": ${this.prop},
 ])!

@@ -91,6 +91,7 @@ foam.CLASS({
       name: 'name'
     },
     'key',
+    'of',
     {
       class: 'Boolean',
       name: 'required',
@@ -225,6 +226,8 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Model',
+  package: 'foam.core',
+  name: 'ImportExportModelRefine',
 
   properties: [
     {

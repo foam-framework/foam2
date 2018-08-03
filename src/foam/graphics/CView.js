@@ -1004,7 +1004,11 @@ foam.CLASS({
     function paintSelf(x) {
       x.beginPath();
       x.arc(0, 0, this.radius, this.start, this.end);
-	  x.lineTo(0,0);
+
+      if ( this.start != 0 || this.end != Math.PI*2 ) {
+        x.lineTo(0,0);
+        x.lineTo(this.radius*Math.cos(this.start)+0.5,this.radius*Math.sin(this.start));
+      }
 
       if ( this.color ) x.fill();
 
@@ -1012,7 +1016,7 @@ foam.CLASS({
         x.lineWidth = this.arcWidth;
         x.stroke();
       }
-    },
+   },
 
     function toE(X) {
       return this.Canvas.create({ cview: this }, X).attrs({

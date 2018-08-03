@@ -12,7 +12,8 @@ foam.CLASS({
   requires: [
     'foam.blob.BlobBlob',
     'foam.nanos.fs.File',
-    'foam.u2.dialog.NotificationMessage'
+    'foam.u2.dialog.NotificationMessage',
+    'foam.u2.tag.Input'
   ],
 
   imports: [
@@ -67,9 +68,9 @@ foam.CLASS({
       outline: none;
     }
     ^ .uploadDescContainer{
-      position: absolute;
-      left: 132px;
-      bottom: 9px;
+      position: relative;
+      left: 26%;
+      bottom: 24%;
     }
     ^ .uploadDescription {
       margin-top: 9px;
@@ -88,17 +89,15 @@ foam.CLASS({
     ^ .box-for-drag-drop {
       border: dashed 4px #edf0f5;
       background:white;
-      height: 110px;
+      height: 100px;
       padding: 10px 10px;
-      position: relative;
     }
 
     ^ .boxless-for-drag-drop {
       border: solid 4px white;
       background:white;
-      height: 110px;
+      height: 100px;
       padding: 10px 10px;
-      position: relative;
     }
   `,
 
@@ -117,14 +116,15 @@ foam.CLASS({
       value: false
     },
     [ 'uploadHidden', false ],
-    [ 'boxHidden', false ]
+    [ 'boxHidden', false ],
+    [ 'attachmentInputValue', null ]
   ],
 
   messages: [
     { name: 'UploadImageLabel', message: 'Choose File' },
     { name: 'RemoveImageLabel', message: 'Remove File' },
     { name: 'UploadDesc', message: 'Or drag and drop an image here' },
-    { name: 'UploadRestrict', message: '* jpg, jpeg, or png only, 2MB maximum, 100*100 72dpi recommanded' },
+    { name: 'UploadRestrict', message: '* jpg, jpeg, or png only, 2MB maximum, 100*100 72dpi recommended' },
     { name: 'FileError', message: 'File required' },
     { name: 'FileTypeError', message: 'Wrong file format' },
     { name: 'ErrorMessage', message: 'Please upload an image less than 2MB' }
@@ -164,14 +164,15 @@ foam.CLASS({
           .on('dragover', this.onDragOver)
           .on('drop', this.onDrop)
           .start().addClass('uploadButtonContainer').hide(this.uploadHidden)
-            .start('input').addClass('attachment-input')
+            .start(this.Input, { data$: this.attachmentInputValue$ })
+              .addClass('attachment-input')
               .attrs({
                 type: 'file',
                 accept: 'image/jpg,image/gif,image/jpeg,image/bmp,image/png'
               })
               .on('change', this.onChange)
             .end()
-            .start().addClass('attachment-btn white-blue-button btn')
+            .start().addClass('attachment-btn').addClass('white-blue-button').addClass('btn')
               .add(this.UploadImageLabel)
               .on('click', this.onAddAttachmentClicked)
             .end()
@@ -179,7 +180,7 @@ foam.CLASS({
           .start().addClass('removeButtonContainer').show( !(this.uploadHidden) && this.ProfilePictureImage$.map(function (ProfilePictureImage) {
               return ProfilePictureImage;
             }))
-            .start().addClass('attachment-btn grey-button btn')
+            .start().addClass('attachment-btn').addClass('grey-button').addClass('btn')
               .add(this.RemoveImageLabel)
               .on('click', this.onRemoveClicked)
             .end()
@@ -193,13 +194,14 @@ foam.CLASS({
   ],
 
   listeners: [
-    function onAddAttachmentClicked (e) {
+    function onAddAttachmentClicked(e) {
       this.document.querySelector('.attachment-input').click();
     },
 
-    function onRemoveClicked (e) {
+    function onRemoveClicked(e) {
       this.dragActive = false;
       this.ProfilePictureImage= null;
+      this.attachmentInputValue = null;
     },
 
     function onDragOver(e) {
@@ -235,13 +237,13 @@ foam.CLASS({
       return file.type === "image/jpg" || file.type === "image/jpeg" || file.type === "image/png";
     },
 
-    function onChange (e) {
+    function onChange(e) {
       this.dragActive = false;
       var file = e.target.files[0];
       this.addFile(file);
     },
 
-    function addFile (file) {
+    function addFile(file) {
       if ( file.size > ( 2 * 1024 * 1024 ) ) {
         this.add(this.NotificationMessage.create({ message: this.ErrorMessage, type: 'error' }));
         return;

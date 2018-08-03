@@ -50,7 +50,11 @@ foam.CLASS({
         this.daoKey = nu;
       }
     },
-    'q',
+    {
+      class: 'String',
+      name: 'q',
+      label: 'Query'
+    },
     {
         class: 'String',
         name: 'key'
@@ -116,10 +120,10 @@ foam.CLASS({
         if ( q ) {
           url += query ? "&" : "?";
           query = true;
-          url += "&q=" + q;
+          url += "q=" + q;
         }
 
-        return url;
+        return encodeURI(url);
       }
     }
   ],

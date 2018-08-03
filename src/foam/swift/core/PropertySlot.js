@@ -10,8 +10,8 @@ foam.CLASS({
   extends: 'foam.swift.core.Slot',
   properties: [
     {
+      class: 'FObjectProperty',
       name: 'object',
-      swiftType: 'FObject?',
       swiftWeak: true,
     },
     {

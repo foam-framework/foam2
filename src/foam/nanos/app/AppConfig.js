@@ -19,12 +19,35 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'privacy',
+      value: 'Privacy Policy'
+    },
+    {
+      class: 'String',
+      name: 'privacyUrl'
+    },
+    {
+      class: 'String',
       name: 'copyright'
     },
     {
       class: 'String',
       name: 'url',
       value: 'http://localhost:8080/'
+    },
+    {
+      class: 'String',
+      name: 'urlLabel',
+      value: 'FOAM Powered'
+    },
+    {
+      class:'String',
+      name: 'termsAndCondLabel',
+      value: 'Terms and Conditions'
+    },
+    {
+      class: 'String',
+      name: 'termsAndCondLink'
     },
     {
       class: 'Enum',

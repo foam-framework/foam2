@@ -25,19 +25,19 @@ foam.INTERFACE({
     {
       name: 'put',
       returns: 'Promise',
-      swiftReturns: 'FObject?',
+      swiftReturns: 'foam_core_FObject?',
       swiftThrows: true,
       args: [
         {
+          of: 'FObject',
           name: 'obj',
-          swiftType: 'FObject'
         }
-      ],
+      ]
     },
     {
       name: 'put_',
       returns: 'Promise',
-      swiftReturns: 'FObject?',
+      swiftReturns: 'foam_core_FObject?',
       swiftThrows: true,
       args: [
         {
@@ -45,27 +45,27 @@ foam.INTERFACE({
           swiftType: 'Context?'
         },
         {
+          of: 'FObject',
           name: 'obj',
-          swiftType: 'FObject'
         }
-      ],
+      ]
     },
     {
       name: 'remove',
       returns: 'Promise',
-      swiftReturns: 'FObject?',
+      swiftReturns: 'foam_core_FObject?',
       swiftThrows: true,
       args: [
         {
+          of: 'FObject',
           name: 'obj',
-          swiftType: 'FObject'
         }
-      ],
+      ]
     },
     {
       name: 'remove_',
       returns: 'Promise',
-      swiftReturns: 'FObject?',
+      swiftReturns: 'foam_core_FObject?',
       swiftThrows: true,
       args: [
         {
@@ -74,26 +74,25 @@ foam.INTERFACE({
         },
         {
           name: 'obj',
-          swiftType: 'FObject'
+          of: 'FObject'
         }
-      ],
+      ]
     },
     {
       name: 'find',
       returns: 'Promise',
-      swiftReturns: 'FObject?',
+      swiftReturns: 'foam_core_FObject?',
       swiftThrows: true,
       args: [
         {
           name: 'id',
-          swiftType: 'Any?'
         }
       ],
     },
     {
       name: 'find_',
       returns: 'Promise',
-      swiftReturns: 'FObject?',
+      swiftReturns: 'foam_core_FObject?',
       swiftThrows: true,
       args: [
         {
@@ -102,26 +101,25 @@ foam.INTERFACE({
         },
         {
           name: 'id',
-          swiftType: 'Any?'
         }
-      ],
+      ]
     },
     {
       name: 'select',
       returns: 'Promise',
-      swiftReturns: 'Sink',
+      swiftReturns: 'foam_dao_Sink',
       swiftThrows: true,
       args: [
         {
           name: 'sink',
-          swiftType: 'Sink',
-        },
-      ],
+          of: 'foam.dao.Sink',
+        }
+      ]
     },
     {
       name: 'select_',
       returns: 'Promise',
-      swiftReturns: 'Sink',
+      swiftReturns: 'foam_dao_Sink',
       swiftThrows: true,
       args: [
         {
@@ -130,8 +128,8 @@ foam.INTERFACE({
         },
         {
           name: 'sink',
-          swiftType: 'Sink',
-          swiftDefaultValue: 'ArraySink()',
+          of: 'foam.dao.Sink',
+          swiftDefaultValue: 'foam_dao_ArraySink()',
         },
         {
           name: 'skip',
@@ -145,15 +143,17 @@ foam.INTERFACE({
         },
         {
           name: 'order',
-          swiftType: 'Comparator?',
+          of: 'foam.mlang.order.Comparator',
+          optional: true,
           swiftDefaultValue: 'nil',
         },
         {
           name: 'predicate',
-          swiftType: 'FoamPredicate?',
+          of: 'foam.mlang.predicate.Predicate',
+          optional: true,
           swiftDefaultValue: 'nil',
         }
-      ],
+      ]
     },
     {
       name: 'removeAll',
@@ -182,15 +182,17 @@ foam.INTERFACE({
         },
         {
           name: 'order',
-          swiftType: 'Comparator?',
+          of: 'foam.mlang.order.Comparator',
+          optional: true,
           swiftDefaultValue: 'nil',
         },
         {
           name: 'predicate',
-          swiftType: 'FoamPredicate?',
+          of: 'foam.mlang.predicate.Predicate',
+          optional: true,
           swiftDefaultValue: 'nil',
         }
-      ],
+      ]
     },
     {
       name: 'listen',
@@ -199,16 +201,17 @@ foam.INTERFACE({
       swiftThrows: true,
       args: [
         {
+          of: 'foam.dao.Sink',
           name: 'sink',
-          swiftType: 'Sink',
-          swiftDefaultValue: 'ArraySink()',
+          swiftDefaultValue: 'foam_dao_ArraySink()',
         },
         {
           name: 'predicate',
-          swiftType: 'FoamPredicate?',
+          of: 'foam.mlang.predicate.Predicate',
+          optional: true,
           swiftDefaultValue: 'nil',
         }
-      ],
+      ]
     },
     {
       name: 'listen_',
@@ -222,15 +225,16 @@ foam.INTERFACE({
         },
         {
           name: 'sink',
-          swiftType: 'Sink',
-          swiftDefaultValue: 'ArraySink()',
+          of: 'foam.dao.Sink',
+          swiftDefaultValue: 'foam_dao_ArraySink()',
         },
         {
           name: 'predicate',
-          swiftType: 'FoamPredicate?',
+          of: 'foam.mlang.predicate.Predicate',
+          optional: true,
           swiftDefaultValue: 'nil',
         }
-      ],
+      ]
     },
     {
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
@@ -239,7 +243,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'sink',
-          swiftType: 'Sink'
+          of: 'foam.dao.Sink',
         }
       ],
     },
@@ -254,14 +258,15 @@ foam.INTERFACE({
         },
         {
           name: 'sink',
-          swiftType: 'Sink'
+          of: 'foam.dao.Sink',
         },
         {
           name: 'predicate',
-          swiftType: 'FoamPredicate?',
+          of: 'foam.mlang.predicate.Predicate',
+          optional: true,
           swiftDefaultValue: 'nil',
-        },
-      ],
+        }
+      ]
     },
     {
       name: 'where',
@@ -270,10 +275,11 @@ foam.INTERFACE({
       args: [
         {
           name: 'predicate',
-          swiftType: 'FoamPredicate?',
+          of: 'foam.mlang.predicate.Predicate',
+          optional: true,
           swiftDefaultValue: 'nil',
         }
-      ],
+      ]
     },
     {
       name: 'orderBy',
@@ -282,9 +288,9 @@ foam.INTERFACE({
       args: [
         {
           name: 'comparator',
-          swiftType: 'Comparator'
+          of: 'foam.mlang.order.Comparator',
         }
-      ],
+      ]
     },
     {
       name: 'skip',
@@ -295,7 +301,7 @@ foam.INTERFACE({
           name: 'count',
           swiftType: 'Int'
         }
-      ],
+      ]
     },
     {
       name: 'limit',
@@ -306,7 +312,7 @@ foam.INTERFACE({
           name: 'count',
           swiftType: 'Int'
         }
-      ],
+      ]
     },
     {
       name: 'inX',

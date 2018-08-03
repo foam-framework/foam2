@@ -16,7 +16,17 @@
  */
 
 
+foam.SCRIPT({
+  package: 'foam.net.web',
+  name: 'HTTPRequestScript',
+  requires: [
+    'foam.net.web.HTTPRequest',
+  ],
+  flags: ['web'],
+  code: function() {
 // Registering BaseHTTPRequest facilitates decoration when HTTPRequest has been
 // re-overridden.
 foam.register(foam.lookup('foam.net.web.HTTPRequest'),
               'foam.net.web.BaseHTTPRequest');
+  }
+});

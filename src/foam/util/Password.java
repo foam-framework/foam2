@@ -6,25 +6,18 @@
 
 package foam.util;
 
-import foam.core.FObject;
-import java.security.SecureRandom;
-import java.util.regex.Pattern;
+import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.util.encoders.Base64;
+
+import java.security.SecureRandom;
+import java.util.regex.Pattern;
 
 public class Password {
 
   // Min 8 characters, at least one uppercase, one lowercase, one number
-  public static Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$");
-
-  private static ThreadLocal<SecureRandom> secureRandom = new ThreadLocal<SecureRandom>() {
-    @Override
-    protected SecureRandom initialValue() {
-      return new SecureRandom();
-    }
-  };
+  private static Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$");
 
   /**
    * Generates random salt given a size
@@ -33,7 +26,7 @@ public class Password {
    */
   private static byte[] salt(int size) {
     byte[] salt = new byte[size];
-    secureRandom.get().nextBytes(salt);
+    SecurityUtil.GetSecureRandom().nextBytes(salt);
     return salt;
   }
 
@@ -81,6 +74,7 @@ public class Password {
    * @return hashed password containing the salt. Format salt:hash
    */
   private static String hash(String password, byte[] salt, int keySize, int iterations) {
+    if ( SafetyUtil.isEmpty(password) ) throw new IllegalArgumentException("Password cannot be empty");
     PKCS5S2ParametersGenerator generator = new PKCS5S2ParametersGenerator();
     generator.init(PBEParametersGenerator.PKCS5PasswordToBytes(password.toCharArray()), salt, iterations);
     byte[] key = ((KeyParameter) generator.generateDerivedParameters(keySize)).getKey();
@@ -94,7 +88,11 @@ public class Password {
    * @return true if matches, false otherwise
    */
   public static boolean verify(String password, String hash) {
-    return hash(password, decode(getSalt(hash))).equals(hash);
+    try {
+      return hash(password, decode(getSalt(hash))).equals(hash);
+    } catch ( Throwable t ) {
+      return false;
+    }
   }
 
   /**
@@ -103,18 +101,6 @@ public class Password {
    * @return true if valid, false otherwise
    */
   public static boolean isValid(String password) {
-    return PASSWORD_PATTERN.matcher(password).matches();
-  }
-
-  public static FObject sanitize(FObject obj) {
-    if ( obj == null ) {
-      return null;
-    }
-
-    FObject clone = obj.fclone();
-    clone.setProperty("password", null);
-    clone.setProperty("previousPassword", null);
-    clone.setProperty("passwordLastModified", null);
-    return clone;
+    return ! SafetyUtil.isEmpty(password) && PASSWORD_PATTERN.matcher(password).matches();
   }
 }

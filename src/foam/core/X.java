@@ -24,9 +24,17 @@ public interface X
   public <T> T get(Class<T> key);
   public Object get(Object key);
   public Object get(X x, Object key);
+
+  // getInt methods
   public int getInt(Object key);
   public int getInt(Object key, int defaultValue);
   public int getInt(X x, Object key, int defaultValue);
+
+  // getBoolean methods
+  public boolean getBoolean(Object key);
+  public boolean getBoolean(Object key, boolean defaultValue);
+  public boolean getBoolean(X x, Object key, boolean defaultValue);
+
   public X put(Object key, Object value);
   public X putFactory(Object key, XFactory factory);
 

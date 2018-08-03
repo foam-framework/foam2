@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'Cron',
   extends: 'foam.nanos.script.Script',
 
+  imports: [ 'cronDAO as scriptDAO' ],
+
   javaImports: [
     'java.util.Date',
     'java.util.Calendar'
@@ -16,7 +18,11 @@ foam.CLASS({
 
   documentation: 'FOAM class that models a Cron script',
 
-  searchColumns: [],
+  tableColumns: [
+    'id', 'enabled', 'server', 'description', 'lastDuration', 'status', 'run'
+  ],
+
+  searchColumns: ['id', 'description'],
 
   properties: [
     {

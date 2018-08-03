@@ -98,7 +98,7 @@ foam.CLASS({
     },
     function build() {
       var pl = this.pipeline;
-      var onRegisteredBox = ;
+      //var onRegisteredBox = ;
       var onRegisteredPromise = onRegisteredBox.promise;
       this.registry.send(this.Message.create({
         object: this.RPCMessage.create({

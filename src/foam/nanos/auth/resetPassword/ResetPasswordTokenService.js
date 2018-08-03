@@ -97,11 +97,11 @@ return true;`
     {
       name: 'processToken',
       javaCode:
-`if ( user == null || SafetyUtil.isEmpty(user.getPassword()) ) {
+`if ( user == null || SafetyUtil.isEmpty(user.getDesiredPassword()) ) {
   throw new RuntimeException("Cannot leave new password field empty");
 }
 
-String newPassword = user.getPassword();
+String newPassword = user.getDesiredPassword();
 
 int length = newPassword.length();
 if ( length < 7 || length > 32 ) {
@@ -136,11 +136,8 @@ if ( data == null || data.size() == 0 ) {
   throw new RuntimeException("Token not found");
 }
 
-// set token processed to true
+// find user from token
 Token tokenResult = (Token) data.get(0);
-tokenResult.setProcessed(true);
-tokenDAO.put(tokenResult);
-
 User userResult = (User) userDAO.find(tokenResult.getUserId());
 if ( userResult == null ) {
   throw new RuntimeException("User not found");
@@ -151,10 +148,18 @@ if ( ! Password.isValid(newPassword) ) {
 }
 
 // update user's password
+userResult = (User) userResult.fclone();
 userResult.setPasswordLastModified(Calendar.getInstance().getTime());
 userResult.setPreviousPassword(userResult.getPassword());
 userResult.setPassword(Password.hash(newPassword));
+userResult.setPasswordExpiry(null);
 userDAO.put(userResult);
+
+// set token processed to true
+tokenResult = (Token) tokenResult.fclone();
+tokenResult.setProcessed(true);
+tokenDAO.put(tokenResult);
+
 EmailService email = (EmailService) getEmail();
 EmailMessage message = new EmailMessage();
 message.setTo(new String[] { userResult.getEmail() });

@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+/** Use foam.u2.view.TableView instead. **/
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'TableCellPropertyRefinement',
@@ -411,9 +413,7 @@ foam.CLASS({
       isFramed: true,
       code: function() {
         var dao = this.data;
-        if ( this.sortOrder ) {
-          dao = dao.orderBy(this.sortOrder);
-        }
+        if ( this.sortOrder ) dao = dao.orderBy(this.sortOrder);
         dao.select(this.TableBodySink.create({
           columns_: this.columns_
         })).then(function(a) {
