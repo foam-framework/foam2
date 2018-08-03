@@ -69,5 +69,53 @@ foam.CLASS({
     .foam-u2-view-TableView tbody > tr:nth-child(odd) {
       background: #f6f9f9;
     }
+    .New {
+      width: 35px;
+      height: 20px;
+      border-radius: 100px;
+      background-color: #eedb5f;
+    }
+    .Updated {
+      width: 60px;
+      height: 20px;
+      border-radius: 100px;
+      background-color: #093649;
+    }
+    .Open {
+      width: 49px;
+      height: 20px;
+      border-radius: 100px;
+      background-color: #ee5f71;
+    }
+    .Pending {
+      width: 55px;
+      height: 20px;
+      border-radius: 100px;
+      background-color: #59a5d5;
+    }
+    .Solved {
+      width: 50px;
+      height: 20px;
+      border-radius: 100px;
+      background-color: #a4b3b8;
+    }
+    ^ .generic-status {
+      display: inline-block;
+      font-family: Roboto;
+      font-size: 12px;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.67;
+      letter-spacing: 0.2px;
+      text-align: center;
+      color: #ffffff;
+    }
+    textarea:focus{
+      outline: none;
+    }
+    input:focus{
+      outline: none;
+    }
   `
 });
