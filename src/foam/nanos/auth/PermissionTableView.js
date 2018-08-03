@@ -24,6 +24,9 @@ foam.CLASS({
     ^ table > tbody:nth-child(odd) {
       background: #f6f9f9;
     }
+    ^ .foam-u2-md-CheckBox:hover {
+      background: #FFCCCC;
+    }
   `,
 
   properties: [
@@ -81,7 +84,7 @@ foam.CLASS({
                     .start('tr').style({'background': '#D4E3EB'})
                       .tag('td').style({'text-align': 'left', 'width': '480', 'height': '35'})
                       .select(this.groupDAO.orderBy(this.Group.ID), function(g) {
-                        this.start('td').show(groups[g.id].data$.map(function() {return groups[g.id].data;}))
+                        this.start('td').show(groups[g.id].data$.map(function() { return groups[g.id].data;} ))
                           .addClass(g.id).start().style({'text-align': 'center', 'width': '100'}).add(g.id).end().end();
                       }).end()
                     .end()
@@ -91,10 +94,20 @@ foam.CLASS({
                         .start('td').style({'text-align': 'left', 'width': '480', 'padding-left': '8px'}).add(p.id).end()
                           .select(self.groupDAO.orderBy(self.Group.ID), function(g) {
                               var cb = foam.u2.md.CheckBox.create({data: self.checkPermissionForGroup(p.id, g)});
-                              cb.data$.sub(function() { self.updateGroup(p, g, cb.data); });
-                              this.start('td').show(groups[g.id].data$.map(function() {return groups[g.id].data;}))
+                              cb.data$.sub(function() { self.updateGroup(p, g, cb.data, self); });
+                              this.start('td').show(groups[g.id].data$.map(function() { return groups[g.id].data; }))
                                     .style({'text-align': 'center', 'width': '100'}).tag(cb).call(function() {
-                                      if ( g.implies(p.id) ) { cb.style({'border-color': '#40C75B'}) };
+                                      if ( g.implies(p.id) ) {
+                                        cb.setAttribute('title', g.id + ': ' + p.id);
+                                        cb.style({'border-color': '#40C75B'});
+                                      } else {
+                                        g.parent$find.then(function(a) {
+                                          if ( a != undefined && a.implies(p.id) ) {
+                                            cb.setAttribute('title', g.parent + ': ' + p.id);
+                                            cb.style({'border-color': '#40C75B'});
+                                          }
+                                        });
+                                      }
                                     }).end()
                           })
                       .end()
@@ -114,19 +127,49 @@ foam.CLASS({
       }
     },
 
-    function updateGroup(permission, group, data) {
+    function updateGroup(p_, g_, data, self) {
       var dao = this.groupDAO;
-      dao.find(group).then(function(group) {
+      var e = foam.mlang.Expressions.create();
+
+      dao.find(g_.id).then(function(group) {
         // Remove permission if found
         var permissions = group.permissions.filter(function(p) {
-          return p.id != permission.id;
+          return p.id != p_.id;
+        });
+
+        //parents' permissions
+        group.parent$find.then(function(groupParent) {
+          if ( groupParent != undefined ) {
+              permissions += groupParent.permissions.filter(function(gp) {
+                return gp.id == p_.id;
+              });
+          }
         });
 
         // Add if requested
-        if ( data ) permissions.push(permission);
+        if ( data ) permissions.push(p_);
 
         group.permissions = permissions;
         dao.put(group);
+
+        self.updateChildrenPermission(g_.id, permissions);
+      });
+    },
+
+    function updateChildrenPermission(gp, permissions) {
+      var self = this;
+      var dao = this.groupDAO;
+      var e = foam.mlang.Expressions.create();
+
+      dao.where(e.EQ(this.Group.PARENT, gp)).select().then(function(sink) {
+        var array = sink.array;
+
+        for ( var i = 0; i < array.length; i++ ) {
+            self.updateChildrenPermission(array[i].id, permissions);
+
+            array[i].permissions = permissions;
+            dao.put(array[i]);
+        }
       });
     }
   ]
