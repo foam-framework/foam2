@@ -15,7 +15,7 @@ foam.CLASS({
     'foam.dao.RelationshipDAO',
     'foam.dao.ManyToManyRelationshipDAO',
     'foam.dao.ReadOnlyDAO',
-    'foam.dao.OneToManyRelationshipProperty',
+    'foam.dao.OneToManyRelationshipAxiom',
     'foam.dao.ManyToManyRelationshipAxiom'
   ],
 
@@ -150,7 +150,7 @@ foam.CLASS({
       if ( source !== target ) target.axiomMap_[this.id] = this;
 
       if ( cardinality === '1:*' ) {
-        sourceProp = foam.dao.OneToManyRelationshipProperty.create({
+        sourceProp = foam.dao.OneToManyRelationshipAxiom.create({
           propertyName: forwardName,
           target: target,
           targetPropertyName: inverseName,
@@ -497,7 +497,7 @@ return junction`
 
 foam.CLASS({
   package: 'foam.dao',
-  name: 'OneToManyRelationshipProperty',
+  name: 'OneToManyRelationshipAxiom',
   properties: [
     {
       name: 'name',
