@@ -535,3 +535,93 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.CLASS({
+  package: 'foam.u2.search',
+  name: 'IntRefinement',
+  refines: 'foam.core.Int',
+
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'searchView',
+      value: { class: 'foam.u2.search.IntegerSearchView' }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2.search',
+  name: 'ShortRefinement',
+  refines: 'foam.core.Short',
+
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'searchView',
+      value: { class: 'foam.u2.search.IntegerSearchView' }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2.search',
+  name: 'LongRefinement',
+  refines: 'foam.core.Long',
+
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'searchView',
+      value: { class: 'foam.u2.search.IntegerSearchView' }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2.search',
+  name: 'ByteRefinement',
+  refines: 'foam.core.Byte',
+
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'searchView',
+      value: { class: 'foam.u2.search.IntegerSearchView' }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2.search',
+  name: 'FloatRefinement',
+  refines: 'foam.core.Float',
+
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'searchView',
+      value: { class: 'foam.u2.search.FloatSearchView' }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2.search',
+  name: 'DoubleRefinement',
+  refines: 'foam.core.Double',
+
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'searchView',
+      value: { class: 'foam.u2.search.FloatSearchView' }
+    }
+  ]
+});
