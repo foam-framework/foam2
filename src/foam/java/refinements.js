@@ -443,7 +443,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'javaReturns'
+      name: 'javaReturns',
+      expression: function(returns) { return returns || '' },
     },
     {
       class: 'Boolean',

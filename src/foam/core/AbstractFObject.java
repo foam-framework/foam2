@@ -58,7 +58,13 @@ public abstract class AbstractFObject
 
   public FObject copyFrom(FObject obj) {
     List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
-    for ( PropertyInfo p : props ) p.set(this, p.get(obj));
+    for ( PropertyInfo p : props ) {
+      try {
+        p.set(this, p.get(obj));
+      } catch (java.lang.ClassCastException e) {
+        // nop - ignore - only copy common properties.
+      }
+    }
     return this;
   }
 

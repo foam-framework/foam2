@@ -67,7 +67,7 @@ foam.CLASS({
   ],
 
   constants: {
-    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor' ]
+    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor', 'secondaryHoverColor' ]
   },
 
   css: `
@@ -142,6 +142,7 @@ foam.CLASS({
     'webApp',
     'primaryColor',
     'secondaryColor',
+    'secondaryHoverColor',
     'tableColor',
     'tableHoverColor',
     'accentColor'

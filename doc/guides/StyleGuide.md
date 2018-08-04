@@ -25,6 +25,26 @@ for ( var i = 0 ; i < a.length ; i++ ) a[i] = '';
   omitted; use FOAM's `requires: []` support instead.
 * The rules about using JSDoc comments to inform the Closure compiler's
   type-checking are omitted; use FOAM's type-checking instead.
+* Encourage the use of vertical alignment where it makes sense, since it makes code easier to read. Ex.:
+```javascript
+  var firstName = 'John';
+  var lastName  = 'Smith';
+  var age       = 42;
+```
+* The Google standard uses two space for indentation but four spaces for line continuation. This is conflicting for FOAM since the U2 library is an internal DSL for creating virtual DOM and it relies on long heirarchical continued statements. While this is technically a continued statement, and should therefore use four spaces, the indent is clearly one of structural indentation, which would require two. To avoid the conflict FOAM uses two spaces of indentation in both case. Ex.:
+```javascript
+      this
+        .addClass(this.myClass())
+        .start()
+          .start('p')
+            .addClass('label')
+            .add(this.data)
+            .startContext({ data: this })
+              .add(this.REMOVE_SELF)
+            .endContext()
+          .end()
+        .end();
+```
 
 ## Naming
 
