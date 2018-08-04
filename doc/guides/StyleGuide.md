@@ -25,7 +25,7 @@ for ( var i = 0 ; i < a.length ; i++ ) a[i] = '';
   omitted; use FOAM's `requires: []` support instead.
 * The rules about using JSDoc comments to inform the Closure compiler's
   type-checking are omitted; use FOAM's type-checking instead.
-* Encourage the use of vertical alignment where it makes sense, since it makes the code easier to read. Ex.:
+* Encourage the use of vertical alignment where it makes sense, since it makes code easier to read. Ex.:
 ```javascript
   var firstName = 'John';
   var lastName  = 'Smith';
