@@ -282,10 +282,12 @@ foam.CLASS({
       `
     },
     {
-      name: 'eof'
+      name: 'eof',
+      javaCode: '// NOOP',
     },
     {
-      name: 'reset'
+      name: 'reset',
+      javaCode: '// NOOP',
     },
     {
       name: 'replay',
