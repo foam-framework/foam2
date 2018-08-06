@@ -12,7 +12,8 @@ foam.CLASS({
     'foam.support.view.TicketView',
   ],
   imports: [
-    'user'
+    'user',
+    'ticketDAO'
   ],
   exports: [ 'as data' ],
  
@@ -136,8 +137,7 @@ foam.CLASS({
         var self = this;
 
         var newDAO = this.dao.where(this.EQ(this.Ticket.STATUS, "New"));
-        if( newDAO ){
-          debugger;
+        if( newDAO != null ){
           newDAO.select(this.COUNT()).then(function(count) {
             self.newCount = count.value;
           });
@@ -147,8 +147,7 @@ foam.CLASS({
         }
 
         var updatedDAO = this.dao.where(this.EQ(this.Ticket.STATUS, "Updated"));
-        if( updatedDAO ){
-          debugger;
+        if( updatedDAO != null ){
           updatedDAO.select(this.COUNT()).then(function(count) {
             self.updatedCount = count.value;
           });
@@ -158,8 +157,7 @@ foam.CLASS({
         }
 
         var openDAO = this.dao.where(this.EQ(this.Ticket.STATUS, "Open"));
-        if( openDAO ){
-          debugger;
+        if( openDAO != null ){
           openDAO.select(this.COUNT()).then(function(count) {
             self.openCount = count.value;
           });
@@ -169,8 +167,7 @@ foam.CLASS({
         }
 
         var pendingDAO = this.dao.where(this.EQ(this.Ticket.STATUS, 'Pending'));
-        if( pendingDAO ){
-          debugger;
+        if( pendingDAO != null ){
           pendingDAO.select(this.COUNT()).then(function(count) {
             self.pendingCount = count.value;
           });
@@ -180,8 +177,7 @@ foam.CLASS({
         }
 
         var solvedDAO = this.dao.where(this.EQ(this.Ticket.STATUS, 'Solved'));
-        if( solvedDAO ){
-          debugger;
+        if( solvedDAO != null ){
           solvedDAO.select(this.COUNT()).then(function(count) {
             self.solvedCount = count.value;
           });
@@ -190,8 +186,7 @@ foam.CLASS({
           console.log('warning: solvedDAO dao=(ticket.STATUS = solved)= null');
         }
 
-        if( dao ){
-          debugger;
+        if( this.dao != null ){
           this.dao.select(this.COUNT()).then(function(count) {
             self.ticketCount = count.value;
           });

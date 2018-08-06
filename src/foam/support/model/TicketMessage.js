@@ -7,9 +7,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Long',
-      name: 'id',
-      visibility: foam.u2.Visibility.RO,
-      label: 'Ticket Message Id'
+      name: 'id'
     },
     {
       class: 'Long',
