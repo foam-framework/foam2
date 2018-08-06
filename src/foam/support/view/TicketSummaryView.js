@@ -66,11 +66,17 @@ foam.CLASS({
   properties: [
     {
       name: 'dao',
-      factory: function() { return this.user.tickets; }
+      factory: function() { 
+        if( this.user.tickets ){
+          return this.user.tickets;
+        }else{
+          return new foam.dao.EasyDAO.Builder(x).setPm(true).setSeqNo(true).setJournaled(true).setJournalName('tickets').setOf(foam.support.model.Ticket.getOwnClassInfo()).build();
+        } 
+      }
     },
     {
       class: 'Int',
-      name: 'newCount',
+      name: 'newCount', 
       value: "...",
    
     },
@@ -128,30 +134,74 @@ foam.CLASS({
       isFramed: true,
       code: function() {
         var self = this;
+
         var newDAO = this.dao.where(this.EQ(this.Ticket.STATUS, "New"));
-        newDAO.select(this.COUNT()).then(function(count) {
-          self.newCount = count.value;
-        });
+        if( newDAO ){
+          debugger;
+          newDAO.select(this.COUNT()).then(function(count) {
+            self.newCount = count.value;
+          });
+        } else {
+          self.newCount = 0;
+          console.log('warning: newDAO dao=(ticket.STATUS = new)= null');
+        }
+
         var updatedDAO = this.dao.where(this.EQ(this.Ticket.STATUS, "Updated"));
-        updatedDAO.select(this.COUNT()).then(function(count) {
-          self.updatedCount = count.value;
-        });
+        if( updatedDAO ){
+          debugger;
+          updatedDAO.select(this.COUNT()).then(function(count) {
+            self.updatedCount = count.value;
+          });
+        } else {
+          self.updatedCount = 0;
+          console.log('warning: updatedDAO dao=(ticket.STATUS = updated) = null');
+        }
+
         var openDAO = this.dao.where(this.EQ(this.Ticket.STATUS, "Open"));
-        openDAO.select(this.COUNT()).then(function(count) {
-          self.openCount = count.value;
-        });
+        if( openDAO ){
+          debugger;
+          openDAO.select(this.COUNT()).then(function(count) {
+            self.openCount = count.value;
+          });
+        } else {
+          self.openCount = 0;
+          console.log('warning: openDAO dao=(ticket.STATUS = open)= null');
+        }
+
         var pendingDAO = this.dao.where(this.EQ(this.Ticket.STATUS, 'Pending'));
-        pendingDAO.select(this.COUNT()).then(function(count) {
-          self.pendingCount = count.value;
-        });
+        if( pendingDAO ){
+          debugger;
+          pendingDAO.select(this.COUNT()).then(function(count) {
+            self.pendingCount = count.value;
+          });
+        } else {
+          self.pendingCount = 0;
+          console.log('warning: pendingDAO dao=(ticket.STATUS = pending) = null');
+        }
+
         var solvedDAO = this.dao.where(this.EQ(this.Ticket.STATUS, 'Solved'));
-        solvedDAO.select(this.COUNT()).then(function(count) {
-          self.solvedCount = count.value;
-        });
-        this.dao.select(this.COUNT()).then(function(count) {
-          self.ticketCount = count.value;
-        });
+        if( solvedDAO ){
+          debugger;
+          solvedDAO.select(this.COUNT()).then(function(count) {
+            self.solvedCount = count.value;
+          });
+        } else {
+          self.solvedCount = 0;
+          console.log('warning: solvedDAO dao=(ticket.STATUS = solved)= null');
+        }
+
+        if( dao ){
+          debugger;
+          this.dao.select(this.COUNT()).then(function(count) {
+            self.ticketCount = count.value;
+          });
+        } else {
+          self.ticketCount = 0;
+          console.log('warning: dao = null');
+        }
+
       }
     }
   ]
 });
+
