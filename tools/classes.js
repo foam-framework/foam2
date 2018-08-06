@@ -194,6 +194,8 @@ var classes = [
   'foam.nanos.notification.email.NullEmailService',
   'foam.nanos.notification.email.DAOEmailService',
   'foam.nanos.notification.email.SMTPEmailMessageDAO',
+  'foam.nanos.notification.email.POP3Email',
+  'foam.nanos.notification.email.ClientPOP3EmailService',
   'foam.nanos.notification.push.PushService',
   'foam.nanos.notification.push.FirebasePushService',
   'foam.nanos.notification.Notification',
@@ -277,7 +279,12 @@ var classes = [
   'foam.nanos.dig.exception.ParsingErrorException',
   'foam.nanos.dig.exception.DAOPutException',
   'foam.nanos.dig.exception.EmptyDataException',
-  'foam.nanos.dig.exception.UnsupportException'
+  'foam.nanos.dig.exception.UnsupportException',
+
+  //Support Files
+  'foam.support.model.TicketMessage',
+  'foam.support.model.SupportEmail',
+  'foam.support.model.Ticket'
 ];
 
 var abstractClasses = [
@@ -294,6 +301,7 @@ var skeletons = [
   'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.auth.token.TokenService',
   'foam.nanos.notification.email.EmailService',
+  'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.push.PushService',
 
 ];
