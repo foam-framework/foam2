@@ -8,6 +8,7 @@ package foam.nanos.servlet;
 
 import foam.util.SafetyUtil;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.text.StringEscapeUtils;
 
 import javax.servlet.ServletException;
@@ -50,25 +51,25 @@ public class ImageServlet
   {
     // get path
     String cwd = System.getProperty("user.dir");
-    String path = getServletConfig().getInitParameter("path");
+    String[] paths = getServletConfig().getInitParameter("paths").split(":");
     String reqPath = req.getRequestURI().replaceFirst("/?images/?", "/");
 
-    // get file
-    File src = new File(cwd + "/" + path + reqPath);
-    if ( src.isFile() && src.canRead() && src.getCanonicalPath().startsWith(new File(path).getCanonicalPath()) ) {
-      String ext = EXTS.get(FilenameUtils.getExtension(src.getName()));
-      try ( BufferedInputStream is = new BufferedInputStream(new FileInputStream(src)) ) {
-        resp.setContentType(!SafetyUtil.isEmpty(ext) ? ext : DEFAULT_EXT);
-        resp.setHeader("Content-Disposition", "filename=\"" + StringEscapeUtils.escapeHtml4(src.getName()) + "\"");
-        resp.setContentLengthLong(src.length());
+    // enumerate each file path
+    for ( int i = 0 ; i < paths.length ; i++ ) {
+      File src = new File(cwd + "/" + paths[i] + reqPath);
+      if ( src.isFile() && src.canRead() && src.getCanonicalPath().startsWith(new File(paths[i]).getCanonicalPath()) ) {
+        String ext = EXTS.get(FilenameUtils.getExtension(src.getName()));
+        try ( BufferedInputStream is = new BufferedInputStream(new FileInputStream(src)) ) {
+          resp.setContentType(!SafetyUtil.isEmpty(ext) ? ext : DEFAULT_EXT);
+          resp.setHeader("Content-Disposition", "filename=\"" + StringEscapeUtils.escapeHtml4(src.getName()) + "\"");
+          resp.setContentLengthLong(src.length());
 
-        int read = 0;
-        byte[] buffer = new byte[BUFFER_SIZE];
-        while ( (read = is.read(buffer, 0, BUFFER_SIZE)) != -1 ) {
-          resp.getOutputStream().write(buffer, 0, read);
+          IOUtils.copy(is, resp.getOutputStream());
+          return;
         }
       }
-      return;
     }
+    
+    resp.sendError(resp.SC_NOT_FOUND);
   }
 }
