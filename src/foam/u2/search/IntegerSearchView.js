@@ -65,9 +65,6 @@ foam.CLASS({
           SearchManager. The SearchManager will read this predicate and use it
           to filter the dao being displayed in the view.`,
       expression: function(qualifier, amount) {
-        amount = typeof amount === 'number' ?
-            Math.floor(amount * 100) :
-            0;
         if ( qualifier ) {
           return foam.mlang.predicate[qualifier].create({
             arg1: this.property,
