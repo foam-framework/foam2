@@ -40,6 +40,9 @@ var classes = [
   'foam.swift.ui.PropertyView',
   'foam.swift.ui.ScrollingViewController',
   'foam.u2.Visibility',
+
+  'foam.swift.type.Util',
+  'foam.swift.type.Type',
 ];
 
 module.exports = {

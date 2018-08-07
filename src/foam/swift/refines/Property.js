@@ -176,18 +176,6 @@ foam.CLASS({
       name: 'swiftWeak',
       value: false,
     },
-    {
-      class: 'String',
-      name: 'swiftCompareValues',
-      factory: function() {
-        return foam.String.multiline(function() {/*
-let v1 = v1 as AnyObject
-let v2 = v2 as AnyObject
-if v1.isEqual(v2) { return 0 }
-return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
-        */});
-      },
-    },
   ],
   methods: [
     function writeToSwiftClass(cls, parentCls) {
@@ -469,9 +457,6 @@ class PInfo: PropertyInfo {
     if obj.hasListeners(["propertyChange", "<%=p.name%>"]) {
       _ = obj.pub(["propertyChange", "<%=p.name%>", obj.<%=p.swiftSlotName%>])
     }
-  }
-  public func compareValues(_ v1: Any?, _ v2: Any?) -> Int {
-    <%=this.swiftCompareValues%>
   }
   init(_ ci: ClassInfo) { classInfo = ci }
   func viewFactory(x: Context) -> foam_core_FObject? {
