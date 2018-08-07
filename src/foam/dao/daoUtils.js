@@ -108,6 +108,7 @@ public ProxyDAO(foam.core.X x, foam.dao.DAO delegate) {
 foam.CLASS({
   package: 'foam.dao',
   name: 'ProxyListener',
+  flags: ['js', 'swift'],
 
   implements: ['foam.dao.Sink'],
 

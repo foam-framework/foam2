@@ -13,12 +13,12 @@ foam.CLASS({
   methods: [
     {
       name: 'sendEmail',
-      javaCode: '',
+      javaCode: '// NOOP',
       code: function() { return Promise.resolve(); }
     },
     {
       name: 'sendEmailFromTemplate',
-      javaCode: '',
+      javaCode: '// NOOP',
       code: function() { return Promise.resolve(); }
     }
   ]
