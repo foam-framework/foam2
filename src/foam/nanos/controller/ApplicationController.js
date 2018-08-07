@@ -79,6 +79,9 @@ foam.CLASS({
       background: #edf0f5;
       margin: 0;
     }
+    .foam-u2-UnstyledActionView-signIn {
+      margin-left: 25px !important;
+    }
     .stack-wrapper {
       margin-bottom: -10px;
       min-height: calc(80% - 60px);
@@ -86,6 +89,9 @@ foam.CLASS({
     .stack-wrapper:after {
       content: "";
       display: block;
+    }
+    .foam-u2-UnstyledActionView:focus{
+      outline: none;
     }
   `,
 
@@ -148,7 +154,6 @@ foam.CLASS({
       var self = this;
       self.clientPromise.then(function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
-        //foam.__context__.register(foam.u2.UnstyledActionView, 'foam.u2.ActionView');
         self.getCurrentUser();
 
         window.onpopstate = function(event) {

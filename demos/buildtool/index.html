@@ -4,16 +4,21 @@
   </head>
   <body>
     <script>
+
       var cl = foam.__context__.classloader;
 
       var l = document.location;
-      cl.addClassPath(l.protocol + '//' + l.host + l.pathname + 'build', true);
+      
+
+      cl.addClassPath(l.protocol + '/' + l.host + l.pathname + 'build', true); //works with '/' instead of '//' ??
 
       cl.load('demo.build.ModelToBuild').then(function() {
+       
         foam.u2.DetailView.create({
           data: demo.build.ModelToBuild.create(),
-        }).write()
-      });
+          showActions: true
+        }).write() 
+      }); 
     </script>
   </body>
 </html>

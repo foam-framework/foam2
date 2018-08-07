@@ -439,6 +439,7 @@ foam.CLASS({
         })
           .start().add('Submit as').addClass('Submit-as').end()
           .start().add('Updated').addClass('Updated').end()
+
         .end()
 
         .start('div').on('click', function(){

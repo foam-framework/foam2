@@ -140,13 +140,15 @@ foam.CLASS({
           resp: resp,
           responseType: this.responseType
         });
-
+        //console.log(" line 143 HTTPRequest request = " + request.protocol + " "+ request.hostname + " "+ request.path + " ");
+       
         if ( resp.success ) return resp;
-
-        // Use Promise.reject so crappy debuggers don't pause here
+         // Use Promise.reject so crappy debuggers don't pause here
         // throw resp;
         return Promise.reject(resp);
-      }.bind(this));
+      }.bind(this) , 
+      //console.log("error line 149 HTTPRequest request = " + request.protocol + " "+ request.hostname + " "+ request.path + " ")
+    );
     },
     function addContentHeaders() {
       // Specify Content-Type header when it can be deduced.

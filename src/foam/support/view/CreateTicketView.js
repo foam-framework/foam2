@@ -207,6 +207,7 @@ foam.CLASS({
     margin-right:20px;
     float:left;
   }
+
   .New {
     width: 76px;
     height: 20px;
@@ -347,6 +348,7 @@ foam.CLASS({
           subject: this.subject,
           status: this.status
         });
+        
         console.log("this.user: "+ this.user);
         this.dao.put(ticket).then(function(ticket){
           if (self.message == "") return;
@@ -385,6 +387,7 @@ foam.CLASS({
           width: 170,
         })
         self.voidPopUp_.addClass('popUpDropDown')
+        
         .start('div').on('click', function(){
           self.status = 'Pending'
           self.voidPopUp()
