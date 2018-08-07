@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FileServlet
+public class ImageServlet
   extends HttpServlet
 {
   protected static final int                 BUFFER_SIZE = 4096;
@@ -55,7 +55,7 @@ public class FileServlet
 
     // get file
     File src = new File(cwd + "/" + path + reqPath);
-    if ( src.isFile() && src.canRead() ) {
+    if ( src.isFile() && src.canRead() && src.getCanonicalPath().startsWith(new File(path).getCanonicalPath()) ) {
       String ext = EXTS.get(FilenameUtils.getExtension(src.getName()));
       try ( BufferedInputStream is = new BufferedInputStream(new FileInputStream(src)) ) {
         resp.setContentType(!SafetyUtil.isEmpty(ext) ? ext : DEFAULT_EXT);
