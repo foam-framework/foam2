@@ -455,11 +455,25 @@ foam.CLASS({
   ]
 });
 
-// ???: What does this do?
 foam.CLASS({
   package: 'foam.u2',
   name: 'RenderSink',
-  implements: [ 'foam.dao.Sink' ],
+  implements: [
+    'foam.dao.Sink'
+  ],
+
+  documentation: `
+    Any call to put, remove, or reset on this sink will:
+
+      1. call the 'cleanup' method, then
+      2. call the 'addRow' method on each object in the DAO.
+
+    You must provide three things:
+
+      1. the DAO,
+      2. an implementation of the 'addRow' method, and
+      3. an implementation of the 'cleanup' method.
+  `,
 
   axioms: [
     {
@@ -470,17 +484,23 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Function',
-      name: 'addRow'
+      class: 'foam.dao.DAOProperty',
+      name: 'dao',
     },
     {
       class: 'Function',
-      name: 'cleanup'
+      name: 'addRow',
+      documentation: `Called on each object in the DAO.`
     },
-    'dao',
+    {
+      class: 'Function',
+      name: 'cleanup',
+      documentation: `Called before addRow is applied to objects in the DAO.`
+    },
     {
       class: 'Int',
-      name: 'batch'
+      name: 'batch',
+      documentation: `Used to check whether a paint should be performed or not.`
     }
   ],
 
@@ -505,6 +525,11 @@ foam.CLASS({
       code: function() {
         var batch = ++this.batch;
         var self = this;
+
+        if ( ! foam.dao.DAO.isInstance(this.dao) ) {
+          throw new Exception(`You must set the 'dao' property of RenderSink.`);
+        }
+
         this.dao.select().then(function(a) {
           // Check if this is a stale render
           if ( self.batch !== batch ) return;

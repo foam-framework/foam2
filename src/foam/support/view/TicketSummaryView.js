@@ -12,7 +12,8 @@ foam.CLASS({
     'foam.support.view.TicketView',
   ],
   imports: [
-    'user'
+    'user',
+    'ticketDAO'
   ],
   exports: [ 'as data' ],
  

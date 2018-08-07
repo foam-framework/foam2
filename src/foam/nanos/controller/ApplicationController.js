@@ -67,7 +67,7 @@ foam.CLASS({
   ],
 
   constants: {
-    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor' ]
+    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor', 'secondaryHoverColor' ]
   },
 
   css: `
@@ -142,6 +142,7 @@ foam.CLASS({
     'webApp',
     'primaryColor',
     'secondaryColor',
+    'secondaryHoverColor',
     'tableColor',
     'tableHoverColor',
     'accentColor'
@@ -153,7 +154,6 @@ foam.CLASS({
       var self = this;
       self.clientPromise.then(function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
-        foam.__context__.register(foam.u2.UnstyledActionView, 'foam.u2.ActionView');
         self.getCurrentUser();
 
         window.onpopstate = function(event) {
