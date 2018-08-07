@@ -261,6 +261,7 @@ var classes = [
   'foam.nanos.jetty.HttpServer',
   'foam.nanos.servlet.ServletMapping',
   'foam.nanos.servlet.ErrorPageMapping',
+  'foam.nanos.servlet.FilterMapping',
 
   'foam.lib.query.TestModel',
   'foam.lib.query.FooEnum',

@@ -81,6 +81,9 @@
         margin-left:20px;
         margin-top:10px;
       }
+      ^ .net-nanopay-ui-ActionView:hover {
+        background-color: #d2e2ef;
+      }
       ^ .net-nanopay-ui-ActionView > span {
         height: 40px;
         font-family: Roboto;

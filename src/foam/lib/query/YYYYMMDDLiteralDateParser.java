@@ -77,8 +77,7 @@ public class YYYYMMDDLiteralDateParser extends ProxyParser {
             new Alt(
               new Literal("-"),
               new Literal("/")),
-            new IntParser(),
-            new Whitespace()),
+            new IntParser()),//,new Whitespace()
 
           //YYYY
           new Seq(
@@ -100,12 +99,12 @@ public class YYYYMMDDLiteralDateParser extends ProxyParser {
     Date date1 = null, date2 = null;
     c.clear();
 
-    c.set(result.length > 1 ? (Integer) result[0] : 0,
-        result.length > 3 ? (Integer) result[2] - 1 : 0,
-        result.length > 5 ? (Integer) result[4] : 0,
-        result.length > 7 ? (Integer) result[6] : 0,
-        result.length > 9 ? (Integer) result[8] : 0,
-        result.length > 11 ? (Integer) result[10] : 0);
+    c.set(result.length >= 1 ? (Integer) result[0] : 0,
+        result.length >= 3 ? (Integer) result[2] - 1 : 0,
+        result.length >= 5 ? (Integer) result[4] : 0,
+        result.length >= 7 ? (Integer) result[6] : 0,
+        result.length >= 9 ? (Integer) result[8] : 0,
+        result.length >= 11 ? (Integer) result[10] : 0);
 
     date1 = c.getTime();
     
