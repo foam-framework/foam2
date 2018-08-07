@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.u2.search',
   name: 'IntegerSearchView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Controller',
 
   documentation: `
     A SearchView for properties of type Int, Short, Long, and Byte. Lets the
@@ -15,10 +15,6 @@ foam.CLASS({
       1. A qualifier (Eg: equal to, not equal to, greater than)
       2. An amount (Eg: 25)
   `,
-
-  exports: [
-    'as data'
-  ],
 
   requires: [
     'foam.mlang.predicate.True',

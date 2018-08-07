@@ -7,13 +7,9 @@
 foam.CLASS({
   package: 'foam.u2.search',
   name: 'DateSearchView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Controller',
 
   documentation: `A SearchView for properties of type Date.`,
-
-  exports: [
-    'as data'
-  ],
 
   properties: [
     {
