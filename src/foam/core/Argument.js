@@ -41,7 +41,7 @@ foam.LIB({
         if ( cls ) return cls;
 
         // could not resolve
-        throw new TypeError('foam.Function.args could not resolve type ' +
+        throw new TypeError('foam.Function.resolveTypeString could not resolve type ' +
           typeStr);
       };
       ret.isTypeChecked__ = true;
@@ -316,5 +316,38 @@ foam.CLASS({
           cls.create(e, obj);
       }
     }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.AbstractMethod',
+  package: 'foam.core',
+  name: 'CreateChildRefines',
+  documentation: `
+    Overwrites the createChildMethod_ to merge in details from the parent method
+    into the child method like return types, arguments, and any other method
+    properties. This allows a model to not need to list these details when
+    implementing an interface or overriding a parent's method.
+  `,
+  methods: [
+    function createChildMethod_(child) {
+      var result = child.clone();
+      var props = child.cls_.getAxiomsByClass(foam.core.Property);
+      for ( var i = 0 ; i < props.length ; i++ ) {
+        var prop = props[i];
+        if ( this.hasOwnProperty(prop.name) && ! child.hasOwnProperty(prop.name) ) {
+          prop.set(result, prop.get(this));
+        }
+      }
+
+      // Special merging behaviour for args.
+      var i = 0;
+      var resultArgs = [];
+      for ( ; i < this.args.length ; i++ ) resultArgs.push(this.args[i].clone().copyFrom(child.args[i]));
+      for ( ; i < child.args.length ; i++ ) resultArgs.push(child.args[i]);
+      result.args = resultArgs; // To trigger the adaptArrayElement
+
+      return result;
+    },
   ]
 });
