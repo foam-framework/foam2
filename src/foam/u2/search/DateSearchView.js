@@ -105,7 +105,7 @@ foam.CLASS({
       z-index: 1;
     }
 
-    ^ input, select {
+    ^ input, ^ select {
       background-color: white;
       border-radius: 2px;
       border: 1px solid #dce0e7;
