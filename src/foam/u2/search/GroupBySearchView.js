@@ -42,7 +42,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'viewSpec',
-      value: { class: 'foam.u2.view.ChoiceView', size: 10 }
+      value: { class: 'foam.u2.view.ChoiceView' }
     },
     {
       class: 'foam.dao.DAOProperty',
