@@ -58,6 +58,8 @@ foam.CLASS({
     { class: 'Boolean', name: 'isMerged',   value: false },
     { class: 'Int',     name: 'mergeDelay', value: 16, units: 'ms' },
     {
+      class: 'FObjectArray',
+      of: 'foam.core.Argument',
       name: 'args',
       factory: function() {
         return [
