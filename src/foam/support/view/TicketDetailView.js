@@ -261,6 +261,36 @@ foam.CLASS({
     border-radius: 2px;
     background: #59a5d5;
   }
+  .New {
+    width: 35px;
+    height: 20px;
+    border-radius: 100px;
+    background-color: #eedb5f;
+  }
+  .Updated {
+    width: 60px;
+    height: 20px;
+    border-radius: 100px;
+    background-color: #093649;
+  }
+  .Open {
+    width: 49px;
+    height: 20px;
+    border-radius: 100px;
+    background-color: #ee5f71;
+  }
+  .Pending {
+    width: 55px;
+    height: 20px;
+    border-radius: 100px;
+    background-color: #59a5d5;
+  }
+  .Solved {
+    width: 50px;
+    height: 20px;
+    border-radius: 100px;
+    background-color: #a4b3b8;
+  }
   `,
 
   methods: [
@@ -274,7 +304,7 @@ foam.CLASS({
       .start()
         .start(this.BACK_ACTION).end()
         .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$).enableClass('hide', this.status$.map(function(a){ return a == 'Solved' ? true : false; }))
-          .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/images/drop_down.png'}).end()
+          .start({class:'foam.u2.tag.Image',data:'../../../foam/support/images/drop_down.png'}).end()
         .end()
           .start(this.SUBMIT_TICKET).addClass('Rectangle-8').enableClass('hide', this.status$.map(function(a){ return a == 'Solved' ? true : false; }))
             .start().add('Submit as').addClass('SubmitButton').end()
@@ -384,7 +414,7 @@ foam.CLASS({
           self.voidPopUp()
         })
           .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('Pending').addClass('Pending status').end()
+          .start().add('Pending').addClass('Pending').end()
         .end()
 
         .start('div').on('click', function(){
@@ -392,7 +422,7 @@ foam.CLASS({
           self.voidPopUp()
         })
           .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('New').addClass('New status').end()
+          .start().add('New').addClass('New').end()
         .end()
 
         .start('div').on('click', function(){
@@ -400,7 +430,7 @@ foam.CLASS({
           self.voidPopUp()
         })
           .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('Solved').addClass('Solved status').end()
+          .start().add('Solved').addClass('Solved').end()
         .end()
 
         .start('div').on('click', function(){
@@ -408,7 +438,7 @@ foam.CLASS({
           self.voidPopUp()
         })
           .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('Updated').addClass('Updated status').end()
+          .start().add('Updated').addClass('Updated').end()
         .end()
 
         .start('div').on('click', function(){
@@ -416,7 +446,7 @@ foam.CLASS({
           self.voidPopUp()
         })
           .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('Open').addClass('Open status').end()
+          .start().add('Open').addClass('Open').end()
         .end()
                  
         self.voidMenuBtn_.add(self.voidPopUp_)

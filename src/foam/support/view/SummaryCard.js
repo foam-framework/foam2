@@ -48,6 +48,36 @@ foam.CLASS({
 		float: right;
 		margin-right: 15px;
 	}
+  .New {
+    width: 35px;
+    height: 20px;
+    border-radius: 100px;
+    background-color: #eedb5f;
+  }
+  .Updated {
+    width: 60px;
+    height: 20px;
+    border-radius: 100px;
+    background-color: #093649;
+  }
+  .Open {
+    width: 49px;
+    height: 20px;
+    border-radius: 100px;
+    background-color: #ee5f71;
+  }
+  .Pending {
+    width: 55px;
+    height: 20px;
+    border-radius: 100px;
+    background-color: #59a5d5;
+  }
+  .Solved {
+    width: 50px;
+    height: 20px;
+    border-radius: 100px;
+    background-color: #a4b3b8;
+  }
 	`,
 
   properties: [
@@ -61,7 +91,7 @@ foam.CLASS({
       this
         .addClass(this.myClass())
           .start().addClass('count').add(this.count$).end()
-          //.start().addClass(this.status + ' label special-status-tag ').add(this.status).end()
+          .start().addClass(this.status).addClass('label').add(this.status).end()
         .end()
     },
   ]

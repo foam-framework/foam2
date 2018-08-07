@@ -52,7 +52,7 @@ foam.CLASS({
     text-align: center;
     color: #093649;
   }
-  ^ .Rectangle-8 {
+  ^ .Rectangle-7a {
     padding: 0 10px;
     border: solid 0.5px #59a5d5 !important;
     margin: 0px 2px !important;
@@ -207,6 +207,41 @@ foam.CLASS({
     margin-right:20px;
     float:left;
   }
+  .New {
+    width: 76px;
+    height: 20px;
+    border-radius: 100px;
+    color: #ffffff;
+    background-color: #eedb5f;
+  }
+  .Updated {
+    width: 76px;
+    height: 20px;
+    border-radius: 100px;
+    color: #ffffff;
+    background-color: #093649;
+  }
+  .Open {
+    width: 76px;
+    height: 20px;
+    border-radius: 100px;
+    color: #ffffff;
+    background-color: #ee5f71;
+  }
+  .Pending {
+    width: 76px;
+    height: 20px;
+    border-radius: 100px;
+    color: #ffffff;
+    background-color: #59a5d5;
+  }
+  .Solved {
+    width: 76px;
+    height: 20px;
+    border-radius: 100px;
+    color: #ffffff;
+    background-color: #a4b3b8;
+  }
   `,
 
   properties: [
@@ -254,17 +289,16 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start(this.DELETE_DRAFT).addClass('Rectangle-7').end()
-        .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$)
-          .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/images/drop_down.png'}).end()
+        .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$).addClass('Rectangle-7a')
+          .start({class:'foam.u2.tag.Image',data:'../../../foam/support/images/drop_down.png'}).end()
         .end()
-        .start(this.SUBMIT_TICKET).addClass('Rectangle-8')
-            .start().add('Submit as').addClass('SubmitButton').end()
-            .start().addClass('SubmitLabel')
-              .start().addClass(this.status$).add(this.status$).end()
-            .end()
+        .start(this.SUBMIT_TICKET).addClass('Rectangle-7a')
+          .start().add('Submit as').addClass('SubmitButton').end()
+          .start().addClass('SubmitLabel')
+            .start().addClass(this.status$).add(this.status$).end()
+          .end()
         .end()
         .start().addClass('New-ticket').add('New Ticket #',this.ticketCount$).end()
-      
         .start().addClass('bg2')
         .start()
           .start().addClass('rname')
@@ -306,7 +340,6 @@ foam.CLASS({
       label: '',
       code: function(){
         var self = this;
-
         var ticket = this.Ticket.create({
           requestorEmail: this.requestorEmail,
           requestorName: this.requestorName,
@@ -314,7 +347,6 @@ foam.CLASS({
           subject: this.subject,
           status: this.status
         });
-
         console.log("this.user: "+ this.user);
         this.dao.put(ticket).then(function(ticket){
           if (self.message == "") return;
@@ -357,36 +389,40 @@ foam.CLASS({
           self.status = 'Pending'
           self.voidPopUp()
         })
-          .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('Pending').addClass('Pending status').end()
+          .start('span').add('Submit as').addClass('Submit-as').end()
+          .start('span').add('Pending').addClass('Pending').end()
         .end()
+
         .start('div').on('click', function(){
           self.status = 'New'
           self.voidPopUp()
         })
-          .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('New').addClass('New status').end()
+          .start('span').add('Submit as').addClass('Submit-as').end()
+          .start('span').addClass('New').add('New').end()
         .end()
+
         .start('div').on('click', function(){
           self.status = 'Solved'
           self.voidPopUp()
         })
-          .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('Solved').addClass('Solved status').end()
+          .start('span').add('Submit as').addClass('Submit-as').end()
+          .start('span').addClass('Solved').add('Solved').end()
         .end()
+
         .start('div').on('click', function(){
           self.status = 'Updated'
           self.voidPopUp()
         })
-          .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('Updated').addClass('Updated status').end()
+          .start('span').add('Submit as').addClass('Submit-as').end()
+          .start('span').addClass('Updated').add('Updated').end()
         .end()
+
         .start('div').on('click', function(){
           self.status = 'Open'
           self.voidPopUp()
         })
-          .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('Open').addClass('Open status').end()
+          .start('span').add('Submit as').addClass('Submit-as').end()
+          .start('span').addClass('Open').add('Open').end()
         .end()
                  
         self.voidMenuBtn_.add(self.voidPopUp_)

@@ -67,13 +67,7 @@ foam.CLASS({
   properties: [
     {
       name: 'dao',
-      factory: function() { 
-        if( this.user.tickets ){
-          return this.user.tickets;
-        }else{
-          return new foam.dao.EasyDAO.Builder(x).setPm(true).setSeqNo(true).setJournaled(true).setJournalName('tickets').setOf(foam.support.model.Ticket.getOwnClassInfo()).build();
-        } 
-      }
+      factory: function() { return this.user.tickets; }
     },
     {
       class: 'Int',
