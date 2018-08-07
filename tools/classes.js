@@ -277,7 +277,8 @@ var classes = [
   'foam.nanos.dig.exception.ParsingErrorException',
   'foam.nanos.dig.exception.DAOPutException',
   'foam.nanos.dig.exception.EmptyDataException',
-  'foam.nanos.dig.exception.UnsupportException'
+  'foam.nanos.dig.exception.UnsupportException',
+  'foam.nanos.dig.exception.UnknownIdException'
 ];
 
 var abstractClasses = [
