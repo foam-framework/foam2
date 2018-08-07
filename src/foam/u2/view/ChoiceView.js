@@ -78,7 +78,6 @@ foam.CLASS({
           for ( var key in nu ) {
             if ( nu.hasOwnProperty(key) ) out.push([ key, nu[key] ]);
           }
-          this.size = out.length;
           return out;
         }
 
@@ -91,7 +90,6 @@ foam.CLASS({
           }
         }
 
-        this.size = nu.length;
         return nu;
       },
     },
@@ -178,7 +176,7 @@ foam.CLASS({
         choices$: this.choices$,
         placeholder$: this.placeholder$,
         mode$: this.mode$,
-        size$: this.size$
+        size: this.size
       }).end();
 
       this.dao$proxy.on.sub(this.onDAOUpdate);
