@@ -268,8 +268,9 @@ var addDepsToClasses = function() {
     while ( classQueue.length ) {
       var cls = classQueue.pop();
       if ( ! classMap[cls] && ! blacklist[cls] ) {
-        classMap[cls] = true;
         cls = foam.lookup(cls);
+        if ( ! flagFilter(cls.model_) ) continue;
+        classMap[cls.id] = true;
         cls.getAxiomsByClass(foam.core.Requires).filter(flagFilter).forEach(function(r) {
           r.javaPath && classQueue.push(r.javaPath);
         });
