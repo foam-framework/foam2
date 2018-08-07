@@ -52,12 +52,12 @@ foam.CLASS({
 
         if ( placeholder ) {
           cs.push(self.E('option').attrs({
-            value: - 1,
-            selected: self.data === - 1
+            value: -1,
+            selected: self.data === -1
           }).add(self.placeholder));
         }
 
-        for ( var i = 0; i < choices.length; i ++ ) {
+        for ( var i = 0; i < choices.length; i++ ) {
           var c = choices[i];
           let value = c[1];
           let e = self.E('option').attrs({
@@ -65,7 +65,7 @@ foam.CLASS({
             selected: self.data === i
           }).add(value);
 
-          if ( value.indexOf('  ') !== - 1 ) {
+          if ( value.indexOf('  ') !== -1 ) {
             // Hack to display spaces as nbsp's
             e.onload.sub(function() {
               e.el().innerHTML = value.replace(/ /g, '&nbsp;');
