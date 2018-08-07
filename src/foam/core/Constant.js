@@ -38,7 +38,7 @@ foam.CLASS({
     {
       name: 'value',
       expression: function(factory) {
-        return factory();
+        return factory ? factory() : null;
       },
     },
     'factory',
