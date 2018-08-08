@@ -42,7 +42,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'viewSpec',
-      value: { class: 'foam.u2.view.ChoiceView', size: 10 }
+      value: { class: 'foam.u2.view.ChoiceView' }
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -106,7 +106,9 @@ foam.CLASS({
         .addClass(this.myClass())
         .tag(this.viewSpec, {
           label$: this.label$,
-          alwaysFloatLabel: true
+          alwaysFloatLabel: true,
+          dynamicSize: true,
+          maxSize: 10
         }, this.view$)
         .on('click', function(e) {
           try {
