@@ -52,7 +52,7 @@ return o
       name: 'find_',
       swiftCode: function() {/*
 let i = array.index { (o) -> Bool in
-  return self.primaryKey.compareValues(id, self.primaryKey.get(o)) == 0
+  return FOAM_utils.compare(id, self.primaryKey.get(o)) == 0
 }
 if i == nil { return nil }
 return array[i!]
