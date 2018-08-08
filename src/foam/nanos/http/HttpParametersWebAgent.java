@@ -150,6 +150,8 @@ public class HttpParametersWebAgent
               break;
             case "remove":
               command = Command.remove;
+              parameters.set("id", req.getParameter("id"));
+              logger.debug("id", req.getParameter("id"));
               break;
             case "help":
               command = Command.help;
@@ -173,6 +175,8 @@ public class HttpParametersWebAgent
           break;
         case "remove":
           command = Command.remove;
+          parameters.set("id", req.getParameter("id"));
+          logger.debug("id", req.getParameter("id"));
           break;
         case "help":
           command = Command.help;
