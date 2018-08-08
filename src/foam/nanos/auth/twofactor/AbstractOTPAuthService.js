@@ -16,9 +16,9 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.util.SecurityUtil',
     'javax.crypto.Mac',
-    'javax.crypto.spec.SecretKeySpec',
-    'java.util.concurrent.ThreadLocalRandom'
+    'javax.crypto.spec.SecretKeySpec'
   ],
 
   properties: [
@@ -41,7 +41,7 @@ foam.CLASS({
       ],
       javaCode: `
         final byte[] bytes = new byte[size];
-        ThreadLocalRandom.current().nextBytes(bytes);
+        SecurityUtil.GetSecureRandom().nextBytes(bytes);
         return bytes;
       `
     },
