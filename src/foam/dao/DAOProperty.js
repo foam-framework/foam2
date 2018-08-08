@@ -29,11 +29,8 @@ foam.CLASS({
       name: 'view',
       value: {class: 'foam.comics.InlineBrowserView'},
     },
-    ['of', 'foam.dao.DAO'],
-    // TODO: fix network/storage transient expressions
     ['transient', true],
-    ['networkTransient', true],
-    ['storageTransient', true]
+    ['of', 'foam.dao.DAO']
   ],
 
   methods: [
