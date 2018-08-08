@@ -48,6 +48,20 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.Object',
+
+  properties: [
+    {
+      name: 'toJSON',
+      value: function toJSON(value, outputter) {
+        return value instanceof Date ?
+            { class: '__Timestamp__', value: value.getTime() } :
+            value;
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.core',
