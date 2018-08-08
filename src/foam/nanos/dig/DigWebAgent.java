@@ -362,7 +362,11 @@ public class DigWebAgent
         FObject      targetFobj = dao.find(idObj);
 
         if ( targetFobj == null ) {
-          throw new RuntimeException("Unknown ID");
+          DigErrorMessage error = new UnknownIdException.Builder(x)
+            .build();
+          outputException(x, resp, format, out, error);
+
+          return;
         } else {
           dao.remove(targetFobj);
           out.println("Success");
