@@ -21,7 +21,7 @@ foam.CLASS({
   `,
 
   properties: [
-    [ 'nodeName', 'select' ],
+    ['nodeName', 'select'],
     {
       name: 'choices',
       factory: function() {
@@ -44,7 +44,7 @@ foam.CLASS({
 
       this
         .addClass(this.myClass())
-        .attrs({size: this.size$})
+        .attrs({ size: this.size$ })
         .attrSlot().linkFrom(this.data$);
 
       this.setChildren(this.slot(function(choices, placeholder) {
@@ -53,19 +53,19 @@ foam.CLASS({
         if ( placeholder ) {
           cs.push(self.E('option').attrs({
             value: -1,
-            selected: self.data == -1 ? true : undefined
+            selected: self.data === -1
           }).add(self.placeholder));
         }
 
-        for ( var i = 0 ; i < choices.length ; i++ ) {
-          var c     = choices[i];
+        for ( var i = 0; i < choices.length; i++ ) {
+          var c = choices[i];
           let value = c[1];
-          let e     = self.E('option').attrs({
+          let e = self.E('option').attrs({
             value: i,
-            selected: self.data === i ? true : undefined
+            selected: self.data === i
           }).add(value);
 
-          if ( value.indexOf('  ') != -1 ) {
+          if ( value.indexOf('  ') !== -1 ) {
             // Hack to display spaces as nbsp's
             e.onload.sub(function() {
               e.el().innerHTML = value.replace(/ /g, '&nbsp;');
@@ -80,9 +80,9 @@ foam.CLASS({
     },
 
     function updateMode_(mode) {
-      this.setAttribute(
-        'disabled',
-        mode === foam.u2.DisplayMode.DISABLED || mode === foam.u2.DisplayMode.RO);
+      var disabled = mode === foam.u2.DisplayMode.DISABLED ||
+          mode === foam.u2.DisplayMode.RO;
+      this.setAttribute('disabled', disabled);
     }
   ]
 });
