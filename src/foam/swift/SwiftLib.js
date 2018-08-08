@@ -24,7 +24,7 @@ foam.LIB({
         // Unable to convert functions.
         return 'nil';
       } else if ( type == foam.core.FObject ) {
-        // TODO: Serialize the FObject in a way swift can understand.
+        // TODO: Should be able to serialize an FObject to swift.
         return 'nil';
       } else  {
         console.log('Encountered unexpected type while converitng value to string:', v);
