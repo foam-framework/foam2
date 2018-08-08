@@ -14,7 +14,10 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.dao.InternalException'
+    {
+      flags: ['swift'],
+      path: 'foam.mlang.sink.Max',
+    },
   ],
 
   documentation: 'DAO Decorator which sets a specified property\'s value with an auto-increment sequence number on DAO.put() if the value is set to the default value.',
@@ -27,6 +30,7 @@ foam.CLASS({
       value: 'id'
     },
     {
+      flags: ['java'],
       javaType: 'foam.core.PropertyInfo',
       javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
       name: 'axiom',
@@ -38,10 +42,17 @@ foam.CLASS({
         than the maximum existing value. */
       class: 'Long',
       name: 'value',
-      value: 1
+      value: 1,
+      swiftExpressionArgs: ['delegate', 'property_'],
+      swiftExpression: `
+        let s = self.Max_create(["arg1": property_])
+        _ = try? delegate.select(s)
+        return s.value as? Int ?? 0
+      `,
     },
     { /** Returns a promise that fulfills when the maximum existing number
           has been found and assigned to this.value */
+      flags: ['js'],
       name: 'calcDelegateMax_',
       hidden: true,
       expression: function(delegate, property) {
@@ -54,12 +65,17 @@ foam.CLASS({
             if ( max.value ) self.value = max.value + 1;
           }
         );
-      }
+      },
     },
     {
       /** @private */
       name: 'property_',
+      swiftType: 'PropertyInfo',
       hidden: true,
+      swiftExpressionArgs: ['property', 'of'],
+      swiftExpression: `
+        return of.axiom(byName: property) as! PropertyInfo
+      `,
       expression: function(property, of) {
         var a = this.of.getAxiomByName(property);
         if ( ! a ) {
@@ -89,6 +105,14 @@ foam.CLASS({
           return self.delegate.put_(x, obj);
         });
       },
+      swiftSynchronized: true,
+      swiftCode: `
+        if !property_.hasOwnProperty(obj) {
+          value += 1
+          property_.set(obj, value: value)
+        }
+        return try delegate.put_(x, obj)
+      `,
       javaCode: `
 synchronized (this) {
   if ( ! isPropertySet("value") ) calcDelegateMax_();

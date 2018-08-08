@@ -39,6 +39,7 @@ foam.CLASS({
           return self.maybeContextualize_(x, obj);
         });
       },
+      swiftCode: 'return maybeContextualize_(x, super.find_(x, id))',
       javaCode: 'return maybeContextualize_(x, super.find_(x, id));'
     },
     {
@@ -49,6 +50,7 @@ foam.CLASS({
           return self.maybeContextualize_(x, o);
         });
       },
+      swiftCode: 'return maybeContextualize_(x, super.put_(x, obj))',
       javaCode: 'return maybeContextualize_(x, super.put_(x, obj));'
     },
     {
@@ -60,11 +62,20 @@ foam.CLASS({
       code: function(x, obj) {
         return obj && obj.clone(this);
       },
-      javaCode: `if ( obj != null ) {
-  obj = obj.fclone();
-  obj.setX(x);
-}
-return obj;`
+      swiftCode: `
+        if ( obj != null ) {
+          obj = obj.fclone();
+          obj.setX(x);
+        }
+        return obj;
+      `,
+      javaCode: `
+        if ( obj != null ) {
+          obj = obj.fclone();
+          obj.setX(x);
+        }
+        return obj;
+      `
     }
   ]
 });
