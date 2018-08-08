@@ -686,10 +686,15 @@ foam.CLASS({
         of: 'foam.dao.ManyToManyRelationship',
         flags: ['swift', 'js'],
         transient: true,
-        factory: function() {
+        expression: function(id) {
           return this[methodName](this.__context__);
         },
-        swiftFactory: `return ${methodName}(__context__)`,
+        swiftExpressionArgs: ['id'],
+        swiftExpression: `
+          // id is used in ${methodName}. Suppress warning by touching it here.
+          _ = id
+          return self.${methodName}(self.__context__)
+        `,
       }));
     },
   ]
