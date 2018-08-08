@@ -45,6 +45,8 @@ class ListenerList {
 public protocol PropertyInfo: Axiom, SlotGetterAxiom, SlotSetterAxiom, GetterAxiom, SetterAxiom, foam_mlang_Expr {
   var classInfo: ClassInfo { get }
   var transient: Bool { get }
+  var storageTransient: Bool { get }
+  var networkTransient: Bool { get }
   var label: String { get }
   var visibility: foam_u2_Visibility { get }
   var jsonParser: foam_swift_parse_parser_Parser? { get }

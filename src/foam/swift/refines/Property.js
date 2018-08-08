@@ -404,6 +404,8 @@ class PInfo: PropertyInfo {
   let name = "<%=this.name%>"
   let classInfo: ClassInfo
   let transient = <%=!!this.transient%>
+  let storageTransient = <%=!!this.storageTransient%>
+  let networkTransient = <%=!!this.networkTransient%>
   let label = "<%=this.label%>" // TODO localize
   lazy private(set) var visibility: <%=foam.u2.Visibility.model_.swiftName%> = {
     return <%=foam.u2.Visibility.model_.swiftName%>.<%=this.visibility.name%>
