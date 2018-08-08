@@ -30,8 +30,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftValue',
-      expression: function(swiftFactory) {
-        return swiftFactory ? '' : 'nil';
+      expression: function(value, swiftFactory) {
+        return swiftFactory ? '' : foam.swift.stringify(value);
       }
     },
   ],
