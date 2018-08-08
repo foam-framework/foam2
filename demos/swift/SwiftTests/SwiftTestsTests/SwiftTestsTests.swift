@@ -594,4 +594,47 @@ class SwiftTestsTests: XCTestCase {
     let o = x.create(somepackage_Test.self)!
     XCTAssertTrue(somepackage_Test.classInfo().instanceOf(o))
   }
+
+  func testTypeUtil() {
+    let u = foam_swift_type_Util()
+    XCTAssertTrue(u.typeOf(nil) === u.tNull)
+    XCTAssertTrue(u.typeOf(true) === u.tBoolean)
+    XCTAssertTrue(u.typeOf("true") === u.tString)
+    XCTAssertTrue(u.typeOf(12345) === u.tNumber)
+    XCTAssertTrue(u.typeOf([1]) === u.tArray)
+    XCTAssertTrue(u.typeOf(Date()) === u.tDate)
+    XCTAssertTrue(u.typeOf(u) === u.tFObject)
+    XCTAssertTrue(u.typeOf(["yo":"yo"]) === u.tMap)
+    XCTAssertTrue(u.typeOf(CGRect.zero) === u.tUnknown)
+
+    XCTAssertEqual(u.compare(nil, nil), 0)
+    XCTAssertEqual(u.compare(nil, 1234), 1)
+    XCTAssertEqual(u.compare(1234, nil), -1)
+
+    XCTAssertEqual(u.compare(true, true), 0)
+    XCTAssertEqual(u.compare(false, false), 0)
+    XCTAssertEqual(u.compare(false, true), -1)
+    XCTAssertEqual(u.compare(true, false), 1)
+
+    XCTAssertEqual(u.compare("string1", 1), -1)
+    XCTAssertEqual(u.compare(1, "string1"), 1)
+    XCTAssertEqual(u.compare("string2", "string1"), 1)
+    XCTAssertEqual(u.compare("string1", "string2"), -1)
+    XCTAssertEqual(u.compare("string", "string"), 0)
+
+    XCTAssertEqual(u.compare(1, 1), 0)
+    XCTAssertEqual(u.compare(2, 1), 1)
+    XCTAssertEqual(u.compare(1, 2), -1)
+
+    XCTAssertEqual(u.compare([1], [1]), 0)
+    XCTAssertEqual(u.compare([1, 2], [1]), 1)
+    XCTAssertEqual(u.compare([1], [1, 2]), -1)
+
+    XCTAssertEqual(u.compare(["yo":1], ["yo":1, "sup":2]), 1)
+    XCTAssertEqual(u.compare(["yo":1, "sup":2], ["yo":1]), -1)
+    XCTAssertEqual(u.compare(["yo":1, "sup":2], ["yo":1, "sup":3]), -1)
+    XCTAssertEqual(u.compare(["sup":3, "yo":1], ["yo":1, "sup":2]), 1)
+    XCTAssertEqual(u.compare(["yo":1, "sup":2], ["hi":3, "yo":1]), 1)
+    XCTAssertEqual(u.compare(["hi":3, "yo":1], ["yo":1, "sup":2]), -1)
+  }
 }

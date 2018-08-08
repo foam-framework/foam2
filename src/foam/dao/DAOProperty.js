@@ -29,6 +29,7 @@ foam.CLASS({
       name: 'view',
       value: {class: 'foam.comics.InlineBrowserView'},
     },
+    ['transient', true],
     ['of', 'foam.dao.DAO']
   ],
 
