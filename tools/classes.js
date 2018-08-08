@@ -261,6 +261,7 @@ var classes = [
   'foam.nanos.jetty.HttpServer',
   'foam.nanos.servlet.ServletMapping',
   'foam.nanos.servlet.ErrorPageMapping',
+  'foam.nanos.servlet.FilterMapping',
 
   'foam.lib.query.TestModel',
   'foam.lib.query.FooEnum',
@@ -277,7 +278,8 @@ var classes = [
   'foam.nanos.dig.exception.ParsingErrorException',
   'foam.nanos.dig.exception.DAOPutException',
   'foam.nanos.dig.exception.EmptyDataException',
-  'foam.nanos.dig.exception.UnsupportException'
+  'foam.nanos.dig.exception.UnsupportException',
+  'foam.nanos.dig.exception.UnknownIdException'
 ];
 
 var abstractClasses = [
