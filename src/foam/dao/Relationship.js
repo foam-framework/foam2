@@ -387,7 +387,7 @@ foam.CLASS({
       javaCode: `getJunctionDAO()
               .put(createJunction(((foam.core.Identifiable)target)
               .getPrimaryKey()));`,
-      swiftCode: `try junctionDAO!
+      swiftCode: `_ = try junctionDAO!
               .put(createJunction((target as? foam_core_Identifiable)?
               .getPrimaryKey()))`,
       code: function add(target) {
@@ -399,7 +399,7 @@ foam.CLASS({
       javaCode: `getJunctionDAO()
               .remove(createJunction(((foam.core.Identifiable)target)
               .getPrimaryKey()));`,
-      swiftCode: `try junctionDAO!
+      swiftCode: `_ = try junctionDAO!
               .remove(createJunction((target as? foam_core_Identifiable)?
               .getPrimaryKey()))`,
       code: function remove(target) {
@@ -685,10 +685,17 @@ foam.CLASS({
         name: this.propertyName,
         of: 'foam.dao.ManyToManyRelationship',
         flags: ['swift', 'js'],
+        transient: true,
         getter: function() {
           return this[methodName](this.__context__);
         },
-        swiftGetter: `return ${methodName}(__context__)`,
+        setter: function() {
+          // NOOP
+        },
+        swiftGetter: `
+          return ${methodName}(__context__)
+        `,
+        swiftSetter: '// NOOP',
       }));
     },
   ]
