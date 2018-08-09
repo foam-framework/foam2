@@ -262,7 +262,6 @@ foam.LIB({
 
     /** Finds the function(...) declaration arguments part. Strips newlines. */
     function argsStr(f) {
-      if ( f.args ) return f.args.join(',');
       var str = f.
           toString().
           replace(/(\r\n|\n|\r)/gm,'');
