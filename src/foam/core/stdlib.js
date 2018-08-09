@@ -276,6 +276,9 @@ foam.LIB({
           match = str.match(/^(async )?function(\s+[_$\w]+|\s*)\((.*?)\)/);
 
       if ( ! match ) {
+        // MultiMethods have their own toString that fail the regexes but we
+        // don't want to throw every time they're encountered.
+        if ( str.match(/^foam.mmethod/) ) return '';
         /* istanbul ignore next */
         throw new TypeError("foam.Function.argsStr could not parse input function:\n" + ( f ? f.toString() : 'undefined' ) );
       }
