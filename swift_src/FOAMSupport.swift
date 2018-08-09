@@ -637,8 +637,8 @@ public class ParserContext {
 }
 
 extension foam_dao_DAO {
-  public func select() throws -> foam_dao_Sink {
-    return try select(Context.GLOBAL.create(foam_dao_ArraySink.self)!)
+  public func select() throws -> foam_dao_ArraySink {
+    return try select(Context.GLOBAL.create(foam_dao_ArraySink.self)!) as! foam_dao_ArraySink
   }
 }
 

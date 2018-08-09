@@ -1862,11 +1862,20 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj, sub) {
-      if ( ! this.hasOwnProperty('value') || foam.util.compare(this.value, this.arg1.f(obj)) < 0 ) {
-        this.value = this.arg1.f(obj);
-      }
-    }
+    {
+      name: 'put',
+      code: function(obj, sub) {
+        if ( ! this.hasOwnProperty('value') || foam.util.compare(this.value, this.arg1.f(obj)) < 0 ) {
+          this.value = this.arg1.f(obj);
+        }
+      },
+      swiftCode: `
+        let arg1 = self.arg1 as! foam_mlang_Expr
+        if !hasOwnProperty("value") || FOAM_utils.compare(value, arg1.f(obj)) < 0 {
+          value = arg1.f(obj);
+        }
+      `
+    },
   ]
 });
 

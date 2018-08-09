@@ -685,10 +685,17 @@ foam.CLASS({
         name: this.propertyName,
         of: 'foam.dao.ManyToManyRelationship',
         flags: ['swift', 'js'],
+        transient: true,
         getter: function() {
           return this[methodName](this.__context__);
         },
-        swiftGetter: `return ${methodName}(__context__)`,
+        setter: function() {
+          // NOOP
+        },
+        swiftGetter: `
+          return ${methodName}(__context__)
+        `,
+        swiftSetter: '// NOOP',
       }));
     },
   ]
