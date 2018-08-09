@@ -134,7 +134,7 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertNotEqual(tRemoved, tToRemove)
     XCTAssertEqual(tRemoved, t1)
 
-    let sink = (try? dao.select()) as! foam_dao_ArraySink
+    let sink = (try? dao.select())!
     XCTAssertEqual(sink.array as! [somepackage_Test], [t2])
   }
 
@@ -201,7 +201,7 @@ class SwiftTestsTests: XCTestCase {
       _ = (try? dao.put(somepackage_Test(["firstName": i])))
     }
 
-    let sink = (try? dao.skip(2).limit(5).select()) as! foam_dao_ArraySink
+    let sink = (try? dao.skip(2).limit(5).select())!
     XCTAssertEqual(sink.array.count, 5)
     XCTAssertEqual("3", (sink.array[0] as! somepackage_Test).firstName)
   }
@@ -517,7 +517,7 @@ class SwiftTestsTests: XCTestCase {
       pDao.promise.set(dao)
     }
 
-    let a = try? pDao.select() as! foam_dao_ArraySink
+    let a = try? pDao.select()
     XCTAssertEqual(a?.array.count, 2)
   }
 
