@@ -47,6 +47,24 @@ foam.INTERFACE({
           swiftType: 'String'
         }
       ]
+    },
+    {
+      name: 'disable',
+      returns: 'Promise',
+      javaReturns: 'boolean',
+      swiftReturns: 'Bool',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X',
+          swiftType: 'Context'
+        },
+        {
+          name: 'token',
+          javaType: 'String',
+          swiftType: 'String'
+        }
+      ]
     }
   ]
 });

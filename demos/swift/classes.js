@@ -5,9 +5,6 @@
  */
 
 var classes = [
-  'somepackage.TestApp',
-  'somepackage.TestDetailView',
-  'somepackage.TestExtended',
   'foam.box.Box',
   'foam.box.BoxRegistry',
   'foam.box.BoxService',
@@ -32,6 +29,7 @@ var classes = [
   'foam.swift.dao.ArrayDAO',
   'foam.swift.dao.CachingDAO',
   'foam.swift.parse.StringPStream',
+  'foam.swift.type.Util',
   'foam.swift.ui.DAOTableViewSource',
   'foam.swift.ui.DetailView',
   'foam.swift.ui.FOAMUILabel',
@@ -40,6 +38,21 @@ var classes = [
   'foam.swift.ui.PropertyView',
   'foam.swift.ui.ScrollingViewController',
   'foam.u2.Visibility',
+  'somepackage.TestApp',
+  'somepackage.TestDetailView',
+  'somepackage.TestExtended',
+
+  'foam.dao.ManyToManyRelationshipDAO',
+  'foam.dao.ManyToManyRelationshipImpl',
+  'foam.dao.ReadOnlyDAO',
+  'foam.dao.RelationshipDAO',
+  'foam.dao.SequenceNumberDAO',
+  'foam.mlang.ArrayConstant',
+  'foam.nanos.demo.relationship.Course',
+  'foam.nanos.demo.relationship.CourseType',
+  'foam.nanos.demo.relationship.Professor',
+  'foam.nanos.demo.relationship.Student',
+  'foam.nanos.demo.relationship.StudentCourseJunction',
 ];
 
 module.exports = {
