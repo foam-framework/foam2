@@ -262,6 +262,7 @@ foam.LIB({
 
     /** Finds the function(...) declaration arguments part. Strips newlines. */
     function argsStr(f) {
+      if ( f.args ) return f.args.join(',');
       var str = f.
           toString().
           replace(/(\r\n|\n|\r)/gm,'');
@@ -276,9 +277,6 @@ foam.LIB({
           match = str.match(/^(async )?function(\s+[_$\w]+|\s*)\((.*?)\)/);
 
       if ( ! match ) {
-        // MultiMethods have their own toString that fail the regexes but we
-        // don't want to throw every time they're encountered.
-        if ( str.match(/^foam.mmethod/) ) return '';
         /* istanbul ignore next */
         throw new TypeError("foam.Function.argsStr could not parse input function:\n" + ( f ? f.toString() : 'undefined' ) );
       }
@@ -885,6 +883,7 @@ foam.LIB({
 
         return `foam.mmethod(${mapString}, ${defaultMethodStr})`;
       };
+      f.args = [];
       return f;
     }
   ]
