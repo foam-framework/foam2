@@ -92,6 +92,10 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'swiftSetter',
+    },
+    {
+      class: 'String',
       name: 'swiftPreSet',
       expression: function() {
         return 'return newValue';
@@ -202,7 +206,7 @@ foam.CLASS({
         name: this.swiftVarName,
         type: this.swiftType,
         getter: this.swiftGetter || this.swiftGetterTemplate(),
-        setter: this.swiftSetter(),
+        setter: this.swiftSetter || this.swiftSetterTemplate(),
       }));
       cls.fields.push(this.Field.create({
         visibility: 'private',
@@ -339,7 +343,7 @@ return s
       */},
     },
     {
-      name: 'swiftSetter',
+      name: 'swiftSetterTemplate',
       template: function() {/*
 self.set(key: "<%=this.name%>", value: value)
       */},
@@ -414,11 +418,14 @@ class PInfo: PropertyInfo {
   public func set(_ obj: foam_core_FObject, value: Any?) {
     let obj = obj as! <%=parentCls.model_.swiftName%>
 <% var p = this %>
-<% if ( p.swiftExpression ) { %>
+<% if ( p.swiftSetter ) { %>
+    obj.<%=this.swiftVarName%> = value<%if (this.swiftType != 'Any?') {%> as! <%=this.swiftType%><%}%>
+<% } else { %>
+  <% if ( p.swiftExpression ) { %>
     if obj.<%= p.swiftExpressionSubscriptionName %> != nil {
       for s in obj.<%=p.swiftExpressionSubscriptionName%>! { s.detach() }
     }
-<% } %>
+  <% } %>
     let oldValue: Any? = obj.<%=p.swiftInitedName%> ? obj.`<%=p.name%>` : nil
     obj.<%=p.swiftValueName%> = obj.<%=p.swiftPreSetFuncName%>(oldValue, obj.<%=p.swiftAdaptFuncName%>(oldValue, value))
     obj.<%=p.swiftInitedName%> = true
@@ -426,6 +433,7 @@ class PInfo: PropertyInfo {
     if obj.hasListeners(["propertyChange", "<%=p.name%>"]) && !FOAM_utils.equals(oldValue, obj.<%=p.swiftValueName%>) {
       _ = obj.pub(["propertyChange", "<%=p.name%>", obj.<%=p.swiftSlotName%>])
     }
+<% } %>
   }
   public func get(_ obj: foam_core_FObject) -> Any? {
     let obj = obj as! <%=parentCls.model_.swiftName%>
@@ -682,4 +690,110 @@ return newValue as! ${swiftType}
       },
     },
   ],
+});
+
+foam.CLASS({
+  refines: 'foam.core.MultiPartID',
+  properties: [
+    {
+      name: 'swiftGetter',
+      expression: function(propNames) {
+        return `
+let propNames = ${foam.swift.stringify(propNames)}
+var args = [String:Any?]()
+for propName in propNames {
+  let pInfo = self.ownClassInfo().axiom(byName: propName) as! PropertyInfo
+  args[propName] = pInfo.get(self)
+}
+return self.__subContext__.create(${this.of.model_.swiftName}.self, args: args)!
+        `
+      },
+    },
+    {
+      name: 'swiftSetter',
+      expression: function(propNames) {
+        return `
+let propNames = ${foam.swift.stringify(propNames)}
+for propName in propNames {
+  let selfPInfo = self.ownClassInfo().axiom(byName: propName) as! PropertyInfo
+  let valuePInfo = value!.ownClassInfo().axiom(byName: propName) as! PropertyInfo
+  selfPInfo.set(self, value: valuePInfo.get(value!))
+}
+        `
+      },
+    },
+  ],
+})
+
+foam.CLASS({
+  refines: 'foam.core.IDAlias',
+  properties: [
+    {
+      name: 'swiftGetter',
+      expression: function(targetProperty) {
+        return `
+return Swift.type(of: self).${targetProperty.swiftAxiomName}().get(self)
+        `
+      },
+    },
+    {
+      name: 'swiftSetter',
+      expression: function(targetProperty) {
+        return `
+return Swift.type(of: self).${targetProperty.swiftAxiomName}().set(self, value: value)
+        `
+      },
+    },
+  ],
+})
+
+foam.CLASS({
+  refines: 'foam.core.Reference',
+  flags: [ 'swift' ],
+  properties: [
+    {
+      // TODO: copied from java refinements.
+      name: 'referencedProperty',
+      transient: true,
+      factory: function() {
+        var idProp = this.of.ID.cls_ == foam.core.IDAlias ? this.of.ID.targetProperty : this.of.ID;
+
+        idProp = idProp.clone();
+        idProp.name = this.name;
+
+        return idProp;
+      }
+    },
+    {
+      name: 'swiftType',
+      factory: function() { return this.referencedProperty.swiftType; }
+    },
+    {
+      name: 'swiftJsonParser',
+      factory: function() { return this.referencedProperty.swiftJsonParser; }
+    },
+  ],
+
+  methods: [
+    function writeToSwiftClass(cls, parentCls) {
+      this.SUPER(cls, parentCls);
+      cls.method(this.Method.create({
+        name: `find${foam.String.capitalize(this.name)}`,
+        visibility: 'public',
+        returnType: this.of.model_.swiftName,
+        throws: true,
+        args: [
+          this.Argument.create({
+            localName: 'x',
+            externalName: '_',
+            type: 'Context'
+          })
+        ],
+        body: `
+let dao = x["${this.targetDAOKey}"] as! foam_dao_DAO
+return try dao.find_(x, ${this.swiftVarName}) as! ${this.of.model_.swiftName}
+        `
+      }));
+    }
+  ]
 });

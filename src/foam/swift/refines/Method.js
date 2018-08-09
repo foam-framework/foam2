@@ -170,8 +170,7 @@ foam.CLASS({
           throws: this.swiftThrows,
           returnType: this.swiftReturns,
           args: this.swiftArgs,
-          visibility: this.swiftVisibility,
-          override: this.getSwiftOverride(parentCls),
+          visibility: 'private',
           annotations: this.swiftAnnotations,
         }));
         cls.method(this.Method.create({
@@ -272,6 +271,7 @@ return <%=foam.swift.core.ConstantSlot.model_.swiftName%>([
       template: function() {/*
 <%=this.swiftSynchronizedSemaphoreName%>.wait()
 <%if (this.swiftReturns) {%>let ret = <%}%><%=
+    this.swiftThrows ? 'try ' : ''%><%=
     this.swiftSynchronizedMethodName%>(<%=
         this.swiftArgs.map(function(a) { return a.localName }).join(',')%>)
 <%=this.swiftSynchronizedSemaphoreName%>.signal()
