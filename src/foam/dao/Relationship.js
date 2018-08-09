@@ -689,9 +689,13 @@ foam.CLASS({
         getter: function() {
           return this[methodName](this.__context__);
         },
+        setter: function() {
+          // NOOP
+        },
         swiftGetter: `
           return ${methodName}(__context__)
         `,
+        swiftSetter: '// NOOP',
       }));
     },
   ]
