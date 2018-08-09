@@ -71,7 +71,7 @@ foam.CLASS({
         }
       ],
       swiftReturns: 'Void',
-      swiftCode: `delegate.put(f(obj), sub)`
+      swiftCode: `delegate.put(f(obj)!, sub)`
 
     }
   ]
