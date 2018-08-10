@@ -118,7 +118,15 @@ foam.CLASS({
     },
     {
       class: 'Map',
+      name: 'sourceMethod'
+    },
+    {
+      class: 'Map',
       name: 'targetProperty'
+    },
+    {
+      class: 'Map',
+      name: 'targetMethod'
     },
     /* FUTURE:
     {
@@ -154,8 +162,10 @@ foam.CLASS({
           propertyName: forwardName,
           target: target,
           targetPropertyName: inverseName,
-          targetDAOKey: targetDAOKey
-        }).copyFrom(this.sourceProperty);
+          targetDAOKey: targetDAOKey,
+          propertyOverrides: this.sourceProperty,
+          methodOverrides: this.sourceMethod,
+        });
 
         targetProp = foam.core.Reference.create({
           name: inverseName,
@@ -197,8 +207,10 @@ foam.CLASS({
           junctionDAOKey: junctionDAOKey,
           targetDAOKey: targetDAOKey,
           targetProperty: junction.TARGET_ID,
-          sourceProperty: junction.SOURCE_ID
-        }).copyFrom(this.sourceProperty);
+          sourceProperty: junction.SOURCE_ID,
+          propertyOverrides: this.sourceProperty,
+          methodOverrides: this.sourceMethod,
+        });
 
           // Same as sourceProp except we swap target/source so that this relationship
           // works in the opposite direction.
@@ -208,8 +220,10 @@ foam.CLASS({
           junctionDAOKey: junctionDAOKey,
           targetDAOKey: sourceDAOKey,
           targetProperty: junction.SOURCE_ID,
-          sourceProperty: junction.TARGET_ID
-        }).copyFrom(this.targetProperty);
+          sourceProperty: junction.TARGET_ID,
+          propertyOverrides: this.targetProperty,
+          methodOverrides: this.targetMethod,
+        });
       }
 
       source.installAxiom(sourceProp);
@@ -535,6 +549,14 @@ foam.CLASS({
       class: 'String',
       name: 'targetDAOKey'
     },
+    {
+      class: 'Map',
+      name: 'propertyOverrides'
+    },
+    {
+      class: 'Map',
+      name: 'methodOverrides'
+    },
   ],
   methods: [
     function installInClass(cls) {
@@ -543,12 +565,12 @@ foam.CLASS({
         target: this.target,
         targetPropertyName: this.targetPropertyName,
         targetDAOKey: this.targetDAOKey,
-      }));
+      }).copyFrom(this.methodOverrides));
 
       cls.installAxiom(this.OneToManyRelationshipProperty.create({
         name: this.propertyName,
         methodName: this.methodName,
-      }));
+      }).copyFrom(this.propertyOverrides));
     },
   ]
 });
@@ -557,8 +579,11 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'OneToManyRelationshipProperty',
   extends: 'foam.dao.DAOProperty',
-  flags: ['swift', 'js'],
   properties: [
+    {
+      name: 'flags',
+      value: ['swift', 'js'],
+    },
     {
       name: 'methodName',
     },
@@ -690,6 +715,14 @@ foam.CLASS({
       name: 'targetDAOKey'
     },
     'targetProperty',
+    {
+      class: 'Map',
+      name: 'propertyOverrides'
+    },
+    {
+      class: 'Map',
+      name: 'methodOverrides'
+    },
   ],
 
   methods: [
@@ -701,11 +734,11 @@ foam.CLASS({
         junctionDAOKey: this.junctionDAOKey,
         junction: this.junction,
         name: this.methodName,
-      }));
+      }).copyFrom(this.methodOverrides));
       cls.installAxiom(this.ManyToManyRelationshipProperty.create({
         name: this.propertyName,
         methodName: this.methodName,
-      }));
+      }).copyFrom(this.propertyOverrides));
     },
   ]
 });
@@ -789,8 +822,11 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'ManyToManyRelationshipProperty',
   extends: 'FObjectProperty',
-  flags: ['swift', 'js'],
   properties: [
+    {
+      name: 'flags',
+      value: ['swift', 'js'],
+    },
     {
       name: 'of',
       value: 'foam.dao.ManyToManyRelationship',
