@@ -739,8 +739,8 @@ foam.CLASS({
     {
       name: 'code',
       factory: function() {
+        var self = this;
         return function(x) {
-          var self = this;
           return foam.dao.ManyToManyRelationshipImpl.create({
             sourceId: this.id,
             sourceProperty: self.sourceProperty,
