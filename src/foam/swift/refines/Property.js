@@ -161,7 +161,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftToJSON',
-      value: 'outputter.output(&out, value)',
+      value: 'outputter.output(out, value)',
     },
     {
       class: 'Boolean',
@@ -476,7 +476,7 @@ class PInfo: PropertyInfo {
     return nil
 <% } %>
   }
-  public func toJSON(outputter: <%=foam.swift.parse.json.output.Outputter.model_.swiftName%>, out: inout String, value: Any?) {
+  public func toJSON(outputter: <%=foam.swift.parse.json.output.Outputter.model_.swiftName%>, out: foam_json2_Outputter, value: Any?) {
     <%=p.swiftToJSON%>
   }
 }
