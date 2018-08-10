@@ -41,9 +41,6 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'swiftMutable',
-      expression: function(swiftAnnotations) {
-        return swiftAnnotations.indexOf('inout') != -1;
-      },
     },
     {
       class: 'String',
