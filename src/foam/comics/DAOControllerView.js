@@ -29,10 +29,27 @@ foam.CLASS({
 
   // TODO: wrong class name, fix when ActionView fixed.
   css: `
+    ^ {
+      display: flex;
+    }
+
+    ^ > * {
+      margin-left: 10px;
+    }
+
+    ^ > *:last-child {
+      margin-right: 10px;
+    }
+
+    ^ .actions {
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
     ^ .net-nanopay-ui-ActionView {
       background: #59aadd;
       color: white;
-      margin-right: 4px;
+      margin-right: 10px;
     }
   `,
 
@@ -77,20 +94,17 @@ foam.CLASS({
 
       this.
         addClass(this.myClass()).
-        start('table').
-          start('tr').
-            start('td').style({display: 'block', padding: '8px'}).add(this.cls.PREDICATE).end().
-            start('td').style({'vertical-align': 'top', 'width': '100%'}).
-              start('span').
-                style({background: 'rgba(0,0,0,0)'}).
-                show(self.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
-                  start().
-                    style({padding: '4px 4px 4px 1px'}).
-                    add(self.cls.getAxiomsByClass(foam.core.Action)).
-                  end().
-                end().
-              tag(this.summaryView, {data$: this.data.filteredDAO$}).
-            end().
+        start().add(this.cls.PREDICATE).end().
+        start().
+          style({ 'overflow-x': 'auto' }).
+          start().
+            addClass('actions').
+            show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW)).
+              start().add(self.cls.getAxiomsByClass(foam.core.Action)).end().
+          end().
+          start().
+            style({ 'overflow-x': 'auto' }).
+            tag(this.summaryView, { data$: this.data.filteredDAO$ }).
           end().
         end();
     },
