@@ -2,7 +2,14 @@ foam.CLASS({
   package: 'foam.json2',
   name: 'PrettyOutputterOutput',
   extends: 'foam.json2.ProxyOutputterOutput',
+  requires: [
+    'foam.json2.SimpleOutputterOutput',
+  ],
   properties: [
+    {
+      name: 'delegate',
+      factory: function() { return this.SimpleOutputterOutput.create() },
+    },
     {
       class: 'Int',
       name: 'indent',
@@ -97,7 +104,7 @@ foam.CLASS({
     },
     {
       name: 'out',
-      code: function() {
+      code: function(s) {
         this.e()
         this.delegate.out(s)
       },
