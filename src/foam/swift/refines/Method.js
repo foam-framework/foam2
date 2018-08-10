@@ -53,20 +53,9 @@ foam.CLASS({
       name: 'swiftThrows',
     },
     {
-      class: 'FObjectArray',
-      of: 'foam.core.Argument',
-      name: 'args',
-      adaptArrayElement: function(o, prop) {
-        var Argument = foam.lookup('foam.core.Argument');
-        return typeof o === 'string' ? Argument.create({name: o}) :
-            Argument.create(o);
-      },
-    },
-    {
       name: 'swiftArgs',
       expression: function(args) {
        return args.map(function(a) {
-          if ( ! a.toSwiftArg ) debugger;
           return this.Argument.create(a).toSwiftArg()
         }.bind(this));
       },
@@ -244,21 +233,18 @@ foam.CLASS({
       name: 'slotInit',
       args: [],
       template: function() {/*
-<%
-var isMutable = function(a) { return a.annotations.indexOf('inout') != -1 };
-%>
 return <%=foam.swift.core.ConstantSlot.model_.swiftName%>([
   "value": { [weak self] (args: [Any?]) throws -> Any? in
     if self == nil { fatalError() }
 <% this.swiftArgs.forEach(function(a, i) { %>
-    <%=isMutable(a) ? 'var' : 'let' %> <%
+    <%=a.mutable ? 'var' : 'let' %> <%
   %><%=a.localName%> = args[<%=i%>] as<%=!a.type.match(/^Any\??$/) ? '!' : ''%> <%=a.type%>
 <% }) %>
 
     return <%=this.swiftThrows ? 'try ' : ''%>self!.`<%=this.swiftName%>`(
         <%=this.swiftArgs.map(function(a){
           return (a.externalName != '_' ? a.externalName + ': ' : '') +
-                 (isMutable(a) ? '&' : '') +
+                 (a.mutable ? '&' : '') +
                  a.localName
         }).join(', ')%>)
   }
