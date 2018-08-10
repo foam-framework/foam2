@@ -65,7 +65,7 @@ foam.CLASS({
   properties: [
     {
       name: 'swiftToJSON',
-      value: `outputter.output(&out, (value as? foam_core_AbstractEnum)?.ordinal ?? nil)`
+      value: `outputter.output(out, (value as? foam_core_AbstractEnum)?.ordinal ?? nil)`
     }
   ]
 });
