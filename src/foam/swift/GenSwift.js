@@ -28,7 +28,6 @@ foam.CLASS({
       name: 'coreModels',
       value: [
         'foam.core.EventProxy',
-        'foam.json2.SimpleOutputterOutput', // TODO figure out why this isn't picked up automatically.
         'foam.mlang.order.Comparator',
         'foam.mlang.predicate.Predicate',
         'foam.swift.core.ConstantSlot',

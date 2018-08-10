@@ -135,6 +135,8 @@ FOAM_FILES([
   { name: "foam/java/refinements", flags: ['java'] },
 
   { name: "foam/json2/Outputter" },
+  { name: "foam/json2/OutputterOutput" },
+  { name: "foam/json2/SimpleOutputterOutput" },
   { name: "foam/json2/Deserializer" },
   { name: "foam/json2/Serializer" },
 
