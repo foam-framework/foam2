@@ -33,6 +33,10 @@ foam.CLASS({
       factory: function() { return []; }
     },
     {
+      class: 'StringArray',
+      name: 'imports'
+    },
+    {
       class: 'FObjectArray',
       of: 'foam.swift.ProtocolMethod',
       name: 'methods',
@@ -59,6 +63,7 @@ foam.CLASS({
     function outputSwift(o) {
       o.indent();
       o.out('// GENERATED CODE. DO NOT MODIFY BY HAND.\n');
+      this.imports.forEach(function(i) { o.out('import ', i, '\n') });
       o.out(
         this.visibility,
         this.visibility ? ' ' : '',
