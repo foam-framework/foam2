@@ -53,7 +53,7 @@ public protocol PropertyInfo: Axiom, SlotGetterAxiom, SlotSetterAxiom, GetterAxi
   func viewFactory(x: Context) -> foam_core_FObject?
   func hasOwnProperty(_ o: foam_core_FObject) -> Bool
   func clearProperty(_ o: foam_core_FObject)
-  func toJSON(outputter: foam_swift_parse_json_output_Outputter, out: inout String, value: Any?)
+  func toJSON(outputter: foam_swift_parse_json_output_Outputter, out: foam_json2_Outputter, value: Any?)
 }
 extension PropertyInfo {
   public func f(_ obj: Any?) -> Any? {
@@ -68,7 +68,7 @@ extension PropertyInfo {
 }
 
 public protocol JSONOutputter {
-  func toJSON(outputter: foam_swift_parse_json_output_Outputter, out: inout String)
+  func toJSON(outputter: foam_swift_parse_json_output_Outputter, out: foam_json2_Outputter)
 }
 
 extension PropertyInfo {
@@ -449,8 +449,8 @@ public class AbstractFObject: NSObject, foam_core_FObject, ContextAware {
     return super.isEqual(object)
   }
 
-  public func toJSON(outputter: foam_swift_parse_json_output_Outputter, out: inout String) {
-    outputter.outputFObject(&out, self)
+  public func toJSON(outputter: foam_swift_parse_json_output_Outputter, out: foam_json2_Outputter) {
+    outputter.outputFObject(out, self)
   }
 }
 
