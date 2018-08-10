@@ -32,7 +32,7 @@ foam.CLASS({
       name: 'outputProperty',
       args: [
         {
-          swiftAnnotations: ['inout'],
+          swiftMutable: true,
           swiftType: 'String',
           name: 'out',
         },
@@ -70,7 +70,7 @@ return data.replacingOccurrences(of: "\"", with: "\\\"")
       name: 'outputNil',
       args: [
         {
-          swiftAnnotations: ['inout'],
+          swiftMutable: true,
           swiftType: 'String',
           name: 'out',
         },
@@ -83,7 +83,7 @@ out.append("null")
       name: 'outputString',
       args: [
         {
-          swiftAnnotations: ['inout'],
+          swiftMutable: true,
           swiftType: 'String',
           name: 'out',
         },
@@ -102,7 +102,7 @@ out.append("\"")
       name: 'outputBoolean',
       args: [
         {
-          swiftAnnotations: ['inout'],
+          swiftMutable: true,
           swiftType: 'String',
           name: 'out',
         },
@@ -119,7 +119,7 @@ out.append(data ? "true" : "false")
       name: 'outputMap',
       args: [
         {
-          swiftAnnotations: ['inout'],
+          swiftMutable: true,
           swiftType: 'String',
           name: 'out',
         },
@@ -143,7 +143,7 @@ out.append("}")
       name: 'outputArray',
       args: [
         {
-          swiftAnnotations: ['inout'],
+          swiftMutable: true,
           swiftType: 'String',
           name: 'out',
         },
@@ -165,7 +165,7 @@ out.append("]")
       name: 'outputNumber',
       args: [
         {
-          swiftAnnotations: ['inout'],
+          swiftMutable: true,
           swiftType: 'String',
           name: 'out',
         },
@@ -182,7 +182,7 @@ out.append(data.stringValue)
       name: 'outputDate',
       args: [
         {
-          swiftAnnotations: ['inout'],
+          swiftMutable: true,
           swiftType: 'String',
           name: 'out'
         },
@@ -201,7 +201,7 @@ out.append("\"\(formatter.string(from: data))\"")
       name: 'output',
       args: [
         {
-          swiftAnnotations: ['inout'],
+          swiftMutable: true,
           swiftType: 'String',
           name: 'out',
         },
@@ -241,7 +241,7 @@ if let data = data as? JSONOutputter {
       name: 'outputClassInfo',
       args: [
         {
-          swiftAnnotations: ['inout'],
+          swiftMutable: true,
           swiftType: 'String',
           name: 'out',
         },
@@ -266,7 +266,7 @@ out.append("}");
       name: 'outputPropertyInfo',
       args: [
         {
-          swiftAnnotations: ['inout'],
+          swiftMutable: true,
           swiftType: 'String',
           name: 'out',
         },
@@ -295,7 +295,7 @@ out.append("}");
       name: 'outputFObject',
       args: [
         {
-          swiftAnnotations: ['inout'],
+          swiftMutable: true,
           swiftType: 'String',
           name: 'out',
         },
