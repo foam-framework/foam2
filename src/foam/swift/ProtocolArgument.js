@@ -15,6 +15,7 @@ foam.CLASS({
         this.externalName != this.localName ? ' ' + this.localName : '',
         ': ',
         this.mutable ? 'inout ' : '',
+        this.annotations.length ? this.annotations.join(' ') + ' ' : '',
         this.type);
     }
   ]
