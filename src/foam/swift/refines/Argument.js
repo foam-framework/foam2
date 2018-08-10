@@ -30,6 +30,10 @@ foam.CLASS({
       name: 'swiftAnnotations',
     },
     {
+      class: 'Boolean',
+      name: 'swiftMutable',
+    },
+    {
       class: 'String',
       name: 'swiftType',
       expression: function(of, optional) {
@@ -45,6 +49,7 @@ foam.CLASS({
         externalName: this.swiftExternalName,
         type: this.swiftType,
         annotations: this.swiftAnnotations,
+        mutable: this.swiftMutable,
       });
       if (this.swiftDefaultValue) arg.defaultValue = this.swiftDefaultValue;
       return arg;
