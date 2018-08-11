@@ -7,17 +7,10 @@
 foam.CLASS({
   package: 'foam.swift.parse.json.output',
   name: 'Outputter',
+  requires: [
+    'foam.json2.Outputter',
+  ],
   properties: [
-    {
-      name: 'beforeKey',
-      class: 'String',
-      value: '"',
-    },
-    {
-      name: 'afterKey',
-      class: 'String',
-      value: '"',
-    },
     {
       swiftType: '((foam_core_FObject, PropertyInfo) -> Bool)',
       swiftRequiresEscaping: true,
@@ -29,180 +22,10 @@ foam.CLASS({
   ],
   methods: [
     {
-      name: 'outputProperty',
-      args: [
-        {
-          swiftAnnotations: ['inout'],
-          swiftType: 'String',
-          name: 'out',
-        },
-        {
-          of: 'FObject',
-          name: 'o',
-        },
-        {
-          swiftType: 'PropertyInfo',
-          name: 'p',
-        },
-      ],
-      swiftCode: function() {/*
-out.append(beforeKey)
-out.append(p.name)
-out.append(afterKey)
-out.append(":")
-p.toJSON(outputter: self, out: &out, value: p.get(o))
-      */},
-    },
-    {
-      name: 'escape',
-      args: [
-        {
-          swiftType: 'String',
-          name: 'data',
-        },
-      ],
-      swiftReturns: 'String',
-      swiftCode: function() {/*
-return data.replacingOccurrences(of: "\"", with: "\\\"")
-      */},
-    },
-    {
-      name: 'outputNil',
-      args: [
-        {
-          swiftAnnotations: ['inout'],
-          swiftType: 'String',
-          name: 'out',
-        },
-      ],
-      swiftCode: function() {/*
-out.append("null")
-      */},
-    },
-    {
-      name: 'outputString',
-      args: [
-        {
-          swiftAnnotations: ['inout'],
-          swiftType: 'String',
-          name: 'out',
-        },
-        {
-          swiftType: 'String',
-          name: 'data',
-        },
-      ],
-      swiftCode: function() {/*
-out.append("\"")
-out.append(escape(data))
-out.append("\"")
-      */},
-    },
-    {
-      name: 'outputBoolean',
-      args: [
-        {
-          swiftAnnotations: ['inout'],
-          swiftType: 'String',
-          name: 'out',
-        },
-        {
-          swiftType: 'Bool',
-          name: 'data',
-        },
-      ],
-      swiftCode: function() {/*
-out.append(data ? "true" : "false")
-      */},
-    },
-    {
-      name: 'outputMap',
-      args: [
-        {
-          swiftAnnotations: ['inout'],
-          swiftType: 'String',
-          name: 'out',
-        },
-        {
-          swiftType: '[String:Any?]',
-          name: 'data',
-        },
-      ],
-      swiftCode: function() {/*
-out.append("{")
-for (i, d) in data.keys.enumerated() {
-  outputString(&out, d)
-  out.append(":")
-  output(&out, data[d]!)
-  if i < data.count - 1 { out.append(",") }
-}
-out.append("}")
-      */},
-    },
-    {
-      name: 'outputArray',
-      args: [
-        {
-          swiftAnnotations: ['inout'],
-          swiftType: 'String',
-          name: 'out',
-        },
-        {
-          swiftType: '[Any?]',
-          name: 'data',
-        },
-      ],
-      swiftCode: function() {/*
-out.append("[")
-for (i, d) in data.enumerated() {
-  output(&out, d)
-  if i < data.count - 1 { out.append(",") }
-}
-out.append("]")
-      */},
-    },
-    {
-      name: 'outputNumber',
-      args: [
-        {
-          swiftAnnotations: ['inout'],
-          swiftType: 'String',
-          name: 'out',
-        },
-        {
-          swiftType: 'NSNumber',
-          name: 'data',
-        },
-      ],
-      swiftCode: function() {/*
-out.append(data.stringValue)
-      */},
-    },
-    {
-      name: 'outputDate',
-      args: [
-        {
-          swiftAnnotations: ['inout'],
-          swiftType: 'String',
-          name: 'out'
-        },
-        {
-          swiftType: 'Date',
-          name: 'data'
-        }
-      ],
-      swiftCode: function() {/*
-let formatter = DateFormatter()
-formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-out.append("\"\(formatter.string(from: data))\"")
-      */}
-    },
-    {
       name: 'output',
       args: [
         {
-          swiftAnnotations: ['inout'],
-          swiftType: 'String',
+          of: 'foam.json2.Outputter',
           name: 'out',
         },
         {
@@ -210,93 +33,61 @@ out.append("\"\(formatter.string(from: data))\"")
           name: 'data',
         },
       ],
-      swiftCode: function() {/*
+      swiftCode: `
 if let data = data as? JSONOutputter {
-  data.toJSON(outputter: self, out: &out)
+  data.toJSON(outputter: self, out: out)
 } else if let data = data as? ClassInfo {
-  outputClassInfo(&out, data)
+  _ = out.obj()
+    .key("class")
+    .s("__Class__")
+    .key("forClass_")
+    .s(data.id)
+    .end()
 } else if let data = data as? PropertyInfo {
-  outputPropertyInfo(&out, data)
+  _ = out.obj()
+    .key("class")
+    .s("__Property__")
+    .key("forClass_")
+    .s(data.classInfo.id)
+    .key("name")
+    .s(data.name)
+    .end()
 } else if let data = data as? String {
-  outputString(&out, data)
+  _ = out.s(data)
 } else if let data = data as? Bool {
-  outputBoolean(&out, data)
+  _ = out.b(data)
 } else if let data = data as? NSNumber {
-  outputNumber(&out, data)
+  _ = out.n(data)
 } else if let data = data as? [Any?] {
-  outputArray(&out, data)
+  _ = out.array()
+  for d in data {
+    output(out, d)
+  }
+  _ = out.end()
 } else if let data = data as? [String:Any?] {
-  outputMap(&out, data)
+  _ = out.obj()
+  for d in data.keys {
+    _ = out.key(d)
+    output(out, data[d]!)
+  }
+  _ = out.end()
 } else if let data = data as? Date {
-  outputDate(&out, data)
+  let formatter = DateFormatter()
+  formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+  _ = out.s(formatter.string(from: data))
 } else if data == nil {
-  outputNil(&out)
+  _ = out.nul()
 } else {
   NSLog("Unable to output %@", (data as AnyObject).description)
-  outputNil(&out)
+  _ = out.nul()
 }
-      */},
-    },
-    {
-      name: 'outputClassInfo',
-      args: [
-        {
-          swiftAnnotations: ['inout'],
-          swiftType: 'String',
-          name: 'out',
-        },
-        {
-          swiftType: 'ClassInfo',
-          name: 'data',
-        },
-      ],
-      swiftCode: function() {/*
-out.append("{");
-outputString(&out, "class");
-out.append(":");
-outputString(&out, "__Class__");
-out.append(",");
-outputString(&out, "forClass_");
-out.append(":");
-outputString(&out, data.id);
-out.append("}");
-      */},
-    },
-    {
-      name: 'outputPropertyInfo',
-      args: [
-        {
-          swiftAnnotations: ['inout'],
-          swiftType: 'String',
-          name: 'out',
-        },
-        {
-          swiftType: 'PropertyInfo',
-          name: 'data',
-        },
-      ],
-      swiftCode: function() {/*
-out.append("{");
-outputString(&out, "class");
-out.append(":");
-outputString(&out, "__Property__");
-out.append(",");
-outputString(&out, "forClass_");
-out.append(":");
-outputString(&out, data.classInfo.id);
-out.append(",");
-outputString(&out, "name");
-out.append(":");
-outputString(&out, data.name);
-out.append("}");
-      */},
+      `,
     },
     {
       name: 'outputFObject',
       args: [
         {
-          swiftAnnotations: ['inout'],
-          swiftType: 'String',
+          of: 'foam.json2.Outputter',
           name: 'out',
         },
         {
@@ -304,26 +95,22 @@ out.append("}");
           name: 'data',
         },
       ],
-      swiftCode: function() {/*
+      swiftCode: `
 let info = data.ownClassInfo()
-out.append("{")
+_ = out.obj()
 
-out.append(beforeKey)
-out.append("class")
-out.append(afterKey)
-out.append(":")
-outputString(&out, info.id)
+_ = out.key("class").s(info.id)
 
 for p in info.axioms(byType: PropertyInfo.self) {
   if !data.hasOwnProperty(p.name) { continue }
   if propertyPredicate(data, p) {
-    out.append(",")
-    outputProperty(&out, data, p)
+    _ = out.key(p.name)
+    p.toJSON(outputter: self, out: out, value: p.get(data))
   }
 }
 
-out.append("}");
-      */},
+_ = out.end()
+      `,
     },
     {
       // Can't call it stringify because that method is actually inherited so
@@ -336,11 +123,11 @@ out.append("}");
         },
       ],
       swiftReturns: 'String',
-      swiftCode: function() {/*
-var s = ""
-output(&s, data)
-return s
-      */},
+      swiftCode: `
+let s = Outputter_create()
+output(s, data)
+return s.out.output()
+      `,
     },
   ]
 });
