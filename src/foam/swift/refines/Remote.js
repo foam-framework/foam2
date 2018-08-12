@@ -34,7 +34,7 @@ foam.CLASS({
           this.Argument.create({
             localName: 'out',
             externalName: 'out',
-            type: 'inout String',
+            type: 'foam_json2_Outputter',
           }),
         ],
         body: this.swiftCode(),
@@ -56,7 +56,7 @@ box = registry.register(nil, nil, box)
 let obj = __context__.create(<%=cls.model_.swiftName%>.self)!
 obj.delegate = box;
 
-obj.toJSON(outputter: outputter, out: &out)
+obj.toJSON(outputter: outputter, out: out)
       `,
     },
   ]
