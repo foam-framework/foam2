@@ -18,6 +18,7 @@ foam.CLASS({
           var cls = foam.lookup('foam.swift.Protocol').create({
             name: m.swiftName,
             implements: impls,
+            imports: ['Foundation'],
           });
 
           var axioms = this.getAxioms();
@@ -57,7 +58,7 @@ foam.CLASS({
       missingMethods.forEach(function(m) {
         if (m.getSwiftOverride(parentCls)) return;
         var method = foam.core.Method.create(m);
-        method.swiftCode = 'fatalError()';
+        method.swiftCode = m.swiftCode;
         method.writeToSwiftClass_(cls, parentCls);
       });
     }
