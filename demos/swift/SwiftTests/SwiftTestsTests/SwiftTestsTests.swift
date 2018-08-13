@@ -134,7 +134,7 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertNotEqual(tRemoved, tToRemove)
     XCTAssertEqual(tRemoved, t1)
 
-    let sink = (try? dao.select()) as! foam_dao_ArraySink
+    let sink = (try? dao.select())!
     XCTAssertEqual(sink.array as! [somepackage_Test], [t2])
   }
 
@@ -201,7 +201,7 @@ class SwiftTestsTests: XCTestCase {
       _ = (try? dao.put(somepackage_Test(["firstName": i])))
     }
 
-    let sink = (try? dao.skip(2).limit(5).select()) as! foam_dao_ArraySink
+    let sink = (try? dao.skip(2).limit(5).select())!
     XCTAssertEqual(sink.array.count, 5)
     XCTAssertEqual("3", (sink.array[0] as! somepackage_Test).firstName)
   }
@@ -517,7 +517,7 @@ class SwiftTestsTests: XCTestCase {
       pDao.promise.set(dao)
     }
 
-    let a = try? pDao.select() as! foam_dao_ArraySink
+    let a = try? pDao.select()
     XCTAssertEqual(a?.array.count, 2)
   }
 
@@ -636,5 +636,122 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertEqual(u.compare(["sup":3, "yo":1], ["yo":1, "sup":2]), 1)
     XCTAssertEqual(u.compare(["yo":1, "sup":2], ["hi":3, "yo":1]), 1)
     XCTAssertEqual(u.compare(["hi":3, "yo":1], ["yo":1, "sup":2]), -1)
+  }
+
+  func testRelationship() throws {
+    var x = self.x
+    
+    x = Context.GLOBAL.createSubContext(args: [
+      "courseDAO": x.create(foam_swift_dao_ArrayDAO.self, args: [
+        "of": foam_nanos_demo_relationship_Course.classInfo()
+      ])!,
+      "professorDAO": x.create(foam_dao_SequenceNumberDAO.self, args: [
+        "delegate": x.create(foam_swift_dao_ArrayDAO.self, args: [
+          "of": foam_nanos_demo_relationship_Professor.classInfo()
+        ])!,
+      ])!,
+      "studentDAO": x.create(foam_dao_SequenceNumberDAO.self, args: [
+        "delegate": x.create(foam_swift_dao_ArrayDAO.self, args: [
+          "of": foam_nanos_demo_relationship_Student.classInfo()
+        ])!
+      ])!,
+      "studentCourseJunctionDAO": x.create(foam_swift_dao_ArrayDAO.self, args: [
+        "of": foam_nanos_demo_relationship_StudentCourseJunction.classInfo()
+      ])!,
+    ])
+
+    let studentDAO = (x["studentDAO"] as! foam_dao_DAO).inX(x)
+    let courseDAO = (x["courseDAO"] as! foam_dao_DAO).inX(x)
+    let professorDAO = (x["professorDAO"] as! foam_dao_DAO).inX(x)
+
+    _ = try studentDAO.put(x.create(foam_nanos_demo_relationship_Student.self, args: [
+      "name": "Adam"
+    ])!)
+    _ = try studentDAO.put(x.create(foam_nanos_demo_relationship_Student.self, args: [
+      "name": "Mike"
+    ])!)
+
+    _ = try courseDAO.put(x.create(foam_nanos_demo_relationship_Course.self, args: [
+      "code": "CS 101",
+      "title": "Intro to computer science",
+    ])!)
+    _ = try courseDAO.put(x.create(foam_nanos_demo_relationship_Course.self, args: [
+      "code": "CS 201",
+      "title": "Intro to computer science II",
+    ])!)
+
+    let donald = try professorDAO.put(x.create(foam_nanos_demo_relationship_Professor.self, args: [
+      "name": "Donald Knuth",
+    ])!) as! foam_nanos_demo_relationship_Professor
+    let alan = try professorDAO.put(x.create(foam_nanos_demo_relationship_Professor.self, args: [
+      "name": "Alan Kay",
+    ])!) as! foam_nanos_demo_relationship_Professor
+
+    let adam = try studentDAO.find(1) as! foam_nanos_demo_relationship_Student
+    let mike = try studentDAO.find(2) as! foam_nanos_demo_relationship_Student
+
+    let cs101 = try courseDAO.find("CS 101") as! foam_nanos_demo_relationship_Course
+    let cs201 = try courseDAO.find("CS 201") as! foam_nanos_demo_relationship_Course
+
+    // Assign professors
+    _ = try donald.getCourses(x).put(cs101)
+    _ = try alan.getCourses(x).put(cs201)
+
+    // Enroll students
+    _ = try cs101.getStudents(x).add(adam)
+    _ = try mike.getCourses(x).add(cs201)
+    _ = try mike.getCourses(x).add(cs101)
+
+    let course = cs101
+    try XCTAssertEqual(course.findProfessor(x).name, "Donald Knuth")
+
+    let donaldsCourses = try donald.getCourses(x).select().array as! [foam_nanos_demo_relationship_Course]
+    XCTAssertEqual(donaldsCourses[0].code, "CS 101")
+
+    let students = try course.getStudents(x).getDAO().select().array as! [foam_nanos_demo_relationship_Student]
+    XCTAssertEqual(students.count, 2)
+    XCTAssertEqual(students[0].name, "Adam")
+
+    let adamsCourses = try adam.getCourses(x).getDAO().select().array as! [foam_nanos_demo_relationship_Course]
+    XCTAssertEqual(adamsCourses.count, 1)
+    XCTAssertEqual(adamsCourses[0].code, "CS 101")
+
+    let mikesCourses = try mike.getCourses(x).getDAO().select().array as! [foam_nanos_demo_relationship_Course]
+    XCTAssertEqual(mikesCourses.count, 2)
+
+    var containsCourses = true;
+    let courseCodes = ["CS 101", "CS 201"]
+    for course in mikesCourses {
+      let code = course.code
+      containsCourses = containsCourses && courseCodes.contains(code);
+    }
+    XCTAssertTrue(containsCourses)
+
+    let printCourse = { (course: foam_nanos_demo_relationship_Course) -> Void in
+      let prof = try (x["professorDAO"] as! foam_dao_DAO).find(course.professor) as! foam_nanos_demo_relationship_Professor
+      print("");
+      print("**** " + course.code + " ****");
+      print("Instructor: " + prof.name)
+      print("");
+      print("*** Students ***");
+      let a = try course.getStudents(x).getDAO().select().array as! [foam_nanos_demo_relationship_Student]
+      for s in a { print(s.name) }
+      print("");
+    }
+
+    try printCourse(cs101)
+    try printCourse(cs201)
+
+    let printProfessor = { (professor: foam_nanos_demo_relationship_Professor) -> Void in
+      print("");
+      print("**** " + professor.name + " ****");
+      print("*** Courses ***");
+      let a = try professor.getCourses(x).select().array as! [foam_nanos_demo_relationship_Course]
+      for c in a { print(c.code) }
+      print("");
+    }
+
+    try printProfessor(alan)
+    try printProfessor(donald)
   }
 }

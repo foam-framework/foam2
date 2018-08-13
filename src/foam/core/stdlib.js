@@ -882,6 +882,7 @@ foam.LIB({
 
         return `foam.mmethod(${mapString}, ${defaultMethodStr})`;
       };
+      f.args = [];
       return f;
     }
   ]

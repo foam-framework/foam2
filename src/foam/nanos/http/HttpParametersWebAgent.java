@@ -106,9 +106,10 @@ public class HttpParametersWebAgent
         int count  = 0;
         int length = req.getContentLength();
 
-        BufferedReader reader  = req.getReader();
         StringBuilder  builder = sb.get();
         char[] cbuffer = new char[BUFFER_SIZE];
+        BufferedReader reader  = new BufferedReader(new InputStreamReader(req.getInputStream()));
+
         while ( ( read = reader.read(cbuffer, 0, BUFFER_SIZE)) != -1 && count < length ) {
           builder.append(cbuffer, 0, read);
           count += read;

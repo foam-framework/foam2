@@ -11,9 +11,14 @@ foam.CLASS({
     {
       installInClass: function(cls) {
         cls.toSwiftClass =  function() {
+          var m = this.model_;
+          // If the interface implements any other interfaces, ommit the 'class'
+          // to remove a "Redundant constraint 'Self' : 'AnyObject'" warning.
+          var impls = ( (m.implements || []).length ? [] : ['class'] ).concat(m.swiftAllImplements)
           var cls = foam.lookup('foam.swift.Protocol').create({
-            name: this.model_.swiftName,
-            implements: ['class'].concat(this.model_.swiftAllImplements)
+            name: m.swiftName,
+            implements: impls,
+            imports: ['Foundation'],
           });
 
           var axioms = this.getAxioms();
@@ -53,7 +58,7 @@ foam.CLASS({
       missingMethods.forEach(function(m) {
         if (m.getSwiftOverride(parentCls)) return;
         var method = foam.core.Method.create(m);
-        method.swiftCode = 'fatalError()';
+        method.swiftCode = m.swiftCode;
         method.writeToSwiftClass_(cls, parentCls);
       });
     }
