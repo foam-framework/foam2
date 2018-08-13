@@ -423,7 +423,7 @@ public class AbstractFObject: NSObject, foam_core_FObject, ContextAware {
   }
 
   public func toString() -> String {
-    return __context__.create(foam_swift_parse_json_output_Outputter.self)!.swiftStringify(self)
+    return foam_swift_parse_json_output_Outputter.DEFAULT.swiftStringify(self)
   }
 
   public func copyFrom(_ o: foam_core_FObject) {
@@ -516,7 +516,7 @@ public class FoamError: Error {
   init(_ obj: Any?) { self.obj = obj }
   public func toString() -> String {
     if let obj = self.obj as? foam_core_FObject {
-      let o = Context.GLOBAL.create(foam_swift_parse_json_output_Outputter.self)!
+      let o = foam_swift_parse_json_output_Outputter.DEFAULT
       return o.swiftStringify(obj)
     } else if let obj = self.obj as? FoamError {
       return "FoamError(" + obj.toString() + ")"
