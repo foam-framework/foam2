@@ -750,6 +750,9 @@ return Swift.type(of: self).${targetProperty.swiftAxiomName}().set(self, value: 
 foam.CLASS({
   refines: 'foam.core.Reference',
   flags: [ 'swift' ],
+  requires: [
+    'foam.swift.ProtocolMethod',
+  ],
   properties: [
     {
       // TODO: copied from java refinements.
@@ -777,6 +780,23 @@ foam.CLASS({
   methods: [
     function writeToSwiftClass(cls, parentCls) {
       this.SUPER(cls, parentCls);
+      if ( ! parentCls.hasOwnAxiom(this.name) ) return;
+      if ( ! this.swiftSupport ) return;
+      if ( foam.core.AbstractInterface.isSubClass(parentCls) ) {
+        cls.method(this.ProtocolMethod.create({
+          name: `find${foam.String.capitalize(this.name)}`,
+          returnType: this.of.model_.swiftName,
+          args: [
+            this.Argument.create({
+              localName: 'x',
+              externalName: '_',
+              type: 'Context'
+            })
+          ],
+          throws: true,
+        }));
+        return;
+      }
       cls.method(this.Method.create({
         name: `find${foam.String.capitalize(this.name)}`,
         visibility: 'public',
