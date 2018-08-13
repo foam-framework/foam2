@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'Protocol',
 
   requires: [
+    'foam.swift.ProtocolMethod',
     'foam.swift.Outputter'
   ],
 
@@ -46,6 +47,7 @@ foam.CLASS({
 
   methods: [
     function method(m) {
+      if ( ! foam.core.FObject.isInstance(m) ) m = this.ProtocolMethod.create(m)
       this.methods.push(m);
       return this;
     },
