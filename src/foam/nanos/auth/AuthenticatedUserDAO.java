@@ -54,10 +54,15 @@ public class AuthenticatedUserDAO
     AuthService auth    = (AuthService) x.get("auth");
 
     User toPut = (User) obj;
-    if ( toPut != null && ! SafetyUtil.equals(toPut.getId(), user.getId()) &&
-      ! auth.check(x, GLOBAL_USER_UPDATE) &&
+    boolean updatingSelf = SafetyUtil.equals(toPut.getId(), user.getId());
+    boolean isGlobalAdmin = auth.check(x, GLOBAL_USER_UPDATE);
+    if (
+      toPut != null &&
+      ! updatingSelf &&
+      ! isGlobalAdmin &&
       ! auth.check(x, GLOBAL_SPID_UPDATE) &&
-      ! auth.check(x, "spid.update." + user.getSpid()) ) {
+      ! auth.check(x, "spid.update." + user.getSpid())
+    ) {
       throw new RuntimeException("Unable to update user");
     }
 
@@ -65,6 +70,21 @@ public class AuthenticatedUserDAO
     if ( SafetyUtil.isEmpty((String) toPut.getSpid()) &&
         ! SafetyUtil.isEmpty((String) user.getSpid()) ) {
       toPut.setSpid(user.getSpid());
+    }
+
+    if ( toPut != null ) {
+      User result = (User) super.find_(x, toPut.getId());
+      if (
+        result != null &&
+        ! SafetyUtil.equals(result.getGroup(), toPut.getGroup())
+      ) {
+        if ( updatingSelf ) {
+          throw new RuntimeException("You cannot set your own group.");
+        } else if ( ! isGlobalAdmin ) {
+          throw new RuntimeException("Only administrators may update another user's group.");
+        }
+        // TODO: Handle SPIDs.
+      }
     }
 
     return super.put_(x, toPut);
