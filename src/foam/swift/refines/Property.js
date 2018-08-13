@@ -782,38 +782,24 @@ foam.CLASS({
       this.SUPER(cls, parentCls);
       if ( ! parentCls.hasOwnAxiom(this.name) ) return;
       if ( ! this.swiftSupport ) return;
-      if ( foam.core.AbstractInterface.isSubClass(parentCls) ) {
-        cls.method(this.ProtocolMethod.create({
-          name: `find${foam.String.capitalize(this.name)}`,
-          returnType: this.of.model_.swiftName,
-          args: [
-            this.Argument.create({
-              localName: 'x',
-              externalName: '_',
-              type: 'Context'
-            })
-          ],
-          throws: true,
-        }));
-        return;
-      }
-      cls.method(this.Method.create({
-        name: `find${foam.String.capitalize(this.name)}`,
+      cls.method({
         visibility: 'public',
+        override: !!parentCls.getSuperClass().getAxiomByName(this.name),
+        name: `find${foam.String.capitalize(this.name)}`,
         returnType: this.of.model_.swiftName,
-        throws: true,
         args: [
-          this.Argument.create({
+          {
             localName: 'x',
             externalName: '_',
             type: 'Context'
-          })
+          }
         ],
+        throws: true,
         body: `
 let dao = x["${this.targetDAOKey}"] as! foam_dao_DAO
 return try dao.find_(x, ${this.swiftVarName}) as! ${this.of.model_.swiftName}
         `
-      }));
+      });
     }
   ]
 });
