@@ -783,6 +783,7 @@ foam.CLASS({
       if ( ! parentCls.hasOwnAxiom(this.name) ) return;
       if ( ! this.swiftSupport ) return;
       cls.method({
+        visibility: 'public',
         override: !!parentCls.getSuperClass().getAxiomByName(this.name),
         name: `find${foam.String.capitalize(this.name)}`,
         returnType: this.of.model_.swiftName,
