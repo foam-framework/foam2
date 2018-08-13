@@ -782,8 +782,10 @@ foam.CLASS({
       this.SUPER(cls, parentCls);
       if ( ! parentCls.hasOwnAxiom(this.name) ) return;
       if ( ! this.swiftSupport ) return;
+      var isOverride = !!parentCls.getSuperClass().getAxiomByName(this.name);
       if ( foam.core.AbstractInterface.isSubClass(parentCls) ) {
         cls.method(this.ProtocolMethod.create({
+          override: isOverride,
           name: `find${foam.String.capitalize(this.name)}`,
           returnType: this.of.model_.swiftName,
           args: [
@@ -798,6 +800,7 @@ foam.CLASS({
         return;
       }
       cls.method(this.Method.create({
+        override: isOverride,
         name: `find${foam.String.capitalize(this.name)}`,
         visibility: 'public',
         returnType: this.of.model_.swiftName,

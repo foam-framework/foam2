@@ -62,6 +62,7 @@ foam.CLASS({
     { name: 'code', required: false },
     'documentation',
     'returns',
+    'flags',
     {
       name: 'args',
       factory: function() {
