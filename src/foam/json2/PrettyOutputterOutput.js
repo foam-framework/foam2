@@ -9,6 +9,7 @@ foam.CLASS({
     {
       name: 'delegate',
       factory: function() { return this.SimpleOutputterOutput.create() },
+      swiftFactory: `return self.SimpleOutputterOutput_create()`,
     },
     {
       class: 'Int',
