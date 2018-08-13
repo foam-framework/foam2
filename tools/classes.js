@@ -140,7 +140,6 @@ var classes = [
   'foam.nanos.auth.ClientAuthService',
   'foam.nanos.auth.HtmlDoc',
   'foam.nanos.auth.PasswordExpiryAuthService',
-  'foam.nanos.auth.twofactor.authy.AuthyService',
   'foam.nanos.auth.token.Token',
   'foam.nanos.auth.token.TokenService',
   'foam.nanos.auth.token.ClientTokenService',

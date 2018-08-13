@@ -28,6 +28,19 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'swiftAnnotations',
+      preSet: function(_, n) {
+        var i = n.indexOf('inout');
+        if ( i != -1 ) {
+          console.log('Warning: found "inout" in swiftAnnotations. Set swiftMutable instead.');
+          n.splice(i, 1);
+          this.swiftMutable = true;
+        }
+        return n;
+      },
+    },
+    {
+      class: 'Boolean',
+      name: 'swiftMutable',
     },
     {
       class: 'String',
@@ -45,6 +58,7 @@ foam.CLASS({
         externalName: this.swiftExternalName,
         type: this.swiftType,
         annotations: this.swiftAnnotations,
+        mutable: this.swiftMutable,
       });
       if (this.swiftDefaultValue) arg.defaultValue = this.swiftDefaultValue;
       return arg;
