@@ -153,18 +153,18 @@ return exportBox;
         delete this.registry_[name];
       },
       swiftSynchronized: true,
-      swiftCode: function() {/*
+      swiftCode: `
 if let name = name as? String {
   registry_.removeValue(forKey: name)
-} else if let name = name as? AnyClass {
+} else if let name = name as? foam_box_Box {
   for key in registry_.keys {
-    if ((registry_[key] as! Registration).exportBox as? AnyClass) === name {
+    if (registry_[key] as! Registration).exportBox === name {
       registry_.removeValue(forKey: key)
       return
     }
   }
 }
-      */},
+      `,
       javaCode: `
 getRegistry_().remove(name);
 `

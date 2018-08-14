@@ -31,6 +31,12 @@ foam.CLASS({
       name: 'errorMappings',
       javaFactory: `return new foam.nanos.servlet.ErrorPageMapping[0];`
     },
+    {
+      class: 'FObjectArray',
+      name: 'filterMappings',
+      of: 'foam.nanos.servlet.FilterMapping',
+      javaFactory: 'return new foam.nanos.servlet.FilterMapping[0];'
+    }
   ],
   methods: [
     {
@@ -70,6 +76,21 @@ foam.CLASS({
             errorHandler.addErrorPage(errorMapping.getErrorCode(), errorMapping.getLocation());
           } else {
             errorHandler.addErrorPage((Class<? extends java.lang.Throwable>)Class.forName(errorMapping.getExceptionType()), errorMapping.getLocation());
+          }
+        }
+
+        for ( foam.nanos.servlet.FilterMapping mapping : getFilterMappings() ) {
+          org.eclipse.jetty.servlet.FilterHolder holder =
+            handler.addFilter(
+              (Class<? extends javax.servlet.Filter>)Class.forName(mapping.getFilterClass()),
+              mapping.getPathSpec(),
+              java.util.EnumSet.of(javax.servlet.DispatcherType.REQUEST));
+
+          java.util.Iterator iter = mapping.getInitParameters().keySet().iterator();
+
+          while ( iter.hasNext() ) {
+            String key = (String)iter.next();
+            holder.setInitParameter(key, (String)mapping.getInitParameters().get(key));
           }
         }
 
