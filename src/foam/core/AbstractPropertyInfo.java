@@ -129,7 +129,7 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public void validate(FObject obj) throws IllegalStateException {}
+  public void validate(X x, FObject obj) throws IllegalStateException {}
 
   @Override
   public void updateDigest(FObject obj, MessageDigest md) {}
