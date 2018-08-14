@@ -15,10 +15,10 @@ import foam.nanos.auth.User;
 public class QueryParserUser {
 
   /**
-   * Determines if an query is valid or not
+   * Determines if the query is valid or not
    *
-   * @param query query to validate
-   * @return true if valid, false otherwise
+   * @param query the query to validate
+   * @return true if it is a valid query, otherwise false
    */
   public static boolean isValid(String query, String statement) {
     QueryParser parser = new QueryParser(User.getOwnClassInfo());
