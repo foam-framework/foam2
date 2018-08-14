@@ -100,5 +100,14 @@
   //  delete this.FOAM_FILES;
   };
 
+  this.foam = {
+    SCRIPT: function(m) {
+      // An instance of the script isn't useful at this point so just blindly
+      // execute the code. foam.SCRIPT can be overwritten later to capture the
+      // details of the script if need be.
+      m.code();
+    }
+  }
+
   getLoader()('files');
 })();

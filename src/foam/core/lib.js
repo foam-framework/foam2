@@ -25,7 +25,8 @@ foam = {
     /* Return a unique id. */
     var id = 1;
     return function next$UID() { return id++; };
-  })()
+  })(),
+  SCRIPT: foam.SCRIPT
 };
 
 
