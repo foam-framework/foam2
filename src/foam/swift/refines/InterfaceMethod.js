@@ -15,6 +15,11 @@ foam.CLASS({
       class: 'Boolean',
       name: 'swiftSupport',
       value: true,
+    },
+    {
+      class: 'String',
+      name: 'swiftCode',
+      value: 'fatalError()',
     }
   ],
   methods: [

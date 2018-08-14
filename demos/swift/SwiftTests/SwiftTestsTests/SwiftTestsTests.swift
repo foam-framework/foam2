@@ -754,4 +754,22 @@ class SwiftTestsTests: XCTestCase {
     try printProfessor(alan)
     try printProfessor(donald)
   }
+
+  func testLogBox() {
+    let a = x.create(foam_nanos_auth_Address.self)!
+    a.address1 = "123 Fake Street"
+    a.city = "Kitchener"
+
+    let u = x.create(foam_nanos_auth_User.self)!
+    u.firstName = "Mike"
+    u.lastName = "C"
+    u.address = a
+
+    let m = x.create(foam_box_Message.self)!
+    m.object = u
+    let lb = x.create(foam_box_LogBox.self)!
+    lb.delegate = x.create(foam_box_NullBox.self)!
+
+    try! lb.send(m)
+  }
 }

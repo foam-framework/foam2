@@ -53,7 +53,7 @@ public protocol PropertyInfo: Axiom, SlotGetterAxiom, SlotSetterAxiom, GetterAxi
   func viewFactory(x: Context) -> foam_core_FObject?
   func hasOwnProperty(_ o: foam_core_FObject) -> Bool
   func clearProperty(_ o: foam_core_FObject)
-  func toJSON(outputter: foam_swift_parse_json_output_Outputter, out: inout String, value: Any?)
+  func toJSON(outputter: foam_swift_parse_json_output_Outputter, out: foam_json2_Outputter, value: Any?)
 }
 extension PropertyInfo {
   public func f(_ obj: Any?) -> Any? {
@@ -68,7 +68,7 @@ extension PropertyInfo {
 }
 
 public protocol JSONOutputter {
-  func toJSON(outputter: foam_swift_parse_json_output_Outputter, out: inout String)
+  func toJSON(outputter: foam_swift_parse_json_output_Outputter, out: foam_json2_Outputter)
 }
 
 extension PropertyInfo {
@@ -423,7 +423,7 @@ public class AbstractFObject: NSObject, foam_core_FObject, ContextAware {
   }
 
   public func toString() -> String {
-    return __context__.create(foam_swift_parse_json_output_Outputter.self)!.swiftStringify(self)
+    return foam_swift_parse_json_output_Outputter.DEFAULT.swiftStringify(self)
   }
 
   public func copyFrom(_ o: foam_core_FObject) {
@@ -449,8 +449,8 @@ public class AbstractFObject: NSObject, foam_core_FObject, ContextAware {
     return super.isEqual(object)
   }
 
-  public func toJSON(outputter: foam_swift_parse_json_output_Outputter, out: inout String) {
-    outputter.outputFObject(&out, self)
+  public func toJSON(outputter: foam_swift_parse_json_output_Outputter, out: foam_json2_Outputter) {
+    outputter.outputFObject(out, self)
   }
 }
 
@@ -516,7 +516,7 @@ public class FoamError: Error {
   init(_ obj: Any?) { self.obj = obj }
   public func toString() -> String {
     if let obj = self.obj as? foam_core_FObject {
-      let o = Context.GLOBAL.create(foam_swift_parse_json_output_Outputter.self)!
+      let o = foam_swift_parse_json_output_Outputter.DEFAULT
       return o.swiftStringify(obj)
     } else if let obj = self.obj as? FoamError {
       return "FoamError(" + obj.toString() + ")"
