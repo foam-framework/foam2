@@ -173,5 +173,10 @@ foam.CLASS({
   ]
 });
 
-
-foam.boot.phase2();
+foam.SCRIPT({
+  package: 'foam.core',
+  name: 'MethodScript',
+  code: function() {
+    foam.boot.phase2();
+  }
+});
