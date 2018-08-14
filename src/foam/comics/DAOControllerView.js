@@ -11,6 +11,7 @@ foam.CLASS({
 
   requires: [
     'foam.comics.DAOController',
+    'foam.comics.DAOUpdateControllerView',
     'foam.u2.view.ScrollTableView'
   ],
 
