@@ -61,6 +61,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/twofactor/AbstractOTPAuthService" },
   { name: "foam/nanos/auth/twofactor/AbstractTOTPAuthService" },
   { name: "foam/nanos/auth/twofactor/ClientOTPAuthService" },
+  { name: "foam/nanos/auth/twofactor/TwoFactorSignInView" },
   { name: "foam/nanos/auth/twofactor/refinements" },
   { name: "foam/nanos/bench/Benchmark" },
   { name: "foam/nanos/boot/NSpec" },
@@ -110,7 +111,6 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/email/SMTPEmailService' },
   { name: 'foam/nanos/notification/push/PushService' },
   { name: 'foam/nanos/notification/push/FirebasePushService' },
-  { name: 'foam/nanos/auth/twofactor/authy/AuthyService' },
   { name: 'foam/nanos/demo/DemoObject' },
   { name: 'foam/nanos/demo/Demo' },
   { name: 'foam/nanos/http/Format' },
@@ -139,4 +139,6 @@ FOAM_FILES([
   { name: 'foam/demos/net/nap/web/RegulatoryNoticeForm', flags: ['web'] },
   { name: 'foam/demos/net/nap/web/RegulatoryNoticeList', flags: ['web'] },
   { name: 'foam/demos/net/nap/web/EditRegulatoryNotice', flags: ['web'] }
+
+
 ]);

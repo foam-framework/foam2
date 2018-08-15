@@ -7,6 +7,8 @@
 package foam.core;
 
 import foam.lib.json.Outputter;
+import foam.util.SecurityUtil;
+
 import java.security.*;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -56,7 +58,13 @@ public abstract class AbstractFObject
 
   public FObject copyFrom(FObject obj) {
     List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
-    for ( PropertyInfo p : props ) p.set(this, p.get(obj));
+    for ( PropertyInfo p : props ) {
+      try {
+        p.set(this, p.get(obj));
+      } catch (java.lang.ClassCastException e) {
+        // nop - ignore - only copy common properties.
+      }
+    }
     return this;
   }
 
@@ -154,14 +162,9 @@ public abstract class AbstractFObject
 
   public byte[] hash(String algorithm, byte[] hash) throws NoSuchAlgorithmException {
       MessageDigest md = MessageDigest.getInstance(algorithm);
-
-      // update with previous hash
-      if ( hash != null && hash.length != 0 ) {
-        md.update(hash, 0, hash.length);
-      }
-
       List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
       Iterator i = props.iterator();
+
       while ( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
         if ( ! prop.includeInDigest() ) continue;
@@ -171,6 +174,15 @@ public abstract class AbstractFObject
         prop.updateDigest(this, md);
       }
 
+      // no chaining so return digest
+      if ( hash == null || hash.length == 0 ) {
+        return md.digest();
+      }
+
+      // calculate digest, update with previous hash and current hash
+      byte[] digest = md.digest();
+      md.update(hash);
+      md.update(digest);
       return md.digest();
   }
 
@@ -180,7 +192,7 @@ public abstract class AbstractFObject
 
   public byte[] sign(String algorithm, PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
     Signature signer = Signature.getInstance(algorithm);
-    signer.initSign(key, SecureRandom.getInstance("SHA1PRNG"));
+    signer.initSign(key, SecurityUtil.GetSecureRandom());
 
     List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
     Iterator i = props.iterator();

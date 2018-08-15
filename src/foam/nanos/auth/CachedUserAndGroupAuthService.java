@@ -43,7 +43,7 @@ public class CachedUserAndGroupAuthService
     User user = (User) x.get("user");
     if ( user == null ) return false;
 
-    Group group = (Group) user.getGroup();
+    Group group = user.findGroup(x);
     if ( group == null ) return false;
 
     if ( userMap.containsKey(user.getId()) ) {

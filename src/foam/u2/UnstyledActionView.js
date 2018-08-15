@@ -20,14 +20,14 @@ foam.CLASS({
   name: 'UnstyledActionView',
   extends: 'foam.u2.Element',
 
-  documentation: function() {`
+  documentation: `
     A button View for triggering Actions.
 
     Icon Fonts
     If using icon-fonts a css stylesheet link to the fonts is required in index.html.
     The default of foam.core.Action.js is 'Material Icons' supported by the following
     link: <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"></link>
-  `},
+  `,
 
   enums: [
     {
@@ -100,8 +100,7 @@ foam.CLASS({
     function initE() {
       this.initCls();
 
-      this.
-        on('click', this.click);
+      this.on('click', this.click);
 
       this.addContent();
 
@@ -146,20 +145,18 @@ foam.CLASS({
     function click(e) {
       if ( this.buttonState == this.ButtonState.NO_CONFIRM ) {
         this.action && this.action.maybeCall(this.__subContext__, this.data);
-      }
-      else if ( this.buttonState == this.ButtonState.CONFIRM ) {
+      } else if ( this.buttonState == this.ButtonState.CONFIRM ) {
         this.buttonState = this.ButtonState.DEBOUNCE;
         this.removeAllChildren();
         this.add(this.confirm);
         this.debounce();
-      }
-      else if ( this.buttonState == this.ButtonState.ARMED ) {
+      } else if ( this.buttonState == this.ButtonState.ARMED ) {
         this.buttonState = this.ButtonState.CONFIRM;
         this.removeAllChildren();
         this.addContent();
         this.action && this.action.maybeCall(this.__subContext__, this.data);
       }
-      
+
       e.preventDefault();
       e.stopPropagation();
     },

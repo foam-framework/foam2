@@ -80,25 +80,26 @@ foam.CLASS({
   `,
 
   methods: [
-    function initE(){
+    function initE() {
       this.SUPER();
       var self = this;
 
       this.start().addClass(this.myClass())
-        .start('h2').add("Model Browser").end()
+        .start('h2').add('Model Browser').end()
         .start().add(this.PRINT_PAGE).end()
         .select(this.nSpecDAO, function(n) {
           var model = self.parseClientModel(n);
-          if( ! model ) return;
-          this.start().style({ 'font-size' : '20px', 'margin-top' : '20px'}).add("Model " + model).end()
-          this.tag(self.UMLDiagram.create({ data: model }))
-          this.tag(self.SimpleClassView.create({data: model }))
-
+          if ( ! model ) return;
+          this.start().style({ 'font-size': '20px', 'margin-top': '20px' })
+            .add('Model ' + model)
+          .end();
+          this.tag(self.UMLDiagram.create({ data: model }));
+          this.tag(self.SimpleClassView.create({ data: model }));
         })
       .end();
     },
 
-    function parseClientModel(n){
+    function parseClientModel(n) {
       var cls = JSON.parse(n.client);
       var clsName = cls.of ? cls.of : cls.class;
       return foam.lookup(clsName, true);
@@ -109,7 +110,7 @@ foam.CLASS({
     {
       name: 'printPage',
       label: 'Print',
-      code: function(){
+      code: function() {
         window.print();
       }
     }
@@ -131,37 +132,58 @@ foam.CLASS({
   ],
 
   imports: [
+    'auth',
     'selectedAxiom',
     'showInherited',
     'showOnlyProperties'
   ],
 
+  properties: [
+    'classPropertyTableView'
+  ],
+
   methods: [
     function initE() {
       this.SUPER();
-
       var data = this.data;
+      this.updateTableView();
 
       this.
         start('b').add(data.id).end().br().
         add('Extends: ');
 
       var cls = data;
-      for ( var i = 0 ; cls ; i++ ) {
+      for ( var i = 0; cls; i ++ ) {
         cls = this.lookup(cls.model_.extends, true);
         if ( i ) this.add(' : ');
-        this.start(this.ClassLink, {data: cls}).end();
+        this.start(this.ClassLink, { data: cls }).end();
         if ( cls === foam.core.FObject ) break;
       }
       this.br();
-      this.start(foam.u2.HTMLElement).style({ 'margin-top' : '10px'}).add('Documentation: ', data.model_.documentation).end();
+      this.start(foam.u2.HTMLElement).style({ 'margin-top': '10px' }).add('Documentation: ', data.model_.documentation).end();
+      this.add(this.classPropertyTableView$);
+    },
 
-      this.add( this.slot(function (showInherited, showOnlyProperties) {
-        var axs = [];
-        for ( var key in data.axiomMap_ ) {
-          if ( showInherited || Object.hasOwnProperty.call(data.axiomMap_, key) ) {
-            var a  = data.axiomMap_[key];
-	            if ( ( ! showOnlyProperties ) || foam.core.Property.isInstance(a) ) {
+    async function updateTableView() {
+      var permissioned = await this.auth.check(null, this.data.id + '.properties.permissioned');
+      var axs = await this.permittedAxioms(permissioned);
+
+      this.classPropertyTableView = this.TableView.create({
+        of: this.PropertyInfo,
+        data: this.ArrayDAO.create({ array: axs })
+      });
+    },
+
+    async function permittedAxioms(permissioned) {
+      var data = this.data;
+      var axs = [];
+
+      for ( var key in data.axiomMap_ ) {
+        if ( Object.hasOwnProperty.call(data.axiomMap_, key) ) {
+          var a = data.axiomMap_[key];
+          if ( foam.core.Property.isInstance(a) ) {
+            if ( permissioned ) {
+              if ( await this.auth.check(null, data.id + '.property.' + a.name ) ) {
                 var ai = foam.doc.PropertyInfo.create({
                   axiom: a,
                   type: a.cls_,
@@ -170,15 +192,25 @@ foam.CLASS({
                   documentation: a.documentation,
                   name: a.name
                 });
+
+                axs.push(ai);
+              }
+            } else {
+              var ai = foam.doc.PropertyInfo.create({
+                axiom: a,
+                type: a.cls_,
+                required: a.required,
+                of: a.of,
+                documentation: a.documentation,
+                name: a.name
+              });
+
               axs.push(ai);
-	          }
+            }
           }
         }
-        return this.TableView.create({
-          of: this.PropertyInfo,
-          data: this.ArrayDAO.create({ array: axs })
-        });
-      }));
+      }
+      return axs;
     }
   ]
 });

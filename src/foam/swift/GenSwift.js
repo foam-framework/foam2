@@ -52,6 +52,7 @@ foam.CLASS({
         'foam.swift.parse.json.PropertyParser',
         'foam.swift.parse.json.UnknownPropertyParser',
         'foam.swift.parse.json.output.Outputter',
+        'foam.json2.PrettyOutputterOutput',
         'foam.swift.parse.parser.Alt',
         'foam.swift.parse.parser.AnyChar',
         'foam.swift.parse.parser.Chars',

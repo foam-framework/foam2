@@ -84,6 +84,7 @@ return getOf() == null ? null : (foam.core.PropertyInfo) getOf().getAxiomByName(
       code: function(x) {
         return this.ProxyDAO.create({delegate: this}, x);
       },
+      swiftCode: `return ProxyDAO_create(["delegate": self], x)`,
       javaCode: `return new ProxyDAO.Builder(x).setDelegate(this).build();`,
     },
 

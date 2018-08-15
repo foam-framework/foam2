@@ -1862,11 +1862,20 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj, sub) {
-      if ( ! this.hasOwnProperty('value') || foam.util.compare(this.value, this.arg1.f(obj)) < 0 ) {
-        this.value = this.arg1.f(obj);
-      }
-    }
+    {
+      name: 'put',
+      code: function(obj, sub) {
+        if ( ! this.hasOwnProperty('value') || foam.util.compare(this.value, this.arg1.f(obj)) < 0 ) {
+          this.value = this.arg1.f(obj);
+        }
+      },
+      swiftCode: `
+        let arg1 = self.arg1 as! foam_mlang_Expr
+        if !hasOwnProperty("value") || FOAM_utils.compare(value, arg1.f(obj)) < 0 {
+          value = arg1.f(obj);
+        }
+      `
+    },
   ]
 });
 
@@ -1972,6 +1981,7 @@ foam.CLASS({
     'foam.mlang.predicate.Neq',
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
+    'foam.mlang.predicate.IsInstanceOf',
     'foam.mlang.predicate.StartsWith',
     'foam.mlang.predicate.StartsWithIC',
     'foam.mlang.predicate.EndsWith',
@@ -2037,7 +2047,7 @@ foam.CLASS({
     function DESC(a) { return this._unary_("Desc", a); },
     function THEN_BY(a, b) { return this.ThenBy.create({head: a, tail: b}); },
 
-    function INSTANCE_OF(cls) { return this.IsInstanceOf({targetClass: cls}); }
+    function INSTANCE_OF(cls) { return this.IsInstanceOf.create({ targetClass: cls }); }
   ]
 });
 

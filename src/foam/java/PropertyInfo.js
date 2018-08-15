@@ -151,34 +151,32 @@ foam.CLASS({
             type: 'int',
             visibility: 'public',
             args: [ { name: 'key', type: 'Object' }, { name: 'o', type: 'Object' } ],
-            body: this.comparePropertyToObject, 
+            body: this.comparePropertyToObject,
           },
           {
             name: 'comparePropertyToValue',
             type: 'int',
             visibility: 'public',
             args: [ { name: 'key', type: 'Object' }, { name: 'value', type: 'Object' } ],
-            body: this.comparePropertyToValue, 
+            body: this.comparePropertyToValue,
           },
           {
             name: 'jsonParser',
             type: 'foam.lib.parse.Parser',
             visibility: 'public',
-            body: 'return ' +  (this.jsonParser ? this.jsonParser : null) + ';'
+            body: 'return ' + ( this.jsonParser ? this.jsonParser : null ) + ';'
           },
           {
             name: 'queryParser',
             type: 'foam.lib.parse.Parser',
             visibility: 'public',
-            body: 'return ' +  (this.queryParser ? this.queryParser : null) + ';'
+            body: 'return ' + ( this.queryParser ? this.queryParser : null ) + ';'
           },
           {
             name: 'csvParser',
             type: 'foam.lib.parse.Parser',
             visibility: 'public',
-            body: ( this.csvParser ) ?
-              'return new ' + this.csvParser + '();' :
-              'return null;'
+            body: 'return ' + ( this.csvParser ? this.csvParser : null ) + ';'
           },
           {
             name: 'getNetworkTransient',

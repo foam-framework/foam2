@@ -49,8 +49,24 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  name: '__Property__',
+  refines: 'foam.core.Object',
+
+  properties: [
+    {
+      name: 'toJSON',
+      value: function toJSON(value, outputter) {
+        return value instanceof Date ?
+            { class: '__Timestamp__', value: value.getTime() } :
+            value;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
   package: 'foam.core',
+  name: '__Property__',
+
   axioms: [
     {
       name: 'create',
@@ -84,12 +100,15 @@ foam.CLASS({
 
 
 foam.CLASS({
-  name: '__Class__',
   package: 'foam.core',
+  name: '__Class__',
+
   axioms: [
     {
       name: 'create',
-      installInClass: function(clsName) { return X.lookup(clsName, true); }
+      installInClass: function(clsName) {
+        return X.lookup(clsName, true);
+      }
     }
   ]
 });
@@ -457,7 +476,9 @@ foam.CLASS({
           this.end(']');
         },
         Object: function(o) {
-          if ( o.outputJSON ) {
+          if ( o.isSubClass ) {
+            this.output({ class: '__Class__', forClass_: o.id });
+          } else if ( o.outputJSON ) {
             o.outputJSON(this);
           } else {
             this.start('{');

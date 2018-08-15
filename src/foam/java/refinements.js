@@ -443,7 +443,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'javaReturns'
+      name: 'javaReturns',
+      expression: function(returns) { return returns || '' },
     },
     {
       class: 'Boolean',
@@ -679,7 +680,7 @@ foam.CLASS({
     ['javaType', 'int'],
     ['javaInfoType', 'foam.core.AbstractIntPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.IntParser()'],
-    ['javaCSVParser', 'foam.lib.json.IntParser'],
+    ['javaCSVParser', 'new foam.lib.json.IntParser()'],
     ['sqlType', 'INT']
   ],
 
@@ -708,7 +709,7 @@ foam.CLASS({
     ['javaType', 'byte'],
     ['javaInfoType', 'foam.core.AbstractBytePropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.ByteParser()'],
-    ['javaCSVParser', 'foam.lib.json.ByteParser'],
+    ['javaCSVParser', 'new foam.lib.json.ByteParser()'],
     ['sqlType', 'SMALLINT']
   ],
 
@@ -737,7 +738,7 @@ foam.CLASS({
     ['javaType', 'short'],
     ['javaInfoType', 'foam.core.AbstractShortPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.ShortParser()'],
-    ['javaCSVParser', 'foam.lib.json.ShortParser'],
+    ['javaCSVParser', 'new foam.lib.json.ShortParser()'],
     ['sqlType', 'SMALLINT']
   ],
 
@@ -766,7 +767,7 @@ foam.CLASS({
     ['javaType', 'long'],
     ['javaInfoType', 'foam.core.AbstractLongPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.LongParser()'],
-    ['javaCSVParser', 'foam.lib.json.LongParser'],
+    ['javaCSVParser', 'new foam.lib.json.LongParser()'],
     ['sqlType', 'BIGINT']
   ],
 
@@ -795,7 +796,7 @@ foam.CLASS({
     ['javaType', 'double'],
     ['javaInfoType', 'foam.core.AbstractDoublePropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.FloatParser()'],
-    ['javaCSVParser', 'foam.lib.json.FloatParser'],
+    ['javaCSVParser', 'new foam.lib.json.FloatParser()'],
     ['sqlType', 'DOUBLE PRECISION']
   ],
 
@@ -829,7 +830,7 @@ foam.CLASS({
     },
     ['javaInfoType', 'foam.core.AbstractEnumPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.IntParser()'],
-    ['javaCSVParser', 'foam.lib.json.IntParser']
+    ['javaCSVParser', 'new foam.lib.json.IntParser()']
   ],
 
   methods: [
@@ -953,7 +954,7 @@ foam.CLASS({
     ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.DateParser()'],
     ['javaQueryParser', 'new foam.lib.query.DuringExpressionParser()'],
-    ['javaCSVParser', 'foam.lib.json.DateParser'],
+    ['javaCSVParser', 'new foam.lib.json.DateParser()'],
     ['sqlType', 'TIMESTAMP WITHOUT TIME ZONE']
   ],
 
@@ -989,7 +990,7 @@ foam.CLASS({
        ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
        ['javaJSONParser', 'new foam.lib.json.DateParser()'],
        ['javaQueryParser', 'new foam.lib.query.DuringExpressionParser()'],
-       ['javaCSVParser', 'foam.lib.json.DateParser'],
+       ['javaCSVParser', 'new foam.lib.json.DateParser()'],
        ['sqlType', 'DATE']
    ],
 
@@ -1059,7 +1060,7 @@ foam.CLASS({
     ['javaInfoType', 'foam.core.AbstractStringPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.StringParser()'],
     ['javaQueryParser', 'new foam.lib.query.StringParser()'],
-    ['javaCSVParser', 'foam.lib.csv.CSVStringParser'],
+    ['javaCSVParser', 'new foam.lib.csv.CSVStringParser()'],
     {
       name: 'sqlType',
       expression: function(width) {
@@ -1078,6 +1079,11 @@ foam.CLASS({
         type: 'int',
         body: 'return ' + this.width + ';'
       });
+
+      // cast numbers to strings
+      var cast = info.getMethod('cast');
+      cast.body = `return ( o instanceof Number ) ?
+        ((Number) o).toString() : (String) o;`;
 
       return info;
     }
@@ -1114,6 +1120,7 @@ foam.CLASS({
     ['javaType', 'String[]'],
     ['javaInfoType', 'foam.core.AbstractArrayPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.StringArrayParser()'],
+    ['javaFactory', 'return new String[0];'],
     {
       name: 'javaValue',
       expression: function(value) {
@@ -1358,7 +1365,7 @@ foam.CLASS({
     ['javaType', 'boolean'],
     ['javaInfoType', 'foam.core.AbstractBooleanPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.BooleanParser()'],
-    ['javaCSVParser', 'foam.lib.json.BooleanParser'],
+    ['javaCSVParser', 'new foam.lib.json.BooleanParser()'],
     ['sqlType', 'BOOLEAN']
   ],
   methods: [
@@ -1419,37 +1426,41 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'javaType',
+      name: 'referencedProperty',
+      transient: true,
       factory: function() {
-        // TODO: instead of creating reference properties as Object type, match
-        // the primary key of the target class/model
-        /*
         var idProp = this.of.ID.cls_ == foam.core.IDAlias ? this.of.ID.targetProperty : this.of.ID;
-        console.log('******************************************************', this.of.id, idProp.javaType);
-        */
 
-        return 'Object';
+        idProp = idProp.clone();
+        idProp.name = this.name;
+
+        return idProp;
       }
     },
-    [ 'javaJSONParser',  'foam.lib.json.AnyParser.instance()' ],
-    [ 'javaQueryParser', 'foam.lib.query.AnyParser.instance()' ],
-    [ 'javaInfoType',    'foam.core.AbstractObjectPropertyInfo' ]
+    { name: 'javaType',        factory: function() { return this.referencedProperty.javaType; } },
+    { name: 'javaJSONParser',  factory: function() { return this.referencedProperty.javaJSONParser; } },
+    { name: 'javaQueryParser', factory: function() { return this.referencedProperty.javaQueryParser; } },
+    { name: 'javaInfoType',    factory: function() { return this.referencedProperty.javaInfoType; } }
   ],
 
   methods: [
     function buildJavaClass(cls) {
-      this.SUPER(cls);
+      // Disable super behaviour on purpose.
+      // this.SUPER(cls);
+
+      // Install a renamed copy of the refernced model's id property instead
+      this.referencedProperty.buildJavaClass(cls);
+
       cls.method({
         name: `find${foam.String.capitalize(this.name)}`,
         visibility: 'public',
         type: this.of.id,
         args: [ { name: 'x', type: 'foam.core.X' } ],
-        body: `return (${this.of.id})((foam.dao.DAO) x.get("${this.targetDAOKey}")).find_(x, get${foam.String.capitalize(this.name)}());`
+        body: `return (${this.of.id})((foam.dao.DAO) x.get("${this.targetDAOKey}")).find_(x, (Object) get${foam.String.capitalize(this.name)}());`
       });
     }
   ]
 });
-
 
 foam.CLASS({
   refines: 'foam.pattern.Multiton',

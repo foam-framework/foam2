@@ -28,37 +28,37 @@ public class YYYYMMDDLiteralDateParser extends ProxyParser {
     super(
         new Alt(
 
-            //YYYY-MM-DDTHH:MM
-            new Seq(
-              new IntParser(),
-              new Alt(
-                new Literal("-"),
-                new Literal("/")),
-              new IntParser(),
-              new Alt(
-                new Literal("-"),
-                new Literal("/")),
-              new IntParser(),
-              new Literal("T"),
-              new IntParser(),
-              new Literal(":"),
-              new IntParser()),
+          //YYYY-MM-DDTHH:MM
+          new Seq(
+            new IntParser(),
+            new Alt(
+              new Literal("-"),
+              new Literal("/")),
+            new IntParser(),
+            new Alt(
+              new Literal("-"),
+              new Literal("/")),
+            new IntParser(),
+            new Literal("T"),
+            new IntParser(),
+            new Literal(":"),
+            new IntParser()),
 
-            //YYYY-MM-DDTHH
-            new Seq(
-              new IntParser(),
-              new Alt(
-                new Literal("-"),
-                new Literal("/")),
-              new IntParser(),
-              new Alt(
-                new Literal("-"),
-                new Literal("/")),
-              new IntParser(),
-              new Literal("T"),
-              new IntParser()),
+          //YYYY-MM-DDTHH
+          new Seq(
+            new IntParser(),
+            new Alt(
+              new Literal("-"),
+              new Literal("/")),
+            new IntParser(),
+            new Alt(
+              new Literal("-"),
+              new Literal("/")),
+            new IntParser(),
+            new Literal("T"),
+            new IntParser()),
 
-        //YYYY-MM-DD
+          //YYYY-MM-DD
           new Seq(
             //new Literal("\""),
             new IntParser(),
@@ -69,21 +69,19 @@ public class YYYYMMDDLiteralDateParser extends ProxyParser {
             new Alt(
                 new Literal("-"),
                 new Literal("/")),
+            new IntParser()),
+
+          //YYYY-MM
+          new Seq(
             new IntParser(),
-            new Whitespace()),
+            new Alt(
+              new Literal("-"),
+              new Literal("/")),
+            new IntParser()),//,new Whitespace()
 
-        //YYYY-MM
+          //YYYY
           new Seq(
-              new IntParser(),
-              new Alt(
-                  new Literal("-"),
-                  new Literal("/")),
-              new IntParser(),
-              new Whitespace()),
-
-        //YYYY
-          new Seq(
-              new IntParser())//,new Whitespace()
+            new IntParser())//,new Whitespace()
           ));
 
   }
@@ -101,22 +99,25 @@ public class YYYYMMDDLiteralDateParser extends ProxyParser {
     Date date1 = null, date2 = null;
     c.clear();
 
-    c.set(result.length > 1 ? (Integer) result[0] : 0,
-        result.length > 3 ? (Integer) result[2] - 1 : 0,
-        result.length > 5 ? (Integer) result[4] : 0,
-        result.length > 7 ? (Integer) result[6] : 0,
-        result.length > 9 ? (Integer) result[8] : 0,
-        result.length > 11 ? (Integer) result[10] : 0);
+    c.set(result.length >= 1 ? (Integer) result[0] : 0,
+        result.length >= 3 ? (Integer) result[2] - 1 : 0,
+        result.length >= 5 ? (Integer) result[4] : 0,
+        result.length >= 7 ? (Integer) result[6] : 0,
+        result.length >= 9 ? (Integer) result[8] : 0,
+        result.length >= 11 ? (Integer) result[10] : 0);
 
     date1 = c.getTime();
-    c.clear();
-
-    c.set(result.length > 1 ? (Integer) result[0] + (result.length > 3 ? 0 : 1): 0,
-          result.length > 3 ? (Integer) result[2] - 1 + (result.length > 5 ? 0 : 1) : 0,
-          result.length > 5 ? (Integer) result[4] + (result.length > 7 ? 0 : 1): 0,
-          result.length > 7 ? (Integer) result[6] + (result.length > 9 ? 0 : 1) : 0,
-          result.length > 9 ? (Integer) result[8] + (result.length > 11 ? 0 : 1) : 0,
-          result.length > 11 ? (Integer) result[10] + (result.length > 13 ? 0 : 1) : 0);
+    
+    if ( result.length < 3 ) 
+      c.add(java.util.Calendar.YEAR, 1);
+    else if ( result.length < 5 ) 
+      c.add(java.util.Calendar.MONTH, 1);
+    else if ( result.length < 7 ) 
+      c.add(java.util.Calendar.DAY_OF_MONTH, 1);
+    else if ( result.length < 9 ) 
+      c.add(java.util.Calendar.HOUR_OF_DAY, 1);
+    else if ( result.length < 11 ) 
+      c.add(java.util.Calendar.MINUTE, 1);
 
     date2 = c.getTime();
 
