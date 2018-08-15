@@ -88,7 +88,7 @@ foam.CLASS({
     [ 'data', 'edit', 'onEdit' ],
     [ 'data', 'action.findRelatedObject', 'onFindRelated' ],
     [ 'data', 'finished', 'onFinished' ],
-    [ 'data', 'export', 'onExport' ]
+    [ 'data', 'action.export', 'onExport' ]
   ],
 
   methods: [
