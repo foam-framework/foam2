@@ -7,10 +7,11 @@
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'ReciprocalSearch',
-  extends: 'foam.u2.Element', // TODO: make be a View
+  extends: 'foam.u2.View',
 
   requires: [
-    'foam.u2.search.SearchManager'
+    'foam.u2.search.SearchManager',
+    'foam.u2.view.SearchViewWrapper'
   ],
 
   imports: [
@@ -25,7 +26,9 @@ foam.CLASS({
   // TODO: CSS classname shouldn't be .net-nanopay-ui-ActionView, fix.
   css: `
     ^ {
-      min-width: 180px;
+      background-color: white;
+      border-radius: 2px;
+      min-width: 300px;
       font-size: medium;
     }
 
@@ -33,17 +36,50 @@ foam.CLASS({
       font-size: medium;
     }
 
+    ^ .foam-u2-tag-Input {
+      background-image: url("images/ic-search.svg");
+      background-repeat: no-repeat;
+      background-position: 8px;
+      border-radius: 2px;
+      border: 1px solid #dce0e7;
+      color: #093649;
+      font-size: 14px;
+      height: 40px;
+      padding: 0 21px 0 38px;
+      width: 100%;
+    }
+
+    ^ input:not([type="checkbox"]):focus, ^ select:focus {
+      outline: none;
+      border: 1px solid #59a5d5;
+    }
+
+    ^ .general-query {
+      padding: 20px;
+    }
+
     ^count {
       font-size: 14pt;
       color: #555;
+      margin: 20px 20px 0 20px;
     }
 
     ^ .net-nanopay-ui-ActionView-clear {
-      background: #59aadd;
-      color: white;
-      margin-top: 14px;
-      padding: 12px;
-      width: auto;
+      background-color: rgba(164, 179, 184, 0.1);
+      border: solid 1px rgba(164, 179, 184, 0.5);
+      border-radius: 2px;
+      color: #093649;
+      font-family: Roboto;
+      font-size: 14px;
+      font-stretch: normal;
+      font-style: normal;
+      font-weight: normal;
+      height: 40px;
+      letter-spacing: 0.2px;
+      line-height: 2.86;
+      text-align: center;
+      width: 60px;
+      margin: 20px;
     }
   `,
 
@@ -64,17 +100,17 @@ foam.CLASS({
 
         if ( ! of ) return [];
 
-        if ( of.model_.searchColumns )
-          return of.model_.searchColumns;
+        if ( of.model_.searchColumns ) return of.model_.searchColumns;
 
-        if ( of.model_.tableColumns )
+        if ( of.model_.tableColumns ) {
           return of.model_.tableColumns.filter(function(c) {
             var axiom = of.getAxiomByName(c);
             return axiom && axiom.searchView;
           });
+        }
 
         return of.getAxiomsByClass(foam.core.Property)
-            .filter(function(p) { return p.searchView && ! p.hidden })
+            .filter((prop) => prop.searchView && ! prop.hidden)
             .map(foam.core.Property.NAME.f);
       }
     },
@@ -105,28 +141,39 @@ foam.CLASS({
             predicate$: self.data$
           });
 
-//          searchManager.filteredDAO.on.sub(self.updateSelectedCount);
           searchManager.filteredDAO$.sub(self.updateSelectedCount);
-          self.updateSelectedCount(0,0,0,searchManager.filteredDAO$);
+          self.updateSelectedCount(0, 0, 0, searchManager.filteredDAO$);
 
           var e = this.E('div');
 
           e.onDetach(searchManager);
 
+          var generalQueryView = foam.u2.ViewSpec.createView(
+              { class: 'foam.u2.search.TextSearchView' },
+              {
+                richSearch: true,
+                of: self.dao.of.id,
+                onKey: true
+              },
+              this,
+              this.__subSubContext__);
+          searchManager.add(generalQueryView);
+          e.start(generalQueryView).addClass('general-query').end();
+
           e.forEach(filters, function(f) {
-            // TODO: See if this can be cleaned up somehow, if searchView didn't require the proprety explicitly, or
-            // could find the search manager via the context and add itself to that.
+            // TODO: See if this can be cleaned up somehow, if searchView didn't
+            // require the proprety explicitly, or could find the search manager
+            // via the context and add itself to that.
             var axiom = self.dao.of.getAxiomByName(f);
-            var spec  = axiom.searchView;
-            var view  = foam.u2.ViewSpec.createView(spec, { property: axiom, dao: self.dao }, this, this.__subSubContext__);
+            var spec = axiom.searchView;
+            var view = foam.u2.ViewSpec.createView(spec, {
+              property: axiom,
+              dao: self.dao
+            }, this, this.__subSubContext__);
 
             searchManager.add(view);
             this
-              .start()
-                .addClass(self.myClass('filter-header'))
-                .add(axiom.label)
-              .end()
-              .start(view)
+              .start(self.SearchViewWrapper, { searchView: view })
                 .addClass(self.myClass('filter'))
               .end();
           });
@@ -136,11 +183,15 @@ foam.CLASS({
         .start()
           .addClass(self.myClass('count'))
           // TODO: move formatting function to stdlib
-          .add(self.selectedCount$.map(function(a) { return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }))
+          .add(self.selectedCount$.map(function(a) {
+            return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          }))
           .entity('nbsp')
           .add('of')
           .entity('nbsp')
-          .add(self.totalCount$.map(function(a) { return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }))
+          .add(self.totalCount$.map(function(a) {
+            return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          }))
           .entity('nbsp')
           .add('selected')
         .end()
@@ -167,12 +218,6 @@ foam.CLASS({
       }
     }
   ],
-
-  /*
-  reactions: [
-    [ 'data', 'on', 'updateTotalCount' ]
-  ],
-  */
 
   listeners: [
     {

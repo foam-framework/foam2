@@ -7,6 +7,7 @@ foam.CLASS({
   package: 'foam.box',
   name: 'AnonymousBox',
   implements: ['foam.box.Box'],
+  flags: ['js'],
   properties: [
     {
       class: 'Function',

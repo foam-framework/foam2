@@ -6,6 +6,7 @@
 
 foam.INTERFACE({
   refines: 'foam.mlang.F',
+  flags: ['java'],
 
   methods: [
     {
@@ -23,6 +24,7 @@ foam.INTERFACE({
 
 foam.INTERFACE({
   refines: 'foam.mlang.Expr',
+  flags: ['java'],
 
   implements: [ 'foam.dao.SQLStatement' ],
 
@@ -37,6 +39,7 @@ foam.INTERFACE({
 
 foam.CLASS({
   refines: 'foam.mlang.ExprProperty',
+  flags: ['java'],
 
   properties: [
     ['javaType', 'foam.mlang.Expr'],
@@ -47,6 +50,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.SinkProperty',
+  flags: ['java'],
 
   properties: [
     ['javaType', 'foam.dao.Sink'],
@@ -57,6 +61,7 @@ foam.CLASS({
 
 foam.INTERFACE({
   refines: 'foam.mlang.predicate.Predicate',
+  flags: ['java'],
 
   implements: [ 'foam.dao.SQLStatement' ],
 
@@ -97,6 +102,7 @@ foam.INTERFACE({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.PredicateProperty',
+  flags: ['java'],
 
   properties: [
     ['javaType', 'foam.mlang.predicate.Predicate']
@@ -106,6 +112,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.PredicateArray',
+  flags: ['java'],
 
   properties: [
     ['javaType', 'foam.mlang.predicate.Predicate[]']
@@ -115,6 +122,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.AbstractPredicate',
+  flags: ['java'],
 
   methods: [
     {
@@ -176,6 +184,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.AbstractExpr',
+  flags: ['java'],
 
   methods: [
     {
@@ -190,6 +199,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.True',
+  flags: ['java'],
 
   methods: [
     {
@@ -207,6 +217,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.False',
+  flags: ['java'],
 
   methods: [
     {
@@ -224,6 +235,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Or',
+  flags: ['java'],
 
   methods: [
     {
@@ -293,6 +305,7 @@ return this;`
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.And',
+  flags: ['java'],
 
   methods: [
     {
@@ -362,6 +375,7 @@ return this;`
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.In',
+  flags: ['java'],
 
   methods: [
     {
@@ -401,6 +415,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.sink.Map',
+  flags: ['java'],
 
   methods: [
     {
@@ -435,6 +450,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Contains',
+  flags: ['java'],
 
   methods: [
     {
@@ -469,6 +485,7 @@ return ( s1 instanceof String && ((String) s1).contains(s2) );`
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.ContainsIC',
+  flags: ['java'],
 
   methods: [
     {
@@ -495,6 +512,7 @@ return ( s1 instanceof String && ((String) s1).toUpperCase().contains(s2) );`
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.StartsWith',
+  flags: ['java'],
 
   methods: [
     {
@@ -521,6 +539,7 @@ return ( arg1 instanceof String && ((String) arg1).startsWith(arg2) );`
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.StartsWithIC',
+  flags: ['java'],
 
   methods: [
     {
@@ -547,6 +566,7 @@ return ( arg1 instanceof String && ((String) arg1).toUpperCase().startsWith(arg2
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.EndsWith',
+  flags: ['java'],
 
   methods: [
     {
@@ -574,6 +594,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.Constant',
+  flags: ['java'],
 
   methods: [
     {
@@ -595,6 +616,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.ArrayConstant',
+  flags: ['java'],
 
   axioms: [
     {
@@ -684,6 +706,7 @@ builder.append(s);
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Eq',
+  flags: ['java'],
 
   methods: [
     {
@@ -702,6 +725,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Neq',
+  flags: ['java'],
 
   methods: [
     {
@@ -719,6 +743,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Lt',
+  flags: ['java'],
 
   methods: [
     {
@@ -736,6 +761,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Lte',
+  flags: ['java'],
 
   methods: [
     {
@@ -753,6 +779,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Gt',
+  flags: ['java'],
 
   methods: [
     {
@@ -770,6 +797,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Gte',
+  flags: ['java'],
 
   methods: [
     {
@@ -787,6 +815,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Not',
+  flags: ['java'],
 
   methods: [
     {
@@ -858,6 +887,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.IsInstanceOf',
+  flags: ['java'],
 
    methods: [
     {
@@ -870,6 +900,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Has',
+  flags: ['java'],
 
   methods: [
     {
@@ -893,6 +924,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Property',
+  flags: ['java'],
 
   methods: [
     {
@@ -913,6 +945,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.order.Desc',
+  flags: ['java'],
 
   properties: [
     {
@@ -966,6 +999,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.order.CustomComparator',
+  flags: ['java'],
 
   methods: [
     {
@@ -986,6 +1020,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.sink.Count',
+  flags: ['java'],
 
   methods: [
     {
@@ -1009,6 +1044,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.sink.Max',
+  flags: ['java'],
 
   methods: [
     {
@@ -1034,6 +1070,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.sink.Min',
+  flags: ['java'],
 
   methods: [
     {
@@ -1061,6 +1098,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.sink.Sum',
+  flags: ['java'],
 
   methods: [
     {
@@ -1084,6 +1122,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Unary',
+  flags: ['java'],
 
   methods: [
     {
@@ -1104,6 +1143,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Binary',
+  flags: ['java'],
 
   methods: [
     {
@@ -1126,6 +1166,7 @@ getArg2().prepareStatement(stmt);`
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Nary',
+  flags: ['java'],
 
   methods: [
     {
@@ -1149,6 +1190,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Keyword',
+  flags: ['java'],
 
   javaImports: [
     'foam.core.PropertyInfo',
@@ -1196,6 +1238,7 @@ return false;`
 
 foam.CLASS({
   refines: 'foam.mlang.sink.GroupBy',
+  flags: ['java'],
 
   methods: [
     {

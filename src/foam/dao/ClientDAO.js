@@ -151,7 +151,7 @@ var detached = false
 let sub = Subscription { detached = true }
 for o in result.array {
   if detached { break }
-  sink.put(o, sub)
+  sink.put(o!, sub)
 }
 sink.eof()
 return sink

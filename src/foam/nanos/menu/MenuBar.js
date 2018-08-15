@@ -57,7 +57,7 @@ foam.CLASS({
         .start()
           .start('ul')
             .select(this.menuDAO.orderBy(this.Menu.ORDER).where(this.EQ(this.Menu.PARENT, this.menuName)), function(menu) {
-              this.start('li')
+              return this.E('li')
                 .call(function() {
                   var e = this;
                   this.start()
@@ -73,8 +73,7 @@ foam.CLASS({
                       menu.launch_(self.__context__, e);
                     }.bind(this))
                   .end();
-                })
-              .end()
+                });
             })
           .end()
         .end()

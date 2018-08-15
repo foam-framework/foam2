@@ -20,25 +20,21 @@ foam.CLASS({
   name: 'PaperDropdown',
   extends: 'foam.u2.tag.Select',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^unrolled paper-item {
-          font-size: 12px;
-          min-height: 36px;
-        }
-        ^label {
-          color: #737373;
-          font-size: 12px;
-          font-weight: 400;
-          line-height: 18px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-      */}
-    })
-  ],
+  css: `
+    ^unrolled paper-item {
+      font-size: 12px;
+      min-height: 36px;
+    }
+    ^label {
+      color: #737373;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 18px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  `,
 
   properties: [
     {

@@ -18,8 +18,16 @@ foam.LIB({
           .replace(/"/g, '\\"')
           .replace(/\n/g, '\\n')
         }"`;
-      } else {
-        console.log('Encountered unexpected type while converitng value to string');
+      } else if ( type == foam.Array ) {
+        return `[${v.map(foam.swift.stringify).join(',')}]`;
+      } else if ( type == foam.Function ) {
+        // Unable to convert functions.
+        return 'nil';
+      } else if ( type == foam.core.FObject ) {
+        // TODO: Should be able to serialize an FObject to swift.
+        return 'nil';
+      } else  {
+        console.log('Encountered unexpected type while converitng value to string:', v);
         debugger;
       }
     },

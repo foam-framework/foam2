@@ -19,6 +19,7 @@ foam.CLASS({
   package: 'foam.box',
   name: 'SkeletonBox',
   implements: ['foam.box.Box'],
+  flags: ['js', 'swift'],
 
   requires: [
     'foam.box.InvalidMessageException',
