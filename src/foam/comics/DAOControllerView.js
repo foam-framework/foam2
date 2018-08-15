@@ -11,8 +11,9 @@ foam.CLASS({
 
   requires: [
     'foam.comics.DAOController',
-    'foam.comics.DAOUpdateControllerView',
-    'foam.u2.view.ScrollTableView'
+    'foam.u2.view.ScrollTableView',
+    'foam.u2.dialog.Popup',
+    'foam.u2.dialog.ExportModal'
   ],
 
   imports: [
@@ -30,24 +31,24 @@ foam.CLASS({
 
   // TODO: wrong class name, fix when ActionView fixed.
   css: `
-    .middle-row {
+    ^ {
       display: flex;
     }
 
-    .middle-row > *:not(:empty) {
+    ^ > * {
       margin-left: 10px;
     }
 
-    .middle-row > *:last-child {
+    ^ > *:last-child {
       margin-right: 10px;
     }
 
-    .middle-row .actions {
+    ^ .actions {
       display: inline-block;
       margin-bottom: 10px;
     }
 
-    .middle-row .net-nanopay-ui-ActionView {
+    ^ .net-nanopay-ui-ActionView {
       background: #59aadd;
       color: white;
       margin-right: 10px;
@@ -95,26 +96,23 @@ foam.CLASS({
 
       this.
         addClass(this.myClass()).
-        tag(this.data.topBorder$).
+        start().add(this.cls.PREDICATE).end().
         start().
-          addClass('middle-row').
-          tag(this.data.leftBorder).
-          start().add(this.cls.PREDICATE).end().
+          style({ 'overflow-x': 'auto' }).
+          start().
+            addClass('actions').
+            show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW)).
+              start().add(self.cls.getAxiomsByClass(foam.core.Action)).end().
+          end().
+          startContext({ data: this }).
+            start(this.EXPORT_DATA).
+            end().
+          endContext().
           start().
             style({ 'overflow-x': 'auto' }).
-            start().
-              addClass('actions').
-              show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW)).
-                start().add(self.cls.getAxiomsByClass(foam.core.Action)).end().
-            end().
-            start().
-              style({ 'overflow-x': 'auto' }).
-              tag(this.summaryView, { data$: this.data.filteredDAO$ }).
-            end().
+            tag(this.summaryView, { data$: this.data.filteredDAO$ }).
           end().
-          tag(this.data.rightBorder$).
-        end().
-        tag(this.data.bottomBorder$);
+        end();
     },
 
     function dblclick(obj) {
@@ -151,6 +149,19 @@ foam.CLASS({
 
     function onFinished() {
       this.stack.back();
+    }
+  ],
+
+  actions: [
+    {
+      name: 'exportData',
+      label: 'Export',
+      code: function(X) {
+        this.add(this.Popup.create().tag({
+          class: 'foam.u2.ExportModal',
+          exportData: this.data.data
+        }));
+      }
     }
   ]
 });
