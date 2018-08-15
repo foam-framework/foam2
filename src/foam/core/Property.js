@@ -246,6 +246,22 @@ foam.CLASS({
       name: 'forClass_',
       transient: true
     },
+    {
+      /**
+        Identifies properties that contain Personally identifiable information,
+        which may fall within the ambit of privacy regulations.
+      */
+      class: 'Boolean',
+      name: 'containsPII'
+    },
+    {
+      /**
+        Identifies properties that contain Personally identifiable information which
+        may be elgiible for deletion on request.
+      */
+      class: 'Boolean',
+      name: 'containsDeletablePII'
+    }
   ],
 
   methods: [
