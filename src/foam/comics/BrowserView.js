@@ -27,7 +27,8 @@ foam.CLASS({
 
   exports: [
     'controller as data',
-    'summaryView'
+    'summaryView',
+    'updateView'
   ],
 
   properties: [
@@ -52,7 +53,8 @@ foam.CLASS({
       value: { class: 'foam.u2.view.ScrollTableView' },
       // TODO: remove next line when permanently fixed in ViewSpec
       fromJSON: function fromJSON(value, ctx, prop, json) { return value; }
-    }
+    },
+    'updateView'
   ],
 
   methods: [
