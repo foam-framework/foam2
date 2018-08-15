@@ -15,9 +15,10 @@ foam.CLASS({
   ],
 
   imports: [
+    'data? as importedData',
     'stack',
     'summaryView? as importedSummaryView',
-    'data? as importedData',
+    'updateView? as importedUpdateView',
     'window'
   ],
 
@@ -73,6 +74,14 @@ foam.CLASS({
       }
     },
     {
+      name: 'updateView',
+      expression: function() {
+        return this.importedUpdateView ?
+            this.importedUpdateView :
+            { class: 'foam.comics.DAOUpdateControllerView' };
+      }
+    },
+    {
       class: 'String',
       name: 'title',
       expression: function(data$data$of) {
@@ -122,10 +131,17 @@ foam.CLASS({
     },
 
     function onEdit(s, edit, id) {
-      this.stack.push({
-        class: 'foam.comics.DAOUpdateControllerView',
-        key: id
-      }, this);
+      if ( this.updateView.class === 'foam.comics.DAOUpdateControllerView' ) {
+        this.stack.push({
+          class: 'foam.comics.DAOUpdateControllerView',
+          key: id
+        }, this);
+      } else {
+        this.stack.push({
+          class: 'net.nanopay.auth.ui.UserDetailView',
+          userId: id
+        });
+      }
     },
 
     function onFindRelated() {
