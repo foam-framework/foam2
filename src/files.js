@@ -436,7 +436,6 @@ FOAM_FILES([
   { name: "foam/apploader/ClassLoader" },
   { name: "foam/apploader/SubClassLoader" },
   { name: "foam/classloader/OrDAO", flags: ['debug'] },
-  { name: "foam/apploader/JSON2ModelFileDAO" },
   { name: "foam/apploader/WebModelFileFetcher" },
   { name: "foam/apploader/NodeModelFileFetcher", flags: ['node'] },
   { name: "foam/apploader/ModelFileDAO" },
