@@ -149,7 +149,9 @@ foam.CLASS({
     {
       name: 'export',
       isAvailable: function(exportEnabled) { return exportEnabled; },
-      code: function() { }
+      code: function() { 
+        this.pub('export', this.filteredDAO)
+      }
     }
   ]
 });
