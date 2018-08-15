@@ -101,7 +101,7 @@ foam.CLASS({
           tag(this.data.leftBorder).
           start().
             hide(self.data.searchHidden$).
-            enableClass('hide', self.data.filtersEnabled$, true).
+            show(self.data.filtersEnabled$).
             add(self.cls.PREDICATE).
           end().
           start().
