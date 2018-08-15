@@ -152,6 +152,7 @@ FOAM_FILES([
   { name: "lib/input", flags: ['web'] },
   { name: 'foam/nanos/controller/AppStyles', flags: ['web'] },
   { name: 'foam/u2/ModalHeader', flags: ['web'] },
+  { name: 'foam/u2/ExportModal', flags: ['web'] },
   { name: "foam/u2/AttrSlot" },
   { name: "foam/u2/ViewSpec" },
   { name: "foam/u2/Visibility"},
