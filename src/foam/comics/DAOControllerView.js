@@ -88,7 +88,7 @@ foam.CLASS({
     [ 'data', 'edit', 'onEdit' ],
     [ 'data', 'action.findRelatedObject', 'onFindRelated' ],
     [ 'data', 'finished', 'onFinished' ],
-    [ 'data', 'action.export', 'onExport' ]
+    [ 'data', 'export', 'onExport' ]
   ],
 
   methods: [
@@ -155,10 +155,10 @@ foam.CLASS({
       this.stack.back();
     },
 
-    function onExport() {
+    function onExport(dao) {
       this.add(this.Popup.create().tag({
         class: 'foam.u2.ExportModal',
-        exportData: this.data.data
+        exportData: dao.src.filteredDAO
       }));
     }
   ]
