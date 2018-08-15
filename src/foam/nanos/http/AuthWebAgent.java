@@ -197,6 +197,7 @@ public class AuthWebAgent
       } else {
         PrintWriter out = x.get(PrintWriter.class);
         out.println("Access denied. Need permission: " + permission_);
+        ((foam.nanos.logger.Logger)x.get("logger")).debug("Access denied, requires permission:", permission_);
       }
     } else {
       templateLogin(x);
