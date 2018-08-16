@@ -80,6 +80,14 @@ foam.CLASS({
       class: 'Boolean',
       name: 'includeInSignature'
     },
+    {
+      class: 'Boolean',
+      name: 'containsPII'
+    },
+    {
+      class: 'Boolean',
+      name: 'containsDeletablePII'
+    },
     'sourceCls',
     'propType',
     'propValue',
@@ -252,6 +260,18 @@ foam.CLASS({
             visibility: 'public',
             type: 'boolean',
             body: `return ${this.includeInSignature};`
+          },
+          {
+            name: 'containsPII',
+            visibility: 'public',
+            type: 'boolean',
+            body: `return ${this.containsPII};`
+          },
+          {
+            name: 'containsDeletablePII',
+            visibility: 'public',
+            type: 'boolean',
+            body: `return ${this.containsDeletablePII};`
           }
         ];
 
