@@ -72,6 +72,12 @@ foam.CLASS({
       value: false
     },
     {
+      class: 'Boolean',
+      name: 'exportEnabled',
+      documentation: 'True to enable the export button.',
+      value: true
+    },
+    {
       class: 'foam.u2.ViewSpec',
       name: 'topBorder',
       documentation: `Lets you put a view above the rest of the DAOController
@@ -138,6 +144,13 @@ foam.CLASS({
       code: function() {
         this.pub('select', this.selection.id);
         this.finished.pub();
+      }
+    },
+    {
+      name: 'export',
+      isAvailable: function(exportEnabled) { return exportEnabled; },
+      code: function() { 
+        this.pub('export', this.filteredDAO)
       }
     }
   ]

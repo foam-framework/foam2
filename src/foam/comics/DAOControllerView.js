@@ -12,7 +12,8 @@ foam.CLASS({
   requires: [
     'foam.comics.DAOController',
     'foam.comics.DAOUpdateControllerView',
-    'foam.u2.view.ScrollTableView'
+    'foam.u2.view.ScrollTableView',
+    'foam.u2.dialog.Popup'
   ],
 
   imports: [
@@ -86,7 +87,8 @@ foam.CLASS({
     [ 'data', 'action.create', 'onCreate' ],
     [ 'data', 'edit', 'onEdit' ],
     [ 'data', 'action.findRelatedObject', 'onFindRelated' ],
-    [ 'data', 'finished', 'onFinished' ]
+    [ 'data', 'finished', 'onFinished' ],
+    [ 'data', 'export', 'onExport' ]
   ],
 
   methods: [
@@ -151,6 +153,13 @@ foam.CLASS({
 
     function onFinished() {
       this.stack.back();
+    },
+
+    function onExport(dao) {
+      this.add(this.Popup.create().tag({
+        class: 'foam.u2.ExportModal',
+        exportData: dao.src.filteredDAO
+      }));
     }
   ]
 });
