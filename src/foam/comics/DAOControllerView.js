@@ -31,6 +31,12 @@ foam.CLASS({
 
   // TODO: wrong class name, fix when ActionView fixed.
   css: `
+    ^ {
+      width: fit-content;
+      max-width: 100vw;
+      margin: auto;
+    }
+
     .middle-row {
       display: flex;
     }
