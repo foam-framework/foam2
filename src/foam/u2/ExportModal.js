@@ -5,32 +5,15 @@ foam.CLASS({
 
   documentation: 'Export Modal',
 
+  imports: [
+    'exportDriverRegistryDAO'
+  ],
+
   requires: [
-    'foam.u2.ModalHeader',
-    'foam.nanos.export.JSONDriver',
-    'foam.nanos.export.XMLDriver',
-    'foam.nanos.export.CSVDriver'
+    'foam.u2.ModalHeader'
   ],
 
   properties: [
-    {
-      name: 'jsonDriver',
-      factory: function() {
-        return this.JSONDriver.create();
-      }
-    },
-    {
-      name: 'xmlDriver',
-      factory: function() {
-        return this.XMLDriver.create();
-      }
-    },
-    {
-      name: 'csvDriver',
-      factory: function() {
-        return this.CSVDriver.create();
-      }
-    },
     {
       name: 'dataType',
       view: function(_, X) {
@@ -91,54 +74,27 @@ foam.CLASS({
         title: 'Export'
       }))
       .addClass(this.myClass())
-        .startContext({ data: this })
-          .start()
-            .start().addClass('label').add('Data Type').end()
-            .start(this.DATA_TYPE).end()
-            .start().addClass('label').add('Response').end()
-            .start(this.NOTE).addClass('input-box').addClass('note').end()
-            .start(this.CONVERT).addClass('blue-button').addClass('btn').end()
-          .end()
+      .startContext({ data: this })
+        .start()
+          .start().addClass('label').add('Data Type').end()
+          .start(this.DATA_TYPE).end()
+          .start().addClass('label').add('Response').end()
+          .start(this.NOTE).addClass('input-box').addClass('note').end()
+          .start(this.CONVERT).addClass('blue-button').addClass('btn').end()
         .end()
-      .end();
+      .endContext();
     }
   ],
 
   actions: [
-    function convert() {
-      var self = this;
+    async function convert() {
+      var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
+      exportDriver = foam.lookup(exportDriver.driverName).create();
 
       if ( this.exportData ) {
-        if ( this.dataType == 'JSON' ) {
-          this.jsonDriver.exportDAO(this.__context__, this.exportData)
-              .then(function(result) {
-                self.note = result;
-              });
-        } else if ( this.dataType == 'XML' ) {
-          this.xmlDriver.exportDAO(this.__context__, this.exportData)
-              .then(function(result) {
-                self.note = result;
-              });
-        } else if ( this.dataType == 'CSV' ) {
-          this.csvDriver.exportDAO(this.__context__, this.exportData)
-              .then(function(result) {
-                self.note = result;
-              });
-        }
-     } else {
-        if ( this.dataType == 'JSON' ) {
-          this.note = this.jsonDriver.exportFObject(
-                this.__context__, this.exportObj
-              );
-        } else if ( this.dataType == 'XML' ) {
-          this.note = this.xmlDriver.exportFObject(
-                this.__context__, this.exportObj
-              );
-        } else if ( this.dataType == 'CSV' ) {
-          this.note = this.csvDriver.exportFObject(
-                this.__context__, this.exportObj
-              );
-        }
+        this.note = await exportDriver.exportDAO(this.__context__, this.exportData);
+      } else {
+        this.note = await exportDriver.exportFObject(this.__context__, this.exportObj);
       }
     }
   ]
