@@ -151,6 +151,7 @@ FOAM_FILES([
   { name: "foam/web/URLState", flags: ['web'] },
   { name: "lib/input", flags: ['web'] },
   { name: 'foam/nanos/controller/AppStyles', flags: ['web'] },
+  { name: "foam/box/Remote" },
   { name: 'foam/u2/ModalHeader', flags: ['web'] },
   { name: "foam/u2/AttrSlot" },
   { name: "foam/u2/ViewSpec" },
@@ -338,7 +339,6 @@ FOAM_FILES([
   { name: "foam/box/ForwardedMessage" },
   { name: "foam/box/ForwardBox" },
   { name: "foam/box/ForwardingBox" },
-  { name: "foam/box/Remote" },
   { name: "foam/box/SessionClientBox" },
   { name: "lib/boxJava", flags: ['java'] },
 
