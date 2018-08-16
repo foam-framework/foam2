@@ -267,7 +267,7 @@ foam.CLASS({
             name: 'diff',
             visibility: 'public',
             type: 'void',
-            args: [{ type: 'foam.core.FObject',      name: 'o1'   },
+            args: [{ type: 'foam.core.FObject',       name: 'o1'   },
                     { type: 'foam.core.FObject',      name: 'o2'   },
                     { type: 'java.util.Map',          name: 'diff' },
                     { type: 'foam.core.PropertyInfo', name: 'prop' }],
@@ -292,6 +292,24 @@ foam.CLASS({
             visibility: 'public',
             type: 'boolean',
             body: `return ${this.includeInSignature};`
+          });
+        }
+
+        if ( this.containsPII ) {
+          m.push({
+            name: 'containsPII',
+            visibility: 'public',
+            type: 'booleans',
+            body: `return ${this.containsPII};`
+          });
+        }
+
+        if ( this.containsDeletablePII ) {
+          m.push({
+            name: 'containsDeletablePII',
+            visibility: 'public',
+            type: 'boolean',
+            body: `return ${this.containsDeletablePII};`
           });
         }
 
