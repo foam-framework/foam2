@@ -7,5 +7,5 @@
 package foam.core;
 
 public interface Validator {
-  public void validate(foam.core.FObject obj) throws IllegalStateException;
+  public void validate(X x, foam.core.FObject obj) throws IllegalStateException;
 }

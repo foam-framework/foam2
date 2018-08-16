@@ -301,7 +301,9 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  refines: 'foam.core.Method',
+  package: 'foam.core',
+  name: 'MethodArgumentRefine',
+  refines: 'foam.core.AbstractMethod',
   properties: [
     {
       class: 'FObjectArray',
