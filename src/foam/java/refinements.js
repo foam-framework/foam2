@@ -147,7 +147,9 @@ foam.CLASS({
         xmlTextNode:             this.xmlTextNode,
         sqlType:                 this.sqlType,
         includeInDigest:         this.includeInDigest,
-        includeInSignature:      this.includeInSignature
+        includeInSignature:      this.includeInSignature,
+        containsPII:             this.containsPII,
+        containsDeletablePII:    this.containsDeletablePII
       });
     },
 
