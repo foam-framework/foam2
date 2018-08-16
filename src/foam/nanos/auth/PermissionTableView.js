@@ -12,7 +12,8 @@ foam.CLASS({
   imports: [
     'auth',
     'groupDAO',
-    'permissionDAO'
+    'permissionDAO',
+    'user'
   ],
 
   requires: [
@@ -73,7 +74,12 @@ foam.CLASS({
             .add('Groups: ').tag('br')
 
             .start().select(self.groupDAO.orderBy(self.Group.ID), function(g) {
-              groups[g.id] = foam.u2.md.CheckBox.create({label: g.id, data: true});
+              if ( self.user.group == g.id ) {
+                groups[g.id] = foam.u2.md.CheckBox.create({label: g.id, data: true});
+              } else {
+                groups[g.id] = foam.u2.md.CheckBox.create({label: g.id, data: false});
+              }
+
               this.tag(groups[g.id]).tag('br')
             }).end()
 
