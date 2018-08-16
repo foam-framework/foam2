@@ -32,8 +32,8 @@ foam.CLASS({
       name: 'getAliasesBody',
       expression: function() {
       var b = 'new String[] {';
-        for (var i = 0; i < this.propAliases.length; i++) {
-          b+= '"'+ this.propAliases[i]+'"' + (i < this.propAliases.length-1 ? ', ' : '');
+        for ( var i = 0; i < this.propAliases.length; i++ ) {
+          b+= '"'+ this.propAliases[i]+'"' + ( i < this.propAliases.length-1 ? ', ' : '' );
         }
         return b+'};';
       }
@@ -103,7 +103,7 @@ foam.CLASS({
             name: 'getShortName',
             visibility: 'public',
             type: 'String',
-            body:  this.propShortName ? 'return "' +this.propShortName + '";' : 'return null;'
+            body: this.propShortName ? 'return "' +this.propShortName + '";' : 'return null;'
           },
           {
             name: 'getAliases',
@@ -115,49 +115,49 @@ foam.CLASS({
             name: 'get',
             visibility: 'public',
             type: 'Object',
-            args: [ { name: 'o', type: 'Object' } ],
+            args: [{ name: 'o', type: 'Object' }],
             body: 'return get_(o);'
           },
           {
             name: 'get_',
             type: this.propType,
             visibility: 'public',
-            args: [ { name: 'o', type: 'Object' } ],
+            args: [{ name: 'o', type: 'Object' }],
             body: 'return ((' + this.sourceCls.name + ') o).' + this.getterName + '();'
           },
           {
             name: 'set',
             type: 'void',
             visibility: 'public',
-            args: [ { name: 'o', type: 'Object' }, { name: 'value', type: 'Object' } ],
+            args: [{ name: 'o', type: 'Object' }, { name: 'value', type: 'Object' }],
             body: '((' + this.sourceCls.name + ') o).' + this.setterName + '(cast(value));'
           },
           {
             name: 'cast',
             type: this.propType,
             visibility: 'public',
-            args: [ { name: 'o', type: 'Object' } ],
+            args: [{ name: 'o', type: 'Object' }],
             body: 'return (' + this.propType + ') o;'
           },
           {
             name: 'compare',
             type: 'int',
             visibility: 'public',
-            args: [ { name: 'o1', type: 'Object' }, { name: 'o2', type: 'Object' } ],
+            args: [{ name: 'o1', type: 'Object' }, { name: 'o2', type: 'Object' }],
             body: this.compare,
           },
           {
             name: 'comparePropertyToObject',
             type: 'int',
             visibility: 'public',
-            args: [ { name: 'key', type: 'Object' }, { name: 'o', type: 'Object' } ],
+            args: [{ name: 'key', type: 'Object' }, { name: 'o', type: 'Object' }],
             body: this.comparePropertyToObject,
           },
           {
             name: 'comparePropertyToValue',
             type: 'int',
             visibility: 'public',
-            args: [ { name: 'key', type: 'Object' }, { name: 'value', type: 'Object' } ],
+            args: [{ name: 'key', type: 'Object' }, { name: 'value', type: 'Object' }],
             body: this.comparePropertyToValue,
           },
           {
@@ -230,14 +230,14 @@ foam.CLASS({
             name: 'isSet',
             visibility: 'public',
             type: 'boolean',
-            args: [ { name: 'o', type: 'Object' } ],
+            args: [{ name: 'o', type: 'Object' }],
             body: `return ((${this.sourceCls.name}) o).${this.propName}IsSet_;`
           },
           {
             name: 'isDefaultValue',
             visibility: 'public',
             type: 'boolean',
-            args: [ { name: 'o', type: 'Object' } ],
+            args: [{ name: 'o', type: 'Object' }],
             /* TODO: revise when/if expression support is added to Java */
             body: `return foam.util.SafetyUtil.compare(get_(o), ${this.propValue}) == 0;`
           },
@@ -260,8 +260,8 @@ foam.CLASS({
             name: 'cloneProperty',
             visibility: 'public',
             type: 'void',
-            args: [ { type: 'foam.core.FObject', name: 'source' },
-                    { type: 'foam.core.FObject', name: 'dest' } ],
+            args: [{ type: 'foam.core.FObject', name: 'source' },
+                    { type: 'foam.core.FObject', name: 'dest' }],
             body: this.cloneProperty
           });
         }
@@ -271,7 +271,7 @@ foam.CLASS({
             name: 'diff',
             visibility: 'public',
             type: 'void',
-            args: [ { type: 'foam.core.FObject',      name: 'o1'   },
+            args: [{ type: 'foam.core.FObject',      name: 'o1'   },
                     { type: 'foam.core.FObject',      name: 'o2'   },
                     { type: 'java.util.Map',          name: 'diff' },
                     { type: 'foam.core.PropertyInfo', name: 'prop' }],
