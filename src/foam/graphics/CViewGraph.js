@@ -18,7 +18,7 @@ foam.CLASS( {
     },
     {
       class: 'Array',
-      of: 'LegendEntries',
+      of: 'foam.graphics.LegendEntries',
       name: 'LegendEntries'
     }, //LegendEntries  [ name ,  value [ float ] ]
     {
