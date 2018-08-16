@@ -175,7 +175,7 @@ foam.CLASS({
 
 foam.SCRIPT({
   package: 'foam.core',
-  name: 'MethodScript',
+  name: 'BootPhase2',
   code: function() {
     foam.boot.phase2();
   }
