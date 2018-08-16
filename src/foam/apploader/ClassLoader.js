@@ -53,9 +53,9 @@ have multiple classloaders running alongside eachother`
   methods: [
     {
       name: 'addClassPath',
-      code: function(path, json2) {
+      code: function(path) {
         var cls = this[foam.isServer ? 'NodeModelFileDAO' : 'WebModelFileDAO'];
-        var modelDAO = cls.create({root: path, json2: json2}, this);
+        var modelDAO = cls.create({root: path}, this);
 
         if ( this.modelDAO ) {
           modelDAO = this.OrDAO.create({

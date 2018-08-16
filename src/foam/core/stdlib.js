@@ -213,7 +213,10 @@ foam.LIB({
             return cache;
           },
           'memoize0(' + f.name + ')');
-      ret.toString = function() { return f.toString(); };
+      ret.toString = function() {
+        return `foam.Function.memoize0(${f.toString()})`
+      };
+      ret.args = []
       return ret;
     },
 
@@ -222,7 +225,7 @@ foam.LIB({
      * with a particular value for its first argument.
      */
     function memoize1(/* Function */ f) {
-      var cache = {}, nullCache, undefinedCache;
+      var cache = {};
       var ret = foam.Function.setName(
           function(key) {
             foam.assert(
@@ -239,8 +242,11 @@ foam.LIB({
             return cache[mKey];
           },
           'memoize1(' + f.name + ')');
-        ret.toString = function() { return f.toString(); };
-        return ret;
+      ret.toString = function() {
+        return `foam.Function.memoize1(${f.toString()})`
+      };
+      ret.args = [];
+      return ret;
     },
 
     /**
