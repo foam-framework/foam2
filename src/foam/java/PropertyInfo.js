@@ -299,7 +299,7 @@ foam.CLASS({
           m.push({
             name: 'containsPII',
             visibility: 'public',
-            type: 'booleans',
+            type: 'boolean',
             body: `return ${this.containsPII};`
           });
         }
