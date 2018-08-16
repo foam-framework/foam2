@@ -73,7 +73,18 @@ foam.CLASS({
       name: 'axioms',
       hidden: true,
       factory: function() { return []; },
-      postSet: function(_, a) { this.axioms_.push.apply(this.axioms_, a); }
+      postSet: function(_, a) { this.axioms_.push.apply(this.axioms_, a); },
+      adapt: function(_, v) {
+        if ( ! Array.isArray(v) ) return v;
+        var copy;
+        for ( var i = 0 ; i < v.length ; i++ ) {
+          if ( v[i].class ) {
+            if ( ! copy ) copy = v.slice();
+            copy[i] = foam.lookup(v[i].class).create(v[i]);
+          }
+        }
+        return copy || v;
+      }
     },
     {
       // Is upgraded to an AxiomArray later.

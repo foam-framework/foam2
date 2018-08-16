@@ -10,7 +10,36 @@ foam.CLASS({
   requires: [
     'foam.json2.Outputter',
   ],
+  constants: [
+    {
+      name: 'DEFAULT',
+      of: 'foam.swift.parse.json.output.Outputter',
+      swiftFactory: `return Context.GLOBAL.create(foam_swift_parse_json_output_Outputter.self)!`,
+    },
+    {
+      name: 'PRETTY',
+      of: 'foam.swift.parse.json.output.Outputter',
+      swiftFactory: `
+let x = Context.GLOBAL
+return x.create(foam_swift_parse_json_output_Outputter.self, args: [
+  "outputterFactory": { (_: Context) -> foam_json2_Outputter in
+    return x.create(foam_json2_Outputter.self, args: [
+      "out": x.create(foam_json2_PrettyOutputterOutput.self)
+    ])!
+  }
+])!
+      `,
+    },
+  ],
   properties: [
+    {
+      swiftType: '((Context) -> foam_json2_Outputter)',
+      swiftRequiresEscaping: true,
+      name: 'outputterFactory',
+      swiftValue: `{ (x: Context) -> foam_json2_Outputter in
+        return x.create(foam_json2_Outputter.self)!
+      }`,
+    },
     {
       swiftType: '((foam_core_FObject, PropertyInfo) -> Bool)',
       swiftRequiresEscaping: true,
@@ -124,7 +153,7 @@ _ = out.end()
       ],
       swiftReturns: 'String',
       swiftCode: `
-let s = Outputter_create()
+let s = outputterFactory(__subContext__)
 output(s, data)
 return s.out.output()
       `,

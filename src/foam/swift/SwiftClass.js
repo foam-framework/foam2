@@ -64,6 +64,7 @@ foam.CLASS({
 
   methods: [
     function method(m) {
+      if ( ! foam.core.FObject.isInstance(m) ) m = this.Method.create(m)
       this.methods.push(m);
       return this;
     },
