@@ -50,7 +50,9 @@ public class IsInstanceOfParser extends foam.lib.parse.ProxyParser {
         throw new RuntimeException(e);
       }
 
-      ps.setValue( new IsInstanceOf(info) );
+      foam.mlang.predicate.IsInstanceOf exp = new foam.mlang.predicate.IsInstanceOf();
+      exp.setTargetClass(info);
+      ps.setValue(exp);
     }
 
     return ps;
