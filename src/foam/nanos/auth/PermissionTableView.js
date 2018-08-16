@@ -74,12 +74,7 @@ foam.CLASS({
             .add('Groups: ').tag('br')
 
             .start().select(self.groupDAO.orderBy(self.Group.ID), function(g) {
-              if ( self.user.group == g.id ) {
-                groups[g.id] = foam.u2.md.CheckBox.create({label: g.id, data: true});
-              } else {
-                groups[g.id] = foam.u2.md.CheckBox.create({label: g.id, data: false});
-              }
-
+              groups[g.id] = foam.u2.md.CheckBox.create({label: g.id, data: self.user.group == g.id});
               this.tag(groups[g.id]).tag('br')
             }).end()
 
