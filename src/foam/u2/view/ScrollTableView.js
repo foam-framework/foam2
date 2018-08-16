@@ -84,7 +84,7 @@
         // Convert to rows, rounding up. (Therefore minumum 1.)
         var rows = Math.ceil(Math.abs(e.deltaY) / /*self.rowHeight*/ 40);
         this.skip = Math.max(0, this.skip + (negative ? -rows : rows));
-        e.preventDefault();
+        if ( e.deltaY !== 0 ) e.preventDefault();
       }
     },
     {

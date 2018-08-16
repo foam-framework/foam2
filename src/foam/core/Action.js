@@ -168,6 +168,8 @@ foam.CLASS({
 /** Add Action support to Model. */
 foam.CLASS({
   refines: 'foam.core.Model',
+  package: 'foam.core',
+  name: 'ModelActionRefine',
 
   properties: [
     {
