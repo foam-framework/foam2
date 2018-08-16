@@ -145,6 +145,16 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
+  public boolean containsPII(){
+    return false;
+  }
+
+  @Override
+  public boolean containsDeletablePII(){
+    return false;
+  }
+
+  @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {}
 
   protected byte[] nameAsByteArray_ = null;
