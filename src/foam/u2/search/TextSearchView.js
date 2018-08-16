@@ -21,10 +21,18 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
-    'foam.mlang.predicate.ContainsIC',
     'foam.mlang.predicate.True',
+    'foam.mlang.predicate.False',
     'foam.parse.QueryParser',
     'foam.u2.tag.Input'
+  ],
+
+  imports: [
+    'filterController'
+  ],
+
+  implements: [
+    'foam.mlang.Expressions'
   ],
 
   properties: [
@@ -100,11 +108,27 @@ foam.CLASS({
       name: 'updateValue',
       code: function() {
         var value = this.view.data;
-        this.predicate = ! value ?
-            this.True.create() :
-            this.richSearch ?
-                this.queryParser.parseString(value) :
-                this.ContainsIC(this.property, value);
+
+        if ( ! value ) {
+          this.predicate = this.True.create();
+          return;
+        }
+
+        if ( this.richSearch ) {
+          this.predicate = this.filterController.filters
+            .map((name) => this.of.getAxiomByName(name))
+            .filter((property) => foam.core.String.isInstance(property))
+            .reduce(
+              (acc, property) => this.OR(
+                this.CONTAINS_IC(property, value),
+                acc || this.False.create()
+              ),
+              this.queryParser.parseString(value)
+            );
+          return;
+        }
+
+        this.predicate = this.CONTAINS_IC(this.property, value);
       }
     }
   ]
