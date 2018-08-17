@@ -70,6 +70,36 @@ foam.CLASS({
       name: 'addEnabled',
       documentation: 'True to enable the Add button for adding to a relationship',
       value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'exportEnabled',
+      documentation: 'True to enable the export button.',
+      value: true
+    },
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'topBorder',
+      documentation: `Lets you put a view above the rest of the DAOController
+        content.`
+    },
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'rightBorder',
+      documentation: `Lets you put a view to the right of the rest of the
+        DAOController content.`
+    },
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'bottomBorder',
+      documentation: `Lets you put a view below the rest of the DAOController
+        content.`
+    },
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'leftBorder',
+      documentation: `Lets you put a view to the left of the rest of the
+        DAOController content.`
     }
   ],
 
@@ -114,6 +144,13 @@ foam.CLASS({
       code: function() {
         this.pub('select', this.selection.id);
         this.finished.pub();
+      }
+    },
+    {
+      name: 'export',
+      isAvailable: function(exportEnabled) { return exportEnabled; },
+      code: function() { 
+        this.pub('export', this.filteredDAO)
       }
     }
   ]

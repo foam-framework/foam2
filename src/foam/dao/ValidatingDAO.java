@@ -24,7 +24,7 @@ public class ValidatingDAO
   }
 
   public FObject put_(X x, FObject obj) throws IllegalStateException {
-    validator_.validate(obj);
+    validator_.validate(x, obj);
     return super.put_(x, obj);
   }
 }

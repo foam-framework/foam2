@@ -240,18 +240,6 @@ foam.CLASS({
             args: [ { name: 'o', type: 'Object' } ],
             /* TODO: revise when/if expression support is added to Java */
             body: `return foam.util.SafetyUtil.compare(get_(o), ${this.propValue}) == 0;`
-          },
-          {
-            name: 'includeInDigest',
-            visibility: 'public',
-            type: 'boolean',
-            body: `return ${this.includeInDigest};`
-          },
-          {
-            name: 'includeInSignature',
-            visibility: 'public',
-            type: 'boolean',
-            body: `return ${this.includeInSignature};`
           }
         ];
 
@@ -276,6 +264,26 @@ foam.CLASS({
                     { type: 'java.util.Map',          name: 'diff' },
                     { type: 'foam.core.PropertyInfo', name: 'prop' }],
             body: this.diffProperty
+          });
+        }
+
+        // default value is true, only generate if value is false
+        if ( ! this.includeInDigest ) {
+          m.push({
+            name: 'includeInDigest',
+            visibility: 'public',
+            type: 'boolean',
+            body: `return ${this.includeInDigest};`
+          });
+        }
+
+        // default value is true, only generate if value is false
+        if ( ! this.includeInSignature ) {
+          m.push({
+            name: 'includeInSignature',
+            visibility: 'public',
+            type: 'boolean',
+            body: `return ${this.includeInSignature};`
           });
         }
 
