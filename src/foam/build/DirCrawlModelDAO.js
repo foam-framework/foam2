@@ -129,10 +129,12 @@ foam.CLASS({
       var self = this;
       var scriptFilesExp = new RegExp(self.unwrappedScripts.join('|'));
       var blacklistExp = new RegExp(self.blacklist.join('|'));
-      var files = require('child_process')
-        .execSync(`find ${self.srcDir}`)
-        .toString('utf-8')
-        .split('\n');
+
+      var files = [];
+      self.ftw(self.srcDir, function(path, lstat) {
+        if ( ! lstat.isFile() ) return;
+        files.push(path);
+      });
 
       var jsFiles = files
         .filter(function(o) {
@@ -182,6 +184,20 @@ foam.CLASS({
       });
 
       return Promise.all(promises);
+    },
+    function ftw(dir, fn) {
+      var fs = require('fs');
+      var sep = require('path').sep;
+      var dirs = [this.srcDir];
+      while ( dirs.length ) {
+        var dir = dirs.pop();
+        fs.readdirSync(dir).forEach(function(f) {
+          var path = dir + sep + f;
+          var lstat = fs.lstatSync(path);
+          if ( lstat.isDirectory() ) dirs.push(path)
+          fn(path, lstat)
+        })
+      }
     },
     function execute() {
       this.select().then(function(a) {
