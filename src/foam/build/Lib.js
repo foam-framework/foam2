@@ -5,17 +5,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
-      expression: function(package, name) {
-        return package ? package + '.' + name : name;
-      },
-    },
-    {
-      class: 'String',
-      name: 'package'
-    },
-    {
-      class: 'String',
-      name: 'name'
     },
     {
       name: 'flags',
