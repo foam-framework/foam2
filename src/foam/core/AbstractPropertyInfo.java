@@ -144,10 +144,12 @@ public abstract class AbstractPropertyInfo
     return true;
   }
 
+  @Override
   public boolean containsPII(){
     return false;
   }
 
+  @Override
   public boolean containsDeletablePII(){
     return false;
   }
