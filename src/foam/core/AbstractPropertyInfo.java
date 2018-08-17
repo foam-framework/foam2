@@ -144,6 +144,14 @@ public abstract class AbstractPropertyInfo
     return true;
   }
 
+  public boolean containsPII(){
+    return false;
+  }
+
+  public boolean containsDeletablePII(){
+    return false;
+  }
+
   @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {}
 
