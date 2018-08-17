@@ -107,7 +107,11 @@ foam.CLASS({
         start().
           addClass('middle-row').
           tag(this.data.leftBorder).
-          start().add(this.cls.PREDICATE).end().
+          start().
+            hide(self.data.searchHidden$).
+            show(self.data.filtersEnabled$).
+            add(self.cls.PREDICATE).
+          end().
           start().
             style({ 'overflow-x': 'auto' }).
             start().
