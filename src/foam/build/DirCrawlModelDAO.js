@@ -151,7 +151,9 @@ foam.CLASS({
           return scriptFilesExp.exec(o) && !blacklistExp.exec(o)
         })
 
-      // TODO: Do something with java files?
+      // TODO: Add a JavaClass model for manually written java classes.
+      // Parse the package/name from the .java and then store them in the DAO as
+      // well. Also do the same for swift files.
       var javaFiles = files
         .filter(function(o) {
           return o.endsWith('.java');
