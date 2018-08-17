@@ -597,6 +597,7 @@ foam.CLASS({
     },
     {
       name: 'swiftGetter',
+      flags: ['swift'],
       expression: function(methodName) {
         return `return ${methodName}(__context__) as? (foam_dao_DAO & foam_core_FObject)`
       },
@@ -642,6 +643,7 @@ foam.CLASS({
     },
     {
       name: 'swiftCode',
+      flags: ['swift'],
       expression: function(target, targetPropertyName, targetDAOKey) {
         return `
           return x.create(foam_dao_RelationshipDAO.self, args: [
@@ -787,6 +789,7 @@ foam.CLASS({
     },
     {
       name: 'swiftCode',
+      flags: ['swift'],
       expression: function(sourceProperty, targetProperty, targetDAOKey, junctionDAOKey, junction) {
         return `
           return x.create(foam_dao_ManyToManyRelationshipImpl.self, args: [
@@ -852,12 +855,14 @@ foam.CLASS({
     },
     {
       name: 'swiftGetter',
+      flags: ['swift'],
       expression: function(methodName) {
         return `return ${methodName}(__context__)`
       },
     },
     {
       name: 'swiftSetter',
+      flags: ['swift'],
       value: '// NOOP',
     },
   ],
