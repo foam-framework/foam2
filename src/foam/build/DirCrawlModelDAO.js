@@ -130,58 +130,34 @@ foam.CLASS({
       var scriptFilesExp = new RegExp(self.unwrappedScripts.join('|'));
       var blacklistExp = new RegExp(self.blacklist.join('|'));
 
-      var files = [];
-      self.ftw(self.srcDir, function(path, lstat) {
-        if ( ! lstat.isFile() ) return;
-        files.push(path);
-      });
-
-      var jsFiles = files
-        .filter(function(o) {
-          return o.endsWith('.js');
-        })
-
-      var evalFiles = jsFiles
-        .filter(function(o) {
-          return !scriptFilesExp.exec(o) && !blacklistExp.exec(o)
-        })
-
-      var scriptFiles = jsFiles
-        .filter(function(o) {
-          return scriptFilesExp.exec(o) && !blacklistExp.exec(o)
-        })
-
-      // TODO: Add a JavaClass model for manually written java classes.
-      // Parse the package/name from the .java and then store them in the DAO as
-      // well. Also do the same for swift files.
-      var javaFiles = files
-        .filter(function(o) {
-          return o.endsWith('.java');
-        })
-
       var fs = require('fs');
       var sep = require('path').sep;
-      evalFiles.forEach(function(f) {
-        var o = fs.readFileSync(f, 'utf-8');
-        try {
-          with ( context ) { eval(o) };
-        } catch(e) {
-          console.log(e);
-        }
-      });
+      self.ftw(self.srcDir, function(path, lstat) {
+        if ( ! lstat.isFile() ) return;
+        if ( blacklistExp.exec(path) ) return;
 
-      scriptFiles.forEach(function(f) {
-        var o = fs.readFileSync(f, 'utf-8');
+        var o = fs.readFileSync(path, 'utf-8');
 
-        // Remove extension and append 'Script' to name.
-        var n = f.split(sep).pop().replace(/\.js$/, '') + 'Script';
-
-        with ( context ) {
-          foam.SCRIPT({
-            package: 'foam.core',
-            name: n,
-            code: new Function(o),
-          });
+        if ( scriptFilesExp.exec(path) ) {
+          // Remove extension and append 'Script' to name.
+          var n = path.split(sep).pop().replace(/\.js$/, '') + 'Script';
+          with ( context ) {
+            foam.SCRIPT({
+              package: 'foam.core',
+              name: n,
+              code: new Function(o),
+            });
+          }
+        } else if ( path.endsWith('.js') ) {
+          try {
+            with ( context ) { eval(o) };
+          } catch(e) {
+            console.log(e);
+          }
+        } else if ( path.endsWith('.java') ) {
+          // TODO: Add a JavaClass model for manually written java classes.
+          // Parse the package/name from the .java and then store them in the DAO as
+          // well. Also do the same for swift files.
         }
       });
 
