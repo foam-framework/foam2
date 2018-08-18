@@ -31,6 +31,12 @@ foam.CLASS({
 
   // TODO: wrong class name, fix when ActionView fixed.
   css: `
+    ^ {
+      width: fit-content;
+      max-width: 100vw;
+      margin: auto;
+    }
+
     .middle-row {
       display: flex;
     }
@@ -101,7 +107,11 @@ foam.CLASS({
         start().
           addClass('middle-row').
           tag(this.data.leftBorder).
-          start().add(this.cls.PREDICATE).end().
+          start().
+            hide(self.data.searchHidden$).
+            show(self.data.filtersEnabled$).
+            add(self.cls.PREDICATE).
+          end().
           start().
             style({ 'overflow-x': 'auto' }).
             start().

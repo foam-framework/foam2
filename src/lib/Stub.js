@@ -62,14 +62,16 @@ foam.CLASS({
   package: 'foam.core',
   name: 'StubAction',
   extends: 'Action',
-
+  requires: [
+    'foam.core.StubMethod',
+  ],
   properties: [
     'replyPolicyName',
     'boxPropName',
     {
       name: 'stubMethod',
       factory: function() {
-        return foam.core.StubMethod.create({
+        return this.StubMethod.create({
           name: this.name,
           replyPolicyName: this.replyPolicyName,
           boxPropName: this.boxPropName
@@ -98,7 +100,9 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Stub',
   extends: 'Property',
-
+  requires: [
+    'foam.core.StubMethod',
+  ],
   properties: [
     'of',
     {

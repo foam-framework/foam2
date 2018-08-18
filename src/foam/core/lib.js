@@ -25,7 +25,13 @@ foam = {
     /* Return a unique id. */
     var id = 1;
     return function next$UID() { return id++; };
-  })()
+  })(),
+  SCRIPT: function(m) {
+    // An instance of the script isn't useful at this point so just blindly
+    // execute the code. foam.SCRIPT can be overwritten later to capture the
+    // details of the script if need be.
+    m.code();
+  }
 };
 
 
