@@ -4,6 +4,13 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+// Several examples of creating Border or Container views.
+// Containers are views which set the 'content' Property of Element to
+// some child Element. When add() is called new child elements are added
+// to the content area rather than to the end of the View.
+// Alternatively, containers can create explicit content areas like
+// 'leftPane', 'rightPane', 'header', etc.
+
 var E = foam.__context__.E.bind(foam.__context__);
 
 foam.CLASS({
@@ -109,7 +116,10 @@ var tabs = Tabs.create().
 tabs.write();
 
 
+
 E('br').write();
+E('br').write();
+
 
 
 // TODO: add CardDeck example
@@ -142,8 +152,11 @@ foam.CLASS({
 
 Card.create().add('content').tag('br').add('more content').tag('br').add('even more conent').write();
 
+
+
 E('br').write();
 E('br').write();
+
 
 
 foam.CLASS({
@@ -185,8 +198,11 @@ var sb = SampleBorder.create({title: 'Title', footer: 'Footer'});
 sb.add('content');
 sb.write();
 
+
+
 E('br').write();
 E('br').write();
+
 
 
 foam.CLASS({
@@ -220,6 +236,7 @@ var split = SampleSplitContainer.create();
 split.write();
 split.leftPanel.add('leftContent');
 split.rightPanel.add('rightContent');
+
 
 
 E('br').write();
