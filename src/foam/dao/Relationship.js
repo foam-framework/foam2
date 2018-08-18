@@ -32,7 +32,8 @@ foam.CLASS({
       name: 'package',
       // Default to sourceModel's package if not specified.
       factory: function() {
-        return this.lookup(this.sourceModel).package;
+        var i = this.sourceModel.lastIndexOf('.')
+        return i == -1 ? '' : this.sourceModel.substring(0, i)
       }
     },
     {
@@ -41,8 +42,10 @@ foam.CLASS({
       transient: true,
       hidden: true,
       getter: function() {
-        return this.lookup(this.sourceModel).name +
-          this.lookup(this.targetModel).name + 'Relationship';
+        var s = this.sourceModel;
+        var t = this.targetModel;
+        return s.substring(s.lastIndexOf('.') + 1) +
+          t.substring(t.lastIndexOf('.') + 1) + 'Relationship';
       }
     },
     'forwardName',
