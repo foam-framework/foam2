@@ -13,7 +13,6 @@ foam.CLASS({
     'foam.build.FlagStripSink',
     'foam.dao.DAOSink',
     'foam.dao.EasyDAO',
-    'foam.dao.PromisedDAO',
   ],
   implements: [
     'foam.mlang.Expressions',
