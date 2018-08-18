@@ -14,9 +14,6 @@ foam.CLASS({
     'foam.dao.EasyDAO',
     'foam.dao.Relationship',
   ],
-  imports: [
-    'classloader',
-  ],
   properties: [
     {
       name: 'unwrappedScripts',
@@ -118,12 +115,7 @@ foam.CLASS({
 
       context.foam.RELATIONSHIP = function(m) {
         var r = self.Relationship.create(m);
-        promises.push(Promise.all([
-          self.classloader.load(r.sourceModel),
-          self.classloader.load(r.targetModel)
-        ]).then(function() {
-          return dao.put(r);
-        }))
+        return dao.put(r);
       };
 
       var self = this;
