@@ -41,6 +41,8 @@ foam.CLASS({
       flags: ['swift'],
     },
     'foam.box.HTTPReplyBox',
+    'foam.box.HTTPException',
+    'foam.box.Message',
   ],
 
   imports: [
