@@ -31,7 +31,7 @@ public class TomcatRouter
       ((javax.websocket.server.ServerContainer)
        config.getServletContext().getAttribute("javax.websocket.server.ServerContainer")).
         addEndpoint(ServerEndpointConfig.Builder.
-                    create(WebSocketHandler.class, "/service/{service}").
+                    create(WebSocketHandler.class, "/socket/{service}").
                     configurator(new Configurator(getX())).
                     build());
     } catch (javax.websocket.DeploymentException e) {
