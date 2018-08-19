@@ -13,6 +13,8 @@
 
 var E = foam.__context__.E.bind(foam.__context__);
 
+// Note that this is just a simple Tab view for demonstration purposes.
+// There's a more complete implementation in the foam.u2 package.
 foam.CLASS({
   name: 'Tab',
   extends: 'foam.u2.Element',
@@ -79,13 +81,13 @@ foam.CLASS({
   methods: [
     function init() {
       this.
-          addClass(this.myClass()).
-          start('div', null, this.tabRow$).
-            addClass(this.myClass('tabRow')).
-          end().
-          start('div', null, this.content$).
-            addClass(this.myClass('content')).
-          end();
+        addClass(this.myClass()).
+        start('div', null, this.tabRow$).
+          addClass(this.myClass('tabRow')).
+        end().
+        start('div', null, this.content$).
+          addClass(this.myClass('content')).
+        end();
     },
 
     function add(tab) {
@@ -94,10 +96,10 @@ foam.CLASS({
         if ( ! this.selected ) this.selected = tab;
 
         this.tabRow.start('span').
-            addClass(this.myClass('tab')).
-            enableClass('selected', tab.selected$).
-            on('click', function() { this.selected = tab; }.bind(this)).
-            add(tab.label).
+          addClass(this.myClass('tab')).
+          enableClass('selected', tab.selected$).
+          on('click', function() { this.selected = tab; }.bind(this)).
+          add(tab.label).
         end();
 
         tab.shown$ = tab.selected$;
@@ -128,24 +130,24 @@ foam.CLASS({
   extends: 'foam.u2.Element',
 
   css: `
-      ^ {
-        background: white;
-        border-radius: 3px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
-        margin: 8px;
-        transform-origin: top left;
-        display: inline-block;
-      }
-      ^content { padding: 6px; width: 300px; height: 200px; background: white; }
+    ^ {
+      background: white;
+      border-radius: 3px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
+      margin: 8px;
+      transform-origin: top left;
+      display: inline-block;
+    }
+    ^content { padding: 6px; width: 300px; height: 200px; background: white; }
   `,
 
   methods: [
     function init() {
       this.
-          addClass(this.myClass()).
-          start('div', null, this.content$).
-            addClass(this.myClass('content')).
-          end();
+        addClass(this.myClass()).
+        start('div', null, this.content$).
+          addClass(this.myClass('content')).
+        end();
     }
   ]
 });
@@ -178,18 +180,18 @@ foam.CLASS({
   methods: [
     function init() {
       this.
-          start().
-            addClass(this.myClass()).
-            start('div').addClass(this.myClass('title')).add(this.title$).end().
-            start('div', null, this.content$).
-              addClass(this.myClass('content')).
-            end().
-            start('div')
-              .addClass(this.myClass('footer'))
-              .tag('hr')
-              .add(this.footer$)
-            .end().
-          end();
+        start().
+          addClass(this.myClass()).
+          start('div').addClass(this.myClass('title')).add(this.title$).end().
+          start('div', null, this.content$).
+            addClass(this.myClass('content')).
+          end().
+          start('div')
+            .addClass(this.myClass('footer'))
+            .tag('hr')
+            .add(this.footer$)
+          .end().
+        end();
     }
   ]
 });
@@ -221,13 +223,13 @@ foam.CLASS({
   methods: [
     function init() {
       this.
-          addClass(this.myClass()).
-          start('div', null, this.leftPanel$).
-            addClass(this.myClass('content')).
-          end().
-          start('div', null, this.rightPanel$).
-            addClass(this.myClass('content')).
-          end();
+        addClass(this.myClass()).
+        start('div', null, this.leftPanel$).
+          addClass(this.myClass('content')).
+        end().
+        start('div', null, this.rightPanel$).
+          addClass(this.myClass('content')).
+        end();
     }
   ]
 });
