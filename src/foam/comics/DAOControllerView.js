@@ -30,7 +30,6 @@ foam.CLASS({
     'dblclick'
   ],
 
-  // TODO: wrong class name, fix when ActionView fixed.
   css: `
     ^ {
       width: fit-content;
@@ -38,26 +37,29 @@ foam.CLASS({
       margin: auto;
     }
 
-    .middle-row {
+    ^ .middle-row {
       display: flex;
     }
 
-    .middle-row > *:not(:empty) {
+    ^ .middle-row > *:not(:empty) {
       margin-left: 10px;
     }
 
-    .middle-row > *:last-child {
+    ^ .middle-row > *:last-child {
       margin-right: 10px;
     }
 
-    .middle-row .actions {
+    ^ .actions {
       display: inline-block;
     }
 
-    .middle-row .net-nanopay-ui-ActionView {
+    ^ .actions .net-nanopay-ui-ActionView {
+      margin: 0 10px 10px 0;
+    }
+
+    ^ .net-nanopay-ui-ActionView {
       background: #59aadd;
       color: white;
-      margin: 0 10px 10px 0;
     }
   `,
 
