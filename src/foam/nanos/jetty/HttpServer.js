@@ -1,9 +1,25 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.jetty',
   name: 'HttpServer',
+
   implements: [
     'foam.nanos.NanoService'
   ],
+
+  javaImports: [
+    'org.eclipse.jetty.http.pathmap.ServletPathSpec',
+    'org.eclipse.jetty.websocket.server.WebSocketUpgradeFilter',
+    'org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest',
+    'org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse',
+    'org.eclipse.jetty.websocket.servlet.WebSocketCreator'
+  ],
+
   properties: [
     {
       class: 'Int',
@@ -94,9 +110,22 @@ foam.CLASS({
           }
         }
 
+        // set error handler
         handler.setErrorHandler(errorHandler);
+
+        // Add websocket upgrade filter
+        WebSocketUpgradeFilter wsFilter = WebSocketUpgradeFilter.configureContext(handler);
+        // set idle time out to 10s
+        wsFilter.getFactory().getPolicy().setIdleTimeout(10000);
+        // add mapping
+        wsFilter.addMapping(new ServletPathSpec("/service/*"), new WebSocketCreator() {
+          @Override
+          public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp) {
+            return new foam.nanos.ws.NanoWebSocket(getX());
+          }
+        });
+
         server.setHandler(handler);
-        
         server.start();
       } catch(Exception e) {
         e.printStackTrace();
