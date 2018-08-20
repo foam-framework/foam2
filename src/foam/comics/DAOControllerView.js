@@ -131,17 +131,10 @@ foam.CLASS({
     },
 
     function onEdit(s, edit, id) {
-      if ( this.updateView.class === 'foam.comics.DAOUpdateControllerView' ) {
-        this.stack.push({
-          class: 'foam.comics.DAOUpdateControllerView',
-          key: id
-        }, this);
-      } else {
-        this.stack.push({
-          class: 'net.nanopay.auth.ui.UserDetailView',
-          userId: id
-        });
-      }
+      this.stack.push({
+        class: this.updateView.class,
+        key: id
+      }, this);
     },
 
     function onFindRelated() {
