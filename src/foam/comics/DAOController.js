@@ -76,6 +76,14 @@ foam.CLASS({
       name: 'exportEnabled',
       documentation: 'True to enable the export button.',
       value: true
+    },
+    {
+      name: 'border',
+      documentation: `
+        If you want the DAO controller to be the content of a border view, set
+        the border here.
+      `,
+      factory: function() { return foam.u2.borders.NullBorder.create(); }
     }
   ],
 

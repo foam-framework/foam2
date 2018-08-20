@@ -95,8 +95,8 @@ foam.CLASS({
     function initE() {
       var self = this;
 
-      this.
-        addClass(this.myClass()).
+      this.data.border.add(
+        this.E().addClass(this.myClass()).
         start().add(this.cls.PREDICATE).end().
         start().
           style({ 'overflow-x': 'auto' }).
@@ -109,7 +109,10 @@ foam.CLASS({
             style({ 'overflow-x': 'auto' }).
             tag(this.summaryView, { data$: this.data.filteredDAO$ }).
           end().
-        end();
+        end()
+      );
+
+      this.add(this.data.border);
     },
 
     function dblclick(obj) {
