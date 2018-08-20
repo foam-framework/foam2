@@ -121,7 +121,7 @@ public class DigWebAgent
           jsonParser.setX(x);
           foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
           outputterJson.setOutputDefaultValues(true);
-          outputterJson.setOutputClassNames(false);
+          outputterJson.setOutputClassNames(true);
           // let FObjectArray parse first
           if ( SafetyUtil.isEmpty(data) ) {
               DigErrorMessage error = new EmptyDataException.Builder(x)
@@ -245,7 +245,7 @@ public class DigWebAgent
           if ( Format.JSON == format ) {
             foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
             outputterJson.setOutputDefaultValues(true);
-            outputterJson.setOutputClassNames(false);
+            outputterJson.setOutputClassNames(true);
             outputterJson.output(sink.getArray().toArray());
 
             //resp.setContentType("application/json");
@@ -450,7 +450,7 @@ public class DigWebAgent
       jsonParser.setX(x);
       foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
       outputterJson.setOutputDefaultValues(true);
-      outputterJson.setOutputClassNames(false);
+      outputterJson.setOutputClassNames(true);
       outputterJson.output(error);
       out.println(outputterJson.toString());
 

@@ -17,9 +17,10 @@ foam.CLASS({
   ],
 
   imports: [
+    'data? as importedData',
     'stack',
     'summaryView? as importedSummaryView',
-    'data? as importedData',
+    'updateView? as importedUpdateView',
     'window'
   ],
 
@@ -32,6 +33,9 @@ foam.CLASS({
   // TODO: wrong class name, fix when ActionView fixed.
   css: `
     ^ {
+      width: fit-content;
+      max-width: 100vw;
+      margin: auto;
       display: flex;
     }
 
@@ -75,6 +79,14 @@ foam.CLASS({
       }
     },
     {
+      name: 'updateView',
+      expression: function() {
+        return this.importedUpdateView ?
+            this.importedUpdateView :
+            { class: 'foam.comics.DAOUpdateControllerView' };
+      }
+    },
+    {
       class: 'String',
       name: 'title',
       expression: function(data$data$of) {
@@ -97,7 +109,11 @@ foam.CLASS({
 
       this.data.border.add(
         this.E().addClass(this.myClass()).
-        start().add(this.cls.PREDICATE).end().
+        start().
+          hide(self.data.searchHidden$).
+          show(self.data.filtersEnabled$).
+          add(self.cls.PREDICATE).
+        end().
         start().
           style({ 'overflow-x': 'auto' }).
           start().
@@ -129,7 +145,7 @@ foam.CLASS({
 
     function onEdit(s, edit, id) {
       this.stack.push({
-        class: 'foam.comics.DAOUpdateControllerView',
+        class: this.updateView.class,
         key: id
       }, this);
     },

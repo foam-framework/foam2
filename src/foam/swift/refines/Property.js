@@ -694,6 +694,7 @@ return newValue as! ${swiftType}
 
 foam.CLASS({
   refines: 'foam.core.MultiPartID',
+  flags: [ 'swift' ],
   properties: [
     {
       name: 'swiftGetter',
@@ -727,6 +728,7 @@ for propName in propNames {
 
 foam.CLASS({
   refines: 'foam.core.IDAlias',
+  flags: [ 'swift' ],
   properties: [
     {
       name: 'swiftGetter',
