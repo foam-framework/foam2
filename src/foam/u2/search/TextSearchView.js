@@ -115,16 +115,11 @@ foam.CLASS({
         }
 
         if ( this.richSearch ) {
-          this.predicate = this.filterController.filters
+          this.predicate = this.OR(...this.filterController.filters
             .map((name) => this.of.getAxiomByName(name))
             .filter((property) => foam.core.String.isInstance(property))
-            .reduce(
-              (acc, property) => this.OR(
-                this.CONTAINS_IC(property, value),
-                acc || this.False.create()
-              ),
-              this.queryParser.parseString(value)
-            );
+            .map((property) => this.CONTAINS_IC(property, value))
+            .concat(this.queryParser.parseString(value) || this.False.create()));
           return;
         }
 
