@@ -30,6 +30,7 @@ foam2_MAVEN_DEPS = \
 	com.authy:authy-java:1.1.0 \
 	org.bouncycastle:bcpkix-jdk15on:1.57 \
 	org.bouncycastle:bcprov-jdk15on:1.57 \
+	org.java-websocket:Java-WebSocket:1.3.7 \
 	org.eclipse.jetty:jetty-alpn-conscrypt-server:9.4.8.v20171121 \
 	org.eclipse.jetty:jetty-alpn-java-server:9.4.8.v20171121 \
 	org.eclipse.jetty:jetty-alpn-openjdk8-server:9.4.8.v20171121 \
