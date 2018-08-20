@@ -84,10 +84,31 @@ foam.CLASS({
         the border here.
       `,
       factory: function() { return foam.u2.borders.NullBorder.create(); }
+    },
+    {
+      class: 'Boolean',
+      name: 'filtersEnabled',
+      documentation: `Set to true if you want to completely hide the search
+        panel and the button to toggle it.`,
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'searchHidden',
+      documentation: `Used internally to keep track of whether the search panel
+        is currently hidden or not.`,
+      value: false
     }
   ],
 
   actions: [
+    {
+      name: 'toggleFilters',
+      isAvailable: function(filtersEnabled) { return filtersEnabled; },
+      code: function() {
+        this.searchHidden = ! this.searchHidden;
+      },
+    },
     {
       name: 'create',
       isAvailable: function(createEnabled) { return createEnabled; },
