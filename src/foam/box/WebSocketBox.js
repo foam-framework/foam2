@@ -76,7 +76,7 @@ foam.CLASS({
         }
 
         return protocol + this.window.location.hostname +
-          ( this.window.location.port ? ':' + ( parseInt(this.window.location.port) + 1 ) : '' ) +
+          ( this.window.location.port ? ':' + parseInt(this.window.location.port) : '' ) +
           '/' + url;
       }
 
