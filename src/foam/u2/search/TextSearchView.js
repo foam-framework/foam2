@@ -51,6 +51,16 @@ foam.CLASS({
       value: false
     },
     {
+      class: 'Boolean',
+      name: 'checkStrictEquality',
+      documentation: `
+        Set this flag if you want to match by strict equality instead of
+        checking if the text contains the string. Doing so should improve
+        performance.
+      `,
+      value: false
+    },
+    {
       name: 'queryParser',
       factory: function() {
         return this.QueryParser.create({ of: this.of });
@@ -108,6 +118,9 @@ foam.CLASS({
       name: 'updateValue',
       code: function() {
         var value = this.view.data;
+        var pred = this.checkStrictEquality ?
+          this.EQ.bind(this) :
+          this.CONTAINS_IC.bind(this);
 
         if ( ! value ) {
           this.predicate = this.True.create();
@@ -118,12 +131,12 @@ foam.CLASS({
           this.predicate = this.OR(...this.filterController.filters
             .map((name) => this.of.getAxiomByName(name))
             .filter((property) => foam.core.String.isInstance(property))
-            .map((property) => this.CONTAINS_IC(property, value))
+            .map((property) => pred(property, value))
             .concat(this.queryParser.parseString(value) || this.False.create()));
           return;
         }
 
-        this.predicate = this.CONTAINS_IC(this.property, value);
+        this.predicate = pred(this.property, value);
       }
     }
   ]
