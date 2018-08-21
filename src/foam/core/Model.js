@@ -28,20 +28,8 @@ foam.CLASS({
       hidden: true,
       transient: true,
       getter: function() {
-        if ( this.refines && ! this.name ) {
-          // No ID for the refinement so give it one. These names should be
-          // consistent regardless of how this is being run (e.g. node, web,
-          // debug, etc) so the first axiom name is used.
-          var n = new RegExp('(.*)\\.(.*)?$').exec(this.refines)
-          var p = n ? n[1] : 'foam.core';
-          n = (n ? n[2] : this.refines) + 'Refines';
-          if ( this.axioms_.length ) {
-            n = n + this.axioms_[0].name;
-          }
-          return p + '.' + n;
-        }
         return this.package ? this.package + '.' + this.name : this.name;
-      }
+      },
     },
     'package',
     'abstract',
@@ -98,5 +86,16 @@ foam.CLASS({
     }
   ],
 
-  methods: [ foam.boot.buildClass ]
+  methods: [
+    foam.boot.buildClass,
+    function init() {
+      if ( this.hasOwnProperty('refines') && ! this.hasOwnProperty('name') ) {
+        var i = this.refines.lastIndexOf('.');
+        var n = this.refines.substring(i + 1) + 'Refines';
+        if ( this.axioms_.length ) n = n + this.axioms_[0].name;
+        this.name = n;
+        this.package = this.refines.substring(0, i);
+      }
+    },
+  ]
 });
