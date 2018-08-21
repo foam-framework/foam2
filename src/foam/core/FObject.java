@@ -8,11 +8,13 @@ package foam.core;
 
 import foam.crypto.hash.Hashable;
 import foam.crypto.sign.Signable;
+import foam.nanos.auth.CreatedAware;
+import foam.nanos.auth.LastModifiedAware;
 
 import java.util.Map;
 
 public interface FObject
-    extends ContextAware, Comparable, Hashable, Signable
+    extends ContextAware, Comparable, CreatedAware, Hashable, LastModifiedAware, Signable
 {
   ClassInfo getClassInfo();
   FObject copyFrom(FObject obj);
