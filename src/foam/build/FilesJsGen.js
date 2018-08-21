@@ -157,11 +157,11 @@ foam.CLASS({
       };
       return Promise.all([
           getTreeHead(self.IN(self.Model.ID, self.CORE_MODELS)),
-          getTreeHead(self.HAS(self.Lib.JSON)),
+          getTreeHead(self.INSTANCE_OF(self.Lib)),
           getTreeHead(self.IN(self.Model.ID, self.PHASE_1)),
           getTreeHead(self.IN(self.Model.ID, self.PHASE_2)),
-          getTreeHead(self.HAS(self.Script.CODE)),
-          getTreeHead(self.HAS(self.Relationship.SOURCE_MODEL)),
+          getTreeHead(self.INSTANCE_OF(self.Script)),
+          getTreeHead(self.INSTANCE_OF(self.Relationship)),
           getTreeHead(self.HAS(self.Model.REFINES)),
           getTreeHead(self.IN(self.Model.ID, self.required)),
       ]).then(function(args) {
