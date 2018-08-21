@@ -222,9 +222,9 @@ FOAM_FILES([
         // Check if it's an actual class. foam.core.FObject.isSubClass
         // should work but doesn't:
         // https://github.com/foam-framework/foam2/issues/1023
-        if ( o && o.prototype && (
-            foam.core.FObject.prototype === o.prototype ||
-            foam.core.FObject.prototype.isPrototypeOf(o.prototype) ) ) {
+        if ( o && o.prototype &&
+             ( foam.core.FObject.prototype === o.prototype ||
+               foam.core.FObject.prototype.isPrototypeOf(o.prototype) ) ) {
           return self.modelDAO.find(o.id).then(function(m) {
             return self.getDepsTree(m, seen, head);
           });

@@ -78,9 +78,9 @@ foam.CLASS({
             // Check if it's an actual class. foam.core.FObject.isSubClass
             // should work but doesn't:
             // https://github.com/foam-framework/foam2/issues/1023
-            if ( v && v.prototype && (
-                foam.core.FObject.prototype === v.prototype ||
-                foam.core.FObject.prototype.isPrototypeOf(v.prototype) ) ) {
+            if ( v && v.prototype &&
+                 ( foam.core.FObject.prototype === v.prototype ||
+                   foam.core.FObject.prototype.isPrototypeOf(v.prototype) ) ) {
               if ( v.id.indexOf('AnonymousClass') == 0 ) {
                 this.output(x, v.model_);
               } else {
