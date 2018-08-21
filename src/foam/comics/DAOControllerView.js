@@ -49,13 +49,12 @@ foam.CLASS({
 
     ^ .actions {
       display: inline-block;
-      margin-bottom: 10px;
     }
 
     ^ .net-nanopay-ui-ActionView {
       background: #59aadd;
       color: white;
-      margin-right: 10px;
+      margin: 0 10px 10px 0;
     }
   `,
 
