@@ -6,6 +6,7 @@
 
 foam.LIB({
   name: 'foam.swift',
+  flags: ['swift'],
   methods: [
     function stringify(v) {
       var type = foam.typeOf(v);
