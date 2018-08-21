@@ -27,10 +27,6 @@ foam.CLASS({
     'foam.u2.tag.Input'
   ],
 
-  imports: [
-    'filterController'
-  ],
-
   implements: [
     'foam.mlang.Expressions'
   ],
@@ -118,25 +114,16 @@ foam.CLASS({
       name: 'updateValue',
       code: function() {
         var value = this.view.data;
-        var pred = this.checkStrictEquality ?
-          this.EQ.bind(this) :
-          this.CONTAINS_IC.bind(this);
-
-        if ( ! value ) {
-          this.predicate = this.True.create();
-          return;
-        }
-
-        if ( this.richSearch ) {
-          this.predicate = this.OR(...this.filterController.filters
-            .map((name) => this.of.getAxiomByName(name))
-            .filter((property) => foam.core.String.isInstance(property))
-            .map((property) => pred(property, value))
-            .concat(this.queryParser.parseString(value) || this.False.create()));
-          return;
-        }
-
-        this.predicate = pred(this.property, value);
+        this.predicate = ! value ?
+          this.True.create() :
+          this.richSearch ?
+            this.OR(
+              this.queryParser.parseString(value) || this.False.create(),
+              this.KEYWORD(value)
+            ) :
+            this.checkStrictEquality ?
+              this.EQ(this.property, value) :
+              this.CONTAINS_IC(this.property, value);
       }
     }
   ]
