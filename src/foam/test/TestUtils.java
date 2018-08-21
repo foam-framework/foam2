@@ -6,17 +6,10 @@
 
 package foam.test;
 
-import java.lang.reflect.Method;
-import java.security.AccessControlException;
-import java.util.concurrent.Callable;
-import java.util.function.Function;
-
 import foam.core.ClassInfo;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.MDAO;
-import foam.nanos.auth.Address;
-import foam.nanos.auth.Phone;
 import foam.nanos.auth.User;
 import foam.nanos.fs.File;
 
@@ -65,10 +58,10 @@ public class TestUtils {
    *   test(
    *     TestUtils.testThrows(
    *       () -> doSomethingIllegal(a, b, c),
-   *       "Permission denied!",
-   *       AccessControlException.class
+   *       "Permission denied.",
+   *       AuthorizationException.class
    *     ),
-   *     "Should throw an 'AccessControlException' when you try to do something illegal."
+   *     "Should throw an 'AuthorizationException' when you try to do something illegal."
    *   );
    * </pre>
    * @param fn
