@@ -302,9 +302,14 @@ foam.LIB({
 
       cls.name = this.model_.name;
       cls.package = this.model_.package;
-      cls.extends = this.model_.extends === 'FObject' ?
-        'foam.core.AbstractFObject' : this.model_.extends;
       cls.abstract = this.model_.abstract;
+
+      if ( this.model_.name !== 'AbstractFObject' ) {
+        cls.extends = this.model_.extends === 'FObject' ?
+          'foam.core.AbstractFObject' : this.model_.extends;
+      } else {
+        cls.implements = [ 'foam.core.FObject' ];
+      }
 
       cls.fields.push(foam.java.ClassInfo.create({ id: this.id }));
 
@@ -339,17 +344,19 @@ foam.LIB({
           return foam.java.Field.create({ name: p.name, type: p.javaType });
         });
 
-      cls.method({
-        visibility: 'protected',
-        type: 'void',
-        name: 'beforeFreeze',
-        body: 'super.beforeFreeze();\n' + this.getAxiomsByClass(foam.core.Property).
-          filter(function(p) { return !! p.javaType && p.javaInfoType && p.generateJava; }).
-          filter(function(p) { return p.javaFactory; }).
-          map(function(p) {
-            return `get${foam.String.capitalize(p.name)}();`
-          }).join('\n')
-      });
+      if ( this.model_.name !== 'AbstractFObject' ) {
+        cls.method({
+          visibility: 'public',
+          type: 'void',
+          name: 'beforeFreeze',
+          body: 'super.beforeFreeze();\n' + this.getAxiomsByClass(foam.core.Property).
+            filter(function(p) { return !! p.javaType && p.javaInfoType && p.generateJava; }).
+            filter(function(p) { return p.javaFactory; }).
+            map(function(p) {
+              return `get${foam.String.capitalize(p.name)}();`
+            }).join('\n')
+        });
+      }
 
       if ( this.hasOwnAxiom('id') ) {
         cls.implements = cls.implements.concat('foam.core.Identifiable');
