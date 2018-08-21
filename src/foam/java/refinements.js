@@ -979,7 +979,7 @@ foam.CLASS({
           if ( o instanceof Number ) {
             return new java.util.Date(((Number) o).longValue());
           } else if ( o instanceof String ) {
-            return sdf.get().parse((String) o);
+            return (java.util.Date) fromString((String) o);
           } else {
             return (java.util.Date) o;
           }
@@ -1015,7 +1015,7 @@ foam.CLASS({
           if ( o instanceof Number ) {
             return new java.util.Date(((Number) o).longValue());
           } else if ( o instanceof String ) {
-            return sdf.get().parse((String) o);
+            return (java.util.Date) fromString((String) o);
           } else {
             return (java.util.Date) o;
           }
