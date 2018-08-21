@@ -17,9 +17,10 @@ foam.CLASS({
   ],
 
   imports: [
+    'data? as importedData',
     'stack',
     'summaryView? as importedSummaryView',
-    'data? as importedData',
+    'updateView? as importedUpdateView',
     'window'
   ],
 
@@ -31,6 +32,12 @@ foam.CLASS({
 
   // TODO: wrong class name, fix when ActionView fixed.
   css: `
+    ^ {
+      width: fit-content;
+      max-width: 100vw;
+      margin: auto;
+    }
+
     .middle-row {
       display: flex;
     }
@@ -45,13 +52,12 @@ foam.CLASS({
 
     .middle-row .actions {
       display: inline-block;
-      margin-bottom: 10px;
     }
 
     .middle-row .net-nanopay-ui-ActionView {
       background: #59aadd;
       color: white;
-      margin-right: 10px;
+      margin: 0 10px 10px 0;
     }
   `,
 
@@ -72,6 +78,14 @@ foam.CLASS({
         return this.importedSummaryView$ ?
             this.importedSummaryView :
             { class: 'foam.u2.view.ScrollTableView' };
+      }
+    },
+    {
+      name: 'updateView',
+      expression: function() {
+        return this.importedUpdateView ?
+            this.importedUpdateView :
+            { class: 'foam.comics.DAOUpdateControllerView' };
       }
     },
     {
@@ -101,7 +115,11 @@ foam.CLASS({
         start().
           addClass('middle-row').
           tag(this.data.leftBorder).
-          start().add(this.cls.PREDICATE).end().
+          start().
+            hide(self.data.searchHidden$).
+            show(self.data.filtersEnabled$).
+            add(self.cls.PREDICATE).
+          end().
           start().
             style({ 'overflow-x': 'auto' }).
             start().
@@ -133,7 +151,7 @@ foam.CLASS({
 
     function onEdit(s, edit, id) {
       this.stack.push({
-        class: 'foam.comics.DAOUpdateControllerView',
+        class: this.updateView.class,
         key: id
       }, this);
     },
