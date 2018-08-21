@@ -12,16 +12,5 @@ foam.CLASS({
   documentation: `
     An unstyled border. Intended for use as a default value for
     border properties.
-  `,
-
-  methods: [
-    function initE() {
-      this
-        .addClass(this.myClass())
-        .start('div', null, this.content$)
-          .addClass(this.myClass('content'))
-        .end();
-    }
-  ]
+  `
 });
-
