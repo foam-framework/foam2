@@ -143,7 +143,7 @@ foam.CLASS({
   ],
   methods: [
     function execute() {
-      this.getFilesJs().then(console.log);
+      this.getFilesJs().then(console.log.bind(console));
     },
     function getFilesJs() {
       var self = this;
