@@ -17,9 +17,10 @@ foam.CLASS({
   ],
 
   imports: [
+    'data? as importedData',
     'stack',
     'summaryView? as importedSummaryView',
-    'data? as importedData',
+    'updateView? as importedUpdateView',
     'window'
   ],
 
@@ -51,13 +52,12 @@ foam.CLASS({
 
     .middle-row .actions {
       display: inline-block;
-      margin-bottom: 10px;
     }
 
     .middle-row .net-nanopay-ui-ActionView {
       background: #59aadd;
       color: white;
-      margin-right: 10px;
+      margin: 0 10px 10px 0;
     }
   `,
 
@@ -78,6 +78,14 @@ foam.CLASS({
         return this.importedSummaryView$ ?
             this.importedSummaryView :
             { class: 'foam.u2.view.ScrollTableView' };
+      }
+    },
+    {
+      name: 'updateView',
+      expression: function() {
+        return this.importedUpdateView ?
+            this.importedUpdateView :
+            { class: 'foam.comics.DAOUpdateControllerView' };
       }
     },
     {
@@ -143,7 +151,7 @@ foam.CLASS({
 
     function onEdit(s, edit, id) {
       this.stack.push({
-        class: 'foam.comics.DAOUpdateControllerView',
+        class: this.updateView.class,
         key: id
       }, this);
     },

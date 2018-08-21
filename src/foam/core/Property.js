@@ -257,7 +257,7 @@ foam.CLASS({
     {
       /**
         Identifies properties that contain Personally identifiable information which
-        may be elgiible for deletion on request.
+        may be eligible for deletion on request.
       */
       class: 'Boolean',
       name: 'containsDeletablePII'

@@ -32,10 +32,11 @@ foam.CLASS({
       name: 'getAliasesBody',
       expression: function() {
       var b = 'new String[] {';
-        for ( var i = 0; i < this.propAliases.length; i++ ) {
-          b+= '"'+ this.propAliases[i]+'"' + ( i < this.propAliases.length-1 ? ', ' : '' );
+        for ( var i = 0 ; i < this.propAliases.length ; i++ ) {
+          b += '"' + this.propAliases[i] + '"';
+          if ( i < this.propAliases.length-1 ) b += ', ';
         }
-        return b+'};';
+        return b + '};';
       }
     },
     {
@@ -111,7 +112,9 @@ foam.CLASS({
             name: 'getShortName',
             visibility: 'public',
             type: 'String',
-            body: this.propShortName ? 'return "' +this.propShortName + '";' : 'return null;'
+            body: this.propShortName ?
+              'return "' + this.propShortName + '";' :
+              'return null;'
           },
           {
             name: 'getAliases',
@@ -278,38 +281,38 @@ foam.CLASS({
         // default value is true, only generate if value is false
         if ( ! this.includeInDigest ) {
           m.push({
-            name: 'includeInDigest',
+            name:       'includeInDigest',
             visibility: 'public',
-            type: 'boolean',
-            body: `return ${this.includeInDigest};`
+            type:       'boolean',
+            body:       `return ${this.includeInDigest};`
           });
         }
 
         // default value is true, only generate if value is false
         if ( ! this.includeInSignature ) {
           m.push({
-            name: 'includeInSignature',
+            name:       'includeInSignature',
             visibility: 'public',
-            type: 'boolean',
-            body: `return ${this.includeInSignature};`
+            type:       'boolean',
+            body:       `return ${this.includeInSignature};`
           });
         }
 
         if ( this.containsPII ) {
           m.push({
-            name: 'containsPII',
+            name:       'containsPII',
             visibility: 'public',
-            type: 'boolean',
-            body: `return ${this.containsPII};`
+            type:       'boolean',
+            body:       `return ${this.containsPII};`
           });
         }
 
         if ( this.containsDeletablePII ) {
           m.push({
-            name: 'containsDeletablePII',
+            name:       'containsDeletablePII',
             visibility: 'public',
-            type: 'boolean',
-            body: `return ${this.containsDeletablePII};`
+            type:       'boolean',
+            body:       `return ${this.containsDeletablePII};`
           });
         }
 
