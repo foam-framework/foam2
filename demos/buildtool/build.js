@@ -5,14 +5,16 @@ var root = dir + '/../..';
 
 require(root + '/src/foam.js');
 
-var classloader = foam.__context__.classloader;
-
-classloader.addClassPath(dir + '/src');
-
-classloader.load('foam.tools.Build').then(function() {
-  var b = foam.tools.Build.create({
-    modelId: 'demo.build.ModelToBuild',
-    root: dir + '/build/',
-  });
-  b.execute();
+foam.__context__.classloader.load('foam.build.Builder').then(function(cls) {
+  cls.create({
+    srcDirs: [
+      global.FOAM_ROOT,
+      dir + '/src',
+    ],
+    outDir: dir + '/build/src',
+    required: [
+      'demo.build.ModelToBuild',
+    ],
+    flags: ['js', 'web'],
+  }).execute();
 });
