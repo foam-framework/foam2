@@ -305,9 +305,11 @@ foam.LIB({
       cls.abstract = this.model_.abstract;
 
       if ( this.model_.name !== 'AbstractFObject' ) {
+        // if not AbstractFObject either extend AbstractFObject or use provided extends property
         cls.extends = this.model_.extends === 'FObject' ?
           'foam.core.AbstractFObject' : this.model_.extends;
       } else {
+        // if AbstractFObject we implement FObject
         cls.implements = [ 'foam.core.FObject' ];
       }
 
@@ -345,6 +347,7 @@ foam.LIB({
         });
 
       if ( this.model_.name !== 'AbstractFObject' ) {
+        // if not AbstractFObject add beforeFreeze method
         cls.method({
           visibility: 'public',
           type: 'void',
