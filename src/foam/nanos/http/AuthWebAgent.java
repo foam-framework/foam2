@@ -9,6 +9,7 @@ package foam.nanos.http;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.auth.AuthService;
+import foam.nanos.auth.AuthenticationException;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.session.Session;
@@ -172,7 +173,7 @@ public class AuthWebAgent
             out.println("Authentication failure.");
           }
         }
-      } catch (javax.naming.AuthenticationException e) {
+      } catch ( AuthenticationException e ) {
         if ( ! SafetyUtil.isEmpty(authHeader) ) {
           resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         } else {

@@ -8,8 +8,10 @@ var classes = [
   'foam.core.Axiom',
   'foam.core.Serializable',
   'foam.core.Exception',
+  'foam.core.Freezable',
   'foam.core.ContextAgent',
   'foam.core.Identifiable',
+  'foam.core.AbstractFObject',
   'foam.mlang.predicate.Predicate',
   'foam.mlang.predicate.True',
   'foam.mlang.predicate.False',
@@ -278,7 +280,8 @@ var classes = [
   'foam.nanos.dig.exception.DAOPutException',
   'foam.nanos.dig.exception.EmptyDataException',
   'foam.nanos.dig.exception.UnsupportException',
-  'foam.nanos.dig.exception.UnknownIdException'
+  'foam.nanos.dig.exception.UnknownIdException',
+  'foam.nanos.dig.exception.DigSuccessMessage'
 ];
 
 var abstractClasses = [
