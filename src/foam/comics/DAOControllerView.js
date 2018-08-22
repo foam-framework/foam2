@@ -35,17 +35,14 @@ foam.CLASS({
       width: fit-content;
       max-width: 100vw;
       margin: auto;
-    }
-
-    ^ .middle-row {
       display: flex;
     }
 
-    ^ .middle-row > *:not(:empty) {
+    ^ > * {
       margin-left: 10px;
     }
 
-    ^ .middle-row > *:last-child {
+    ^ > *:last-child {
       margin-right: 10px;
     }
 
@@ -111,32 +108,28 @@ foam.CLASS({
     function initE() {
       var self = this;
 
-      this.
-        addClass(this.myClass()).
-        tag(this.data.topBorder$).
+      this.data.border.add(
+        this.E().addClass(this.myClass()).
         start().
-          addClass('middle-row').
-          tag(this.data.leftBorder).
+          hide(self.data.searchHidden$).
+          show(self.data.filtersEnabled$).
+          add(self.cls.PREDICATE).
+        end().
+        start().
+          style({ 'overflow-x': 'auto' }).
           start().
-            hide(self.data.searchHidden$).
-            show(self.data.filtersEnabled$).
-            add(self.cls.PREDICATE).
+            addClass('actions').
+            show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW)).
+              start().add(self.cls.getAxiomsByClass(foam.core.Action)).end().
           end().
           start().
             style({ 'overflow-x': 'auto' }).
-            start().
-              addClass('actions').
-              show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW)).
-                start().add(self.cls.getAxiomsByClass(foam.core.Action)).end().
-            end().
-            start().
-              style({ 'overflow-x': 'auto' }).
-              tag(this.summaryView, { data$: this.data.filteredDAO$ }).
-            end().
+            tag(this.summaryView, { data$: this.data.filteredDAO$ }).
           end().
-          tag(this.data.rightBorder$).
-        end().
-        tag(this.data.bottomBorder$);
+        end()
+      );
+
+      this.add(this.data.border);
     },
 
     function dblclick(obj) {

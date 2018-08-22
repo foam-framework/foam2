@@ -80,6 +80,8 @@ FOAM_FILES([
   { name: "foam/core/Static" },
   { name: "foam/core/Reaction" },
   { name: "foam/core/Serializable" },
+  { name: "foam/core/Freezable" },
+  { name: "foam/core/AbstractFObject" },
   { name: "foam/java/Validation" },
 
   { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
@@ -168,6 +170,7 @@ FOAM_FILES([
   { name: "foam/u2/ProgressView", flags: ['web'] },
   { name: "foam/u2/ListCreateController", flags: ['web'] },
   { name: 'foam/u2/view/SearchViewWrapper', flags: ['web'] },
+  { name: 'foam/u2/borders/NullBorder', flags: ['web'] },
   { name: "foam/version/VersionTrait" },
   { name: "foam/version/VersionedClass" },
   { name: "foam/version/VersionedClassFactory" },
