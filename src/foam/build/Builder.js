@@ -45,15 +45,6 @@ foam.CLASS({
     function execute() {
       var self = this;
 
-      // Clear the destination dir and copy all non-js files to it from the
-      // srcDirs.
-      var cp = require('child_process');
-      cp.execSync('rm -rf ' + self.outDir)
-      cp.execSync('mkdir -p ' + self.outDir)
-      self.srcDirs.forEach(function(srcDir) {
-        cp.execSync(`rsync -a --exclude='*.js' ${srcDir}/ ${self.outDir}/`)
-      })
-
       Promise.all(self.srcDirs.map(function(srcDir) {
         return self.DirWriter.create({
           flags: self.flags,
