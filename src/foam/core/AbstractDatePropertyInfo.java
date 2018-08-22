@@ -6,14 +6,15 @@
 
 package foam.core;
 
+import foam.lib.parse.ParserContextImpl;
+import foam.lib.parse.StringPStream;
+
 import javax.xml.stream.XMLStreamReader;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 
 public abstract class AbstractDatePropertyInfo
     extends AbstractPropertyInfo
@@ -32,38 +33,28 @@ public abstract class AbstractDatePropertyInfo
     }
   };
 
-  protected static final ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
-    @Override
-    protected SimpleDateFormat initialValue() {
-      SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
-      df.setTimeZone(TimeZone.getTimeZone("UTC"));
-      return df;
-    }
-  };
-
   public int compareValues(java.lang.Object o1, java.lang.Object o2) {
     return ((Date)o1).compareTo(((Date)o2));
   }
 
   public Object fromString(String value) {
-    //  DateTimeFormatter formatter = DateTimeFormatter.ofPattern(getDateFormat()).withZone(ZoneOffset.UTC);		 +    return new Date(value);
-    //  LocalDateTime date = LocalDateTime.parse(value, formatter);
-    //  this.set(obj, Date.from(date.atZone(ZoneId.of("UTC")).toInstant()));
-    return new Date(value);
+    StringPStream ps = new StringPStream(value);
+    ParserContextImpl x = new ParserContextImpl();
+    ps = (StringPStream) jsonParser().parse(ps, x);
+    return ps == null ? null : ps.value();
   }
 
   @Override
   public Object fromXML(X x, XMLStreamReader reader) {
     super.fromXML(x, reader);
-    Date date = new Date(reader.getText());
-    return date;
+    return fromString(reader.getText());
   }
 
   @Override
   public void cloneProperty(FObject source, FObject dest) {
     Object value = get(source);
 
-    set(dest, value == null ? null : new Date(((Date)value).getTime()));
+    set(dest, value == null ? null : new Date(((Date) value).getTime()));
   }
 
   @Override

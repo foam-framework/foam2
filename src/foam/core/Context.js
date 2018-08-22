@@ -15,6 +15,14 @@
  * limitations under the License.
  */
 
+foam.SCRIPT({
+  package: 'foam.core',
+  name: 'ContextScript',
+  requires: [
+    'foam.core.ConstantSlot',
+  ],
+  code: function() {
+
 /**
  * Context Support
  *
@@ -206,3 +214,6 @@
 
   foam.__context__ = __context__;
 })();
+
+  }
+});

@@ -1,22 +1,20 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2016 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
+
+// Several examples of creating Border or Container views.
+// Containers are views which set the 'content' Property of Element to
+// some child Element. When add() is called new child elements are added
+// to the content area rather than to the end of the View.
+// Alternatively, containers can create explicit content areas like
+// 'leftPane', 'rightPane', 'header', etc.
 
 var E = foam.__context__.E.bind(foam.__context__);
 
+// Note that this is just a simple Tab view for demonstration purposes.
+// There's a more complete implementation in the foam.u2 package.
 foam.CLASS({
   name: 'Tab',
   extends: 'foam.u2.Element',
@@ -32,40 +30,36 @@ foam.CLASS({
   name: 'Tabs',
   extends: 'foam.u2.Element',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-        ^ {
-          background: gray;
-          width: 600px;
-          height: 200px;
-          padding: 10px;
-          display: block;
-        }
-        ^tabRow { height: 30px; }
-        ^tab {
-          border: 1px solid black;
-          border-bottom: none;
-          padding: 5px;
-          background: lightgray;
-        }
-        ^tab.selected {
-          background: white;
-          position: relative;
-          z-index: 1;
-        }
-        ^content {
-          margin: 4px;
-          padding: 6px;
-          background: white;
-          border: 1px solid black;
-          position: relative;
-          top: -13px;
-          left: -4px;
-        }
-      */}
-    })
-  ],
+  css: `
+    ^ {
+      background: gray;
+      width: 600px;
+      height: 200px;
+      padding: 10px;
+      display: block;
+    }
+    ^tabRow { height: 30px; }
+    ^tab {
+      border: 1px solid black;
+      border-bottom: none;
+      padding: 5px;
+      background: lightgray;
+    }
+    ^tab.selected {
+      background: white;
+      position: relative;
+      z-index: 1;
+    }
+    ^content {
+      margin: 4px;
+      padding: 6px;
+      background: white;
+      border: 1px solid black;
+      position: relative;
+      top: -13px;
+      left: -4px;
+    }
+  `,
 
   properties: [
     /* not used
@@ -87,13 +81,13 @@ foam.CLASS({
   methods: [
     function init() {
       this.
-          addClass(this.myClass()).
-          start('div', null, this.tabRow$).
-            addClass(this.myClass('tabRow')).
-          end().
-          start('div', null, this.content$).
-            addClass(this.myClass('content')).
-          end();
+        addClass(this.myClass()).
+        start('div', null, this.tabRow$).
+          addClass(this.myClass('tabRow')).
+        end().
+        start('div', null, this.content$).
+          addClass(this.myClass('content')).
+        end();
     },
 
     function add(tab) {
@@ -102,10 +96,10 @@ foam.CLASS({
         if ( ! this.selected ) this.selected = tab;
 
         this.tabRow.start('span').
-            addClass(this.myClass('tab')).
-            enableClass('selected', tab.selected$).
-            on('click', function() { this.selected = tab; }.bind(this)).
-            add(tab.label).
+          addClass(this.myClass('tab')).
+          enableClass('selected', tab.selected$).
+          on('click', function() { this.selected = tab; }.bind(this)).
+          add(tab.label).
         end();
 
         tab.shown$ = tab.selected$;
@@ -124,7 +118,10 @@ var tabs = Tabs.create().
 tabs.write();
 
 
+
 E('br').write();
+E('br').write();
+
 
 
 // TODO: add CardDeck example
@@ -132,35 +129,34 @@ foam.CLASS({
   name: 'Card',
   extends: 'foam.u2.Element',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-        ^ {
-          background: white;
-          border-radius: 3px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
-          margin: 8px;
-          transform-origin: top left;
-          display: inline-block;
-        }
-        ^content { padding: 6px; width: 300px; height: 200px; background: white; }
-      */}
-    })
-  ],
+  css: `
+    ^ {
+      background: white;
+      border-radius: 3px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
+      margin: 8px;
+      transform-origin: top left;
+      display: inline-block;
+    }
+    ^content { padding: 6px; width: 300px; height: 200px; background: white; }
+  `,
 
   methods: [
     function init() {
       this.
-          addClass(this.myClass()).
-          start('div', null, this.content$).
-            addClass(this.myClass('content')).
-          end();
+        addClass(this.myClass()).
+        start('div', null, this.content$).
+          addClass(this.myClass('content')).
+        end();
     }
   ]
 });
 
 Card.create().add('content').tag('br').add('more content').tag('br').add('even more conent').write();
 
+
+
+E('br').write();
 E('br').write();
 
 
@@ -169,36 +165,44 @@ foam.CLASS({
   name: 'SampleBorder',
   extends: 'foam.u2.Element',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-        ^ { background: gray; padding: 10px; display: inline-block; }
-        ^title { padding: 6px; align-content: center; background: aliceblue; }
-        ^content { padding: 6px; width: 300px; height: 200px; background: white; }
-      */}
-    })
-  ],
+  css: `
+    ^ { background: gray; padding: 10px; display: inline-block; }
+    ^title { padding: 6px; align-content: center; background: aliceblue; }
+    ^footer { padding: 6px; align-content: left; background: white; }
+    ^content { padding: 6px; width: 300px; height: 200px; background: white; }
+  `,
 
   properties: [
-    'title'
+    'title',
+    'footer'
   ],
 
   methods: [
     function init() {
       this.
+        start().
           addClass(this.myClass()).
           start('div').addClass(this.myClass('title')).add(this.title$).end().
           start('div', null, this.content$).
             addClass(this.myClass('content')).
-          end();
+          end().
+          start('div')
+            .addClass(this.myClass('footer'))
+            .tag('hr')
+            .add(this.footer$)
+          .end().
+        end();
     }
   ]
 });
 
-var sb = SampleBorder.create({title: 'Title'});
+var sb = SampleBorder.create({title: 'Title', footer: 'Footer'});
 sb.add('content');
 sb.write();
 
+
+
+E('br').write();
 E('br').write();
 
 
@@ -207,14 +211,10 @@ foam.CLASS({
   name: 'SampleSplitContainer',
   extends: 'foam.u2.Element',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-        ^ { background: gray; padding: 10px; display: inline-flex; }
-        ^content { margin: 4px; padding: 6px; width: 300px; height: 200px; background: white; }
-      */}
-    })
-  ],
+  css: `
+    ^ { background: gray; padding: 10px; display: inline-flex; }
+    ^content { margin: 4px; padding: 6px; width: 300px; height: 200px; background: white; }
+  `,
 
   properties: [
     'leftPanel', 'rightPanel'
@@ -223,13 +223,13 @@ foam.CLASS({
   methods: [
     function init() {
       this.
-          addClass(this.myClass()).
-          start('div', null, this.leftPanel$).
-            addClass(this.myClass('content')).
-          end().
-          start('div', null, this.rightPanel$).
-            addClass(this.myClass('content')).
-          end();
+        addClass(this.myClass()).
+        start('div', null, this.leftPanel$).
+          addClass(this.myClass('content')).
+        end().
+        start('div', null, this.rightPanel$).
+          addClass(this.myClass('content')).
+        end();
     }
   ]
 });
@@ -238,6 +238,12 @@ var split = SampleSplitContainer.create();
 split.write();
 split.leftPanel.add('leftContent');
 split.rightPanel.add('rightContent');
+
+
+
+E('br').write();
+E('br').write();
+
 
 
 foam.CLASS({
