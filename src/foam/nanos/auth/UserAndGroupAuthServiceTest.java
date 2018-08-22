@@ -4,7 +4,6 @@ import foam.core.X;
 import foam.dao.ArraySink;
 import foam.util.Password;
 
-import javax.naming.AuthenticationException;
 import javax.security.auth.AuthPermission;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;

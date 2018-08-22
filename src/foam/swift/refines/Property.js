@@ -654,7 +654,7 @@ if let n = newValue as? Date {
   return n
 } else if let n = newValue as? String {
   let dateFormatter = DateFormatter()
-  dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.S'Z'"
+  dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
   return dateFormatter.date(from: n)
 } else if let n = newValue as? NSNumber {
   return Date(timeIntervalSince1970: n.doubleValue)

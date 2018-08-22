@@ -7,15 +7,12 @@
 package foam.dao;
 
 import foam.core.FObject;
-import foam.core.X;
 import foam.core.InvalidX;
+import foam.core.X;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
-import foam.mlang.sink.Count;
 import foam.nanos.auth.AuthService;
-
-import java.security.AccessControlException;
-import java.security.Permission;
+import foam.nanos.auth.AuthorizationException;
 
 /** Authenticate access to a DAO. **/
 public class AuthenticatedDAO
@@ -31,7 +28,7 @@ public class AuthenticatedDAO
   public AuthenticatedDAO(String name, boolean authenticateRead, DAO delegate) {
     this.name_             = name;
     this.authenticateRead_ = authenticateRead;
-    AccessControlException exception = new AccessControlException("When " +
+    AuthorizationException exception = new AuthorizationException("When " +
         "using a DAO decorated by AuthenticatedDAO, you may only call the " +
         "context-oriented methods: put_(), find_(), select_(), remove_(), " +
         "removeAll_(), pipe_(), and listen_(). Alternatively, you can also " +
@@ -66,7 +63,7 @@ public class AuthenticatedDAO
     }
 
     if ( ! authService.check(x, permission) ) {
-      throw new AccessControlException("Insufficient permissions");
+      throw new AuthorizationException();
     }
 
     return super.put_(x, obj);
@@ -78,7 +75,7 @@ public class AuthenticatedDAO
     AuthService authService = (AuthService) x.get("auth");
 
     if ( ! authService.check(x, permission) ) {
-      throw new AccessControlException("Insufficient permissions");
+      throw new AuthorizationException();
     }
 
     return super.remove_(x, obj);
@@ -91,7 +88,7 @@ public class AuthenticatedDAO
       AuthService authService = (AuthService) x.get("auth");
 
       if ( ! authService.check(x, permission) ) {
-        throw new AccessControlException("Insufficient permissions");
+        throw new AuthorizationException();
       }
     }
 
