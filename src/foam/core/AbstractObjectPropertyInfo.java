@@ -22,7 +22,7 @@ public abstract class AbstractObjectPropertyInfo
 
   public Object fromString(String value) {
     //TODO
-    return "";
+    return value;
   }
 
   @Override
