@@ -5,13 +5,21 @@ var root = dir + '/../..';
 
 require(root + '/src/foam.js');
 
+var outDir = dir + '/build/src'
+srcDirs = [
+  global.FOAM_ROOT,
+  dir + '/src',
+];
+
+// Clear the destination dir.
+var cp = require('child_process');
+cp.execSync('rm -rf ' + outDir)
+cp.execSync('mkdir -p ' + outDir)
+
 foam.__context__.classloader.load('foam.build.Builder').then(function(cls) {
   cls.create({
-    srcDirs: [
-      global.FOAM_ROOT,
-      dir + '/src',
-    ],
-    outDir: dir + '/build/src',
+    srcDirs: srcDirs,
+    outDir: outDir,
     required: [
       'demo.build.ModelToBuild',
     ],
