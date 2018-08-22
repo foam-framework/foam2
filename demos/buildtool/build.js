@@ -6,7 +6,7 @@ var root = dir + '/../..';
 require(root + '/src/foam.js');
 
 var outDir = dir + '/build/src'
-srcDirs = [
+var srcDirs = [
   global.FOAM_ROOT,
   dir + '/src',
 ];
