@@ -8,9 +8,11 @@ package foam.dao;
 
 import foam.core.Detachable;
 import foam.core.FObject;
+import foam.core.X;
 import foam.lib.Outputter;
 import foam.lib.json.OutputterMode;
 import foam.nanos.http.Format;
+import foam.nanos.logger.Logger;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletResponse;
@@ -22,11 +24,13 @@ import java.nio.charset.StandardCharsets;
 public class HTTPSink
     extends AbstractSink
 {
+  protected X x_;
   protected String url_;
   protected Format format_;
 
-  public HTTPSink(String url, Format format) throws IOException {
-    url_ = url;
+  public HTTPSink(X x, String url, Format format) throws IOException {
+    x_      = x;
+    url_    = url;
     format_ = format;
   }
 
@@ -35,7 +39,8 @@ public class HTTPSink
     HttpURLConnection conn = null;
     OutputStream os = null;
     BufferedWriter writer = null;
-
+    Logger logger = (Logger) x_.get("logger");
+    logger.debug(this.getClass().getSimpleName(), "url", url_, "format", format_, "put");
     try {
       Outputter outputter = null;
       conn = (HttpURLConnection) new URL(url_).openConnection();

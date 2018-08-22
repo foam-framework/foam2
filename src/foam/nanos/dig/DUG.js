@@ -54,8 +54,7 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.http.Format',
       name: 'format',
-      // format hidden until implemented
-      hidden: true
+      value: 'JSON'
     },
     {
       class: 'Reference',
@@ -84,9 +83,10 @@ foam.CLASS({
       javaReturns: 'void',
       javaCode: `
         try {
+          ((Logger) x.get("logger")).debug("DUG", "installing", getDaoKey());
           DAO dao = (DAO) x.get(getDaoKey());
           // TODO: choose outputter based on format
-          dao.listen(new HTTPSink(getUrl(), foam.nanos.http.Format.JSON), null);
+          dao.listen(new HTTPSink(x, getUrl(), getFormat()), null);
         } catch (Throwable t) {
           ((Logger) x.get("logger")).error("DUG", "error executing DUG", t);
         }

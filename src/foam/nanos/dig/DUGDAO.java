@@ -49,10 +49,12 @@ public class DUGDAO
 
   protected void executeDUG(X x, DUG dug) {
     try {
+      Logger logger = (Logger) x.get("logger");
+      logger.debug(DUGDAO.class.getSimpleName(), "execute", dug);
       dug.execute(Auth.sudo(x, dug.getOwner()));
     } catch (Throwable t) {
       Logger logger = (Logger) x.get("logger");
-      logger.error(DUGDAO.class, "Error executing DUG", dug.getId(), t);
+      logger.error(DUGDAO.class.getSimpleName(), "Error executing DUG", dug.getId(), t);
     }
   }
 }
