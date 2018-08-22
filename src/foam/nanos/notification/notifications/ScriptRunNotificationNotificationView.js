@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'ScriptRunNotificationNotificationView',
   extends: 'foam.nanos.notification.NotificationView',
 
+  requires: [
+    'foam.comics.DAOUpdateControllerView'
+  ],
+
   imports: [
     'scriptDAO',
     'stack'

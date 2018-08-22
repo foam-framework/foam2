@@ -173,5 +173,10 @@ foam.CLASS({
   ]
 });
 
-
-foam.boot.phase2();
+foam.SCRIPT({
+  package: 'foam.core',
+  name: 'BootPhase2',
+  code: function() {
+    foam.boot.phase2();
+  }
+});
