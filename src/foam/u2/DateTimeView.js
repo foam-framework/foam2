@@ -28,6 +28,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.setAttribute('type', 'datetime-local');
+      this.setAttribute('placeholder', 'Eg: 24 Aug 2019 16:00');
     },
 
     function link() {

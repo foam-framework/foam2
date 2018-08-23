@@ -17,9 +17,10 @@ foam.CLASS({
   ],
 
   imports: [
+    'data? as importedData',
     'stack',
     'summaryView? as importedSummaryView',
-    'data? as importedData',
+    'updateView? as importedUpdateView',
     'window'
   ],
 
@@ -29,35 +30,33 @@ foam.CLASS({
     'dblclick'
   ],
 
-  // TODO: wrong class name, fix when ActionView fixed.
   css: `
     ^ {
       width: fit-content;
       max-width: 100vw;
       margin: auto;
-    }
-
-    .middle-row {
       display: flex;
     }
 
-    .middle-row > *:not(:empty) {
+    ^ > * {
       margin-left: 10px;
     }
 
-    .middle-row > *:last-child {
+    ^ > *:last-child {
       margin-right: 10px;
     }
 
-    .middle-row .actions {
+    ^ .actions {
       display: inline-block;
-      margin-bottom: 10px;
     }
 
-    .middle-row .net-nanopay-ui-ActionView {
+    ^ .actions .net-nanopay-ui-ActionView {
+      margin: 0 10px 10px 0;
+    }
+
+    ^ .net-nanopay-ui-ActionView {
       background: #59aadd;
       color: white;
-      margin-right: 10px;
     }
   `,
 
@@ -81,6 +80,14 @@ foam.CLASS({
       }
     },
     {
+      name: 'updateView',
+      expression: function() {
+        return this.importedUpdateView ?
+            this.importedUpdateView :
+            { class: 'foam.comics.DAOUpdateControllerView' };
+      }
+    },
+    {
       class: 'String',
       name: 'title',
       expression: function(data$data$of) {
@@ -101,32 +108,28 @@ foam.CLASS({
     function initE() {
       var self = this;
 
-      this.
-        addClass(this.myClass()).
-        tag(this.data.topBorder$).
+      this.data.border.add(
+        this.E().addClass(this.myClass()).
         start().
-          addClass('middle-row').
-          tag(this.data.leftBorder).
+          hide(self.data.searchHidden$).
+          show(self.data.filtersEnabled$).
+          add(self.cls.PREDICATE).
+        end().
+        start().
+          style({ 'overflow-x': 'auto' }).
           start().
-            hide(self.data.searchHidden$).
-            show(self.data.filtersEnabled$).
-            add(self.cls.PREDICATE).
+            addClass('actions').
+            show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW)).
+              start().add(self.cls.getAxiomsByClass(foam.core.Action)).end().
           end().
           start().
             style({ 'overflow-x': 'auto' }).
-            start().
-              addClass('actions').
-              show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW)).
-                start().add(self.cls.getAxiomsByClass(foam.core.Action)).end().
-            end().
-            start().
-              style({ 'overflow-x': 'auto' }).
-              tag(this.summaryView, { data$: this.data.filteredDAO$ }).
-            end().
+            tag(this.summaryView, { data$: this.data.filteredDAO$ }).
           end().
-          tag(this.data.rightBorder$).
-        end().
-        tag(this.data.bottomBorder$);
+        end()
+      );
+
+      this.add(this.data.border);
     },
 
     function dblclick(obj) {
@@ -143,7 +146,7 @@ foam.CLASS({
 
     function onEdit(s, edit, id) {
       this.stack.push({
-        class: 'foam.comics.DAOUpdateControllerView',
+        class: this.updateView.class,
         key: id
       }, this);
     },

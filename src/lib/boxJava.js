@@ -112,7 +112,7 @@ foam.CLASS({
   flags: ['java'],
 
   javaImports: [
-    'java.security.AccessControlException'
+    'foam.nanos.auth.AuthenticationException'
   ],
 
   properties: [
@@ -134,7 +134,7 @@ foam.CLASS({
       javaCode:
 `Object object = message.getObject();
 if ( object instanceof RPCErrorMessage && ((RPCErrorMessage) object).getData() instanceof RemoteException &&
-    "java.security.AccessControlException".equals(((RemoteException) ((RPCErrorMessage) object).getData()).getId()) ) {
+    "foam.nanos.auth.AuthenticationException".equals(((RemoteException) ((RPCErrorMessage) object).getData()).getId()) ) {
   // TODO: should this be wrapped in new Thread() ?
   ((Runnable) getX().get("requestLogin")).run();
   getClientBox().send(getMsg());

@@ -78,28 +78,12 @@ foam.CLASS({
       value: true
     },
     {
-      class: 'foam.u2.ViewSpec',
-      name: 'topBorder',
-      documentation: `Lets you put a view above the rest of the DAOController
-        content.`
-    },
-    {
-      class: 'foam.u2.ViewSpec',
-      name: 'rightBorder',
-      documentation: `Lets you put a view to the right of the rest of the
-        DAOController content.`
-    },
-    {
-      class: 'foam.u2.ViewSpec',
-      name: 'bottomBorder',
-      documentation: `Lets you put a view below the rest of the DAOController
-        content.`
-    },
-    {
-      class: 'foam.u2.ViewSpec',
-      name: 'leftBorder',
-      documentation: `Lets you put a view to the left of the rest of the
-        DAOController content.`
+      name: 'border',
+      documentation: `
+        If you want the DAO controller to be the content of a border view, set
+        the border here.
+      `,
+      factory: function() { return foam.u2.borders.NullBorder.create(); }
     },
     {
       class: 'Boolean',

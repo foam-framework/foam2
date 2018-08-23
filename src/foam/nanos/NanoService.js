@@ -7,10 +7,14 @@
 foam.INTERFACE({
   package: 'foam.nanos',
   name: 'NanoService',
+
   methods: [
     {
       name: 'start',
-      javaReturns: 'void'
+      javaReturns: 'void',
+      javaThrows: [
+        'java.lang.Exception'
+      ]
     }
   ]
 });

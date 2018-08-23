@@ -16,7 +16,7 @@ foam.INTERFACE({
       returns: 'Promise',
       javaReturns: 'String',
       swiftReturns: 'String',
-      javaThrows: [ 'javax.naming.AuthenticationException' ],
+      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
       args: [
         {
           name: 'x',
