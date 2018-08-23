@@ -6,6 +6,7 @@ import foam.lib.parse.ParserContext;
 import foam.lib.parse.PStream;
 import foam.lib.query.AndParser;
 import foam.lib.query.HasParser;
+import foam.lib.query.IsInstanceOfParser;
 import foam.lib.query.IsParser;
 import foam.lib.query.MeParser;
 import foam.lib.query.NegateParser;
@@ -39,11 +40,11 @@ public class QueryParser
     }
 
     expressions.add(new MeParser());
+    expressions.add(new IsInstanceOfParser());
 
-    Parser[] parsers = new Parser[expressions.size()];
-    expressions.toArray(parsers);
-
-    setDelegate(new Alt(new ParenParser (new OrParser(new AndParser(new Alt(parsers)))),
+    Parser[] parsers = expressions.toArray(new Parser[expressions.size()]);
+    setDelegate(new Alt(
+      new ParenParser (new OrParser(new AndParser(new Alt(parsers)))),
       new ParenParser (new OrParser(new ParenParser(new AndParser(new Alt(parsers))))),
       new OrParser(new AndParser(new Alt(parsers)))));
   }
