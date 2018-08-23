@@ -121,7 +121,7 @@ public class DigWebAgent
           jsonParser.setX(x);
           foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
           outputterJson.setOutputDefaultValues(true);
-          outputterJson.setOutputClassNames(false);
+          outputterJson.setOutputClassNames(true);
           // let FObjectArray parse first
           if ( SafetyUtil.isEmpty(data) ) {
               DigErrorMessage error = new EmptyDataException.Builder(x)
@@ -245,7 +245,7 @@ public class DigWebAgent
           if ( Format.JSON == format ) {
             foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
             outputterJson.setOutputDefaultValues(true);
-            outputterJson.setOutputClassNames(false);
+            outputterJson.setOutputClassNames(true);
             outputterJson.output(sink.getArray().toArray());
 
             //resp.setContentType("application/json");
@@ -369,7 +369,12 @@ public class DigWebAgent
           return;
         } else {
           dao.remove(targetFobj);
-          out.println("Success");
+
+          DigErrorMessage error = new DigSuccessMessage.Builder(x)
+            .setMessage("Success")
+            .build();
+          outputException(x, resp, format, out, error);
+          return;
         }
       } else {
         DigErrorMessage error = new ParsingErrorException.Builder(x)
@@ -450,7 +455,7 @@ public class DigWebAgent
       jsonParser.setX(x);
       foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
       outputterJson.setOutputDefaultValues(true);
-      outputterJson.setOutputClassNames(false);
+      outputterJson.setOutputClassNames(true);
       outputterJson.output(error);
       out.println(outputterJson.toString());
 
@@ -464,7 +469,7 @@ public class DigWebAgent
       //output error in csv format
 
       foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);
-      outputterCsv.output(error);
+      outputterCsv.put(error, null);
       out.println(outputterCsv.toString());
 
     } else if ( format == Format.HTML ) {

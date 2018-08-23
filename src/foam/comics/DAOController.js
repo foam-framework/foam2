@@ -78,32 +78,37 @@ foam.CLASS({
       value: true
     },
     {
-      class: 'foam.u2.ViewSpec',
-      name: 'topBorder',
-      documentation: `Lets you put a view above the rest of the DAOController
-        content.`
+      name: 'border',
+      documentation: `
+        If you want the DAO controller to be the content of a border view, set
+        the border here.
+      `,
+      factory: function() { return foam.u2.borders.NullBorder.create(); }
     },
     {
-      class: 'foam.u2.ViewSpec',
-      name: 'rightBorder',
-      documentation: `Lets you put a view to the right of the rest of the
-        DAOController content.`
+      class: 'Boolean',
+      name: 'filtersEnabled',
+      documentation: `Set to true if you want to completely hide the search
+        panel and the button to toggle it.`,
+      value: true
     },
     {
-      class: 'foam.u2.ViewSpec',
-      name: 'bottomBorder',
-      documentation: `Lets you put a view below the rest of the DAOController
-        content.`
-    },
-    {
-      class: 'foam.u2.ViewSpec',
-      name: 'leftBorder',
-      documentation: `Lets you put a view to the left of the rest of the
-        DAOController content.`
+      class: 'Boolean',
+      name: 'searchHidden',
+      documentation: `Used internally to keep track of whether the search panel
+        is currently hidden or not.`,
+      value: false
     }
   ],
 
   actions: [
+    {
+      name: 'toggleFilters',
+      isAvailable: function(filtersEnabled) { return filtersEnabled; },
+      code: function() {
+        this.searchHidden = ! this.searchHidden;
+      },
+    },
     {
       name: 'create',
       isAvailable: function(createEnabled) { return createEnabled; },

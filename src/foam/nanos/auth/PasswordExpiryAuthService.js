@@ -22,8 +22,7 @@ foam.CLASS({
   javaImports: [
     'foam.dao.DAO',
     'foam.nanos.NanoService',
-    'static foam.mlang.MLang.EQ',
-    'javax.naming.AuthenticationException',
+    'static foam.mlang.MLang.EQ'
   ],
 
   methods: [
@@ -56,7 +55,7 @@ return getDelegate().loginByEmail(x, email, password);`
       name: 'isPasswordExpired',
       documentation: 'Checks if password is expired. True if expired, false if not expired',
       javaReturns: 'boolean',
-      javaThrows: ['javax.naming.AuthenticationException'],
+      javaThrows: ['foam.nanos.auth.AuthenticationException'],
       args: [
         {
           name: 'user',
