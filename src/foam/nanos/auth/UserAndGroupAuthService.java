@@ -18,7 +18,6 @@ import foam.util.Email;
 import foam.util.Password;
 import foam.util.SafetyUtil;
 
-import javax.naming.AuthenticationException;
 import javax.security.auth.AuthPermission;
 import java.security.Permission;
 import java.util.Calendar;
