@@ -225,19 +225,13 @@ foam.CLASS({
         .end();
     },
 
-    /** Change the application page to #notifications */
     function changeToNotificationsPage() {
-      this.menuDAO
-          .where(this.EQ(this.Menu.ID, 'notifications'))
-          .select()
-          .then((queryResult) => {
-            if ( queryResult.length === 0 ) {
-              throw Error('No menu item in menuDAO with id "notifications"');
-            }
-            var notificationMenu = queryResult.array[0];
-            notificationMenu.launch();
-          })
-          .catch((err) => console.error(err));
+      this.menuDAO.find('notifications').then((queryResult) => {
+        if ( queryResult == null ) {
+          throw new Error(`No menu in menuDAO with id "notifications".`);
+        }
+        queryResult.launch();
+      });
     },
     function otherViews() {
      
