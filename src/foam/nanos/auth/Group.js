@@ -64,6 +64,16 @@ foam.CLASS({
       name: 'primaryColor',
       documentation: 'The following color properties can determine the color scheme of the GUI.'
     },
+    {
+      class: 'String',
+      name: 'topNavigation',
+      value: 'foam.nanos.u2.navigation.TopNavigation'
+    },
+    {
+      class: 'String',
+      name: 'footerView',
+      value: 'foam.nanos.u2.navigation.FooterView'
+    },
     { class: 'String', name: 'secondaryColor' },
     { class: 'String', name: 'tableColor' },
     { class: 'String', name: 'tableHoverColor' },
