@@ -406,6 +406,7 @@ FOAM_FILES([
   { name: "foam/u2/view/ChipView", flags: ['web'] },
   { name: "foam/u2/view/Formatter", flags: ['web'] },
   { name: "foam/u2/view/FnFormatter", flags: ['web'] },
+  { name: "foam/u2/view/TableCellPropertyRefinement", flags: ['node'] },
   { name: "foam/u2/view/TableCellFormatter", flags: ['web'] },
   { name: "foam/u2/view/TableView", flags: ['web'] },
   { name: "foam/u2/view/EditColumnsView", flags: ['web'] },
