@@ -9,10 +9,8 @@ package foam.lib.query;
 import foam.core.ClassInfo;
 import foam.lib.parse.Literal;
 import foam.lib.parse.PStream;
-import foam.lib.parse.Parser;
 import foam.lib.parse.ParserContext;
 import foam.lib.parse.Seq;
-import foam.mlang.Constant;
 import foam.mlang.predicate.IsInstanceOf;
 
 public class IsInstanceOfParser extends foam.lib.parse.ProxyParser {
@@ -50,11 +48,9 @@ public class IsInstanceOfParser extends foam.lib.parse.ProxyParser {
         throw new RuntimeException(e);
       }
 
-      foam.mlang.predicate.IsInstanceOf exp = new foam.mlang.predicate.IsInstanceOf();
-      exp.setTargetClass(info);
-      ps.setValue(exp);
+      return ps.setValue(new IsInstanceOf(info));
     }
 
-    return ps;
+    return null;
   }
 }
