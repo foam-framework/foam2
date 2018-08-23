@@ -39,7 +39,6 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.nanos.auth.resetPassword.ResetView',
     'foam.nanos.u2.navigation.TopNavigation',
-    'foam.nanos.u2.navigation.FooterView',
     'foam.u2.stack.Stack',
     'foam.u2.stack.StackView'
   ],
@@ -142,9 +141,7 @@ foam.CLASS({
     'secondaryHoverColor',
     'tableColor',
     'tableHoverColor',
-    'accentColor',
-    'topNavigation_',
-    'footerView_'
+    'accentColor'
   ],
 
   methods: [
@@ -175,48 +172,30 @@ foam.CLASS({
       self.clientPromise.then(function() {
         self
           .addClass(self.myClass())
-          .start('div', null, self.topNavigation_$).end()
+          .tag({class: 'foam.nanos.u2.navigation.TopNavigation'})
           .start('div').addClass('stack-wrapper')
             .tag({class: 'foam.u2.stack.StackView', data: self.stack, showActions: false})
-          .end()
-          .start('div', null, self.footerView_$).end();
-
-          // Sets up application view
-          self.topNavigation_.add(self.TopNavigation.create());
-          self.footerView_.add(self.FooterView.create());
+          .end();
       });
     },
 
-    function setPortalView(group) {
-      // Replaces contents of top navigation and footer view with group views
-      this.topNavigation_.replaceChild(
-        foam.lookup(group.topNavigation).create(null, this),
-        this.topNavigation_.children[0]
-      );
-
-      this.footerView_.replaceChild(
-        foam.lookup(group.footerView).create(null, this),
-        this.footerView_.children[0]
-      );
-    },
-
-    async function setDefaultMenu() {
+    function setDefaultMenu() {
       // Don't select default if menu already set
       if ( this.window.location.hash || ! this.user.group ) return;
 
-      var group = await this.client.groupDAO.find(this.user.group);
+      this.client.groupDAO.find(this.user.group).then(function (group) {
+        this.group.copyFrom(group);
 
-      this.group.copyFrom(group);
-      for ( var i = 0; i < this.MACROS.length; i++ ) {
-        var m = this.MACROS[i];
-        if ( group[m] ) this[m] = group[m];
-      }
+        for ( var i = 0 ; i < this.MACROS.length ; i++ ) {
+          var m = this.MACROS[i];
+          if ( group[m] ) this[m] = group[m];
+        }
 
-      if ( group && ! this.window.location.hash ) {
-        this.window.location.hash = group.defaultMenu;
-      }
-
-      this.setPortalView(group);
+        // Don't select default if menu already set
+        if ( group && ! this.window.location.hash ) {
+          this.window.location.hash = group.defaultMenu;
+        }
+      }.bind(this));
     },
 
     function getCurrentUser() {
