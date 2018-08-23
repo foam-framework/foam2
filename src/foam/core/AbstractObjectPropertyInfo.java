@@ -21,8 +21,7 @@ public abstract class AbstractObjectPropertyInfo
   public void setFromString(Object obj, String value) { }
 
   public Object fromString(String value) {
-    //TODO
-    return "";
+    return value;
   }
 
   @Override

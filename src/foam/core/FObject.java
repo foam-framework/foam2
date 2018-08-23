@@ -11,8 +11,8 @@ import foam.crypto.sign.Signable;
 
 import java.util.Map;
 
-public interface FObject
-    extends ContextAware, Comparable, Hashable, Signable
+public interface FObject extends
+  Appendable, ContextAware, Comparable, Freezable, Hashable, Signable
 {
   ClassInfo getClassInfo();
   FObject copyFrom(FObject obj);

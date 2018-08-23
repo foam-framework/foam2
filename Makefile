@@ -27,7 +27,6 @@ foam2_MAVEN_DEPS = \
 	org.mongodb:mongodb-driver-core:3.4.2 \
 	org.mongodb:bson:3.4.2 \
 	org.postgresql:postgresql:42.0.0 \
-	org.java-websocket:Java-WebSocket:1.3.4 \
 	com.authy:authy-java:1.1.0 \
 	org.bouncycastle:bcpkix-jdk15on:1.57 \
 	org.bouncycastle:bcprov-jdk15on:1.57 \
@@ -61,6 +60,9 @@ foam2_MAVEN_DEPS = \
 	org.eclipse.jetty:jetty-util:9.4.8.v20171121 \
 	org.eclipse.jetty:jetty-webapp:9.4.8.v20171121 \
 	org.eclipse.jetty:jetty-xml:9.4.8.v20171121 \
+	org.eclipse.jetty.websocket:websocket-api:9.4.8.v20171121 \
+	org.eclipse.jetty.websocket:websocket-server:9.4.8.v20171121 \
+	org.eclipse.jetty.websocket:websocket-servlet:9.4.8.v20171121 \
 	com.google.guava:guava:23.6-jre \
 	com.google.appengine:appengine-api-1.0-sdk:1.9.24
 
