@@ -102,6 +102,7 @@ foam.CLASS({
   extends: 'Property',
   requires: [
     'foam.core.StubMethod',
+    'foam.core.StubNotification',
   ],
   properties: [
     'of',
