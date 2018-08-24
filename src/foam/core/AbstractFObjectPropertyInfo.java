@@ -122,4 +122,48 @@ public abstract class AbstractFObjectPropertyInfo
     this.set(diff, d);
     return d != null;
   }
+
+  protected boolean containsPII_ = false;
+  protected boolean containsPIIIsSet_ = false;
+
+  @Override
+  public boolean containsPII() {
+    if ( containsPIIIsSet_ ) {
+      return containsPII_;
+    }
+
+    // iterate through sub properties and check if any of them have PII
+    List<PropertyInfo> props = this.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    for ( PropertyInfo prop : props ) {
+      if ( prop.containsPII() ) {
+        containsPII_ = true;
+        break;
+      }
+    }
+
+    containsPIIIsSet_ = true;
+    return containsPII_;
+  }
+
+  protected boolean containsDeletablePII_ = false;
+  protected boolean containsDeletablePIIIsSet_ = false;
+
+  @Override
+  public boolean containsDeletablePII() {
+    if ( containsDeletablePIIIsSet_ ) {
+      return containsDeletablePII_;
+    }
+
+    // iterate through sub properties and check if any of them have deletable PII
+    List<PropertyInfo> props = this.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    for ( PropertyInfo prop : props ) {
+      if ( prop.containsDeletablePII() ) {
+        containsDeletablePII_ = true;
+        break;
+      }
+    }
+
+    containsDeletablePIIIsSet_ = true;
+    return containsDeletablePII_;
+  }
 }
