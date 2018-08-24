@@ -144,7 +144,8 @@ foam.CLASS({
     'tableHoverColor',
     'accentColor',
     'topNavigation_',
-    'footerView_'
+    'footerView_',
+    'stackStyle'
   ],
 
   methods: [
@@ -176,7 +177,7 @@ foam.CLASS({
         self
           .addClass(self.myClass())
           .start('div', null, self.topNavigation_$).end()
-          .start('div').addClass('stack-wrapper')
+          .start('div').addClass('stack-wrapper').addClass(self.stackStyle$)
             .tag({class: 'foam.u2.stack.StackView', data: self.stack, showActions: false})
           .end()
           .start('div', null, self.footerView_$).end();
@@ -198,6 +199,8 @@ foam.CLASS({
         foam.lookup(group.footerView).create(null, this),
         this.footerView_.children[0]
       );
+
+      this.stackStyle = group.stackStyle;
     },
 
     async function setDefaultMenu() {
