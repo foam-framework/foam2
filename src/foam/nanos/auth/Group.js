@@ -74,6 +74,7 @@ foam.CLASS({
       name: 'footerView',
       value: 'foam.nanos.u2.navigation.FooterView'
     },
+    { class: 'String', name: 'stackStyle' },
     { class: 'String', name: 'secondaryColor' },
     { class: 'String', name: 'tableColor' },
     { class: 'String', name: 'tableHoverColor' },
