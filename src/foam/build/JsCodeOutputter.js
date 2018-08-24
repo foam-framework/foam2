@@ -92,7 +92,12 @@ foam.CLASS({
               for ( var i = 0 ; i < keys.length ; i++ ) {
                 if ( foam.Undefined.isInstance(v[keys[i]]) ) continue;
                 out.key(keys[i]);
-                this.output(x, v[keys[i]]);
+                var o = v[keys[i]];
+                if ( keys[i] == 'class' && foam.String.isInstance(o) && o.indexOf('AnonymousClass') == 0 ) {
+                  this.output(x, foam.lookup(o))
+                } else {
+                  this.output(x, o);
+                }
               }
               out.end();
             }
