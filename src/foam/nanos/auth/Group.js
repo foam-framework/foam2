@@ -74,10 +74,10 @@ foam.CLASS({
       name: 'footerView',
       value: 'foam.nanos.u2.navigation.FooterView'
     },
-    { 
+    {
       class: 'String',
-      name: 'stackStyle',
-      documentation: 'Appends a css class to the main application stack container.'
+      name: 'groupCSS',
+      view: { class: 'foam.u2.tag.TextArea', rows: 16 },
     },
     { class: 'String', name: 'secondaryColor' },
     { class: 'String', name: 'tableColor' },
