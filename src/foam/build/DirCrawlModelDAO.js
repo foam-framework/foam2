@@ -84,7 +84,7 @@ foam.CLASS({
 
       context.foam.LIB = function(m) {
         if ( ! m.id ) {
-          m.id = 'lib.Lib' + foam.next$UID()
+          m.id = m.name + '.' + m.methods[0].name;
         }
         promises.push(dao.put(self.Lib.create({
           id: m.id,
