@@ -38,7 +38,7 @@ foam.CLASS({
     }
   ],
 
-  css: ` %GROUPCSS% `,
+  css: '%GROUPCSS%',
 
   methods: [
     // TODO: Why is this init() instead of initE()? Investigate and maybe fix.
