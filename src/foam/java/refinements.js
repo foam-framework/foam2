@@ -296,6 +296,7 @@ foam.CLASS({
 
 foam.LIB({
   name: 'foam.core.FObject',
+  flags: ['java'],
   methods: [
     function buildJavaClass(cls) {
       cls = cls || foam.java.Class.create();
