@@ -145,8 +145,7 @@ foam.CLASS({
     'accentColor',
     'groupCSS',
     'topNavigation_',
-    'footerView_',
-    'stackStyle'
+    'footerView_'
   ],
 
   methods: [
@@ -200,8 +199,6 @@ foam.CLASS({
         foam.lookup(group.footerView).create(null, this),
         this.footerView_.children[0]
       );
-
-      this.stackStyle = group.stackStyle;
     },
 
     async function setDefaultMenu() {
