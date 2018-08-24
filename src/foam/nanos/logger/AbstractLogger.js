@@ -82,12 +82,19 @@ return String.valueOf(obj);`
       ],
       javaReturns: 'String',
       javaCode:
-      `StringBuilder str = sb.get();
-for ( Object n : args ) {
-  str.append(',');
-  str.append(formatArg(n));
-}
-return str.toString();`
+      `
+  StringBuilder str = sb.get();
+  if ( args.length >= 1) {
+    str.append(formatArg(args[0]));
+  }
+  for ( int i = 1; i < args.length; ++i) {
+    Object n = args[i];
+    str.append(',');
+    str.append(formatArg(n));
+  }
+  return str.toString();`
     }
   ]
 });
+
+
