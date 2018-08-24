@@ -149,7 +149,7 @@ foam.CLASS({
     */
     function initArgs(args, ctx) {
       if ( ctx  ) this.__context__ = ctx;
-      if ( args ) this.copyFrom(args, true);
+      if ( args ) this.copyFrom(args);
     },
 
     /**
