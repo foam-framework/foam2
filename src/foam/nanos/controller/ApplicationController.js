@@ -68,7 +68,7 @@ foam.CLASS({
   ],
 
   constants: {
-    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor', 'secondaryHoverColor' ]
+    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor', 'secondaryHoverColor', 'groupCSS' ]
   },
 
   css: `
@@ -143,6 +143,7 @@ foam.CLASS({
     'tableColor',
     'tableHoverColor',
     'accentColor',
+    'groupCSS',
     'topNavigation_',
     'footerView_',
     'stackStyle'
@@ -177,7 +178,7 @@ foam.CLASS({
         self
           .addClass(self.myClass())
           .start('div', null, self.topNavigation_$).end()
-          .start('div').addClass('stack-wrapper').addClass(self.stackStyle$)
+          .start('div').addClass('stack-wrapper')
             .tag({class: 'foam.u2.stack.StackView', data: self.stack, showActions: false})
           .end()
           .start('div', null, self.footerView_$).end();
