@@ -103,5 +103,5 @@
   //  delete this.FOAM_FILES;
   };
 
-  getLoader()('files2');
+  getLoader()('files');
 })();
