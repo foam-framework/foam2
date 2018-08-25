@@ -27,9 +27,22 @@ foam = {
     return function next$UID() { return id++; };
   })(),
   SCRIPT: function(m) {
-    // An instance of the script isn't useful at this point so just blindly
-    // execute the code. foam.SCRIPT can be overwritten later to capture the
-    // details of the script if need be.
+    // An instance of the script isn't useful at this point so just
+    // execute the code. foam.SCRIPT can be overwritten later to
+    // capture the details of the script if need be.
+
+    // Only execute if the script's flags match the curren runtime flags.
+    if ( m.flags &&
+         global.FOAM_FLAGS ) {
+      for ( var i = 0 ; i < m.flags.length ; i++ ) {
+        if ( global.FOAM_FLAGS[m.flags[i]] ) {
+          m.code();
+          return;
+        }
+      }
+      return;
+    }
+    
     m.code();
   }
 };
