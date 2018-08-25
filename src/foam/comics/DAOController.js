@@ -20,6 +20,10 @@ foam.CLASS({
   package: 'foam.comics',
   name: 'DAOController',
 
+  requires: [
+    'foam.u2.borders.NullBorder',
+  ],
+
   topics: [
     'finished'
   ],
@@ -83,7 +87,7 @@ foam.CLASS({
         If you want the DAO controller to be the content of a border view, set
         the border here.
       `,
-      factory: function() { return foam.u2.borders.NullBorder.create(); }
+      factory: function() { return this.NullBorder.create(); }
     },
     {
       class: 'Boolean',

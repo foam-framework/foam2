@@ -164,7 +164,7 @@ have multiple classloaders running alongside eachother`
         }
 
         if ( foam.core.Model.isInstance(id) ) {
-          return this.pending[id] = this.buildClass_(id, path);
+          return this.pending[id.id] = this.buildClass_(id, path);
         }
 
         throw new Error("Invalid parameter to ClassLoader.load_");

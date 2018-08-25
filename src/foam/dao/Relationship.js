@@ -45,7 +45,7 @@ foam.CLASS({
         var s = this.sourceModel;
         var t = this.targetModel;
         return s.substring(s.lastIndexOf('.') + 1) +
-          t.substring(t.lastIndexOf('.') + 1) + 'Relationship';
+          t.substring(t.lastIndexOf('.') + 1) + this.forwardName + 'Relationship';
       }
     },
     'forwardName',
