@@ -35,8 +35,9 @@ foam.CLASS({
       background: gray;
       width: 600px;
       height: 200px;
-      padding: 10px;
+      padding: 10px 4px;
       display: block;
+      // width: 100%;
     }
     ^tabRow { height: 30px; }
     ^tab {
@@ -243,6 +244,7 @@ split.rightPanel.add('rightContent');
 
 E('br').write();
 E('br').write();
+E('br').write();
 
 
 
@@ -271,3 +273,68 @@ foam.CLASS({
 var blink = Blink.create();
 blink.add('blinking');
 blink.write();
+
+
+
+E('br').write();
+E('br').write();
+
+
+
+foam.CLASS({
+  name: 'Columns',
+  extends: 'foam.u2.Element',
+
+  css: `
+    ^ {
+      background: #efefef;
+      display: flex;
+      width: 100%;
+    }
+  `,
+
+  methods: [
+    function init() {
+      this.addClass(this.myClass());
+    }
+  ]
+});
+
+foam.CLASS({
+  name: 'Column',
+  extends: 'foam.u2.Element',
+
+  css: `
+    ^ {
+      display: inline-block;
+      padding: 4px;
+      float: left;
+      margin: 4px;
+      border: 1px solid black;
+      width: 100%;
+    }
+  `,
+
+  methods: [
+    function init() {
+      this.addClass(this.myClass())
+    }
+  ]
+});
+
+var cols = E().
+  start(Columns).
+    start(Column).add('column 1 contents').end().
+    start(Column).add('column 2 contents').br().add('and more content').end().
+  end().
+  start(Columns).
+    start(Column).add('column 1 contents').end().
+    start(Column).add('column 2 contents').br().add('and more content').end().
+    start(Column).add('column 3 contents').br().add('and more content').end().
+  end().
+  start(foam.u2.Tabs).
+    start(foam.u2.Tab, {label: 'Tab 1'}).add('tab 1 contents').end().
+    start(foam.u2.Tab, {label: 'Tab 2'}).add('tab 2 contents').end().
+    start(foam.u2.Tab, {label: 'Tab 3'}).add('Even more contents in tab 3').end().
+  end();
+cols.write();
