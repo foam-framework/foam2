@@ -593,7 +593,7 @@ foam.CLASS({
               }).
                 add( 'Conventional UML : ' ).tag( this.CONVENTIONAL_UML, { data$: this.conventionalUML$ } ).
                 add(this.slot(function(selectedClass, conventionalUML) {
-                  if (!selectedClass) return '';
+                  if ( ! selectedClass ) return '';
                   return this.UMLDiagram.create({
                     data: selectedClass
                   });
