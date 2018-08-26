@@ -42,14 +42,24 @@ foam.CLASS({
     ^tabRow { height: 30px; }
     ^tab {
       border: 1px solid black;
-      border-bottom: none;
-      padding: 5px;
+      // border-bottom: none;
+      padding: 4px;
       background: lightgray;
+      display: inline-block;
+      height: 12px;
     }
     ^tab.selected {
       background: white;
       position: relative;
       z-index: 1;
+    }
+    ^bottomEdge {
+      background: white;
+      left: 0;
+      width: 43.75px;
+      position: absolute;
+      height: 2.5px;
+      top: 19px;
     }
     ^content {
       margin: 4px;
@@ -63,12 +73,6 @@ foam.CLASS({
   `,
 
   properties: [
-    /* not used
-    {
-      name: 'tabs',
-      factory: function() { return []; }
-    },
-    */
     {
       name: 'selected',
       postSet: function(o, n) {
@@ -101,6 +105,8 @@ foam.CLASS({
           enableClass('selected', tab.selected$).
           on('click', function() { this.selected = tab; }.bind(this)).
           add(tab.label).
+          br().
+          start('div').addClass(this.myClass('bottomEdge')).show(tab.selected$).end().
         end();
 
         tab.shown$ = tab.selected$;
