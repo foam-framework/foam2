@@ -44,18 +44,15 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'static',
-      value: false
+      name: 'static'
     },
     {
       class: 'Boolean',
-      name: 'final',
-      value: false
+      name: 'final'
     },
     {
       class: 'Boolean',
-      name: 'abstract',
-      value: false
+      name: 'abstract'
     },
     {
       class: 'String',
