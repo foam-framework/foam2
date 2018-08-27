@@ -63,6 +63,10 @@ foam.CLASS({
         org.eclipse.jetty.server.Server server =
           new org.eclipse.jetty.server.Server(getPort());
 
+        /*
+          Prevent Jetty server from broadcasting its version number in the HTTP
+          response headers.
+        */
         for ( org.eclipse.jetty.server.Connector conn : server.getConnectors() ) {
           for ( org.eclipse.jetty.server.ConnectionFactory f : conn.getConnectionFactories() ) {
             if ( f instanceof org.eclipse.jetty.server.HttpConnectionFactory ) {
