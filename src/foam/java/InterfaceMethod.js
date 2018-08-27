@@ -35,6 +35,10 @@ foam.CLASS({
       name: 'args'
     },
     {
+      class: 'StringArray',
+      name: 'throws'
+    },
+    {
       name: 'body',
       documentation: 'Dummy property to silence warnings',
       setter: function() {},
@@ -46,13 +50,18 @@ foam.CLASS({
       setter: function() {},
       getter: function() {}
     },
-    { class: 'StringArray', name: 'throws' },
     {
       name: 'static',
       documentation: 'Dummy property to silence warnings',
       setter: function() {},
       getter: function() {}
     },
+    {
+      name: 'final',
+      documentation: 'Dummy property to silence warnings',
+      setter: function() {},
+      getter: function() {}
+    }
   ],
 
   methods: [
