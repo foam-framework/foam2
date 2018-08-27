@@ -215,6 +215,60 @@ E('br').write();
 
 
 foam.CLASS({
+  name: 'LabelledSection',
+  extends: 'foam.u2.Element',
+
+  css: `
+    ^ {
+      border: 1px solid #666;
+      display: inline-block;
+      padding: 10px;
+    }
+    ^title {
+      align-content: center;
+      background: white;
+      color: #666;
+      display: inline;
+      padding: 3px;
+      position: relative;
+      top: -20px;
+    }
+    ^content {
+      background: white;
+      height: 200px;
+      position: relative;
+      top: -22px;
+      width: 300px;
+    }
+  `,
+
+  properties: [ 'title' ],
+
+  methods: [
+    function init() {
+      this.start().
+        addClass(this.myClass()).
+        start('div').addClass(this.myClass('title')).add(this.title$).end().
+        start('div', null, this.content$).
+          addClass(this.myClass('content')).
+        end().
+      end();
+    }
+  ]
+});
+
+var sb = LabelledSection.create({title: 'Title'});
+sb.add('content').br().add('more content');
+sb.write();
+
+
+
+E('br').write();
+E('br').write();
+
+
+
+foam.CLASS({
   name: 'SampleSplitContainer',
   extends: 'foam.u2.Element',
 
