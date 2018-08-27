@@ -33,20 +33,20 @@ foam.CLASS({
   css: `
     ^ {
       background: gray;
-      width: 600px;
+      display: block;
       height: 200px;
       padding: 10px 4px;
-      display: block;
+      width: 600px;
       // width: 100%;
     }
     ^tabRow { height: 30px; }
     ^tab {
-      border: 1px solid black;
-      // border-bottom: none;
-      padding: 4px;
       background: lightgray;
+      border: 1px solid black;
+      border-radius: 3px 3px 0 0;
       display: inline-block;
       height: 12px;
+      padding: 4px;
     }
     ^tab.selected {
       background: white;
@@ -55,11 +55,11 @@ foam.CLASS({
     }
     ^bottomEdge {
       background: white;
-      left: 0;
-      width: 43.75px;
-      position: absolute;
       height: 2.5px;
+      left: 0;
+      position: absolute;
       top: 19px;
+      width: 43.75px;
     }
     ^content {
       margin: 4px;
