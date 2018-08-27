@@ -461,8 +461,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'final',
-      value: false
+      name: 'final'
     },
     {
       class: 'Boolean',
@@ -471,8 +470,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'synchronized',
-      value: false
+      name: 'synchronized'
     },
     {
       class: 'StringArray',
