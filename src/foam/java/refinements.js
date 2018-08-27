@@ -461,6 +461,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'final',
+      value: false
+    },
+    {
+      class: 'Boolean',
       name: 'abstract',
       value: true
     },
@@ -490,6 +495,7 @@ foam.CLASS({
         type: this.javaReturns || 'void',
         visibility: 'public',
         static: this.isStatic(),
+        final: this.final,
         synchronized: this.synchronized,
         throws: this.javaThrows,
         args: this.args && this.args.map(function(a) {
