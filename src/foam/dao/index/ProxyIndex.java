@@ -11,6 +11,8 @@ import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
+import java.io.IOException;
+
 public class ProxyIndex
   extends AbstractIndex
 {
@@ -75,5 +77,10 @@ public class ProxyIndex
   @Override
   public Object unwrap(Object state) {
     return getDelegate().unwrap(state);
+  }
+
+  @Override
+  public void flush(Object state) throws IOException {
+    getDelegate().flush(state);
   }
 }
