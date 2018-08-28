@@ -220,7 +220,7 @@ foam.CLASS({
 
   css: `
     ^ {
-      border: 1px solid #666;
+      border-style: ridge;
       display: inline-block;
       padding: 10px;
     }
@@ -275,12 +275,12 @@ foam.CLASS({
 
   css: `
     ^ {
-      border-top: 1px solid #666;
+      border-top-style: ridge;
       display: inline-block;
       padding: 10px;
     }
     ^.expanded {
-      border: 1px solid #666;
+      border-style: ridge;
       padding-left: 9px;
     }
     ^toolbar {
