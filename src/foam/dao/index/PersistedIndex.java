@@ -1,7 +1,7 @@
 /**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 package foam.dao.index;
@@ -52,10 +52,12 @@ public class PersistedIndex
     }
 
     synchronized ( file_ ) {
-      try ( ObjectInputStream iis = new ObjectInputStream(fis_) ) {
+      try {
         fis_.getChannel().position(position);
 
+        ObjectInputStream iis = new ObjectInputStream(fis_);
         Object value = iis.readObject();
+
         persisted.setPosition(-1);
         persisted.setValue(value);
         return value;
@@ -80,21 +82,18 @@ public class PersistedIndex
     }
 
     synchronized ( file_ ) {
-      try ( ObjectOutputStream oos = new ObjectOutputStream(bos_) ) {
-        long position = fos_.getChannel().position();
+      long position = fos_.getChannel().position();
 
-        oos.writeObject(persisted.getValue());
-        oos.flush();
+      ObjectOutputStream oos = new ObjectOutputStream(bos_);
+      oos.writeObject(persisted.getValue());
+      oos.flush();
 
-        bos_.writeTo(fos_);
-        bos_.flush();
-        bos_.reset();
+      bos_.writeTo(fos_);
+      bos_.flush();
+      bos_.reset();
 
-        persisted.setPosition(position);
-        persisted.setValue(null);
-      } catch ( Throwable t ) {
-        throw new RuntimeException(t);
-      }
+      persisted.setPosition(position);
+      persisted.setValue(null);
     }
   }
 
