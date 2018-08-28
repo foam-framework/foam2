@@ -225,7 +225,6 @@ foam.CLASS({
       padding: 10px;
     }
     ^title {
-      align-content: center;
       background: white;
       color: #666;
       display: inline;
@@ -258,6 +257,100 @@ foam.CLASS({
 });
 
 var sb = LabelledSection.create({title: 'Title'});
+sb.add('content').br().add('more content');
+sb.write();
+
+
+
+E('br').write();
+E('br').write();
+
+
+
+foam.CLASS({
+  name: 'FoldingSection',
+  extends: 'foam.u2.Controller',
+
+  requires: [ 'foam.u2.ActionView' ],
+
+  css: `
+    ^ {
+      border-top: 1px solid #666;
+      display: inline-block;
+      padding: 10px;
+    }
+    ^.expanded {
+      border: 1px solid #666;
+      padding-left: 9px;
+    }
+    ^toolbar {
+      color: #666;
+      display: inline-block;
+      padding: 3px;
+      position: relative;
+      left: -8px;
+      top: -20px;
+      width: 100%;
+    }
+    ^title {
+      background: white;
+      padding: 3px;
+      position: relative;
+      top: -3px;
+    }
+    ^content {
+      background: white;
+      height: 200px;
+      position: relative;
+      top: -22px;
+      width: 300px;
+    }
+    ^ .foam-u2-ActionView-toggle {
+      background: white;
+      border: none;
+      float: right;
+      padding: 3px;
+      position: relative;
+      top: -6px;
+      width: 14px;
+    }
+  `,
+
+  properties: [
+    'title',
+    {
+      class: 'Boolean',
+      name: 'expanded',
+      value: true
+    }
+  ],
+
+  methods: [
+    function init() {
+      this.
+        addClass(this.myClass()).
+        enableClass('expanded', this.expanded$).
+        start('div').
+          addClass(this.myClass('toolbar')).
+          start('span').
+            addClass(this.myClass('title')).
+            add(this.title$).
+          end().
+          tag(this.ActionView, {action: this.TOGGLE, data: this, label: this.expanded$.map(function(e) { return e ? '-' : '+'; })}).
+        end().
+        start('div', null, this.content$).
+          show(this.expanded$).
+          addClass(this.myClass('content')).
+        end();
+    }
+  ],
+
+  actions: [
+    function toggle() { this.expanded = ! this.expanded; console.log(this.expanded); }
+  ]
+});
+
+var sb = FoldingSection.create({title: 'Title'}).style({width: '500px'});
 sb.add('content').br().add('more content');
 sb.write();
 
