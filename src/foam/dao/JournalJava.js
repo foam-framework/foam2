@@ -240,10 +240,11 @@ foam.CLASS({
       name: 'put',
       synchronized: true,
       javaCode: `
+        FObject old = null;
         FObject fobj = (FObject) obj;
-        if ( getOutputDiff() ) {
-          PropertyInfo id = (PropertyInfo) fobj.getClassInfo().getAxiomByName("id");
-          FObject old = getDao().find(id.get(obj));
+        PropertyInfo id = (PropertyInfo) fobj.getClassInfo().getAxiomByName("id");
+
+        if ( getOutputDiff() && ( old = getDao().find(id.get(obj))) != null ) {
           write_("p(" + getOutputter().stringifyDelta(old.fclone(), fobj) + ")");
         } else {
           write_("p(" + getOutputter().stringify(fobj) + ")");
