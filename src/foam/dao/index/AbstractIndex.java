@@ -19,7 +19,7 @@ public abstract class AbstractIndex
     return state;
   }
 
-  public void flush(Object state) {
+  public void flush(Object state) throws IOException {
 
   }
 }
