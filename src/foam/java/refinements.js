@@ -314,22 +314,24 @@ foam.LIB({
         cls.implements = [ 'foam.core.FObject' ];
       }
 
-      cls.fields.push(foam.java.ClassInfo.create({ id: this.id }));
+      if ( this.model_.name !== 'AbstractFObject' ) {
+        cls.fields.push(foam.java.ClassInfo.create({ id: this.id }));
 
-      cls.method({
-        name: 'getClassInfo',
-        type: 'foam.core.ClassInfo',
-        visibility: 'public',
-        body: 'return classInfo_;'
-      });
+        cls.method({
+          name: 'getClassInfo',
+          type: 'foam.core.ClassInfo',
+          visibility: 'public',
+          body: 'return classInfo_;'
+        });
 
-      cls.method({
-        name: 'getOwnClassInfo',
-        visibility: 'public',
-        static: true,
-        type: 'foam.core.ClassInfo',
-        body: 'return classInfo_;'
-      });
+        cls.method({
+          name: 'getOwnClassInfo',
+          visibility: 'public',
+          static: true,
+          type: 'foam.core.ClassInfo',
+          body: 'return classInfo_;'
+        });
+      }
 
       var axioms = this.getOwnAxioms();
 
