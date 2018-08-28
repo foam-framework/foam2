@@ -12,7 +12,7 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
 public class ProxyIndex
-    implements Index
+  extends AbstractIndex
 {
   protected Index delegate_;
 
@@ -67,11 +67,13 @@ public class ProxyIndex
     return getDelegate().size(unwrap(state));
   }
 
+  @Override
   public Object wrap(Object state) {
-    return state;
+    return getDelegate().wrap(state);
   }
 
+  @Override
   public Object unwrap(Object state) {
-    return state;
+    return getDelegate().unwrap(state);
   }
 }
