@@ -309,10 +309,14 @@ foam.CLASS({
       background: white;
       border: none;
       float: right;
+      outline: none;
       padding: 3px;
       position: relative;
       top: -6px;
       width: 14px;
+    }
+    ^ .foam-u2-ActionView-toggle:hover {
+      background: white;
     }
   `,
 
