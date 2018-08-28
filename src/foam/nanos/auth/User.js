@@ -30,6 +30,15 @@ foam.CLASS({
     'id', 'enabled', 'type', 'group', 'spid', 'firstName', 'lastName', 'organization', 'email'
   ],
 
+  // TODO: The following properties don't have to be defined here anymore once
+  // https://github.com/foam-framework/foam2/issues/1529 is fixed:
+  //   1. enabled
+  //   2. created
+  //   3. firstName
+  //   4. middleName
+  //   5. lastName
+  //   6. legalName
+  //   7. lastModified
   properties: [
     {
       class: 'Long',
