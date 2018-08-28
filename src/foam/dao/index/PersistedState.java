@@ -25,7 +25,7 @@ public class PersistedState {
     return value_;
   }
 
-  public void setValue_(Object value) {
+  public void setValue(Object value) {
     value_ = value;
   }
 }
