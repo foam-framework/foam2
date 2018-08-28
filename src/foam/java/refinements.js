@@ -1048,8 +1048,13 @@ foam.CLASS({
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
+
       var compare = info.getMethod('compare');
       compare.body = 'return super.compare(o1, o2);';
+
+      var getValueClass = info.getMethod('getValueClass');
+      getValueClass.body = 'return java.util.Map.class;';
+
       return info;
     }
   ]
