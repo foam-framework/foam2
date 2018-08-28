@@ -830,36 +830,54 @@ foam.CLASS({
     if ( this.arg1_ instanceof Not )
       return ( (Not) arg1_ ).arg1_.partialEval();
     if ( arg1_.getClass().equals(Eq.class) ) {
-      return new Neq(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
+      return new Neq.Builder(null)
+        .setArg1(( (Binary) arg1_ ).getArg1())
+        .setArg2(( (Binary) arg1_ ).getArg2())
+        .build();
     }
     if ( arg1_.getClass().equals(Neq.class) ) {
-      return new Eq(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
+      return new Eq.Builder(null)
+        .setArg1(( (Binary) arg1_ ).getArg1())
+        .setArg2(( (Binary) arg1_ ).getArg2())
+        .build();
     }
     if ( arg1_.getClass().equals(Gt.class) ) {
-      return new Lte(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
+      return new Lte.Builder(null)
+        .setArg1(( (Binary) arg1_ ).getArg1())
+        .setArg2(( (Binary) arg1_ ).getArg2())
+        .build();
     }
     if ( arg1_.getClass().equals(Gte.class) ) {
-      return new Lt(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
+      return new Lt.Builder(null)
+        .setArg1(( (Binary) arg1_ ).getArg1())
+        .setArg2(( (Binary) arg1_ ).getArg2())
+        .build();
     }
     if ( arg1_.getClass().equals(Lt.class) ) {
-      return new Gte(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
+      return new Gte.Builder(null)
+        .setArg1(( (Binary) arg1_ ).getArg1())
+        .setArg2(( (Binary) arg1_ ).getArg2())
+        .build();
     }
     if ( arg1_.getClass().equals(Lte.class) ) {
-      return new Gt(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
+      return new Gt.Builder(null)
+        .setArg1(( (Binary) arg1_ ).getArg1())
+        .setArg2(( (Binary) arg1_ ).getArg2())
+        .build();
     }
     if ( predicate.arg1_.getClass().equals(And.class) ) {
       int len = ( (And) predicate.getArg1() ).args_.length;
       for ( int i = 0; i < len; i++ ) {
-        ( (And) predicate.getArg1() ).args_[i] = ( new Not(( (And) predicate.getArg1() ).args_[i]) ).partialEval();
+        ( (And) predicate.getArg1() ).args_[i] = ( new Not.Builder(null).setArg1((( (And) predicate.getArg1() ).args_[i]) ).build().partialEval() );
       }
-      return new Or(( (And) predicate.getArg1() ).args_).partialEval();
+      return new Or.Builder(null).setArgs(( (And) predicate.getArg1() ).args_).build().partialEval();
     }
     if ( predicate.arg1_.getClass().equals(Or.class) ) {
       int len = ( (Or) predicate.getArg1() ).args_.length;
       for ( int i = 0; i < len; i++ ) {
-        ( (Or) predicate.getArg1() ).args_[i] = ( new Not(( (Or) predicate.getArg1() ).args_[i]) ).partialEval();
+        ( (Or) predicate.getArg1() ).args_[i] = ( new Not.Builder(null).setArg1((( (Or) predicate.getArg1() ).args_[i]) ).build().partialEval() );
       }
-      return new And(( (Or) predicate.getArg1() ).args_).partialEval();
+      return new And.Builder(null).setArgs((( (Or) predicate.getArg1() ).args_)).build().partialEval();
     }
     return this;`
     },

@@ -209,6 +209,10 @@ var classes = [
   'foam.dao.FixedSizeDAO',
   'foam.mop.MOP',
   'foam.u2.Element',
+  'foam.u2.ControllerMode',
+  'foam.u2.ElementState',
+  'foam.u2.DefaultValidator',
+  'foam.u2.DisplayMode',
   'foam.u2.Visibility',
   'foam.nanos.export.ExportDriverRegistry',
   'foam.dao.pg.ConnectionPool',
@@ -319,6 +323,9 @@ var proxies = [
 ];
 
 var blacklist = [
+  'foam.core.Property',
+  'foam.u2.ViewSpec',
+  'foam.u2.AttrSlot',
 ];
 
 module.exports = {
