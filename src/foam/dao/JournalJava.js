@@ -168,6 +168,12 @@ foam.CLASS({
       value: true,
     },
     {
+      class: 'Boolean',
+      name: 'outputDiff',
+      documentation: 'Flag to enable/disable diff\'d output.',
+      value: false
+    },
+    {
       class: 'Object',
       name: 'file',
       javaType: 'java.io.File',
@@ -234,13 +240,15 @@ foam.CLASS({
       name: 'put',
       synchronized: true,
       javaCode: `
+        FObject old = null;
         FObject fobj = (FObject) obj;
         PropertyInfo id = (PropertyInfo) fobj.getClassInfo().getAxiomByName("id");
-        FObject old = getDao().find(id.get(obj));
-        String record = ( old != null ) ?
-          getOutputter().stringifyDelta(old.fclone(), fobj) :
-          getOutputter().stringify(fobj);
-        write_("p(" + record + ")");
+
+        if ( getOutputDiff() && ( old = getDao().find(id.get(obj))) != null ) {
+          write_("p(" + getOutputter().stringifyDelta(old.fclone(), fobj) + ")");
+        } else {
+          write_("p(" + getOutputter().stringify(fobj) + ")");
+        }
       `
     },
     {
