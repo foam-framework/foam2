@@ -137,6 +137,7 @@ var classes = [
   'foam.nanos.auth.Hours',
   'foam.nanos.auth.Address',
   'foam.nanos.auth.Phone',
+  'foam.nanos.auth.HumanNameTrait',
   'foam.nanos.auth.User',
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
