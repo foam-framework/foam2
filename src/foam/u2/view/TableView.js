@@ -69,8 +69,7 @@ foam.CLASS({
 
   properties: [
     {
-      // TODO: Class property doesn't support expressions.
-      // class: 'Class',
+      class: 'Class',
       name: 'of',
       expression: function(data$of) { return data$of || null; }
     },

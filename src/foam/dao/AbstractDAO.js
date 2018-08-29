@@ -55,10 +55,8 @@ foam.CLASS({
       /**
         Set to the name or class instance of the type of object the DAO
         will store.
-
-        // TODO: Class property doesn't support expressions
-        class: 'Class',
       */
+      class: 'Class',
       javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
       javaType: 'foam.core.ClassInfo',
       name: 'of',

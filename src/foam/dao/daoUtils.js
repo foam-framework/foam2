@@ -46,6 +46,7 @@ if let oldValue = oldValue as? foam_dao_AbstractDAO {
       `,
     },
     {
+      class: 'Class',
       name: 'of',
       expression: function(delegate$of) { return delegate$of || null; },
       swiftExpressionArgs: ['delegate$of'],
