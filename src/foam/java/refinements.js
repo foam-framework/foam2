@@ -165,9 +165,7 @@ foam.CLASS({
     function generateSetter_() {
       return this.javaSetter ? this.javaSetter : `
         if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
-        assert${foam.String.capitalize(this.name)}(val);
-        ${this.name}_ = val;
-        ${this.name}IsSet_ = true;
+        setProperty(\"${this.name}\", val);
       `;
     },
 
@@ -213,6 +211,7 @@ foam.CLASS({
         }).
         method({
           name: 'set' + capitalized,
+          type: 'void',
           visibility: 'public',
           args: [
             {
@@ -220,9 +219,41 @@ foam.CLASS({
               name: 'val'
             }
           ],
-          type: 'void',
           body: this.generateSetter_()
-        });
+        }).
+        method({
+          name: this.name + 'PreSet_',
+          type: this.javaType,
+          visibility: 'public',
+          args: [
+            {
+              type: 'Object',
+              name: 'oldValue'
+            },
+            {
+              type: this.javaType,
+              name: 'newValue'
+            }
+          ],
+          body: this.javaPreSet
+        }).
+        method({
+          name: this.name + 'PostSet_',
+          type: 'void',
+          visibility: 'public',
+          args: [
+            {
+              type: 'Object',
+              name: 'oldValue'
+            },
+            {
+              type: this.javaType,
+              name: 'newValue'
+            }
+          ],
+          body: this.javaPostSet
+        })
+
 
       if ( this.javaFactory ) {
         cls.method({
