@@ -39,8 +39,18 @@ foam.CLASS({
         });
       }
     },
-    'cmd',
-    'format',
+    {
+      class: 'Enum',
+      of: 'foam.nanos.http.Command',
+      name: 'cmd',
+      value: 'select'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.nanos.http.Format',
+      name: 'format',
+      value: 'JSON'
+    },
     {
       class: 'String',
       name: 'dao',
