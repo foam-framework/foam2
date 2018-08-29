@@ -53,6 +53,25 @@ foam.CLASS({
       cls.name    = this.name;
       cls.extends = 'foam.box.AbstractSkeleton',
 
+      // add class info methods
+      cls.fields.push(foam.java.ClassInfo.create({ id: this.id }));
+
+      cls.method({
+        name: 'getClassInfo',
+        type: 'foam.core.ClassInfo',
+        visibility: 'public',
+        body: 'return classInfo_;'
+      });
+
+      cls.method({
+        name: 'getOwnClassInfo',
+        visibility: 'public',
+        static: true,
+        type: 'foam.core.ClassInfo',
+        body: 'return classInfo_;'
+      });
+
+
       foam.core.Object.create({
         name: 'delegate',
         javaType: this.of.id
