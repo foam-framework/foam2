@@ -82,6 +82,7 @@ public class MDAO
       }
 
       state_ = index_.put(state_, obj);
+      onPut(obj);
 
       return obj;
     }
@@ -95,6 +96,7 @@ public class MDAO
 
       if ( found != null ) {
         state_ = index_.remove(state_, found);
+        onRemove(found);
       }
 
       return found;
