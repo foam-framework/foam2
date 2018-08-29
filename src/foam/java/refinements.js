@@ -330,7 +330,8 @@ foam.LIB({
         body: 'return classInfo_;'
       });
 
-      var axioms = this.getOwnAxioms();
+      var flagFilter = foam.util.flagFilter(['java']);
+      var axioms = this.getOwnAxioms().filter(flagFilter);
 
       for ( var i = 0 ; i < axioms.length ; i++ ) {
         axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls, this);
@@ -339,6 +340,7 @@ foam.LIB({
       // TODO: instead of doing this here, we should walk all Axioms
       // and introuce a new buildJavaAncestorClass() method
       cls.allProperties = this.getAxiomsByClass(foam.core.Property)
+        .filter(flagFilter)
         .filter(function(p) {
           return !! p.javaType && p.javaInfoType && p.generateJava;
         })
@@ -431,7 +433,7 @@ foam.LIB({
 
         if ( ! cls.abstract ) {
           // Apply builder pattern if more than 3 properties and not abstract.
-          foam.java.Builder.create({ properties: this.getAxiomsByClass(foam.core.Property).filter(function(p) {
+          foam.java.Builder.create({ properties: this.getAxiomsByClass(foam.core.Property).filter(flagFilter).filter(function(p) {
             return p.generateJava && p.javaInfoType;
           }) }).buildJavaClass(cls);
         }

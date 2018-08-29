@@ -351,7 +351,6 @@ FOAM_FILES([
   { name: "foam/swift/refines/Stub", flags: ['swift'] },
   { name: "foam/swift/refines/Promised", flags: ['swift'] },
   { name: "foam/swift/refines/Topic", flags: ['swift'] },
-  { name: "foam/swift/refines/Box", flags: ['swift'] },
   { name: "foam/swift/refines/Remote", flags: ['swift'] },
 
   { name: "foam/box/Runnable" },

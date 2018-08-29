@@ -1065,7 +1065,12 @@ foam.CLASS({
   ],
 
   methods: [
-    function f() { return this.value; },
+    {
+      name: 'f',
+      code: function() { return this.value; },
+      swiftCode: 'return value',
+      javaCode: 'return getValue();',
+    },
 
     function toString_(x) {
       return Array.isArray(x) ? '[' + x.map(this.toString_.bind(this)).join(', ') + ']' :

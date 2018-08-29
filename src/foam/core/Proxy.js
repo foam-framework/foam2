@@ -150,6 +150,7 @@ foam.CLASS({
           name: method.name,
           returns: method.returns,
           property: name,
+          flags: this.flags,
           args: method.args
         }));
       }
@@ -161,6 +162,7 @@ foam.CLASS({
           returns: method.returns,
           property: name,
           args: method.args,
+          flags: this.flags,
           delegate: true
         }));
       }
@@ -168,6 +170,7 @@ foam.CLASS({
       if ( ! this.topics || this.topics.length ) {
         axioms.push(this.ProxySub.create({
           topics: this.topics,
+          flags: this.flags,
           prop:   this.name
         }));
       }

@@ -765,6 +765,7 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
       name: 'id',
       transient: true,
       factory: function() { return this.NEXT_ID(); }
@@ -773,6 +774,7 @@ foam.CLASS({
       name: 'state',
       class: 'Proxy',
       of: 'foam.u2.ElementState',
+      flags: ['js'],
       transient: true,
       topics: [],
       delegates: foam.u2.ElementState.getOwnAxiomsByClass(foam.core.Method).
@@ -814,6 +816,7 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.u2.DefaultValidator',
       name: 'validator',
+      flags: ['js'],
       topics: [],
       factory: function() {
         return this.elementValidator$ ? this.elementValidator : this.DEFAULT_VALIDATOR;
