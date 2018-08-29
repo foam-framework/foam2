@@ -5,24 +5,6 @@
  */
 
 foam.INTERFACE({
-  refines: 'foam.mlang.F',
-  flags: ['java'],
-
-  methods: [
-    {
-      name: 'f',
-      args: [
-        {
-          name: 'obj',
-          javaType: 'Object'
-        }
-      ],
-      javaReturns: 'Object'
-    }
-  ]
-});
-
-foam.INTERFACE({
   refines: 'foam.mlang.Expr',
   flags: ['java'],
 
@@ -55,47 +37,6 @@ foam.CLASS({
   properties: [
     ['javaType', 'foam.dao.Sink'],
     ['javaJSONParser', 'new foam.lib.json.FObjectParser()']
-  ]
-});
-
-
-foam.INTERFACE({
-  refines: 'foam.mlang.predicate.Predicate',
-  flags: ['java'],
-
-  implements: [ 'foam.dao.SQLStatement' ],
-
-  methods: [
-    {
-      name: 'f',
-      args: [
-        {
-          name: 'obj',
-          javaType: 'Object'
-        }
-      ],
-      javaReturns: 'boolean'
-    },
-    {
-      name: 'partialEval',
-      javaReturns: 'foam.mlang.predicate.Predicate'
-    },
-    {
-      name: 'toIndex',
-      javaSupport: false,
-      args: [
-        {
-          name: 'tail',
-          javaType: 'foam.dao.index.Index'
-        }
-      ],
-      javaReturns: 'foam.dao.index.Index'
-    },
-    {
-      name: 'toDisjunctiveNormalForm',
-      javaSupport: false,
-      javaReturns: 'foam.mlang.predicate.Predicate'
-    }
   ]
 });
 

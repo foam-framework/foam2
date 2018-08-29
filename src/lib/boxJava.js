@@ -15,22 +15,6 @@
  * limitations under the License.
  */
 
-foam.INTERFACE({
-  refines: 'foam.box.Box',
-  flags: ['java'],
-  methods: [
-    {
-      name: 'send',
-      args: [
-        {
-          name: 'message',
-          javaType: 'foam.box.Message'
-        }
-      ]
-    }
-  ]
-});
-
 foam.CLASS({
   refines: 'foam.box.SubBox',
   flags: ['java'],
@@ -40,9 +24,9 @@ foam.CLASS({
       javaCode: function() {
 /*foam.box.SubBoxMessage subBoxMessage = getX().create(foam.box.SubBoxMessage.class);
 subBoxMessage.setName(getName());
-subBoxMessage.setObject(message.getObject());
-message.setObject(subBoxMessage);
-getDelegate().send(message);*/
+subBoxMessage.setObject(msg.getObject());
+msg.setObject(subBoxMessage);
+getDelegate().send(msg);*/
       }
     }
   ]
@@ -70,7 +54,7 @@ try {
   javax.servlet.http.HttpServletResponse response = (javax.servlet.http.HttpServletResponse)getX().get("httpResponse");
   response.setContentType("application/json");
   java.io.PrintWriter writer = response.getWriter();
-  writer.print(new foam.lib.json.Outputter(foam.lib.json.OutputterMode.NETWORK).stringify(message));
+  writer.print(new foam.lib.json.Outputter(foam.lib.json.OutputterMode.NETWORK).stringify(msg));
   writer.flush();
 } catch(java.io.IOException e) {
   throw new RuntimeException(e);
@@ -88,7 +72,7 @@ foam.CLASS({
       name: 'send',
       javaCode: function() {/*
 try {
-  String token = (String)message.getAttributes().get("idToken");
+  String token = (String)msg.getAttributes().get("idToken");
 
   if ( token == null ) {
     throw new java.security.GeneralSecurityException("No ID Token present.");
@@ -96,9 +80,9 @@ try {
 
   String principal = ((com.google.auth.TokenVerifier)getTokenVerifier()).verify(token);
 
-  message.getAttributes().put("principal", principal);
+  msg.getAttributes().put("principal", principal);
 
-  super.send(message);
+  super.send(msg);
 } catch ( java.security.GeneralSecurityException e) {
   throw new RuntimeException("Failed to verify token.", e);
 }
@@ -132,14 +116,14 @@ foam.CLASS({
     {
       name: 'send',
       javaCode:
-`Object object = message.getObject();
+`Object object = msg.getObject();
 if ( object instanceof RPCErrorMessage && ((RPCErrorMessage) object).getData() instanceof RemoteException &&
     "foam.nanos.auth.AuthenticationException".equals(((RemoteException) ((RPCErrorMessage) object).getData()).getId()) ) {
   // TODO: should this be wrapped in new Thread() ?
   ((Runnable) getX().get("requestLogin")).run();
   getClientBox().send(getMsg());
 } else {
-  getDelegate().send(message);
+  getDelegate().send(msg);
 }`
     }
   ]
@@ -153,11 +137,11 @@ foam.CLASS({
     {
       name: 'send',
       javaCode:
-`message.getAttributes().put(SESSION_KEY, getSessionID());
-SessionReplyBox sessionReplyBox = new SessionReplyBox(getX(), message,
-    this, (Box) message.getAttributes().get("replyBox"));
-message.getAttributes().put("replyBox", sessionReplyBox);
-getDelegate().send(message);`
+`msg.getAttributes().put(SESSION_KEY, getSessionID());
+SessionReplyBox sessionReplyBox = new SessionReplyBox(getX(), msg,
+    this, (Box) msg.getAttributes().get("replyBox"));
+msg.getAttributes().put("replyBox", sessionReplyBox);
+getDelegate().send(msg);`
     }
   ]
 });

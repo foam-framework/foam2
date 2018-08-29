@@ -65,8 +65,12 @@ foam.INTERFACE({
   methods: [
     {
       name: 'f',
+      javaReturns: 'Object',
       args: [
-        'obj'
+        {
+          name: 'obj',
+          javaType: 'Object'
+        }
       ],
       swiftReturns: 'Any?',
     }
@@ -141,28 +145,42 @@ foam.INTERFACE({
   package: 'foam.mlang.predicate',
   name: 'Predicate',
 
+  implements: [ 'foam.dao.SQLStatement' ],
+
   documentation: 'Predicate interface: f(obj) -> boolean.',
 
   methods: [
     {
       name: 'f',
       swiftReturns: 'Bool',
+      javaReturns: 'boolean',
       args: [
-        'obj'
+        {
+          name: 'obj',
+          javaType: 'Object'
+        }
       ]
     },
     {
       name: 'partialEval',
+      flags: ['js', 'java'],
       returns: 'foam.mlang.predicate.Predicate',
     },
     {
       name: 'toIndex',
+      flags: ['js', 'java'],
       args: [
-        'tail'
-      ]
+        {
+          name: 'tail',
+          of: 'foam.dao.index.Index'
+        }
+      ],
+      returns: 'foam.dao.index.Index'
     },
     {
       name: 'toDisjunctiveNormalForm',
+      flags: ['js', 'java'],
+      javaSupport: false,
       returns: 'foam.mlang.predicate.Predicate',
     }
   ]
@@ -228,6 +246,11 @@ foam.CLASS({
   documentation: 'Abstract Predicate base-class.',
 
   methods: [
+    {
+      name: 'f',
+      swiftOverride: false,
+      swiftCode: 'return',
+    },
     {
       name: 'toIndex',
       code: function() { },

@@ -15,57 +15,6 @@
  * limitations under the License.
  */
 
-foam.INTERFACE({
-  refines: 'foam.dao.Sink',
-  flags: ['java'],
-
-  methods: [
-    {
-      name: 'put',
-      javaReturns: 'void',
-      args: [
-        {
-          name: 'obj',
-          javaType: 'Object'
-        },
-        {
-          name: 'sub',
-          javaType: 'foam.core.Detachable'
-        }
-      ]
-    },
-    {
-      name: 'remove',
-      javaReturns: 'void',
-      args: [
-        {
-          name: 'obj',
-          javaType: 'Object'
-        },
-        {
-          name: 'sub',
-          javaType: 'foam.core.Detachable'
-        },
-      ]
-    },
-    {
-      name: 'eof',
-      javaReturns: 'void'
-    },
-    {
-      name: 'reset',
-      javaReturns: 'void',
-      args: [
-        {
-          name: 'sub',
-          javaType: 'foam.core.Detachable'
-        }
-      ]
-    }
-  ]
-});
-
-
 foam.CLASS({
   refines: 'foam.dao.AbstractSink',
   flags: ['java'],
