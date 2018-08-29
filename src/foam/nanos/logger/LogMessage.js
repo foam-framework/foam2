@@ -30,6 +30,7 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
       name: 'severity',
       class: 'Enum',
       of: 'foam.nanos.logger.LogLevel',
+      toJSON: function(value) { return value && value.label; },
       javaJSONOutput: `((foam.nanos.logger.LogLevel) value).getLabel()`
     },
     {
