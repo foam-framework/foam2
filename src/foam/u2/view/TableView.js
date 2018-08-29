@@ -69,15 +69,14 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Class',
-      name: 'of'
+      // TODO: Class property doesn't support expressions.
+      // class: 'Class',
+      name: 'of',
+      expression: function(data$of) { return data$of || null; }
     },
     {
       class: 'foam.dao.DAOProperty',
-      name: 'data',
-      postSet: function(_, data) {
-        if ( ! this.of && data ) this.of = data.of;
-      }
+      name: 'data'
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -208,7 +207,7 @@ foam.CLASS({
 
       this.
         addClass(this.myClass()).
-        addClass(this.myClass(this.of.id.replace(/\./g,'-'))).
+        addClass(this.myClass(this.of && this.of.id.replace(/\./g,'-'))).
         setNodeName('table').
         start('thead').
           add(this.slot(function(columns_) {
