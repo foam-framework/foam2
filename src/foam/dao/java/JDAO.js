@@ -54,7 +54,15 @@ foam.CLASS({
             this(x, new MapDAO(classInfo), filename);
           }
 
+          public JDAO(X x, ClassInfo classInfo, String filename, boolean outputDiff) {
+            this(x, new MapDAO(classInfo), filename, outputDiff);
+          }
+
           public JDAO(X x, DAO delegate, String filename) {
+            this(x, delegate, filename, false);
+          }
+
+          public JDAO(X x, DAO delegate, String filename, boolean outputDiff) {
             setX(x);
             setOf(delegate.getOf());
             setDelegate(delegate);
@@ -64,6 +72,7 @@ foam.CLASS({
               .setDao(delegate)
               .setFilename(filename)
               .setCreateFile(true)
+              .setOutputDiff(outputDiff)
               .build();
 
             // create a composite journal of repo journal

@@ -42,7 +42,12 @@ foam.CLASS({
             return self.filterAxiomsByFlags(obj);
           });
         } else if ( type == foam.Object ) {
-          if ( foam.core.FObject.isSubClass(o) ) { // Is an actual class
+          // Check if it's an actual class. foam.core.FObject.isSubClass
+          // should work but doesn't:
+          // https://github.com/foam-framework/foam2/issues/1023
+          if ( o && o.prototype &&
+               ( foam.core.FObject.prototype === o.prototype ||
+                 foam.core.FObject.prototype.isPrototypeOf(o.prototype) ) ) {
             return o;
           }
           var fo = {};
