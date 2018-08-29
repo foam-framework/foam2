@@ -82,7 +82,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Unary',
-  requires: [ 'foam.dao.SQLException' ],
   methods: [
     function toSQL() {
       throw this.SQLException.create({message: this.cls_.name + '.toSQL() not implemented'});
@@ -93,7 +92,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Binary',
-  requires: [ 'foam.dao.SQLException' ],
   methods: [
     function toSQL() {
       throw this.SQLException.create({message: this.cls_.name + '.toSQL() not implemented'});

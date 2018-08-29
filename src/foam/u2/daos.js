@@ -79,8 +79,14 @@ foam.CLASS({
   refines: 'foam.dao.RelationshipDAO',
 
   requires: [
-    'foam.u2.CitationView',
-    'foam.u2.DAOList'
+    {
+      path: 'foam.u2.CitationView',
+      flags: ['web'],
+    },
+    {
+      path: 'foam.u2.DAOList',
+      flags: ['web'],
+    },
   ],
 
   methods: [

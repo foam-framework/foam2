@@ -5,14 +5,6 @@
  */
 
 foam.CLASS({
-  refines: 'foam.mlang.AbstractExpr',
-  flags: ['swift'],
-  methods: [
-    function f() {}
-  ]
-});
-
-foam.CLASS({
   refines: 'foam.mlang.ExprProperty',
   flags: ['swift'],
   properties: [

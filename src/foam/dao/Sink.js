@@ -24,44 +24,44 @@ foam.INTERFACE({
   methods: [
     {
       name: 'put',
-      returns: '',
       args: [
         {
           name: 'obj',
-          swiftType: 'Any'
+          swiftType: 'Any',
+          javaType: 'Object'
         },
         {
           name: 'sub',
           swiftType: 'Detachable',
+          javaType: 'foam.core.Detachable'
         },
       ],
     },
     {
       name: 'remove',
-      returns: '',
       args: [
         {
           name: 'obj',
-          swiftType: 'Any'
+          swiftType: 'Any',
+          javaType: 'Object'
         },
         {
           name: 'sub',
           swiftType: 'Detachable',
+          javaType: 'foam.core.Detachable'
         },
       ],
     },
     {
       name: 'eof',
-      returns: '',
-      args: [],
     },
     {
       name: 'reset',
-      returns: '',
       args: [
         {
           name: 'sub',
           swiftType: 'Detachable',
+          javaType: 'foam.core.Detachable'
         },
       ],
     }

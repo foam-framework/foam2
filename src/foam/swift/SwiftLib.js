@@ -30,6 +30,7 @@ foam.LIB({
       } else  {
         console.log('Encountered unexpected type while converitng value to string:', v);
         debugger;
+        return 'nil';
       }
     },
   ],
