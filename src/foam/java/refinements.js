@@ -173,6 +173,7 @@ foam.CLASS({
 
     function buildJavaClass(cls) {
       if ( ! this.generateJava ) return;
+      if ( foam.java.Enum.isInstance(cls) ) return;
 
       // Use javaInfoType as an indicator that this property should be
       // generated to java code.
@@ -950,15 +951,7 @@ foam.CLASS({
           cls.extends = this.extends;
           cls.values = this.VALUES;
 
-          cls.field({
-            name: '__frozen__',
-            visibility: 'protected',
-            type: 'boolean',
-            initializer: 'false'
-          });
-
           var axioms = this.getAxioms();
-
           for ( var i = 0 ; i < axioms.length ; i++ ) {
             axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
           }
@@ -1512,6 +1505,7 @@ foam.CLASS({
 
   methods: [
     function buildJavaClass(cls) {
+      if ( foam.java.Enum.isInstance(cls) ) return;
       var info = cls.getField('classInfo_');
       if ( info ) info.addAxiom(cls.name + '.' + this.javaInfoName);
 

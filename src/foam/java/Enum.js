@@ -71,6 +71,31 @@ foam.CLASS({
       }
     },
     {
+      name: 'fields',
+      factory: function() {
+        return [
+          {
+            name: 'ordinal_',
+            visibility: 'protected',
+            final: true,
+            type: 'int'
+          },
+          {
+            name: 'label_',
+            visibility: 'protected',
+            final: true,
+            type: 'String'
+          },
+          {
+            name: 'name_',
+            visibility: 'protected',
+            final: true,
+            type: 'String'
+          }
+        ]
+      }
+    },
+    {
       name: 'methods',
       factory: function() {
         return [
@@ -86,7 +111,29 @@ foam.CLASS({
                 type: 'String'
               },
             ],
-            body: 'setOrdinal(ordinal);\nsetLabel(label);\nsetName(name());'
+            body: `
+              ordinal_ = ordinal;
+              label_ = label;
+              name_ = name();
+            `
+          },
+          {
+            name: 'getOrdinal',
+            type: 'int',
+            visibility: 'public',
+            body: `return this.ordinal_;`
+          },
+          {
+            name: 'getLabel',
+            type: 'String',
+            visibility: 'public',
+            body: `return this.label_;`
+          },
+          {
+            name: 'getName',
+            type: 'String',
+            visibility: 'public',
+            body: `return this.name_;`
           },
           {
             name: 'forOrdinal',
