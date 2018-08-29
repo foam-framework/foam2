@@ -11,7 +11,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'javaType',
-      factory: function() { return this.of; }
+      expression: function(of) {
+        of = foam.String.isInstance(of) ? foam.lookup(of, true) : of;
+        return of ? of.model_.id : '';
+      }
     }
   ]
 });
