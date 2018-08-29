@@ -52,7 +52,7 @@ public class StdoutLogger
         str.append(record.getLevel());
       }
 
-      str.append(" ");
+      str.append(',');
       str.append(msg);
       str.append('\n');
       return str.toString();
