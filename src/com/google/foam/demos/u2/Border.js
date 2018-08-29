@@ -33,22 +33,33 @@ foam.CLASS({
   css: `
     ^ {
       background: gray;
-      width: 600px;
-      height: 200px;
-      padding: 10px;
       display: block;
+      height: 200px;
+      padding: 10px 4px;
+      width: 600px;
+      // width: 100%;
     }
     ^tabRow { height: 30px; }
     ^tab {
-      border: 1px solid black;
-      border-bottom: none;
-      padding: 5px;
       background: lightgray;
+      border: 1px solid black;
+      border-radius: 3px 3px 0 0;
+      display: inline-block;
+      height: 12px;
+      padding: 4px;
     }
     ^tab.selected {
       background: white;
       position: relative;
       z-index: 1;
+    }
+    ^bottomEdge {
+      background: white;
+      height: 2.5px;
+      left: 0;
+      position: absolute;
+      top: 19px;
+      width: 43.75px;
     }
     ^content {
       margin: 4px;
@@ -62,12 +73,6 @@ foam.CLASS({
   `,
 
   properties: [
-    /* not used
-    {
-      name: 'tabs',
-      factory: function() { return []; }
-    },
-    */
     {
       name: 'selected',
       postSet: function(o, n) {
@@ -100,6 +105,8 @@ foam.CLASS({
           enableClass('selected', tab.selected$).
           on('click', function() { this.selected = tab; }.bind(this)).
           add(tab.label).
+          br().
+          start('div').addClass(this.myClass('bottomEdge')).show(tab.selected$).end().
         end();
 
         tab.shown$ = tab.selected$;
@@ -208,6 +215,157 @@ E('br').write();
 
 
 foam.CLASS({
+  name: 'LabelledSection',
+  extends: 'foam.u2.Element',
+
+  css: `
+    ^ {
+      border-style: ridge;
+      display: inline-block;
+      padding: 10px;
+    }
+    ^title {
+      background: white;
+      color: #666;
+      display: inline;
+      padding: 3px;
+      position: relative;
+      top: -20px;
+    }
+    ^content {
+      background: white;
+      height: 200px;
+      position: relative;
+      top: -22px;
+      width: 300px;
+    }
+  `,
+
+  properties: [ 'title' ],
+
+  methods: [
+    function init() {
+      this.start().
+        addClass(this.myClass()).
+        start('div').addClass(this.myClass('title')).add(this.title$).end().
+        start('div', null, this.content$).
+          addClass(this.myClass('content')).
+        end().
+      end();
+    }
+  ]
+});
+
+var sb = LabelledSection.create({title: 'Title'});
+sb.add('content').br().add('more content');
+sb.write();
+
+
+
+E('br').write();
+E('br').write();
+
+
+
+foam.CLASS({
+  name: 'FoldingSection',
+  extends: 'foam.u2.Controller',
+
+  requires: [ 'foam.u2.ActionView' ],
+
+  css: `
+    ^ {
+      border-top-style: ridge;
+      display: inline-block;
+      padding: 10px;
+    }
+    ^.expanded {
+      border-style: ridge;
+      padding-left: 9px;
+    }
+    ^toolbar {
+      color: #666;
+      display: inline-block;
+      padding: 3px;
+      position: relative;
+      left: -8px;
+      top: -20px;
+      width: 100%;
+    }
+    ^title {
+      background: white;
+      padding: 3px;
+      position: relative;
+      top: -3px;
+    }
+    ^content {
+      background: white;
+      height: 200px;
+      position: relative;
+      top: -22px;
+      width: 300px;
+    }
+    ^ .foam-u2-ActionView-toggle {
+      background: white;
+      border: none;
+      float: right;
+      outline: none;
+      padding: 3px;
+      position: relative;
+      top: -6px;
+      width: 14px;
+    }
+    ^ .foam-u2-ActionView-toggle:hover {
+      background: white;
+    }
+  `,
+
+  properties: [
+    'title',
+    {
+      class: 'Boolean',
+      name: 'expanded',
+      value: true
+    }
+  ],
+
+  methods: [
+    function init() {
+      this.
+        addClass(this.myClass()).
+        enableClass('expanded', this.expanded$).
+        start('div').
+          addClass(this.myClass('toolbar')).
+          start('span').
+            addClass(this.myClass('title')).
+            add(this.title$).
+          end().
+          tag(this.ActionView, {action: this.TOGGLE, data: this, label: this.expanded$.map(function(e) { return e ? '-' : '+'; })}).
+        end().
+        start('div', null, this.content$).
+          show(this.expanded$).
+          addClass(this.myClass('content')).
+        end();
+    }
+  ],
+
+  actions: [
+    function toggle() { this.expanded = ! this.expanded; console.log(this.expanded); }
+  ]
+});
+
+var sb = FoldingSection.create({title: 'Title'}).style({width: '500px'});
+sb.add('content').br().add('more content');
+sb.write();
+
+
+
+E('br').write();
+E('br').write();
+
+
+
+foam.CLASS({
   name: 'SampleSplitContainer',
   extends: 'foam.u2.Element',
 
@@ -243,6 +401,7 @@ split.rightPanel.add('rightContent');
 
 E('br').write();
 E('br').write();
+E('br').write();
 
 
 
@@ -271,3 +430,68 @@ foam.CLASS({
 var blink = Blink.create();
 blink.add('blinking');
 blink.write();
+
+
+
+E('br').write();
+E('br').write();
+
+
+
+foam.CLASS({
+  name: 'Columns',
+  extends: 'foam.u2.Element',
+
+  css: `
+    ^ {
+      background: #efefef;
+      display: flex;
+      width: 100%;
+    }
+  `,
+
+  methods: [
+    function init() {
+      this.addClass(this.myClass());
+    }
+  ]
+});
+
+foam.CLASS({
+  name: 'Column',
+  extends: 'foam.u2.Element',
+
+  css: `
+    ^ {
+      display: inline-block;
+      padding: 4px;
+      float: left;
+      margin: 4px;
+      border: 1px solid black;
+      width: 100%;
+    }
+  `,
+
+  methods: [
+    function init() {
+      this.addClass(this.myClass())
+    }
+  ]
+});
+
+var cols = E().
+  start(Columns).
+    start(Column).add('column 1 contents').end().
+    start(Column).add('column 2 contents').br().add('and more content').end().
+  end().
+  start(Columns).
+    start(Column).add('column 1 contents').end().
+    start(Column).add('column 2 contents').br().add('and more content').end().
+    start(Column).add('column 3 contents').br().add('and more content').end().
+  end().
+  start(foam.u2.Tabs).
+    start(foam.u2.Tab, {label: 'Tab 1'}).add('tab 1 contents').end().
+    start(foam.u2.Tab, {label: 'Tab 2'}).add('tab 2 contents').end().
+    start(foam.u2.Tab, {label: 'Tab 3'}).add('Even more contents in tab 3').end().
+  end();
+cols.write();
