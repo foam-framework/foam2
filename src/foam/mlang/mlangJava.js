@@ -644,10 +644,6 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'f',
-      javaCode: 'return getValue();'
-    },
-    {
       name: 'createStatement',
       javaReturns: 'String',
       javaCode: 'return " ? "; '

@@ -31,18 +31,6 @@ return Context.GLOBAL.create(foam_mlang_Constant.self, args: ["value": newValue]
 });
 
 foam.CLASS({
-  refines: 'foam.mlang.ArrayConstant',
-  flags: ['swift'],
-
-  methods: [
-    {
-      name: 'f',
-      swiftCode: 'return value'
-    }
-  ]
-});
-
-foam.CLASS({
   refines: 'foam.mlang.sink.Map',
   flags: ['swift'],
 

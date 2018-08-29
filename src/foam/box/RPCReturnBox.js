@@ -34,7 +34,9 @@ foam.CLASS({
           this.resolve_ = resolve;
           this.reject_ = reject;
         }.bind(this));
-      }
+      },
+      swiftType: 'Future<Any?>',
+      swiftFactory: 'return Future()'
     },
     {
       name: 'resolve_'
@@ -81,7 +83,14 @@ foam.CLASS({
       javaCode: `
 setMessage(message);
 getSemaphore().release();
-`
+`,
+      swiftCode: `
+if let o = msg.object as? foam_box_RPCReturnMessage {
+  promise.set(o.data)
+  return
+}
+promise.error(FoamError(msg.object))
+      `
     }
   ]
 });
