@@ -252,7 +252,7 @@ foam.CLASS({
             }
           ],
           body: this.javaPostSet
-        })
+        });
 
 
       if ( this.javaFactory ) {
