@@ -61,15 +61,24 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'javaSetter'
+    },
+    {
+      class: 'String',
+      name: 'javaPreSet',
+      value: 'return newValue;'
+    },
+    {
+      class: 'String',
+      name: 'javaPostSet'
+    },
+    {
+      class: 'String',
       name: 'shortName'
     },
     {
       class: 'StringArray',
       name: 'aliases'
-    },
-    {
-      class: 'String',
-      name: 'javaSetter'
     },
     {
       class: 'String',
