@@ -27,6 +27,7 @@ foam.INTERFACE({
       returns: 'Promise',
       swiftReturns: 'foam_core_FObject?',
       swiftThrows: true,
+      javaReturns: 'foam.core.FObject',
       args: [
         {
           of: 'FObject',
@@ -38,11 +39,13 @@ foam.INTERFACE({
       name: 'put_',
       returns: 'Promise',
       swiftReturns: 'foam_core_FObject?',
+      javaReturns: 'foam.core.FObject',
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          swiftType: 'Context?'
+          javaType: 'foam.core.X',
+          swiftType: 'Context?',
         },
         {
           of: 'FObject',
@@ -54,6 +57,7 @@ foam.INTERFACE({
       name: 'remove',
       returns: 'Promise',
       swiftReturns: 'foam_core_FObject?',
+      javaReturns: 'foam.core.FObject',
       swiftThrows: true,
       args: [
         {
@@ -66,11 +70,13 @@ foam.INTERFACE({
       name: 'remove_',
       returns: 'Promise',
       swiftReturns: 'foam_core_FObject?',
+      javaReturns: 'foam.core.FObject',
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          swiftType: 'Context?'
+          swiftType: 'Context?',
+          javaType: 'foam.core.X',
         },
         {
           name: 'obj',
@@ -81,10 +87,12 @@ foam.INTERFACE({
     {
       name: 'find',
       returns: 'Promise',
+      javaReturns: 'foam.core.FObject',
       swiftReturns: 'foam_core_FObject?',
       swiftThrows: true,
       args: [
         {
+          javaType: 'Object',
           name: 'id',
         }
       ],
@@ -92,14 +100,17 @@ foam.INTERFACE({
     {
       name: 'find_',
       returns: 'Promise',
+      javaReturns: 'foam.core.FObject',
       swiftReturns: 'foam_core_FObject?',
       swiftThrows: true,
       args: [
         {
           name: 'x',
+          javaType: 'foam.core.X',
           swiftType: 'Context?'
         },
         {
+          javaType: 'Object',
           name: 'id',
         }
       ]
@@ -107,6 +118,7 @@ foam.INTERFACE({
     {
       name: 'select',
       returns: 'Promise',
+      javaReturns: 'foam.dao.Sink',
       swiftReturns: 'foam_dao_Sink',
       swiftThrows: true,
       args: [
@@ -119,11 +131,13 @@ foam.INTERFACE({
     {
       name: 'select_',
       returns: 'Promise',
+      javaReturns: 'foam.dao.Sink',
       swiftReturns: 'foam_dao_Sink',
       swiftThrows: true,
       args: [
         {
           name: 'x',
+          javaType: 'foam.core.X',
           swiftType: 'Context?'
         },
         {
@@ -135,11 +149,13 @@ foam.INTERFACE({
           name: 'skip',
           swiftType: 'Int',
           swiftDefaultValue: '0',
+          javaType: 'long'
         },
         {
           name: 'limit',
           swiftType: 'Int',
           swiftDefaultValue: 'Int.max',
+          javaType: 'long'
         },
         {
           name: 'order',
@@ -157,28 +173,29 @@ foam.INTERFACE({
     },
     {
       name: 'removeAll',
-      returns: '',
       swiftThrows: true,
       args: [ ]
     },
     {
       name: 'removeAll_',
-      returns: '',
       swiftThrows: true,
       args: [
         {
           name: 'x',
+          javaType: 'foam.core.X',
           swiftType: 'Context?'
         },
         {
           name: 'skip',
           swiftType: 'Int?',
           swiftDefaultValue: 'nil',
+          javaType: 'long'
         },
         {
           name: 'limit',
           swiftType: 'Int?',
           swiftDefaultValue: 'nil',
+          javaType: 'long'
         },
         {
           name: 'order',
@@ -196,7 +213,6 @@ foam.INTERFACE({
     },
     {
       name: 'listen',
-      returns: '',
       swiftReturns: 'Detachable',
       swiftThrows: true,
       args: [
@@ -215,12 +231,12 @@ foam.INTERFACE({
     },
     {
       name: 'listen_',
-      returns: '',
       swiftReturns: 'Detachable',
       swiftThrows: true,
       args: [
         {
           name: 'x',
+          javaType: 'foam.core.X',
           swiftType: 'Context?'
         },
         {
@@ -238,7 +254,6 @@ foam.INTERFACE({
     },
     {
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
-      returns: '',
       swiftThrows: true,
       args: [
         {
@@ -249,11 +264,11 @@ foam.INTERFACE({
     },
     {
       name: 'pipe_', // TODO: return a promise? don't put pipe and listen here?
-      returns: '',
       swiftThrows: true,
       args: [
         {
           name: 'x',
+          javaType: 'foam.core.X',
           swiftType: 'Context?'
         },
         {
@@ -299,7 +314,8 @@ foam.INTERFACE({
       args: [
         {
           name: 'count',
-          swiftType: 'Int'
+          swiftType: 'Int',
+          javaType: 'long'
         }
       ]
     },
@@ -310,26 +326,49 @@ foam.INTERFACE({
       args: [
         {
           name: 'count',
-          swiftType: 'Int'
+          swiftType: 'Int',
+          javaType: 'long'
         }
       ]
     },
     {
       name: 'inX',
       returns: 'foam.dao.DAO',
-      args: [ { name: 'x', swiftType: 'Context' } ]
+      args: [
+        {
+          name: 'x',
+          swiftType: 'Context',
+          javaType:  'foam.core.X'
+        }
+      ]
     },
     {
       name: 'cmd',
       swiftSupport: false,
       returns: 'obj',
-      args: [ 'obj' ]
+      javaReturns: 'Object',
+      args: [
+        {
+          name: 'obj',
+          javaType:  'Object'
+        }
+      ]
     },
     {
       name: 'cmd_',
       swiftSupport: false,
+      javaReturns: 'Object',
       returns: 'obj',
-      args: [ 'x', 'obj' ]
+      args: [
+        {
+          name: 'x',
+          javaType:  'foam.core.X'
+        },
+        {
+          name: 'obj',
+          javaType:  'Object'
+        }
+      ]
     }
   ]
 });

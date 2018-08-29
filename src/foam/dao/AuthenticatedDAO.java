@@ -117,8 +117,8 @@ public class AuthenticatedDAO
   }
 
   @Override
-  public void pipe_(X x, Sink sink) {
+  public void pipe_(foam.core.X x, foam.dao.Sink sink, foam.mlang.predicate.Predicate predicate) {
     sink = new AuthenticatedSink(x, createPermission("pipe"), sink);
-    super.pipe_(x, sink);
+    super.pipe_(x, sink, null);
   }
 }

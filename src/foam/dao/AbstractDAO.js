@@ -193,7 +193,7 @@ return new LimitedDAO(this.getX(), count, this);
         this.pipe_(this.__context__, sink, undefined);
       },
       swiftCode: 'return try pipe_(__context__, sink)',
-      javaCode: `this.pipe_(this.getX(), sink);`,
+      javaCode: `this.pipe_(this.getX(), sink, null);`,
     },
 
     {
