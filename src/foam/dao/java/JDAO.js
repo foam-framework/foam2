@@ -143,6 +143,9 @@ foam.CLASS({
     {
       name: 'writeComment',
       synchronized: true,
+      javaThrows: [
+        'java.io.IOException'
+      ],
       documentation: 'Writes comment explaining who modified entry',
       args: [
         {
