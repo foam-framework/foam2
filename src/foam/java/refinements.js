@@ -191,7 +191,7 @@ foam.CLASS({
 
       // add post-set function
       if ( this.javaPostSet ) {
-        setter += `${capitalized}PostSet_(oldValue, ${this.name}_);`;
+        setter += `${capitalized}PostSet_(oldValue, ${this.name}_);\n`;
       }
 
       return setter;
