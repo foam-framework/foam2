@@ -95,7 +95,7 @@ foam.lib.json.Outputter outputter = new Outputter();
 outputter.setX(getX());
 
 // TODO: Clone message or something when it clones safely.
-foam.box.Box replyBox = (foam.box.Box)message.getAttributes().get("replyBox");
+foam.box.Box replyBox = (foam.box.Box)msg.getAttributes().get("replyBox");
 
 if ( replyBox != null ) {
   foam.box.SubBox export = (foam.box.SubBox)getRegistry().register(null, null, replyBox);
@@ -103,9 +103,9 @@ if ( replyBox != null ) {
   replyBox = new foam.box.ReplyBox(getX(), export.getName(), replyBox);
 }
 
-String payload = outputter.stringify(message);
+String payload = outputter.stringify(msg);
 
-message.getAttributes().put("replyBox", replyBox);
+msg.getAttributes().put("replyBox", replyBox);
 
 try {
   getSocket().send(payload);

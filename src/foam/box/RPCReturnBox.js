@@ -81,7 +81,7 @@ foam.CLASS({
         this.warn('Invalid message to RPCReturnBox.');
       },
       javaCode: `
-setMessage(message);
+setMessage(msg);
 getSemaphore().release();
 `,
       swiftCode: `

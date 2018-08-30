@@ -675,7 +675,7 @@ foam.CLASS({
           cls.implements = (this.implements || [])
             .concat(this.model_.javaExtends || []);
 
-          var axioms = this.getAxioms();
+          var axioms = this.getAxioms().filter(foam.util.flagFilter(['java']));
 
           for ( var i = 0 ; i < axioms.length ; i++ ) {
             axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
