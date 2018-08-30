@@ -32,7 +32,7 @@ public class PersistedIndexTest {
       samples[i] = generator.generate(50);
     }
 
-    PersistedIndex index = new PersistedIndex("test", new TreeIndex(Country.CODE));
+    Index index = new PersistedIndex("test", new TreeIndex(Country.CODE));
     startTotal = start = System.nanoTime();
 
     for ( int i = 0; i < SAMPLE_SIZE; i++ ) {
