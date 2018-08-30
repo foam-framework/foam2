@@ -172,7 +172,7 @@ foam.CLASS({
 
       // add value assertion
       if ( this.javaAssertValue ) {
-        setter += `assert${capitalized}(val);\n`;
+        setter += `${capitalized}Assert_(val);\n`;
       }
 
       // if we have a preset or postset function, store the old value
@@ -211,6 +211,7 @@ foam.CLASS({
       var capitalized = foam.String.capitalize(this.name);
       var constantize = foam.String.constantize(this.name);
       var isSet = this.name + 'IsSet_';
+      var assertName = capitalized + 'Assert_';
       var factoryName = capitalized + 'Factory_';
       var preSetName = capitalized + 'PreSet_';
       var postSetName = capitalized + 'PostSet_';
@@ -300,18 +301,20 @@ foam.CLASS({
         });
       }
 
-      cls.method({
-        name: 'assert' + foam.String.capitalize(this.name),
-        visibility: 'public',
-        args: [
-          {
-            type: this.javaType,
-            name: 'val'
-          }
-        ],
-        type: 'void',
-        body: this.javaAssertValue
-      });
+      if ( this.javaAssertValue ) {
+        cls.method({
+          name: assertName,
+          visibility: 'protected',
+          args: [
+            {
+              type: this.javaType,
+              name: 'val'
+            }
+          ],
+          type: 'void',
+          body: this.javaAssertValue
+        });
+      }
 
       cls.field({
         name: constantize,
