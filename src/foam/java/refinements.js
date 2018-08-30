@@ -299,6 +299,7 @@ foam.CLASS({
 
 foam.LIB({
   name: 'foam.core.FObject',
+  flags: ['java'],
   methods: [
     function buildJavaClass(cls) {
       cls = cls || foam.java.Class.create();
@@ -465,13 +466,16 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'final'
+    },
+    {
+      class: 'Boolean',
       name: 'abstract',
       value: true
     },
     {
       class: 'Boolean',
-      name: 'synchronized',
-      value: false
+      name: 'synchronized'
     },
     {
       class: 'StringArray',
@@ -494,6 +498,7 @@ foam.CLASS({
         type: this.javaReturns || 'void',
         visibility: 'public',
         static: this.isStatic(),
+        final: this.final,
         synchronized: this.synchronized,
         throws: this.javaThrows,
         args: this.args && this.args.map(function(a) {
@@ -1048,8 +1053,13 @@ foam.CLASS({
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
+
       var compare = info.getMethod('compare');
       compare.body = 'return super.compare(o1, o2);';
+
+      var getValueClass = info.getMethod('getValueClass');
+      getValueClass.body = 'return java.util.Map.class;';
+
       return info;
     }
   ]

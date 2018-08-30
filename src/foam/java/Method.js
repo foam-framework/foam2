@@ -23,6 +23,7 @@ foam.CLASS({
     'name',
     { class: 'String', name: 'visibility' },
     'static',
+    'final',
     'type',
     'synchronized',
     {
@@ -39,6 +40,7 @@ foam.CLASS({
       o.indent();
       o.out(this.visibility, this.visibility ? ' ' : '',
         this.static ? 'static ' : '',
+        this.final ? 'final ' : '',
         this.synchronized ? 'synchronized ' : '',
         this.type ? this.type + ' ' : '',
         this.name, '(');
