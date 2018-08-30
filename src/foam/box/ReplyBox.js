@@ -59,7 +59,7 @@ try delegate.send(msg)
       */},
       javaCode: `
 getRegistry().unregister(getId());
-getDelegate().send(message);
+getDelegate().send(msg);
 `
     }
   ]

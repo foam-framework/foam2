@@ -198,7 +198,7 @@ task.resume()
       javaCode: `
 // TODO: Go async and make request in a separate thread.
 java.net.HttpURLConnection conn;
-foam.box.Box replyBox = (foam.box.Box)message.getAttributes().get("replyBox");
+foam.box.Box replyBox = (foam.box.Box)msg.getAttributes().get("replyBox");
 
 try {
   java.net.URL url = new java.net.URL(getUrl());
@@ -213,14 +213,14 @@ try {
 
 
   // TODO: Clone message or something when it clones safely.
-  message.getAttributes().put("replyBox", getX().create(foam.box.HTTPReplyBox.class));
+  msg.getAttributes().put("replyBox", getX().create(foam.box.HTTPReplyBox.class));
 
 
   foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(foam.lib.json.OutputterMode.NETWORK);
   outputter.setX(getX());
-  output.write(outputter.stringify(message));
+  output.write(outputter.stringify(msg));
 
-  message.getAttributes().put("replyBox", replyBox);
+  msg.getAttributes().put("replyBox", replyBox);
 
   output.close();
 

@@ -168,7 +168,7 @@ foam.INTERFACE({
     },
     {
       name: 'toIndex',
-      flags: ['js', 'java'],
+      flags: ['js'],
       args: [
         {
           name: 'tail',
@@ -254,7 +254,6 @@ foam.CLASS({
     {
       name: 'toIndex',
       code: function() { },
-      swiftCode: 'return',
     },
 
     {
