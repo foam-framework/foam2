@@ -172,17 +172,12 @@ foam.CLASS({
 
       // add value assertion
       if ( this.javaAssertValue ) {
-        setter += `${capitalized}Assert_(val);\n`;
-      }
-
-      // if we have a preset or postset function, store the old value
-      if ( this.javaPreSet || this.javaPostSet ) {
-        setter += `${this.javaType} oldValue = ${this.name}_;\n`
+        setter += `${this.javaAssertValue}\n`;
       }
 
       // add pre-set function
       if ( this.javaPreSet ) {
-        setter += `val = ${capitalized}PreSet_(oldValue, val);\n`;
+        setter += `${this.javaPreSet}\n`;
       };
 
       // set value
@@ -191,7 +186,7 @@ foam.CLASS({
 
       // add post-set function
       if ( this.javaPostSet ) {
-        setter += `${capitalized}PostSet_(oldValue, ${this.name}_);\n`;
+        setter += `${this.javaPostSet}\n`;
       }
 
       return setter;
@@ -211,10 +206,7 @@ foam.CLASS({
       var capitalized = foam.String.capitalize(this.name);
       var constantize = foam.String.constantize(this.name);
       var isSet = this.name + 'IsSet_';
-      var assertName = capitalized + 'Assert_';
       var factoryName = capitalized + 'Factory_';
-      var preSetName = capitalized + 'PreSet_';
-      var postSetName = capitalized + 'PostSet_';
 
       cls.
         field({
@@ -252,67 +244,12 @@ foam.CLASS({
           body: this.generateSetter_()
         });
 
-      // add pre set method
-      if ( this.javaPreSet ) {
-        cls.method({
-          name: preSetName,
-          type: this.javaType,
-          visibility: 'protected',
-          args: [
-            {
-              type: 'Object',
-              name: 'oldValue'
-            },
-            {
-              type: this.javaType,
-              name: 'newValue'
-            }
-          ],
-          body: this.javaPreSet
-        });
-      }
-
-      // add post set method
-      if ( this.javaPostSet ) {
-        cls.method({
-          name: postSetName,
-          type: 'void',
-          visibility: 'protected',
-          args: [
-            {
-              type: 'Object',
-              name: 'oldValue'
-            },
-            {
-              type: this.javaType,
-              name: 'newValue'
-            }
-          ],
-          body: this.javaPostSet
-        });
-      }
-
       if ( this.javaFactory ) {
         cls.method({
           name: factoryName,
           visibility: 'protected',
           type: this.javaType,
           body: this.javaFactory
-        });
-      }
-
-      if ( this.javaAssertValue ) {
-        cls.method({
-          name: assertName,
-          visibility: 'protected',
-          args: [
-            {
-              type: this.javaType,
-              name: 'val'
-            }
-          ],
-          type: 'void',
-          body: this.javaAssertValue
         });
       }
 
