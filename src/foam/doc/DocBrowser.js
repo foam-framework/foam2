@@ -789,8 +789,9 @@ foam.CLASS({
       value: 350
     },
     {
-      name: 'widthRequiredBox',//the default size of required box.
-      value: 300
+      name: 'widthRequiredBox',
+      value: 300,
+      documentation: 'the default size of required box.',
     },
     {
       name: 'widthExtendsBox',
@@ -802,7 +803,7 @@ foam.CLASS({
   methods: [
     function initE() {
       var data = this.data;
-      var nbrOfProperty = 5;
+      var nbrOfPropInNonConventionalDiag = 5;
       var propertyHeight = 20;
       this.className  = this.data.name;
       this.elementMap = new Map();
@@ -810,7 +811,7 @@ foam.CLASS({
 
       this.canvas.height = this.conventionalUML && this.properties.length >= 15 ? this.properties.length * 60 + 800 : 2000;
 
-      var heightCenterBox = (this.conventionalUML ? this.properties.length : nbrOfProperty) * propertyHeight;
+      var heightCenterBox = (this.conventionalUML ? this.properties.length : nbrOfPropInNonConventionalDiag) * propertyHeight;
       this.addModel(this.canvas.width / 2 - this.widthCenterModel / 2, this.canvas.height / 2.5 - heightCenterBox , this.widthCenterModel);//
       this.addExtends(this.canvas.width / 2 - this.widthExtendsBox / 2, this.canvas.height / 2.5 - heightCenterBox );
       this.addImplements(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / 2.5 - heightCenterBox );
