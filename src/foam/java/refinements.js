@@ -172,12 +172,12 @@ foam.CLASS({
 
       // add value assertion
       if ( this.javaAssertValue ) {
-        setter += `${this.javaAssertValue}\n`;
+        setter += this.javaAssertValue;
       }
 
       // add pre-set function
       if ( this.javaPreSet ) {
-        setter += `${this.javaPreSet}\n`;
+        setter += this.javaPreSet;
       };
 
       // set value
@@ -186,7 +186,7 @@ foam.CLASS({
 
       // add post-set function
       if ( this.javaPostSet ) {
-        setter += `${this.javaPostSet}\n`;
+        setter += this.javaPostSet;
       }
 
       return setter;
