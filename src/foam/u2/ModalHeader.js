@@ -41,6 +41,7 @@ foam.CLASS({
       display: inline-block;
     }
     ^ .close{
+      background: 0;
       width: 24px;
       height: 24px;
       margin-top: 5px;
