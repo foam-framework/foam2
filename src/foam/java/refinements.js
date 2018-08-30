@@ -61,15 +61,24 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'javaSetter'
+    },
+    {
+      class: 'String',
+      name: 'javaPreSet',
+      value: 'return newValue;'
+    },
+    {
+      class: 'String',
+      name: 'javaPostSet'
+    },
+    {
+      class: 'String',
       name: 'shortName'
     },
     {
       class: 'StringArray',
       name: 'aliases'
-    },
-    {
-      class: 'String',
-      name: 'javaSetter'
     },
     {
       class: 'String',
@@ -156,14 +165,13 @@ foam.CLASS({
     function generateSetter_() {
       return this.javaSetter ? this.javaSetter : `
         if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
-        assert${foam.String.capitalize(this.name)}(val);
-        ${this.name}_ = val;
-        ${this.name}IsSet_ = true;
+        setProperty(\"${this.name}\", val);
       `;
     },
 
     function buildJavaClass(cls) {
       if ( ! this.generateJava ) return;
+      if ( foam.java.Enum.isInstance(cls) ) return;
 
       // Use javaInfoType as an indicator that this property should be
       // generated to java code.
@@ -203,6 +211,7 @@ foam.CLASS({
         }).
         method({
           name: 'set' + capitalized,
+          type: 'void',
           visibility: 'public',
           args: [
             {
@@ -210,9 +219,41 @@ foam.CLASS({
               name: 'val'
             }
           ],
-          type: 'void',
           body: this.generateSetter_()
+        }).
+        method({
+          name: this.name + 'PreSet_',
+          type: this.javaType,
+          visibility: 'public',
+          args: [
+            {
+              type: 'Object',
+              name: 'oldValue'
+            },
+            {
+              type: this.javaType,
+              name: 'newValue'
+            }
+          ],
+          body: this.javaPreSet
+        }).
+        method({
+          name: this.name + 'PostSet_',
+          type: 'void',
+          visibility: 'public',
+          args: [
+            {
+              type: 'Object',
+              name: 'oldValue'
+            },
+            {
+              type: this.javaType,
+              name: 'newValue'
+            }
+          ],
+          body: this.javaPostSet
         });
+
 
       if ( this.javaFactory ) {
         cls.method({
@@ -941,15 +982,7 @@ foam.CLASS({
           cls.extends = this.extends;
           cls.values = this.VALUES;
 
-          cls.field({
-            name: '__frozen__',
-            visibility: 'protected',
-            type: 'boolean',
-            initializer: 'false'
-          });
-
           var axioms = this.getAxioms();
-
           for ( var i = 0 ; i < axioms.length ; i++ ) {
             axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
           }
@@ -1503,6 +1536,7 @@ foam.CLASS({
 
   methods: [
     function buildJavaClass(cls) {
+      if ( foam.java.Enum.isInstance(cls) ) return;
       var info = cls.getField('classInfo_');
       if ( info ) info.addAxiom(cls.name + '.' + this.javaInfoName);
 

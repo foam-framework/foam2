@@ -141,7 +141,14 @@ foam.CLASS({
             type: 'void',
             visibility: 'public',
             args: [{ name: 'o', type: 'Object' }, { name: 'value', type: 'Object' }],
-            body: '((' + this.sourceCls.name + ') o).' + this.setterName + '(cast(value));'
+            body: `
+              ${this.sourceCls.name} obj = (${this.sourceCls.name}) o;
+              obj.assert${foam.String.capitalize(this.propName)}(cast(value));
+              Object oldValue = obj.${this.propName}IsSet_ ? obj.${this.propName}_ : null;
+              obj.${this.propName}_ = obj.${this.propName}PreSet_(oldValue, cast(value));
+              obj.${this.propName}IsSet_ = true;
+              obj.${this.propName}PostSet_(oldValue, obj.${this.propName}_);
+            `
           },
           {
             name: 'cast',
