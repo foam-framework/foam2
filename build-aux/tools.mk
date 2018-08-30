@@ -1,4 +1,4 @@
-JAVAC ?= javac
+JAVAC ?= javac -encoding UTF-8
 JAVA ?= java
 JAR ?= jar
 NODE ?= node

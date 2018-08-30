@@ -61,6 +61,7 @@ foam2_MAVEN_DEPS = \
 	org.eclipse.jetty:jetty-webapp:9.4.8.v20171121 \
 	org.eclipse.jetty:jetty-xml:9.4.8.v20171121 \
 	org.eclipse.jetty.websocket:websocket-api:9.4.8.v20171121 \
+	org.eclipse.jetty.websocket:websocket-common:9.4.8.v20171121 \
 	org.eclipse.jetty.websocket:websocket-server:9.4.8.v20171121 \
 	org.eclipse.jetty.websocket:websocket-servlet:9.4.8.v20171121 \
 	com.google.guava:guava:23.6-jre \

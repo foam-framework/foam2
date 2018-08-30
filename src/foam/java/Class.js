@@ -44,11 +44,20 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'static',
-      value: false
+      name: 'static'
     },
-    'abstract',
-    'extends',
+    {
+      class: 'Boolean',
+      name: 'final'
+    },
+    {
+      class: 'Boolean',
+      name: 'abstract'
+    },
+    {
+      class: 'String',
+      name: 'extends'
+    },
     {
       class: 'FObjectArray',
       of: 'foam.java.Constant',
@@ -164,6 +173,7 @@ foam.CLASS({
       if ( ! this.anonymous ) {
         o.out(this.visibility, ' ', this.static ? 'static ' : '');
 
+        o.out(this.final    ? 'final '    : '');
         o.out(this.abstract ? 'abstract ' : '');
         o.out(this.isEnum   ? 'enum '     : 'class ', this.name);
 
