@@ -61,15 +61,23 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'javaSetter'
+    },
+    {
+      class: 'String',
+      name: 'javaPreSet'
+    },
+    {
+      class: 'String',
+      name: 'javaPostSet'
+    },
+    {
+      class: 'String',
       name: 'shortName'
     },
     {
       class: 'StringArray',
       name: 'aliases'
-    },
-    {
-      class: 'String',
-      name: 'javaSetter'
     },
     {
       class: 'String',
@@ -154,12 +162,39 @@ foam.CLASS({
     },
 
     function generateSetter_() {
-      return this.javaSetter ? this.javaSetter : `
-        if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
-        assert${foam.String.capitalize(this.name)}(val);
-        ${this.name}_ = val;
-        ${this.name}IsSet_ = true;
-      `;
+      // return user defined setter
+      if ( this.javaSetter ) {
+        return this.javaSetter;
+      }
+
+      var capitalized = foam.String.capitalize(this.name);
+      var setter = `if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");\n`;
+
+      // add value assertion
+      if ( this.javaAssertValue ) {
+        setter += `assert${capitalized}(val);\n`;
+      }
+
+      // if we have a preset or postset function, store the old value
+      if ( this.javaPreSet || this.javaPostSet ) {
+        setter += `${this.javaType} oldValue = ${this.name}_;\n`
+      }
+
+      // add pre-set function
+      if ( this.javaPreSet ) {
+        setter += `val = ${capitalized}PreSet_(oldValue, val);\n`;
+      };
+
+      // set value
+      setter += `${this.name}_ = val;\n`;
+      setter += `${this.name}IsSet_ = true;\n`;
+
+      // add post-set function
+      if ( this.javaPostSet ) {
+        setter += `${capitalized}PostSet_(oldValue, ${this.name}_);`;
+      }
+
+      return setter;
     },
 
     function buildJavaClass(cls) {
@@ -177,6 +212,8 @@ foam.CLASS({
       var constantize = foam.String.constantize(this.name);
       var isSet = this.name + 'IsSet_';
       var factoryName = capitalized + 'Factory_';
+      var preSetName = capitalized + 'PreSet_';
+      var postSetName = capitalized + 'PostSet_';
 
       cls.
         field({
@@ -213,6 +250,46 @@ foam.CLASS({
           type: 'void',
           body: this.generateSetter_()
         });
+
+      // add pre set method
+      if ( this.javaPreSet ) {
+        cls.method({
+          name: preSetName,
+          type: this.javaType,
+          visibility: 'protected',
+          args: [
+            {
+              type: 'Object',
+              name: 'oldValue'
+            },
+            {
+              type: this.javaType,
+              name: 'newValue'
+            }
+          ],
+          body: this.javaPreSet
+        });
+      }
+
+      // add post set method
+      if ( this.javaPostSet ) {
+        cls.method({
+          name: postSetName,
+          type: 'void',
+          visibility: 'protected',
+          args: [
+            {
+              type: 'Object',
+              name: 'oldValue'
+            },
+            {
+              type: this.javaType,
+              name: 'newValue'
+            }
+          ],
+          body: this.javaPostSet
+        });
+      }
 
       if ( this.javaFactory ) {
         cls.method({
