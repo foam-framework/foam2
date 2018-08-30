@@ -244,6 +244,8 @@
 		10ABA6761F9F9C2A0045BCA2 /* CustomView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 10ABA6751F9F9C2A0045BCA2 /* CustomView.xib */; };
 		10ABA67E1FA1626A0045BCA2 /* TestRowView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 10ABA67D1FA1626A0045BCA2 /* TestRowView.xib */; };
 		10E1BA281F6AE50C00215766 /* ParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E1BA271F6AE50C00215766 /* ParserTests.swift */; };
+		75A802812135DFE50065F2CC /* foam_box_HTTPException.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75A802802135DFE50065F2CC /* foam_box_HTTPException.swift */; };
+		75A802832135E02D0065F2CC /* foam_nanos_auth_HumanNameTrait.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75A802822135E02D0065F2CC /* foam_nanos_auth_HumanNameTrait.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -507,6 +509,8 @@
 		10ABA6751F9F9C2A0045BCA2 /* CustomView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomView.xib; sourceTree = "<group>"; };
 		10ABA67D1FA1626A0045BCA2 /* TestRowView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TestRowView.xib; sourceTree = "<group>"; };
 		10E1BA271F6AE50C00215766 /* ParserTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParserTests.swift; sourceTree = "<group>"; };
+		75A802802135DFE50065F2CC /* foam_box_HTTPException.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = foam_box_HTTPException.swift; sourceTree = "<group>"; };
+		75A802822135E02D0065F2CC /* foam_nanos_auth_HumanNameTrait.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = foam_nanos_auth_HumanNameTrait.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -591,6 +595,7 @@
 		1059844E1E5F466A0063941D /* gen */ = {
 			isa = PBXGroup;
 			children = (
+				75A802822135E02D0065F2CC /* foam_nanos_auth_HumanNameTrait.swift */,
 				108AB5F42121DA9C006421FB /* foam_blob_Blob.swift */,
 				108AB61C2121DAA4006421FB /* foam_box_AnonymousBox.swift */,
 				108AB5ED2121DA9B006421FB /* foam_box_Box.swift */,
@@ -804,6 +809,7 @@
 				108AB5E12121DA99006421FB /* foam_swift_ui_DAOCreateViewController.swift */,
 				108AB5D32121DA97006421FB /* foam_swift_ui_DAOTableViewSource.swift */,
 				108AB59E2121DA8D006421FB /* foam_swift_ui_DAOUITableViewDelegate.swift */,
+				75A802802135DFE50065F2CC /* foam_box_HTTPException.swift */,
 				108AB5EF2121DA9B006421FB /* foam_swift_ui_DAOViewController.swift */,
 				108AB6232121DAA5006421FB /* foam_swift_ui_DetailView.swift */,
 				108AB5E52121DA9A006421FB /* foam_swift_ui_FOAMActionUIButton.swift */,
@@ -985,6 +991,7 @@
 				108AB64F2121DAAE006421FB /* foam_swift_parse_json_LongParser.swift in Sources */,
 				108AB6A02121DAAE006421FB /* RegisterClasses.swift in Sources */,
 				108AB6692121DAAE006421FB /* foam_swift_parse_json_output_Outputter.swift in Sources */,
+				75A802832135E02D0065F2CC /* foam_nanos_auth_HumanNameTrait.swift in Sources */,
 				108AB6BA2121DAAE006421FB /* foam_dao_FilteredDAO.swift in Sources */,
 				108AB7222121DAAE006421FB /* foam_swift_parse_json_Whitespace.swift in Sources */,
 				108AB69F2121DAAE006421FB /* foam_swift_parse_json_NullParser.swift in Sources */,
@@ -1022,6 +1029,7 @@
 				108AB7232121DAAE006421FB /* foam_box_BoxRegistryBox.swift in Sources */,
 				10AB7C652121E779008F55AF /* foam_box_NullBox.swift in Sources */,
 				108AB6D62121DAAE006421FB /* foam_swift_ui_PropertyView.swift in Sources */,
+				75A802812135DFE50065F2CC /* foam_box_HTTPException.swift in Sources */,
 				108AB6512121DAAE006421FB /* foam_box_BoxService.swift in Sources */,
 				108AB6B42121DAAE006421FB /* foam_mlang_sink_GroupBy.swift in Sources */,
 				108AB6702121DAAE006421FB /* foam_swift_parse_StringPStream.swift in Sources */,
