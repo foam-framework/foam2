@@ -22,9 +22,8 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function (cls) {
         cls.extras.push(`
-          protected Outputter outputter_ = new Outputter(OutputterMode.STORAGE);
-          // FIXME: the following line fails compilation
-          //outputter_.setOutputClassNames(getOutputClassNames());
+          protected Outputter outputter_ = new Outputter(OutputterMode.STORAGE)
+              .setOutputClassNames(getOutputClassNames());
         `);
       }
     }
@@ -35,17 +34,20 @@ foam.CLASS({
       name: 'put',
       synchronized: true,
       javaCode: `
-        // FIXME: can't get this line to compile in cls.extras.push
-        outputter_.setOutputClassNames(getOutputClassNames());
-
-        // Since only writing, dispense with id lookup and delta
-        String record = outputter_.stringify((FObject) obj);
-        write_("p(" + record + ")");
+        try {
+          // Since only writing, dispense with id lookup and delta
+          String record = outputter_.stringify((FObject) obj);
+          write_("p(" + record + ")");
+        } catch ( Throwable t ) {
+          throw new RuntimeException(t);
+        }
       `
     },
     {
       name: 'replay',
-      javaCode: ``
+      javaCode: `
+        return;
+      `
     }
   ]
 });
