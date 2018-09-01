@@ -82,23 +82,29 @@ public class MDAO
       }
 
       state_ = index_.put(state_, obj);
-
-      return obj;
     }
+
+    onPut(obj);
+    return obj;
   }
 
   public FObject remove_(X x, FObject obj) {
     if ( obj == null ) return null;
 
+    FObject found;
     synchronized ( lock_.writeLock() ) {
-      FObject found = find(obj);
+      found = find(obj);
 
       if ( found != null ) {
         state_ = index_.remove(state_, found);
       }
-
-      return found;
     }
+
+    if ( found != null ) {
+      onRemove(found);
+    }
+
+    return found;
   }
 
   public FObject find_(X x, Object o) {

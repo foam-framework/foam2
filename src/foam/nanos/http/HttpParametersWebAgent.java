@@ -72,7 +72,6 @@ public class HttpParametersWebAgent
     String         accept          = req.getHeader("Accept");
     String         contentType     = req.getHeader("Content-Type");
     HttpParameters parameters      = null;
-    Class          parametersClass = null;
     Command        command         = Command.select;
     String         cmd             = req.getParameter("cmd");
 
@@ -149,6 +148,13 @@ public class HttpParametersWebAgent
             case "put":
               command = Command.put;
               break;
+            case "select":
+              command = Command.select;
+              if ( ! SafetyUtil.isEmpty(req.getParameter("id")) ) {
+                parameters.set("id", req.getParameter("id"));
+                logger.debug("id", req.getParameter("id"));
+              }
+              break;
             case "remove":
               command = Command.remove;
               parameters.set("id", req.getParameter("id"));
@@ -158,13 +164,11 @@ public class HttpParametersWebAgent
               command = Command.help;
               resp.setContentType("text/html");
               break;
-            // defaults to SELECT
           }
         } else {
           logger.warning("cmd/method could not be determined, defaulting to SELECT.");
         }
-       break;
-       // defauts to SELECT
+        break;
       }
     } else {
       cmd = req.getParameter("cmd");
@@ -174,16 +178,25 @@ public class HttpParametersWebAgent
         case "put":
           command = Command.put;
           break;
+
+        case "select":
+          command = Command.select;
+          if ( ! SafetyUtil.isEmpty(req.getParameter("id")) ) {
+            parameters.set("id", req.getParameter("id"));
+            logger.debug("id", req.getParameter("id"));
+          }
+          break;
+
         case "remove":
           command = Command.remove;
           parameters.set("id", req.getParameter("id"));
           logger.debug("id", req.getParameter("id"));
           break;
+
         case "help":
           command = Command.help;
           resp.setContentType("text/html");
           break;
-          // defaults to SELECT
         }
       } else {
         logger.warning("cmd/method could not be determined, defaulting to SELECT.");
