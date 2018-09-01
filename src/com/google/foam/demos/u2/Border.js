@@ -275,13 +275,14 @@ foam.CLASS({
 
   css: `
     ^ {
-      border-top-style: ridge;
+      border-top: 1px solid #999;
       display: inline-block;
       padding: 10px;
     }
     ^.expanded {
-      border-style: ridge;
-      padding-left: 9px;
+      border: 1px solid #999;
+      padding-left: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
     }
     ^toolbar {
       color: #666;
@@ -340,7 +341,7 @@ foam.CLASS({
             addClass(this.myClass('title')).
             add(this.title$).
           end().
-          tag(this.ActionView, {action: this.TOGGLE, data: this, label: this.expanded$.map(function(e) { return e ? '-' : '+'; })}).
+          tag(this.ActionView, {action: this.TOGGLE, data: this, label: this.expanded$.map(function(e) { return e ? '\u25BD' : '\u25B7'; })}).
         end().
         start('div', null, this.content$).
           show(this.expanded$).
