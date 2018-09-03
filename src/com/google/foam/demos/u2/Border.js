@@ -284,6 +284,15 @@ foam.CLASS({
       padding-left: 8px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
     }
+    ^control {
+      background: white;
+      display: inline;
+      float: right;
+      height: 30px;
+      position: relative;
+      top: -10px;
+      width: 30px;
+    }
     ^toolbar {
       color: #666;
       display: inline-block;
@@ -307,17 +316,21 @@ foam.CLASS({
       width: 300px;
     }
     ^ .foam-u2-ActionView-toggle {
-      background: white;
+      transform: rotate(-90deg);
+      transition: transform 0.3s;
+      background: transparent;
       border: none;
-      float: right;
       outline: none;
       padding: 3px;
-      position: relative;
-      top: -6px;
-      width: 14px;
+      width: 30px;
+      height: 30px;
+    }
+    ^.expanded .foam-u2-ActionView-toggle {
+      transform: rotate(0deg);
+      transition: transform 0.3s;
     }
     ^ .foam-u2-ActionView-toggle:hover {
-      background: white;
+      background: transparent;
     }
   `,
 
@@ -341,7 +354,10 @@ foam.CLASS({
             addClass(this.myClass('title')).
             add(this.title$).
           end().
-          tag(this.ActionView, {action: this.TOGGLE, data: this, label: this.expanded$.map(function(e) { return e ? '\u25BD' : '\u25B7'; })}).
+          start('div').
+            addClass(this.myClass('control')).
+            tag(this.ActionView, {action: this.TOGGLE, data: this, label: '\u25BD'}).
+          end().
         end().
         start('div', null, this.content$).
           show(this.expanded$).
