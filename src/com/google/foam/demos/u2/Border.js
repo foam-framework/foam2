@@ -268,6 +268,57 @@ E('br').write();
 
 
 foam.CLASS({
+  name: 'SideLabelledSection',
+  extends: 'foam.u2.Element',
+
+  css: `
+    ^ {
+      display: inline-block;
+      padding: 10px;
+    }
+    ^title {
+      vertical-align: top;
+      background: white;
+      color: #666;
+      display: inline;
+      padding: 3px;
+      width: 33%;
+    }
+    ^content {
+      display: inline-block;
+      background: white;
+      height: 200px;
+      width: 66%;
+    }
+  `,
+
+  properties: [ 'title' ],
+
+  methods: [
+    function init() {
+      this.start().
+        addClass(this.myClass()).
+        start('div').addClass(this.myClass('title')).add(this.title).end().
+        start('div', null, this.content$).
+          addClass(this.myClass('content')).
+        end().
+      end();
+    }
+  ]
+});
+
+var sb = SideLabelledSection.create({title: 'Title'});
+sb.add('content').br().add('more content');
+sb.write();
+
+
+
+E('br').write();
+E('br').write();
+
+
+
+foam.CLASS({
   name: 'FoldingSection',
   extends: 'foam.u2.Controller',
 
