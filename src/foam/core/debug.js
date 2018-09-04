@@ -29,6 +29,7 @@
 /* Validating a Model should also validate all of its Axioms. */
 foam.CLASS({
   refines: 'foam.core.Model',
+  flags: ['debug'],
 
   properties: [
     {
@@ -58,6 +59,7 @@ foam.CLASS({
 /* Validate that Listeners aren't both framed and merged. */
 foam.CLASS({
   refines: 'foam.core.Listener',
+  flags: ['debug'],
 
   methods: [
     function validate() {
@@ -73,6 +75,7 @@ foam.CLASS({
 /* Validating a Model should also validate all of its Axioms. */
 foam.CLASS({
   refines: 'foam.core.Property',
+  flags: ['debug'],
 
   properties: [
     {
@@ -274,11 +277,21 @@ if ( false && global.Proxy ) {
 /* Add describe() support to objects. */
 foam.CLASS({
   refines: 'foam.core.FObject',
+  flags: ['debug'],
 
   methods: [
     function unknownArg(key, value) {
       if ( key == 'class' ) return;
-      this.warn('Unknown property ' + this.cls_.id + '.' + key + ': ' + value);
+
+      // Temporarily disable warnings related to generating Java code.
+      var blackList = [
+        'javaThrows',
+        'javaReturns',
+        'javaCode'
+      ];
+      if ( ! blackList.some((keyword) => key.includes(keyword)) ) {
+        this.warn('Unknown property ' + this.cls_.id + '.' + key + ': ' + value);
+      }
     },
 
     function describe(opt_name) {
@@ -475,6 +488,7 @@ foam.core.Argument;
 /* Methods gain type checking. */
 foam.CLASS({
   refines: 'foam.core.Method',
+  flags: ['debug'],
 
   properties: [
     {
@@ -499,6 +513,7 @@ foam.CLASS({
 foam.SCRIPT({
   package: 'foam.core',
   name: 'DebugUpgradeLibScript',
+  flags: ['debug'],
   code: function() {
 // Upgrade a LIBs
 var upgradeLib = function upgradeLib(lib) {
@@ -544,6 +559,7 @@ foam.core.Import;
 
 foam.CLASS({
   refines: 'foam.core.FObject',
+  flags: ['debug'],
 
   documentation: 'Assert that all required imports are provided.',
 
@@ -565,6 +581,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Import',
+  flags: ['debug'],
 
   properties: [
     {
@@ -594,6 +611,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.FObject',
+  flags: ['debug'],
 
   documentation: '.',
 

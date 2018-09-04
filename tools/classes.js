@@ -8,8 +8,10 @@ var classes = [
   'foam.core.Axiom',
   'foam.core.Serializable',
   'foam.core.Exception',
+  'foam.core.Freezable',
   'foam.core.ContextAgent',
   'foam.core.Identifiable',
+  'foam.core.AbstractFObject',
   'foam.mlang.predicate.Predicate',
   'foam.mlang.predicate.True',
   'foam.mlang.predicate.False',
@@ -84,6 +86,7 @@ var classes = [
   'foam.dao.FileJournal',
   'foam.dao.WriteOnlyJDAO',
   'foam.dao.WriteOnlyFileJournal',
+  'foam.dao.RoutingJournal',
   'foam.dao.BaseClientDAO',
   'foam.dao.ClientDAO',
   'foam.dao.ClientSink',
@@ -107,6 +110,7 @@ var classes = [
   'foam.dao.SQLStatement',
   'foam.dao.EasyDAO',
   'foam.dao.EnabledAwareDAO',
+  'foam.dao.index.PersistedIndexTest',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
@@ -134,13 +138,13 @@ var classes = [
   'foam.nanos.auth.Hours',
   'foam.nanos.auth.Address',
   'foam.nanos.auth.Phone',
+  'foam.nanos.auth.HumanNameTrait',
   'foam.nanos.auth.User',
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.ClientAuthService',
   'foam.nanos.auth.HtmlDoc',
   'foam.nanos.auth.PasswordExpiryAuthService',
-  'foam.nanos.auth.twofactor.authy.AuthyService',
   'foam.nanos.auth.token.Token',
   'foam.nanos.auth.token.TokenService',
   'foam.nanos.auth.token.ClientTokenService',
@@ -261,12 +265,14 @@ var classes = [
   'foam.nanos.jetty.HttpServer',
   'foam.nanos.servlet.ServletMapping',
   'foam.nanos.servlet.ErrorPageMapping',
+  'foam.nanos.servlet.FilterMapping',
 
   'foam.lib.query.TestModel',
   'foam.lib.query.FooEnum',
   'foam.demos.net.nap.web.model.RegulatoryNotice',
   'foam.demos.net.nap.web.model.RegulatoryNoticeAudit',
 
+  'foam.parse.QueryParserUserTest',
   'foam.util.EmailTest',
   'foam.util.PasswordTest',
   'foam.test.TestObj',
@@ -277,7 +283,9 @@ var classes = [
   'foam.nanos.dig.exception.ParsingErrorException',
   'foam.nanos.dig.exception.DAOPutException',
   'foam.nanos.dig.exception.EmptyDataException',
-  'foam.nanos.dig.exception.UnsupportException'
+  'foam.nanos.dig.exception.UnsupportException',
+  'foam.nanos.dig.exception.UnknownIdException',
+  'foam.nanos.dig.exception.DigSuccessMessage'
 ];
 
 var abstractClasses = [

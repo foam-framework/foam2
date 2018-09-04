@@ -16,7 +16,7 @@ foam.INTERFACE({
       returns: 'Promise',
       javaReturns: 'String',
       swiftReturns: 'String',
-      javaThrows: [ 'javax.naming.AuthenticationException' ],
+      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
       args: [
         {
           name: 'x',
@@ -32,6 +32,24 @@ foam.INTERFACE({
     },
     {
       name: 'verifyToken',
+      returns: 'Promise',
+      javaReturns: 'boolean',
+      swiftReturns: 'Bool',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X',
+          swiftType: 'Context'
+        },
+        {
+          name: 'token',
+          javaType: 'String',
+          swiftType: 'String'
+        }
+      ]
+    },
+    {
+      name: 'disable',
       returns: 'Promise',
       javaReturns: 'boolean',
       swiftReturns: 'Bool',

@@ -742,7 +742,7 @@ foam.CLASS({
     {
       name: 'eof',
       code: function() {},
-      javaCode: ``,
+      javaCode: `// NOOP`,
       swiftCode: '// NOOP',
     },
     {

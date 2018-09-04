@@ -62,6 +62,7 @@ foam.CLASS({
     { name: 'code', required: false },
     'documentation',
     'returns',
+    'flags',
     {
       name: 'args',
       factory: function() {
@@ -136,10 +137,7 @@ foam.CLASS({
     },
 
     function createChildMethod_(child) {
-      /**
-        Template method for use by Method subclasses.
-        (Used by JavaSource.)
-      */
+      // Overwritten after foam.core.Argument is created.
       return child;
     },
 
@@ -175,5 +173,10 @@ foam.CLASS({
   ]
 });
 
-
-foam.boot.phase2();
+foam.SCRIPT({
+  package: 'foam.core',
+  name: 'BootPhase2',
+  code: function() {
+    foam.boot.phase2();
+  }
+});

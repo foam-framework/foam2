@@ -18,90 +18,234 @@
 foam.CLASS({
   package: 'foam.json2',
   name: 'Outputter',
+  requires: [
+    'foam.json2.SimpleOutputterOutput',
+  ],
   properties: [
     {
-      class: 'String',
-      name: 'str'
+      class: 'FObjectProperty',
+      of: 'foam.json2.OutputterOutput',
+      required: true,
+      name: 'out',
+      factory: function() { return this.SimpleOutputterOutput.create() },
+      swiftFactory: `return SimpleOutputterOutput_create()`,
     },
     {
       name: 'state',
-      factory: function() {
-        return [{}];
-      }
+      swiftType: '[State]',
+      swiftFactory: 'return [State_create()]',
+      factory: function() { return [this.State.create() ] },
     }
   ],
+  classes: [
+    {
+      name: 'State',
+      properties: [
+        {
+          class: 'Boolean',
+          name: 'endArray',
+        },
+        {
+          class: 'Boolean',
+          name: 'endObj',
+        },
+        {
+          class: 'Boolean',
+          name: 'comma',
+        },
+        {
+          class: 'Boolean',
+          name: 'array',
+        },
+      ],
+    },
+  ],
   methods: [
-    function obj() {
-      this.e();
-      this.str += '{';
-      this.state.push({
-        end: '}',
-        comma: false
-      });
-      return this;
+    {
+      name: 'obj',
+      returns: 'foam.json2.Outputter',
+      code: function() {
+        this.e();
+        this.out.startObj()
+        this.state.push(this.State.create({
+          endObj: true,
+          comma: false
+        }));
+        return this;
+      },
+      swiftCode: `
+        e();
+        out.startObj()
+        state.append(State_create([
+          "endObj": true,
+          "comma": false
+        ]))
+        return self
+      `,
     },
-    function array() {
-      this.e();
-      this.str += '[';
-      this.state.push({
-        end: ']',
-        array: true,
-        comma: false
-      });
-      return this;
+    {
+      name: 'array',
+      returns: 'foam.json2.Outputter',
+      code: function() {
+        this.e();
+        this.out.startArray();
+        this.state.push(this.State.create({
+          endArray: true,
+          array: true,
+          comma: false
+        }));
+        return this;
+      },
+      swiftCode: `
+        e()
+        out.startArray()
+        state.append(State_create([
+          "endArray": true,
+          "array": true,
+          "comma": false
+        ]))
+        return self
+      `,
     },
-    function top() {
-      return this.state[this.state.length - 1];
+    {
+      name: 'top',
+      swiftReturns: 'State',
+      code: function() {
+        return this.state[this.state.length - 1];
+      },
+      swiftCode: `return state.last!`,
     },
-    function key(s) {
-      if ( this.top().comma ) this.str += ',';
-      else this.top().comma = true;
+    {
+      name: 'key',
+      args: [{ name: 's', swiftType: 'String' }],
+      returns: 'foam.json2.Outputter',
+      code: function(s) {
+        if ( this.top().comma ) this.out.comma();
+        else this.top().comma = true;
 
-      this.str += this.string(s);
-      this.str += ':';
+        this.out.out(this.string(s));
+        this.out.keySep()
 
-      return this;
+        return this;
+      },
+      swiftCode: `
+        if top().comma { out.comma() }
+        else { top().comma = true }
+
+        out.out(self.string(s))
+        out.keySep()
+
+        return self
+      `,
     },
-    function e() {
-      if ( this.top().array ) {
-        if ( this.top().comma ) this.str += ',';
-        this.top().comma = true;
-      }
+    {
+      name: 'e',
+      code: function() {
+        if ( this.top().array ) {
+          if ( this.top().comma ) this.out.comma();
+          this.top().comma = true;
+        }
+      },
+      swiftCode: `
+        if top().array {
+          if top().comma { out.comma() }
+          top().comma = true
+        }
+      `,
     },
-    function string(s) {
-      return '"' + s.
-        replace(/\\/g, '\\\\').
-        replace(/"/g, '\\"').
-        replace(/[\x00-\x1f]/g, function(c) {
-          return "\\u00" + ((c.charCodeAt(0) < 0x10) ?
-                            '0' + c.charCodeAt(0).toString(16) :
-                            c.charCodeAt(0).toString(16));
-        }) + '"';
+    {
+      name: 'string',
+      args: [{ name: 's', swiftType: 'String' }],
+      swiftReturns: 'String',
+      code: function(s) {
+        return '"' + s.
+          replace(/\\/g, '\\\\').
+          replace(/"/g, '\\"').
+          replace(/[\x00-\x1f]/g, function(c) {
+            return "\\u00" + ((c.charCodeAt(0) < 0x10) ?
+                              '0' + c.charCodeAt(0).toString(16) :
+                              c.charCodeAt(0).toString(16));
+          }) + '"';
+      },
+      swiftCode: `
+        // TODO handle more stuff
+        return "\\"" + s.replacingOccurrences(of: "\\"", with: "\\\\\\"") + "\\""
+      `,
     },
-    function s(s) {
-      this.e();
-      this.str += this.string(s);
-      return this;
+    {
+      name: 's',
+      args: [{ name: 's', swiftType: 'String' }],
+      returns: 'foam.json2.Outputter',
+      code: function(s) {
+        this.e();
+        this.out.out(this.string(s));
+        return this;
+      },
+      swiftCode: `
+        e()
+        out.out(string(s))
+        return self
+      `,
     },
-    function n(n) {
-      this.e();
-      this.str += n;
-      return this;
+    {
+      name: 'n',
+      args: [{ name: 'n', swiftType: 'NSNumber' }],
+      returns: 'foam.json2.Outputter',
+      code: function(n) {
+        this.e();
+        this.out.out(n);
+        return this;
+      },
+      swiftCode: `
+        e()
+        out.out(n.stringValue)
+        return self
+      `,
     },
-    function b(b) {
-      this.e();
-      this.str += b;
-      return this;
+    {
+      name: 'b',
+      args: [{ name: 'b', swiftType: 'Bool' }],
+      returns: 'foam.json2.Outputter',
+      code: function(b) {
+        this.e();
+        this.out.out(b);
+        return this;
+      },
+      swiftCode: `
+        e()
+        out.out(b ? "true" : "false")
+        return self
+      `,
     },
-    function nul() {
-      this.e();
-      this.str += 'null';
-      return this;
+    {
+      name: 'nul',
+      returns: 'foam.json2.Outputter',
+      code: function() {
+        this.e();
+        this.out.out('null');
+        return this;
+      },
+      swiftCode: `
+        e()
+        out.out("null")
+        return self
+      `,
     },
-    function end() {
-      var s = this.state.pop();
-      this.str += s.end;
-      return this;
+    {
+      name: 'end',
+      returns: 'foam.json2.Outputter',
+      code: function() {
+        var s = this.state.pop();
+        if ( s.endObj ) this.out.endObj();
+        if ( s.endArray ) this.out.endArray();
+        return this;
+      },
+      swiftCode: `
+        let s = state.popLast()!
+        if s.endObj { out.endObj() }
+        if s.endArray { out.endArray() }
+        return self
+      `
     }
   ]
 });

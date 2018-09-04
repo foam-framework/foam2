@@ -92,6 +92,10 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'swiftSetter',
+    },
+    {
+      class: 'String',
       name: 'swiftPreSet',
       expression: function() {
         return 'return newValue';
@@ -157,7 +161,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftToJSON',
-      value: 'outputter.output(&out, value)',
+      value: 'outputter.output(out, value)',
     },
     {
       class: 'Boolean',
@@ -175,18 +179,6 @@ foam.CLASS({
       class: 'Boolean',
       name: 'swiftWeak',
       value: false,
-    },
-    {
-      class: 'String',
-      name: 'swiftCompareValues',
-      factory: function() {
-        return foam.String.multiline(function() {/*
-let v1 = v1 as AnyObject
-let v2 = v2 as AnyObject
-if v1.isEqual(v2) { return 0 }
-return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
-        */});
-      },
     },
   ],
   methods: [
@@ -214,7 +206,7 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
         name: this.swiftVarName,
         type: this.swiftType,
         getter: this.swiftGetter || this.swiftGetterTemplate(),
-        setter: this.swiftSetter(),
+        setter: this.swiftSetter || this.swiftSetterTemplate(),
       }));
       cls.fields.push(this.Field.create({
         visibility: 'private',
@@ -351,7 +343,7 @@ return s
       */},
     },
     {
-      name: 'swiftSetter',
+      name: 'swiftSetterTemplate',
       template: function() {/*
 self.set(key: "<%=this.name%>", value: value)
       */},
@@ -416,6 +408,8 @@ class PInfo: PropertyInfo {
   let name = "<%=this.name%>"
   let classInfo: ClassInfo
   let transient = <%=!!this.transient%>
+  let storageTransient = <%=!!this.storageTransient%>
+  let networkTransient = <%=!!this.networkTransient%>
   let label = "<%=this.label%>" // TODO localize
   lazy private(set) var visibility: <%=foam.u2.Visibility.model_.swiftName%> = {
     return <%=foam.u2.Visibility.model_.swiftName%>.<%=this.visibility.name%>
@@ -424,11 +418,14 @@ class PInfo: PropertyInfo {
   public func set(_ obj: foam_core_FObject, value: Any?) {
     let obj = obj as! <%=parentCls.model_.swiftName%>
 <% var p = this %>
-<% if ( p.swiftExpression ) { %>
+<% if ( p.swiftSetter ) { %>
+    obj.<%=this.swiftVarName%> = value<%if (this.swiftType != 'Any?') {%> as! <%=this.swiftType%><%}%>
+<% } else { %>
+  <% if ( p.swiftExpression ) { %>
     if obj.<%= p.swiftExpressionSubscriptionName %> != nil {
       for s in obj.<%=p.swiftExpressionSubscriptionName%>! { s.detach() }
     }
-<% } %>
+  <% } %>
     let oldValue: Any? = obj.<%=p.swiftInitedName%> ? obj.`<%=p.name%>` : nil
     obj.<%=p.swiftValueName%> = obj.<%=p.swiftPreSetFuncName%>(oldValue, obj.<%=p.swiftAdaptFuncName%>(oldValue, value))
     obj.<%=p.swiftInitedName%> = true
@@ -436,6 +433,7 @@ class PInfo: PropertyInfo {
     if obj.hasListeners(["propertyChange", "<%=p.name%>"]) && !FOAM_utils.equals(oldValue, obj.<%=p.swiftValueName%>) {
       _ = obj.pub(["propertyChange", "<%=p.name%>", obj.<%=p.swiftSlotName%>])
     }
+<% } %>
   }
   public func get(_ obj: foam_core_FObject) -> Any? {
     let obj = obj as! <%=parentCls.model_.swiftName%>
@@ -470,9 +468,6 @@ class PInfo: PropertyInfo {
       _ = obj.pub(["propertyChange", "<%=p.name%>", obj.<%=p.swiftSlotName%>])
     }
   }
-  public func compareValues(_ v1: Any?, _ v2: Any?) -> Int {
-    <%=this.swiftCompareValues%>
-  }
   init(_ ci: ClassInfo) { classInfo = ci }
   func viewFactory(x: Context) -> foam_core_FObject? {
 <% if (this.swiftView && !this.hidden) { %>
@@ -481,7 +476,7 @@ class PInfo: PropertyInfo {
     return nil
 <% } %>
   }
-  public func toJSON(outputter: <%=foam.swift.parse.json.output.Outputter.model_.swiftName%>, out: inout String, value: Any?) {
+  public func toJSON(outputter: <%=foam.swift.parse.json.output.Outputter.model_.swiftName%>, out: foam_json2_Outputter, value: Any?) {
     <%=p.swiftToJSON%>
   }
 }
@@ -659,7 +654,7 @@ if let n = newValue as? Date {
   return n
 } else if let n = newValue as? String {
   let dateFormatter = DateFormatter()
-  dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.S'Z'"
+  dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
   return dateFormatter.date(from: n)
 } else if let n = newValue as? NSNumber {
   return Date(timeIntervalSince1970: n.doubleValue)
@@ -695,4 +690,118 @@ return newValue as! ${swiftType}
       },
     },
   ],
+});
+
+foam.CLASS({
+  refines: 'foam.core.MultiPartID',
+  flags: [ 'swift' ],
+  properties: [
+    {
+      name: 'swiftGetter',
+      expression: function(propNames) {
+        return `
+let propNames = ${foam.swift.stringify(propNames)}
+var args = [String:Any?]()
+for propName in propNames {
+  let pInfo = self.ownClassInfo().axiom(byName: propName) as! PropertyInfo
+  args[propName] = pInfo.get(self)
+}
+return self.__subContext__.create(${this.of.model_.swiftName}.self, args: args)!
+        `
+      },
+    },
+    {
+      name: 'swiftSetter',
+      expression: function(propNames) {
+        return `
+let propNames = ${foam.swift.stringify(propNames)}
+for propName in propNames {
+  let selfPInfo = self.ownClassInfo().axiom(byName: propName) as! PropertyInfo
+  let valuePInfo = value!.ownClassInfo().axiom(byName: propName) as! PropertyInfo
+  selfPInfo.set(self, value: valuePInfo.get(value!))
+}
+        `
+      },
+    },
+  ],
+})
+
+foam.CLASS({
+  refines: 'foam.core.IDAlias',
+  flags: [ 'swift' ],
+  properties: [
+    {
+      name: 'swiftGetter',
+      expression: function(targetProperty) {
+        return `
+return Swift.type(of: self).${targetProperty.swiftAxiomName}().get(self)
+        `
+      },
+    },
+    {
+      name: 'swiftSetter',
+      expression: function(targetProperty) {
+        return `
+return Swift.type(of: self).${targetProperty.swiftAxiomName}().set(self, value: value)
+        `
+      },
+    },
+  ],
+})
+
+foam.CLASS({
+  refines: 'foam.core.Reference',
+  flags: [ 'swift' ],
+  requires: [
+    'foam.swift.ProtocolMethod',
+  ],
+  properties: [
+    {
+      // TODO: copied from java refinements.
+      name: 'referencedProperty',
+      transient: true,
+      factory: function() {
+        var idProp = this.of.ID.cls_ == foam.core.IDAlias ? this.of.ID.targetProperty : this.of.ID;
+
+        idProp = idProp.clone();
+        idProp.name = this.name;
+
+        return idProp;
+      }
+    },
+    {
+      name: 'swiftType',
+      factory: function() { return this.referencedProperty.swiftType; }
+    },
+    {
+      name: 'swiftJsonParser',
+      factory: function() { return this.referencedProperty.swiftJsonParser; }
+    },
+  ],
+
+  methods: [
+    function writeToSwiftClass(cls, parentCls) {
+      this.SUPER(cls, parentCls);
+      if ( ! parentCls.hasOwnAxiom(this.name) ) return;
+      if ( ! this.swiftSupport ) return;
+      cls.method({
+        visibility: 'public',
+        override: !!parentCls.getSuperClass().getAxiomByName(this.name),
+        name: `find${foam.String.capitalize(this.name)}`,
+        returnType: this.of.model_.swiftName,
+        args: [
+          {
+            localName: 'x',
+            externalName: '_',
+            type: 'Context'
+          }
+        ],
+        throws: true,
+        body: `
+let dao = x["${this.targetDAOKey}"] as! foam_dao_DAO
+return try dao.find_(x, ${this.swiftVarName}) as! ${this.of.model_.swiftName}
+        `
+      });
+    }
+  ]
 });
