@@ -6,6 +6,8 @@
 
 package foam.dao.index;
 
+import java.io.IOException;
+
 public abstract class AbstractIndex
   implements Index
 {
@@ -15,5 +17,9 @@ public abstract class AbstractIndex
 
   public Object unwrap(Object state) {
     return state;
+  }
+
+  public void flush(Object state) throws IOException {
+
   }
 }

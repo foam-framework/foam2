@@ -11,13 +11,16 @@ foam.CLASS({
 
   requires: [
     'foam.comics.DAOController',
-    'foam.u2.view.ScrollTableView'
+    'foam.comics.DAOUpdateControllerView',
+    'foam.u2.view.ScrollTableView',
+    'foam.u2.dialog.Popup'
   ],
 
   imports: [
+    'data? as importedData',
     'stack',
     'summaryView? as importedSummaryView',
-    'data? as importedData',
+    'updateView? as importedUpdateView',
     'window'
   ],
 
@@ -27,9 +30,11 @@ foam.CLASS({
     'dblclick'
   ],
 
-  // TODO: wrong class name, fix when ActionView fixed.
   css: `
     ^ {
+      width: fit-content;
+      max-width: 100vw;
+      margin: auto;
       display: flex;
     }
 
@@ -43,13 +48,15 @@ foam.CLASS({
 
     ^ .actions {
       display: inline-block;
-      margin-bottom: 10px;
+    }
+
+    ^ .actions .net-nanopay-ui-ActionView {
+      margin: 0 10px 10px 0;
     }
 
     ^ .net-nanopay-ui-ActionView {
       background: #59aadd;
       color: white;
-      margin-right: 10px;
     }
   `,
 
@@ -73,6 +80,14 @@ foam.CLASS({
       }
     },
     {
+      name: 'updateView',
+      expression: function() {
+        return this.importedUpdateView ?
+            this.importedUpdateView :
+            { class: 'foam.comics.DAOUpdateControllerView' };
+      }
+    },
+    {
       class: 'String',
       name: 'title',
       expression: function(data$data$of) {
@@ -85,16 +100,21 @@ foam.CLASS({
     [ 'data', 'action.create', 'onCreate' ],
     [ 'data', 'edit', 'onEdit' ],
     [ 'data', 'action.findRelatedObject', 'onFindRelated' ],
-    [ 'data', 'finished', 'onFinished' ]
+    [ 'data', 'finished', 'onFinished' ],
+    [ 'data', 'export', 'onExport' ]
   ],
 
   methods: [
     function initE() {
       var self = this;
 
-      this.
-        addClass(this.myClass()).
-        start().add(this.cls.PREDICATE).end().
+      this.data.border.add(
+        this.E().addClass(this.myClass()).
+        start().
+          hide(self.data.searchHidden$).
+          show(self.data.filtersEnabled$).
+          add(self.cls.PREDICATE).
+        end().
         start().
           style({ 'overflow-x': 'auto' }).
           start().
@@ -106,7 +126,10 @@ foam.CLASS({
             style({ 'overflow-x': 'auto' }).
             tag(this.summaryView, { data$: this.data.filteredDAO$ }).
           end().
-        end();
+        end()
+      );
+
+      this.add(this.data.border);
     },
 
     function dblclick(obj) {
@@ -123,7 +146,7 @@ foam.CLASS({
 
     function onEdit(s, edit, id) {
       this.stack.push({
-        class: 'foam.comics.DAOUpdateControllerView',
+        class: this.updateView.class,
         key: id
       }, this);
     },
@@ -143,6 +166,13 @@ foam.CLASS({
 
     function onFinished() {
       this.stack.back();
+    },
+
+    function onExport(dao) {
+      this.add(this.Popup.create().tag({
+        class: 'foam.u2.ExportModal',
+        exportData: dao.src.filteredDAO
+      }));
     }
   ]
 });

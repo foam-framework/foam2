@@ -34,6 +34,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.setAttribute('type', 'date');
+      this.setAttribute('placeholder', 'yyyy/mm/dd');
     },
 
     function link() {

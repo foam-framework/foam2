@@ -25,7 +25,7 @@ public class Outputter
   protected ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
     protected SimpleDateFormat initialValue() {
-      SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
+      SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
       df.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
       return df;
     }
@@ -364,12 +364,14 @@ public class Outputter
     writer_.append(str);
   }
 
-  public void setOutputDefaultValues(boolean outputDefaultValues) {
+  public Outputter setOutputDefaultValues(boolean outputDefaultValues) {
     outputDefaultValues_ = outputDefaultValues;
+    return this;
   }
 
-  public void setOutputClassNames(boolean outputClassNames) {
+  public Outputter setOutputClassNames(boolean outputClassNames) {
     outputClassNames_ = outputClassNames;
+    return this;
   }
 
   @Override

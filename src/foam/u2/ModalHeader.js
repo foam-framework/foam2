@@ -41,6 +41,7 @@ foam.CLASS({
       display: inline-block;
     }
     ^ .close{
+      background: 0;
       width: 24px;
       height: 24px;
       margin-top: 5px;
@@ -84,7 +85,7 @@ foam.CLASS({
   actions: [
     {
       name: 'closeModal',
-      icon: 'ic-cancelwhite.svg',
+      icon: 'images/ic-cancelwhite.svg',
       code: function(X){
         X.closeDialog()
       }
