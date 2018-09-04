@@ -12,10 +12,10 @@ foam.CLASS({
 
   javaImports: [
     'java.nio.charset.StandardCharsets',
-    'java.util.Date' ,
+    'java.util.Date',
   ],
 
-  tableColumns: [ 'id', 'issuedDate' ],
+  tableColumns: [ 'id', 'name', 'issuedDate' ],
 
   properties: [
     {
@@ -31,7 +31,7 @@ foam.CLASS({
       name: 'issuedDate',
       label: 'Effective Date',
       tableCellFormatter: function(date) {
-        this.add(date ? date.toISOString().substring(0,10) : '');
+        this.add(date ? date.toISOString().substring(0, 10) : '');
       }
     },
     {

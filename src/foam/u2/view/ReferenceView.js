@@ -24,6 +24,12 @@ foam.CLASS({
     'data as parentObj'
   ],
 
+  documentation: `
+    View for editing ReferenceProperty-ies.
+    Note: that if the property's value is undefined this view will set it to
+    to first choice unless you provide a 'placeholder' (inherited from ChoiceView).
+  `,
+
   properties: [
     {
       name: 'objToChoice',
