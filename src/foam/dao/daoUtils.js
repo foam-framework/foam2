@@ -82,9 +82,9 @@ listener.onDetach(listener.dao$.follow(delegate$))
 return listener
       `,
       javaCode: `
-// TODO: Support changing of delegate
-super.listen_(getX(), sink, predicate);
-`
+        // TODO: Support changing of delegate
+        getDelegate().listen_(getX(), sink, predicate);
+      `
     }
   ],
 
@@ -108,6 +108,7 @@ public ProxyDAO(foam.core.X x, foam.dao.DAO delegate) {
 foam.CLASS({
   package: 'foam.dao',
   name: 'ProxyListener',
+  flags: ['js', 'swift'],
 
   implements: ['foam.dao.Sink'],
 

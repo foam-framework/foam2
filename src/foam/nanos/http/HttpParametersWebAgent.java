@@ -72,7 +72,6 @@ public class HttpParametersWebAgent
     String         accept          = req.getHeader("Accept");
     String         contentType     = req.getHeader("Content-Type");
     HttpParameters parameters      = null;
-    Class          parametersClass = null;
     Command        command         = Command.select;
     String         cmd             = req.getParameter("cmd");
 
@@ -106,9 +105,10 @@ public class HttpParametersWebAgent
         int count  = 0;
         int length = req.getContentLength();
 
-        BufferedReader reader  = req.getReader();
         StringBuilder  builder = sb.get();
         char[] cbuffer = new char[BUFFER_SIZE];
+        BufferedReader reader  = new BufferedReader(new InputStreamReader(req.getInputStream()));
+
         while ( ( read = reader.read(cbuffer, 0, BUFFER_SIZE)) != -1 && count < length ) {
           builder.append(cbuffer, 0, read);
           count += read;
@@ -148,20 +148,27 @@ public class HttpParametersWebAgent
             case "put":
               command = Command.put;
               break;
+            case "select":
+              command = Command.select;
+              if ( ! SafetyUtil.isEmpty(req.getParameter("id")) ) {
+                parameters.set("id", req.getParameter("id"));
+                logger.debug("id", req.getParameter("id"));
+              }
+              break;
             case "remove":
               command = Command.remove;
+              parameters.set("id", req.getParameter("id"));
+              logger.debug("id", req.getParameter("id"));
               break;
             case "help":
               command = Command.help;
               resp.setContentType("text/html");
               break;
-            // defaults to SELECT
           }
         } else {
           logger.warning("cmd/method could not be determined, defaulting to SELECT.");
         }
-       break;
-       // defauts to SELECT
+        break;
       }
     } else {
       cmd = req.getParameter("cmd");
@@ -171,14 +178,25 @@ public class HttpParametersWebAgent
         case "put":
           command = Command.put;
           break;
+
+        case "select":
+          command = Command.select;
+          if ( ! SafetyUtil.isEmpty(req.getParameter("id")) ) {
+            parameters.set("id", req.getParameter("id"));
+            logger.debug("id", req.getParameter("id"));
+          }
+          break;
+
         case "remove":
           command = Command.remove;
+          parameters.set("id", req.getParameter("id"));
+          logger.debug("id", req.getParameter("id"));
           break;
+
         case "help":
           command = Command.help;
           resp.setContentType("text/html");
           break;
-          // defaults to SELECT
         }
       } else {
         logger.warning("cmd/method could not be determined, defaulting to SELECT.");

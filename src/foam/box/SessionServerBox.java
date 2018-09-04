@@ -13,7 +13,6 @@ import foam.nanos.auth.*;
 import foam.nanos.boot.NSpec;
 import foam.nanos.logger.*;
 import foam.nanos.session.Session;
-import java.security.AccessControlException;
 import java.util.Date;
 import javax.naming.NoPermissionException;
 import javax.servlet.http.HttpServletRequest;
@@ -58,7 +57,7 @@ public class SessionServerBox
         session.setUses(session.getUses()+1);
 
         if ( authenticate_ && session.getUserId() == 0 ) {
-          msg.replyWithException(new AccessControlException("Not logged in"));
+          msg.replyWithException(new AuthenticationException());
           return;
         }
 

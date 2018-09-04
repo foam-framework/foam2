@@ -28,6 +28,10 @@ public class StringPStream
     this(new Reference<String>());
   }
 
+  public StringPStream(String s) {
+    this(new Reference<>(s));
+  }
+
   public StringPStream(Reference<String> s) {
     this(s, 0);
   }

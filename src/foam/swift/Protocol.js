@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'Protocol',
 
   requires: [
+    'foam.swift.ProtocolMethod',
     'foam.swift.Outputter'
   ],
 
@@ -33,6 +34,10 @@ foam.CLASS({
       factory: function() { return []; }
     },
     {
+      class: 'StringArray',
+      name: 'imports'
+    },
+    {
       class: 'FObjectArray',
       of: 'foam.swift.ProtocolMethod',
       name: 'methods',
@@ -42,6 +47,7 @@ foam.CLASS({
 
   methods: [
     function method(m) {
+      if ( ! foam.core.FObject.isInstance(m) ) m = this.ProtocolMethod.create(m)
       this.methods.push(m);
       return this;
     },
@@ -59,6 +65,7 @@ foam.CLASS({
     function outputSwift(o) {
       o.indent();
       o.out('// GENERATED CODE. DO NOT MODIFY BY HAND.\n');
+      this.imports.forEach(function(i) { o.out('import ', i, '\n') });
       o.out(
         this.visibility,
         this.visibility ? ' ' : '',

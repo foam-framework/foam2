@@ -22,7 +22,7 @@ public class ValidatableValidator
 
   private ValidatableValidator() {}
 
-  public void validate(FObject obj) throws IllegalStateException {
-    ((Validatable)obj).validate();
+  public void validate(X x, FObject obj) throws IllegalStateException {
+    ((Validatable)obj).validate(x);
   }
 }

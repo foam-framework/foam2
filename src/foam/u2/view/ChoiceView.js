@@ -58,8 +58,8 @@ foam.CLASS({
           this.text = this.placeholder;
           this.index = -1;
         } else {
-          this.data  = n && n[0];
-          this.text  = n && n[1];
+          this.data = n && n[0];
+          this.text = n && n[1];
           this.index = this.findIndexOfChoice(n);
         }
         this.feedback_ = false;
@@ -78,6 +78,9 @@ foam.CLASS({
           for ( var key in nu ) {
             if ( nu.hasOwnProperty(key) ) out.push([ key, nu[key] ]);
           }
+          if ( this.dynamicSize ) {
+            this.size = Math.min(out.length, this.maxSize);
+          }
           return out;
         }
 
@@ -90,6 +93,7 @@ foam.CLASS({
           }
         }
 
+        if ( this.dynamicSize ) this.size = Math.min(nu.length, this.maxSize);
         return nu;
       },
     },
@@ -135,7 +139,7 @@ foam.CLASS({
     {
       name: 'data',
       postSet: function(o, n) {
-        if ( o !== n ) this.choice = this.findChoiceByData(n) || [ n, n ];
+        if ( o !== n ) this.choice = this.findChoiceByData(n) || [n, n];
       }
     },
     {
@@ -152,7 +156,27 @@ foam.CLASS({
     },
     'feedback_',
     'defaultValue',
-    'size'
+    {
+      class: 'Int',
+      name: 'size',
+      documentation: `The number of entries in the HTML 'select' element that
+        should be visible.`
+    },
+    {
+      class: 'Boolean',
+      name: 'dynamicSize',
+      documentation: `The size of the select element (ie: the number of entries
+        shown at one time) should match the number of entries in the list. If
+        set to true, the 'size' property will be ignored. However, the 'maxSize'
+        property will still be respected.`
+    },
+    {
+      class: 'Int',
+      name: 'maxSize',
+      documentation: `The size of the select element should never be greater
+        than this number.`,
+      value: Number.MAX_SAFE_INTEGER
+    }
   ],
 
   methods: [
@@ -176,7 +200,7 @@ foam.CLASS({
         choices$: this.choices$,
         placeholder$: this.placeholder$,
         mode$: this.mode$,
-        size: this.size
+        size$: this.size$
       }).end();
 
       this.dao$proxy.on.sub(this.onDAOUpdate);

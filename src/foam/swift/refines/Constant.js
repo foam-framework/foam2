@@ -19,13 +19,20 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftType',
-      value: 'Any?',
+      expression: function(of) {
+        return of ? foam.lookup(of).model_.swiftName : 'Any?';
+      },
+    },
+    {
+      class: 'String',
+      name: 'swiftFactory',
     },
     {
       class: 'String',
       name: 'swiftValue',
-      // TODO adapt the value to swift safe value.
-      value: 'nil',
+      expression: function(value, swiftFactory) {
+        return swiftFactory ? '' : foam.swift.stringify(value);
+      }
     },
   ],
   methods: [
@@ -37,6 +44,7 @@ foam.CLASS({
         static: true,
         final: true,
         defaultValue: this.swiftValue,
+        initializer: this.swiftFactory,
       }));
     },
   ]

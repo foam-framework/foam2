@@ -81,6 +81,9 @@
         margin-left:20px;
         margin-top:10px;
       }
+      ^ .net-nanopay-ui-ActionView:hover {
+        background-color: #d2e2ef;
+      }
       ^ .net-nanopay-ui-ActionView > span {
         height: 40px;
         font-family: Roboto;
@@ -169,7 +172,7 @@
           var self = this;
           self.optionPopup_ = this.PopupView.create({
             width: 205,
-            x: -137,
+            x: -160,
             y: 40
           });
 

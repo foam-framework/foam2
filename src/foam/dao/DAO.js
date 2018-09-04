@@ -316,9 +316,8 @@ foam.INTERFACE({
     },
     {
       name: 'inX',
-      swiftSupport: false,
       returns: 'foam.dao.DAO',
-      args: [ 'x' ]
+      args: [ { name: 'x', swiftType: 'Context' } ]
     },
     {
       name: 'cmd',
