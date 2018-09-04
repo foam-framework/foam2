@@ -367,11 +367,122 @@ foam.CLASS({
   ],
 
   actions: [
-    function toggle() { this.expanded = ! this.expanded; console.log(this.expanded); }
+    function toggle() { this.expanded = ! this.expanded; }
   ]
 });
 
 var sb = FoldingSection.create({title: 'Title'}).style({width: '500px'});
+sb.add('content').br().add('more content');
+sb.write();
+
+
+
+E('br').write();
+E('br').write();
+
+
+
+foam.CLASS({
+  name: 'MDFoldingSection',
+  extends: 'FoldingSection',
+
+  requires: [ 'foam.u2.ActionView' ],
+
+  css: `
+    ^ {
+      border: 1px solid #999;
+      padding-left: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
+    }
+    ^.expanded {
+    }
+    ^control {
+      background: white;
+      display: inline;
+      float: right;
+      height: 30px;
+      position: relative;
+      top: -10px;
+      width: 30px;
+    }
+    ^toolbar {
+      color: #666;
+      display: inline-block;
+      padding: 3px;
+      position: relative;
+      left: -8px;
+      top: 10px;
+      width: 100%;
+    }
+    ^title {
+      background: white;
+      padding: 3px;
+      position: relative;
+      top: -3px;
+    }
+    ^content {
+      background: white;
+      height: 200px;
+      width: 300px;
+    }
+    ^ .foam-u2-ActionView-toggle {
+      transform: rotate(-90deg);
+      transition: transform 0.3s;
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 3px;
+      width: 30px;
+      height: 30px;
+    }
+    ^.expanded .foam-u2-ActionView-toggle {
+      transform: rotate(0deg);
+      transition: transform 0.3s;
+    }
+    ^ .foam-u2-ActionView-toggle:hover {
+      background: transparent;
+    }
+  `,
+/*
+  properties: [
+    'title',
+    {
+      class: 'Boolean',
+      name: 'expanded',
+      value: true
+    }
+  ],
+
+  methods: [
+    function init() {
+      this.
+        addClass(this.myClass()).
+        enableClass('expanded', this.expanded$).
+        start('div').
+          addClass(this.myClass('toolbar')).
+          start('span').
+            addClass(this.myClass('title')).
+            add(this.title$).
+          end().
+          start('div').
+            addClass(this.myClass('control')).
+            tag(this.ActionView, {action: this.TOGGLE, data: this, label: '\u25BD'}).
+          end().
+        end().
+        start('div', null, this.content$).
+          show(this.expanded$).
+          addClass(this.myClass('content')).
+        end();
+    }
+  ],
+
+  actions: [
+    function toggle() { this.expanded = ! this.expanded; console.log(this.expanded); }
+  ]
+  */
+});
+
+var sb = MDFoldingSection.create({title: 'Title'}).style({width: '500px'});
 sb.add('content').br().add('more content');
 sb.write();
 
