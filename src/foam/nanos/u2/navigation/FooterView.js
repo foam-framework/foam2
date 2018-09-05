@@ -10,7 +10,7 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   documentation: 'View to display footer, including copyright label',
-  
+
   requires: [
     'foam.u2.PopupView',
     'foam.u2.dialog.Popup',
@@ -84,13 +84,13 @@ foam.CLASS({
   `,
 
   methods: [
-    function initE(){
+    function initE() {
       this.SUPER();
 
       this
         .addClass(this.myClass())
         .start('div').addClass('col').addClass('mini-links')
-          .start(this.GO_TO,{ label$: this.appConfig.urlLabel$ }).end()
+          .start(this.GO_TO, { label$: this.appConfig.urlLabel$ }).end()
           .add('|')
           .start(this.GO_TO_TERM, { label$: this.appConfig.termsAndCondLabel$ }).end()
           .add('|')
@@ -99,11 +99,14 @@ foam.CLASS({
           .start().addClass('mode').add(this.appConfig.mode$.map(function(m) { return m.label; }), ' version: ', this.appConfig.version$).end()
         .end()
         .start('div').addClass('col').addClass('copyright-label')
-          .start('p').add(this.appConfig.copyright$).end()
-        .end()
-
-        
-
+          .start('p').add(this.appConfig.copyright$.map(function(str) {
+            str = str.replace(/@\{(\w+)\}/g, function() {
+              var date = new Date();
+              return date.getFullYear();
+            });
+            return str;
+          })).end()
+        .end();
     },
     function openTermsModal() {
       this.add(this.Popup.create().tag({ class: this.appConfig.termsAndCondLink, exportData$: this.appConfig.version$ }));
@@ -113,7 +116,7 @@ foam.CLASS({
   actions: [
      {
       name: 'goTo',
-      label:'',
+      label: '',
       code: function(X) {
         this.window.location.assign(X.appConfig.url);
       }
@@ -122,7 +125,7 @@ foam.CLASS({
       name: 'goToTerm',
       label: '',
       code: function(X) {
-        X.openTermsModal()
+        X.openTermsModal();
       }
     },
     {
