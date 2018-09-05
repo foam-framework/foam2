@@ -331,22 +331,24 @@ foam.LIB({
         cls.implements = [ 'foam.core.FObject' ];
       }
 
-      cls.fields.push(foam.java.ClassInfo.create({ id: this.id }));
+      if ( this.model_.name !== 'AbstractFObject' ) {
+        cls.fields.push(foam.java.ClassInfo.create({ id: this.id }));
 
-      cls.method({
-        name: 'getClassInfo',
-        type: 'foam.core.ClassInfo',
-        visibility: 'public',
-        body: 'return classInfo_;'
-      });
+        cls.method({
+          name: 'getClassInfo',
+          type: 'foam.core.ClassInfo',
+          visibility: 'public',
+          body: 'return classInfo_;'
+        });
 
-      cls.method({
-        name: 'getOwnClassInfo',
-        visibility: 'public',
-        static: true,
-        type: 'foam.core.ClassInfo',
-        body: 'return classInfo_;'
-      });
+        cls.method({
+          name: 'getOwnClassInfo',
+          visibility: 'public',
+          static: true,
+          type: 'foam.core.ClassInfo',
+          body: 'return classInfo_;'
+        });
+      }
 
       var axioms = this.getOwnAxioms();
 
@@ -864,7 +866,9 @@ foam.CLASS({
     },
     ['javaInfoType', 'foam.core.AbstractEnumPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.IntParser()'],
-    ['javaCSVParser', 'new foam.lib.json.IntParser()']
+    ['javaCSVParser', 'new foam.lib.json.IntParser()'],
+    ['javaJSONOutput', `getOrdinal(value)`],
+    'javaFromJSON'
   ],
 
   methods: [
@@ -911,8 +915,23 @@ foam.CLASS({
             type: 'Object'
           }
         ],
-        body: `outputter.output(getOrdinal(value));`
+        body: `outputter.output(${this.javaJSONOutput});`
       });
+
+      if ( this.javaFromJSON !== undefined) {
+        info.method({
+          name: 'fromJSON',
+          visibility: 'public',
+          type: 'Object',
+          args: [
+            {
+              name: 'value',
+              type: 'String'
+            }
+          ],
+          body: `return ${this.of.id}.forLabel(value);`
+        });
+      }
 
       info.method({
         name: 'toCSV',
