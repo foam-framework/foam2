@@ -11,6 +11,7 @@
 // Alternatively, containers can create explicit content areas like
 // 'leftPane', 'rightPane', 'header', etc.
 
+// Copy 'E' out of root context for convenience.
 var E = foam.__context__.E.bind(foam.__context__);
 
 // Note that this is just a simple Tab view for demonstration purposes.
@@ -277,16 +278,16 @@ foam.CLASS({
       padding: 10px;
     }
     ^title {
-      vertical-align: top;
       background: white;
       color: #666;
       display: inline;
       padding: 3px;
+      vertical-align: top;
       width: 33%;
     }
     ^content {
-      display: inline-block;
       background: white;
+      display: inline-block;
       height: 200px;
       width: 66%;
     }
