@@ -848,7 +848,8 @@ foam.CLASS({
     ['javaInfoType', 'foam.core.AbstractEnumPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.IntParser()'],
     ['javaCSVParser', 'new foam.lib.json.IntParser()'],
-    ['javaJSONOutput', `getOrdinal(value)`]
+    ['javaJSONOutput', `getOrdinal(value)`],
+    'javaFromJSON'
   ],
 
   methods: [
@@ -880,7 +881,6 @@ foam.CLASS({
         ],
         body: `return ${this.of.id}.forOrdinal(ordinal);`
       });
-      
 
       info.method({
         name: 'toJSON',
@@ -898,6 +898,21 @@ foam.CLASS({
         ],
         body: `outputter.output(${this.javaJSONOutput});`
       });
+
+      if ( this.javaFromJSON !== undefined) {
+        info.method({
+          name: 'fromJSON',
+          visibility: 'public',
+          type: 'Object',
+          args: [
+            {
+              name: 'value',
+              type: 'String'
+            }
+          ],
+          body: `return ${this.of.id}.forLabel(value);`
+        });
+      }
 
       info.method({
         name: 'toCSV',
