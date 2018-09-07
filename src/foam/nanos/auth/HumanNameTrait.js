@@ -66,6 +66,7 @@ foam.INTERFACE({
           ? getFirstName() + " " + getMiddleName() + " " + getLastName()
           : getFirstName() + " " + getLastName();
       `,
+      visibility: foam.u2.Visibility.RO
     }
   ]
 });
