@@ -31,6 +31,8 @@ public class UserAndGroupAuthService
   protected DAO groupDAO_;
   protected DAO sessionDAO_;
 
+  private final String PermissionPrivilege_ = "permission.privilege.*";
+
   // pattern used to check if password has only alphanumeric characters
   java.util.regex.Pattern alphanumeric = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");
 
@@ -172,10 +174,10 @@ public class UserAndGroupAuthService
     in permission attributed to it by checking their group.
     No check on User and group enabled flags.
   */
-  public Boolean checkUserPermission(foam.core.X x, User user, String permission) {
+  public boolean checkUserPermission(foam.core.X x, User user, Permission permission) {
     // check whether user has permission to check user permissions
-    if ( ! check(x, permissionCheckPrivilege_) ) {
-      return false;
+    if ( ! check(x, PermissionPrivilege_) ) {
+      throw new AuthenticationException();
     }
 
     if ( user == null || permission == null ) {
@@ -206,12 +208,12 @@ public class UserAndGroupAuthService
 
     return false;
   }
-  
+
   /**
    * Check if the user in the context supplied has the right permission
    * Return Boolean for this
    */
-  public Boolean checkPermission(foam.core.X x, Permission permission) {
+  public boolean checkPermission(foam.core.X x, Permission permission) {
     if ( x == null || permission == null ) {
       return false;
     }
@@ -257,8 +259,12 @@ public class UserAndGroupAuthService
     return false;
   }
 
-  public Boolean check(foam.core.X x, String permission) {
+  public boolean check(foam.core.X x, String permission) {
     return checkPermission(x, new AuthPermission(permission));
+  }
+
+  public boolean checkUser(foam.core.X x, User user, String permission) {
+    return checkUserPermission(x, user, new AuthPermission(permission));
   }
 
   /**

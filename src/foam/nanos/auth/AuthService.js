@@ -110,6 +110,27 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'checkUser',
+      javaReturns: 'Boolean',
+      swiftReturns: 'Bool',
+      swiftThrows: true,
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X',
+          swiftType: 'Context'
+        },
+        {
+          name: 'user',
+          javaType: 'foam.nanos.auth.User'
+        },
+        {
+          name: 'permission',
+          javaType: 'String',
+        }
+      ]
+    },
+    {
       name: 'checkUserPermission',
       javaReturns: 'Boolean',
       swiftReturns: 'Bool',
@@ -126,7 +147,24 @@ foam.INTERFACE({
         },
         {
           name: 'permission',
-          javaType: 'String'
+          javaType: 'java.security.Permission'
+        }
+      ]
+    },
+    {
+      name: 'check',
+      javaReturns: 'Boolean',
+      swiftReturns: 'Bool',
+      swiftThrows: true,
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X',
+          swiftType: 'Context'
+        },
+        {
+          name: 'permission',
+          javaType: 'String',
         }
       ]
     },
