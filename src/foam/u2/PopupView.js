@@ -76,13 +76,13 @@ foam.CLASS({
         bg.remove();
       };
 
-      if ( ! this.padding ) this.padding = 20;
-      if ( ! this.y       ) this.y = (parent.el().clientHeight - this.height)/2;
-      if ( ! this.x       ) this.x = (parent.el().clientWidth  - this.width )/2;
-      if ( this.width     ) this.style({width    : this.width     + 'px'});
-      if ( this.height    ) this.style({height   : this.height    + 'px'});
-      if ( this.maxWidth  ) this.style({maxWidth : this.maxWidth  + 'px'});
-      if ( this.maxHeight ) this.style({maxHeight: this.maxHeight + 'px'});
+      if ( this.padding == null   ) this.padding = 20;
+      if ( this.y == null         ) this.y = (parent.el().clientHeight - this.height)/2;
+      if ( this.x == null         ) this.x = (parent.el().clientWidth  - this.width )/2;
+      if ( this.width != null     ) this.style({ width     : this.width     + 'px' });
+      if ( this.height != null    ) this.style({ height    : this.height    + 'px' });
+      if ( this.maxWidth != null  ) this.style({ maxWidth  : this.maxWidth  + 'px' });
+      if ( this.maxHeight != null ) this.style({ maxHeight : this.maxHeight + 'px' });
 
       // Make a full-screen transparent background, which when clicked,
       // closes this Popup
