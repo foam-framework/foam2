@@ -168,6 +168,46 @@ public class UserAndGroupAuthService
   }
 
   /**
+    Checks if the user passed into the method has the passed
+    in permission attributed to it by checking their group.
+    No check on User and group enabled flags.
+  */
+  public Boolean checkUserPermission(foam.core.X x, User user, String permission) {
+    // check whether user has permission to check user permissions
+    if ( ! check(x, permissionCheckPrivilege_) ) {
+      return false;
+    }
+
+    if ( user == null || permission == null ) {
+      return false;
+    }
+
+    try {
+      String groupId = (String) user.getGroup();
+
+      while ( ! SafetyUtil.isEmpty(groupId) ) {
+        Group group = (Group) groupDAO_.find(groupId);
+
+        // if group is null break
+        if ( group == null ) {
+          break;
+        }
+
+        // check permission
+        if ( group.implies(new AuthPermission(permission)) ) {
+          return true;
+        }
+
+        // check parent group
+        groupId = group.getParent();
+      }
+    } catch (Throwable t) {
+    }
+
+    return false;
+  }
+  
+  /**
    * Check if the user in the context supplied has the right permission
    * Return Boolean for this
    */
