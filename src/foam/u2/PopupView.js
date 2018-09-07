@@ -22,14 +22,38 @@ foam.CLASS({
 
   css: `
     ^ {
-      background: #999;
-      box-shadow: 3px 3px 6px 0 gray;
-      color: white;
-      font-size: 18px;
-      opacity: 0.9;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
       position: absolute;
       box-sizing: border-box;
+      box-shadow: 0px 0px 100px rgba(0,0,0,.1);
+      text-align: center;
       z-index: 999;
+    }
+
+    ^:before, ^:after {
+      content: ' ';
+      height: 0;
+      position: absolute;
+      width: 0;
+      border: 10px solid transparent;
+    }
+
+    ^:before {
+      border-bottom-color: #fff;
+      position: absolute;
+      top: -20px;
+      left: calc(50% - 10px);
+      z-index: 2;
+    }
+
+    ^:after {
+      border-bottom-color: #ddd;
+      position: absolute;
+      top: -21px;
+      left: calc(50% - 10px);
+      z-index: 1;
     }
   `,
 
