@@ -31,7 +31,7 @@ public class UserAndGroupAuthService
   protected DAO groupDAO_;
   protected DAO sessionDAO_;
 
-  private final String PermissionPrivilege_ = "permission.privilege.*";
+  public final static String CHECK_USER_PERMISSION = "permission.privilege.*";
 
   // pattern used to check if password has only alphanumeric characters
   java.util.regex.Pattern alphanumeric = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");
@@ -176,8 +176,8 @@ public class UserAndGroupAuthService
   */
   public boolean checkUserPermission(foam.core.X x, User user, Permission permission) {
     // check whether user has permission to check user permissions
-    if ( ! check(x, PermissionPrivilege_) ) {
-      throw new AuthenticationException();
+    if ( ! check(x, CHECK_USER_PERMISSION) ) {
+      throw new AuthorizationException();
     }
 
     if ( user == null || permission == null ) {
@@ -196,7 +196,7 @@ public class UserAndGroupAuthService
         }
 
         // check permission
-        if ( group.implies(new AuthPermission(permission)) ) {
+        if ( group.implies(permission) ) {
           return true;
         }
 
