@@ -111,7 +111,7 @@ foam.INTERFACE({
     },
     {
       name: 'checkUser',
-      javaReturns: 'Boolean',
+      javaReturns: 'boolean',
       swiftReturns: 'Bool',
       swiftThrows: true,
       args: [
@@ -132,7 +132,7 @@ foam.INTERFACE({
     },
     {
       name: 'checkUserPermission',
-      javaReturns: 'Boolean',
+      javaReturns: 'boolean',
       swiftReturns: 'Bool',
       swiftThrows: true,
       args: [
@@ -152,25 +152,8 @@ foam.INTERFACE({
       ]
     },
     {
-      name: 'check',
-      javaReturns: 'Boolean',
-      swiftReturns: 'Bool',
-      swiftThrows: true,
-      args: [
-        {
-          name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
-        },
-        {
-          name: 'permission',
-          javaType: 'String',
-        }
-      ]
-    },
-    {
       name: 'checkPermission',
-      javaReturns: 'Boolean',
+      javaReturns: 'boolean',
       swiftReturns: 'Bool',
       swiftThrows: true,
       args: [
@@ -187,7 +170,7 @@ foam.INTERFACE({
     },
     {
       name: 'check',
-      javaReturns: 'Boolean',
+      javaReturns: 'boolean',
       swiftReturns: 'Bool',
       swiftThrows: true,
       args: [
