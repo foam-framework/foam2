@@ -20,7 +20,20 @@ foam.CLASS({
   name: 'Input',
   extends: 'foam.u2.View',
 
-  css: '^:read-only { border: none; background: rgba(0,0,0,0); }',
+  css: `
+    ^:read-only {
+      border: none;
+      background: rgba(0,0,0,0);
+    }
+
+    input.invalid {
+      border-color: red;
+    }
+  `,
+
+  requires: [
+    'foam.u2.PopupView'
+  ],
 
   properties: [
     [ 'nodeName', 'input' ],
@@ -32,6 +45,19 @@ foam.CLASS({
           this.warn('Set Input data to non-primitive:' + d);
           return o;
         }
+
+        if ( typeof this.validateValue === 'function' && o != undefined ) {
+          var message = this.validateValue(d);
+          if ( message != null ) {
+            var popup = this.PopupView.create({ y: 32 });
+            popup.add(message);
+            this.parentNode.add(popup);
+            this.addClass('invalid');
+          } else {
+            this.removeClass('invalid');
+          }
+        }
+
         return d;
       }
       /*
@@ -56,7 +82,22 @@ foam.CLASS({
       // documentation: 'When set, will limit the length of the input to a certain number'
     },
     'type',
-    'placeholder'
+    'placeholder',
+    {
+      name: 'validationCheck',
+      documentation: `
+        This should be set to a function that takes a value and validates it. If
+        the value is invalid, the function should return a string containing a
+        message telling the user about the invalid value. If the argument is
+        valid, the function should not return anything, which is the same as
+        returning undefined.
+
+        Usually instead of setting this directly, you will define a
+        'validateObj' function on a property. Doing that will automatically set
+        this property to the validateObj function you defined on the property.
+      `,
+      value: function() {}
+    }
   ],
 
   methods: [

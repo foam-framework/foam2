@@ -43,6 +43,10 @@ foam.CLASS({
       if ( prop.visibility ) {
         this.visibility = prop.visibility;
       }
+
+      if ( prop.validateObj ) {
+        this.validateValue = prop.validateObj;
+      }
     }
   ]
 });
