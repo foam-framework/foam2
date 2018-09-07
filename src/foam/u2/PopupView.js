@@ -107,7 +107,7 @@ foam.CLASS({
         }).
         onunload.sub(close);
 
-      parent.style({position: 'relative'});
+      parent.style({ position: 'relative' });
     }
   ]
 });
