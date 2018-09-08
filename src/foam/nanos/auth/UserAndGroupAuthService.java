@@ -31,6 +31,8 @@ public class UserAndGroupAuthService
   protected DAO groupDAO_;
   protected DAO sessionDAO_;
 
+  public final static String CHECK_USER_PERMISSION = "service.auth.checkUser";
+
   // pattern used to check if password has only alphanumeric characters
   java.util.regex.Pattern alphanumeric = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");
 
@@ -168,10 +170,50 @@ public class UserAndGroupAuthService
   }
 
   /**
+    Checks if the user passed into the method has the passed
+    in permission attributed to it by checking their group.
+    No check on User and group enabled flags.
+  */
+  public boolean checkUserPermission(foam.core.X x, User user, Permission permission) {
+    // check whether user has permission to check user permissions
+    if ( ! check(x, CHECK_USER_PERMISSION) ) {
+      throw new AuthorizationException();
+    }
+
+    if ( user == null || permission == null ) {
+      return false;
+    }
+
+    try {
+      String groupId = (String) user.getGroup();
+
+      while ( ! SafetyUtil.isEmpty(groupId) ) {
+        Group group = (Group) groupDAO_.find(groupId);
+
+        // if group is null break
+        if ( group == null ) {
+          break;
+        }
+
+        // check permission
+        if ( group.implies(permission) ) {
+          return true;
+        }
+
+        // check parent group
+        groupId = group.getParent();
+      }
+    } catch (Throwable t) {
+    }
+
+    return false;
+  }
+
+  /**
    * Check if the user in the context supplied has the right permission
    * Return Boolean for this
    */
-  public Boolean checkPermission(foam.core.X x, Permission permission) {
+  public boolean checkPermission(foam.core.X x, Permission permission) {
     if ( x == null || permission == null ) {
       return false;
     }
@@ -217,8 +259,12 @@ public class UserAndGroupAuthService
     return false;
   }
 
-  public Boolean check(foam.core.X x, String permission) {
+  public boolean check(foam.core.X x, String permission) {
     return checkPermission(x, new AuthPermission(permission));
+  }
+
+  public boolean checkUser(foam.core.X x, User user, String permission) {
+    return checkUserPermission(x, user, new AuthPermission(permission));
   }
 
   /**
