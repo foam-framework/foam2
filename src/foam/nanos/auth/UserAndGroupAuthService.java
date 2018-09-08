@@ -31,7 +31,7 @@ public class UserAndGroupAuthService
   protected DAO groupDAO_;
   protected DAO sessionDAO_;
 
-  public final static String CHECK_USER_PERMISSION = "permission.privilege.*";
+  public final static String CHECK_USER_PERMISSION = "service.auth.checkUser";
 
   // pattern used to check if password has only alphanumeric characters
   java.util.regex.Pattern alphanumeric = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");
