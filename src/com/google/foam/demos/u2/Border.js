@@ -669,6 +669,11 @@ var cols = E().
     start(Column).add('column 2 contents').br().add('and more content').end().
     start(Column).add('column 3 contents').br().add('and more content').end().
   end().
+  start(Tabs).
+    start(Tab, {label: 'Tab 1'}).add('tab 1 contents').end().
+    start(Tab, {label: 'Tab 2'}).add('tab 2 contents').end().
+    start(Tab, {label: 'Tab 3'}).add('Even more contents in tab 3').end().
+  end().
   start(foam.u2.Tabs).
     start(foam.u2.Tab, {label: 'Tab 1'}).add('tab 1 contents').end().
     start(foam.u2.Tab, {label: 'Tab 2'}).add('tab 2 contents').end().
