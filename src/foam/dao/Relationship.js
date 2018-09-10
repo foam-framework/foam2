@@ -402,7 +402,7 @@ foam.CLASS({
       name: 'add',
       args: [{ name: 'target', of: 'foam.core.FObject' }],
       javaCode: `getJunctionDAO()
-              .put(createJunction(((foam.core.Identifiable)target)
+              .put_(getX(), createJunction(((foam.core.Identifiable)target)
               .getPrimaryKey()));`,
       swiftCode: `_ = try junctionDAO!
               .put(createJunction((target as? foam_core_Identifiable)?
@@ -414,7 +414,7 @@ foam.CLASS({
     {
       name: 'remove',
       javaCode: `getJunctionDAO()
-              .remove(createJunction(((foam.core.Identifiable)target)
+              .remove_(getX(), createJunction(((foam.core.Identifiable)target)
               .getPrimaryKey()));`,
       swiftCode: `_ = try junctionDAO!
               .remove(createJunction((target as? foam_core_Identifiable)?
