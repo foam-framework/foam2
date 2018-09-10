@@ -258,6 +258,7 @@ var classes = [
   'foam.nanos.http.HttpParameters',
   'foam.nanos.dig.DIG',
   'foam.nanos.dig.DUG',
+  'foam.nanos.dig.SUGAR',
 
   'foam.nanos.jetty.HttpServer',
   'foam.nanos.servlet.ServletMapping',
