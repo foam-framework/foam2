@@ -205,6 +205,8 @@ foam.CLASS({
     function output(out) {},
     function load() {},
     function unload() {},
+    function onLoad() {},
+    function onUnload() {},
     function onRemove() {},
     function onSetClass() {},
     function onFocus() {},
@@ -240,16 +242,18 @@ foam.CLASS({
 
   methods: [
     function output(out) {
-      console.error('Outputting unloaded element can cause event/binding bugs.', this.cls_.id);
       this.state = this.OUTPUT;
       this.output_(out);
       return out;
     },
+    function onLoad(f) {
+      this.onload.sub(f);
+    },
+    function onUnload(f) {
+      f();
+    },
     function load() {
       this.error('Must output before loading.');
-    },
-    function unload() {
-      this.error('Must output and load before unloading.');
     },
     function toString() { return 'UNLOADED'; }
   ]
@@ -266,9 +270,7 @@ foam.CLASS({
   methods: [
     function output(out) {
       this.initE();
-      this.state = this.OUTPUT;
-      this.output_(out);
-      return out;
+      return this.SUPER(out);
     },
     function toString() { return 'INITIAL'; }
   ]
@@ -347,6 +349,15 @@ foam.CLASS({
       return this.UNLOADED.output.call(this, out);
     },
     function load() { this.error('Duplicate load.'); },
+    function onLoad(f) {
+      f();
+    },
+    function onUnload(f) {
+      this.onunload.sub(function(s) {
+        s.detach();
+        f();
+      });
+    },
     function unload() {
       if ( ! this.parentNode || this.parentNode.state === this.LOADED ) {
         var e = this.el();
@@ -454,6 +465,7 @@ foam.CLASS({
     function toString() { return 'LOADED'; }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2',
@@ -917,6 +929,21 @@ foam.CLASS({
       this.onDetach(this.visitChildren.bind(this, 'detach'));
     },
 
+    function detach() {
+      this.unload();
+      this.SUPER();
+    },
+
+    function whileLoaded(f) {
+      this.onLoad(function() {
+        var s = f();
+        if ( ! s ) {
+          console.warn("whileLoaded() function did not return a subscription:", f.toString());
+        }
+        this.onUnload(function() { s.detach(); });
+      }.bind(this));
+    },
+
     function initE() {
       /*
         Template method for adding addtion element initialization
@@ -934,12 +961,13 @@ foam.CLASS({
       });
       var config = { attributes: true, childList: true, characterData: true };
 
-      this.onload.sub(function(s) {
+      this.onLoad(function(s) {
         observer.observe(self.el(), config);
+        this.onUnload.sub(function(s) {
+          observer.disconnect()
+        });
       });
-      this.onunload.sub(function(s) {
-        observer.disconnect()
-      });
+
       return this;
     },
 
@@ -1243,6 +1271,8 @@ foam.CLASS({
 
     function replaceChild(newE, oldE) {
       /* Replace current child oldE with newE. */
+      if ( newE === oldE ) return;
+
       var cs = this.childNodes;
       for ( var i = 0 ; i < cs.length ; ++i ) {
         if ( cs[i] === oldE ) {
@@ -1466,7 +1496,12 @@ foam.CLASS({
       return c;
     },
 
-    function end() {
+    function end(opt_name) {
+      if ( opt_name ) {
+        foam.assert(foam.String.toUpperCase(opt_name) === this.nodeName,
+                    'Mis-matched .end() call');
+      }
+
       /* Return this Element's parent. Used to terminate a start(). */
       return this.parentNode;
     },
@@ -1478,6 +1513,10 @@ foam.CLASS({
         this.add_(arguments, this);
       }
       return this;
+    },
+
+    function addAll(array) {
+      return this.add.apply(this, array);
     },
 
     function toE() {
@@ -1589,8 +1628,6 @@ foam.CLASS({
         sink: sink
       });
 
-      this.onDetach(slot);
-
       return slot;
     },
 
@@ -1649,8 +1686,11 @@ foam.CLASS({
         delegate: listener
       }, this);
 
-      this.onDetach(dao.listen(listener));
-      listener.delegate.paint();
+      this.whileLoaded(function() {
+        var s = dao.listen(listener);
+        listener.delegate.paint();
+        return s;
+      });
 
       return this;
     },
@@ -1832,14 +1872,6 @@ foam.CLASS({
         // So that it can be located later.
         if ( e === undefined || e === null || e === '' ) {
           e = self.E('SPAN');
-        } else if ( Array.isArray(e) ) {
-          if ( e.length ) {
-            if ( typeof e[0] === 'string' ) {
-              e[0] = self.E('SPAN').add(e[0]);
-            }
-          } else {
-            e = self.E('SPAN');
-          }
         } else if ( ! foam.u2.Element.isInstance(e) ) {
           e = self.E('SPAN').add(e);
         }
@@ -1849,30 +1881,25 @@ foam.CLASS({
         return e;
       }
 
-      var e = nextE();
+      var prev = nextE();
       var l = function() {
         if ( self.state !== self.LOADED ) {
-          s && s.detach();
           return;
         }
-        var first = Array.isArray(e) ? e[0] : e;
-        var tmp = self.E();
-        self.insertBefore(tmp, first);
-        if ( Array.isArray(e) ) {
-          for ( var i = 0 ; i < e.length ; i++ ) { e[i].remove(); e[i].detach(); }
-        } else {
-          if ( e.state === e.LOADED ) { e.remove(); e.detach(); }
-        }
-        var e2 = nextE();
-        self.insertBefore(e2, tmp);
-        tmp.remove();
-        e = e2;
+        var next = nextE();
+        self.replaceChild(next, prev);
+        prev = next;
       };
 
-      var s = slot.sub(this.framed(l));
-      this.onDetach(s);
+      var first = true;
+      l = this.framed(l);
+      this.whileLoaded(function() {
+        if ( first ) first = false;
+        else l();
+        return slot.sub(l);
+      }.bind(this));
 
-      return e;
+      return prev;
     },
 
     function addEventListener_(topic, listener) {
