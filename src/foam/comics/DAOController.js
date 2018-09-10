@@ -102,6 +102,14 @@ foam.CLASS({
       documentation: `Used internally to keep track of whether the search panel
         is currently hidden or not.`,
       value: false
+    },
+    {
+      name: 'searchColumns',
+      documentation: `
+        Lets you pick which properties on the model should be used as search
+        filters. You should set the search columns on the model itself and only
+        set this property when you want to override the ones set on the model.
+      `
     }
   ],
 
