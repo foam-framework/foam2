@@ -101,24 +101,33 @@ foam.CLASS({
     {
       name: 'dao',
       factory: () => this.menuDAO
-    }
+    },
+    'welcome'
   ],
 
   methods: [
     function initE() {
       this
         .addClass(this.myClass())
+        .start('div', null, this.welcome$)
+          .add('Welcome').addClass('welcome-label').hide(this.loginSuccess$)
+        .end();
+
+      this.user.id$.sub(this.userLoggedIn);
+    }
+  ],
+
+  listeners: [
+    function userLoggedIn() {
+      this.welcome.remove();
+      this
         .start()
           .addClass('logged-in-container')
-          .show(this.loginSuccess$)
           .tag({ class: 'foam.nanos.u2.navigation.BusinessLogoView' })
           .start({ class: 'foam.nanos.menu.MenuBar' })
             .addClass('menuBar')
           .end()
           .tag({ class: 'foam.nanos.u2.navigation.UserView' })
-        .end()
-        .start()
-          .add('Welcome').addClass('welcome-label').hide(this.loginSuccess$)
         .end();
     }
   ]
