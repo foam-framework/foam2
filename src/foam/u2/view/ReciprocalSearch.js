@@ -15,7 +15,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'dao'
+    'dao',
+    'searchColumns'
   ],
 
   exports: [
@@ -95,10 +96,12 @@ foam.CLASS({
       class: 'Array',
       name: 'filters',
       factory: null,
-      expression: function(dao) {
+      expression: function(dao, searchColumns) {
         var of = dao && dao.of;
 
         if ( ! of ) return [];
+
+        if ( searchColumns ) return searchColumns;
 
         if ( of.model_.searchColumns ) return of.model_.searchColumns;
 

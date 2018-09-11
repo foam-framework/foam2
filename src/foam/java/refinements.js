@@ -331,24 +331,22 @@ foam.LIB({
         cls.implements = [ 'foam.core.FObject' ];
       }
 
-      if ( this.model_.name !== 'AbstractFObject' ) {
-        cls.fields.push(foam.java.ClassInfo.create({ id: this.id }));
+      cls.fields.push(foam.java.ClassInfo.create({ id: this.id }));
 
-        cls.method({
-          name: 'getClassInfo',
-          type: 'foam.core.ClassInfo',
-          visibility: 'public',
-          body: 'return classInfo_;'
-        });
+      cls.method({
+        name: 'getClassInfo',
+        type: 'foam.core.ClassInfo',
+        visibility: 'public',
+        body: 'return classInfo_;'
+      });
 
-        cls.method({
-          name: 'getOwnClassInfo',
-          visibility: 'public',
-          static: true,
-          type: 'foam.core.ClassInfo',
-          body: 'return classInfo_;'
-        });
-      }
+      cls.method({
+        name: 'getOwnClassInfo',
+        visibility: 'public',
+        static: true,
+        type: 'foam.core.ClassInfo',
+        body: 'return classInfo_;'
+      });
 
       var axioms = this.getOwnAxioms();
 
@@ -866,9 +864,7 @@ foam.CLASS({
     },
     ['javaInfoType', 'foam.core.AbstractEnumPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.IntParser()'],
-    ['javaCSVParser', 'new foam.lib.json.IntParser()'],
-    ['javaJSONOutput', `getOrdinal(value)`],
-    'javaFromJSON'
+    ['javaCSVParser', 'new foam.lib.json.IntParser()']
   ],
 
   methods: [
@@ -915,23 +911,8 @@ foam.CLASS({
             type: 'Object'
           }
         ],
-        body: `outputter.output(${this.javaJSONOutput});`
+        body: `outputter.output(getOrdinal(value));`
       });
-
-      if ( this.javaFromJSON !== undefined) {
-        info.method({
-          name: 'fromJSON',
-          visibility: 'public',
-          type: 'Object',
-          args: [
-            {
-              name: 'value',
-              type: 'String'
-            }
-          ],
-          body: `return ${this.of.id}.forLabel(value);`
-        });
-      }
 
       info.method({
         name: 'toCSV',
@@ -1105,6 +1086,17 @@ foam.CLASS({
     ['javaType', 'java.util.List'],
     ['javaFactory', 'return new java.util.ArrayList();'],
     ['javaJSONParser', 'new foam.lib.json.ListParser()']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+
+      var getValueClass = info.getMethod('getValueClass');
+      getValueClass.body = 'return java.util.List.class;';
+
+      return info;
+    }
   ]
 });
 
@@ -1310,6 +1302,12 @@ foam.CLASS({
       name: 'javaType',
       expression: function(of) {
         return of + '[]';
+      }
+    },
+    {
+      name: 'javaFactory',
+      expression: function(of) {
+        return `return new ${of}[0];`;
       }
     },
     {
