@@ -191,7 +191,7 @@ foam.CLASS({
     [
       'assertValue',
       function(value, prop) {
-        foam.assert(typeof value === 'function', prop.name, 'Cannot set to non function type.');
+        foam.assert(typeof value === 'function', `The value of property '${prop.name}' must be a function. It was set to ${value}. The type of ${value} is '${typeof value}', not 'function'.`);
       }
     ]
   ]
