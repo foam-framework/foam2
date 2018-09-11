@@ -108,15 +108,14 @@ foam.CLASS({
     {
       name: 'dao',
       factory: () => this.menuDAO
-    },
-    'welcome'
+    }
   ],
 
   methods: [
     function initE() {
       this
         .addClass(this.myClass())
-        .start('div', null, this.welcome$)
+        .start()
           .addClass('welcome-label')
           .hide(this.loginSuccess$)
           .add(this.Greeting)
@@ -128,7 +127,6 @@ foam.CLASS({
 
   listeners: [
     function userLoggedIn() {
-      this.welcome.remove();
       this
         .start()
           .addClass('logged-in-container')
