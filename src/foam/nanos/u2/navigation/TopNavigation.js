@@ -97,6 +97,13 @@ foam.CLASS({
     }
   `,
 
+  messages: [
+    {
+      name: 'Greeting',
+      message: 'Welcome'
+    }
+  ],
+
   properties: [
     {
       name: 'dao',
@@ -110,7 +117,9 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start('div', null, this.welcome$)
-          .add('Welcome').addClass('welcome-label').hide(this.loginSuccess$)
+          .addClass('welcome-label')
+          .hide(this.loginSuccess$)
+          .add(this.Greeting)
         .end();
 
       this.user.id$.sub(this.userLoggedIn);
