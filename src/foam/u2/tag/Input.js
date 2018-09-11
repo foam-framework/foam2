@@ -46,7 +46,7 @@ foam.CLASS({
           return o;
         }
 
-        if ( typeof this.validateValue === 'function' && o != undefined ) {
+        if ( o != undefined ) {
           var message = this.validateValue(d);
           if ( message != null ) {
             var popup = this.PopupView.create({ y: 32 });
@@ -84,7 +84,8 @@ foam.CLASS({
     'type',
     'placeholder',
     {
-      name: 'validationCheck',
+      class: 'Function',
+      name: 'validateValue',
       documentation: `
         This should be set to a function that takes a value and validates it. If
         the value is invalid, the function should return a string containing a
@@ -95,8 +96,7 @@ foam.CLASS({
         Usually instead of setting this directly, you will define a
         'validateObj' function on a property. Doing that will automatically set
         this property to the validateObj function you defined on the property.
-      `,
-      value: function() {}
+      `
     }
   ],
 
