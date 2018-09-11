@@ -54,6 +54,7 @@ foam.CLASS({
       label: 'Total',
       tableCellFormatter: {
         class: {
+          implements: [ 'foam.u2.view.Formatter' ],
           requires: [ 'foam.nanos.pm.TemperatureCView' ],
           methods: [
             function format(e, value, obj, axiom) {

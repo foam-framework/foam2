@@ -27,13 +27,7 @@ foam.CLASS({
       name: 'send',
       code: function send(msg) {
         var self = this;
-
-        // TODO: if I get an AuthException the call the requestLogin
-        // handler then retry once it finishes.
-        // console.log('************************* REPLY: ', foam.json.stringify(msg));
-        // Exception looks like this:
-        // {class:"foam.box.Message",attributes:{},object:{class:"foam.box.RPCErrorMessage",data:{class:"foam.box.RemoteException",id:"java.security.AccessControlException",message:"not logged in"}}}
-        if ( this.RPCErrorMessage.isInstance(msg.object) && msg.object.data.id === 'java.security.AccessControlException' ) {
+        if ( this.RPCErrorMessage.isInstance(msg.object) && msg.object.data.id === 'foam.nanos.auth.AuthenticationException' ) {
           this.requestLogin().then(function() {
             self.clientBox.send(self.msg);
           });

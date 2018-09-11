@@ -14,17 +14,16 @@ import java.security.NoSuchAlgorithmException;
 /**
  * HashingOutputStream
  *
- * OutputStream decorator that, given a digest, hashes incoming data before writing it
- * to the underlying OutputStream
+ * OutputStream decorator that hashes all data written to the underlying OutputStream
  */
 public class HashingOutputStream
-    extends OutputStream
+  extends OutputStream
 {
-  protected MessageDigest digest_;
   protected OutputStream os_;
+  protected MessageDigest digest_;
 
   /**
-   * HashingOutputStream constructor using SHA-256 as the default digest
+   * HashingOutputStream constructor using SHA-256 as the default algorithm
    * @param os OutputStream delegate
    * @throws NoSuchAlgorithmException
    */
@@ -33,31 +32,23 @@ public class HashingOutputStream
   }
 
   /**
-   * HashingOutputStream constructor allowing for user specified digest string
-   * @param digest digest string
+   * HashingOutputStream constructor allowing for user specified algorithm
+   * @param algorithm hashing algorithm
    * @param os OutputStream delegate
    * @throws NoSuchAlgorithmException
    */
-  public HashingOutputStream(String digest, OutputStream os) throws NoSuchAlgorithmException {
-    this(MessageDigest.getInstance(digest), os);
+  public HashingOutputStream(String algorithm, OutputStream os) throws NoSuchAlgorithmException {
+    this(MessageDigest.getInstance(algorithm), os);
   }
 
   /**
-   * HashingOutputStream constructor allowing for user specified digest object
+   * HashingOutputStream constructor allowing for user specified digest
    * @param digest digest object
    * @param os OutputStream delegate
    */
   public HashingOutputStream(MessageDigest digest, OutputStream os) {
     os_ = os;
     digest_ = digest;
-  }
-
-  /**
-   * Returns the current value of the digest
-   * @return digest as a byte array
-   */
-  public byte[] digest() {
-    return digest_.digest();
   }
 
   @Override
@@ -75,5 +66,20 @@ public class HashingOutputStream
   @Override
   public void close() throws IOException {
     os_.close();
+  }
+
+  /**
+   * Returns the output of the hash function
+   * @return hash function output
+   */
+  public byte[] digest() {
+    return digest_.digest();
+  }
+
+  /**
+   * Resets the digest
+   */
+  public void reset() {
+    digest_.reset();
   }
 }

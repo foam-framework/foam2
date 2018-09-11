@@ -129,10 +129,30 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public void validate(FObject obj) throws IllegalStateException {}
+  public void validate(X x, FObject obj) throws IllegalStateException {}
+
+  @Override
+  public boolean includeInDigest() {
+    return true;
+  }
 
   @Override
   public void updateDigest(FObject obj, MessageDigest md) {}
+
+  @Override
+  public boolean includeInSignature() {
+    return true;
+  }
+
+  @Override
+  public boolean containsPII(){
+    return false;
+  }
+
+  @Override
+  public boolean containsDeletablePII(){
+    return false;
+  }
 
   @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {}

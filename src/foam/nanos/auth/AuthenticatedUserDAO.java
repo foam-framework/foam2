@@ -15,8 +15,6 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import foam.util.SafetyUtil;
 
-import java.security.AccessControlException;
-
 import static foam.mlang.MLang.EQ;
 
 /**
@@ -97,7 +95,7 @@ public class AuthenticatedUserDAO
 
     // check if logged in
     if ( user == null ) {
-      throw new AccessControlException("User is not logged in");
+      throw new AuthenticationException();
     }
 
     // find user and check if current user has permission to read
@@ -119,7 +117,7 @@ public class AuthenticatedUserDAO
 
     // check if logged in
     if ( user == null ) {
-      throw new AccessControlException("User is not logged in");
+      throw new AuthenticationException();
     }
 
     DAO dao;
@@ -143,7 +141,7 @@ public class AuthenticatedUserDAO
 
     // check if logged in
     if ( user == null ) {
-      throw new AccessControlException("User is not logged in");
+      throw new AuthenticationException();
     }
 
     // check if current user has permission to delete
@@ -165,7 +163,7 @@ public class AuthenticatedUserDAO
 
     // check if logged in
     if ( user == null ) {
-      throw new AccessControlException("User is not logged in");
+      throw new AuthenticationException();
     }
 
     DAO dao;
