@@ -34,13 +34,12 @@ import static foam.mlang.MLang.EQ;
 public class AuthenticatedUserDAO
   extends ProxyDAO
 {
-  public final static String GLOBAL_USER_READ   = "user.read.x";
-  public final static String GLOBAL_USER_UPDATE = "user.update.x";
-  public final static String GLOBAL_USER_DELETE = "user.delete.x";
+  public final static String GLOBAL_USER_READ   = "user.read.*";
+  public final static String GLOBAL_USER_DELETE = "user.delete.*";
 
-  public final static String GLOBAL_SPID_READ   = "spid.read.x";
-  public final static String GLOBAL_SPID_UPDATE = "spid.update.x";
-  public final static String GLOBAL_SPID_DELETE = "spid.delete.x";
+  public final static String GLOBAL_SPID_READ   = "spid.read.*";
+  public final static String GLOBAL_SPID_UPDATE = "spid.update.*";
+  public final static String GLOBAL_SPID_DELETE = "spid.delete.*";
 
   public AuthenticatedUserDAO(X x, DAO delegate) {
     super(x, delegate);
@@ -52,16 +51,21 @@ public class AuthenticatedUserDAO
     AuthService auth    = (AuthService) x.get("auth");
 
     User toPut = (User) obj;
+
+    if ( toPut == null ) {
+      throw new RuntimeException("Cannot put null.");
+    }
+
     boolean updatingSelf = SafetyUtil.equals(toPut.getId(), user.getId());
-    boolean isGlobalAdmin = auth.check(x, GLOBAL_USER_UPDATE);
+    boolean hasUserEditPermission = auth.check(x, "user.update." + toPut.getId());
+
     if (
-      toPut != null &&
       ! updatingSelf &&
-      ! isGlobalAdmin &&
+      ! hasUserEditPermission &&
       ! auth.check(x, GLOBAL_SPID_UPDATE) &&
       ! auth.check(x, "spid.update." + user.getSpid())
     ) {
-      throw new RuntimeException("Unable to update user");
+      throw new AuthorizationException("You do not have permission to update this user.");
     }
 
     // set spid if not set
@@ -70,19 +74,23 @@ public class AuthenticatedUserDAO
       toPut.setSpid(user.getSpid());
     }
 
-    if ( toPut != null ) {
-      User result = (User) super.find_(x, toPut.getId());
-      if (
-        result != null &&
-        ! SafetyUtil.equals(result.getGroup(), toPut.getGroup())
-      ) {
-        if ( updatingSelf ) {
-          throw new RuntimeException("You cannot set your own group.");
-        } else if ( ! isGlobalAdmin ) {
-          throw new RuntimeException("Only administrators may update another user's group.");
-        }
-        // TODO: Handle SPIDs.
+    User result = (User) super.find_(x, toPut.getId());
+
+    if (
+      result != null &&
+      ! SafetyUtil.equals(result.getGroup(), toPut.getGroup())
+    ) {
+      // Are we sure "group.update.whatever" is the best permission for this purpose? I'd expect that to let me edit a
+      // specific group, but not necessarily assign users to it.
+      boolean hasGroupUpdatePermission = auth.check(x, "group.update." + result.getGroup());
+      if ( updatingSelf ) {
+        throw new AuthorizationException("You cannot change your own group.");
+      } else if ( ! hasUserEditPermission ) {
+        throw new AuthorizationException("You do not have permission to change this user's group.");
+      } else if ( ! hasGroupUpdatePermission ) {
+        throw new AuthorizationException("You do not have permission to change a user's group to '" + toPut.getGroup() + "'.");
       }
+      // TODO: Handle SPIDs.
     }
 
     return super.put_(x, toPut);
