@@ -168,6 +168,12 @@ foam.CLASS({
       value: true,
     },
     {
+      class: 'Boolean',
+      name: 'outputDiff',
+      documentation: 'Flag to enable/disable diff\'d output.',
+      value: false
+    },
+    {
       class: 'Object',
       name: 'file',
       javaType: 'java.io.File',
@@ -222,7 +228,7 @@ foam.CLASS({
           writer.newLine();
           return writer;
         } catch ( Throwable t ) {
-          getLogger().error("Failed to write to journal", t);
+          getLogger().error("Failed to create writer", t);
           throw new RuntimeException(t);
         }
       `
@@ -234,13 +240,20 @@ foam.CLASS({
       name: 'put',
       synchronized: true,
       javaCode: `
-        FObject fobj = (FObject) obj;
-        PropertyInfo id = (PropertyInfo) fobj.getClassInfo().getAxiomByName("id");
-        FObject old = getDao().find(id.get(obj));
-        String record = ( old != null ) ?
-          getOutputter().stringifyDelta(old.fclone(), fobj) :
-          getOutputter().stringify(fobj);
-        write_("p(" + record + ")");
+        try {
+          FObject old = null;
+          FObject fobj = (FObject) obj;
+          PropertyInfo id = (PropertyInfo) fobj.getClassInfo().getAxiomByName("id");
+
+          if ( getOutputDiff() && ( old = getDao().find(id.get(obj))) != null ) {
+            write_("p(" + getOutputter().stringifyDelta(old.fclone(), fobj) + ")");
+          } else {
+            write_("p(" + getOutputter().stringify(fobj) + ")");
+          }
+        } catch ( Throwable t ) {
+          getLogger().error("Failed to write to put entry to journal", t);
+          throw new RuntimeException(t);
+        }
       `
     },
     {
@@ -257,6 +270,7 @@ foam.CLASS({
           id.set(toWrite, id.get(obj));
           write_("r(" + getOutputter().stringify(toWrite) + ")");
         } catch ( Throwable t ) {
+          getLogger().error("Failed to write to remove entry to journal", t);
           throw new RuntimeException(t);
         }
       `
@@ -264,6 +278,9 @@ foam.CLASS({
     {
       name: 'write_',
       synchronized: true,
+      javaThrows: [
+        'java.io.IOException'
+      ],
       args: [
         {
           class: 'String',
@@ -271,14 +288,10 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        try {
-          BufferedWriter writer = getWriter();
-          writer.write(data);
-          writer.newLine();
-          writer.flush();
-        } catch ( Throwable t ) {
-          getLogger().error("Failed to write to journal", t);
-        }
+        BufferedWriter writer = getWriter();
+        writer.write(data);
+        writer.newLine();
+        writer.flush();
       `
     },
     {

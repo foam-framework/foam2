@@ -34,7 +34,17 @@ foam.CLASS({
     }
 
     ^ .section {
-      padding: 10px 13px;
+      padding: 13px 16px;
+    }
+
+    ^ .section:first-of-type {
+      display: flex;
+      align-items: center;
+    }
+
+    ^ .section:first-of-type label {
+      position: initial;
+      margin: 0 0 0 8px;
     }
 
     ^ .foam-u2-search-TextSearchView {

@@ -9,15 +9,15 @@ package foam.nanos.http;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.auth.AuthService;
+import foam.nanos.auth.AuthenticationException;
+import foam.nanos.auth.AuthorizationException;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
 
-import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.security.AccessControlException;
 
 /**
  * ProxyWebAgent that checks for a sessionId in the query parameters of the request,
@@ -65,7 +65,7 @@ public class SessionWebAgent
       // check permissions
       session.setContext(session.getContext().put("user", user));
       if ( ! auth.check(session.getContext(), permission_) ) {
-        throw new AccessControlException("Access denied");
+        throw new AuthorizationException();
       }
 
       // execute delegate

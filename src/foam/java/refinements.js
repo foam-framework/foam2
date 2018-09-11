@@ -61,15 +61,23 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'javaSetter'
+    },
+    {
+      class: 'String',
+      name: 'javaPreSet'
+    },
+    {
+      class: 'String',
+      name: 'javaPostSet'
+    },
+    {
+      class: 'String',
       name: 'shortName'
     },
     {
       class: 'StringArray',
       name: 'aliases'
-    },
-    {
-      class: 'String',
-      name: 'javaSetter'
     },
     {
       class: 'String',
@@ -147,17 +155,41 @@ foam.CLASS({
         xmlTextNode:             this.xmlTextNode,
         sqlType:                 this.sqlType,
         includeInDigest:         this.includeInDigest,
-        includeInSignature:      this.includeInSignature
+        includeInSignature:      this.includeInSignature,
+        containsPII:             this.containsPII,
+        containsDeletablePII:    this.containsDeletablePII
       });
     },
 
     function generateSetter_() {
-      return this.javaSetter ? this.javaSetter : `
-        if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
-        assert${foam.String.capitalize(this.name)}(val);
-        ${this.name}_ = val;
-        ${this.name}IsSet_ = true;
-      `;
+      // return user defined setter
+      if ( this.javaSetter ) {
+        return this.javaSetter;
+      }
+
+      var capitalized = foam.String.capitalize(this.name);
+      var setter = `if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");\n`;
+
+      // add value assertion
+      if ( this.javaAssertValue ) {
+        setter += this.javaAssertValue;
+      }
+
+      // add pre-set function
+      if ( this.javaPreSet ) {
+        setter += this.javaPreSet;
+      };
+
+      // set value
+      setter += `${this.name}_ = val;\n`;
+      setter += `${this.name}IsSet_ = true;\n`;
+
+      // add post-set function
+      if ( this.javaPostSet ) {
+        setter += this.javaPostSet;
+      }
+
+      return setter;
     },
 
     function buildJavaClass(cls) {
@@ -221,19 +253,6 @@ foam.CLASS({
         });
       }
 
-      cls.method({
-        name: 'assert' + foam.String.capitalize(this.name),
-        visibility: 'public',
-        args: [
-          {
-            type: this.javaType,
-            name: 'val'
-          }
-        ],
-        type: 'void',
-        body: this.javaAssertValue
-      });
-
       cls.field({
         name: constantize,
         visibility: 'public',
@@ -294,32 +313,42 @@ foam.CLASS({
 
 foam.LIB({
   name: 'foam.core.FObject',
+  flags: ['java'],
   methods: [
     function buildJavaClass(cls) {
       cls = cls || foam.java.Class.create();
 
       cls.name = this.model_.name;
       cls.package = this.model_.package;
-      cls.extends = this.model_.extends === 'FObject' ?
-        'foam.core.AbstractFObject' : this.model_.extends;
       cls.abstract = this.model_.abstract;
 
-      cls.fields.push(foam.java.ClassInfo.create({ id: this.id }));
+      if ( this.model_.name !== 'AbstractFObject' ) {
+        // if not AbstractFObject either extend AbstractFObject or use provided extends property
+        cls.extends = this.model_.extends === 'FObject' ?
+          'foam.core.AbstractFObject' : this.model_.extends;
+      } else {
+        // if AbstractFObject we implement FObject
+        cls.implements = [ 'foam.core.FObject' ];
+      }
 
-      cls.method({
-        name: 'getClassInfo',
-        type: 'foam.core.ClassInfo',
-        visibility: 'public',
-        body: 'return classInfo_;'
-      });
+      if ( this.model_.name !== 'AbstractFObject' ) {
+        cls.fields.push(foam.java.ClassInfo.create({ id: this.id }));
 
-      cls.method({
-        name: 'getOwnClassInfo',
-        visibility: 'public',
-        static: true,
-        type: 'foam.core.ClassInfo',
-        body: 'return classInfo_;'
-      });
+        cls.method({
+          name: 'getClassInfo',
+          type: 'foam.core.ClassInfo',
+          visibility: 'public',
+          body: 'return classInfo_;'
+        });
+
+        cls.method({
+          name: 'getOwnClassInfo',
+          visibility: 'public',
+          static: true,
+          type: 'foam.core.ClassInfo',
+          body: 'return classInfo_;'
+        });
+      }
 
       var axioms = this.getOwnAxioms();
 
@@ -337,17 +366,20 @@ foam.LIB({
           return foam.java.Field.create({ name: p.name, type: p.javaType });
         });
 
-      cls.method({
-        visibility: 'protected',
-        type: 'void',
-        name: 'beforeFreeze',
-        body: 'super.beforeFreeze();\n' + this.getAxiomsByClass(foam.core.Property).
-          filter(function(p) { return !! p.javaType && p.javaInfoType && p.generateJava; }).
-          filter(function(p) { return p.javaFactory; }).
-          map(function(p) {
-            return `get${foam.String.capitalize(p.name)}();`
-          }).join('\n')
-      });
+      if ( this.model_.name !== 'AbstractFObject' ) {
+        // if not AbstractFObject add beforeFreeze method
+        cls.method({
+          visibility: 'public',
+          type: 'void',
+          name: 'beforeFreeze',
+          body: 'super.beforeFreeze();\n' + this.getAxiomsByClass(foam.core.Property).
+            filter(function(p) { return !! p.javaType && p.javaInfoType && p.generateJava; }).
+            filter(function(p) { return p.javaFactory; }).
+            map(function(p) {
+              return `get${foam.String.capitalize(p.name)}();`
+            }).join('\n')
+        });
+      }
 
       if ( this.hasOwnAxiom('id') ) {
         cls.implements = cls.implements.concat('foam.core.Identifiable');
@@ -448,13 +480,16 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'final'
+    },
+    {
+      class: 'Boolean',
       name: 'abstract',
       value: true
     },
     {
       class: 'Boolean',
-      name: 'synchronized',
-      value: false
+      name: 'synchronized'
     },
     {
       class: 'StringArray',
@@ -477,6 +512,7 @@ foam.CLASS({
         type: this.javaReturns || 'void',
         visibility: 'public',
         static: this.isStatic(),
+        final: this.final,
         synchronized: this.synchronized,
         throws: this.javaThrows,
         args: this.args && this.args.map(function(a) {
@@ -830,7 +866,9 @@ foam.CLASS({
     },
     ['javaInfoType', 'foam.core.AbstractEnumPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.IntParser()'],
-    ['javaCSVParser', 'new foam.lib.json.IntParser()']
+    ['javaCSVParser', 'new foam.lib.json.IntParser()'],
+    ['javaJSONOutput', `getOrdinal(value)`],
+    'javaFromJSON'
   ],
 
   methods: [
@@ -877,8 +915,23 @@ foam.CLASS({
             type: 'Object'
           }
         ],
-        body: `outputter.output(getOrdinal(value));`
+        body: `outputter.output(${this.javaJSONOutput});`
       });
+
+      if ( this.javaFromJSON !== undefined) {
+        info.method({
+          name: 'fromJSON',
+          visibility: 'public',
+          type: 'Object',
+          args: [
+            {
+              name: 'value',
+              type: 'String'
+            }
+          ],
+          body: `return ${this.of.id}.forLabel(value);`
+        });
+      }
 
       info.method({
         name: 'toCSV',
@@ -967,7 +1020,7 @@ foam.CLASS({
           if ( o instanceof Number ) {
             return new java.util.Date(((Number) o).longValue());
           } else if ( o instanceof String ) {
-            return sdf.get().parse((String) o);
+            return (java.util.Date) fromString((String) o);
           } else {
             return (java.util.Date) o;
           }
@@ -1003,7 +1056,7 @@ foam.CLASS({
           if ( o instanceof Number ) {
             return new java.util.Date(((Number) o).longValue());
           } else if ( o instanceof String ) {
-            return sdf.get().parse((String) o);
+            return (java.util.Date) fromString((String) o);
           } else {
             return (java.util.Date) o;
           }
@@ -1031,8 +1084,13 @@ foam.CLASS({
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
+
       var compare = info.getMethod('compare');
       compare.body = 'return super.compare(o1, o2);';
+
+      var getValueClass = info.getMethod('getValueClass');
+      getValueClass.body = 'return java.util.Map.class;';
+
       return info;
     }
   ]

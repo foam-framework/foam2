@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.StubMethod',
+  flags: ['java'],
 
   methods: [
     function buildJavaClass(cls) {
@@ -62,6 +63,7 @@ if ( result instanceof foam.box.RPCErrorMessage )
 
 foam.CLASS({
   refines: 'foam.core.StubNotification',
+  flags: ['java'],
 
   methods: [
     function buildJavaClass(cls) {
