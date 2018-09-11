@@ -1313,6 +1313,12 @@ foam.CLASS({
       }
     },
     {
+      name: 'javaFactory',
+      expression: function(of) {
+        return `return new ${of}[0];`;
+      }
+    },
+    {
       name: 'javaJSONParser',
       expression: function(of) {
         var id = of ? of.id ? of.id : of : null;
