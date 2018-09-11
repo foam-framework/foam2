@@ -12,7 +12,6 @@ import foam.util.SafetyUtil;
  * Features:
  *   - If creating a group, you can only give it permissions you already have.
  *   - If updating a group, you can't modify the permissions array to have a permission you don't have.
- *   - If removing a group, you have to have all of the permissions in that group.
  */
 public class AuthenticatedGroupDAO extends ProxyDAO {
   public AuthenticatedGroupDAO(X x, DAO delegate) {
@@ -53,13 +52,6 @@ public class AuthenticatedGroupDAO extends ProxyDAO {
     Group existing = (Group) getDelegate().find_(x, id);
     if ( existing != null ) checkUserHasAllPermissionsInGroup(x, existing);
     checkUserHasAllPermissionsInGroup(x, toPut);
-    return super.put_(x, obj);
-  }
-
-  @Override
-  public FObject remove_(X x, FObject obj) {
-    Group group = (Group) obj;
-    checkUserHasAllPermissionsInGroup(x, group);
     return super.put_(x, obj);
   }
 }
