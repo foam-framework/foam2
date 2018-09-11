@@ -80,8 +80,6 @@ public class AuthenticatedUserDAO
       result != null &&
       ! SafetyUtil.equals(result.getGroup(), toPut.getGroup())
     ) {
-      // Are we sure "group.update.whatever" is the best permission for this purpose? I'd expect that to let me edit a
-      // specific group, but not necessarily assign users to it.
       boolean hasGroupUpdatePermission = auth.check(x, "group.update." + result.getGroup());
       if ( updatingSelf ) {
         throw new AuthorizationException("You cannot change your own group.");
