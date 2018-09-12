@@ -1066,6 +1066,7 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
 
+      // override usage of SafetyUtil.compare with PropertyInfo compare
       var compare = info.getMethod('compare');
       compare.body = 'return super.compare(o1, o2);';
 
@@ -1093,6 +1094,7 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
 
+      // override usage of SafetyUtil.compare with PropertyInfo compare
       var compare = info.getMethod('compare');
       compare.body = 'return super.compare(o1, o2);';
 
