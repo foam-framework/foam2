@@ -29,6 +29,7 @@ public abstract class AbstractListPropertyInfo
     if ( l1.size() < l2.size() ) return -1;
 
     // check if lists are equal, if not return -1 suggesting the 2nd list is newer
-    return ( l1.containsAll(l2) && l2.containsAll(l1) ) ? 0 : -1;
+    if ( l1.containsAll(l2) && l2.containsAll(l2) ) return 0;
+    return Integer.compare(l1.hashCode(), l2.hashCode());
   }
 }
