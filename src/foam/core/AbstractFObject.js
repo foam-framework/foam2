@@ -44,13 +44,13 @@ foam.CLASS({
           public byte[] hash()
             throws NoSuchAlgorithmException
           {
-            return this.hash(null);
+            return this.hash("SHA-256");
           }
 
-          public byte[] hash(byte[] hash)
+          public byte[] hash(String algorithm)
             throws NoSuchAlgorithmException
           {
-            return this.hash("SHA-256", hash);
+            return this.hash(MessageDigest.getInstance(algorithm));
           }
 
           // convenience sign method
@@ -348,15 +348,10 @@ foam.CLASS({
     {
       name: 'hash',
       javaReturns: 'byte[]',
-      javaThrows: [
-        'java.security.NoSuchAlgorithmException'
-      ],
       args: [
-        { class: 'String', name: 'algorithm' },
-        { class: 'Object', name: 'hash', javaType: 'byte[]' },
+        { class: 'Object', name: 'md', javaType: 'java.security.MessageDigest' },
       ],
       javaCode: `
-        MessageDigest md = MessageDigest.getInstance(algorithm);
         List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
         Iterator i = props.iterator();
 
@@ -369,15 +364,6 @@ foam.CLASS({
           prop.updateDigest(this, md);
         }
 
-        // no chaining so return digest
-        if ( hash == null || hash.length == 0 ) {
-          return md.digest();
-        }
-
-        // calculate digest, update with previous hash and current hash
-        byte[] digest = md.digest();
-        md.update(hash);
-        md.update(digest);
         return md.digest();
       `
     },
