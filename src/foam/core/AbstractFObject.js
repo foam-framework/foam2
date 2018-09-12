@@ -57,14 +57,30 @@ foam.CLASS({
           public byte[] sign(PrivateKey key)
             throws NoSuchAlgorithmException, InvalidKeyException, SignatureException
           {
-            return this.sign("SHA256withRSA", key);
+            return this.sign(String.format("SHA256with%s", key.getAlgorithm()), key);
+          }
+
+          public byte[] sign(String algorithm, PrivateKey key)
+            throws NoSuchAlgorithmException, InvalidKeyException, SignatureException
+          {
+            Signature signer = Signature.getInstance(algorithm);
+            signer.initSign(key, SecurityUtil.GetSecureRandom());
+            return this.sign(signer);
           }
 
           // convenience verify method
           public boolean verify(byte[] signature, PublicKey key)
             throws NoSuchAlgorithmException, InvalidKeyException, SignatureException
           {
-            return this.verify(signature, "SHA256withRSA", key);
+            return this.verify(signature, String.format("SHA256with%s", key.getAlgorithm()), key);
+          }
+
+          public boolean verify(byte[] signature, String algorithm, PublicKey key)
+            throws NoSuchAlgorithmException, InvalidKeyException, SignatureException
+          {
+            Signature verifier = Signature.getInstance(algorithm);
+            verifier.initVerify(key);
+            return this.verify(signature, verifier);
           }
         `);
       }
@@ -369,18 +385,12 @@ foam.CLASS({
       name: 'sign',
       javaReturns: 'byte[]',
       javaThrows: [
-        'NoSuchAlgorithmException',
-        'InvalidKeyException',
         'SignatureException'
       ],
       args: [
-        { class: 'String', name: 'algorithm' },
-        { class: 'Object', name: 'key', javaType: 'java.security.PrivateKey' },
+        { class: 'Object', name: 'signer', javaType: 'java.security.Signature' },
       ],
       javaCode: `
-        Signature signer = Signature.getInstance(algorithm);
-        signer.initSign(key, SecurityUtil.GetSecureRandom());
-
         List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
         Iterator i = props.iterator();
         while ( i.hasNext() ) {
@@ -398,19 +408,13 @@ foam.CLASS({
       name: 'verify',
       javaReturns: 'boolean',
       javaThrows: [
-        'NoSuchAlgorithmException',
-        'InvalidKeyException',
         'SignatureException'
       ],
       args: [
         { class: 'Object', name: 'signature', javaType: 'byte[]' },
-        { class: 'String', name: 'algorithm' },
-        { class: 'Object', name: 'key', javaType: 'java.security.PublicKey' },
+        { class: 'Object', name: 'verifier', javaType: 'java.security.Signature' },
       ],
       javaCode: `
-        Signature verifier = Signature.getInstance(algorithm);
-        verifier.initVerify(key);
-
         List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
         Iterator i = props.iterator();
         while ( i.hasNext() ) {
