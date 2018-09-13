@@ -202,22 +202,21 @@ foam.CLASS({
     },
 
     async function setDefaultMenu() {
-      // Don't select default if menu already set
-      if ( this.window.location.hash || ! this.user.group ) return;
-
       var group = await this.client.groupDAO.find(this.user.group);
-
       this.group.copyFrom(group);
+      this.setPortalView(group);
+
       for ( var i = 0; i < this.MACROS.length; i++ ) {
         var m = this.MACROS[i];
         if ( group[m] ) this[m] = group[m];
       }
 
+      // Don't select default if menu already set
+      if ( this.window.location.hash || ! this.user.group ) return;
+
       if ( group && ! this.window.location.hash ) {
         this.window.location.hash = group.defaultMenu;
       }
-
-      this.setPortalView(group);
     },
 
     function getCurrentUser() {
