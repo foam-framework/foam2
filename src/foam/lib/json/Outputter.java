@@ -34,6 +34,7 @@ public class Outputter
   protected PrintWriter   writer_;
   protected OutputterMode mode_;
   protected StringWriter  stringWriter_        = null;
+  protected boolean       outputShortNames_    = false;
   protected boolean       outputDefaultValues_ = false;
   protected boolean       outputClassNames_    = true;
 
@@ -142,7 +143,8 @@ public class Outputter
 
   protected void outputProperty(FObject o, PropertyInfo p) {
     writer_.append(beforeKey_());
-    writer_.append(p.getName());
+    writer_.append(! outputShortNames_ ?
+      p.getName() : p.getShortName());
     writer_.append(afterKey_());
     writer_.append(":");
     p.toJSON(this, p.get(o));
@@ -322,7 +324,8 @@ public class Outputter
     writer_.append(",");
     outputString("name");
     writer_.append(":");
-    outputString(prop.getName());
+    outputString(! outputShortNames_ ?
+      prop.getName() : prop.getShortName());
     writer_.append("}");
   }
 
@@ -362,6 +365,11 @@ public class Outputter
 
   public void outputRawString(String str) {
     writer_.append(str);
+  }
+
+  public Outputter setOutputShortNames(boolean outputShortNames) {
+    outputShortNames_ = outputShortNames;
+    return this;
   }
 
   public Outputter setOutputDefaultValues(boolean outputDefaultValues) {
