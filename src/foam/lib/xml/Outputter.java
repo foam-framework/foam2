@@ -2,20 +2,28 @@ package foam.lib.xml;
 
 import foam.core.*;
 import foam.lib.json.OutputterMode;
-import net.nanopay.iso20022.CreditTransferTransaction25;
-import net.nanopay.iso20022.FIToFICustomerCreditTransferV06;
-import net.nanopay.iso20022.GroupHeader70;
-import net.nanopay.iso20022.Pacs00800106;
+import net.nanopay.iso20022.*;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Outputter
   implements foam.lib.Outputter
 {
+  protected static ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
+    @Override
+    protected SimpleDateFormat initialValue() {
+      SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+      df.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+      return df;
+    }
+  };
+
   protected PrintWriter   writer_;
   protected OutputterMode mode_;
   protected StringWriter  stringWriter_ = null;
@@ -55,7 +63,7 @@ public class Outputter
   @Override
   public String stringify(FObject obj) {
     initWriter();
-    outputFObject(obj);
+    output(obj);
     return this.toString();
   }
 
@@ -96,29 +104,10 @@ public class Outputter
       .filter(propertyInfo -> propertyInfo.getXMLAttribute())
       .collect(Collectors.toList());
 
-    writer_.append("<")
-      .append(o.getClass().getSimpleName());
-
-    // output attributes
-    for ( PropertyInfo prop : attributes ) {
-      Object attr = prop.get(o);
-      if ( attr == null ) continue;
-      writer_.append(" ")
-        .append(prop.getName())
-        .append("=\"")
-        .append(attr.toString())
-        .append("\"");
-    }
-    writer_.append(">");
-
     // output properties
     for ( PropertyInfo prop : properties ) {
       outputProperty_(o, prop);
     }
-
-    writer_.append("</")
-      .append(o.getClass().getSimpleName())
-      .append(">");
   }
 
   protected void outputNumber(Number value) {
@@ -130,7 +119,7 @@ public class Outputter
   }
 
   protected void outputDate(Date value) {
-
+    writer_.append(sdf.get().format(value));
   }
 
   protected void outputEnum(Enum<?> value) {
@@ -151,27 +140,69 @@ public class Outputter
   }
 
   protected void outputProperty(Object value, PropertyInfo prop) {
-    if ( value instanceof FObject[] ) {
-      FObject[] array = (FObject[]) value;
-      for ( int i = 0 ; i < array.length ; i++ ) {
-        prop.toXML(this, array[i]);
-      }
+    if ( value instanceof Object[] ) {
+      outputArrayProperty((Object[]) value, prop);
     } else if ( value instanceof FObject ) {
-      prop.toXML(this, value);
+      outputFObjectProperty((FObject) value, prop);
     } else {
-      outputPrimitive(value, prop);
+      outputPrimitiveProperty(value, prop);
+    }
+  }
+
+  protected void outputArrayProperty(Object[] values, PropertyInfo prop) {
+    for ( Object value : values ) {
+      outputProperty(value, prop);
     }
   }
 
   protected void outputFObjectProperty(FObject value, PropertyInfo prop) {
-    
+    Object xmlValue;
+    if ( ( xmlValue = value.getProperty("xmlValue") ) == null ) {
+      writer_.append("<").append(getPropertyName(prop)).append(">");
+      prop.toXML(this, value);
+      writer_.append("</").append(getPropertyName(prop)).append(">");
+      return;
+    }
+
+    // write property name and attributes
+    writer_.append("<").append(getPropertyName(prop));
+    outputAttributes(value);
+    writer_.append(">");
+
+    if ( xmlValue instanceof FObject ) {
+      prop.toXML(this, value);
+    } else {
+      prop.toXML(this, xmlValue);
+    }
+
+    writer_.append("</").append(getPropertyName(prop)).append(">");
   }
 
-  protected void outputPrimitive(Object value, PropertyInfo prop) {
-    String name = ! outputShortNames_ ? prop.getName() : prop.getShortName();
-    writer_.append("<").append(name).append(">");
+  protected void outputPrimitiveProperty(Object value, PropertyInfo prop) {
+    writer_.append("<").append(getPropertyName(prop)).append(">");
     prop.toXML(this, value);
-    writer_.append("</").append(name).append(">");
+    writer_.append("</").append(getPropertyName(prop)).append(">");
+  }
+
+  protected void outputAttributes(FObject obj) {
+    List<PropertyInfo> attributes = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class)
+      .stream().filter(PropertyInfo::getXMLAttribute)
+      .collect(Collectors.toList());
+
+    for ( PropertyInfo attribute : attributes ) {
+      Object value = attribute.get(obj);
+      if ( value == null ) continue;
+
+      writer_.append(" ")
+        .append(getPropertyName(attribute))
+        .append("=\"");
+      output(value);
+      writer_.append("\"");
+    }
+  }
+
+  protected String getPropertyName(PropertyInfo prop) {
+    return ! outputShortNames_ ? prop.getName() : prop.getShortName();
   }
 
   public Outputter setOutputShortNames(boolean outputShortNames) {
@@ -205,6 +236,10 @@ public class Outputter
     Pacs00800106 pacs008 = new Pacs00800106.Builder(x)
       .setFIToFICstmrCdtTrf(new FIToFICustomerCreditTransferV06.Builder(x)
         .setGroupHeader(new GroupHeader70.Builder(x)
+          .setTotalInterbankSettlementAmount(new ActiveCurrencyAndAmount.Builder(x)
+            .setCcy("USD")
+            .setXmlValue(100.0)
+            .build())
           .setCreationDateTime(new Date())
           .setControlSum(100.0)
           .setBatchBooking(true)
