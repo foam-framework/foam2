@@ -76,8 +76,6 @@ public class SessionServerBox
           sessionDAO.put(session);
         }
 
-        if ( user != null ) sessionDAO.put(session);
-
         msg.getLocalAttributes().put("x", x);
       }
     } catch (Throwable t) {
