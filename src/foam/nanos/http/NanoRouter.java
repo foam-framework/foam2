@@ -13,13 +13,11 @@ import foam.core.XFactory;
 import foam.dao.DAO;
 import foam.dao.SessionDAOSkeleton;
 import foam.nanos.NanoService;
-import foam.nanos.app.AppConfig;
 import foam.nanos.boot.NSpec;
 import foam.nanos.boot.NSpecAware;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 import foam.nanos.pm.PMWebAgent;
-import org.eclipse.jetty.server.Request;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -66,9 +64,6 @@ public class NanoRouter
     PM       pm         = new PM(this.getClass(), serviceKey);
 
     resp.setContentType("text/html");
-
-    AppConfig appConfig = (AppConfig) getX().get("appConfig");
-    appConfig.setUrl(((Request) req).getRootURL().toString());
 
     try {
       if ( serv == null ) {
