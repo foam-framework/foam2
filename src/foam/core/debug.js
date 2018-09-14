@@ -281,17 +281,9 @@ foam.CLASS({
 
   methods: [
     function unknownArg(key, value) {
-      if ( key == 'class' ) return;
-
       // Temporarily disable warnings related to generating Java code.
-      var blackList = [
-        'javaThrows',
-        'javaReturns',
-        'javaCode'
-      ];
-      if ( ! blackList.some((keyword) => key.includes(keyword)) ) {
-        this.warn('Unknown property ' + this.cls_.id + '.' + key + ': ' + value);
-      }
+      if ( key == 'class' || key.startsWith('java') ) return;
+      this.warn('Unknown property ' + this.cls_.id + '.' + key + ': ' + value);
     },
 
     function describe(opt_name) {
