@@ -30,9 +30,6 @@ public abstract class AbstractObjectPropertyInfo
   }
 
   @Override
-  public void toXML(FObject obj, Document dom, Element objElement) { }
-
-  @Override
   public boolean hardDiff(FObject o1, FObject o2, FObject diff) {
     //if both this.get(o1) and this.get(o2) are null, then no difference
     //if one is null and the other one is not null, then difference
