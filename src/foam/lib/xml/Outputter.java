@@ -164,8 +164,8 @@ public class Outputter
   }
 
   protected void outputFObjectProperty(FObject value, PropertyInfo prop) {
-    Object xmlValue;
-    if ( ( xmlValue = value.getProperty("xmlValue") ) == null ) {
+    Object text;
+    if ( ( text = value.getProperty("text") ) == null ) {
       writer_.append("<").append(getPropertyName(prop)).append(">");
       outputProperties_(value);
       writer_.append("</").append(getPropertyName(prop)).append(">");
@@ -177,10 +177,10 @@ public class Outputter
     outputAttributes(value);
     writer_.append(">");
 
-    if ( xmlValue instanceof FObject ) {
+    if ( text instanceof FObject ) {
       prop.toXML(this, value);
     } else {
-      prop.toXML(this, xmlValue);
+      prop.toXML(this, text);
     }
 
     writer_.append("</").append(getPropertyName(prop)).append(">");
