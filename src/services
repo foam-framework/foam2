@@ -15,7 +15,7 @@ p({"class":"foam.nanos.boot.NSpec", "name":"uptime",                           "
 p({"class":"foam.nanos.boot.NSpec", "name":"static",                           "lazy":true,  "serve":false, "authenticate": false, "serviceClass":"foam.nanos.http.FileWebAgent"})
 p({"class":"foam.nanos.boot.NSpec", "name":"images",                           "lazy":true,  "serve":false, "authenticate": false, "serviceScript":"return new foam.nanos.http.FileWebAgent(\"NANOPAY/nanopay/src/net/nanopay/images\");"})
 p({"class":"foam.nanos.boot.NSpec", "name":"export",                           "lazy":true,  "serve":false, "serviceClass":"foam.nanos.export.ExportService"})
-p({"class":"foam.nanos.boot.NSpec", "name":"trace",                            "lazy":true,  "serve":false, "parameters":true, "serviceClass":"foam.nanos.http.TraceWebAgent"})
+p({"class":"foam.nanos.boot.NSpec", "name":"trace",                            "lazy":true,  "serve":false, "authenticate": false, "parameters":true, "serviceClass":"foam.nanos.http.TraceWebAgent"})
 p({"class":"foam.nanos.boot.NSpec", "name":"services",                         "lazy":true,  "serve":false, "serviceClass":"foam.nanos.http.ServicesWebAgent"})
 p({"class":"foam.nanos.boot.NSpec", "name":"threadPool",                       "lazy":false,  "serve":false, "serviceClass":"foam.nanos.pool.FixedThreadPool"})
 p({"class":"foam.nanos.boot.NSpec", "name":"testDAO",                          "lazy":true,  "serve":true,  "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.GUIDDAO(new foam.nanos.script.ScriptRunnerDAO(new foam.dao.java.JDAO(x, foam.nanos.test.Test.getOwnClassInfo(), \"tests\"))));", "client":"{\"of\":\"foam.nanos.test.Test\"}"})

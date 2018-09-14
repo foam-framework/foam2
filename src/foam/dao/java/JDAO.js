@@ -10,11 +10,11 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   javaImports: [
-    'foam.dao.*',
     'foam.core.ClassInfo',
-    'foam.core.FObject',
     'foam.core.X',
+    'foam.dao.*',
     'foam.nanos.auth.LastModifiedByAware',
+    
     'java.text.SimpleDateFormat',
     'java.util.Calendar',
     'java.util.TimeZone'
@@ -51,11 +51,11 @@ foam.CLASS({
 
           // TODO: These convenience constructors should be removed and done using the facade pattern.
           public JDAO(X x, ClassInfo classInfo, String filename) {
-            this(x, new MapDAO(classInfo), filename);
+            this(x, new foam.dao.MDAO(classInfo), filename);
           }
 
           public JDAO(X x, ClassInfo classInfo, String filename, boolean outputDiff) {
-            this(x, new MapDAO(classInfo), filename, outputDiff);
+            this(x, new foam.dao.MDAO(classInfo), filename, outputDiff);
           }
 
           public JDAO(X x, DAO delegate, String filename) {

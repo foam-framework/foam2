@@ -248,11 +248,9 @@ var classes = [
   'foam.nanos.fs.File',
 
   'foam.crypto.hash.Hasher',
-  'foam.crypto.hash.Hashable',
   'foam.crypto.hash.HashableTest',
 
   'foam.crypto.sign.Signer',
-  'foam.crypto.sign.Signable',
   'foam.crypto.sign.SignableTest',
 
   'foam.nanos.http.Command',
