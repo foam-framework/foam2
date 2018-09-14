@@ -2,6 +2,7 @@ package foam.lib.xml;
 
 import foam.core.*;
 import foam.lib.json.OutputterMode;
+import foam.util.SafetyUtil;
 import net.nanopay.iso20022.*;
 import org.apache.commons.io.IOUtils;
 
@@ -203,7 +204,8 @@ public class Outputter
   }
 
   protected String getPropertyName(PropertyInfo prop) {
-    return ! outputShortNames_ ? prop.getName() : prop.getShortName();
+    return outputShortNames_ && ! SafetyUtil.isEmpty(prop.getShortName()) ?
+      prop.getShortName() : prop.getName();
   }
 
   public Outputter setOutputShortNames(boolean outputShortNames) {
@@ -226,39 +228,5 @@ public class Outputter
   @Override
   public String toString() {
     return ( stringWriter_ != null ) ? stringWriter_.toString() : null;
-  }
-
-  public static void main(String[] args) {
-    X x = EmptyX.instance();
-
-    Outputter outputter = new Outputter(OutputterMode.STORAGE)
-      .setOutputShortNames(true);
-
-    Pacs00800106 pacs008 = new Pacs00800106.Builder(x)
-      .setFIToFICstmrCdtTrf(new FIToFICustomerCreditTransferV06.Builder(x)
-        .setGroupHeader(new GroupHeader70.Builder(x)
-          .setTotalInterbankSettlementAmount(new ActiveCurrencyAndAmount.Builder(x)
-            .setCcy("USD")
-            .setXmlValue(100.0)
-            .build())
-          .setCreationDateTime(new Date())
-          .setControlSum(100.0)
-          .setBatchBooking(true)
-          .setNumberOfTransactions("2")
-          .build())
-        .setCreditTransferTransactionInformation(new CreditTransferTransaction25[]{
-          new CreditTransferTransaction25.Builder(x)
-            .setAcceptanceDateTime(new Date())
-            .setExchangeRate(100.0)
-            .build(),
-          new CreditTransferTransaction25.Builder(x)
-            .setAcceptanceDateTime(new Date())
-            .setExchangeRate(125.0)
-            .build()
-        })
-        .build())
-      .build();
-
-    System.out.println(outputter.stringify(pacs008));
   }
 }
