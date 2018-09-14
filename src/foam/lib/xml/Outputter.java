@@ -1,16 +1,22 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.lib.xml;
 
-import foam.core.*;
+import foam.core.ClassInfo;
+import foam.core.FObject;
+import foam.core.PropertyInfo;
 import foam.lib.json.OutputterMode;
 import foam.util.SafetyUtil;
-import net.nanopay.iso20022.*;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Outputter
