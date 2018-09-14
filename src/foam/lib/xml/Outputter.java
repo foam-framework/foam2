@@ -94,20 +94,10 @@ public class Outputter
     writer_.append(s);
   }
 
-  protected void outputFObject(FObject o) {
-    ClassInfo info = o.getClassInfo();
-    List<PropertyInfo> properties = info.getAxiomsByClass(PropertyInfo.class).stream()
-      .filter(propertyInfo -> ! propertyInfo.getXMLAttribute())
-      .collect(Collectors.toList());
-
-    List<PropertyInfo> attributes = info.getAxiomsByClass(PropertyInfo.class).stream()
-      .filter(propertyInfo -> propertyInfo.getXMLAttribute())
-      .collect(Collectors.toList());
-
-    // output properties
-    for ( PropertyInfo prop : properties ) {
-      outputProperty_(o, prop);
-    }
+  protected void outputFObject(FObject obj) {
+    writer_.append("<").append(obj.getClass().getSimpleName()).append(">");
+    outputProperties_(obj);
+    writer_.append("</").append(obj.getClass().getSimpleName()).append(">");
   }
 
   protected void outputNumber(Number value) {
@@ -124,6 +114,17 @@ public class Outputter
 
   protected void outputEnum(Enum<?> value) {
     writer_.append(value.name());
+  }
+
+  protected void outputProperties_(FObject obj) {
+    // output properties
+    ClassInfo info = obj.getClassInfo();
+    List<PropertyInfo> properties = info.getAxiomsByClass(PropertyInfo.class).stream()
+      .filter(propertyInfo -> ! propertyInfo.getXMLAttribute())
+      .collect(Collectors.toList());
+    for ( PropertyInfo prop : properties ) {
+      outputProperty_(obj, prop);
+    }
   }
 
   protected void outputProperty_(FObject obj, PropertyInfo prop) {
@@ -159,7 +160,7 @@ public class Outputter
     Object xmlValue;
     if ( ( xmlValue = value.getProperty("xmlValue") ) == null ) {
       writer_.append("<").append(getPropertyName(prop)).append(">");
-      prop.toXML(this, value);
+      outputProperties_(value);
       writer_.append("</").append(getPropertyName(prop)).append(">");
       return;
     }
