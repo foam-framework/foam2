@@ -1057,8 +1057,8 @@ foam.CLASS({
 
   properties: [
     ['javaType', 'java.util.Map'],
-    ['javaJSONParser', 'new foam.lib.json.MapParser()'],
     ['javaInfoType', 'foam.core.AbstractMapPropertyInfo'],
+    ['javaJSONParser', 'new foam.lib.json.MapParser()'],
     ['javaFactory', 'return new java.util.HashMap();']
   ],
 
@@ -1066,6 +1066,7 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
 
+      // override usage of SafetyUtil.compare with PropertyInfo compare
       var compare = info.getMethod('compare');
       compare.body = 'return super.compare(o1, o2);';
 
@@ -1084,13 +1085,18 @@ foam.CLASS({
 
   properties: [
     ['javaType', 'java.util.List'],
+    ['javaInfoType', 'foam.core.AbstractListPropertyInfo'],
+    ['javaJSONParser', 'new foam.lib.json.ListParser()'],
     ['javaFactory', 'return new java.util.ArrayList();'],
-    ['javaJSONParser', 'new foam.lib.json.ListParser()']
   ],
 
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
+
+      // override usage of SafetyUtil.compare with PropertyInfo compare
+      var compare = info.getMethod('compare');
+      compare.body = 'return super.compare(o1, o2);';
 
       var getValueClass = info.getMethod('getValueClass');
       getValueClass.body = 'return java.util.List.class;';
