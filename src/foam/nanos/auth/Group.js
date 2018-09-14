@@ -111,6 +111,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.app.AppConfig',
     'foam.nanos.session.Session',
+    'foam.util.SafetyUtil',
     'org.eclipse.jetty.server.Request',
     'javax.servlet.http.HttpServletRequest'
   ],
@@ -160,7 +161,7 @@ Session session = x.get(Session.class);
 if ( session != null ) {
   User user = (User) userDAO.find(session.getUserId());
   if ( user != null ) {
-    if ( this.getUrl() != null ) {
+    if ( ! SafetyUtil.isEmpty(this.getUrl()) ) {
       //populate AppConfig url with group url
       config.setUrl(this.getUrl());
     } else {
