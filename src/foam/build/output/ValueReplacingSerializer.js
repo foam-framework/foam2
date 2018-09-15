@@ -11,54 +11,25 @@ foam.CLASS({
   implements: [
     'foam.mlang.Expressions'
   ],
-  requires: [
-    'foam.core.Argument',
-    'foam.core.EnumModel',
-    'foam.core.Export',
-    'foam.core.Implements',
-    'foam.core.Import',
-    'foam.core.InnerClass',
-    'foam.core.InnerEnum',
-    'foam.core.InterfaceModel',
-    'foam.core.Method',
-    'foam.core.Model',
-    'foam.core.Property',
-    'foam.core.Requires',
-    'foam.core.internal.EnumValueAxiom',
-    'foam.core.internal.InterfaceMethod',
-    'foam.dao.Relationship',
+  exports: [
+    'chain',
   ],
-  classes: [
-    {
-      name: 'Replacer',
-      properties: [
-        {
-          class: 'String',
-          name: 'description',
-        },
-        {
-          class: 'FObjectArray',
-          of: 'foam.mlang.predicate.Predicate',
-          name: 'where',
-        },
-        {
-          class: 'Function',
-          name: 'adapt',
-        },
-      ],
-      methods: [
-        function f(chain) {
-          var v = chain[chain.length - 1];
-          if ( chain.length < this.where.length ) return false;
-
-          for ( var i = 0 ; i < this.where.length ; i++ ) {
-            if ( ! this.where[i].f(chain[chain.length - 1 - i]) ) return false;
-          }
-
-          return true;
-        },
-      ],
-    },
+  requires: [
+    'foam.build.output.replacer.ArgumentClassStrip',
+    'foam.build.output.replacer.EnumModelClassStrip',
+    'foam.build.output.replacer.EnumValueAxiomReplacer',
+    'foam.build.output.replacer.ExportsNameOnlyReplacer',
+    'foam.build.output.replacer.ImplementsPathOnlyReplacer',
+    'foam.build.output.replacer.ImportsPathOnlyReplacer',
+    'foam.build.output.replacer.InterfaceMethodClassStrip',
+    'foam.build.output.replacer.InterfaceModelClassStrip',
+    'foam.build.output.replacer.MethodClassStrip',
+    'foam.build.output.replacer.MethodJsCodeOnlyReplacer',
+    'foam.build.output.replacer.ModelClassStrip',
+    'foam.build.output.replacer.PropertyClassStrip',
+    'foam.build.output.replacer.PropertyNameOnlyReplace',
+    'foam.build.output.replacer.RelationshipClassStrip',
+    'foam.build.output.replacer.RequiresPathOnlyReplacer',
   ],
   properties: [
     {
@@ -66,255 +37,33 @@ foam.CLASS({
       name: 'chain',
     },
     {
+      class: 'FObjectArray',
+      of: 'foam.build.output.Replacer',
       name: 'rules',
       factory: function() {
-        var self = this;
-        var stripClass = function(v) {
-          var ret = {};
-          v.cls_.getAxiomsByClass(foam.core.Property).forEach(function(a) {
-            if ( v.hasDefaultValue(a.name) ) return;
-            if ( a.transient ) return;
-            ret[a.name] = v[a.name];
-          });
-          return ret;
-        }
         return [
-          this.Replacer.create({
-            description: 'Collapse properties with just a name into just a string',
-            where: [
-              self.AND(
-                self.IS_TYPE(self.Property),
-                self.HAS_ONLY_PROPERTIES(['name'])
-              ),
-              self.FUNC(foam.Array.isInstance),
-              self.AND(
-                self.INSTANCE_OF(self.Model),
-                self.FUNC(function(v) {
-                  return v.properties == self.chain[self.chain.length-2]
-                })
-              )
-            ],
-            adapt: function(v) { return v.name },
-          }),
-          this.Replacer.create({
-            description: 'Collapse implements with just path to just a string',
-            where: [
-              self.AND(
-                self.IS_TYPE(self.Implements),
-                self.HAS_ONLY_PROPERTIES(['path'])
-              ),
-              self.FUNC(foam.Array.isInstance),
-              self.AND(
-                self.INSTANCE_OF(self.Model),
-                self.FUNC(function(v) {
-                  return v.implements == self.chain[self.chain.length-2]
-                })
-              )
-            ],
-            adapt: function(v) { return v.path },
-          }),
-          this.Replacer.create({
-            description: 'Collapse requires with just path to just a string',
-            where: [
-              self.AND(
-                self.IS_TYPE(self.Requires),
-                self.HAS_ONLY_PROPERTIES(['path', 'name']),
-                self.FUNC(function(v) {
-                  return v.name == v.path.split('.').pop();
-                })
-              ),
-              self.FUNC(foam.Array.isInstance),
-              self.AND(
-                self.INSTANCE_OF(self.Model),
-                self.FUNC(function(v) {
-                  return v.requires == self.chain[self.chain.length-2]
-                })
-              )
-            ],
-            adapt: function(v) { return v.path },
-          }),
-          this.Replacer.create({
-            description: 'Collapse imports with just path to just a string',
-            where: [
-              self.AND(
-                self.IS_TYPE(self.Import),
-                self.FUNC(function(v) {
-                  return v.name == v.key && v.slotName_ == foam.String.toSlotName(v.name)
-                })
-              ),
-              self.FUNC(foam.Array.isInstance),
-              self.AND(
-                self.INSTANCE_OF(self.Model),
-                self.FUNC(function(v) {
-                  return v.imports == self.chain[self.chain.length-2]
-                })
-              )
-            ],
-            adapt: function(v) { return v.key + (v.required ? '' : '?') },
-          }),
-          this.Replacer.create({
-            description: 'Collapse methods with just js into only the function',
-            where: [
-              self.AND(
-                self.IS_TYPE(self.Method),
-                self.HAS_ONLY_PROPERTIES(['name', 'code']),
-                self.FUNC(function(v) {
-                  return v.code && v.name == v.code.name
-                })
-              ),
-              self.FUNC(foam.Array.isInstance),
-              self.AND(
-                self.INSTANCE_OF(self.Model),
-                self.FUNC(function(v) {
-                  return v.methods == self.chain[self.chain.length-2]
-                })
-              )
-            ],
-            adapt: function(v) {
-              return v.code
-            },
-          }),
-          this.Replacer.create({
-            description: 'Remove class from EnumValueAxioms',
-            where: [
-              self.IS_TYPE(self.EnumValueAxiom),
-              self.FUNC(foam.Array.isInstance),
-              self.AND(
-                self.INSTANCE_OF(self.EnumModel),
-                self.FUNC(function(v) {
-                  return v.values == self.chain[self.chain.length-2]
-                })
-              )
-            ],
-            adapt: stripClass,
-          }),
-          this.Replacer.create({
-            description: 'Remove class from interface methods',
-            where: [
-              self.IS_TYPE(self.InterfaceMethod),
-              self.FUNC(foam.Array.isInstance),
-              self.AND(
-                self.INSTANCE_OF(self.InterfaceModel),
-                self.FUNC(function(v) {
-                  return v.methods == self.chain[self.chain.length-2]
-                })
-              )
-            ],
-            adapt: stripClass,
-          }),
-          this.Replacer.create({
-            description: 'Remove class from methods',
-            where: [
-              self.IS_TYPE(self.Method),
-              self.FUNC(foam.Array.isInstance),
-              self.AND(
-                self.INSTANCE_OF(self.Model),
-                self.FUNC(function(v) {
-                  return v.methods == self.chain[self.chain.length-2]
-                })
-              )
-            ],
-            adapt: stripClass,
-          }),
-          this.Replacer.create({
-            description: 'Remove class from properties',
-            where: [
-              self.IS_TYPE(self.Property),
-              self.FUNC(foam.Array.isInstance),
-              self.AND(
-                self.INSTANCE_OF(self.Model),
-                self.FUNC(function(v) {
-                  return v.properties == self.chain[self.chain.length-2]
-                })
-              )
-            ],
-            adapt: stripClass,
-          }),
-          this.Replacer.create({
-            description: 'Remove class from arguments',
-            where: [
-              self.IS_TYPE(self.Argument),
-              self.FUNC(foam.Array.isInstance),
-              self.AND(
-                self.INSTANCE_OF(self.Method),
-                self.FUNC(function(v) {
-                  return v.args == self.chain[self.chain.length-2]
-                })
-              )
-            ],
-            adapt: stripClass,
-          }),
-          this.Replacer.create({
-            description: 'Remove class from top level models',
-            where: [
-              self.AND(
-                self.IS_TYPE(self.Model),
-                self.FUNC(function(v) {
-                  return self.chain.length == 1
-                })
-              )
-            ],
-            adapt: stripClass,
-          }),
-          this.Replacer.create({
-            description: 'Remove class from top level relationships',
-            where: [
-              self.AND(
-                self.IS_TYPE(self.Relationship),
-                self.FUNC(function(v) {
-                  return self.chain.length == 1
-                })
-              )
-            ],
-            adapt: stripClass,
-          }),
-          this.Replacer.create({
-            description: 'Remove class from top level interfaces',
-            where: [
-              self.AND(
-                self.IS_TYPE(self.InterfaceModel),
-                self.FUNC(function(v) {
-                  return self.chain.length == 1
-                })
-              )
-            ],
-            adapt: stripClass,
-          }),
-          this.Replacer.create({
-            description: 'Remove class from top level enums',
-            where: [
-              self.AND(
-                self.IS_TYPE(self.EnumModel),
-                self.FUNC(function(v) {
-                  return self.chain.length == 1
-                })
-              )
-            ],
-            adapt: stripClass,
-          }),
+          this.ArgumentClassStrip.create(),
+          this.EnumModelClassStrip.create(),
+          this.EnumValueAxiomReplacer.create(),
+          this.ExportsNameOnlyReplacer.create(),
+          this.ImplementsPathOnlyReplacer.create(),
+          this.ImportsPathOnlyReplacer.create(),
+          this.InterfaceMethodClassStrip.create(),
+          this.InterfaceModelClassStrip.create(),
+          this.ModelClassStrip.create(),
+          this.RelationshipClassStrip.create(),
+          this.RequiresPathOnlyReplacer.create(),
+
+          this.MethodJsCodeOnlyReplacer.create(),
+          this.MethodClassStrip.create(),
+
+          this.PropertyNameOnlyReplace.create(),
+          this.PropertyClassStrip.create(),
         ];
       },
     },
   ],
   methods: [
-    function HAS_ONLY_PROPERTIES(keys) {
-      var keyMap = {};
-      keys.forEach(function(k) { keyMap[k] = true });
-      return this.FUNC(function(v) {
-        var axioms = v.cls_.getAxiomsByClass(foam.core.Property);
-        for ( var i = 0 ; i < axioms.length ; i++ ) {
-          if ( v.hasOwnProperty(axioms[i].name) &&
-               ! keyMap[axioms[i].name] )
-            return false;
-        }
-        return true;
-      })
-    },
-    function IS_TYPE(cls) {
-      return this.FUNC(function(v) {
-        return v && v.cls_ && v.cls_.id == cls.id
-      })
-    },
     function output(x, v) {
       this.chain.push(v)
 
