@@ -1,6 +1,7 @@
 foam.CLASS({
   package: 'demo.build',
   name: 'ModelToBuild',
+  imports: ['foo?'],
   requires: [
     {
       path: 'foam.swift.parse.json.output.Outputter',
