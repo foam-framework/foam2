@@ -24,10 +24,11 @@ foam.CLASS({
         ]
       },
     },
-  ],
-  methods: [
-    function adapt(v) {
-      return v.definition;
+    {
+      name: 'adapt',
+      value: function(v) {
+        return v.definition;
+      },
     },
   ],
 });

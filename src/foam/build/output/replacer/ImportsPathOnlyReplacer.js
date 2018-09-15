@@ -28,10 +28,11 @@ foam.CLASS({
         ];
       },
     },
-  ],
-  methods: [
-    function adapt(v) {
-      return v.key + (v.required ? '' : '?')
-    }
+    {
+      name: 'adapt',
+      value: function(v) {
+        return v.key + (v.required ? '' : '?')
+      },
+    },
   ],
 });

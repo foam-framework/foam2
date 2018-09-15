@@ -4,6 +4,12 @@ foam.CLASS({
   implements: [
     'foam.mlang.Expressions',
   ],
+  documentation: `
+    A class that's used to replace values that are being outputted. It tracks
+    the chain of values that have been outputted and will pass the elements of
+    the chain to each predicate in the 'where' property. If all of these
+    predicates are true, the value should be adapted.
+  `,
   imports: [
     'chain',
   ],
@@ -12,6 +18,12 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.mlang.predicate.Predicate',
       name: 'where',
+      required: true,
+    },
+    {
+      class: 'Function',
+      name: 'adapt',
+      required: true,
     },
   ],
   methods: [
@@ -25,10 +37,6 @@ foam.CLASS({
       }
 
       return true;
-    },
-    function adapt(v) {
-      console.log('Replacer adapt should be overwritten.');
-      return v;
     },
     function HAS_ONLY_PROPERTIES(keys) {
       var keyMap = {};
