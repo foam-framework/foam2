@@ -6,10 +6,11 @@
 
 foam.CLASS({
   package: 'foam.build.output',
-  name: 'InnerSerializer',
+  name: 'ModelSerializer',
   implements: [
     'foam.build.output.CodeSerializer',
   ],
+  description: 'Outputs models in a format similar to hand written models.',
   requires: [
     'foam.core.Model',
     'foam.json2.Outputter',
