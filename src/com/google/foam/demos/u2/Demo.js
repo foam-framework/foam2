@@ -262,13 +262,9 @@ foam.CLASS({
 
   exports: [ 'as data' ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-        important { color: red; }
-      */}
-    })
-  ],
+  css: `
+    important { color: red; }
+  ,
 
   properties: [
     { class: 'Int', name: 'i' },
