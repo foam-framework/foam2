@@ -5,6 +5,10 @@ foam.CLASS({
   requires: [
     'foam.dao.Relationship',
   ],
+  implements: [
+    'foam.build.output.replacer.Expressions',
+    'foam.mlang.Expressions',
+  ],
   properties: [
     {
       name: 'where',

@@ -5,6 +5,10 @@ foam.CLASS({
   requires: [
     'foam.core.Model',
   ],
+  implements: [
+    'foam.build.output.replacer.Expressions',
+    'foam.mlang.Expressions',
+  ],
   properties: [
     {
       name: 'where',
