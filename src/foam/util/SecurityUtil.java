@@ -29,7 +29,7 @@ public class SecurityUtil {
     }
   }
 
-  private static final char[] DIGITS = "0123456789ABCDEF".toCharArray();
+  private static final char[] DIGITS = "0123456789abcdef".toCharArray();
 
   private static ThreadLocal<StringBuilder> sb_ = new ThreadLocal<StringBuilder>() {
     @Override
@@ -90,10 +90,21 @@ public class SecurityUtil {
     }
   }
 
+  /**
+   * Generates an SSH key fingerprint given a public key and using a default hashing algorithm of SHA-256.
+   * @param key public key to generate fingerprint from
+   * @return the ssh key fingerprint
+   */
   public static String GenerateSSHKeyFingerprintFromPublicKey(PublicKey key) {
     return GenerateSSHKeyFingerprintFromPublicKey("SHA-256", key);
   }
 
+  /**
+   * Generates an SSH key fingerprint given a public key and hashing algorithm
+   * @param algorithm hashing algorithm to use
+   * @param key public key to generate fingerprint from
+   * @return the ssh key fingerprint
+   */
   public static String GenerateSSHKeyFingerprintFromPublicKey(String algorithm, PublicKey key) {
     switch ( key.getAlgorithm() ) {
       case "DSA"  : return GenerateSSHKeyFingerprintFromDSAPublicKey(algorithm, (DSAPublicKey) key);
@@ -102,6 +113,12 @@ public class SecurityUtil {
     }
   }
 
+  /**
+   * Generates an SSH key fingerprint given a DSA public key and hashing algorithm
+   * @param algorithm hashing algorithm
+   * @param key dsa public key
+   * @return ssh key fingerprint
+   */
   protected static String GenerateSSHKeyFingerprintFromDSAPublicKey(String algorithm, DSAPublicKey key) {
     try {
       byte[] tag = "ssh-dss".getBytes(StandardCharsets.UTF_8);
@@ -138,6 +155,12 @@ public class SecurityUtil {
     }
   }
 
+  /**
+   * Generates an SSH key fingerprint given an RSA public key and hashing algorithm
+   * @param algorithm hashing algorithm
+   * @param key rsa public key
+   * @return ssh key fingerprint
+   */
   protected static String GenerateSSHKeyFingerprintFromRSAPublicKey(String algorithm, RSAPublicKey key) {
     try {
       byte[] tag = "ssh-rsa".getBytes(StandardCharsets.UTF_8);
@@ -163,6 +186,14 @@ public class SecurityUtil {
     }
   }
 
+  /**
+   * Generates the SSH key fingerprint string using algorithm and digest.
+   * MD5 is encoded as a hex string delimited by colons
+   * SHA1 and SHA256 is encoded as a base64 string
+   * @param algorithm hashing algorithm
+   * @param digest message digest
+   * @return ssh key fingerprint string
+   */
   protected static String GetSSHKeyFingerPrintString(String algorithm, byte[] digest) {
     switch ( algorithm ) {
       case "MD5"      : return "MD5:"    + ByteArrayToHexString(digest, ':');
@@ -172,10 +203,21 @@ public class SecurityUtil {
     }
   }
 
+  /**
+   * Converts a byte array to a hex string
+   * @param bytes bytes to convert
+   * @return hex string
+   */
   public static String ByteArrayToHexString(byte[] bytes) {
     return ByteArrayToHexString(bytes, '\u0000');
   }
 
+  /**
+   * Converts a byte array to hex string separating each value with a delimiter
+   * @param bytes bytes to convert
+   * @param delimiter delimiter to use
+   * @return hex string delimited with provided delimter
+   */
   public static String ByteArrayToHexString(byte[] bytes, char delimiter) {
     StringBuilder builder = sb_.get();
     for ( int i = 0 ; i < bytes.length ; i++ ) {
