@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.build.output',
-  name: 'ModelSerializer',
+  name: 'CodeSerializerImpl',
   implements: [
     'foam.build.output.CodeSerializer',
   ],

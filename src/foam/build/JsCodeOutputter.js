@@ -10,7 +10,7 @@ foam.CLASS({
   requires: [
     'foam.core.Script',
     'foam.build.Lib',
-    'foam.build.output.ModelSerializer',
+    'foam.build.output.CodeSerializerImpl',
     'foam.build.output.ValueReplacingSerializer',
     'foam.dao.Relationship',
     'foam.core.EnumModel',
@@ -26,7 +26,7 @@ foam.CLASS({
         'CLASS';
 
       var serializer = this.ValueReplacingSerializer.create({
-        delegate: this.ModelSerializer.create()
+        delegate: this.CodeSerializerImpl.create()
       });
       x = x.createSubContext({out: serializer})
       serializer.output(x, this.Lib.isInstance(v) ? v.json : v);
