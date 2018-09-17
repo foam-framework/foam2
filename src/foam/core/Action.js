@@ -31,6 +31,9 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'Action',
+  requires: [
+    'foam.core.ExpressionSlot',
+  ],
 
   documentation: 'An Action is a method with extra GUI support.',
 
