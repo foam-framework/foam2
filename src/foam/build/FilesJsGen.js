@@ -155,27 +155,67 @@ foam.CLASS({
             return self.getDepsTree(s.array)
           });
       };
-      return Promise.all([
-          getTreeHead(self.IN(self.Model.ID, self.CORE_MODELS)),
-          getTreeHead(self.INSTANCE_OF(self.Lib)),
-          getTreeHead(self.IN(self.Model.ID, self.PHASE_1)),
-          getTreeHead(self.IN(self.Model.ID, self.PHASE_2)),
-          getTreeHead(self.INSTANCE_OF(self.Script)),
-          getTreeHead(self.INSTANCE_OF(self.Relationship)),
-          getTreeHead(self.HAS(self.Model.REFINES)),
-          getTreeHead(self.IN(self.Model.ID, self.required)),
-      ]).then(function(args) {
+
+
+
+      // Get all dependencies.
+      return getTreeHead(self.IN(self.Model.ID, self.required)).then(function(a) {
+        var deps = {
+          'foam.core.FObject': true,
+          'foam.core.Model': true
+        };
+        var q = [a];
+        while ( q.length ) {
+          var n = q.pop();
+          Object.keys(n).forEach(function(k) {
+            if ( deps[k] ) return;
+            deps[k] = true;
+            q.push(n[k]);
+          });
+        }
+        return Object.keys(deps);
+      }).then(function(deps) {
+        return Promise.all([
+            getTreeHead(self.IN(self.Model.ID, self.CORE_MODELS)),
+            getTreeHead(self.INSTANCE_OF(self.Lib)),
+            getTreeHead(self.IN(self.Model.ID, self.PHASE_1)),
+            getTreeHead(self.IN(self.Model.ID, self.PHASE_2)),
+            getTreeHead(self.INSTANCE_OF(self.Script)),
+            getTreeHead(
+              self.OR(
+                self.IN(self.Relationship.SOURCE_MODEL, deps),
+                self.IN(self.Relationship.TARGET_MODEL, deps)
+              ),
+            ),
+            getTreeHead(self.IN(self.Model.REFINES, deps)),
+            getTreeHead(self.IN(self.Model.ID, self.required)),
+        ])
+      }).then(function(args) {
         return Promise.all(
           args.map(function(head) {
+
+            var depthMap = {};
+            var fillDepth = function(node, depth, seen) {
+              var keys = Object.keys(node);
+              for ( var i = 0 ; i < keys.length ; i++ ) {
+                var k = keys[i];
+                if ( seen[k] ) continue;
+                if ( ( depthMap[k] || 0 ) > depth ) continue;
+                depthMap[k] = depth;
+                seen[k] = true;
+                fillDepth(node[k], depth + 1, seen);
+                delete seen[k];
+              }
+            };
+            fillDepth(head, 0, {});
             var order = [];
-            var queue = [head];
-            while ( queue.length ) {
-              var n = queue.pop();
-              Object.keys(n).forEach(function(k) {
-                if ( order.indexOf(k) == -1 ) queue.unshift(n[k]);
-                order.unshift(k)
-              });
-            }
+            Object.keys(depthMap).forEach(function(k) {
+              order[depthMap[k]] = order[depthMap[k]] || [];
+              order[depthMap[k]].push(k);
+            });
+            order.reverse();
+            order = [].concat.apply([], order);
+
             // Remove anyting not in the DAO. This can happen for inner classes
             // and enums. TODO: Would be nice if we didn't have to do this.
             return Promise.all(order.map(function(id) {
