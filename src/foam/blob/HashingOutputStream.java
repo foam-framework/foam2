@@ -6,6 +6,7 @@
 
 package foam.blob;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.MessageDigest;
@@ -21,6 +22,24 @@ public class HashingOutputStream
 {
   protected OutputStream os_;
   protected MessageDigest digest_;
+
+  /**
+   * HashingOutputStream constructor using SHA-256 as the default algorithm
+   * and a ByteArrayOutputStream as the delegate
+   * @throws NoSuchAlgorithmException
+   */
+  public HashingOutputStream() throws NoSuchAlgorithmException {
+    this("SHA-256", new ByteArrayOutputStream());
+  }
+
+  /**
+   * HashingOutputStream constructor with user provided algorithm
+   * that uses a ByteArrayOutputStream as the delegate
+   * @throws NoSuchAlgorithmException
+   */
+  public HashingOutputStream(String algorithm) throws NoSuchAlgorithmException {
+    this(algorithm, new ByteArrayOutputStream());
+  }
 
   /**
    * HashingOutputStream constructor using SHA-256 as the default algorithm
