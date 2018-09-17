@@ -7,6 +7,10 @@ foam.CLASS({
     'foam.core.Model',
     'foam.core.internal.InterfaceMethod',
   ],
+  implements: [
+    'foam.build.output.replacer.Expressions',
+    'foam.mlang.Expressions',
+  ],
   properties: [
     {
       name: 'where',
