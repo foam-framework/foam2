@@ -6,7 +6,9 @@ import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BinaryOperator;
 
@@ -19,7 +21,7 @@ public class SecurityUtil {
     }
   }
 
-  private static SecureRandom srand_ = null;
+  private static Map<String, SecureRandom> srand_ = new ConcurrentHashMap<>();
 
   // reseed counter, atomic so we don't exceed reseed count
   private static AtomicBigInteger count_ = new AtomicBigInteger();
@@ -45,15 +47,20 @@ public class SecurityUtil {
    */
   public static SecureRandom GetSecureRandom(String algorithm) {
     try {
+      SecureRandom srand = srand_.get(algorithm);
+
       // generate new secure random if srand is null or if we have reached our reseed interval
-      if ( srand_ == null || count_.incrementAndGet().compareTo(interval_) == 0 ) {
+      if ( srand == null || count_.incrementAndGet().compareTo(interval_) == 0 ) {
         // get new instance and get next bytes to force seeding
-        srand_ = SecureRandom.getInstance(algorithm);
-        srand_.nextBytes(new byte[16]);
-        return srand_;
+        srand = SecureRandom.getInstance(algorithm);
+        srand.nextBytes(new byte[16]);
+
+        // store secure random in map
+        srand_.put(algorithm, srand);
+        return srand;
       }
 
-      return srand_;
+      return srand;
     } catch ( Throwable t ) {
       throw new RuntimeException(t);
     }
