@@ -11,6 +11,7 @@ import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
+import foam.util.SafetyUtil;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -143,8 +144,7 @@ public class Outputter
 
   protected void outputProperty(FObject o, PropertyInfo p) {
     writer_.append(beforeKey_());
-    writer_.append(! outputShortNames_ ?
-      p.getName() : p.getShortName());
+    writer_.append(getPropertyName(p));
     writer_.append(afterKey_());
     writer_.append(":");
     p.toJSON(this, p.get(o));
@@ -324,8 +324,7 @@ public class Outputter
     writer_.append(",");
     outputString("name");
     writer_.append(":");
-    outputString(! outputShortNames_ ?
-      prop.getName() : prop.getShortName());
+    outputString(getPropertyName(prop));
     writer_.append("}");
   }
 
@@ -351,6 +350,10 @@ public class Outputter
 
   public FObject parse(String str) {
     return null;
+  }
+
+  public String getPropertyName(PropertyInfo p) {
+    return outputShortNames_ && ! SafetyUtil.isEmpty(p.getShortName()) ? p.getShortName() : p.getName();
   }
 
   @Override
