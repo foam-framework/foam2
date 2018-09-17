@@ -1,8 +1,13 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.util;
 
 import foam.blob.HashingOutputStream;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.util.encoders.Base64;
 
 import java.io.OutputStream;
 import java.math.BigInteger;
@@ -14,6 +19,7 @@ import java.security.Security;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Base64;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -254,9 +260,9 @@ public class SecurityUtil {
     if ( "MD5".equals(algorithm) ) {
       return "MD5:" + ByteArrayToHexString(digest, ':');
     } else if ( "SHA-1".equals(algorithm) ) {
-      return "SHA1:" + Base64.toBase64String(digest);
+      return "SHA1:" + Base64.getEncoder().withoutPadding().encodeToString(digest);
     } else if ( "SHA-256".equals(algorithm) ) {
-      return "SHA256:" + Base64.toBase64String(digest);
+      return "SHA256:" + Base64.getEncoder().withoutPadding().encodeToString(digest);
     } else {
       throw new IllegalArgumentException("Unsupported hashing algorithm");
     }
