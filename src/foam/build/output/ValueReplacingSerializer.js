@@ -65,16 +65,15 @@ foam.CLASS({
   ],
   methods: [
     function output(x, v) {
-      this.chain.push(v)
+      var self = this;
+      self.chain.push(v)
 
-      var c = this.chain;
-      var r = this.rules.find(function(r) {
-        return r.f(c);
-      })
+      var r = self.rules.find(function(r) { return r.f(self.chain) })
       if ( r ) v = r.adapt(v);
 
       this.delegate.output(x, v);
-      this.chain.pop()
+
+      self.chain.pop()
     },
   ],
 });
