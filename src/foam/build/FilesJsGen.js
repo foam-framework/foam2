@@ -156,9 +156,7 @@ foam.CLASS({
           });
       };
 
-
-
-      // Get all dependencies.
+      // Get all dependencies of models that are required.
       return getTreeHead(self.IN(self.Model.ID, self.required)).then(function(a) {
         var deps = {
           'foam.core.FObject': true,
