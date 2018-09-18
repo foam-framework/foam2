@@ -155,19 +155,23 @@ foam.CLASS({
       ],
       javaCode: `
 DAO userDAO         = (DAO) x.get("localUserDAO");
+DAO groupDAO        = (DAO) x.get("groupDAO");
 AppConfig config    = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
 
 Session session = x.get(Session.class);
 if ( session != null ) {
   User user = (User) userDAO.find(session.getUserId());
   if ( user != null ) {
-    if ( ! SafetyUtil.isEmpty(this.getUrl()) ) {
+    Group group    = (Group) groupDAO.find(user.getGroup());
+    if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
       //populate AppConfig url with group url
-      config.setUrl(this.getUrl());
+      config.setUrl(group.getUrl());
     } else {
       //populate AppConfig url with request's RootUrl
       HttpServletRequest req = x.get(HttpServletRequest.class);
-      config.setUrl(((Request) req).getRootURL().toString());
+      if (req != null) {
+        config.setUrl(((Request) req).getRootURL().toString());
+      }
     }
   }
 }
