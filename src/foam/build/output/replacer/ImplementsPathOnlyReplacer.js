@@ -31,10 +31,8 @@ foam.CLASS({
       },
     },
     {
-      name: 'adapt',
-      value: function(v) {
-        return v.path;
-      },
+      name: 'output',
+      value: function(x, v) { this.out.output(x, v.path) },
     },
   ],
 });

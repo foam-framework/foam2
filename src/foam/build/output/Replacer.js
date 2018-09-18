@@ -9,6 +9,7 @@ foam.CLASS({
   `,
   imports: [
     'chain',
+    'out',
   ],
   properties: [
     {
@@ -19,8 +20,9 @@ foam.CLASS({
     },
     {
       class: 'Function',
-      name: 'adapt',
+      name: 'output',
       required: true,
+      value: function(x, v) { this.out.output(x, v) },
     },
   ],
   methods: [

@@ -40,11 +40,14 @@ foam.CLASS({
     }
   ],
   methods: [
+    function getOutputter() {
+      return this.out;
+    },
     function getString() {
-      return this.out.out.output();
+      return this.getOutputter().out.output();
     },
     function output(x, v) {
-      var out = this.out;
+      var out = this.getOutputter();
       var type = foam.typeOf(v);
 
       if ( type == foam.Number ) {
