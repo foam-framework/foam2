@@ -145,6 +145,7 @@ FOAM_FILES([
   { name: "foam/util/Timer" },
   { name: "foam/util/EmailTest" },
   { name: "foam/util/PasswordTest" },
+  { name: "foam/util/SecurityUtilTest" },
   { name: "foam/log/LogLevel" },
   { name: "foam/log/Logger" },
   { name: "foam/log/ConsoleLogger" },

@@ -678,5 +678,10 @@ var cols = E().
     start(foam.u2.Tab, {label: 'Tab 1'}).add('tab 1 contents').end().
     start(foam.u2.Tab, {label: 'Tab 2'}).add('tab 2 contents').end().
     start(foam.u2.Tab, {label: 'Tab 3'}).add('Even more contents in tab 3').end().
+  end().
+  start(Tabs).
+    start(Tab, {label: 'Tab 1'}).add('tab 1 contents').end().
+    start(Tab, {label: 'Tab 2'}).add('tab 2 contents').end().
+    start(Tab, {label: 'Tab 3'}).add('Even more contents in tab 3').end().
   end();
 cols.write();
