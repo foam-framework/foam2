@@ -273,6 +273,7 @@ var classes = [
   'foam.parse.QueryParserUserTest',
   'foam.util.EmailTest',
   'foam.util.PasswordTest',
+  'foam.util.SecurityUtilTest',
   'foam.test.TestObj',
   'foam.core.FObjectTest',
 
