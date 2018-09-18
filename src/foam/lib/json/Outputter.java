@@ -13,7 +13,6 @@ import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
 import foam.util.SafetyUtil;
 import org.apache.commons.io.IOUtils;
-import org.bouncycastle.util.encoders.Hex;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -129,7 +128,7 @@ public class Outputter
   }
 
   protected void outputByteArray(byte[] array) {
-    output(Hex.toHexString(array));
+    output(foam.util.SecurityUtil.ByteArrayToHexString(array));
   }
 
   protected void outputMap(java.util.Map map) {
