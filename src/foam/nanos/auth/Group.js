@@ -61,11 +61,6 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'primaryColor',
-      documentation: 'The following color properties can determine the color scheme of the GUI.'
-    },
-    {
-      class: 'String',
       name: 'topNavigation',
       value: 'foam.nanos.u2.navigation.TopNavigation'
     },
@@ -78,6 +73,11 @@ foam.CLASS({
       class: 'String',
       name: 'groupCSS',
       view: { class: 'foam.u2.tag.TextArea', rows: 16 },
+    },
+    {
+      class: 'String',
+      name: 'primaryColor',
+      documentation: 'The following color properties can determine the color scheme of the GUI.'
     },
     { class: 'String', name: 'secondaryColor' },
     { class: 'String', name: 'tableColor' },
