@@ -8,11 +8,9 @@ foam.CLASS({
   package: 'foam.build.output',
   name: 'ValueReplacingSerializer',
   extends: 'foam.build.output.ProxySerializer',
-  implements: [
-    'foam.mlang.Expressions'
-  ],
   exports: [
     'chain',
+    'delegate as out',
   ],
   requires: [
     'foam.build.output.replacer.ArgumentClassStrip',
@@ -25,8 +23,8 @@ foam.CLASS({
     'foam.build.output.replacer.InterfaceModelClassStrip',
     'foam.build.output.replacer.MethodClassStrip',
     'foam.build.output.replacer.MethodJsCodeOnlyReplacer',
-    'foam.build.output.replacer.ModelClassStrip',
-    'foam.build.output.replacer.PropertyClassStrip',
+    'foam.build.output.replacer.ModelOrderer',
+    'foam.build.output.replacer.PropertyOrderer',
     'foam.build.output.replacer.PropertyNameOnlyReplace',
     'foam.build.output.replacer.RelationshipClassStrip',
     'foam.build.output.replacer.RequiresPathOnlyReplacer',
@@ -50,7 +48,7 @@ foam.CLASS({
           this.ImportsPathOnlyReplacer.create(),
           this.InterfaceMethodClassStrip.create(),
           this.InterfaceModelClassStrip.create(),
-          this.ModelClassStrip.create(),
+          this.ModelOrderer.create(),
           this.RelationshipClassStrip.create(),
           this.RequiresPathOnlyReplacer.create(),
 
@@ -58,7 +56,7 @@ foam.CLASS({
           this.MethodClassStrip.create(),
 
           this.PropertyNameOnlyReplace.create(),
-          this.PropertyClassStrip.create(),
+          this.PropertyOrderer.create(),
         ];
       },
     },
@@ -69,9 +67,8 @@ foam.CLASS({
       self.chain.push(v)
 
       var r = self.rules.find(function(r) { return r.f(self.chain) })
-      if ( r ) v = r.adapt(v);
-
-      this.delegate.output(x, v);
+      if ( r ) r.output(x, v);
+      else this.delegate.output(x, v);
 
       self.chain.pop()
     },
