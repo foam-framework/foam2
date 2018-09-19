@@ -8,6 +8,7 @@ package foam.lib.json;
 
 import foam.lib.parse.*;
 import foam.core.*;
+import java.io.StringReader;
 
 public class JSONParser
   extends foam.core.ContextAwareSupport
@@ -17,6 +18,18 @@ public class JSONParser
 
   public FObject parseString(String data) {
     return parseString(data, null);
+  }
+
+  public FObject parseReader(StringReader data, Class defaultClass) {
+    ReaderPStream ps = new ReaderPStream();
+
+    ps.setString(data);
+    ParserContext x = new ParserContextImpl();
+    x.set("X", getX());
+    x.set("defaultClass", defaultClass);
+    ps = (ReaderPStream) ps.apply(parser, x);
+
+    return ps == null ? null : (FObject) ps.value();
   }
 
   public FObject parseString(String data, Class defaultClass) {
