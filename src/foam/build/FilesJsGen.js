@@ -109,6 +109,15 @@ foam.CLASS({
       ],
     },
     {
+      name: 'END',
+      documentation: `
+        The following models must be added at the end of files.js in this order.
+      `,
+      value: [
+        'foam.apploader.ClassLoaderContextScript',
+      ],
+    },
+    {
       name: 'NANOS_MODELS',
       documentation: `
         These are the models needed for booting nanos.
@@ -191,6 +200,7 @@ foam.CLASS({
             ),
             getTreeHead(self.IN(self.Model.REFINES, deps)),
             getTreeHead(self.IN(self.Model.ID, self.required)),
+            getTreeHead(self.IN(self.Model.ID, self.END)),
         ])
       }).then(function(args) {
         return Promise.all(
@@ -233,13 +243,21 @@ foam.CLASS({
         var files = [].concat(
           self.BOOT_FILES,
           self.CORE_MODELS,
-          args).map(function(o) {
-            return `{ name: "${o.replace(/\./g, '/')}" },`;
-          });
+          args);
+
+        // Remove anything that should be forced into the end.
+        files = files.filter(function(id, i) {
+          return self.END.indexOf(id) == -1;
+        }).concat(self.END);
 
         // Remove duplicates.
         files = files.filter(function(id, i) {
           return files.indexOf(id) == i;
+        });
+
+        // Format each line of files.js
+        files = files.map(function(o) {
+          return `{ name: "${o.replace(/\./g, '/')}" },`;
         })
 
         var filesJs = `
