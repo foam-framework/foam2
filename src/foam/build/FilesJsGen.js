@@ -255,7 +255,10 @@ foam.CLASS({
         // Remove duplicates.
         files = files.filter(function(id, i) {
           return files.indexOf(id) == i;
-        }).map(function(o) {
+        });
+
+        // Format each line of files.js
+        files = files.map(function(o) {
           return `{ name: "${o.replace(/\./g, '/')}" },`;
         })
 
