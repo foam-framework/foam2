@@ -8,6 +8,7 @@ package foam.box;
 
 import foam.core.X;
 import foam.dao.DAO;
+import foam.nanos.app.AppConfig;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.*;
 import foam.nanos.boot.NSpec;
@@ -32,16 +33,16 @@ public class SessionServerBox
 
     try {
       if ( sessionID != null ) {
-        NSpec       spec       = getX().get(NSpec.class);
-        AuthService auth       = (AuthService) getX().get("auth");
-        DAO         sessionDAO = (DAO)         getX().get("sessionDAO");
-        Session     session    = (Session)     sessionDAO.find(sessionID);
+        NSpec              spec         = getX().get(NSpec.class);
+        HttpServletRequest req          = getX().get(HttpServletRequest.class);
+        AuthService        auth         = (AuthService) getX().get("auth");
+        DAO                sessionDAO   = (DAO)         getX().get("sessionDAO");
+        DAO                groupDAO     = (DAO)         getX().get("groupDAO");
+        Session            session      = (Session)     sessionDAO.find(sessionID);
 
         if ( session == null ) {
           session = new Session();
           session.setId(sessionID);
-
-          HttpServletRequest req = getX().get(HttpServletRequest.class);
           session.setRemoteHost(req.getRemoteHost());
           session.setContext(getX().put(Session.class, session));
         }
@@ -51,7 +52,8 @@ public class SessionServerBox
             "logger",
             new PrefixLogger(
                 new Object[] { user == null ? "" : user.getId() + " - " + user.label(), "[Service]", spec.getName() },
-                (Logger) session.getContext().get("logger")));
+                (Logger) session.getContext().get("logger")))
+          .put(HttpServletRequest.class, req);
 
         session.setLastUsed(new Date());
         session.setUses(session.getUses()+1);
@@ -61,16 +63,22 @@ public class SessionServerBox
           return;
         }
 
-        if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
-          DAO    groupDAO = (DAO) x.get("groupDAO");
-          Group  group    = (Group) groupDAO.find(user.getGroup());
-          Logger logger   = (Logger) x.get("logger");
-          logger.debug("missing permission", group.getId(), "service." + spec.getName());
-          // msg.replyWithException(new NoPermissionException("No permission"));
-          // return;
-        }
+        if ( user != null ) {
+          Group group    = (Group) groupDAO.find(user.getGroup());
 
-        if ( user != null ) sessionDAO.put(session);
+          if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
+            Logger logger   = (Logger) x.get("logger");
+            logger.debug("missing permission", group.getId(), "service." + spec.getName());
+            // msg.replyWithException(new NoPermissionException("No permission"));
+            // return;
+          }
+
+          AppConfig appConfig = group.getAppConfig(x);
+          x = x.put("appConfig", appConfig);
+
+          session.getContext().put("appConfig", appConfig);
+          sessionDAO.put(session);
+        }
 
         msg.getLocalAttributes().put("x", x);
       }
