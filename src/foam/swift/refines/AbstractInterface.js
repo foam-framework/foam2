@@ -21,7 +21,7 @@ foam.CLASS({
             imports: ['Foundation'],
           });
 
-          var axioms = this.getAxioms();
+          var axioms = this.getAxioms().filter(foam.util.flagFilter(['swift']));
 
           for ( var i = 0 ; i < axioms.length ; i++ ) {
             axioms[i].writeToSwiftClass && axioms[i].writeToSwiftClass(cls, this);
