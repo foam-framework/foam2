@@ -66,6 +66,12 @@ foam.CLASS({
         'foam.core.BooleanScript',
         'foam.core.AxiomArrayScript',
         'foam.core.EndBootScript',
+
+        'foam.core.Requires',
+        'foam.core.ModelRequiresRefines',
+
+        'foam.core.Implements',
+        'foam.core.ImplementsModelRefine',
       ],
     },
     {
@@ -78,13 +84,11 @@ foam.CLASS({
       value: [
         'foam.core.ContextMultipleInheritenceScript',
         'foam.core.DebugDescribeScript',
-        'foam.core.ImplementsModelRefine',
         'foam.core.ImportExportModelRefine',
         'foam.core.ListenerModelRefine',
         'foam.core.MethodArgumentRefine',
         'foam.core.ModelConstantRefine',
         'foam.core.ModelRefinestopics',
-        'foam.core.ModelRequiresRefines',
         'foam.core.ModelActionRefine',
         'foam.core.Promised',
         'foam.core.__Class__',
@@ -102,6 +106,17 @@ foam.CLASS({
         'foam.core.ModelRefinescss',
         'foam.core.WindowScript',
         'foam.net.WebLibScript',
+      ],
+    },
+    {
+      name: 'END',
+      documentation: `
+        The following models must be added at the end of files.js in this order
+        and the outputter will force these to be loaded at the end even if
+        they're discovered as a dependency of something else.
+      `,
+      value: [
+        'foam.apploader.ClassLoaderContextScript',
       ],
     },
     {
@@ -187,6 +202,7 @@ foam.CLASS({
             ),
             getTreeHead(self.IN(self.Model.REFINES, deps)),
             getTreeHead(self.IN(self.Model.ID, self.required)),
+            getTreeHead(self.IN(self.Model.ID, self.END)),
         ])
       }).then(function(args) {
         return Promise.all(
@@ -224,19 +240,25 @@ foam.CLASS({
           })
         );
       }).then(function(args) {
-        // Flatten args.
-        args = [].concat.apply([], args);
-        var files = [].concat(
-          self.BOOT_FILES,
-          self.CORE_MODELS,
-          args).map(function(o) {
-            return `{ name: "${o.replace(/\./g, '/')}" },`;
-          });
+        // Args is a 2D array so concat.apply will flatten it.
+        var files = [].concat.apply(self.CORE_MODELS, args);
+
+        // Remove anything that should be forced into the end.
+        files = files.filter(function(id, i) {
+          return self.END.indexOf(id) == -1;
+        }).concat(self.END);
 
         // Remove duplicates.
         files = files.filter(function(id, i) {
           return files.indexOf(id) == i;
-        })
+        });
+
+        // Prepend the files needed to boot and adapt the IDs into file names.
+        files = self.BOOT_FILES.concat(files.map(function(o) {
+          return o.replace(/\./g, '/')
+        })).map(function(o) {
+          return `{ name: "${o}" },`;
+        });
 
         var filesJs = `
 if ( typeof window !== 'undefined' ) global = window;
