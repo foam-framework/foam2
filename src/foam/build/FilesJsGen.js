@@ -66,6 +66,12 @@ foam.CLASS({
         'foam.core.BooleanScript',
         'foam.core.AxiomArrayScript',
         'foam.core.EndBootScript',
+
+        'foam.core.Requires',
+        'foam.core.ModelRequiresRefines',
+
+        'foam.core.Implements',
+        'foam.core.ImplementsModelRefine',
       ],
     },
     {
@@ -78,13 +84,11 @@ foam.CLASS({
       value: [
         'foam.core.ContextMultipleInheritenceScript',
         'foam.core.DebugDescribeScript',
-        'foam.core.ImplementsModelRefine',
         'foam.core.ImportExportModelRefine',
         'foam.core.ListenerModelRefine',
         'foam.core.MethodArgumentRefine',
         'foam.core.ModelConstantRefine',
         'foam.core.ModelRefinestopics',
-        'foam.core.ModelRequiresRefines',
         'foam.core.ModelActionRefine',
         'foam.core.Promised',
         'foam.core.__Class__',
