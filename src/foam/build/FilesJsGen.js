@@ -240,12 +240,8 @@ foam.CLASS({
           })
         );
       }).then(function(args) {
-        // Flatten args.
-        args = [].concat.apply([], args);
-        var files = [].concat(
-          self.BOOT_FILES,
-          self.CORE_MODELS,
-          args);
+        // Args is a 2D array so concat.apply will flatten it.
+        var files = [].concat.apply(self.CORE_MODELS, args);
 
         // Remove anything that should be forced into the end.
         files = files.filter(function(id, i) {
@@ -257,10 +253,12 @@ foam.CLASS({
           return files.indexOf(id) == i;
         });
 
-        // Format each line of files.js
-        files = files.map(function(o) {
-          return `{ name: "${o.replace(/\./g, '/')}" },`;
-        })
+        // Prepend the files needed to boot and adapt the IDs into file names.
+        files = self.BOOT_FILES.concat(files.map(function(o) {
+          return o.replace(/\./g, '/')
+        })).map(function(o) {
+          return `{ name: "${o}" },`;
+        });
 
         var filesJs = `
 if ( typeof window !== 'undefined' ) global = window;
