@@ -118,6 +118,19 @@ public class Outputter
     writer_.append("]");
   }
 
+  protected void outputByteArray(byte[][] array) {
+    writer_.append("[");
+    for ( int i = 0 ; i < array.length ; i++ ) {
+      output(array[i]);
+      if ( i < array.length - 1 ) writer_.append(",");
+    }
+    writer_.append("]");
+  }
+
+  protected void outputByteArray(byte[] array) {
+    output(foam.util.SecurityUtil.ByteArrayToHexString(array));
+  }
+
   protected void outputMap(java.util.Map map) {
     writer_.append("{");
     java.util.Iterator keys = map.keySet().iterator();
@@ -200,7 +213,14 @@ public class Outputter
     } else if ( value instanceof Number ) {
       outputNumber((Number) value);
     } else if ( isArray(value) ) {
-      outputArray((Object[]) value);
+        if ( value.getClass().equals(byte[][].class) ) {
+          outputByteArray((byte[][]) value);
+        } else if ( value instanceof byte[] ) {
+          outputByteArray((byte[]) value);
+        }
+        else {
+          outputArray((Object[]) value);
+        }
     } else if ( value instanceof Boolean ) {
       outputBoolean((Boolean) value);
     } else if ( value instanceof java.util.Date ) {
