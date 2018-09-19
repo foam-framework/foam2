@@ -111,7 +111,9 @@ foam.CLASS({
     {
       name: 'END',
       documentation: `
-        The following models must be added at the end of files.js in this order.
+        The following models must be added at the end of files.js in this order
+        and the outputter will force these to be loaded at the end even if
+        they're discovered as a dependency of something else.
       `,
       value: [
         'foam.apploader.ClassLoaderContextScript',
@@ -253,10 +255,7 @@ foam.CLASS({
         // Remove duplicates.
         files = files.filter(function(id, i) {
           return files.indexOf(id) == i;
-        });
-
-        // Format each line of files.js
-        files = files.map(function(o) {
+        }).map(function(o) {
           return `{ name: "${o.replace(/\./g, '/')}" },`;
         })
 
