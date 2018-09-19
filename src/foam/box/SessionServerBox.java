@@ -74,9 +74,10 @@ public class SessionServerBox
           }
 
           AppConfig appConfig = group.getAppConfig(x);
+          x = x.put("appConfig", appConfig);
+
           session.getContext().put("appConfig", appConfig);
           sessionDAO.put(session);
-          x = x.put("appConfig", appConfig);
         }
 
         msg.getLocalAttributes().put("x", x);
