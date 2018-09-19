@@ -55,7 +55,7 @@ have multiple classloaders running alongside eachother`
       name: 'addClassPath',
       code: function(path) {
         var cls = this[foam.isServer ? 'NodeModelFileDAO' : 'WebModelFileDAO'];
-        var modelDAO = cls.create({root: path}, this);
+        var modelDAO = cls.create({root: path});
 
         if ( this.modelDAO ) {
           modelDAO = this.OrDAO.create({
@@ -131,7 +131,7 @@ have multiple classloaders running alongside eachother`
           if ( this.latched[id] ) {
             var json = this.latched[id];
             delete this.latched[id];
-            return this.pending[id] = Promise.all(foam.json.references(this.__context__, json)).then(function() {
+            return this.pending[id] = Promise.all(foam.json.references(foam.__context__, json)).then(function() {
               var cls = json.class ? foam.lookup(json.class) : foam.core.Model;
               return self.modelDeps_(cls.create(json), path);
             }).then(function() {
@@ -143,7 +143,7 @@ have multiple classloaders running alongside eachother`
 
           if ( foam.lookup(id, true) ) return Promise.resolve(foam.lookup(id));
 
-          var x2 = self.SubClassLoader.create({delegate: self, path: path});
+          var x2 = self.SubClassLoader.create({delegate: self, path: path}, foam.__context__);
           return this.pending[id] = this.modelDAO.inX(x2).find(id).then(function(m) {
             if ( ! m ) return Promise.reject(new Error('Model Not Found: ' + id));
             if ( self.Relationship.isInstance(m) ) {
