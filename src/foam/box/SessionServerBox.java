@@ -8,6 +8,7 @@ package foam.box;
 
 import foam.core.X;
 import foam.dao.DAO;
+import foam.nanos.app.AppConfig;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.*;
 import foam.nanos.boot.NSpec;
@@ -51,7 +52,8 @@ public class SessionServerBox
             "logger",
             new PrefixLogger(
                 new Object[] { user == null ? "" : user.getId() + " - " + user.label(), "[Service]", spec.getName() },
-                (Logger) session.getContext().get("logger")));
+                (Logger) session.getContext().get("logger")))
+          .put(HttpServletRequest.class, req);
 
         session.setLastUsed(new Date());
         session.setUses(session.getUses()+1);
@@ -71,9 +73,10 @@ public class SessionServerBox
             // return;
           }
 
-          x = x.put("appConfig", group.getAppConfig(getX()));
-
+          AppConfig appConfig = group.getAppConfig(x);
+          session.getContext().put("appConfig", appConfig);
           sessionDAO.put(session);
+          x = x.put("appConfig", appConfig);
         }
 
         msg.getLocalAttributes().put("x", x);
