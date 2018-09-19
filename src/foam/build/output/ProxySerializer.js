@@ -5,16 +5,16 @@
  */
 
 foam.CLASS({
-  package: 'foam.json2',
-  name: 'ProxyOutputterOutput',
+  package: 'foam.build.output',
+  name: 'ProxySerializer',
   implements: [
-    'foam.json2.OutputterOutput'
+    'foam.build.output.CodeSerializer',
   ],
   properties: [
     {
       class: 'Proxy',
-      of: 'foam.json2.OutputterOutput',
+      of: 'foam.build.output.CodeSerializer',
       name: 'delegate',
-    },
+    }
   ],
-})
+});
