@@ -6,98 +6,6 @@
 
 foam.CLASS({
   package: 'foam.core',
-  name: 'StubMethod',
-  extends: 'Method',
-
-  properties: [
-    'replyPolicyName',
-    'boxPropName',
-    {
-      name: 'code',
-      factory: function() {
-        var returns           = foam.String.isInstance(this.returns) ?
-            this.returns :
-            this.returns && this.returns.typeName;
-        var isContextOriented =  this.args.length >= 1 && this.args[0].javaType == 'foam.core.X'
-        var replyPolicyName   = this.replyPolicyName;
-        var boxPropName       = this.boxPropName;
-        var name              = this.name;
-
-        return function() {
-          var replyBox = this.RPCReturnBox.create();
-          var ret      = replyBox.promise;
-
-          // Automatically wrap RPCs that return a "PromisedAbc" or similar
-          // TODO: Move this into RPCReturnBox ?
-          if ( returns && returns !== 'Promise' ) {
-            ret = this.lookup(returns).create({ delegate: ret });
-          }
-
-          var args = Array.from(arguments);
-
-          // Don't try to marshal context across network
-          // It will be re-added on the Server by the Skeleton
-          if ( isContextOriented ) args[0] = null;
-
-          var msg = this.Message.create({
-            object: this.RPCMessage.create({
-              name: name,
-              args: args
-            })
-          });
-
-          msg.attributes.replyBox = replyBox;
-
-          this[boxPropName].send(msg);
-
-          return ret;
-        };
-      }
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.core',
-  name: 'StubAction',
-  extends: 'Action',
-  requires: [
-    'foam.core.StubMethod',
-  ],
-  properties: [
-    'replyPolicyName',
-    'boxPropName',
-    {
-      name: 'stubMethod',
-      factory: function() {
-        return this.StubMethod.create({
-          name: this.name,
-          replyPolicyName: this.replyPolicyName,
-          boxPropName: this.boxPropName
-        });
-      }
-    },
-    {
-      name: 'code',
-      factory: function() {
-        return function(ctx, action) {
-          action.stubMethod.code.call(this);
-        };
-      }
-    }
-  ],
-
-  methods: [
-    function installInProto(proto) {
-      proto[this.name] = this.stubMethod.code;
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.core',
   name: 'Stub',
   extends: 'Property',
   requires: [
@@ -127,24 +35,17 @@ foam.CLASS({
             methods.map(function(m) { return cls.getAxiomByName(m); }) :
             cls.getAxiomsByClass(foam.core.Method).filter(function (m) { return cls.hasOwnAxiom(m.name); }) ).
               map(function(m) {
-                var returns = foam.String.isInstance(m.returns) ?
-                    m.returns :
-                    m.returns && m.returns.typeName ;
-
-                if ( returns && returns !== 'Promise' ) {
-                  var id = returns.split('.');
-                  id[id.length - 1] = 'Promised' + id[id.length - 1];
-                  returns = id.join('.');
-                }
-
+                foam.assert(m.async || m.returns == 'Void',
+                            'Cannot stub non-void non-async method', m.name, 'on class', cls.id);
+                
                 return foam.core.StubMethod.create({
                   name: m.name,
                   replyPolicyName: replyPolicyName,
                   boxPropName: name,
+                  returns: m.returns,
                   javaReturns: m.javaReturns,
                   swiftReturns: m.swiftReturns,
-                  args: m.args,
-                  returns: returns
+                  args: m.args
                 });
               });
       }
@@ -193,7 +94,7 @@ foam.CLASS({
           });
       }
     },
-    ['javaType',     'foam.box.Box'],
+    ['type',     'foam.box.Box'],
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo']
   ],
 
@@ -204,7 +105,7 @@ foam.CLASS({
 
       cls.installAxiom(foam.core.Object.create({
         name: this.replyPolicyName,
-        javaType: 'foam.box.BoxService',
+        type: 'foam.box.BoxService',
         hidden: true
       }));
 
@@ -228,7 +129,7 @@ foam.CLASS({
       cls.installAxiom(foam.core.Import.create({
         key: 'registry',
         name: 'registry',
-        javaType: 'foam.box.BoxRegistry',
+        type: 'foam.box.BoxRegistry',
       }));
     }
   ]
@@ -339,6 +240,34 @@ foam.CLASS({
 
           return;
         };
+      }
+    }
+  ],
+  methods: [
+    {
+      name: 'buildJavaClass',
+      flags: [ 'java' ],
+      code: function buildJavaClass(cls) {
+        if ( ! this.javaSupport ) return;
+
+        var name = this.name;
+        var args = this.args;
+        var boxPropName = foam.String.capitalize(this.boxPropName);
+
+        var code =
+`foam.box.Message message = getX().create(foam.box.Message.class);
+foam.box.RPCMessage rpc = getX().create(foam.box.RPCMessage.class);
+rpc.setName("${name}");
+Object[] args = { ${ args.map( a => a.name ).join(',') } };
+rpc.setArgs(args);
+
+message.setObject(rpc);
+get${boxPropName}().send(message);
+`;
+
+        this.javaCode = code;
+
+        this.SUPER(cls);
       }
     }
   ]

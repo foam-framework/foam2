@@ -105,8 +105,6 @@ public class HttpBlobService
     } catch (Throwable t) {
       t.printStackTrace();
       throw new RuntimeException(t);
-    } finally {
-      IOUtils.closeQuietly(blob);
     }
   }
 }

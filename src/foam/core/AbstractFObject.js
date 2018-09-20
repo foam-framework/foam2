@@ -74,10 +74,8 @@ foam.CLASS({
   methods: [
     {
       name: 'compareTo',
-      javaReturns: 'int',
-      args: [
-        { class: 'Object', name: 'o' }
-      ],
+      returns: 'Integer',
+      args: [ { name: 'o', type: 'Any' } ],
       javaCode: `
         if ( o == this ) return 0;
         if ( o == null ) return 1;
@@ -101,20 +99,16 @@ foam.CLASS({
     },
     {
       name: 'equals',
-      javaReturns: 'boolean',
-      args: [
-        { class: 'Object', name: 'o' }
-      ],
+      returns: 'Boolean',
+      args: [ { name: 'o', type: 'Any' } ],
       javaCode: `
         return compareTo(o) == 0;
       `
     },
     {
       name: 'diff',
-      javaReturns: 'java.util.Map',
-      args: [
-        { class: 'FObjectProperty', name: 'obj' }
-      ],
+      returns: 'Map',
+      args: [ { name: 'obj', type: 'FObject' } ],
       javaCode: `
         List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
         Iterator i = props.iterator();
@@ -130,10 +124,8 @@ foam.CLASS({
     },
     {
       name: 'hardDiff',
-      javaReturns: 'foam.core.FObject',
-      args: [
-        { class: 'FObjectProperty', name: 'obj' }
-      ],
+      returns: 'FObject',
+      args: [ { name: 'obj', type: 'FObject' } ],
       javaCode: `
         FObject ret = null;
         boolean isDiff = false;
@@ -158,7 +150,7 @@ foam.CLASS({
     },
     {
       name: 'fclone',
-      javaReturns: 'foam.core.FObject',
+      returns: 'FObject',
       javaCode: `
         try {
           FObject ret = getClass().newInstance();
@@ -175,14 +167,14 @@ foam.CLASS({
     },
     {
       name: 'deepClone',
-      javaReturns: 'foam.core.FObject',
+      returns: 'FObject',
       javaCode: `
         return fclone();
       `
     },
     {
       name: 'shallowClone',
-      javaReturns: 'foam.core.FObject',
+      returns: 'FObject',
       javaCode: `
         try {
           FObject ret = getClass().newInstance();
@@ -199,10 +191,8 @@ foam.CLASS({
     },
     {
       name: 'copyFrom',
-      javaReturns: 'foam.core.FObject',
-      args: [
-        { class: 'FObjectProperty', name: 'obj' }
-      ],
+      returns: 'FObject',
+      args: [ { name: 'obj', type: 'FObject' } ],
       javaCode: `
         List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
         for ( PropertyInfo p : props ) {
@@ -217,10 +207,8 @@ foam.CLASS({
     },
     {
       name: 'getProperty',
-      javaReturns: 'Object',
-      args: [
-        { class: 'String', name: 'prop' }
-      ],
+      returns: 'Any',
+      args: [ { name: 'prop', type: 'String' } ],
       javaCode: `
         PropertyInfo property = ((PropertyInfo) getClassInfo().getAxiomByName(prop));
         return property == null ? null : property.get(this);
@@ -228,11 +216,9 @@ foam.CLASS({
     },
     {
       name: 'setProperty',
-      javaReturns: 'foam.core.FObject',
-      args: [
-        { class: 'String', name: 'prop' },
-        { class: 'Object', name: 'value' }
-      ],
+      returns: 'FObject',
+      args: [ { name: 'prop', type: 'String' },
+              { name: 'value', type: 'Any' } ],
       javaCode: `
         PropertyInfo property = ((PropertyInfo) getClassInfo().getAxiomByName(prop));
         if ( property != null ) property.set(this, value);
@@ -241,10 +227,8 @@ foam.CLASS({
     },
     {
       name: 'isPropertySet',
-      javaReturns: 'boolean',
-      args: [
-        { class: 'String', name: 'prop' },
-      ],
+      returns: 'Boolean',
+      args: [ { name: 'prop', type: 'String' } ],
       javaCode: `
         PropertyInfo property = (PropertyInfo) getClassInfo().getAxiomByName(prop);
         return property != null && property.isSet(this);
@@ -252,10 +236,8 @@ foam.CLASS({
     },
     {
       name: 'hasDefaultValue',
-      javaReturns: 'boolean',
-      args: [
-        { class: 'String', name: 'prop' }
-      ],
+      returns: 'Boolean',
+      args: [ { name: 'prop', type: 'String' } ],
       javaCode: `
         if ( ! this.isPropertySet(prop) ) return true;
         PropertyInfo property = (PropertyInfo) getClassInfo().getAxiomByName(prop);
@@ -264,7 +246,7 @@ foam.CLASS({
     },
     {
       name: 'toJSON',
-      javaReturns: 'String',
+      returns: 'String',
       javaCode: `
         Outputter out = new Outputter();
         return out.stringify(this);
@@ -272,7 +254,7 @@ foam.CLASS({
     },
     {
       name: 'toString',
-      javaReturns: 'String',
+      returns: 'String',
       javaCode: `
         StringBuilder sb = new StringBuilder();
         append(sb);
@@ -281,9 +263,7 @@ foam.CLASS({
     },
     {
       name: 'append',
-      args: [
-        { class: 'Object', name: 'sb', javaType: 'java.lang.StringBuilder' }
-      ],
+      args: [ { name: 'sb', javaType: 'java.lang.StringBuilder' } ],
       javaCode: `
         List     props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
         Iterator i     = props.iterator();
@@ -312,11 +292,13 @@ foam.CLASS({
     },
     {
       name: 'beforeFreeze',
+      returns: 'Void',
       javaCode: `
       `
     },
     {
       name: 'freeze',
+      returns: 'Void',
       javaCode: `
         beforeFreeze();
         this.__frozen__ = true;
@@ -324,21 +306,19 @@ foam.CLASS({
     },
     {
       name: 'isFrozen',
-      javaReturns: 'boolean',
+      returns: 'Boolean',
       javaCode: `
         return this.__frozen__;
       `
     },
     {
       name: 'hash',
-      javaReturns: 'byte[]',
+      returns: 'ByteArray',
       javaThrows: [
         'java.security.NoSuchAlgorithmException'
       ],
-      args: [
-        { class: 'String', name: 'algorithm' },
-        { class: 'Object', name: 'hash', javaType: 'byte[]' },
-      ],
+      args: [ { name: 'algorithm', type: 'String' },
+              { name: 'hash', type: 'ByteArray' } ],
       javaCode: `
         MessageDigest md = MessageDigest.getInstance(algorithm);
         List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
@@ -403,7 +383,7 @@ foam.CLASS({
         'SignatureException'
       ],
       args: [
-        { class: 'Object', name: 'signature', javaType: 'byte[]' },
+        { class: 'Object', name: 'signature', type: 'ByteArray' },
         { class: 'String', name: 'algorithm' },
         { class: 'Object', name: 'key', javaType: 'java.security.PublicKey' },
       ],

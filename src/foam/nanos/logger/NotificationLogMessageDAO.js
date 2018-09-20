@@ -80,11 +80,11 @@ foam.CLASS({
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'log',
-          javaType: 'foam.nanos.logger.LogMessage'
+          type: 'foam.nanos.logger.LogMessage'
         },
       ],
       javaCode: `

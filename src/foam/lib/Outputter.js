@@ -24,21 +24,21 @@ foam.INTERFACE({
     },
     {
       name: 'stringify',
-      javaReturns: 'String',
+      returns: 'String',
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          type: 'FObject'
         }
       ]
     },
     {
       name: 'output',
-      javaReturns: 'void',
+      returns: 'Void',
       args: [
         {
           name: 'value',
-          javaType: 'Object'
+          type: 'Any'
         }
       ]
     }

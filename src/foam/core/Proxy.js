@@ -97,6 +97,10 @@ foam.CLASS({
   properties: [
     { name: 'of', required: true },
     {
+      name: 'type',
+      factory: function() { return this.of; }
+    },
+    {
       class: 'StringArray',
       name: 'topics'
     },
@@ -350,7 +354,7 @@ if let src = src as? Topic {
       args: [
         {
           name: 'c',
-          of: 'foam.core.EventProxy',
+          type: 'foam.core.EventProxy',
         },
       ],
       code: function removeChild(c) {

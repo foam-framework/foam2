@@ -11,21 +11,18 @@ foam.INTERFACE({
   methods: [
     {
       name: 'beforeFreeze',
-      returns: 'Promise',
-      javaReturns: 'void',
-      swiftReturns: 'Void'
+      async: true,
+      returns: 'Void'
     },
     {
       name: 'freeze',
-      returns: 'Promise',
-      javaReturns: 'void',
-      swiftReturns: 'Void'
+      async: true,
+      returns: 'Void'
     },
     {
       name: 'isFrozen',
-      returns: 'Boolean',
-      javaReturns: 'boolean',
-      swiftReturns: 'Bool'
+      async: true,
+      returns: 'Boolean'
     }
   ]
 });

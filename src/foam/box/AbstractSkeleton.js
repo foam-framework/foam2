@@ -15,8 +15,8 @@ foam.CLASS({
     {
       name: 'getMessageX',
       documentation: 'Return context stored in message if present, otherwise getX().',
-      javaReturns: 'foam.core.X',
-      args: [ { name: 'msg', of: 'foam.box.Message' } ],
+      returns: 'Context',
+      args: [ { name: 'msg', type: 'foam.box.Message' } ],
       javaCode: `foam.core.X x = (foam.core.X)msg.getLocalAttributes().get("x");
 return x == null ? getX() : x;`
     },

@@ -272,39 +272,32 @@ foam.INTERFACE({
   methods: [
     {
       name: 'add',
-      returns: 'Promise',
-      javaReturns: 'void',
-      swiftReturns: 'Void',
+      async: true,
       swiftThrows: true,
       args: [
-        { name: 'target', of: 'foam.core.FObject' }
+        { name: 'target', type: 'FObject' }
       ]
     },
     {
       name: 'remove',
-      returns: 'Promise',
-      javaReturns: 'void',
-      swiftReturns: 'Void',
+      async: true,
       swiftThrows: true,
       args: [
-        { name: 'target', of: 'foam.core.FObject' }
+        { name: 'target', type: 'FObject' }
       ]
     },
     // TODO: These should really be properties.
     {
       name: 'getDAO',
-      javaReturns: 'foam.dao.DAO',
-      swiftReturns: 'foam_dao_DAO'
+      returns: 'foam.dao.DAO'
     },
     {
       name: 'getJunctionDAO',
-      javaReturns: 'foam.dao.DAO',
-      swiftReturns: 'foam_dao_DAO'
+      returns: 'foam.dao.DAO'
     },
     {
       name: 'getTargetDAO',
-      javaReturns: 'foam.dao.DAO',
-      swiftReturns: 'foam_dao_DAO'
+      returns: 'foam.dao.DAO'
     },
   ]
 });
@@ -400,7 +393,7 @@ foam.CLASS({
   methods: [
     {
       name: 'add',
-      args: [{ name: 'target', of: 'foam.core.FObject' }],
+      args: [{ name: 'target', type: 'FObject' }],
       javaCode: `getJunctionDAO()
               .put(createJunction(((foam.core.Identifiable)target)
               .getPrimaryKey()));`,
@@ -425,9 +418,8 @@ foam.CLASS({
     },
     {
       name: 'createJunction',
-      args: [{ name: 'targetId', javaType: 'Object' }],
+      args: [{ name: 'targetId', type: 'Any' }],
       returns: 'foam.core.FObject',
-      javaReturns: 'foam.core.FObject',
       code: function createJunction(targetId) {
         foam.assert( ( ! foam.Undefined.isInstance(this.sourceId) ) &&
                      ( ! foam.Undefined.isInstance(targetId) ),
@@ -622,8 +614,7 @@ foam.CLASS({
         return [
           {
             name: 'x',
-            javaType: 'foam.core.X',
-            swiftType: 'Context',
+            type: 'Context'
           }
         ];
       },
@@ -764,8 +755,7 @@ foam.CLASS({
         return [
           {
             name: 'x',
-            javaType: 'foam.core.X',
-            swiftType: 'Context',
+            type: 'Context'
           }
         ];
       },

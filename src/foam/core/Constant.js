@@ -34,7 +34,18 @@ foam.CLASS({
 
   properties: [
     'name',
-    'of',
+    {
+      class: 'Class',
+      name: 'of'
+    },
+    {
+      class: 'TypeProperty',
+      name: 'type'
+    },
+    {
+      class: 'StringArray',
+      name: 'flags'
+    },
     {
       name: 'value',
       expression: function(factory) {

@@ -141,8 +141,8 @@ foam.CLASS({
     {
       name: 'saveService',
       args: [
-        { name: 'x', javaType: 'foam.core.X' },
-        { name: 'service', javaType: 'Object' }
+        { name: 'x', type: 'Context' },
+        { name: 'service', type: 'Any' }
       ],
       javaCode: `
       /*
@@ -158,7 +158,7 @@ foam.CLASS({
     {
       name: 'createService',
       args: [
-        { name: 'x', javaType: 'foam.core.X' }
+        { name: 'x', type: 'Context' }
       ],
       javaReturns: 'java.lang.Object',
       javaCode: `

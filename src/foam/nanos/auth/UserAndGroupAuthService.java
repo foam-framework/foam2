@@ -171,7 +171,7 @@ public class UserAndGroupAuthService
    * Check if the user in the context supplied has the right permission
    * Return Boolean for this
    */
-  public Boolean checkPermission(foam.core.X x, Permission permission) {
+  public boolean checkPermission(foam.core.X x, Permission permission) {
     if ( x == null || permission == null ) {
       return false;
     }
@@ -217,7 +217,7 @@ public class UserAndGroupAuthService
     return false;
   }
 
-  public Boolean check(foam.core.X x, String permission) {
+  public boolean check(foam.core.X x, String permission) {
     return checkPermission(x, new AuthPermission(permission));
   }
 

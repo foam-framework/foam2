@@ -78,17 +78,18 @@ foam.CLASS({
       name: 'runScript',
       args: [
         {
-          name: 'x', javaType: 'foam.core.X'
+          name: 'x',
+          type: 'Context'
         }
       ],
-      javaReturns: 'void',
+      returns: 'Void',
       javaCode:
 `super.runScript(x);
 setScheduledTime(getNextScheduledTime());`
     },
     {
       name: 'getNextScheduledTime',
-      javaReturns: 'Date',
+      returns: 'Date',
       javaCode:
 `Calendar next = Calendar.getInstance();
 next.add(Calendar.MINUTE, 1);

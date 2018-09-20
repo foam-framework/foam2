@@ -91,7 +91,7 @@ foam.CLASS({
       }
     },
     {
-      type: 'Int',
+      class: 'Int',
       name: 'port',
       value: 8000
     },

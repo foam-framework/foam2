@@ -15,11 +15,11 @@ foam.INTERFACE({
   methods: [
     {
       name: 'setup',
-      javaReturns: 'void',
+      returns: 'Void',
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         }
       ]
     }

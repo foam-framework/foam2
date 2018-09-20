@@ -198,8 +198,11 @@ foam.LIB({
        * if it implements this class (directly or indirectly).
        */
 
-      if ( ! c || ! c.id ) return false;
+      if ( ! c || ! c.id || ! c.prototype ) return false;
 
+      // This optimization means we can't use foam.core.isSubClass() to check
+      // if an object is a class or not.
+      
       // Optimize most common case and avoid creating cache
       if ( this === foam.core.FObject ) return true;
 

@@ -581,7 +581,9 @@ foam.CLASS({
     //
     //   return e;
     // },
-  `,
+`,
+
+  flags: ['web'],
 
   requires: [
     'foam.dao.MergedResetSink',
@@ -622,7 +624,7 @@ foam.CLASS({
 
     {
       name: 'DEFAULT_VALIDATOR',
-      of: 'foam.u2.DefaultValidator',
+      type: 'foam.u2.DefaultValidator',
       factory: function() { return foam.u2.DefaultValidator.create(); }
     },
 
@@ -634,7 +636,7 @@ foam.CLASS({
         to try and mutate the Element while in the OUTPUT state.
       `,
       name: 'OUTPUT',
-      of: 'foam.u2.OutputElementState',
+      type: 'foam.u2.OutputElementState',
       factory: function() { return foam.u2.OutputElementState.create(); }
     },
 
@@ -644,7 +646,7 @@ foam.CLASS({
         A Loaded Element should be visible in the DOM.
       `,
       name: 'LOADED',
-      of: 'foam.u2.LoadedElementState',
+      type: 'foam.u2.LoadedElementState',
       factory: function() { return foam.u2.LoadedElementState.create(); }
     },
 
@@ -654,7 +656,7 @@ foam.CLASS({
         An unloaded Element can be readded to the DOM.
       `,
       name: 'UNLOADED',
-      of: 'foam.u2.UnloadedElementState',
+      type: 'foam.u2.UnloadedElementState',
       factory: function() { return foam.u2.UnloadedElementState.create(); }
     },
 
@@ -663,8 +665,10 @@ foam.CLASS({
         Initial state of an Element before it has been added to the DOM.
       `,
       name: 'INITIAL',
-      of: 'foam.u2.InitialElementState',
-      factory: function() { return foam.u2.InitialElementState.create(); }
+      type: 'foam.u2.InitialElementState',
+      factory: function() {
+        return foam.u2.InitialElementState.create();
+      }
     },
 
     // ???: Add DESTROYED State?
@@ -779,7 +783,9 @@ foam.CLASS({
       topics: [],
       delegates: foam.u2.ElementState.getOwnAxiomsByClass(foam.core.Method).
           map(function(m) { return m.name; }),
-      factory: function() { return this.INITIAL; },
+      factory: function() {
+        return this.INITIAL;
+      },
       postSet: function(oldState, state) {
         if ( state === this.LOADED ) {
           this.pub('onload');

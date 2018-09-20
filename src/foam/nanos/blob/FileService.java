@@ -82,7 +82,6 @@ public class FileService
     } catch (Throwable t) {
       throw new RuntimeException(t);
     } finally {
-      IOUtils.closeQuietly(blob);
       IOUtils.closeQuietly(os);
     }
   }

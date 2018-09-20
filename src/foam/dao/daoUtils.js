@@ -83,6 +83,7 @@ return listener
       `,
       javaCode: `
         // TODO: Support changing of delegate
+        // TODO: Return a detachable
         getDelegate().listen_(getX(), sink, predicate);
       `
     }

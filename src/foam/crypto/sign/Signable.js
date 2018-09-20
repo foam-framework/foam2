@@ -13,7 +13,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'sign',
-      javaReturns: 'byte[]',
+      returns: 'ByteArray',
       javaThrows: [
         'java.security.NoSuchAlgorithmException',
         'java.security.InvalidKeyException',
@@ -22,7 +22,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'algorithm',
-          javaType: 'String',
+          type: 'String',
           documentation: 'Signing algorithm'
         },
         {
@@ -43,12 +43,12 @@ foam.INTERFACE({
       args: [
         {
           name: 'signature',
-          javaType: 'byte[]',
+          type: 'ByteArray',
           documentation: 'Signature to verify'
         },
         {
           name: 'algorithm',
-          javaType: 'String',
+          type: 'String',
           documentation: 'Signing algorithm'
         },
         {

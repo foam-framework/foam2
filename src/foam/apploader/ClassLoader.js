@@ -78,7 +78,7 @@ have multiple classloaders running alongside eachother`
       name: 'maybeLoad',
       returns: 'Promise',
       documentation: "Like load, but don't throw if not found.",
-      args: [ { name: 'id', of: 'String' } ],
+      args: [ { name: 'id', type: 'String' } ],
       code: function(id) {
         return this.load(id).catch(function() { return null; });
       }
@@ -86,8 +86,8 @@ have multiple classloaders running alongside eachother`
     {
       name: 'maybeLoad_',
       returns: 'Promise',
-      args: [ { name: 'id', of: 'String' },
-              { name: 'path', of: 'StringArray' } ],
+      args: [ { name: 'id', type: 'String' },
+              { name: 'path', type: 'StringArray' } ],
       code: function(id, path) {
         return this.load_(id, path).catch(function() { return null; });
       }
@@ -107,8 +107,8 @@ have multiple classloaders running alongside eachother`
     {
       name: 'load_',
       returns: 'Promise',
-      args: [ { class: 'String', name: 'id' },
-              { class: 'StringArray', name: 'path' } ],
+      args: [ { name: 'id', type: 'String' },
+              { name: 'path', type: 'StringArray' } ],
       code: function(id, path) {
         var self = this;
 
@@ -158,8 +158,9 @@ have multiple classloaders running alongside eachother`
               });
             }
             return this.buildClass_(m, path);
-          }.bind(this), function() {
-            throw new Error("Failed to load class " + id);
+          }.bind(this), function(e) {
+            throw e ? new Error("Failed to load class " + id + ".  Caused by: " + e.message) :
+              new Error("Failed to load class " + id);
           });
         }
 
@@ -172,7 +173,7 @@ have multiple classloaders running alongside eachother`
     },
     {
       name: 'modelDeps_',
-      args: [ { name: 'model', of: 'foam.core.Model' },
+      args: [ { name: 'model', type: 'Model' },
               { name: 'path' } ],
       code: function(model, path) {
         var self = this;
@@ -183,8 +184,8 @@ have multiple classloaders running alongside eachother`
     },
     {
       name: 'buildClass_',
-      args: [ { name: 'model', of: 'foam.core.Model' },
-              { name: 'path', of: 'StringArray' } ],
+      args: [ { name: 'model', type: 'Model' },
+              { name: 'path', type: 'StringArray' } ],
       code: function(model, path) {
         var self = this;
 

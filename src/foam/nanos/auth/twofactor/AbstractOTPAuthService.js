@@ -32,22 +32,20 @@ foam.CLASS({
   methods: [
     {
       name: 'generateSecret',
-      javaReturns: 'byte[]',
+      returns: 'ByteArray',
       args: [
         {
           name: 'size',
-          javaType: 'int',
+          type: 'Integer'
         }
       ],
-      javaCode: `
-        final byte[] bytes = new byte[size];
-        SecurityUtil.GetSecureRandom().nextBytes(bytes);
-        return bytes;
-      `
+      javaCode: `final byte[] bytes = new byte[size];
+SecurityUtil.GetSecureRandom().nextBytes(bytes);
+return bytes;`
     },
     {
       name: 'calculateCode',
-      javaReturns: 'long',
+      returns: 'Long',
       javaThrows: [
         'java.security.InvalidKeyException',
         'java.security.NoSuchAlgorithmException'
@@ -55,11 +53,11 @@ foam.CLASS({
       args: [
         {
           name: 'key',
-          javaType: 'byte[]'
+          type: 'ByteArray'
         },
         {
           name: 'interval',
-          javaType: 'long'
+          type: 'Long'
         }
       ],
       javaCode: `

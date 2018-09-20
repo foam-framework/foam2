@@ -215,7 +215,8 @@ foam.CLASS({
         return function compare(o1, o2) {
           return comparePropertyValues(f(o1), f(o2));
         };
-      }
+      },
+
     },
     // FUTURE: Move to refinement?
     {

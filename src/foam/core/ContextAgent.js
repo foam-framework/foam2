@@ -12,7 +12,7 @@ foam.INTERFACE({
     {
       name: 'execute',
       javaReturns: 'void',
-      args: [ { name: 'x', javaType: 'foam.core.X' } ]
+      args: [ { name: 'x', type: 'Context' } ]
     }
   ]
 });

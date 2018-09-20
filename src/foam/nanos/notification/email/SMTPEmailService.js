@@ -128,7 +128,7 @@ protected EnvironmentConfiguration config_ = null;`
       args: [
         {
           name: 'group',
-          javaType: 'String'
+          type: 'String'
         }
       ],
       javaCode:
@@ -150,7 +150,7 @@ return config_;`
       args: [
         {
           name: 'emailMessage',
-          javaType: 'foam.nanos.notification.email.EmailMessage'
+          type: 'foam.nanos.notification.email.EmailMessage'
         }
       ],
       javaCode:
@@ -228,7 +228,7 @@ return config_;`
       args: [
         {
           name: 'emailMessage',
-          javaType: 'final foam.nanos.notification.email.EmailMessage'
+          type: 'foam.nanos.notification.email.EmailMessage'
         }
       ],
       javaCode: `

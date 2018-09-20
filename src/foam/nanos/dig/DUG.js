@@ -78,10 +78,9 @@ foam.CLASS({
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         }
       ],
-      javaReturns: 'void',
       javaCode: `
         try {
           DAO dao = (DAO) x.get(getDaoKey());

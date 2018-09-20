@@ -39,7 +39,7 @@ foam.CLASS({
       name: 'linkFrom',
       args: [
         {
-          of: 'foam.swift.core.Slot',
+          type: 'foam.swift.core.Slot',
           name: 's2',
         },
       ],
@@ -88,7 +88,7 @@ return Subscription {
       name: 'linkTo',
       args: [
         {
-          of: 'foam.swift.core.Slot',
+          type: 'foam.swift.core.Slot',
           name: 'other',
         },
       ],
@@ -101,7 +101,7 @@ return other.linkFrom(self)
       name: 'follow',
       args: [
         {
-          of: 'foam.swift.core.Slot',
+          type: 'foam.swift.core.Slot',
           name: 'other',
         },
       ],
@@ -120,7 +120,7 @@ return other.swiftSub { (_, _) in l() }
       name: 'mapFrom',
       args: [
         {
-          of: 'foam.swift.core.Slot',
+          type: 'foam.swift.core.Slot',
           name: 'other',
         },
         {
@@ -142,7 +142,7 @@ return other.swiftSub { (_, _) in l() }
       name: 'mapTo',
       args: [
         {
-          of: 'foam.swift.core.Slot',
+          type: 'foam.swift.core.Slot',
           name: 'other',
         },
         {

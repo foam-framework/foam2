@@ -72,7 +72,7 @@ foam.CLASS({
       args: [
         {
           name: 'group',
-          javaType: 'String'
+          type: 'String'
         }
       ],
       javaCode:
