@@ -9,6 +9,7 @@ package foam.util;
 import foam.blob.HashingOutputStream;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -48,6 +49,20 @@ public class SecurityUtil {
       StringBuilder b = super.get();
       b.setLength(0);
       return b;
+    }
+  };
+
+  private static ThreadLocal<ByteArrayOutputStream> baos_ = new ThreadLocal<ByteArrayOutputStream>() {
+    @Override
+    protected ByteArrayOutputStream initialValue() {
+      return new ByteArrayOutputStream();
+    }
+
+    @Override
+    public ByteArrayOutputStream get() {
+      ByteArrayOutputStream baos = super.get();
+      baos.reset();
+      return baos;
     }
   };
 
@@ -294,6 +309,28 @@ public class SecurityUtil {
     }
 
     return builder.toString();
+  }
+
+  public static byte[] HexStringToByteArray(String str) {
+    return HexStringToByteArray(str, '\u0000');
+  }
+
+  public static byte[] HexStringToByteArray(String str, char delimiter) {
+    int length = str.length() / 2;
+    ByteArrayOutputStream baos = baos_.get();
+    for ( int i = 0 ; i < length ; i++ ) {
+      if ( str.charAt(i) == delimiter )
+        continue;
+
+      int index = i * 2;
+      baos.write(HexToInt(str.charAt(index)) *
+        16 + HexToInt(str.charAt(index+1)));
+    }
+    return baos.toByteArray();
+  }
+
+  public static int HexToInt(char c) {
+    return c < ':' ? c - '0' : 10 + c - 'A';
   }
 
   /**

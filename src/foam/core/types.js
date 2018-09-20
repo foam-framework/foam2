@@ -349,7 +349,8 @@ foam.CLASS({
   name: 'Image',
   extends: 'String',
   // FUTURE: verify
-  label: 'Image data or link'
+  label: 'Image data or link',
+  properties: [ [ 'displayWidth', 80 ] ]
 });
 
 
@@ -358,7 +359,8 @@ foam.CLASS({
   name: 'URL',
   extends: 'String',
   // FUTURE: verify
-  label: 'Web link (URL or internet address)'
+  label: 'Web link (URL or internet address)',
+  properties: [ [ 'displayWidth', 80 ] ]
 });
 
 
@@ -366,7 +368,8 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Color',
   extends: 'String',
-  label: 'Color'
+  label: 'Color',
+  properties: [ [ 'displayWidth', 20 ] ]
 });
 
 
