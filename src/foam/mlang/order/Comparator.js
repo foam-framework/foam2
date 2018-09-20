@@ -20,6 +20,7 @@ foam.INTERFACE({
       ]
     },
     {
+      flags: ['js', 'java'],
       name: 'toIndex',
       args: [
         'tail'
@@ -29,16 +30,19 @@ foam.INTERFACE({
       // TODO: why is this here?
       /** Returns remaning ordering without this first one, which may be the
         only one. */
+      flags: ['js', 'java'],
       name: 'orderTail'
     },
     {
       // TODO: why is this here?
       /** The property, if any, sorted by this ordering. */
+      flags: ['js', 'java'],
       name: 'orderPrimaryProperty'
     },
     {
       // TODO: why is this here?
       /** Returns 1 or -1 for ascending/descending */
+      flags: ['js', 'java'],
       name: 'orderDirection'
     }
   ]
