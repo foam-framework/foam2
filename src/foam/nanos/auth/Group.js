@@ -169,8 +169,10 @@ if ( session != null ) {
     } else {
       //populate AppConfig url with request's RootUrl
       HttpServletRequest req = x.get(HttpServletRequest.class);
-      if (req != null) {
-        config.setUrl(((Request) req).getRootURL().toString());
+      if (req != null) {  
+        String httpsRequest = ((Request) req).getRootURL().toString();
+        httpsRequest = "https" + httpsRequest.substring(4);
+        config.setUrl(httpsRequest);
       }
     }
   }
