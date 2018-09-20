@@ -330,7 +330,7 @@ public class SecurityUtil {
   }
 
   public static int HexToInt(char c) {
-    return c < ':' ? c - '0' : 10 + c - 'A';
+    return c > '/' && c < ':' ? c - '0' : c > '@' && c < 'G' ? 10 + c - 'A' : 10 + c - 'a';
   }
 
   /**
