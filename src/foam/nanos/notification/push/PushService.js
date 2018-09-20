@@ -11,20 +11,20 @@ foam.INTERFACE({
   methods: [
     {
       name: 'sendPush',
-      returns: 'Promise',
-      javaReturns: 'boolean',
+      async: true,
+      returns: 'Boolean',
       args: [
         {
           name: 'user',
-          javaType: 'foam.nanos.auth.User'
+          type: 'foam.nanos.auth.User'
         },
         {
           name: 'msg',
-          javaType: 'String'
+          type: 'String'
         },
         {
           name: 'data',
-          javaType: 'java.util.Map'
+          type: 'Map'
         }
       ]
     }

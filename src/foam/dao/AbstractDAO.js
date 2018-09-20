@@ -281,19 +281,16 @@ listeners_.add(new DAOListener(sink, listeners_));
 
     {
       name: 'decorateListener_',
-      swiftReturns: 'foam_dao_Sink',
-      javaReturns: 'Sink',
+      returns: 'foam.dao.Sink',
       args: [
         {
-          of: 'foam.dao.Sink',
           name: 'sink',
-          javaType: 'Sink',
+          type: 'foam.dao.Sink'
         },
         {
-          of: 'foam.mlang.predicate.Predicate',
-          optional: true,
           name: 'predicate',
-          javaType: 'foam.mlang.predicate.Predicate',
+          type: 'foam.mlang.predicate.Predicate',
+          optional: true
         },
       ],
       code: function decorateListener_(sink, predicate) {
@@ -329,35 +326,29 @@ return sink;
     */
     {
       name: 'decorateSink_',
-      swiftReturns: 'foam_dao_Sink',
-      javaReturns: 'foam.dao.Sink',
+      returns: 'foam.dao.Sink',
       args: [
         {
-          of: 'foam.dao.Sink',
           name: 'sink',
-          javaType: 'foam.dao.Sink',
+          type: 'foam.dao.Sink'
         },
         {
           name: 'skip',
-          swiftType: 'Int?',
-          javaType: 'long',
+          type: 'Long'
         },
         {
           name: 'limit',
-          swiftType: 'Int?',
-          javaType: 'long',
+          type: 'Long'
         },
         {
-          of: 'foam.mlang.order.Comparator',
           name: 'order',
-          optional: true,
-          javaType: 'foam.mlang.order.Comparator',
+          type: 'foam.mlang.order.Comparator',
+          optional: true
         },
         {
-          of: 'foam.mlang.predicate.Predicate',
           name: 'predicate',
-          optional: true,
-          javaType: 'foam.mlang.predicate.Predicate',
+          type: 'foam.mlang.predicate.Predicate',
+          optional: true
         },
       ],
       code: function decorateSink_(sink, skip, limit, order, predicate) {
@@ -548,27 +539,27 @@ this.select_(x, new RemoveSink(x, this), skip, limit, order, predicate);
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
+          type: 'Context'
         },
         {
           name: 'sink',
-          javaType: 'foam.dao.Sink',
+          type: 'foam.dao.Sink',
         },
         {
           name: 'skip',
-          javaType: 'long',
+          type: 'Long'
         },
         {
           name: 'limit',
-          javaType: 'long',
+          type: 'Long'
         },
         {
           name: 'order',
-          javaType: 'foam.mlang.order.Comparator',
+          type: 'foam.mlang.order.Comparator'
         },
         {
           name: 'predicate',
-          javaType: 'foam.mlang.predicate.Predicate',
+          type: 'foam.mlang.predicate.Predicate'
         },
       ],
       javaCode: `

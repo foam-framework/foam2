@@ -6,6 +6,7 @@
 
 var classes = [
   'foam.core.Axiom',
+  'foam.core.Detachable',
   'foam.core.Serializable',
   'foam.core.Exception',
   'foam.core.Freezable',
@@ -226,7 +227,6 @@ var classes = [
   'foam.lib.json.UnknownFObject',
   'foam.lib.json.UnknownFObjectArray',
   'foam.lib.json.ClassReferenceParserTest',
-  'foam.blob.Buffer',
   'foam.blob.Blob',
   'foam.blob.BlobService',
   'foam.blob.AbstractBlob',

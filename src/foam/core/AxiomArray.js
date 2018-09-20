@@ -27,6 +27,7 @@ foam.CLASS({
       name: 'of',
       required: true
     },
+    [ 'type', 'Array' ],
     {
       name: 'adapt',
       value: function(_, a, prop) {

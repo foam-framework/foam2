@@ -44,6 +44,7 @@ FOAM_FILES([
   { name: "foam/core/Validation" },
   { name: "foam/pattern/Faceted" },
   { name: "foam/core/types" },
+  { name: "foam/core/Type" },
   { name: "foam/core/Topic" },
   { name: "foam/core/InnerClass" },
   { name: "foam/core/InnerEnum" },
@@ -81,6 +82,7 @@ FOAM_FILES([
   { name: "foam/core/Reaction" },
   { name: "foam/core/Serializable" },
   { name: "foam/core/Freezable" },
+  { name: "foam/core/Detachable" },
   { name: "foam/core/AbstractFObject" },
   { name: "foam/java/Validation" },
 
@@ -250,8 +252,6 @@ FOAM_FILES([
   { name: "foam/physics/Collider" },
   { name: "foam/physics/PhysicsEngine" },
   { name: "foam/blob/Blob" },
-  { name: "foam/blob/Blob_node", flags: ['node'] },
-  { name: "foam/blob/BlobJava", flags: ['java'] },
   { name: "lib/node/json_dao", flags: ['node'] },
   { name: "lib/utf8" },
 
@@ -279,8 +279,9 @@ FOAM_FILES([
   { name: "foam/net/node/WebSocketService", flags: ['node'] },
   { name: "lib/firebase" },
   { name: "lib/fcm" },
-  { name: "lib/Stub" },
-  { name: "lib/StubJava", flags: ['java'] },
+  { name: "foam/core/StubMethod" },
+  { name: "foam/core/StubAction" },
+  { name: "foam/core/Stub" },
   { name: "foam/box/Box" },
   { name: "foam/box/AnonymousBox" },
   { name: "foam/box/RemoteException" },
@@ -347,8 +348,7 @@ FOAM_FILES([
   { name: "foam/box/ForwardBox" },
   { name: "foam/box/ForwardingBox" },
   { name: "foam/box/SessionClientBox" },
-  { name: "lib/boxJava", flags: ['java'] },
-
+  
   { name: "foam/swift/refines/Stub", flags: ['swift'] },
   { name: "foam/swift/refines/Promised", flags: ['swift'] },
   { name: "foam/swift/refines/Topic", flags: ['swift'] },

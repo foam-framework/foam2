@@ -54,7 +54,7 @@ foam.CLASS({
       name: 'runScript',
       args: [
         {
-          name: 'x', javaType: 'foam.core.X'
+          name: 'x', type: 'Context'
         }
       ],
       javaReturns: 'void',
@@ -98,7 +98,7 @@ foam.CLASS({
       name: 'runServerSideTest',
       args: [
         {
-          name: 'x', javaType: 'foam.core.X'
+          name: 'x', type: 'Context'
         },
         {
           name: 'test', javaType: 'Test'
@@ -120,12 +120,12 @@ foam.CLASS({
     },
     {
       name: 'printBold',
+      returns: 'Void',
       args: [
         {
-          name: 'message', javaType: 'String'
+          name: 'message', type: 'String'
         }
       ],
-      javaReturns: 'void',
       javaCode: 'System.out.println("\\033[0;1m" + message + RESET_COLOR);'
     },
     {

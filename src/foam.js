@@ -20,7 +20,7 @@
   var isWorker = typeof importScripts !== 'undefined';
   var isServer = ( ! isWorker ) && typeof window === 'undefined';
 
-  var flags    = this.FOAM_FLAGS || {};
+  var flags    = this.FOAM_FLAGS = this.FOAM_FLAGS || {};
   flags.web    = ! isServer,
   flags.node   = isServer;
   flags.loader = ! isServer;

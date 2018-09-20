@@ -13,19 +13,19 @@ foam.INTERFACE({
   methods: [
     {
       name: 'hash',
-      javaReturns: 'byte[]',
+      returns: 'ByteArray',
       javaThrows: [
         'java.security.NoSuchAlgorithmException',
       ],
       args: [
         {
           name: 'algorithm',
-          javaType: 'String',
+          type: 'String',
           documentation: 'Hashing algorithm to use'
         },
         {
           name: 'hash',
-          javaType: 'byte[]',
+          type: 'ByteArray',
           documentation: 'Previous hash (used for chaining)'
         }
       ]

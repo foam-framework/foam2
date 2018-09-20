@@ -53,7 +53,7 @@ foam.CLASS({
     {
       class: 'Object',
       name: 'context',
-      javaType: 'foam.core.X',
+      type: 'Context',
       javaFactory: 'return foam.core.EmptyX.instance().put(Session.class, this);',
       hidden: true,
       transient: true

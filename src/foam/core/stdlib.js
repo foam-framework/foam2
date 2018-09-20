@@ -326,12 +326,20 @@ foam.LIB({
       var ws = "\\s*";
       var comment = "(?:\\/\\*(?:.|\\s)*?\\*\\/)?";
       var skip = "(?:" + ws + comment + ws + ")*";
+      
+      var functionHeader = "function" + skip + ident + "?\\(";
+      
+      var arrowHeader = "\\(";
+      
       var header = "(?:function" + skip + ident + "?\\(|\\()" + skip;
+      
       var arg = "(?:" + ident + skip + ")";
       var nextArg = "(?:," + skip + arg + ")";
       var argEnd = "\\)";
       var headerToBody = skip + "(?:\\=\\>)?" + skip;
-      var body = "\\{((?:.|\\s)*)\\}";
+      var bodyText = "((?:.|\\s))*";
+      var body = "\\{" + bodyText + "\\}";
+      var arrowBody = bodyText;
 
       var breakdown = {
         name: '',
@@ -360,10 +368,16 @@ foam.LIB({
         currentRegex.lastIndex = lastIndex;
       }
 
-      var match = next(header);
-      if ( ! match ) return null;
-
-      if ( match[1] ) breakdown.name = match[1];
+      var isArrow = false;
+      
+      var match = next(functionHeader);
+      if ( match ) {
+        if ( match[1] ) breakdown.name = match[1];
+      } else {
+        match = next(arrowHeader);
+        if ( ! match ) return null;
+        isArrow = true;
+      }
 
       match = next(arg);
 
@@ -380,7 +394,9 @@ foam.LIB({
 
       if ( ! next(headerToBody) ) return null;
 
-      match = next(body);
+
+      match = isArrow ? next(arrowBody) : next(body);
+      
       if ( ! match ) return null;
       breakdown.body = match[1];
 
@@ -843,6 +859,13 @@ foam.LIB({
       var uid = '__mmethod__' + foam.next$UID() + '__';
 
       var first = true;
+      
+      var name;
+      for ( var key in map ) {
+        name = map[key].name;
+        break;
+      }
+        
       var f = function(arg1) {
         if ( first ) {
           for ( var key in map ) {
@@ -864,7 +887,7 @@ foam.LIB({
               'and no default method provided');
           foam.assert(
               type[uid],
-              'Missing multi-method for type ', arg1, ' map: ', map,
+              'Missing ' + name + ' multi-method for type ', type.model_.name, ' map: ', map,
               'and no deafult method provided');
         }
         return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
@@ -925,7 +948,7 @@ foam.LIB({
       function flagFilter(flags) {
         return function(a) {
           if ( ! flags ) return true;
-          if ( ! a.flags ) return true;
+          if ( ! a.flags || ! a.flags.length ) return true;
           for ( var i = 0, f; f = flags[i]; i++ ) {
             if ( a.flags.indexOf(f) != -1 ) return true;
           }

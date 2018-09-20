@@ -146,9 +146,8 @@ foam.CLASS({
       documentation: 'Writes comment explaining who modified entry',
       args: [
         {
-          class: 'FObjectProperty',
-          of: 'foam.nanos.auth.User',
-          name: 'user'
+          name: 'user',
+          type: 'foam.nanos.auth.User'
         }
       ],
       javaCode: `

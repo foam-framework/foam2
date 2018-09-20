@@ -63,11 +63,11 @@ foam.CLASS({
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'obj',
-          of: 'foam.core.FObject',
+          type: 'FObject'
         }
       ],
       javaCode: `

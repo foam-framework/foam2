@@ -32,6 +32,17 @@ foam.CLASS({
         throw 'unimplemented';
       },
       swiftCode: 'throw FoamError("unimplemented")',
+      javaCode: `
+try {
+  javax.servlet.http.HttpServletResponse response = (javax.servlet.http.HttpServletResponse)getX().get("httpResponse");
+  response.setContentType("application/json");
+  java.io.PrintWriter writer = response.getWriter();
+  writer.print(new foam.lib.json.Outputter(foam.lib.json.OutputterMode.NETWORK).stringify(msg));
+  writer.flush();
+} catch(java.io.IOException e) {
+  throw new RuntimeException(e);
+}
+`
     }
   ]
 });

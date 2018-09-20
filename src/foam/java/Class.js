@@ -210,10 +210,15 @@ foam.CLASS({
       o.out('}');
     },
 
-    function toJavaSource() {
+      function toJavaSource() {
+        try {
       var output = foam.java.Outputter.create();
       output.out(this);
-      return output.buf_;
+          return output.buf_;
+        } catch(e) {
+          console.log("***Error generating", this.name);
+          throw e;
+        }
     }
   ]
 });

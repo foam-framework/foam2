@@ -26,7 +26,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'end',
-          of: 'foam.swift.parse.PStream',
+          type: 'foam.swift.parse.PStream',
         },
       ],
     },

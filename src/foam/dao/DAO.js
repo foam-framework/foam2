@@ -24,148 +24,138 @@ foam.INTERFACE({
   methods: [
     {
       name: 'put',
-      returns: 'Promise',
-      swiftReturns: 'foam_core_FObject?',
+      async: true,
+      returns: 'FObject',
       swiftThrows: true,
-      javaReturns: 'foam.core.FObject',
       args: [
         {
-          of: 'FObject',
           name: 'obj',
+          type: 'FObject'
         }
       ]
     },
     {
       name: 'put_',
-      returns: 'Promise',
-      swiftReturns: 'foam_core_FObject?',
-      javaReturns: 'foam.core.FObject',
+      async: true,
+      returns: 'FObject',
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context?',
+          type: 'Context',
+          optional: true
         },
         {
-          of: 'FObject',
           name: 'obj',
+          type: 'FObject'
         }
       ]
     },
     {
       name: 'remove',
-      returns: 'Promise',
-      swiftReturns: 'foam_core_FObject?',
-      javaReturns: 'foam.core.FObject',
+      async: true,
+      returns: 'FObject',
       swiftThrows: true,
       args: [
         {
-          of: 'FObject',
           name: 'obj',
+          type: 'FObject'
         }
       ]
     },
     {
       name: 'remove_',
-      returns: 'Promise',
-      swiftReturns: 'foam_core_FObject?',
-      javaReturns: 'foam.core.FObject',
+      async: true,
+      returns: 'FObject',
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          swiftType: 'Context?',
-          javaType: 'foam.core.X',
+          type: 'Context',
+          optional: true
         },
         {
           name: 'obj',
-          of: 'FObject'
+          type: 'FObject'
         }
       ]
     },
     {
       name: 'find',
-      returns: 'Promise',
-      javaReturns: 'foam.core.FObject',
-      swiftReturns: 'foam_core_FObject?',
+      async: true,
+      returns: 'FObject',
       swiftThrows: true,
       args: [
         {
-          javaType: 'Object',
           name: 'id',
+          type: 'Object'
         }
       ],
     },
     {
       name: 'find_',
-      returns: 'Promise',
-      javaReturns: 'foam.core.FObject',
-      swiftReturns: 'foam_core_FObject?',
+      async: true,
+      returns: 'FObject',
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context?'
+          type: 'Context',
+          optional: true
         },
         {
-          javaType: 'Object',
           name: 'id',
+          type: 'Object'
         }
       ]
     },
     {
       name: 'select',
-      returns: 'Promise',
-      javaReturns: 'foam.dao.Sink',
-      swiftReturns: 'foam_dao_Sink',
+      async: true,
+      returns: 'foam.dao.Sink',
       swiftThrows: true,
       args: [
         {
           name: 'sink',
-          of: 'foam.dao.Sink',
+          type: 'foam.dao.Sink',
         }
       ]
     },
     {
       name: 'select_',
-      returns: 'Promise',
-      javaReturns: 'foam.dao.Sink',
-      swiftReturns: 'foam_dao_Sink',
+      async: true,
+      returns: 'foam.dao.Sink',
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context?'
+          type: 'Context',
+          optional: true,
         },
         {
           name: 'sink',
-          of: 'foam.dao.Sink',
+          type: 'foam.dao.Sink',
           swiftDefaultValue: 'foam_dao_ArraySink()',
         },
         {
           name: 'skip',
-          swiftType: 'Int',
-          swiftDefaultValue: '0',
-          javaType: 'long'
+          type: 'Long',
+          swiftDefaultValue: '0'
         },
         {
           name: 'limit',
-          swiftType: 'Int',
-          swiftDefaultValue: 'Int.max',
-          javaType: 'long'
+          type: 'Long',
+          swiftDefaultValue: 'Int.max'
         },
         {
           name: 'order',
-          of: 'foam.mlang.order.Comparator',
+          type: 'foam.mlang.order.Comparator',
           optional: true,
           swiftDefaultValue: 'nil',
         },
         {
           name: 'predicate',
-          of: 'foam.mlang.predicate.Predicate',
+          type: 'foam.mlang.predicate.Predicate',
           optional: true,
           swiftDefaultValue: 'nil',
         }
@@ -173,39 +163,39 @@ foam.INTERFACE({
     },
     {
       name: 'removeAll',
+      async: true,
       swiftThrows: true,
       args: [ ]
     },
     {
       name: 'removeAll_',
       swiftThrows: true,
+      async: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context?'
+          type: 'Context',
+          optional: true
         },
         {
           name: 'skip',
-          swiftType: 'Int?',
-          swiftDefaultValue: 'nil',
-          javaType: 'long'
+          type: 'Long',
+          swiftDefaultValue: '0'
         },
         {
           name: 'limit',
-          swiftType: 'Int?',
-          swiftDefaultValue: 'nil',
-          javaType: 'long'
+          type: 'Long',
+          swiftDefaultValue: 'Int.max'
         },
         {
           name: 'order',
-          of: 'foam.mlang.order.Comparator',
+          type: 'foam.mlang.order.Comparator',
           optional: true,
           swiftDefaultValue: 'nil',
         },
         {
           name: 'predicate',
-          of: 'foam.mlang.predicate.Predicate',
+          type: 'foam.mlang.predicate.Predicate',
           optional: true,
           swiftDefaultValue: 'nil',
         }
@@ -213,17 +203,18 @@ foam.INTERFACE({
     },
     {
       name: 'listen',
-      swiftReturns: 'Detachable',
-      swiftThrows: true,
+      returns: 'Detachable',
+      javaReturns: 'void', // TODO Java detachable support.
+      async: true,
       args: [
         {
-          of: 'foam.dao.Sink',
           name: 'sink',
+          type: 'foam.dao.Sink',
           swiftDefaultValue: 'foam_dao_ArraySink()',
         },
         {
           name: 'predicate',
-          of: 'foam.mlang.predicate.Predicate',
+          type: 'foam.mlang.predicate.Predicate',
           optional: true,
           swiftDefaultValue: 'nil',
         }
@@ -231,22 +222,24 @@ foam.INTERFACE({
     },
     {
       name: 'listen_',
-      swiftReturns: 'Detachable',
+      returns: 'Detachable',
+      javaReturns: 'void', // TODO Java detachable support.
+      async: true,
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context?'
+          type: 'Context',
+          optional: true
         },
         {
           name: 'sink',
-          of: 'foam.dao.Sink',
+          type: 'foam.dao.Sink',
           swiftDefaultValue: 'foam_dao_ArraySink()',
         },
         {
           name: 'predicate',
-          of: 'foam.mlang.predicate.Predicate',
+          type: 'foam.mlang.predicate.Predicate',
           optional: true,
           swiftDefaultValue: 'nil',
         }
@@ -254,30 +247,31 @@ foam.INTERFACE({
     },
     {
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
+      returns: 'Void',
       swiftThrows: true,
       args: [
         {
           name: 'sink',
-          of: 'foam.dao.Sink',
+          type: 'foam.dao.Sink',
         }
       ],
     },
     {
       name: 'pipe_', // TODO: return a promise? don't put pipe and listen here?
+      returns: 'Void',
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context?'
+          type: 'Context'
         },
         {
           name: 'sink',
-          of: 'foam.dao.Sink',
+          type: 'foam.dao.Sink',
         },
         {
           name: 'predicate',
-          of: 'foam.mlang.predicate.Predicate',
+          type: 'foam.mlang.predicate.Predicate',
           optional: true,
           swiftDefaultValue: 'nil',
         }
@@ -290,7 +284,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'predicate',
-          of: 'foam.mlang.predicate.Predicate',
+          type: 'foam.mlang.predicate.Predicate',
           optional: true,
           swiftDefaultValue: 'nil',
         }
@@ -303,7 +297,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'comparator',
-          of: 'foam.mlang.order.Comparator',
+          type: 'foam.mlang.order.Comparator',
         }
       ]
     },
@@ -314,8 +308,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'count',
-          swiftType: 'Int',
-          javaType: 'long'
+          type: 'Long'
         }
       ]
     },
@@ -326,8 +319,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'count',
-          swiftType: 'Int',
-          javaType: 'long'
+          type: 'Long'
         }
       ]
     },
@@ -337,38 +329,41 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          swiftType: 'Context',
-          javaType:  'foam.core.X'
+          type: 'Context'
         }
       ]
     },
     {
       name: 'cmd',
-      swiftSupport: false,
-      returns: 'obj',
-      javaReturns: 'Object',
+      async: true,
+      returns: 'Any',
       args: [
         {
           name: 'obj',
-          javaType:  'Object'
+          type: 'Any'
         }
       ]
     },
     {
       name: 'cmd_',
-      swiftSupport: false,
-      javaReturns: 'Object',
-      returns: 'obj',
+      async: true,
+      returns: 'Any',
       args: [
         {
           name: 'x',
-          javaType:  'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'obj',
-          javaType:  'Object'
+          type: 'Any'
         }
       ]
+    },
+    {
+      name: 'getOf',
+      flags: ['java'],
+      returns: 'Class',
+      javaReturns: 'foam.core.ClassInfo'
     }
   ]
 });

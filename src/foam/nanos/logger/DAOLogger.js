@@ -61,17 +61,17 @@ return dao;
   methods: [
     {
       name: 'submit',
+      returns: 'Void',
       args: [
         {
           name: 'severity',
-          javaType: 'foam.nanos.logger.LogLevel'
+          type: 'foam.nanos.logger.LogLevel'
         },
         {
           name: 'message',
-          javaType: 'String'
+          type: 'String'
         }
       ],
-      javaReturns: 'void',
       javaCode: `
 if ( initializing.get() ) {
   System.out.println("DAOLogger initializing");
@@ -83,62 +83,62 @@ getDao().put_(getX().put("logger", (Logger) getLogger()), lm);
     },
     {
       name: 'log',
+      returns: 'Void',
       args: [
         {
           name: 'args',
           javaType: 'Object...'
         }
       ],
-      javaReturns: 'void',
       javaCode: 'submit(LogLevel.INFO, combine(args));'
     },
     {
       name: 'info',
+      returns: 'Void',
       args: [
         {
           name: 'args',
           javaType: 'Object...'
         }
       ],
-      javaReturns: 'void',
       javaCode: 'submit(LogLevel.INFO, combine(args));'
     },
     {
       name: 'warning',
+      returns: 'Void',
       args: [
         {
           name: 'args',
           javaType: 'Object...'
         }
       ],
-      javaReturns: 'void',
       javaCode: 'submit(LogLevel.WARNING, combine(args));'
     },
     {
       name: 'error',
+      returns: 'Void',
       args: [
         {
           name: 'args',
           javaType: 'Object...'
         }
       ],
-      javaReturns: 'void',
       javaCode: 'submit(LogLevel.ERROR, combine(args));'
     },
     {
       name: 'debug',
+      returns: 'Void',
       args: [
         {
           name: 'args',
           javaType: 'Object...'
         }
       ],
-      javaReturns: 'void',
       javaCode: 'submit(LogLevel.DEBUG, combine(args));'
     },
     {
       name: 'toString',
-      javaReturns: 'String',
+      returns: 'String',
       javaCode: 'return this.getClass().getSimpleName();'
     }
   ]

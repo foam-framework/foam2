@@ -1453,3 +1453,299 @@ p({"created":"2018-08-23T18:56:05.555Z","severity":2,"createdBy":1,"message":",D
 p({"created":"2018-08-23T18:56:05.557Z","severity":2,"createdBy":1,"message":"The previous log was repeated 2 times"})
 // Modified by system (1) at 2018-08-23T18:56:05Z
 p({"created":"2018-08-23T18:56:05.557Z","severity":1,"createdBy":1,"message":",Created Service,dugDAO"})
+
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.428Z","severity":1,"createdBy":1,"message":"Creating Service,nSpecDAO"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.449Z","severity":1,"createdBy":1,"message":"Created Service,nSpecDAO"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.453Z","severity":1,"createdBy":1,"message":"Creating Service,AuthenticatedNSpecDAO"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.454Z","severity":1,"createdBy":1,"message":"Created Service,AuthenticatedNSpecDAO"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.467Z","severity":1,"createdBy":1,"message":"Creating Service,cronScheduler"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.468Z","severity":1,"createdBy":1,"message":"Created Service,cronScheduler"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.469Z","severity":1,"createdBy":1,"message":"Creating Service,cronDAO"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.508Z","severity":1,"createdBy":1,"message":"[JDAO],cronjobs.0,Loading file: cronjobs.0"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.510Z","severity":1,"createdBy":1,"message":"[JDAO],cronjobs.0,Successfully read 0 entries from file: cronjobs.0"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.511Z","severity":1,"createdBy":1,"message":"[JDAO],cronjobs,Loading file: cronjobs"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.540Z","severity":1,"createdBy":1,"message":"[JDAO],cronjobs,Successfully read 2 entries from file: cronjobs"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.545Z","severity":2,"createdBy":1,"message":"Direct constructor use is deprecated. Use Builder instead."})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.546Z","severity":1,"createdBy":1,"message":"Created Service,cronDAO"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.547Z","severity":1,"createdBy":1,"message":"Creating Service,appConfig"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.550Z","severity":1,"createdBy":1,"message":"Created Service,appConfig"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.558Z","severity":1,"createdBy":1,"message":"Creating Service,threadPool"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.562Z","severity":1,"createdBy":1,"message":"Created Service,threadPool"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.564Z","severity":1,"createdBy":1,"message":"Creating Service,scriptDAO"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.583Z","severity":1,"createdBy":1,"message":"[JDAO],scripts.0,Loading file: scripts.0"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.585Z","severity":1,"createdBy":1,"message":"[JDAO],scripts.0,Successfully read 0 entries from file: scripts.0"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.585Z","severity":1,"createdBy":1,"message":"[JDAO],scripts,Loading file: scripts"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.600Z","severity":1,"createdBy":1,"message":"[JDAO],scripts,Successfully read 6 entries from file: scripts"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.601Z","severity":2,"createdBy":1,"message":"Direct constructor use is deprecated. Use Builder instead."})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.604Z","severity":1,"createdBy":1,"message":"Created Service,scriptDAO"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.605Z","severity":1,"createdBy":1,"message":"Creating Service,notificationDAO"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.697Z","severity":1,"createdBy":1,"message":"[JDAO],notifications.0,Loading file: notifications.0"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.698Z","severity":1,"createdBy":1,"message":"[JDAO],notifications.0,Successfully read 0 entries from file: notifications.0"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.699Z","severity":1,"createdBy":1,"message":"[JDAO],notifications,Loading file: notifications"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.700Z","severity":1,"createdBy":1,"message":"[JDAO],notifications,Successfully read 0 entries from file: notifications"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.710Z","severity":2,"createdBy":1,"message":"Direct constructor use is deprecated. Use Builder instead."})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.711Z","severity":1,"createdBy":1,"message":"Created Service,notificationDAO"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.712Z","severity":1,"createdBy":1,"message":"Creating Service,emailDocService"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.714Z","severity":1,"createdBy":1,"message":"Created Service,emailDocService"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.715Z","severity":1,"createdBy":1,"message":"Creating Service,digDAO"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.772Z","severity":1,"createdBy":1,"message":"[JDAO],digs.0,Loading file: digs.0"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.775Z","severity":1,"createdBy":1,"message":"[JDAO],digs.0,Successfully read 0 entries from file: digs.0"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.777Z","severity":1,"createdBy":1,"message":"[JDAO],digs,Loading file: digs"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.781Z","severity":1,"createdBy":1,"message":"[JDAO],digs,Successfully read 0 entries from file: digs"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.784Z","severity":2,"createdBy":1,"message":"Direct constructor use is deprecated. Use Builder instead."})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.791Z","severity":1,"createdBy":1,"message":"Created Service,digDAO"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.793Z","severity":1,"createdBy":1,"message":"Creating Service,LogLevelFilterLogger"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.794Z","severity":1,"createdBy":1,"message":"Created Service,LogLevelFilterLogger"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.795Z","severity":1,"createdBy":1,"message":"Creating Service,http"})
+// Modified by system (1) at 2018-08-30T16:44:02Z
+p({"created":"2018-08-30T16:44:02.796Z","severity":1,"createdBy":1,"message":"Created Service,http"})
+// Modified by system (1) at 2018-08-30T16:44:03Z
+p({"created":"2018-08-30T16:44:03.631Z","severity":1,"createdBy":1,"message":"Creating Service,notificationTemplateDAO"})
+// Modified by system (1) at 2018-08-30T16:44:03Z
+p({"created":"2018-08-30T16:44:03.649Z","severity":1,"createdBy":1,"message":"[JDAO],notificationTemplates.0,Loading file: notificationTemplates.0"})
+// Modified by system (1) at 2018-08-30T16:44:03Z
+p({"created":"2018-08-30T16:44:03.650Z","severity":1,"createdBy":1,"message":"[JDAO],notificationTemplates.0,Successfully read 0 entries from file: notificationTemplates.0"})
+// Modified by system (1) at 2018-08-30T16:44:03Z
+p({"created":"2018-08-30T16:44:03.651Z","severity":1,"createdBy":1,"message":"[JDAO],notificationTemplates,Loading file: notificationTemplates"})
+// Modified by system (1) at 2018-08-30T16:44:03Z
+p({"created":"2018-08-30T16:44:03.652Z","severity":1,"createdBy":1,"message":"[JDAO],notificationTemplates,Successfully read 0 entries from file: notificationTemplates"})
+// Modified by system (1) at 2018-08-30T16:44:03Z
+p({"created":"2018-08-30T16:44:03.653Z","severity":2,"createdBy":1,"message":"Direct constructor use is deprecated. Use Builder instead."})
+// Modified by system (1) at 2018-08-30T16:44:03Z
+p({"created":"2018-08-30T16:44:03.654Z","severity":1,"createdBy":1,"message":"Created Service,notificationTemplateDAO"})
+// Modified by system (1) at 2018-08-30T16:44:03Z
+p({"created":"2018-08-30T16:44:03.655Z","severity":1,"createdBy":1,"message":"Creating Service,websockets"})
+// Modified by system (1) at 2018-08-30T16:44:03Z
+p({"created":"2018-08-30T16:44:03.665Z","severity":1,"createdBy":1,"message":"Created Service,websockets"})
+// Modified by system (1) at 2018-08-30T16:44:03Z
+p({"created":"2018-08-30T16:44:03.681Z","severity":1,"createdBy":1,"message":"Creating Service,uptime"})
+// Modified by system (1) at 2018-08-30T16:44:03Z
+p({"created":"2018-08-30T16:44:03.683Z","severity":1,"createdBy":1,"message":"Created Service,uptime"})
+// Modified by system (1) at 2018-08-30T16:44:03Z
+p({"created":"2018-08-30T16:44:03.684Z","severity":1,"createdBy":1,"message":"Creating Service,dugDAO"})
+// Modified by system (1) at 2018-08-30T16:44:03Z
+p({"created":"2018-08-30T16:44:03.721Z","severity":1,"createdBy":1,"message":"[JDAO],dugs.0,Loading file: dugs.0"})
+// Modified by system (1) at 2018-08-30T16:44:03Z
+p({"created":"2018-08-30T16:44:03.723Z","severity":1,"createdBy":1,"message":"[JDAO],dugs.0,Successfully read 0 entries from file: dugs.0"})
+// Modified by system (1) at 2018-08-30T16:44:03Z
+p({"created":"2018-08-30T16:44:03.728Z","severity":1,"createdBy":1,"message":"[JDAO],dugs,Loading file: dugs"})
+// Modified by system (1) at 2018-08-30T16:44:03Z
+p({"created":"2018-08-30T16:44:03.730Z","severity":1,"createdBy":1,"message":"[JDAO],dugs,Successfully read 0 entries from file: dugs"})
+// Modified by system (1) at 2018-08-30T16:44:03Z
+p({"created":"2018-08-30T16:44:03.731Z","severity":2,"createdBy":1,"message":"Direct constructor use is deprecated. Use Builder instead."})
+// Modified by system (1) at 2018-08-30T16:44:03Z
+p({"created":"2018-08-30T16:44:03.736Z","severity":2,"createdBy":1,"message":"The previous log was repeated 2 times"})
+// Modified by system (1) at 2018-08-30T16:44:03Z
+p({"created":"2018-08-30T16:44:03.736Z","severity":1,"createdBy":1,"message":"Created Service,dugDAO"})
+
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.798Z","severity":1,"createdBy":1,"message":"Creating Service,nSpecDAO"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.846Z","severity":1,"createdBy":1,"message":"Created Service,nSpecDAO"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.850Z","severity":1,"createdBy":1,"message":"Creating Service,AuthenticatedNSpecDAO"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.851Z","severity":1,"createdBy":1,"message":"Created Service,AuthenticatedNSpecDAO"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.864Z","severity":1,"createdBy":1,"message":"Creating Service,cronScheduler"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.866Z","severity":1,"createdBy":1,"message":"Created Service,cronScheduler"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.867Z","severity":1,"createdBy":1,"message":"Creating Service,cronDAO"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.900Z","severity":1,"createdBy":1,"message":"[JDAO],cronjobs.0,Loading file: cronjobs.0"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.901Z","severity":1,"createdBy":1,"message":"[JDAO],cronjobs.0,Successfully read 0 entries from file: cronjobs.0"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.902Z","severity":1,"createdBy":1,"message":"[JDAO],cronjobs,Loading file: cronjobs"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.914Z","severity":1,"createdBy":1,"message":"[JDAO],cronjobs,Successfully read 2 entries from file: cronjobs"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.922Z","severity":2,"createdBy":1,"message":"Direct constructor use is deprecated. Use Builder instead."})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.923Z","severity":1,"createdBy":1,"message":"Created Service,cronDAO"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.924Z","severity":1,"createdBy":1,"message":"Creating Service,appConfig"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.935Z","severity":1,"createdBy":1,"message":"Created Service,appConfig"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.936Z","severity":1,"createdBy":1,"message":"Creating Service,threadPool"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.942Z","severity":1,"createdBy":1,"message":"Created Service,threadPool"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.944Z","severity":1,"createdBy":1,"message":"Creating Service,scriptDAO"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.964Z","severity":1,"createdBy":1,"message":"[JDAO],scripts.0,Loading file: scripts.0"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.965Z","severity":1,"createdBy":1,"message":"[JDAO],scripts.0,Successfully read 0 entries from file: scripts.0"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.966Z","severity":1,"createdBy":1,"message":"[JDAO],scripts,Loading file: scripts"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.973Z","severity":1,"createdBy":1,"message":"[JDAO],scripts,Successfully read 6 entries from file: scripts"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.975Z","severity":2,"createdBy":1,"message":"Direct constructor use is deprecated. Use Builder instead."})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.977Z","severity":1,"createdBy":1,"message":"Created Service,scriptDAO"})
+// Modified by system (1) at 2018-09-20T18:04:20Z
+p({"created":"2018-09-20T18:04:20.979Z","severity":1,"createdBy":1,"message":"Creating Service,notificationDAO"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.038Z","severity":1,"createdBy":1,"message":"[JDAO],notifications.0,Loading file: notifications.0"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.040Z","severity":1,"createdBy":1,"message":"[JDAO],notifications.0,Successfully read 0 entries from file: notifications.0"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.041Z","severity":1,"createdBy":1,"message":"[JDAO],notifications,Loading file: notifications"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.042Z","severity":1,"createdBy":1,"message":"[JDAO],notifications,Successfully read 0 entries from file: notifications"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.052Z","severity":2,"createdBy":1,"message":"Direct constructor use is deprecated. Use Builder instead."})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.054Z","severity":1,"createdBy":1,"message":"Created Service,notificationDAO"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.055Z","severity":1,"createdBy":1,"message":"Creating Service,emailDocService"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.058Z","severity":1,"createdBy":1,"message":"Created Service,emailDocService"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.059Z","severity":1,"createdBy":1,"message":"Creating Service,digDAO"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.093Z","severity":1,"createdBy":1,"message":"[JDAO],digs.0,Loading file: digs.0"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.094Z","severity":1,"createdBy":1,"message":"[JDAO],digs.0,Successfully read 0 entries from file: digs.0"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.095Z","severity":1,"createdBy":1,"message":"[JDAO],digs,Loading file: digs"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.096Z","severity":1,"createdBy":1,"message":"[JDAO],digs,Successfully read 0 entries from file: digs"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.097Z","severity":2,"createdBy":1,"message":"Direct constructor use is deprecated. Use Builder instead."})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.098Z","severity":1,"createdBy":1,"message":"Created Service,digDAO"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.100Z","severity":1,"createdBy":1,"message":"Creating Service,LogLevelFilterLogger"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.101Z","severity":1,"createdBy":1,"message":"Created Service,LogLevelFilterLogger"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.102Z","severity":1,"createdBy":1,"message":"Creating Service,http"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.103Z","severity":1,"createdBy":1,"message":"Created Service,http"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.883Z","severity":1,"createdBy":1,"message":"Creating Service,notificationTemplateDAO"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.901Z","severity":1,"createdBy":1,"message":"[JDAO],notificationTemplates.0,Loading file: notificationTemplates.0"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.902Z","severity":1,"createdBy":1,"message":"[JDAO],notificationTemplates.0,Successfully read 0 entries from file: notificationTemplates.0"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.903Z","severity":1,"createdBy":1,"message":"[JDAO],notificationTemplates,Loading file: notificationTemplates"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.903Z","severity":1,"createdBy":1,"message":"[JDAO],notificationTemplates,Successfully read 0 entries from file: notificationTemplates"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.905Z","severity":2,"createdBy":1,"message":"Direct constructor use is deprecated. Use Builder instead."})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.905Z","severity":1,"createdBy":1,"message":"Created Service,notificationTemplateDAO"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.906Z","severity":1,"createdBy":1,"message":"Creating Service,websockets"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.908Z","severity":1,"createdBy":1,"message":"Created Service,websockets"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.937Z","severity":1,"createdBy":1,"message":"Creating Service,uptime"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.939Z","severity":1,"createdBy":1,"message":"Created Service,uptime"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.940Z","severity":1,"createdBy":1,"message":"Creating Service,dugDAO"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.958Z","severity":1,"createdBy":1,"message":"[JDAO],dugs.0,Loading file: dugs.0"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.959Z","severity":1,"createdBy":1,"message":"[JDAO],dugs.0,Successfully read 0 entries from file: dugs.0"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.959Z","severity":1,"createdBy":1,"message":"[JDAO],dugs,Loading file: dugs"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.960Z","severity":1,"createdBy":1,"message":"[JDAO],dugs,Successfully read 0 entries from file: dugs"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.961Z","severity":2,"createdBy":1,"message":"Direct constructor use is deprecated. Use Builder instead."})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.963Z","severity":2,"createdBy":1,"message":"The previous log was repeated 2 times"})
+// Modified by system (1) at 2018-09-20T18:04:21Z
+p({"created":"2018-09-20T18:04:21.964Z","severity":1,"createdBy":1,"message":"Created Service,dugDAO"})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.790Z","severity":1,"createdBy":1,"message":"Creating Service,auth"})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.819Z","severity":1,"createdBy":1,"message":"Created Service,auth"})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.820Z","severity":1,"createdBy":1,"message":"Creating Service,localUserDAO"})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.852Z","severity":1,"createdBy":1,"message":"[JDAO],users.0,Loading file: users.0"})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.853Z","severity":1,"createdBy":1,"message":"[JDAO],users.0,Successfully read 0 entries from file: users.0"})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.854Z","severity":1,"createdBy":1,"message":"[JDAO],users,Loading file: users"})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.910Z","severity":1,"createdBy":1,"message":"[JDAO],users,Successfully read 1 entries from file: users"})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.917Z","severity":2,"createdBy":1,"message":"Direct constructor use is deprecated. Use Builder instead."})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.918Z","severity":2,"createdBy":1,"message":"The previous log was repeated 2 times"})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.919Z","severity":1,"createdBy":1,"message":"Created Service,localUserDAO"})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.923Z","severity":1,"createdBy":1,"message":"Creating Service,groupDAO"})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.963Z","severity":1,"createdBy":1,"message":"[JDAO],groups.0,Loading file: groups.0"})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.964Z","severity":1,"createdBy":1,"message":"[JDAO],groups.0,Successfully read 0 entries from file: groups.0"})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.965Z","severity":1,"createdBy":1,"message":"[JDAO],groups,Loading file: groups"})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.970Z","severity":1,"createdBy":1,"message":"[JDAO],groups,Successfully read 1 entries from file: groups"})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.973Z","severity":2,"createdBy":1,"message":"Direct constructor use is deprecated. Use Builder instead."})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.974Z","severity":1,"createdBy":1,"message":"Created Service,groupDAO"})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.974Z","severity":1,"createdBy":1,"message":"Creating Service,sessionDAO"})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.997Z","severity":2,"createdBy":1,"message":"Direct constructor use is deprecated. Use Builder instead."})
+// Modified by system (1) at 2018-09-20T18:04:31Z
+p({"created":"2018-09-20T18:04:31.997Z","severity":1,"createdBy":1,"message":"Created Service,sessionDAO"})
+// Modified by system (1) at 2018-09-20T18:04:32Z
+p({"created":"2018-09-20T18:04:32.020Z","severity":0,"createdBy":1,"message":"1 - system,[Service],auth,returning skeleton exception,foam.nanos.auth.AuthenticationException: Not logged in\n\tat foam.nanos.auth.UserAndGroupAuthService.getCurrentUser(UserAndGroupAuthService.java:52)\n\tat foam.nanos.auth.ProxyAuthService.getCurrentUser(ProxyAuthService.java:107)\n\tat foam.nanos.auth.AuthServiceSkeleton.send(AuthServiceSkeleton.java:110)\n\tat foam.box.SessionServerBox.send(SessionServerBox.java:81)\n\tat foam.nanos.http.ServiceWebAgent.execute(ServiceWebAgent.java:118)\n\tat foam.nanos.http.NanoRouter.service(NanoRouter.java:85)\n\tat javax.servlet.http.HttpServlet.service(HttpServlet.java:790)\n\tat org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:860)\n\tat org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1650)\n\tat org.eclipse.jetty.websocket.server.WebSocketUpgradeFilter.doFilter(WebSocketUpgradeFilter.java:206)\n\tat org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1637)\n\tat org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:533)\n\tat org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:188)\n\tat org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1253)\n\tat org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:168)\n\tat org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:473)\n\tat org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:166)\n\tat org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1155)\n\tat org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:141)\n\tat org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)\n\tat org.eclipse.jetty.server.Server.handle(Server.java:530)\n\tat org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:347)\n\tat org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:256)\n\tat org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:279)\n\tat org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:102)\n\tat org.eclipse.jetty.io.ChannelEndPoint$2.run(ChannelEndPoint.java:124)\n\tat org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.doProduce(EatWhatYouKill.java:247)\n\tat org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.produce(EatWhatYouKill.java:140)\n\tat org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.run(EatWhatYouKill.java:131)\n\tat org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:382)\n\tat org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:708)\n\tat org.eclipse.jetty.util.thread.QueuedThreadPool$2.run(QueuedThreadPool.java:626)\n\tat java.lang.Thread.run(Thread.java:748)\n"})

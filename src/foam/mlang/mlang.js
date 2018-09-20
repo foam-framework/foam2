@@ -108,6 +108,10 @@ foam.CLASS({
       name: 'adapt',
       value: function(_, o, p) { return p.adaptValue(o); }
     },
+    {
+      name: 'type',
+      value: 'foam.mlang.Expr'
+    }
   ],
 
   methods: [
@@ -136,6 +140,12 @@ foam.CLASS({
   package: 'foam.mlang',
   name: 'SinkProperty',
   extends: 'FObjectProperty',
+  properties: [
+    {
+      name: 'type',
+      value: 'Any'
+    }
+  ],
 
   documentation: 'Property for Sink values.'
 });
@@ -172,7 +182,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'tail',
-          of: 'foam.dao.index.Index'
+          type: 'foam.dao.index.Index'
         }
       ],
       returns: 'foam.dao.index.Index'

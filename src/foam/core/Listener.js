@@ -65,7 +65,7 @@ foam.CLASS({
         return [
           this.Argument.create({
             name: 'sub',
-            javaType: 'foam.core.Detachable'
+            type: 'Detachable'
           })
         ];
       }

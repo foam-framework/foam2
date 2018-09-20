@@ -14,6 +14,7 @@ foam.CLASS({
     [ 'value', 0 ],
     'min',
     'max',
+    [ 'type', 'Integer' ],
     [ 'adapt', function adaptInt(_, v) {
         return typeof v === 'number' ? Math.trunc(v) :
           v ? parseInt(v) :
@@ -44,6 +45,7 @@ foam.CLASS({
                                          ''                       ;
       }
     ],
+    [ 'type', 'String' ],
     [ 'value', '' ]
   ]
 });
@@ -83,6 +85,7 @@ foam.CLASS({
         return d;
       }
     },
+    [ 'type', 'Date' ],
     {
       name: 'comparePropertyValues',
       value: function(o1, o2) {
@@ -102,7 +105,11 @@ foam.CLASS({
   extends: 'Date',
 
   documentation: 'Describes properties of type DateTime.',
-  label: 'Date and time'
+  label: 'Date and time',
+
+  properties: [
+    [ 'type', 'DateTime' ]
+  ]
 });
 
 foam.CLASS({
@@ -111,7 +118,11 @@ foam.CLASS({
   extends: 'String',
 
   documentation: 'Describes properties of type Time.',
-  label: 'Time'
+  label: 'Time',
+
+  properties: [
+    [ 'type', 'Time' ]
+  ]
 });
 
 
@@ -121,7 +132,11 @@ foam.CLASS({
   extends: 'Int',
 
   documentation: 'Describes properties of type Byte.',
-  label: 'Round byte numbers'
+  label: 'Round byte numbers',
+
+  properties: [
+    [ 'type', 'Byte' ]
+  ]
 });
 
 
@@ -131,7 +146,11 @@ foam.CLASS({
   extends: 'Int',
 
   documentation: 'Describes properties of type Short.',
-  label: 'Round short numbers'
+  label: 'Round short numbers',
+
+  properties: [
+    [ 'type', 'Short' ]
+  ]
 });
 
 
@@ -141,7 +160,11 @@ foam.CLASS({
   extends: 'Int',
 
   documentation:  'Describes properties of type Long.',
-  label: 'Round long numbers'
+  label: 'Round long numbers',
+
+  properties: [
+    [ 'type', 'Long' ]
+  ]
 });
 
 
@@ -160,7 +183,8 @@ foam.CLASS({
       function (_, v) {
         return typeof v === 'number' ? v : v ? parseFloat(v) : 0.0 ;
       }
-    ]
+    ],
+    [ 'type', 'Double' ]
   ]
 });
 
@@ -171,7 +195,10 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'Double',
-  extends: 'Float'
+  extends: 'Float',
+  properties: [
+    [ 'type', 'Double' ]
+  ]
 });
 
 
@@ -202,7 +229,10 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Object',
   extends: 'Property',
-  documentation: ''
+  documentation: '',
+  properties: [
+    [ 'type', 'Any' ]
+  ]
 });
 
 
@@ -219,7 +249,8 @@ foam.CLASS({
     [
       'isDefaultValue',
       function(v) { return ! v || ! v.length; }
-    ]
+    ],
+    [ 'type', 'AnyArray' ]
   ]
 });
 
@@ -227,7 +258,10 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'List',
-  extends: 'foam.core.Object'
+  extends: 'foam.core.Object',
+  properties: [
+    [ 'type', 'List' ]
+  ]
 });
 
 
@@ -245,6 +279,7 @@ foam.CLASS({
       value: 'String',
       documentation: 'The FOAM sub-type of this property.'
     },
+    [ 'type', 'StringArray' ],
     [
       'factory',
       function() { return []; }
@@ -313,7 +348,8 @@ foam.CLASS({
 
         return c;
       }
-    ]
+    ],
+    [ 'type', 'Class' ]
   ],
 
   methods: [
@@ -437,7 +473,7 @@ foam.CLASS({
         // TODO
       }
     ],
-    'of'
+    [ 'type', 'Map' ]
   ]
 });
 
@@ -454,9 +490,13 @@ foam.CLASS({
       value: 'foam.core.FObject'
     },
     {
+      name: 'type',
+      factory: function() { return this.of.id; }
+    },
+    {
       name: 'fromJSON',
       value: function(json, ctx, prop) {
-        return foam.json.parse(json, prop.of, ctx);
+        return foam.json.parse(json, foam.lookup(prop.type), ctx);
       }
     },
     {
@@ -465,13 +505,13 @@ foam.CLASS({
         // All FObjects may be null.
         if (v === null) return v;
 
-        var of = prop.of;
+        var type = foam.lookup(prop.type);
 
-        return of.isInstance(v) ?
+        return type.isInstance(v) ?
             v :
             ( v.class ?
                 this.lookup(v.class) :
-                of ).create(v, this.__subContext__);
+                type ).create(v, this.__subContext__);
       }
     }
   ]
@@ -488,6 +528,7 @@ foam.CLASS({
       class: 'Class',
       name: 'of'
     },
+    [ 'type', 'Any' ],
     {
       class: 'String',
       name: 'targetDAOKey',
@@ -570,5 +611,17 @@ foam.CLASS({
     </pre>
     */
     { class: 'String', name: 'shortName' }
+  ]
+});
+
+// Upgrade async property to a real boolean property.
+foam.CLASS({
+  refines: 'AbstractMethod',
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'async',
+      value: false
+    }
   ]
 });

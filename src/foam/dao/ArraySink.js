@@ -9,24 +9,29 @@ foam.CLASS({
   name: 'ArraySink',
   extends: 'foam.dao.AbstractSink',
 
-  constants: {
-    // Dual to outputJSON method.
-    //
-    // TODO(markdittmer): Turn into static method: "parseJSON" once
-    // https://github.com/foam-framework/foam2/issues/613 is fixed.
-    PARSE_JSON: function(json, opt_cls, opt_ctx) {
-      var cls = json.of && json.of.forClass_ || opt_cls;
-      var array = json.array;
-      if ( ! array ) return foam.dao.ArraySink.create({ of: cls }, opt_ctx);
-      if ( foam.typeOf(cls) === foam.String )
-        cls = ( opt_ctx || foam ).lookup(cls);
+  constants: [
+    {
+      // Dual to outputJSON method.
+      //
+      // TODO(markdittmer): Turn into static method: "parseJSON" once
+      // https://github.com/foam-framework/foam2/issues/613 is fixed.
+      // TODO(adamvy): Why is this necessary?
+      name: 'PARSE_JSON',
+      flags: [ 'js' ],
+      value: function(json, opt_cls, opt_ctx) {
+        var cls = json.of && json.of.forClass_ || opt_cls;
+        var array = json.array;
+        if ( ! array ) return foam.dao.ArraySink.create({ of: cls }, opt_ctx);
+        if ( foam.typeOf(cls) === foam.String )
+          cls = ( opt_ctx || foam ).lookup(cls);
 
-      return foam.dao.ArraySink.create({
-        of: cls,
-        array: foam.json.parse(array, cls, opt_ctx)
-      }, opt_ctx);
+        return foam.dao.ArraySink.create({
+          of: cls,
+          array: foam.json.parse(array, cls, opt_ctx)
+        }, opt_ctx);
+      }
     }
-  },
+  ],
 
   properties: [
     {

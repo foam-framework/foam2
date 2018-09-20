@@ -40,8 +40,8 @@ foam.CLASS({
       name: 'serverBox',
       args: [
         {
-          of: 'foam.box.Box',
           name: 'box',
+          type: 'foam.box.Box'
         },
       ],
       returns: 'foam.box.Box',
@@ -59,7 +59,7 @@ return server.create(args: ["delegate": box2], x: __subContext__) as! foam_box_B
       args: [
         {
           name: 'box',
-          of: 'foam.box.Box',
+          type: 'foam.box.Box'
         },
       ],
       returns: 'foam.box.Box',

@@ -187,12 +187,12 @@ foam.CLASS({
       }
     },
     {
-      of: 'Boolean',
+      class: 'Boolean',
       name: 'showPackage',
       value: true
     },
     {
-      of: 'Boolean',
+      class: 'Boolean',
       name: 'showSummary'
     }
   ],
