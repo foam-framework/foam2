@@ -86,6 +86,11 @@ foam.CLASS({
     { class: 'Color', name: 'accentColor' },
     { class: 'Color', name: 'tableColor' },
     { class: 'Color', name: 'tableHoverColor' },
+    {
+      class: 'String',
+      name: 'url',
+      value: null
+    }
 /*    {
       class: 'FObjectProperty',
       of: 'foam.nanos.app.AppConfig',
@@ -102,6 +107,16 @@ foam.CLASS({
       documentation: 'Custom authentication settings for this group.'
     }
     */
+  ],
+
+  javaImports: [
+    'foam.core.X',
+    'foam.dao.DAO',
+    'foam.nanos.app.AppConfig',
+    'foam.nanos.session.Session',
+    'foam.util.SafetyUtil',
+    'org.eclipse.jetty.server.Request',
+    'javax.servlet.http.HttpServletRequest'
   ],
 
   methods: [
@@ -131,6 +146,41 @@ foam.CLASS({
 
         return false;
       }
+    },
+    {
+      name: 'getAppConfig',
+      javaReturns: 'AppConfig',
+      args: [
+        {
+          name: 'x',
+          javaType: 'X'
+        }
+      ],
+      javaCode: `
+DAO userDAO         = (DAO) x.get("localUserDAO");
+DAO groupDAO        = (DAO) x.get("groupDAO");
+AppConfig config    = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
+
+Session session = x.get(Session.class);
+if ( session != null ) {
+  User user = (User) userDAO.find(session.getUserId());
+  if ( user != null ) {
+    Group group    = (Group) groupDAO.find(user.getGroup());
+    if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
+      //populate AppConfig url with group url
+      config.setUrl(group.getUrl());
+    } else {
+      //populate AppConfig url with request's RootUrl
+      HttpServletRequest req = x.get(HttpServletRequest.class);
+      if (req != null) {
+        config.setUrl(((Request) req).getRootURL().toString());
+      }
+    }
+  }
+}
+
+return config;
+        `
     }
   ]
 });

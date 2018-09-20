@@ -1660,8 +1660,14 @@ foam.CLASS({
   ],
 
   methods: [
-    function compare(o1, o2) {
-      return -1 * this.arg1.compare(o1, o2);
+    {
+      name: 'compare',
+      code: function compare(o1, o2) {
+        return -1 * this.arg1.compare(o1, o2);
+      },
+      swiftCode: `
+        return -1 * self.arg1!.compare(o1, o2);
+      `,
     },
     function toString() { return 'DESC(' + this.arg1.toString() + ')'; },
     function toIndex(tail) { return this.arg1 && this.arg1.toIndex(tail); },
@@ -2044,7 +2050,13 @@ foam.CLASS({
     function MIN(arg1) { return this.Min.create({ arg1: arg1 }); },
     function SUM(arg1) { return this.Sum.create({ arg1: arg1 }); },
 
-    function DESC(a) { return this._unary_("Desc", a); },
+    {
+      name: 'DESC',
+      args: [ { name: 'a', of: 'foam.mlang.order.Comparator' } ],
+      returns: 'foam.mlang.order.Comparator',
+      code: function DESC(a) { return this._unary_("Desc", a); },
+      swiftCode: `return Desc_create(["arg1": a])`,
+    },
     function THEN_BY(a, b) { return this.ThenBy.create({head: a, tail: b}); },
 
     function INSTANCE_OF(cls) { return this.IsInstanceOf.create({ targetClass: cls }); }
