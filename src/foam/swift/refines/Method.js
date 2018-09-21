@@ -86,7 +86,7 @@ foam.CLASS({
       name: 'swiftOverride',
     },
     {
-      class: 'String',
+      class: 'Boolean',
       name: 'swiftSupport',
     },
     {

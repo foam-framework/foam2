@@ -88,8 +88,14 @@ foam.CLASS({
       method it overrides with this.SUPER().
     */
     function override_(proto, method, superMethod) {
-      if ( ! method ) return;
-
+      if ( ! method ) {
+        if ( this.name == 'toDisjunctiveNormalForm' ) {
+          console.warn('Method code missing for', this.name);
+          debugger;
+        }
+        return;
+      }
+      
       // Not using SUPER, so just return original method
       if ( method.toString().indexOf('SUPER') == -1 ) return method;
 
