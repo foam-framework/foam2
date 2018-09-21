@@ -201,6 +201,28 @@ foam.CLASS({
       methods: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_', 'listen_', 'cmd_' ],
       name: 'promise'
     }
+  ],
+  
+  methods: [
+    {
+      name: 'listen_',
+      code: function(x, sink, prediate) {
+        // TODO(adamvy): Temporary hack to fix regression.  listen_
+        // didn't used to have a declared return type, as such it
+        // would return void when Promised, but a detachable when not.
+        //
+        // This sort of worked in that ProxyListener and others
+        // wouldn't throw an exception when undefined was returned,
+        // but will throw if a Promise is return.
+        //
+        // To fix this we should automagically return a
+        // PromisedDetachable as .detach() can be async since it has
+        // no return value.
+        this.promise.then(function(dao) {
+          dao.listen_(x, sink, predicate);
+        });
+      }
+    }
   ]
 });
 

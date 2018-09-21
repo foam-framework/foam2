@@ -43,6 +43,7 @@ foam.CLASS({
       value: function() {},
     },
     {
+      class: 'Boolean',
       name: 'swiftSupport',
       expression: function(swiftCode) { return !!swiftCode },
     },
