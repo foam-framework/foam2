@@ -93,6 +93,7 @@ foam.CLASS({
         'foam.core.Promised',
         'foam.core.__Class__',
         'foam.core.__Property__',
+        'foam.core.ModelIDRefine',
       ],
     },
     {
