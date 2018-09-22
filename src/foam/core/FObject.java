@@ -17,6 +17,7 @@ public interface FObject extends
   ClassInfo getClassInfo();
   FObject copyFrom(FObject obj);
   FObject fclone();
+  FObject fclone(foam.core.X x);
   FObject deepClone();
   FObject shallowClone();
   Map diff(FObject obj);

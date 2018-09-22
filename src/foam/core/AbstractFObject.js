@@ -82,6 +82,10 @@ foam.CLASS({
             verifier.initVerify(key);
             return this.verify(signature, verifier);
           }
+
+          public foam.core.FObject fclone() {
+            return fclone(getX());
+          }
         `);
       }
     }
@@ -174,10 +178,12 @@ foam.CLASS({
     },
     {
       name: 'fclone',
+      args: [ { name: 'x', javaType: 'foam.core.X' } ],
       javaReturns: 'foam.core.FObject',
       javaCode: `
         try {
           FObject ret = getClass().newInstance();
+          ret.setX(x);
           List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
           for( PropertyInfo prop : props ) {
             if ( ! prop.isSet(this) ) continue;
