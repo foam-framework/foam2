@@ -171,6 +171,7 @@ FOAM_FILES([
   { name: "foam/u2/ProgressView", flags: ['web'] },
   { name: "foam/u2/ListCreateController", flags: ['web'] },
   { name: 'foam/u2/view/SearchViewWrapper', flags: ['web'] },
+  { name: 'foam/u2/view/StringArrayRowView', flags: ['web'] },
   { name: 'foam/u2/borders/NullBorder', flags: ['web'] },
   { name: "foam/version/VersionTrait" },
   { name: "foam/version/VersionedClass" },
