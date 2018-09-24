@@ -338,7 +338,7 @@ foam.CLASS({
         // Upgrade Strings to actual classes, if available.
         if ( foam.String.isInstance(c) ) {
           var className = c;
-          c = this.lookup(className, true);
+          c = this.__context__.lookup(className, true);
           if ( c ) {
             this.instance_[prop.name] = c;
           } else {
@@ -510,7 +510,7 @@ foam.CLASS({
         return type.isInstance(v) ?
             v :
             ( v.class ?
-                this.lookup(v.class) :
+                this.__context__.lookup(v.class) :
                 type ).create(v, this.__subContext__);
       }
     }

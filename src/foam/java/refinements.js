@@ -678,7 +678,7 @@ foam.CLASS({
       }
         
       if ( ! this.javaType ) {
-        this.warn('Skipping constant ', this.name, ' with unknown type.');
+        this.__context__.warn('Skipping constant ', this.name, ' with unknown type.');
         return;
       }
 
@@ -1849,7 +1849,7 @@ foam.CLASS({
     {
       name: 'javaReturns',
       expression: function(javaPath) {
-        return this.lookup(javaPath).model_.id;
+        return this.__context__.lookup(javaPath).model_.id;
       },
     },
   ]

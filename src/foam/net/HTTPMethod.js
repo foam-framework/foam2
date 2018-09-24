@@ -176,7 +176,7 @@ foam.CLASS({
             return;
           }
           if ( ! self.promisedType.type ) { // TODO: should not need this check. Getter in Arg.type?
-            self.promisedType.type = this.lookup(self.promisedType.typeName, true);
+            self.promisedType.type = this.__context__.lookup(self.promisedType.typeName, true);
           }
           if ( self.promisedType.type ) {
             // a modelled return type

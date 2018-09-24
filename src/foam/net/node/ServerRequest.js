@@ -138,9 +138,9 @@ foam.CLASS({
     },
     {
       name: 'parseURL_',
-      code: foam.Function.memoize1(function(urlString) {
+      code: function(urlString) {
         return this.urlLib_.parse(urlString, true);
-      })
+      }
     }
   ]
 });

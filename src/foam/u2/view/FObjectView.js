@@ -20,7 +20,7 @@ foam.CLASS({
       displayWidth: 70,
       postSet: function(oldValue, newValue) {
         if ( newValue !== oldValue ) {
-          var m = this.lookup(newValue, true);
+          var m = this.__context__.lookup(newValue, true);
           if ( m ) {
             this.data = m.create(this.data);
           }

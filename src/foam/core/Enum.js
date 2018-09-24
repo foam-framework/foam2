@@ -214,7 +214,7 @@ foam.CLASS({
           }
 
           def = this.EnumValueAxiom.isInstance(def) ? def :
-            def.class ? this.lookup(def.class).create(def) :
+            def.class ? this.__context__.lookup(def.class).create(def) :
             this.EnumValueAxiom.create({definition: def});
 
           v[i] = def;

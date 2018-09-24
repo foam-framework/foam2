@@ -27,8 +27,8 @@ foam.CLASS({
 
           // Automatically wrap RPCs that return a "PromisedAbc" or similar
           // TODO: Move this into RPCReturnBox ?
-          if ( this.lookup(returns, true) && this.lookup(returns).name.startsWith('Promised') ) {
-            ret = this.lookup(returns).create({ delegate: ret });
+          if ( this.__context__.lookup(returns, true) && this.__context__.lookup(returns).name.startsWith('Promised') ) {
+            ret = this.__context__.lookup(returns).create({ delegate: ret });
           }
 
           var args = Array.from(arguments);

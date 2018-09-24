@@ -117,34 +117,65 @@ foam.CLASS({
               out.end();
             }
           } else if ( type == foam.Function ) {
+            if ( v.toString().startsWith("foam.mmethod(") ) {
+              var map = v.map;
+              var defaultMethod = v.defaultMethod;
+              out.obj();
+              
+              out.key("$MMETHOD$");
+              out.b(true);
 
-            var breakdown = foam.Function.breakdown(v);
-            if ( breakdown == null ) {
-              debugger;
-              breakdown = foam.Function.breakdown(v);
+              out.key("map");
+              out.obj();
+              
+              for ( var key in map ) {
+                out.key(key);
+                this.output(map[key]);
+              }
+
+              out.end();
+
+              if ( defaultMethod ) {
+                out.key("default");
+
+                this.output(defaultMethod);
+              }
+
+              out.end();
+            } else {
+              var breakdown = foam.Function.breakdown(v);
+              if ( breakdown == null ) {
+                debugger;
+                breakdown = foam.Function.breakdown(v);
+              }
+
+              foam.assert(breakdown, "Failed to parse funciton, this is a bug!", "Function was ", v);
+
+              foam.assert(foam.String.isInstance(breakdown.body), "Breakdown contains no body text.");
+
+              out.obj();
+
+              out.key("$FUNC$");
+              out.b(true);
+
+              out.key("name")
+              out.s(breakdown.name);
+
+              out.key("async");
+              out.b(breakdown.async);
+
+              out.key("args");
+              out.array();
+              for ( var i = 0 ; i < breakdown.args.length ; i++ ) {
+                out.s(breakdown.args[i]);
+              }
+              out.end();
+
+              out.key("body");
+              out.s(breakdown.body);
+
+              out.end();
             }
-
-            foam.assert(breakdown, "Failed to parse funciton, this is a bug!");
-
-            out.obj();
-
-            out.key("$FUNC$");
-            out.b(true);
-
-            out.key("name")
-            out.s(breakdown.name);
-
-            out.key("args");
-            out.array();
-            for ( var i = 0 ; i < breakdown.args.length ; i++ ) {
-              out.s(breakdown.args[i]);
-            }
-            out.end();
-
-            out.key("body");
-            out.s(breakdown.body);
-
-            out.end();
           }
         }
       ]

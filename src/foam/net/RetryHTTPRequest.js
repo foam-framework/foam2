@@ -56,7 +56,7 @@ foam.CLASS({
   listeners: [
     function onError(error) {
       this.currentTry_++;
-      this.warn('RetryHTTPRequest: Try #' + this.currentTry_ +
+      this.__context__.warn('RetryHTTPRequest: Try #' + this.currentTry_ +
                 ' failed on ' + error);
       if ( this.currentTry_ < this.numTries ) {
         return this.send();

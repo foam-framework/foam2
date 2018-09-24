@@ -285,7 +285,7 @@ foam.CLASS({
   methods: [
     function output(out) {
       // TODO: raise a real error
-      this.warn('ERROR: Duplicate output.');
+      this.__context__.warn('ERROR: Duplicate output.');
       return this.UNLOADED.output.call(this, out);
     },
     function load() {
@@ -343,7 +343,7 @@ foam.CLASS({
 
   methods: [
     function output(out) {
-      this.warn('Duplicate output.');
+      this.__context__.warn('Duplicate output.');
       return this.UNLOADED.output.call(this, out);
     },
     function load() { this.error('Duplicate load.'); },
@@ -362,7 +362,7 @@ foam.CLASS({
       if ( e ) {
         e.classList[enabled ? 'add' : 'remove'](cls);
       } else {
-        this.warn('Missing Element: ', this.id);
+        this.__context__.warn('Missing Element: ', this.id);
       }
     },
     function onFocus() {
@@ -394,7 +394,7 @@ foam.CLASS({
     function onAddChildren() {
       var e = this.el();
       if ( ! e ) {
-        this.warn('Missing Element: ', this.id);
+        this.__context__.warn('Missing Element: ', this.id);
         return;
       }
       var out = this.createOutputStream();
@@ -409,7 +409,7 @@ foam.CLASS({
     function onInsertChildren(children, reference, where) {
       var e = this.el();
       if ( ! e ) {
-        this.warn('Missing Element: ', this.id);
+        this.__context__.warn('Missing Element: ', this.id);
         return;
       }
       var out = this.createOutputStream();
@@ -433,7 +433,7 @@ foam.CLASS({
     function onReplaceChild(oldE, newE) {
       var e = this.el();
       if ( ! e ) {
-        this.warn('Missing Element: ', this.id);
+        this.__context__.warn('Missing Element: ', this.id);
         return;
       }
       var out = this.createOutputStream();
@@ -1630,7 +1630,7 @@ foam.CLASS({
           // By checking for undefined, f can still return null if it doesn't
           // want anything to be added.
           if ( e === undefined )
-            this.warn(self.SELECT_BAD_USAGE);
+            this.__context__.warn(self.SELECT_BAD_USAGE);
 
           if ( update ) {
             o.propertyChange.sub(function(_,__,prop,slot) {
@@ -1758,7 +1758,7 @@ foam.CLASS({
       var i = this.childNodes.indexOf(reference);
 
       if ( i === -1 ) {
-        this.warn("Reference node isn't a child of this.");
+        this.__context__.warn("Reference node isn't a child of this.");
         return this;
       }
 

@@ -102,7 +102,7 @@ foam.CLASS({
     },
     function addBinding(name, slot) {
       if ( this.bindingsMap_.hasOwnProperty(name) ) {
-        this.warn('Overwriting URLState:', name, this.bindingsMap_[name],
+        this.__context__.warn('Overwriting URLState:', name, this.bindingsMap_[name],
                   'with', slot);
         this.subMap_[name].detach();
       }

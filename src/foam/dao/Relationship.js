@@ -74,29 +74,29 @@ foam.CLASS({
       name: 'junctionModel',
       expression: function(sourceModel, targetModel) {
         return (this.package ? this.package + '.' : '') +
-          this.lookup(sourceModel).name +
-          this.lookup(targetModel).name + 'Junction';
+          this.__context__.lookup(sourceModel).name +
+          this.__context__.lookup(targetModel).name + 'Junction';
     }
     },
     {
       class: 'String',
       name: 'sourceDAOKey',
       expression: function(sourceModel) {
-        return foam.String.daoize(this.lookup(sourceModel).name);
+        return foam.String.daoize(this.__context__.lookup(sourceModel).name);
       }
     },
     {
       class: 'String',
       name: 'targetDAOKey',
       expression: function(targetModel) {
-        return foam.String.daoize(this.lookup(targetModel).name);
+        return foam.String.daoize(this.__context__.lookup(targetModel).name);
       }
     },
     {
       class: 'String',
       name: 'junctionDAOKey',
       expression: function(junctionModel) {
-        return foam.String.daoize(this.lookup(junctionModel).name);
+        return foam.String.daoize(this.__context__.lookup(junctionModel).name);
       }
     },
     {
@@ -149,9 +149,9 @@ foam.CLASS({
       var sourceModel   = this.sourceModel;
       var targetModel   = this.targetModel;
       var junctionModel = this.junctionModel;
-      var source        = this.lookup(sourceModel);
-      var target        = this.lookup(targetModel);
-      var junction      = this.lookup(junctionModel, true);
+      var source        = this.__context__.lookup(sourceModel);
+      var target        = this.__context__.lookup(targetModel);
+      var junction      = this.__context__.lookup(junctionModel, true);
       var sourceDAOKey  = this.sourceDAOKey;
       var targetDAOKey  = this.targetDAOKey;
 
@@ -199,7 +199,7 @@ foam.CLASS({
             ]
           });
 
-          junction = this.lookup(this.junctionModel);
+          junction = this.__context__.lookup(this.junctionModel);
         }
 
         var junctionDAOKey = this.junctionDAOKey;

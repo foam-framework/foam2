@@ -15,14 +15,14 @@ foam.CLASS({
     {
       name: 'swiftReturns',
       expression: function(path) {
-        return this.lookup(path).model_.swiftName;
+        return this.__context__.lookup(path).model_.swiftName;
       },
     },
   ],
   methods: [
     function writeToSwiftClass(cls, parentCls) {
       if ( ! parentCls.hasOwnAxiom(this.name) ) return;
-      if (foam.core.InterfaceModel.isInstance(this.lookup(this.path).model_)) {
+      if (foam.core.InterfaceModel.isInstance(this.__context__.lookup(this.path).model_)) {
         return;
       }
       // TODO skip refines.

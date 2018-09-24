@@ -56,7 +56,7 @@ foam.CLASS({
         }
 
         if ( o.class ) {
-          var m = this.lookup(o.class);
+          var m = this.__context__.lookup(o.class);
           if ( ! m ) throw 'Unknown class : ' + o.class;
           return m.create(o, this);
         }
@@ -72,13 +72,13 @@ foam.CLASS({
         if ( typeof o === 'function' ) {
           var name = foam.Function.getName(o);
           foam.assert(name, 'Method must be named');
-          var m = this.lookup(prop.of).create();
+          var m = this.__context__.lookup(prop.of).create();
           m.name = name;
           m.code = o;
           return m;
         }
-        if ( this.lookup(prop.of).isInstance(o) ) return o;
-        if ( o.class ) return this.lookup(o.class).create(o, this);
+        if ( this.__context__.lookup(prop.of).isInstance(o) ) return o;
+        if ( o.class ) return this.__context__.lookup(o.class).create(o, this);
         return foam.lookup(prop.of).create(o);
       }
     }
@@ -220,6 +220,7 @@ foam.CLASS({
   // List of unused Models in the system.
   foam.USED      = {};
   foam.UNUSED    = {};
+  foam._MODELS_ = [];
 
   var CLASS = foam.CLASS;
 
@@ -233,10 +234,13 @@ foam.CLASS({
     m.id = m.package ? m.package + '.' + m.name : m.name;
     foam.UNUSED[m.id] = true;
 
+//    var cls = foam.lookup(m.class || "foam.core.Model");
+//    foam._MODELS_.push(cls.create(m));
+
     var f = foam.Function.memoize0(function() {
       delete foam.UNUSED[m.id];
       var c = CLASS(m);
-      foam.USED[m.id] = c;
+      foam.USED[m.id] = true;
       return c;
     });
 

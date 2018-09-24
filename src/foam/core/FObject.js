@@ -33,7 +33,10 @@ foam.LIB({
     // Each class has a prototype object which is the prototype of all
     // instances of the class. A classes prototype extends its parent
     // classes prototype.
-    prototype: {},
+    prototype: {
+      // Bootstrap context getter, upgraded in EndBoot.js
+      get __context__() { return foam.__context__; }
+    },
 
     // Each class has a map of Axioms added to the class.
     // Map keys are the name of the axiom.
@@ -501,25 +504,6 @@ foam.CLASS({
         a.validateInstance && a.validateInstance(this);
       }
     },
-
-
-    /************************************************
-     * Console
-     ************************************************/
-
-    // Imports aren't implemented yet, so mimic:
-    //   imports: [ 'lookup', 'assert', 'error', 'log', 'warn' ],
-
-
-    // Bootstrap form replaced after this.__context__ is added.
-    function lookup() { return foam.lookup.apply(foam, arguments); },
-
-    function error() { this.__context__.error.apply(null, arguments); },
-
-    function log() { this.__context__.log.apply(null, arguments); },
-
-    function warn() { this.__context__.warn.apply(null, arguments); },
-
 
     /************************************************
      * Publish and Subscribe

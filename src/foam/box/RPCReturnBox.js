@@ -78,7 +78,7 @@ foam.CLASS({
           return;
         }
 
-        this.warn('Invalid message to RPCReturnBox.');
+        this.__context__.warn('Invalid message to RPCReturnBox.');
       },
       javaCode: `
 setMessage(msg);

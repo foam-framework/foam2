@@ -107,7 +107,7 @@ foam.CLASS({
     {
       name: 'create',
       installInClass: function(clsName) {
-        return X.lookup(clsName, true);
+        return foam.lookup(clsName, true);
       }
     }
   ]
@@ -552,7 +552,7 @@ foam.CLASS({
     },
 
     function getCls(opt_cls) {
-      return foam.typeOf(opt_cls) === foam.String ? this.lookup(opt_cls, true) :
+      return foam.typeOf(opt_cls) === foam.String ? this.__context__.lookup(opt_cls, true) :
           opt_cls;
     }
   ]
@@ -741,7 +741,7 @@ foam.LIB({
         } else if ( foam.Object.isInstance(o) ) {
           for ( var key in o ) {
             // anonymous class support.
-            if ( key === 'class' && foam.Object.isInstance(o[key]) ) {
+            if ( key === 'class' && foam.Object.isInstance(o[key]) ) {b
               var json = o[key];
               json.name = 'AnonymousClass' + foam.next$UID();
               console.log('Constructing anonymous class', json.name);

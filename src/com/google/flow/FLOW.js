@@ -677,7 +677,7 @@ foam.CLASS({
       if ( c === this.canvas ) {
         var tool = this.currentTool;
         if ( tool === this.CURRENT_TOOL.value ) return;
-        var cls = this.lookup(tool.id);
+        var cls = this.__context__.lookup(tool.id);
         var o = cls.create({x: x, y: y}, this.__subContext__);
         var p = this.addProperty(o, null, null, 'canvas1');
         // TODO: hack because addProperty is asyn

@@ -107,7 +107,7 @@ foam.CLASS({
               }
 
               var source = this.source;
-              this.warn(
+              this.__context__.warn(
                   (source ? source + ' ' : '') +
                   'Property ' + mName +
                   this.name + ' "' + e[j] +
@@ -291,14 +291,14 @@ foam.CLASS({
         'javaCode'
       ];
       if ( ! blackList.some((keyword) => key.includes(keyword)) ) {
-        this.warn('Unknown property ' + this.cls_.id + '.' + key + ': ' + value);
+        this.__context__.warn('Unknown property ' + this.cls_.id + '.' + key + ': ' + value);
       }
     },
 
     function describe(opt_name) {
-      this.log('Instance of', this.cls_.name);
-      this.log('Axiom Type           Name           Value');
-      this.log('----------------------------------------------------');
+      this.__context__.log('Instance of', this.cls_.name);
+      this.__context__.log('Axiom Type           Name           Value');
+      this.__context__.log('----------------------------------------------------');
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var p = ps[i];
@@ -318,7 +318,7 @@ foam.CLASS({
           foam.String.pad(p.name, 14),
           value);
       }
-      this.log('\n');
+      this.__context__.log('\n');
     }
   ]
 });
@@ -331,22 +331,22 @@ foam.SCRIPT({
 /* Add describe support to contexts. */
 foam.__context__ = foam.__context__.createSubContext({
   describe: function() {
-    this.log(
+    this.__context__.log(
         'Context:',
         this.hasOwnProperty('NAME') ? this.NAME : ('anonymous ' + this.$UID));
-    this.log('KEY                  Type           Value');
-    this.log('----------------------------------------------------');
+    this.__context__.log('KEY                  Type           Value');
+    this.__context__.log('----------------------------------------------------');
     for ( var key in this ) {
       var value = this[key];
       var type = foam.core.FObject.isInstance(value) ?
           value.cls_.name :
           typeof value    ;
-      this.log(
+      this.__context__.log(
         foam.String.pad(key,  20),
         foam.String.pad(type, 14),
         typeof value === 'string' || typeof value === 'number' ? value : '');
     }
-    this.log('\n');
+    this.__context__.log('\n');
 }});
   }
 });
@@ -444,7 +444,7 @@ foam.CLASS({
     function installInClass(c, superImport) {
       // Produce warning for duplicate imports
       if ( superImport ) {
-        this.warn(
+        this.__context__.warn(
           'Import "' + this.name + '" already exists in ancestor class of ' +
           c.id + '.');
       }
@@ -475,7 +475,7 @@ foam.CLASS({
       }
 
       show(this.getPrivate_('listeners'));
-      this.log(count, 'subscriptions');
+      this.__context__.log(count, 'subscriptions');
     }
   ]
 });

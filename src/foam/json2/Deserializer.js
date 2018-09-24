@@ -49,12 +49,24 @@ foam.CLASS({
             var name = v.name;
             var args = v.args;
             var body = v.body;
-            var f = Function.apply(null, args.concat(body));
+            var async = v.async;
+            var constructor = async ? AsyncFunction : Function;
+            var f = constructor.apply(null, args.concat(body));
             if ( name ) foam.Function.setName(f, name);
             return f;
           }
 
           return null;
+        }
+        if ( ! foam.Undefined.isInstance(v["$MMETHOD$"]) ) {
+          if ( this.parseFunctions ) {
+            var map = v["map"];
+            var defaultMethod = v["default"];
+
+            return defaultMethod ?
+              foam.mmethod(map, defaultMethod) :
+              foam.mmethod(map);
+          }
         }
         if ( ! foam.Undefined.isInstance(v["$INST$"]) ) {
           // Is an instance of the class defined by $INST$ key

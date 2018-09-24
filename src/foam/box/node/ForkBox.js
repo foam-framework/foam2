@@ -199,7 +199,7 @@ foam.CLASS({
     function onExit() { this.child_ && this.child_.kill(); },
     function onCriticalError() {
       var process = require('process');
-      this.error(`PID=${process.pid} exiting due to critical error in child
+      this.__context__.error(`PID=${process.pid} exiting due to critical error in child
                       (PID=${this.child_ ? this.child_.pid : 'UNKNOWN'})`);
       process.exit(1);
     }
