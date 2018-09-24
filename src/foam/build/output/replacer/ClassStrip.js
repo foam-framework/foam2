@@ -8,7 +8,7 @@ foam.CLASS({
       value: function(x, v) {
         var ret = {};
         v.cls_.getAxiomsByClass(foam.core.Property).forEach(function(a) {
-          if ( v.hasDefaultValue(a.name) ) return;
+          if ( ! v.hasOwnProperty(a.name) ) return;
           if ( a.transient ) return;
           ret[a.name] = v[a.name];
         });
