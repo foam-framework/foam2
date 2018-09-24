@@ -409,8 +409,16 @@ foam.CLASS({
     {
       class: 'Stub',
       of: 'foam.blob.Blob',
-      name: 'delegate'
+      name: 'delegate',
+      methods: [ 'read' ]
+    },
+    {
+      class: 'Long',
+      name: 'size'
     }
+  ],
+  methods: [
+    function getSize() { return this.size; }
   ]
 });
 
