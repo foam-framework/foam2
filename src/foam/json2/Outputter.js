@@ -246,6 +246,11 @@ foam.CLASS({
         if s.endArray { out.endArray() }
         return self
       `
+    },
+    {
+      name: 'getString',
+      returns: 'String',
+      code: function() { return this.out.str; }
     }
   ]
 });
