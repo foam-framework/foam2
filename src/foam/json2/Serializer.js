@@ -40,7 +40,7 @@ foam.CLASS({
       methods: [
         function getString() {
           var deps = Object.keys(this.deps).map(function(d) { return `"${d}"` }).join(',');
-          return `{"$DEPS$":[${deps}],"$BODY$":${this.out.str}}`
+          return `{"$DEPS$":[${deps}],"$BODY$":${this.out.getString()}}`
         },
         function output(x, v) {
           var out = this.out;
