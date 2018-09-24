@@ -42,7 +42,7 @@ foam.CLASS({
       name: 'messagePortService',
       hidden: true,
       factory: function() {
-        var model = this.lookup('foam.messageport.MessagePortService', true);
+        var model = this.__context__.lookup('foam.messageport.MessagePortService', true);
         if ( model ) {
           return model.create({
             delegate: this.registry
@@ -54,7 +54,7 @@ foam.CLASS({
       name: 'socketService',
       hidden: true,
       factory: function() {
-        var model = this.lookup('foam.net.node.SocketService', true);
+        var model = this.__context__.lookup('foam.net.node.SocketService', true);
         if ( model ) {
           return model.create({
             port: Math.floor( 10000 + ( Math.random() * 10000 ) ),
@@ -72,8 +72,8 @@ return __context__.lookup("foam.swift.net.SocketService")!.create(args: [
       name: 'webSocketService',
       hidden: true,
       factory: function() {
-        var model = this.lookup('foam.net.node.WebSocketService', true) ||
-            this.lookup('foam.net.web.WebSocketService', true);
+        var model = this.__context__.lookup('foam.net.node.WebSocketService', true) ||
+            this.__context__.lookup('foam.net.web.WebSocketService', true);
 
         if ( model ) {
           return model.create({

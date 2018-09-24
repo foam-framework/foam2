@@ -116,6 +116,7 @@ FOAM_FILES([
   { name: 'foam/nanos/demo/Demo' },
   { name: 'foam/nanos/http/Format' },
   { name: 'foam/nanos/http/Command' },
+  { name: 'foam/nanos/http/WebAgent' },
   { name: "foam/nanos/http/ProxyWebAgent" },
   { name: "foam/nanos/http/HttpParameters" },
   { name: "foam/nanos/http/DefaultHttpParameters" },

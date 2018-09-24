@@ -87,7 +87,7 @@ foam.CLASS({
       name: 'delegate',
       postSet: function(old, nu) {
         if ( this.isForwarding_ )
-          this.warn('StoreAndForwardDAO: Delegate while flushing queue!');
+          this.__context__.warn('StoreAndForwardDAO: Delegate while flushing queue!');
         this.forward_();
       }
     },

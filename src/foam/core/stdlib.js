@@ -214,6 +214,7 @@ foam.LIB({
           },
           'memoize0(' + f.name + ')');
       ret.toString = function() {
+        return f.toString();
         return `foam.Function.memoize0(${f.toString()})`
       };
       ret.args = []
@@ -243,6 +244,7 @@ foam.LIB({
           },
           'memoize1(' + f.name + ')');
       ret.toString = function() {
+        return f.toString();
         return `foam.Function.memoize1(${f.toString()})`
       };
       ret.args = [];
@@ -327,17 +329,15 @@ foam.LIB({
       var comment = "(?:\\/\\*(?:.|\\s)*?\\*\\/)?";
       var skip = "(?:" + ws + comment + ws + ")*";
       
-      var functionHeader = "function" + skip + ident + "?\\(";
+      var functionHeader = "(async )?" + "function" + skip + ident + "?\\(";
       
       var arrowHeader = "\\(";
       
-      var header = "(?:function" + skip + ident + "?\\(|\\()" + skip;
-      
-      var arg = "(?:" + ident + skip + ")";
+      var arg = "(?:" + skip + ident + skip + ")";
       var nextArg = "(?:," + skip + arg + ")";
       var argEnd = "\\)";
       var headerToBody = skip + "(?:\\=\\>)?" + skip;
-      var bodyText = "((?:.|\\s))*";
+      var bodyText = "((?:.|\\s)*)";
       var body = "\\{" + bodyText + "\\}";
       var arrowBody = bodyText;
 
@@ -372,7 +372,8 @@ foam.LIB({
       
       var match = next(functionHeader);
       if ( match ) {
-        if ( match[1] ) breakdown.name = match[1];
+        breakdown.async = !! match[1];
+        if ( match[2] ) breakdown.name = match[2];
       } else {
         match = next(arrowHeader);
         if ( ! match ) return null;
@@ -911,6 +912,8 @@ foam.LIB({
 
         return `foam.mmethod(${mapString}, ${defaultMethodStr})`;
       };
+      f.map = map;
+      f.defaultMethod = opt_defaultMethod;
       f.args = [];
       return f;
     }

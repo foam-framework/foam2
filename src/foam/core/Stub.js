@@ -28,16 +28,20 @@ foam.CLASS({
     {
       name: 'methods_',
       expression: function(of, name, methods, replyPolicyName) {
-        var cls = this.lookup(of);
+        var cls = this.__context__.lookup(of);
 
         return (
           methods ?
-            methods.map(function(m) { return cls.getAxiomByName(m); }) :
-            cls.getAxiomsByClass(foam.core.Method).filter(function (m) { return cls.hasOwnAxiom(m.name); }) ).
-              map(function(m) {
+            methods.map(function(m) {
+              var axiom = cls.getAxiomByName(m);
+              foam.assert(axiom, 'Stub Error: Cannot find method name', m, 'for class', of);
+              return axiom;
+            }) :
+          cls.getAxiomsByClass(foam.core.Method).filter(function (m) { return cls.hasOwnAxiom(m.name); }) ).
+          map(function(m) {
                 foam.assert(m.async || m.returns == 'Void',
                             'Cannot stub non-void non-async method', m.name, 'on class', cls.id);
-                
+
                 return foam.core.StubMethod.create({
                   name: m.name,
                   replyPolicyName: replyPolicyName,
@@ -58,10 +62,14 @@ foam.CLASS({
     {
       name: 'notifications_',
       expression: function(of, name, notifications) {
-        var cls = this.lookup(of);
+        var cls = this.__context__.lookup(of);
 
         return notifications && notifications.
-          map(function(m) { return cls.getAxiomByName(m); }).
+          map(function(m) {
+            var axiom = cls.getAxiomByName(m);
+            foam.assert(axiom, 'Stub Error: Cannot find method name', m, 'for class', of);
+            return axiom;
+          }).
           map(function(m) {
             return foam.core.StubNotification.create({
               name: m.name,
@@ -79,7 +87,7 @@ foam.CLASS({
     {
       name: 'actions_',
       expression: function(of, name, actions, replyPolicyName) {
-        var cls = this.lookup(of);
+        var cls = this.__context__.lookup(of);
 
         return (
           actions ? actions.map(function(a) { return cls.getAxiomByName(a); }) :
@@ -100,7 +108,7 @@ foam.CLASS({
 
   methods: [
     function installInClass(cls) {
-      var model = this.lookup(this.of);
+      var model = this.__context__.lookup(this.of);
       var propName = this.name;
 
       cls.installAxiom(foam.core.Object.create({

@@ -39,7 +39,7 @@ foam.CLASS({
 
   methods: [
     function handle(req, res) {
-      this.warn('Abstract BaseHandler.handle() call');
+      this.__context__.warn('Abstract BaseHandler.handle() call');
       return false;
     },
 
@@ -81,7 +81,7 @@ foam.CLASS({
       }
     },
     function reportWarnMsg(req, msg) {
-      this.warn(msg);
+      this.__context__.warn(msg);
     },
     function reportErrorMsg(req, msg) {
       this.error(msg);

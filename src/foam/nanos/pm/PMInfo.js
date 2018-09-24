@@ -6,6 +6,18 @@
 
 foam.CLASS({
   package: 'foam.nanos.pm',
+  name: 'PMTemperatureCellFormatter',
+  implements: ['foam.u2.view.Formatter'],
+  requires: ['foam.nanos.pm.TemperatureCView'],
+  methods: [
+    function format(e, value, obj, axiom) {
+      e.tag({ class: 'foam.nanos.pm.TemperatureCView', totalTime: value });
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.nanos.pm',
   name: 'PMInfo',
 
   documentation: 'Performance Measurement database entry.',
@@ -52,17 +64,7 @@ foam.CLASS({
       class: 'Long',
       name: 'totalTime',
       label: 'Total',
-      tableCellFormatter: {
-        class: {
-          implements: [ 'foam.u2.view.Formatter' ],
-          requires: [ 'foam.nanos.pm.TemperatureCView' ],
-          methods: [
-            function format(e, value, obj, axiom) {
-              e.tag({ class: 'foam.nanos.pm.TemperatureCView', totalTime: value })
-            }
-          ]
-        }
-      }
+      tableCellFormatter: { class: 'foam.nanos.pm.PMTemperatureCellFormatter' }
     }
   ]
 });

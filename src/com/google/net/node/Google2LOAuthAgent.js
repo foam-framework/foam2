@@ -103,7 +103,7 @@ foam.CLASS({
   methods: [
     function init() {
       this.__subContext__.register(
-          this.lookup('foam.net.auth.TokenBearerHTTPRequest'),
+          this.__context__.lookup('foam.net.auth.TokenBearerHTTPRequest'),
           'foam.net.HTTPRequest');
       this.SUPER();
     },

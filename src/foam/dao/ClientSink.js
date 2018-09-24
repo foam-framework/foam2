@@ -13,7 +13,7 @@ foam.CLASS({
       class: 'Stub',
       of: 'foam.dao.Sink',
       name: 'delegate',
-      notifications: [ 'put', 'remove', 'eof', 'error', 'reset' ]
+      notifications: [ 'put', 'remove', 'eof', 'reset' ]
     }
   ]
 });

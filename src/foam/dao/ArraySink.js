@@ -57,7 +57,7 @@ foam.CLASS({
       name: 'a',
       transient: true,
       getter: function() {
-        this.warn('Use of deprecated ArraySink.a');
+        this.__context__.warn('Use of deprecated ArraySink.a');
         return this.array;
       }
     }

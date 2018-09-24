@@ -45,7 +45,7 @@ foam.CLASS({
     {
       name: 'swiftCode',
       template: `
-<% var cls = this.lookup(this.clientClass) %>
+<% var cls = this.__context__.lookup(this.clientClass) %>
 
 let X = __subContext__
 let registry = X["registry"] as! foam_box_BoxRegistry

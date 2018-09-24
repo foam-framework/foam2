@@ -57,12 +57,12 @@ foam.CLASS({
       for ( var i = 0; i < bindings.length; i++ ) {
         if ( bindings[i].route.match(url) ) {
           if ( handled ) {
-            this.warn(`Route handler matches handled response (${url})`);
+            this.__context__.warn(`Route handler matches handled response (${url})`);
           } else {
             if ( bindings[i].handler.handle(req, res) ) {
               handled = true;
             } else {
-              this.warn(`Route handler failed to handle ${url}`);
+              this.__context__.warn(`Route handler failed to handle ${url}`);
             }
           }
         }

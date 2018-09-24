@@ -377,11 +377,11 @@ return delegate;
       }
 
       var daoModel = typeof daoType === 'string' ?
-        this.lookup(daoType) || global[daoType] :
+        this.__context__.lookup(daoType) || global[daoType] :
         daoType;
 
       if ( ! daoModel ) {
-        this.warn(
+        this.__context__.warn(
           "EasyDAO: Unknown DAO Type.  Add '" + daoType + "' to requires: list."
         );
       }

@@ -154,7 +154,7 @@ foam.CLASS({
 
       var cls = data;
       for ( var i = 0; cls; i ++ ) {
-        cls = this.lookup(cls.model_.extends, true);
+        cls = this.__context__.lookup(cls.model_.extends, true);
         if ( i ) this.add(' : ');
         this.start(this.ClassLink, { data: cls }).end();
         if ( cls === foam.core.FObject ) break;

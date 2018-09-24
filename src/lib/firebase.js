@@ -425,7 +425,7 @@ foam.CLASS({
       // try {
       //   var payload = JSON.parse(this.buffer);
       // } catch(e) {
-      //   this.warn('Failed to parse payload, assuming its incomplete.', e, this.buffer.length);
+      //   this.__context__.warn('Failed to parse payload, assuming its incomplete.', e, this.buffer.length);
       //   return;
       // }
 
@@ -444,7 +444,7 @@ foam.CLASS({
     },
 
     function onUnknown(name, data) {
-      this.warn('Unknown firebase event', name, data);
+      this.__context__.warn('Unknown firebase event', name, data);
     }
   ]
 });
