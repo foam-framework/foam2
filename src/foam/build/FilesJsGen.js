@@ -66,6 +66,12 @@ foam.CLASS({
         'foam.core.BooleanScript',
         'foam.core.AxiomArrayScript',
         'foam.core.EndBootScript',
+
+        'foam.core.Requires',
+        'foam.core.ModelRequiresRefines',
+
+        'foam.core.Implements',
+        'foam.core.ImplementsModelRefine',
       ],
     },
     {
@@ -78,17 +84,16 @@ foam.CLASS({
       value: [
         'foam.core.ContextMultipleInheritenceScript',
         'foam.core.DebugDescribeScript',
-        'foam.core.ImplementsModelRefine',
         'foam.core.ImportExportModelRefine',
         'foam.core.ListenerModelRefine',
         'foam.core.MethodArgumentRefine',
         'foam.core.ModelConstantRefine',
         'foam.core.ModelRefinestopics',
-        'foam.core.ModelRequiresRefines',
         'foam.core.ModelActionRefine',
         'foam.core.Promised',
         'foam.core.__Class__',
         'foam.core.__Property__',
+        'foam.core.ModelIDRefine',
       ],
     },
     {
@@ -102,6 +107,18 @@ foam.CLASS({
         'foam.core.ModelRefinescss',
         'foam.core.WindowScript',
         'foam.net.WebLibScript',
+        'foam.u2.view.TableCellPropertyRefinement',
+      ],
+    },
+    {
+      name: 'END',
+      documentation: `
+        The following models must be added at the end of files.js in this order
+        and the outputter will force these to be loaded at the end even if
+        they're discovered as a dependency of something else.
+      `,
+      value: [
+        'foam.apploader.ClassLoaderContextScript',
       ],
     },
     {
@@ -155,27 +172,66 @@ foam.CLASS({
             return self.getDepsTree(s.array)
           });
       };
-      return Promise.all([
-          getTreeHead(self.IN(self.Model.ID, self.CORE_MODELS)),
-          getTreeHead(self.INSTANCE_OF(self.Lib)),
-          getTreeHead(self.IN(self.Model.ID, self.PHASE_1)),
-          getTreeHead(self.IN(self.Model.ID, self.PHASE_2)),
-          getTreeHead(self.INSTANCE_OF(self.Script)),
-          getTreeHead(self.INSTANCE_OF(self.Relationship)),
-          getTreeHead(self.HAS(self.Model.REFINES)),
-          getTreeHead(self.IN(self.Model.ID, self.required)),
-      ]).then(function(args) {
+
+      // Get all dependencies of models that are required.
+      return getTreeHead(self.IN(self.Model.ID, self.required)).then(function(a) {
+        var deps = {
+          'foam.core.FObject': true,
+          'foam.core.Model': true
+        };
+        var q = [a];
+        while ( q.length ) {
+          var n = q.pop();
+          Object.keys(n).forEach(function(k) {
+            if ( deps[k] ) return;
+            deps[k] = true;
+            q.push(n[k]);
+          });
+        }
+        return Object.keys(deps);
+      }).then(function(deps) {
+        return Promise.all([
+            getTreeHead(self.IN(self.Model.ID, self.CORE_MODELS)),
+            getTreeHead(self.INSTANCE_OF(self.Lib)),
+            getTreeHead(self.IN(self.Model.ID, self.PHASE_1)),
+            getTreeHead(self.IN(self.Model.ID, self.PHASE_2)),
+            getTreeHead(self.INSTANCE_OF(self.Script)),
+            getTreeHead(
+              self.OR(
+                self.IN(self.Relationship.SOURCE_MODEL, deps),
+                self.IN(self.Relationship.TARGET_MODEL, deps)
+              ),
+            ),
+            getTreeHead(self.IN(self.Model.REFINES, deps)),
+            getTreeHead(self.IN(self.Model.ID, self.required)),
+            getTreeHead(self.IN(self.Model.ID, self.END)),
+        ])
+      }).then(function(args) {
         return Promise.all(
           args.map(function(head) {
+
+            var depthMap = {};
+            var fillDepth = function(node, depth, seen) {
+              var keys = Object.keys(node);
+              for ( var i = 0 ; i < keys.length ; i++ ) {
+                var k = keys[i];
+                if ( seen[k] ) continue;
+                if ( ( depthMap[k] || 0 ) > depth ) continue;
+                depthMap[k] = depth;
+                seen[k] = true;
+                fillDepth(node[k], depth + 1, seen);
+                delete seen[k];
+              }
+            };
+            fillDepth(head, 0, {});
             var order = [];
-            var queue = [head];
-            while ( queue.length ) {
-              var n = queue.pop();
-              Object.keys(n).forEach(function(k) {
-                if ( order.indexOf(k) == -1 ) queue.unshift(n[k]);
-                order.unshift(k)
-              });
-            }
+            Object.keys(depthMap).forEach(function(k) {
+              order[depthMap[k]] = order[depthMap[k]] || [];
+              order[depthMap[k]].push(k);
+            });
+            order.reverse();
+            order = [].concat.apply([], order);
+
             // Remove anyting not in the DAO. This can happen for inner classes
             // and enums. TODO: Would be nice if we didn't have to do this.
             return Promise.all(order.map(function(id) {
@@ -186,19 +242,25 @@ foam.CLASS({
           })
         );
       }).then(function(args) {
-        // Flatten args.
-        args = [].concat.apply([], args);
-        var files = [].concat(
-          self.BOOT_FILES,
-          self.CORE_MODELS,
-          args).map(function(o) {
-            return `{ name: "${o.replace(/\./g, '/')}" },`;
-          });
+        // Args is a 2D array so concat.apply will flatten it.
+        var files = [].concat.apply(self.CORE_MODELS, args);
+
+        // Remove anything that should be forced into the end.
+        files = files.filter(function(id, i) {
+          return self.END.indexOf(id) == -1;
+        }).concat(self.END);
 
         // Remove duplicates.
         files = files.filter(function(id, i) {
           return files.indexOf(id) == i;
-        })
+        });
+
+        // Prepend the files needed to boot and adapt the IDs into file names.
+        files = self.BOOT_FILES.concat(files.map(function(o) {
+          return o.replace(/\./g, '/')
+        })).map(function(o) {
+          return `{ name: "${o}" },`;
+        });
 
         var filesJs = `
 if ( typeof window !== 'undefined' ) global = window;
