@@ -36,27 +36,28 @@ public abstract class AbstractFObjectArrayPropertyInfo
   public Object fromXML(X x, XMLStreamReader reader) {
     List objList = new ArrayList();
     String startTag = reader.getLocalName();
+
     try {
       int eventType;
-      while (reader.hasNext()) {
+      while ( reader.hasNext() ) {
         eventType = reader.next();
-        switch (eventType) {
+        switch ( eventType ) {
           case XMLStreamConstants.START_ELEMENT:
             // Nested object in array
-            if (reader.getLocalName().equals("object")) {
+            if ( reader.getLocalName().equals("object") ) {
               FObject o = XMLSupport.createObj(x, reader);
-              if (o != null) {
+              if ( o != null ) {
                 objList.add(o);
               }
             }
             break;
           case XMLStreamConstants.END_ELEMENT:
-            if (reader.getLocalName() == startTag) {
+            if ( reader.getLocalName() == startTag ) {
               return objList.toArray();
             }
         }
       }
-    } catch(XMLStreamException ex){
+    } catch(XMLStreamException ex) {
       Logger logger = (Logger) x.get("logger");
       logger.error("Premature end of XML file");
     }
@@ -64,7 +65,7 @@ public abstract class AbstractFObjectArrayPropertyInfo
   }
 
   @Override
-  public void toXML (FObject obj, Document doc, Element objElement) {
+  public void toXML(FObject obj, Document doc, Element objElement) {
     if ( this.f(obj) == null ) return;
 
     Element prop = doc.createElement(this.getName());
@@ -72,9 +73,10 @@ public abstract class AbstractFObjectArrayPropertyInfo
 
     // FObject Array check
     FObject[] nestedArray = (FObject[]) this.f(obj);
-    for ( int j = 0; j < nestedArray.length; j++ ) {
+    for ( int j = 0 ; j < nestedArray.length ; j++ ) {
       XMLSupport.toXML(nestedArray[j], doc, prop);
     }
+
     return;
   }
 
