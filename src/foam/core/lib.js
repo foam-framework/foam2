@@ -143,8 +143,6 @@ foam.LIB = function LIB(model) {
   // During boot, keep a list of created LIBs
   if ( global.foam.__LIBS__ ) global.foam.__LIBS__[model.name] = root;
 
-  root.model_ = model;
-
   if ( model.constants ) {
     foam.assert(
       typeof model.constants === 'object',
