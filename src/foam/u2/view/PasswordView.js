@@ -21,15 +21,15 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   css: `
+    .input-field-container {
+      position: relative;
+    }
     .input-image {
       position: absolute;
       width: 24px;
       height: 24px;
       bottom: 8px;
       right: 6px;
-    }
-    .input-field-container {
-      position: relative;
     }
     .input-field {
       padding-right: 30px;
@@ -40,7 +40,6 @@ foam.CLASS({
   `,
 
   properties: [
-    ['nodeName', 'input'],
     'data',
     'type',
     {
@@ -56,20 +55,27 @@ foam.CLASS({
       class: 'Boolean',
       name: 'passwordIcon',
       defaultValue: false
-    }
+    },
+    'inputElement'
   ],
 
   methods: [
     function initE() {
       this.SUPER();
 
-      this.addClass(this.myClass());
-      this.addClass('input-field');
-      this.start('img').show(this.passwordIcon$).addClass('input-image').
-        attr('src', this.visibilityIcon$).on('click', this.visible).
+      this.addClass(this.myClass()).start().
+        addClass('input-field-container').
+        start('input', {
+          type: this.type
+        }, this.inputElement$).
+          addClass('input-field').
+        end().
+        start('img').show(this.passwordIcon$).addClass('input-image').
+          attr('src', this.visibilityIcon$).on('click', this.visible).
+        end().
       end();
 
-      this.attrSlot(
+      this.inputElement.attrSlot(
         'value',
         this.onKey ? 'input' : 'change'
       ).linkFrom(this.data$);
@@ -90,6 +96,7 @@ foam.CLASS({
         this.visibleIcon('/foam2/src/foam/u2/images/visibility-off.svg',
             'text');
       } else {
+        // Password invisible
         this.visibleIcon('/foam2/src/foam/u2/images/visibility.svg',
             'password');
       }
