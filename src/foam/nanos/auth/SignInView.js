@@ -68,6 +68,15 @@ foam.CLASS({
       outline: none;
       padding: 10px;
     }
+    ^ .full-width-input-password {
+      /* Required for password input field */
+      width: 90%;
+      height: 40px;
+      margin-left: 5%;
+      margin-bottom: 15px;
+      outline: none;
+      padding: 10px;
+    }
     ^ .label{
       height: 16px;
       font-family: Roboto;
@@ -123,7 +132,7 @@ foam.CLASS({
           .start().addClass('label').add("Email Address").end()
           .start(this.EMAIL).addClass('full-width-input').end()
           .start().addClass('label').add("Password").end()
-          .start(this.PASSWORD).addClass('full-width-input').end()
+          .start(this.PASSWORD).end()
           .start(this.SIGN_IN).addClass('full-width-button').end()
         .end()
         .start('div')
