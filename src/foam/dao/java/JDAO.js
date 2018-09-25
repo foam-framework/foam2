@@ -86,7 +86,7 @@ foam.CLASS({
                   .setFilename(filename)
                   .build()
               })
-              .build().replay(delegate);
+              .build().replay(x, delegate);
           }
         `);
       }
@@ -114,7 +114,7 @@ foam.CLASS({
       } catch (Throwable t) {
         t.printStackTrace();
       }
-      journal_.put(obj);
+      journal_.put(x, obj);
       return super.put_(x, obj);
       `
     },
@@ -130,7 +130,7 @@ foam.CLASS({
       } catch (Throwable t) {
         t.printStackTrace();
       }
-      journal_.remove(obj);
+      journal_.remove(x, obj);
       return super.remove_(x, obj);
       `
     },
