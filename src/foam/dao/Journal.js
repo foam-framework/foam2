@@ -9,9 +9,9 @@ foam.INTERFACE({
   name: 'Journal',
 
   methods: [
-    function put(obj) {},
-    function remove(obj) {},
-    function replay(dao) {}
+    function put(x, obj) {},
+    function remove(x, obj) {},
+    function replay(x, dao) {}
   ]
 });
 
@@ -74,13 +74,13 @@ if ( foam.isServer ) {
     ],
 
     methods: [
-      function put(obj) {
+      function put(x, obj) {
         return this.write_(Buffer.from(
             "put(foam.json.parse(" + foam.json.Storage.stringify(obj, this.of) +
               "));\n"));
       },
 
-      function remove(obj) {
+      function remove(x, obj) {
         return this.write_(Buffer.from(
             "remove(foam.json.parse(" +
               foam.json.Storage.stringify(obj, this.of) +
@@ -105,7 +105,7 @@ if ( foam.isServer ) {
         });
       },
 
-      function replay(dao) {
+      function replay(x, dao) {
         var self = this;
         return new Promise(function(resolve, reject) {
           self.fs.readFile(self.fd, 'utf8', function(err, data_) {

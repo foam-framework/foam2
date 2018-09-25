@@ -17,7 +17,7 @@ foam.CLASS({
     {
       name: 'replay',
       javaCode: `
-        super.replay(new foam.dao.ProxyDAO(getX(), dao) {
+        super.replay(x, new foam.dao.ProxyDAO() {
 
           @Override
           public foam.core.FObject put_(foam.core.X x, foam.core.FObject obj) {
