@@ -1,4 +1,4 @@
-/**
+ /**
  * @license
  * Copyright 2018 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -100,7 +100,7 @@ foam.CLASS({
 
         for ( var i = 0 ; i < axioms.length ; i++ ) {
           var a = axioms[i];
-          if ( v.hasDefaultValue(a.name) ) continue;
+          if ( ! v.hasOwnProperty(a.name) ) continue;
 
           if ( a.transient ) continue;
 

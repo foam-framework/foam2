@@ -93,6 +93,7 @@ foam.CLASS({
         'foam.core.Promised',
         'foam.core.__Class__',
         'foam.core.__Property__',
+        'foam.core.ModelIDRefine',
       ],
     },
     {
@@ -106,6 +107,7 @@ foam.CLASS({
         'foam.core.ModelRefinescss',
         'foam.core.WindowScript',
         'foam.net.WebLibScript',
+        'foam.u2.view.TableCellPropertyRefinement',
       ],
     },
     {
