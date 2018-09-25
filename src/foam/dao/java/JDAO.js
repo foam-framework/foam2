@@ -114,7 +114,7 @@ foam.CLASS({
       } catch (Throwable t) {
         t.printStackTrace();
       }
-      journal_.put(obj, null);
+      journal_.put(obj);
       return super.put_(x, obj);
       `
     },
@@ -130,7 +130,7 @@ foam.CLASS({
       } catch (Throwable t) {
         t.printStackTrace();
       }
-      journal_.remove(obj, null);
+      journal_.remove(obj);
       return super.remove_(x, obj);
       `
     },

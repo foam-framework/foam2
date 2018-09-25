@@ -7,9 +7,10 @@
 foam.INTERFACE({
   package: 'foam.dao',
   name: 'Journal',
-  extends: 'foam.dao.Sink',
 
   methods: [
+    function put(obj) {},
+    function remove(obj) {},
     function replay(dao) {}
   ]
 });
@@ -30,7 +31,7 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.Journal',
       name: 'delegate',
-      forwards: [ 'replay', 'put', 'remove', 'eof', 'reset' ]
+      forwards: [ 'put', 'remove', 'replay' ]
     }
   ]
 });
@@ -40,7 +41,11 @@ if ( foam.isServer ) {
   foam.CLASS({
     package: 'foam.dao',
     name: 'NodeFileJournal',
-    implements: ['foam.dao.Journal'],
+
+    implements: [
+      'foam.dao.Journal'
+    ],
+
     properties: [
       {
         class: 'Class',
@@ -126,8 +131,7 @@ if ( foam.isServer ) {
             resolve(dao);
           });
         });
-      },
-      function eof() {}
+      }
     ]
   });
 }

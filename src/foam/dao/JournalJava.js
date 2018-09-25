@@ -9,6 +9,24 @@ foam.INTERFACE({
 
   methods: [
     {
+      name: 'put',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ]
+    },
+    {
+      name: 'remove',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ]
+    },
+    {
       name: 'replay',
       args: [
         {
@@ -41,18 +59,10 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'replay',
-      javaCode: `
-        for ( Journal delegate : getDelegates() ) {
-          delegate.replay(dao);
-        }
-      `
-    },
-    {
       name: 'put',
       javaCode: `
         for ( Journal delegate : getDelegates() ) {
-          delegate.put(obj, sub);
+          delegate.put(obj);
         }
       `
     },
@@ -60,23 +70,15 @@ foam.CLASS({
       name: 'remove',
       javaCode: `
         for ( Journal delegate : getDelegates() ) {
-          delegate.remove(obj, sub);
+          delegate.remove(obj);
         }
       `
     },
     {
-      name: 'eof',
+      name: 'replay',
       javaCode: `
         for ( Journal delegate : getDelegates() ) {
-          delegate.eof();
-        }
-      `
-    },
-    {
-      name: 'reset',
-      javaCode: `
-        for ( Journal delegate : getDelegates() ) {
-          delegate.reset(sub);
+          delegate.replay(dao);
         }
       `
     }
