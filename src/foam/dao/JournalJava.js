@@ -125,8 +125,10 @@ foam.CLASS({
     'java.io.File',
     'java.io.FileReader',
     'java.io.FileWriter',
+    'java.text.SimpleDateFormat',
     'java.util.Iterator',
     'java.util.List',
+    'java.util.TimeZone',
     'java.util.regex.Pattern'
   ],
 
@@ -135,7 +137,29 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function (cls) {
         cls.extras.push(`
-          protected Pattern COMMENT = Pattern.compile("(/\\\\*([^*]|[\\\\r\\\\n]|(\\\\*+([^*/]|[\\\\r\\\\n])))*\\\\*+/)|(//.*)");
+          protected static Pattern COMMENT = Pattern.compile("(/\\\\*([^*]|[\\\\r\\\\n]|(\\\\*+([^*/]|[\\\\r\\\\n])))*\\\\*+/)|(//.*)");
+
+          protected static ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
+            @Override
+            protected StringBuilder initialValue() {
+              return new StringBuilder();
+            }
+            @Override
+            public StringBuilder get() {
+              StringBuilder b = super.get();
+              b.setLength(0);
+              return b;
+            }
+          };
+
+          protected static final ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
+            @Override
+            protected SimpleDateFormat initialValue() {
+              SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+              sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+              return sdf;
+            }
+          };
         `);
       }
     }
@@ -256,13 +280,18 @@ foam.CLASS({
       javaCode: `
         try {
           FObject old = null;
-          FObject fobj = (FObject) obj;
-          PropertyInfo id = (PropertyInfo) fobj.getClassInfo().getAxiomByName("id");
+          Object id = obj.getProperty("id");
+          String record = ( getOutputDiff() && ( old = getDao().find(id) ) != null ) ?
+            getOutputter().stringifyDelta(old.fclone(), obj) :
+            getOutputter().stringify(obj);
 
-          if ( getOutputDiff() && ( old = getDao().find(id.get(obj))) != null ) {
-            write_("p(" + getOutputter().stringifyDelta(old.fclone(), fobj) + ")");
-          } else {
-            write_("p(" + getOutputter().stringify(fobj) + ")");
+          if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
+            writeComment_(x, obj);
+            write_(sb.get()
+              .append("p(")
+              .append(record)
+              .append(")")
+              .toString());
           }
         } catch ( Throwable t ) {
           getLogger().error("Failed to write to put entry to journal", t);
@@ -278,11 +307,18 @@ foam.CLASS({
           // TODO: Would be more efficient to output the ID portion of the object.  But
           // if ID is an alias or multi part id we should only output the
           // true properties that ID/MultiPartID maps too.
-          FObject fobj = (FObject) obj;
-          FObject toWrite = (FObject) fobj.getClassInfo().getObjClass().newInstance();
-          PropertyInfo id = (PropertyInfo) fobj.getClassInfo().getAxiomByName("id");
-          id.set(toWrite, id.get(obj));
-          write_("r(" + getOutputter().stringify(toWrite) + ")");
+          FObject toWrite = (FObject) obj.getClassInfo().newInstance();
+          toWrite.setProperty("id", obj.getProperty("id"));
+          String record = getOutputter().stringify(toWrite);
+
+          if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
+            writeComment_(x, obj);
+            write_(sb.get()
+              .append("r(")
+              .append(record)
+              .append(")")
+              .toString());
+          }
         } catch ( Throwable t ) {
           getLogger().error("Failed to write to remove entry to journal", t);
           throw new RuntimeException(t);
@@ -309,12 +345,24 @@ foam.CLASS({
       `
     },
     {
-      name: 'eof',
-      javaCode: '// NOOP',
-    },
-    {
-      name: 'reset',
-      javaCode: '// NOOP',
+      name: 'writeComment_',
+      synchronized: true,
+      javaThrows: [
+        'java.io.IOException'
+      ],
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ],
+      javaCode: `
+
+      `
     },
     {
       name: 'replay',
