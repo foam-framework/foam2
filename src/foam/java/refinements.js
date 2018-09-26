@@ -1638,6 +1638,23 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.Model',
+  flags: ['java'],
+  properties: [
+    {
+      class: 'AxiomArray',
+      of: 'foam.java.JavaImplements',
+      name: 'javaImplements',
+      adaptArrayElement: function(o) {
+        return foam.String.isInstance(o) ?
+          foam.java.JavaImplements.create({ name: o }) :
+          foam.java.JavaImplements.create(o);
+      }
+    }
+  ]
+});
+
 
 foam.CLASS({
   refines: 'foam.core.Listener',
