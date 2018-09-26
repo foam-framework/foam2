@@ -11,6 +11,7 @@ import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
+import foam.util.SafetyUtil;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -34,6 +35,7 @@ public class Outputter
   protected PrintWriter   writer_;
   protected OutputterMode mode_;
   protected StringWriter  stringWriter_        = null;
+  protected boolean       outputShortNames_    = false;
   protected boolean       outputDefaultValues_ = false;
   protected boolean       outputClassNames_    = true;
 
@@ -116,6 +118,19 @@ public class Outputter
     writer_.append("]");
   }
 
+  protected void outputByteArray(byte[][] array) {
+    writer_.append("[");
+    for ( int i = 0 ; i < array.length ; i++ ) {
+      output(array[i]);
+      if ( i < array.length - 1 ) writer_.append(",");
+    }
+    writer_.append("]");
+  }
+
+  protected void outputByteArray(byte[] array) {
+    output(foam.util.SecurityUtil.ByteArrayToHexString(array));
+  }
+
   protected void outputMap(java.util.Map map) {
     writer_.append("{");
     java.util.Iterator keys = map.keySet().iterator();
@@ -142,7 +157,7 @@ public class Outputter
 
   protected void outputProperty(FObject o, PropertyInfo p) {
     writer_.append(beforeKey_());
-    writer_.append(p.getName());
+    writer_.append(getPropertyName(p));
     writer_.append(afterKey_());
     writer_.append(":");
     p.toJSON(this, p.get(o));
@@ -198,7 +213,14 @@ public class Outputter
     } else if ( value instanceof Number ) {
       outputNumber((Number) value);
     } else if ( isArray(value) ) {
-      outputArray((Object[]) value);
+        if ( value.getClass().equals(byte[][].class) ) {
+          outputByteArray((byte[][]) value);
+        } else if ( value instanceof byte[] ) {
+          outputByteArray((byte[]) value);
+        }
+        else {
+          outputArray((Object[]) value);
+        }
     } else if ( value instanceof Boolean ) {
       outputBoolean((Boolean) value);
     } else if ( value instanceof java.util.Date ) {
@@ -322,7 +344,7 @@ public class Outputter
     writer_.append(",");
     outputString("name");
     writer_.append(":");
-    outputString(prop.getName());
+    outputString(getPropertyName(prop));
     writer_.append("}");
   }
 
@@ -350,6 +372,10 @@ public class Outputter
     return null;
   }
 
+  public String getPropertyName(PropertyInfo p) {
+    return outputShortNames_ && ! SafetyUtil.isEmpty(p.getShortName()) ? p.getShortName() : p.getName();
+  }
+
   @Override
   public String toString() {
     return ( stringWriter_ != null ) ? stringWriter_.toString() : null;
@@ -362,6 +388,11 @@ public class Outputter
 
   public void outputRawString(String str) {
     writer_.append(str);
+  }
+
+  public Outputter setOutputShortNames(boolean outputShortNames) {
+    outputShortNames_ = outputShortNames;
+    return this;
   }
 
   public Outputter setOutputDefaultValues(boolean outputDefaultValues) {
