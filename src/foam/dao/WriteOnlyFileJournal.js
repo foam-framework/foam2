@@ -27,7 +27,11 @@ foam.CLASS({
           // Since only writing, dispense with id lookup and delta
           String record = getOutputter().stringify(obj);
           if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
-            write_("p(" + record + ")");
+            write_(sb.get()
+              .append("p(")
+              .append(record)
+              .append(")")
+              .toString());
           }
         } catch ( Throwable t ) {
           throw new RuntimeException(t);
