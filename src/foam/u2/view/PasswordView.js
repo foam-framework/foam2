@@ -21,24 +21,22 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   css: `
-    .input-field-container {
+    ^ .input-field-container {
       position: relative;
     }
-    .input-image {
+    ^ .input-image {
       position: absolute;
       width: 24px;
       height: 24px;
       bottom: 8px;
       right: 6px;
     }
-    .input-field {
+    ^ .input-field {
       padding-right: 30px;
     }
   `,
 
   properties: [
-    'data',
-    'type',
     {
       name: 'visibilityIcon',
       value: '/foam2/src/foam/u2/images/visibility.svg'
@@ -50,10 +48,8 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'passwordIcon',
-      defaultValue: false
-    },
-    'inputElement'
+      name: 'passwordIcon'
+    }
   ],
 
   methods: [
@@ -62,20 +58,16 @@ foam.CLASS({
 
       this.addClass(this.myClass()).start().
         addClass('input-field-container').
-        start('input', {
-          type: this.type
-        }, this.inputElement$).
+        start(foam.u2.tag.Input, {
+          type: this.type,
+          data$: this.data$
+        }).
           addClass('input-field').addClass('full-width-input-password').
         end().
         start('img').show(this.passwordIcon$).addClass('input-image').
           attr('src', this.visibilityIcon$).on('click', this.visible).
         end().
       end();
-
-      this.inputElement.attrSlot(
-        'value',
-        this.onKey ? 'input' : 'change'
-      ).linkFrom(this.data$);
     },
 
     function visibleIcon(visibilityIcon, type) {
