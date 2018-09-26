@@ -80,7 +80,7 @@ foam.CLASS({
 
             try {
               String[] split = line.split("\\\\.", 2);
-              if (split.length != 2) {
+              if ( split.length != 2 ) {
                 continue;
               }
 
@@ -93,7 +93,7 @@ foam.CLASS({
 
               dao = (foam.dao.DAO) x.get(service);
               foam.core.FObject obj = parser.parseString(line);
-              if (obj == null) {
+              if ( obj == null ) {
                 getLogger().error("Parse error", getParsingErrorMessage(line), "line:", line);
                 continue;
               }
