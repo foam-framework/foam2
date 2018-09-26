@@ -132,7 +132,7 @@ foam.CLASS({
           .start().addClass('label').add("Email Address").end()
           .start(this.EMAIL).addClass('full-width-input').end()
           .start().addClass('label').add("Password").end()
-          .start(this.PASSWORD).end()
+          .add(this.PASSWORD)
           .start(this.SIGN_IN).addClass('full-width-button').end()
         .end()
         .start('div')
