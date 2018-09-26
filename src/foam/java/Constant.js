@@ -50,9 +50,6 @@ foam.CLASS({
       o.out(this.type);
       o.out(' ' + this.name);
       o.out(' = ');
-      if ( this.name === 'MAX_OUTPUT_CHARS' ) {
-        console.log("****adamvy:", foam.typeOf(this.value).model_.name);
-      }
       o.out(foam.java.asJavaValue(this.value));
       o.out(';\n');
     }
