@@ -33,15 +33,10 @@ public class AuthenticatedGroupDAO extends ProxyDAO {
    */
   public void checkUserHasAllPermissionsInGroup(X x, Group toCheck) {
     AuthService auth = (AuthService) x.get("auth");
-    String groupId = toCheck.getId();
+    String groupId;
+    Group group = toCheck;
 
-    while ( ! SafetyUtil.isEmpty(groupId) ) {
-      Group group = (Group) getDelegate().find_(x, groupId);
-
-      if ( group == null ) {
-        throw new RuntimeException("The '" + toCheck.getId() + "' group has a null ancestor named '" + groupId + "'.");
-      }
-
+    while ( true ) {
       Permission[] permissions = group.getPermissions();
 
       for ( Permission permission : permissions ) {
@@ -52,6 +47,16 @@ public class AuthenticatedGroupDAO extends ProxyDAO {
       }
 
       groupId = group.getParent();
+
+      if ( SafetyUtil.isEmpty(groupId) ) {
+        break;
+      }
+
+      group = (Group) getDelegate().find_(x, groupId);
+
+      if ( group == null ) {
+        throw new RuntimeException("The '" + toCheck.getId() + "' group has a null ancestor named '" + groupId + "'.");
+      }
     }
   }
 
