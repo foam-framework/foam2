@@ -24,6 +24,7 @@ foam.CLASS({
         'exports',
         'constants',
         'messages',
+        'ids',
         'properties',
         'axioms',
         'methods',

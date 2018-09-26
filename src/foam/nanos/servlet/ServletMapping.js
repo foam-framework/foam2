@@ -7,6 +7,11 @@ foam.CLASS({
       name: 'className'
     },
     {
+      class: "FObjectProperty",
+      javaType: 'javax.servlet.Servlet',
+      name: 'servletObject'
+    },
+    {
       class: 'String',
       name: 'pathSpec'
     },

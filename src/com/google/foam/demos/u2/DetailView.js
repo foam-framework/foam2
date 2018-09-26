@@ -66,7 +66,9 @@ foam.CLASS({
   // css: foam.u2.DetailView.model_.css,
 
   css: `
-    ^ > table {
+    ^ {
+      padding: 8px;
+      display: inline-block;
       border-radius: 3px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
       margin: 8px;
@@ -80,52 +82,165 @@ foam.CLASS({
 
       this.
         addClass(this.myClass()).
-        start('table').
-          tag(this.DetailPropertyView, {prop: this.data.ID}).
-          tag(this.DetailPropertyView, {prop: this.data.DESCRIPTION}).
-          tag(this.DetailPropertyView, {prop: this.data.ENABLED}).
-          tag(this.DetailPropertyView, {prop: this.data.PARENT}).
-          tag(this.DetailPropertyView, {prop: this.data.DEFAULT_MENU}).
-          start('tr').start('td').attrs({colspan:2}).
-            start(LabelledSection, {title: 'Permissions'}).
-              add('this.data.PERMISSIONS').
-            end().
+        start(Columns).
+          start(Column).start('table').
+            tag(this.DetailPropertyView, {prop: this.data.ID}).
+            tag(this.DetailPropertyView, {prop: this.data.DESCRIPTION}).
           end().end().
-          start('tr').start('td').attrs({colspan:2}).
-            start(Tabs).
-              start(Tab, {label: 'Colours'}).
-                start('table').
-                  tag(this.DetailPropertyView, {prop: this.data.PRIMARY_COLOR,     label: 'Primary'}).
-                  tag(this.DetailPropertyView, {prop: this.data.SECONDARY_COLOR,   label: 'Secondary'}).
-                  tag(this.DetailPropertyView, {prop: this.data.TABLE_COLOR,       label: 'Table'}).
-                  tag(this.DetailPropertyView, {prop: this.data.TABLE_HOVER_COLOR, label: 'Table Hover'}).
-                  tag(this.DetailPropertyView, {prop: this.data.ACCENT_COLOR,      label: 'Accent'}).
-                end().
-              end().
-              start(Tab, {label: 'CSS'}).
-                add(this.data.GROUP_CSS).
-              end().
-              start(Tab, {label: 'Views'}).
-                start('table').
-                  tag(this.DetailPropertyView, {prop: this.data.TOP_NAVIGATION}).
-                  tag(this.DetailPropertyView, {prop: this.data.FOOTER_VIEW, label: 'Footer'}).
-                end().
-              end().
-              start(Tab, {label: 'Logo'}).
-                add(this.data.LOGO).
-                add('image: ').
-                tag(foam.u2.tag.Image, {data: this.data.logo$}).
-                add(this.data.logo$).
-              end().
-            end().
+          start(Column).start('table').
+            tag(this.DetailPropertyView, {prop: this.data.PARENT}).
+            tag(this.DetailPropertyView, {prop: this.data.DEFAULT_MENU}).
+            tag(this.DetailPropertyView, {prop: this.data.ENABLED}).
           end().end().
+        end().
+        br().
+        start(Tabs).
+          start(Tab, {label: 'Permissions'}).
+            start().style({'overflow-y': 'auto'}).
+              startContext({data: this.data}).
+                add(this.data.PERMISSIONS).
+              endContext().
+              startContext({data: this.data}).
+                add(this.data.PERMISSIONS2).
+              endContext().
+            end().
+          end().
+          start(Tab, {label: 'Users'}).
+          end().
+          start(Tab, {label: 'Colours'}).
+            start('table').
+              tag(this.DetailPropertyView, {prop: this.data.PRIMARY_COLOR,     label: 'Primary'}).
+              tag(this.DetailPropertyView, {prop: this.data.SECONDARY_COLOR,   label: 'Secondary'}).
+              tag(this.DetailPropertyView, {prop: this.data.ACCENT_COLOR,      label: 'Accent'}).
+              tag(this.DetailPropertyView, {prop: this.data.TABLE_COLOR,       label: 'Table'}).
+              tag(this.DetailPropertyView, {prop: this.data.TABLE_HOVER_COLOR, label: 'Table Hover'}).
+            end().
+          end().
+          start(Tab, {label: 'CSS'}).
+            add(this.data.GROUP_CSS).
+          end().
+          start(Tab, {label: 'Views'}).
+            start('table').
+              tag(this.DetailPropertyView, {prop: this.data.TOP_NAVIGATION}).
+              tag(this.DetailPropertyView, {prop: this.data.FOOTER_VIEW, label: 'Footer'}).
+            end().
+          end().
+          start(Tab, {label: 'Logo'}).
+            add(this.data.LOGO).
+            br().
+            start(foam.u2.view.ImageView, {data: this.data.logo$}).style({padding: '10px'}).end().
+          end().
         end();
 //        tag(this.DetailPropertyView, {prop: this.data.USERS});
     }
   ]
 });
 
+// Bug: Borders don't pass down Context properly
+
 foam.u2.DetailView.create({of: foam.nanos.auth.Group, data: foam.nanos.auth.Group.create(), showActions: true}).write();
+
+E('br').write();
+E('hr').write();
+E('br').write();
+
+foam.CLASS({
+  name: 'GroupDetailView2',
+  extends: 'foam.u2.View',
+
+  requires: [
+    'foam.nanos.auth.Group',
+    'foam.u2.DetailPropertyView'
+  ],
+
+  css: `
+    ^ {
+      padding: 8px;
+      display: inline-block;
+      border-radius: 3px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
+      margin: 8px;
+    }
+  `,
+
+  methods: [
+    function initE() {
+      this.SUPER();
+      var self = this;
+
+      this.
+        addClass(this.myClass()).
+        start(Columns).
+          start(Column).start('table').
+            tag(this.DetailPropertyView, {prop: this.data.ID}).
+            tag(this.DetailPropertyView, {prop: this.data.DESCRIPTION}).
+          end().end().
+          start(Column).start('table').
+            tag(this.DetailPropertyView, {prop: this.data.PARENT}).
+            tag(this.DetailPropertyView, {prop: this.data.DEFAULT_MENU}).
+            tag(this.DetailPropertyView, {prop: this.data.ENABLED}).
+          end().end().
+        end().
+        br().
+        start(Tabs).
+
+          start(Tab, {label: 'Look & Feel'}).
+
+            start(Columns).
+              start(Column).
+
+                start(LabelledSection, {title: 'CSS'}).
+                  add(this.data.GROUP_CSS).
+                end().br().
+
+                start(LabelledSection, {title: 'Logo'}).
+                  br().
+                  add(this.data.LOGO).
+                  br().
+                  start(foam.u2.view.ImageView, {data: this.data.logo$}).style({padding: '10px'}).end().
+                end().
+
+              end().
+
+              start(Column).
+
+                start(LabelledSection, {title: 'Colours'}).
+                  start('table').
+                    tag(this.DetailPropertyView, {prop: this.data.PRIMARY_COLOR,     label: 'Primary'}).
+                    tag(this.DetailPropertyView, {prop: this.data.SECONDARY_COLOR,   label: 'Secondary'}).
+                    tag(this.DetailPropertyView, {prop: this.data.ACCENT_COLOR,      label: 'Accent'}).
+                    tag(this.DetailPropertyView, {prop: this.data.TABLE_COLOR,       label: 'Table'}).
+                    tag(this.DetailPropertyView, {prop: this.data.TABLE_HOVER_COLOR, label: 'Table Hover'}).
+                  end().
+                end().br().
+
+                start(LabelledSection, {title: 'Views'}).
+                  start('table').
+                    tag(this.DetailPropertyView, {prop: this.data.TOP_NAVIGATION}).
+                    tag(this.DetailPropertyView, {prop: this.data.FOOTER_VIEW, label: 'Footer'}).
+                  end().
+                end().
+
+              end().
+            end().
+          end().
+
+          start(Tab, {label: 'Permissions'}).
+            start().style({'overflow-y': 'auto'}).
+              add(this.data.PERMISSIONS).
+            end().
+          end().
+
+          start(Tab, {label: 'Users'}).
+          end().
+
+        end();
+//        tag(this.DetailPropertyView, {prop: this.data.USERS});
+    }
+  ]
+});
+
+GroupDetailView2.create({of: foam.nanos.auth.Group, data: foam.nanos.auth.Group.create(), showActions: true}).write();
 
 E('br').write();
 E('hr').write();
