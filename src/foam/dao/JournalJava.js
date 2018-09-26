@@ -115,6 +115,8 @@ foam.CLASS({
     'foam.lib.json.Outputter',
     'foam.lib.json.OutputterMode',
     'foam.lib.parse.*',
+    'foam.nanos.auth.LastModifiedByAware',
+    'foam.nanos.auth.User',
     'foam.nanos.fs.Storage',
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
@@ -126,6 +128,7 @@ foam.CLASS({
     'java.io.FileReader',
     'java.io.FileWriter',
     'java.text.SimpleDateFormat',
+    'java.util.Calendar',
     'java.util.Iterator',
     'java.util.List',
     'java.util.TimeZone',
@@ -361,7 +364,19 @@ foam.CLASS({
         }
       ],
       javaCode: `
+        if ( x.get("user") == null || ((User) x.get("user")).getId()  <= 1 ) return;
+        if ( obj instanceof LastModifiedByAware && ((LastModifiedByAware) obj).getLastModifiedBy() != 0L ) return;
 
+        User user = (User) x.get("user");
+        Calendar now = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        write_(sb.get()
+          .append("// Modified by ")
+          .append(user.label())
+          .append(" (")
+          .append(user.getId())
+          .append(") at ")
+          .append(sdf.get().format(now.getTime()))
+          .toString());
       `
     },
     {
