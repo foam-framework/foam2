@@ -28,7 +28,7 @@ foam.CLASS({
 
         var order = this.order;
         order.forEach(function(a) {
-          if ( v.hasDefaultValue(a) ) return;
+          if ( ! v.hasOwnProperty(a) ) return;
           if ( v.cls_.getAxiomByName(a).transient ) return;
           outputter.key(a);
           out.output(x, v[a]);
@@ -36,7 +36,7 @@ foam.CLASS({
 
         v.cls_.getAxiomsByClass(foam.core.Property).forEach(function(a) {
           if ( order.indexOf(a.name) != -1 ) return;
-          if ( v.hasDefaultValue(a.name) ) return;
+          if ( ! v.hasOwnProperty(a.name) ) return;
           if ( a.transient ) return;
           outputter.key(a.name);
           out.output(x, v[a.name]);
