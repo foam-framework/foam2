@@ -85,6 +85,7 @@ var classes = [
   'foam.dao.CompositeJournal',
   'foam.dao.FileJournal',
   'foam.dao.RoutingJournal',
+  'foam.dao.RoutingJournalTest',
   'foam.dao.RoutingJDAO',
   'foam.dao.WriteOnlyJDAO',
   'foam.dao.WriteOnlyFileJournal',
