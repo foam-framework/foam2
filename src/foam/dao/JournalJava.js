@@ -397,36 +397,30 @@ foam.CLASS({
               int length = line.trim().length();
               line = line.trim().substring(2, length - 1);
 
-              FObject object = parser.parseString(line);
-              if ( object == null ) {
-                getLogger().error("parse error", getParsingErrorMessage(line), "line:", line);
+              FObject obj = parser.parseString(line);
+              if ( obj == null ) {
+                getLogger().error("Parse error", getParsingErrorMessage(line), "line:", line);
                 continue;
               }
 
               switch ( operation ) {
                 case 'p':
-                  PropertyInfo id = (PropertyInfo) dao.getOf().getAxiomByName("id");
-                  FObject old = dao.find(id.get(object));
-                  if ( old != null ) {
-                    // merge difference
-                    object = mergeFObject(old, object);
-                  }
-
-                  dao.put(object);
+                  foam.core.FObject old = dao.find(obj.getProperty("id"));
+                  dao.put(old != null ? mergeFObject(old, obj) : obj);
                   break;
 
                 case 'r':
-                  dao.remove(object);
+                  dao.remove(obj);
                   break;
               }
 
               successReading++;
             } catch ( Throwable t ) {
-              getLogger().error("error replaying journal line:", line, t);
+              getLogger().error("Error replaying journal line:", line, t);
             }
           }
         } catch ( Throwable t) {
-          getLogger().error("failed to read from journal", t);
+          getLogger().error("Failed to read from journal", t);
         } finally {
           getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename());
         }
