@@ -62,11 +62,7 @@ public class AuthenticatedGroupDAO extends ProxyDAO {
 
   @Override
   public FObject put_(X x, FObject obj) {
-    Group toPut = (Group) obj;
-    String id = toPut.getId();
-    Group existing = (Group) getDelegate().find_(x, id);
-    if ( existing != null ) checkUserHasAllPermissionsInGroup(x, existing);
-    checkUserHasAllPermissionsInGroup(x, toPut);
+    checkUserHasAllPermissionsInGroup(x, (Group) obj);
     return super.put_(x, obj);
   }
 }
