@@ -125,15 +125,15 @@ foam.CLASS({
     },
     {
       name: 'innerSub',
-      swiftType: 'Detachable?',
+      type: 'foam.core.Detachable',
       postSet: function(_, s) {
         if (s) this.onDetach(s);
       },
       swiftPostSet: 'if let s = newValue { onDetach(s) }',
     },
     {
+      class: 'foam.dao.DAOProperty',
       name: 'dao',
-      swiftType: 'foam_dao_DAO?',
       swiftPostSet: `
 self.innerSub?.detach()
 try? self.innerSub = newValue?.listen_(__context__, self, predicate)

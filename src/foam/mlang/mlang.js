@@ -84,7 +84,13 @@ foam.INTERFACE({
 foam.INTERFACE({
   package: 'foam.mlang',
   name: 'Expr',
-  implements: [ 'foam.mlang.F', 'foam.dao.SQLStatement' ],
+  implements: [
+    'foam.mlang.F',
+    {
+      path: 'foam.dao.SQLStatement',
+      flags: ['js', 'java'],
+    },
+  ],
 
   documentation: 'Expr interface extends F interface: partialEval -> Expr.',
 
@@ -176,7 +182,6 @@ foam.INTERFACE({
     },
     {
       name: 'partialEval',
-      flags: ['js', 'java'],
       returns: 'foam.mlang.predicate.Predicate',
     },
     {
@@ -270,8 +275,7 @@ foam.CLASS({
         }
       ],
       javaCode: 'return false;',
-      swiftOverride: false,
-      swiftCode: 'return',
+      swiftCode: 'return false',
     },
     {
       name: 'toIndex',
@@ -1979,12 +1983,14 @@ foam.CLASS({
       returns: 'Any',
       args: [ { name: 'obj', type: 'Any' } ],
       code: function f(obj) { return this.arg1.f(obj); },
+      swiftCode: `return (arg1 as? foam_mlang_Expr)?.f(obj)`,
       javaCode: `return getArg1().f(obj);`
     },
 
     {
       name: 'put',
       code: function put(o, sub) { this.delegate.put(this.f(o), sub); },
+      swiftCode: `delegate.put(f(obj)!, sub)`,
       javaCode: 'getDelegate().put(f(obj), sub);'
     },
 

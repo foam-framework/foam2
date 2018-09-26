@@ -55,6 +55,7 @@ foam.INTERFACE({
       name: 'remove',
       async: true,
       returns: 'FObject',
+      returnsNullable: true,
       swiftThrows: true,
       args: [
         {
@@ -67,6 +68,7 @@ foam.INTERFACE({
       name: 'remove_',
       async: true,
       returns: 'FObject',
+      returnsNullable: true,
       swiftThrows: true,
       args: [
         {
@@ -84,6 +86,7 @@ foam.INTERFACE({
       name: 'find',
       async: true,
       returns: 'FObject',
+      returnsNullable: true,
       swiftThrows: true,
       args: [
         {
@@ -96,6 +99,7 @@ foam.INTERFACE({
       name: 'find_',
       async: true,
       returns: 'FObject',
+      returnsNullable: true,
       swiftThrows: true,
       args: [
         {
@@ -206,6 +210,7 @@ foam.INTERFACE({
       returns: 'Detachable',
       javaReturns: 'void', // TODO Java detachable support.
       async: true,
+      swiftThrows: true,
       args: [
         {
           name: 'sink',

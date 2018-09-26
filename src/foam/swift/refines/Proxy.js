@@ -27,10 +27,8 @@ foam.CLASS({
   flags: ['swift'],
   properties: [
     {
-      name: 'swiftType',
-      expression: function(of) {
-        return foam.lookup(of).model_.swiftName;
-      }
+      name: 'swiftOptional',
+      value: false,
     }
   ]
 });

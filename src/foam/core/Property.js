@@ -262,7 +262,10 @@ foam.CLASS({
       */
       class: 'Boolean',
       name: 'containsDeletablePII'
-    }
+    },
+    {
+      name: 'type',
+    },
   ],
 
   methods: [

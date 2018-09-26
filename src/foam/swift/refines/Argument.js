@@ -43,11 +43,9 @@ foam.CLASS({
       name: 'swiftMutable',
     },
     {
-      class: 'String',
-      name: 'swiftType',
-      expression: function(of, optional) {
-        of = foam.String.isInstance(of) ? foam.lookup(of, true) : of;
-        return of ? of.model_.swiftName + (optional ? '?' : '') : 'Any?';
+      class: 'foam.swift.SwiftTypeProperty',
+      expression: function(type, optional) {
+        return foam.swift.toSwiftType(type, optional)
       },
     },
   ],

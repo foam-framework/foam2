@@ -38,10 +38,12 @@ foam.INTERFACE({
       args: [
         {
           name: 'name',
+          optional: true,
           type: 'String'
         },
         {
           name: 'service',
+          optional: true,
           type: 'foam.box.BoxService'
         },
         {

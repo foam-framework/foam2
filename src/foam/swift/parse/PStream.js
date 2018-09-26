@@ -10,11 +10,11 @@ foam.INTERFACE({
   methods: [
     {
       name: 'head',
-      swiftReturns: 'Character',
+      returns: 'Char',
     },
     {
       name: 'valid',
-      swiftReturns: 'Bool',
+      returns: 'Boolean',
     },
     {
       name: 'tail',
@@ -22,7 +22,7 @@ foam.INTERFACE({
     },
     {
       name: 'substring',
-      swiftReturns: 'String',
+      returns: 'String',
       args: [
         {
           name: 'end',
@@ -32,7 +32,7 @@ foam.INTERFACE({
     },
     {
       name: 'value',
-      swiftReturns: 'Any?',
+      returns: 'Any',
     },
     {
       name: 'setValue',
