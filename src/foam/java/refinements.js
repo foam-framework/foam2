@@ -1233,7 +1233,7 @@ if ( values1.length < values2.length ) return -1;
 
 int result;
 for ( int i = 0 ; i < values1.length ; i++ ) {
-  result = ((Comparable)values1[i]).compareTo(values2[i]);
+  result = foam.util.SafetyUtil.compare(values1[i], values2[i]);
   if ( result != 0 ) return result;
 }
 return 0;*/
