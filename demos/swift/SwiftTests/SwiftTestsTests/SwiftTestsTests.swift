@@ -450,7 +450,7 @@ class SwiftTestsTests: XCTestCase {
     Async.aSeq([
       { ret, _, name in
         DispatchQueue.global(qos: .utility).async {
-          try? ret(dao.put(x.create(somepackage_Test.self, args: ["firstName": name])!)!)
+          try? ret(dao.put(x.create(somepackage_Test.self, args: ["firstName": name])!))
         }
       },
       { ret, _, t in

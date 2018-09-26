@@ -10,7 +10,8 @@ foam.INTERFACE({
   methods: [
     {
       name: 'parse',
-      swiftReturns: 'foam_swift_parse_PStream?',
+      returns: 'foam.swift.parse.PStream',
+      returnsNullable: true,
       args: [
         {
           type: 'foam.swift.parse.PStream',

@@ -66,7 +66,7 @@ DispatchQueue.global(qos: .background).async {
       listenSub?.detach()
       sub.detach()
       self?.clearProperty("delegate")
-    } as (String, Any?, Detachable) -> Void,
+    } as (String, Any?, ${foam.core.Detachable.model_.swiftName}) -> Void,
   ]), nil)
 
   pDao.promise.set(cache)

@@ -46,6 +46,7 @@ foam.CLASS({
       expression: function(swiftImplements) {
         return this.swiftImplements.concat(
           ( this.implements || [] )
+            .filter(foam.util.flagFilter(['swift']))
             .map(function(i) { return foam.lookup(i.path).model_ })
             .filter(function(i) {
               return foam.core.InterfaceModel.isInstance(i);

@@ -62,8 +62,8 @@ extension PropertyInfo {
     }
     return nil
   }
-  public func partialEval() {
-    // TODO
+  func `partialEval`() -> foam_mlang_Expr {
+    return self
   }
 }
 
@@ -202,11 +202,7 @@ extension ClassInfo {
   }
 }
 
-public protocol Detachable {
-  func detach()
-}
-
-public class Subscription: Detachable {
+public class Subscription: foam_core_Detachable {
   private var detach_: (() -> Void)?
   init(detach: @escaping () ->Void) {
     self.detach_ = detach
@@ -217,7 +213,7 @@ public class Subscription: Detachable {
   }
 }
 
-public protocol foam_core_FObject: class, Detachable, Topic, JSONOutputter {
+public protocol foam_core_FObject: class, foam_core_Detachable, Topic, JSONOutputter {
   func ownClassInfo() -> ClassInfo
   func set(key: String, value: Any?)
   func get(key: String) -> Any?
@@ -225,7 +221,7 @@ public protocol foam_core_FObject: class, Detachable, Topic, JSONOutputter {
   func hasOwnProperty(_ key: String) -> Bool
   func clearProperty(_ key: String)
   func compareTo(_ data: foam_core_FObject?) -> Int
-  func onDetach(_ sub: Detachable?)
+  func onDetach(_ sub: foam_core_Detachable?)
   func toString() -> String
   func copyFrom(_ o: foam_core_FObject)
   init(_ args: [String:Any?])
@@ -274,7 +270,7 @@ public class AbstractFObject: NSObject, foam_core_FObject, ContextAware {
     (self.ownClassInfo().axiom(byName: key) as? PropertyInfo)?.clearProperty(self)
   }
 
-  public func onDetach(_ sub: Detachable?) {
+  public func onDetach(_ sub: foam_core_Detachable?) {
     guard let sub = sub else { return }
     _ = self.sub(topics: ["detach"]) { (s, _) in
       s.detach()
@@ -516,8 +512,7 @@ public class FoamError: Error {
   init(_ obj: Any?) { self.obj = obj }
   public func toString() -> String {
     if let obj = self.obj as? foam_core_FObject {
-      let o = foam_swift_parse_json_output_Outputter.DEFAULT
-      return o.swiftStringify(obj)
+      return foam_swift_parse_json_output_Outputter.DEFAULT.swiftStringify(obj)
     } else if let obj = self.obj as? FoamError {
       return "FoamError(" + obj.toString() + ")"
     }
@@ -624,6 +619,7 @@ public class Future<T> {
   }
 }
 
+// TODO: Model!
 public class ParserContext {
   private lazy var map_: [String:Any] = [:]
   private var parent_: ParserContext?

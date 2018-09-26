@@ -91,18 +91,13 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'swiftReturnsOptional',
+      name: 'returnsNullable',
     },
     {
       class: 'String',
       name: 'swiftReturns',
-      expression: function(returns, swiftReturnsOptional) {
-        if (!returns) return '';
-        var cls = foam.lookup(returns, true)
-        if (cls) {
-          return cls.model_.swiftName + (swiftReturnsOptional ? '?' : '')
-        }
-        return 'Any?';
+      expression: function(returns, returnsNullable) {
+        return foam.swift.toSwiftType(returns, returnsNullable)
       },
     },
     {
@@ -256,12 +251,12 @@ return <%=foam.swift.core.ConstantSlot.model_.swiftName%>([
       args: [],
       template: function() {/*
 <%=this.swiftSynchronizedSemaphoreName%>.wait()
-<%if (this.swiftReturns) {%>let ret = <%}%><%=
+<%if (this.swiftReturns != 'Void') {%>let ret = <%}%><%=
     this.swiftThrows ? 'try ' : ''%><%=
     this.swiftSynchronizedMethodName%>(<%=
         this.swiftArgs.map(function(a) { return a.localName }).join(',')%>)
 <%=this.swiftSynchronizedSemaphoreName%>.signal()
-<%if (this.swiftReturns) {%>return ret<%}%>
+<%if (this.swiftReturns != 'Void') {%>return ret<%}%>
       */},
     },
     {

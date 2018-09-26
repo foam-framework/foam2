@@ -9,13 +9,13 @@ foam.CLASS({
   flags: ['swift'],
   properties: [
     {
-      name: 'swiftType',
-      value: 'Int',
+      name: 'swiftOptional',
+      value: false,
     },
     {
       name: 'swiftAdapt',
       factory: function() {
-        return function() {/*
+        return `
 var newValue = newValue
 if let str = newValue as? String { newValue = Int(str) }
 if let i = newValue as? Int {
@@ -24,13 +24,7 @@ if let i = newValue as? Int {
   return i > max ? max : i < min ? min : i
 }
 return 0
-        */}
-      },
-    },
-    {
-      name: 'swiftValue',
-      expression: function(value) {
-        return value + '';
+        `
       },
     },
     {
@@ -47,12 +41,12 @@ foam.CLASS({
     {
       name: 'swiftAdapt',
       factory: function() {
-        return function() {/*
+        return `
 var newValue = newValue
 if let str = newValue as? String { newValue = Int(str) }
 if let i = newValue as? Int { return i }
 return 0
-        */}
+        `
       },
     },
   ],
@@ -63,18 +57,14 @@ foam.CLASS({
   flags: ['swift'],
   properties: [
     {
-      name: 'swiftType',
-      value: 'Float',
-    },
-    {
       name: 'swiftAdapt',
       factory: function() {
-        return function() {/*
+        return `
 var newValue = newValue
-if let str = newValue as? String { newValue = Float(str) }
-if let i = newValue as? Float { return i }
+if let str = newValue as? String { newValue = ${this.swiftType}(str) }
+if let i = newValue as? ${this.swiftType} { return i }
 return 0
-        */}
+        `
       },
     },
   ],

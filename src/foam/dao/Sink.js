@@ -27,13 +27,11 @@ foam.INTERFACE({
       args: [
         {
           name: 'obj',
-          swiftType: 'Any',
-          javaType: 'Object'
+          type: 'Any',
         },
         {
           name: 'sub',
-          swiftType: 'Detachable',
-          javaType: 'foam.core.Detachable'
+          type: 'foam.core.Detachable',
         },
       ],
     },
@@ -42,13 +40,11 @@ foam.INTERFACE({
       args: [
         {
           name: 'obj',
-          swiftType: 'Any',
-          javaType: 'Object'
+          type: 'Any',
         },
         {
           name: 'sub',
-          swiftType: 'Detachable',
-          javaType: 'foam.core.Detachable'
+          type: 'foam.core.Detachable',
         },
       ],
     },
@@ -60,8 +56,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'sub',
-          swiftType: 'Detachable',
-          javaType: 'foam.core.Detachable'
+          type: 'foam.core.Detachable',
         },
       ],
     }
@@ -652,7 +647,7 @@ foam.CLASS({
   properties: [
     {
       name: 'fn',
-      swiftType: '((String, Any?, Detachable) -> Void)',
+      swiftType: '((String, Any?, foam_core_Detachable) -> Void)',
       swiftRequiresEscaping: true,
     },
   ],
