@@ -288,7 +288,7 @@ function checkFlags(model) {
   var parent = true;
   
   if ( model.extends &&
-       ( model.extends != 'foam.core.FObject' || model.extends != 'FObject' ) ) {
+       ( model.extends != 'foam.core.FObject' && model.extends != 'FObject' ) ) {
     parent = checkFlags(foam.lookup(model.extends).model_);
   }
 

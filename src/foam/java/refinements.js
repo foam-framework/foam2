@@ -28,7 +28,7 @@ foam.LIB({
           // a number of places.
           return null;
         },
-        Array: function(a, type) {
+        Array: function(a) {
           return "new Object[] {" +
             a.map(foam.java.asJavaValue).join(',') +
             '}';
@@ -254,7 +254,7 @@ foam.CLASS({
       class: 'String',
       name: 'javaValue',
       expression: function(value) {
-        return foam.java.asJavaValue(value, this.type);
+        return foam.java.asJavaValue(value);
       }
     },
     {

@@ -888,7 +888,7 @@ foam.LIB({
               'and no default method provided');
           foam.assert(
               type[uid],
-              'Missing ' + name + ' multi-method for type ', type.model_.name, ' map: ', map,
+              'Missing ' + name + ' multi-method for type ', arg1, ' map: ', map,
               'and no deafult method provided');
         }
         return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
