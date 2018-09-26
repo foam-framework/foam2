@@ -84,9 +84,15 @@ foam.CLASS({
         handler.setAttribute("X", getX());
 
         for ( foam.nanos.servlet.ServletMapping mapping : getServletMappings() ) {
-          org.eclipse.jetty.servlet.ServletHolder holder =
-            handler.addServlet(
-              (Class<? extends javax.servlet.Servlet>)Class.forName(mapping.getClassName()), mapping.getPathSpec());
+          org.eclipse.jetty.servlet.ServletHolder holder;
+
+          if ( mapping.getServletObject() != null ) {
+            holder = new org.eclipse.jetty.servlet.ServletHolder(mapping.getServletObject());
+            handler.addServlet(holder, mapping.getPathSpec());
+          } else {
+            holder = handler.addServlet(
+                (Class<? extends javax.servlet.Servlet>)Class.forName(mapping.getClassName()), mapping.getPathSpec());
+          }
 
           java.util.Iterator iter = mapping.getInitParameters().keySet().iterator();
 
