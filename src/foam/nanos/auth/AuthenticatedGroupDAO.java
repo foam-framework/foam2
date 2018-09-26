@@ -16,8 +16,12 @@ import foam.util.SafetyUtil;
  * Custom authentication for groupDAO
  *
  * Features:
- *   - If creating a group, you can only give it permissions implied by those that you already have.
- *   - If updating a group, you can't modify the permissions array to have a permission that isn't implied by one you have.
+ *   - If creating a group, you can only give it permissions implied by those
+ *     that you already have.
+ *   - If updating a group, you can't modify the permissions array to have a
+ *     permission that isn't implied by one you have.
+ *   - If updating a group, you can't modify the parent of the group such that
+ *     the group gains a permission that isn't implied by one you have.
  */
 public class AuthenticatedGroupDAO extends ProxyDAO {
   public AuthenticatedGroupDAO(X x, DAO delegate) {
