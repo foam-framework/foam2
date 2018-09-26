@@ -285,7 +285,7 @@ foam.CLASS({
           FObject old = null;
           Object id = obj.getProperty("id");
           String record = ( getOutputDiff() && ( old = getDao().find(id) ) != null ) ?
-            getOutputter().stringifyDelta(old.fclone(), obj) :
+            getOutputter().stringifyDelta(old, obj) :
             getOutputter().stringify(obj);
 
           if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
@@ -297,7 +297,7 @@ foam.CLASS({
               .toString());
           }
         } catch ( Throwable t ) {
-          getLogger().error("Failed to write to put entry to journal", t);
+          getLogger().error("Failed to write put entry to journal", t);
           throw new RuntimeException(t);
         }
       `
@@ -323,7 +323,7 @@ foam.CLASS({
               .toString());
           }
         } catch ( Throwable t ) {
-          getLogger().error("Failed to write to remove entry to journal", t);
+          getLogger().error("Failed to write remove entry to journal", t);
           throw new RuntimeException(t);
         }
       `
@@ -409,7 +409,7 @@ foam.CLASS({
                   FObject old = dao.find(id.get(object));
                   if ( old != null ) {
                     // merge difference
-                    object = mergeFObject(old.fclone(), object);
+                    object = mergeFObject(old, object);
                   }
 
                   dao.put(object);
