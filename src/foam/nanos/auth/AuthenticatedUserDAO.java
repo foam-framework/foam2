@@ -80,7 +80,7 @@ public class AuthenticatedUserDAO
       result != null &&
       ! SafetyUtil.equals(result.getGroup(), toPut.getGroup())
     ) {
-      boolean hasGroupUpdatePermission = auth.check(x, "group.update." + result.getGroup());
+      boolean hasGroupUpdatePermission = auth.check(x, "group.update." + toPut.getGroup());
       if ( updatingSelf ) {
         throw new AuthorizationException("You cannot change your own group.");
       } else if ( ! hasUserEditPermission ) {
