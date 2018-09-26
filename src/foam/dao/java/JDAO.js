@@ -62,7 +62,7 @@ foam.CLASS({
   properties: [
     {
       class: 'FObjectProperty',
-      of: 'foam.dao.FileJournal',
+      of: 'foam.dao.Journal',
       name: 'journal'
     }
   ],
