@@ -264,6 +264,7 @@ var classes = [
   'foam.nanos.servlet.ServletMapping',
   'foam.nanos.servlet.ErrorPageMapping',
   'foam.nanos.servlet.FilterMapping',
+  'foam.nanos.servlet.VirtualHostRoutingServlet',
 
   'foam.lib.query.TestModel',
   'foam.lib.query.FooEnum',
