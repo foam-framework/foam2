@@ -38,34 +38,43 @@ foam.CLASS({
 
   css: `
     ^ {
+      background: gray;
       display: block;
+      height: 200px;
+      padding: 10px 4px;
+      width: 600px;
+      // width: 100%;
     }
-    ^tabRow { height: 37px; }
+    ^tabRow { height: 38px; }
     ^tab {
       background: lightgray;
-      border-bottom: none;
-      border-top: 1px solid black;
-      border-left: 1px solid black;
-      border-right: 1px solid black;
-      border-top-right-radius: 4px;
-      border-top-left-radius: 4px;
-      float: left;
-      padding: 6px;
+      border: 1px solid black;
+      border-radius: 3px 3px 0 0;
+      display: inline-block;
+      height: 12px;
+      padding: 8px;
     }
     ^tab.selected {
       background: white;
       position: relative;
       z-index: 1;
     }
+    ^bottomEdge {
+      background: white;
+      height: 2.5px;
+      left: 0;
+      position: absolute;
+      top: 27px;
+      width: 100%;
+    }
     ^content {
+      margin: 4px;
+      padding: 6px;
       background: white;
       border: 1px solid black;
-      box-shadow: 3px 3px 6px 0 gray;
-      left: -4px;
-      margin: 4px;
-      padding: 0;
       position: relative;
       top: -13px;
+      left: -4px;
     }
   `,
 
