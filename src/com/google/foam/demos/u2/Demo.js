@@ -244,17 +244,6 @@ var dv2 = foam.u2.DetailView.create({
   showActions: true
 }).write();
 
-foam.u2.DetailView.create({
-  data: foam.util.Timer.create(),
-  showActions: true
-}).write();
-
-foam.u2.DetailView.create({
-  data: foam.util.Timer.create(),
-  showActions: true,
-  properties: [ foam.util.Timer.INTERVAL, foam.util.Timer.I ],
-  actions: [ foam.util.Timer.STOP, foam.util.Timer.START ]
-}).write();
 
 foam.CLASS({
   name: 'CustomDetailView',
@@ -262,13 +251,7 @@ foam.CLASS({
 
   exports: [ 'as data' ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-        important { color: red; }
-      */}
-    })
-  ],
+  css: 'important { color: red; }',
 
   properties: [
     { class: 'Int', name: 'i' },
@@ -495,11 +478,7 @@ ActionDemoView.create({data: ActionDemo.create()}).write();
 foam.CLASS({
   name: 'ParentView',
   extends: 'foam.u2.Element',
-  axioms: [
-    foam.u2.CSS.create({code: `
-      ^ { background: pink }
-    `})
-  ],
+  css: '^ { background: pink }',
   methods: [ function initE() {
     this.addClass(this.myClass()).add('text');
   }]

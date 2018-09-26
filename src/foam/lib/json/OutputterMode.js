@@ -21,7 +21,8 @@ foam.ENUM({
     },
     {
       name: 'FULL',
-      label: 'Full'
+      label: 'Full',
+      documentation: 'Outputs all of the properties.'
     }
   ]
 });
