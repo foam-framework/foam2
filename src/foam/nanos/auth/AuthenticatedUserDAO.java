@@ -86,7 +86,7 @@ public class AuthenticatedUserDAO
         throw new AuthorizationException("You cannot change your own group.");
       } else if ( ! hasUserEditPermission ) {
         throw new AuthorizationException("You do not have permission to change that user's group.");
-      } else if ( ! (hasOldGroupUpdatePermission || hasNewGroupUpdatePermission) ) {
+      } else if ( ! (hasOldGroupUpdatePermission && hasNewGroupUpdatePermission) ) {
         throw new AuthorizationException("You do not have permission to change that user's group to '" + newUser.getGroup() + "'.");
       }
       // TODO: Handle SPIDs.
