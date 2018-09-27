@@ -7,38 +7,58 @@
 foam.CLASS({
   package: 'foam.nanos.dig',
   name: 'SUGAR',
-  extends: 'foam.nanos.http.DefaultHttpParameters',
 
   documentation: 'Service Unified GAteway Relay - Perform non-DAO operations against a web service',
 
   tableColumns: [
-    'id',
+    //'id',
     'serviceKey',
-    'method',
-    'cmd',
-    'format',
-    'owner'
+    'method'
   ],
 
-  searchColumns: [],
+  requires: [
+    //'foam.core.Argument',
+//    //'foam.core.Method'
+//    'foam.core.AbstractMethod',
+    //'foam.java.Argument',
+    //'foam.java.Method'
+    'foam.nanos.dig.Argument'
+  ],
+
+  css: `
+    .property-argumentInfo button {
+      display: none;
+    }
+  `,
 
   properties: [
-    'id',
+    //'id',
     {
       class: 'String',
       name: 'serviceKey',
-      label: 'SERVICE',
+      label: 'Service',
       view: function(_, X) {
         var E = foam.mlang.Expressions.create();
         return foam.u2.view.ChoiceView.create({
           dao: X.nSpecDAO
-            //.where(E.AND(E.EQ(E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO'), false), E.EQ(foam.nanos.boot.NSpec.SERVE, false)) )
-            .where(E.EQ(E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO'), false))
+            .where(E.AND(E.EQ(E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO'), false), E.EQ(foam.nanos.boot.NSpec.SERVE, true)))
             .orderBy(foam.nanos.boot.NSpec.ID),
           objToChoice: function(nspec) {
             return [nspec.id, nspec.id];
-          }
+          },
+          index: 1
         });
+      },
+      postSet: function() {
+        var service = this.__context__[this.serviceKey];
+
+        if ( ! service ) return;
+
+        var of = this.lookup(service.cls_.getAxiomByName('delegate').of);
+
+        if ( ! of ) return;
+        this.interfaceName = of.id.toString();
+
       }
     },
     {
@@ -47,72 +67,97 @@ foam.CLASS({
       label: 'Method',
       view: function(_, X) {
         return X.data.slot(function(serviceKey) {
-        if ( serviceKey == 'undefined' ) {
-          return;
+          var service = this.__context__[serviceKey];
+
+          if ( ! service ) return;
+
+          var of = this.lookup(service.cls_.getAxiomByName('delegate').of);
+
+          if ( ! of ) return;
+
+          var methods = of.getOwnAxiomsByClass(foam.core.Method);
+          var methodNames = methods.map(function(m) { return m.name; }).sort();
+
+//          var filteredMethod =
+//          methods.filter(function(fm) {
+//            for ( var j = 0; j < fm.args.length; j++ ) {
+//               if ( fm.args[j].javaType.toString() == "foam.core.X" ) {
+//               //alert(fm.name + "___" + fm.args[j].javaType.toString());
+//                  return false;
+//               }
+//               return true;
+//             }
+//          }).map(function(m) { return m.name; }).sort();
+
+          return foam.u2.view.ChoiceView.create({choices: methodNames, data$: this.method$});
+        });
+      },
+      postSet: function(old, nu) {
+        if ( old != nu ) {
+          var data = "";
+          var service = this.__context__[this.serviceKey];
+
+          if ( ! service ) return;
+
+          var of = this.lookup(service.cls_.getAxiomByName('delegate').of);
+
+          if ( ! of ) return;
+
+          var methods = of.getOwnAxiomsByClass(foam.core.Method);
+
+          for ( var i = 0; i < methods.length; i++ ) {
+            if ( methods[i].name == this.method ) {
+              this.argumentInfo = methods[i].args;
+              //this.argumentInfo[0].sub(function() { console.log('****** arg update'); });
+
+//              for ( var j = 0; j < methods[i].args.length; j++ ) {
+//                data += methods[i].args[j].name + " : " + methods[i].args[j].javaType + "\n";
+//              }
+            }
+          }
         }
-        //debugger;
-          alert( this.__context__[serviceKey] );
-          //alert( X[serviceKey]); //.getOwnAxiomsByClass(foam.core.Method) );
-          //alert( this.__context__.lookup(serviceKey, true) );
-          var map = {
-            'exchangeRate': [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ],
-            'serviceKey': [ 'getRateFromSource', 'getRateFromTarget', 'fetchRates', 'acceptRate' ]
-            // X.serviceKey.getRateFromSourceserviceKey : [ X.serviceKey.getRateFromSource ]
-          };
-          return foam.u2.view.ChoiceView.create({choices: map[serviceKey], data$: this.method$});
+      }
+    },
+    {
+      class: 'FObjectArray',
+      //of: 'foam.java.Argument',
+      of: 'foam.nanos.dig.Argument',
+      name: 'argumentInfo',
+      postSet: function() {
+      var self = this;
+
+      for ( let j = 0 ; j < this.argumentInfo.length ; j++ ) {
+        this.argumentInfo[j].sub(function(argInfo) {
+          self.flag = !self.flag;
         });
       }
-
-      //javaFactory: 'return getX().get("exchangeRate").getClass().getMethods()[0].toString();'
+      }
     },
-////   {
-////      class: 'String',
-////      name: 'method'
-////    },
+    {
+      class: 'Boolean',
+      name: 'isMethodChanged',
+      hidden: true
+    },
     {
       class: 'String',
-      name: 'parameters'
-    },
-    'cmd',
-    'format',
-//    {
-//      class: 'String',
-//      name: 'service',
-//      hidden: true,
-//      transient: true,
-//      postSet: function(old, nu) {
-//        this.serviceKey = nu;
-//      }
-//    },
-    {
-      class: 'String',
-      name: 'q',
-      label: 'Query'
+      name: 'interfaceName',
+      displayWidth: 60,
+      visibility: foam.u2.Visibility.RO,
     },
     {
-        class: 'String',
-        name: 'key'
+      class: 'Boolean',
+      name: 'flag',
+      hidden: true
     },
-    {
-      class: 'EMail',
-      displayWidth: 100,
-      name: 'email'
-    },
-    {
-      class: 'EMail',
-      displayWidth: 100,
-      name: 'subject'
-    },
-    'data',
     {
       class: 'URL',
       // TODO: appears not to work if named 'url', find out why.
-      name: 'digURL',
+      name: 'sugarURL',
       label: 'URL',
       displayWidth: 120,
       view: 'foam.nanos.dig.LinkView',
       setter: function() {}, // Prevent from ever getting set
-      expression: function(key, data, email, subject, serviceKey, cmd, format, q, method, parameters) {
+      expression: function(serviceKey, method, interfaceName, argumentInfo, flag) {
         var query = false;
         var url = "/service/sugar";
 
@@ -121,57 +166,76 @@ foam.CLASS({
           query = true;
           url += "service=" + serviceKey;
         }
-        if ( cmd ) {
+        if ( interfaceName ) {
           url += query ? "&" : "?";
           query = true;
-          url += "cmd=" + cmd.name.toLowerCase();
-        }
-        if ( format ) {
-          url += query ? "&" : "?";
-          query = true;
-          url += "format=" + format.name.toLowerCase();
-        }
-        if ( key ) {
-          url += query ? "&" : "?";
-          query = true;
-          url += "id=" + key;
-        }
-        if ( data ) {
-          url += query ? "&" : "?";
-          query = true;
-          url += "data=" + data;
-        }
-        if ( email ) {
-          url += query ? "&" : "?";
-          query = true;
-          url += "email=" + email;
-        }
-        if ( subject ) {
-          url += query ? "&" : "?";
-          query = true;
-          url += "subject=" + subject;
-        }
-        if ( q ) {
-          url += query ? "&" : "?";
-          query = true;
-          url += "q=" + q;
+          url += "interfaceName=" + interfaceName;
         }
         if ( method ) {
           url += query ? "&" : "?";
           query = true;
           url += "method=" + method;
         }
-        if ( parameters ) {
-          url += query ? "&" : "?";
-          query = true;
-          url += "parameters=" + parameters;
+
+        //if ( flag ) {
+          for ( let j = 0 ; j < argumentInfo.length ; j++ ) {
+          var newUrl = "";
+          var index;
+
+            argumentInfo[j].sub(function(ai) {
+              //alert("ai : " + ai.src.instance_.value);
+              //alert("*** url *** : " + url);
+              //if( ai.src.instance_.value ) {
+              index = j;
+
+              if ( ai ) {
+                newUrl += query ? "&" : "?";
+                query = true;
+                newUrl = ai.src.instance_.name + "=" + ai.src.instance_.value;
+
+                console.log("newUrl : " + newUrl);
+              }
+
+              //}
+            });
+
+            //alert(j + "   hhhhhh");
+            //console.log(argumentInfo[j].private_.contextParent.instance_.argumentInfo[j]);
+            //console.log(argumentInfo[j]);
+            //alert(j);
+          }
+        //}
+
+        if ( flag ) {  // use this flag to give a change event on purpose for argumentInfo (FObjectArray)
+          for ( let k = 0 ; k < argumentInfo.length ; k++ ) {
+            //url += query ? "&" : "?";
+            query = true;
+
+            if ( k == Number(index) ) url += newUrl;
+
+            if ( argumentInfo[k].value != "") {
+              url += query ? "&" : "?";
+              url += argumentInfo[k].name + "=" + argumentInfo[k].value;
+            }
+          }
+        } else { // use this flag to give a change event for argumentInfo (FObjectArray)
+          for ( let k = 0 ; k < argumentInfo.length ; k++ ) {
+            //url += query ? "&" : "?";
+            query = true;
+
+            if ( k == Number(index) ) url += newUrl;
+
+            if ( argumentInfo[k].value != "") {
+              url += query ? "&" : "?";
+              url += argumentInfo[k].name + "=" + argumentInfo[k].value;
+            }
+          }
         }
+
+        console.log("url : " + url);
 
         return encodeURI(url);
       }
     }
-  ],
-
-  methods: [
   ]
 });

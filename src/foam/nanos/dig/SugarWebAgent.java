@@ -1,20 +1,24 @@
 package foam.nanos.dig;
 
 import foam.nanos.http.WebAgent;
-import foam .core.X;
+import foam.core.X;
 import foam.nanos.logger.Logger;
 import java.io.*;
 import foam.dao.AbstractSink;
 import foam.dao.DAO;
 import foam.nanos.boot.NSpec;
 import foam.core.Detachable;
-import foam.core.ClassInfo;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import foam.nanos.http.HttpParameters;
 import javax.servlet.ServletException;
 import java.nio.CharBuffer;
 import foam.util.SafetyUtil;
+import foam.core.FObject;
+import net.nanopay.fx.ExchangeRateService;
+import org.apache.http.impl.auth.GGSSchemeBase;
+
+import java.lang.reflect.*;
 
 public class SugarWebAgent
   implements WebAgent
@@ -22,99 +26,191 @@ public class SugarWebAgent
   public SugarWebAgent() {}
 
   public void execute(X x) {
-    Logger logger = (Logger) x.get("logger");
-    PrintWriter         out      = x.get(PrintWriter.class);
-    HttpServletResponse resp     = x.get(HttpServletResponse.class);
-    HttpParameters      p        = x.get(HttpParameters.class);
-    CharBuffer buffer_ = CharBuffer.allocate(65535);
-    String serviceName = p.getParameter("servic");
-    String methodName = p.getParameter("method");
-    String parameters = p.getParameter("parameters");
-//    String Command =
+    Logger              logger         = (Logger) x.get("logger");
+    PrintWriter         out            = x.get(PrintWriter.class);
+    HttpServletResponse resp           = x.get(HttpServletResponse.class);
+    HttpParameters      p              = x.get(HttpParameters.class);
+    CharBuffer          buffer_        = CharBuffer.allocate(65535);
+    String              serviceName    = p.getParameter("service");
+    String              methodName     = p.getParameter("method");
+    String              interfaceName  = p.getParameter("interfaceName");
 
     try {
-      if ( SafetyUtil.isEmpty(serviceName) ) {
-        System.out.println("serviceName 11 : " + serviceName);
+      if ( !SafetyUtil.isEmpty(serviceName) ) {
         //outputPage(x);
       }
 
-      //System.out.println("this is 22 : " + x.get("exchangeRate").getClass().getMethods()[1]);
-      System.out.println("serviceName 22 : " + serviceName);
+      Class c = Class.forName(interfaceName); //"net.nanopay.fx.ExchangeRateInterface"  "net.nanopay.fx.ExchangeRateService"
+      //Object objClass = c.newInstance();
 
-      for ( int i = 0; i < x.get("exchangeRate").getClass().getMethods().length; i++ ) {
-        out.println("getMethods[] : " + x.get("exchangeRate").getClass().getMethods()[i]);
-        out.println("getName : " + x.get("exchangeRate").getClass().getMethods()[i].getName());
-        out.println("getParameterTypes : " + x.get("exchangeRate").getClass().getMethods()[i].getParameterTypes());
-        out.println("getGenericParameterTypes : " + x.get("exchangeRate").getClass().getMethods()[i].getGenericParameterTypes());
-        out.println("getParameterCount : " + x.get("exchangeRate").getClass().getMethods()[i].getParameterCount());
-        out.println("getReturnType : " + x.get("exchangeRate").getClass().getMethods()[i].getReturnType());
-      }
+      Method m[] = c.getMethods();  // get Methods' List
+      //c.getMethod(methodName, ).invoke();
 
-      if ( !SafetyUtil.isEmpty(parameters) ) {
-        String parameterArr[] = parameters.split(",");
-        String parameterStr = null;
 
-        for ( int j = 0; j < parameterArr.length; j++ ) {
-          out.println("j : " + parameterArr[j]);
-          //parameterStr += "\"" + parameterArr[j]
+      Object arglist[] = null;
+      Class[] paramTypes = null; // for picked Method's parameters' types
 
+      for ( int k = 0; k < m.length; k++ ) {
+        if ( m[k].getName().equals(methodName) ) { //found picked Method
+
+          System.out.println("service : " + serviceName);
+          System.out.println("methodName : " + m[k].getName());
+
+          Parameter[] pArray = m[k].getParameters();
+          paramTypes = new Class[pArray.length];
+          arglist = new Object[pArray.length];
+
+          for ( int j = 0; j < pArray.length; j++ ) {
+            paramTypes[j] = pArray[j].getType();
+
+            if (!pArray[j].isNamePresent()) {
+              throw new IllegalArgumentException("No defined parameter name");
+            }
+
+            paramTypes[j] = pArray[j].getType();
+            arglist[j] = p.getParameter(pArray[j].getName());
+
+            System.out.println(pArray[j].getName() + " :   " + p.getParameter(pArray[j].getName()));
+            System.out.println("pArray[j].getType() :   " + pArray[j].getType().getCanonicalName());
+            System.out.println("arglist :   " + j + "   " + arglist[j]);
+            System.out.println(" paramTypes[j] : " + paramTypes[j].isPrimitive());
+
+            //if ( (Object) paramTypes[j] instanceof java.lang.String) {
+            if (pArray[j].getType().getCanonicalName().equals("double")){
+              arglist[j] = Double.parseDouble(p.getParameter(pArray[j].getName()));
+              System.out.println(j + "  doubledddd");
+            } else if ( pArray[j].getType().getCanonicalName().equals("int") ){
+              System.out.println(j + "  instanceOf int");
+              arglist[j] = Integer.parseInt(p.getParameter(pArray[j].getName()));
+            } else if ( pArray[j].getType().getCanonicalName().equals("boolean") ){
+              System.out.println(j + "  instanceOf boolean");
+              arglist[j] = Boolean.parseBoolean(p.getParameter(pArray[j].getName()));
+            } else if ( pArray[j].getType().getCanonicalName().equals("long") ){
+              System.out.println(j + "  instanceOf long");
+              arglist[j] = Long.parseLong(p.getParameter(pArray[j].getName()));
+            } else if ( paramTypes[j].isInstance("java.lang.String") ) {
+              System.out.println(j + "  instanceOf String");
+              arglist[j] = p.getParameter(pArray[j].getName());
+            } else if ( paramTypes[j].isInstance("java.lang.Double") ){
+              System.out.println(j + "  instanceOf java.lang.Double");
+              arglist[j] = p.getParameter(pArray[j].getName());
+            } else if ( paramTypes[j].isInstance("java.lang.Long")  ){
+              System.out.println(j + "  instanceOf ava.lang.Long");
+              arglist[j] = p.getParameter(pArray[j].getName());
+            } else if ( paramTypes[j].isInstance("java.lang.Integer") ) {
+              System.out.println(j + "  instancesOf java.lang.Integer");
+              arglist[j] = p.getParameter(pArray[j].getName());
+            } else if ( paramTypes[j].isInstance("java.lang.Number") ) {
+              System.out.println(j + "  instancesOf java.lang.Number");
+              arglist[j] = p.getParameter(pArray[j].getName());
+            } else {
+              System.out.println(j + "  else else");
+            }
+          }
+
+
+
+
+
+//          for ( Parameter parameter : pArray ) {
+//            if( ! parameter.isNamePresent() ) {
+//              throw new IllegalArgumentException("No defined parameter name");
+//            }
 //
+//            //String parameterName = parameter.getName();
+//            //System.out.println("parameterName : " +  parameterName);
+//
+//            paramTypes = parameter.getType();
+//
+//            System.out.println(parameter.getName() + " :   " + p.getParameter(parameter.getName()));
+//            System.out.println("parameter.getType() :   " + parameter.getType());
+//          }
+
+//          for ( paramTypes[j] = pArray[j].getType(); ) {
+//
+//          }
+        }
+      }
+//            for ( int j = 0; j < pArray.length; j++ ) {
+//              paramTypes[j] = pArray[j].getType();
+//
+//              if ( ! pArray[j].isNamePresent() ) {
+//                throw new IllegalArgumentException("No defined parameter name");
+//              }
+//
+//              paramTypes[j] = pArray[j].getType();
+//
+//              System.out.println(pArray[j].getName() + " :   " + p.getParameter(pArray[j].getName()));
+//              System.out.println("pArray[j].getType() :   " + pArray[j].getType());
+//
+//              System.out.println("ParamTypes : " +  paramTypes[j]);
+//
+//              System.out.println("Paratmeter Type : " +  pArray[j].getType());
+//              System.out.println("Paratmeter Name : " +  pArray[j].getName());
+//              System.out.println("m[k].getParameterCount() : " +  m[k].getParameterCount());
+//
+//              for(Parameter parameter : pArray) {
+////                if(!parameter.isNamePresent()) {
+////                  throw new IllegalArgumentException("error !!");
+////                }
+//                String parameterName = parameter.getName();
+//                System.out.println("parameterName : " +  parameterName);
+//              }
+//            }
+//        }
+//      }
+
+      //arglist[0] = (long)1348;
+//      arglist[1] = "2";
+//      arglist[2] = 3.0;
+//      arglist[3] = "4";
+
+      //System.out.println(" x.get(serviceName) : " + x.get);
+
+      //net.nanopay.fx.localfx.LocalFXServiceAdapter localFXService = (net.nanopay.fx.localfx.LocalFXServiceAdapter) x.get("localFXService");
+      // **********
+      try {
+        Method mm1 = c.getDeclaredMethod(methodName, paramTypes);
+        mm1.setAccessible(true);
+        mm1.invoke(x.get(serviceName), arglist);
+        //mm1.invoke(localFXService, arglist);
+
+        System.out.println(mm1.invoke(x.get(serviceName), arglist));
+      } catch (InvocationTargetException e) {
+        logger.error(e);
+        System.out.println("errororororo: " + e.getTargetException().getMessage());
+        return;
+      } catch (Exception e) {
+        logger.error(e);
+        System.out.println("errororororo: " + e.getMessage());
+        return;
+      }
+      // **********
+
+
+      for ( int i = 0; i < x.get(serviceName).getClass().getMethods().length; i++ ) {
+        if ( x.get(serviceName).getClass().getMethods()[i].getName().equals(methodName) ) {
+          for ( int j = 0; j < x.get(serviceName).getClass().getMethods()[i].getParameterCount(); j++ ) {
+            System.out.println("here I am");
+            System.out.println("j : " + x.get(serviceName).getClass().getMethods()[j].getParameterCount());
+
+            if ( x.get(serviceName).getClass().getMethods()[j].getParameterCount() > 0 )
+            System.out.println("j Name : " + x.get(serviceName).getClass().getMethods()[j].getParameters()[j].getName());
+          }
         }
 
-        //x.get(methodName).getClass().getM
+//        System.out.println("getMethods[] : " + x.get("exchangeRate").getClass().getMethods()[i]);
+//        System.out.println("getName : " + x.get("exchangeRate").getClass().getMethods()[i].getName());
+//        System.out.println("getParameterTypes : " + x.get("exchangeRate").getClass().getMethods()[i].getParameterTypes());
+//        System.out.println("getGenericParameterTypes : " + x.get("exchangeRate").getClass().getMethods()[i].getGenericParameterTypes());
+//        System.out.println("getParameterCount : " + x.get("exchangeRate").getClass().getMethods()[i].getParameterCount());
+//        System.out.println("getReturnType : " + x.get("exchangeRate").getClass().getMethods()[i].getReturnType());
+        //System.out.println("ParamName : " + x.get("exchangeRate").getClass().getMethods()[i].getParameters());
       }
-
     } catch (Exception e) {
       logger.error(e);
 
       return;
     }
-
-    //outputPage(x);
-  }
-
-  protected void outputPage(X x) {
-    PrintWriter       out      = x.get(PrintWriter.class);
-    DAO               nSpecDAO = (DAO) x.get("AuthenticatedNSpecDAO");
-    Logger            logger   = (Logger) x.get("logger");
-
-
-
-    System.out.println("this is 11 : " + x.get("exchangeRate").getClass());
-    System.out.println("this is 22 : " + x.get("exchangeRate").getClass().getMethods()[1]);
-    System.out.println("this is 33 : " + x.get("exchangeRate").getClass().getSimpleName());
-
-    //ClassInfo         cInfo    = (ClassInfo) "net.nanopay.fx.ExchangeRateInterfaceSkeleton";
-
-    //System.out.println("cInfo111 : " + cInfo);
-
-    out.println("<form method=post><span>SERVICE:</span>");
-    out.println("<span><select name=serviceName id=serviceName style=margin-left:35 >");
-    // gets all ongoing nanopay services
-    nSpecDAO.inX(x).orderBy(NSpec.NAME).select(new AbstractSink() {
-      @Override
-      public void put(Object o, Detachable d) {
-        NSpec s = (NSpec) o;
-        if ( s.getName().endsWith("DAO") == false ) { //s.getServe() && !s.getName().endsWith("DAO")
-          out.println("<option value=" + s.getName() + ">" + s.getName() + "</option>");
-        }
-      }
-    });
-    out.println("</select></span>");
-//    out.println("<br><br><span id=formatSpan>Format:<select name=format id=format onchange=changeUrl() style=margin-left:25><option value=csv>CSV</option><option value=xml>XML</option><option value=json selected>JSON</option><option value=html>HTML</option><option value=jsonj>JSON/J</option></select></span>");
-//    out.println("<br><br><span>Command:<select name=cmd id=cmd width=150 style=margin-left:5  onchange=changeCmd(this.value)><option value=put selected>PUT</option><option value=select>SELECT</option><option value=remove>REMOVE</option><option value=help>HELP</option></select></span>");
-//    out.println("<br><br><span id=qSpan style=display:none;>Query:<input id=q name=q style=margin-left:30;width:350 onchange=changeUrl() onkeyup=changeUrl()></input></span>");
-//    out.println("<br><br><span id=emailSpan style=display:none;>Email:<input id=email name=email style=margin-left:30;width:350 onkeyup=changeUrl() onchange=changeUrl()></input></span>");
-//    out.println("<br><br><span id=subjectSpan style=display:none;>Subject:<input id=subject name=subject style=margin-left:20;width:350 onkeyup=changeUrl() onchange=changeUrl()></input></span>");
-//    out.println("<br><br><span id=idSpan style=display:none;>ID:<input id=id name=id style=margin-left:52 onkeyup=changeUrl() onchange=changeUrl()></input></span>");
-//    out.println("<br><br><span id=dataSpan>Data:<br><textarea rows=20 cols=120 name=data></textarea></span>");
-//    out.println("<br><span id=urlSpan style=display:none;> URL : </span>");
-//    out.println("<input id=builtUrl size=120 style=margin-left:20;display:none;/ >");
-      out.println("<br><br><button type=submit >Submit</button></form>");
-//    out.println("<script>function changeCmd(cmdValue) { if ( cmdValue != 'put' ) {document.getElementById('dataSpan').style.cssText = 'display: none'; } else { document.getElementById('dataSpan').style.cssText = 'display: inline-block'; } if ( cmdValue == 'remove' ) { document.getElementById('idSpan').style.cssText = 'display: inline-block'; document.getElementById('formatSpan').style.cssText = 'display:none';} else { document.getElementById('idSpan').style.cssText = 'display: none'; document.getElementById('formatSpan').style.cssText = 'display: inline-block'; document.getElementById('id').value = '';} if ( cmdValue == 'select' ) {document.getElementById('qSpan').style.cssText = 'display: inline-block'; document.getElementById('emailSpan').style.cssText = 'display: inline-block'; document.getElementById('subjectSpan').style.cssText = 'display: inline-block'; document.getElementById('urlSpan').style.cssText = 'display: inline-block';document.getElementById('builtUrl').style.cssText = 'display: inline-block'; var vbuiltUrl = document.location.protocol + '//' + document.location.host + '/service/dig?dao=' + document.getElementById('dao').value + '&format=' + document.getElementById('format').options[document.getElementById('format').selectedIndex].value + '&cmd=' + document.getElementById('cmd').options[document.getElementById('cmd').selectedIndex].value + '&email='; document.getElementById('builtUrl').value=vbuiltUrl;}else {document.getElementById('qSpan').style.cssText = 'display:none'; document.getElementById('emailSpan').style.cssText = 'display:none'; document.getElementById('subjectSpan').style.cssText ='display:none';document.getElementById('urlSpan').style.cssText = 'display:none';document.getElementById('builtUrl').style.cssText = 'display:none';}}</script>");
-//
-//    out.println("<script>function changeUrl() {var vbuiltUrl = document.location.protocol + '//' + document.location.host + '/service/dig?dao=' + document.getElementById('dao').value + '&format=' + document.getElementById('format').options[document.getElementById('format').selectedIndex].value + '&cmd=' + document.getElementById('cmd').options[document.getElementById('cmd').selectedIndex].value + '&email=' + document.getElementById('email').value + '&q=' + document.getElementById('q').value; document.getElementById('builtUrl').value=vbuiltUrl;}</script>");
-
-    out.println();
   }
 }
