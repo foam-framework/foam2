@@ -14,9 +14,6 @@ import foam.nanos.http.HttpParameters;
 import javax.servlet.ServletException;
 import java.nio.CharBuffer;
 import foam.util.SafetyUtil;
-import foam.core.FObject;
-import net.nanopay.fx.ExchangeRateService;
-import org.apache.http.impl.auth.GGSSchemeBase;
 
 import java.lang.reflect.*;
 
@@ -40,15 +37,15 @@ public class SugarWebAgent
         //outputPage(x);
       }
 
-      Class c = Class.forName(interfaceName); //"net.nanopay.fx.ExchangeRateInterface"  "net.nanopay.fx.ExchangeRateService"
+      Class c = Class.forName(interfaceName);
       //Object objClass = c.newInstance();
 
       Method m[] = c.getMethods();  // get Methods' List
       //c.getMethod(methodName, ).invoke();
 
 
-      Object arglist[] = null;
       Class[] paramTypes = null; // for picked Method's parameters' types
+      Object arglist[] = null; // to store each parameters' values
 
       for ( int k = 0; k < m.length; k++ ) {
         if ( m[k].getName().equals(methodName) ) { //found picked Method
@@ -160,13 +157,6 @@ public class SugarWebAgent
 //        }
 //      }
 
-      //arglist[0] = (long)1348;
-//      arglist[1] = "2";
-//      arglist[2] = 3.0;
-//      arglist[3] = "4";
-
-      //System.out.println(" x.get(serviceName) : " + x.get);
-
       //net.nanopay.fx.localfx.LocalFXServiceAdapter localFXService = (net.nanopay.fx.localfx.LocalFXServiceAdapter) x.get("localFXService");
       // **********
       try {
@@ -175,14 +165,14 @@ public class SugarWebAgent
         mm1.invoke(x.get(serviceName), arglist);
         //mm1.invoke(localFXService, arglist);
 
-        System.out.println(mm1.invoke(x.get(serviceName), arglist));
+        out.println(mm1.invoke(x.get(serviceName), arglist));
       } catch (InvocationTargetException e) {
         logger.error(e);
-        System.out.println("errororororo: " + e.getTargetException().getMessage());
+        System.out.println("InvocationTargetException: " + e.getTargetException().getMessage());
         return;
       } catch (Exception e) {
         logger.error(e);
-        System.out.println("errororororo: " + e.getMessage());
+        System.out.println("Error Message : " + e.getMessage());
         return;
       }
       // **********
