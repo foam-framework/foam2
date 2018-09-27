@@ -6,51 +6,37 @@
 
 package foam.nanos.dig;
 
-import foam.core.ClassInfo;
-import foam.core.Detachable;
-import foam.core.FObject;
-import foam.core.PropertyInfo;
-import foam.core.ProxyX;
-import foam.core.EmptyX;
-import foam.core.X;
-import foam.core.XMLSupport;
+import foam.core.*;
 import foam.dao.AbstractSink;
 import foam.dao.ArraySink;
-import foam.dao.AuthenticatedDAO;
 import foam.dao.DAO;
-import foam.lib.csv.*;
-import foam.lib.json.*;
-import foam.lib.parse.ErrorReportingPStream;
-import foam.lib.parse.PStream;
-import foam.lib.parse.Parser;
-import foam.lib.parse.ParserContext;
-import foam.lib.parse.ParserContextImpl;
-import foam.lib.parse.StringPStream;
-import foam.mlang.predicate.Nary;
+import foam.lib.csv.CSVSupport;
+import foam.lib.json.JSONParser;
+import foam.lib.json.OutputterMode;
+import foam.lib.parse.*;
+import foam.mlang.MLang;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.boot.NSpec;
-import foam.nanos.http.Command;
-import foam.nanos.http.Format;
-import foam.nanos.http.WebAgent;
-import foam.nanos.http.HttpParameters;
-import foam.nanos.http.WebAgentQueryParser;
+import foam.nanos.dig.exception.*;
+import foam.nanos.http.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.PrefixLogger;
 import foam.nanos.notification.email.EmailMessage;
 import foam.nanos.notification.email.EmailService;
 import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
-import java.io.*;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringReader;
 import java.nio.CharBuffer;
 import java.util.Iterator;
 import java.util.List;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-import foam.nanos.dig.exception.*;
+import java.lang.Exception;
 
 public class DigWebAgent
   implements WebAgent
@@ -229,7 +215,10 @@ public class DigWebAgent
         }
         out.println(returnMessage);
       } else if ( Command.select == command ) {
-        ArraySink sink = (ArraySink) dao.select(new ArraySink());
+        PropertyInfo idProp = (PropertyInfo) cInfo.getAxiomByName("id");
+        ArraySink sink = (ArraySink) ( ! SafetyUtil.isEmpty(id) ?
+          dao.where(MLang.EQ(idProp, id)).select(new ArraySink()) :
+          dao.select(new ArraySink()));
 
         if ( sink != null ) {
           if ( sink.getArray().size() == 0 ) {
@@ -369,7 +358,12 @@ public class DigWebAgent
           return;
         } else {
           dao.remove(targetFobj);
-          out.println("Success");
+
+          DigErrorMessage error = new DigSuccessMessage.Builder(x)
+            .setMessage("Success")
+            .build();
+          outputException(x, resp, format, out, error);
+          return;
         }
       } else {
         DigErrorMessage error = new ParsingErrorException.Builder(x)
@@ -464,7 +458,7 @@ public class DigWebAgent
       //output error in csv format
 
       foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);
-      outputterCsv.output(error);
+      outputterCsv.put(error, null);
       out.println(outputterCsv.toString());
 
     } else if ( format == Format.HTML ) {

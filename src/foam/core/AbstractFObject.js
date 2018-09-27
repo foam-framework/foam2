@@ -44,27 +44,43 @@ foam.CLASS({
           public byte[] hash()
             throws NoSuchAlgorithmException
           {
-            return this.hash(null);
+            return this.hash("SHA-256");
           }
 
-          public byte[] hash(byte[] hash)
+          public byte[] hash(String algorithm)
             throws NoSuchAlgorithmException
           {
-            return this.hash("SHA-256", hash);
+            return this.hash(MessageDigest.getInstance(algorithm));
           }
 
           // convenience sign method
           public byte[] sign(PrivateKey key)
             throws NoSuchAlgorithmException, InvalidKeyException, SignatureException
           {
-            return this.sign("SHA256withRSA", key);
+            return this.sign(String.format("SHA256with%s", key.getAlgorithm()), key);
+          }
+
+          public byte[] sign(String algorithm, PrivateKey key)
+            throws NoSuchAlgorithmException, InvalidKeyException, SignatureException
+          {
+            Signature signer = Signature.getInstance(algorithm);
+            signer.initSign(key, SecurityUtil.GetSecureRandom());
+            return this.sign(signer);
           }
 
           // convenience verify method
           public boolean verify(byte[] signature, PublicKey key)
             throws NoSuchAlgorithmException, InvalidKeyException, SignatureException
           {
-            return this.verify(signature, "SHA256withRSA", key);
+            return this.verify(signature, String.format("SHA256with%s", key.getAlgorithm()), key);
+          }
+
+          public boolean verify(byte[] signature, String algorithm, PublicKey key)
+            throws NoSuchAlgorithmException, InvalidKeyException, SignatureException
+          {
+            Signature verifier = Signature.getInstance(algorithm);
+            verifier.initVerify(key);
+            return this.verify(signature, verifier);
           }
         `);
       }
@@ -332,15 +348,10 @@ foam.CLASS({
     {
       name: 'hash',
       javaReturns: 'byte[]',
-      javaThrows: [
-        'java.security.NoSuchAlgorithmException'
-      ],
       args: [
-        { class: 'String', name: 'algorithm' },
-        { class: 'Object', name: 'hash', javaType: 'byte[]' },
+        { class: 'Object', name: 'md', javaType: 'java.security.MessageDigest' },
       ],
       javaCode: `
-        MessageDigest md = MessageDigest.getInstance(algorithm);
         List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
         Iterator i = props.iterator();
 
@@ -353,15 +364,6 @@ foam.CLASS({
           prop.updateDigest(this, md);
         }
 
-        // no chaining so return digest
-        if ( hash == null || hash.length == 0 ) {
-          return md.digest();
-        }
-
-        // calculate digest, update with previous hash and current hash
-        byte[] digest = md.digest();
-        md.update(hash);
-        md.update(digest);
         return md.digest();
       `
     },
@@ -369,18 +371,12 @@ foam.CLASS({
       name: 'sign',
       javaReturns: 'byte[]',
       javaThrows: [
-        'NoSuchAlgorithmException',
-        'InvalidKeyException',
         'SignatureException'
       ],
       args: [
-        { class: 'String', name: 'algorithm' },
-        { class: 'Object', name: 'key', javaType: 'java.security.PrivateKey' },
+        { class: 'Object', name: 'signer', javaType: 'java.security.Signature' },
       ],
       javaCode: `
-        Signature signer = Signature.getInstance(algorithm);
-        signer.initSign(key, SecurityUtil.GetSecureRandom());
-
         List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
         Iterator i = props.iterator();
         while ( i.hasNext() ) {
@@ -398,19 +394,13 @@ foam.CLASS({
       name: 'verify',
       javaReturns: 'boolean',
       javaThrows: [
-        'NoSuchAlgorithmException',
-        'InvalidKeyException',
         'SignatureException'
       ],
       args: [
         { class: 'Object', name: 'signature', javaType: 'byte[]' },
-        { class: 'String', name: 'algorithm' },
-        { class: 'Object', name: 'key', javaType: 'java.security.PublicKey' },
+        { class: 'Object', name: 'verifier', javaType: 'java.security.Signature' },
       ],
       javaCode: `
-        Signature verifier = Signature.getInstance(algorithm);
-        verifier.initVerify(key);
-
         List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
         Iterator i = props.iterator();
         while ( i.hasNext() ) {

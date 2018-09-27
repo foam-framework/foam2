@@ -39,6 +39,7 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.nanos.auth.resetPassword.ResetView',
     'foam.nanos.u2.navigation.TopNavigation',
+    'foam.nanos.u2.navigation.FooterView',
     'foam.u2.stack.Stack',
     'foam.u2.stack.StackView'
   ],
@@ -67,7 +68,7 @@ foam.CLASS({
   ],
 
   constants: {
-    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor', 'secondaryHoverColor' ]
+    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor', 'secondaryHoverColor', 'groupCSS' ]
   },
 
   css: `
@@ -141,7 +142,10 @@ foam.CLASS({
     'secondaryHoverColor',
     'tableColor',
     'tableHoverColor',
-    'accentColor'
+    'accentColor',
+    'groupCSS',
+    'topNavigation_',
+    'footerView_'
   ],
 
   methods: [
@@ -172,30 +176,47 @@ foam.CLASS({
       self.clientPromise.then(function() {
         self
           .addClass(self.myClass())
-          .tag({class: 'foam.nanos.u2.navigation.TopNavigation'})
+          .start('div', null, self.topNavigation_$).end()
           .start('div').addClass('stack-wrapper')
             .tag({class: 'foam.u2.stack.StackView', data: self.stack, showActions: false})
-          .end();
+          .end()
+          .start('div', null, self.footerView_$).end();
+
+          // Sets up application view
+          self.topNavigation_.add(self.TopNavigation.create());
+          self.footerView_.add(self.FooterView.create());
       });
     },
 
-    function setDefaultMenu() {
+    function setPortalView(group) {
+      // Replaces contents of top navigation and footer view with group views
+      this.topNavigation_.replaceChild(
+        foam.lookup(group.topNavigation).create(null, this),
+        this.topNavigation_.children[0]
+      );
+
+      this.footerView_.replaceChild(
+        foam.lookup(group.footerView).create(null, this),
+        this.footerView_.children[0]
+      );
+    },
+
+    async function setDefaultMenu() {
+      var group = await this.client.groupDAO.find(this.user.group);
+      this.group.copyFrom(group);
+      this.setPortalView(group);
+
+      for ( var i = 0; i < this.MACROS.length; i++ ) {
+        var m = this.MACROS[i];
+        if ( group[m] ) this[m] = group[m];
+      }
+
       // Don't select default if menu already set
       if ( this.window.location.hash || ! this.user.group ) return;
 
-      this.client.groupDAO.find(this.user.group).then(function (group) {
-        this.group.copyFrom(group);
-
-        for ( var i = 0 ; i < this.MACROS.length ; i++ ) {
-          var m = this.MACROS[i];
-          if ( group[m] ) this[m] = group[m];
-        }
-
-        // Don't select default if menu already set
-        if ( group && ! this.window.location.hash ) {
-          this.window.location.hash = group.defaultMenu;
-        }
-      }.bind(this));
+      if ( group && ! this.window.location.hash ) {
+        this.window.location.hash = group.defaultMenu;
+      }
     },
 
     function getCurrentUser() {

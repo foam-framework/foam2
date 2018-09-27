@@ -82,9 +82,9 @@ listener.onDetach(listener.dao$.follow(delegate$))
 return listener
       `,
       javaCode: `
-// TODO: Support changing of delegate
-super.listen_(getX(), sink, predicate);
-`
+        // TODO: Support changing of delegate
+        getDelegate().listen_(getX(), sink, predicate);
+      `
     }
   ],
 

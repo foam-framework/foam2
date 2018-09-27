@@ -10,11 +10,11 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   javaImports: [
-    'foam.dao.*',
     'foam.core.ClassInfo',
-    'foam.core.FObject',
     'foam.core.X',
+    'foam.dao.*',
     'foam.nanos.auth.LastModifiedByAware',
+    
     'java.text.SimpleDateFormat',
     'java.util.Calendar',
     'java.util.TimeZone'
@@ -51,10 +51,18 @@ foam.CLASS({
 
           // TODO: These convenience constructors should be removed and done using the facade pattern.
           public JDAO(X x, ClassInfo classInfo, String filename) {
-            this(x, new MapDAO(classInfo), filename);
+            this(x, new foam.dao.MDAO(classInfo), filename);
+          }
+
+          public JDAO(X x, ClassInfo classInfo, String filename, boolean outputDiff) {
+            this(x, new foam.dao.MDAO(classInfo), filename, outputDiff);
           }
 
           public JDAO(X x, DAO delegate, String filename) {
+            this(x, delegate, filename, false);
+          }
+
+          public JDAO(X x, DAO delegate, String filename, boolean outputDiff) {
             setX(x);
             setOf(delegate.getOf());
             setDelegate(delegate);
@@ -64,6 +72,7 @@ foam.CLASS({
               .setDao(delegate)
               .setFilename(filename)
               .setCreateFile(true)
+              .setOutputDiff(outputDiff)
               .build();
 
             // create a composite journal of repo journal
@@ -134,6 +143,9 @@ foam.CLASS({
     {
       name: 'writeComment',
       synchronized: true,
+      javaThrows: [
+        'java.io.IOException'
+      ],
       documentation: 'Writes comment explaining who modified entry',
       args: [
         {

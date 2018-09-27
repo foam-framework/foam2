@@ -86,6 +86,7 @@ var classes = [
   'foam.dao.FileJournal',
   'foam.dao.WriteOnlyJDAO',
   'foam.dao.WriteOnlyFileJournal',
+  'foam.dao.RoutingJournal',
   'foam.dao.BaseClientDAO',
   'foam.dao.ClientDAO',
   'foam.dao.ClientSink',
@@ -109,6 +110,7 @@ var classes = [
   'foam.dao.SQLStatement',
   'foam.dao.EasyDAO',
   'foam.dao.EnabledAwareDAO',
+  'foam.dao.index.PersistedIndexTest',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
@@ -136,6 +138,7 @@ var classes = [
   'foam.nanos.auth.Hours',
   'foam.nanos.auth.Address',
   'foam.nanos.auth.Phone',
+  'foam.nanos.auth.HumanNameTrait',
   'foam.nanos.auth.User',
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
@@ -245,11 +248,9 @@ var classes = [
   'foam.nanos.fs.File',
 
   'foam.crypto.hash.Hasher',
-  'foam.crypto.hash.Hashable',
   'foam.crypto.hash.HashableTest',
 
   'foam.crypto.sign.Signer',
-  'foam.crypto.sign.Signable',
   'foam.crypto.sign.SignableTest',
 
   'foam.nanos.http.Command',
@@ -264,14 +265,17 @@ var classes = [
   'foam.nanos.servlet.ServletMapping',
   'foam.nanos.servlet.ErrorPageMapping',
   'foam.nanos.servlet.FilterMapping',
+  'foam.nanos.servlet.VirtualHostRoutingServlet',
 
   'foam.lib.query.TestModel',
   'foam.lib.query.FooEnum',
   'foam.demos.net.nap.web.model.RegulatoryNotice',
   'foam.demos.net.nap.web.model.RegulatoryNoticeAudit',
 
+  'foam.parse.QueryParserUserTest',
   'foam.util.EmailTest',
   'foam.util.PasswordTest',
+  'foam.util.SecurityUtilTest',
   'foam.test.TestObj',
   'foam.core.FObjectTest',
 
@@ -281,7 +285,8 @@ var classes = [
   'foam.nanos.dig.exception.DAOPutException',
   'foam.nanos.dig.exception.EmptyDataException',
   'foam.nanos.dig.exception.UnsupportException',
-  'foam.nanos.dig.exception.UnknownIdException'
+  'foam.nanos.dig.exception.UnknownIdException',
+  'foam.nanos.dig.exception.DigSuccessMessage'
 ];
 
 var abstractClasses = [

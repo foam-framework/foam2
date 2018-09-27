@@ -59,9 +59,21 @@ foam.CLASS({
       name: 'start',
       javaCode: `
       try {
-        System.out.println("Starting jetty http server.");
+        System.out.println("Starting Jetty http server.");
         org.eclipse.jetty.server.Server server =
           new org.eclipse.jetty.server.Server(getPort());
+
+        /*
+          Prevent Jetty server from broadcasting its version number in the HTTP
+          response headers.
+        */
+        for ( org.eclipse.jetty.server.Connector conn : server.getConnectors() ) {
+          for ( org.eclipse.jetty.server.ConnectionFactory f : conn.getConnectionFactories() ) {
+            if ( f instanceof org.eclipse.jetty.server.HttpConnectionFactory ) {
+              ((org.eclipse.jetty.server.HttpConnectionFactory) f).getHttpConfiguration().setSendServerVersion(false);
+            }
+          }
+        }
 
         org.eclipse.jetty.servlet.ServletContextHandler handler =
           new org.eclipse.jetty.servlet.ServletContextHandler();
@@ -72,9 +84,15 @@ foam.CLASS({
         handler.setAttribute("X", getX());
 
         for ( foam.nanos.servlet.ServletMapping mapping : getServletMappings() ) {
-          org.eclipse.jetty.servlet.ServletHolder holder =
-            handler.addServlet(
-              (Class<? extends javax.servlet.Servlet>)Class.forName(mapping.getClassName()), mapping.getPathSpec());
+          org.eclipse.jetty.servlet.ServletHolder holder;
+
+          if ( mapping.getServletObject() != null ) {
+            holder = new org.eclipse.jetty.servlet.ServletHolder(mapping.getServletObject());
+            handler.addServlet(holder, mapping.getPathSpec());
+          } else {
+            holder = handler.addServlet(
+                (Class<? extends javax.servlet.Servlet>)Class.forName(mapping.getClassName()), mapping.getPathSpec());
+          }
 
           java.util.Iterator iter = mapping.getInitParameters().keySet().iterator();
 
@@ -125,11 +143,38 @@ foam.CLASS({
           }
         });
 
+        addJettyShutdownHook(server);
         server.setHandler(handler);
         server.start();
       } catch(Exception e) {
         e.printStackTrace();
       }
+      `
+    },
+    {
+      name: 'addJettyShutdownHook',
+      documentation: `A shutdown hook in case of unexpected process termination
+        (covers break/ctrl+C but not kill -9).`,
+      args: [
+        {
+          name: 'server',
+          javaType: 'final org.eclipse.jetty.server.Server'
+        }
+      ],
+      javaReturns: 'void',
+      javaCode: `
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+          @Override
+          public void run() {
+            try {
+              System.out.println("Shutting down Jetty server with the shutdown hook.");
+              server.stop();
+            } catch (Exception e) {
+              System.err.println("Exception during Jetty server stop in the shutdown hook");
+              e.printStackTrace();
+            }
+          }
+        });
       `
     }
   ]

@@ -27,10 +27,10 @@ foam.CLASS({
   exports: [
     'data.selection as selection',
     'data.data as dao',
+    'data.searchColumns as searchColumns',
     'dblclick'
   ],
 
-  // TODO: wrong class name, fix when ActionView fixed.
   css: `
     ^ {
       width: fit-content;
@@ -51,10 +51,13 @@ foam.CLASS({
       display: inline-block;
     }
 
+    ^ .actions .net-nanopay-ui-ActionView {
+      margin: 0 10px 10px 0;
+    }
+
     ^ .net-nanopay-ui-ActionView {
       background: #59aadd;
       color: white;
-      margin: 0 10px 10px 0;
     }
   `,
 

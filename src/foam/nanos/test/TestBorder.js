@@ -4,36 +4,40 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
- foam.CLASS({
-   package: 'foam.nanos.test',
-   name: 'TestBorder',
-   extends: 'foam.u2.view.ScrollTableView',
+foam.CLASS({
+  package: 'foam.nanos.test',
+  name: 'TestBorder',
+  extends: 'foam.u2.view.ScrollTableView',
 
-   implements: ['foam.mlang.Expressions'],
+  implements: ['foam.mlang.Expressions'],
 
-   requires: ['foam.nanos.test.Test'],
+  requires: ['foam.nanos.test.Test'],
 
-   properties: [
-     'status',
-     { class: 'Int', name: 'passed' },
-     { class: 'Int', name: 'failed' }
-   ],
+  css: `
+    ^ > span, ^ .buttons .net-nanopay-ui-ActionView {
+      margin: 0 10px 10px 0;
+    }
+  `,
 
-   methods: [
-     function initE() {
+  properties: [
+    'status',
+    { class: 'Int', name: 'passed' },
+    { class: 'Int', name: 'failed' }
+  ],
+
+  methods: [
+    function initE() {
       this
-      .startContext({ data: this })
-        .add(this.RUN_ALL, this.RUN_FAILED_TESTS)
-      .endContext()
-      .start('span').style({ 'padding-left': '12px' })
-        .add('Passed: ', this.passed$)
-      .end()
-      .start('span').style({ 'padding-left': '12px' })
-        .add('Failed: ', this.failed$)
-      .end()
-      .start('span').style({ 'padding-left': '12px' })
-        .add('Status: ', this.status$)
-      .end();
+        .addClass(this.myClass())
+        .start('span')
+          .addClass('buttons')
+          .startContext({ data: this })
+            .add(this.RUN_ALL, this.RUN_FAILED_TESTS)
+          .endContext()
+        .end()
+        .start('span').add('Passed: ', this.passed$).end()
+        .start('span').add('Failed: ', this.failed$).end()
+        .start('span').add('Status: ', this.status$).end();
 
       this.SUPER();
     },
@@ -58,14 +62,14 @@
         }
       });
     }
-   ],
+  ],
 
-   actions: [
-     function runAll() {
-       this.runTests(this.data);
-     },
-     function runFailedTests() {
-       this.runTests(this.data.where(this.GT(this.Test.FAILED, 0)));
-     },
-   ]
+  actions: [
+    function runAll() {
+      this.runTests(this.data);
+    },
+    function runFailedTests() {
+      this.runTests(this.data.where(this.GT(this.Test.FAILED, 0)));
+    },
+  ]
 });
