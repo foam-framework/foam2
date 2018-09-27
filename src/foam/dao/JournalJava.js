@@ -364,7 +364,7 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        if ( x.get("user") == null || ((User) x.get("user")).getId()  <= 1 ) return;
+        if ( x.get("user") == null || ((User) x.get("user")).getId() <= 1 ) return;
         if ( obj instanceof LastModifiedByAware && ((LastModifiedByAware) obj).getLastModifiedBy() != 0L ) return;
 
         User user = (User) x.get("user");
