@@ -50,14 +50,14 @@ public class AuthenticatedUserDAO
     User        user    = (User) x.get("user");
     AuthService auth    = (AuthService) x.get("auth");
 
-    User toPut = (User) obj;
+    User newUser = (User) obj;
 
-    if ( toPut == null ) {
+    if ( newUser == null ) {
       throw new RuntimeException("Cannot put null.");
     }
 
-    boolean updatingSelf = SafetyUtil.equals(toPut.getId(), user.getId());
-    boolean hasUserEditPermission = auth.check(x, "user.update." + toPut.getId());
+    boolean updatingSelf = SafetyUtil.equals(newUser.getId(), user.getId());
+    boolean hasUserEditPermission = auth.check(x, "user.update." + newUser.getId());
 
     if (
       ! updatingSelf &&
@@ -69,29 +69,30 @@ public class AuthenticatedUserDAO
     }
 
     // set spid if not set
-    if ( SafetyUtil.isEmpty((String) toPut.getSpid()) &&
+    if ( SafetyUtil.isEmpty((String) newUser.getSpid()) &&
         ! SafetyUtil.isEmpty((String) user.getSpid()) ) {
-      toPut.setSpid(user.getSpid());
+      newUser.setSpid(user.getSpid());
     }
 
-    User result = (User) super.find_(x, toPut.getId());
+    User oldUser = (User) super.find_(x, newUser.getId());
 
     if (
-      result != null &&
-      ! SafetyUtil.equals(result.getGroup(), toPut.getGroup())
+      oldUser != null &&
+      ! SafetyUtil.equals(oldUser.getGroup(), newUser.getGroup())
     ) {
-      boolean hasGroupUpdatePermission = auth.check(x, "group.update." + toPut.getGroup());
+      boolean hasOldGroupUpdatePermission = auth.check(x, "group.update." + oldUser.getGroup());
+      boolean hasNewGroupUpdatePermission = auth.check(x, "group.update." + newUser.getGroup());
       if ( updatingSelf ) {
         throw new AuthorizationException("You cannot change your own group.");
       } else if ( ! hasUserEditPermission ) {
-        throw new AuthorizationException("You do not have permission to change this user's group.");
-      } else if ( ! hasGroupUpdatePermission ) {
-        throw new AuthorizationException("You do not have permission to change a user's group to '" + toPut.getGroup() + "'.");
+        throw new AuthorizationException("You do not have permission to change that user's group.");
+      } else if ( ! (hasOldGroupUpdatePermission || hasNewGroupUpdatePermission) ) {
+        throw new AuthorizationException("You do not have permission to change that user's group to '" + newUser.getGroup() + "'.");
       }
       // TODO: Handle SPIDs.
     }
 
-    return super.put_(x, toPut);
+    return super.put_(x, newUser);
   }
 
   @Override
