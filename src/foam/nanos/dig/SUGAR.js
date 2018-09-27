@@ -232,7 +232,7 @@ foam.CLASS({
           }
         }
 
-        console.log("url : " + url);
+        //console.log("url : " + url);
 
         return encodeURI(url);
       }
