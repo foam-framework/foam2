@@ -48,6 +48,13 @@ foam.CLASS({
       documentation: 'Permissions set on group.'
     },
     {
+      class: 'StringArray',
+      of: 'foam.nanos.auth.Permission',
+      name: 'permissions2',
+      view: 'foam.u2.view.StringArrayRowView',
+      documentation: 'Permissions set on group.'
+    },
+    {
       class: 'Reference',
       targetDAOKey: 'menuDAO',
       name: 'defaultMenu',
