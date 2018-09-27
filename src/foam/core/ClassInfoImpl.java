@@ -79,7 +79,7 @@ public class ClassInfoImpl
 
   @Override
   public Object newInstance() throws IllegalAccessException, InstantiationException {
-    return class_.getClass().newInstance();
+    return class_.newInstance();
   }
 
   public List getAxioms() {
