@@ -45,7 +45,7 @@ foam.CLASS({
         var s = this.sourceModel;
         var t = this.targetModel;
         return s.substring(s.lastIndexOf('.') + 1) +
-          t.substring(t.lastIndexOf('.') + 1) + 'Relationship';
+          t.substring(t.lastIndexOf('.') + 1) + this.forwardName + 'Relationship';
       }
     },
     'forwardName',
@@ -402,7 +402,7 @@ foam.CLASS({
       name: 'add',
       args: [{ name: 'target', of: 'foam.core.FObject' }],
       javaCode: `getJunctionDAO()
-              .put(createJunction(((foam.core.Identifiable)target)
+              .put_(getX(), createJunction(((foam.core.Identifiable)target)
               .getPrimaryKey()));`,
       swiftCode: `_ = try junctionDAO!
               .put(createJunction((target as? foam_core_Identifiable)?
@@ -414,7 +414,7 @@ foam.CLASS({
     {
       name: 'remove',
       javaCode: `getJunctionDAO()
-              .remove(createJunction(((foam.core.Identifiable)target)
+              .remove_(getX(), createJunction(((foam.core.Identifiable)target)
               .getPrimaryKey()));`,
       swiftCode: `_ = try junctionDAO!
               .remove(createJunction((target as? foam_core_Identifiable)?
