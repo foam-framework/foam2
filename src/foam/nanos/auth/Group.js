@@ -179,7 +179,7 @@ if ( session != null ) {
     } else {
       //populate AppConfig url with request's RootUrl
       HttpServletRequest req = x.get(HttpServletRequest.class);
-      if (req != null) {
+      if (req.getRequestURI() != null) {
         config.setUrl(((Request) req).getRootURL().toString());
       }
     }
