@@ -23,7 +23,7 @@ foam.CLASS({
       type: 'String',
       name: 'GROUP_DAO_PUT',
       documentation: 'GroupDAO expected put line',
-      value: `groupDAO.p({"class":"foam.nanos.auth.Group","id":"admin","enabled":true,"permissions":[]})`
+      value: `groupDAO.p({"class":"foam.nanos.auth.Group","id":"admin","enabled":true,"permissions":[],"permissions2":[]})`
 
     }
   ],
