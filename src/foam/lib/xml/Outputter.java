@@ -76,7 +76,9 @@ public class Outputter
 
   @Override
   public void output(Object value) {
-    if ( value instanceof String ) {
+    if ( value instanceof OutputXML ) {
+      ((OutputXML) value).outputXML(this);
+    } else if ( value instanceof String ) {
       outputString((String) value);
     } else if ( value instanceof FObject ) {
       outputFObject((FObject) value);
