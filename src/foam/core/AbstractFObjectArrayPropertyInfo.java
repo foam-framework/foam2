@@ -7,8 +7,6 @@
 package foam.core;
 
 import foam.nanos.logger.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -36,27 +34,28 @@ public abstract class AbstractFObjectArrayPropertyInfo
   public Object fromXML(X x, XMLStreamReader reader) {
     List objList = new ArrayList();
     String startTag = reader.getLocalName();
+
     try {
       int eventType;
-      while (reader.hasNext()) {
+      while ( reader.hasNext() ) {
         eventType = reader.next();
-        switch (eventType) {
+        switch ( eventType ) {
           case XMLStreamConstants.START_ELEMENT:
             // Nested object in array
-            if (reader.getLocalName().equals("object")) {
+            if ( reader.getLocalName().equals("object") ) {
               FObject o = XMLSupport.createObj(x, reader);
-              if (o != null) {
+              if ( o != null ) {
                 objList.add(o);
               }
             }
             break;
           case XMLStreamConstants.END_ELEMENT:
-            if (reader.getLocalName() == startTag) {
+            if ( reader.getLocalName() == startTag ) {
               return objList.toArray();
             }
         }
       }
-    } catch(XMLStreamException ex){
+    } catch(XMLStreamException ex) {
       Logger logger = (Logger) x.get("logger");
       logger.error("Premature end of XML file");
     }

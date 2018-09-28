@@ -797,17 +797,38 @@ foam.CLASS({
   package: 'foam.parse',
   name: 'Parsers',
 
+  requires: [
+    'foam.parse.Alternate',
+    'foam.parse.AnyChar',
+    'foam.parse.Chars',
+    'foam.parse.Literal',
+    'foam.parse.LiteralIC',
+    'foam.parse.Not',
+    'foam.parse.NotChars',
+    'foam.parse.Optional',
+    'foam.parse.Plus',
+    'foam.parse.Range',
+    'foam.parse.Repeat',
+    'foam.parse.Repeat0',
+    'foam.parse.Sequence',
+    'foam.parse.Sequence0',
+    'foam.parse.Sequence1',
+    'foam.parse.String',
+    'foam.parse.Substring',
+    'foam.parse.Symbol',
+  ],
+
   axioms: [ foam.pattern.Singleton.create() ],
 
   methods: [
     function seq() {
-      return this.lookup('foam.parse.Sequence').create({
+      return this.Sequence.create({
         args: Array.from(arguments)
       });
     },
 
     function repeat0(p, delim, min) {
-      return this.lookup('foam.parse.Repeat0').create({
+      return this.Repeat0.create({
         p: p,
         minimum: min || 0,
         delimiter: delim
@@ -815,38 +836,36 @@ foam.CLASS({
     },
 
     function simpleAlt() {
-      return this.lookup('foam.parse.Alternate').create({
+      return this.Alternate.create({
         args: Array.from(arguments)
       });
     },
 
     function alt() {
-      return this.lookup('foam.parse.Alternate').create({
+      return this.Alternate.create({
         args: Array.from(arguments)
       });
     },
 
     function sym(name) {
-      return this.lookup('foam.parse.Symbol').create({
-        name: name
-      });
+      return this.Symbol.create({ name: name });
     },
 
     function seq1(n) {
-      return this.lookup('foam.parse.Sequence1').create({
+      return this.Sequence1.create({
         n: n,
         args: Array.from(arguments).slice(1)
       });
     },
 
     function seq0() {
-      return this.lookup('foam.parse.Sequence0').create({
+      return this.Sequence0.create({
         args: Array.from(arguments)
       });
     },
 
     function repeat(p, delim, min) {
-      return this.lookup('foam.parse.Repeat').create({
+      return this.Repeat.create({
         p: p,
         minimum: min || 0,
         delimiter: delim
@@ -854,72 +873,72 @@ foam.CLASS({
     },
 
     function plus(p, delim) {
-      return this.lookup('foam.parse.Plus').create({
+      return this.Plus.create({
         p: p,
         delimiter: delim
       });
     },
 
     function str(p) {
-      return this.lookup('foam.parse.String').create({
+      return this.String.create({
         p: p
       });
     },
 
     function substring(p) {
-      return this.lookup('foam.parse.Substring').create({
+      return this.Substring.create({
         p: p
       });
     },
 
     function range(a, b) {
-      return this.lookup('foam.parse.Range').create({
+      return this.Range.create({
         from: a,
         to: b
       });
     },
 
     function notChars(s) {
-      return this.lookup('foam.parse.NotChars').create({
+      return this.NotChars.create({
         string: s
       });
     },
 
     function chars(s) {
-      return this.lookup('foam.parse.Chars').create({
+      return this.Chars.create({
         string: s
       });
     },
 
     function not(p, opt_else) {
-      return this.lookup('foam.parse.Not').create({
+      return this.Not.create({
         p: p,
         else: opt_else
       });
     },
 
     function optional(p) {
-      return this.lookup('foam.parse.Optional').create({
+      return this.Optional.create({
         p: p
       });
     },
 
     function literal(s, value) {
-      return this.lookup('foam.parse.Literal').create({
+      return this.Literal.create({
         s: s,
         value: value
       });
     },
 
     function literalIC(s, value) {
-      return this.lookup('foam.parse.LiteralIC').create({
+      return this.LiteralIC.create({
         s: s,
         value: value
       });
     },
 
     function anyChar() {
-      return foam.parse.AnyChar.create();
+      return this.AnyChar.create();
     }
   ]
 });
@@ -939,6 +958,7 @@ foam.CLASS({
 
   requires: [
     'foam.parse.StringPStream',
+    'foam.parse.ParserWithAction',
     'foam.parse.Parsers'
   ],
 
@@ -1022,7 +1042,7 @@ foam.CLASS({
     function addAction(name, action) {
       for ( var i = 0 ; i < this.symbols.length ; i++ ) {
         if ( this.symbols[i].name === name ) {
-          this.symbols[i].parser = foam.parse.ParserWithAction.create({
+          this.symbols[i].parser = this.ParserWithAction.create({
             p: this.symbols[i].parser,
             action: action
           });
