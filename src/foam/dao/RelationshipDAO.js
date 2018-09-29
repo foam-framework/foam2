@@ -24,6 +24,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'RelationshipDAO',
   extends: 'foam.dao.FilteredDAO',
+
   requires: [
     'foam.mlang.predicate.Eq'
   ],
@@ -68,7 +69,7 @@ foam.CLASS({
 
         return delegate;
       },
-      javaFactory: 'return (foam.dao.DAO)getX().get(getTargetDAOKey());',
+      javaFactory: 'return ((foam.dao.DAO) getX().get(getTargetDAOKey())).inX(getX());',
       swiftFactory: `return __context__[targetDAOKey] as! foam_dao_DAO`,
     }
   ],

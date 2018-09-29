@@ -12,15 +12,14 @@ foam.INTERFACE({
 
   implements: [ 'foam.dao.SQLStatement' ],
 
-  javaExtends: [ 'java.util.Comparator' ],
+  javaImplements: [ 'java.util.Comparator' ],
   
   methods: [
     {
       name: 'compare',
-      swiftReturns: 'Int',
-      javaReturns: 'int',
-      args: [ { name: 'o1', javaType: 'Object' },
-              { name: 'o2', javaType: 'Object' } ]
+      returns: 'Integer',
+      args: [ { name: 'o1', type: 'Any' },
+              { name: 'o2', type: 'Any' } ]
     }
   ]
 });

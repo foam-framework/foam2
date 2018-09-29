@@ -48,6 +48,13 @@ foam.CLASS({
       documentation: 'Permissions set on group.'
     },
     {
+      class: 'StringArray',
+      of: 'foam.nanos.auth.Permission',
+      name: 'permissions2',
+      view: 'foam.u2.view.StringArrayRowView',
+      documentation: 'Permissions set on group.'
+    },
+    {
       class: 'Reference',
       targetDAOKey: 'menuDAO',
       name: 'defaultMenu',
@@ -55,34 +62,42 @@ foam.CLASS({
       of: 'foam.nanos.menu.Menu'
     },
     {
-      class: 'URL',
+      class: 'Image',
       name: 'logo',
-      documentation: 'Group logo.'
-    },
-    {
-      class: 'String',
-      name: 'primaryColor',
-      documentation: 'The following color properties can determine the color scheme of the GUI.'
+      documentation: 'Group logo.',
+      displayWidth: 60
     },
     {
       class: 'String',
       name: 'topNavigation',
-      value: 'foam.nanos.u2.navigation.TopNavigation'
+      value: 'foam.nanos.u2.navigation.TopNavigation',
+      displayWidth: 45
     },
     {
       class: 'String',
       name: 'footerView',
-      value: 'foam.nanos.u2.navigation.FooterView'
+      value: 'foam.nanos.u2.navigation.FooterView',
+      displayWidth: 45
     },
     {
       class: 'String',
       name: 'groupCSS',
-      view: { class: 'foam.u2.tag.TextArea', rows: 16 },
+      view: { class: 'foam.u2.tag.TextArea', rows: 16, cols: 60 },
     },
-    { class: 'String', name: 'secondaryColor' },
-    { class: 'String', name: 'tableColor' },
-    { class: 'String', name: 'tableHoverColor' },
-    { class: 'String', name: 'accentColor' },
+    {
+      class: 'Color',
+      name: 'primaryColor',
+      documentation: 'The following color properties can determine the color scheme of the GUI.'
+    },
+    { class: 'Color', name: 'secondaryColor' },
+    { class: 'Color', name: 'accentColor' },
+    { class: 'Color', name: 'tableColor' },
+    { class: 'Color', name: 'tableHoverColor' },
+    {
+      class: 'String',
+      name: 'url',
+      value: null
+    }
 /*    {
       class: 'FObjectProperty',
       of: 'foam.nanos.app.AppConfig',
@@ -99,6 +114,16 @@ foam.CLASS({
       documentation: 'Custom authentication settings for this group.'
     }
     */
+  ],
+
+  javaImports: [
+    'foam.core.X',
+    'foam.dao.DAO',
+    'foam.nanos.app.AppConfig',
+    'foam.nanos.session.Session',
+    'foam.util.SafetyUtil',
+    'org.eclipse.jetty.server.Request',
+    'javax.servlet.http.HttpServletRequest'
   ],
 
   methods: [
@@ -128,6 +153,41 @@ foam.CLASS({
 
         return false;
       }
+    },
+    {
+      name: 'getAppConfig',
+      javaReturns: 'AppConfig',
+      args: [
+        {
+          name: 'x',
+          javaType: 'X'
+        }
+      ],
+      javaCode: `
+DAO userDAO         = (DAO) x.get("localUserDAO");
+DAO groupDAO        = (DAO) x.get("groupDAO");
+AppConfig config    = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
+
+Session session = x.get(Session.class);
+if ( session != null ) {
+  User user = (User) userDAO.find(session.getUserId());
+  if ( user != null ) {
+    Group group    = (Group) groupDAO.find(user.getGroup());
+    if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
+      //populate AppConfig url with group url
+      config.setUrl(group.getUrl());
+    } else {
+      //populate AppConfig url with request's RootUrl
+      HttpServletRequest req = x.get(HttpServletRequest.class);
+      if (req.getRequestURI() != null) {
+        config.setUrl(((Request) req).getRootURL().toString());
+      }
+    }
+  }
+}
+
+return config;
+        `
     }
   ]
 });
