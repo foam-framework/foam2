@@ -334,6 +334,8 @@ foam.CLASS({
       name: 'value',
       adapt: function(_, n) {
         if ( foam.String.isInstance(n) ) n = foam.lookup(this.type)[n];
+        if ( foam.Object.isInstance(n) && n.class )
+          n = foam.lookup(n.class).create(n);
         return n
       },
       expression: function(type) {

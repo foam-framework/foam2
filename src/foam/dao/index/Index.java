@@ -11,6 +11,8 @@ import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
+import java.io.IOException;
+
 public interface Index {
   // Called when an Index is added
   public void onAdd(Sink sink);
@@ -38,6 +40,9 @@ public interface Index {
 
   // Unwrap an object stored in this Index. o == unwrap(wrap(o))
   public Object unwrap(Object state);
+
+  // Flushes the state
+  public void flush(Object state) throws IOException;
 
   // Future:
   // toString()

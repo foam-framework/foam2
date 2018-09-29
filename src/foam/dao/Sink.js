@@ -544,7 +544,7 @@ foam.CLASS({
         }
       },
       swiftCode: `array.sort(by: {
-  return comparator.compare($0, $1) == 0
+  return comparator.compare($0, $1) < 0
 });
 
 var detached = false
