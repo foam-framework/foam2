@@ -9,8 +9,38 @@ foam.INTERFACE({
 
   methods: [
     {
+      name: 'put',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ]
+    },
+    {
+      name: 'remove',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ]
+    },
+    {
       name: 'replay',
       args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
         {
           name: 'dao',
           javaType: 'foam.dao.DAO'
@@ -41,18 +71,10 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'replay',
-      javaCode: `
-        for ( Journal delegate : getDelegates() ) {
-          delegate.replay(dao);
-        }
-      `
-    },
-    {
       name: 'put',
       javaCode: `
         for ( Journal delegate : getDelegates() ) {
-          delegate.put(obj, sub);
+          delegate.put(x, obj);
         }
       `
     },
@@ -60,23 +82,15 @@ foam.CLASS({
       name: 'remove',
       javaCode: `
         for ( Journal delegate : getDelegates() ) {
-          delegate.remove(obj, sub);
+          delegate.remove(x, obj);
         }
       `
     },
     {
-      name: 'eof',
+      name: 'replay',
       javaCode: `
         for ( Journal delegate : getDelegates() ) {
-          delegate.eof();
-        }
-      `
-    },
-    {
-      name: 'reset',
-      javaCode: `
-        for ( Journal delegate : getDelegates() ) {
-          delegate.reset(sub);
+          delegate.replay(x, dao);
         }
       `
     }
@@ -101,6 +115,8 @@ foam.CLASS({
     'foam.lib.json.Outputter',
     'foam.lib.json.OutputterMode',
     'foam.lib.parse.*',
+    'foam.nanos.auth.LastModifiedByAware',
+    'foam.nanos.auth.User',
     'foam.nanos.fs.Storage',
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
@@ -111,8 +127,11 @@ foam.CLASS({
     'java.io.File',
     'java.io.FileReader',
     'java.io.FileWriter',
+    'java.text.SimpleDateFormat',
+    'java.util.Calendar',
     'java.util.Iterator',
     'java.util.List',
+    'java.util.TimeZone',
     'java.util.regex.Pattern'
   ],
 
@@ -121,7 +140,29 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function (cls) {
         cls.extras.push(`
-          protected Pattern COMMENT = Pattern.compile("(/\\\\*([^*]|[\\\\r\\\\n]|(\\\\*+([^*/]|[\\\\r\\\\n])))*\\\\*+/)|(//.*)");
+          protected static Pattern COMMENT = Pattern.compile("(/\\\\*([^*]|[\\\\r\\\\n]|(\\\\*+([^*/]|[\\\\r\\\\n])))*\\\\*+/)|(//.*)");
+
+          protected static ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
+            @Override
+            protected StringBuilder initialValue() {
+              return new StringBuilder();
+            }
+            @Override
+            public StringBuilder get() {
+              StringBuilder b = super.get();
+              b.setLength(0);
+              return b;
+            }
+          };
+
+          protected static final ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
+            @Override
+            protected SimpleDateFormat initialValue() {
+              SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+              sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+              return sdf;
+            }
+          };
         `);
       }
     }
@@ -242,16 +283,21 @@ foam.CLASS({
       javaCode: `
         try {
           FObject old = null;
-          FObject fobj = (FObject) obj;
-          PropertyInfo id = (PropertyInfo) fobj.getClassInfo().getAxiomByName("id");
+          Object id = obj.getProperty("id");
+          String record = ( getOutputDiff() && ( old = getDao().find(id) ) != null ) ?
+            getOutputter().stringifyDelta(old, obj) :
+            getOutputter().stringify(obj);
 
-          if ( getOutputDiff() && ( old = getDao().find(id.get(obj))) != null ) {
-            write_("p(" + getOutputter().stringifyDelta(old.fclone(), fobj) + ")");
-          } else {
-            write_("p(" + getOutputter().stringify(fobj) + ")");
+          if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
+            writeComment_(x, obj);
+            write_(sb.get()
+              .append("p(")
+              .append(record)
+              .append(")")
+              .toString());
           }
         } catch ( Throwable t ) {
-          getLogger().error("Failed to write to put entry to journal", t);
+          getLogger().error("Failed to write put entry to journal", t);
           throw new RuntimeException(t);
         }
       `
@@ -264,13 +310,20 @@ foam.CLASS({
           // TODO: Would be more efficient to output the ID portion of the object.  But
           // if ID is an alias or multi part id we should only output the
           // true properties that ID/MultiPartID maps too.
-          FObject fobj = (FObject) obj;
-          FObject toWrite = (FObject) fobj.getClassInfo().getObjClass().newInstance();
-          PropertyInfo id = (PropertyInfo) fobj.getClassInfo().getAxiomByName("id");
-          id.set(toWrite, id.get(obj));
-          write_("r(" + getOutputter().stringify(toWrite) + ")");
+          FObject toWrite = (FObject) obj.getClassInfo().newInstance();
+          toWrite.setProperty("id", obj.getProperty("id"));
+          String record = getOutputter().stringify(toWrite);
+
+          if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
+            writeComment_(x, obj);
+            write_(sb.get()
+              .append("r(")
+              .append(record)
+              .append(")")
+              .toString());
+          }
         } catch ( Throwable t ) {
-          getLogger().error("Failed to write to remove entry to journal", t);
+          getLogger().error("Failed to write remove entry to journal", t);
           throw new RuntimeException(t);
         }
       `
@@ -295,12 +348,36 @@ foam.CLASS({
       `
     },
     {
-      name: 'eof',
-      javaCode: '// NOOP',
-    },
-    {
-      name: 'reset',
-      javaCode: '// NOOP',
+      name: 'writeComment_',
+      synchronized: true,
+      javaThrows: [
+        'java.io.IOException'
+      ],
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ],
+      javaCode: `
+        if ( x.get("user") == null || ((User) x.get("user")).getId() <= 1 ) return;
+        if ( obj instanceof LastModifiedByAware && ((LastModifiedByAware) obj).getLastModifiedBy() != 0L ) return;
+
+        User user = (User) x.get("user");
+        Calendar now = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        write_(sb.get()
+          .append("// Modified by ")
+          .append(user.label())
+          .append(" (")
+          .append(user.getId())
+          .append(") at ")
+          .append(sdf.get().format(now.getTime()))
+          .toString());
+      `
     },
     {
       name: 'replay',
@@ -320,36 +397,30 @@ foam.CLASS({
               int length = line.trim().length();
               line = line.trim().substring(2, length - 1);
 
-              FObject object = parser.parseString(line);
-              if ( object == null ) {
-                getLogger().error("parse error", getParsingErrorMessage(line), "line:", line);
+              FObject obj = parser.parseString(line);
+              if ( obj == null ) {
+                getLogger().error("Parse error", getParsingErrorMessage(line), "line:", line);
                 continue;
               }
 
               switch ( operation ) {
                 case 'p':
-                  PropertyInfo id = (PropertyInfo) dao.getOf().getAxiomByName("id");
-                  FObject old = dao.find(id.get(object));
-                  if ( old != null ) {
-                    // merge difference
-                    object = mergeFObject(old.fclone(), object);
-                  }
-
-                  dao.put(object);
+                  foam.core.FObject old = dao.find(obj.getProperty("id"));
+                  dao.put(old != null ? mergeFObject(old, obj) : obj);
                   break;
 
                 case 'r':
-                  dao.remove(object);
+                  dao.remove(obj);
                   break;
               }
 
               successReading++;
             } catch ( Throwable t ) {
-              getLogger().error("error replaying journal line:", line, t);
+              getLogger().error("Error replaying journal line:", line, t);
             }
           }
         } catch ( Throwable t) {
-          getLogger().error("failed to read from journal", t);
+          getLogger().error("Failed to read from journal", t);
         } finally {
           getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename());
         }
