@@ -190,12 +190,12 @@ foam.CLASS({
 
     function setPortalView(group) {
       // Replaces contents of top navigation and footer view with group views
-      this.topNavigation_.replaceChild(
+      this.topNavigation_ && this.topNavigation_.replaceChild(
         foam.lookup(group.topNavigation).create(null, this),
         this.topNavigation_.children[0]
       );
 
-      this.footerView_.replaceChild(
+      this.footerView_ && this.footerView_.replaceChild(
         foam.lookup(group.footerView).create(null, this),
         this.footerView_.children[0]
       );
