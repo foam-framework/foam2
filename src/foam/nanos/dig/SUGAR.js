@@ -11,17 +11,12 @@ foam.CLASS({
   documentation: 'Service Unified GAteway Relay - Perform non-DAO operations against a web service',
 
   tableColumns: [
-    //'id',
+    'id',
     'serviceKey',
     'method'
   ],
 
   requires: [
-    //'foam.core.Argument',
-//    //'foam.core.Method'
-//    'foam.core.AbstractMethod',
-    //'foam.java.Argument',
-    //'foam.java.Method'
     'foam.nanos.dig.Argument'
   ],
 
@@ -32,7 +27,11 @@ foam.CLASS({
   `,
 
   properties: [
-    //'id',
+    {
+      class: 'String',
+      name: 'id',
+      displayWidth: 40
+    },
     {
       class: 'String',
       name: 'serviceKey',
@@ -45,8 +44,7 @@ foam.CLASS({
             .orderBy(foam.nanos.boot.NSpec.ID),
           objToChoice: function(nspec) {
             return [nspec.id, nspec.id];
-          },
-          index: 1
+          }
         });
       },
       postSet: function() {
@@ -57,8 +55,31 @@ foam.CLASS({
         var of = this.lookup(service.cls_.getAxiomByName('delegate').of);
 
         if ( ! of ) return;
+
         this.interfaceName = of.id.toString();
 
+        var methods = of.getOwnAxiomsByClass(foam.core.Method);
+        //var methodName = methods.map(function(m) { return m.name; }).sort();
+
+        var filteredMethod =
+          methods.filter(function(fm) {
+            for ( var j = 0; j < fm.args.length; j++ ) {
+               if ( fm.args[j].javaType.toString() == "foam.core.X" ) {
+                  return false;
+               }
+               return true;
+             }
+          }).map(function(m) { return m.name; }).sort();
+
+        if ( filteredMethod.length > 0) {
+          for ( var i = 0; i < methods.length; i++ ) {
+            if ( methods[i].name == filteredMethod[0] ) {
+              this.argumentInfo = methods[i].args;
+            }
+          }
+        } else {
+          this.argumentInfo = null;
+        }
       }
     },
     {
@@ -76,20 +97,19 @@ foam.CLASS({
           if ( ! of ) return;
 
           var methods = of.getOwnAxiomsByClass(foam.core.Method);
-          var methodNames = methods.map(function(m) { return m.name; }).sort();
+          //var methodNames = methods.map(function(m) { return m.name; }).sort();
 
-//          var filteredMethod =
-//          methods.filter(function(fm) {
-//            for ( var j = 0; j < fm.args.length; j++ ) {
-//               if ( fm.args[j].javaType.toString() == "foam.core.X" ) {
-//               //alert(fm.name + "___" + fm.args[j].javaType.toString());
-//                  return false;
-//               }
-//               return true;
-//             }
-//          }).map(function(m) { return m.name; }).sort();
+          var filteredMethod =
+            methods.filter(function(fm) {
+              for ( var j = 0; j < fm.args.length; j++ ) {
+                 if ( fm.args[j].javaType.toString() == "foam.core.X" ) {
+                    return false;
+                 }
+                 return true;
+               }
+            }).map(function(m) { return m.name; }).sort();
 
-          return foam.u2.view.ChoiceView.create({choices: methodNames, data$: this.method$});
+          return foam.u2.view.ChoiceView.create({choices: filteredMethod, data$: this.method$});
         });
       },
       postSet: function(old, nu) {
@@ -107,12 +127,10 @@ foam.CLASS({
 
           for ( var i = 0; i < methods.length; i++ ) {
             if ( methods[i].name == this.method ) {
-              this.argumentInfo = methods[i].args;
-              //this.argumentInfo[0].sub(function() { console.log('****** arg update'); });
 
-//              for ( var j = 0; j < methods[i].args.length; j++ ) {
-//                data += methods[i].args[j].name + " : " + methods[i].args[j].javaType + "\n";
-//              }
+              if ( methods[i].args.length > 0 )
+                this.argumentInfo = methods[i].args;
+              else this.argumentInfo = "";
             }
           }
         }
@@ -120,9 +138,9 @@ foam.CLASS({
     },
     {
       class: 'FObjectArray',
-      //of: 'foam.java.Argument',
       of: 'foam.nanos.dig.Argument',
       name: 'argumentInfo',
+      documentation: 'Set the arguments Info of the method',
       postSet: function() {
       var self = this;
 
@@ -177,38 +195,25 @@ foam.CLASS({
           url += "method=" + method;
         }
 
-        //if ( flag ) {
-          for ( let j = 0 ; j < argumentInfo.length ; j++ ) {
-          var newUrl = "";
-          var index;
+        for ( let j = 0 ; j < argumentInfo.length ; j++ ) {
+        var newUrl = "";
+        var index;
 
-            argumentInfo[j].sub(function(ai) {
-              //alert("ai : " + ai.src.instance_.value);
-              //alert("*** url *** : " + url);
-              //if( ai.src.instance_.value ) {
-              index = j;
+          argumentInfo[j].sub(function(ai) {
+            index = j;
 
-              if ( ai ) {
-                newUrl += query ? "&" : "?";
-                query = true;
-                newUrl = ai.src.instance_.name + "=" + ai.src.instance_.value;
+            if ( ai ) {
+              newUrl += query ? "&" : "?";
+              query = true;
+              newUrl = ai.src.instance_.name + "=" + ai.src.instance_.value;
 
-                console.log("newUrl : " + newUrl);
-              }
-
-              //}
-            });
-
-            //alert(j + "   hhhhhh");
-            //console.log(argumentInfo[j].private_.contextParent.instance_.argumentInfo[j]);
-            //console.log(argumentInfo[j]);
-            //alert(j);
-          }
-        //}
+              console.log("newUrl : " + newUrl);
+            }
+          });
+        }
 
         if ( flag ) {  // use this flag to give a change event on purpose for argumentInfo (FObjectArray)
           for ( let k = 0 ; k < argumentInfo.length ; k++ ) {
-            //url += query ? "&" : "?";
             query = true;
 
             if ( k == Number(index) ) url += newUrl;
@@ -220,7 +225,6 @@ foam.CLASS({
           }
         } else { // use this flag to give a change event for argumentInfo (FObjectArray)
           for ( let k = 0 ; k < argumentInfo.length ; k++ ) {
-            //url += query ? "&" : "?";
             query = true;
 
             if ( k == Number(index) ) url += newUrl;
@@ -231,8 +235,6 @@ foam.CLASS({
             }
           }
         }
-
-        //console.log("url : " + url);
 
         return encodeURI(url);
       }

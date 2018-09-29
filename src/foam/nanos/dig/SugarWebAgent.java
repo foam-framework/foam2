@@ -1,5 +1,7 @@
 package foam.nanos.dig;
 
+import foam.lib.json.JSONParser;
+import foam.lib.json.OutputterMode;
 import foam.nanos.http.WebAgent;
 import foam.core.X;
 import foam.nanos.logger.Logger;
@@ -14,6 +16,7 @@ import foam.nanos.http.HttpParameters;
 import javax.servlet.ServletException;
 import java.nio.CharBuffer;
 import foam.util.SafetyUtil;
+import foam.lib.json.Outputter;
 
 import java.lang.reflect.*;
 
@@ -75,30 +78,21 @@ public class SugarWebAgent
             //if ( (Object) paramTypes[j] instanceof java.lang.String) {
             if (pArray[j].getType().getCanonicalName().equals("double")){
               arglist[j] = Double.parseDouble(p.getParameter(pArray[j].getName()));
-              System.out.println(j + "  doubledddd");
-            } else if ( pArray[j].getType().getCanonicalName().equals("int") ){
-              System.out.println(j + "  instanceOf int");
+            } else if ( pArray[j].getType().getCanonicalName().equals("int") ) {
               arglist[j] = Integer.parseInt(p.getParameter(pArray[j].getName()));
-            } else if ( pArray[j].getType().getCanonicalName().equals("boolean") ){
-              System.out.println(j + "  instanceOf boolean");
+            } else if ( pArray[j].getType().getCanonicalName().equals("boolean") ) {
               arglist[j] = Boolean.parseBoolean(p.getParameter(pArray[j].getName()));
             } else if ( pArray[j].getType().getCanonicalName().equals("long") ){
-              System.out.println(j + "  instanceOf long");
               arglist[j] = Long.parseLong(p.getParameter(pArray[j].getName()));
             } else if ( paramTypes[j].isInstance("java.lang.String") ) {
-              System.out.println(j + "  instanceOf String");
               arglist[j] = p.getParameter(pArray[j].getName());
             } else if ( paramTypes[j].isInstance("java.lang.Double") ){
-              System.out.println(j + "  instanceOf java.lang.Double");
               arglist[j] = p.getParameter(pArray[j].getName());
             } else if ( paramTypes[j].isInstance("java.lang.Long")  ){
-              System.out.println(j + "  instanceOf ava.lang.Long");
               arglist[j] = p.getParameter(pArray[j].getName());
             } else if ( paramTypes[j].isInstance("java.lang.Integer") ) {
-              System.out.println(j + "  instancesOf java.lang.Integer");
               arglist[j] = p.getParameter(pArray[j].getName());
             } else if ( paramTypes[j].isInstance("java.lang.Number") ) {
-              System.out.println(j + "  instancesOf java.lang.Number");
               arglist[j] = p.getParameter(pArray[j].getName());
             } else {
               System.out.println(j + "  else else");
@@ -157,15 +151,31 @@ public class SugarWebAgent
 //        }
 //      }
 
-      //net.nanopay.fx.localfx.LocalFXServiceAdapter localFXService = (net.nanopay.fx.localfx.LocalFXServiceAdapter) x.get("localFXService");
+      net.nanopay.fx.FXService fxService = (net.nanopay.fx.FXService) x.get("localFXService");
+      //fxService = (FXService) x.get("localFXService"); fxService.getFXRate
       // **********
       try {
         Method mm1 = c.getDeclaredMethod(methodName, paramTypes);
         mm1.setAccessible(true);
-        mm1.invoke(x.get(serviceName), arglist);
-        //mm1.invoke(localFXService, arglist);
+        //mm1.invoke(x.get(serviceName), arglist);
 
-        out.println(mm1.invoke(x.get(serviceName), arglist));
+        mm1.invoke(fxService, arglist);
+        //out.println(mm1.invoke(x.get(serviceName), arglist));
+
+        JSONParser jsonParser = new JSONParser();
+        jsonParser.setX(x);
+        resp.setContentType("application/json");
+
+        Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+        outputterJson.setOutputDefaultValues(true);
+        outputterJson.setOutputClassNames(true);
+
+        //outputterJson.output(mm1.invoke(x.get(serviceName), arglist));
+        //outputterJson.output(mm1.invoke(fxService, arglist));
+
+        out.println(fxService.getFXRate("CAD", "INR", 2000, "selling", "2018-09-10T18:58:20Z"));
+        out.println(outputterJson);
+
       } catch (InvocationTargetException e) {
         logger.error(e);
         System.out.println("InvocationTargetException: " + e.getTargetException().getMessage());
