@@ -240,16 +240,16 @@ foam.CLASS({
 
   methods: [
     function output(out) {
-      console.error('Outputting unloaded element can cause event/binding bugs.', this.cls_.id);
+      this.__context__.warn('Outputting unloaded element can cause event/binding bugs.', this.cls_.id);
       this.state = this.OUTPUT;
       this.output_(out);
       return out;
     },
     function load() {
-      this.error('Must output before loading.');
+      this.__context__.warn('Must output before loading.');
     },
     function unload() {
-      this.error('Must output and load before unloading.');
+      this.__context__.warn('Must output before loading.');
     },
     function toString() { return 'UNLOADED'; }
   ]
@@ -346,7 +346,7 @@ foam.CLASS({
       this.__context__.warn('Duplicate output.');
       return this.UNLOADED.output.call(this, out);
     },
-    function load() { this.error('Duplicate load.'); },
+    function load() { this.__console__.warn('Duplicate load.'); },
     function unload() {
       if ( ! this.parentNode || this.parentNode.state === this.LOADED ) {
         var e = this.el();
