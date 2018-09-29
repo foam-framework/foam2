@@ -17,13 +17,13 @@ foam.CLASS({
       type: 'String',
       name: 'USER_DAO_PUT',
       documentation: 'UserDAO expected put line',
-      value: `userDAO.p({"class":"foam.nanos.auth.User","id":1000,"firstName":"Kirk","lastName":"Eaton","disabledTopics":[],"disabledTopicsEmail":[],"additionalDocuments":[],"principalOwners":[],"transactionLimits":[]})`
+      value: `userDAO.p({"class":"foam.nanos.auth.User","id":1000,"firstName":"Kirk","lastName":"Eaton"})`
     },
     {
       type: 'String',
       name: 'GROUP_DAO_PUT',
       documentation: 'GroupDAO expected put line',
-      value: `groupDAO.p({"class":"foam.nanos.auth.Group","id":"admin","enabled":true,"permissions":[]})`
+      value: `groupDAO.p({"class":"foam.nanos.auth.Group","id":"admin","enabled":true})`
 
     }
   ],
