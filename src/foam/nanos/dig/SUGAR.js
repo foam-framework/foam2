@@ -52,6 +52,8 @@ foam.CLASS({
 
         if ( ! service ) return;
 
+        if ( ! service.cls_.getAxiomByName('delegate') ) return;
+
         var of = this.lookup(service.cls_.getAxiomByName('delegate').of);
 
         if ( ! of ) return;
@@ -92,6 +94,8 @@ foam.CLASS({
 
           if ( ! service ) return;
 
+          if ( ! service.cls_.getAxiomByName('delegate') ) return;
+
           var of = this.lookup(service.cls_.getAxiomByName('delegate').of);
 
           if ( ! of ) return;
@@ -118,6 +122,8 @@ foam.CLASS({
           var service = this.__context__[this.serviceKey];
 
           if ( ! service ) return;
+
+          if ( ! service.cls_.getAxiomByName('delegate') ) return;
 
           var of = this.lookup(service.cls_.getAxiomByName('delegate').of);
 
