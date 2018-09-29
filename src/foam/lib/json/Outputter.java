@@ -15,6 +15,7 @@ import foam.util.SafetyUtil;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
@@ -252,8 +253,9 @@ public class Outputter
     if ( ! outputDefaultValues_ && ! prop.isSet(fo) ) return false;
 
     Object value = prop.get(fo);
-
-    if ( value == null ) return false;
+    if ( value == null || ( isArray(value) && Array.getLength(value) == 0 ) ) {
+      return false;
+    }
 
     if ( includeComma ) writer_.append(",");
     outputProperty(fo, prop);
