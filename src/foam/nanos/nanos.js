@@ -69,6 +69,7 @@ FOAM_FILES([
   { name: "foam/nanos/session/Session" },
   { name: "foam/nanos/menu/AbstractMenu" },
   { name: "foam/nanos/menu/DAOMenu" },
+  { name: "foam/nanos/menu/DocumentMenu" },
   { name: "foam/nanos/menu/LinkMenu" },
   { name: "foam/nanos/menu/ListMenu" },
   { name: "foam/nanos/menu/Menu" },
