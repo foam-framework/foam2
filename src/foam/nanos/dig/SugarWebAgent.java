@@ -2,23 +2,19 @@ package foam.nanos.dig;
 
 import foam.lib.json.JSONParser;
 import foam.lib.json.OutputterMode;
+import foam.nanos.dig.exception.*;
 import foam.nanos.http.WebAgent;
 import foam.core.X;
 import foam.nanos.logger.Logger;
 import java.io.*;
-import foam.dao.AbstractSink;
-import foam.dao.DAO;
-import foam.nanos.boot.NSpec;
-import foam.core.Detachable;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import foam.nanos.http.HttpParameters;
-import javax.servlet.ServletException;
 import java.nio.CharBuffer;
 import foam.util.SafetyUtil;
 import foam.lib.json.Outputter;
-
+import java.lang.Exception;
 import java.lang.reflect.*;
+import java.lang.Exception;
 
 public class SugarWebAgent
   implements WebAgent
@@ -36,16 +32,27 @@ public class SugarWebAgent
     String              interfaceName  = p.getParameter("interfaceName");
 
     try {
-      if ( !SafetyUtil.isEmpty(serviceName) ) {
-        //outputPage(x);
+      if ( SafetyUtil.isEmpty(serviceName) ) {
+        DigErrorMessage error = new EmptyParameterException.Builder(x)
+          .setMessage("Empty Service Key")
+          .build();
+        outputException(x, resp, "JSON", out, error);
+
+        return;
+      }
+
+      if ( SafetyUtil.isEmpty(methodName) ) {
+        DigErrorMessage error = new EmptyParameterException.Builder(x)
+          .setMessage("Empty Method Name")
+          .build();
+        outputException(x, resp, "JSON", out, error);
+
+        return;
       }
 
       Class c = Class.forName(interfaceName);
-      //Object objClass = c.newInstance();
 
       Method m[] = c.getMethods();  // get Methods' List
-      //c.getMethod(methodName, ).invoke();
-
 
       Class[] paramTypes = null; // for picked Method's parameters' types
       Object arglist[] = null; // to store each parameters' values
@@ -53,8 +60,8 @@ public class SugarWebAgent
       for ( int k = 0; k < m.length; k++ ) {
         if ( m[k].getName().equals(methodName) ) { //found picked Method
 
-          System.out.println("service : " + serviceName);
-          System.out.println("methodName : " + m[k].getName());
+          logger.debug("service : " + serviceName);
+          logger.debug("methodName : " + m[k].getName());
 
           Parameter[] pArray = m[k].getParameters();
           paramTypes = new Class[pArray.length];
@@ -63,104 +70,52 @@ public class SugarWebAgent
           for ( int j = 0; j < pArray.length; j++ ) {
             paramTypes[j] = pArray[j].getType();
 
-            if (!pArray[j].isNamePresent()) {
-              throw new IllegalArgumentException("No defined parameter name");
+            if ( ! pArray[j].isNamePresent() ) {
+              DigErrorMessage error = new GeneralException.Builder(x)
+                .setMessage("IllegalArgumentException : Add a compiler argument")
+                .build();
+              outputException(x, resp, "JSON", out, error);
+
+              return;
             }
 
             paramTypes[j] = pArray[j].getType();
             arglist[j] = p.getParameter(pArray[j].getName());
 
-            System.out.println(pArray[j].getName() + " :   " + p.getParameter(pArray[j].getName()));
-            System.out.println("pArray[j].getType() :   " + pArray[j].getType().getCanonicalName());
-            System.out.println("arglist :   " + j + "   " + arglist[j]);
-            System.out.println(" paramTypes[j] : " + paramTypes[j].isPrimitive());
+            logger.debug(pArray[j].getName() + " :   " + p.getParameter(pArray[j].getName()));
+            logger.debug("pArray[j].getType() :   " + pArray[j].getType().getCanonicalName());
+            logger.debug("arglist :   " + j + "   " + arglist[j]);
+            logger.debug(" paramTypes[j] : " + paramTypes[j].isPrimitive());
 
-            //if ( (Object) paramTypes[j] instanceof java.lang.String) {
-            if (pArray[j].getType().getCanonicalName().equals("double")){
+            if (pArray[j].getType().getCanonicalName().equals("double"))
               arglist[j] = Double.parseDouble(p.getParameter(pArray[j].getName()));
-            } else if ( pArray[j].getType().getCanonicalName().equals("int") ) {
+            else if ( pArray[j].getType().getCanonicalName().equals("int") )
               arglist[j] = Integer.parseInt(p.getParameter(pArray[j].getName()));
-            } else if ( pArray[j].getType().getCanonicalName().equals("boolean") ) {
+            else if ( pArray[j].getType().getCanonicalName().equals("boolean") )
               arglist[j] = Boolean.parseBoolean(p.getParameter(pArray[j].getName()));
-            } else if ( pArray[j].getType().getCanonicalName().equals("long") ){
+            else if ( pArray[j].getType().getCanonicalName().equals("long") )
               arglist[j] = Long.parseLong(p.getParameter(pArray[j].getName()));
-            } else if ( paramTypes[j].isInstance("java.lang.String") ) {
+            else if ( paramTypes[j].isInstance("java.lang.String") )
               arglist[j] = p.getParameter(pArray[j].getName());
-            } else if ( paramTypes[j].isInstance("java.lang.Double") ){
-              arglist[j] = p.getParameter(pArray[j].getName());
-            } else if ( paramTypes[j].isInstance("java.lang.Long")  ){
-              arglist[j] = p.getParameter(pArray[j].getName());
-            } else if ( paramTypes[j].isInstance("java.lang.Integer") ) {
-              arglist[j] = p.getParameter(pArray[j].getName());
-            } else if ( paramTypes[j].isInstance("java.lang.Number") ) {
-              arglist[j] = p.getParameter(pArray[j].getName());
-            } else {
-              System.out.println(j + "  else else");
+            else {
+              DigErrorMessage error = new GeneralException.Builder(x)
+                .setMessage("Parameter Type Exception")
+                .build();
+              outputException(x, resp, "JSON", out, error);
+
+              return;
             }
+
           }
-
-
-
-
-
-//          for ( Parameter parameter : pArray ) {
-//            if( ! parameter.isNamePresent() ) {
-//              throw new IllegalArgumentException("No defined parameter name");
-//            }
-//
-//            //String parameterName = parameter.getName();
-//            //System.out.println("parameterName : " +  parameterName);
-//
-//            paramTypes = parameter.getType();
-//
-//            System.out.println(parameter.getName() + " :   " + p.getParameter(parameter.getName()));
-//            System.out.println("parameter.getType() :   " + parameter.getType());
-//          }
-
-//          for ( paramTypes[j] = pArray[j].getType(); ) {
-//
-//          }
         }
       }
-//            for ( int j = 0; j < pArray.length; j++ ) {
-//              paramTypes[j] = pArray[j].getType();
-//
-//              if ( ! pArray[j].isNamePresent() ) {
-//                throw new IllegalArgumentException("No defined parameter name");
-//              }
-//
-//              paramTypes[j] = pArray[j].getType();
-//
-//              System.out.println(pArray[j].getName() + " :   " + p.getParameter(pArray[j].getName()));
-//              System.out.println("pArray[j].getType() :   " + pArray[j].getType());
-//
-//              System.out.println("ParamTypes : " +  paramTypes[j]);
-//
-//              System.out.println("Paratmeter Type : " +  pArray[j].getType());
-//              System.out.println("Paratmeter Name : " +  pArray[j].getName());
-//              System.out.println("m[k].getParameterCount() : " +  m[k].getParameterCount());
-//
-//              for(Parameter parameter : pArray) {
-////                if(!parameter.isNamePresent()) {
-////                  throw new IllegalArgumentException("error !!");
-////                }
-//                String parameterName = parameter.getName();
-//                System.out.println("parameterName : " +  parameterName);
-//              }
-//            }
-//        }
-//      }
 
-      net.nanopay.fx.FXService fxService = (net.nanopay.fx.FXService) x.get("localFXService");
-      //fxService = (FXService) x.get("localFXService"); fxService.getFXRate
-      // **********
       try {
         Method mm1 = c.getDeclaredMethod(methodName, paramTypes);
         mm1.setAccessible(true);
-        //mm1.invoke(x.get(serviceName), arglist);
+        mm1.invoke(x.get(serviceName), arglist);
 
-        mm1.invoke(fxService, arglist);
-        //out.println(mm1.invoke(x.get(serviceName), arglist));
+        out.println(mm1.invoke(x.get(serviceName), arglist));
 
         JSONParser jsonParser = new JSONParser();
         jsonParser.setX(x);
@@ -170,47 +125,49 @@ public class SugarWebAgent
         outputterJson.setOutputDefaultValues(true);
         outputterJson.setOutputClassNames(true);
 
-        //outputterJson.output(mm1.invoke(x.get(serviceName), arglist));
-        //outputterJson.output(mm1.invoke(fxService, arglist));
-
-        out.println(fxService.getFXRate("CAD", "INR", 2000, "selling", "2018-09-10T18:58:20Z"));
+        outputterJson.output(mm1.invoke(x.get(serviceName), arglist));
         out.println(outputterJson);
 
       } catch (InvocationTargetException e) {
         logger.error(e);
-        System.out.println("InvocationTargetException: " + e.getTargetException().getMessage());
+
+        DigErrorMessage error = new GeneralException.Builder(x)
+          .setMessage("InvocationTargetException: " + e.getTargetException().getMessage())
+          .build();
+        outputException(x, resp, "JSON", out, error);
+
         return;
       } catch (Exception e) {
         logger.error(e);
-        System.out.println("Error Message : " + e.getMessage());
+
+        DigErrorMessage error = new GeneralException.Builder(x)
+          .setMessage("Exception: " + e.getMessage())
+          .build();
+        outputException(x, resp, "JSON", out, error);
+
         return;
-      }
-      // **********
-
-
-      for ( int i = 0; i < x.get(serviceName).getClass().getMethods().length; i++ ) {
-        if ( x.get(serviceName).getClass().getMethods()[i].getName().equals(methodName) ) {
-          for ( int j = 0; j < x.get(serviceName).getClass().getMethods()[i].getParameterCount(); j++ ) {
-            System.out.println("here I am");
-            System.out.println("j : " + x.get(serviceName).getClass().getMethods()[j].getParameterCount());
-
-            if ( x.get(serviceName).getClass().getMethods()[j].getParameterCount() > 0 )
-            System.out.println("j Name : " + x.get(serviceName).getClass().getMethods()[j].getParameters()[j].getName());
-          }
-        }
-
-//        System.out.println("getMethods[] : " + x.get("exchangeRate").getClass().getMethods()[i]);
-//        System.out.println("getName : " + x.get("exchangeRate").getClass().getMethods()[i].getName());
-//        System.out.println("getParameterTypes : " + x.get("exchangeRate").getClass().getMethods()[i].getParameterTypes());
-//        System.out.println("getGenericParameterTypes : " + x.get("exchangeRate").getClass().getMethods()[i].getGenericParameterTypes());
-//        System.out.println("getParameterCount : " + x.get("exchangeRate").getClass().getMethods()[i].getParameterCount());
-//        System.out.println("getReturnType : " + x.get("exchangeRate").getClass().getMethods()[i].getReturnType());
-        //System.out.println("ParamName : " + x.get("exchangeRate").getClass().getMethods()[i].getParameters());
       }
     } catch (Exception e) {
       logger.error(e);
 
       return;
+    }
+  }
+
+  protected void outputException(X x, HttpServletResponse resp, String format, PrintWriter out, DigErrorMessage error) {
+    resp.setStatus(Integer.parseInt(error.getStatus()));
+    format = "JSON";  // Currently supporting only JSON
+
+    if ( format.equals("JSON") ) {
+      JSONParser jsonParser = new JSONParser();
+      jsonParser.setX(x);
+
+      Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+      outputterJson.setOutputDefaultValues(true);
+      outputterJson.setOutputClassNames(true);
+      outputterJson.output(error);
+
+      out.println(outputterJson.toString());
     }
   }
 }

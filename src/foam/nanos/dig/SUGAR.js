@@ -77,10 +77,12 @@ foam.CLASS({
           for ( var i = 0; i < methods.length; i++ ) {
             if ( methods[i].name == filteredMethod[0] ) {
               this.argumentInfo = methods[i].args;
+              this.hiddenMethod = methods[i].name;
             }
           }
         } else {
           this.argumentInfo = null;
+          this.hiddenMethod = "";
         }
       }
     },
@@ -133,6 +135,7 @@ foam.CLASS({
 
           for ( var i = 0; i < methods.length; i++ ) {
             if ( methods[i].name == this.method ) {
+              this.hiddenMethod = methods[i].name;
 
               if ( methods[i].args.length > 0 )
                 this.argumentInfo = methods[i].args;
@@ -171,6 +174,13 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'flag',
+      documentation: 'to give a change event for argumentInfo',
+      hidden: true
+    },
+    {
+      class: 'String',
+      name: 'hiddenMethod',
+      documentation: 'to use for a url',
       hidden: true
     },
     {
@@ -181,7 +191,7 @@ foam.CLASS({
       displayWidth: 120,
       view: 'foam.nanos.dig.LinkView',
       setter: function() {}, // Prevent from ever getting set
-      expression: function(serviceKey, method, interfaceName, argumentInfo, flag) {
+      expression: function(serviceKey, method, interfaceName, argumentInfo, flag, hiddenMethod) {
         var query = false;
         var url = "/service/sugar";
 
@@ -195,25 +205,23 @@ foam.CLASS({
           query = true;
           url += "interfaceName=" + interfaceName;
         }
-        if ( method ) {
+        if ( hiddenMethod ) {
           url += query ? "&" : "?";
           query = true;
-          url += "method=" + method;
+          url += "method=" + hiddenMethod;
         }
 
         for ( let j = 0 ; j < argumentInfo.length ; j++ ) {
-        var newUrl = "";
+        var paramUrl = "";
         var index;
 
           argumentInfo[j].sub(function(ai) {
             index = j;
 
             if ( ai ) {
-              newUrl += query ? "&" : "?";
+              paramUrl += query ? "&" : "?";
               query = true;
-              newUrl = ai.src.instance_.name + "=" + ai.src.instance_.value;
-
-              console.log("newUrl : " + newUrl);
+              paramUrl = ai.src.instance_.name + "=" + ai.src.instance_.value;
             }
           });
         }
@@ -222,7 +230,7 @@ foam.CLASS({
           for ( let k = 0 ; k < argumentInfo.length ; k++ ) {
             query = true;
 
-            if ( k == Number(index) ) url += newUrl;
+            if ( k == Number(index) ) url += paramUrl;
 
             if ( argumentInfo[k].value != "") {
               url += query ? "&" : "?";
@@ -233,7 +241,7 @@ foam.CLASS({
           for ( let k = 0 ; k < argumentInfo.length ; k++ ) {
             query = true;
 
-            if ( k == Number(index) ) url += newUrl;
+            if ( k == Number(index) ) url += paramUrl;
 
             if ( argumentInfo[k].value != "") {
               url += query ? "&" : "?";
