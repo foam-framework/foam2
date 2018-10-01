@@ -18,7 +18,7 @@
 /**
   Parse combinator library.
 
-  Create complex parsers by composing simple parsers.s
+  Create complex parsers by composing simple parsers.
 
   A PStream is a "Parser Stream", the input format accepted by
   FOAM parsers.
