@@ -72,8 +72,9 @@ foam.CLASS({
       name: 'put_',
       synchronized: true,
       javaCode: `
+        foam.core.FObject old = super.find_(x, obj.getProperty("id"));
         foam.core.FObject result = super.put_(x, obj);
-        getJournal().put(x, result);
+        getJournal().put_(x, old, result);
         return result;
       `
     },
