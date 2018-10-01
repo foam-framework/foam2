@@ -35,7 +35,7 @@ return view$title as? String ?? ""
       swiftExpressionArgs: ['view$view', 'title', 'backgroundColor'],
       swiftExpression: function() {/*
 let vc = VC_()
-vc.innerView = view$view as! UIView
+vc.innerView = view$view as? UIView
 vc.title = title
 vc.backgroundColor = backgroundColor
 return vc

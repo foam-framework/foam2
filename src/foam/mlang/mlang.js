@@ -85,11 +85,8 @@ foam.INTERFACE({
   package: 'foam.mlang',
   name: 'Expr',
   implements: [
+    'foam.dao.SQLStatement',
     'foam.mlang.F',
-    {
-      path: 'foam.dao.SQLStatement',
-      flags: ['js', 'java'],
-    },
   ],
 
   documentation: 'Expr interface extends F interface: partialEval -> Expr.',
@@ -313,7 +310,8 @@ foam.CLASS({
     {
       name: 'createStatement',
       returns: 'String',
-      javaCode: 'return "";'
+      javaCode: 'return "";',
+      swiftCode: 'return "";',
     },
     {
       name: 'prepareStatement',
@@ -325,7 +323,8 @@ foam.CLASS({
           javaType: 'foam.dao.pg.IndexedPreparedStatement'
         }
       ],
-      javaCode: '//noop'
+      javaCode: '//noop',
+      swiftCode: '//noop'
     }
   ]
 });
@@ -1241,9 +1240,9 @@ foam.CLASS({
 
         return rhs ? rhs.indexOf(lhs) !== -1 : false;
       },
-      swiftCode:
-`let lhs = (arg1 as! foam_mlang_Expr).f(obj)
-let rhs = (arg2 as! foam_mlang_Expr).f(obj)
+      swiftCode: `
+let lhs = arg1!.f(obj)
+let rhs = arg2!.f(obj)
 if ( rhs == nil ) {
   return false
 }
@@ -1258,7 +1257,8 @@ if let values = rhs as? [Any] {
   return rhsStr.contains(lhsStr)
 }
 
-return false`,
+return false
+      `,
       javaCode:
   `
   Object lhs = getArg1().f(obj);
@@ -1535,8 +1535,8 @@ foam.CLASS({
         return ( v1 === undefined && v2 === null ) || foam.util.equals(v1, v2);
       },
       swiftCode: `
-let v1 = (arg1 as! foam_mlang_Expr).f(obj)
-let v2 = (arg2 as! foam_mlang_Expr).f(obj)
+let v1 = arg1!.f(obj)
+let v2 = arg2!.f(obj)
 return FOAM_utils.equals(v1, v2)
       `,
       javaCode: 'return foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))==0;'
@@ -1594,8 +1594,8 @@ foam.CLASS({
         return ! foam.util.equals(this.arg1.f(o), this.arg2.f(o));
       },
       swiftCode: `
-let v1 = (arg1 as! foam_mlang_Expr).f(obj)
-let v2 = (arg2 as! foam_mlang_Expr).f(obj)
+let v1 = arg1!.f(obj)
+let v2 = arg2!.f(obj)
 return !FOAM_utils.equals(v1, v2)
 `,
       javaCode: 'return foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))!=0;'
@@ -1983,7 +1983,7 @@ foam.CLASS({
       returns: 'Any',
       args: [ { name: 'obj', type: 'Any' } ],
       code: function f(obj) { return this.arg1.f(obj); },
-      swiftCode: `return (arg1 as? foam_mlang_Expr)?.f(obj)`,
+      swiftCode: `return arg1?.f(obj)`,
       javaCode: `return getArg1().f(obj);`
     },
 
@@ -2532,7 +2532,7 @@ foam.CLASS({
         }
       },
       swiftCode: `
-        let arg1 = self.arg1 as! foam_mlang_Expr
+        let arg1 = self.arg1!
         if !hasOwnProperty("value") || FOAM_utils.compare(value, arg1.f(obj)) < 0 {
           value = arg1.f(obj);
         }

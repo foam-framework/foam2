@@ -131,16 +131,17 @@ foam.CLASS({
             });
 
         var classes = [];
-        var output = [];
         for (var i = 0; i < models.length; i++) {
           var cls = self.lookup(models[i], self);
           var swiftClass = cls.toSwiftClass();
           if (swiftClass.getMethod && swiftClass.getMethod('classInfo')) {
             classes.push(swiftClass.name);
           }
-          output.push(swiftClass.toSwiftSource());
+          var fileName = self.outdir + sep + cls.id.replace(/\./g, '_') + '.swift';
+          self.fs.writeFileSync(
+              fileName,
+              swiftClass.toSwiftSource());
         }
-        self.fs.writeFileSync(self.outdir + sep + 'ALL_CLASSES.swift', output.join('\n'));
         var regClass = self.SwiftClass.create({
           type: 'extension',
           name: 'FOAM_utils',

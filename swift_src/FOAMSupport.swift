@@ -72,6 +72,11 @@ extension PropertyInfo {
     }
     return FOAM_utils.compare(get(fo1), get(fo2))
   }
+  public func createStatement() -> String {
+    return ""
+  }
+  public func prepareStatement(_ stmt: Any?) {
+  }
 }
 
 public protocol JSONOutputter {
@@ -214,7 +219,7 @@ public class Subscription: foam_core_Detachable {
   }
 }
 
-public protocol foam_core_FObject: class, foam_core_Detachable, Topic, JSONOutputter {
+public protocol foam_core_FObject: foam_core_Detachable, Topic, JSONOutputter {
   func ownClassInfo() -> ClassInfo
   func set(key: String, value: Any?)
   func get(key: String) -> Any?
