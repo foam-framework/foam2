@@ -33,7 +33,8 @@ foam.CLASS({
       name: 'init',
       javaReturns: 'void',
       args: [ { name: 'config', javaType: 'javax.servlet.ServletConfig' } ],
-      javaCode: 'setServletConfig(config);'
+      javaCode: 'setServletConfig(config);',
+      code: function() { }
     },
     {
       name: 'service',
