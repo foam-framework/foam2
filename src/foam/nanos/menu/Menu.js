@@ -29,7 +29,18 @@ foam.CLASS({
       class: 'FObjectProperty',
       name: 'handler',
       documentation: 'View initialized when menu is launched.',
-      view: { class: 'foam.u2.view.FObjectView' }
+      view: {
+        class: 'foam.u2.view.FObjectView',
+        choices: [
+          [ 'foam.nanos.menu.DAOMenu',      'DAO' ],
+          [ 'foam.nanos.menu.DocumentMenu', 'Document' ],
+          [ 'foam.nanos.menu.LinkMenu',     'Link' ],
+          [ 'foam.nanos.menu.ListMenu',     'List' ],
+          [ 'foam.nanos.menu.SubMenu',      'Submenu' ],
+          [ 'foam.nanos.menu.TabsMenu',     'Tabs' ],
+          [ 'foam.nanos.menu.ViewMenu',     'View' ]
+        ]
+      }
     },
     {
       class: 'Int',
