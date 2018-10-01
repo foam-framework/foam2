@@ -269,6 +269,20 @@ foam.LIB({
 foam.INTERFACE({
   package: 'foam.dao',
   name: 'ManyToManyRelationship',
+  properties: [
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'junctionDAO',
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'targetDAO',
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'dao',
+    },
+  ],
   methods: [
     {
       name: 'add',
@@ -290,21 +304,12 @@ foam.INTERFACE({
         { name: 'target', of: 'foam.core.FObject' }
       ]
     },
-    // TODO: These should really be properties.
     {
       name: 'getDAO',
-      javaReturns: 'foam.dao.DAO',
-      swiftReturns: 'foam_dao_DAO'
-    },
-    {
-      name: 'getJunctionDAO',
-      javaReturns: 'foam.dao.DAO',
-      swiftReturns: 'foam_dao_DAO'
-    },
-    {
-      name: 'getTargetDAO',
-      javaReturns: 'foam.dao.DAO',
-      swiftReturns: 'foam_dao_DAO'
+      documentation: `
+        This is just an alias for getDao.
+      `,
+      returns: 'foam.dao.DAO',
     },
   ]
 });

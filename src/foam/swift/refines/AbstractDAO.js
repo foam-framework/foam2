@@ -22,6 +22,7 @@ foam.CLASS({
     function writeToSwiftClass(cls, parentCls) {
       if ( ! parentCls.hasOwnAxiom(this.name) ) return;
       this.SUPER(cls, parentCls);
+      if ( foam.core.AbstractInterface.isSubClass(parentCls) ) return;
       cls.fields.push(
         foam.swift.Field.create({
           lazy: true,
