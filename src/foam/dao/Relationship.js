@@ -290,7 +290,6 @@ foam.INTERFACE({
         { name: 'target', of: 'foam.core.FObject' }
       ]
     },
-    // TODO: These should really be properties.
     {
       name: 'getDAO',
       javaReturns: 'foam.dao.DAO',
@@ -350,7 +349,7 @@ foam.CLASS({
     },
     {
       class: 'foam.dao.DAOProperty',
-      name: 'dao',
+      name: 'dao_',
       label: '',
       factory: function() {
         return foam.dao.ReadOnlyDAO.create({
@@ -377,7 +376,7 @@ foam.CLASS({
     },
     {
       class: 'foam.dao.DAOProperty',
-      name: 'junctionDAO',
+      name: 'junctionDAO_',
       hidden: true,
       factory: function() {
         return this.__context__[this.junctionDAOKey];
@@ -387,7 +386,7 @@ foam.CLASS({
     },
     {
       class: 'foam.dao.DAOProperty',
-      name: 'targetDAO',
+      name: 'targetDAO_',
       hidden: true,
       factory: function() {
         return this.__context__[this.targetDAOKey];
@@ -398,6 +397,24 @@ foam.CLASS({
   ],
 
   methods: [
+    {
+      name: 'getJunctionDAO',
+      javaCode: `return getJunctionDAO_();`,
+      swiftCode: `return junctionDAO_;`,
+      code: function() { return this.junctionDAO_; },
+    },
+    {
+      name: 'getTargetDAO',
+      javaCode: `return getTargetDAO_();`,
+      swiftCode: `return targetDAO_;`,
+      code: function() { return this.targetDAO_; },
+    },
+    {
+      name: 'getDAO',
+      javaCode: `return getDao_();`,
+      swiftCode: `return dao_;`,
+      code: function() { return this.dao_; },
+    },
     {
       name: 'add',
       args: [{ name: 'target', of: 'foam.core.FObject' }],
