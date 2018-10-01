@@ -392,13 +392,13 @@ return sink;
       },
       swiftCode: function() {/*
 var sink = sink
-if limit != nil {
+if limit > 0 {
   sink = LimitedSink_create([
     "limit": limit,
     "delegate": sink
   ])
 }
-if skip != nil {
+if skip > 0 {
   sink = SkipSink_create([
     "skip": skip,
     "delegate": sink

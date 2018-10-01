@@ -80,8 +80,8 @@ return resultSink
       name: 'removeAll_',
       swiftCode: `
 let predicate: foam_mlang_predicate_Predicate = predicate ?? True_create()
-var skip: Int = skip ?? 0;
-var limit: Int = limit ?? Int.max
+var skip: Int = skip
+var limit: Int = limit
 
 for (i, o) in array.enumerated() {
   if predicate.f(o) {
