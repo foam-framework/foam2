@@ -20,12 +20,12 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'put',
+      name: 'put_',
       synchronized: true,
       javaCode: `
         try {
           // Since only writing, dispense with id lookup and delta
-          String record = getOutputter().stringify(obj);
+          String record = getOutputter().stringify(nu);
           if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
             write_(sb.get()
               .append("p(")
