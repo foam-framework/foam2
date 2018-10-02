@@ -115,11 +115,6 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'interfaceClass',
-      displayWidth: 80
-    },
-    {
-      class: 'String',
       name: 'boxClass',
       displayWidth: 80
     },
