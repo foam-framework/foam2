@@ -346,7 +346,6 @@ foam.RELATIONSHIP({
   }
 });
 
-
 foam.RELATIONSHIP({
   cardinality: '*:*',
   sourceModel: 'foam.nanos.auth.User',

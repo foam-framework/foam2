@@ -4,11 +4,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
- /*
-  Source user is permitted to act as target user not visa versa.
-  Target user creates the priviledge to allow source user.
-*/
-
 /*
 foam.RELATIONSHIP({
   cardinality: '*:*',
