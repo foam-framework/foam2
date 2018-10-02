@@ -8,24 +8,9 @@ package foam.nanos.auth;
 
 import foam.core.ContextAwareSupport;
 import foam.core.X;
-import foam.dao.ArraySink;
 import foam.dao.DAO;
-import foam.dao.Sink;
-import foam.mlang.MLang;
 import foam.nanos.NanoService;
 import foam.nanos.session.Session;
-import foam.util.Email;
-import foam.util.Password;
-import foam.util.SafetyUtil;
-import foam.nanos.session.Session;
-import foam.nanos.auth.Group;
-import javax.security.auth.AuthPermission;
-import java.security.Permission;
-import java.util.Calendar;
-import java.util.List;
-import foam.nanos.auth.User;
-import foam.nanos.auth.AuthenticationException;
-import foam.nanos.auth.UserUserJunction;
 
 import static foam.mlang.MLang.EQ;
 import static foam.mlang.MLang.AND;

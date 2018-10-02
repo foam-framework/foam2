@@ -21,4 +21,4 @@ build/*
 .*-gensrcs
 nano.log*
 /cronjobs
-logs
+logs/logs
