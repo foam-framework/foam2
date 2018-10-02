@@ -16,7 +16,24 @@ foam.INTERFACE({
           javaType: 'foam.core.X'
         },
         {
-          name: 'obj',
+          name: 'nu',
+          javaType: 'foam.core.FObject'
+        }
+      ]
+    },
+    {
+      name: 'put_',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
+          name: 'old',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'nu',
           javaType: 'foam.core.FObject'
         }
       ]
@@ -54,12 +71,9 @@ foam.INTERFACE({
 foam.CLASS({
   package: 'foam.dao',
   name: 'CompositeJournal',
+  extends: 'foam.dao.AbstractJournal',
 
   documentation: 'Composite journal implementation',
-
-  implements: [
-    'foam.dao.Journal'
-  ],
 
   properties: [
     {
@@ -71,10 +85,10 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'put',
+      name: 'put_',
       javaCode: `
         for ( Journal delegate : getDelegates() ) {
-          delegate.put(x, obj);
+          delegate.put_(x, old, nu);
         }
       `
     },
@@ -101,10 +115,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'FileJournal',
-
-  implements: [
-    'foam.dao.Journal'
-  ],
+  extends: 'foam.dao.AbstractJournal',
 
   javaImports: [
     'foam.core.FObject',
@@ -278,18 +289,16 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'put',
+      name: 'put_',
       synchronized: true,
       javaCode: `
         try {
-          FObject old = null;
-          Object id = obj.getProperty("id");
-          String record = ( getOutputDiff() && ( old = getDao().find(id) ) != null ) ?
-            getOutputter().stringifyDelta(old, obj) :
-            getOutputter().stringify(obj);
+          String record = ( getOutputDiff() && old != null ) ?
+            getOutputter().stringifyDelta(old, nu) :
+            getOutputter().stringify(nu);
 
           if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
-            writeComment_(x, obj);
+            writeComment_(x, nu);
             write_(sb.get()
               .append("p(")
               .append(record)
