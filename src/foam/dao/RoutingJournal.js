@@ -19,7 +19,7 @@ foam.CLASS({
       javaCode: `
         try {
           String service = (String) x.get("service");
-          String record = ( getOutputDiff() && old != null ) ?
+          String record = ( old != null ) ?
             getOutputter().stringifyDelta(old, nu) :
             getOutputter().stringify(nu);
 
