@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -41,9 +41,9 @@ public class AgentUserAuthService
     sets "user" in the context to the passed in user. This allows users to
     act on behalf of others while retaining information on the user.
   */
-  public User ActAs(X x, User sudoUser) throws AuthenticationException {
+  public User actAs(X x, User superUser) throws AuthenticationException {
     User agent = (User) x.get("user");
-    User user = (User) userDAO_.find(sudoUser.getId());
+    User user = (User) userDAO_.find(superUser.getId());
 
     if ( agent == null ) {
       throw new AuthenticationException();
@@ -56,35 +56,62 @@ public class AgentUserAuthService
     Group group = (Group) groupDAO_.find(user.getGroup());
 
     if ( group == null ) {
-      throw new AuthenticationException("User must exist within a group.");
+      throw new AuthenticationException("Super user must exist within a group.");
     }
 
-    // Finds the AgentUserJunction object to see if user can log in as the passed in user.
-    // Source users are permissioned to act as target users, not visa versa.
-
+    /*
+      Finds the AgentUserJunction object to see if user can log in as the passed in user.
+      Source users are permitted to act as target users, not vice versa.
+    */
     UserUserJunction permissionJunction = (UserUserJunction) agentJunctionDAO_.find(AND(
       EQ(UserUserJunction.SOURCE_ID, agent.getId()),
       EQ(UserUserJunction.TARGET_ID, user.getId())
     ));
 
     if ( permissionJunction == null ) {
-      throw new AuthenticationException("You don't have access to act as the requested user.");
+      throw new AuthorizationException("You don't have access to act as the requested super user.");
     }
 
     // Junction object contains a group which has a unique set of permissions specific to the relationship.
-    Group ActingWithinGroup = (Group) groupDAO_.find(permissionJunction.getGroup());
+    Group actingWithinGroup = (Group) groupDAO_.find(permissionJunction.getGroup());
 
     if ( group != null && ! group.getEnabled() ) {
-      throw new AuthenticationException("User group disabled");
+      throw new AuthenticationException("No permissions are appended to the super user relationship.");
     }
     
     Session session = x.get(Session.class);
     session.setUserId(user.getId());
     session.setContext(session.getContext().put("user", user));
     session.setContext(session.getContext().put("agent", agent));
-    session.setContext(session.getContext().put("group", ActingWithinGroup));
+    session.setContext(session.getContext().put("group", actingWithinGroup));
     sessionDAO_.put(session);
     
     return user;
+  }
+
+    /**
+    Retrieves the agent user from the current sessions context.
+  */
+  public User getCurrentAgent(X x) throws AuthenticationException {
+    // fetch context and check if not null or user id is 0
+    Session session = x.get(Session.class);
+    if ( session == null ) {
+      throw new AuthenticationException("Not logged in");
+    }
+
+    X sessionContext = session.getContext();
+    // get agent from session context
+    User agent = (User) sessionContext.get("agent");
+
+    if ( agent == null ) {
+      throw new AuthenticationException("Agent not found.");
+    }
+
+    // check if user enabled
+    if ( ! agent.getEnabled() ) {
+      throw new AuthenticationException("Agent disabled");
+    }
+
+    return agent;
   }
 }

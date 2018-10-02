@@ -351,7 +351,7 @@ foam.RELATIONSHIP({
   sourceModel: 'foam.nanos.auth.User',
   targetModel: 'foam.nanos.auth.User',
   forwardName: 'agents',
-  inverseName: 'sudoUsers',
+  inverseName: 'superUsers',
   junctionDAOKey: 'agentJunctionDAO',
 });
 
