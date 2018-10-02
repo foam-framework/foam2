@@ -63,13 +63,13 @@ public class SessionWebAgent
       }
 
       // check permissions
-      session.setContext(session.getContext().put("user", user));
+      session.setContext(session.getContext().put("user", user).put("group", user.getGroup()));
       if ( ! auth.check(session.getContext(), permission_) ) {
         throw new AuthorizationException();
       }
 
       // execute delegate
-      getDelegate().execute(x.put(Session.class, session).put("user", user));
+      getDelegate().execute(x.put(Session.class, session).put("user", user).put("group", user.getGroup()));
     } catch ( Throwable t ) {
       logger.error("Unexpected exception in SessionWebAgent", t);
       // throw unauthorized on error

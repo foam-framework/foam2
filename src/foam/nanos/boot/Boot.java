@@ -97,7 +97,7 @@ public class Boot {
     session.setUserId(user.getId());
     session.setContext(root_);
 
-    root_.put("user", user);
+    root_.put("user", user).put("group", user.getGroup());
     root_.put(Session.class, session);
   }
 

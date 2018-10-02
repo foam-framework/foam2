@@ -97,7 +97,7 @@ foam.CLASS({
           // update session with two factor success set to true
           Session session = x.get(Session.class);
           session.setUserId(user.getId());
-          session.setContext(session.getContext().put("user", user).put("twoFactorSuccess", true));
+          session.setContext(session.getContext().put("user", user).put("twoFactorSuccess", true).put("group", user.getGroup()));
           sessionDAO.put(session);
           return true;
         }

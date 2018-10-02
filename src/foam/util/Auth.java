@@ -29,6 +29,7 @@ public class Auth {
     Session session = new Session();
     x = x.put(Session.class, session);
     x = x.put("user", user);
+    x = x.put("group", user.getGroup());
     session.setUserId(user.getId());
     session.setContext(x);
 
