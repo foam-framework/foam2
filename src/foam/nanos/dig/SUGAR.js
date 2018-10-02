@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.dig',
   name: 'SUGAR',
 
-  documentation: 'Service Unified GAteway Relay - Perform non-DAO operations against a web service',
+  documentation: 'SUGAR : Service Unified GAteway Relay - Perform non-DAO operations against a web service',
 
   tableColumns: [
     'id',
@@ -36,6 +36,7 @@ foam.CLASS({
       class: 'String',
       name: 'serviceKey',
       label: 'Service',
+      documentation: 'non DAOs list as service',
       view: function(_, X) {
         var E = foam.mlang.Expressions.create();
         return foam.u2.view.ChoiceView.create({
@@ -65,7 +66,7 @@ foam.CLASS({
 
         var filteredMethod =
           methods.filter(function(fm) {
-            for ( var j = 0; j < fm.args.length; j++ ) {
+            for ( var j = 0 ; j < fm.args.length ; j++ ) {
                if ( fm.args[j].javaType.toString() == "foam.core.X" ) {
                   return false;
                }
@@ -73,8 +74,8 @@ foam.CLASS({
              }
           }).map(function(m) { return m.name; }).sort();
 
-        if ( filteredMethod.length > 0) {
-          for ( var i = 0; i < methods.length; i++ ) {
+        if ( filteredMethod.length > 0 ) {
+          for ( var i = 0 ; i < methods.length ; i++ ) {
             if ( methods[i].name == filteredMethod[0] ) {
               this.argumentInfo = methods[i].args;
               this.hiddenMethod = methods[i].name;
@@ -90,6 +91,7 @@ foam.CLASS({
       class: 'String',
       name: 'method',
       label: 'Method',
+      documentation: 'the methods list of the picked service key',
       view: function(_, X) {
         return X.data.slot(function(serviceKey) {
           var service = this.__context__[serviceKey];
@@ -107,7 +109,7 @@ foam.CLASS({
 
           var filteredMethod =
             methods.filter(function(fm) {
-              for ( var j = 0; j < fm.args.length; j++ ) {
+              for ( var j = 0 ; j < fm.args.length ; j++ ) {
                  if ( fm.args[j].javaType.toString() == "foam.core.X" ) {
                     return false;
                  }
@@ -133,7 +135,7 @@ foam.CLASS({
 
           var methods = of.getOwnAxiomsByClass(foam.core.Method);
 
-          for ( var i = 0; i < methods.length; i++ ) {
+          for ( var i = 0 ; i < methods.length ; i++ ) {
             if ( methods[i].name == this.method ) {
               this.hiddenMethod = methods[i].name;
 
@@ -151,23 +153,19 @@ foam.CLASS({
       name: 'argumentInfo',
       documentation: 'Set the arguments Info of the method',
       postSet: function() {
-      var self = this;
+        var self = this;
 
-      for ( let j = 0 ; j < this.argumentInfo.length ; j++ ) {
-        this.argumentInfo[j].sub(function(argInfo) {
-          self.flag = !self.flag;
-        });
+        for ( var j = 0 ; j < this.argumentInfo.length ; j++ ) {
+          this.argumentInfo[j].sub(function(argInfo) {
+            self.flag = !self.flag;
+          });
+        }
       }
-      }
-    },
-    {
-      class: 'Boolean',
-      name: 'isMethodChanged',
-      hidden: true
     },
     {
       class: 'String',
       name: 'interfaceName',
+      documentation: 'service class name',
       displayWidth: 60,
       visibility: foam.u2.Visibility.RO,
     },
@@ -180,7 +178,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'hiddenMethod',
-      documentation: 'to use for a url',
+      documentation: 'to set a current method for URL',
       hidden: true
     },
     {
@@ -189,6 +187,7 @@ foam.CLASS({
       name: 'sugarURL',
       label: 'URL',
       displayWidth: 120,
+      documentation: 'dynamic URL according to picking service, method, parameters against web agent',
       view: 'foam.nanos.dig.LinkView',
       setter: function() {}, // Prevent from ever getting set
       expression: function(serviceKey, method, interfaceName, argumentInfo, flag, hiddenMethod) {
@@ -211,9 +210,9 @@ foam.CLASS({
           url += "method=" + hiddenMethod;
         }
 
-        for ( let j = 0 ; j < argumentInfo.length ; j++ ) {
-        var paramUrl = "";
-        var index;
+        for ( var j = 0 ; j < argumentInfo.length ; j++ ) {
+          var paramUrl = "";
+          var index;
 
           argumentInfo[j].sub(function(ai) {
             index = j;
@@ -227,23 +226,23 @@ foam.CLASS({
         }
 
         if ( flag ) {  // use this flag to give a change event on purpose for argumentInfo (FObjectArray)
-          for ( let k = 0 ; k < argumentInfo.length ; k++ ) {
+          for ( var k = 0 ; k < argumentInfo.length ; k++ ) {
             query = true;
 
             if ( k == Number(index) ) url += paramUrl;
 
-            if ( argumentInfo[k].value != "") {
+            if ( argumentInfo[k].value != "" ) {
               url += query ? "&" : "?";
               url += argumentInfo[k].name + "=" + argumentInfo[k].value;
             }
           }
         } else { // use this flag to give a change event for argumentInfo (FObjectArray)
-          for ( let k = 0 ; k < argumentInfo.length ; k++ ) {
+          for ( var k = 0 ; k < argumentInfo.length ; k++ ) {
             query = true;
 
             if ( k == Number(index) ) url += paramUrl;
 
-            if ( argumentInfo[k].value != "") {
+            if ( argumentInfo[k].value != "" ) {
               url += query ? "&" : "?";
               url += argumentInfo[k].name + "=" + argumentInfo[k].value;
             }

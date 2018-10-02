@@ -1,20 +1,26 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.dig;
 
+import foam.core.X;
 import foam.lib.json.JSONParser;
+import foam.lib.json.Outputter;
 import foam.lib.json.OutputterMode;
 import foam.nanos.dig.exception.*;
-import foam.nanos.http.WebAgent;
-import foam.core.X;
-import foam.nanos.logger.Logger;
-import java.io.*;
-import javax.servlet.http.HttpServletResponse;
 import foam.nanos.http.HttpParameters;
-import java.nio.CharBuffer;
+import foam.nanos.logger.Logger;
 import foam.util.SafetyUtil;
-import foam.lib.json.Outputter;
+import foam.nanos.http.WebAgent;
+
+import java.io.*;
+import java.nio.CharBuffer;
 import java.lang.Exception;
 import java.lang.reflect.*;
-import java.lang.Exception;
+import javax.servlet.http.HttpServletResponse;
 
 public class SugarWebAgent
   implements WebAgent
@@ -52,12 +58,12 @@ public class SugarWebAgent
 
       Class c = Class.forName(interfaceName);
 
-      Method m[] = c.getMethods();  // get Methods' List
+      Method m[] = c.getMethods();  // get Methods' List from the class
 
       Class[] paramTypes = null; // for picked Method's parameters' types
       Object arglist[] = null; // to store each parameters' values
 
-      for ( int k = 0; k < m.length; k++ ) {
+      for ( int k = 0 ; k < m.length ; k++ ) {
         if ( m[k].getName().equals(methodName) ) { //found picked Method
 
           logger.debug("service : " + serviceName);
@@ -67,7 +73,7 @@ public class SugarWebAgent
           paramTypes = new Class[pArray.length];
           arglist = new Object[pArray.length];
 
-          for ( int j = 0; j < pArray.length; j++ ) {
+          for ( int j = 0 ; j < pArray.length ; j++ ) {
             paramTypes[j] = pArray[j].getType();
 
             if ( ! pArray[j].isNamePresent() ) {
@@ -83,10 +89,8 @@ public class SugarWebAgent
             arglist[j] = p.getParameter(pArray[j].getName());
 
             logger.debug(pArray[j].getName() + " :   " + p.getParameter(pArray[j].getName()));
-            logger.debug("pArray[j].getType() :   " + pArray[j].getType().getCanonicalName());
-            logger.debug("arglist :   " + j + "   " + arglist[j]);
-            logger.debug(" paramTypes[j] : " + paramTypes[j].isPrimitive());
 
+            // casting and setting according to parameters type
             if (pArray[j].getType().getCanonicalName().equals("double"))
               arglist[j] = Double.parseDouble(p.getParameter(pArray[j].getName()));
             else if ( pArray[j].getType().getCanonicalName().equals("int") )
