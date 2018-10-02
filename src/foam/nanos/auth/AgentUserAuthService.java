@@ -56,9 +56,9 @@ public class AgentUserAuthService
     sets "user" in the context to the passed in user. This allows users to
     act on behalf of others while retaining information on the user.
   */
-  public User ActAs(X x, User superUser) throws AuthenticationException {
+  public User ActAs(X x, User sudoUser) throws AuthenticationException {
     User agent = (User) x.get("user");
-    User user = (User) userDAO_.find(superUser.getId());
+    User user = (User) userDAO_.find(sudoUser.getId());
 
     if ( agent == null ) {
       throw new AuthenticationException();

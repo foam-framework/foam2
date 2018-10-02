@@ -292,7 +292,7 @@ var classes = [
   'foam.nanos.dig.exception.EmptyDataException',
   'foam.nanos.dig.exception.UnsupportException',
   'foam.nanos.dig.exception.UnknownIdException',
-  'foam.nanos.dig.exception.DigSuccessMessage'  
+  'foam.nanos.dig.exception.DigSuccessMessage'
 ];
 
 var abstractClasses = [

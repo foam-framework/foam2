@@ -99,6 +99,7 @@ FOAM_FILES([
   { name: "foam/nanos/export/JSONDriver"},
   { name: "foam/nanos/export/XMLDriver"},
   { name: "foam/nanos/export/CSVDriver"},
+  { name: "foam/nanos/auth/Relationships" },
   { name: "foam/nanos/NanoService" },
   { name: "foam/nanos/auth/AuthService" },
   { name: "foam/nanos/auth/ProxyAuthService" },
@@ -142,6 +143,5 @@ FOAM_FILES([
   { name: 'foam/demos/net/nap/web/model/RegulatoryNoticeAudit' },
   { name: 'foam/demos/net/nap/web/RegulatoryNoticeForm', flags: ['web'] },
   { name: 'foam/demos/net/nap/web/RegulatoryNoticeList', flags: ['web'] },
-  { name: 'foam/demos/net/nap/web/EditRegulatoryNotice', flags: ['web'] },
-  { name: 'foam/nanos/auth/Relationships' }
+  { name: 'foam/demos/net/nap/web/EditRegulatoryNotice', flags: ['web'] }
 ]);
