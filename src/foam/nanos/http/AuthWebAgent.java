@@ -194,7 +194,7 @@ public class AuthWebAgent
 
     if ( session != null && session.getContext() != null ) {
       if ( auth.check(session.getContext(), permission_) ) {
-        getDelegate().execute(x.put(Session.class, session).put("user", session.getContext().get("user")).put("group", session.getContext().get("user").getGroup()));
+        getDelegate().execute(x.put(Session.class, session).put("user", session.getContext().get("user")).put("group", session.getContext().get("group")));
       } else {
         PrintWriter out = x.get(PrintWriter.class);
         out.println("Access denied. Need permission: " + permission_);

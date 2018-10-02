@@ -345,3 +345,25 @@ foam.RELATIONSHIP({
     tableWidth: 120
   }
 });
+
+
+foam.RELATIONSHIP({
+  cardinality: '*:*',
+  sourceModel: 'foam.nanos.auth.User',
+  targetModel: 'foam.nanos.auth.User',
+  forwardName: 'agents',
+  inverseName: 'sudoUsers',
+  junctionDAOKey: 'agentJunctionDAO',
+});
+
+foam.CLASS({
+  refines: 'foam.nanos.auth.UserUserJunction',
+
+  properties: [
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.Group',
+      name: 'group'
+    }
+  ]
+});

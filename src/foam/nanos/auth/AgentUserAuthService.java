@@ -30,9 +30,9 @@ import foam.nanos.auth.UserUserJunction;
 import static foam.mlang.MLang.EQ;
 import static foam.mlang.MLang.AND;
 
-public class SudoUserAuthService
+public class AgentUserAuthService
   extends    ContextAwareSupport
-  implements SudoAuthService, NanoService
+  implements AgentAuthService, NanoService
 {
   protected DAO userDAO_;
   protected DAO groupDAO_;
@@ -65,7 +65,7 @@ public class SudoUserAuthService
     }
 
     if ( user == null || ! user.getEnabled() ) {
-      throw new AuthenticationException("Sudo user doesn't exist.");
+      throw new AuthenticationException("Super user doesn't exist.");
     }
 
     Group group = (Group) groupDAO_.find(user.getGroup());

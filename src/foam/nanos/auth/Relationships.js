@@ -9,15 +9,6 @@
   Target user creates the priviledge to allow source user.
 */
 
-foam.RELATIONSHIP({
-  cardinality: '*:*',
-  sourceModel: 'foam.nanos.auth.User',
-  targetModel: 'foam.nanos.auth.User',
-  forwardName: 'agents',
-  inverseName: 'sudoUsers',
-  junctionDAOKey: 'agentJunctionDAO',
-});
-
 /*
 foam.RELATIONSHIP({
   cardinality: '*:*',

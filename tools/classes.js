@@ -144,6 +144,7 @@ var classes = [
   'foam.nanos.auth.HumanNameTrait',
   'foam.nanos.auth.User',
   'foam.nanos.auth.Country',
+  'foam.nanos.auth.UserUserJunction',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.ClientAuthService',
   'foam.nanos.auth.AgentAuthService',
@@ -291,7 +292,7 @@ var classes = [
   'foam.nanos.dig.exception.EmptyDataException',
   'foam.nanos.dig.exception.UnsupportException',
   'foam.nanos.dig.exception.UnknownIdException',
-  'foam.nanos.dig.exception.DigSuccessMessage'
+  'foam.nanos.dig.exception.DigSuccessMessage'  
 ];
 
 var abstractClasses = [
