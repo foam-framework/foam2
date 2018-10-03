@@ -53,37 +53,40 @@ foam.CLASS({
 
         if ( ! service ) return;
 
-        if ( ! service.cls_.getAxiomByName('delegate') ) return;
-
-        var of = this.lookup(service.cls_.getAxiomByName('delegate').of);
-
-        if ( ! of ) return;
-
-        this.interfaceName = of.id.toString();
-
-        var methods = of.getOwnAxiomsByClass(foam.core.Method);
-        //var methodName = methods.map(function(m) { return m.name; }).sort();
-
-        var filteredMethod =
-          methods.filter(function(fm) {
-            for ( var j = 0 ; j < fm.args.length ; j++ ) {
-               if ( fm.args[j].javaType.toString() == "foam.core.X" ) {
-                  return false;
-               }
-               return true;
-             }
-          }).map(function(m) { return m.name; }).sort();
-
-        if ( filteredMethod.length > 0 ) {
-          for ( var i = 0 ; i < methods.length ; i++ ) {
-            if ( methods[i].name == filteredMethod[0] ) {
-              this.argumentInfo = methods[i].args;
-              this.hiddenMethod = methods[i].name;
-            }
-          }
+        if ( ! service.cls_.getAxiomByName('delegate') ) {
+          this.interfaceName = "";
+          return;
         } else {
-          this.argumentInfo = null;
-          this.hiddenMethod = "";
+          var of = this.lookup(service.cls_.getAxiomByName('delegate').of);
+
+          if ( ! of ) return;
+
+          this.interfaceName = of.id.toString();
+
+          var methods = of.getOwnAxiomsByClass(foam.core.Method);
+          //var methodName = methods.map(function(m) { return m.name; }).sort();
+
+          var filteredMethod =
+            methods.filter(function(fm) {
+              for ( var j = 0 ; j < fm.args.length ; j++ ) {
+                 if ( fm.args[j].javaType.toString() == "foam.core.X" ) {
+                    return false;
+                 }
+                 return true;
+               }
+            }).map(function(m) { return m.name; }).sort();
+
+          if ( filteredMethod.length > 0 ) {
+              methods.find((item) => {
+                if ( item.name == filteredMethod[0] ) {
+                  this.argumentInfo = item.args;
+                  this.currentMethod = item.name;
+                }
+              });
+          } else { // if the service doesn't have a filtered method, the following should be empty
+            this.argumentInfo = null;
+            this.currentMethod = "";
+          }
         }
       }
     },
@@ -135,15 +138,15 @@ foam.CLASS({
 
           var methods = of.getOwnAxiomsByClass(foam.core.Method);
 
-          for ( var i = 0 ; i < methods.length ; i++ ) {
-            if ( methods[i].name == this.method ) {
-              this.hiddenMethod = methods[i].name;
+          methods.find((item) => {
+            if ( item.name == this.method ) {
+              this.currentMethod = item.name;
 
-              if ( methods[i].args.length > 0 )
-                this.argumentInfo = methods[i].args;
+              if ( item.args.length > 0 )
+                this.argumentInfo = item.args;
               else this.argumentInfo = "";
             }
-          }
+          });
         }
       }
     },
@@ -177,7 +180,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'hiddenMethod',
+      name: 'currentMethod',
       documentation: 'to set a current method for URL',
       hidden: true
     },
@@ -190,7 +193,7 @@ foam.CLASS({
       documentation: 'dynamic URL according to picking service, method, parameters against web agent',
       view: 'foam.nanos.dig.LinkView',
       setter: function() {}, // Prevent from ever getting set
-      expression: function(serviceKey, method, interfaceName, argumentInfo, flag, hiddenMethod) {
+      expression: function(serviceKey, method, interfaceName, argumentInfo, flag, currentMethod) {
         var query = false;
         var url = "/service/sugar";
 
@@ -204,10 +207,10 @@ foam.CLASS({
           query = true;
           url += "interfaceName=" + interfaceName;
         }
-        if ( hiddenMethod ) {
+        if ( currentMethod ) {
           url += query ? "&" : "?";
           query = true;
-          url += "method=" + hiddenMethod;
+          url += "method=" + currentMethod;
         }
 
         for ( var j = 0 ; j < argumentInfo.length ; j++ ) {

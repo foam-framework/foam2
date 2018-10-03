@@ -39,7 +39,7 @@ public class SugarWebAgent
 
     try {
       if ( SafetyUtil.isEmpty(serviceName) ) {
-        DigErrorMessage error = new EmptyParameterException.Builder(x)
+        DigErrorMessage error = new GeneralException.Builder(x)
           .setMessage("Empty Service Key")
           .build();
         outputException(x, resp, "JSON", out, error);
@@ -48,7 +48,7 @@ public class SugarWebAgent
       }
 
       if ( SafetyUtil.isEmpty(methodName) ) {
-        DigErrorMessage error = new EmptyParameterException.Builder(x)
+        DigErrorMessage error = new GeneralException.Builder(x)
           .setMessage("Empty Method Name")
           .build();
         outputException(x, resp, "JSON", out, error);
@@ -56,103 +56,121 @@ public class SugarWebAgent
         return;
       }
 
-      Class c = Class.forName(interfaceName);
+      Class class_ = null;
+      try {
+        class_ = Class.forName(interfaceName);
+      } catch (Exception e) {
+          DigErrorMessage error = new GeneralException.Builder(x)
+            .setMessage("Can not find out service interface")
+            .build();
+          outputException(x, resp, "JSON", out, error);
 
-      Method m[] = c.getMethods();  // get Methods' List from the class
+          return;
+      }
 
       Class[] paramTypes = null; // for picked Method's parameters' types
       Object arglist[] = null; // to store each parameters' values
 
-      for ( int k = 0 ; k < m.length ; k++ ) {
-        if ( m[k].getName().equals(methodName) ) { //found picked Method
+      if ( class_ != null ) {
+        Method method_[] = class_.getMethods();  // get Methods' List from the class
 
-          logger.debug("service : " + serviceName);
-          logger.debug("methodName : " + m[k].getName());
+        for (int k = 0; k < method_.length; k++) {
+          if (method_[k].getName().equals(methodName)) { //found picked Method
 
-          Parameter[] pArray = m[k].getParameters();
-          paramTypes = new Class[pArray.length];
-          arglist = new Object[pArray.length];
+            logger.debug("service : " + serviceName);
+            logger.debug("methodName : " + method_[k].getName());
 
-          for ( int j = 0 ; j < pArray.length ; j++ ) {
-            paramTypes[j] = pArray[j].getType();
+            Parameter[] pArray = method_[k].getParameters();
+            paramTypes = new Class[pArray.length];
+            arglist = new Object[pArray.length];
 
-            if ( ! pArray[j].isNamePresent() ) {
-              DigErrorMessage error = new GeneralException.Builder(x)
-                .setMessage("IllegalArgumentException : Add a compiler argument")
-                .build();
-              outputException(x, resp, "JSON", out, error);
+            for (int j = 0; j < pArray.length; j++) {  // checking the method's each parameter
+              paramTypes[j] = pArray[j].getType();
 
-              return;
-            }
+              if (!pArray[j].isNamePresent()) {
+                DigErrorMessage error = new GeneralException.Builder(x)
+                  .setMessage("IllegalArgumentException : Add a compiler argument")
+                  .build();
+                outputException(x, resp, "JSON", out, error);
 
-            paramTypes[j] = pArray[j].getType();
-            arglist[j] = p.getParameter(pArray[j].getName());
+                return;
+              }
 
-            logger.debug(pArray[j].getName() + " :   " + p.getParameter(pArray[j].getName()));
-
-            // casting and setting according to parameters type
-            if (pArray[j].getType().getCanonicalName().equals("double"))
-              arglist[j] = Double.parseDouble(p.getParameter(pArray[j].getName()));
-            else if ( pArray[j].getType().getCanonicalName().equals("int") )
-              arglist[j] = Integer.parseInt(p.getParameter(pArray[j].getName()));
-            else if ( pArray[j].getType().getCanonicalName().equals("boolean") )
-              arglist[j] = Boolean.parseBoolean(p.getParameter(pArray[j].getName()));
-            else if ( pArray[j].getType().getCanonicalName().equals("long") )
-              arglist[j] = Long.parseLong(p.getParameter(pArray[j].getName()));
-            else if ( paramTypes[j].isInstance("java.lang.String") )
+              paramTypes[j] = pArray[j].getType();
               arglist[j] = p.getParameter(pArray[j].getName());
-            else {
-              DigErrorMessage error = new GeneralException.Builder(x)
-                .setMessage("Parameter Type Exception")
-                .build();
-              outputException(x, resp, "JSON", out, error);
 
-              return;
+              logger.debug(pArray[j].getName() + " :   " + p.getParameter(pArray[j].getName()));
+
+              // casting and setting according to parameters type
+              String typeName = pArray[j].getType().getCanonicalName();
+
+              switch ( typeName ) {
+                case "double":
+                  arglist[j] = Double.parseDouble(p.getParameter(pArray[j].getName()));
+                  break;
+                case "boolean":
+                  arglist[j] = Boolean.parseBoolean(p.getParameter(pArray[j].getName()));
+                  break;
+                case "int":
+                  arglist[j] = Integer.parseInt(p.getParameter(pArray[j].getName()));
+                  break;
+                case "long":
+                  arglist[j] = Long.parseLong(p.getParameter(pArray[j].getName()));
+                  break;
+                case "java.lang.String":
+                  arglist[j] = p.getParameter(pArray[j].getName());
+                  break;
+                default:
+                  DigErrorMessage error = new GeneralException.Builder(x)
+                    .setMessage("Parameter Type Exception")
+                    .build();
+                  outputException(x, resp, "JSON", out, error);
+
+                  return;
+              }
             }
-
           }
         }
       }
 
-      try {
-        Method mm1 = c.getDeclaredMethod(methodName, paramTypes);
-        mm1.setAccessible(true);
-        mm1.invoke(x.get(serviceName), arglist);
+      executeMethod(x, resp, out, class_, serviceName, methodName, paramTypes, arglist);
 
-        out.println(mm1.invoke(x.get(serviceName), arglist));
-
-        JSONParser jsonParser = new JSONParser();
-        jsonParser.setX(x);
-        resp.setContentType("application/json");
-
-        Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
-        outputterJson.setOutputDefaultValues(true);
-        outputterJson.setOutputClassNames(true);
-
-        outputterJson.output(mm1.invoke(x.get(serviceName), arglist));
-        out.println(outputterJson);
-
-      } catch (InvocationTargetException e) {
-        logger.error(e);
-
-        DigErrorMessage error = new GeneralException.Builder(x)
-          .setMessage("InvocationTargetException: " + e.getTargetException().getMessage())
-          .build();
-        outputException(x, resp, "JSON", out, error);
-
-        return;
-      } catch (Exception e) {
-        logger.error(e);
-
-        DigErrorMessage error = new GeneralException.Builder(x)
-          .setMessage("Exception: " + e.getMessage())
-          .build();
-        outputException(x, resp, "JSON", out, error);
-
-        return;
-      }
     } catch (Exception e) {
       logger.error(e);
+
+      return;
+    }
+  }
+
+  protected void executeMethod(X x, HttpServletResponse resp, PrintWriter out, Class class_, String serviceName, String methodName, Class[] paramTypes, Object arglist[]) {
+    try {
+      Method declaredMethod_ = class_.getDeclaredMethod(methodName, paramTypes);
+      declaredMethod_.setAccessible(true);
+      declaredMethod_.invoke(x.get(serviceName), arglist);
+
+      JSONParser jsonParser = new JSONParser();
+      jsonParser.setX(x);
+      resp.setContentType("application/json");
+
+      Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+      outputterJson.setOutputDefaultValues(true);
+      outputterJson.setOutputClassNames(true);
+
+      outputterJson.output(declaredMethod_.invoke(x.get(serviceName), arglist));
+      out.println(outputterJson);
+
+    } catch (InvocationTargetException e) {
+      DigErrorMessage error = new GeneralException.Builder(x)
+        .setMessage("InvocationTargetException: " + e.getTargetException().getMessage())
+        .build();
+      outputException(x, resp, "JSON", out, error);
+
+      return;
+    } catch (Exception e) {
+      DigErrorMessage error = new GeneralException.Builder(x)
+        .setMessage("Exception: " + e.getMessage())
+        .build();
+      outputException(x, resp, "JSON", out, error);
 
       return;
     }
