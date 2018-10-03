@@ -9,7 +9,8 @@ foam.INTERFACE({
   name: 'Journal',
 
   methods: [
-    function put(x, obj) {},
+    function put(x, nu) {},
+    function put_(x, old, nu) {},
     function remove(x, obj) {},
     function replay(x, dao) {}
   ]
@@ -18,20 +19,41 @@ foam.INTERFACE({
 
 foam.CLASS({
   package: 'foam.dao',
-  name: 'ProxyJournal',
-
-  documentation: 'Proxy journal class',
+  name: 'AbstractJournal',
+  abstract: true,
 
   implements: [
     'foam.dao.Journal'
   ],
+
+  methods: [
+    {
+      name: 'put',
+      code: function (x, nu) {
+        this.put_(x, null, nu);
+      },
+      javaCode: `
+        this.put_(x, null, nu);
+      `
+    }
+  ]
+});
+
+
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'ProxyJournal',
+  extends: 'foam.dao.AbstractJournal',
+
+  documentation: 'Proxy journal class',
 
   properties: [
     {
       class: 'Proxy',
       of: 'foam.dao.Journal',
       name: 'delegate',
-      forwards: [ 'put', 'remove', 'replay' ]
+      forwards: [ 'put_', 'remove', 'replay' ]
     }
   ]
 });
@@ -41,10 +63,7 @@ if ( foam.isServer ) {
   foam.CLASS({
     package: 'foam.dao',
     name: 'NodeFileJournal',
-
-    implements: [
-      'foam.dao.Journal'
-    ],
+    extends: 'foam.dao.AbstractJournal',
 
     properties: [
       {
@@ -74,9 +93,9 @@ if ( foam.isServer ) {
     ],
 
     methods: [
-      function put(x, obj) {
+      function put_(x, old, nu) {
         return this.write_(Buffer.from(
-            "put(foam.json.parse(" + foam.json.Storage.stringify(obj, this.of) +
+            "put(foam.json.parse(" + foam.json.Storage.stringify(nu, this.of) +
               "));\n"));
       },
 

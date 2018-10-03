@@ -81,6 +81,7 @@ var classes = [
   'foam.dao.java.JDAO',
   'foam.dao.FilteredDAO',
   'foam.dao.Journal',
+  'foam.dao.AbstractJournal',
   'foam.dao.ProxyJournal',
   'foam.dao.CompositeJournal',
   'foam.dao.FileJournal',
