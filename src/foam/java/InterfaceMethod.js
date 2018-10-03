@@ -61,6 +61,12 @@ foam.CLASS({
       documentation: 'Dummy property to silence warnings',
       setter: function() {},
       getter: function() {}
+    },
+    {
+      name: 'abstract',
+      documentation: 'Dummy property to silence warnings',
+      setter: function() {},
+      getter: function() {}
     }
   ],
 

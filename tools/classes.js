@@ -186,6 +186,7 @@ var classes = [
   'foam.nanos.menu.Menu',
   'foam.nanos.menu.DAOMenu',
   'foam.nanos.menu.DocumentMenu',
+  'foam.nanos.menu.DocumentFileMenu',
   'foam.nanos.menu.LinkMenu',
   'foam.nanos.menu.ListMenu',
   'foam.nanos.menu.MenuBar',
@@ -291,6 +292,8 @@ var classes = [
   'foam.nanos.dig.exception.UnsupportException',
   'foam.nanos.dig.exception.UnknownIdException',
   'foam.nanos.dig.exception.DigSuccessMessage',
+  'foam.flow.Document',
+  'foam.flow.DocumentationFolderDAO'
   'foam.nanos.dig.exception.EmptyParameterException',
   'foam.nanos.dig.exception.GeneralException'
 ];
@@ -310,7 +313,6 @@ var skeletons = [
   'foam.nanos.auth.token.TokenService',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.push.PushService',
-
 ];
 
 var proxies = [
