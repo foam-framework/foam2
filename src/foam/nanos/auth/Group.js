@@ -174,16 +174,16 @@ if ( session != null ) {
   if ( user != null ) {
     Group group    = (Group) groupDAO.find(user.getGroup());
     if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
-      // populate AppConfig url with group url
+      //populate AppConfig url with group url
       config.setUrl(group.getUrl());
     } else {
-      // populate AppConfig url with request's RootUrl
+      //populate AppConfig url with request's RootUrl
       HttpServletRequest req = x.get(HttpServletRequest.class);
       if ( ! SafetyUtil.isEmpty(config.getUrl()) && ! SafetyUtil.isEmpty(req.getRequestURI())) {
         String curConfigUrl = config.getUrl();
         String request = ((Request) req).getRootURL().toString();
         
-        // check it's http or https
+        //check it's http or https
         if ( curConfigUrl.startsWith("https") ) {
           config.setUrl("https" + request.substring(4));
         } else {
