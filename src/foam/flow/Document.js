@@ -67,7 +67,7 @@ foam.CLASS({
 
           'section': seq('<section', sym('attributes'), '>', sym('content'), '</section>'),
           'paragraph': seq1(1, '<p>', sym('content'), '</p>'),
-          'anchor': seq('<a', optional(sym('attributes')), '>', sym('content'), '</a>'),
+          'anchor': seq('<a', sym('attributes'), '>', sym('content'), '</a>'),
           'h1': seq1(1, '<h1>', sym('content'), '</h1>'),
           'h2': seq1(1, '<h2>', sym('content'), '</h2>'),
           'h3': seq1(1, '<h3>', sym('content'), '</h3>'),
@@ -112,7 +112,7 @@ foam.CLASS({
                                   sym('attrib-value'),
                                   '"'),
 
-          'attrib-key': seq1(1, repeat0(' '), plus(notChars('='))),
+          'attrib-key': seq1(1, repeat0(' '), plus(notChars('=>'))),
           'attrib-value': repeat(notChars('"'))
         }
       },
