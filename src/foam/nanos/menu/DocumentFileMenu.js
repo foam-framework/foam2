@@ -19,12 +19,17 @@ foam.CLASS({
     {
       class: 'String',
       name: 'docKey'
+    },
+    {
+      class: 'String',
+      name: 'daoKey',
+      value: 'documentDAO'
     }
   ],
 
   methods: [
     function createView(X) {
-      return this.DocumentationView.create({ id: this.docKey });
+      return this.DocumentationView.create({ id: this.docKey, daoKey: this.daoKey });
     }
   ]
 });

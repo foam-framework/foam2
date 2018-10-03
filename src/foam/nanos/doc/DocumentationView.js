@@ -2,14 +2,16 @@ foam.CLASS({
   package: 'foam.nanos.doc',
   name: 'DocumentationView',
   extends: 'foam.u2.View',
-  imports: [
-    'documentDAO'
-  ],
   properties: [
     {
       class: 'String',
       name: 'id',
       documentation: 'ID of the document to render.'
+    },
+    {
+      class: 'String',
+      name: 'daoKey',
+      value: 'documentDAO'
     },
     {
       name: 'data'
@@ -18,9 +20,11 @@ foam.CLASS({
   ],
   methods: [
     function initE() {
-      this.add(this.slot(function(data, error) {
+      var dao = this.__context__[this.daoKey];
+      if ( ! dao ) this.add('No DAO found for key: ', this.daoKey);
+      else this.add(this.slot(function(data, error) {
         if ( ! data && ! error) {
-          this.documentDAO.find(this.id).then(function(doc) {
+          dao.find(this.id).then(function(doc) {
             if ( doc ) this.data = doc;
             else this.error = 'Not found.';
           }.bind(this), function(e) {
