@@ -48,13 +48,6 @@ foam.CLASS({
       documentation: 'Permissions set on group.'
     },
     {
-      class: 'StringArray',
-      of: 'foam.nanos.auth.Permission',
-      name: 'permissions2',
-      view: 'foam.u2.view.StringArrayRowView',
-      documentation: 'Permissions set on group.'
-    },
-    {
       class: 'Reference',
       targetDAOKey: 'menuDAO',
       name: 'defaultMenu',
@@ -98,14 +91,14 @@ foam.CLASS({
       name: 'url',
       value: null
     }
-/*    {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.app.AppConfig',
-      name: 'appConfig',
-      factory: function() { return this.AppConfig.create(); },
-      documentation: 'Custom application configuration for group.'
-    }
-*/
+    /*    {
+          class: 'FObjectProperty',
+          of: 'foam.nanos.app.AppConfig',
+          name: 'appConfig',
+          factory: function() { return this.AppConfig.create(); },
+          documentation: 'Custom application configuration for group.'
+        }
+    */
     /*
       FUTURE
     {
@@ -174,13 +167,21 @@ if ( session != null ) {
   if ( user != null ) {
     Group group    = (Group) groupDAO.find(user.getGroup());
     if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
-      //populate AppConfig url with group url
+      // populate AppConfig url with group url
       config.setUrl(group.getUrl());
     } else {
-      //populate AppConfig url with request's RootUrl
+      // populate AppConfig url with request's RootUrl
       HttpServletRequest req = x.get(HttpServletRequest.class);
-      if (req.getRequestURI() != null) {
-        config.setUrl(((Request) req).getRootURL().toString());
+      if ( ! SafetyUtil.isEmpty(config.getUrl()) && ! SafetyUtil.isEmpty(req.getRequestURI())) {
+        String curConfigUrl = config.getUrl();
+        String request = ((Request) req).getRootURL().toString();
+        
+        // check it's http or https
+        if ( curConfigUrl.startsWith("https") ) {
+          config.setUrl("https" + request.substring(4));
+        } else {
+          config.setUrl(request);
+        }
       }
     }
   }
