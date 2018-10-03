@@ -20,15 +20,7 @@ foam.CLASS({
             this(x, new foam.dao.MDAO(classInfo), filename);
           }
 
-          public JDAO(foam.core.X x, foam.core.ClassInfo classInfo, String filename, boolean outputDiff) {
-            this(x, new foam.dao.MDAO(classInfo), filename, outputDiff);
-          }
-
           public JDAO(foam.core.X x, foam.dao.DAO delegate, String filename) {
-            this(x, delegate, filename, false);
-          }
-
-          public JDAO(foam.core.X x, foam.dao.DAO delegate, String filename, boolean outputDiff) {
             setX(x);
             setOf(delegate.getOf());
             setDelegate(delegate);
@@ -38,7 +30,6 @@ foam.CLASS({
               .setDao(delegate)
               .setFilename(filename)
               .setCreateFile(true)
-              .setOutputDiff(outputDiff)
               .build());
 
             // create a composite journal of repo journal
@@ -72,8 +63,9 @@ foam.CLASS({
       name: 'put_',
       synchronized: true,
       javaCode: `
+        foam.core.FObject old = super.find_(x, obj.getProperty("id"));
         foam.core.FObject result = super.put_(x, obj);
-        getJournal().put(x, result);
+        getJournal().put_(x, old, result);
         return result;
       `
     },
