@@ -264,6 +264,8 @@ FOAM_FILES([
   { name: "lib/node/json_dao", flags: ['node'] },
   { name: "lib/utf8" },
 
+  { name: "foam/flow/Document" },
+
   { name: "foam/net/NotConnectedException" },
   { name: "foam/net/ConnectionFailedException" },
   { name: "foam/net/web/WebSocket" },
@@ -546,4 +548,5 @@ FOAM_FILES([
   { name: "foam/test/TestObj" },
   { name: "foam/core/FObjectTest" },
   { name: "foam/nanos/dig/exception/DigErrorMessage" },
+  { name: "com/google/foam/demos/bubbles/Bubbles" }
 ]);
