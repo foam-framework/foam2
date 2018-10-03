@@ -20,12 +20,12 @@ foam.CLASS({
       background: #edf0f5;
       margin: 0;
     }
-    table {
+    table.foam-u2-view-TableView {
       border-collapse: collapse;
       margin: auto;
       width: 962px;
     }
-    thead > tr > th {
+    .foam-u2-view-TableView thead > tr > th {
       font-family: 'Roboto';
       font-size: 14px;
       background-color: rgba(110, 174, 195, 0.2);
@@ -37,7 +37,7 @@ foam.CLASS({
       padding-left: 15px;
       height: 40px;
     }
-    tbody > tr > th > td {
+    .foam-u2-view-TableView tbody > tr > th > td {
       font-size: 12px;
       letter-spacing: 0.2px;
       text-align: left;
