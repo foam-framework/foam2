@@ -17,8 +17,18 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'String',
-      name: 'docKey'
+      class: 'Reference',
+      of: 'foam.flow.Document',
+      name: 'docKey',
+      label: 'Document',
+      view: function(args, X) {
+        return {
+          class: 'foam.u2.view.ReferenceView',
+          dao$: X.data$.dot('daoKey').map(function(key) {
+            return X[key] || foam.dao.NullDAO.create();
+          })
+        };
+      }
     },
     {
       class: 'String',
@@ -29,7 +39,7 @@ foam.CLASS({
 
   methods: [
     function createView(X) {
-      return this.DocumentationView.create({ id: this.docKey, daoKey: this.daoKey });
+      return this.DocumentationView.create({ id: this.docId, daoKey: this.daoKey });
     }
   ]
 });
