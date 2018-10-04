@@ -39,7 +39,7 @@ foam.CLASS({
 
   methods: [
     function createView(X) {
-      return this.DocumentationView.create({ id: this.docId, daoKey: this.daoKey });
+      return this.DocumentationView.create({ docKey: this.docKey, daoKey: this.daoKey });
     }
   ]
 });
