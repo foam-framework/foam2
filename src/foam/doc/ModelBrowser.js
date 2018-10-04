@@ -94,7 +94,7 @@ foam.CLASS({
             start().style({ 'font-size': '20px', 'margin-top': '20px' }).
               add('Model ' + model).
             end().
-            //tag(self.UMLDiagram.create({ data: model })).
+            tag(self.UMLDiagram.create({ data: model })).
             tag(self.SimpleClassView.create({ data: model }));
         })
       .end();
@@ -122,9 +122,6 @@ foam.CLASS({
   package: 'foam.doc',
   name: 'AxiomLink',
   extends: 'foam.u2.View',
-
-  imports: [ 'browserPath' ],
-
   properties: [
     {
       class: 'Class',
@@ -134,7 +131,6 @@ foam.CLASS({
       name: 'axiomName'
     }
   ],
-
   methods: [
     function initE() {
       this.SUPER();
@@ -278,18 +274,17 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.core.Implements',
+    'foam.core.Method',
+    'foam.core.Property',
     'foam.dao.ArrayDAO',
+    'foam.doc.AxiomLink',
+    'foam.doc.AxiomTableView',
     'foam.doc.ClassLink',
-    'foam.doc.Link',
+    'foam.doc.MethodAxiom',
+    'foam.doc.PropertyAxiom',
     'foam.doc.PropertyInfo',
     'foam.u2.view.TableView',
-    'foam.core.Implements',
-    'foam.core.Property',
-    'foam.core.Method',
-    'foam.doc.AxiomTableView',
-    'foam.doc.PropertyAxiom',
-    'foam.doc.MethodAxiom',
-    'foam.doc.AxiomLink',
   ],
 
   imports: [
@@ -304,23 +299,23 @@ foam.CLASS({
   ],
 
   css: `
-    ^header {
+    ^inheritheader {
       background-color: #dee3e9;
       border: 1px solid #d0d9e0;
       margin-top: 14px;
       margin-bottom: 0px;
       padding: 7px 5px;
     }
-    ^footer {
+    ^inheritfooter {
       background-color: #ffffff;
       padding: 7px 5px;
       font-family: monospace;
       line-height: 1.5em;
     }
-    ^footer span:after {
+    ^inheritfooter span:after {
       content: ", ";
     }
-    ^footer span:last-child:after {
+    ^inheritfooter span:last-child:after {
       content: "";
     }
   `,
@@ -366,12 +361,12 @@ foam.CLASS({
       var outputInheritedProps = function(id) {
         this.
           start('h3').
-            addClass(this.myClass('header')).
+            addClass(this.myClass('inheritheader')).
             add('Properties inherited from ').
             start(ClassLink, { data: id }).end().
           end().
           start('div').
-            addClass(this.myClass('footer')).
+            addClass(this.myClass('inheritfooter')).
             select(propertyAxiomDAO.where(this.EQ(this.PropertyAxiom.PARENT_ID, id)), function(a) {
               return this.E('span').
                 start(AxiomLink, { cls: id, axiomName: a.name }).end()
@@ -382,12 +377,12 @@ foam.CLASS({
       var outputInheritedMethods = function(id) {
         this.
           start('h3').
-            addClass(this.myClass('header')).
+            addClass(this.myClass('inheritheader')).
             add('Methods inherited from ').
             start(ClassLink, { data: id }).end().
           end().
           start('div').
-            addClass(this.myClass('footer')).
+            addClass(this.myClass('inheritfooter')).
             select(methodAxiomDAO.where(this.EQ(this.MethodAxiom.PARENT_ID, id)), function(a) {
               return this.E('span').
                 start(AxiomLink, { cls: id, axiomName: a.name }).end()
