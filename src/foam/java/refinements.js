@@ -481,14 +481,9 @@ foam.CLASS({
       name: 'final'
     },
     {
-      class: 'String',
-      name: 'visibility',
-      value: 'public'
-    },
-    {
       class: 'Boolean',
       name: 'abstract',
-      value: false
+      value: true
     },
     {
       class: 'Boolean',
@@ -513,8 +508,7 @@ foam.CLASS({
       cls.method({
         name: this.name,
         type: this.javaReturns || 'void',
-        visibility: this.visibility,
-        abstract: this.abstract,
+        visibility: 'public',
         static: this.isStatic(),
         final: this.final,
         synchronized: this.synchronized,

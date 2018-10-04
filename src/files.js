@@ -424,6 +424,7 @@ FOAM_FILES([
   { name: "foam/u2/view/Formatter", flags: ['js'] },
   { name: "foam/u2/view/FnFormatter", flags: ['js'] },
   { name: "foam/u2/view/TableCellFormatter", flags: ['js'] },
+  { name: "foam/u2/view/UnstyledTableView", flags: ['web'] },
   { name: "foam/u2/view/TableView", flags: ['web'] },
   { name: "foam/u2/view/EditColumnsView", flags: ['web'] },
   { name: "foam/u2/md/OverlayDropdown", flags: ['web'] },
