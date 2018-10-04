@@ -22,24 +22,11 @@ foam.CLASS({
     'nSpecDAO'
   ],
 
-  exports: [
-    'showInherited',
-    'showOnlyProperties'
-  ],
-
   properties: [
     {
       name: 'models',
       value: []
     },
-    {
-      name: 'showOnlyProperties',
-      value: true
-    },
-    {
-      name: 'showInherited',
-      value: false
-    }
   ],
 
   css: `
@@ -274,18 +261,6 @@ foam.CLASS({
     'foam.doc.ClassLink',
     'foam.doc.MethodAxiom',
     'foam.doc.PropertyAxiom',
-    'foam.u2.view.TableView',
-  ],
-
-  imports: [
-    'auth',
-    'selectedAxiom',
-    'showInherited',
-    'showOnlyProperties'
-  ],
-
-  properties: [
-    'classPropertyTableView',
   ],
 
   css: `
