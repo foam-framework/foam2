@@ -89,7 +89,7 @@ foam.CLASS({
               this.addClass(this.myClass())
               .start().addClass('side-nav')
                 .select(dao, function(menu) {
-                    self.accordionCardShowDict[menu.id] = true;
+                  self.accordionCardShowDict[menu.id] = true;
                   return this.E()
                     .call(function() {
                       var self2 = this;
@@ -100,8 +100,8 @@ foam.CLASS({
                             menu.children.select().then(function(temp) {
                               // Only display submenu if array length is longer than 0
                               temp.array.length === 0 ?
-                                  menu.launch_(self2.__context__, self2) :
-                                  self.accordianToggle(menu.id);
+                                menu.launch(self2.__context__, self2) :
+                                self.accordianToggle(menu.id);
                             });
                           })
                         .end();
