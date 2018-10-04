@@ -67,13 +67,15 @@ foam.CLASS({
         .start().add(this.PRINT_PAGE).end()
         .select(this.nSpecDAO, function(n) {
           var model = self.parseClientModel(n);
-          if ( ! model ) return this.E();
           return this.E().
-            start().style({ 'font-size': '20px', 'margin-top': '20px' }).
-              add('Model ' + model).
-            end().
-            tag(self.UMLDiagram.create({ data: model })).
-            tag(self.SimpleClassView.create({ data: model }));
+            callIf(model, function() {
+              this.
+                start().style({ 'font-size': '20px', 'margin-top': '20px' }).
+                  add('Model ' + model).
+                end().
+                tag(self.UMLDiagram.create({ data: model })).
+                tag(self.SimpleClassView.create({ data: model }));
+            })
         })
       .end();
     },
