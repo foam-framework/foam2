@@ -43,8 +43,10 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      this.SUPER();
+
       if ( this.choices && Array.isArray(this.choices) ) {
-        this.tag({class: 'foam.u2.view.ChoiceView', choices: this.choices, data$: this.objectClass$});
+        this.tag({class: 'foam.u2.TextField', choices: this.choices, data$: this.objectClass$, size: 60});
         /*
          * NOTE:
          * Displays the first choice on init.
