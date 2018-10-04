@@ -179,21 +179,27 @@ if ( session != null ) {
     } else {
       //populate AppConfig url with request's RootUrl
       HttpServletRequest req = x.get(HttpServletRequest.class);
-      if ( ! SafetyUtil.isEmpty(config.getUrl()) && ! SafetyUtil.isEmpty(req.getRequestURI())) {
-        String curConfigUrl = config.getUrl();
-        String request = ((Request) req).getRootURL().toString();
-        
-        //check it's http or https
-        if ( curConfigUrl.startsWith("https") ) {
-          config.setUrl("https" + request.substring(4));
-        } else {
-          config.setUrl(request);
+
+      if ( config.getEnableForceHttps() ) {
+        if ( ! SafetyUtil.isEmpty(req.getRequestURI()) && ! SafetyUtil.isEmpty(config.getUrl())) {
+          String curConfigUrl = config.getUrl();
+          String request = ((Request) req).getRootURL().toString();
+
+          //check it's http or https
+          if ( curConfigUrl.startsWith("https") ) {
+            config.setUrl("https" + request.substring(4));
+          } else {
+            config.setUrl(request);
+          }
+        }
+      } else {
+        if ( ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
+          config.setUrl(((Request) req).getRootURL().toString());
         }
       }
     }
   }
 }
-
 return config;
         `
     }
