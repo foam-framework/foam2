@@ -122,7 +122,7 @@ foam.CLASS({
                             .call(function() {
                               this.start('a').add(submenu.label)
                               .on('click', function() {
-                                submenu.launch_(X, self2);
+                                submenu.launch(X, self2);
                               }).end();
                             })
                           .end();
