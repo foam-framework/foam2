@@ -451,7 +451,7 @@ foam.CLASS({
         }).
         // TODO Direct Known Subclasses? Javadoc has this.
         start('hr').end().
-        start('pre').
+        start('code').
           add('public class ').
           add(model.name).
           br().
