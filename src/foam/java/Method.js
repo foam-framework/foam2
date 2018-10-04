@@ -22,6 +22,7 @@ foam.CLASS({
   properties: [
     'name',
     { class: 'String', name: 'visibility' },
+    'abstract',
     'static',
     'final',
     'type',
@@ -39,6 +40,7 @@ foam.CLASS({
     function outputJava(o) {
       o.indent();
       o.out(this.visibility, this.visibility ? ' ' : '',
+        this.abstract ? 'abstract ' : '',
         this.static ? 'static ' : '',
         this.final ? 'final ' : '',
         this.synchronized ? 'synchronized ' : '',
@@ -58,6 +60,11 @@ foam.CLASS({
           o.out(this.throws[i]);
           if ( i < this.throws.length - 1 ) o.out(", ");
         }
+      }
+
+      if ( this.abstract ) {
+        o.out(';');
+        return;
       }
 
       o.out(' {\n');
