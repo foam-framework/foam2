@@ -267,6 +267,7 @@ FOAM_FILES([
   { name: "lib/utf8" },
 
   { name: "foam/flow/Document" },
+  { name: "foam/flow/MarkupEditor" },
 
   { name: "foam/net/NotConnectedException" },
   { name: "foam/net/ConnectionFailedException" },

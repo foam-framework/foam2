@@ -15,7 +15,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'markup'
+      name: 'markup',
+      view: { class: 'foam.flow.MarkupEditor' }
     }
   ],
   methods: [
