@@ -87,14 +87,16 @@ foam.CLASS({
           var dao = this.menuDAO.orderBy(Menu.ORDER)
               .where(this.EQ(Menu.PARENT, this.menuName));
               this.addClass(this.myClass())
-              .start().addClass('side-nav')
+              .start()
+                .addClass('side-nav')
                 .select(dao, function(menu) {
                   self.accordionCardShowDict[menu.id] = true;
                   return this.E()
                     .call(function() {
                       var self2 = this;
                       this
-                        .start('a').addClass('menuItem')
+                        .start('a')
+                          .addClass('menuItem')
                           .add(menu.label)
                           .on('click', function() {
                             menu.children.select().then(function(temp) {
@@ -120,10 +122,12 @@ foam.CLASS({
                             .enableClass('accordion-card-show',
                             accordianSlot)
                             .call(function() {
-                              this.start('a').add(submenu.label)
-                              .on('click', function() {
-                                submenu.launch(X, self2);
-                              }).end();
+                              this.start('a')
+                                .add(submenu.label)
+                                .on('click', function() {
+                                  submenu.launch(X, self2);
+                                })
+                              .end();
                             })
                           .end();
                         }
