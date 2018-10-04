@@ -308,23 +308,13 @@ foam.CLASS({
       imports: [
         'auth',
       ],
-      properties: [
-        {
-          class: 'Map',
-          name: 'checks',
-        },
-      ],
       methods: [
-        function check(p) {
-          if ( ! this.checks[p] ) this.checks[p] = this.auth.check(null, p);
-          return this.checks[p]
-        },
         function put_(x, o) {
           var self = this;
-          return self.check(`${o.parendId}.properties.permissioned`)
+          return self.auth.check(x, `${o.parendId}.properties.permissioned`)
             .then(function(permitted) {
               if ( ! permitted ) return false;
-              return self.check(`${o.parentId}.property.${o.axiom.name}`)
+              return self.auth.check(x, `${o.parentId}.property.${o.axiom.name}`)
           }).then(function(permitted) {
             return permitted ? self.delegate.put_(x, o) : null;
           });
@@ -504,6 +494,8 @@ foam.CLASS({
         call(outputMethodAxiomTable).
         forEach(exts.map(function(e) { return e.id }), outputInheritedMethods).
         forEach(impls.map(function(i) { return i.path }), outputInheritedMethods)
+
+        // TODO property and method detail sections.
     },
   ]
 });
