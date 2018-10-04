@@ -51,7 +51,7 @@ foam.CLASS({
           }
 
           f = function(obj) {
-              return [obj.id, obj.id];
+            return [obj.id, obj.id];
           };
 
           return f(obj);
