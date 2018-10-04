@@ -488,7 +488,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'abstract',
-      value: false
+      value: true
     },
     {
       class: 'Boolean',
