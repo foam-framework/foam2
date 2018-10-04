@@ -277,11 +277,15 @@ foam.CLASS({
       font-family: monospace;
       line-height: 1.5em;
     }
-    ^inheritfooter span:after {
+    ^commaseparated span:after {
       content: ", ";
     }
-    ^inheritfooter span:last-child:after {
+    ^commaseparated span:last-child:after {
       content: "";
+    }
+    ^modeldocumentation {
+      margin-top: 10px;
+      margin-bottom: 10px;
     }
   `,
 
@@ -371,6 +375,7 @@ foam.CLASS({
               end().
               start('div').
                 addClass(this.myClass('inheritfooter')).
+                addClass(this.myClass('commaseparated')).
                 select(dao, function(a) {
                   return this.E('span').
                     start(AxiomLink, { cls: id, axiomName: a.name }).end()
@@ -428,11 +433,16 @@ foam.CLASS({
           add(model.name).
         end().
         start('div').
-          forEach(exts, function(e, i) {
+          forEach([cls].concat(exts).reverse(), function(e, i) {
             this.
               start('div').
                 style({ 'text-indent': ( i ) * 20 + 'px' }).
-                add(e.id).
+                callIf(cls == e, function() {
+                  this.add(e.id)
+                }).
+                callIf(cls != e, function() {
+                  this.start(ClassLink, { data: e, showPackage: true }).end()
+                }).
               end();
           }).
         end().
@@ -442,10 +452,12 @@ foam.CLASS({
               add('All Implemented Interfaces:').
             end().
             start('div').
-              forEach(impls, function(impl, i) {
+              addClass(this.myClass('commaseparated')).
+              forEach(impls, function(impl) {
                 this.
-                  callIf(i > 0, function() { this.add(', ') }).
-                  add(impl.path)
+                  start('span').
+                    start(ClassLink, { data: impl.path }).end().
+                  end()
               }).
             end()
         }).
@@ -469,6 +481,7 @@ foam.CLASS({
           }).
         end().
         start('div').
+          addClass(this.myClass('modeldocumentation')).
           add(model.documentation).
         end().
 
