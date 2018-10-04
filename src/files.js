@@ -71,6 +71,10 @@ FOAM_FILES([
   { name: "foam/core/XML" },
   { name: "foam/lib/csv/CSV" },
   { name: "foam/lib/csv/CSVParser" },
+  { name: "foam/parse/StringPStream" },
+  { name: "foam/parse/ErrorReportingPStream" },
+  { name: "foam/parse/TrapPStream" },
+  { name: "foam/parse/InvalidPStream" },
   { name: "foam/parse/parse" },
   { name: "foam/parse/json" },
   { name: "foam/parsers/FON" },
@@ -215,6 +219,8 @@ FOAM_FILES([
   { name: "foam/dao/StoreAndForwardDAO" },
   { name: "foam/dao/Journal" },
   { name: "foam/dao/JournalJava", flags: ['java'] },
+  { name: "foam/dao/CompositeJournal", flags: ['java'] },
+  { name: "foam/dao/FileJournal", flags: ['java'] },
   { name: "foam/dao/JDAO", flags: ['web'] },
   { name: "foam/dao/java/JDAO", flags: ['java'] },
   { name: "foam/dao/RoutingJournal", flags: ['java'] },
@@ -259,6 +265,8 @@ FOAM_FILES([
   { name: "foam/blob/BlobJava", flags: ['java'] },
   { name: "lib/node/json_dao", flags: ['node'] },
   { name: "lib/utf8" },
+
+  { name: "foam/flow/Document" },
 
   { name: "foam/net/NotConnectedException" },
   { name: "foam/net/ConnectionFailedException" },
@@ -415,6 +423,7 @@ FOAM_FILES([
   { name: "foam/u2/view/Formatter", flags: ['js'] },
   { name: "foam/u2/view/FnFormatter", flags: ['js'] },
   { name: "foam/u2/view/TableCellFormatter", flags: ['js'] },
+  { name: "foam/u2/view/UnstyledTableView", flags: ['web'] },
   { name: "foam/u2/view/TableView", flags: ['web'] },
   { name: "foam/u2/view/EditColumnsView", flags: ['web'] },
   { name: "foam/u2/md/OverlayDropdown", flags: ['web'] },
@@ -542,4 +551,5 @@ FOAM_FILES([
   { name: "foam/test/TestObj" },
   { name: "foam/core/FObjectTest" },
   { name: "foam/nanos/dig/exception/DigErrorMessage" },
+  { name: "com/google/foam/demos/bubbles/Bubbles" }
 ]);

@@ -15,20 +15,16 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'put',
+      name: 'put_',
       javaCode: `
         try {
-          foam.core.FObject old = null;
-          Object id = obj.getProperty("id");
           String service = (String) x.get("service");
-          foam.dao.DAO dao = (foam.dao.DAO) x.get(service);
-
-          String record = ( getOutputDiff() && ( old = dao.find(id) ) != null ) ?
-            getOutputter().stringifyDelta(old, obj) :
-            getOutputter().stringify(obj);
+          String record = ( old != null ) ?
+            getOutputter().stringifyDelta(old, nu) :
+            getOutputter().stringify(nu);
 
           if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
-            writeComment_(x, obj);
+            writeComment_(x, nu);
             write_(sb.get()
               .append(service)
               .append(".p(")
