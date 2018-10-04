@@ -57,19 +57,10 @@ foam.CLASS({
     ^ .foam-doc-UMLDiagram canvas{
       width: 700px;
     }
-    ^ .foam-u2-view-TableView-foam-doc-PropertyInfo{
-      width: 700px;
-      float: left;
-      margin-top: 20px;
-      margin-bottom: 30px;
-    }
     ^ .net-nanopay-ui-ActionView-printPage{
       margin-top: 20px;
     }
     @media print{
-      .foam-u2-view-TableView-th-editColumns{
-        display: none;
-      }
       ^ .net-nanopay-ui-ActionView-printPage{
         display: none;
       }
@@ -283,7 +274,6 @@ foam.CLASS({
     'foam.doc.ClassLink',
     'foam.doc.MethodAxiom',
     'foam.doc.PropertyAxiom',
-    'foam.doc.PropertyInfo',
     'foam.u2.view.TableView',
   ],
 
@@ -320,12 +310,43 @@ foam.CLASS({
     }
   `,
 
+  classes: [
+    {
+      name: 'PropertyPermissionCheckDecorator',
+      extends: 'foam.dao.ProxyDAO',
+      imports: [
+        'auth',
+      ],
+      properties: [
+        {
+          class: 'Map',
+          name: 'checks',
+        },
+      ],
+      methods: [
+        function check(p) {
+          if ( ! this.checks[p] ) this.checks[p] = this.auth.check(null, p);
+          return this.checks[p]
+        },
+        function put_(x, o) {
+          var self = this;
+          return self.check(`${o.parendId}.properties.permissioned`)
+            .then(function(permitted) {
+              if ( ! permitted ) return false;
+              return self.check(`${o.parentId}.property.${o.axiom.name}`)
+          }).then(function(permitted) {
+            return permitted ? self.delegate.put_(x, o) : null;
+          });
+        },
+      ],
+    },
+  ],
+
   methods: [
     function fillAxiomDAO(dao, docAxiomCls, axiomCls) {
       var m = this.data;
       while ( true ) {
         m.getOwnAxiomsByClass(axiomCls).forEach(function(a) {
-          // TODO check permissions before putting.
           dao.put(docAxiomCls.create({
             axiom: a,
             parentId: m.id
@@ -349,7 +370,9 @@ foam.CLASS({
         exts.push(m);
       }
 
-      var propertyAxiomDAO = this.ArrayDAO.create({ of: this.PropertyAxiom })
+      var propertyAxiomDAO = this.PropertyPermissionCheckDecorator.create({
+        delegate: this.ArrayDAO.create({ of: this.PropertyAxiom })
+      });
       this.fillAxiomDAO(propertyAxiomDAO, this.PropertyAxiom, this.Property);
 
       var methodAxiomDAO = this.ArrayDAO.create({ of: this.MethodAxiom })
@@ -358,36 +381,67 @@ foam.CLASS({
       var ClassLink = this.ClassLink;
       var AxiomLink = this.AxiomLink;
 
-      var outputInheritedProps = function(id) {
+      var outputInherited = function(title, dao, id) {
+        var count = this.Count.create();
+        dao.pipe(count);
         this.
-          start('h3').
-            addClass(this.myClass('inheritheader')).
-            add('Properties inherited from ').
-            start(ClassLink, { data: id }).end().
-          end().
-          start('div').
-            addClass(this.myClass('inheritfooter')).
-            select(propertyAxiomDAO.where(this.EQ(this.PropertyAxiom.PARENT_ID, id)), function(a) {
-              return this.E('span').
-                start(AxiomLink, { cls: id, axiomName: a.name }).end()
-            }).
-          end()
+          add(this.slot(function(c) {
+            if ( ! c ) return;
+            return this.E().
+              start('h3').
+                addClass(this.myClass('inheritheader')).
+                add(title).
+                add(' inherited from ').
+                start(ClassLink, { data: id }).end().
+              end().
+              start('div').
+                addClass(this.myClass('inheritfooter')).
+                select(dao, function(a) {
+                  return this.E('span').
+                    start(AxiomLink, { cls: id, axiomName: a.name }).end()
+                }).
+              end()
+          }, count.value$))
+      }
+
+      var outputInheritedProps = function(id) {
+        var dao = propertyAxiomDAO.where(this.EQ(this.PropertyAxiom.PARENT_ID, id));
+        outputInherited.call(this, 'Properties', dao, id);
       }
 
       var outputInheritedMethods = function(id) {
+        var dao = methodAxiomDAO.where(this.EQ(this.MethodAxiom.PARENT_ID, id));
+        outputInherited.call(this, 'Methods', dao, id);
+      }
+
+      var outputAxiomTable = function(title, dao) {
+        var count = this.Count.create();
+        dao.pipe(count);
         this.
-          start('h3').
-            addClass(this.myClass('inheritheader')).
-            add('Methods inherited from ').
-            start(ClassLink, { data: id }).end().
-          end().
-          start('div').
-            addClass(this.myClass('inheritfooter')).
-            select(methodAxiomDAO.where(this.EQ(this.MethodAxiom.PARENT_ID, id)), function(a) {
-              return this.E('span').
-                start(AxiomLink, { cls: id, axiomName: a.name }).end()
-            }).
-          end()
+          add(this.slot(function(c) {
+            if ( ! c ) return;
+            return this.E().
+              start('h5').
+                add(title).
+                add(' Summary').
+              end().
+              start(this.AxiomTableView, { data: dao }).
+              end()
+          }, count.value$))
+      }
+
+      var outputPropertyAxiomTable = function() {
+        outputAxiomTable.call(
+          this,
+          'Property',
+          propertyAxiomDAO.where(this.EQ(this.PropertyAxiom.PARENT_ID, cls.id)))
+      }
+
+      var outputMethodAxiomTable = function() {
+        outputAxiomTable.call(
+          this,
+          'Method',
+          methodAxiomDAO.where(this.EQ(this.MethodAxiom.PARENT_ID, cls.id)))
       }
 
       this.
@@ -443,129 +497,13 @@ foam.CLASS({
           add(model.documentation).
         end().
 
-        start('h5').
-          add('Property Summary').
-        end().
-        start(this.AxiomTableView, {
-          data: propertyAxiomDAO.where(this.EQ(this.PropertyAxiom.PARENT_ID, cls.id))
-        }).
-        end().
+        call(outputPropertyAxiomTable).
         forEach(exts.map(function(e) { return e.id }), outputInheritedProps).
         forEach(impls.map(function(i) { return i.path }), outputInheritedProps).
 
-        start('h5').
-          add('Method Summary').
-        end().
-        start(this.AxiomTableView, {
-          data: methodAxiomDAO.where(this.EQ(this.MethodAxiom.PARENT_ID, cls.id))
-        }).
-        end().
+        call(outputMethodAxiomTable).
         forEach(exts.map(function(e) { return e.id }), outputInheritedMethods).
         forEach(impls.map(function(i) { return i.path }), outputInheritedMethods)
     },
-
-    async function updateTableView() {
-      var permissioned = await this.auth.check(null, this.data.id + '.properties.permissioned');
-      var axs = await this.permittedAxioms(permissioned);
-
-      this.classPropertyTableView = this.TableView.create({
-        of: this.PropertyInfo,
-        data: this.ArrayDAO.create({ array: axs })
-      });
-    },
-
-    async function permittedAxioms(permissioned) {
-      var data = this.data;
-      var axs = [];
-
-      for ( var key in data.axiomMap_ ) {
-        if ( Object.hasOwnProperty.call(data.axiomMap_, key) ) {
-          var a = data.axiomMap_[key];
-          if ( foam.core.Property.isInstance(a) ) {
-            if ( permissioned ) {
-              if ( await this.auth.check(null, data.id + '.property.' + a.name ) ) {
-                var ai = foam.doc.PropertyInfo.create({
-                  axiom: a,
-                  type: a.cls_,
-                  required: a.required,
-                  of: a.of,
-                  documentation: a.documentation,
-                  name: a.name
-                });
-
-                axs.push(ai);
-              }
-            } else {
-              var ai = foam.doc.PropertyInfo.create({
-                axiom: a,
-                type: a.cls_,
-                required: a.required,
-                of: a.of,
-                documentation: a.documentation,
-                name: a.name
-              });
-
-              axs.push(ai);
-            }
-          }
-        }
-      }
-      return axs;
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.doc',
-  name: 'PropertyInfo',
-  documentation: 'Table view model to display' +
-    ' model in printable model browser\'s',
-  ids: ['name'],
-
-  tableColumns: [
-    'name', 'required', 'of', 'type', 'documentation'
-  ],
-
-  properties: [
-    {
-      name: 'name',
-      tableCellFormatter: function(value, obj, axiom) {
-        this.add(value);
-      }
-    },
-    {
-      name: 'axiom',
-      hidden: true
-    },
-    {
-      name: 'required',
-      tableCellFormatter: function(value, obj, axiom) {
-        this.add(value);
-      }
-    },
-    {
-      name: 'of',
-      label: 'Property Of',
-      tableCellFormatter: function(value, obj, axiom) {
-        var of_ = value ? value.id : '';
-        this.add(of_);
-      }
-    },
-    {
-      name: 'type',
-      tableCellFormatter: function(value, obj, axiom) {
-        if ( value ) {
-          this.add(value.name);
-          return;
-        }
-        this.add('anonymous');
-      }
-    },
-    {
-      name: 'documentation',
-      tableCellFormatter: function(value, obj, axiom) {
-        this.add(value);
-      }
-    }
   ]
 });
