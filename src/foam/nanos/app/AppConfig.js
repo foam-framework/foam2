@@ -11,24 +11,29 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'name'
+      name: 'name',
+      visibility: 'RO'
     },
     {
       class: 'String',
-      name: 'version'
+      name: 'version',
+      visibility: 'RO'
     },
     {
       class: 'String',
       name: 'privacy',
-      value: 'Privacy Policy'
+      value: 'Privacy Policy',
+      visibility: 'RO'
     },
     {
       class: 'String',
-      name: 'privacyUrl'
+      name: 'privacyUrl',
+      visibility: 'RO'
     },
     {
       class: 'String',
-      name: 'copyright'
+      name: 'copyright',
+      visibility: 'RO'
     },
     {
       class: 'String',
@@ -38,31 +43,42 @@ foam.CLASS({
     {
       class: 'String',
       name: 'urlLabel',
-      value: 'FOAM Powered'
+      value: 'FOAM Powered',
+      visibility: 'RO'
     },
     {
       class:'String',
       name: 'termsAndCondLabel',
-      value: 'Terms and Conditions'
+      value: 'Terms and Conditions',
+      visibility: 'RO'
     },
     {
       class: 'String',
-      name: 'termsAndCondLink'
+      name: 'termsAndCondLink',
+      visibility: 'RO'
     },
     {
       class: 'Enum',
       of: 'foam.nanos.app.Mode',
-      name: 'mode'
+      name: 'mode',
+      visibility: 'RO'
     },
     {
       class: 'String',
       name: 'appLink',
-      value: 'https://www.apple.com/lae/ios/app-store/'
+      value: 'https://www.apple.com/lae/ios/app-store/',
+      visibility: 'RO'
     },
     {
       class: 'String',
       name: 'playLink',
-      value: 'https://play.google.com/store?hl=en'
+      value: 'https://play.google.com/store?hl=en',
+      visibility: 'RO'
+    },
+    {
+      class: 'Boolean',
+      name: 'enableForceHttps',
+      value: true
     }
   ]
 });
