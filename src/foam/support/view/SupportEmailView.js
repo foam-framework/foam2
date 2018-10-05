@@ -169,8 +169,8 @@ foam.CLASS({
     {
       name: 'newEmail',
       label: 'New Email',
-      code: function(){
-        this.ctrl.add(this.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportModal'}));
+      code: function() {
+        this.ctrl.add(this.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportModal' }));
       }
     }
   ],
@@ -207,7 +207,7 @@ foam.CLASS({
                 'status'
               ]
             })
-              .addClass(this.myClass('table'))
+            .addClass(this.myClass('table'))
             .end();
         }
       ] 
