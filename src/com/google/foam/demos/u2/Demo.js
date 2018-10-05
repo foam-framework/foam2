@@ -244,17 +244,6 @@ var dv2 = foam.u2.DetailView.create({
   showActions: true
 }).write();
 
-foam.u2.DetailView.create({
-  data: foam.util.Timer.create(),
-  showActions: true
-}).write();
-
-foam.u2.DetailView.create({
-  data: foam.util.Timer.create(),
-  showActions: true,
-  properties: [ foam.util.Timer.INTERVAL, foam.util.Timer.I ],
-  actions: [ foam.util.Timer.STOP, foam.util.Timer.START ]
-}).write();
 
 foam.CLASS({
   name: 'CustomDetailView',
@@ -262,13 +251,7 @@ foam.CLASS({
 
   exports: [ 'as data' ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-        important { color: red; }
-      */}
-    })
-  ],
+  css: 'important { color: red; }',
 
   properties: [
     { class: 'Int', name: 'i' },
@@ -495,11 +478,7 @@ ActionDemoView.create({data: ActionDemo.create()}).write();
 foam.CLASS({
   name: 'ParentView',
   extends: 'foam.u2.Element',
-  axioms: [
-    foam.u2.CSS.create({code: `
-      ^ { background: pink }
-    `})
-  ],
+  css: '^ { background: pink }',
   methods: [ function initE() {
     this.addClass(this.myClass()).add('text');
   }]
@@ -566,12 +545,11 @@ foam.CLASS({
     function initE() {
       this.SUPER();
 
-      this.tick();
+//      this.tick();
 
       this.start('blockquote')
         .show(this.showMe$)
         .forEach(this.data.a1, function(d) {
-          console.log('*******', d);
           this.add('(', d, ')');
         })
       .end();
@@ -601,6 +579,49 @@ var sat = StringArrayTest.create({a1:['abc','def','ghi']});
 
 // foam.u2.DetailView.create({data: sat}).write(document);
 
-document.write("*********************");
-
 StringArrayTestDetailView.create({data: sat}).write(document);
+
+
+foam.CLASS({
+  name: 'TextFieldTest',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'textField',
+    },
+    {
+      class: 'String',
+      name: 'textArea',
+      view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 40}
+    },
+    {
+      class: 'String',
+      name: 'choiceView',
+      view: {
+        class: 'foam.u2.view.ChoiceView',
+        choices: [ 'Red', 'Green', 'Blue' ]
+      }
+    },
+    {
+      class: 'String',
+      name: 'choiceView2',
+      view: {
+        class: 'foam.u2.view.ChoiceView',
+        choices: [ [ 'R', 'Red' ], [ 'G', 'Green' ], [ 'B', 'Blue' ] ]
+      }
+    },
+    {
+      class: 'String',
+      name: 'comboBox',
+      view: {
+        class: 'foam.u2.TextField',
+        choices: [ 'Red', 'Green', 'Blue', 'Purple', 'Peach', 'Pink' ]
+      }
+    },
+  ]
+});
+
+var d = TextFieldTest.create();
+foam.u2.DetailView.create({ data: d }).write();
+foam.u2.DetailView.create({ data: d }).write();

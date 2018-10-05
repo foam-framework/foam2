@@ -7,30 +7,53 @@
 foam.INTERFACE({
   package: 'foam.dao',
   name: 'Journal',
-  extends: 'foam.dao.Sink',
 
   methods: [
-    function replay(dao) {}
+    function put(x, nu) {},
+    function put_(x, old, nu) {},
+    function remove(x, obj) {},
+    function replay(x, dao) {}
   ]
 });
 
 
 foam.CLASS({
   package: 'foam.dao',
-  name: 'ProxyJournal',
-
-  documentation: 'Proxy journal class',
+  name: 'AbstractJournal',
+  abstract: true,
 
   implements: [
     'foam.dao.Journal'
   ],
+
+  methods: [
+    {
+      name: 'put',
+      code: function (x, nu) {
+        this.put_(x, null, nu);
+      },
+      javaCode: `
+        this.put_(x, null, nu);
+      `
+    }
+  ]
+});
+
+
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'ProxyJournal',
+  extends: 'foam.dao.AbstractJournal',
+
+  documentation: 'Proxy journal class',
 
   properties: [
     {
       class: 'Proxy',
       of: 'foam.dao.Journal',
       name: 'delegate',
-      forwards: [ 'replay', 'put', 'remove', 'eof', 'reset' ]
+      forwards: [ 'put_', 'remove', 'replay' ]
     }
   ]
 });
@@ -40,7 +63,8 @@ if ( foam.isServer ) {
   foam.CLASS({
     package: 'foam.dao',
     name: 'NodeFileJournal',
-    implements: ['foam.dao.Journal'],
+    extends: 'foam.dao.AbstractJournal',
+
     properties: [
       {
         class: 'Class',
@@ -69,13 +93,13 @@ if ( foam.isServer ) {
     ],
 
     methods: [
-      function put(obj) {
+      function put_(x, old, nu) {
         return this.write_(Buffer.from(
-            "put(foam.json.parse(" + foam.json.Storage.stringify(obj, this.of) +
+            "put(foam.json.parse(" + foam.json.Storage.stringify(nu, this.of) +
               "));\n"));
       },
 
-      function remove(obj) {
+      function remove(x, obj) {
         return this.write_(Buffer.from(
             "remove(foam.json.parse(" +
               foam.json.Storage.stringify(obj, this.of) +
@@ -100,7 +124,7 @@ if ( foam.isServer ) {
         });
       },
 
-      function replay(dao) {
+      function replay(x, dao) {
         var self = this;
         return new Promise(function(resolve, reject) {
           self.fs.readFile(self.fd, 'utf8', function(err, data_) {
@@ -126,8 +150,7 @@ if ( foam.isServer ) {
             resolve(dao);
           });
         });
-      },
-      function eof() {}
+      }
     ]
   });
 }

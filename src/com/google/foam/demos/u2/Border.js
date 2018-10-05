@@ -11,6 +11,7 @@
 // Alternatively, containers can create explicit content areas like
 // 'leftPane', 'rightPane', 'header', etc.
 
+// Copy 'E' out of root context for convenience.
 var E = foam.__context__.E.bind(foam.__context__);
 
 // Note that this is just a simple Tab view for demonstration purposes.
@@ -19,9 +20,19 @@ foam.CLASS({
   name: 'Tab',
   extends: 'foam.u2.Element',
 
+  css: `
+    ^ { xxxposition: absolute; }
+  `,
+
   properties: [
     { class: 'String',  name: 'label' },
     { class: 'Boolean', name: 'selected' }
+  ],
+
+  methods: [
+    function initE() {
+      this.addClass(this.myClass());
+    }
   ]
 });
 
@@ -32,21 +43,21 @@ foam.CLASS({
 
   css: `
     ^ {
-      background: gray;
+      // background: gray;
       display: block;
-      height: 200px;
+      // height: 200px;
       padding: 10px 4px;
-      width: 600px;
+      // width: 600px;
       // width: 100%;
     }
-    ^tabRow { height: 30px; }
+    ^tabRow { height: 38px; }
     ^tab {
       background: lightgray;
       border: 1px solid black;
       border-radius: 3px 3px 0 0;
       display: inline-block;
       height: 12px;
-      padding: 4px;
+      padding: 8px;
     }
     ^tab.selected {
       background: white;
@@ -58,8 +69,8 @@ foam.CLASS({
       height: 2.5px;
       left: 0;
       position: absolute;
-      top: 19px;
-      width: 43.75px;
+      top: 27px;
+      width: 100%;
     }
     ^content {
       margin: 4px;
@@ -109,7 +120,10 @@ foam.CLASS({
           start('div').addClass(this.myClass('bottomEdge')).show(tab.selected$).end().
         end();
 
-        tab.shown$ = tab.selected$;
+        // tab.shown$ = tab.selected$;
+        // Rather than using 'shown', setting visibility maintains the size of the
+        // largest tab.
+        tab.style({visibility: tab.selected$.map(function(s) { return s ? '' : 'hidden'; })});
       }
 
       this.SUPER(tab);
@@ -221,7 +235,7 @@ foam.CLASS({
   css: `
     ^ {
       border-style: ridge;
-      display: inline-block;
+      display: block;
       padding: 10px;
     }
     ^title {
@@ -233,11 +247,10 @@ foam.CLASS({
       top: -20px;
     }
     ^content {
-      background: white;
       height: 200px;
       position: relative;
       top: -22px;
-      width: 300px;
+      // width: 300px;
     }
   `,
 
@@ -268,6 +281,57 @@ E('br').write();
 
 
 foam.CLASS({
+  name: 'SideLabelledSection',
+  extends: 'foam.u2.Element',
+
+  css: `
+    ^ {
+      display: inline-block;
+      padding: 10px;
+    }
+    ^title {
+      background: white;
+      color: #666;
+      display: inline;
+      padding: 3px;
+      vertical-align: top;
+      width: 33%;
+    }
+    ^content {
+      background: white;
+      display: inline-block;
+      height: 200px;
+      width: 66%;
+    }
+  `,
+
+  properties: [ 'title' ],
+
+  methods: [
+    function init() {
+      this.start().
+        addClass(this.myClass()).
+        start('div').addClass(this.myClass('title')).add(this.title).end().
+        start('div', null, this.content$).
+          addClass(this.myClass('content')).
+        end().
+      end();
+    }
+  ]
+});
+
+var sb = SideLabelledSection.create({title: 'Title'});
+sb.add('content').br().add('more content');
+sb.write();
+
+
+
+E('br').write();
+E('br').write();
+
+
+
+foam.CLASS({
   name: 'FoldingSection',
   extends: 'foam.u2.Controller',
 
@@ -275,13 +339,23 @@ foam.CLASS({
 
   css: `
     ^ {
-      border-top-style: ridge;
+      border-top: 1px solid #999;
       display: inline-block;
       padding: 10px;
     }
     ^.expanded {
-      border-style: ridge;
-      padding-left: 9px;
+      border: 1px solid #999;
+      padding-left: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
+    }
+    ^control {
+      background: white;
+      display: inline;
+      float: right;
+      height: 30px;
+      position: relative;
+      top: -10px;
+      width: 30px;
     }
     ^toolbar {
       color: #666;
@@ -306,17 +380,21 @@ foam.CLASS({
       width: 300px;
     }
     ^ .foam-u2-ActionView-toggle {
-      background: white;
+      transform: rotate(-90deg);
+      transition: transform 0.3s;
+      background: transparent;
       border: none;
-      float: right;
       outline: none;
       padding: 3px;
-      position: relative;
-      top: -6px;
-      width: 14px;
+      width: 30px;
+      height: 30px;
+    }
+    ^.expanded .foam-u2-ActionView-toggle {
+      transform: rotate(0deg);
+      transition: transform 0.3s;
     }
     ^ .foam-u2-ActionView-toggle:hover {
-      background: white;
+      background: transparent;
     }
   `,
 
@@ -340,7 +418,120 @@ foam.CLASS({
             addClass(this.myClass('title')).
             add(this.title$).
           end().
-          tag(this.ActionView, {action: this.TOGGLE, data: this, label: this.expanded$.map(function(e) { return e ? '-' : '+'; })}).
+          start('div').
+            addClass(this.myClass('control')).
+            tag(this.ActionView, {action: this.TOGGLE, data: this, label: '\u25BD'}).
+          end().
+        end().
+        start('div', null, this.content$).
+          show(this.expanded$).
+          addClass(this.myClass('content')).
+        end();
+    }
+  ],
+
+  actions: [
+    function toggle() { this.expanded = ! this.expanded; }
+  ]
+});
+
+var sb = FoldingSection.create({title: 'Title'}).style({width: '500px'});
+sb.add('content').br().add('more content');
+sb.write();
+
+
+
+E('br').write();
+E('br').write();
+
+
+
+foam.CLASS({
+  name: 'MDFoldingSection',
+  extends: 'FoldingSection',
+
+  requires: [ 'foam.u2.ActionView' ],
+
+  css: `
+    ^ {
+      border: 1px solid #999;
+      padding-left: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
+    }
+    ^.expanded {
+    }
+    ^control {
+      background: white;
+      display: inline;
+      float: right;
+      height: 30px;
+      position: relative;
+      top: -10px;
+      width: 30px;
+    }
+    ^toolbar {
+      color: #666;
+      display: inline-block;
+      padding: 3px;
+      position: relative;
+      left: -8px;
+      top: 10px;
+      width: 100%;
+    }
+    ^title {
+      background: white;
+      padding: 3px;
+      position: relative;
+      top: -3px;
+    }
+    ^content {
+      background: white;
+      height: 200px;
+      width: 300px;
+    }
+    ^ .foam-u2-ActionView-toggle {
+      transform: rotate(-90deg);
+      transition: transform 0.3s;
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 3px;
+      width: 30px;
+      height: 30px;
+    }
+    ^.expanded .foam-u2-ActionView-toggle {
+      transform: rotate(0deg);
+      transition: transform 0.3s;
+    }
+    ^ .foam-u2-ActionView-toggle:hover {
+      background: transparent;
+    }
+  `,
+/*
+  properties: [
+    'title',
+    {
+      class: 'Boolean',
+      name: 'expanded',
+      value: true
+    }
+  ],
+
+  methods: [
+    function init() {
+      this.
+        addClass(this.myClass()).
+        enableClass('expanded', this.expanded$).
+        start('div').
+          addClass(this.myClass('toolbar')).
+          start('span').
+            addClass(this.myClass('title')).
+            add(this.title$).
+          end().
+          start('div').
+            addClass(this.myClass('control')).
+            tag(this.ActionView, {action: this.TOGGLE, data: this, label: '\u25BD'}).
+          end().
         end().
         start('div', null, this.content$).
           show(this.expanded$).
@@ -352,9 +543,10 @@ foam.CLASS({
   actions: [
     function toggle() { this.expanded = ! this.expanded; console.log(this.expanded); }
   ]
+  */
 });
 
-var sb = FoldingSection.create({title: 'Title'}).style({width: '500px'});
+var sb = MDFoldingSection.create({title: 'Title'}).style({width: '500px'});
 sb.add('content').br().add('more content');
 sb.write();
 
@@ -444,9 +636,9 @@ foam.CLASS({
 
   css: `
     ^ {
-      background: #efefef;
+      // background: #efefef;
       display: flex;
-      width: 100%;
+      // width: 100%;
     }
   `,
 
@@ -467,8 +659,8 @@ foam.CLASS({
       padding: 4px;
       float: left;
       margin: 4px;
-      border: 1px solid black;
-      width: 100%;
+      // border: 1px solid black;
+      // width: 100%;
     }
   `,
 
@@ -489,9 +681,19 @@ var cols = E().
     start(Column).add('column 2 contents').br().add('and more content').end().
     start(Column).add('column 3 contents').br().add('and more content').end().
   end().
+  start(Tabs).
+    start(Tab, {label: 'Tab 1'}).add('tab 1 contents').end().
+    start(Tab, {label: 'Tab 2'}).add('tab 2 contents').end().
+    start(Tab, {label: 'Tab 3'}).add('Even more contents in tab 3').end().
+  end().
   start(foam.u2.Tabs).
     start(foam.u2.Tab, {label: 'Tab 1'}).add('tab 1 contents').end().
     start(foam.u2.Tab, {label: 'Tab 2'}).add('tab 2 contents').end().
     start(foam.u2.Tab, {label: 'Tab 3'}).add('Even more contents in tab 3').end().
+  end().
+  start(Tabs).
+    start(Tab, {label: 'Tab 1'}).add('tab 1 contents').end().
+    start(Tab, {label: 'Tab 2'}).add('tab 2 contents').end().
+    start(Tab, {label: 'Tab 3'}).add('Even more contents in tab 3').end().
   end();
 cols.write();

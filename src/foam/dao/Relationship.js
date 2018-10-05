@@ -290,21 +290,18 @@ foam.INTERFACE({
         { name: 'target', of: 'foam.core.FObject' }
       ]
     },
-    // TODO: These should really be properties.
+    // TODO: Make these readOnly properties when we have that support.
     {
       name: 'getDAO',
-      javaReturns: 'foam.dao.DAO',
-      swiftReturns: 'foam_dao_DAO'
+      returns: 'foam.dao.DAO',
     },
     {
       name: 'getJunctionDAO',
-      javaReturns: 'foam.dao.DAO',
-      swiftReturns: 'foam_dao_DAO'
+      returns: 'foam.dao.DAO',
     },
     {
       name: 'getTargetDAO',
-      javaReturns: 'foam.dao.DAO',
-      swiftReturns: 'foam_dao_DAO'
+      returns: 'foam.dao.DAO',
     },
   ]
 });
@@ -402,7 +399,7 @@ foam.CLASS({
       name: 'add',
       args: [{ name: 'target', of: 'foam.core.FObject' }],
       javaCode: `getJunctionDAO()
-              .put(createJunction(((foam.core.Identifiable)target)
+              .put_(getX(), createJunction(((foam.core.Identifiable)target)
               .getPrimaryKey()));`,
       swiftCode: `_ = try junctionDAO!
               .put(createJunction((target as? foam_core_Identifiable)?
@@ -414,7 +411,7 @@ foam.CLASS({
     {
       name: 'remove',
       javaCode: `getJunctionDAO()
-              .remove(createJunction(((foam.core.Identifiable)target)
+              .remove_(getX(), createJunction(((foam.core.Identifiable)target)
               .getPrimaryKey()));`,
       swiftCode: `_ = try junctionDAO!
               .remove(createJunction((target as? foam_core_Identifiable)?
@@ -448,9 +445,17 @@ sourceProperty.set(junction, value: sourceId)
 return junction`
     },
     {
-      // TODO: Should we remove this, or maybe just the java portion?
+      name: 'getJunctionDAO',
+      swiftCode: 'return junctionDAO!',
+      code: function() { return this.junctionDAO; }
+    },
+    {
+      name: 'getTargetDAO',
+      swiftCode: 'return targetDAO!',
+      code: function() { return this.targetDAO; }
+    },
+    {
       name: 'getDAO',
-      returns: 'foam.dao.DAO',
       javaCode: 'return getDao();',
       swiftCode: 'return dao!',
       code: function getDAO() { return this.dao; }
