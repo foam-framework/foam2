@@ -146,7 +146,7 @@ public class SugarWebAgent
     try {
       Method declaredMethod_ = class_.getDeclaredMethod(methodName, paramTypes);
       declaredMethod_.setAccessible(true);
-      declaredMethod_.invoke(x.get(serviceName), arglist);
+      //declaredMethod_.invoke(x.get(serviceName), arglist);
 
       JSONParser jsonParser = new JSONParser();
       jsonParser.setX(x);
@@ -158,7 +158,6 @@ public class SugarWebAgent
 
       outputterJson.output(declaredMethod_.invoke(x.get(serviceName), arglist));
       out.println(outputterJson);
-
     } catch (InvocationTargetException e) {
       DigErrorMessage error = new GeneralException.Builder(x)
         .setMessage("InvocationTargetException: " + e.getTargetException().getMessage())
