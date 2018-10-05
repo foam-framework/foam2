@@ -20,9 +20,19 @@ foam.CLASS({
   name: 'Tab',
   extends: 'foam.u2.Element',
 
+  css: `
+    ^ { xxxposition: absolute; }
+  `,
+
   properties: [
     { class: 'String',  name: 'label' },
     { class: 'Boolean', name: 'selected' }
+  ],
+
+  methods: [
+    function initE() {
+      this.addClass(this.myClass());
+    }
   ]
 });
 
@@ -33,11 +43,11 @@ foam.CLASS({
 
   css: `
     ^ {
-      background: gray;
+      // background: gray;
       display: block;
-      height: 200px;
+      // height: 200px;
       padding: 10px 4px;
-      width: 600px;
+      // width: 600px;
       // width: 100%;
     }
     ^tabRow { height: 38px; }
@@ -110,7 +120,10 @@ foam.CLASS({
           start('div').addClass(this.myClass('bottomEdge')).show(tab.selected$).end().
         end();
 
-        tab.shown$ = tab.selected$;
+        // tab.shown$ = tab.selected$;
+        // Rather than using 'shown', setting visibility maintains the size of the
+        // largest tab.
+        tab.style({visibility: tab.selected$.map(function(s) { return s ? '' : 'hidden'; })});
       }
 
       this.SUPER(tab);
@@ -222,7 +235,7 @@ foam.CLASS({
   css: `
     ^ {
       border-style: ridge;
-      display: inline-block;
+      display: block;
       padding: 10px;
     }
     ^title {
@@ -234,11 +247,10 @@ foam.CLASS({
       top: -20px;
     }
     ^content {
-      background: white;
       height: 200px;
       position: relative;
       top: -22px;
-      width: 300px;
+      // width: 300px;
     }
   `,
 
@@ -624,9 +636,9 @@ foam.CLASS({
 
   css: `
     ^ {
-      background: #efefef;
+      // background: #efefef;
       display: flex;
-      width: 100%;
+      // width: 100%;
     }
   `,
 
@@ -647,8 +659,8 @@ foam.CLASS({
       padding: 4px;
       float: left;
       margin: 4px;
-      border: 1px solid black;
-      width: 100%;
+      // border: 1px solid black;
+      // width: 100%;
     }
   `,
 
