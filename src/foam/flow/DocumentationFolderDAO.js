@@ -12,6 +12,10 @@ foam.CLASS({
       name: 'dir'
     },
     {
+      name: 'of',
+      javaFactory: 'return foam.flow.Document.getOwnClassInfo();'
+    },
+    {
       name: 'delegate',
       javaFactory: 'return new foam.dao.MDAO.Builder(getX()).build();'
     }
@@ -40,7 +44,7 @@ for ( java.nio.file.Path path : contents ) {
 
   foam.flow.Document obj = new foam.flow.Document();
   String id = path.getFileName().toString().substring(0, path.getFileName().toString().lastIndexOf(".flow"));
-  
+
   obj.setId(id);
 
   // TODO: We could parse the markup on the server to get the embedded title.
