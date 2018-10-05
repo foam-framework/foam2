@@ -330,21 +330,6 @@ public class DigWebAgent
 
           return;
         }
-      } else if ( Command.help == command ) {
-        out.println("Help: <br><br>" );
-        /*List<PropertyInfo> props = cInfo.getAxiomsByClass(PropertyInfo.class);
-        out.println(daoName + "<br><br>");
-        out.println("<table>");
-        for( PropertyInfo pi : props ) {
-          out.println("<tr>");
-          out.println("<td width=200>" + pi.getName() + "</td>");
-          out.println("<td width=200>" + pi.getValueClass().getSimpleName() + "</td>");
-          out.println("</tr>");
-        }
-        out.println("</table>");*/
-
-        out.println("<input type=hidden id=classInfo style=margin-left:30;width:350 value=" + cInfo.getId() + "></input>");
-        out.println("<script>var vurl = document.location.protocol + '//' + document.location.host + '/?path=' + document.getElementById('classInfo').value + '#docs'; window.open(vurl, '_self');</script>");
       } else if ( Command.remove == command ) {
         PropertyInfo idProp     = (PropertyInfo) cInfo.getAxiomByName("id");
         Object       idObj      = idProp.fromString(id);
