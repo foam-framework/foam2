@@ -10,9 +10,9 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
-    'foam.u2.ListCreateController',
+    'foam.support.view.CreateTicketView',
     'foam.support.view.TicketDetailView',
-    'foam.support.view.CreateTicketView'
+    'foam.u2.ListCreateController'
   ],
 
   imports: [ 'user' ,'createLabel'],

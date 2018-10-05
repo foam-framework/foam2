@@ -12,7 +12,7 @@ foam.CLASS({
   documentation: 'Cards for summary views',
 
 	css: `
-    ^{
+    ^ {
       display: inline-block;
       width: 20%;
       background: white;
@@ -22,7 +22,6 @@ foam.CLASS({
       border-radius: 3px;
       overflow: hidden;
     }
-
     ^ .label {
       position: relative;
       top: 35;
@@ -39,7 +38,6 @@ foam.CLASS({
       text-align: center;
       color: #ffffff;
     }
-
     ^ .count {
       font-size: 30px;
       font-weight: 300;
@@ -48,7 +46,6 @@ foam.CLASS({
       top: 20;
       left: 20;
     }
-
     ^ .amount {
       line-height: 0.86;
       text-align: left;
