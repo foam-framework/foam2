@@ -74,8 +74,8 @@ public class SugarWebAgent
       if ( class_ != null ) {
         Method method_[] = class_.getMethods();  // get Methods' List from the class
 
-        for (int k = 0; k < method_.length; k++) {
-          if (method_[k].getName().equals(methodName)) { //found picked Method
+        for ( int k = 0 ; k < method_.length ; k++ ) {
+          if ( method_[k].getName().equals(methodName) ) { //found picked Method
 
             logger.debug("service : " + serviceName);
             logger.debug("methodName : " + method_[k].getName());
@@ -84,16 +84,14 @@ public class SugarWebAgent
             paramTypes = new Class[pArray.length];
             arglist = new Object[pArray.length];
 
-            for (int j = 0; j < pArray.length; j++) {  // checking the method's each parameter
+            for ( int j = 0 ; j < pArray.length ; j++ ) {  // checking the method's each parameter
               paramTypes[j] = pArray[j].getType();
 
-              if (!pArray[j].isNamePresent()) {
+              if ( ! pArray[j].isNamePresent() ) {
                 DigErrorMessage error = new GeneralException.Builder(x)
                   .setMessage("IllegalArgumentException : Add a compiler argument")
                   .build();
                 outputException(x, resp, "JSON", out, error);
-
-                return;
               }
 
               paramTypes[j] = pArray[j].getType();
@@ -104,36 +102,41 @@ public class SugarWebAgent
               // casting and setting according to parameters type
               String typeName = pArray[j].getType().getCanonicalName();
 
-              switch ( typeName ) {
-                case "double":
-                  arglist[j] = Double.parseDouble(p.getParameter(pArray[j].getName()));
-                  break;
-                case "boolean":
-                  arglist[j] = Boolean.parseBoolean(p.getParameter(pArray[j].getName()));
-                  break;
-                case "int":
-                  arglist[j] = Integer.parseInt(p.getParameter(pArray[j].getName()));
-                  break;
-                case "long":
-                  arglist[j] = Long.parseLong(p.getParameter(pArray[j].getName()));
-                  break;
-                case "java.lang.String":
-                  arglist[j] = p.getParameter(pArray[j].getName());
-                  break;
-                default:
-                  DigErrorMessage error = new GeneralException.Builder(x)
-                    .setMessage("Parameter Type Exception")
-                    .build();
-                  outputException(x, resp, "JSON", out, error);
+              if ( ! SafetyUtil.isEmpty(p.getParameter(pArray[j].getName())) ) {
+                switch (typeName) {
+                  case "double":
+                    arglist[j] = Double.parseDouble(p.getParameter(pArray[j].getName()));
+                    break;
+                  case "boolean":
+                    arglist[j] = Boolean.parseBoolean(p.getParameter(pArray[j].getName()));
+                    break;
+                  case "int":
+                    arglist[j] = Integer.parseInt(p.getParameter(pArray[j].getName()));
+                    break;
+                  case "long":
+                    arglist[j] = Long.parseLong(p.getParameter(pArray[j].getName()));
+                    break;
+                  case "java.lang.String":
+                    arglist[j] = p.getParameter(pArray[j].getName());
+                    break;
+                  default:
+                    DigErrorMessage error = new GeneralException.Builder(x)
+                      .setMessage("Parameter Type Exception")
+                      .build();
+                    outputException(x, resp, "JSON", out, error);
+                }
 
-                  return;
+                executeMethod(x, resp, out, class_, serviceName, methodName, paramTypes, arglist);
+              } else {
+                DigErrorMessage error = new GeneralException.Builder(x)
+                  .setMessage("Empty Parameter values : " + pArray[j].getName())
+                  .build();
+                outputException(x, resp, "JSON", out, error);
               }
             }
           }
         }
       }
-
-      executeMethod(x, resp, out, class_, serviceName, methodName, paramTypes, arglist);
 
     } catch (Exception e) {
       logger.error(e);
@@ -144,7 +147,9 @@ public class SugarWebAgent
 
   protected void executeMethod(X x, HttpServletResponse resp, PrintWriter out, Class class_, String serviceName, String methodName, Class[] paramTypes, Object arglist[]) {
     try {
+      System.out.println("eee");
       Method declaredMethod_ = class_.getDeclaredMethod(methodName, paramTypes);
+      System.out.println("fff");
       declaredMethod_.setAccessible(true);
       //declaredMethod_.invoke(x.get(serviceName), arglist);
 
@@ -156,22 +161,22 @@ public class SugarWebAgent
       outputterJson.setOutputDefaultValues(true);
       outputterJson.setOutputClassNames(true);
 
+      System.out.println("aaa");
       outputterJson.output(declaredMethod_.invoke(x.get(serviceName), arglist));
+      System.out.println("bbb");
       out.println(outputterJson);
     } catch (InvocationTargetException e) {
+      System.out.println("ccc");
       DigErrorMessage error = new GeneralException.Builder(x)
         .setMessage("InvocationTargetException: " + e.getTargetException().getMessage())
         .build();
       outputException(x, resp, "JSON", out, error);
-
-      return;
     } catch (Exception e) {
+      System.out.println("ddd");
       DigErrorMessage error = new GeneralException.Builder(x)
         .setMessage("Exception: " + e.getMessage())
         .build();
       outputException(x, resp, "JSON", out, error);
-
-      return;
     }
   }
 
@@ -190,5 +195,7 @@ public class SugarWebAgent
 
       out.println(outputterJson.toString());
     }
+
+    return;
   }
 }
