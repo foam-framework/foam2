@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.support.model',
   name: 'SupportEmail',
@@ -18,13 +24,18 @@ foam.CLASS({
     {
       class: 'String',
       name: 'status',
-      factory: function(){
-        return 'Pending'
-      }
+      value: 'Pending'
     },
     {
       class: 'DateTime',
       name: 'connectedTime'
     }
   ]
+});
+
+foam.RELATIONSHIP({
+  sourceModel: 'foam.nanos.auth.User',
+  targetModel: 'foam.support.model.SupportEmail',
+  forwardName: 'supportEmails',
+  inverseName: 'user'
 });

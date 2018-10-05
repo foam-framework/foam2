@@ -86,6 +86,15 @@ foam.CLASS({
   ]
 });
 
+
+foam.RELATIONSHIP({
+  sourceModel: 'foam.nanos.auth.User',
+  targetModel: 'foam.support.model.Ticket',
+  forwardName: 'tickets',
+  inverseName: 'user'
+});
+
+
 foam.RELATIONSHIP({
   sourceModel: 'foam.support.model.Ticket',
   targetModel: 'foam.support.model.TicketMessage',
