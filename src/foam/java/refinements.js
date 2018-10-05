@@ -1461,7 +1461,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'foam.core.ClassInfo'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
-    ['javaJSONPaser', 'new foam.lib.parse.Fail()']
+    ['javaJSONPaser', 'new ClassReferenceParser()']
   ]
 });
 
