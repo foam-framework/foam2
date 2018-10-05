@@ -15,9 +15,9 @@ foam.CLASS({
       value: '200'
     },
     {
-      class: 'String',
+      class: 'Int',
       name: 'code',
-      value: '1006'
+      value: 1006
     },
     {
       class: 'String',

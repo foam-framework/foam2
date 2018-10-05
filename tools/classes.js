@@ -264,6 +264,7 @@ var classes = [
   'foam.nanos.http.HttpParameters',
   'foam.nanos.dig.DIG',
   'foam.nanos.dig.DUG',
+  'foam.nanos.dig.SUGAR',
 
   'foam.nanos.jetty.HttpServer',
   'foam.nanos.servlet.ServletMapping',
@@ -291,9 +292,10 @@ var classes = [
   'foam.nanos.dig.exception.UnsupportException',
   'foam.nanos.dig.exception.UnknownIdException',
   'foam.nanos.dig.exception.DigSuccessMessage',
-
   'foam.flow.Document',
-  'foam.flow.DocumentationFolderDAO'
+  'foam.flow.DocumentationFolderDAO',
+  'foam.nanos.dig.exception.EmptyParameterException',
+  'foam.nanos.dig.exception.GeneralException'
 ];
 
 var abstractClasses = [
