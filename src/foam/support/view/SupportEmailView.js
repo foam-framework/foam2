@@ -7,7 +7,7 @@
 foam.CLASS({
   package:'foam.support.view',
   name:'SupportEmailView',
-  extends:'foam.u2.View',
+  extends: 'foam.u2.Controller',
 
   requires: [
     'foam.u2.dialog.Popup',
@@ -19,10 +19,6 @@ foam.CLASS({
     'createLabel',  
     'ctrl',
     'user'
-  ],
-
-  exports: [
-    'as data'
   ],
 
   css:`
