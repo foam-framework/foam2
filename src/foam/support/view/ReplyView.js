@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.support.view',
   name: 'ReplyView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Controller',
 
   documentation: 'Internal note for ticket detail view',
 
@@ -36,10 +36,6 @@ foam.CLASS({
     'viewData'
   ],
   
-  exports: [
-    'as data'
-  ],
-
   css: `
   ^ .bg {
     width: 1000px;
