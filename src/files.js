@@ -550,22 +550,5 @@ FOAM_FILES([
   { name: "foam/test/TestObj" },
   { name: "foam/core/FObjectTest" },
   { name: "foam/nanos/dig/exception/DigErrorMessage" },
-
-  // Support
-  { name: "foam/support/model/SupportEmail" },
-  { name: "foam/support/modal/NewEmailSupportModal"},
-  { name: "foam/support/modal/NewEmailSupportConfirmationModal"},
-  { name: "foam/support/modal/DeleteEmailSupportModal"},
-  { name: "foam/support/view/SupportEmailView"},
-  { name: "foam/support/model/TicketMessage" },
-  { name: "foam/support/model/Ticket" },
-  { name: "foam/support/view/TicketView" },
-  { name: "foam/support/view/TicketDetailView" },
-  { name: "foam/support/view/CreateTicketView" },
-  { name: "foam/support/view/TicketSummaryView" },
-  { name: "foam/support/view/SummaryCard" },
-  { name: "foam/support/view/MessageCard" },
-  { name: "foam/support/view/ReplyView" },
-
   { name: "com/google/foam/demos/bubbles/Bubbles" }
 ]);
