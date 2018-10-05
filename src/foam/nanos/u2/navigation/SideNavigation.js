@@ -56,7 +56,6 @@ foam.CLASS({
         .start()
           .addClass(this.myClass('side-nav'))
           .select(dao, function(menu) {
-            // console.log('menu.label: ' + menu.label)
             return foam.nanos.u2.navigation.SideNavigationItemView.create({ data: menu });
           })
         .end();
@@ -80,7 +79,6 @@ foam.CLASS({
   methods: [
     function initE() {
       var view = this;
-      // console.log('label: ' + this.data.label + ' isSubMenu: ' + this.isSubMenu )
 
       this
         .start('a')
@@ -89,10 +87,8 @@ foam.CLASS({
             var menu = view.data;
             menu.children.select().then(function(c) {
               if ( c.array.length === 0 ) {
-                // console.log('expanded: ' + view.expanded + ' length: 0' + ' submenu: ' + view.isSubMenu)
                 menu.launch(view.__context__, view);
               } else {
-                // console.log('expanded: ' + view.expanded + ' array: ' + c.array[0].label + " " + c.array[1].label + ' submenu: ' + view.isSubMenu)
                 view.expanded = ! view.expanded;
               }
             });
