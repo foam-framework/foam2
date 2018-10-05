@@ -49,7 +49,7 @@ E('b').add(
   E('br'),
   '<span style="color:red">HTML Injection Attempt</span>',
   E('br')
-);
+).write();
 
 E().
   add('Entities: ').
@@ -60,7 +60,9 @@ E().
   entity('lt').
   entity('quot').
   entity("#039").
+  add("&quot;").
   tag('br').
+  br().
   write();
 
 E('b').add(
