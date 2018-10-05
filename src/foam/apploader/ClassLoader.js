@@ -158,8 +158,8 @@ have multiple classloaders running alongside eachother`
               });
             }
             return this.buildClass_(m, path);
-          }.bind(this), function() {
-            throw new Error("Failed to load class " + id);
+          }.bind(this), function(e) {
+            throw new Error("Failed to load class " + id + " reason: " + e);
           });
         }
 

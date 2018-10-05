@@ -41,6 +41,7 @@ foam.CLASS({
       display: inline-block;
     }
     ^ .close{
+      background: 0;
       width: 24px;
       height: 24px;
       margin-top: 5px;
@@ -49,6 +50,17 @@ foam.CLASS({
       top: 4px;
       right: 20px;
       float: right;
+    }
+    ^ .foam-u2-UnstyledActionView-closeModal{
+      position: relative;
+      right: 0px;
+      width: 50px;
+      height: 40px;
+      background: transparent;
+      margin-top: 0;
+      top: 0;
+      right: 0;
+      border: none;
     }
     ^ .foam-u2-ActionView-closeModal{
       position: relative;
@@ -84,7 +96,7 @@ foam.CLASS({
   actions: [
     {
       name: 'closeModal',
-      icon: 'ic-cancelwhite.svg',
+      icon: 'images/ic-cancelwhite.svg',
       code: function(X){
         X.closeDialog()
       }

@@ -69,6 +69,8 @@ FOAM_FILES([
   { name: "foam/nanos/session/Session" },
   { name: "foam/nanos/menu/AbstractMenu" },
   { name: "foam/nanos/menu/DAOMenu" },
+  { name: "foam/nanos/menu/DocumentMenu" },
+  { name: "foam/nanos/menu/DocumentFileMenu" },
   { name: "foam/nanos/menu/LinkMenu" },
   { name: "foam/nanos/menu/ListMenu" },
   { name: "foam/nanos/menu/Menu" },
@@ -89,6 +91,7 @@ FOAM_FILES([
   { name: "foam/nanos/script/ScriptStatus" },
   { name: "foam/nanos/script/Script" },
   { name: "foam/nanos/script/TestRunnerScript" },
+  { name: "foam/nanos/servlet/ServletMapping" },
   { name: "foam/nanos/test/Test" },
   { name: "foam/nanos/test/TestBorder" },
   { name: "foam/nanos/cron/Cron" },
@@ -119,6 +122,7 @@ FOAM_FILES([
   { name: "foam/nanos/http/ProxyWebAgent" },
   { name: "foam/nanos/http/HttpParameters" },
   { name: "foam/nanos/http/DefaultHttpParameters" },
+  { name: "foam/nanos/doc/DocumentationView" },
   { name: 'foam/nanos/dig/DIG' },
   { name: 'foam/nanos/dig/DUG' },
   { name: 'foam/nanos/dig/LinkView' },
@@ -140,6 +144,4 @@ FOAM_FILES([
   { name: 'foam/demos/net/nap/web/RegulatoryNoticeForm', flags: ['web'] },
   { name: 'foam/demos/net/nap/web/RegulatoryNoticeList', flags: ['web'] },
   { name: 'foam/demos/net/nap/web/EditRegulatoryNotice', flags: ['web'] }
-
-
 ]);

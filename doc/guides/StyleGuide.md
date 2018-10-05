@@ -52,7 +52,7 @@ for ( var i = 0 ; i < a.length ; i++ ) a[i] = '';
 * Acronyms should have all letters capitalized: Ex. `DAO`
 * Properties should start with a lower-case character and be camelCase. Ex. `parent`, `firstName`
 * Non-public properties and methods can end with an underscore (`_`). Ex. `listeners_`
-* Use `NAMES_LIKE_THIS` for constant values.
+* Use `NAMES_LIKE_THIS` for constant and message names.
 
 ## Modelling
 Code should be modeled rather than created as conventional JS prototypes.

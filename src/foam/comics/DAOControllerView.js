@@ -27,6 +27,7 @@ foam.CLASS({
   exports: [
     'data.selection as selection',
     'data.data as dao',
+    'data.searchColumns as searchColumns',
     'dblclick'
   ],
 
