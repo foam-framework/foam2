@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package:'foam.support.view',
   name:'SupportEmailView',
@@ -155,7 +161,7 @@ foam.CLASS({
             .start(this.NEW_EMAIL).end()
           .end()
         .end()   
-      .end()
+      .end();
     }
   ],
 

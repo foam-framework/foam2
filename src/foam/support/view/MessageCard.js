@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.support.view',
   name: 'MessageCard',
@@ -6,14 +12,14 @@ foam.CLASS({
   documentation: 'Card for message views',
 
   requires: [
-    'foam.support.model.TicketMessage',
     'foam.support.model.Ticket',
+    'foam.support.model.TicketMessage'
   ],
 
   imports: [
-    'ticketMessageDAO',
+    'userDAO',
     'ticketDAO',
-    'userDAO'
+    'ticketMessageDAO'
   ],  
 
   javaImports: [
