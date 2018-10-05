@@ -84,6 +84,7 @@ FOAM_FILES([
   { name: "foam/nanos/u2/navigation/TopNavigation", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/FooterView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/SideNavigation", flags: ['web'] },
+  { name: "foam/nanos/u2/navigation/SideNavigationItemView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/NavigationView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/BusinessLogoView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/UserView", flags: ['web'] },

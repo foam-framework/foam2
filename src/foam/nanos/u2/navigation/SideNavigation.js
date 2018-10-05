@@ -56,54 +56,9 @@ foam.CLASS({
         .start()
           .addClass(this.myClass('side-nav'))
           .select(dao, function(menu) {
-            return foam.nanos.u2.navigation.SideNavigationItemView.create({ data: menu });
+            return foam.nanos.u2.navigation.SideNavigationItemView.create({ data: menu }, this);
           })
         .end();
     }
   ]
 });
-
-foam.CLASS({
-  package: 'foam.nanos.u2.navigation',
-  name: 'SideNavigationItemView',
-  extends: 'foam.u2.View',
-
-  properties: [
-    {
-      class: 'Boolean',
-      name: 'expanded',
-      value: true
-    }
-  ],
-
-  methods: [
-    function initE() {
-      var view = this;
-
-      this
-        .start('a')
-          .add(this.data.label)
-          .on('click', function() {
-            var menu = view.data;
-            menu.children.select().then(function(c) {
-              if ( c.array.length === 0 ) {
-                menu.launch(view.__context__, view);
-              } else {
-                view.expanded = ! view.expanded;
-              }
-            });
-          })
-        .end()
-        .start('div')
-          .add(this.slot(function(expanded, data) {
-            return ! expanded ?
-              this.E() :
-              this.E()
-                .select(data.children, function(child) {
-                  return view.cls_.create({ data: child }, view).style({'margin-left': '30px'});
-                });
-          }))
-        .end();
-    }
-  ]
-})
