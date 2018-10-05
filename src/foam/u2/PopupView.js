@@ -40,7 +40,8 @@ foam.CLASS({
     'height',
     'maxWidth',
     'maxHeight',
-    'padding'
+    'padding',
+    'bg'
   ],
 
   methods: [
@@ -49,7 +50,7 @@ foam.CLASS({
       var parent   = this.parentNode;
       var close    = function() {
         self.remove();
-        bg.remove();
+        self.bg.remove();
       };
 
       if ( ! this.padding ) this.padding = 20;
@@ -62,7 +63,7 @@ foam.CLASS({
 
       // Make a full-screen transparent background, which when clicked,
       // closes this Popup
-      var bg = this.E('div').
+      self.bg = this.E('div').
         style({
           position: 'absolute',
           width: '100%',
@@ -80,10 +81,13 @@ foam.CLASS({
           padding: this.padding + 'px',
           left:    this.x + 'px',
           top:     this.y + 'px'
-        }).
-        onunload.sub(close);
+        })
 
       parent.style({position: 'relative'});
+    },
+    function close(){
+      this.bg.remove();
+      this.remove();
     }
   ]
 });

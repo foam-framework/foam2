@@ -87,7 +87,6 @@ FOAM_FILES([
   { name: "foam/core/Freezable" },
   { name: "foam/core/AbstractFObject" },
   { name: "foam/java/Validation" },
-
   { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
   { name: "foam/swift/SwiftLib", flags: ['swift'] },
   { name: "foam/swift/Protocol", flags: ['swift'] },
@@ -140,7 +139,6 @@ FOAM_FILES([
   { name: "foam/java/JavaImport", flags: ['java'] },
   { name: "foam/java/Builder", flags: ['java'] },
   { name: "foam/java/refinements", flags: ['java'] },
-
   { name: "foam/json2/Outputter" },
   { name: "foam/json2/OutputterOutput" },
   { name: "foam/json2/SimpleOutputterOutput" },
@@ -267,6 +265,7 @@ FOAM_FILES([
   { name: "lib/utf8" },
 
   { name: "foam/flow/Document" },
+  { name: "foam/flow/MarkupEditor" },
 
   { name: "foam/net/NotConnectedException" },
   { name: "foam/net/ConnectionFailedException" },
@@ -423,6 +422,7 @@ FOAM_FILES([
   { name: "foam/u2/view/Formatter", flags: ['js'] },
   { name: "foam/u2/view/FnFormatter", flags: ['js'] },
   { name: "foam/u2/view/TableCellFormatter", flags: ['js'] },
+  { name: "foam/u2/view/UnstyledTableView", flags: ['web'] },
   { name: "foam/u2/view/TableView", flags: ['web'] },
   { name: "foam/u2/view/EditColumnsView", flags: ['web'] },
   { name: "foam/u2/md/OverlayDropdown", flags: ['web'] },
@@ -550,5 +550,22 @@ FOAM_FILES([
   { name: "foam/test/TestObj" },
   { name: "foam/core/FObjectTest" },
   { name: "foam/nanos/dig/exception/DigErrorMessage" },
+
+  // Support
+  { name: "foam/support/model/SupportEmail" },
+  { name: "foam/support/modal/NewEmailSupportModal"},
+  { name: "foam/support/modal/NewEmailSupportConfirmationModal"},
+  { name: "foam/support/modal/DeleteEmailSupportModal"},
+  { name: "foam/support/view/SupportEmailView"},
+  { name: "foam/support/model/TicketMessage" },
+  { name: "foam/support/model/Ticket" },
+  { name: "foam/support/view/TicketView" },
+  { name: "foam/support/view/TicketDetailView" },
+  { name: "foam/support/view/CreateTicketView" },
+  { name: "foam/support/view/TicketSummaryView" },
+  { name: "foam/support/view/SummaryCard" },
+  { name: "foam/support/view/MessageCard" },
+  { name: "foam/support/view/ReplyView" },
+
   { name: "com/google/foam/demos/bubbles/Bubbles" }
 ]);
