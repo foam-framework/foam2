@@ -28,7 +28,7 @@ foam.CLASS({
   exports: [ 'as data' ],
  
   css: `
-    ^ .blue-card-title{
+    ^ .blue-card-title {
       width: 100px;
       height: 100px;
       border-radius: 2px;
@@ -59,7 +59,7 @@ foam.CLASS({
       text-align: center;
       color: #ffffff;
     }
-    ^ .ticketdiv{
+    ^ .ticketdiv {
       margin: 30px 0px;
     }
     ^ .foam-support-view-SummaryCard {
@@ -68,12 +68,12 @@ foam.CLASS({
   `,
 
   messages: [
-    { name: 'title',          message: 'Tickets' },
-    { name: 'newLabel',      message: 'New' },
-    { name: 'updatedLabel',       message: 'Updated' },
-    { name: 'openLabel',       message: 'Open' },
+    { name: 'title',        message: 'Tickets' },
+    { name: 'newLabel',     message: 'New'     },
+    { name: 'updatedLabel', message: 'Updated' },
+    { name: 'openLabel',    message: 'Open'    },
     { name: 'pendingLabel', message: 'Pending' },
-    { name: 'solvedLabel',      message: 'Solved' }
+    { name: 'solvedLabel',  message: 'Solved'  }
   ],
 
   properties: [
@@ -83,36 +83,28 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'newCount',
-      value: "...",
-   
+      name: 'newCount'
     },
     {
       class: 'Int',
-      name: 'updatedCount',
-      value: '...'
+      name: 'updatedCount'
     },
     {
       class: 'Int',
-      name: 'openCount',
-      value: '...'
+      name: 'openCount'
     },
     {
       class: 'Int',
-      name: 'pendingCount',
-      value: '...'
+      name: 'pendingCount'
     },
     {
       class: 'Int',
-      name: 'solvedCount',
-      value: '...'
+      name: 'solvedCount'
     },
     {
       class: 'Int',
-      name: 'ticketCount',
-      value: '...'
-    },
-    
+      name: 'ticketCount'
+    }
   ],
 
   methods: [
