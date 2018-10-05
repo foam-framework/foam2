@@ -1,60 +1,72 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.support.view',
   name: 'TicketSummaryView',
   extends: 'foam.u2.View',
+
   documentation: 'Top-level ticket summary view.',
+
   implements: [
     'foam.mlang.Expressions'
   ],
+
   requires: [
     'foam.support.model.Ticket',
     'foam.support.view.SummaryCard',
     'foam.support.view.TicketView',
   ],
+
   imports: [
     'user'
   ],
+
   exports: [ 'as data' ],
  
   css: `
-  ^ .blue-card-title{
-    width: 100px;
-    height: 100px;
-    border-radius: 2px;
-    background-color: #59a5d5;
-    display: inline-block;
-  }
-  ^ .Mentions { 
-    font-family: Roboto;
-    font-size: 16px;
-    font-weight: bold;
-    font-style: normal;
-    font-stretch: normal;
-    line-height: 1.25;
-    letter-spacing: 0.3px;
-    text-align: center;
-    color: #ffffff;
-    margin-top: 30px;
-    margin-bottom: 5px;
-  }
-  ^ .M {
-    font-family: Roboto;
-    font-size: 14px;
-    font-weight: normal;
-    font-style: normal;
-    font-stretch: normal;
-    line-height: 0.86;
-    letter-spacing: 0.2px;
-    text-align: center;
-    color: #ffffff;
-  }
-  ^ .ticketdiv{
-    margin: 30px 0px;
-  }
-  ^ .foam-support-view-SummaryCard {
-    width: 170px;
-  }
+    ^ .blue-card-title{
+      width: 100px;
+      height: 100px;
+      border-radius: 2px;
+      background-color: #59a5d5;
+      display: inline-block;
+    }
+    ^ .Mentions {
+      font-family: Roboto;
+      font-size: 16px;
+      font-weight: bold;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.25;
+      letter-spacing: 0.3px;
+      text-align: center;
+      color: #ffffff;
+      margin-top: 30px;
+      margin-bottom: 5px;
+    }
+    ^ .M {
+      font-family: Roboto;
+      font-size: 14px;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 0.86;
+      letter-spacing: 0.2px;
+      text-align: center;
+      color: #ffffff;
+    }
+    ^ .ticketdiv{
+      margin: 30px 0px;
+    }
+    ^ .foam-support-view-SummaryCard {
+      width: 170px;
+    }
   `,
+
   messages: [
     { name: 'title',          message: 'Tickets' },
     { name: 'newLabel',      message: 'New' },
@@ -63,6 +75,7 @@ foam.CLASS({
     { name: 'pendingLabel', message: 'Pending' },
     { name: 'solvedLabel',      message: 'Solved' }
   ],
+
   properties: [
     {
       name: 'dao',
@@ -101,6 +114,7 @@ foam.CLASS({
     },
     
   ],
+
   methods: [
     function initE() {
     this.dao.on.sub(this.onDAOUpdate);    
@@ -122,6 +136,7 @@ foam.CLASS({
         .end()
     },
   ],
+
   listeners: [
     {
       name: 'onDAOUpdate',

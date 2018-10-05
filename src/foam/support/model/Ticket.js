@@ -53,8 +53,8 @@ foam.CLASS({
         if(!state) return;
         var locale = "en-us";
         var month = state.toLocaleString(locale, {month: "short"});
-        var date=state.getDate();
-        var year=state.getFullYear();
+        var date = state.getDate();
+        var year = state.getFullYear();
         this.start().add(month+" "+date+", "+year).end();
       }
     },

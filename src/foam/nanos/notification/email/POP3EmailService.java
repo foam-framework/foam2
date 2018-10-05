@@ -69,9 +69,7 @@ public class POP3EmailService
     }
   }
 
-  
-
-  private Message getMessageById(String id, Message[] messages, IMAPFolder folder){
+  protected Message getMessageById(String id, Message[] messages, IMAPFolder folder){
     String uidString = null;
     for ( int i = 0 ; i < messages.length ; i++ ) {
       try {

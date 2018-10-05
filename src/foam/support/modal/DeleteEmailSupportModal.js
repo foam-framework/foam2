@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.support.modal',
   name: 'DeleteEmailSupportModal',
@@ -120,7 +126,7 @@ foam.CLASS({
           .end()
           .start(this.DELETE_BUTTON).addClass('Rectangle-8')
           .end()
-        .end()
+        .end();
       }
     ],
         
