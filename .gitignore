@@ -21,3 +21,4 @@ build/*
 .*-gensrcs
 nano.log*
 /cronjobs
+.vscode/

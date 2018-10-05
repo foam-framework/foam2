@@ -22,7 +22,7 @@ foam.CLASS({
         if ( newValue !== oldValue ) {
           var m = this.lookup(newValue, true);
           if ( m ) {
-            this.data = m.create(this.data);
+            this.data = m.create(this.data, this);
           }
         }
       }

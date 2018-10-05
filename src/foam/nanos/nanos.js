@@ -84,6 +84,9 @@ FOAM_FILES([
   { name: "foam/nanos/auth/PermissionTableView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/TopNavigation", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/FooterView", flags: ['web'] },
+  { name: "foam/nanos/u2/navigation/SideNavigation", flags: ['web'] },
+  { name: "foam/nanos/u2/navigation/SideNavigationItemView", flags: ['web'] },
+  { name: "foam/nanos/u2/navigation/NavigationView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/BusinessLogoView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/UserView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/SubMenuBar", flags: ['web'] },
@@ -144,6 +147,4 @@ FOAM_FILES([
   { name: 'foam/demos/net/nap/web/RegulatoryNoticeForm', flags: ['web'] },
   { name: 'foam/demos/net/nap/web/RegulatoryNoticeList', flags: ['web'] },
   { name: 'foam/demos/net/nap/web/EditRegulatoryNotice', flags: ['web'] }
-
-
 ]);

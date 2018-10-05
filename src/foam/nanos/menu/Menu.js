@@ -34,6 +34,7 @@ foam.CLASS({
         choices: [
           [ 'foam.nanos.menu.DAOMenu',      'DAO' ],
           [ 'foam.nanos.menu.DocumentMenu', 'Document' ],
+          [ 'foam.nanos.menu.DocumentFileMenu', 'External Document' ],
           [ 'foam.nanos.menu.LinkMenu',     'Link' ],
           [ 'foam.nanos.menu.ListMenu',     'List' ],
           [ 'foam.nanos.menu.SubMenu',      'Submenu' ],
