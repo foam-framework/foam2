@@ -12,7 +12,7 @@ public class ClassReferenceParser
   extends ProxyParser
 {
   public ClassReferenceParser() {
-    super(new Seq0(
+    super(new Seq1(15,
       new Whitespace(),
       new Literal("{"),
       new Whitespace(),
@@ -28,14 +28,7 @@ public class ClassReferenceParser
       new Whitespace(),
       new Literal(":"),
       new Whitespace(),
-      new Parser() {
-       private Parser delegate = new StringParser();
-       public PStream parse(PStream ps, ParserContext x) {
-         ps = ps.apply(delegate, x);
-         if ( ps != null ) x.set("forClass_", ps.value());
-         return ps;
-       }
-      },
+      new StringParser(),
       new Whitespace(),
       new Literal("}")));
   }
@@ -46,7 +39,7 @@ public class ClassReferenceParser
         return null;
       }
 
-      String classId = (String) x.get("forClass_");
+      String classId = (String) ps.value();
       Class cls = Class.forName(classId);
       return cls != null ? ps.setValue(cls) : null;
     } catch ( Throwable t ) {
