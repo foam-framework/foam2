@@ -20,7 +20,6 @@ foam.RELATIONSHIP({
 });
 */
 
-
 /*
 foam.RELATIONSHIP({
   cardinality: '*:*',
