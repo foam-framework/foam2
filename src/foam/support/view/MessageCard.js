@@ -131,7 +131,7 @@ foam.CLASS({
         .start('div').addClass('bg')
           .start('hr').end() 
             .start().addClass('spaceline')
-              .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/images/person.svg'}).addClass('person')
+              .start({ class:'foam.u2.tag.Image', data:'images/person.svg' }).addClass('person')
               .start()
                 .start().add(this.requestName$).addClass('company-name').end() 
                 .start().add(this.message.dateCreated).addClass('date').end()
