@@ -280,7 +280,7 @@ foam.CLASS({
       .start()
         .start(this.BACK_ACTION).end()
         .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$).enableClass('hide', this.status$.map(function(a){ return a == 'Solved' ? true : false; }))
-          .start({ class:'foam.u2.tag.Image', data:'images/drop_down.png' }).end()
+          .start({ class:'foam.u2.tag.Image', data: 'images/drop_down.png' }).end()
         .end()
           .start(this.SUBMIT_TICKET).addClass('Rectangle-8').enableClass('hide', this.status$.map(function(a){ return a == 'Solved' ? true : false; }))
             .start().add('Submit as').addClass('SubmitButton').end()
@@ -296,7 +296,7 @@ foam.CLASS({
         .end()
         .start().addClass('primarydiv')
           .start().addClass('Missing-Cash-Out-for').add(this.data.subject + "...").end()
-          .start().add(this.status).addClass('generic-status '+ this.status).end()
+          .start().add(this.status).addClass('generic-status').addClass(this.status).end()
         .end()
         .br()
         .start().addClass('sub-div-format')
@@ -390,7 +390,7 @@ foam.CLASS({
           self.voidPopUp()
         })
           .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('Pending').addClass('Pending status').end()
+          .start().addClass('Pending').addClass('status').add('Pending').end()
         .end()
 
         .start('div').on('click', function(){
@@ -398,7 +398,7 @@ foam.CLASS({
           self.voidPopUp()
         })
           .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('New').addClass('New status').end()
+          .start().addClass('New').addClass('status').add('New').end()
         .end()
 
         .start('div').on('click', function(){
@@ -406,7 +406,7 @@ foam.CLASS({
           self.voidPopUp()
         })
           .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('Solved').addClass('Solved status').end()
+          .start().addClass('Solved').addClass('status').add('Solved').end()
         .end()
 
         .start('div').on('click', function(){
@@ -414,7 +414,7 @@ foam.CLASS({
           self.voidPopUp()
         })
           .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('Updated').addClass('Updated status').end()
+          .start().addClass('Updated').addClass('status').add('Updated').end()
         .end()
 
         .start('div').on('click', function(){
@@ -422,7 +422,7 @@ foam.CLASS({
           self.voidPopUp()
         })
           .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('Open').addClass('Open status').end()
+          .start().addClass('Open').addClass('status').add('Open').end()
         .end()
                  
         self.voidMenuBtn_.add(self.voidPopUp_)
