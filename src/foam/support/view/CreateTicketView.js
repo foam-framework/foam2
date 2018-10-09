@@ -261,7 +261,7 @@ foam.CLASS({
         .addClass(this.myClass())
         .start(this.DELETE_DRAFT).addClass('Rectangle-7').end()
         .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$)
-          .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/images/drop_down.png'}).end()
+          .start({ class:'foam.u2.tag.Image', data:'images/drop_down.png' }).end()
         .end()
         .start(this.SUBMIT_TICKET).addClass('Rectangle-8')
             .start().add('Submit as').addClass('SubmitButton').end()
@@ -364,35 +364,35 @@ foam.CLASS({
           self.voidPopUp()
         })
           .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('Pending').addClass('Pending status').end()
+          .start().addClass('Pending').addClass('status').add('Pending').end()
         .end()
         .start('div').on('click', function(){
           self.status = 'New'
           self.voidPopUp()
         })
           .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('New').addClass('New status').end()
+          .start().addClass('New').addClass('status').add('New').end()
         .end()
         .start('div').on('click', function(){
           self.status = 'Solved'
           self.voidPopUp()
         })
           .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('Solved').addClass('Solved status').end()
+          .start().addClass('Solved').addClass('status').add('Solved').end()
         .end()
         .start('div').on('click', function(){
           self.status = 'Updated'
           self.voidPopUp()
         })
           .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('Updated').addClass('Updated status').end()
+          .start().addClass('Updated').addClass('status').add('Updated').end()
         .end()
         .start('div').on('click', function(){
           self.status = 'Open'
           self.voidPopUp()
         })
           .start().add('Submit as').addClass('Submit-as').end()
-          .start().add('Open').addClass('Open status').end()
+          .start().addClass('Open').addClass('status').add('Open').end()
         .end()
                  
         self.voidMenuBtn_.add(self.voidPopUp_)
