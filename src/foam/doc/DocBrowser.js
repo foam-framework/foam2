@@ -806,21 +806,26 @@ foam.CLASS({
       name: 'canvasHeightExtension',
       value: 0
     },
+    //To avoid the overlap between different element.
     {
       name: 'lastRequireY',
-      value: 0
+      value: 0,
+      documentation: 'the y of the last require element draw in the canvas.',
     },
     {
       name: 'lastRequiredByY',
-      value: 0
+      value: 0,
+      documentation: 'the y of the last required by element draw in the canvas.',
     },
     {
       name: 'lastRelatedFromY',
-      value: 0
+      value: 0,
+      documentation: 'the y of the last required from element draw in the canvas.',
     },    
     {
       name: 'lastRelatedToY',
-      value: 0
+      value: 0,
+      documentation: 'the y of the last required to element draw in the canvas.',
     },
   ],
 
