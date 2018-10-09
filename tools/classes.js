@@ -338,7 +338,7 @@ var proxies = [
   'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.http.WebAgent',
   'foam.nanos.notification.email.EmailService',
-  'foam.nanos.notification.push.PushService',
+  'foam.nanos.notification.push.PushService'
 ];
 
 var blacklist = [
