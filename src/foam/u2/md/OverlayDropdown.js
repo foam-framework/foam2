@@ -43,8 +43,6 @@ foam.CLASS({
       overflow-x: hidden;
       overflow-y: hidden;
       position: absolute;
-      width: 125px;
-      padding: 10px;
       padding-bottom: -20px;
       margin-bottom: -20px;
       right: 3px;
