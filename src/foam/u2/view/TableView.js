@@ -46,5 +46,14 @@ foam.CLASS({
       -ms-user-select: none;
       user-select: none;
     }
+
+    ^context-menu-item {
+      padding: 10px;
+    }
+
+    ^context-menu-item:hover {
+      cursor: pointer;
+      background-color: %ACCENTCOLOR%;
+    }
   `,
 });
