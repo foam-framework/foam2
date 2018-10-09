@@ -55,7 +55,7 @@ public class AgentUserAuthService
 
     Group group = (Group) groupDAO_.find(user.getGroup());
 
-    if ( group == null ) {
+    if ( group == null && ! group.getEnabled() ) {
       throw new AuthenticationException("Super user must exist within a group.");
     }
 
@@ -75,7 +75,7 @@ public class AgentUserAuthService
     // Junction object contains a group which has a unique set of permissions specific to the relationship.
     Group actingWithinGroup = (Group) groupDAO_.find(permissionJunction.getGroup());
 
-    if ( group != null && ! group.getEnabled() ) {
+    if ( actingWithinGroup == null && ! actingWithinGroup.getEnabled() ) {
       throw new AuthenticationException("No permissions are appended to the super user relationship.");
     }
     
