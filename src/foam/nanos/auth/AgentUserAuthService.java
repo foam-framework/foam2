@@ -80,11 +80,11 @@ public class AgentUserAuthService
     }
     
     // Clone user and associate new junction group to user. Clone and freeze both user and agent. 
-    user = user.fclone();
-    user.setGroup(actingWithinGroup);
+    user = (User) user.fclone();
+    user.setGroup(actingWithinGroup.getId());
     user.freeze();
 
-    agent = user.fclone();
+    agent = (User) user.fclone();
     agent.freeze();
 
     // Set user and agent objects into the session context and place into sessionDAO.

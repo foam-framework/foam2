@@ -146,7 +146,7 @@ public class UserAndGroupAuthService
     }
 
     // Freeze user
-    user = user.fclone();
+    user = (User) user.fclone();
     user.freeze();
 
     Session session = x.get(Session.class);
