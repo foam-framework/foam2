@@ -153,7 +153,7 @@ foam.CLASS({
     z-index: 10000;
     box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.19);
   }
-  .popUpDropDown > div {     
+  .popUpDropDown > div {
     padding: 8px 0 0 11px;
     box-sizing:border-box;
     width: 185px;
@@ -280,7 +280,7 @@ foam.CLASS({
       .start()
         .start(this.BACK_ACTION).end()
         .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$).enableClass('hide', this.status$.map(function(a){ return a == 'Solved' ? true : false; }))
-          .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/images/drop_down.png'}).end()
+          .start({ class:'foam.u2.tag.Image', data:'images/drop_down.png' }).end()
         .end()
           .start(this.SUBMIT_TICKET).addClass('Rectangle-8').enableClass('hide', this.status$.map(function(a){ return a == 'Solved' ? true : false; }))
             .start().add('Submit as').addClass('SubmitButton').end()
