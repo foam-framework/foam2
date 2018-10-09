@@ -49,7 +49,7 @@ public class AgentUserAuthService
       throw new AuthenticationException();
     }
 
-    if ( user == null || ! user.getEnabled() ) {
+    if ( user == null ) {
       throw new AuthenticationException("Super user doesn't exist.");
     }
 
@@ -79,11 +79,19 @@ public class AgentUserAuthService
       throw new AuthenticationException("No permissions are appended to the super user relationship.");
     }
     
+    // Clone user and associate new junction group to user. Clone and freeze both user and agent. 
+    user = user.fclone();
+    user.setGroup(actingWithinGroup);
+    user.freeze();
+
+    agent = user.fclone();
+    agent.freeze();
+
+    // Set user and agent objects into the session context and place into sessionDAO.
     Session session = x.get(Session.class);
     session.setUserId(user.getId());
     session.setContext(session.getContext().put("user", user));
     session.setContext(session.getContext().put("agent", agent));
-    session.setContext(session.getContext().put("group", actingWithinGroup));
     sessionDAO_.put(session);
     
     return user;
