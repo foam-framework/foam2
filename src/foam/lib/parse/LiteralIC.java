@@ -10,9 +10,11 @@ import foam.lib.parse.PStream;
 import foam.lib.parse.Parser;
 import foam.lib.parse.ParserContext;
 
-public class LiteralIC implements Parser {
-  private String string;
-  private Object value;
+public class LiteralIC
+  implements Parser
+{
+  protected String string;
+  protected Object value;
 
   public LiteralIC(String s) {
     this(s, s);
@@ -20,7 +22,7 @@ public class LiteralIC implements Parser {
 
   public LiteralIC(String s, Object v) {
     string = s.toUpperCase();
-    value = v;
+    value  = v;
   }
 
   public PStream parse(PStream ps, ParserContext x) {
@@ -34,5 +36,9 @@ public class LiteralIC implements Parser {
     }
 
     return ps.setValue(value);
+  }
+
+  public String toString() {
+    return "LiteralIC(" + string_ + ")";
   }
 }
