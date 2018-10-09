@@ -20,48 +20,48 @@ foam.CLASS({
   exports: [ 'hideSummary' ],
 
   css:`
-  ^ {
-    width: 992px;
-    margin: auto;
-    padding-bottom: 40px;
-  }
-  ^ .foam-u2-UnstyledActionView-create {
-    float: right;
-    width: 135px;
-    height: 40px;
-    color: white;
-    background-color: #59a5d5;
-    border: none;
-    margin: 0 20px 20px;
-  }
-  ^ .foam-support-view-SummaryCard{
-    width: 164px;
-  }
-  ^ .foam-u2-view-TableView-row:hover {
-    cursor: pointer;
-    background: %TABLEHOVERCOLOR%;
-  }
-  ^ .foam-u2-view-TableView-row {
-    height: 40px;
-  }
-  ^ .button-div{
-    height: 40px;
-  }
-  ^ .foam-u2-view-TableView td{
-    width: 8px;
-  }
-  ^ .foam-u2-view-TableView-th-editColumns{
-    width: 10px;
-  }
-  ^ .foam-u2-view-TableView-th-id{
-    width: 125px;
-  }
-  ^ .foam-u2-view-TableView-th-requestorEmail{
-    width: 200px;
-  }
-  ^ .foam-u2-view-TableView-th-requestorName{
-    width: 200px;
-  }
+    ^ {
+      width: 992px;
+      margin: auto;
+      padding-bottom: 40px;
+    }
+    ^ .foam-u2-UnstyledActionView-create {
+      float: right;
+      width: 135px;
+      height: 40px;
+      color: white;
+      background-color: #59a5d5;
+      border: none;
+      margin: 0 20px 20px;
+    }
+    ^ .foam-support-view-SummaryCard{
+      width: 164px;
+    }
+    ^ .foam-u2-view-TableView-row:hover {
+      cursor: pointer;
+      background: %TABLEHOVERCOLOR%;
+    }
+    ^ .foam-u2-view-TableView-row {
+      height: 40px;
+    }
+    ^ .button-div{
+      height: 40px;
+    }
+    ^ .foam-u2-view-TableView td{
+      width: 8px;
+    }
+    ^ .foam-u2-view-TableView-th-editColumns{
+      width: 10px;
+    }
+    ^ .foam-u2-view-TableView-th-id{
+      width: 125px;
+    }
+    ^ .foam-u2-view-TableView-th-requestorEmail{
+      width: 200px;
+    }
+    ^ .foam-u2-view-TableView-th-requestorName{
+      width: 200px;
+    }
   `,
 
   properties: [
