@@ -152,7 +152,6 @@ public class UserAndGroupAuthService
     Session session = x.get(Session.class);
     session.setUserId(user.getId());
     session.setContext(session.getContext().put("user", user));
-    session.setContext(session.getContext().put("agent", user));
     sessionDAO_.put(session);
  
     return user;
