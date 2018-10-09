@@ -80,6 +80,32 @@ public class UserAndGroupAuthService
   }
 
   /**
+    Retrieves the agent user from the current sessions context.
+  */
+  public User getCurrentAgent(X x) throws AuthenticationException {
+    // fetch context and check if not null or user id is 0
+    Session session = x.get(Session.class);
+    if ( session == null ) {
+      throw new AuthenticationException("Not logged in");
+    }
+
+    X sessionContext = session.getContext();
+    // get agent from session context
+    User agent = (User) sessionContext.get("agent");
+
+    if ( agent == null ) {
+      throw new AuthenticationException("Agent not found.");
+    }
+
+    // check if user enabled
+    if ( ! agent.getEnabled() ) {
+      throw new AuthenticationException("Agent disabled");
+    }
+
+    return agent;
+  }
+
+  /**
    * A challenge is generated from the userID provided
    * This is saved in a LinkedHashMap with ttl of 5
    */
@@ -98,24 +124,17 @@ public class UserAndGroupAuthService
   }
 
   /**
-   * Login a user by the id provided, validate the password
-   * and return the user in the context.
+    Logs user and sets user group into the current sessions context.
    */
-  public User login(X x, long userId, String password) throws AuthenticationException {
-    if ( userId < 1 || SafetyUtil.isEmpty(password) ) {
-      throw new AuthenticationException("Invalid Parameters");
-    }
-
-    User user = (User) userDAO_.find(userId);
+  private User userAndGroupContext(X x, User user, String password) throws AuthenticationException {
     if ( user == null ) {
-      throw new AuthenticationException("User not found.");
+      throw new AuthenticationException("User not found");
     }
 
     // check if user enabled
     if ( ! user.getEnabled() ) {
       throw new AuthenticationException("User disabled");
     }
-
     // check if user group enabled
     Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
     if ( group != null && ! group.getEnabled() ) {
@@ -126,11 +145,31 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Invalid Password");
     }
 
+    // Freeze user
+    user = user.fclone();
+    user.freeze();
+
     Session session = x.get(Session.class);
     session.setUserId(user.getId());
     session.setContext(session.getContext().put("user", user));
+    session.setContext(session.getContext().put("agent", user));
     sessionDAO_.put(session);
+ 
     return user;
+  }
+
+  /**
+   * Login a user by the id provided, validate the password
+   * and return the user in the context.
+   */
+  public User login(X x, long userId, String password) throws AuthenticationException {
+    if ( userId < 1 || SafetyUtil.isEmpty(password) ) {
+      throw new AuthenticationException("Invalid Parameters");
+    }
+
+    User user = (User) userDAO_.find(userId);
+    User contextUser = (User) userAndGroupContext(x, user, password);
+    return contextUser;
   }
 
   public User loginByEmail(X x, String email, String password) throws AuthenticationException {
@@ -143,30 +182,9 @@ public class UserAndGroupAuthService
     }
 
     User user = (User) data.get(0);
-    if ( user == null ) {
-      throw new AuthenticationException("User not found");
-    }
+    User contextUser = (User) userAndGroupContext(x, user, password);
 
-    // check if user enabled
-    if ( ! user.getEnabled() ) {
-      throw new AuthenticationException("User disabled");
-    }
-
-    // check if user group enabled
-    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
-    if ( group != null && ! group.getEnabled() ) {
-      throw new AuthenticationException("User group disabled");
-    }
-
-    if ( ! Password.verify(password, user.getPassword()) ) {
-      throw new AuthenticationException("Incorrect password");
-    }
-
-    Session session = x.get(Session.class);
-    session.setUserId(user.getId());
-    session.setContext(session.getContext().put("user", user));
-    sessionDAO_.put(session);
-    return user;
+    return contextUser;
   }
 
   /**
@@ -258,6 +276,7 @@ public class UserAndGroupAuthService
 
     return false;
   }
+
 
   public boolean check(foam.core.X x, String permission) {
     return checkPermission(x, new AuthPermission(permission));
