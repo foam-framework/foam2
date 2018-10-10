@@ -157,7 +157,7 @@ foam.CLASS({
       var boundingBox = origin.getBoundingClientRect();
       var dropdownMenu = current.getBoundingClientRect();
 
-      overlay.style({ top: boundingBox.top - dropdownMenu.top + 'px'});
+      overlay.style({ top: boundingBox.top - dropdownMenu.top + 'px' });
     },
 
     function initE() {
@@ -268,15 +268,17 @@ foam.CLASS({
 
                     return this.start('td').
                       add(overlay).
-                      addClass(view.myClass('th-editColumns')).
+                      style({ 'text-align': 'right' }).
                       on('click', function(e) {
                         e.stopImmediatePropagation();
                         view.positionOverlayDropdown(overlay);
                         overlay.open();
                       }).
-                      add(' ', view.vertMenuIcon).
-                      addClass(view.myClass('vertDots')).
-                      addClass(view.myClass('noselect')).
+                      start('span').
+                        addClass(view.myClass('vertDots')).
+                        addClass(view.myClass('noselect')).
+                        add(view.vertMenuIcon).
+                      end().
                     end();
                   });
               });
