@@ -15,7 +15,7 @@ foam.INTERFACE({
     Along with the target & source Id on the junction object (UserUserJunction), a group is
     appended and is used to determine the list of permissions for the current user agent
     access to the system. When acting as another user, the user requesting to act is an "agent"
-    within the context. The user being logged into becomes the "user" within the context, and
+    within the context. The user being acted as becomes the "user" within the context, and
     the group associated to the junction object is associated to the "user" within the context.
   `,
 
@@ -25,7 +25,7 @@ foam.INTERFACE({
       name: 'actAs',
       javaReturns: 'foam.nanos.auth.User',
       swiftReturns: 'foam_nanos_auth_User',
-      javaThrows: ['foam.nanos.auth.AuthenticationException'],
+      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
       swiftThrows: true,
       args: [
         {

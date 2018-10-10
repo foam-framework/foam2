@@ -43,7 +43,7 @@ public class AgentUserAuthService
   */
   public User actAs(X x, User superUser) throws AuthenticationException {
     User agent = (User) x.get("user");
-    User user = (User) userDAO_.find(superUser.getId());
+    User user = (User) userDAO_.find_(x, superUser.getId());
 
     if ( agent == null ) {
       throw new AuthenticationException();
@@ -55,13 +55,13 @@ public class AgentUserAuthService
 
     Group group = (Group) groupDAO_.find(user.getGroup());
 
-    if ( group == null && ! group.getEnabled() ) {
+    if ( group != null && ! group.getEnabled() ) {
       throw new AuthenticationException("Super user must exist within a group.");
     }
 
     /*
-      Finds the AgentUserJunction object to see if user can log in as the passed in user.
-      Source users are permitted to act as target users, not vice versa.
+      Finds the UserUserJunction object to see if user can act as the passed in user.
+      Source (agent) users are permitted to act as target (superUser) users, not vice versa.
     */
     UserUserJunction permissionJunction = (UserUserJunction) agentJunctionDAO_.find(AND(
       EQ(UserUserJunction.SOURCE_ID, agent.getId()),
@@ -73,9 +73,9 @@ public class AgentUserAuthService
     }
 
     // Junction object contains a group which has a unique set of permissions specific to the relationship.
-    Group actingWithinGroup = (Group) groupDAO_.find(permissionJunction.getGroup());
+    Group actingWithinGroup = (Group) groupDAO_.find_(x, permissionJunction.getGroup());
 
-    if ( actingWithinGroup == null && ! actingWithinGroup.getEnabled() ) {
+    if ( actingWithinGroup != null && ! actingWithinGroup.getEnabled() ) {
       throw new AuthenticationException("No permissions are appended to the super user relationship.");
     }
     
@@ -84,7 +84,7 @@ public class AgentUserAuthService
     user.setGroup(actingWithinGroup.getId());
     user.freeze();
 
-    agent = (User) user.fclone();
+    agent = (User) agent.fclone();
     agent.freeze();
 
     // Set user and agent objects into the session context and place into sessionDAO.
