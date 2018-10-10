@@ -8,9 +8,6 @@ foam.CLASS({
   package: 'foam.doc',
   name: 'Axiom',
   ids: ['name', 'parentId'],
-  imports: [
-    'auth',
-  ],
   properties: [
     {
       name: 'axiom',
