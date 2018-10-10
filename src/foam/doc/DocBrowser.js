@@ -750,11 +750,15 @@ foam.CLASS({
       }
     },
     {
+      name: 'height',
+      value: 800,
+    },
+    {
       name: 'canvas',
       factory: function() {
         return this.Box.create({
           width: 1200,
-          height: 1200,
+          height: this.height,
           color: '#f3f3f3'
         });
       }
@@ -797,7 +801,32 @@ foam.CLASS({
       name: 'widthExtendsBox',
       value: 200
     },
-    'data'
+    'data',
+    {
+      name: 'canvasHeightExtension',
+      value: 0
+    },
+    //To avoid the overlap between different element.
+    {
+      name: 'lastRequireY',
+      value: 0,
+      documentation: 'the y of the last require element draw in the canvas.',
+    },
+    {
+      name: 'lastRequiredByY',
+      value: 0,
+      documentation: 'the y of the last required by element draw in the canvas.',
+    },
+    {
+      name: 'lastRelatedFromY',
+      value: 0,
+      documentation: 'the y of the last required from element draw in the canvas.',
+    },    
+    {
+      name: 'lastRelatedToY',
+      value: 0,
+      documentation: 'the y of the last required to element draw in the canvas.',
+    },
   ],
 
   methods: [
@@ -809,19 +838,21 @@ foam.CLASS({
       this.elementMap = new Map();
       this.properties = this.getAllProperties( data );
 
-      this.canvas.height = this.conventionalUML && this.properties.length >= 15 ? this.properties.length * 60 + 800 : 1200;
+      this.canvas.height = this.conventionalUML && this.properties.length >= 15 ? this.properties.length * 30 + this.height : this.height;
 
       var heightCenterBox = (this.conventionalUML ? this.properties.length : nbrOfPropInNonConventionalDiag) * propertyHeight;
-      this.addModel(this.canvas.width / 2 - this.widthCenterModel / 2, this.canvas.height / 2.5 - heightCenterBox , this.widthCenterModel);//
-      this.addExtends(this.canvas.width / 2 - this.widthExtendsBox / 2, this.canvas.height / 2.5 - heightCenterBox );
-      this.addImplements(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / 2.5 - heightCenterBox );
-      this.addRequires(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / 2.5 - heightCenterBox );
-      this.addRequiredBy(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / 2.5 - heightCenterBox );
-      this.addSubClasses(this.canvas.width / 2 - this.widthExtendsBox / 2, this.canvas.height / 2.5 - heightCenterBox );
-      /*this.addImports(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / 2.5 - heightCenterBox );
-      this.addExports(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / 2.5 - heightCenterBox );*/
-      this.addRelatedto(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / 2.5 - heightCenterBox );
-      this.addRelatedFrom(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / 2.5 - heightCenterBox );
+      this.addModel(this.canvas.width / 2 - this.widthCenterModel / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox , this.widthCenterModel);
+      this.addExtends(this.canvas.width / 2 - this.widthExtendsBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
+      this.addImplements(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
+      this.addRequires(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
+      this.addRequiredBy(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
+      /*this.addImports(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?2.5:1.5) - heightCenterBox );
+      this.addExports(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?2.5:1.5) - heightCenterBox );*/
+      this.addRelatedto(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
+      this.addRelatedFrom(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
+      this.addSubClasses(this.canvas.width / 2 - this.widthExtendsBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
+
+      this.canvas.height = this.canvasHeightExtension >= this.canvas.height ? this.canvasHeightExtension: this.canvas.height;
 
       this.addLegend();
 
@@ -1309,6 +1340,7 @@ foam.CLASS({
             color: 'white'
           });
           this.selected = this.canvas.addChildren(requiresByLine, requiresByConnectorCircle, requiresByName, requiresByNameLabel);
+          this.lastRelatedToY = this.lastRequiredByY = requiresByName.y + ( h || 30 );
         }
       }
     },
@@ -1368,13 +1400,19 @@ foam.CLASS({
             color: 'white'
           });
           this.selected = this.canvas.addChildren( requiresName, requiresNameLabel, requiresLine, requiresConnector );
+          this.lastRelatedFromY = this.lastRequireY = requiresName.y + ( h || 30 );
         }
       }
     },
 
     function addSubClasses(x, y, w, h) {
-      var marge = 4;
-      var d = this.conventionalUML ? 300 + this.properties.length * 30 : 300;
+      var marge = 4;                  
+      var dDefualt = 300 + this.properties.length * 30;
+      var d = this.conventionalUML && dDefualt+y > this.lastRelatedFromY && dDefualt+y > this.lastRelatedToY ? dDefualt : 
+          this.lastRelatedFromY > this.lastRelatedToY ?
+            this.lastRelatedFromY > this.height ? this.lastRelatedFromY - 300: 500 :
+            this.lastRelatedToY > this.height ? this.lastRelatedToY - 300: 500 ;    
+
       var boxLarge = 35;
       var endPtD = this.conventionalUML ? 30 + this.properties.length * 30 : 180;
       var l = 230;
@@ -1473,6 +1511,7 @@ foam.CLASS({
       });
 
       this.selected = this.canvas.addChildren( triangleEndSubClasses, subClassesLineV, subClassesLineH );
+      if ( subClassesName.y >= this.height && subClassesName.y >= this.canvasHeightExtension ) this.canvasHeightExtension = subClassesName.y + ( ( h || 30 ) * 2 );
     },
 
     function arrowEnd(ptX, ptY, ang) {
@@ -1497,6 +1536,7 @@ foam.CLASS({
           }).includes(path);
       });
       d1 += (req.length * (h || 30)) + 20;
+      d1 = this.lastRequiredByY > y ? this.lastRequiredByY - d : y - d1 + 10;
 
       var targetM =  [];
       var recursiveM ;
@@ -1584,6 +1624,10 @@ foam.CLASS({
             } else {
               this.selected = this.canvas.addChildren( relatedtoName, relatedtoNameLabel, relatedtoline, arrowRelatedto );
             }
+            if ( relatedtoName.y >= this.height && relatedtoName.y >= this.canvasHeightExtension ) {
+              this.canvasHeightExtension = relatedtoName.y + (( h || 30 ) * 2 );
+              if ( this.lastRelatedFromY < relatedtoName.y ) this.lastRelatedToY = relatedtoName.y;
+            }
           }
         }
       }
@@ -1592,7 +1636,7 @@ foam.CLASS({
     function addRelatedFrom(x, y, w, h) {
       var marge = 45;
       var d     = -400;
-      var d1    = 210;
+      var d1    = 160;
       var cls   = this.data;
       var axeX  = x + d;
       //just to avoid the overlap????
@@ -1606,8 +1650,7 @@ foam.CLASS({
       });
 
       d1 += (req.length * (h || 30)) +20;
-
-      var axeY = y + d1;
+      var axeY = this.lastRequireY > y ? this.lastRequireY  : y + d1 ;
 
       var targetM =  [];
       var recursiveM ;
@@ -1698,6 +1741,10 @@ foam.CLASS({
             } else {
               this.selected = this.canvas.addChildren( RelatedFromName, RelatedFromNameLabel, RelatedFromLine, arrowRelatedFrom );
             }
+            if ( RelatedFromName.y >= this.height && RelatedFromName.y >= this.canvasHeightExtension ) {
+              this.canvasHeightExtension = axeY + ( ( h || 30 ) * 3 );
+            }
+            if ( this.lastRelatedFromY < axeY ) this.lastRelatedFromY = axeY;
           }
         }
       }
