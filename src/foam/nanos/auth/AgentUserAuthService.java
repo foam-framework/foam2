@@ -43,20 +43,21 @@ public class AgentUserAuthService
   */
   public User actAs(X x, User superUser) throws AuthenticationException {
     User agent = (User) x.get("user");
-    User user = (User) userDAO_.find_(x, superUser.getId());
+    User user = (User) userDAO_.find(superUser.getId());
 
+    // Check for current context user
     if ( agent == null ) {
       throw new AuthenticationException();
     }
 
     if ( user == null ) {
-      throw new AuthenticationException("Super user doesn't exist.");
+      throw new AuthorizationException("Super user doesn't exist.");
     }
 
     Group group = (Group) groupDAO_.find(user.getGroup());
 
     if ( group != null && ! group.getEnabled() ) {
-      throw new AuthenticationException("Super user must exist within a group.");
+      throw new AuthorizationException("Super user must exist within a group.");
     }
 
     /*
@@ -73,10 +74,10 @@ public class AgentUserAuthService
     }
 
     // Junction object contains a group which has a unique set of permissions specific to the relationship.
-    Group actingWithinGroup = (Group) groupDAO_.find_(x, permissionJunction.getGroup());
+    Group actingWithinGroup = (Group) groupDAO_.find(permissionJunction.getGroup());
 
     if ( actingWithinGroup != null && ! actingWithinGroup.getEnabled() ) {
-      throw new AuthenticationException("No permissions are appended to the super user relationship.");
+      throw new AuthorizationException("No permissions are appended to the super user relationship.");
     }
     
     // Clone user and associate new junction group to user. Clone and freeze both user and agent. 
@@ -100,7 +101,7 @@ public class AgentUserAuthService
   /**
     Retrieves the agent user from the current sessions context.
   */
-  public User getCurrentAgent(X x) throws AuthenticationException {
+  public User getCurrentAgent(X x) throws AuthorizationException {
     // fetch context and check if not null or user id is 0
     Session session = x.get(Session.class);
     if ( session == null ) {
@@ -112,12 +113,12 @@ public class AgentUserAuthService
     User agent = (User) sessionContext.get("agent");
 
     if ( agent == null ) {
-      throw new AuthenticationException("Agent not found.");
+      throw new AuthorizationException("Agent not found.");
     }
 
     // check if user enabled
     if ( ! agent.getEnabled() ) {
-      throw new AuthenticationException("Agent disabled");
+      throw new AuthorizationException("Agent disabled");
     }
 
     return agent;

@@ -94,12 +94,12 @@ public class UserAndGroupAuthService
     User agent = (User) sessionContext.get("agent");
 
     if ( agent == null ) {
-      throw new AuthenticationException("Agent not found.");
+      throw new AuthorizationException("Agent not found.");
     }
 
     // check if user enabled
     if ( ! agent.getEnabled() ) {
-      throw new AuthenticationException("Agent disabled");
+      throw new AuthorizationException("Agent disabled");
     }
 
     return agent;
