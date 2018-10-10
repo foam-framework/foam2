@@ -12,6 +12,7 @@ usage() {
     echo " -s When debugging is enabled, start with application suspended."
     echo " -a PORT Listen on PORT for debugger connections, default 8000"
     echo " -j JAR1:JAR2 Additional jars to add to the classpath."
+    echo " -t Runs tests."
     echo ""
     echo "Nanos Options:"
     # TODO: Let nanos output these itself.
