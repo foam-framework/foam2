@@ -353,8 +353,8 @@ foam.RELATIONSHIP({
   cardinality: '*:*',
   sourceModel: 'foam.nanos.auth.User',
   targetModel: 'foam.nanos.auth.User',
-  forwardName: 'agents',
-  inverseName: 'superUsers',
+  forwardName: 'superUsers',
+  inverseName: 'agents',
   junctionDAOKey: 'agentJunctionDAO',
 });
 
