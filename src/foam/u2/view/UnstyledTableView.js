@@ -252,20 +252,18 @@ foam.CLASS({
                     if ( availableActions.length === 0 ) {
                       if ( view.editColumnsEnabled ) {
                         return this.tag('td');
-                      } else {
-                        return;
                       }
+                      return;
                     }
 
-                    availableActions.forEach((action) => {
-                      var option = view.E().start()
+                    overlay.forEach(availableActions, function(action) {
+                      this.start()
                         .addClass(view.myClass('context-menu-item'))
                         .add(action.label)
                         .on('click', function(evt) {
                           action.code.call(obj);
                         })
                       .end();
-                      overlay.add(option);
                     });
 
                     return this.start('td').
