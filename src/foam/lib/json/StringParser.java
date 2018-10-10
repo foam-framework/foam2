@@ -6,16 +6,16 @@
 
 package foam.lib.json;
 
-import foam.lib.parse.*;
-
-import java.util.function.Supplier;
+import foam.lib.parse.PStream;
+import foam.lib.parse.Parser;
+import foam.lib.parse.ParserContext;
 
 public class StringParser
   implements Parser
 {
   protected final static char ESCAPE = '\\';
   protected final static ThreadLocal<Parser> unicodeParser = ThreadLocal.withInitial(UnicodeParser::new);
-  protected final static ThreadLocal<Parser> asciiEscapeParser = ThreadLocal.withInitial(ASCIIEscapeParser::new);cd 
+  protected final static ThreadLocal<Parser> asciiEscapeParser = ThreadLocal.withInitial(ASCIIEscapeParser::new);cd
   protected final static ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
 
     @Override
