@@ -59,26 +59,41 @@ public class AuthenticatedAgentJunctionDAO
 
   @Override
   public FObject find_(X x, Object id) {
-    User user = (User) x.get("user");
-    User agent = (User) x.get("agent");
     AuthService auth = (AuthService) x.get("auth");
 
-    // Check if logged in
+    UserUserJunction junctionObj = (UserUserJunction) super.inX(x).find(id);
+    
+    // Check global permissions
+    if ( auth.check(x, GLOBAL_AGENT_JUNCTION_READ) || userAndAgentAuthorized(x, junctionObj) ) {
+      return junctionObj;
+    }
+
+    return null;
+  }
+
+  @Override
+  public FObject remove_(X x, FObject obj) {
+    if ( obj == null ){ 
+      throw new RuntimeException("Junction object is null.");
+    }
+    if ( auth.check(x, GLOBAL_AGENT_JUNCTION_DELETE) || userAndAgentAuthorized(x, obj) ) {
+      return super.inX(x).remove(obj);
+    }
+
+    throw new AuthorizationException("Unable to remove object.");
+  }
+
+  public void userAndAgentAuthorized(X x, UserUserJunction junctionObj){
+    User user = (User) x.get("user");
+    User agent = (User) x.get("agent");
+
     if ( user == null ) {
       throw new AuthenticationException();
     }
 
-    UserUserJunction junctionObj = (UserUserJunction) super.inX(x).find(id);
-
-    if ( junctionObj == null ){
-      return null;
+    if ( junctionObj == null ) {
+      return false;
     }
-    
-    // Check global permissions
-    if ( auth.check(x, GLOBAL_AGENT_JUNCTION_READ) ) {
-      return junctionObj;
-    }
-
     // Check agent in context, return junction object related to agent.
     boolean agentAuthorized = agent != null && 
         ( SafetyUtil.equals(junctionObj.getTargetId(), agent.getId()) ||
@@ -89,21 +104,6 @@ public class AuthenticatedAgentJunctionDAO
         ( SafetyUtil.equals(junctionObj.getTargetId(), user.getId()) ||
         SafetyUtil.equals(junctionObj.getSourceId(), user.getId()) );
 
-    if ( agentAuthorized  && userAuthorized) {
-      return junctionObj;
-    }
-  
-    return null;
+    return agentAuthorized || userAuthorized;
   }
-
-  @Override
-  public FObject remove_(X x, FObject obj) {
-    if ( obj == null ){ 
-      throw new RuntimeException("Junction object is null.");
-    }
-
-    booean
-    return super.remove_(x, obj);
-  }
-
 }
