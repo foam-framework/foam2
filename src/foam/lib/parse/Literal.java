@@ -33,6 +33,8 @@ public class Literal
   }
 
   public PStream parse(PStream ps, ParserContext x) {
+    if ( string_ == null ) return null;
+
     for ( int i = 0 ; i < string_.length() ; i++ ) {
       if ( ! ps.valid() || ps.head() != string_.charAt(i) ) return null;
 
@@ -40,5 +42,9 @@ public class Literal
     }
 
     return ps.setValue(value_);
+  }
+
+  public String toString() {
+    return "Literal(" + string_ + ")";
   }
 }

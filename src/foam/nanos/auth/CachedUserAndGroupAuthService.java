@@ -37,7 +37,7 @@ public class CachedUserAndGroupAuthService
   }
 
   @Override
-  public Boolean checkPermission(foam.core.X x, java.security.Permission permission) {
+  public boolean checkPermission(foam.core.X x, java.security.Permission permission) {
     if ( x == null || permission == null ) return false;
 
     User user = (User) x.get("user");

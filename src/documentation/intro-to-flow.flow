@@ -1,0 +1,97 @@
+<title>Introduction to FLOW</title>
+
+<h1>Introduction to FLOW</h1>
+
+<section name="intro">
+<p>FLOW is a text markup language for live documents in the
+FOAM system.  It is a subset of HTML with added support for FOAM specific features.</p>
+
+</section>
+<section name="features">
+<h2>Features</h2>
+A quick rundown of the features in FLOW
+<ul>
+  <li>&lt;i&gt;<i>italics</i>&lt;/li&gt;</li>
+  <li>&lt;b&gt;<b>bold</b>&lt;/b&gt;</li>
+  <li>&lt;p&gt;Paragraph tags&lt;/p&gt;</li>
+  <li>HTML entities: &amp;amp; -> &amp;</li>
+  <li><h3>Headers</h3></li>
+  <li>
+  Various lists, including:
+  <ol>
+    <li>Ordered</li>
+    <li>Unordered</li>
+    <li>additionally
+      <ul>
+        <li>Sub</li>
+        <li>
+          <ol>
+            <li>Lists</li>
+          </ol>
+        </li>
+      </ul>
+    </li>
+  </ol>
+  </li>
+  <li>
+    <a href="#nspec">Links!</a>
+  </li>
+  <li>
+  Embedded FOAM tags &lt;foam class="com.google.foam.demos.bubbles.Bubbles"/&gt;<br/>
+  <foam class="com.google.foam.demos.bubbles.Bubbles"/>
+  </li>
+  <li>Code tags:
+  <code>/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+foam.CLASS({
+  package: 'foam.nanos.demo.relationship',
+  name: 'Student',
+  ids: [ 'studentId' ],
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'Long',
+      name: 'studentId'
+    }
+  ]
+});
+
+foam.RELATIONSHIP({
+  sourceModel: 'foam.nanos.demo.relationship.Student',
+  targetModel: 'foam.nanos.demo.relationship.Course',
+  cardinality: '*:*',
+  forwardName: 'courses',
+  inverseName: 'students'
+});
+</code>
+</li>
+<li>Image support:</br>
+<img src="/src/foam/nanos/controller/foam_red.png"/>
+</ul>
+
+
+</section>
+
+<section name="todo">
+<h2>Items still to implement</h2>
+<ul>
+<li>Table of Contents support</li>
+<li>More robust linking for linking</li>
+<li>Native support for android/iOS</li>
+<li>Tables</li>
+<li>Any other formatting tags we decide we want</li>
+<li>Syntax highlighting for code tags</li>
+<li>Naming and references of objects defined by FOAM tags to build more complete "applications"</li>
+<li>Additional markup formats like Markdown or Org mode</li>
+<li>PDF or other printable format rendering</li>
+<li>Online editing with split/alt view of markup vs rendered document.</li>
+<li>Online editing with a rich text editor</li>
+</ul>
+</section>

@@ -1,3 +1,4 @@
 p({"class":"foam.util.EmailTest","id":"emailTest","description":"email tests"})
 p({"class":"foam.util.PasswordTest","id":"passwordTest","description":"password tests"})
+p({"class":"foam.util.SecurityUtilTest","id":"security util tests","description":"security util tests"})
 p({"class":"foam.parse.QueryParserUserTest","id":"QueryParserUserTest"})

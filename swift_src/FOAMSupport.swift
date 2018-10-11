@@ -42,7 +42,7 @@ class ListenerList {
   var sub: Subscription?
 }
 
-public protocol PropertyInfo: Axiom, SlotGetterAxiom, SlotSetterAxiom, GetterAxiom, SetterAxiom, foam_mlang_Expr {
+public protocol PropertyInfo: Axiom, SlotGetterAxiom, SlotSetterAxiom, GetterAxiom, SetterAxiom, foam_mlang_Expr, foam_mlang_order_Comparator {
   var classInfo: ClassInfo { get }
   var transient: Bool { get }
   var storageTransient: Bool { get }
@@ -65,16 +65,17 @@ extension PropertyInfo {
   public func partialEval() {
     // TODO
   }
+  func `compare`(_ o1: Any?, _ o2: Any?) -> Int {
+    guard let fo1 = o1 as? foam_core_FObject,
+      let fo2 = o2 as? foam_core_FObject else {
+        return FOAM_utils.compare(o1, o2)
+    }
+    return FOAM_utils.compare(get(fo1), get(fo2))
+  }
 }
 
 public protocol JSONOutputter {
   func toJSON(outputter: foam_swift_parse_json_output_Outputter, out: foam_json2_Outputter)
-}
-
-extension PropertyInfo {
-  public func compare(_ o1: foam_core_FObject, _ o2: foam_core_FObject) -> Int {
-    return FOAM_utils.compare(get(o1), get(o2))
-  }
 }
 
 public class MethodArg {

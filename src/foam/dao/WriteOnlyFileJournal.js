@@ -3,41 +3,36 @@ foam.CLASS({
   name: 'WriteOnlyFileJournal',
   extends: 'foam.dao.FileJournal',
 
-  javaImports: [
-    'foam.core.FObject',
-    'foam.lib.json.Outputter',
-    'foam.lib.json.OutputterMode'
-  ],
-
   properties: [
     {
       name: 'outputClassNames',
       class: 'Boolean',
       value: false
-    }
-  ],
-
-  axioms: [
+    },
     {
-      name: 'javaExtras',
-      buildJavaClass: function (cls) {
-        cls.extras.push(`
-          protected Outputter outputter_ = new Outputter(OutputterMode.STORAGE)
-              .setOutputClassNames(getOutputClassNames());
-        `);
-      }
+      name: 'outputter',
+      javaFactory: `
+        return new foam.lib.json.Outputter(foam.lib.json.OutputterMode.STORAGE)
+          .setOutputClassNames(getOutputClassNames());
+      `
     }
   ],
 
   methods: [
     {
-      name: 'put',
+      name: 'put_',
       synchronized: true,
       javaCode: `
         try {
           // Since only writing, dispense with id lookup and delta
-          String record = outputter_.stringify((FObject) obj);
-          write_("p(" + record + ")");
+          String record = getOutputter().stringify(nu);
+          if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
+            write_(sb.get()
+              .append("p(")
+              .append(record)
+              .append(")")
+              .toString());
+          }
         } catch ( Throwable t ) {
           throw new RuntimeException(t);
         }

@@ -1153,7 +1153,7 @@ foam.CLASS({
       } else {
         if ( value === undefined || value === null || value === false ) {
           this.removeAttribute(name);
-          return;
+          return this;
         }
 
         if ( foam.core.Slot.isInstance(value) ) {
@@ -1176,6 +1176,8 @@ foam.CLASS({
           this.onSetAttr(name, value);
         }
       }
+
+      return this;
     },
 
     function removeAttribute(name) {
