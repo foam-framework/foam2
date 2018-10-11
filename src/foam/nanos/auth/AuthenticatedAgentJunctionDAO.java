@@ -70,28 +70,40 @@ public class AuthenticatedAgentJunctionDAO
 
     UserUserJunction junctionObj = (UserUserJunction) super.inX(x).find(id);
 
+    if ( junctionObj == null ){
+      return null;
+    }
+    
     // Check global permissions
     if ( auth.check(x, GLOBAL_AGENT_JUNCTION_READ) ) {
       return junctionObj;
     }
 
-    // If agent exists return junction object related to agent.
-    if ( agent != null && junctionObj != null &&
+    // Check agent in context, return junction object related to agent.
+    boolean agentAuthorized = agent != null && 
         ( SafetyUtil.equals(junctionObj.getTargetId(), agent.getId()) ||
-        SafetyUtil.equals(junctionObj.getSourceId(), agent.getId()) )) {
+        SafetyUtil.equals(junctionObj.getSourceId(), agent.getId()) );
+
+    // Check if agent doesn't exist, return junction object related to user.
+    boolean userAuthorized = agent == null &&
+        ( SafetyUtil.equals(junctionObj.getTargetId(), user.getId()) ||
+        SafetyUtil.equals(junctionObj.getSourceId(), user.getId()) );
+
+    if ( agentAuthorized  && userAuthorized) {
       return junctionObj;
     }
   
-    // Check if current user has permission to read
-    if ( junctionObj != null && agent == null &&
-        ( SafetyUtil.equals(junctionObj.getTargetId(), user.getId()) ||
-        SafetyUtil.equals(junctionObj.getSourceId(), user.getId()) )) {
-      return junctionObj;
-    }
-
     return null;
   }
 
+  @Override
+  public FObject remove_(X x, FObject obj) {
+    if ( obj == null ){ 
+      throw new RuntimeException("Junction object is null.");
+    }
 
+    booean
+    return super.remove_(x, obj);
+  }
 
 }
