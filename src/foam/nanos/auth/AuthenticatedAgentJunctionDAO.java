@@ -68,18 +68,30 @@ public class AuthenticatedAgentJunctionDAO
       throw new AuthenticationException();
     }
 
-    // Find junction object and check if current user has permission to read
     UserUserJunction junctionObj = (UserUserJunction) super.inX(x).find(id);
 
-    if ( junctionObj != null && 
-        ( ! SafetyUtil.equals(junctionObj.getTargetId(), user.getId()) ||
-        ! SafetyUtil.equals(junctionObj.getSourceId(), user.getId()) )
-        ! auth.check(x, GLOBAL_AGENT_JUNCTION_READ) ) {
+    // Check global permissions
+    if ( auth.check(x, GLOBAL_AGENT_JUNCTION_READ) ) {
       return null;
     }
 
-    return junctionObj;
+    // If agent exists return junction object related to agent.
+    if ( agent != null && junctionObj != null &&
+        ( SafetyUtil.equals(junctionObj.getTargetId(), agent.getId()) ||
+        SafetyUtil.equals(junctionObj.getSourceId(), agent.getId()) )) {
+      return junctionObj;
+    }
+  
+    // Check if current user has permission to read
+    if ( junctionObj != null && agent == null &&
+        ( SafetyUtil.equals(junctionObj.getTargetId(), user.getId()) ||
+        SafetyUtil.equals(junctionObj.getSourceId(), user.getId()) )) {
+      return junctionObj;
+    }
+
+    return null;
   }
+
 
 
 }
