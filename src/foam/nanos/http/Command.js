@@ -13,8 +13,8 @@ foam.ENUM({
   values: [
     { name: 'select', label: 'SELECT' },
     { name: 'put',    label: 'PUT' },
-    { name: 'remove', label: 'REMOVE' },
+    { name: 'remove', label: 'REMOVE' }
     //{ name: 'find',  label: 'FIND' },
-    { name: 'help',   label: 'HELP' }
+    //{ name: 'help',   label: 'HELP' }
   ]
 });

@@ -80,15 +80,19 @@ foam.CLASS({
       background: #edf0f5;
       margin: 0;
     }
-
+    .foam-u2-UnstyledActionView-signIn {
+      margin-left: 25px !important;
+    }
     .stack-wrapper {
       margin-bottom: -10px;
       min-height: calc(80% - 60px);
     }
-
     .stack-wrapper:after {
       content: "";
       display: block;
+    }
+    .foam-u2-UnstyledActionView:focus{
+      outline: none;
     }
   `,
 
@@ -151,10 +155,10 @@ foam.CLASS({
   methods: [
     function init() {
       this.SUPER();
-
       var self = this;
       self.clientPromise.then(function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
+        foam.__context__.register(foam.u2.UnstyledActionView, 'foam.u2.ActionView');
         self.getCurrentUser();
 
         window.onpopstate = function(event) {
@@ -190,34 +194,33 @@ foam.CLASS({
 
     function setPortalView(group) {
       // Replaces contents of top navigation and footer view with group views
-      this.topNavigation_.replaceChild(
+      this.topNavigation_ && this.topNavigation_.replaceChild(
         foam.lookup(group.topNavigation).create(null, this),
         this.topNavigation_.children[0]
       );
 
-      this.footerView_.replaceChild(
+      this.footerView_ && this.footerView_.replaceChild(
         foam.lookup(group.footerView).create(null, this),
         this.footerView_.children[0]
       );
     },
 
     async function setDefaultMenu() {
-      // Don't select default if menu already set
-      if ( this.window.location.hash || ! this.user.group ) return;
-
       var group = await this.client.groupDAO.find(this.user.group);
-
       this.group.copyFrom(group);
+      this.setPortalView(group);
+
       for ( var i = 0; i < this.MACROS.length; i++ ) {
         var m = this.MACROS[i];
         if ( group[m] ) this[m] = group[m];
       }
 
+      // Don't select default if menu already set
+      if ( this.window.location.hash || ! this.user.group ) return;
+
       if ( group && ! this.window.location.hash ) {
         this.window.location.hash = group.defaultMenu;
       }
-
-      this.setPortalView(group);
     },
 
     function getCurrentUser() {

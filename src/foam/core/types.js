@@ -287,40 +287,35 @@ foam.CLASS({
   name: 'Class',
   extends: 'Property',
 
-  properties: [
-    [ 'getter', function(prop) {
-        var c = this.instance_[prop.name];
-
-        // Implement value and factory support.
-        if ( foam.Undefined.isInstance(c) ) {
-          if ( ! foam.Undefined.isInstance(prop.value) ) {
-            c = prop.value;
-          } else if ( prop.factory ) {
-            c = this.instance_[prop.name] = prop.factory.call(this, prop);
-          }
-        }
-
-        // Upgrade Strings to actual classes, if available.
-        if ( foam.String.isInstance(c) ) {
-          var className = c;
-          c = this.lookup(className, true);
-          if ( c ) {
-            this.instance_[prop.name] = c;
-          } else {
-            console.error(`Property '${this.name}' of type '${this.model_.name}' was set to '${className}', which isn't a valid class.`);
-          }
-        }
-
-        return c;
-      }
-    ]
-  ],
-
   methods: [
     function installInProto(proto) {
       this.SUPER(proto);
 
+      // Wrap the getter that was installed with an adapter that will perform the lookup.
+      // We don't adapt at set time because the class were referring to might not be loaded
+      // at that point.
       var name = this.name;
+      var desc = Object.getOwnPropertyDescriptor(proto, name);
+
+      var adapt = function(value) {
+        if ( foam.String.isInstance(value) ) {
+          var cls = this.lookup(value, true);
+          if ( ! cls ) {
+            console.error(`Property '${name}' of type '${this.model_.name}' was set to '${value}', which isn't a valid class.`);
+            return null;
+          }
+          return cls;
+        }
+        return value;
+      };
+
+      var get = desc.get;
+      desc.get = function() {
+        return adapt.call(this, get.call(this));
+      };
+
+      Object.defineProperty(proto, name, desc);
+
 
       Object.defineProperty(proto, name + '$cls', {
         get: function classGetter() {
@@ -349,7 +344,8 @@ foam.CLASS({
   name: 'Image',
   extends: 'String',
   // FUTURE: verify
-  label: 'Image data or link'
+  label: 'Image data or link',
+  properties: [ [ 'displayWidth', 80 ] ]
 });
 
 
@@ -358,7 +354,8 @@ foam.CLASS({
   name: 'URL',
   extends: 'String',
   // FUTURE: verify
-  label: 'Web link (URL or internet address)'
+  label: 'Web link (URL or internet address)',
+  properties: [ [ 'displayWidth', 80 ] ]
 });
 
 
@@ -366,7 +363,8 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Color',
   extends: 'String',
-  label: 'Color'
+  label: 'Color',
+  properties: [ [ 'displayWidth', 20 ] ]
 });
 
 

@@ -1057,8 +1057,8 @@ foam.CLASS({
 
   properties: [
     ['javaType', 'java.util.Map'],
-    ['javaJSONParser', 'new foam.lib.json.MapParser()'],
     ['javaInfoType', 'foam.core.AbstractMapPropertyInfo'],
+    ['javaJSONParser', 'new foam.lib.json.MapParser()'],
     ['javaFactory', 'return new java.util.HashMap();']
   ],
 
@@ -1066,6 +1066,7 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
 
+      // override usage of SafetyUtil.compare with PropertyInfo compare
       var compare = info.getMethod('compare');
       compare.body = 'return super.compare(o1, o2);';
 
@@ -1084,8 +1085,24 @@ foam.CLASS({
 
   properties: [
     ['javaType', 'java.util.List'],
+    ['javaInfoType', 'foam.core.AbstractListPropertyInfo'],
+    ['javaJSONParser', 'new foam.lib.json.ListParser()'],
     ['javaFactory', 'return new java.util.ArrayList();'],
-    ['javaJSONParser', 'new foam.lib.json.ListParser()']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+
+      // override usage of SafetyUtil.compare with PropertyInfo compare
+      var compare = info.getMethod('compare');
+      compare.body = 'return super.compare(o1, o2);';
+
+      var getValueClass = info.getMethod('getValueClass');
+      getValueClass.body = 'return java.util.List.class;';
+
+      return info;
+    }
   ]
 });
 
@@ -1216,7 +1233,7 @@ if ( values1.length < values2.length ) return -1;
 
 int result;
 for ( int i = 0 ; i < values1.length ; i++ ) {
-  result = ((Comparable)values1[i]).compareTo(values2[i]);
+  result = foam.util.SafetyUtil.compare(values1[i], values2[i]);
   if ( result != 0 ) return result;
 }
 return 0;*/
@@ -1291,6 +1308,12 @@ foam.CLASS({
       name: 'javaType',
       expression: function(of) {
         return of + '[]';
+      }
+    },
+    {
+      name: 'javaFactory',
+      expression: function(of) {
+        return `return new ${of}[0];`;
       }
     },
     {
@@ -1438,7 +1461,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'foam.core.ClassInfo'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
-    ['javaJSONPaser', 'new foam.lib.parse.Fail()']
+    ['javaJSONParser', 'new foam.lib.json.ClassReferenceParser()']
   ]
 });
 
@@ -1610,6 +1633,23 @@ foam.CLASS({
         return typeof o === 'string' ?
           foam.java.JavaImport.create({import: o}) :
           foam.java.JavaImport.create(o);
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Model',
+  flags: ['java'],
+  properties: [
+    {
+      class: 'AxiomArray',
+      of: 'foam.java.JavaImplements',
+      name: 'javaImplements',
+      adaptArrayElement: function(o) {
+        return foam.String.isInstance(o) ?
+          foam.java.JavaImplements.create({ name: o }) :
+          foam.java.JavaImplements.create(o);
       }
     }
   ]
