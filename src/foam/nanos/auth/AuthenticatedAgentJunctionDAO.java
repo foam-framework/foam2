@@ -72,7 +72,7 @@ public class AuthenticatedAgentJunctionDAO
 
     // Check global permissions
     if ( auth.check(x, GLOBAL_AGENT_JUNCTION_READ) ) {
-      return null;
+      return junctionObj;
     }
 
     // If agent exists return junction object related to agent.
