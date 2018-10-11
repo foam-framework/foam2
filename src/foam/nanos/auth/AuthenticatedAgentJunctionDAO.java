@@ -83,6 +83,11 @@ public class AuthenticatedAgentJunctionDAO
     throw new AuthorizationException("Unable to remove object.");
   }
 
+  @Override
+  public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+
+  }
+
   public void userAndAgentAuthorized(X x, UserUserJunction junctionObj){
     User user = (User) x.get("user");
     User agent = (User) x.get("agent");
@@ -105,5 +110,23 @@ public class AuthenticatedAgentJunctionDAO
         SafetyUtil.equals(junctionObj.getSourceId(), user.getId()) );
 
     return agentAuthorized || userAuthorized;
+  }
+
+  // Returns predicated delegate based on user and agent in context.
+  public DAO getFilteredDAO(X x, String permission) {
+    User user = (User) x.get("user");
+    User agent = (User) x.get("agent");
+    AuthService auth = (AuthService) x.get("auth");
+
+    if ( auth.check(x, permission) ) return super.inX(x).where();
+
+    if ( agent != null ){
+      User delegateUser = agent != null ? agent : user;
+    }
+
+    return super.inX(x).where(AND(
+      EQ(UserUserJunction.TARGET_ID, delegateUser.getId()),
+      EQ(UserUserJunction.SOURCE_ID, delegateUser.getId())
+    ))
   }
 }
