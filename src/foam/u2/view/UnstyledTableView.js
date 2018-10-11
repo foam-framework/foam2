@@ -121,6 +121,11 @@ foam.CLASS({
       name: 'selection',
       expression: function(importSelection) { return importSelection || null; },
     },
+    {
+      class: 'Boolean',
+      name: 'editableRows',
+      value: false
+    },
     'hoverSelection',
     'dropdownOrigin',
     'overlayOrigin'
@@ -238,7 +243,7 @@ foam.CLASS({
                   call(function() {
                     if ( view.editColumnsEnabled ) return this.tag('td');
                   })
-              });
+              }, view.editableRows);
           }));
     }
   ]
