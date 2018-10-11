@@ -57,5 +57,29 @@ public class AuthenticatedAgentJunctionDAO
     return super.put_(x, toPut);
   }
 
-  
+  @Override
+  public FObject find_(X x, Object id) {
+    User user = (User) x.get("user");
+    User agent = (User) x.get("agent");
+    AuthService auth = (AuthService) x.get("auth");
+
+    // Check if logged in
+    if ( user == null ) {
+      throw new AuthenticationException();
+    }
+
+    // Find junction object and check if current user has permission to read
+    UserUserJunction junctionObj = (UserUserJunction) super.inX(x).find(id);
+
+    if ( junctionObj != null && 
+        ( ! SafetyUtil.equals(junctionObj.getTargetId(), user.getId()) ||
+        ! SafetyUtil.equals(junctionObj.getSourceId(), user.getId()) )
+        ! auth.check(x, GLOBAL_AGENT_JUNCTION_READ) ) {
+      return null;
+    }
+
+    return junctionObj;
+  }
+
+
 }
