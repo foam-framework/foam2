@@ -48,6 +48,13 @@ foam.CLASS({
       documentation: 'Permissions set on group.'
     },
     {
+      class: 'StringArray',
+      of: 'foam.nanos.auth.Permission',
+      name: 'permissions2',
+      view: 'foam.u2.view.StringArrayRowView',
+      documentation: 'Permissions set on group.'
+    },
+    {
       class: 'Reference',
       targetDAOKey: 'menuDAO',
       name: 'defaultMenu',
@@ -172,13 +179,27 @@ if ( session != null ) {
     } else {
       //populate AppConfig url with request's RootUrl
       HttpServletRequest req = x.get(HttpServletRequest.class);
-      if (req.getRequestURI() != null) {
-        config.setUrl(((Request) req).getRootURL().toString());
+
+      if ( config.getEnableForceHttps() ) {
+        if ( ! SafetyUtil.isEmpty(req.getRequestURI()) && ! SafetyUtil.isEmpty(config.getUrl())) {
+          String curConfigUrl = config.getUrl();
+          String request = ((Request) req).getRootURL().toString();
+
+          //check it's http or https
+          if ( curConfigUrl.startsWith("https") ) {
+            config.setUrl("https" + request.substring(4));
+          } else {
+            config.setUrl(request);
+          }
+        }
+      } else {
+        if ( ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
+          config.setUrl(((Request) req).getRootURL().toString());
+        }
       }
     }
   }
 }
-
 return config;
         `
     }

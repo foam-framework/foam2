@@ -1233,7 +1233,7 @@ if ( values1.length < values2.length ) return -1;
 
 int result;
 for ( int i = 0 ; i < values1.length ; i++ ) {
-  result = ((Comparable)values1[i]).compareTo(values2[i]);
+  result = foam.util.SafetyUtil.compare(values1[i], values2[i]);
   if ( result != 0 ) return result;
 }
 return 0;*/
@@ -1461,7 +1461,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'foam.core.ClassInfo'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
-    ['javaJSONPaser', 'new foam.lib.parse.Fail()']
+    ['javaJSONParser', 'new foam.lib.json.ClassReferenceParser()']
   ]
 });
 
@@ -1633,6 +1633,23 @@ foam.CLASS({
         return typeof o === 'string' ?
           foam.java.JavaImport.create({import: o}) :
           foam.java.JavaImport.create(o);
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Model',
+  flags: ['java'],
+  properties: [
+    {
+      class: 'AxiomArray',
+      of: 'foam.java.JavaImplements',
+      name: 'javaImplements',
+      adaptArrayElement: function(o) {
+        return foam.String.isInstance(o) ?
+          foam.java.JavaImplements.create({ name: o }) :
+          foam.java.JavaImplements.create(o);
       }
     }
   ]

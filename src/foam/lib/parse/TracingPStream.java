@@ -7,17 +7,19 @@
 package foam.lib.parse;
 
 import java.io.PrintWriter;
+import java.io.Writer;
 
 public class TracingPStream
     extends ProxyPStream
 {
+  protected final static PrintWriter OUT = new PrintWriter(System.out);
   protected int pos;
   protected int depth;
   protected PrintWriter writer;
   protected TracingPStream tail_ = null;
 
   public TracingPStream(PStream delegate) {
-    this(delegate, new PrintWriter(System.out), 0, 0);
+    this(delegate, OUT/*new PrintWriter(System.out)*/, 0, 0);
   }
 
   public TracingPStream(PStream delegate, PrintWriter writer, int pos, int depth) {
@@ -44,7 +46,7 @@ public class TracingPStream
     String indentation = String.format(format, "");
 
     char char1 = ( this.valid() ) ? this.head() : ' ';
-    writer.println(indentation + "Parsing '" + char1 + "' at position: " + pos + " using " + ps.getClass().getSimpleName());
+    writer.println(indentation + "Parsing '" + char1 + "' at position: " + pos + " using " + ps);
 
     PStream result = ps.parse(this, x);
     if ( result == null ) {
