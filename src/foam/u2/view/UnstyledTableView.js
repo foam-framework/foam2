@@ -25,6 +25,14 @@ foam.CLASS({
   ],
 
   imports: [
+    // Each table row has a context menu that contains actions you can perform
+    // on the object in that row. The actions used to populate that menu come
+    // from two different sources. The first source is the 'contextMenuActions'
+    // import. If you want a context menu action to do something in the view,
+    // then you should write the code for that action on the view and export it.
+    // The second source of actions is from the model of the object being shown
+    // in the table.
+    'contextMenuActions',
     'dblclick?',
     'editRecord?',
     'selection? as importSelection'
@@ -247,23 +255,25 @@ foam.CLASS({
                       end();
                   }).
                   call(function() {
-                    var model = view.of;
-                    var actions = model.getAxiomsByClass(foam.core.Action);
-                    var overlay = view.OverlayDropdown.create();
-                    var availableActions = actions.filter(function(action) {
+                    var modelActions = view.of.getAxiomsByClass(foam.core.Action);
+                    var allActions = Array.isArray(view.contextMenuActions) ?
+                      view.contextMenuActions.concat(modelActions) :
+                      modelActions;
+                    var actions = allActions.filter(function(action) {
                       return action.isAvailableFor(obj);
                     });
 
                     // Don't show the context menu if there are no available
                     // actions defined on the model.
-                    if ( availableActions.length === 0 ) {
+                    if ( actions.length === 0 ) {
                       if ( view.editColumnsEnabled ) {
                         return this.tag('td');
                       }
                       return;
                     }
 
-                    overlay.forEach(availableActions, function(action) {
+                    var overlay = view.OverlayDropdown.create();
+                    overlay.forEach(actions, function(action) {
                       var elm = this.start()
                         .addClass(view.myClass('context-menu-item'))
                         .add(action.label);
