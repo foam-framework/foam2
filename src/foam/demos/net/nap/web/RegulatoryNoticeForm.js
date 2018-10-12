@@ -57,7 +57,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'description_',
-      view: { class: 'foam.u2.tag.TextArea', rows: 30, cols: 120}
+      view: { class: 'foam.u2.tag.TextArea', rows: 16, cols: 120}
     },
     {
       class: 'DateTime',
@@ -99,6 +99,8 @@ foam.CLASS({
       width: 100%;
       margin: auto;
       background-color: #edf0f5;
+      height: 95%;
+      min-height: 620px;
     }
     ^ .net-nanopay-ui-ActionView-backAction {
       border-radius: 2px;
@@ -172,7 +174,7 @@ foam.CLASS({
     }
     ^ .boxless-for-drag-drop {
       border: dashed 4px #a4b3b8;
-      width: 97%;
+      width: 84%;
       height: 110px;
       padding: 10px 10px;
       position: relative;
