@@ -27,6 +27,13 @@ public class AuthenticatedGroupDAO extends ProxyDAO {
   public AuthenticatedGroupDAO(X x, DAO delegate) {
     super(x, delegate);
   }
+  public void enforceNameSpaceForGroupName(X x, Group toCheck) {
+    AuthService auth = (AuthService) x.get("auth");
+    Group group = toCheck;
+    if ( ! auth.check(x, "group.create." + group.getId()) ) {
+    throw new AuthorizationException("Permission Denied. Your group name must begin with your spid."); 
+  }
+}
 
   /**
    * Make sure that the user has all permissions in the given group.
@@ -62,6 +69,9 @@ public class AuthenticatedGroupDAO extends ProxyDAO {
 
   @Override
   public FObject put_(X x, FObject obj) {
+    if ( getDelegate().find_(x, obj) == null ) {
+      enforceNameSpaceForGroupName(x, (Group) obj);
+    }
     checkUserHasAllPermissionsInGroup(x, (Group) obj);
     return super.put_(x, obj);
   }
