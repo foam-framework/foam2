@@ -25,14 +25,6 @@ foam.CLASS({
   ],
 
   imports: [
-    // Each table row has a context menu that contains actions you can perform
-    // on the object in that row. The actions used to populate that menu come
-    // from two different sources. The first source is the 'contextMenuActions'
-    // import. If you want a context menu action to do something in the view,
-    // then you should write the code for that action on the view and export it.
-    // The second source of actions is from the model of the object being shown
-    // in the table.
-    'contextMenuActions',
     'dblclick?',
     'editRecord?',
     'selection? as importSelection'
@@ -93,6 +85,20 @@ foam.CLASS({
             filter(function(p) { return p.tableCellFormatter && ! p.hidden; }).
             map(foam.core.Property.NAME.f);
       }
+    },
+    {
+      class: 'FObjectArray',
+      of: 'foam.core.Action',
+      name: 'contextMenuActions',
+      documentation: `
+        Each table row has a context menu that contains actions you can perform
+        on the object in that row. The actions used to populate that menu come
+        from two different sources. The first source is this property. If you
+        want a context menu action to do something in the view, then you should
+        write the code for that action in the view model and pass it to the
+        table view via this property. The second source of actions is from the
+        model of the object being shown in the table.
+      `
     },
     {
       class: 'Boolean',
