@@ -57,13 +57,13 @@ foam.CLASS({
     {
       class: 'String',
       name: 'description_',
-      view: { class: 'foam.u2.tag.TextArea', rows: 16, cols: 120}
+      view: { class: 'foam.u2.tag.TextArea', rows: 16, cols: 120 }
     },
     {
       class: 'DateTime',
       name: 'createdDate_',
       visibility: foam.u2.Visibility.RO,
-      factory: function(){
+      factory: function() {
         return new Date();
       }
     },
@@ -302,14 +302,14 @@ foam.CLASS({
                 .on('click', this.onAddAttachmentClicked)
               .end()
               .start('div').addClass('boxless-for-drag-drop')
-                .add(this.slot(function (data) {
+                .add(this.slot(function(data) {
                   var e = this.E();
-                  for ( var i = 0 ; i < data.length ; i++ ) {
+                  for ( var i = 0; i < data.length; i++ ) {
                       e.start('div').addClass('attachment-view').setID(i+1)
                       .start().addClass('attachment-filename')
                         .start('a')
                           .attrs({
-                            href: this.data_.map(function (data) {
+                            href: this.data_.map(function(data) {
                               if ( data[i] ) {
                                   var blob = data[i].data;
                                   var sessionId = localStorage['defaultSession'];
@@ -329,7 +329,7 @@ foam.CLASS({
                            }),
                            target: '_blank'
                          })  //attrs
-                         .add(this.slot(function (filename) {
+                         .add(this.slot(function(filename) {
                            var len = filename.length;
                            return ( len > 35 ) ? (filename.substr(0, 20) +
                              '...' + filename.substr(len - 10, len)) : filename;
@@ -337,7 +337,7 @@ foam.CLASS({
                       .end()
                    .end()
                    .start().addClass('attachment-footer').setID(i+1)
-                     .start({ class: 'foam.u2.tag.Image', data: 'images/ic-delete.svg'}).hide(this.removeHidden).end()
+                     .start({ class: 'foam.u2.tag.Image', data: 'images/ic-delete.svg' }).hide(this.removeHidden).end()
                      .on('click', function(e) {
                        console.log(this);
                        self.data_.splice(this.id - 1, 1);
@@ -345,7 +345,7 @@ foam.CLASS({
                        self.data_ = Array.from(self.data_);
                      })
                    .end()
-                   .end()
+                   .end();
                   }
                   return e;
                 }, this.data_$))
@@ -373,27 +373,26 @@ foam.CLASS({
     {
       name: 'backAction',
       label: 'Back',
-      code: function(X){
-        var self = this;
+      code: function(X) {
         X.stack.push({ class: 'foam.demos.net.nap.web.RegulatoryNoticeList' });
       }
     }
   ],
 
   listeners: [
-    function onAddAttachmentClicked () {
+    function onAddAttachmentClicked() {
       this.document.querySelector('.attachment-input').click();
     },
 
-    function onRemoveClicked (e) {
+    function onRemoveClicked(e) {
       this.dragActive = false;
       this.data = null;
     },
 
-    function onChange (e) {
+    function onChange(e) {
       this.dragActive = false;
       var files = e.target.files;
-      this.addFiles(files)
+      this.addFiles(files);
     },
 
     function onDragOver(e) {
@@ -406,29 +405,29 @@ foam.CLASS({
       var files = [];
       var inputFile;
       if ( e.dataTransfer.items ) {
-        inputFile = e.dataTransfer.items
+        inputFile = e.dataTransfer.items;
         if ( inputFile ) {
           for ( var i = 0; i < inputFile.length; i++ ) {
             // If dropped items aren't files, reject them
             if ( inputFile[i].kind === 'file' ) {
               var file = inputFile[i].getAsFile();
-              if( this.isFileType(file) ) files.push(file);
+              if ( this.isFileType(file) ) files.push(file);
               else
                 this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' }));
             }
           }
         }
-      } else if( e.dataTransfer.files ) {
-        inputFile = e.dataTransfer.files
-        for (var i = 0; i < inputFile.length; i++) {
+      } else if ( e.dataTransfer.files ) {
+        inputFile = e.dataTransfer.files;
+        for ( var i = 0; i < inputFile.length; i++ ) {
           var file = inputFile[i];
-          if( this.isFileType(file) ) files.push(file);
-          else{
+          if ( this.isFileType(file) ) files.push(file);
+          else {
             this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' }));
           }
         }
       }
-      this.addFiles(files)
+      this.addFiles(files);
     },
 
     function isFileType(file) {
@@ -446,28 +445,29 @@ foam.CLASS({
            file.type === "application/vnd.ms-excel" ||
            file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
            file.type === "application/pdf"
-        )
-        return true;
+        ) {
+          return true;
+        }
       return false;
     },
 
     function addFiles(files) {
       var errors = false;
-      for ( var i = 0 ; i < files.length ; i++ ) {
+      for ( var i = 0; i < files.length; i++ ) {
         // skip files that exceed limit
         if ( files[i].size > ( 10 * 1024 * 1024 ) ) {
           if ( ! errors ) errors = true;
           this.add(this.NotificationMessage.create({ message: this.ErrorMessage, type: 'error' }));
           continue;
         }
-        var isIncluded = false
-        for ( var j = 0 ; j < this.data_.length ; j++ ) {
-          if( this.data_[j].filename.localeCompare(files[i].name) === 0 ) {
+        var isIncluded = false;
+        for ( var j = 0; j < this.data_.length; j++ ) {
+          if ( this.data_[j].filename.localeCompare(files[i].name) === 0 ) {
             isIncluded = true;
-            break
+            break;
           }
         }
-        if ( isIncluded ) continue ;
+        if ( isIncluded ) continue;
         this.data_.push(this.File.create({
           filename: files[i].name,
           filesize: files[i].size,
@@ -475,7 +475,7 @@ foam.CLASS({
           data: this.BlobBlob.create({
             blob: files[i]
           })
-        }))
+        }));
       }
       this.data_ = Array.from(this.data_);
       this.exportData = this.data;
@@ -495,13 +495,13 @@ foam.CLASS({
       }
 
       var message = self.RegulatoryNotice.create({
-        id : self.id_,
-        starmark : self.mark_,
+        id: self.id_,
+        starmark: self.mark_,
         title: self.title_,
         content: self.description_,
-        creator : this.user.firstName_,
-        createdDate : self.createdDate_,
-        data : Array.from(self.data_)
+        creator: this.user.firstName_,
+        createdDate: self.createdDate_,
+        data: Array.from(self.data_)
       });
 
       var regulatoryNoticeAudit = self.RegulatoryNoticeAudit.create({
@@ -510,7 +510,7 @@ foam.CLASS({
       });
 
       var notification = self.Notification.create({
-        notificationType : "New Post On RegulatoryNotice",
+        notificationType: "New Post On RegulatoryNotice",
         userId: this.user.id,
         body: self.title_,
         groupId: this.user.group
