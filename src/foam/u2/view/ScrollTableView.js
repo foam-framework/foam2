@@ -40,6 +40,11 @@
     },
     'columns',
     {
+      class: 'FObjectArray',
+      of: 'foam.core.Action',
+      name: 'contextMenuActions'
+    },
+    {
       class: 'Int',
       name: 'daoCount'
     },
@@ -59,7 +64,12 @@
         start('tr').
           start('td').
             style({ 'vertical-align': 'top' }).
-            start(this.TableView, {data$: this.scrolledDAO$, columns: this.columns, selection$: this.selection$}).
+            start(this.TableView, {
+              data$: this.scrolledDAO$,
+              columns: this.columns,
+              contextMenuActions: this.contextMenuActions,
+              selection$: this.selection$
+            }).
             end().
           end().
           start('td').style({ 'vertical-align': 'top' }).
