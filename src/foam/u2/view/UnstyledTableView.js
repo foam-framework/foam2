@@ -220,7 +220,14 @@ foam.CLASS({
                     });
                   }).
                   callIf( ! view.disableUserSelection, function() {
-                    this.on('click', function() {
+                    this.on('click', function(evt) {
+                      // If we're clicking somewhere to close the context menu,
+                      // don't do anything.
+                      if (
+                        evt.target.nodeName === 'DROPDOWN-OVERLAY' ||
+                        evt.target.classList.contains(view.myClass('vertDots'))
+                      ) return;
+
                       view.selection = obj;
                       if ( view.importSelection$ ) view.importSelection = obj;
                       if ( view.editRecord$ ) view.editRecord(obj);
@@ -275,15 +282,14 @@ foam.CLASS({
                     return this.start('td').
                       add(overlay).
                       style({ 'text-align': 'right' }).
-                      on('click', function(e) {
-                        e.stopImmediatePropagation();
-                        view.positionOverlayDropdown(overlay);
-                        overlay.open();
-                      }).
                       start('span').
                         addClass(view.myClass('vertDots')).
                         addClass(view.myClass('noselect')).
                         add(view.vertMenuIcon).
+                        on('click', function(evt) {
+                          view.positionOverlayDropdown(overlay);
+                          overlay.open();
+                        }).
                       end().
                     end();
                   });
