@@ -58,6 +58,11 @@ if ( flags.nanos ) {
       require('fs').readFileSync(__dirname + '/../src/foam/nanos/nanos.js'));
 }
 
+if ( flags.support ) {
+  data.push(
+    require('fs').readFileSync(__dirname + '/../src/foam/support/support.js'));
+}
+
 for ( var i = 0; i < data.length; i++ ) {
   with (env) { eval(data[i].toString()); }
 }

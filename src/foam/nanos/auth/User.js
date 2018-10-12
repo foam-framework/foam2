@@ -320,6 +320,7 @@ foam.RELATIONSHIP({
   }
 });
 
+
 foam.RELATIONSHIP({
   sourceModel: 'foam.nanos.auth.User',
   targetModel: 'foam.nanos.fs.File',
@@ -330,6 +331,7 @@ foam.RELATIONSHIP({
     transient: true
   }
 });
+
 
 foam.RELATIONSHIP({
   cardinality: '1:*',
