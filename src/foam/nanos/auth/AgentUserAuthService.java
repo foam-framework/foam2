@@ -43,7 +43,7 @@ public class AgentUserAuthService
   */
   public User actAs(X x, User superUser) throws AuthenticationException {
     User agent = (User) x.get("user");
-    User user = (User) userDAO_.find(superUser.getId());
+    User user = (User) userDAO_.inX(x).find(superUser.getId());
 
     // Check for current context user
     if ( agent == null ) {
@@ -54,7 +54,7 @@ public class AgentUserAuthService
       throw new AuthorizationException("Super user doesn't exist.");
     }
 
-    Group group = (Group) groupDAO_.find(user.getGroup());
+    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
 
     if ( group != null && ! group.getEnabled() ) {
       throw new AuthorizationException("Super user must exist within a group.");
@@ -64,7 +64,7 @@ public class AgentUserAuthService
       Finds the UserUserJunction object to see if user can act as the passed in user.
       Source (agent) users are permitted to act as target (superUser) users, not vice versa.
     */
-    UserUserJunction permissionJunction = (UserUserJunction) agentJunctionDAO_.find(AND(
+    UserUserJunction permissionJunction = (UserUserJunction) agentJunctionDAO_.inX(x).find(AND(
       EQ(UserUserJunction.SOURCE_ID, agent.getId()),
       EQ(UserUserJunction.TARGET_ID, user.getId())
     ));
@@ -74,7 +74,7 @@ public class AgentUserAuthService
     }
 
     // Junction object contains a group which has a unique set of permissions specific to the relationship.
-    Group actingWithinGroup = (Group) groupDAO_.find(permissionJunction.getGroup());
+    Group actingWithinGroup = (Group) groupDAO_.inX(x).find(permissionJunction.getGroup());
 
     if ( actingWithinGroup != null && ! actingWithinGroup.getEnabled() ) {
       throw new AuthorizationException("No permissions are appended to the super user relationship.");
