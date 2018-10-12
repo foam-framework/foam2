@@ -76,7 +76,7 @@ public class AgentUserAuthService
     // Junction object contains a group which has a unique set of permissions specific to the relationship.
     Group actingWithinGroup = (Group) groupDAO_.inX(x).find(permissionJunction.getGroup());
 
-    if ( actingWithinGroup != null && ! actingWithinGroup.getEnabled() ) {
+    if ( actingWithinGroup == null || ! actingWithinGroup.getEnabled() ) {
       throw new AuthorizationException("No permissions are appended to the super user relationship.");
     }
     
