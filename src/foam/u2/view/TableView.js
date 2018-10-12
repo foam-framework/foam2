@@ -51,7 +51,11 @@ foam.CLASS({
       padding: 10px;
     }
 
-    ^context-menu-item:hover {
+    ^context-menu-item.disabled {
+      color: #ddd;
+    }
+
+    ^context-menu-item:hover:not(.disabled) {
       cursor: pointer;
       background-color: %ACCENTCOLOR%;
     }
