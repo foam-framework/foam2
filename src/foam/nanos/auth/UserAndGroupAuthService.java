@@ -173,7 +173,7 @@ public class UserAndGroupAuthService
 
   public User loginByEmail(X x, String email, String password) throws AuthenticationException {
     Sink sink = new ArraySink();
-    sink = userDAO_.where(MLang.EQ(User.EMAIL, email.toLowerCase())).limit(1).select(sink);
+    sink = userDAO_.inX(x).where(MLang.EQ(User.EMAIL, email.toLowerCase())).limit(1).select(sink);
 
     List data = ((ArraySink) sink).getArray();
     if ( data == null || data.size() != 1 ) {
@@ -241,7 +241,7 @@ public class UserAndGroupAuthService
     }
 
     // check if user exists and is enabled
-    User user = (User) userDAO_.find(session.getUserId());
+    User user = (User) userDAO_.inX(x).find(session.getUserId());
     if ( user == null || ! user.getEnabled() ) {
       return false;
     }
@@ -250,7 +250,7 @@ public class UserAndGroupAuthService
       String groupId = (String) user.getGroup();
 
       while ( ! SafetyUtil.isEmpty(groupId) ) {
-        Group group = (Group) groupDAO_.find(groupId);
+        Group group = (Group) groupDAO_.inX(x).find(groupId);
 
         // if group is null break
         if ( group == null ) {
@@ -299,7 +299,7 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found");
     }
 
-    User user = (User) userDAO_.find(session.getUserId());
+    User user = (User) userDAO_.inX(x).find(session.getUserId());
     if ( user == null ) {
       throw new AuthenticationException("User not found");
     }
