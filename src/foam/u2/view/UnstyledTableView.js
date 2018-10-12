@@ -257,13 +257,19 @@ foam.CLASS({
                     }
 
                     overlay.forEach(availableActions, function(action) {
-                      this.start()
+                      var elm = this.start()
                         .addClass(view.myClass('context-menu-item'))
-                        .add(action.label)
-                        .on('click', function(evt) {
-                          action.code.call(obj);
-                        })
-                      .end();
+                        .add(action.label);
+
+                      if ( action.isEnabledFor(obj) ) {
+                        elm = elm.on('click', function(evt) {
+                          action.maybeCall(view.__subContext__, obj);
+                        });
+                      } else {
+                        elm.addClass('disabled');
+                      }
+
+                      elm.end();
                     });
 
                     return this.start('td').
