@@ -30,7 +30,8 @@ public class AuthenticatedGroupDAO extends ProxyDAO {
   public void enforceNameSpaceForGroupName(X x, Group toCheck) {
     AuthService auth = (AuthService) x.get("auth");
     Group group = toCheck;
-    if ( ! auth.check(x, "group.create." + group.getId()) ) {
+    User user = (User) x.get("user");
+    if ( ! auth.check(x, "group.create." + user.getSpid() + group.getId() ) ) {
     throw new AuthorizationException("Permission Denied. Your group name must begin with your spid."); 
   }
 }
