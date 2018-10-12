@@ -166,7 +166,7 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Invalid Parameters");
     }
 
-    User user = (User) userDAO_.find(userId);
+    User user = (User) userDAO_.inX(x).find(userId);
     User contextUser = (User) userAndGroupContext(x, user, password);
     return contextUser;
   }
