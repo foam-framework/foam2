@@ -87,7 +87,6 @@ FOAM_FILES([
   { name: "foam/core/Freezable" },
   { name: "foam/core/AbstractFObject" },
   { name: "foam/java/Validation" },
-
   { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
   { name: "foam/swift/SwiftLib", flags: ['swift'] },
   { name: "foam/swift/Protocol", flags: ['swift'] },
@@ -140,7 +139,6 @@ FOAM_FILES([
   { name: "foam/java/JavaImport", flags: ['java'] },
   { name: "foam/java/Builder", flags: ['java'] },
   { name: "foam/java/refinements", flags: ['java'] },
-
   { name: "foam/json2/Outputter" },
   { name: "foam/json2/OutputterOutput" },
   { name: "foam/json2/SimpleOutputterOutput" },
@@ -267,6 +265,7 @@ FOAM_FILES([
   { name: "lib/utf8" },
 
   { name: "foam/flow/Document" },
+  { name: "foam/flow/MarkupEditor" },
 
   { name: "foam/net/NotConnectedException" },
   { name: "foam/net/ConnectionFailedException" },

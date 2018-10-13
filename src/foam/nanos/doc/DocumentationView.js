@@ -5,7 +5,7 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'id',
+      name: 'docKey',
       documentation: 'ID of the document to render.'
     },
     {
@@ -24,7 +24,7 @@ foam.CLASS({
       if ( ! dao ) this.add('No DAO found for key: ', this.daoKey);
       else this.add(this.slot(function(data, error) {
         if ( ! data && ! error) {
-          dao.find(this.id).then(function(doc) {
+          dao.find(this.docKey).then(function(doc) {
             if ( doc ) this.data = doc;
             else this.error = 'Not found.';
           }.bind(this), function(e) {

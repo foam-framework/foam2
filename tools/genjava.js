@@ -14,6 +14,7 @@ global.FOAM_FLAGS = { 'java': true, 'debug': true, 'js': false };
 
 require('../src/foam.js');
 require('../src/foam/nanos/nanos.js');
+require('../src/foam/support/support.js');
 
 var srcPath = __dirname + "/../src/";
 

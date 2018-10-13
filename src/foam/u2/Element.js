@@ -1153,7 +1153,7 @@ foam.CLASS({
       } else {
         if ( value === undefined || value === null || value === false ) {
           this.removeAttribute(name);
-          return;
+          return this;
         }
 
         if ( foam.core.Slot.isInstance(value) ) {
@@ -1176,6 +1176,8 @@ foam.CLASS({
           this.onSetAttr(name, value);
         }
       }
+
+      return this;
     },
 
     function removeAttribute(name) {
@@ -1672,11 +1674,14 @@ foam.CLASS({
       return this;
     },
 
-    function forEach(a, f) {
-      for ( var i = 0 ; i < a.length ; i++ ) {
-        f.call(this, a[i], i);
-      }
-
+    /**
+     * Call the given function on each element in the array. In the function,
+     * `this` will refer to the element.
+     * @param {Array} array An array to loop over.
+     * @param {Function} fn A function to call for each item in the given array.
+     */
+    function forEach(array, fn) {
+      array.forEach(fn.bind(this));
       return this;
     },
 

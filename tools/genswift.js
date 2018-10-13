@@ -19,6 +19,7 @@ var root = dir + '/..';
 
 require(root + '/src/foam.js');
 require('../src/foam/nanos/nanos.js'); // TODO this shouldnt always be loaded.
+require('../src/foam/support/support.js'); // TODO this shouldnt always be loaded.
 
 if ( ! (process.argv.length >= 4 && process.argv.length <= 5) ) {
   console.log("USAGE: genswift.js input-path output-path classpaths(optional)");

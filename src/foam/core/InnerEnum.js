@@ -76,6 +76,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'InnerEnumModelRefine',
   refines: 'foam.core.Model',
   properties: [
     {
