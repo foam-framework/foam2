@@ -160,10 +160,6 @@ public class HttpParametersWebAgent
               parameters.set("id", req.getParameter("id"));
               logger.debug("id", req.getParameter("id"));
               break;
-            case "help":
-              command = Command.help;
-              resp.setContentType("text/html");
-              break;
           }
         } else {
           logger.warning("cmd/method could not be determined, defaulting to SELECT.");
@@ -192,11 +188,6 @@ public class HttpParametersWebAgent
           parameters.set("id", req.getParameter("id"));
           logger.debug("id", req.getParameter("id"));
           break;
-
-        case "help":
-          command = Command.help;
-          resp.setContentType("text/html");
-          break;
         }
       } else {
         logger.warning("cmd/method could not be determined, defaulting to SELECT.");
@@ -207,7 +198,7 @@ public class HttpParametersWebAgent
 
     Format format = Format.JSON;
     resp.setContentType("text/html");
-    if ( req.getParameter("format") != null && ! "".equals(req.getParameter("format").trim()) && command != Command.help ) {
+    if ( req.getParameter("format") != null && ! "".equals(req.getParameter("format").trim()) ) {
       String f = req.getParameter("format");
       switch ( f.toUpperCase() ) {
         case "XML":

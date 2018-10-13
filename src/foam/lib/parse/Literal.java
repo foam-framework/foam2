@@ -43,4 +43,8 @@ public class Literal
 
     return ps.setValue(value_);
   }
+
+  public String toString() {
+    return "Literal(" + string_ + ")";
+  }
 }

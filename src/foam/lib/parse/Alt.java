@@ -39,6 +39,7 @@ public class Alt
       PStream ret = ps.apply(parsers_[i], x);
       if ( ret != null ) return ret;
     }
+
     return null;
   }
 }

@@ -37,7 +37,11 @@ foam.CLASS({
       this.SUPER(prop);
 
       if ( ! this.displayWidth ) {
-        this.size = this.displayWidth = prop.displayWidth;
+        this.displayWidth = prop.displayWidth;
+      }
+
+      if ( ! this.size ) {
+        this.size = this.displayWidth;
       }
 
       if ( prop.visibility ) {
