@@ -16,8 +16,8 @@ foam.CLASS({
   requires: [
     {
       flags: ['swift'],
-      path: 'foam.mlang.sink.Max',
-    },
+      path: 'foam.mlang.sink.Max'
+    }
   ],
 
   documentation: 'DAO Decorator which sets a specified property\'s value with an auto-increment sequence number on DAO.put() if the value is set to the default value.',
@@ -136,7 +136,7 @@ return getDelegate().put_(x, obj);
 /**
  * Calculates the next largest value in the sequence
  */
-private void calcDelegateMax_() {
+public void calcDelegateMax_() {
   Sink sink = foam.mlang.MLang.MAX(getAxiom());
   sink = getDelegate().select(sink);
   setValue((long) ( ( (foam.mlang.sink.Max) sink ).getValue() == null ? 1 : ( (Number) ( (foam.mlang.sink.Max) sink ).getValue() ).longValue() + 1.0 ));
@@ -147,7 +147,7 @@ public SequenceNumberDAO(foam.dao.DAO delegate) {
   setDelegate(delegate);
 }
         `);
-      },
-    },
-  ],
+      }
+    }
+  ]
 });
