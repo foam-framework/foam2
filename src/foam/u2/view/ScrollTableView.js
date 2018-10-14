@@ -96,7 +96,7 @@
         this.data$proxy.select(this.Count.create()).then(function(s) {
           self.daoCount = s.value;
         })
-      },
-    },
+      }
+    }
   ]
 });
