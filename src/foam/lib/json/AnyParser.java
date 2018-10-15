@@ -29,6 +29,7 @@ public class AnyParser
           new StringArrayParser(),
           new StringDoubleArrayParser(),
           new PropertyReferenceParser(),
+          new ClassReferenceParser(),
           new ArrayParser(),
           new FObjectParser(),
           new MapParser());

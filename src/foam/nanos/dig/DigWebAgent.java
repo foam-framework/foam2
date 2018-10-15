@@ -69,6 +69,7 @@ public class DigWebAgent
     try {
       if ( SafetyUtil.isEmpty(daoName) ) {
         resp.setContentType("text/html");
+
         // FIXME: Presently the dig UI doesn't have any way to submit/send a request.
         //   String url = "/#dig";
         //   try {
@@ -294,27 +295,16 @@ public class DigWebAgent
             foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
             List a = sink.getArray();
             String dataToString = "";
+            outputterJson.setOutputJsonj_(true);
 
             //resp.setContentType("application/json");
-            for ( int i = 0; i < a.size(); i++ ) {
+            for ( int i = 0 ; i < a.size() ; i++ )
               outputterJson.output(a.get(i));
-            }
-
-            String dataArray[] = outputterJson.toString().split("\\{\"class\":\"" + cInfo.getId());
-
-            int k_ = 0;
-            if ( a.size() > 0 && dataArray.length > 1 ) {
-              k_ = 1;
-            }
-
-            for ( int k = k_; k < dataArray.length; k++ ) {
-              dataToString += "p({\"class\":\"" + cInfo.getId() + dataArray[k] + ")\n";
-            }
 
             if ( emailSet ) {
               output(x, dataToString);
             } else {
-              out.println(dataToString);
+              out.println(outputterJson.toString());
             }
           }
         } else {
@@ -329,21 +319,6 @@ public class DigWebAgent
 
           return;
         }
-      } else if ( Command.help == command ) {
-        out.println("Help: <br><br>" );
-        /*List<PropertyInfo> props = cInfo.getAxiomsByClass(PropertyInfo.class);
-        out.println(daoName + "<br><br>");
-        out.println("<table>");
-        for( PropertyInfo pi : props ) {
-          out.println("<tr>");
-          out.println("<td width=200>" + pi.getName() + "</td>");
-          out.println("<td width=200>" + pi.getValueClass().getSimpleName() + "</td>");
-          out.println("</tr>");
-        }
-        out.println("</table>");*/
-
-        out.println("<input type=hidden id=classInfo style=margin-left:30;width:350 value=" + cInfo.getId() + "></input>");
-        out.println("<script>var vurl = document.location.protocol + '//' + document.location.host + '/?path=' + document.getElementById('classInfo').value + '#docs'; window.open(vurl, '_self');</script>");
       } else if ( Command.remove == command ) {
         PropertyInfo idProp     = (PropertyInfo) cInfo.getAxiomByName("id");
         Object       idObj      = idProp.fromString(id);

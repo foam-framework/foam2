@@ -16,8 +16,8 @@ foam.CLASS({
   requires: [
     {
       flags: ['swift'],
-      path: 'foam.mlang.sink.Max',
-    },
+      path: 'foam.mlang.sink.Max'
+    }
   ],
 
   documentation: 'DAO Decorator which sets a specified property\'s value with an auto-increment sequence number on DAO.put() if the value is set to the default value.',
@@ -114,17 +114,16 @@ foam.CLASS({
         return try delegate.put_(x, obj)
       `,
       javaCode: `
-synchronized (this) {
-  if ( ! isPropertySet("value") ) calcDelegateMax_();
+        synchronized (this) {
+          if ( ! isPropertySet("value") ) calcDelegateMax_();
 
-  //if ( ! getAxiom().isSet(obj) ) {
-  if ( (Long) getAxiom().get(obj) == 0 ) {
-    getAxiom().set(obj, getValue());
-    setValue(getValue() + 1);
-  }
-}
+          if ( (long) getAxiom().get(obj) == 0 ) {
+            getAxiom().set(obj, getValue());
+            setValue(getValue() + 1);
+          }
+        }
 
-return getDelegate().put_(x, obj);
+        return getDelegate().put_(x, obj);
       `,
     },
   ],
@@ -133,21 +132,26 @@ return getDelegate().put_(x, obj);
     {
       buildJavaClass: function(cls) {
         cls.extras.push(`
-/**
- * Calculates the next largest value in the sequence
- */
-private void calcDelegateMax_() {
-  Sink sink = foam.mlang.MLang.MAX(getAxiom());
-  sink = getDelegate().select(sink);
-  setValue((long) ( ( (foam.mlang.sink.Max) sink ).getValue() == null ? 1 : ( (Number) ( (foam.mlang.sink.Max) sink ).getValue() ).longValue() + 1.0 ));
-}
+          /**
+           * Calculates the next largest value in the sequence
+           */
+          public void calcDelegateMax_() {
+            Sink sink = foam.mlang.MLang.MAX(getAxiom());
+            sink = getDelegate().select(sink);
+            setValue((long) ( ( (foam.mlang.sink.Max) sink ).getValue() == null ? 1 : ( (Number) ( (foam.mlang.sink.Max) sink ).getValue() ).longValue() + 1.0 ));
+          }
 
-public SequenceNumberDAO(foam.dao.DAO delegate) {
-  System.err.println("Direct constructor use is deprecated. Use Builder instead.");
-  setDelegate(delegate);
-}
+          public SequenceNumberDAO(foam.dao.DAO delegate) {
+            this(1, delegate);
+          }
+
+          public SequenceNumberDAO(long value, foam.dao.DAO delegate) {
+            System.err.println("Direct constructor use is deprecated. Use Builder instead.");
+            setDelegate(delegate);
+            setValue(value);
+          }
         `);
-      },
-    },
-  ],
+      }
+    }
+  ]
 });
