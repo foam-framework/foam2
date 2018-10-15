@@ -57,7 +57,7 @@ public class AuthenticatedUserDAO
        throw new RuntimeException("User can't be null");
      }
 
-     if ( isExistingUser(toPut) &&  toPut.getId() < 1000 ) {
+     if ( isExistingUser(toPut) && toPut.getId() < 1000 ) {
        throw new RuntimeException("Unable to update user");
      }
 
