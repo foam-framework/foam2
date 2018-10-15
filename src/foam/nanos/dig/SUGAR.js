@@ -55,8 +55,11 @@ foam.CLASS({
 
         if ( ! service.cls_.getAxiomByName('delegate') ) {
           this.interfaceName = "";
-          return;
+          this.argumentInfo = null;
+          this.currentMethod = "";
 
+          return;
+        } else {
           var of = this.lookup(service.cls_.getAxiomByName('delegate').of);
 
           if ( ! of ) return;
