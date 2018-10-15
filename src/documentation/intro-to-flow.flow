@@ -72,6 +72,8 @@ foam.RELATIONSHIP({
 });
 </code>
 </li>
+<li>Image support:</br>
+<img src="/src/foam/nanos/controller/foam_red.png"/>
 </ul>
 
 

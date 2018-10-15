@@ -56,9 +56,9 @@ foam.CLASS({
       // Force undefined values to null so that hasOwnProperty checks are faster.
       if ( value === undefined ) value = null;
       var ps = this.cls_.create();
-      ps.str = this.str;
-      ps.pos = this.pos;
-      ps.tail = this.tail;
+      ps.str   = this.str;
+      ps.pos   = this.pos;
+      ps.tail  = this.tail;
       ps.value = value;
       return ps;
     },
@@ -86,4 +86,3 @@ foam.CLASS({
     }
   ]
 });
-
