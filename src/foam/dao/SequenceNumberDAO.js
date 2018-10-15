@@ -149,6 +149,8 @@ foam.CLASS({
             System.err.println("Direct constructor use is deprecated. Use Builder instead.");
             setDelegate(delegate);
             setValue(value);
+            // TODO; find a better way to do this
+            calcDelegateMax_();
           }
         `);
       }
