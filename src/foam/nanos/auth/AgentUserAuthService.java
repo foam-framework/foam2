@@ -56,7 +56,7 @@ public class AgentUserAuthService
 
     Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
 
-    if ( group != null && ! group.getEnabled() ) {
+    if ( group == null || ! group.getEnabled() ) {
       throw new AuthorizationException("Super user must exist within a group.");
     }
 
