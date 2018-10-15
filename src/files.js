@@ -234,6 +234,7 @@ FOAM_FILES([
   { name: "foam/dao/DeDupDAO" },
   { name: "foam/dao/LRUDAOManager" },
   { name: "foam/dao/SequenceNumberDAO" },
+  { name: "foam/dao/SequenceNumberDAOTest" },
   { name: "foam/dao/ContextualizingDAO" },
   { name: "foam/dao/VersionNoDAO" },
   { name: "foam/dao/sync/SyncRecord" },
