@@ -30,6 +30,7 @@ public class SessionServerBox
 
   public void send(Message msg) {
     String sessionID = (String) msg.getAttributes().get("sessionId");
+    Logger logger = (Logger) getX().get("logger");
 
     try {
       if ( sessionID != null ) {
@@ -38,6 +39,7 @@ public class SessionServerBox
         AuthService        auth         = (AuthService) getX().get("auth");
         DAO                sessionDAO   = (DAO)         getX().get("sessionDAO");
         DAO                groupDAO     = (DAO)         getX().get("groupDAO");
+
         Session            session      = (Session)     sessionDAO.find(sessionID);
 
         if ( session == null ) {
@@ -67,7 +69,6 @@ public class SessionServerBox
           Group group    = (Group) groupDAO.find(user.getGroup());
 
           if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
-            Logger logger   = (Logger) x.get("logger");
             logger.debug("missing permission", group != null ? group.getId() : "NO GROUP" , "service." + spec.getName());
             // msg.replyWithException(new NoPermissionException("No permission"));
             // return;
@@ -79,14 +80,16 @@ public class SessionServerBox
             AppConfig appConfig = group.getAppConfig(x);
             x = x.put("appConfig", appConfig);
             session.getContext().put("appConfig", appConfig);
+          } else {
+            logger.error("missing group: ", String.format("User: [%d]", user.getId()));
+            throw new RuntimeException("User without a group.");
           }
-          AppConfig appConfig = group.getAppConfig(x);
-
         }
         sessionDAO.put(session);
         msg.getLocalAttributes().put("x", x);
       }
     } catch (Throwable t) {
+      logger.error(t);
       t.printStackTrace();
       return;
     }
