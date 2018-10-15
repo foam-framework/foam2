@@ -54,17 +54,15 @@ public class AuthenticatedAgentJunctionDAO
       throw new RuntimeException("Unable to update junction.");
     }
 
-    return super.put_(x, toPut);
+    return super.put_(x, junctionObj);
   }
 
   @Override
   public FObject find_(X x, Object id) {
-    AuthService auth = (AuthService) x.get("auth");
-
     UserUserJunction junctionObj = (UserUserJunction) super.inX(x).find(id);
     
     // Check global permissions
-    if ( auth.check(x, GLOBAL_AGENT_JUNCTION_READ) || userAndAgentAuthorized(x, junctionObj) ) {
+    if ( userAndAgentAuthorized(x, junctionObj, GLOBAL_AGENT_JUNCTION_READ) ) {
       return junctionObj;
     }
 
@@ -76,7 +74,10 @@ public class AuthenticatedAgentJunctionDAO
     if ( obj == null ){ 
       throw new RuntimeException("Junction object is null.");
     }
-    if ( auth.check(x, GLOBAL_AGENT_JUNCTION_DELETE) || userAndAgentAuthorized(x, obj) ) {
+
+    UserUserJunction junctionObj = (UserUserJunction) super.inX(x).find(obj);
+
+    if ( userAndAgentAuthorized(x, junctionObj, GLOBAL_AGENT_JUNCTION_DELETE) ) {
       return super.inX(x).remove(obj);
     }
 
@@ -88,9 +89,10 @@ public class AuthenticatedAgentJunctionDAO
 
   }
 
-  public void userAndAgentAuthorized(X x, UserUserJunction junctionObj){
+  public boolean userAndAgentAuthorized(X x, UserUserJunction junctionObj, String permission){
     User user = (User) x.get("user");
     User agent = (User) x.get("agent");
+    AuthService auth = (AuthService) x.get("auth");
 
     if ( user == null ) {
       throw new AuthenticationException();
@@ -109,7 +111,7 @@ public class AuthenticatedAgentJunctionDAO
         ( SafetyUtil.equals(junctionObj.getTargetId(), user.getId()) ||
         SafetyUtil.equals(junctionObj.getSourceId(), user.getId()) );
 
-    return agentAuthorized || userAuthorized;
+    return auth.check(x, permission) || agentAuthorized || userAuthorized;
   }
 
   // Returns predicated delegate based on user and agent in context.
@@ -120,13 +122,11 @@ public class AuthenticatedAgentJunctionDAO
 
     if ( auth.check(x, permission) ) return super.inX(x).where();
 
-    if ( agent != null ){
-      User delegateUser = agent != null ? agent : user;
-    }
+    User delegateUser = agent != null ? agent : user;
 
     return super.inX(x).where(AND(
       EQ(UserUserJunction.TARGET_ID, delegateUser.getId()),
       EQ(UserUserJunction.SOURCE_ID, delegateUser.getId())
-    ))
+    ));
   }
 }
