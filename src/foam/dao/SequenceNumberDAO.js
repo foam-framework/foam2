@@ -141,6 +141,11 @@ foam.CLASS({
             setValue((long) ( ( (foam.mlang.sink.Max) sink ).getValue() == null ? 1 : ( (Number) ( (foam.mlang.sink.Max) sink ).getValue() ).longValue() + 1.0 ));
           }
 
+          public SequenceNumberDAO(foam.dao.DAO delegate) {
+            System.err.println("Direct constructor use is deprecated. Use Builder instead.");
+            setDelegate(delegate);
+          }
+
           public SequenceNumberDAO(long value, foam.dao.DAO delegate) {
             System.err.println("Direct constructor use is deprecated. Use Builder instead.");
             setDelegate(delegate);
