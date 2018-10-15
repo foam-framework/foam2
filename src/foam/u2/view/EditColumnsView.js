@@ -32,6 +32,13 @@ foam.CLASS({
       value: false
     }
   ],
+
+  css: `
+    ^ {
+      padding: 10px;
+      width: 125px;
+    }
+  `,
   
   methods: [
     function initE() {
@@ -43,6 +50,8 @@ foam.CLASS({
       //     return a.label.toLowerCase().compareTo(b.label.toLowerCase());
       //   });
       // } else { ...
+
+      this.addClass(this.myClass());
 
       this.selected = []
 
