@@ -115,8 +115,6 @@ foam.CLASS({
       `,
       javaCode: `
         synchronized (this) {
-          if ( ! isPropertySet("value") ) calcDelegateMax_();
-
           if ( (long) getAxiom().get(obj) == 0 ) {
             getAxiom().set(obj, getValue());
             setValue(getValue() + 1);
@@ -132,15 +130,6 @@ foam.CLASS({
     {
       buildJavaClass: function(cls) {
         cls.extras.push(`
-          /**
-           * Calculates the next largest value in the sequence
-           */
-          public void calcDelegateMax_() {
-            Sink sink = foam.mlang.MLang.MAX(getAxiom());
-            sink = getDelegate().select(sink);
-            setValue((long) ( ( (foam.mlang.sink.Max) sink ).getValue() == null ? 1 : ( (Number) ( (foam.mlang.sink.Max) sink ).getValue() ).longValue() + 1.0 ));
-          }
-
           public SequenceNumberDAO(foam.dao.DAO delegate) {
             this(1, delegate);
           }
@@ -148,9 +137,11 @@ foam.CLASS({
           public SequenceNumberDAO(long value, foam.dao.DAO delegate) {
             System.err.println("Direct constructor use is deprecated. Use Builder instead.");
             setDelegate(delegate);
-            setValue(value);
-            // TODO; find a better way to do this
-            calcDelegateMax_();
+
+            // calculate the delegate's max or use default
+            foam.mlang.sink.Max sink = (foam.mlang.sink.Max) foam.mlang.MLang.MAX(getAxiom());
+            sink = (foam.mlang.sink.Max) getDelegate().select(sink);
+            setValue((long) ( sink.getValue() == null ? value : ( (Number) sink.getValue() ).longValue() + 1.0 ));
           }
         `);
       }
