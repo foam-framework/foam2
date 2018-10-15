@@ -51,12 +51,17 @@ public class AuthenticatedUserDAO
     User        user    = (User) x.get("user");
     AuthService auth    = (AuthService) x.get("auth");
 
-    User toPut = (User) obj;
-    if ( toPut.getId() < 1000 ) {
-      throw new RuntimeException("Unable to update user");
-    }
+     User toPut = (User) obj;
 
-    if ( toPut != null && ! SafetyUtil.equals(toPut.getId(), user.getId()) &&
+     if ( toPut == null ) {
+       throw new RuntimeException("User can't be null");
+     }
+
+     if ( isExistingUser(toPut) && toPut.getId() < 1000 ) {
+       throw new RuntimeException("Unable to update user");
+     }
+
+    if ( ! SafetyUtil.equals(toPut.getId(), user.getId()) &&
       ! auth.check(x, GLOBAL_USER_UPDATE) &&
       ! auth.check(x, GLOBAL_SPID_UPDATE) &&
       ! auth.check(x, "spid.update." + user.getSpid()) ) {
@@ -64,8 +69,8 @@ public class AuthenticatedUserDAO
     }
 
     // set spid if not set
-    if ( SafetyUtil.isEmpty((String) toPut.getSpid()) &&
-        ! SafetyUtil.isEmpty((String) user.getSpid()) ) {
+    if ( SafetyUtil.isEmpty(toPut.getSpid()) &&
+        ! SafetyUtil.isEmpty(user.getSpid()) ) {
       toPut.setSpid(user.getSpid());
     }
 
@@ -163,5 +168,9 @@ public class AuthenticatedUserDAO
     }
 
     dao.removeAll_(x, skip, limit, order, predicate);
+  }
+
+  private boolean isExistingUser(User user) {
+    return this.find_(getX(), user) != null;
   }
 }
