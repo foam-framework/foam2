@@ -49,7 +49,7 @@ E('b').add(
   E('br'),
   '<span style="color:red">HTML Injection Attempt</span>',
   E('br')
-);
+).write();
 
 E().
   add('Entities: ').
@@ -60,7 +60,9 @@ E().
   entity('lt').
   entity('quot').
   entity("#039").
+  add("&quot;").
   tag('br').
+  br().
   write();
 
 E('b').add(
@@ -206,6 +208,7 @@ foam.CLASS({
   properties: [ 'firstName', 'lastName', 'age' ],
   actions: [
     function sayHello() {
+      debugger;
       console.log('hello');
     },
     function sayGoodbye() {
@@ -267,7 +270,8 @@ foam.CLASS({
           'DEF',
           'XYZ'
         ]
-      }
+      },
+      value: 'ABC'
     },
     'flip'
   ],
@@ -323,6 +327,24 @@ foam.CLASS({
               this.E('br'),
               'OnKey: '
           ).
+          // Static method of implementing a 'switch' statement.
+          // Output won't change if the value of 'choices' changes.
+          call(function() {
+            switch ( this.choices ) {
+              case 'ABC': this.add('choice ABC'); break;
+              case 'DEF': this.add('choice 2'); break;
+              default: this.add('other');
+            }
+          }).
+          // Dynamic method of implementing a 'switch' statement.
+          // Output will change if the value of 'choices' changes.
+          add(this.choices$.map(function(c) {
+            switch ( c ) {
+              case 'ABC': return 'choice ABC';
+              case 'DEF': return 'choice 2';
+              default: return 'other';
+            }
+          })).
           start('div').show(this.flip$).add('flip').end().
           start('div').hide(this.flip$).add('flop').end().
           start(this.FIELD1).attrs({onKey: true}).end().

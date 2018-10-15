@@ -3,6 +3,7 @@
 DEBUG=n
 SUSPEND=n
 DEBUG_PORT=8000
+TEST=0
 
 usage() {
     echo "Usage: nanos [OPTIONS] [NANOS_OPTIONS]"
@@ -12,6 +13,7 @@ usage() {
     echo " -s When debugging is enabled, start with application suspended."
     echo " -a PORT Listen on PORT for debugger connections, default 8000"
     echo " -j JAR1:JAR2 Additional jars to add to the classpath."
+    echo " -t Runs tests."
     echo ""
     echo "Nanos Options:"
     # TODO: Let nanos output these itself.
@@ -21,13 +23,14 @@ usage() {
     echo ""
 }
 
-while getopts ":da:shj:" opt; do
+while getopts ":da:shj:t" opt; do
     case $opt in
         d) DEBUG=y ;;
         s) SUSPEND=y ;;
         a) DEBUG_PORT=$OPTARG ;;
         j) EXTRA_CP=":$OPTARG" ;;
         h) usage ; exit 0 ;;
+        t) TEST=1 ;;
         ?) break ;;
     esac
 done
@@ -36,6 +39,10 @@ DEBUG_ARGS=
 
 if test "$DEBUG" = y; then
     DEBUG_ARGS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=${SUSPEND},address=${DEBUG_PORT}"
+fi
+
+if test "$TEST" = 1; then
+    DEBUG_ARGS="${DEBUG_ARGS} -Dfoam.main=testRunnerScript"
 fi
 
 shift $(($OPTIND - 1))

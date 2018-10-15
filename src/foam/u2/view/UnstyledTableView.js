@@ -9,11 +9,13 @@ foam.CLASS({
   name: 'UnstyledTableView',
   extends: 'foam.u2.Element',
 
-  implements: [ 'foam.mlang.Expressions' ],
+  implements: [
+    'foam.mlang.Expressions'
+  ],
 
   requires: [
-    'foam.u2.view.EditColumnsView',
-    'foam.u2.md.OverlayDropdown'
+    'foam.u2.md.OverlayDropdown',
+    'foam.u2.view.EditColumnsView'
   ],
 
   exports: [
@@ -59,7 +61,7 @@ foam.CLASS({
         return columns.map(function(p) {
           var c = typeof p == 'string' ?
             of.getAxiomByName(p) :
-            p ;
+            p;
 
            if ( ! c ) {
              console.error('Unknown table column: ', p);
@@ -83,6 +85,20 @@ foam.CLASS({
             filter(function(p) { return p.tableCellFormatter && ! p.hidden; }).
             map(foam.core.Property.NAME.f);
       }
+    },
+    {
+      class: 'FObjectArray',
+      of: 'foam.core.Action',
+      name: 'contextMenuActions',
+      documentation: `
+        Each table row has a context menu that contains actions you can perform
+        on the object in that row. The actions used to populate that menu come
+        from two different sources. The first source is this property. If you
+        want a context menu action to do something in the view, then you should
+        write the code for that action in the view model and pass it to the
+        table view via this property. The second source of actions is from the
+        model of the object being shown in the table.
+      `
     },
     {
       class: 'Boolean',
@@ -147,7 +163,7 @@ foam.CLASS({
      * OverlayDropdown adds element to top right of parent container.
      * We want the table dropdown to appear below the dropdown icon.
      */
-    function positionOverlayDropdown(columnSelectionE) {
+    function positionOverlayDropdown(overlay) {
       // Dynamic position calculation
       var origin  = this.dropdownOrigin.el();
       var current = this.overlayOrigin.el();
@@ -155,21 +171,23 @@ foam.CLASS({
       var boundingBox = origin.getBoundingClientRect();
       var dropdownMenu = current.getBoundingClientRect();
 
-      columnSelectionE.style({ top: boundingBox.top - dropdownMenu.top + 'px'});
+      overlay.style({ top: boundingBox.top - dropdownMenu.top + 'px' });
     },
 
     function initE() {
       var view = this;
       var columnSelectionE;
 
-      if ( view.editColumnsEnabled ) {
-        columnSelectionE = view.createColumnSelection();
-        this.start('div', null, this.overlayOrigin$).add(columnSelectionE).end();
-      }
+      this.start('div', null, this.overlayOrigin$)
+        .callIf(view.editColumnsEnabled, function() {
+          columnSelectionE = view.createColumnSelection();
+          this.add(columnSelectionE);
+        })
+      .end();
 
       this.
         addClass(this.myClass()).
-        addClass(this.myClass(this.of.id.replace(/\./g,'-'))).
+        addClass(this.myClass(this.of.id.replace(/\./g, '-'))).
         setNodeName('table').
         start('thead').
           add(this.slot(function(columns_) {
@@ -178,7 +196,7 @@ foam.CLASS({
                 this.start('th').
                   addClass(view.myClass('th-' + column.name)).
                   callIf(column.tableWidth, function() {
-                    this.style({width: column.tableWidth});
+                    this.style({ width: column.tableWidth });
                   }).
                   on('click', function(e) { view.sortBy(column); }).
                   call(column.tableHeaderFormatter, [column]).
@@ -189,20 +207,20 @@ foam.CLASS({
                 end();
               }).
               call(function() {
-                if ( view.editColumnsEnabled ) {
-                  this.start('th').
-                    addClass(view.myClass('th-editColumns')).
+                this.start('th').
+                  callIf(view.editColumnsEnabled, function() {
+                    this.addClass(view.myClass('th-editColumns')).
                     on('click', function(e) {
                       view.positionOverlayDropdown(columnSelectionE);
                       columnSelectionE.open();
                     }).
                     add(' ', view.vertMenuIcon).
                     addClass(view.myClass('vertDots')).
-                    addClass(view.myClass('noselect')).
-                    tag('div', null, view.dropdownOrigin$)
-                  .end();
-                }
-              })
+                    addClass(view.myClass('noselect'));
+                  }).
+                  tag('div', null, view.dropdownOrigin$).
+                end();
+              });
           })).
           add(this.slot(function(columns_) {
             return this.
@@ -216,11 +234,18 @@ foam.CLASS({
                     });
                   }).
                   callIf( ! view.disableUserSelection, function() {
-                    this.on('click', function() {
+                    this.on('click', function(evt) {
+                      // If we're clicking somewhere to close the context menu,
+                      // don't do anything.
+                      if (
+                        evt.target.nodeName === 'DROPDOWN-OVERLAY' ||
+                        evt.target.classList.contains(view.myClass('vertDots'))
+                      ) return;
+
                       view.selection = obj;
                       if ( view.importSelection$ ) view.importSelection = obj;
                       if ( view.editRecord$ ) view.editRecord(obj);
-                    })
+                    });
                   }).
                   addClass(view.slot(function(selection) {
                     return selection && foam.util.equals(obj.id, selection.id) ?
@@ -236,8 +261,54 @@ foam.CLASS({
                       end();
                   }).
                   call(function() {
-                    if ( view.editColumnsEnabled ) return this.tag('td');
-                  })
+                    var modelActions = view.of.getAxiomsByClass(foam.core.Action);
+                    var allActions = Array.isArray(view.contextMenuActions) ?
+                      view.contextMenuActions.concat(modelActions) :
+                      modelActions;
+                    var actions = allActions.filter(function(action) {
+                      return action.isAvailableFor(obj);
+                    });
+
+                    // Don't show the context menu if there are no available
+                    // actions defined on the model.
+                    if ( actions.length === 0 ) {
+                      if ( view.editColumnsEnabled ) {
+                        return this.tag('td');
+                      }
+                      return;
+                    }
+
+                    var overlay = view.OverlayDropdown.create();
+                    overlay.forEach(actions, function(action) {
+                      this.start()
+                        .addClass(view.myClass('context-menu-item'))
+                        .add(action.label)
+                        .call(function() {
+                          if ( action.isEnabledFor(obj) ) {
+                            this.on('click', function(evt) {
+                              action.maybeCall(view.__subContext__, obj);
+                            });
+                          } else {
+                            this.addClass('disabled');
+                          }
+                        })
+                        .end();
+                    });
+
+                    return this.start('td').
+                      add(overlay).
+                      style({ 'text-align': 'right' }).
+                      start('span').
+                        addClass(view.myClass('vertDots')).
+                        addClass(view.myClass('noselect')).
+                        add(view.vertMenuIcon).
+                        on('click', function(evt) {
+                          view.positionOverlayDropdown(overlay);
+                          overlay.open();
+                        }).
+                      end().
+                    end();
+                  });
               });
           }));
     }
