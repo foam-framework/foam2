@@ -68,22 +68,27 @@ public class SessionServerBox
 
           if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
             Logger logger   = (Logger) x.get("logger");
-            logger.debug("missing permission", group.getId(), "service." + spec.getName());
+            logger.debug("missing permission", group != null ? group.getId() : "NO GROUP" , "service." + spec.getName());
             // msg.replyWithException(new NoPermissionException("No permission"));
             // return;
           }
 
+          // padding this cause if group is null this can cause an NPE
+          // technically the user shouldn't be created without a group
+          if (group != null) {
+            AppConfig appConfig = group.getAppConfig(x);
+            x = x.put("appConfig", appConfig);
+            session.getContext().put("appConfig", appConfig);
+          }
           AppConfig appConfig = group.getAppConfig(x);
-          x = x.put("appConfig", appConfig);
 
-          session.getContext().put("appConfig", appConfig);
-          sessionDAO.put(session);
         }
-
+        sessionDAO.put(session);
         msg.getLocalAttributes().put("x", x);
       }
     } catch (Throwable t) {
       t.printStackTrace();
+      return;
     }
 
     getDelegate().send(msg);
