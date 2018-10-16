@@ -114,6 +114,8 @@ var classes = [
   'foam.dao.EasyDAO',
   'foam.dao.EnabledAwareDAO',
   'foam.dao.index.PersistedIndexTest',
+  'foam.dao.SequenceNumberDAO',
+  'foam.dao.SequenceNumberDAOTest',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
