@@ -187,4 +187,8 @@ public class AuthenticatedUserDAO
 
     dao.removeAll_(x, skip, limit, order, predicate);
   }
+
+  private boolean isExistingUser(User user) {
+    return this.find_(getX(), user) != null;
+  }
 }
