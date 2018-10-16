@@ -50,18 +50,18 @@ public class AuthenticatedUserDAO
     User        user    = (User) x.get("user");
     AuthService auth    = (AuthService) x.get("auth");
 
-     User toPut = (User) obj;
+    User newUser = (User) obj;
 
-     if ( toPut == null ) {
-       throw new RuntimeException("User can't be null");
-     }
+    if ( newUser == null ) {
+      throw new RuntimeException("Cannot put null.");
+    }
 
-     if ( isExistingUser(toPut) && toPut.getId() < 1000 ) {
-       throw new RuntimeException("Unable to update user");
-     }
+    boolean updatingSelf = SafetyUtil.equals(newUser.getId(), user.getId());
+    boolean hasUserEditPermission = auth.check(x, "user.update." + newUser.getId());
 
-    if ( ! SafetyUtil.equals(toPut.getId(), user.getId()) &&
-      ! auth.check(x, GLOBAL_USER_UPDATE) &&
+    if (
+      ! updatingSelf &&
+      ! hasUserEditPermission &&
       ! auth.check(x, GLOBAL_SPID_UPDATE) &&
       ! auth.check(x, "spid.update." + user.getSpid())
     ) {
