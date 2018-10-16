@@ -33,7 +33,7 @@ public class UserGroupAndSpidValidator implements Validator
       DAO serviceProviderDAO = (DAO) x.get("serviceProviderDAO");
       ServiceProvider serviceProvider = (ServiceProvider) serviceProviderDAO.find(user.getSpid());
       if ( serviceProvider == null ) {
-        throw new IllegalArgumentException("User need to be assigned to a valid service provider");
+        throw new IllegalArgumentException("User needs to be assigned to a valid service provider");
       }
     }
   }
