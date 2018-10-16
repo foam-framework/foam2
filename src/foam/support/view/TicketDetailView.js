@@ -300,7 +300,7 @@ foam.CLASS({
         .end()
         .br()
         .start().addClass('sub-div-format')
-          .add("#", this.data.id, "   |    ", formattedDate.month, " ", formattedDate.date, " ", formattedDate.hours, ":", formattedDate.mins, "  |  ", this.data.requestorName, " <", this.data.requestorEmail, ">", "  |  Via support@mintchip.ca") 
+          .add("#", this.data.id, "   |    ", formattedDate.month, " ", formattedDate.date, " ", formattedDate.hours, ":", formattedDate.mins, "  |  ", this.data.requesterName, " <", this.data.requesterEmail, ">", "  |  Via support@mintchip.ca")
         .end()
         .start().enableClass('hide', this.status$.map(function(a){ return a == 'Solved' ? true : false; }))
           .tag({ class: 'foam.support.view.ReplyView' })
@@ -348,7 +348,7 @@ foam.CLASS({
           self.data.messages.put(message).then(function(a){
             if (!a) return;
             if( !self.data.emailId ){
-              // var messageId = self.pop3.sendEmail(self.data.requestorEmail, self.data.subject, self.viewData.message)
+              // var messageId = self.pop3.sendEmail(self.data.requesterEmail, self.data.subject, self.viewData.message)
               self.data.emailId = 2;
               self.user.tickets.put(self.data);
               self.stack.push({ class: 'foam.support.view.TicketView' });
@@ -357,7 +357,7 @@ foam.CLASS({
           });
         });
 
-        // if(this.viewData.variant == false && this.messages == "" && !this.data.requestorEmail){
+        // if(this.viewData.variant == false && this.messages == "" && !this.data.requesterEmail){
 
         // }
       }
