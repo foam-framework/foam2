@@ -30,11 +30,18 @@ public class AuthenticatedGroupDAO extends ProxyDAO {
 
   @Override
   public FObject put_(X x, FObject obj) {
+    // If a new group is being created, check that the user has permission to create the group
+    if ( getDelegate().find_(x, obj) == null ) {
+      AuthService auth = (AuthService) x.get("auth");
+      if ( ! auth.check(x, "group.create." + ((Group) obj).getId()) ) {
+        throw new AuthorizationException("Permission Denied. You do not have requisite permission to create this group."); 
+      }
+    }
     checkUserHasAllPermissionsInGroupAndAncestors(x, (Group) obj);
     return super.put_(x, obj);
   }
 
-  private void checkUserHasAllPermissionsInGroupAndAncestors(X x, Group toCheck) {
+  public void checkUserHasAllPermissionsInGroupAndAncestors(X x, Group toCheck) {
     Group group = toCheck;
     checkUserHasAllPermissionsInGroup(x, group);
     while ( getAncestor(x, group) != null ) {
@@ -44,19 +51,19 @@ public class AuthenticatedGroupDAO extends ProxyDAO {
   }
   
   // Make sure that the user has all permissions in the given group.
-  private void checkUserHasAllPermissionsInGroup(X x, Group group) {
+  public void checkUserHasAllPermissionsInGroup(X x, Group group) {
     AuthService auth = (AuthService) x.get("auth");
     Permission[] permissions = group.getPermissions();
     for ( Permission permission : permissions ) {
       String id = permission.getId();
       if ( ! auth.check(x, id) ) {
         throw new AuthorizationException("Permission Denied. You do not have the '" + id + "' permission.");
-        }
-     }
+      }
+    }
   }
 
-  // returns ancestor of a group if it exists, null otherwise null
-  private Group getAncestor(X x, Group group) {    
+  // returns ancestor of a group if it exists, otherwise null
+  public Group getAncestor(X x, Group group) {    
     String ancestorGroupId = group.getParent();
     if ( SafetyUtil.isEmpty(ancestorGroupId) ) {
       return null;
