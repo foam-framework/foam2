@@ -121,7 +121,7 @@ foam.CLASS({
   methods: [
     function initE(){
       var self = this;
-      //find requestorName associated to ticketMessages
+      //find requesterName associated to ticketMessages
       this.userDAO.find(this.message.senderId).then(function(a){
         self.requestName = a.firstName + " " + a.lastName;
       });

@@ -59,10 +59,10 @@ foam.CLASS({
     ^ .foam-u2-view-TableView-th-id{
       width: 125px;
     }
-    ^ .foam-u2-view-TableView-th-requestorEmail{
+    ^ .foam-u2-view-TableView-th-requesterEmail{
       width: 200px;
     }
-    ^ .foam-u2-view-TableView-th-requestorName{
+    ^ .foam-u2-view-TableView-th-requesterName{
       width: 200px;
     }
   `,

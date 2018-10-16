@@ -29,10 +29,25 @@ foam.CLASS({
   ],
 
   exports: [
-    'as data'
+    'as data',
+    'submitAsPopUp'
   ],
 
   css: `
+    ^ .actions {
+      width: 970px;
+      height: 40px;
+      margin: 0 auto;
+      padding: 20px 0 20px 0;
+    }
+    ^ .left-actions {
+      display: inline-block;
+      float: left;
+    }
+    ^ .right-actions {
+      display: inline-block;
+      float: right;
+    }
     ^ {
       box-sizing: border-box;
     }
@@ -41,40 +56,6 @@ foam.CLASS({
     }
     ^ .div{
       margin-top: 40px;
-    }
-    ^ .Rectangle-7 {
-      width: 135px;
-      height: 40px;
-      border-radius: 2px;
-      background-color: rgba(164, 179, 184, 0.1);
-      box-shadow: 0 0 1px 0 rgba(9, 54, 73, 0.8);
-      font-family: Roboto;
-      font-size: 14px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 2.86;
-      letter-spacing: 0.2px;
-      text-align: center;
-      color: #093649;
-    }
-    ^ .Rectangle-8 {
-      padding: 0 10px;
-      border: solid 0.5px #59a5d5 !important;
-      margin: 0px 2px !important;
-      -webkit-box-shadow: none;
-      font-family: Roboto;
-      font-size: 14px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      letter-spacing: 0.2px;
-      text-align: center;
-      color: #ffffff;
-      float: right;
-      height: 40px;
-      border-radius: 2px;
-      background: #59a5d5;
     }
     ^ .label{
       height: 16px;
@@ -87,6 +68,7 @@ foam.CLASS({
       letter-spacing: 0.2px;
       text-align: left;
       color: #093649;
+      margin: 0px;
     }
     ^ .foam-u2-TextField {
       margin-bottom:20px;
@@ -97,7 +79,7 @@ foam.CLASS({
     ^ .foam-u2-tag-TextArea {
       margin-top:8px;
     }
-    ^ .property-requestorEmail,.property-requestorName{
+    ^ .property-requesterEmail,.property-requesterName{
       width: 450px;
       height: 40px;
     }
@@ -131,17 +113,6 @@ foam.CLASS({
       background-color: #ffffff;
       padding: 20px;
     }
-    ^ .foam-u2-UnstyledActionView-voidDropDown{
-      padding: 0px;
-      float: right;
-      width: 30px;
-      height: 40px;
-      background: #59a5d5 !important;
-      -webkit-box-shadow: none !important;
-      box-shadow:none !important;
-      margin: 0px !important;
-      border: solid 0.5px #59a5d5 !important;
-    }
     ^ .foam-u2-PopupView {
       background: #ffffff !important;
       font-size: 14px;
@@ -159,15 +130,15 @@ foam.CLASS({
     }
     ^ .popUpDropDown {
       padding: 0 !important;
-      width: 170px;
+      width: 165px;
       background: #ffffff;
       z-index: 10000;
       box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.19);
     }
-    ^ .popUpDropDown > div {
+    ^ .popUpDropDown > div > div {
       padding: 8px 0 0 11px;
       box-sizing:border-box;
-      width: 170px;
+      width: 165px;
       height: 35px;
       z-index: 10000
       font-family: Roboto;
@@ -180,15 +151,15 @@ foam.CLASS({
       text-align: left;
       color: #093649;
     }
-    ^ .popUpDropDown > div:hover {
+    ^ .popUpDropDown > div > div:hover {
       background-color: rgba(89, 165, 213, 0.3);
     }
     ^ .status{
       color: white;
       display: inline-block;
       text-align: center;
-      padding-top: 4px;
       font-size: 10px;
+      line-height: 20px;
     }
     ^ .Submit-as{
       float: left;
@@ -216,17 +187,19 @@ foam.CLASS({
   `,
 
   properties: [
+    'submitAsMenuBtn_',
+    'submitAsPopUp',
     {
       name: 'dao',
       factory: function() { return this.user.tickets; }
     },
     {
       class: 'String',
-      name: 'requestorEmail'
+      name: 'requesterEmail'
     },
     {
       class: 'String',
-      name: 'requestorName'
+      name: 'requesterName'
     },
     {
       class: 'String',
@@ -246,9 +219,7 @@ foam.CLASS({
       class: 'Int',
       name: 'ticketCount',
       value: '...'
-    },
-    'voidMenuBtn_',
-    'voidPopUp_'
+    }
   ],
 
   methods: [
@@ -257,36 +228,41 @@ foam.CLASS({
       this.onDAOUpdate(); 
       this.SUPER();
       this.hideSummary = true;
+
       this
         .addClass(this.myClass())
-        .start(this.DELETE_DRAFT).addClass('Rectangle-7').end()
-        .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$)
-          .start({ class:'foam.u2.tag.Image', data:'images/drop_down.png' }).end()
+        .start().addClass('actions')
+          .start().addClass('left-actions')
+            .start(this.DELETE_DRAFT).end()
+          .end()
+          .start().addClass('right-actions')
+            .start(this.SUBMIT_AS_DROP_DOWN, null, this.submitAsMenuBtn_$).end()
+            .start(this.SUBMIT_AS, {
+              label: this.slot(function (status) {
+                return 'Submit as ' + status;
+              }, this.status$)
+            }).end()
+          .end()
         .end()
-        .start(this.SUBMIT_TICKET).addClass('Rectangle-8')
-            .start().add('Submit as').addClass('SubmitButton').end()
-            .start().addClass('SubmitLabel')
-              .start().addClass(this.status$).add(this.status$).end()
-            .end()
-        .end()
-        .start().addClass('New-ticket').add('New Ticket #',this.ticketCount$).end()
-      
+
+        .start().addClass('New-ticket').add('New Ticket #', this.ticketCount$).end()
+
         .start().addClass('bg2')
         .start()
           .start().addClass('rname')
             .start().addClass('label')
-              .add('Requestor Name')
+              .add('Requester Name')
             .end()
             .start()
-              .tag(this.REQUESTOR_NAME)
+              .tag(this.REQUESTER_NAME)
             .end()
           .end()
           .start().addClass('remail')
             .start().addClass('label')
-              .add('Requestor Email')
+              .add('Requester Email (optional)')
             .end()
             .start()
-              .tag(this.REQUESTOR_EMAIL)
+              .tag(this.REQUESTER_EMAIL)
             .end()
           .end()
         .end()
@@ -297,7 +273,7 @@ foam.CLASS({
             .tag(this.SUBJECT)
           .end()
           .start().addClass('label')
-            .add('Message')
+            .add('Description')
           .end()
           .start()
             .tag(this.MESSAGE)
@@ -308,14 +284,19 @@ foam.CLASS({
 
   actions: [
     {
-      name: 'submitTicket',
-      label: '',
-      code: function(){
+      name: 'deleteDraft',
+      code: function(X){
+        X.stack.push({ class: 'foam.support.view.TicketView'});
+      }
+    },
+    {
+      name: 'submitAs',
+      code: function (X) {
         var self = this;
 
         var ticket = this.Ticket.create({
-          requestorEmail: this.requestorEmail,
-          requestorName: this.requestorName,
+          requesterEmail: this.requesterEmail,
+          requesterName: this.requesterName,
           userId: this.user.id,
           subject: this.subject,
           status: this.status
@@ -337,69 +318,49 @@ foam.CLASS({
       }
     },
     {
-      name: 'deleteDraft',
-      code: function(X){
-        X.stack.push({ class: 'foam.support.view.TicketView'});
-      }
-    },
-    {
-      name: 'voidDropDown',
+      name: 'submitAsDropDown',
       label: '',
       code: function(X) {
         var self = this;
-        if(this.voidPopUp_) {
-          this.voidPopUp_ = null;
+        if ( this.submitAsPopUp ) {
+          this.submitAsPopUp = null;
           return;
         }
-        
-        self.voidPopUp_ = self.PopupView.create({
-          x: -140,
-          y: 40,
-          width: 170,
-        })
-        self.voidPopUp_.addClass('popUpDropDown')
-        .start('div').on('click', function(){
-          self.status = 'Pending'
-          self.voidPopUp()
-        })
-          .start().add('Submit as').addClass('Submit-as').end()
-          .start().addClass('Pending').addClass('status').add('Pending').end()
-        .end()
-        .start('div').on('click', function(){
-          self.status = 'New'
-          self.voidPopUp()
-        })
-          .start().add('Submit as').addClass('Submit-as').end()
-          .start().addClass('New').addClass('status').add('New').end()
-        .end()
-        .start('div').on('click', function(){
-          self.status = 'Solved'
-          self.voidPopUp()
-        })
-          .start().add('Submit as').addClass('Submit-as').end()
-          .start().addClass('Solved').addClass('status').add('Solved').end()
-        .end()
-        .start('div').on('click', function(){
-          self.status = 'Updated'
-          self.voidPopUp()
-        })
-          .start().add('Submit as').addClass('Submit-as').end()
-          .start().addClass('Updated').addClass('status').add('Updated').end()
-        .end()
-        .start('div').on('click', function(){
-          self.status = 'Open'
-          self.voidPopUp()
-        })
-          .start().add('Submit as').addClass('Submit-as').end()
-          .start().addClass('Open').addClass('status').add('Open').end()
-        .end()
-                 
-        self.voidMenuBtn_.add(self.voidPopUp_)
+
+        // create popup view
+        this.submitAsPopUp = foam.u2.PopupView.create({
+          width: 165,
+          x: -137,
+          y: 40
+        });
+
+        // add items
+        this.submitAsPopUp.addClass('popUpDropDown')
+          .add(this.slot(function (status) {
+            console.log('status', status);
+            var statuses = ['New', 'Pending', 'Open', 'Updated', 'Solved'].filter(function (status) {
+              return status !== self.status;
+            });
+
+            return this.E().forEach(statuses, function (status) {
+              this
+                .start('div')
+                .start().add('Submit as').addClass('Submit-as').end()
+                .start().addClass(status).addClass('status').add(status).end()
+                .on('click', function () {
+                  self.status = status;
+                  self.submitAsPopUp.close();
+                })
+                .end();
+            })
+          }, this.status$));
+
+        this.submitAsMenuBtn_.add(this.submitAsPopUp);
       }
     }
   ],
   listeners: [
-    function voidPopUp(){
+    function voidPopUp() {
       var self = this;
       self.voidPopUp_.close();
     },
@@ -409,7 +370,7 @@ foam.CLASS({
       code: function() {
         var self = this;
         this.dao.select(this.COUNT()).then(function(count) {
-          self.ticketCount = count.value;
+          self.ticketCount = count.value + 1;
         });
       }
     }
