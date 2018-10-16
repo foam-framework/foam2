@@ -321,7 +321,6 @@ foam.CLASS({
           status: this.status
         });
 
-        console.log("this.user: "+ this.user);
         this.dao.put(ticket).then(function(ticket){
           if (self.message == "") return;
           var message = self.TicketMessage.create({

@@ -439,8 +439,8 @@ foam.CLASS({
       var self = this;
       this.data.status = 'Pending';
       self.user.tickets.put(this.data).then(function(a){
-        if (!a){
-          console.log('no ticket Created');
+        if ( ! a ){
+          throw new Error('No ticket created');
         }
         self.stack.push({ class: 'foam.support.view.TicketView' });
       })
