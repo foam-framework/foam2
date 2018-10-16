@@ -30,6 +30,13 @@ public class AuthenticatedGroupDAO extends ProxyDAO {
 
   @Override
   public FObject put_(X x, FObject obj) {
+    // If a new group is being created, check that the user has permission to create the group
+    if ( getDelegate().find_(x, obj) == null ) {
+      AuthService auth = (AuthService) x.get("auth");
+      if ( ! auth.check(x, "group.create." + ((Group) obj).getId()) ) {
+        throw new AuthorizationException("Permission Denied. You do not have requisite permission to create this group."); 
+      }
+    }
     checkUserHasAllPermissionsInGroupAndAncestors(x, (Group) obj);
     return super.put_(x, obj);
   }
