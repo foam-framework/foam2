@@ -87,7 +87,7 @@ foam.RELATIONSHIP({
     value: '',
     view: {
       class: 'foam.u2.view.ReferenceView',
-      placeholder: '[ROOT]'
+      placeholder: '--'
     }
   }
 });
