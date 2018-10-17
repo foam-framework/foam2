@@ -55,6 +55,7 @@ foam.CLASS({
       class: 'StringArray',
       of: 'foam.nanos.auth.Permission',
       name: 'permissions2',
+      hidden: true,
       view: 'foam.u2.view.StringArrayRowView',
       documentation: 'Permissions set on group.'
     },
