@@ -41,7 +41,7 @@ foam.CLASS({
       of: 'foam.nanos.auth.Group',
       view: {
         class: 'foam.u2.view.ReferenceView',
-        plaeholder: '[Root]'
+        placeholder: '[Root]'
       },
       documentation: 'Parent group to inherit permissions from.'
     },
