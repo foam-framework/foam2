@@ -39,6 +39,10 @@ foam.CLASS({
       name: 'parent',
       targetDAOKey: 'groupDAO',
       of: 'foam.nanos.auth.Group',
+      view: {
+        class: 'foam.u2.view.ReferenceView',
+        placeholder: '[ROOT]'
+      },
       documentation: 'Parent group to inherit permissions from.'
     },
     {
