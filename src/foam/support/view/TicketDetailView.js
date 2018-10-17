@@ -54,86 +54,6 @@ foam.CLASS({
       display: inline-block;
       float: right;
     }
-    ^ .foam-u2-UnstyledActionView-backAction {
-      float:left;
-      width: 135px;
-      height: 40px;
-      border-radius: 2px;
-      background-color: rgba(164, 179, 184, 0.1);
-      box-shadow: 0 0 1px 0 rgba(9, 54, 73, 0.8);
-      font-family: Roboto;
-      font-size: 14px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 2.86;
-      letter-spacing: 0.2px;
-      text-align: center;
-      color: #093649;
-    }
-    ^ .Rectangle-9 {
-      width: 135px;
-      padding-left: 35px;
-      border: solid 0.5px #59a5d5 !important;
-      margin: 0px 2px !important;
-      -webkit-box-shadow: none;
-      font-family: Roboto;
-      font-size: 14px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      letter-spacing: 0.2px;
-      text-align: center;
-      color: #ffffff;
-      float: right;
-      height: 40px;
-      border-radius: 2px;
-      background: #59a5d5;
-    }
-    ^ .Rectangle-8 {
-      padding: 0 10px;
-      border: solid 0.5px #59a5d5 !important;
-      margin: 0px 2px !important;
-      -webkit-box-shadow: none;
-      font-family: Roboto;
-      font-size: 14px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      letter-spacing: 0.2px;
-      text-align: center;
-      color: #ffffff;
-      float: right;
-      height: 40px;
-      border-radius: 2px;
-      background: #59a5d5;
-    }
-    ^ .foam-u2-UnstyledActionView-voidDropDown{
-      padding: 0px;
-      float: right;
-      width: 30px;
-      height: 40px;
-      background: #59a5d5 !important;
-      -webkit-box-shadow: none !important;
-      box-shadow:none !important;
-      margin: 0px !important;
-      border: solid 0.5px #59a5d5 !important;
-    }
-    ^ .foam-u2-PopupView {
-      background: #ffffff !important;
-      font-size: 14px;
-      font-weight: 300;
-      letter-spacing: 0.2px;
-      color: #093649;
-      line-height: 30px;
-      position: absolute;
-    }
-    ^ .foam-u2-UnstyledActionView > button {
-      margin: 0px;
-      box-shadow: none;
-      border: solid 0.5px #59a5d5;
-      background-color: #59a5d5;
-    }
     ^ .popUpDropDown {
       padding: 0 !important;
       width: 165px;
@@ -160,34 +80,23 @@ foam.CLASS({
     ^ .popUpDropDown > div > div:hover {
       background-color: rgba(89, 165, 213, 0.3);
     }
-    ^ .SubmitButton{
-      margin-top:1.5px;
-      margin-right:10px;
-      float: left;
-    }
-    ^ .SubmitLabel {
-      float: right;
-      min-width: 60px;
-    }
     ^ .Submit-as{
       float: left;
       margin-top:2px;
       margin-right:10px;
     }
-    ^ .status{
+    ^ .status {
       color: white;
       display: inline-block;
       text-align: center;
       padding-top: 4px;
       font-size: 10px;
     }
-
     ^ .header {
       text-align: left;
       color: #093649;
       margin: 30px 0 20px 0;
     }
-
     ^ .title {
       width: auto;
       height: 20px;
@@ -204,12 +113,10 @@ foam.CLASS({
       display: inline-block;
       padding-right: 20px;
     }
-
     ^ .generic-status {
       line-height: 1.2;
       height: 14px;
     }
-
     ^ .subtitle {
       opacity: 0.7;
       font-family: Roboto;
@@ -222,18 +129,6 @@ foam.CLASS({
       text-align: left;
       color: #093649;
       padding-top: 10px;
-    }
-    ^ .SubmitLabel span{
-      font-size: 10px;
-      position: relative;
-      top: 4px;
-    }
-    ^ .hide {
-      display: none;
-    }
-    ^ .def{
-      position: relative;
-      left: 20px;
     }
   `,
 
@@ -283,7 +178,7 @@ foam.CLASS({
               .start(this.SUBMIT_AS, {
                 label: this.slot(function (status) {
                   return 'Submit as ' + status;
-                }, this.status$)
+                }, this.data.status$)
               }).end()
             .end()
             .start().show(this.status$.map(function (a) { return a === 'Solved'; }))
@@ -297,7 +192,7 @@ foam.CLASS({
             .start().addClass('generic-status').addClass(this.status).add(this.status).end()
           .end()
           .start().addClass('subtitle')
-            .add("#", this.data.id, ' ', formattedDate.month, ' ', formattedDate.date, ' ', formattedDate.hours, ":", formattedDate.mins, "  |  ", this.data.requesterName, " <", this.data.requesterEmail, ">", "  |  Via support@mintchip.ca")
+            .add("#", this.data.id, ' ', this.formatDate(this.data.createdAt), ' | ', this.data.requesterName, " <", this.data.requesterEmail, ">", "  |  Via support@mintchip.ca")
           .end()
         .end()
         .start('div')
@@ -316,22 +211,25 @@ foam.CLASS({
         .end();
     },
 
-    function formatDate(date){
-      var formattedDate = {
-        month: date.toLocaleString("en-us", {month: "short"}),
-        date: date.getDate(),
-        hours: date.getHours(),
-        mins: date.getMinutes()
-      }
-      return formattedDate;
+    function formatDate(date) {
+      return date.toLocaleString('en-us', { month: 'short' }) + ' ' +
+        date.getDate() + ' ' +
+        date.getHours() + ':' +
+        date.getMinutes();
     }
   ],
 
   actions: [
     {
-      name: 'submitTicket',
-      label: '',
-      code: function(){
+      name: 'backAction',
+      label: 'Back',
+      code: function(X) {
+        X.stack.push({ class: 'foam.support.view.TicketView'});
+      }
+    },
+    {
+      name: 'submitAs',
+      code: function (X) {
         var self = this;
         var receiverId = this.data.receiverId ? this.data.receiverId : null;
         var messageType = this.viewData.variant ? 'Internal' : 'Public';
@@ -344,40 +242,24 @@ foam.CLASS({
           type: messageType
         });
 
-        this.user.tickets.put(this.data).then(function(a){
-          if (!a) return;
-          if (self.viewData.message == "") {
+        this.user.tickets.put(this.data).then(function(a) {
+          if ( ! a ) return;
+          if ( self.viewData.message === '' ) {
             self.stack.push({ class: 'foam.support.view.TicketView' });
             return;
           }
-          self.data.messages.put(message).then(function(a){
-            if (!a) return;
-            if( !self.data.emailId ){
+
+          self.data.messages.put(message).then(function(a) {
+            if ( ! a ) return;
+            if ( ! self.data.emailId ) {
               // var messageId = self.pop3.sendEmail(self.data.requesterEmail, self.data.subject, self.viewData.message)
               self.data.emailId = 2;
               self.user.tickets.put(self.data);
-              self.stack.push({ class: 'foam.support.view.TicketView' });
             }
+
             self.stack.push({ class: 'foam.support.view.TicketView' });
           });
         });
-
-        // if(this.viewData.variant == false && this.messages == "" && !this.data.requesterEmail){
-
-        // }
-      }
-    },
-    {
-      name: 'backAction',
-      label: 'Back',
-      code: function(X) {
-        X.stack.push({ class: 'foam.support.view.TicketView'});
-      }
-    },
-    {
-      name: 'submitAs',
-      code: function (X) {
-
       }
     },
     {
@@ -410,12 +292,12 @@ foam.CLASS({
                 .start().add('Submit as').addClass('Submit-as').end()
                 .start().addClass(status).addClass('status').add(status).end()
                 .on('click', function () {
-                  self.status = status;
+                  self.data.status = status;
                   self.submitAsPopUp.close();
                 })
                 .end();
             })
-          }, this.status$));
+          }, this.data.status$));
 
         this.submitAsMenuBtn_.add(this.submitAsPopUp);
       }

@@ -113,21 +113,6 @@ foam.CLASS({
       background-color: #ffffff;
       padding: 20px;
     }
-    ^ .foam-u2-PopupView {
-      background: #ffffff !important;
-      font-size: 14px;
-      font-weight: 300;
-      letter-spacing: 0.2px;
-      color: #093649;
-      line-height: 30px;
-      position: absolute;
-    }
-    ^ .foam-u2-UnstyledActionView > button {
-      margin:0px;
-      box-shadow:none;
-      border: solid 0.5px #59a5d5;
-      background-color: #59a5d5;
-    }
     ^ .popUpDropDown {
       padding: 0 !important;
       width: 165px;
@@ -165,20 +150,6 @@ foam.CLASS({
       float: left;
       margin-top:2px;
       margin-right:10px;
-    }
-    ^ .SubmitButton{
-      margin-top:1.5px;
-      margin-right:10px;
-      float: left;
-    }
-    ^ .SubmitLabel {
-      float:right;
-      min-width: 60px;
-    }
-    ^ .SubmitLabel span{
-      font-size: 10px;
-      position: relative;
-      top: 4px;
     }
     ^ .rname {
       margin-right:20px;
