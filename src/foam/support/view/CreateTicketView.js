@@ -79,7 +79,7 @@ foam.CLASS({
     ^ .foam-u2-tag-TextArea {
       margin-top:8px;
     }
-    ^ .property-requesterEmail,.property-requesterName{
+    ^ .property-requestorEmail,.property-requestorName{
       width: 450px;
       height: 40px;
     }
@@ -166,11 +166,11 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'requesterEmail'
+      name: 'requestorEmail'
     },
     {
       class: 'String',
-      name: 'requesterName'
+      name: 'requestorName'
     },
     {
       class: 'String',
@@ -222,18 +222,18 @@ foam.CLASS({
         .start()
           .start().addClass('rname')
             .start().addClass('label')
-              .add('Requester Name')
+              .add('Requestor Name')
             .end()
             .start()
-              .tag(this.REQUESTER_NAME)
+              .tag(this.REQUESTOR_NAME)
             .end()
           .end()
           .start().addClass('remail')
             .start().addClass('label')
-              .add('Requester Email (optional)')
+              .add('Requestor Email (optional)')
             .end()
             .start()
-              .tag(this.REQUESTER_EMAIL)
+              .tag(this.REQUESTOR_EMAIL)
             .end()
           .end()
         .end()
@@ -267,8 +267,8 @@ foam.CLASS({
         var self = this;
 
         var ticket = this.Ticket.create({
-          requesterEmail: this.requesterEmail,
-          requesterName: this.requesterName,
+          requestorEmail: this.requestorEmail,
+          requestorName: this.requestorName,
           userId: this.user.id,
           subject: this.subject,
           status: this.status

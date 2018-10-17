@@ -21,7 +21,7 @@ foam.INTERFACE({
       args: [
         {
           class:'String',
-          name:'requester'
+          name:'requestor'
         },
         {
           class:'String',

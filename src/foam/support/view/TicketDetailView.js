@@ -191,7 +191,7 @@ foam.CLASS({
             .start().addClass('generic-status').addClass(this.status).add(this.status).end()
           .end()
           .start().addClass('subtitle')
-            .add("#", this.data.id, ' ', this.formatDate(this.data.createdAt), ' | ', this.data.requesterName, " <", this.data.requesterEmail, ">", "  |  Via support@mintchip.ca")
+            .add("#", this.data.id, ' ', this.formatDate(this.data.createdAt), ' | ', this.data.requestorName, " <", this.data.requestorEmail, ">", "  |  Via support@mintchip.ca")
           .end()
         .end()
         .start('div')
@@ -252,7 +252,7 @@ foam.CLASS({
           self.data.messages.put(message).then(function(a) {
             if ( ! a ) return;
             if ( ! self.data.emailId ) {
-              // var messageId = self.pop3.sendEmail(self.data.requesterEmail, self.data.subject, self.viewData.message)
+              // var messageId = self.pop3.sendEmail(self.data.requestorEmail, self.data.subject, self.viewData.message)
               self.data.emailId = 2;
               self.user.tickets.put(self.data);
             }
