@@ -254,6 +254,9 @@ public class UserAndGroupAuthService
         // check parent group
         groupId = group.getParent();
       }
+     } catch (IllegalArgumentException e) {
+      Logger logger = (Logger) x.get("logger");
+      logger.error("check", permission, e);
     } catch (Throwable t) {
     }
 
@@ -261,13 +264,7 @@ public class UserAndGroupAuthService
   }
 
   public boolean check(foam.core.X x, String permission) {
-    try {
-      return checkPermission(x, new AuthPermission(permission));
-    } catch (IllegalArgumentException e) {
-      Logger logger = (Logger) x.get("logger");
-      logger.error("check", permission, e);
-      throw e;
-    }
+    return checkPermission(x, new AuthPermission(permission));
   }
 
   public boolean checkUser(foam.core.X x, User user, String permission) {
