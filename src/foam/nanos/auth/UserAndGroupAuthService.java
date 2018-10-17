@@ -254,7 +254,7 @@ public class UserAndGroupAuthService
         // check parent group
         groupId = group.getParent();
       }
-     } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       Logger logger = (Logger) x.get("logger");
       logger.error("check", permission, e);
     } catch (Throwable t) {
