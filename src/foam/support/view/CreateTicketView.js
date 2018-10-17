@@ -34,6 +34,9 @@ foam.CLASS({
   ],
 
   css: `
+    ^ {
+      box-sizing: border-box;
+    }
     ^ .actions {
       width: 970px;
       height: 40px;
@@ -47,9 +50,6 @@ foam.CLASS({
     ^ .right-actions {
       display: inline-block;
       float: right;
-    }
-    ^ {
-      box-sizing: border-box;
     }
     ^ .foam-support-view-CreateTicketView {
       margin-top:20px;
@@ -223,11 +223,11 @@ foam.CLASS({
   ],
 
   methods: [
-    function initE(){
-      this.dao.on.sub(this.onDAOUpdate);    
-      this.onDAOUpdate(); 
+    function initE() {
       this.SUPER();
       this.hideSummary = true;
+      this.dao.on.sub(this.onDAOUpdate);    
+      this.onDAOUpdate();
 
       this
         .addClass(this.myClass())
@@ -285,7 +285,7 @@ foam.CLASS({
   actions: [
     {
       name: 'deleteDraft',
-      code: function(X){
+      code: function(X) {
         X.stack.push({ class: 'foam.support.view.TicketView'});
       }
     },
@@ -337,7 +337,6 @@ foam.CLASS({
         // add items
         this.submitAsPopUp.addClass('popUpDropDown')
           .add(this.slot(function (status) {
-            console.log('status', status);
             var statuses = ['New', 'Pending', 'Open', 'Updated', 'Solved'].filter(function (status) {
               return status !== self.status;
             });
@@ -359,11 +358,8 @@ foam.CLASS({
       }
     }
   ],
+
   listeners: [
-    function voidPopUp() {
-      var self = this;
-      self.voidPopUp_.close();
-    },
     {
       name: 'onDAOUpdate',
       isFramed: true,
