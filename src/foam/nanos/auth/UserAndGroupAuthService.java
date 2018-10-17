@@ -12,6 +12,7 @@ import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.dao.Sink;
 import foam.mlang.MLang;
+import foam.nanos.logger.Logger;
 import foam.nanos.NanoService;
 import foam.nanos.session.Session;
 import foam.util.Email;
@@ -260,7 +261,13 @@ public class UserAndGroupAuthService
   }
 
   public boolean check(foam.core.X x, String permission) {
-    return checkPermission(x, new AuthPermission(permission));
+    try {
+      return checkPermission(x, new AuthPermission(permission));
+    } catch (IllegalArgumentException e) {
+      Logger logger = (Logger) x.get("logger");
+      logger.error("check", permission, e);
+      throw e;
+    }
   }
 
   public boolean checkUser(foam.core.X x, User user, String permission) {
