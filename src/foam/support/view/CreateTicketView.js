@@ -195,9 +195,9 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.SUPER();
       this.hideSummary = true;
-      this.dao.on.sub(this.onDAOUpdate);    
+
+      this.dao.on.sub(this.onDAOUpdate);
       this.onDAOUpdate();
 
       this
@@ -257,7 +257,8 @@ foam.CLASS({
     {
       name: 'deleteDraft',
       code: function(X) {
-        X.stack.push({ class: 'foam.support.view.TicketView'});
+        this.hideSummary = false;
+        X.stack.back();
       }
     },
     {
