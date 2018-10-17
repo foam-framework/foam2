@@ -45,7 +45,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'address1',
-      //required: true
+      // required: true
       width: 70,
       displayWidth: 50,
       documentation: 'for an unstructured address, use this as a main address field.',
@@ -76,7 +76,7 @@ foam.CLASS({
       name: 'suite',
       documentation: 'Suite pertaining to address.',
       width: 16,
-      validateObj: function (suite) {
+      validateObj: function(suite) {
         var suiteRegex = /^[a-zA-Z0-9 ]{1,70}$/;
 
         if ( suite.length > 0 && ! suiteRegex.test(suite) ) {
@@ -89,7 +89,7 @@ foam.CLASS({
       name: 'city',
       documentation: 'City pertaining to address.',
       required: true,
-      validateObj: function (city) {
+      validateObj: function(city) {
         var cityRegex = /^[a-zA-Z ]{1,35}$/;
 
         if ( ! cityRegex.test(city) ) {
@@ -102,13 +102,13 @@ foam.CLASS({
       name: 'postalCode',
       documentation: 'Postal code pertaining to address.',
       required: true,
-      validateObj: function (postalCode) {
+      validateObj: function(postalCode) {
         var postalCodeRegex = /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i;
         if ( ! postalCodeRegex.test(postalCode) ) {
           return 'Invalid postal code.';
         }
       },
-      preSet: function(oldValue, newValue){
+      preSet: function(oldValue, newValue) {
         return newValue.toUpperCase();
       },
       javaSetter:
@@ -128,8 +128,8 @@ foam.CLASS({
       name: 'regionId',
       of: 'foam.nanos.auth.Region',
       documentation: 'Region address.',
-      view: function (_, X) {
-        var choices = X.data.slot(function (countryId) {
+      view: function(_, X) {
+        var choices = X.data.slot(function(countryId) {
           return X.regionDAO.where(X.data.EQ(X.data.Region.COUNTRY_ID, countryId || ""));
         });
         return foam.u2.view.ChoiceView.create({
@@ -160,7 +160,7 @@ foam.CLASS({
       name: 'streetNumber',
       width: 16,
       documentation: 'for an structured address, use this field.',
-      validateObj: function (streetNumber) {
+      validateObj: function(streetNumber) {
         var streetNumberRegex = /^[0-9]{1,16}$/;
 
         if ( ! streetNumberRegex.test(streetNumber) ) {
@@ -173,7 +173,7 @@ foam.CLASS({
       name: 'streetName',
       width: 70,
       documentation: 'for an structured address, use this field.',
-      validateObj: function (streetName) {
+      validateObj: function(streetName) {
         var streetNameRegex = /^[a-zA-Z0-9 ]{1,70}$/;
 
         if ( ! streetNameRegex.test(streetName) ) {

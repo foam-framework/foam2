@@ -25,8 +25,8 @@ foam.CLASS({
           return 'Invalid phone number.';
         }
       },
-      preSet: function(o, n){
-        return n.replace(/[- )(]/g,'');
+      preSet: function(o, n) {
+        return n.replace(/[- )(]/g, '');
       }
     }
   ]
