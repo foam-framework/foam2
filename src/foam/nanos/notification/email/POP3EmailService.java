@@ -191,7 +191,7 @@ public class POP3EmailService
     fetch("pop.gmail.com", "pop3", "pat.dev.test1@gmail.com", "Choose123");
   }
   
-  public String sendEmail(String requester,String subject,String body) {
+  public String sendEmail(String requestor,String subject,String body) {
     String host = "pop.gmail.com";// change accordingly
     String mailStoreType = "pop3";
     String username = "pat.dev.test1@gmail.com";// change accordingly
@@ -219,7 +219,7 @@ public class POP3EmailService
       message.setFrom(new InternetAddress("pat.dev.test1@gmail.com"));
 
       // Set To: header field of the header.
-      message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(requester));
+      message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(requestor));
 
       // Set Subject: header field
       message.setSubject(subject);
