@@ -127,25 +127,27 @@ foam.CLASS({
 
       this.addClass(this.myClass())
       .start()
-        .start('h1').add("Sign In").end()
+        .start('h1').add('Sign In').end()
         .start('form').addClass('sign-in-container')
-          .start().addClass('label').add("Email Address").end()
+          .start().addClass('label').add('Email Address').end()
           .start(this.EMAIL).addClass('full-width-input').end()
-          .start().addClass('label').add("Password").end()
+          .start().addClass('label').add('Password').end()
           .add(this.PASSWORD)
           .start(this.SIGN_IN).addClass('full-width-button').end()
         .end()
         .start('div')
-          .callIf(this.signUpEnabled, function(){
-            this.start('p').add("Don't have an account?").end()
+          .callIf(this.signUpEnabled, function() {
+            this.start('p').add('Don\'t have an account?').end()
             .start('p').style({ 'margin-left': '2px' }).addClass('link')
-              .add("Sign up.")
+              .add('Sign up.')
               .on('click', self.signUp)
-            .end()
+            .end();
           })
           .start('p').style({ 'margin-left': '150px' }).addClass('forgot-link')
-            .add("Forgot Password?")
-            .on('click', function(){ self.stack.push({ class: 'foam.nanos.auth.resetPassword.EmailView' })})
+            .add('Forgot Password?')
+            .on('click', function() {
+              self.stack.push({ class: 'foam.nanos.auth.resetPassword.EmailView' })
+            })
           .end()
         .end()
       .end();
