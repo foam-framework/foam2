@@ -161,7 +161,6 @@ foam.CLASS({
       var self = this;
       this.hideSummary = true;
       this.status = this.data.status;
-      var formattedDate = this.formatDate(this.data.createdAt);
 
       this.dao.on.sub(this.onDAOUpdate);
       this.onDAOUpdate();
@@ -224,7 +223,8 @@ foam.CLASS({
       name: 'backAction',
       label: 'Back',
       code: function(X) {
-        X.stack.push({ class: 'foam.support.view.TicketView'});
+        this.hideSummary = false;
+        X.stack.back();
       }
     },
     {

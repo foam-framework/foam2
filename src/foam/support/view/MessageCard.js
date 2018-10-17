@@ -107,22 +107,21 @@ foam.CLASS({
   `,
 
   properties: [
-   {
-     name: 'message',     
-   },
-   'requestName'
+    'message',
+    'requestName'
   ],
 
   methods: [
     function initE() {
       var self = this;
       //find requesterName associated to ticketMessages
-      this.userDAO.find(this.message.senderId).then(function(a){
+      this.userDAO.find(this.message.senderId).then(function(a) {
+        if ( ! a ) return;
         self.requestName = a.firstName + " " + a.lastName;
       });
 
       this
-        .addClass(this.myClass()) 
+        .addClass(this.myClass())
         .start('div').addClass('bg')
           .start('hr').end() 
             .start().addClass('spaceline')

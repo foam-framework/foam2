@@ -85,7 +85,7 @@ foam.CLASS({
         class: 'foam.u2.ListCreateController',
         dao: this.user.tickets,
         detailView: this.TicketDetailView,
-        summaryView: this.TicketTableView.create(),
+        summaryView: this.TicketTableView,
         createDetailView: this.CreateTicketView,
         createLabel:'New Ticket',
         showActions: false
