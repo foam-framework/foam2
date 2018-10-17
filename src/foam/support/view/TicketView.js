@@ -21,9 +21,11 @@ foam.CLASS({
 
   css:`
     ^ {
-      width: 992px;
+      width: 970px;
       margin: auto;
-      padding-bottom: 40px;
+    }
+    ^ .foam-support-view-SummaryCard{
+      width: 15.8%;
     }
     ^ .foam-u2-UnstyledActionView-create {
       float: right;
@@ -33,9 +35,6 @@ foam.CLASS({
       background-color: #59a5d5;
       border: none;
       margin: 0 20px 20px;
-    }
-    ^ .foam-support-view-SummaryCard{
-      width: 164px;
     }
     ^ .foam-u2-view-TableView-row:hover {
       cursor: pointer;
@@ -50,16 +49,20 @@ foam.CLASS({
     ^ .foam-u2-view-TableView td{
       width: 8px;
     }
+    ^ .foam-u2-ListCreateController{
+      top: 30px;
+      position: relative;
+    }
     ^ .foam-u2-view-TableView-th-editColumns{
       width: 10px;
     }
     ^ .foam-u2-view-TableView-th-id{
       width: 125px;
     }
-    ^ .foam-u2-view-TableView-th-requestorEmail{
+    ^ .foam-u2-view-TableView-th-requesterEmail{
       width: 200px;
     }
-    ^ .foam-u2-view-TableView-th-requestorName{
+    ^ .foam-u2-view-TableView-th-requesterName{
       width: 200px;
     }
   `,
@@ -82,7 +85,7 @@ foam.CLASS({
         class: 'foam.u2.ListCreateController',
         dao: this.user.tickets,
         detailView: this.TicketDetailView,
-        summaryView: this.TicketTableView.create(),
+        summaryView: this.TicketTableView,
         createDetailView: this.CreateTicketView,
         createLabel:'New Ticket',
         showActions: false

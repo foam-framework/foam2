@@ -15,7 +15,7 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'id', 'requestorEmail', 'subject', 'createdAt', 'status'
+    'id', 'requesterEmail', 'subject', 'createdAt', 'status'
   ],
   exports: [
     'subject'
@@ -29,11 +29,11 @@ foam.CLASS({
     }, 
     {
       class: 'String',
-      name: 'requestorEmail'
+      name: 'requesterEmail'
     },
     {
       class: 'String',
-      name: 'requestorName'
+      name: 'requesterName'
     },
     {
       class: 'String',
@@ -75,7 +75,7 @@ foam.CLASS({
       },
       tableCellFormatter: function(state, obj, rel) {
         this.start()
-          .start().add(state).addClass('generic-status '+ state).end()
+          .start().add(state).addClass('generic-status').addClass(state).end()
         .end()
       }
     },
