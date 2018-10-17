@@ -75,7 +75,7 @@ foam.CLASS({
       },
       tableCellFormatter: function(state, obj, rel) {
         this.start()
-          .start().add(state).addClass('generic-status '+ state).end()
+          .start().add(state).addClass('generic-status').addClass(state).end()
         .end()
       }
     },

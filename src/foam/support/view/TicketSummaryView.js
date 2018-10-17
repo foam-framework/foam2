@@ -28,42 +28,11 @@ foam.CLASS({
   exports: [ 'as data' ],
  
   css: `
-    ^ .blue-card-title {
-      width: 100px;
-      height: 100px;
-      border-radius: 2px;
-      background-color: #59a5d5;
-      display: inline-block;
+    ^ {
+      margin-bottom: 20px;
     }
-    ^ .Mentions {
-      font-family: Roboto;
-      font-size: 16px;
-      font-weight: bold;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.25;
-      letter-spacing: 0.3px;
-      text-align: center;
-      color: #ffffff;
-      margin-top: 30px;
-      margin-bottom: 5px;
-    }
-    ^ .M {
-      font-family: Roboto;
-      font-size: 14px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 0.86;
-      letter-spacing: 0.2px;
-      text-align: center;
-      color: #ffffff;
-    }
-    ^ .ticketdiv {
-      margin: 30px 0px;
-    }
-    ^ .foam-support-view-SummaryCard {
-      width: 170px;
+    ^:hover{
+      cursor: pointer;
     }
   `,
 
@@ -109,23 +78,48 @@ foam.CLASS({
 
   methods: [
     function initE() {
-    this.dao.on.sub(this.onDAOUpdate);    
+    this.dao.on.sub(this.onDAOUpdate);
     this.onDAOUpdate();
-      this
-        .addClass(this.myClass())
-        .start('div')
-          .start().addClass('ticketdiv')
-            .start().addClass('blue-card-title')
-              .start().add(this.title).addClass('Mentions').end()
-                .start().add(this.ticketCount$).addClass('M').end()           
-            .end()
-            .tag({ class: 'foam.support.view.SummaryCard', count$: this.newCount$, status: this.newLabel })
-            .tag({ class: 'foam.support.view.SummaryCard', count$: this.updatedCount$, status: this.updatedLabel })
-            .tag({ class: 'foam.support.view.SummaryCard', count$: this.openCount$, status: this.openLabel })
-            .tag({ class: 'foam.support.view.SummaryCard', count$: this.pendingCount$, status: this.pendingLabel })
-            .tag({ class: 'foam.support.view.SummaryCard', count$: this.solvedCount$, status: this.solvedLabel })
-          .end()
+
+    this
+      .addClass(this.myClass())
+      .start().addClass('blue-card-title')
+        .add(this.title)
+        .start()
+          .addClass('thin-align')
+          .add(this.ticketCount$)
         .end()
+      .end()
+      .start('span')
+        .tag(this.SummaryCard, {
+          count$: this.newCount$,
+          status: this.newLabel
+        })
+      .end()
+      .start('span')
+        .tag(this.SummaryCard, {
+          count: this.updatedCount$,
+          status: this.updatedLabel
+        })
+      .end()
+      .start('span')
+        .tag(this.SummaryCard, {
+          count: this.openCount$,
+          status: this.openLabel
+        })
+      .end()
+      .start('span')
+        .tag(this.SummaryCard, {
+          count: this.pendingCount$,
+          status: this.pendingLabel
+        })
+      .end()
+      .start('span')
+        .tag(this.SummaryCard, {
+          count: this.solvedCount$,
+          status: this.solvedLabel
+        })
+      .end();
     },
   ],
 
