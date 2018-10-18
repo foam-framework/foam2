@@ -12,6 +12,7 @@ import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.dao.Sink;
 import foam.mlang.MLang;
+import foam.nanos.logger.Logger;
 import foam.nanos.NanoService;
 import foam.nanos.session.Session;
 import foam.util.Email;
@@ -253,6 +254,9 @@ public class UserAndGroupAuthService
         // check parent group
         groupId = group.getParent();
       }
+    } catch (IllegalArgumentException e) {
+      Logger logger = (Logger) x.get("logger");
+      logger.error("check", permission, e);
     } catch (Throwable t) {
     }
 

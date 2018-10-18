@@ -215,11 +215,13 @@ foam.CLASS({
         if ( group[m] ) this[m] = group[m];
       }
 
-      // Don't select default if menu already set
-      if ( this.window.location.hash || ! this.user.group ) return;
+      var hash = this.window.location.hash;
+      this.window.location.hash = '';
 
-      if ( group && ! this.window.location.hash ) {
+      if ( group ) {
         this.window.location.hash = group.defaultMenu;
+      } else {
+        this.window.location.hash = hash;
       }
     },
 
