@@ -37,7 +37,7 @@ foam.INTERFACE({
           swiftType: 'Context'
         },
         {
-          name: 'superUser',
+          name: 'entity',
           javaType: 'foam.nanos.auth.User'
         }
       ]

@@ -66,7 +66,7 @@ public class UserAndGroupAuthService
     }
 
     // check if user group enabled
-    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
+    Group group = (Group) groupDAO_.find(user.getGroup());
     if ( group != null && ! group.getEnabled() ) {
       throw new AuthenticationException("User group disabled");
     }
@@ -136,7 +136,7 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User disabled");
     }
     // check if user group enabled
-    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
+    Group group = (Group) groupDAO_.find(user.getGroup());
     if ( group != null && ! group.getEnabled() ) {
       throw new AuthenticationException("User group disabled");
     }
@@ -166,14 +166,14 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Invalid Parameters");
     }
 
-    User user = (User) userDAO_.inX(x).find(userId);
+    User user = (User) userDAO_.find(userId);
     User contextUser = (User) userAndGroupContext(x, user, password);
     return contextUser;
   }
 
   public User loginByEmail(X x, String email, String password) throws AuthenticationException {
     Sink sink = new ArraySink();
-    sink = userDAO_.inX(x).where(MLang.EQ(User.EMAIL, email.toLowerCase())).limit(1).select(sink);
+    sink = userDAO_.where(MLang.EQ(User.EMAIL, email.toLowerCase())).limit(1).select(sink);
 
     List data = ((ArraySink) sink).getArray();
     if ( data == null || data.size() != 1 ) {
@@ -241,7 +241,7 @@ public class UserAndGroupAuthService
     }
 
     // check if user exists and is enabled
-    User user = (User) userDAO_.inX(x).find(session.getUserId());
+    User user = (User) userDAO_.find(session.getUserId());
     if ( user == null || ! user.getEnabled() ) {
       return false;
     }
@@ -250,7 +250,7 @@ public class UserAndGroupAuthService
       String groupId = (String) user.getGroup();
 
       while ( ! SafetyUtil.isEmpty(groupId) ) {
-        Group group = (Group) groupDAO_.inX(x).find(groupId);
+        Group group = (Group) groupDAO_.find(groupId);
 
         // if group is null break
         if ( group == null ) {
@@ -299,7 +299,7 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found");
     }
 
-    User user = (User) userDAO_.inX(x).find(session.getUserId());
+    User user = (User) userDAO_.find(session.getUserId());
     if ( user == null ) {
       throw new AuthenticationException("User not found");
     }
@@ -310,7 +310,7 @@ public class UserAndGroupAuthService
     }
 
     // check if user group enabled
-    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
+    Group group = (Group) groupDAO_.find(user.getGroup());
     if ( group != null && ! group.getEnabled() ) {
       throw new AuthenticationException("User group disabled");
     }
