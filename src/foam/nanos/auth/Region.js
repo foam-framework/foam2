@@ -10,9 +10,9 @@ foam.CLASS({
 
   documentation: 'Region (province/state) information.',
 
-  ids: [ 'code' ],
+  ids: ['code'],
 
-  searchColumns: [ ],
+  searchColumns: [],
 
   properties: [
     {
