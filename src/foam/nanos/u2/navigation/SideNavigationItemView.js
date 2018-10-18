@@ -7,6 +7,10 @@ foam.CLASS({
     'currentMenu',
   ],
 
+  requires: [
+    'foam.nanos.menu.Menu',
+  ],
+
   css:`
     ^selected {
       opacity:1 !important;
@@ -61,7 +65,7 @@ foam.CLASS({
           return ! expanded ?
             this.E() :
             this.E()
-              .select(data.children, function(child) {
+              .select(data.children.orderBy(view.Menu.ORDER), function(child) {
                 return view.cls_.create({ data: child, paddingLeft: view.paddingLeft + 10, fontSize: view.fontSize - 1, opacity: view.opacity - 0.1 }, view);
               });
         }));
