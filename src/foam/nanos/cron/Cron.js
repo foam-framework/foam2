@@ -88,13 +88,13 @@ foam.CLASS({
 `DAO notification = (DAO) x.get("notificationDAO");
     
 Notification cronStartNotify = new Notification();
-cronStartNotify.setBody(this.getId() + " started");
+cronStartNotify.setBody("Cron job: " + this.getId() + " started");
 notification.put(cronStartNotify);
 
 super.runScript(x);
 
 Notification cronEndNotify = new Notification();
-cronEndNotify.setBody(this.getId() + " ended");
+cronEndNotify.setBody("Cron job: " + this.getId() + " ended");
 notification.put(cronEndNotify);
 
 setScheduledTime(getNextScheduledTime());`
