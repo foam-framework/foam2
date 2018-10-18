@@ -41,9 +41,9 @@ public class AgentUserAuthService
     sets "user" in the context to the passed in user. This allows users to
     act on behalf of others while retaining information on the user.
   */
-  public User actAs(X x, User superUser) throws AuthenticationException {
+  public User actAs(X x, User entity) throws AuthenticationException {
     User agent = (User) x.get("user");
-    User user = (User) userDAO_.inX(x).find(superUser.getId());
+    User user = (User) userDAO_.find(entity.getId());
 
     // Check for current context user
     if ( agent == null ) {
@@ -51,33 +51,37 @@ public class AgentUserAuthService
     }
 
     if ( user == null ) {
-      throw new AuthorizationException("Super user doesn't exist.");
+      throw new AuthorizationException("Entity user doesn't exist.");
     }
 
-    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
+    Group group = (Group) groupDAO_.find(user.getGroup());
 
-    if ( group == null || ! group.getEnabled() ) {
-      throw new AuthorizationException("Super user must exist within a group.");
+    if ( group == null ) {
+      throw new AuthorizationException("Entity must exist within a group.");
+    }
+
+    if ( ! group.getEnabled() ) {
+      throw new AuthorizationException("Entity' group must be enabled.");
     }
 
     /*
       Finds the UserUserJunction object to see if user can act as the passed in user.
-      Source (agent) users are permitted to act as target (superUser) users, not vice versa.
+      Source (agent) users are permitted to act as target (entity) users, not vice versa.
     */
-    UserUserJunction permissionJunction = (UserUserJunction) agentJunctionDAO_.inX(x).find(AND(
+    UserUserJunction permissionJunction = (UserUserJunction) agentJunctionDAO_.find(AND(
       EQ(UserUserJunction.SOURCE_ID, agent.getId()),
       EQ(UserUserJunction.TARGET_ID, user.getId())
     ));
 
     if ( permissionJunction == null ) {
-      throw new AuthorizationException("You don't have access to act as the requested super user.");
+      throw new AuthorizationException("You don't have access to act as the requested entity.");
     }
 
     // Junction object contains a group which has a unique set of permissions specific to the relationship.
-    Group actingWithinGroup = (Group) groupDAO_.inX(x).find(permissionJunction.getGroup());
+    Group actingWithinGroup = (Group) groupDAO_.find(permissionJunction.getGroup());
 
     if ( actingWithinGroup == null || ! actingWithinGroup.getEnabled() ) {
-      throw new AuthorizationException("No permissions are appended to the super user relationship.");
+      throw new AuthorizationException("No permissions are appended to the entity relationship.");
     }
     
     // Clone user and associate new junction group to user. Clone and freeze both user and agent. 
