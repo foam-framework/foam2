@@ -27,7 +27,7 @@ foam.CLASS({
       name: 'delegate',
       of: 'foam.nanos.auth.AuthService',
       factory: function() {
-        return this.SessionClientBox.create({delegate:this.HTTPBox.create({
+        return this.SessionClientBox.create({ delegate: this.HTTPBox.create({
           method: 'POST',
           url: this.serviceName
         })});
