@@ -87,25 +87,15 @@ foam.CLASS({
       javaReturns: 'void',
       javaCode:
 `DAO notification = (DAO) x.get("notificationDAO");
-            
+                
 Notification cronStartNotify = new Notification();
-StringBuilder startMsg = new StringBuilder();
-startMsg.append("Cron job: ").append(this.getId()).append(" started.");
-if ( ! SafetyUtil.isEmpty(this.getDescription()) ) {
-  startMsg.append(" Cron job description: ").append(this.getDescription());
-}
-cronStartNotify.setBody(startMsg.toString());
+cronStartNotify.setBody("Cron STARTED - " + this.getId() + " " + this.getDescription());
 notification.put(cronStartNotify);
 
 super.runScript(x);
 
 Notification cronEndNotify = new Notification();
-StringBuilder endMsg = new StringBuilder();
-endMsg.append("Cron job: ").append(this.getId()).append(" ended.");
-if ( ! SafetyUtil.isEmpty(this.getDescription()) ) {
-  endMsg.append(" Cron job description: ").append(this.getDescription());
-}
-cronEndNotify.setBody(endMsg.toString());
+cronEndNotify.setBody("Cron ENDED - " + this.getId() + " " + this.getDescription());
 notification.put(cronEndNotify);
 
 setScheduledTime(getNextScheduledTime());`
