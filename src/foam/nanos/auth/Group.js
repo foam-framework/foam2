@@ -45,7 +45,12 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.nanos.auth.Permission',
       name: 'permissions',
-      documentation: 'Permissions set on group.'
+      documentation: 'Permissions set on group.',
+      preSet: function(oldVal, newVal) {
+        // if old value is undefined, that means save action triggered
+        return oldVal !== undefined ? newVal :
+          newVal.filter(permission => {return Object.keys(permission.instance_).length !== 0});
+      }
     },
     {
       class: 'StringArray',
