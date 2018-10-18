@@ -97,7 +97,6 @@ public class AgentUserAuthService
     session.setUserId(user.getId());
     session.setContext(session.getContext().put("user", user));
     session.setContext(session.getContext().put("agent", agent));
-    sessionDAO_.put(session);
     
     return user;
   }
@@ -106,24 +105,15 @@ public class AgentUserAuthService
     Retrieves the agent user from the current sessions context.
   */
   public User getCurrentAgent(X x) throws AuthorizationException {
-    // fetch context and check if not null or user id is 0
+    // Fetch context and check if not null.
     Session session = x.get(Session.class);
     if ( session == null ) {
       throw new AuthenticationException("Not logged in");
     }
 
     X sessionContext = session.getContext();
-    // get agent from session context
+    // Get agent from session context
     User agent = (User) sessionContext.get("agent");
-
-    if ( agent == null ) {
-      throw new AuthorizationException("Agent not found.");
-    }
-
-    // check if user enabled
-    if ( ! agent.getEnabled() ) {
-      throw new AuthorizationException("Agent disabled");
-    }
 
     return agent;
   }
