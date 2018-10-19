@@ -24,20 +24,6 @@ foam.INTERFACE({
       ]
     },
     {
-      name: 'getCurrentAgent',
-      javaReturns: 'foam.nanos.auth.User',
-      swiftReturns: 'foam_nanos_auth_User?',
-      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
-      swiftThrows: true,
-      args: [
-        {
-          name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
-        }
-      ]
-    },
-    {
       name: 'generateChallenge',
       javaReturns: 'String',
       swiftReturns: 'String',
