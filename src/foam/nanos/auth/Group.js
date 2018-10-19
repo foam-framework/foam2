@@ -185,7 +185,7 @@ if ( session != null ) {
       //populate AppConfig url with request's RootUrl
       HttpServletRequest req = x.get(HttpServletRequest.class);
 
-      if ( config.getEnableForceHttps() ) {
+      if ( config.getForceHttps() ) {
         if ( ! SafetyUtil.isEmpty(req.getRequestURI()) && ! SafetyUtil.isEmpty(config.getUrl())) {
           String curConfigUrl = config.getUrl();
           String request = ((Request) req).getRootURL().toString();
