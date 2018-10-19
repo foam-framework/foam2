@@ -49,7 +49,7 @@ foam.CLASS({
       preSet: function(oldVal, newVal) {
         // if old value is undefined, that means save action triggered
         return oldVal !== undefined ? newVal :
-          newVal.filter(permission => {return permission.id});
+          newVal.filter(permission => permission.id);
       }
     },
     {
