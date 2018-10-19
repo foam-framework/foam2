@@ -269,13 +269,18 @@ foam.CLASS({
                       return action.isAvailableFor(obj);
                     });
 
-                    // Don't show the context menu if there are no available
-                    // actions defined on the model.
+                    // Show the context menu in a disabled state if there are
+                    // no available actions.
                     if ( actions.length === 0 ) {
-                      if ( view.editColumnsEnabled ) {
-                        return this.tag('td');
-                      }
-                      return;
+                      return this.start('td').
+                        style({ 'text-align': 'right' }).
+                        start('span').
+                          addClass(view.myClass('vertDots')).
+                          addClass(view.myClass('noselect')).
+                          addClass('disabled').
+                          add(view.vertMenuIcon).
+                        end().
+                      end();
                     }
 
                     var overlay = view.OverlayDropdown.create();
