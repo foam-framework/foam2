@@ -34,13 +34,12 @@ import static foam.mlang.MLang.EQ;
 public class AuthenticatedUserDAO
   extends ProxyDAO
 {
-  public final static String GLOBAL_USER_READ   = "user.read.x";
-  public final static String GLOBAL_USER_UPDATE = "user.update.x";
-  public final static String GLOBAL_USER_DELETE = "user.delete.x";
+  public final static String GLOBAL_USER_READ   = "user.read.*";
+  public final static String GLOBAL_USER_DELETE = "user.delete.*";
 
-  public final static String GLOBAL_SPID_READ   = "spid.read.x";
-  public final static String GLOBAL_SPID_UPDATE = "spid.update.x";
-  public final static String GLOBAL_SPID_DELETE = "spid.delete.x";
+  public final static String GLOBAL_SPID_READ   = "spid.read.*";
+  public final static String GLOBAL_SPID_UPDATE = "spid.update.*";
+  public final static String GLOBAL_SPID_DELETE = "spid.delete.*";
 
   public AuthenticatedUserDAO(X x, DAO delegate) {
     super(x, delegate);
@@ -51,21 +50,49 @@ public class AuthenticatedUserDAO
     User        user    = (User) x.get("user");
     AuthService auth    = (AuthService) x.get("auth");
 
-    User toPut = (User) obj;
-    if ( toPut != null && ! SafetyUtil.equals(toPut.getId(), user.getId()) &&
-      ! auth.check(x, GLOBAL_USER_UPDATE) &&
+    User newUser = (User) obj;
+
+    if ( newUser == null ) {
+      throw new RuntimeException("Cannot put null.");
+    }
+
+    boolean updatingSelf = SafetyUtil.equals(newUser.getId(), user.getId());
+    boolean hasUserEditPermission = auth.check(x, "user.update." + newUser.getId());
+
+    if (
+      ! updatingSelf &&
+      ! hasUserEditPermission &&
       ! auth.check(x, GLOBAL_SPID_UPDATE) &&
-      ! auth.check(x, "spid.update." + user.getSpid()) ) {
-      throw new RuntimeException("Unable to update user");
+      ! auth.check(x, "spid.update." + user.getSpid())
+    ) {
+      throw new AuthorizationException("You do not have permission to update this user.");
     }
 
     // set spid if not set
-    if ( SafetyUtil.isEmpty((String) toPut.getSpid()) &&
+    if ( SafetyUtil.isEmpty((String) newUser.getSpid()) &&
         ! SafetyUtil.isEmpty((String) user.getSpid()) ) {
-      toPut.setSpid(user.getSpid());
+      newUser.setSpid(user.getSpid());
     }
 
-    return super.put_(x, toPut);
+    User oldUser = (User) super.find_(x, newUser.getId());
+
+    if (
+      oldUser != null &&
+      ! SafetyUtil.equals(oldUser.getGroup(), newUser.getGroup())
+    ) {
+      boolean hasOldGroupUpdatePermission = auth.check(x, "group.update." + oldUser.getGroup());
+      boolean hasNewGroupUpdatePermission = auth.check(x, "group.update." + newUser.getGroup());
+      if ( updatingSelf ) {
+        throw new AuthorizationException("You cannot change your own group.");
+      } else if ( ! hasUserEditPermission ) {
+        throw new AuthorizationException("You do not have permission to change that user's group.");
+      } else if ( ! (hasOldGroupUpdatePermission && hasNewGroupUpdatePermission) ) {
+        throw new AuthorizationException("You do not have permission to change that user's group to '" + newUser.getGroup() + "'.");
+      }
+      // TODO: Handle SPIDs.
+    }
+
+    return super.put_(x, newUser);
   }
 
   @Override

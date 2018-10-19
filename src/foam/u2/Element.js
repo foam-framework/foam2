@@ -1674,11 +1674,14 @@ foam.CLASS({
       return this;
     },
 
-    function forEach(a, f) {
-      for ( var i = 0 ; i < a.length ; i++ ) {
-        f.call(this, a[i], i);
-      }
-
+    /**
+     * Call the given function on each element in the array. In the function,
+     * `this` will refer to the element.
+     * @param {Array} array An array to loop over.
+     * @param {Function} fn A function to call for each item in the given array.
+     */
+    function forEach(array, fn) {
+      array.forEach(fn.bind(this));
       return this;
     },
 

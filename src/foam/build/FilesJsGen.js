@@ -94,6 +94,7 @@ foam.CLASS({
         'foam.core.__Class__',
         'foam.core.__Property__',
         'foam.core.ModelIDRefine',
+        'foam.core.InnerEnumModelRefine',
       ],
     },
     {
