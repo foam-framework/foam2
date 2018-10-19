@@ -66,7 +66,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'enableForceHttps',
+      name: 'forceHttps',
       value: false
     }
   ]

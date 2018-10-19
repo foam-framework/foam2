@@ -12,6 +12,9 @@ foam.CLASS({
   imports: [ 'cronDAO as scriptDAO' ],
 
   javaImports: [
+    'foam.dao.DAO',
+    'foam.util.SafetyUtil',
+    'foam.nanos.notification.Notification',
     'java.util.Date',
     'java.util.Calendar'
   ],
@@ -83,7 +86,18 @@ foam.CLASS({
       ],
       javaReturns: 'void',
       javaCode:
-`super.runScript(x);
+`DAO notification = (DAO) x.get("notificationDAO");
+                
+Notification cronStartNotify = new Notification();
+cronStartNotify.setBody("Cron STARTED - " + this.getId() + " " + this.getDescription());
+notification.put(cronStartNotify);
+
+super.runScript(x);
+
+Notification cronEndNotify = new Notification();
+cronEndNotify.setBody("Cron ENDED - " + this.getId() + " " + this.getDescription());
+notification.put(cronEndNotify);
+
 setScheduledTime(getNextScheduledTime());`
     },
     {
