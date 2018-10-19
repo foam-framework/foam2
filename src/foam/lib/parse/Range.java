@@ -22,4 +22,8 @@ public class Range implements Parser {
 
     return null;
   }
+
+  public String toString() {
+    return "Range(" + from + "-" + to + ")";
+  }
 }
