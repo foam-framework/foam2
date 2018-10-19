@@ -177,7 +177,7 @@ Session session = x.get(Session.class);
 if ( session != null ) {
   User user = (User) userDAO.find(session.getUserId());
   if ( user != null ) {
-    Group group    = (Group) groupDAO.find(user.getGroup());
+    Group group = (Group) groupDAO.find(user.getGroup());
     if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
       //populate AppConfig url with group url
       config.setUrl(group.getUrl());
@@ -185,22 +185,14 @@ if ( session != null ) {
       //populate AppConfig url with request's RootUrl
       HttpServletRequest req = x.get(HttpServletRequest.class);
 
-      if ( config.getForceHttps() ) {
-        if ( ! SafetyUtil.isEmpty(req.getRequestURI()) && ! SafetyUtil.isEmpty(config.getUrl())) {
-          String curConfigUrl = config.getUrl();
-          String request = ((Request) req).getRootURL().toString();
+      if ( req != null && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
+        String reqRootUrl = ((Request) req).getRootURL().toString();
 
-          //check it's http or https
-          if ( curConfigUrl.startsWith("https") ) {
-            config.setUrl("https" + request.substring(4));
-          } else {
-            config.setUrl(request);
-          }
+        if ( config.getForceHttps() && config.getUrl().startsWith("https") ) {
+          reqRootUrl = "https" + reqRootUrl.substring(4);
         }
-      } else {
-        if ( req != null && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
-          config.setUrl(((Request) req).getRootURL().toString());
-        }
+
+        config.setUrl(reqRootUrl);
       }
     }
   }
