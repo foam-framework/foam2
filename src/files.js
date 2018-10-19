@@ -264,10 +264,6 @@ FOAM_FILES([
   { name: "foam/blob/BlobJava", flags: ['java'] },
   { name: "lib/node/json_dao", flags: ['node'] },
   { name: "lib/utf8" },
-
-  { name: "foam/flow/Document" },
-  { name: "foam/flow/MarkupEditor" },
-
   { name: "foam/net/NotConnectedException" },
   { name: "foam/net/ConnectionFailedException" },
   { name: "foam/net/web/WebSocket" },
