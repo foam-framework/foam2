@@ -80,28 +80,6 @@ public class UserAndGroupAuthService
   }
 
   /**
-    Retrieves the agent (original user acting as the entity) from the current sessions context.
-  */
-  public User getCurrentAgent(X x) throws AuthenticationException {
-    // Fetch context and check if not null or user id is 0
-    Session session = x.get(Session.class);
-    if ( session == null ) {
-      throw new AuthenticationException("Not logged in");
-    }
-
-    X sessionContext = session.getContext();
-    // Get agent from session context
-    User agent = (User) sessionContext.get("agent");
-
-    // Check if user enabled
-    if ( ! agent.getEnabled() ) {
-      throw new AuthorizationException("Agent disabled");
-    }
-
-    return agent;
-  }
-
-  /**
    * A challenge is generated from the userID provided
    * This is saved in a LinkedHashMap with ttl of 5
    */
