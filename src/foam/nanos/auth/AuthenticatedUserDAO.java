@@ -150,6 +150,7 @@ public class AuthenticatedUserDAO
       throw new AuthenticationException();
     }
 
+    DAO dao;
     if ( auth.check(x, GLOBAL_USER_DELETE) ) {
       // delete all users in system
       dao = getDelegate();
