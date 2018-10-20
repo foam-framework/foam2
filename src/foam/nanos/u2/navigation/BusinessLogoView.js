@@ -35,6 +35,7 @@ foam.CLASS({
     ^ img {
       height: 30px;
       padding-top: 10px;
+      cursor: pointer;
     }
     ^ span{
       position: relative;
@@ -74,7 +75,16 @@ foam.CLASS({
         .addClass(this.myClass())
         .start()
           .tag({class: 'foam.u2.tag.Image', data$: logoSlot})
+          .on('click', self.goToDefault)
         .end();
     }
+  ],
+
+  listeners: [
+    function goToDefault() {
+      if ( this.group ) {
+        window.location.hash = this.group.defaultMenu;
+      }
+    },
   ]
 });
