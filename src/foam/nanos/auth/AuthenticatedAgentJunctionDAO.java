@@ -16,6 +16,8 @@ import foam.mlang.predicate.Predicate;
 import foam.util.SafetyUtil;
 
 import static foam.mlang.MLang.EQ;
+import static foam.mlang.MLang.OR;
+import static foam.mlang.MLang.AND;
 
 /**
  * Authenticated AgentJunctionDAO
@@ -85,8 +87,40 @@ public class AuthenticatedAgentJunctionDAO
   }
 
   @Override
-  public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
+    User user = (User) x.get("user");
+    User agent = (User) x.get("agent");
+    AuthService auth = (AuthService) x.get("auth");
 
+    if ( agent == null) {
+      return;
+    }
+
+    boolean global = auth.check(x, GLOBAL_AGENT_JUNCTION_DELETE);
+
+    DAO dao = global ? getDelegate() : getDelegate().where(EQ(UserUserJunction.TARGET_ID, user.getId()));
+    dao.removeAll_(x, skip, limit, order, predicate);
+  }
+
+  @Override
+  public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+    User user = (User) x.get("user");
+    AuthService auth = (AuthService) x.get("auth");
+
+    DAO dao;
+    if ( auth.check(x, GLOBAL_AGENT_JUNCTION_READ) ) {
+      // get all users in system
+      dao = getDelegate();
+    } else {
+      // only get authenticated user
+      dao = getDelegate().where(
+        OR(
+          EQ(UserUserJunction.TARGET_ID, user.getId()),
+          EQ(UserUserJunction.SOURCE_ID, user.getId())
+        )
+      );
+    }
+    return dao.select_(x, sink, skip, limit, order, predicate);
   }
 
   public boolean userAndAgentAuthorized(X x, UserUserJunction junctionObj, String permission){
@@ -120,7 +154,8 @@ public class AuthenticatedAgentJunctionDAO
     User agent = (User) x.get("agent");
     AuthService auth = (AuthService) x.get("auth");
 
-    if ( auth.check(x, permission) ) return super.inX(x).where();
+    if ( auth.check(x, permission) )
+        return super.inX(x);
 
     User delegateUser = agent != null ? agent : user;
 
