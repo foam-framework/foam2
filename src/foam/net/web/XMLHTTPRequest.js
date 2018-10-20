@@ -44,15 +44,16 @@ foam.CLASS({
       var self = this;
       return new Promise(function(resolve, reject) {
         xhr.addEventListener('readystatechange', function foo() {
-          if ( this.readyState === this.LOADING ||
-               this.readyState === this.DONE ) {
+          if ( this.readyState === this.LOADING || this.readyState === this.DONE ) {
             this.removeEventListener('readystatechange', foo);
-            var resp = self.HTTPResponse.create({
-              xhr: this
-            });
 
-            if ( resp.success ) resolve(resp);
-            else reject(resp);
+            var resp = self.HTTPResponse.create({xhr: this});
+
+            if ( resp.success ) {
+              resolve(resp);
+            } else {
+              reject(resp);
+            }
           }
         });
         xhr.send(self.payload);

@@ -348,12 +348,12 @@ foam.RELATIONSHIP({
   }
 });
 
-// Relationship used in the agent auth service. Determines permission list when acting as a super user.
+// Relationship used in the agent auth service. Determines permission list when acting as a entity.
 foam.RELATIONSHIP({
   cardinality: '*:*',
   sourceModel: 'foam.nanos.auth.User',
   targetModel: 'foam.nanos.auth.User',
-  forwardName: 'superUsers',
+  forwardName: 'entities',
   inverseName: 'agents',
   junctionDAOKey: 'agentJunctionDAO',
 });

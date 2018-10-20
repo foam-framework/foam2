@@ -39,6 +39,7 @@ public class Outputter
   protected boolean       outputShortNames_    = false;
   protected boolean       outputDefaultValues_ = false;
   protected boolean       outputClassNames_    = true;
+  protected boolean       outputJsonj_         = false;
 
   public Outputter() {
     this(OutputterMode.FULL);
@@ -315,6 +316,9 @@ public class Outputter
 
   protected void outputFObject(FObject o) {
     ClassInfo info = o.getClassInfo();
+
+    if ( outputJsonj_ ) writer_.append("p(");
+
     writer_.append("{");
     if ( outputClassNames_ ) {
       writer_.append(beforeKey_());
@@ -332,6 +336,8 @@ public class Outputter
     }
 
     writer_.append("}");
+
+    if ( outputJsonj_ ) writer_.append(")");
   }
 
   protected void outputPropertyInfo(PropertyInfo prop) {
@@ -417,5 +423,9 @@ public class Outputter
   public void flush() throws IOException {
     if ( stringWriter_ != null ) stringWriter_.flush();
     if ( writer_ != null ) writer_.flush();
+  }
+
+  public void setOutputJsonj_(boolean outputJsonj) {
+    outputJsonj_ = outputJsonj;
   }
 }

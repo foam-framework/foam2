@@ -48,6 +48,11 @@ foam.CLASS({
       name: 'order',
       documentation: 'Used to order the menu list.',
       value: 1000
+    },
+    {
+      class: 'String',
+      name: 'description',
+      documentation: 'Menu item explaination.'
     }
   ],
 

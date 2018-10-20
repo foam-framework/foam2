@@ -52,6 +52,10 @@ public class AuthenticatedUserDAO
     AuthService auth    = (AuthService) x.get("auth");
 
     User toPut = (User) obj;
+    if ( toPut.getId() < 1000 ) {
+      throw new RuntimeException("Unable to update user");
+    }
+
     if ( toPut != null && ! SafetyUtil.equals(toPut.getId(), user.getId()) &&
       ! auth.check(x, GLOBAL_USER_UPDATE) &&
       ! auth.check(x, GLOBAL_SPID_UPDATE) &&

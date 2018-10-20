@@ -47,7 +47,19 @@ foam.CLASS({
 
           'entity': seq1(1, '&', alt('nbsp', 'lt', 'gt', 'amp'), ';'),
 
-          'tag': alt(sym('br'),
+          'normal-tag': seq('<', sym('tag-identifier'), sym('attributes'), '>', sym('content'), '</', sym('tag-identifier'), '>'),
+          'self-closed-tag': seq('<', sym('tag-identifier'), sym('attributes'), '/>'),
+
+          // TODO: FOAM tags have their own entry because the registerElement support
+          // does not actually take effect during Element.start/tag/add
+          'tag': alt(sym('foam'),
+                     sym('code'),
+                     sym('self-closed-tag'),
+                     sym('normal-tag')),
+
+          'tag-identifier': substring(plus(notChars(' />'))),
+
+          'xtag': alt(sym('br'),
                      sym('bold'),
                      sym('italic'),
                      sym('paragraph'),
@@ -144,6 +156,37 @@ foam.CLASS({
         'content': function(children) {
           return function(x) {
             this.forEach(children, function(c) { c.call(this, x); });
+          };
+        },
+
+        'normal-tag': function(v) {
+          var openIdent = v[1];
+          var closeIdent = v[6];
+          var attributes = v[2];
+          var children = v[4];
+
+          if ( closeIdent !== openIdent ) {
+            console.warn("Expected close of", openIdent, "but instead found close of", closeIdent);
+          }
+
+          return function(x) {
+            console.log("Tag", openIdent, "attributes", attributes);
+            this.
+              start(openIdent).
+              attrs(attributes).
+              call(children, [x]).
+              end();
+          }
+        },
+
+        'self-closed-tag': function(v) {
+          var ident = v[1];
+          var attributes = v[2];
+          return function(x) {
+            this.
+              start(ident).
+              attrs(attributes).
+              end();
           };
         },
 

@@ -25,7 +25,10 @@ foam.INTERFACE({
       name: 'actAs',
       javaReturns: 'foam.nanos.auth.User',
       swiftReturns: 'foam_nanos_auth_User',
-      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
+      javaThrows: [
+        'foam.nanos.auth.AuthorizationException',
+        'foam.nanos.auth.AuthenticationException'
+      ],
       swiftThrows: true,
       args: [
         {
@@ -34,7 +37,7 @@ foam.INTERFACE({
           swiftType: 'Context'
         },
         {
-          name: 'superUser',
+          name: 'entity',
           javaType: 'foam.nanos.auth.User'
         }
       ]
@@ -43,7 +46,10 @@ foam.INTERFACE({
       name: 'getCurrentAgent',
       javaReturns: 'foam.nanos.auth.User',
       swiftReturns: 'foam_nanos_auth_User?',
-      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
+      javaThrows: [
+        'foam.nanos.auth.AuthorizationException',
+        'foam.nanos.auth.AuthenticationException'
+      ],
       swiftThrows: true,
       args: [
         {

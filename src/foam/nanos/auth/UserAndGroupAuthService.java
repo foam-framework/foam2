@@ -66,7 +66,7 @@ public class UserAndGroupAuthService
     }
 
     // check if user group enabled
-    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
+    Group group = (Group) groupDAO_.find(user.getGroup());
     if ( group != null && ! group.getEnabled() ) {
       throw new AuthenticationException("User group disabled");
     }
@@ -77,32 +77,6 @@ public class UserAndGroupAuthService
     }
 
     return user;
-  }
-
-  /**
-    Retrieves the agent user from the current sessions context.
-  */
-  public User getCurrentAgent(X x) throws AuthenticationException {
-    // fetch context and check if not null or user id is 0
-    Session session = x.get(Session.class);
-    if ( session == null ) {
-      throw new AuthenticationException("Not logged in");
-    }
-
-    X sessionContext = session.getContext();
-    // get agent from session context
-    User agent = (User) sessionContext.get("agent");
-
-    if ( agent == null ) {
-      throw new AuthorizationException("Agent not found.");
-    }
-
-    // check if user enabled
-    if ( ! agent.getEnabled() ) {
-      throw new AuthorizationException("Agent disabled");
-    }
-
-    return agent;
   }
 
   /**
@@ -136,7 +110,7 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User disabled");
     }
     // check if user group enabled
-    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
+    Group group = (Group) groupDAO_.find(user.getGroup());
     if ( group != null && ! group.getEnabled() ) {
       throw new AuthenticationException("User group disabled");
     }
@@ -310,7 +284,7 @@ public class UserAndGroupAuthService
     }
 
     // check if user group enabled
-    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
+    Group group = (Group) groupDAO_.find(user.getGroup());
     if ( group != null && ! group.getEnabled() ) {
       throw new AuthenticationException("User group disabled");
     }
