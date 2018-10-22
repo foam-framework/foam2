@@ -22,7 +22,7 @@ import static foam.mlang.MLang.AND;
 /**
  * Authenticated AgentJunctionDAO
  * Restrict users from creating a junction object where they are the source user (Agent)
- * Restrict users from finding and selecting junction objects they are not referenced to. (Agent or Super user)
+ * Restrict users from finding and selecting junction objects they are not referenced to. (Agent or Entity)
  * Restrict users from removing junction objects where they are the source user (Agent)
  */
 public class AuthenticatedAgentJunctionDAO
@@ -56,12 +56,12 @@ public class AuthenticatedAgentJunctionDAO
       throw new RuntimeException("Unable to update junction.");
     }
 
-    return super.put_(x, junctionObj);
+    return getDelegate().put_(x, junctionObj);
   }
 
   @Override
   public FObject find_(X x, Object id) {
-    UserUserJunction junctionObj = (UserUserJunction) super.inX(x).find(id);
+    UserUserJunction junctionObj = (UserUserJunction) getDelegate().inX(x).find(id);
     
     // Check global permissions
     if ( userAndAgentAuthorized(x, junctionObj, GLOBAL_AGENT_JUNCTION_READ) ) {
@@ -77,10 +77,10 @@ public class AuthenticatedAgentJunctionDAO
       throw new RuntimeException("Junction object is null.");
     }
 
-    UserUserJunction junctionObj = (UserUserJunction) super.inX(x).find(obj);
+    UserUserJunction junctionObj = (UserUserJunction) getDelegate().inX(x).find(obj);
 
     if ( userAndAgentAuthorized(x, junctionObj, GLOBAL_AGENT_JUNCTION_DELETE) ) {
-      return super.inX(x).remove(obj);
+      return getDelegate().inX(x).remove(obj);
     }
 
     throw new AuthorizationException("Unable to remove object.");
@@ -108,7 +108,7 @@ public class AuthenticatedAgentJunctionDAO
     AuthService auth = (AuthService) x.get("auth");
 
     boolean global = auth.check(x, GLOBAL_AGENT_JUNCTION_READ);
-    
+
     DAO dao = global ? getDelegate() :
         getDelegate().where(
           OR(
@@ -120,6 +120,10 @@ public class AuthenticatedAgentJunctionDAO
     return dao.select_(x, sink, skip, limit, order, predicate);
   }
 
+  /**
+   * Checks if agent is present within the context, if so check id on target and source
+   * of junction object. If no agent is present within the context apply same condidition to user.
+   */
   public boolean userAndAgentAuthorized(X x, UserUserJunction junctionObj, String permission){
     User user = (User) x.get("user");
     User agent = (User) x.get("agent");
@@ -149,11 +153,11 @@ public class AuthenticatedAgentJunctionDAO
     AuthService auth = (AuthService) x.get("auth");
 
     if ( auth.check(x, permission) )
-        return super.inX(x);
+        return getDelegate().inX(x);
 
     User delegateUser = agent != null ? agent : user;
 
-    return super.inX(x).where(AND(
+    return getDelegate().inX(x).where(AND(
       EQ(UserUserJunction.TARGET_ID, delegateUser.getId()),
       EQ(UserUserJunction.SOURCE_ID, delegateUser.getId())
     ));

@@ -1,0 +1,8 @@
+
+p({"class":"foam.nanos.auth.UserUserJunction","sourceId":2,"targetId":1})
+p({"class":"foam.nanos.auth.UserUserJunction","sourceId":1,"targetId":2})
+
+p({"class":"foam.nanos.auth.UserUserJunction","id":{"class":"foam.nanos.auth.UserUserJunctionId","sourceId":1,"targetId":2},"group":"system"})
+p({"class":"foam.nanos.auth.UserUserJunction","id":{"class":"foam.nanos.auth.UserUserJunctionId","sourceId":2,"targetId":1},"group":"system"})
+
+p({"class":"foam.nanos.auth.UserUserJunction","sourceId":1,"targetId":1000,"group":"system"})

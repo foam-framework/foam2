@@ -3,3 +3,9 @@ p({"class":"foam.nanos.auth.Permission", "id":"menu.auth", "description":"Perfor
 p({"class":"foam.nanos.auth.Permission", "id":"service.*", "description":"Global permission for reading of services"})
 p({"class":"foam.nanos.auth.Permission", "id":"service.read.*", "description":"Global permission for reading of services from a DAO"})
 p({"class":"foam.nanos.auth.Permission", "id":"service.auth.checkUser", "description":"Permission to grant access to check user permissions."})
+
+p({"class":"foam.nanos.auth.Permission","id":"agentJunction.read.*","description":"Global permission to read agentJunctionDAO"})
+p({"class":"foam.nanos.auth.Permission","id":"agentJunction.update.*","description":"Global permission to update and create on the agentJunctionDAO"})
+p({"class":"foam.nanos.auth.Permission","id":"agentJunction.delete.*","description":"Global permission to delete on the agentJunctionDAO."})
+p({"class":"foam.nanos.auth.Permission","id":"agentJunction.read.*","description":"Global permission to read agentJunctionDAO."})
+p({"class":"foam.nanos.auth.Permission","id":"agentJunction.update.*","description":"Global permission to update and create on the agentJunctionDAO."})
