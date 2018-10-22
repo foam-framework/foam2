@@ -176,7 +176,7 @@ AppConfig config = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
 String configUrl = config.getUrl();
 
 HttpServletRequest req = x.get(HttpServletRequest.class);
-if ( (req != null) && !SafetyUtil.isEmpty(req.getRequestURI()) ) {
+if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
   // populate AppConfig url with request's RootUrl
   configUrl = ((Request) req).getRootURL().toString();
 } else {
@@ -185,7 +185,7 @@ if ( (req != null) && !SafetyUtil.isEmpty(req.getRequestURI()) ) {
   User user = (User) userDAO.find(session.getUserId());
   if ( user != null ) {
     Group group = (Group) groupDAO.find(user.getGroup());
-    if ( SafetyUtil.isEmpty(group.getUrl()) ) {
+    if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
       configUrl = group.getUrl();
     }
   }
