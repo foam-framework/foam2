@@ -12,6 +12,7 @@ import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.dao.Sink;
 import foam.mlang.MLang;
+import foam.nanos.logger.Logger;
 import foam.nanos.NanoService;
 import foam.nanos.session.Session;
 import foam.util.Email;
@@ -66,7 +67,7 @@ public class UserAndGroupAuthService
     }
 
     // check if user group enabled
-    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
+    Group group = (Group) groupDAO_.find(user.getGroup());
     if ( group != null && ! group.getEnabled() ) {
       throw new AuthenticationException("User group disabled");
     }
@@ -98,6 +99,40 @@ public class UserAndGroupAuthService
   }
 
   /**
+    Logs user and sets user group into the current sessions context.
+   */
+  private User userAndGroupContext(X x, User user, String password) throws AuthenticationException {
+    if ( user == null ) {
+      throw new AuthenticationException("User not found");
+    }
+
+    // check if user enabled
+    if ( ! user.getEnabled() ) {
+      throw new AuthenticationException("User disabled");
+    }
+    // check if user group enabled
+    Group group = (Group) groupDAO_.find(user.getGroup());
+    if ( group != null && ! group.getEnabled() ) {
+      throw new AuthenticationException("User group disabled");
+    }
+
+    if ( ! Password.verify(password, user.getPassword()) ) {
+      throw new AuthenticationException("Invalid Password");
+    }
+
+    // Freeze user
+    user = (User) user.fclone();
+    user.freeze();
+
+    Session session = x.get(Session.class);
+    session.setUserId(user.getId());
+    session.setContext(session.getContext().put("user", user));
+    sessionDAO_.put(session);
+ 
+    return user;
+  }
+
+  /**
    * Login a user by the id provided, validate the password
    * and return the user in the context.
    */
@@ -107,30 +142,8 @@ public class UserAndGroupAuthService
     }
 
     User user = (User) userDAO_.find(userId);
-    if ( user == null ) {
-      throw new AuthenticationException("User not found.");
-    }
-
-    // check if user enabled
-    if ( ! user.getEnabled() ) {
-      throw new AuthenticationException("User disabled");
-    }
-
-    // check if user group enabled
-    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
-    if ( group != null && ! group.getEnabled() ) {
-      throw new AuthenticationException("User group disabled");
-    }
-
-    if ( ! Password.verify(password, user.getPassword()) ) {
-      throw new AuthenticationException("Invalid Password");
-    }
-
-    Session session = x.get(Session.class);
-    session.setUserId(user.getId());
-    session.setContext(session.getContext().put("user", user));
-    sessionDAO_.put(session);
-    return user;
+    User contextUser = (User) userAndGroupContext(x, user, password);
+    return contextUser;
   }
 
   public User loginByEmail(X x, String email, String password) throws AuthenticationException {
@@ -143,30 +156,9 @@ public class UserAndGroupAuthService
     }
 
     User user = (User) data.get(0);
-    if ( user == null ) {
-      throw new AuthenticationException("User not found");
-    }
+    User contextUser = (User) userAndGroupContext(x, user, password);
 
-    // check if user enabled
-    if ( ! user.getEnabled() ) {
-      throw new AuthenticationException("User disabled");
-    }
-
-    // check if user group enabled
-    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
-    if ( group != null && ! group.getEnabled() ) {
-      throw new AuthenticationException("User group disabled");
-    }
-
-    if ( ! Password.verify(password, user.getPassword()) ) {
-      throw new AuthenticationException("Incorrect password");
-    }
-
-    Session session = x.get(Session.class);
-    session.setUserId(user.getId());
-    session.setContext(session.getContext().put("user", user));
-    sessionDAO_.put(session);
-    return user;
+    return contextUser;
   }
 
   /**
@@ -253,11 +245,15 @@ public class UserAndGroupAuthService
         // check parent group
         groupId = group.getParent();
       }
+    } catch (IllegalArgumentException e) {
+      Logger logger = (Logger) x.get("logger");
+      logger.error("check", permission, e);
     } catch (Throwable t) {
     }
 
     return false;
   }
+
 
   public boolean check(foam.core.X x, String permission) {
     return checkPermission(x, new AuthPermission(permission));
@@ -292,7 +288,7 @@ public class UserAndGroupAuthService
     }
 
     // check if user group enabled
-    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
+    Group group = (Group) groupDAO_.find(user.getGroup());
     if ( group != null && ! group.getEnabled() ) {
       throw new AuthenticationException("User group disabled");
     }

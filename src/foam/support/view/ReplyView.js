@@ -37,8 +37,7 @@ foam.CLASS({
   ],
   
   css: `
-    ^ .bg {
-      width: 1000px;
+    ^ {
       height: 250px;
       border-radius: 2px;
       background-color: #ffffff;
@@ -97,7 +96,7 @@ foam.CLASS({
       border-radius: 2px;
       background-color: #ffffff;
       border: solid 1px rgba(164, 179, 184, 0.5);
-      margin-left:75px;
+      margin-left:77px;
       margin-top:40px;
     }
     ^ .background-color{
@@ -126,17 +125,15 @@ foam.CLASS({
 
       this
       .addClass(this.myClass())
-      .start().addClass('bg')
-        .startContext({ data: this })
-          .start().addClass('firstdiv')
-            .start({ class:'foam.u2.tag.Image', data:'images/person.svg' }).addClass('person').end()
-            .nbsp().nbsp().nbsp().nbsp().nbsp()
-            .start(this.PUBLIC_REPLY).addClass('Public-Reply').enableClass('border', this.variant$.map(function(a){ return !a; })).end()
-            .start(this.INTERNAL_NOTE).addClass('Internal-Note').enableClass('border', this.variant$).end()
-          .end()
-        .endContext()
-        .start(this.MESSAGE).addClass('Rectangle').enableClass('background-color', this.variant$).end()
-      .end();
+      .startContext({ data: this })
+        .start().addClass('firstdiv')
+          .start({ class:'foam.u2.tag.Image', data:'images/person.svg' }).addClass('person').end()
+          .nbsp().nbsp().nbsp().nbsp().nbsp()
+          .start(this.PUBLIC_REPLY).addClass('Public-Reply').enableClass('border', this.variant$.map(function(a){ return !a; })).end()
+          .start(this.INTERNAL_NOTE).addClass('Internal-Note').enableClass('border', this.variant$).end()
+        .end()
+      .endContext()
+      .start(this.MESSAGE).addClass('Rectangle').enableClass('background-color', this.variant$).end();
     },
   ],
   actions: [

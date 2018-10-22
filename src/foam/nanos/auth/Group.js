@@ -39,6 +39,10 @@ foam.CLASS({
       name: 'parent',
       targetDAOKey: 'groupDAO',
       of: 'foam.nanos.auth.Group',
+      view: {
+        class: 'foam.u2.view.ReferenceView',
+        placeholder: '--'
+      },
       documentation: 'Parent group to inherit permissions from.'
     },
     {
@@ -47,13 +51,14 @@ foam.CLASS({
       name: 'permissions',
       documentation: 'Permissions set on group.'
     },
-    {
-      class: 'StringArray',
-      of: 'foam.nanos.auth.Permission',
-      name: 'permissions2',
-      view: 'foam.u2.view.StringArrayRowView',
-      documentation: 'Permissions set on group.'
-    },
+    // {
+    //   class: 'StringArray',
+    //   of: 'foam.nanos.auth.Permission',
+    //   name: 'permissions2',
+    //   hidden: true,
+    //   view: 'foam.u2.view.StringArrayRowView',
+    //   documentation: 'Permissions set on group.'
+    // },
     {
       class: 'Reference',
       targetDAOKey: 'menuDAO',
@@ -164,9 +169,9 @@ foam.CLASS({
         }
       ],
       javaCode: `
-DAO userDAO         = (DAO) x.get("localUserDAO");
-DAO groupDAO        = (DAO) x.get("groupDAO");
-AppConfig config    = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
+DAO userDAO      = (DAO) x.get("localUserDAO");
+DAO groupDAO     = (DAO) x.get("groupDAO");
+AppConfig config = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
 
 Session session = x.get(Session.class);
 if ( session != null ) {
@@ -180,7 +185,7 @@ if ( session != null ) {
       //populate AppConfig url with request's RootUrl
       HttpServletRequest req = x.get(HttpServletRequest.class);
 
-      if ( config.getEnableForceHttps() ) {
+      if ( config.getForceHttps() ) {
         if ( ! SafetyUtil.isEmpty(req.getRequestURI()) && ! SafetyUtil.isEmpty(config.getUrl())) {
           String curConfigUrl = config.getUrl();
           String request = ((Request) req).getRootURL().toString();
@@ -193,7 +198,7 @@ if ( session != null ) {
           }
         }
       } else {
-        if ( ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
+        if ( req != null && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
           config.setUrl(((Request) req).getRootURL().toString());
         }
       }
