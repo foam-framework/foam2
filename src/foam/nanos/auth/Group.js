@@ -185,18 +185,25 @@ if ( session != null ) {
       //populate AppConfig url with request's RootUrl
       HttpServletRequest req = x.get(HttpServletRequest.class);
 
-      if ( req != null && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
+      if ( (req != null) && !SafetyUtil.isEmpty(req.getRequestURI()) ) {
         String reqRootUrl = ((Request) req).getRootURL().toString();
 
-        if ( config.getForceHttps() && config.getUrl().startsWith("https") ) {
-          reqRootUrl = "https" + reqRootUrl.substring(4);
+        // If incoming URL is already HTTPS just use it as is
+        if ( reqRootUrl.startsWith("https") ) {
+          config.setUrl(reqRootUrl);
+          return config;
         }
 
-        config.setUrl(reqRootUrl);
+        if ( config.getForceHttps() && config.getUrl().startsWith("https") ) {
+          config.setUrl("https" + reqRootUrl.substring(4));
+        } else {
+          config.setUrl(reqRootUrl);
+        }
       }
     }
   }
 }
+
 return config;
         `
     }
