@@ -4,7 +4,7 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   javaImports: [
-    'foam.mlang.MLang'
+    'static foam.mlang.MLang.*'
   ],
 
   properties: [
@@ -29,7 +29,7 @@ foam.CLASS({
       code: function(x, id) {
       },
       javaCode: `
-      DAO targetDAO = ((DAO) x.get(getTargetDAOKey())).where(MLang.EQ(getTargetKey(), getSourceKey().get(obj)));
+      DAO targetDAO = ((DAO) x.get(getTargetDAOKey())).where(EQ(getTargetKey(), getSourceKey().get(obj)));
       try {
         targetDAO.removeAll();
       }
@@ -45,7 +45,7 @@ foam.CLASS({
     {
       buildJavaClass: function(cls) {
         cls.extras.push(`
-      public OnDeleteRemoveChildrenDAO(foam.core.X x, foam.dao.DAO delegate, foam.core.PropertyInfo sourceKey, foam.core.PropertyInfo targetKey, String targetDAOKey) {
+      public RemoveChildrenOnRemoveDAO(foam.core.X x, foam.dao.DAO delegate, foam.core.PropertyInfo sourceKey, foam.core.PropertyInfo targetKey, String targetDAOKey) {
       setSourceKey(sourceKey);
       setTargetKey(targetKey);
       setTargetDAOKey(targetDAOKey);
