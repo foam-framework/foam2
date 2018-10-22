@@ -91,6 +91,7 @@ foam.CLASS({
             this.currentMethod = "";
           }
         }
+        console.log("service Key changed");
       }
     },
     {
@@ -165,6 +166,10 @@ foam.CLASS({
           this.argumentInfo[j].sub(function(argInfo) {
             self.flag = !self.flag;
           });
+
+          this.argumentInfo[j].objectType.sub(function(ot) {
+             self.objFlag = !self.objFlag;
+          });
         }
       }
     },
@@ -173,11 +178,17 @@ foam.CLASS({
       name: 'interfaceName',
       documentation: 'service class name',
       displayWidth: 60,
-      visibility: foam.u2.Visibility.RO,
+      visibility: foam.u2.Visibility.RO
     },
     {
       class: 'Boolean',
       name: 'flag',
+      documentation: 'to give a change event for argumentInfo',
+      hidden: true
+    },
+    {
+      class: 'Boolean',
+      name: 'objFlag',
       documentation: 'to give a change event for argumentInfo',
       hidden: true
     },
@@ -192,11 +203,11 @@ foam.CLASS({
       // TODO: appears not to work if named 'url', find out why.
       name: 'sugarURL',
       label: 'URL',
-      displayWidth: 120,
+      displayWidth: 80,
       documentation: 'dynamic URL according to picking service, method, parameters against web agent',
       view: 'foam.nanos.dig.LinkView',
       setter: function() {}, // Prevent from ever getting set
-      expression: function(serviceKey, method, interfaceName, argumentInfo, flag, currentMethod) {
+      expression: function(serviceKey, method, interfaceName, argumentInfo, flag, currentMethod, objFlag) {
         var query = false;
         var url = "/service/sugar";
 
@@ -216,44 +227,55 @@ foam.CLASS({
           url += "method=" + currentMethod;
         }
 
-        for ( var j = 0 ; j < argumentInfo.length ; j++ ) {
-          var paramUrl = "";
-          var index;
+        for ( var k = 0 ; k < argumentInfo.length ; k++ ) {
+          query = true;
 
-          argumentInfo[j].sub(function(ai) {
-            index = j;
+          if ( argumentInfo[k].value != "" ) {
+            url += query ? "&" : "?";
+            url += argumentInfo[k].name + "=" + argumentInfo[k].value;
+          }
 
-            if ( ai ) {
-              paramUrl += query ? "&" : "?";
-              query = true;
-              paramUrl = ai.src.instance_.name + "=" + ai.src.instance_.value;
-            }
-          });
+//          var javaType_ = argumentInfo[k].javaType;
+//          var prop = foam.lookup(javaType_).getAxiomsByClass(foam.core.Property);
+
+          //if ( k == Number(index) ) url += objParamUrl;
+
+//          if ( argumentInfo[k].objectType.instance_ != "" ) {
+//            url += "&isObjParam=Y&javaType=" + javaType_;
+//
+//            for ( var i = 0 ; i < prop.length ; i++ ) {
+//              if ( argumentInfo[k].objectType.instance_[prop[i].name] ) {
+//                url += query ? "&" : "?";
+//                query = true;
+//
+//                url += prop[i].name + "=" + argumentInfo[k].objectType.instance_[prop[i].name];
+//              }
+//            }
+//          }
         }
 
-        if ( flag ) {  // use this flag to give a change event on purpose for argumentInfo (FObjectArray)
-          for ( var k = 0 ; k < argumentInfo.length ; k++ ) {
-            query = true;
-
-            if ( k == Number(index) ) url += paramUrl;
-
-            if ( argumentInfo[k].value != "" ) {
-              url += query ? "&" : "?";
-              url += argumentInfo[k].name + "=" + argumentInfo[k].value;
-            }
-          }
-        } else { // use this flag to give a change event for argumentInfo (FObjectArray)
-          for ( var k = 0 ; k < argumentInfo.length ; k++ ) {
-            query = true;
-
-            if ( k == Number(index) ) url += paramUrl;
-
-            if ( argumentInfo[k].value != "" ) {
-              url += query ? "&" : "?";
-              url += argumentInfo[k].name + "=" + argumentInfo[k].value;
-            }
-          }
-        }
+//          for ( var k = 0 ; k < argumentInfo.length ; k++ ) {
+//            var javaType_ = argumentInfo[k].javaType;
+//            var prop = foam.lookup(javaType_).getAxiomsByClass(foam.core.Property);
+//
+//            //if ( k == Number(index) ) url += objParamUrl;
+//
+//            if ( argumentInfo[k].objectType.instance_ != '' ) {
+//              url += "&isObjParam=Y&javaType=" + javaType_;
+//
+//              for ( var i = 0 ; i < prop.length ; i++ ) {
+//                if ( argumentInfo[k].objectType.instance_[prop[i].name] ) {
+//                  url += query ? "&" : "?";
+//                  query = true;
+//
+//                  url += prop[i].name + "=" + argumentInfo[k].objectType.instance_[prop[i].name];
+//                }
+//              }
+//            }
+//
+//            //console.log( argumentInfo[k].objectType.instance_);
+//          }
+//        //}
 
         return encodeURI(url);
       }

@@ -147,9 +147,7 @@ public class SugarWebAgent
 
   protected void executeMethod(X x, HttpServletResponse resp, PrintWriter out, Class class_, String serviceName, String methodName, Class[] paramTypes, Object arglist[]) {
     try {
-      System.out.println("eee");
       Method declaredMethod_ = class_.getDeclaredMethod(methodName, paramTypes);
-      System.out.println("fff");
       declaredMethod_.setAccessible(true);
       //declaredMethod_.invoke(x.get(serviceName), arglist);
 
@@ -161,18 +159,14 @@ public class SugarWebAgent
       outputterJson.setOutputDefaultValues(true);
       outputterJson.setOutputClassNames(true);
 
-      System.out.println("aaa");
       outputterJson.output(declaredMethod_.invoke(x.get(serviceName), arglist));
-      System.out.println("bbb");
       out.println(outputterJson);
     } catch (InvocationTargetException e) {
-      System.out.println("ccc");
       DigErrorMessage error = new GeneralException.Builder(x)
         .setMessage("InvocationTargetException: " + e.getTargetException().getMessage())
         .build();
       outputException(x, resp, "JSON", out, error);
     } catch (Exception e) {
-      System.out.println("ddd");
       DigErrorMessage error = new GeneralException.Builder(x)
         .setMessage("Exception: " + e.getMessage())
         .build();
