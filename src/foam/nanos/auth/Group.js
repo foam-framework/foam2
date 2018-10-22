@@ -191,8 +191,15 @@ if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
   }
 }
 
-if ( config.getForceHttps() && configUrl.startsWith("http://") ) {
-  configUrl = "https" + configUrl.substring(4);
+if ( config.getForceHttps() ) {
+  if ( configUrl.startsWith("https://") ) {
+    config.setUrl(configUrl);
+    return config;
+  } else if ( configUrl.startsWith("http://") ) {
+    configUrl = "https" + configUrl.substring(4);
+  } else {
+    configUrl = "https://" + configUrl;
+  }
 }
 
 config.setUrl(configUrl);
