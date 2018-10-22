@@ -1,6 +1,6 @@
 foam.CLASS({
   package: 'foam.dao',
-  name: 'OnDeleteRemoveChildrenDAO',
+  name: 'RemoveChildrenOnRemoveDAO',
   extends: 'foam.dao.ProxyDAO',
 
   javaImports: [
