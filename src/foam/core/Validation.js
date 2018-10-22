@@ -115,6 +115,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'ValidationFObjectRefinement',
   refines: 'foam.core.FObject',
 
   axioms: [

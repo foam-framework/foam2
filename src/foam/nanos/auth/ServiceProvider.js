@@ -8,11 +8,11 @@ foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'ServiceProvider',
 
-  implements: [ 'foam.nanos.auth.EnabledAware' ],
+  implements: ['foam.nanos.auth.EnabledAware'],
 
   documentation: 'Service Provider',
 
-  tableColumns: [ 'id', 'description' ],
+  tableColumns: ['id', 'description'],
 
   properties: [
     {
