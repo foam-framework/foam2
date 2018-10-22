@@ -191,4 +191,18 @@ class ParserTests: XCTestCase {
     XCTAssertEqual(parser.parse(foam_swift_parse_StringPStream(["str": "-0.1123"]), x)!.value()! as! Int, 0)
     XCTAssertEqual(parser.parse(foam_swift_parse_StringPStream(["str": "-50"]), x)!.value()! as! Int, -50)
   }
+
+  func testFObjectArray() {
+    let obj1 = X.create(somepackage_Test.self, args: [
+      "fobjArr": [
+        X.create(foam_nanos_auth_Country.self, args: [
+          "code": "MIKE"
+        ])!
+      ]
+    ])!
+    let json = foam_swift_parse_json_output_Outputter.PRETTY.swiftStringify(obj1)
+    let parser = X.create(foam_swift_parse_json_FObjectParser.self)!
+    let obj2 = parser.parseString(json)!
+    XCTAssertTrue(obj1.isEqual(obj2))
+  }
 }
