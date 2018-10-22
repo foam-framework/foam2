@@ -173,36 +173,29 @@ DAO userDAO      = (DAO) x.get("localUserDAO");
 DAO groupDAO     = (DAO) x.get("groupDAO");
 AppConfig config = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
 
-Session session = x.get(Session.class);
-if ( session != null ) {
+String configUrl = config.getUrl();
+
+HttpServletRequest req = x.get(HttpServletRequest.class);
+if ( (req != null) && !SafetyUtil.isEmpty(req.getRequestURI()) ) {
+  // populate AppConfig url with request's RootUrl
+  configUrl = ((Request) req).getRootURL().toString();
+} else {
+  // populate AppConfig url with group url
+  Session session = x.get(Session.class);
   User user = (User) userDAO.find(session.getUserId());
   if ( user != null ) {
     Group group = (Group) groupDAO.find(user.getGroup());
-    if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
-      //populate AppConfig url with group url
-      config.setUrl(group.getUrl());
-    } else {
-      //populate AppConfig url with request's RootUrl
-      HttpServletRequest req = x.get(HttpServletRequest.class);
-
-      if ( (req != null) && !SafetyUtil.isEmpty(req.getRequestURI()) ) {
-        String reqRootUrl = ((Request) req).getRootURL().toString();
-
-        // If incoming URL is already HTTPS just use it as is
-        if ( reqRootUrl.startsWith("https") ) {
-          config.setUrl(reqRootUrl);
-          return config;
-        }
-
-        if ( config.getForceHttps() && config.getUrl().startsWith("https") ) {
-          config.setUrl("https" + reqRootUrl.substring(4));
-        } else {
-          config.setUrl(reqRootUrl);
-        }
-      }
+    if ( SafetyUtil.isEmpty(group.getUrl()) ) {
+      configUrl = group.getUrl();
     }
   }
 }
+
+if ( config.getForceHttps() && configUrl.startsWith("http://") ) {
+  configUrl = "https" + configUrl.substring(4);
+}
+
+config.setUrl(configUrl);
 
 return config;
         `
