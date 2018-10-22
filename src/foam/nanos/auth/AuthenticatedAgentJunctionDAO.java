@@ -29,9 +29,9 @@ public class AuthenticatedAgentJunctionDAO
   extends ProxyDAO
 {
 
-  public final static String GLOBAL_AGENT_JUNCTION_READ   = "agentJunction.read.x";
-  public final static String GLOBAL_AGENT_JUNCTION_UPDATE = "agentJunction.update.x";
-  public final static String GLOBAL_AGENT_JUNCTION_DELETE = "agentJunction.delete.x";
+  public final static String GLOBAL_AGENT_JUNCTION_READ   = "agentJunction.read.*";
+  public final static String GLOBAL_AGENT_JUNCTION_UPDATE = "agentJunction.update.*";
+  public final static String GLOBAL_AGENT_JUNCTION_DELETE = "agentJunction.delete.*";
 
   public AuthenticatedAgentJunctionDAO(X x, DAO delegate) {
     super(x, delegate);
@@ -51,7 +51,7 @@ public class AuthenticatedAgentJunctionDAO
     UserUserJunction junctionObj = (UserUserJunction) obj;
 
     // Prevents put if user has no permission or if user isn't the targetId of the junction object being created.
-    if ( junctionObj != null && ! SafetyUtil.equals(junctionObj.getTargetId(), user.getId()) &&
+    if ( junctionObj != null && ! SafetyUtil.equals(junctionObj.getSourceId(), user.getId()) &&
       ! auth.check(x, GLOBAL_AGENT_JUNCTION_UPDATE) ) {
       throw new RuntimeException("Unable to update junction.");
     }
@@ -107,19 +107,16 @@ public class AuthenticatedAgentJunctionDAO
     User user = (User) x.get("user");
     AuthService auth = (AuthService) x.get("auth");
 
-    DAO dao;
-    if ( auth.check(x, GLOBAL_AGENT_JUNCTION_READ) ) {
-      // get all users in system
-      dao = getDelegate();
-    } else {
-      // only get authenticated user
-      dao = getDelegate().where(
-        OR(
-          EQ(UserUserJunction.TARGET_ID, user.getId()),
-          EQ(UserUserJunction.SOURCE_ID, user.getId())
-        )
-      );
-    }
+    boolean global = auth.check(x, GLOBAL_AGENT_JUNCTION_READ);
+    
+    DAO dao = global ? getDelegate() :
+        getDelegate().where(
+          OR(
+            EQ(UserUserJunction.TARGET_ID, user.getId()),
+            EQ(UserUserJunction.SOURCE_ID, user.getId())
+          )
+        );
+
     return dao.select_(x, sink, skip, limit, order, predicate);
   }
 
@@ -132,15 +129,12 @@ public class AuthenticatedAgentJunctionDAO
       throw new AuthenticationException();
     }
 
-    if ( junctionObj == null ) {
-      return false;
-    }
-    // Check agent in context, return junction object related to agent.
+    // Check agent in context, junction object related to agent condition.
     boolean agentAuthorized = agent != null && 
         ( SafetyUtil.equals(junctionObj.getTargetId(), agent.getId()) ||
         SafetyUtil.equals(junctionObj.getSourceId(), agent.getId()) );
 
-    // Check if agent doesn't exist, return junction object related to user.
+    // Check if agent doesn't exist, Junction object related to user condition.
     boolean userAuthorized = agent == null &&
         ( SafetyUtil.equals(junctionObj.getTargetId(), user.getId()) ||
         SafetyUtil.equals(junctionObj.getSourceId(), user.getId()) );
