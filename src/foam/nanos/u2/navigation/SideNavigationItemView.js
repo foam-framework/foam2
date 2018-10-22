@@ -26,21 +26,17 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'paddingLeft'
-    },
-    {
-      class: 'Int',
-      name: 'fontSize'
-    },
-    {
-      class: 'Float',
-      name: 'opacity'
+      name: 'level'
     }
   ],
 
   methods: [
     function initE() {
       var view = this;
+
+      var paddingLeft = view.level * 10 + 15;
+      var fontSize = view.level * -1 + 18;
+      var opacity = view.level * -0.1 + 0.9;
 
       this
         .addClass(this.myClass())
@@ -49,15 +45,14 @@ foam.CLASS({
           .enableClass(this.myClass('selected'), view.currentMenu$.map(function (value) {
             return window.location.hash.substring(1) === (view.data.id);
           }))
-          .style({'padding-left': view.paddingLeft + 'px', 'font-size': view.fontSize + 'px', 'opacity': view.opacity})
+          .style({'padding-left': paddingLeft +  'px', 'font-size': fontSize + 'px', 'opacity': opacity})
           .on('click', function() {
             var menu = view.data;
             menu.children.select().then(function(c) {
-              if ( c.array.length === 0 ) {
+              if ( menu.handler != 'foam.nanos.menu.SubMenu' ) {
                 menu.launch(view.__context__, view);
-              } else {
-                view.expanded = ! view.expanded;
               }
+              view.expanded = ! view.expanded;
             });
           })
         .end()
@@ -66,7 +61,7 @@ foam.CLASS({
             this.E() :
             this.E()
               .select(data.children.orderBy(view.Menu.ORDER), function(child) {
-                return view.cls_.create({ data: child, paddingLeft: view.paddingLeft + 10, fontSize: view.fontSize - 1, opacity: view.opacity - 0.1 }, view);
+                return view.cls_.create({ data: child, level: view.level + 1 }, view);
               });
         }));
     }
