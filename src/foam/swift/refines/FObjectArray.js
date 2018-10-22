@@ -11,7 +11,7 @@ foam.CLASS({
     {
       name: 'swiftType',
       expression: function(of) {
-        return `[${foam.lookup(of || 'foam.core.FObject').model_.swiftName}]`
+        return `[${foam.lookup(of).model_.swiftName}]`
       },
     },
     {
