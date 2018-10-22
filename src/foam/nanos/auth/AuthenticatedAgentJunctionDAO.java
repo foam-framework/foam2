@@ -59,18 +59,24 @@ public class AuthenticatedAgentJunctionDAO
     return getDelegate().put_(x, junctionObj);
   }
 
+  /**
+   * Return junction object based on logic within userAgentAuthorization method.
+   */
   @Override
   public FObject find_(X x, Object id) {
     UserUserJunction junctionObj = (UserUserJunction) getDelegate().inX(x).find(id);
     
     // Check global permissions
-    if ( userAndAgentAuthorized(x, junctionObj, GLOBAL_AGENT_JUNCTION_READ) ) {
+    if ( userAgentAuthorization(x, junctionObj, GLOBAL_AGENT_JUNCTION_READ) ) {
       return junctionObj;
     }
 
     return null;
   }
 
+  /**
+   * Allow users to remove junction objects based on logic within userAgentAuthorization method.
+   */
   @Override
   public FObject remove_(X x, FObject obj) {
     if ( obj == null ){ 
@@ -79,7 +85,7 @@ public class AuthenticatedAgentJunctionDAO
 
     UserUserJunction junctionObj = (UserUserJunction) getDelegate().inX(x).find(obj);
 
-    if ( userAndAgentAuthorized(x, junctionObj, GLOBAL_AGENT_JUNCTION_DELETE) ) {
+    if ( userAgentAuthorization(x, junctionObj, GLOBAL_AGENT_JUNCTION_DELETE) ) {
       return getDelegate().inX(x).remove(obj);
     }
 
@@ -122,9 +128,9 @@ public class AuthenticatedAgentJunctionDAO
 
   /**
    * Checks if agent is present within the context, if so check id on target and source
-   * of junction object. If no agent is present within the context apply same condidition to user.
+   * of junction object. If no agent is present within the context, apply target and source condition to user.
    */
-  public boolean userAndAgentAuthorized(X x, UserUserJunction junctionObj, String permission){
+  public boolean userAgentAuthorization(X x, UserUserJunction junctionObj, String permission){
     User user = (User) x.get("user");
     User agent = (User) x.get("agent");
     AuthService auth = (AuthService) x.get("auth");
@@ -133,17 +139,15 @@ public class AuthenticatedAgentJunctionDAO
       throw new AuthenticationException();
     }
 
-    // Check agent in context, junction object related to agent condition.
-    boolean agentAuthorized = agent != null && 
-        ( SafetyUtil.equals(junctionObj.getTargetId(), agent.getId()) ||
-        SafetyUtil.equals(junctionObj.getSourceId(), agent.getId()) );
+    // Check agent or user to authorize the request as.
+    User authorizedUser = agent != null ? agent : user;
 
-    // Check if agent doesn't exist, Junction object related to user condition.
-    boolean userAuthorized = agent == null &&
-        ( SafetyUtil.equals(junctionObj.getTargetId(), user.getId()) ||
-        SafetyUtil.equals(junctionObj.getSourceId(), user.getId()) );
+    // Check junction object relation to authorized user.
+    boolean authorized =
+        ( SafetyUtil.equals(junctionObj.getTargetId(), authorizedUser.getId()) ||
+        SafetyUtil.equals(junctionObj.getSourceId(), authorizedUser.getId()) );
 
-    return auth.check(x, permission) || agentAuthorized || userAuthorized;
+    return auth.check(x, permission) || authorized;
   }
 
   // Returns predicated delegate based on user and agent in context.
