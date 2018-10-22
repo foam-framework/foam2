@@ -114,6 +114,8 @@ var classes = [
   'foam.dao.EasyDAO',
   'foam.dao.EnabledAwareDAO',
   'foam.dao.index.PersistedIndexTest',
+  'foam.dao.SequenceNumberDAO',
+  'foam.dao.SequenceNumberDAOTest',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
@@ -145,7 +147,10 @@ var classes = [
   'foam.nanos.auth.User',
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
+  'foam.nanos.auth.UserUserJunction',
   'foam.nanos.auth.ClientAuthService',
+  'foam.nanos.auth.AgentAuthService',
+  'foam.nanos.auth.ClientAgentAuthService',
   'foam.nanos.auth.HtmlDoc',
   'foam.nanos.auth.PasswordExpiryAuthService',
   'foam.nanos.auth.token.Token',
@@ -316,12 +321,13 @@ var skeletons = [
   'foam.dao.DAO',
   'foam.mop.MOP',
   'foam.nanos.auth.AuthService',
+  'foam.nanos.auth.AgentAuthService',
   'foam.nanos.auth.email.EmailDocInterface',
   'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.auth.token.TokenService',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.POP3Email',
-  'foam.nanos.notification.push.PushService',
+  'foam.nanos.notification.push.PushService'
 ];
 
 var proxies = [

@@ -268,44 +268,39 @@ foam.CLASS({
                     var actions = allActions.filter(function(action) {
                       return action.isAvailableFor(obj);
                     });
-
-                    // Don't show the context menu if there are no available
-                    // actions defined on the model.
-                    if ( actions.length === 0 ) {
-                      if ( view.editColumnsEnabled ) {
-                        return this.tag('td');
-                      }
-                      return;
-                    }
-
                     var overlay = view.OverlayDropdown.create();
-                    overlay.forEach(actions, function(action) {
-                      this.start()
-                        .addClass(view.myClass('context-menu-item'))
-                        .add(action.label)
-                        .call(function() {
-                          if ( action.isEnabledFor(obj) ) {
-                            this.on('click', function(evt) {
-                              action.maybeCall(view.__subContext__, obj);
-                            });
-                          } else {
-                            this.addClass('disabled');
-                          }
-                        })
-                        .end();
-                    });
-
                     return this.start('td').
-                      add(overlay).
+                      callIf(actions.length > 0, function() {
+                        overlay.forEach(actions, function(action) {
+                          this.
+                            start().
+                              addClass(view.myClass('context-menu-item')).
+                              add(action.label).
+                              call(function() {
+                                if ( action.isEnabledFor(obj) ) {
+                                  this.on('click', function(evt) {
+                                    action.maybeCall(view.__subContext__, obj);
+                                  });
+                                } else {
+                                  this.addClass('disabled');
+                                }
+                              }).
+                            end();
+                        });
+                        this.add(overlay);
+                      }).
                       style({ 'text-align': 'right' }).
                       start('span').
                         addClass(view.myClass('vertDots')).
                         addClass(view.myClass('noselect')).
-                        add(view.vertMenuIcon).
-                        on('click', function(evt) {
-                          view.positionOverlayDropdown(overlay);
-                          overlay.open();
+                        enableClass('disabled', actions.length === 0).
+                        callIf(actions.length > 0, function() {
+                          this.on('click', function(evt) {
+                            view.positionOverlayDropdown(overlay);
+                            overlay.open();
+                          });
                         }).
+                        add(view.vertMenuIcon).
                       end().
                     end();
                   });
