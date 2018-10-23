@@ -37,7 +37,6 @@ foam.CLASS({
       class: 'Long',
       name: 'value_',
       documentation: 'The next value to be used.',
-      value: 1,
       swiftExpressionArgs: ['delegate', 'property_', 'startingValue'],
       swiftExpression: `
         let max = self.Max_create(["arg1": property_])
