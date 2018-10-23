@@ -30,11 +30,8 @@ foam.CLASS({
       value: 'id'
     },
     {
-      flags: ['java'],
-      javaType: 'foam.core.PropertyInfo',
-      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
-      name: 'axiom',
-      javaFactory: 'return (foam.core.PropertyInfo)(getOf().getAxiomByName(getProperty()));'
+      class: 'Long',
+      name: 'startingValue',
     },
     {
       /** The starting sequence value. This will be calclated from the
@@ -43,11 +40,18 @@ foam.CLASS({
       class: 'Long',
       name: 'value',
       value: 1,
-      swiftExpressionArgs: ['delegate', 'property_'],
+      swiftExpressionArgs: ['delegate', 'property_', 'startingValue'],
       swiftExpression: `
         let s = self.Max_create(["arg1": property_])
         _ = try? delegate.select(s)
-        return s.value as? Int ?? 0
+        let v = s.value is Int ? (s.value as! Int) + 1 : 0
+        return v >= startingValue ? v : startingValue
+      `,
+      javaFactory: `
+        foam.mlang.sink.Max sink = (foam.mlang.sink.Max) foam.mlang.MLang.MAX(getProperty_());
+        getDelegate().select(sink);
+        long v = sink.getValue() instanceof Number ? ( (Number) sink.getValue() ).longValue() + 1 : 0;
+        return v > getStartingValue() ? v : getStartingValue();
       `,
     },
     { /** Returns a promise that fulfills when the maximum existing number
@@ -62,7 +66,8 @@ foam.CLASS({
           self.MAX(self.property_)
         ).then(
           function(max) {
-            if ( max.value ) self.value = max.value + 1;
+            var v = foam.Number.isInstance(max.value) ? ( max.value + 1 ) : 0;
+            self.value = v > self.startingValue ? v : self.startingValue
           }
         );
       },
@@ -70,8 +75,10 @@ foam.CLASS({
     {
       /** @private */
       name: 'property_',
-      swiftType: 'PropertyInfo',
       hidden: true,
+      javaType: 'foam.core.PropertyInfo',
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
+      swiftType: 'PropertyInfo',
       swiftExpressionArgs: ['property', 'of'],
       swiftExpression: `
         return of.axiom(byName: property) as! PropertyInfo
@@ -85,7 +92,8 @@ foam.CLASS({
           });
         }
         return a;
-      }
+      },
+      javaFactory: 'return (foam.core.PropertyInfo)(getOf().getAxiomByName(getProperty()));'
     }
   ],
 
@@ -99,28 +107,27 @@ foam.CLASS({
         var self = this;
         return this.calcDelegateMax_.then(function() {
           if ( ! obj.hasOwnProperty(self.property_.name) ) {
-            obj[self.property_.name] = self.value++;
+            obj[self.property_.name] = self.value;
+            self.value++;
           }
-
           return self.delegate.put_(x, obj);
         });
       },
       swiftSynchronized: true,
       swiftCode: `
         if !property_.hasOwnProperty(obj) {
-          value += 1
           property_.set(obj, value: value)
+          value += 1
         }
         return try delegate.put_(x, obj)
       `,
       javaCode: `
         synchronized (this) {
-          if ( (long) getAxiom().get(obj) == 0 ) {
-            getAxiom().set(obj, getValue());
+          if ( (long) getProperty_().get(obj) == 0 ) {
+            getProperty_().set(obj, getValue());
             setValue(getValue() + 1);
           }
         }
-
         return getDelegate().put_(x, obj);
       `,
     },
@@ -136,12 +143,8 @@ foam.CLASS({
 
           public SequenceNumberDAO(long value, foam.dao.DAO delegate) {
             System.err.println("Direct constructor use is deprecated. Use Builder instead.");
+            setStartingValue(value);
             setDelegate(delegate);
-
-            // calculate the delegate's max or use default
-            foam.mlang.sink.Max sink = (foam.mlang.sink.Max) foam.mlang.MLang.MAX(getAxiom());
-            sink = (foam.mlang.sink.Max) getDelegate().select(sink);
-            setValue((long) ( sink.getValue() == null ? value : ( (Number) sink.getValue() ).longValue() + 1.0 ));
           }
         `);
       }
