@@ -22,10 +22,6 @@ foam.CLASS({
     'ticketMessageDAO'
   ],  
 
-  javaImports: [
-    'java.util.Date'
-  ],
-
   css: `
     ^ {
       box-sizing: border-box;
@@ -61,8 +57,7 @@ foam.CLASS({
       letter-spacing: 0.2px;
       text-align: left;
       color: #a4b3b8;
-      padding-top: 14px;
-      width: 225px;
+      padding: 14px 14px 0 0;
       display: inline-block;
     }
     ^ .text {
@@ -75,7 +70,7 @@ foam.CLASS({
       letter-spacing: 0.2px;
       text-align: left;
       color: #093649;
-      margin-left:10px;
+      margin-left:20px;
       padding: 30px 0 0 60px;
     }
     ^ .person {
@@ -99,42 +94,41 @@ foam.CLASS({
     ^ .spaceline {
       padding-top: 15px;
     }
-    ^ .internal-status{
+    ^ .internal-status {
       display: inline-block;
-      width: 100px;
-      height: 20px;
-      padding-left: 8px;
-      padding-top: 2px;
+      height: 16px;
+      padding: 2px 8px 2px 8px;
       border-radius: 100px;
       background-color: #1cc2b7;
       color: white;
+      font-size: 12px;
+      line-height: 1.2;
     }
   `,
 
   properties: [
-   {
-     name: 'message',     
-   },
-   'requestName'
+    'message',
+    'requestName'
   ],
 
   methods: [
-    function initE(){
+    function initE() {
       var self = this;
       //find requestorName associated to ticketMessages
-      this.userDAO.find(this.message.senderId).then(function(a){
+      this.userDAO.find(this.message.senderId).then(function(a) {
+        if ( ! a ) return;
         self.requestName = a.firstName + " " + a.lastName;
       });
 
       this
-        .addClass(this.myClass()) 
+        .addClass(this.myClass())
         .start('div').addClass('bg')
           .start('hr').end() 
             .start().addClass('spaceline')
               .start({ class:'foam.u2.tag.Image', data:'images/person.svg' }).addClass('person')
               .start()
                 .start().add(this.requestName$).addClass('company-name').end() 
-                .start().add(this.message.dateCreated).addClass('date').end()
+                .start().add(this.formatDate(this.message.dateCreated)).addClass('date').end()
                 .callIf(this.message.type == 'Internal', function(){
                   this.start().addClass('internal-status')
                     .add('Internal Note')
@@ -145,5 +139,13 @@ foam.CLASS({
           .end()     
         .end()               
     },
+
+    function formatDate(date) {
+      return date.toLocaleString('en-us', { month: 'short' }) + ' ' +
+        date.getDate() + ', ' +
+        date.getFullYear() + ' ' +
+        date.getHours() + ':' +
+        date.getMinutes();
+    }
   ]
 });
