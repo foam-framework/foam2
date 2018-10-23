@@ -62,8 +62,9 @@ foam.CLASS({
             this.E()
               .select(data.children.orderBy(view.Menu.ORDER), function(child) {
                 return view.cls_.create({ data: child, level: view.level + 1 }, view);
-              });
-        }));
-    }
-  ]
-});
+                  });
+            }))
+          .end();
+      }
+    ]
+  });
