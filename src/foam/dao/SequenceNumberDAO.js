@@ -57,7 +57,7 @@ foam.CLASS({
       flags: ['js'],
       name: 'calcDelegateMax_',
       hidden: true,
-      expression: function(delegate, property) {
+      expression: function(delegate, property, startingValue) {
         // TODO: validate property self.of[self.property.toUpperCase()]
         var self = this;
         return self.delegate.select( // TODO: make it a pipe?
@@ -65,7 +65,7 @@ foam.CLASS({
         ).then(
           function(max) {
             var v = foam.Number.isInstance(max.value) ? ( max.value + 1 ) : 0;
-            self.value_ = v > self.startingValue ? v : self.startingValue
+            self.value_ = v > startingValue ? v : startingValue
           }
         );
       },
