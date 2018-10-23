@@ -12,6 +12,8 @@ import foam.dao.DAO;
 import foam.dao.ProxyDAO;
 import foam.util.SafetyUtil;
 
+import java.util.Arrays;
+
 /**
  * Custom authentication for groupDAO
  *
@@ -30,6 +32,12 @@ public class AuthenticatedGroupDAO extends ProxyDAO {
 
   @Override
   public FObject put_(X x, FObject obj) {
+
+    // filter out all empty permissions
+    ((Group) obj).setPermissions(
+      Arrays.stream(((Group) obj).getPermissions()).filter(permission -> !"".equals(permission.getId())).toArray(Permission[]::new)
+    );
+
     // If a new group is being created, check that the user has permission to create the group
     if ( getDelegate().find_(x, obj) == null ) {
       AuthService auth = (AuthService) x.get("auth");
