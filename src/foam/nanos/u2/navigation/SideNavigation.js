@@ -56,7 +56,7 @@ foam.CLASS({
         .start()
           .addClass(this.myClass('side-nav'))
           .select(dao, function(menu) {
-            return foam.nanos.u2.navigation.SideNavigationItemView.create({ data: menu }, this);
+            return foam.nanos.u2.navigation.SideNavigationItemView.create({ data: menu, level: 0 }, this);
           })
         .end();
     }
