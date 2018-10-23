@@ -137,11 +137,17 @@ foam.CLASS({
           public SequenceNumberDAO(long value, foam.dao.DAO delegate) {
             System.err.println("Direct constructor use is deprecated. Use Builder instead.");
             setDelegate(delegate);
+            setValue(value);
+            init_();
+          }
 
+          public void init_() {
             // calculate the delegate's max or use default
             foam.mlang.sink.Max sink = (foam.mlang.sink.Max) foam.mlang.MLang.MAX(getAxiom());
             sink = (foam.mlang.sink.Max) getDelegate().select(sink);
-            setValue((long) ( sink.getValue() == null ? value : ( (Number) sink.getValue() ).longValue() + 1.0 ));
+            if ( sink.getValue() != null ) {
+              setValue(((Number) sink.getValue()).longValue() + 1);
+            }
           }
         `);
       }
