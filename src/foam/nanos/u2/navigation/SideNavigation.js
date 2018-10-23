@@ -22,20 +22,23 @@ foam.CLASS({
   ^side-nav {
     height: 100%;
     width: 200px;
-    position
     z-index: 1;
     top: 0;
     left: 0;
     overflow-x: hidden;
-    background-color: white;
+    background: %SECONDARYCOLOR%;
     display: inline-block;
   }
-  ^side-nav a {
+  ^side-nav div a {
     display: inline-block;
     margin: 8px 8px 8px 8px;
-    text-decoration: none;
-    font-size: 20px;
-    transition: 0.3s;
+    transition: all .15s ease-in-out;
+    border-top: 1px;
+    color: #fff;
+    cursor: pointer;
+  }
+  ^side-nav div a:hover {
+    opacity:1 !important;
   }
   `,
 
