@@ -37,23 +37,31 @@ public class AuthenticatedAgentJunctionDAO
     super(x, delegate);
   }
 
+  /**
+   * Allows put if user or agent is target of the junction object.
+   * If agent exists within context, condition checks on agent user.
+   */
   @Override
   public FObject put_(X x, FObject obj) {
     User user = (User) x.get("user");
     User agent = (User) x.get("agent");
     AuthService auth    = (AuthService) x.get("auth");
 
-    // Currently cannot set objects on the agentJunction if acting as another user.
-    if ( agent != null ) {
-      throw new RuntimeException("Unable to make changes to the agent junction while acting as another user.");
-    }
-
     UserUserJunction junctionObj = (UserUserJunction) obj;
 
-    // Prevents put if user has no permission or if user isn't the targetId of the junction object being created.
-    if ( junctionObj != null && ! SafetyUtil.equals(junctionObj.getSourceId(), user.getId()) &&
-      ! auth.check(x, GLOBAL_AGENT_JUNCTION_UPDATE) ) {
-      throw new RuntimeException("Unable to update junction.");
+    // Permit permission check if agent is not present within context.
+    if ( agent == null && auth.check(x, GLOBAL_AGENT_JUNCTION_UPDATE)) {
+      return getDelegate().put_(x, junctionObj);
+    }
+
+    // Check agent or user to authorize the request as.
+    User authorizedUser = agent != null ? agent : user;
+
+    // Check junction object relation to authorized user.
+    boolean authorized = SafetyUtil.equals(junctionObj.getTargetId(), authorizedUser.getId());
+
+    if ( junctionObj != null && ! authorized ) {
+      throw new AuthorizationException("Unable to update junction.");
     }
 
     return getDelegate().put_(x, junctionObj);
@@ -64,8 +72,11 @@ public class AuthenticatedAgentJunctionDAO
    */
   @Override
   public FObject find_(X x, Object id) {
-    UserUserJunction junctionObj = (UserUserJunction) getDelegate().inX(x).find(id);
+    UserUserJunction junctionObj = (UserUserJunction) getDelegate().find_(x, id);
     
+    if ( junctionObj == null )
+        return null;
+
     // Check global permissions
     if ( userAgentAuthorization(x, junctionObj, GLOBAL_AGENT_JUNCTION_READ) ) {
       return junctionObj;
@@ -79,14 +90,13 @@ public class AuthenticatedAgentJunctionDAO
    */
   @Override
   public FObject remove_(X x, FObject obj) {
-    if ( obj == null ){ 
-      throw new RuntimeException("Junction object is null.");
-    }
-
     UserUserJunction junctionObj = (UserUserJunction) getDelegate().inX(x).find(obj);
 
+    if ( junctionObj == null )
+        return null;
+
     if ( userAgentAuthorization(x, junctionObj, GLOBAL_AGENT_JUNCTION_DELETE) ) {
-      return getDelegate().inX(x).remove(obj);
+      return getDelegate().remove_(x, junctionObj);
     }
 
     throw new AuthorizationException("Unable to remove object.");
@@ -94,34 +104,14 @@ public class AuthenticatedAgentJunctionDAO
 
   @Override
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    User user = (User) x.get("user");
-    User agent = (User) x.get("agent");
-    AuthService auth = (AuthService) x.get("auth");
+    DAO dao = getFilteredDAO(x, GLOBAL_AGENT_JUNCTION_DELETE);
 
-    if ( agent == null) {
-      return;
-    }
-
-    boolean global = auth.check(x, GLOBAL_AGENT_JUNCTION_DELETE);
-
-    DAO dao = global ? getDelegate() : getDelegate().where(EQ(UserUserJunction.TARGET_ID, user.getId()));
     dao.removeAll_(x, skip, limit, order, predicate);
   }
 
   @Override
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    User user = (User) x.get("user");
-    AuthService auth = (AuthService) x.get("auth");
-
-    boolean global = auth.check(x, GLOBAL_AGENT_JUNCTION_READ);
-
-    DAO dao = global ? getDelegate() :
-        getDelegate().where(
-          OR(
-            EQ(UserUserJunction.TARGET_ID, user.getId()),
-            EQ(UserUserJunction.SOURCE_ID, user.getId())
-          )
-        );
+    DAO dao = getFilteredDAO(x, GLOBAL_AGENT_JUNCTION_READ);
 
     return dao.select_(x, sink, skip, limit, order, predicate);
   }
@@ -147,7 +137,7 @@ public class AuthenticatedAgentJunctionDAO
         ( SafetyUtil.equals(junctionObj.getTargetId(), authorizedUser.getId()) ||
         SafetyUtil.equals(junctionObj.getSourceId(), authorizedUser.getId()) );
 
-    return auth.check(x, permission) || authorized;
+    return ( auth.check(x, permission) && agent == null ) || authorized;
   }
 
   // Returns predicated delegate based on user and agent in context.
@@ -156,14 +146,15 @@ public class AuthenticatedAgentJunctionDAO
     User agent = (User) x.get("agent");
     AuthService auth = (AuthService) x.get("auth");
 
-    if ( auth.check(x, permission) )
-        return getDelegate().inX(x);
+    if ( auth.check(x, permission) && agent == null )
+        return getDelegate();
 
-    User delegateUser = agent != null ? agent : user;
+    // Check agent or user to authorize the request as.
+    User authorizedUser = agent != null ? agent : user;
 
-    return getDelegate().inX(x).where(AND(
-      EQ(UserUserJunction.TARGET_ID, delegateUser.getId()),
-      EQ(UserUserJunction.SOURCE_ID, delegateUser.getId())
+    return getDelegate().where(OR(
+      EQ(UserUserJunction.TARGET_ID, authorizedUser.getId()),
+      EQ(UserUserJunction.SOURCE_ID, authorizedUser.getId())
     ));
   }
 }
