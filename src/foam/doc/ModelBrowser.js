@@ -14,7 +14,6 @@ foam.CLASS({
     'foam.core.Model',
     'foam.dao.ArrayDAO',
     'foam.dao.PromisedDAO',
-    'foam.doc.CachedAuthServiceCheck',
     'foam.doc.ClassList',
     'foam.doc.DocBorder',
     'foam.doc.SimpleClassView',
@@ -24,20 +23,9 @@ foam.CLASS({
 
   imports: [
     'nSpecDAO',
-    'auth',
-  ],
-
-  exports: [
-    'cachedAuth as auth',
   ],
 
   properties: [
-    {
-      name: 'cachedAuth',
-      expression: function(auth) {
-        return this.CachedAuthServiceCheck.create({delegate: auth});
-      },
-    },
     {
       name: 'modelDAO',
       expression: function(nSpecDAO) {
