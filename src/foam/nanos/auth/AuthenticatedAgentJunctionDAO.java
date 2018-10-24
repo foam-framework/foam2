@@ -23,7 +23,7 @@ import static foam.mlang.MLang.AND;
  * Authenticated AgentJunctionDAO
  * Restrict users from creating a junction object where they are the source user (Agent)
  * Restrict users from finding and selecting junction objects they are not referenced to. (Agent or Entity)
- * Restrict users from removing junction objects where they are the source user (Agent)
+ * Restrict users from removing junction objects where they aren't the target user or source user. (Agent or Entity)
  */
 public class AuthenticatedAgentJunctionDAO
   extends ProxyDAO
