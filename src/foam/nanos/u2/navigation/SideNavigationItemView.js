@@ -48,10 +48,8 @@ foam.CLASS({
           .style({'padding-left': paddingLeft +  'px', 'font-size': fontSize + 'px', 'opacity': opacity})
           .on('click', function() {
             var menu = view.data;
-            if ( menu.handler != 'foam.nanos.menu.SubMenu' ) {
-              if ((window.location.hash.substring(1) !== (menu.id))) {
-                menu.launch(view.__context__, view);
-              }  
+            if (menu.handler !== 'foam.nanos.menu.SubMenu' && (window.location.hash.substring(1) !== menu.id)) {
+              menu.launch(view.__context__, view);
             } 
             view.expanded = ! view.expanded;
           })
