@@ -52,6 +52,7 @@ foam.CLASS({
 
   exports: [
     'as ctrl',
+    'appConfig',
     'group',
     'loginSuccess',
     'logo',
@@ -109,6 +110,12 @@ foam.CLASS({
     },
     {
       name: 'client',
+    },
+    {
+      name: 'appConfig',
+      expression: function(client) {
+        return client && client.appConfig || null;
+      }
     },
     {
       name: 'stack',
