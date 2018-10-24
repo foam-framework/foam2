@@ -92,6 +92,14 @@ public class AuthenticatedUserDAO
       // TODO: Handle SPIDs.
     }
 
+    if ((
+      ( oldUser != null && ! SafetyUtil.equals(oldUser.getSystem(), newUser.getSystem()) ) ||
+      ( oldUser == null && newUser.getSystem() ))
+      && ! user.getGroup().equals("admin")
+    ) {
+      throw new AuthorizationException("You do not have permission to change the 'system' flag.");
+    }
+
     return super.put_(x, newUser);
   }
 
