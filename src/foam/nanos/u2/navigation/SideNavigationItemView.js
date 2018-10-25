@@ -49,7 +49,11 @@ foam.CLASS({
           .on('click', function() {
             var menu = view.data;
             if (menu.handler != 'foam.nanos.menu.SubMenu' && (view.currentMenu.id !== menu.id)) {
-              menu.launch(view.__context__, view);
+              if (menu.handler == 'foam.nanos.menu.LinkMenu') {
+                view.setAnchor(menu.handler.link.substring(1));
+              } else {
+                menu.launch(view.__context__, view);
+              }
             } 
             view.expanded = ! view.expanded;
           })
@@ -63,6 +67,13 @@ foam.CLASS({
                   });
             }))
           .end();
+      },
+
+      function setAnchor(name) {
+        var names = document.getElementsByName(name);
+        if (names.length > 0) {
+          document.getElementsByName(name)[0].scrollIntoView();
+        }
       }
     ]
   });
