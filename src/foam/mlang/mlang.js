@@ -1506,6 +1506,7 @@ foam.CLASS({
         this.groupKeys.push(key);
       }
       group.put(obj, sub);
+      this.pub('propertyChange', 'groups');
     },
 
     function put(obj, sub) {
