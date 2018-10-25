@@ -39,7 +39,6 @@ foam.CLASS({
       this.SUPER(o);
     },
     function toE(_, x) {
-      var self = this;
       return x.E().add(this.view$);
     },
   ]
