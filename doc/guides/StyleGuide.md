@@ -62,6 +62,22 @@ Provide property labels when the default labelization of the property name will 
 ## Line Length
 Line lengths should be 80 characters or less, except for embedded data, like templates or sprites, or when modifying the code to make it fit in less than 80 characters would actually makes it less readable.
 
+## Calling DAO's From Java
+When implementing DAO strategies in Java, implement the Context-Oriented (CO) methods, ie. those ending with _ and explicitly taking Contexts as the first paramter, like:
+```javascript
+   find_(X x, Object query).
+```
+
+When implementing DAO decoratores in Java, implement the CO methods and also delegate to the CO method of your delegate. ie.
+```javascript
+   getDelegate().find_(x, id).
+```
+
+When using a DAO as a regular client from outside of a decorator for that DAO, use the non-CO methods and use inX() to specify the context. ie.
+```javascript
+   DAO userDAO = (DAO) x.get("userDAO").inX(x);
+```
+
 ## Other
  * Do not quote map keys unless necessary.
  * Do not leave trailing unnecessary commas (this is implicit in the Google
