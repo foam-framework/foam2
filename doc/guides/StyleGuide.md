@@ -76,6 +76,7 @@ When implementing DAO decoratores in Java, implement the CO methods and also del
 When using a DAO as a regular client from outside of a decorator for that DAO, use the non-CO methods and use inX() to specify the context. ie.
 ```javascript
    DAO userDAO = ((DAO) x.get("userDAO")).inX(x);
+   userDAO.find(id);
 ```
 
 ## Other
