@@ -6,7 +6,11 @@ foam.CLASS({
     'foam.dao.EasyDAO',
     'foam.u2.mlang.Table',
     'foam.u2.mlang.Pie',
+    'foam.u2.mlang.Sequence',
     'foam.mlang.sink.Count',
+  ],
+  implements: [
+    'foam.mlang.Expressions',
   ],
   properties: [
     {
@@ -36,23 +40,40 @@ foam.CLASS({
     function initE() {
       this.SUPER();
 
-      var tableSink = this.Table.create({
-        columns: ['name', 'age', 'sex'],
-      });
-      this.dao.pipe(tableSink)
+      var GROUP_BY = this.GROUP_BY.bind(this);
+      var COUNT = this.COUNT.bind(this);
+      var Person = this.Person;
 
-      var pieSink = this.Pie.create({
-        arg1: this.Person.SEX,
-        arg2: this.Count.create(),
-      });
-      this.dao.pipe(pieSink)
+      var PIE = function(arg1) {
+        return this.Pie.create({
+          arg1: arg1,
+          arg2: this.Count.create(),
+        })
+      }.bind(this);
+
+      var SEQ = function() {
+        return this.Sequence.create({
+          data: Array.from(arguments),
+        })
+      }.bind(this);
+
+      var TABLE = function() {
+        return this.Table.create({
+          columns: Array.from(arguments)
+        });
+      }.bind(this);
+
+      var sink = GROUP_BY(Person.NAME, SEQ(COUNT(), PIE(Person.SEX)));
+      this.dao.pipe(sink);
+
+      var tableSink = TABLE('name', 'age', 'sex')
+      this.dao.pipe(tableSink)
 
       this.
         startContext({ data: this }).
           add(this.ADD_PERSON).
-          add(this.REMOVE_PERSON).
         endContext().
-        add(pieSink).
+        add(sink).
         add(tableSink);
     },
   ],
@@ -61,8 +82,6 @@ foam.CLASS({
       name: 'addPerson',
       code: function() {
         var names = [
-          'Joe',
-          'Bob',
           'Mike',
           'Adam',
           'Kevin',
@@ -72,18 +91,6 @@ foam.CLASS({
           age: Math.floor(Math.random()*100),
           sex: Math.floor(Math.random()*2) ? 'M' : 'F',
         }));
-      },
-    },
-    {
-      name: 'removePerson',
-      code: function() {
-        var self = this;
-        self.dao.select().then(function(sink) {
-          var a = sink.array;
-          if ( ! a.length ) return;
-          var o = a[Math.floor(Math.random()*a.length)]
-          self.dao.remove(o);
-        });
       },
     },
   ],

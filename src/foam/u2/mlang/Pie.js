@@ -10,10 +10,12 @@ foam.CLASS({
     {
       name: 'graphArgs',
       value: {
-        radius: 200,
-        x: 150,
-        y: 150,
-        margin: 1.3,
+        radius: 50,
+        x: 50,
+        y: 50,
+        margin: 1.5,
+        height: 150,
+        width: 150,
         graphColors: [ '#d81e05', '#093649', '#59a5d5', '#2cab70' ],
       },
     },
