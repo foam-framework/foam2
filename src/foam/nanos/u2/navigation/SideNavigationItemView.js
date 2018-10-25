@@ -43,12 +43,12 @@ foam.CLASS({
         .start('a')
           .add(this.data.label)
           .enableClass(this.myClass('selected'), view.currentMenu$.map(function (value) {
-            return window.location.hash.substring(1) === (view.data.id);
+            return view.currentMenu.id === (view.data.id);
           }))
           .style({'padding-left': paddingLeft +  'px', 'font-size': fontSize + 'px', 'opacity': opacity})
           .on('click', function() {
             var menu = view.data;
-            if (menu.handler != 'foam.nanos.menu.SubMenu' && (window.location.hash.substring(1) !== menu.id)) {
+            if (menu.handler != 'foam.nanos.menu.SubMenu' && (view.currentMenu.id !== menu.id)) {
               menu.launch(view.__context__, view);
             } 
             view.expanded = ! view.expanded;
