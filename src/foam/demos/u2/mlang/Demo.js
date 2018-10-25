@@ -1,5 +1,5 @@
 foam.CLASS({
-  package: 'foam.u2.mlang',
+  package: 'foam.demos.u2.mlang',
   name: 'Demo',
   extends: 'foam.u2.Element',
   requires: [
