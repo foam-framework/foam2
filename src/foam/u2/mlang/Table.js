@@ -1,50 +1,46 @@
 foam.CLASS({
   package: 'foam.u2.mlang',
   name: 'Table',
-  extends: 'foam.dao.AbstractSink',
+  extends: 'foam.dao.DAOSink',
   requires: [
+    'foam.dao.ArrayDAO',
     'foam.u2.view.TableView',
   ],
   properties: [
     {
-      name: 'columns',
+      name: 'dao',
+      expression: function(of) {
+        return this.ArrayDAO.create({of: of});
+      },
     },
     {
-      class: 'Map',
-      name: 'values_',
+      class: 'Class',
+      name: 'of',
+    },
+    {
+      name: 'view',
+      expression: function(of, dao, columns) {
+        if ( ! of ) return 'No results';
+        var tv = this.TableView.create({ data: dao });
+        if ( columns.length ) {
+          tv.columns = columns.map(function(c) { return of.getAxiomByName(c) });
+        }
+        return tv;
+      },
+    },
+    {
+      class: 'StringArray',
+      name: 'columns',
     },
   ],
   methods: [
     function put(o) {
-      this.values_[o.id] = o;
-      this.pub('propertyChange', 'values_');
-    },
-    function remove(o) {
-      delete this.values_[o.id];
-      this.pub('propertyChange', 'values_');
+      if ( ! this.of ) this.of = o.cls_
+      this.SUPER(o);
     },
     function toE(_, x) {
       var self = this;
-      return x.E('table').
-          add(self.slot(function(columns) {
-            return x.E('thead').
-              start('tr').
-                forEach(columns, function(c) {
-                  this.start('th').add(c).end()
-                }).
-              end().
-              add(self.slot(function(values_) {
-                return x.E('tbody').
-                  forEach(Object.values(values_), function(v) {
-                    this.
-                      start('tr').
-                        forEach(columns, function(c) {
-                          this.start('td').add(v[c]).end()
-                        }).
-                      end()
-                  })
-              }))
-          }))
+      return x.E().add(this.view$);
     },
   ]
 });
