@@ -73,10 +73,38 @@ foam.CLASS({
         startContext({ data: this }).
           add(this.ADD_PERSON).
         endContext().
-        add(sink).
-        add(tableSink);
+        start('table').
+          addClass(this.myClass('table')).
+          start('tr').
+            addClass(this.myClass('table')).
+            start('td').
+              addClass(this.myClass('table')).
+              start('pre').
+                add(`TABLE('name', 'age', 'sex')`).
+              end().
+              add(tableSink).
+            end().
+            start('td').
+              addClass(this.myClass('table')).
+              start('pre').
+                add(`GROUP_BY(Person.NAME, SEQ(COUNT(), PIE(Person.SEX)))`).
+              end().
+              add(sink).
+            end().
+          end().
+        end();
     },
   ],
+  css: `
+    table^table {
+      border-collapse: collapse;
+    }
+    table^table,
+    th^table,
+    td^table {
+      border: 1px solid black;
+    }
+  `,
   actions: [
     {
       name: 'addPerson',
