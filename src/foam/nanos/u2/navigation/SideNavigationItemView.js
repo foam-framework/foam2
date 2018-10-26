@@ -3,8 +3,13 @@ foam.CLASS({
   name: 'SideNavigationItemView',
   extends: 'foam.u2.View',
 
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
   imports: [
     'currentMenu',
+    'menuDAO'
   ],
 
   requires: [
@@ -46,17 +51,7 @@ foam.CLASS({
             return view.currentMenu.id === (view.data.id);
           }))
           .style({'padding-left': paddingLeft +  'px', 'font-size': fontSize + 'px', 'opacity': opacity})
-          .on('click', function() {
-            var menu = view.data;
-            if (menu.handler != 'foam.nanos.menu.SubMenu' && (view.currentMenu.id !== menu.id)) {
-              if (menu.handler == 'foam.nanos.menu.LinkMenu') {
-                view.setAnchor(menu.handler.link.substring(1));
-              } else {
-                menu.launch(view.__context__, view);
-              }
-            } 
-            view.expanded = ! view.expanded;
-          })
+          .on('click', this.onClick)
         .end()
         .add(this.slot(function(expanded, data) {
           return ! expanded ?
@@ -64,16 +59,39 @@ foam.CLASS({
             this.E()
               .select(data.children.orderBy(view.Menu.ORDER), function(child) {
                 return view.cls_.create({ data: child, level: view.level + 1 }, view);
-                  });
+              });
             }))
           .end();
       },
 
-      function setAnchor(name) {
-        var names = document.getElementsByName(name);
-        if (names.length > 0) {
-          document.getElementsByName(name)[0].scrollIntoView();
-        }
+      function handleClick(menu) {
+        var self = this;
+        if ( menu.handler != 'foam.nanos.menu.SubMenu' && this.currentMenu.id !== menu.id ) {
+          if ( menu.handler == 'foam.nanos.menu.LinkMenu' ) {
+            var names = document.getElementsByName(menu.handler.link.substring(1));
+            if ( names.length > 0 ) { // found in currently loaded document
+              names[0].scrollIntoView();
+            } else { // not in currently loaded document, need to check if a parent menu contains the element
+              this.select(this.menuDAO.orderBy(this.Menu.ORDER).limit(1).where(this.EQ(this.Menu.ID, menu.parent)), function(parent) {
+                if ( this.currentMenu.id !== parent.id ) {
+                  self.handleClick(parent);
+                  setTimeout( () => {
+                    self.handleClick(menu);
+                  }, 100);
+                }
+              });
+            }
+          } else {
+            menu.launch(this.__context__, this);
+          }
+        } 
+        this.expanded = ! this.expanded;
+      }
+    ],
+
+    listeners: [
+      function onClick() {
+        this.handleClick(this.data);
       }
     ]
   });
