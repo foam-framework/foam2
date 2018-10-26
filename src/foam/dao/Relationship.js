@@ -173,6 +173,7 @@ foam.CLASS({
         targetProp = foam.core.Reference.create({
           name: inverseName,
           of: sourceModel,
+          required: true,
           targetDAOKey: sourceDAOKey
         }).copyFrom(this.targetProperty);
       } else {/* cardinality === '*.*' */

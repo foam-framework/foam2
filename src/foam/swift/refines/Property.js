@@ -761,18 +761,20 @@ foam.CLASS({
       // TODO: copied from java refinements.
       name: 'referencedProperty',
       transient: true,
-      factory: function() {
-        var idProp = this.of.ID.cls_ == foam.core.IDAlias ? this.of.ID.targetProperty : this.of.ID;
+      expression: function(of, name) {
+        var idProp = of.ID.cls_ == foam.core.IDAlias ? of.ID.targetProperty : of.ID;
 
         idProp = idProp.clone();
-        idProp.name = this.name;
+        idProp.name = name;
 
         return idProp;
       }
     },
     {
       name: 'swiftType',
-      factory: function() { return this.referencedProperty.swiftType; }
+      expression: function(referencedProperty) {
+        return referencedProperty.swiftType;
+      },
     },
     {
       name: 'swiftJsonParser',
@@ -789,7 +791,7 @@ foam.CLASS({
         visibility: 'public',
         override: !!parentCls.getSuperClass().getAxiomByName(this.name),
         name: `find${foam.String.capitalize(this.name)}`,
-        returnType: this.of.model_.swiftName,
+        returnType: this.of.model_.swiftName + ( this.required ? '' : '?' ),
         args: [
           {
             localName: 'x',
@@ -799,6 +801,9 @@ foam.CLASS({
         ],
         throws: true,
         body: `
+${this.required ? '' : `
+if !hasOwnProperty("${this.name}") { return nil }
+`}
 let dao = x["${this.targetDAOKey}"] as! foam_dao_DAO
 return try dao.find_(x, ${this.swiftVarName}) as! ${this.of.model_.swiftName}
         `

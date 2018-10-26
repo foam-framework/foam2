@@ -802,4 +802,20 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertEqual((a.array[1] as! somepackage_Test).firstName, "Joe2")
     XCTAssertEqual((a.array[2] as! somepackage_Test).firstName, "Joe1")
   }
+
+  func testRefProp() {
+    let languageDAO = self.x.create(foam_swift_dao_ArrayDAO.self, args: [
+      "of": foam_nanos_auth_Language.classInfo(),
+    ])!
+    _ = try! languageDAO.put(self.x.create(foam_nanos_auth_Language.self, args: [
+      "code": "IT"
+    ])!)
+    let x = self.x.createSubContext(args: ["languageDAO": languageDAO])
+
+    let t = x.create(somepackage_Test.self)!
+    try! XCTAssertNil(t.findOptRefProp(x))
+
+    t.optRefProp = "IT"
+    try! XCTAssertNotNil(t.findOptRefProp(x))
+  }
 }
