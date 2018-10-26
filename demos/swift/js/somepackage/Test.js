@@ -103,8 +103,7 @@ return ["Hello", "World"]
     {
       class: 'Reference',
       of: 'foam.nanos.auth.Language',
-      required: false,
-      name: 'optRefProp',
+      name: 'refProp',
     },
   ],
   actions: [

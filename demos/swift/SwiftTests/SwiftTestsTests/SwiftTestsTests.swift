@@ -703,7 +703,7 @@ class SwiftTestsTests: XCTestCase {
     _ = try mike.getCourses(x).add(cs101)
 
     let course = cs101
-    try XCTAssertEqual(course.findProfessor(x).name, "Donald Knuth")
+    try XCTAssertEqual(course.findProfessor(x)!.name, "Donald Knuth")
 
     let donaldsCourses = try donald.getCourses(x).select().array as! [foam_nanos_demo_relationship_Course]
     XCTAssertEqual(donaldsCourses[0].code, "CS 101")
@@ -813,9 +813,9 @@ class SwiftTestsTests: XCTestCase {
     let x = self.x.createSubContext(args: ["languageDAO": languageDAO])
 
     let t = x.create(somepackage_Test.self)!
-    try! XCTAssertNil(t.findOptRefProp(x))
+    try! XCTAssertNil(t.findRefProp(x))
 
-    t.optRefProp = "IT"
-    try! XCTAssertNotNil(t.findOptRefProp(x))
+    t.refProp = "IT"
+    try! XCTAssertNotNil(t.findRefProp(x))
   }
 }

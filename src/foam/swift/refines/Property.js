@@ -781,12 +781,11 @@ foam.CLASS({
       this.SUPER(cls, parentCls);
       if ( ! parentCls.hasOwnAxiom(this.name) ) return;
       if ( ! this.swiftSupport ) return;
-      var r = this.required;
       cls.method({
         visibility: 'public',
         override: !!parentCls.getSuperClass().getAxiomByName(this.name),
         name: `find${foam.String.capitalize(this.name)}`,
-        returnType: this.of.model_.swiftName + ( r ? '' : '?' ),
+        returnType: this.of.model_.swiftName + '?',
         args: [
           {
             localName: 'x',
@@ -796,9 +795,8 @@ foam.CLASS({
         ],
         throws: true,
         body: `
-${r ? '' : `if !hasOwnProperty("${this.name}") { return nil }`}
-let dao = x["${this.targetDAOKey}"] as! foam_dao_DAO
-return try dao.find_(x, ${this.swiftVarName}) as${r ? '!' : '?'} ${this.of.model_.swiftName}
+guard let dao = x["${this.targetDAOKey}"] as? foam_dao_DAO else { return nil }
+return try dao.inX(x).find(${this.swiftVarName}) as? ${this.of.model_.swiftName}
         `
       });
     }
