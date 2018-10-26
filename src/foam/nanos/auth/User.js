@@ -290,6 +290,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'system',
+      value: false,
       documentation: 'Indicate system accounts.'
     }
   ],
