@@ -15,9 +15,9 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import foam.util.SafetyUtil;
 
+import static foam.mlang.MLang.AND;
 import static foam.mlang.MLang.EQ;
 import static foam.mlang.MLang.OR;
-import static foam.mlang.MLang.AND;
 
 /**
  * Authenticated AgentJunctionDAO
@@ -45,12 +45,16 @@ public class AuthenticatedAgentJunctionDAO
   public FObject put_(X x, FObject obj) {
     User user = (User) x.get("user");
     User agent = (User) x.get("agent");
-    AuthService auth    = (AuthService) x.get("auth");
+    AuthService auth = (AuthService) x.get("auth");
 
     UserUserJunction junctionObj = (UserUserJunction) obj;
 
+    if ( junctionObj == null ) {
+      return null;
+    }
+
     // Permit permission check if agent is not present within context.
-    if ( agent == null && auth.check(x, GLOBAL_AGENT_JUNCTION_UPDATE)) {
+    if ( agent == null && auth.check(x, GLOBAL_AGENT_JUNCTION_UPDATE) ) {
       return getDelegate().put_(x, junctionObj);
     }
 
@@ -137,7 +141,7 @@ public class AuthenticatedAgentJunctionDAO
         ( SafetyUtil.equals(junctionObj.getTargetId(), authorizedUser.getId()) ||
         SafetyUtil.equals(junctionObj.getSourceId(), authorizedUser.getId()) );
 
-    return ( auth.check(x, permission) && agent == null ) || authorized;
+    return  authorized || auth.check(x, permission);
   }
 
   // Returns predicated delegate based on user and agent in context.
@@ -146,7 +150,7 @@ public class AuthenticatedAgentJunctionDAO
     User agent = (User) x.get("agent");
     AuthService auth = (AuthService) x.get("auth");
 
-    if ( auth.check(x, permission) && agent == null )
+    if ( auth.check(x, permission) )
         return getDelegate();
 
     // Check agent or user to authorize the request as.

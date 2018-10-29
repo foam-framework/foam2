@@ -215,9 +215,10 @@ public class UserAndGroupAuthService
       return false;
     }
 
+    User user = (User) x.get("user");
     // check if user exists and is enabled
-    User user = (User) userDAO_.find(session.getUserId());
-    if ( user == null || ! user.getEnabled() ) {
+    User userObj = (User) userDAO_.find(user.getId());
+    if ( userObj == null || ! userObj.getEnabled() ) {
       return false;
     }
 
