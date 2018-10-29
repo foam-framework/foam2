@@ -64,27 +64,31 @@ foam.CLASS({
           .end();
       },
 
+      function setAnchor(menu) {
+        setTimeout( () => {
+          var names = document.getElementsByName(menu.handler.anchor);
+          if ( names.length > 0 ) {
+            names[0].scrollIntoView();
+          }
+        }, 500);
+      },
+
       function handleClick(menu) {
         var self = this;
-        if ( menu.handler != 'foam.nanos.menu.SubMenu' && this.currentMenu.id !== menu.id ) {
-          if ( menu.handler == 'foam.nanos.menu.LinkMenu' ) {
-            var names = document.getElementsByName(menu.handler.link.substring(1));
-            if ( names.length > 0 ) { // found in currently loaded document
-              names[0].scrollIntoView();
-            } else { // not in currently loaded document, need to check if a parent menu contains the element
-              this.select(this.menuDAO.orderBy(this.Menu.ORDER).limit(1).where(this.EQ(this.Menu.ID, menu.parent)), function(parent) {
-                if ( this.currentMenu.id !== parent.id ) {
-                  self.handleClick(parent);
-                  setTimeout( () => {
-                    self.handleClick(menu);
-                  }, 100);
-                }
-              });
+
+        if ( menu.handler != 'foam.nanos.menu.SubMenu' ) {
+          if ( menu.handler == 'foam.nanos.menu.DocumentFileMenu' ) {
+            if ( this.currentMenu.handler != 'foam.nanos.menu.DocumentFileMenu' || (this.currentMenu.handler == 'foam.nanos.menu.DocumentFileMenu' && this.currentMenu.handler.docKey != menu.handler.docKey) ) {
+              menu.launch(this.__context__, this);
             }
-          } else {
+            if ( menu.handler.anchor ) {
+              this.setAnchor(menu);
+            }
+          } else if ( this.currentMenu.id !== menu.id ) {
             menu.launch(this.__context__, this);
           }
-        } 
+        }
+
         this.expanded = ! this.expanded;
       }
     ],
