@@ -3,13 +3,8 @@ foam.CLASS({
   name: 'SideNavigationItemView',
   extends: 'foam.u2.View',
 
-  implements: [
-    'foam.mlang.Expressions'
-  ],
-
   imports: [
-    'currentMenu',
-    'menuDAO'
+    'currentMenu'
   ],
 
   requires: [
