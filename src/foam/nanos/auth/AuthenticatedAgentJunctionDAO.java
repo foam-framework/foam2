@@ -45,12 +45,20 @@ public class AuthenticatedAgentJunctionDAO
   public FObject put_(X x, FObject obj) {
     User user = (User) x.get("user");
     User agent = (User) x.get("agent");
+    DAO groupDAO = (DAO) x.get("groupDAO");
     AuthService auth = (AuthService) x.get("auth");
 
     UserUserJunction junctionObj = (UserUserJunction) obj;
 
     if ( junctionObj == null ) {
       return null;
+    }
+
+    // Checks group' junction object exists.
+    Group groupToBePut = (Group) groupDAO.find(junctionObj.getGroup());
+
+    if ( groupToBePut == null ) {
+      throw new IllegalStateException("Junction object group doesn't exist.");
     }
 
     // Permit permission check if agent is not present within context.
@@ -64,8 +72,19 @@ public class AuthenticatedAgentJunctionDAO
     // Check junction object relation to authorized user.
     boolean authorized = SafetyUtil.equals(junctionObj.getTargetId(), authorizedUser.getId());
 
-    if ( junctionObj != null && ! authorized ) {
+    if ( ! authorized ) {
       throw new AuthorizationException("Unable to update junction.");
+    }
+
+    // Checks to see if all permissions on junction object exist within user' group.
+    Group group = (Group) groupDAO.find(user.getGroup());
+
+    if ( group == null ) {
+      throw new AuthorizationException("User must have an association to a group.");
+    }
+
+    if ( ! auth.checkPermissionsInGroup(x, groupToBePut) ) {
+      throw new AuthorizationException();
     }
 
     return getDelegate().put_(x, junctionObj);

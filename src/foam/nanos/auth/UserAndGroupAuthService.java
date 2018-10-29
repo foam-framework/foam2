@@ -368,6 +368,44 @@ public class UserAndGroupAuthService
     }
   }
 
+  // Make sure that the user has all permissions in the given group.
+  public void checkUserHasAllPermissionsInGroup(X x, Group group) {
+    AuthService auth = (AuthService) x.get("auth");
+    foam.nanos.auth.Permission[] permissions = group.getPermissions();
+    for ( foam.nanos.auth.Permission permission : permissions ) {
+      String id = permission.getId();
+      if ( ! auth.check(x, id) ) {
+        throw new AuthorizationException("Permission Denied. You do not have the '" + id + "' permission.");
+      }
+    }
+  }
+
+  // Check if user has all permissions in group and ancestors.
+  public boolean checkPermissionsInGroup(X x, Group toCheck) {
+    Group group = toCheck;
+    checkUserHasAllPermissionsInGroup(x, group);
+    while ( getAncestor(x, group) != null ) {
+      group = getAncestor(x, group);
+      checkUserHasAllPermissionsInGroup(x, group);
+    }
+    return true;
+  }
+
+  // Returns ancestor of a group if it exists, otherwise null
+  public Group getAncestor(X x, Group group) {
+    String ancestorGroupId = group.getParent();
+    if ( SafetyUtil.isEmpty(ancestorGroupId) ) {
+      return null;
+    }
+
+    Group ancestor = (Group) groupDAO_.find(ancestorGroupId);
+
+    if ( ancestor == null ) {
+      throw new RuntimeException("The '" + group.getId() + "' group has a null ancestor named '" + ancestorGroupId + "'.");
+    }
+    return ancestor;
+  }
+
   /**
    * Just return a null user for now. Not sure how to handle the cleanup
    * of the current context
