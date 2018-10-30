@@ -35,7 +35,7 @@ foam.CLASS({
 
   css: `
     ^ { white-space: nowrap; margin-left: 20px; }
-    ^selected > ^label { outline: 2px solid #dddd00; }
+    ^selected > ^label { outline: 2px solid #59aadd; }
   `,
 
   properties: [
