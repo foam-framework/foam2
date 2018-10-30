@@ -376,7 +376,7 @@ FOAM_FILES([
   { name: "foam/core/async" },
   { name: "foam/dao/ClientSink" },
   { name: "foam/u2/ViewFactory", flags: ['web'] },
-  { name: "foam/u2/daos", flags: ['web'] },
+  { name: "foam/u2/DAOList", flags: ['web'] },
   { name: "foam/u2/TableView", flags: ['web'] },
   { name: "foam/u2/TableSelection", flags: ['web'] },
   { name: "foam/u2/Scroller", flags: ['web'] },

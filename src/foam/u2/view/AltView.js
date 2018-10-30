@@ -54,7 +54,7 @@ foam.CLASS({
       height: 40px;
     }
     ^ .property-viewChoices{
-      margin: 0 0 25px 15px;
+      margin: 0 0 0 15px;
     }
   `,
 
@@ -66,7 +66,7 @@ foam.CLASS({
       this.altStack = this.Stack.create();
       this.viewChoices$.sub(this.changeView);
 
-      this.views.forEach(function(view){
+      this.views.forEach(function(view) {
         view[0].data = view[0].data ? view[0].data : self.data;
       });
       this.altStack.push(this.views[0][0]);
@@ -84,7 +84,7 @@ foam.CLASS({
   ],
 
   listeners: [
-    function changeView(){
+    function changeView() {
       this.altStack.push(this.viewChoices);
     }
   ]

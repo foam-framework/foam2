@@ -51,8 +51,8 @@ foam.CLASS({
       padding: 10px;
     }
 
-    ^context-menu-item.disabled {
-      color: #ddd;
+    ^ .disabled {
+      color: #aaa;
     }
 
     ^context-menu-item:hover:not(.disabled) {
