@@ -330,7 +330,11 @@ foam.CLASS({
 
         'code': function(code) {
           return function(x) {
-            this.start('code').add(code).end();
+            this.
+              start('pre').
+                cssClass('code').
+                add(code).
+              end();
           };
         },
 
@@ -339,7 +343,7 @@ foam.CLASS({
             var viewName = attributes.view;
             var className = attributes.class;
 
-            // TODO: Reuse FoamTagLoader support, support classloading
+            // TODO: Reuse FoamTagLoader support
             var promise = Promise.all([
               viewName ? x.classloader.load(viewName) : Promise.resolve(),
               className ? x.classloader.load(className) : Promise.resolve(),
