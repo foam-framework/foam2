@@ -20,7 +20,7 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'modelID',
+      name: 'modelId',
     },
     {
       class: 'Class',
@@ -29,8 +29,8 @@ foam.CLASS({
     },
     {
       name: 'axiomDAO',
-      expression: function(modelID) {
-        return this.AxiomDAO.create({ modelIDs: [modelID] })
+      expression: function(modelId) {
+        return this.AxiomDAO.create({ modelIds: [modelId] })
       },
     },
     {
@@ -52,14 +52,14 @@ foam.CLASS({
       var of = this.of;
       var titleFn = this.titleFn;
       var titleTag = this.titleTag;
-      var modelID = this.modelID;
+      var modelId = this.modelId;
       var AxiomLink = this.AxiomLink;
 
       var dao = this.axiomDAO.where(
         this.AND(
           this.INSTANCE_OF(of),
           this.EQ(this.Axiom.HAS_PERMISSION, true),
-          this.EQ(this.Axiom.PARENT_ID, modelID)))
+          this.EQ(this.Axiom.PARENT_ID, modelId)))
 
       this.add(this.slot(function(sink) {
         return this.E().
@@ -71,7 +71,7 @@ foam.CLASS({
                 addClass('commaseparated').
                 select(dao, function(a) {
                   return this.E('span').
-                    start(AxiomLink, { cls: modelID, axiomName: a.name }).end()
+                    start(AxiomLink, { cls: modelId, axiomName: a.name }).end()
                 }).
               end()
           })

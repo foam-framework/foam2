@@ -20,7 +20,7 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'modelID',
+      name: 'modelId',
     },
     {
       class: 'Class',
@@ -29,8 +29,8 @@ foam.CLASS({
     },
     {
       name: 'axiomDAO',
-      expression: function(modelID) {
-        return this.AxiomDAO.create({ modelIDs: [modelID] })
+      expression: function(modelId) {
+        return this.AxiomDAO.create({ modelIds: [modelId] })
       },
     },
     {
@@ -43,14 +43,14 @@ foam.CLASS({
       this.SUPER();
       var of = this.of;
       var title = this.title;
-      var modelID = this.modelID;
+      var modelId = this.modelId;
       var AxiomTableView = this.AxiomTableView;
 
       var dao = this.axiomDAO.where(
         this.AND(
           this.INSTANCE_OF(of),
           this.EQ(this.Axiom.HAS_PERMISSION, true),
-          this.EQ(this.Axiom.PARENT_ID, modelID)))
+          this.EQ(this.Axiom.PARENT_ID, modelId)))
 
       this.add(this.slot(function(sink) {
         return this.E().
