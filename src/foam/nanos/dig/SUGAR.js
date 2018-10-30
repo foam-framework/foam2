@@ -239,7 +239,7 @@ foam.CLASS({
           if ( argumentInfo[k].objectType ) {
             var javaType_ = argumentInfo[k].javaType;
             var prop = foam.lookup(javaType_).getAxiomsByClass(foam.core.Property);
-            url += "&isObjParam=Y&" + argumentInfo[k].name + "=" + argumentInfo[k].name + "&";
+            url += "&" + argumentInfo[k].name + "=" + argumentInfo[k].name + "&";
 
             for ( var i = 0 ; i < prop.length ; i++ ) {
               if ( argumentInfo[k].objectType.instance_[prop[i].name] ) {
