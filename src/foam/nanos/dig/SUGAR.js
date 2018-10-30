@@ -65,7 +65,6 @@ foam.CLASS({
           if ( ! of ) return;
 
           this.interfaceName = of.id.toString();
-
           var methods = of.getOwnAxiomsByClass(foam.core.Method);
           //var methodName = methods.map(function(m) { return m.name; }).sort();
 
@@ -77,13 +76,14 @@ foam.CLASS({
                  }
                  return true;
                }
+               //return true;
             }).map(function(m) { return m.name; }).sort();
 
           if ( filteredMethod.length > 0 ) {
               methods.find((item) => {
                 if ( item.name == filteredMethod[0] ) {
-                  this.argumentInfo = item.args;
                   this.currentMethod = item.name;
+                  this.argumentInfo = item.args;
                 }
               });
           } else { // if the service doesn't have a filtered method, the following should be empty
@@ -91,7 +91,6 @@ foam.CLASS({
             this.currentMethod = "";
           }
         }
-        console.log("service Key changed");
       }
     },
     {
@@ -117,11 +116,11 @@ foam.CLASS({
           var filteredMethod =
             methods.filter(function(fm) {
               for ( var j = 0 ; j < fm.args.length ; j++ ) {
-                 if ( fm.args[j].javaType.toString() == "foam.core.X" ) {
+                 if ( fm.args[j].javaType == "foam.core.X" ) {
                     return false;
                  }
                  return true;
-               }
+              }
             }).map(function(m) { return m.name; }).sort();
 
           return foam.u2.view.ChoiceView.create({choices: filteredMethod, data$: this.method$});
@@ -151,7 +150,7 @@ foam.CLASS({
               else this.argumentInfo = "";
             }
           });
-        }
+       }
       }
     },
     {
@@ -167,9 +166,11 @@ foam.CLASS({
             self.flag = !self.flag;
           });
 
-          this.argumentInfo[j].objectType.sub(function(ot) {
-             self.objFlag = !self.objFlag;
-          });
+          if ( this.argumentInfo[j].objectType ) {
+            this.argumentInfo[j].objectType.sub(function(ot) {
+               self.objFlag = !self.objFlag;
+            });
+          }
         }
       }
     },
@@ -189,7 +190,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'objFlag',
-      documentation: 'to give a change event for argumentInfo',
+      documentation: 'to give a change event for Object argumentInfo',
       hidden: true
     },
     {
@@ -203,7 +204,7 @@ foam.CLASS({
       // TODO: appears not to work if named 'url', find out why.
       name: 'sugarURL',
       label: 'URL',
-      displayWidth: 80,
+      displayWidth: 120,
       documentation: 'dynamic URL according to picking service, method, parameters against web agent',
       view: 'foam.nanos.dig.LinkView',
       setter: function() {}, // Prevent from ever getting set
@@ -235,47 +236,21 @@ foam.CLASS({
             url += argumentInfo[k].name + "=" + argumentInfo[k].value;
           }
 
-//          var javaType_ = argumentInfo[k].javaType;
-//          var prop = foam.lookup(javaType_).getAxiomsByClass(foam.core.Property);
+          if ( argumentInfo[k].objectType ) {
+            var javaType_ = argumentInfo[k].javaType;
+            var prop = foam.lookup(javaType_).getAxiomsByClass(foam.core.Property);
+            url += "&isObjParam=Y&" + argumentInfo[k].name + "=" + argumentInfo[k].name + "&";
 
-          //if ( k == Number(index) ) url += objParamUrl;
+            for ( var i = 0 ; i < prop.length ; i++ ) {
+              if ( argumentInfo[k].objectType.instance_[prop[i].name] ) {
+                url += query ? "&" : "?";
+                query = true;
 
-//          if ( argumentInfo[k].objectType.instance_ != "" ) {
-//            url += "&isObjParam=Y&javaType=" + javaType_;
-//
-//            for ( var i = 0 ; i < prop.length ; i++ ) {
-//              if ( argumentInfo[k].objectType.instance_[prop[i].name] ) {
-//                url += query ? "&" : "?";
-//                query = true;
-//
-//                url += prop[i].name + "=" + argumentInfo[k].objectType.instance_[prop[i].name];
-//              }
-//            }
-//          }
+                url += prop[i].name + "=" + argumentInfo[k].objectType.instance_[prop[i].name];
+              }
+            }
+          }
         }
-
-//          for ( var k = 0 ; k < argumentInfo.length ; k++ ) {
-//            var javaType_ = argumentInfo[k].javaType;
-//            var prop = foam.lookup(javaType_).getAxiomsByClass(foam.core.Property);
-//
-//            //if ( k == Number(index) ) url += objParamUrl;
-//
-//            if ( argumentInfo[k].objectType.instance_ != '' ) {
-//              url += "&isObjParam=Y&javaType=" + javaType_;
-//
-//              for ( var i = 0 ; i < prop.length ; i++ ) {
-//                if ( argumentInfo[k].objectType.instance_[prop[i].name] ) {
-//                  url += query ? "&" : "?";
-//                  query = true;
-//
-//                  url += prop[i].name + "=" + argumentInfo[k].objectType.instance_[prop[i].name];
-//                }
-//              }
-//            }
-//
-//            //console.log( argumentInfo[k].objectType.instance_);
-//          }
-//        //}
 
         return encodeURI(url);
       }

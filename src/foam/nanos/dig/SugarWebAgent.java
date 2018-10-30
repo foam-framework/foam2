@@ -6,6 +6,8 @@
 
 package foam.nanos.dig;
 
+import foam.core.FObject;
+import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.lib.json.JSONParser;
 import foam.lib.json.Outputter;
@@ -21,6 +23,8 @@ import java.nio.CharBuffer;
 import java.lang.Exception;
 import java.lang.reflect.*;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Iterator;
+import java.util.List;
 
 public class SugarWebAgent
   implements WebAgent
@@ -36,6 +40,7 @@ public class SugarWebAgent
     String              serviceName    = p.getParameter("service");
     String              methodName     = p.getParameter("method");
     String              interfaceName  = p.getParameter("interfaceName");
+    String              isObjParam     = p.getParameter("isObjParam");
 
     try {
       if ( SafetyUtil.isEmpty(serviceName) ) {
@@ -101,30 +106,11 @@ public class SugarWebAgent
 
               // casting and setting according to parameters type
               String typeName = pArray[j].getType().getCanonicalName();
+              Class paramObj_ = null;
+              Object obj_ = null;
 
               if ( ! SafetyUtil.isEmpty(p.getParameter(pArray[j].getName())) ) {
-                switch (typeName) {
-                  case "double":
-                    arglist[j] = Double.parseDouble(p.getParameter(pArray[j].getName()));
-                    break;
-                  case "boolean":
-                    arglist[j] = Boolean.parseBoolean(p.getParameter(pArray[j].getName()));
-                    break;
-                  case "int":
-                    arglist[j] = Integer.parseInt(p.getParameter(pArray[j].getName()));
-                    break;
-                  case "long":
-                    arglist[j] = Long.parseLong(p.getParameter(pArray[j].getName()));
-                    break;
-                  case "java.lang.String":
-                    arglist[j] = p.getParameter(pArray[j].getName());
-                    break;
-                  default:
-                    DigErrorMessage error = new GeneralException.Builder(x)
-                      .setMessage("Parameter Type Exception")
-                      .build();
-                    outputException(x, resp, "JSON", out, error);
-                }
+                arglist[j] = setParameterType(x, resp, out, p, typeName, pArray[j]);
 
                 executeMethod(x, resp, out, class_, serviceName, methodName, paramTypes, arglist);
               } else {
@@ -191,5 +177,82 @@ public class SugarWebAgent
     }
 
     return;
+  }
+
+  protected Object getFieldInfo(String className, HttpParameters p) {  // For Obj Parameters
+    Class clsForObj = null;
+    Object clsObj = null;
+
+    try {
+      clsForObj = Class.forName(className);
+      clsObj = clsForObj.newInstance();
+      Field[] fieldList = clsForObj.getDeclaredFields();
+
+      List axioms = ((foam.core.FObject)clsObj).getClassInfo().getAxiomsByClass(PropertyInfo.class);
+      Iterator it = axioms.iterator();
+
+      while ( it.hasNext() ) {
+        PropertyInfo prop = (PropertyInfo) it.next();
+
+        for ( int m = 0 ; m < fieldList.length ; m++ ) {
+          if ( fieldList[m].getName().equals(prop.getName().toUpperCase()) ) {
+            fieldList[m].setAccessible(true);
+            Field modifiersField = (Field.class).getDeclaredField("modifiers");
+            modifiersField.setAccessible(true);
+            modifiersField.set(fieldList[m], fieldList[m].getModifiers() & ~Modifier.STATIC );
+
+            if (!SafetyUtil.isEmpty(p.getParameter(prop.getName()))) {
+              if ( prop.getValueClass().toString().equals("class [Ljava.lang.String;") ) {  //String[]
+                prop.set(clsObj, p.getParameterValues(prop.getName()));
+              } else {
+                prop.set(clsObj, p.getParameter(prop.getName()));
+              }
+
+              try {
+                fieldList[m].set(clsObj, prop);
+              } catch (IllegalAccessException e) {
+                e.printStackTrace();
+              }
+            }
+          }
+        }
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    return clsObj;
+  }
+
+  protected Object setParameterType(X x, HttpServletResponse resp, PrintWriter out, HttpParameters p, String typeName, Parameter pArray_) {
+    Object arg = null;
+
+    if ( ! SafetyUtil.isEmpty(typeName) ) {
+      switch ( typeName ) {
+        case "double":
+          arg = Double.parseDouble(p.getParameter(pArray_.getName()));
+          break;
+        case "boolean":
+          arg = Boolean.parseBoolean(p.getParameter(pArray_.getName()));
+          break;
+        case "int":
+          arg = Integer.parseInt(p.getParameter(pArray_.getName()));
+          break;
+        case "long":
+          arg = Long.parseLong(p.getParameter(pArray_.getName()));
+          break;
+        case "java.lang.String":
+          arg = p.getParameter(pArray_.getName());
+          break;
+        case "String[]":
+          System.out.println("typeName");
+          arg = p.getParameterValues(pArray_.getName());
+          break;
+        default:
+          arg = getFieldInfo(typeName, p);  // For Object Parameter
+      }
+    }
+
+    return arg;
   }
 }
