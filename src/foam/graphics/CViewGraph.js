@@ -4,9 +4,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-
-
-
 //PI
 /*foam.CLASS( {
   package: 'foam.graphics',
