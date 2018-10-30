@@ -6,10 +6,30 @@
 
 package foam.lib.json;
 
-import foam.lib.parse.*;
+import foam.lib.parse.PStream;
+import foam.lib.parse.Parser;
+import foam.lib.parse.ParserContext;
 
-public class StringParser implements Parser {
-  public final static char ESCAPE = '\\';
+public class StringParser
+  implements Parser
+{
+  protected final static char ESCAPE = '\\';
+  protected final static ThreadLocal<Parser> unicodeParser = ThreadLocal.withInitial(UnicodeParser::new);
+  protected final static ThreadLocal<Parser> asciiEscapeParser = ThreadLocal.withInitial(ASCIIEscapeParser::new);
+  protected final static ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
+
+    @Override
+    protected StringBuilder initialValue() {
+      return new StringBuilder();
+    }
+
+    @Override
+    public StringBuilder get() {
+      StringBuilder b = super.get();
+      b.setLength(0);
+      return b;
+    }
+  };
 
   public StringParser() {
   }
@@ -22,8 +42,7 @@ public class StringParser implements Parser {
     ps = ps.tail();
     char lastc = delim;
 
-    // TODO: use thread-local SB instead to avoid generating garbage
-    StringBuilder sb = new StringBuilder();
+    StringBuilder builder = sb.get();
 
     while ( ps.valid() ) {
       char c = ps.head();
@@ -34,33 +53,27 @@ public class StringParser implements Parser {
 
       if ( c == ESCAPE ) {
         char   nextChar        = ps.tail().head();
-        Parser escapeSeqParser = null;
-
-        if ( nextChar == 'u' ) {
-          // TODO: make a constant
-          escapeSeqParser = new UnicodeParser();
-        } else if ( nextChar == 'n' ) {
-          // TODO: make a constant
-          escapeSeqParser = new ASCIIEscapeParser();
-        }
+        Parser escapeSeqParser = nextChar == 'u' ?
+          unicodeParser.get() : nextChar == 'n' ?
+          asciiEscapeParser.get() : null;
 
         if ( escapeSeqParser != null ) {
           PStream escapePS = ps.apply(escapeSeqParser, x);
           if ( escapePS != null ) {
-            sb.append(escapePS.value());
+            builder.append(escapePS.value());
             tail = escapePS;
 
-            c = ((Character) escapePS.value()).charValue();
+            c = (Character) escapePS.value();
           }
         }
       } else {
-        sb.append(c);
+        builder.append(c);
       }
 
       ps = tail;
       lastc = c;
     }
 
-    return ps.tail().setValue(sb.toString());
+    return ps.tail().setValue(builder.toString());
   }
 }

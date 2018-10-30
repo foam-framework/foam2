@@ -8,7 +8,9 @@ package foam.lib.json;
 
 import foam.lib.parse.*;
 
-public class Whitespace implements Parser {
+public class Whitespace
+  implements Parser
+{
   // From RFC4627
   // Insignificant whitespace is allowed before or after any of the six
   // structural characters.
@@ -30,6 +32,11 @@ public class Whitespace implements Parser {
         return ps;
       }
     }
+
     return null;
+  }
+
+  public String toString() {
+    return "Whitespace";
   }
 }

@@ -1506,6 +1506,7 @@ foam.CLASS({
         this.groupKeys.push(key);
       }
       group.put(obj, sub);
+      this.pub('propertyChange', 'groups');
     },
 
     function put(obj, sub) {
@@ -1534,6 +1535,18 @@ foam.CLASS({
 
     function toString() {
       return this.groups.toString();
+    },
+
+    function toE(_, x) {
+      return x.E('table').
+        add(this.slot(function(arg1, groups) {
+          return x.E('tbody').
+            forEach(Object.keys(groups), function(g) {
+              this.start('tr').
+                start('td').add(g).end().
+                start('td').add(groups[g]).end()
+            });
+        }));
     }
   ]
 });

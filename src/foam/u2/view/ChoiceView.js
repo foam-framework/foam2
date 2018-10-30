@@ -95,7 +95,7 @@ foam.CLASS({
 
         if ( this.dynamicSize ) this.size = Math.min(nu.length, this.maxSize);
         return nu;
-      },
+      }
     },
     {
       class: 'Int',

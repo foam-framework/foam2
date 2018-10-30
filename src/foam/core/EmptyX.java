@@ -141,10 +141,10 @@ class XI
   final Object  value_;
 
   XI(X leftChild, X rightChild, Object key, Object value) {
-    leftChild_   = leftChild;
-    rightChild_  = rightChild;
-    key_          = key;
-    value_        = value;
+    leftChild_  = leftChild;
+    rightChild_ = rightChild;
+    key_        = key;
+    value_      = value;
   }
   @Override
   protected Object getKey() { return key_; }

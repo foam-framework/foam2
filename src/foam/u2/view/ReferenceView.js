@@ -37,6 +37,24 @@ foam.CLASS({
         var f;
         return function(obj) {
           if ( f ) return f(obj);
+          var props = obj.cls_.getAxiomsByClass(foam.core.String);
+
+          // Find the first non-hidden string property.
+          for ( var i = 0 ; i < props.length ; i++ ) {
+            var p = props[i];
+            if ( ! p.hidden ) {
+              f = function(obj) {
+                return [obj.id, p.f(obj)];
+              };
+              return f(obj);
+            }
+          }
+
+          f = function(obj) {
+            return [obj.id, obj.id];
+          };
+
+          return f(obj);
         };
       }
     }
@@ -45,31 +63,6 @@ foam.CLASS({
   methods: [
     function fromProperty(prop) {
       this.SUPER(prop);
-
-      if ( ! this.hasOwnProperty('objToChoice') ) {
-        var of = prop.of;
-
-        var props = of.getAxiomsByClass(foam.core.String);
-        var f;
-
-        // Find the first non-hidden string property.
-        for ( var i = 0 ; i < props.length ; i++ ) {
-          var p = props[i];
-          if ( ! p.hidden ) {
-            this.objToChoice = function(obj) {
-              return [obj.id, p.f(obj)];
-            };
-            break;
-          }
-        }
-
-        if ( i === props.length ) {
-          this.objToChoice = function(obj) {
-            return [obj.id, obj.id];
-          };
-        }
-      }
-
       var dao = this.parentObj.__context__[prop.targetDAOKey];
       this.dao = dao;
     }

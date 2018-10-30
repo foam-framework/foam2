@@ -34,6 +34,7 @@ foam.CLASS({
         choices: [
           [ 'foam.nanos.menu.DAOMenu',      'DAO' ],
           [ 'foam.nanos.menu.DocumentMenu', 'Document' ],
+          [ 'foam.nanos.menu.DocumentFileMenu', 'External Document' ],
           [ 'foam.nanos.menu.LinkMenu',     'Link' ],
           [ 'foam.nanos.menu.ListMenu',     'List' ],
           [ 'foam.nanos.menu.SubMenu',      'Submenu' ],
@@ -47,6 +48,16 @@ foam.CLASS({
       name: 'order',
       documentation: 'Used to order the menu list.',
       value: 1000
+    },
+    {
+      class: 'String',
+      name: 'description',
+      documentation: 'Menu item explaination.'
+    },
+    {
+      class: 'String',
+      name: 'icon',
+      documentation: 'Icon associated to the menu item.'
     }
   ],
 
@@ -78,6 +89,10 @@ foam.RELATIONSHIP({
   },
   targetProperty: {
     class: 'String',
-    value: ''
+    value: '',
+    view: {
+      class: 'foam.u2.view.ReferenceView',
+      placeholder: '--'
+    }
   }
 });

@@ -70,6 +70,7 @@ FOAM_FILES([
   { name: "foam/nanos/menu/AbstractMenu" },
   { name: "foam/nanos/menu/DAOMenu" },
   { name: "foam/nanos/menu/DocumentMenu" },
+  { name: "foam/nanos/menu/DocumentFileMenu" },
   { name: "foam/nanos/menu/LinkMenu" },
   { name: "foam/nanos/menu/ListMenu" },
   { name: "foam/nanos/menu/Menu" },
@@ -83,6 +84,9 @@ FOAM_FILES([
   { name: "foam/nanos/auth/PermissionTableView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/TopNavigation", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/FooterView", flags: ['web'] },
+  { name: "foam/nanos/u2/navigation/SideNavigation", flags: ['web'] },
+  { name: "foam/nanos/u2/navigation/SideNavigationItemView", flags: ['web'] },
+  { name: "foam/nanos/u2/navigation/NavigationView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/BusinessLogoView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/UserView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/SubMenuBar", flags: ['web'] },
@@ -104,6 +108,8 @@ FOAM_FILES([
   { name: "foam/nanos/auth/AuthService" },
   { name: "foam/nanos/auth/ProxyAuthService" },
   { name: "foam/nanos/auth/ClientAuthService" },
+  { name: "foam/nanos/auth/AgentAuthService" },
+  { name: "foam/nanos/auth/ClientAgentAuthService" },
   { name: "foam/nanos/pm/PMInfo" },
   { name: "foam/nanos/pm/PMTableView", flags:['web'] },
   { name: "foam/nanos/pm/TemperatureCView" },
@@ -121,6 +127,7 @@ FOAM_FILES([
   { name: "foam/nanos/http/ProxyWebAgent" },
   { name: "foam/nanos/http/HttpParameters" },
   { name: "foam/nanos/http/DefaultHttpParameters" },
+  { name: "foam/nanos/doc/DocumentationView" },
   { name: 'foam/nanos/dig/DIG' },
   { name: 'foam/nanos/dig/DUG' },
   { name: 'foam/nanos/dig/LinkView' },
@@ -142,6 +149,4 @@ FOAM_FILES([
   { name: 'foam/demos/net/nap/web/RegulatoryNoticeForm', flags: ['web'] },
   { name: 'foam/demos/net/nap/web/RegulatoryNoticeList', flags: ['web'] },
   { name: 'foam/demos/net/nap/web/EditRegulatoryNotice', flags: ['web'] }
-
-
 ]);

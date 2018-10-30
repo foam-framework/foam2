@@ -52,6 +52,7 @@ foam.CLASS({
 
   exports: [
     'as ctrl',
+    'appConfig',
     'group',
     'loginSuccess',
     'logo',
@@ -80,15 +81,19 @@ foam.CLASS({
       background: #edf0f5;
       margin: 0;
     }
-
+    .foam-u2-UnstyledActionView-signIn {
+      margin-left: 25px !important;
+    }
     .stack-wrapper {
       margin-bottom: -10px;
       min-height: calc(80% - 60px);
     }
-
     .stack-wrapper:after {
       content: "";
       display: block;
+    }
+    .foam-u2-UnstyledActionView:focus{
+      outline: none;
     }
   `,
 
@@ -105,6 +110,12 @@ foam.CLASS({
     },
     {
       name: 'client',
+    },
+    {
+      name: 'appConfig',
+      expression: function(client) {
+        return client && client.appConfig || null;
+      }
     },
     {
       name: 'stack',
@@ -151,14 +162,14 @@ foam.CLASS({
   methods: [
     function init() {
       this.SUPER();
-
       var self = this;
       self.clientPromise.then(function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
+        foam.__context__.register(foam.u2.UnstyledActionView, 'foam.u2.ActionView');
         self.getCurrentUser();
 
         window.onpopstate = function(event) {
-          if ( location.hash != null ) {
+          if ( location.hash != null) {
             var hid = location.hash.substr(1);
 
             hid && self.client.menuDAO.find(hid).then(function(menu) {
@@ -166,8 +177,6 @@ foam.CLASS({
             });
           }
         };
-
-        window.onpopstate();
       });
     },
 
@@ -199,24 +208,6 @@ foam.CLASS({
         foam.lookup(group.footerView).create(null, this),
         this.footerView_.children[0]
       );
-    },
-
-    async function setDefaultMenu() {
-      var group = await this.client.groupDAO.find(this.user.group);
-      this.group.copyFrom(group);
-      this.setPortalView(group);
-
-      for ( var i = 0; i < this.MACROS.length; i++ ) {
-        var m = this.MACROS[i];
-        if ( group[m] ) this[m] = group[m];
-      }
-
-      // Don't select default if menu already set
-      if ( this.window.location.hash || ! this.user.group ) return;
-
-      if ( group && ! this.window.location.hash ) {
-        this.window.location.hash = group.defaultMenu;
-      }
     },
 
     function getCurrentUser() {
@@ -310,17 +301,34 @@ foam.CLASS({
   ],
 
   listeners: [
-    function onUserUpdate() {
-      this.setDefaultMenu();
+    async function onUserUpdate() {
+      var group = await this.client.groupDAO.find(this.user.group);
+
+      this.group.copyFrom(group);
+      this.setPortalView(group);
+
+      for ( var i = 0; i < this.MACROS.length; i++ ) {
+        var m = this.MACROS[i];
+        if ( group[m] ) this[m] = group[m];
+      }
+
+      var hash = this.window.location.hash;
+      if ( hash ) hash = hash.substring(1);
+
+      if ( hash ) {
+        window.onpopstate();
+      } else if ( group ) {
+        this.window.location.hash = group.defaultMenu;
+      }
     },
 
-    // This listener should be triggered when a Menu item has been launched AND
-    // navigates to a new screen.
+    // This listener should be called when a Menu item has been launched
+    // by some Menu View. Is exported.
     function menuListener(m) {
       this.currentMenu = m;
     },
 
-    // This listener should be triggered when a Menu has been launched but does
+    // This listener should be called when a Menu has been launched but does
     // not navigate to a new screen. Typically for SubMenus
     function lastMenuLaunchedListener(m) {
       this.lastMenuLaunched = m;
