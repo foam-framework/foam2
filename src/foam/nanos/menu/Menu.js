@@ -53,6 +53,11 @@ foam.CLASS({
       class: 'String',
       name: 'description',
       documentation: 'Menu item explaination.'
+    },
+    {
+      class: 'String',
+      name: 'icon',
+      documentation: 'Icon associated to the menu item.'
     }
   ],
 
@@ -84,6 +89,10 @@ foam.RELATIONSHIP({
   },
   targetProperty: {
     class: 'String',
-    value: ''
+    value: '',
+    view: {
+      class: 'foam.u2.view.ReferenceView',
+      placeholder: '--'
+    }
   }
 });

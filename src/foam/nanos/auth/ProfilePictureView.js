@@ -135,13 +135,13 @@ foam.CLASS({
       var self = this;
       this
         .addClass(this.myClass())
-        .start('div').addClass((this.boxHidden)?'boxless-for-drag-drop' :this.dragActive$.map(function (drag) {
+        .start('div').addClass((this.boxHidden)?'boxless-for-drag-drop' :this.dragActive$.map(function(drag) {
           return drag ? 'box-for-drag-drop' : 'boxless-for-drag-drop';
         }))
-          .add(this.slot(function (ProfilePictureImage) {
+          .add(this.slot(function(ProfilePictureImage) {
             return this.E('img').addClass('shopperImage')
             .attrs({
-              src: this.ProfilePictureImage$.map(function (ProfilePictureImage) {
+              src: this.ProfilePictureImage$.map(function(ProfilePictureImage) {
                 if ( ProfilePictureImage && ProfilePictureImage.data ) {
                   var blob = ProfilePictureImage.data;
                   var sessionId = localStorage['defaultSession'];

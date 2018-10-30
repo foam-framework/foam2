@@ -1,15 +1,16 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+
 foam.CLASS({
   package: 'foam.nanos.auth',
-  name: 'ClientAuthService',
+  name: 'ClientAgentAuthService',
 
   implements: [
-    'foam.nanos.auth.AuthService'
+    'foam.nanos.auth.AgentAuthService'
   ],
 
   requires: [
@@ -25,9 +26,9 @@ foam.CLASS({
     {
       class: 'Stub',
       name: 'delegate',
-      of: 'foam.nanos.auth.AuthService',
+      of: 'foam.nanos.auth.AgentAuthService',
       factory: function() {
-        return this.SessionClientBox.create({ delegate: this.HTTPBox.create({
+        return this.SessionClientBox.create({delegate:this.HTTPBox.create({
           method: 'POST',
           url: this.serviceName
         })});

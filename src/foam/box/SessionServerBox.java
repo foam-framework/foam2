@@ -76,7 +76,7 @@ public class SessionServerBox
 
           // padding this cause if group is null this can cause an NPE
           // technically the user shouldn't be created without a group
-          if (group != null) {
+          if ( group != null ) {
             AppConfig appConfig = group.getAppConfig(x);
             x = x.put("appConfig", appConfig);
             session.getContext().put("appConfig", appConfig);

@@ -12,11 +12,11 @@ foam.CLASS({
   documentation: 'An Axiom for defining Relationships between models.',
 
   requires: [
-    'foam.dao.RelationshipDAO',
+    'foam.dao.ManyToManyRelationshipAxiom',
     'foam.dao.ManyToManyRelationshipDAO',
-    'foam.dao.ReadOnlyDAO',
     'foam.dao.OneToManyRelationshipAxiom',
-    'foam.dao.ManyToManyRelationshipAxiom'
+    'foam.dao.ReadOnlyDAO',
+    'foam.dao.RelationshipDAO'
   ],
 
   properties: [
