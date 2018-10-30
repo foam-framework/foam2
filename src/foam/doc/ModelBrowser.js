@@ -83,17 +83,42 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var self = this;
+      var E = foam.mlang.Expressions.create();
+
+      var objDAO= this.nSpecDAO
+                         .where(E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO$'))
+                         .orderBy(foam.nanos.boot.NSpec.ID)
+                         .private_.contextParent.private_.__context__;
+
+
+      /*var objService= this.nSpecDAO
+                         .where(E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'Service'))
+             .orderBy(foam.nanos.boot.NSpec.ID)
+                     .private_.contextParent.private_.__context__;*/
+
+
+      var arrayDAO = [];
+      for (var key in objDAO) {
+        if ( key.endsWith('DAO$') ) {
+          arrayDAO.push(key.toLowerCase().substring(0,key.length-4));
+        }
+      }
 
       this.start().addClass(this.myClass())
         .start('h2').add('Model Browser').end()
-        .start().add(this.PRINT_PAGE).end()
+        //.start().add(this.PRINT_PAGE).end()
         .select(this.nSpecDAO, function(n) {
           var model = self.parseClientModel(n);
           if ( ! model ) return;
           this.start().style({ 'font-size': '20px', 'margin-top': '20px' })
-            .add('Model ' + model)
-          .end();
-          this.tag(self.UMLDiagram.create({ data: model }));
+            //.add('Model ' + model)
+            .callIf( arrayDAO.includes(model.name.toLowerCase() ), function (){ this.add('Model ' + model.name + 'DAO') })
+            .callIf( ! arrayDAO.includes(model.name.toLowerCase() ), function (){ this.add('Model ' + model.name + 'model') })
+            .end();
+          if ( arrayDAO.includes(model.name.toLowerCase() ) )
+            this.tag(self.UMLDiagram.create({ data: model, modelBrowser: true }));
+          else
+            this.tag(self.UMLDiagram.create({ data: model, conventionalUML: false }));
           this.tag(self.SimpleClassView.create({ data: model }));
         })
       .end();
@@ -107,13 +132,13 @@ foam.CLASS({
   ],
 
   actions: [
-    {
+    /*{
       name: 'printPage',
       label: 'Print',
       code: function() {
         window.print();
       }
-    }
+    }*/
   ]
 });
 

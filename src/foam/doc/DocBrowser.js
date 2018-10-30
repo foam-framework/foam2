@@ -827,6 +827,11 @@ foam.CLASS({
       value: 0,
       documentation: 'the y of the last required to element draw in the canvas.',
     },
+    {
+      class: 'Boolean',
+	  name: 'modelBrowser',
+      value: false
+    },
   ],
 
   methods: [
@@ -838,19 +843,23 @@ foam.CLASS({
       this.elementMap = new Map();
       this.properties = this.getAllProperties( data );
 
-      this.canvas.height = this.conventionalUML && this.properties.length >= 15 ? this.properties.length * 30 + this.height : this.height;
+      this.canvas.height = ( this.conventionalUML || this.modelBrowser )  && this.properties.length >= 15 ? this.properties.length * 30 + this.height : this.height;
 
-      var heightCenterBox = (this.conventionalUML ? this.properties.length : nbrOfPropInNonConventionalDiag) * propertyHeight;
-      this.addModel(this.canvas.width / 2 - this.widthCenterModel / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox , this.widthCenterModel);
-      this.addExtends(this.canvas.width / 2 - this.widthExtendsBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
-      this.addImplements(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
-      this.addRequires(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
+      var heightCenterBox = ( ( this.conventionalUML || this.modelBrowser ) ? this.properties.length : nbrOfPropInNonConventionalDiag) * propertyHeight;
+      this.addModel(this.canvas.width / 2 - this.widthCenterModel / 2, this.canvas.height / (( this.conventionalUML || this.modelBrowser ) ?1.5:1.5) - heightCenterBox , this.widthCenterModel);
+      this.addExtends(this.canvas.width / 2 - this.widthExtendsBox / 2, this.canvas.height / (( this.conventionalUML || this.modelBrowser )?1.5:1.5) - heightCenterBox );
+      this.addImplements(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (( this.conventionalUML || this.modelBrowser )?1.5:1.5) - heightCenterBox );
+      if ( ! this.modelBrowser )
+        this.addRequires(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
+      if ( ! this.modelBrowser )
       this.addRequiredBy(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
       /*this.addImports(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?2.5:1.5) - heightCenterBox );
       this.addExports(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?2.5:1.5) - heightCenterBox );*/
-      this.addRelatedto(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
-      this.addRelatedFrom(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
-      this.addSubClasses(this.canvas.width / 2 - this.widthExtendsBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
+      if ( ! this.modelBrowser )
+        this.addRelatedto(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
+      if ( ! this.modelBrowser )
+        this.addRelatedFrom(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
+      this.addSubClasses(this.canvas.width / 2 - this.widthExtendsBox / 2, this.canvas.height / (( this.conventionalUML || this.modelBrowser )?1.5:1.5) - heightCenterBox );
 
       this.canvas.height = this.canvasHeightExtension >= this.canvas.height ? this.canvasHeightExtension: this.canvas.height;
 
@@ -891,7 +900,7 @@ foam.CLASS({
         x: x || 0,
         y: y || 0,
         width: w || 350,
-        height: h || 160,
+        height: h || this.modelBrowser ? 100:160,
         color: '#ffffff' || this.UNSELECTED_COLOR,
         border: 'black'
       });
@@ -956,71 +965,10 @@ foam.CLASS({
 
       this.selected = this.canvas.addChildren( ImplementNameLabel, triangleEndImplement, dashedLine );
 
-      var requiredLine = foam.graphics.Line.create({
-        startX: x - 510 || startX,
-        startY: y - 570 || startY * 4,
-        endX: x + 530 || startX + d,
-        endY: y + 530 + this.triangleSize || startY * 4,
-        color: 'black',
-        lineWidth: 2
-      });
-
-      var requiredConnectorEnd = foam.graphics.Circle.create({
-        x: requiredLine.endX,
-        y: requiredLine.endY,
-        radius: marge,
-        border: 'black',
-        color: 'white'
-      });
-
-      var requiredNameLabel = foam.graphics.Label.create({
-        align: 'center',
-        x: x || 0,
-        y: y - marge || startY * 4,
-        color: 'black',
-        font: '20px Arial',
-        width: w || 200,
-        height: h || 30,
-        text: 'Required By'
-      });
-
-      this.selected = this.canvas.addChildren( requiredLine, requiredConnectorEnd, requiredNameLabel );
-
-      requiresLink = foam.graphics.Line.create({
-        startX: x - 510 || startX,
-        startY: y - 570 || startY * 5,
-        endX: x + 530 || startX + d,
-        endY: y + 530 || startY * 5,
-        color: 'black',
-        lineWidth: 2
-      });
-
-      var requiresConnectorCircle = foam.graphics.Circle.create({
-        x: requiresLink.endX,
-        y: requiresLink.endY,
-        start: Math.PI / 2,
-        end: -Math.PI / 2,
-        radius: marge,
-        border: 'black',
-        color: 'white'
-      });
-
-      var RequiresNameLabel = foam.graphics.Label.create({
-        align: 'center',
-        x: x || 0,
-        y: y - marge || startY * 3,
-        color: 'black',
-        font: '20px Arial',
-        width: w || 200,
-        height: h || 30,
-        text: 'Requires'
-      });
-      this.selected = this.canvas.addChildren( requiresLink, requiresConnectorCircle, RequiresNameLabel );
-
       var RelatedToNameLabel = foam.graphics.Label.create({
         align: 'center',
         x: x || 0,
-        y: y || startY * 5,
+        y: y || startY * 3,
         color: 'black',
         font: '20px Arial',
         width: w || 200,
@@ -1030,37 +978,104 @@ foam.CLASS({
 
       var RelatedToLinkLine = foam.graphics.Line.create({
         startX: x - 510 || startX,
-        startY: y - 570 || startY * 6,
+        startY: y - 570 || startY * 4,
         endX: x + 530 || startX + d,
-        endY: y + 530 || startY * 6,
+        endY: y + 530 || startY * 4,
         color: 'black',
         lineWidth: 2
       });
       var arrowRelatedto = this.arrowEnd( RelatedToLinkLine.endX, RelatedToLinkLine.endY, 3 * Math.PI / 2 );
       this.selected = this.canvas.addChildren( RelatedToNameLabel, RelatedToLinkLine, arrowRelatedto );
 
-      var RelatedFromNameLabel = foam.graphics.Label.create({
-        align: 'center',
-        x: x || 0,
-        y: y || startY * 6,
-        color: 'black',
-        font: '20px Arial',
-        width: w || 200,
-        height: h || 30,
-        text: 'Related From'
-      });
+      if ( ! this.modelBrowser ) {
+        var RelatedFromNameLabel = foam.graphics.Label.create({
+          align: 'center',
+          x: x || 0,
+          y: y || startY * 4,
+          color: 'black',
+          font: '20px Arial',
+          width: w || 200,
+          height: h || 30,
+          text: 'Related From'
+        });
 
-      var RelatedFromLinkLine = foam.graphics.Line.create({
-        startX: x - 510 || startX,
-        startY: y - 570 || startY * 7,
-        endX: x + 530 || startX + d,
-        endY: y + 530 || startY * 7,
-        color: 'black',
-        lineWidth: 2
-      });
-      var arrowRelatedFrom = this.arrowEnd( RelatedFromLinkLine.startX, RelatedFromLinkLine.startY, Math.PI / 2 );
+        var RelatedFromLinkLine = foam.graphics.Line.create({
+          startX: x - 510 || startX,
+          startY: y - 570 || startY * 5,
+          endX: x + 530 || startX + d,
+          endY: y + 530 || startY * 5,
+          color: 'black',
+          lineWidth: 2
+        });
+        var arrowRelatedFrom = this.arrowEnd( RelatedFromLinkLine.startX, RelatedFromLinkLine.startY, Math.PI / 2 );
 
-      this.selected = this.canvas.addChildren( RelatedFromNameLabel, RelatedFromLinkLine, arrowRelatedFrom );
+        this.selected = this.canvas.addChildren( RelatedFromNameLabel, RelatedFromLinkLine, arrowRelatedFrom );
+      }
+
+      if ( ! this.modelBrowser ) {
+        var requiredLine = foam.graphics.Line.create({
+          startX: x - 510 || startX,
+          startY: y - 570 || startY * 7,
+          endX: x + 530 || startX + d,
+          endY: y + 530 + this.triangleSize || startY * 7,
+          color: 'black',
+          lineWidth: 2
+        });
+
+        var requiredConnectorEnd = foam.graphics.Circle.create({
+          x: requiredLine.endX,
+          y: requiredLine.endY,
+          radius: marge,
+          border: 'black',
+          color: 'white'
+        });
+
+        var requiredNameLabel = foam.graphics.Label.create({
+          align: 'center',
+          x: x || 0,
+          y: y - marge || startY * 6,
+          color: 'black',
+          font: '20px Arial',
+          width: w || 200,
+          height: h || 30,
+          text: 'Required By'
+        });
+
+        this.selected = this.canvas.addChildren( requiredLine, requiredConnectorEnd, requiredNameLabel );
+      }
+
+      if ( ! this.modelBrowser ) {
+        var requiresLink = foam.graphics.Line.create({
+          startX: x - 510 || startX,
+          startY: y - 570 || startY * 6,
+          endX: x + 530 || startX + d,
+          endY: y + 530 || startY * 6,
+          color: 'black',
+          lineWidth: 2
+        });
+
+        var requiresConnectorCircle = foam.graphics.Circle.create({
+          x: requiresLink.endX,
+          y: requiresLink.endY,
+          start: Math.PI / 2,
+          end: -Math.PI / 2,
+          radius: marge,
+          border: 'black',
+          color: 'white'
+        });
+
+        var RequiresNameLabel = foam.graphics.Label.create({
+          align: 'center',
+          x: x || 0,
+          y: y - marge || startY * 5,
+          color: 'black',
+          font: '20px Arial',
+          width: w || 200,
+          height: h || 30,
+          text: 'Requires'
+        });
+        this.selected = this.canvas.addChildren( requiresLink, requiresConnectorCircle, RequiresNameLabel );
+      }
     },
 
     function addModel(x, y, w, h) {
@@ -1092,7 +1107,7 @@ foam.CLASS({
         x: x,
         y: y + step,
         width: w || defaultWidth,
-        height: h || this.conventionalUML ? step * this.properties.length : step * 5,
+        height: h || ( this.conventionalUML || this.modelBrowser ) ? step * this.properties.length : step * 5,
         color: '#ffffff', //this.UNSELECTED_COLOR
         border: 'black',
         text: this.prop
@@ -1101,7 +1116,7 @@ foam.CLASS({
       this.selected = this.canvas.addChildren( modelBox, modelNameLabel, propertyBox );
       var propertyPadding = - this.widthCenterModel +10;
       
-      if ( ! this.conventionalUML ){
+      if ( ! ( this.conventionalUML || this.modelBrowser ) ){
          var propertyNameLabel = foam.graphics.Label.create({
           align: 'left',
           x: x + propertyPadding,
@@ -1406,15 +1421,15 @@ foam.CLASS({
     },
 
     function addSubClasses(x, y, w, h) {
-      var marge = 4;                  
+      var marge = 4;
       var dDefualt = 300 + this.properties.length * 30;
-      var d = this.conventionalUML && dDefualt+y > this.lastRelatedFromY && dDefualt+y > this.lastRelatedToY ? dDefualt : 
+      var d = (this.conventionalUML || this.modelBrowser) && dDefualt+y > this.lastRelatedFromY && dDefualt+y > this.lastRelatedToY ? dDefualt : 
           this.lastRelatedFromY > this.lastRelatedToY ?
             this.lastRelatedFromY > this.height ? this.lastRelatedFromY - 300: 500 :
             this.lastRelatedToY > this.height ? this.lastRelatedToY - 300: 500 ;    
 
       var boxLarge = 35;
-      var endPtD = this.conventionalUML ? 30 + this.properties.length * 30 : 180;
+      var endPtD = (this.conventionalUML || this.modelBrowser)  ? 30 + this.properties.length * 30 : 180;
       var l = 230;
 
       var cls = this.data;
