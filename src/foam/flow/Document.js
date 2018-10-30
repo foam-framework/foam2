@@ -1,12 +1,6 @@
 foam.CLASS({
   package: 'foam.flow',
   name: 'Document',
-  requires: [
-    {
-      path: 'foam.flow.PromiseSlot',
-      flags: ['js'],
-    },
-  ],
   properties: [
     {
       class: 'String',
@@ -345,14 +339,13 @@ foam.CLASS({
             var viewName = attributes.view;
             var className = attributes.class;
 
-            var slot = foam.flow.PromiseSlot.create({
-              promise: Promise.all([
-                viewName ? x.classloader.load(viewName) : Promise.resolve(),
-                className ? x.classloader.load(className) : Promise.resolve(),
-              ])
-            });
+            // TODO: Reuse FoamTagLoader support, support classloading
+            var promise = Promise.all([
+              viewName ? x.classloader.load(viewName) : Promise.resolve(),
+              className ? x.classloader.load(className) : Promise.resolve(),
+            ])
 
-            this.add(this.slot(function(o) {
+            this.promise(promise, function(o) {
               return this.E().
                 callIf(o, function() {
                   var cls = x.lookup(className, true);
@@ -370,7 +363,7 @@ foam.CLASS({
                   if ( ! viewName ) this.add(obj)
                   else this.tag(view, { data: obj });
                 });
-            }, slot))
+            })
 
           };
         },
