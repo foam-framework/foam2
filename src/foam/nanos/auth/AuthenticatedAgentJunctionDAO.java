@@ -76,13 +76,6 @@ public class AuthenticatedAgentJunctionDAO
       throw new AuthorizationException("Unable to update junction.");
     }
 
-    // Checks to see if all permissions on junction object exist within user' group.
-    Group group = (Group) groupDAO.find(user.getGroup());
-
-    if ( group == null ) {
-      throw new AuthorizationException("User must have an association to a group.");
-    }
-
     if ( ! auth.check(x, "group.update." + junctionObj.getGroup()) ) {
       throw new AuthorizationException("Cannot assign non permitted group on junction.");
     }
