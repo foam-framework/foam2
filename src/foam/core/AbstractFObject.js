@@ -40,6 +40,10 @@ foam.CLASS({
             this.x_ = x;
           }
 
+          // Template method for initializing object after done being built.
+          public void init_() {
+          }
+
           // convenience hash function
           public byte[] hash()
             throws NoSuchAlgorithmException
