@@ -34,8 +34,8 @@ foam.CLASS({
   ],
 
   css: `
-    ^ { white-space: nowrap; margin-left:16px; }
-    ^selected { outline: 2px solid #dddd00; }
+    ^ { white-space: nowrap; margin-left: 20px; }
+    ^selected > ^label { outline: 2px solid #dddd00; }
   `,
 
   properties: [
@@ -78,7 +78,7 @@ foam.CLASS({
         on('dragenter', this.onDragOver).
         on('dragover', this.onDragOver).
         on('drop', this.onDrop).
-        call(this.formatter).
+        start('span').addClass(self.myClass('label')).call(this.formatter, [self.data]).end().
         add(this.slot(function(e) {
           if ( ! e ) return this.E('div');
           var e2 = this.E('div');
