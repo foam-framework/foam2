@@ -40,7 +40,6 @@ public class SugarWebAgent
     String              serviceName    = p.getParameter("service");
     String              methodName     = p.getParameter("method");
     String              interfaceName  = p.getParameter("interfaceName");
-    String              isObjParam     = p.getParameter("isObjParam");
 
     try {
       if ( SafetyUtil.isEmpty(serviceName) ) {
@@ -97,6 +96,8 @@ public class SugarWebAgent
                   .setMessage("IllegalArgumentException : Add a compiler argument")
                   .build();
                 outputException(x, resp, "JSON", out, error);
+
+                return;
               }
 
               paramTypes[j] = pArray[j].getType();
@@ -118,6 +119,8 @@ public class SugarWebAgent
                   .setMessage("Empty Parameter values : " + pArray[j].getName())
                   .build();
                 outputException(x, resp, "JSON", out, error);
+
+                return;
               }
             }
           }
@@ -152,11 +155,15 @@ public class SugarWebAgent
         .setMessage("InvocationTargetException: " + e.getTargetException().getMessage())
         .build();
       outputException(x, resp, "JSON", out, error);
+
+      return;
     } catch (Exception e) {
       DigErrorMessage error = new GeneralException.Builder(x)
         .setMessage("Exception: " + e.getMessage())
         .build();
       outputException(x, resp, "JSON", out, error);
+
+      return;
     }
   }
 
