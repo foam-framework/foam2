@@ -15,8 +15,16 @@ foam.CLASS({
   extends: 'foam.u2.view.AltView',
 
   requires: [
-    'foam.nanos.menu.Menu'
+    'foam.nanos.menu.Menu',
+    'foam.u2.view.TableView',
+    'foam.u2.view.TableView'
   ],
+
+  css: `
+    .foam-u2-view-TreeView {
+      width: 962px;
+    }
+  `,
 
   methods: [
     function init(){
