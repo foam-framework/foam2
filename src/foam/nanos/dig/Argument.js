@@ -26,6 +26,13 @@ foam.CLASS({
      visibility: foam.u2.Visibility.RO
     },
     {
+     class: 'String',
+     name: 'of',
+     label: 'of',
+     displayWidth: '100',
+     visibility: foam.u2.Visibility.RO
+    },
+    {
       class: 'String',
       documentation: 'Parameters input value',
       name: 'value'

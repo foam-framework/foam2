@@ -112,8 +112,6 @@ public class SugarWebAgent
 
               if ( ! SafetyUtil.isEmpty(p.getParameter(pArray[j].getName())) ) {
                 arglist[j] = setParameterType(x, resp, out, p, typeName, pArray[j]);
-
-                executeMethod(x, resp, out, class_, serviceName, methodName, paramTypes, arglist);
               } else {
                 DigErrorMessage error = new GeneralException.Builder(x)
                   .setMessage("Empty Parameter values : " + pArray[j].getName())
@@ -123,6 +121,7 @@ public class SugarWebAgent
                 return;
               }
             }
+            executeMethod(x, resp, out, class_, serviceName, methodName, paramTypes, arglist);
           }
         }
       }
@@ -192,24 +191,25 @@ public class SugarWebAgent
 
     try {
       clsForObj = Class.forName(className);
+
       clsObj = clsForObj.newInstance();
       Field[] fieldList = clsForObj.getDeclaredFields();
 
-      List axioms = ((foam.core.FObject)clsObj).getClassInfo().getAxiomsByClass(PropertyInfo.class);
+      List axioms = ((foam.core.FObject) clsObj).getClassInfo().getAxiomsByClass(PropertyInfo.class);
       Iterator it = axioms.iterator();
 
-      while ( it.hasNext() ) {
+      while (it.hasNext()) {
         PropertyInfo prop = (PropertyInfo) it.next();
 
-        for ( int m = 0 ; m < fieldList.length ; m++ ) {
-          if ( fieldList[m].getName().equals(prop.getName().toUpperCase()) ) {
+        for (int m = 0; m < fieldList.length; m++) {
+          if (fieldList[m].getName().equals(prop.getName().toUpperCase())) {
             fieldList[m].setAccessible(true);
             Field modifiersField = (Field.class).getDeclaredField("modifiers");
             modifiersField.setAccessible(true);
-            modifiersField.set(fieldList[m], fieldList[m].getModifiers() & ~Modifier.STATIC );
+            modifiersField.set(fieldList[m], fieldList[m].getModifiers() & ~Modifier.STATIC);
 
             if (!SafetyUtil.isEmpty(p.getParameter(prop.getName()))) {
-              if ( prop.getValueClass().toString().equals("class [Ljava.lang.String;") ) {  //String[]
+              if (prop.getValueClass().toString().equals("class [Ljava.lang.String;")) {  //String[]
                 prop.set(clsObj, p.getParameterValues(prop.getName()));
               } else {
                 prop.set(clsObj, p.getParameter(prop.getName()));
@@ -256,7 +256,23 @@ public class SugarWebAgent
           arg = p.getParameterValues(pArray_.getName());
           break;
         default:
-          arg = getFieldInfo(typeName, p);  // For Object Parameter
+          Class objClass = null;
+
+          try {
+            objClass = Class.forName(typeName);
+
+            if ( objClass != null && objClass.isEnum() ) {  // For Enum Parameter
+              for ( int t = 0 ; t < objClass.getEnumConstants().length ; t++ ) {
+                if ( objClass.getEnumConstants()[t].toString().equals(p.getParameter(pArray_.getName())) ) {
+                  arg = objClass.getEnumConstants()[t];
+                }
+              }
+            } else {
+              arg = getFieldInfo(typeName, p);  // For Object Parameter
+            }
+          } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+          }
       }
     }
 
