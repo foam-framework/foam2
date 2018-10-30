@@ -23,7 +23,7 @@ foam.CLASS({
       value: 'foam.doc.Axiom',
     },
     {
-      name: 'modelIDs',
+      name: 'modelIds',
     },
     {
       name: 'delegate',
@@ -35,9 +35,9 @@ foam.CLASS({
     },
     {
       name: 'promise',
-      expression: function(modelIDs, delegate) {
+      expression: function(modelIds, delegate) {
         var self = this;
-        return Promise.all(modelIDs.map(function(m) {
+        return Promise.all(modelIds.map(function(m) {
           return self.putCls_(foam.lookup(m));
         })).then(function() {
           return delegate;

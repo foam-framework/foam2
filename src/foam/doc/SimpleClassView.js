@@ -36,7 +36,7 @@ foam.CLASS({
     {
       name: 'axiomDAO',
       expression: function(data) {
-        return this.AxiomDAO.create({modelIDs: [data.id]});
+        return this.AxiomDAO.create({modelIds: [data.id]});
       },
     },
   ],
@@ -121,13 +121,13 @@ foam.CLASS({
         add(this.AxiomSummaryView.create({
           title: 'Property Summary',
           of: this.PropertyAxiom,
-          modelID: model.id,
+          modelId: model.id,
         })).
         forEach(exts.map(function(e) { return e.id }).concat(impls.map(function(i) { return i.path })), function(id) {
           this.
             start(this.AxiomListView, {
               of: this.PropertyAxiom,
-              modelID: id,
+              modelId: id,
               titleFn: function() {
                   return this.E('h3').
                     add('Properties inherited from ').
@@ -141,13 +141,13 @@ foam.CLASS({
         add(this.AxiomSummaryView.create({
           title: 'Method Summary',
           of: this.MethodAxiom,
-          modelID: model.id,
+          modelId: model.id,
         })).
         forEach(exts.map(function(e) { return e.id }).concat(impls.map(function(i) { return i.path })), function(id) {
           this.
             start(this.AxiomListView, {
               of: this.MethodAxiom,
-              modelID: id,
+              modelId: id,
               titleFn: function() {
                   return this.E('h3').
                     add('Methods inherited from ').
