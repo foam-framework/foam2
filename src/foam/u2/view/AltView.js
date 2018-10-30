@@ -46,15 +46,11 @@ foam.CLASS({
 
   css: `
     ^ {
-      width: 992px;
       margin: auto;
     }
-    ^ .foam-u2-tag-Select{
+    ^ .foam-u2-tag-Select {
       width: 100px;
-      height: 40px;
-    }
-    ^ .property-viewChoices{
-      margin: 0 0 0 15px;
+      height: 28px;
     }
   `,
 
