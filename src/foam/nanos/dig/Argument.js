@@ -39,39 +39,11 @@ foam.CLASS({
       factory: function() {
         var model = this.lookup(this.javaType.toString(), true);
 
-        if ( this.javaType != 'String' && this.javaType != 'double' && this.javaType != 'boolean' && this.javaType != 'long' ) return model.create();
+        if ( this.javaType != 'String' && this.javaType != 'double' && this.javaType != 'boolean' && this.javaType != 'long' )
+          return model.create(null, this.__context__);
         else return null;
       }
-    },
-//    {
-//      class: 'String',
-//      name: 'madeURL',
-//      displayWidth: 120,
-//      documentation: 'dynamic URL',
-//      visibility: foam.u2.Visibility.RO,
-//      setter: function() {}, // Prevent from ever getting set,
-//      postSet: function(objectType, javaType) {
-//        var url;
-//
-//        if ( objectType ) {
-//          if ( javaType != 'String' && javaType != 'double' && javaType != 'boolean' && javaType != 'long' ) {
-//            var prop = foam.lookup(javaType).getAxiomsByClass(foam.core.Property);
-//
-//            objectType.sub(function(ot) {
-//              //url = "";
-//              for ( var i = 0 ; i < prop.length ; i++ ) {
-//                if ( ot.src.instance_[prop[i].name] ) {
-//                  url += prop[i].name + "=" + ot.src.instance_[prop[i].name] + "&";
-//                }
-//              }
-//            });
-//            //console.log("1");
-//          }
-//        }
-//
-//        //return url;
-//      }
-//    }
+    }
   ],
 
   methods: [

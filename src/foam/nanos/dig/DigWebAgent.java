@@ -37,6 +37,7 @@ import java.nio.CharBuffer;
 import java.util.Iterator;
 import java.util.List;
 import java.lang.Exception;
+import java.util.StringTokenizer;
 
 public class DigWebAgent
   implements WebAgent
@@ -369,18 +370,23 @@ public class DigWebAgent
   }
 
   protected void output(X x, String data) {
-    HttpParameters p       = x.get(HttpParameters.class);
-    String[]       email   = p.getParameterValues("email");
-    String         subject = p.getParameter("subject");
+    HttpParameters p            = x.get(HttpParameters.class);
+    String         emailParam   = p.getParameter("email");
+    String         subject      = p.getParameter("subject");
 
-    if ( email.length == 0 ) {
+    if (  SafetyUtil.isEmpty(emailParam) ) {
       PrintWriter out = x.get(PrintWriter.class);
 
       out.print(data);
     } else {
       EmailService emailService = (EmailService) x.get("email");
       EmailMessage message      = new EmailMessage();
-      message.setTo(email);
+
+      // For multiple receiver
+      String[]  email = emailParam.split(",");
+
+      if ( email.length > 0 ) message.setTo(email);
+
       message.setSubject(subject);
 
       String newData = data;
