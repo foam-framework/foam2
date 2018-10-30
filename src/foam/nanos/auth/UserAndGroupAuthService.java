@@ -216,6 +216,10 @@ public class UserAndGroupAuthService
     }
 
     User user = (User) x.get("user");
+
+    if ( user == null ) {
+      return false;
+    }
     // check if user exists and is enabled
     User userObj = (User) userDAO_.find(user.getId());
     if ( userObj == null || ! userObj.getEnabled() ) {
@@ -366,44 +370,6 @@ public class UserAndGroupAuthService
     if ( ! Password.isValid(user.getPassword()) ) {
       throw new AuthenticationException("Password needs to minimum 8 characters, contain at least one uppercase, one lowercase and a number");
     }
-  }
-
-  // Make sure that the user has all permissions in the given group.
-  public void checkUserHasAllPermissionsInGroup(X x, Group group) {
-    AuthService auth = (AuthService) x.get("auth");
-    foam.nanos.auth.Permission[] permissions = group.getPermissions();
-    for ( foam.nanos.auth.Permission permission : permissions ) {
-      String id = permission.getId();
-      if ( ! auth.check(x, id) ) {
-        throw new AuthorizationException("Permission Denied. You do not have the '" + id + "' permission.");
-      }
-    }
-  }
-
-  // Check if user has all permissions in group and ancestors.
-  public boolean checkPermissionsInGroup(X x, Group toCheck) {
-    Group group = toCheck;
-    checkUserHasAllPermissionsInGroup(x, group);
-    while ( getAncestor(x, group) != null ) {
-      group = getAncestor(x, group);
-      checkUserHasAllPermissionsInGroup(x, group);
-    }
-    return true;
-  }
-
-  // Returns ancestor of a group if it exists, otherwise null
-  public Group getAncestor(X x, Group group) {
-    String ancestorGroupId = group.getParent();
-    if ( SafetyUtil.isEmpty(ancestorGroupId) ) {
-      return null;
-    }
-
-    Group ancestor = (Group) groupDAO_.find(ancestorGroupId);
-
-    if ( ancestor == null ) {
-      throw new RuntimeException("The '" + group.getId() + "' group has a null ancestor named '" + ancestorGroupId + "'.");
-    }
-    return ancestor;
   }
 
   /**

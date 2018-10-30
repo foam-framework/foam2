@@ -38,24 +38,6 @@ foam.INTERFACE({
       ]
     },
     {
-      name: 'checkPermissionsInGroup',
-      javaReturns: 'boolean',
-      swiftReturns: 'Bool',
-      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
-      swiftThrows: true,
-      args: [
-        {
-          name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
-        },
-        {
-          name: 'group',
-          javaType: 'foam.nanos.auth.Group'
-        }
-      ]
-    },
-    {
       name: 'challengedLogin',
       javaReturns: 'foam.nanos.auth.User',
       swiftReturns: 'foam_nanos_auth_User',

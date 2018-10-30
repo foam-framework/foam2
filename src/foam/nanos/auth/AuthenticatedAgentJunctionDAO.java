@@ -62,7 +62,7 @@ public class AuthenticatedAgentJunctionDAO
     }
 
     // Permit permission check if agent is not present within context.
-    if ( agent == null && auth.check(x, GLOBAL_AGENT_JUNCTION_UPDATE) ) {
+    if ( auth.check(x, GLOBAL_AGENT_JUNCTION_UPDATE) ) {
       return getDelegate().put_(x, junctionObj);
     }
 
@@ -83,8 +83,8 @@ public class AuthenticatedAgentJunctionDAO
       throw new AuthorizationException("User must have an association to a group.");
     }
 
-    if ( ! auth.checkPermissionsInGroup(x, groupToBePut) ) {
-      throw new AuthorizationException();
+    if ( ! auth.check(x, "group.update." + junctionObj.getGroup()) ) {
+      throw new AuthorizationException("Cannot assign non permitted group on junction.");
     }
 
     return getDelegate().put_(x, junctionObj);
