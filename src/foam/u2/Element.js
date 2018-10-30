@@ -584,6 +584,7 @@ foam.CLASS({
   `,
 
   requires: [
+    'foam.core.PromiseSlot',
     'foam.dao.MergedResetSink',
     'foam.u2.AttrSlot',
     'foam.u2.Entity',
@@ -1947,7 +1948,12 @@ foam.CLASS({
       }
 
       out('>');
-    }
+    },
+
+    function promise(promise, func) {
+      var slot = this.PromiseSlot.create({ promise: promise });
+      this.add(this.slot(func, slot));
+    },
   ],
 
   listeners: [
