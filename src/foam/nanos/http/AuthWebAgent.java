@@ -67,28 +67,27 @@ public class AuthWebAgent
     out.println("<button type=submit style=\"display:inline-block;margin-top:10px;\"; onclick=\"checkEmpty()\">Log In</button>");
     out.println("</form>");
     out.println("<script>function checkEmpty() { if ( document.getElementById('user').value == '') { alert('Email Required'); } else if ( document.getElementById('password').value == '') { alert('Password Required'); } }</script>");
-
   }
 
   /** If provided, use user and password parameters to login and create session and cookie. **/
   public Session authenticate(X x) {
-    Logger             logger       = (Logger) x.get("logger");
+    Logger              logger       = (Logger) x.get("logger");
 
     // context parameters
-    HttpServletRequest req          = x.get(HttpServletRequest.class);
-    HttpServletResponse resp        = x.get(HttpServletResponse.class);
-    AuthService        auth         = (AuthService) x.get("auth");
-    DAO                sessionDAO   = (DAO) x.get("sessionDAO");
+    HttpServletRequest  req          = x.get(HttpServletRequest.class);
+    HttpServletResponse resp         = x.get(HttpServletResponse.class);
+    AuthService         auth         = (AuthService) x.get("auth");
+    DAO                 sessionDAO   = (DAO) x.get("sessionDAO");
 
     // query parameters
-    String             email        = req.getParameter("user");
-    String             password     = req.getParameter("password");
-    String             authHeader   = req.getHeader("Authorization");
+    String              email        = req.getParameter("user");
+    String              password     = req.getParameter("password");
+    String              authHeader   = req.getHeader("Authorization");
 
     // instance parameters
-    Session            session      = null;
-    Cookie             cookie       = getCookie(req);
-    boolean            attemptLogin = ! SafetyUtil.isEmpty(authHeader) || ( ! SafetyUtil.isEmpty(email) && ! SafetyUtil.isEmpty(password) );
+    Session             session      = null;
+    Cookie              cookie       = getCookie(req);
+    boolean             attemptLogin = ! SafetyUtil.isEmpty(authHeader) || ( ! SafetyUtil.isEmpty(email) && ! SafetyUtil.isEmpty(password) );
 
     // get session id from either query parameters or cookie
     String sessionId = ( ! SafetyUtil.isEmpty(req.getParameter("sessionId")) ) ?

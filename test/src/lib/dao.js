@@ -219,14 +219,14 @@ describe('SequenceNumberDAO', function() {
     sDAO.put(a).then(function() {
       return mDAO.select().then(function (sink) {
         expect(sink.array.length).toEqual(1);
-        expect(sink.array[0].id).toEqual(1);
+        expect(sink.array[0].id).toEqual(0);
         a = test.CompA.create({ a: 6 }, foam.__context__); // id not set
         return sDAO.put(a).then(function() {
           return mDAO.select().then(function (sink) {
             expect(sink.array.length).toEqual(2);
-            expect(sink.array[0].id).toEqual(1);
+            expect(sink.array[0].id).toEqual(0);
             expect(sink.array[0].a).toEqual(4);
-            expect(sink.array[1].id).toEqual(2);
+            expect(sink.array[1].id).toEqual(1);
             expect(sink.array[1].a).toEqual(6);
             done();
           });
