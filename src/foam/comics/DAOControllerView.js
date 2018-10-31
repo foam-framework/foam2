@@ -171,6 +171,9 @@ foam.CLASS({
                   }))
                 .end()
               .end()
+              .callIf(this.data.searchMode === this.SearchMode.SIMPLE, function() {
+                this.start().add(self.cls.PREDICATE).end();
+              })
               .start()
                 .style({ 'overflow-x': 'auto' })
                 .tag(this.summaryView, { data$: this.data.filteredDAO$ })
