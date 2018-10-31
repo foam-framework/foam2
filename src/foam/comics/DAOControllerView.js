@@ -26,6 +26,7 @@ foam.CLASS({
   ],
 
   exports: [
+    'as controllerView',
     'data.selection as selection',
     'data.data as dao',
     'data.searchColumns as searchColumns',
@@ -95,9 +96,16 @@ foam.CLASS({
     {
       name: 'summaryView',
       factory: function() {
-        return this.importedSummaryView$ ?
-            this.importedSummaryView :
-            { class: 'foam.u2.view.ScrollTableView' };
+        var defaultView = { class: 'foam.u2.view.ScrollTableView' };
+        if (
+          Array.isArray(this.data.contextMenuActions) &&
+          this.data.contextMenuActions.length > 0
+        ) {
+          defaultView.contextMenuActions = this.data.contextMenuActions;
+        }
+        return this.importedSummaryView ?
+          this.importedSummaryView :
+          defaultView;
       }
     },
     {

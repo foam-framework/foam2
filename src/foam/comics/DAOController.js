@@ -146,6 +146,11 @@ foam.CLASS({
         The most important action on the page. The view for this controller may
         choose to display this action prominantly.
       `
+    },
+    {
+      class: 'FObjectArray',
+      of: 'foam.core.Action',
+      name: 'contextMenuActions'
     }
   ],
 
