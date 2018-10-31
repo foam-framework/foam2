@@ -1783,7 +1783,7 @@ foam.CLASS({
     function addClass_(oldClass, newClass) {
       /* Replace oldClass with newClass. Called by cls(). */
       if ( oldClass === newClass ) return;
-      this.removeClass(oldClass);
+      if ( oldClass ) this.removeClass(oldClass);
       if ( newClass ) {
         if ( ! this.CSS_CLASSNAME_PATTERN.test(newClass) ) {
           console.log('!!!!!!!!!!!!!!!!!!! Invalid CSS ClassName: ', newClass);
