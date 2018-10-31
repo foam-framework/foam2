@@ -21,6 +21,7 @@ foam.CLASS({
   name: 'DAOController',
 
   requires: [
+    'foam.comics.SearchMode',
     'foam.u2.borders.NullBorder',
   ],
 
@@ -91,17 +92,21 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'filtersEnabled',
-      documentation: `Set to true if you want to completely hide the search
-        panel and the button to toggle it.`,
-      value: true
-    },
-    {
-      class: 'Boolean',
       name: 'searchHidden',
       documentation: `Used internally to keep track of whether the search panel
         is currently hidden or not.`,
       value: false
+    },
+    {
+      class: 'Enum',
+      of: 'foam.comics.SearchMode',
+      name: 'searchMode',
+      documentation: `
+        The level of search capabilities that the controller should have.
+      `,
+      factory: function() {
+        return this.SearchMode.FULL;
+      }
     },
     {
       name: 'searchColumns',
@@ -136,7 +141,6 @@ foam.CLASS({
   actions: [
     {
       name: 'toggleFilters',
-      isAvailable: function(filtersEnabled) { return filtersEnabled; },
       code: function() {
         this.searchHidden = ! this.searchHidden;
       },
