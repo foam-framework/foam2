@@ -468,6 +468,7 @@ FOAM_FILES([
   { name: "foam/graphics/CView", flags: ['web'] },
   { name: "foam/graphics/ScrollCView", flags: ['web'] },
   { name: "foam/physics/PhysicalCircle", flags: ['web'] },
+  { name: "foam/comics/SearchMode", flags: ['web'] },
   { name: "foam/comics/DAOController" },
   { name: "foam/comics/DAOControllerView", flags: ['web'] },
   { name: "foam/comics/InlineDAOControllerView", flags: ['web'] },

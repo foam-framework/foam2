@@ -10,6 +10,7 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
+    'foam.comics.SearchMode',
     'foam.comics.DAOController',
     'foam.comics.DAOUpdateControllerView',
     'foam.u2.view.ScrollTableView',
@@ -146,26 +147,29 @@ foam.CLASS({
           .end()
           .start()
             .addClass(this.myClass('container'))
-            .start()
-              .hide(self.data.searchHidden$)
-              .show(self.data.filtersEnabled$)
-              .add(self.cls.PREDICATE)
-            .end()
+            .callIf(this.data.searchMode === this.SearchMode.FULL, function() {
+              this.start()
+                .hide(self.data.searchHidden$)
+                .add(self.cls.PREDICATE)
+              .end();
+            })
             .start()
               .style({ 'overflow-x': 'auto' })
               .start()
                 .addClass('actions')
                 .show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW))
-                .callIf(this.data.primaryAction, function() {
-                  this.start()
-                    .add(self.cls.getAxiomsByClass(foam.core.Action))
-                  .end();
-                })
-                .callIf(! this.data.primaryAction, function() {
-                  this.start()
-                    .add(self.cls.getAxiomsByClass(foam.core.Action).filter((action) => action.name !== 'create'))
-                  .end();
-                })
+                .start()
+                  .add(self.cls.getAxiomsByClass(foam.core.Action).filter((action) => {
+                    var rtn = true;
+                    if ( self.primaryAction ) {
+                      rtn = rtn && action.name !== 'create';
+                    }
+                    if ( self.data.searchMode !== self.SearchMode.FULL ) {
+                      rtn = rtn && action.name !== 'toggleFilters';
+                    }
+                    return rtn;
+                  }))
+                .end()
               .end()
               .start()
                 .style({ 'overflow-x': 'auto' })
