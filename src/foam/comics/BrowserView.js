@@ -50,12 +50,18 @@ foam.CLASS({
       name: 'customDAOController'
     },
     {
+      class: 'String',
+      name: 'createLabel',
+      documentation: 'Set this to override the create button label.'
+    },
+    {
       name: 'controller',
-      expression: function(data, title, subtitle, customDAOController) {
+      expression: function(data, title, subtitle, customDAOController, createLabel) {
         var config = { data: data };
 
         if ( title ) config.title = title;
         if ( subtitle ) config.subtitle = subtitle;
+        if ( createLabel ) config.createLabel = createLabel;
 
         if ( customDAOController ) {
           return this.__context__.lookup(customDAOController).create(config);

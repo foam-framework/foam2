@@ -49,6 +49,11 @@ foam.CLASS({
       fromJSON: function fromJSON(value, ctx, prop, json) {
         return value;
       }
+    },
+    {
+      class: 'String',
+      name: 'createLabel',
+      documentation: 'Set this to override the create button label.'
     }
   ],
 
@@ -68,6 +73,7 @@ foam.CLASS({
       if ( this.title ) view.title = this.title;
       if ( this.subtitle ) view.subtitle = this.subtitle;
       if ( this.customDAOController ) view.customDAOController = this.customDAOController;
+      if ( this.createLabel ) view.createLabel = this.createLabel;
 
       return view;
     }

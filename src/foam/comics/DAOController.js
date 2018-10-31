@@ -151,6 +151,10 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.core.Action',
       name: 'contextMenuActions'
+    },
+    {
+      class: 'String',
+      name: 'createLabel'
     }
   ],
 
