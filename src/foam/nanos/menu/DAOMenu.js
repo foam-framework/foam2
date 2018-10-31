@@ -43,10 +43,13 @@ foam.CLASS({
   methods: [
     function createView(X) {
       if ( ! X[this.daoKey] ) {
-        throw new Error("No DAO found for " + this.daoKey);
+        throw new Error('No DAO found for ' + this.daoKey);
       }
 
-      var view = { class: 'foam.comics.BrowserView', data: X[this.daoKey] };
+      var view = {
+        class: 'foam.comics.BrowserView',
+        data: X[this.daoKey]
+      };
 
       if ( this.summaryView ) view.summaryView = this.summaryView;
       if ( this.updateView ) view.updateView = this.updateView;
