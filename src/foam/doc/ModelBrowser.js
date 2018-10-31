@@ -84,43 +84,31 @@ foam.CLASS({
       var self = this;
       var E = foam.mlang.Expressions.create();
 
-      var objDAO= this.nSpecDAO
-                         .where(E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO$'))
-                         .orderBy(foam.nanos.boot.NSpec.ID)
-                         .private_.contextParent.private_.__context__;
-
-
-      /*var objService= this.nSpecDAO
-                         .where(E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'Service'))
-             .orderBy(foam.nanos.boot.NSpec.ID)
-                     .private_.contextParent.private_.__context__;*/
-
-
+      this.nSpecDAO.where(foam.mlang.Expressions.create().ENDS_WITH(foam.nanos.boot.NSpec.ID, "DAO")).select().then(function (s) { 
+       
+      var objDAO = s.array;
       var arrayDAO = [];
-      for (var key in objDAO) {
-        if ( key.endsWith('DAO$') ) {
-          arrayDAO.push(key.toLowerCase().substring(0,key.length-4));
-        }
+	    for (var key in objDAO) {
+        arrayDAO.push(objDAO[key].name.toLowerCase().substring(0,objDAO[key].name.length-3));
       }
 
-      this.start().addClass(this.myClass())
+      self.start().addClass(self.myClass())
         .start('h2').add('Model Browser').end()
-        // we use nSpecDAO to get all the DAOs
-        //.start().add(this.PRINT_PAGE).end()
-        .select(this.nSpecDAO, function(n) {
-          var model = self.parseClientModel(n);
-          if ( ! model ) return;
+        .start().add(this.PRINT_PAGE).end()
+        .select(self.nSpecDAO, function(model) {//nSpecDAO  modelDAO
+          var cls = self.parseClientModel(model);//foam.lookup(model.id);
+          if ( ! cls ) return;
           this.start().style({ 'font-size': '20px', 'margin-top': '20px' })
             //.add('Model ' + model)
-            .callIf( arrayDAO.includes(model.name.toLowerCase() ), function (){ this.add('Model ' + model.name + 'DAO') })
-            .callIf( ! arrayDAO.includes(model.name.toLowerCase() ), function (){ this.add('Model ' + model.name + 'model') })
+            .callIf( arrayDAO.includes(cls.name.toLowerCase() ), function (){ this.add('Model ' + cls.name + 'DAO') })
+		        .callIf( ! arrayDAO.includes(cls.name.toLowerCase() ), function (){ this.add('Model ' + cls.name + 'model') })
             .end();
-          if ( arrayDAO.includes(model.name.toLowerCase() ) )
-            this.tag(self.UMLDiagram.create({ data: model, modelBrowser: true }));
+          if ( arrayDAO.includes(cls.name.toLowerCase() ) )
+            this.tag(self.UMLDiagram.create({ data: cls, modelBrowser: true }));//,  conventionalUML: true,
           else
-            this.tag(self.UMLDiagram.create({ data: model, conventionalUML: false }));
-          this.tag(self.SimpleClassView.create({ data: model }));
-/*
+			      this.tag(self.UMLDiagram.create({ data: cls, conventionalUML: false }));//, 
+          this.tag(self.SimpleClassView.create({ data: cls }));
+          /*
         .start().add(this.PRINT_PAGE).end()
         .select(this.modelDAO, function(model) {
           var cls = foam.lookup(model.id);
@@ -130,9 +118,10 @@ foam.CLASS({
               end().
               start(self.UMLDiagram, { data: cls }).end().
               start(self.SimpleClassView, { data: cls }).end()
-*/
+          */
         })
       .end();
+      });
     },
 
     function parseClientModel(n) {
@@ -143,12 +132,5 @@ foam.CLASS({
   ],
 
   actions: [
-    /*{
-      name: 'printPage',
-      label: 'Print',
-      code: function() {
-        window.print();
-      }
-    }*/
   ]
 });
