@@ -169,7 +169,7 @@ foam.CLASS({
                 .start()
                   .add(self.cls.getAxiomsByClass(foam.core.Action).filter((action) => {
                     var rtn = true;
-                    if ( self.primaryAction ) {
+                    if ( ! self.primaryAction ) {
                       rtn = rtn && action.name !== 'create';
                     }
                     if ( self.data.searchMode !== self.SearchMode.FULL ) {
