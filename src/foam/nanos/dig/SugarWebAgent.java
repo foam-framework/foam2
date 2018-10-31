@@ -23,6 +23,7 @@ import java.nio.CharBuffer;
 import java.lang.Exception;
 import java.lang.reflect.*;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -127,7 +128,10 @@ public class SugarWebAgent
       }
 
     } catch (Exception e) {
-      logger.error(e);
+      DigErrorMessage error = new GeneralException.Builder(x)
+        .setMessage(e.toString())
+        .build();
+      outputException(x, null, "JSON", null, error);
 
       return;
     }
@@ -158,7 +162,7 @@ public class SugarWebAgent
       return;
     } catch (Exception e) {
       DigErrorMessage error = new GeneralException.Builder(x)
-        .setMessage("Exception: " + e.getMessage())
+        .setMessage("Exception: " + e.toString())
         .build();
       outputException(x, resp, "JSON", out, error);
 
@@ -167,6 +171,10 @@ public class SugarWebAgent
   }
 
   protected void outputException(X x, HttpServletResponse resp, String format, PrintWriter out, DigErrorMessage error) {
+    if ( resp == null ) resp = x.get(HttpServletResponse.class);
+
+    if ( out == null ) out = x.get(PrintWriter.class);
+
     resp.setStatus(Integer.parseInt(error.getStatus()));
     format = "JSON";  // Currently supporting only JSON
 
@@ -185,7 +193,7 @@ public class SugarWebAgent
     return;
   }
 
-  protected Object getFieldInfo(String className, HttpParameters p) {  // For Obj Parameters
+  protected Object getFieldInfo(X x, String className, HttpParameters p) {  // For Obj Parameters
     Class clsForObj = null;
     Object clsObj = null;
 
@@ -201,7 +209,7 @@ public class SugarWebAgent
       while (it.hasNext()) {
         PropertyInfo prop = (PropertyInfo) it.next();
 
-        for (int m = 0; m < fieldList.length; m++) {
+        for (int m = 0; m < fieldList.length; m++)
           if (fieldList[m].getName().equals(prop.getName().toUpperCase())) {
             fieldList[m].setAccessible(true);
             Field modifiersField = (Field.class).getDeclaredField("modifiers");
@@ -215,17 +223,15 @@ public class SugarWebAgent
                 prop.set(clsObj, p.getParameter(prop.getName()));
               }
 
-              try {
-                fieldList[m].set(clsObj, prop);
-              } catch (IllegalAccessException e) {
-                e.printStackTrace();
-              }
-            }
+              fieldList[m].set(clsObj, prop);
           }
         }
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      DigErrorMessage error = new GeneralException.Builder(x)
+        .setMessage(e.toString())
+        .build();
+      outputException(x, null, "JSON", null, error);
     }
 
     return clsObj;
@@ -252,7 +258,6 @@ public class SugarWebAgent
           arg = p.getParameter(pArray_.getName());
           break;
         case "String[]":
-          System.out.println("typeName");
           arg = p.getParameterValues(pArray_.getName());
           break;
         default:
@@ -268,10 +273,15 @@ public class SugarWebAgent
                 }
               }
             } else {
-              arg = getFieldInfo(typeName, p);  // For Object Parameter
+              arg = getFieldInfo(x, typeName, p);  // For Object Parameter
             }
-          } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+          } catch (Exception e) {
+            DigErrorMessage error = new GeneralException.Builder(x)
+              .setMessage(e.toString())
+              .build();
+            outputException(x, null, "JSON", null, error);
+
+
           }
       }
     }
