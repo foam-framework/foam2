@@ -150,7 +150,11 @@ foam.CLASS({
               .endContext();
             })
             .callIf(! this.data.primaryAction, function() {
-              this.start().add(self.cls.CREATE).end();
+              if ( self.data.createLabel ) {
+                this.tag(self.cls.CREATE, { label$: self.data.createLabel$ });
+              } else {
+                this.start().add(self.cls.CREATE).end();
+              }
             })
           .end()
           .start()
