@@ -51,6 +51,9 @@ foam.CLASS({
           `Showing ${format(selectedCount)} out of ${format(totalCount)} items` :
           `${format(totalCount)} ${word}`;
       }
+    },
+    {
+      name: 'searchManager'
     }
   ],
 
@@ -61,12 +64,12 @@ foam.CLASS({
       this.dao.on.sub(this.updateTotalCount);
       this.updateTotalCount();
 
-      var searchManager = self.SearchManager.create({
-        dao$: self.dao$,
-        predicate$: self.data$
+      this.searchManager = self.SearchManager.create({
+        dao: this.dao,
+        predicate$: this.data$
       });
-      searchManager.filteredDAO$.sub(self.updateSelectedCount);
-      self.updateSelectedCount(0, 0, 0, searchManager.filteredDAO$);
+      this.searchManager.filteredDAO$.sub(self.updateSelectedCount);
+      self.updateSelectedCount(0, 0, 0, this.searchManager.filteredDAO$);
 
       var generalQueryView = foam.u2.ViewSpec.createView(
         { class: 'foam.u2.search.TextSearchView' },
@@ -79,7 +82,7 @@ foam.CLASS({
         this.__subSubContext__
       );
 
-      searchManager.add(generalQueryView);
+      this.searchManager.add(generalQueryView);
 
       this
         .addClass(this.myClass())
@@ -100,6 +103,7 @@ foam.CLASS({
         this.dao.select(foam.mlang.sink.Count.create()).then(function(c) {
           this.totalCount = c.value;
         }.bind(this));
+        this.updateSelectedCount(0, 0, 0, this.searchManager.filteredDAO$);
       }
     },
     {
