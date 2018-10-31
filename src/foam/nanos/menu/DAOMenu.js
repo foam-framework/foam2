@@ -18,6 +18,10 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'customDAOController'
+    },
+    {
+      class: 'String',
       name: 'title'
     },
     {
@@ -50,7 +54,7 @@ foam.CLASS({
 
   methods: [
     function createView(X) {
-      if ( ! X[this.daoKey] ) {
+      if ( ! this.customDAOController && ! X[this.daoKey] ) {
         throw new Error('No DAO found for ' + this.daoKey);
       }
 
@@ -63,6 +67,7 @@ foam.CLASS({
       if ( this.updateView ) view.updateView = this.updateView;
       if ( this.title ) view.title = this.title;
       if ( this.subtitle ) view.subtitle = this.subtitle;
+      if ( this.customDAOController ) view.customDAOController = this.customDAOController;
 
       return view;
     }
