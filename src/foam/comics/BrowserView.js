@@ -46,14 +46,21 @@ foam.CLASS({
       name: 'subtitle'
     },
     {
+      class: 'String',
+      name: 'customDAOController'
+    },
+    {
       name: 'controller',
-      expression: function(data, title, subtitle) {
-        var obj = { data: data };
+      expression: function(data, title, subtitle, customDAOController) {
+        var config = { data: data };
 
-        if ( title ) obj.title = title;
-        if ( subtitle ) obj.subtitle = subtitle;
+        if ( title ) config.title = title;
+        if ( subtitle ) config.subtitle = subtitle;
 
-        return this.DAOController.create(obj);
+        if ( customDAOController ) {
+          return this.__context__.lookup(customDAOController).create(config);
+        }
+        return this.DAOController.create(config);
       }
     },
     {

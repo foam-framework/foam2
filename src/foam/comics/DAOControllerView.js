@@ -133,9 +133,16 @@ foam.CLASS({
               .end()
               .add(this.data.subtitle$)
             .end()
-            .start()
-              .add(self.cls.CREATE) // TODO: Primary action
-            .end()
+            .callIf(this.data.primaryAction, function() {
+              this.startContext({ data: self })
+                .start()
+                  .add(self.data.primaryAction)
+                .end()
+              .endContext();
+            })
+            .callIf(! this.data.primaryAction, function() {
+              this.start().add(self.cls.CREATE).end();
+            })
           .end()
           .start()
             .addClass(this.myClass('container'))
@@ -149,9 +156,16 @@ foam.CLASS({
               .start()
                 .addClass('actions')
                 .show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW))
-                .start()
-                  .add(self.cls.getAxiomsByClass(foam.core.Action))
-                .end()
+                .callIf(this.data.primaryAction, function() {
+                  this.start()
+                    .add(self.cls.getAxiomsByClass(foam.core.Action))
+                  .end();
+                })
+                .callIf(! this.data.primaryAction, function() {
+                  this.start()
+                    .add(self.cls.getAxiomsByClass(foam.core.Action).filter((action) => action.name !== 'create'))
+                  .end();
+                })
               .end()
               .start()
                 .style({ 'overflow-x': 'auto' })

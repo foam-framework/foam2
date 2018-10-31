@@ -121,6 +121,15 @@ foam.CLASS({
     {
       class: 'String',
       name: 'subtitle'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.core.Action',
+      name: 'primaryAction',
+      documentation: `
+        The most important action on the page. The view for this controller may
+        choose to display this action prominantly.
+      `
     }
   ],
 
