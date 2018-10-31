@@ -31,53 +31,9 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
-  name: 'Tabs',
+  name: 'UnstyledTabs',
   extends: 'foam.u2.Element',
-
   requires: [ 'foam.u2.Tab' ],
-
-  css: `
-    ^ {
-      background: gray;
-      display: block;
-      height: 200px;
-      padding: 10px 4px;
-      width: 600px;
-      // width: 100%;
-    }
-    ^tabRow { height: 38px; }
-    ^tab {
-      background: lightgray;
-      border: 1px solid black;
-      border-radius: 3px 3px 0 0;
-      display: inline-block;
-      height: 12px;
-      padding: 8px;
-    }
-    ^tab.selected {
-      background: white;
-      position: relative;
-      z-index: 1;
-    }
-    ^bottomEdge {
-      background: white;
-      height: 2.5px;
-      left: 0;
-      position: absolute;
-      top: 27px;
-      width: 100%;
-    }
-    ^content {
-      margin: 4px;
-      padding: 6px;
-      background: white;
-      border: 1px solid black;
-      position: relative;
-      top: -13px;
-      left: -4px;
-    }
-  `,
-
   properties: [
     /* not used
     {
@@ -125,4 +81,51 @@ foam.CLASS({
       this.SUPER(tab);
     }
   ]
+});
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'Tabs',
+  extends: 'foam.u2.UnstyledTabs',
+  css: `
+    ^ {
+      background: gray;
+      display: block;
+      height: 200px;
+      padding: 10px 4px;
+      width: 600px;
+      // width: 100%;
+    }
+    ^tabRow { height: 38px; }
+    ^tab {
+      background: lightgray;
+      border: 1px solid black;
+      border-radius: 3px 3px 0 0;
+      display: inline-block;
+      height: 12px;
+      padding: 8px;
+    }
+    ^tab.selected {
+      background: white;
+      position: relative;
+      z-index: 1;
+    }
+    ^bottomEdge {
+      background: white;
+      height: 2.5px;
+      left: 0;
+      position: absolute;
+      top: 27px;
+      width: 100%;
+    }
+    ^content {
+      margin: 4px;
+      padding: 6px;
+      background: white;
+      border: 1px solid black;
+      position: relative;
+      top: -13px;
+      left: -4px;
+    }
+  `,
 });
