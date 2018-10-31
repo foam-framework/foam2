@@ -17,6 +17,14 @@ foam.CLASS({
       name: 'daoKey'
     },
     {
+      class: 'String',
+      name: 'title'
+    },
+    {
+      class: 'String',
+      name: 'subtitle'
+    },
+    {
       class: 'foam.u2.ViewSpec',
       name: 'summaryView',
       javaType: 'foam.lib.json.UnknownFObject',
@@ -53,6 +61,9 @@ foam.CLASS({
 
       if ( this.summaryView ) view.summaryView = this.summaryView;
       if ( this.updateView ) view.updateView = this.updateView;
+      if ( this.title ) view.title = this.title;
+      if ( this.subtitle ) view.subtitle = this.subtitle;
+
       return view;
     }
   ]

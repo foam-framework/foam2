@@ -36,15 +36,30 @@ foam.CLASS({
       width: fit-content;
       max-width: 100vw;
       margin: auto;
+    }
+
+    ^top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 10px;
+    }
+
+    ^title-container > * {
+      display: inline-block;
+      margin: 0.67rem 0;
+    }
+
+    ^title-container > * + * {
+      margin-left: 1rem;
+    }
+
+    ^container {
       display: flex;
     }
 
-    ^ > * {
+    ^container > * + * {
       margin-left: 10px;
-    }
-
-    ^ > *:last-child {
-      margin-right: 10px;
     }
 
     ^ .actions {
@@ -91,17 +106,6 @@ foam.CLASS({
             this.importedUpdateView :
             { class: 'foam.comics.DAOUpdateControllerView' };
       }
-    },
-    {
-      class: 'String',
-      name: 'title',
-      expression: function(data$data$of) {
-        return 'Browse ' + data$data$of.name;
-      }
-    },
-    {
-      class: 'String',
-      name: 'subtitle'
     }
   ],
 
@@ -121,20 +125,38 @@ foam.CLASS({
         this.E()
           .addClass(this.myClass())
           .start()
-            .hide(self.data.searchHidden$)
-            .show(self.data.filtersEnabled$)
-            .add(self.cls.PREDICATE)
+            .addClass(this.myClass('top-row'))
+            .start()
+              .addClass(this.myClass('title-container'))
+              .start('h1')
+                .add(this.data.title$)
+              .end()
+              .add(this.data.subtitle$)
+            .end()
+            .start()
+              .add(self.cls.CREATE) // TODO: Primary action
+            .end()
           .end()
           .start()
-            .style({ 'overflow-x': 'auto' })
+            .addClass(this.myClass('container'))
             .start()
-              .addClass('actions')
-              .show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW))
-                .start().add(self.cls.getAxiomsByClass(foam.core.Action)).end()
+              .hide(self.data.searchHidden$)
+              .show(self.data.filtersEnabled$)
+              .add(self.cls.PREDICATE)
             .end()
             .start()
               .style({ 'overflow-x': 'auto' })
-              .tag(this.summaryView, { data$: this.data.filteredDAO$ })
+              .start()
+                .addClass('actions')
+                .show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW))
+                .start()
+                  .add(self.cls.getAxiomsByClass(foam.core.Action))
+                .end()
+              .end()
+              .start()
+                .style({ 'overflow-x': 'auto' })
+                .tag(this.summaryView, { data$: this.data.filteredDAO$ })
+              .end()
             .end()
           .end());
 

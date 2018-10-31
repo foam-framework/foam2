@@ -110,6 +110,17 @@ foam.CLASS({
         filters. You should set the search columns on the model itself and only
         set this property when you want to override the ones set on the model.
       `
+    },
+    {
+      class: 'String',
+      name: 'title',
+      expression: function(data$data$of) {
+        return 'Browse ' + data$data$of.name;
+      }
+    },
+    {
+      class: 'String',
+      name: 'subtitle'
     }
   ],
 

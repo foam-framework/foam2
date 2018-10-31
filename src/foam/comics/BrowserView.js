@@ -42,9 +42,18 @@ foam.CLASS({
       }
     },
     {
+      class: 'String',
+      name: 'subtitle'
+    },
+    {
       name: 'controller',
-      expression: function(data) {
-        return this.DAOController.create({ data: data });
+      expression: function(data, title, subtitle) {
+        var obj = { data: data };
+
+        if ( title ) obj.title = title;
+        if ( subtitle ) obj.subtitle = subtitle;
+
+        return this.DAOController.create(obj);
       }
     },
     {
