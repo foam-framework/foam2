@@ -1674,6 +1674,12 @@ foam.CLASS({
       return this;
     },
 
+    function callIfElse(bool, iff, elsef, args) {
+      (bool ? iff : elsef).apply(this, args);
+
+      return this;
+    },
+
     /**
      * Call the given function on each element in the array. In the function,
      * `this` will refer to the element.
@@ -1783,7 +1789,7 @@ foam.CLASS({
     function addClass_(oldClass, newClass) {
       /* Replace oldClass with newClass. Called by cls(). */
       if ( oldClass === newClass ) return;
-      this.removeClass(oldClass);
+      if ( oldClass ) this.removeClass(oldClass);
       if ( newClass ) {
         if ( ! this.CSS_CLASSNAME_PATTERN.test(newClass) ) {
           console.log('!!!!!!!!!!!!!!!!!!! Invalid CSS ClassName: ', newClass);
