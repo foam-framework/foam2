@@ -1674,6 +1674,12 @@ foam.CLASS({
       return this;
     },
 
+    function callIfElse(bool, iff, elsef, args) {
+      (bool ? iff : elsef).apply(this, args);
+
+      return this;
+    },
+
     /**
      * Call the given function on each element in the array. In the function,
      * `this` will refer to the element.
