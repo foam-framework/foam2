@@ -488,8 +488,6 @@ FOAM_FILES([
   { name: "foam/net/auth/TokenBearerHTTPRequest" },
   { name: "foam/net/auth/AuthAgent" },
   { name: "foam/doc/ClassLink", flags: ['debug', 'web'] },
-  { name: "foam/doc/CodeTab", flags: ['debug', 'web'] },
-  { name: "foam/doc/CodeTabs", flags: ['debug', 'web'] },
   { name: "foam/doc/DocBrowser", flags: ['debug', 'web'] },
   { name: "com/google/net/node/Google2LOAuthAgent", flags: ['node', 'gcloud'] },
   { name: "com/google/cloud/datastore/types", flags: ['gcloud'] },

@@ -1,7 +1,14 @@
-foam.CLASS({
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+ foam.CLASS({
   package: 'foam.doc',
   name: 'DigDeleteView',
   extends: 'foam.u2.View',
+  documentation: 'View used to show snippets of deletion API calls.',
   implements: [
     'foam.mlang.Expressions',
   ],
@@ -11,13 +18,12 @@ foam.CLASS({
   ],
   requires: [
     'foam.doc.CodeTabs',
-    'foam.u2.Tab',
     'foam.doc.dao.AxiomDAO',
     'foam.doc.PropertyAxiom',
-    'foam.doc.CodeTab',
     'foam.flow.PromiseSlot',
-    'foam.u2.DetailView',
     'foam.nanos.dig.DIG',
+    'foam.u2.DetailView',
+    'foam.u2.Tab',
   ],
   properties: [
     {
@@ -56,7 +62,8 @@ foam.CLASS({
             this.
               start(self.CodeTabs).
                 start(self.Tab, { label: 'CURL' }).
-                  start('code').
+                  start('pre').
+                    addClass('code').
                     add(dig.slot(function(digURL) {
                       return `
 curl -X GET \\
@@ -70,7 +77,8 @@ curl -X GET \\
                   end().
                 end().
                 start(self.Tab, { label: 'Node' }).
-                  start('code').
+                  start('pre').
+                    addClass('code').
                     add(dig.slot(function(digURL) {
                       var u = new URL(url);
                       var protocol = u.protocol.slice(0, -1)
@@ -104,7 +112,7 @@ var req = ${protocol}.request({
 
 req.write('');
 req.end();
-                      `.trim();
+                        `.trim();
                     })).
                   end().
                 end().
@@ -112,7 +120,8 @@ req.end();
                   add(this.slot(function(digURL) {
                     var u = url.replace(/\/$/,'') + digURL;
                     return this.E().
-                      start('code').
+                      start('pre').
+                        addClass('code').
                         start('a').
                           add(u).
                           attrs({

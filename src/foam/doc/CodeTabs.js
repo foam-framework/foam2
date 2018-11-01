@@ -1,7 +1,14 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.doc',
   name: 'CodeTabs',
   extends: 'foam.u2.UnstyledTabs',
+  documentation: 'Multiple code tabs.',
   css: `
     ^ {
       background: gray;
