@@ -584,6 +584,7 @@ foam.CLASS({
   `,
 
   requires: [
+    'foam.core.PromiseSlot',
     'foam.dao.MergedResetSink',
     'foam.u2.AttrSlot',
     'foam.u2.Entity',
@@ -1508,6 +1509,8 @@ foam.CLASS({
             e = this.slotE_(e);
           }
           es.push(e);
+        } else if ( c.then ) {
+          this.add(this.PromiseSlot.create({ promise: c }));
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
         } else if ( foam.core.Slot.isInstance(c) ) {

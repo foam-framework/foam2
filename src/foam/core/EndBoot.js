@@ -81,7 +81,14 @@ foam.CLASS({
         if ( o.class ) return this.lookup(o.class).create(o, this);
         return foam.lookup(prop.of).create(o);
       }
-    }
+    },
+    {
+      class: 'String',
+      name: 'plural',
+      expression: function(name) {
+        return foam.String.pluralize(name);
+      }
+    },
   ]
 });
 
