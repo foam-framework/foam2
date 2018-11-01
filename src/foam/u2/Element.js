@@ -1950,7 +1950,7 @@ foam.CLASS({
       }
 
       out('>');
-    },
+    }
   ],
 
   listeners: [
