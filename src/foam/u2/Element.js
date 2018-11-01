@@ -1509,6 +1509,8 @@ foam.CLASS({
             e = this.slotE_(e);
           }
           es.push(e);
+        } else if ( c.then ) {
+          this.add(this.PromiseSlot.create({ promise: c }));
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
         } else if ( foam.core.Slot.isInstance(c) ) {
@@ -1948,11 +1950,6 @@ foam.CLASS({
       }
 
       out('>');
-    },
-
-    function promise(promise, func) {
-      var slot = this.PromiseSlot.create({ promise: promise });
-      this.add(this.slot(func, slot));
     },
   ],
 

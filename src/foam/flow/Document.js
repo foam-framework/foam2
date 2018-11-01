@@ -349,8 +349,9 @@ foam.CLASS({
               className ? x.classloader.load(className) : Promise.resolve(),
             ])
 
-            this.promise(promise, function(o) {
-              return this.E().
+            var self = this;
+            this.add(promise.then(function(o) {
+              return self.E().
                 callIf(o, function() {
                   var cls = x.lookup(className, true);
                   var view = x.lookup(viewName, true);
@@ -367,7 +368,7 @@ foam.CLASS({
                   if ( ! viewName ) this.add(obj)
                   else this.tag(view, { data: obj });
                 });
-            })
+            }))
 
           };
         },
