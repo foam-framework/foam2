@@ -12,11 +12,6 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'cssClass',
-      value: 'foam-flow-Document',
-    },
-    {
-      class: 'String',
       name: 'markup',
       view: { class: 'foam.flow.MarkupEditor' }
     }
@@ -141,7 +136,7 @@ foam.CLASS({
           return function(x) {
             return x.
               E('article').
-              cssClass(self.cssClass$).
+              cssClass('foam-flow-Document').
               call(children, [x]);
           };
         },
