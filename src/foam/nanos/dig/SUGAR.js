@@ -59,37 +59,36 @@ foam.CLASS({
           this.currentMethod = "";
 
           return;
-        } else {
-          var of = this.lookup(service.cls_.getAxiomByName('delegate').of);
+        }
+        var of = this.lookup(service.cls_.getAxiomByName('delegate').of);
 
-          if ( ! of ) return;
+        if ( ! of ) return;
 
-          this.interfaceName = of.id.toString();
-          var methods = of.getOwnAxiomsByClass(foam.core.Method);
-          //var methodName = methods.map(function(m) { return m.name; }).sort();
+        this.interfaceName = of.id.toString();
+        var methods = of.getOwnAxiomsByClass(foam.core.Method);
+        //var methodName = methods.map(function(m) { return m.name; }).sort();
 
-          var filteredMethod =
-            methods.filter(function(fm) {
-              for ( var j = 0 ; j < fm.args.length ; j++ ) {
-                 if ( fm.args[j].javaType.toString() == "foam.core.X" ) {
-                    return false;
-                 }
-                 return true;
+        var filteredMethod =
+          methods.filter(function(fm) {
+            for ( var j = 0 ; j < fm.args.length ; j++ ) {
+               if ( fm.args[j].javaType.toString() == "foam.core.X" ) {
+                  return false;
                }
-               //return true;
-            }).map(function(m) { return m.name; }).sort();
+               return true;
+             }
+             //return true;
+          }).map(function(m) { return m.name; }).sort();
 
-          if ( filteredMethod.length > 0 ) {
-              methods.find((item) => {
-                if ( item.name == filteredMethod[0] ) {
-                  this.currentMethod = item.name;
-                  this.argumentInfo = item.args;
-                }
-              });
-          } else { // if the service doesn't have a filtered method, the following should be empty
-            this.argumentInfo = null;
-            this.currentMethod = "";
-          }
+        if ( filteredMethod.length > 0 ) {
+            methods.find((item) => {
+              if ( item.name == filteredMethod[0] ) {
+                this.currentMethod = item.name;
+                this.argumentInfo = item.args;
+              }
+            });
+        } else { // if the service doesn't have a filtered method, the following should be empty
+          this.argumentInfo = null;
+          this.currentMethod = "";
         }
       }
     },
