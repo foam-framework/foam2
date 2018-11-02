@@ -83,6 +83,10 @@ public class Outputter
     stringWriter_.getBuffer().setLength(0);
   }
 
+  public void setWriter(PrintWriter writer) {
+    writer_ = writer;
+  }
+
   protected void outputUndefined() {
   }
 

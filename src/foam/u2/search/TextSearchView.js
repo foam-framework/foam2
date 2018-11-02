@@ -91,6 +91,11 @@ foam.CLASS({
       // This defaults to 'query'.
       name: 'name',
       value: 'query'
+    },
+    {
+      class: 'Boolean',
+      name: 'onKey',
+      value: false
     }
   ],
 
@@ -98,7 +103,11 @@ foam.CLASS({
     function initE() {
       this
         .addClass(this.myClass())
-        .tag(this.viewSpec, { alwaysFloatLabel: true, label$: this.label$ }, this.view$);
+        .tag(this.viewSpec, {
+          alwaysFloatLabel: true,
+          label$: this.label$,
+          onKey: this.onKey
+        }, this.view$);
 
       this.view.data$.sub(this.updateValue);
     },

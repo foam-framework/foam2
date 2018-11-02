@@ -14,6 +14,10 @@ foam.CLASS({
       value: 'documentDAO'
     },
     {
+      class: 'String',
+      name: 'anchor'
+    },
+    {
       name: 'data'
     },
     'error'
