@@ -303,6 +303,8 @@ var classes = [
   'foam.flow.Document',
   'foam.flow.DocumentationFolderDAO',
 
+  'foam.comics.SearchMode',
+
   //Support Files
   'foam.support.model.TicketMessage',
   'foam.support.model.SupportEmail',
