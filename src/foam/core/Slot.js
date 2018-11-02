@@ -326,7 +326,7 @@ foam.CLASS({
       // because a new class will have different sub-slots.
       if ( ( ! this.of  ) && o ) this.of = o.cls_;
 
-      this.prevSub = o && o.slot(this.name).sub(this.valueChange);
+      this.prevSub = o && o.slot && o.slot(this.name).sub(this.valueChange);
       this.valueChange();
     },
 
