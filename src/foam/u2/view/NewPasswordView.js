@@ -29,10 +29,6 @@ foam.CLASS({
       display: inline-block;
     }
 
-    ^ .sme-inputContainer{
-      margin-bottom: 2%;
-    }
-
     ^ .strength {
       border-radius: 2px;
       height: 4px;      
@@ -88,7 +84,7 @@ foam.CLASS({
     ^ .text3 {
       color: #d2bb41
     }
-    
+
     ^ .text4 {
       color: #36a52b      
     }
