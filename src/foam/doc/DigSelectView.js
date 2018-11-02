@@ -18,25 +18,10 @@ foam.CLASS({
   ],
   requires: [
     'foam.doc.CodeTabs',
-    'foam.doc.dao.AxiomDAO',
-    'foam.doc.PropertyAxiom',
-    'foam.flow.PromiseSlot',
     'foam.nanos.dig.DIG',
-    'foam.u2.DetailView',
     'foam.u2.Tab',
   ],
   properties: [
-    {
-      class: 'StringArray',
-      name: 'digProperties',
-      factory: function() {
-        return [
-          'daoKey',
-          'format',
-          'q',
-        ];
-      },
-    },
     {
       name: 'url',
       expression: function(appConfig) {
@@ -44,17 +29,14 @@ foam.CLASS({
       }
     },
     {
-      name: 'samplequery',
-      experssion: function(appConfig) {
-        if ( appConfig ) return appConfig.q;
-      }
+      name: 'samplequery'
     }
   ],
   methods: [
     function initE() {
       var self = this;
       this.
-      add(this.slot(function(data, samplequery, url, user, digProperties) {
+      add(this.slot(function(data, samplequery, url, user) {
         var dig = self.DIG.create({
           daoKey: data,
           cmd: 'SELECT',
@@ -72,7 +54,7 @@ foam.CLASS({
 curl -X GET \\
   '${url.replace(/\/$/,'') + digURL}' \\
   -u '${user.email}' \\
-  -H 'accept: application/json' \\
+  -H 'accept: application/json1' \\
   -H 'cache-control: no-cache' \\
   -H 'content-type: application/json'
                     `.trim();
