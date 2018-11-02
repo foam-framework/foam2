@@ -401,6 +401,7 @@ FOAM_FILES([
   { name: "foam/u2/ReadWriteView", flags: ['web'] },
   { name: "foam/u2/HTMLElement", flags: ['web'] },
   { name: "foam/u2/tag/Select", flags: ['web'] },
+  { name: "foam/u2/UnstyledTabs", flags: ['web'] },
   { name: "foam/u2/Tabs", flags: ['web'] },
   { name: "foam/u2/TimeView", flags: ['web'] },
   { name: "foam/u2/history/HistoryItemView", flags: ['web'] },
