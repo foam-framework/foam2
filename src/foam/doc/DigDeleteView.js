@@ -18,25 +18,10 @@
   ],
   requires: [
     'foam.doc.CodeTabs',
-    'foam.doc.dao.AxiomDAO',
-    'foam.doc.PropertyAxiom',
-    'foam.flow.PromiseSlot',
     'foam.nanos.dig.DIG',
-    'foam.u2.DetailView',
     'foam.u2.Tab',
   ],
   properties: [
-    {
-      class: 'StringArray',
-      name: 'digProperties',
-      factory: function() {
-        return [
-          'daoKey',
-          'format',
-          'key',
-        ];
-      },
-    },
     {
       name: 'url',
       expression: function(appConfig) {
@@ -51,7 +36,7 @@
     function initE() {
       var self = this;
       this.
-      add(this.slot(function(data, url, samplekey, user, digProperties) {
+      add(this.slot(function(data, url, samplekey, user) {
         var dig = self.DIG.create({
           daoKey: data,
           cmd: 'REMOVE',
