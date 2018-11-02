@@ -9,9 +9,6 @@
   name: 'DigDeleteView',
   extends: 'foam.u2.View',
   documentation: 'View used to show snippets of deletion API calls.',
-  implements: [
-    'foam.mlang.Expressions',
-  ],
   imports: [
     'appConfig',
     'user',

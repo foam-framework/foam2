@@ -9,9 +9,6 @@ foam.CLASS({
   name: 'DigPutView',
   extends: 'foam.u2.View',
   documentation: 'View used to show snippets of put API calls for create and update.',
-  implements: [
-    'foam.mlang.Expressions',
-  ],
   imports: [
     'appConfig',
     'user',
