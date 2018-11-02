@@ -9,9 +9,6 @@ foam.CLASS({
   name: 'DigSelectView',
   extends: 'foam.u2.View',
   documentation: 'View used to show snippets of select API calls.',
-  implements: [
-    'foam.mlang.Expressions',
-  ],
   imports: [
     'appConfig',
     'user',
