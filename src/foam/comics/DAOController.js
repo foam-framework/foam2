@@ -144,7 +144,7 @@ foam.CLASS({
       name: 'primaryAction',
       documentation: `
         The most important action on the page. The view for this controller may
-        choose to display this action prominantly.
+        choose to display this action prominently.
       `
     },
     {
