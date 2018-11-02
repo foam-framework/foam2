@@ -66,16 +66,15 @@ foam.CLASS({
       width: 50%;
       background-color: #f38d2f
     }
+
     ^ ._3 {
       width: 80%;
       background-color: #d2bb41
     }
+
     ^ ._4 {
       width: 100%;
       background-color: #36a52b      
-    }
-    ^ ._0 {
-      color: #000000
     }
 
     ^ .text1 {
@@ -85,9 +84,11 @@ foam.CLASS({
     ^ .text2 {
       color: #f38d2f
     }
+
     ^ .text3 {
       color: #d2bb41
     }
+    
     ^ .text4 {
       color: #36a52b      
     }
