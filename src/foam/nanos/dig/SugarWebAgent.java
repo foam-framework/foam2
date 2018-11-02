@@ -6,7 +6,6 @@
 
 package foam.nanos.dig;
 
-import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.lib.json.JSONParser;
@@ -19,11 +18,10 @@ import foam.util.SafetyUtil;
 import foam.nanos.http.WebAgent;
 
 import java.io.*;
-import java.nio.CharBuffer;
 import java.lang.Exception;
 import java.lang.reflect.*;
+import java.nio.CharBuffer;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -48,8 +46,6 @@ public class SugarWebAgent
           .setMessage("Empty Service Key")
           .build();
         outputException(x, resp, "JSON", out, error);
-
-        return;
       }
 
       if ( SafetyUtil.isEmpty(methodName) ) {
@@ -57,8 +53,6 @@ public class SugarWebAgent
           .setMessage("Empty Method Name")
           .build();
         outputException(x, resp, "JSON", out, error);
-
-        return;
       }
 
       Class class_ = null;
@@ -69,8 +63,6 @@ public class SugarWebAgent
             .setMessage("Can not find out service interface")
             .build();
           outputException(x, resp, "JSON", out, error);
-
-          return;
       }
 
       Class[] paramTypes = null; // for picked Method's parameters' types
@@ -97,8 +89,6 @@ public class SugarWebAgent
                   .setMessage("IllegalArgumentException : Add a compiler argument")
                   .build();
                 outputException(x, resp, "JSON", out, error);
-
-                return;
               }
 
               paramTypes[j] = pArray[j].getType();
@@ -118,8 +108,6 @@ public class SugarWebAgent
                   .setMessage("Empty Parameter values : " + pArray[j].getName())
                   .build();
                 outputException(x, resp, "JSON", out, error);
-
-                return;
               }
             }
             executeMethod(x, resp, out, class_, serviceName, methodName, paramTypes, arglist);
@@ -132,8 +120,6 @@ public class SugarWebAgent
         .setMessage(e.toString())
         .build();
       outputException(x, null, "JSON", null, error);
-
-      return;
     }
   }
 
@@ -158,15 +144,11 @@ public class SugarWebAgent
         .setMessage("InvocationTargetException: " + e.getTargetException().getMessage())
         .build();
       outputException(x, resp, "JSON", out, error);
-
-      return;
     } catch (Exception e) {
       DigErrorMessage error = new GeneralException.Builder(x)
         .setMessage("Exception: " + e.toString())
         .build();
       outputException(x, resp, "JSON", out, error);
-
-      return;
     }
   }
 
