@@ -38,7 +38,7 @@ foam.CLASS({
     {
       name: 'title',
       expression: function(data$of) {
-        return 'Browse ' + data$of.name;
+        return 'Browse ' + data$of.model_.plural;
       }
     },
     {
