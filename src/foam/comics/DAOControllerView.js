@@ -111,9 +111,9 @@ foam.CLASS({
     {
       name: 'updateView',
       expression: function() {
-        return this.importedUpdateView ?
-            this.importedUpdateView :
-            { class: 'foam.comics.DAOUpdateControllerView' };
+        return this.importedUpdateView || {
+          class: 'foam.comics.DAOUpdateControllerView'
+        };
       }
     }
   ],
@@ -142,14 +142,13 @@ foam.CLASS({
               .end()
               .add(this.data.subtitle$)
             .end()
-            .callIf(this.data.primaryAction, function() {
+            .callIfElse(this.data.primaryAction, function() {
               this.startContext({ data: self })
                 .start()
                   .add(self.data.primaryAction)
                 .end()
               .endContext();
-            })
-            .callIf(! this.data.primaryAction, function() {
+            }, function() {
               if ( self.data.createLabel ) {
                 this.tag(self.cls.CREATE, { label$: self.data.createLabel$ });
               } else {
