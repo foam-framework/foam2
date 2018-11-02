@@ -30,23 +30,6 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'data',
-      postSet: function(old, nu) {
-        if ( nu && nu.cls_ !== this.of ) this.of = nu.cls_;
-      }
-    },
-    {
-      name: 'of'
-    },
-    {
-      name: 'properties',
-      expression: function(of) {
-        return of.getAxiomsByClass(foam.core.Property).filter(function(p) {
-          return ! p.hidden;
-        });
-      }
-    },
-    {
       name: 'title',
       expression: function(of) {
         return of.model_.label;
