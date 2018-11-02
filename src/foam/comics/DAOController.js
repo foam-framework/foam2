@@ -119,7 +119,7 @@ foam.CLASS({
       class: 'String',
       name: 'title',
       expression: function(data$data$of) {
-        return 'Browse ' + data$data$of.name;
+        return 'Browse ' + data$data$of.model_.plural;
       }
     },
     {

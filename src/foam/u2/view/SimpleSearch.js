@@ -42,13 +42,14 @@ foam.CLASS({
       class: 'String',
       name: 'countText',
       expression: function(selectedCount, totalCount) {
-        // TODO: Support terms specific to the model.
-        var word = totalCount === 1 ? 'item' : 'items';
+        var singular = this.dao.of.name.toLowerCase();
+        var plural = this.dao.of.model_.plural.toLowerCase();
+        var word = totalCount === 1 ? singular : plural;
         var format = (int) => int
           .toString()
           .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         return selectedCount !== totalCount ?
-          `Showing ${format(selectedCount)} out of ${format(totalCount)} items` :
+          `Showing ${format(selectedCount)} out of ${format(totalCount)} ${plural}` :
           `${format(totalCount)} ${word}`;
       }
     },
