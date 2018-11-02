@@ -55,13 +55,66 @@ foam.CLASS({
       documentation: 'Set this to override the create button label.'
     },
     {
+      class: 'Enum',
+      of: 'foam.comics.SearchMode',
+      name: 'searchMode',
+      documentation: `
+        The level of search capabilities that the controller should have.
+      `
+    },
+    {
+      class: 'Boolean',
+      name: 'createEnabled',
+      documentation: 'True to enable the create button.'
+    },
+    {
+      class: 'Boolean',
+      name: 'editEnabled',
+      documentation: 'True to enable the edit button.'
+    },
+    {
+      class: 'Boolean',
+      name: 'selectEnabled',
+      documentation: 'True to enable the select button.'
+    },
+    {
+      class: 'Boolean',
+      name: 'addEnabled',
+      documentation: `
+        True to enable the Add button for adding to a relationship.
+      `
+    },
+    {
+      class: 'Boolean',
+      name: 'exportEnabled',
+      documentation: 'True to enable the export button.'
+    },
+    {
       name: 'controller',
-      expression: function(data, title, subtitle, customDAOController, createLabel) {
+      expression: function(
+        data,
+        title,
+        subtitle,
+        customDAOController,
+        createLabel,
+        searchMode,
+        createEnabled,
+        editEnabled,
+        selectEnabled,
+        addEnabled,
+        exportEnabled
+      ) {
         var config = { data: data };
 
         if ( title ) config.title = title;
         if ( subtitle ) config.subtitle = subtitle;
         if ( createLabel ) config.createLabel = createLabel;
+        if ( searchMode ) config.searchMode = searchMode;
+        config.createEnabled = createEnabled;
+        config.editEnabled = editEnabled;
+        config.selectEnabled = selectEnabled;
+        config.addEnabled = addEnabled;
+        config.exportEnabled = exportEnabled;
 
         if ( customDAOController ) {
           return this.__context__.lookup(customDAOController).create(config);
