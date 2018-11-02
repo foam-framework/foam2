@@ -105,18 +105,6 @@ foam.CLASS({
       `,
       factory: function() {
         return this.SearchMode.FULL;
-      },
-      postSet: function(oldValue, newValue) {
-        switch ( newValue ) {
-          case this.SearchMode.FULL:
-            this.PREDICATE.view = { class: 'foam.u2.view.ReciprocalSearch' };
-            break;
-          case this.SearchMode.SIMPLE:
-            this.PREDICATE.view = { class: 'foam.u2.view.SimpleSearch' };
-            break;
-          default:
-            break;
-        }
       }
     },
     {

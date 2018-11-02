@@ -161,7 +161,9 @@ foam.CLASS({
             .callIf(this.data.searchMode === this.SearchMode.FULL, function() {
               this.start()
                 .hide(self.data.searchHidden$)
-                .add(self.cls.PREDICATE)
+                .add(self.cls.PREDICATE.clone().copyFrom({
+                  view: { class: 'foam.u2.view.ReciprocalSearch' }
+                }))
               .end();
             })
             .start()
@@ -183,7 +185,9 @@ foam.CLASS({
                 .end()
               .end()
               .callIf(this.data.searchMode === this.SearchMode.SIMPLE, function() {
-                this.start().add(self.cls.PREDICATE).end();
+                this.start().add(self.cls.PREDICATE.clone().copyFrom({
+                  view: { class: 'foam.u2.view.SimpleSearch' }
+                })).end();
               })
               .start()
                 .style({ 'overflow-x': 'auto' })
