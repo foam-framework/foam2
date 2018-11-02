@@ -138,11 +138,19 @@ foam.CLASS({
     {
       class: 'FObjectArray',
       of: 'foam.core.Action',
-      name: 'contextMenuActions'
+      name: 'contextMenuActions',
+      documentation: `
+        Custom subclasses can set this to add extra context menu actions to the
+        table.
+      `
     },
     {
       class: 'String',
-      name: 'createLabel'
+      name: 'createLabel',
+      documentation: `
+        Set this to override the label of the create button, which is the
+        default primary action.
+      `
     }
   ],
 
