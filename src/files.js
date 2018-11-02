@@ -264,10 +264,6 @@ FOAM_FILES([
   { name: "foam/blob/BlobJava", flags: ['java'] },
   { name: "lib/node/json_dao", flags: ['node'] },
   { name: "lib/utf8" },
-
-  { name: "foam/flow/Document" },
-  { name: "foam/flow/MarkupEditor" },
-
   { name: "foam/net/NotConnectedException" },
   { name: "foam/net/ConnectionFailedException" },
   { name: "foam/net/web/WebSocket" },
@@ -405,6 +401,7 @@ FOAM_FILES([
   { name: "foam/u2/ReadWriteView", flags: ['web'] },
   { name: "foam/u2/HTMLElement", flags: ['web'] },
   { name: "foam/u2/tag/Select", flags: ['web'] },
+  { name: "foam/u2/UnstyledTabs", flags: ['web'] },
   { name: "foam/u2/Tabs", flags: ['web'] },
   { name: "foam/u2/TimeView", flags: ['web'] },
   { name: "foam/u2/history/HistoryItemView", flags: ['web'] },
@@ -468,6 +465,8 @@ FOAM_FILES([
   { name: "foam/graphics/CView", flags: ['web'] },
   { name: "foam/graphics/ScrollCView", flags: ['web'] },
   { name: "foam/physics/PhysicalCircle", flags: ['web'] },
+  { name: "foam/u2/view/SimpleSearch", flags: ['web'] },
+  { name: "foam/comics/SearchMode", flags: ['web'] },
   { name: "foam/comics/DAOController" },
   { name: "foam/comics/DAOControllerView", flags: ['web'] },
   { name: "foam/comics/InlineDAOControllerView", flags: ['web'] },
