@@ -13,7 +13,9 @@ foam.CLASS({
     'foam.PasswordStrengthGauge'
   ],
   css: `
-
+    ^ .strenght-indicator{
+      text-align: right;
+    }
 
     ^ .outer{
       width: 60%;
@@ -29,7 +31,6 @@ foam.CLASS({
 
     ^ .sme-inputContainer{
       margin-bottom: 2%;
-
     }
 
     ^ .strength {
@@ -43,16 +44,14 @@ foam.CLASS({
       width: 75px;
       height: 12px;
       font-family: Avenir;
-      font-size: 10px;
+      font-size: 8px;
       font-weight: 900;
       font-style: normal;
       font-stretch: normal;
       line-height: 1.2;
       letter-spacing: normal;
-
       margin-left: 6%;
     }
-
 
     ^ ._0 {
       width: 0%;
@@ -69,7 +68,7 @@ foam.CLASS({
     }
     ^ ._3 {
       width: 80%;
-      background-color: #ece356
+      background-color: #d2bb41
     }
     ^ ._4 {
       width: 100%;
@@ -87,7 +86,7 @@ foam.CLASS({
       color: #f38d2f
     }
     ^ .text3 {
-      color: #ece356
+      color: #d2bb41
     }
     ^ .text4 {
       color: #36a52b      
@@ -103,7 +102,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'textStrength',
-      value: '_0'
+      value: 'text0'
     }
   ],
 
@@ -112,27 +111,26 @@ foam.CLASS({
       this.SUPER();
       this.addClass(this.myClass())
       .start().
+      start('div').addClass('strenght-indicator').
         start('div').addClass('outer').
           start('div').addClass('strength').addClass(this.strength$).end().
         end().
         start('div').addClass('message').addClass(this.textStrength$).
-        
-        add(this.textStrength$.map(function(textStrength) {
-          switch ( textStrength ) {
-            case ('text0)'):
-              return 'That\'s really weak';
-            case ('text1'):
-              return 'That\'s still a pretty weak password';
-            case ('text2'):
-              return 'Not bad, but try adding some more complexity';
-            case ('text3'):
-              return 'You\'re almost there!';
-            case ('text4'):
-              return 'That\'s an awesome password!';
-            default:
-              return 'Password strength';
-          }
-        })).
+            add(this.textStrength$.map(function(textStrength) {
+            switch ( textStrength ) {
+              case ('text1'):
+                return 'That\'s a really weak password';
+              case ('text2'):
+                return 'Better, but try adding some more complexity';
+              case ('text3'):
+                return 'You\'re almost there!';
+              case ('text4'):
+                return 'That\'s an awesome password!';
+              default:
+                return 'Password strength';
+            }
+          })).
+          end().
         end().
       end();
     }
