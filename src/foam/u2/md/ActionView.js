@@ -19,15 +19,11 @@ foam.CLASS({
   name: 'ActionView',
   extends: 'foam.u2.Element',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^unavailable {
-          display: none;
-        }
-      */}
-    })
-  ],
+  css: `
+    ^unavailable {
+      display: none;
+    }
+  `,
 
   properties: [
     'data',
