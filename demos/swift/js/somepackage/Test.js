@@ -100,6 +100,11 @@ return ["Hello", "World"]
       of: 'foam.core.FObject',
       name: 'fobjArr',
     },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.Language',
+      name: 'refProp',
+    },
   ],
   actions: [
     {

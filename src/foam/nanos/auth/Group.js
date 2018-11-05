@@ -101,7 +101,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'url',
-      value: null
     }
 /*    {
       class: 'FObjectProperty',
