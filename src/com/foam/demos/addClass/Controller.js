@@ -1,7 +1,6 @@
 /**
- * @license
- * Copyright 2018 The FOAM Authors. All Rights Reserved.
- * http://www.apache.org/licenses/LICENSE-2.0
+ * @license Copyright 2018 The FOAM Authors. All Rights Reserved.
+ *          http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -44,7 +43,7 @@ foam.CLASS({
     },
     'data',
     {
-      //class: 'String',
+      // class: 'String',
       name: 'colorStyle',
       value: 'red',
       expression: function(colorStyle) {
@@ -60,16 +59,16 @@ foam.CLASS({
         return this.E('span').forEach(animals, function(d, index) {
           if ( self.selectedAnimal === d ) {
             var self2 = this;
-            this.start('span'). //addClass(self.COLOR_STYLE.value).//attrs({color: self.COLOR_STYLE.value}).//.addClass(this.myClass('bgRed')).
+            this.start('span').                                
               add(index).add(' ').add(d).on('click', function(e) {
               self.selectedAnimal = d;
               console.log('yes');
               self2.addClass(self.COLOR_STYLE.value);
             }).end();
-            //TODO how to got the index.
+            // TODO how to got the index.
           } else
-            this.start('div'). //addClass(this.myClass('bgRed')).
-              add(index).add(' ').add(d).on('click', //self.slt(d)
+            this.start('div').
+              add(index).add(' ').add(d).on('click',
               function() {
                 self.selectedAnimal = d;
                 console.log('no');
@@ -78,10 +77,5 @@ foam.CLASS({
         })
       })).end();
     }
-  ],
-  listeners: [
-    function slt(data) {
-      console.log(data);
-    }
-  ],
+  ]
 });
