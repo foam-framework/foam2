@@ -16,7 +16,6 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.menu.Menu',
-    'foam.u2.view.TableView',
     'foam.u2.view.TableView'
   ],
 
