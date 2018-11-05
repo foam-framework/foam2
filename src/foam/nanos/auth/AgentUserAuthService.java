@@ -84,6 +84,11 @@ public class AgentUserAuthService
       throw new AuthorizationException("No permissions are appended to the entity relationship.");
     }
     
+    // Permit access to agent with active junctions.
+    if ( permissionJunction.status != AgentJunctionStatus.ACTIVE ) {
+      throw new AuthorizationException("Junction currently disabled, unable to act as user.");
+    }
+
     // Clone user and associate new junction group to user. Clone and freeze both user and agent. 
     user = (User) user.fclone();
     user.setGroup(actingWithinGroup.getId());

@@ -366,6 +366,11 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.Group',
       name: 'group'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.nanos.auth.AgentJunctionStatus',
+      documentation: 'Describes the active state between agent and entity.'
     }
   ]
 });

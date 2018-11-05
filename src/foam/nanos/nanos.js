@@ -110,6 +110,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/ClientAuthService" },
   { name: "foam/nanos/auth/AgentAuthService" },
   { name: "foam/nanos/auth/ClientAgentAuthService" },
+  { name: 'foam/nanos/auth/AgentJunctionStatus' },
   { name: "foam/nanos/pm/PMInfo" },
   { name: "foam/nanos/pm/PMTableView", flags:['web'] },
   { name: "foam/nanos/pm/TemperatureCView" },
