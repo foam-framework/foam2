@@ -48,11 +48,10 @@ foam.CLASS({
       */
 
       this.start('div').add('Your name:').add(this.GREETING).
-          start('button').add('sayHello').on('click', this.sayHello).end(). //TODO the button is useless.
+          start('button').add('sayHello').on('click', this.sayHello).end(). //TODO on-click the bottom.
         end().
         tag('hr').
         start().add('Hello ').add(this.greeting$).add('!').end();
-
     }
   ],
 

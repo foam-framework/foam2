@@ -85,7 +85,7 @@ foam.CLASS({
           return cost * qty;
         })
       ).end();
-      //start('div').add('Total: ').add(this.cost * this.qty).end(). // wrong result
+      //start('div').add('Total1: ').add(this.cost * this.qty).end(); // wrong result
       //start('div').add('Total2: ').add(this.cost$.prop.value * this.qty$.prop.value).end().// wrong result
     }
   ]
