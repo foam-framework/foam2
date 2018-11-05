@@ -2,6 +2,9 @@ foam.CLASS({
   package: 'org.chartjs',
   name: 'Line',
   extends: 'foam.u2.Element',
+  requires: [
+    'org.chartjs.Lib',
+  ],
   properties: [
     {
       class: 'FObjectProperty',
@@ -47,7 +50,7 @@ foam.CLASS({
       code: function() {
         var canvas = document.getElementById(this.id);
         var ctx = canvas.getContext('2d');
-        this.chart = new Chart(ctx, this.chartConfig);
+        this.chart = new this.Lib.CHART(ctx, this.chartConfig);
         this.updateChart();
       },
     },
