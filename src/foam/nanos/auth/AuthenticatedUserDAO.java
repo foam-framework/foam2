@@ -14,7 +14,6 @@ import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import foam.util.SafetyUtil;
-
 import static foam.mlang.MLang.EQ;
 
 /**
