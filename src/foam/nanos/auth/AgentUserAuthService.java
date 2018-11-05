@@ -85,7 +85,7 @@ public class AgentUserAuthService
     }
     
     // Permit access to agent with active junctions.
-    if ( permissionJunction.status != AgentJunctionStatus.ACTIVE ) {
+    if ( permissionJunction.getStatus() != AgentJunctionStatus.ACTIVE ) {
       throw new AuthorizationException("Junction currently disabled, unable to act as user.");
     }
 

@@ -1,7 +1,6 @@
 foam.ENUM({
   package: 'foam.nanos.auth',
   name: 'AgentJunctionStatus',
-
   documentation: 'Describes the status between agent and entity on their junction.',
 
   values: [

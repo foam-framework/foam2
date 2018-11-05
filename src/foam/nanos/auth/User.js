@@ -370,6 +370,7 @@ foam.CLASS({
     {
       class: 'Enum',
       of: 'foam.nanos.auth.AgentJunctionStatus',
+      name: 'status',
       documentation: 'Describes the active state between agent and entity.'
     }
   ]
