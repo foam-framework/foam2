@@ -48,7 +48,7 @@ foam.CLASS({
       name: 'loadChart',
       isFramed: true,
       code: function() {
-        var canvas = document.getElementById(this.id);
+        var canvas = this.el();
         var ctx = canvas.getContext('2d');
         this.chart = new this.Lib.CHART(ctx, this.chartConfig);
         this.updateChart();
