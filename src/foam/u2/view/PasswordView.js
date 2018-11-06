@@ -69,6 +69,7 @@ foam.CLASS({
           data$: this.data$
         }, this.inputElement$).
           addClass('input-field').addClass('full-width-input-password').
+          on('keyup', this.onPasswordKeyUp).
         end().
         start('img').show(this.passwordIcon$).addClass('input-image').
           attr('src', this.visibilityIcon$).on('click', this.visible).
@@ -95,6 +96,7 @@ foam.CLASS({
         this.visibleIcon('/foam2/src/foam/u2/images/visibility.svg',
             'password');
       }
-    }
+    },
+    function onPasswordKeyUp(evt) {}
   ]
 });
