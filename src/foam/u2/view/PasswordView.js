@@ -97,6 +97,12 @@ foam.CLASS({
             'password');
       }
     },
+    /**
+    * This listener listens for keyup on the password input field.
+    * Having it allows developers to subclass password view and dynamically
+    * access potential passwords being input by users. It enables the providing
+    * real time feedback to a user about the strength of passwords being typed.
+    */
     function onPasswordKeyUp(evt) {}
   ]
 });
