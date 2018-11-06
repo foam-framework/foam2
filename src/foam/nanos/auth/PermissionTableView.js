@@ -57,7 +57,8 @@ foam.CLASS({
     ^ table {
        box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
        width: auto;
-    }
+       border: 0;
+      }
 
     ^header {
       box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
@@ -254,12 +255,12 @@ foam.CLASS({
                   this.data$.sub(function() { self.updateGroup(p, g, this.data, self); });
                   if ( g.implies(p.id) ) {
                     this.setAttribute('title', g.id + ': ' + p.id);
-                    this.style({'border-color': '#40C75B'});
+                    //this.style({'border-color': '#40C75B'});
                   } else {
                     g.parent$find.then(function(a) {
                       if ( a != undefined && a.implies(p.id) ) {
                         this.setAttribute('title', g.parent + ': ' + p.id);
-                        this.style({'border-color': '#40C75B'});
+                        //this.style({'border-color': '#40C75B'});
                       }
                     });
                   }
