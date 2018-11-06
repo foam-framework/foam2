@@ -35,20 +35,19 @@ foam.CLASS({
     {
       class: 'String',
       documentation: 'Parameters input value',
-      name: 'value'
+      name: 'value',
+      displayWidth: 120
     },
     {
       class: 'FObjectProperty',
-      of: this.javaType,
       name: 'objectType',
       label: 'Object Value',
       documentation: 'Parameters input value (Object Type Parameters)',
       factory: function() {
-        var model = this.lookup(this.javaType.toString(), true);
+        var model = this.lookup(this.javaType, true);
 
         if ( this.javaType != '' && ( this.javaType != 'String' && this.javaType != 'double' && this.javaType != 'boolean' && this.javaType != 'long' ) )
           return model.create(null, this);
-        else return null;
       }
     }
   ],
