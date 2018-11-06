@@ -22,7 +22,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'expanded',
-      value: true
+      value: false
     },
     {
       class: 'Int',
