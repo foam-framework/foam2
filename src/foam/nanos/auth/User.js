@@ -286,6 +286,12 @@ foam.CLASS({
       class: 'DateTime',
       name: 'lastModified',
       documentation: 'Last modified date.'
+    },
+    {
+      class: 'Boolean',
+      name: 'system',
+      value: false,
+      documentation: 'Indicate system accounts.'
     }
   ],
 
