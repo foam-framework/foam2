@@ -99,10 +99,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       name: 'of',
       expression: function(sections) {
-        if ( ! Array.isArray(sections) || sections.length === 0 ) {
-          return null;
-        }
-        return ctrl.__subContext__[sections[0].dao].of; // FIXME
+        return sections[0].dao.of;
       }
     },
     {
@@ -114,9 +111,13 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
+
+      if ( ! Array.isArray(this.sections) || this.sections.length === 0 ) {
+        throw new Error(`You must provide an array of sections. See documentation on the 'sections' property in RichTextView.js.`);
+      }
+
       if ( this.data ) {
-        // FIXME
-        ctrl.__subContext__[this.sections[0].dao].find(this.data).then((result) => {
+        this.sections[0].dao.find(this.data).then((result) => {
           this.fullObject = result;
         });
       }
@@ -144,7 +145,7 @@ foam.CLASS({
           .addClass(this.myClass('container'))
           .show(self.isOpen_$)
           .forEach(this.sections, function(section) {
-            var dao = ctrl.__subContext__[section.dao]; // FIXME
+            var dao = section.dao;
             this
               .start()
                 .addClass(self.myClass('heading'))
