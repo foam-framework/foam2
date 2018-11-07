@@ -114,6 +114,12 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
+      if ( this.data ) {
+        // FIXME
+        ctrl.__subContext__[this.sections[0].dao].find(this.data).then((result) => {
+          this.fullObject = result;
+        });
+      }
       this
         .addClass(this.myClass())
         .start()
@@ -126,8 +132,8 @@ foam.CLASS({
             .add(this.slot((data) => {
               return this.E().tag(self.buttonContentView, {
                 data: data,
-                fullObject: this.fullObject
-              }));
+                fullObject$: this.fullObject$
+              });
             }))
           .end()
           .start()
