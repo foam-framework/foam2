@@ -213,8 +213,13 @@ foam.CLASS({
         var log = function() {
           this.output += Array.from(arguments).join('') + '\n';
         }.bind(this);
-        with ( { log: log, print: log, x: this.__context__ } )
+        try {
+          with ({ log: log, print: log, x: this.__context__ })
           return Promise.resolve(eval(this.code));
+        } catch (err) {
+          this.output += err;
+          return Promise.reject(err);
+        }
       },
       args: [
         {
@@ -296,6 +301,10 @@ foam.CLASS({
           this.status = this.ScriptStatus.RUNNING;
           this.runScript().then(() => {
             this.status = this.ScriptStatus.UNSCHEDULED;
+            this.scriptDAO.put(this);
+          }).catch((err) => {
+            console.log(err);
+            this.status = this.ScriptStatus.ERROR;
             this.scriptDAO.put(this);
           });
         }
