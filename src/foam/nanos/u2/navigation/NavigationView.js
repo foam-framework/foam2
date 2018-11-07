@@ -8,10 +8,10 @@ foam.CLASS({
   css: `
     ^ {
       position: fixed;
+      width: 100%;
       z-index: 10001;
     }
     ^top-nav {
-      width: calc(100% - 200px);
       display: inline;
     }
     ^side-nav {
