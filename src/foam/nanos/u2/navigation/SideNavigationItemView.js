@@ -40,6 +40,7 @@ foam.CLASS({
 
       this
         .addClass(this.myClass())
+        .addClass(`side-navigation-level-${this.level}`)
         .start('a')
           .add(this.data.label)
           .enableClass(this.myClass('selected'), view.currentMenu$.map(function (value) {
