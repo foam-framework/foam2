@@ -7,18 +7,20 @@ foam.CLASS({
 
   css: `
     ^ {
-      position: fixed;
       z-index: 10001;
     }
     ^top-nav {
-      width: calc(100% - 200px);
+      width: 100%;
       display: inline;
+      z-index: 10003;
     }
     ^side-nav {
+      position: relative;
       float:left;
       display: inline-block;
       width: 200px;
       height: 100vh;
+      z-index: 10002;
     }
   `,
 

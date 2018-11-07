@@ -37,6 +37,7 @@ foam.CLASS({
       var paddingLeft = view.level * 10 + 15;
       var fontSize = view.level * -1 + 18;
       var opacity = view.level * -0.1 + 0.9;
+      var childIsExpanded = (view.level + 1) == 1;
 
       this
         .addClass(this.myClass())
@@ -54,7 +55,7 @@ foam.CLASS({
             this.E() :
             this.E()
               .select(data.children.orderBy(view.Menu.ORDER), function(child) {
-                return view.cls_.create({ data: child, level: view.level + 1 }, view);
+                return view.cls_.create({ data: child, level: view.level + 1, expanded: childIsExpanded }, view);
               });
             }))
           .end();
