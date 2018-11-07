@@ -41,13 +41,13 @@ foam.CLASS({
       swiftExpression: `
         let max = self.Max_create(["arg1": property_])
         _ = try? delegate.select(max)
-        let v = max.value is Int ? (max.value as! Int) + 1 : 0
+        let v = max.value is Int ? (max.value as! Int) + 1 : 1
         return v >= startingValue ? v : startingValue
       `,
       javaFactory: `
         foam.mlang.sink.Max max = (foam.mlang.sink.Max) foam.mlang.MLang.MAX(getProperty_());
         getDelegate().select(max);
-        long v = max.getValue() instanceof Number ? ( (Number) max.getValue() ).longValue() + 1 : 0;
+        long v = max.getValue() instanceof Number ? ( (Number) max.getValue() ).longValue() + 1 : 1;
         return v > getStartingValue() ? v : getStartingValue();
       `,
     },
@@ -63,7 +63,7 @@ foam.CLASS({
           self.MAX(self.property_)
         ).then(
           function(max) {
-            var v = foam.Number.isInstance(max.value) ? ( max.value + 1 ) : 0;
+            var v = foam.Number.isInstance(max.value) ? ( max.value + 1 ) : 1;
             self.value_ = v > startingValue ? v : startingValue
           }
         );
