@@ -28,7 +28,8 @@ foam.CLASS({
 
   css: `
     ^ {
-      width: 100%;
+      width: 85%;
+      
       min-width: 992px;
       margin: auto;
       position: relative;
