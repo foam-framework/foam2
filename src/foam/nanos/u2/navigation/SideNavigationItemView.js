@@ -40,8 +40,7 @@ foam.CLASS({
       var childIsExpanded = (view.level + 1) == 1;
 
       this
-        .addClass(this.myClass())
-        .addClass(`side-navigation-level-${this.level}`)
+        .addClass(`${this.myClass()}-level-${this.level}`)
         .start('a')
           .add(this.data.label)
           .enableClass(this.myClass('selected'), view.currentMenu$.map(function (value) {
