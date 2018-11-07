@@ -53,7 +53,7 @@ foam.CLASS({
       margin-bottom: 4px;
     }
 
-    ^caret::before {
+    ^chevron::before {
       content: '▾';
       color: #bdbdbd;
       font-size: 17px;
@@ -85,9 +85,9 @@ foam.CLASS({
     },
     {
       class: 'foam.u2.ViewSpec',
-      name: 'buttonView',
+      name: 'buttonContentView',
       factory: function() {
-        return this.DefaultButtonView;
+        return this.DefaultButtonContentView;
       }
     },
     {
@@ -124,14 +124,14 @@ foam.CLASS({
           .start()
             .addClass(this.myClass('custom-button'))
             .add(this.slot((data) => {
-              return this.E().add(self.buttonView.create({
+              return this.E().tag(self.buttonContentView, {
                 data: data,
                 fullObject: this.fullObject
               }));
             }))
           .end()
           .start()
-            .addClass(this.myClass('caret'))
+            .addClass(this.myClass('chevron'))
           .end()
         .end()
         .start()
@@ -163,7 +163,7 @@ foam.CLASS({
 
   classes: [
     {
-      name: 'DefaultButtonView',
+      name: 'DefaultButtonContentView',
       extends: 'foam.u2.Element',
 
       imports: [
@@ -172,7 +172,7 @@ foam.CLASS({
 
       messages: [
         {
-          name: 'DEFAULT_BUTTON_LABEL',
+          name: 'CHOOSE_FROM',
           message: 'Choose from '
         }
       ],
@@ -185,8 +185,8 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          return this
-            .add(this.data || this.DEFAULT_BUTTON_LABEL + this.of.model_.plural.toLowerCase());
+          var plural = this.of.model_.plural.toLowerCase();
+          return this.add(this.data || this.CHOOSE_FROM + plural);
         }
       ]
     }
