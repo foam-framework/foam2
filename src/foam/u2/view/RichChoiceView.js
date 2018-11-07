@@ -10,7 +10,30 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   documentation: `
-  
+    This is similar to foam.u2.view.ChoiceView, but lets you provide views for
+    the button content and options instead of strings. This allows you to create
+    dropdowns with rich content like images and formatting using CSS.
+
+    Example usage for a Reference property on a model:
+
+      {
+        class: 'Reference',
+        of: 'foam.nanos.auth.User',
+        name: 'exampleProperty',
+        view: function(_, X) {
+          return {
+            class: 'foam.u2.view.RichChoiceView',
+            buttonContentView: { class: 'a.b.c.MyCustomButtonView' }, // Optional
+            rowView: { class: 'a.b.c.MyCustomCitationView' }, // Optional
+            sections: [
+              {
+                heading: 'Users',
+                dao: X.userDAO.orderBy(foam.nanos.auth.User.LEGAL_NAME)
+              }
+            ]
+          };
+        }
+      }
   `,
 
   exports: [
@@ -69,11 +92,17 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'rowView',
-      value: { class: 'foam.u2.CitationView' }
+      documentation: `
+        Set this to override the default view used for each row. It will be
+        instantiated with an object from the DAO as the 'data' property.
+      `,
+      value: { class: 'foam.u2.CitationView' },
     },
     {
       name: 'data',
-      documentation: `` // TODO
+      documentation: `
+        The value that gets chosen. This is set whenever a user makes a choice.
+      `
     },
     {
       class: 'Boolean',
@@ -86,6 +115,11 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'buttonContentView',
+      documentation: `
+        Set this to override the default view used for the button content. It
+        will be instantiated with an object from the DAO as the 'fullObject'
+        property and that object's id as the 'data' property.
+      `,
       factory: function() {
         return this.DefaultButtonContentView;
       }
@@ -93,18 +127,30 @@ foam.CLASS({
     {
       class: 'Array',
       name: 'sections',
-      documentation: '' // TODO
+      documentation: `
+        This lets you pass different predicated versions of a dao in different
+        sections, which can be used to do things like grouping by some property
+        for each section.
+        Each object in the array must have a 'label' property of type string
+        which will be used for the section heading, and a 'dao' property of type
+        DAO that will be used to populate the list in that section.
+      `,
     },
     {
       class: 'FObjectProperty',
       name: 'of',
+      documentation: 'The model stored in the DAO. Used intenrally.',
       expression: function(sections) {
         return sections[0].dao.of;
       }
     },
     {
       class: 'FObjectProperty',
-      name: 'fullObject'
+      name: 'fullObject_',
+      documentation: `
+        The full object from the DAO. This property is only used internally, you
+        do not need to set it as a consumer of this view.
+      `
     }
   ],
 
@@ -116,11 +162,19 @@ foam.CLASS({
         throw new Error(`You must provide an array of sections. See documentation on the 'sections' property in RichTextView.js.`);
       }
 
+      // If the property that this view is for already has a value when being
+      // rendered, the 'data' property on this model will be set to an id for
+      // the object being referenced by the Reference property being rendered.
+      // Custom views might need the full object to render though, not just the
+      // id, so we do a lookup at the beginning of initE for the full object and
+      // set it here when found. This then gets passed to the button view to use
+      // it if it wants to.
       if ( this.data ) {
         this.sections[0].dao.find(this.data).then((result) => {
-          this.fullObject = result;
+          this.fullObject_ = result;
         });
       }
+
       this
         .addClass(this.myClass())
         .start()
@@ -133,7 +187,7 @@ foam.CLASS({
             .add(this.slot((data) => {
               return this.E().tag(self.buttonContentView, {
                 data: data,
-                fullObject$: this.fullObject$
+                fullObject$: this.fullObject_$
               });
             }))
           .end()
@@ -156,7 +210,7 @@ foam.CLASS({
                   return this.E()
                     .start(self.rowView, { data: obj })
                       .on('click', () => {
-                        self.fullObject = obj;
+                        self.fullObject_ = obj;
                         self.data = obj;
                         self.isOpen_ = false;
                       })
