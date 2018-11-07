@@ -41,11 +41,18 @@ foam.CLASS({
   ],
 
   css: `
+    ^ {
+      position: relative;
+    }
+
     ^container {
+      position: absolute;
+      top: 40px; // 36px for height of button, plus 4px bottom margin
+      left: 0;
       background: white;
       border: 1px solid #bdbdbd;
       border-radius: 4px;
-      max-width: 488px;
+      width: 488px;
       max-height: 378px;
       overflow-y: scroll;
       box-sizing: border-box;
