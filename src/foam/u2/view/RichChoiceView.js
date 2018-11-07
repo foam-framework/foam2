@@ -96,7 +96,9 @@ foam.CLASS({
         Set this to override the default view used for each row. It will be
         instantiated with an object from the DAO as the 'data' property.
       `,
-      value: { class: 'foam.u2.CitationView' },
+      factory: function() {
+        return this.DefaultRowView;
+      }
     },
     {
       name: 'data',
@@ -223,6 +225,43 @@ foam.CLASS({
   ],
 
   classes: [
+    {
+      name: 'DefaultRowView',
+      extends: 'foam.u2.View',
+
+      documentation: `
+        This is the view that gets rendered for each item in the list.
+      `,
+
+      css: `
+        ^row {
+          background: white;
+          padding: 8px 16px;
+        }
+
+        ^row:hover {
+          background: #f4f4f9;
+          cursor: pointer;
+        }
+      `,
+
+      properties: [
+        {
+          name: 'data',
+          documentation: 'The selected object.'
+        }
+      ],
+
+      methods: [
+        function initE() {
+          return this
+            .start()
+              .addClass(this.myClass('row'))
+              .add(this.data.id)
+            .end();
+        }
+      ]
+    },
     {
       name: 'DefaultButtonContentView',
       extends: 'foam.u2.Element',
