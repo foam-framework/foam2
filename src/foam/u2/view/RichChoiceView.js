@@ -166,6 +166,19 @@ foam.CLASS({
       name: 'DefaultButtonContentView',
       extends: 'foam.u2.Element',
 
+      documentation: `
+        This is the view that gets rendered inside the button. It is put to the
+        left of the chevron (the triangle at the far right side of the button).
+        This is an Element instead of a simple string, meaning the button can
+        contain "rich" content like images and make use of CSS for styling and
+        layout.
+        As an example of why this is useful, imagine you wanted to show a
+        dropdown to select a country. You could choose to display the flag of
+        the selected country alongside its name after the user makes a
+        selection by creating that custom view and providing it in place of this
+        one by setting the buttonContentView property on RichChoiceView.
+      `,
+
       imports: [
         'of'
       ],
@@ -179,7 +192,17 @@ foam.CLASS({
 
       properties: [
         {
-          name: 'data'
+          name: 'data',
+          documentation: 'The id of the selected object.'
+        },
+        {
+          name: 'fullObject',
+          documentation: `
+            The full object. It's not used here in the default button view, but
+            this property is included to let you know that if you create a
+            custom button content view, it will be passed the id of the object
+            (data) as well as the full object.
+          `
         }
       ],
 
