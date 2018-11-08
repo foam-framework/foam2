@@ -8,8 +8,11 @@ foam.CLASS({
   ],
   methods: [
     function initE() {
-      this.add(this.slot(function(data$data) {
-        return this.Bar.create({ data: data$data });
+      this.add(this.slot(function(data$data, data$chartConfig) {
+        return this.Bar.create({
+          data: data$data,
+          config: data$chartConfig,
+        });
       }));
     }
   ]
