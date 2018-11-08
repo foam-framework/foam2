@@ -173,38 +173,37 @@ DAO userDAO      = (DAO) x.get("localUserDAO");
 DAO groupDAO     = (DAO) x.get("groupDAO");
 AppConfig config = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
 
-Session session = x.get(Session.class);
-if ( session != null ) {
+String configUrl = config.getUrl();
+
+HttpServletRequest req = x.get(HttpServletRequest.class);
+if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
+  // populate AppConfig url with request's RootUrl
+  configUrl = ((Request) req).getRootURL().toString();
+} else {
+  // populate AppConfig url with group url
+  Session session = x.get(Session.class);
   User user = (User) userDAO.find(session.getUserId());
   if ( user != null ) {
-    Group group    = (Group) groupDAO.find(user.getGroup());
+    Group group = (Group) groupDAO.find(user.getGroup());
     if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
-      //populate AppConfig url with group url
-      config.setUrl(group.getUrl());
-    } else {
-      //populate AppConfig url with request's RootUrl
-      HttpServletRequest req = x.get(HttpServletRequest.class);
-
-      if ( config.getEnableForceHttps() ) {
-        if ( ! SafetyUtil.isEmpty(req.getRequestURI()) && ! SafetyUtil.isEmpty(config.getUrl())) {
-          String curConfigUrl = config.getUrl();
-          String request = ((Request) req).getRootURL().toString();
-
-          //check it's http or https
-          if ( curConfigUrl.startsWith("https") ) {
-            config.setUrl("https" + request.substring(4));
-          } else {
-            config.setUrl(request);
-          }
-        }
-      } else {
-        if ( req != null && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
-          config.setUrl(((Request) req).getRootURL().toString());
-        }
-      }
+      configUrl = group.getUrl();
     }
   }
 }
+
+if ( config.getForceHttps() ) {
+  if ( configUrl.startsWith("https://") ) {
+    config.setUrl(configUrl);
+    return config;
+  } else if ( configUrl.startsWith("http://") ) {
+    configUrl = "https" + configUrl.substring(4);
+  } else {
+    configUrl = "https://" + configUrl;
+  }
+}
+
+config.setUrl(configUrl);
+
 return config;
         `
     }

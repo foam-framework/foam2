@@ -15,14 +15,26 @@ foam.CLASS({
   extends: 'foam.u2.view.AltView',
 
   requires: [
-    'foam.nanos.menu.Menu'
+    'foam.nanos.menu.Menu',
+    'foam.u2.view.TableView'
   ],
+
+  css: `
+    .foam-u2-view-TreeView {
+      width: 962px;
+    }
+  `,
 
   methods: [
     function init(){
       this.views = [
         [ { class: 'foam.u2.view.TableView' }, 'Table' ],
-        [ { class: 'foam.u2.view.TreeView', relationship: foam.nanos.menu.MenuMenuRelationship, formatter: function() { this.add(this.data.label); } }, 'Tree' ]
+        [ {
+            class: 'foam.u2.view.TreeView',
+            relationship: foam.nanos.menu.MenuMenuchildrenRelationship,
+            startExpanded: true,
+            formatter: function(data) { this.add(data.label); }
+          }, 'Tree' ]
       ]
     }
   ]
