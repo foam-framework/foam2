@@ -46,15 +46,36 @@ foam.CLASS({
     {
       name: 'childNodes',
       factory: function() { return []; }
-    }
+    },
+    'parentNode'
   ],
 
   methods: [
     function xxxinitCView( x, y, seriesValues, radius, margin, graphColors, symbol, lineColor, w, h, lineWidth, fontValue, align ) {
     },
 
+    function paintSelf(x) {
+      this.SUPER(x);
+      if ( this.children.length ) {
+        function line(x1, y1, x2, y2) {
+          x.beginPath();
+          x.moveTo(x1, y1);
+          x.lineTo(x2, y2);
+          x.lineWidth = 1;
+          x.strokeStyle = 'gray';
+          x.stroke();
+        }
+        line(-this.children.length*100 + 150, 75, this.children.length*100 -50, 75);
+        line(50, 50, 50, 75);
+        var l = this.children.length;
+        for ( var i = 0 ; i < l ; i++ ) {
+          line(i*200-100*(l-1)+50, 75, i*200-100*(l-1)+50, 100);
+        }
+      }
+    },
+
     function addChildNode() {
-      var node = this.cls_.create({x: 50, y:100});
+      var node = this.cls_.create({x: 50, y:100, parentNode: this});
       this.add(node);
       this.layout();
       return this;
