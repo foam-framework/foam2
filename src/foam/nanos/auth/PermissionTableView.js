@@ -168,7 +168,16 @@ foam.CLASS({
     },
 
     function createCheckBox(p, g) {
-      return {class: 'foam.u2.md.CheckBox', data: this.checkPermissionForGroup(p.id, g)};
+      var self = this;
+//      return {class: 'foam.u2.md.CheckBox', data: this.checkPermissionForGroup(p.id, g)};
+      return function() {
+        var data = self.GroupPermission.create({checked: self.checkPermissionForGroup(p.id, g)});
+        data.checked$.sub(function() {
+          self.updateGroup(p, g, data.checked$, self);
+         });
+
+        return self.GroupPermissionView.create({data: data});
+      };
     },
 
     function initTableColumns(gs) {
@@ -195,8 +204,7 @@ foam.CLASS({
           self.initMatrix(gs.array, ps.array);
         })
       });
-
-      return;
+      /*
       this
       .start('table').style({'table-layout': 'fixed', 'margin-left': '100'})
         .start('tr')
@@ -216,16 +224,12 @@ foam.CLASS({
               .addClass(this.myClass())
               .start('table').style({'table-layout': 'fixed', 'width': 'auto'})
                 .call(self.initColumns.bind(this, self, groups))
-                /*
-                .select(this.permissionDAO.orderBy(this.Permission.ID), function(p) {
-                  return self.E('tr').start('td').add('YYYYYYYYYYYYY').end().end();
-                })*/
             .end()
           .end()
-      .end()
-    .end();
+      .end()*/
     },
 
+    /*
     function initColumns(self, groups) {
       this.start('tr')
         .style({'background': '#D4E3EB'})
@@ -240,7 +244,9 @@ foam.CLASS({
         })
       .end();
     },
+    */
 
+    /*
     function initPermissionRow() {
       return self.E('tr')
         .show(self.query$.map(function(query) { query = query.trim(); return query == "" || p.id.indexOf(query) != -1; }))
@@ -271,6 +277,7 @@ foam.CLASS({
         .end()
 
     },
+    */
 
     function checkPermissionForGroup(permissionId, group) {
       for ( i = 0 ; i < group.permissions.length ; i++ ) {
@@ -282,7 +289,7 @@ foam.CLASS({
 
     function updateGroup(p_, g_, data, self) {
       var dao = this.groupDAO;
-      var e = foam.mlang.Expressions.create();
+      var e   = foam.mlang.Expressions.create();
 
       dao.find(g_.id).then(function(group) {
         // Remove permission if found
@@ -290,7 +297,7 @@ foam.CLASS({
           return p.id != p_.id;
         });
 
-        //parents' permissions
+        // parents' permissions
         group.parent$find.then(function(groupParent) {
           if ( groupParent != undefined ) {
               permissions += groupParent.permissions.filter(function(gp) {
@@ -300,15 +307,13 @@ foam.CLASS({
         });
 
         // Add if requested
-        if ( data ) permissions.push(p_);
+        if ( data.get() ) permissions.push(p_);
 
         group.permissions = permissions;
         dao.put(group);
-
-        self.updateChildrenPermission(g_.id, permissions);
       });
     },
-
+    /*
     function updateChildrenPermission(gp, permissions) {
       var self = this;
       var dao = this.groupDAO;
@@ -325,5 +330,53 @@ foam.CLASS({
         }
       });
     }
+    */
+  ],
+
+  classes: [
+    {
+      name: 'GroupPermission',
+      properties: [
+        {
+          class: 'Boolean',
+          name: 'checked'
+        },
+        {
+          class: 'Boolean',
+          name: 'implied'
+        },
+        {
+          name: 'dependees',
+          factory: function() { return []; }
+        }
+      ]
+    },
+    {
+      name: 'GroupPermissionView',
+      extends: 'foam.u2.View',
+      css: `
+        ^ { color: lightGray }
+        ^, .checked { color: #4885ed }
+      `,
+      methods: [
+        function initE() {
+          this.SUPER();
+          this.
+            addClass(this.myClass()).
+            style({width: '18px', height: '18px'}).
+            enableClass('checked', this.data$checked).
+            add(this.slot(function(data$checked, data$implied) {
+              return data$checked || data$implied ? '✓' : '';
+            })).
+            on('click', this.onClick);
+        }
+      ],
+      listeners: [
+        function onClick() {
+          this.data.checked = ! this.data.checked;
+        }
+      ]
+    }
   ]
+
 });
