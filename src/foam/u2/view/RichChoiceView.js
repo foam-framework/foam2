@@ -43,51 +43,47 @@ foam.CLASS({
   css: `
     ^ {
       position: relative;
+      display: inline-block;
     }
 
     ^container {
       position: absolute;
-      top: 40px; // 36px for height of select input, plus 4px bottom margin
+      top: 18px;
       left: 0;
       background: white;
       border: 1px solid #bdbdbd;
-      border-radius: 4px;
-      width: 488px;
       max-height: 378px;
       overflow-y: scroll;
       box-sizing: border-box;
+      width: 100%;
+      min-width: fit-content;
+      -webkit-appearance: textfield;
     }
 
     ^heading {
-      font-weight: bold;
       border-bottom: 1px solid #f4f4f9;
-      line-height: 24px;
-      font-size: 14px;
-      color: #333;
+      font-size: 12px;
       font-weight: 900;
-      padding: 6px 16px;
+      padding: 1px 2px;
     }
 
     ^selection-view {
-      height: 36px;
-      width: 488px;
-      border-radius: 4px;
-      border: solid 1px #bdbdbd;
-      background-color: #ffffff;
-      display: flex;
+      background-color: white;
+      display: inline-flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 8px;
-      font-size: 12px;
+      font-size: 11px;
       box-sizing: border-box;
-      margin-bottom: 4px;
+      -webkit-appearance: textfield;
+      padding: 1px 2px;
+      cursor: default;
+      border: 1px solid;
+      min-width: 94px;
     }
 
     ^chevron::before {
       content: '▾';
-      color: #bdbdbd;
-      font-size: 17px;
-      padding-left: 8px;
+      padding-left: 4px;
     }
 
     ^custom-selection-view {
@@ -242,7 +238,8 @@ foam.CLASS({
       css: `
         ^row {
           background: white;
-          padding: 8px 16px;
+          padding: 1px 2px;
+          font-size: 12px;
         }
 
         ^row:hover {
