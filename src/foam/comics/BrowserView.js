@@ -90,6 +90,11 @@ foam.CLASS({
       documentation: 'True to enable the export button.'
     },
     {
+      class: 'Boolean',
+      name: 'toggleEnabled',
+      documentation: 'True to enable the toggle filters button.'
+    },
+    {
       name: 'controller',
       expression: function(
         data,
@@ -102,7 +107,8 @@ foam.CLASS({
         editEnabled,
         selectEnabled,
         addEnabled,
-        exportEnabled
+        exportEnabled,
+        toggleEnabled
       ) {
         var config = { data: data };
 
@@ -115,6 +121,7 @@ foam.CLASS({
         config.selectEnabled = selectEnabled;
         config.addEnabled = addEnabled;
         config.exportEnabled = exportEnabled;
+        config.toggleEnabled = toggleEnabled;
 
         if ( customDAOController ) {
           return this.__context__.lookup(customDAOController).create(config);
