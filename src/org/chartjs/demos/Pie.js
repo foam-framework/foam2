@@ -35,7 +35,7 @@ foam.CLASS({
     {
       name: 'pie',
       view: {
-        class: 'org.chartjs.Pie',
+        class: 'org.chartjs.demos.CustomizePie',
         height: 200,
         width: 200,
       },
