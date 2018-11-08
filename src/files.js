@@ -356,6 +356,7 @@ FOAM_FILES([
   { name: "foam/box/ForwardBox" },
   { name: "foam/box/ForwardingBox" },
   { name: "foam/box/SessionClientBox" },
+  { name: "foam/box/AuthServiceClientBox" },  
   { name: "lib/boxJava", flags: ['java'] },
 
   { name: "foam/swift/refines/Stub", flags: ['swift'] },
