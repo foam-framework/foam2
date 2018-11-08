@@ -1,47 +1,52 @@
 foam.CLASS({
   package: 'org.chartjs',
   name: 'Pie',
-  extends: 'foam.u2.Element',
+  extends: 'foam.u2.View',
   requires: [
     'org.chartjs.Lib',
+    'org.chartjs.PieConfig',
   ],
   properties: [
     {
       class: 'FObjectProperty',
       of: 'foam.mlang.sink.GroupBy',
       name: 'data',
+      hidden: true,
       postSet: function(_, n) {
         this.onDetach(n.groups$.sub(function(sub) {
           if ( this.data !== n ) sub.detach();
           else this.updateChart();
         }.bind(this)));
+        this.updateChart()
       },
-    },
-    {
-      name: 'nodeName',
-      value: 'canvas',
     },
     {
       name: 'chart',
     },
     {
-      name: 'backgroundColor',
-      value: [
-        'rgba(255, 99, 132, 0.2)',
-        'rgba(54, 162, 235, 0.2)',
-        'rgba(255, 206, 86, 0.2)',
-        'rgba(75, 192, 192, 0.2)',
-        'rgba(153, 102, 255, 0.2)',
-        'rgba(255, 159, 64, 0.2)'
-      ],
-      postSet: function() { this.updateChart() },
+      class: 'FObjectProperty',
+      of: 'org.chartjs.PieConfig',
+      name: 'config',
+      factory: function() {
+        return this.PieConfig.create();
+      },
+      postSet: function(_, n) {
+        this.onDetach(n.sub(function(sub) {
+          if ( this.config !== n ) sub.detach();
+          else this.updateChart();
+        }.bind(this)));
+        this.updateChart()
+      },
     },
     {
       name: 'chartConfig',
-      factory: function() {
+      factory: function(config) {
         return {
           type: 'pie',
           datasets: [{}],
+          options: {
+            maintainAspectRatio: false,
+          },
         }
       },
     },
@@ -51,7 +56,7 @@ foam.CLASS({
       name: 'loadChart',
       isFramed: true,
       code: function() {
-        var canvas = this.el();
+        var canvas = this.el().getElementsByTagName('canvas')[0];
         var ctx = canvas.getContext('2d');
         this.chart = new this.Lib.CHART(ctx, this.chartConfig);
         this.updateChart();
@@ -65,7 +70,7 @@ foam.CLASS({
         var groups = this.data.groups;
         var keys = Object.keys(groups);
         this.chartConfig.labels = keys;
-        this.chartConfig.datasets[0].backgroundColor = this.backgroundColor;
+        this.chartConfig.datasets[0].backgroundColor = this.config.backgroundColor;
         this.chartConfig.datasets[0].data = keys.map(function(k) {
           return groups[k].value
         });
@@ -78,6 +83,16 @@ foam.CLASS({
     function init() {
       this.onDetach(this.onload.sub(this.loadChart));
       this.SUPER();
+    },
+    function initE() {
+      this.SUPER();
+      this.
+        style({
+          position: 'relative',
+          height: this.config$.dot('height'),
+          width: this.config$.dot('width'),
+        }).
+        start('canvas').end();
     },
   ],
 });
