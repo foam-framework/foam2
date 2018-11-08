@@ -11,7 +11,7 @@ foam.CLASS({
 
   documentation: `
     This is similar to foam.u2.view.ChoiceView, but lets you provide views for
-    the button content and options instead of strings. This allows you to create
+    the selection and options instead of strings. This allows you to create
     dropdowns with rich content like images and formatting using CSS.
 
     Example usage for a Reference property on a model:
@@ -23,7 +23,7 @@ foam.CLASS({
         view: function(_, X) {
           return {
             class: 'foam.u2.view.RichChoiceView',
-            buttonContentView: { class: 'a.b.c.MyCustomButtonView' }, // Optional
+            selectionView: { class: 'a.b.c.MyCustomSelectionView' }, // Optional
             rowView: { class: 'a.b.c.MyCustomCitationView' }, // Optional
             sections: [
               {
@@ -47,7 +47,7 @@ foam.CLASS({
 
     ^container {
       position: absolute;
-      top: 40px; // 36px for height of button, plus 4px bottom margin
+      top: 40px; // 36px for height of select input, plus 4px bottom margin
       left: 0;
       background: white;
       border: 1px solid #bdbdbd;
@@ -68,7 +68,7 @@ foam.CLASS({
       padding: 6px 16px;
     }
 
-    ^button {
+    ^selection-view {
       height: 36px;
       width: 488px;
       border-radius: 4px;
@@ -90,7 +90,7 @@ foam.CLASS({
       padding-left: 8px;
     }
 
-    ^custom-button {
+    ^custom-selection-view {
       flex-grow: 1;
     }
   `,
@@ -123,14 +123,14 @@ foam.CLASS({
     },
     {
       class: 'foam.u2.ViewSpec',
-      name: 'buttonContentView',
+      name: 'selectionView',
       documentation: `
-        Set this to override the default view used for the button content. It
+        Set this to override the default view used for the input content. It
         will be instantiated with an object from the DAO as the 'fullObject'
         property and that object's id as the 'data' property.
       `,
       factory: function() {
-        return this.DefaultButtonContentView;
+        return this.DefaultSelectionView;
       }
     },
     {
@@ -175,9 +175,8 @@ foam.CLASS({
       // rendered, the 'data' property on this model will be set to an id for
       // the object being referenced by the Reference property being rendered.
       // Custom views might need the full object to render though, not just the
-      // id, so we do a lookup at the beginning of initE for the full object and
-      // set it here when found. This then gets passed to the button view to use
-      // it if it wants to.
+      // id, so we do a lookup here for the full object here. This then gets
+      // passed to the selectionView to use it if it wants to.
       if ( this.data ) {
         this.sections[0].dao.find(this.data).then((result) => {
           this.fullObject_ = result;
@@ -187,14 +186,14 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start()
-          .addClass(this.myClass('button'))
+          .addClass(this.myClass('selection-view'))
           .on('click', function() {
             self.isOpen_ = ! self.isOpen_;
           })
           .start()
-            .addClass(this.myClass('custom-button'))
+            .addClass(this.myClass('custom-selection-view'))
             .add(this.slot((data) => {
-              return this.E().tag(self.buttonContentView, {
+              return this.E().tag(self.selectionView, {
                 data: data,
                 fullObject$: this.fullObject_$
               });
@@ -270,20 +269,20 @@ foam.CLASS({
       ]
     },
     {
-      name: 'DefaultButtonContentView',
+      name: 'DefaultSelectionView',
       extends: 'foam.u2.Element',
 
       documentation: `
-        This is the view that gets rendered inside the button. It is put to the
-        left of the chevron (the triangle at the far right side of the button).
-        This is an Element instead of a simple string, meaning the button can
-        contain "rich" content like images and make use of CSS for styling and
-        layout.
+        This is the view that gets rendered inside the select input. It is put
+        to the left of the chevron (the triangle at the far right side of the
+        select input). This is an Element instead of a simple string, meaning
+        the select input can contain "rich" content like images and make use of
+        CSS for styling and layout.
         As an example of why this is useful, imagine you wanted to show a
         dropdown to select a country. You could choose to display the flag of
         the selected country alongside its name after the user makes a
         selection by creating that custom view and providing it in place of this
-        one by setting the buttonContentView property on RichChoiceView.
+        one by setting the selectionView property on RichChoiceView.
       `,
 
       imports: [
@@ -305,10 +304,10 @@ foam.CLASS({
         {
           name: 'fullObject',
           documentation: `
-            The full object. It's not used here in the default button view, but
-            this property is included to let you know that if you create a
-            custom button content view, it will be passed the id of the object
-            (data) as well as the full object.
+            The full object. It's not used here in the default selection view,
+            but this property is included to let you know that if you create a
+            custom selection view, it will be passed the id of the object (data)
+            as well as the full object.
           `
         }
       ],
