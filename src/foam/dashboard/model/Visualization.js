@@ -12,6 +12,10 @@ foam.CLASS({
       name: 'daoName'
     },
     {
+      class: 'String',
+      name: 'label'
+    },
+    {
       name: 'dao',
       hidden: true,
       expression: function(daoName) {
@@ -31,10 +35,25 @@ foam.CLASS({
       hidden: true
     },
     {
+      name: 'currentView',
+      view: function(args, x) {
+        return {
+          class: 'foam.u2.view.ChoiceView',
+          choices: x.data.views
+        };
+      },
+      hidden: true,
+      factory: function() {
+        return this.views[0][0];
+      }
+    },
+    {
       name: 'views',
       hidden: true,
       factory: function() {
-        return []
+        return [
+          [ this.DetailView, 'Configuration' ]
+        ]
       }
     }
   ],
