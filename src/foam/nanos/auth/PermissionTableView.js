@@ -74,15 +74,6 @@ foam.CLASS({
       text-align: left;
       padding-left: 6px;
     }
-
-    ^ .foam-u2-md-CheckBox:checked:after {
-      content: url(data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2048%2048%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2215%22%20height%3D%2215%22%20version%3D%221.1%22%3E%0A%20%20%20%3Cpath%20fill%3D%22darkgreen%22%20stroke-width%3D%223%22%20d%3D%22M18%2032.34L9.66%2024l-2.83%202.83L18%2038l24-24-2.83-2.83z%22/%3E%0A%3C/svg%3E);
-    }
-
-    ^ .foam-u2-md-CheckBox:checked {
-      background-color: #0000;
-      // opacity: 0;
-    }
   `,
 
   properties: [
@@ -169,9 +160,11 @@ foam.CLASS({
 
     function createCheckBox(p, g) {
       var self = this;
-//      return {class: 'foam.u2.md.CheckBox', data: this.checkPermissionForGroup(p.id, g)};
       return function() {
-        var data = self.GroupPermission.create({checked: self.checkPermissionForGroup(p.id, g)});
+        var data = self.GroupPermission.create({
+          checked: self.checkPermissionForGroup(p.id, g),
+          implied: g.implies(p.id)
+        });
         data.checked$.sub(function() {
           self.updateGroup(p, g, data.checked$, self);
          });
@@ -355,8 +348,8 @@ foam.CLASS({
       name: 'GroupPermissionView',
       extends: 'foam.u2.View',
       css: `
-        ^ { color: lightGray }
-        ^, .checked { color: #4885ed }
+        ^checked { color: #4885ed }
+        ^implied { color: lightGray }
       `,
       methods: [
         function initE() {
@@ -364,7 +357,8 @@ foam.CLASS({
           this.
             addClass(this.myClass()).
             style({width: '18px', height: '18px'}).
-            enableClass('checked', this.data$checked).
+            enableClass(this.myClass('implied'), this.data.checked$, true).
+            enableClass(this.myClass('checked'), this.data.checked$).
             add(this.slot(function(data$checked, data$implied) {
               return data$checked || data$implied ? '✓' : '';
             })).
@@ -378,5 +372,4 @@ foam.CLASS({
       ]
     }
   ]
-
 });
