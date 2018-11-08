@@ -27,9 +27,8 @@ foam.CLASS({
     {
       name: 'stockPrices',
       view: {
-        class: 'org.chartjs.Line',
-        height: 200,
-        width: 200,
+        class: 'org.chartjs.demos.ConfigurableChartView',
+        view: 'org.chartjs.Line',
       },
       factory: function() {
         var sink = this.GROUP_BY(
@@ -44,9 +43,8 @@ foam.CLASS({
     {
       name: 'holdings',
       view: {
-        class: 'org.chartjs.Bar',
-        height: 200,
-        width: 200,
+        class: 'org.chartjs.demos.ConfigurableChartView',
+        view: 'org.chartjs.Bar',
       },
       factory: function() {
         var sink = this.GROUP_BY(this.StockOrder.SYMBOL, this.SUM(this.StockOrder.SHARES));
