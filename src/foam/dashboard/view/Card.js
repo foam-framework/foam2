@@ -8,6 +8,20 @@ foam.CLASS({
   imports: [
     'dashboardController'
   ],
+  css: `
+^ {
+  border: 2px solid #dae1e9;
+  border-radius: 2px;
+  background: white;
+}
+
+^header {
+  padding: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #ccc;
+  font-weight: bold;
+}
+`,
   methods: [
     function initE() {
       this.onDetach(this.dashboardController.sub('dashboard', 'update', function() {
@@ -16,9 +30,18 @@ foam.CLASS({
       this.data.update();
 
       this.
-        tag(this.SimpleAltView, {
-          choices$: this.dot('data').dot('views'),
-        });
+        addClass(this.myClass()).
+        start('div').
+        addClass(this.myClass('header')).
+        add(this.data.label$).
+        add(this.data.CURRENT_VIEW).
+        end('div').
+        tag(this.slot(function(data$currentView) {
+          return foam.u2.ViewSpec.createView(data$currentView, null, this, this.__subSubContext__);
+        }));
+//        tag(this.SimpleAltView, {
+//          choices$: this.dot('data').dot('views'),
+//        });
     }
   ]
 });
