@@ -99,6 +99,14 @@ foam.CLASS({
       name: 'textData',
       documentation: 'input text value by user'
 
+    },
+    {
+      class: 'Map',
+      name: 'gpMap'
+    },
+    {
+      class: 'Map',
+      name: 'gMap'
     }
   ],
 
@@ -158,13 +166,32 @@ foam.CLASS({
         .end();
     },
 
+    function getGroupPermission(p, g) {
+      var key  = p.id + ':' + g.id;
+      var data = this.gpMap[key];
+
+      if ( ! data ) {
+        data = this.GroupPermission.create({
+          checked: this.checkPermissionForGroup(p.id, g),
+          implied: g.implies(p.id)
+        });
+        if ( ! data.implied && ! data.checked ) {
+          var a = g.parent && this.gMap[g.parent];
+          var parent = a && g.parent && this.getGroupPermission(p, a);
+          if ( parent && ( parent.checked || parent.implied ) ) {
+            data.implied = true;
+          }
+        }
+        this.gpMap[key] = data;
+      }
+
+      return data;
+    },
+
     function createCheckBox(p, g) {
       var self = this;
       return function() {
-        var data = self.GroupPermission.create({
-          checked: self.checkPermissionForGroup(p.id, g),
-          implied: g.implies(p.id)
-        });
+        var data = self.getGroupPermission(p, g);
         data.checked$.sub(function() {
           self.updateGroup(p, g, data.checked$, self);
          });
@@ -180,7 +207,15 @@ foam.CLASS({
           .attrs({title: g.description})
           .call(function() {
             var cv = foam.graphics.CView.create({width: 20, height: 200});
-            var l  = foam.graphics.Label.create({text: g.id, x: 25 , y: 8, color: 'black', font: '300 16px Roboto', width: 200, height: 20, rotation: -Math.PI/2});
+            var l  = foam.graphics.Label.create({
+              text: g.id,
+              x: 25,
+              y: 8,
+              color: 'black',
+              font: '300 16px Roboto',
+              width: 200,
+              height: 20,
+              rotation: -Math.PI/2});
             cv.add(l);
             this.add(cv);
           })
@@ -193,6 +228,9 @@ foam.CLASS({
       var self = this;
 
       this.groupDAO.orderBy(this.Group.ID).select().then(function(gs) {
+        for ( var i = 0 ; i < gs.array.length ; i++ ) {
+          self.gMap[gs.array[i].id] = gs.array[i];
+        }
         self.permissionDAO.orderBy(self.Permission.ID).select().then(function(ps) {
           self.initMatrix(gs.array, ps.array);
         })
@@ -348,8 +386,9 @@ foam.CLASS({
       name: 'GroupPermissionView',
       extends: 'foam.u2.View',
       css: `
-        ^checked { color: #4885ed }
-        ^implied { color: lightGray }
+        ^:hover { background: #f55 }
+        ^checked { color: #4885ff }
+        ^implied { color: gray }
       `,
       methods: [
         function initE() {
