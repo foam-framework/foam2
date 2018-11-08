@@ -16,7 +16,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'text',
-      view: { class: 'foam.u2.tag.TextArea', rows: 40, cols: 120}
+      view: { class: 'foam.u2.tag.TextArea', rows: 40, cols: 120 }
     }
   ],
 

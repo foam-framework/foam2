@@ -1,9 +1,6 @@
 foam.CLASS({
   package: 'foam.flow',
   name: 'Document',
-  requires: [
-    'foam.u2.Element'
-  ],
   properties: [
     {
       class: 'String',
@@ -134,6 +131,7 @@ foam.CLASS({
           if ( foam.String.isInstance(v[0]) ) this.title = v[0];
 
           var children = v[1];
+          var self = this;
 
           return function(x) {
             return x.
@@ -329,31 +327,44 @@ foam.CLASS({
           return function(x) {
             this.
               start('pre').
-              cssClass('foam-flow-Document-code').
-              add(code).
+                cssClass('code').
+                add(code).
               end();
           };
         },
 
         'foam': function(attributes) {
           return function(x) {
-            // TODO: Reuse FoamTagLoader support, support classloading
             var viewName = attributes.view;
             var className = attributes.class;
-            var cls = x.lookup(className, true);
-            var view = x.lookup(viewName, true);
 
-            if ( className && ! cls )
-              this.add('Unknown class', className);
-            if ( viewName && ! view )
-              this.add('Unknown view', viewName);
+            // TODO: Reuse FoamTagLoader support
+            var promise = Promise.all([
+              viewName ? x.classloader.load(viewName) : Promise.resolve(),
+              className ? x.classloader.load(className) : Promise.resolve(),
+            ])
 
-            if ( ! cls && ! view ) return;
+            var self = this;
+            this.add(promise.then(function(o) {
+              return self.E().
+                callIf(o, function() {
+                  var cls = x.lookup(className, true);
+                  var view = x.lookup(viewName, true);
 
-            var obj = cls.create(attributes, this);
+                  if ( className && ! cls )
+                    this.add('Unknown class', className);
+                  if ( viewName && ! view )
+                    this.add('Unknown view', viewName);
 
-            if ( ! viewName ) this.add(obj)
-            else this.tag(view, { data: obj });
+                  if ( ! cls && ! view ) return;
+
+                  var obj = cls.create(attributes, this);
+
+                  if ( ! viewName ) this.add(obj)
+                  else this.tag(view, { data: obj });
+                });
+            }))
+
           };
         },
 

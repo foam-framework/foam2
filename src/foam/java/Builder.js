@@ -83,7 +83,7 @@ return this;`
 `;
       }
 
-      buildBody += 'return obj;'
+      buildBody += 'obj.init_(); return obj;'
 
       builder.method({
         name: 'build',

@@ -286,6 +286,12 @@ foam.CLASS({
       class: 'DateTime',
       name: 'lastModified',
       documentation: 'Last modified date.'
+    },
+    {
+      class: 'Boolean',
+      name: 'system',
+      value: false,
+      documentation: 'Indicate system accounts.'
     }
   ],
 
@@ -346,4 +352,26 @@ foam.RELATIONSHIP({
     hidden: false,
     tableWidth: 120
   }
+});
+
+// Relationship used in the agent auth service. Determines permission list when acting as a entity.
+foam.RELATIONSHIP({
+  cardinality: '*:*',
+  sourceModel: 'foam.nanos.auth.User',
+  targetModel: 'foam.nanos.auth.User',
+  forwardName: 'entities',
+  inverseName: 'agents',
+  junctionDAOKey: 'agentJunctionDAO',
+});
+
+foam.CLASS({
+  refines: 'foam.nanos.auth.UserUserJunction',
+
+  properties: [
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.Group',
+      name: 'group'
+    }
+  ]
 });

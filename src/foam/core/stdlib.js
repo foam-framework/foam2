@@ -536,7 +536,17 @@ foam.LIB({
         foam.assert(typeof str === 'string',
             'Cannot capitalize non-string values.');
         // switchFromProperyName to //SwitchFromPropertyName
+        if ( ! str ) return '';
         return str[0].toUpperCase() + str.substring(1);
+      })
+    },
+    {
+      name: 'pluralize',
+      code: foam.Function.memoize1(function(str) {
+        // Ex. Book -> Books, Currency -> Currencies, Kiss -> Kisses
+        if ( str.endsWith('s') ) return str + 'es';
+        if ( str.endsWith('y') ) return str.substring(0, str.length-1) + 'ies';
+        return str + 's';
       })
     },
     {
