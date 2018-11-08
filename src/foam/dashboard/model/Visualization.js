@@ -3,7 +3,8 @@ foam.CLASS({
   name: 'Visualization',
   requires: [
     'foam.dao.NullDAO',
-    'foam.dashboard.view.Card'
+    'foam.dashboard.view.Card',
+    'org.chartjs.ChartConfig',
   ],
   properties: [
     {
@@ -14,6 +15,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'label'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'org.chartjs.ChartConfig',
+      name: 'chartConfig',
+      factory: function() {
+        return this.ChartConfig.create();
+      },
     },
     {
       name: 'dao',
