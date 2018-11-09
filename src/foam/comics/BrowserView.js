@@ -110,7 +110,7 @@ foam.CLASS({
         exportEnabled,
         toggleEnabled
       ) {
-        var config = { data: data };
+        var config = {};
 
         if ( title ) config.title = title;
         if ( subtitle ) config.subtitle = subtitle;
@@ -124,8 +124,16 @@ foam.CLASS({
         config.toggleEnabled = toggleEnabled;
 
         if ( customDAOController ) {
-          return this.__context__.lookup(customDAOController).create(config);
+          var X = this.__context__;
+          var controller = X.lookup(customDAOController).create(config, X);
+
+          // Let the custom controller override the dao used.
+          controller.data = controller.data || data;
+
+          return controller;
         }
+
+        config.data = data;
         return this.DAOController.create(config);
       }
     },
