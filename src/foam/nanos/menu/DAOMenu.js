@@ -94,6 +94,12 @@ foam.CLASS({
       name: 'exportEnabled',
       documentation: 'True to enable the export button.',
       value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'toggleEnabled',
+      documentation: 'True to enable the toggle filters button.',
+      value: true
     }
   ],
 
@@ -110,7 +116,8 @@ foam.CLASS({
         editEnabled: this.editEnabled,
         selectEnabled: this.selectEnabled,
         addEnabled: this.addEnabled,
-        exportEnabled: this.exportEnabled
+        exportEnabled: this.exportEnabled,
+        toggleEnabled: this.toggleEnabled
       };
 
       if ( this.summaryView ) view.summaryView = this.summaryView;
