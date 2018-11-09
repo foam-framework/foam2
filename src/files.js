@@ -554,6 +554,11 @@ FOAM_FILES([
   { name: "foam/nanos/dig/exception/DigErrorMessage" },
   { name: "com/google/foam/demos/bubbles/Bubbles" },
 
+  { name: "org/chartjs/Lib" },
+  { name: "org/chartjs/AbstractChartCView" },
+  { name: "org/chartjs/Pie" },
+  { name: "org/chartjs/Bar" },
+
   { name: "foam/dashboard/model/Visualization" },
   { name: "foam/dashboard/model/GroupBy" },
   { name: "foam/dashboard/model/Count" },
