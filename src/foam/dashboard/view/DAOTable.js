@@ -6,6 +6,11 @@ foam.CLASS({
     'foam.u2.view.TableView',
   ],
   imports: [ 'data' ],
+  css: `
+    ^ table {
+      width: 100%;
+    }
+  `,
   methods: [
     function initE() {
       this.
