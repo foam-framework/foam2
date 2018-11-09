@@ -7,12 +7,14 @@ foam.CLASS({
   ],
   methods: [
     function updateChart_(data) {
+      var colors = this.colors;
       var groups = this.data.groups;
       var keys = this.data.sortedKeys();
       var data = {
         labels: keys,
         datasets: [
           {
+            backgroundColor: colors,
             data: keys.map(function(k) { return groups[k].value; })
           }
         ]

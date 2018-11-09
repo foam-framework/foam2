@@ -14,6 +14,7 @@ foam.CLASS({
     },
     function updateChart_(data) {
       // TODO: Support multiple datasets via nested groupby
+      var colors = this.colors;
       var groups = data.groups;
       var keys = data.sortedKeys();
       var data = {
@@ -21,6 +22,7 @@ foam.CLASS({
         datasets: [
           {
             label: data.arg2.label || data.arg2.model_.label,
+            backgroundColor: colors,
             data: keys.map(function(k) { return groups[k].value; })
           }
         ]
