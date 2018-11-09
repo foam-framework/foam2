@@ -506,7 +506,7 @@ return ( s1 instanceof String && ((String) s1).toUpperCase().contains(s2) );`
       javaReturns: 'String',
       javaCode: `return " '" + getArg1().createStatement() + "' ilike '%" + getArg2().createStatement() + "%' ";`
     }
-  ]
+  ]\
 });
 
 
@@ -909,7 +909,8 @@ foam.CLASS({
       // type-specific has() method to the Property.
       javaCode: `Object value = getArg1().f(obj);
         return ! (value == null ||
-          (value instanceof String && ((String)value).length() == 0) ||
+          (value instanceof Number && ((Number) value).intValue() == 0) ||
+          (value instanceof String && ((String) value).length() == 0) ||
           (value.getClass().isArray() && java.lang.reflect.Array.getLength(value) == 0));`
     },
     {
