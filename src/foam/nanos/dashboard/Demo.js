@@ -10,8 +10,9 @@ foam.CLASS({
     'as dashboardController'
   ],
   requires: [
+    'foam.dashboard.model.Count',
     'foam.dashboard.model.GroupBy',
-    'foam.dashboard.model.Count'
+    'foam.dashboard.model.Table',
   ],
   methods: [
     function initE() {
@@ -41,6 +42,9 @@ foam.CLASS({
           daoName: 'nSpecDAO',
           label: 'Lazy Services',
           predicate: 'is:lazy'
+        })).
+        add(this.Table.create({
+          daoName: 'nSpecDAO',
         })).
         end('td').
         end('tr').

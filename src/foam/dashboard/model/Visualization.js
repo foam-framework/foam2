@@ -4,6 +4,7 @@ foam.CLASS({
   requires: [
     'foam.dao.NullDAO',
     'foam.dashboard.view.Card',
+    'foam.mlang.sink.NullSink',
     'org.chartjs.ChartConfig',
   ],
   properties: [
@@ -34,7 +35,8 @@ foam.CLASS({
     {
       // TODO: Provide rich configuration of sink.
       name: 'sink',
-      hidden: true
+      hidden: true,
+      factory: function() { return this.NullSink.create() },
     },
     {
       name: 'data',
