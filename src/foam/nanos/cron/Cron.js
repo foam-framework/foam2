@@ -66,7 +66,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'second',
-      value: -1,
+      value: 0,
       documentation: `Second to execute the script.
            Ranges from 0 - 59. -1 for wildcard`
     },
