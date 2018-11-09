@@ -82,6 +82,12 @@ foam.CLASS({
       value: true
     },
     {
+      class: 'Boolean',
+      name: 'toggleEnabled',
+      documentation: 'True to enable the toggle filters button.',
+      value: true
+    },
+    {
       name: 'border',
       documentation: `
         If you want the DAO controller to be the content of a border view, set
@@ -157,6 +163,7 @@ foam.CLASS({
   actions: [
     {
       name: 'toggleFilters',
+      isAvailable: function(toggleEnabled) { return toggleEnabled; },
       code: function() {
         this.searchHidden = ! this.searchHidden;
       },
