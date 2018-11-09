@@ -194,7 +194,11 @@ foam.CLASS({
     },
 
     function dblclick(obj) {
-      this.onEdit(null, null, obj.id);
+      if ( this.data.dblclick ) {
+        this.data.dblclick(obj);
+      } else {
+        this.onEdit(null, null, obj.id);
+      }
     }
   ],
 
