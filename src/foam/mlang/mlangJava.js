@@ -506,7 +506,7 @@ return ( s1 instanceof String && ((String) s1).toUpperCase().contains(s2) );`
       javaReturns: 'String',
       javaCode: `return " '" + getArg1().createStatement() + "' ilike '%" + getArg2().createStatement() + "%' ";`
     }
-  ]\
+  ]
 });
 
 
