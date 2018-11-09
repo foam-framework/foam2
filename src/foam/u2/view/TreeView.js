@@ -197,7 +197,7 @@ foam.CLASS({
       var M   = this.ExpressionsSingleton.create();
       var of  = this.lookup(this.relationship.sourceModel);
       var dao = this.data$proxy.where(
-        M.NOT(M.EQ(of.getAxiomByName(this.relationship.inverseName), null)));
+        M.NOT(M.HAS(of.getAxiomByName(this.relationship.inverseName))));
       
       var self = this;
       this.addClass(this.myClass()).
