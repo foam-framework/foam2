@@ -5,7 +5,6 @@ foam.CLASS({
     'foam.dao.NullDAO',
     'foam.dashboard.view.Card',
     'foam.mlang.sink.NullSink',
-    'org.chartjs.ChartConfig',
   ],
   properties: [
     {
@@ -16,14 +15,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'label'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'org.chartjs.ChartConfig',
-      name: 'chartConfig',
-      factory: function() {
-        return this.ChartConfig.create();
-      },
     },
     {
       name: 'dao',
@@ -83,6 +74,26 @@ foam.CLASS({
       of: 'foam.dashboard.model.VisualizationSize',
       name: 'size',
       value: 'MEDIUM'
+    },
+    {
+      class: 'StringArray',
+      name: 'colors',
+      factory: function() {
+        return [
+          'blue',
+          'fuchsia',
+          'gray',
+          'green',
+          'maroon',
+          'navy',
+          'olive',
+          'purple',
+          'red',
+          'silver',
+          'teal',
+          'yellow',
+        ]
+      },
     }
   ],
   methods: [

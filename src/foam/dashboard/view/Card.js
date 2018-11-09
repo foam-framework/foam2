@@ -10,7 +10,8 @@ foam.CLASS({
   ],
   exports: [
     'contentWidth as visualizationWidth',
-    'contentHeight as visualizationHeight'
+    'contentHeight as visualizationHeight',
+    'data.colors as visualizationColors',
   ],
   constants: [
     {
