@@ -57,6 +57,17 @@ foam.CLASS({
       }
     },
     {
+      // TODO: An enum would be better'
+      class: 'String',
+      name: 'mode',
+      hidden: true,
+      expression: function(currentView) {
+        return currentView == this.DetailView ?
+          'config' :
+          'display';
+      }
+    },
+    {
       name: 'views',
       hidden: true,
       factory: function() {
@@ -64,6 +75,12 @@ foam.CLASS({
           [ this.DetailView, 'Configuration' ]
         ]
       }
+    },
+    {
+      class: 'Enum',
+      of: 'foam.dashboard.model.VisualizationSize',
+      name: 'size',
+      value: 'MEDIUM'
     }
   ],
   methods: [
