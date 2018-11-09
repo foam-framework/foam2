@@ -1281,6 +1281,7 @@ foam.CLASS({
       var value = this.arg1.f(obj);
 
       return ! (
+        value === 0         ||
         value === undefined ||
         value === null      ||
         value === ''        ||
