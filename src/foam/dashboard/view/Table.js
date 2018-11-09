@@ -6,6 +6,11 @@ foam.CLASS({
   properties: [
     [ 'nodeName', 'table' ]
   ],
+  css: `
+^ {
+  flex: 1 1 auto;
+}
+`,
   methods: [
     function initE() {
       this.
