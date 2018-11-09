@@ -81,6 +81,7 @@ FOAM_FILES([
   { name: "foam/nanos/menu/TabsMenu" },
   { name: "foam/nanos/menu/ViewMenu" },
   { name: "foam/nanos/menu/TreeAltView" },
+  { name: "foam/nanos/menu/TreeGraphAltView" },
   { name: "foam/nanos/auth/PermissionTableView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/TopNavigation", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/FooterView", flags: ['web'] },
