@@ -72,6 +72,12 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'draggable',
+      documentation: 'Enable to allow drag&drop editing.'
+      value: true
+    },
+    {
+      class: 'Boolean',
       name: 'hasChildren'
     }
   ],
@@ -87,7 +93,6 @@ foam.CLASS({
           }
           return '';
         }, this.selection$, this.data$.dot('id'))).
-        attrs({ draggable: 'true' }).
         start('span').
           style({
             visibility: this.hasChildren$.map(function(c) { return c ? 'visible' : 'hidden'; }),
@@ -97,11 +102,15 @@ foam.CLASS({
           add(this.expanded$.map(function(v) { return v ? '\u25BD' : '\u25B7'; })).
           entity('nbsp').
         end().
-        on('click', this.selected).
-        on('dragstart', this.onDragStart).
-        on('dragenter', this.onDragOver).
-        on('dragover', this.onDragOver).
-        on('drop', this.onDrop).
+        callIf(this.draggable, function() {
+          this.
+          attrs({ draggable: 'true' }).
+          on('click',     this.selected).
+          on('dragstart', this.onDragStart).
+          on('dragenter', this.onDragOver).
+          on('dragover',  this.onDragOver).
+          on('drop',      this.onDrop);
+        }).
         start('span').addClass(self.myClass('label')).call(this.formatter, [self.data]).end().
         add(this.slot(function(e) {
           if ( ! e ) return this.E('div');
