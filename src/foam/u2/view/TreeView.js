@@ -34,8 +34,14 @@ foam.CLASS({
   ],
 
   css: `
-    ^ { white-space: nowrap; margin-left: 20px; }
-    ^selected > ^label { outline: 2px solid #59aadd; }
+    ^ {
+      white-space: nowrap;
+      margin-left: 20px;
+    }
+
+    ^selected > ^label {
+      outline: 2px solid #59aadd;
+    }
   `,
 
   properties: [
@@ -53,6 +59,10 @@ foam.CLASS({
     {
       class: 'Function',
       name: 'formatter'
+    },
+    {
+      class: 'Boolean',
+      name: 'hasChildren'
     }
   ],
 
@@ -69,6 +79,7 @@ foam.CLASS({
         }, this.selection$, this.data$.dot('id'))).
         attrs({ draggable: 'true' }).
         start('span').
+          style({visibility: this.hasChildren$.map(function(c) { return c ? 'visible' : 'hidden'; })}).
           on('click', this.toggleExpanded).
           add(this.expanded$.map(function(v) { return v ? '\u25BD' : '\u25B7'; })).
           entity('nbsp').
@@ -83,6 +94,7 @@ foam.CLASS({
           if ( ! e ) return this.E('div');
           var e2 = this.E('div');
           e2.select(this.data[self.relationship.forwardName]/*.dao*/, function(obj) {
+            self.hasChildren = true;
             return self.cls_.create({
               data: obj,
               formatter: self.formatter,
@@ -198,7 +210,7 @@ foam.CLASS({
       var of  = this.lookup(this.relationship.sourceModel);
       var dao = this.data$proxy.where(
         M.NOT(M.HAS(of.getAxiomByName(this.relationship.inverseName))));
-      
+
       var self = this;
       this.addClass(this.myClass()).
         select(dao, function(obj) {
