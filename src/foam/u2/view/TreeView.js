@@ -41,6 +41,7 @@ foam.CLASS({
 
     ^label:hover {
       background: #59aadd;
+      color: white;
     }
 
     ^label {
