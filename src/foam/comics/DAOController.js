@@ -157,6 +157,11 @@ foam.CLASS({
         Set this to override the label of the create button, which is the
         default primary action.
       `
+    },
+    {
+      class: 'String',
+      name: 'detailView',
+      value: 'foam.u2.DetailView'
     }
   ],
 
@@ -166,7 +171,7 @@ foam.CLASS({
       isAvailable: function(toggleEnabled) { return toggleEnabled; },
       code: function() {
         this.searchHidden = ! this.searchHidden;
-      },
+      }
     },
     {
       name: 'create',
@@ -213,7 +218,7 @@ foam.CLASS({
     {
       name: 'export',
       isAvailable: function(exportEnabled) { return exportEnabled; },
-      code: function() { 
+      code: function() {
         this.pub('export', this.filteredDAO)
       }
     }
