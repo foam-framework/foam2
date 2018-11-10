@@ -29,8 +29,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'selection',
-    'onObjDrop'
+    'onObjDrop',
+    'selection'
   ],
 
   css: `
@@ -73,7 +73,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'draggable',
-      documentation: 'Enable to allow drag&drop editing.'
+      documentation: 'Enable to allow drag&drop editing.',
       value: true
     },
     {
@@ -102,10 +102,10 @@ foam.CLASS({
           add(this.expanded$.map(function(v) { return v ? '\u25BD' : '\u25B7'; })).
           entity('nbsp').
         end().
+        on('click',     this.selected).
         callIf(this.draggable, function() {
           this.
           attrs({ draggable: 'true' }).
-          on('click',     this.selected).
           on('dragstart', this.onDragStart).
           on('dragenter', this.onDragOver).
           on('dragover',  this.onDragOver).
