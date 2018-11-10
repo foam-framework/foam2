@@ -79,7 +79,10 @@ foam.CLASS({
         }, this.selection$, this.data$.dot('id'))).
         attrs({ draggable: 'true' }).
         start('span').
-          style({visibility: this.hasChildren$.map(function(c) { return c ? 'visible' : 'hidden'; })}).
+          style({
+            visibility: this.hasChildren$.map(function(c) { return c ? 'visible' : 'hidden'; }),
+            'font-size': '12px'
+          }).
           on('click', this.toggleExpanded).
           add(this.expanded$.map(function(v) { return v ? '\u25BD' : '\u25B7'; })).
           entity('nbsp').
