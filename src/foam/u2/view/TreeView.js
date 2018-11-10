@@ -36,7 +36,16 @@ foam.CLASS({
   css: `
     ^ {
       white-space: nowrap;
-      margin-left: 20px;
+      margin: 4px 20px;
+    }
+
+    ^label:hover {
+      background: #59aadd;
+    }
+
+    ^label {
+      min-width: 120px;
+      padding: 4px;
     }
 
     ^selected > ^label {
