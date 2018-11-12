@@ -1,16 +1,31 @@
 foam.CLASS({
   package: 'foam.dashboard.view',
   name: 'Pie',
-  extends: 'foam.u2.Element',
-  imports: [ 'data' ],
-  requires: [
-    'org.chartjs.Pie'
+  extends: 'org.chartjs.Pie',
+  imports: [
+    'visualizationWidth',
+    'visualizationHeight',
+    'visualizationColors',
+    'data as visualization'
+  ],
+  properties: [
+    {
+      name: 'width',
+      expression: function(visualizationWidth) { return visualizationWidth; }
+    },
+    {
+      name: 'height',
+      expression: function(visualizationHeight) { return visualizationHeight; }
+    },
+    {
+      name: 'colors',
+      expression: function(visualizationColors) { return visualizationColors; }
+    },
   ],
   methods: [
-    function initE() {
-      this.add(this.slot(function(data$data) {
-        return this.Pie.create({ data: data$data });
-      }));
+    function initCView(x) {
+      this.SUPER(x);
+      this.data$ = this.visualization$.dot('data');
     }
   ]
 });

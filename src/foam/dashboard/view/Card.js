@@ -8,6 +8,49 @@ foam.CLASS({
   imports: [
     'dashboardController'
   ],
+  exports: [
+    'contentWidth as visualizationWidth',
+    'contentHeight as visualizationHeight',
+    'data.colors as visualizationColors',
+  ],
+  constants: [
+    {
+      name: 'SIZES',
+      value: {
+        TINY:   [176, 176],
+        SMALL:  [312, 176],
+        MEDIUM: [624, 358],
+        LARGE:  [936, 528]
+      }
+    }
+  ],
+  properties: [
+    {
+      name: 'width',
+      expression: function(data$size) {
+        return this.SIZES[data$size.name][0];
+      }
+    },
+    {
+      name: 'height',
+      expression: function(data$size) {
+        return this.SIZES[data$size.name][1];
+      }
+    },
+    {
+      name: 'contentWidth',
+      expression: function(width) {
+        return width;
+      }
+    },
+    {
+      name: 'contentHeight',
+      expression: function(height) {
+        // 70 is height of header as dictated by the ^header CSS class
+        return height - 70;
+      }
+    }
+  ],
   css: `
 ^ {
   border: 2px solid #dae1e9;
@@ -20,6 +63,39 @@ foam.CLASS({
   margin-bottom: 16px;
   border-bottom: 1px solid #ccc;
   font-weight: bold;
+  height: 21px;
+}
+
+^display^tiny ^content {
+  height: 106px;
+}
+
+^display^small ^content {
+  height: 106px;
+}
+
+^display^medium ^content {
+  height: 282px;
+}
+
+^display^large ^content {
+  height: 458px;
+}
+
+^display^tiny {
+  width: 176px;
+}
+
+^display^small {
+  width: 312px;
+}
+
+^display^medium {
+  width: 624px;
+}
+
+^display^large {
+  width: 936px;
 }
 `,
   methods: [
@@ -29,16 +105,37 @@ foam.CLASS({
       }.bind(this)));
       this.data.update();
 
+      var view = this;
+
       this.
+        style({
+          width: this.slot(function(data$mode, width) {
+            return data$mode == 'config' ? 'initial' : ( width + 'px' );
+          }),
+          height: this.slot(function(data$mode, height) {
+            return data$mode == 'config' ? 'initial' : ( height + 'px' );
+          })
+        }).
         addClass(this.myClass()).
+        // addClass(this.dot('data').dot('mode').map(function(m){
+        //   return m == 'config' ?
+        //     view.myClass('config') :
+        //     view.myClass('display');
+        // })).
+        // addClass(this.dot('data').dot('size').map(function(s) {
+        //   return view.myClass(s.name);
+        // })).
         start('div').
         addClass(this.myClass('header')).
         add(this.data.label$).
         add(this.data.CURRENT_VIEW).
         end('div').
+        start('div').
+        addClass(this.myClass('content')).
         tag(this.slot(function(data$currentView) {
           return foam.u2.ViewSpec.createView(data$currentView, null, this, this.__subSubContext__);
-        }));
+        })).
+        end('div');
 //        tag(this.SimpleAltView, {
 //          choices$: this.dot('data').dot('views'),
 //        });

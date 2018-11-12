@@ -10,12 +10,14 @@ foam.CLASS({
     'as dashboardController'
   ],
   requires: [
+    'foam.dashboard.model.Count',
     'foam.dashboard.model.GroupBy',
-    'foam.dashboard.model.Count'
+    'foam.dashboard.model.Table',
   ],
   methods: [
     function initE() {
-      var timeout = this.setInterval(this.onUpdate, 5000);
+      var timeout = -1;
+      //      var timeout = this.setInterval(this.onUpdate, 5000);
       var view = this;
 
       this.onDetach(function() {
@@ -40,18 +42,23 @@ foam.CLASS({
           label: 'Served/Unserved Services.'
         })).
         end('td').
-        start('td').
-        add(this.GroupBy.create({
-          daoName: 'nSpecDAO',
-          arg1: 'serve',
-          label: 'Served/Unserved Services.'
-        })).
-        end('td').
+        end('tr').
+        start('tr').
         start('td').
         add(this.Count.create({
           daoName: 'nSpecDAO',
           label: 'Lazy Services',
           predicate: 'is:lazy'
+        })).
+        add(this.Table.create({
+          daoName: 'nSpecDAO',
+        })).
+        end('td').
+        start('td').
+        add(this.GroupBy.create({
+          daoName: 'nSpecDAO',
+          arg1: 'serve',
+          label: 'Served/Unserved Services.'
         })).
         end('td').
         end('tr').

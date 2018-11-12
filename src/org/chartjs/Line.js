@@ -1,95 +1,34 @@
 foam.CLASS({
   package: 'org.chartjs',
   name: 'Line',
-  extends: 'foam.u2.Element',
+  extends: 'org.chartjs.AbstractChartCView',
   requires: [
-    'org.chartjs.Lib',
+    'foam.mlang.sink.GroupBy',
   ],
   properties: [
-    {
-      class: 'FObjectProperty',
-      of: 'foam.mlang.sink.GroupBy',
-      name: 'data',
-      postSet: function(_, n) {
-        this.onDetach(n.groups$.sub(function(sub) {
-          if ( this.data !== n ) sub.detach();
-          else this.updateChart();
-        }.bind(this)));
-      },
-    },
-    {
-      name: 'nodeName',
-      value: 'canvas',
-    },
-    {
-      name: 'chart',
-    },
-    {
-      name: 'chartConfig',
-      factory: function() {
-        return {
-          type: 'line',
-          datasets: [{}],
-          options: {
-            scales: {
-              yAxes: [{
-                ticks: {
-                  beginAtZero: true
-                }
-              }]
-            }
-          }
-        }
-      },
-    },
-  ],
-  listeners: [
-    {
-      name: 'loadChart',
-      isFramed: true,
-      code: function() {
-        var canvas = this.el();
-        var ctx = canvas.getContext('2d');
-        this.chart = new this.Lib.CHART(ctx, this.chartConfig);
-        this.updateChart();
-      },
-    },
-    {
-      name: 'updateChart',
-      isFramed: true,
-      code: function() {
-        if ( ! this.chart ) return;
-        var groups = this.data.groups;
-
-        var datasets = this.chartConfig.datasets;
-        var i = 0;
-        Object.keys(groups).forEach(function(k) {
-          var d = datasets[i] || {};
-          d.label = k;
-          d.data = Object.keys(groups[k].groups).map(function(x) {
-            return { x: x, y: groups[k].groups[x].value }
-          })
-          datasets[i] = d;
-          i++;
-        });
-
-        var xValues = {};
-        Object.keys(groups).forEach(function(k) {
-          Object.keys(groups[k].groups).forEach(function(x) {
-            xValues[x] = true;
-          });
-        });
-        this.chartConfig.labels = Object.keys(xValues);
-
-        this.chart.data = this.chartConfig;
-        this.chart.update();
-      },
-    },
+    ['chartType', 'line'],
   ],
   methods: [
-    function init() {
-      this.onDetach(this.onload.sub(this.loadChart));
-      this.SUPER();
-    },
-  ],
+    function updateChart_(data) {
+      var groups = data.groups;
+      var keys = data.sortedKeys();
+
+      if ( this.GroupBy.isInstance(data.arg2) ) {
+        // TODO
+        return;
+      }
+
+      this.chart.data = {
+        labels: keys,
+        datasets: [
+          {
+            label: data.arg2.label || data.arg2.model_.label,
+            data: keys.map(function(k) { return groups[k].value; })
+          }
+        ]
+      };
+
+      this.chart.update();
+    }
+  ]
 });

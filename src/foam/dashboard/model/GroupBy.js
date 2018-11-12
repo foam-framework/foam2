@@ -20,10 +20,10 @@ foam.CLASS({
       name: 'views',
       factory: function() {
         return [
-          [ this.Table, 'Table' ],
           [ this.Pie, 'Pie', ],
-          [ this.Line, 'Line' ],
           [ this.Bar, 'Bar', ],
+          [ this.Line, 'Line' ],
+          [ this.Table, 'Table' ],
           [ this.DetailView, 'Configure' ]
         ]
       }
