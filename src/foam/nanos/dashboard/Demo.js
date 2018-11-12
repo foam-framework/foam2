@@ -35,6 +35,13 @@ foam.CLASS({
           label: 'Served/Unserved Services.'
         })).
         end('td').
+        start('td').
+        add(this.GroupBy.create({
+          daoName: 'nSpecDAO',
+          arg1: 'serve',
+          label: 'Served/Unserved Services.'
+        })).
+        end('td').
         end('tr').
         start('tr').
         start('td').
@@ -45,6 +52,13 @@ foam.CLASS({
         })).
         add(this.Table.create({
           daoName: 'nSpecDAO',
+        })).
+        end('td').
+        start('td').
+        add(this.GroupBy.create({
+          daoName: 'nSpecDAO',
+          arg1: 'serve',
+          label: 'Served/Unserved Services.'
         })).
         end('td').
         end('tr').
