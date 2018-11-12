@@ -48,9 +48,7 @@ foam.CLASS({
               value: data$data$groups[k].value,
             }));
           })
-          return this.E().
-            start(this.TableView, { data: dao }).
-            end();
+          return this.TableView.create({ data: dao });
         }))
     }
   ]
