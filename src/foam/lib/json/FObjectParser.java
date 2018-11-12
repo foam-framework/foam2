@@ -30,7 +30,7 @@ public class FObjectParser
         public PStream parse(PStream ps, ParserContext x) {
           try {
             PStream ps1 = ps.apply(delegate, x);
-            Class   c   = ps1 != null ?
+            Class   c   = ( ps1 != null ) ?
               Class.forName(ps1.value().toString()) :
               defaultClass ;
 

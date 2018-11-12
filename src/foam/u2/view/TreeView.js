@@ -29,13 +29,29 @@ foam.CLASS({
   ],
 
   imports: [
-    'selection',
-    'onObjDrop'
+    'onObjDrop',
+    'selection'
   ],
 
   css: `
-    ^ { white-space: nowrap; margin-left: 20px; }
-    ^selected > ^label { outline: 2px solid #59aadd; }
+    ^ {
+      white-space: nowrap;
+      margin: 4px 20px;
+    }
+
+    ^label:hover {
+      background: #59aadd;
+      color: white;
+    }
+
+    ^label {
+      min-width: 120px;
+      padding: 4px;
+    }
+
+    ^selected > ^label {
+      outline: 2px solid #59aadd;
+    }
   `,
 
   properties: [
@@ -53,6 +69,16 @@ foam.CLASS({
     {
       class: 'Function',
       name: 'formatter'
+    },
+    {
+      class: 'Boolean',
+      name: 'draggable',
+      documentation: 'Enable to allow drag&drop editing.',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'hasChildren'
     }
   ],
 
@@ -67,22 +93,30 @@ foam.CLASS({
           }
           return '';
         }, this.selection$, this.data$.dot('id'))).
-        attrs({ draggable: 'true' }).
         start('span').
+          style({
+            visibility: this.hasChildren$.map(function(c) { return c ? 'visible' : 'hidden'; }),
+            'font-size': '12px'
+          }).
           on('click', this.toggleExpanded).
           add(this.expanded$.map(function(v) { return v ? '\u25BD' : '\u25B7'; })).
           entity('nbsp').
         end().
-        on('click', this.selected).
-        on('dragstart', this.onDragStart).
-        on('dragenter', this.onDragOver).
-        on('dragover', this.onDragOver).
-        on('drop', this.onDrop).
+        on('click',     this.selected).
+        callIf(this.draggable, function() {
+          this.
+          attrs({ draggable: 'true' }).
+          on('dragstart', this.onDragStart).
+          on('dragenter', this.onDragOver).
+          on('dragover',  this.onDragOver).
+          on('drop',      this.onDrop);
+        }).
         start('span').addClass(self.myClass('label')).call(this.formatter, [self.data]).end().
         add(this.slot(function(e) {
           if ( ! e ) return this.E('div');
           var e2 = this.E('div');
           e2.select(this.data[self.relationship.forwardName]/*.dao*/, function(obj) {
+            self.hasChildren = true;
             return self.cls_.create({
               data: obj,
               formatter: self.formatter,
@@ -188,7 +222,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'startExpanded',
-      value: false
+      value: true
     }
   ],
 
@@ -205,7 +239,7 @@ foam.CLASS({
           return self.TreeViewRow.create({
             data: obj,
             relationship: self.relationship,
-            expanded: self.startExpanded,
+            startExpanded: self.startExpanded,
             formatter: self.formatter
           }, this);
         });

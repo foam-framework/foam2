@@ -410,6 +410,7 @@ FOAM_FILES([
   { name: "foam/u2/view/FObjectView", flags: ['web'] },
   { name: "foam/u2/view/FObjectArrayView", flags: ['web'] },
   { name: "foam/u2/view/ChoiceView", flags: ['web'] },
+  { name: "foam/u2/view/RichChoiceView", flags: ['web'] },
   { name: "foam/u2/view/RadioView", flags: ['web'] },
   { name: "foam/u2/view/TextField", flags: ['web'] },
   { name: "foam/u2/view/TreeView", flags: ['web'] },
