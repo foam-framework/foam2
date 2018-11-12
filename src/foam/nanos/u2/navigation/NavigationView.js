@@ -7,7 +7,7 @@ foam.CLASS({
 
   css: `
     ^top-nav {
-      width: calc(100% - 0px);
+      width: 100%;
       display: inline;
       z-index: 10001;
       position: fixed;
