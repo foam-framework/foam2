@@ -37,7 +37,7 @@ foam.CLASS({
   css: `
     ^ {
       white-space: nowrap;
-      margin: 4px 20px;
+      margin: 6px 20px;
       inset: none;
     }
 
@@ -48,7 +48,7 @@ foam.CLASS({
 
     ^label {
       min-width: 120px;
-      padding: 4px;
+      padding: 2px;
     }
 
     ^selected > ^label {
@@ -104,7 +104,7 @@ foam.CLASS({
           add(this.expanded$.map(function(v) { return v ? '\u25BD' : '\u25B7'; })).
           entity('nbsp').
         end().
-        on('click',     this.selected).
+        on('click', this.selected).
         callIf(this.draggable, function() {
           this.
           attrs({ draggable: 'true' }).
