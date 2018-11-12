@@ -36,7 +36,7 @@ foam.CLASS({
       }.bind(this));
 
       this.
-        addClass(this.myClass())
+        addClass(this.myClass());
     }
   ],
   listeners: [
