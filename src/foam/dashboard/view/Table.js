@@ -9,11 +9,8 @@ foam.CLASS({
   ],
   imports: [
     'data',
-    'visualizationWidth',
-    'visualizationHeight'
   ],
   properties: [
-    [ 'nodeName', 'table' ],
     {
       name: 'tableCls',
       expression: function(data$data$arg1, data$data$arg2) {
@@ -47,8 +44,8 @@ foam.CLASS({
           var dao = this.ArrayDAO.create({ of: tableCls });
           data$data.sortedKeys().forEach(function(k) {
             dao.put(tableCls.create({
-              id: k,
-              value: '' + data$data$groups[k].value,
+              id: '' + k,
+              value: data$data$groups[k].value,
             }));
           })
           return this.E().
