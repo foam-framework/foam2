@@ -65,38 +65,6 @@ foam.CLASS({
   font-weight: bold;
   height: 21px;
 }
-
-^display^tiny ^content {
-  height: 106px;
-}
-
-^display^small ^content {
-  height: 106px;
-}
-
-^display^medium ^content {
-  height: 282px;
-}
-
-^display^large ^content {
-  height: 458px;
-}
-
-^display^tiny {
-  width: 176px;
-}
-
-^display^small {
-  width: 312px;
-}
-
-^display^medium {
-  width: 624px;
-}
-
-^display^large {
-  width: 936px;
-}
 `,
   methods: [
     function initE() {

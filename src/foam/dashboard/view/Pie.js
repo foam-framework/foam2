@@ -15,7 +15,7 @@ foam.CLASS({
     },
     {
       name: 'height',
-      expression: function(visualizationHeight) { return visualizationHeight; }
+      expression: function(visualizationHeight) { return visualizationHeight - 16; }
     },
     {
       name: 'colors',
