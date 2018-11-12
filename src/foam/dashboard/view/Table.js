@@ -2,19 +2,27 @@ foam.CLASS({
   package: 'foam.dashboard.view',
   name: 'Table',
   extends: 'foam.u2.Element',
-  imports: [ 'data' ],
+  imports: [
+    'data',
+    'visualizationWidth',
+    'visualizationHeight'
+  ],
   properties: [
     [ 'nodeName', 'table' ]
   ],
   css: `
 ^ {
-  flex: 1 1 auto;
+  overflow: auto;
 }
 `,
   methods: [
     function initE() {
       this.
         addClass(this.myClass()).
+        style({
+          width: this.visualizationWidth$.map(function(w) { return w + 'px'; })
+//          height: this.visualizationHeight$.map(function(h) { return h + 'px'; })
+        }).
         add(this.slot(function(data$data$arg1, data$data$arg2) {
           return this.
             E('thead').
