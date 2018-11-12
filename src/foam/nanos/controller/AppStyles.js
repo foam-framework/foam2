@@ -37,7 +37,7 @@ foam.CLASS({
       padding-left: 15px;
       height: 40px;
     }
-    .foam-u2-view-TableView tbody > tr > th > td {
+    .foam-u2-view-TableView-row > th > td {
       font-size: 12px;
       letter-spacing: 0.2px;
       text-align: left;
@@ -62,12 +62,16 @@ foam.CLASS({
       font-size: 12px;
       color: #093649;
     }
-    .foam-u2-view-TableView tbody > tr {
+    .foam-u2-view-TableView-row {
       height: 60px;
       background: white;
     }
-    .foam-u2-view-TableView tbody > tr:nth-child(odd) {
+    .foam-u2-view-TableView-row:nth-child(odd) {
       background: #f6f9f9;
+    }
+    .foam-u2-view-TableView-row.foam-u2-view-TableView-selected,
+    .foam-u2-view-TableView-row:nth-child(odd):hover {
+      background: #eee;
     }
     .New {
       width: 35px;
