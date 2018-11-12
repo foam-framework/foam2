@@ -14,7 +14,10 @@ foam.CLASS({
         labels: keys,
         datasets: [
           {
-            backgroundColor: colors,
+            borderColor: colors,
+            backgroundColor: colors.map(function(c) {
+              return this.Lib.CHART.helpers.color(c).alpha(0.5).rgbString();
+            }.bind(this)),
             data: keys.map(function(k) { return groups[k].value; })
           }
         ]
