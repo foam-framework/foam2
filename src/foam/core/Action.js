@@ -147,7 +147,9 @@ foam.CLASS({
     function maybeCall(ctx, data) {
       if ( this.isEnabledFor(data) && this.isAvailableFor(data) ) {
         this.code.call(data, ctx, this);
-        data && data.pub('action', this.name, this);
+        // primitive types won't have a pub method
+        // Why are we publishing this event anyway? KGR
+        data && data.pub && data.pub('action', this.name, this);
         return true;
       }
 

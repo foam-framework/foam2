@@ -1,60 +1,59 @@
 foam.CLASS({
   package: 'foam.nanos.dashboard',
   name: 'Demo',
-  extends: 'foam.u2.Element',
+  extends: 'foam.dashboard.view.Dashboard',
   imports: [
     'nSpecDAO',
-    'setInterval'
-  ],
-  exports: [
-    'as dashboardController'
   ],
   requires: [
     'foam.dashboard.model.Count',
     'foam.dashboard.model.GroupBy',
     'foam.dashboard.model.Table',
+    'foam.dashboard.model.VisualizationSize'
+  ],
+  properties: [
+    [ 'nodeName', 'div' ]
   ],
   methods: [
     function initE() {
-      var timeout = -1;
-      //      var timeout = this.setInterval(this.onUpdate, 5000);
-      var view = this;
-
-      this.onDetach(function() {
-        this.clearInterval(timeout);
-      }.bind(this));
+      this.SUPER();
 
       this.
-        start('table').
-        start('tbody').
-        start('tr').
-        start('td').
+        add(this.Count.create({
+          daoName: 'nSpecDAO',
+          predicate: 'is:lazy',
+          size: this.VisualizationSize.TINY,
+          label: 'Lazy services'
+        })).
         add(this.GroupBy.create({
           daoName: 'nSpecDAO',
           arg1: 'serve',
-          label: 'Served/Unserved Services.'
+          size: this.VisualizationSize.SMALL,
+          label: 'Served/Unserved Services'
         })).
-        end('td').
-        end('tr').
-        start('tr').
-        start('td').
-        add(this.Count.create({
+        add(this.GroupBy.create({
           daoName: 'nSpecDAO',
-          label: 'Lazy Services',
-          predicate: 'is:lazy'
+          arg1: 'serve',
+          size: this.VisualizationSize.MEDIUM,
+          label: 'Served/Unserved Services'
+        })).
+        add(this.GroupBy.create({
+          daoName: 'nSpecDAO',
+          arg1: 'serve',
+          size: this.VisualizationSize.SMALL,
+          label: 'Served/Unserved Services'
+        })).
+        add(this.GroupBy.create({
+          daoName: 'nSpecDAO',
+          arg1: 'serve',
+          size: this.VisualizationSize.LARGE,
+          label: 'Served/Unserved Services'
         })).
         add(this.Table.create({
           daoName: 'nSpecDAO',
-        })).
-        end('td').
-        end('tr').
-        end('tbody').
-        end('table');
-    }
-  ],
-  listeners: [
-    function onUpdate() {
-      this.pub('dashboard', 'update');
+          size: this.VisualizationSize.LARGE,
+          label: 'Served/Unserved Services'
+        }));
     }
   ]
 });
