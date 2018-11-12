@@ -16,7 +16,8 @@ foam.CLASS({
       // TODO: Support multiple datasets via nested groupby
       var groups = data.groups;
       var keys = data.sortedKeys();
-      var data = {
+
+      this.chart.data = {
         labels: keys,
         datasets: [
           {
@@ -25,7 +26,7 @@ foam.CLASS({
           }
         ]
       };
-      this.chart.data = data
+
       this.chart.update();
     }
   ]

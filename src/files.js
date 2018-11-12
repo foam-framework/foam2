@@ -558,14 +558,18 @@ FOAM_FILES([
   { name: "org/chartjs/AbstractChartCView" },
   { name: "org/chartjs/Pie" },
   { name: "org/chartjs/Bar" },
+  { name: "org/chartjs/Line" },
 
   { name: "foam/dashboard/model/Visualization" },
   { name: "foam/dashboard/model/GroupBy" },
   { name: "foam/dashboard/model/Count" },
+  { name: "foam/dashboard/model/Table" },
 
   { name: "foam/dashboard/view/Count" },
   { name: "foam/dashboard/view/Table" },
   { name: "foam/dashboard/view/Pie" },
   { name: "foam/dashboard/view/Bar" },
+  { name: "foam/dashboard/view/Line" },
+  { name: "foam/dashboard/view/DAOTable" },
   { name: "foam/dashboard/view/Card" }
 ]);

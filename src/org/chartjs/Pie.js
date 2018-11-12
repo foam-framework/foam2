@@ -7,9 +7,9 @@ foam.CLASS({
   ],
   methods: [
     function updateChart_(data) {
-      var groups = this.data.groups;
-      var keys = this.data.sortedKeys();
-      var data = {
+      var groups = data.groups;
+      var keys = data.sortedKeys();
+      this.chart.data = {
         labels: keys,
         datasets: [
           {
@@ -17,7 +17,7 @@ foam.CLASS({
           }
         ]
       };
-      this.chart.data = data;
+
       this.chart.update();
     }
   ]
