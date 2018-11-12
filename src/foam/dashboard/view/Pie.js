@@ -5,6 +5,7 @@ foam.CLASS({
   imports: [
     'visualizationWidth',
     'visualizationHeight',
+    'visualizationColors',
     'data as visualization'
   ],
   properties: [
@@ -15,7 +16,11 @@ foam.CLASS({
     {
       name: 'height',
       expression: function(visualizationHeight) { return visualizationHeight; }
-    }
+    },
+    {
+      name: 'colors',
+      expression: function(visualizationColors) { return visualizationColors; }
+    },
   ],
   methods: [
     function initCView(x) {
