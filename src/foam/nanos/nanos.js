@@ -96,6 +96,7 @@ FOAM_FILES([
   { name: "foam/nanos/script/Script" },
   { name: "foam/nanos/script/TestRunnerScript" },
   { name: "foam/nanos/jetty/HttpServer" },
+  { name: "foam/nanos/servlet/Servlet" },
   { name: "foam/nanos/servlet/ErrorPageMapping" },
   { name: "foam/nanos/servlet/FilterMapping" },
   { name: "foam/nanos/servlet/ServletMapping" },
