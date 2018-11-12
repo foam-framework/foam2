@@ -21,8 +21,11 @@ foam.CLASS({
         labels: keys,
         datasets: [
           {
+            // TODO: When multiple datasets are supported, use a different color
+            // for each dataset.
+            backgroundColor: colors[0],
+
             label: data.arg2.label || data.arg2.model_.label,
-            backgroundColor: colors,
             data: keys.map(function(k) { return groups[k].value; })
           }
         ]
