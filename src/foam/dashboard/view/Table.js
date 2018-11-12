@@ -7,7 +7,11 @@ foam.CLASS({
     'foam.dao.ArrayDAO',
     'foam.u2.view.TableView',
   ],
-  imports: [ 'data' ],
+  imports: [
+    'data',
+    'visualizationWidth',
+    'visualizationHeight'
+  ],
   properties: [
     [ 'nodeName', 'table' ],
     {

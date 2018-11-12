@@ -29,8 +29,8 @@ foam.CLASS({
     ^ {
       background-color: white;
       border-radius: 2px;
-      min-width: 300px;
-      font-size: medium;
+      min-width: 250px;
+      font-size: smaller;
     }
 
     ^ input {
@@ -47,11 +47,11 @@ foam.CLASS({
     }
 
     ^ .general-query {
-      padding: 20px;
+      padding: 16px 20px;
     }
 
     ^count {
-      font-size: 14pt;
+      font-size: 12pt;
       color: #555;
       margin: 20px 20px 0 20px;
     }
@@ -66,11 +66,11 @@ foam.CLASS({
       font-stretch: normal;
       font-style: normal;
       font-weight: normal;
-      height: 40px;
+      height: 30px;
       letter-spacing: 0.2px;
-      line-height: 2.86;
       text-align: center;
       width: 60px;
+      height: 32px;
       margin: 20px;
     }
   `,

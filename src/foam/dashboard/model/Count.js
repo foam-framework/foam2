@@ -24,9 +24,7 @@ foam.CLASS({
 
         var queryParser = this.QueryParser.create({ of: dao.of });
 
-        var pred = queryParser.parseString(predicate) || this.False;
-
-        if ( ! pred ) pred = this.False.create();
+        var pred = queryParser.parseString(predicate) || this.False.create();
 
         return this.__context__[daoName].where(pred);
       }

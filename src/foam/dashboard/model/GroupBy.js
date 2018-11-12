@@ -22,8 +22,8 @@ foam.CLASS({
         return [
           [ this.Pie, 'Pie', ],
           [ this.Bar, 'Bar', ],
+          [ this.Line, 'Line' ],
           [ this.Table, 'Table' ],
-//          [ this.Line, 'Line' ],
           [ this.DetailView, 'Configure' ]
         ]
       }

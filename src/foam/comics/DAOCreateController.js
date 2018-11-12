@@ -36,6 +36,10 @@ foam.CLASS({
       name: 'exception'
     },
     {
+      name: 'view',
+      value: 'foam.u2.DetailView'
+    },
+    {
       name: 'data',
       view: { class: 'foam.u2.DetailView' },
       factory: function() {

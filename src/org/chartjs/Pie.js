@@ -7,17 +7,22 @@ foam.CLASS({
   ],
   methods: [
     function updateChart_(data) {
-      var groups = this.data.groups;
-      var keys = this.data.sortedKeys();
-      var data = {
+      var colors = this.colors;
+      var groups = data.groups;
+      var keys = data.sortedKeys();
+      this.chart.data = {
         labels: keys,
         datasets: [
           {
+            borderColor: colors,
+            backgroundColor: colors.map(function(c) {
+              return this.Lib.CHART.helpers.color(c).alpha(0.5).rgbString();
+            }.bind(this)),
             data: keys.map(function(k) { return groups[k].value; })
           }
         ]
       };
-      this.chart.data = data;
+
       this.chart.update();
     }
   ]

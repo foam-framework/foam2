@@ -74,15 +74,6 @@ foam.CLASS({
       text-align: left;
       padding-left: 6px;
     }
-
-    ^ .foam-u2-md-CheckBox:checked:after {
-      content: url(data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2048%2048%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2215%22%20height%3D%2215%22%20version%3D%221.1%22%3E%0A%20%20%20%3Cpath%20fill%3D%22darkgreen%22%20stroke-width%3D%223%22%20d%3D%22M18%2032.34L9.66%2024l-2.83%202.83L18%2038l24-24-2.83-2.83z%22/%3E%0A%3C/svg%3E);
-    }
-
-    ^ .foam-u2-md-CheckBox:checked {
-      background-color: #0000;
-      // opacity: 0;
-    }
   `,
 
   properties: [
@@ -108,6 +99,14 @@ foam.CLASS({
       name: 'textData',
       documentation: 'input text value by user'
 
+    },
+    {
+      class: 'Map',
+      name: 'gpMap'
+    },
+    {
+      class: 'Map',
+      name: 'gMap'
     }
   ],
 
@@ -167,8 +166,38 @@ foam.CLASS({
         .end();
     },
 
+    function getGroupPermission(p, g) {
+      var key  = p.id + ':' + g.id;
+      var data = this.gpMap[key];
+
+      if ( ! data ) {
+        data = this.GroupPermission.create({
+          checked: this.checkPermissionForGroup(p.id, g),
+          implied: g.implies(p.id)
+        });
+        if ( ! data.implied && ! data.checked ) {
+          var a = g.parent && this.gMap[g.parent];
+          var parent = a && g.parent && this.getGroupPermission(p, a);
+          if ( parent && ( parent.checked || parent.implied ) ) {
+            data.implied = true;
+          }
+        }
+        this.gpMap[key] = data;
+      }
+
+      return data;
+    },
+
     function createCheckBox(p, g) {
-      return {class: 'foam.u2.md.CheckBox', data: this.checkPermissionForGroup(p.id, g)};
+      var self = this;
+      return function() {
+        var data = self.getGroupPermission(p, g);
+        data.checked$.sub(function() {
+          self.updateGroup(p, g, data.checked$, self);
+         });
+
+        return self.GroupPermissionView.create({data: data});
+      };
     },
 
     function initTableColumns(gs) {
@@ -178,7 +207,15 @@ foam.CLASS({
           .attrs({title: g.description})
           .call(function() {
             var cv = foam.graphics.CView.create({width: 20, height: 200});
-            var l  = foam.graphics.Label.create({text: g.id, x: 25 , y: 8, color: 'black', font: '300 16px Roboto', width: 200, height: 20, rotation: -Math.PI/2});
+            var l  = foam.graphics.Label.create({
+              text: g.id,
+              x: 25,
+              y: 8,
+              color: 'black',
+              font: '300 16px Roboto',
+              width: 200,
+              height: 20,
+              rotation: -Math.PI/2});
             cv.add(l);
             this.add(cv);
           })
@@ -191,12 +228,14 @@ foam.CLASS({
       var self = this;
 
       this.groupDAO.orderBy(this.Group.ID).select().then(function(gs) {
+        for ( var i = 0 ; i < gs.array.length ; i++ ) {
+          self.gMap[gs.array[i].id] = gs.array[i];
+        }
         self.permissionDAO.orderBy(self.Permission.ID).select().then(function(ps) {
           self.initMatrix(gs.array, ps.array);
         })
       });
-
-      return;
+      /*
       this
       .start('table').style({'table-layout': 'fixed', 'margin-left': '100'})
         .start('tr')
@@ -216,16 +255,12 @@ foam.CLASS({
               .addClass(this.myClass())
               .start('table').style({'table-layout': 'fixed', 'width': 'auto'})
                 .call(self.initColumns.bind(this, self, groups))
-                /*
-                .select(this.permissionDAO.orderBy(this.Permission.ID), function(p) {
-                  return self.E('tr').start('td').add('YYYYYYYYYYYYY').end().end();
-                })*/
             .end()
           .end()
-      .end()
-    .end();
+      .end()*/
     },
 
+    /*
     function initColumns(self, groups) {
       this.start('tr')
         .style({'background': '#D4E3EB'})
@@ -240,7 +275,9 @@ foam.CLASS({
         })
       .end();
     },
+    */
 
+    /*
     function initPermissionRow() {
       return self.E('tr')
         .show(self.query$.map(function(query) { query = query.trim(); return query == "" || p.id.indexOf(query) != -1; }))
@@ -271,6 +308,7 @@ foam.CLASS({
         .end()
 
     },
+    */
 
     function checkPermissionForGroup(permissionId, group) {
       for ( i = 0 ; i < group.permissions.length ; i++ ) {
@@ -282,7 +320,7 @@ foam.CLASS({
 
     function updateGroup(p_, g_, data, self) {
       var dao = this.groupDAO;
-      var e = foam.mlang.Expressions.create();
+      var e   = foam.mlang.Expressions.create();
 
       dao.find(g_.id).then(function(group) {
         // Remove permission if found
@@ -290,7 +328,7 @@ foam.CLASS({
           return p.id != p_.id;
         });
 
-        //parents' permissions
+        // parents' permissions
         group.parent$find.then(function(groupParent) {
           if ( groupParent != undefined ) {
               permissions += groupParent.permissions.filter(function(gp) {
@@ -300,15 +338,13 @@ foam.CLASS({
         });
 
         // Add if requested
-        if ( data ) permissions.push(p_);
+        if ( data.get() ) permissions.push(p_);
 
         group.permissions = permissions;
         dao.put(group);
-
-        self.updateChildrenPermission(g_.id, permissions);
       });
     },
-
+    /*
     function updateChildrenPermission(gp, permissions) {
       var self = this;
       var dao = this.groupDAO;
@@ -324,6 +360,55 @@ foam.CLASS({
             dao.put(array[i]);
         }
       });
+    }
+    */
+  ],
+
+  classes: [
+    {
+      name: 'GroupPermission',
+      properties: [
+        {
+          class: 'Boolean',
+          name: 'checked'
+        },
+        {
+          class: 'Boolean',
+          name: 'implied'
+        },
+        {
+          name: 'dependees',
+          factory: function() { return []; }
+        }
+      ]
+    },
+    {
+      name: 'GroupPermissionView',
+      extends: 'foam.u2.View',
+      css: `
+        ^:hover { background: #f55 }
+        ^checked { color: #4885ff }
+        ^implied { color: gray }
+      `,
+      methods: [
+        function initE() {
+          this.SUPER();
+          this.
+            addClass(this.myClass()).
+            style({width: '18px', height: '18px'}).
+            enableClass(this.myClass('implied'), this.data.checked$, true).
+            enableClass(this.myClass('checked'), this.data.checked$).
+            add(this.slot(function(data$checked, data$implied) {
+              return data$checked || data$implied ? '✓' : '';
+            })).
+            on('click', this.onClick);
+        }
+      ],
+      listeners: [
+        function onClick() {
+          this.data.checked = ! this.data.checked;
+        }
+      ]
     }
   ]
 });
