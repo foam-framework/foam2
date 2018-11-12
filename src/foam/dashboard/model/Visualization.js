@@ -80,18 +80,15 @@ foam.CLASS({
       name: 'colors',
       factory: function() {
         return [
-          'blue',
-          'fuchsia',
-          'gray',
-          'green',
-          'maroon',
-          'navy',
-          'olive',
-          'purple',
-          'red',
-          'silver',
-          'teal',
-          'yellow',
+          '#4dc9f6',
+          '#f67019',
+          '#f53794',
+          '#537bc4',
+          '#acc236',
+          '#166a8f',
+          '#00a950',
+          '#58595b',
+          '#8549ba',
         ]
       },
     }
