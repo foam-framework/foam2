@@ -3,7 +3,8 @@ foam.CLASS({
   name: 'Visualization',
   requires: [
     'foam.dao.NullDAO',
-    'foam.dashboard.view.Card'
+    'foam.dashboard.view.Card',
+    'foam.mlang.sink.NullSink',
   ],
   properties: [
     {
@@ -25,7 +26,8 @@ foam.CLASS({
     {
       // TODO: Provide rich configuration of sink.
       name: 'sink',
-      hidden: true
+      hidden: true,
+      factory: function() { return this.NullSink.create() },
     },
     {
       name: 'data',
@@ -48,6 +50,17 @@ foam.CLASS({
       }
     },
     {
+      // TODO: An enum would be better'
+      class: 'String',
+      name: 'mode',
+      hidden: true,
+      expression: function(currentView) {
+        return currentView == this.DetailView ?
+          'config' :
+          'display';
+      }
+    },
+    {
       name: 'views',
       hidden: true,
       factory: function() {
@@ -55,6 +68,29 @@ foam.CLASS({
           [ this.DetailView, 'Configuration' ]
         ]
       }
+    },
+    {
+      class: 'Enum',
+      of: 'foam.dashboard.model.VisualizationSize',
+      name: 'size',
+      value: 'MEDIUM'
+    },
+    {
+      class: 'StringArray',
+      name: 'colors',
+      factory: function() {
+        return [
+          '#4dc9f6',
+          '#f67019',
+          '#f53794',
+          '#537bc4',
+          '#acc236',
+          '#166a8f',
+          '#00a950',
+          '#58595b',
+          '#8549ba',
+        ]
+      },
     }
   ],
   methods: [
