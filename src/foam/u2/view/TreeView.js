@@ -30,13 +30,15 @@ foam.CLASS({
 
   imports: [
     'onObjDrop',
-    'selection'
+    'selection',
+    'startExpanded'
   ],
 
   css: `
     ^ {
       white-space: nowrap;
       margin: 4px 20px;
+      inset: none;
     }
 
     ^label:hover {
@@ -120,7 +122,8 @@ foam.CLASS({
             return self.cls_.create({
               data: obj,
               formatter: self.formatter,
-              relationship: self.relationship
+              relationship: self.relationship,
+              expanded: self.startExpanded
             }, this);
           });
           return e2;
@@ -201,7 +204,8 @@ foam.CLASS({
 
   exports: [
     'onObjDrop',
-    'selection'
+    'selection',
+    'startExpanded'
   ],
 
   properties: [
@@ -222,7 +226,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'startExpanded',
-      value: true
+      value: false
     }
   ],
 
@@ -239,7 +243,7 @@ foam.CLASS({
           return self.TreeViewRow.create({
             data: obj,
             relationship: self.relationship,
-            startExpanded: self.startExpanded,
+            expanded: self.startExpanded,
             formatter: self.formatter
           }, this);
         });
