@@ -6,19 +6,19 @@ foam.CLASS({
   documentation: 'Navigation bars',
 
   css: `
-    ^ {
-      position: fixed;
-      z-index: 10001;
-    }
     ^top-nav {
-      width: calc(100% - 200px);
+      width: 100%;
       display: inline;
+      z-index: 10001;
+      position: fixed;
     }
     ^side-nav {
       float:left;
       display: inline-block;
       width: 200px;
       height: 100vh;
+      position: fixed;
+      padding-top: 65px;
     }
   `,
 

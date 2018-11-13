@@ -48,6 +48,7 @@ foam.CLASS({
     }
 
     ^title-container > * {
+      color: #555;
       display: inline-block;
       margin: 0.67rem 0;
     }
@@ -205,13 +206,15 @@ foam.CLASS({
   listeners: [
     function onCreate() {
       this.stack.push({
-        class: 'foam.comics.DAOCreateControllerView'
+        class: 'foam.comics.DAOCreateControllerView',
+        detailView: this.data.detailView
       }, this);
     },
 
     function onEdit(s, edit, id) {
       this.stack.push({
         class: this.updateView.class,
+        detailView: this.data.detailView,
         key: id
       }, this);
     },
