@@ -26,9 +26,10 @@
        g.children[0].addChildNode()/*.addChildNode()*/;
        g.children[0].addChildNode();
        g.children[0].children[0].addChildNode().addChildNode()/*.addChildNode()*/;
-       g.children[0].children[0].children[0].addChildNode().addChildNode();
+       g.children[0].children[0].children[0].addChildNode().addChildNode().addChildNode();
        g.children[0].children[1].addChildNode();
        g.children[1].addChildNode();
+       // g.children[1].children[0].addChildNode(); // TODO: not supported
        g.children[2].addChildNode();
        g.children[2].children[0].addChildNode();
        g.children[2].children[0].addChildNode();
@@ -74,12 +75,39 @@ foam.CLASS({
       name: 'childNodes',
       factory: function() { return []; }
     },
-    [ 'left', 0 ],
+    [ 'left',  0 ],
     [ 'right', 0 ],
+    {
+      class: 'Boolean',
+      name: 'expanded',
+      value: true
+    },
     'parentNode'
   ],
 
   methods: [
+    function initCView() {
+      this.SUPER();
+
+      // If top-level node
+      if ( ! this.parentNode ) {
+        var self = this;
+        this.parent.canvas.on('click', function(e) {
+          var c = self.findFirstChildAt(e.clientX+50, e.clientY);
+          console.log('*******', c);
+          if ( ! c ) return;
+          c.expanded = ! c.expanded;
+          if ( ! c.expanded ) {
+            for ( var i = 0 ; i < c.children.length ; i++ ) {
+              c.children[i].y = 50;
+              c.children[i].x = 0;
+            }
+          }
+          self.doLayout();
+        });
+      }
+    },
+
     function doTransform(x) {
       this.SUPER(x);
     },
@@ -88,7 +116,7 @@ foam.CLASS({
       x.translate(-50, 0);
       this.SUPER(x);
       x.translate(50, 0);
-      if ( this.children.length ) {
+      if ( this.expanded && this.children.length ) {
         function line(x1, y1, x2, y2) {
           x.beginPath();
           x.moveTo(x1, y1);
@@ -107,8 +135,12 @@ foam.CLASS({
       }
     },
 
+    function paintChildren(x) {
+      if ( this.expanded ) this.SUPER(x);
+    },
+
     function addChildNode(args) {
-      var node = this.cls_.create({y: 50, parentNode: this});
+      var node = this.cls_.create({y: 0, parentNode: this});
       node.copyFrom(args);
       this.add(node);
       this.doLayout();
@@ -116,16 +148,19 @@ foam.CLASS({
     },
 
     function layout() {
-      var moved = false;
-      var children = this.children;
-      var l = children.length;
-
       this.left = this.right = 0;
+
+      if ( ! this.expanded ) return false;
+
+      var moved    = false;
+      var children = this.children;
+      var l        = children.length;
+
       for ( var i = 0 ; i < l ; i++ ) {
         var c = children[i];
         if ( c.y < 100 ) { moved = true; c.y += 4; }
 
-        c.layout();
+        moved      = moved || c.layout();
         this.left  = Math.min(this.left, c.x);
         this.right = Math.max(this.right, c.x);
       }
@@ -134,10 +169,12 @@ foam.CLASS({
       for ( var i = 0 ; i < l-1 ; i++ ) {
         var n1 = children[i];
         var n2 = children[i+1];
-        var d = n2.x-n1.x+n2.left-n1.right;
-        if ( d < 120 ) {
+        var d  = n2.x-n1.x+n2.left-n1.right;
+        if ( d != 130 ) {
           moved = true;
-          var w = 20;
+          var w = Math.min(Math.abs(130-d), 10);
+          console.log(w);
+          if ( d > 130 ) w = -w;
           if ( i+1 == m ) {
             console.log('move away', w/2);
             n1.x -= w/2;
