@@ -22,19 +22,19 @@
        this.add(g.addChildNode());
        this.add(g.addChildNode());
        this.add(g.addChildNode());
-       g.children[0].addChildNode()/*.addChildNode()*/;
-       g.children[0].addChildNode();
-       g.children[0].children[0].addChildNode().addChildNode()/*.addChildNode()*/;
-       g.children[0].children[0].children[0].addChildNode().addChildNode().addChildNode();
-       g.children[0].children[1].addChildNode();
-       g.children[1].addChildNode();
-       // g.children[1].children[0].addChildNode(); // TODO: not supported
-       g.children[2].addChildNode();
-       g.children[2].children[0].addChildNode();
-       g.children[2].children[0].addChildNode();
-       g.children[2].children[0].addChildNode();
-       g.children[2].children[0].children[1].addChildNode();
-       g.children[2].children[0].children[2].addChildNode().addChildNode();
+       g.childNodes[0].addChildNode()/*.addChildNode()*/;
+       g.childNodes[0].addChildNode();
+       g.childNodes[0].childNodes[0].addChildNode().addChildNode()/*.addChildNode()*/;
+       g.childNodes[0].childNodes[0].childNodes[0].addChildNode().addChildNode().addChildNode();
+       g.childNodes[0].childNodes[1].addChildNode();
+       g.childNodes[1].addChildNode();
+       // g.childNodes[1].childNodes[0].addChildNode(); // TODO: not supported
+       g.childNodes[2].addChildNode();
+       g.childNodes[2].childNodes[0].addChildNode();
+       g.childNodes[2].childNodes[0].addChildNode();
+       g.childNodes[2].childNodes[0].addChildNode();
+       g.childNodes[2].childNodes[0].childNodes[1].addChildNode();
+       g.childNodes[2].childNodes[0].childNodes[2].addChildNode().addChildNode();
        g.layout();
        g.x+=100;
 
@@ -62,12 +62,13 @@ foam.CLASS({
 
   requires: [
     'foam.graphics.Box',
-    'foam.graphics.CView'
+    'foam.graphics.CView',
+    'foam.graphics.Label'
   ],
 
   properties: [
-    [ 'height', 50 ],
-    [ 'width', 100 ],
+    [ 'height', 60 ],
+    [ 'width', 140 ],
     [ 'border', 'gray' ],
     [ 'slide', 0 ],
     {
@@ -82,12 +83,17 @@ foam.CLASS({
       value: true
     },
     [ 'color', 'white' ],
+    [ 'padding', 30 ],
     'parentNode'
   ],
 
   methods: [
     function initCView() {
       this.SUPER();
+
+      this.add(this.Label.create({x: -this.width/2+10, y: 7, text: 'ABC Corp.', font: 'bold 12px sans-serif'}));
+      this.add(this.Label.create({x: this.width/2-10,  y: this.height-22, align: 'end', text: '$100,000'}));
+      this.add(this.Label.create({x: -this.width/2+10, y: this.height-22, text: this.childNodes.length ? 'Aggregate' : ''}));
 
       // If top-level node
       if ( ! this.parentNode ) {
@@ -97,9 +103,9 @@ foam.CLASS({
           if ( ! c ) return;
           c.expanded = ! c.expanded;
           if ( ! c.expanded ) {
-            for ( var i = 0 ; i < c.children.length ; i++ ) {
-              c.children[i].y = 50;
-              c.children[i].x = 0;
+            for ( var i = 0 ; i < c.childNodes.length ; i++ ) {
+              c.childNodes[i].y = self.height;
+              c.childNodes[i].x = 0;
             }
           }
           self.doLayout();
@@ -107,14 +113,16 @@ foam.CLASS({
       }
     },
 
-    function doTransform(x) {
+    function paint(x) {
+      if ( this.parentNode && ! this.parentNode.expanded ) return;
       this.SUPER(x);
     },
 
     function paintSelf(x) {
-      x.translate(-50, 0);
+      x.translate(-this.width/2, 0);
       this.SUPER(x);
-      x.translate(50, 0);
+      x.translate(this.width/2, 0);
+
       function line(x1, y1, x2, y2) {
         x.beginPath();
         x.moveTo(x1, y1);
@@ -125,34 +133,33 @@ foam.CLASS({
       x.lineWidth   = 0.5; //this.borderWidth;
       x.strokeStyle = this.border;
 
-      // Paint lines to children
-      if ( this.expanded && this.children.length ) {
-        line(0, 50, 0, 75);
-        var l = this.children.length;
+      // Paint lines to childNodes
+      if ( this.expanded && this.childNodes.length ) {
+        var h = this.height+25;
+        line(0, this.height, 0, h);
+        var l = this.childNodes.length;
         for ( var i = 0 ; i < l ; i++ ) {
-          var c = this.children[i];
-          line(0, 75, c.x, 75);
-          line(c.x, 75, c.x, c.y);
+          var c = this.childNodes[i];
+          line(0, h, c.x, h);
+          line(c.x, h, c.x, c.y);
         }
       }
 
-      x.lineWidth   = 1.5; //this.borderWidth;
+      x.lineWidth = 1.5; //this.borderWidth;
       // Paint expand/collapse arrow
-      if ( this.children.length ) {
+      if ( this.childNodes.length ) {
         var d = this.expanded ? 5 : -5;
-        line(-5, 42, 0, 42+d);
-        line(0, 42+d, 5, 42);
+        var y = this.height - 8;
+        line(-5, y, 0, y+d);
+        line(0, y+d, 5, y);
       }
-    },
-
-    function paintChildren(x) {
-      if ( this.expanded ) this.SUPER(x);
     },
 
     function addChildNode(args) {
       var node = this.cls_.create({y: 0, parentNode: this});
       node.copyFrom(args);
       this.add(node);
+      this.childNodes.push(node);
       this.doLayout();
       return this;
     },
@@ -162,13 +169,13 @@ foam.CLASS({
 
       if ( ! this.expanded ) return false;
 
-      var moved    = false;
-      var children = this.children;
-      var l        = children.length;
+      var moved      = false;
+      var childNodes = this.childNodes;
+      var l          = childNodes.length;
 
       for ( var i = 0 ; i < l ; i++ ) {
-        var c = children[i];
-        if ( c.y < 100 ) { moved = true; c.y += 4; }
+        var c = childNodes[i];
+        if ( c.y < this.height*2 ) { moved = true; c.y += 5; }
 
         moved      = moved || c.layout();
         this.left  = Math.min(this.left, c.x);
@@ -177,13 +184,13 @@ foam.CLASS({
 
       var m = l/2;
       for ( var i = 0 ; i < l-1 ; i++ ) {
-        var n1 = children[i];
-        var n2 = children[i+1];
+        var n1 = childNodes[i];
+        var n2 = childNodes[i+1];
         var d  = n2.x-n1.x+n2.left-n1.right;
-        if ( d != 130 ) {
+        if ( d != this.width + this.padding ) {
           moved = true;
-          var w = Math.min(Math.abs(130-d), 10);
-          if ( d > 130 ) w = -w;
+          var w = Math.min(Math.abs(this.width+this.padding-d), 10);
+          if ( d > this.width + this.padding ) w = -w;
           if ( i+1 == m ) {
             // console.log('move away', w/2);
             n1.x -= w/2;
