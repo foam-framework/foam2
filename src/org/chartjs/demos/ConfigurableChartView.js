@@ -5,27 +5,63 @@ foam.CLASS({
   requires: [
     'foam.u2.DetailView',
     'org.chartjs.Pie',
-    'org.chartjs.ChartConfig',
   ],
   imports: [
     'classloader',
   ],
   properties: [
     'view',
+    {
+      name: 'config',
+      factory: function() {
+        return this.Config.create();
+      },
+    },
+  ],
+  classes: [
+    {
+      name: 'Config',
+      properties: [
+        {
+          class: 'Int',
+          name: 'height',
+          value: 300,
+        },
+        {
+          class: 'Int',
+          name: 'width',
+          value: 300,
+        },
+        {
+          class: 'StringArray',
+          name: 'colors',
+          factory: function() {
+            return [
+              'red',
+              'green',
+              'blue',
+              'orange',
+              'purple',
+            ]
+          },
+        },
+      ],
+    },
   ],
   methods: [
     function initE() {
-      var config = this.ChartConfig.create();
       this.
-        start(this.DetailView, { data: config }).end().
-        add(this.classloader.load(this.view).then(function(cls) {
-          return this.E().
-            start(cls, {
-              data$: this.data$,
-              config: config
-            }).
-            end();
-        }.bind(this)))
+        start(this.DetailView, { data: this.config }).end().
+        add(this.slot(function(data, view, config$colors, config$height, config$width) {
+          return this.classloader.load(this.view).then(function(cls) {
+            return cls.create({
+              data: data,
+              colors: config$colors,
+              height: config$height,
+              width: config$width,
+            })
+          }.bind(this))
+        }));
     },
   ],
 });
