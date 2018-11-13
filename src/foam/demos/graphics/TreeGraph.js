@@ -4,7 +4,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-
  foam.CLASS({
    // package: 'foam.graphics',
    name: 'TreeGraphDemo',
@@ -95,7 +94,6 @@ foam.CLASS({
         var self = this;
         this.parent.canvas.on('click', function(e) {
           var c = self.findFirstChildAt(e.clientX+50, e.clientY);
-          console.log('*******', c);
           if ( ! c ) return;
           c.expanded = ! c.expanded;
           if ( ! c.expanded ) {
@@ -121,15 +119,13 @@ foam.CLASS({
         x.beginPath();
         x.moveTo(x1, y1);
         x.lineTo(x2, y2);
-        x.lineWidth = 1;
-        x.strokeStyle = 'gray';
         x.stroke();
       }
-      if ( this.children.length ) {
-        var d = this.expanded ? 5 : -5;
-        line(-5, 42, 0, 42+d);
-        line(0, 42+d, 5, 42);
-      }
+
+      x.lineWidth   = 0.5; //this.borderWidth;
+      x.strokeStyle = this.border;
+
+      // Paint lines to children
       if ( this.expanded && this.children.length ) {
         line(0, 50, 0, 75);
         var l = this.children.length;
@@ -138,6 +134,14 @@ foam.CLASS({
           line(0, 75, c.x, 75);
           line(c.x, 75, c.x, c.y);
         }
+      }
+
+      x.lineWidth   = 1.5; //this.borderWidth;
+      // Paint expand/collapse arrow
+      if ( this.children.length ) {
+        var d = this.expanded ? 5 : -5;
+        line(-5, 42, 0, 42+d);
+        line(0, 42+d, 5, 42);
       }
     },
 
@@ -179,17 +183,16 @@ foam.CLASS({
         if ( d != 130 ) {
           moved = true;
           var w = Math.min(Math.abs(130-d), 10);
-          console.log(w);
           if ( d > 130 ) w = -w;
           if ( i+1 == m ) {
-            console.log('move away', w/2);
+            // console.log('move away', w/2);
             n1.x -= w/2;
             n2.x += w/2;
           } else if ( i < Math.floor(m) ) {
-            console.log('move left', i, m, l, w);
+            // console.log('move left', i, m, l, w);
             n1.x -= w;
           } else {
-            console.log('move right', i, m, l, w);
+            // console.log('move right', i, m, l, w);
             n2.x += w;
           }
         }
