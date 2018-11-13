@@ -18,7 +18,7 @@
 
    methods: [
      function init() {
-       var g = TreeGraph.create({x:800, y:50});
+       var g = TreeGraph.create({x:850, y:50});
        this.add(g.addChildNode());
        this.add(g.addChildNode());
        this.add(g.addChildNode());
@@ -63,12 +63,13 @@ foam.CLASS({
   requires: [
     'foam.graphics.Box',
     'foam.graphics.CView',
-    'foam.graphics.Label'
+    'foam.graphics.Label',
+    'foam.graphics.Line'
   ],
 
   properties: [
     [ 'height', 60 ],
-    [ 'width', 140 ],
+    [ 'width', 135 ],
     [ 'border', 'gray' ],
     [ 'slide', 0 ],
     {
@@ -91,15 +92,25 @@ foam.CLASS({
     function initCView() {
       this.SUPER();
 
-      this.add(this.Label.create({x: -this.width/2+10, y: 7, text: 'ABC Corp.', font: 'bold 12px sans-serif'}));
-      this.add(this.Label.create({x: this.width/2-10,  y: this.height-22, align: 'end', text: '$100,000'}));
-      this.add(this.Label.create({x: -this.width/2+10, y: this.height-22, text: this.childNodes.length ? 'Aggregate' : ''}));
+      var c = this.hsl(Math.random()*360, 90, 45);
+
+      this.add(this.Label.create({color: 'black', x: -this.width/2+14, y: 7, text: 'ABC Corp.', font: 'bold 12px sans-serif'}));
+      this.add(this.Label.create({color: 'gray', x: -this.width/2+14, y: this.height-22, text: this.childNodes.length ? 'Aggregate' : ''}));
+      this.add(this.Label.create({color: 'gray', x: this.width/2-10,  y: this.height-22, align: 'end', text: '$100,000'}));
+      this.add(this.Line.create({
+        startX: -this.width/2+7,
+        startY: 5,
+        endX: -this.width/2+7,
+        endY: this.height-5,
+        color: c,
+        lineWidth: 4
+      }));
 
       // If top-level node
       if ( ! this.parentNode ) {
         var self = this;
         this.parent.canvas.on('click', function(e) {
-          var c = self.findFirstChildAt(e.clientX+50, e.clientY);
+          var c = self.findFirstChildAt(e.clientX+self.width/2, e.clientY);
           if ( ! c ) return;
           c.expanded = ! c.expanded;
           if ( ! c.expanded ) {
