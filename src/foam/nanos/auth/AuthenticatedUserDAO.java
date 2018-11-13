@@ -14,7 +14,6 @@ import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import foam.util.SafetyUtil;
-
 import static foam.mlang.MLang.EQ;
 
 /**
@@ -90,6 +89,14 @@ public class AuthenticatedUserDAO
         throw new AuthorizationException("You do not have permission to change that user's group to '" + newUser.getGroup() + "'.");
       }
       // TODO: Handle SPIDs.
+    }
+
+    if ((
+      ( oldUser != null && ! SafetyUtil.equals(oldUser.getSystem(), newUser.getSystem()) ) ||
+      ( oldUser == null && newUser.getSystem() ))
+      && ! user.getGroup().equals("admin")
+    ) {
+      throw new AuthorizationException("You do not have permission to change the 'system' flag.");
     }
 
     return super.put_(x, newUser);

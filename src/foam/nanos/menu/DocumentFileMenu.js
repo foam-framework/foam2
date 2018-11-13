@@ -34,12 +34,16 @@ foam.CLASS({
       class: 'String',
       name: 'daoKey',
       value: 'documentDAO'
+    },
+    {
+      class: 'String',
+      name: 'anchor'
     }
   ],
 
   methods: [
     function createView(X) {
-      return this.DocumentationView.create({ docKey: this.docKey, daoKey: this.daoKey });
+      return this.DocumentationView.create({ docKey: this.docKey, daoKey: this.daoKey, anchor: this.anchor });
     }
   ]
 });

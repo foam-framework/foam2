@@ -4,7 +4,7 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   imports: [
-    'currentMenu',
+    'currentMenu'
   ],
 
   requires: [
@@ -22,7 +22,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'expanded',
-      value: true
+      value: false
     },
     {
       class: 'Int',
@@ -39,22 +39,14 @@ foam.CLASS({
       var opacity = view.level * -0.1 + 0.9;
 
       this
-        .addClass(this.myClass())
+        .addClass(`${this.myClass()}-level-${this.level}`)
         .start('a')
           .add(this.data.label)
           .enableClass(this.myClass('selected'), view.currentMenu$.map(function (value) {
-            return window.location.hash.substring(1) === (view.data.id);
+            return view.currentMenu.id === (view.data.id);
           }))
           .style({'padding-left': paddingLeft +  'px', 'font-size': fontSize + 'px', 'opacity': opacity})
-          .on('click', function() {
-            var menu = view.data;
-            menu.children.select().then(function(c) {
-              if ( menu.handler != 'foam.nanos.menu.SubMenu' ) {
-                menu.launch(view.__context__, view);
-              }
-              view.expanded = ! view.expanded;
-            });
-          })
+          .on('click', this.onClick)
         .end()
         .add(this.slot(function(expanded, data) {
           return ! expanded ?
@@ -62,9 +54,43 @@ foam.CLASS({
             this.E()
               .select(data.children.orderBy(view.Menu.ORDER), function(child) {
                 return view.cls_.create({ data: child, level: view.level + 1 }, view);
-                  });
+              });
             }))
           .end();
+      },
+
+      function setAnchor(menu) {
+        setTimeout( () => {
+          var names = document.getElementsByName(menu.handler.anchor);
+          if ( names.length > 0 ) {
+            names[0].scrollIntoView();
+          }
+        }, 500);
+      },
+
+      function handleClick(menu) {
+        var self = this;
+
+        if ( menu.handler != 'foam.nanos.menu.SubMenu' ) {
+          if ( menu.handler == 'foam.nanos.menu.DocumentFileMenu' ) {
+            if ( this.currentMenu.handler != 'foam.nanos.menu.DocumentFileMenu' || (this.currentMenu.handler == 'foam.nanos.menu.DocumentFileMenu' && this.currentMenu.handler.docKey != menu.handler.docKey) ) {
+              menu.launch(this.__context__, this);
+            }
+            if ( menu.handler.anchor ) {
+              this.setAnchor(menu);
+            }
+          } else if ( this.currentMenu.id !== menu.id ) {
+            menu.launch(this.__context__, this);
+          }
+        }
+
+        this.expanded = ! this.expanded;
+      }
+    ],
+
+    listeners: [
+      function onClick() {
+        this.handleClick(this.data);
       }
     ]
   });

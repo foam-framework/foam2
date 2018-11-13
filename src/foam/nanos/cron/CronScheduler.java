@@ -77,8 +77,8 @@ public class CronScheduler
         Date minScheduledTime = getMinScheduledTime();
 
         if ( minScheduledTime != null ) {
-          // Check for new cronjobs every minute
-          Thread.sleep(1000 * 60);
+          // Check for new cronjobs every second
+          Thread.sleep(1000);
         }
       }
     } catch (Throwable t) {

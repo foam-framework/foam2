@@ -11,7 +11,6 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
 import foam.util.SafetyUtil;
-
 import java.util.Arrays;
 
 /**
@@ -42,7 +41,7 @@ public class AuthenticatedGroupDAO extends ProxyDAO {
     if ( getDelegate().find_(x, obj) == null ) {
       AuthService auth = (AuthService) x.get("auth");
       if ( ! auth.check(x, "group.create." + ((Group) obj).getId()) ) {
-        throw new AuthorizationException("Permission Denied. You do not have requisite permission to create this group."); 
+        throw new AuthorizationException("Permission Denied. You do not have requisite permission to create this group.");
       }
     }
     checkUserHasAllPermissionsInGroupAndAncestors(x, (Group) obj);
@@ -57,7 +56,7 @@ public class AuthenticatedGroupDAO extends ProxyDAO {
       checkUserHasAllPermissionsInGroup(x, group);
     }
   }
-  
+
   // Make sure that the user has all permissions in the given group.
   public void checkUserHasAllPermissionsInGroup(X x, Group group) {
     AuthService auth = (AuthService) x.get("auth");
@@ -71,7 +70,7 @@ public class AuthenticatedGroupDAO extends ProxyDAO {
   }
 
   // returns ancestor of a group if it exists, otherwise null
-  public Group getAncestor(X x, Group group) {    
+  public Group getAncestor(X x, Group group) {
     String ancestorGroupId = group.getParent();
     if ( SafetyUtil.isEmpty(ancestorGroupId) ) {
       return null;
