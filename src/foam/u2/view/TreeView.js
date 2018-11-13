@@ -115,8 +115,8 @@ foam.CLASS({
         }).
         start('span').addClass(self.myClass('label')).call(this.formatter, [self.data]).end().
         add(this.slot(function(e) {
-          if ( ! e ) return this.E('div');
           var e2 = this.E('div');
+          if ( ! e ) return e2;
           e2.select(this.data[self.relationship.forwardName]/*.dao*/, function(obj) {
             self.hasChildren = true;
             return self.cls_.create({
