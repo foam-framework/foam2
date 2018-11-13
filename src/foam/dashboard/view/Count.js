@@ -2,14 +2,16 @@ foam.CLASS({
   package: 'foam.dashboard.view',
   name: 'Count',
   extends: 'foam.u2.Element',
-  imports: [ 'data' ],
+  imports: [
+    'data',
+    'visualizationWidth',
+    'visualizationHeight'
+  ],
   properties: [
     [ 'nodeName', 'div' ]
   ],
   css: `
 ^ {
-  width: 100%;
-  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -22,6 +24,10 @@ foam.CLASS({
       var view = this;
 
       this.
+        style({
+          width: this.visualizationWidth$.map(function(w) { return w + 'px'; }),
+          height: this.visualizationHeight$.map(function(h) { return h + 'px'; })
+        }).
         addClass(this.myClass()).
         add(this.slot(function(data$data) {
           return this.E('span').
