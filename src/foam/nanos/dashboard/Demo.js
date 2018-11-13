@@ -8,6 +8,7 @@ foam.CLASS({
   requires: [
     'foam.dashboard.model.Count',
     'foam.dashboard.model.GroupBy',
+    'foam.dashboard.model.GroupByGroupBy',
     'foam.dashboard.model.Table',
     'foam.dashboard.model.VisualizationSize'
   ],
@@ -30,6 +31,13 @@ foam.CLASS({
           arg1: 'serve',
           size: this.VisualizationSize.SMALL,
           label: 'Served/Unserved Services'
+        })).
+        add(this.GroupByGroupBy.create({
+          daoName: 'nSpecDAO',
+          arg1: 'serve',
+          arg2: 'authenticate',
+          size: this.VisualizationSize.MEDIUM,
+          label: 'Grouped by serverd/lazy',
         })).
         add(this.GroupBy.create({
           daoName: 'nSpecDAO',
