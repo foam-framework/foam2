@@ -82,6 +82,7 @@ foam.CLASS({
       name: 'expanded',
       value: true
     },
+    [ 'color', 'white' ],
     'parentNode'
   ],
 
@@ -116,15 +117,20 @@ foam.CLASS({
       x.translate(-50, 0);
       this.SUPER(x);
       x.translate(50, 0);
+      function line(x1, y1, x2, y2) {
+        x.beginPath();
+        x.moveTo(x1, y1);
+        x.lineTo(x2, y2);
+        x.lineWidth = 1;
+        x.strokeStyle = 'gray';
+        x.stroke();
+      }
+      if ( this.children.length ) {
+        var d = this.expanded ? 5 : -5;
+        line(-5, 42, 0, 42+d);
+        line(0, 42+d, 5, 42);
+      }
       if ( this.expanded && this.children.length ) {
-        function line(x1, y1, x2, y2) {
-          x.beginPath();
-          x.moveTo(x1, y1);
-          x.lineTo(x2, y2);
-          x.lineWidth = 1;
-          x.strokeStyle = 'gray';
-          x.stroke();
-        }
         line(0, 50, 0, 75);
         var l = this.children.length;
         for ( var i = 0 ; i < l ; i++ ) {
@@ -179,15 +185,12 @@ foam.CLASS({
             console.log('move away', w/2);
             n1.x -= w/2;
             n2.x += w/2;
-            n1.color = n2.color = 'green';
           } else if ( i < Math.floor(m) ) {
             console.log('move left', i, m, l, w);
             n1.x -= w;
-            n1.color = 'pink';
           } else {
             console.log('move right', i, m, l, w);
             n2.x += w;
-            n2.color = 'blue';
           }
         }
       }
