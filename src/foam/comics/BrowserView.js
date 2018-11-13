@@ -108,24 +108,25 @@ foam.CLASS({
         selectEnabled,
         addEnabled,
         exportEnabled,
-        toggleEnabled
+        toggleEnabled,
+        detailView
       ) {
         var config = {};
 
-        if ( title ) config.title = title;
-        if ( subtitle ) config.subtitle = subtitle;
         if ( createLabel ) config.createLabel = createLabel;
-        if ( searchMode ) config.searchMode = searchMode;
+        if ( searchMode )  config.searchMode  = searchMode;
+        if ( subtitle )    config.subtitle    = subtitle;
+        if ( title )       config.title       = title;
+        config.addEnabled    = addEnabled;
         config.createEnabled = createEnabled;
-        config.editEnabled = editEnabled;
-        config.selectEnabled = selectEnabled;
-        config.addEnabled = addEnabled;
+        config.detailView    = detailView;
+        config.editEnabled   = editEnabled;
         config.exportEnabled = exportEnabled;
+        config.selectEnabled = selectEnabled;
         config.toggleEnabled = toggleEnabled;
 
         if ( customDAOController ) {
-          var X = this.__context__;
-          var controller = X.lookup(customDAOController).create(config, X);
+          var controller = this.__context__.lookup(customDAOController).create(config, this);
 
           // Let the custom controller override the dao used.
           controller.data = controller.data || data;
@@ -134,7 +135,7 @@ foam.CLASS({
         }
 
         config.data = data;
-        return this.DAOController.create(config);
+        return this.DAOController.create(config, this);
       }
     },
     {
@@ -143,7 +144,13 @@ foam.CLASS({
       // TODO: remove next line when permanently fixed in ViewSpec
       fromJSON: function fromJSON(value, ctx, prop, json) { return value; }
     },
-    'updateView'
+    // This is the DAOUpdateControllerView, not the DetailView
+    'updateView',
+    {
+      class: 'String',
+      name: 'detailView',
+      value: 'foam.u2.DetailView'
+    }
   ],
 
   methods: [

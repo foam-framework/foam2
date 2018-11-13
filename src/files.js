@@ -384,6 +384,7 @@ FOAM_FILES([
   { name: "foam/u2/UnstyledActionView", flags: ['web'] },
   { name: "foam/u2/DetailPropertyView", flags: ['web'] },
   { name: "foam/u2/DetailView", flags: ['web'] },
+  { name: "foam/u2/ContextSensitiveDetailView", flags: ['web'] },
   { name: "foam/u2/tag/Image", flags: ['web'] },
   { name: "foam/u2/tag/Input", flags: ['web'] },
   { name: "foam/u2/tag/TextArea", flags: ['web'] },
@@ -409,10 +410,12 @@ FOAM_FILES([
   { name: "foam/u2/view/FObjectView", flags: ['web'] },
   { name: "foam/u2/view/FObjectArrayView", flags: ['web'] },
   { name: "foam/u2/view/ChoiceView", flags: ['web'] },
+  { name: "foam/u2/view/RichChoiceView", flags: ['web'] },
   { name: "foam/u2/view/RadioView", flags: ['web'] },
   { name: "foam/u2/view/TextField", flags: ['web'] },
   { name: "foam/u2/view/TreeView", flags: ['web'] },
   { name: "foam/u2/view/AltView", flags: ['web'] },
+  { name: "foam/u2/view/SimpleAltView", flags: ['web'] },
   { name: "foam/u2/view/DualView", flags: ['web'] },
   { name: "foam/u2/view/ColorPicker", flags: ['web'] },
   { name: "foam/u2/view/PasswordView", flags: ['web'] },
@@ -550,5 +553,24 @@ FOAM_FILES([
   { name: "foam/test/TestObj" },
   { name: "foam/core/FObjectTest" },
   { name: "foam/nanos/dig/exception/DigErrorMessage" },
-  { name: "com/google/foam/demos/bubbles/Bubbles" }
+  { name: "com/google/foam/demos/bubbles/Bubbles" },
+
+  { name: "org/chartjs/Lib" },
+  { name: "org/chartjs/AbstractChartCView" },
+  { name: "org/chartjs/Pie" },
+  { name: "org/chartjs/Bar" },
+  { name: "org/chartjs/Line" },
+
+  { name: "foam/dashboard/model/Visualization" },
+  { name: "foam/dashboard/model/GroupBy" },
+  { name: "foam/dashboard/model/Count" },
+  { name: "foam/dashboard/model/Table" },
+
+  { name: "foam/dashboard/view/Count" },
+  { name: "foam/dashboard/view/Table" },
+  { name: "foam/dashboard/view/Pie" },
+  { name: "foam/dashboard/view/Bar" },
+  { name: "foam/dashboard/view/Line" },
+  { name: "foam/dashboard/view/DAOTable" },
+  { name: "foam/dashboard/view/Card" }
 ]);
