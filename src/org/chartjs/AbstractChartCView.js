@@ -9,6 +9,7 @@ foam.CLASS({
     'chart',
     'chartType',
     'colors',
+    'data',
     {
       name: 'config',
       factory: function() {
@@ -22,17 +23,9 @@ foam.CLASS({
         };
       }
     },
-    {
-      name: 'data',
-      postSet: function(_, n) {
-        this.onDetach(n.sub(function(sub) {
-          if ( n !== this.data ) sub.detach();
-          else this.update();
-        }.bind(this)));
-      },
-    },
   ],
   reactions: [
+    ['data', 'propertyChange', 'update' ],
     ['', 'propertyChange.data', 'update' ],
     ['', 'propertyChange.chart', 'update' ],
   ],
