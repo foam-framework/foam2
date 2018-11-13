@@ -95,7 +95,19 @@ return config_;`
 `
     },
     {
+      name: 'sendEmailWithX',
+      javaCode: `
+        getDao().put_(x, emailMessage);
+`
+    },
+    {
       name: 'sendEmailFromTemplate',
+      javaCode: `
+sendEmailFromTemplateWithX(getX(), user,  emailMessage, name, templateArgs);
+`
+    },
+    {
+      name: 'sendEmailFromTemplateWithX',
       javaCode: `
 String group = user != null ? (String) user.getGroup() : null;
 EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(getX(), name, group);
@@ -111,12 +123,19 @@ for ( String key : templateArgs.keySet() ) {
 }
 
 EnvironmentConfiguration config = getConfig(group);
-JtwigTemplate template = JtwigTemplate.inlineTemplate(emailTemplate.getBody(), config);
 JtwigModel model = JtwigModel.newModel(templateArgs);
 emailMessage = (EmailMessage) emailMessage.fclone();
-emailMessage.setSubject(emailTemplate.getSubject());
-emailMessage.setBody(template.render(model));
-sendEmail(emailMessage);
+
+JtwigTemplate templateBody =    JtwigTemplate.inlineTemplate(emailTemplate.getBody(), config);
+emailMessage.setBody(templateBody.render(model));
+
+// If subject has already provided, then we don't want to use template subject.
+if (foam.util.SafetyUtil.isEmpty(emailMessage.getSubject())) {
+  JtwigTemplate templateSubject = JtwigTemplate.inlineTemplate(emailTemplate.getSubject(), config);
+  emailMessage.setSubject(templateSubject.render(model));
+}
+
+sendEmailWithX(x, emailMessage);
 `
     }
   ]
