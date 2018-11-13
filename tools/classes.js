@@ -275,6 +275,7 @@ var classes = [
   'foam.nanos.dig.SUGAR',
 
   'foam.nanos.jetty.HttpServer',
+  'foam.nanos.servlet.Servlet',
   'foam.nanos.servlet.ServletMapping',
   'foam.nanos.servlet.ErrorPageMapping',
   'foam.nanos.servlet.FilterMapping',
@@ -302,6 +303,8 @@ var classes = [
   'foam.nanos.dig.exception.DigSuccessMessage',
   'foam.flow.Document',
   'foam.flow.DocumentationFolderDAO',
+
+  'foam.comics.SearchMode',
 
   //Support Files
   'foam.support.model.TicketMessage',

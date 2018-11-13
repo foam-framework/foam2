@@ -584,6 +584,7 @@ foam.CLASS({
   `,
 
   requires: [
+    'foam.core.PromiseSlot',
     'foam.dao.MergedResetSink',
     'foam.u2.AttrSlot',
     'foam.u2.Entity',
@@ -1508,6 +1509,8 @@ foam.CLASS({
             e = this.slotE_(e);
           }
           es.push(e);
+        } else if ( c.then ) {
+          this.add(this.PromiseSlot.create({ promise: c }));
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
         } else if ( foam.core.Slot.isInstance(c) ) {
@@ -1674,6 +1677,12 @@ foam.CLASS({
       return this;
     },
 
+    function callIfElse(bool, iff, elsef, args) {
+      (bool ? iff : elsef).apply(this, args);
+
+      return this;
+    },
+
     /**
      * Call the given function on each element in the array. In the function,
      * `this` will refer to the element.
@@ -1783,7 +1792,7 @@ foam.CLASS({
     function addClass_(oldClass, newClass) {
       /* Replace oldClass with newClass. Called by cls(). */
       if ( oldClass === newClass ) return;
-      this.removeClass(oldClass);
+      if ( oldClass ) this.removeClass(oldClass);
       if ( newClass ) {
         if ( ! this.CSS_CLASSNAME_PATTERN.test(newClass) ) {
           console.log('!!!!!!!!!!!!!!!!!!! Invalid CSS ClassName: ', newClass);
