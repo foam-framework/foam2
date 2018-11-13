@@ -40,17 +40,22 @@ foam.CLASS({
     }
 
     ^label:hover {
-      background: #59aadd;
-      color: white;
+      border-radius: 2px;
+      background-color: rgba(0, 48, 249, 0.1);
+      color: #0030f9;
     }
 
     ^label {
       min-width: 120px;
       padding: 4px;
+      font-weight: 900;
+      color: #2b2b2b;
     }
 
     ^selected > ^label {
-      outline: 2px solid #59aadd;
+      border-radius: 2px;
+      background-color: rgba(0, 48, 249, 0.1);
+      color: #0030f9;
     }
   `,
 
@@ -73,7 +78,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'draggable',
-      documentation: 'Enable to allow drag&drop editing.'
+      documentation: 'Enable to allow drag&drop editing.',
       value: true
     },
     {
@@ -95,7 +100,8 @@ foam.CLASS({
         }, this.selection$, this.data$.dot('id'))).
         start('span').
           style({
-            visibility: this.hasChildren$.map(function(c) { return c ? 'visible' : 'hidden'; }),
+            visibility: 'visible',
+            //visibility: this.hasChildren$.map(function(c) { return c ? 'visible' : 'hidden'; }),
             'font-size': '12px'
           }).
           on('click', this.toggleExpanded).
@@ -182,6 +188,7 @@ foam.CLASS({
 
     function toggleExpanded(e) {
       this.expanded = ! this.expanded;
+      this.selection = this.data;
       e.preventDefault();
       e.stopPropagation();
     }
