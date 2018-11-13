@@ -19,6 +19,10 @@ foam.CLASS({
       white-space: nowrap;
     }
 
+    ^ tr {
+      border-bottom: solid 1px #e2e2e3;
+    }
+
     ^ td {
       white-space: nowrap;
     }
