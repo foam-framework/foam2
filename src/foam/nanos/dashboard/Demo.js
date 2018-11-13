@@ -37,7 +37,7 @@ foam.CLASS({
           arg1: 'serve',
           arg2: 'authenticate',
           size: this.VisualizationSize.MEDIUM,
-          label: 'Grouped by serverd/lazy',
+          label: 'Grouped by served/authenticate',
         })).
         add(this.GroupBy.create({
           daoName: 'nSpecDAO',
