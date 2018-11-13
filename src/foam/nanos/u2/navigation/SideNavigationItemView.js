@@ -22,7 +22,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'expanded',
-      value: true
+      value: false
     },
     {
       class: 'Int',
@@ -39,7 +39,7 @@ foam.CLASS({
       var opacity = view.level * -0.1 + 0.9;
 
       this
-        .addClass(this.myClass())
+        .addClass(`${this.myClass()}-level-${this.level}`)
         .start('a')
           .add(this.data.label)
           .enableClass(this.myClass('selected'), view.currentMenu$.map(function (value) {
