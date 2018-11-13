@@ -4,7 +4,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-
  foam.CLASS({
    // package: 'foam.graphics',
    name: 'TreeGraphDemo',
@@ -19,23 +18,23 @@
 
    methods: [
      function init() {
-       var g = TreeGraph.create({x:800, y:50});
+       var g = TreeGraph.create({x:850, y:50});
        this.add(g.addChildNode());
        this.add(g.addChildNode());
        this.add(g.addChildNode());
-       g.children[0].addChildNode()/*.addChildNode()*/;
-       g.children[0].addChildNode();
-       g.children[0].children[0].addChildNode().addChildNode()/*.addChildNode()*/;
-       g.children[0].children[0].children[0].addChildNode().addChildNode().addChildNode();
-       g.children[0].children[1].addChildNode();
-       g.children[1].addChildNode();
-       // g.children[1].children[0].addChildNode(); // TODO: not supported
-       g.children[2].addChildNode();
-       g.children[2].children[0].addChildNode();
-       g.children[2].children[0].addChildNode();
-       g.children[2].children[0].addChildNode();
-       g.children[2].children[0].children[1].addChildNode();
-       g.children[2].children[0].children[2].addChildNode().addChildNode();
+       g.childNodes[0].addChildNode()/*.addChildNode()*/;
+       g.childNodes[0].addChildNode();
+       g.childNodes[0].childNodes[0].addChildNode().addChildNode()/*.addChildNode()*/;
+       g.childNodes[0].childNodes[0].childNodes[0].addChildNode().addChildNode().addChildNode();
+       g.childNodes[0].childNodes[1].addChildNode();
+       g.childNodes[1].addChildNode();
+       // g.childNodes[1].childNodes[0].addChildNode(); // TODO: not supported
+       g.childNodes[2].addChildNode();
+       g.childNodes[2].childNodes[0].addChildNode();
+       g.childNodes[2].childNodes[0].addChildNode();
+       g.childNodes[2].childNodes[0].addChildNode();
+       g.childNodes[2].childNodes[0].childNodes[1].addChildNode();
+       g.childNodes[2].childNodes[0].childNodes[2].addChildNode().addChildNode();
        g.layout();
        g.x+=100;
 
@@ -63,12 +62,14 @@ foam.CLASS({
 
   requires: [
     'foam.graphics.Box',
-    'foam.graphics.CView'
+    'foam.graphics.CView',
+    'foam.graphics.Label',
+    'foam.graphics.Line'
   ],
 
   properties: [
-    [ 'height', 50 ],
-    [ 'width', 100 ],
+    [ 'height', 60 ],
+    [ 'width', 135 ],
     [ 'border', 'gray' ],
     [ 'slide', 0 ],
     {
@@ -82,6 +83,8 @@ foam.CLASS({
       name: 'expanded',
       value: true
     },
+    [ 'color', 'white' ],
+    [ 'padding', 30 ],
     'parentNode'
   ],
 
@@ -89,18 +92,31 @@ foam.CLASS({
     function initCView() {
       this.SUPER();
 
+      var c = this.hsl(Math.random()*360, 90, 45);
+
+      this.add(this.Label.create({color: 'black', x: -this.width/2+14, y: 7, text: 'ABC Corp.', font: 'bold 12px sans-serif'}));
+      this.add(this.Label.create({color: 'gray', x: -this.width/2+14, y: this.height-22, text: this.childNodes.length ? 'Aggregate' : ''}));
+      this.add(this.Label.create({color: 'gray', x: this.width/2-10,  y: this.height-22, align: 'end', text: '$100,000'}));
+      this.add(this.Line.create({
+        startX: -this.width/2+7,
+        startY: 5,
+        endX: -this.width/2+7,
+        endY: this.height-5,
+        color: c,
+        lineWidth: 4
+      }));
+
       // If top-level node
       if ( ! this.parentNode ) {
         var self = this;
         this.parent.canvas.on('click', function(e) {
-          var c = self.findFirstChildAt(e.clientX+50, e.clientY);
-          console.log('*******', c);
+          var c = self.findFirstChildAt(e.clientX+self.width/2, e.clientY);
           if ( ! c ) return;
           c.expanded = ! c.expanded;
           if ( ! c.expanded ) {
-            for ( var i = 0 ; i < c.children.length ; i++ ) {
-              c.children[i].y = 50;
-              c.children[i].x = 0;
+            for ( var i = 0 ; i < c.childNodes.length ; i++ ) {
+              c.childNodes[i].y = self.height;
+              c.childNodes[i].x = 0;
             }
           }
           self.doLayout();
@@ -108,41 +124,53 @@ foam.CLASS({
       }
     },
 
-    function doTransform(x) {
+    function paint(x) {
+      if ( this.parentNode && ! this.parentNode.expanded ) return;
       this.SUPER(x);
     },
 
     function paintSelf(x) {
-      x.translate(-50, 0);
+      x.translate(-this.width/2, 0);
       this.SUPER(x);
-      x.translate(50, 0);
-      if ( this.expanded && this.children.length ) {
-        function line(x1, y1, x2, y2) {
-          x.beginPath();
-          x.moveTo(x1, y1);
-          x.lineTo(x2, y2);
-          x.lineWidth = 1;
-          x.strokeStyle = 'gray';
-          x.stroke();
-        }
-        line(0, 50, 0, 75);
-        var l = this.children.length;
+      x.translate(this.width/2, 0);
+
+      function line(x1, y1, x2, y2) {
+        x.beginPath();
+        x.moveTo(x1, y1);
+        x.lineTo(x2, y2);
+        x.stroke();
+      }
+
+      x.lineWidth   = 0.5; //this.borderWidth;
+      x.strokeStyle = this.border;
+
+      // Paint lines to childNodes
+      if ( this.expanded && this.childNodes.length ) {
+        var h = this.height+25;
+        line(0, this.height, 0, h);
+        var l = this.childNodes.length;
         for ( var i = 0 ; i < l ; i++ ) {
-          var c = this.children[i];
-          line(0, 75, c.x, 75);
-          line(c.x, 75, c.x, c.y);
+          var c = this.childNodes[i];
+          line(0, h, c.x, h);
+          line(c.x, h, c.x, c.y);
         }
       }
-    },
 
-    function paintChildren(x) {
-      if ( this.expanded ) this.SUPER(x);
+      x.lineWidth = 1.5; //this.borderWidth;
+      // Paint expand/collapse arrow
+      if ( this.childNodes.length ) {
+        var d = this.expanded ? 5 : -5;
+        var y = this.height - 8;
+        line(-5, y, 0, y+d);
+        line(0, y+d, 5, y);
+      }
     },
 
     function addChildNode(args) {
       var node = this.cls_.create({y: 0, parentNode: this});
       node.copyFrom(args);
       this.add(node);
+      this.childNodes.push(node);
       this.doLayout();
       return this;
     },
@@ -152,13 +180,13 @@ foam.CLASS({
 
       if ( ! this.expanded ) return false;
 
-      var moved    = false;
-      var children = this.children;
-      var l        = children.length;
+      var moved      = false;
+      var childNodes = this.childNodes;
+      var l          = childNodes.length;
 
       for ( var i = 0 ; i < l ; i++ ) {
-        var c = children[i];
-        if ( c.y < 100 ) { moved = true; c.y += 4; }
+        var c = childNodes[i];
+        if ( c.y < this.height*2 ) { moved = true; c.y += 5; }
 
         moved      = moved || c.layout();
         this.left  = Math.min(this.left, c.x);
@@ -167,27 +195,23 @@ foam.CLASS({
 
       var m = l/2;
       for ( var i = 0 ; i < l-1 ; i++ ) {
-        var n1 = children[i];
-        var n2 = children[i+1];
+        var n1 = childNodes[i];
+        var n2 = childNodes[i+1];
         var d  = n2.x-n1.x+n2.left-n1.right;
-        if ( d != 130 ) {
+        if ( d != this.width + this.padding ) {
           moved = true;
-          var w = Math.min(Math.abs(130-d), 10);
-          console.log(w);
-          if ( d > 130 ) w = -w;
+          var w = Math.min(Math.abs(this.width+this.padding-d), 10);
+          if ( d > this.width + this.padding ) w = -w;
           if ( i+1 == m ) {
-            console.log('move away', w/2);
+            // console.log('move away', w/2);
             n1.x -= w/2;
             n2.x += w/2;
-            n1.color = n2.color = 'green';
           } else if ( i < Math.floor(m) ) {
-            console.log('move left', i, m, l, w);
+            // console.log('move left', i, m, l, w);
             n1.x -= w;
-            n1.color = 'pink';
           } else {
-            console.log('move right', i, m, l, w);
+            // console.log('move right', i, m, l, w);
             n2.x += w;
-            n2.color = 'blue';
           }
         }
       }
