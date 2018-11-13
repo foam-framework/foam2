@@ -53,10 +53,10 @@ foam.CLASS({
       },
     },
     {
-      name: 'holdingsByPerson',
+      name: 'holdingsByPersonPie',
       view: {
         class: 'org.chartjs.demos.ConfigurableChartView',
-        view: 'org.chartjs.Bar',
+        view: 'org.chartjs.Pie',
       },
       factory: function() {
         var sink = this.GROUP_BY(
@@ -66,6 +66,16 @@ foam.CLASS({
             this.SUM(this.StockOrder.SHARES)));
         this.stockOrderDAO.listen(sink);
         return sink;
+      },
+    },
+    {
+      name: 'holdingsByPersonBar',
+      view: {
+        class: 'org.chartjs.demos.ConfigurableChartView',
+        view: 'org.chartjs.Bar',
+      },
+      expression: function(holdingsByPersonPie) {
+        return holdingsByPersonPie;
       },
     },
     {
