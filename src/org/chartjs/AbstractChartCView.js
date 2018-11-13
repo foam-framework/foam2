@@ -6,7 +6,9 @@ foam.CLASS({
     'org.chartjs.Lib'
   ],
   properties: [
-    [ 'chartType', 'pie' ],
+    'chart',
+    'chartType',
+    'colors',
     {
       name: 'config',
       factory: function() {
@@ -21,15 +23,18 @@ foam.CLASS({
       }
     },
     {
-      name: 'chart',
-      postSet: function(_, c) {
-        this.data && c.update(this.data);
-      }
+      name: 'data',
+      postSet: function(_, n) {
+        this.onDetach(n.sub(function(sub) {
+          if ( n !== this.data ) sub.detach();
+          else this.update();
+        }.bind(this)));
+      },
     },
-    'data'
   ],
   reactions: [
-    [ '', 'propertyChange.data', 'update' ]
+    ['', 'propertyChange.data', 'update' ],
+    ['', 'propertyChange.chart', 'update' ],
   ],
   methods: [
     function initCView(x) {
@@ -52,8 +57,7 @@ foam.CLASS({
       name: 'update',
       isFramed: true,
       code: function() {
-        if ( ! this.chart ) return;
-        this.updateChart_(this.data);
+        if ( this.chart && this.data ) this.updateChart_(this.data);
       }
     }
   ]
