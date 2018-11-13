@@ -43,7 +43,7 @@ public class UserAndGroupAuthService
 
   @Override
   public void start() {
-    userDAO_     = (DAO) getX().get("localUserDAO");
+    userDAO_     = (DAO) getX().get("bareUserDAO");
     groupDAO_    = (DAO) getX().get("groupDAO");
     sessionDAO_  = (DAO) getX().get("sessionDAO");
   }
