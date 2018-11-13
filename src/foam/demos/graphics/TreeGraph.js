@@ -74,21 +74,14 @@ foam.CLASS({
       name: 'childNodes',
       factory: function() { return []; }
     },
+    [ 'left', 0 ],
+    [ 'right', 0 ],
     'parentNode'
   ],
 
   methods: [
     function doTransform(x) {
       this.SUPER(x);
-    },
-
-    function widths() {
-      var ws = [];
-      ws[0] = this.children.length*2+1;
-      return ws;
-    },
-
-    function xxxinitCView( x, y, seriesValues, radius, margin, graphColors, symbol, lineColor, w, h, lineWidth, fontValue, align ) {
     },
 
     function paintSelf(x) {
@@ -107,38 +100,44 @@ foam.CLASS({
         line(0, 50, 0, 75);
         var l = this.children.length;
         for ( var i = 0 ; i < l ; i++ ) {
-          line(0, 75, this.children[i].x, 75);
-          line(this.children[i].x, 75, this.children[i].x, 100);
+          var c = this.children[i];
+          line(0, 75, c.x, 75);
+          line(c.x, 75, c.x, c.y);
         }
       }
     },
 
     function addChildNode(args) {
-      var node = this.cls_.create({y:100, parentNode: this});
+      var node = this.cls_.create({y: 50, parentNode: this});
       node.copyFrom(args);
       this.add(node);
-      this.layout();
+      this.doLayout();
       return this;
     },
 
     function layout() {
+      var moved = false;
       var children = this.children;
       var l = children.length;
+
+      this.left = this.right = 0;
       for ( var i = 0 ; i < l ; i++ ) {
-        this.children[i].x = -l*100 + 200 * i + 100;
-        this.children[i].layout();
+        var c = children[i];
+        if ( c.y < 100 ) { moved = true; c.y += 4; }
+
+        c.layout();
+        this.left  = Math.min(this.left, c.x);
+        this.right = Math.max(this.right, c.x);
       }
 
       var m = l/2;
       for ( var i = 0 ; i < l-1 ; i++ ) {
         var n1 = children[i];
         var n2 = children[i+1];
-        var w1 = n1.widths()[0];
-        var w2 = n2.widths()[0];
-        var w = w1 + w2;
-        if ( w > 6 ) {
-          console.log('******************', i, w, m, w1, w2, n1.children.length, n2.children.length);
-          w *= 20*2/3;
+        var d = n2.x-n1.x+n2.left-n1.right;
+        if ( d < 120 ) {
+          moved = true;
+          var w = 20;
           if ( i+1 == m ) {
             console.log('move away', w/2);
             n1.x -= w/2;
@@ -156,26 +155,17 @@ foam.CLASS({
         }
       }
 
-      return;
-      var children = this.children;
-      var l        = children.length;
+      return moved;
+    }
+  ],
 
-      if ( ! l ) return;
-
-      children[0].x = -125;
-      for ( var i = 1 ; i < l ; i++ ) {
-        var p  = children[i-1];
-        var c  = children[i];
-        var pw = p.widths()[0];
-        var cw = c.widths()[0];
-        c.x = p.x + Math.min(200, pw/2 + cw/2);
-      }
-      var w = children[l-1].x/2;
-      for ( var i = 0 ; i < l ; i++ ) {
-        var p = this.children[i];
-        p.x = /*this.x + */ p.x - w/2;
+  listeners: [
+    {
+      name: 'doLayout',
+      isFramed: true,
+      code: function() {
+        if ( this.layout() ) this.doLayout();
       }
     }
-
   ]
 } );
