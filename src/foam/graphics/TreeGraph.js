@@ -9,10 +9,33 @@
    name: 'TreeGraph',
    extends: 'foam.graphics.CView',
 
+   exports: [ 'nodeWidth', 'nodeHeight', 'padding' ],
+
    properties: [
+     [ 'nodeWidth',  155 ],
+     [ 'nodeHeight',  60 ],
+     [ 'padding',     30 ]
    ],
 
    methods: [
+     function initCView() {
+       this.SUPER();
+
+       // List for 'click' events to expand/collapse Nodes.
+       this.canvas.on('click', function(e) {
+         var x = e.clientX+this.nodeWidth/2, y = e.clientY;
+         var c = this.children[0].findFirstChildAt(x, y);
+         if ( ! c ) return;
+         c.expanded = ! c.expanded;
+         if ( ! c.expanded ) {
+           for ( var i = 0 ; i < c.childNodes.length ; i++ ) {
+             c.childNodes[i].y = this.nodeHeight;
+             c.childNodes[i].x = 0;
+           }
+         }
+         this.children[0].doLayout();
+       }.bind(this));
+     }
    ],
 
    classes: [
@@ -27,9 +50,12 @@
          'foam.graphics.Line'
        ],
 
+       imports: [ 'nodeWidth', 'nodeHeight', 'padding', 'parentNode?' ],
+       exports: [ 'as parentNode' ],
+
        properties: [
-         [ 'height', 60 ],
-         [ 'width', 155 ],
+         { name: 'height', factory: function() { return this.nodeHeight; } },
+         { name: 'width',  factory: function() { return this.nodeWidth; } },
          [ 'border', 'gray' ],
          {
            name: 'childNodes',
@@ -42,9 +68,7 @@
            name: 'expanded',
            value: true
          },
-         [ 'color', 'white' ],
-         [ 'padding', 30 ],
-         'parentNode'
+         [ 'color', 'white' ]
        ],
 
        methods: [
@@ -54,8 +78,8 @@
            var c = this.hsl(Math.random()*360, 90, 45);
 
            this.add(this.Label.create({color: 'black', x: -this.width/2+14, y: 7, text: 'ABC Corp.', font: 'bold 12px sans-serif'}));
-           this.add(this.Label.create({color: 'gray', x: -this.width/2+14, y: this.height-22, text: this.childNodes.length ? 'Aggregate' : ''}));
-           this.add(this.Label.create({color: 'gray', x: this.width/2-10,  y: this.height-22, align: 'end', text: '$100,000'}));
+           this.add(this.Label.create({color: 'gray', x: -this.width/2+14, y: this.height-20, text: this.childNodes.length ? 'Aggregate' : ''}));
+           this.add(this.Label.create({color: 'gray', x: this.width/2-10,  y: this.height-20, align: 'end', text: '$100,000'}));
            this.add(this.Line.create({
              startX: -this.width/2+7,
              startY: 5,
@@ -64,28 +88,10 @@
              color: c,
              lineWidth: 4
            }));
-
-           // If top-level node
-           if ( ! this.parentNode ) {
-             var self = this;
-             this.parent.canvas.on('click', function(e) {
-               var c = self.findFirstChildAt(e.clientX+self.width/2, e.clientY);
-               if ( ! c ) return;
-               c.expanded = ! c.expanded;
-               if ( ! c.expanded ) {
-                 for ( var i = 0 ; i < c.childNodes.length ; i++ ) {
-                   c.childNodes[i].y = self.height;
-                   c.childNodes[i].x = 0;
-                 }
-               }
-               self.doLayout();
-             });
-           }
          },
 
          function paint(x) {
-           if ( this.parentNode && ! this.parentNode.expanded ) return;
-           this.SUPER(x);
+           if ( ! this.parentNode || this.parentNode.expanded ) this.SUPER(x);
          },
 
          function paintSelf(x) {
@@ -93,6 +99,10 @@
            this.SUPER(x);
            x.translate(this.width/2, 0);
 
+           this.paintConnectors(x);
+         },
+
+         function paintConnectors(x) {
            function line(x1, y1, x2, y2) {
              x.beginPath();
              x.moveTo(x1, y1);
@@ -126,7 +136,7 @@
          },
 
          function addChildNode(args) {
-           var node = this.cls_.create({y: 0, parentNode: this});
+           var node = this.cls_.create({y: 0}, this);
            node.copyFrom(args);
            this.add(node);
            this.childNodes.push(node);
