@@ -102,8 +102,7 @@ foam.CLASS({
         }, this.selection$, this.data$.dot('id'))).
         start('span').
           style({
-            visibility: 'visible',
-            //visibility: this.hasChildren$.map(function(c) { return c ? 'visible' : 'hidden'; }),
+            visibility: this.hasChildren$.map(function(c) { return c ? 'visible' : 'hidden'; }),
             'font-size': '12px'
           }).
           on('click', this.toggleExpanded).
