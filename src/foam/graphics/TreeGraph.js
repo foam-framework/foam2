@@ -9,22 +9,42 @@
    name: 'TreeGraph',
    extends: 'foam.graphics.CView',
 
-   exports: [ 'nodeWidth', 'nodeHeight', 'padding' ],
+   exports: [ 'nodeWidth', 'nodeHeight', 'padding', 'relationship', 'as graph', 'formatNode' ],
 
    properties: [
      [ 'nodeWidth',  155 ],
      [ 'nodeHeight',  60 ],
-     [ 'padding',     30 ]
+     [ 'padding',     30 ],
+     {
+       name: 'data'
+     },
+     {
+       name: 'relationship'
+     },
+     'root',
+     {
+       name: 'formatNode',
+       value: function() {}
+     }
    ],
 
    methods: [
+     function init() {
+       this.SUPER();
+
+       if ( this.data ) {
+         this.root = this.Node.create();
+         this.children.push(this.root);
+       }
+     },
+
      function initCView() {
        this.SUPER();
 
        // List for 'click' events to expand/collapse Nodes.
        this.canvas.on('click', function(e) {
          var x = e.clientX+this.nodeWidth/2, y = e.clientY;
-         var c = this.children[0].findFirstChildAt(x, y);
+         var c = this.root.findFirstChildAt(x, y);
          if ( ! c ) return;
          c.expanded = ! c.expanded;
          if ( ! c.expanded ) {
@@ -33,9 +53,11 @@
              c.childNodes[i].x = 0;
            }
          }
-         this.children[0].doLayout();
+         this.doLayout();
        }.bind(this));
-     }
+     },
+
+     function doLayout() { if ( this.root ) this.root.doLayout(); }
    ],
 
    classes: [
@@ -50,10 +72,11 @@
          'foam.graphics.Line'
        ],
 
-       imports: [ 'nodeWidth', 'nodeHeight', 'padding', 'parentNode?' ],
+       imports: [ 'nodeWidth', 'nodeHeight', 'padding', 'parentNode?', 'formatNode', 'graph' ],
        exports: [ 'as parentNode' ],
 
        properties: [
+         'data',
          { name: 'height', factory: function() { return this.nodeHeight; } },
          { name: 'width',  factory: function() { return this.nodeWidth; } },
          [ 'border', 'gray' ],
@@ -75,19 +98,13 @@
          function initCView() {
            this.SUPER();
 
-           var c = this.hsl(Math.random()*360, 90, 45);
+           this.formatNode();
 
-           this.add(this.Label.create({color: 'black', x: -this.width/2+14, y: 7, text: 'ABC Corp.', font: 'bold 12px sans-serif'}));
-           this.add(this.Label.create({color: 'gray', x: -this.width/2+14, y: this.height-20, text: this.childNodes.length ? 'Aggregate' : ''}));
-           this.add(this.Label.create({color: 'gray', x: this.width/2-10,  y: this.height-20, align: 'end', text: '$100,000'}));
-           this.add(this.Line.create({
-             startX: -this.width/2+7,
-             startY: 5,
-             endX: -this.width/2+7,
-             endY: this.height-5,
-             color: c,
-             lineWidth: 4
-           }));
+           if ( this.relationship ) {
+             this.data[this.relationship.forwardName].select(function(data) {
+               this.addChildNode({data: data});
+              }.bind(this));
+            }
          },
 
          function paint(x) {
@@ -115,13 +132,14 @@
 
            // Paint lines to childNodes
            if ( this.expanded && this.childNodes.length ) {
-             var h = this.height+25;
+             var h = this.childNodes[0].y*3/4;
              line(0, this.height, 0, h);
              var l = this.childNodes.length;
              for ( var i = 0 ; i < l ; i++ ) {
                var c = this.childNodes[i];
-               line(0, h, c.x, h);
-               line(c.x, h, c.x, c.y);
+               if ( i == 0 || i == l-1 ) {
+                line(0, h, c.x, h);
+               }
              }
            }
 
@@ -136,11 +154,10 @@
          },
 
          function addChildNode(args) {
-           var node = this.cls_.create({y: 0}, this);
-           node.copyFrom(args);
+           var node = this.cls_.create(args, this);
            this.add(node);
            this.childNodes.push(node);
-           this.doLayout();
+           this.graph.doLayout();
            return this;
          },
 
@@ -158,7 +175,7 @@
              var c = childNodes[i];
              if ( c.y < this.height*2 ) { moved = true; c.y += 5; }
 
-             moved      = moved || c.layout();
+             if ( c.layout() ) moved = true;
              this.left  = Math.min(this.left, c.x);
              this.right = Math.max(this.right, c.x);
            }
