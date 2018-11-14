@@ -14,7 +14,7 @@ foam.CLASS({
       name: 'status'
     },
     {
-      class: 'String',
+      class: 'Int',
       name: 'code'
     },
     {
