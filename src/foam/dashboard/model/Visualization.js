@@ -4,9 +4,35 @@ foam.CLASS({
   requires: [
     'foam.dao.NullDAO',
     'foam.dashboard.view.Card',
-    'foam.mlang.sink.NullSink',
+    'foam.dao.ArraySink',
+    'foam.mlang.sink.Sum',
+    'foam.mlang.sink.Count',
+    'foam.mlang.sink.Average',
+    'foam.mlang.order.Desc',
+    'foam.parse.QueryParser',
+    'foam.mlang.predicate.False',
+    'foam.mlang.predicate.True',
   ],
   properties: [
+    {
+      class: 'String',
+      // TODO: Write a predicate view
+      name: 'predicate'
+    },
+    {
+      // TODO: A more complete Ordering view would be useful rather
+      // than having a property for "order" and one for
+      // "ascending/descending"
+      class: 'FObjectProperty',
+      of: 'foam.core.Property',
+      name: 'order',
+      view: { class: 'foam.u2.view.ExprView' }
+    },
+    {
+      class: 'Boolean',
+      name: 'descending',
+      value: false
+    },
     {
       class: 'String',
       label: 'DAO',
@@ -19,15 +45,34 @@ foam.CLASS({
     {
       name: 'dao',
       hidden: true,
-      expression: function(daoName) {
-        return this.__context__[daoName] || this.NullDAO.create();
+      expression: function(daoName, predicate, order, descending) {
+        var dao = this.__context__[daoName];
+
+        if ( ! dao ) return this.NullDAO.create();
+
+        var pred = predicate ?
+            ( this.QueryParser.create({ of: dao.of }).parseString(predicate) || this.True.create() ) :
+            this.True.create();
+
+        return this.__context__[daoName].
+          where(pred).
+          orderBy(descending ? this.Desc.create({ arg1: order }) : order);
       }
     },
     {
-      // TODO: Provide rich configuration of sink.
+      class: 'FObjectProperty',
+      of: 'foam.dao.Sink',
+      view: {
+        class: 'foam.u2.view.FObjectView',
+        choices: [
+          [ 'foam.mlang.sink.ArraySink', 'LIST' ],
+          [ 'foam.mlang.sink.Count', 'COUNT' ],
+          [ 'foam.mlang.sink.Sum', 'SUM' ],
+          [ 'foam.mlang.sink.Average', 'AVG' ],
+        ]
+      },
       name: 'sink',
-      hidden: true,
-      factory: function() { return this.NullSink.create() },
+      factory: function() { return this.ArraySink.create() },
     },
     {
       name: 'data',
@@ -99,6 +144,8 @@ foam.CLASS({
     }
   ],
   reactions: [
+    [ 'sink', 'propertyChange', 'update' ],
+    [ 'sink', 'nestedPropertyChange', 'update' ],
     [ '', 'propertyChange.sink', 'update' ],
     [ '', 'propertyChange.dao', 'update' ],
   ],

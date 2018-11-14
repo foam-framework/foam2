@@ -123,6 +123,7 @@ var classes = [
   'foam.mlang.sink.Max',
   'foam.mlang.sink.Min',
   'foam.mlang.sink.Sum',
+  'foam.mlang.sink.Average',
   'foam.mlang.sink.Map',
   'foam.nanos.actioncommand.ActionCommand',
   'foam.nanos.NanoService',
@@ -272,6 +273,7 @@ var classes = [
   'foam.nanos.http.HttpParameters',
   'foam.nanos.dig.DIG',
   'foam.nanos.dig.DUG',
+  'foam.nanos.dig.SUGAR',
 
   'foam.nanos.jetty.HttpServer',
   'foam.nanos.servlet.Servlet',
@@ -300,7 +302,6 @@ var classes = [
   'foam.nanos.dig.exception.UnsupportException',
   'foam.nanos.dig.exception.UnknownIdException',
   'foam.nanos.dig.exception.DigSuccessMessage',
-
   'foam.flow.Document',
   'foam.flow.DocumentationFolderDAO',
 
@@ -309,7 +310,10 @@ var classes = [
   //Support Files
   'foam.support.model.TicketMessage',
   'foam.support.model.SupportEmail',
-  'foam.support.model.Ticket'
+  'foam.support.model.Ticket',
+
+  'foam.nanos.dig.exception.EmptyParameterException',
+  'foam.nanos.dig.exception.GeneralException'
 ];
 
 var abstractClasses = [

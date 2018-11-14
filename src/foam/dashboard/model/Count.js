@@ -11,25 +11,6 @@ foam.CLASS({
   ],
   properties: [
     {
-      class: 'String',
-      // TODO: Write a predicate view
-      name: 'predicate'
-    },
-    {
-      name: 'dao',
-      expression: function(daoName, predicate) {
-        var dao = this.__context__[daoName];
-
-        if ( ! dao ) return this.NullDAO.create();
-
-        var queryParser = this.QueryParser.create({ of: dao.of });
-
-        var pred = queryParser.parseString(predicate) || this.False.create();
-
-        return this.__context__[daoName].where(pred);
-      }
-    },
-    {
       name: 'views',
       factory: function() {
         return [
