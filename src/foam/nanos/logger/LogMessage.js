@@ -37,10 +37,10 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
         var severityLabelColor;
         switch ( severity.label ) {
           case 'Warning':
-            severityLabelColor = '#cccc00';
+            severityLabelColor = '#ffa500';
             break;
           case 'Info':
-            severityLabelColor = '#00cc00';
+            severityLabelColor = '#0000cc';
             break;
           case 'Error':
             severityLabelColor = '#ff0000';
