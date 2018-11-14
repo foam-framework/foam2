@@ -111,7 +111,7 @@ foam.CLASS({
         toggleEnabled,
         detailView
       ) {
-        var config = { data: data };
+        var config = {};
 
         if ( createLabel ) config.createLabel = createLabel;
         if ( searchMode )  config.searchMode  = searchMode;
@@ -126,8 +126,15 @@ foam.CLASS({
         config.toggleEnabled = toggleEnabled;
 
         if ( customDAOController ) {
-          return this.__context__.lookup(customDAOController).create(config, this);
+          var controller = this.__context__.lookup(customDAOController).create(config, this);
+
+          // Let the custom controller override the dao used.
+          controller.data = controller.data || data;
+
+          return controller;
         }
+
+        config.data = data;
         return this.DAOController.create(config, this);
       }
     },
