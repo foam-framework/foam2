@@ -3,7 +3,8 @@ foam.CLASS({
   name: 'AbstractChartCView',
   extends: 'foam.graphics.CView',
   requires: [
-    'org.chartjs.Lib'
+    'foam.mlang.sink.GroupBy',
+    'org.chartjs.Lib',
   ],
   properties: [
     'chart',
@@ -43,7 +44,44 @@ foam.CLASS({
     function updateChart_(data) {
       // Template method, in child classes update the chart's data
       // from our data.
-    }
+    },
+    function toChartData(data) {
+      var keys = data.sortedKeys();
+
+      if ( this.GroupBy.isInstance(data.arg2) ) {
+        var xValues = {};
+        keys.forEach(function(k) {
+          Object.keys(data.groups[k].groups).forEach(function(k2) {
+            xValues[k2] = true;
+          })
+        });
+        xValues = Object.keys(xValues);
+        xValues.sort();
+        return {
+          labels: xValues,
+          datasets: keys.map(function(k, i) {
+            return {
+              label: k,
+              data: xValues.map(function(x) {
+                var y = data.groups[k].groups[x] ?
+                  data.groups[k].groups[x].value : null
+                return { y: y, x: x }
+              }),
+            }
+          })
+        };
+      } else {
+        return {
+          labels: keys,
+          datasets: [
+            {
+              label: data.arg2.label || data.arg2.model_.label,
+              data: keys.map(function(k) { return data.groups[k].value; })
+            }
+          ]
+        };
+      }
+    },
   ],
   listeners: [
     {
