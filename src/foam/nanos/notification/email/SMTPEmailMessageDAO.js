@@ -16,7 +16,7 @@ foam.CLASS({
         EmailService service = (EmailService) x.get("smtpEmailService");
         if ( service != null ) {
           try {
-            service.sendEmailWithX(x, (EmailMessage) obj);
+            service.sendEmail(x, (EmailMessage) obj);
           } catch (RuntimeException e) {
             e.printStackTrace();
           }

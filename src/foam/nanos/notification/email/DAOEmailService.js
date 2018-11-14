@@ -91,23 +91,11 @@ return config_;`
     {
       name: 'sendEmail',
       javaCode: `
-        getDao().put(emailMessage);
-`
-    },
-    {
-      name: 'sendEmailWithX',
-      javaCode: `
         getDao().put_(x, emailMessage);
 `
     },
     {
       name: 'sendEmailFromTemplate',
-      javaCode: `
-sendEmailFromTemplateWithX(getX(), user,  emailMessage, name, templateArgs);
-`
-    },
-    {
-      name: 'sendEmailFromTemplateWithX',
       javaCode: `
 String group = user != null ? (String) user.getGroup() : null;
 EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(getX(), name, group);
@@ -135,7 +123,7 @@ if (foam.util.SafetyUtil.isEmpty(emailMessage.getSubject())) {
   emailMessage.setSubject(templateSubject.render(model));
 }
 
-sendEmailWithX(x, emailMessage);
+sendEmail(x, emailMessage);
 `
     }
   ]

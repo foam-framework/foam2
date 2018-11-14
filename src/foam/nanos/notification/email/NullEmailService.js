@@ -17,17 +17,7 @@ foam.CLASS({
       code: function() { return Promise.resolve(); }
     },
     {
-      name: 'sendEmailWithX',
-      javaCode: '// NOOP',
-      code: function() { return Promise.resolve(); }
-    },
-    {
       name: 'sendEmailFromTemplate',
-      javaCode: '// NOOP',
-      code: function() { return Promise.resolve(); }
-    },
-    {
-      name: 'sendEmailFromTemplateWithX',
       javaCode: '// NOOP',
       code: function() { return Promise.resolve(); }
     }

@@ -231,16 +231,14 @@ return config_;`
       name: 'sendEmail',
       args: [
         {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
           name: 'emailMessage',
           javaType: 'final foam.nanos.notification.email.EmailMessage'
         }
       ],
-      javaCode: `
-sendEmailWithX(getX(), emailMessage);
-      `
-    },
-    {
-      name: 'sendEmailWithX',
       javaCode: `
 if ( ! this.getEnabled() ) return;
 
@@ -266,11 +264,6 @@ if ( ! this.getEnabled() ) return;
     },
     {
       name: 'sendEmailFromTemplate',
-      javaCode: `
-sendEmailFromTemplateWithX(getX(), user,  emailMessage, name, templateArgs);`
-    },
-    {
-      name: 'sendEmailFromTemplateWithX',
       javaCode: `
 if ( ! this.getEnabled() ) return;
 
@@ -300,7 +293,7 @@ if (SafetyUtil.isEmpty(emailMessage.getSubject())) {
   emailMessage.setSubject(templateSubject.render(model));
 }
 
-sendEmailWithX(x, emailMessage);`
+sendEmail(x, emailMessage);`
     },
     {
       name: 'start',
