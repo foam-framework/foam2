@@ -52,6 +52,21 @@ foam.CLASS({
       name: 'body'
     },
     {
+      class: 'String',
+      name: 'from',
+      value: null
+    },
+    {
+      class: 'String',
+      name: 'displayName',
+      value: null
+    },
+    {
+      class: 'String',
+      name: 'replyTo',
+      value: null
+    },
+    {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
