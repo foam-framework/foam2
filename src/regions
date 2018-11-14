@@ -45,7 +45,7 @@ p({"class":"foam.nanos.auth.Region", "code":"NJ", "name": "New Jersey", "country
 p({"class":"foam.nanos.auth.Region", "code":"NM", "name": "New Mexico", "countryId":"US"})
 p({"class":"foam.nanos.auth.Region", "code":"NY", "name": "New York", "countryId":"US"})
 p({"class":"foam.nanos.auth.Region", "code":"NC", "name": "North Carolina", "countryId":"US"})
-p({"class":"foam.nanos.auth.Region", "code":"ND", "name": " North Dakota", "countryId":"US"})
+p({"class":"foam.nanos.auth.Region", "code":"ND", "name": "North Dakota", "countryId":"US"})
 p({"class":"foam.nanos.auth.Region", "code":"OH", "name": "Ohio", "countryId":"US"})
 p({"class":"foam.nanos.auth.Region", "code":"OK", "name": "Oklahoma", "countryId":"US"})
 p({"class":"foam.nanos.auth.Region", "code":"OR", "name": "Oregon", "countryId":"US"})

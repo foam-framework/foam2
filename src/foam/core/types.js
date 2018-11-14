@@ -472,6 +472,44 @@ foam.CLASS({
                 of ).create(v, this.__subContext__);
       }
     }
+  ],
+  methods: [
+    function initObject(obj) {
+      var s1, s2;
+
+      obj.onDetach(function() {
+        s1 && s1.detach();
+        s2 && s2.detach();
+      });
+
+      var name = this.name;
+      var slot = this.toSlot(obj);
+
+      function proxyListener(sub) {
+        var args = [
+          'nestedPropertyChange', name, slot
+        ].concat(Array.from(arguments).slice(1));
+
+        obj.pub.apply(obj, args);
+      }
+
+      function attach(inner) {
+        s1 && s1.detach();
+        s1 = inner && inner.sub('propertyChange', proxyListener);
+
+        s2 && s2.detach();
+        s2 = inner && inner.sub('nestedPropertyChange', proxyListener);
+      }
+
+      function listener(s, pc, name, slot) {
+        attach(slot.get());
+      }
+
+      obj.sub('propertyChange', name, listener);
+
+      // TODO: Only hook up the subscription when somebody listens to us.
+      if ( obj[name] ) attach(obj[name]);
+    }
   ]
 });
 

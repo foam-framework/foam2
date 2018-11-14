@@ -48,6 +48,7 @@ foam.CLASS({
     }
 
     ^title-container > * {
+      color: #555;
       display: inline-block;
       margin: 0.67rem 0;
     }
@@ -94,18 +95,12 @@ foam.CLASS({
       }
     },
     {
+      class: 'foam.u2.ViewSpec',
       name: 'summaryView',
       factory: function() {
-        var defaultView = { class: 'foam.u2.view.ScrollTableView' };
-        if (
-          Array.isArray(this.data.contextMenuActions) &&
-          this.data.contextMenuActions.length > 0
-        ) {
-          defaultView.contextMenuActions = this.data.contextMenuActions;
-        }
-        return this.importedSummaryView ?
-          this.importedSummaryView :
-          defaultView;
+        return this.data.summaryView || this.importedSummaryView || {
+          class: 'foam.u2.view.ScrollTableView'
+        };
       }
     },
     {
@@ -200,20 +195,26 @@ foam.CLASS({
     },
 
     function dblclick(obj) {
-      this.onEdit(null, null, obj.id);
+      if ( this.data.dblclick ) {
+        this.data.dblclick(obj);
+      } else {
+        this.onEdit(null, null, obj.id);
+      }
     }
   ],
 
   listeners: [
     function onCreate() {
       this.stack.push({
-        class: 'foam.comics.DAOCreateControllerView'
+        class: 'foam.comics.DAOCreateControllerView',
+        detailView: this.data.detailView
       }, this);
     },
 
     function onEdit(s, edit, id) {
       this.stack.push({
         class: this.updateView.class,
+        detailView: this.data.detailView,
         key: id
       }, this);
     },
