@@ -196,6 +196,7 @@ foam.CLASS({
       factory: function() { return this.TableBody.create({ columns_: this.columns_ }); }
     }
   ],
+
   methods: [
     function put(obj) {
       this.body.addObj(obj);

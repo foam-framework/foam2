@@ -14,10 +14,9 @@ foam.CLASS({
       name: 'className'
     },
     {
-      class: 'Object',
-      name: 'servletObject',
-      javaType: 'javax.servlet.Servlet',
-      transient: true
+      class: 'FObjectProperty',
+      of: 'foam.nanos.servlet.Servlet',
+      name: 'servletObject'
     },
     {
       class: 'String',

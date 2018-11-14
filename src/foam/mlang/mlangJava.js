@@ -909,7 +909,8 @@ foam.CLASS({
       // type-specific has() method to the Property.
       javaCode: `Object value = getArg1().f(obj);
         return ! (value == null ||
-          (value instanceof String && ((String)value).length() == 0) ||
+          (value instanceof Number && ((Number) value).intValue() == 0) ||
+          (value instanceof String && ((String) value).length() == 0) ||
           (value.getClass().isArray() && java.lang.reflect.Array.getLength(value) == 0));`
     },
     {
@@ -1119,6 +1120,28 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.mlang.sink.Average',
+  flags: ['java'],
+  methods: [
+    {
+      name: 'put',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'Object',
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        }
+      ],
+      javaCode: `setCount(getCount() + 1);
+setValue((getValue() + ((Number)this.getArg1().f(obj)).doubleValue()) / getCount());`
+    }
+  ]
+});
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Unary',
