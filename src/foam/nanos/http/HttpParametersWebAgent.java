@@ -127,7 +127,6 @@ public class HttpParametersWebAgent
       }
     }
 
-    if ( ! "application/x-www-form-urlencoded".equals(contentType) ) {
       if ( ! SafetyUtil.isEmpty(cmd) ) {
         switch ( cmd.toLowerCase() ) {
           case "put":
@@ -166,33 +165,6 @@ public class HttpParametersWebAgent
             break;
         }
       }
-    } else {
-      cmd = req.getParameter("cmd");
-      logger.debug("command", cmd);
-      if ( ! SafetyUtil.isEmpty(cmd) ) {
-        switch ( cmd.toLowerCase() ) {
-          case "put":
-            command = Command.put;
-            break;
-
-          case "select":
-            command = Command.select;
-            if ( ! SafetyUtil.isEmpty(req.getParameter("id")) ) {
-              parameters.set("id", req.getParameter("id"));
-              logger.debug("id", req.getParameter("id"));
-            }
-            break;
-
-          case "remove":
-            command = Command.remove;
-            parameters.set("id", req.getParameter("id"));
-            logger.debug("id", req.getParameter("id"));
-            break;
-        }
-      } else {
-        logger.warning("cmd/method could not be determined, defaulting to SELECT.");
-      }
-    }
 
     parameters.set("cmd", command);
     parameters.set(Command.class, command);
