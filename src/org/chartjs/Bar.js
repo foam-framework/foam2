@@ -9,15 +9,14 @@ foam.CLASS({
     function configChart_(chart) {
       chart.options.scales.yAxes[0].ticks.beginAtZero =  true;
     },
-    function updateChart_(data) {
+    function genChartData_(data) {
       var chartData = this.toChartData(data);
       chartData.datasets.forEach(function(d, i) {
         d.backgroundColor = this.Lib.CHART.helpers.color(this.colors[i]).alpha(0.5).rgbString()
         d.borderColor = this.colors[i]
         d.borderWidth = 2
       }.bind(this));
-      this.chart.data = chartData;
-      this.chart.update();
+      return chartData;
     }
   ]
 });

@@ -31,7 +31,7 @@ foam.CLASS({
     },
   ],
   methods: [
-    function updateChart_(data) {
+    function genChartData_(data) {
       var chartData = this.toChartData(data);
       chartData.datasets.forEach(function(d, i) {
         if ( d.data.length && foam.Object.isInstance(d.data[0]) ) {
@@ -43,8 +43,7 @@ foam.CLASS({
         d.borderColor = this.colors
       }.bind(this));
 
-      this.chart.data = chartData;
-      this.chart.update();
+      return chartData;
     }
   ]
 });

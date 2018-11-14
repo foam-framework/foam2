@@ -142,12 +142,10 @@ foam.CLASS({
       `
     },
     {
-      class: 'FObjectArray',
-      of: 'foam.core.Action',
-      name: 'contextMenuActions',
+      class: 'foam.u2.ViewSpec',
+      name: 'summaryView',
       documentation: `
-        Custom subclasses can set this to add extra context menu actions to the
-        table.
+        Subclasses can set this to override the default summaryView.
       `
     },
     {
