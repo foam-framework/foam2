@@ -332,23 +332,18 @@ DAO groupDAO        = (DAO) x.get("groupDAO");
 
 User user           = (User) userDAO.find(session.getUserId());
 Group group         = (Group) groupDAO.find(user.getGroup());
-AppConfig appConfig = group.getAppConfig(x);
-
-String domain = appConfig.getUrl().contains("ablii") ? "ablii.com" : "nanopay.net";
 
 if ( SafetyUtil.isEmpty(emailMessage.getFrom()) ) {
   emailMessage.setFrom(
     ! SafetyUtil.isEmpty(group.getFrom()) ?
-      group.getFrom() :
-      getFrom().substring(0, getFrom().indexOf("@") + 1) + domain
+      group.getFrom() : getFrom()
   );
 }
 
 if ( SafetyUtil.isEmpty(emailMessage.getReplyTo()) ) {
   emailMessage.setReplyTo(
     ! SafetyUtil.isEmpty(group.getReplyTo()) ?
-      group.getReplyTo() :
-      getFrom().substring(0, getFrom().indexOf("@") + 1) + domain
+      group.getReplyTo() : getReplyTo()
   );
 }
 
