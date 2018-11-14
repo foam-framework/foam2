@@ -24,6 +24,15 @@ foam.CLASS({
   ],
 
   css: `
+    ^ div[title = "Warning"]{
+      color: #ffa500;
+    }
+    ^ div[title = "Info"]{
+     color: #0000cc;
+    }
+    ^ div[title = "Error"]{
+     color: #ff0000;
+    }
     ^ {
       width: 962px;
       margin: 0 auto;
@@ -133,7 +142,7 @@ foam.CLASS({
         }
       },
       view: {
-        class: 'foam.u2.view.TableView',
+        class: 'foam.u2.view.ScrollTableView',
         columns: [
           'created', 'severity', 'createdBy', 'lastModifiedBy', 'message'
         ]
