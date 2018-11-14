@@ -140,10 +140,11 @@
                if ( i == 0 || i == l-1 ) {
                 line(0, h, c.x, h);
                }
+               line(c.x, h, c.x, c.y);
              }
            }
 
-           x.lineWidth = 1.5; //this.borderWidth;
+           x.lineWidth = this.borderWidth;
            // Paint expand/collapse arrow
            if ( this.childNodes.length ) {
              var d = this.expanded ? 5 : -5;
