@@ -41,7 +41,7 @@ foam.CLASS({
       },
     },
     {
-      name: 'holdings',
+      name: 'totalHoldings',
       view: {
         class: 'org.chartjs.demos.ConfigurableChartView',
         view: 'org.chartjs.Bar',
@@ -50,6 +50,32 @@ foam.CLASS({
         var sink = this.GROUP_BY(this.StockOrder.SYMBOL, this.SUM(this.StockOrder.SHARES));
         this.stockOrderDAO.listen(sink);
         return sink;
+      },
+    },
+    {
+      name: 'holdingsByPersonPie',
+      view: {
+        class: 'org.chartjs.demos.ConfigurableChartView',
+        view: 'org.chartjs.Pie',
+      },
+      factory: function() {
+        var sink = this.GROUP_BY(
+          this.StockOrder.SYMBOL,
+          this.GROUP_BY(
+            this.StockOrder.PERSON,
+            this.SUM(this.StockOrder.SHARES)));
+        this.stockOrderDAO.listen(sink);
+        return sink;
+      },
+    },
+    {
+      name: 'holdingsByPersonBar',
+      view: {
+        class: 'org.chartjs.demos.ConfigurableChartView',
+        view: 'org.chartjs.Bar',
+      },
+      expression: function(holdingsByPersonPie) {
+        return holdingsByPersonPie;
       },
     },
     {
@@ -72,6 +98,17 @@ foam.CLASS({
           daoType: 'MDAO',
           seqNo: true,
         });
+      },
+    },
+    {
+      class: 'StringArray',
+      name: 'personNames',
+      factory: function() {
+        return [
+          'Adam',
+          'Mike',
+          'Kevin',
+        ];
       },
     },
     {
@@ -108,6 +145,7 @@ foam.CLASS({
       properties: [
         { name: 'id' },
         { class: 'String', name: 'symbol' },
+        { class: 'String', name: 'person' },
         { class: 'Currency', name: 'pricePerShare' },
         { class: 'Int', name: 'shares' },
       ]
@@ -139,9 +177,11 @@ foam.CLASS({
     {
       name: 'addRandomOrder',
       code: function() {
-        var names = this.stockSymbols;
+        var symbols = this.stockSymbols;
+        var names = this.personNames;
         this.stockOrderDAO.put(this.StockOrder.create({
-          symbol: names[Math.floor(Math.random()*names.length)],
+          symbol: symbols[Math.floor(Math.random()*symbols.length)],
+          person: names[Math.floor(Math.random()*names.length)],
           shares: Math.floor(Math.random()*100) - 50,
           pricePerShare: Math.random()*100000,
         }));
@@ -152,6 +192,7 @@ foam.CLASS({
       code: function() {
         var self = this;
         self.stockSymbols.forEach(function(n) {
+          if ( Math.floor(Math.random()*2) ) return;
           self.stockPriceSnapshotDAO.put(self.StockPriceSnapshot.create({
             date: self.date,
             symbol: n,

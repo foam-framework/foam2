@@ -3,9 +3,10 @@ foam.CLASS({
   name: 'Line',
   extends: 'org.chartjs.Line',
   imports: [
-    'visualizationWidth',
+    'data as visualization',
+    'visualizationColors',
     'visualizationHeight',
-    'data as visualization'
+    'visualizationWidth',
   ],
   properties: [
     {
@@ -15,7 +16,11 @@ foam.CLASS({
     {
       name: 'height',
       expression: function(visualizationHeight) { return visualizationHeight; }
-    }
+    },
+    {
+      name: 'colors',
+      expression: function(visualizationColors) { return visualizationColors; }
+    },
   ],
   methods: [
     function initCView(x) {

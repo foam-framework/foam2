@@ -20,11 +20,7 @@ foam.CLASS({
       this.
         addClass(this.myClass()).
         add(this.slot(function(data$dao, data$limit) {
-          return this.E().
-            start(this.TableView, {
-              data: data$dao.limit(data$limit),
-            }).
-            end()
+          return this.TableView.create({ data: data$dao.limit(data$limit) });
         }));
     }
   ]
