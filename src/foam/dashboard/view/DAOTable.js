@@ -7,9 +7,13 @@ foam.CLASS({
   ],
   imports: [ 'data' ],
   css: `
-    ^ table {
-      width: 100%;
-    }
+^ {
+  overflow: auto;
+}
+
+^ table {
+ width: 100%;
+}
   `,
   methods: [
     function initE() {

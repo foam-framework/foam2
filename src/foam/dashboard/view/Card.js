@@ -12,13 +12,14 @@ foam.CLASS({
     'contentWidth as visualizationWidth',
     'contentHeight as visualizationHeight',
     'data.colors as visualizationColors',
+    'data.dao.of as of'
   ],
   constants: [
     {
       name: 'SIZES',
       value: {
-        TINY:   [176, 176],
-        SMALL:  [312, 176],
+        TINY:   [176, 358],
+        SMALL:  [312, 358],
         MEDIUM: [624, 358],
         LARGE:  [936, 528]
       }
