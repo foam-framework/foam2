@@ -466,6 +466,7 @@ FOAM_FILES([
   { name: "foam/apploader/ClassLoaderContext" },
   { name: "foam/u2/FoamTagLoader", flags: ['web'] },
   { name: "foam/graphics/CView", flags: ['web'] },
+  { name: "foam/graphics/TreeGraph", flags: ['web'] },
   { name: "foam/graphics/ScrollCView", flags: ['web'] },
   { name: "foam/physics/PhysicalCircle", flags: ['web'] },
   { name: "foam/u2/view/SimpleSearch", flags: ['web'] },
