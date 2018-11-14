@@ -29,14 +29,16 @@ foam.CLASS({
   ],
 
   imports: [
+    'onObjDrop',
     'selection',
-    'onObjDrop'
+    'startExpanded'
   ],
 
   css: `
     ^ {
       white-space: nowrap;
-      margin: 4px 20px;
+      margin: 6px 20px;
+      inset: none;
     }
 
     ^label:hover {
@@ -108,10 +110,10 @@ foam.CLASS({
           add(this.expanded$.map(function(v) { return v ? '\u25BD' : '\u25B7'; })).
           entity('nbsp').
         end().
+        on('click', this.selected).
         callIf(this.draggable, function() {
           this.
           attrs({ draggable: 'true' }).
-          on('click',     this.selected).
           on('dragstart', this.onDragStart).
           on('dragenter', this.onDragOver).
           on('dragover',  this.onDragOver).
@@ -119,14 +121,15 @@ foam.CLASS({
         }).
         start('span').addClass(self.myClass('label')).call(this.formatter, [self.data]).end().
         add(this.slot(function(e) {
-          if ( ! e ) return this.E('div');
           var e2 = this.E('div');
+          if ( ! e ) return e2;
           e2.select(this.data[self.relationship.forwardName]/*.dao*/, function(obj) {
             self.hasChildren = true;
             return self.cls_.create({
               data: obj,
               formatter: self.formatter,
-              relationship: self.relationship
+              relationship: self.relationship,
+              expanded: self.startExpanded
             }, this);
           });
           return e2;
@@ -208,7 +211,8 @@ foam.CLASS({
 
   exports: [
     'onObjDrop',
-    'selection'
+    'selection',
+    'startExpanded'
   ],
 
   properties: [

@@ -274,6 +274,7 @@ var classes = [
   'foam.nanos.dig.DUG',
 
   'foam.nanos.jetty.HttpServer',
+  'foam.nanos.servlet.Servlet',
   'foam.nanos.servlet.ServletMapping',
   'foam.nanos.servlet.ErrorPageMapping',
   'foam.nanos.servlet.FilterMapping',

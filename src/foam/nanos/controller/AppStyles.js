@@ -40,7 +40,7 @@ foam.CLASS({
       letter-spacing: 0.4px;
       background: transparent;
     }
-    .foam-u2-view-TableView tbody > tr > th > td {
+    .foam-u2-view-TableView-row > th > td {
       font-size: 12px;
       letter-spacing: 0.2px;
       text-align: left;
@@ -65,7 +65,7 @@ foam.CLASS({
       font-size: 12px;
       color: #093649;
     }
-    .foam-u2-view-TableView tbody > tr {
+    .foam-u2-view-TableView-row {
       height: 60px;
       background: white;
     }
