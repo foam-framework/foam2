@@ -133,7 +133,7 @@ foam.CLASS({
         }
       },
       view: {
-        class: 'foam.u2.view.ScrollTableView',
+        class: 'foam.u2.view.TableView',
         columns: [
           'created', 'severity', 'createdBy', 'lastModifiedBy', 'message'
         ]
