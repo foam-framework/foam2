@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'DetailPropertyView',
   extends: 'foam.u2.Element',
 
+  imports: [ 'data' ],
+
   documentation: 'View for one row/property of a DetailView.',
 
   properties: [
@@ -45,26 +47,57 @@ foam.CLASS({
     .foam-u2-PropertyView-view {
       padding: 2px 8px 2px 6px;
     }
-    .foam-u2-PropertyView-units  {
+    .foam-u2-PropertyView-units {
       color: #444;
       font-size: 12px;
       padding: 4px;
       text-align: right;
     }
+    .foam-u2-PropertyView-invalidField input,
+    .foam-u2-PropertyView-invalidField select {
+      background-color: #fff6f6;
+      border: 1px solid #f91c1c;
+    }
+    .foam-u2-PropertyView-invalid {
+      margin: 0;
+      margin-top: 6px;
+      font-size: 12px;
+      color: #f91c1c;
+    }
   `,
 
   methods: [
     function initE() {
+      var self = this;
       var prop = this.prop;
 
       // TODO: hide this element if the prop changes its mode to HIDDEN.
       this.
         addClass('foam-u2-PropertyView').
         start('td').addClass('foam-u2-PropertyView-label').add(this.label).end().
-        start('td').addClass('foam-u2-PropertyView-view').add(
-          prop,
-          prop.units && this.E('span').addClass('foam-u2-PropertyView-units').add(' ', prop.units)).
-        end();
+        start('td').addClass('foam-u2-PropertyView-view').
+          enableClass('foam-u2-PropertyView-invalidField', this.isInvalidSlot(false)).
+          add(
+            prop,
+            prop.units && this.E('span').addClass('foam-u2-PropertyView-units').add(' ', prop.units)).
+            add(this.isInvalidSlot(true)).
+        end()
+    },
+
+    function isInvalidSlot(forElement) {
+      var self = this;
+      var prop = this.prop;
+      return this.slot(function(data) {
+        /* empty element when data is undefined */
+        if ( ! data || ! prop.validateObj ) { return ''; }
+
+        return data.slot(prop.validateObj).map(function(isInvalid) {
+          if ( isInvalid ) {
+            return forElement ? self.E('p').add(isInvalid).addClass('foam-u2-PropertyView-invalid') : 'foam-u2-PropertyView-invalidField';
+          }
+          return forElement ? self.E() : '';
+        });
+      })
     }
   ]
 });

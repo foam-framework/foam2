@@ -47,6 +47,8 @@ foam.CLASS({
       if ( prop.visibility ) {
         this.visibility = prop.visibility;
       }
+
+      this.onKey = true;
     }
   ]
 });
