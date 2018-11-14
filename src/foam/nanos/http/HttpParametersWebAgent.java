@@ -72,7 +72,7 @@ public class HttpParametersWebAgent
     String         accept          = req.getHeader("Accept");
     String         contentType     = req.getHeader("Content-Type");
     HttpParameters parameters      = null;
-    Command        command         = Command.select;
+    Command        command         = null;
     String         cmd             = req.getParameter("cmd");
 
     logger.debug("methodName", methodName);
@@ -127,28 +127,110 @@ public class HttpParametersWebAgent
       }
     }
 
-    if ( ! SafetyUtil.isEmpty(cmd) ) {
-      switch ( cmd.toLowerCase() ) {
-      case "put":
-        command = Command.put;
-        break;
-
-      case "select":
-        command = Command.select;
-        if ( ! SafetyUtil.isEmpty(req.getParameter("id")) ) {
-          parameters.set("id", req.getParameter("id"));
-          logger.debug("id", req.getParameter("id"));
+    if ( ! "application/x-www-form-urlencoded".equals(contentType) ) {
+      if ( ! SafetyUtil.isEmpty(cmd) ) {
+        switch ( cmd.toLowerCase() ) {
+          case "put":
+            command = Command.put;
+            break;
+          case "select":
+            command = Command.select;
+            if ( ! SafetyUtil.isEmpty(req.getParameter("id")) ) {
+              parameters.set("id", req.getParameter("id"));
+              logger.debug("id", req.getParameter("id"));
+            }
+            break;
+          case "remove":
+            command = Command.remove;
+            parameters.set("id", req.getParameter("id"));
+            logger.debug("id", req.getParameter("id"));
+            break;
         }
-        break;
-
-      case "remove":
-        command = Command.remove;
-        parameters.set("id", req.getParameter("id"));
-        logger.debug("id", req.getParameter("id"));
-        break;
+      } else {
+        switch ( methodName.toUpperCase() ) {
+          case "POST":
+            command = Command.put;
+            break;
+          case "PUT":
+            command = Command.put;
+            break;
+          case "DELETE":
+            command = Command.remove;
+            break;
+          case "GET":
+            command = Command.remove;
+            break;
+          default:
+            logger.warning("cmd/method could not be determined, defaulting to SELECT.");
+            break;
+        }
       }
+
+
+//      switch ( methodName.toUpperCase() ) {
+//        case "POST":
+//          command = Command.put;
+//          break;
+//        case "PUT":
+//          command = Command.put;
+//          break;
+//        case "DELETE":
+//          command = Command.remove;
+//          break;
+////      case "HELP":
+////        command = Command.help;
+////        resp.setContentType("text/html");
+////        break;
+//        case "GET":
+//          if ( ! SafetyUtil.isEmpty(cmd) ) {
+//            switch ( cmd.toLowerCase() ) {
+//              case "put":
+//                command = Command.put;
+//                break;
+//              case "select":
+//                command = Command.select;
+//                if ( ! SafetyUtil.isEmpty(req.getParameter("id")) ) {
+//                  parameters.set("id", req.getParameter("id"));
+//                  logger.debug("id", req.getParameter("id"));
+//                }
+//                break;
+//              case "remove":
+//                command = Command.remove;
+//                parameters.set("id", req.getParameter("id"));
+//                logger.debug("id", req.getParameter("id"));
+//                break;
+//            }
+//          } else {
+//            logger.warning("cmd/method could not be determined, defaulting to SELECT.");
+//          }
+//          break;
+//      }
     } else {
-      logger.warning("cmd/method could not be determined, defaulting to SELECT.");
+      cmd = req.getParameter("cmd");
+      logger.debug("command", cmd);
+      if ( ! SafetyUtil.isEmpty(cmd) ) {
+        switch ( cmd.toLowerCase() ) {
+          case "put":
+            command = Command.put;
+            break;
+
+          case "select":
+            command = Command.select;
+            if ( ! SafetyUtil.isEmpty(req.getParameter("id")) ) {
+              parameters.set("id", req.getParameter("id"));
+              logger.debug("id", req.getParameter("id"));
+            }
+            break;
+
+          case "remove":
+            command = Command.remove;
+            parameters.set("id", req.getParameter("id"));
+            logger.debug("id", req.getParameter("id"));
+            break;
+        }
+      } else {
+        logger.warning("cmd/method could not be determined, defaulting to SELECT.");
+      }
     }
 
     parameters.set("cmd", command);
