@@ -91,7 +91,7 @@ return config_;`
     {
       name: 'sendEmail',
       javaCode: `
-        getDao().put_(x, emailMessage);
+        getDao().inX(x).put(emailMessage);
 `
     },
     {
