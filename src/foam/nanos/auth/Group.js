@@ -211,8 +211,8 @@ return config;
       name: 'isDescendantOf',
       code: function(groupId, groupDAO) {
         /**
-         * Return true if this group is a descendant of the given group.
-         * Returns a promise.
+         * Returns a promise that resolves to true if this group is a
+         * descendant of the given group or false if it is not.
          */
         if ( ! groupId ) return false;
         const inner = async (group) => {
