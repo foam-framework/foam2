@@ -35,7 +35,7 @@
       class: 'foam.dao.DAOProperty',
       name: 'scrolledDAO',
       expression: function(data, limit, skip) {
-        return data.limit(limit).skip(skip);
+        return data && data.limit(limit).skip(skip);
       },
     },
     'columns',
