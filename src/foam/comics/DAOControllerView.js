@@ -95,18 +95,12 @@ foam.CLASS({
       }
     },
     {
+      class: 'foam.u2.ViewSpec',
       name: 'summaryView',
       factory: function() {
-        var defaultView = { class: 'foam.u2.view.ScrollTableView' };
-        if (
-          Array.isArray(this.data.contextMenuActions) &&
-          this.data.contextMenuActions.length > 0
-        ) {
-          defaultView.contextMenuActions = this.data.contextMenuActions;
-        }
-        return this.importedSummaryView ?
-          this.importedSummaryView :
-          defaultView;
+        return this.data.summaryView || this.importedSummaryView || {
+          class: 'foam.u2.view.ScrollTableView'
+        };
       }
     },
     {
@@ -201,7 +195,11 @@ foam.CLASS({
     },
 
     function dblclick(obj) {
-      this.onEdit(null, null, obj.id);
+      if ( this.data.dblclick ) {
+        this.data.dblclick(obj);
+      } else {
+        this.onEdit(null, null, obj.id);
+      }
     }
   ],
 
