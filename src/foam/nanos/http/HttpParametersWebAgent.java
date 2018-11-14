@@ -166,46 +166,6 @@ public class HttpParametersWebAgent
             break;
         }
       }
-
-
-//      switch ( methodName.toUpperCase() ) {
-//        case "POST":
-//          command = Command.put;
-//          break;
-//        case "PUT":
-//          command = Command.put;
-//          break;
-//        case "DELETE":
-//          command = Command.remove;
-//          break;
-////      case "HELP":
-////        command = Command.help;
-////        resp.setContentType("text/html");
-////        break;
-//        case "GET":
-//          if ( ! SafetyUtil.isEmpty(cmd) ) {
-//            switch ( cmd.toLowerCase() ) {
-//              case "put":
-//                command = Command.put;
-//                break;
-//              case "select":
-//                command = Command.select;
-//                if ( ! SafetyUtil.isEmpty(req.getParameter("id")) ) {
-//                  parameters.set("id", req.getParameter("id"));
-//                  logger.debug("id", req.getParameter("id"));
-//                }
-//                break;
-//              case "remove":
-//                command = Command.remove;
-//                parameters.set("id", req.getParameter("id"));
-//                logger.debug("id", req.getParameter("id"));
-//                break;
-//            }
-//          } else {
-//            logger.warning("cmd/method could not be determined, defaulting to SELECT.");
-//          }
-//          break;
-//      }
     } else {
       cmd = req.getParameter("cmd");
       logger.debug("command", cmd);
