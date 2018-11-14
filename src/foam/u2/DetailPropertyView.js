@@ -68,7 +68,6 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      var self = this;
       var prop = this.prop;
 
       // TODO: hide this element if the prop changes its mode to HIDDEN.
