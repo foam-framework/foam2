@@ -18,7 +18,7 @@
 
    methods: [
      function init() {
-       var g = TreeGraph.create({x:850, y:50});
+       var g = TreeGraph.create({x:910, y:50});
        this.add(g.addChildNode());
        this.add(g.addChildNode());
        this.add(g.addChildNode());
@@ -69,7 +69,7 @@ foam.CLASS({
 
   properties: [
     [ 'height', 60 ],
-    [ 'width', 135 ],
+    [ 'width', 155 ],
     [ 'border', 'gray' ],
     [ 'slide', 0 ],
     {
@@ -203,14 +203,11 @@ foam.CLASS({
           var w = Math.min(Math.abs(this.width+this.padding-d), 10);
           if ( d > this.width + this.padding ) w = -w;
           if ( i+1 == m ) {
-            // console.log('move away', w/2);
             n1.x -= w/2;
             n2.x += w/2;
           } else if ( i < Math.floor(m) ) {
-            // console.log('move left', i, m, l, w);
             n1.x -= w;
           } else {
-            // console.log('move right', i, m, l, w);
             n2.x += w;
           }
         }
