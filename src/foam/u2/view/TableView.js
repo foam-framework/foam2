@@ -12,15 +12,12 @@ foam.CLASS({
   css: `
     ^ {
       border-spacing: 14px 8px;
+      border-radius: 10px;
     }
 
     ^ th {
       text-align: left;
       white-space: nowrap;
-    }
-
-    ^ tr {
-      border-bottom: solid 1px #e2e2e3;
     }
 
     ^ td {
