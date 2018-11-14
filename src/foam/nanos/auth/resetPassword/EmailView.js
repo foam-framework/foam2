@@ -129,6 +129,11 @@ foam.CLASS({
     {
       class: 'EMail',
       name: 'email'
+    },
+    {
+      class: 'String',
+      name: 'signInView',
+      value: 'foam.nanos.auth.SignInView'
     }
   ],
 
@@ -154,7 +159,7 @@ foam.CLASS({
         .start('p').addClass('link')
           .add('Sign in.')
           .on('click', function() {
-            self.stack.push({ class: 'net.nanopay.sme.ui.SignInView' });
+            self.stack.push({ class: self.signInView });
           })
         .end()
       .end();
