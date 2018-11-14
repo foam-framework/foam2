@@ -12,7 +12,6 @@ foam.CLASS({
   css: `
     ^ {
       border-spacing: 14px 8px;
-      border-radius: 10px;
     }
 
     ^ th {
