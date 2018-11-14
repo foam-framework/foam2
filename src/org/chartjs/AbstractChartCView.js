@@ -41,8 +41,8 @@ foam.CLASS({
     function configChart_(chart) {
       // template method
     },
-    function updateChart_(data) {
-      // Template method, in child classes update the chart's data
+    function genChartData_(data) {
+      // Template method, in child classes generate the chart data
       // from our data.
     },
     function toChartData(data) {
@@ -88,7 +88,34 @@ foam.CLASS({
       name: 'update',
       isFramed: true,
       code: function() {
-        if ( this.chart && this.data ) this.updateChart_(this.data);
+        if ( this.chart && this.data ) {
+          // Simply doing this.chart.data = this.data will cause the entire
+          // chart to re-render when chart.update() is called. Doing a deep
+          // copyFrom makes the chart update only what it needs to which is a
+          // much nicer animation.
+          var copyFrom = function(to, from) {
+            if ( foam.Array.isInstance(from) ) {
+              to = to || [];
+              while ( to.length > from.length ) {
+                to.pop();
+              }
+              for ( var i = 0; i < from.length; i++ ) {
+                to[i] = copyFrom(to[i], from[i]);
+              }
+              return to;
+            } else if ( foam.Object.isInstance(to) ) {
+              to = to || {};
+              Object.keys(from).forEach(function(k) {
+                to[k] = copyFrom(to[k], from[k])
+              });
+              return to;
+            }
+            return from;
+          }
+          var data = this.genChartData_(this.data);
+          copyFrom(this.chart.data, data);
+          this.chart.update();
+        }
       }
     }
   ]
