@@ -147,7 +147,7 @@ public class HttpParametersWebAgent
             break;
         }
       } else {
-        switch ( methodName.toUpperCase() ) {
+        switch ( methodName.toUpperCase() ) {  // set default command
           case "POST":
             command = Command.put;
             break;
@@ -158,9 +158,10 @@ public class HttpParametersWebAgent
             command = Command.remove;
             break;
           case "GET":
-            command = Command.remove;
+            command = Command.select;
             break;
           default:
+            command = Command.select;
             logger.warning("cmd/method could not be determined, defaulting to SELECT.");
             break;
         }
