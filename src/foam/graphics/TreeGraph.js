@@ -57,7 +57,9 @@
        }.bind(this));
      },
 
-     function doLayout() { if ( this.root ) this.root.doLayout(); }
+     function doLayout() {
+       if ( this.root ) this.root.doLayout();
+     }
    ],
 
    classes: [
@@ -86,6 +88,8 @@
          },
          [ 'left',  0 ],
          [ 'right', 0 ],
+         [ 'maxLeft',  0 ],
+         [ 'maxRight', 0 ],
          {
            class: 'Boolean',
            name: 'expanded',
@@ -202,6 +206,14 @@
              }
            }
 
+           // Calculate maxLeft and maxRight
+           this.maxLeft = this.maxRight = 0;
+           for ( var i = 0 ; i < l ; i++ ) {
+             var c = childNodes[i];
+             this.maxLeft  = Math.min(c.x + c.maxLeft, this.maxLeft);
+             this.maxRight = Math.max(c.x + c.maxRight, this.maxRight);
+           }
+
            return moved;
          }
        ],
@@ -211,7 +223,20 @@
            name: 'doLayout',
            isFramed: true,
            documentation: 'Animate layout until positions stabilize',
-           code: function() { if ( this.layout() ) this.doLayout(); }
+           code: function() {
+             if ( this.layout() ) {
+               this.doLayout();
+
+               // Scale and translate the view to fit in the available window
+               var gw = this.graph.width-200;
+               var w = this.scaleX * (this.maxRight - this.maxLeft + 200);
+               if ( w > gw ) this.scaleX = this.scaleY = Math.min(this.scaleX, gw / w);
+               if ( this.scaleX*(this.x + this.maxLeft) < 40 ) this.x += 20;
+               if ( this.scaleX*(this.x + this.maxRight) > gw-40  ) this.x -= 20;
+               // console.log('w: ', w, this.graph.width / w);
+               // console.log(this.maxLeft, this.maxRight);
+             }
+           }
          }
        ]
      }
