@@ -95,7 +95,12 @@ FOAM_FILES([
   { name: "foam/nanos/script/ScriptStatus" },
   { name: "foam/nanos/script/Script" },
   { name: "foam/nanos/script/TestRunnerScript" },
+  { name: "foam/nanos/jetty/HttpServer" },
+  { name: "foam/nanos/servlet/Servlet" },
+  { name: "foam/nanos/servlet/ErrorPageMapping" },
+  { name: "foam/nanos/servlet/FilterMapping" },
   { name: "foam/nanos/servlet/ServletMapping" },
+  { name: "foam/nanos/servlet/VirtualHostRoutingServlet" },
   { name: "foam/nanos/test/Test" },
   { name: "foam/nanos/test/TestBorder" },
   { name: "foam/nanos/cron/Cron" },
@@ -149,5 +154,6 @@ FOAM_FILES([
   { name: 'foam/demos/net/nap/web/model/RegulatoryNoticeAudit' },
   { name: 'foam/demos/net/nap/web/RegulatoryNoticeForm', flags: ['web'] },
   { name: 'foam/demos/net/nap/web/RegulatoryNoticeList', flags: ['web'] },
-  { name: 'foam/demos/net/nap/web/EditRegulatoryNotice', flags: ['web'] }
+  { name: 'foam/demos/net/nap/web/EditRegulatoryNotice', flags: ['web'] },
+  { name: 'foam/nanos/dashboard/Demo' }
 ]);
