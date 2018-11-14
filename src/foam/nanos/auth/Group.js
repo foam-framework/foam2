@@ -102,7 +102,22 @@ foam.CLASS({
       class: 'String',
       name: 'url',
       value: null
-    }
+    },
+    {
+      class: 'String',
+      name: 'from',
+      value: null
+    },
+    {
+      class: 'String',
+      name: 'displayName',
+      value: null
+    },
+    {
+      class: 'String',
+      name: 'replyTo',
+      value: null
+    },
 /*    {
       class: 'FObjectProperty',
       of: 'foam.nanos.app.AppConfig',
