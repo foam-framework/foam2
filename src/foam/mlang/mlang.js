@@ -187,7 +187,6 @@ foam.INTERFACE({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.mlang',
   name: 'ExprProperty',
@@ -200,6 +199,10 @@ foam.CLASS({
       name: 'adapt',
       value: function(_, o, p) { return p.adaptValue(o); }
     },
+    {
+      name: 'view',
+      value: { class: 'foam.u2.view.ExprView' }
+    }
   ],
 
   methods: [
@@ -252,6 +255,12 @@ foam.CLASS({
   package: 'foam.mlang',
   name: 'SinkProperty',
   extends: 'FObjectProperty',
+  properties: [
+    {
+      name: 'view',
+      value: { class: 'foam.u2.view.FObjectView' }
+    }
+  ],
 
   documentation: 'Property for Sink values.'
 });
@@ -1593,17 +1602,20 @@ foam.CLASS({
     {
       class: 'Map',
       name: 'groups',
+      hidden: true,
       factory: function() { return {}; },
       javaFactory: 'return new java.util.HashMap<Object, foam.dao.Sink>();'
     },
     {
       class: 'List',
+      hidden: true,
       name: 'groupKeys',
       javaFactory: 'return new java.util.ArrayList();',
       factory: function() { return []; }
     },
     {
       class: 'Boolean',
+      hidden: true,
       name: 'processArrayValuesIndividually',
       documentation: 'If true, each value of an array will be entered into a separate group.',
       factory: function() {
@@ -2074,6 +2086,38 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  name: 'Average',
+  extends: 'foam.mlang.sink.AbstractUnarySink',
+
+  documentation: 'A Sink which averages put() values.',
+
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg1'
+    },
+    {
+      class: 'Double',
+      name: 'value',
+      value: 0
+    },
+    {
+      class: 'Long',
+      name: 'count',
+      value: 0
+    }
+  ],
+
+  methods: [
+    function put(obj, sub) {
+      this.count++;
+      this.value = ( this.value + this.arg1.f(obj) ) / this.count;
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.mlang.expr',
@@ -2190,6 +2234,7 @@ foam.CLASS({
     function MAX(arg1) { return this.Max.create({ arg1: arg1 }); },
     function MIN(arg1) { return this.Min.create({ arg1: arg1 }); },
     function SUM(arg1) { return this.Sum.create({ arg1: arg1 }); },
+    function AVG(arg1) { return this.Average.create({ arg1: arg1 }); },
     function SEQ() { return this._nary_("Sequence", arguments); },
 
     {

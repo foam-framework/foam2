@@ -123,6 +123,7 @@ var classes = [
   'foam.mlang.sink.Max',
   'foam.mlang.sink.Min',
   'foam.mlang.sink.Sum',
+  'foam.mlang.sink.Average',
   'foam.mlang.sink.Map',
   'foam.nanos.actioncommand.ActionCommand',
   'foam.nanos.NanoService',
