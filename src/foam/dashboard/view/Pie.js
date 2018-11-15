@@ -24,8 +24,8 @@ foam.CLASS({
   ],
   methods: [
     function initCView(x) {
-      this.SUPER(x);
       this.data$ = this.visualization$.dot('data');
+      this.SUPER(x);
     }
   ]
 });
