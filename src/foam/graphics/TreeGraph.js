@@ -206,6 +206,9 @@
                }
              }
            }
+           // TODO/BUG: I'm not sure why this is necessary, but without, center
+           // nodes are a few pixels off.
+           if ( l%2 == 1 ) childNodes[Math.floor(m)].x = 0;
 
            // Calculate maxLeft and maxRight
            this.maxLeft = this.maxRight = 0;
