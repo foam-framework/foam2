@@ -103,8 +103,9 @@ foam.CLASS({
       name: 'arg2'
     },
     {
-      class: 'Array',
-      name: 'points'
+      class: 'List',
+      name: 'points',
+      factory: function() { return [] },
     }
   ],
 
@@ -116,13 +117,18 @@ foam.CLASS({
         // TODO: Array properties should provide convenience for this,
         // like this.point$.push() or something.
         this.pub('propertyChange', 'points', this.points$);
-      }
+      },
+      javaCode: `
+        java.util.List point = new java.util.ArrayList();
+        point.add(getArg1().f(obj));
+        point.add(getArg2().f(obj));
+        getPoints().add(point);
+      `,
     },
     {
       name: 'remove',
       code: function(obj, s) {
-        this.points.push([this.arg1.f(obj), this.arg2.f(obj)]);
-        this.pub('propertyChange', 'points', this.points$);
+        // TODO
       }
     },
     {
