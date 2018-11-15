@@ -107,6 +107,7 @@ FOAM_FILES([
   { name: "foam/nanos/export/ExportDriverRegistry"},
   { name: "foam/nanos/export/ExportDriver" },
   { name: "foam/nanos/export/JSONDriver"},
+  { name: "foam/nanos/export/JSONJDriver"},
   { name: "foam/nanos/export/XMLDriver"},
   { name: "foam/nanos/export/CSVDriver"},
   { name: "foam/nanos/auth/Relationships" },

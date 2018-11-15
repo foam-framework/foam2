@@ -19,9 +19,17 @@ foam.CLASS({
     function init() {
       this.views = [
         [{ class: 'foam.u2.view.TableView' }, 'Table'],
+        /*
         [{
             class: 'foam.u2.view.TreeGraphView'
           }, 'Tree']];
+        },
+        */
+        [{
+            class: 'foam.graphics.TreeGraph',
+            width: 1000,
+            heigh: 1000
+          }, 'Graph']];
         }
       ]
 });
