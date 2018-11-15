@@ -236,7 +236,7 @@
                /*this.scaleY = */this.scaleX = Math.min(1, (19*this.scaleX+scaleX)/20);
              }
 
-             var x = -this.maxLeft/w * gw + 72;
+             var x = (-this.maxLeft+25)/w * gw + 50;
              if ( x != this.x ) {
                this.x = (19*this.x + x)/20;
                needsLayout = true;
