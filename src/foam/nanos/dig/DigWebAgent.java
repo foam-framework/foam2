@@ -393,7 +393,7 @@ public class DigWebAgent
 
       message.setBody(newData);
 
-      emailService.sendEmail(message);
+      emailService.sendEmail(x, message);
     }
   }
 
