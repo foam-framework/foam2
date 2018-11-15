@@ -6,30 +6,30 @@
 
 foam.CLASS({
   package: 'foam.nanos.export',
-  name: 'JSONDriver',
+  name: 'JSONJDriver',
   implements: [ 'foam.nanos.export.ExportDriver' ],
 
-  documentation: 'Class for exporting data from a DAO to JSON',
+  documentation: 'Class for exporting data from a DAO to JSON/J',
 
   properties: [
     {
       class: 'FObjectProperty',
       of: 'foam.json.Outputter',
       name: 'outputter',
-      factory: function() { return foam.json.PrettyStrict; }
+      factory: function() { return foam.json.Storage; }
     }
   ],
 
   methods: [
     function exportFObject(X, obj) {
-      return this.outputter.stringify(obj);
+      return 'p(' + this.outputter.stringify(obj) + ')\r\n';
     },
 
     function exportDAO(X, dao) {
-      var self = this;
-      return dao.select().then(function (sink) {
-        return self.outputter.stringify(sink.array);
-      });
+      var output = '';
+      return dao.select(function(o) {
+        output += this.exportFObject(X, o);
+      }.bind(this)).then(function() { return output; });
     }
   ]
 });

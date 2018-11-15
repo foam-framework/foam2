@@ -18,13 +18,14 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
   ],
 
   searchColumns: [
-    'severity'
+    'exception', 'message', 'severity'
    ],
 
   properties: [
     {
       class: 'DateTime',
       name: 'created',
+      visibility: 'RO'
     },
     {
       name: 'severity',
@@ -33,6 +34,7 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
       toJSON: function(value) { return value && value.label; },
       javaJSONOutput: `((foam.nanos.logger.LogLevel) value).getLabel()`,
       javaFromJSON: `return forLabel(value);`,
+      visibility: 'RO',
       tableCellFormatter: function(severity, obj, axiom) {
          this.start('div').setAttribute('title', severity.label).add(severity.label).end();
       },
@@ -41,13 +43,15 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
       name: 'id',
       class: 'Long',
       storageTransient: 'true',
-      hidden: 'true'
+      hidden: 'true',
+      visibility: 'RO'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
-      documentation: 'User who created the entry'
+      documentation: 'User who created the entry',
+      visibility: 'RO'
     },
     {
       class: 'Reference',
@@ -57,14 +61,16 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
       transient: true,
       hidden: true,
       documentation: 'Added to suppress journal comments regarding "modified by". Also, a non-null value is required.',
-      javaFactory: 'return 1L;'
+      javaFactory: 'return 1L;',
+      visibility: 'RO'
     },
     {
       name: 'message',
       class: 'String',
       label: 'Log Message',
       visibility: foam.u2.Visibility.RO,
-      view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 80 }
+      view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 80 },
+      visibility: 'RO'
     },
     // TODO: implement via an additional method on Logger logger.flag(x, y).log(message)
     // {
@@ -73,7 +79,9 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
     // },
     {
       name: 'exception',
-      class: 'Object'
+      class: 'Object',
+      visibility: 'RO',
+      view: { class: 'foam.u2.tag.TextArea', rows: 5, col: 80 }
     }
   ]
 });
