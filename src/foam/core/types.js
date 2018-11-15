@@ -495,10 +495,10 @@ foam.CLASS({
 
       function attach(inner) {
         s1 && s1.detach();
-        s1 = inner && inner.sub('propertyChange', proxyListener);
+        s1 = inner && inner.sub && inner.sub('propertyChange', proxyListener);
 
         s2 && s2.detach();
-        s2 = inner && inner.sub('nestedPropertyChange', proxyListener);
+        s2 = inner && inner.sub && inner.sub('nestedPropertyChange', proxyListener);
       }
 
       function listener(s, pc, name, slot) {
