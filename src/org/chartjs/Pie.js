@@ -5,32 +5,24 @@ foam.CLASS({
   properties: [
     [ 'chartType', 'pie' ],
     {
-      name: 'config',
-      factory: function() {
-        return {
-          type: this.chartType,
-          datasets: [{}],
-          options: {
-            responsive: false,
-            maintainAspectRatio: false,
-            tooltips: {
-              callbacks: {
-                title: function(tooltipItem, data) {
-                  tooltipItem = tooltipItem[0];
-                  return data.datasets[tooltipItem.datasetIndex].label;
-                },
-                label: function(tooltipItem, data) {
-                  return data.labels[tooltipItem.index] +
-                    ': ' + data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]
-                },
-              }
-            }
-          }
-        }
+      name: 'tooltipLabelFormatter',
+      value: function(tooltipItem, data) {
+        return data.labels[tooltipItem.index] +
+          ': ' + data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]
+      }
+    },
+    {
+      name: 'tooltipTitleFormatter',
+      value: function(tooltipItem, data) {
+        tooltipItem = tooltipItem[0];
+        return data.datasets[tooltipItem.datasetIndex].label;
       }
     },
   ],
   methods: [
+    function configChart_(chart) {
+      delete chart.options.scales;
+    },
     function genChartData_(data) {
       var chartData = this.toChartData(data);
       chartData.datasets.forEach(function(d, i) {
