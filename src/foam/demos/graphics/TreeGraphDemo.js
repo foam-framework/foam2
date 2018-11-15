@@ -3,7 +3,7 @@ foam.CLASS({
   extends: 'foam.graphics.TreeGraph',
 
   properties: [
-    [ 'width', 1700 ],
+    [ 'width', 1500 ],
     [ 'height', 1000 ],
     [ 'x', 0 ],
     [ 'y', 0 ],
@@ -29,7 +29,7 @@ foam.CLASS({
 
   methods: [
     function init() {
-      var g = this.Node.create({x:400, y:40}, this);
+      var g = this.Node.create({x:500, y:40}, this);
       this.root = g;
       this.add(g.addChildNode().addChildNode().addChildNode().addChildNode());
       g.childNodes[0].addChildNode()/*.addChildNode()*/;

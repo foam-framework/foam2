@@ -293,14 +293,13 @@ public class DigWebAgent
               out.println(outputterHtml.toString());
             }
           } else if ( Format.JSONJ == format ) {
-            foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+            foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.STORAGE);
             List a = sink.getArray();
             String dataToString = "";
-            outputterJson.setOutputJsonj_(true);
 
             //resp.setContentType("application/json");
             for ( int i = 0 ; i < a.size() ; i++ )
-              outputterJson.output(a.get(i));
+              outputterJson.outputJSONJFObject((FObject) a.get(i));
 
             if ( emailSet ) {
               output(x, dataToString);
@@ -393,7 +392,7 @@ public class DigWebAgent
 
       message.setBody(newData);
 
-      emailService.sendEmail(message);
+      emailService.sendEmail(x, message);
     }
   }
 
