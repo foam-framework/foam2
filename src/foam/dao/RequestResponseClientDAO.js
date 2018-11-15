@@ -24,8 +24,8 @@ foam.CLASS({
     'foam.core.Serializable'
   ],
 
-  documentation: function() {/*A ClientDAO implementation which publishes its own events upon put/remove.
-Suitable for usage against backends that don't support listen(), such as plain HTTP based servers.*/},
+  documentation: `A ClientDAO implementation which publishes its own events upon put/remove.
+Suitable for usage against backends that don't support listen(), such as plain HTTP based servers.`,
 
   methods: [
     function put_(x, obj) {

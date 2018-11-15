@@ -52,13 +52,14 @@
              c.childNodes[i].y = this.nodeHeight;
              c.childNodes[i].x = 0;
            }
+           c.maxLeft = c.maxRight = 0;
          }
          this.doLayout();
        }.bind(this));
      },
 
      function doLayout() {
-       if ( this.root ) this.root.doLayout();
+       if ( this.root ) { this.root.layout(); this.root.doLayout(); }
      }
    ],
 
@@ -178,7 +179,7 @@
            // Layout children
            for ( var i = 0 ; i < l ; i++ ) {
              var c = childNodes[i];
-             if ( c.y < this.height*2 ) { moved = true; c.y += 5; }
+             if ( c.y < this.height*2 ) { moved = true; c.y += 2; }
 
              if ( c.layout() ) moved = true;
              this.left  = Math.min(this.left, c.x);
@@ -205,6 +206,9 @@
                }
              }
            }
+           // TODO/BUG: I'm not sure why this is necessary, but without, center
+           // nodes are a few pixels off.
+           if ( l%2 == 1 ) childNodes[Math.floor(m)].x = 0;
 
            // Calculate maxLeft and maxRight
            this.maxLeft = this.maxRight = 0;
@@ -224,17 +228,25 @@
            isFramed: true,
            documentation: 'Animate layout until positions stabilize',
            code: function() {
-             if ( this.layout() ) {
-               this.doLayout();
+             var needsLayout = false;
 
-               // Scale and translate the view to fit in the available window
-               var gw = this.graph.width-200;
-               var w = this.scaleX * (this.maxRight - this.maxLeft + 200);
-               if ( w > gw ) this.scaleX = this.scaleY = Math.min(this.scaleX, gw / w);
-               if ( this.scaleX*(this.x + this.maxLeft) < 40 ) this.x += 20;
-               if ( this.scaleX*(this.x + this.maxRight) > gw-40  ) this.x -= 20;
-               // console.log('w: ', w, this.graph.width / w);
-               // console.log(this.maxLeft, this.maxRight);
+             // Scale and translate the view to fit in the available window
+             var gw = this.graph.width-100;
+             var w = this.maxRight - this.maxLeft + 50;
+             if ( w > gw ) {
+               var scaleX = Math.min(1, gw / w);
+               if ( scaleX != this.scaleX ) needsLayout = 1;
+               /*this.scaleY = */this.scaleX = Math.min(1, (19*this.scaleX+scaleX)/20);
+             }
+
+             var x = (-this.maxLeft+25)/w * gw + 50;
+             if ( x != this.x ) {
+               this.x = (19*this.x + x)/20;
+               needsLayout = true;
+             }
+
+             if ( this.layout() || needsLayout ) {
+               this.doLayout();
              }
            }
          }
