@@ -36,7 +36,11 @@ foam.CLASS({
     'org.jtwig.environment.EnvironmentConfigurationBuilder',
     'org.jtwig.JtwigModel',
     'org.jtwig.JtwigTemplate',
-    'org.jtwig.resource.loader.TypedResourceLoader'
+    'org.jtwig.resource.loader.TypedResourceLoader',
+    'foam.dao.DAO',
+    'foam.nanos.auth.User',
+    'foam.nanos.auth.Group',
+    'foam.nanos.app.AppConfig'
   ],
 
   axioms: [
@@ -158,12 +162,12 @@ return config_;`
   MimeMessage message = new MimeMessage(session_);
 
   // don't send email if no sender
-  String from = getFrom();
+  String from = emailMessage.getFrom();
   if ( SafetyUtil.isEmpty(from) )
     return null;
 
   // add display name if present
-  String displayName = getDisplayName();
+  String displayName = emailMessage.getDisplayName();
   if ( SafetyUtil.isEmpty(displayName) ) {
     message.setFrom(new InternetAddress(from));
   } else {
@@ -171,7 +175,7 @@ return config_;`
   }
 
   // attach reply to if present
-  String replyTo = getReplyTo();
+  String replyTo = emailMessage.getReplyTo();
   if ( ! SafetyUtil.isEmpty(replyTo) ) {
     message.setReplyTo(InternetAddress.parse(replyTo));
   }
@@ -227,6 +231,10 @@ return config_;`
       name: 'sendEmail',
       args: [
         {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
           name: 'emailMessage',
           javaType: 'final foam.nanos.notification.email.EmailMessage'
         }
@@ -234,11 +242,11 @@ return config_;`
       javaCode: `
 if ( ! this.getEnabled() ) return;
 
-((FixedThreadPool) getThreadPool()).submit(getX(), new ContextAgent() {
+((FixedThreadPool) getThreadPool()).submit(x, new ContextAgent() {
   @Override
   public void execute(X x) {
     try {
-      MimeMessage message = createMimeMessage(emailMessage);
+      MimeMessage message = createMimeMessage(finalizeEmailConfig(x, emailMessage));
       if ( message == null ) {
         return;
       }
@@ -273,11 +281,19 @@ for ( String key : templateArgs.keySet() ) {
 }
 
 EnvironmentConfiguration config = getConfig(group);
-JtwigTemplate template = JtwigTemplate.inlineTemplate(emailTemplate.getBody(), config);
 JtwigModel model = JtwigModel.newModel(templateArgs);
-emailMessage.setSubject(emailTemplate.getSubject());
-emailMessage.setBody(template.render(model));
-sendEmail(emailMessage);`
+emailMessage = (EmailMessage) emailMessage.fclone();
+
+JtwigTemplate templateBody =    JtwigTemplate.inlineTemplate(emailTemplate.getBody(), config);
+emailMessage.setBody(templateBody.render(model));
+
+// If subject has already provided, then we don't want to use template subject.
+if (SafetyUtil.isEmpty(emailMessage.getSubject())) {
+  JtwigTemplate templateSubject = JtwigTemplate.inlineTemplate(emailTemplate.getSubject(), config);
+  emailMessage.setSubject(templateSubject.render(model));
+}
+
+sendEmail(x, emailMessage);`
     },
     {
       name: 'start',
@@ -293,6 +309,52 @@ if ( getAuthenticate() ) {
 } else {
   session_ = Session.getInstance(props);
 }`
+    },
+    {
+      name: 'finalizeEmailConfig',
+      javaReturns: 'foam.nanos.notification.email.EmailMessage',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
+          name: 'emailMessage',
+          javaType: 'final foam.nanos.notification.email.EmailMessage'
+        }
+      ],
+      javaCode:
+        `
+foam.nanos.session.Session session = x.get(foam.nanos.session.Session.class);
+
+DAO userDAO         = (DAO) x.get("localUserDAO");
+DAO groupDAO        = (DAO) x.get("groupDAO");
+
+User user           = (User) userDAO.find(session.getUserId());
+Group group         = (Group) groupDAO.find(user.getGroup());
+
+if ( SafetyUtil.isEmpty(emailMessage.getFrom()) ) {
+  emailMessage.setFrom(
+    ! SafetyUtil.isEmpty(group.getFrom()) ?
+      group.getFrom() : getFrom()
+  );
+}
+
+if ( SafetyUtil.isEmpty(emailMessage.getReplyTo()) ) {
+  emailMessage.setReplyTo(
+    ! SafetyUtil.isEmpty(group.getReplyTo()) ?
+      group.getReplyTo() : getReplyTo()
+  );
+}
+
+if ( SafetyUtil.isEmpty(emailMessage.getDisplayName()) ) {
+  emailMessage.setDisplayName(
+    ! SafetyUtil.isEmpty(group.getDisplayName()) ? group.getDisplayName() : getDisplayName()
+  );
+}
+
+return emailMessage;
+      `
     }
   ]
 });

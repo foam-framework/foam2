@@ -91,7 +91,7 @@ HashMap<String, Object> args = new HashMap<>();
 args.put("name", String.format("%s %s", user.getFirstName(), user.getLastName()));
 args.put("link", url +"?token=" + token.getData() + "#reset");
 
-email.sendEmailFromTemplate(user, message, "reset-password", args);
+email.sendEmailFromTemplate(x, user, message, "reset-password", args);
 return true;`
     },
     {
@@ -165,7 +165,7 @@ EmailMessage message = new EmailMessage();
 message.setTo(new String[] { userResult.getEmail() });
 HashMap<String, Object> args = new HashMap<>();
 args.put("name", userResult.getFirstName());
-email.sendEmailFromTemplate(userResult, message, "password-changed", args);
+email.sendEmailFromTemplate(x, userResult, message, "password-changed", args);
 return true;`
     }
   ]

@@ -61,7 +61,7 @@ foam.CLASS({
         HashMap<String, Object> args = new HashMap<>();
         args.put("doc", doc.getBody());
       
-        email.sendEmailFromTemplate(user, message, "docEmail", args);
+        email.sendEmailFromTemplate(getX(), user, message, "docEmail", args);
         return true;
       }catch(Throwable t){
         ((Logger) getLogger()).error("Error retrieving Terms and Conditions.", t);
