@@ -8,7 +8,7 @@ foam.CLASS({
       name: 'tooltipLabelFormatter',
       value: function(tooltipItem, data) {
         return data.labels[tooltipItem.index] +
-          ': ' + data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]
+          ': ' + this.yFormatter(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]);
       }
     },
     {
