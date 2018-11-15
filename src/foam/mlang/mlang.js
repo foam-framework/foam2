@@ -100,11 +100,12 @@ foam.CLASS({
     },
     {
       class: 'foam.mlang.ExprProperty',
-      name: 'arg1'
+      name: 'arg2'
     },
     {
-      class: 'Array',
-      name: 'points'
+      class: 'List',
+      name: 'points',
+      factory: function() { return [] },
     }
   ],
 
@@ -116,13 +117,18 @@ foam.CLASS({
         // TODO: Array properties should provide convenience for this,
         // like this.point$.push() or something.
         this.pub('propertyChange', 'points', this.points$);
-      }
+      },
+      javaCode: `
+        java.util.List point = new java.util.ArrayList();
+        point.add(getArg1().f(obj));
+        point.add(getArg2().f(obj));
+        getPoints().add(point);
+      `,
     },
     {
       name: 'remove',
       code: function(obj, s) {
-        this.points.push([this.arg1.f(obj), this.arg2.f(obj)]);
-        this.pub('propertyChange', 'points', this.points$);
+        // TODO
       }
     },
     {
@@ -2179,6 +2185,7 @@ foam.CLASS({
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Explain',
     'foam.mlang.sink.GroupBy',
+    'foam.mlang.sink.Plot',
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Max',
     'foam.mlang.sink.Min',
@@ -2228,6 +2235,7 @@ foam.CLASS({
 
     function UNIQUE(expr, sink) { return this.Unique.create({ expr: expr, delegate: sink }); },
     function GROUP_BY(expr, sinkProto) { return this.GroupBy.create({ arg1: expr, arg2: sinkProto }); },
+    function PLOT(x, y) { return this.Plot.create({ arg1: x, arg2: y }); },
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
     function COUNT() { return this.Count.create(); },

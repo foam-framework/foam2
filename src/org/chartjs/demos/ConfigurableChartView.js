@@ -25,12 +25,12 @@ foam.CLASS({
         {
           class: 'Int',
           name: 'height',
-          value: 300,
+          value: 500,
         },
         {
           class: 'Int',
           name: 'width',
-          value: 300,
+          value: 1000,
         },
         {
           class: 'StringArray',
