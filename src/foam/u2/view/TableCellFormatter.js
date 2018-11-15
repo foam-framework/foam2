@@ -121,12 +121,22 @@ foam.CLASS({
 
   properties: [
     {
+      documentation: `
+        A method that can be called to format a value for display purposes.
+        // TODO: Only works for $. How would this work for other currencies?
+      `,
+      name: 'displayFormatter',
+      value: function(value) {
+        return '$' + (value/100).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')
+      },
+    },
+    {
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
-      value: function(value) {
+      value: function(value, _, prop) {
         this.start()
           .style({'text-align': 'left', 'padding-right': '20px'})
-          .add('$' + (value/100).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,'))
+          .add(prop.displayFormatter(value))
         .end();
       }
     }
