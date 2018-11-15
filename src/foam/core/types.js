@@ -474,7 +474,7 @@ foam.CLASS({
     }
   ],
   methods: [
-    function initObject(obj) {
+    function xinitObject(obj) {
       var s1, s2;
 
       obj.onDetach(function() {
