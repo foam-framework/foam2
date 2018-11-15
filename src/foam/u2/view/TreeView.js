@@ -40,20 +40,30 @@ foam.CLASS({
       white-space: nowrap;
       margin: 6px 20px;
       inset: none;
+      cursor: pointer;
     }
 
     ^label:hover {
-      background: #59aadd;
-      color: white;
+      border-radius: 2px;
+      background-color: rgba(0, 48, 249, 0.1);
+      color: #0030f9;
     }
 
     ^label {
       min-width: 120px;
-      padding: 2px;
+      padding: 4px;
+      font-weight: 900;
+      color: #2b2b2b;
     }
 
     ^selected > ^label {
-      outline: 2px solid #59aadd;
+      border-radius: 2px;
+      background-color: rgba(0, 48, 249, 0.1);
+      color: #0030f9;
+    }
+
+    ^expanded {
+      transform: rotate(180deg);
     }
   `,
 
@@ -99,10 +109,15 @@ foam.CLASS({
         start('span').
           style({
             visibility: this.hasChildren$.map(function(c) { return c ? 'visible' : 'hidden'; }),
-            'font-size': '12px'
+            'vertical-align': 'middle',
+            'font-weight': 'bold',
+            'display': 'inline-block',
+            'visibility': 'visible',
+            'font-size': '16px',
+            'transform': this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)' })
           }).
           on('click', this.toggleExpanded).
-          add(this.expanded$.map(function(v) { return v ? '\u25BD' : '\u25B7'; })).
+          add('\u2303').
           entity('nbsp').
         end().
         on('click', this.selected).
@@ -187,6 +202,7 @@ foam.CLASS({
 
     function toggleExpanded(e) {
       this.expanded = ! this.expanded;
+      this.selection = this.data;
       e.preventDefault();
       e.stopPropagation();
     }
