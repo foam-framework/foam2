@@ -39,6 +39,7 @@ foam.CLASS({
       white-space: nowrap;
       margin: 6px 20px;
       inset: none;
+      cursor: pointer;
     }
 
     ^label:hover {
@@ -58,6 +59,10 @@ foam.CLASS({
       border-radius: 2px;
       background-color: rgba(0, 48, 249, 0.1);
       color: #0030f9;
+    }
+
+    ^expanded {
+      transform: rotate(180deg);
     }
   `,
 
@@ -103,10 +108,13 @@ foam.CLASS({
         start('span').
           style({
             visibility: this.hasChildren$.map(function(c) { return c ? 'visible' : 'hidden'; }),
-            'font-size': '12px'
+            'display': 'inline-block',
+            'visibility': 'visible',
+            'font-size': '16px',
+            'transform': this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)' })
           }).
           on('click', this.toggleExpanded).
-          add(this.expanded$.map(function(v) { return v ? '\u25BD' : '\u25B7'; })).
+          add('\u2303').
           entity('nbsp').
         end().
         on('click', this.selected).
