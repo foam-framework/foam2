@@ -296,6 +296,7 @@ public class DigWebAgent
             List a = sink.getArray();
             String dataToString = "";
             outputterJson.setOutputJsonj_(true);
+            outputterJson.setMainFObject(cInfo.getId());
 
             //resp.setContentType("application/json");
             for ( int i = 0 ; i < a.size() ; i++ )
