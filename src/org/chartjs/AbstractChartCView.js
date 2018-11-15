@@ -3,7 +3,10 @@ foam.CLASS({
   name: 'AbstractChartCView',
   extends: 'foam.graphics.CView',
   requires: [
+    'foam.dao.PromisedDAO',
+    'foam.dao.MDAO',
     'foam.mlang.sink.GroupBy',
+    'foam.mlang.sink.Plot',
     'org.chartjs.Lib',
   ],
   properties: [
@@ -30,6 +33,15 @@ foam.CLASS({
     ['', 'propertyChange.data', 'update' ],
     ['', 'propertyChange.chart', 'update' ],
   ],
+  classes: [
+    {
+      name: 'ChartData',
+      properties: [
+        'key',
+        'data',
+      ],
+    },
+  ],
   methods: [
     function initCView(x) {
       this.chart = new this.Lib.CHART(x, this.config);
@@ -45,38 +57,70 @@ foam.CLASS({
       // Template method, in child classes generate the chart data
       // from our data.
     },
+    function normalizeData() {
+      var getData = function(data) {
+        if ( this.GroupBy.isInstance(data) ) {
+          var ps = [];
+          var o = [];
+          data.sortedKeys().forEach(function(k) {
+            ps.push(getData(data.groups[k]).then(function(o2) {
+              o2.forEach(function(o3) {
+                o.push([k].concat(o3));
+              })
+            }))
+          });
+          return Promise.all(ps).then(function() { return o });
+        } else if ( this.Plot.isInstance(data) ) {
+          return Promise.resolve(data.points);
+        } else if ( data && data.value ) {
+          return Promise.resolve([data.value])
+        } else {
+          return Promise.resolve([data]);
+        }
+      }.bind(this);
+      return getData(this.data).then(function(o) {
+        o.sort(foam.util.compare);
+        return o;
+      });
+    },
     function toChartData(data) {
-      var keys = data.sortedKeys();
+      var dimensions = data.length && data[0].length;
 
-      if ( this.GroupBy.isInstance(data.arg2) ) {
-        var xValues = {};
-        keys.forEach(function(k) {
-          Object.keys(data.groups[k].groups).forEach(function(k2) {
-            xValues[k2] = true;
-          })
+      if ( dimensions == 3 ) {
+        var xValues = [];
+        data.forEach(function(row) {
+          var x = row[1];
+          if ( xValues.indexOf(x) == -1 ) xValues.push(x);
         });
-        xValues = Object.keys(xValues);
-        xValues.sort();
+        xValues.sort(foam.util.compare);
+
+        var datasets = [];
+        for ( var i = 0 ; i < data.length ; ) {
+          var o = { label: data[i][0], data: [] };
+          for ( var xi = 0 ; xi < xValues.length ; xi++ ) {
+            if ( i >= data.length ) break;
+            if ( o.label != data[i][0] ) break;
+            var x = xValues[xi];
+            var y = null;
+            if ( x == data[i][1] ) {
+              y = data[i][2];
+              i++;
+            }
+            o.data.push({ x: x, y: y })
+          }
+          datasets.push(o);
+        }
         return {
           labels: xValues,
-          datasets: keys.map(function(k, i) {
-            return {
-              label: k,
-              data: xValues.map(function(x) {
-                var y = data.groups[k].groups[x] ?
-                  data.groups[k].groups[x].value : null
-                return { y: y, x: x }
-              }),
-            }
-          })
+          datasets: datasets,
         };
       } else {
         return {
-          labels: keys,
+          labels: data.map(function(o) { return o[0] }),
           datasets: [
             {
-              label: data.arg2.label || data.arg2.model_.label,
-              data: keys.map(function(k) { return data.groups[k].value; })
+              label: 'Total', // TODO how to customize this?
+              data: data.map(function(o) { return o[1] })
             }
           ]
         };
@@ -103,6 +147,8 @@ foam.CLASS({
                 to[i] = copyFrom(to[i], from[i]);
               }
               return to;
+            } else if ( foam.Date.isInstance(from) ) {
+              return from;
             } else if ( foam.Object.isInstance(to) ) {
               to = to || {};
               Object.keys(from).forEach(function(k) {
@@ -112,9 +158,13 @@ foam.CLASS({
             }
             return from;
           }
-          var data = this.genChartData_(this.data);
-          copyFrom(this.chart.data, data);
-          this.chart.update();
+
+          this.normalizeData().then(function(o) {
+            var data = this.genChartData_(o);
+            copyFrom(this.chart.data, data);
+            this.chart.update();
+          }.bind(this))
+
         }
       }
     }

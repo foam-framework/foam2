@@ -29,6 +29,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'dblclick?',
     'onObjDrop',
     'selection',
     'startExpanded'
@@ -120,6 +121,7 @@ foam.CLASS({
           entity('nbsp').
         end().
         on('click', this.selected).
+        on('dblclick', function() { self.dblclick && self.dblclick(self.data); }).
         callIf(this.draggable, function() {
           this.
           attrs({ draggable: 'true' }).
