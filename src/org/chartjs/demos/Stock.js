@@ -25,6 +25,22 @@ foam.CLASS({
       postSet: function() { this.maybeAddRandomSnapshots() },
     },
     {
+      name: 'plottedStockPrices',
+      view: {
+        class: 'org.chartjs.demos.ConfigurableChartView',
+        view: 'org.chartjs.Line',
+      },
+      factory: function() {
+        var sink = this.GROUP_BY(
+          this.StockPriceSnapshot.SYMBOL,
+          this.PLOT(
+            this.StockPriceSnapshot.DATE,
+            this.StockPriceSnapshot.PRICE));
+        this.stockPriceSnapshotDAO.listen(sink);
+        return sink;
+      },
+    },
+    {
       name: 'stockPrices',
       view: {
         class: 'org.chartjs.demos.ConfigurableChartView',
@@ -125,9 +141,9 @@ foam.CLASS({
       },
     },
     {
-      class: 'Int',
+      class: 'Date',
       name: 'date',
-      //factory: function() { return new Date() },
+      factory: function() { return new Date() },
     },
   ],
   classes: [
@@ -135,7 +151,7 @@ foam.CLASS({
       name: 'StockPriceSnapshot',
       properties: [
         { name: 'id' },
-        { class: 'Int', name: 'date' },
+        { class: 'Date', name: 'date' },
         { class: 'String', name: 'symbol' },
         { class: 'Currency', name: 'price' },
       ]
@@ -165,7 +181,7 @@ foam.CLASS({
     {
       name: 'maybeAddRandomSnapshots',
       isMerged: true,
-      mergeDelay: 500,
+      mergeDelay: 1000,
       code: function() {
         if ( ! this.autoAddRandomSnapshots ) return;
         this.addRandomSnapshots();
@@ -199,8 +215,7 @@ foam.CLASS({
             price: Math.random()*100000,
           }));
         })
-        self.date++;
-        //self.date = new Date(self.date.getTime() + 24*60*60*1000);
+        self.date = new Date(self.date.getTime() + 24*60*60*1000);
       },
     },
   ],
