@@ -51,7 +51,7 @@ message.setTo(new String[]{user.getEmail()});
 HashMap<String, Object> args = new HashMap<>();
 args.put("name", user.getFirstName());
 args.put("link", url + "/service/verifyEmail?userId=" + user.getId() + "&token=" + token.getData() + "&redirect=/" );
-email.sendEmailFromTemplate(user, message, "verifyEmail", args);
+email.sendEmailFromTemplate(x, user, message, "verifyEmail", args);
 return true;
 } catch(Throwable t) {
   t.printStackTrace();
