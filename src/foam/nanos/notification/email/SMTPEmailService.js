@@ -40,7 +40,11 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Group',
-    'foam.nanos.app.AppConfig'
+    'foam.nanos.app.AppConfig',
+    'foam.dao.ArraySink',
+    'foam.dao.Sink',
+    'foam.mlang.MLang',
+    'java.util.List'
   ],
 
   axioms: [
@@ -325,13 +329,10 @@ if ( getAuthenticate() ) {
       ],
       javaCode:
         `
-foam.nanos.session.Session session = x.get(foam.nanos.session.Session.class);
+User user      = findUser(x, emailMessage);
 
-DAO userDAO         = (DAO) x.get("localUserDAO");
-DAO groupDAO        = (DAO) x.get("groupDAO");
-
-User user           = (User) userDAO.find(session.getUserId());
-Group group         = (Group) groupDAO.find(user.getGroup());
+DAO groupDAO   = (DAO) x.get("groupDAO");
+Group group    = (Group) groupDAO.find(user.getGroup());
 
 if ( SafetyUtil.isEmpty(emailMessage.getFrom()) ) {
   emailMessage.setFrom(
@@ -354,6 +355,48 @@ if ( SafetyUtil.isEmpty(emailMessage.getDisplayName()) ) {
 }
 
 return emailMessage;
+      `
+    },
+    {
+      name: 'findUser',
+      javaReturns: 'foam.nanos.auth.User',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
+          name: 'emailMessage',
+          javaType: 'final foam.nanos.notification.email.EmailMessage'
+        }
+      ],
+      javaCode:
+        `
+foam.nanos.session.Session session = x.get(foam.nanos.session.Session.class);
+
+DAO userDAO         = (DAO) x.get("localUserDAO");
+User user           = (User) userDAO.find(session.getUserId());
+
+// 1. If the user doesn't login at this time, get the user from localUserDao
+// 2. If the user is the system user, get the real user from localUserDao
+if ( user == null || user.getId() == 1 ) {
+
+  Sink sink = new ArraySink();
+  sink = userDAO.where(MLang.EQ(User.EMAIL, emailMessage.getTo()[0]))
+    .limit(1).select(sink);
+
+  List list = ((ArraySink) sink).getArray();
+  if ( list == null || list.size() == 0 ) {
+    throw new RuntimeException("User not found");
+  }
+
+  user = (User) list.get(0);
+  if ( user == null ) {
+    throw new RuntimeException("User not found");
+  }
+}
+
+return user;
       `
     }
   ]
