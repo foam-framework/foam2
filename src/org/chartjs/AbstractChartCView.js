@@ -147,6 +147,8 @@ foam.CLASS({
                 to[i] = copyFrom(to[i], from[i]);
               }
               return to;
+            } else if ( foam.Date.isInstance(from) ) {
+              return from;
             } else if ( foam.Object.isInstance(to) ) {
               to = to || {};
               Object.keys(from).forEach(function(k) {
