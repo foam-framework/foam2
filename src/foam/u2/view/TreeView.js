@@ -108,6 +108,8 @@ foam.CLASS({
         start('span').
           style({
             visibility: this.hasChildren$.map(function(c) { return c ? 'visible' : 'hidden'; }),
+            'vertical-align': 'middle',
+            'font-weight': 'bold',
             'display': 'inline-block',
             'visibility': 'visible',
             'font-size': '16px',
