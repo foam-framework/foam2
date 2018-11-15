@@ -141,9 +141,9 @@ foam.CLASS({
       },
     },
     {
-      class: 'Int',
+      class: 'Date',
       name: 'date',
-      //factory: function() { return new Date() },
+      factory: function() { return new Date() },
     },
   ],
   classes: [
@@ -151,7 +151,7 @@ foam.CLASS({
       name: 'StockPriceSnapshot',
       properties: [
         { name: 'id' },
-        { class: 'Int', name: 'date' },
+        { class: 'Date', name: 'date' },
         { class: 'String', name: 'symbol' },
         { class: 'Currency', name: 'price' },
       ]
@@ -181,7 +181,7 @@ foam.CLASS({
     {
       name: 'maybeAddRandomSnapshots',
       isMerged: true,
-      mergeDelay: 2000,
+      mergeDelay: 1000,
       code: function() {
         if ( ! this.autoAddRandomSnapshots ) return;
         this.addRandomSnapshots();
@@ -215,8 +215,7 @@ foam.CLASS({
             price: Math.random()*100000,
           }));
         })
-        self.date++;
-        //self.date = new Date(self.date.getTime() + 24*60*60*1000);
+        self.date = new Date(self.date.getTime() + 24*60*60*1000);
       },
     },
   ],
