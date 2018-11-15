@@ -25,6 +25,22 @@ foam.CLASS({
       postSet: function() { this.maybeAddRandomSnapshots() },
     },
     {
+      name: 'plottedStockPrices',
+      view: {
+        class: 'org.chartjs.demos.ConfigurableChartView',
+        view: 'org.chartjs.Line',
+      },
+      factory: function() {
+        var sink = this.GROUP_BY(
+          this.StockPriceSnapshot.SYMBOL,
+          this.PLOT(
+            this.StockPriceSnapshot.DATE,
+            this.StockPriceSnapshot.PRICE));
+        this.stockPriceSnapshotDAO.listen(sink);
+        return sink;
+      },
+    },
+    {
       name: 'stockPrices',
       view: {
         class: 'org.chartjs.demos.ConfigurableChartView',
@@ -165,7 +181,7 @@ foam.CLASS({
     {
       name: 'maybeAddRandomSnapshots',
       isMerged: true,
-      mergeDelay: 500,
+      mergeDelay: 2000,
       code: function() {
         if ( ! this.autoAddRandomSnapshots ) return;
         this.addRandomSnapshots();
