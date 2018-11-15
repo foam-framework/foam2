@@ -67,10 +67,15 @@ foam.CLASS({
 
     ^ .actions {
       display: inline-block;
+      margin-bottom: 8px;
     }
 
     ^ .actions .net-nanopay-ui-ActionView {
       margin: 0 10px 10px 0;
+    }
+
+    ^ .actions button + button {
+      margin-left: 8px;
     }
 
     ^ .net-nanopay-ui-ActionView {

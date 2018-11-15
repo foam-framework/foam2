@@ -18,6 +18,7 @@ foam.CLASS({
       class: 'String',
       name: 'objectClass',
       displayWidth: 70,
+      view: { class: 'foam.u2.DetailView', size: 60 },
       postSet: function(oldValue, newValue) {
         if ( oldValue && newValue !== oldValue ) {
           var m = this.lookup(newValue, true);
@@ -45,8 +46,10 @@ foam.CLASS({
     function initE() {
       this.SUPER();
 
+      this.addClass(this.myClass());
+
       if ( this.choices && Array.isArray(this.choices) ) {
-        this.tag({class: 'foam.u2.TextField', choices: this.choices, data$: this.objectClass$, size: 60});
+        this.tag(this.OBJECT_CLASS.view, {choices: this.choices, data$: this.objectClass$});
         /*
          * NOTE:
          * Displays the first choice on init.
