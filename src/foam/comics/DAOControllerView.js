@@ -18,6 +18,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'createControllerView? as importedCreateControllerView',
     'data? as importedData',
     'stack',
     'summaryView? as importedSummaryView',
@@ -111,6 +112,14 @@ foam.CLASS({
       factory: function() {
         return this.data.summaryView || this.importedSummaryView || {
           class: 'foam.u2.view.ScrollTableView'
+        };
+      }
+    },
+    {
+      name: 'createControllerView',
+      expression: function() {
+        return this.importedCreateControllerView || {
+          class: 'foam.comics.DAOCreateControllerView'
         };
       }
     },
@@ -217,7 +226,7 @@ foam.CLASS({
   listeners: [
     function onCreate() {
       this.stack.push({
-        class: 'foam.comics.DAOCreateControllerView',
+        class: this.createControllerView.class,
         detailView: this.data.detailView
       }, this);
     },

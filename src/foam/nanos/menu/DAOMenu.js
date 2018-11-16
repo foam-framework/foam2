@@ -41,6 +41,17 @@ foam.CLASS({
     },
     {
       class: 'foam.u2.ViewSpec',
+      name: 'createControllerView',
+      javaType: 'foam.lib.json.UnknownFObject',
+      javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
+      javaJSONParser: 'new foam.lib.json.UnknownFObjectParser()',
+      // TODO: remove next line when permanently fixed in ViewSpec
+      fromJSON: function fromJSON(value, ctx, prop, json) {
+        return value;
+      }
+    },
+    {
+      class: 'foam.u2.ViewSpec',
       name: 'updateView',
       javaType: 'foam.lib.json.UnknownFObject',
       javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
@@ -126,13 +137,14 @@ foam.CLASS({
         toggleEnabled: this.toggleEnabled
       };
 
-      if ( this.summaryView )         view.summaryView         = this.summaryView;
-      if ( this.updateView )          view.updateView          = this.updateView;
-      if ( this.title )               view.title               = this.title;
-      if ( this.subtitle )            view.subtitle            = this.subtitle;
-      if ( this.customDAOController ) view.customDAOController = this.customDAOController;
-      if ( this.createLabel )         view.createLabel         = this.createLabel;
-      if ( this.searchMode )          view.searchMode          = this.searchMode;
+      if ( this.summaryView )          view.summaryView          = this.summaryView;
+      if ( this.createControllerView ) view.createControllerView = this.createControllerView;
+      if ( this.updateView )           view.updateView           = this.updateView;
+      if ( this.title )                view.title                = this.title;
+      if ( this.subtitle )             view.subtitle             = this.subtitle;
+      if ( this.customDAOController )  view.customDAOController  = this.customDAOController;
+      if ( this.createLabel )          view.createLabel          = this.createLabel;
+      if ( this.searchMode )           view.searchMode           = this.searchMode;
 
       return view;
     }
