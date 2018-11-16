@@ -51,9 +51,8 @@
 
        // List for 'click' events to expand/collapse Nodes.
        this.canvas.on('click', function(e) {
-         var x = e.clientX+this.nodeWidth/2, y = e.clientY;
+         var x = e.layerX+this.nodeWidth/2, y = e.layerY;
          var c = this.root.findFirstChildAt(x, y);
-         console.log('click', x,y, c);
          if ( ! c ) return;
          c.expanded = ! c.expanded;
          if ( ! c.expanded ) {
@@ -259,7 +258,7 @@
              if ( w > gw ) {
                var scaleX = Math.min(1, gw / w);
                if ( scaleX != this.scaleX ) needsLayout = 1;
-               /*this.scaleY = */this.scaleX = Math.min(1, (19*this.scaleX+scaleX)/20);
+               this.scaleX = Math.min(1, (19*this.scaleX+scaleX)/20);
              }
 
              var x = (-this.maxLeft+25)/w * gw + 50;
@@ -267,7 +266,6 @@
                this.x = (19*this.x + x)/20;
                needsLayout = true;
              }
-
              if ( this.layout() || needsLayout ) {
                this.doLayout();
              }
