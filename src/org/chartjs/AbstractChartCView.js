@@ -9,16 +9,6 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  refines: 'foam.core.Currency',
-  properties: [
-    {
-      name: 'chartJsFormatter',
-      value: function(v) { return this.displayFormatter(v) },
-    },
-  ]
-});
-
-foam.CLASS({
   refines: 'foam.mlang.sink.Sum',
   properties: [
     {
