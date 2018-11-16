@@ -64,8 +64,7 @@ foam.CLASS({
   name: 'AbstractChartCView',
   extends: 'foam.graphics.CView',
   requires: [
-    'foam.dao.PromisedDAO',
-    'foam.dao.MDAO',
+    'foam.dao.ProxySink',
     'foam.mlang.sink.GroupBy',
     'foam.mlang.sink.Plot',
     'org.chartjs.Lib',
@@ -108,6 +107,8 @@ foam.CLASS({
         var getData = function(data) {
           if ( this.GroupBy.isInstance(data) || this.Plot.isInstance(data) ) {
             return getData(data.arg1).concat(getData(data.arg2));
+          } else if ( this.ProxySink.isInstance(data) ) {
+            return getData(data.delegate);
           } else if ( data.chartJsFormatter ) {
             return [data.chartJsFormatter.bind(data)]
           } else {
@@ -197,6 +198,8 @@ foam.CLASS({
           return Promise.all(ps).then(function() { return o });
         } else if ( this.Plot.isInstance(data) ) {
           return Promise.resolve(data.points);
+        } else if ( this.ProxySink.isInstance(data) ) {
+          return getData(data.delegate);
         } else if ( data && data.value ) {
           return Promise.resolve([data.value])
         } else {
