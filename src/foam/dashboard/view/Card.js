@@ -20,7 +20,7 @@ foam.CLASS({
       value: {
         TINY:   [176, 358],
         SMALL:  [312, 358],
-        MEDIUM: [624, 358],
+        MEDIUM: [624, 528],
         LARGE:  [936, 528]
       }
     }
@@ -53,20 +53,21 @@ foam.CLASS({
     }
   ],
   css: `
-^ {
-  border: 2px solid #dae1e9;
-  border-radius: 2px;
-  background: white;
-}
+    ^ {
+      border: 2px solid #dae1e9;
+      border-radius: 2px;
+      background: white;
+      margin: 8px;
+    }
 
-^header {
-  padding: 16px;
-  margin-bottom: 16px;
-  border-bottom: 1px solid #ccc;
-  font-weight: bold;
-  height: 21px;
-}
-`,
+    ^header {
+      padding: 16px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #ccc;
+      font-weight: bold;
+      height: 21px;
+    }
+  `,
   methods: [
     function initE() {
       this.onDetach(this.dashboardController.sub('dashboard', 'update', function() {
