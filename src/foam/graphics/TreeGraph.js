@@ -9,7 +9,14 @@
    name: 'TreeGraph',
    extends: 'foam.graphics.CView',
 
-   exports: [ 'nodeWidth', 'nodeHeight', 'padding', 'relationship', 'as graph', 'formatNode' ],
+   exports: [
+     'as graph',
+     'formatNode',
+     'nodeHeight',
+     'nodeWidth',
+     'padding',
+     'relationship'
+   ],
 
    properties: [
      [ 'nodeWidth',  155 ],
@@ -33,8 +40,9 @@
        this.SUPER();
 
        if ( this.data ) {
-         this.root = this.Node.create();
+         this.root = this.Node.create({x:500, y: 50, data: this.data});
          this.children.push(this.root);
+         this.doLayout();
        }
      },
 
@@ -45,6 +53,7 @@
        this.canvas.on('click', function(e) {
          var x = e.clientX+this.nodeWidth/2, y = e.clientY;
          var c = this.root.findFirstChildAt(x, y);
+         console.log('click', x,y, c);
          if ( ! c ) return;
          c.expanded = ! c.expanded;
          if ( ! c.expanded ) {
@@ -60,6 +69,7 @@
 
      function doLayout() {
        if ( this.root ) { this.root.layout(); this.root.doLayout(); }
+       this.invalidate();
      }
    ],
 
@@ -75,7 +85,15 @@
          'foam.graphics.Line'
        ],
 
-       imports: [ 'nodeWidth', 'nodeHeight', 'padding', 'parentNode?', 'formatNode', 'graph' ],
+       imports: [
+         'formatNode',
+         'graph',
+         'nodeHeight',
+         'nodeWidth',
+         'padding',
+         'parentNode?',
+         'relationship'
+       ],
        exports: [ 'as parentNode' ],
 
        properties: [
@@ -106,9 +124,14 @@
            this.formatNode();
 
            if ( this.relationship ) {
-             this.data[this.relationship.forwardName].select(function(data) {
-               this.addChildNode({data: data});
-              }.bind(this));
+             var data = this.data.clone(this.__subContext__);
+
+             try {
+               data[this.relationship.forwardName].select(function(data) {
+                 this.addChildNode({data: data});
+                }.bind(this));
+              } catch(x) {}
+              this.graph.doLayout();
             }
          },
 
@@ -248,6 +271,7 @@
              if ( this.layout() || needsLayout ) {
                this.doLayout();
              }
+             this.graph.invalidate();
            }
          }
        ]
