@@ -19,8 +19,15 @@ foam.CLASS({
     function initE() {
       this.
         addClass(this.myClass()).
-        add(this.slot(function(data$dao, data$limit) {
-          return this.TableView.create({ data: data$dao.limit(data$limit) });
+        add(this.slot(function(data$dao, data$limit, data$columns) {
+          var view = this.TableView.create({
+            data: data$dao.limit(data$limit),
+          });
+
+          if ( data$columns && data$columns.length )
+            view.columns = data$columns;
+
+          return view;
         }));
     }
   ]
