@@ -28,6 +28,7 @@ foam.CLASS({
   exports: [
     'controller as data',
     'summaryView',
+    'createControllerView',
     'updateView'
   ],
 
@@ -146,6 +147,8 @@ foam.CLASS({
     },
     // This is the DAOUpdateControllerView, not the DetailView
     'updateView',
+    // This is the DAOCreateControllerView, not the DetailView
+    'createControllerView',
     {
       class: 'String',
       name: 'detailView',
