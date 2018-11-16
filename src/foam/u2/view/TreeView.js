@@ -46,7 +46,7 @@ foam.CLASS({
     ^label:hover {
       border-radius: 2px;
       background-color: rgba(0, 48, 249, 0.1);
-      color: #0030f9;
+      color: #0098db;
     }
 
     ^label {
@@ -59,7 +59,7 @@ foam.CLASS({
     ^selected > ^label {
       border-radius: 2px;
       background-color: rgba(0, 48, 249, 0.1);
-      color: #0030f9;
+      color: #0098db;
     }
 
     ^expanded {
