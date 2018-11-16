@@ -157,19 +157,19 @@ foam.CLASS({
               .end()
               .add(this.data.subtitle$)
             .end()
-            .callIfElse(this.data.primaryAction, function() {
-              this.startContext({ data: self })
-                .start()
-                  .add(self.data.primaryAction)
-                .end()
-              .endContext();
-            }, function() {
-              if ( self.data.createLabel ) {
-                this.tag(self.cls.CREATE, { label$: self.data.createLabel$ });
-              } else {
-                this.start().add(self.cls.CREATE).end();
-              }
-            })
+            // .callIfElse(this.data.primaryAction, function() {
+            //   this.startContext({ data: self })
+            //     .start()
+            //       .add(self.data.primaryAction)
+            //     .end()
+            //   .endContext();
+            // }, function() {
+            //   if ( self.data.createLabel ) {
+            //     this.tag(self.cls.CREATE, { label$: self.data.createLabel$ });
+            //   } else {
+            //     this.start().add(self.cls.CREATE).end();
+            //   }
+            // })
           .end()
           .start()
             .addClass(this.myClass('container'))
@@ -189,9 +189,9 @@ foam.CLASS({
                 .start()
                   .add(self.cls.getAxiomsByClass(foam.core.Action).filter((action) => {
                     var rtn = true;
-                    if ( ! self.primaryAction ) {
-                      rtn = rtn && action.name !== 'create';
-                    }
+                    // if ( ! self.primaryAction ) {
+                    //   rtn = rtn && action.name !== 'create';
+                    // }
                     if ( self.data.searchMode !== self.SearchMode.FULL ) {
                       rtn = rtn && action.name !== 'toggleFilters';
                     }
