@@ -63,8 +63,10 @@ foam.CLASS({
   methods: [
     function fromProperty(prop) {
       this.SUPER(prop);
-      var dao = this.parentObj.__context__[prop.targetDAOKey];
-      this.dao = dao;
+      if ( ! this.dao ) {
+        var dao = this.parentObj.__context__[prop.targetDAOKey];
+        this.dao = dao;
+      }
     }
   ]
 });

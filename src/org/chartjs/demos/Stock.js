@@ -161,9 +161,21 @@ foam.CLASS({
       properties: [
         { name: 'id' },
         { class: 'String', name: 'symbol' },
-        { class: 'String', name: 'person' },
+        {
+          class: 'String',
+          name: 'person',
+          chartJsFormatter: function(v) {
+            return v + '!'
+          },
+        },
         { class: 'Currency', name: 'pricePerShare' },
-        { class: 'Int', name: 'shares' },
+        {
+          class: 'Int',
+          name: 'shares',
+          chartJsFormatter: function(v) {
+            return v + ' shares'
+          },
+        },
       ]
     },
   ],

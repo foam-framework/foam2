@@ -1,4 +1,65 @@
 foam.CLASS({
+  refines: 'foam.core.Property',
+  properties: [
+    {
+      name: 'chartJsFormatter',
+      value: function(v) { return v },
+    },
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.Sum',
+  properties: [
+    {
+      name: 'chartJsFormatter',
+      value: function(v) { return this.arg1.chartJsFormatter(v) },
+    },
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Date',
+  properties: [
+    {
+      name: 'chartJsFormatter',
+      value: function(d) {
+        if ( ! foam.Date.isInstance(d) ) { d = new Date(d) }
+        var month = d.getMonth() + 1
+        if ( month < 10 ) month = '0' + month
+        var day = d.getDate()
+        if ( day < 10 ) day = '0' + day
+        var year = d.getFullYear()
+        return `${year}-${month}-${day}`;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.DateTime',
+  properties: [
+    {
+      name: 'chartJsFormatter',
+      value: function(d) {
+        if ( ! foam.Date.isInstance(d) ) { d = new Date(d) }
+        var month = d.getMonth() + 1
+        if ( month < 10 ) month = '0' + month
+        var day = d.getDate()
+        if ( day < 10 ) day = '0' + day
+        var year = d.getFullYear()
+
+        var hour = d.getHours();
+        var min = d.getMinutes();
+        if ( min < 10 ) min = '0' + min
+
+        return `${year}-${month}-${day} ${hour}:${min}`;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
   package: 'org.chartjs',
   name: 'AbstractChartCView',
   extends: 'foam.graphics.CView',
@@ -15,6 +76,48 @@ foam.CLASS({
     'colors',
     'data',
     {
+      name: 'xFormatter',
+      expression: function(propertyFormatters_) {
+        return propertyFormatters_[propertyFormatters_.length - 2]
+      },
+    },
+    {
+      name: 'yFormatter',
+      expression: function(propertyFormatters_) {
+        return propertyFormatters_[propertyFormatters_.length - 1]
+      },
+    },
+    {
+      name: 'tooltipLabelFormatter',
+      value: function(tooltipItem, data) {
+        var yLabel = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]
+        if ( foam.Object.isInstance(yLabel) ) yLabel = yLabel.y
+        return data.datasets[tooltipItem.datasetIndex].label +
+          ': ' + this.yFormatter(yLabel)
+      }
+    },
+    {
+      name: 'tooltipTitleFormatter',
+      value: function(tooltipItem, data) {
+        return tooltipItem[0].xLabel;
+      }
+    },
+    {
+      name: 'propertyFormatters_',
+      expression: function(data) {
+        var getData = function(data) {
+          if ( this.GroupBy.isInstance(data) || this.Plot.isInstance(data) ) {
+            return getData(data.arg1).concat(getData(data.arg2));
+          } else if ( data.chartJsFormatter ) {
+            return [data.chartJsFormatter.bind(data)]
+          } else {
+            return [function(v) { return v }];
+          }
+        }.bind(this);
+        return getData(data)
+      },
+    },
+    {
       name: 'config',
       factory: function() {
         return {
@@ -22,7 +125,29 @@ foam.CLASS({
           datasets: [{}],
           options: {
             responsive: false,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            tooltips: {
+              callbacks: {
+                title: this.tooltipTitleFormatter.bind(this),
+                label: this.tooltipLabelFormatter.bind(this),
+              }
+            },
+            scales: {
+              yAxes: [
+                {
+                  ticks: {
+                    callback: this.yFormatter.bind(this),
+                  },
+                }
+              ],
+              xAxes: [
+                {
+                  ticks: {
+                    callback: this.xFormatter.bind(this),
+                  },
+                }
+              ]
+            }
           }
         };
       }
