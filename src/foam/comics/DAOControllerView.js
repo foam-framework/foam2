@@ -70,8 +70,24 @@ foam.CLASS({
       margin-bottom: 8px;
     }
 
+    ^ .actions .net-nanopay-ui-ActionView {
+      margin: 0 10px 10px 0;
+    }
+
     ^ .actions button + button {
       margin-left: 8px;
+    }
+
+    ^ .net-nanopay-ui-ActionView {
+      width: 128px;
+      height: 40px;
+      background: #0030f9;;
+      color: white;
+      border-radius: 4px;
+      box-shadow: 0 1px 0 0 rgba(22, 29, 37, 0.05);
+      border: solid 1px #4a33f4;
+      font-weight: 500;
+      font-size: 14px;
     }
   `,
 
