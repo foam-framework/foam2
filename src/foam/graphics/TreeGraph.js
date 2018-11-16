@@ -9,7 +9,14 @@
    name: 'TreeGraph',
    extends: 'foam.graphics.CView',
 
-   exports: [ 'nodeWidth', 'nodeHeight', 'padding', 'relationship', 'as graph', 'formatNode' ],
+   exports: [
+     'as graph',
+     'formatNode',
+     'nodeHeight',
+     'nodeWidth',
+     'padding',
+     'relationship'
+   ],
 
    properties: [
      [ 'nodeWidth',  155 ],
@@ -33,8 +40,9 @@
        this.SUPER();
 
        if ( this.data ) {
-         this.root = this.Node.create();
+         this.root = this.Node.create({x:500, y: 50, data: this.data});
          this.children.push(this.root);
+         this.doLayout();
        }
      },
 
@@ -43,7 +51,7 @@
 
        // List for 'click' events to expand/collapse Nodes.
        this.canvas.on('click', function(e) {
-         var x = e.clientX+this.nodeWidth/2, y = e.clientY;
+         var x = e.layerX+this.nodeWidth/2, y = e.layerY;
          var c = this.root.findFirstChildAt(x, y);
          if ( ! c ) return;
          c.expanded = ! c.expanded;
@@ -60,6 +68,7 @@
 
      function doLayout() {
        if ( this.root ) { this.root.layout(); this.root.doLayout(); }
+       this.invalidate();
      }
    ],
 
@@ -75,7 +84,15 @@
          'foam.graphics.Line'
        ],
 
-       imports: [ 'nodeWidth', 'nodeHeight', 'padding', 'parentNode?', 'formatNode', 'graph' ],
+       imports: [
+         'formatNode',
+         'graph',
+         'nodeHeight',
+         'nodeWidth',
+         'padding',
+         'parentNode?',
+         'relationship'
+       ],
        exports: [ 'as parentNode' ],
 
        properties: [
@@ -106,9 +123,14 @@
            this.formatNode();
 
            if ( this.relationship ) {
-             this.data[this.relationship.forwardName].select(function(data) {
-               this.addChildNode({data: data});
-              }.bind(this));
+             var data = this.data.clone(this.__subContext__);
+
+             try {
+               data[this.relationship.forwardName].select(function(data) {
+                 this.addChildNode({data: data});
+                }.bind(this));
+              } catch(x) {}
+              this.graph.doLayout();
             }
          },
 
@@ -236,7 +258,7 @@
              if ( w > gw ) {
                var scaleX = Math.min(1, gw / w);
                if ( scaleX != this.scaleX ) needsLayout = 1;
-               /*this.scaleY = */this.scaleX = Math.min(1, (19*this.scaleX+scaleX)/20);
+               this.scaleX = Math.min(1, (19*this.scaleX+scaleX)/20);
              }
 
              var x = (-this.maxLeft+25)/w * gw + 50;
@@ -244,10 +266,10 @@
                this.x = (19*this.x + x)/20;
                needsLayout = true;
              }
-
              if ( this.layout() || needsLayout ) {
                this.doLayout();
              }
+             this.graph.invalidate();
            }
          }
        ]
