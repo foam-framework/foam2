@@ -562,6 +562,7 @@ FOAM_FILES([
   { name: "org/chartjs/Pie" },
   { name: "org/chartjs/Bar" },
   { name: "org/chartjs/Line" },
+  { name: "org/chartjs/Line2" },
 
   { name: "foam/dashboard/model/Visualization" },
   { name: "foam/dashboard/model/GroupBy" },
