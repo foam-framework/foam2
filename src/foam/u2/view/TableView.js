@@ -17,15 +17,51 @@ foam.CLASS({
     ^ th {
       text-align: left;
       white-space: nowrap;
+      font-family: 'Roboto';
+      padding-left: 15px;
+      font-size: 14px;
+      line-height: 1;
+      letter-spacing: 0.4px;
+      color: #2b2b2b;
     }
 
     ^ td {
       white-space: nowrap;
+      font-family: Roboto;
+      line-height: 1.33;
+      letter-spacing: 0.2px;
+      padding-left: 15px;
+      font-size: 14px;
+      color: #2b2b2b;
     }
 
     ^row:hover {
       background: #eee;
       cursor: pointer;
+    }
+
+    ^ tbody {
+      box-shadow: 0 2px 2px 0 #dae1e9;
+    }
+
+    ^ tbody > tr {
+      height: 48px;
+      background: white;
+    }
+
+    ^ tbody > tr > td {
+      border-top: solid 1px #e2e2e3;
+      border-bottom: solid 1px #e2e2e3;
+    }
+
+    ^ tbody > tr > td:first-child {
+      border-top-left-radius: 5px;
+      border-left: solid 1px #e2e2e3;
+    }
+    
+    ^ tbody > tr > td:last-child {
+      border-top-right-radius: 5px;
+      border-right: solid 1px #e2e2e3;
     }
 
     ^selected {

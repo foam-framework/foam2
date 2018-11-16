@@ -96,8 +96,14 @@ foam.CLASS({
         // })).
         start('div').
         addClass(this.myClass('header')).
-        add(this.data.label$).
-        add(this.data.CURRENT_VIEW).
+        start().
+          style({ float: 'left' }).
+          add(this.data.label$).
+        end().
+        start().
+          style({ float: 'right' }).
+          add(this.data.CURRENT_VIEW).
+        end().
         end('div').
         start('div').
         addClass(this.myClass('content')).
