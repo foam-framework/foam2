@@ -81,11 +81,10 @@ foam.CLASS({
     ^ .net-nanopay-ui-ActionView {
       width: 128px;
       height: 40px;
-      background: #0030f9;;
+      background: #0098db;
       color: white;
       border-radius: 4px;
       box-shadow: 0 1px 0 0 rgba(22, 29, 37, 0.05);
-      border: solid 1px #4a33f4;
       font-weight: 500;
       font-size: 14px;
     }
