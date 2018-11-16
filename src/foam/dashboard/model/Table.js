@@ -17,6 +17,9 @@ foam.CLASS({
       value: 5,
     },
     {
+      name: 'columns'
+    },
+    {
       name: 'views',
       factory: function() {
         return [
