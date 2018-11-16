@@ -37,6 +37,29 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  refines: 'foam.core.DateTime',
+  properties: [
+    {
+      name: 'chartJsFormatter',
+      value: function(d) {
+        if ( ! foam.Date.isInstance(d) ) { d = new Date(d) }
+        var month = d.getMonth() + 1
+        if ( month < 10 ) month = '0' + month
+        var day = d.getDate()
+        if ( day < 10 ) day = '0' + day
+        var year = d.getFullYear()
+
+        var hour = d.getHours();
+        var min = d.getMinutes();
+        if ( min < 10 ) min = '0' + min
+
+        return `${year}-${month}-${day} ${hour}:${min}`;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
   package: 'org.chartjs',
   name: 'AbstractChartCView',
   extends: 'foam.graphics.CView',
