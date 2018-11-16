@@ -92,7 +92,13 @@ foam.CLASS({
       hidden: true,
       factory: function() {
         return this.views[0][0];
-      }
+      },
+      adapt: function(_, n) {
+        if ( foam.String.isInstance(n) ) {
+          return this.views.find(function(o) { return o[1] == n })[0];
+        }
+        return n;
+      },
     },
     {
       // TODO: An enum would be better'
