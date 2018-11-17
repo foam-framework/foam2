@@ -48,7 +48,7 @@ foam.CLASS({
       name: 'contentHeight',
       expression: function(height) {
         // 70 is height of header as dictated by the ^header CSS class
-        return height - 70;
+        return height - 60;
       }
     }
   ],
@@ -58,7 +58,7 @@ foam.CLASS({
       border-radius: 2px;
       background: white;
       margin: 8px;
-      padding-bottom: 10px;
+      padding-bottom: 20px;
     }
 
     ^header {
@@ -69,7 +69,7 @@ foam.CLASS({
       margin-bottom: 16px;
       border-bottom: 1px solid #ccc;
       font-weight: bold;
-      height: 21px;
+      height: 20px;
       font-size: 20px;
     }
   `,
