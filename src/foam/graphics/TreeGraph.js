@@ -241,6 +241,17 @@
            }
 
            return moved;
+         },
+
+         function convergeTo(slot, newValue) {
+           /* Return true iff value was changed. */
+           var delta = Math.abs(slot.get() - newValue);
+           if ( delta < 1 ) {
+             slot.set(newValue);
+             return false;
+           }
+           slot.set((19*slot.get() + newValue)/20);
+           return true;
          }
        ],
 
@@ -257,18 +268,12 @@
              var w = this.maxRight - this.maxLeft + 50;
              if ( w > gw ) {
                var scaleX = Math.min(1, gw / w);
-               if ( scaleX != this.scaleX ) needsLayout = 1;
-               this.scaleX = Math.min(1, (19*this.scaleX+scaleX)/20);
+               needsLayout = this.convergeTo(this.scaleX$, scaleX) || needsLayout;
              }
 
              var x = (-this.maxLeft+25)/w * gw + 50;
-             if ( x != this.x ) {
-               this.x = (19*this.x + x)/20;
-               needsLayout = true;
-             }
-             if ( this.layout() || needsLayout ) {
-               this.doLayout();
-             }
+             needsLayout = this.convergeTo(this.x$, x);
+             if ( this.layout() || needsLayout ) this.doLayout();
              this.graph.invalidate();
            }
          }
