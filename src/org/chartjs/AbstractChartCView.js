@@ -3,17 +3,7 @@ foam.CLASS({
   properties: [
     {
       name: 'chartJsFormatter',
-      value: function(v) { return v },
-    },
-  ]
-});
-
-foam.CLASS({
-  refines: 'foam.mlang.sink.Sum',
-  properties: [
-    {
-      name: 'chartJsFormatter',
-      value: function(v) { return this.arg1.chartJsFormatter(v) },
+      value: function(v) { return v.toLocaleString() },
     },
   ]
 });
@@ -65,6 +55,7 @@ foam.CLASS({
   extends: 'foam.graphics.CView',
   requires: [
     'foam.dao.ProxySink',
+    'foam.mlang.sink.AbstractUnarySink',
     'foam.mlang.sink.GroupBy',
     'foam.mlang.sink.Plot',
     'org.chartjs.Lib',
@@ -76,14 +67,26 @@ foam.CLASS({
     'data',
     {
       name: 'xFormatter',
-      expression: function(propertyFormatters_) {
-        return propertyFormatters_[propertyFormatters_.length - 2]
+      expression: function(dataProperties_) {
+        return dataProperties_[dataProperties_.length - 2].chartJsFormatter
+      },
+    },
+    {
+      name: 'xAxisLabel',
+      expression: function(dataProperties_) {
+        return dataProperties_[dataProperties_.length - 2].label
       },
     },
     {
       name: 'yFormatter',
-      expression: function(propertyFormatters_) {
-        return propertyFormatters_[propertyFormatters_.length - 1]
+      expression: function(dataProperties_) {
+        return dataProperties_[dataProperties_.length - 1].chartJsFormatter
+      },
+    },
+    {
+      name: 'yAxisLabel',
+      expression: function(dataProperties_) {
+        return dataProperties_[dataProperties_.length - 1].label
       },
     },
     {
@@ -102,17 +105,17 @@ foam.CLASS({
       }
     },
     {
-      name: 'propertyFormatters_',
+      name: 'dataProperties_',
       expression: function(data) {
         var getData = function(data) {
           if ( this.GroupBy.isInstance(data) || this.Plot.isInstance(data) ) {
             return getData(data.arg1).concat(getData(data.arg2));
           } else if ( this.ProxySink.isInstance(data) ) {
             return getData(data.delegate);
-          } else if ( data.chartJsFormatter ) {
-            return [data.chartJsFormatter.bind(data)]
+          } else if ( this.AbstractUnarySink.isInstance(data) ) {
+            return getData(data.arg1);
           } else {
-            return [function(v) { return v }];
+            return [data]
           }
         }.bind(this);
         return getData(data)
@@ -139,12 +142,20 @@ foam.CLASS({
                   ticks: {
                     callback: this.yFormatter.bind(this),
                   },
+                  scaleLabel: {
+                    display: true,
+                    labelString: this.yAxisLabel,
+                  },
                 }
               ],
               xAxes: [
                 {
                   ticks: {
                     callback: this.xFormatter.bind(this),
+                  },
+                  scaleLabel: {
+                    display: true,
+                    labelString: this.xAxisLabel,
                   },
                 }
               ]
