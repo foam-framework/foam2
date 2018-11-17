@@ -58,14 +58,19 @@ foam.CLASS({
       border-radius: 2px;
       background: white;
       margin: 8px;
+      padding-bottom: 10px;
     }
 
     ^header {
-      padding: 16px;
+      padding-left: 24px;
+      padding-right: 16px;
+      padding-top: 20px;
+      padding-bottom: 20px;
       margin-bottom: 16px;
       border-bottom: 1px solid #ccc;
       font-weight: bold;
       height: 21px;
+      font-size: 20px;
     }
   `,
   methods: [
