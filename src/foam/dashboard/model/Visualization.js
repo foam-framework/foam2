@@ -82,6 +82,10 @@ foam.CLASS({
       hidden: true
     },
     {
+      name: 'configView',
+      factory: function() { return this.CURRENT_VIEW },
+    },
+    {
       name: 'currentView',
       view: function(args, x) {
         return {
