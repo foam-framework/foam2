@@ -22,7 +22,7 @@ foam.CLASS({
         SMALL:  [312, 358],
         MEDIUM: [624, 528],
         LARGE:  [936, 528],
-        XLARGE: [1560, 698],
+        XLARGE: [1580, 698],
       }
     }
   ],
