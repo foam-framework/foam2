@@ -192,6 +192,23 @@ foam.CLASS({
       javaCode: 'return this;',
       // Remove this javaReturns when it is inherited properly. (Traits are fixed).
       javaReturns: 'foam.mlang.Expr'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      javaReturns: 'void',
+      javaThrows: [ 'java.sql.SQLException' ],
+      args: [
+        {
+          name: 'stmt',
+          javaType: 'foam.dao.pg.IndexedPreparedStatement'
+        }
+      ],
+      javaCode: ' '
     }
   ]
 });
