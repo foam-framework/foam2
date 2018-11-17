@@ -63,7 +63,7 @@ foam.CLASS({
       this.viewChoices$.sub(this.changeView);
 
       this.views.forEach(function(view) {
-        view[0].data = view[0].data ? view[0].data : self.data;
+        view[0].data$ = view[0].data$ ? view[0].data$ : self.data$;
       });
       this.altStack.push(this.views[0][0]);
 

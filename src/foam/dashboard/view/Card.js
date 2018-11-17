@@ -20,7 +20,7 @@ foam.CLASS({
       value: {
         TINY:   [176, 358],
         SMALL:  [312, 358],
-        MEDIUM: [624, 358],
+        MEDIUM: [624, 528],
         LARGE:  [936, 528]
       }
     }
@@ -48,25 +48,31 @@ foam.CLASS({
       name: 'contentHeight',
       expression: function(height) {
         // 70 is height of header as dictated by the ^header CSS class
-        return height - 70;
+        return height - 60;
       }
     }
   ],
   css: `
-^ {
-  border: 2px solid #dae1e9;
-  border-radius: 2px;
-  background: white;
-}
+    ^ {
+      border: 2px solid #dae1e9;
+      border-radius: 2px;
+      background: white;
+      margin: 8px;
+      padding-bottom: 20px;
+    }
 
-^header {
-  padding: 16px;
-  margin-bottom: 16px;
-  border-bottom: 1px solid #ccc;
-  font-weight: bold;
-  height: 21px;
-}
-`,
+    ^header {
+      padding-left: 24px;
+      padding-right: 16px;
+      padding-top: 20px;
+      padding-bottom: 20px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #ccc;
+      font-weight: bold;
+      height: 20px;
+      font-size: 20px;
+    }
+  `,
   methods: [
     function initE() {
       this.onDetach(this.dashboardController.sub('dashboard', 'update', function() {
