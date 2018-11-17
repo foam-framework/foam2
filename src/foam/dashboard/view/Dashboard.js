@@ -3,7 +3,8 @@ foam.CLASS({
   name: 'Dashboard',
   extends: 'foam.u2.Element',
   imports: [
-    'setInterval'
+    'setInterval',
+    'clearInterval'
   ],
   exports: [
     'as dashboardController'
