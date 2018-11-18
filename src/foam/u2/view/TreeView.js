@@ -108,7 +108,7 @@ foam.CLASS({
         }, this.selection$, this.data$.dot('id'))).
         start('span').
           style({
-            visibility: this.hasChildren$.map(function(c) { return c ? 'visible' : 'hidden'; }),
+            'visibility': this.hasChildren$.map(function(c) { return c ? 'visible' : 'hidden'; }),
             'margin-right': '5px',
             'vertical-align': 'middle',
             'font-weight': 'bold',
@@ -251,21 +251,27 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      var M   = this.ExpressionsSingleton.create();
-      var of  = this.lookup(this.relationship.sourceModel);
+      var M = this.ExpressionsSingleton.create();
+      var of = this.lookup(this.relationship.sourceModel);
       var dao = this.data$proxy.where(
         M.NOT(M.HAS(of.getAxiomByName(this.relationship.inverseName))));
 
-      var self = this;
-      this.addClass(this.myClass()).
-        select(dao, function(obj) {
-          return self.TreeViewRow.create({
-            data: obj,
-            relationship: self.relationship,
-            expanded: self.startExpanded,
-            formatter: self.formatter
-          }, this);
-        });
+      var element = this.addClass(this.myClass());
+      dao.select().then((sink) => {
+        if ( ! this.selection && sink.array.length !== 0 ) {
+          this.selection = sink.array[0];
+        }
+        for ( var obj of sink.array ) {
+          element = element.tag(
+            this.TreeViewRow.create({
+              data: obj,
+              relationship: this.relationship,
+              expanded: this.startExpanded,
+              formatter: this.formatter
+            }, this)
+          );
+        }
+      });
     },
 
     function onObjDrop(obj, target) {
