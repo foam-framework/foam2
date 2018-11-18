@@ -21,7 +21,8 @@ foam.CLASS({
         TINY:   [176, 358],
         SMALL:  [312, 358],
         MEDIUM: [624, 528],
-        LARGE:  [936, 528]
+        LARGE:  [936, 528],
+        XLARGE: [1580, 698],
       }
     }
   ],
@@ -108,7 +109,7 @@ foam.CLASS({
         end().
         start().
           style({ float: 'right' }).
-          add(this.data.CURRENT_VIEW).
+          add(this.data.configView$).
         end().
         end('div').
         start('div').

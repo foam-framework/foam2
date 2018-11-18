@@ -5,6 +5,7 @@ foam.ENUM({
     'tiny',
     'small',
     'medium',
-    'large'
+    'large',
+    'xlarge'
   ]
 });
