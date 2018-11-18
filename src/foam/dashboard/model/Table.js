@@ -28,5 +28,14 @@ foam.CLASS({
         ]
       }
     },
+  ],
+  listeners: [
+    {
+      name: 'update',
+      isFramed: true,
+      code: function() {
+        // no-op
+      }
+    }
   ]
 });

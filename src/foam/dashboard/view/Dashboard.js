@@ -3,7 +3,8 @@ foam.CLASS({
   name: 'Dashboard',
   extends: 'foam.u2.Element',
   imports: [
-    'setInterval'
+    'setInterval',
+    'clearInterval'
   ],
   exports: [
     'as dashboardController'
@@ -27,8 +28,7 @@ foam.CLASS({
 `,
   methods: [
     function initE() {
-      var timeout = -1;
-      //      var timeout = this.setInterval(this.onUpdate, 5000);
+      var timeout = this.setInterval(this.onUpdate, 5000);
       var view = this;
 
       this.onDetach(function() {
