@@ -246,11 +246,11 @@
          function convergeTo(slot, newValue) {
            /* Return true iff value was changed. */
            var delta = Math.abs(slot.get() - newValue);
-           if ( delta < 0.01 ) {
+           if ( delta < 0.001 ) {
              slot.set(newValue);
              return false;
            }
-           slot.set((19*slot.get() + newValue)/20);
+           slot.set((14*slot.get() + newValue)/15);
            return true;
          }
        ],
