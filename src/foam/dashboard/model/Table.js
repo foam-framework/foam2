@@ -17,7 +17,8 @@ foam.CLASS({
       value: 5,
     },
     {
-      name: 'columns'
+      name: 'columns',
+      hidden: true
     },
     {
       name: 'views',
