@@ -33,7 +33,7 @@ foam.CLASS({
       view: { class: 'foam.u2.DetailView' },
       postSet: function(_, data) {
         if ( ! data ) {
-          this.objectClass = '';
+          this.objectClass = undefined;
         } else if ( data.cls_.id != this.objectClass ) {
           this.objectClass = data.cls_.id;
         }
