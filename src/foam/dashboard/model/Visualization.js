@@ -17,7 +17,8 @@ foam.CLASS({
     {
       class: 'String',
       // TODO: Write a predicate view
-      name: 'predicate'
+      name: 'predicate',
+      hidden: true
     },
     {
       // TODO: A more complete Ordering view would be useful rather
@@ -26,7 +27,8 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.core.Property',
       name: 'order',
-      view: { class: 'foam.u2.view.ExprView' }
+      view: { class: 'foam.u2.view.ExprView' },
+      hidden: true
     },
     {
       class: 'Boolean',
@@ -36,6 +38,7 @@ foam.CLASS({
     {
       class: 'String',
       label: 'DAO',
+      hidden: true,
       name: 'daoName'
     },
     {
@@ -62,6 +65,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.dao.Sink',
+      hidden: true,
       view: {
         class: 'foam.u2.view.FObjectView',
         choices: [
@@ -83,6 +87,7 @@ foam.CLASS({
     },
     {
       name: 'configView',
+      hidden: true,
       factory: function() { return this.CURRENT_VIEW },
     },
     {
