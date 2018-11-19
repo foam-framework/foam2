@@ -1,18 +1,17 @@
 package foam.dao;
 
-import foam.core.*;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
+import foam.core.ClassInfo;
+import foam.core.FObject;
+import foam.core.XMLSupport;
+import org.w3c.dom.Document;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-import org.w3c.dom.Document;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 
 public class XMLDAO
   extends MapDAO
@@ -79,8 +78,8 @@ public class XMLDAO
       DocumentBuilder        dBuilder  = dbFactory.newDocumentBuilder();
       Document               doc       = dBuilder.newDocument();
 
-      XMLSupport.toXML(ls.getArray(), doc, null);
-      XMLSupport.toXMLFile(doc, fileName);
+//      XMLSupport.toXML(ls.getArray(), doc, null);
+//      XMLSupport.toXMLFile(doc, fileName);
     } catch (ParserConfigurationException ex) {
     }
   }

@@ -257,8 +257,13 @@ foam.CLASS({
         M.NOT(M.HAS(of.getAxiomByName(this.relationship.inverseName))));
 
       var self = this;
+      var isFirstSet = false;
       this.addClass(this.myClass()).
         select(dao, function(obj) {
+          if ( ! isFirstSet && ! self.selection ) {
+            self.selection = obj;
+            isFirstSet = true;
+          }
           return self.TreeViewRow.create({
             data: obj,
             relationship: self.relationship,
