@@ -131,76 +131,6 @@ public class XMLSupport {
     }
   }
 
-  public static void toXML(List<FObject> objList, Document doc, Element e) {
-    Iterator i = objList.iterator();
-    if ( objList.size() > 1 ) {
-      Element rootElement = doc.createElement("objects");
-      // Case for nested object arrays
-      if ( doc.hasChildNodes() ) {
-        e.appendChild(rootElement);
-      } else {
-        doc.appendChild(rootElement);
-      }
-    }
-    while ( i.hasNext() ) {
-      toXML((FObject) i.next(), doc, e) ;
-    }
-  }
-
-  public static void toXML(FObject obj, Document doc, Element e) {
-    Element objElement = doc.createElement("object");
-    objElement.setAttribute("class", obj.getClass().toString().replaceAll("class ", ""));
-    writeToXML(obj, doc, objElement);
-    if ( e != null ) {
-      // Append to element (nested object)
-      e.appendChild(objElement);
-    } else if ( doc.hasChildNodes() ) {
-      // Append to existing root
-      Element root = doc.getDocumentElement();
-      root.appendChild(objElement);
-    } else {
-      // New root element
-      doc.appendChild(objElement);
-    }
-  }
-
-  // Write properties from given FObject
-  public static void writeToXML(FObject obj, Document doc, Element objElement) {
-    ClassInfo cInfo = obj.getClassInfo();
-    List props = cInfo.getAxiomsByClass(PropertyInfo.class);
-    Iterator propItr = props.iterator();
-
-    while ( propItr.hasNext() ) {
-      PropertyInfo prop = (PropertyInfo) propItr.next();
-      prop.toXML(obj, doc, objElement);
-    }
-  }
-
-  public static void toXMLFile (Document doc, String fileName) {
-    try {
-      DOMSource source = new DOMSource(doc);
-      StreamResult result = new StreamResult(new File(fileName));
-      Transformer transformer = createTransformer();
-      transformer.transform(source, result);
-    } catch (TransformerConfigurationException ex) {
-    } catch (TransformerException ex ) {
-    }
-  }
-
-  // Returns XML string as full XML document string with document tags
-  public static String toXMLString(List<FObject> objArray) {
-    Document doc = createDoc();
-    toXML(objArray, doc, null);
-    return toXMLString(doc);
-  }
-
-  // Returns XML string as partial XML string with only object tags
-  public static String toXMLString(FObject obj) {
-    Document doc = createDoc();
-    toXML(obj, doc, null);
-    return toXMLString(doc);
-  }
-
   public static Document createDoc() {
     Document doc = null;
     try {
@@ -222,18 +152,5 @@ public class XMLSupport {
     } catch (TransformerConfigurationException ex) {
     }
     return transformer;
-  }
-
-  public static String toXMLString (Document doc) {
-    try {
-      DOMSource domSource = new DOMSource(doc);
-      StringWriter writer = new StringWriter();
-      StreamResult result = new StreamResult(writer);
-      Transformer transformer = createTransformer();
-      transformer.transform(domSource, result);
-      return writer.toString();
-    } catch (TransformerException ex) {
-    }
-    return null;
   }
 }

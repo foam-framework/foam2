@@ -7,6 +7,7 @@
 package foam.core;
 
 import foam.dao.pg.IndexedPreparedStatement;
+import foam.lib.xml.Outputter;
 import foam.nanos.logger.Logger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -42,6 +43,11 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public void toCSV(foam.lib.csv.Outputter outputter, Object value) {
+    outputter.output(value);
+  }
+
+  @Override
+  public void toXML(foam.lib.xml.Outputter outputter, Object value) {
     outputter.output(value);
   }
 
@@ -96,16 +102,6 @@ public abstract class AbstractPropertyInfo
       logger.error("Premature end of XML file");
     }
     return "";
-  }
-
-  @Override
-  public void toXML(FObject obj, Document doc, Element objElement) {
-    Object value = this.f(obj);
-    if ( value != null && value != "" ) {
-      Element prop = doc.createElement(this.getName());
-      prop.appendChild(doc.createTextNode(value.toString()));
-      objElement.appendChild(prop);
-    }
   }
 
   @Override
