@@ -245,15 +245,14 @@ public class DigWebAgent
               out.println(outputterJson.toString());
             }
           } else if ( Format.XML == format ) {
-            XMLSupport xmlSupport = new XMLSupport();
+            foam.lib.xml.Outputter outputterXml = new foam.lib.xml.Outputter(OutputterMode.NETWORK);
+            outputterXml.output(sink.getArray().toArray());
 
+            //resp.setContentType("application/xml");
             if ( emailSet ) {
-              String xmlData = "<textarea style=\"width:700;height:400;\" rows=10 cols=120>" + xmlSupport.toXMLString(sink.getArray()) + "</textarea>";
-
-              output(x, xmlData);
+              output(x, "<textarea style=\"width:700;height:400;\" rows=10 cols=120>" + outputterXml.toString() + "</textarea>");
             } else {
-              //resp.setContentType("application/xml");
-              out.println(xmlSupport.toXMLString(sink.getArray()));
+              out.println(outputterXml.toString());
             }
           } else if ( Format.CSV == format ) {
             foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);
@@ -430,8 +429,9 @@ public class DigWebAgent
     } else if ( format == Format.XML )  {
       //output error in xml format
 
-      XMLSupport xmlSupport = new XMLSupport();
-      out.println(xmlSupport.toXMLString(error));
+      foam.lib.xml.Outputter outputterXml = new foam.lib.xml.Outputter(OutputterMode.NETWORK);
+      outputterXml.output(error);
+      out.println(outputterXml.toString());
 
     } else if ( format == Format.CSV )  {
       //output error in csv format

@@ -246,11 +246,11 @@
          function convergeTo(slot, newValue) {
            /* Return true iff value was changed. */
            var delta = Math.abs(slot.get() - newValue);
-           if ( delta < 1 ) {
+           if ( delta < 0.001 ) {
              slot.set(newValue);
              return false;
            }
-           slot.set((19*slot.get() + newValue)/20);
+           slot.set((14*slot.get() + newValue)/15);
            return true;
          }
        ],
@@ -262,17 +262,16 @@
            documentation: 'Animate layout until positions stabilize',
            code: function() {
              var needsLayout = false;
-
              // Scale and translate the view to fit in the available window
-             var gw = this.graph.width-100;
-             var w = this.maxRight - this.maxLeft + 50;
+             var gw = this.graph.width-110;
+             var w  = this.maxRight - this.maxLeft + 55;
              if ( w > gw ) {
                var scaleX = Math.min(1, gw / w);
                needsLayout = this.convergeTo(this.scaleX$, scaleX) || needsLayout;
              }
 
-             var x = (-this.maxLeft+25)/w * gw + 50;
-             needsLayout = this.convergeTo(this.x$, x);
+             var x = (-this.maxLeft+25)/w * gw + 55;
+             needsLayout = this.convergeTo(this.x$, x) || needsLayout;
              if ( this.layout() || needsLayout ) this.doLayout();
              this.graph.invalidate();
            }
