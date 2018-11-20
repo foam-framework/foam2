@@ -49,7 +49,7 @@ foam.CLASS({
       this.addClass(this.myClass());
 
       if ( this.choices && Array.isArray(this.choices) ) {
-        this.tag(this.OBJECT_CLASS.view, {choices: this.choices, data$: this.objectClass$});
+        this.tag(this.OBJECT_CLASS, {choices: this.choices});
         /*
          * NOTE:
          * Displays the first choice on init.
