@@ -18,6 +18,11 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'value'
+    },
+    {
+      class: 'String',
+      name: 'label',
+      value: 'Count'
     }
   ],
 
@@ -39,6 +44,103 @@ foam.CLASS({
       swiftCode: 'value = 0',
     },
     function toString() { return 'COUNT()'; }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  name: 'Sequence',
+  extends: 'foam.dao.AbstractSink',
+  implements: [ 'foam.core.Serializable' ],
+
+  properties: [
+    {
+      class: 'Array',
+      of: 'foam.dao.Sink',
+      name: 'args'
+    },
+  ],
+
+  methods: [
+    {
+      name: 'put',
+      code: function(obj, s) {
+        this.args.forEach(function(a) { a.put(obj, s); });
+      }
+    },
+    {
+      name: 'remove',
+      code: function(obj, s) {
+        this.args.forEach(function(a) { a.remove(obj, s); });
+      }
+    },
+    {
+      name: 'reset',
+      code: function(s) {
+        this.args.forEach(function(a) { a.reset(s); });
+      }
+    },
+    function toString() {
+      return 'SEQ(' + this.args.map(function(a) { return a.toString(); }).join(',') + ')';
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  name: 'Plot',
+  extends: 'foam.dao.AbstractSink',
+  implements: [ 'foam.core.Serializable' ],
+
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg1'
+    },
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg2'
+    },
+    {
+      class: 'List',
+      name: 'points',
+      factory: function() { return [] },
+    }
+  ],
+
+  methods: [
+    {
+      name: 'put',
+      code: function(obj, s) {
+        this.points.push([this.arg1.f(obj), this.arg2.f(obj)]);
+        // TODO: Array properties should provide convenience for this,
+        // like this.point$.push() or something.
+        this.pub('propertyChange', 'points', this.points$);
+      },
+      javaCode: `
+        java.util.List point = new java.util.ArrayList();
+        point.add(getArg1().f(obj));
+        point.add(getArg2().f(obj));
+        getPoints().add(point);
+      `,
+    },
+    {
+      name: 'remove',
+      code: function(obj, s) {
+        // TODO
+      }
+    },
+    {
+      name: 'reset',
+      code: function(s) {
+        this.points = [];
+      }
+    },
+    function toString() {
+      return 'PLOT(' + this.arg1.toString() + ',' + this.arg2.toString() + ')';
+    }
   ]
 });
 
@@ -99,7 +201,6 @@ foam.INTERFACE({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.mlang',
   name: 'ExprProperty',
@@ -116,7 +217,11 @@ foam.CLASS({
       name: 'type',
       value: 'foam.mlang.Expr'
     },
-    ['javaJSONParser', 'new foam.lib.json.ExprParser()']
+    ['javaJSONParser', 'new foam.lib.json.ExprParser()'],
+    {
+      name: 'view',
+      value: { class: 'foam.u2.view.ExprView' }
+    }
   ],
 
   methods: [
@@ -140,6 +245,30 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'ExprArrayProperty',
+  extends: 'FObjectArray',
+  requires: [
+    'foam.mlang.ExprProperty'
+  ],
+
+  documentation: 'Property for Expr values.',
+
+  properties: [
+    ['of', 'foam.mlang.Expr'],
+    {
+      name: 'adaptArrayElement',
+      value: function(_, o, p) {
+        // TODO: This is probably a little hacky, should have a more
+        // declarative way of saying all the ways things can be
+        // adapted to an expression.
+        return this.ExprProperty.prototype.adaptValue.call(this, o);
+      }
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.mlang',
@@ -150,7 +279,11 @@ foam.CLASS({
       name: 'type',
       value: 'foam.dao.Sink'
     },
-    ['javaJSONParser', 'new foam.lib.json.FObjectParser()']
+    ['javaJSONParser', 'new foam.lib.json.FObjectParser()'],
+    {
+      name: 'view',
+      value: { class: 'foam.u2.view.FObjectView' }
+    }
   ],
 
   documentation: 'Property for Sink values.'
@@ -320,7 +453,7 @@ foam.CLASS({
       args: [
         {
           name: 'stmt',
-          javaType: 'foam.dao.pg.IndexedPreparedStatement'
+          type: 'foam.dao.pg.IndexedPreparedStatement'
         }
       ],
       javaCode: '//noop',
@@ -343,6 +476,22 @@ foam.CLASS({
       name: 'partialEval',
       code: function partialEval() { return this; },
       javaCode: 'return this;'
+    },
+    {
+      name: 'createStatement',
+      returns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      javaThrows: [ 'java.sql.SQLException' ],
+      args: [
+        {
+          name: 'stmt',
+          type: 'foam.dao.pg.IndexedPreparedStatement'
+        }
+      ],
+      javaCode: ' '
     }
   ]
 });
@@ -1724,17 +1873,19 @@ foam.CLASS({
         var value = this.arg1.f(obj);
 
         return ! (
+          value === 0         ||
           value === undefined ||
-            value === null      ||
-            value === ''        ||
-            (Array.isArray(value) && value.length === 0) );
+          value === null      ||
+          value === ''        ||
+          (Array.isArray(value) && value.length === 0) );
       },
       // TODO(kgr): Instead of checking type, use polymorphims and add a
       // type-specific has() method to the Property.
       javaCode: `Object value = getArg1().f(obj);
-  return ! (value == null ||
-    (value instanceof String && ((String)value).length() == 0) ||
-    (value.getClass().isArray() && java.lang.reflect.Array.getLength(value) == 0));`
+        return ! (value == null ||
+          (value instanceof Number && ((Number) value).intValue() == 0) ||
+          (value instanceof String && ((String) value).length() == 0) ||
+          (value.getClass().isArray() && java.lang.reflect.Array.getLength(value) == 0));`
     },
     {
       name: 'createStatement',
@@ -2041,17 +2192,20 @@ foam.CLASS({
     {
       class: 'Map',
       name: 'groups',
+      hidden: true,
       factory: function() { return {}; },
       javaFactory: 'return new java.util.HashMap<Object, foam.dao.Sink>();'
     },
     {
       class: 'List',
+      hidden: true,
       name: 'groupKeys',
       javaFactory: 'return new java.util.ArrayList();',
       factory: function() { return []; }
     },
     {
       class: 'Boolean',
+      hidden: true,
       name: 'processArrayValuesIndividually',
       documentation: 'If true, each value of an array will be entered into a separate group.',
       factory: function() {
@@ -2108,6 +2262,7 @@ return getGroupKeys();`
           this.groupKeys.push(key);
         }
         group.put(obj, sub);
+        this.pub('propertyChange', 'groups');
       },
       javaCode:
 `foam.dao.Sink group = (foam.dao.Sink) getGroups().get(key);
@@ -2117,6 +2272,11 @@ return getGroupKeys();`
    getGroupKeys().add(key);
  }
  group.put(obj, sub);`
+    },
+    function reset() {
+      this.arg2.reset();
+      this.groups = undefined;
+      this.groupKeys = undefined;
     },
     {
       name: 'put',
@@ -2172,6 +2332,18 @@ return clone;`
         return this.groups.toString();
       },
       javaCode: 'return this.getGroups().toString();'
+    },
+
+    function toE(_, x) {
+      return x.E('table').
+        add(this.slot(function(arg1, groups) {
+          return x.E('tbody').
+            forEach(Object.keys(groups), function(g) {
+              this.start('tr').
+                start('td').add(g).end().
+                start('td').add(groups[g]).end()
+            });
+        }));
     }
   ]
 });
@@ -2603,6 +2775,45 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  name: 'Average',
+  extends: 'foam.mlang.sink.AbstractUnarySink',
+
+  documentation: 'A Sink which averages put() values.',
+
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg1'
+    },
+    {
+      class: 'Double',
+      name: 'value',
+      value: 0
+    },
+    {
+      class: 'Long',
+      name: 'count',
+      value: 0
+    }
+  ],
+
+  methods: [
+    {
+      name: 'put',
+      code: function put(obj, sub) {
+        this.count++;
+        this.value = ( this.value + this.arg1.f(obj) ) / this.count;
+      },
+      javaCode: `
+setCount(getCount() + 1);
+setValue((getValue() + ((Number)this.getArg1().f(obj)).doubleValue()) / getCount());
+      `,
+    },
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.mlang.expr',
@@ -2664,9 +2875,11 @@ foam.CLASS({
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Explain',
     'foam.mlang.sink.GroupBy',
+    'foam.mlang.sink.Plot',
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Max',
     'foam.mlang.sink.Min',
+    'foam.mlang.sink.Sequence',
     'foam.mlang.sink.Sum',
     'foam.mlang.sink.Unique'
   ],
@@ -2712,12 +2925,15 @@ foam.CLASS({
 
     function UNIQUE(expr, sink) { return this.Unique.create({ expr: expr, delegate: sink }); },
     function GROUP_BY(expr, sinkProto) { return this.GroupBy.create({ arg1: expr, arg2: sinkProto }); },
+    function PLOT(x, y) { return this.Plot.create({ arg1: x, arg2: y }); },
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
     function COUNT() { return this.Count.create(); },
     function MAX(arg1) { return this.Max.create({ arg1: arg1 }); },
     function MIN(arg1) { return this.Min.create({ arg1: arg1 }); },
     function SUM(arg1) { return this.Sum.create({ arg1: arg1 }); },
+    function AVG(arg1) { return this.Average.create({ arg1: arg1 }); },
+    function SEQ() { return this._nary_("Sequence", arguments); },
 
     {
       name: 'DESC',

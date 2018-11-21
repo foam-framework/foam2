@@ -207,6 +207,9 @@ foam.CLASS({
         if ( foam.dao.DAO.isInstance(service) ) {
           this.__context__.stack.push({
             class: 'foam.comics.BrowserView',
+            createEnabled: true,
+            editEnabled: true,
+            exportEnabled: true,
             data: service
           });
         }

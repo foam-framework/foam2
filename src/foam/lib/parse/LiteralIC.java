@@ -6,33 +6,35 @@
 
 package foam.lib.parse;
 
-import foam.lib.parse.PStream;
-import foam.lib.parse.Parser;
-import foam.lib.parse.ParserContext;
-
-public class LiteralIC implements Parser {
-  private String string;
-  private Object value;
+public class LiteralIC
+  implements Parser
+{
+  protected String string_;
+  protected Object value_;
 
   public LiteralIC(String s) {
     this(s, s);
   }
 
   public LiteralIC(String s, Object v) {
-    string = s.toUpperCase();
-    value = v;
+    string_ = s.toUpperCase();
+    value_  = v;
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    for ( int i = 0 ; i < string.length() ; i++ ) {
+    for ( int i = 0 ; i < string_.length() ; i++ ) {
       if ( ! ps.valid() ||
-          Character.toUpperCase(ps.head()) != string.charAt(i) ) {
+          Character.toUpperCase(ps.head()) != string_.charAt(i) ) {
         return null;
       }
 
       ps = ps.tail();
     }
 
-    return ps.setValue(value);
+    return ps.setValue(value_);
+  }
+
+  public String toString() {
+    return "LiteralIC(" + string_ + ")";
   }
 }

@@ -586,6 +586,7 @@ foam.CLASS({
   flags: ['web'],
 
   requires: [
+    'foam.core.PromiseSlot',
     'foam.dao.MergedResetSink',
     'foam.u2.AttrSlot',
     'foam.u2.Entity',
@@ -1162,7 +1163,7 @@ foam.CLASS({
       } else {
         if ( value === undefined || value === null || value === false ) {
           this.removeAttribute(name);
-          return;
+          return this;
         }
 
         if ( foam.core.Slot.isInstance(value) ) {
@@ -1185,6 +1186,8 @@ foam.CLASS({
           this.onSetAttr(name, value);
         }
       }
+
+      return this;
     },
 
     function removeAttribute(name) {
@@ -1515,6 +1518,8 @@ foam.CLASS({
             e = this.slotE_(e);
           }
           es.push(e);
+        } else if ( c.then ) {
+          this.add(this.PromiseSlot.create({ promise: c }));
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
         } else if ( foam.core.Slot.isInstance(c) ) {
@@ -1681,11 +1686,20 @@ foam.CLASS({
       return this;
     },
 
-    function forEach(a, f) {
-      for ( var i = 0 ; i < a.length ; i++ ) {
-        f.call(this, a[i], i);
-      }
+    function callIfElse(bool, iff, elsef, args) {
+      (bool ? iff : elsef).apply(this, args);
 
+      return this;
+    },
+
+    /**
+     * Call the given function on each element in the array. In the function,
+     * `this` will refer to the element.
+     * @param {Array} array An array to loop over.
+     * @param {Function} fn A function to call for each item in the given array.
+     */
+    function forEach(array, fn) {
+      array.forEach(fn.bind(this));
       return this;
     },
 
@@ -1787,7 +1801,7 @@ foam.CLASS({
     function addClass_(oldClass, newClass) {
       /* Replace oldClass with newClass. Called by cls(). */
       if ( oldClass === newClass ) return;
-      this.removeClass(oldClass);
+      if ( oldClass ) this.removeClass(oldClass);
       if ( newClass ) {
         if ( ! this.CSS_CLASSNAME_PATTERN.test(newClass) ) {
           console.log('!!!!!!!!!!!!!!!!!!! Invalid CSS ClassName: ', newClass);

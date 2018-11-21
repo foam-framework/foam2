@@ -687,8 +687,8 @@ class SwiftTestsTests: XCTestCase {
       "name": "Alan Kay",
     ])!) as! foam_nanos_demo_relationship_Professor
 
-    let adam = try studentDAO.find(1) as! foam_nanos_demo_relationship_Student
-    let mike = try studentDAO.find(2) as! foam_nanos_demo_relationship_Student
+    let adam = try studentDAO.find(0) as! foam_nanos_demo_relationship_Student
+    let mike = try studentDAO.find(1) as! foam_nanos_demo_relationship_Student
 
     let cs101 = try courseDAO.find("CS 101") as! foam_nanos_demo_relationship_Course
     let cs201 = try courseDAO.find("CS 201") as! foam_nanos_demo_relationship_Course

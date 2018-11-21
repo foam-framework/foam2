@@ -54,10 +54,10 @@ foam.CLASS({
           cs.push(self.E('option').attrs({
             value: -1,
             selected: self.data === -1
-          }).add(self.placeholder));
+          }).add(placeholder));
         }
 
-        for ( var i = 0; i < choices.length; i++ ) {
+        for ( var i = 0 ; i < choices.length ; i++ ) {
           var c = choices[i];
           let value = c[1];
           let e = self.E('option').attrs({

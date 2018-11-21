@@ -61,8 +61,17 @@ foam.CLASS({
           // Force hard reload when app version updates
           self.nSpecDAO.find("appConfig").then(function(spec) {
             var appConfig = spec.service;
-            var version   = appConfig.version;
 
+            client.exports.push(spec.name);
+            references = references.concat(foam.json.references(self.__context__, appConfig));
+            client.properties.push({
+              name: spec.name,
+              factory: function() {
+                return foam.json.parse(appConfig, null, this);
+              }
+            });
+
+            var version   = appConfig.version;
             if ( "CLIENT_VERSION" in localStorage ) {
               var oldVersion = localStorage.CLIENT_VERSION;
               if ( version != oldVersion ) {

@@ -52,6 +52,12 @@ foam.CLASS({
       value: true
     },
     {
+      class: 'Boolean',
+      name: 'loginEnabled',
+      documentation: 'Enables user to login',
+      value: true
+    },
+    {
       class: 'DateTime',
       name: 'lastLogin',
       documentation: 'Date and time user last logged in.'
@@ -269,7 +275,7 @@ foam.CLASS({
       documentation: 'User\' website.',
       displayWidth: 80,
       width: 2048,
-      validateObj: function (website) {
+      validateObj: function(website) {
         var websiteRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,})/;
 
         if ( website.length > 0 && ! websiteRegex.test(website) ) {
@@ -286,6 +292,12 @@ foam.CLASS({
       class: 'DateTime',
       name: 'lastModified',
       documentation: 'Last modified date.'
+    },
+    {
+      class: 'Boolean',
+      name: 'system',
+      value: false,
+      documentation: 'Indicate system accounts.'
     }
   ],
 
@@ -320,6 +332,7 @@ foam.RELATIONSHIP({
   }
 });
 
+
 foam.RELATIONSHIP({
   sourceModel: 'foam.nanos.auth.User',
   targetModel: 'foam.nanos.fs.File',
@@ -330,6 +343,7 @@ foam.RELATIONSHIP({
     transient: true
   }
 });
+
 
 foam.RELATIONSHIP({
   cardinality: '1:*',
@@ -344,4 +358,26 @@ foam.RELATIONSHIP({
     hidden: false,
     tableWidth: 120
   }
+});
+
+// Relationship used in the agent auth service. Determines permission list when acting as a entity.
+foam.RELATIONSHIP({
+  cardinality: '*:*',
+  sourceModel: 'foam.nanos.auth.User',
+  targetModel: 'foam.nanos.auth.User',
+  forwardName: 'entities',
+  inverseName: 'agents',
+  junctionDAOKey: 'agentJunctionDAO',
+});
+
+foam.CLASS({
+  refines: 'foam.nanos.auth.UserUserJunction',
+
+  properties: [
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.Group',
+      name: 'group'
+    }
+  ]
 });

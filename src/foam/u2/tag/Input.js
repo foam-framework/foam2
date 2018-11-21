@@ -56,17 +56,64 @@ foam.CLASS({
       // documentation: 'When set, will limit the length of the input to a certain number'
     },
     'type',
-    'placeholder'
+    'placeholder',
+    {
+      name: 'choices',
+      documentation: 'Array of [value, text] choices. You can pass in just ' +
+          'an array of strings, which are expanded to [str, str]. Can also ' +
+          'be a map, which results in [key, value] pairs listed in ' +
+          'enumeration order.',
+      factory: function() { return []; },
+      adapt: function(old, nu) {
+        if ( typeof nu === 'object' && ! Array.isArray(nu) ) {
+          var out = [];
+          for ( var key in nu ) {
+            if ( nu.hasOwnProperty(key) ) out.push([ key, nu[key] ]);
+          }
+          if ( this.dynamicSize ) {
+            this.size = Math.min(out.length, this.maxSize);
+          }
+          return out;
+        }
+
+        nu = foam.Array.clone(nu);
+
+        // Upgrade single values to [value, value].
+        for ( var i = 0; i < nu.length; i++ ) {
+          if ( ! Array.isArray(nu[i]) ) {
+            nu[i] = [ nu[i], nu[i] ];
+          }
+        }
+
+        if ( this.dynamicSize ) this.size = Math.min(nu.length, this.maxSize);
+        return nu;
+      }
+    }
   ],
 
   methods: [
     function initE() {
       this.SUPER();
+      var self = this;
 
       if ( this.size          ) this.setAttribute('size',        this.size);
       if ( this.type          ) this.setAttribute('type',        this.type);
       if ( this.placeholder   ) this.setAttribute('placeholder', this.placeholder);
       if ( this.maxLength > 0 ) this.setAttribute('maxlength',   this.maxLength);
+      if ( this.choices && this.choices.length ) {
+        this.
+          setAttribute('list', this.id + '-datalist').
+          start('datalist').
+            // TODO: I should be able to just set the 'id' in the start() above
+            // but it doesn't work. Find out why.
+            call(function() { this.id = self.id + '-datalist' }).
+            forEach(this.choices, function(c) {
+              var key   = c[0];
+              var label = c[1];
+              this.start('option').attrs({value: key}).add(label).end();
+            }).
+          end();
+      }
 
       this.initCls();
       this.link();

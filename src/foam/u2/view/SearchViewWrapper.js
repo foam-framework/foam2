@@ -34,7 +34,7 @@ foam.CLASS({
     }
 
     ^ .section {
-      padding: 13px 16px;
+      padding: 8px 16px;
     }
 
     ^ .section:first-of-type {

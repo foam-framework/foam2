@@ -21,6 +21,7 @@ foam.CLASS({
       expression: function(name) {
         var reserved = [
           'description',
+          'internal'
         ];
         if ( reserved.indexOf(name) != -1 ) {
           return 'swift_' + name;
@@ -431,7 +432,7 @@ class PInfo: PropertyInfo {
       for s in obj.<%=p.swiftExpressionSubscriptionName%>! { s.detach() }
     }
   <% } %>
-    let oldValue: Any? = obj.<%=p.swiftInitedName%> ? obj.`<%=p.name%>` : nil
+    let oldValue: Any? = obj.<%=p.swiftInitedName%> ? obj.`<%=p.swiftVarName%>` : nil
     obj.<%=p.swiftValueName%> = obj.<%=p.swiftPreSetFuncName%>(oldValue, obj.<%=p.swiftAdaptFuncName%>(oldValue, value))
     obj.<%=p.swiftInitedName%> = true
     obj.<%=p.swiftPostSetFuncName%>(oldValue, obj.<%=p.swiftValueName%>)

@@ -12,19 +12,18 @@ import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
 import foam.util.SafetyUtil;
-import org.apache.commons.io.IOUtils;
-
 import java.io.*;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
+import org.apache.commons.io.IOUtils;
 
 public class Outputter
   extends AbstractSink
   implements foam.lib.Outputter
 {
-  protected ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
+  protected static ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
     protected SimpleDateFormat initialValue() {
       SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -80,6 +79,10 @@ public class Outputter
       writer_ = new PrintWriter(stringWriter_);
     }
     stringWriter_.getBuffer().setLength(0);
+  }
+
+  public void setWriter(PrintWriter writer) {
+    writer_ = writer;
   }
 
   protected void outputUndefined() {
@@ -313,8 +316,15 @@ public class Outputter
     return false;
   }
 
+  public void outputJSONJFObject(FObject o) {
+    writer_.append("p(");
+    outputFObject(o);
+    writer_.append(")\r\n");
+  }
+
   protected void outputFObject(FObject o) {
     ClassInfo info = o.getClassInfo();
+
     writer_.append("{");
     if ( outputClassNames_ ) {
       writer_.append(beforeKey_());

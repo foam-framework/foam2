@@ -20,24 +20,28 @@ foam.CLASS({
       background: #edf0f5;
       margin: 0;
     }
-    table {
+    table.foam-u2-view-TableView {
       border-collapse: collapse;
+      border-style: hidden;
       margin: auto;
       width: 962px;
     }
-    thead > tr > th {
-      font-family: 'Roboto';
-      font-size: 14px;
-      background-color: rgba(110, 174, 195, 0.2);
-      color: #093649;
-      line-height: 1.14;
-      letter-spacing: 0.3px;
+    .foam-u2-view-TableView thead > tr > th {
+      color: #2b2b2b;
       border-spacing: 0;
       text-align: left;
       padding-left: 15px;
       height: 40px;
+      font-family: 'Roboto';
+      font-size: 14px;
+      font-style: normal;
+      font-stretch: normal;
+      font-weight: 900;
+      line-height: 1.5;
+      letter-spacing: 0.4px;
+      background: transparent;
     }
-    tbody > tr > th > td {
+    .foam-u2-view-TableView-row > th > td {
       font-size: 12px;
       letter-spacing: 0.2px;
       text-align: left;
@@ -54,7 +58,7 @@ foam.CLASS({
       color: #093649;
     }
     .foam-u2-view-TableView td {
-      font-family: Roboto;
+      font-family: 'Roboto';
       font-size: 12px;
       line-height: 1.33;
       letter-spacing: 0.2px;
@@ -62,12 +66,57 @@ foam.CLASS({
       font-size: 12px;
       color: #093649;
     }
-    .foam-u2-view-TableView tbody > tr {
+    .foam-u2-view-TableView-row {
       height: 60px;
       background: white;
     }
-    .foam-u2-view-TableView tbody > tr:nth-child(odd) {
-      background: #f6f9f9;
+    .New {
+      width: 35px;
+      height: 20px;
+      border-radius: 100px;
+      background-color: #eedb5f;
+    }
+    .Updated {
+      width: 60px;
+      height: 20px;
+      border-radius: 100px;
+      background-color: #093649;
+    }
+    .Open {
+      width: 49px;
+      height: 20px;
+      border-radius: 100px;
+      background-color: #ee5f71;
+    }
+    .Pending {
+      width: 55px;
+      height: 20px;
+      border-radius: 100px;
+      background-color: #59a5d5;
+    }
+    .Solved {
+      width: 50px;
+      height: 20px;
+      border-radius: 100px;
+      background-color: #a4b3b8;
+    }
+    ^ .generic-status {
+      display: inline-block;
+      font-family: Roboto;
+      font-size: 12px;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.67;
+      letter-spacing: 0.2px;
+      text-align: center;
+      color: #ffffff;
+    }
+    textarea:focus{
+      outline: none;
+    }
+    input:focus{
+      outline: none;
     }
   `
 });

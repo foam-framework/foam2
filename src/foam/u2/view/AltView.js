@@ -46,15 +46,11 @@ foam.CLASS({
 
   css: `
     ^ {
-      width: 992px;
       margin: auto;
     }
-    ^ .foam-u2-tag-Select{
+    ^ .foam-u2-tag-Select {
       width: 100px;
-      height: 40px;
-    }
-    ^ .property-viewChoices{
-      margin: 0 0 25px 15px;
+      height: 28px;
     }
   `,
 
@@ -66,8 +62,8 @@ foam.CLASS({
       this.altStack = this.Stack.create();
       this.viewChoices$.sub(this.changeView);
 
-      this.views.forEach(function(view){
-        view[0].data = view[0].data ? view[0].data : self.data;
+      this.views.forEach(function(view) {
+        view[0].data$ = view[0].data$ ? view[0].data$ : self.data$;
       });
       this.altStack.push(this.views[0][0]);
 
@@ -84,7 +80,7 @@ foam.CLASS({
   ],
 
   listeners: [
-    function changeView(){
+    function changeView() {
       this.altStack.push(this.viewChoices);
     }
   ]

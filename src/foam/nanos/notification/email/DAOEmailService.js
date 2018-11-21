@@ -91,7 +91,7 @@ return config_;`
     {
       name: 'sendEmail',
       javaCode: `
-        getDao().put(emailMessage);
+        getDao().inX(x).put(emailMessage);
 `
     },
     {
@@ -111,12 +111,19 @@ for ( String key : templateArgs.keySet() ) {
 }
 
 EnvironmentConfiguration config = getConfig(group);
-JtwigTemplate template = JtwigTemplate.inlineTemplate(emailTemplate.getBody(), config);
 JtwigModel model = JtwigModel.newModel(templateArgs);
 emailMessage = (EmailMessage) emailMessage.fclone();
-emailMessage.setSubject(emailTemplate.getSubject());
-emailMessage.setBody(template.render(model));
-sendEmail(emailMessage);
+
+JtwigTemplate templateBody =    JtwigTemplate.inlineTemplate(emailTemplate.getBody(), config);
+emailMessage.setBody(templateBody.render(model));
+
+// If subject has already provided, then we don't want to use template subject.
+if (foam.util.SafetyUtil.isEmpty(emailMessage.getSubject())) {
+  JtwigTemplate templateSubject = JtwigTemplate.inlineTemplate(emailTemplate.getSubject(), config);
+  emailMessage.setSubject(templateSubject.render(model));
+}
+
+sendEmail(x, emailMessage);
 `
     }
   ]
