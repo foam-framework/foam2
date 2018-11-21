@@ -4,8 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
- // TODO: create filteredPS property and bind length to scroll extent
- // update permission dependency graph
+ // TODO: update permission dependency graph
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'PermissionTableView',
@@ -119,11 +118,29 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'skip'
+    },
+    'ps',
+    'gs',
+    {
+      name: 'filteredPs',
+      expression: function(ps, query) {
+        query = query.trim();
+        return ps.filter(function(p) {
+          return query == '' || p.id.indexOf(query) != -1;
+        });
+      }
+    },
+    {
+      name: 'filteredRows',
+      expression: function(filteredPs) {
+        return filteredPs.length;
+      }
     }
   ],
 
   methods: [
-    function initMatrix(gs, ps) {
+    function initMatrix() {
+      var ps   = this.filteredPs, gs = this.gs;
       var self = this;
       this
         .addClass(this.myClass())
@@ -156,12 +173,10 @@ foam.CLASS({
                 .call(function() { self.initTableColumns.call(this, gs); })
               .end()
             .end()
-            .add(this.slot(function(skip, query) {
+            .add(this.slot(function(skip, filteredPs) {
               var count = 0;
-              query = query.trim();
-              return self.E('tbody').forEach(ps, function(p) {
+              return self.E('tbody').forEach(filteredPs, function(p) {
                 if ( count > self.skip + self.ROWS ) return;
-                if ( query != '' && p.id.indexOf(query) == -1 ) return;
                 if ( count < self.skip ) { count++; return; }
                 count++;
                 this.start('tr')
@@ -185,7 +200,7 @@ foam.CLASS({
             extent: self.ROWS,
             height: self.ROWS*25.5,
             width: 24,
-            size: ps.length
+            size$: self.filteredRows$
           }))
             .style({gridColumn: '2/span 1', gridRow: '2/span 2', 'margin-top':'246px'})
           .end()
@@ -258,7 +273,9 @@ foam.CLASS({
           self.gMap[gs.array[i].id] = gs.array[i];
         }
         self.permissionDAO.orderBy(self.Permission.ID).select().then(function(ps) {
-          self.initMatrix(gs.array, ps.array);
+          self.gs = gs.array;
+          self.ps = ps.array;
+          self.initMatrix();
         })
       });
     },
