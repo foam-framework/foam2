@@ -453,7 +453,7 @@ foam.CLASS({
       args: [
         {
           name: 'stmt',
-          type: 'foam.dao.pg.IndexedPreparedStatement'
+          javaType: 'foam.dao.pg.IndexedPreparedStatement'
         }
       ],
       javaCode: '//noop',
@@ -488,7 +488,7 @@ foam.CLASS({
       args: [
         {
           name: 'stmt',
-          type: 'foam.dao.pg.IndexedPreparedStatement'
+          javaType: 'foam.dao.pg.IndexedPreparedStatement'
         }
       ],
       javaCode: ' '

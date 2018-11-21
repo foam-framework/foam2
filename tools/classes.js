@@ -243,7 +243,6 @@ var classes = [
   'foam.lib.json.UnknownFObjectArray',
   'foam.lib.json.ClassReferenceParserTest',
   'foam.lib.xml.OutputXML',
-  'foam.blob.Buffer',
   'foam.blob.Blob',
   'foam.blob.BlobService',
   'foam.blob.AbstractBlob',

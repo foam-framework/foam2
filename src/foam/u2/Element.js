@@ -583,10 +583,11 @@ foam.CLASS({
     // },
 `,
 
-  flags: ['web'],
-
   requires: [
-    'foam.core.PromiseSlot',
+    {
+      path: 'foam.core.PromiseSlot',
+      flags: ['js'],
+    },
     'foam.dao.MergedResetSink',
     'foam.u2.AttrSlot',
     'foam.u2.Entity',
@@ -638,6 +639,7 @@ foam.CLASS({
       `,
       name: 'OUTPUT',
       type: 'foam.u2.OutputElementState',
+      flags: ['js'],
       factory: function() { return foam.u2.OutputElementState.create(); }
     },
 
@@ -648,6 +650,7 @@ foam.CLASS({
       `,
       name: 'LOADED',
       type: 'foam.u2.LoadedElementState',
+      flags: ['js'],
       factory: function() { return foam.u2.LoadedElementState.create(); }
     },
 
@@ -658,6 +661,7 @@ foam.CLASS({
       `,
       name: 'UNLOADED',
       type: 'foam.u2.UnloadedElementState',
+      flags: ['js'],
       factory: function() { return foam.u2.UnloadedElementState.create(); }
     },
 
@@ -667,6 +671,7 @@ foam.CLASS({
       `,
       name: 'INITIAL',
       type: 'foam.u2.InitialElementState',
+      flags: ['js'],
       factory: function() {
         return foam.u2.InitialElementState.create();
       }
