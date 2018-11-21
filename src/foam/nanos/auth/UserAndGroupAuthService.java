@@ -163,12 +163,11 @@ public class UserAndGroupAuthService
 
   public User loginByEmail(X x, String email, String password) throws AuthenticationException {
     User user = (User) userDAO_.find(MLang.EQ(User.EMAIL, email.toLowerCase()));
-
     if ( user == null ) {
       throw new AuthenticationException("User not found");
     }
     
-    return userAndGroupContext(x, (User) data.get(0), password);
+    return userAndGroupContext(x, user, password);
   }
 
   /**
