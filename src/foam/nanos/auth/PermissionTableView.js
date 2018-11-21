@@ -155,13 +155,12 @@ foam.CLASS({
           .start('table')
             .on('wheel', this.onWheel)
             .style({gridColumn: '1/span 1', gridRow: '2/span 1'})
-            .attrs({border: 1})
             .start('thead')
               .start('tr')
                 .start('th')
                   .attrs({colspan:1000})
                   .style({textAlign: 'left', padding: '8px', fontWeight: 400})
-                  .add(gs.length, ' groups, ', ps.length, ' permissions')
+                  .add(gs.length, ' groups, ', ps.length, ' permissions', self.filteredRows$.map(function(rows) { return rows == ps.length ?  '' : (', ' + rows + ' selected'); }))
                   .start()
                     .style({float: 'right'})
                     .add('⋮')
@@ -198,11 +197,11 @@ foam.CLASS({
           .start(self.ScrollCView.create({
             value$: self.skip$,
             extent: self.ROWS,
-            height: self.ROWS*25.5,
-            width: 24,
+            height: self.ROWS*24.5,
+            width: 26,
             size$: self.filteredRows$
           }))
-            .style({gridColumn: '2/span 1', gridRow: '2/span 2', 'margin-top':'246px'})
+            .style({gridColumn: '2/span 1', gridRow: '2/span 2', 'margin-top':'242px'})
           .end()
         .end();
     },
