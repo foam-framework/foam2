@@ -85,6 +85,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'query',
+      postSet: function() { this.skip = 0; },
       view: {
         class: 'foam.u2.TextField',
         type: 'Search',
