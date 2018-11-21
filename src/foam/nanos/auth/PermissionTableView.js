@@ -213,14 +213,20 @@ foam.CLASS({
 
       if ( ! data ) {
         data = this.GroupPermission.create({
-          checked: this.checkPermissionForGroup(p.id, g),
-          implied: g.implies(p.id)
+          checked: this.checkPermissionForGroup(p.id, g)
         });
-        if ( ! data.implied && ! data.checked ) {
-          var a = g.parent && this.gMap[g.parent];
-          var parent = a && g.parent && this.getGroupPermission(p, a);
-          if ( parent && ( parent.checked || parent.implied ) ) {
-            data.implied = true;
+        data.impliedByParentPermission = ! data.checked && g.implies(p.id);
+        if ( ! data.granted && g.parent ) {
+          var a = this.gMap[g.parent];
+          if ( a ) {
+            var parent = g.parent && this.getGroupPermission(p, a);
+            if ( parent ) {
+              function update() {
+                data.impliedByParentGroup = parent.granted;
+              }
+              update();
+              parent.granted$.sub(update);
+            }
           }
         }
         this.gpMap[key] = data;
@@ -235,7 +241,7 @@ foam.CLASS({
         var data = self.getGroupPermission(p, g);
         data.checked$.sub(function() {
           self.updateGroup(p, g, data.checked$, self);
-         });
+        });
 
         return self.GroupPermissionView.create({data: data});
       };
@@ -339,7 +345,25 @@ foam.CLASS({
         },
         {
           class: 'Boolean',
-          name: 'implied'
+          name: 'impliedByParentPermission'
+        },
+        {
+          class: 'Boolean',
+          name: 'impliedByParentGroup'
+        },
+        {
+          class: 'Boolean',
+          name: 'implied',
+          expression: function(impliedByParentPermission, impliedByParentGroup) {
+            return impliedByParentPermission || impliedByParentGroup;
+          }
+        },
+        {
+          class: 'Boolean',
+          name: 'granted',
+          expression: function(checked, implied) {
+            return checked || implied;
+          }
         },
         {
           name: 'dependees',
