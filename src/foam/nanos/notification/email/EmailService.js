@@ -15,6 +15,10 @@ foam.INTERFACE({
       returns: 'Void',
       args: [
         {
+          name: 'x',
+          type: 'Context',
+        },
+        {
           name: 'emailMessage',
           type: 'foam.nanos.notification.email.EmailMessage'
         }
@@ -25,6 +29,10 @@ foam.INTERFACE({
       async: true,
       returns: 'Void',
       args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
         {
           name: 'user',
           type: 'foam.nanos.auth.User',

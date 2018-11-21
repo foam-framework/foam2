@@ -60,25 +60,6 @@ public abstract class AbstractArrayPropertyInfo
   }
 
   @Override
-  public void toXML (FObject obj, Document doc, Element objElement) {
-    Object value = this.f(obj);
-
-    // Return if some kind of array other than Object[], like int[]
-    if ( value == null || ! ( value instanceof Object[]) ) return;
-
-    Object[] nestObj = (Object[]) value;
-    Element  prop    = doc.createElement(this.getName());
-
-    objElement.appendChild(prop);
-
-    for ( int k = 0; k < nestObj.length; k++ ) {
-      Element nestedProp = doc.createElement("value");
-      nestedProp.appendChild(doc.createTextNode(nestObj[k].toString()));
-      prop.appendChild(nestedProp);
-    }
-  }
-
-  @Override
   public void setStatementValue(IndexedPreparedStatement stmt, FObject o) throws java.sql.SQLException {
     Object obj = this.get(o);
     if ( obj == null ) {

@@ -95,6 +95,11 @@ return ["Hello", "World"]
       class: 'DateTime',
       name: 'dateProp',
     },
+    {
+      class: 'FObjectArray',
+      of: 'foam.core.FObject',
+      name: 'fobjArr',
+    },
   ],
   actions: [
     {

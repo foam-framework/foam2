@@ -1,7 +1,11 @@
 foam.CLASS({
   package: 'foam.nanos.servlet',
   name: 'VirtualHostRoutingServlet',
-  javaImplements: [ 'javax.servlet.Servlet' ],
+
+  implements: [
+    'foam.nanos.servlet.Servlet'
+  ],
+
   properties: [
     {
       class: 'Map',
@@ -33,7 +37,8 @@ foam.CLASS({
       name: 'init',
       returns: 'Void',
       args: [ { name: 'config', javaType: 'javax.servlet.ServletConfig' } ],
-      javaCode: 'setServletConfig(config);'
+      javaCode: 'setServletConfig(config);',
+      code: function() { }
     },
     {
       name: 'service',

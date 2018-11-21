@@ -16,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ModelParserFactory {
-  private static HashMap<Class, Parser> parsers_ = new HashMap<Class, Parser>();
+  protected static HashMap<Class, Parser> parsers_ = new HashMap<Class, Parser>();
 
   public static Parser getInstance(Class c) {
     if ( parsers_.containsKey(c) ) return parsers_.get(c);
@@ -45,9 +45,8 @@ public class ModelParserFactory {
       i++;
     }
 
+    // Prevents failure to parse if unknown property found
     propertyParsers[i] = new UnknownPropertyParser();
-
-    // TODO: Don't fail to parse if we find an unknown property.
 
     return new Repeat0(
         new Seq0(new Whitespace(), new Alt(propertyParsers)),

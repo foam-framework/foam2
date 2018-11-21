@@ -32,7 +32,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'url'
+      name: 'url',
+      value: 'http://localhost:8080/'
     },
     {
       class: 'String',
@@ -62,6 +63,11 @@ foam.CLASS({
       class: 'String',
       name: 'playLink',
       value: 'https://play.google.com/store?hl=en'
+    },
+    {
+      class: 'Boolean',
+      name: 'forceHttps',
+      value: false
     }
   ]
 });

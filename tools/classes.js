@@ -82,6 +82,8 @@ var classes = [
   'foam.dao.java.JDAO',
   'foam.dao.FilteredDAO',
   'foam.dao.Journal',
+  'foam.dao.RemoveChildrenOnRemoveDAO',
+  'foam.dao.AbstractJournal',
   'foam.dao.ProxyJournal',
   'foam.dao.CompositeJournal',
   'foam.dao.FileJournal',
@@ -114,12 +116,15 @@ var classes = [
   'foam.dao.EasyDAO',
   'foam.dao.EnabledAwareDAO',
   'foam.dao.index.PersistedIndexTest',
+  'foam.dao.SequenceNumberDAO',
+  'foam.dao.SequenceNumberDAOTest',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
   'foam.mlang.sink.Max',
   'foam.mlang.sink.Min',
   'foam.mlang.sink.Sum',
+  'foam.mlang.sink.Average',
   'foam.mlang.sink.Map',
   'foam.nanos.actioncommand.ActionCommand',
   'foam.nanos.NanoService',
@@ -145,7 +150,10 @@ var classes = [
   'foam.nanos.auth.User',
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
+  'foam.nanos.auth.UserUserJunction',
   'foam.nanos.auth.ClientAuthService',
+  'foam.nanos.auth.AgentAuthService',
+  'foam.nanos.auth.ClientAgentAuthService',
   'foam.nanos.auth.HtmlDoc',
   'foam.nanos.auth.PasswordExpiryAuthService',
   'foam.nanos.auth.token.Token',
@@ -185,6 +193,8 @@ var classes = [
   'foam.nanos.logger.LogsView',
   'foam.nanos.menu.Menu',
   'foam.nanos.menu.DAOMenu',
+  'foam.nanos.menu.DocumentMenu',
+  'foam.nanos.menu.DocumentFileMenu',
   'foam.nanos.menu.LinkMenu',
   'foam.nanos.menu.ListMenu',
   'foam.nanos.menu.MenuBar',
@@ -201,6 +211,8 @@ var classes = [
   'foam.nanos.notification.email.NullEmailService',
   'foam.nanos.notification.email.DAOEmailService',
   'foam.nanos.notification.email.SMTPEmailMessageDAO',
+  'foam.nanos.notification.email.POP3Email',
+  'foam.nanos.notification.email.ClientPOP3EmailService',
   'foam.nanos.notification.push.PushService',
   'foam.nanos.notification.push.FirebasePushService',
   'foam.nanos.notification.Notification',
@@ -230,6 +242,8 @@ var classes = [
   'foam.lib.json.UnknownFObject',
   'foam.lib.json.UnknownFObjectArray',
   'foam.lib.json.ClassReferenceParserTest',
+  'foam.lib.xml.OutputXML',
+  'foam.blob.Buffer',
   'foam.blob.Blob',
   'foam.blob.BlobService',
   'foam.blob.AbstractBlob',
@@ -265,8 +279,10 @@ var classes = [
   'foam.nanos.http.HttpParameters',
   'foam.nanos.dig.DIG',
   'foam.nanos.dig.DUG',
+  'foam.nanos.dig.SUGAR',
 
   'foam.nanos.jetty.HttpServer',
+  'foam.nanos.servlet.Servlet',
   'foam.nanos.servlet.ServletMapping',
   'foam.nanos.servlet.ErrorPageMapping',
   'foam.nanos.servlet.FilterMapping',
@@ -291,7 +307,19 @@ var classes = [
   'foam.nanos.dig.exception.EmptyDataException',
   'foam.nanos.dig.exception.UnsupportException',
   'foam.nanos.dig.exception.UnknownIdException',
-  'foam.nanos.dig.exception.DigSuccessMessage'
+  'foam.nanos.dig.exception.DigSuccessMessage',
+  'foam.flow.Document',
+  'foam.flow.DocumentationFolderDAO',
+
+  'foam.comics.SearchMode',
+
+  //Support Files
+  'foam.support.model.TicketMessage',
+  'foam.support.model.SupportEmail',
+  'foam.support.model.Ticket',
+
+  'foam.nanos.dig.exception.EmptyParameterException',
+  'foam.nanos.dig.exception.GeneralException'
 ];
 
 var abstractClasses = [
@@ -304,12 +332,13 @@ var skeletons = [
   'foam.dao.DAO',
   'foam.mop.MOP',
   'foam.nanos.auth.AuthService',
+  'foam.nanos.auth.AgentAuthService',
   'foam.nanos.auth.email.EmailDocInterface',
   'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.auth.token.TokenService',
   'foam.nanos.notification.email.EmailService',
-  'foam.nanos.notification.push.PushService',
-
+  'foam.nanos.notification.email.POP3Email',
+  'foam.nanos.notification.push.PushService'
 ];
 
 var proxies = [

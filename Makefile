@@ -82,3 +82,6 @@ all: nanos
 
 run: nanos $(foam2_JAR)
 	./$< -d --datadir src
+
+test: nanos $(foam2_JAR)
+	./$< -t --datadir src
