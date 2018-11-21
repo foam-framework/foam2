@@ -72,6 +72,11 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User disabled");
     }
 
+    // check if user login enabled
+    if ( ! user.getLoginEnabled() ) {
+      throw new AuthenticationException("Login disabled");
+    }
+
     // check if user group enabled
     Group group = (Group) groupDAO_.find(user.getGroup());
     if ( group != null && ! group.getEnabled() ) {
@@ -116,6 +121,12 @@ public class UserAndGroupAuthService
     if ( ! user.getEnabled() ) {
       throw new AuthenticationException("User disabled");
     }
+
+    // check if user login enabled
+    if ( ! user.getLoginEnabled() ) {
+      throw new AuthenticationException("Login disabled");
+    }
+
     // check if user group enabled
     Group group = (Group) groupDAO_.find(user.getGroup());
     if ( group != null && ! group.getEnabled() ) {
@@ -146,10 +157,8 @@ public class UserAndGroupAuthService
     if ( userId < 1 || SafetyUtil.isEmpty(password) ) {
       throw new AuthenticationException("Invalid Parameters");
     }
-
-    User user = (User) userSubclassDAO_.find(userId);
-    User contextUser = (User) userAndGroupContext(x, user, password);
-    return contextUser;
+    
+    return userAndGroupContext(x, (User) userDAO_.find(userId), password);
   }
 
   public User loginByEmail(X x, String email, String password) throws AuthenticationException {
@@ -158,10 +167,8 @@ public class UserAndGroupAuthService
     if ( user == null ) {
       throw new AuthenticationException("User not found");
     }
-
-    User contextUser = (User) userAndGroupContext(x, user, password);
-
-    return contextUser;
+    
+    return userAndGroupContext(x, (User) data.get(0), password);
   }
 
   /**
@@ -288,6 +295,11 @@ public class UserAndGroupAuthService
     // check if user enabled
     if ( ! user.getEnabled() ) {
       throw new AuthenticationException("User disabled");
+    }
+
+    // check if user login enabled
+    if ( ! user.getLoginEnabled() ) {
+      throw new AuthenticationException("Login disabled");
     }
 
     // check if user group enabled
