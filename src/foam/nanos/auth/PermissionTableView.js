@@ -133,6 +133,7 @@ foam.CLASS({
             .add(this.QUERY)
           .end()
           .start('table')
+            .on('wheel', this.onWheel)
             .style({gridColumn: '1/span 1', gridRow: '2/span 1'})
             .attrs({border: 1})
             .start('thead')
@@ -292,6 +293,19 @@ foam.CLASS({
         group.permissions = permissions;
         dao.put(group);
       });
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'onWheel',
+      code: function(e) {
+        var negative = e.deltaY < 0;
+        // Convert to rows, rounding up. (Therefore minumum 1.)
+        var rows = Math.ceil(Math.abs(e.deltaY) / 40);
+        this.skip = Math.max(0, this.skip + (negative ? -rows : rows));
+        if ( e.deltaY !== 0 ) e.preventDefault();
+      }
     }
   ],
 
