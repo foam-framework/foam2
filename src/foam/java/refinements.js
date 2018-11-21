@@ -34,7 +34,7 @@ foam.LIB({
             '}';
         },
         Null: function(n) { return "null"; },
-      })
+      }, function() { return "null" })
     },
     {
       name: 'toJavaType',
@@ -807,6 +807,13 @@ foam.CLASS({
   refines: 'foam.core.FObject',
   flags: ['java'],
   methods: [
+    {
+      name: 'asJavaValue',
+      code: function() {
+        // TODO
+        return 'null';
+      },
+    },
     {
       name: 'toString',
       javaReturns: 'String',

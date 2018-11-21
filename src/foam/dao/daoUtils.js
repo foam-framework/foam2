@@ -206,7 +206,7 @@ foam.CLASS({
   methods: [
     {
       name: 'listen_',
-      code: function(x, sink, prediate) {
+      code: function(x, sink, predicate) {
         // TODO(adamvy): Temporary hack to fix regression.  listen_
         // didn't used to have a declared return type, as such it
         // would return void when Promised, but a detachable when not.

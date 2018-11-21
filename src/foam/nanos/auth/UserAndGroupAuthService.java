@@ -168,7 +168,7 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found");
     }
     
-    return userAndGroupContext(x, (User) data.get(0), password);
+    return userAndGroupContext(x, user, password);
   }
 
   /**
