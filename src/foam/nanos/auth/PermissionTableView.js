@@ -19,8 +19,13 @@ foam.CLASS({
   requires: [
     'foam.nanos.auth.Group',
     'foam.nanos.auth.Permission',
-    'foam.graphics.Label'
+    'foam.graphics.Label',
+    'foam.graphics.ScrollCView'
   ],
+
+  constants: {
+    ROWS: 20
+  },
 
   css: `
     ^ thead th {
@@ -107,6 +112,10 @@ foam.CLASS({
     {
       class: 'Map',
       name: 'gMap'
+    },
+    {
+      class: 'Int',
+      name: 'skip'
     }
   ],
 
@@ -139,29 +148,42 @@ foam.CLASS({
                 .end()
               .end()
               .start('tr')
-                .start('th').style({minWidth: '350px'}).end()
+                .start('th').style({minWidth: '510px'}).end()
                 .call(function() { self.initTableColumns.call(this, gs); })
               .end()
             .end()
-            .start('tbody')
-              .forEach(ps, function(p) {
-                this
-                  .start('tr')
-                    .show(self.query$.map(function(query) { query = query.trim(); return query == "" || p.id.indexOf(query) != -1; }))
-                    .start('td')
-                      .addClass('permissionHeader')
-                      .attrs({title: p.description})
-                      .add(p.id)
-                    .end()
-                    .forEach(gs, function(g) {
-                      this.start('td')
-                        .attrs({title: g.id + ' : ' + p.id})
-                        .tag(self.createCheckBox(p, g))
-                      .end();
-                    })
-                  .end();
-              })
-            .end()
+            .add(this.slot(function(skip, query) {
+              var count = 0;
+              query = query.trim();
+              return self.E('tbody').forEach(ps, function(p) {
+                if ( count > self.skip + self.ROWS ) return;
+                if ( query != '' && p.id.indexOf(query) == -1 ) return;
+                if ( count < self.skip ) { count++; return; }
+                count++;
+                this.start('tr')
+                  .start('td')
+                    .addClass('permissionHeader')
+                    .attrs({title: p.description})
+                    .add(p.id)
+                  .end()
+                  .forEach(gs, function(g) {
+                    this.start('td')
+                      .attrs({title: g.id + ' : ' + p.id})
+                      .tag(self.createCheckBox(p, g))
+                    .end();
+                  })
+                .end();
+              });
+            }))
+          .end()
+          .start(self.ScrollCView.create({
+            value$: self.skip$,
+            extent: self.ROWS,
+            height: self.ROWS*25.5,
+            width: 24,
+            size: ps.length
+          }))
+            .style({gridColumn: '2/span 1', gridRow: '2/span 2', 'margin-top':'246px'})
           .end()
         .end();
     },
@@ -235,80 +257,7 @@ foam.CLASS({
           self.initMatrix(gs.array, ps.array);
         })
       });
-      /*
-      this
-      .start('table').style({'table-layout': 'fixed', 'margin-left': '100'})
-        .start('tr')
-          .start('td').style({'display': 'block', 'padding': '10'})
-            .start('h2').add('Permission').end()
-            .add('Search: ').start(this.QUERY).end()
-            .tag('br').tag('br').tag('br')
-            .add('Groups: ').tag('br')
-            .start()
-              .select(self.groupDAO.orderBy(self.Group.ID), function(g) {
-                groups[g.id] = foam.u2.md.CheckBox.create({label: g.id, data: self.user.group == g.id});
-                return self.E().add(groups[g.id]).tag('br');
-              })
-            .end()
-            .start('td').style({'padding-top': '50'})
-              .add('above table')
-              .addClass(this.myClass())
-              .start('table').style({'table-layout': 'fixed', 'width': 'auto'})
-                .call(self.initColumns.bind(this, self, groups))
-            .end()
-          .end()
-      .end()*/
     },
-
-    /*
-    function initColumns(self, groups) {
-      this.start('tr')
-        .style({'background': '#D4E3EB'})
-        .tag('td').style({'text-align': 'left', 'width': '480', 'height': '35'})
-        .select(this.groupDAO.orderBy(this.Group.ID), function(g) {
-          debugger;
-          return self.E('td').
-            // .show(groups[g.id].data$.map(function() { return groups[g.id].data;} ))
-            addClass(g.id).start().style({'text-align': 'center', 'width': '100'})
-            .add(g.id)
-          .end();
-        })
-      .end();
-    },
-    */
-
-    /*
-    function initPermissionRow() {
-      return self.E('tr')
-        .show(self.query$.map(function(query) { query = query.trim(); return query == "" || p.id.indexOf(query) != -1; }))
-        .start('td').style({'text-align': 'left', 'width': '480', 'padding-left': '8px'}).add(p.id).end()
-          .select(self.groupDAO.orderBy(self.Group.ID), function(g) {
-            return self.E('b').add('X');
-            return this.E('td')
-              .show(groups[g.id].data$.map(function() { return groups[g.id].data; }))
-              .style({'text-align': 'center', 'width': '100'})
-              .start({class: 'foam.u2.md.CheckBox', data: self.checkPermissionForGroup(p.id, g)})
-                .call(function() {
-                  this.data$.sub(function() { self.updateGroup(p, g, this.data, self); });
-                  if ( g.implies(p.id) ) {
-                    this.setAttribute('title', g.id + ': ' + p.id);
-                    //this.style({'border-color': '#40C75B'});
-                  } else {
-                    g.parent$find.then(function(a) {
-                      if ( a != undefined && a.implies(p.id) ) {
-                        this.setAttribute('title', g.parent + ': ' + p.id);
-                        //this.style({'border-color': '#40C75B'});
-                      }
-                    });
-                  }
-                })
-              .end()
-            .end();
-          })
-        .end()
-
-    },
-    */
 
     function checkPermissionForGroup(permissionId, group) {
       for ( i = 0 ; i < group.permissions.length ; i++ ) {
@@ -343,25 +292,7 @@ foam.CLASS({
         group.permissions = permissions;
         dao.put(group);
       });
-    },
-    /*
-    function updateChildrenPermission(gp, permissions) {
-      var self = this;
-      var dao = this.groupDAO;
-      var e = foam.mlang.Expressions.create();
-
-      dao.where(e.EQ(this.Group.PARENT, gp)).select().then(function(sink) {
-        var array = sink.array;
-
-        for ( var i = 0; i < array.length; i++ ) {
-            self.updateChildrenPermission(array[i].id, permissions);
-
-            array[i].permissions = permissions;
-            dao.put(array[i]);
-        }
-      });
     }
-    */
   ],
 
   classes: [
