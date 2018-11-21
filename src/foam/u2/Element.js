@@ -627,6 +627,7 @@ foam.CLASS({
     {
       name: 'DEFAULT_VALIDATOR',
       type: 'foam.u2.DefaultValidator',
+      flags: ['js'],
       factory: function() { return foam.u2.DefaultValidator.create(); }
     },
 
@@ -732,6 +733,7 @@ foam.CLASS({
 
     {
       name: 'NEXT_ID',
+      flags: ['js'],
       value: function() {
         return 'v' + this.__ID__[ 0 ]++;
       }
