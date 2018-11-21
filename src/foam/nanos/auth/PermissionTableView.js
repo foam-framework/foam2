@@ -4,6 +4,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+ // TODO: create filteredPS property and bind length to scroll extent
+ // update permission dependency graph
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'PermissionTableView',
