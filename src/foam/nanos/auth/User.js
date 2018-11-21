@@ -52,6 +52,12 @@ foam.CLASS({
       value: true
     },
     {
+      class: 'Boolean',
+      name: 'loginEnabled',
+      documentation: 'Enables user to login',
+      value: true
+    },
+    {
       class: 'DateTime',
       name: 'lastLogin',
       documentation: 'Date and time user last logged in.'
