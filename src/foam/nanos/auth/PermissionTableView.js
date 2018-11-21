@@ -387,8 +387,8 @@ foam.CLASS({
             style({width: '18px', height: '18px'}).
             enableClass(this.myClass('implied'), this.data.checked$, true).
             enableClass(this.myClass('checked'), this.data.checked$).
-            add(this.slot(function(data$checked, data$implied) {
-              return data$checked || data$implied ? '✓' : '';
+            add(this.slot(function(data$granted) {
+              return data$granted ? '✓' : '';
             })).
             on('click', this.onClick);
         }
