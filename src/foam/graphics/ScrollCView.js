@@ -41,7 +41,7 @@ foam.CLASS({
       name: 'value',
 //      help: 'The first element being shown, starting at zero.',
       preSet: function(_, value) {
-        return Math.max(0, Math.min(this.size-this.extent, value));
+        return Math.max(0, Math.min(this.size-this.extent-1, value));
       },
       postSet: function(old, nu) {
         if ( old !== nu ) this.invalidated.pub();
