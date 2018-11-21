@@ -34,7 +34,24 @@ foam.LIB({
             '}';
         },
         Null: function(n) { return "null"; },
-      }, function() { return "null" })
+        Object: function(o) {
+          return `
+new java.util.HashMap() {
+  {
+${Object.keys(o).map(function(k) {
+  return `put(${foam.java.asJavaValue(k)}, ${foam.java.asJavaValue(o[k])});`
+}).join('\n')}
+  }
+}
+          `;
+        },
+        RegExp: function(o) {
+          o = o.toString();
+          o = o.slice(o.indexOf('/') + 1, o.lastIndexOf('/'))
+          o = o.replace(/\\/g, '\\\\')
+          return `java.util.regex.Pattern.compile("${o}")`
+        },
+      })
     },
     {
       name: 'toJavaType',
@@ -810,8 +827,19 @@ foam.CLASS({
     {
       name: 'asJavaValue',
       code: function() {
-        // TODO
-        return 'null';
+        var self = this;
+        var props = self.cls_.getAxiomsByClass(foam.core.Property)
+          .filter(function(a) {
+            return self.hasOwnProperty(a.name);
+          })
+          .map(function(p) {
+            return `.set${foam.String.capitalize(p.name)}(${foam.java.asJavaValue(self[p.name])})`
+          })
+        return `
+new ${self.cls_.id}.Builder(null) // TODO what context to use?
+  ${props.join('\n')}
+  .build()
+        `
       },
     },
     {

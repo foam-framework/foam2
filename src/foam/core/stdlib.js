@@ -702,6 +702,23 @@ foam.LIB({
 
 
 foam.LIB({
+  name: 'foam.RegExp',
+  methods: [
+    function isInstance(o) { return o instanceof RegExp; },
+    function is(a, b) { return a === b; },
+    function clone(o) { return new RegExp(o); },
+    function equals(a, b) { return this.compare(a, b) == 0 },
+    function compare(a, b) {
+      if ( ! foam.RegExp.isInstance(b) ) return 1;
+      return foam.String.compare(a.toString(), b.toString());
+    },
+    // Hash n & n: Truncate to 32 bits.
+    function hashCode(d) { foam.String.hashCode(d.toString()) },
+  ]
+});
+
+
+foam.LIB({
   name: 'foam.Date',
   methods: [
     function isInstance(o) { return o instanceof Date; },
@@ -830,6 +847,7 @@ foam.typeOf = (function() {
   var tFObject   = foam.core.FObject;
   var tFunction  = foam.Function;
   var tObject    = foam.Object;
+  var tRegExp    = foam.RegExp;
 
   return function typeOf(o) {
     if ( tNumber.isInstance(o) )    return tNumber;
@@ -841,6 +859,7 @@ foam.typeOf = (function() {
     if ( tDate.isInstance(o) )      return tDate;
     if ( tFunction.isInstance(o) )  return tFunction;
     if ( tFObject.isInstance(o) )   return tFObject;
+    if ( tRegExp.isInstance(o) )   return tRegExp;
     return tObject;
   };
 })();
@@ -853,14 +872,15 @@ foam.typeOf = (function() {
 
 foam.core.FObject.ordinal = 0;
 foam.Date.ordinal = 1;
-foam.Object.ordinal = 2;
-foam.Function.ordinal = 3;
-foam.Array.ordinal = 4;
-foam.String.ordinal = 5;
-foam.Number.ordinal = 6;
-foam.Boolean.ordinal = 7;
-foam.Null.ordinal = 8;
-foam.Undefined.ordinal = 9;
+foam.RegExp.ordinal = 2;
+foam.Object.ordinal = 3;
+foam.Function.ordinal = 4;
+foam.Array.ordinal = 5;
+foam.String.ordinal = 6;
+foam.Number.ordinal = 7;
+foam.Boolean.ordinal = 8;
+foam.Null.ordinal = 9;
+foam.Undefined.ordinal = 10;
 
 foam.LIB({
   name: 'foam',
