@@ -351,7 +351,7 @@ FOAM_FILES([
   { name: "foam/box/ForwardBox" },
   { name: "foam/box/ForwardingBox" },
   { name: "foam/box/SessionClientBox" },
-  
+
   { name: "foam/swift/refines/Stub", flags: ['swift'] },
   { name: "foam/swift/refines/Promised", flags: ['swift'] },
   { name: "foam/swift/refines/Topic", flags: ['swift'] },
@@ -479,7 +479,6 @@ FOAM_FILES([
   { name: 'foam/nanos/logger/LogsView', flags: ['web'] },
   { name: "lib/node/box", flags: ['node'] },
   { name: "foam/box/node/ForkBox", flags: ['node'] },
-  { name: "foam/net/HTTPMethod" },
   { name: "lib/net", flags: ['web'] },
   { name: "lib/netNode", flags: ['node'] },
   { name: "foam/net/RetryHTTPRequest" },
