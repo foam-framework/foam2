@@ -114,6 +114,19 @@ foam.CLASS({
   ],
 
   methods: [
+    function fromModel(model) {
+      this.name = model.name;
+      this.package = model.package;
+      this.abstract = model.abstract;
+
+      if ( model.name != 'AbstractFObject' ) {
+        this.extends = model.extends  === 'FObject' ?
+          'foam.core.AbstractFObject' : model.extends;
+      } else {
+        this.implements = [ 'foam.core.FObject' ]
+      }
+    },
+
     function getField(name) {
       for ( var i  = 0 ; this.fields && i < this.fields.length ; i++ ) {
         if ( this.fields[i].name === name ) return this.fields[i];
@@ -210,15 +223,10 @@ foam.CLASS({
       o.out('}');
     },
 
-      function toJavaSource() {
-        try {
+    function toJavaSource() {
       var output = foam.java.Outputter.create();
       output.out(this);
-          return output.buf_;
-        } catch(e) {
-          console.log("***Error generating", this.name);
-          throw e;
-        }
+      return output.buf_;
     }
   ]
-});
+})
