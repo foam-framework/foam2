@@ -116,6 +116,10 @@ foam.CLASS({
       name: 'gMap'
     },
     {
+      class: 'Map',
+      name: 'pMap'
+    },
+    {
       class: 'Int',
       name: 'skip'
     },
@@ -206,6 +210,21 @@ foam.CLASS({
         .end();
     },
 
+    // * -> null, foo.bar -> foo.*, foo.* -> *
+    function getParentGroupPermission(p, g) {
+      var pid = p.id;
+      while ( true ) {
+        console.log(pid);
+        while ( pid.endsWith('.*') ) {
+          pid = pid.substring(0, pid.length-2);
+        }
+        if ( pid == '*' ) return null;
+        var i = pid.lastIndexOf('.');
+        pid = ( i == -1 ) ? '*' : pid.substring(0, i) + '.*';
+        if ( pid in this.pMap ) return this.getGroupPermission(this.pMap[pid], g);
+      }
+    },
+
     function getGroupPermission(p, g) {
       var key  = p.id + ':' + g.id;
       var data = this.gpMap[key];
@@ -214,8 +233,11 @@ foam.CLASS({
         data = this.GroupPermission.create({
           checked: this.checkPermissionForGroup(p.id, g)
         });
-        data.impliedByParentPermission = ! data.checked && g.implies(p.id);
-        if ( ! data.granted && g.parent ) {
+
+        // data.impliedByParentPermission = ! data.checked && g.implies(p.id);
+
+        // Parent Group Inheritance
+        if ( g.parent ) {
           var a = this.gMap[g.parent];
           if ( a ) {
             var parent = g.parent && this.getGroupPermission(p, a);
@@ -228,6 +250,17 @@ foam.CLASS({
             }
           }
         }
+
+        // Parent Permission Inheritance (wildcarding)
+        var pParent = this.getParentGroupPermission(p, g);
+        if ( pParent ) {
+          function update2() {
+            data.impliedByParentPermission = pParent.granted;
+          }
+          update2();
+          pParent.granted$.sub(update2);
+        }
+
         this.gpMap[key] = data;
       }
 
@@ -278,6 +311,9 @@ foam.CLASS({
           self.gMap[gs.array[i].id] = gs.array[i];
         }
         self.permissionDAO.orderBy(self.Permission.ID).select().then(function(ps) {
+          for ( var i = 0 ; i < ps.array.length ; i++ ) {
+            self.pMap[ps.array[i].id] = ps.array[i];
+          }
           self.gs = gs.array;
           self.ps = ps.array;
           self.initMatrix();
@@ -363,10 +399,6 @@ foam.CLASS({
           expression: function(checked, implied) {
             return checked || implied;
           }
-        },
-        {
-          name: 'dependees',
-          factory: function() { return []; }
         }
       ]
     },
