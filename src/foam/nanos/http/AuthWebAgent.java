@@ -64,9 +64,9 @@ public class AuthWebAgent
     out.println("<label style=\"display:inline-block;width:70px;\">Password:</label>");
     out.println("<input name=\"password\" id=\"password\" type=\"password\" size=\"30\" style=\"display:inline-block;\"></input>");
     out.println("<br>");
-    out.println("<button type=submit style=\"display:inline-block;margin-top:10px;\"; onclick=\"checkEmpty()\">Log In</button>");
+    out.println("<button id=\"login\" type=submit style=\"display:inline-block;margin-top:10px;\";>Log In</button>");
     out.println("</form>");
-    out.println("<script>function checkEmpty() { if ( document.getElementById('user').value == '') { alert('Email Required'); } else if ( document.getElementById('password').value == '') { alert('Password Required'); } }</script>");
+    out.println("<script>document.getElementById('login').addEventListener('click', checkEmpty); function checkEmpty() { if ( document.getElementById('user').value == '') { alert('Email Required'); } else if ( document.getElementById('password').value == '') { alert('Password Required'); } }</script>");
   }
 
   /** If provided, use user and password parameters to login and create session and cookie. **/
@@ -157,7 +157,9 @@ public class AuthWebAgent
       }
 
       try {
-        User user = auth.loginByEmail(session.getContext(), email, password);
+        User user = auth.loginByEmail(session.getContext()
+          .put(HttpServletRequest.class, req)
+          .put(HttpServletResponse.class, resp), email, password);
 
         if ( user != null ) {
           return session;
