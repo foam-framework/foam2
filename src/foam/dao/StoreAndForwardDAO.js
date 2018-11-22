@@ -102,13 +102,13 @@ foam.CLASS({
       /*
       returns: {
         documentation: 'Indicator: Should this error be retried?',
-        typeName: 'Boolean',
+        type: 'Boolean',
       },
       args: [
         {
           documentation: 'The error thrown by the delegate DAO.',
           name: 'error',
-          typeName: 'Error',
+          type: 'Any',
         },
       ],
       */
