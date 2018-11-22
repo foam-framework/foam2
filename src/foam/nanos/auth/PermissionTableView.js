@@ -25,7 +25,7 @@ foam.CLASS({
   ],
 
   constants: {
-    ROWS: 20
+    ROWS: 22
   },
 
   css: `
