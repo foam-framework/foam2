@@ -740,26 +740,13 @@ foam.LIB({
           return r;
         } else if ( foam.Object.isInstance(o) ) {
           for ( var key in o ) {
-            // anonymous class support.
-            if ( key === 'class' && foam.Object.isInstance(o[key]) ) {
-              var json = o[key];
-              json.name = 'AnonymousClass' + foam.next$UID();
-              console.log('Constructing anonymous class', json.name);
-
-              r.push(Promise.all(foam.json.references(x, json, [])).then(function() {
-                return x.classloader.maybeLoad(foam.core.Model.create(json));
-              }));
-
-              o[key] = json.name;
-              continue;
-            } else if ( (
-                key === 'of' ||
-                key === 'class' ||
-                key == 'view' ||
-                key == 'sourceModel' ||
-                key == 'targetModel' ||
-                key == 'refines' ) &&
-                        foam.String.isInstance(o[key]) ) {
+            if ( ( key === 'of' ||
+                   key === 'class' ||
+                   key === 'view' ||
+                   key === 'sourceModel' ||
+                   key === 'targetModel' ||
+                   key === 'refines' ) &&
+                 foam.String.isInstance(o[key]) ) {
               r.push(x.classloader.maybeLoad(o[key]));
               continue;
             }
