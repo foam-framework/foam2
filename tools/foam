@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
 require('../src/foam.js');
+require('../src/foam/nanos/nanos.js');
 
 foam.classloader.NodeJsModelExecutor.create().fromArgs(process.argv.slice(2)).execute();
