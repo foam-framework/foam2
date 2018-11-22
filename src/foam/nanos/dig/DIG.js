@@ -11,6 +11,8 @@ foam.CLASS({
 
   documentation: 'Data Integration Gateway - Perform DAO operations against a web service',
 
+  requires: ['foam.net.web.HTTPRequest'], 
+
   tableColumns: [
     'id',
     'daoKey',
@@ -20,6 +22,14 @@ foam.CLASS({
   ],
 
   searchColumns: [],
+
+  constants: [
+    {
+      name: 'MAX_URL_SIZE',
+      value: 70,
+      type: 'int'
+    }
+  ],
 
   properties: [
     'id',
@@ -102,11 +112,6 @@ foam.CLASS({
           query = true;
           url += "id=" + key;
         }
-        if ( data ) {
-          url += query ? "&" : "?";
-          query = true;
-          url += "data=" + data;
-        }
         if ( email ) {
           url += query ? "&" : "?";
           query = true;
@@ -122,12 +127,43 @@ foam.CLASS({
           query = true;
           url += "q=" + q;
         }
-
+        if ( data ) {
+          if ( data.length + url.length < this.MAX_URL_SIZE ) {
+            url += query ? "&" : "?";
+            query = true;
+            url += "data=" + data;
+          }
+        }
         return encodeURI(url);
       }
     }
   ],
 
   methods: [
+  ],
+
+  actions: [
+    {
+      name: 'postButton',
+      label: 'Send Request',
+      code: function() {
+        var req = this.HTTPRequest.create({
+          url: window.location.origin + this.digURL,
+          method: 'POST',
+          payload: this.data,
+        }).send();
+
+        req.then(function(resp) {
+          console.log(resp.payload);
+          alert('Success, see console for more details');
+          resp.payload.then(function(result) {
+            console.log(result);
+          });
+        }, function(error) {
+          alert('Error. status: '+error.resp.status+' '+error.resp.statusText);
+          console.log(error.resp);
+        });
+      }
+    }
   ]
 });
