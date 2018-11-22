@@ -3,7 +3,9 @@ foam.CLASS({
   name: 'MarkupEditor',
   extends: 'foam.u2.View',
   requires: [
-    'foam.flow.Document',
+    // We don't require Document as it causes a circular dependency
+    // that the classloader can't deal with yet.
+//    'foam.flow.Document',
     'foam.u2.tag.TextArea'
   ],
   properties: [
@@ -51,7 +53,7 @@ table-layout: fixed;
       name: 'updatePreview',
       isMerged: 1000,
       code: function() {
-        this.preview = this.Document.create({ markup: this.data });
+        this.preview = this.__context__.lookup('foam.flow.Document').create({ markup: this.data });
       }
     }
   ]
