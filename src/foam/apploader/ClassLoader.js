@@ -80,7 +80,10 @@ have multiple classloaders running alongside eachother`
       documentation: "Like load, but don't throw if not found.",
       args: [ { name: 'id', type: 'String' } ],
       code: function(id) {
-        return this.load(id).catch(function() { return null; });
+        return this.load(id).catch(function() {
+          console.warn.apply(console, ["Failed to load", id].concat(Array.from(arguments)));
+          return null;
+        });
       }
     },
     {
