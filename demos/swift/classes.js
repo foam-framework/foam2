@@ -64,6 +64,8 @@ var classes = [
   'foam.swift.ui.FOAMUITextField',
   'foam.swift.ui.FOAMUITextFieldInt',
   'foam.swift.ui.PropertyView',
+  'foam.u2.ControllerMode',
+  'foam.u2.DisplayMode',
   'foam.swift.ui.ScrollingViewController',
   'foam.u2.Visibility',
   'somepackage.TestApp',

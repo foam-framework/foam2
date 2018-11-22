@@ -588,11 +588,14 @@ foam.CLASS({
       path: 'foam.core.PromiseSlot',
       flags: ['js'],
     },
+    {
+      path: 'foam.u2.ViewSpec',
+      flags: ['js'],
+    },
     'foam.dao.MergedResetSink',
     'foam.u2.AttrSlot',
     'foam.u2.Entity',
     'foam.u2.RenderSink',
-    'foam.u2.ViewSpec'
   ],
 
   imports: [
