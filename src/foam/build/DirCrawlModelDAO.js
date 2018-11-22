@@ -110,7 +110,7 @@ foam.CLASS({
 
       context.foam.CLASS = function(m) {
         promises.push(Promise.all(foam.json.references(self.__context__, m)).then(function(p) {
-          var cls = self.lookup(m.class || 'foam.core.Model')
+          var cls = self.__context__.lookup(m.class || 'foam.core.Model')
           return dao.put(cls.create(m));
         }))
       };
@@ -176,6 +176,8 @@ foam.CLASS({
     function execute() {
       this.select().then(function(a) {
         console.log(a.array.map(function(o) { return o.id }).join('\n'));
+      }, function() {
+        console.error.apply(console, arguments);
       });
     },
   ],

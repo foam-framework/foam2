@@ -132,7 +132,7 @@ foam.CLASS({
 
         var classes = [];
         for (var i = 0; i < models.length; i++) {
-          var cls = self.lookup(models[i], self);
+          var cls = self.__context__.lookup(models[i], self);
           var swiftClass = cls.toSwiftClass();
           if (swiftClass.getMethod && swiftClass.getMethod('classInfo')) {
             classes.push(swiftClass.name);

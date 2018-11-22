@@ -165,9 +165,7 @@ foam.CLASS({
     */
     function unknownArg(key, value) {
       // NOP
-    },
-
-    function lookup() { return this.__context__.lookup.apply(this.__context__, arguments); },
+    }
   ]
 });
 
