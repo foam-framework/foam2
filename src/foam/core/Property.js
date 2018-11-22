@@ -592,7 +592,7 @@ foam.CLASS({
           }
         }
         var ret = e.apply(this, args);
-        if ( ret === undefined ) this.__context__.warn('Expression returned undefined: ', e);
+        if ( ret === undefined ) this.__context__.warn('Expression returned undefined: ', e, this.name);
         return ret;
       };
     },

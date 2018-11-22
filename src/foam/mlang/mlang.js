@@ -722,7 +722,7 @@ for ( int i = 0 ; i < length ; i++ ) {
 }
 return stmt.toString();`
     },
-    
+
     {
       name: 'partialEval',
       code: function partialEval() {
@@ -1438,7 +1438,7 @@ return false
       returns: 'String',
       javaCode: 'return " " + getArg1().createStatement() + " in " + getArg2().createStatement();'
     },
-    
+
     function partialEval() {
       if ( ! this.Constant.isInstance(this.arg2) ) return this;
 
@@ -1989,7 +1989,7 @@ return this;`
       name: 'prepareStatement',
       javaCode: 'getArg1().prepareStatement(stmt);'
     },
-      
+
 
     /*
       TODO: this isn't ported to FOAM2 yet.
@@ -2325,7 +2325,7 @@ clone.setArg1(this.getArg1());
 clone.setArg2(this.getArg2());
 return clone;`
     },
-    
+
     {
       name: 'toString',
       code: function toString() {
@@ -2467,7 +2467,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'arg1',
-      of: 'foam.mlang.order.Comparator',
+      type: 'foam.mlang.order.Comparator',
       adapt: function(_, c) { return foam.compare.toCompare(c); },
       javaJSONParser: 'new foam.lib.json.ExprParser()'
     }
@@ -2517,7 +2517,7 @@ foam.CLASS({
   properties: [
     {
       class: 'FObjectProperty',
-      of: 'foam.mlang.order.Comparator',
+      type: 'foam.mlang.order.Comparator',
       adapt: function(_, a) {
         // TODO(adamvy): We should fix FObjectProperty's default adapt when the
         // of parameter is an interface rather than a class.
@@ -2527,7 +2527,7 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.mlang.order.Comparator',
+      type: 'foam.mlang.order.Comparator',
       adapt: function(_, a) {
         // TODO(adamvy): We should fix FObjectProperty's default adapt when the
         // of parameter is an interface rather than a class.
@@ -2937,7 +2937,7 @@ foam.CLASS({
 
     {
       name: 'DESC',
-      args: [ { name: 'a', of: 'foam.mlang.order.Comparator' } ],
+      args: [ { name: 'a', type: 'foam.mlang.order.Comparator' } ],
       returns: 'foam.mlang.order.Comparator',
       code: function DESC(a) { return this._unary_("Desc", a); },
       swiftCode: `return Desc_create(["arg1": a])`,

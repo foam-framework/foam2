@@ -216,7 +216,9 @@ foam.core.FObject.installModel = function() {
               ' type from ' +
               prevCls +
               ' to ' +
-              aCls);
+              aCls +
+              ' in model ' +
+              m.id);
         }
       }
 
