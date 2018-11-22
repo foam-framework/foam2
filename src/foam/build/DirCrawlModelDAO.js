@@ -18,6 +18,8 @@ foam.CLASS({
     {
       name: 'unwrappedScripts',
       value: [
+        'src/foam/core/poly\\.js',
+        'src/foam/core/lib\\.js',
         'src/foam/core/stdlib\\.js',
         'src/foam/core/events\\.js',
         'src/foam/core/Boot\\.js',
@@ -33,12 +35,11 @@ foam.CLASS({
       value: [
         // Boot files that cannot be wrapped in foam.SCRIPT
         'src/foam\\.js',
-        'src/foam/core/poly\\.js',
-        'src/foam/core/lib\\.js',
 
         // Not models.
         'src/foam/nanos/nanos\\.js',
         'src/files\\.js',
+        'src/foam/support/support\\.js',
 
         // Dirs we don't care about.
         'src/com/*',
@@ -80,6 +81,7 @@ foam.CLASS({
 
       var context = {
         foam: Object.create(foam)
+//        foam: {}
       };
 
       context.foam.LIB = function(m) {
@@ -124,6 +126,7 @@ foam.CLASS({
 
       var fs = require('fs');
       var sep = require('path').sep;
+      var i = 0;
       self.ftw(self.srcDir, function(path, lstat) {
         if ( ! lstat.isFile() ) return;
         if ( blacklistExp.exec(path) ) return;
@@ -141,6 +144,7 @@ foam.CLASS({
             });
           }
         } else if ( path.endsWith('.js') ) {
+          var j = i++;
           try {
             with ( context ) { eval(o) };
           } catch(e) {
