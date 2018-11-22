@@ -28,7 +28,7 @@ foam.INTERFACE({
         {
           name: 'url',
           documentation: `The URL to test against this route.`,
-          typeName: 'URL'
+          // TODO type: 'URL'
         }
       ],
       returns: 'Boolean',

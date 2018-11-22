@@ -45,13 +45,13 @@ foam.INTERFACE({
         {
           name: 'route',
           documentation: `Route being bound to this handler.`,
-          typeName: 'foam.net.node.Route'
+          type: 'foam.net.node.Route'
         }
       ],
       returns: {
         documentation: `The appropriately configured Handler that has been
             bound to "route".`,
-        typeName: 'foam.net.node.Handler',
+        type: 'foam.net.node.Handler',
       }
     }
   ]

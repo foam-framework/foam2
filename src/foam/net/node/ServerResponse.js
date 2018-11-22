@@ -34,7 +34,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'statusCode',
-          typeName: 'Int'
+          type: 'Integer'
         }
       ],
       code: function(statusCode) {}
@@ -46,12 +46,12 @@ foam.INTERFACE({
         {
           name: 'header',
           documentation: 'The header name.',
-          typeName: 'String'
+          type: 'String'
         },
         {
           name: 'value',
           documentation: 'The header value.',
-          typeName: 'String'
+          type: 'String'
         }
       ],
       code: function(header, value) {}
