@@ -158,7 +158,8 @@ public class AuthWebAgent
 
       try {
         User user = auth.loginByEmail(session.getContext()
-          .put(HttpServletRequest.class, req), email, password);
+          .put(HttpServletRequest.class, req)
+          .put(HttpServletResponse.class, resp), email, password);
 
         if ( user != null ) {
           return session;
