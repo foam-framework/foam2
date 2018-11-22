@@ -319,7 +319,6 @@ FOAM_FILES([
   { name: "foam/dao/BaseClientDAO" },
   { name: "foam/dao/MergeBox" },
   { name: "foam/dao/ClientDAO" },
-  { name: "foam/dao/EventlessClientDAO" },
   { name: "foam/dao/PollingClientDAO" },
   { name: "foam/dao/StreamingClientDAO" },
   { name: "foam/dao/RequestResponseClientDAO" },
