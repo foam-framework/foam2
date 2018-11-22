@@ -617,7 +617,9 @@ foam.CLASS({
 
 
 foam.CLASS({
-  refines: 'Property',
+  package: 'foam.core',
+  name: 'FacetedPropertyRefinement',
+  refines: 'foam.core.Property',
 
   axioms: [
     foam.pattern.Faceted.create()
@@ -632,6 +634,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'PropertyShortNameRefinement',
   refines: 'Property',
 
   properties: [
