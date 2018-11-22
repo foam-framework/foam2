@@ -10,8 +10,7 @@ foam.CLASS({
   implements: [
     'foam.build.output.CodeSerializer',
   ],
-  description: `
-    The base serializer that's typically used to output models by the build tool
+  documentation: `The base serializer that's typically used to output models by the build tool
     in a format that looks similar to hand written models.
     There are many shortcuts we use when writing models that this serializer
     doesn't know/care about. Any optimizations should happen as decorators.
