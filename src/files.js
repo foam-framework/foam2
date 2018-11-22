@@ -357,7 +357,6 @@ FOAM_FILES([
   { name: "foam/swift/refines/Topic", flags: ['swift'] },
   { name: "foam/swift/refines/Remote", flags: ['swift'] },
 
-  { name: "foam/box/Runnable" },
   { name: "foam/box/LogBox" },
   { name: "foam/box/MultiDelegateBox" },
   { name: "foam/box/BroadcastBox" },
