@@ -741,7 +741,7 @@ foam.LIB({
         } else if ( foam.Object.isInstance(o) ) {
           for ( var key in o ) {
             // anonymous class support.
-            if ( key === 'class' && foam.Object.isInstance(o[key]) ) {b
+            if ( key === 'class' && foam.Object.isInstance(o[key]) ) {
               var json = o[key];
               json.name = 'AnonymousClass' + foam.next$UID();
               console.log('Constructing anonymous class', json.name);
