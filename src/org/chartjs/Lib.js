@@ -5,6 +5,7 @@ foam.CLASS({
     {
       name: 'CHART',
       factory: function() {
+        try {
         /*!
          * Chart.js
          * http://chartjs.org/
@@ -8186,6 +8187,9 @@ foam.CLASS({
             }]
           }, {}, [7])(7)
         });
+        } catch(e) {
+          return null;
+        }
         return Chart;
       }
     }
