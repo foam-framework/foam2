@@ -116,6 +116,10 @@ foam.CLASS({
       class: 'String',
       name: 'detailView',
       value: 'foam.u2.DetailView'
+    },
+    {
+      class: 'Boolean',
+      name: 'showCICO'
     }
   ],
 
@@ -134,7 +138,8 @@ foam.CLASS({
         editEnabled: this.editEnabled,
         exportEnabled: this.exportEnabled,
         selectEnabled: this.selectEnabled,
-        toggleEnabled: this.toggleEnabled
+        toggleEnabled: this.toggleEnabled,
+        showCICO: this.showCICO
       };
 
       if ( this.summaryView )          view.summaryView          = this.summaryView;

@@ -88,6 +88,12 @@ foam.CLASS({
       value: true
     },
     {
+      class: 'Boolean',
+      name: 'showCICO',
+      documentation: 'True to show cash in and cash out container.',
+      value: false
+    },
+    {
       name: 'border',
       documentation: `
         If you want the DAO controller to be the content of a border view, set
