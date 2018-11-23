@@ -103,9 +103,11 @@ public class AuthWebAgent
         session = new Session.Builder(x).build();
         session.setId(sessionId);
         session.setContext(x.put(Session.class, session));
+      }
 
-        createCookie(x, session);
-      } else if ( ! attemptLogin && session.getContext().get("user") != null ) {
+      // save cookie
+      createCookie(x, session);
+      if ( ! attemptLogin && session.getContext().get("user") != null ) {
         return session;
       }
     } else {
