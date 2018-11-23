@@ -658,7 +658,7 @@ foam.CLASS({
 
 // Upgrade async property to a real boolean property.
 foam.CLASS({
-  refines: 'AbstractMethod',
+  refines: 'foam.core.AbstractMethod',
   properties: [
     {
       class: 'Boolean',
