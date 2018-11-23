@@ -11,7 +11,9 @@ foam.CLASS({
 
   documentation: 'Data Integration Gateway - Perform DAO operations against a web service',
 
-  requires: ['foam.net.web.HTTPRequest'], 
+  requires: ['foam.net.web.HTTPRequest'],
+
+  imports: ['appConfig'],
 
   tableColumns: [
     'id',
@@ -148,7 +150,7 @@ foam.CLASS({
       label: 'Send Request',
       code: function() {
         var req = this.HTTPRequest.create({
-          url: window.location.origin + this.digURL,
+          url: this.appConfig.URL.value + this.digURL.substring(1),
           method: 'POST',
           payload: this.data,
         }).send();
