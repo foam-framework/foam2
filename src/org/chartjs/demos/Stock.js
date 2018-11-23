@@ -25,11 +25,26 @@ foam.CLASS({
       postSet: function() { this.maybeAddRandomSnapshots() },
     },
     {
+      name: 'plottedStockPrices',
+      view: {
+        class: 'org.chartjs.demos.ConfigurableChartView',
+        view: 'org.chartjs.Line',
+      },
+      factory: function() {
+        var sink = this.GROUP_BY(
+          this.StockPriceSnapshot.SYMBOL,
+          this.PLOT(
+            this.StockPriceSnapshot.DATE,
+            this.StockPriceSnapshot.PRICE));
+        this.stockPriceSnapshotDAO.listen(sink);
+        return sink;
+      },
+    },
+    {
       name: 'stockPrices',
       view: {
-        class: 'org.chartjs.Line',
-        height: 200,
-        width: 200,
+        class: 'org.chartjs.demos.ConfigurableChartView',
+        view: 'org.chartjs.Line',
       },
       factory: function() {
         var sink = this.GROUP_BY(
@@ -42,16 +57,41 @@ foam.CLASS({
       },
     },
     {
-      name: 'holdings',
+      name: 'totalHoldings',
       view: {
-        class: 'org.chartjs.Bar',
-        height: 200,
-        width: 200,
+        class: 'org.chartjs.demos.ConfigurableChartView',
+        view: 'org.chartjs.Bar',
       },
       factory: function() {
         var sink = this.GROUP_BY(this.StockOrder.SYMBOL, this.SUM(this.StockOrder.SHARES));
         this.stockOrderDAO.listen(sink);
         return sink;
+      },
+    },
+    {
+      name: 'holdingsByPersonPie',
+      view: {
+        class: 'org.chartjs.demos.ConfigurableChartView',
+        view: 'org.chartjs.Pie',
+      },
+      factory: function() {
+        var sink = this.GROUP_BY(
+          this.StockOrder.SYMBOL,
+          this.GROUP_BY(
+            this.StockOrder.PERSON,
+            this.SUM(this.StockOrder.SHARES)));
+        this.stockOrderDAO.listen(sink);
+        return sink;
+      },
+    },
+    {
+      name: 'holdingsByPersonBar',
+      view: {
+        class: 'org.chartjs.demos.ConfigurableChartView',
+        view: 'org.chartjs.Bar',
+      },
+      expression: function(holdingsByPersonPie) {
+        return holdingsByPersonPie;
       },
     },
     {
@@ -78,6 +118,17 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
+      name: 'personNames',
+      factory: function() {
+        return [
+          'Adam',
+          'Mike',
+          'Kevin',
+        ];
+      },
+    },
+    {
+      class: 'StringArray',
       name: 'stockSymbols',
       factory: function() {
         return [
@@ -90,9 +141,9 @@ foam.CLASS({
       },
     },
     {
-      class: 'Int',
+      class: 'Date',
       name: 'date',
-      //factory: function() { return new Date() },
+      factory: function() { return new Date() },
     },
   ],
   classes: [
@@ -100,7 +151,7 @@ foam.CLASS({
       name: 'StockPriceSnapshot',
       properties: [
         { name: 'id' },
-        { class: 'Int', name: 'date' },
+        { class: 'Date', name: 'date' },
         { class: 'String', name: 'symbol' },
         { class: 'Currency', name: 'price' },
       ]
@@ -110,8 +161,21 @@ foam.CLASS({
       properties: [
         { name: 'id' },
         { class: 'String', name: 'symbol' },
+        {
+          class: 'String',
+          name: 'person',
+          chartJsFormatter: function(v) {
+            return v + '!'
+          },
+        },
         { class: 'Currency', name: 'pricePerShare' },
-        { class: 'Int', name: 'shares' },
+        {
+          class: 'Int',
+          name: 'shares',
+          chartJsFormatter: function(v) {
+            return v + ' shares'
+          },
+        },
       ]
     },
   ],
@@ -129,7 +193,7 @@ foam.CLASS({
     {
       name: 'maybeAddRandomSnapshots',
       isMerged: true,
-      mergeDelay: 500,
+      mergeDelay: 1000,
       code: function() {
         if ( ! this.autoAddRandomSnapshots ) return;
         this.addRandomSnapshots();
@@ -141,9 +205,11 @@ foam.CLASS({
     {
       name: 'addRandomOrder',
       code: function() {
-        var names = this.stockSymbols;
+        var symbols = this.stockSymbols;
+        var names = this.personNames;
         this.stockOrderDAO.put(this.StockOrder.create({
-          symbol: names[Math.floor(Math.random()*names.length)],
+          symbol: symbols[Math.floor(Math.random()*symbols.length)],
+          person: names[Math.floor(Math.random()*names.length)],
           shares: Math.floor(Math.random()*100) - 50,
           pricePerShare: Math.random()*100000,
         }));
@@ -154,14 +220,14 @@ foam.CLASS({
       code: function() {
         var self = this;
         self.stockSymbols.forEach(function(n) {
+          if ( Math.floor(Math.random()*2) ) return;
           self.stockPriceSnapshotDAO.put(self.StockPriceSnapshot.create({
             date: self.date,
             symbol: n,
             price: Math.random()*100000,
           }));
         })
-        self.date++;
-        //self.date = new Date(self.date.getTime() + 24*60*60*1000);
+        self.date = new Date(self.date.getTime() + 24*60*60*1000);
       },
     },
   ],

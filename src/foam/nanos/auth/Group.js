@@ -102,7 +102,22 @@ foam.CLASS({
       class: 'String',
       name: 'url',
       value: null
-    }
+    },
+    {
+      class: 'String',
+      name: 'from',
+      value: null
+    },
+    {
+      class: 'String',
+      name: 'displayName',
+      value: null
+    },
+    {
+      class: 'String',
+      name: 'replyTo',
+      value: null
+    },
 /*    {
       class: 'FObjectProperty',
       of: 'foam.nanos.app.AppConfig',
@@ -206,6 +221,23 @@ config.setUrl(configUrl);
 
 return config;
         `
+    },
+    {
+      name: 'isDescendantOf',
+      code: function(groupId, groupDAO) {
+        /**
+         * Returns a promise that resolves to true if this group is a
+         * descendant of the given group or false if it is not.
+         */
+        if ( ! groupId ) return false;
+        const inner = async (group) => {
+          if ( ! group ) return false;
+          if ( group.id === groupId ) return true;
+          var nextGroup = await groupDAO.find(group.parent);
+          return await inner(nextGroup);
+        };
+        return inner(this);
+      }
     }
   ]
 });

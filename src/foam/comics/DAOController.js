@@ -82,6 +82,12 @@ foam.CLASS({
       value: true
     },
     {
+      class: 'Boolean',
+      name: 'toggleEnabled',
+      documentation: 'True to enable the toggle filters button.',
+      value: true
+    },
+    {
       name: 'border',
       documentation: `
         If you want the DAO controller to be the content of a border view, set
@@ -136,12 +142,10 @@ foam.CLASS({
       `
     },
     {
-      class: 'FObjectArray',
-      of: 'foam.core.Action',
-      name: 'contextMenuActions',
+      class: 'foam.u2.ViewSpec',
+      name: 'summaryView',
       documentation: `
-        Custom subclasses can set this to add extra context menu actions to the
-        table.
+        Subclasses can set this to override the default summaryView.
       `
     },
     {
@@ -151,15 +155,21 @@ foam.CLASS({
         Set this to override the label of the create button, which is the
         default primary action.
       `
+    },
+    {
+      class: 'String',
+      name: 'detailView',
+      value: 'foam.u2.DetailView'
     }
   ],
 
   actions: [
     {
       name: 'toggleFilters',
+      isAvailable: function(toggleEnabled) { return toggleEnabled; },
       code: function() {
         this.searchHidden = ! this.searchHidden;
-      },
+      }
     },
     {
       name: 'create',
@@ -206,7 +216,7 @@ foam.CLASS({
     {
       name: 'export',
       isAvailable: function(exportEnabled) { return exportEnabled; },
-      code: function() { 
+      code: function() {
         this.pub('export', this.filteredDAO)
       }
     }

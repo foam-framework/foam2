@@ -29,9 +29,9 @@ foam.CLASS({
   axioms: [
     {
       installInClass: function(cls) {
-        cls.createView = function(spec, args, self, ctx) {
+        cls.createView = function(spec, args, self, ctx, disableWarning) {
           if ( foam.u2.Element.isInstance(spec) ) {
-            if ( foam.debug ) {
+            if ( foam.debug && ! disableWarning ) {
               console.warn('Warning: Use of literal View as ViewSpec: ', spec.cls_.id);
             }
             return spec.copyFrom(args);
@@ -44,7 +44,7 @@ foam.CLASS({
             return spec.toE(args, ctx);
 
           if ( foam.Function.isInstance(spec) )
-            return foam.u2.ViewSpec.createView(spec.call(self, args, ctx), args, self, ctx);
+            return foam.u2.ViewSpec.createView(spec.call(self, args, ctx, true), args, self, ctx, true);
 
           if ( foam.Object.isInstance(spec) ) {
             var ret = spec.create ?

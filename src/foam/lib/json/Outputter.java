@@ -12,19 +12,18 @@ import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
 import foam.util.SafetyUtil;
-import org.apache.commons.io.IOUtils;
-
 import java.io.*;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
+import org.apache.commons.io.IOUtils;
 
 public class Outputter
   extends AbstractSink
   implements foam.lib.Outputter
 {
-  protected ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
+  protected static ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
     protected SimpleDateFormat initialValue() {
       SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -39,7 +38,6 @@ public class Outputter
   protected boolean       outputShortNames_    = false;
   protected boolean       outputDefaultValues_ = false;
   protected boolean       outputClassNames_    = true;
-  protected boolean       outputJsonj_         = false;
 
   public Outputter() {
     this(OutputterMode.FULL);
@@ -318,10 +316,14 @@ public class Outputter
     return false;
   }
 
+  public void outputJSONJFObject(FObject o) {
+    writer_.append("p(");
+    outputFObject(o);
+    writer_.append(")\r\n");
+  }
+
   protected void outputFObject(FObject o) {
     ClassInfo info = o.getClassInfo();
-
-    if ( outputJsonj_ ) writer_.append("p(");
 
     writer_.append("{");
     if ( outputClassNames_ ) {
@@ -340,8 +342,6 @@ public class Outputter
     }
 
     writer_.append("}");
-
-    if ( outputJsonj_ ) writer_.append(")");
   }
 
   protected void outputPropertyInfo(PropertyInfo prop) {
@@ -427,9 +427,5 @@ public class Outputter
   public void flush() throws IOException {
     if ( stringWriter_ != null ) stringWriter_.flush();
     if ( writer_ != null ) writer_.flush();
-  }
-
-  public void setOutputJsonj_(boolean outputJsonj) {
-    outputJsonj_ = outputJsonj;
   }
 }

@@ -619,7 +619,7 @@ foam.CLASS({
 
     function maybeInitCView(x) {
       if ( this.state === 'initial' ) {
-        this.state = 'initailized'
+        this.state = 'initailized';
         this.initCView(x);
       }
     },

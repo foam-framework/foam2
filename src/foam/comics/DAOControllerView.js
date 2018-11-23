@@ -18,6 +18,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'createControllerView? as importedCreateControllerView',
     'data? as importedData',
     'stack',
     'summaryView? as importedSummaryView',
@@ -48,6 +49,7 @@ foam.CLASS({
     }
 
     ^title-container > * {
+      color: #555;
       display: inline-block;
       margin: 0.67rem 0;
     }
@@ -66,15 +68,26 @@ foam.CLASS({
 
     ^ .actions {
       display: inline-block;
+      margin-bottom: 8px;
     }
 
     ^ .actions .net-nanopay-ui-ActionView {
       margin: 0 10px 10px 0;
     }
 
+    ^ .actions button + button {
+      margin-left: 8px;
+    }
+
     ^ .net-nanopay-ui-ActionView {
-      background: #59aadd;
+      width: 128px;
+      height: 40px;
+      background: #0098db;
       color: white;
+      border-radius: 4px;
+      box-shadow: 0 1px 0 0 rgba(22, 29, 37, 0.05);
+      font-weight: 500;
+      font-size: 14px;
     }
   `,
 
@@ -94,18 +107,20 @@ foam.CLASS({
       }
     },
     {
+      class: 'foam.u2.ViewSpec',
       name: 'summaryView',
       factory: function() {
-        var defaultView = { class: 'foam.u2.view.ScrollTableView' };
-        if (
-          Array.isArray(this.data.contextMenuActions) &&
-          this.data.contextMenuActions.length > 0
-        ) {
-          defaultView.contextMenuActions = this.data.contextMenuActions;
-        }
-        return this.importedSummaryView ?
-          this.importedSummaryView :
-          defaultView;
+        return this.data.summaryView || this.importedSummaryView || {
+          class: 'foam.u2.view.ScrollTableView'
+        };
+      }
+    },
+    {
+      name: 'createControllerView',
+      expression: function() {
+        return this.importedCreateControllerView || {
+          class: 'foam.comics.DAOCreateControllerView'
+        };
       }
     },
     {
@@ -200,20 +215,26 @@ foam.CLASS({
     },
 
     function dblclick(obj) {
-      this.onEdit(null, null, obj.id);
+      if ( this.data.dblclick ) {
+        this.data.dblclick(obj);
+      } else {
+        this.onEdit(null, null, obj.id);
+      }
     }
   ],
 
   listeners: [
     function onCreate() {
       this.stack.push({
-        class: 'foam.comics.DAOCreateControllerView'
+        class: this.createControllerView.class,
+        detailView: this.data.detailView
       }, this);
     },
 
     function onEdit(s, edit, id) {
       this.stack.push({
         class: this.updateView.class,
+        detailView: this.data.detailView,
         key: id
       }, this);
     },

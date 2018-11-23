@@ -37,6 +37,7 @@ import java.nio.CharBuffer;
 import java.util.Iterator;
 import java.util.List;
 import java.lang.Exception;
+import java.util.StringTokenizer;
 
 public class DigWebAgent
   implements WebAgent
@@ -244,15 +245,14 @@ public class DigWebAgent
               out.println(outputterJson.toString());
             }
           } else if ( Format.XML == format ) {
-            XMLSupport xmlSupport = new XMLSupport();
+            foam.lib.xml.Outputter outputterXml = new foam.lib.xml.Outputter(OutputterMode.NETWORK);
+            outputterXml.output(sink.getArray().toArray());
 
+            //resp.setContentType("application/xml");
             if ( emailSet ) {
-              String xmlData = "<textarea style=\"width:700;height:400;\" rows=10 cols=120>" + xmlSupport.toXMLString(sink.getArray()) + "</textarea>";
-
-              output(x, xmlData);
+              output(x, "<textarea style=\"width:700;height:400;\" rows=10 cols=120>" + outputterXml.toString() + "</textarea>");
             } else {
-              //resp.setContentType("application/xml");
-              out.println(xmlSupport.toXMLString(sink.getArray()));
+              out.println(outputterXml.toString());
             }
           } else if ( Format.CSV == format ) {
             foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);
@@ -292,14 +292,13 @@ public class DigWebAgent
               out.println(outputterHtml.toString());
             }
           } else if ( Format.JSONJ == format ) {
-            foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+            foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.STORAGE);
             List a = sink.getArray();
             String dataToString = "";
-            outputterJson.setOutputJsonj_(true);
 
             //resp.setContentType("application/json");
             for ( int i = 0 ; i < a.size() ; i++ )
-              outputterJson.output(a.get(i));
+              outputterJson.outputJSONJFObject((FObject) a.get(i));
 
             if ( emailSet ) {
               output(x, dataToString);
@@ -369,25 +368,30 @@ public class DigWebAgent
   }
 
   protected void output(X x, String data) {
-    HttpParameters p       = x.get(HttpParameters.class);
-    String[]       email   = p.getParameterValues("email");
-    String         subject = p.getParameter("subject");
+    HttpParameters p            = x.get(HttpParameters.class);
+    String         emailParam   = p.getParameter("email");
+    String         subject      = p.getParameter("subject");
 
-    if ( email.length == 0 ) {
+    if (  SafetyUtil.isEmpty(emailParam) ) {
       PrintWriter out = x.get(PrintWriter.class);
 
       out.print(data);
     } else {
       EmailService emailService = (EmailService) x.get("email");
       EmailMessage message      = new EmailMessage();
-      message.setTo(email);
+
+      // For multiple receiver
+      String[]  email = emailParam.split(",");
+
+      if ( email.length > 0 ) message.setTo(email);
+
       message.setSubject(subject);
 
       String newData = data;
 
       message.setBody(newData);
 
-      emailService.sendEmail(message);
+      emailService.sendEmail(x, message);
     }
   }
 
@@ -425,8 +429,9 @@ public class DigWebAgent
     } else if ( format == Format.XML )  {
       //output error in xml format
 
-      XMLSupport xmlSupport = new XMLSupport();
-      out.println(xmlSupport.toXMLString(error));
+      foam.lib.xml.Outputter outputterXml = new foam.lib.xml.Outputter(OutputterMode.NETWORK);
+      outputterXml.output(error);
+      out.println(outputterXml.toString());
 
     } else if ( format == Format.CSV )  {
       //output error in csv format

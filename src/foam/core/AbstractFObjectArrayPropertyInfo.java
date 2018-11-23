@@ -7,8 +7,6 @@
 package foam.core;
 
 import foam.nanos.logger.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -62,22 +60,6 @@ public abstract class AbstractFObjectArrayPropertyInfo
       logger.error("Premature end of XML file");
     }
     return objList.toArray();
-  }
-
-  @Override
-  public void toXML(FObject obj, Document doc, Element objElement) {
-    if ( this.f(obj) == null ) return;
-
-    Element prop = doc.createElement(this.getName());
-    objElement.appendChild(prop);
-
-    // FObject Array check
-    FObject[] nestedArray = (FObject[]) this.f(obj);
-    for ( int j = 0 ; j < nestedArray.length ; j++ ) {
-      XMLSupport.toXML(nestedArray[j], doc, prop);
-    }
-
-    return;
   }
 
   @Override
