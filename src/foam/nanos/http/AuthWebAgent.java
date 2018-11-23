@@ -36,20 +36,22 @@ public class AuthWebAgent
 
   public Cookie getCookie(HttpServletRequest req) {
     Cookie[] cookies = req.getCookies();
+    if ( cookies == null ) {
+      return null;
+    }
 
-    if ( cookies != null )
-      for ( Cookie cookie : cookies )
-        if ( SESSION_ID.equals(cookie.getName()) )
-          return cookie;
+    for ( Cookie cookie : cookies ) {
+      if ( SESSION_ID.equals(cookie.getName()) ) {
+        return cookie;
+      }
+    }
 
     return null;
   }
 
-  public void createCookie(X x, Session session){
-    HttpServletResponse resp   = x.get(HttpServletResponse.class);
-    Cookie              cookie = new Cookie(SESSION_ID, session.getId());
-
-    resp.addCookie(cookie);
+  public void createCookie(X x, Session session) {
+    HttpServletResponse resp = x.get(HttpServletResponse.class);
+    resp.addCookie(new Cookie(SESSION_ID, session.getId()));
   }
 
   public void templateLogin(X x) {
@@ -97,15 +99,19 @@ public class AuthWebAgent
     if ( ! SafetyUtil.isEmpty(sessionId) ) {
       session = (Session) sessionDAO.find(sessionId);
       if ( session == null ) {
-        session = new Session();
+        // create new session
+        session = new Session.Builder(x).build();
         session.setId(sessionId);
+        session.setContext(x.put(Session.class, session));
+
         createCookie(x, session);
       } else if ( ! attemptLogin && session.getContext().get("user") != null ) {
         return session;
       }
     } else {
       // create new cookie
-      session = new Session();
+      session = new Session.Builder(x).build();
+      session.setContext(x.put(Session.class, session));
       createCookie(x, session);
     }
 
