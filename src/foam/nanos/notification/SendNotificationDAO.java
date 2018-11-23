@@ -12,18 +12,20 @@ import static foam.mlang.MLang.EQ;
 
 public class SendNotificationDAO extends ProxyDAO {
 
+  public DAO userDAO_;
+
   public SendNotificationDAO(X x, DAO delegate) {
     setX(x);
     setDelegate(delegate);
-
+    userDAO_ = (DAO) x.get("localUserDAO");
   }
+
   @Override
   public FObject put_(X x, FObject obj) {
-    DAO userDAO = (DAO) x.get("localUserDAO");
     Notification notif = (Notification) obj;
 
     if ( notif.getBroadcasted() ) {
-      userDAO.select(new AbstractSink() {
+      userDAO_.inX(x).select(new AbstractSink() {
         @Override
         public void put(Object o, Detachable d) {
           User user = (User) o;
@@ -31,7 +33,7 @@ public class SendNotificationDAO extends ProxyDAO {
         }
       });
     } else if ( ! SafetyUtil.isEmpty(notif.getGroupId()) ) {
-      userDAO.where(EQ(User.GROUP, notif.getGroupId())).select(new AbstractSink() {
+      userDAO_.inX(x).where(EQ(User.GROUP, notif.getGroupId())).select(new AbstractSink() {
         @Override
         public void put(Object o, Detachable d) {
           User user = (User) o;
@@ -54,4 +56,3 @@ public class SendNotificationDAO extends ProxyDAO {
     ((DAO) x.get("notificationDAO")).put_(x, notification);
   }
 }
-

@@ -20,6 +20,8 @@ import java.util.List;
 // If notification's emailEnabled is true, the decorator creates an email based on provided or default emailTemplate, sets the reciever based on notification userId/groupId/broadcasted
 public class SendEmailNotificationDAO extends ProxyDAO {
 
+  public DAO userDAO_;
+
   public SendEmailNotificationDAO(DAO delegate) {
     setDelegate(delegate);
   }
@@ -27,14 +29,15 @@ public class SendEmailNotificationDAO extends ProxyDAO {
   public SendEmailNotificationDAO(X x, DAO delegate) {
     setX(x);
     setDelegate(delegate);
+    userDAO_ = (DAO) x.get("localUserDAO");
   }
+
   @Override
   public FObject put_(X x, FObject obj) {
-    DAO userDAO = (DAO) x.get("localUserDAO");
     AppConfig config     = (AppConfig) x.get("appConfig");
     EmailService email      = (EmailService) x.get("email");
     Notification notif = (Notification) obj;
-    User user = (User) userDAO.find(notif.getUserId());
+    User user = (User) userDAO_.inX(x).find(notif.getUserId());
     Notification oldNotif = (Notification) getDelegate().find(obj);
 
     if ( oldNotif != null )
