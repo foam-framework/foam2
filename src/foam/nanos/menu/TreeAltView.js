@@ -19,12 +19,6 @@ foam.CLASS({
     'foam.u2.view.TableView'
   ],
 
-  css: `
-    .foam-u2-view-TreeView {
-      width: 962px;
-    }
-  `,
-
   methods: [
     function init(){
       this.views = [

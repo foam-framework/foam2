@@ -68,15 +68,6 @@ public abstract class AbstractEnumPropertyInfo
   }
 
   @Override
-  public void toXML(FObject obj, Document doc, Element objElement) {
-    Object nestObj = this.f(obj);
-    Element objTag = doc.createElement(this.getName());
-    int ordVal = this.getOrdinal(nestObj);
-    objTag.appendChild(doc.createTextNode(Integer.toString(ordVal)));
-    objElement.appendChild(objTag);
-  }
-
-  @Override
   public void updateDigest(FObject obj, MessageDigest md) {
     if ( ! includeInDigest() ) return;
     int val = getOrdinal(get(obj));
