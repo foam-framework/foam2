@@ -44,6 +44,9 @@ foam.CLASS({
           d.setTime(v["$DATE"]);
           return d;
         }
+        if ( ! foam.Undefined.isInstance(v["$REGEXP$"]) ) {
+          return new RegExp(v["$REGEXP$"]);
+        }
         if ( ! foam.Undefined.isInstance(v["$FUNC$"]) ) {
           if ( this.parseFunctions ) {
             var name = v.name;
