@@ -70,6 +70,11 @@ foam.CLASS({
             out.key("$DATE$");
             out.n(v.getTime());
             out.end();
+          } else if ( type == foam.RegExp ) {
+            out.obj();
+            out.key("$REGEXP$");
+            out.s(v.toString());
+            out.end();
           } else if ( type == foam.Object ) {
             if ( foam.core.FObject.isSubClass(v) ) { // Is an actual class
               if ( v.id.indexOf('AnonymousClass') == 0 ) {
