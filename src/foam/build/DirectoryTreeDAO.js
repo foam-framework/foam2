@@ -20,15 +20,19 @@ foam.CLASS({
     },
     {
       name: 'deserializer',
-      factory: function() [
+      factory: function() {
         return this.Deserializer.create();
       }
     },
     {
-      name: 'index'
+      name: 'sep',
+      factory: function() { return require('path').sep; }
     },
     {
-      name: 'fs'
+      name: 'fs',
+      factory: function() {
+        return require('fs')
+      },
     }
   ],
   methods: [
@@ -38,22 +42,42 @@ foam.CLASS({
         { name: 'id', type: 'String' },
       ],
       code: function(id) {
+        return this.root + this.sep + id.replace(/\./g, this.sep) + '.js';
+      }
+    },
+    {
+      name: 'pathsAt_',
+      args: [
+        { name: 'root', type: 'String' },
+      ],
+      code: function(root) {
+        var fs = this.fs;
+        var sep = this.sep;
+        var dirs = [root];
+        var files = [];
+        while ( dirs.length ) {
+          var dir = dirs.pop();
+          fs.readdirSync(dir).forEach(function(f) {
+            var path = dir + sep + f;
+            var lstat = fs.lstatSync(path);
+            if ( lstat.isDirectory() ) dirs.push(path)
+            else files.push(path)
+          })
+        }
+        return files;
       }
     },
     {
       name: 'loadFile_',
-      args: [ { name: 'path', type: 'Stirng' } ],
-      async: true,
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'path', type: 'Stirng' }
+      ],
       returns: 'foam.core.FObject',
-      code: function(path) {
-        return new Promise(function(resolve, reject) {
-          requires('fs').readFile(path, { encoding: 'utf8' }, function(err, data) {
-            if ( err ) reject(err);
-            else resolve(data);
-          });
-        }).then(function(data) {
-          return this.deserializer.parseString(this.__context__, data);
-        }.bind(this));
+      async: true,
+      code: function(x, path) {
+        var s = this.fs.readFileSync(path, 'utf-8');
+        return this.deserializer.aparseString(x, s)
       }
     },
     {
@@ -65,33 +89,41 @@ foam.CLASS({
 
         var detached = false;
         var sub = foam.core.FObject.create();
-        sub.onDeatch(function() { detached = true; });
+        sub.onDetach(function() { detached = true; });
 
-        return Promise.all(this.index.map(function(path) {
-          return this.loadFile_(path).then(function(obj) {
+        return Promise.all(this.pathsAt_(this.root).map(function(path) {
+          return this.loadFile_(x, path).then(function(obj) {
             if ( detached ) return;
             mysink.put(obj, sub);
           });
         }.bind(this))).then(function(objs) {
           mysink.eof();
-
           return sink;
         });
       }
     },
     {
       name: 'find_',
-      code: function(id) {
-        return this.index.find(id).then(function(path) {
-          return this.loadFile_(path);
-        }, function() { return null; });
+      code: function(x, id) {
+        return this.loadFile_(x, this.pathFor_(id));
       }
     },
     {
       name: 'put_',
       code: function(x, obj) {
-        return this.index.find(obj.id).then(function(path) {
-        });
+        var path = this.pathFor_(obj.id);
+
+        var dirs = path.split(this.sep);
+        dirs.pop(); // Don't want a dir with the filename.
+        var p = '';
+        while ( dirs.length ) {
+          p = p + dirs.shift() + this.sep;
+          if ( ! this.fs.existsSync(p) ) this.fs.mkdirSync(p);
+        }
+
+        var s = this.serializer.stringify(x, obj)
+        this.fs.writeFileSync(path, s, 'utf8');
+        return Promise.resolve(obj);
       }
     },
     {
@@ -102,6 +134,36 @@ foam.CLASS({
 
         }.bind(this));
       }
+    },
+    {
+      name: 'execute',
+      code: function() {
+        // TODO remove all this. It's just for testing for now.
+        var self = this;
+        self.root = '/tmp/foam2out/';
+        var classloader = self.__context__.classloader;
+
+        Promise.all([
+          classloader.load('foam.build.DirCrawlModelDAO'),
+          classloader.load('foam.dao.DAOSink'),
+        ]).then(function() {
+          var sink = foam.dao.DAOSink.create({ dao: self })
+          var dao = foam.build.DirCrawlModelDAO.create()
+          return dao.select(sink);
+        }).then(function() {
+          return self.find('foam.apploader.Classloader')
+        }).then(function(o) {
+          console.log(o.id);
+          /*
+        }).then(function() {
+          return self.select();
+        }).then(function(sink) {
+          sink.array.forEach(function(model) {
+            console.log(model.id);
+          })
+          */
+        });
+      },
     },
   ]
 });
