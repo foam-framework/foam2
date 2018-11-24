@@ -66,7 +66,10 @@ foam.CLASS({
       name: 'returns',
       value: 'Void'
     },
-    'async',
+    {
+      class: 'Boolean',
+      name: 'async',
+    },
     {
       name: 'args',
       factory: function() {
