@@ -199,7 +199,7 @@ foam.CLASS({
       this.constants.forEach(function(c) { o.out(c, '\n'); });
 
       this.fields.sort(function(o1, o2) {
-        return o2.order < o1.order
+        return o1.order - o2.order
       }).forEach(function(f) { o.out(f, '\n'); });
 
       this.methods.forEach(function(f) { o.out(f, '\n'); });
