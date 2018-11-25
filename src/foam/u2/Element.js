@@ -314,6 +314,7 @@ foam.CLASS({
     function unload() {
       this.state = this.UNLOADED;
       this.visitChildren('unload');
+      this.detach();
     },
     function error() {
       throw new Error('Mutations not allowed in OUTPUT state.');
@@ -355,6 +356,7 @@ foam.CLASS({
 
       this.state = this.UNLOADED;
       this.visitChildren('unload');
+      this.detach();
     },
     function onRemove() { this.unload(); },
     function onSetClass(cls, enabled) {
