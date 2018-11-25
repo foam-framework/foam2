@@ -201,7 +201,7 @@ public class AuthWebAgent
     AuthService auth    = (AuthService) x.get("auth");
     Session     session = authenticate(x);
 
-    if ( session != null && session.getContext() != null ) {
+    if ( session != null && session.getUserId() != 0 ) {
       if ( auth.check(session.getContext(), permission_) ) {
         getDelegate().execute(x.put(Session.class, session).put("user", session.getContext().get("user")));
       } else {
