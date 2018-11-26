@@ -1101,7 +1101,7 @@ foam.CLASS({
       if ( opt_shown === undefined ) {
         this.shown = true;
       } else if ( foam.core.Slot.isInstance(opt_shown) ) {
-        this.shown$.follow(opt_shown);
+        this.onDetach(this.shown$.follow(opt_shown));
       } else {
         this.shown = !! opt_shown;
       }
@@ -1149,7 +1149,7 @@ foam.CLASS({
           // TODO: remove check when all properties have fromString()
           this[name] = prop.fromString ? prop.fromString(value) : value;
         } else if ( foam.core.Slot.isInstance(value) ) {
-          this.slot(name).follow(value);
+          this.onDetach(this.slot(name).follow(value));
         } else {
           this[name] = value;
         }
@@ -1885,8 +1885,7 @@ foam.CLASS({
         e = e2;
       };
 
-      var s = slot.sub(this.framed(l));
-      this.onDetach(s);
+      this.onDetach(slot.sub(this.framed(l)));
 
       return e;
     },
