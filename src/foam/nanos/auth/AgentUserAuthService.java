@@ -113,7 +113,7 @@ public class AgentUserAuthService
     X sessionContext = session.getContext();
     // Get agent from session context
     User agent = (User) sessionContext.get("agent");
-    if (agent != null) {
+    if ( agent != null ) {
       agent = (User) userDAO_.find(agent.getId());
     }
     return agent;
