@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'Serializer',
   requires: [
     'foam.json2.Outputter',
+    'foam.json2.PrettyOutputterOutput',
   ],
   methods: [
     function stringify(x, v) {
@@ -21,7 +22,8 @@ foam.CLASS({
     {
       name: 'InnerSerializer',
       requires: [
-        'foam.json2.Outputter'
+        'foam.json2.Outputter',
+        'foam.json2.PrettyOutputterOutput',
       ],
       properties: [
         {
@@ -33,7 +35,9 @@ foam.CLASS({
           of: 'foam.json2.Outputter',
           name: 'out',
           factory: function() {
-            return this.Outputter.create();
+            return this.Outputter.create({
+              out: this.PrettyOutputterOutput.create(),
+            });
           }
         }
       ],
@@ -150,8 +154,10 @@ foam.CLASS({
             } else {
               var breakdown = foam.Function.breakdown(v);
               if ( breakdown == null ) {
-                debugger;
-                breakdown = foam.Function.breakdown(v);
+                console.error('Unable to breakdown', v.toString());
+                breakdown = foam.Function.breakdown(function() {
+                  // Breakdown failed!
+                });
               }
 
               foam.assert(breakdown, "Failed to parse funciton, this is a bug!", "Function was ", v);
@@ -184,21 +190,6 @@ foam.CLASS({
           }
         }
       ]
-    }
-  ]
-});
-
-foam.CLASS({
-  refines: 'foam.core.Property',
-  methods: [
-    function outputPropertyJSON2(x, obj, outputter, out) {
-      if ( obj.hasDefaultValue(this.name) ) return;
-
-      if ( this.transient ) return;
-
-      out.key(this.name);
-
-      outputter.output(x, this.f(obj), out);
     }
   ]
 });
