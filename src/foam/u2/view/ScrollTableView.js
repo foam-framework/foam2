@@ -48,7 +48,15 @@
       class: 'Int',
       name: 'daoCount'
     },
-    'selection'
+    'selection',
+    {
+      class: 'Boolean',
+      name: 'editColumnsEnabled',
+      documentation: `
+        Set to true if users should be allowed to choose which columns to use.
+      `,
+      value: true
+    }
   ],
 
   methods: [
@@ -68,7 +76,8 @@
               data$: this.scrolledDAO$,
               columns: this.columns,
               contextMenuActions: this.contextMenuActions,
-              selection$: this.selection$
+              selection$: this.selection$,
+              editColumnsEnabled: this.editColumnsEnabled
             }).
             end().
           end().
