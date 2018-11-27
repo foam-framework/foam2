@@ -88,7 +88,11 @@ foam.CLASS({
           };
 
           if ( foam.String.isInstance(text) ) {
-            with ( context ) { eval(text); }
+            try {
+              with ( context ) { eval(text); }
+            } catch ( e ) {
+              throw new Error("Error parsing " + id + " error was:" + e);
+            }
           } else {
             context.foam.CLASS(text);
           }
@@ -107,4 +111,3 @@ foam.CLASS({
     }
   ]
 });
-
