@@ -18,6 +18,11 @@ foam.CLASS({
       swiftFactory: `return self.SimpleOutputterOutput_create()`,
     },
     {
+      class: 'String',
+      name: 'str',
+      expression: function(delegate$str) { return delegate$str }
+    },
+    {
       class: 'Int',
       name: 'indent',
     },
