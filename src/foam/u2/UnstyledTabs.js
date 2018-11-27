@@ -35,8 +35,8 @@ foam.CLASS({
 
     function add(tab) {
       if ( this.Tab.isInstance(tab) ) {
-
         if ( ! this.selected ) this.selected = tab;
+        if ( tab.selected ) this.selected = tab;
 
         this.tabRow.start('span').
           addClass(this.myClass('tab')).
