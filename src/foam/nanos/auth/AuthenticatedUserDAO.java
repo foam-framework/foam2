@@ -55,7 +55,7 @@ public class AuthenticatedUserDAO
       throw new RuntimeException("Cannot put null.");
     }
 
-    boolean updatingSelf = SafetyUtil.equals(newUser.getId(), user.getId());
+    boolean updatingSelf = SafetyUtil.equals(newUser.getId(), user.getId()) || (x.get("agent") != null && SafetyUtil.equals(((User) x.get("agent")).getId(), newUser.getId()));
     boolean hasUserEditPermission = auth.check(x, "user.update." + newUser.getId());
 
     if (
