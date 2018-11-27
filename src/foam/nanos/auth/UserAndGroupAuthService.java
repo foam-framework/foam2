@@ -24,6 +24,9 @@ import java.security.Permission;
 import java.util.Calendar;
 import java.util.List;
 
+import static foam.mlang.MLang.AND;
+import static foam.mlang.MLang.EQ;
+
 public class UserAndGroupAuthService
   extends    ContextAwareSupport
   implements AuthService, NanoService
@@ -31,7 +34,6 @@ public class UserAndGroupAuthService
   protected DAO userDAO_;
   protected DAO groupDAO_;
   protected DAO sessionDAO_;
-  protected DAO userSubclassDAO_;
 
   public final static String CHECK_USER_PERMISSION = "service.auth.checkUser";
 
@@ -44,14 +46,9 @@ public class UserAndGroupAuthService
 
   @Override
   public void start() {
-    userDAO_     = (DAO) getX().get("localUserDAO");
-    groupDAO_    = (DAO) getX().get("groupDAO");
-    sessionDAO_  = (DAO) getX().get("sessionDAO");
-
-    // Override this in a subclass if you need a DAO that contains instances of
-    // User as well as instances of subclasses of User. Since FOAM doesn't have
-    // any subclasses of User, this just refers to localUserDAO.
-    userSubclassDAO_     = (DAO) getX().get("localUserDAO");
+    userDAO_    = (DAO) getX().get("localUserDAO");
+    groupDAO_   = (DAO) getX().get("groupDAO");
+    sessionDAO_ = (DAO) getX().get("sessionDAO");
   }
 
   public User getCurrentUser(X x) throws AuthenticationException {
@@ -62,7 +59,7 @@ public class UserAndGroupAuthService
     }
 
     // get user from session id
-    User user = (User) userSubclassDAO_.find(session.getUserId());
+    User user = (User) userDAO_.find(session.getUserId());
     if ( user == null ) {
       throw new AuthenticationException("User not found: " + session.getUserId());
     }
@@ -145,7 +142,7 @@ public class UserAndGroupAuthService
     session.setUserId(user.getId());
     session.setContext(session.getContext().put("user", user));
     sessionDAO_.put(session);
- 
+
     return user;
   }
 
@@ -157,16 +154,22 @@ public class UserAndGroupAuthService
     if ( userId < 1 || SafetyUtil.isEmpty(password) ) {
       throw new AuthenticationException("Invalid Parameters");
     }
-    
+
     return userAndGroupContext(x, (User) userDAO_.find(userId), password);
   }
 
   public User loginByEmail(X x, String email, String password) throws AuthenticationException {
-    User user = (User) userDAO_.find(MLang.EQ(User.EMAIL, email.toLowerCase()));
+    User user = (User) userDAO_.find(
+      AND(
+        EQ(User.EMAIL, email.toLowerCase()),
+        EQ(User.LOGIN_ENABLED, true)
+      )
+    );
+
     if ( user == null ) {
       throw new AuthenticationException("User not found");
     }
-    
+
     return userAndGroupContext(x, user, password);
   }
 
@@ -225,7 +228,7 @@ public class UserAndGroupAuthService
     }
 
     // check if user exists and is enabled
-    User user = (User) userSubclassDAO_.find(session.getUserId());
+    User user = (User) userDAO_.find(session.getUserId());
     if ( user == null || ! user.getEnabled() ) {
       return false;
     }
