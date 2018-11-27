@@ -148,7 +148,7 @@ foam.CLASS({
           try {
             with ( context ) { eval(o) };
           } catch(e) {
-            console.log(e);
+            console.log("Error parsing file:", path, e);
           }
         } else if ( path.endsWith('.java') ) {
           // TODO: Add a JavaClass model for manually written java classes.
