@@ -62,7 +62,12 @@ foam.CLASS({
       return i < 0 ? this.stack_[this.pos + i + 1] : this.stack_[i];
     },
 
-    function push(v, parent) {
+    function push(v, parent, opt_id) {
+      /** opt_id - used to give some unique id to the view being pushed. If it matches the current view then push() ignored. **/
+
+      // Avoid feedback of views updating mementos causing themselves to be re-inserted
+      if ( this.top && opt_id && this.top[2] === opt_id ) return;
+
       if ( foam.u2.Element.isInstance(v) ) {
         console.warn("Views are not recommended to be pushed to a stack. Please use a viewSpec.");
       }
@@ -75,7 +80,7 @@ foam.CLASS({
 
       this.depth = pos + 1;
       this.stack_.length = this.depth;
-      this.stack_[pos] = [v, parent];
+      this.stack_[pos] = [v, parent, opt_id];
       this.pos = pos;
     }
   ],
