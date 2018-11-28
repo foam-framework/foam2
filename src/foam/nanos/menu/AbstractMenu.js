@@ -13,15 +13,20 @@ foam.CLASS({
 
   methods: [
     function setMenuId(id) {
-      if ( window.location.hash.substr(1) != id ){
-        window.location.hash = id;
-      }
+      if ( window.location.hash.substr(1) != id ) window.location.hash = id;
     },
 
     function launch(X, menu) {
-      this.setMenuId(menu.id);
-      this.menuListener && this.menuListener(menu);
-      X.stack.push(this.createView(X, menu));
+      X.stack.push(
+        function() {
+          // Set the menuId and call the menuListener so that the
+          // hash is updated properly when stack.back() is called.
+          this.setMenuId(menu.id);
+          this.menuListener && this.menuListener(menu);
+          return this.createView(X, menu);
+        }.bind(this),
+        undefined,
+        menu.id);
     }
   ]
 });
