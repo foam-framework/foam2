@@ -143,11 +143,7 @@ FOAM_FILES([
   { name: "foam/java/JavaImport", flags: ['java'] },
   { name: "foam/java/Builder", flags: ['java'] },
   { name: "foam/java/refinements", flags: ['java'] },
-  { name: "foam/json2/Outputter" },
-  { name: "foam/json2/OutputterOutput" },
-  { name: "foam/json2/SimpleOutputterOutput" },
-  { name: "foam/json2/Deserializer" },
-  { name: "foam/json2/Serializer" },
+  { name: "foam/json2/Json2PropertyRefine" },
 
   { name: "foam/util/Timer" },
   { name: "foam/util/EmailTest" },
