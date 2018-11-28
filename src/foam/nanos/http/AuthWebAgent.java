@@ -100,9 +100,8 @@ public class AuthWebAgent
       session = (Session) sessionDAO.find(sessionId);
       if ( session == null ) {
         // create new session
-        session = new Session.Builder(x).build();
+        session = new Session();
         session.setId(sessionId);
-        session.setContext(x.put(Session.class, session));
       }
 
       // save cookie
@@ -112,8 +111,7 @@ public class AuthWebAgent
       }
     } else {
       // create new cookie
-      session = new Session.Builder(x).build();
-      session.setContext(x.put(Session.class, session));
+      session = new Session();
       createCookie(x, session);
     }
 
