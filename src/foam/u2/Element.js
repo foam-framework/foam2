@@ -1868,11 +1868,10 @@ foam.CLASS({
       var e = nextE();
       var l = function() {
         if ( self.state !== self.LOADED ) {
-          s && s.detach();
           return;
         }
         var first = Array.isArray(e) ? e[0] : e;
-        var tmp = self.E();
+        var tmp   = self.E();
         self.insertBefore(tmp, first);
         if ( Array.isArray(e) ) {
           for ( var i = 0 ; i < e.length ; i++ ) { e[i].remove(); e[i].detach(); }
