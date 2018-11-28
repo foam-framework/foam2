@@ -9,19 +9,15 @@ foam.CLASS({
   name: 'AbstractMenu',
   abstract: true,
 
-  imports: [ 'menuListener?' ],
+  imports: [ 'menuListener?', 'pushMenu' ],
 
   methods: [
-    function setMenuId(id) {
-      if ( window.location.hash.substr(1) != id ) window.location.hash = id;
-    },
-
     function launch(X, menu) {
       X.stack.push(
         function() {
           // Set the menuId and call the menuListener so that the
           // hash is updated properly when stack.back() is called.
-          this.setMenuId(menu.id);
+          this.pushMenu(menu.id);
           this.menuListener && this.menuListener(menu);
           return this.createView(X, menu);
         }.bind(this),
