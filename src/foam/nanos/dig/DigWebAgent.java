@@ -510,6 +510,17 @@ public class DigWebAgent
       outputterHtml.outputEndTable();
       outputterHtml.outputEndHtml();
       out.println(outputterHtml.toString());
+    }else if ( format == Format.JSONJ ) {
+      //output error in jsonJ format
+
+      JSONParser jsonParser = new JSONParser();
+      jsonParser.setX(x);
+      foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.STORAGE);
+      outputterJson.setOutputDefaultValues(true);
+      outputterJson.setOutputClassNames(true);
+      outputterJson.outputJSONJFObject(error);
+      out.println(outputterJson.toString());
+
     } else {
       // TODO
     }
