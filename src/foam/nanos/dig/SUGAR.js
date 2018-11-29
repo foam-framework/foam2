@@ -274,7 +274,6 @@ foam.CLASS({
             }
           }
         }
-        console.log(url.length + this.postData.length);
         if ( (url.length + this.postData.length) >= this.MAX_URL_SIZE ) {
           this.postURL = url;
         }
