@@ -54,6 +54,7 @@ externalFile.blacklist.forEach(function(cls) {
   'foam.core.Property',
   'foam.core.String',
   'foam.core.Validatable',
+  'foam.nanos.auth.Authorizable',
 
   // These have hand written java impls so we don't want to clobber them.
   // TODO: Change gen.sh to prefer hand written java files over generated.
