@@ -215,16 +215,15 @@ public class DigWebAgent
           return;
         } else if (Format.JSONJ == format ) {
           String dataJson = "[";
-          String dataJsonJ[] = data.split("\\s*\\r?\\n");
+          String dataJsonJ[] = data.split("\\r?\\n");
           for (String i:dataJsonJ){
-            if (i.startsWith("p(") && i.endsWith(")")) {
-              dataJson += i.substring(2, i.length()-1) + ',';
-            }
+            i = i.trim();
+            dataJson += i.substring(2, i.length()-1) + ',';
           }
           dataJson += "]";
          
-        // JSON part from above
-        JSONParser jsonParser = new JSONParser();
+          // JSON part from above
+          JSONParser jsonParser = new JSONParser();
           jsonParser.setX(x);
           foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
           outputterJson.setOutputDefaultValues(true);
@@ -241,7 +240,7 @@ public class DigWebAgent
             Object o1 = jsonParser.parseString(dataJson, objClass);
             if ( o == null && o1 == null ) {
               DigErrorMessage error = new ParsingErrorException.Builder(x)
-                                            .setMessage("Invalid JSON Format")
+                                            .setMessage("Invalid JSONJ Format")
                                             .build();
               outputException(x, resp, format, out, error);
               return;
@@ -510,7 +509,7 @@ public class DigWebAgent
       outputterHtml.outputEndTable();
       outputterHtml.outputEndHtml();
       out.println(outputterHtml.toString());
-    }else if ( format == Format.JSONJ ) {
+    } else if ( format == Format.JSONJ ) {
       //output error in jsonJ format
 
       JSONParser jsonParser = new JSONParser();
