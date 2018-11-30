@@ -138,6 +138,13 @@ foam.CLASS({
         }
         return encodeURI(url);
       }
+    },
+    {
+      class: 'String',
+      name: 'result',
+      value: 'No Request Sent Yet.',
+      view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 120 },
+      visibility: 'RO'
     }
   ],
 
@@ -148,23 +155,25 @@ foam.CLASS({
     {
       name: 'postButton',
       label: 'Send Request',
-      code: function() {
+      code: async function() {
         var req = this.HTTPRequest.create({
           url: this.appConfig.URL.value + this.digURL.substring(1),
           method: 'POST',
           payload: this.data,
         }).send();
 
-        req.then(function(resp) {
-          console.log(resp.payload);
-          alert('Success, see console for more details');
-          resp.payload.then(function(result) {
-            console.log(result);
+        var resp = await req.then(async function(resp) {
+          var temp = await resp.payload.then(function(result) {
+            return result;
           });
-        }, function(error) {
-          alert('Error. status: '+error.resp.status+' '+error.resp.statusText);
-          console.log(error.resp);
+          return temp;
+        }, async function(error) {
+          var temp = await error.payload.then(function(result) {
+            return result;
+          });
+          return temp;
         });
+        this.result = resp;
       }
     }
   ]
