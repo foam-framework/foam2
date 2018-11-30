@@ -218,7 +218,9 @@ public class DigWebAgent
           String dataJsonJ[] = data.split("\\r?\\n");
           for (String i:dataJsonJ){
             i = i.trim();
-            dataJson += i.substring(2, i.length()-1) + ',';
+            if (i.startsWith("p(")) {
+              dataJson += i.substring(2, i.length()-1) + ',';
+            }
           }
           dataJson += "]";
          
