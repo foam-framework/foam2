@@ -54,6 +54,10 @@ bodyAsByteArrayIsSet_ = false;`
       transient: true,
       javaType: 'byte[]',
       javaFactory: 'return getBody() != null ? getBody().getBytes(StandardCharsets.UTF_8) : null;'
+    },
+    {
+      class: 'String',
+      name: 'displayName'
     }
   ]
 });
