@@ -86,6 +86,8 @@ foam.CLASS({
         DAO userDAO = (DAO) x.get("localUserDAO");
         DAO sessionDAO = (DAO) x.get("sessionDAO");
 
+        String sessionUser = (String) x.get("agent") != null ? "agent" : "user";
+
         // fetch from user dao to get secret key
         user = (User) userDAO.find(user.getId());
 
@@ -98,7 +100,7 @@ foam.CLASS({
 
           // update session with two factor success set to true
           Session session = x.get(Session.class);
-          session.setContext(session.getContext().put("twoFactorSuccess", true));
+          session.setContext(session.getContext().put(sessionUser, user).put("twoFactorSuccess", true));
           sessionDAO.put(session);
           return true;
         }
