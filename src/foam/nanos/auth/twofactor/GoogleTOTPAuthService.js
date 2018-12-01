@@ -46,7 +46,8 @@ foam.CLASS({
     {
       name: 'generateKey',
       javaCode: `
-        User user = (User) x.get("user");
+        User user = (User) (x.get("agent") != null ?
+          x.get("agent") : x.get("user"));
         DAO userDAO = (DAO) x.get("localUserDAO");
 
         // fetch from user dao to get secret key
@@ -80,7 +81,8 @@ foam.CLASS({
       name: 'verifyToken',
       javaCode: `
         long code = Long.parseLong(token, 10);
-        User user = (User) x.get("user");
+        User user = (User) (x.get("agent") != null ?
+          x.get("agent") : x.get("user"));
         DAO userDAO = (DAO) x.get("localUserDAO");
         DAO sessionDAO = (DAO) x.get("sessionDAO");
 
@@ -96,8 +98,7 @@ foam.CLASS({
 
           // update session with two factor success set to true
           Session session = x.get(Session.class);
-          session.setUserId(user.getId());
-          session.setContext(session.getContext().put("user", user).put("twoFactorSuccess", true));
+          session.setContext(session.getContext().put("twoFactorSuccess", true));
           sessionDAO.put(session);
           return true;
         }
@@ -109,7 +110,8 @@ foam.CLASS({
       name: 'disable',
       javaCode: `
         if ( verifyToken(x, token) ) {
-          User user = (User) x.get("user");
+          User user = (User) (x.get("agent") != null ?
+            x.get("agent") : x.get("user"));
           DAO userDAO = (DAO) x.get("localUserDAO");
 
           // fetch user from DAO and set two factor secret to null
