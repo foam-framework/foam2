@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'DAOControllerView',
   extends: 'foam.u2.View',
 
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
   requires: [
     'foam.comics.SearchMode',
     'foam.comics.DAOController',
@@ -130,6 +134,18 @@ foam.CLASS({
           class: 'foam.comics.DAOUpdateControllerView'
         };
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'isEmpty',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'isEmptyStateShowing',
+      expression: function(isEmpty, data) {
+        return isEmpty && data.emptyStateView;
+      }
     }
   ],
 
@@ -144,6 +160,8 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
+
+      this.fetchDaoCount();
 
       this.data.border.add(
         this.E()
@@ -211,7 +229,8 @@ foam.CLASS({
             .end()
           .end());
 
-      this.add(this.data.border);
+      this.start().hide(this.isEmptyStateShowing$).add(this.data.border).end()
+        .start().show(this.isEmptyStateShowing$).tag(this.data.emptyStateView).end();
     },
 
     function dblclick(obj) {
@@ -219,6 +238,13 @@ foam.CLASS({
         this.data.dblclick(obj);
       } else {
         this.onEdit(null, null, obj.id);
+      }
+    },
+
+    async function fetchDaoCount() {
+      var count = await this.data.data.select(this.COUNT());
+      if ( count.value > 0 ) {
+        this.isEmpty = false;
       }
     }
   ],

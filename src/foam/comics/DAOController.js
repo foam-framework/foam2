@@ -149,6 +149,13 @@ foam.CLASS({
       `
     },
     {
+      class: 'foam.u2.ViewSpec',
+      name: 'emptyStateView',
+      documentation: `
+        Displays empty state view if DAO is empty
+      `
+    },
+    {
       class: 'String',
       name: 'createLabel',
       documentation: `
