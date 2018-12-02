@@ -26,7 +26,8 @@ foam.CLASS({
   ],
   methods: [
     function embedModelDAO(dao) {
-      return new Promise(function(resolve, reject) {
+      var self = this;
+      return (async function() {
         var payload = `(function() {
 
 foam.__context__ = foam.build.ClassLoaderContext.create().__subContext__;
@@ -102,100 +103,72 @@ var deserializer = foam.json2.Deserializer.create();
           return Object.keys(deps);
         }
 
-        dao.select().then(function(a) {
-          var models = a.array;
-          var nodes = [];
-          var edges = [];
-          var L = [];
-          var S = [];
+        var models = (await dao.select()).array;
+        var nodes = [];
+        var edges = [];
+        var L = [];
+        var S = [];
 
-          models.forEach(function(model) {
-            nodes.push(model.id);
-            dependencies(model).
-              forEach(function(dep) {
-                edges.push([model.id, dep]);
-              });
-          });
+        models.forEach(function(model) {
+          nodes.push(model.id);
+          dependencies(model).
+            filter(function(dep) { return dep !== model.id; }).
+            forEach(function(dep) {
+              edges.push([model.id, dep]);
+            });
+        });
 
-          // Exclude dependencies that live outside the modeldao.
-          edges = edges.filter(e => nodes.indexOf(e[0]) != -1 && nodes.indexOf(e[1]) != -1);
+        // Exclude dependencies that live outside the modeldao.
+        edges = edges.filter(e => nodes.indexOf(e[0]) != -1 && nodes.indexOf(e[1]) != -1);
 
-          edges.forEach(e => console.log(e[0] + " -> " + e[1]));
+        edges.forEach(e => console.log(e[0] + " -> " + e[1]));
 
-          function replace(s) { return s.replace(/\./g, "_"); }
+        function replace(s) { return s.replace(/\./g, "_"); }
 
-          S = nodes.filter(n => ! edges.some(e => e[1] == n));
+        S = nodes.filter(n => ! edges.some(e => e[1] == n));
 
-          while ( S.length ) {
-            var n = S.shift();
-            L.push(n);
-            nodes.forEach(function(m) {
-              for ( var i = 0 ; i < edges.length ; i++ ) {
-                var e = edges[i];
-                if ( e[0] == n && e[1] == m ) {
-                  edges = edges.slice(0, i).concat(edges.slice(i + 1));
-                  if ( ! edges.some(e => e[1] == m ) ) {
-                    S.push(m);
-                  }
+        while ( S.length ) {
+          var n = S.shift();
+          L.push(n);
+          nodes.forEach(function(m) {
+            for ( var i = 0 ; i < edges.length ; i++ ) {
+              var e = edges[i];
+              if ( e[0] == n && e[1] == m ) {
+                edges = edges.slice(0, i).concat(edges.slice(i + 1));
+                if ( ! edges.some(e => e[1] == m ) ) {
+                  S.push(m);
                 }
               }
-            });
-          }
+            }
+          });
+        }
 
-          if ( edges.length ) {
-            reject("Cyclic dependencies: " + edges);
-            return;
-          }
+        if ( edges.length ) {
+          throw new Error("Cyclic dependencies: " + edges);
+        }
 
-          L.reverse();
+        L.reverse();
 
-          console.log('Address', L.indexOf('foam.nanos.auth.Address'));
-          console.log('Region', L.indexOf('foam.nanos.auth.Region'));
-          console.log('Country', L.indexOf('foam.nanos.auth.Country'));
+        console.log("Sorted");
 
-          console.log('Mode', L.indexOf('foam.nanos.app.Mode'));
-          console.log('AppConfig', L.indexOf('foam.nanos.app.AppConfig'));
-          //          console.log('Country', L.indexOf('foam.nanos.auth.Country'));
+        L.forEach(l => console.log(l));
 
-          L.forEach(l => console.log(l));
-
-
-          models.sort((a, b) => L.indexOf(a.id) > L.indexOf(b.id));
-
-          models.forEach(function(m) {
-            payload += `// ${m.id}
+        for ( var i = 0 ; i < L.length ; i++ ) {
+          var m = await dao.find(L[i]);
+          payload += `// ${m.id}
 modelDAO.put(await deserializer.aparse(x, ${serializer.stringify(foam.__context__, m)}));
 `;
-            //modelDAO.put(deserializer.parse(foam.__context__, ${serializer.stringify(foam.__context__, m)}));
-          });
-          payload += `
+        }
+
+        payload += `
 resolve(classloader);
 console.log("Done.");
 })();
 })();
 `;
 
-          resolve(payload);
-        });
-      });
-
-/*
-        dao.select({
-          put: function(m) {
-            payload += `// ${m.id}
-deserializer.aparse(foam.__context__, ${serializer.stringify(foam.__context__, m)}));
-`;
-          },
-          eof: function() {
-            payload += `
-console.log("Done.");
-window.modelDAO = modelDAO;
-})();
-`
-            resolve(payload);
-          }
-        }).catch(function(e) { reject(e); });
-      });*/
+        return payload;
+      })();
     },
 
     function buildBootstrap() {
@@ -220,6 +193,21 @@ window.modelDAO = modelDAO;
     function execute() {
       var self = this;
 
+      var modelDAO = foam.dao.EasyDAO.create({
+        daoType: 'MDAO',
+        of: foam.core.Model
+      });
+
+      foam.__MODELS__.forEach(function(model) {
+        if ( ! model.cls_ ) {
+          model = model.class == "__Library__" ? foam.build.Library.create(model) :
+            model.class == "__Script__" ? foam.build.Script.create(model) :
+            foam.lookup(model.class).create(model);
+        }
+        modelDAO.put(model);
+      });
+
+/*
       var modelDAO = this.DirCrawlModelDAO.create({
         srcDir: global.FOAM_ROOT + 'foam/nanos',
         blacklist: [
@@ -233,7 +221,7 @@ window.modelDAO = modelDAO;
           'src/foam/nanos.js'
         ]
       });
-
+*/
       var foamjs = this.buildBootstrap()
 
       return this.embedModelDAO(modelDAO).then(function(s) {
