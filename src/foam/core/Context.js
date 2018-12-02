@@ -74,6 +74,10 @@ foam.SCRIPT({
         typeof cls === 'object',
         'Cannot register non-objects into a context.');
 
+      // Top level context also registers classes globally.
+      if ( this === foam.__context__ )
+        foam.package.registerClass(cls);
+
       if ( opt_id ) {
         this.registerInCache_(cls, this.__cache__, opt_id);
       } else {
@@ -98,6 +102,10 @@ foam.SCRIPT({
       foam.assert(
         typeof m.id === 'string',
         'Must have an .id property to be registered in a context.');
+
+      // top level context registers classes globally
+      if ( this === foam.__context__ )
+        foam.package.registerClassFactory(m, factory);
 
       this.registerInCache_(factory, this.__cache__, m.id);
 

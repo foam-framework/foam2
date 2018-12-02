@@ -73,30 +73,35 @@ foam.CLASS({
       class: 'String',
       name: 'junctionModel',
       expression: function(sourceModel, targetModel) {
+        var source = sourceModel.substring(sourceModel.lastIndexOf('.') + 1);
+        var target = targetModel.substring(targetModel.lastIndexOf('.') + 1);
+
         return (this.package ? this.package + '.' : '') +
-          this.__context__.lookup(sourceModel).name +
-          this.__context__.lookup(targetModel).name + 'Junction';
+          source + target + 'Junction';
     }
     },
     {
       class: 'String',
       name: 'sourceDAOKey',
       expression: function(sourceModel) {
-        return foam.String.daoize(this.__context__.lookup(sourceModel).name);
+        var sourceName = sourceModel.substring(sourceModel.lastIndexOf('.') + 1);
+        return foam.String.daoize(sourceName);
       }
     },
     {
       class: 'String',
       name: 'targetDAOKey',
       expression: function(targetModel) {
-        return foam.String.daoize(this.__context__.lookup(targetModel).name);
+        var targetName = targetModel.substring(targetModel.lastIndexOf('.') + 1);
+        return foam.String.daoize(targetName);
       }
     },
     {
       class: 'String',
       name: 'junctionDAOKey',
       expression: function(junctionModel) {
-        return foam.String.daoize(this.__context__.lookup(junctionModel).name);
+        var junctionName = junctionModel.substring(junctionModel.lastIndexOf('.') + 1);
+        return foam.String.daoize(junctionName);
       }
     },
     {
@@ -131,6 +136,12 @@ foam.CLASS({
       class: 'Map',
       name: 'targetMethod'
     },
+    {
+      class: 'Boolean',
+      name: 'initialized',
+      value: false,
+      transient: true
+    },
     /* FUTURE:
     {
       name: 'deleteStrategy'
@@ -140,7 +151,12 @@ foam.CLASS({
   ],
 
   methods: [
-    function initRelationship() {
+    function initRelationship(x) {
+      if ( this.initialized ) return;
+      this.initialized = true;
+
+      var context = x || this.__context__;
+
       var sourceProp;
       var targetProp;
       var cardinality   = this.cardinality;
@@ -149,9 +165,9 @@ foam.CLASS({
       var sourceModel   = this.sourceModel;
       var targetModel   = this.targetModel;
       var junctionModel = this.junctionModel;
-      var source        = this.__context__.lookup(sourceModel);
-      var target        = this.__context__.lookup(targetModel);
-      var junction      = this.__context__.lookup(junctionModel, true);
+      var source        = context.lookup(sourceModel);
+      var target        = context.lookup(targetModel);
+      var junction      = context.lookup(junctionModel, true);
       var sourceDAOKey  = this.sourceDAOKey;
       var targetDAOKey  = this.targetDAOKey;
 
@@ -199,7 +215,7 @@ foam.CLASS({
             ]
           });
 
-          junction = this.__context__.lookup(this.junctionModel);
+          junction = context.lookup(this.junctionModel);
         }
 
         var junctionDAOKey = this.junctionDAOKey;
@@ -349,7 +365,7 @@ foam.CLASS({
         return foam.dao.ReadOnlyDAO.create({
           delegate: foam.dao.ManyToManyRelationshipDAO.create({
             relationship: this,
-            delegate: this.__context__[this.targetDAOKey]
+            delegate: x[this.targetDAOKey]
           }, this)
         }, this);
       },

@@ -120,8 +120,8 @@ foam.LIB({
 
       (Model is 'this').
     */
-    function buildClass() {
-      var context = this.__context__ || foam.__context__;
+    function buildClass(x) {
+      var context = x || this.__context__ || foam.__context__;
       var cls;
 
       if ( this.refines ) {
@@ -179,9 +179,6 @@ foam.LIB({
 
         foam.register(cls);
 
-        // Register the class in the global package path.
-        foam.package.registerClass(cls);
-
         return cls;
       };
     },
@@ -209,11 +206,8 @@ foam.LIB({
         if ( ! m.refines ) {
           // Register class in global context.
           foam.register(cls);
-
-          // Register the class in the global package path.
-          foam.package.registerClass(cls);
         }
-        
+
         return cls;
       };
 
@@ -248,8 +242,6 @@ foam.LIB({
       }
 
       delete foam.boot;
-
-      console.log('core boot time: ', Date.now() - this.startTime);
     }
   ]
 });

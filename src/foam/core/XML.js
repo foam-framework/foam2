@@ -49,7 +49,7 @@ foam.CLASS({
       Use for debugging/testing purposes. If you want actual
       XML output, use foam.xml.* instead.
     */
-    function stringify() {
+    function toXML() {
       return foam.xml.Pretty.stringify(this);
     }
   ]

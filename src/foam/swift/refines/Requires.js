@@ -15,7 +15,8 @@ foam.CLASS({
     {
       name: 'swiftReturns',
       expression: function(path) {
-        return this.__context__.lookup(path).model_.swiftName;
+        return path.replace(/\./g, '_');
+//        return this.__context__.lookup(path).model_.swiftName;
       },
     },
   ],
@@ -30,7 +31,7 @@ foam.CLASS({
         name: this.name + '_create',
         returnType: this.swiftReturns,
         visibility: 'public',
-	body: this.swiftInitializer(),
+        body: this.swiftInitializer(),
         args: [
           this.Argument.create({
             localName: 'args',
