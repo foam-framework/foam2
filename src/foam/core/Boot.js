@@ -170,6 +170,9 @@ foam.LIB({
 
       // Will be replaced in phase2.
       foam.CLASS = function(m) {
+        m.class = m.class || 'foam.core.Model';
+        if ( global.foam.__MODELS__ ) global.foam.__MODELS__.push(m);
+
         m.id = m.package + '.' + m.name;
         var cls = buildClass.call(m);
 
@@ -195,6 +198,8 @@ foam.LIB({
       foam.CLASS = function(m, skipRegistration) {
         var cls   = m.class ? foam.lookup(m.class) : foam.core.Model;
         var model = cls.create(m);
+        global.foam.__MODELS__.push(model);
+
         model.validate();
         // cls was: class-for-model-construction;
         // cls is: class-constructed-from-model.

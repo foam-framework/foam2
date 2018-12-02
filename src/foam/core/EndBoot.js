@@ -31,7 +31,6 @@ foam.core.Property.SHADOW_MAP = {
   expression: [ 'value' ]
 };
 
-
 /** Add new Axiom types (Implements, Constants, Topics, Properties, Methods and Listeners) to Model. */
 foam.CLASS({
   refines: 'foam.core.Model',
@@ -225,7 +224,6 @@ foam.CLASS({
   // List of unused Models in the system.
   foam.USED      = {};
   foam.UNUSED    = {};
-  foam._MODELS_ = [];
 
   var CLASS = foam.CLASS;
 
@@ -240,7 +238,10 @@ foam.CLASS({
     foam.UNUSED[m.id] = true;
 
 //    var cls = foam.lookup(m.class || "foam.core.Model");
-//    foam._MODELS_.push(cls.create(m));
+    //    foam._MODELS_.push(cls.create(m));
+    m.class = m.class || 'foam.core.Model';
+
+    global.foam.__MODELS__.push(m);
 
     var f = foam.Function.memoize0(function() {
       delete foam.UNUSED[m.id];
