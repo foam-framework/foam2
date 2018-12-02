@@ -547,6 +547,7 @@ FOAM_FILES([
   { name: "org/chartjs/Line" },
   { name: "org/chartjs/Line2" },
 
+  { name: "foam/dashboard/model/VisualizationSize" },
   { name: "foam/dashboard/model/Visualization" },
   { name: "foam/dashboard/model/GroupBy" },
   { name: "foam/dashboard/model/Count" },
@@ -560,4 +561,6 @@ FOAM_FILES([
   { name: "foam/dashboard/view/DAOTable" },
   { name: "foam/dashboard/view/Card" },
   { name: "test/Foo" },
+  { name: "foam/build/Library" },
+  { name: "foam/build/Script" }
 ]);
