@@ -82,8 +82,6 @@ foam.ENUM({
 foam.CLASS({
   refines: 'test.Foo',
   name: 'FooRefinement',
-  require: [
-  ],
   methods: [
     function refined_method() {
       console.log("Get refined", this.yeah);
