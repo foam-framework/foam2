@@ -27,6 +27,9 @@ foam = {
     return function next$UID() { return id++; };
   })(),
   SCRIPT: function(m) {
+    m.class = '__Script__';
+    if ( global.foam.__MODELS__ ) global.foam.__MODELS__.push(m);
+
     // An instance of the script isn't useful at this point so just
     // execute the code. foam.SCRIPT can be overwritten later to
     // capture the details of the script if need be.
@@ -141,7 +144,10 @@ foam.LIB = function LIB(model) {
   }
 
   // During boot, keep a list of created LIBs
-  if ( global.foam.__LIBS__ ) global.foam.__LIBS__[model.name] = root;
+  model.class = '__Library__';
+
+  if ( global.foam.__MODELS__ )
+    global.foam.__MODELS__.push(model);
 
   if ( model.constants ) {
     foam.assert(
@@ -172,4 +178,4 @@ foam.LIB = function LIB(model) {
     }
   }
 };
-global.foam.__LIBS__ = {};
+global.foam.__MODELS__ = [];

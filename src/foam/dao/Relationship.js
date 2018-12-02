@@ -275,6 +275,8 @@ foam.LIB({
   methods: [
     function RELATIONSHIP(m, opt_ctx) {
       var r = foam.dao.Relationship.create(m, opt_ctx);
+      if ( global.__MODELS__ ) global.__MODELS__.push(r);
+
       r.validate && r.validate();
       r.initRelationship();
       return r;
