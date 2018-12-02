@@ -250,6 +250,5 @@ foam.CLASS({
     });
 
     foam.__context__.registerFactory(m, f);
-    foam.package.registerClassFactory(m, f);
   };
 })();

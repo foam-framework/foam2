@@ -5,6 +5,9 @@
  */
 
 FOAM_FILES([
+  { name: 'foam/nanos/controller/AppStyles', flags: ['web'] },
+  { name: 'foam/nanos/logger/LogsView', flags: ['web'] },
+  { name: "foam/nanos/dig/exception/DigErrorMessage" },
   { name: 'foam/nanos/fs/File' },
   { name: 'foam/nanos/fs/FileProperty' },
   { name: 'foam/nanos/fs/FileDAODecorator' },

@@ -328,11 +328,11 @@ foam.LIB({
       var ws = "\\s*";
       var comment = "(?:\\/\\*(?:.|\\s)*?\\*\\/)?";
       var skip = "(?:" + ws + comment + ws + ")*";
-      
+
       var functionHeader = "(async )?" + "function" + skip + ident + "?\\(";
-      
+
       var arrowHeader = "\\(";
-      
+
       var arg = "(?:" + skip + ident + skip + ")";
       var nextArg = "(?:," + skip + arg + ")";
       var argEnd = "\\)";
@@ -369,7 +369,7 @@ foam.LIB({
       }
 
       var isArrow = false;
-      
+
       var match = next(functionHeader);
       if ( match ) {
         breakdown.async = !! match[1];
@@ -397,7 +397,7 @@ foam.LIB({
 
 
       match = isArrow ? next(arrowBody) : next(body);
-      
+
       if ( ! match ) return null;
       breakdown.body = match[1];
 
@@ -890,13 +890,13 @@ foam.LIB({
       var uid = '__mmethod__' + foam.next$UID() + '__';
 
       var first = true;
-      
+
       var name;
       for ( var key in map ) {
         name = map[key].name;
         break;
       }
-        
+
       var f = function(arg1) {
         if ( first ) {
           for ( var key in map ) {
@@ -1010,31 +1010,6 @@ foam.LIB({
 
       var pkg = foam.package.ensurePackage(global, cls.package);
       pkg[cls.name] = cls;
-
-      foam.package.triggerClass_(cls);
-    },
-
-    function waitForClass(cls) {
-      if ( foam.lookup(cls, true) ) return Promise.resolve(foam.lookup(cls));
-
-      foam.package.__pending = foam.package.__pending || {};
-      foam.package.__pending[cls] = foam.package.__pending[cls] || [];
-
-      return new Promise(function(resolve, reject) {
-        foam.package.__pending[cls].push(resolve);
-      });
-    },
-
-    function triggerClass_(cls) {
-      if ( ! foam.package.__pending || ! foam.package.__pending[cls.id] ) return;
-
-      var pending = foam.package.__pending[cls.id];
-
-      foam.package.__pending[cls.id] = undefined;
-
-      for ( var i = 0 ; i < pending.length ; i++ ) {
-        pending[i](cls);
-      }
     },
 
     /**
@@ -1054,8 +1029,6 @@ foam.LIB({
             if ( tmp ) return tmp;
 
             tmp = thunk();
-
-            foam.package.triggerClass_(tmp);
 
             return tmp;
           }

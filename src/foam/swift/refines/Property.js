@@ -178,7 +178,7 @@ foam.CLASS({
       class: 'String',
       name: 'swiftJsonParser',
       factory: function() {
-        return `Context.GLOBAL.create(${foam.swift.parse.json.AnyParser.model_.swiftName}.self)!`;
+        return `Context.GLOBAL.create(foam_swift_parse_json_AnyParser.self)!`;
       },
     },
     {
@@ -730,17 +730,17 @@ foam.CLASS({
   properties: [
     {
       name: 'swiftGetter',
-      expression: function(targetProperty) {
+      expression: function(propName) {
         return `
-return Swift.type(of: self).${targetProperty.swiftAxiomName}().get(self)
+return Swift.type(of: self).${foam.String.constantize(propName)}().get(self)
         `
       },
     },
     {
       name: 'swiftSetter',
-      expression: function(targetProperty) {
+      expression: function(propName) {
         return `
-return Swift.type(of: self).${targetProperty.swiftAxiomName}().set(self, value: value)
+return Swift.type(of: self).${foam.String.constantize(propName)}().set(self, value: value)
         `
       },
     },

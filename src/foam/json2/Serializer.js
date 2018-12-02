@@ -16,7 +16,7 @@ foam.CLASS({
       var serializer = this.InnerSerializer.create();
       serializer.output(x, v);
       return serializer.getString();
-    }
+    },
   ],
   classes: [
     {
@@ -26,10 +26,6 @@ foam.CLASS({
         'foam.json2.PrettyOutputterOutput',
       ],
       properties: [
-        {
-          class: 'Map',
-          name: 'deps'
-        },
         {
           class: 'FObjectProperty',
           of: 'foam.json2.Outputter',
@@ -43,8 +39,7 @@ foam.CLASS({
       ],
       methods: [
         function getString() {
-          var deps = Object.keys(this.deps).map(function(d) { return `"${d}"` }).join(',');
-          return `{"$DEPS$":[${deps}],"$BODY$":${this.out.getString()}}`
+          return this.out.getString();
         },
         function output(x, v) {
           var out = this.out;
@@ -82,13 +77,13 @@ foam.CLASS({
           } else if ( type == foam.Object ) {
             if ( foam.core.FObject.isSubClass(v) ) { // Is an actual class
               if ( v.id.indexOf('AnonymousClass') == 0 ) {
+                throw new Error("Anonymous Class support dropped.");
                 this.output(x, v.model_);
               } else {
                 out.obj();
                 out.key("$CLS$");
                 out.s(v.id);
                 out.end();
-                this.deps[v.id] = true;
               }
             } else { // is some other JS object
               if ( v.outputJSON2 ) {
@@ -116,7 +111,8 @@ foam.CLASS({
               var axioms = v.cls_.getAxioms();
 
               out.key("$INST$");
-              this.output(x, cls);
+              out.s(cls.id);
+//              this.output(x, cls);
 
               for ( var i = 0 ; i < axioms.length ; i++ ) {
                 var a = axioms[i];
@@ -130,13 +126,13 @@ foam.CLASS({
               var map = v.map;
               var defaultMethod = v.defaultMethod;
               out.obj();
-              
+
               out.key("$MMETHOD$");
               out.b(true);
 
               out.key("map");
               out.obj();
-              
+
               for ( var key in map ) {
                 out.key(key);
                 this.output(map[key]);
