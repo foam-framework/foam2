@@ -54,9 +54,9 @@ foam.CLASS({
         if ( ! service ) return;
 
         if ( ! service.cls_.getAxiomByName('delegate') ) {
-          this.interfaceName = "";
+          this.interfaceName = '';
           this.argumentInfo = null;
-          this.currentMethod = "";
+          this.currentMethod = '';
 
           return;
         }
@@ -66,17 +66,17 @@ foam.CLASS({
 
         this.interfaceName = of.id.toString();
         var methods = of.getOwnAxiomsByClass(foam.core.Method);
-        //var methodName = methods.map(function(m) { return m.name; }).sort();
+        // var methodName = methods.map(function(m) { return m.name; }).sort();
 
         var filteredMethod =
           methods.filter(function(fm) {
             for ( var j = 0 ; j < fm.args.length ; j++ ) {
-               if ( fm.args[j].javaType.toString() == "foam.core.X" ) {
+               if ( fm.args[j].javaType.toString() == 'foam.core.X' ) {
                   return false;
                }
                return true;
              }
-             //return true;
+             // return true;
           }).map(function(m) { return m.name; }).sort();
 
         if ( filteredMethod.length > 0 ) {
@@ -88,7 +88,7 @@ foam.CLASS({
             });
         } else { // if the service doesn't have a filtered method, the following should be empty
           this.argumentInfo = null;
-          this.currentMethod = "";
+          this.currentMethod = '';
         }
       }
     },
@@ -110,24 +110,24 @@ foam.CLASS({
           if ( ! of ) return;
 
           var methods = of.getOwnAxiomsByClass(foam.core.Method);
-          //var methodNames = methods.map(function(m) { return m.name; }).sort();
+          // var methodNames = methods.map(function(m) { return m.name; }).sort();
 
           var filteredMethod =
             methods.filter(function(fm) {
-              for ( var j = 0 ; j < fm.args.length ; j++ ) {
-                 if ( fm.args[j].javaType == "foam.core.X" ) {
+              for ( var j = 0; j < fm.args.length; j++ ) {
+                 if ( fm.args[j].javaType == 'foam.core.X' ) {
                     return false;
                  }
                  return true;
               }
             }).map(function(m) { return m.name; }).sort();
 
-          return foam.u2.view.ChoiceView.create({choices: filteredMethod, data$: this.method$});
+          return foam.u2.view.ChoiceView.create({ choices: filteredMethod, data$: this.method$ });
         });
       },
       postSet: function(old, nu) {
         if ( old != nu ) {
-          var data = "";
+          var data = '';
           var service = this.__context__[this.serviceKey];
 
           if ( ! service ) return;
@@ -146,7 +146,7 @@ foam.CLASS({
 
               if ( item.args.length > 0 )
                 this.argumentInfo = item.args;
-              else this.argumentInfo = "";
+              else this.argumentInfo = '';
             }
           });
        }
@@ -160,14 +160,14 @@ foam.CLASS({
       postSet: function() {
         var self = this;
 
-        for ( var j = 0 ; j < this.argumentInfo.length ; j++ ) {
+        for ( var j = 0; j < this.argumentInfo.length; j++ ) {
           this.argumentInfo[j].sub(function(argInfo) {
-            self.flag = !self.flag;
+            self.flag = ! self.flag;
           });
 
           if ( this.argumentInfo[j].objectType ) {
             this.argumentInfo[j].objectType.sub(function(ot) {
-               self.objFlag = !self.objFlag;
+               self.objFlag = ! self.objFlag;
             });
           }
         }
@@ -209,43 +209,43 @@ foam.CLASS({
       setter: function() {}, // Prevent from ever getting set
       expression: function(serviceKey, method, interfaceName, argumentInfo, flag, currentMethod, objFlag) {
         var query = false;
-        var url = "/service/sugar";
+        var url = '/service/sugar';
 
         if ( serviceKey ) {
-          url += query ? "&" : "?";
+          url += query ? '&' : '?';
           query = true;
-          url += "service=" + serviceKey;
+          url += 'service=' + serviceKey;
         }
         if ( interfaceName ) {
-          url += query ? "&" : "?";
+          url += query ? '&' : '?';
           query = true;
-          url += "interfaceName=" + interfaceName;
+          url += 'interfaceName=' + interfaceName;
         }
         if ( currentMethod ) {
-          url += query ? "&" : "?";
+          url += query ? '&' : '?';
           query = true;
-          url += "method=" + currentMethod;
+          url += 'method=' + currentMethod;
         }
 
-        for ( var k = 0 ; k < argumentInfo.length ; k++ ) {
+        for ( var k = 0; k < argumentInfo.length; k++ ) {
           query = true;
 
-          if ( argumentInfo[k].value != "" ) {
-            url += query ? "&" : "?";
-            url += argumentInfo[k].name + "=" + argumentInfo[k].value;
+          if ( argumentInfo[k].value != '' ) {
+            url += query ? '&' : '?';
+            url += argumentInfo[k].name + '=' + argumentInfo[k].value;
           }
 
           if ( argumentInfo[k].objectType ) {
             var javaType_ = argumentInfo[k].javaType;
             var prop = foam.lookup(javaType_).getAxiomsByClass(foam.core.Property);
-            url += "&" + argumentInfo[k].name + "=" + argumentInfo[k].name + "&";
+            url += '&' + argumentInfo[k].name + '=' + argumentInfo[k].name + '&';
 
-            for ( var i = 0 ; i < prop.length ; i++ ) {
+            for ( var i = 0; i < prop.length; i++ ) {
               if ( argumentInfo[k].objectType.instance_[prop[i].name] ) {
-                url += query ? "&" : "?";
+                url += query ? '&' : '?';
                 query = true;
 
-                url += prop[i].name + "=" + argumentInfo[k].objectType.instance_[prop[i].name];
+                url += prop[i].name + '=' + argumentInfo[k].objectType.instance_[prop[i].name];
               }
             }
           }
