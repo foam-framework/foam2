@@ -168,7 +168,7 @@ foam.CLASS({
       var origin  = this.dropdownOrigin.el();
       var current = this.overlayOrigin.el();
 
-      var boundingBox = origin.getBoundingClientRect();
+      var boundingBox  = origin.getBoundingClientRect();
       var dropdownMenu = current.getBoundingClientRect();
 
       overlay.style({ top: boundingBox.top - dropdownMenu.top + 'px' });
