@@ -213,6 +213,67 @@ public class DigWebAgent
           outputException(x, resp, format, out, error);
 
           return;
+        } else if (Format.JSONJ == format ) {
+          String dataJson = "[";
+          String dataJsonJ[] = data.split("\\r?\\n");
+          for (String i:dataJsonJ){
+            i = i.trim();
+            if (i.startsWith("p(")) {
+              dataJson += i.substring(2, i.length()-1) + ',';
+            }
+          }
+          dataJson += "]";
+         
+          // JSON part from above
+          JSONParser jsonParser = new JSONParser();
+          jsonParser.setX(x);
+          foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+          outputterJson.setOutputDefaultValues(true);
+          outputterJson.setOutputClassNames(true);
+          // let FObjectArray parse first
+          if ( SafetyUtil.isEmpty(dataJson) ) {
+              DigErrorMessage error = new EmptyDataException.Builder(x)
+                                            .build();
+              outputException(x, resp, format, out, error);
+              return;
+          }
+          try {
+            Object o = jsonParser.parseStringForArray(dataJson, objClass);
+            Object o1 = jsonParser.parseString(dataJson, objClass);
+            if ( o == null && o1 == null ) {
+              DigErrorMessage error = new ParsingErrorException.Builder(x)
+                                            .setMessage("Invalid JSONJ Format")
+                                            .build();
+              outputException(x, resp, format, out, error);
+              return;
+            }
+
+            if ( o == null )
+              o = o1;
+
+            if ( o instanceof Object[] ) {
+              Object[] objs = (Object[]) o;
+              for ( int j = 0 ; j < objs.length ; j++ ) {
+                obj = (FObject) objs[j];
+                dao.put(obj);
+              }
+            } else {
+              obj = (FObject) o;
+              obj = dao.put(obj);
+            }
+            outputterJson.output(o);
+            out.println(outputterJson);
+            resp.setStatus(HttpServletResponse.SC_OK);
+            return;
+
+          } catch (Exception e) {
+            logger.error(e);
+            DigErrorMessage error = new DAOPutException.Builder(x)
+                                          .setMessage(e.getMessage())
+                                          .build();
+            outputException(x, resp, format, out, error);
+            return;
+          }
         }
         out.println(returnMessage);
       } else if ( Command.select == command ) {
@@ -450,6 +511,17 @@ public class DigWebAgent
       outputterHtml.outputEndTable();
       outputterHtml.outputEndHtml();
       out.println(outputterHtml.toString());
+    } else if ( format == Format.JSONJ ) {
+      //output error in jsonJ format
+
+      JSONParser jsonParser = new JSONParser();
+      jsonParser.setX(x);
+      foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.STORAGE);
+      outputterJson.setOutputDefaultValues(true);
+      outputterJson.setOutputClassNames(true);
+      outputterJson.outputJSONJFObject(error);
+      out.println(outputterJson.toString());
+
     } else {
       // TODO
     }
