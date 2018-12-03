@@ -17,7 +17,8 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.dig.Argument'
+    'foam.nanos.dig.Argument',
+    'foam.net.web.HTTPRequest'
   ],
 
   css: `
@@ -25,6 +26,16 @@ foam.CLASS({
       display: none;
     }
   `,
+
+  imports: ['appConfig'],
+
+  constants: [
+    {
+      name: 'MAX_URL_SIZE',
+      value: 2000,
+      type: 'int'
+    }
+  ],
 
   properties: [
     {
@@ -199,10 +210,23 @@ foam.CLASS({
       hidden: true
     },
     {
+      class: 'String',
+      name: 'postData',
+      value: '',
+      hidden: true
+    },
+    {
+      class: 'String',
+      name: 'postURL',
+      value: '',
+      hidden: true
+    },
+    {
       class: 'URL',
       // TODO: appears not to work if named 'url', find out why.
       name: 'sugarURL',
       label: 'URL',
+      hidden: false,
       displayWidth: 120,
       documentation: 'dynamic URL according to picking service, method, parameters against web agent',
       view: 'foam.nanos.dig.LinkView',
@@ -231,27 +255,70 @@ foam.CLASS({
           query = true;
 
           if ( argumentInfo[k].value != '' ) {
-            url += query ? '&' : '?';
-            url += argumentInfo[k].name + '=' + argumentInfo[k].value;
+            this.postData += query ? '&' : '?';
+            this.postData += argumentInfo[k].name + '=' + argumentInfo[k].value;
           }
 
           if ( argumentInfo[k].objectType ) {
             var javaType_ = argumentInfo[k].javaType;
             var prop = foam.lookup(javaType_).getAxiomsByClass(foam.core.Property);
-            url += '&' + argumentInfo[k].name + '=' + argumentInfo[k].name + '&';
+            this.postData += '&' + argumentInfo[k].name + '=' + argumentInfo[k].name + '&';
 
             for ( var i = 0; i < prop.length; i++ ) {
               if ( argumentInfo[k].objectType.instance_[prop[i].name] ) {
-                url += query ? '&' : '?';
+                this.postData += query ? '&' : '?';
                 query = true;
 
-                url += prop[i].name + '=' + argumentInfo[k].objectType.instance_[prop[i].name];
+                this.postData += prop[i].name + '=' + argumentInfo[k].objectType.instance_[prop[i].name];
               }
             }
           }
         }
+        if ( (url.length + this.postData.length) >= this.MAX_URL_SIZE ) {
+          this.postURL = url;
+        }
+        return encodeURI(url + this.postData);
+      }
+    },
+    {
+      class: 'String',
+      name: 'result',
+      value: 'No Request Sent Yet.',
+      view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 137 },
+      visibility: 'RO'
+    }
+  ],
 
-        return encodeURI(url);
+  actions: [
+    {
+      name: 'postButton',
+      hidden: true,
+      label: 'Send POST Request',
+      code: async function() {
+        if ( ! (this.postURL === '') ) {
+          var req = this.HTTPRequest.create({
+            url: this.appConfig.URL.value + this.postURL.substring(1),
+            method: 'POST',
+            contentType: 'url',
+            payload: this.postData.substring(1),
+          }).send();
+
+          var resp = await req.then(async function(resp) {
+            var temp = await resp.payload.then(function(result) {
+              return result;
+            });
+            return temp;
+          }, async function(error) {
+            var temp = await error.payload.then(function(result) {
+              return result;
+            });
+            return temp;
+          });
+
+          this.result = resp;
+        } else {
+          alert('Click on URL link.');
+        }
       }
     }
   ]
