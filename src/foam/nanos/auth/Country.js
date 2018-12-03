@@ -10,7 +10,7 @@ foam.CLASS({
 
   documentation: 'Country information.',
 
-  ids: [ 'code' ],
+  ids: ['code'],
 
   properties: [
     {
