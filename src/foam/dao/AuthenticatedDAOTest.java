@@ -12,7 +12,6 @@ import foam.test.TestObj;
 import foam.test.TestUtils;
 import foam.util.Auth;
 
-import java.security.AccessControlException;
 import java.util.List;
 
 public class AuthenticatedDAOTest
@@ -65,8 +64,8 @@ public class AuthenticatedDAOTest
     userDAO_.put(testUser_);
 
     // Mock the groupDAO.
-    x = TestUtils.mockDAO(x, "groupDAO");
-    DAO groupDAO = (DAO) x.get("groupDAO");
+    x = TestUtils.mockDAO(x, "localGroupDAO");
+    DAO groupDAO = (DAO) x.get("localGroupDAO");
 
     // Put a group in the groupDAO with permission to read, update, and delete the testObjDAO.
     Permission adminPermissions[] = new Permission[5];
@@ -131,9 +130,9 @@ public class AuthenticatedDAOTest
       TestUtils.testThrows(
         () -> dao.find(testObj),
         INVALID_DAO_MESSAGE,
-        AccessControlException.class
+        AuthorizationException.class
       ),
-      "Should throw 'AccessControlException' with appropriate message when a user tries to 'find' from the DAO."
+      "Should throw 'AuthorizationException' with appropriate message when a user tries to 'find' from the DAO."
     );
   }
 
@@ -149,9 +148,9 @@ public class AuthenticatedDAOTest
       TestUtils.testThrows(
         () -> dao.put(testObj),
         INVALID_DAO_MESSAGE,
-        AccessControlException.class
+        AuthorizationException.class
       ),
-      "Should throw 'AccessControlException' with appropriate message when a user tries to 'put' to the DAO."
+      "Should throw 'AuthorizationException' with appropriate message when a user tries to 'put' to the DAO."
     );
   }
 
@@ -168,9 +167,9 @@ public class AuthenticatedDAOTest
       TestUtils.testThrows(
         () -> dao.remove(testObj),
         INVALID_DAO_MESSAGE,
-        AccessControlException.class
+        AuthorizationException.class
       ),
-      "Should throw 'AccessControlException' with appropriate message when a user tries to 'remove' from the DAO."
+      "Should throw 'AuthorizationException' with appropriate message when a user tries to 'remove' from the DAO."
     );
   }
 
@@ -187,9 +186,9 @@ public class AuthenticatedDAOTest
       TestUtils.testThrows(
         dao::removeAll,
         INVALID_DAO_MESSAGE,
-        AccessControlException.class
+        AuthorizationException.class
       ),
-      "Should throw 'AccessControlException' with appropriate message when a user tries to 'removeAll' from the DAO."
+      "Should throw 'AuthorizationException' with appropriate message when a user tries to 'removeAll' from the DAO."
     );
   }
 
@@ -206,9 +205,9 @@ public class AuthenticatedDAOTest
       TestUtils.testThrows(
         dao::select,
         INVALID_DAO_MESSAGE,
-        AccessControlException.class
+        AuthorizationException.class
       ),
-      "Should throw 'AccessControlException' with appropriate message when a user tries to 'select' from the DAO."
+      "Should throw 'AuthorizationException' with appropriate message when a user tries to 'select' from the DAO."
     );
   }
 
@@ -224,10 +223,10 @@ public class AuthenticatedDAOTest
     test(
       TestUtils.testThrows(
         () -> dao.find_(x, testObj),
-        "Insufficient permissions",
-        AccessControlException.class
+        "Permission denied.",
+        AuthorizationException.class
       ),
-      "Should throw 'AccessControlException' with appropriate message when an unauthenticated user tries to 'find_' from the DAO."
+      "Should throw 'AuthorizationException' with appropriate message when an unauthenticated user tries to 'find_' from the DAO."
     );
   }
 
@@ -242,10 +241,10 @@ public class AuthenticatedDAOTest
     test(
       TestUtils.testThrows(
         () -> dao.put_(x, testObj),
-        "Insufficient permissions",
-        AccessControlException.class
+        "Permission denied.",
+        AuthorizationException.class
       ),
-      "Should throw 'AccessControlException' with appropriate message when an unauthenticated user tries to 'put_' to the DAO."
+      "Should throw 'AuthorizationException' with appropriate message when an unauthenticated user tries to 'put_' to the DAO."
     );
   }
 
@@ -261,10 +260,10 @@ public class AuthenticatedDAOTest
     test(
       TestUtils.testThrows(
         () -> dao.remove_(x, testObj),
-        "Insufficient permissions",
-        AccessControlException.class
+        "Permission denied.",
+        AuthorizationException.class
       ),
-      "Should throw 'AccessControlException' with appropriate message when an unauthenticated user tries to 'remove_' from the DAO."
+      "Should throw 'AuthorizationException' with appropriate message when an unauthenticated user tries to 'remove_' from the DAO."
     );
   }
 

@@ -9,8 +9,10 @@ foam.CLASS({
   name: 'User',
 
   implements: [
+    'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.EnabledAware',
+    'foam.nanos.auth.HumanNameTrait',
     'foam.nanos.auth.LastModifiedAware'
   ],
 
@@ -20,7 +22,16 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.util.SafetyUtil'
+    'foam.core.FObject',
+    'foam.core.X',
+    'foam.dao.DAO',
+    'foam.dao.ProxyDAO',
+    'foam.dao.Sink',
+    'foam.mlang.order.Comparator',
+    'foam.mlang.predicate.Predicate',
+    'foam.nanos.auth.AuthService',
+    'foam.util.SafetyUtil',
+    'static foam.mlang.MLang.EQ'
   ],
 
   documentation: '',
@@ -29,6 +40,15 @@ foam.CLASS({
     'id', 'enabled', 'type', 'group', 'spid', 'firstName', 'lastName', 'organization', 'email'
   ],
 
+  // TODO: The following properties don't have to be defined here anymore once
+  // https://github.com/foam-framework/foam2/issues/1529 is fixed:
+  //   1. enabled
+  //   2. created
+  //   3. firstName
+  //   4. middleName
+  //   5. lastName
+  //   6. legalName
+  //   7. lastModified
   properties: [
     {
       class: 'Long',
@@ -42,68 +62,20 @@ foam.CLASS({
       value: true
     },
     {
+      class: 'Boolean',
+      name: 'loginEnabled',
+      documentation: 'Enables user to login',
+      value: true
+    },
+    {
       class: 'DateTime',
       name: 'lastLogin',
       documentation: 'Date and time user last logged in.'
     },
-    {
-      class: 'String',
-      name: 'firstName',
-      tableWidth: 160,
-      documentation: 'First name of user.',
-      validateObj: function(firstName) {
-        if ( firstName.length > 70 ) {
-          return 'First name cannot exceed 70 characters.';
-        }
-
-        if ( /\d/.test(firstName) ) {
-          return 'First name cannot contain numbers.';
-        }
-      }
-    },
-    {
-      class: 'String',
-      name: 'middleName',
-      documentation: 'Middle name of user.',
-      validateObj: function(middleName) {
-        if ( middleName.length > 70 ) {
-          return 'Middle name cannot exceed 70 characters.';
-        }
-
-        if ( /\d/.test(middleName) ) {
-          return 'Middle name cannot contain numbers.';
-        }
-      }
-    },
-    {
-      class: 'String',
-      name: 'lastName',
-      documentation: 'Last name of user.',
-      tableWidth: 160,
-      validateObj: function(lastName) {
-        if ( lastName.length > 70 ) {
-          return 'Last name cannot exceed 70 characters.';
-        }
-
-        if ( /\d/.test(lastName) ) {
-          return 'Last name cannot contain numbers.';
-        }
-      }
-    },
-    {
-      class: 'String',
-      name: 'legalName',
-      documentation: 'Full legal name of user. Appends first, middle & last name.',
-      transient: true,
-      expression: function(firstName, middleName, lastName) {
-        return middleName != '' ? firstName + ' ' + middleName + ' ' + lastName : firstName + ' ' + lastName;
-      },
-      javaGetter: `
-        return ! getMiddleName().equals("")
-          ? getFirstName() + " " + getMiddleName() + " " + getLastName()
-          : getFirstName() + " " + getLastName();
-      `,
-    },
+    'firstName',
+    'middleName',
+    'lastName',
+    'legalName',
     {
       class: 'String',
       name: 'organization',
@@ -197,7 +169,10 @@ foam.CLASS({
       class: 'foam.nanos.fs.FileProperty',
       name: 'profilePicture',
       documentation: 'User\' profile picture.',
-      view: { class: 'foam.nanos.auth.ProfilePictureView' }
+      view: {
+        class: 'foam.nanos.auth.ProfilePictureView',
+        placeholderImage: 'images/ic-placeholder.png'
+      }
     },
     {
       class: 'FObjectProperty',
@@ -310,7 +285,7 @@ foam.CLASS({
       documentation: 'User\' website.',
       displayWidth: 80,
       width: 2048,
-      validateObj: function (website) {
+      validateObj: function(website) {
         var websiteRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,})/;
 
         if ( website.length > 0 && ! websiteRegex.test(website) ) {
@@ -327,6 +302,12 @@ foam.CLASS({
       class: 'DateTime',
       name: 'lastModified',
       documentation: 'Last modified date.'
+    },
+    {
+      class: 'Boolean',
+      name: 'system',
+      value: false,
+      documentation: 'Indicate system accounts.'
     }
   ],
 
@@ -341,6 +322,121 @@ foam.CLASS({
         if ( ! SafetyUtil.isEmpty(getOrganization()) ) return getOrganization();
         if ( SafetyUtil.isEmpty(getLastName()) ) return getFirstName();
         return getFirstName() + " " + getLastName();
+      `
+    },
+    {
+      name: 'authorizeOnCreate',
+      args: [
+        { name: 'x', javaType: 'foam.core.X' }
+      ],
+      javaReturns: 'void',
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        User user = (User) x.get("user");
+        AuthService auth = (AuthService) x.get("auth");
+
+        // Prevent privilege escalation by only allowing a user's group to be
+        // set to one that the user doing the put has permission to update.
+        boolean hasGroupUpdatePermission = auth.check(x, "group.update." + this.getGroup());
+        if ( ! hasGroupUpdatePermission ) {
+          throw new AuthorizationException("You do not have permission to set that user's group to '" + this.getGroup() + "'.");
+        }
+
+        // Prevent everyone but admins from changing the 'system' property. 
+        if ( this.getSystem() && ! user.getGroup().equals("admin") ) {
+          throw new AuthorizationException("You do not have permission to change the 'system' flag.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnRead',
+      args: [
+        { name: 'x', javaType: 'foam.core.X' }
+      ],
+      javaReturns: 'void',
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        User user = (User) x.get("user");
+        AuthService auth = (AuthService) x.get("auth");
+
+        if (
+          ! SafetyUtil.equals(this.getId(), user.getId()) &&
+          ! auth.check(x, "user.read." + this.getId()) &&
+          ! auth.check(x, "spid.read." + this.getSpid())
+        ) {
+          throw new AuthorizationException();
+        }
+      `
+    },
+    {
+      name: 'authorizeOnUpdate',
+      args: [
+        { name: 'x', javaType: 'foam.core.X' },
+        { name: 'oldObj', javaType: 'foam.core.FObject' }
+      ],
+      javaReturns: 'void',
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        User user = (User) x.get("user");
+        AuthService auth = (AuthService) x.get("auth");
+        User oldUser = (User) oldObj;
+
+        boolean updatingSelf = SafetyUtil.equals(this.getId(), user.getId()) ||
+          (
+            x.get("agent") != null &&
+            SafetyUtil.equals(((User) x.get("agent")).getId(), this.getId())
+          );
+        boolean hasUserEditPermission = auth.check(x, "user.update." + this.getId());
+
+        if (
+          ! updatingSelf &&
+          ! hasUserEditPermission &&
+          ! auth.check(x, "spid.update." + user.getSpid())
+        ) {
+          throw new AuthorizationException("You do not have permission to update this user.");
+        }
+
+        // Prevent privilege escalation by only allowing a user's group to be
+        // changed under appropriate conditions.
+        if ( ! SafetyUtil.equals(oldUser.getGroup(), this.getGroup()) ) {
+          boolean hasOldGroupUpdatePermission = auth.check(x, "group.update." + oldUser.getGroup());
+          boolean hasNewGroupUpdatePermission = auth.check(x, "group.update." + this.getGroup());
+          if ( updatingSelf ) {
+            throw new AuthorizationException("You cannot change your own group.");
+          } else if ( ! hasUserEditPermission ) {
+            throw new AuthorizationException("You do not have permission to change that user's group.");
+          } else if ( ! (hasOldGroupUpdatePermission && hasNewGroupUpdatePermission) ) {
+            throw new AuthorizationException("You do not have permission to change that user's group to '" + this.getGroup() + "'.");
+          }
+        }
+
+        // Prevent everyone but admins from changing the 'system' property. 
+        if (
+          ! SafetyUtil.equals(oldUser.getSystem(), this.getSystem()) &&
+          ! user.getGroup().equals("admin")
+        ) {
+          throw new AuthorizationException("You do not have permission to change the 'system' flag.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnDelete',
+      args: [
+        { name: 'x', javaType: 'foam.core.X' }
+      ],
+      javaReturns: 'void',
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        User user = (User) x.get("user");
+        AuthService auth = (AuthService) x.get("auth");
+
+        if (
+          ! SafetyUtil.equals(this.getId(), user.getId()) &&
+          ! auth.check(x, "user.delete." + this.getId()) &&
+          ! auth.check(x, "spid.delete." + this.getSpid())
+        ) {
+          throw new RuntimeException("You do not have permission to delete that user.");
+        }
       `
     }
   ]
@@ -361,6 +457,7 @@ foam.RELATIONSHIP({
   }
 });
 
+
 foam.RELATIONSHIP({
   sourceModel: 'foam.nanos.auth.User',
   targetModel: 'foam.nanos.fs.File',
@@ -371,6 +468,7 @@ foam.RELATIONSHIP({
     transient: true
   }
 });
+
 
 foam.RELATIONSHIP({
   sourceModel: 'foam.nanos.auth.User',
@@ -399,4 +497,26 @@ foam.RELATIONSHIP({
     hidden: false,
     tableWidth: 120
   }
+});
+
+// Relationship used in the agent auth service. Determines permission list when acting as a entity.
+foam.RELATIONSHIP({
+  cardinality: '*:*',
+  sourceModel: 'foam.nanos.auth.User',
+  targetModel: 'foam.nanos.auth.User',
+  forwardName: 'entities',
+  inverseName: 'agents',
+  junctionDAOKey: 'agentJunctionDAO',
+});
+
+foam.CLASS({
+  refines: 'foam.nanos.auth.UserUserJunction',
+
+  properties: [
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.Group',
+      name: 'group'
+    }
+  ]
 });

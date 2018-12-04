@@ -11,35 +11,43 @@ foam.CLASS({
   documentation: 'Show UML & properties for passed in models',
 
   requires: [
+    'foam.core.Model',
+    'foam.dao.ArrayDAO',
+    'foam.dao.PromisedDAO',
     'foam.doc.ClassList',
     'foam.doc.DocBorder',
     'foam.doc.SimpleClassView',
     'foam.doc.UMLDiagram',
-    'foam.nanos.boot.NSpec'
+    'foam.nanos.boot.NSpec',
   ],
 
   imports: [
-    'nSpecDAO'
-  ],
-
-  exports: [
-    'showInherited',
-    'showOnlyProperties'
+    'nSpecDAO',
   ],
 
   properties: [
     {
-      name: 'models',
-      value: []
+      name: 'modelDAO',
+      expression: function(nSpecDAO) {
+        var self = this;
+        var dao = self.ArrayDAO.create({ of: self.Model })
+        return self.PromisedDAO.create({
+          promise: nSpecDAO.select().then(function(a) {
+            return Promise.all(
+              a.array.map(function(nspec) {
+                return self.parseClientModel(nspec)
+              }).filter(function(cls) {
+                return !!cls;
+              }).map(function(cls) {
+                return dao.put(cls.model_);
+              })
+            )
+          }).then(function() {
+            return dao;
+          })
+        })
+      },
     },
-    {
-      name: 'showOnlyProperties',
-      value: true
-    },
-    {
-      name: 'showInherited',
-      value: false
-    }
   ],
 
   css: `
@@ -57,19 +65,10 @@ foam.CLASS({
     ^ .foam-doc-UMLDiagram canvas{
       width: 700px;
     }
-    ^ .foam-u2-view-TableView-foam-doc-PropertyInfo{
-      width: 700px;
-      float: left;
-      margin-top: 20px;
-      margin-bottom: 30px;
-    }
     ^ .net-nanopay-ui-ActionView-printPage{
       margin-top: 20px;
     }
     @media print{
-      .foam-u2-view-TableView-th-editColumns{
-        display: none;
-      }
       ^ .net-nanopay-ui-ActionView-printPage{
         display: none;
       }
@@ -87,14 +86,14 @@ foam.CLASS({
       this.start().addClass(this.myClass())
         .start('h2').add('Model Browser').end()
         .start().add(this.PRINT_PAGE).end()
-        .select(this.nSpecDAO, function(n) {
-          var model = self.parseClientModel(n);
-          if ( ! model ) return;
-          this.start().style({ 'font-size': '20px', 'margin-top': '20px' })
-            .add('Model ' + model)
-          .end();
-          this.tag(self.UMLDiagram.create({ data: model }));
-          this.tag(self.SimpleClassView.create({ data: model }));
+        .select(this.modelDAO, function(model) {
+          var cls = foam.lookup(model.id);
+          return this.E().
+              start().style({ 'font-size': '20px', 'margin-top': '20px' }).
+                add('Model ' + model).
+              end().
+              start(self.UMLDiagram, { data: cls }).end().
+              start(self.SimpleClassView, { data: cls }).end()
         })
       .end();
     },
@@ -112,159 +111,6 @@ foam.CLASS({
       label: 'Print',
       code: function() {
         window.print();
-      }
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.doc',
-  name: 'SimpleClassView',
-  extends: 'foam.u2.View',
-
-  requires: [
-    'foam.dao.ArrayDAO',
-    'foam.doc.ClassLink',
-    'foam.doc.Link',
-    'foam.doc.PropertyInfo',
-    'foam.u2.view.TableView'
-  ],
-
-  imports: [
-    'auth',
-    'selectedAxiom',
-    'showInherited',
-    'showOnlyProperties'
-  ],
-
-  properties: [
-    'classPropertyTableView'
-  ],
-
-  methods: [
-    function initE() {
-      this.SUPER();
-      var data = this.data;
-      this.updateTableView();
-
-      this.
-        start('b').add(data.id).end().br().
-        add('Extends: ');
-
-      var cls = data;
-      for ( var i = 0; cls; i ++ ) {
-        cls = this.lookup(cls.model_.extends, true);
-        if ( i ) this.add(' : ');
-        this.start(this.ClassLink, { data: cls }).end();
-        if ( cls === foam.core.FObject ) break;
-      }
-      this.br();
-      this.start(foam.u2.HTMLElement).style({ 'margin-top': '10px' }).add('Documentation: ', data.model_.documentation).end();
-      this.add(this.classPropertyTableView$);
-    },
-
-    async function updateTableView() {
-      var permissioned = await this.auth.check(null, this.data.id + '.properties.permissioned');
-      var axs = await this.permittedAxioms(permissioned);
-
-      this.classPropertyTableView = this.TableView.create({
-        of: this.PropertyInfo,
-        data: this.ArrayDAO.create({ array: axs })
-      });
-    },
-
-    async function permittedAxioms(permissioned) {
-      var data = this.data;
-      var axs = [];
-
-      for ( var key in data.axiomMap_ ) {
-        if ( Object.hasOwnProperty.call(data.axiomMap_, key) ) {
-          var a = data.axiomMap_[key];
-          if ( foam.core.Property.isInstance(a) ) {
-            if ( permissioned ) {
-              if ( await this.auth.check(null, data.id + '.property.' + a.name ) ) {
-                var ai = foam.doc.PropertyInfo.create({
-                  axiom: a,
-                  type: a.cls_,
-                  required: a.required,
-                  of: a.of,
-                  documentation: a.documentation,
-                  name: a.name
-                });
-
-                axs.push(ai);
-              }
-            } else {
-              var ai = foam.doc.PropertyInfo.create({
-                axiom: a,
-                type: a.cls_,
-                required: a.required,
-                of: a.of,
-                documentation: a.documentation,
-                name: a.name
-              });
-
-              axs.push(ai);
-            }
-          }
-        }
-      }
-      return axs;
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.doc',
-  name: 'PropertyInfo',
-  documentation: 'Table view model to display' +
-    ' model in printable model browser\'s',
-  ids: ['name'],
-
-  tableColumns: [
-    'name', 'required', 'of', 'type', 'documentation'
-  ],
-
-  properties: [
-    {
-      name: 'name',
-      tableCellFormatter: function(value, obj, axiom) {
-        this.add(value);
-      }
-    },
-    {
-      name: 'axiom',
-      hidden: true
-    },
-    {
-      name: 'required',
-      tableCellFormatter: function(value, obj, axiom) {
-        this.add(value);
-      }
-    },
-    {
-      name: 'of',
-      label: 'Property Of',
-      tableCellFormatter: function(value, obj, axiom) {
-        var of_ = value ? value.id : '';
-        this.add(of_);
-      }
-    },
-    {
-      name: 'type',
-      tableCellFormatter: function(value, obj, axiom) {
-        if ( value ) {
-          this.add(value.name);
-          return;
-        }
-        this.add('anonymous');
-      }
-    },
-    {
-      name: 'documentation',
-      tableCellFormatter: function(value, obj, axiom) {
-        this.add(value);
       }
     }
   ]

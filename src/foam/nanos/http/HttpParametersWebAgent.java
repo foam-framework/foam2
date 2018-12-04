@@ -72,8 +72,7 @@ public class HttpParametersWebAgent
     String         accept          = req.getHeader("Accept");
     String         contentType     = req.getHeader("Content-Type");
     HttpParameters parameters      = null;
-    Class          parametersClass = null;
-    Command        command         = Command.select;
+    Command        command         = null;
     String         cmd             = req.getParameter("cmd");
 
     logger.debug("methodName", methodName);
@@ -106,9 +105,10 @@ public class HttpParametersWebAgent
         int count  = 0;
         int length = req.getContentLength();
 
-        BufferedReader reader  = req.getReader();
         StringBuilder  builder = sb.get();
         char[] cbuffer = new char[BUFFER_SIZE];
+        BufferedReader reader  = new BufferedReader(new InputStreamReader(req.getInputStream()));
+
         while ( ( read = reader.read(cbuffer, 0, BUFFER_SIZE)) != -1 && count < length ) {
           builder.append(cbuffer, 0, read);
           count += read;
@@ -127,69 +127,51 @@ public class HttpParametersWebAgent
       }
     }
 
-    if ( ! "application/x-www-form-urlencoded".equals(contentType) ) {
-      switch ( methodName.toUpperCase() ) {
-      case "POST":
-        command = Command.put;
-        break;
-      case "PUT":
-        command = Command.put;
-        break;
-      case "DELETE":
-        command = Command.remove;
-        break;
-//      case "HELP":
-//        command = Command.help;
-//        resp.setContentType("text/html");
-//        break;
-      case "GET":
-        if ( ! SafetyUtil.isEmpty(cmd) ) {
-          switch ( cmd.toLowerCase() ) {
-            case "put":
-              command = Command.put;
-              break;
-            case "remove":
-              command = Command.remove;
-              break;
-            case "help":
-              command = Command.help;
-              resp.setContentType("text/html");
-              break;
-            // defaults to SELECT
-          }
-        } else {
-          logger.warning("cmd/method could not be determined, defaulting to SELECT.");
-        }
-       break;
-       // defauts to SELECT
-      }
-    } else {
-      cmd = req.getParameter("cmd");
-      logger.debug("command", cmd);
       if ( ! SafetyUtil.isEmpty(cmd) ) {
         switch ( cmd.toLowerCase() ) {
-        case "put":
-          command = Command.put;
-          break;
-        case "remove":
-          command = Command.remove;
-          break;
-        case "help":
-          command = Command.help;
-          resp.setContentType("text/html");
-          break;
-          // defaults to SELECT
+          case "put":
+            command = Command.put;
+            break;
+          case "select":
+            command = Command.select;
+            if ( ! SafetyUtil.isEmpty(req.getParameter("id")) ) {
+              parameters.set("id", req.getParameter("id"));
+              logger.debug("id", req.getParameter("id"));
+            }
+            break;
+          case "remove":
+            command = Command.remove;
+            parameters.set("id", req.getParameter("id"));
+            logger.debug("id", req.getParameter("id"));
+            break;
         }
       } else {
-        logger.warning("cmd/method could not be determined, defaulting to SELECT.");
+        switch ( methodName.toUpperCase() ) {  // set default command
+          case "POST":
+            command = Command.put;
+            break;
+          case "PUT":
+            command = Command.put;
+            break;
+          case "DELETE":
+            command = Command.remove;
+            break;
+          case "GET":
+            command = Command.select;
+            break;
+          default:
+            command = Command.select;
+            logger.warning("cmd/method could not be determined, defaulting to SELECT.");
+            break;
+        }
       }
-    }
+
     parameters.set("cmd", command);
     parameters.set(Command.class, command);
 
     Format format = Format.JSON;
     resp.setContentType("text/html");
-    if ( req.getParameter("format") != null && ! "".equals(req.getParameter("format").trim()) && command != Command.help ) {
+    if ( req.getParameter("format") != null && ! "".equals(req.getParameter("format").trim()) ) {
       String f = req.getParameter("format");
       switch ( f.toUpperCase() ) {
         case "XML":

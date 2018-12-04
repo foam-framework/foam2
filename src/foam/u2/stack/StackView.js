@@ -38,6 +38,8 @@ foam.CLASS({
     }
   ],
 
+  css: '%GROUPCSS%',
+
   methods: [
     // TODO: Why is this init() instead of initE()? Investigate and maybe fix.
     function init() {
@@ -46,16 +48,15 @@ foam.CLASS({
 
       if ( this.showActions ) {
         this.start('actions')
-            .add(this.data.cls_.getAxiomsByClass(foam.core.Action))
-            .end();
+          .add(this.data.cls_.getAxiomsByClass(foam.core.Action))
+          .end();
       }
 
       this.add(this.slot(function(s) {
         if ( ! s ) return this.E('span');
 
-        var view = s[0];
+        var view   = s[0];
         var parent = s[1];
-
 
         // Do a bit of a dance with the context, to ensure that exports from "parent"
         // are available to "view"

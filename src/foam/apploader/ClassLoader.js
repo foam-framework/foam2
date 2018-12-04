@@ -53,9 +53,9 @@ have multiple classloaders running alongside eachother`
   methods: [
     {
       name: 'addClassPath',
-      code: function(path, json2) {
+      code: function(path) {
         var cls = this[foam.isServer ? 'NodeModelFileDAO' : 'WebModelFileDAO'];
-        var modelDAO = cls.create({root: path, json2: json2}, this);
+        var modelDAO = cls.create({root: path}, this);
 
         if ( this.modelDAO ) {
           modelDAO = this.OrDAO.create({
@@ -158,13 +158,13 @@ have multiple classloaders running alongside eachother`
               });
             }
             return this.buildClass_(m, path);
-          }.bind(this), function() {
-            throw new Error("Failed to load class " + id);
+          }.bind(this), function(e) {
+            throw new Error("Failed to load class " + id + " reason: " + e);
           });
         }
 
         if ( foam.core.Model.isInstance(id) ) {
-          return this.pending[id] = this.buildClass_(id, path);
+          return this.pending[id.id] = this.buildClass_(id, path);
         }
 
         throw new Error("Invalid parameter to ClassLoader.load_");

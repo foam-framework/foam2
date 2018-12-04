@@ -129,6 +129,13 @@ foam.CLASS({
     {
       class: 'EMail',
       name: 'email'
+    },
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'signInView',
+      factory: function() {
+        return { class: 'foam.nanos.auth.SignInView'};
+      }
     }
   ],
 
@@ -154,7 +161,7 @@ foam.CLASS({
         .start('p').addClass('link')
           .add('Sign in.')
           .on('click', function() {
-            self.stack.push({ class: 'foam.nanos.auth.SignInView' });
+            self.stack.push( self.signInView );
           })
         .end()
       .end();

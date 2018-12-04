@@ -619,7 +619,7 @@ foam.CLASS({
 
     function maybeInitCView(x) {
       if ( this.state === 'initial' ) {
-        this.state = 'initailized'
+        this.state = 'initailized';
         this.initCView(x);
       }
     },
@@ -1249,7 +1249,7 @@ foam.CLASS({
   methods: [
     function initE() {
       this.SUPER();
-      this.on('load', this.paint);
+      this.sub('onload', this.paint);
       this.cview$.valueSub('invalidated', this.paint);
     },
 

@@ -35,8 +35,15 @@ foam.CLASS({
   ]
 });
 
-(function() {
-  var tmp = foam.core.internal.ContextMultipleInheritence.create();
-  tmp.setPrivate_('__context__', foam.__context__);
-  foam.__context__ = tmp.__subContext__;
-})();
+foam.SCRIPT({
+  package: 'foam.core',
+  name: 'ContextMultipleInheritenceScript',
+  requires: [
+    'foam.core.internal.ContextMultipleInheritence',
+  ],
+  code: function() {
+    var tmp = foam.core.internal.ContextMultipleInheritence.create();
+    tmp.setPrivate_('__context__', foam.__context__);
+    foam.__context__ = tmp.__subContext__;
+  }
+})

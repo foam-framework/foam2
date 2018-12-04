@@ -31,6 +31,9 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'Action',
+  requires: [
+    'foam.core.ExpressionSlot',
+  ],
 
   documentation: 'An Action is a method with extra GUI support.',
 
@@ -144,7 +147,9 @@ foam.CLASS({
     function maybeCall(ctx, data) {
       if ( this.isEnabledFor(data) && this.isAvailableFor(data) ) {
         this.code.call(data, ctx, this);
-        data && data.pub('action', this.name, this);
+        // primitive types won't have a pub method
+        // Why are we publishing this event anyway? KGR
+        data && data.pub && data.pub('action', this.name, this);
         return true;
       }
 
@@ -168,6 +173,8 @@ foam.CLASS({
 /** Add Action support to Model. */
 foam.CLASS({
   refines: 'foam.core.Model',
+  package: 'foam.core',
+  name: 'ModelActionRefine',
 
   properties: [
     {

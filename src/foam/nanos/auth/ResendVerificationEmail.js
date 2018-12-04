@@ -21,7 +21,7 @@ foam.CLASS({
     'user'
   ],
 
-  css:`
+  css: `
     ^{
       width: 490px;
       margin: auto;
@@ -57,7 +57,7 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'Title', message: "You're almost there..." },
+    { name: 'Title', message: 'You\'re almost there...' },
     { name: 'Instructions1', message: 'We have sent you an email.' },
     { name: 'Instructions2', message: 'Please go to your inbox to confirm your email address.' },
     { name: 'Instructions3', message: 'Your email address needs to be verified before getting started.' }
@@ -66,8 +66,6 @@ foam.CLASS({
   methods: [
     function initE() {
       this.SUPER();
-      var self = this;
-
       this
         .addClass(this.myClass())
         .start()
@@ -91,12 +89,12 @@ foam.CLASS({
       code: function(X) {
         var self = this;
 
-        this.emailToken.generateToken(null, this.user).then(function (result) {
+        this.emailToken.generateToken(null, this.user).then(function(result) {
           if ( ! result ) {
             throw new Error('Error generating reset token');
           }
           self.add(self.NotificationMessage.create({ message: 'Verification email sent to ' + self.user.email }));
-        }).catch(function (err) {
+        }).catch(function(err) {
           self.add(self.NotificationMessage.create({ message: err.message, type: 'error' }));
         });
       }

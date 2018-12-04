@@ -5,6 +5,7 @@
  */
 
 package foam.core;
+
 import java.util.Map;
 
 public abstract class AbstractMapPropertyInfo

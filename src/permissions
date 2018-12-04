@@ -2,3 +2,4 @@ p({"class":"foam.nanos.auth.Permission", "id":"*",         "description":"Do any
 p({"class":"foam.nanos.auth.Permission", "id":"menu.auth", "description":"Perform authentication related configuration" })
 p({"class":"foam.nanos.auth.Permission", "id":"service.*", "description":"Global permission for reading of services"})
 p({"class":"foam.nanos.auth.Permission", "id":"service.read.*", "description":"Global permission for reading of services from a DAO"})
+p({"class":"foam.nanos.auth.Permission", "id":"service.auth.checkUser", "description":"Permission to grant access to check user permissions."})

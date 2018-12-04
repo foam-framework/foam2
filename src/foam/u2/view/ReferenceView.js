@@ -24,6 +24,12 @@ foam.CLASS({
     'data as parentObj'
   ],
 
+  documentation: `
+    View for editing ReferenceProperty-ies.
+    Note: that if the property's value is undefined this view will set it to
+    to first choice unless you provide a 'placeholder' (inherited from ChoiceView).
+  `,
+
   properties: [
     {
       name: 'objToChoice',
@@ -31,6 +37,24 @@ foam.CLASS({
         var f;
         return function(obj) {
           if ( f ) return f(obj);
+          var props = obj.cls_.getAxiomsByClass(foam.core.String);
+
+          // Find the first non-hidden string property.
+          for ( var i = 0 ; i < props.length ; i++ ) {
+            var p = props[i];
+            if ( ! p.hidden ) {
+              f = function(obj) {
+                return [obj.id, p.f(obj)];
+              };
+              return f(obj);
+            }
+          }
+
+          f = function(obj) {
+            return [obj.id, obj.id];
+          };
+
+          return f(obj);
         };
       }
     }
@@ -39,33 +63,10 @@ foam.CLASS({
   methods: [
     function fromProperty(prop) {
       this.SUPER(prop);
-
-      if ( ! this.hasOwnProperty('objToChoice') ) {
-        var of = prop.of;
-
-        var props = of.getAxiomsByClass(foam.core.String);
-        var f;
-
-        // Find the first non-hidden string property.
-        for ( var i = 0 ; i < props.length ; i++ ) {
-          var p = props[i];
-          if ( ! p.hidden ) {
-            this.objToChoice = function(obj) {
-              return [obj.id, p.f(obj)];
-            };
-            break;
-          }
-        }
-
-        if ( i === props.length ) {
-          this.objToChoice = function(obj) {
-            return [obj.id, obj.id];
-          };
-        }
+      if ( ! this.dao ) {
+        var dao = this.parentObj.__context__[prop.targetDAOKey];
+        this.dao = dao;
       }
-
-      var dao = this.parentObj.__context__[prop.targetDAOKey];
-      this.dao = dao;
     }
   ]
 });

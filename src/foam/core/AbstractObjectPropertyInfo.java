@@ -21,17 +21,13 @@ public abstract class AbstractObjectPropertyInfo
   public void setFromString(Object obj, String value) { }
 
   public Object fromString(String value) {
-    //TODO
-    return "";
+    return value;
   }
 
   @Override
   public Object fromXML(X x, XMLStreamReader reader) {
     return "";
   }
-
-  @Override
-  public void toXML(FObject obj, Document dom, Element objElement) { }
 
   @Override
   public boolean hardDiff(FObject o1, FObject o2, FObject diff) {

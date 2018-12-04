@@ -12,6 +12,9 @@ foam.CLASS({
   imports: [ 'cronDAO as scriptDAO' ],
 
   javaImports: [
+    'foam.dao.DAO',
+    'foam.util.SafetyUtil',
+    'foam.nanos.notification.Notification',
     'java.util.Date',
     'java.util.Calendar'
   ],
@@ -61,6 +64,13 @@ foam.CLASS({
           Ranges from 0 - 6, where 0 is Sunday. -1 for wildcard`
     },
     {
+      class: 'Int',
+      name: 'second',
+      value: 0,
+      documentation: `Second to execute the script.
+           Ranges from 0 - 59. -1 for wildcard`
+    },
+    {
       class: 'DateTime',
       name: 'scheduledTime',
       documentation: `Scheduled time to run Cron script.`,
@@ -83,7 +93,18 @@ foam.CLASS({
       ],
       javaReturns: 'void',
       javaCode:
-`super.runScript(x);
+`DAO notification = (DAO) x.get("notificationDAO");
+
+Notification cronStartNotify = new Notification();
+cronStartNotify.setBody("Cron STARTED - " + this.getId() + " " + this.getDescription());
+notification.put(cronStartNotify);
+
+super.runScript(x);
+
+Notification cronEndNotify = new Notification();
+cronEndNotify.setBody("Cron ENDED - " + this.getId() + " " + this.getDescription());
+notification.put(cronEndNotify);
+
 setScheduledTime(getNextScheduledTime());`
     },
     {
@@ -91,9 +112,8 @@ setScheduledTime(getNextScheduledTime());`
       javaReturns: 'Date',
       javaCode:
 `Calendar next = Calendar.getInstance();
-next.add(Calendar.MINUTE, 1);
+next.add(Calendar.SECOND, 1);
 next.set(Calendar.MILLISECOND, 0);
-next.set(Calendar.SECOND, 0);
 
 boolean dateFound = false;
 while ( next.get(Calendar.YEAR) < 3000 ) {
@@ -102,6 +122,7 @@ while ( next.get(Calendar.YEAR) < 3000 ) {
     next.set(Calendar.DAY_OF_MONTH, 1);
     next.set(Calendar.HOUR_OF_DAY, 0);
     next.set(Calendar.MINUTE, 0);
+    next.set(Calendar.SECOND, 0);
     continue;
   }
   if ( ( getDayOfMonth() >= 0 && next.get(Calendar.DAY_OF_MONTH) != getDayOfMonth() ) ||
@@ -109,17 +130,25 @@ while ( next.get(Calendar.YEAR) < 3000 ) {
     next.add(Calendar.DAY_OF_MONTH, 1);
     next.set(Calendar.HOUR_OF_DAY, 0);
     next.set(Calendar.MINUTE, 0);
+    next.set(Calendar.SECOND, 0);
     continue;
   }
   if ( getHour() >= 0 && next.get(Calendar.HOUR_OF_DAY) != getHour() ) {
     next.add(Calendar.HOUR_OF_DAY, 1);
     next.set(Calendar.MINUTE, 0);
+    next.set(Calendar.SECOND, 0);
     continue;
   }
   if ( getMinute() >= 0 && next.get(Calendar.MINUTE) != getMinute() ) {
     next.add(Calendar.MINUTE, 1);
+    next.set(Calendar.SECOND, 0);
     continue;
   }
+  if( getSecond() >= 0 && next.get(Calendar.SECOND) != getSecond()) {
+    next.add(Calendar.SECOND, 1);
+    continue;
+  }
+
   dateFound = true;
   break;
 }

@@ -408,45 +408,6 @@ foam.CLASS({
   ]
 });
 
-
-foam.CLASS({
-  package: 'foam.doc',
-  name: 'ClassLink',
-  extends: 'foam.u2.View',
-
-  imports: [ 'browserPath' ],
-
-  properties: [
-    {
-      class: 'Class',
-      name: 'data'
-    },
-    {
-      class: 'Boolean',
-      name: 'showPackage'
-    }
-  ],
-
-  methods: [
-    function initE() {
-      this.SUPER();
-
-      this.setNodeName('a').
-        on('click', this.click).
-        attrs({href: this.data.id}).
-        add(this.showPackage ? this.data.id : this.data.name);
-    }
-  ],
-
-  listeners: [
-    function click(e) {
-      this.browserPath$.set(this.data.id);
-      e.preventDefault();
-    }
-  ]
-});
-
-
 foam.CLASS({
   package: 'foam.doc',
   name: 'DocBrowser',
@@ -593,7 +554,7 @@ foam.CLASS({
               }).
                 add( 'Conventional UML : ' ).tag( this.CONVENTIONAL_UML, { data$: this.conventionalUML$ } ).
                 add(this.slot(function(selectedClass, conventionalUML) {
-                  if (!selectedClass) return '';
+                  if ( ! selectedClass ) return '';
                   return this.UMLDiagram.create({
                     data: selectedClass
                   });
@@ -750,11 +711,15 @@ foam.CLASS({
       }
     },
     {
+      name: 'height',
+      value: 800,
+    },
+    {
       name: 'canvas',
       factory: function() {
         return this.Box.create({
           width: 1200,
-          height: 2000,
+          height: this.height,
           color: '#f3f3f3'
         });
       }
@@ -786,33 +751,69 @@ foam.CLASS({
     },
     {
       name: 'widthCenterModel',
+      value: 350
+    },
+    {
+      name: 'widthRequiredBox',
+      value: 300,
+      documentation: 'the default size of required box.',
+    },
+    {
+      name: 'widthExtendsBox',
+      value: 200
+    },
+    'data',
+    {
+      name: 'canvasHeightExtension',
       value: 0
     },
-    'data'
+    //To avoid the overlap between different element.
+    {
+      name: 'lastRequireY',
+      value: 0,
+      documentation: 'the y of the last require element draw in the canvas.',
+    },
+    {
+      name: 'lastRequiredByY',
+      value: 0,
+      documentation: 'the y of the last required by element draw in the canvas.',
+    },
+    {
+      name: 'lastRelatedFromY',
+      value: 0,
+      documentation: 'the y of the last required from element draw in the canvas.',
+    },    
+    {
+      name: 'lastRelatedToY',
+      value: 0,
+      documentation: 'the y of the last required to element draw in the canvas.',
+    },
   ],
 
   methods: [
     function initE() {
       var data = this.data;
+      var nbrOfPropInNonConventionalDiag = 5;
+      var propertyHeight = 20;
       this.className  = this.data.name;
       this.elementMap = new Map();
       this.properties = this.getAllProperties( data );
 
-      if ( this.properties.length > 10 ) this.canvas.height = this.properties.length * 60 + 800;
-      this.widthCenterModel = this.conventionalUML ? 370 : 200;
+      this.canvas.height = this.conventionalUML && this.properties.length >= 15 ? this.properties.length * 30 + this.height : this.height;
 
-      var widthCenterBox = 200;
-      var heightCenterBox = this.properties.length *20;
-      this.addModel(this.canvas.width / 2 - this.widthCenterModel / 2, this.canvas.height / 3 - heightCenterBox , this.widthCenterModel);
-      this.addExtends(this.canvas.width / 2 - widthCenterBox / 2, this.canvas.height / 3 - heightCenterBox );
-      this.addImplements(this.canvas.width / 2 - widthCenterBox / 2, this.canvas.height / 3 - heightCenterBox );
-      this.addRequires(this.canvas.width / 2 - widthCenterBox / 2, this.canvas.height / 3 - heightCenterBox );
-      this.addRequiredBy(this.canvas.width / 2 - widthCenterBox / 2, this.canvas.height / 3 - heightCenterBox );
-      this.addSubClasses(this.canvas.width / 2 - widthCenterBox / 2, this.canvas.height / 3 - heightCenterBox );
-      /*this.addImports(this.canvas.width / 2 - widthCenterBox / 2, this.canvas.height / 3 - heightCenterBox );
-      this.addExports(this.canvas.width / 2 - widthCenterBox / 2, this.canvas.height / 3 - heightCenterBox );*/
-      this.addRelatedto(this.canvas.width / 2 - widthCenterBox / 2, this.canvas.height / 3 - heightCenterBox );
-      this.addRelatedFrom(this.canvas.width / 2 - widthCenterBox / 2, this.canvas.height / 3 - heightCenterBox );
+      var heightCenterBox = (this.conventionalUML ? this.properties.length : nbrOfPropInNonConventionalDiag) * propertyHeight;
+      this.addModel(this.canvas.width / 2 - this.widthCenterModel / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox , this.widthCenterModel);
+      this.addExtends(this.canvas.width / 2 - this.widthExtendsBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
+      this.addImplements(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
+      this.addRequires(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
+      this.addRequiredBy(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
+      /*this.addImports(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?2.5:1.5) - heightCenterBox );
+      this.addExports(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?2.5:1.5) - heightCenterBox );*/
+      this.addRelatedto(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
+      this.addRelatedFrom(this.canvas.width / 2 - this.widthRequiredBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
+      this.addSubClasses(this.canvas.width / 2 - this.widthExtendsBox / 2, this.canvas.height / (this.conventionalUML?1.5:1.5) - heightCenterBox );
+
+      this.canvas.height = this.canvasHeightExtension >= this.canvas.height ? this.canvasHeightExtension: this.canvas.height;
 
       this.addLegend();
 
@@ -852,7 +853,7 @@ foam.CLASS({
         y: y || 0,
         width: w || 350,
         height: h || 160,
-        color: '#ffffe0' || this.UNSELECTED_COLOR,
+        color: '#ffffff' || this.UNSELECTED_COLOR,
         border: 'black'
       });
 
@@ -1026,13 +1027,14 @@ foam.CLASS({
     function addModel(x, y, w, h) {
       var marge = 5;
       var step = 30;
+      var defaultWidth = 300;
       var cls  = this.data;
       var modelBox = this.Box.create({
         x: x,
         y: y,
-        width: w || 200,
+        width: w || defaultWidth,
         height: h || 30,
-        color: '#ffffe0', //this.UNSELECTED_COLOR
+        color: '#ffffff', //this.UNSELECTED_COLOR
         border: 'black'
       });
 
@@ -1042,7 +1044,7 @@ foam.CLASS({
         y: y - marge,
         color: 'black',
         font: '20px Arial',
-        width: w || 200,
+        width: w || defaultWidth,
         height: h || 30,
         text: this.className
       });
@@ -1050,69 +1052,70 @@ foam.CLASS({
       var propertyBox = this.Box.create({
         x: x,
         y: y + step,
-        width: w || 200,
+        width: w || defaultWidth,
         height: h || this.conventionalUML ? step * this.properties.length : step * 5,
-        color: '#ffffe0', //this.UNSELECTED_COLOR
+        color: '#ffffff', //this.UNSELECTED_COLOR
         border: 'black',
         text: this.prop
       });
 
       this.selected = this.canvas.addChildren( modelBox, modelNameLabel, propertyBox );
-
+      var propertyPadding = - this.widthCenterModel +10;
+      
       if ( ! this.conventionalUML ){
          var propertyNameLabel = foam.graphics.Label.create({
           align: 'left',
-          x: x - 160,
+          x: x + propertyPadding,
           y: y + step,
           color: 'black',
-          font: '20px Arial',
-          width: w || 200,
+          font: '22px Arial',//Arial monospace
+          width: w || defaultWidth,
           height: h || 30,
-          text: cls.model_.properties !== undefined ? 'Properties: ' + cls.model_.properties.length : 'Properties: ' + 0
+          text: 'Properties:    ' + ( cls.model_.properties !== undefined ? cls.model_.properties.length : 0 )
         });
 
         var methodsNameLabel = foam.graphics.Label.create({
           align: 'left',
-          x: x - 160,
+          x: x + propertyPadding,
           y: y + step * 2,
           color: 'black',
-          font: '20px Arial',
+          font: '22px Arial',
           width: w || 200,
           height: h || 30,
-          text: cls.model_.methods !== undefined ? 'Methods : ' + cls.model_.methods.length : 'Methods : ' + 0
+          text:  'Methods:      '+ ( cls.model_.methods !== undefined ? cls.model_.methods.length : 0 )
         });
 
         var actionsNameLabel = foam.graphics.Label.create({
           align: 'left',
-          x: x - 160,
+          x: x + propertyPadding,
           y: y + step * 3,
           color: 'black',
-          font: '20px Arial',
+          font: '22px Arial',
           width: w || 200,
           height: h || 30,
-          text: cls.getAxiomsByClass(foam.core.Action) !== undefined ? 'Action : ' + cls.getAxiomsByClass(foam.core.Action).length : 'Actions : ' + 0
+          text: 'Action:          '+ ( cls.getAxiomsByClass(foam.core.Action) !== undefined ? cls.getAxiomsByClass(foam.core.Action).length : 0 )
         });
 
         var listenersNameLabel = foam.graphics.Label.create({
           align: 'left',
-          x: x - 160,
+          x: x + propertyPadding,
           y: y + step * 4,
           color: 'black',
-          font: '20px Arial',
+          font: '22px Arial',
           width: w || 200,
           height: h || 30,
-          text: cls.getAxiomsByClass(foam.core.Listener) !== undefined ? 'Listener : ' + cls.getAxiomsByClass(foam.core.Listener).length : 'Listener : ' + 0
+          text: 'Listener:       ' + ( cls.getAxiomsByClass(foam.core.Listener) !== undefined ?  cls.getAxiomsByClass(foam.core.Listener).length : 0 )
         });
 
         var RelationshipNameLabel = foam.graphics.Label.create({
           align: 'left',
-          x: x - 160,
+          x: x + propertyPadding,
           y: y + step * 5,
           color: 'black',
-          font: '20px Arial',
+          font: '22px Arial',
           width: w || 200,
           height: h || 30,
-          text: cls.getAxiomsByClass(foam.dao.Relationship) !== undefined ? 'Relationship : ' + cls.getAxiomsByClass(foam.dao.Relationship).length : 'Relationship : ' + 0
+          text: 'Relationship:' + ( cls.getAxiomsByClass(foam.dao.Relationship) !== undefined ?  cls.getAxiomsByClass(foam.dao.Relationship).length : 0 )
         });
 
         this.selected = this.canvas.addChildren( propertyNameLabel, methodsNameLabel, actionsNameLabel, listenersNameLabel,RelationshipNameLabel );
@@ -1159,12 +1162,13 @@ foam.CLASS({
 
       for ( var i = 0; cls; i++ ) {
         cls = this.lookup( cls.model_.extends, true );
+        if ( cls === foam.core.FObject ) break;
         var extendsBox = this.Box.create({
           x: x,
           y: y - ((i + 1) * d),
           width: w || 200,
           height: h || 30,
-          color: '#ffffe0', //this.UNSELECTED_COLOR
+          color: '#ffffff', //this.UNSELECTED_COLOR
           border: 'black'
         });
 
@@ -1196,14 +1200,14 @@ foam.CLASS({
 
         this.setData( extendsBox.x, extendsBox.y, cls.id );
 
-        if ( cls === foam.core.FObject ) break;
+        //if ( cls === foam.core.FObject ) break;
       }
     },
 
     function addImplements(x, y, w, h) {
       var marge = 5;
       var sideY = 150; //d
-      var sideX = -250;
+      var sideX = -400;
       var cls   = this.data;
 
       if ( cls.model_.implements !== undefined ) {
@@ -1213,9 +1217,9 @@ foam.CLASS({
             var implementsName = this.Box.create({
               x: x - sideX,
               y: y - sideY - key * 45,
-              width: w || 200,
+              width: w || this.widthRequiredBox,
               height: h || 30,
-              color: '#ffffe0', //this.UNSELECTED_COLOR
+              color: '#ffffff', //this.UNSELECTED_COLOR
               border: 'black'
             });
 
@@ -1227,7 +1231,7 @@ foam.CLASS({
               y: y - sideY - marge - key * 45,
               color: 'black',
               font: '20px Arial',
-              width: w || 200,
+              width: w || this.widthRequiredBox,
               height: h || 30,
               text: eval(a.path).name
             });
@@ -1253,17 +1257,17 @@ foam.CLASS({
     function addRequiredBy(x, y, w, h) {
       var triangleSize = 5;
       var marge = 5;
-      var d = this.conventionalUML ? 400 : 300;
+      var d = 400;
       var cls = this.data;
       if ( cls.model_.requires !== undefined ) {
         for ( var key in cls.model_.requires ) {
           var a = cls.model_.requires[key];
           var requiresByName = this.Box.create({
             x: x + d,
-            y: y + triangleSize * (key + 1),
-            width: w || 200,
+            y: y + triangleSize * (key + 0),
+            width: w || this.widthRequiredBox,
             height: h || 30,
-            color: '#ffffe0', //this.UNSELECTED_COLOR
+            color: '#ffffff', //this.UNSELECTED_COLOR
             border: 'black'
           });
 
@@ -1272,10 +1276,10 @@ foam.CLASS({
           var requiresByNameLabel = foam.graphics.Label.create({
             align: 'center',
             x: x + d,
-            y: y + triangleSize * (key + 1) - marge,
+            y: y + triangleSize * (key + 0) - marge,
             color: 'black',
             font: '20px Arial',
-            width: w || 200,
+            width: w || this.widthRequiredBox,
             height: h || 30,
             text: a.name
           });
@@ -1284,19 +1288,20 @@ foam.CLASS({
             startX: x + this.widthCenterModel-( this.widthCenterModel - requiresByName.width ) / 2 || 0,
             startY: y + requiresByName.height / 2 || 0,
             endX: x + d || 0,
-            endY: y + triangleSize * (key + 1) + requiresByName.height / 2 || 0,
+            endY: y + triangleSize * (key + 0) + requiresByName.height / 2 || 0,
             color: 'black',
             lineWidth: 2
           });
 
           var requiresByConnectorCircle = foam.graphics.Circle.create({
             x: x + d,
-            y: y + triangleSize * (key + 1) + requiresByName.height / 2,
+            y: y + triangleSize * (key + 0) + requiresByName.height / 2,
             radius: marge,
             border: 'black',
             color: 'white'
           });
           this.selected = this.canvas.addChildren(requiresByLine, requiresByConnectorCircle, requiresByName, requiresByNameLabel);
+          this.lastRelatedToY = this.lastRequiredByY = requiresByName.y + ( h || 30 );
         }
       }
     },
@@ -1304,7 +1309,7 @@ foam.CLASS({
     function addRequires(x, y, w, h) {
       var triangleSize = 5;
       var marge = 5;
-      var d = this.conventionalUML ? 400 : 300;
+      var d = 400;
       var cls = this.data;
       if ( cls !== undefined ) {
         var path = cls.id;
@@ -1320,10 +1325,10 @@ foam.CLASS({
           var a = req[key];
           var requiresName = this.Box.create({
             x: x - d,
-            y: y + triangleSize * (key + 1),
-            width: w || 200,
+            y: y + triangleSize * (key + 0),
+            width: w || this.widthRequiredBox,
             height: h || 30,
-            color: '#ffffe0', //this.UNSELECTED_COLOR
+            color: '#ffffff', //this.UNSELECTED_COLOR
             border: 'black'
           });
 
@@ -1332,10 +1337,10 @@ foam.CLASS({
           var requiresNameLabel = foam.graphics.Label.create({
             align: 'center',
             x: x - d,
-            y: y + triangleSize * (key + 1) - marge,
+            y: y + triangleSize * (key + 0) - marge,
             color: 'black',
             font: '20px Arial',
-            width: w || 200,
+            width: w || this.widthRequiredBox,
             height: h || 30,
             text: a.name
           });
@@ -1344,25 +1349,31 @@ foam.CLASS({
             startX: + x - ( this.widthCenterModel - requiresName.width ) / 2  ,
             startY: y + requiresName.height / 2 || 0,
             endX: x - d + requiresName.width + marge || 0,
-            endY: y + triangleSize * (key + 1) + requiresName.height / 2 || 0,
+            endY: y + triangleSize * (key + 0) + requiresName.height / 2 || 0,
             color: 'black',
             lineWidth: 2
           });
           var requiresConnector = foam.graphics.Circle.create({
             x: x - d + requiresName.width,
-            y: y + triangleSize * (key + 1) + requiresName.height / 2,
+            y: y + triangleSize * (key + 0) + requiresName.height / 2,
             radius: marge,
             border: 'black',
             color: 'white'
           });
           this.selected = this.canvas.addChildren( requiresName, requiresNameLabel, requiresLine, requiresConnector );
+          this.lastRelatedFromY = this.lastRequireY = requiresName.y + ( h || 30 );
         }
       }
     },
 
     function addSubClasses(x, y, w, h) {
-      var marge = 4;
-      var d = this.conventionalUML ? 300 + this.properties.length * 30 : 300;
+      var marge = 4;                  
+      var dDefualt = 300 + this.properties.length * 30;
+      var d = this.conventionalUML && dDefualt+y > this.lastRelatedFromY && dDefualt+y > this.lastRelatedToY ? dDefualt : 
+          this.lastRelatedFromY > this.lastRelatedToY ?
+            this.lastRelatedFromY > this.height ? this.lastRelatedFromY - 300: 500 :
+            this.lastRelatedToY > this.height ? this.lastRelatedToY - 300: 500 ;    
+
       var boxLarge = 35;
       var endPtD = this.conventionalUML ? 30 + this.properties.length * 30 : 180;
       var l = 230;
@@ -1389,7 +1400,7 @@ foam.CLASS({
           y: y + d + ( boxLarge + 20 ) * ( Math.floor( key / 5 ) ),
           width: w || 200,
           height: h || 30,
-          color: '#ffffe0', //this.UNSELECTED_COLOR
+          color: '#ffffff', //this.UNSELECTED_COLOR
           border: 'black'
         });
 
@@ -1461,6 +1472,7 @@ foam.CLASS({
       });
 
       this.selected = this.canvas.addChildren( triangleEndSubClasses, subClassesLineV, subClassesLineH );
+      if ( subClassesName.y >= this.height && subClassesName.y >= this.canvasHeightExtension ) this.canvasHeightExtension = subClassesName.y + ( ( h || 30 ) * 2 );
     },
 
     function arrowEnd(ptX, ptY, ang) {
@@ -1472,7 +1484,7 @@ foam.CLASS({
     },
 
     function addRelatedto(x, y, w, h) {
-      var d   = this.conventionalUML ? 400 : 300;
+      var d   = 400;
       var d1  = 200;
       var cls = this.data;
       //just to avoid the overlap
@@ -1485,6 +1497,7 @@ foam.CLASS({
           }).includes(path);
       });
       d1 += (req.length * (h || 30)) + 20;
+      d1 = this.lastRequiredByY > y ? this.lastRequiredByY - d : y - d1 + 10;
 
       var targetM =  [];
       var recursiveM ;
@@ -1509,7 +1522,7 @@ foam.CLASS({
               color: 'black'
           } );
 
-          var arrowRelatedto = this.arrowEnd( x, y, Math.PI );
+          var arrowRelatedto = this.arrowEnd( x+10, y, Math.PI );
           var cardinalityToNameLabel;
           if ( a.cardinality !== 'undefined' ) {
               cardinalityToNameLabel = foam.graphics.Label.create( {
@@ -1531,9 +1544,9 @@ foam.CLASS({
             var relatedtoName = this.Box.create( {
               x: x + d,
               y: y + d1 + 5 * ( key + 1 ),
-              width: w || 200,
+              width: w || this.widthRequiredBox,
               height: h || 30,
-              color: '#ffffe0', //this.UNSELECTED_COLOR
+              color: '#ffffff', //this.UNSELECTED_COLOR
               border: 'black'
             } );
             this.setData( relatedtoName.x, relatedtoName.y, a.sourceModel );
@@ -1543,7 +1556,7 @@ foam.CLASS({
               y: y + d1 + 5 * ( key + 1 ),
               color: 'black',
               font: '20px Arial',
-              width: w || 200,
+              width: w || this.widthRequiredBox,
               height: h || 30,
               text: eval( a.sourceModel ).name
             } );
@@ -1564,13 +1577,17 @@ foam.CLASS({
                 y: relatedtoline.endY - relatedtoName.height * 1 / 3,
                 color: 'black',
                 font: '20px Arial',
-                width: w || 200,
+                width: w || this.widthRequiredBox,
                 height: h || 30,
                 text: a.cardinality
               } );
               this.selected = this.canvas.addChildren( relatedtoName, relatedtoNameLabel, relatedtoline, arrowRelatedto, cardinalityToNameLabel );
             } else {
               this.selected = this.canvas.addChildren( relatedtoName, relatedtoNameLabel, relatedtoline, arrowRelatedto );
+            }
+            if ( relatedtoName.y >= this.height && relatedtoName.y >= this.canvasHeightExtension ) {
+              this.canvasHeightExtension = relatedtoName.y + (( h || 30 ) * 2 );
+              if ( this.lastRelatedFromY < relatedtoName.y ) this.lastRelatedToY = relatedtoName.y;
             }
           }
         }
@@ -1579,8 +1596,8 @@ foam.CLASS({
 
     function addRelatedFrom(x, y, w, h) {
       var marge = 45;
-      var d     = this.conventionalUML ? -400 : -300;
-      var d1    = 210;
+      var d     = -400;
+      var d1    = 160;
       var cls   = this.data;
       var axeX  = x + d;
       //just to avoid the overlap????
@@ -1594,8 +1611,7 @@ foam.CLASS({
       });
 
       d1 += (req.length * (h || 30)) +20;
-
-      var axeY = y + d1;
+      var axeY = this.lastRequireY > y ? this.lastRequireY  : y + d1 ;
 
       var targetM =  [];
       var recursiveM ;
@@ -1621,7 +1637,7 @@ foam.CLASS({
             color: 'black'
           });
 
-          var arrowRelatedto = this.arrowEnd( x, y, Math.PI );
+          var arrowRelatedto = this.arrowEnd( x+10, y, Math.PI );
           var cardinalityToNameLabel;
           if ( a.cardinality !== 'undefined' ) {
               cardinalityToNameLabel = foam.graphics.Label.create( {
@@ -1645,9 +1661,9 @@ foam.CLASS({
             var RelatedFromName = foam.graphics.Box.create( {
                 x: axeX,
                 y: axeY,
-                width: w || 200,
+                width: w || this.widthRequiredBox,
                 height: h || 30,
-                color: '#ffffe0', // this.UNSELECTED_COLOR
+                color: '#ffffff', // this.UNSELECTED_COLOR
                 border: 'black'
             } );
             this.setData( RelatedFromName.x, RelatedFromName.y, a.targetModel );
@@ -1657,7 +1673,7 @@ foam.CLASS({
                 y: axeY,
                 color: 'black',
                 font: '20px Arial',
-                width: w || 200,
+                width: w || this.widthRequiredBox,
                 height: h || 30,
                 text: eval( a.targetModel ).name
             } );
@@ -1678,7 +1694,7 @@ foam.CLASS({
                 y: RelatedFromLine.endY - RelatedFromName.height / 2,
                 color: 'black',
                 font: '20px Arial',
-                width: w || 200,
+                width: w || this.widthRequiredBox,
                 height: h || 30,
                 text: a.cardinality
               } );
@@ -1686,6 +1702,10 @@ foam.CLASS({
             } else {
               this.selected = this.canvas.addChildren( RelatedFromName, RelatedFromNameLabel, RelatedFromLine, arrowRelatedFrom );
             }
+            if ( RelatedFromName.y >= this.height && RelatedFromName.y >= this.canvasHeightExtension ) {
+              this.canvasHeightExtension = axeY + ( ( h || 30 ) * 3 );
+            }
+            if ( this.lastRelatedFromY < axeY ) this.lastRelatedFromY = axeY;
           }
         }
       }
@@ -1704,7 +1724,7 @@ foam.CLASS({
             y: y + 5 * (key + 1),
             width: w || 200,
             height: h || 30,
-            color: '#ffffe0', //this.UNSELECTED_COLOR
+            color: '#ffffff', //this.UNSELECTED_COLOR
             border: 'black'
           });
 
@@ -1746,7 +1766,7 @@ foam.CLASS({
             y: y + 5 * (key + 1),
             width: w || 200,
             height: h || 30,
-            color: '#ffffe0', //this.UNSELECTED_COLOR
+            color: '#ffffff', //this.UNSELECTED_COLOR
             border: 'black'
           });
 

@@ -63,6 +63,11 @@ foam.CLASS({
       class: 'String',
       name: 'playLink',
       value: 'https://play.google.com/store?hl=en'
+    },
+    {
+      class: 'Boolean',
+      name: 'forceHttps',
+      value: false
     }
   ]
 });

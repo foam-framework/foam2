@@ -52,7 +52,7 @@ for ( var i = 0 ; i < a.length ; i++ ) a[i] = '';
 * Acronyms should have all letters capitalized: Ex. `DAO`
 * Properties should start with a lower-case character and be camelCase. Ex. `parent`, `firstName`
 * Non-public properties and methods can end with an underscore (`_`). Ex. `listeners_`
-* Use `NAMES_LIKE_THIS` for constant values.
+* Use `NAMES_LIKE_THIS` for constant and message names.
 
 ## Modelling
 Code should be modeled rather than created as conventional JS prototypes.
@@ -61,6 +61,23 @@ Provide property labels when the default labelization of the property name will 
 
 ## Line Length
 Line lengths should be 80 characters or less, except for embedded data, like templates or sprites, or when modifying the code to make it fit in less than 80 characters would actually makes it less readable.
+
+## Calling DAO's From Java
+When implementing DAO strategies in Java, implement the Context-Oriented (CO) methods, ie. those ending with _ and explicitly taking Contexts as the first paramter, like:
+```javascript
+   find_(X x, Object query).
+```
+
+When implementing DAO decoratores in Java, implement the CO methods and also delegate to the CO method of your delegate. ie.
+```javascript
+   getDelegate().find_(x, id).
+```
+
+When using a DAO as a regular client from outside of a decorator for that DAO, use the non-CO methods and use inX() to specify the context. ie.
+```javascript
+   DAO userDAO = ((DAO) x.get("userDAO")).inX(x);
+   userDAO.find(id);
+```
 
 ## Other
  * Do not quote map keys unless necessary.

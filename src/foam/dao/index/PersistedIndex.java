@@ -1,7 +1,7 @@
 /**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 package foam.dao.index;
@@ -33,35 +33,67 @@ public class PersistedIndex
 
   @Override
   public Object wrap(Object state) {
+    return new PersistedState(state);
+  }
+
+  @Override
+  public Object unwrap(Object state) {
+    PersistedState persisted = (PersistedState) state;
+
+    // not yet persisted
+    if ( persisted.getValue() != null ) {
+      return persisted.getValue();
+    }
+
+    // invalid file position
+    long position = persisted.getPosition();
+    if ( position < 0 ) {
+      throw new RuntimeException("Invalid file position: " + position);
+    }
+
     synchronized ( file_ ) {
       try {
-        long position = fos_.getChannel().position();
-        ObjectOutputStream oos = new ObjectOutputStream(bos_);
-        oos.writeObject(state);
-        oos.flush();
+        fis_.getChannel().position(position);
 
-        bos_.writeTo(fos_);
-        bos_.flush();
-        bos_.reset();
+        ObjectInputStream iis = new ObjectInputStream(fis_);
+        Object value = iis.readObject();
 
-        return position;
-      } catch (Throwable t) {
+        persisted.setPosition(-1);
+        persisted.setValue(value);
+        return value;
+      } catch ( Throwable t ) {
         throw new RuntimeException(t);
       }
     }
   }
 
   @Override
-  public Object unwrap(Object state) {
+  public void flush(Object state) throws IOException {
+    PersistedState persisted = (PersistedState) state;
+
+    // already persisted
+    if ( persisted.getPosition() >= 0 ) {
+      return;
+    }
+
+    // nothing to persist
+    if ( persisted.getValue() == null ) {
+      throw new RuntimeException("Invalid value: null");
+    }
+
     synchronized ( file_ ) {
-      try {
-        long position = (long) state;
-        fis_.getChannel().position(position);
-        ObjectInputStream iis = new ObjectInputStream(fis_);
-        return iis.readObject();
-      } catch (Throwable t) {
-        throw new RuntimeException(t);
-      }
+      long position = fos_.getChannel().position();
+
+      ObjectOutputStream oos = new ObjectOutputStream(bos_);
+      oos.writeObject(persisted.getValue());
+      oos.flush();
+
+      bos_.writeTo(fos_);
+      bos_.flush();
+      bos_.reset();
+
+      persisted.setPosition(position);
+      persisted.setValue(null);
     }
   }
 

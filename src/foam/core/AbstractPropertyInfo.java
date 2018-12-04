@@ -7,6 +7,7 @@
 package foam.core;
 
 import foam.dao.pg.IndexedPreparedStatement;
+import foam.lib.xml.Outputter;
 import foam.nanos.logger.Logger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -42,6 +43,11 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public void toCSV(foam.lib.csv.Outputter outputter, Object value) {
+    outputter.output(value);
+  }
+
+  @Override
+  public void toXML(foam.lib.xml.Outputter outputter, Object value) {
     outputter.output(value);
   }
 
@@ -99,16 +105,6 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public void toXML(FObject obj, Document doc, Element objElement) {
-    Object value = this.f(obj);
-    if ( value != null && value != "" ) {
-      Element prop = doc.createElement(this.getName());
-      prop.appendChild(doc.createTextNode(value.toString()));
-      objElement.appendChild(prop);
-    }
-  }
-
-  @Override
   public void setStatementValue(IndexedPreparedStatement stmt, FObject o) throws java.sql.SQLException {
     stmt.setObject(this.get(o));
   }
@@ -129,10 +125,30 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public void validate(FObject obj) throws IllegalStateException {}
+  public void validate(X x, FObject obj) throws IllegalStateException {}
+
+  @Override
+  public boolean includeInDigest() {
+    return true;
+  }
 
   @Override
   public void updateDigest(FObject obj, MessageDigest md) {}
+
+  @Override
+  public boolean includeInSignature() {
+    return true;
+  }
+
+  @Override
+  public boolean containsPII(){
+    return false;
+  }
+
+  @Override
+  public boolean containsDeletablePII(){
+    return false;
+  }
 
   @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {}

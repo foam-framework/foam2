@@ -68,6 +68,15 @@ foam.CLASS({
       outline: none;
       padding: 10px;
     }
+    ^ .full-width-input-password {
+      /* Required for password input field */
+      width: 90%;
+      height: 40px;
+      margin-left: 5%;
+      margin-bottom: 15px;
+      outline: none;
+      padding: 10px;
+    }
     ^ .label{
       height: 16px;
       font-family: Roboto;
@@ -118,25 +127,27 @@ foam.CLASS({
 
       this.addClass(this.myClass())
       .start()
-        .start('h1').add("Sign In").end()
+        .start('h1').add('Sign In').end()
         .start('form').addClass('sign-in-container')
-          .start().addClass('label').add("Email Address").end()
+          .start().addClass('label').add('Email Address').end()
           .start(this.EMAIL).addClass('full-width-input').end()
-          .start().addClass('label').add("Password").end()
-          .start(this.PASSWORD).addClass('full-width-input').end()
+          .start().addClass('label').add('Password').end()
+          .add(this.PASSWORD)
           .start(this.SIGN_IN).addClass('full-width-button').end()
         .end()
         .start('div')
-          .callIf(this.signUpEnabled, function(){
-            this.start('p').add("Don't have an account?").end()
+          .callIf(this.signUpEnabled, function() {
+            this.start('p').add('Don\'t have an account?').end()
             .start('p').style({ 'margin-left': '2px' }).addClass('link')
-              .add("Sign up.")
+              .add('Sign up.')
               .on('click', self.signUp)
-            .end()
+            .end();
           })
           .start('p').style({ 'margin-left': '150px' }).addClass('forgot-link')
-            .add("Forgot Password?")
-            .on('click', function(){ self.stack.push({ class: 'foam.nanos.auth.resetPassword.EmailView' })})
+            .add('Forgot Password?')
+            .on('click', function() {
+              self.stack.push({ class: 'foam.nanos.auth.resetPassword.EmailView' })
+            })
           .end()
         .end()
       .end();
@@ -189,7 +200,7 @@ foam.CLASS({
             self.add(self.NotificationMessage.create({ message: 'Login Successful.' }));
           }
         }).catch(function(a) {
-          self.add(self.NotificationMessage.create({ message: a.message + '. Please try again.', type: 'error' }));
+          self.add(self.NotificationMessage.create({ message: a.message, type: 'error' }));
         });
       }
     }

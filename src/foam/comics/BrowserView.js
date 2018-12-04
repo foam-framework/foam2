@@ -27,7 +27,9 @@ foam.CLASS({
 
   exports: [
     'controller as data',
-    'summaryView'
+    'summaryView',
+    'createControllerView',
+    'updateView'
   ],
 
   properties: [
@@ -37,21 +39,120 @@ foam.CLASS({
     {
       name: 'title',
       expression: function(data$of) {
-        return 'Browse ' + data$of.name;
+        return 'Browse ' + data$of.model_.plural;
       }
     },
     {
+      class: 'String',
+      name: 'subtitle'
+    },
+    {
+      class: 'String',
+      name: 'customDAOController'
+    },
+    {
+      class: 'String',
+      name: 'createLabel',
+      documentation: 'Set this to override the create button label.'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.comics.SearchMode',
+      name: 'searchMode',
+      documentation: `
+        The level of search capabilities that the controller should have.
+      `
+    },
+    {
+      class: 'Boolean',
+      name: 'createEnabled',
+      documentation: 'True to enable the create button.'
+    },
+    {
+      class: 'Boolean',
+      name: 'editEnabled',
+      documentation: 'True to enable the edit button.'
+    },
+    {
+      class: 'Boolean',
+      name: 'selectEnabled',
+      documentation: 'True to enable the select button.'
+    },
+    {
+      class: 'Boolean',
+      name: 'addEnabled',
+      documentation: `
+        True to enable the Add button for adding to a relationship.
+      `
+    },
+    {
+      class: 'Boolean',
+      name: 'exportEnabled',
+      documentation: 'True to enable the export button.'
+    },
+    {
+      class: 'Boolean',
+      name: 'toggleEnabled',
+      documentation: 'True to enable the toggle filters button.'
+    },
+    {
       name: 'controller',
-      expression: function(data) {
-        return this.DAOController.create({ data: data });
+      expression: function(
+        data,
+        title,
+        subtitle,
+        customDAOController,
+        createLabel,
+        searchMode,
+        createEnabled,
+        editEnabled,
+        selectEnabled,
+        addEnabled,
+        exportEnabled,
+        toggleEnabled,
+        detailView
+      ) {
+        var config = {};
+
+        if ( createLabel ) config.createLabel = createLabel;
+        if ( searchMode )  config.searchMode  = searchMode;
+        if ( subtitle )    config.subtitle    = subtitle;
+        if ( title )       config.title       = title;
+        config.addEnabled    = addEnabled;
+        config.createEnabled = createEnabled;
+        config.detailView    = detailView;
+        config.editEnabled   = editEnabled;
+        config.exportEnabled = exportEnabled;
+        config.selectEnabled = selectEnabled;
+        config.toggleEnabled = toggleEnabled;
+
+        if ( customDAOController ) {
+          var controller = this.__context__.lookup(customDAOController).create(config, this);
+
+          // Let the custom controller override the dao used.
+          controller.data = controller.data || data;
+
+          return controller;
+        }
+
+        config.data = data;
+        return this.DAOController.create(config, this);
       }
     },
     {
       class: 'foam.u2.ViewSpec',
       name: 'summaryView',
-      value: { class: 'foam.u2.view.ScrollTableView' },
       // TODO: remove next line when permanently fixed in ViewSpec
       fromJSON: function fromJSON(value, ctx, prop, json) { return value; }
+    },
+    // This is the DAOUpdateControllerView, not the DetailView
+    'updateView',
+    // This is the DAOCreateControllerView, not the DetailView
+    'createControllerView',
+    {
+      class: 'String',
+      name: 'detailView',
+      value: 'foam.u2.DetailView'
     }
   ],
 

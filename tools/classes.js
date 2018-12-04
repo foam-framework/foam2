@@ -8,8 +8,10 @@ var classes = [
   'foam.core.Axiom',
   'foam.core.Serializable',
   'foam.core.Exception',
+  'foam.core.Freezable',
   'foam.core.ContextAgent',
   'foam.core.Identifiable',
+  'foam.core.AbstractFObject',
   'foam.mlang.predicate.Predicate',
   'foam.mlang.predicate.True',
   'foam.mlang.predicate.False',
@@ -55,6 +57,7 @@ var classes = [
   'foam.box.NamedBox',
   'foam.box.HTTPBox',
   'foam.box.HTTPReplyBox',
+  'foam.box.AuthServiceClientBox',
   'foam.nanos.app.AppConfig',
   'foam.nanos.http.WebAgent',
   'com.google.foam.demos.heroes.Hero',
@@ -79,9 +82,14 @@ var classes = [
   'foam.dao.java.JDAO',
   'foam.dao.FilteredDAO',
   'foam.dao.Journal',
+  'foam.dao.RemoveChildrenOnRemoveDAO',
+  'foam.dao.AbstractJournal',
   'foam.dao.ProxyJournal',
   'foam.dao.CompositeJournal',
   'foam.dao.FileJournal',
+  'foam.dao.RoutingJournal',
+  'foam.dao.RoutingJournalTest',
+  'foam.dao.RoutingJDAO',
   'foam.dao.WriteOnlyJDAO',
   'foam.dao.WriteOnlyFileJournal',
   'foam.dao.BaseClientDAO',
@@ -107,12 +115,16 @@ var classes = [
   'foam.dao.SQLStatement',
   'foam.dao.EasyDAO',
   'foam.dao.EnabledAwareDAO',
+  'foam.dao.index.PersistedIndexTest',
+  'foam.dao.SequenceNumberDAO',
+  'foam.dao.SequenceNumberDAOTest',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
   'foam.mlang.sink.Max',
   'foam.mlang.sink.Min',
   'foam.mlang.sink.Sum',
+  'foam.mlang.sink.Average',
   'foam.mlang.sink.Map',
   'foam.nanos.actioncommand.ActionCommand',
   'foam.nanos.NanoService',
@@ -134,13 +146,17 @@ var classes = [
   'foam.nanos.auth.Hours',
   'foam.nanos.auth.Address',
   'foam.nanos.auth.Phone',
+  'foam.nanos.auth.HumanNameTrait',
   'foam.nanos.auth.User',
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
+  'foam.nanos.auth.UserUserJunction',
   'foam.nanos.auth.ClientAuthService',
+  'foam.nanos.auth.ClientLoginAuthService',
+  'foam.nanos.auth.AgentAuthService',
+  'foam.nanos.auth.ClientAgentAuthService',
   'foam.nanos.auth.HtmlDoc',
   'foam.nanos.auth.PasswordExpiryAuthService',
-  'foam.nanos.auth.twofactor.authy.AuthyService',
   'foam.nanos.auth.token.Token',
   'foam.nanos.auth.token.TokenService',
   'foam.nanos.auth.token.ClientTokenService',
@@ -178,6 +194,8 @@ var classes = [
   'foam.nanos.logger.LogsView',
   'foam.nanos.menu.Menu',
   'foam.nanos.menu.DAOMenu',
+  'foam.nanos.menu.DocumentMenu',
+  'foam.nanos.menu.DocumentFileMenu',
   'foam.nanos.menu.LinkMenu',
   'foam.nanos.menu.ListMenu',
   'foam.nanos.menu.MenuBar',
@@ -221,6 +239,7 @@ var classes = [
   'foam.lib.json.UnknownFObject',
   'foam.lib.json.UnknownFObjectArray',
   'foam.lib.json.ClassReferenceParserTest',
+  'foam.lib.xml.OutputXML',
   'foam.blob.Buffer',
   'foam.blob.Blob',
   'foam.blob.BlobService',
@@ -246,11 +265,9 @@ var classes = [
   'foam.nanos.fs.File',
 
   'foam.crypto.hash.Hasher',
-  'foam.crypto.hash.Hashable',
   'foam.crypto.hash.HashableTest',
 
   'foam.crypto.sign.Signer',
-  'foam.crypto.sign.Signable',
   'foam.crypto.sign.SignableTest',
 
   'foam.nanos.http.Command',
@@ -259,18 +276,24 @@ var classes = [
   'foam.nanos.http.HttpParameters',
   'foam.nanos.dig.DIG',
   'foam.nanos.dig.DUG',
+  'foam.nanos.dig.SUGAR',
 
   'foam.nanos.jetty.HttpServer',
+  'foam.nanos.servlet.Servlet',
   'foam.nanos.servlet.ServletMapping',
   'foam.nanos.servlet.ErrorPageMapping',
+  'foam.nanos.servlet.FilterMapping',
+  'foam.nanos.servlet.VirtualHostRoutingServlet',
 
   'foam.lib.query.TestModel',
   'foam.lib.query.FooEnum',
   'foam.demos.net.nap.web.model.RegulatoryNotice',
   'foam.demos.net.nap.web.model.RegulatoryNoticeAudit',
 
+  'foam.parse.QueryParserUserTest',
   'foam.util.EmailTest',
   'foam.util.PasswordTest',
+  'foam.util.SecurityUtilTest',
   'foam.test.TestObj',
   'foam.core.FObjectTest',
 
@@ -280,11 +303,20 @@ var classes = [
   'foam.nanos.dig.exception.DAOPutException',
   'foam.nanos.dig.exception.EmptyDataException',
   'foam.nanos.dig.exception.UnsupportException',
+  'foam.nanos.dig.exception.UnknownIdException',
+  'foam.nanos.dig.exception.DigSuccessMessage',
+  'foam.flow.Document',
+  'foam.flow.DocumentationFolderDAO',
+
+  'foam.comics.SearchMode',
 
   //Support Files
   'foam.support.model.TicketMessage',
   'foam.support.model.SupportEmail',
-  'foam.support.model.Ticket'
+  'foam.support.model.Ticket',
+
+  'foam.nanos.dig.exception.EmptyParameterException',
+  'foam.nanos.dig.exception.GeneralException'
 ];
 
 var abstractClasses = [
@@ -297,13 +329,13 @@ var skeletons = [
   'foam.dao.DAO',
   'foam.mop.MOP',
   'foam.nanos.auth.AuthService',
+  'foam.nanos.auth.AgentAuthService',
   'foam.nanos.auth.email.EmailDocInterface',
   'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.auth.token.TokenService',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.POP3Email',
-  'foam.nanos.notification.push.PushService',
-
+  'foam.nanos.notification.push.PushService'
 ];
 
 var proxies = [

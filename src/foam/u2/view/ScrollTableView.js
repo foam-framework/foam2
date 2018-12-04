@@ -35,15 +35,28 @@
       class: 'foam.dao.DAOProperty',
       name: 'scrolledDAO',
       expression: function(data, limit, skip) {
-        return data.limit(limit).skip(skip);
+        return data && data.limit(limit).skip(skip);
       },
     },
     'columns',
     {
+      class: 'FObjectArray',
+      of: 'foam.core.Action',
+      name: 'contextMenuActions'
+    },
+    {
       class: 'Int',
       name: 'daoCount'
     },
-    'selection'
+    'selection',
+    {
+      class: 'Boolean',
+      name: 'editColumnsEnabled',
+      documentation: `
+        Set to true if users should be allowed to choose which columns to use.
+      `,
+      value: true
+    }
   ],
 
   methods: [
@@ -59,7 +72,13 @@
         start('tr').
           start('td').
             style({ 'vertical-align': 'top' }).
-            start(this.TableView, {data$: this.scrolledDAO$, columns: this.columns, selection$: this.selection$}).
+            start(this.TableView, {
+              data$: this.scrolledDAO$,
+              columns: this.columns,
+              contextMenuActions: this.contextMenuActions,
+              selection$: this.selection$,
+              editColumnsEnabled: this.editColumnsEnabled
+            }).
             end().
           end().
           start('td').style({ 'vertical-align': 'top' }).
@@ -84,7 +103,7 @@
         // Convert to rows, rounding up. (Therefore minumum 1.)
         var rows = Math.ceil(Math.abs(e.deltaY) / /*self.rowHeight*/ 40);
         this.skip = Math.max(0, this.skip + (negative ? -rows : rows));
-        e.preventDefault();
+        if ( e.deltaY !== 0 ) e.preventDefault();
       }
     },
     {
@@ -96,7 +115,7 @@
         this.data$proxy.select(this.Count.create()).then(function(s) {
           self.daoCount = s.value;
         })
-      },
-    },
+      }
+    }
   ]
 });

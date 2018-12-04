@@ -56,6 +56,7 @@ foam.LIB({
        * @return {Array} An array of Argument objects.
        */
       // strip newlines and find the function(...) declaration
+      if ( fn.args ) return fn.args;
       var args = foam.Function.argsStr(fn);
 
       if ( ! args ) return [];
@@ -300,7 +301,9 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  refines: 'foam.core.Method',
+  package: 'foam.core',
+  name: 'MethodArgumentRefine',
+  refines: 'foam.core.AbstractMethod',
   properties: [
     {
       class: 'FObjectArray',

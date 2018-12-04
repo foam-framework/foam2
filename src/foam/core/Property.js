@@ -246,6 +246,22 @@ foam.CLASS({
       name: 'forClass_',
       transient: true
     },
+    {
+      /**
+        Identifies properties that contain Personally identifiable information,
+        which may fall within the ambit of privacy regulations.
+      */
+      class: 'Boolean',
+      name: 'containsPII'
+    },
+    {
+      /**
+        Identifies properties that contain Personally identifiable information which
+        may be eligible for deletion on request.
+      */
+      class: 'Boolean',
+      name: 'containsDeletablePII'
+    }
   ],
 
   methods: [
@@ -336,6 +352,14 @@ foam.CLASS({
       // since installInClass() may have created a modified version
       // to inherit Property Properties from a super-Property.
       var prop        = proto.cls_.getAxiomByName(this.name);
+      if ( prop !== this ) {
+        // Delegate to the installInProto found in the class in case it
+        // has custom behaviour it wants to do.  See Class property for
+        // and example.
+        prop.installInProto(proto);
+        return;
+      }
+
       var name        = prop.name;
       var adapt       = prop.adapt
       var assertValue = prop.assertValue;

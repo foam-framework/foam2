@@ -15,6 +15,10 @@ foam.INTERFACE({
       returns: 'Promise',
       args: [
         {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
           class: 'FObjectProperty',
           of: 'foam.nanos.notification.email.EmailMessage',
           name: 'emailMessage',
@@ -27,6 +31,10 @@ foam.INTERFACE({
       javaReturns: 'void',
       returns: 'Promise',
       args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
         {
           class: 'FObjectProperty',
           of: 'foam.nanos.auth.User',

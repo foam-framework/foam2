@@ -25,9 +25,11 @@ public class AnyParser
             new LongParser(),
             new Not(new Literal("."))),
           new DoubleParser(),
+          new ObjectDateParser(),
           new StringArrayParser(),
           new StringDoubleArrayParser(),
           new PropertyReferenceParser(),
+          new ClassReferenceParser(),
           new ArrayParser(),
           new FObjectParser(),
           new MapParser());

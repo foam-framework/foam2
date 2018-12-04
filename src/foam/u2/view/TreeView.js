@@ -29,13 +29,42 @@ foam.CLASS({
   ],
 
   imports: [
+    'dblclick?',
+    'onObjDrop',
     'selection',
-    'onObjDrop'
+    'startExpanded'
   ],
 
   css: `
-    ^ { white-space: nowrap; margin-left:16px; }
-    ^selected { outline: 2px solid #dddd00; }
+    ^ {
+      white-space: nowrap;
+      margin: 6px 20px;
+      inset: none;
+      cursor: pointer;
+    }
+
+    ^label:hover {
+      border-radius: 2px;
+      background-color: rgba(0, 48, 249, 0.1);
+      color: #0098db;
+    }
+
+    ^label {
+      min-width: 120px;
+      padding: 4px;
+      font-weight: 500;
+      color: #2b2b2b;
+    }
+
+    ^selected > ^label {
+      border-radius: 2px;
+      background-color: rgba(0, 48, 249, 0.1);
+      color: #0098db;
+    }
+
+    ^expanded {
+      transform: rotate(180deg);
+    }
   `,
 
   properties: [
@@ -53,6 +82,16 @@ foam.CLASS({
     {
       class: 'Function',
       name: 'formatter'
+    },
+    {
+      class: 'Boolean',
+      name: 'draggable',
+      documentation: 'Enable to allow drag&drop editing.',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'hasChildren'
     }
   ],
 
@@ -67,26 +106,42 @@ foam.CLASS({
           }
           return '';
         }, this.selection$, this.data$.dot('id'))).
-        attrs({ draggable: 'true' }).
         start('span').
+          style({
+            visibility: this.hasChildren$.map(function(c) { return c ? 'visible' : 'hidden'; }),
+            'margin-right': '5px',
+            'vertical-align': 'middle',
+            'font-weight': 'bold',
+            'display': 'inline-block',
+            'visibility': 'visible',
+            'font-size': '16px',
+            'transform': this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)' })
+          }).
           on('click', this.toggleExpanded).
-          add(this.expanded$.map(function(v) { return v ? '\u25BD' : '\u25B7'; })).
+          add('\u2303').
           entity('nbsp').
         end().
         on('click', this.selected).
-        on('dragstart', this.onDragStart).
-        on('dragenter', this.onDragOver).
-        on('dragover', this.onDragOver).
-        on('drop', this.onDrop).
-        call(this.formatter).
+        on('dblclick', function() { self.dblclick && self.dblclick(self.data); }).
+        callIf(this.draggable, function() {
+          this.
+          attrs({ draggable: 'true' }).
+          on('dragstart', this.onDragStart).
+          on('dragenter', this.onDragOver).
+          on('dragover',  this.onDragOver).
+          on('drop',      this.onDrop);
+        }).
+        start('span').addClass(self.myClass('label')).call(this.formatter, [self.data]).end().
         add(this.slot(function(e) {
-          if ( ! e ) return this.E('div');
           var e2 = this.E('div');
+          if ( ! e ) return e2;
           e2.select(this.data[self.relationship.forwardName]/*.dao*/, function(obj) {
+            self.hasChildren = true;
             return self.cls_.create({
               data: obj,
               formatter: self.formatter,
-              relationship: self.relationship
+              relationship: self.relationship,
+              expanded: self.startExpanded
             }, this);
           });
           return e2;
@@ -148,6 +203,7 @@ foam.CLASS({
 
     function toggleExpanded(e) {
       this.expanded = ! this.expanded;
+      this.selection = this.data;
       e.preventDefault();
       e.stopPropagation();
     }
@@ -167,7 +223,8 @@ foam.CLASS({
 
   exports: [
     'onObjDrop',
-    'selection'
+    'selection',
+    'startExpanded'
   ],
 
   properties: [
@@ -200,8 +257,13 @@ foam.CLASS({
         M.NOT(M.HAS(of.getAxiomByName(this.relationship.inverseName))));
 
       var self = this;
+      var isFirstSet = false;
       this.addClass(this.myClass()).
         select(dao, function(obj) {
+          if ( ! isFirstSet && ! self.selection ) {
+            self.selection = obj;
+            isFirstSet = true;
+          }
           return self.TreeViewRow.create({
             data: obj,
             relationship: self.relationship,

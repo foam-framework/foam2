@@ -1,7 +1,13 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package:'foam.support.view',
   name:'SupportEmailView',
-  extends:'foam.u2.View',
+  extends: 'foam.u2.Controller',
 
   requires: [
     'foam.u2.dialog.Popup',
@@ -13,10 +19,6 @@ foam.CLASS({
     'createLabel',  
     'ctrl',
     'user'
-  ],
-
-  exports: [
-    'as data'
   ],
 
   css:`
@@ -155,7 +157,7 @@ foam.CLASS({
             .start(this.NEW_EMAIL).end()
           .end()
         .end()   
-      .end()
+      .end();
     }
   ],
 
@@ -163,8 +165,8 @@ foam.CLASS({
     {
       name: 'newEmail',
       label: 'New Email',
-      code: function(){
-        this.ctrl.add(this.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportModal'}));
+      code: function() {
+        this.ctrl.add(this.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportModal' }));
       }
     }
   ],
@@ -201,7 +203,7 @@ foam.CLASS({
                 'status'
               ]
             })
-              .addClass(this.myClass('table'))
+            .addClass(this.myClass('table'))
             .end();
         }
       ] 

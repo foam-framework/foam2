@@ -91,7 +91,7 @@ return config_;`
     {
       name: 'sendEmail',
       javaCode: `
-        getDao().put(emailMessage);
+        getDao().inX(x).put(emailMessage);
 `
     },
     {
@@ -111,12 +111,27 @@ for ( String key : templateArgs.keySet() ) {
 }
 
 EnvironmentConfiguration config = getConfig(group);
-JtwigTemplate template = JtwigTemplate.inlineTemplate(emailTemplate.getBody(), config);
 JtwigModel model = JtwigModel.newModel(templateArgs);
 emailMessage = (EmailMessage) emailMessage.fclone();
-emailMessage.setSubject(emailTemplate.getSubject());
-emailMessage.setBody(template.render(model));
-sendEmail(emailMessage);
+
+JtwigTemplate templateBody =    JtwigTemplate.inlineTemplate(emailTemplate.getBody(), config);
+emailMessage.setBody(templateBody.render(model));
+
+// If subject has already provided, then we don't want to use template subject.
+if (foam.util.SafetyUtil.isEmpty(emailMessage.getSubject())) {
+  JtwigTemplate templateSubject = JtwigTemplate.inlineTemplate(emailTemplate.getSubject(), config);
+  emailMessage.setSubject(templateSubject.render(model));
+}
+
+// If the displayName doesn't set in the message
+// and the displayName provided in the template, use the displayName from template
+if ( foam.util.SafetyUtil.isEmpty(emailMessage.getDisplayName()) &&
+     ! foam.util.SafetyUtil.isEmpty(emailTemplate.getDisplayName()) ) {
+  JtwigTemplate templateDisplayName = JtwigTemplate.inlineTemplate(emailTemplate.getDisplayName(), config);
+  emailMessage.setDisplayName(templateDisplayName.render(model));
+}
+
+sendEmail(x, emailMessage);
 `
     }
   ]
