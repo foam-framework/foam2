@@ -357,10 +357,17 @@ foam.CLASS({
       javaThrows: ['AuthorizationException'],
       javaCode: `
         User user = (User) x.get("user");
+        User agent = (User) x.get("agent");
         AuthService auth = (AuthService) x.get("auth");
-
+        
+        boolean findSelf = SafetyUtil.equals(this.getId(), user.getId()) ||
+          (
+            agent != null &&
+            SafetyUtil.equals(agent.getId(), this.getId())
+          );
+        
         if (
-          ! SafetyUtil.equals(this.getId(), user.getId()) &&
+          ! findSelf &&
           ! auth.check(x, "user.read." + this.getId()) &&
           ! auth.check(x, "spid.read." + this.getSpid())
         ) {
