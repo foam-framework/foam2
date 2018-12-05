@@ -235,12 +235,10 @@ foam.CLASS({
           .end());
 
       this.start()
-        .start().hide(this.isLoadingDaoCount$)
           .hide(this.isEmptyStateShowing$).add(this.data.border).end()
           .start().show(this.isEmptyStateShowing$)
             .tag(this.data.emptyStateView)
-          .end()
-        .end();
+          .end();
     },
 
     function dblclick(obj) {
