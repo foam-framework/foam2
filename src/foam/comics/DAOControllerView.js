@@ -134,23 +134,6 @@ foam.CLASS({
           class: 'foam.comics.DAOUpdateControllerView'
         };
       }
-    },
-    {
-      class: 'Boolean',
-      name: 'isLoadingDaoCount',
-      value: true
-    },
-    {
-      class: 'Boolean',
-      name: 'isEmpty',
-      value: true
-    },
-    {
-      class: 'Boolean',
-      name: 'isEmptyStateShowing',
-      expression: function(isEmpty, isLoadingDaoCount, data) {
-        return isEmpty && ! isLoadingDaoCount && data.emptyStateView;
-      }
     }
   ],
 
@@ -233,12 +216,6 @@ foam.CLASS({
               .end()
             .end()
           .end());
-
-      this.start()
-          .hide(this.isEmptyStateShowing$).add(this.data.border).end()
-          .start().show(this.isEmptyStateShowing$)
-            .tag(this.data.emptyStateView)
-          .end();
     },
 
     function dblclick(obj) {
@@ -250,12 +227,14 @@ foam.CLASS({
     },
 
     function fetchDaoCount() {
-      var self = this;
-      this.data.data.select(this.COUNT()).then(function(count) {
-        if ( count.value > 0 ) {
-          self.isEmpty = false;
+      this.data.data.select(this.COUNT()).then((count) => {
+        if ( count.value === 0 ) {
+          if ( this.data.emptyStateView ) {
+            this.start().tag(this.data.emptyStateView).end();
+            return;
+          }
         }
-        self.isLoadingDaoCount = false;
+        this.start().add(this.data.border).end();
       });
     }
   ],
