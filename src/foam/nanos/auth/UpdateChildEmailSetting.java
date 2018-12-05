@@ -52,8 +52,9 @@ public class UpdateChildEmailSetting extends ProxyDAO {
       return group;
     }
 
-    if ( SafetyUtil.isEmpty(group.getFrom()) ||
-         SafetyUtil.isEmpty(group.getDisplayName()) ||
+    // If none of the settings are set, get parent value
+    if ( SafetyUtil.isEmpty(group.getFrom()) &&
+         SafetyUtil.isEmpty(group.getDisplayName()) &&
          SafetyUtil.isEmpty(group.getReplyTo())) {
 
       getParentValue(x, group, group);
