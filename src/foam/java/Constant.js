@@ -50,7 +50,7 @@ foam.CLASS({
       o.out(this.type);
       o.out(' ' + this.name);
       o.out(' = ');
-      o.out(foam.java.asJavaValue(this.value));
+      o.out(this.value);
       o.out(';\n');
     }
   ]
