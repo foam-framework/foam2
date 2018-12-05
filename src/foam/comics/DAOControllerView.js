@@ -137,14 +137,19 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'isLoadingDaoCount',
+      value: true
+    },
+    {
+      class: 'Boolean',
       name: 'isEmpty',
       value: true
     },
     {
       class: 'Boolean',
       name: 'isEmptyStateShowing',
-      expression: function(isEmpty, data) {
-        return isEmpty && data.emptyStateView;
+      expression: function(isEmpty, isLoadingDaoCount, data) {
+        return isEmpty && ! isLoadingDaoCount && data.emptyStateView;
       }
     }
   ],
@@ -229,8 +234,13 @@ foam.CLASS({
             .end()
           .end());
 
-      this.start().hide(this.isEmptyStateShowing$).add(this.data.border).end()
-        .start().show(this.isEmptyStateShowing$).tag(this.data.emptyStateView).end();
+      this.start()
+        .start().hide(this.isLoadingDaoCount$)
+          .hide(this.isEmptyStateShowing$).add(this.data.border).end()
+          .start().show(this.isEmptyStateShowing$)
+            .tag(this.data.emptyStateView)
+          .end()
+        .end();
     },
 
     function dblclick(obj) {
@@ -241,11 +251,14 @@ foam.CLASS({
       }
     },
 
-    async function fetchDaoCount() {
-      var count = await this.data.data.select(this.COUNT());
-      if ( count.value > 0 ) {
-        this.isEmpty = false;
-      }
+    function fetchDaoCount() {
+      var self = this;
+      this.data.data.select(this.COUNT()).then(function(count) {
+        if ( count.value > 0 ) {
+          self.isEmpty = false;
+        }
+        self.isLoadingDaoCount = false;
+      });
     }
   ],
 
