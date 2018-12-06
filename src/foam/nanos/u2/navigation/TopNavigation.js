@@ -97,6 +97,13 @@ foam.CLASS({
     }
   `,
 
+  messages: [
+    {
+      name: 'GREETING',
+      message: 'Welcome'
+    }
+  ],
+
   properties: [
     {
       name: 'dao',
@@ -109,16 +116,25 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start()
+          .addClass('welcome-label')
+          .hide(this.loginSuccess$)
+          .add(this.GREETING)
+        .end();
+
+      this.user.id$.sub(this.userLoggedIn);
+    }
+  ],
+
+  listeners: [
+    function userLoggedIn() {
+      this
+        .start()
           .addClass('logged-in-container')
-          .show(this.loginSuccess$)
           .tag({ class: 'foam.nanos.u2.navigation.BusinessLogoView' })
           .start({ class: 'foam.nanos.menu.MenuBar' })
             .addClass('menuBar')
           .end()
           .tag({ class: 'foam.nanos.u2.navigation.UserView' })
-        .end()
-        .start()
-          .add('Welcome').addClass('welcome-label').hide(this.loginSuccess$)
         .end();
     }
   ]
