@@ -8,6 +8,6 @@ p({"class":"foam.nanos.auth.Country", "code":"MX", "ISO_3166_1":"MEX","name":"Me
 p({"class":"foam.nanos.auth.Country", "code":"MY", "ISO_3166_1":"MYS","name":"Malaysia"})
 p({"class":"foam.nanos.auth.Country", "code":"RS", "ISO_3166_1":"SRB","name":"Serbia"})
 p({"class":"foam.nanos.auth.Country", "code":"TT", "ISO_3166_1":"TTO","name":"Trinidad and Tobago"})
-p({"class":"foam.nanos.auth.Country", "code":"GB", "ISO_3166_1":"GBR","name":"United Kingdom", "alternativeName":["Great Britain"]})
+p({"class":"foam.nanos.auth.Country", "code":"GB", "ISO_3166_1":"GBR","name":"United Kingdom", "alternativeNames":["Great Britain"]})
 p({"class":"foam.nanos.auth.Country", "code":"US", "ISO_3166_1":"USA","name":"USA", "alternativeNames":["United States", "United States of America"]})
 p({"class":"foam.nanos.auth.Country", "code":"ZA", "ISO_3166_1":"ZAF","name":"South Africa"})
