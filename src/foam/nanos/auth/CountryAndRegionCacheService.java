@@ -154,7 +154,9 @@ public class CountryAndRegionCacheService extends ContextAwareSupport implements
 
   private String formatName(String query) {
     return Arrays.stream(query.split(" "))
-      .map(string -> string.substring(0, 1).toUpperCase() + string.substring(1).toLowerCase())
+      .map(string -> string.equals("and") || string.equals("of") ?
+          string :
+          string.substring(0, 1).toUpperCase() + string.substring(1).toLowerCase())
       .collect(Collectors.joining(" "));
   }
 
