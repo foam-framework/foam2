@@ -20,8 +20,17 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'ISOCode',
+      documentation: '3 digit ISO country code'
+    },
+    {
+      class: 'String',
       name: 'name',
       documentation: 'Country name.'
+    },
+    {
+      class: 'StringArray',
+      name: 'alternativeName'
     }
   ],
   methods: [{
