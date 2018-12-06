@@ -16,12 +16,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'code',
-      documentation: 'Country code.'
+      documentation: 'ISO 3166-1 alpha-2 Country codes.'
     },
     {
       class: 'String',
-      name: 'ISOCode',
-      documentation: '3 digit ISO country code'
+      name: 'ISO_3166_1',
+      documentation: 'ISO 3166-1 alpha-3 country codes.'
     },
     {
       class: 'String',
@@ -30,7 +30,7 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
-      name: 'alternativeName'
+      name: 'alternativeNames'
     }
   ],
   methods: [{

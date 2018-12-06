@@ -31,7 +31,7 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
-      name: 'alternativeName'
+      name: 'alternativeNames'
     }
   ]
 });
