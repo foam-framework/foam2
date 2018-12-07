@@ -16,6 +16,14 @@
     'foam.u2.view.TableView'
   ],
 
+  constants: [
+    {
+      type: 'Int',
+      name: 'TABLE_HEAD_HEIGHT',
+      value: 40
+    }
+  ],
+
   properties: [
     {
       class: 'foam.dao.DAOProperty',
@@ -62,6 +70,21 @@
       name: 'rowHeight',
       documentation: 'The height of one row of the table in px.',
       value: 40
+    },
+    {
+      class: 'Boolean',
+      name: 'fitInScreen',
+      documentation: `
+        If true, the table height will be dynamically set such that the table
+        will not overflow off of the bottom of the page.
+      `,
+      value: false
+    },
+    {
+      name: 'table_',
+      documentation: `
+        A reference to the table element we use in the fitInScreen calculations.
+      `
     }
   ],
 
@@ -84,20 +107,24 @@
               contextMenuActions: this.contextMenuActions,
               selection$: this.selection$,
               editColumnsEnabled: this.editColumnsEnabled
-            }).
+            }, this.table_$).
             end().
           end().
           start('td').style({ 'vertical-align': 'top' }).
-            add(this.ScrollCView.create({
-              value$: this.skip$,
-              extent$: this.limit$,
-              height: this.rowHeight * this.limit + 41, // TODO: Use window height.
-              width: 18,
-              size$: this.daoCount$,
+            add(this.slot(function(limit) {
+              return this.ScrollCView.create({
+                value$: this.skip$,
+                extent$: this.limit$,
+                height: this.rowHeight * limit + this.TABLE_HEAD_HEIGHT,
+                width: 18,
+                size$: this.daoCount$,
+              });
             })).
           end().
         end().
       end();
+
+      if ( this.fitInScreen ) this.onload.sub(this.updateTableHeight);
     }
   ],
 
@@ -121,6 +148,20 @@
         this.data$proxy.select(this.Count.create()).then(function(s) {
           self.daoCount = s.value;
         })
+      }
+    },
+    {
+      name: 'updateTableHeight',
+      code: function() {
+        // Find the distance from the top of the table to the top of the screen.
+        var distanceFromTop = this.table_.el().getBoundingClientRect().y;
+
+        // Calculate the remaining space we have to make use of.
+        var remainingSpace = window.innerHeight - distanceFromTop;
+
+        // Set the limit such that we make maximum use of the space without
+        // overflowing.
+        this.limit = Math.max(1, Math.floor((remainingSpace - this.TABLE_HEAD_HEIGHT) / this.rowHeight));
       }
     }
   ]
