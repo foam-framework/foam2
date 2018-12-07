@@ -36,7 +36,7 @@ public class CountryService extends ContextAwareSupport implements NanoService {
 
     // 2. by 3 digit iso code
     if ( query.length() == 3) {
-      return findCountry(MLang.EQ(Country.ISO_3166_1, query.toUpperCase()));
+      return findCountry(MLang.EQ(Country.ISO31661CODE, query.toUpperCase()));
     }
 
     query = formatName(query);

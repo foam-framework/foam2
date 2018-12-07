@@ -20,7 +20,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'ISO_3166_1',
+      name: 'iso31661Code',
       documentation: 'ISO 3166-1 alpha-3 country codes.'
     },
     {
