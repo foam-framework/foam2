@@ -56,6 +56,12 @@
         Set to true if users should be allowed to choose which columns to use.
       `,
       value: true
+    },
+    {
+      class: 'Int',
+      name: 'rowHeight',
+      documentation: 'The height of one row of the table in px.',
+      value: 40
     }
   ],
 
@@ -85,7 +91,7 @@
             add(this.ScrollCView.create({
               value$: this.skip$,
               extent$: this.limit$,
-              height: 40*18+41, // TODO use window height.
+              height: this.rowHeight * this.limit + 41, // TODO: Use window height.
               width: 18,
               size$: this.daoCount$,
             })).
@@ -101,7 +107,7 @@
       code: function(e) {
         var negative = e.deltaY < 0;
         // Convert to rows, rounding up. (Therefore minumum 1.)
-        var rows = Math.ceil(Math.abs(e.deltaY) / /*self.rowHeight*/ 40);
+        var rows = Math.ceil(Math.abs(e.deltaY) / 40);
         this.skip = Math.max(0, this.skip + (negative ? -rows : rows));
         if ( e.deltaY !== 0 ) e.preventDefault();
       }
