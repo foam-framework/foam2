@@ -119,9 +119,10 @@ foam.CLASS({
           .addClass('welcome-label')
           .hide(this.loginSuccess$)
           .add(this.GREETING)
-        .end();
+        .end()
+        .callIf(this.loginSuccess, this.userLoggedIn);
 
-      this.user.id$.sub(this.userLoggedIn);
+      this.loginSuccess$.sub(this.userLoggedIn);
     }
   ],
 
