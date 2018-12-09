@@ -28,6 +28,10 @@ foam.CLASS({
       targetDAOKey: 'countryDAO',
       name: 'countryId',
       of: 'foam.nanos.auth.Country'
+    },
+    {
+      class: 'StringArray',
+      name: 'alternativeNames'
     }
   ]
 });
