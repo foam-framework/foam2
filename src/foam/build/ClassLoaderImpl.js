@@ -1,25 +1,9 @@
-/*
-TODO:
-
- - Remove foam.classloader classes
- - Remove arequire, or change it to use classloader.load
- - Make GENMODEL work when running without a classloader
- - Fix WebSocketBox port autodetection to work when running with tomcat and also without
-
-
-*/
-
 foam.CLASS({
   package: 'foam.build',
   name: 'ClassLoaderImpl',
   implements: [
     'foam.build.ClassLoader'
   ],
-
-  /* todo: [
-    `Don't register classes globally, register in a subcontext so we can
-have multiple classloaders running alongside eachother`
-],*/
   requires: [
     'foam.dao.ArrayDAO',
     'foam.dao.Relationship',
@@ -29,130 +13,225 @@ have multiple classloaders running alongside eachother`
     {
       class: 'foam.dao.DAOProperty',
       name: 'modelDAO'
+    },
+    {
+      class: 'Map',
+      name: 'loading'
     }
+  ],
+  exports: [
+    'aref'
   ],
   methods: [
     {
-      name: 'load',
+      class: 'ContextMethod',
+      name: 'aref',
       async: true,
-      returns: 'Class',
+      returns: 'Any',
       args: [ { class: 'String', name: 'id' } ],
-      code: function(id) {
-        function log() {
-          console.log.apply(console, ["**adamvy"].concat(Array.from(arguments)));
+      code: function(x, id) {
+        // In order to avoid circular dependencies, we resolve references lazily.
+        return Promise.resolve({ "$REF$": id });
+      }
+    },
+    {
+      name: 'resolveReferences',
+      code: function(o) {
+        var self = this;
+
+        function visit(o) {
+          if ( foam.Object.isInstance(o) && o["$REF$"] ) {
+            return foam.lookup(o["$REF$"]);
+          } else if ( foam.Array.isInstance(o) ) {
+            for ( var i = 0 ; i < o.length ; i++ ) {
+              o[i] = visit(o[i]);
+            }
+          } else if ( foam.core.FObject.isInstance(o) ) {
+            var props = o.cls_.getAxiomsByClass(foam.core.Property);
+
+            if ( foam.core.Model.isInstance(o) ) {
+              // Workaround for model's psuedo properties that all have postsets.
+              props = [o.cls_.AXIOMS_];
+            }
+
+            for ( var i = 0 ; i < props.length ; i++ ) {
+              var p = props[i];
+
+              if ( ! o.hasDefaultValue(p.name) )
+                o[p.name] = visit(p.f(o));
+            }
+          }
+
+          return o;
         }
 
-        log("loading class", id);
+        return visit(o);
+      }
+    },
+    {
+      name: 'load',
+      async: true,
+      code: function(id) {
+        var self = this;
 
         var E = this.ExpressionsSingleton.create();
 
-        var self = this;
+        if ( this.loading[id] ) return this.loading[id];
 
-        var dependencies = {};
+        var deps = {};
 
-        async function depsForId(id) {
-          // Already processed
-          if ( dependencies[id] ) return;
+        function latch(model) {
+          if ( ! foam.core.Model.isInstance(model) ) {
+            console.warn("Tried to latch non model" + model.id);
+            return;
+          }
 
-          // Already loaded
-          if ( self.__context__.lookup(id, true) ) return;
+          if ( foam.__context__.isRegistered(model.id) ) {
+            return;
+          }
 
-          var model = await self.modelDAO.find(id);
+          foam.UNUSED[model.id] = model;
 
-          if ( ! model ) throw new Error("Unable to find model: " + id);
+          var f = foam.Function.memoize0(function() {
+            model = self.resolveReferences(model);
 
-          await depsForModel(model);
-        }
+            delete foam.UNUSED[model.id];
 
-        async function depsForModel(model) {
-          log("Dependencies of", model.id)
-          if ( dependencies[model.id] ) return;
+            model.validate();
 
-          dependencies[model.id] = { model: model };
+            var cls = model.buildClass();
+            cls.validate();
 
-          if ( model.extends ) await depsForId(model.extends)
+            foam.register(cls);
 
-          if ( model.implements )
-            await Promise.all(model.implements.map(i => depsForId(i.path)));
+            self.pub('load', model.id);
 
-          if ( model.requires )
-            await Promise.all(model.requires.map(i => depsForId(i.path)));
+            foam.USED[model.id] = true;
 
-          var refinements = (await self.modelDAO.
-                             where(E.AND(E.INSTANCE_OF(foam.core.Model),
-                                         E.EQ(foam.core.Model.REFINES, id))).
-                             select()).array;
-
-          dependencies[model.id].refinements = refinements;
-
-          await Promise.all(refinements.map(depsForModel));
-
-          var relationships = (await self.modelDAO.
-                               where(E.AND(E.INSTANCE_OF(foam.dao.Relationship),
-                                           E.OR(E.EQ(foam.dao.Relationship.SOURCE_MODEL,
-                                                     id),
-                                                E.EQ(foam.dao.Relationship.TARGET_MODEL,
-                                                     id)))).
-                               select()).array;
-
-          await Promise.all(relationships.map(depsForModel));
-
-          dependencies[model.id].relationships = relationships;
-        }
-
-        var x = self.__context__;
-
-        log("computing dependencies");
-        return depsForId(id).then(function() {
-          var models = Object.keys(dependencies);
-
-          log("We will load/latch all of:");
-          models.forEach(function(f) { log(f); });
-
-          models.forEach(function(id) {
-            foam.UNUSED[id] = true;
-            var model = dependencies[id].model;
-            var refinements = dependencies[id].refinements || [];
-            var relationships = dependencies[id].relationships || [];
-
-            // Register all normal class models
-            if ( foam.core.Model.isInstance(model) && ! model.refines ) {
-              log("Latching", model.id);
-              x.registerFactory(model, foam.Function.memoize0(function() {
-                log(model.id, "triggered");
-                model.validate();
-
-                delete foam.UNUSED[model.id];
-                foam.USED[model.id] = true;
-
-                var cls = model.buildClass();
-                cls.validate();
-
-                x.register(cls);
-
-                log(model.id, "class built, now doing refinements");
-
-                refinements.forEach(function(r) {
-                  log("building", r.id);
-                  r.buildClass(x);
-                });
-
-                log(model.id, "now relationships");
-
-                relationships.forEach(function(r) {
-                  log("initializing", r.id);
-                  r.initRelationship(x);
-                });
-
-                return cls;
-              }));
-            }
+            return cls;
           });
 
-          return x.lookup(id);
+          foam.__context__.registerFactory(model, f);
+
+          return model;
+        }
+
+        function dep(id) {
+          if ( deps[id] ||
+               foam.__context__.isRegistered(id) )
+            return Promise.resolve();
+
+          deps[id] = true;
+
+          return load(id).then(function(m) {
+            latch(m);
+            return m;
+          });
+        }
+
+        function load(id) {
+          return self.modelDAO.find(id).then(function(m) {
+            if ( ! m ) throw new Error("No model found for id: " + id);
+            return refs(m).then(function() {
+              return classDeps(m);
+            }).then(function() {
+              return refinements(m);
+            }).then(function() {
+              return relationships(m);
+            }).then(function() {
+              return m;
+            });
+          });
+        }
+
+        function aforeach(array, f) {
+          var i = 0;
+          function iter(i) {
+            return i < array.length ? f(array[i]).then(function() { return iter(i + 1); }) :
+                Promise.resolve();
+          }
+
+          return iter(0);
+        }
+
+        function refs(obj) {
+          function visitFObject(obj) {
+            var props = obj.cls_.getAxiomsByClass(foam.core.Property);
+
+            if ( foam.core.Model.isInstance(obj) ) {
+              // Workaround for model's psuedo properties that all have postsets.
+              props = [obj.cls_.AXIOMS_];
+            }
+
+            return aforeach(props, function(prop) {
+              if ( obj.hasDefaultValue(prop.name) ) return Promise.resolve();
+
+              return visit(prop.f(obj));
+            });
+          }
+
+          function visit(o) {
+            if ( foam.Object.isInstance(o) && o["$REF$"] ) {
+              return dep(o["$REF$"]);
+            } else if ( foam.Array.isInstance(o) ) {
+              return aforeach(o, visit);
+            } else if ( foam.core.FObject.isInstance(o) ) {
+              return visitFObject(o);
+            }
+            return Promise.resolve();
+          }
+
+          return visit(obj);
+        }
+
+        function classDeps(model) {
+          var deps = [];
+          if ( model.requires ) deps = deps.concat(model.requires.map(r => r.path));
+          if ( model.implements ) deps = deps.concat(model.implements.map(i => i.path));
+          if ( model.extends ) deps.push(model.extends);
+
+          return aforeach(deps, dep);
+        }
+
+        function refinements(model) {
+          return self.modelDAO.
+            where(E.AND(E.INSTANCE_OF(foam.core.Model),
+                        E.EQ(foam.core.Model.REFINES, model.id))).
+            select().then(function(a) {
+              return aforeach(a.array, function(m) {
+                self.sub("load", model.id, function() {
+                  m = self.resolveReferences(m);
+                  m.buildClass();
+                });
+
+                return Promise.resolve();
+              });
+            });
+        }
+
+        function relationships(model) {
+          return self.modelDAO.
+            where(E.AND(E.INSTANCE_OF(foam.dao.Relationship),
+                        E.OR(E.EQ(foam.dao.Relationship.SOURCE_MODEL, model.id),
+                             E.EQ(foam.dao.Relationship.TARGET_MODEL, model.id)))).
+            select().then(function(a) {
+              return aforeach(a.array, function(m) {
+                self.sub("load", model.id, function() {
+                  m = self.resolveReferences(m);
+                  m.initRelationship();
+                });
+                return Promise.resolve();
+              })
+            });
+        }
+
+        return dep(id).then(function() {
+          return foam.lookup(id);
         });
 
-        return cls;
+        return this.loading[id] = load(id).then(function(model) {
+        });
+
       }
     }
   ]
