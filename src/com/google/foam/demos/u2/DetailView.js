@@ -20,7 +20,7 @@ foam.u2.DetailView.create({
 */
 foam.CLASS({
   package: 'foam.util',
-  name: 'TimerView',
+  name: 'TimerDetailView',
   extends: 'foam.u2.DetailView',
 
   requires: [
@@ -49,11 +49,22 @@ E('br').write();
 E('hr').write();
 E('br').write();
 
-foam.util.TimerView.create({data: timer, showActions: true}).write();
-E('hr').write();
+E('h3').add('Custom DetailView').write();
+foam.util.TimerDetailView.create({data: timer, showActions: true}).write();
+
+E('h3').add('DetailView with data').write();
 foam.u2.DetailView.create({data: timer, showActions: true}).write();
+
+E('h3').add('DetailView with of and data').write();
 foam.u2.DetailView.create({of: 'foam.util.Timer', data: timer, showActions: true}).write();
 
+E('h3').add('DetailView with of').write();
+foam.u2.DetailView.create({of: 'foam.util.Timer', showActions: true}).write();
+
+
+E('br').write();
+E('hr').write();
+E('br').write();
 
 foam.CLASS({
   package: 'foam.nanos.auth',
