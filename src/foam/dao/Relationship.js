@@ -275,7 +275,7 @@ foam.LIB({
   methods: [
     function RELATIONSHIP(m, opt_ctx) {
       var r = foam.dao.Relationship.create(m, opt_ctx);
-      if ( global.__MODELS__ ) global.__MODELS__.push(r);
+      if ( foam.__MODELS__ ) foam.__MODELS__.push(r);
 
       r.validate && r.validate();
       r.initRelationship();
@@ -367,7 +367,7 @@ foam.CLASS({
         return foam.dao.ReadOnlyDAO.create({
           delegate: foam.dao.ManyToManyRelationshipDAO.create({
             relationship: this,
-            delegate: x[this.targetDAOKey]
+            delegate: this.__context__[this.targetDAOKey]
           }, this)
         }, this);
       },
