@@ -6,15 +6,29 @@ foam.CLASS({
   ],
   properties: [
     {
-      name: 'foo',
+      name: 'asdf',
       value: 12
+    },
+    {
+      class: 'Reference',
+      of: 'test.Person',
+      name: 'ref'
     }
   ],
   methods: [
     function init() {
     },
     function method() {
-      console.log("Foo.bar", this.Bar.create().bar);
+      console.log("Foo.Bar.bar", this.Bar.create().asdf);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'test',
+  name: 'Person',
+  methods: [
+    function foo() {
     }
   ]
 });
@@ -27,7 +41,7 @@ foam.CLASS({
   ],
   properties: [
     {
-      name: 'bar',
+      name: 'asdf',
       value: 32
     }
   ],
@@ -35,7 +49,39 @@ foam.CLASS({
     function init() {
     },
     function method() {
-      console.log("Bar.foo", this.Foo.create().foo);
+      console.log("Bar.Foo.asdf", this.Foo.create().asdf);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'test',
+  name: 'Address',
+  requires: [
+    'test.DayOfWeek'
+  ]
+});
+
+foam.ENUM({
+  package: 'test',
+  name: 'DayOfWeek',
+  values: [
+    'MONDAY',
+    'TUESDAY'
+  ]
+});
+
+foam.CLASS({
+  package: 'test',
+  name: 'User',
+  requires: [
+    'test.Address'
+  ],
+  properties: [
+    {
+      class: 'FObjectProperty',
+      name: 'address',
+      of: 'test.Address'
     }
   ]
 });
@@ -63,8 +109,8 @@ foam.CLASS({
     },
     {
       name: 'value',
-      factory: function() {
-        return this.of.CONSTANT;
+      expression: function(of) {
+        return of.CONSTANT;
       }
     }
   ]
@@ -81,6 +127,7 @@ foam.ENUM({
 
 foam.CLASS({
   refines: 'test.Foo',
+  package: 'test',
   name: 'FooRefinement',
   methods: [
     function refined_method() {
