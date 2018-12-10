@@ -48,11 +48,7 @@ foam.INTERFACE({
           type: 'foam.net.node.Route'
         }
       ],
-      returns: {
-        documentation: `The appropriately configured Handler that has been
-            bound to "route".`,
-        type: 'foam.net.node.Handler',
-      }
+      returns: 'foam.net.node.Handler'
     }
   ]
 });
