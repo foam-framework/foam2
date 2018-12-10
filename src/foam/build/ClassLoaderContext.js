@@ -11,7 +11,7 @@ foam.CLASS({
       name: 'aref',
       async: true,
       code: async function(x, id) {
-        console.log("aref(" + id + ")");
+//        console.log("aref(" + id + ")");
         var cls = x.lookup(id, true);
         if ( cls ) return cls;
 
@@ -23,10 +23,10 @@ foam.CLASS({
       name: 'acreate',
       async: true,
       code: async function(x, id, args) {
-        console.log("acreate(" + id + ", " + args);
+//        console.log("acreate(" + id + ", " + args);
         var cls = x.lookup(id, true);
         if ( cls ) {
-          console.log("** cls found");
+//          console.log("** cls found");
           return cls.create(args, x);
         }
 
