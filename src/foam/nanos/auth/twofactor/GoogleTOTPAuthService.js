@@ -70,7 +70,7 @@ foam.CLASS({
         try {
           AppConfig config = (AppConfig) x.get("appConfig");
           SMTPEmailService service = (SMTPEmailService) x.get("smtpEmailService");
-          String name = service == null ? "nanopay Corporation" : service.getDisplayName();
+          String name = service == null ? "FOAM" : service.getDisplayName();
           String path = String.format("/%s:%s", name, user.getEmail());
           String query = String.format("secret=%s&issuer=%s&algorithm=%s", key, name, getAlgorithm());
           URI uri = new URI("otpauth", "totp", path, query, null);
