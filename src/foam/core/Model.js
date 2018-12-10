@@ -100,6 +100,6 @@ foam.CLASS({
         this.name = n;
         this.package = this.refines.substring(0, i);
       }
-    },
+    }
   ]
 });
