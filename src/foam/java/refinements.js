@@ -150,13 +150,11 @@ foam.CLASS({
   extends: 'String',
   properties: [
     {
-      name: 'factory',
-      value: function(p) {
-        // The p.value thing feels like a hack around the fact that a factory
-        // will take priority over a value despite the factory being a default
-        // value and the value being actually set.
-        // TODO: Is there a deeper issue here?
-        return p.value || foam.java.toJavaType(this.type);
+      name: 'expression',
+      factory: function() {
+        return function(type) {
+          return foam.java.toJavaType(type);
+        }
       }
     },
     {
@@ -839,7 +837,7 @@ foam.CLASS({
             return `.set${foam.String.capitalize(p.name)}(${foam.java.asJavaValue(self[p.name])})`
           })
         return `
-new ${self.cls_.id}.Builder(null) // TODO what context to use?
+new ${self.cls_.id}.Builder(EmptyX.instance())
   ${props.join('\n')}
   .build()
         `
