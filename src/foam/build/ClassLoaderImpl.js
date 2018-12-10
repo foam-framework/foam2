@@ -108,8 +108,9 @@ foam.CLASS({
 
             foam.USED[model.id] = true;
 
+            done = true;
             return cls;
-          });
+          };
 
           foam.__context__.registerFactory(model, f);
 
@@ -216,20 +217,22 @@ foam.CLASS({
                              E.EQ(foam.dao.Relationship.TARGET_MODEL, model.id)))).
             select().then(function(a) {
               return aforeach(a.array, function(m) {
-                self.sub("load", model.id, function() {
-                  m = self.resolveReferences(m);
-                  m.initRelationship();
-                });
-                return Promise.resolve();
+                // TODO: Should sourceModel/targetModel be REFS?
+                return dep(m.sourceModel).then(function() {
+                  return dep(m.targetModel);
+                }).then(function() {
+                  self.sub("load", model.id, function() {
+                    m = self.resolveReferences(m);
+                    m.initRelationship();
+                  });
+                })
               })
             });
         }
 
-        return dep(id).then(function() {
+        return this.loading[id] = dep(id).then(function() {
+          delete self.loading[id];
           return foam.lookup(id);
-        });
-
-        return this.loading[id] = load(id).then(function(model) {
         });
 
       }
