@@ -235,13 +235,7 @@ foam.CLASS({
     if ( m.refines ) return CLASS(m);
 
     m.id = m.package ? m.package + '.' + m.name : m.name;
-    foam.UNUSED[m.id] = true;
-
-//    var cls = foam.lookup(m.class || "foam.core.Model");
-    //    foam._MODELS_.push(cls.create(m));
-    m.class = m.class || 'foam.core.Model';
-
-    global.foam.__MODELS__.push(m);
+    foam.UNUSED[m.id] = m;
 
     var f = foam.Function.memoize0(function() {
       delete foam.UNUSED[m.id];
