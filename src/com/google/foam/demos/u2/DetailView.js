@@ -19,6 +19,7 @@ foam.u2.DetailView.create({
 
 */
 foam.CLASS({
+  package: 'foam.util',
   name: 'TimerView',
   extends: 'foam.u2.DetailView',
 
@@ -29,7 +30,7 @@ foam.CLASS({
   // css: foam.u2.DetailView.model_.css,
 
   methods: [
-    function xxxinitE() {
+    function initE() {
       var self = this;
       this.startContext({data: this.data}).
         tag(this.DetailPropertyView, {prop: self.Timer.I}).
@@ -43,15 +44,16 @@ foam.CLASS({
 
   ]
 });
-/*
+
 E('br').write();
 E('hr').write();
 E('br').write();
 
-TimerView.create({data: timer, showActions: true})..write();
+foam.util.TimerView.create({data: timer, showActions: true}).write();
 E('hr').write();
-foam.u2.DetailView.create({data: timer, showActions: true})..write();
-*/
+foam.u2.DetailView.create({data: timer, showActions: true}).write();
+foam.u2.DetailView.create({of: 'foam.util.Timer', data: timer, showActions: true}).write();
+
 
 foam.CLASS({
   package: 'foam.nanos.auth',
