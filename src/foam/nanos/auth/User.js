@@ -53,6 +53,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'id',
+      final: true,
       tableWidth: 45
     },
     {
