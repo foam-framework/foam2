@@ -8,6 +8,7 @@ var classes = [
   'foam.core.Axiom',
   'foam.core.Detachable',
   'foam.core.Serializable',
+  'foam.core.ContextAware',
   'foam.core.Exception',
   'foam.core.Freezable',
   'foam.core.ContextAgent',
