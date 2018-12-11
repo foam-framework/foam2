@@ -19,7 +19,8 @@ foam.CLASS({
         return this.SUPER(x, obj);
       },
       javaCode: `
-        if ( obj instanceof LastModifiedByAware ) {
+        if ( obj instanceof LastModifiedByAware &&
+             ! obj.isFrozen() ) {
           User user = (User) x.get("user");
           ((LastModifiedByAware) obj).setLastModifiedBy(user.getId());
         }
@@ -29,7 +30,8 @@ foam.CLASS({
     {
       name: 'remove_',
       javaCode: `
-        if ( obj instanceof LastModifiedByAware ) {
+        if ( obj instanceof LastModifiedByAware &&
+             ! ((foam.core.FObject) obj).isFrozen() ) {
           User user = (User) x.get("user");
           ((LastModifiedByAware) obj).setLastModifiedBy(user.getId());
         }
