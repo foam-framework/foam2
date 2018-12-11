@@ -290,8 +290,6 @@ var classes = [
 
   'foam.lib.query.TestModel',
   'foam.lib.query.FooEnum',
-  'foam.demos.net.nap.web.model.RegulatoryNotice',
-  'foam.demos.net.nap.web.model.RegulatoryNoticeAudit',
 
   'foam.parse.QueryParserUserTest',
   'foam.util.EmailTest',

@@ -150,9 +150,15 @@ foam.CLASS({
   extends: 'String',
   properties: [
     {
-      name: 'factory',
-      value: function() {
-        return foam.java.toJavaType(this.type);
+      name: 'expression',
+      expression: function(value) {
+        // The value thing feels like a hack around the fact that a factory
+        // will take priority over a value despite the factory being a default
+        // value and the value being actually set.
+        // TODO: Is there a deeper issue here?
+        return function(type) {
+          return value || foam.java.toJavaType(type);
+        }
       }
     },
     {
@@ -698,8 +704,7 @@ foam.CLASS({
     {
       name: 'javaValue',
       expression: function(value) {
-        // TODO: Anything special we need to do?
-        return value;
+        return foam.java.asJavaValue(value);
       }
     },
     { class: 'foam.java.JavaType' }
@@ -836,7 +841,7 @@ foam.CLASS({
             return `.set${foam.String.capitalize(p.name)}(${foam.java.asJavaValue(self[p.name])})`
           })
         return `
-new ${self.cls_.id}.Builder(null) // TODO what context to use?
+new ${self.cls_.id}.Builder(EmptyX.instance())
   ${props.join('\n')}
   .build()
         `
@@ -1433,7 +1438,12 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
-    ['javaType', 'Object[]'],
+    {
+      name: 'javaType',
+      expression: function(type) {
+        return type ? foam.java.toJavaType(type) : 'Object[]'
+      }
+    },
     ['javaInfoType', 'foam.core.AbstractArrayPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.ArrayParser()']
   ],
@@ -1632,7 +1642,6 @@ foam.CLASS({
   refines: 'foam.core.Object',
   flags: ['java'],
   properties: [
-    ['javaType', 'Object'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.AnyParser.instance()'],
     ['javaQueryParser', 'foam.lib.query.AnyParser.instance()']
