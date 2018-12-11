@@ -198,8 +198,8 @@ foam.CLASS({
       // for now, but should get the config object from the NSpec itself
       // to be extensible.
       name: 'configure',
-      isAvailable: function(boxClass) {
-        return ! boxClass;
+      isAvailable: function(boxClass, serve) {
+        return serve && ! boxClass;
 //        return foam.dao.DAO.isInstance(this.__context__[this.name]);
       },
       code: function() {
