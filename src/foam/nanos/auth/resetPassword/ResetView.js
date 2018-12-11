@@ -125,7 +125,7 @@ foam.CLASS({
     { name: 'noSpaces', message: 'Password cannot contain spaces' },
     { name: 'noNumbers', message: 'Password must have one numeric character' },
     { name: 'noSpecial', message: 'Password must not contain: !@#$%^&*()_+' },
-    { name: 'emptyPassword', message: 'Please enter new your password' },
+    { name: 'emptyPassword', message: 'Please enter your new password' },
     { name: 'emptyConfirmation', message: 'Please re-enter your new password' },
     { name: 'invalidLength', message: 'Password must be 7-32 characters long' },
     { name: 'passwordMismatch', message: 'Passwords do not match' }
