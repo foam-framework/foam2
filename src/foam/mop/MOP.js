@@ -14,7 +14,7 @@ foam.INTERFACE({
     {
       name: 'get',
       async: true,
-      returns: 'Any',
+      returns: 'foam.core.FObject',
       args: [
         { name: 'x', type: 'Context' }
       ]
