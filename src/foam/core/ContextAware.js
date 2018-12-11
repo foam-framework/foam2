@@ -6,5 +6,16 @@
 
 foam.INTERFACE({
   package: 'foam.core',
-  name: 'ContextAware'
+  name: 'ContextAware',
+  methods: [
+    {
+      name: 'getX',
+      type: 'Context'
+    },
+    {
+      name: 'setX',
+      type: 'Void',
+      args: [ { name: 'x', type: 'Context' } ]
+    }
+  ]
 });

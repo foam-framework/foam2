@@ -2048,7 +2048,8 @@ foam.CLASS({
 
 
 foam.SCRIPT({
-  id: 'foam.u2.U2ContextScript',
+  package: 'foam.u2',
+  name: 'U2ContextScript',
   requires: [
     'foam.u2.U2Context',
   ],
