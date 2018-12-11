@@ -32,6 +32,21 @@ foam.CLASS({
         }
         return super.put_(x, obj);
       `
+    },
+    {
+      name: 'remove_',
+      code: function(x, obj) {
+        return this.SUPER(x, obj);
+      },
+      javaCode: `
+        return super.put_(x, obj);
+      `
+    },
+    {
+      name: 'removeAll_',
+      javaCode: `
+        getDelegate().select_(x, new foam.dao.RemoveSink(x, this), skip, limit, order, predicate);
+      `
     }
   ]
 });
