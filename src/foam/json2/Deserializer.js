@@ -8,13 +8,20 @@ foam.CLASS({
   package: 'foam.json2',
   name: 'Deserializer',
   imports: [
-    'classloader',
+    'aref',
+    'acreate'
   ],
   properties: [
     {
       class: 'Boolean',
       name: 'parseFunctions',
       value: true
+    },
+    {
+      name: 'asyncFunctionConstructor',
+      factory: function() {
+        return (async function(){}).constructor;
+      }
     }
   ],
   methods: [
@@ -40,7 +47,7 @@ foam.CLASS({
             var args = v.args;
             var body = v.body;
             var async = v.async;
-            var constructor = async ? AsyncFunction : Function;
+            var constructor = async ? this.asyncFunctionConstructor : Function;
             var f = constructor.apply(null, args.concat(body));
             if ( name ) foam.Function.setName(f, name);
             return f;
@@ -60,7 +67,7 @@ foam.CLASS({
         }
         if ( ! foam.Undefined.isInstance(v["$CLS$"]) ) {
           // Defines a class referenced by $CLS$ key
-          return await x.aref(v["$CLS$"]);
+          return this.aref(v["$CLS$"]);
           return foam.lookup(v["$CLS$"]);
         }
         if ( ! foam.Undefined.isInstance(v["$INST$"]) ) {
@@ -77,7 +84,7 @@ foam.CLASS({
         }
 
         return cls ?
-          await x.acreate(cls, args) :
+          await this.acreate(cls, args) :
           args;
 
       } else if ( type == foam.Array ) {

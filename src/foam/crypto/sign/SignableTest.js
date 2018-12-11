@@ -148,9 +148,9 @@ foam.CLASS({
     {
       name: 'Signable_SignWithValidAlgorithmAndKey',
       args: [
-        { class: 'FObjectProperty', name: 'input'     },
-        { class: 'String',          name: 'algorithm' },
-        { class: 'Object',          name: 'key'       }
+        { name: 'input', type: 'FObject' },
+        { name: 'algorithm', type: 'String' },
+        { name: 'key', type: 'Any' }
       ],
       javaCode: `
         try {
@@ -164,10 +164,10 @@ foam.CLASS({
     {
       name: 'Signable_VerifyWithValidAlgorithmSignatureAndKey',
       args: [
-        { class: 'FObjectProperty', name: 'input' },
-        { class: 'String', name: 'algorithm'      },
-        { class: 'Object', name: 'key'            },
-        { class: 'String', name: 'signature'      }
+        { name: 'input', type: 'FObject' },
+        { name: 'algorithm', type: 'String' },
+        { name: 'key', type: 'Any' },
+        { name: 'signature', type: 'String' }
       ],
       javaCode: `
         try {
@@ -179,7 +179,7 @@ foam.CLASS({
     },
     {
       name: 'Signable_SignWithInvalidAlgorithm_NoSuchAlgorithmException',
-      args: [ { class: 'FObjectProperty', name: 'input' } ],
+      args: [ { type: 'FObject', name: 'input' } ],
       javaCode: `
         try {
           input.sign("asdfghjkl", null);
@@ -192,7 +192,7 @@ foam.CLASS({
     {
       name: 'Signable_SignWithNullPrivateKey_InvalidKeyException',
       args: [
-        { class: 'FObjectProperty', name: 'input' }
+        { type: 'FObject', name: 'input' }
       ],
       javaCode: `
         try {
@@ -206,9 +206,9 @@ foam.CLASS({
     {
       name: 'Signable_SignWithMismatchedAlgorithmAndKey_InvalidKeyException',
       args: [
-        { class: 'FObjectProperty', name: 'input'     },
-        { class: 'String',          name: 'algorithm' },
-        { class: 'Object',          name: 'key'       }
+        { type: 'FObject', name: 'input'     },
+        { type: 'String', name: 'algorithm' },
+        { type: 'Any', name: 'key'       }
       ],
       javaCode: `
         try {

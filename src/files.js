@@ -540,6 +540,10 @@ FOAM_FILES([
   { name: "foam/core/FObjectTest" },
   { name: "com/google/foam/demos/bubbles/Bubbles" },
 
+  { name: "foam/flow/Document" },
+  { name: "foam/flow/MarkupEditor" },
+  { name: "foam/flow/DocumentationFolderDAO" },
+
   { name: "org/chartjs/Lib" },
   { name: "org/chartjs/AbstractChartCView" },
   { name: "org/chartjs/Pie" },
