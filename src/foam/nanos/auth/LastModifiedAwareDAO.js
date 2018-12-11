@@ -21,13 +21,15 @@ foam.CLASS({
     {
       name: 'put_',
       code: function(x, obj) {
-        if ( foam.nanos.auth.LastModifiedAware.isInstance(obj) ) {
+        if ( foam.nanos.auth.LastModifiedAware.isInstance(obj) &&
+             ! obj.isFrozen() ) {
           obj.lastModified = new Date();
         }
         return this.SUPER(x, obj);
       },
       javaCode: `
-        if ( obj instanceof LastModifiedAware ) {
+        if ( obj instanceof LastModifiedAware &&
+             ! ((foam.core.FObject) obj).isFrozen() ) {
           ((LastModifiedAware) obj).setLastModified(Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime());
         }
         return super.put_(x, obj);
