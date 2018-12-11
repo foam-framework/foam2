@@ -28,11 +28,10 @@ foam.CLASS({
     },
     {
       name: 'remove_',
+      code: function(x, obj) {
+        return this.SUPER(x, obj);
+      },
       javaCode: `
-        if ( obj instanceof LastModifiedByAware ) {
-          User user = (User) x.get("user");
-          ((LastModifiedByAware) obj).setLastModifiedBy(user.getId());
-        }
         return super.remove_(x, obj);
       `
     },
