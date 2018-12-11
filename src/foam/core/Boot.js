@@ -126,10 +126,10 @@ foam.LIB({
 
       if ( this.refines ) {
         cls = context.lookup(this.refines);
-        foam.assert(cls, 'Unknown refinement class: ' + this.refines);
+        foam.assert(cls, 'Unknown refinement class: ' + this.refines + ' in: ' + this.id);
       } else {
-        foam.assert(this.id, 'Missing id name.', this.name);
-        foam.assert(this.name, 'Missing class name.');
+        foam.assert(this.name, 'Missing class name.', this);
+        foam.assert(this.id, 'Missing class id: ', this.name);
 
         var parent = this.extends      ?
           context.lookup(this.extends) :

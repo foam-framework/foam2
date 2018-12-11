@@ -62,6 +62,10 @@ foam.SCRIPT({
       return foam.Function.isInstance(ret) ? ret() : ret;
     },
 
+    isRegistered: function(id) {
+      return !! this.__cache_[id];
+    },
+
     /**
      * Register a class into the given context.  After registration
      * the class can be found again by calling foam.lookup('com.foo.SomeClass');

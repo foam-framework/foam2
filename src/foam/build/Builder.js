@@ -10,7 +10,9 @@ foam.CLASS({
   requires: [
     'foam.build.DirWriter',
     'foam.build.FilesJsGen',
-    'foam.build.DirCrawlModelDAO'
+    'foam.build.DirCrawlModelDAO',
+    'foam.mlang.ExpressionsSingleton',
+    'foam.build.JsCodeOutputter',
   ],
   properties: [
     {
@@ -25,9 +27,151 @@ foam.CLASS({
     }
   ],
   methods: [
+    function xembedModelDAO(dao) {
+      var self = this;
+      return (async function() {
+        var models = (await dao.select()).array;
+        var serializer = foam.json2.Serializer.create();
+        return `(function() {
+foam.__context__ = foam.build.ClassLoaderContext.create().__subContext__;
+
+var classloader = foam.build.ClassLoaderImpl.create();
+
+var modelDAO = foam.dao.EasyDAO.create({
+  daoType: 'MDAO',
+  of: foam.core.Model
+});
+
+var resolve;
+var promised = foam.build.PromisedClassLoader.create({
+  delegate: new Promise(function(r) { resolve = r; })
+});
+
+classloader.modelDAO = modelDAO;
+
+x = foam.__context__.createSubContext({
+  classloader: classloader
+});
+
+foam.__context__ = x.createSubContext({
+  classloader: promised
+});
+
+var deserializer = foam.json2.Deserializer.create(null, x);
+
+Promise.all([
+${models.map(m => serializer.stringify(self.__context__, m)).join(',\n')}
+]).then(function() {
+  resolve(classloader);
+});
+
+})();`;
+      })();
+    },
     function embedModelDAO(dao) {
       var self = this;
       return (async function() {
+        var payload;
+        var E = self.ExpressionsSingleton.create();
+//        dao = dao.where(E.EQ(foam.core.Model.PACKAGE, "test"));
+
+        var models = (await dao.select()).array;
+
+        function visit(a, m) {
+          if ( foam.Array.isInstance(m) ) {
+            m.forEach(o => visit(a, o));
+          } else if ( foam.core.FObject.isInstance(m) ) {
+            var cls = m.cls_;
+
+            a.push(cls);
+
+            var props = cls.getAxiomsByClass(foam.core.Property);
+
+            for ( var i = 0 ; i < props.length ; i++ ) {
+              var prop = props[i];
+
+              if ( ! m.hasDefaultValue(prop.name) )
+                visit(a, m[prop.name]);
+            }
+          } else if ( foam.core.FObject.isSubClass(m) ) {
+            a.push(m);
+          }
+
+          return a;
+        }
+        var allclasses = visit([], models);
+
+        allclasses.sort(function(a, b) { return a.id < b.id; });
+
+        function isSorted(a, comp) {
+          if ( a.length < 2 ) return true;
+
+          for ( var i = 0 ; i < a.length - 1 ; i++ ) {
+            if ( comp(a[i], a[i+1]) > 0 ) {
+              return false;
+            }
+          }
+          return true;
+        }
+
+        var comp = function(a, b) { return a.id.localeCompare(b.id); };
+
+        allclasses.sort(comp);
+
+        var classes = allclasses.reduce(function(a, v, i, s) {
+          if ( v !== a[a.length - 1] ) a.push(v);
+          return a;
+        }, []);
+
+//        console.log("=== START REQUIRED CLASSES ===");
+//        classes.forEach((c, i) => console.log(c.id, i));
+//        console.log("=== END REQUIRED CLASSES ===");
+
+        var data = {};
+        var serializer = foam.json2.Serializer.create();
+
+        var staticCodeGen = self.JsCodeOutputter.create();
+
+        var a = 1;
+//        payload = classes.map(function(c) {
+//          return `console.log(${a++});
+//${staticCodeGen.stringify(self.__context__, c.model_)}`
+//        }).join('\n');
+
+        models.forEach(function(m) {
+          data[m.id] = m;
+        });
+
+        return `
+(function() {
+foam.__context__ = foam.build.ClassLoaderContext.create().__subContext__;
+
+var classloader = foam.build.ClassLoaderImpl.create();
+
+foam.__context__ = foam.__context__.createSubContext({
+  classloader: classloader
+});
+
+var modelDAO = foam.build.EmbeddedModelDAO.create({
+  delegate: foam.dao.EasyDAO.create({
+    daoType: 'MDAO',
+    of: foam.core.Model
+  })
+}, classloader);
+
+//var modelDAO = foam.dao.EasyDAO.create({
+//  daoType: 'MDAO',
+//  of: foam.core.Model
+//});
+
+
+classloader.modelDAO = modelDAO;
+
+modelDAO.json = ${serializer.stringify(self.__context__, data)};
+})();`;
+      })();
+
+        /*
         var payload = `(function() {
 
 foam.__context__ = foam.build.ClassLoaderContext.create().__subContext__;
@@ -46,9 +190,11 @@ console.log("Seeding modeldao");
 
 var classloader = foam.build.ClassLoaderImpl.create();
 
-var modelDAO = foam.dao.EasyDAO.create({
-daoType: 'MDAO',
-of: foam.core.Model
+var modelDAO = foam.build.EmbeddedModelDAO.create({
+  delegate: foam.dao.EasyDAO.create({
+    daoType: 'MDAO',
+    of: foam.core.Model
+  })
 });
 
 classloader.modelDAO = modelDAO;
@@ -57,7 +203,7 @@ var x = foam.__context__.createSubContext({
   classloader: classloader
 });
 
-var deserializer = foam.json2.Deserializer.create();
+//var deserializer = foam.json2.Deserializer.create();
 `;
 
         var serializer = foam.json2.Serializer.create();
@@ -104,6 +250,9 @@ var deserializer = foam.json2.Deserializer.create();
         }
 
         var models = (await dao.select()).array;
+        console.log("===== models =====");
+        models.forEach(function(m) { console.log(m.refines, m.package, m.name); });
+        console.log("=====");
         var nodes = [];
         var edges = [];
         var L = [];
@@ -165,10 +314,12 @@ resolve(classloader);
 console.log("Done.");
 })();
 })();
+
 `;
 
         return payload;
       })();
+*/
     },
 
     function buildBootstrap() {
@@ -198,12 +349,19 @@ console.log("Done.");
         of: foam.core.Model
       });
 
-      foam.__MODELS__.forEach(function(model) {
-        if ( ! model.cls_ ) {
-          model = model.class == "__Library__" ? foam.build.Library.create(model) :
-            model.class == "__Script__" ? foam.build.Script.create(model) :
-            foam.lookup(model.class).create(model);
-        }
+      function inflate(model) {
+        return model.cls_ ? model :
+          model.class == "__Library__" ? foam.build.Library.create(model) :
+          model.class == "__Script__" ? foam.build.Script.create(model) :
+          foam.lookup(model.class || 'foam.core.Model').create(model)
+      }
+      // Trigger all classes.
+
+      for ( var unused in foam.UNUSED ) {
+        modelDAO.put(inflate(foam.UNUSED[unused]));
+      }
+
+      foam.__MODELS__.map(inflate).forEach(function(model) {
         modelDAO.put(model);
       });
 

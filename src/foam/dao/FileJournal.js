@@ -351,12 +351,12 @@ foam.CLASS({
       documentation: 'Add diff property to old property',
       args: [
         {
-          class: 'FObjectProperty',
           name: 'oldFObject',
+          type: 'FObject'
         },
         {
-          class: 'FObjectProperty',
-          name: 'diffFObject'
+          name: 'diffFObject',
+          type: 'FObject'
         }
       ],
       javaCode: `
@@ -375,12 +375,12 @@ foam.CLASS({
       name: 'mergeProperty',
       args: [
         {
-          class: 'FObjectProperty',
           name: 'oldFObject',
+          type: 'FObject'
         },
         {
-          class: 'FObjectProperty',
-          name: 'diffFObject'
+          name: 'diffFObject',
+          type: 'FObject'
         },
         {
           name: 'prop',

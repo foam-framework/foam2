@@ -549,6 +549,7 @@ FOAM_FILES([
   { name: "foam/dashboard/view/Card" },
   { name: "foam/apploader/NoClassLoader" },
   { name: "foam/u2/FoamTagLoader", flags: ['web'] },
+  { name: "foam/build/EmbeddedModelDAO" },
   { name: "foam/build/ClassLoader" },
   { name: "foam/build/ClassLoaderImpl" },
   { name: "foam/build/PromisedClassLoader" },
