@@ -151,9 +151,13 @@ foam.CLASS({
   properties: [
     {
       name: 'expression',
-      factory: function() {
+      expression: function(value) {
+        // The value thing feels like a hack around the fact that a factory
+        // will take priority over a value despite the factory being a default
+        // value and the value being actually set.
+        // TODO: Is there a deeper issue here?
         return function(type) {
-          return foam.java.toJavaType(type);
+          return value || foam.java.toJavaType(type);
         }
       }
     },
@@ -1434,7 +1438,12 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
-    ['javaType', 'Object[]'],
+    {
+      name: 'javaType',
+      expression: function(type) {
+        return type ? foam.java.toJavaType(type) : 'Object[]'
+      }
+    },
     ['javaInfoType', 'foam.core.AbstractArrayPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.ArrayParser()']
   ],
