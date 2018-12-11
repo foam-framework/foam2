@@ -110,7 +110,7 @@ foam.CLASS({
 
             done = true;
             return cls;
-          };
+          });
 
           foam.__context__.registerFactory(model, f);
 
