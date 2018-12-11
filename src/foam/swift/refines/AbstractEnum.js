@@ -38,7 +38,7 @@ foam.CLASS({
               args: [
                 foam.swift.Argument.create({
                   localName: 'o',
-                  type: 'Int',
+                  type: 'Integer',
                 })
               ],
               body: `
