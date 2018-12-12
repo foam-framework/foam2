@@ -25,6 +25,7 @@ foam.CLASS({
     'foam.box.NamedBox',
     'foam.box.ClassWhitelistContext',
     'foam.box.LoggedLookupContext',
+    'foam.net.WebSocketService',
   ],
 
   exports: [
@@ -72,14 +73,9 @@ return __context__.lookup("foam.swift.net.SocketService")!.create(args: [
       name: 'webSocketService',
       hidden: true,
       factory: function() {
-        var model = this.__context__.lookup('foam.net.node.WebSocketService', true) ||
-            this.__context__.lookup('foam.net.web.WebSocketService', true);
-
-        if ( model ) {
-          return model.create({
-            delegate: this.registry
-          }, this);
-        }
+        return this.WebSocketService.create({
+          delegate: this.registry
+        });
       }
     },
     {
