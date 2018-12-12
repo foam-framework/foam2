@@ -12,6 +12,7 @@ var classes = [
   'foam.core.ContextAgent',
   'foam.core.Identifiable',
   'foam.core.AbstractFObject',
+  'foam.core.Validatable',
   'foam.mlang.predicate.Predicate',
   'foam.mlang.predicate.True',
   'foam.mlang.predicate.False',
