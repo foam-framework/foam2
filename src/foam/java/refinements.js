@@ -205,7 +205,7 @@ foam.CLASS({
       var privateName = this.name + '_';
       var capitalized = foam.String.capitalize(this.name);
       var constantize = foam.String.constantize(this.name);
-      var isSet = this.name + 'IsSet_';
+      var isSet       = this.name + 'IsSet_';
       var factoryName = capitalized + 'Factory_';
 
       cls.
@@ -242,6 +242,12 @@ foam.CLASS({
           ],
           type: 'void',
           body: this.generateSetter_()
+        }).
+        method({
+          name: 'clear' + capitalized,
+          visibility: 'public',
+          type: 'void',
+          body: isSet + ' = false;'
         });
 
       if ( this.javaFactory ) {
