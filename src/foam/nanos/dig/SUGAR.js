@@ -27,8 +27,6 @@ foam.CLASS({
     }
   `,
 
-  imports: ['appConfig'],
-
   constants: [
     {
       name: 'MAX_URL_SIZE',
@@ -297,7 +295,7 @@ foam.CLASS({
       code: async function() {
         if ( ! (this.postURL === '') ) {
           var req = this.HTTPRequest.create({
-            url: this.appConfig.URL.value + this.postURL.substring(1),
+            url: window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + this.postURL,
             method: 'POST',
             contentType: 'url',
             payload: this.postData.substring(1),
