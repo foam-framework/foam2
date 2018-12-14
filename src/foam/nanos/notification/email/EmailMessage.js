@@ -11,17 +11,10 @@ foam.CLASS({
   documentation: 'Email message',
 
   implements: [
-    'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.LastModifiedByAware'
-  ],
-
-  javaImports: [
-    'foam.nanos.auth.AuthorizationException',
-    'foam.nanos.auth.User',
-    'foam.util.SafetyUtil'
-  ],
+ ],
 
   properties: [
     {
@@ -82,61 +75,6 @@ foam.CLASS({
       hidden: true,
       documentation: 'Added to suppress journal comments regarding "modified by". Also, a non-null value is required.',
       javaFactory: 'return 1L;'
-    }
-  ],
-
-  methods: [
-    {
-      name: 'authorizeOnCreate',
-      args: [
-        { name: 'x', javaType: 'foam.core.X' }
-      ],
-      javaReturns: 'void',
-      javaThrows: ['AuthorizationException'],
-      javaCode: `
-        // TODO: Add authorization logic.
-      `
-    },
-    {
-      name: 'authorizeOnRead',
-      args: [
-        { name: 'x', javaType: 'foam.core.X' }
-      ],
-      javaReturns: 'void',
-      javaThrows: ['AuthorizationException'],
-      javaCode: `
-        User user = (User) x.get("user");
-
-        if (
-          ! user.getSystem() &&
-          ! SafetyUtil.equals(user.getGroup(), "admin")
-        ) {
-          throw new AuthorizationException();
-        }
-      `
-    },
-    {
-      name: 'authorizeOnUpdate',
-      args: [
-        { name: 'x', javaType: 'foam.core.X' },
-        { name: 'oldObj', javaType: 'foam.core.FObject' }
-      ],
-      javaReturns: 'void',
-      javaThrows: ['AuthorizationException'],
-      javaCode: `
-        // TODO: Add authorization logic.
-      `
-    },
-    {
-      name: 'authorizeOnDelete',
-      args: [
-        { name: 'x', javaType: 'foam.core.X' }
-      ],
-      javaReturns: 'void',
-      javaThrows: ['AuthorizationException'],
-      javaCode: `
-        // TODO: Add authorization logic.
-      `
     }
   ]
 });
