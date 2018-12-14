@@ -162,6 +162,7 @@ foam.CLASS({
           this.headers['Content-Type'] = 'application/x-www-form-urlencoded';
           break;
         }
+        this.headers['Content-Type'] += '; charset=utf-8'
       }
       // Specify this.contentType when it can be deduced.
       if ( ! this.headers['Accept'] ) {
