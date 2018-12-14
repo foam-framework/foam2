@@ -120,7 +120,8 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'emailVerified',
-      documentation: 'Email verified flag'
+      documentation: 'Email verified flag',
+      permissionRequired: true
     },
     {
       class: 'FObjectProperty',
