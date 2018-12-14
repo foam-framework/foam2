@@ -53,8 +53,8 @@ foam.CLASS({
         }
         return data;
       },
-      expression: function(of) {
-        return of.create();
+      factory: function() {
+        return this.of && this.of.create();
       }
     },
     'currentData',
