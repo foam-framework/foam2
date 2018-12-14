@@ -168,6 +168,7 @@ var classes = [
   'foam.nanos.auth.email.ClientEmailDocService',
   'foam.nanos.auth.resetPassword.ResetPasswordTokenService',
   'foam.nanos.auth.PreventDuplicateEmailDAO',
+  'foam.nanos.auth.PropertyPermissionDAO',
   'foam.nanos.auth.ServiceProvider',
   'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.auth.twofactor.AbstractOTPAuthService',
