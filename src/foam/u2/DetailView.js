@@ -20,10 +20,6 @@ foam.CLASS({
   name: 'DetailView',
   extends: 'foam.u2.View',
 
-  axioms: [
-    foam.pattern.Multiton.create({property: 'of'})
-  ],
-
   documentation: 'A generic property-sheet style View for editing an FObject.',
 
   requires: [
