@@ -42,6 +42,8 @@ foam.LIB({
       return type != 'Any?' && type != 'Any!'
     },
     function toSwiftType(type, optional) {
+      // TODO!!!
+      return 'Any';
       // Is this right?
 
       if ( ! type ) type = 'Any';
