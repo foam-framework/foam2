@@ -69,7 +69,7 @@
       class: 'Int',
       name: 'rowHeight',
       documentation: 'The height of one row of the table in px.',
-      value: 40
+      value: 48
     },
     {
       class: 'Boolean',
@@ -124,7 +124,13 @@
         end().
       end();
 
-      if ( this.fitInScreen ) this.onload.sub(this.updateTableHeight);
+      if ( this.fitInScreen ) {
+        this.onload.sub(this.updateTableHeight);
+        window.addEventListener('resize', this.updateTableHeight);
+        this.onDetach(() => {
+          window.removeEventListener('resize', this.updateTableHeight);
+        });
+      }
     }
   ],
 
