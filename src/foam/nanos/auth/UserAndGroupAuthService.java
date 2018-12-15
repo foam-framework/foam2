@@ -227,8 +227,14 @@ public class UserAndGroupAuthService
       return false;
     }
 
+    // NOTE: It's important that we use the User from the context here instead
+    // of looking it up in a DAO because if the user is actually an entity that
+    // an agent is acting as, then the user we get from the DAO won't have the
+    // correct group, which is the group set on the junction between the agent
+    // and the entity.
+    User user = (User) x.get("user");
+
     // check if user exists and is enabled
-    User user = (User) userDAO_.find(session.getUserId());
     if ( user == null || ! user.getEnabled() ) {
       return false;
     }
