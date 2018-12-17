@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'GoogleTOTPAuthService',
   extends: 'foam.nanos.auth.twofactor.AbstractTOTPAuthService',
 
+  documentation: `TOTP stands for Time-based One-Time Password algorithm.`,
+
   javaImports: [
     'com.google.common.io.BaseEncoding',
     'foam.dao.DAO',
