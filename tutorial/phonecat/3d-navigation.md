@@ -1,6 +1,6 @@
 ---
 layout: tutorial-phonecat
-permalink: /tutorial/phonecat/3d-navigation/
+permalink: ../3d-navigation/
 tutorial: 3d
 ---
 # **Part III - Applied Learning d. Navigation**
@@ -408,14 +408,14 @@ See the Appendix from the below menu for further reading.
 
 ### **Tutorial Menu:**
 
-1. [Getting Started](/tutorial/phonecat/1-gettingstarted/) 
-2. [Core Concepts](/tutorial/phonecat/2-concepts/) 
+1. [Getting Started](../1-gettingstarted/) 
+2. [Core Concepts](../2-concepts/) 
 3. Applied Learning: Build a Basic App with FOAM
-     1. [Defining the Model](/tutorial/phonecat/3-model/)
-     2. [the Controller](/tutorial/phonecat/4-dao/)
-     3. [UI Library](/tutorial/phonecat/3c-UI/)
-     4. [Navigation](/tutorial/phonecat/3d-navigation/)
-* [Tutorial Overview](/Users/lilian/foam/tutorial/phonecat/0-intro.md)
-* [About FOAM](https://katemengjunxia.github.io/foam/about/)
-* [Appendix](/Users/lilian/foam/tutorial/phonecat/4-appendix.md) 
+     1. [Defining the Model](../3-model/)
+     2. [the Controller](../4-dao/)
+     3. [UI Library](../3c-UI/)
+     4. [Navigation](../3d-navigation/)
+* [Tutorial Overview](../0-intro.md)
+* [About FOAM](/foam/about/)
+* [Appendix](../4-appendix.md) 
 

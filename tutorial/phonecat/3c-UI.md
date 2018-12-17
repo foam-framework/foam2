@@ -1,6 +1,6 @@
 ---
 layout: tutorial-phonecat
-permalink: /tutorial/phonecat/3c-UI/
+permalink: ../3c-UI/
 tutorial: 3c
 ---
 # **Part III - Applied Learning c. User Interface**
@@ -151,18 +151,18 @@ foam.CLASS({
 
 Now your app should look much better and the search and sort functions work! You are now ready for the final stage of your basic app in FOAM.  Please proceed to the next lesson on navigation.
 
-# **[NEXT: Part III - d. Navigation](/Users/lilian/foam/tutorial/phonecat/3d-navigation.md)** 
+# **[NEXT: Part III - d. Navigation](../3d-navigation.md)** 
 
 ### **Tutorial Menu:**
 
-1. [Getting Started](/tutorial/phonecat/1-gettingstarted/) 
-2. [Core Concepts](/tutorial/phonecat/2-concepts/) 
+1. [Getting Started](../1-gettingstarted/) 
+2. [Core Concepts](../2-concepts/) 
 3. Applied Learning: Build a Basic App with FOAM
-     1. [Defining the Model](/tutorial/phonecat/3-model/)
-     2. [the Controller](/tutorial/phonecat/4-dao/)
-     3. [UI Library](/tutorial/phonecat/3c-UI/)
-     4. [Navigation](/tutorial/phonecat/3d-navigation/)
-* [Tutorial Overview](/Users/lilian/foam/tutorial/phonecat/0-intro.md)
-* [About FOAM](https://katemengjunxia.github.io/foam/about/)
-* [Appendix](/Users/lilian/foam/tutorial/phonecat/4-appendix.md) 
+     1. [Defining the Model](../3-model/)
+     2. [the Controller](../4-dao/)
+     3. [UI Library](../3c-UI/)
+     4. [Navigation](../3d-navigation/)
+* [Tutorial Overview](../0-intro.md)
+* [About FOAM](/foam/about/)
+* [Appendix](../4-appendix.md) 
 

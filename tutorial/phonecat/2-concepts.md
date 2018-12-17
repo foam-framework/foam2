@@ -1,6 +1,6 @@
 ---
 layout: tutorial-phonecat
-permalink: /tutorial/phonecat/2-concepts/
+permalink: ../2-concepts/
 tutorial: 2
 ---
 
@@ -71,7 +71,7 @@ FOAM's classes are much richer than their Java counterparts. Unlike Java, FOAM h
 2. FOAM has `postSet` functions to call when the property's value changes the `view` to use when displaying this property to the user `expression` for spreadsheet-style reactive programming, 
 3. `value` FOAM models support `constants`, mixins (known as `traits`) and special kinds of methods (`actions`, `listeners`, and `UI library`)
 
-Please visit the [Appendix](/Users/lilian/foam/tutorial/phonecat/4-appendix.md) in the menu below for more information on FOAM classes.
+Please visit the [Appendix](../4-appendix.md) in the menu below for more information on FOAM classes.
 
 ### **3. A Simple FOAM Class Example:**
 
@@ -180,7 +180,7 @@ FOAM has excellent support for reactive programming. The programmer can specify 
 
 FOAM's reactive programming support is event-driven and therefore has minimal overhead. It does not do dirty checking; rather each update to a value ripples through the data model, triggering further updates, and so on. No handlers are run when none of their inputs have changed. This is why FOAM's reactive programming support scales so well; it's still very fast with thousands of bindings.
 
-The various ways of hooking up reactive listeners are detailed in the [Appendix](/Users/lilian/foam/tutorial/phonecat/4-appendix.md).
+The various ways of hooking up reactive listeners are detailed in the [Appendix](/Users/lilian/foam../4-appendix.md).
 
    ### **Animation**
 
@@ -202,19 +202,19 @@ FOAM tries to provide many missing utilities from Javascript and web platform.  
 
 Please proceed to the next stage of this tutorial, Applied Learning - a. Defining the Model.
 
-# [NEXT:  Part III - Applied Learning a. Defining the Model](/Users/lilian/foam/tutorial/phonecat/3a-model.md) 
+# [NEXT:  Part III - Applied Learning a. Defining the Model](../3a-model.md) 
 
 ### **Tutorial Menu:** 
 
-1. [Getting Started](/tutorial/phonecat/1-gettingstarted/) 
-2. [Core Concepts](/tutorial/phonecat/2-concepts/) 
+1. [Getting Started](../1-gettingstarted/) 
+2. [Core Concepts](../2-concepts/) 
 3. Applied Learning: Build a Basic App with FOAM
-     1. [Defining the Model](/tutorial/phonecat/3-model/)
-     2. [Controllers](/tutorial/phonecat/4-dao/)
-     3. [UI Library](/tutorial/phonecat/3c-UI/)
-     4. [Navigation](/tutorial/phonecat/3d-navigation/)
-* [Tutorial Overview](/Users/lilian/foam/tutorial/phonecat/0-intro.md)
-* [About FOAM](https://katemengjunxia.github.io/foam/about/)
-* [Appendix](/Users/lilian/foam/tutorial/phonecat/4-appendix.md) 
+     1. [Defining the Model](../3-model/)
+     2. [Controllers](../4-dao/)
+     3. [UI Library](../3c-UI/)
+     4. [Navigation](../3d-navigation/)
+* [Tutorial Overview](../0-intro.md)
+* [About FOAM](/foam/about/)
+* [Appendix](../4-appendix.md) 
 
 

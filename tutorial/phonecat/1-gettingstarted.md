@@ -1,6 +1,6 @@
 ---
 layout: tutorial-phonecat
-permalink: /tutorial/phonecat/1-gettingstarted/
+permalink: ../1-gettingstarted/
 tutorial: 1
 ---
 
@@ -17,7 +17,7 @@ Let's dive right in.
      1. [FOAM framework](https://github.com/foam-framework/foam2.git)
      2. [GIT GUI](https://www.sourcetreeapp.com/)
      3. [Python](https://www.python.org/downloads/) (Python is our recommended local web server)
-     4. [Tutorial Companion File](/Users/lilian/foam/tutorial/phonecat/bundle.zip) **NOT REALLY USED IN TUTORIAL, CAN WE REMOVE IT?**
+     4. [Tutorial Companion File](../bundle.zip) **NOT REALLY USED IN TUTORIAL, CAN WE REMOVE IT?**
 
      When downloading, save the FOAM framework to your project folder. A sub-directory will be created that holds all the code for FOAM as well as numerous demos and test pages.
 
@@ -59,17 +59,17 @@ Let's dive right in.
 
 If that's what you're seeing, then congratulations! You've got FOAM running and you're ready to move on to the next stage in this tutorial: Core Concepts.
 
-# **[NEXT:  Part II - Core Concepts](/Users/lilian/foam/tutorial/phonecat/2-concepts.md)** 
+# **[NEXT:  Part II - Core Concepts](../2-concepts.md)** 
 
 ### **Tutorial Menu:** 
 
-1. [Getting Started](/tutorial/phonecat/1-gettingstarted/) 
-2. [Core Concepts](/tutorial/phonecat/2-concepts/) 
+1. [Getting Started](../1-gettingstarted/) 
+2. [Core Concepts](../2-concepts/) 
 3. Applied Learning: Build a Basic App with FOAM
-     1. [Defining the Model](/tutorial/phonecat/3-model/)
-     2. [the Controller](/tutorial/phonecat/4-dao/)
-     3. [UI Library](/tutorial/phonecat/3c-UI/)
-     4. [Navigation](/tutorial/phonecat/3d-navigation/)
-* [Tutorial Overview](/Users/lilian/foam/tutorial/phonecat/0-intro.md)
-* [About FOAM](https://katemengjunxia.github.io/foam/about/)
-* [Appendix](/Users/lilian/foam/tutorial/phonecat/4-appendix.md) 
+     1. [Defining the Model](../3-model/)
+     2. [the Controller](../4-dao/)
+     3. [UI Library](../3c-UI/)
+     4. [Navigation](../3d-navigation/)
+* [Tutorial Overview](../0-intro.md)
+* [About FOAM](/foam/about/)
+* [Appendix](../4-appendix.md) 
