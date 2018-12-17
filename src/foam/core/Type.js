@@ -6,9 +6,6 @@ foam.CLASS({
     [
       'adapt',
       function(_, v) {
-        /*
-        return foam.core.type.toType(v);
-        */
         return v;
       }
     ],
@@ -30,14 +27,4 @@ foam.CLASS({
       value: 'Void'
     }
   ]
-});
-
-foam.CLASS({
-  refines: 'foam.core.Property',
-  properties: [
-    {
-      class: 'TypeProperty',
-      name: 'type',
-    },
-  ],
 });
