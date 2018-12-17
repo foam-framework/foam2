@@ -1,6 +1,6 @@
 ---
 layout: tutorial-phonecat
-permalink: ../4-appendix/
+permalink: /tutorial/phonecat/4-appendix/
 tutorial: 4
 ---
 # **Appendix**

@@ -1,6 +1,6 @@
 ---
 layout: tutorial-phonecat
-permalink: ../3d-navigation/
+permalink: /tutorial/phonecat/3d-navigation/
 tutorial: 3d
 ---
 # **Part III - Applied Learning d. Navigation**
