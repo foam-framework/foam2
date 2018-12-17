@@ -28,6 +28,7 @@ FOAM_FILES([
   { name: "foam/core/lib" },
   { name: "foam/core/stdlib" },
   { name: "foam/core/events" },
+  { name: "foam/core/cps" },
   { name: "foam/core/Context" },
   { name: "foam/core/Boot" },
   { name: "foam/core/FObject" },
