@@ -18,7 +18,7 @@ This tutorial will provide the user with a good understanding of the core concep
      3. [UI Library](../3c-UI/)
      4. [Navigation](../3d-navigation/)
 * [About FOAM](/foam/about/)
-* [Appendix](../4-appendix.md) 
+* [Appendix](../4-appendix) 
 
 ## **What is FOAM?**
 
@@ -45,4 +45,4 @@ There are only four required tools for this tutorial. The following list include
 3. [Python](https://www.python.org/downloads/) (Python is our recommended local web server)
 4. [Tutorial Companion File](../bundle.zip)
 
-# **[NEXT:  Part I - GETTING STARTED](../1-gettingstarted.md)**
+# **[NEXT:  Part I - GETTING STARTED](../1-gettingstarted)**
