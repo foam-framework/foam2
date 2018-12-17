@@ -10,7 +10,7 @@ This tutorial will provide the user with a good understanding of the core concep
 
 ### **Tutorial Menu:** 
 
-1. [Getting Started](/tutorial/phonecat/1-gettingstarted/) 
+1. [Getting Started](1-gettingstarted/) 
 2. [Core Concepts](/tutorial/phonecat/2-concepts/) 
 3. Applied Learning: Build a Basic App with FOAM
      1. [Defining the Model](/tutorial/phonecat/3-model/)
