@@ -24,7 +24,7 @@ foam.LIB({
       var cls = foam.lookup('foam.swift.SwiftClass').create({
         name: this.model_.swiftName,
         imports: ['Foundation'].concat(initImports(this.model_)),
-        implements: [this.model_.swiftExtends].concat(this.model_.swiftAllImplements),
+        implements: [this.model_.swiftExtends].concat(this.model_.swiftAllImplements()),
         visibility: 'public',
         code: this.model_.swiftCode,
       });

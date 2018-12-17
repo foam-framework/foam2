@@ -34,8 +34,7 @@ foam.CLASS({
         // TODO: This should be an expression on extends but putting extends in
         // the args makes js unhappy.
         if ( this.extends == 'FObject' ) return 'AbstractFObject';
-        return this.extends.replace(/\./g, '_');
-//        return foam.lookup(this.extends).model_.swiftName;
+        return foam.swift.toSwiftType(this.extends)
       },
     },
     {
@@ -43,11 +42,25 @@ foam.CLASS({
       name: 'swiftImplements',
     },
     {
-      name: 'swiftAllImplements',
-    },
-    {
       class: 'String',
       name: 'swiftCode',
+    },
+  ],
+  methods: [
+    function swiftAllImplements() {
+      // Return a list of everything the model implements including swift
+      // specific protocols and models that are implemented.
+      return this.swiftImplements.concat(
+        ( this.implements || [] )
+        .filter(foam.util.flagFilter(['swift']))
+        .map(function(i) {
+          return foam.lookup(i.path).model_
+        })
+        .filter(function(i) {
+          return foam.core.InterfaceModel.isInstance(i);
+        })
+        .map(function(i) { return i.swiftName })
+      );
     },
   ],
 });

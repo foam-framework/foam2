@@ -25,7 +25,10 @@ foam.CLASS({
     'foam.box.NamedBox',
     'foam.box.ClassWhitelistContext',
     'foam.box.LoggedLookupContext',
-    'foam.net.WebSocketService',
+    {
+      path: 'foam.net.WebSocketService',
+      flags: ['js'],
+    }
   ],
 
   exports: [
