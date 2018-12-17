@@ -1,6 +1,6 @@
 ---
 layout: tutorial-phonecat
-permalink: /tutorial/phonecat/3b-controllers/
+permalink: /tutorial/phonecat/3b-dao/
 tutorial: 3b
 ---
 # **Part III - Applied Learning b. the Controller**
