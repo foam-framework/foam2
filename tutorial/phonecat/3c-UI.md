@@ -1,20 +1,20 @@
 ---
 layout: tutorial-phonecat
-permalink: /tutorial/phonecat/4-UI/
-tutorial: 4
+permalink: /tutorial/phonecat/3c-UI/
+tutorial: 3c
 ---
+# **Part III - Applied Learning c. User Interface**
 
-A view is responsible for presenting some data to the user. This might be a
-single object, or a collection.
+A view is responsible for presenting specific data to the user. An example of this kind of data would be a single object or a collection.
 
-In FOAM, a `view` needs to present some UI components, by calling a template method called `initE()` in the U2 library. The U2 library provides a variety of views, such as `DetailView`, `TableView`, `ImageView`, etc. These views extend `Element`, which is a virtual-DOM element that serves as the root model for all U2 UI components.
+In FOAM, a `view` needs to present a UI component by defining a template method `initE()` in the U2 library. The U2 library provides a variety of views, such as `DetailView`, `TableView`, `ImageView`, etc. These views extend `Element` which is a virtual-DOM element that serves as the root model for all U2 UI components.
 
-## UI Library
+## **UI Library**
 
 FOAM’s U2 syntax provides methods for adding and interacting with UI components, including:
 
 {% raw %}
-- `start()` ecreates an element and adds it as a child.
+- `start()` creates an element and adds it as a child.
 - `end()` terminates a `start()`.
 - `add(args)` adds UI components to this element.
 - `addClass(cls)` specifies a CSS class to this element.
@@ -22,7 +22,12 @@ FOAM’s U2 syntax provides methods for adding and interacting with UI component
 - `addEventListener(topic, listener)` adds a DOM listener.
 {% endraw %}
 
-Let’s define the `initE()` for each phone in the catalog. Expand `PhoneCitationView` so it looks like this:
+
+# **TUTORIAL APPLICATION**
+
+Let’s define the `initE()` for each phone in the catalog. 
+
+**STEP #1.** Expand `PhoneCitationView` so it looks like this:
 
 {% highlight js %}
 {% raw %}
@@ -54,9 +59,11 @@ foam.CLASS({
 {% endraw %}
 {% endhighlight %}
 
-Now reload your app and see that... it's a complete mess. That's because `PhoneCitationView` is putting in `<li>` tags but they're not in a `<ul>`, and the custom CSS for the app is not being loaded.
+**STEP #2.** Reload your app and see that... it's a complete mess. That's because `PhoneCitationView` is putting in `<li>` tags but they're not in a `<ul>`, and the custom CSS for the app is not being loaded.  We'll get back to the CSS shortly. 
 
-We'll get back to the CSS shortly. First, let's add a second template, for the top-level `ControllerView`. Add this code to `Controller.js`, expanding our `ControllerView`:
+**STEP #3.** Add a second template for the top-level `ControllerView`. 
+
+**STEP #4.** Add the followng code to `Controller.js`and expand your `ControllerView`:
 
 {% highlight js %}
 foam.CLASS({
@@ -124,23 +131,38 @@ foam.CLASS({
 });
 {% endhighlight %}
 
-- Most FOAM views support `className` and `tagName`. The default `tagName` for a
-  `DAOList` is `<div>`, but we want to use `<ul>` here.
-- `search` has `view` set to `TextField`, so it will render as a text box.
-- `order`'s `view` is `ChoiceView`, which renders a drop-down list.
-- `filteredDAO` is the `DAOList`, which renders the list of entries.
+#### **About the Above Code:**
 
-The custom CSS still isn't loaded, so add the following to `index.html`'s
-`<head>` tag:
+1. Most FOAM views support `className` and `tagName`. The default `tagName` for a `DAOList` is `<div>`.
+2. `search` has `view` set to `TextField`, so it will render as a text box.
+3. `order`'s `view` is `ChoiceView`, which renders a drop-down list.
+4. `filteredDAO` is the `DAOList`, which renders the list of entries.
+
+**STEP #5.** Add the following to `index.html`'s `<head>` tag to load the custom CSS:
 
 {% highlight html %}
 <link rel="stylesheet" href="css/app.css" />
 <link rel="stylesheet" href="css/bootstrap.css" />
 {% endhighlight %}
 
-and reload your app. Now it should look much better, and the search and sort
-functions work!
+**STEP #6.** Reload your app. 
 
-[Part 5]({{ site.baseurl }}/tutorial/phonecat/5-navigation) will add navigation to our
-app.
+# **Conclusion**
+
+Now your app should look much better and the search and sort functions work! You are now ready for the final stage of your basic app in FOAM.  Please proceed to the next lesson on navigation.
+
+# **[NEXT: Part III - d. Navigation](/Users/lilian/foam/tutorial/phonecat/3d-navigation.md)** 
+
+### **Tutorial Menu:**
+
+1. [Getting Started](/tutorial/phonecat/1-gettingstarted/) 
+2. [Core Concepts](/tutorial/phonecat/2-concepts/) 
+3. Applied Learning: Build a Basic App with FOAM
+     1. [Defining the Model](/tutorial/phonecat/3-model/)
+     2. [the Controller](/tutorial/phonecat/4-dao/)
+     3. [UI Library](/tutorial/phonecat/3c-UI/)
+     4. [Navigation](/tutorial/phonecat/3d-navigation/)
+* [Tutorial Overview](/Users/lilian/foam/tutorial/phonecat/0-intro.md)
+* [About FOAM](https://katemengjunxia.github.io/foam/about/)
+* [Appendix](/Users/lilian/foam/tutorial/phonecat/4-appendix.md) 
 
