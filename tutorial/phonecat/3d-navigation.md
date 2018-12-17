@@ -415,7 +415,7 @@ See the Appendix from the below menu for further reading.
      2. [the Controller](../4-dao/)
      3. [UI Library](../3c-UI/)
      4. [Navigation](../3d-navigation/)
-* [Tutorial Overview](../0-intro.md)
+* [Tutorial Overview](../0-intro)
 * [About FOAM](/foam/about/)
-* [Appendix](../4-appendix.md) 
+* [Appendix](../4-appendix) 
 

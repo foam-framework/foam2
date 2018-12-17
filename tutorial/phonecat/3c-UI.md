@@ -151,7 +151,7 @@ foam.CLASS({
 
 Now your app should look much better and the search and sort functions work! You are now ready for the final stage of your basic app in FOAM.  Please proceed to the next lesson on navigation.
 
-# **[NEXT: Part III - d. Navigation](../3d-navigation.md)** 
+# **[NEXT: Part III - d. Navigation](../3d-navigation)** 
 
 ### **Tutorial Menu:**
 
@@ -162,7 +162,7 @@ Now your app should look much better and the search and sort functions work! You
      2. [the Controller](../4-dao/)
      3. [UI Library](../3c-UI/)
      4. [Navigation](../3d-navigation/)
-* [Tutorial Overview](../0-intro.md)
+* [Tutorial Overview](../0-intro)
 * [About FOAM](/foam/about/)
-* [Appendix](../4-appendix.md) 
+* [Appendix](../4-appendix) 
 

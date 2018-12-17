@@ -202,7 +202,7 @@ FOAM tries to provide many missing utilities from Javascript and web platform.  
 
 Please proceed to the next stage of this tutorial, Applied Learning - a. Defining the Model.
 
-# [NEXT:  Part III - Applied Learning a. Defining the Model](../3a-model.md) 
+# [NEXT:  Part III - Applied Learning a. Defining the Model](../3a-model) 
 
 ### **Tutorial Menu:** 
 
@@ -213,8 +213,8 @@ Please proceed to the next stage of this tutorial, Applied Learning - a. Definin
      2. [Controllers](../4-dao/)
      3. [UI Library](../3c-UI/)
      4. [Navigation](../3d-navigation/)
-* [Tutorial Overview](../0-intro.md)
+* [Tutorial Overview](../0-intro)
 * [About FOAM](/foam/about/)
-* [Appendix](../4-appendix.md) 
+* [Appendix](../4-appendix) 
 
 

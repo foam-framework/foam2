@@ -59,7 +59,7 @@ Let's dive right in.
 
 If that's what you're seeing, then congratulations! You've got FOAM running and you're ready to move on to the next stage in this tutorial: Core Concepts.
 
-# **[NEXT:  Part II - Core Concepts](../2-concepts.md)** 
+# **[NEXT:  Part II - Core Concepts](../2-concepts)** 
 
 ### **Tutorial Menu:** 
 
@@ -70,6 +70,6 @@ If that's what you're seeing, then congratulations! You've got FOAM running and 
      2. [the Controller](../4-dao/)
      3. [UI Library](../3c-UI/)
      4. [Navigation](../3d-navigation/)
-* [Tutorial Overview](../0-intro.md)
+* [Tutorial Overview](../0-intro)
 * [About FOAM](/foam/about/)
-* [Appendix](../4-appendix.md) 
+* [Appendix](../4-appendix) 
