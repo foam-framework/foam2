@@ -13,12 +13,12 @@ This tutorial will provide the user with a good understanding of the core concep
 1. [Getting Started](../1-gettingstarted/) 
 2. [Core Concepts](../2-concepts/) 
 3. Applied Learning: Build a Basic App with FOAM
-     1. [Defining the Model](../3-model/)
-     2. [the Controller](../4-dao/)
+     1. [Defining the Model](../3a-model/)
+     2. [the Controller](../3b-dao/)
      3. [UI Library](../3c-UI/)
      4. [Navigation](../3d-navigation/)
 * [About FOAM](/foam/about/)
-* [Appendix](../4-appendix) 
+* [Appendix](../4-appendix/) 
 
 ## **What is FOAM?**
 

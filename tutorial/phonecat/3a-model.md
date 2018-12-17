@@ -57,18 +57,18 @@ If this class doesn't seem to do much, that's because it doesn't. This simply sp
 
 After entering the above code you will have defined the model for your app.  Please have the tutorial bundle ready and select NEXT below to proceed to your next lesson on DOAs and controllers in FOAM.
 
-# **[NEXT:  Part III - b. the Controller](../3b-dao)**
+# **[NEXT:  Part III - b. the Controller](../3b-dao/)**
 
 ### **Tutorial Menu:** 
 
 1. [Getting Started](../1-gettingstarted/) 
 2. [Core Concepts](../2-concepts/) 
 3. Applied Learning: Build a Basic App with FOAM
-     1. [Defining the Model](../3-model/)
-     2. [the Controller](../4-dao/)
+     1. [Defining the Model](../3a-model/)
+     2. [the Controller](../3b-dao/)
      3. [UI Library](../3c-UI/)
      4. [Navigation](../3d-navigation/)
-* [Tutorial Overview](../0-intro)
+* [Tutorial Overview](../0-intro/)
 * [About FOAM](/foam/about/)
-* [Appendix](../4-appendix) 
+* [Appendix](../4-appendix/) 
 
