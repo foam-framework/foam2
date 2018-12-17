@@ -1,6 +1,6 @@
 ---
 layout: tutorial-phonecat
-permalink: ../3c-UI/
+permalink: /tutorial/phonecat/3c-UI/
 tutorial: 3c
 ---
 # **Part III - Applied Learning c. User Interface**

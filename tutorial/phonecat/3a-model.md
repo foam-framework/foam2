@@ -1,6 +1,6 @@
 ---
 layout: tutorial-phonecat
-permalink: ../3a-model/
+permalink: /tutorial/phonecat/3a-model/
 tutorial: 3a
 ---
 # **Part III - Applied Learning a. Defining the Model**

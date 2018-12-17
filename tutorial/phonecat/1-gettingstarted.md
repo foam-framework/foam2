@@ -1,6 +1,6 @@
 ---
 layout: tutorial-phonecat
-permalink: ../1-gettingstarted/
+permalink: /tutorial/phonecat/1-gettingstarted/
 tutorial: 1
 ---
 

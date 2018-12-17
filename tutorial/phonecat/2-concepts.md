@@ -1,6 +1,6 @@
 ---
 layout: tutorial-phonecat
-permalink: ../2-concepts/
+permalink: /tutorial/phonecat/2-concepts/
 tutorial: 2
 ---
 
