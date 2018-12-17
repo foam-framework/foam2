@@ -130,6 +130,13 @@ foam.SCRIPT({
       var hasOld = Object.prototype.hasOwnProperty.call(cache, name);
       var old = cache[name];
 
+      // Okay to replace a function with an actual class.
+      // This happens after a lazy class is initialized.
+      foam.assert(
+          ! hasOld ||
+              (foam.Function.isInstance(old) && ! foam.Function.isInstance(cls)),
+          name + ' is already registered in this context.');
+
       cache[name] = cls;
     },
 
