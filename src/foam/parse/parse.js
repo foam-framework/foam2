@@ -1170,16 +1170,16 @@ foam.CLASS({
       });
     },
     function buildGrammar(obj) {
-      var g = obj.lookup('foam.parse.Grammar').create(null, obj);
+      var g = foam.lookup('foam.parse.Grammar').create(null, obj);
 
       var symbols;
 
       if ( typeof this.symbols == 'function' ) {
-        var language = obj.lookup(this.language).create();
+        var language = foam.lookup(this.language).create();
         if (this.withArgs) {
           symbols = foam.Function.withArgs(this.symbols, language);
         } else {
-          with(obj.lookup(this.language).create()) {
+          with(foam.lookup(this.language).create()) {
             symbols = eval('(' + this.symbols.toString() + ')()');
           }
         }
