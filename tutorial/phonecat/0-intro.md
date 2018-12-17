@@ -17,7 +17,7 @@ This tutorial will provide the user with a good understanding of the core concep
      2. [the Controller](../4-dao/)
      3. [UI Library](../3c-UI/)
      4. [Navigation](../3d-navigation/)
-* [About FOAM](/foam/../..about/)
+* [About FOAM](/foam/about/)
 * [Appendix](../4-appendix.md) 
 
 ## **What is FOAM?**
