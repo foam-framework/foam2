@@ -39,7 +39,7 @@ foam.CLASS({
         if ( ! data ) {
           return this.E('span').add(this.error);
         }
-        return data.toE(this.__subSubContext__);
+        return data.toE(null, this.__subSubContext__);
       }));
     }
   ]
