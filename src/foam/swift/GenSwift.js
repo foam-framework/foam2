@@ -115,7 +115,7 @@ foam.CLASS({
           var model = queue.pop();
           if (!models[model]) {
             models[model] = 1;
-            var cls = self.lookup(model);
+            var cls = foam.lookup(model);
             cls.getAxiomsByClass(foam.core.Requires).filter(axiomFilter).forEach(function(r) {
               queue.push(r.path);
             });
