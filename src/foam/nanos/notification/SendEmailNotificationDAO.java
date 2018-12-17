@@ -13,7 +13,6 @@ import foam.dao.ProxyDAO;
 import foam.nanos.app.AppConfig;
 import foam.nanos.auth.User;
 import foam.nanos.notification.email.EmailMessage;
-import foam.nanos.notification.email.EmailService;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class SendEmailNotificationDAO extends ProxyDAO {
   public FObject put_(X x, FObject obj) {
     DAO userDAO = (DAO) x.get("localUserDAO");
     AppConfig config     = (AppConfig) x.get("appConfig");
-    EmailService email      = (EmailService) x.get("email");
+    DAO localEmailMessageDAO = (DAO) x.get("localEmailMessageDAO");
     Notification notif = (Notification) obj;
     User user = (User) userDAO.find(notif.getUserId());
     Notification oldNotif = (Notification) getDelegate().find(obj);
@@ -62,10 +61,11 @@ public class SendEmailNotificationDAO extends ProxyDAO {
       if ( foam.util.SafetyUtil.isEmpty(notif.getEmailName()) ) {
         message.setSubject(notif.getTemplate());
         message.setBody(notif.getBody());
-        email.sendEmail(x, message);
       } else {
-        email.sendEmailFromTemplate(x, user, message, notif.getEmailName(), notif.getEmailArgs());
+        message.setTemplate(notif.getEmailName());
+        message.setTemplateArgs(notif.getEmailArgs());
       }
+      localEmailMessageDAO.inX(x).put(message);
     } catch(Throwable t) {
       System.err.println("Error sending notification email message: "+message+". Error: " + t);
     }

@@ -297,6 +297,16 @@ if (SafetyUtil.isEmpty(emailMessage.getSubject())) {
   emailMessage.setSubject(templateSubject.render(model));
 }
 
+// If the displayName isn't set in the message and the displayName is provided
+// in the template, use the displayName from template.
+if (
+  foam.util.SafetyUtil.isEmpty(emailMessage.getDisplayName()) &&
+  ! foam.util.SafetyUtil.isEmpty(emailTemplate.getDisplayName())
+) {
+  JtwigTemplate templateDisplayName = JtwigTemplate.inlineTemplate(emailTemplate.getDisplayName(), config);
+  emailMessage.setDisplayName(templateDisplayName.render(model));
+}
+
 sendEmail(x, emailMessage);`
     },
     {
