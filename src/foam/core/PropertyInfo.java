@@ -37,6 +37,7 @@ public interface PropertyInfo
   public byte[] getNameAsByteArray();
   public Object get(Object obj);
   public void set(Object obj, Object value);
+  public void clear(Object obj);
   public Parser jsonParser();
   public Parser queryParser();
   public Parser csvParser();
