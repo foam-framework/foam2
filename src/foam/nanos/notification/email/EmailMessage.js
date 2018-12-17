@@ -14,7 +14,7 @@ foam.CLASS({
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.LastModifiedByAware'
- ],
+  ],
 
   properties: [
     {
