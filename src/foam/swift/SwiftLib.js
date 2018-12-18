@@ -44,6 +44,9 @@ foam.LIB({
     function toSwiftType(type, optional) {
       return foam.core.type.toType(type).toSwiftType(optional)
     },
+    function toSwiftName(id) {
+      return id.replace(/\./g, '_')
+    },
   ],
 });
 

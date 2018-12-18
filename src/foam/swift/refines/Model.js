@@ -15,7 +15,8 @@ foam.CLASS({
       class: 'String',
       name: 'swiftName',
       expression: function(id) {
-        return id.replace(/\./g, '_')
+        // TODO: remove this property.
+        return foam.swift.toSwiftName(id);
       },
     },
     {
@@ -54,12 +55,8 @@ foam.CLASS({
         ( this.implements || [] )
         .filter(foam.util.flagFilter(['swift']))
         .map(function(i) {
-          return foam.lookup(i.path).model_
+          return foam.swift.toSwiftName(i.path)
         })
-        .filter(function(i) {
-          return foam.core.InterfaceModel.isInstance(i);
-        })
-        .map(function(i) { return i.swiftName })
       );
     },
   ],
