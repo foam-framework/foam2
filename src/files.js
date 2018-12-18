@@ -567,5 +567,5 @@ FOAM_FILES([
   { name: "foam/dashboard/view/Card" },
   { name: "test/Foo" },
   { name: "foam/build/Library" },
-  { name: "foam/build/Script" }
+  { name: "foam/build/EmbeddedModelDAO" },
 ]);
