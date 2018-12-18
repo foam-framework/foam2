@@ -18,7 +18,12 @@
 foam.CLASS({
   package: 'foam.u2',
   name: 'AttrSlot',
-  implements: [ 'foam.core.Slot' ],
+  implements: [
+    {
+      path: 'foam.core.Slot',
+      flags: ['js'],
+    },
+  ],
 
   documentation: 'A Value bound to an Element attribute. Used to bind values to DOM.',
 
