@@ -293,16 +293,7 @@ foam.CLASS({
   methods: [
     function unknownArg(key, value) {
       if ( key == 'class' ) return;
-
-      // Temporarily disable warnings related to generating Java code.
-      var blackList = [
-        'javaThrows',
-        'javaReturns',
-        'javaCode'
-      ];
-      if ( ! blackList.some((keyword) => key.includes(keyword)) ) {
-        this.__context__.warn('Unknown property ' + this.cls_.id + '.' + key + ': ' + value);
-      }
+      this.__context__.warn('Unknown property ' + this.cls_.id + '.' + key + ': ' + value);
     },
 
     function describe(opt_name) {
