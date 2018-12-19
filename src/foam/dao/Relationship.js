@@ -274,12 +274,24 @@ foam.LIB({
   name: 'foam',
   methods: [
     function RELATIONSHIP(m, opt_ctx) {
-      var r = foam.dao.Relationship.create(m, opt_ctx);
-      if ( foam.__MODELS__ ) foam.__MODELS__.push(r);
+      foam.__RELATIONSHIPS__ = foam.__RELATIONSHIPS__ || [];
+      foam.__RELATIONSHIPS__.push(m);
 
-      r.validate && r.validate();
-      r.initRelationship();
-      return r;
+      var r = foam.dao.Relationship.create(m, opt_ctx);
+
+      function trigger(s) {
+        s && s.detach();
+
+        r.validate && r.validate();
+        r.initRelationship();
+      }
+
+      if ( foam.__context__.isDefined(r.sourceModel) ||
+           foam.__context__.isDefined(r.targetModel) ) trigger();
+      else {
+        foam.pubsub.sub("defineClass", r.sourceModel, trigger);
+        foam.pubsub.sub("defineClass", r.targetModel, trigger);
+      }
     }
   ]
 });

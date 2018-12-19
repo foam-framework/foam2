@@ -16,6 +16,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'PropertyValidationRefinement',
   refines: 'foam.core.Property',
 
   properties: [

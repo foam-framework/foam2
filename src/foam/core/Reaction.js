@@ -69,6 +69,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'ModelReactionsRefinement',
   refines: 'foam.core.Model',
 
   properties: [

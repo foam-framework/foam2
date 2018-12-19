@@ -344,54 +344,195 @@ console.log("Done.");
     function execute() {
       var self = this;
 
+      var E = foam.mlang.ExpressionsSingleton.create();
+
       var modelDAO = foam.dao.EasyDAO.create({
         daoType: 'MDAO',
         of: foam.core.Model
       });
 
+      modelDAO = modelDAO.where(
+        E.NOT(E.IN("node", foam.core.Model.FLAGS)));
+
       function inflate(model) {
         return model.cls_ ? model :
-          model.class == "__Library__" ? foam.build.Library.create(model) :
-          model.class == "__Script__" ? foam.build.Script.create(model) :
-          foam.lookup(model.class || 'foam.core.Model').create(model)
+          foam.lookup(model.class || 'foam.core.Model').create(model);
       }
+
       // Trigger all classes.
 
-      for ( var unused in foam.UNUSED ) {
-        modelDAO.put(inflate(foam.UNUSED[unused]));
+      var unused = Object.
+          keys(foam.UNUSED).
+          map(k => foam.UNUSED[k]);
+      var used = Object.
+          keys(foam.USED).
+          map(k => foam.USED[k]);
+
+      var allmodels = unused.concat(used).forEach(function(m) {
+        modelDAO.put(inflate(m));
+      });
+
+      foam.__SCRIPTS__.forEach(function(s) {
+        s.class = 'foam.core.Script';
+        modelDAO.put(inflate(s));
+      });
+
+      foam.__LIBS__.reduce(function(libs, l) {
+        if ( libs[l.name] ) {
+          l.iteration = libs[l.name] + 1;
+        }
+        libs[l.name] = 0;
+        l.class = 'foam.build.Library';
+        modelDAO.put(inflate(l));
+        return libs;
+      }, {});
+
+      foam.__RELATIONSHIPS__.forEach(function(r) {
+        r.class = 'foam.dao.Relationship';
+        modelDAO.put(inflate(r));
+      });
+
+      var serializer = foam.json.Outputter.create({
+        pretty: true,
+        strict: false,
+        outputDefaultValues: false,
+        passPropertiesByReference: false,
+        propertyPredicate: function(o, p) {
+          return o.hasOwnProperty(p.name) &&
+            ! p.storageTransient;
+        }
+      });
+
+      function models(then, abort) {
+        var data = '';
+
+        modelDAO.
+          where(E.AND(E.INSTANCE_OF(foam.core.Model),
+                      E.EQ(foam.core.Model.REFINES, null))).
+          select().then(function(a) {
+          var models = a.array;
+
+          models.
+            filter(function(m) {
+              return !! m.id;
+            }).
+            forEach(function(obj) {
+              data += `foam.CLASS(${serializer.stringify(obj)});\n`;
+            });
+
+          then(data);
+        });
       }
 
-      foam.__MODELS__.map(inflate).forEach(function(model) {
-        modelDAO.put(model);
+      function refinements(then, abort) {
+        var data = '';
+
+        modelDAO.
+          where(E.AND(E.INSTANCE_OF(foam.core.Model),
+                      E.NEQ(foam.core.Model.REFINES, null))).
+          select({
+            put: function(m) {
+              data += `foam.CLASS(${serializer.stringify(m)});\n`;
+            },
+            eof: function() { then(data); }
+          });
+      }
+
+      function relationships(then, abort) {
+        var data = '';
+
+        modelDAO.where(E.INSTANCE_OF(foam.dao.Relationship)).select({
+          put: function(s) {
+            data += `foam.RELATIONSHIP(${serializer.stringify(s)});\n`;
+          },
+          eof: function() { then(data); }
+        });
+      }
+
+
+      function libraries(then, abort) {
+        var data = '';
+
+        modelDAO.where(E.INSTANCE_OF(foam.build.Library)).select({
+          put: function(s) {
+            data += `foam.LIB(${serializer.stringify(s)});\n`;
+          },
+          eof: function() { then(data); }
+        });
+      }
+
+      function scripts(then, abort) {
+        var data = '';
+
+        modelDAO.where(E.INSTANCE_OF(foam.core.Script)).select({
+          put: function(s) {
+            data += `foam.SCRIPT(${serializer.stringify(s)});\n`;
+          },
+          eof: function() { then(data); }
+        });
+      }
+
+      function bootstrap(then, abort) {
+        then([
+          { name: "foam/core/poly" },
+          { name: "foam/core/lib" },
+          { name: "foam/core/stdlib" },
+          { name: "foam/core/events" },
+          { name: "foam/core/cps" },
+          { name: "foam/core/Context" },
+          { name: "foam/core/Boot" },
+          { name: "foam/core/FObject" },
+          { name: "foam/core/Model" },
+          { name: "foam/core/Property" },
+          { name: "foam/core/Simple" },
+          { name: "foam/core/Method" },
+          { name: "foam/core/Boolean" },
+          { name: "foam/core/AxiomArray" },
+          { name: "foam/core/EndBoot" }
+        ].reduce(function(s, f) {
+          return s + '\n' + require('fs').
+            readFileSync(global.FOAM_ROOT + f.name + '.js', { encoding: 'utf8' });
+        }, ''));
+      }
+
+      var fd = require('fs').openSync(self.targetFile, 'w');
+
+      function write(then, abort, data) {
+        require('fs').writeSync(fd, Buffer.from(data, 'utf8'));
+        then();
+      }
+
+      function close(then, abort) {
+        require('fs').closeSync(fd);
+        then();
+      }
+
+
+      modelDAO.select().then(function(a) {
+        a.array.forEach(function(m) {
+        });
       });
 
-/*
-      var modelDAO = this.DirCrawlModelDAO.create({
-        srcDir: global.FOAM_ROOT + 'foam/nanos',
-        blacklist: [
-          'src/foam/nanos.js'
-        ]
-      });
-
-      var modelDAO = this.DirCrawlModelDAO.create({
-        srcDir: global.FOAM_ROOT + 'test',
-        blacklist: [
-          'src/foam/nanos.js'
-        ]
-      });
-*/
-      var foamjs = this.buildBootstrap()
-
-      return this.embedModelDAO(modelDAO).then(function(s) {
-        require('fs').writeFileSync('modeldao.js', s, { encoding: 'utf8' });
-//        foamjs += s;
-        return foamjs;
-      }).then(function(payload) {
-//        console.log(payload.length, "characters.");
-        require('fs').writeFileSync(self.targetFile, payload, { encoding: 'utf8' });
-      });
+      with ( foam.cps ) {
+        sequence(
+          compose(write, wrap(function() {
+            return "FOAM_FLAGS = { js: true, web: true, debug: true };\n";
+          })),
+          compose(write, bootstrap),
+          compose(write, models),
+          compose(write, refinements),
+          compose(write, libraries),
+          compose(write, relationships),
+          compose(write, scripts),
+          wrap(function() {
+            require('fs').closeSync(fd);
+          }))(nop, function(error) {
+            console.log("Error building payload", error);
+          });
+      }
 
       return;
+
     }
   ]
 });

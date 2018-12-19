@@ -28,6 +28,7 @@ FOAM_FILES([
   { name: "foam/core/lib" },
   { name: "foam/core/stdlib" },
   { name: "foam/core/events" },
+  { name: "foam/core/cps" },
   { name: "foam/core/Context" },
   { name: "foam/core/Boot" },
   { name: "foam/core/FObject" },
@@ -474,7 +475,6 @@ FOAM_FILES([
   { name: "foam/comics/InlineBrowserView", flags: ['web'] },
   { name: "foam/comics/RelationshipView", flags: ['web'] },
   { name: "foam/u2/view/ReciprocalSearch", flags: ['web'] },
-  { name: "lib/node/box", flags: ['node'] },
   { name: "lib/net", flags: ['web'] },
   { name: "lib/netNode", flags: ['node'] },
   { name: "foam/net/RetryHTTPRequest" },
@@ -569,5 +569,5 @@ FOAM_FILES([
   { name: "foam/dashboard/view/Card" },
   { name: "test/Foo" },
   { name: "foam/build/Library" },
-  { name: "foam/build/Script" }
+  { name: "foam/build/EmbeddedModelDAO" },
 ]);

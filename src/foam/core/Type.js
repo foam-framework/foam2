@@ -19,6 +19,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'AbstractMethodReturnTypeRefinement',
   refines: 'foam.core.AbstractMethod',
   properties: [
     {

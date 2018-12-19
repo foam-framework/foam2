@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'AbstractPredicateSwiftRefinement',
   refines: 'foam.mlang.predicate.AbstractPredicate',
   flags: ['swift'],
   methods: [

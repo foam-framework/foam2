@@ -104,6 +104,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'ModelInnerClassRefinement',
   refines: 'foam.core.Model',
   properties: [
     {

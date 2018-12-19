@@ -1680,6 +1680,7 @@ foam.CLASS({
         var v1 = this.arg1.f(o);
         var v2 = this.arg2.f(o);
 
+        // TODO This first check shouldn't be necessary.
         // First check is so that EQ(Class.PROPERTY, null | undefined) works.
         return ( v1 === undefined && v2 === null ) || foam.util.equals(v1, v2);
       },
@@ -1740,7 +1741,13 @@ foam.CLASS({
     {
       name: 'f',
       code: function(o) {
-        return ! foam.util.equals(this.arg1.f(o), this.arg2.f(o));
+        var v1 = this.arg1.f(o);
+        var v2 = this.arg2.f(o);
+
+        // TODO This first check shouldn't be necessary.
+        return  ( v1 !== undefined ||
+                  v2 !== null ) &&
+          ! foam.util.equals(v1, v2);
       },
       swiftCode: `
 let v1 = arg1!.f(obj)
@@ -2427,6 +2434,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.mlang',
+  name: 'PropertyComparatorRefinement',
   refines: 'foam.core.Property',
 
   implements: [ 'foam.mlang.order.Comparator' ],
