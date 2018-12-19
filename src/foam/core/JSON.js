@@ -22,6 +22,8 @@
 //   - don't output default classes
 */
 foam.CLASS({
+  package: 'foam.core',
+  name: 'PropertyToFromJSONRefinement',
   refines: 'foam.core.Property',
 
   properties: [
@@ -49,6 +51,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'ObjectToJSONRefinement',
   refines: 'foam.core.Object',
 
   properties: [
@@ -114,8 +118,9 @@ foam.CLASS({
 });
 
 
-/** Add toJSON() method to FObject. **/
 foam.CLASS({
+  package: 'foam.core',
+  name: 'FObjectStringifyRefinement',
   refines: 'foam.core.FObject',
 
   methods: [
@@ -347,7 +352,7 @@ foam.CLASS({
     },
 
     function outputProperty(o, p, includeComma) {
-      if ( ! this.propertyPredicate(o, p ) ) return false;
+      if ( ! this.propertyPredicate(o, p) ) return false;
       if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) )
         return false;
 
@@ -363,6 +368,7 @@ foam.CLASS({
 
       this.nl().indent().outputPropertyName(p).out(':', this.postColonStr);
       this.output(p.toJSON(v, this), p.of);
+
       return true;
     },
 

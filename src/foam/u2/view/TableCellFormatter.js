@@ -71,6 +71,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'ActionTableCellFormatterRefinement',
   refines: 'foam.core.Action',
 
   properties: [
@@ -95,6 +97,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'EnumTableCellFormatterRefinement',
   refines: 'foam.core.Enum',
 
   properties: [
@@ -110,6 +114,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'FObjectPropertyTableCellFormatterRefinement',
   refines: 'foam.core.FObjectProperty',
 
   properties: [ [ 'tableCellFormatter', null ] ]
@@ -117,6 +123,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'CurrencyTableCellFormatterRefinement',
   refines: 'foam.core.Currency',
 
   properties: [
@@ -135,6 +143,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'DateTableCellFormatterRefinement',
   refines: 'foam.core.Date',
 
   properties: [
@@ -150,6 +160,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'DateTimeTableCellFormatterRefinement',
   refines: 'foam.core.DateTime',
 
   properties: [
@@ -162,4 +174,3 @@ foam.CLASS({
     }
   ]
 });
-

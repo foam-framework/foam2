@@ -22,6 +22,8 @@
 //
 
 foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'CountDatastoreRefinement',
   refines: 'foam.mlang.sink.Count',
 
   methods: [
@@ -53,6 +55,8 @@ foam.CLASS({
 //
 
 foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'PropertyDatastoreRefinement',
   refines: 'foam.core.Property',
 
   methods: [
@@ -71,6 +75,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'DotDatastoreRefinement',
   refines: 'foam.mlang.expr.Dot',
 
   methods: [
@@ -90,6 +96,8 @@ foam.CLASS({
 //
 
 foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'ConstantDatastoreRefinement',
   refines: 'foam.mlang.Constant',
 
   methods: [
@@ -113,6 +121,8 @@ foam.CLASS({
 //
 
 foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'AbstractPredicateDatastoreRefinement',
   refines: 'foam.mlang.predicate.AbstractPredicate',
 
   methods: [
@@ -133,6 +143,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'AndDatastoreRefinement',
   refines: 'foam.mlang.predicate.And',
 
   methods: [
@@ -163,6 +175,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'BinaryDatastoreRefinement',
   refines: 'foam.mlang.predicate.Binary',
 
   properties: [
@@ -200,11 +214,40 @@ foam.CLASS({
 // predicates by refining them with a particular "datastoreOpName" value.
 //
 
-foam.CLASS({refines: 'foam.mlang.predicate.Eq',  properties: [ {class: 'String', name: 'datastoreOpName', value: 'EQUAL' }] });
-foam.CLASS({refines: 'foam.mlang.predicate.Lt',  properties: [ {class: 'String', name: 'datastoreOpName', value: 'LESS_THAN' }] });
-foam.CLASS({refines: 'foam.mlang.predicate.Lte', properties: [ {class: 'String', name: 'datastoreOpName', value: 'LESS_THAN_OR_EQUAL' }] });
-foam.CLASS({refines: 'foam.mlang.predicate.Gt',  properties: [ {class: 'String', name: 'datastoreOpName', value: 'GREATER_THAN' }] });
-foam.CLASS({refines: 'foam.mlang.predicate.Gte', properties: [ {class: 'String', name: 'datastoreOpName', value: 'GREATER_THAN_OR_EQUAL' }] });
+foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'EqDatastoreRefinement',
+  refines: 'foam.mlang.predicate.Eq',
+  properties: [ {class: 'String', name: 'datastoreOpName', value: 'EQUAL' }]
+});
+
+foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'LtDatastoreRefinement',
+  refines: 'foam.mlang.predicate.Lt',
+  properties: [ {class: 'String', name: 'datastoreOpName', value: 'LESS_THAN' }]
+});
+
+foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'LteDatastoreRefinement',
+  refines: 'foam.mlang.predicate.Lte',
+  properties: [ {class: 'String', name: 'datastoreOpName', value: 'LESS_THAN_OR_EQUAL' }]
+});
+
+foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'GtDatastoreRefinement',
+  refines: 'foam.mlang.predicate.Gt',
+  properties: [ {class: 'String', name: 'datastoreOpName', value: 'GREATER_THAN' }]
+});
+
+foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'GteDatastoreRefinement',
+  refines: 'foam.mlang.predicate.Gte',
+  properties: [ {class: 'String', name: 'datastoreOpName', value: 'GREATER_THAN_OR_EQUAL' }]
+});
 
 
 //
@@ -212,6 +255,8 @@ foam.CLASS({refines: 'foam.mlang.predicate.Gte', properties: [ {class: 'String',
 //
 
 foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'PropertyToDataStoreOrderRefinement',
   refines: 'foam.core.Property',
 
   methods: [
@@ -234,6 +279,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'DescDatastoreRefinement',
   refines: 'foam.mlang.order.Desc',
 
   methods: [
@@ -246,6 +293,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'ThenByDatastoreRefinement',
   refines: 'foam.mlang.order.ThenBy',
 
   methods: [

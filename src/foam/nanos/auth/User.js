@@ -504,6 +504,8 @@ foam.RELATIONSHIP({
 });
 
 foam.CLASS({
+  package: 'foam.nanos.auth',
+  name: 'UserUserJunctionGroupRefinement',
   refines: 'foam.nanos.auth.UserUserJunction',
 
   properties: [

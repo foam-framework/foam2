@@ -16,6 +16,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'PropertyToIndexRefinement',
   refines: 'foam.core.Property',
 
   requires: [
@@ -33,6 +35,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'FObjectArrayToIndexRefinement',
   refines: 'foam.core.FObjectArray',
 
   requires: [
@@ -48,6 +52,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'AxiomArrayToIndexRefinement',
   refines: 'foam.core.AxiomArray',
 
   requires: [
@@ -63,6 +69,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'StringArrayToIndexRefinement',
   refines: 'foam.core.StringArray',
 
   requires: [

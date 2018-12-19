@@ -84,7 +84,7 @@
       filter(function(f) {
         // Ignore all flags, load everything.
         return true;
-        
+
         if ( f.flags ) {
           for ( var i = 0; i < f.flags.length; i++ ) {
             if ( ! flags[f.flags[i]] ) return false;

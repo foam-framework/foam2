@@ -185,6 +185,7 @@ foam.CLASS({
           return visit(obj);
         }
 
+
         function classDeps(model) {
           var deps = [];
           if ( model.requires ) deps = deps.concat(model.requires.map(r => r.path));
