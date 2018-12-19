@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'AbstractInterfaceSwiftRefinement',
   refines: 'foam.core.AbstractInterface',
   flags: ['swift'],
   axioms: [
@@ -35,6 +37,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'ImplementsSwiftRefinement',
   refines: 'foam.core.Implements',
   flags: ['swift'],
   methods: [

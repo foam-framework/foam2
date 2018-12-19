@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.apploader',
-  name: 'ModelRefines',
+  name: 'ModelGetClassDepsRefinement',
   refines: 'foam.core.Model',
   methods: [
     {

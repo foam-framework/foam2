@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'ConstantSwiftRefinement',
   refines: 'foam.core.Constant',
   flags: ['swift'],
   requires: [

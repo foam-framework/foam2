@@ -24,6 +24,8 @@ foam.INTERFACE({
  * CreatedByAware interface to have a reference property without doing this refinement
  */
 foam.CLASS({
+  package: 'foam.nanos.auth',
+  name: 'UserCreatedByAwareRefinement',
   refines: 'foam.nanos.auth.User',
 
   implements: [

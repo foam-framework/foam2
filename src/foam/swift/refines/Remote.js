@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'RemoteSwiftRefinement',
   refines: 'foam.box.Remote',
   flags: ['swift'],
   requires: [

@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'RequiresSwiftRefinement',
   refines: 'foam.core.Requires',
   flags: ['swift'],
   requires: [

@@ -1,4 +1,6 @@
 foam.CLASS({
+  package: 'org.chartjs',
+  name: 'ChartJSPropertyFormatterRefinement',
   refines: 'foam.core.Property',
   properties: [
     {
@@ -9,6 +11,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'org.chartjs',
+  name: 'ChartJSDateFormatterRefinement',
   refines: 'foam.core.Date',
   properties: [
     {
@@ -27,6 +31,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'org.chartjs',
+  name: 'ChartJSDateTimeFormatterRefinement',
   refines: 'foam.core.DateTime',
   properties: [
     {

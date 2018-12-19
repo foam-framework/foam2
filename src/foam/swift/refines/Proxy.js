@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'ProxiedMethodSwiftRefinement',
   refines: 'foam.core.ProxiedMethod',
   flags: ['swift'],
   properties: [
@@ -15,7 +17,7 @@ foam.CLASS({
           return arg.localName;
         });
         return (this.swiftReturns ? 'return ' : '') +
-          (this.swiftThrows ? 'try ' : '') + 
+          (this.swiftThrows ? 'try ' : '') +
           this.property + '.' + this.swiftName + '(' + args.join(', ') + ')';
       }
     }
@@ -23,6 +25,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'ProxySwiftRefinement',
   refines: 'foam.core.Proxy',
   flags: ['swift'],
   properties: [
@@ -34,6 +38,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'ProxySubSwiftRefinement',
   refines: 'foam.core.ProxySub',
   flags: ['swift'],
   methods: [

@@ -2061,6 +2061,8 @@ foam.SCRIPT({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'FObjectToERefinement',
   refines: 'foam.core.FObject',
   methods: [
     function toE(args, X) {
@@ -2073,6 +2075,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'SlotToERefinement',
   refines: 'foam.core.Slot',
   methods: [
     function toE() { return this; }
@@ -2081,6 +2085,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ExpressionSlotToERefinement',
   refines: 'foam.core.ExpressionSlot',
   methods: [
     function toE() { return this; }
@@ -2089,6 +2095,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'PropertyViewRefinements',
   refines: 'foam.core.Property',
 
   requires: [
@@ -2134,6 +2142,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'StringDisplayWidthRefinement',
   refines: 'foam.core.String',
   properties: [
     {
@@ -2146,6 +2156,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'StringArrayViewRefinement',
   refines: 'foam.core.StringArray',
   properties: [
     [ 'view', { class: 'foam.u2.view.StringArrayView' } ]
@@ -2154,6 +2166,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'DateViewRefinement',
   refines: 'foam.core.Date',
   requires: [ 'foam.u2.DateView' ],
   properties: [
@@ -2163,6 +2177,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'DateTimeViewRefinement',
   refines: 'foam.core.DateTime',
   requires: [ 'foam.u2.DateTimeView' ],
   properties: [
@@ -2172,6 +2188,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'TimeViewRefinement',
   refines: 'foam.core.Time',
   requires: [ 'foam.u2.TimeView' ],
   properties: [
@@ -2181,6 +2199,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'FloatViewRefinement',
   refines: 'foam.core.Float',
   requires: [ 'foam.u2.FloatView' ],
   properties: [
@@ -2191,6 +2211,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'IntViewRefinement',
   refines: 'foam.core.Int',
   requires: [ 'foam.u2.IntView' ],
   properties: [
@@ -2201,6 +2223,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'CurrencyViewRefinement',
   refines: 'foam.core.Currency',
   requires: [ 'foam.u2.CurrencyView' ],
   properties: [
@@ -2211,6 +2235,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'BooleanViewRefinement',
   refines: 'foam.core.Boolean',
   requires: [ 'foam.u2.CheckBox' ],
   properties: [
@@ -2220,6 +2246,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ColorViewRefinement',
   refines: 'foam.core.Color',
   properties: [
     {
@@ -2235,6 +2263,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'FObjectPropertyViewRefinement',
   refines: 'foam.core.FObjectProperty',
   properties: [
     {
@@ -2246,6 +2276,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'FObjectArrayViewRefinement',
   refines: 'foam.core.FObjectArray',
   properties: [
     {
@@ -2257,6 +2289,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ClassViewRefinement',
   refines: 'foam.core.Class',
   properties: [
     [ 'view', { class: 'foam.u2.ClassView' } ]
@@ -2265,6 +2299,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ReferenceViewRefinement',
   refines: 'foam.core.Reference',
   properties: [
     {
@@ -2278,6 +2314,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'EnumViewRefinement',
   refines: 'foam.core.Enum',
   properties: [
     [ 'view',          { class: 'foam.u2.EnumView' } ],
@@ -2407,6 +2445,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ActionViewRefinement',
   refines: 'foam.core.Action',
 
   requires: [
@@ -2454,6 +2494,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ModelU2Refinements',
   refines: 'foam.core.Model',
 
   properties: [

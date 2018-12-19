@@ -28,6 +28,8 @@
 
 /* Validating a Model should also validate all of its Axioms. */
 foam.CLASS({
+  package: 'foam.core',
+  name: 'ModelSourceRefinement',
   refines: 'foam.core.Model',
   flags: ['debug'],
 
@@ -58,6 +60,8 @@ foam.CLASS({
 
 /* Validate that Listeners aren't both framed and merged. */
 foam.CLASS({
+  package: 'foam.core',
+  name: 'ListenerValidateRefinement',
   refines: 'foam.core.Listener',
   flags: ['debug'],
 
@@ -74,6 +78,8 @@ foam.CLASS({
 
 /* Validating a Model should also validate all of its Axioms. */
 foam.CLASS({
+  package: 'foam.core',
+  name: 'PropertyValidateRefinement',
   refines: 'foam.core.Property',
   flags: ['debug'],
 
@@ -279,6 +285,8 @@ if ( false && global.Proxy ) {
 
 /* Add describe() support to objects. */
 foam.CLASS({
+  package: 'foam.core',
+  name: 'FObjectDescribeRefinement',
   refines: 'foam.core.FObject',
   flags: ['debug'],
 
@@ -403,6 +411,8 @@ foam.SCRIPT({
 });
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'FObjectValidateImportsRefinement',
   refines: 'foam.core.FObject',
   flags: ['debug'],
 
@@ -425,6 +435,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'ImportValidationRefinement',
   refines: 'foam.core.Import',
   flags: ['debug'],
 
@@ -455,6 +467,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'FObjectDescribeListenersRefinement',
   refines: 'foam.core.FObject',
   flags: ['debug'],
 

@@ -5,6 +5,8 @@ http://www.apache.org/licenses/LICENSE-2.0
 */
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'PropertyXMLRefinement',
   refines: 'foam.core.Property',
 
   properties: [

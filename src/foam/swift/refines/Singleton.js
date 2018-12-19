@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'SingletonSwiftRefinement',
   refines: 'foam.pattern.Singleton',
   flags: ['swift'],
   requires: [
