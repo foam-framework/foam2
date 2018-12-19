@@ -329,7 +329,7 @@ foam.LIB({
       var comment = "(?:\\/\\*(?:.|\\s)*?\\*\\/)?";
       var skip = "(?:" + ws + comment + ws + ")*";
 
-      var functionHeader = "(async )?" + "function" + skip + ident + "?\\(";
+      var functionHeader = "(async )?" + "function" + skip + ident + "?" + ws + "\\(";
 
       var arrowHeader = "\\(";
 

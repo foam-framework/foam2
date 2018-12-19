@@ -314,6 +314,7 @@ foam.CLASS({
     function unload() {
       this.state = this.UNLOADED;
       this.visitChildren('unload');
+      this.detach();
     },
     function error() {
       throw new Error('Mutations not allowed in OUTPUT state.');
@@ -355,6 +356,7 @@ foam.CLASS({
 
       this.state = this.UNLOADED;
       this.visitChildren('unload');
+      this.detach();
     },
     function onRemove() { this.unload(); },
     function onSetClass(cls, enabled) {
@@ -1118,7 +1120,7 @@ foam.CLASS({
       if ( opt_shown === undefined ) {
         this.shown = true;
       } else if ( foam.core.Slot.isInstance(opt_shown) ) {
-        this.shown$.follow(opt_shown);
+        this.onDetach(this.shown$.follow(opt_shown));
       } else {
         this.shown = !! opt_shown;
       }
@@ -1166,7 +1168,7 @@ foam.CLASS({
           // TODO: remove check when all properties have fromString()
           this[name] = prop.fromString ? prop.fromString(value) : value;
         } else if ( foam.core.Slot.isInstance(value) ) {
-          this.slot(name).follow(value);
+          this.onDetach(this.slot(name).follow(value));
         } else {
           this[name] = value;
         }
@@ -1364,7 +1366,7 @@ foam.CLASS({
           self.addClass_(lastValue, v);
           lastValue = v;
         };
-        cls.sub(l);
+        this.onDetach(cls.sub(l));
         l();
       } else if ( typeof cls === 'string' ) {
         this.addClass_(null, cls);
@@ -1389,7 +1391,7 @@ foam.CLASS({
         var self = this;
         var value = enabled;
         var l = function() { self.enableClass(cls, value.get(), opt_negate); };
-        value.sub(l);
+        this.onDetach(value.sub(l));
         l();
       } else {
         enabled = negate(enabled, opt_negate);
@@ -1593,7 +1595,7 @@ foam.CLASS({
         this.add.apply(this, slot.get());
       }.bind(this);
 
-      slot.sub(l);
+      this.onDetach(slot.sub(l));
       l();
 
       return this;
@@ -1826,7 +1828,7 @@ foam.CLASS({
       /* Set an attribute based off of a dynamic Value. */
       var self = this;
       var l = function() { self.setAttribute(key, value.get()); };
-      value.sub(l);
+      this.onDetach(value.sub(l));
       l();
     },
 
@@ -1834,7 +1836,7 @@ foam.CLASS({
       /* Set a CSS style based off of a dynamic Value. */
       var self = this;
       var l = function(value) { self.style_(key, v.get()); };
-      v.sub(l);
+      this.onDetach(v.sub(l));
       l();
     },
 
@@ -1885,11 +1887,10 @@ foam.CLASS({
       var e = nextE();
       var l = function() {
         if ( self.state !== self.LOADED ) {
-          s && s.detach();
           return;
         }
         var first = Array.isArray(e) ? e[0] : e;
-        var tmp = self.E();
+        var tmp   = self.E();
         self.insertBefore(tmp, first);
         if ( Array.isArray(e) ) {
           for ( var i = 0 ; i < e.length ; i++ ) { e[i].remove(); e[i].detach(); }
@@ -1902,8 +1903,7 @@ foam.CLASS({
         e = e2;
       };
 
-      var s = slot.sub(this.framed(l));
-      this.onDetach(s);
+      this.onDetach(slot.sub(this.framed(l)));
 
       return e;
     },
