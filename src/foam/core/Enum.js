@@ -202,6 +202,9 @@ foam.CLASS({
       class: 'AxiomArray',
       of: 'foam.core.internal.EnumValueAxiom',
       name: 'values',
+      toJSON: function(values, out) {
+        return values.map(function(v) { return v.definition; });
+      },
       adapt: function(_, v) {
         var used = {}; // map of ordinals used to check for duplicates
 
@@ -366,7 +369,7 @@ foam.CLASS({
         }
 
         if ( ret ) return ret;
- 
+
         console.log("*** adamvy");
         console.log("** name:",prop.name);
         console.log("** of:",prop.of);
