@@ -6,7 +6,6 @@
 
 FOAM_FILES([
   { name: 'foam/nanos/controller/AppStyles', flags: ['web'] },
-  { name: 'foam/nanos/logger/LogsView', flags: ['web'] },
   { name: "foam/nanos/logger/LogLevel" },
   { name: "foam/nanos/logger/LogMessage" },
   { name: "foam/nanos/logger/Logger" },
