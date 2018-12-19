@@ -40,10 +40,10 @@ foam.CLASS({
   axioms: [
     {
       name: 'javaExtras',
-      buildJavaClass: function (cls) {
+      buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: 'java.util.regex.Pattern p = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");'
-        }))
+        }));
       }
     }
   ],
