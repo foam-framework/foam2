@@ -232,15 +232,30 @@ foam.CLASS({
       m.source = global.document.currentScript.src;
     }
 
-    if ( m.refines ) return CLASS(m);
+    if ( ! m.name ) throw new Error("Unnamed model" + m);
 
-    m.id = m.package ? m.package + '.' + m.name : m.name;
     foam.UNUSED[m.id] = m;
+    m.id = m.package ? m.package + '.' + m.name : m.name;
+
+    if ( m.refines ) {
+      if ( foam.__context__.isDefined(m.refines) ) {
+        delete foam.UNUSED[m.id];
+        CLASS(m);
+        foam.USED[m.id] = m;
+      } else {
+        foam.pubsub.sub("defineClass", m.refines, function(s) {
+          s.detach();
+          CLASS(m);
+          foam.USED[m.id] = m;
+        });
+      }
+      return;
+    }
 
     var f = foam.Function.memoize0(function() {
       delete foam.UNUSED[m.id];
       var c = CLASS(m);
-      foam.USED[m.id] = true;
+      foam.USED[m.id] = m;
       return c;
     });
 
