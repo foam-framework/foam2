@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'AbstractMethodSwiftRefinement',
   refines: 'foam.core.AbstractMethod',
   flags: ['swift'],
   requires: [

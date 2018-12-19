@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'ExprPropertySwiftRefinement',
   refines: 'foam.mlang.ExprProperty',
   flags: ['swift'],
   properties: [

@@ -57,7 +57,7 @@ ${Object.keys(o).map(function(k) {
       name: 'toJavaType',
       code: function(type) {
         // Is this right?
-        
+
         if ( ! type ) type = 'Any';
 
         // Is this the right idea?
@@ -71,7 +71,7 @@ ${Object.keys(o).map(function(k) {
         // to design it.
 
         var s;
-        
+
         switch ( type ) {
         case "Number":
         case "Float":
@@ -167,7 +167,7 @@ foam.CLASS({
     }
   ]
 });
-  
+
 foam.CLASS({
   package: 'foam.java',
   name: 'JavaReturns',
@@ -187,6 +187,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'ArgumentJavaRefinement',
   refines: 'foam.core.Argument',
   flags: ['java'],
   properties: [
@@ -195,6 +197,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'PropertyJavaRefinement',
   refines: 'foam.core.Property',
   flags: ['java'],
   properties: [
@@ -439,6 +443,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'ImplementsJavaRefinement',
   refines: 'foam.core.Implements',
   flags: ['java'],
   properties: [
@@ -457,6 +463,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'InnerClassJavaRefinement',
   refines: 'foam.core.InnerClass',
   flags: ['java'],
   properties: [
@@ -634,6 +642,8 @@ foam.LIB({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'AbstractMethodJavaRefinement',
   refines: 'foam.core.AbstractMethod',
   flags: ['java'],
 
@@ -697,6 +707,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'ConstantJavaRefinement',
   refines: 'foam.core.Constant',
   flags: ['java'],
 
@@ -715,7 +727,7 @@ foam.CLASS({
       if ( this.flags && this.flags.length && this.flags.indexOf('java') == -1 ) {
         return;
       }
-        
+
       if ( ! this.javaType ) {
         this.__context__.warn('Skipping constant ', this.name, ' with unknown type.');
         return;
@@ -732,6 +744,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'ActionJavaRefinement',
   refines: 'foam.core.Action',
   flags: ['java'],
 
@@ -757,6 +771,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'MethodJavaRefinement',
   refines: 'foam.core.Method',
   flags: ['java'],
   properties: [
@@ -770,6 +786,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'ProxiedMethodJavaRefinement',
   refines: 'foam.core.ProxiedMethod',
   flags: ['java'],
 
@@ -805,6 +823,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'ImportJavaRefinement',
   refines: 'foam.core.Import',
   flags: ['java'],
 
@@ -826,6 +846,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'FObjectJavaRefinement',
   refines: 'foam.core.FObject',
   flags: ['java'],
   methods: [
@@ -856,6 +878,8 @@ new ${self.cls_.id}.Builder(EmptyX.instance())
 });
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'AbstractInterfaceJavaRefinement',
   refines: 'foam.core.AbstractInterface',
   flags: ['java'],
   axioms: [
@@ -884,6 +908,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'IntJavaRefinement',
   refines: 'foam.core.Int',
   flags: ['java'],
 
@@ -912,6 +938,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'ByteJavaRefinement',
   refines: 'foam.core.Byte',
   flags: ['java'],
 
@@ -940,6 +968,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'ShortJavaRefinement',
   refines: 'foam.core.Short',
   flags: ['java'],
 
@@ -968,6 +998,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'LongJavaRefinement',
   refines: 'foam.core.Long',
   flags: ['java'],
 
@@ -995,6 +1027,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'DoubleJavaRefinement',
   refines: 'foam.core.Double',
   flags: ['java'],
 
@@ -1023,6 +1057,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'FloatJavaRefinement',
   refines: 'foam.core.Float',
   flags: ['java'],
 
@@ -1051,6 +1087,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'EnumJavaRefinement',
   refines: 'foam.core.Enum',
   flags: ['java'],
 
@@ -1138,6 +1176,8 @@ return (${this.of.id})o;`;
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'AbstractEnumJavaRefinement',
   refines: 'foam.core.AbstractEnum',
   flags: ['java'],
 
@@ -1174,6 +1214,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'DateTimeJavaRefinement',
   refines: 'foam.core.DateTime',
   flags: ['java'],
 
@@ -1209,6 +1251,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'DateJavaRefinement',
   refines: 'foam.core.Date',
   flags: ['java'],
 
@@ -1244,6 +1288,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'MapJavaRefinement',
   refines: 'foam.core.Map',
   flags: ['java'],
 
@@ -1272,6 +1318,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'ListJavaRefinement',
   refines: 'foam.core.List',
   flags: ['java'],
 
@@ -1300,6 +1348,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'StringJavaRefinement',
   refines: 'foam.core.String',
   flags: ['java'],
 
@@ -1338,6 +1388,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'FObjectPropertyJavaRefinement',
   refines: 'foam.core.FObjectProperty',
   flags: ['java'],
   properties: [
@@ -1359,6 +1411,8 @@ foam.CLASS({
 // Java but unspecific in JS (arrays have specific types in Java but
 // are all the same in JS.)
 foam.CLASS({
+  package: 'foam.java',
+  name: 'StringArrayJavaRefinement',
   refines: 'foam.core.StringArray',
   flags: ['java'],
 
@@ -1434,6 +1488,8 @@ return 0;*/
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'ArrayJavaRefinement',
   refines: 'foam.core.Array',
   flags: ['java'],
 
@@ -1495,6 +1551,8 @@ return 0;*/
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'FObjectArrayJavaRefinement',
   refines: 'foam.core.FObjectArray',
   flags: ['java'],
 
@@ -1616,6 +1674,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'BooleanJavaRefinement',
   refines: 'foam.core.Boolean',
   flags: ['java'],
   properties: [
@@ -1639,6 +1699,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'ObjectJavaRefinement',
   refines: 'foam.core.Object',
   flags: ['java'],
   properties: [
@@ -1650,6 +1712,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'ClassJavaRefinement',
   refines: 'foam.core.Class',
   flags: ['java'],
   properties: [
@@ -1661,6 +1725,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'ProxyJavaRefinement',
   refines: 'foam.core.Proxy',
   flags: ['java'],
   properties: [
@@ -1677,6 +1743,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'ReferenceJavaRefinement',
   refines: 'foam.core.Reference',
   flags: [ 'java' ],
 
@@ -1719,6 +1787,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'MultitonJavaRefinement',
   refines: 'foam.pattern.Multiton',
   flags: ['java'],
 
@@ -1755,6 +1825,8 @@ new foam.core.MultitonInfo("${this.javaName}", ${cls.name}.${foam.String.constan
 });
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'IDAliasJavaRefinement',
   refines: 'foam.core.IDAlias',
   flags: ['java'],
   properties: [
@@ -1774,6 +1846,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'MultiPartIDJavaRefinement',
   refines: 'foam.core.MultiPartID',
   flags: ['java'],
 
@@ -1815,6 +1889,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'ModelJavaRefinement',
   refines: 'foam.core.Model',
   flags: ['java'],
 
@@ -1833,14 +1909,7 @@ foam.CLASS({
       class: 'String',
       name: 'javaName',
       factory: function() { return this.id; }
-    }
-  ]
-});
-
-foam.CLASS({
-  refines: 'foam.core.Model',
-  flags: ['java'],
-  properties: [
+    },
     {
       class: 'AxiomArray',
       of: 'foam.java.JavaImplements',
@@ -1856,6 +1925,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'ListenerJavaRefinement',
   refines: 'foam.core.Listener',
   flags: ['java'],
   properties: [
@@ -1940,6 +2011,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'RequiresJavaRefinement',
   refines: 'foam.core.Requires',
   flags: ['java'],
   properties: [
@@ -1952,13 +2025,15 @@ foam.CLASS({
     {
       name: 'javaReturns',
       expression: function(javaPath) {
-        return this.__context__.lookup(javaPath).model_.id;
+        return javaPath;
       },
     },
   ]
 });
 
 foam.CLASS({
+  package: 'foam.java',
+  name: 'FunctionJavaRefinement',
   refines: 'foam.core.Function',
   flags: ['java'],
   properties: [

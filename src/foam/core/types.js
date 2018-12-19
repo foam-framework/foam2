@@ -52,6 +52,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'ModelDocumentationRefinement',
   refines: 'foam.core.Model',
 
   documentation: 'Upgrade Mode.documentation to a proper String property.',
@@ -605,6 +607,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'ModelUpgradeTypesRefinement',
   refines: 'foam.core.Model',
 
   documentation: 'Update Model Property types.',
@@ -658,6 +662,8 @@ foam.CLASS({
 
 // Upgrade async property to a real boolean property.
 foam.CLASS({
+  package: 'foam.core',
+  name: 'AbstractMethodUpgradeTypesRefinement',
   refines: 'foam.core.AbstractMethod',
   properties: [
     {

@@ -16,6 +16,8 @@
  */
 
 foam.CLASS({
+  package: 'com.google.flow',
+  name: 'FObjectReactiveDetailViewRefinement',
   refines: 'FObject',
   properties: [
     {

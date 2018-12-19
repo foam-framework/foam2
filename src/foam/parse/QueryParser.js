@@ -507,7 +507,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.parse',
-  name: 'PropertyRefinement',
+  name: 'PropertyAliasesRefinement',
   refines: 'foam.core.Property',
 
   properties: [

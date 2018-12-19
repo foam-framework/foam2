@@ -284,6 +284,8 @@ foam.LIB({
 //
 
 foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'PropertyDatastoreTypesRefinement',
   refines: 'foam.core.Property',
 
   methods: [
@@ -313,6 +315,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'DateDatastoreTypesRefinement',
   refines: 'foam.core.Date',
 
   methods: [
@@ -323,6 +327,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'MultiPartIDDatastoreTypesRefinement',
   refines: 'foam.core.MultiPartID',
 
   properties: [
@@ -355,6 +361,8 @@ foam.CLASS({
 //
 
 foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'AbstractEnumDatastoreTypesRefinement',
   refines: 'foam.core.AbstractEnum',
 
   methods: [
@@ -373,6 +381,8 @@ foam.CLASS({
 //
 
 foam.CLASS({
+  package: 'com.google.cloud.datastore',
+  name: 'FObjectDatastoreTypesRefinement',
   refines: 'foam.core.FObject',
 
   methods: [

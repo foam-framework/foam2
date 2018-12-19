@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'AbstractEnumSwiftRefinement',
   refines: 'foam.core.AbstractEnum',
   flags: ['swift'],
   axioms: [
@@ -60,6 +62,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'EnumSwiftRefinement',
   refines: 'foam.core.Enum',
   flags: ['swift'],
   properties: [

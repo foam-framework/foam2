@@ -76,6 +76,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'RelationshipDAOToERefinement',
   refines: 'foam.dao.RelationshipDAO',
 
   requires: [

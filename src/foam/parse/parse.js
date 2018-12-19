@@ -1202,6 +1202,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.parse',
+  name: 'ModelGrammarsRefinement',
   refines: 'foam.core.Model',
   properties: [
     {

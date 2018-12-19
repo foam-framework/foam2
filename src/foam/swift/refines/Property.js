@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'PropertySwiftRefinement',
   refines: 'foam.core.Property',
   flags: ['swift'],
   requires: [
@@ -493,6 +495,8 @@ return PInfo(classInfo())
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'ListSwiftRefinement',
   refines: 'foam.core.List',
   flags: ['swift'],
   properties: [
@@ -508,6 +512,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'MapSwiftRefinement',
   refines: 'foam.core.Map',
   flags: ['swift'],
   properties: [
@@ -523,6 +529,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'ArraySwiftRefinement',
   refines: 'foam.core.Array',
   flags: ['swift'],
   properties: [
@@ -538,6 +546,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'StringArraySwiftRefinement',
   refines: 'foam.core.StringArray',
   flags: ['swift'],
   properties: [
@@ -553,6 +563,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'ClassSwiftRefinement',
   refines: 'foam.core.Class',
   flags: ['swift'],
   properties: [
@@ -564,6 +576,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'BooleanSwiftRefinement',
   refines: 'foam.core.Boolean',
   flags: ['swift'],
   properties: [
@@ -641,6 +655,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'DateTimeSwiftRefinement',
   refines: 'foam.core.DateTime',
   flags: ['swift'],
   properties: [
@@ -664,6 +680,8 @@ return Date()
 })
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'EnumSwiftRefinement',
   refines: 'foam.core.Enum',
   flags: ['swift'],
   properties: [
@@ -691,6 +709,8 @@ return newValue as! ${swiftType}
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'MultiPartIDSwitRefinement',
   refines: 'foam.core.MultiPartID',
   flags: [ 'swift' ],
   properties: [
@@ -725,6 +745,8 @@ for propName in propNames {
 })
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'IDAliasSwiftRefinement',
   refines: 'foam.core.IDAlias',
   flags: [ 'swift' ],
   properties: [
@@ -748,6 +770,8 @@ return Swift.type(of: self).${foam.String.constantize(propName)}().set(self, val
 })
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'ReferenceSwiftRefinement',
   refines: 'foam.core.Reference',
   flags: [ 'swift' ],
   requires: [

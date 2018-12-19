@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'MultitonSwiftRefinement',
   refines: 'foam.pattern.Multiton',
   flags: ['swift'],
   requires: [

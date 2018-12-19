@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'PromisedMethodSwiftRefinement',
   refines: 'foam.core.PromisedMethod',
   flags: ['swift'],
   properties: [
@@ -33,6 +35,8 @@ _ = try! method(args)
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'PromisedSwiftRefinement',
   refines: 'foam.core.Promised',
   flags: ['swift'],
   properties: [

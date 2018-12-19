@@ -23,6 +23,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao',
+  name: 'AbstractPredicateSQLValueRefinement',
   refines: 'foam.mlang.predicate.AbstractPredicate',
 
   requires: [ 'foam.dao.SQLException' ],
@@ -44,6 +46,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao',
+  name: 'ConstantToSQLRefinement',
   refines: 'foam.mlang.Constant',
   methods: [
     function toSQL() {
@@ -65,6 +69,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao',
+  name: 'TrueToSQLRefinement',
   refines: 'foam.mlang.predicate.True',
   methods: [
     function toSQL() { return '( 1 = 1 )'; }
@@ -73,6 +79,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao',
+  name: 'FalseToSQLRefinement',
   refines: 'foam.mlang.predicate.False',
   methods: [
     function toSQL() { return '( 1 <> 1 )'; }
@@ -81,6 +89,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao',
+  name: 'UnaryToSQLRefinement',
   refines: 'foam.mlang.predicate.Unary',
   methods: [
     function toSQL() {
@@ -91,6 +101,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao',
+  name: 'BinaryToSQLRefinement',
   refines: 'foam.mlang.predicate.Binary',
   methods: [
     function toSQL() {
@@ -101,6 +113,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao',
+  name: 'HasToSQLRefinement',
   refines: 'foam.mlang.predicate.Has',
   methods: [
     function toSQL() {
@@ -111,6 +125,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao',
+  name: 'NotToSQLRefinement',
   refines: 'foam.mlang.predicate.Not',
   methods: [
     function toSQL() { return 'NOT ('+ this.arg1.toSQL()+')'; }
@@ -119,6 +135,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao',
+  name: 'EqToSQLRefinement',
   refines: 'foam.mlang.predicate.Eq',
   methods: [
     function toSQL() {
@@ -131,6 +149,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao',
+  name: 'NeqToSQLRefinement',
   refines: 'foam.mlang.predicate.Neq',
   methods: [
     function toSQL() {
@@ -143,6 +163,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao',
+  name: 'GtToSQLRefinement',
   refines: 'foam.mlang.predicate.Gt',
   methods: [
     function toSQL() {
@@ -153,6 +175,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao',
+  name: 'GteToSQLRefinement',
   refines: 'foam.mlang.predicate.Gte',
   methods: [
     function toSQL() {
@@ -163,6 +187,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao',
+  name: 'LtToSQLRefinement',
   refines: 'foam.mlang.predicate.Lt',
   methods: [
     function toSQL() {
@@ -173,6 +199,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao',
+  name: 'LteToSQLRefinement',
   refines: 'foam.mlang.predicate.Lte',
   methods: [
     function toSQL() {
@@ -183,6 +211,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao',
+  name: 'AndToSQLRefinement',
   refines: 'foam.mlang.predicate.And',
   methods: [
     // AND has a higher precedence than OR so doesn't need paranthesis
@@ -201,6 +231,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao',
+  name: 'OrToSQLRefinement',
   refines: 'foam.mlang.predicate.Or',
   methods: [
     function toSQL() {
@@ -219,6 +251,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao',
+  name: 'InToSQLRefinement',
   refines: 'foam.mlang.predicate.In',
   methods: [
     function toSQL() {
@@ -237,6 +271,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao',
+  name: 'DateToSQLRefinement',
   refines: 'foam.core.Date',
   methods: [
     function toSQL() {

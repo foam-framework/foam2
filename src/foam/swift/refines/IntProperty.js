@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'IntSwiftRefinement',
   refines: 'foam.core.Int',
   flags: ['swift'],
   properties: [
@@ -35,6 +37,8 @@ return 0
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'LongSwiftRefinement',
   refines: 'foam.core.Long',
   flags: ['swift'],
   properties: [
@@ -53,6 +57,8 @@ return 0
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'FloatSwiftRefinement',
   refines: 'foam.core.Float',
   flags: ['swift'],
   properties: [
