@@ -1,6 +1,6 @@
 foam.CLASS({
     package: 'foam.nanos.auth',
-    name: 'PropertyPermissionDAO',
+    name: 'PropertyUserPermissionDAO',
   
     javaImports: [
       'foam.core.FObject',
@@ -49,7 +49,7 @@ foam.CLASS({
       ProxySink proxySink = new ProxySink(x, sink) {
         @Override
         public void put(Object obj, foam.core.Detachable sub) {
-          FObject oldObj = PropertyPermissionDAO.this.getDelegate().find(((FObject) obj).getProperty("id"));
+          FObject oldObj = PropertyUserPermissionDAO.this.getDelegate().find(((FObject) obj).getProperty("id"));
           if ( oldObj != null ) {
             super.put(hideProperties(x, oldObj), sub);
           } else {
@@ -210,7 +210,7 @@ foam.CLASS({
           cls.extras.push(`
   protected Map<String, List<PropertyInfo>> propertyMap = new LinkedHashMap<>();
 
-  public PropertyPermissionDAO(foam.core.X x, foam.dao.DAO delegate) {
+  public PropertyUserPermissionDAO(foam.core.X x, foam.dao.DAO delegate) {
     super(x, delegate);
   }
           `);
