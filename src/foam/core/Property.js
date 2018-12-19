@@ -164,7 +164,7 @@ foam.CLASS({
     'required',
 
     /**
-      When set to true, model.propperty.permission is needed for read / write on this property
+      When set to true, model.property.permission is needed for read / write on this property
      */
     {
       class: 'Boolean',
