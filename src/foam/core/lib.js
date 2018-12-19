@@ -28,7 +28,6 @@ foam = {
   })(),
   SCRIPT: function(m) {
     m.class = '__Script__';
-    if ( global.foam.__MODELS__ ) global.foam.__MODELS__.push(m);
 
     // An instance of the script isn't useful at this point so just
     // execute the code. foam.SCRIPT can be overwritten later to
@@ -143,12 +142,6 @@ foam.LIB = function LIB(model) {
     root = root[path[i]] || ( root[path[i]] = {} );
   }
 
-  // During boot, keep a list of created LIBs
-  model.class = '__Library__';
-
-  if ( global.foam.__MODELS__ )
-    global.foam.__MODELS__.push(model);
-
   if ( model.constants ) {
     foam.assert(
       typeof model.constants === 'object',
@@ -178,4 +171,3 @@ foam.LIB = function LIB(model) {
     }
   }
 };
-global.foam.__MODELS__ = [];

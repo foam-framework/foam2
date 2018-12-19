@@ -125,6 +125,24 @@ foam.LIB({
       var cls;
 
       if ( this.refines ) {
+        // TODO This should probably live elsewhere.
+        if ( this.flags &&
+             global.FOAM_FLAGS ) {
+          var flagged = false;
+          for ( var i = 0 ; i < this.flags.length ; i++ ) {
+            if ( global.FOAM_FLAGS[this.flags[i]] ) {
+              flagged = true;
+              break;
+            }
+          }
+
+          if ( ! flagged ) {
+            if ( global.FOAM_FLAGS.debug )
+              console.warn("skipping", this.name, "refinement due to flags.");
+            return context.lookup(this.refines);
+          }
+        }
+
         cls = context.lookup(this.refines);
         foam.assert(cls, 'Unknown refinement class: ' + this.refines + ' in: ' + this.id);
       } else {
@@ -171,7 +189,6 @@ foam.LIB({
       // Will be replaced in phase2.
       foam.CLASS = function(m) {
         m.class = m.class || 'foam.core.Model';
-        if ( global.foam.__MODELS__ ) global.foam.__MODELS__.push(m);
 
         m.id = m.package + '.' + m.name;
         var cls = buildClass.call(m);
@@ -188,6 +205,9 @@ foam.LIB({
 
     /** Start second phase of bootstrap process. */
     function phase2() {
+      // Add a pubsub to foam for class definitions
+      foam.pubsub = foam.core.FObject.create();
+
       // Upgrade to final CLASS() definition.
       /* Creates a Foam class from a plain-old-object definition:
           (1) Determine the class of model for the new class's model;
@@ -198,7 +218,6 @@ foam.LIB({
       foam.CLASS = function(m, skipRegistration) {
         var cls   = m.class ? foam.lookup(m.class) : foam.core.Model;
         var model = cls.create(m);
-        global.foam.__MODELS__.push(model);
 
         model.validate();
         // cls was: class-for-model-construction;
@@ -211,6 +230,7 @@ foam.LIB({
         if ( ! m.refines ) {
           // Register class in global context.
           foam.register(cls);
+          foam.pubsub.pub("defineClass", cls.id, cls);
         }
 
         return cls;
@@ -247,6 +267,20 @@ foam.LIB({
       }
 
       delete foam.boot;
+
+      // Track libraries and scripts created after boot
+      foam.__LIBS__ = [];
+      foam.__SCRIPTS__ = [];
+      var foamLIB = foam.LIB;
+      foam.LIB = function(model) {
+        foam.__LIBS__.push(model);
+        foamLIB(model);
+      };
+      var foamSCRIPT = foam.SCRIPT;
+      foam.SCRIPT = function(model) {
+        foam.__SCRIPTS__.push(model);
+        foamSCRIPT(model);
+      };
     }
   ]
 });
