@@ -217,10 +217,37 @@ foam.CLASS({
 
 
 /**
- * Replace foam.CLASS() with a lazy version which only
- * build the class when first accessed.
+ * Some final adjustments.
+ *
+ * Make foam.CLASS lazy so it only builds models and classes when
+ * first accessed.  Also make refinements lazy, so they only trigger
+ * when the class being refined is first referenced.
+ *
+ * Track definitions of LIBs and SCRIPTs
+ *
+ * Also track the order in which Classes, Scripts and Libraries are defined.
  */
 (function() {
+  // Track libraries and scripts created after boot
+  foam.__count = 0;
+
+  foam.__LIBS__ = [];
+  foam.__SCRIPTS__ = [];
+
+  var foamLIB = foam.LIB;
+  foam.LIB = function(model) {
+    foam.__LIBS__.push(model);
+    foamLIB(model);
+    model.order = foam.__count++;
+  };
+
+  var foamSCRIPT = foam.SCRIPT;
+  foam.SCRIPT = function(model) {
+    foam.__SCRIPTS__.push(model);
+    foamSCRIPT(model);
+    model.order = foam.__count++;
+  };
+
   // List of unused Models in the system.
   foam.USED      = {};
   foam.UNUSED    = {};
@@ -234,8 +261,10 @@ foam.CLASS({
 
     if ( ! m.name ) throw new Error("Unnamed model" + m);
 
-    foam.UNUSED[m.id] = m;
+    m.order = foam.__count++;
     m.id = m.package ? m.package + '.' + m.name : m.name;
+
+    foam.UNUSED[m.id] = m;
 
     if ( m.refines ) {
       if ( foam.__context__.isDefined(m.refines) ) {
@@ -245,6 +274,7 @@ foam.CLASS({
       } else {
         foam.pubsub.sub("defineClass", m.refines, function(s) {
           s.detach();
+          delete foam.UNUSED[m.id];
           CLASS(m);
           foam.USED[m.id] = m;
         });
