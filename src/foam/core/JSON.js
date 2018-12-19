@@ -367,6 +367,7 @@ foam.CLASS({
       if ( includeComma ) this.out(',');
 
       this.nl().indent().outputPropertyName(p).out(':', this.postColonStr);
+
       this.output(p.toJSON(v, this), p.of);
 
       return true;
@@ -482,7 +483,7 @@ foam.CLASS({
           this.end(']');
         },
         Object: function(o) {
-          if ( o.isSubClass ) {
+          if ( foam.core.FObject.isSubClass(o) ) {
             this.output({ class: '__Class__', forClass_: o.id });
           } else if ( o.outputJSON ) {
             o.outputJSON(this);
@@ -690,7 +691,6 @@ foam.LIB({
 
   methods: [
     {
-      // TODO: why is this called parse when it's really objectify?
       name: 'parse',
       code: foam.mmethod({
         Array: function(o, opt_class, opt_ctx) {
