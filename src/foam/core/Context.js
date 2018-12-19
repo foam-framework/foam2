@@ -66,6 +66,11 @@ foam.SCRIPT({
       return !! this.__cache_[id];
     },
 
+    isDefined: function(id) {
+      return !! this.__cache__[id] &&
+        ! foam.Function.isInstance(this.__cache__[id]);
+    },
+
     /**
      * Register a class into the given context.  After registration
      * the class can be found again by calling foam.lookup('com.foo.SomeClass');
