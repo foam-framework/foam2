@@ -959,7 +959,11 @@ foam.LIB({
 
     methods: [
       function clone(o)      { return typeOf(o).clone(o); },
-      function equals(a, b)  { return typeOf(a).equals(a, b); },
+      function equals(a, b)  {
+        var typeA = typeOf(a);
+        var typeB = typeOf(b);
+        return typeA === typeB && typeA.equals(a, b);
+      },
       function is(a, b) {
         var aType = typeOf(a);
         var bType = typeOf(b);
