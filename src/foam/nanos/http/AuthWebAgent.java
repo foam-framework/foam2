@@ -36,20 +36,22 @@ public class AuthWebAgent
 
   public Cookie getCookie(HttpServletRequest req) {
     Cookie[] cookies = req.getCookies();
+    if ( cookies == null ) {
+      return null;
+    }
 
-    if ( cookies != null )
-      for ( Cookie cookie : cookies )
-        if ( SESSION_ID.equals(cookie.getName()) )
-          return cookie;
+    for ( Cookie cookie : cookies ) {
+      if ( SESSION_ID.equals(cookie.getName()) ) {
+        return cookie;
+      }
+    }
 
     return null;
   }
 
-  public void createCookie(X x, Session session){
-    HttpServletResponse resp   = x.get(HttpServletResponse.class);
-    Cookie              cookie = new Cookie(SESSION_ID, session.getId());
-
-    resp.addCookie(cookie);
+  public void createCookie(X x, Session session) {
+    HttpServletResponse resp = x.get(HttpServletResponse.class);
+    resp.addCookie(new Cookie(SESSION_ID, session.getId()));
   }
 
   public void templateLogin(X x) {
@@ -64,9 +66,9 @@ public class AuthWebAgent
     out.println("<label style=\"display:inline-block;width:70px;\">Password:</label>");
     out.println("<input name=\"password\" id=\"password\" type=\"password\" size=\"30\" style=\"display:inline-block;\"></input>");
     out.println("<br>");
-    out.println("<button type=submit style=\"display:inline-block;margin-top:10px;\"; onclick=\"checkEmpty()\">Log In</button>");
+    out.println("<button id=\"login\" type=submit style=\"display:inline-block;margin-top:10px;\";>Log In</button>");
     out.println("</form>");
-    out.println("<script>function checkEmpty() { if ( document.getElementById('user').value == '') { alert('Email Required'); } else if ( document.getElementById('password').value == '') { alert('Password Required'); } }</script>");
+    out.println("<script>document.getElementById('login').addEventListener('click', checkEmpty); function checkEmpty() { if ( document.getElementById('user').value == '') { alert('Email Required'); } else if ( document.getElementById('password').value == '') { alert('Password Required'); } }</script>");
   }
 
   /** If provided, use user and password parameters to login and create session and cookie. **/
@@ -97,10 +99,14 @@ public class AuthWebAgent
     if ( ! SafetyUtil.isEmpty(sessionId) ) {
       session = (Session) sessionDAO.find(sessionId);
       if ( session == null ) {
+        // create new session
         session = new Session();
         session.setId(sessionId);
-        createCookie(x, session);
-      } else if ( ! attemptLogin && session.getContext().get("user") != null ) {
+      }
+
+      // save cookie
+      createCookie(x, session);
+      if ( ! attemptLogin && session.getContext().get("user") != null ) {
         return session;
       }
     } else {
@@ -157,7 +163,9 @@ public class AuthWebAgent
       }
 
       try {
-        User user = auth.loginByEmail(session.getContext(), email, password);
+        User user = auth.loginByEmail(session.getContext()
+          .put(HttpServletRequest.class, req)
+          .put(HttpServletResponse.class, resp), email, password);
 
         if ( user != null ) {
           return session;
@@ -191,7 +199,7 @@ public class AuthWebAgent
     AuthService auth    = (AuthService) x.get("auth");
     Session     session = authenticate(x);
 
-    if ( session != null && session.getContext() != null ) {
+    if ( session != null && session.getContext() != null && session.getContext().get("user") != null ) {
       if ( auth.check(session.getContext(), permission_) ) {
         getDelegate().execute(x.put(Session.class, session).put("user", session.getContext().get("user")));
       } else {

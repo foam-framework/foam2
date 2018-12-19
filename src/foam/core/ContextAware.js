@@ -10,11 +10,11 @@ foam.INTERFACE({
   methods: [
     {
       name: 'getX',
-      type: 'Context'
+      returns: 'Context'
     },
     {
       name: 'setX',
-      type: 'Void',
+      returns: 'Void',
       args: [ { name: 'x', type: 'Context' } ]
     }
   ]

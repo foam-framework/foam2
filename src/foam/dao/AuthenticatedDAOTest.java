@@ -64,8 +64,8 @@ public class AuthenticatedDAOTest
     userDAO_.put(testUser_);
 
     // Mock the groupDAO.
-    x = TestUtils.mockDAO(x, "groupDAO");
-    DAO groupDAO = (DAO) x.get("groupDAO");
+    x = TestUtils.mockDAO(x, "localGroupDAO");
+    DAO groupDAO = (DAO) x.get("localGroupDAO");
 
     // Put a group in the groupDAO with permission to read, update, and delete the testObjDAO.
     Permission adminPermissions[] = new Permission[5];

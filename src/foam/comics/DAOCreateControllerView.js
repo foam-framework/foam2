@@ -82,7 +82,8 @@ foam.CLASS({
                 add(this.data.cls_.getAxiomsByClass(foam.core.Action)).
               end().
             end().
-            tag({class: this.detailView}, {data$: this.data$.dot('data')}).
+            tag({class: this.detailView}, {data: this.data.obj}).
+            add(this.data$.dot('data')).
           end().
         end().
       end();

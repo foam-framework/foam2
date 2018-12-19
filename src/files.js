@@ -90,7 +90,8 @@ FOAM_FILES([
   { name: "foam/core/Detachable" },
   { name: "foam/core/AbstractFObject" },
   { name: "foam/core/ContextAgent" },
-  { name: "foam/java/Validation" },
+  { name: "foam/core/Validatable" },
+  { name: "foam/java/Authorizable" },
   { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
   { name: "foam/swift/SwiftLib", flags: ['swift'] },
   { name: "foam/swift/SwiftClass", flags: ['swift'] },
@@ -352,6 +353,7 @@ FOAM_FILES([
   { name: "foam/box/ForwardBox" },
   { name: "foam/box/ForwardingBox" },
   { name: "foam/box/SessionClientBox" },
+  { name: "foam/box/AuthServiceClientBox" },  
 
   { name: "foam/swift/refines/Stub", flags: ['swift'] },
   { name: "foam/swift/refines/Promised", flags: ['swift'] },

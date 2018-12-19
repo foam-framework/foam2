@@ -40,6 +40,7 @@ foam.CLASS({
         return o || self.delegate.find_(x, id);
       });
     },
+
     function select_(x, sink, skip, limit, order, predicate) {
       var self = this;
       sink = sink || self.ArraySink.create();
@@ -49,6 +50,6 @@ foam.CLASS({
       }).then(function() {
         return sink;
       });
-    },
+    }
   ]
 });

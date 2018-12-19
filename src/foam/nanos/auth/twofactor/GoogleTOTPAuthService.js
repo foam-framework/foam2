@@ -14,6 +14,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.User',
+    'foam.nanos.notification.email.SMTPEmailService',
     'foam.nanos.session.Session',
     'foam.util.SafetyUtil',
     'io.nayuki.qrcodegen.QrCode',
@@ -46,7 +47,8 @@ foam.CLASS({
     {
       name: 'generateKey',
       javaCode: `
-        User user = (User) x.get("user");
+        User user = (User) (x.get("agent") != null ?
+          x.get("agent") : x.get("user"));
         DAO userDAO = (DAO) x.get("localUserDAO");
 
         // fetch from user dao to get secret key
@@ -67,8 +69,10 @@ foam.CLASS({
 
         try {
           AppConfig config = (AppConfig) x.get("appConfig");
-          String path = String.format("/%s:%s", config.getName(), user.getEmail());
-          String query = String.format("secret=%s&issuer=%s&algorithm=%s", key, config.getName(), getAlgorithm());
+          SMTPEmailService service = (SMTPEmailService) x.get("smtpEmailService");
+          String name = service == null ? "FOAM" : service.getDisplayName();
+          String path = String.format("/%s:%s", name, user.getEmail());
+          String query = String.format("secret=%s&issuer=%s&algorithm=%s", key, name, getAlgorithm());
           URI uri = new URI("otpauth", "totp", path, query, null);
           return "data:image/svg+xml;charset=UTF-8," + QrCode.encodeText(uri.toASCIIString(), QrCode.Ecc.MEDIUM).toSvgString(0);
         } catch ( Throwable t ) {
@@ -80,9 +84,12 @@ foam.CLASS({
       name: 'verifyToken',
       javaCode: `
         long code = Long.parseLong(token, 10);
-        User user = (User) x.get("user");
+        User user = (User) (x.get("agent") != null ?
+          x.get("agent") : x.get("user"));
         DAO userDAO = (DAO) x.get("localUserDAO");
         DAO sessionDAO = (DAO) x.get("sessionDAO");
+
+        String sessionUser = (String) ( x.get("agent") != null ? "agent" : "user" );
 
         // fetch from user dao to get secret key
         user = (User) userDAO.find(user.getId());
@@ -96,8 +103,7 @@ foam.CLASS({
 
           // update session with two factor success set to true
           Session session = x.get(Session.class);
-          session.setUserId(user.getId());
-          session.setContext(session.getContext().put("user", user).put("twoFactorSuccess", true));
+          session.setContext(session.getContext().put(sessionUser, user).put("twoFactorSuccess", true));
           sessionDAO.put(session);
           return true;
         }
@@ -109,7 +115,8 @@ foam.CLASS({
       name: 'disable',
       javaCode: `
         if ( verifyToken(x, token) ) {
-          User user = (User) x.get("user");
+          User user = (User) (x.get("agent") != null ?
+            x.get("agent") : x.get("user"));
           DAO userDAO = (DAO) x.get("localUserDAO");
 
           // fetch user from DAO and set two factor secret to null
