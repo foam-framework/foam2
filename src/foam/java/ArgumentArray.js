@@ -17,8 +17,8 @@ foam.CLASS({
       // Support type short-form: 'Type argName'
       if ( foam.String.isInstance(e) ) {
         var a = e.split(' ');
-        console.log('3 **************************************************************************',a);
-        e = { of: a[0], name: a[1] };
+        // console.log('ArgumentArray.adaptArrayElement **************************************************************************',a);
+        e = { type: a[0], name: a[1] };
       }
 
       return foam.core.FObjectArray.ADAPT_ARRAY_ELEMENT.value.call(this, e, obj);
@@ -28,6 +28,7 @@ foam.CLASS({
       // FObject obj, Int age, String name
       if ( foam.String.isInstance(a) ) {
         a = a.split(',');
+        // console.log('ArgumentArray.adapt **************************************************************************',a);
       }
 
       return foam.core.FObjectArray.ADAPT.value.call(this, _, a, prop);
