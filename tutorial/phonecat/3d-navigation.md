@@ -402,7 +402,7 @@ The `$` appended to `this.image`. `this.image$` is `a slot` (object-oriented p
 Once you’ve got this file saved, reload the app and navigate to a phone.  You should see its information nicely laid out. Clicking a thumbnail image will load the larger version.
 
 
-# **Finished**
+## **Finished**
 
 And that's the complete app! Hopefully you now have a better feel for the steps for building a FOAM app and are ready to start building your own.
 

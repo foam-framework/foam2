@@ -150,7 +150,7 @@ foam.CLASS({
 
 **STEP #6.** Reload your app. 
 
-# **Conclusion**
+## **Conclusion**
 
 Now your app should look much better and the search and sort functions work! You are now ready for the final stage of your basic app in FOAM.  Please proceed to the next lesson on navigation.
 
