@@ -32,7 +32,6 @@ This appendix introduces further details about parts of FOAM that aren't necessa
 
 ---
 
-  
 
 ## **1. Properties**
 
@@ -376,13 +375,14 @@ This query syntax works on all DAOs, including plain Javascript arrays. It is al
 
 ### **Tutorial Menu:**
 
-1. [Getting Started](../1-gettingstarted/) 
-2. [Core Concepts](../2-concepts/) 
-3. Applied Learning: Build a Basic App with FOAM
-     1. [Defining the Model](../3a-model/)
-     2. [the Controller](../3b-dao/)
-     3. [UI Library](../3c-UI/)
-     4. [Navigation](../3d-navigation/)
+1. [Getting Started](../1-gettingstarted/)
+1. [Core Concepts](../2-concepts/)
+1. Applied Learning: Build a Basic App with FOAM
+    * [Defining the Model](../3a-model/)
+    * [The Controller](../3b-dao/)
+    * [UI Library](../3c-UI/)
+    * [Navigation](../3d-navigation/)
+
 * [Tutorial Overview](../0-intro/)
 * [About FOAM](/foam/about/)
-* [Appendix](../4-appendix/) 
+* [Appendix](../4-appendix/)

@@ -10,11 +10,11 @@ This tutorial will provide the user with a good understanding of the core concep
 
 ### **Tutorial Menu:** 
 
-1. [Getting Started](../1-gettingstarted/) 
-1. [Core Concepts](../2-concepts/) 
+1. [Getting Started](../1-gettingstarted/)
+1. [Core Concepts](../2-concepts/)
 1. Applied Learning: Build a Basic App with FOAM
     * [Defining the Model](../3a-model/)
-    * [the Controller](../3b-dao/)
+    * [The Controller](../3b-dao/)
     * [UI Library](../3c-UI/)
     * [Navigation](../3d-navigation/)
 
