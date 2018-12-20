@@ -162,7 +162,7 @@ The `<foam>` tag is convenient for loading a given model and view and inserting 
 
 In this part of the tutorial, we have explained the use of DAOs, the DetailView and the controller in FOAM.  You have applied a controller to your app and used DetailView to assess your work. You are now ready to move onto learning about FOAM UI components and add them to your app.
 
-## **[NEXT: Part III - c. User Interface Library](../3c-UI/)**
+## **[NEXT: Part III - Applied Learning - User Interface Library](../3c-UI/)**
   
 
 ### **Tutorial Menu:** 

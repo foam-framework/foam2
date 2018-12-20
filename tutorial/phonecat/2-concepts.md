@@ -109,7 +109,7 @@ which will output
      }
      {% endhighlight %}
 
-These objects can be manipulated very much like plain old Javascript objects such as properties and methods, however, new instances are created with `MyClass.create({...})` rather than `new MyClass(...)'.  
+These objects can be manipulated very much like plain old Javascript objects such as properties and methods, however, new instances are created with `MyClass.create({...})` rather than `new MyClass(...)`.  
 
 
 ### **4. Extending Classes** 
@@ -202,7 +202,7 @@ FOAM tries to provide many missing utilities from Javascript and web platform.  
 
 Please proceed to the next stage of this tutorial, Applied Learning - a. Defining the Model.
 
-## **[NEXT:  Part III - Applied Learning a. Defining the Model](../3a-model/)**
+## **[NEXT:  Part III - Applied Learning - Defining the Model](../3a-model/)**
 
 ### **Tutorial Menu:** 
 
