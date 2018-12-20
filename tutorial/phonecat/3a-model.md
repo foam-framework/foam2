@@ -18,7 +18,7 @@ The first step to any FOAM application is to define the data model: the M of MVC
 
 For example, the model for an email client might consist of a handful of classes: `Email`, `Attachment`, `Contact`, and maybe `Thread` and `Label`.  Your application has only one class in its Model: `Phone`. `Phone` has many properties; most of them giving the specifications of the device.
 
-# **Tutorial Application**
+## **Tutorial Application**
 
 **STEP 1:** Enter the following code in `$PROJECT/Phone.js`:
 
@@ -50,7 +50,7 @@ For example, the model for an email client might consist of a handful of classes
 
 
 
-# **Conclusion**
+## **Conclusion**
 
 If this class doesn't seem to do much that's because it doesn't. This simply specifies what properties there are and a few extra details about some of them.  However,  like all great ideas, your app needs a basis for how it will materialize into the real world, and hence defining the model is the first step to writing a great app with FOAM. 
 

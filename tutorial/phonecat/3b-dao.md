@@ -30,18 +30,18 @@ FOAM's data storage library contains many implementations of the common DAO inte
 
 There are also many DAO "decorators" which add extra functionality on top of other DAOs. This spares each DAO's author from having to reimplement caching, autoincrement, logging and timing.
 
-## **2. the FOAM DetailView** 
+## **2. The FOAM DetailView** 
 
 The FOAM `DetailView` has a `data` property which is set to a specified FOAM object. 
 
 The FOAM `DetailView` has a default template which runs through the list of `properties` on the object and displays their `name`s (or `label`s, if set) in the left column of a table and their `view`s on the right. Therefore, we don't really have to define a custom view here. 
 
-## **3. the Controller**
+## **3. The Controller**
 
 At the top level of an app, the controller (C of MVC) is responsible for connecting the views and model. The controller knows nothing about how the app is laid out visually; it just creates the components and binds them together.
 
 
-# **Tutorial Application**
+## **Tutorial Application**
 
 For this simple app, you will have a small controller with very few parts:
 
@@ -158,7 +158,7 @@ If loaded into your browser, you'll see that it's far from pretty but that searc
 The `<foam>` tag is convenient for loading a given model and view and inserting it into the DOM.
 
 
-# **Conclusion**
+## **Conclusion**
 
 In this part of the tutorial, we have explained the use of DAOs, the DetailView and the controller in FOAM.  You have applied a controller to your app and used DetailView to assess your work. You are now ready to move onto learning about FOAM UI components and add them to your app.
 

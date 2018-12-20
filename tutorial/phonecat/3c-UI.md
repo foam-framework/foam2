@@ -23,7 +23,7 @@ FOAM’s U2 syntax provides methods for adding and interacting with UI component
 {% endraw %}
 
 
-# **TUTORIAL APPLICATION**
+## **Tutorial Application**
 
 Let’s define the `initE()` for each phone in the catalog. 
 
