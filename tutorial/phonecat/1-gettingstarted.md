@@ -17,7 +17,7 @@ Let's dive right in.
      1. [FOAM framework](https://github.com/foam-framework/foam2.git)
      2. [GIT GUI](https://www.sourcetreeapp.com/)
      3. [Python](https://www.python.org/downloads/) (Python is our recommended local web server)
-     4. [Tutorial Companion File](../bundle.zip) **NOT REALLY USED IN TUTORIAL, CAN WE REMOVE IT?**
+     4. [Tutorial Companion File](../bundle.zip)
 
      When downloading, save the FOAM framework to your project folder. A sub-directory will be created that holds all the code for FOAM as well as numerous demos and test pages.
 
@@ -59,17 +59,18 @@ Let's dive right in.
 
 If that's what you're seeing, then congratulations! You've got FOAM running and you're ready to move on to the next stage in this tutorial: Core Concepts.
 
-# **[NEXT:  Part II - Core Concepts](../2-concepts/)** 
+## **[NEXT:  Part II - Core Concepts](../2-concepts/)** 
 
 ### **Tutorial Menu:** 
 
-1. [Getting Started](../1-gettingstarted/) 
-2. [Core Concepts](../2-concepts/) 
-3. Applied Learning: Build a Basic App with FOAM
-     1. [Defining the Model](../3a-model/)
-     2. [the Controller](../3b-dao/)
-     3. [UI Library](../3c-UI/)
-     4. [Navigation](../3d-navigation/)
+1. [Getting Started](../1-gettingstarted/)
+1. [Core Concepts](../2-concepts/)
+1. Applied Learning: Build a Basic App with FOAM
+    * [Defining the Model](../3a-model/)
+    * [The Controller](../3b-dao/)
+    * [UI Library](../3c-UI/)
+    * [Navigation](../3d-navigation/)
+
 * [Tutorial Overview](../0-intro/)
 * [About FOAM](/foam/about/)
-* [Appendix](../4-appendix/) 
+* [Appendix](../4-appendix/)
