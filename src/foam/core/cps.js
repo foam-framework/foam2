@@ -363,6 +363,45 @@
 
     prog(nop, nop);
   }
+
+  // The CPS library also provides some convenience methods for
+  // mapping, iterating and reducing arrays with CPS functions.
+
+  with ( foam.cps ) {
+    let data = [ 1, 2, 3, 4, 5 ];
+
+    function log(then, abort, element) {
+      message(then, abort, element)
+    }
+
+    // 'forEach' takes a CPS function and composes it into a function
+    // which takes an array and will iterate all values.
+    let logger = forEach(log);
+    logger(nop, nop, data);
+
+    // We can use 'wrap' from before to let us write our iteration
+    // function as a normal synchronous function.
+    let timestwo = wrap(function(v) {
+      return v * 2;
+    });
+
+    // Use 'map' to builder a mapping function from our doubler
+    // defined above.
+    let doubler = map(timestwo);
+
+    let prog = compose(logger, doubler);
+    prog(nop, nop, data);
+
+    // Finally let's sum our array using the CPS 'reduce' function.
+
+    function adder(then, abort, a, b) {
+      then(a + b);
+    }
+
+    prog = compose(bind(message, 'Your sum is: '), reduce(adder));
+    prog(nop, nop, data);
+  }
+
  */
 foam.LIB({
   name: 'foam.cps',
@@ -522,10 +561,14 @@ foam.LIB({
     function forEach(f) {
       return function(then, abort, array) {
         function loop(then, abort, i) {
-          if ( i < array.length ) f(function() { loop(then, abort, i + 1); },
-                                    abort,
-                                    array[i]);
-          else then(array);
+          if ( i < array.length )
+            f(function() { loop(then, abort, i + 1); },
+              abort,
+              array[i],
+              i,
+              array);
+          else
+            then();
         }
         loop(then, abort, 0);
       };
@@ -537,15 +580,36 @@ foam.LIB({
 
         function loop(then, abort, i) {
           if ( i < array.length )
-            f(function(v) {
-              ret[i] = v;
-              loop(then, abort, i + 1); },
+            f(function(v) { ret[i] = v; loop(then, abort, i + 1); },
               abort,
-              array[i]);
-          else then(array);
+              array[i],
+              i,
+              array);
+          else
+            then(ret);
         }
 
         loop(then, abort, 0);
+      };
+    },
+
+    function reduce(f) {
+      return function(then, abort, array) {
+        function loop(then, abort, acc, i) {
+          if ( i < array.length )
+            f(function(v) { loop(then, abort, v, i + 1); },
+              abort,
+              acc,
+              array[i],
+              i,
+              array);
+          else
+            then(acc);
+        }
+
+        if ( array.length == 0 ) abort('Cannot reduce an empty array');
+        else if ( array.length == 1 ) then(array[0]);
+        else loop(then, abort, array[0], 1);
       };
     },
 
