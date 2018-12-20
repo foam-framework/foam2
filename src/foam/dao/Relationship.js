@@ -142,6 +142,7 @@ foam.CLASS({
       value: false,
       transient: true
     },
+    'order'
     /* FUTURE:
     {
       name: 'deleteStrategy'
@@ -284,6 +285,8 @@ foam.LIB({
 
         r.validate && r.validate();
         r.initRelationship();
+
+        r.order = m.order = foam.__count++;
       }
 
       if ( foam.__context__.isDefined(r.sourceModel) ||

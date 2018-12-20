@@ -47,6 +47,7 @@ foam.CLASS({
     },
     [ 'extends', 'FObject' ],
     'refines',
+    'order',
     { name: 'documentation', adapt: function(_, d) { return typeof d === 'function' ? foam.String.multiline(d).trim() : d; } },
     {
       // List of all axioms, including methods, properties, listeners,
