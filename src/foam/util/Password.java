@@ -16,8 +16,11 @@ import java.util.regex.Pattern;
 
 public class Password {
 
+  // TODO: refs pr-#1757 on the FOAM site.we should NOT make this change until we implement the new password validation
+  // TODO: Fix this once we have the new implementation of the password validation
   // Min 6 characters
-  private static Pattern PASSWORD_PATTERN = Pattern.compile("^.{6,}$");
+  // private static Pattern PASSWORD_PATTERN = Pattern.compile("^.{6,}$");
+  private static Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$");
 
   /**
    * Generates random salt given a size
