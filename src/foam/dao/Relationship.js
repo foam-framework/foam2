@@ -278,6 +278,8 @@ foam.LIB({
       foam.__RELATIONSHIPS__ = foam.__RELATIONSHIPS__ || [];
       foam.__RELATIONSHIPS__.push(m);
 
+      m.order = foam.__count++;
+
       var r = foam.dao.Relationship.create(m, opt_ctx);
 
       function trigger(s) {
@@ -285,8 +287,6 @@ foam.LIB({
 
         r.validate && r.validate();
         r.initRelationship();
-
-        r.order = m.order = foam.__count++;
       }
 
       if ( foam.__context__.isDefined(r.sourceModel) ||
