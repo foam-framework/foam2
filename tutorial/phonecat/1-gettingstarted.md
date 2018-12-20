@@ -30,7 +30,7 @@ Let's dive right in.
      <font color="#555555" > POWERED</font></font></a>';
      {% endhighlight %}
 
-The FOAM library is split across many files, but you only need to include this one JS file in your HTML document: `foam2/src/foam.js`.  
+   The FOAM library is split across many files, but you only need to include this one JS file in your HTML document: `foam2/src/foam.js`.  
 
 1. Create and save a new HTML file in your project directory called `$PROJECT/index.html` with the following contents:
 
