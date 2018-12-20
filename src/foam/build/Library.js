@@ -12,6 +12,9 @@ foam.CLASS({
       value: 0
     },
     {
+      name: 'order'
+    },
+    {
       name: 'flags'
     },
     {

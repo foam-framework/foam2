@@ -325,6 +325,14 @@ foam.CLASS({
   extends: 'Property',
 
   properties: [
+    [
+      'adapt',
+      function(_, v) {
+        if ( v && v.class == '__Class__' )
+          return v.forClass_;
+        return v;
+      }
+    ],
     [ 'type', 'Class' ]
   ],
   methods: [

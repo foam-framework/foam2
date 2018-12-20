@@ -351,27 +351,26 @@ console.log("Done.");
         of: foam.core.Model
       });
 
-      modelDAO = modelDAO.where(
-        E.NOT(E.IN("node", foam.core.Model.FLAGS)));
+      modelDAO = modelDAO.
+        where(E.NOT(E.IN("node", foam.core.Model.FLAGS))).
+        orderBy(foam.core.Model.ORDER);
 
       function inflate(model) {
         return model.cls_ ? model :
           foam.lookup(model.class || 'foam.core.Model').create(model);
       }
 
-      // Trigger all classes.
+      // Load all class models from USED/UNUSED
+      Object.
+        keys(foam.UNUSED).
+        map(k => foam.UNUSED[k]).
+        concat(Object.keys(foam.USED).
+               map(k => foam.USED[k])).
+        forEach(function(m) {
+          modelDAO.put(inflate(m));
+        });
 
-      var unused = Object.
-          keys(foam.UNUSED).
-          map(k => foam.UNUSED[k]);
-      var used = Object.
-          keys(foam.USED).
-          map(k => foam.USED[k]);
-
-      var allmodels = unused.concat(used).forEach(function(m) {
-        modelDAO.put(inflate(m));
-      });
-
+      // Instantiate models for SCRIPTs, LIBs, and RELATIONSHIPs.
       foam.__SCRIPTS__.forEach(function(s) {
         s.class = 'foam.core.Script';
         modelDAO.put(inflate(s));
@@ -403,75 +402,6 @@ console.log("Done.");
         }
       });
 
-      function models(then, abort) {
-        var data = '';
-
-        modelDAO.
-          where(E.AND(E.INSTANCE_OF(foam.core.Model),
-                      E.EQ(foam.core.Model.REFINES, null))).
-          select().then(function(a) {
-          var models = a.array;
-
-          models.
-            filter(function(m) {
-              return !! m.id;
-            }).
-            forEach(function(obj) {
-              data += `foam.CLASS(${serializer.stringify(obj)});\n`;
-            });
-
-          then(data);
-        });
-      }
-
-      function refinements(then, abort) {
-        var data = '';
-
-        modelDAO.
-          where(E.AND(E.INSTANCE_OF(foam.core.Model),
-                      E.NEQ(foam.core.Model.REFINES, null))).
-          select({
-            put: function(m) {
-              data += `foam.CLASS(${serializer.stringify(m)});\n`;
-            },
-            eof: function() { then(data); }
-          });
-      }
-
-      function relationships(then, abort) {
-        var data = '';
-
-        modelDAO.where(E.INSTANCE_OF(foam.dao.Relationship)).select({
-          put: function(s) {
-            data += `foam.RELATIONSHIP(${serializer.stringify(s)});\n`;
-          },
-          eof: function() { then(data); }
-        });
-      }
-
-
-      function libraries(then, abort) {
-        var data = '';
-
-        modelDAO.where(E.INSTANCE_OF(foam.build.Library)).select({
-          put: function(s) {
-            data += `foam.LIB(${serializer.stringify(s)});\n`;
-          },
-          eof: function() { then(data); }
-        });
-      }
-
-      function scripts(then, abort) {
-        var data = '';
-
-        modelDAO.where(E.INSTANCE_OF(foam.core.Script)).select({
-          put: function(s) {
-            data += `foam.SCRIPT(${serializer.stringify(s)});\n`;
-          },
-          eof: function() { then(data); }
-        });
-      }
-
       function bootstrap(then, abort) {
         then([
           { name: "foam/core/poly" },
@@ -497,6 +427,25 @@ console.log("Done.");
 
       var fd = require('fs').openSync(self.targetFile, 'w');
 
+      function models(then, abort) {
+        var data = '';
+
+        modelDAO.orderBy(foam.core.Model.ORDER).select({
+          put: function(s) {
+            var func = foam.core.Model.isInstance(s) ? 'CLASS' :
+                foam.dao.Relationship.isInstance(s) ? 'RELATIONSHIP' :
+                foam.build.Library.isInstance(s) ? 'LIB' :
+                foam.core.Script.isInstance(s) ? 'SCRIPT' : 'UNKNOWN';
+
+            if ( func == 'UNKNOWN' ) throw new Error("What's the right foam.FOO function for a " + s.cls_.id);
+
+
+            data += `foam.${func}(${serializer.stringify(s)});\n`;
+          },
+          eof: function() { then(data); }
+        });
+      }
+
       function write(then, abort, data) {
         require('fs').writeSync(fd, Buffer.from(data, 'utf8'));
         then();
@@ -507,12 +456,6 @@ console.log("Done.");
         then();
       }
 
-
-      modelDAO.select().then(function(a) {
-        a.array.forEach(function(m) {
-        });
-      });
-
       with ( foam.cps ) {
         sequence(
           compose(write, wrap(function() {
@@ -520,10 +463,6 @@ console.log("Done.");
           })),
           compose(write, bootstrap),
           compose(write, models),
-          compose(write, refinements),
-          compose(write, libraries),
-          compose(write, relationships),
-          compose(write, scripts),
           wrap(function() {
             require('fs').closeSync(fd);
           }))(nop, function(error) {
