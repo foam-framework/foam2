@@ -64,6 +64,12 @@ foam.CLASS({
       class: 'StringArray',
       name: 'javaExtends'
     }
+  ],
+  methods: [
+    function validate() {
+      if ( this.extends !== 'foam.core.AbstractInterface' )
+        throw 'INTERFACE: ' + this.id + ' does not extend AbstractInterface.  Did you mean impelments [ \'' + this.extends + '\' ], ?';
+    }
   ]
 });
 
