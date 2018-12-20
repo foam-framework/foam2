@@ -267,20 +267,6 @@ foam.LIB({
       }
 
       delete foam.boot;
-
-      // Track libraries and scripts created after boot
-      foam.__LIBS__ = [];
-      foam.__SCRIPTS__ = [];
-      var foamLIB = foam.LIB;
-      foam.LIB = function(model) {
-        foam.__LIBS__.push(model);
-        foamLIB(model);
-      };
-      var foamSCRIPT = foam.SCRIPT;
-      foam.SCRIPT = function(model) {
-        foam.__SCRIPTS__.push(model);
-        foamSCRIPT(model);
-      };
     }
   ]
 });

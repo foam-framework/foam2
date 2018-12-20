@@ -376,15 +376,15 @@ console.log("Done.");
         modelDAO.put(inflate(s));
       });
 
-      foam.__LIBS__.reduce(function(libs, l) {
-        if ( libs[l.name] ) {
-          l.iteration = libs[l.name] + 1;
-        }
-        libs[l.name] = 0;
-        l.class = 'foam.build.Library';
-        modelDAO.put(inflate(l));
-        return libs;
-      }, {});
+      (function() {
+        var libs = {};
+        foam.__LIBS__.forEach(function(l) {
+          if ( ! foam.Number.isInstance(libs[l.name])) libs[l.name] = 0;
+          l.iteration = libs[l.name]++;
+          l.class = 'foam.build.Library';
+          modelDAO.put(inflate(l));
+        });
+      })();
 
       foam.__RELATIONSHIPS__.forEach(function(r) {
         r.class = 'foam.dao.Relationship';
