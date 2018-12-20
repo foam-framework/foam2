@@ -49,7 +49,9 @@ foam.CLASS({
       },
       expression: function (dao, search, order) {
         var expr = foam.mlang.Expressions.create();
-        return dao.orderBy(order).where(expr.OR(expr.CONTAINS_IC(Phone.SNIPPET, search), expr.CONTAINS_IC(Phone.SNIPPET, search)));
+        return dao.orderBy(order).where(expr.OR(
+          expr.CONTAINS_IC(Phone.SNIPPET, search), 
+          expr.CONTAINS_IC(Phone.SNIPPET, search)));
       }
     },
     'image'
@@ -67,10 +69,11 @@ foam.CLASS({
 
       if (window.location.hash) {
         var expr = foam.mlang.Expressions.create();
-        this.dao.where(expr.EQ(Phone.ID, window.location.hash.substring(1))).select().then(function (sink) {
-          var phone = sink.a[0];
-          self.add(tutorial.PhoneDetialView.create({ data: phone }));
-        })
+        this.dao.where(expr.EQ(Phone.ID, window.location.hash.substring(1))).select()
+          .then(function (sink) {
+            var phone = sink.a[0];
+            self.add(tutorial.PhoneDetialView.create({ data: phone }));
+          })
       } else {
         this
           .add('Search: ').add(this.SEARCH)
