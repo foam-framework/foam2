@@ -51,7 +51,7 @@ foam.CLASS({
   name: 'InterfaceModel',
   extends: 'foam.core.Model',
 
-  documentation: 'An Interface Mode/definition. Created with foam.INTERFACE().',
+  documentation: 'An Interface definition. Created with foam.INTERFACE().',
 
   properties: [
     [ 'extends', 'foam.core.AbstractInterface' ],

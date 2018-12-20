@@ -260,33 +260,43 @@ var addDepsToClasses = function() {
     classloader.addClassPath(p);
   });
 
-  return Promise.all(classes.map(function(cls) {
-    return classloader.load(cls);
-  })).then(function() {
-    var classMap = {};
-    var classQueue = classes.slice(0);
-    while ( classQueue.length ) {
-      var cls = classQueue.pop();
-      if ( ! classMap[cls] && ! blacklist[cls] ) {
-        cls = foam.lookup(cls);
-        if ( ! checkFlags(cls.model_) ) continue;
-        classMap[cls.id] = true;
-        cls.getAxiomsByClass(foam.core.Requires).filter(flagFilter).forEach(function(r) {
-          r.javaPath && classQueue.push(r.javaPath);
-        });
-        cls.getAxiomsByClass(foam.core.Implements).filter(flagFilter).forEach(function(r) {
-          classQueue.push(r.path);
-        });
-        if ( cls.model_.extends ) classQueue.push(cls.model_.extends);
+  return (function() {
+    var loadClass = foam.cps.awrap(classloader.load.bind(classloader));
+
+    function collectDeps() {
+      var classMap = {};
+      var classQueue = classes.slice(0);
+      while ( classQueue.length ) {
+        var cls = classQueue.pop();
+        if ( ! classMap[cls] && ! blacklist[cls] ) {
+          cls = foam.lookup(cls);
+          if ( ! checkFlags(cls.model_) ) continue;
+          classMap[cls.id] = true;
+          cls.getAxiomsByClass(foam.core.Requires).filter(flagFilter).forEach(function(r) {
+            r.javaPath && classQueue.push(r.javaPath);
+          });
+          cls.getAxiomsByClass(foam.core.Implements).filter(flagFilter).forEach(function(r) {
+            classQueue.push(r.path);
+          });
+          if ( cls.model_.extends ) classQueue.push(cls.model_.extends);
+        }
       }
+      classes = Object.keys(classMap);
     }
-    classes = Object.keys(classMap);
-  });
+
+    with ( foam.cps ) {
+      return new Promise(
+        sequence(
+          compose(map(loadClass), value(classes)),
+          wrap(collectDeps)));
+
+    }
+  })();
 };
 
 function checkFlags(model) {
   var parent = true;
-  
+
   if ( model.extends &&
        ( model.extends != 'foam.core.FObject' && model.extends != 'FObject' ) ) {
     parent = checkFlags(foam.lookup(model.extends).model_);
@@ -297,7 +307,7 @@ function checkFlags(model) {
   if ( model.flags && model.flags.indexOf('java') == -1 ) {
     return false;
   }
-  
+
   return true;
 }
 

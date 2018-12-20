@@ -18,7 +18,7 @@
 foam.INTERFACE({
   package: 'foam.net.node',
   name: 'Router',
-  extends: [ 'foam.net.node.Handler' ],
+  implements: [ 'foam.net.node.Handler' ],
 
   methods: [
     {
