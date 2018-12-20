@@ -99,7 +99,7 @@ and it can be instantiated and used like this:
      console.log(p.toJSON());
      {% endhighlight %}
 
-     which will output
+which will output
 
      {% highlight js %}
      {
