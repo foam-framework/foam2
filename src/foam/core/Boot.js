@@ -137,8 +137,6 @@ foam.LIB({
           }
 
           if ( ! flagged ) {
-            if ( global.FOAM_FLAGS.debug )
-              console.warn("skipping", this.name, "refinement due to flags.");
             return context.lookup(this.refines);
           }
         }

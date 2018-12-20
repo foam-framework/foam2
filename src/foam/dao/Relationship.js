@@ -45,7 +45,9 @@ foam.CLASS({
         var s = this.sourceModel;
         var t = this.targetModel;
         return s.substring(s.lastIndexOf('.') + 1) +
-          t.substring(t.lastIndexOf('.') + 1) + this.forwardName + 'Relationship';
+          t.substring(t.lastIndexOf('.') + 1) +
+          foam.String.capitalize(this.forwardName) +
+          'Relationship';
       }
     },
     'forwardName',
@@ -153,6 +155,7 @@ foam.CLASS({
 
   methods: [
     function initRelationship(x) {
+      console.log("Initializing", this.id);
       if ( this.initialized ) return;
       this.initialized = true;
 
@@ -283,6 +286,7 @@ foam.LIB({
       var r = foam.dao.Relationship.create(m, opt_ctx);
 
       function trigger(s) {
+        console.log("Trigger", r.id);
         s && s.detach();
 
         r.validate && r.validate();
