@@ -42,7 +42,8 @@ foam.CLASS({
         .start('li')
           .start('a')
             .attrs({ href: '#' + this.data.id })
-            .start({ class: 'foam.u2.tag.Image', data: this.data.imageUrl })
+            .start({ class: 'foam.u2.tag.Image', 
+                     data: this.data.imageUrl })
               .addClass('thumb').end()
           .end()
           .start('a')
@@ -154,7 +155,7 @@ foam.CLASS({
 
 Now your app should look much better and the search and sort functions work! You are now ready for the final stage of your basic app in FOAM.  Please proceed to the next lesson on navigation.
 
-## **[NEXT: Part III - d. Navigation](../3d-navigation/)** 
+## **[NEXT: Part III - Applied Learning - Navigation](../3d-navigation/)** 
 
 ### **Tutorial Menu:**
 

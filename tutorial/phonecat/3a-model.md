@@ -27,8 +27,8 @@ For example, the model for an email client might consist of a handful of classes
        name: 'Phone',
        properties: [
          'id', 'age', 'name', 'snippet', 'additionalFeatures', 'android',
-         'availability', 'battery', 'camera', 'connectivity', 'description',
-         'display', 'hardware', 'sizeAndWeight', 'storage', 'details',
+         'availability', 'battery', 'camera', 'connectivity', 'display',
+         'description', 'hardware', 'sizeAndWeight', 'storage', 'details',
          { name: 'imageUrl', view: 'foam.u2.ImageView' },
          { name: 'images', class: 'StringArray' }
        ]
@@ -56,7 +56,7 @@ If this class doesn't seem to do much that's because it doesn't. This simply spe
 
 After entering the above code you will have defined the model for your app.  Please have the tutorial bundle ready and select NEXT below to proceed to your next lesson on DAOs and controllers in FOAM.
 
-## **[NEXT:  Part III - b. the Controller](../3b-dao/)**
+## **[NEXT:  Part III - Applied Learning - The Controller](../3b-dao/)**
 
 ### **Tutorial Menu:** 
 

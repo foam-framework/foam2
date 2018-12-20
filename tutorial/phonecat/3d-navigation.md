@@ -69,7 +69,8 @@ foam.CLASS({
 
       if (window.location.hash) {
         var expr = foam.mlang.Expressions.create();
-        this.dao.where(expr.EQ(Phone.ID, window.location.hash.substring(1))).select()
+        this.dao.where(expr.EQ(Phone.ID, 
+            window.location.hash.substring(1))).select()
           .then(function (sink) {
             var phone = sink.a[0];
             self.add(tutorial.PhoneDetialView.create({ data: phone }));

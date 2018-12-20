@@ -13,25 +13,18 @@ This appendix introduces further details about parts of FOAM that aren't necessa
       - Slots
       - Listening to Properties
       - Types
-
-2. Requires, Imports, Exports, and Contexts
+1. Requires, Imports, Exports, and Contexts
     - Requiring Dependencies
     - Contexts and Dependency Injection
     - Contextual Creation
     - Renaming
-
-3. Methods on the Class
-  
-4. Listeners
-
-5. Actions
-  
-6. Methods on all objects
-
-7. DAOs
+1. Methods on the Class
+1. Listeners
+1. Actions
+1. Methods on all objects
+1. DAOs
 
 ---
-
 
 ## **1. Properties**
 
@@ -97,7 +90,7 @@ To make an UI component update every time some property changes:
     this.add(obj.prop$)
     {% endhighlight %}
 
-    To create a listener function on some properties:
+To create a listener function on some properties:
 
     {% highlight js %}
     obj.slot(function[, slots])
@@ -303,7 +296,7 @@ Actions are guarded, GUI-friendly methods. FOAM will run code you supply to dete
 By default, an action is always visible and enabled (so the `isAvailable` above is unnecessary). This button is always visible but only enabled when `this.isStarted` is false. When the button is clicked while enabled, `action` is called. If the button is disabled, nothing happens on a click.
 
 
-## 6. Methods on all objects
+## **6. Methods on all objects**
 
 FOAM includes several properties and methods on all objects:
 
@@ -318,7 +311,7 @@ FOAM includes several properties and methods on all objects:
 - `o.toJSON()` and `o.toXML()` return JSON or XML as a string. Parsers are included to read them in again.
 - `o.write(document)` writes the default view of the object into the document.
 
-## 7. DAOs
+## **7. DAOs**
 
 The DAO interface looks like this, if you pretend Javascript supports interfaces:
 
