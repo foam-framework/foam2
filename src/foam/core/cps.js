@@ -392,7 +392,7 @@ foam.LIB({
           abort,
         ].concat(args));
       };
-    },        
+    },
 
     function bind(f, ...bound) {
       return function(then, abort, ...args) {
@@ -493,7 +493,7 @@ foam.LIB({
       return function(then, abort, ...args) {
         var pending = fs.length
         var values = new Array(fs.length);
-        
+
         var joinAbort = function(e) {
           if ( pending > 0 ) {
             pending = -1;
@@ -517,6 +517,36 @@ foam.LIB({
     // Generates a CPS function that always returns the same value.
     function value(v) {
       return function(then, abort) { then(v); };
+    },
+
+    function forEach(f) {
+      return function(then, abort, array) {
+        function loop(then, abort, i) {
+          if ( i < array.length ) f(function() { loop(then, abort, i + 1); },
+                                    abort,
+                                    array[i]);
+          else then(array);
+        }
+        loop(then, abort, 0);
+      };
+    },
+
+    function map(f) {
+      return function(then, abort, array) {
+        var ret = new Array(array.length);
+
+        function loop(then, abort, i) {
+          if ( i < array.length )
+            f(function(v) {
+              ret[i] = v;
+              loop(then, abort, i + 1); },
+              abort,
+              array[i]);
+          else then(array);
+        }
+
+        loop(then, abort, 0);
+      };
     },
 
     // Generates a CPS function that always aborts with the given value.
