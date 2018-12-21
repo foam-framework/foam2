@@ -13,6 +13,18 @@ foam.CLASS({
 
   requires: ['foam.net.web.HTTPRequest'],
 
+  javaImports: [
+    'java.io.BufferedReader',
+    'java.io.BufferedWriter',
+    'java.io.File',
+    'java.io.FileReader',
+    'java.io.FileWriter',
+    'java.io.ByteArrayInputStream',
+    'java.io.ByteArrayOutputStream',
+    'java.io.IOException',
+    'java.io.InputStream',
+  ],
+
   tableColumns: [
     'id',
     'daoKey',
@@ -81,6 +93,13 @@ foam.CLASS({
     },
     'data',
     {
+      class: 'foam.nanos.fs.FileProperty',
+      name: 'dataFile',
+      label: 'DataFile',
+      documentation: 'dig file to put data',
+      view: { class: 'foam.nanos.dig.DigFileUploadView', data: this.dataFile$ },
+    },
+    {
       class: 'URL',
       name: 'postURL',
       hidden: true
@@ -93,7 +112,8 @@ foam.CLASS({
       displayWidth: 120,
       view: 'foam.nanos.dig.LinkView',
       setter: function() {}, // Prevent from ever getting set
-      expression: function(key, data, email, subject, daoKey, cmd, format, q) {
+      expression: function(key, data, email, subject, daoKey, cmd, format, q, dataFile) {
+
         var query = false;
         var url = "/service/dig";
 
@@ -140,6 +160,12 @@ foam.CLASS({
             url += "data=" + data;
           }
         }
+        if ( dataFile ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "&fileaddress=" + dataFile.address;
+        }
+
         return encodeURI(url);
       }
     },
@@ -150,9 +176,6 @@ foam.CLASS({
       view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 120 },
       visibility: 'RO'
     }
-  ],
-
-  methods: [
   ],
 
   actions: [
@@ -176,6 +199,9 @@ foam.CLASS({
             return result;
           });
           return temp;
+        }, function(error) {
+          alert('Error. status: ' + error.resp.status+' ' + error.resp.statusText);
+          console.log(error.resp);
         });
         this.result = resp;
       }
