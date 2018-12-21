@@ -182,7 +182,7 @@ foam.CLASS({
             .start('input').addClass('attachment-input')
               .attrs({
                 type: 'file',
-                accept: 'application/vnd.ms-excel, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, text/csv'
+                accept: 'application/vnd.ms-excel, text/csv'
               })
               .on('change', this.onChange)
             .end()
@@ -233,13 +233,8 @@ foam.CLASS({
     },
 
     function isFileType(file) {
-      if ( file.type === "application/vnd.ms-excel" ||
-           file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
-           file.type === "application/vnd.oasis.opendocument.text" ||
-           file.type === "application/msword" ||
-           file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-           file.type === "text/csv"
-         ) return true;
+      if ( file.type === "application/vnd.ms-excel" || file.type === "text/csv" ) return true;
+
       return false;
     },
 
