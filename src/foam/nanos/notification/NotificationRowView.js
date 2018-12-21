@@ -215,7 +215,7 @@
       var self = this;
         if ( ! this.data.read ) {
             this.data.read = true;
-            self.notificationDAO.put(this.data);
+            this.notificationDAO.put(this.data);
         }
       },
 
