@@ -13,7 +13,6 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.nanos.session.Session',
     'foam.util.SafetyUtil',
-    'net.nanopay.model.Business',
     'java.util.List'
   ],
 
@@ -43,14 +42,14 @@ foam.CLASS({
       name: 'logoutAgent',
       javaReturns: 'void',
       args: [
-        { of: 'User', name: 'user' },
+        { of: 'User', name: 'agent' },
         { of: 'DAO', name: 'entitiesDAO'}
       ],
       javaCode: `
         ArraySink sink = (ArraySink) entitiesDAO.select(new ArraySink());
-        List<Business> businesses = sink.getArray();
+        List<User> entities = sink.getArray();
 
-        businesses.forEach((business) -> { logoutUser(user, business); });
+        entities.forEach((entity) -> { logoutUser(agent, entity); });
       `
     },
     {
@@ -58,13 +57,13 @@ foam.CLASS({
       javaReturns: 'void',
       args: [
         { of: 'User', name: 'user' },
-        { of: 'Business', name: 'business' }
+        { of: 'User', name: 'entity' }
       ],
       javaCode: `
         long userId = user.getId();
         ArraySink sink = (ArraySink) sessionDAO_.where(
           MLang.EQ(Session.USER_ID,
-            business != null ? business.getId() : userId))
+            entity != null ? entity.getId() : userId))
           .select(new ArraySink());
         List<Session> sessions = sink.getArray();
 
