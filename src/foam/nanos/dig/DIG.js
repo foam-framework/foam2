@@ -199,9 +199,6 @@ foam.CLASS({
             return result;
           });
           return temp;
-        }, function(error) {
-          alert('Error. status: ' + error.resp.status+' ' + error.resp.statusText);
-          console.log(error.resp);
         });
         this.result = resp;
       }
