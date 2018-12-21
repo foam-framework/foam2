@@ -13,18 +13,6 @@ foam.CLASS({
 
   requires: ['foam.net.web.HTTPRequest'],
 
-  javaImports: [
-    'java.io.BufferedReader',
-    'java.io.BufferedWriter',
-    'java.io.File',
-    'java.io.FileReader',
-    'java.io.FileWriter',
-    'java.io.ByteArrayInputStream',
-    'java.io.ByteArrayOutputStream',
-    'java.io.IOException',
-    'java.io.InputStream',
-  ],
-
   tableColumns: [
     'id',
     'daoKey',
