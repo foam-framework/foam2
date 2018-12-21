@@ -9,10 +9,7 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.mlang.MLang',
-    'foam.nanos.auth.AuthService',
-    'foam.nanos.auth.User',
     'foam.nanos.session.Session',
-    'foam.util.SafetyUtil',
     'java.util.List'
   ],
 
