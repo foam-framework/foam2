@@ -212,7 +212,7 @@
       },
 
       function read() {
-      var self = this;
+
         if ( ! this.data.read ) {
             this.data.read = true;
             this.notificationDAO.put(this.data);

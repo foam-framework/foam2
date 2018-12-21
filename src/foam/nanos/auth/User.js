@@ -170,8 +170,8 @@ foam.CLASS({
       class: 'foam.nanos.fs.FileProperty',
       name: 'profilePicture',
       documentation: 'User\' profile picture.',
-      view: {class: 'foam.nanos.auth.ProfilePictureView',
-
+      view: {
+        class: 'foam.nanos.auth.ProfilePictureView',
         placeholderImage: 'images/ic-placeholder.png'
       }
     },
@@ -343,7 +343,7 @@ foam.CLASS({
           throw new AuthorizationException("You do not have permission to set that user's group to '" + this.getGroup() + "'.");
         }
 
-        // Prevent everyone but admins from changing the 'system' property. 
+        // Prevent everyone but admins from changing the 'system' property.
         if ( this.getSystem() && ! user.getGroup().equals("admin") ) {
           throw new AuthorizationException("You do not have permission to change the 'system' flag.");
         }
@@ -360,13 +360,13 @@ foam.CLASS({
         User user = (User) x.get("user");
         User agent = (User) x.get("agent");
         AuthService auth = (AuthService) x.get("auth");
-        
+
         boolean findSelf = SafetyUtil.equals(this.getId(), user.getId()) ||
           (
             agent != null &&
             SafetyUtil.equals(agent.getId(), this.getId())
           );
-        
+
         if (
           ! findSelf &&
           ! auth.check(x, "user.read." + this.getId()) &&
@@ -418,7 +418,7 @@ foam.CLASS({
           }
         }
 
-        // Prevent everyone but admins from changing the 'system' property. 
+        // Prevent everyone but admins from changing the 'system' property.
         if (
           ! SafetyUtil.equals(oldUser.getSystem(), this.getSystem()) &&
           ! user.getGroup().equals("admin")
