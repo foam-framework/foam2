@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'GoogleTOTPAuthService',
   extends: 'foam.nanos.auth.twofactor.AbstractTOTPAuthService',
 
+  documentation: 'Google Authenticator Time-based One-time Password Service (TOTP)',
+
   javaImports: [
     'com.google.common.io.BaseEncoding',
     'foam.dao.DAO',
@@ -40,7 +42,7 @@ foam.CLASS({
   ],
 
   properties: [
-    ['algorithm', 'SHA1' ]
+    [ 'algorithm', 'SHA1' ]
   ],
 
   methods: [
@@ -48,7 +50,8 @@ foam.CLASS({
       name: 'generateKey',
       javaCode: `
         User user = (User) (x.get("agent") != null ?
-          x.get("agent") : x.get("user"));
+          x.get("agent") :
+          x.get("user")) ;
         DAO userDAO = (DAO) x.get("localUserDAO");
 
         // fetch from user dao to get secret key
@@ -83,10 +86,11 @@ foam.CLASS({
     {
       name: 'verifyToken',
       javaCode: `
-        long code = Long.parseLong(token, 10);
-        User user = (User) (x.get("agent") != null ?
-          x.get("agent") : x.get("user"));
-        DAO userDAO = (DAO) x.get("localUserDAO");
+        long code      = Long.parseLong(token, 10);
+        User user      = (User) (x.get("agent") != null ?
+          x.get("agent") :
+          x.get("user")) ;
+        DAO userDAO    = (DAO) x.get("localUserDAO");
         DAO sessionDAO = (DAO) x.get("sessionDAO");
 
         String sessionUser = (String) ( x.get("agent") != null ? "agent" : "user" );
@@ -115,8 +119,9 @@ foam.CLASS({
       name: 'disable',
       javaCode: `
         if ( verifyToken(x, token) ) {
-          User user = (User) (x.get("agent") != null ?
-            x.get("agent") : x.get("user"));
+          User user   = (User) (x.get("agent") != null ?
+            x.get("agent") :
+            x.get("user")) ;
           DAO userDAO = (DAO) x.get("localUserDAO");
 
           // fetch user from DAO and set two factor secret to null
@@ -124,6 +129,7 @@ foam.CLASS({
           user.setTwoFactorEnabled(false);
           user.setTwoFactorSecret(null);
           userDAO.put_(x, user);
+
           return true;
         }
 
