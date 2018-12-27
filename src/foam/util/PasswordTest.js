@@ -35,10 +35,8 @@ foam.CLASS({
         // isValid tests
         Password_IsValid(null, false, "isValid method returns false given null");
         Password_IsValid("", false, "isValid method returns false given empty string");
-        Password_IsValid("foam", false, "isValid returns false given password shorter than 8 characters");
-        Password_IsValid("foamframework", false, "isValid returns false given password with no uppercase and no numbers");
-        Password_IsValid("Foamframework", false, "isValid returns false given password with no numbers");
-        Password_IsValid("F0amframew0rk", true, "isValid returns true given password longer than 8 characters, with uppercase and with numbers");
+        Password_IsValid("foam", false, "isValid returns false given password shorter than 6 characters");
+        Password_IsValid("F0amframew0rk", true, "isValid returns true given password longer than 6 characters, with uppercase and with numbers");
       `
     },
     {

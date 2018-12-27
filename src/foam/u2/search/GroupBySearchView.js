@@ -96,7 +96,7 @@ foam.CLASS({
   methods: [
     function clear() {
       this.view.data = '';
-      this.hardData = undefined;
+      this.hardData  = undefined;
     },
 
     function initE() {

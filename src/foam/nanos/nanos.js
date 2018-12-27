@@ -167,5 +167,6 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/NotificationNotificationView'},
   { name: 'foam/nanos/notification/notifications/ScriptRunNotificationNotificationView'},
   { name: 'foam/nanos/dashboard/Demo' },
-  { name: 'foam/nanos/dig/SUGAR' }
+  { name: 'foam/nanos/dig/SUGAR' },
+  { name: 'foam/nanos/dig/DigFileUploadView'},
 ]);
