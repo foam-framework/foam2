@@ -111,7 +111,8 @@ foam.CLASS({
       name: 'summaryView',
       factory: function() {
         return this.data.summaryView || this.importedSummaryView || {
-          class: 'foam.u2.view.ScrollTableView'
+          class: 'foam.u2.view.ScrollTableView',
+          fitInScreen: true
         };
       }
     },
