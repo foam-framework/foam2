@@ -170,7 +170,10 @@ foam.LIB({
           // Relay 'installAxiom' events from parent class.
           parent.pubsub_ && parent.pubsub_.sub(
             'installAxiom',
-            function(_, a1, a2, a3) { cls.pubsub_.pub(a1, a2, a3); });
+            function(_, a1, a2, a3) {
+              cls.private_.axiomCache = {};
+              cls.pubsub_.pub(a1, a2, a3);
+            });
         }
       }
 
