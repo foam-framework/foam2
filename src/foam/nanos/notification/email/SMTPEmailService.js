@@ -11,7 +11,6 @@ foam.CLASS({
   documentation: 'Implementation of Email Service using SMTP',
 
   implements: [
-    'foam.nanos.NanoService',
     'foam.nanos.notification.email.EmailService'
   ],
 
@@ -25,18 +24,12 @@ foam.CLASS({
     'foam.core.X',
     'foam.nanos.pool.FixedThreadPool',
     'foam.util.SafetyUtil',
-    'java.nio.charset.StandardCharsets',
     'java.util.Date',
     'java.util.Properties',
     'javax.mail.*',
     'javax.mail.internet.InternetAddress',
     'javax.mail.internet.MimeMessage',
     'org.apache.commons.lang3.StringUtils',
-    'org.jtwig.environment.EnvironmentConfiguration',
-    'org.jtwig.environment.EnvironmentConfigurationBuilder',
-    'org.jtwig.JtwigModel',
-    'org.jtwig.JtwigTemplate',
-    'org.jtwig.resource.loader.TypedResourceLoader',
     'foam.dao.DAO',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Group',
@@ -50,7 +43,7 @@ foam.CLASS({
   axioms: [
     {
       name: 'javaExtras',
-      buildJavaClass: function (cls) {
+      buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data:
 `private class SMTPAuthenticator extends javax.mail.Authenticator {
@@ -68,9 +61,8 @@ foam.CLASS({
   }
 }
 
-protected Session session_ = null;
-protected EnvironmentConfiguration config_ = null;`
-        }))
+protected Session session_ = null;`
+        }));
       }
     }
   ],
@@ -130,28 +122,6 @@ protected EnvironmentConfiguration config_ = null;`
   ],
 
   methods: [
-    {
-      name: 'getConfig',
-      javaReturns: 'EnvironmentConfiguration',
-      args: [
-        {
-          name: 'group',
-          javaType: 'String'
-        }
-      ],
-      javaCode:
-`if ( config_ == null ) {
-  config_ = EnvironmentConfigurationBuilder
-    .configuration()
-    .resources()
-      .resourceLoaders()
-        .add(new TypedResourceLoader("dao", new DAOResourceLoader(getX(), group)))
-      .and()
-    .and()
-  .build();
-}
-return config_;`
-    },
     {
       name: 'createMimeMessage',
       javaReturns: 'MimeMessage',
@@ -269,39 +239,11 @@ if ( ! this.getEnabled() ) return;
     {
       name: 'sendEmailFromTemplate',
       javaCode: `
-if ( ! this.getEnabled() ) return;
-
-String group = user != null ? (String) user.getGroup() : null;
-EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(getX(), name, group);
-if ( emailMessage == null )
-  return;
-
-for ( String key : templateArgs.keySet() ) {
-  Object value = templateArgs.get(key);
-  if ( value instanceof String ) {
-    String s = (String) value;
-    templateArgs.put(key, new String(s.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
-  }
-}
-
-EnvironmentConfiguration config = getConfig(group);
-JtwigModel model = JtwigModel.newModel(templateArgs);
-emailMessage = (EmailMessage) emailMessage.fclone();
-
-JtwigTemplate templateBody =    JtwigTemplate.inlineTemplate(emailTemplate.getBody(), config);
-emailMessage.setBody(templateBody.render(model));
-
-// If subject has already provided, then we don't want to use template subject.
-if (SafetyUtil.isEmpty(emailMessage.getSubject())) {
-  JtwigTemplate templateSubject = JtwigTemplate.inlineTemplate(emailTemplate.getSubject(), config);
-  emailMessage.setSubject(templateSubject.render(model));
-}
-
-sendEmail(x, emailMessage);`
+        sendEmail(x, emailMessage);
+      `
     },
     {
-      name: 'start',
-      javaReturns: 'void',
+      name: 'init_',
       javaCode:
 `Properties props = new Properties();
 props.setProperty("mail.smtp.auth", getAuthenticate() ? "true" : "false");
