@@ -247,7 +247,7 @@ public class DigWebAgent
             }
           }
           dataJson += "]";
-         
+
           // JSON part from above
           JSONParser jsonParser = new JSONParser();
           jsonParser.setX(x);
