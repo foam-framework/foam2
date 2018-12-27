@@ -7,6 +7,7 @@ import foam.mlang.MLang;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.NanoService;
 import foam.nanos.notification.email.EmailMessage;
+import foam.nanos.notification.email.EmailService;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -17,12 +18,12 @@ import java.util.stream.Collectors;
 public class RegionService extends ContextAwareSupport implements NanoService {
 
   protected DAO regionDAO;
-  protected DAO localEmailMessageDAO;
+  protected EmailService emailService;
 
   @Override
   public void start() throws Exception {
     regionDAO    = (DAO) getX().get("regionDAO");
-    localEmailMessageDAO = (DAO) getX().get("localEmailMessageDAO");
+    emailService = (EmailService) getX().get("email");
   }
 
   public Region getRegion(String query) {
@@ -65,7 +66,7 @@ public class RegionService extends ContextAwareSupport implements NanoService {
     emailMessage.setSubject ("Unknown Region");
     emailMessage.setBody    ("User just added an unknown region " + query);
     emailMessage.setTo(new String[]{"ops@nanopay.net"});
-    localEmailMessageDAO.inX(getX()).put(emailMessage);
+    emailService.sendEmail(getX(), emailMessage);
   }
 
   protected String formatName(String query) {

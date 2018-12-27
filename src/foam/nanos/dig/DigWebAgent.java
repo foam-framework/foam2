@@ -20,6 +20,7 @@ import foam.nanos.http.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.PrefixLogger;
 import foam.nanos.notification.email.EmailMessage;
+import foam.nanos.notification.email.EmailService;
 import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
 
@@ -246,7 +247,7 @@ public class DigWebAgent
             }
           }
           dataJson += "]";
-
+         
           // JSON part from above
           JSONParser jsonParser = new JSONParser();
           jsonParser.setX(x);
@@ -462,8 +463,8 @@ public class DigWebAgent
 
       out.print(data);
     } else {
-      DAO localEmailMessageDAO = (DAO) x.get("localEmailMessageDAO");
-      EmailMessage message     = new EmailMessage();
+      EmailService emailService = (EmailService) x.get("email");
+      EmailMessage message      = new EmailMessage();
 
       // For multiple receiver
       String[]  email = emailParam.split(",");
@@ -476,7 +477,7 @@ public class DigWebAgent
 
       message.setBody(newData);
 
-      localEmailMessageDAO.inX(x).put(message);
+      emailService.sendEmail(x, message);
     }
   }
 

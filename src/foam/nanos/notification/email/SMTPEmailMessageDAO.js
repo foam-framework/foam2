@@ -9,52 +9,20 @@ foam.CLASS({
   name: 'SMTPEmailMessageDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: `
-    The decorator on localEmailMessageDAO that actually sends the email.
-  `,
-
-  javaImports: [
-    'foam.nanos.logger.Logger',
-    'foam.nanos.auth.User',
-    'foam.util.SafetyUtil'
-  ],
-
-  properties: [
-    {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.logger.Logger',
-      name: 'logger',
-      javaFactory: `return (Logger) getX().get("logger");`
-    }
-  ],
-
   methods: [
     {
       name: 'put_',
       javaCode: `
         EmailService service = (EmailService) x.get("smtpEmailService");
-
-        if ( service == null ) {
-          getLogger().error("SMTPEmailService not found.");
-          return super.put_(x, obj);
-        }
-
-        EmailMessage message = (EmailMessage) obj;
-
-        if ( message == null ) {
-          throw new RuntimeException("Cannot put null.");
-        }
-
-        try {
-          if ( SafetyUtil.isEmpty(message.getTemplate()) ) {
-            service.sendEmail(x, message);
-          } else {
-            service.sendEmailFromTemplate(x, ((User) x.get("user")), message, message.getTemplate(), message.getTemplateArgs());
+        if ( service != null ) {
+          try {
+            service.sendEmail(x, (EmailMessage) obj);
+          } catch (RuntimeException e) {
+            e.printStackTrace();
           }
-        } catch (RuntimeException e) {
-          e.printStackTrace();
+        } else {
+           System.out.println("SMTPEmailService not found");
         }
-
         return super.put_(x, obj);
 `
     }

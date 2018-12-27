@@ -75,18 +75,6 @@ foam.CLASS({
       hidden: true,
       documentation: 'Added to suppress journal comments regarding "modified by". Also, a non-null value is required.',
       javaFactory: 'return 1L;'
-    },
-    {
-      class: 'String',
-      name: 'template',
-      javaType: 'String',
-      documentation: 'Template name'
-    },
-    {
-      class: 'Map',
-      name: 'templateArgs',
-      javaType: 'java.util.Map<String, Object>',
-      documentation: 'Template arguments'
     }
   ]
 });

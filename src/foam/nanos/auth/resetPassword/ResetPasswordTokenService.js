@@ -13,7 +13,7 @@ foam.CLASS({
 
   imports: [
     'appConfig',
-    'localEmailMessageDAO',
+    'email',
     'localUserDAO',
     'tokenDAO'
   ],
@@ -27,7 +27,7 @@ foam.CLASS({
     'foam.nanos.auth.token.Token',
     'foam.nanos.auth.User',
     'foam.nanos.notification.email.EmailMessage',
-    'foam.util.Auth',
+    'foam.nanos.notification.email.EmailService',
     'foam.util.Email',
     'foam.util.Password',
     'foam.util.SafetyUtil',
@@ -83,7 +83,7 @@ token.setExpiry(generateExpiryDate());
 token.setData(UUID.randomUUID().toString());
 token = (Token) tokenDAO.put(token);
 
-DAO localEmailMessageDAO = (DAO) getLocalEmailMessageDAO();
+EmailService email = (EmailService) getEmail();
 EmailMessage message = new EmailMessage();
 message.setTo(new String[] { user.getEmail() });
 
@@ -91,9 +91,7 @@ HashMap<String, Object> args = new HashMap<>();
 args.put("name", String.format("%s %s", user.getFirstName(), user.getLastName()));
 args.put("link", url +"?token=" + token.getData() + "#reset");
 
-message.setTemplate("reset-password");
-message.setTemplateArgs(args);
-localEmailMessageDAO.inX(Auth.sudo(x, user)).put(message);
+email.sendEmailFromTemplate(x, user, message, "reset-password", args);
 return true;`
     },
     {
@@ -145,14 +143,12 @@ tokenResult = (Token) tokenResult.fclone();
 tokenResult.setProcessed(true);
 tokenDAO.put(tokenResult);
 
-DAO localEmailMessageDAO = (DAO) getLocalEmailMessageDAO();
+EmailService email = (EmailService) getEmail();
 EmailMessage message = new EmailMessage();
 message.setTo(new String[] { userResult.getEmail() });
 HashMap<String, Object> args = new HashMap<>();
 args.put("name", userResult.getFirstName());
-message.setTemplate("password-changed");
-message.setTemplateArgs(args);
-localEmailMessageDAO.inX(Auth.sudo(x, userResult)).put(message);
+email.sendEmailFromTemplate(x, userResult, message, "password-changed", args);
 return true;`
     }
   ]
