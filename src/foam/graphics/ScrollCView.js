@@ -147,14 +147,14 @@ foam.CLASS({
 
       c.strokeStyle = this.borderColor;
       c.lineWidth = 0.4;
-      c.strokeRect(0, 0, this.width-7, this.height);
+      c.strokeRect(0, 0, this.width, this.height);
 
       c.fillStyle = this.handleColor;
 
       c.fillRect(
         2,
         this.valueToY(this.value),
-        this.width - 11,
+        this.width - 4,
         this.handleSize);
     }
   ],
