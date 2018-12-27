@@ -74,6 +74,12 @@ foam.CLASS({
       }
     },
     {
+      name: 'clearName',
+      expression: function(propName) {
+        return 'clear' + foam.String.capitalize(propName);
+      }
+    },
+    {
       class: 'Boolean',
       name: 'includeInDigest'
     },
@@ -142,6 +148,13 @@ foam.CLASS({
             visibility: 'public',
             args: [{ name: 'o', type: 'Object' }, { name: 'value', type: 'Object' }],
             body: '((' + this.sourceCls.name + ') o).' + this.setterName + '(cast(value));'
+          },
+          {
+            name: 'clear',
+            type: 'void',
+            visibility: 'public',
+            args: [{ name: 'o', type: 'Object' }],
+            body: '((' + this.sourceCls.name + ') o).' + this.clearName + '();'
           },
           {
             name: 'cast',
