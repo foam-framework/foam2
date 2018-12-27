@@ -47,7 +47,7 @@ foam.CLASS({
         var dao = this.MDAO.create({ of: this.LabeledValue });
         if ( ! groups || ! groups.length ) return dao;
 
-        for ( var i = 0; i < groups.length; i++ ) {
+        for ( var i = 0 ; i < groups.length ; i++ ) {
           var str = '' + groups[i];
           if ( ! str ) continue;
           dao.put(this.LabeledValue.create({
