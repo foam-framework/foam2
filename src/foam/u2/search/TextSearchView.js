@@ -38,13 +38,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'richSearch',
-      value: false
+      name: 'richSearch'
     },
     {
       class: 'Boolean',
-      name: 'keywordSearch',
-      value: false
+      name: 'keywordSearch'
     },
     {
       class: 'Boolean',
@@ -53,8 +51,7 @@ foam.CLASS({
         Set this flag if you want to match by strict equality instead of
         checking if the text contains the string. Doing so should improve
         performance.
-      `,
-      value: false
+      `
     },
     {
       name: 'queryParser',
@@ -94,8 +91,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'onKey',
-      value: false
+      name: 'onKey'
     }
   ],
 
