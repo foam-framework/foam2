@@ -47,7 +47,10 @@ public class AuthorizationDAO extends ProxyDAO {
 
   @Override
   public FObject remove_(X x, FObject obj) {
-    authorizer_.authorizeOnDelete(x, obj);
+    Object id = obj.getProperty("id");
+    FObject oldObj = getDelegate().inX(x).find(id);
+    if ( id == null || oldObj == null ) return null;
+    authorizer_.authorizeOnDelete(x, oldObj);
     return super.remove_(x, obj);
   }
 
