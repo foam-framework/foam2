@@ -70,7 +70,7 @@ public class AuthorizationDAO extends ProxyDAO {
 
   @Override
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    Sink authorizationSink = new AuthorizationSink(x, authorizer_, new RemoveSink(x, this));
-    this.select_(x, authorizationSink, skip, limit, order, predicate);
+    Sink sink = new AuthorizationSink(x, authorizer_, new RemoveSink(x, getDelegate()), true);
+    getDelegate().select_(x, sink, skip, limit, order, predicate);
   }
 }
