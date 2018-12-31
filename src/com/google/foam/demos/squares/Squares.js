@@ -57,12 +57,13 @@ foam.CLASS({
       name: 'tick',
       isFramed: true,
       code: function() {
-        if ( this.i++ % 20 == 0 ) {
+        if ( this.i++ % 10 == 0 ) {
           this.add(this.Square.create({
             x:      this.width/2,
             y:      this.height/2,
             width:  1,
             height: 1,
+            // rotation: this.i/720,
             color:  this.hsl(this.i, 100, 50),
             border: 'white'
           }));
