@@ -23,14 +23,17 @@ foam.CLASS({
           name: 'tick',
           isFramed: true,
           code: function() {
-            if ( this.x < 0 ) {
-              this.remove();
+            if ( this.x < 300 ) { this.alpha *= 0.99;}
+            if ( this.x < -100 ) {
+              this.parent.remove(this);
               return;
             }
             this.x--;
             this.y--;
             this.width  += 2;
             this.height += 2;
+            this.originX = this.width / 2;
+            this.originY = this.height / 2;
             this.tick();
           }
         }
@@ -57,14 +60,14 @@ foam.CLASS({
       name: 'tick',
       isFramed: true,
       code: function() {
-        if ( this.i++ % 10 == 0 ) {
+        if ( this.i++ % 5 == 0 ) {
           this.add(this.Square.create({
             x:      this.width/2,
             y:      this.height/2,
             width:  1,
             height: 1,
-            // rotation: this.i/720,
-            color:  this.hsl(this.i, 100, 50),
+            rotation: this.i/45,
+            color:  this.hsl(this.i, 100, 40),
             border: 'white'
           }));
         }
