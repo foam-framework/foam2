@@ -23,7 +23,7 @@ foam.CLASS({
           name: 'tick',
           isFramed: true,
           code: function() {
-            if ( this.x < 300 ) { this.alpha *= 0.99;}
+            if ( this.x < 350 ) { this.alpha *= 0.99;}
             if ( this.x < -100 ) {
               this.parent.remove(this);
               return;
@@ -43,8 +43,8 @@ foam.CLASS({
 
   properties: [
     [ 'i',         0   ],
-    [ 'width',     720 ],
-    [ 'height',    720 ],
+    [ 'width',     800 ],
+    [ 'height',    800 ],
     [ 'fillStyle', 'black' ],
     [ 'color',     'black' ]
   ],
@@ -60,7 +60,7 @@ foam.CLASS({
       name: 'tick',
       isFramed: true,
       code: function() {
-        if ( this.i++ % 5 == 0 ) {
+        if ( this.i++ % 1 == 0 ) {
           this.add(this.Square.create({
             x:      this.width/2,
             y:      this.height/2,
