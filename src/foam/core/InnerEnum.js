@@ -90,6 +90,7 @@ foam.CLASS({
       adaptArrayElement: function(o) {
         return foam.core.InnerEnum.isInstance(o) ? o :
           o.class ? this.__context__.lookup(o.class).create(o) :
+          o.model ? foam.core.InnerEnum.create(o) :
           foam.core.InnerEnum.create({model: o}) ;
       }
     }
