@@ -22,6 +22,13 @@ foam.CLASS({
       },
     },
     {
+      name: 'blacklist',
+      value: [
+        'foam.apploader.ClassLoaderContextScript',
+        'foam.apploader.ClassLoaderContext'
+      ]
+    },
+    {
       name: 'targetFile',
       value: 'foam-bin.js'
     }
@@ -432,6 +439,11 @@ console.log("Done.");
 
         modelDAO.orderBy(foam.core.Model.ORDER).select({
           put: function(s) {
+            if ( self.blacklist.indexOf(s.id) != -1 ) {
+              console.log("Skipping", s.id);
+              return;
+            }
+
             var func = foam.core.Model.isInstance(s) ? 'CLASS' :
                 foam.dao.Relationship.isInstance(s) ? 'RELATIONSHIP' :
                 foam.build.Library.isInstance(s) ? 'LIB' :
@@ -459,7 +471,7 @@ console.log("Done.");
       with ( foam.cps ) {
         sequence(
           compose(write, wrap(function() {
-            return "FOAM_FLAGS = { js: true, web: true, debug: true };\n";
+            return "FOAM_FLAGS = { js: true, web: true, debug: true, java: true, swift: true };\n";
           })),
           compose(write, bootstrap),
           compose(write, models),

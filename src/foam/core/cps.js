@@ -407,45 +407,27 @@ foam.LIB({
   name: 'foam.cps',
 
   methods: [
-    function apply(then, abort, f, args) {
-      f.apply(null, [
-        then, abort
-      ].concat(args));
-    },
-
     // Transform f into a function which forwards its results as
     // arguments to its continunation.
     // TODO: Is this really currying?
     function curry(f) {
       return function(then, abort, ...curried) {
         f(function(...args) {
-          then.apply(null, args.concat(curried));
+          then(...args);
         });
       };
     },
 
     function compose(a, b) {
       return function(then, abort, ...args) {
-        b.apply(null, [
-          function(...args) { a.apply(null, [then, abort].concat(args)); },
-          abort,
-        ].concat(args));
+        b(function(...args) { a(then, abort, ...args); }, abort, ...args);
       };
     },
 
     function bind(f, ...bound) {
       return function(then, abort, ...args) {
-        f.apply(null, [
-          then,
-          abort
-        ].concat(bound, args));
+        f(then, abort, ...bound, ...args);
       };
-    },
-
-    function apply(then, abort, f, args) {
-      f.apply(null, [
-        then, abort
-      ].concat(args));
     },
 
     // Compose a set of CPS functions into a single CPS function which
@@ -453,10 +435,7 @@ foam.LIB({
     function sequence(...fs) {
       return fs.reduce(function(a, b) {
         return function(then, abort) {
-          a.apply(null, [
-            function() { b.apply(null, [then, abort]); },
-            abort
-          ]);
+          a(function() { b(then, abort); }, abort);
         };
       });
     },
@@ -481,10 +460,7 @@ foam.LIB({
         }
 
         fs.forEach(function(f) {
-          f.apply(null, [
-            joinThen,
-            joinAbort
-          ].concat(args));
+          f(joinThen, joinAbort, ...args);
         });
       };
     },
@@ -492,12 +468,7 @@ foam.LIB({
     // Decorate a CPS function with a separate CPS function as an error handler.
     function handle(f, c) {
       return function(then, abort, ...args) {
-        f.apply(null, [
-          then,
-          function(...args) {
-            c.apply(null, [then, abort].concat(args));
-          }
-        ].concat(args));
+        f(then, function(...args) { c(then, abort, ...args); }, ...args);
       };
     },
 
@@ -506,7 +477,7 @@ foam.LIB({
       return function(then, abort, ...args) {
         var v;
         try {
-          v = f.apply(null, args);
+          v = f(...args);
         } catch(e) {
           abort(e);
         }
@@ -518,7 +489,7 @@ foam.LIB({
     // into a CPS-style function.
     function awrap(f) {
       return function(then, abort, ...args) {
-        f.apply(null, args).then(function(v) {
+        f(...args).then(function(v) {
           then(v);
         }, function(e) {
           abort(e);
@@ -541,14 +512,13 @@ foam.LIB({
         };
 
         fs.forEach(function(f, i) {
-          f.apply(null, [
+          f(
             function(v) {
               pending--;
               values[i] = v;
-              if ( pending == 0 ) then.apply(null, values);
+              if ( pending == 0 ) then(...values);
             },
-            joinAbort
-          ].concat(args));
+            joinAbort, ...args)
         });
       }
     },

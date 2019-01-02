@@ -5,6 +5,7 @@
  */
 
 FOAM_FILES([
+  { name: 'foam/nanos/client/ClientBuilder' },
   { name: 'foam/nanos/controller/AppStyles', flags: ['web'] },
   { name: "foam/nanos/logger/LogLevel" },
   { name: "foam/nanos/logger/LogMessage" },
@@ -126,6 +127,7 @@ FOAM_FILES([
   { name: "foam/nanos/NanoService" },
   { name: "foam/nanos/auth/AuthService" },
   { name: "foam/nanos/auth/ProxyAuthService" },
+  { name: "foam/nanos/auth/CachedAuthServiceProxy" },
   { name: "foam/nanos/auth/ClientAuthService" },
   { name: "foam/nanos/auth/ClientLoginAuthService" },
   { name: "foam/nanos/auth/AgentAuthService" },

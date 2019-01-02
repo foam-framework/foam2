@@ -155,7 +155,6 @@ foam.CLASS({
 
   methods: [
     function initRelationship(x) {
-      console.log("Initializing", this.id);
       if ( this.initialized ) return;
       this.initialized = true;
 
@@ -286,7 +285,6 @@ foam.LIB({
       var r = foam.dao.Relationship.create(m, opt_ctx);
 
       function trigger(s) {
-        console.log("Trigger", r.id);
         s && s.detach();
 
         r.validate && r.validate();
