@@ -153,10 +153,7 @@
           .on('mouseover', this.read)
           .addClass(this.myClass());
 
-        this.tag(this.OPTIONS_DROP_DOWN, {
-          icon: 'images/ic-options.png',
-          showLabel: true
-        }, this.optionsBtn_$);
+        this.tag(this.OPTIONS_DROP_DOWN, {}, this.optionsBtn_$);
         this.add(this.NotificationView.create({
           of: this.data.cls_,
           data: this.data
@@ -168,6 +165,7 @@
       {
         name: 'optionsDropDown',
         label: '',
+        icon: 'images/ic-options.png',
         code: function(X) {
           var self = this;
           self.optionPopup_ = this.PopupView.create({
