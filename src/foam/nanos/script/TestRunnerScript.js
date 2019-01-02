@@ -57,7 +57,6 @@ foam.CLASS({
           name: 'x', type: 'Context'
         }
       ],
-      javaReturns: 'void',
       javaCode: `
         // turn off logging to get rid of clutter.
         LogLevelFilterLogger loggerFilter = (LogLevelFilterLogger) x.get("logger");
@@ -109,10 +108,10 @@ foam.CLASS({
       name: 'runTests',
       args: [
         {
-          name: 'x', javaType: 'foam.core.X'
+          name: 'x', type: 'Context'
         },
         {
-          name: 'test', javaType: 'Test'
+          name: 'test', type: 'foam.nanos.test.Test'
         }
       ],
       javaCode: `
@@ -130,7 +129,7 @@ foam.CLASS({
           name: 'x', type: 'Context'
         },
         {
-          name: 'test', javaType: 'Test'
+          name: 'test', type: 'foam.nanos.test.Test'
         }
       ],
       javaCode: `
@@ -149,7 +148,6 @@ foam.CLASS({
     },
     {
       name: 'printBold',
-      returns: 'Void',
       args: [
         {
           name: 'message', type: 'String'
@@ -161,10 +159,9 @@ foam.CLASS({
       name: 'printOutput',
       args: [
         {
-          name: 'test', javaType: 'Test'
+          name: 'test', type: 'foam.nanos.test.Test'
         }
       ],
-      javaReturns: 'void',
       javaCode: `
         String outputs[] = test.getOutput().split("\\n");
         for( String output: outputs ) {
