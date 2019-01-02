@@ -42,10 +42,13 @@ foam.CLASS({
     }
 
     ^top-row {
-      display: flex;
-      justify-content: space-between;
       align-items: flex-end;
       margin-bottom: 10px;
+    }
+
+    ^separate {
+      display: flex;
+      justify-content: space-between;
     }
 
     ^title-container > * {
@@ -71,23 +74,8 @@ foam.CLASS({
       margin-bottom: 8px;
     }
 
-    ^ .actions .net-nanopay-ui-ActionView {
-      margin: 0 10px 10px 0;
-    }
-
     ^ .actions button + button {
       margin-left: 8px;
-    }
-
-    ^ .net-nanopay-ui-ActionView {
-      width: 128px;
-      height: 40px;
-      background: #0098db;
-      color: white;
-      border-radius: 4px;
-      box-shadow: 0 1px 0 0 rgba(22, 29, 37, 0.05);
-      font-weight: 500;
-      font-size: 14px;
     }
   `,
 
@@ -111,7 +99,8 @@ foam.CLASS({
       name: 'summaryView',
       factory: function() {
         return this.data.summaryView || this.importedSummaryView || {
-          class: 'foam.u2.view.ScrollTableView'
+          class: 'foam.u2.view.ScrollTableView',
+          fitInScreen: true
         };
       }
     },
@@ -150,6 +139,7 @@ foam.CLASS({
           .addClass(this.myClass())
           .start()
             .addClass(this.myClass('top-row'))
+            .addClass(this.myClass('separate'))
             .start()
               .addClass(this.myClass('title-container'))
               .start('h1')
@@ -184,26 +174,32 @@ foam.CLASS({
             .start()
               .style({ 'overflow-x': 'auto' })
               .start()
-                .addClass('actions')
-                .show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW))
+                .addClass(this.myClass('separate'))
+                .callIf(this.data.searchMode === this.SearchMode.SIMPLE, function() {
+                  this
+                    .start()
+                      .add(self.cls.PREDICATE.clone().copyFrom({
+                        view: { class: 'foam.u2.view.SimpleSearch' }
+                      }))
+                    .end();
+                })
                 .start()
-                  .add(self.cls.getAxiomsByClass(foam.core.Action).filter((action) => {
-                    var rtn = true;
-                    if ( ! self.primaryAction ) {
-                      rtn = rtn && action.name !== 'create';
-                    }
-                    if ( self.data.searchMode !== self.SearchMode.FULL ) {
-                      rtn = rtn && action.name !== 'toggleFilters';
-                    }
-                    return rtn;
-                  }))
+                  .addClass('actions')
+                  .show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW))
+                  .start()
+                    .add(self.cls.getAxiomsByClass(foam.core.Action).filter((action) => {
+                      var rtn = true;
+                      if ( ! self.primaryAction ) {
+                        rtn = rtn && action.name !== 'create';
+                      }
+                      if ( self.data.searchMode !== self.SearchMode.FULL ) {
+                        rtn = rtn && action.name !== 'toggleFilters';
+                      }
+                      return rtn;
+                    }))
+                  .end()
                 .end()
               .end()
-              .callIf(this.data.searchMode === this.SearchMode.SIMPLE, function() {
-                this.start().add(self.cls.PREDICATE.clone().copyFrom({
-                  view: { class: 'foam.u2.view.SimpleSearch' }
-                })).end();
-              })
               .start()
                 .style({ 'overflow-x': 'auto' })
                 .tag(this.summaryView, { data$: this.data.filteredDAO$ })

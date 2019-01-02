@@ -13,8 +13,6 @@ foam.CLASS({
 
   requires: ['foam.net.web.HTTPRequest'],
 
-  imports: ['appConfig'],
-
   tableColumns: [
     'id',
     'daoKey',
@@ -83,6 +81,18 @@ foam.CLASS({
     },
     'data',
     {
+      class: 'foam.nanos.fs.FileProperty',
+      name: 'dataFile',
+      label: 'DataFile',
+      documentation: 'dig file to put data',
+      view: { class: 'foam.nanos.dig.DigFileUploadView', data: this.dataFile$ },
+    },
+    {
+      class: 'URL',
+      name: 'postURL',
+      hidden: true
+    },
+    {
       class: 'URL',
       // TODO: appears not to work if named 'url', find out why.
       name: 'digURL',
@@ -90,7 +100,8 @@ foam.CLASS({
       displayWidth: 120,
       view: 'foam.nanos.dig.LinkView',
       setter: function() {}, // Prevent from ever getting set
-      expression: function(key, data, email, subject, daoKey, cmd, format, q) {
+      expression: function(key, data, email, subject, daoKey, cmd, format, q, dataFile) {
+
         var query = false;
         var url = "/service/dig";
 
@@ -129,6 +140,7 @@ foam.CLASS({
           query = true;
           url += "q=" + q;
         }
+        this.postURL = url;
         if ( data ) {
           if ( data.length + url.length < this.MAX_URL_SIZE ) {
             url += query ? "&" : "?";
@@ -136,6 +148,12 @@ foam.CLASS({
             url += "data=" + data;
           }
         }
+        if ( dataFile ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "&fileaddress=" + dataFile.address;
+        }
+
         return encodeURI(url);
       }
     },
@@ -148,16 +166,13 @@ foam.CLASS({
     }
   ],
 
-  methods: [
-  ],
-
   actions: [
     {
       name: 'postButton',
       label: 'Send Request',
       code: async function() {
         var req = this.HTTPRequest.create({
-          url: this.appConfig.URL.value + this.digURL.substring(1),
+          url: window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + this.postURL,
           method: 'POST',
           payload: this.data,
         }).send();

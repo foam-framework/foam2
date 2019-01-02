@@ -69,7 +69,7 @@
       class: 'Int',
       name: 'rowHeight',
       documentation: 'The height of one row of the table in px.',
-      value: 40
+      value: 48
     },
     {
       class: 'Boolean',
@@ -110,13 +110,15 @@
             }, this.table_$).
             end().
           end().
-          start('td').style({ 'vertical-align': 'top' }).
+          start('td').
+            style({ 'vertical-align': 'top' }).
+            show(this.daoCount$.map((count) => count >= this.limit)).
             add(this.slot(function(limit) {
               return this.ScrollCView.create({
                 value$: this.skip$,
                 extent$: this.limit$,
                 height: this.rowHeight * limit + this.TABLE_HEAD_HEIGHT,
-                width: 18,
+                width: 12,
                 size$: this.daoCount$,
               });
             })).
@@ -124,7 +126,13 @@
         end().
       end();
 
-      if ( this.fitInScreen ) this.onload.sub(this.updateTableHeight);
+      if ( this.fitInScreen ) {
+        this.onload.sub(this.updateTableHeight);
+        window.addEventListener('resize', this.updateTableHeight);
+        this.onDetach(() => {
+          window.removeEventListener('resize', this.updateTableHeight);
+        });
+      }
     }
   ],
 
@@ -135,8 +143,9 @@
         var negative = e.deltaY < 0;
         // Convert to rows, rounding up. (Therefore minumum 1.)
         var rows = Math.ceil(Math.abs(e.deltaY) / 40);
+        var oldSkip = this.skip;
         this.skip = Math.max(0, this.skip + (negative ? -rows : rows));
-        if ( e.deltaY !== 0 ) e.preventDefault();
+        if ( e.deltaY !== 0 && oldSkip != this.skip ) e.preventDefault();
       }
     },
     {
