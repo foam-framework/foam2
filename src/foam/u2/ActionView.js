@@ -64,11 +64,6 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Boolean',
-      name: 'showLabel',
-      expression: function(icon, iconFontName ) { return ! ( icon || iconFontName); }
-    },
-    {
       class: 'URL',
       name: 'icon',
       factory: function(action) { return this.action.icon; }
@@ -115,7 +110,7 @@ foam.CLASS({
         this.add(this.iconFontName);
       }
 
-      if ( this.showLabel ) {
+      if ( this.label ) {
         this.add(this.label$);
       }
 
