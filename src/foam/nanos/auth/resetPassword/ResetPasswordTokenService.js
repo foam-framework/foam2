@@ -132,10 +132,8 @@ if ( ! Password.isValid(newPassword) ) {
 
 // update user's password
 userResult = (User) userResult.fclone();
-userResult.setPasswordLastModified(Calendar.getInstance().getTime());
-userResult.setPreviousPassword(userResult.getPassword());
-userResult.setPassword(Password.hash(newPassword));
-userResult.setPasswordExpiry(null);
+userResult.setDesiredPassword(newPassword);
+user.setPasswordExpiry(null);
 userDAO.put(userResult);
 
 // set token processed to true
