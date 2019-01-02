@@ -57,7 +57,6 @@ foam.CLASS({
           name: 'x', type: 'Context'
         }
       ],
-      javaReturns: 'void',
       javaCode: `
         // turn off logging to get rid of clutter.
         LogLevelFilterLogger loggerFilter = (LogLevelFilterLogger) x.get("logger");
@@ -69,16 +68,27 @@ foam.CLASS({
         ArraySink tests = (ArraySink) testDAO.select(new ArraySink());
         List testArray = tests.getArray();
 
+        List<String> selectedTests = null;
+        if ( ! SafetyUtil.isEmpty(System.getProperty("foam.tests")) ){
+          String t = System.getProperty("foam.tests");
+          selectedTests = Arrays.asList(t.split(","));
+        }
+
         for ( int i = 0; i < testArray.size(); i ++ ) {
           Test test = (Test) testArray.get(i);
           test = (Test) test.fclone();
           if ( ! test.getEnabled() ) {
             continue;
           }
-          if ( test.getServer() ) {
-            runServerSideTest(x, test);
+
+          if ( selectedTests != null ) {
+            if ( selectedTests.contains(test.getId()) ) {
+              runTests(x, test);
+            } else {
+              continue;
+            }
           } else {
-            // TODO: Run client side tests in a headless browser.
+            runTests(x, test);
           }
         }
 
@@ -95,13 +105,31 @@ foam.CLASS({
       `
     },
     {
+      name: 'runTests',
+      args: [
+        {
+          name: 'x', type: 'Context'
+        },
+        {
+          name: 'test', type: 'foam.nanos.test.Test'
+        }
+      ],
+      javaCode: `
+        if ( test.getServer() ) {
+          runServerSideTest(x, test);
+        } else {
+          // TODO: Run client side tests in a headless browser.
+        }
+      `
+    },
+    {
       name: 'runServerSideTest',
       args: [
         {
           name: 'x', type: 'Context'
         },
         {
-          name: 'test', javaType: 'Test'
+          name: 'test', type: 'foam.nanos.test.Test'
         }
       ],
       javaCode: `
@@ -120,7 +148,6 @@ foam.CLASS({
     },
     {
       name: 'printBold',
-      returns: 'Void',
       args: [
         {
           name: 'message', type: 'String'
@@ -132,10 +159,9 @@ foam.CLASS({
       name: 'printOutput',
       args: [
         {
-          name: 'test', javaType: 'Test'
+          name: 'test', type: 'foam.nanos.test.Test'
         }
       ],
-      javaReturns: 'void',
       javaCode: `
         String outputs[] = test.getOutput().split("\\n");
         for( String output: outputs ) {

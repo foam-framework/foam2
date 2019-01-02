@@ -1630,7 +1630,8 @@ foam.CLASS({
   properties: [
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.AnyParser.instance()'],
-    ['javaQueryParser', 'foam.lib.query.AnyParser.instance()']
+    ['javaQueryParser', 'foam.lib.query.AnyParser.instance()'],
+    ['javaCSVParser', 'new foam.lib.csv.CSVStringParser()']
   ]
 });
 
