@@ -54,7 +54,7 @@ public class Outputter
   public Outputter(PrintWriter writer, OutputterMode mode) {
     if ( writer == null ) {
       stringWriter_ = new StringWriter();
-      writer = new PrintWriter(stringWriter_);
+      writer        = new PrintWriter(stringWriter_);
     }
 
     this.mode_   = mode;
@@ -76,7 +76,7 @@ public class Outputter
   protected void initWriter() {
     if ( stringWriter_ == null ) {
       stringWriter_ = new StringWriter();
-      writer_ = new PrintWriter(stringWriter_);
+      writer_       = new PrintWriter(stringWriter_);
     }
     stringWriter_.getBuffer().setLength(0);
   }
@@ -174,7 +174,7 @@ public class Outputter
 
     writer_.append("{");
     int i = 0;
-    while(i < values.length ) {
+    while ( i < values.length ) {
       writer_.append(beforeKey_());
       writer_.append(values[i++].toString());
       writer_.append(afterKey_());
@@ -241,7 +241,7 @@ public class Outputter
   }
 
   protected boolean isArray(Object value) {
-    return ( value != null ) &&
+    return value != null &&
         ( value.getClass() != null ) &&
         value.getClass().isArray();
   }
@@ -266,15 +266,16 @@ public class Outputter
   }
 
   protected void outputFObjectDelta(FObject oldFObject, FObject newFObject) {
-    ClassInfo info = oldFObject.getClassInfo();
-    boolean outputComma = true;
-    boolean isDiff = false;
-    boolean isPropertyDiff = false;
-    if ( ! oldFObject.equals(newFObject) ) {
-      List axioms = info.getAxiomsByClass(PropertyInfo.class);
-      Iterator i = axioms.iterator();
+    ClassInfo info           = oldFObject.getClassInfo();
+    boolean   outputComma    = true;
+    boolean   isDiff         = false;
+    boolean   isPropertyDiff = false;
 
-      while( i.hasNext() ) {
+    if ( ! oldFObject.equals(newFObject) ) {
+      List     axioms = info.getAxiomsByClass(PropertyInfo.class);
+      Iterator i      = axioms.iterator();
+
+      while ( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
         isPropertyDiff = maybeOutputPropertyDelta(oldFObject, newFObject, prop);
         if ( isPropertyDiff) {
@@ -288,8 +289,7 @@ public class Outputter
               writer_.append(":");
               outputString(info.getId());
             }
-            if ( outputClassNames_ )
-              writer_.append(",");
+            if ( outputClassNames_ ) writer_.append(",");
             PropertyInfo id = (PropertyInfo) info.getAxiomByName("id");
             outputProperty(newFObject, id);
             isDiff = true;
@@ -300,9 +300,7 @@ public class Outputter
         }
       }
 
-      if ( isDiff ) {
-        writer_.append("}");
-      }
+      if ( isDiff ) writer_.append("}");
     }
   }
 
@@ -310,10 +308,7 @@ public class Outputter
     if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
     if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
 
-    if ( prop.compare(oldFObject, newFObject) != 0 ) {
-      return true;
-    }
-    return false;
+    return prop.compare(oldFObject, newFObject) != 0;
   }
 
   public void outputJSONJFObject(FObject o) {
@@ -333,9 +328,10 @@ public class Outputter
       writer_.append(":");
       outputString(info.getId());
     }
-    List axioms = info.getAxiomsByClass(PropertyInfo.class);
-    Iterator i = axioms.iterator();
-    boolean outputComma = outputClassNames_;
+
+    List     axioms      = info.getAxiomsByClass(PropertyInfo.class);
+    Iterator i           = axioms.iterator();
+    boolean  outputComma = outputClassNames_;
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
       outputComma = maybeOutputProperty(o, prop, outputComma) || outputComma;

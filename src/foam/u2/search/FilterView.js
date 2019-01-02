@@ -99,7 +99,7 @@ foam.CLASS({
       .end();
 
       this.bodyE = this.start('div').addClass(this.myClass('body'));
-      for ( var i = 0; i < this.addQueue_.length; i++ ) {
+      for ( var i = 0 ; i < this.addQueue_.length ; i++ ) {
         this.bodyE.add.apply(this.bodyE, this.addQueue_[i]);
       }
       this.bodyE.end();
