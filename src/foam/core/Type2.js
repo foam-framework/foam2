@@ -21,7 +21,7 @@ foam.LIB({
       }
 
       console.log('Type: ', str);
-      return foam.core.type.QuickType.create({
+      return foam.core.type.SimpleType.create({
         java: str,
         swift: str,
       });
@@ -49,7 +49,7 @@ foam.INTERFACE({
 
 foam.CLASS({
   package: 'foam.core.type',
-  name: 'QuickType',
+  name: 'SimpleType',
   properties: [
     {
       class: 'String',
@@ -72,6 +72,7 @@ foam.CLASS({
   package: 'foam.core.type',
   name: 'Any',
   implements: ['foam.core.type.Type'],
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   methods: [
     function toJavaType() { return 'Object' },
     function toSwiftType() { return 'Any?' },
@@ -81,7 +82,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Object',
-  extends: 'foam.core.type.QuickType',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'Object'],
     ['swift', 'Any'],
@@ -91,7 +93,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Byte',
-  extends: 'foam.core.type.QuickType',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'byte'],
     ['swift', 'Int8'],
@@ -101,7 +104,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Short',
-  extends: 'foam.core.type.QuickType',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'short'],
     ['swift', 'Int16'],
@@ -111,7 +115,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Integer',
-  extends: 'foam.core.type.QuickType',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'int'],
     ['swift', 'Int'],
@@ -121,7 +126,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Void',
-  extends: 'foam.core.type.QuickType',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'void'],
     ['swift', 'Void'],
@@ -131,7 +137,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'String',
-  extends: 'foam.core.type.QuickType',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'String'],
     ['swift', 'String'],
@@ -141,7 +148,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Long',
-  extends: 'foam.core.type.QuickType',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'long'],
     ['swift', 'Int'],
@@ -152,6 +160,7 @@ foam.CLASS({
   package: 'foam.core.type',
   name: 'Array',
   implements: ['foam.core.type.Type'],
+  axioms: [ { class: 'foam.pattern.Multiton', property: 'type' } ],
   requires: [
     'foam.core.type.Any',
   ],
@@ -176,7 +185,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Boolean',
-  extends: 'foam.core.type.QuickType',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'boolean'],
     ['swift', 'Bool'],
@@ -205,7 +215,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Char',
-  extends: 'foam.core.type.QuickType',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'char'],
     ['swift', 'Character'],
@@ -215,7 +226,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'DateTime',
-  extends: 'foam.core.type.QuickType',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'java.util.Date'],
     ['swift', 'Date'],
@@ -225,7 +237,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Time',
-  extends: 'foam.core.type.QuickType',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'java.util.Date'],
     ['swift', 'Date'],
@@ -235,7 +248,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Date',
-  extends: 'foam.core.type.QuickType',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'java.util.Date'],
     ['swift', 'Date'],
@@ -245,7 +259,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Context',
-  extends: 'foam.core.type.QuickType',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'foam.core.X'],
     ['swift', 'Context'],
@@ -255,7 +270,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Number',
-  extends: 'foam.core.type.QuickType',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'float'],
     ['swift', 'Float'],
@@ -265,7 +281,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Float',
-  extends: 'foam.core.type.QuickType',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'float'],
     ['swift', 'Float'],
@@ -275,7 +292,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'List',
-  extends: 'foam.core.type.QuickType',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'java.util.List'],
     ['swift', '[Any?]'],
@@ -285,7 +303,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Map',
-  extends: 'foam.core.type.QuickType',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'java.util.Map'],
     ['swift', '[AnyHashable:Any?]'],
@@ -295,7 +314,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Class',
-  extends: 'foam.core.type.QuickType',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'java.core.ClassInfo'],
     ['swift', 'ClassInfo'],
@@ -305,7 +325,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Double',
-  extends: 'foam.core.type.QuickType',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'double'],
     ['swift', 'Double'],
