@@ -35,8 +35,12 @@ foam.CLASS({
 
   css: `
     ^ {
+      text-align: left;
       padding: 10px;
       width: 125px;
+    }
+    ^ label {
+      margin-top: 5px;
     }
   `,
   

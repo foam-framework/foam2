@@ -131,7 +131,7 @@ foam.CLASS({
         this.nodeName = 'i';
         this.cssClass(this.action.name);
         this.cssClass(this.iconFontClass); // required by font package
-        this.style({'font-family': this.iconFontFamily});
+        this.style({ 'font-family': this.iconFontFamily });
         this.add(this.iconFontName);
       }
 

@@ -170,7 +170,15 @@ foam.LIB({
           // Relay 'installAxiom' events from parent class.
           parent.pubsub_ && parent.pubsub_.sub(
             'installAxiom',
-            function(_, a1, a2, a3) { cls.pubsub_.pub(a1, a2, a3); });
+            function(_, a1, a2, a3) {
+              // When an axiom is installed on the parent, the child's axiom
+              // cache needs to be cleared. Otherwise it will be stale if
+              // previously accessed.
+              // https://github.com/foam-framework/foam2/issues/1764
+              cls.private_.axiomCache = {};
+
+              cls.pubsub_.pub(a1, a2, a3);
+            });
         }
       }
 
