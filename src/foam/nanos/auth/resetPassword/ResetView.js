@@ -21,7 +21,7 @@ foam.CLASS({
     'foam.u2.dialog.NotificationMessage'
   ],
 
-  css:`
+  css: `
     ^{
       width: 490px;
       margin: auto;
@@ -135,11 +135,11 @@ foam.CLASS({
     {
       class: 'String',
       name: 'token',
-      factory: function () {
+      factory: function() {
         var search = /([^&=]+)=?([^&]*)/g;
         var query  = window.location.search.substring(1);
 
-        var decode = function (s) {
+        var decode = function(s) {
           return decodeURIComponent(s.replace(/\+/g, ' '));
         };
 
@@ -166,60 +166,41 @@ foam.CLASS({
   ],
 
   methods: [
-    function initE(){
+    function initE() {
     this.SUPER();
     var self = this;
 
     this
       .addClass(this.myClass())
       .start()
-        .start().addClass('Reset-Password').add("Reset Password").end()
+        .start().addClass('Reset-Password').add('Reset Password').end()
         .start().addClass('Message-Container')
-          .start().addClass('newPassword-Text').add("New Password").end()
+          .start().addClass('newPassword-Text').add('New Password').end()
           .add(this.NEW_PASSWORD)
-          .start().addClass('confirmPassword-Text').add("Confirm Password").end()
+          .start().addClass('confirmPassword-Text').add('Confirm Password').end()
           .add(this.CONFIRM_PASSWORD)
           .start('div')
             .start(this.CONFIRM).addClass('resetButton').end()
           .end()
         .end()
-        .start('p').add("Remember your password?").end()
+        .start('p').add('Remember your password?').end()
         .start('p').addClass('link')
           .add('Sign in.')
-          .on('click', function(){ window.location.href = '#'; self.stack.push({ class: 'foam.nanos.auth.SignInView' })})
+          .on('click', function() { window.location.href = '#'; self.stack.push({ class: 'foam.nanos.auth.SignInView' })})
       .end()
-    .end()
+    .end();
     }
   ],
 
   actions: [
     {
       name: 'confirm',
-      code: function (X, obj) {
+      code: function(X, obj) {
         var self = this;
+
         // check if new password entered
         if ( ! this.newPassword ) {
           this.add(this.NotificationMessage.create({ message: this.emptyPassword, type: 'error' }));
-          return;
-        }
-
-        if ( this.newPassword.includes(' ') ) {
-          this.add(this.NotificationMessage.create({ message: this.noSpaces, type: 'error' }));
-          return;
-        }
-
-        if ( this.newPassword.length < 7 || this.newPassword.length > 32 ) {
-          this.add(this.NotificationMessage.create({ message: this.invalidLength, type: 'error' }));
-          return;
-        }
-
-        if ( ! /\d/g.test(this.newPassword) ) {
-          this.add(self.NotificationMessage.create({ message: this.noNumbers, type: 'error' }));
-          return;
-        }
-
-        if ( /[^a-zA-Z0-9]/.test(this.newPassword) ) {
-          this.add(self.NotificationMessage.create({ message: this.noSpecial, type: 'error' }));
           return;
         }
 
@@ -239,9 +220,9 @@ foam.CLASS({
           desiredPassword: this.newPassword
         });
 
-        this.resetPasswordToken.processToken(null, user, this.token).then(function (result) {
+        this.resetPasswordToken.processToken(null, user, this.token).then(function(result) {
           self.stack.push({ class: 'foam.nanos.auth.resetPassword.SuccessView' });
-        }).catch(function (err) {
+        }).catch(function(err) {
           self.add(self.NotificationMessage.create({ message: err.message, type: 'error' }));
         });
       }
