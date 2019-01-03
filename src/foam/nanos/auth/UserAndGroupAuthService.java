@@ -37,9 +37,6 @@ public class UserAndGroupAuthService
 
   public final static String CHECK_USER_PERMISSION = "service.auth.checkUser";
 
-  // pattern used to check if password has only alphanumeric characters
-  java.util.regex.Pattern alphanumeric = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");
-
   public UserAndGroupAuthService(X x) {
     setX(x);
   }
@@ -277,6 +274,10 @@ public class UserAndGroupAuthService
     return checkPermission(x, new AuthPermission(permission));
   }
 
+  public boolean validatePassword( String Password) {
+    return Password.isValid(Password);
+  }
+
   public boolean checkUser(foam.core.X x, User user, String permission) {
     return checkUserPermission(x, user, new AuthPermission(permission));
   }
@@ -287,7 +288,7 @@ public class UserAndGroupAuthService
    */
   public User updatePassword(foam.core.X x, String oldPassword, String newPassword) throws AuthenticationException {
     if ( x == null || SafetyUtil.isEmpty(oldPassword) || SafetyUtil.isEmpty(newPassword) ) {
-      throw new RuntimeException("Invalid parameters");
+      throw new RuntimeException("Password fields cannot be blank");
     }
 
     Session session = x.get(Session.class);
@@ -316,21 +317,8 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User group disabled");
     }
 
-    int length = newPassword.length();
-    if ( length < 7 || length > 32 ) {
-      throw new RuntimeException("Password must be 7-32 characters long");
-    }
-
-    if ( newPassword.equals(newPassword.toLowerCase()) ) {
-      throw new RuntimeException("Password must have one capital letter");
-    }
-
-    if ( ! newPassword.matches(".*\\d+.*") ) {
-      throw new RuntimeException("Password must have one numeric character");
-    }
-
-    if ( alphanumeric.matcher(newPassword).matches() ) {
-      throw new RuntimeException("Password must not contain: !@#$%^&*()_+");
+    if (! validatePassword(newPassword)) {
+      throw new AuthenticationException(Password.PASSWORD_ERROR_MESSAGE);
     }
 
     // old password does not match
