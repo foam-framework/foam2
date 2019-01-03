@@ -274,8 +274,8 @@ public class UserAndGroupAuthService
     return checkPermission(x, new AuthPermission(permission));
   }
 
-  public boolean validatePassword( String Password) {
-    return Password.isValid(Password);
+  public boolean validatePassword( String newPassword) {
+    return Password.isValid(newPassword);
   }
 
   public boolean checkUser(foam.core.X x, User user, String permission) {
