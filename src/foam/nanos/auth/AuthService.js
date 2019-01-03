@@ -110,6 +110,18 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'validatePassword',
+      javaReturns: 'boolean',
+      swiftReturns: 'Bool',
+      swiftThrows: true,
+      args: [
+        {
+          name: 'potentialPassword',
+          javaType: 'String',
+        }
+      ]
+    },
+    {
       name: 'checkUser',
       javaReturns: 'boolean',
       swiftReturns: 'Bool',
