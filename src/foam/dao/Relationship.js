@@ -287,13 +287,19 @@ foam.LIB({
       function trigger(s) {
         s && s.detach();
 
-        r.validate && r.validate();
-        r.initRelationship();
+        if ( foam.__context__.isDefined(r.sourceModel) &&
+             foam.__context__.isDefined(r.targetModel) ) {
+
+          r.validate && r.validate();
+          r.initRelationship();
+
+          return true;
+        }
+
+        return false;
       }
 
-      if ( foam.__context__.isDefined(r.sourceModel) ||
-           foam.__context__.isDefined(r.targetModel) ) trigger();
-      else {
+      if ( ! trigger() ) {
         foam.pubsub.sub("defineClass", r.sourceModel, trigger);
         foam.pubsub.sub("defineClass", r.targetModel, trigger);
       }
