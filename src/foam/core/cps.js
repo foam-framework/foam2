@@ -514,12 +514,15 @@ foam.LIB({
     // Transform f into a function which forwards its results as
     // arguments to its continunation.
     // TODO: Is this really currying?
-    function curry(f) {
+    function curry0(f) {
       return function(then, abort, ...curried) {
         f(function(...args) {
           then(...args, ...curried);
-        });
+        }, abort);
       };
+    },
+
+    function forward(f) {
     },
 
     function compose(a, b) {
@@ -696,6 +699,21 @@ foam.LIB({
 
     // Handy NO-OP function to pass for "then" and "abort" when
     // we don't care what happens when they are reached.
-    function nop() {}
+    function nop() {},
+
+    // Decorates a function to log its activity to console.  Can be
+    // used as trace('foo', f); or just trace(f) if f has a suitable
+    // name.
+    function trace(name, f) {
+      if ( typeof name == 'function' ) {
+        f = name;
+        name = f.name;
+      }
+
+      return function(then, abort, ...args) {
+        console.log("ENTER", name, ...args);
+        f(function(...args) { console.log("EXIT", f.name, ...args); then(...args); }, abort, ...args);
+      };
+    }
   ]
 });
