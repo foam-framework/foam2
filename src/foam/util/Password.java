@@ -16,8 +16,9 @@ import java.util.regex.Pattern;
 
 public class Password {
 
-  // Min 6 characters
-  private static Pattern PASSWORD_PATTERN = Pattern.compile("^.{6,}$");
+  // Password validation
+  private static Pattern PASSWORD_PATTERN = Pattern.compile("^.{6,}$"); // Minimum 6 characters
+  public static String PASSWORD_ERROR_MESSAGE = "Password must be at least 6 characters long";
 
   /**
    * Generates random salt given a size
