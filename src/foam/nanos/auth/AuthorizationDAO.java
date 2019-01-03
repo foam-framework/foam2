@@ -47,7 +47,10 @@ public class AuthorizationDAO extends ProxyDAO {
 
   @Override
   public FObject remove_(X x, FObject obj) {
-    authorizer_.authorizeOnDelete(x, obj);
+    Object id = obj.getProperty("id");
+    FObject oldObj = getDelegate().inX(x).find(id);
+    if ( id == null || oldObj == null ) return null;
+    authorizer_.authorizeOnDelete(x, oldObj);
     return super.remove_(x, obj);
   }
 
@@ -56,7 +59,7 @@ public class AuthorizationDAO extends ProxyDAO {
     FObject obj = super.find_(x, id);
     if ( id == null || obj == null ) return null;
     authorizer_.authorizeOnRead(x, obj);
-    return super.find_(x, id);
+    return obj;
   }
 
   @Override
@@ -67,7 +70,7 @@ public class AuthorizationDAO extends ProxyDAO {
 
   @Override
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    Sink authorizationSink = new AuthorizationSink(x, authorizer_, new RemoveSink(x, this));
-    this.select_(x, authorizationSink, skip, limit, order, predicate);
+    Sink sink = new AuthorizationSink(x, authorizer_, new RemoveSink(x, getDelegate()), true);
+    getDelegate().select_(x, sink, skip, limit, order, predicate);
   }
 }
