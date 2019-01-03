@@ -692,6 +692,11 @@ foam.LIB({
   methods: [
     {
       name: 'parse',
+      args: [
+        { type: 'Any', name: 'o' },
+        { type: 'Class', name: 'opt_class' },
+        { type: 'Context', name: 'opt_ctx' },
+      ],
       code: foam.mmethod({
         Array: function(o, opt_class, opt_ctx) {
           var a = new Array(o.length);

@@ -25,7 +25,7 @@ foam.CLASS({
   name: 'ManyToManyRelationshipDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  implements: [ { path: 'foam.mlang.Expressions', java: false } ],
+  implements: [ { path: 'foam.mlang.Expressions', flags: ['js'], java: false } ],
 
   documentation: 'Adapts a DAO based on a *:* Relationship.',
 

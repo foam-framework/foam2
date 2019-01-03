@@ -40,7 +40,8 @@ foam.CLASS({
       o.out(
         ')',
         this.throws ? ' throws' : '',
-        this.returnType ? ' -> ' + this.returnType : '');
+        this.returnType && this.returnType != 'Void' ? ' -> ' + this.returnType : ''
+      )
     }
   ]
 });

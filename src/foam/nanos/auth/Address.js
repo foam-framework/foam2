@@ -11,7 +11,10 @@ foam.CLASS({
   documentation: 'Postal address.',
 
   implements: [
-    'foam.mlang.Expressions',
+    {
+      path: 'foam.mlang.Expressions',
+      flags: ['js'],
+    },
   ],
 
   requires: [
