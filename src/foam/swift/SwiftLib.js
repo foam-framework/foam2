@@ -26,6 +26,8 @@ foam.LIB({
       } else if ( type == foam.Function ) {
         // Unable to convert functions.
         return 'nil';
+      } else if ( type == foam.Null ) {
+        return 'nil';
       } else if ( type == foam.core.FObject ) {
         // TODO: Should be able to serialize an FObject to swift.
         return 'nil';
@@ -42,85 +44,10 @@ foam.LIB({
       return type != 'Any?' && type != 'Any!'
     },
     function toSwiftType(type, optional) {
-      // Is this right?
-
-      if ( ! type ) type = 'Any';
-
-      // Is this the right idea?
-      var isArray = type.endsWith('Array');
-      if ( isArray ) type = type.substring(0, type.lastIndexOf('Array'));
-
-      // TODO(adamvy): Model types as a object and use polymorphism
-      // instead of this stupid switch statement.  I haven't done
-      // that yet because I want to see all the different variations
-      // we have/need to express a type so I have a better idea how
-      // to design it.
-
-      var s;
-
-      switch ( type ) {
-      case "Number":
-      case "Float":
-        s = "Float";
-        break;
-      case "Double":
-        s = "Double";
-        break;
-      case "String":
-        s = "String"
-        break;
-      case "Byte":
-        s = "Int8";
-        break;
-      case "Short":
-        s = "Int16";
-        break;
-      case "Integer":
-        s = "Int"; // TODO Int32
-        break;
-      case "Long":
-        s = "Int";
-        break;
-      case "Boolean":
-        s = "Bool";
-        break;
-      case "Object":
-        s = "Any";
-        break;
-      case "Any":
-        s = "Any";
-        optional = true;
-        break;
-      case "List":
-        s = "[Any?]";
-        break;
-      case "Map":
-        s = "[AnyHashable:Any?]";
-        break;
-      case "Class":
-        s = "ClassInfo";
-        break;
-      case "Char":
-        s = "Character";
-        break;
-      case "Date":
-      case "DateTime":
-      case "Time":
-        s = "Date";
-        break;
-      case "Void":
-        s = "Void";
-        break;
-      case "Context":
-        s = "Context";
-        break;
-      default:
-        s = foam.lookup(type).model_.swiftName
-      }
-
-      if ( isArray ) s = `[${s}]`;
-      if ( optional ) s += '?';
-      return s;
+      return foam.core.type.toType(type).toSwiftType(optional)
+    },
+    function toSwiftName(id) {
+      return id.replace(/\./g, '_')
     },
   ],
 });

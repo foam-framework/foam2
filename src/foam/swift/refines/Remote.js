@@ -47,15 +47,13 @@ foam.CLASS({
     {
       name: 'swiftCode',
       template: `
-<% var cls = this.__context__.lookup(this.clientClass) %>
-
 let X = __subContext__
 let registry = X["registry"] as! foam_box_BoxRegistry
 
 var box: foam_box_Box = X.create(foam_box_SkeletonBox.self, args: ["data": self])!
 box = registry.register(nil, nil, box)
 
-let obj = __context__.create(<%=cls.model_.swiftName%>.self)!
+let obj = __context__.create(<%=foam.swift.toSwiftName(this.clientClass)%>.self)!
 obj.delegate = box;
 
 obj.toJSON(outputter: outputter, out: out)

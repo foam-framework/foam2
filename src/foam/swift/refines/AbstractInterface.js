@@ -16,7 +16,7 @@ foam.CLASS({
           var m = this.model_;
           // If the interface implements any other interfaces, ommit the 'class'
           // to remove a "Redundant constraint 'Self' : 'AnyObject'" warning.
-          var impls = ( (m.implements || []).length ? [] : ['class'] ).concat(m.swiftAllImplements)
+          var impls = ( (m.implements || []).length ? [] : ['class'] ).concat(m.swiftAllImplements())
           var cls = foam.lookup('foam.swift.Protocol').create({
             name: m.swiftName,
             implements: impls,

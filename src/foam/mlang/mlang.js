@@ -1329,7 +1329,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.ArrayBinary',
   implements: [
     'foam.core.Serializable',
-    { path: 'foam.mlang.Expressions', java: false }
+    { path: 'foam.mlang.Expressions', flags: ['js'], java: false }
   ],
 
   documentation: 'Predicate returns true iff arg1 is a substring of arg2, or if arg2 is an array, arg1 is an element of arg2.',
