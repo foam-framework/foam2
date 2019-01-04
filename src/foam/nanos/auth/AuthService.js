@@ -111,8 +111,7 @@ foam.INTERFACE({
     },
     {
       name: 'validatePassword',
-      javaReturns: 'boolean',
-      swiftReturns: 'Bool',
+      javaThrows: [ 'java.lang.RuntimeException' ],
       swiftThrows: true,
       args: [
         {
