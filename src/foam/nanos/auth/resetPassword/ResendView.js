@@ -92,7 +92,7 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'Instructions', message: 'We\'ve sent the instructions to your email. Please check your inbox to continue.'}
+    { name: 'Instructions', message: "We've sent the instructions to your email. Please check your inbox to continue."}
   ],
 
   methods: [
