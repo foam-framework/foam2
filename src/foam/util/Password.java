@@ -6,19 +6,16 @@
 
 package foam.util;
 
+import foam.nanos.auth.AuthService;
+
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.util.encoders.Base64;
 
 import java.security.SecureRandom;
-import java.util.regex.Pattern;
 
 public class Password {
-
-  // Password validation
-  private static Pattern PASSWORD_PATTERN = Pattern.compile("^.{6,}$"); // Minimum 6 characters
-  public static String PASSWORD_ERROR_MESSAGE = "Password must be at least 6 characters long";
 
   /**
    * Generates random salt given a size
@@ -101,7 +98,13 @@ public class Password {
    * @param password password to validate
    * @return true if valid, false otherwise
    */
-  public static boolean isValid(String password) {
-    return ! SafetyUtil.isEmpty(password) && PASSWORD_PATTERN.matcher(password).matches();
+  public static boolean isValid(foam.core.X x, String password) {
+    AuthService auth = (AuthService) x.get("auth");
+    try {
+      auth.validatePassword(password);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
   }
 }
