@@ -23,6 +23,7 @@ import javax.security.auth.AuthPermission;
 import java.security.Permission;
 import java.util.Calendar;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static foam.mlang.MLang.AND;
 import static foam.mlang.MLang.EQ;
@@ -274,8 +275,20 @@ public class UserAndGroupAuthService
     return checkPermission(x, new AuthPermission(permission));
   }
 
-  public boolean validatePassword( String newPassword) {
-    return Password.isValid(newPassword);
+  private String passwordValidationRegex() {
+    return "^.{6,}$"; // Minimum 6 characters
+  }
+
+  private String passwordValidationErrorMessage() {
+    return "Password must be at least 6 characters long";
+  }
+
+  public void validatePassword( String newPassword ) {
+    Pattern passwordValidationPattern = Pattern.compile(passwordValidationRegex()); 
+    String passwordErrorMessage = passwordValidationErrorMessage();
+    if ( SafetyUtil.isEmpty(newPassword) || ! passwordValidationPattern.matcher(newPassword).matches() ) {
+      throw new RuntimeException(passwordErrorMessage);
+    }
   }
 
   public boolean checkUser(foam.core.X x, User user, String permission) {
@@ -317,10 +330,9 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User group disabled");
     }
 
-    if ( ! validatePassword(newPassword) ) {
-      throw new AuthenticationException(Password.PASSWORD_ERROR_MESSAGE);
-    }
-
+    // check if password is valid per validatePassword method
+    validatePassword(newPassword);
+    
     // old password does not match
     if ( ! Password.verify(oldPassword, user.getPassword()) ) {
       throw new RuntimeException("Old password is incorrect");
@@ -373,9 +385,7 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Password is required for creating a user");
     }
 
-    if ( ! Password.isValid(user.getPassword()) ) {
-      throw new AuthenticationException("Password needs to minimum 8 characters, contain at least one uppercase, one lowercase and a number");
-    }
+    validatePassword(user.getPassword());
   }
 
   /**
