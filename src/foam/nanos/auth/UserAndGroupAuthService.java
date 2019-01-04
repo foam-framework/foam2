@@ -317,7 +317,7 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User group disabled");
     }
 
-    if (! validatePassword(newPassword)) {
+    if ( ! validatePassword(newPassword) ) {
       throw new AuthenticationException(Password.PASSWORD_ERROR_MESSAGE);
     }
 
