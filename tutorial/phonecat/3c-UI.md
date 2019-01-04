@@ -3,11 +3,11 @@ layout: tutorial-phonecat
 permalink: /tutorial/phonecat/3c-UI/
 tutorial: 3c
 ---
-# **Part III - Applied Learning c. User Interface**
+# **Part III - Applied Learning - User Interface**
 
 A view is responsible for presenting specific data to the user. An example of this kind of data would be a single object or a collection.
 
-In FOAM, a `view` needs to present a UI component by defining a template method `initE()` in the U2 library. The U2 library provides a variety of views, such as `DetailView`, `TableView`, `ImageView`, etc. These views extend `Element` which is a virtual-DOM element that serves as the root model for all U2 UI components.
+In FOAM, a `view` needs to present a UI component by defining a template method `initE()` in the U2 library. The U2 library provides a variety of views such as `DetailView`, `TableView`, `ImageView`, etc. These views extend `Element` which is a virtual-DOM element that serves as the root model for all U2 UI components.
 
 ## **UI Library**
 
@@ -23,7 +23,7 @@ FOAM’s U2 syntax provides methods for adding and interacting with UI component
 {% endraw %}
 
 
-# **TUTORIAL APPLICATION**
+## **Tutorial Application**
 
 Let’s define the `initE()` for each phone in the catalog. 
 
@@ -42,7 +42,9 @@ foam.CLASS({
         .start('li')
           .start('a')
             .attrs({ href: '#' + this.data.id })
-            .start({ class: 'foam.u2.tag.Image', data: this.data.imageUrl }).addClass('thumb').end()
+            .start({ class: 'foam.u2.tag.Image', 
+                     data: this.data.imageUrl })
+              .addClass('thumb').end()
           .end()
           .start('a')
             .attrs({ href: '#' + this.data.id })
@@ -102,7 +104,9 @@ foam.CLASS({
       },
       expression: function (dao, search, order) {
         var expr = foam.mlang.Expressions.create();
-        return dao.orderBy(order).where(expr.OR(expr.CONTAINS_IC(Phone.SNIPPET, search), expr.CONTAINS_IC(Phone.SNIPPET, search)));
+        return dao.orderBy(order).where(expr.OR(
+          expr.CONTAINS_IC(Phone.SNIPPET, search), 
+          expr.CONTAINS_IC(Phone.SNIPPET, search)));
       }
     },
     'image'
@@ -134,9 +138,9 @@ foam.CLASS({
 #### **About the Above Code:**
 
 1. Most FOAM views support `className` and `tagName`. The default `tagName` for a `DAOList` is `<div>`.
-2. `search` has `view` set to `TextField`, so it will render as a text box.
-3. `order`'s `view` is `ChoiceView`, which renders a drop-down list.
-4. `filteredDAO` is the `DAOList`, which renders the list of entries.
+2. `search` has `view` set to `TextField`,so it will render as a text box.
+3. `order`'s `view` is `ChoiceView` which renders a drop-down list.
+4. `filteredDAO` is the `DAOList` which renders the list of entries.
 
 **STEP #5.** Add the following to `index.html`'s `<head>` tag to load the custom CSS:
 
@@ -147,22 +151,22 @@ foam.CLASS({
 
 **STEP #6.** Reload your app. 
 
-# **Conclusion**
+## **Conclusion**
 
 Now your app should look much better and the search and sort functions work! You are now ready for the final stage of your basic app in FOAM.  Please proceed to the next lesson on navigation.
 
-# **[NEXT: Part III - d. Navigation](../3d-navigation/)** 
+## **[NEXT: Part III - Applied Learning - Navigation](../3d-navigation/)** 
 
 ### **Tutorial Menu:**
 
-1. [Getting Started](../1-gettingstarted/) 
-2. [Core Concepts](../2-concepts/) 
-3. Applied Learning: Build a Basic App with FOAM
-     1. [Defining the Model](../3a-model/)
-     2. [the Controller](../3b-dao/)
-     3. [UI Library](../3c-UI/)
-     4. [Navigation](../3d-navigation/)
+1. [Getting Started](../1-gettingstarted/)
+1. [Core Concepts](../2-concepts/)
+1. Applied Learning: Build a Basic App with FOAM
+    * [Defining the Model](../3a-model/)
+    * [The Controller](../3b-dao/)
+    * [UI Library](../3c-UI/)
+    * [Navigation](../3d-navigation/)
+
 * [Tutorial Overview](../0-intro/)
 * [About FOAM](/foam/about/)
-* [Appendix](../4-appendix/) 
-
+* [Appendix](../4-appendix/)

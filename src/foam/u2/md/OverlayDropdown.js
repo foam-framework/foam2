@@ -9,10 +9,6 @@ foam.CLASS({
   name: 'OverlayDropdown',
   extends: 'foam.u2.Element',
 
-  imports: [
-    'window'
-  ],
-
   exports: [
     'as dropdown'
   ],
@@ -27,13 +23,6 @@ foam.CLASS({
       z-index: 1009;
     }
 
-    ^container {
-      position: relative;
-      right: 0;
-      top: 0;
-      z-index: 100;
-    }
-
     ^ {
       background: white;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
@@ -45,10 +34,8 @@ foam.CLASS({
       position: absolute;
       padding-bottom: -20px;
       margin-bottom: -20px;
-      right: 3px;
-      top: 4px;
-      transition: height 0.25s cubic-bezier(0, .3, .8, 1);
       z-index: 1010;
+      transform: translate(-60%, 33px);
     }
 
     ^open {
@@ -74,29 +61,11 @@ foam.CLASS({
     }
   `,
 
-  constants: {
-    BOTTOM_OFFSET: -25,
-  },
-
   properties: [
-    {
-      class: 'Float',
-      name: 'height',
-      value: 0
-    },
     {
       class: 'Boolean',
       name: 'opened',
-      documentation: 'True when the overlay has been commanded to be open. ' +
-          'It might still be animating; see $$DOC{ref:".animationComplete"}.',
-    },
-    {
-      class: 'Boolean',
-      name: 'animationComplete',
-      documentation: 'True when an animation is running. The overlay hasn\'t ' +
-          'really reached the state commanded by $$DOC{ref:".opened"} until ' +
-          'this is true.',
-      value: true
+      documentation: 'True when the overlay has been commanded to be open.'
     },
     {
       name: 'dropdownE_',
@@ -114,52 +83,20 @@ foam.CLASS({
     function add() {
       // TODO: Replace with content @kgr
       if ( this.addToSelf_ ) {
-        this.SUPER.apply(this, arguments);
+        this.SUPER(...arguments);
       } else {
-        this.dropdownE_.add.apply(this.dropdownE_, arguments);
+        this.dropdownE_.add(...arguments);
       }
 
       return this;
     },
 
     function open() {
-      if ( this.opened ) return;
-
-      this.onOpenStart();
-
-      this.animationComplete = false;
       this.opened = true;
-      this.dropdownE_.style({ height: this.getFullHeight() + 'px' });
     },
 
     function close() {
-      if ( ! this.opened ) return;
-      this.height = 0;
-      this.animationComplete = false;
       this.opened = false;
-      this.dropdownE_.style({ height: 0 + 'px' });
-    },
-
-    function getFullHeight() {
-      if ( this.state !== this.LOADED ) return 0;
-
-      var myStyle = this.window.getComputedStyle(this.dropdownE_.el());
-
-      var first = this.dropdownE_.children[0].el();
-      var top = first.offsetTop;
-      var last = this.dropdownE_.children[this.dropdownE_.children.length - 1]
-          .el();
-      var margin = parseInt(
-          this.window.getComputedStyle(last)['margin-bottom']);
-      if ( Number.isNaN(margin) ) margin = 0;
-      var bottom = last.offsetTop + last.offsetHeight + margin;
-
-      var childrenHeight = bottom - top;
-      var maxHeight = this.window.innerHeight -
-            this.dropdownE_.el().getBoundingClientRect().top +
-            this.BOTTOM_OFFSET;
-
-      return Math.min(childrenHeight, maxHeight);
     },
 
     function initE() {
@@ -167,25 +104,24 @@ foam.CLASS({
       this.addClass(this.myClass('container'));
       var view = this;
 
-      this.addClass(this.slot(function(open, animationComplete) {
-        this.shown = open || ! animationComplete;
-      }, this.opened$, this.animationComplete$));
+      this.addClass(this.slot(function(opened) {
+        this.shown = opened;
+      }, this.opened$));
 
       this.start('dropdown-overlay')
         .addClass(this.myClass('overlay'))
-        .addClass(this.slot(function(open) {
-          return open ? view.myClass('zeroOverlay') :
-              view.myClass('initialOverlay');
+        .addClass(this.slot(function(opened) {
+          return opened
+            ? view.myClass('zeroOverlay')
+            : view.myClass('initialOverlay');
         }, this.opened$))
         .on('click', this.onCancel)
       .end();
 
-      this.dropdownE_.addClass(this.myClass()).style({height: '0px'})
-        .addClass(this.slot(function(opened, animationComplete) {
-          var openComplete = opened && animationComplete;
-          return openComplete ? this.myClass('open') : '';
-        }, this.opened$, this.animationComplete$))
-        .on('transitionend', this.onTransitionEnd)
+      this.dropdownE_.addClass(this.myClass())
+        .addClass(this.slot(function(opened) {
+          return opened ? this.myClass('open') : '';
+        }, this.opened$))
         .on('mouseleave', this.onMouseLeave)
         .on('click', this.onClick);
 
@@ -200,11 +136,6 @@ foam.CLASS({
       this.close();
     },
 
-    function onTransitionEnd() {
-      this.animationComplete = true;
-      if (!this.opened) this.onCloseComplete();
-    },
-
     function onMouseLeave(e) {
       console.assert(e.target === this.dropdownE_.el(),
           'mouseleave should only fire on this, not on children');
@@ -217,24 +148,6 @@ foam.CLASS({
      */
     function onClick(e) {
       e.stopPropagation();
-    },
-
-    function onOpenStart() {
-      var parent = this.el().parentElement;
-      var parentClass = this.myClass('parents');
-      while (parent) {
-        parent.classList.add(parentClass);
-        parent = parent.parentElement;
-      }
-    },
-
-    function onCloseComplete() {
-      var parent = this.el().parentElement;
-      var parentClass = this.myClass('parents');
-      while (parent) {
-        parent.classList.remove(parentClass);
-        parent = parent.parentElement;
-      }
     }
   ]
 });
