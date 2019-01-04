@@ -115,7 +115,7 @@ if ( userResult == null ) {
   throw new RuntimeException("User not found");
 }
 
-if ( ! Password.isValid(newPassword) ) {
+if ( ! Password.isValid(x, newPassword) ) {
   throw new RuntimeException("Invalid password");
 }
 
