@@ -159,31 +159,23 @@ foam.CLASS({
       return this.OverlayDropdown.create().add(editor);
     },
 
-    /** Adds offset for edit columns overlay dropdown
-     * OverlayDropdown adds element to top right of parent container.
-     * We want the table dropdown to appear below the dropdown icon.
-     */
-    function positionOverlayDropdown(overlay) {
-      // Dynamic position calculation
-      var origin  = this.dropdownOrigin.el();
-      var current = this.overlayOrigin.el();
-
-      var boundingBox  = origin.getBoundingClientRect();
-      var dropdownMenu = current.getBoundingClientRect();
-
-      overlay.style({ top: boundingBox.top - dropdownMenu.top + 'px' });
-    },
-
     function initE() {
       var view = this;
       var columnSelectionE;
 
-      this.start('div', null, this.overlayOrigin$)
-        .callIf(view.editColumnsEnabled, function() {
-          columnSelectionE = view.createColumnSelection();
-          this.add(columnSelectionE);
-        })
-      .end();
+      this.
+        start('div', null, this.overlayOrigin$).
+          style({
+            float: 'right',
+            // Make sure the dropdown to edit the table columns is in the
+            // correct position.
+            transform: 'translate(-67px, 2px)'
+          }).
+          callIf(view.editColumnsEnabled, function() {
+            columnSelectionE = view.createColumnSelection();
+            this.add(columnSelectionE);
+          }).
+        end();
 
       this.
         addClass(this.myClass()).
@@ -211,7 +203,6 @@ foam.CLASS({
                   callIf(view.editColumnsEnabled, function() {
                     this.addClass(view.myClass('th-editColumns')).
                     on('click', function(e) {
-                      view.positionOverlayDropdown(columnSelectionE);
                       columnSelectionE.open();
                     }).
                     add(' ', view.vertMenuIcon).
@@ -296,7 +287,6 @@ foam.CLASS({
                         enableClass('disabled', actions.length === 0).
                         callIf(actions.length > 0, function() {
                           this.on('click', function(evt) {
-                            view.positionOverlayDropdown(overlay);
                             overlay.open();
                           });
                         }).
