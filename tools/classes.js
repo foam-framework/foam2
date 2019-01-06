@@ -116,6 +116,7 @@ var classes = [
   'foam.dao.SQLStatement',
   'foam.dao.EasyDAO',
   'foam.dao.EnabledAwareDAO',
+  'foam.dao.EnabledAwareDAOTest',
   'foam.dao.index.PersistedIndexTest',
   'foam.dao.SequenceNumberDAO',
   'foam.dao.SequenceNumberDAOTest',
