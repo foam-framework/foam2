@@ -27,7 +27,9 @@ foam.CLASS({
       factory: function() {
         return this.EQ(this.EnabledAware.ENABLED, true);
       },
-      javaFactory: 'return foam.mlang.MLang.EQ(EnabledAware.ENABLED, true);'
+      javaFactory: `
+        return foam.mlang.MLang.EQ(getOf().getAxiomByName("enabled"), true);
+      `
     }
   ]
 });
