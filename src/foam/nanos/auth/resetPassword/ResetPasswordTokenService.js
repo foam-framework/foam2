@@ -37,17 +37,6 @@ foam.CLASS({
     'java.util.UUID'
   ],
 
-  axioms: [
-    {
-      name: 'javaExtras',
-      buildJavaClass: function (cls) {
-        cls.extras.push(foam.java.Code.create({
-          data: 'java.util.regex.Pattern p = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");'
-        }))
-      }
-    }
-  ],
-
   methods: [
     {
       name: 'generateTokenWithParameters',
@@ -126,7 +115,7 @@ if ( userResult == null ) {
   throw new RuntimeException("User not found");
 }
 
-if ( ! Password.isValid(newPassword) ) {
+if ( ! Password.isValid(x, newPassword) ) {
   throw new RuntimeException("Invalid password");
 }
 
