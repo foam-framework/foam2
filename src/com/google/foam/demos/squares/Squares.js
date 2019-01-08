@@ -58,6 +58,41 @@ foam.CLASS({
     }
   ],
 
+  actions: [
+    {
+      name: 'settings1',
+      code: function() {
+        this.inColour          = true;
+        this.rotationPerSquare = 0;
+        this.frequency         = 20;
+      }
+    },
+    {
+      name: 'settings2',
+      code: function() {
+        this.inColour          = true;
+        this.rotationPerSquare = 1/45;
+        this.frequency         = 3;
+      }
+    },
+    {
+      name: 'settings3',
+      code: function() {
+        this.inColour          = true;
+        this.rotationPerSquare = 1/45;
+        this.frequency         = 1;
+      }
+    },
+    {
+      name: 'settings4',
+      code: function() {
+        this.inColour          = false;
+        this.rotationPerSquare = 1/45;
+        this.frequency         = 1;
+      }
+    }
+  ],
+
   listeners: [
     {
       name: 'tick',
