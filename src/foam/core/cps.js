@@ -701,6 +701,14 @@ foam.LIB({
     // we don't care what happens when they are reached.
     function nop() {},
 
+    function when(p, f) {
+      return function(then, abort, ...args) {
+        p(function(b) { if ( b ) f(then, abort, ...args); else then(); },
+          abort,
+          ...args);
+      }
+    },
+
     // Decorates a function to log its activity to console.  Can be
     // used as trace('foo', f); or just trace(f) if f has a suitable
     // name.
