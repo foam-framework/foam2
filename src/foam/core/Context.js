@@ -84,7 +84,7 @@ foam.SCRIPT({
         'Cannot register non-objects into a context.');
 
       // Top level context also registers classes globally.
-      if ( this === foam.__context__ )
+      if ( this === foam.__context__ && ! opt_id )
         foam.package.registerClass(cls);
 
       if ( opt_id ) {

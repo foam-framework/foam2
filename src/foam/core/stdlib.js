@@ -1006,11 +1006,11 @@ foam.LIB({
      * then the class object will be made available globally at
      * global.some.package.MyClass.
      */
-    function registerClass(cls) {
+    function registerClass(cls, opt_id) {
       foam.assert(typeof cls === 'object',
-          'cls must be an object');
+                  'cls must be an object');
       foam.assert(typeof cls.name === 'string' && cls.name !== '',
-          'cls must have a non-empty string name');
+                  'cls must have a non-empty string name');
 
       var pkg = foam.package.ensurePackage(global, cls.package);
       pkg[cls.name] = cls;
