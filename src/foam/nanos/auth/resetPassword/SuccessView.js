@@ -19,7 +19,7 @@ foam.CLASS({
     'foam.u2.dialog.NotificationMessage'
   ],
 
-  css:`
+  css: `
     ^{
       width: 490px;
       margin: auto;
@@ -82,25 +82,25 @@ foam.CLASS({
   `,
 
   messages: [
-    { name: 'Instructions', message: "Successfully reset password!"}
+    { name: 'Instructions', message: 'Successfully reset password!' }
   ],
 
   methods: [
-    function initE(){
+    function initE() {
       this.SUPER();
       var self = this;
 
       this
         .addClass(this.myClass())
         .start()
-          .start().addClass('Reset-Password').add("Reset Password").end()
+          .start().addClass('Reset-Password').add('Reset Password').end()
           .start().addClass('Message-Container')
             .start().addClass('success-Text').add(this.Instructions).end()
             .start().addClass('Back-Button')
-              .add("Back to Sign In")
-              .on('click', function(){
+              .add('Back to Sign In')
+              .on('click', function() {
                 window.location.href = '#';
-                self.stack.push({ class: 'foam.nanos.auth.SignInView' })
+                self.stack.push({ class: 'foam.nanos.auth.SignInView' });
               })
             .end()
           .end()
