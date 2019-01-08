@@ -777,7 +777,7 @@ foam.LIB({
     function clone(o) {
       const newObj = {};
 
-      for ( let key in o ) {
+      for ( var key in o ) {
         if ( o.hasOwnProperty(key) ) {
           newObj[key] = foam.util.clone(o[key]);
         }
