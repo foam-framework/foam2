@@ -99,9 +99,70 @@ foam.CLASS({
       label: 'URL',
       displayWidth: 120,
       view: 'foam.nanos.dig.LinkView',
-      setter: function() {}, // Prevent from ever getting set
+      setter: function() {}, // Prevent from ever getting set,
+      hidden: true,
       expression: function(key, data, email, subject, daoKey, cmd, format, q, dataFile) {
+        var query = false;
+        var url = "/service/dig";
 
+        if ( daoKey ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "dao=" + daoKey;
+        }
+        if ( cmd ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "cmd=" + cmd.name.toLowerCase();
+        }
+        if ( format ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "format=" + format.name.toLowerCase();
+        }
+        if ( key ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "id=" + key;
+        }
+        if ( email ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "email=" + email;
+        }
+        if ( subject ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "subject=" + subject;
+        }
+        if ( q ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "q=" + q;
+        }
+        this.postURL = url;
+        if ( data ) {
+          if ( data.length + url.length < this.MAX_URL_SIZE ) {
+            url += query ? "&" : "?";
+            query = true;
+            url += "data=" + data;
+          }
+        }
+        if ( dataFile ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "&fileaddress=" + dataFile.address;
+        }
+
+        return encodeURI(url);
+      }
+    },
+    {
+      name: 'snippet',
+      label: 'Snippet',
+      documentation: 'show a specific type of request would look like in a given language.',
+      view: { class: 'foam.nanos.dig.DigSnippetView' },
+      expression: function(key, data, email, subject, daoKey, cmd, format, q, dataFile) {
         var query = false;
         var url = "/service/dig";
 
