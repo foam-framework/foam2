@@ -92,11 +92,11 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'Instructions', message: "We've sent the instructions to your email. Please check your inbox to continue."}
+    { name: 'Instructions', message: `We've sent the instructions to your email. Please check your inbox to continue.` }
   ],
 
   methods: [
-    function initE(){
+    function initE() {
       this.SUPER();
       var self = this;
 
@@ -112,8 +112,8 @@ foam.CLASS({
           .start('p').addClass('link')
             .add('Sign in.')
             .on('click', function() {self.stack.push({ class: 'foam.nanos.auth.SignInView' })})
-        .end()       
-      .end()
+        .end()
+      .end();
 
       this.add(self.NotificationMessage.create({ message: 'Password reset instructions sent to ' + self.email }));
     }
@@ -123,14 +123,14 @@ foam.CLASS({
     {
       name: 'resendEmail',
       label: 'Resend Email',
-      code: function (X) {
+      code: function(X) {
         var self = this;
 
         var user = this.User.create({ email: this.email });
-        this.resetPasswordToken.generateToken(null, user).then(function (result) {
+        this.resetPasswordToken.generateToken(null, user).then(function(result) {
           self.add(self.NotificationMessage.create({ message: 'Password reset instructions sent to ' + self.email }));
         })
-        .catch(function (err) {
+        .catch(function(err) {
           self.add(self.NotificationMessage.create({ message: err.message, type: 'error' }));
         });
       }
