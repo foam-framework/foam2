@@ -120,9 +120,9 @@ foam.LIB({
 
       (Model is 'this').
     */
-    function buildClass(x, c) {
+    function buildClass(x) {
       var context = x || this.__context__ || foam.__context__;
-      var cls = c || {};
+      var cls;
 
       if ( this.refines ) {
         // TODO This should probably live elsewhere.
@@ -151,7 +151,7 @@ foam.LIB({
           context.lookup(this.extends) :
           foam.core.FObject            ;
 
-        parent.createSubClass_(cls);
+        cls                  = parent.createSubClass_();
         cls.prototype.cls_   = cls;
         cls.prototype.model_ = this;
         cls.count_           = 0;            // Number of instances created
@@ -192,30 +192,12 @@ foam.LIB({
 
       var buildClass = this.buildClass;
 
-
-      var foamClass = function(m) {
+      // Will be replaced in phase2.
+      foam.CLASS = function(m) {
         m.class = m.class || 'foam.core.Model';
 
         m.id = m.package + '.' + m.name;
         var cls = buildClass.call(m);
-
-        foam.assert(
-          ! m.refines,
-          'Refines is not supported in early bootstrap');
-
-        foam.register(cls);
-
-        return cls;
-      };
-
-      // Will be replaced in phase2.
-      foam.CLASS = function(m) {
-        foam.CLASS = foamClass;
-
-        m.class = m.class || 'foam.core.Model';
-
-        m.id = m.package + '.' + m.name;
-        var cls = buildClass.call(m, null, foam.core.FObject);
 
         foam.assert(
           ! m.refines,
@@ -240,21 +222,20 @@ foam.LIB({
           @method CLASS
           @memberof module:foam */
       foam.CLASS = function(m, skipRegistration) {
-        var modelClass   = m.class ? foam.lookup(m.class) : foam.core.Model;
-        var model = modelClass.create(m);
+        var cls   = m.class ? foam.lookup(m.class) : foam.core.Model;
+        var model = cls.create(m);
 
         model.validate();
-
-        var cls = { id: model.id, package: model.package, name: model.name };
-
-        if ( ! m.refines && ! skipRegistration ) {
-          foam.register(cls);
-        }
-
-        cls = model.buildClass(null, cls);
+        // cls was: class-for-model-construction;
+        // cls is: class-constructed-from-model.
+        cls = model.buildClass();
         cls.validate();
 
-        if ( ! m.refines && ! skipRegistration ) {
+        if ( skipRegistration ) return cls;
+
+        if ( ! m.refines ) {
+          // Register class in global context.
+          foam.register(cls);
           foam.pubsub.pub("defineClass", cls.id, cls);
         }
 
