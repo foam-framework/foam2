@@ -23,6 +23,7 @@ import javax.security.auth.AuthPermission;
 import java.security.Permission;
 import java.util.Calendar;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static foam.mlang.MLang.AND;
 import static foam.mlang.MLang.EQ;
@@ -36,9 +37,6 @@ public class UserAndGroupAuthService
   protected DAO sessionDAO_;
 
   public final static String CHECK_USER_PERMISSION = "service.auth.checkUser";
-
-  // pattern used to check if password has only alphanumeric characters
-  java.util.regex.Pattern alphanumeric = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");
 
   public UserAndGroupAuthService(X x) {
     setX(x);
@@ -276,6 +274,22 @@ public class UserAndGroupAuthService
     return checkPermission(x, new AuthPermission(permission));
   }
 
+  private String passwordValidationRegex() {
+    return "^.{6,}$"; // Minimum 6 characters
+  }
+
+  private String passwordValidationErrorMessage() {
+    return "Password must be at least 6 characters long";
+  }
+
+  public void validatePassword( String newPassword ) {
+    Pattern passwordValidationPattern = Pattern.compile(passwordValidationRegex()); 
+    String passwordErrorMessage = passwordValidationErrorMessage();
+    if ( SafetyUtil.isEmpty(newPassword) || ! passwordValidationPattern.matcher(newPassword).matches() ) {
+      throw new RuntimeException(passwordErrorMessage);
+    }
+  }
+
   public boolean checkUser(foam.core.X x, User user, String permission) {
     return checkUserPermission(x, user, new AuthPermission(permission));
   }
@@ -286,7 +300,7 @@ public class UserAndGroupAuthService
    */
   public User updatePassword(foam.core.X x, String oldPassword, String newPassword) throws AuthenticationException {
     if ( x == null || SafetyUtil.isEmpty(oldPassword) || SafetyUtil.isEmpty(newPassword) ) {
-      throw new RuntimeException("Invalid parameters");
+      throw new RuntimeException("Password fields cannot be blank");
     }
 
     Session session = x.get(Session.class);
@@ -315,23 +329,9 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User group disabled");
     }
 
-    int length = newPassword.length();
-    if ( length < 7 || length > 32 ) {
-      throw new RuntimeException("Password must be 7-32 characters long");
-    }
-
-    if ( newPassword.equals(newPassword.toLowerCase()) ) {
-      throw new RuntimeException("Password must have one capital letter");
-    }
-
-    if ( ! newPassword.matches(".*\\d+.*") ) {
-      throw new RuntimeException("Password must have one numeric character");
-    }
-
-    if ( alphanumeric.matcher(newPassword).matches() ) {
-      throw new RuntimeException("Password must not contain: !@#$%^&*()_+");
-    }
-
+    // check if password is valid per validatePassword method
+    validatePassword(newPassword);
+    
     // old password does not match
     if ( ! Password.verify(oldPassword, user.getPassword()) ) {
       throw new RuntimeException("Old password is incorrect");
@@ -384,9 +384,7 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Password is required for creating a user");
     }
 
-    if ( ! Password.isValid(user.getPassword()) ) {
-      throw new AuthenticationException("Password needs to minimum 8 characters, contain at least one uppercase, one lowercase and a number");
-    }
+    validatePassword(user.getPassword());
   }
 
   /**
