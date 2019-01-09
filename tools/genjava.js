@@ -10,7 +10,7 @@ process.on('unhandledRejection', function(e) {
 });
 
 // enable FOAM java support.
-global.FOAM_FLAGS = { 'java': true, 'debug': true, 'js': false };
+global.FOAM_FLAGS = { 'java': true, 'debug': true, 'js': false, 'swift': true };
 
 require('../src/foam.js');
 require('../src/foam/nanos/nanos.js');
