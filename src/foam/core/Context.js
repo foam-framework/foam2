@@ -62,15 +62,6 @@ foam.SCRIPT({
       return foam.Function.isInstance(ret) ? ret() : ret;
     },
 
-    isRegistered: function(id) {
-      return !! this.__cache_[id];
-    },
-
-    isDefined: function(id) {
-      return !! this.__cache__[id] &&
-        ! foam.Function.isInstance(this.__cache__[id]);
-    },
-
     /**
      * Register a class into the given context.  After registration
      * the class can be found again by calling foam.lookup('com.foo.SomeClass');
@@ -124,10 +115,19 @@ foam.SCRIPT({
     },
 
     /**
-     * Returns true if the model ID has been registered. False otherwise.
+     * Returns true if the ID has been registered. False otherwise.
      */
-    isRegistered: function(modelId) {
-      return !! this.__cache__[modelId];
+    isRegistered: function(id) {
+      return !! this.__cache__[id];
+    },
+
+    /**
+     * Returns true if the given ID has been registered in the context, and isn't
+     * registered as a factory.
+     */
+    isDefined: function(id) {
+      return !! this.__cache__[id] &&
+        ! foam.Function.isInstance(this.__cache__[id]);
     },
 
     /** Internal method to register a context binding in an internal cache */
@@ -227,6 +227,12 @@ foam.SCRIPT({
   };
   foam.createSubContext = function(opt_args, opt_name) {
     return foam.__context__.createSubContext(opt_args, opt_name);
+  };
+  foam.isRegistered = function(id) {
+    return foam.__context__.isRegistered(id);
+  };
+  foam.isDefined = function(id) {
+    return foam.__context__.isDefined(id);
   };
 
   foam.__context__ = __context__;
