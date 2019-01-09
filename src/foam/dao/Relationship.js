@@ -250,7 +250,7 @@ foam.CLASS({
       if ( this.junctionInitialized ) return;
       this.junctionInitialized = true;
 
-      if ( foam.__context__.isDefined(this.junctionModel) )
+      if ( foam.__context__.isRegistered(this.junctionModel) )
         return;
 
       var name = this.junctionModel.substring(
