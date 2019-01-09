@@ -34,7 +34,7 @@ Methods:
 - Asynchronous methods should now be marked as "async: true" rather
   than returns: 'Promise'.  "returns" on an async method should
   indicate the type that we expect the returned promise to resolve to.
-               
+
 
 Properties:
 
@@ -93,3 +93,32 @@ foam.SCRIPT({
     console.log("Running in nodejs!");
   }
 });
+
+Constants:
+
+- Constants no longer blindly print the type or value out when generating the
+  java code.
+
+- The type property of a constant works the same as the type property on method
+  args. Use the type property when outputting primitives or modelled objects and
+  use javaType/swiftType when outputting types for those languages that FOAM is
+  unaware of.
+
+- FOAM will attempt to convert the value property to the appropriate value in
+  the language it's generating. For example, if value is 'Hello world', the
+  javaValue will be computed as '"Hello world"'.
+
+- Here is a sample constant that will no longer build properly with
+  pressure-wash:
+{
+  name: 'EXAMPLE_PATTERN',
+  type: 'java.util.regex.Pattern',
+  value: 'java.util.regex.Pattern.compile("^$")'
+}
+
+  The migration for this specific example is:
+{
+  name: 'EXAMPLE_PATTERN',
+  javaType: 'java.util.regex.Pattern',
+  javaValue: 'java.util.regex.Pattern.compile("^$")'
+}
