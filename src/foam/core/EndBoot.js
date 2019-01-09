@@ -288,25 +288,6 @@ foam.CLASS({
       foam.USED[m.id] = m;
       return c;
     });
-    // var f = (function() {
-    //   var pending = false;
-    //   var value;
-
-    //   return function() {
-    //     if ( value ) {
-    //       return value;
-    //     }
-
-    //     if ( pending ) {
-    //       throw new Error("Tried to access " + m.id + " but latch is still running.");
-    //     }
-    //     pending = true;
-    //     delete foam.UNUSED[m.id];
-    //     value = CLASS(m);
-    //     foam.USED[m.id] = m;
-    //     return value;
-    //   };
-    // })();
 
     foam.__context__.registerFactory(m, f);
   };

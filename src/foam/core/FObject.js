@@ -85,7 +85,7 @@ foam.LIB({
       return obj;
     },
 
-    function createSubClass_(cls) {
+    function createSubClass_() {
       /**
        * Used to create a sub-class of this class.  Sets up the appropriate
        * prototype chains for the class, class.prototype and axiomMap_
@@ -98,13 +98,17 @@ foam.LIB({
        * and replace createSubClass() on FObject to actually create real
        * sub-classes for all subsequent uses of FObject.createSubClass()
        */
-      foam.core.FObject.createSubClass_ = function(cls) {
-        Object.setPrototypeOf(cls, this)
+      foam.core.FObject.createSubClass_ = function() {
+        var cls = Object.create(this);
 
         cls.prototype = Object.create(this.prototype);
         cls.axiomMap_ = Object.create(this.axiomMap_);
         cls.private_  = { axiomCache: {} };
+
+        return cls;
       };
+
+      return this;
     },
 
     function getSuperClass() {
