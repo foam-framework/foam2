@@ -32,7 +32,7 @@ public class AgentUserAuthService
   public void start() {
     userDAO_     = (DAO) getX().get("localUserDAO");
     groupDAO_    = (DAO) getX().get("groupDAO");
-    sessionDAO_  = (DAO) getX().get("sessionDAO");
+    sessionDAO_  = (DAO) getX().get("localSessionDAO");
     agentJunctionDAO_  = (DAO) getX().get("agentJunctionDAO");
   }
 
