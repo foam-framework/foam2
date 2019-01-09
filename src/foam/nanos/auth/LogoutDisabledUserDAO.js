@@ -25,7 +25,7 @@ foam.CLASS({
           && oldUser.getEnabled()
           && !newUser.getEnabled()
         ) {
-          sessionDAO_ = (DAO) x.get("sessionDAO");
+          sessionDAO_ = (DAO) x.get("localSessionDAO");
           auth_ = (AuthService) x.get("auth");
 
           logoutUser(newUser, null);
