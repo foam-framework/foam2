@@ -1,0 +1,95 @@
+Major Changes.
+
+Introduction of CPS library:
+
+- CPS provides a way to write synchronous and asynchronous in a single
+  consistent style.  See src/foam/core/cps.js for a detailed
+  introduction and examples.
+
+Modelling Changes:
+
+Type System:
+
+Methods:
+
+- Argument types should no longer be definied by doing { class: 'XYZ'
+  }, instead use { type: 'XYZ' }.  This is consistent for both
+  primitive types and modelled types.
+
+- type: 'Integer', type: 'Boolean', type: 'foam.nanos.auth.User' are
+  all valid examples.  javaType and swiftType will be computed
+  automatically when they can.  If your java/swift type is not known
+  to FOAM (say is an unmodelled java class) then just provide
+  javaType: 'java.security.Principal' for example.
+
+- Method return types should now be specified similar to argument
+  types.  returns: 'Boolean', returns: 'foam.nanos.auth.User' for
+  example.
+
+  Java/Swift return types can be specified as javaReturns:
+  'java.security.Principal' for cases where the type is not known to
+  FOAM.  If the type is a primitive or modelled type then FOAM will
+  compute the appropriate Java/Swift name.
+
+- Asynchronous methods should now be marked as "async: true" rather
+  than returns: 'Promise'.  "returns" on an async method should
+  indicate the type that we expect the returned promise to resolve to.
+               
+
+Properties:
+
+- All properties now have a "type" field which specifies the type of
+  value that will be stored in the property.  You shouldn't typically
+  need to worry about it, all the built in properties have sensible
+  defaults, and you could potentially provoke weird behaviour by
+  changing the type of a property to something unexpected ( Example
+  making a property such as { class: 'String', type: 'Person' }, will
+  probably cause errors.
+
+Refinements:
+
+- Refinement must now have a "package" and "name" specified.  This is
+  necessary for the build tool to be able to property identify them.
+
+- Refinements are now lazier.  They do not take effect until the
+  target class is used.  This allows us to define refinements before
+  the refined class is itself defined (not that this is recommended).
+  It also means fewer classes need to be built on startup if they are
+  not needed for the first screen.
+
+- Refinements can also be flagged for specific environments.  Rather
+  than having to flag an entire file in files.js, we can instead just
+  flag the specific refinement and it will only get built if the
+  running flags match.
+
+foam.CLASS({
+  name: 'SomeJavaPropertyModelRefinement',
+  refines: 'foam.core.Model',
+  flags: [ 'java' ],
+  properties: [
+    { name: 'someJavaProperty' }
+  ]
+});
+
+This will only add someJavaProperty to Model if we are running with the java flag.
+
+Relationships:
+
+- Relationships are also lazier.  They are not defined until the one
+  of the source or target class are first accessed.  This also means
+  we don't have to worry about ordering as much, the relationship can
+  be defined before one or both of the related models, just so long as
+  both models are defined before we access one of them.
+
+Scripts:
+
+- Scripts can also be flagged for specific platforms, and they will
+  only run if the flags match.
+
+foam.SCRIPT({
+  name: 'NodeJsSpecialness',
+  flags: [ 'node' ],
+  code: function() {
+    console.log("Running in nodejs!");
+  }
+});
