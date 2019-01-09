@@ -99,6 +99,17 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'validatePassword',
+      javaThrows: [ 'java.lang.RuntimeException' ],
+      swiftThrows: true,
+      args: [
+        {
+          name: 'potentialPassword',
+          javaType: 'String',
+        }
+      ]
+    },
+    {
       name: 'checkUser',
       javaReturns: 'boolean',
       swiftReturns: 'Bool',
