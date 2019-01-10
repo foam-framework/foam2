@@ -10,31 +10,59 @@ Modelling Changes:
 
 Type System:
 
+- FOAM now has a rudimentary type system that allows us track types
+  and how to represent them across different platforms.  Most model
+  features that can be typed now contain a 'type' property
+  (Property,Method,Import,Argument,Context, etc).
+
+  Set this to the name of the type that your feature returns, stores,
+  or represents.
+
+  Type names are capital letters and usually complete words rather
+  than abbreivations such as Integer, String and Boolean.  Floating
+  point numbers are just called Float not FloatingPoint.
+
+  The type "Any" represents any possible value can be stored,
+  including null/undefined.
+
+  Types for modelled classes are just the fully qualified class name
+  such as foam.nanos.auth.User.
+  
+  Array types are any type with the suffix '[]'.  "Any[]" represents
+  an array of any type of object.  "Float[]" is an array of floats,
+  and "foam.nanos.auth.User[][][]" is an array of arrays of arrays of
+  Users.
+
+  Finally type should only be set when it's a type that FOAM knows
+  about.  Either a primitive type defined in Type.js or the id of a
+  modeled class/enum.  If the type of a axiom is something native to a
+  specific platform such as "java.io.File", then you can set the aptly
+  named "javaType" property (or "swiftType") for Swift specific types.
+
 Methods:
 
-- Argument types should no longer be definied by doing { class: 'XYZ'
-  }, instead use { type: 'XYZ' }.  This is consistent for both
-  primitive types and modelled types.
+  In addition to having type/javaType/swiftType some other changes
+  have been done to the Method model.
 
-- type: 'Integer', type: 'Boolean', type: 'foam.nanos.auth.User' are
-  all valid examples.  javaType and swiftType will be computed
+- Argument types should no longer be definied by doing { class: 'XYZ'
+  } or { class: 'FObjectProperty' of: 'Foo' }, instead use { type:
+  'XYZ' } or { type: 'Foo' }.
+
+- As explained above javaType and swiftType will be computed
   automatically when they can.  If your java/swift type is not known
-  to FOAM (say is an unmodelled java class) then just provide
+  to FOAM (say is an unmodelled java class) then just it directory as
   javaType: 'java.security.Principal' for example.
 
-- Method return types should now be specified similar to argument
-  types.  returns: 'Boolean', returns: 'foam.nanos.auth.User' for
-  example.
-
-  Java/Swift return types can be specified as javaReturns:
-  'java.security.Principal' for cases where the type is not known to
-  FOAM.  If the type is a primitive or modelled type then FOAM will
-  compute the appropriate Java/Swift name.
+- Method return type is now consistently named 'type' rather than
+ 'returns' as was previously used.
 
 - Asynchronous methods should now be marked as "async: true" rather
-  than returns: 'Promise'.  "returns" on an async method should
-  indicate the type that we expect the returned promise to resolve to.
+  than type: 'Promise'.  "type" on an async method should indicate the
+  type that we expect the returned promise to resolve to.
 
+  Currently async only affects JavaScript, Java/Swift methods are
+  generated as blocking methods whether marked async or not.  This may
+  change in the future.
 
 Properties:
 
@@ -46,10 +74,40 @@ Properties:
   making a property such as { class: 'String', type: 'Person' }, will
   probably cause errors.
 
+  Just continue to use { class: 'String' }.  FObjectProperty should
+  use 'type' instead of 'of' to stay consistent { class:
+  'FObjectProperty', type: 'foam.nanos.auth.Group' }, but of:
+  'foam.nanos.auth.Group' will still work for the time being.
+
+- The default value of a Property will be adapted to an appropriate
+  representation when outputting native code. If you need to drop
+  platform specific code for the default value use the javaValue
+  property.
+
+  Example:
+  {
+    name: 'mySpecialRegex',
+    javaValue: 'Pattern.compile("aaaabbbb");'
+  }
+
+  However FOAM understands JavaScript regex's enough to be able to
+  output them directly to Java. So we could instead have just written:
+
+  Example:
+  {
+    name: 'mySpecialRegex',
+    value: /aaaabbbb/
+  }
+
+  And when generating java code, the appropriate Pattern.compile()
+  code will be output.
+  
+
 Refinements:
 
-- Refinement must now have a "package" and "name" specified.  This is
-  necessary for the build tool to be able to property identify them.
+- Refinements must now have a "package" and "name" specified.  This is
+  necessary for the build tool to be able to property identify and
+  track them.
 
 - Refinements are now lazier.  They do not take effect until the
   target class is used.  This allows us to define refinements before
@@ -71,15 +129,17 @@ foam.CLASS({
   ]
 });
 
-This will only add someJavaProperty to Model if we are running with the java flag.
+  This will only add someJavaProperty to Model if we are running with
+  the java flag.  See src/foam/core/Window.js for an example of how we
+  use this to update the Window class when running on nodejs only.
 
 Relationships:
 
-- Relationships are also lazier.  They are not defined until the one
-  of the source or target class are first accessed.  This also means
-  we don't have to worry about ordering as much, the relationship can
-  be defined before one or both of the related models, just so long as
-  both models are defined before we access one of them.
+- Relationships are also lazier. They upgrade the source/target
+  classes only when the source/target classes get built.  This
+  shouldn't have any visible changes other than allowing people to
+  defined Relationships before either of the involved classes have
+  been declared.
 
 Scripts:
 
@@ -94,31 +154,45 @@ foam.SCRIPT({
   }
 });
 
+  If running foam in nodejs this script will execute, otherwise it
+  will not.
+
 Constants:
 
-- Constants no longer blindly print the type or value out when generating the
-  java code.
+- The type property of a constant works the same as the type property
+  on methods or arguments. As with methods/arguments use 'type' when
+  the constant holds a type known to FOAM (primitive or modelled
+  object), and use javaType/swiftType when the constant holds Use the
+  type property when outputting primitives or modelled objects and use
+  javaType/swiftType when outputting types for those languages that
+  FOAM is unaware of.
 
-- The type property of a constant works the same as the type property on method
-  args. Use the type property when outputting primitives or modelled objects and
-  use javaType/swiftType when outputting types for those languages that FOAM is
-  unaware of.
+- Constants now adapt their value to the appropriate native type when
+  generating code the same as Properties adapt their default value.
 
-- FOAM will attempt to convert the value property to the appropriate value in
-  the language it's generating. For example, if value is 'Hello world', the
-  javaValue will be computed as '"Hello world"'.
+- Here is a sample constant migration
 
-- Here is a sample constant that will no longer build properly with
-  pressure-wash:
-{
-  name: 'EXAMPLE_PATTERN',
-  type: 'java.util.regex.Pattern',
-  value: 'java.util.regex.Pattern.compile("^$")'
-}
+  Before code like this would generate what you expect for Java.
+  {
+    name: 'EXAMPLE_PATTERN',
+    type: 'java.util.regex.Pattern',
+    value: 'java.util.regex.Pattern.compile("^$")'
+  }
 
-  The migration for this specific example is:
-{
-  name: 'EXAMPLE_PATTERN',
-  javaType: 'java.util.regex.Pattern',
-  javaValue: 'java.util.regex.Pattern.compile("^$")'
-}
+  However now that 'type' has meaning in the JavaScript world this has to be migrated to.
+
+  {
+    name: 'EXAMPLE_PATTERN',
+    javaType: 'java.util.regex.Pattern',
+    javaValue: 'java.util.regex.Pattern.compile("^$")'
+  }
+
+  But we can use FOAM's understanding of RegEx to shorten this specific example to:
+  
+  {
+    name: 'EXAMPLE_PATTERN',
+    type: 'Regex',
+    value: /^$/
+  }
+
+  and now we can generate this constant for _all_ supported platforms.
