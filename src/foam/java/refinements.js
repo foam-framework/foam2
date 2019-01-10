@@ -68,9 +68,15 @@ foam.CLASS({
   extends: 'String',
   properties: [
     {
-      name: 'factory',
-      value: function() {
-        return foam.java.toJavaType(this.type);
+      name: 'expression',
+      expression: function(value) {
+        // TODO: This is a large hack around the way SHADOW_MAP works.
+        // What we really want is a way to specify a default
+        // factory/expression but not to use it if the user sets a
+        // default value.
+        return function(type) {
+          return value || foam.java.toJavaType(type);
+        }
       }
     },
     {
