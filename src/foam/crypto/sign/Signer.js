@@ -13,12 +13,12 @@ foam.INTERFACE({
   methods: [
     {
       name: 'includeInSignature',
-      returns: 'Boolean',
+      type: 'Boolean',
       documentation: 'Flag to determine if we should include this property as part of the signature'
     },
     {
       name: 'updateSignature',
-      returns: 'Void',
+      type: 'Void',
       javaThrows: [
         'java.security.SignatureException'
       ],

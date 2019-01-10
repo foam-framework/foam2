@@ -23,8 +23,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'actAs',
-      javaReturns: 'foam.nanos.auth.User',
-      swiftReturns: 'foam_nanos_auth_User',
+      type: 'foam.nanos.auth.User',
       javaThrows: [
         'foam.nanos.auth.AuthorizationException',
         'foam.nanos.auth.AuthenticationException'
@@ -33,19 +32,17 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
+          type: 'Context',
         },
         {
           name: 'entity',
-          javaType: 'foam.nanos.auth.User'
+          type: 'foam.nanos.auth.User'
         }
       ]
     },
     {
       name: 'getCurrentAgent',
-      javaReturns: 'foam.nanos.auth.User',
-      swiftReturns: 'foam_nanos_auth_User?',
+      type: 'foam.nanos.auth.User',
       javaThrows: [
         'foam.nanos.auth.AuthorizationException',
         'foam.nanos.auth.AuthenticationException'
@@ -54,8 +51,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
+          type: 'Context'
         }
       ]
     }

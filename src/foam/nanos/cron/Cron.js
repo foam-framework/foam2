@@ -92,7 +92,7 @@ foam.CLASS({
           type: 'Context'
         }
       ],
-      returns: 'Void',
+      type: 'Void',
       javaCode:
 `DAO notification = (DAO) x.get("notificationDAO");
 
@@ -110,7 +110,7 @@ setScheduledTime(getNextScheduledTime());`
     },
     {
       name: 'getNextScheduledTime',
-      returns: 'Date',
+      type: 'Date',
       javaCode:
 `Calendar next = Calendar.getInstance();
 next.add(Calendar.SECOND, 1);

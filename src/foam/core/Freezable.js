@@ -12,17 +12,17 @@ foam.INTERFACE({
     {
       name: 'beforeFreeze',
       async: true,
-      returns: 'Void'
+      type: 'Void'
     },
     {
       name: 'freeze',
       async: true,
-      returns: 'Void'
+      type: 'Void'
     },
     {
       name: 'isFrozen',
       async: true,
-      returns: 'Boolean'
+      type: 'Boolean'
     }
   ]
 });

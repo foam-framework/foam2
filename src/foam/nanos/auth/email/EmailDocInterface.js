@@ -12,7 +12,7 @@ foam.INTERFACE({
     {
       name: 'emailDoc',
       async: true,
-      returns: 'Boolean',
+      type: 'Boolean',
       swiftThrows: true,
       args: [
         {

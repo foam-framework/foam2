@@ -168,7 +168,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'f',
-      returns: 'Any',
+      type: 'Any',
       args: [
         {
           name: 'obj',
@@ -196,7 +196,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'partialEval',
-      returns: 'foam.mlang.Expr'
+      type: 'foam.mlang.Expr'
     }
   ]
 });
@@ -301,18 +301,17 @@ foam.INTERFACE({
   methods: [
     {
       name: 'f',
-      swiftReturns: 'Bool',
-      javaReturns: 'boolean',
+      type: 'Boolean',
       args: [
         {
           name: 'obj',
-          javaType: 'Object'
+          type: 'Any'
         }
       ]
     },
     {
       name: 'partialEval',
-      returns: 'foam.mlang.predicate.Predicate',
+      type: 'foam.mlang.predicate.Predicate',
     },
     {
       name: 'toIndex',
@@ -323,13 +322,13 @@ foam.INTERFACE({
           type: 'foam.dao.index.Index'
         }
       ],
-      returns: 'foam.dao.index.Index'
+      type: 'foam.dao.index.Index'
     },
     {
       name: 'toDisjunctiveNormalForm',
       flags: ['js', 'java'],
       javaSupport: false,
-      returns: 'foam.mlang.predicate.Predicate',
+      type: 'foam.mlang.predicate.Predicate',
     }
   ]
 });
@@ -397,7 +396,7 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      returns: 'Boolean',
+      type: 'Boolean',
       args: [
         {
           name: 'obj',
@@ -442,13 +441,13 @@ foam.CLASS({
     },
     {
       name: 'createStatement',
-      returns: 'String',
+      type: 'String',
       javaCode: 'return "";',
       swiftCode: 'return "";',
     },
     {
       name: 'prepareStatement',
-      returns: 'Void',
+      type: 'Void',
       javaThrows: [ 'java.sql.SQLException' ],
       args: [
         {
@@ -479,7 +478,7 @@ foam.CLASS({
     },
     {
       name: 'createStatement',
-      returns: 'String',
+      type: 'String',
       javaCode: 'return "";'
     },
     {
@@ -536,7 +535,7 @@ foam.CLASS({
     },
     {
       name: 'createStatement',
-      returns: 'String',
+      type: 'String',
       javaCode: 'return " 1 <> 1 ";',
       code: function() { return "1 <> 1"; }
     }
@@ -707,7 +706,7 @@ return false
 
     {
       name: 'createStatement',
-      returns: 'String',
+      type: 'String',
       javaCode:
 `StringBuilder stmt = new StringBuilder();
 Predicate[] predicates = getArgs();
@@ -858,7 +857,7 @@ return true
 
     {
       name: 'createStatement',
-      returns: 'String',
+      type: 'String',
       javaCode:
 `StringBuilder stmt = new StringBuilder();
 Predicate[] predicates = getArgs();
@@ -1148,7 +1147,7 @@ return ( s1 instanceof String && ((String) s1).toUpperCase().contains(s2) );`
     },
     {
       name: 'createStatement',
-      javaReturns: 'String',
+      javaType: 'String',
       javaCode: `return " '" + getArg1().createStatement() + "' ilike '%" + getArg2().createStatement() + "%' ";`
     }
   ]
@@ -1435,7 +1434,7 @@ return false
 
     {
       name: 'createStatement',
-      returns: 'String',
+      type: 'String',
       javaCode: 'return " " + getArg1().createStatement() + " in " + getArg2().createStatement();'
     },
 
@@ -1617,7 +1616,7 @@ stmt.setObject(builder.toString());`
           type: 'Any'
         }
       ],
-      returns: 'Void',
+      type: 'Void',
       javaCode:
 `String s = o.toString();
 //replace backslash to double backslash
@@ -2138,7 +2137,7 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      returns: 'Any',
+      type: 'Any',
       args: [ { name: 'obj', type: 'Any' } ],
       code: function f(obj) { return this.arg1.f(obj); },
       swiftCode: `return arg1?.f(obj)`,
@@ -2225,7 +2224,7 @@ foam.CLASS({
   methods: [
     {
       name: 'sortedKeys',
-      javaReturns: 'java.util.List',
+      javaType: 'java.util.List',
       args: [
         {
           name: 'comparator',
@@ -2246,7 +2245,7 @@ return getGroupKeys();`
     },
     {
       name: 'putInGroup_',
-      javaReturns: 'void',
+      javaType: 'void',
       args: [
         {
           name: 'sub',
@@ -2321,7 +2320,7 @@ if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
       // TODO(adamvy): Is this right?  Seems like we should be overriding the foam2
       // fclone or deepClone method.
       name: 'clone',
-      returns: 'foam.mlang.sink.GroupBy',
+      type: 'foam.mlang.sink.GroupBy',
       code: function clone() {
         // Don't use the default clone because we don't want to copy 'groups'.
         return this.cls_.create({ arg1: this.arg1, arg2: this.arg2 });
@@ -2947,7 +2946,7 @@ foam.CLASS({
     {
       name: 'DESC',
       args: [ { name: 'a', type: 'foam.mlang.order.Comparator' } ],
-      returns: 'foam.mlang.order.Comparator',
+      type: 'foam.mlang.order.Comparator',
       code: function DESC(a) { return this._unary_("Desc", a); },
       swiftCode: `return Desc_create(["arg1": a])`,
     },

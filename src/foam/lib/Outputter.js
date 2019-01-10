@@ -24,7 +24,7 @@ foam.INTERFACE({
     },
     {
       name: 'stringify',
-      returns: 'String',
+      type: 'String',
       args: [
         {
           name: 'obj',
@@ -34,7 +34,7 @@ foam.INTERFACE({
     },
     {
       name: 'output',
-      returns: 'Void',
+      type: 'Void',
       args: [
         {
           name: 'value',

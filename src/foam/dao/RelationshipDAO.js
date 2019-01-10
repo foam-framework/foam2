@@ -77,7 +77,7 @@ foam.CLASS({
   methods: [
     {
       name: 'put_',
-      returns: 'FObject',
+      type: 'FObject',
       code: function put_(x, obj) {
         return this.SUPER(x, this.adaptTarget(obj));
       },
@@ -86,7 +86,7 @@ foam.CLASS({
     },
     {
       name: 'adaptTarget',
-      returns: 'FObject',
+      type: 'FObject',
       args: [
         {
           name: 'target',

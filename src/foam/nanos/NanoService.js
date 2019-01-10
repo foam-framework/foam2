@@ -11,7 +11,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'start',
-      javaReturns: 'void',
+      javaType: 'void',
       javaThrows: [
         'java.lang.Exception'
       ]

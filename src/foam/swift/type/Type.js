@@ -13,7 +13,7 @@ foam.INTERFACE({
       args: [
         { name: 'o' },
       ],
-      swiftReturns: 'Bool',
+      swiftType: 'Bool',
     },
     {
       name: 'compare',
@@ -21,7 +21,7 @@ foam.INTERFACE({
         { name: 'o1' },
         { name: 'o2' },
       ],
-      swiftReturns: 'Int',
+      swiftType: 'Int',
     },
   ],
 });

@@ -12,33 +12,33 @@ foam.INTERFACE({
     {
       name: 'log',
       documentation: 'Synonym for info.',
-      returns: 'Void',
+      type: 'Void',
       // TODO: How do we capture Object... in our type system?
       args: [ { name: 'args', javaType: 'Object...' } ]
     },
     {
       name: 'info',
       documentation: 'Log at info log level.' ,
-      returns: 'Void',
+      type: 'Void',
       args: [ { name: 'args', javaType: 'Object...' } ]
     },
     // TODO: rename to warn
     {
       name: 'warning',
       documentation: 'Log at warn log level.' ,
-      returns: 'Void',
+      type: 'Void',
       args: [ { name: 'args', javaType: 'Object...' } ]
     },
     {
       name: 'error',
       documentation: 'Log at error log level.',
-      returns: 'Void',
+      type: 'Void',
       args: [ { name: 'args', javaType: 'Object...' } ]
     },
     {
       name: 'debug',
       documentation: 'Log at debug log level.',
-      returns: 'Void',
+      type: 'Void',
       args: [ { name: 'args', javaType: 'Object...' } ]
     }
   ]

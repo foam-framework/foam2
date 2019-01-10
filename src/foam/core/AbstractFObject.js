@@ -94,7 +94,7 @@ foam.CLASS({
   methods: [
     {
       name: 'compareTo',
-      returns: 'Integer',
+      type: 'Integer',
       args: [ { name: 'o', type: 'Any' } ],
       javaCode: `
         if ( o == this ) return 0;
@@ -119,7 +119,7 @@ foam.CLASS({
     },
     {
       name: 'equals',
-      returns: 'Boolean',
+      type: 'Boolean',
       args: [ { name: 'o', type: 'Any' } ],
       javaCode: `
         return compareTo(o) == 0;
@@ -127,7 +127,7 @@ foam.CLASS({
     },
     {
       name: 'diff',
-      returns: 'Map',
+      type: 'Map',
       args: [ { name: 'obj', type: 'FObject' } ],
       javaCode: `
         List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
@@ -144,7 +144,7 @@ foam.CLASS({
     },
     {
       name: 'hardDiff',
-      returns: 'FObject',
+      type: 'FObject',
       args: [ { name: 'obj', type: 'FObject' } ],
       javaCode: `
         FObject ret = null;
@@ -170,7 +170,7 @@ foam.CLASS({
     },
     {
       name: 'fclone',
-      returns: 'FObject',
+      type: 'FObject',
       javaCode: `
         try {
           FObject ret = getClass().newInstance();
@@ -187,14 +187,14 @@ foam.CLASS({
     },
     {
       name: 'deepClone',
-      returns: 'FObject',
+      type: 'FObject',
       javaCode: `
         return fclone();
       `
     },
     {
       name: 'shallowClone',
-      returns: 'FObject',
+      type: 'FObject',
       javaCode: `
         try {
           FObject ret = getClass().newInstance();
@@ -211,7 +211,7 @@ foam.CLASS({
     },
     {
       name: 'copyFrom',
-      returns: 'FObject',
+      type: 'FObject',
       args: [ { name: 'obj', type: 'FObject' } ],
       javaCode: `
         List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
@@ -227,7 +227,7 @@ foam.CLASS({
     },
     {
       name: 'getProperty',
-      returns: 'Any',
+      type: 'Any',
       args: [ { name: 'prop', type: 'String' } ],
       javaCode: `
         PropertyInfo property = ((PropertyInfo) getClassInfo().getAxiomByName(prop));
@@ -236,7 +236,7 @@ foam.CLASS({
     },
     {
       name: 'setProperty',
-      returns: 'FObject',
+      type: 'FObject',
       args: [ { name: 'prop', type: 'String' },
               { name: 'value', type: 'Any' } ],
       javaCode: `
@@ -247,7 +247,7 @@ foam.CLASS({
     },
     {
       name: 'isPropertySet',
-      returns: 'Boolean',
+      type: 'Boolean',
       args: [ { name: 'prop', type: 'String' } ],
       javaCode: `
         PropertyInfo property = (PropertyInfo) getClassInfo().getAxiomByName(prop);
@@ -256,7 +256,7 @@ foam.CLASS({
     },
     {
       name: 'hasDefaultValue',
-      returns: 'Boolean',
+      type: 'Boolean',
       args: [ { name: 'prop', type: 'String' } ],
       javaCode: `
         if ( ! this.isPropertySet(prop) ) return true;
@@ -266,7 +266,7 @@ foam.CLASS({
     },
     {
       name: 'toJSON',
-      returns: 'String',
+      type: 'String',
       javaCode: `
         Outputter out = new Outputter();
         return out.stringify(this);
@@ -274,7 +274,7 @@ foam.CLASS({
     },
     {
       name: 'toString',
-      returns: 'String',
+      type: 'String',
       javaCode: `
         StringBuilder sb = new StringBuilder();
         append(sb);
@@ -312,13 +312,13 @@ foam.CLASS({
     },
     {
       name: 'beforeFreeze',
-      returns: 'Void',
+      type: 'Void',
       javaCode: `
       `
     },
     {
       name: 'freeze',
-      returns: 'Void',
+      type: 'Void',
       javaCode: `
         beforeFreeze();
         this.__frozen__ = true;
@@ -326,14 +326,14 @@ foam.CLASS({
     },
     {
       name: 'isFrozen',
-      returns: 'Boolean',
+      type: 'Boolean',
       javaCode: `
         return this.__frozen__;
       `
     },
     {
       name: 'hash',
-      returns: 'ByteArray',
+      type: 'ByteArray',
       args: [
         { name: 'md', javaType: 'java.security.MessageDigest' },
       ],
@@ -355,7 +355,7 @@ foam.CLASS({
     },
     {
       name: 'sign',
-      javaReturns: 'byte[]',
+      type: 'ByteArray',
       javaThrows: [
         'SignatureException'
       ],
@@ -378,7 +378,7 @@ foam.CLASS({
     },
     {
       name: 'verify',
-      returns: 'Boolean',
+      type: 'Boolean',
       javaThrows: [ 'java.security.SignatureException' ],
       args: [
         { name: 'signature', type: 'ByteArray' },

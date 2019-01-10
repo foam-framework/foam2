@@ -14,7 +14,7 @@ foam.INTERFACE({
     {
       name: 'generateToken',
       async: true,
-      returns: 'Boolean',
+      type: 'Boolean',
       swiftThrows: true,
       args: [
         {
@@ -30,7 +30,7 @@ foam.INTERFACE({
     {
       name: 'generateTokenWithParameters',
       async: true,
-      returns: 'Boolean',
+      type: 'Boolean',
       swiftThrows: true,
       args: [
         {
@@ -53,7 +53,7 @@ foam.INTERFACE({
     {
       name: 'processToken',
       async: true,
-      returns: 'Boolean',
+      type: 'Boolean',
       swiftThrows: true,
       args: [
         {

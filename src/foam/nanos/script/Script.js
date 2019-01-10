@@ -193,7 +193,7 @@ foam.CLASS({
       args: [
         { name: 'x', type: 'Context' }
       ],
-      javaReturns: 'Interpreter',
+      javaType: 'Interpreter',
       javaCode: `
         Interpreter shell = new Interpreter();
 
@@ -226,7 +226,7 @@ foam.CLASS({
           name: 'x', type: 'Context'
         }
       ],
-      javaReturns: 'void',
+      javaType: 'void',
       javaCode: `
         ByteArrayOutputStream baos  = new ByteArrayOutputStream();
         PrintStream           ps    = new PrintStream(baos);

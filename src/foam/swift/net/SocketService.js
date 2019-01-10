@@ -91,7 +91,7 @@ _ = socket.disconnect.sub(listener: { s, _ in
           name: 'address',
         },
       ],
-      swiftReturns: 'Future<FObject>',
+      swiftType: 'Future<FObject>',
       swiftCode: `
 if let fut = futureMap[address] { return fut }
 

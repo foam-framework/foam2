@@ -539,7 +539,7 @@ return delegate;
     */
     {
       name: 'addPropertyIndex',
-      returns: 'foam.dao.EasyDAO',
+      type: 'foam.dao.EasyDAO',
       args: [ { javaType: 'foam.core.PropertyInfo', name: 'prop' } ],
       code:     function addPropertyIndex() {
         this.mdao && this.mdao.addPropertyIndex.apply(this.mdao, arguments);
@@ -560,7 +560,7 @@ return this;
     */
     {
       name: 'addIndex',
-      returns: 'foam.dao.EasyDAO',
+      type: 'foam.dao.EasyDAO',
       // TODO: The java Index interface conflicts with the js CLASS Index
       args: [ { javaType: 'foam.dao.index.Index', name: 'index' } ],
       code: function addIndex(index) {

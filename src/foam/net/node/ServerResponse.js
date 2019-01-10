@@ -25,7 +25,7 @@ foam.INTERFACE({
     {
       name: 'getStatusCode',
       documentation: 'Get HTTP status code.',
-      returns: 'Int',
+      type: 'Int',
       code: function() {}
     },
     {

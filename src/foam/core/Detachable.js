@@ -4,7 +4,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'detach',
-      returns: 'Void',
+      type: 'Void',
       async: true
     }
   ]

@@ -13,7 +13,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'parse',
-      returns: 'foam.lib.parse.PStream',
+      type: 'foam.lib.parse.PStream',
       args: [
         {
           name: 'ps',

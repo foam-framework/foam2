@@ -22,7 +22,7 @@ foam.INTERFACE({
     },
     {
       name: 'getX',
-      returns: 'Context'
+      type: 'Context'
     },
     {
       name: 'set',
@@ -47,7 +47,7 @@ foam.INTERFACE({
           type: 'Any'
         }
       ],
-      returns: 'Any'
+      type: 'Any'
     },
     {
       name: 'getParameter',
@@ -58,7 +58,7 @@ foam.INTERFACE({
           type: 'String'
         }
       ],
-      returns: 'String'
+      type: 'String'
     },
     {
       name: 'getParameterValues',
@@ -69,7 +69,7 @@ foam.INTERFACE({
           type: 'String'
         }
       ],
-      returns: 'StringArray'
+      type: 'StringArray'
     }
   ]
 });

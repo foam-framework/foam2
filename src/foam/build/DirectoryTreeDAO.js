@@ -73,7 +73,7 @@ foam.CLASS({
         { name: 'x', type: 'Context' },
         { name: 'path', type: 'Stirng' }
       ],
-      returns: 'foam.core.FObject',
+      type: 'foam.core.FObject',
       async: true,
       code: function(x, path) {
         var s = this.fs.readFileSync(path, 'utf-8');

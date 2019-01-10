@@ -54,7 +54,7 @@ return getDelegate().loginByEmail(x, email, password);`
     {
       name: 'isPasswordExpired',
       documentation: 'Checks if password is expired. True if expired, false if not expired',
-      returns: 'Boolean',
+      type: 'Boolean',
       javaThrows: ['foam.nanos.auth.AuthenticationException'],
       args: [
         {

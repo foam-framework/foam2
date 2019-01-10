@@ -12,7 +12,7 @@ foam.INTERFACE({
     {
       name: 'sendEmail',
       async: true,
-      returns: 'Void',
+      type: 'Void',
       args: [
         {
           name: 'x',
@@ -27,7 +27,7 @@ foam.INTERFACE({
     {
       name: 'sendEmailFromTemplate',
       async: true,
-      returns: 'Void',
+      type: 'Void',
       args: [
         {
           name: 'x',

@@ -52,7 +52,7 @@ protected ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
   methods: [
     {
       name: 'formatArg',
-      returns: 'String',
+      type: 'String',
       args: [
         {
           name: 'obj',
@@ -74,7 +74,7 @@ return String.valueOf(obj);`
     },
     {
       name: 'combine',
-      returns: 'String',
+      type: 'String',
       args: [
         {
           name: 'args',

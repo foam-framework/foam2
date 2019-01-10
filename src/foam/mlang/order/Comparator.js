@@ -17,7 +17,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'compare',
-      returns: 'Integer',
+      type: 'Integer',
       args: [ { name: 'o1', type: 'Any' },
               { name: 'o2', type: 'Any' } ]
     }

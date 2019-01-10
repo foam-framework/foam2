@@ -53,7 +53,7 @@ foam.CLASS({
     },
     {
       name: 'maybeContextualize_',
-      returns: 'FObject',
+      type: 'FObject',
       args: [ { name: 'x', type: 'Context' },
               { name: 'obj', type: 'FObject' } ],
       code: function(x, obj) {

@@ -15,7 +15,7 @@ foam.INTERFACE({
     },
     {
       name: 'sendEmail',
-      returns: 'String',
+      type: 'String',
       async: true,
       args: [
         {

@@ -27,7 +27,7 @@ foam.CLASS({
       class: 'ContextMethod',
       name: 'aref',
       async: true,
-      returns: 'Any',
+      type: 'Any',
       args: [ { class: 'String', name: 'id' } ],
       code: function(x, id) {
         // In order to avoid circular dependencies, we resolve references lazily.

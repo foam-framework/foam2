@@ -61,7 +61,7 @@ return dao;
   methods: [
     {
       name: 'submit',
-      returns: 'Void',
+      type: 'Void',
       args: [
         {
           name: 'severity',
@@ -83,7 +83,7 @@ getDao().put_(getX().put("logger", (Logger) getLogger()), lm);
     },
     {
       name: 'log',
-      returns: 'Void',
+      type: 'Void',
       args: [
         {
           name: 'args',
@@ -94,7 +94,7 @@ getDao().put_(getX().put("logger", (Logger) getLogger()), lm);
     },
     {
       name: 'info',
-      returns: 'Void',
+      type: 'Void',
       args: [
         {
           name: 'args',
@@ -105,7 +105,7 @@ getDao().put_(getX().put("logger", (Logger) getLogger()), lm);
     },
     {
       name: 'warning',
-      returns: 'Void',
+      type: 'Void',
       args: [
         {
           name: 'args',
@@ -116,7 +116,7 @@ getDao().put_(getX().put("logger", (Logger) getLogger()), lm);
     },
     {
       name: 'error',
-      returns: 'Void',
+      type: 'Void',
       args: [
         {
           name: 'args',
@@ -127,7 +127,7 @@ getDao().put_(getX().put("logger", (Logger) getLogger()), lm);
     },
     {
       name: 'debug',
-      returns: 'Void',
+      type: 'Void',
       args: [
         {
           name: 'args',
@@ -138,7 +138,7 @@ getDao().put_(getX().put("logger", (Logger) getLogger()), lm);
     },
     {
       name: 'toString',
-      returns: 'String',
+      type: 'String',
       javaCode: 'return this.getClass().getSimpleName();'
     }
   ]

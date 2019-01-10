@@ -27,7 +27,7 @@ foam.INTERFACE({
     },
     {
       name: 'getOutputter',
-      returns: 'foam.json2.Outputter',
+      type: 'foam.json2.Outputter',
     },
   ]
 });

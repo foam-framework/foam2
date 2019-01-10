@@ -197,7 +197,7 @@ foam.CLASS({
   methods: [
     {
       name: 'getAddress',
-      javaReturns: 'String',
+      javaType: 'String',
       code: function() { return this.structured ? this.streetNumber + ' ' + this.streetName : this.address1; },
       javaCode: `return getStructured() ? getStreetNumber() + " " + getStreetName() : getAddress1();`
     }

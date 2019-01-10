@@ -13,23 +13,23 @@ foam.INTERFACE({
   methods: [
     {
       name: 'head',
-      returns: 'Char'
+      type: 'Char'
     },
     {
       name: 'valid',
-      returns: 'Boolean'
+      type: 'Boolean'
     },
     {
       name: 'tail',
-      returns: 'foam.lib.parse.PStream'
+      type: 'foam.lib.parse.PStream'
     },
     {
       name: 'value',
-      returns: 'Any'
+      type: 'Any'
     },
     {
       name: 'setValue',
-      returns: 'foam.lib.parse.PStream',
+      type: 'foam.lib.parse.PStream',
       args: [
         {
           name: 'value',
@@ -39,7 +39,7 @@ foam.INTERFACE({
     },
     {
       name: 'substring',
-      returns: 'String',
+      type: 'String',
       args: [
         {
           name: 'end',
@@ -49,7 +49,7 @@ foam.INTERFACE({
     },
     {
       name: 'apply',
-      returns: 'foam.lib.parse.PStream',
+      type: 'foam.lib.parse.PStream',
       args: [
         {
           name: 'ps',
