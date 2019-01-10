@@ -177,7 +177,7 @@ return foam_swift_core_ExpressionSlot([
       name: 'dot',
       args: [
         {
-          swiftType: 'String',
+          type: 'String',
           name: 'name',
         },
       ],

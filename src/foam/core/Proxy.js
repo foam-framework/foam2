@@ -380,10 +380,10 @@ for (key, child) in children {
       args: [
         {
           name: 'key',
-          swiftType: 'String',
+          type: 'String',
         },
       ],
-      swiftType: 'foam_core_EventProxy',
+      type: 'foam.core.EventProxy',
       code: function getChild(key) {
         if ( ! this.children[key] ) {
           this.children[key] = this.cls_.create({
@@ -413,7 +413,7 @@ return children[key]!
       args: [
         {
           name: 'topics',
-          swiftType: '[String]',
+          type: 'String[]',
         },
       ],
       code: function addProxy(topic) {

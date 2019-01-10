@@ -13,7 +13,7 @@ foam.INTERFACE({
       args: [
         { name: 'o' },
       ],
-      swiftType: 'Bool',
+      type: 'Boolean',
     },
     {
       name: 'compare',

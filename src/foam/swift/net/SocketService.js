@@ -87,7 +87,7 @@ _ = socket.disconnect.sub(listener: { s, _ in
       name: 'getSocketBoxFuture',
       args: [
         {
-          swiftType: 'String',
+          type: 'String',
           name: 'address',
         },
       ],

@@ -881,7 +881,7 @@ foam.CLASS({
             "targetProperty": ${foam.swift.toSwiftName(junction)}.${foam.String.constantize(targetProperty)}(),
             "targetDAOKey": "${targetDAOKey}",
             "junctionDAOKey": "${junctionDAOKey}",
-            "junction": ${junction}.classInfo()
+            "junction": ${foam.swift.toSwiftName(junction)}.classInfo()
           ])!;
         `
       },

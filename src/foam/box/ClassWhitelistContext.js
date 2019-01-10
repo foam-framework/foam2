@@ -54,11 +54,11 @@ return w
       swiftThrows: true,
       args: [
         {
-          swiftType: 'Context',
+          type: 'Context',
           name: 'X',
         },
         {
-          swiftType: 'String',
+          type: 'String',
           name: 'id',
         },
       ],

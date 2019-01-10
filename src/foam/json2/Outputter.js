@@ -106,7 +106,7 @@ foam.CLASS({
     },
     {
       name: 'key',
-      args: [{ name: 's', swiftType: 'String' }],
+      args: [{ name: 's', type: 'String' }],
       type: 'foam.json2.Outputter',
       code: function(s) {
         if ( this.top().comma ) this.out.comma();
@@ -144,8 +144,8 @@ foam.CLASS({
     },
     {
       name: 'string',
-      args: [{ name: 's', swiftType: 'String' }],
-      swiftType: 'String',
+      args: [{ name: 's', type: 'String' }],
+      type: 'String',
       code: function(s) {
         return '"' + s.
           replace(/\\/g, '\\\\').
@@ -163,7 +163,7 @@ foam.CLASS({
     },
     {
       name: 's',
-      args: [{ name: 's', swiftType: 'String' }],
+      args: [{ name: 's', type: 'String' }],
       type: 'foam.json2.Outputter',
       code: function(s) {
         this.e();
@@ -193,7 +193,7 @@ foam.CLASS({
     },
     {
       name: 'b',
-      args: [{ name: 'b', swiftType: 'Bool' }],
+      args: [{ name: 'b', type: 'Boolean' }],
       type: 'foam.json2.Outputter',
       code: function(b) {
         this.e();

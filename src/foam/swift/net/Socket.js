@@ -94,7 +94,7 @@ onDetach(Subscription(detach: { [weak self] in
       name: 'write',
       args: [
         {
-          swiftType: 'String',
+          type: 'String',
           name: 'str',
         },
       ],
@@ -110,7 +110,7 @@ _ = buffer.withUnsafeBytes { outputStream?.write($0, maxLength: 4 + str.count) }
       args: [
         {
           name: 'url',
-          swiftType: 'String',
+          type: 'String',
         },
       ],
       swiftCode: `

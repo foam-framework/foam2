@@ -40,7 +40,7 @@ return
       swiftType: 'foam_core_FObject?',
       args: [
         {
-          swiftType: 'String',
+          type: 'String',
           name: 'str',
         },
         {
