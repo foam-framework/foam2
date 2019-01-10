@@ -5,7 +5,7 @@ foam.INTERFACE({
     {
       name: 'load',
       async: true,
-      returns: 'Class',
+      type: 'Class',
       args: [ { class: 'String', name: 'id' } ]
     }
   ]

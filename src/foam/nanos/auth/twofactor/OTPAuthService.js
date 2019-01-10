@@ -14,7 +14,7 @@ foam.INTERFACE({
     {
       name: 'generateKey',
       async: true,
-      returns: 'String',
+      type: 'String',
       javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
       args: [
         {
@@ -30,7 +30,7 @@ foam.INTERFACE({
     {
       name: 'verifyToken',
       async: true,
-      returns: 'Boolean',
+      type: 'Boolean',
       args: [
         {
           name: 'x',
@@ -45,7 +45,7 @@ foam.INTERFACE({
     {
       name: 'disable',
       async: true,
-      returns: 'Boolean',
+      type: 'Boolean',
       args: [
         {
           name: 'x',

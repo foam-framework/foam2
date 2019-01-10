@@ -132,7 +132,7 @@ protected EnvironmentConfiguration config_ = null;`
   methods: [
     {
       name: 'getConfig',
-      javaReturns: 'EnvironmentConfiguration',
+      javaType: 'EnvironmentConfiguration',
       args: [
         {
           name: 'group',
@@ -154,7 +154,7 @@ return config_;`
     },
     {
       name: 'createMimeMessage',
-      javaReturns: 'MimeMessage',
+      javaType: 'MimeMessage',
       args: [
         {
           name: 'emailMessage',
@@ -301,7 +301,7 @@ sendEmail(x, emailMessage);`
     },
     {
       name: 'start',
-      javaReturns: 'void',
+      javaType: 'void',
       javaCode:
 `Properties props = new Properties();
 props.setProperty("mail.smtp.auth", getAuthenticate() ? "true" : "false");
@@ -316,7 +316,7 @@ if ( getAuthenticate() ) {
     },
     {
       name: 'finalizeEmailConfig',
-      javaReturns: 'foam.nanos.notification.email.EmailMessage',
+      javaType: 'foam.nanos.notification.email.EmailMessage',
       args: [
         {
           name: 'x',
@@ -359,7 +359,7 @@ return emailMessage;
     },
     {
       name: 'findUser',
-      javaReturns: 'foam.nanos.auth.User',
+      javaType: 'foam.nanos.auth.User',
       args: [
         {
           name: 'x',

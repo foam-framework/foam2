@@ -25,7 +25,7 @@ foam.INTERFACE({
           name: 'x', javaType: 'foam.core.X'
         }
       ],
-      javaReturns: 'void',
+      javaType: 'void',
       javaThrows: ['IllegalStateException'],
     }
   ]

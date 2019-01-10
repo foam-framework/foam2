@@ -32,7 +32,7 @@ foam.INTERFACE({
     },
     {
       name: 'output',
-      swiftReturns: 'String',
+      swiftType: 'String',
     },
   ],
 })

@@ -31,7 +31,7 @@ foam.INTERFACE({
           // TODO type: 'URL'
         }
       ],
-      returns: 'Boolean',
+      type: 'Boolean',
       code: function(url) {}
     }
   ]

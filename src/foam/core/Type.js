@@ -331,3 +331,14 @@ foam.CLASS({
     ['swift', 'Double'],
   ],
 });
+
+foam.CLASS({
+  package: 'foam.core.type',
+  name: 'Regex',
+  extends: 'foam.core.type.SimpleType',
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
+  properties: [
+    ['java', 'java.util.regex.Pattern'],
+    // TODO: Swift
+  ]
+});

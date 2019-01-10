@@ -23,7 +23,7 @@ foam.INTERFACE({
     {
       name: 'send',
       async: true,
-      returns: 'Void',
+      type: 'Void',
       args: [
         {
           name: 'msg',

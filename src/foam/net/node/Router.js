@@ -38,7 +38,7 @@ foam.INTERFACE({
           type: 'foam.net.node.Handler'
         },
       ],
-      returns: 'foam.net.node.Handler',
+      type: 'foam.net.node.Handler',
       code: function(route, handler) {}
     }
   ]

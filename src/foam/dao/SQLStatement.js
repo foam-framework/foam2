@@ -11,11 +11,11 @@ foam.INTERFACE({
   methods: [
     {
       name: 'createStatement',
-      returns: 'String'
+      type: 'String'
     },
     {
       name: 'prepareStatement',
-      returns: 'Void',
+      type: 'Void',
       javaThrows: ['java.sql.SQLException'],
       args: [
         {

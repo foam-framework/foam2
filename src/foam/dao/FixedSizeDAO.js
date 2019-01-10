@@ -88,7 +88,6 @@ foam.CLASS({
     },
     {
       name: 'select_',
-      javaReturns: 'foam.dao.Sink',
       javaCode: `
   if ( sink == null ) sink = new ArraySink();
   sink = prepareSink(sink);

@@ -12,7 +12,7 @@ foam.INTERFACE({
     {
       name: 'getCurrentUser',
       async: true,
-      returns: 'foam.nanos.auth.User',
+      type: 'foam.nanos.auth.User',
       javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
       swiftThrows: true,
       args: [
@@ -25,7 +25,7 @@ foam.INTERFACE({
     {
       name: 'generateChallenge',
       async: true,
-      returns: 'String',
+      type: 'String',
       javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
       swiftThrows: true,
       args: [
@@ -38,7 +38,7 @@ foam.INTERFACE({
     {
       name: 'challengedLogin',
       async: true,
-      returns: 'foam.nanos.auth.User',
+      type: 'foam.nanos.auth.User',
       javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
       swiftThrows: true,
       args: [
@@ -59,7 +59,7 @@ foam.INTERFACE({
     {
       name: 'login',
       async: true,
-      returns: 'foam.nanos.auth.User',
+      type: 'foam.nanos.auth.User',
       javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
       swiftThrows: true,
       args: [
@@ -80,7 +80,7 @@ foam.INTERFACE({
     {
       name: 'loginByEmail',
       async: true,
-      returns: 'foam.nanos.auth.User',
+      type: 'foam.nanos.auth.User',
       javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
       swiftThrows: true,
       args: [
@@ -100,6 +100,7 @@ foam.INTERFACE({
     },
     {
       name: 'validatePassword',
+      async: true,
       javaThrows: [ 'java.lang.RuntimeException' ],
       swiftThrows: true,
       args: [
@@ -111,39 +112,37 @@ foam.INTERFACE({
     },
     {
       name: 'checkUser',
-      javaReturns: 'boolean',
-      swiftReturns: 'Bool',
+      type: 'Boolean',
+      async: true,
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
+          type: 'Context'
         },
         {
           name: 'user',
-          javaType: 'foam.nanos.auth.User'
+          type: 'foam.nanos.auth.User'
         },
         {
           name: 'permission',
-          javaType: 'String',
+          type: 'String'
         }
       ]
     },
     {
       name: 'checkUserPermission',
-      javaReturns: 'boolean',
-      swiftReturns: 'Bool',
+      type: 'Boolean',
+      async: true,
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
+          type: 'Context'
         },
         {
           name: 'user',
-          javaType: 'foam.nanos.auth.User'
+          type: 'foam.nanos.auth.User'
         },
         {
           name: 'permission',
@@ -154,7 +153,7 @@ foam.INTERFACE({
     {
       name: 'checkPermission',
       async: true,
-      returns: 'Boolean',
+      type: 'Boolean',
       swiftThrows: true,
       args: [
         {
@@ -170,7 +169,7 @@ foam.INTERFACE({
     {
       name: 'check',
       async: true,
-      returns: 'Boolean',
+      type: 'Boolean',
       swiftThrows: true,
       args: [
         {
@@ -186,7 +185,7 @@ foam.INTERFACE({
     {
       name: 'updatePassword',
       async: true,
-      returns: 'foam.nanos.auth.User',
+      type: 'foam.nanos.auth.User',
       javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
       swiftThrows: true,
       args: [
@@ -207,7 +206,7 @@ foam.INTERFACE({
     {
       name: 'validateUser',
       async: true,
-      returns: 'Void',
+      type: 'Void',
       javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
       swiftThrows: true,
       args: [
@@ -224,7 +223,7 @@ foam.INTERFACE({
     {
       name: 'logout',
       async: true,
-      returns: 'Void',
+      type: 'Void',
       swiftThrows: true,
       args: [
         {

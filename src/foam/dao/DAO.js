@@ -25,7 +25,7 @@ foam.INTERFACE({
     {
       name: 'put',
       async: true,
-      returns: 'FObject',
+      type: 'FObject',
       swiftThrows: true,
       args: [
         {
@@ -37,7 +37,7 @@ foam.INTERFACE({
     {
       name: 'put_',
       async: true,
-      returns: 'FObject',
+      type: 'FObject',
       swiftThrows: true,
       args: [
         {
@@ -54,7 +54,7 @@ foam.INTERFACE({
     {
       name: 'remove',
       async: true,
-      returns: 'FObject',
+      type: 'FObject',
       returnsNullable: true,
       swiftThrows: true,
       args: [
@@ -67,7 +67,7 @@ foam.INTERFACE({
     {
       name: 'remove_',
       async: true,
-      returns: 'FObject',
+      type: 'FObject',
       returnsNullable: true,
       swiftThrows: true,
       args: [
@@ -85,7 +85,7 @@ foam.INTERFACE({
     {
       name: 'find',
       async: true,
-      returns: 'FObject',
+      type: 'FObject',
       returnsNullable: true,
       swiftThrows: true,
       args: [
@@ -98,7 +98,7 @@ foam.INTERFACE({
     {
       name: 'find_',
       async: true,
-      returns: 'FObject',
+      type: 'FObject',
       returnsNullable: true,
       swiftThrows: true,
       args: [
@@ -116,7 +116,7 @@ foam.INTERFACE({
     {
       name: 'select',
       async: true,
-      returns: 'foam.dao.Sink',
+      type: 'foam.dao.Sink',
       swiftThrows: true,
       args: [
         {
@@ -128,7 +128,7 @@ foam.INTERFACE({
     {
       name: 'select_',
       async: true,
-      returns: 'foam.dao.Sink',
+      type: 'foam.dao.Sink',
       swiftThrows: true,
       args: [
         {
@@ -207,8 +207,8 @@ foam.INTERFACE({
     },
     {
       name: 'listen',
-      returns: 'Detachable',
-      javaReturns: 'void', // TODO Java detachable support.
+      type: 'Detachable',
+      javaType: 'void', // TODO Java detachable support.
       async: true,
       swiftThrows: true,
       args: [
@@ -227,8 +227,8 @@ foam.INTERFACE({
     },
     {
       name: 'listen_',
-      returns: 'Detachable',
-      javaReturns: 'void', // TODO Java detachable support.
+      type: 'Detachable',
+      javaType: 'void', // TODO Java detachable support.
       async: true,
       swiftThrows: true,
       args: [
@@ -252,7 +252,7 @@ foam.INTERFACE({
     },
     {
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
-      returns: 'Void',
+      type: 'Void',
       swiftThrows: true,
       args: [
         {
@@ -263,7 +263,7 @@ foam.INTERFACE({
     },
     {
       name: 'pipe_', // TODO: return a promise? don't put pipe and listen here?
-      returns: 'Void',
+      type: 'Void',
       swiftThrows: true,
       args: [
         {
@@ -284,7 +284,7 @@ foam.INTERFACE({
     },
     {
       name: 'where',
-      returns: 'foam.dao.DAO',
+      type: 'foam.dao.DAO',
       swiftThrows: true,
       args: [
         {
@@ -297,7 +297,7 @@ foam.INTERFACE({
     },
     {
       name: 'orderBy',
-      returns: 'foam.dao.DAO',
+      type: 'foam.dao.DAO',
       swiftThrows: true,
       args: [
         {
@@ -308,7 +308,7 @@ foam.INTERFACE({
     },
     {
       name: 'skip',
-      returns: 'foam.dao.DAO',
+      type: 'foam.dao.DAO',
       swiftThrows: true,
       args: [
         {
@@ -319,7 +319,7 @@ foam.INTERFACE({
     },
     {
       name: 'limit',
-      returns: 'foam.dao.DAO',
+      type: 'foam.dao.DAO',
       swiftThrows: true,
       args: [
         {
@@ -330,7 +330,7 @@ foam.INTERFACE({
     },
     {
       name: 'inX',
-      returns: 'foam.dao.DAO',
+      type: 'foam.dao.DAO',
       args: [
         {
           name: 'x',
@@ -341,7 +341,7 @@ foam.INTERFACE({
     {
       name: 'cmd',
       async: true,
-      returns: 'Any',
+      type: 'Any',
       args: [
         {
           name: 'obj',
@@ -352,7 +352,7 @@ foam.INTERFACE({
     {
       name: 'cmd_',
       async: true,
-      returns: 'Any',
+      type: 'Any',
       args: [
         {
           name: 'x',
@@ -367,8 +367,8 @@ foam.INTERFACE({
     {
       name: 'getOf',
       flags: ['java'],
-      returns: 'Class',
-      javaReturns: 'foam.core.ClassInfo'
+      type: 'Class',
+      javaType: 'foam.core.ClassInfo'
     }
   ]
 });

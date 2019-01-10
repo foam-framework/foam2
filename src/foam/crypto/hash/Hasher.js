@@ -13,7 +13,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'includeInDigest',
-      returns: 'Boolean',
+      type: 'Boolean',
       documentation: 'Flag to determine if we should include this property as part of the message digest'
     },
     {

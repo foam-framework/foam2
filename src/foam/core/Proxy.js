@@ -152,7 +152,7 @@ foam.CLASS({
         var method = forwards[i];
         axioms.push(this.ProxiedMethod.create({
           name: method.name,
-          returns: method.returns,
+          type: method.type,
           property: name,
           flags: this.flags,
           args: method.args
@@ -163,7 +163,7 @@ foam.CLASS({
         var method = delegates[i];
         axioms.push(this.ProxiedMethod.create({
           name: method.name,
-          returns: method.returns,
+          type: method.type,
           property: name,
           args: method.args,
           flags: this.flags,
@@ -383,7 +383,7 @@ for (key, child) in children {
           swiftType: 'String',
         },
       ],
-      swiftReturns: 'foam_core_EventProxy',
+      swiftType: 'foam_core_EventProxy',
       code: function getChild(key) {
         if ( ! this.children[key] ) {
           this.children[key] = this.cls_.create({

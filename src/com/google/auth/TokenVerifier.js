@@ -21,7 +21,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'verify',
-      returns: 'String',
+      type: 'String',
       javaThrows: [ 'java.security.GeneralSecurityException' ],
       args: [
         {

@@ -157,7 +157,7 @@ foam.CLASS({
         pendingMethods.push(foam.core.PromisedMethod.create({
           name: methods[i].name,
           property: myName,
-          returns:  methods[i].returns,
+          type:  methods[i].type,
           delegate: false
         }));
       }

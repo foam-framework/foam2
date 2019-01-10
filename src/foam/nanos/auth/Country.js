@@ -35,10 +35,9 @@ foam.CLASS({
   ],
   methods: [{
     name: 'toString',
-    returns: 'String',
-    javaReturns: 'String',
+    type: 'String',
     code: function() {
-      return 'Country: ' + this.code + ', ' + this.name; 
+      return 'Country: ' + this.code + ', ' + this.name;
     },
     javaCode: `
       return "{ code:" + this.getCode() + ", name:" + this.getName() + " }";

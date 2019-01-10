@@ -11,7 +11,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'getEnabled',
-      returns: 'Boolean'
+      type: 'Boolean'
     },
     {
       name: 'setEnabled',

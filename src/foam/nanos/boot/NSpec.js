@@ -160,7 +160,7 @@ foam.CLASS({
       args: [
         { name: 'x', type: 'Context' }
       ],
-      javaReturns: 'java.lang.Object',
+      javaType: 'java.lang.Object',
       javaCode: `
         if ( getService() != null ) return getService();
 

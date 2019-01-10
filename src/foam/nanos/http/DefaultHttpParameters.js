@@ -80,7 +80,7 @@ foam.CLASS({
   methods: [
     {
       name: 'get',
-      returns: 'Any',
+      type: 'Any',
       args: [
         {
           name: 'name',
@@ -116,7 +116,7 @@ foam.CLASS({
     },
     {
       name: 'getParameter',
-      returns: 'String',
+      type: 'String',
       args: [
         {
           name: 'name',
@@ -136,7 +136,7 @@ foam.CLASS({
     },
     {
       name: 'getParameterValues',
-      returns: 'StringArray',
+      type: 'StringArray',
       args: [
         {
           name: 'name',

@@ -345,15 +345,15 @@ foam.INTERFACE({
     // TODO: Make these readOnly properties when we have that support.
     {
       name: 'getDAO',
-      returns: 'foam.dao.DAO'
+      type: 'foam.dao.DAO'
     },
     {
       name: 'getJunctionDAO',
-      returns: 'foam.dao.DAO'
+      type: 'foam.dao.DAO'
     },
     {
       name: 'getTargetDAO',
-      returns: 'foam.dao.DAO'
+      type: 'foam.dao.DAO'
     },
   ]
 });
@@ -475,7 +475,7 @@ foam.CLASS({
     {
       name: 'createJunction',
       args: [{ name: 'targetId', type: 'Any' }],
-      returns: 'foam.core.FObject',
+      type: 'foam.core.FObject',
       code: function createJunction(targetId) {
         foam.assert( ( ! foam.Undefined.isInstance(this.sourceId) ) &&
                      ( ! foam.Undefined.isInstance(targetId) ),

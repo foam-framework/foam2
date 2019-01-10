@@ -25,24 +25,24 @@ foam.CLASS({
   methods: [
     {
       name: 'destroy',
-      returns: 'Void',
+      type: 'Void',
       javaCode: '//noop'
     },
     {
       name: 'getServletInfo',
-      returns: 'String',
+      type: 'String',
       javaCode: 'return "VirtualHostRoutingServlet";'
     },
     {
       name: 'init',
-      returns: 'Void',
+      type: 'Void',
       args: [ { name: 'config', javaType: 'javax.servlet.ServletConfig' } ],
       javaCode: 'setServletConfig(config);',
       code: function() { }
     },
     {
       name: 'service',
-      returns: 'Void',
+      type: 'Void',
       args: [ { name: 'request', javaType: 'javax.servlet.ServletRequest' },
               { name: 'response', javaType: 'javax.servlet.ServletResponse' } ],
       javaThrows: [ 'javax.servlet.ServletException',

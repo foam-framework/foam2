@@ -50,7 +50,7 @@ return w
     {
       class: 'ContextMethod',
       name: 'lookup',
-      swiftReturns: 'ClassInfo?',
+      swiftType: 'ClassInfo?',
       swiftThrows: true,
       args: [
         {

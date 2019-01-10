@@ -63,7 +63,7 @@ foam.CLASS({
     'documentation',
     'flags',
     {
-      name: 'returns',
+      name: 'type',
       value: 'Void'
     },
     {
@@ -98,7 +98,7 @@ foam.CLASS({
         }
         return;
       }
-      
+
       // Not using SUPER, so just return original method
       if ( method.toString().indexOf('SUPER') == -1 ) return method;
 

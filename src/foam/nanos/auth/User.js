@@ -315,7 +315,7 @@ foam.CLASS({
   methods: [
     {
       name: 'label',
-      javaReturns: 'String',
+      javaType: 'String',
       code: function label() {
         return this.organization || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
       },
@@ -330,7 +330,7 @@ foam.CLASS({
       args: [
         { name: 'x', javaType: 'foam.core.X' }
       ],
-      javaReturns: 'void',
+      javaType: 'void',
       javaThrows: ['AuthorizationException'],
       javaCode: `
         User user = (User) x.get("user");
@@ -354,7 +354,7 @@ foam.CLASS({
       args: [
         { name: 'x', javaType: 'foam.core.X' }
       ],
-      javaReturns: 'void',
+      javaType: 'void',
       javaThrows: ['AuthorizationException'],
       javaCode: `
         User user = (User) x.get("user");
@@ -382,7 +382,7 @@ foam.CLASS({
         { name: 'x', javaType: 'foam.core.X' },
         { name: 'oldObj', javaType: 'foam.core.FObject' }
       ],
-      javaReturns: 'void',
+      javaType: 'void',
       javaThrows: ['AuthorizationException'],
       javaCode: `
         User user = (User) x.get("user");
@@ -432,7 +432,7 @@ foam.CLASS({
       args: [
         { name: 'x', javaType: 'foam.core.X' }
       ],
-      javaReturns: 'void',
+      javaType: 'void',
       javaThrows: ['AuthorizationException'],
       javaCode: `
         User user = (User) x.get("user");

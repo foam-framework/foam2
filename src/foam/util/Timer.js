@@ -107,7 +107,7 @@ return newValue as! Int
          cycle(frequency, start, end) - cycle between start and end frequency times a second
       */
       name: 'cycle',
-      swiftReturns: 'Float',
+      swiftType: 'Float',
       args: [
         {
           name: 'frequency',

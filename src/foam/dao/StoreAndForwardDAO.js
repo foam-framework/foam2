@@ -100,10 +100,7 @@ foam.CLASS({
       // TODO(markdittmer): These should be supported by function properties,
       // but they're not.
       /*
-      returns: {
-        documentation: 'Indicator: Should this error be retried?',
-        type: 'Boolean',
-      },
+      type: 'Boolean',
       args: [
         {
           documentation: 'The error thrown by the delegate DAO.',

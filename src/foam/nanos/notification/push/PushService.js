@@ -12,7 +12,7 @@ foam.INTERFACE({
     {
       name: 'sendPush',
       async: true,
-      returns: 'Boolean',
+      type: 'Boolean',
       args: [
         {
           name: 'user',

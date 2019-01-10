@@ -15,7 +15,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'setup',
-      returns: 'Void',
+      type: 'Void',
       args: [
         {
           name: 'x',

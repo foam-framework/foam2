@@ -19,7 +19,7 @@ foam.CLASS({
   methods: [
     {
       name: 'checkCode',
-      returns: 'Boolean',
+      type: 'Boolean',
       args: [
         {
           name: 'key',

@@ -15,7 +15,7 @@ foam.CLASS({
   methods: [
     {
       name: 'runTest',
-      javaReturns: 'void',
+      javaType: 'void',
       //INFO it will just parse the query to get the predicate without evaluation.
       javaCode: `
       test( isValid("id=6", " ( ( id =  ?  ) ) ") , "The id equal to the value");
@@ -69,7 +69,7 @@ foam.CLASS({
     },
     {
       name: 'isValid',
-      javaReturns: 'boolean',
+      javaType: 'boolean',
       args : [
         { name: 'query',javaType: 'String' },
         { name: 'statement',javaType: 'String' }

@@ -50,9 +50,9 @@ foam.CLASS({
                   name: m.name,
                   replyPolicyName: replyPolicyName,
                   boxPropName: name,
-                  returns: m.returns,
-                  javaReturns: m.javaReturns,
-                  swiftReturns: m.swiftReturns,
+                  type: m.returns,
+                  javaType: m.javaReturns,
+                  swiftType: m.swiftReturns,
                   args: m.args
                 });
               });

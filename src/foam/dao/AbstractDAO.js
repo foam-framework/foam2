@@ -287,7 +287,7 @@ listeners_.add(new DAOListener(sink, listeners_));
 
     {
       name: 'decorateListener_',
-      returns: 'foam.dao.Sink',
+      type: 'foam.dao.Sink',
       args: [
         {
           name: 'sink',
@@ -332,7 +332,7 @@ return sink;
     */
     {
       name: 'decorateSink_',
-      returns: 'foam.dao.Sink',
+      type: 'foam.dao.Sink',
       args: [
         {
           name: 'sink',
@@ -541,7 +541,7 @@ this.select_(x, new RemoveSink(x, this), skip, limit, order, predicate);
   static: [
     {
       name: 'decorateSink',
-      javaReturns: 'foam.dao.Sink',
+      javaType: 'foam.dao.Sink',
       args: [
         {
           name: 'x',

@@ -25,7 +25,7 @@ foam.INTERFACE({
     {
       name: 'read',
       async: true,
-      returns: 'Long',
+      type: 'Long',
       args: [
         {
           name: 'out',
@@ -47,7 +47,7 @@ foam.INTERFACE({
     // done with just .size
     {
       name: 'getSize',
-      returns: 'Long'
+      type: 'Long'
     }
   ]
 });
@@ -62,7 +62,7 @@ foam.INTERFACE({
     {
       name: 'put',
       async: true,
-      returns: 'foam.blob.Blob',
+      type: 'foam.blob.Blob',
       args: [
         {
           name: 'blob',
@@ -73,7 +73,7 @@ foam.INTERFACE({
     {
       name: 'put_',
       async: 'true',
-      returns: 'foam.blob.Blob',
+      type: 'foam.blob.Blob',
       args: [
         {
           name: 'x',
@@ -88,7 +88,7 @@ foam.INTERFACE({
     {
       name: 'find',
       async: true,
-      returns: 'foam.blob.Blob',
+      type: 'foam.blob.Blob',
       args: [
         {
           name: 'id',
@@ -99,7 +99,7 @@ foam.INTERFACE({
     {
       name: 'find_',
       async: true,
-      returns: 'foam.blob.Blob',
+      type: 'foam.blob.Blob',
       args: [
         {
           name: 'x',
@@ -113,7 +113,7 @@ foam.INTERFACE({
     },
     {
       name: 'urlFor',
-      returns: 'String',
+      type: 'String',
       args: [
         {
           name: 'blob',
@@ -123,7 +123,7 @@ foam.INTERFACE({
     },
     {
       name: 'urlFor_',
-      returns: 'String',
+      type: 'String',
       args: [
         {
           name: 'x',
@@ -149,7 +149,7 @@ foam.CLASS({
   methods: [
     {
       name: 'slice',
-      returns: 'foam.blob.Blob',
+      type: 'foam.blob.Blob',
       args: [ { name: 'offset', type: 'Long' },
               { name: 'length', type: 'Long' } ],
       code: function slice(offset, length) {
@@ -179,7 +179,7 @@ foam.CLASS({
   methods: [
     {
       name: 'inX',
-      returns: 'foam.blob.BlobService',
+      type: 'foam.blob.BlobService',
       args: [ { name: 'x', type: 'Context' }],
       code: function (x) {
         return this.ProxyBlobService.create({ delegate: this }, x);
@@ -539,7 +539,7 @@ foam.CLASS({
   methods: [
     {
       name: 'setup',
-      returns: 'Void',
+      type: 'Void',
       args: [ { name: 'x', type: 'Context' } ],
       code: function setup() {
         if ( this.isSet ) return;
@@ -564,7 +564,7 @@ setIsSet(true);`
     },
     {
       name: 'ensureDir',
-      returns: 'Void',
+      type: 'Void',
       args: [ { name: 'x', type: 'Context' },
               { name: 'path', type: 'String' } ],
       code: function ensureDir(path) {
@@ -590,7 +590,7 @@ if ( ! parsed.mkdirs() ) {
     },
     {
       name: 'allocateTmp',
-      javaReturns: 'File',
+      javaType: 'File',
       args: [
         {
           name: 'x',

@@ -35,7 +35,7 @@ foam.CLASS({
   methods: [
     {
       name: 'error',
-      returns: 'Void',
+      type: 'Void',
       args: [
         {
           name: 'args',
@@ -46,7 +46,7 @@ foam.CLASS({
     },
     {
       name: 'warning',
-      returns: 'Void',
+      type: 'Void',
       args: [
         {
           name: 'args',
@@ -57,7 +57,7 @@ foam.CLASS({
     },
     {
       name: 'info',
-      returns: 'Void',
+      type: 'Void',
       args: [
         {
           name: 'args',
@@ -68,7 +68,7 @@ foam.CLASS({
     },
     {
       name: 'debug',
-      returns: 'Void',
+      type: 'Void',
       args: [
         {
           name: 'args',

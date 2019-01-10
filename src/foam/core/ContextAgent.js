@@ -11,7 +11,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'execute',
-      returns: 'Void',
+      type: 'Void',
       args: [ { name: 'x', type: 'Context' } ]
     }
   ]

@@ -32,7 +32,7 @@ foam.INTERFACE({
           documentation: 'Node JS HTTP response object. http.ServerResponse',
         },
       ],
-      returns: 'Boolean',
+      type: 'Boolean',
       code: function(req, res) {}
     }
   ],
@@ -48,7 +48,7 @@ foam.INTERFACE({
           type: 'foam.net.node.Route'
         }
       ],
-      returns: 'foam.net.node.Handler'
+      type: 'foam.net.node.Handler'
     }
   ]
 });

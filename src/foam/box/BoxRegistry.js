@@ -22,7 +22,7 @@ foam.INTERFACE({
     {
       name: 'doLookup',
       async: true,
-      returns: 'foam.box.Box',
+      type: 'foam.box.Box',
       swiftThrows: true,
       args: [
         {
@@ -34,7 +34,7 @@ foam.INTERFACE({
     {
       name: 'register',
       async: true,
-      returns: 'foam.box.Box',
+      type: 'foam.box.Box',
       args: [
         {
           name: 'name',
@@ -55,7 +55,7 @@ foam.INTERFACE({
     {
       name: 'unregister',
       async: true,
-      returns: 'Void',
+      type: 'Void',
       args: [
         {
           name: 'name',
