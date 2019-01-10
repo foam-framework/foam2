@@ -24,6 +24,8 @@
   flags.web    = ! isServer,
   flags.node   = isServer;
   flags.loader = ! isServer;
+  if ( ! flags.hasOwnProperty('java') ) flags.java   = true;
+  if ( ! flags.hasOwnProperty('swift') ) flags.swift = true;
   if ( ! flags.hasOwnProperty('debug') ) flags.debug = true;
   if ( ! flags.hasOwnProperty('js')    ) flags.js    = true;
 
