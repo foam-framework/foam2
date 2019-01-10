@@ -1147,7 +1147,7 @@ return ( s1 instanceof String && ((String) s1).toUpperCase().contains(s2) );`
     },
     {
       name: 'createStatement',
-      javaType: 'String',
+      type: 'String',
       javaCode: `return " '" + getArg1().createStatement() + "' ilike '%" + getArg2().createStatement() + "%' ";`
     }
   ]
@@ -2228,7 +2228,7 @@ foam.CLASS({
       args: [
         {
           name: 'comparator',
-          javaType: 'foam.mlang.order.Comparator'
+          type: 'foam.mlang.order.Comparator'
         }
       ],
       code: function sortedKeys(opt_comparator) {
@@ -2249,15 +2249,15 @@ return getGroupKeys();`
       args: [
         {
           name: 'sub',
-          javaType: 'foam.core.Detachable'
+          type: 'foam.core.Detachable'
         },
         {
           name: 'key',
-          javaType: 'Object'
+          type: 'Object'
         },
         {
           name: 'obj',
-          javaType: 'Object'
+          type: 'Object'
         }
       ],
       code: function putInGroup_(sub, key, obj) {

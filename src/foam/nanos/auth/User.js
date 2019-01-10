@@ -315,7 +315,7 @@ foam.CLASS({
   methods: [
     {
       name: 'label',
-      javaType: 'String',
+      type: 'String',
       code: function label() {
         return this.organization || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
       },
@@ -328,7 +328,7 @@ foam.CLASS({
     {
       name: 'authorizeOnCreate',
       args: [
-        { name: 'x', javaType: 'foam.core.X' }
+        { name: 'x', type: 'Context' }
       ],
       javaType: 'void',
       javaThrows: ['AuthorizationException'],
@@ -352,7 +352,7 @@ foam.CLASS({
     {
       name: 'authorizeOnRead',
       args: [
-        { name: 'x', javaType: 'foam.core.X' }
+        { name: 'x', type: 'Context' }
       ],
       javaType: 'void',
       javaThrows: ['AuthorizationException'],
@@ -379,8 +379,8 @@ foam.CLASS({
     {
       name: 'authorizeOnUpdate',
       args: [
-        { name: 'x', javaType: 'foam.core.X' },
-        { name: 'oldObj', javaType: 'foam.core.FObject' }
+        { name: 'x', type: 'Context' },
+        { name: 'oldObj', type: 'foam.core.FObject' }
       ],
       javaType: 'void',
       javaThrows: ['AuthorizationException'],
@@ -430,7 +430,7 @@ foam.CLASS({
     {
       name: 'authorizeOnDelete',
       args: [
-        { name: 'x', javaType: 'foam.core.X' }
+        { name: 'x', type: 'Context' }
       ],
       javaType: 'void',
       javaThrows: ['AuthorizationException'],

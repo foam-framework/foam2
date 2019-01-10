@@ -777,7 +777,7 @@ new ${self.cls_.id}.Builder(EmptyX.instance())
     },
     {
       name: 'toString',
-      javaType: 'String',
+      type: 'String',
       code: foam.core.FObject.prototype.toString
     }
   ]

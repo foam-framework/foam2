@@ -236,7 +236,7 @@ return config_;`
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'emailMessage',
@@ -316,11 +316,11 @@ if ( getAuthenticate() ) {
     },
     {
       name: 'finalizeEmailConfig',
-      javaType: 'foam.nanos.notification.email.EmailMessage',
+      type: 'foam.nanos.notification.email.EmailMessage',
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'emailMessage',
@@ -359,11 +359,11 @@ return emailMessage;
     },
     {
       name: 'findUser',
-      javaType: 'foam.nanos.auth.User',
+      type: 'foam.nanos.auth.User',
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'emailMessage',

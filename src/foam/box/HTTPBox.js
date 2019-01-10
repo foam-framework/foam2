@@ -50,7 +50,7 @@ foam.CLASS({
     {
       name: 'me',
       key: 'me',
-      javaType: 'foam.box.Box'
+      type: 'foam.box.Box'
     },
     'window'
   ],

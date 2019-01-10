@@ -69,10 +69,10 @@ foam.CLASS({
     },
     {
       name: 'isValid',
-      javaType: 'boolean',
+      type: 'Boolean',
       args : [
-        { name: 'query',javaType: 'String' },
-        { name: 'statement',javaType: 'String' }
+        { name: 'query',type: 'String' },
+        { name: 'statement',type: 'String' }
       ],
       javaCode: `
         QueryParser parser = new QueryParser(User.getOwnClassInfo());

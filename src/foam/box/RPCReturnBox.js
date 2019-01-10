@@ -53,7 +53,7 @@ foam.CLASS({
     {
       class: 'Object',
       name: 'message',
-      javaType: 'foam.box.Message'
+      type: 'foam.box.Message'
     }
   ],
 

@@ -22,38 +22,38 @@ return x == null ? getX() : x;`
     },
     {
       name: 'tobyte',
-      javaType: 'byte',
-      args: [ { javaType: 'Object', name: 'o' } ],
+      type: 'Byte',
+      args: [ { type: 'Object', name: 'o' } ],
       javaCode: `return ((Number) o).byteValue();`
     },
     {
       name: 'todouble',
-      javaType: 'double',
-      args: [ { javaType: 'Object', name: 'o' } ],
+      type: 'Double',
+      args: [ { type: 'Object', name: 'o' } ],
       javaCode: `return ((Number) o).doubleValue();`
     },
     {
       name: 'tofloat',
-      javaType: 'float',
-      args: [ { javaType: 'Object', name: 'o' } ],
+      type: 'Float',
+      args: [ { type: 'Object', name: 'o' } ],
       javaCode: `return ((Number) o).floatValue();`
     },
     {
       name: 'toint',
-      javaType: 'int',
-      args: [ { javaType: 'Object', name: 'o' } ],
+      type: 'Integer',
+      args: [ { type: 'Object', name: 'o' } ],
       javaCode: `return ((Number) o).intValue();`
     },
     {
       name: 'tolong',
-      javaType: 'long',
-      args: [ { javaType: 'Object', name: 'o' } ],
+      type: 'Long',
+      args: [ { type: 'Object', name: 'o' } ],
       javaCode: `return ((Number) o).longValue();`
     },
     {
       name: 'toshort',
-      javaType: 'short',
-      args: [ { javaType: 'Object', name: 'o' } ],
+      type: 'Short',
+      args: [ { type: 'Object', name: 'o' } ],
       javaCode: `return ((Number) o).shortValue();`
     }
   ]

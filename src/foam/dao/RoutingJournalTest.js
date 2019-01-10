@@ -104,7 +104,7 @@ foam.CLASS({
     {
       name: 'VerifyUserDAO',
       args: [
-        { name: 'userDAO', javaType: 'foam.dao.DAO' }
+        { name: 'userDAO', type: 'foam.dao.DAO' }
       ],
       javaCode: `
         // select from userDAO
@@ -123,7 +123,7 @@ foam.CLASS({
     {
       name: 'VerifyGroupDAO',
       args: [
-        { name: 'groupDAO', javaType: 'foam.dao.DAO' }
+        { name: 'groupDAO', type: 'foam.dao.DAO' }
       ],
       javaCode: `
         // select from groupDAO

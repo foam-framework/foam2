@@ -11,7 +11,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'getPrimaryKey',
-      javaType: 'Object',
+      type: 'Object',
       swiftType: 'Any?'
     }
   ]
