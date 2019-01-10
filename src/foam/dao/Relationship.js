@@ -250,7 +250,13 @@ foam.CLASS({
       if ( this.junctionInitialized ) return;
       this.junctionInitialized = true;
 
-      if ( foam.__context__.isRegistered(this.junctionModel) )
+      // Only need a junction class if this is a Many to Many
+      // relationship.
+      if ( this.cardinality !== '*:*' )
+        return;
+
+      // No need to register junction again.
+      if ( foam.isRegistered(this.junctionModel) )
         return;
 
       var name = this.junctionModel.substring(
@@ -292,7 +298,12 @@ foam.LIB({
       var r = foam.dao.Relationship.create(m, opt_ctx);
       foam.package.registerClass(r);
 
-      if ( foam.__context__.isDefined(r.sourceModel) ) r.initSource();
+      // Latch the junction right away, we have no idea when source or
+      // model will be initialized but someone may want the junction
+      // class first for some reason.
+      r.initJunction();
+
+      if ( foam.isDefined(r.sourceModel) ) r.initSource();
       else
         foam.pubsub.sub("defineClass", r.sourceModel, function(s) {
           s && s.detach();
@@ -300,7 +311,7 @@ foam.LIB({
           r.initSource();
         });
 
-      if ( foam.__context__.isDefined(r.targetModel) ) r.initTarget();
+      if ( foam.isDefined(r.targetModel) ) r.initTarget();
       else
         foam.pubsub.sub("defineClass", r.targetModel, function(s) {
           s && s.detach();
