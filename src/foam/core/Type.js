@@ -159,17 +159,12 @@ foam.CLASS({
   package: 'foam.core.type',
   name: 'Array',
   implements: ['foam.core.type.Type'],
-  axioms: [ { class: 'foam.pattern.Multiton', property: 'type' } ],
-  requires: [
-    'foam.core.type.Any',
-  ],
+  // Should be Multiton, but multitons don't work for non-string properties.
+  // axioms: [ { class: 'foam.pattern.Multiton', property: 'type' } ],
   properties: [
     {
-      name: 'type',
-      factory: function() {
-        return this.Any.create();
-      },
-    },
+      name: 'type'
+    }
   ],
   methods: [
     function toJavaType() {

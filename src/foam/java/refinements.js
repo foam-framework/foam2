@@ -70,7 +70,6 @@ foam.CLASS({
     {
       name: 'factory',
       value: function() {
-        console.log("**adamvy javaType", this.type, this.cls_.id, this.forClass_);
         return foam.java.toJavaType(this.type);
       }
     },
@@ -1456,7 +1455,7 @@ foam.CLASS({
     {
       name: 'javaFactory',
       expression: function(type) {
-        return `return new ${foam.core.type.toType(type).type}[0];`;
+        return `return new ${foam.core.type.toType(type).type.toJavaType()}[0];`;
       }
     },
     {
