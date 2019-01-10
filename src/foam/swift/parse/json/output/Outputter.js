@@ -151,7 +151,7 @@ _ = out.end()
           name: 'data',
         },
       ],
-      swiftType: 'String',
+      type: 'String',
       swiftCode: `
 let s = outputterFactory(__subContext__)
 output(s, data)
