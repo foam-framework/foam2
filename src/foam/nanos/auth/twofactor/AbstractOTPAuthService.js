@@ -32,7 +32,7 @@ foam.CLASS({
   methods: [
     {
       name: 'generateSecret',
-      type: 'ByteArray',
+      type: 'Byte[]',
       args: [
         {
           name: 'size',
@@ -53,7 +53,7 @@ return bytes;`
       args: [
         {
           name: 'key',
-          type: 'ByteArray'
+          type: 'Byte[]'
         },
         {
           name: 'interval',

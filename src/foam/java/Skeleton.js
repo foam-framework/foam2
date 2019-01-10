@@ -95,7 +95,7 @@ foam.CLASS({
   var methods = this.of.getOwnAxiomsByClass(foam.core.Method);
   for ( var i = 0 ; i < methods.length ; i++ ) {
     var m = methods[i];
-    var hasReturn = m.javaReturns && m.javaReturns !== 'void';%>
+    var hasReturn = m.javaType && m.javaType !== 'void';%>
         case "<%= m.name %>":
           <% if ( hasReturn ) { %>result = <% } %>getDelegate().<%= m.name %>(
           <%

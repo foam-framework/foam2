@@ -78,7 +78,7 @@ return String.valueOf(obj);`
       args: [
         {
           name: 'args',
-          type: 'AnyArray'
+          type: 'Any[]'
         }
       ],
       javaCode:

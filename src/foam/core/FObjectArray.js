@@ -27,7 +27,7 @@ foam.CLASS({
     {
       name: 'type',
       factory: function() {
-        return this.of + 'Array';
+        return this.of + '[]';
       }
     },
     [

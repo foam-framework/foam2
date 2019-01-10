@@ -24,6 +24,7 @@ foam.INTERFACE({
     {
       name: 'actAs',
       type: 'foam.nanos.auth.User',
+      async: true,
       javaThrows: [
         'foam.nanos.auth.AuthorizationException',
         'foam.nanos.auth.AuthenticationException'
@@ -43,6 +44,7 @@ foam.INTERFACE({
     {
       name: 'getCurrentAgent',
       type: 'foam.nanos.auth.User',
+      async: true,
       javaThrows: [
         'foam.nanos.auth.AuthorizationException',
         'foam.nanos.auth.AuthenticationException'

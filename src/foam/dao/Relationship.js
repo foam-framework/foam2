@@ -693,7 +693,7 @@ foam.CLASS({
       },
     },
     {
-      name: 'returns',
+      name: 'type',
       value: 'foam.dao.DAO',
     },
     {
@@ -851,7 +851,7 @@ foam.CLASS({
       },
     },
     {
-      name: 'returns',
+      name: 'type',
       value: 'foam.dao.ManyToManyRelationship',
     },
     {

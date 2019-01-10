@@ -252,7 +252,7 @@ foam.CLASS({
       'isDefaultValue',
       function(v) { return ! v || ! v.length; }
     ],
-    [ 'type', 'AnyArray' ]
+    [ 'type', 'Any[]' ]
   ]
 });
 
@@ -281,7 +281,7 @@ foam.CLASS({
       value: 'String',
       documentation: 'The FOAM sub-type of this property.'
     },
-    [ 'type', 'StringArray' ],
+    [ 'type', 'String[]' ],
     [
       'factory',
       function() { return []; }

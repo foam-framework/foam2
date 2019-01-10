@@ -316,7 +316,7 @@ foam.CLASS({
   extends: 'foam.core.type.SimpleType',
   axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
-    ['java', 'java.core.ClassInfo'],
+    ['java', 'foam.core.ClassInfo'],
     ['swift', 'ClassInfo'],
   ],
 });

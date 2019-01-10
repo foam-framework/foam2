@@ -16,7 +16,7 @@ foam.CLASS({
         var args = this.swiftArgs.map(function(arg) {
           return arg.localName;
         });
-        return (this.swiftReturns ? 'return ' : '') +
+        return (this.swiftType ? 'return ' : '') +
           (this.swiftThrows ? 'try ' : '') +
           this.property + '.' + this.swiftName + '(' + args.join(', ') + ')';
       }

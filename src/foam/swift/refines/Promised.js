@@ -24,8 +24,8 @@ foam.CLASS({
 let delegate = try! self.obj.<%=this.property%>.get()
 let method = delegate.getSlot(key: "<%=this.swiftName%>")!.swiftGet() as! MethodSlotClosure
 let args = [<%=this.swiftArgs.map(function(a) { return a.localName }).join(', ')%>] as [Any?]
-<% if (this.swiftReturns) { %>
-return try! method(args) as! <%=this.swiftReturns%>
+<% if (this.swiftType) { %>
+return try! method(args) as! <%=this.swiftType%>
 <% } else { %>
 _ = try! method(args)
 <% } %>

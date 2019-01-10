@@ -136,7 +136,7 @@ foam.CLASS({
     },
     {
       name: 'getParameterValues',
-      type: 'StringArray',
+      type: 'String[]',
       args: [
         {
           name: 'name',

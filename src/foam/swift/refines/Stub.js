@@ -42,14 +42,14 @@ if let o = o as? Error {
   throw o
 }
 
-<% if (this.swiftReturns) { %>
-  <% if (this.swiftReturns == 'Any?') { %>
+<% if (this.swiftType) { %>
+  <% if (this.swiftType == 'Any?') { %>
 return o
   <% } else { %>
-if let o = o as? <%=this.swiftReturns%> {
+if let o = o as? <%=this.swiftType%> {
   return o
 }
-throw FoamError(o ?? "Failed to cast response to <%=this.swiftName%> as <%=this.swiftReturns%>")
+throw FoamError(o ?? "Failed to cast response to <%=this.swiftName%> as <%=this.swiftType%>")
   <% } %>
 <% } %>
       */},
@@ -66,7 +66,7 @@ foam.CLASS({
   properties: [
     {
       name: 'swiftCode',
-      expression: function(swiftName, swiftReturns, swiftArgs, swiftThrows) {
+      expression: function(swiftName, swiftType, swiftArgs, swiftThrows) {
         return swiftThrows ? this.swiftCodeGenerator() : 'fatalError()';
       }
     }

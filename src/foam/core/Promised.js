@@ -23,9 +23,9 @@ foam.CLASS({
   properties: [
     {
       name: 'code',
-      expression: function(name, property, returns, delegate) {
+      expression: function(name, property, type, delegate) {
         if ( delegate ) {
-          return returns ?
+          return type ?
             function() {
               var self = this;
               var args = arguments;
@@ -41,7 +41,7 @@ foam.CLASS({
               });
             };
         }
-        return returns ?
+        return type ?
           function() {
             var self = this;
             var args = arguments;

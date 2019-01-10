@@ -10,8 +10,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'getString',
-      // returns String 
-      // TODO cant do this because returns of primitives dont work.
+      type: 'String'
     },
     {
       name: 'output',

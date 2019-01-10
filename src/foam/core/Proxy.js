@@ -212,7 +212,7 @@ foam.CLASS({
     },
     {
       name: 'code',
-      expression: function(name, property, returns, delegate) {
+      expression: function(name, property, type, delegate) {
         return delegate ?
             function delegate() {
               return this[property][name].apply(this, arguments);
