@@ -52,7 +52,7 @@ bodyAsByteArrayIsSet_ = false;`
       name: 'bodyAsByteArray',
       hidden: true,
       transient: true,
-      type: 'ByteArray',
+      type: 'Byte[]',
       javaFactory: 'return getBody() != null ? getBody().getBytes(StandardCharsets.UTF_8) : null;'
     },
     {

@@ -15,7 +15,7 @@ foam.CLASS({
     {
       name: 'code',
       factory: function() {
-        var returns = this.returns;
+        var type = this.type;
         var isContextOriented =  this.args.length >= 1 && this.args[0].type == 'Context'
         var replyPolicyName   = this.replyPolicyName;
         var boxPropName       = this.boxPropName;
@@ -27,8 +27,8 @@ foam.CLASS({
 
           // Automatically wrap RPCs that return a "PromisedAbc" or similar
           // TODO: Move this into RPCReturnBox ?
-          if ( this.__context__.lookup(returns, true) && this.__context__.lookup(returns).name.startsWith('Promised') ) {
-            ret = this.__context__.lookup(returns).create({ delegate: ret });
+          if ( this.__context__.lookup(type, true) && this.__context__.lookup(type).name.startsWith('Promised') ) {
+            ret = this.__context__.lookup(type).create({ delegate: ret });
           }
 
           var args = Array.from(arguments);
@@ -54,7 +54,7 @@ foam.CLASS({
       }
     }
   ],
-  
+
   methods: [
     {
       name: 'buildJavaClass',
@@ -86,9 +86,9 @@ try {
 Object result = replyBox.getMessage().getObject();
 `;
 
-        if ( this.javaReturns && this.javaReturns !== 'void' ) {
+        if ( this.javaType && this.javaType !== 'void' ) {
           code += `if ( result instanceof foam.box.RPCReturnMessage )
-  return (${this.javaReturns})((foam.box.RPCReturnMessage)result).getData();
+  return (${this.javaType})((foam.box.RPCReturnMessage)result).getData();
 `;
         }
 
@@ -99,7 +99,7 @@ if ( result instanceof foam.box.RPCErrorMessage )
   throw new RuntimeException(((foam.box.RPCErrorMessage)result).getData().toString());
 `;
 
-        if ( this.javaReturns && this.javaReturns !== 'void') {
+        if ( this.javaType && this.javaType !== 'void') {
           code += `throw new RuntimeException("Invalid response type: " + result.getClass());`;
         }
 

@@ -366,7 +366,7 @@ foam.CLASS({
       name: 'of',
       value: 'foam.mlang.predicate.Predicate'
     },
-    [ 'type', 'foam.mlang.predicate.PredicateArray' ],
+    [ 'type', 'foam.mlang.predicate.Predicate[]' ],
     {
       name: 'adaptArrayElement',
       // TODO?: Make into a multi-method?

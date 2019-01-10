@@ -30,7 +30,7 @@ foam.CLASS({
       if ( ! this.swiftSupport ) return;
       cls.method(this.ProtocolMethod.create({
         name: this.swiftName,
-        returnType: this.swiftReturns,
+        returnType: this.swiftType,
         args: this.swiftArgs,
         throws: this.swiftThrows,
       }));

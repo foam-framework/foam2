@@ -97,9 +97,9 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'swiftReturns',
-      expression: function(returns, returnsNullable) {
-        return foam.swift.toSwiftType(returns, returnsNullable)
+      name: 'swiftType',
+      expression: function(type, returnsNullable) {
+        return foam.swift.toSwiftType(type, returnsNullable)
       },
     },
     {
@@ -154,7 +154,7 @@ foam.CLASS({
           name: this.swiftSynchronizedMethodName,
           body: this.getSwiftCode(parentCls),
           throws: this.swiftThrows,
-          returnType: this.swiftReturns,
+          returnType: this.swiftType,
           args: this.swiftArgs,
           visibility: 'private',
           annotations: this.swiftAnnotations,
@@ -163,7 +163,7 @@ foam.CLASS({
           name: this.swiftName,
           body: this.syncronizedCode(),
           throws: this.swiftThrows,
-          returnType: this.swiftReturns,
+          returnType: this.swiftType,
           args: this.swiftArgs,
           visibility: this.swiftVisibility,
           override: this.getSwiftOverride(parentCls),
@@ -174,7 +174,7 @@ foam.CLASS({
           name: this.swiftName,
           body: this.getSwiftCode(parentCls),
           throws: this.swiftThrows,
-          returnType: this.swiftReturns,
+          returnType: this.swiftType,
           args: this.swiftArgs,
           visibility: this.swiftVisibility,
           override: this.getSwiftOverride(parentCls),
@@ -253,12 +253,12 @@ return <%=foam.swift.core.ConstantSlot.model_.swiftName%>([
       args: [],
       template: function() {/*
 <%=this.swiftSynchronizedSemaphoreName%>.wait()
-<%if (this.swiftReturns != 'Void') {%>let ret = <%}%><%=
+<%if (this.swiftType != 'Void') {%>let ret = <%}%><%=
     this.swiftThrows ? 'try ' : ''%><%=
     this.swiftSynchronizedMethodName%>(<%=
         this.swiftArgs.map(function(a) { return a.localName }).join(',')%>)
 <%=this.swiftSynchronizedSemaphoreName%>.signal()
-<%if (this.swiftReturns != 'Void') {%>return ret<%}%>
+<%if (this.swiftType != 'Void') {%>return ret<%}%>
       */},
     },
     {

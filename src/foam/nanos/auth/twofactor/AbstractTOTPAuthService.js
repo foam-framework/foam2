@@ -23,7 +23,7 @@ foam.CLASS({
       args: [
         {
           name: 'key',
-          type: 'ByteArray'
+          type: 'Byte[]'
         },
         {
           name: 'code',

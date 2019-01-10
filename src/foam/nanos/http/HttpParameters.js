@@ -69,7 +69,7 @@ foam.INTERFACE({
           type: 'String'
         }
       ],
-      type: 'StringArray'
+      type: 'String[]'
     }
   ]
 });

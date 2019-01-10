@@ -333,7 +333,7 @@ foam.CLASS({
     },
     {
       name: 'hash',
-      type: 'ByteArray',
+      type: 'Byte[]',
       args: [
         { name: 'md', javaType: 'java.security.MessageDigest' },
       ],
@@ -355,7 +355,7 @@ foam.CLASS({
     },
     {
       name: 'sign',
-      type: 'ByteArray',
+      type: 'Byte[]',
       javaThrows: [
         'SignatureException'
       ],
@@ -381,7 +381,7 @@ foam.CLASS({
       type: 'Boolean',
       javaThrows: [ 'java.security.SignatureException' ],
       args: [
-        { name: 'signature', type: 'ByteArray' },
+        { name: 'signature', type: 'Byte[]' },
         { name: 'verifier', javaType: 'java.security.Signature' },
       ],
       javaCode: `

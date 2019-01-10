@@ -56,7 +56,7 @@ ${Object.keys(o).map(function(k) {
     {
       name: 'toJavaType',
       code: function(type) {
-        return foam.core.type.toType(type).toJavaType()
+        return foam.core.type.toType(type).toJavaType();
       }
     }
   ]
@@ -68,38 +68,15 @@ foam.CLASS({
   extends: 'String',
   properties: [
     {
-      name: 'expression',
-      expression: function(value) {
-        // The value thing feels like a hack around the fact that a factory
-        // will take priority over a value despite the factory being a default
-        // value and the value being actually set.
-        // TODO: Is there a deeper issue here?
-        return function(type) {
-          return value || foam.java.toJavaType(type);
-        }
+      name: 'factory',
+      value: function() {
+        console.log("**adamvy javaType", this.type, this.cls_.id, this.forClass_);
+        return foam.java.toJavaType(this.type);
       }
     },
     {
       name: 'name',
       value: 'javaType'
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.java',
-  name: 'JavaReturns',
-  extends: 'String',
-  properties: [
-    {
-      name: 'factory',
-      value: function() {
-        return foam.java.toJavaType(this.returns);
-      }
-    },
-    {
-      name: 'name',
-      value: 'javaReturns'
     }
   ]
 });
@@ -577,7 +554,7 @@ foam.CLASS({
       name: 'javaCode',
       flags: ['java'],
     },
-    { class: 'foam.java.JavaReturns' },
+    { class: 'foam.java.JavaType' },
     {
       class: 'Boolean',
       name: 'final'
@@ -609,7 +586,7 @@ foam.CLASS({
 
       cls.method({
         name: this.name,
-        type: this.javaReturns || 'void',
+        type: this.javaType || 'void',
         visibility: 'public',
         static: this.isStatic(),
         final: this.final,
@@ -722,11 +699,11 @@ foam.CLASS({
         // TODO: This could be an expression if the copyFrom in createChildMethod
         // didn't finalize its value
         if ( this.name == 'find' ) {
-          console.log(this.name, 'returns', this.javaReturns);
+          console.log(this.name, 'returns', this.javaType);
         }
         var code = '';
 
-        if ( this.javaReturns && this.javaReturns !== 'void' ) {
+        if ( this.javaType && this.javaType !== 'void' ) {
           code += 'return ';
         }
 
@@ -1328,12 +1305,6 @@ foam.CLASS({
   ]
 });
 
-
-// TODO: Is StringArray important enough to be special like this?
-// Should we just be doing type: 'Array', of: 'String' or similar?  Or
-// do we need to model types that are more specific in languages like
-// Java but unspecific in JS (arrays have specific types in Java but
-// are all the same in JS.)
 foam.CLASS({
   package: 'foam.java',
   name: 'StringArrayJavaRefinement',
@@ -1481,16 +1452,11 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
-    {
-      name: 'javaType',
-      expression: function(of) {
-        return of + '[]';
-      }
-    },
+    { class: 'foam.java.JavaType' },
     {
       name: 'javaFactory',
-      expression: function(of) {
-        return `return new ${of}[0];`;
+      expression: function(type) {
+        return `return new ${foam.core.type.toType(type).type}[0];`;
       }
     },
     {
@@ -1945,14 +1911,8 @@ foam.CLASS({
       name: 'javaPath',
       expression: function(path) {
         return path;
-      },
-    },
-    {
-      name: 'javaReturns',
-      expression: function(javaPath) {
-        return javaPath;
-      },
-    },
+      }
+    }
   ]
 });
 
