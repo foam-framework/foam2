@@ -24,7 +24,7 @@ foam.CLASS({
     {
       name: 'registry',
       key: 'registry',
-      javaType: 'foam.box.BoxRegistry'
+      type: 'foam.box.BoxRegistry'
     }
   ],
 

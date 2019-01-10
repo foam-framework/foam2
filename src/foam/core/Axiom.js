@@ -14,7 +14,6 @@ foam.INTERFACE({
     {
       name: 'getName',
       type: 'String',
-      javaType: 'String'
     }
   ]
 });

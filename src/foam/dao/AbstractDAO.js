@@ -541,7 +541,7 @@ this.select_(x, new RemoveSink(x, this), skip, limit, order, predicate);
   static: [
     {
       name: 'decorateSink',
-      javaType: 'foam.dao.Sink',
+      type: 'foam.dao.Sink',
       args: [
         {
           name: 'x',

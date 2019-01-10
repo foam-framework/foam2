@@ -26,12 +26,12 @@ foam.CLASS({
     {
       name: 'me',
       key: 'me',
-      javaType: 'foam.box.Box'
+      type: 'foam.box.Box'
     },
     {
       key: 'registry',
       name: 'registry',
-      javaType: 'foam.box.BoxRegistry',
+      type: 'foam.box.BoxRegistry',
     }
   ],
 

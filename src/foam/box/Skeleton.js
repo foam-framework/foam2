@@ -27,7 +27,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'obj',
-          javaType: 'Object'
+          type: 'Object'
         }
       ]
     }

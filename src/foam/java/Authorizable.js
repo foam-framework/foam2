@@ -19,7 +19,7 @@ foam.INTERFACE({
       name: 'authorizeOnCreate',
       javaType: 'void',
       args: [
-        { name: 'x', javaType: 'foam.core.X' }
+        { name: 'x', type: 'Context' }
       ],
       javaThrows: ['AuthorizationException'],
     },
@@ -27,7 +27,7 @@ foam.INTERFACE({
       name: 'authorizeOnRead',
       javaType: 'void',
       args: [
-        { name: 'x', javaType: 'foam.core.X' }
+        { name: 'x', type: 'Context' }
       ],
       javaThrows: ['AuthorizationException'],
     },
@@ -35,8 +35,8 @@ foam.INTERFACE({
       name: 'authorizeOnUpdate',
       javaType: 'void',
       args: [
-        { name: 'x', javaType: 'foam.core.X' },
-        { name: 'oldObj', javaType: 'foam.core.FObject' }
+        { name: 'x', type: 'Context' },
+        { name: 'oldObj', type: 'foam.core.FObject' }
       ],
       javaThrows: ['AuthorizationException'],
     },
@@ -44,7 +44,7 @@ foam.INTERFACE({
       name: 'authorizeOnDelete',
       javaType: 'void',
       args: [
-        { name: 'x', javaType: 'foam.core.X' }
+        { name: 'x', type: 'Context' }
       ],
       javaThrows: ['AuthorizationException'],
     }

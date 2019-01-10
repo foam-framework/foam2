@@ -66,7 +66,7 @@ try {
           javaType: 'Object[]'
         }
       ],
-      javaType: 'String',
+      type: 'String',
       javaCode:
 `StringBuilder str = sb.get();
   for ( Object n : args ) {
@@ -133,7 +133,7 @@ try {
     },
     {
       name: 'toString',
-      javaType: 'String',
+      type: 'String',
       javaCode: "return this.getClass().getSimpleName();"
     }
   ],

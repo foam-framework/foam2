@@ -31,7 +31,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'summaryView',
-      javaType: 'foam.lib.json.UnknownFObject',
+      type: 'foam.lib.json.UnknownFObject',
       javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
       javaJSONParser: 'new foam.lib.json.UnknownFObjectParser()',
       // TODO: remove next line when permanently fixed in ViewSpec
@@ -42,7 +42,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'createControllerView',
-      javaType: 'foam.lib.json.UnknownFObject',
+      type: 'foam.lib.json.UnknownFObject',
       javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
       javaJSONParser: 'new foam.lib.json.UnknownFObjectParser()',
       // TODO: remove next line when permanently fixed in ViewSpec
@@ -53,7 +53,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'updateView',
-      javaType: 'foam.lib.json.UnknownFObject',
+      type: 'foam.lib.json.UnknownFObject',
       javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
       javaJSONParser: 'new foam.lib.json.UnknownFObjectParser()',
       // TODO: remove next line when permanently fixed in ViewSpec

@@ -180,7 +180,7 @@ foam.CLASS({
       args: [
         {
           name: 'x',
-          javaType: 'X'
+          type: 'Context'
         }
       ],
       javaCode: `
@@ -236,10 +236,10 @@ return config;
         return parent.isDescendantOf(groupId, groupDAO);
       },
       args: [
-        { name: 'groupId',  javaType: 'String' },
-        { name: 'groupDAO', javaType: 'foam.dao.DAO' }
+        { name: 'groupId',  type: 'String' },
+        { name: 'groupDAO', type: 'foam.dao.DAO' }
       ],
-      javaType: 'boolean',
+      type: 'Boolean',
       javaCode: `
         if ( SafetyUtil.isEmpty(groupId) ) return false;
         if (

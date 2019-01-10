@@ -106,7 +106,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'potentialPassword',
-          javaType: 'String',
+          type: 'String',
         }
       ]
     },
