@@ -23,7 +23,7 @@ foam.CLASS({
           name: 'tick',
           isFramed: true,
           code: function() {
-            if ( this.x < 350 ) { this.alpha *= 0.995;}
+            if ( this.x < 350 ) { this.alpha *= 0.988;}
             if ( this.x < -100 ) {
               this.parent.remove(this);
               return;
@@ -48,7 +48,7 @@ foam.CLASS({
     [ 'fillStyle', 'black' ],
     [ 'color',     'black' ],
     [ 'frequency', 1 ],
-    [ 'inColour',  true],
+    { class: 'Boolean', name: 'inColour',  value: true },
     [ 'rotationPerSquare', 1/45 ],
   ],
 
@@ -113,3 +113,7 @@ foam.CLASS({
     }
   ]
 });
+
+var ss = com.google.foam.demos.squares.Squares.create();
+ss.write();
+foam.u2.DetailView.create({data: ss, showActions: true}).write();
