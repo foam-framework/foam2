@@ -29,7 +29,13 @@ foam.CLASS({
               {
                 heading: 'Users',
                 dao: X.userDAO.orderBy(foam.nanos.auth.User.LEGAL_NAME)
-              }
+              },
+              // Set "disabled: true" to render each object as non-selectable row
+              {
+                disabled: true,
+                heading: 'Disabled users',
+                dao: X.userDAO.where(this.EQ(foam.nanos.auth.User.STATUS, this.AccountStatus.DISABLED)),
+              },
             ]
           };
         }
@@ -256,15 +262,22 @@ foam.CLASS({
                   .add(section.heading)
                 .end()
                 .start()
-                  .select(section.filtered || section.dao, function(obj) {
-                    return this.E()
-                      .start(self.rowView, { data: obj })
-                        .on('click', () => {
-                          self.fullObject_ = obj;
-                          self.data = obj;
-                          self.isOpen_ = false;
-                        })
-                      .end();
+                  .callIfElse(! section.disabled, function() {
+                    this.select(section.filtered || section.dao, function(obj) {
+                      return this.E()
+                        .start(self.rowView, { data: obj })
+                          .on('click', () => {
+                            self.fullObject_ = obj;
+                            self.data = obj;
+                            self.isOpen_ = false;
+                          })
+                        .end();
+                    });
+                  }, function() {
+                    this.select(section.filtered || section.dao, function(obj) {
+                      return this.E()
+                        .tag(self.rowView, { data: obj, disabled: true });
+                    });
                   })
                 .end();
             });
