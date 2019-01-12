@@ -18,8 +18,6 @@ foam.CLASS({
     {
       name: 'unwrappedScripts',
       value: [
-        'src/foam/core/poly\\.js',
-        'src/foam/core/lib\\.js',
         'src/foam/core/stdlib\\.js',
         'src/foam/core/events\\.js',
         'src/foam/core/Boot\\.js',
@@ -35,6 +33,8 @@ foam.CLASS({
       value: [
         // Boot files that cannot be wrapped in foam.SCRIPT
         'src/foam\\.js',
+        'src/foam/core/poly\\.js',
+        'src/foam/core/lib\\.js',
 
         // Not models.
         'src/foam/nanos/nanos\\.js',
@@ -81,7 +81,6 @@ foam.CLASS({
 
       var context = {
         foam: Object.create(foam)
-//        foam: {}
       };
 
       context.foam.LIB = function(m) {
