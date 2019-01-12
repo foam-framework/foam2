@@ -22,7 +22,7 @@ foam.CLASS({
     {
       name: 'setUp',
       args: [
-        { of: 'foam.core.X', name: 'x' }
+        { type: 'Context', name: 'x' }
       ],
       javaCode: `
       foam.dao.DAO delegate = new foam.dao.MDAO(foam.nanos.auth.User.getOwnClassInfo());
