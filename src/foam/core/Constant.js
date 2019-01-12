@@ -61,7 +61,7 @@ foam.CLASS({
         cls,
         foam.String.constantize(this.name),
         {
-          value: this.value,
+          get: function() { return this.value }.bind(this),
           configurable: false
         });
     },
