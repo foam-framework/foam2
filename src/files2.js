@@ -458,7 +458,6 @@ FOAM_FILES([
   { name: "foam/comics/InlineBrowserView", flags: ['web'] },
   { name: "foam/comics/RelationshipView", flags: ['web'] },
   { name: "foam/u2/view/ReciprocalSearch", flags: ['web'] },
-  { name: "lib/node/box", flags: ['node'] },
   { name: "lib/net", flags: ['web'] },
   { name: "lib/netNode", flags: ['node'] },
   { name: "foam/net/RetryHTTPRequest" },
