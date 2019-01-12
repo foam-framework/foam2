@@ -16,7 +16,7 @@ var cp = require('child_process');
 cp.execSync('rm -rf ' + outDir)
 cp.execSync('mkdir -p ' + outDir)
 
-foam.__context__.classloader.load('foam.build.Builder').then(function(cls) {
+foam.__context__.classloader.load('foam.build.OldBuilder').then(function(cls) {
   cls.create({
     srcDirs: srcDirs,
     outDir: outDir,

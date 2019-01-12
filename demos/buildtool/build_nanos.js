@@ -18,7 +18,7 @@ srcDirs.forEach(function(srcDir) {
   cp.execSync(`rsync -a --exclude='*.js' --exclude='*.java' ${srcDir}/ ${outDir}/`)
 });
 
-foam.__context__.classloader.load('foam.build.Builder').then(function(cls) {
+foam.__context__.classloader.load('foam.build.OldBuilder').then(function(cls) {
   cls.create({
     srcDirs: srcDirs,
     outDir: outDir,

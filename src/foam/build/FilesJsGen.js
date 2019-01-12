@@ -300,6 +300,13 @@ FOAM_FILES([
               return self.getDepsTree(m, seen, head);
             });
           }
+          if ( k == 'type' && foam.String.isInstance(o[k]) ) {
+            return foam.core.type.toType(o[k]).toModelIdDeps().map(function(id) {
+              self.modelDAO.find(o[k]).then(function(m) {
+                return self.getDepsTree(m, seen, head);
+              });
+            })
+          }
           return self.getDepsTree(o[k], seen, head);
         })).then(function() { return head });
       } else if ( foam.core.FObject.isInstance(o) ) {

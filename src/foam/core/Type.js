@@ -33,6 +33,10 @@ foam.INTERFACE({
   name: 'Type',
   methods: [
     {
+      name: 'toModelIdDeps',
+      type: 'String[]',
+    },
+    {
       name: 'toJavaType',
       type: 'String',
     },
@@ -60,6 +64,7 @@ foam.CLASS({
     },
   ],
   methods: [
+    function toModelIdDeps() { return [] },
     function toJavaType() { return this.java },
     function toSwiftType(optional) {
       return this.swift + (optional ? '?' : '')
@@ -73,6 +78,7 @@ foam.CLASS({
   implements: ['foam.core.type.Type'],
   axioms: [ { class: 'foam.pattern.Singleton' } ],
   methods: [
+    function toModelIdDeps() { return [] },
     function toJavaType() { return 'Object' },
     function toSwiftType() { return 'Any?' },
   ],
@@ -167,6 +173,7 @@ foam.CLASS({
     }
   ],
   methods: [
+    function toModelIdDeps() { return this.type.toModelIdDeps() },
     function toJavaType() {
       return `${this.type.toJavaType()}[]`
     },
@@ -199,6 +206,7 @@ foam.CLASS({
     },
   ],
   methods: [
+    function toModelIdDeps() { return [this.of.id] },
     function toJavaType() { return this.of.id },
     function toSwiftType(optional) {
       return this.of.model_.swiftName + (optional ? '?' : '')
