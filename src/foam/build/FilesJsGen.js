@@ -196,6 +196,7 @@ foam.CLASS({
             getTreeHead(self.INSTANCE_OF(self.Lib)),
             getTreeHead(self.IN(self.Model.ID, self.PHASE_1)),
             getTreeHead(self.IN(self.Model.ID, self.PHASE_2)),
+            getTreeHead(self.CONTAINS(self.Model.ID, 'foam.core.type.')),
             getTreeHead(self.INSTANCE_OF(self.Script)),
             getTreeHead(
               self.OR(
