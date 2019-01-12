@@ -71,7 +71,7 @@ foam.CLASS({
       name: 'loadFile_',
       args: [
         { name: 'x', type: 'Context' },
-        { name: 'path', type: 'Stirng' }
+        { name: 'path', type: 'String' }
       ],
       type: 'foam.core.FObject',
       async: true,
