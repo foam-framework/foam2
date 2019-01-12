@@ -139,9 +139,19 @@
          },
 
          function paintSelf(x) {
+           x.save();
+
+           // Add shadow blur to box
+           x.shadowBlur = 5;
+           x.shadowOffsetX = 5;
+           x.shadowOffsetY = 5;
+           x.shadowColor = "gray";
+
            x.translate(-this.width/2, 0);
            this.SUPER(x);
-           x.translate(this.width/2, 0);
+
+           // reset translate and shadow settings
+           x.restore();
 
            this.paintConnectors(x);
          },
