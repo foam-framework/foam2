@@ -82,7 +82,8 @@ foam.CLASS({
               // If this behavior isn't desired then the relationship should be
               // moved into its own file.
               self.find(jsonId).then(function(m) {
-                m.initRelationship();
+                m.initSource();
+                m.initTarget();
               });
             }
           };
