@@ -17,7 +17,7 @@ foam.CLASS({
     }
   ],
   methods: [
-    function toE(x) {
+    function toE(args, x) {
       var f = this.htmlish.parseString(this.markup, this.cls_.id);
       return f ? f(x) :
         x.E('span').add(this.htmlish.getLastError());

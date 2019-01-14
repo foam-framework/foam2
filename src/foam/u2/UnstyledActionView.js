@@ -48,11 +48,6 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Boolean',
-      name: 'showLabel',
-      expression: function(icon, iconFontName ) { return ! ( icon || iconFontName); }
-    },
-    {
       class: 'URL',
       name: 'icon',
       factory: function(action) { return this.action.icon; }
@@ -131,11 +126,11 @@ foam.CLASS({
         this.nodeName = 'i';
         this.cssClass(this.action.name);
         this.cssClass(this.iconFontClass); // required by font package
-        this.style({'font-family': this.iconFontFamily});
+        this.style({ 'font-family': this.iconFontFamily });
         this.add(this.iconFontName);
       }
 
-      if ( this.showLabel ) {
+      if ( this.label ) {
         this.add(this.label$);
       }
     }

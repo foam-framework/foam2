@@ -171,7 +171,7 @@ foam.CLASS({
           runTest(x);
         } catch (Throwable e) {
           setFailed(getFailed()+1);
-          ps.println();
+          ps.println("FAILURE: "+e.getMessage());
           e.printStackTrace(ps);
           e.printStackTrace();
         } finally {

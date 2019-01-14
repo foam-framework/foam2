@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'User',
 
   implements: [
+    'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.EnabledAware',
     'foam.nanos.auth.HumanNameTrait',
@@ -21,7 +22,16 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.util.SafetyUtil'
+    'foam.core.FObject',
+    'foam.core.X',
+    'foam.dao.DAO',
+    'foam.dao.ProxyDAO',
+    'foam.dao.Sink',
+    'foam.mlang.order.Comparator',
+    'foam.mlang.predicate.Predicate',
+    'foam.nanos.auth.AuthService',
+    'foam.util.SafetyUtil',
+    'static foam.mlang.MLang.EQ'
   ],
 
   documentation: '',
@@ -43,6 +53,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'id',
+      final: true,
       tableWidth: 45
     },
     {
@@ -312,6 +323,128 @@ foam.CLASS({
         if ( ! SafetyUtil.isEmpty(getOrganization()) ) return getOrganization();
         if ( SafetyUtil.isEmpty(getLastName()) ) return getFirstName();
         return getFirstName() + " " + getLastName();
+      `
+    },
+    {
+      name: 'authorizeOnCreate',
+      args: [
+        { name: 'x', javaType: 'foam.core.X' }
+      ],
+      javaReturns: 'void',
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        User user = (User) x.get("user");
+        AuthService auth = (AuthService) x.get("auth");
+
+        // Prevent privilege escalation by only allowing a user's group to be
+        // set to one that the user doing the put has permission to update.
+        boolean hasGroupUpdatePermission = auth.check(x, "group.update." + this.getGroup());
+        if ( ! hasGroupUpdatePermission ) {
+          throw new AuthorizationException("You do not have permission to set that user's group to '" + this.getGroup() + "'.");
+        }
+
+        // Prevent everyone but admins from changing the 'system' property. 
+        if ( this.getSystem() && ! user.getGroup().equals("admin") ) {
+          throw new AuthorizationException("You do not have permission to change the 'system' flag.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnRead',
+      args: [
+        { name: 'x', javaType: 'foam.core.X' }
+      ],
+      javaReturns: 'void',
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        User user = (User) x.get("user");
+        User agent = (User) x.get("agent");
+        AuthService auth = (AuthService) x.get("auth");
+        
+        boolean findSelf = SafetyUtil.equals(this.getId(), user.getId()) ||
+          (
+            agent != null &&
+            SafetyUtil.equals(agent.getId(), this.getId())
+          );
+        
+        if (
+          ! findSelf &&
+          ! auth.check(x, "user.read." + this.getId()) &&
+          ! auth.check(x, "spid.read." + this.getSpid())
+        ) {
+          throw new AuthorizationException();
+        }
+      `
+    },
+    {
+      name: 'authorizeOnUpdate',
+      args: [
+        { name: 'x', javaType: 'foam.core.X' },
+        { name: 'oldObj', javaType: 'foam.core.FObject' }
+      ],
+      javaReturns: 'void',
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        User user = (User) x.get("user");
+        AuthService auth = (AuthService) x.get("auth");
+        User oldUser = (User) oldObj;
+
+        boolean updatingSelf = SafetyUtil.equals(this.getId(), user.getId()) ||
+          (
+            x.get("agent") != null &&
+            SafetyUtil.equals(((User) x.get("agent")).getId(), this.getId())
+          );
+        boolean hasUserEditPermission = auth.check(x, "user.update." + this.getId());
+
+        if (
+          ! updatingSelf &&
+          ! hasUserEditPermission &&
+          ! auth.check(x, "spid.update." + user.getSpid())
+        ) {
+          throw new AuthorizationException("You do not have permission to update this user.");
+        }
+
+        // Prevent privilege escalation by only allowing a user's group to be
+        // changed under appropriate conditions.
+        if ( ! SafetyUtil.equals(oldUser.getGroup(), this.getGroup()) ) {
+          boolean hasOldGroupUpdatePermission = auth.check(x, "group.update." + oldUser.getGroup());
+          boolean hasNewGroupUpdatePermission = auth.check(x, "group.update." + this.getGroup());
+          if ( updatingSelf ) {
+            throw new AuthorizationException("You cannot change your own group.");
+          } else if ( ! hasUserEditPermission ) {
+            throw new AuthorizationException("You do not have permission to change that user's group.");
+          } else if ( ! (hasOldGroupUpdatePermission && hasNewGroupUpdatePermission) ) {
+            throw new AuthorizationException("You do not have permission to change that user's group to '" + this.getGroup() + "'.");
+          }
+        }
+
+        // Prevent everyone but admins from changing the 'system' property. 
+        if (
+          ! SafetyUtil.equals(oldUser.getSystem(), this.getSystem()) &&
+          ! user.getGroup().equals("admin")
+        ) {
+          throw new AuthorizationException("You do not have permission to change the 'system' flag.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnDelete',
+      args: [
+        { name: 'x', javaType: 'foam.core.X' }
+      ],
+      javaReturns: 'void',
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        User user = (User) x.get("user");
+        AuthService auth = (AuthService) x.get("auth");
+
+        if (
+          ! SafetyUtil.equals(this.getId(), user.getId()) &&
+          ! auth.check(x, "user.delete." + this.getId()) &&
+          ! auth.check(x, "spid.delete." + this.getSpid())
+        ) {
+          throw new RuntimeException("You do not have permission to delete that user.");
+        }
       `
     }
   ]

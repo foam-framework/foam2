@@ -46,10 +46,10 @@ public class AuditDAO
 
   @Override
   public FObject put_(X x, FObject obj) {
-    User       user     = (User) x.get("user");
-    Logger     logger   = (Logger) x.get("logger");
-    FObject    current  = this.find_(x, obj);
-    Object     objectId = obj.getProperty("id");
+    User    user     = (User) x.get("user");
+    Logger  logger   = (Logger) x.get("logger");
+    FObject current  = this.find_(x, obj);
+    Object  objectId = obj.getProperty("id");
 
     logger.info("CHANGE", objectId, user.getId(), formatMessage(current, obj));
 
@@ -58,9 +58,9 @@ public class AuditDAO
 
   @Override
   public FObject remove_(X x, FObject obj) {
-    User          user     = (User) x.get("user");
-    Logger        logger   = (Logger) x.get("logger");
-    Object        objectId = obj.getProperty("id");
+    User   user     = (User) x.get("user");
+    Logger logger   = (Logger) x.get("logger");
+    Object objectId = obj.getProperty("id");
 
     outputter.output(obj);
     logger.info("REMOVE", objectId, user.getId(), outputter.toString());

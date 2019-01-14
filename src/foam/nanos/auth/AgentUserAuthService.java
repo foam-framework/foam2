@@ -32,11 +32,11 @@ public class AgentUserAuthService
   public void start() {
     userDAO_     = (DAO) getX().get("localUserDAO");
     groupDAO_    = (DAO) getX().get("groupDAO");
-    sessionDAO_  = (DAO) getX().get("sessionDAO");
+    sessionDAO_  = (DAO) getX().get("localSessionDAO");
     agentJunctionDAO_  = (DAO) getX().get("agentJunctionDAO");
   }
 
-  /* 
+  /*
     Sets the currently logged in user as an "agent" within the context &
     sets "user" in the context to the passed in user. This allows users to
     act on behalf of others while retaining information on the user.
@@ -83,8 +83,8 @@ public class AgentUserAuthService
     if ( actingWithinGroup == null || ! actingWithinGroup.getEnabled() ) {
       throw new AuthorizationException("No permissions are appended to the entity relationship.");
     }
-    
-    // Clone user and associate new junction group to user. Clone and freeze both user and agent. 
+
+    // Clone user and associate new junction group to user. Clone and freeze both user and agent.
     user = (User) user.fclone();
     user.setGroup(actingWithinGroup.getId());
     user.freeze();
@@ -97,7 +97,6 @@ public class AgentUserAuthService
     session.setUserId(user.getId());
     session.setContext(session.getContext().put("user", user));
     session.setContext(session.getContext().put("agent", agent));
-    
     return user;
   }
 
@@ -114,7 +113,9 @@ public class AgentUserAuthService
     X sessionContext = session.getContext();
     // Get agent from session context
     User agent = (User) sessionContext.get("agent");
-
+    if ( agent != null ) {
+      agent = (User) userDAO_.find(agent.getId());
+    }
     return agent;
   }
 }

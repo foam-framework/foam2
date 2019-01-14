@@ -10,18 +10,27 @@ foam.CLASS({
 
   documentation: 'Country information.',
 
-  ids: [ 'code' ],
+  ids: ['code'],
 
   properties: [
     {
       class: 'String',
       name: 'code',
-      documentation: 'Country code.'
+      documentation: 'ISO 3166-1 alpha-2 Country codes.'
+    },
+    {
+      class: 'String',
+      name: 'iso31661Code',
+      documentation: 'ISO 3166-1 alpha-3 country codes.'
     },
     {
       class: 'String',
       name: 'name',
       documentation: 'Country name.'
+    },
+    {
+      class: 'StringArray',
+      name: 'alternativeNames'
     }
   ],
   methods: [{

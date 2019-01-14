@@ -214,7 +214,6 @@ foam.CLASS({
     function getParentGroupPermission(p, g) {
       var pid = p.id;
       while ( true ) {
-        console.log(pid);
         while ( pid.endsWith('.*') ) {
           pid = pid.substring(0, pid.length-2);
         }

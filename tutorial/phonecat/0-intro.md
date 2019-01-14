@@ -4,78 +4,46 @@ permalink: /tutorial/phonecat/0-intro/
 tutorial: 0
 ---
 
-## Overview
+# **FOAM Tutorial Overview**
 
-FOAM is a Javascript library. It is split into several parts conceptually,
-though all are currently imported together:
+This tutorial will provide the user with a good understanding of the core concepts of FOAM (Feature-Oriented Active Modeller) and the ability to build a simple app using FOAM.  
 
-- An advanced class system, similar in principle to Java's but much more
-  powerful.
-- A library for abstracting across data sources, with helpers for caching,
-  logging and more.
-- A view library for use in building web apps.
+### **Tutorial Menu:** 
 
-FOAM is all about working at a high level of abstraction, productivity, and
-performance. See the [About page]({{ site.baseurl}}/about/) for more about its
-philosophy, or follow this tutorial to dive right in.
+1. [Getting Started](../1-gettingstarted/)
+1. [Core Concepts](../2-concepts/)
+1. Applied Learning: Build a Basic App with FOAM
+    * [Defining the Model](../3a-model/)
+    * [The Controller](../3b-dao/)
+    * [UI Library](../3c-UI/)
+    * [Navigation](../3d-navigation/)
 
-This tutorial is split into several parts:
+* [About FOAM](/foam/about/)
+* [Appendix](../4-appendix/)
 
-- Getting Started (below)
-- [Core Concepts]({{ site.baseurl }}/tutorial/phonecat/1-concepts/)
-- [`Phone` model]({{ site.baseurl }}/tutorial/phonecat/2-model/)
-- [Controllers]({{ site.baseurl }}/tutorial/phonecat/3-dao/)
-- [UI Library]({{ site.baseurl }}/tutorial/phonecat/4-UI)
-- [Navigation]({{ site.baseurl }}/tutorial/phonecat/5-navigation)
-- [`DetailView` and UI Library]({{ site.baseurl }}/tutorial/phonecat/6-detailview)
+## **What is FOAM?**
 
-## Audience
+*Fast apps fast.* FOAM (Feature-Oriented Active Modeller) is designed to help developers write apps faster. It is a system for converting abstract models into concrete software implementations. 
 
-This tutorial is for people who are familiar with Javascript and building web apps, but who do not know FOAM's concepts or execution. It provides a brief explanation of the concepts, interwoven with an in-depth tutorial on writing code in FOAM to build an app which shows a catalog of phones.
+The main features of FOAM are:
 
-## Required Tools
+- An advanced class system, similar in principle to Java's but much more powerful.
+- A Javascript library for abstracting across data sources with helpers for caching, logging, etc.
+- A view library for use in building web applications.
 
-There are only two required tools for this tutorial:
+For more information about the philosophy of FOAM, select the following link to [About FOAM](/foam/about/) or follow this tutorial and dive right in.
 
-- `git`
-- A local web server. We recommend Python's built-in web server module.
+## **Audience**
 
-## Getting Started
+This tutorial is for people who are familiar with Javascript and building web apps but who do not know FOAM's concepts or functions.
 
-Let's dive right in. Make a new directory for your project, switch to it, and download FOAM:
+## **Required Tools**
 
-    mkdir $PROJECT
-    cd $PROJECT
-    git clone https://github.com/foam-framework/foam2.git
+There are only four required tools for this tutorial. The following list includes links to locations where the required tools may be downloaded::
 
-Now you've got a subdirectory `foam2/` that holds all the code for FOAM, along with numerous demos and test pages.
+1. [FOAM framework](https://github.com/foam-framework/foam2.git)
+1. [GIT GUI](https://www.sourcetreeapp.com/)
+1. [Python](https://www.python.org/downloads/) (Python is our recommended local web server)
+1. [Tutorial Companion File](../bundle.zip)
 
-The library is split across many files, but you only need to include one in your HTML document: `core/bootFOAM.js`.
-
-Create `$PROJECT/index.html` with the following contents:
-
-{% highlight html %}
-<html>
-  <head>
-    <script src="foam2/src/foam.js"></script>
-    <script src=“foam_powered.js"></script>
-  </head>
-  <body>
-    <script>
-      document.write(FOAM_POWERED);
-    </script>
-  </body>
-</html>
-{% endhighlight %}
-
-Launch your web server and direct your browser to this file. Using Python, that looks like:
-
-    python -m SimpleHTTPServer    # Python 2
-    python -m http.server         # Python 3
-
-which will serve the current directory on port 8000: [http://localhost:8000/](http://localhost:8000/).
-
-Loading the page should show the "FOAM Powered" logo, and no JS console errors.
-
-If that's what you're seeing, then congratulations! You've got FOAM running and you're ready to move on to the tutorial proper, with [Part 1: Core Concepts]({{ site.baseurl }}/tutorial/phonecat/1-concepts).
-
+## **[NEXT:  Part I - GETTING STARTED](../1-gettingstarted)**

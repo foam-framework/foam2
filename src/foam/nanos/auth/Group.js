@@ -224,20 +224,32 @@ return config;
     },
     {
       name: 'isDescendantOf',
-      code: function(groupId, groupDAO) {
+      code: async function(groupId, groupDAO) {
         /**
          * Returns a promise that resolves to true if this group is a
          * descendant of the given group or false if it is not.
          */
         if ( ! groupId ) return false;
-        const inner = async (group) => {
-          if ( ! group ) return false;
-          if ( group.id === groupId ) return true;
-          var nextGroup = await groupDAO.find(group.parent);
-          return await inner(nextGroup);
-        };
-        return inner(this);
-      }
+        if ( this.id === groupId || this.parent === groupId ) return true;
+        var parent = await groupDAO.find(this.parent);
+        if ( parent == null ) return false;
+        return parent.isDescendantOf(groupId, groupDAO);
+      },
+      args: [
+        { name: 'groupId',  javaType: 'String' },
+        { name: 'groupDAO', javaType: 'foam.dao.DAO' }
+      ],
+      javaReturns: 'boolean',
+      javaCode: `
+        if ( SafetyUtil.isEmpty(groupId) ) return false;
+        if (
+          SafetyUtil.equals(this.getId(), groupId) ||
+          SafetyUtil.equals(this.getParent(), groupId)
+        ) return true;
+        Group parent = (Group) groupDAO.find(this.getParent());
+        if ( parent == null ) return false;
+        return parent.isDescendantOf(groupId, groupDAO);
+      `
     }
   ]
 });

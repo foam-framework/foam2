@@ -21,14 +21,12 @@ foam.CLASS({
   ],
 
   css: `
-    ^{
-      width: 448px;
-      margin: auto;
-    }
-    ^ .container{
+    ^ {
       height: 40.8px;
+      width: 448px;
       background-color: #093649;
-      margin-bottom: 20px;
+      border-radius: 2px 2px 0 0;
+      margin: auto;
     }
     ^ .title{
       height: 40px;
@@ -81,15 +79,9 @@ foam.CLASS({
     var self = this;
 
     this
-    .addClass(this.myClass())
-      .start()
-        .start()
-          .start().addClass('container')
-            .start().addClass('title').add(this.title).end()
-            .start(this.CLOSE_MODAL).addClass('close').end()
-          .end()
-        .end()
-      .end()
+      .addClass(this.myClass())
+      .start().addClass('title').add(this.title).end()
+      .start(this.CLOSE_MODAL).addClass('close').end();
     }
   ],
 

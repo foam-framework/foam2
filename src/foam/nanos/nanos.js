@@ -115,6 +115,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/AuthService" },
   { name: "foam/nanos/auth/ProxyAuthService" },
   { name: "foam/nanos/auth/ClientAuthService" },
+  { name: "foam/nanos/auth/ClientLoginAuthService" },
   { name: "foam/nanos/auth/AgentAuthService" },
   { name: "foam/nanos/auth/ClientAgentAuthService" },
   { name: "foam/nanos/pm/PMInfo" },
@@ -157,5 +158,6 @@ FOAM_FILES([
   { name: 'foam/demos/net/nap/web/RegulatoryNoticeList', flags: ['web'] },
   { name: 'foam/demos/net/nap/web/EditRegulatoryNotice', flags: ['web'] },
   { name: 'foam/nanos/dashboard/Demo' },
-  { name: 'foam/nanos/dig/SUGAR' }
+  { name: 'foam/nanos/dig/SUGAR' },
+  { name: 'foam/nanos/dig/DigFileUploadView'},
 ]);

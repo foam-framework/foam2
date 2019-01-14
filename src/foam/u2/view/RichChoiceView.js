@@ -29,12 +29,22 @@ foam.CLASS({
               {
                 heading: 'Users',
                 dao: X.userDAO.orderBy(foam.nanos.auth.User.LEGAL_NAME)
-              }
+              },
+              // Set "disabled: true" to render each object as non-selectable row
+              {
+                disabled: true,
+                heading: 'Disabled users',
+                dao: X.userDAO.where(this.EQ(foam.nanos.auth.User.STATUS, this.AccountStatus.DISABLED)),
+              },
             ]
           };
         }
       }
   `,
+
+  implements: [
+    'foam.mlang.Expressions'
+  ],
 
   exports: [
     'of'
@@ -88,6 +98,23 @@ foam.CLASS({
 
     ^custom-selection-view {
       flex-grow: 1;
+    }
+
+    ^ .search input {
+      width: 100%;
+      border: none;
+    }
+
+    ^ .search input:focus {
+      border: none;
+    }
+
+    ^ .disabled {
+      filter: grayscale(100%) opacity(60%);
+    }
+
+    ^ .disabled:hover {
+      cursor: default;
     }
   `,
 
@@ -156,6 +183,25 @@ foam.CLASS({
         The full object from the DAO. This property is only used internally, you
         do not need to set it as a consumer of this view.
       `
+    },
+    {
+      class: 'Boolean',
+      name: 'search',
+      documentation: 'Set to true to enable searching.'
+    },
+    {
+      class: 'String',
+      name: 'filter_',
+      documentation: 'The text that the user typed in to search by.',
+      postSet: function(oldValue, newValue) {
+        this.sections = this.sections.map((section) => {
+          return Object.assign({}, section, {
+            filtered: newValue
+              ? section.dao.where(this.KEYWORD(newValue))
+              : section.dao
+          });
+        });
+      }
     }
   ],
 
@@ -202,26 +248,44 @@ foam.CLASS({
         .start()
           .addClass(this.myClass('container'))
           .show(self.isOpen_$)
-          .forEach(this.sections, function(section) {
-            var dao = section.dao;
-            this
+          .add(self.search$.map((searchEnabled) => {
+            if ( ! searchEnabled ) return null;
+            return this.E()
               .start()
-                .addClass(self.myClass('heading'))
-                .add(section.heading)
-              .end()
-              .start()
-                .select(dao, function(obj) {
-                  return this.E()
-                    .start(self.rowView, { data: obj })
-                      .on('click', () => {
-                        self.fullObject_ = obj;
-                        self.data = obj;
-                        self.isOpen_ = false;
-                      })
-                    .end();
-                })
+                .startContext({ data: self })
+                  .addClass('search')
+                  .add(self.FILTER_.clone().copyFrom({ view: {
+                    class: 'foam.u2.view.TextField',
+                    placeholder: 'Search...',
+                    onKey: true
+                  } }))
+                .endContext()
               .end();
-          })
+          }))
+          .add(this.slot(function(sections) {
+            return this.E().forEach(sections, function(section) {
+              this
+                .start()
+                  .addClass(self.myClass('heading'))
+                  .add(section.heading)
+                .end()
+                .start()
+                  .select(section.filtered || section.dao, function(obj) {
+                    return this.E()
+                      .start(self.rowView, { data: obj })
+                        .addClass(section.disabled ? 'disabled' : '')
+                        .callIf(! section.disabled, function() {
+                          this.on('click', () => {
+                            self.fullObject_ = obj;
+                            self.data = obj;
+                            self.isOpen_ = false;
+                          })
+                        })
+                      .end();
+                  })
+                .end();
+            });
+          }))
         .end();
     }
   ],
