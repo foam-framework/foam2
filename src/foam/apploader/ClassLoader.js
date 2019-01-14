@@ -220,6 +220,8 @@ have multiple classloaders running alongside eachother`
           //   debugger;
           // }
 
+          delete foam.UNUSED[model.id]
+          foam.USED[model.id] = model
           return cls;
         });
       }

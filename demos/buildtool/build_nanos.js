@@ -1,26 +1,20 @@
 #!/usr/bin/env node
 
-var dir = __dirname;
-var root = dir + '/../..';
+global.FOAM_FLAGS = {
+  web: true,
+  js: true,
+  debug: true,
+};
 
-require(root + '/src/foam.js');
+require(__dirname + '/../../src/foam.js');
 
-var outDir = dir + '/NANO_BUILD/src'
-var srcDirs = [
-  global.FOAM_ROOT
-]
+foam.__context__.classloader.addClassPath(__dirname + '/src');
 
-// Clear the destination dir.
-var cp = require('child_process');
-cp.execSync('rm -rf ' + outDir)
-cp.execSync('mkdir -p ' + outDir)
-srcDirs.forEach(function(srcDir) {
-  cp.execSync(`rsync -a --exclude='*.js' --exclude='*.java' ${srcDir}/ ${outDir}/`)
-});
-
-foam.__context__.classloader.load('foam.build.OldBuilder').then(function(cls) {
-  cls.create({
-    srcDirs: srcDirs,
-    outDir: outDir,
-  }).execute();
+Promise.all([
+  foam.__context__.classloader.load('foam.build.Builder'),
+  foam.__context__.classloader.load('foam.nanos.controller.ApplicationController'),
+]).then(function(cls) {
+  foam.build.Builder.create({
+    targetFile: dir + '/foam-bin.js'
+  }).execute()
 });
