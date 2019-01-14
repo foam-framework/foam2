@@ -8,11 +8,7 @@ foam.CLASS({
   package: 'foam.build',
   name: 'Builder',
   requires: [
-    'foam.build.DirWriter',
-    'foam.build.FilesJsGen',
-    'foam.build.DirCrawlModelDAO',
     'foam.mlang.ExpressionsSingleton',
-    'foam.build.JsCodeOutputter',
   ],
   properties: [
     {
@@ -27,6 +23,10 @@ foam.CLASS({
         'foam.apploader.ClassLoaderContextScript',
         'foam.apploader.ClassLoaderContext'
       ]
+    },
+    {
+      name: 'flags',
+      value: ['js', 'web']
     },
     {
       name: 'targetFile',
@@ -137,7 +137,7 @@ ${models.map(m => serializer.stringify(self.__context__, m)).join(',\n')}
         var data = {};
         var serializer = foam.json2.Serializer.create();
 
-        var staticCodeGen = self.JsCodeOutputter.create();
+        // var staticCodeGen = self.JsCodeOutputter.create();
 
         var a = 1;
 //        payload = classes.map(function(c) {
@@ -393,7 +393,7 @@ console.log("Done.");
         });
       })();
 
-      foam.__RELATIONSHIPS__.forEach(function(r) {
+      (foam.__RELATIONSHIPS__ || []).forEach(function(r) {
         r.class = 'foam.dao.Relationship';
         modelDAO.put(inflate(r));
       });
@@ -452,7 +452,7 @@ console.log("Done.");
             if ( func == 'UNKNOWN' ) throw new Error("What's the right foam.FOO function for a " + s.cls_.id);
 
 
-            data += `foam.${func}(${serializer.stringify(s)});\n`;
+            data += `foam.${func}(${serializer.stringify(filterAxiomsByFlags(s))});\n`;
           },
           eof: function() { then(data); }
         });
@@ -466,6 +466,43 @@ console.log("Done.");
       function close(then, abort) {
         require('fs').closeSync(fd);
         then();
+      }
+
+      var flagFilter = foam.util.flagFilter(this.flags);
+      function filterAxiomsByFlags(o) {
+        var self = this;
+        var type = foam.typeOf(o);
+        if ( type == foam.Array ) {
+          return o.filter(flagFilter).map(function(obj) {
+            return filterAxiomsByFlags(obj);
+          });
+        } else if ( type == foam.Object ) {
+          // Check if it's an actual class. foam.core.FObject.isSubClass
+          // should work but doesn't:
+          // https://github.com/foam-framework/foam2/issues/1023
+          if ( o && o.prototype &&
+               ( foam.core.FObject.prototype === o.prototype ||
+                 foam.core.FObject.prototype.isPrototypeOf(o.prototype) ) ) {
+            return o;
+          }
+          var fo = {};
+          Object.keys(o).forEach(function(k) {
+            fo[k] = filterAxiomsByFlags(o[k]);
+          });
+          return fo;
+        } else if ( type == foam.core.FObject ) {
+          var fo = {};
+          o.cls_.getAxiomsByClass(foam.core.Property)
+            .filter(flagFilter)
+            .filter(function(axiom) {
+              return o.hasOwnProperty(axiom.name);
+            })
+            .forEach(function(axiom) {
+              fo[axiom.name] = filterAxiomsByFlags(o[axiom.name]);
+            });
+          return o.cls_.create(fo);
+        }
+        return o;
       }
 
       with ( foam.cps ) {
