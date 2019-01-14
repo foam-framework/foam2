@@ -15,6 +15,6 @@ Promise.all([
   foam.__context__.classloader.load('demo.build.ModelToBuild'),
 ]).then(function(cls) {
   foam.build.Builder.create({
-    targetFile: dir + '/foam-bin.js'
+    targetFile: __dirname + '/foam-bin.js'
   }).execute()
 });
