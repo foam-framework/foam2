@@ -60,12 +60,8 @@ foam.CLASS({
     }
     ^inner {
       z-index: 3;
-      /* The following transforms fix an overflow issue in certain browsers. */
-      -o-transform: translate3D(0,0,0);
-      -ms-transform: translate3D(0,0,0);
-      -moz-transform: translate3D(0,0,0);
-      -webkit-transform: translate3D(0,0,0);
-      transform: translate3D(0,0,0);
+      /* The following line fixes a stacking problem in certain browsers. */
+      will-change: opacity;
     }
  `,
 
