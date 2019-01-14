@@ -108,6 +108,14 @@ foam.CLASS({
     ^ .search input:focus {
       border: none;
     }
+
+    ^ .disabled {
+      filter: grayscale(100%) opacity(60%);
+    }
+
+    ^ .disabled:hover {
+      cursor: default;
+    }
   `,
 
   properties: [
@@ -262,22 +270,18 @@ foam.CLASS({
                   .add(section.heading)
                 .end()
                 .start()
-                  .callIfElse(! section.disabled, function() {
-                    this.select(section.filtered || section.dao, function(obj) {
-                      return this.E()
-                        .start(self.rowView, { data: obj })
-                          .on('click', () => {
+                  .select(section.filtered || section.dao, function(obj) {
+                    return this.E()
+                      .start(self.rowView, { data: obj })
+                        .addClass(section.disabled ? 'disabled' : '')
+                        .callIf(! section.disabled, function() {
+                          this.on('click', () => {
                             self.fullObject_ = obj;
                             self.data = obj;
                             self.isOpen_ = false;
                           })
-                        .end();
-                    });
-                  }, function() {
-                    this.select(section.filtered || section.dao, function(obj) {
-                      return this.E()
-                        .tag(self.rowView, { data: obj, disabled: true });
-                    });
+                        })
+                      .end();
                   })
                 .end();
             });
