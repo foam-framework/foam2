@@ -181,30 +181,26 @@ foam.CLASS({
 
       requires: [ 'foam.u2.tag.Input', 'foam.u2.HTMLElement' ],
 
-      documentation: function() {/*
+      documentation: `
         Doesn't build inner views until value is set or user clicks on view.
         This complicates the design but saves memory and startup time.
-      */},
+      `,
 
-      axioms: [
-        foam.u2.CSS.create({
-          code: function() {/*
-            ^ > span {
-              display: block;
-              height: 15px;
-              padding: 2px;
-              width: 100%;
-            }
-            ^ > input {
-              border: none;
-              outline: 1px solid blue;
-              outline-offset: 0;
-              padding-left: 2px;
-              width: 100%;
-            }
-          */}
-        })
-      ],
+      css: `
+        ^ > span {
+          display: block;
+          height: 15px;
+          padding: 2px;
+          width: 100%;
+        }
+        ^ > input {
+          border: none;
+          outline: 1px solid blue;
+          outline-offset: 0;
+          padding-left: 2px;
+          width: 100%;
+        }
+      `,
 
       properties: [
         [ 'nodeName', 'span' ],
@@ -252,34 +248,30 @@ foam.CLASS({
     }
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-      ^ tr, ^ td, ^ th, ^ input {
-        color: #333;
-        font: 13px roboto, arial, sans-serif;
-      }
-      ^ tr { height: 26px; }
-      ^cell { min-width: 102px; }
-      ^, ^ th, ^ td { border: 1px solid #ccc; }
-      ^ td { height: 100%; }
-      ^ th, ^ td {
-        border-right: none;
-        border-bottom: none;
-      }
-      ^ th {
-        background: #eee;
-        color: #333;
-        padding: 2px 18px;
-      }
-      ^ {
-        border-left: none;
-        border-top: none;
-        overflow: auto;
-      }
-      */}
-    })
-  ],
+  css: `
+    ^ tr, ^ td, ^ th, ^ input {
+      color: #333;
+      font: 13px roboto, arial, sans-serif;
+    }
+    ^ tr { height: 26px; }
+    ^cell { min-width: 102px; }
+    ^, ^ th, ^ td { border: 1px solid #ccc; }
+    ^ td { height: 100%; }
+    ^ th, ^ td {
+      border-right: none;
+      border-bottom: none;
+    }
+    ^ th {
+      background: #eee;
+      color: #333;
+      padding: 2px 18px;
+    }
+    ^ {
+      border-left: none;
+      border-top: none;
+      overflow: auto;
+    }
+  `,
 
   properties: [
 //    [ 'rows',    99 ],

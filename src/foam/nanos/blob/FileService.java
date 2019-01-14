@@ -36,7 +36,7 @@ public class FileService
     // use the user dao instead of local user dao
     // so that we get the authentication decoration
     userDAO_ = (DAO) x.get("userDAO");
-    sessionDAO_ = (DAO) x.get("sessionDAO");
+    sessionDAO_ = (DAO) x.get("localSessionDAO");
   }
 
   @Override
