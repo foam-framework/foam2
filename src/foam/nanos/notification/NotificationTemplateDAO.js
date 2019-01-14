@@ -65,6 +65,7 @@ the notification will be handled. `,
             // REVIEW/FIXME: no copyFrom in our java
             template.setId(notification.getId());
             template.setBody(notification.getBody());
+            template.setRead(notification.getRead());
           } else {
             System.err.println("Notification template "+notification.getTemplate()+" not found.");
             return notification;

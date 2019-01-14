@@ -30,17 +30,17 @@ public class SessionServerBox
 
   public void send(Message msg) {
     String sessionID = (String) msg.getAttributes().get("sessionId");
-    Logger logger = (Logger) getX().get("logger");
+    Logger logger    = (Logger) getX().get("logger");
 
     try {
       if ( sessionID != null ) {
-        NSpec              spec         = getX().get(NSpec.class);
-        HttpServletRequest req          = getX().get(HttpServletRequest.class);
-        AuthService        auth         = (AuthService) getX().get("auth");
-        DAO                sessionDAO   = (DAO)         getX().get("sessionDAO");
-        DAO                groupDAO     = (DAO)         getX().get("groupDAO");
+        NSpec              spec       = getX().get(NSpec.class);
+        HttpServletRequest req        = getX().get(HttpServletRequest.class);
+        AuthService        auth       = (AuthService) getX().get("auth");
+        DAO                sessionDAO = (DAO)         getX().get("localSessionDAO");
+        DAO                groupDAO   = (DAO)         getX().get("groupDAO");
 
-        Session            session      = (Session)     sessionDAO.find(sessionID);
+        Session            session    = (Session)     sessionDAO.find(sessionID);
 
         if ( session == null ) {
           session = new Session();
@@ -66,7 +66,7 @@ public class SessionServerBox
         }
 
         if ( user != null ) {
-          Group group    = (Group) groupDAO.find(user.getGroup());
+          Group group = (Group) groupDAO.find(user.getGroup());
 
           if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
             logger.debug("missing permission", group != null ? group.getId() : "NO GROUP" , "service." + spec.getName());

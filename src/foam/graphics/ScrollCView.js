@@ -41,7 +41,7 @@ foam.CLASS({
       name: 'value',
 //      help: 'The first element being shown, starting at zero.',
       preSet: function(_, value) {
-        return Math.max(0, Math.min(this.size-this.extent-1, value));
+        return Math.max(0, Math.min(this.size-this.extent, value));
       },
       postSet: function(old, nu) {
         if ( old !== nu ) this.invalidated.pub();
@@ -147,14 +147,14 @@ foam.CLASS({
 
       c.strokeStyle = this.borderColor;
       c.lineWidth = 0.4;
-      c.strokeRect(0, 0, this.width-7, this.height);
+      c.strokeRect(0, 0, this.width, this.height);
 
       c.fillStyle = this.handleColor;
 
       c.fillRect(
         2,
         this.valueToY(this.value),
-        this.width - 11,
+        this.width - 4,
         this.handleSize);
     }
   ],

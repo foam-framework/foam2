@@ -16,6 +16,14 @@
     'foam.u2.view.TableView'
   ],
 
+  constants: [
+    {
+      type: 'Int',
+      name: 'TABLE_HEAD_HEIGHT',
+      value: 40
+    }
+  ],
+
   properties: [
     {
       class: 'foam.dao.DAOProperty',
@@ -48,7 +56,36 @@
       class: 'Int',
       name: 'daoCount'
     },
-    'selection'
+    'selection',
+    {
+      class: 'Boolean',
+      name: 'editColumnsEnabled',
+      documentation: `
+        Set to true if users should be allowed to choose which columns to use.
+      `,
+      value: true
+    },
+    {
+      class: 'Int',
+      name: 'rowHeight',
+      documentation: 'The height of one row of the table in px.',
+      value: 48
+    },
+    {
+      class: 'Boolean',
+      name: 'fitInScreen',
+      documentation: `
+        If true, the table height will be dynamically set such that the table
+        will not overflow off of the bottom of the page.
+      `,
+      value: false
+    },
+    {
+      name: 'table_',
+      documentation: `
+        A reference to the table element we use in the fitInScreen calculations.
+      `
+    }
   ],
 
   methods: [
@@ -68,21 +105,34 @@
               data$: this.scrolledDAO$,
               columns: this.columns,
               contextMenuActions: this.contextMenuActions,
-              selection$: this.selection$
-            }).
+              selection$: this.selection$,
+              editColumnsEnabled: this.editColumnsEnabled
+            }, this.table_$).
             end().
           end().
-          start('td').style({ 'vertical-align': 'top' }).
-            add(this.ScrollCView.create({
-              value$: this.skip$,
-              extent$: this.limit$,
-              height: 40*18+41, // TODO use window height.
-              width: 18,
-              size$: this.daoCount$,
+          start('td').
+            style({ 'vertical-align': 'top' }).
+            show(this.daoCount$.map((count) => count >= this.limit)).
+            add(this.slot(function(limit) {
+              return this.ScrollCView.create({
+                value$: this.skip$,
+                extent$: this.limit$,
+                height: this.rowHeight * limit + this.TABLE_HEAD_HEIGHT,
+                width: 12,
+                size$: this.daoCount$,
+              });
             })).
           end().
         end().
       end();
+
+      if ( this.fitInScreen ) {
+        this.onload.sub(this.updateTableHeight);
+        window.addEventListener('resize', this.updateTableHeight);
+        this.onDetach(() => {
+          window.removeEventListener('resize', this.updateTableHeight);
+        });
+      }
     }
   ],
 
@@ -92,9 +142,10 @@
       code: function(e) {
         var negative = e.deltaY < 0;
         // Convert to rows, rounding up. (Therefore minumum 1.)
-        var rows = Math.ceil(Math.abs(e.deltaY) / /*self.rowHeight*/ 40);
+        var rows = Math.ceil(Math.abs(e.deltaY) / 40);
+        var oldSkip = this.skip;
         this.skip = Math.max(0, this.skip + (negative ? -rows : rows));
-        if ( e.deltaY !== 0 ) e.preventDefault();
+        if ( e.deltaY !== 0 && oldSkip != this.skip ) e.preventDefault();
       }
     },
     {
@@ -106,6 +157,20 @@
         this.data$proxy.select(this.Count.create()).then(function(s) {
           self.daoCount = s.value;
         })
+      }
+    },
+    {
+      name: 'updateTableHeight',
+      code: function() {
+        // Find the distance from the top of the table to the top of the screen.
+        var distanceFromTop = this.table_.el().getBoundingClientRect().y;
+
+        // Calculate the remaining space we have to make use of.
+        var remainingSpace = window.innerHeight - distanceFromTop;
+
+        // Set the limit such that we make maximum use of the space without
+        // overflowing.
+        this.limit = Math.max(1, Math.floor((remainingSpace - this.TABLE_HEAD_HEIGHT) / this.rowHeight));
       }
     }
   ]

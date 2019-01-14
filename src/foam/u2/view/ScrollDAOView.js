@@ -43,10 +43,12 @@ foam.CLASS({
     'foam.dao.QuickSink',
     'foam.u2.ViewSpec'
   ],
+
   imports: [
     'selection as importedSelection',
     'selectionEnabled as importedSelectionEnabled'
   ],
+
   // Provide most state to inner controller and views.
   exports: [
     'anchorDAOIdx_',

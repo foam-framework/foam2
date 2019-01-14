@@ -7,7 +7,7 @@ import foam.test.TestUtils;
 import foam.util.Auth;
 import foam.util.SafetyUtil;
 
-public class AuthenticatedUserDAOTest extends foam.nanos.test.Test {
+public class UserAuthorizationTest extends foam.nanos.test.Test {
   @Override
   public void runTest(X x) {
 
@@ -21,10 +21,8 @@ public class AuthenticatedUserDAOTest extends foam.nanos.test.Test {
     x = x.put("auth", newAuthService);
 
     // create mock userDAO
-    AuthenticatedUserDAO tempDAO = new AuthenticatedUserDAO(x, (DAO) x.get("localUserDAO"));
+    DAO tempDAO = new AuthorizationDAO(x, (DAO) x.get("localUserDAO"));
     x = x.put("userDAO", tempDAO);
-    tempDAO.setX(x);
-
 
     // create an admin User
     User adminUser = new User();
@@ -60,13 +58,13 @@ public class AuthenticatedUserDAOTest extends foam.nanos.test.Test {
 
 
     //test case
-    AuthenticatedUserDAO_AdminUpdateSystemFlag(adminContext);
-    AuthenticatedUserDAO_AdminCreateUserWithSystemFlag(adminContext);
-    AuthenticatedUserDAO_NonAdminUpdateSystemFlag(nonAdminContext);
-    AuthenticatedUserDAO_NonAdminCreateUserWithSystemFlag(nonAdminContext);
+    AdminUpdateSystemFlag(adminContext);
+    AdminCreateUserWithSystemFlag(adminContext);
+    NonAdminUpdateSystemFlag(nonAdminContext);
+    NonAdminCreateUserWithSystemFlag(nonAdminContext);
   }
 
-  public void AuthenticatedUserDAO_AdminUpdateSystemFlag(X adminContext) {
+  public void AdminUpdateSystemFlag(X adminContext) {
     // get old user
     DAO  userDAO =   (DAO) adminContext.get("userDAO");
     User oldUser =   (User) userDAO.find_(adminContext, 2000);
@@ -81,7 +79,7 @@ public class AuthenticatedUserDAOTest extends foam.nanos.test.Test {
       "Admin User update the user's system flag.");
   }
 
-  public void AuthenticatedUserDAO_AdminCreateUserWithSystemFlag(X adminContext) {
+  public void AdminCreateUserWithSystemFlag(X adminContext) {
     // create new user
     User newUser = new User();
     newUser.setId(2001);
@@ -100,7 +98,7 @@ public class AuthenticatedUserDAOTest extends foam.nanos.test.Test {
       "Admin User create a user with system flag.");
   }
 
-  public void AuthenticatedUserDAO_NonAdminUpdateSystemFlag(X nonAdminContext) {
+  public void NonAdminUpdateSystemFlag(X nonAdminContext) {
     // get old user
     DAO userDAO = (DAO) nonAdminContext.get("userDAO");
     User oldUser = (User) userDAO.find_(nonAdminContext, 2000);
@@ -119,7 +117,7 @@ public class AuthenticatedUserDAOTest extends foam.nanos.test.Test {
     );
   }
 
-  public void AuthenticatedUserDAO_NonAdminCreateUserWithSystemFlag(X nonAdminContext) {
+  public void NonAdminCreateUserWithSystemFlag(X nonAdminContext) {
     // create new user
     User newUser = new User();
     newUser.setId(2002);

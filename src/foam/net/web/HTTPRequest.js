@@ -158,6 +158,9 @@ foam.CLASS({
           case 'json':
           this.headers['Content-Type'] = 'application/json';
           break;
+          case 'url':
+          this.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+          break;
         }
       }
       // Specify this.contentType when it can be deduced.

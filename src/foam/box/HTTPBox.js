@@ -156,7 +156,10 @@ protected class ResponseThread implements Runnable {
         var req = this.HTTPRequest.create({
           url:     this.prepareURL(this.url),
           method:  this.method,
-          payload: payload
+          payload: payload,
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+          },
         }).send();
 
         req.then(function(resp) {

@@ -125,8 +125,8 @@ guitarDAO
 // when a "sink" function isn't provided, FOAM defaults it to an ArraySink
 // which puts the results in a "a" prop 
 .then(function(db) {
-  console.log('count: ', db.a.length);
-  console.log('count: ', db.a[0].price);
+  console.log('count: ', db.array.length);
+  console.log('count: ', db.array[0].price);
 });
 ```
 
@@ -146,8 +146,8 @@ guitarDAO
 .where(expr.EQ(Guitar.BRAND, 'gibson'))
 .select()
 .then(function(guitars) {
-  console.log('gibsons count: ', guitars.a.length);
-  console.log(guitars.a[0].name);
+  console.log('gibsons count: ', guitars.array.length);
+  console.log(guitars.array[0].name);
 });
 ```
 
@@ -156,7 +156,7 @@ guitarDAO
 guitarDAO.where(expr.OR(expr.EQ(Guitar.BRAND, 'seizi'), expr.EQ(Guitar.BRAND, 'gibson')))
 .select()
 .then(function(guitars) {
-  console.log('seizi or gibsons count: ', guitars.a.length);
+  console.log('seizi or gibsons count: ', guitars.array.length);
 });
 ```
 
@@ -165,7 +165,7 @@ guitarDAO.where(expr.OR(expr.EQ(Guitar.BRAND, 'seizi'), expr.EQ(Guitar.BRAND, 'g
 guitarDAO.where(expr.IN(Guitar.BRAND, ['gibson', 'fender']))
 .select()
 .then(function(guitars) {
-  console.log(guitars.a.length);
+  console.log(guitars.array.length);
 });
 ```
 
@@ -175,7 +175,7 @@ guitarDAO
 .where(expr.AND(expr.LT(Guitar.PRICE, 2500), expr.EQ(Guitar.BRAND, 'fender')))
 .select()
 .then(function(guitars) {
-  console.log(guitars.a.length);
+  console.log(guitars.array.length);
 });
 ```
 
@@ -184,7 +184,7 @@ guitarDAO
 guitarDAO.where(expr.OR(expr.STARTS_WITH(Guitar.BRAND, 'g'), expr.STARTS_WITH(Guitar.NAME, 's')))
 .select()
 .then(function(guitars) {
-  console.log(guitars.a.length);
+  console.log(guitars.array.length);
 });
 ```
 
@@ -193,7 +193,7 @@ guitarDAO.where(expr.OR(expr.STARTS_WITH(Guitar.BRAND, 'g'), expr.STARTS_WITH(Gu
 guitarDAO.where(expr.CONTAINS(Guitar.NAME, 'sh'))
 .select()
 .then(function(guitars) {
-  console.log(guitars.a.length); // 1 , slash
+  console.log(guitars.array.length); // 1 , slash
 });
 ```
 
@@ -202,7 +202,7 @@ guitarDAO.where(expr.CONTAINS(Guitar.NAME, 'sh'))
 guitarDAO.where(expr.CONTAINS_IC(Guitar.NAME, 'SH'))
 .select()
 .then(function(guitars) {
-  console.log(guitars.a.length); // 1 , slash
+  console.log(guitars.array.length); // 1 , slash
 });
 ```
 
@@ -224,7 +224,7 @@ guitarDAO.where(expr.EQ(Guitar.BRAND, 'fender'))
 guitarDAO.limit(2)
 .select()
 .then(function(g) {
-  console.log(g.a.length);
+  console.log(g.array.length);
 });
 ```
 
@@ -235,7 +235,7 @@ guitarDAO
 .limit(2)
 .select(expr.SUM(Guitar.PRICE))
 .then(function(prices) {
-  console.log(prices.values);
+  console.log(prices.value);
 });
 ```
 
@@ -278,6 +278,6 @@ DAO decorators add more functionality to existing daos, examples below:
 var timing = foam.dao.TimingDAO.create({ name: 'guitar-timer', delegate: guitarDAO });
 
 // time spent in a default ArraySink select()
-timing.where().select().then();
+timing.select().then();
 // Timing:  timer-guitar-select   0.445  ms
 ```

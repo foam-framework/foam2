@@ -51,18 +51,19 @@ foam.CLASS({
   ],
 
   exports: [
-    'as ctrl',
     'appConfig',
+    'as ctrl',
+    'currentMenu',
     'group',
+    'lastMenuLaunched',
+    'lastMenuLaunchedListener',
     'loginSuccess',
     'logo',
+    'menuListener',
+    'pushMenu',
     'requestLogin',
     'signUpEnabled',
     'stack',
-    'currentMenu',
-    'lastMenuLaunched',
-    'menuListener',
-    'lastMenuLaunchedListener',
     'user',
     'webApp',
     'wrapCSS as installCSS'
@@ -282,6 +283,11 @@ foam.CLASS({
 
         this.installCSS(text, id, eid);
       }
+    },
+
+    function pushMenu(menuId) {
+      /** Use to load a specific menu. **/
+      if ( window.location.hash.substr(1) != menuId ) window.location.hash = menuId;
     },
 
     function requestLogin() {

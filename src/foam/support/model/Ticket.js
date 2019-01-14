@@ -38,24 +38,24 @@ foam.CLASS({
     {
       class: 'String',
       name: 'subject',
-      label:'Subject',
+      label: 'Subject',
     },
     {
       class: 'Date',
       name: 'createdAt',
       visibility: foam.u2.Visibility.RO,
       label: 'Time',
-      factory: function(){
+      factory: function() {
           return new Date();
       },
       javaFactory: 'return new Date();',
-      tableCellFormatter: function(state, obj, rel){
-        if(!state) return;
-        var locale = "en-us";
-        var month = state.toLocaleString(locale, {month: "short"});
+      tableCellFormatter: function(state, obj, rel) {
+        if ( ! state ) return;
+        var locale = 'en-us';
+        var month = state.toLocaleString(locale, { month: 'short' });
         var date = state.getDate();
         var year = state.getFullYear();
-        this.start().add(month+" "+date+", "+year).end();
+        this.start().add(month+' '+date+', '+year).end();
       }
     },
     {
@@ -69,19 +69,19 @@ foam.CLASS({
     {
       class: 'String',
       name: 'status',
-      label:'Status',
-      factory: function(){
-        return 'New'
+      label: 'Status',
+      factory: function() {
+        return 'New';
       },
       tableCellFormatter: function(state, obj, rel) {
         this.start()
           .start().add(state).addClass('generic-status').addClass(state).end()
-        .end()
+        .end();
       }
     },
     {
       class: 'Long',
-      name:'emailId'
+      name: 'emailId'
     }
   ]
 });

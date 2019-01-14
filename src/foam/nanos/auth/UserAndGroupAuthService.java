@@ -23,6 +23,10 @@ import javax.security.auth.AuthPermission;
 import java.security.Permission;
 import java.util.Calendar;
 import java.util.List;
+import java.util.regex.Pattern;
+
+import static foam.mlang.MLang.AND;
+import static foam.mlang.MLang.EQ;
 
 public class UserAndGroupAuthService
   extends    ContextAwareSupport
@@ -31,12 +35,8 @@ public class UserAndGroupAuthService
   protected DAO userDAO_;
   protected DAO groupDAO_;
   protected DAO sessionDAO_;
-  protected DAO userSubclassDAO_;
 
   public final static String CHECK_USER_PERMISSION = "service.auth.checkUser";
-
-  // pattern used to check if password has only alphanumeric characters
-  java.util.regex.Pattern alphanumeric = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");
 
   public UserAndGroupAuthService(X x) {
     setX(x);
@@ -44,14 +44,9 @@ public class UserAndGroupAuthService
 
   @Override
   public void start() {
-    userDAO_     = (DAO) getX().get("localUserDAO");
-    groupDAO_    = (DAO) getX().get("groupDAO");
-    sessionDAO_  = (DAO) getX().get("sessionDAO");
-
-    // Override this in a subclass if you need a DAO that contains instances of
-    // User as well as instances of subclasses of User. Since FOAM doesn't have
-    // any subclasses of User, this just refers to localUserDAO.
-    userSubclassDAO_     = (DAO) getX().get("localUserDAO");
+    userDAO_    = (DAO) getX().get("localUserDAO");
+    groupDAO_   = (DAO) getX().get("localGroupDAO");
+    sessionDAO_ = (DAO) getX().get("localSessionDAO");
   }
 
   public User getCurrentUser(X x) throws AuthenticationException {
@@ -62,7 +57,7 @@ public class UserAndGroupAuthService
     }
 
     // get user from session id
-    User user = (User) userSubclassDAO_.find(session.getUserId());
+    User user = (User) userDAO_.find(session.getUserId());
     if ( user == null ) {
       throw new AuthenticationException("User not found: " + session.getUserId());
     }
@@ -145,7 +140,7 @@ public class UserAndGroupAuthService
     session.setUserId(user.getId());
     session.setContext(session.getContext().put("user", user));
     sessionDAO_.put(session);
- 
+
     return user;
   }
 
@@ -157,16 +152,22 @@ public class UserAndGroupAuthService
     if ( userId < 1 || SafetyUtil.isEmpty(password) ) {
       throw new AuthenticationException("Invalid Parameters");
     }
-    
+
     return userAndGroupContext(x, (User) userDAO_.find(userId), password);
   }
 
   public User loginByEmail(X x, String email, String password) throws AuthenticationException {
-    User user = (User) userDAO_.find(MLang.EQ(User.EMAIL, email.toLowerCase()));
+    User user = (User) userDAO_.find(
+      AND(
+        EQ(User.EMAIL, email.toLowerCase()),
+        EQ(User.LOGIN_ENABLED, true)
+      )
+    );
+
     if ( user == null ) {
       throw new AuthenticationException("User not found");
     }
-    
+
     return userAndGroupContext(x, user, password);
   }
 
@@ -224,8 +225,14 @@ public class UserAndGroupAuthService
       return false;
     }
 
+    // NOTE: It's important that we use the User from the context here instead
+    // of looking it up in a DAO because if the user is actually an entity that
+    // an agent is acting as, then the user we get from the DAO won't have the
+    // correct group, which is the group set on the junction between the agent
+    // and the entity.
+    User user = (User) x.get("user");
+
     // check if user exists and is enabled
-    User user = (User) userSubclassDAO_.find(session.getUserId());
     if ( user == null || ! user.getEnabled() ) {
       return false;
     }
@@ -268,6 +275,22 @@ public class UserAndGroupAuthService
     return checkPermission(x, new AuthPermission(permission));
   }
 
+  private String passwordValidationRegex() {
+    return "^.{6,}$"; // Minimum 6 characters
+  }
+
+  private String passwordValidationErrorMessage() {
+    return "Password must be at least 6 characters long";
+  }
+
+  public void validatePassword( String newPassword ) {
+    Pattern passwordValidationPattern = Pattern.compile(passwordValidationRegex()); 
+    String passwordErrorMessage = passwordValidationErrorMessage();
+    if ( SafetyUtil.isEmpty(newPassword) || ! passwordValidationPattern.matcher(newPassword).matches() ) {
+      throw new RuntimeException(passwordErrorMessage);
+    }
+  }
+
   public boolean checkUser(foam.core.X x, User user, String permission) {
     return checkUserPermission(x, user, new AuthPermission(permission));
   }
@@ -278,7 +301,7 @@ public class UserAndGroupAuthService
    */
   public User updatePassword(foam.core.X x, String oldPassword, String newPassword) throws AuthenticationException {
     if ( x == null || SafetyUtil.isEmpty(oldPassword) || SafetyUtil.isEmpty(newPassword) ) {
-      throw new RuntimeException("Invalid parameters");
+      throw new RuntimeException("Password fields cannot be blank");
     }
 
     Session session = x.get(Session.class);
@@ -307,23 +330,9 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User group disabled");
     }
 
-    int length = newPassword.length();
-    if ( length < 7 || length > 32 ) {
-      throw new RuntimeException("Password must be 7-32 characters long");
-    }
-
-    if ( newPassword.equals(newPassword.toLowerCase()) ) {
-      throw new RuntimeException("Password must have one capital letter");
-    }
-
-    if ( ! newPassword.matches(".*\\d+.*") ) {
-      throw new RuntimeException("Password must have one numeric character");
-    }
-
-    if ( alphanumeric.matcher(newPassword).matches() ) {
-      throw new RuntimeException("Password must not contain: !@#$%^&*()_+");
-    }
-
+    // check if password is valid per validatePassword method
+    validatePassword(newPassword);
+    
     // old password does not match
     if ( ! Password.verify(oldPassword, user.getPassword()) ) {
       throw new RuntimeException("Old password is incorrect");
@@ -376,9 +385,7 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Password is required for creating a user");
     }
 
-    if ( ! Password.isValid(user.getPassword()) ) {
-      throw new AuthenticationException("Password needs to minimum 8 characters, contain at least one uppercase, one lowercase and a number");
-    }
+    validatePassword(user.getPassword());
   }
 
   /**

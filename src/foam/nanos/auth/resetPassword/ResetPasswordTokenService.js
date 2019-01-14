@@ -37,17 +37,6 @@ foam.CLASS({
     'java.util.UUID'
   ],
 
-  axioms: [
-    {
-      name: 'javaExtras',
-      buildJavaClass: function (cls) {
-        cls.extras.push(foam.java.Code.create({
-          data: 'java.util.regex.Pattern p = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");'
-        }))
-      }
-    }
-  ],
-
   methods: [
     {
       name: 'generateTokenWithParameters',
@@ -103,23 +92,6 @@ return true;`
 
 String newPassword = user.getDesiredPassword();
 
-int length = newPassword.length();
-if ( length < 7 || length > 32 ) {
-  throw new RuntimeException("Password must be 7-32 characters long");
-}
-
-if ( newPassword.equals(newPassword.toLowerCase()) ) {
-  throw new RuntimeException("Password must have one capital letter");
-}
-
-if ( ! newPassword.matches(".*\\\\d+.*") ) {
-  throw new RuntimeException("Password must have one numeric character");
-}
-
-if ( p.matcher(newPassword).matches() ) {
-  throw new RuntimeException("Password must not contain: !@#$%^&*()_+");
-}
-
 DAO userDAO = (DAO) getLocalUserDAO();
 DAO tokenDAO = (DAO) getTokenDAO();
 Calendar calendar = Calendar.getInstance();
@@ -143,16 +115,14 @@ if ( userResult == null ) {
   throw new RuntimeException("User not found");
 }
 
-if ( ! Password.isValid(newPassword) ) {
+if ( ! Password.isValid(x, newPassword) ) {
   throw new RuntimeException("Invalid password");
 }
 
 // update user's password
 userResult = (User) userResult.fclone();
-userResult.setPasswordLastModified(Calendar.getInstance().getTime());
-userResult.setPreviousPassword(userResult.getPassword());
-userResult.setPassword(Password.hash(newPassword));
-userResult.setPasswordExpiry(null);
+userResult.setDesiredPassword(newPassword);
+user.setPasswordExpiry(null);
 userDAO.put(userResult);
 
 // set token processed to true
