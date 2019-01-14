@@ -752,7 +752,7 @@ foam.LIB({
         } else if ( foam.Object.isInstance(o) ) {
           for ( var key in o ) {
             if ( key === 'type' && foam.String.isInstance(o[key]) ) {
-              foam.core.type.toType(o[key]).toModelIdDeps().forEach(function(id) {
+              foam.core.type.toType(o[key]).refs().forEach(function(id) {
                 r.push(x.classloader.maybeLoad(id));
               })
               continue;
