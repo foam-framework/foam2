@@ -273,7 +273,7 @@ foam.CLASS({
                   .select(section.filtered || section.dao, function(obj) {
                     return this.E()
                       .start(self.rowView, { data: obj })
-                        .addClass(section.disabled ? 'disabled' : '')
+                        .enableClass('disabled', section.disabled)
                         .callIf(! section.disabled, function() {
                           this.on('click', () => {
                             self.fullObject_ = obj;
