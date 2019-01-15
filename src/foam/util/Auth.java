@@ -24,7 +24,7 @@ public class Auth {
     return sudo(x, (User) ((DAO) x.get("userDAO")).inX(x).find(AND(
       EQ(User.EMAIL, email),
       EQ(User.LOGIN_ENABLED, true)
-    ));
+    )));
   }
 
   public static X sudo(X x, User user) {
