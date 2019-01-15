@@ -34,7 +34,10 @@ foam.CLASS({
     {
       class: 'Blob',
       name: 'data',
-      documentation: 'File data'
+      documentation: 'File data',
+      adapt: function(oldObj, newObj) {
+        return newObj;
+      }
     },
     {
       class: 'String',
