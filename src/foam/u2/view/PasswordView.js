@@ -52,7 +52,9 @@ foam.CLASS({
   properties: [
     {
       name: 'visibilityIcon',
-      value: '/foam2/src/foam/u2/images/visibility-off.svg'
+      factory: function() {
+        return this.VISIBILITY_OFF;
+      }
     },
     {
       class: 'Boolean',
