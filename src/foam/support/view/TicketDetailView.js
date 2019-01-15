@@ -15,8 +15,6 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.u2.PopupView',
     'foam.support.model.TicketMessage',
-    'foam.nanos.notification.email.POP3Email',
-    'foam.nanos.notification.email.POP3EmailService',
     'foam.support.view.ReplyView',
     
   ],
@@ -29,7 +27,6 @@ foam.CLASS({
     'stack',
     'userDAO',
     'hideSummary',
-    'pop3',
     'user'
   ],
   
