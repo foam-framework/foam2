@@ -171,4 +171,7 @@ FOAM_FILES([
   { name: 'foam/nanos/dashboard/Demo' },
   { name: 'foam/nanos/dig/SUGAR' },
   { name: 'foam/nanos/dig/DigFileUploadView'},
+  { name: 'foam/nanos/dig/Argument'},
+  { name: 'foam/nanos/notification/email/ClientPOP3EmailService'},
+  { name: 'foam/nanos/notification/email/POP3Email'},
 ]);
