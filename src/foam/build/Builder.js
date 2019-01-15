@@ -25,8 +25,7 @@ foam.CLASS({
       ]
     },
     {
-      name: 'flags',
-      value: ['js', 'web']
+      name: 'enabledFeatures',
     },
     {
       name: 'targetFile',
@@ -468,7 +467,7 @@ console.log("Done.");
         then();
       }
 
-      var flagFilter = foam.util.flagFilter(this.flags);
+      var flagFilter = foam.util.flagFilter(this.enabledFeatures);
       function filterAxiomsByFlags(o) {
         var self = this;
         var type = foam.typeOf(o);
