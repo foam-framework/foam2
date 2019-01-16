@@ -47,8 +47,7 @@ foam.CLASS({
             return [nspec.id, nspec.id];
           }
         });
-      },
-      value: 'accountDAO'
+      }
     },
     'cmd',
     'format',
