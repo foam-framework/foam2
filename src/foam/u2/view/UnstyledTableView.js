@@ -267,8 +267,8 @@ foam.CLASS({
                             start().
                               addClass(view.myClass('context-menu-item')).
                               add(action.label).
-                              call(function() {
-                                if ( action.isEnabledFor(obj) ) {
+                              call(async function() {
+                                if ( await action.isEnabledFor(obj) ) {
                                   this.on('click', function(evt) {
                                     action.maybeCall(view.__subContext__, obj);
                                   });
