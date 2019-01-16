@@ -162,12 +162,11 @@ public class MDAO
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
     synchronized ( lock_.writeLock() ) {
 
-      this.where(predicate).select( new AbstractSink() {
-        @Override
-        public void put(Object obj, Detachable sub) {
-          MDAO.this.remove((FObject) obj);
-        }
-      });
+      if ( predicate == null ) {
+        state_ = null;
+      } else {
+        super.removeAll_(x, skip, limit, order, predicate);
+      }
 
     }
   }
