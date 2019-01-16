@@ -5,11 +5,7 @@
  */
 package foam.dao;
 
-import foam.core.AbstractFObject;
-import foam.core.ClassInfo;
-import foam.core.FObject;
-import foam.core.PropertyInfo;
-import foam.core.X;
+import foam.core.*;
 import foam.dao.index.*;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Or;
@@ -165,7 +161,14 @@ public class MDAO
 
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
     synchronized ( lock_.writeLock() ) {
-      state_ = null;
+
+      this.where(predicate).select( new AbstractSink() {
+        @Override
+        public void put(Object obj, Detachable sub) {
+          MDAO.this.remove((FObject) obj);
+        }
+      });
+
     }
   }
 }
