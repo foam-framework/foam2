@@ -202,6 +202,7 @@ foam.CLASS({
           shell.set("x", x);
           shell.eval("runScript(String name) { script = x.get(\\"scriptDAO\\").find(name); if ( script != null ) eval(script.code); }");
           shell.eval("foam.core.X sudo(String user) { foam.util.Auth.sudo(x, (String) user); }");
+          shell.eval("foam.core.X sudo(Object id) { foam.util.Auth.sudo(x, id); }");
         } catch (EvalError e) {}
 
         return shell;
