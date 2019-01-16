@@ -31,9 +31,11 @@ foam.CLASS({
                 dao: X.userDAO.orderBy(foam.nanos.auth.User.LEGAL_NAME)
               },
               // Set "disabled: true" to render each object as non-selectable row
+              // Set "hideOnEmpty: true" to hide headers if not objects are present in dao provided.
               {
                 disabled: true,
                 heading: 'Disabled users',
+                hideOnEmpty: true,
                 dao: X.userDAO.where(this.EQ(foam.nanos.auth.User.STATUS, this.AccountStatus.DISABLED)),
               },
             ]
