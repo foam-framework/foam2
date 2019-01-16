@@ -182,10 +182,11 @@ foam.CLASS({
 
       req.write('');
       req.end();
-                    `.trim();
-                  })).
-                end().
-              end().
+                            `.trim();
+                          })).
+                        end().
+                      end().
+
             end()
           })
       })
