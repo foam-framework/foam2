@@ -35,7 +35,14 @@ foam.CLASS({
     },
     {
       class: 'DateTime',
-      name: 'lastUsed'
+      name: 'lastUsed',
+      javaSetter:
+        `
+        if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
+        lastUsed_ = val;
+        lastUsedIsSet_ = true;
+        this.setExpiry(new Date(val.getTime() + 5l*60l*1000l));
+      `
     },
     {
       class: 'Long',
