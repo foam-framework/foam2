@@ -264,26 +264,29 @@ foam.CLASS({
           }))
           .add(this.slot(function(sections) {
             return this.E().forEach(sections, function(section) {
-              this
-                .start()
-                  .addClass(self.myClass('heading'))
-                  .add(section.heading)
-                .end()
-                .start()
-                  .select(section.filtered || section.dao, function(obj) {
-                    return this.E()
-                      .start(self.rowView, { data: obj })
-                        .enableClass('disabled', section.disabled)
-                        .callIf(! section.disabled, function() {
-                          this.on('click', () => {
-                            self.fullObject_ = obj;
-                            self.data = obj;
-                            self.isOpen_ = false;
+              var positionElement = this;
+              section.dao.select().then((resp) => {
+                this
+                  .start().hide(!! section.hideOnEmpty && ( ! Array.isArray(resp.array) || ! resp.array.length ))
+                    .addClass(self.myClass('heading'))
+                    .add(section.heading)
+                  .end()
+                  .start()
+                    .select(section.filtered || section.dao, function(obj) {
+                      return positionElement.E()
+                        .start(self.rowView, { data: obj })
+                          .enableClass('disabled', section.disabled)
+                          .callIf(! section.disabled, function() {
+                            positionElement.on('click', () => {
+                              self.fullObject_ = obj;
+                              self.data = obj;
+                              self.isOpen_ = false;
+                            });
                           })
-                        })
-                      .end();
-                  })
-                .end();
+                        .end();
+                    })
+                  .end();
+                });
             });
           }))
         .end();
