@@ -182,28 +182,10 @@ foam.CLASS({
 
       req.write('');
       req.end();
-                            `.trim();
-                          })).
-                        end().
-                      end().
-
-
-//              start(self.Tab, {label: 'URL'}).
-//               add(self.slot(function(data) {
-//                  var u = url.replace(/\/$/,'') + data;
-//                  return this.E().
-//                    start('pre').
-//                      addClass('code').
-//                      start('a').
-//                        add(u).
-//                          attrs({
-//                            href: u,
-//                            target: '_blank',
-//                          }).
-//                      end().
-//                    end()
-//               })).
-//              end().
+                    `.trim();
+                  })).
+                end().
+              end().
             end()
           })
       })
