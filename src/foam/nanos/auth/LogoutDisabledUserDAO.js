@@ -20,11 +20,7 @@ foam.CLASS({
         User newUser = (User) obj;
         User oldUser = (User) getDelegate().find(newUser.getId());
 
-        if (
-          oldUser != null
-          && oldUser.getEnabled()
-          && !newUser.getEnabled()
-        ) {
+        if ( ! isDisabled(oldUser) && isDisabled(newUser) ) {
           sessionDAO_ = (DAO) x.get("localSessionDAO");
           auth_ = (AuthService) x.get("auth");
 
@@ -34,6 +30,14 @@ foam.CLASS({
 
         return super.put_(x, obj);
       `
+    },
+    {
+      name: 'isDisabled',
+      javaReturns: 'Boolean',
+      args: [
+        { of: 'User', name: 'user' }
+      ],
+      javaCode: `return ! user.getEnabled();`
     },
     {
       name: 'logoutAgent',
