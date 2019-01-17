@@ -20,7 +20,10 @@ foam.CLASS({
         User newUser = (User) obj;
         User oldUser = (User) getDelegate().find(newUser.getId());
 
-        if ( ! isDisabled(oldUser) && isDisabled(newUser) ) {
+        if ( oldUser != null
+          && ! isDisabled(oldUser)
+          && isDisabled(newUser)
+        ) {
           sessionDAO_ = (DAO) x.get("localSessionDAO");
           auth_ = (AuthService) x.get("auth");
 
