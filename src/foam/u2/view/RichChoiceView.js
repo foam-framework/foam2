@@ -265,10 +265,16 @@ foam.CLASS({
               .end();
           }))
           .add(this.slot(function(sections) {
-            return this.E().forEach(sections, function(section) {
-              section.dao.select(self.COUNT()).then((count) => {
+            var promiseArray = [];
+            sections.forEach(function(section) {
+              promiseArray.push(section.dao.select(self.COUNT()));
+            });
+
+            return Promise.all(promiseArray).then((resp) => {
+              var index = 0;
+              return this.E().forEach(sections, function(section) {
                 this
-                  .start().hide(!! section.hideIfEmpty && count.value <= 0)
+                  .start().hide(!! section.hideIfEmpty && resp[index].value <= 0)
                     .addClass(self.myClass('heading'))
                     .add(section.heading)
                   .end()
@@ -287,7 +293,8 @@ foam.CLASS({
                         .end();
                     })
                   .end();
-                });
+                  index++;
+              });
             });
           }))
         .end();
