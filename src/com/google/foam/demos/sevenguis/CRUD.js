@@ -51,22 +51,18 @@ foam.CLASS({
 
   exports: [ 'as data' ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-      ^ { padding: 10px; }
-      ^ .detailView { border: none; background: white; }
-      ^ .content span { margin-top: 24px; overflow: hidden !important; }
-      ^ .buttons { margin-top: 24px; }
-      ^ .content { width: 1000px; }
-      ^ .detailPane { width: 45%; display: inline-block; margin-left: 50px; margin-top: 16px; }
-      ^ .label { color: #039; font-size: 14px; padding-top: 6px; }
-      ^ .prefix { margin-left: 10px; }
-      ^ .summaryPane { width: 49%; display: inline-block; vertical-align: top; }
-      ^ .tableView { height: 184px; outline: none; }
-      */}
-    })
-  ],
+  css: `
+    ^ { padding: 10px; }
+    ^ .detailView { border: none; background: white; }
+    ^ .content span { margin-top: 24px; overflow: hidden !important; }
+    ^ .buttons { margin-top: 24px; }
+    ^ .content { width: 1000px; }
+    ^ .detailPane { width: 45%; display: inline-block; margin-left: 50px; margin-top: 16px; }
+    ^ .label { color: #039; font-size: 14px; padding-top: 6px; }
+    ^ .prefix { margin-left: 10px; }
+    ^ .summaryPane { width: 49%; display: inline-block; vertical-align: top; }
+    ^ .tableView { height: 184px; outline: none; }
+  `,
 
   properties: [
     {
