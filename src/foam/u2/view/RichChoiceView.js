@@ -266,7 +266,6 @@ foam.CLASS({
           }))
           .add(this.slot(function(sections) {
             return this.E().forEach(sections, function(section) {
-              var positionElement = this;
               section.dao.select(self.COUNT()).then((count) => {
                 this
                   .start().hide(!! section.hideIfEmpty && count.value <= 0)
@@ -274,12 +273,12 @@ foam.CLASS({
                     .add(section.heading)
                   .end()
                   .start()
-                    .select(section.filtered || section.dao, function(obj) {
-                      return positionElement.E()
+                    .select(section.filtered || section.dao, (obj) => {
+                      return this.E()
                         .start(self.rowView, { data: obj })
                           .enableClass('disabled', section.disabled)
                           .callIf(! section.disabled, function() {
-                            positionElement.on('click', () => {
+                            this.on('click', () => {
                               self.fullObject_ = obj;
                               self.data = obj;
                               self.isOpen_ = false;
