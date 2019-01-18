@@ -62,11 +62,6 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found: " + session.getUserId());
     }
 
-    // check if user enabled
-    if ( ! user.getEnabled() ) {
-      throw new AuthenticationException("User disabled");
-    }
-
     // check if user login enabled
     if ( ! user.getLoginEnabled() ) {
       throw new AuthenticationException("Login disabled");
@@ -110,11 +105,6 @@ public class UserAndGroupAuthService
   private User userAndGroupContext(X x, User user, String password) throws AuthenticationException {
     if ( user == null ) {
       throw new AuthenticationException("User not found");
-    }
-
-    // check if user enabled
-    if ( ! user.getEnabled() ) {
-      throw new AuthenticationException("User disabled");
     }
 
     // check if user login enabled
@@ -232,8 +222,8 @@ public class UserAndGroupAuthService
     // and the entity.
     User user = (User) x.get("user");
 
-    // check if user exists and is enabled
-    if ( user == null || ! user.getEnabled() ) {
+    // check if user exists
+    if ( user == null ) {
       return false;
     }
 
@@ -312,11 +302,6 @@ public class UserAndGroupAuthService
     User user = (User) userDAO_.find(session.getUserId());
     if ( user == null ) {
       throw new AuthenticationException("User not found");
-    }
-
-    // check if user enabled
-    if ( ! user.getEnabled() ) {
-      throw new AuthenticationException("User disabled");
     }
 
     // check if user login enabled

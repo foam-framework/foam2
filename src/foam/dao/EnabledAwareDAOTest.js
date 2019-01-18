@@ -25,16 +25,16 @@ foam.CLASS({
         { of: 'foam.core.X', name: 'x' }
       ],
       javaCode: `
-      foam.dao.DAO delegate = new foam.dao.MDAO(foam.nanos.auth.User.getOwnClassInfo());
+      foam.dao.DAO delegate = new foam.dao.MDAO(foam.nanos.auth.Group.getOwnClassInfo());
         dao_ = (foam.dao.DAO) new EnabledAwareDAO.Builder(x)
           .setDelegate(delegate).build();
 
-        enabled_ = new foam.nanos.auth.User.Builder(x)
-          .setId(1).setEnabled(true).build();
+        enabled_ = new foam.nanos.auth.Group.Builder(x)
+          .setId("1").setEnabled(true).build();
         enabled_ = dao_.put(enabled_);
 
-        disabled_ = new foam.nanos.auth.User.Builder(x)
-          .setId(2).setEnabled(false).build();
+        disabled_ = new foam.nanos.auth.Group.Builder(x)
+          .setId("2").setEnabled(false).build();
         disabled_ = dao_.put(disabled_);
       `
     },

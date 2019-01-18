@@ -44,7 +44,6 @@ public class TestUtils {
     File profilePicFile = new File();
     profilePicFile.setFilename("Profile picture");
     user.setProfilePicture(profilePicFile);
-    user.setEnabled(true);
     return user;
   }
 
