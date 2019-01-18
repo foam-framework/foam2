@@ -47,7 +47,8 @@ foam.CLASS({
             return [nspec.id, nspec.id];
           }
         });
-      }
+      },
+      value: 'accountDAO'
     },
     'cmd',
     'format',
@@ -93,15 +94,11 @@ foam.CLASS({
       hidden: true
     },
     {
-      class: 'URL',
-      // TODO: appears not to work if named 'url', find out why.
-      name: 'digURL',
-      label: 'URL',
-      displayWidth: 120,
-      view: 'foam.nanos.dig.LinkView',
-      setter: function() {}, // Prevent from ever getting set
+      name: 'snippet',
+      label: 'Snippet',
+      documentation: 'show a specific type of request would look like in a given language.',
+      view: { class: 'foam.nanos.dig.DigSnippetView' },
       expression: function(key, data, email, subject, daoKey, cmd, format, q, dataFile) {
-
         var query = false;
         var url = "/service/dig";
 
@@ -141,17 +138,18 @@ foam.CLASS({
           url += "q=" + q;
         }
         this.postURL = url;
+
+        if ( dataFile ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "&fileaddress=" + dataFile.address;
+        }
         if ( data ) {
           if ( data.length + url.length < this.MAX_URL_SIZE ) {
             url += query ? "&" : "?";
             query = true;
             url += "data=" + data;
           }
-        }
-        if ( dataFile ) {
-          url += query ? "&" : "?";
-          query = true;
-          url += "&fileaddress=" + dataFile.address;
         }
 
         return encodeURI(url);
