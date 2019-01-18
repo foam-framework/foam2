@@ -7,7 +7,6 @@
 package foam.nanos.dig;
 
 import foam.core.*;
-import foam.dao.AbstractSink;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.lib.csv.CSVSupport;
@@ -16,7 +15,6 @@ import foam.lib.json.OutputterMode;
 import foam.lib.parse.*;
 import foam.mlang.MLang;
 import foam.mlang.predicate.Predicate;
-import foam.nanos.boot.NSpec;
 import foam.nanos.dig.exception.*;
 import foam.nanos.http.*;
 import foam.nanos.logger.Logger;
@@ -29,15 +27,12 @@ import foam.util.SafetyUtil;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringReader;
+import java.io.*;
+import java.lang.Exception;
+import java.net.URL;
 import java.nio.CharBuffer;
 import java.util.Iterator;
 import java.util.List;
-import java.lang.Exception;
-import java.util.StringTokenizer;
 
 public class DigWebAgent
   implements WebAgent
@@ -60,6 +55,7 @@ public class DigWebAgent
     String[]            email    = p.getParameterValues("email");
     boolean             emailSet = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
     String              subject  = p.getParameter("subject");
+    String              fileAddress = p.getParameter("fileaddress");
 
     //
     // FIXME/TODO: ensuring XML and CSV flows return proper response objects and codes has not been completed since the switch to HttpParameters.
@@ -103,6 +99,7 @@ public class DigWebAgent
 
       if ( Command.put == command ) {
         String returnMessage = "success";
+
         if ( Format.JSON == format ) {
           JSONParser jsonParser = new JSONParser();
           jsonParser.setX(x);
@@ -156,6 +153,14 @@ public class DigWebAgent
         } else if ( Format.XML == format ) {
           XMLSupport      xmlSupport = new XMLSupport();
           XMLInputFactory factory    = XMLInputFactory.newInstance();
+
+          if ( SafetyUtil.isEmpty(data) ) {
+            DigErrorMessage error = new EmptyDataException.Builder(x)
+              .build();
+            outputException(x, resp, format, out, error);
+            return;
+          }
+
           StringReader    reader     = new StringReader(data.toString());
           XMLStreamReader xmlReader  = factory.createXMLStreamReader(reader);
           List<FObject>   objList    = xmlSupport.fromXML(x, xmlReader, objClass);
@@ -179,16 +184,35 @@ public class DigWebAgent
 
           //returnMessage = "<objects>" + success + "</objects>";
         } else if ( Format.CSV == format ) {
+          if ( SafetyUtil.isEmpty(data) && SafetyUtil.isEmpty(fileAddress) ) {
+            DigErrorMessage error = new EmptyDataException.Builder(x)
+              .build();
+            outputException(x, resp, format, out, error);
+            return;
+          }
+
           CSVSupport csvSupport = new CSVSupport();
           csvSupport.setX(x);
 
-          // convert String into InputStream
-          InputStream is = new ByteArrayInputStream(data.toString().getBytes());
-
           ArraySink arraySink = new ArraySink();
 
-          csvSupport.inputCSV(is, arraySink, cInfo);
+          InputStream is = null;
 
+          if ( ! SafetyUtil.isEmpty(data) ) {
+            is = new ByteArrayInputStream(data.toString().getBytes());
+          } else { //file Data
+            try {
+              is = new URL(fileAddress).openStream();
+            } catch (Exception e) {
+                DigErrorMessage error = new GeneralException.Builder(x)
+                  .setMessage("File Not Found Exception")
+                  .build();
+                outputException(x, resp, format, out, error);
+                return;
+            }
+          }
+
+          csvSupport.inputCSV(is, arraySink, cInfo);
 
           List list = arraySink.getArray();
 
@@ -197,8 +221,8 @@ public class DigWebAgent
             logger.error(message + ", input: " + buffer_.toString());
 
             DigErrorMessage error = new ParsingErrorException.Builder(x)
-                                      .setMessage("Invalid CSV Format")
-                                      .build();
+              .setMessage("Invalid CSV Format")
+              .build();
             outputException(x, resp, format, out, error);
             return;
           }
@@ -223,7 +247,7 @@ public class DigWebAgent
             }
           }
           dataJson += "]";
-         
+
           // JSON part from above
           JSONParser jsonParser = new JSONParser();
           jsonParser.setX(x);
@@ -309,11 +333,12 @@ public class DigWebAgent
             foam.lib.xml.Outputter outputterXml = new foam.lib.xml.Outputter(OutputterMode.NETWORK);
             outputterXml.output(sink.getArray().toArray());
 
-            //resp.setContentType("application/xml");
+            resp.setContentType("application/xml");
             if ( emailSet ) {
               output(x, "<textarea style=\"width:700;height:400;\" rows=10 cols=120>" + outputterXml.toString() + "</textarea>");
             } else {
-              out.println(outputterXml.toString());
+              String simpleName = cInfo.getObjClass().getSimpleName().toString();
+              out.println("<" + simpleName + "s>"+ outputterXml.toString() + "</" + simpleName + "s>");
             }
           } else if ( Format.CSV == format ) {
             foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);

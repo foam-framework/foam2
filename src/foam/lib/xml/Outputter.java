@@ -90,6 +90,11 @@ public class Outputter
       outputDate((java.util.Date) value);
     } else if ( value instanceof Enum<?> ) {
       outputEnum((Enum<?>) value);
+    } else if ( isArray(value) ) {
+      if ( value.getClass().equals(byte[][].class) )
+        outputByteArray((byte[][]) value);
+      else
+        outputArray((Object[]) value);
     }
   }
 
@@ -133,6 +138,18 @@ public class Outputter
       .collect(Collectors.toList());
     for ( PropertyInfo prop : properties ) {
       outputProperty_(obj, prop);
+    }
+  }
+
+  protected void outputArray(Object[] array) {
+    for ( int i = 0 ; i < array.length ; i++ ) {
+      output(array[i]);
+    }
+  }
+
+  protected void outputByteArray(byte[][] array) {
+    for ( int i = 0 ; i < array.length ; i++ ) {
+      output(array[i]);
     }
   }
 

@@ -38,7 +38,7 @@ public class SessionWebAgent
   public void execute(X x) {
     Logger              logger     = (Logger) x.get("logger");
     DAO                 userDAO    = (DAO) x.get("localUserDAO");
-    DAO                 sessionDAO = (DAO) x.get("sessionDAO");
+    DAO                 sessionDAO = (DAO) x.get("localSessionDAO");
     AuthService         auth       = (AuthService) x.get("auth");
     HttpServletRequest  req        = x.get(HttpServletRequest.class);
     HttpServletResponse resp       = x.get(HttpServletResponse.class);
