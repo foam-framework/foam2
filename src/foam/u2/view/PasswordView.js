@@ -36,10 +36,25 @@ foam.CLASS({
     }
   `,
 
+  constants: [
+    {
+      type: 'String',
+      name: 'VISIBILITY',
+      value: '/foam2/src/foam/u2/images/visibility.svg'
+    },
+    {
+      type: 'String',
+      name: 'VISIBILITY_OFF',
+      value: '/foam2/src/foam/u2/images/visibility-off.svg'
+    }
+  ],
+
   properties: [
     {
       name: 'visibilityIcon',
-      value: '/foam2/src/foam/u2/images/visibility.svg'
+      factory: function() {
+        return this.VISIBILITY_OFF;
+      }
     },
     {
       class: 'Boolean',
@@ -87,13 +102,11 @@ foam.CLASS({
   listeners: [
     function visible() {
       if ( this.passwordInvisible ) {
-        //  Password visible
-        this.visibleIcon('/foam2/src/foam/u2/images/visibility-off.svg',
-            'text');
+        // Make password visible
+        this.visibleIcon(this.VISIBILITY, 'text');
       } else {
-        // Password invisible
-        this.visibleIcon('/foam2/src/foam/u2/images/visibility.svg',
-            'password');
+        // Make password invisible
+        this.visibleIcon(this.VISIBILITY_OFF, 'password');
       }
     }
   ]

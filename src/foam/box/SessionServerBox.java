@@ -37,7 +37,7 @@ public class SessionServerBox
         NSpec              spec       = getX().get(NSpec.class);
         HttpServletRequest req        = getX().get(HttpServletRequest.class);
         AuthService        auth       = (AuthService) getX().get("auth");
-        DAO                sessionDAO = (DAO)         getX().get("sessionDAO");
+        DAO                sessionDAO = (DAO)         getX().get("localSessionDAO");
         DAO                groupDAO   = (DAO)         getX().get("groupDAO");
 
         Session            session    = (Session)     sessionDAO.find(sessionID);

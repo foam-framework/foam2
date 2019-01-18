@@ -46,7 +46,7 @@ public class UserAndGroupAuthService
   public void start() {
     userDAO_    = (DAO) getX().get("localUserDAO");
     groupDAO_   = (DAO) getX().get("localGroupDAO");
-    sessionDAO_ = (DAO) getX().get("sessionDAO");
+    sessionDAO_ = (DAO) getX().get("localSessionDAO");
   }
 
   public User getCurrentUser(X x) throws AuthenticationException {

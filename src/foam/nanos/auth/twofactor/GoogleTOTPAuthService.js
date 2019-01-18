@@ -91,7 +91,7 @@ foam.CLASS({
           x.get("agent") :
           x.get("user")) ;
         DAO userDAO    = (DAO) x.get("localUserDAO");
-        DAO sessionDAO = (DAO) x.get("sessionDAO");
+        DAO sessionDAO = (DAO) x.get("localSessionDAO");
 
         String sessionUser = (String) ( x.get("agent") != null ? "agent" : "user" );
 
