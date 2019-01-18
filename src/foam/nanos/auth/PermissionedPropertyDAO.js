@@ -174,7 +174,7 @@ foam.CLASS({
       javaCode: `
   AuthService auth = (AuthService) x.get("auth");
   String axiomName =  axiom.toString();
-  axiomName = axiomName.substring(axiomName.lastIndexOf(".") + 1);
+  axiomName = axiomName.substring(axiomName.lastIndexOf(".") + 1).toLowerCase();
   boolean hasPermission = auth.check(x, of + ".rw." + axiomName);
   if ( ! write ) {
     hasPermission = hasPermission || auth.check(x, of + ".ro." + axiomName);
