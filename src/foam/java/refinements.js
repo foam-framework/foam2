@@ -150,6 +150,7 @@ foam.CLASS({
         csvParser:               this.javaCSVParser,
         extends:                 this.javaInfoType,
         networkTransient:        this.networkTransient,
+        permissionRequired:      this.permissionRequired,
         storageTransient:        this.storageTransient,
         xmlAttribute:            this.xmlAttribute,
         xmlTextNode:             this.xmlTextNode,
