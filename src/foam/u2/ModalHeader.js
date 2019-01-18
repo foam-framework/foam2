@@ -79,8 +79,7 @@ foam.CLASS({
 
     this
       .addClass(this.myClass())
-      .start().addClass('title').add(this.title).end()
-      .start(this.CLOSE_MODAL).addClass('close').end();
+      .start().addClass('title').add(this.title).end();
     }
   ],
 
