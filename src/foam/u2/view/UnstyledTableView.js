@@ -178,6 +178,7 @@ foam.CLASS({
           add(this.slot(function(columns_) {
             return this.E('tr').
               forEach(columns_, function(column) {
+                console.log(column.label);
                 this.start('th').
                   addClass(view.myClass('th-' + column.name)).
                   callIf(column.tableWidth, function() {
@@ -185,7 +186,9 @@ foam.CLASS({
                   }).
                   on('click', function(e) { view.sortBy(column); }).
                   call(column.tableHeaderFormatter, [column]).
-                  add(' ', view.sortingIcon).
+                  callIf(column.label != '', function() {
+                    this.add(' ', view.sortingIcon);
+                  }).
                 end();
               }).
               call(function() {
