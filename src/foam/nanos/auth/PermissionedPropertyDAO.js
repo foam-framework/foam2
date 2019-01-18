@@ -68,29 +68,27 @@ foam.CLASS({
         }
       ],
       javaCode: `
-  if ( oldObj != null ) {
-    String of = obj.getClass().getSimpleName().toLowerCase();
+  String of = obj.getClass().getSimpleName().toLowerCase();
 
-    if ( propertyMap_.containsKey(of) ) {
-      List properties = propertyMap_.get(of);
-      Iterator e = properties.iterator();
-      while ( e.hasNext() ) {
-        PropertyInfo axiom = (PropertyInfo) e.next();
+  if ( propertyMap_.containsKey(of) ) {
+    List properties = propertyMap_.get(of);
+    Iterator e = properties.iterator();
+    while ( e.hasNext() ) {
+      PropertyInfo axiom = (PropertyInfo) e.next();
+      checkPermission(axiom, of, x, obj, oldObj, true);
+    }
+  } else {
+    List<PropertyInfo> properties = new ArrayList<>();
+    List list = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    Iterator e = list.iterator();
+    while ( e.hasNext() ) {
+      PropertyInfo axiom = (PropertyInfo) e.next();
+      if ( axiom.getPermissionRequired() ) {
+        properties.add(axiom);
         checkPermission(axiom, of, x, obj, oldObj, true);
       }
-    } else {
-      List<PropertyInfo> properties = new ArrayList<>();
-      List list = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
-      Iterator e = list.iterator();
-      while ( e.hasNext() ) {
-        PropertyInfo axiom = (PropertyInfo) e.next();
-        if ( axiom.getPermissionRequired() ) {
-          properties.add(axiom);
-          checkPermission(axiom, of, x, obj, oldObj, true);
-        }
-      }
-      propertyMap_.put(of, properties);
     }
+    propertyMap_.put(of, properties);
   }
     
   return obj;
@@ -178,7 +176,7 @@ foam.CLASS({
   }
 
   if ( ! hasPermission ) {
-    if ( write ) {
+    if ( write && oldObj != null ) {
       Object oldValue = oldObj.getProperty(axiomName);
       axiom.set(obj, oldValue);
     } else {
