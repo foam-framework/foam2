@@ -15,7 +15,6 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.u2.PopupView',
     'foam.support.model.TicketMessage',
-    'foam.nanos.notification.email.POP3Email',
     'foam.support.view.ReplyView',
   ],
 
@@ -27,10 +26,9 @@ foam.CLASS({
     'stack',
     'userDAO',
     'hideSummary',
-    'pop3',
     'user'
   ],
-  
+
   exports: [
     'as data',
     'viewData'
@@ -250,7 +248,6 @@ foam.CLASS({
           self.data.messages.put(message).then(function(a) {
             if ( ! a ) return;
             if ( ! self.data.emailId ) {
-              // var messageId = self.pop3.sendEmail(self.data.requestorEmail, self.data.subject, self.viewData.message)
               self.data.emailId = 2;
               self.user.tickets.put(self.data);
             }
