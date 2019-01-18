@@ -178,7 +178,6 @@ foam.CLASS({
           add(this.slot(function(columns_) {
             return this.E('tr').
               forEach(columns_, function(column) {
-                console.log(column.label);
                 this.start('th').
                   addClass(view.myClass('th-' + column.name)).
                   callIf(column.tableWidth, function() {
