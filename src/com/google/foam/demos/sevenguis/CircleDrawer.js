@@ -35,17 +35,13 @@ foam.CLASS({
     UNSELECTED_COLOR: 'white'
   },
 
-  axioms: [
-    // TODO: remove '-' after ActionView when CSS naming fixed
-    foam.u2.CSS.create({
-      code: function() {/*
-      ^ { width:600px; margin: 20px; }
-      ^ canvas { border: 1px solid black; }
-      ^ .foam-u2-ActionView- { margin: 10px; }
-      ^ input[type='range'] { width: 400px; }
-      */}
-    })
-  ],
+  // TODO: remove '-' after ActionView when CSS naming fixed
+  css: `
+    ^ { width:600px; margin: 20px; }
+    ^ canvas { border: 1px solid black; }
+    ^ .foam-u2-ActionView- { margin: 10px; }
+    ^ input[type='range'] { width: 400px; }
+  `,
 
   classes: [
     {

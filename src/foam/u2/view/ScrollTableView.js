@@ -110,13 +110,15 @@
             }, this.table_$).
             end().
           end().
-          start('td').style({ 'vertical-align': 'top' }).
+          start('td').
+            style({ 'vertical-align': 'top' }).
+            show(this.daoCount$.map((count) => count >= this.limit)).
             add(this.slot(function(limit) {
               return this.ScrollCView.create({
                 value$: this.skip$,
                 extent$: this.limit$,
                 height: this.rowHeight * limit + this.TABLE_HEAD_HEIGHT,
-                width: 18,
+                width: 12,
                 size$: this.daoCount$,
               });
             })).

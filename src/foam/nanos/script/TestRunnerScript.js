@@ -69,16 +69,27 @@ foam.CLASS({
         ArraySink tests = (ArraySink) testDAO.select(new ArraySink());
         List testArray = tests.getArray();
 
+        List<String> selectedTests = null;
+        if ( ! SafetyUtil.isEmpty(System.getProperty("foam.tests")) ){
+          String t = System.getProperty("foam.tests");
+          selectedTests = Arrays.asList(t.split(","));
+        }
+
         for ( int i = 0; i < testArray.size(); i ++ ) {
           Test test = (Test) testArray.get(i);
           test = (Test) test.fclone();
           if ( ! test.getEnabled() ) {
             continue;
           }
-          if ( test.getServer() ) {
-            runServerSideTest(x, test);
+
+          if ( selectedTests != null ) {
+            if ( selectedTests.contains(test.getId()) ) {
+              runTests(x, test);
+            } else {
+              continue;
+            }
           } else {
-            // TODO: Run client side tests in a headless browser.
+            runTests(x, test);
           }
         }
 
@@ -92,6 +103,24 @@ foam.CLASS({
           System.exit(1);
         }
         System.exit(0);
+      `
+    },
+    {
+      name: 'runTests',
+      args: [
+        {
+          name: 'x', javaType: 'foam.core.X'
+        },
+        {
+          name: 'test', javaType: 'Test'
+        }
+      ],
+      javaCode: `
+        if ( test.getServer() ) {
+          runServerSideTest(x, test);
+        } else {
+          // TODO: Run client side tests in a headless browser.
+        }
       `
     },
     {
