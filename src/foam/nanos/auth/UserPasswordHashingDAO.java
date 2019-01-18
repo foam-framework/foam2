@@ -29,6 +29,9 @@ public class UserPasswordHashingDAO
 
     // hash desired password if provided
     if ( ! SafetyUtil.isEmpty(user.getDesiredPassword()) ) {
+      // do validation
+      ( (AuthService) x.get("auth") ).validatePassword( user.getDesiredPassword() );
+      // hash
       user.setPassword(Password.hash(user.getDesiredPassword()));
       user.setPasswordLastModified(Calendar.getInstance().getTime());
       // set previous password if present

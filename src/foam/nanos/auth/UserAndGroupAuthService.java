@@ -18,6 +18,7 @@ import foam.nanos.session.Session;
 import foam.util.Email;
 import foam.util.Password;
 import foam.util.SafetyUtil;
+import net.nanopay.sme.passwordutil.PasswordEntropy;
 
 import javax.security.auth.AuthPermission;
 import java.security.Permission;
@@ -284,10 +285,19 @@ public class UserAndGroupAuthService
   }
 
   public void validatePassword( String newPassword ) {
-    Pattern passwordValidationPattern = Pattern.compile(passwordValidationRegex()); 
-    String passwordErrorMessage = passwordValidationErrorMessage();
-    if ( SafetyUtil.isEmpty(newPassword) || ! passwordValidationPattern.matcher(newPassword).matches() ) {
-      throw new RuntimeException(passwordErrorMessage);
+    PasswordEntropy passwordEntropy   = (PasswordEntropy) getX().get("passwordEntropyService");
+    Pattern passwordValidationPattern = Pattern.compile(passwordValidationRegex());
+
+    if ( SafetyUtil.isEmpty(newPassword) ) {
+      throw new RuntimeException("Password is required");
+    }
+
+    if ( ! passwordValidationPattern.matcher(newPassword).matches() ) {
+      throw new RuntimeException(passwordValidationErrorMessage());
+    }
+
+    if ( passwordEntropy.getPasswordStrength(newPassword) < 3 ) {
+      throw new RuntimeException("Password is not strong enough.");
     }
   }
 
