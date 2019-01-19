@@ -16,6 +16,7 @@ foam.CLASS({
       name: 'remove_',
       javaCode: `
         if ( obj instanceof DeletedAware ) {
+          obj = obj.fclone();
           ((DeletedAware) obj).setDeleted(true);
           return super.put_(x, obj);
         }
