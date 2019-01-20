@@ -4,3 +4,4 @@ p({ class: 'foam.nanos.test.Test', id: 'CachingDAOTest', enabled: true, descript
 p({"class":"foam.dao.SequenceNumberDAOTest","id":"SequenceNumberDAO test","description":"SequenceNumberDAO tests"})
 p({"class":"foam.nanos.auth.UserAuthorizationTest","id":"UserAuthorizationTest"})
 p({"class":"foam.dao.EnabledAwareDAOTest","id":"EnabledAwareDAOTest"})
+p({"class":"foam.dao.DeletedAwareFilteredDAOTest","id":"DeletedAwareFilteredDAOTest"})
