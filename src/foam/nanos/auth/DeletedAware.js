@@ -27,3 +27,25 @@ foam.INTERFACE({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.nanos.auth',
+  name: 'DeletedAwareDummy',
+
+  implements: [
+    'foam.nanos.auth.DeletedAware'
+  ],
+
+  documentation: 'Dummy class for testing DeletedAware',
+
+  properties: [
+    {
+      class: 'Long',
+      name: 'id'
+    },
+    {
+      class: 'Boolean',
+      name: 'deleted'
+    }
+  ]
+})
