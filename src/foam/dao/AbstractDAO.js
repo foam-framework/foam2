@@ -50,6 +50,10 @@ foam.CLASS({
     }
   ],
 
+  constants: {
+    RESET_CMD: 'RESET_CMD'
+  },
+
   properties: [
     {
       /**
@@ -515,6 +519,11 @@ return this.find_(this.getX(), id);
     {
       name: 'cmd_',
       code: function cmd_(x, obj) {
+        /** Force the DAO to publish a 'reset' notification. **/
+        if ( this.RESET_CMD == obj ) {
+          this.on.reset.pub();
+          return true;
+        }
         return undefined;
       },
       javaCode: `
