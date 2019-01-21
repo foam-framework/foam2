@@ -196,7 +196,7 @@ foam.CLASS({
     {
       buildJavaClass: function(cls) {
         cls.extras.push(`
-  /** map of properties of a model that require model.property.permission for read / write operations **/
+  /** map of properties of a model that require model.permission.property for read / write operations **/
   protected Map<String, List<PropertyInfo>> propertyMap_ = new HashMap<>();
 
   public PermissionedPropertyDAO(foam.core.X x, foam.dao.DAO delegate) {
