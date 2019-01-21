@@ -43,6 +43,27 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'canActAs',
+      javaReturns: 'boolean',
+      swiftReturns: 'Bool',
+      swiftThrows: true,
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X',
+          swiftType: 'Context'
+        },
+        {
+          name: 'agent',
+          javaType: 'foam.nanos.auth.User'
+        },
+        {
+          name: 'entity',
+          javaType: 'foam.nanos.auth.User'
+        }
+      ]
+    },
+    {
       name: 'getCurrentAgent',
       javaReturns: 'foam.nanos.auth.User',
       swiftReturns: 'foam_nanos_auth_User?',
