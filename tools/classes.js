@@ -183,6 +183,7 @@ var classes = [
   'foam.nanos.auth.DeletedAware',
   'foam.nanos.auth.DeletedAwareDAO',
   'foam.nanos.auth.DeletedAwareDummy',
+  'foam.nanos.auth.DeletedAwareDAOTest',
   'foam.nanos.http.HttpParameters',
   'foam.nanos.http.DefaultHttpParameters',
   'foam.nanos.session.Session',
