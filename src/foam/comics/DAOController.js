@@ -215,6 +215,8 @@ foam.CLASS({
     },
     {
       name: 'export',
+      label: 'Export as CSV',
+      icon: 'images/export-icon-resting.svg',
       isAvailable: function(exportEnabled) { return exportEnabled; },
       code: function() {
         this.pub('export', this.filteredDAO)
