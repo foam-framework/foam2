@@ -8,6 +8,7 @@ package foam.nanos.http;
 
 import foam.core.X;
 import foam.dao.DAO;
+import foam.nanos.auth.AgentAuthService;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.AuthenticationException;
 import foam.nanos.auth.User;
@@ -84,6 +85,7 @@ public class AuthWebAgent
     // query parameters
     String              email        = req.getParameter("user");
     String              password     = req.getParameter("password");
+    String              entityId        = req.getParameter("entityId");
     String              authHeader   = req.getHeader("Authorization");
 
     // instance parameters
@@ -121,7 +123,7 @@ public class AuthWebAgent
 
     //
     // Support for Basic HTTP Authentication
-    // Redimentary testing: curl --user username:password http://localhost:8080/service/dig
+    // Redimentary testing: curl --user username:password http://localhost:8080/service/dig?entityId=1234
     //   visually inspect results, on failure you'll see the dig login page.
     //
     try {
@@ -168,8 +170,19 @@ public class AuthWebAgent
           .put(HttpServletResponse.class, resp), email, password);
 
         if ( user != null ) {
+          // if user is attempting to and (Can)actAs another entity, set the entity in session context
+          if ( ! SafetyUtil.isEmpty(entityId) ) {
+            AgentAuthService agentService = (AgentAuthService) x.get("agentAuth");
+            DAO localUserDAO = (DAO) x.get("localUserDAO");
+            User entity = (User) localUserDAO.find(Long.parseLong(entityId));
+            if (agentService.canActAs(x, user, entity)) {
+              // set agent in session
+              session.setContext(session.getContext().put("entity",entity));
+            }
+          }
           return session;
-        } else {
+          }
+         else {
           // user should not be null, any login failure should throw an Exception
           logger.error("AuthService.loginByEmail returned null user and did not throw AuthenticationException.");
           // TODO: generate stack trace.
@@ -201,7 +214,11 @@ public class AuthWebAgent
 
     if ( session != null && session.getContext() != null && session.getContext().get("user") != null ) {
       if ( auth.check(session.getContext(), permission_) ) {
-        getDelegate().execute(x.put(Session.class, session).put("user", session.getContext().get("user")));
+        if (session.getContext().get("entity") != null) {
+          getDelegate().execute(x.put(Session.class, session).put("agent", session.getContext().get("user")).put("user", session.getContext().get("entity")));
+        } else {
+          getDelegate().execute(x.put(Session.class, session).put("user", session.getContext().get("user")));
+        }
       } else {
         PrintWriter out = x.get(PrintWriter.class);
         out.println("Access denied. Need permission: " + permission_);
