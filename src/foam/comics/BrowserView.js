@@ -92,6 +92,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'exportCSVEnabled',
+      documentation: 'True to enabled the export as CSV button'
+    },
+    {
+      class: 'Boolean',
       name: 'toggleEnabled',
       documentation: 'True to enable the toggle filters button.'
     },
@@ -109,6 +114,7 @@ foam.CLASS({
         selectEnabled,
         addEnabled,
         exportEnabled,
+        exportCSVEnabled,
         toggleEnabled,
         detailView
       ) {
@@ -123,6 +129,7 @@ foam.CLASS({
         config.detailView    = detailView;
         config.editEnabled   = editEnabled;
         config.exportEnabled = exportEnabled;
+        config.exportCSVEnabled = exportCSVEnabled;
         config.selectEnabled = selectEnabled;
         config.toggleEnabled = toggleEnabled;
 
