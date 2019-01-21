@@ -114,7 +114,7 @@ public class AgentUserAuthService
           throw new AuthorizationException("No permissions are appended to the entity relationship.");
         }
         return true;
-    } catch (Exception e) {
+    } catch (Throwable t) {
       Logger logger = (Logger) x.get("logger");
       logger.error("Unable to act as entity: ", t);
       return false;
