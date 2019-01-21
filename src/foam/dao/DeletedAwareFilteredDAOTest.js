@@ -27,14 +27,19 @@ foam.CLASS({
       javaCode: `
         foam.dao.DAO delegate = new foam.dao.MDAO(foam.nanos.auth.DeletedAwareDummy.getOwnClassInfo());
         dao_ = (foam.dao.DAO) new DeletedAwareFilteredDAO.Builder(x)
-          .setDelegate(delegate).build();
+          .setDelegate(delegate)
+          .build();
 
         active_ = new foam.nanos.auth.DeletedAwareDummy.Builder(x)
-          .setId(1).setDeleted(false).build();
+          .setId(1)
+          .setDeleted(false)
+          .build();
         active_ = dao_.put(active_);
 
         deleted_ = new foam.nanos.auth.DeletedAwareDummy.Builder(x)
-          .setId(2).setDeleted(true).build();
+          .setId(2)
+          .setDeleted(true)
+          .build();
         deleted_ = dao_.put(deleted_);
       `
     },
