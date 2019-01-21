@@ -60,11 +60,11 @@ public class AgentUserAuthService
     }
 
     UserUserJunction permissionJunction = (UserUserJunction) agentJunctionDAO_.find(AND(
-    EQ(UserUserJunction.SOURCE_ID, agent.getId()),
+      EQ(UserUserJunction.SOURCE_ID, agent.getId()),
       EQ(UserUserJunction.TARGET_ID, user.getId())
-      ));
+    ));
 
-      Group actingWithinGroup = (Group) groupDAO_.find(permissionJunction.getGroup());
+    Group actingWithinGroup = (Group) groupDAO_.find(permissionJunction.getGroup());
 
     // Clone user and associate new junction group to user. Clone and freeze both user and agent.
     user = (User) user.fclone();
