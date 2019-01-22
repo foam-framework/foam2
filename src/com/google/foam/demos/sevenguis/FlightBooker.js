@@ -33,7 +33,7 @@ foam.CLASS({
     ^ .error { border: 2px solid red; }
     ^title { font-size: 18px; }
     ^title, ^ button, ^ input, ^ select {
-      width: 160px; height: 24px; margin: 5px;
+      width: 160px; height: 24px; margin: 8px 0; display: block;
     }
   `,
 
@@ -79,10 +79,11 @@ foam.CLASS({
       this.SUPER();
       this.nodeName = 'div';
       this.
+        addClass(this.myClass()).
         start('div').addClass(this.myClass('title')).add('Book Flight').end().
-        add(this.IS_RETURN).tag('br').
-        add(this.DEPART_DATE).tag('br').
-        start(this.RETURN_DATE).show(this.isReturn$).end().tag('br').
+        add(this.IS_RETURN).
+        add(this.DEPART_DATE).
+        start(this.RETURN_DATE).show(this.isReturn$).end().
         add(this.BOOK);
     }
   ],
