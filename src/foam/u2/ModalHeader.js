@@ -45,7 +45,7 @@ foam.CLASS({
       margin-top: 5px;
       cursor: pointer;
       position: relative;
-      top: 4px;
+      top: -3px;
       right: 20px;
       float: right;
     }
@@ -74,9 +74,8 @@ foam.CLASS({
   `,
 
   methods: [
-    function initE(){
+    function initE() {
     this.SUPER();
-    var self = this;
 
     this
       .addClass(this.myClass())
@@ -89,8 +88,9 @@ foam.CLASS({
     {
       name: 'closeModal',
       icon: 'images/ic-cancelwhite.svg',
-      code: function(X){
-        X.closeDialog()
+      label: 'Close',
+      code: function(X) {
+        X.closeDialog();
       }
     }
   ]

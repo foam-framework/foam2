@@ -41,7 +41,8 @@ foam.CLASS({
     'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.u2.navigation.FooterView',
     'foam.u2.stack.Stack',
-    'foam.u2.stack.StackView'
+    'foam.u2.stack.StackView',
+    'foam.u2.dialog.NotificationMessage',
   ],
 
   imports: [
