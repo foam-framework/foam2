@@ -113,13 +113,6 @@ foam.CLASS({
       documentation: 'Ignores selection by user.'
     },
     {
-      name: 'sortingIcon',
-      documentation: 'HTML entity representing unicode Down-Pointing Triangle',
-      factory: function() {
-        return foam.u2.tag.Image.create({ data: '/foam2/src/foam/u2/images/double-arrow.svg' });
-      }
-    },
-    {
       name: 'vertMenuIcon',
       documentation: 'HTML entity representing unicode Vertical Ellipsis',
       factory: function() {
@@ -186,7 +179,9 @@ foam.CLASS({
                   on('click', function(e) { view.sortBy(column); }).
                   call(column.tableHeaderFormatter, [column]).
                   callIf(column.label != '', function() {
-                    this.add(view.sortingIcon);
+                    this.start('img')
+                    .attr('src', '/foam2/src/foam/u2/images/double-arrow.svg')
+                  .end();
                   }).
                 end();
               }).
