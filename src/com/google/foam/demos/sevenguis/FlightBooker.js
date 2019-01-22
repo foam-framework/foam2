@@ -25,6 +25,7 @@ foam.CLASS({
     'foam.u2.tag.Select'
   ],
 
+  imports: [ 'window' ],
   exports: [ 'as data' ],
 
   css: `
@@ -39,13 +40,13 @@ foam.CLASS({
   properties: [
     {
       class: 'Boolean',
-      name: 'oneWay',
+      name: 'isReturn',
       value: true,
       view: {
         class: 'foam.u2.view.ChoiceView',
         choices: [
-          [ true,  'one-way flight' ],
-          [ false, 'return flight'  ]
+          [ false, 'one-way flight' ],
+          [ true,  'return flight'  ]
         ]
       }
     },
@@ -63,13 +64,13 @@ foam.CLASS({
       class: 'Date',
       name: 'returnDate',
       factory: function() { return new Date(Date.now()+2*3600000*24); },
-      validateObj: function(oneWay, returnDate, departDate) {
-        if ( ! oneWay && foam.Date.compare(returnDate, departDate) < 0 ) return 'Must not be before depart date.';
+      validateObj: function(isReturn, returnDate, departDate) {
+        if ( isReturn && foam.Date.compare(returnDate, departDate) < 0 ) return 'Must not be before depart date.';
       }
     },
     {
       name: 'returnDateMode',
-      expression: function(oneWay) { return oneWay ? 'disabled' : 'rw'; }
+      expression: function(isReturn) { return isReturn ? 'rw' : 'disabled'; }
     }
   ],
 
@@ -78,10 +79,10 @@ foam.CLASS({
       this.SUPER();
       this.nodeName = 'div';
       this.
-        start('div').addClass('^title').add('Book Flight').end().
-        add(this.ONE_WAY).tag('br').
+        start('div').addClass(this.myClass('title')).add('Book Flight').end().
+        add(this.IS_RETURN).tag('br').
         add(this.DEPART_DATE).tag('br').
-        start(this.RETURN_DATE).attrs({mode: this.returnDateMode$}).end().tag('br').
+        start(this.RETURN_DATE).show(this.isReturn$).end().tag('br').
         add(this.BOOK);
     }
   ],
@@ -93,9 +94,9 @@ foam.CLASS({
       code: function() {
         var depart = this.departDate.toLocaleDateString();
 
-        window.alert('You have booked a ' + (this.oneWay ?
-          'one-way flight on ' + depart :
-          'flight departing on ' + depart + ' and returning ' + this.returnDate.toLocaleDateString() ) + '.');
+        this.window.alert('You have booked a ' + (this.isReturn ?
+          'flight departing on ' + depart + ' and returning ' + this.returnDate.toLocaleDateString():
+          'one-way flight on ' + depart) + '.');
       }
     }
   ]
