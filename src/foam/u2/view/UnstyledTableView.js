@@ -186,7 +186,7 @@ foam.CLASS({
                   on('click', function(e) { view.sortBy(column); }).
                   call(column.tableHeaderFormatter, [column]).
                   callIf(column.label != '', function() {
-                    this.add(' ', view.sortingIcon);
+                    this.add(view.sortingIcon);
                   }).
                 end();
               }).
