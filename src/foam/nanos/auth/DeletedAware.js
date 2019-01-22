@@ -48,4 +48,4 @@ foam.CLASS({
       name: 'deleted'
     }
   ]
-})
+});
