@@ -44,7 +44,7 @@ foam.INTERFACE({
     },
     {
       name: 'canActAs',
-      documentation: `Returns a boolean indicating whether the provided agent has adequete permission to actAs the provided entity.`,
+      documentation: `Returns a boolean indicating whether the provided agent has adequate permission to actAs the provided entity.`,
       javaReturns: 'boolean',
       swiftReturns: 'Bool',
       javaThrows: [
