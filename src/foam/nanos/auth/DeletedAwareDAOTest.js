@@ -57,18 +57,18 @@ foam.CLASS({
         { of: 'foam.core.X', name: 'x' }
       ],
       javaCode: `
-        DAO delegate = new MDAO(User.getOwnClassInfo());
+        DAO delegate = new MDAO(Country.getOwnClassInfo());
         DAO dao = (DAO) new DeletedAwareDAO.Builder(x)
           .setDelegate(delegate)
           .build();
 
-        FObject object = new User.Builder(x)
-          .setEmail("test@example.com")
+        FObject object = new Country.Builder(x)
+          .setCode("CN")
           .build();
         object = (FObject) dao.put(object);
 
         dao.remove(object);
-        object = dao.find(object.getProperty("id"));
+        object = dao.find(object.getProperty("code"));
 
         test(object == null, "DeletedAwareDAO remove non DeletedAware object from DAO.");
       `
