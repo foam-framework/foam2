@@ -27,3 +27,19 @@ foam.INTERFACE({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.nanos.auth',
+  name: 'EnabledAwareDummy',
+
+  properties: [
+    {
+      class: 'Long',
+      name: 'id'
+    },
+    {
+      class: 'Boolean',
+      name: 'enabled'
+    }
+  ]
+});
