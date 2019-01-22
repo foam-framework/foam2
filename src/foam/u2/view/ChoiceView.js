@@ -84,7 +84,7 @@ foam.CLASS({
           return out;
         }
 
-        nu = foam.Array.clone(nu);
+        nu = foam.Array.shallowClone(nu);
 
         // Upgrade single values to [value, value].
         for ( var i = 0; i < nu.length; i++ ) {
