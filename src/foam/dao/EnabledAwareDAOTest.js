@@ -9,6 +9,13 @@ foam.CLASS({
   name: 'EnabledAwareDAOTest',
   extends: 'foam.nanos.test.Test',
 
+  javaImports: [
+    'foam.core.FObject',
+    'foam.core.X',
+    'foam.nanos.auth.EnabledAwareDummy',
+    'java.util.List',
+  ],
+
   methods: [
     {
       name: 'runTest',
@@ -22,27 +29,32 @@ foam.CLASS({
     {
       name: 'setUp',
       args: [
-        { of: 'foam.core.X', name: 'x' }
+        { of: 'X', name: 'x' }
       ],
       javaCode: `
-      foam.dao.DAO delegate = new foam.dao.MDAO(foam.nanos.auth.User.getOwnClassInfo());
-        dao_ = (foam.dao.DAO) new EnabledAwareDAO.Builder(x)
-          .setDelegate(delegate).build();
+        DAO delegate = new foam.dao.MDAO(EnabledAwareDummy.getOwnClassInfo());
+        dao_ = (DAO) new EnabledAwareDAO.Builder(x)
+          .setDelegate(delegate)
+          .build();
 
-        enabled_ = new foam.nanos.auth.User.Builder(x)
-          .setId(1).setEnabled(true).build();
+        enabled_ = new EnabledAwareDummy.Builder(x)
+          .setId(1)
+          .setEnabled(true)
+          .build();
         enabled_ = dao_.put(enabled_);
 
-        disabled_ = new foam.nanos.auth.User.Builder(x)
-          .setId(2).setEnabled(false).build();
+        disabled_ = new EnabledAwareDummy.Builder(x)
+          .setId(2)
+          .setEnabled(false)
+          .build();
         disabled_ = dao_.put(disabled_);
       `
     },
     {
       name: 'EnabledAwareDAOTest_find_disabled_returns_null',
       javaCode: `
-        foam.core.FObject found = dao_.find(enabled_.getProperty("id"));
-        foam.core.FObject notFound = dao_.find(disabled_.getProperty("id"));
+        FObject found = dao_.find(enabled_.getProperty("id"));
+        FObject notFound = dao_.find(disabled_.getProperty("id"));
 
         test(found != null && notFound == null, "Find disabled entity returns null");
       `
@@ -50,12 +62,11 @@ foam.CLASS({
     {
       name: 'EnabledAwareDAOTest_select_do_not_include_disabled',
       javaCode: `
-        foam.dao.ArraySink sink = (foam.dao.ArraySink) dao_.select(new foam.dao.ArraySink());
-        java.util.List array = sink.getArray();
-        foam.core.FObject found = (foam.core.FObject) array.get(0);
+        ArraySink sink = (ArraySink) dao_.select(new ArraySink());
+        List array = sink.getArray();
 
         test(
-          array.size() == 1 && foam.util.SafetyUtil.equals(found, enabled_)
+          array.contains(enabled_) && ! array.contains(disabled_)
           , "Select does not include disabled entity"
         );
       `
@@ -67,10 +78,10 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
-          private foam.core.X x_;
-          private foam.dao.DAO dao_;
-          private foam.core.FObject enabled_;
-          private foam.core.FObject disabled_;
+          private X x_;
+          private DAO dao_;
+          private FObject enabled_;
+          private FObject disabled_;
         `);
       }
     }
