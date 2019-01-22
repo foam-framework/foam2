@@ -65,11 +65,11 @@ public class MDAO
   }
 
   synchronized Object getState() {
-    lock_.readLock().lock();
+    //  lock_.readLock().lock();
     try {
       return state_;
     } finally {
-      lock_.readLock().unlock();
+      //lock_.readLock().unlock();
     }
   }
 
