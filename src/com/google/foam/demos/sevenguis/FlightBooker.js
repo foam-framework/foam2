@@ -67,10 +67,6 @@ foam.CLASS({
       validateObj: function(isReturn, returnDate, departDate) {
         if ( isReturn && foam.Date.compare(returnDate, departDate) < 0 ) return 'Must not be before depart date.';
       }
-    },
-    {
-      name: 'returnDateMode',
-      expression: function(isReturn) { return isReturn ? 'rw' : 'disabled'; }
     }
   ],
 
