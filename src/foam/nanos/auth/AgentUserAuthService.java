@@ -101,19 +101,19 @@ public class AgentUserAuthService
       UserUserJunction permissionJunction = (UserUserJunction) agentJunctionDAO_.find(AND(
         EQ(UserUserJunction.SOURCE_ID, agent.getId()),
         EQ(UserUserJunction.TARGET_ID, entity.getId())
-        ));
+      ));
         
-        if ( permissionJunction == null ) {
-          throw new AuthorizationException("You don't have access to act as the requested entity.");
-        }
+      if ( permissionJunction == null ) {
+        throw new AuthorizationException("You don't have access to act as the requested entity.");
+      }
         
-        // Junction object contains a group which has a unique set of permissions specific to the relationship.
-        Group actingWithinGroup = (Group) groupDAO_.find(permissionJunction.getGroup());
-        
-        if ( actingWithinGroup == null || ! actingWithinGroup.getEnabled() ) {
-          throw new AuthorizationException("No permissions are appended to the entity relationship.");
-        }
-        return true;
+      // Junction object contains a group which has a unique set of permissions specific to the relationship.
+      Group actingWithinGroup = (Group) groupDAO_.find(permissionJunction.getGroup());
+      
+      if ( actingWithinGroup == null || ! actingWithinGroup.getEnabled() ) {
+        throw new AuthorizationException("No permissions are appended to the entity relationship.");
+      }
+      return true;
     } catch (Throwable t) {
       Logger logger = (Logger) x.get("logger");
       logger.error("Unable to act as entity: ", t);

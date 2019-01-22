@@ -170,7 +170,7 @@ public class AuthWebAgent
           .put(HttpServletResponse.class, resp), email, password);
 
         if ( user != null ) {
-          // If user is attempting to and can act as another entity, set the entity in session context
+          // If user is attempting to, and can act as another entity, set the entity in session context
           if ( ! SafetyUtil.isEmpty(entityId) ) {
             AgentAuthService agentService = (AgentAuthService) x.get("agentAuth");
             DAO localUserDAO = (DAO) x.get("localUserDAO");
@@ -181,8 +181,7 @@ public class AuthWebAgent
             }
           }
           return session;
-          }
-         else {
+        } else {
           // user should not be null, any login failure should throw an Exception
           logger.error("AuthService.loginByEmail returned null user and did not throw AuthenticationException.");
           // TODO: generate stack trace.
