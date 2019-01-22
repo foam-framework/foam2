@@ -15,7 +15,12 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   documentation: `A DAO decorator that prevents users from updating / reading
-      properties for which they do not have the update / read permission`,
+      properties for which they do not have the update / read permission.
+      
+      To require update / read permission on a property, set the permissionRequired
+      to be true, and add the corresponding permissions,
+      i.e. model.ro.prop / model.rw.prop to  the groups who are granted permissions
+      on the property.`,
 
   methods: [
     {
@@ -169,7 +174,7 @@ foam.CLASS({
       javaCode: `
   AuthService auth = (AuthService) x.get("auth");
   String axiomName =  axiom.toString();
-  axiomName = axiomName.substring(axiomName.lastIndexOf(".") + 1);
+  axiomName = axiomName.substring(axiomName.lastIndexOf(".") + 1).toLowerCase();
   boolean hasPermission = auth.check(x, of + ".rw." + axiomName);
   if ( ! write ) {
     hasPermission = hasPermission || auth.check(x, of + ".ro." + axiomName);
@@ -191,7 +196,7 @@ foam.CLASS({
     {
       buildJavaClass: function(cls) {
         cls.extras.push(`
-  // map of properties of a model that require model.property.permission for read / write operations
+  /** map of properties of a model that require model.permission.property for read / write operations **/
   protected Map<String, List<PropertyInfo>> propertyMap_ = new HashMap<>();
 
   public PermissionedPropertyDAO(foam.core.X x, foam.dao.DAO delegate) {

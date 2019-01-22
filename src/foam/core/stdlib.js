@@ -622,6 +622,14 @@ foam.LIB({
   methods: [
     function isInstance(o) { return Array.isArray(o); },
     function is(a, b) { return a === b; },
+    function shallowClone(o) {
+      /** Returns a shallow copy of this array. */
+      var ret = new Array(o.length);
+      for ( var i = 0 ; i < o.length ; i++ ) {
+        ret[i] = o[i];
+      }
+      return ret;
+    },
     function clone(o) {
       /** Returns a deep copy of this array and its contents. */
       var ret = new Array(o.length);
