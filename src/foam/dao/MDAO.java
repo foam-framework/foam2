@@ -44,12 +44,11 @@ public class MDAO
   extends AbstractDAO
 {
   protected AltIndex      index_;
-  protected Object        state_;
+  protected Object        state_ = null;
   protected ReadWriteLock lock_ = new ReentrantReadWriteLock();
 
   public MDAO(ClassInfo of) {
     setOf(of);
-    state_ = null;
     index_ = new AltIndex(new TreeIndex((PropertyInfo) this.of_.getAxiomByName("id")));
   }
 
@@ -65,19 +64,36 @@ public class MDAO
     for ( PropertyInfo prop : props ) addUniqueIndex(prop);
   }
 
+  synchronized Object getState() {
+    lock_.readLock().lock();
+    try {
+      return state_;
+    } finally {
+      lock_.readLock().unlock();
+    }
+  }
+
+  synchronized void setState(Object state) {
+    state_ = state;
+  }
+
   public FObject put_(X x, FObject obj) {
     // Clone and freeze outside of lock to minimize time spent under lock
     obj = obj.fclone();
     obj.freeze();
 
-    synchronized ( lock_.writeLock() ) {
+    lock_.writeLock().lock();
+    try {
       FObject oldValue = find(obj);
+      Object  state = getState();
 
       if ( oldValue != null ) {
-        state_ = index_.remove(state_, oldValue);
+        state = index_.remove(state, oldValue);
       }
 
-      state_ = index_.put(state_, obj);
+      setState(index_.put(state, obj));
+    } finally {
+      lock_.writeLock().unlock();
     }
 
     onPut(obj);
@@ -88,12 +104,15 @@ public class MDAO
     if ( obj == null ) return null;
 
     FObject found;
-    synchronized ( lock_.writeLock() ) {
+    lock_.writeLock().lock();
+    try {
       found = find(obj);
 
       if ( found != null ) {
-        state_ = index_.remove(state_, found);
+        setState(index_.remove(getState(), found));
       }
+    } finally {
+      lock_.writeLock().unlock();
     }
 
     if ( found != null ) {
@@ -106,9 +125,7 @@ public class MDAO
   public FObject find_(X x, Object o) {
     Object state;
 
-    synchronized ( lock_.readLock() ) {
-      state = state_;
-    }
+    state = getState();
 
     if ( o == null ) return null;
 
@@ -126,11 +143,7 @@ public class MDAO
     // use partialEval to wipe out such useless predicate such as: And(EQ()) ==> EQ(), And(And(EQ()),GT()) ==> And(EQ(),GT())
     if ( predicate != null ) simplePredicate = predicate.partialEval();
 
-    Object state;
-
-    synchronized ( lock_.readLock() ) {
-      state = state_;
-    }
+    Object state = getState();
 
     // We handle OR logic by seperate request from MDAO. We return different plan for each parameter of OR logic.
     if ( simplePredicate instanceof Or ) {
@@ -149,7 +162,7 @@ public class MDAO
     }
 
     // TODO: if plan cost is >= size, log a warning
-    if ( state != null && predicate != null && plan.cost() > 1000 && plan.cost() >= index_.size(state_) ) {
+    if ( state != null && predicate != null && plan.cost() > 1000 && plan.cost() >= index_.size(state) ) {
       Logger logger = (Logger) x.get("logger");
       logger.error(predicate.createStatement(), " Unindexed search on MDAO");
     }
@@ -160,14 +173,15 @@ public class MDAO
   }
 
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    synchronized ( lock_.writeLock() ) {
-
-      if ( predicate == null ) {
-        state_ = null;
-      } else {
-        super.removeAll_(x, skip, limit, order, predicate);
+    if ( predicate == null ) {
+      lock_.writeLock().lock();
+      try {
+        setState(null);
+      } finally {
+        lock_.writeLock().unlock();
       }
-
+    } else {
+      super.removeAll_(x, skip, limit, order, predicate);
     }
   }
 }
