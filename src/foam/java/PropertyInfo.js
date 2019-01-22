@@ -49,6 +49,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'permissionRequired'
+    },
+    {
+      class: 'Boolean',
       documentation: 'define a property is a XML attribute. eg <foo id="XMLAttribute"></foo>',
       name: 'xmlAttribute'
     },
@@ -207,6 +211,12 @@ foam.CLASS({
             type: 'boolean',
             visibility: 'public',
             body: 'return ' + this.networkTransient + ';'
+          },
+          {
+            name: 'getPermissionRequired',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.permissionRequired + ';'
           },
           {
             name: 'getStorageTransient',
