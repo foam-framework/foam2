@@ -164,6 +164,15 @@ foam.CLASS({
     'required',
 
     /**
+      When set to true, model.permission.property is needed for read / write on this property
+     */
+    {
+      class: 'Boolean',
+      name: 'permissionRequired',
+      value: false
+    },
+
+    /**
       When set, marks the property with the given flags. This can be used for
       things like stripping out platform specific properties when serializing.
      */

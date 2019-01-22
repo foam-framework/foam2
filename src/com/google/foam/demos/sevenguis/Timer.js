@@ -27,19 +27,15 @@ foam.CLASS({
     'foam.u2.RangeView'
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-        ^ { padding: 10px !important; font-size: 18px; }
-        ^ .elapsed { margin-top: 10px; }
-        ^ .label { display: inline-block; width: 130px; }
-        ^ .foam-u2-ActionView- { width: 332px !important; margin-top: 16px !important; }
-        ^ input { margin-left: 12px; }
-        ^ .foam-u2-RangeView- { width: 182px; }
-        ^ row { display: block; min-height: 30px; }
-      */}
-    })
-  ],
+  css: `
+    ^ { padding: 10px !important; font-size: 18px; }
+    ^ .elapsed { margin-top: 10px; }
+    ^ .label { display: inline-block; width: 130px; }
+    ^ .foam-u2-ActionView- { width: 332px !important; margin-top: 16px !important; }
+    ^ input { margin-left: 12px; }
+    ^ .foam-u2-RangeView- { width: 182px; }
+    ^ row { display: block; min-height: 30px; }
+  `,
 
   properties: [
     {
