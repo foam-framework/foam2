@@ -57,7 +57,7 @@ foam.CLASS({
 
     {
       name: 'resetProperties',
-      javaReturns: 'foam.core.FObject',
+      type: 'foam.core.FObject',
       args: [
         {
           name: 'x',
@@ -102,7 +102,7 @@ foam.CLASS({
 
     {
       name: 'hideProperties',
-      javaReturns: 'foam.core.FObject',
+      type: 'foam.core.FObject',
       args: [
         {
           name: 'x',
@@ -144,7 +144,6 @@ foam.CLASS({
 
     {
       name: 'checkPermission',
-      javaReturns: 'void',
       args: [
         {
           name: 'axiom',
@@ -220,7 +219,6 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      javaReturns: 'void',
       args: [
         {
           name: 'obj',
