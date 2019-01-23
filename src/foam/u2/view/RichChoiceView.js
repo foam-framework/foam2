@@ -60,8 +60,9 @@ foam.CLASS({
 
     ^container {
       position: absolute;
-      top: 18px;
+      bottom: 0;
       left: 0;
+      transform: translateY(100%);
       background: white;
       border: 1px solid #bdbdbd;
       max-height: 378px;
