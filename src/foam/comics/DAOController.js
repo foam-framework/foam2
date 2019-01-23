@@ -23,6 +23,7 @@ foam.CLASS({
   requires: [
     'foam.comics.SearchMode',
     'foam.u2.borders.NullBorder',
+    'foam.nanos.export.CSVDriver'
   ],
 
   topics: [
@@ -36,6 +37,12 @@ foam.CLASS({
     },
     {
       name: 'predicate'
+    },
+    {
+      name: 'csvDriver',
+      factory: function() {
+        return this.CSVDriver.create();
+      }
     },
     {
       name: 'filteredDAO',
@@ -80,6 +87,12 @@ foam.CLASS({
       name: 'exportEnabled',
       documentation: 'True to enable the export button.',
       value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'exportCSVEnabled',
+      documentation: 'True to enable export csv button',
+      value: false
     },
     {
       class: 'Boolean',
@@ -217,8 +230,32 @@ foam.CLASS({
       name: 'export',
       isAvailable: function(exportEnabled) { return exportEnabled; },
       code: function() {
-        this.pub('export', this.filteredDAO)
+        this.pub('export', this.filteredDAO);
       }
+    },
+    {
+      name: 'exportCSV',
+      label: 'Export as CSV',
+      icon: 'images/export-icon-resting.svg',
+      isAvailable: function(exportCSVEnabled) { return exportCSVEnabled; },
+      code: function() {
+        this.downloadCSV(this.filteredDAO);
+      }
+    }
+  ],
+
+  listeners: [
+    function downloadCSV(data) {
+      this.csvDriver.exportDAO(this.__context__, data)
+      .then(function(result) {
+        result = 'data:text/csv;charset=utf-8,' + result;
+        var encodedUri = encodeURI(result);
+        var link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', 'data.csv');
+        document.body.appendChild(link);
+        link.click();
+      });
     }
   ]
 });
