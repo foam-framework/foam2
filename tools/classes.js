@@ -81,6 +81,7 @@ var classes = [
   'foam.box.SessionClientBox',
   'foam.dao.DAO',
   'foam.dao.java.JDAO',
+  'foam.dao.java.SharedJournal',
   'foam.dao.FilteredDAO',
   'foam.dao.Journal',
   'foam.dao.RemoveChildrenOnRemoveDAO',
@@ -312,7 +313,7 @@ var classes = [
 
   'foam.comics.SearchMode',
 
-  //Support Files
+  // Support Files
   'foam.support.model.TicketMessage',
   'foam.support.model.SupportEmail',
   'foam.support.model.Ticket',
@@ -365,4 +366,4 @@ module.exports = {
     skeletons: skeletons,
     proxies: proxies,
     blacklist: blacklist
-}
+};
