@@ -23,7 +23,7 @@ foam.CLASS({
           name: 'tick',
           isFramed: true,
           code: function() {
-            if ( this.x < 350 ) { this.alpha *= 0.99;}
+            if ( this.x < 350 ) { this.alpha *= 0.988;}
             if ( this.x < -100 ) {
               this.parent.remove(this);
               return;
@@ -43,10 +43,13 @@ foam.CLASS({
 
   properties: [
     [ 'i',         0   ],
-    [ 'width',     800 ],
-    [ 'height',    800 ],
+    [ 'width',     900 ],
+    [ 'height',    900 ],
     [ 'fillStyle', 'black' ],
-    [ 'color',     'black' ]
+    [ 'color',     'black' ],
+    [ 'frequency', 1 ],
+    { class: 'Boolean', name: 'inColour',  value: true },
+    [ 'rotationPerSquare', 1/45 ],
   ],
 
   methods: [
@@ -55,19 +58,52 @@ foam.CLASS({
     }
   ],
 
+  actions: [
+    {
+      name: 'settings1',
+      code: function() {
+        this.inColour          = true;
+        this.rotationPerSquare = 0;
+        this.frequency         = 20;
+      }
+    },
+    {
+      name: 'settings2',
+      code: function() {
+        this.inColour          = true;
+        this.rotationPerSquare = 1/45;
+        this.frequency         = 3;
+      }
+    },
+    {
+      name: 'settings3',
+      code: function() {
+        this.inColour          = true;
+        this.rotationPerSquare = 1/45;
+        this.frequency         = 1;
+      }
+    },
+    {
+      name: 'settings4',
+      code: function() {
+        this.inColour          = false;
+        this.rotationPerSquare = 1/45;
+        this.frequency         = 1;
+      }
+    }
+  ],
+
   listeners: [
     {
       name: 'tick',
       isFramed: true,
       code: function() {
-        if ( this.i++ % 1 == 0 ) {
+        if ( this.i++ % this.frequency == 0 ) {
           this.add(this.Square.create({
             x:      this.width/2,
             y:      this.height/2,
-            width:  1,
-            height: 1,
-            rotation: this.i/45,
-            color:  this.hsl(this.i, 100, 40),
+            rotation: this.i * this.rotationPerSquare,
+            color:  this.inColour ? this.hsl(this.i, 100, 40) : null,
             border: 'white'
           }));
         }
@@ -77,3 +113,7 @@ foam.CLASS({
     }
   ]
 });
+
+var ss = com.google.foam.demos.squares.Squares.create();
+ss.write();
+foam.u2.DetailView.create({data: ss, showActions: true}).write();

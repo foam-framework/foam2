@@ -1,22 +1,22 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.INTERFACE({
   package: 'foam.nanos.auth',
-  name: 'EnabledAware',
+  name: 'DeletedAware',
 
   methods: [
     {
-      name: 'getEnabled',
+      name: 'getDeleted',
       returns: 'Boolean',
       javaReturns: 'boolean',
       swiftReturns: 'Bool'
     },
     {
-      name: 'setEnabled',
+      name: 'setDeleted',
       args: [
         {
           name: 'value',
@@ -30,7 +30,13 @@ foam.INTERFACE({
 
 foam.CLASS({
   package: 'foam.nanos.auth',
-  name: 'EnabledAwareDummy',
+  name: 'DeletedAwareDummy',
+
+  implements: [
+    'foam.nanos.auth.DeletedAware'
+  ],
+
+  documentation: 'Dummy class for testing DeletedAware',
 
   properties: [
     {
@@ -39,7 +45,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'enabled'
+      name: 'deleted'
     }
   ]
 });

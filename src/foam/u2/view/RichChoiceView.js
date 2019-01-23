@@ -29,7 +29,15 @@ foam.CLASS({
               {
                 heading: 'Users',
                 dao: X.userDAO.orderBy(foam.nanos.auth.User.LEGAL_NAME)
-              }
+              },
+              // Set "disabled: true" to render each object as non-selectable row
+              // Set hideIfEmpty: true" to hide headers if not objects are present in dao provided.
+              {
+                disabled: true,
+                heading: 'Disabled users',
+                hideIfEmpty: true,
+                dao: X.userDAO.where(this.EQ(foam.nanos.auth.User.STATUS, this.AccountStatus.DISABLED)),
+              },
             ]
           };
         }
@@ -52,8 +60,9 @@ foam.CLASS({
 
     ^container {
       position: absolute;
-      top: 18px;
+      bottom: 0;
       left: 0;
+      transform: translateY(100%);
       background: white;
       border: 1px solid #bdbdbd;
       max-height: 378px;
@@ -101,6 +110,14 @@ foam.CLASS({
 
     ^ .search input:focus {
       border: none;
+    }
+
+    ^ .disabled {
+      filter: grayscale(100%) opacity(60%);
+    }
+
+    ^ .disabled:hover {
+      cursor: default;
     }
   `,
 
@@ -249,24 +266,36 @@ foam.CLASS({
               .end();
           }))
           .add(this.slot(function(sections) {
-            return this.E().forEach(sections, function(section) {
-              this
-                .start()
-                  .addClass(self.myClass('heading'))
-                  .add(section.heading)
-                .end()
-                .start()
-                  .select(section.filtered || section.dao, function(obj) {
-                    return this.E()
-                      .start(self.rowView, { data: obj })
-                        .on('click', () => {
-                          self.fullObject_ = obj;
-                          self.data = obj;
-                          self.isOpen_ = false;
-                        })
-                      .end();
-                  })
-                .end();
+            var promiseArray = [];
+            sections.forEach(function(section) {
+              promiseArray.push(section.dao.select(self.COUNT()));
+            });
+
+            return Promise.all(promiseArray).then((resp) => {
+              var index = 0;
+              return this.E().forEach(sections, function(section) {
+                this
+                  .start().hide(!! section.hideIfEmpty && resp[index].value <= 0)
+                    .addClass(self.myClass('heading'))
+                    .add(section.heading)
+                  .end()
+                  .start()
+                    .select(section.filtered || section.dao, (obj) => {
+                      return this.E()
+                        .start(self.rowView, { data: obj })
+                          .enableClass('disabled', section.disabled)
+                          .callIf(! section.disabled, function() {
+                            this.on('click', () => {
+                              self.fullObject_ = obj;
+                              self.data = obj;
+                              self.isOpen_ = false;
+                            });
+                          })
+                        .end();
+                    })
+                  .end();
+                  index++;
+              });
             });
           }))
         .end();

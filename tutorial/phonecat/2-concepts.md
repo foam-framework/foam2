@@ -20,7 +20,7 @@ FOAM's approach is similar in principle: you write a definition for the class an
 
 FOAM's class definitions take the form of a JSON object passed to the `CLASS()` global function. 
 
-**JAVA Class example:**  
+**JAVA Class Example:**  
 
      {% highlight java %}
      public class MyClass extends BaseClass {
@@ -38,7 +38,7 @@ FOAM's class definitions take the form of a JSON object passed to the `CLASS()` 
      {% endhighlight %}
 
 
-**FOAM example:**
+**FOAM Class Example:**
 
      {% highlight js %}
      foam.CLASS({
@@ -99,7 +99,7 @@ and it can be instantiated and used like this:
      console.log(p.toJSON());
      {% endhighlight %}
 
-     which will output
+which will output
 
      {% highlight js %}
      {
@@ -109,7 +109,7 @@ and it can be instantiated and used like this:
      }
      {% endhighlight %}
 
-These objects can be manipulated very much like plain old Javascript objects such as properties and methods, however, new instances are created with `MyClass.create({...})` rather than `new MyClass(...)'.  
+These objects can be manipulated very much like plain old Javascript objects such as properties and methods, however, new instances are created with `MyClass.create({...})` rather than `new MyClass(...)`.  
 
 
 ### **4. Extending Classes** 
@@ -182,7 +182,7 @@ FOAM's reactive programming support is event-driven and therefore has minimal ov
 
 The various ways of hooking up reactive listeners are detailed in the [Appendix](/Users/lilian/foam../4-appendix).
 
-   ### **Animation**
+### **Animation**
 
    Animations in FOAM are similarly richer than Java.  An animation is a reactive program with time as an input.  FOAM includes a suite of animation functions that make it easy to have components ease in or out, slide smoothly, bounce, spin, orbit, and more.
 
@@ -202,19 +202,18 @@ FOAM tries to provide many missing utilities from Javascript and web platform.  
 
 Please proceed to the next stage of this tutorial, Applied Learning - a. Defining the Model.
 
-# [NEXT:  Part III - Applied Learning a. Defining the Model](../3a-model/) 
+## **[NEXT:  Part III - Applied Learning - Defining the Model](../3a-model/)**
 
 ### **Tutorial Menu:** 
 
-1. [Getting Started](../1-gettingstarted/) 
-2. [Core Concepts](../2-concepts/) 
-3. Applied Learning: Build a Basic App with FOAM
-     1. [Defining the Model](../3a-model/)
-     2. [Controllers](../3b-dao/)
-     3. [UI Library](../3c-UI/)
-     4. [Navigation](../3d-navigation/)
+1. [Getting Started](../1-gettingstarted/)
+1. [Core Concepts](../2-concepts/)
+1. Applied Learning: Build a Basic App with FOAM
+    * [Defining the Model](../3a-model/)
+    * [The Controller](../3b-dao/)
+    * [UI Library](../3c-UI/)
+    * [Navigation](../3d-navigation/)
+
 * [Tutorial Overview](../0-intro/)
 * [About FOAM](/foam/about/)
-* [Appendix](../4-appendix/) 
-
-
+* [Appendix](../4-appendix/)

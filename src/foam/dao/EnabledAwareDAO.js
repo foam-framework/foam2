@@ -15,19 +15,17 @@ foam.CLASS({
     'foam.mlang.Expressions'
   ],
 
-  requires: [
-    'foam.nanos.auth.EnabledAware'
-  ],
-
   properties: [
     {
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'predicate',
       factory: function() {
-        return this.EQ(this.EnabledAware.ENABLED, true);
+        return this.EQ(this.of.ENABLED, true);
       },
-      javaFactory: 'return foam.mlang.MLang.EQ(EnabledAware.ENABLED, true);'
+      javaFactory: `
+        return foam.mlang.MLang.EQ(getOf().getAxiomByName("enabled"), true);
+      `
     }
   ]
 });

@@ -113,17 +113,10 @@ foam.CLASS({
       documentation: 'Ignores selection by user.'
     },
     {
-      name: 'ascIcon',
-      documentation: 'HTML entity representing unicode Up-Pointing Triangle',
-      factory: function() {
-        return this.Entity.create({ name: '#9650' });
-      }
-    },
-    {
-      name: 'descIcon',
+      name: 'sortingIcon',
       documentation: 'HTML entity representing unicode Down-Pointing Triangle',
       factory: function() {
-        return this.Entity.create({ name: '#9660' });
+        return foam.u2.tag.Image.create({ data: '/foam2/src/foam/u2/images/double-arrow.svg' });
       }
     },
     {
@@ -192,10 +185,9 @@ foam.CLASS({
                   }).
                   on('click', function(e) { view.sortBy(column); }).
                   call(column.tableHeaderFormatter, [column]).
-                  add(' ', this.slot(function(order) {
-                    return column === order ? view.ascIcon :
-                        (view.Desc.isInstance(order) && order.arg1 === column) ? view.descIcon : ''
-                  }, view.order$)).
+                  callIf(column.label != '', function() {
+                    this.add(view.sortingIcon);
+                  }).
                 end();
               }).
               call(function() {
@@ -267,8 +259,8 @@ foam.CLASS({
                             start().
                               addClass(view.myClass('context-menu-item')).
                               add(action.label).
-                              call(function() {
-                                if ( action.isEnabledFor(obj) ) {
+                              call(async function() {
+                                if ( await action.isEnabledFor(obj) ) {
                                   this.on('click', function(evt) {
                                     action.maybeCall(view.__subContext__, obj);
                                   });
