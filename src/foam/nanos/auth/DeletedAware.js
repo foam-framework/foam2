@@ -11,17 +11,14 @@ foam.INTERFACE({
   methods: [
     {
       name: 'getDeleted',
-      returns: 'Boolean',
-      javaReturns: 'boolean',
-      swiftReturns: 'Bool'
+      type: 'Boolean',
     },
     {
       name: 'setDeleted',
       args: [
         {
           name: 'value',
-          javaType: 'boolean',
-          swiftType: 'Bool'
+          type: 'Boolean',
         }
       ]
     }
