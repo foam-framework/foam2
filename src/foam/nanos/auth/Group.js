@@ -52,10 +52,9 @@ foam.CLASS({
       documentation: 'Permissions set on group.'
     },
     {
-      class: 'FObjectArray',
-      of: 'foam.nanos.auth.Permission',
-      name: 'blacklists',
-      documentation: 'Blacklist permissions set on a group'
+      class: 'Boolean',
+      name: 'isBlacklist',
+      value: false
     },
     // {
     //   class: 'StringArray',
