@@ -43,7 +43,7 @@
     }
     ^ .net-nanopay-ui-ActionView-backAction {
       border-radius: 2px;
-      background-color: rgba(164, 179, 184, 0.1);
+      // background-color: rgba(164, 179, 184, 0.1);
       box-shadow: 0 0 1px 0 rgba(9, 54, 73, 0.8);
       margin-right: 10px;
     }
@@ -76,7 +76,7 @@
     }
     ^ .net-nanopay-ui-ActionView-backAction {
       border-radius: 2px;
-      background-color: rgba(164, 179, 184, 0.1);
+      // background-color: rgba(164, 179, 184, 0.1);
       box-shadow: 0 0 1px 0 rgba(9, 54, 73, 0.8);
     }
     ^ .net-nanopay-ui-ActionView-backAction:hover {
