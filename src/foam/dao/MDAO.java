@@ -13,8 +13,6 @@ import foam.mlang.predicate.Predicate;
 import foam.mlang.sink.GroupBy;
 import foam.nanos.logger.Logger;
 import java.util.ArrayList;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.List;
 
 /**
@@ -43,9 +41,9 @@ import java.util.List;
 public class MDAO
   extends AbstractDAO
 {
-  protected AltIndex      index_;
-  protected Object        state_ = null;
-  protected ReadWriteLock lock_ = new ReentrantReadWriteLock();
+  protected AltIndex index_;
+  protected Object   state_ = null;
+  protected Object   writeLock_ = new Object();
 
   public MDAO(ClassInfo of) {
     setOf(of);
@@ -65,12 +63,7 @@ public class MDAO
   }
 
   synchronized Object getState() {
-    lock_.readLock().lock();
-    try {
-      return state_;
-    } finally {
-      lock_.readLock().unlock();
-    }
+    return state_;
   }
 
   synchronized void setState(Object state) {
@@ -82,8 +75,7 @@ public class MDAO
     obj = obj.fclone();
     obj.freeze();
 
-    lock_.writeLock().lock();
-    try {
+    synchronized ( this.writeLock_ ) {
       FObject oldValue = find(obj);
       Object  state = getState();
 
@@ -92,8 +84,6 @@ public class MDAO
       }
 
       setState(index_.put(state, obj));
-    } finally {
-      lock_.writeLock().unlock();
     }
 
     onPut(obj);
@@ -104,15 +94,12 @@ public class MDAO
     if ( obj == null ) return null;
 
     FObject found;
-    lock_.writeLock().lock();
-    try {
+    synchronized ( this.writeLock_ ) {
       found = find(obj);
 
       if ( found != null ) {
         setState(index_.remove(getState(), found));
       }
-    } finally {
-      lock_.writeLock().unlock();
     }
 
     if ( found != null ) {
@@ -131,8 +118,8 @@ public class MDAO
 
     return AbstractFObject.maybeClone(
         getOf().isInstance(o)
-            ? (FObject) index_.planFind(state, getPrimaryKey().get(o)).find(state, getPrimaryKey().get(o))
-            : (FObject) index_.planFind(state, o).find(state,o)
+          ? (FObject) index_.planFind(state, getPrimaryKey().get(o)).find(state, getPrimaryKey().get(o))
+          : (FObject) index_.planFind(state, o).find(state,o)
     );
   }
 
@@ -174,11 +161,8 @@ public class MDAO
 
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
     if ( predicate == null ) {
-      lock_.writeLock().lock();
-      try {
+      synchronized ( this.writeLock_ ) {
         setState(null);
-      } finally {
-        lock_.writeLock().unlock();
       }
     } else {
       super.removeAll_(x, skip, limit, order, predicate);
