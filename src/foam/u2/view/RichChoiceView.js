@@ -233,10 +233,10 @@ foam.CLASS({
         .start()
           .addClass(this.myClass('selection-view'))
           .enableClass('disabled', this.mode$.map((mode) => mode === foam.u2.DisplayMode.DISABLED))
-          .callIf(this.mode === foam.u2.DisplayMode.RW, function() {
-            this.on('click', function() {
+          .on('click', function() {
+            if ( self.mode === foam.u2.DisplayMode.RW ) {
               self.isOpen_ = ! self.isOpen_;
-            });
+            }
           })
           .start()
             .addClass(this.myClass('custom-selection-view'))
