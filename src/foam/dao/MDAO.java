@@ -70,7 +70,7 @@ public class MDAO
     state_ = state;
   }
 
-  public FObject put_(X x, FObject obj) {
+  public synchronized FObject put_(X x, FObject obj) {
     // Clone and freeze outside of lock to minimize time spent under lock
     obj = obj.fclone();
     obj.freeze();
@@ -90,7 +90,7 @@ public class MDAO
     return obj;
   }
 
-  public FObject remove_(X x, FObject obj) {
+  public synchronized FObject remove_(X x, FObject obj) {
     if ( obj == null ) return null;
 
     FObject found;
