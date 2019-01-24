@@ -25,6 +25,10 @@ foam.CLASS({
       color: #2b2b2b;
     }
 
+    ^ th > img {
+      margin-left: 8px;
+    }
+
     ^ td {
       white-space: nowrap;
       font-family: Roboto;
