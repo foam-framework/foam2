@@ -120,14 +120,14 @@ foam.CLASS({
       }
     },
     {
+      name: 'selection',
+      expression: function(importSelection) { return importSelection || null; },
+    },
+    {
       class: 'String',
       name: 'sortingIcon',	
       documentation: 'HTML entity representing unicode Down-Pointing Triangle',	
       value: '/foam2/src/foam/u2/images/double-arrow.svg',	
-    },
-    {
-      name: 'selection',
-      expression: function(importSelection) { return importSelection || null; },
     },
     'hoverSelection',
     'dropdownOrigin',
@@ -186,8 +186,8 @@ foam.CLASS({
                   call(column.tableHeaderFormatter, [column]).
                   callIf(column.label != '', function() {
                     this.start('img')
-                    .attr('src', view.sortingIcon$)
-                  .end();
+                      .attr('src', view.sortingIcon$)
+                    .end();
                   }).
                 end();
               }).
