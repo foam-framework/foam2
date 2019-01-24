@@ -21,7 +21,28 @@ foam.CLASS({
     the user group has {model}.read.deleted permission where {model} is
     the lowercase name of the model of the objects.`,
 
+  javaImports: [
+    'foam.core.FObject',
+    'foam.nanos.auth.AuthService',
+  ],
+
   methods: [
+    {
+      name: 'find_',
+      javaCode: `
+        return read(x, super.find_(x, id));
+      `
+    },
+    {
+      name: 'select_',
+      javaCode: `
+        if (sink != null) {
+          super.select_(x, new DeletedAwareSink(x, sink, this), skip, limit, order, predicate);
+          return sink;
+        }
+        return super.select_(x, sink, skip, limit, order, predicate);
+      `
+    },
     {
       name: 'remove_',
       javaCode: `
@@ -32,6 +53,65 @@ foam.CLASS({
         }
         return super.remove_(x, obj);
       `
+    },
+    {
+      name: 'read',
+      javaReturns: 'FObject',
+      args: [
+        { of: 'foam.core.X', name: 'x' },
+        { of: 'FObject', name: 'obj' }
+      ],
+      javaCode: `
+        if ( obj != null
+          && obj instanceof DeletedAware
+          && ((DeletedAware) obj).getDeleted()
+        ) {
+          String of = obj.getClass().getSimpleName().toLowerCase();
+          AuthService auth = (AuthService) x.get("auth");
+
+          if ( ! auth.check(x, of + ".read.deleted") ) {
+            return null;
+          }
+        }
+        return obj;
+      `
     }
   ],
+});
+
+foam.CLASS({
+  package: 'foam.nanos.auth',
+  name: 'DeletedAwareSink',
+  extends: 'foam.dao.ProxySink',
+
+  javaImports: [
+    'foam.core.FObject',
+  ],
+
+  methods: [
+    {
+      name: 'put',
+      javaCode: `
+        FObject result = dao.read(getX(), (FObject) obj);
+        if ( result != null ) {
+          super.put(result, sub);
+        }
+      `
+    }
+  ],
+
+  axioms: [
+    {
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+          private DeletedAwareDAO dao;
+          public DeletedAwareSink(foam.core.X  x, foam.dao.Sink delegate, DeletedAwareDAO dao) {
+            setX(x);
+            setDelegate(delegate);
+            this.dao = dao;
+          }
+        `);
+      }
+    }
+  ]
 });
