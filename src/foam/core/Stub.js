@@ -107,7 +107,11 @@ foam.CLASS({
       }
     },
     ['type',     'foam.box.Box'],
-    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo']
+    {
+      name: 'javaInfoType',
+      value: 'foam.core.AbstractFObjectPropertyInfo',
+      flags: ['java'],
+    },
   ],
 
   methods: [
