@@ -17,43 +17,42 @@ import foam.mlang.sink.GroupBy;
 
 public class TreeNode {
 
-  protected Object key;
-  protected Object value;
-  protected long size;
-  protected long level;
+  protected Object   key;
+  protected Object   value;
+  protected long     size;
+  protected long     level;
   protected TreeNode left;
   protected TreeNode right;
 
-  protected final static TreeNode NULL_NODE = new TreeNode(null, null,
-                                                          0, 0, null, null);
+  protected final static TreeNode NULL_NODE = new TreeNode(null, null, 0, 0, null, null);
 
   public TreeNode(Object key, Object value) {
-    this.key = key;
-
+    this.key   = key;
     this.value = value;
   }
 
-  public TreeNode(Object key, Object value, long size, long level,
-                  TreeNode left, TreeNode right) {
-    this.key = key;
+  public TreeNode(Object key, Object value, long size, long level, TreeNode left, TreeNode right) {
+    this.key   = key;
     this.value = value;
-    this.size = size;
+    this.size  = size;
     this.level = level;
-    this.left = left;
+    this.left  = left;
     this.right = right;
   }
 
   public TreeNode cloneNode() {
-    return new TreeNode( this.key, this.value, this.size,
-                               this.level, this.left, this.right);
+    return new TreeNode(
+      this.key,
+      this.value,
+      this.size,
+      this.level,
+      this.left,
+      this.right);
 
   }
 
-  private TreeNode maybeClone(TreeNode s) {
-    if ( s != null ) {
-      return s.cloneNode();
-    }
-    return s;
+  TreeNode maybeClone(TreeNode s) {
+    return s == null ? null : s.cloneNode();
   }
 
   public static TreeNode getNullNode() {
@@ -72,13 +71,12 @@ public class TreeNode {
     return tree;
   }
 
-  public TreeNode putKeyValue(TreeNode state, PropertyInfo prop, Object key,
-    FObject value, Index tail) {
+  public TreeNode putKeyValue(TreeNode state, PropertyInfo prop, Object key, FObject value, Index tail) {
     if ( state == null || state.equals(TreeNode.getNullNode()) ) {
       return new TreeNode(key, tail.put(null, value), 1, 1, null, null);
     }
     state = maybeClone(state);
-    int r = prop.comparePropertyToValue(key,state.key);
+    int r = prop.comparePropertyToValue(key, state.key);
 
     if ( r == 0 ) {
       state.size -= tail.size(state.value);
@@ -136,9 +134,7 @@ public class TreeNode {
 
   public TreeNode removeKeyValue(TreeNode state, PropertyInfo prop, Object key,
     FObject value, Index tail) {
-    if ( state == null ) {
-      return state;
-    }
+    if ( state == null ) return state;
 
     state = maybeClone(state);
     long compareValue = prop.comparePropertyToValue(key,state.key);
@@ -209,13 +205,13 @@ public class TreeNode {
       state.right = removeNode(state.right, key, prop);
       state.size += size(state.right);
     }
+
     return state;
   }
 
   private TreeNode predecessor(TreeNode node) {
-    if ( node.left == null ) {
-      return node;
-    }
+    if ( node.left == null ) return node;
+
     node = node.left;
     while ( node.right != null ) {
       node = node.right;
@@ -224,9 +220,7 @@ public class TreeNode {
   }
 
   private TreeNode successor(TreeNode node) {
-    if ( node.right == null ) {
-      return node;
-    }
+    if ( node.right == null ) return node;
     node = node.right;
     while ( node.left != null ) {
       node = node.left;
@@ -254,39 +248,31 @@ public class TreeNode {
     return node;
   }
 
-  private long size (TreeNode node) {
-    if ( node != null ) {
-      return node.size;
-    }
-    return 0;
+  private long size(TreeNode node) {
+    return node == null ? 0 : node.size;
   }
 
   /** extracts the value with the given key from the index */
   public TreeNode get(TreeNode s, Object key, PropertyInfo prop) {
-    if ( s == null ) {
-      return s;
-    }
+    if ( s == null ) return s;
 
     int r = prop.comparePropertyToValue(key, s.key);
     if ( r == 0 ) {
       long size = s.value instanceof TreeNode ? ( (TreeNode) s.value ).size : 1;
       return new TreeNode(s.key, s.value, size, 0, null, null);
     }
-    if ( r > 0 ) {
-      return get(s.right, key, prop);
-    }
-    return get(s.left, key, prop);
+    return r > 0 ? get(s.right, key, prop) : get(s.left, key, prop);
   }
 
   protected TreeNode getLeft() {
     return left;
   }
 
-  protected TreeNode getRight(){
+  protected TreeNode getRight() {
     return right;
   }
 
-  protected Object getValue(){
+  protected Object getValue() {
     return value;
   }
 
