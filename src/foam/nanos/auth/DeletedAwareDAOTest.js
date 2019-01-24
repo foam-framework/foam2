@@ -25,6 +25,7 @@ foam.CLASS({
       javaCode: `
         DeletedAwareDAOTest_remove_DeletedAware(x);
         DeletedAwareDAOTest_remove_non_DeletedAware(x);
+        DeletedAwareDAOTest_removeAll(x);
 
         User user = new User.Builder(x)
           .setEmail("test@example.com")
@@ -83,6 +84,34 @@ foam.CLASS({
         object = dao.find(object.getProperty("code"));
 
         test(object == null, "DeletedAwareDAO remove non DeletedAware object from DAO.");
+      `
+    },
+    {
+      name: 'DeletedAwareDAOTest_removeAll',
+      args: [
+        { of: 'X', name: 'x' }
+      ],
+      javaCode: `
+        DAO delegate = new MDAO(DeletedAwareDummy.getOwnClassInfo());
+        DAO dao = (DAO) new DeletedAwareDAO.Builder(x)
+          .setDelegate(delegate)
+          .build();
+
+        dao.put(
+          new DeletedAwareDummy.Builder(x)
+            .setId(1)
+            .setDeleted(false)
+            .build()
+        );
+
+        dao.removeAll();
+        ArraySink sink = (ArraySink) dao.select(new ArraySink());
+        List array = sink.getArray();
+
+        test(array.size() == 1
+          && ((DeletedAware) array.get(0)).getDeleted()
+          , "DeletedAwareDAO set DeletedAware.deleted=true on removeAll."
+        );
       `
     },
     {

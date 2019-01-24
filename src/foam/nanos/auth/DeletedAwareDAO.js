@@ -23,6 +23,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.FObject',
+    'foam.dao.RemoveSink',
     'foam.nanos.auth.AuthService',
   ],
 
@@ -52,6 +53,12 @@ foam.CLASS({
           return super.put_(x, obj);
         }
         return super.remove_(x, obj);
+      `
+    },
+    {
+      name: 'removeAll_',
+      javaCode: `
+        getDelegate().select_(x, new RemoveSink(x, this), skip, limit, order, predicate);
       `
     },
     {
