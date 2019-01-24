@@ -18,7 +18,11 @@ foam.CLASS({
       },
     },
     {
+      class: 'StringArray',
       name: 'blacklist',
+    },
+    {
+      name: 'blacklist_',
       value: [
         'foam.apploader.ClassLoaderContextScript',
         'foam.apploader.ClassLoaderContext'
@@ -357,9 +361,11 @@ console.log("Done.");
         of: foam.core.Model
       });
 
-      modelDAO = modelDAO.
-        where(E.NOT(E.IN("node", foam.core.Model.FLAGS))).
-        orderBy(foam.core.Model.ORDER);
+      var pred = self.enabledFeatures.map(f => E.IN(f, foam.core.Model.FLAGS))
+      pred.push(E.NOT(E.HAS(foam.core.Model.FLAGS)));
+      pred = E.OR.apply(E, pred);
+
+      modelDAO = modelDAO.where(pred).orderBy(foam.core.Model.ORDER)
 
       function inflate(model) {
         return model.cls_ ? model :
@@ -436,9 +442,11 @@ console.log("Done.");
       function models(then, abort) {
         var data = '';
 
+        var blacklist = self.blacklist_.concat(self.blacklist)
+
         modelDAO.orderBy(foam.core.Model.ORDER).select({
           put: function(s) {
-            if ( self.blacklist.indexOf(s.id) != -1 ) {
+            if ( blacklist.indexOf(s.id) != -1 ) {
               console.log("Skipping", s.id);
               return;
             }
