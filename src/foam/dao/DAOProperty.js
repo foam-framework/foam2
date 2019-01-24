@@ -31,7 +31,11 @@ foam.CLASS({
     },
     ['transient', true],
     ['of', 'foam.dao.DAO'],
-    ['javaInfoType', 'foam.core.AbstractDAOPropertyPropertyInfo']
+    {
+      name: 'javaInfoType',
+      flags: ['java'],
+      value: 'foam.core.AbstractDAOPropertyPropertyInfo',
+    },
   ],
 
   methods: [

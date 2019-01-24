@@ -68,6 +68,10 @@ foam.CLASS({
   extends: 'String',
   properties: [
     {
+      name: 'flags',
+      value: ['java']
+    },
+    {
       name: 'expression',
       expression: function(value) {
         // TODO: This is a large hack around the way SHADOW_MAP works.
@@ -1532,7 +1536,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'ArrayList',
   extends: 'foam.core.Array',
-
+  flags: ['java'],
   properties: [
     ['javaType', 'ArrayList'],
     ['javaInfoType', 'foam.core.AbstractPropertyInfo'],
