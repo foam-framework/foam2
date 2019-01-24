@@ -54,7 +54,8 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isBlacklist',
-      value: false
+      value: false,
+      documentation: 'Flag to check if group is blacklisted.'
     },
     // {
     //   class: 'StringArray',
