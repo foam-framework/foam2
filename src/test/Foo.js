@@ -16,8 +16,6 @@ foam.CLASS({
     }
   ],
   methods: [
-    function init() {
-    },
     function method() {
       console.log("Foo.Bar.bar", this.Bar.create().asdf);
     }
@@ -27,8 +25,19 @@ foam.CLASS({
 foam.CLASS({
   package: 'test',
   name: 'Person',
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'Int',
+      name: 'age'
+    }
+  ],
   methods: [
-    function foo() {
+    function describe() {
+      console.log("Hello, my name is: " + this.name + ", and I am " + this.age + " years old.");
     }
   ]
 });
