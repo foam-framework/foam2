@@ -75,9 +75,9 @@ public class MDAO
     obj = obj.fclone();
     obj.freeze();
 
-    synchronized ( this.writeLock_ ) {
+    synchronized ( writeLock_ ) {
       FObject oldValue = find(obj);
-      Object  state = getState();
+      Object  state    = getState();
 
       if ( oldValue != null ) {
         state = index_.remove(state, oldValue);
@@ -94,7 +94,7 @@ public class MDAO
     if ( obj == null ) return null;
 
     FObject found;
-    synchronized ( this.writeLock_ ) {
+    synchronized ( writeLock_ ) {
       found = find(obj);
 
       if ( found != null ) {
@@ -161,7 +161,7 @@ public class MDAO
 
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
     if ( predicate == null ) {
-      synchronized ( this.writeLock_ ) {
+      synchronized ( writeLock_ ) {
         setState(null);
       }
     } else {
