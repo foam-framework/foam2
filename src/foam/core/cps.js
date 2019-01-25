@@ -522,9 +522,6 @@ foam.LIB({
       };
     },
 
-    function forward(f) {
-    },
-
     function compose(a, b) {
       if ( ! a || ! b ) throw new Error("Compose requires two functions.");
 
@@ -720,7 +717,7 @@ foam.LIB({
 
       return function(then, abort, ...args) {
         console.log("ENTER", name, ...args);
-        f(function(...args) { console.log("EXIT", f.name, ...args); then(...args); }, abort, ...args);
+        f(function(...args) { console.log("EXIT", name, ...args); then(...args); }, abort, ...args);
       };
     }
   ]
