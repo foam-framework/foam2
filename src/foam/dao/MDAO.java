@@ -70,43 +70,37 @@ public class MDAO
     state_ = state;
   }
 
-  public synchronized FObject put_(X x, FObject obj) {
+  public FObject put_(X x, FObject obj) {
     // Clone and freeze outside of lock to minimize time spent under lock
     obj = obj.fclone();
     obj.freeze();
 
-<<<<<<< HEAD
     synchronized ( writeLock_ ) {
       FObject oldValue = find(obj);
       Object  state    = getState();
-=======
-    FObject oldValue = find(obj);
-    Object  state = getState();
->>>>>>> 8ebfef65a7d8b1d2b8a16b2eba06a2bd96044da2
 
-    if ( oldValue != null ) {
-      state = index_.remove(state, oldValue);
+      if ( oldValue != null ) {
+        state = index_.remove(state, oldValue);
+      }
+
+      setState(index_.put(state, obj));
     }
-
-    setState(index_.put(state, obj));
 
     onPut(obj);
     return obj;
   }
 
-  public synchronized FObject remove_(X x, FObject obj) {
+  public FObject remove_(X x, FObject obj) {
     if ( obj == null ) return null;
 
-<<<<<<< HEAD
     FObject found;
+
     synchronized ( writeLock_ ) {
       found = find(obj);
-=======
-    FObject found = find(obj);
->>>>>>> 8ebfef65a7d8b1d2b8a16b2eba06a2bd96044da2
 
-    if ( found != null ) {
-      setState(index_.remove(getState(), found));
+      if ( found != null ) {
+        setState(index_.remove(getState(), found));
+      }
     }
 
     if ( found != null ) {
