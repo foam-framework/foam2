@@ -2892,10 +2892,16 @@ foam.CLASS({
     'foam.mlang.sink.Unique'
   ],
 
-  constants: {
-    FALSE: foam.mlang.predicate.False.create(),
-    TRUE: foam.mlang.predicate.True.create()
-  },
+  constants: [
+    {
+      name: 'FALSE',
+      factory: function() { return foam.mlang.predicate.False.create() }
+    },
+    {
+      name: 'TRUE',
+      factory: function() { return foam.mlang.predicate.True.create() }
+    }
+  ],
 
   methods: [
     function _nary_(name, args) {
