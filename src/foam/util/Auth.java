@@ -30,7 +30,7 @@ public class Auth {
   public static X sudo(X x, User user) {
     if ( user == null ) throw new RuntimeException("Unknown user");
 
-    Session session = new Session();
+    Session session = new Session(x);
     x = x.put(Session.class, session);
     x = x.put("user", user);
     session.setUserId(user.getId());
