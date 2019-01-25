@@ -103,7 +103,7 @@ foam.CLASS({
     {
       name: 'maxAttempts',
       documentation: 'Set to -1 to infinitely retry.',
-      value: 3
+      value: 0
     }
   ],
 
