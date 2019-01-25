@@ -335,7 +335,7 @@ foam.LIB({
 
       var arg = "(?:" + skip + ident + skip + ")";
       var nextArg = "(?:," + skip + arg + ")";
-      var argEnd = "\\)";
+      var argEnd = skip + "\\)";
       var headerToBody = skip + "(?:\\=\\>)?" + skip;
       var bodyText = "((?:.|\\s)*)";
       var body = "\\{" + bodyText + "\\}";
