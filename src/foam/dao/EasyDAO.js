@@ -128,7 +128,7 @@ if ( getAuthenticate() ) {
 }
 
 if ( getPm() ) {
-  delegate = new foam.dao.PMDAO(delegate);
+  delegate = new foam.dao.PMDAO(getX(), delegate);
 }
 
 return delegate;
