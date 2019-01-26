@@ -102,12 +102,6 @@ foam.CLASS({
       name: 'postalCode',
       documentation: 'Postal code pertaining to address.',
       required: true,
-      validateObj: function(postalCode) {
-        var postalCodeRegex = /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i;
-        if ( ! postalCodeRegex.test(postalCode) ) {
-          return 'Invalid postal code.';
-        }
-      },
       preSet: function(oldValue, newValue) {
         return newValue.toUpperCase();
       },
