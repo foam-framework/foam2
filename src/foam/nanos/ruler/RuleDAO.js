@@ -8,6 +8,7 @@ foam.CLASS({
   `,
 
   javaImports: [
+    'foam.mlang.order.Desc',
     'foam.dao.DAO',
     'static foam.mlang.MLang.*',
     'java.util.List',
@@ -94,7 +95,7 @@ foam.CLASS({
         EQ(Rule.OPERATION, operation),
         EQ(Rule.DAO_KEY, getDaoKey()),
         EQ(Rule.AFTER, after)
-      )).orderBy(Rule.PRIORITY).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
       for ( Object key : sink.getGroupKeys() ) {
         List<Rule> groups = ((ArraySink) sink.getGroups().get(key)).getArray();
         for ( Rule rule : groups ) {
