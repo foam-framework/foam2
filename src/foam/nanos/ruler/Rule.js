@@ -15,8 +15,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Long',
-      name: 'id',
-      visibility: foam.u2.Visibility.RO
+      name: 'id'
     },
     {
       class: 'String',
