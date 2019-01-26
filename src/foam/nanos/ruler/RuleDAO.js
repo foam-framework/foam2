@@ -1,10 +1,17 @@
-foam.CLASS({
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+ foam.CLASS({
   package: 'foam.nanos.ruler',
   name: 'RuleDAO',
   extends: 'foam.dao.ProxyDAO',
 
   documentation: `
-    RuleDAO finds all the rules that can be applied to specific daoKey and executes actions on each
+    RuleDAO selects all the rules that can be applied to specific dao depending on type of operation(create/update/remove). Selected rules are applied
+    in the order specified in rule.priority until all are executed or until one of the rules forces execution to stop.
   `,
 
   javaImports: [
@@ -21,24 +28,14 @@ foam.CLASS({
     {
       class: 'Reference',
       of: 'foam.nanos.boot.NSpec',
-      name: 'daoKey'
+      name: 'daoKey',
+      documentation: 'the dao name that rules need to be applied against.'
     }
   ],
 
   methods: [
     {
       name: 'put_',
-      args: [
-        {
-          name: 'x',
-          of: 'foam.core.X'
-        },
-        {
-          name: 'obj',
-          of: 'foam.core.FObject'
-        }
-      ],
-      javaReturns: 'foam.core.FObject',
       javaCode: `
       DAO service = (DAO) x.get(getDaoKey());
       if ( service == null ) {
@@ -52,7 +49,7 @@ foam.CLASS({
       }
       applyRules(x, obj, operation, false);
       FObject ret =  getDelegate().put_(x, obj);
-      applyRules(x, obj, operation, true);
+      applyRules(x, ret, operation, true);
       return ret;
       `
     },
@@ -65,7 +62,7 @@ foam.CLASS({
       }
       applyRules(x, obj, Operations.REMOVE, false);
       FObject ret =  getDelegate().put_(x, obj);
-      applyRules(x, obj, Operations.REMOVE, true);
+      applyRules(x, ret, Operations.REMOVE, true);
       return ret;
       `
     },
