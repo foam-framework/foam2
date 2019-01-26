@@ -8,15 +8,14 @@ foam.CLASS({
   `,
 
   javaImports: [
-    'foam.core.FObject',
-    'foam.core.X',
-    'foam.dao.ProxyDAO',
     'foam.dao.DAO',
-    'foam.nanos.boot.NSpec',
     'static foam.mlang.MLang.*',
     'java.util.List',
-    'foam.dao.ArraySink'
+    'foam.dao.ArraySink',
+    'foam.mlang.sink.GroupBy',
+    'foam.core.FObject'
   ],
+
   properties: [
     {
       class: 'Reference',
@@ -40,27 +39,75 @@ foam.CLASS({
       ],
       javaReturns: 'foam.core.FObject',
       javaCode: `
-      NSpec service = (NSpec) x.get(getDaoKey());
+      DAO service = (DAO) x.get(getDaoKey());
       if ( service == null ) {
-        throw new RuntimeException("Service with the name " + getDaoKey() + " was not found");
+        throw new RuntimeException("dao with the name " + getDaoKey() + " was not found");
       }
+      Operations operation;
+      if ( service.find_(x, obj) == null ) {
+        operation = Operations.CREATE;
+      } else {
+        operation = Operations.UPDATE;
+      }
+      applyRules(x, obj, operation, false);
+      FObject ret =  getDelegate().put_(x, obj);
+      applyRules(x, obj, operation, true);
+      return ret;
+      `
+    },
+    {
+      name: 'remove_',
+      javaCode: `
+      DAO service = (DAO) x.get(getDaoKey());
+      if ( service == null ) {
+        throw new RuntimeException("dao with the name " + getDaoKey() + " was not found");
+      }
+      applyRules(x, obj, Operations.REMOVE, false);
+      FObject ret =  getDelegate().put_(x, obj);
+      applyRules(x, obj, Operations.REMOVE, true);
+      return ret;
+      `
+    },
+    {
+      name: 'applyRules',
+      args: [
+        {
+          name: 'x',
+          of: 'foam.core.X'
+        },
+        {
+          name: 'obj',
+          of: 'foam.core.FObject'
+        },
+        {
+          name: 'operation',
+          of: 'Operations'
+        },
+        {
+          name: 'after',
+          class: 'Boolean'
+        }
+      ],
+      javaCode: `
       DAO ruleDAO = (DAO) x.get("ruleDAO");
-      List<Rule> rules = ((ArraySink)ruleDAO.where(AND(
-        EQ(Rule.ACTION, Operations.CREATE),
+      GroupBy sink = (GroupBy) ruleDAO.where(AND(
+        EQ(Rule.OPERATION, operation),
         EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, false)
-      )).orderBy(Rule.PRIORITY).select(new ArraySink())).getArray();
-      for ( Rule rule : rules ) {
-        if ( rule.getPredicate().f(obj) ) {
-          rule.getAction().execute(x);
-          if ( rule.getStops() ) {
-            break;
+        EQ(Rule.AFTER, after)
+      )).orderBy(Rule.PRIORITY).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+      for ( Object key : sink.getGroupKeys() ) {
+        List<Rule> groups = ((ArraySink) sink.getGroups().get(key)).getArray();
+        for ( Rule rule : groups ) {
+          if ( rule.getPredicate().f(obj) ) {
+            rule.getAction().applyAction(x, obj);
+            if ( rule.getStops() ) {
+              break;
+            }
           }
         }
       }
-      return getDelegate().put_(x, obj);
       `
-    },
+    }
   ],
   axioms: [
     {
