@@ -318,6 +318,9 @@ var classes = [
   'foam.flow.Document',
   'foam.flow.DocumentationFolderDAO',
 
+  'foam.nanos.ruler.Rule',
+  'foam.nanos.ruler.RuleDAO',
+  'foam.nanos.ruler.Operations',
   'foam.comics.SearchMode',
 
   //Support Files
