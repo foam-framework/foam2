@@ -321,6 +321,7 @@ var classes = [
   'foam.nanos.ruler.Rule',
   'foam.nanos.ruler.RuleDAO',
   'foam.nanos.ruler.Operations',
+  'foam.nanos.ruler.RuleAction',
   'foam.comics.SearchMode',
 
   //Support Files
