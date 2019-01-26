@@ -125,6 +125,8 @@ public class RulerDAOTest extends Test {
     ruleDAO.remove_(x, rule1);
     ruleDAO.remove_(x, rule2);
     ruleDAO.remove_(x, rule3);
+    ruleDAO.remove_(x, rule4);
+    ruleDAO.remove_(x, rule5);
     userDAO.remove_(x, user);
   }
 }
