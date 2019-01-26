@@ -41,15 +41,20 @@
       if ( service == null ) {
         throw new RuntimeException("dao with the name " + getDaoKey() + " was not found");
       }
+
       Operations operation;
       if ( service.find_(x, obj) == null ) {
         operation = Operations.CREATE;
       } else {
         operation = Operations.UPDATE;
       }
+
       applyRules(x, obj, operation, false);
+
       FObject ret =  getDelegate().put_(x, obj);
+
       applyRules(x, ret, operation, true);
+
       return ret;
       `
     },
@@ -57,12 +62,16 @@
       name: 'remove_',
       javaCode: `
       DAO service = (DAO) x.get(getDaoKey());
+
       if ( service == null ) {
         throw new RuntimeException("dao with the name " + getDaoKey() + " was not found");
       }
       applyRules(x, obj, Operations.REMOVE, false);
+
       FObject ret =  getDelegate().put_(x, obj);
+
       applyRules(x, ret, Operations.REMOVE, true);
+
       return ret;
       `
     },
@@ -88,11 +97,13 @@
       ],
       javaCode: `
       DAO ruleDAO = (DAO) x.get("ruleDAO");
+
       GroupBy sink = (GroupBy) ruleDAO.where(AND(
         EQ(Rule.OPERATION, operation),
         EQ(Rule.DAO_KEY, getDaoKey()),
         EQ(Rule.AFTER, after)
       )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+
       for ( Object key : sink.getGroupKeys() ) {
         List<Rule> groups = ((ArraySink) sink.getGroups().get(key)).getArray();
         for ( Rule rule : groups ) {
