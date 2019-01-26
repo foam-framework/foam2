@@ -9,7 +9,9 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.auth.User',
     'java.util.List',
-    'net.nanopay.account.DigitalAccount'
+    'net.nanopay.account.DigitalAccount',
+    'foam.core.X',
+    'foam.core.FObject'
   ],
 
   properties: [
@@ -32,12 +34,20 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
-      name: 'predicate'
+      name: 'predicate',
+      javaFactory: `
+      return foam.mlang.MLang.EQ(true, true);
+      `
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.ruler.RuleAction',
-      name: 'action'
+      name: 'action',
+      javaFactory: `
+      return new RuleAction() {
+        @Override
+        public void applyAction(X x, FObject obj) {}
+      };`
     },
     {
       class: 'Int',
