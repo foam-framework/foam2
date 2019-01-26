@@ -36,7 +36,7 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.core.ContextAgent',
+      of: 'foam.nanos.ruler.RuleAction',
       name: 'action'
     },
     {
@@ -48,11 +48,11 @@ foam.CLASS({
       of: 'foam.nanos.boot.NSpec',
       name: 'daoKey'
     },
-    // {
-    //   class: 'Enum',
-    //   of: 'foam.nanos.ruler.Operations',
-    //   name: 'operation'
-    // },
+    {
+      class: 'Enum',
+      of: 'foam.nanos.ruler.Operations',
+      name: 'operation'
+    },
     {
       class: 'Boolean',
       name: 'after'
