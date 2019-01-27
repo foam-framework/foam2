@@ -42,17 +42,38 @@
         throw new RuntimeException("dao with the name " + getDaoKey() + " was not found");
       }
 
+      DAO ruleDAO = (DAO) x.get("ruleDAO");
+
       Operations operation;
       if ( service.find_(x, obj) == null ) {
         operation = Operations.CREATE;
       } else {
         operation = Operations.UPDATE;
       }
-      applyRules(x, obj, operation, false);
+
+      GroupBy sinkBefore = (GroupBy) ruleDAO.where(AND(
+        OR(
+          EQ(Rule.OPERATION, operation),
+          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+        ),
+        EQ(Rule.DAO_KEY, getDaoKey()),
+        EQ(Rule.AFTER, false)
+      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+
+      applyRules(x, obj, sinkBefore);
 
       FObject ret =  getDelegate().put_(x, obj);
 
-      applyRules(x, ret, operation, true);
+      GroupBy sinkAfter = (GroupBy) ruleDAO.where(AND(
+        OR(
+          EQ(Rule.OPERATION, operation),
+          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+        ),
+        EQ(Rule.DAO_KEY, getDaoKey()),
+        EQ(Rule.AFTER, true)
+      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+
+      applyRules(x, ret, sinkAfter);
       return ret;
       `
     },
@@ -60,15 +81,29 @@
       name: 'remove_',
       javaCode: `
       DAO service = (DAO) x.get(getDaoKey());
-
       if ( service == null ) {
         throw new RuntimeException("dao with the name " + getDaoKey() + " was not found");
       }
-      applyRules(x, obj, Operations.REMOVE, false);
+
+      DAO ruleDAO = (DAO) x.get("ruleDAO");
+
+      GroupBy sinkBefore = (GroupBy) ruleDAO.where(AND(
+        EQ(Rule.OPERATION, Operations.REMOVE),
+        EQ(Rule.DAO_KEY, getDaoKey()),
+        EQ(Rule.AFTER, false)
+      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+
+      applyRules(x, obj, sinkBefore);
 
       FObject ret =  getDelegate().put_(x, obj);
 
-      applyRules(x, ret, Operations.REMOVE, true);
+      GroupBy sinkAfter = (GroupBy) ruleDAO.where(AND(
+        EQ(Rule.OPERATION, Operations.REMOVE),
+        EQ(Rule.DAO_KEY, getDaoKey()),
+        EQ(Rule.AFTER, true)
+      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+
+      applyRules(x, ret, sinkAfter);
       return ret;
       `
     },
@@ -84,23 +119,11 @@
           of: 'foam.core.FObject'
         },
         {
-          name: 'operation',
-          of: 'Operations'
-        },
-        {
-          name: 'after',
-          class: 'Boolean'
+          name: 'sink',
+          of: 'GroupBy'
         }
       ],
       javaCode: `
-      DAO ruleDAO = (DAO) x.get("ruleDAO");
-
-      GroupBy sink = (GroupBy) ruleDAO.where(AND(
-        EQ(Rule.OPERATION, operation),
-        EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, after)
-      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-
       for ( Object key : sink.getGroupKeys() ) {
         List<Rule> groups = ((ArraySink) sink.getGroups().get(key)).getArray();
         for ( Rule rule : groups ) {
