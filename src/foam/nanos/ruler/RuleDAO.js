@@ -15,13 +15,13 @@
   `,
 
   javaImports: [
-    'foam.mlang.order.Desc',
-    'foam.dao.DAO',
-    'static foam.mlang.MLang.*',
-    'java.util.List',
+    'foam.core.FObject',
     'foam.dao.ArraySink',
+    'foam.dao.DAO',
+    'foam.mlang.order.Desc',
     'foam.mlang.sink.GroupBy',
-    'foam.core.FObject'
+    'java.util.List',
+    'static foam.mlang.MLang.*'
   ],
 
   properties: [

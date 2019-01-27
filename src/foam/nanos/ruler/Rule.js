@@ -11,13 +11,8 @@
   documentation: 'Rule model represents rules(actions) that need to be applied in case passed object satisfies provided predicate.',
 
   javaImports: [
-    'foam.dao.ArraySink',
-    'foam.dao.DAO',
-    'foam.nanos.auth.User',
-    'java.util.List',
-    'net.nanopay.account.DigitalAccount',
-    'foam.core.X',
-    'foam.core.FObject'
+    'foam.core.FObject',
+    'foam.core.X'
   ],
 
   properties: [
