@@ -29,7 +29,7 @@
     {
       class: 'String',
       name: 'daoKey',
-      documentation: 'the dao name that rule need to be applied against.'
+      documentation: 'The dao name that rule needs to be applied on.'
     }
   ],
 
@@ -48,13 +48,11 @@
       } else {
         operation = Operations.UPDATE;
       }
-
       applyRules(x, obj, operation, false);
 
       FObject ret =  getDelegate().put_(x, obj);
 
       applyRules(x, ret, operation, true);
-
       return ret;
       `
     },
