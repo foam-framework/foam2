@@ -52,7 +52,7 @@
       of: 'foam.mlang.predicate.Predicate',
       name: 'predicate',
       javaFactory: `
-      return foam.mlang.MLang.EQ(true, true);
+      return foam.mlang.MLang.TRUE;
       `,
       documentation: 'predicate is checked against an object; if returns true, the action is executed.'+
       'Deafaults to return true.'
@@ -72,7 +72,18 @@
       class: 'Reference',
       of: 'foam.nanos.boot.NSpec',
       name: 'daoKey',
-      documentation: 'dao name that the rule is applied on.'
+      documentation: 'dao name that the rule is applied on.',
+      view: function(_, X) {
+        var E = foam.mlang.Expressions.create();
+        return foam.u2.view.ChoiceView.create({
+          dao: X.nSpecDAO
+            .where(E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO'))
+            .orderBy(foam.nanos.boot.NSpec.ID),
+          objToChoice: function(nspec) {
+            return [nspec.id, nspec.id];
+          }
+        });
+      }
     },
     {
       class: 'Enum',

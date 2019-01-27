@@ -24,6 +24,11 @@ foam.ENUM({
       name: 'REMOVE',
       label: 'Remove',
       documentation: 'Operation applied on dao.remove.'
+    },
+    {
+      name: 'CREATE_OR_UPDATE',
+      label: 'Create/Update',
+      documentation: 'Operation applied on dao.put'
     }
   ]
 });
