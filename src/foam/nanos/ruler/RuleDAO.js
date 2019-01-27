@@ -42,9 +42,7 @@
       if ( service == null ) {
         throw new RuntimeException("dao with the name " + getDaoKey() + " was not found");
       }
-
-      DAO ruleDAO = (DAO) x.get("ruleDAO");
-
+      
       Operations operation;
       if ( service.find_(x, obj) == null ) {
         operation = Operations.CREATE;
