@@ -12,6 +12,7 @@
   documentation: `
     RuleDAO selects all the rules that can be applied to specific dao depending on type of operation(create/update/remove). Selected rules are applied
     in the order specified in rule.priority until all are executed or until one of the rules forces execution to stop.
+    See RulerDAOTest for examples. 
   `,
 
   javaImports: [
@@ -26,10 +27,9 @@
 
   properties: [
     {
-      class: 'Reference',
-      of: 'foam.nanos.boot.NSpec',
+      class: 'String',
       name: 'daoKey',
-      documentation: 'the dao name that rules need to be applied against.'
+      documentation: 'the dao name that rule need to be applied against.'
     }
   ],
 
@@ -71,7 +71,6 @@
       FObject ret =  getDelegate().put_(x, obj);
 
       applyRules(x, ret, Operations.REMOVE, true);
-
       return ret;
       `
     },
