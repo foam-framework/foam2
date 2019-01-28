@@ -312,7 +312,6 @@ return delegate;
       generateJava: false
     },
     {
-      /** Destination address for server. */
       name: 'retryBoxMaxAttempts',
       generateJava: false,
     },
