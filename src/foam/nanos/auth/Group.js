@@ -119,6 +119,10 @@ foam.CLASS({
       value: null
     },
     {
+      class: 'Long',
+      name: 'softSessionLimit'
+    },
+    {
       class: 'String',
       name: 'supportEmail'
     }
