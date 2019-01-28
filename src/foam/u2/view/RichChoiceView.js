@@ -302,6 +302,12 @@ foam.CLASS({
             });
           }))
         .end();
+    },
+
+    function updateMode_(mode) {
+      if ( mode !== foam.u2.DisplayMode.RW ) {
+        this.isOpen_ = false;
+      }
     }
   ],
 

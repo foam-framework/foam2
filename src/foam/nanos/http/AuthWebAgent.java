@@ -103,7 +103,6 @@ public class AuthWebAgent
         req.getParameter("sessionId") : ( cookie != null ) ?
         cookie.getValue() : null;
 
-
     // this is one function - can we spin it off?
 
     if ( ! SafetyUtil.isEmpty(sessionId) ) {
@@ -112,6 +111,8 @@ public class AuthWebAgent
         // create new session
         session = new Session();
         session.setId(sessionId);
+        session.setRemoteHost(req.getRemoteHost());
+        sessionDAO.put(session);
       }
 
       // save cookie
@@ -122,7 +123,9 @@ public class AuthWebAgent
     } else {
       // create new cookie
       session = new Session();
+      session.setRemoteHost(req.getRemoteHost());
       createCookie(x, session);
+      sessionDAO.put(session);
     }
 
     X sessionX =  session.getContext()
@@ -194,17 +197,16 @@ public class AuthWebAgent
               sessionX = sessionX.put("agent", user).put("user", entity);
             }
           }
-          return sessionX;
+        return sessionX;
+        }
+        // user should not be null, any login failure should throw an Exception
+        logger.error("AuthService.loginByEmail returned null user and did not throw AuthenticationException.");
+        // TODO: generate stack trace.
+        if ( ! SafetyUtil.isEmpty(authHeader) ) {
+          resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } else {
-          // user should not be null, any login failure should throw an Exception
-          logger.error("AuthService.loginByEmail returned null user and did not throw AuthenticationException.");
-          // TODO: generate stack trace.
-          if ( ! SafetyUtil.isEmpty(authHeader) ) {
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-          } else {
-            PrintWriter out = x.get(PrintWriter.class);
-            out.println("Authentication failure.");
-          }
+          PrintWriter out = x.get(PrintWriter.class);
+          out.println("Authentication failure.");
         }
       } catch ( AuthenticationException e ) {
         if ( ! SafetyUtil.isEmpty(authHeader) ) {

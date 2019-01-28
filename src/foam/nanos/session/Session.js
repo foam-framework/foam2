@@ -31,6 +31,7 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'created',
+      factory: function() { return new Date(); },
       javaFactory: 'return new Date();'
     },
     {
@@ -57,6 +58,30 @@ foam.CLASS({
       javaFactory: 'return foam.core.EmptyX.instance().put(Session.class, this);',
       hidden: true,
       transient: true
+    }
+  ],
+
+  methods: [
+    // Disable cloneing and freezing so that Sessions can be mutated while
+    // in the SessionDAO.
+    {
+      name: 'fclone',
+      javaReturns: 'foam.core.FObject',
+      javaCode: 'return this;'
+    },
+    {
+      name: 'freeze',
+      javaCode: ' //nop '
+    },
+    {
+      name: 'touch',
+      documentation: 'Called when session used to track usage statistics.',
+      javaCode: `
+        synchronized ( this ) {
+          setLastUsed(new Date());
+          setUses(getUses()+1);
+        }
+      `
     }
   ]
 });
