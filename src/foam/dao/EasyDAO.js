@@ -313,16 +313,25 @@ return delegate;
     },
     {
       /** Destination address for server. */
+      name: 'retryBoxMaxAttempts',
+      generateJava: false,
+    },
+    {
+      /** Destination address for server. */
       name: 'serverBox',
       generateJava: false,
       factory: function() {
         // TODO: This should come from the server via a lookup from a NamedBox.
-        return this.SessionClientBox.create({ delegate: this.RetryBox.create({ delegate:
-          this.TimeoutBox.create({ delegate:
-          this.remoteListenerSupport ?
-              this.WebSocketBox.create({ uri: this.serviceName }) :
-              this.HTTPBox.create({ url: this.serviceName })
-        })})});
+        return this.SessionClientBox.create({
+          delegate: this.RetryBox.create({
+            maxAttempts: this.retryBoxMaxAttempts,
+            delegate: this.TimeoutBox.create({
+              delegate: this.remoteListenerSupport ?
+                this.WebSocketBox.create({ uri: this.serviceName }) :
+                this.HTTPBox.create({ url: this.serviceName })
+            })
+          })
+        });
       }
     },
     {
