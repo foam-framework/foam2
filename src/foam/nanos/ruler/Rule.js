@@ -55,7 +55,7 @@
       return foam.mlang.MLang.TRUE;
       `,
       documentation: 'predicate is checked against an object; if returns true, the action is executed.'+
-      'Deafaults to return true.'
+      'Defaults to return true.'
     },
     {
       class: 'FObjectProperty',
@@ -64,9 +64,9 @@
       javaFactory: `
       return new RuleAction() {
         @Override
-        public void applyAction(X x, FObject obj) {}
+        public void applyAction(X x, FObject obj, FObject oldObj) {}
       };`,
-      documentation: 'The action to be executed if predicates reutns true for passed object.'
+      documentation: 'The action to be executed if predicates returns true for passed object.'
     },
     {
       class: 'Reference',
@@ -89,7 +89,7 @@
       class: 'Enum',
       of: 'foam.nanos.ruler.Operations',
       name: 'operation',
-      documentation: 'Defines when the rules is to be applied: UPDATE(put), CREATE(put), REMOVE(remove)'
+      documentation: 'Defines when the rules is to be applied: put/removed'
     },
     {
       class: 'Boolean',

@@ -6,11 +6,11 @@
 
  foam.CLASS({
   package: 'foam.nanos.ruler',
-  name: 'RuleDAO',
+  name: 'RulerDAO',
   extends: 'foam.dao.ProxyDAO',
 
   documentation: `
-    RuleDAO selects all the rules that can be applied to specific dao depending on type of operation(create/update/remove). Selected rules are applied
+    RulerDAO selects all the rules that can be applied to specific dao depending on type of operation(create/update/remove). Selected rules are applied
     in the order specified in rule.priority until all are executed or until one of the rules forces execution to stop.
     See RulerDAOTest for examples. 
   `,
@@ -38,13 +38,9 @@
     {
       name: 'put_',
       javaCode: `
-      DAO service = (DAO) x.get(getDaoKey());
-      if ( service == null ) {
-        throw new RuntimeException("dao with the name " + getDaoKey() + " was not found");
-      }
-      
+      FObject oldObj = getDelegate().find_(x, obj);
       Operations operation;
-      if ( service.find_(x, obj) == null ) {
+      if ( oldObj == null ) {
         operation = Operations.CREATE;
       } else {
         operation = Operations.UPDATE;
@@ -59,7 +55,7 @@
         EQ(Rule.AFTER, false)
       );
 
-      applyRules(x, obj, before);
+      applyRules(x, obj, oldObj, before);
 
       FObject ret =  getDelegate().put_(x, obj);
 
@@ -72,25 +68,21 @@
         EQ(Rule.AFTER, true)
       );
 
-      applyRules(x, ret, after);
+      applyRules(x, ret, oldObj, after);
       return ret;
       `
     },
     {
       name: 'remove_',
       javaCode: `
-      DAO service = (DAO) x.get(getDaoKey());
-      if ( service == null ) {
-        throw new RuntimeException("dao with the name " + getDaoKey() + " was not found");
-      }
-
+      FObject oldObj = getDelegate().find_(x, obj);
       Predicate before = AND(
         EQ(Rule.OPERATION, Operations.REMOVE),
         EQ(Rule.DAO_KEY, getDaoKey()),
         EQ(Rule.AFTER, false)
       );
 
-      applyRules(x, obj, before);
+      applyRules(x, obj, oldObj, before);
 
       FObject ret =  getDelegate().put_(x, obj);
 
@@ -100,7 +92,7 @@
         EQ(Rule.AFTER, true)
       );
 
-      applyRules(x, ret, after);
+      applyRules(x, ret, oldObj, after);
       return ret;
       `
     },
@@ -113,6 +105,10 @@
         },
         {
           name: 'obj',
+          of: 'foam.core.FObject'
+        },
+        {
+          name: 'oldObj',
           of: 'foam.core.FObject'
         },
         {
@@ -130,7 +126,7 @@
         List<Rule> groups = ((ArraySink) sink.getGroups().get(key)).getArray();
         for ( Rule rule : groups ) {
           if ( rule.getPredicate().f(obj) ) {
-            rule.getAction().applyAction(x, obj);
+            rule.getAction().applyAction(x, obj, oldObj);
             if ( rule.getStops() ) {
               break;
             }
@@ -140,12 +136,13 @@
       `
     }
   ],
+
   axioms: [
     {
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
-         public RuleDAO(foam.core.X x, foam.dao.DAO delegate, String serviceName) {
+         public RulerDAO(foam.core.X x, foam.dao.DAO delegate, String serviceName) {
            setX(x);
            setDelegate(delegate);
            setDaoKey(serviceName);

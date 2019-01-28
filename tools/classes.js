@@ -320,7 +320,7 @@ var classes = [
   'foam.flow.DocumentationFolderDAO',
 
   'foam.nanos.ruler.Rule',
-  'foam.nanos.ruler.RuleDAO',
+  'foam.nanos.ruler.RulerDAO',
   'foam.nanos.ruler.Operations',
   'foam.nanos.ruler.RuleAction',
   'foam.comics.SearchMode',
