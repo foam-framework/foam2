@@ -80,6 +80,7 @@ foam.CLASS({
           .start(this.DATA_TYPE).end()
           .start().addClass('label').add('Response').end()
           .start(this.NOTE).addClass('input-box').addClass('note').end()
+          .start(this.DOWNLOAD_CSV).addClass('blue-button').addClass('btn').end()
           .start(this.CONVERT).addClass('blue-button').addClass('btn').end()
         .end()
       .endContext();
@@ -96,6 +97,28 @@ foam.CLASS({
       } else {
         this.note = await exportDriver.exportFObject(this.__context__, this.exportObj);
       }
+    },
+
+    async function downloadCSV() {
+      var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
+      exportDriver = foam.lookup(exportDriver.driverName).create();
+
+      this.downloadCSV(this.exportData, exportDriver);
+    }
+  ],
+
+  listeners: [
+    function downloadCSV(data, exportDriver) {
+      exportDriver.exportDAO(this.__context__, this.exportData)
+      .then(function(result) {
+        result = 'data:text/csv;charset=utf-8,' + result;
+        var encodedUri = encodeURI(result);
+        var link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', 'data.csv');
+        document.body.appendChild(link);
+        link.click();
+      });
     }
   ]
 });
