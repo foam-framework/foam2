@@ -199,10 +199,11 @@ if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
     if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
       configUrl = group.getUrl();
     }
-    if ( ! SafetyUtil.isEmpty(group.getSupportEmail()) ) {
-      config.setSupportEmail(group.getSupportEmail());
-    }
   }
+}
+
+if ( ! SafetyUtil.isEmpty(group.getSupportEmail()) ) {
+  config.setSupportEmail(group.getSupportEmail());
 }
 
 if ( config.getForceHttps() ) {
