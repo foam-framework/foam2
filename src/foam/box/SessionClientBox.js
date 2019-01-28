@@ -14,7 +14,9 @@ foam.CLASS({
   ],
 
   imports: [
-    'requestLogin'
+    'requestLogin',
+    'sessionTimer',
+    'group'
   ],
 
   properties: [
@@ -32,6 +34,11 @@ foam.CLASS({
             self.clientBox.send(self.msg);
           });
         } else {
+
+          if ( this.group.id !== "" && this.group.softSessionLimit !== 0 ) {
+            this.sessionTimer.startTimer(this.group.softSessionLimit);
+          }
+
           this.delegate.send(msg);
         }
       }
