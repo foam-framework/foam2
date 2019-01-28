@@ -68,6 +68,10 @@ foam.CLASS({
       class: 'Boolean',
       name: 'forceHttps',
       value: false
+    },
+    {
+      class: 'String',
+      name: 'supportEmail'
     }
   ]
 });
