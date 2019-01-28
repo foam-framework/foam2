@@ -130,7 +130,7 @@ public class AuthWebAgent
       .put(HttpServletResponse.class, resp);
 
     if ( ! attemptLogin ) {
-      return sessionX; // does this make sense?
+      return sessionX;
     }
 
     // Support for Basic HTTP Authentication
