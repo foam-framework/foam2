@@ -93,7 +93,7 @@ public class Boot {
     user.setFirstName("system");
     user.setGroup("system");
 
-    Session session = new Session();
+    Session session = new Session(getX());
     session.setUserId(user.getId());
     session.setContext(root_);
 

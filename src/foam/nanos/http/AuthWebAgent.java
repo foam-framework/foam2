@@ -109,7 +109,7 @@ public class AuthWebAgent
       session = (Session) sessionDAO.find(sessionId);
       if ( session == null ) {
         // create new session
-        session = new Session();
+        session = new Session(x);
         session.setId(sessionId);
         session.setRemoteHost(req.getRemoteHost());
         sessionDAO.put(session);
@@ -122,7 +122,7 @@ public class AuthWebAgent
       }
     } else {
       // create new cookie
-      session = new Session();
+      session = new Session(x);
       session.setRemoteHost(req.getRemoteHost());
       createCookie(x, session);
       sessionDAO.put(session);

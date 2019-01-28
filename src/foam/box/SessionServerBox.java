@@ -42,7 +42,7 @@ public class SessionServerBox
         Session            session    = (Session)     sessionDAO.find(sessionID);
 
         if ( session == null ) {
-          session = new Session();
+          session = new Session(getX());
           session.setId(sessionID);
           session.setRemoteHost(req.getRemoteHost());
           session.setContext(getX().put(Session.class, session));
