@@ -15,7 +15,7 @@ public class RulerDAOTest extends Test {
 
   public void runTest(X x) {
     ruleDAO = ((DAO) x.get("ruleDAO"));
-    userDAO = new RuleDAO(x, (DAO)x.get("localUserDAO"), "localUserDAO");
+    userDAO = new RulerDAO(x, (DAO)x.get("localUserDAO"), "localUserDAO");
     x = x.put(userDAO, "localUserDAO");
     createRule(x);
     testUsers(x);
@@ -42,7 +42,6 @@ public class RulerDAOTest extends Test {
     rule1 = new Rule();
     rule1.setName("userDAO email filter");
     rule1.setRuleGroup("users:email filter");
-    rule1.setDocumentation("test rule on userDAO, prevents execution of rules with lower priority on object creation");
     rule1.setDaoKey("localUserDAO");
     rule1.setOperation(Operations.CREATE);
     rule1.setAfter(false);
@@ -54,7 +53,6 @@ public class RulerDAOTest extends Test {
     rule2 = new Rule();
     rule2.setName("userDAO email filter");
     rule2.setRuleGroup("users:email filter");
-    rule2.setDocumentation("test rule on userDAO, changes email 'nanos@nanos.net' to 'foam@nanos.net', stops execution of other rules");
     rule2.setDaoKey("localUserDAO");
     rule2.setOperation(Operations.CREATE);
     rule2.setAfter(false);
@@ -64,7 +62,7 @@ public class RulerDAOTest extends Test {
       foam.mlang.MLang.INSTANCE_OF(foam.nanos.auth.User.class)
     );
     rule2.setPredicate(predicate2);
-    RuleAction action2 = (x1, obj) -> {
+    RuleAction action2 = (x1, obj, oldObj) -> {
       User user = (User) obj;
       user.setEmail("foam@nanos.net");
     };
@@ -75,12 +73,11 @@ public class RulerDAOTest extends Test {
     rule3 = new Rule();
     rule3.setName("userDAO email filter");
     rule3.setRuleGroup("users:email filter");
-    rule3.setDocumentation("test rule on userDAO, changes email 'nanos@nanos.net' to 'foam@nanos.net', stops execution of other rules");
     rule3.setDaoKey("localUserDAO");
     rule3.setOperation(Operations.CREATE);
     rule3.setAfter(false);
     rule3.setPriority(20);
-    RuleAction action3 = (x1, obj) -> {
+    RuleAction action3 = (x1, obj, oldObj) -> {
       throw new RuntimeException("this rule is not supposed to be executed");
     };
     rule3.setAction(action3);
@@ -90,14 +87,13 @@ public class RulerDAOTest extends Test {
     rule4 = new Rule();
     rule4.setName("userDAO lastName filter");
     rule4.setRuleGroup("users:change lastName");
-    rule4.setDocumentation("test rule on userDAO, changes email 'nanos@nanos.net' to 'foam@nanos.net', stops execution of other rules");
-    rule4.setDaoKey("localUserDAO");
+   rule4.setDaoKey("localUserDAO");
     rule4.setOperation(Operations.CREATE);
     rule4.setAfter(false);
     rule4.setPriority(10);
     Predicate predicate4 = foam.mlang.MLang.INSTANCE_OF(foam.nanos.auth.User.class);
     rule4.setPredicate(predicate4);
-    RuleAction action4 = (x1, obj) -> {
+    RuleAction action4 = (x1, obj, oldObj) -> {
       User user = (User) obj;
       user.setLastName("Smirnova");
     };
@@ -108,13 +104,12 @@ public class RulerDAOTest extends Test {
     rule5 = new Rule();
     rule5.setName("userDAO lastName filter");
     rule5.setRuleGroup("users:change lastName");
-    rule5.setDocumentation("test rule on userDAO, changes email 'nanos@nanos.net' to 'foam@nanos.net', stops execution of other rules");
-    rule5.setDaoKey("localUserDAO");
+   rule5.setDaoKey("localUserDAO");
     rule5.setOperation(Operations.UPDATE);
     rule5.setAfter(false);
     Predicate predicate5 = foam.mlang.MLang.INSTANCE_OF(foam.nanos.auth.User.class);
     rule5.setPredicate(predicate5);
-    RuleAction action5 = (x1, obj) -> {
+    RuleAction action5 = (x1, obj, oldObj) -> {
       User user = (User) obj;
       user.setLastName("Unknown");
     };
