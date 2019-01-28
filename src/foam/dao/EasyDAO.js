@@ -321,16 +321,18 @@ return delegate;
       generateJava: false,
       factory: function() {
         // TODO: This should come from the server via a lookup from a NamedBox.
-        return this.SessionClientBox.create({
-          delegate: this.RetryBox.create({
+        var box = this.TimeoutBox.create({
+          delegate: this.remoteListenerSupport ?
+            this.WebSocketBox.create({ uri: this.serviceName }) :
+            this.HTTPBox.create({ url: this.serviceName })
+        })
+        if ( this.retryBoxMaxAttempts != 0 ) {
+          box = this.RetryBox.create({
             maxAttempts: this.retryBoxMaxAttempts,
-            delegate: this.TimeoutBox.create({
-              delegate: this.remoteListenerSupport ?
-                this.WebSocketBox.create({ uri: this.serviceName }) :
-                this.HTTPBox.create({ url: this.serviceName })
-            })
+            delegate: box,
           })
-        });
+        }
+        return this.SessionClientBox.create({ delegate: box });
       }
     },
     {
