@@ -124,14 +124,10 @@ foam.CLASS({
       name: 'replyTo',
       value: null
     },
-/*    {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.app.AppConfig',
-      name: 'appConfig',
-      factory: function() { return this.AppConfig.create(); },
-      documentation: 'Custom application configuration for group.'
+    {
+      class: 'String',
+      name: 'supportEmail'
     }
-*/
     /*
       FUTURE
     {
@@ -208,6 +204,9 @@ if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
     Group group = (Group) groupDAO.find(user.getGroup());
     if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
       configUrl = group.getUrl();
+    }
+    if ( ! SafetyUtil.isEmpty(group.getSupportEmail()) ) {
+      config.setSupportEmail(group.getSupportEmail());
     }
   }
 }
