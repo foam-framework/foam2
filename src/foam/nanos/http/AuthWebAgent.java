@@ -73,7 +73,10 @@ public class AuthWebAgent
   }
 
   /** If provided, use user and password parameters to login and create session and cookie. **/
-  public Session authenticate(X x) {
+  /** Takes a context, and if provided, use user and password parameters to login and 
+   * create session and cookie in a new context and return it. **/
+  
+  public X authenticate(X x) {
     Logger              logger       = (Logger) x.get("logger");
 
     // context parameters
@@ -93,10 +96,15 @@ public class AuthWebAgent
     Cookie              cookie       = getCookie(req);
     boolean             attemptLogin = ! SafetyUtil.isEmpty(authHeader) || ( ! SafetyUtil.isEmpty(email) && ! SafetyUtil.isEmpty(password) );
 
+    // DAO to do lookup on actAs
+
     // get session id from either query parameters or cookie
     String sessionId = ( ! SafetyUtil.isEmpty(req.getParameter("sessionId")) ) ?
         req.getParameter("sessionId") : ( cookie != null ) ?
         cookie.getValue() : null;
+
+
+    // this is one function - can we spin it off?
 
     if ( ! SafetyUtil.isEmpty(sessionId) ) {
       session = (Session) sessionDAO.find(sessionId);
@@ -109,7 +117,7 @@ public class AuthWebAgent
       // save cookie
       createCookie(x, session);
       if ( ! attemptLogin && session.getContext().get("user") != null ) {
-        return session;
+        return x; // this was return session - fix
       }
     } else {
       // create new cookie
@@ -117,11 +125,17 @@ public class AuthWebAgent
       createCookie(x, session);
     }
 
+    X sessionX =  session.getContext()
+      .put("user", null)
+      // .put(PrintWriter.class, x.get("PrintWriter.class")) // do we need this?
+      .put(HttpServletRequest.class, req)
+      .put(HttpServletResponse.class, resp);
+
+
     if ( ! attemptLogin ) {
-      return null;
+      return sessionX;
     }
 
-    //
     // Support for Basic HTTP Authentication
     // Rudimentary testing: curl --user username:password http://localhost:8080/service/dig?entityId=1234
     //   visually inspect results, on failure you'll see the dig login page.
@@ -151,24 +165,24 @@ public class AuthWebAgent
               logger.warning(e, "Unsupported authentication encoding, expecting Base64.");
               if ( ! SafetyUtil.isEmpty(authHeader) ) {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Supported Authentication Encodings: Base64");
-                return null;
+                return sessionX;
               }
             }
           } else {
             logger.warning("Unsupported authorization type, expecting Basic, received: "+basic);
             if ( ! SafetyUtil.isEmpty(authHeader) ) {
               resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Supported Authorizations: Basic");
-              return null;
+              return sessionX;
             }
           }
         }
       }
 
       try {
-        User user = auth.loginByEmail(session.getContext()
-          .put(HttpServletRequest.class, req)
-          .put(HttpServletResponse.class, resp), email, password);
 
+        // setting user in the context, email, password);
+
+        User user = auth.loginByEmail(sessionX, email,password);
         if ( user != null ) {
           // If user is attempting to, and can act as another entity, set the entity in session context
           if ( ! SafetyUtil.isEmpty(entityId) ) {
@@ -177,10 +191,10 @@ public class AuthWebAgent
             User entity = (User) localUserDAO.find(Long.parseLong(entityId));
             if ( agentService.canActAs(x, user, entity) ) {
               // set agent in session
-              session.setContext(session.getContext().put("entity", entity));
+              sessionX = sessionX.put("agent", user).put("user", entity);
             }
           }
-          return session;
+          return sessionX;
         } else {
           // user should not be null, any login failure should throw an Exception
           logger.error("AuthService.loginByEmail returned null user and did not throw AuthenticationException.");
@@ -204,24 +218,23 @@ public class AuthWebAgent
       logger.error(e);
     }
 
-    return null;
+    return sessionX;
   }
 
   public void execute(X x) {
-    AuthService auth    = (AuthService) x.get("auth");
-    Session     session = authenticate(x);
+    AuthService auth = (AuthService) x.get("auth");
+    // pass x to authenticate, which will return a context with a session, and user and agent set
+    X sessionX = authenticate(x);
 
-    if ( session != null && session.getContext() != null && session.getContext().get("user") != null ) {
-      if ( auth.check(session.getContext(), permission_) ) {
-        if ( session.getContext().get("entity") != null ) {
-          getDelegate().execute(x.put(Session.class, session).put("agent", session.getContext().get("user")).put("user", session.getContext().get("entity")));
-        } else {
-          getDelegate().execute(x.put(Session.class, session).put("user", session.getContext().get("user")));
-        }
+  
+
+    if ( sessionX.get("user") != null ) {
+      if ( auth.check(sessionX, permission_) ) {
+        getDelegate().execute(sessionX);
       } else {
         PrintWriter out = x.get(PrintWriter.class);
         out.println("Access denied. Need permission: " + permission_);
-        ((foam.nanos.logger.Logger)x.get("logger")).debug("Access denied, requires permission:", permission_);
+        ((foam.nanos.logger.Logger) x.get("logger")).debug("Access denied, requires permission:", permission_);
       }
     } else {
       templateLogin(x);
