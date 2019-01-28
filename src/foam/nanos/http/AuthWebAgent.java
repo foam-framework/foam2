@@ -95,44 +95,42 @@ public class AuthWebAgent
     Session             session      = null;
     Cookie              cookie       = getCookie(req);
     boolean             attemptLogin = ! SafetyUtil.isEmpty(authHeader) || ( ! SafetyUtil.isEmpty(email) && ! SafetyUtil.isEmpty(password) );
-
+    
     // get session id from either query parameters or cookie
     String sessionId = ( ! SafetyUtil.isEmpty(req.getParameter("sessionId")) ) ?
         req.getParameter("sessionId") : ( cookie != null ) ?
         cookie.getValue() : null;
 
-    // this is one function - can we spin it off?
-
-    if ( ! SafetyUtil.isEmpty(sessionId) ) {
+    if ( ! SafetyUtil.isEmpty(sessionId) ) {  // we have a sessionID
       session = (Session) sessionDAO.find(sessionId);
-      if ( session == null ) {
-        // create new session
-        session = new Session(x);
+      if ( session == null ) { // if session is not in sessionDAO, create and put one.
+        session = new Session(x); // this session.context is global context with null user
         session.setId(sessionId);
         session.setRemoteHost(req.getRemoteHost());
         sessionDAO.put(session);
       }
 
-      // save cookie
+      // create a cookie and put in resp object
       createCookie(x, session);
+
+      // if there is a user in the session context, and not attempted login, return session contet
       if ( ! attemptLogin && session.getContext().get("user") != null ) {
-        return x; // this was return session - fix
+        return session.getContext();
       }
-    } else {
-      // create new cookie
-      session = new Session(x);
+    } else { // sessionId is empty
+      // create a new session, put in sessionDAO, set a cookie in the response class
+      session = new Session(x); // this session.context is global context with null user
       session.setRemoteHost(req.getRemoteHost());
       createCookie(x, session);
       sessionDAO.put(session);
     }
 
     X sessionX =  session.getContext()
-      .put("user", null)
       .put(HttpServletRequest.class, req)
       .put(HttpServletResponse.class, resp);
 
     if ( ! attemptLogin ) {
-      return sessionX;
+      return sessionX; // does this make sense?
     }
 
     // Support for Basic HTTP Authentication
@@ -168,7 +166,7 @@ public class AuthWebAgent
               }
             }
           } else {
-            logger.warning("Unsupported authorization type, expecting Basic, received: "+basic);
+            logger.warning("Unsupported authorization type, expecting Basic, received: " + basic);
             if ( ! SafetyUtil.isEmpty(authHeader) ) {
               resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Supported Authorizations: Basic");
               return sessionX;
@@ -178,9 +176,8 @@ public class AuthWebAgent
       }
 
       try {
-
         // setting user in the context, email, password);
-        User user = auth.loginByEmail(sessionX, email,password);
+        User user = auth.loginByEmail(sessionX, email, password);
         if ( user != null ) {
           // If user is attempting to, and can act as another entity, set the entity in session context
           if ( ! SafetyUtil.isEmpty(actAs) ) {
@@ -192,7 +189,7 @@ public class AuthWebAgent
               sessionX = sessionX.put("agent", user).put("user", entity);
             }
           }
-        return sessionX;
+          return sessionX;
         }
         // user should not be null, any login failure should throw an Exception
         logger.error("AuthService.loginByEmail returned null user and did not throw AuthenticationException.");
