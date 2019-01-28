@@ -29,6 +29,12 @@ foam.CLASS({
       class: 'String',
       name: 'type'
     },
+    {
+      name: 'isEmpty',
+      expression: function(message) {
+        return ! message || message.length === 0;
+      }
+    },
     'message',
     'data'
   ],
@@ -86,9 +92,7 @@ foam.CLASS({
         img = 'images/checkmark-small-green.svg';
       }
       this
-        .hide(this.message$.map(function(msg) {
-          return msg == '' || msg == undefined;
-        }))
+        .hide(this.isEmpty$)
         .addClass(this.myClass())
         .start().addClass(this.myClass('inner'))
           .enableClass(this.myClass('error-background'), this.type === 'error')
@@ -100,7 +104,7 @@ foam.CLASS({
             .end()
             .start()
               .addClass(this.myClass('message'))
-              .add(this.message)
+              .add(this.message$)
             .end()
           .end()
         .end();
