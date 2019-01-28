@@ -88,15 +88,13 @@ public class AuthWebAgent
     // query parameters
     String              email        = req.getParameter("user");
     String              password     = req.getParameter("password");
-    String              entityId     = req.getParameter("entityId");
+    String              actAs        = req.getParameter("actAs");
     String              authHeader   = req.getHeader("Authorization");
 
     // instance parameters
     Session             session      = null;
     Cookie              cookie       = getCookie(req);
     boolean             attemptLogin = ! SafetyUtil.isEmpty(authHeader) || ( ! SafetyUtil.isEmpty(email) && ! SafetyUtil.isEmpty(password) );
-
-    // DAO to do lookup on actAs
 
     // get session id from either query parameters or cookie
     String sessionId = ( ! SafetyUtil.isEmpty(req.getParameter("sessionId")) ) ?
@@ -130,17 +128,15 @@ public class AuthWebAgent
 
     X sessionX =  session.getContext()
       .put("user", null)
-      // .put(PrintWriter.class, x.get("PrintWriter.class")) // do we need this?
       .put(HttpServletRequest.class, req)
       .put(HttpServletResponse.class, resp);
-
 
     if ( ! attemptLogin ) {
       return sessionX;
     }
 
     // Support for Basic HTTP Authentication
-    // Rudimentary testing: curl --user username:password http://localhost:8080/service/dig?entityId=1234
+    // Rudimentary testing: curl --user username:password http://localhost:8080/service/dig?actAs=1234
     //   visually inspect results, on failure you'll see the dig login page.
     //
     try {
@@ -184,14 +180,13 @@ public class AuthWebAgent
       try {
 
         // setting user in the context, email, password);
-
         User user = auth.loginByEmail(sessionX, email,password);
         if ( user != null ) {
           // If user is attempting to, and can act as another entity, set the entity in session context
-          if ( ! SafetyUtil.isEmpty(entityId) ) {
+          if ( ! SafetyUtil.isEmpty(actAs) ) {
             AgentAuthService agentService = (AgentAuthService) x.get("agentAuth");
             DAO localUserDAO = (DAO) x.get("localUserDAO");
-            User entity = (User) localUserDAO.find(Long.parseLong(entityId));
+            User entity = (User) localUserDAO.find(Long.parseLong(actAs));
             if ( agentService.canActAs(x, user, entity) ) {
               // set agent in session
               sessionX = sessionX.put("agent", user).put("user", entity);
@@ -227,9 +222,6 @@ public class AuthWebAgent
     AuthService auth = (AuthService) x.get("auth");
     // pass x to authenticate, which will return a context with a session, and user and agent set
     X sessionX = authenticate(x);
-
-  
-
     if ( sessionX.get("user") != null ) {
       if ( auth.check(sessionX, permission_) ) {
         getDelegate().execute(sessionX);
