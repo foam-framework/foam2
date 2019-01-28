@@ -114,9 +114,21 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'sortingIcon',
-      documentation: 'HTML entity representing unicode Down-Pointing Triangle',	
-      value: '/foam2/src/foam/u2/images/double-arrow.svg',
+      name: 'restingIcon',
+      documentation: 'Image for grayed out double arrow when table header is not sorting',
+      value: '/foam2/src/foam/u2/images/resting-arrow.svg'
+    },
+    {
+      class: 'String',
+      name: 'ascIcon',
+      documentation: 'Image for table header ascending sorting arrow',
+      value: '/foam2/src/foam/u2/images/up-arrow.svg',
+    },
+    {
+      class: 'String',
+      name: 'descIcon',
+      documentation: 'Image for table header descending sorting arrow',
+      value: '/foam2/src/foam/u2/images/down-arrow.svg',
     },
     {
       name: 'vertMenuIcon',
@@ -185,9 +197,11 @@ foam.CLASS({
                   on('click', function(e) { view.sortBy(column); }).
                   call(column.tableHeaderFormatter, [column]).
                   callIf(column.label != '', function() {
-                    this.start('img')
-                      .attr('src', view.sortingIcon$)
-                    .end();
+                    this.add(' ', this.slot(function(order) {
+                      return column === order ? view.ascIcon :
+                        (view.Desc.isInstance(order) && order.arg1 === column) ? view.descIcon : view.restingIcon;
+                    }, view.order$)).
+                    end();
                   }).
                 end();
               }).
