@@ -579,5 +579,7 @@ FOAM_FILES([
   { name: "foam/dashboard/view/Bar" },
   { name: "foam/dashboard/view/Line" },
   { name: "foam/dashboard/view/DAOTable" },
-  { name: "foam/dashboard/view/Card" }
+  { name: "foam/dashboard/view/Card" },
+  { name: "foam/nanos/ruler/Rule" },
+  { name: "foam/nanos/ruler/Operations" }
 ]);
