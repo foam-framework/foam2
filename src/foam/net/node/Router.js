@@ -19,7 +19,7 @@ foam.INTERFACE({
   package: 'foam.net.node',
   name: 'Router',
   implements: [ 'foam.net.node.Handler' ],
-
+  flags: ['node'],
   methods: [
     {
       name: 'addRoute',

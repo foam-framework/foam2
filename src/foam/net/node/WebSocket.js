@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.net.node',
   name: 'WebSocket',
-
+  flags: ['node'],
   requires: [
     'foam.json.Outputter',
     'foam.net.node.Frame'

@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'foam.net.node',
   name: 'CacheHandler',
   extends: 'foam.net.node.BaseHandler',
-
+  flags: ['node'],
   documentation: `Handler decorator that caches responses.`,
 
   requires: [

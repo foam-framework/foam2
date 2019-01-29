@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.net.node',
   name: 'SocketService',
-
+  flags: ['node'],
   requires: [
     'foam.box.Message',
     'foam.box.RawSocketBox',
