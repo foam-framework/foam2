@@ -21,6 +21,12 @@
        class: 'String',
        name: 'description',
        documentation: 'Description of the Blacklist'
+     },
+     {
+       class: 'Enum',
+       of: 'foam.nanos.auth.BlacklistEntityType',
+       name: 'entityType',
+       documentation: 'Entity type to distinguish Object'
      }
    ]
  });

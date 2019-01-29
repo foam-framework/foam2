@@ -51,12 +51,6 @@ foam.CLASS({
       name: 'permissions',
       documentation: 'Permissions set on group.'
     },
-    {
-      class: 'Boolean',
-      name: 'isBlacklist',
-      value: false,
-      documentation: 'Flag to check if group is blacklisted.'
-    },
     // {
     //   class: 'StringArray',
     //   of: 'foam.nanos.auth.Permission',
