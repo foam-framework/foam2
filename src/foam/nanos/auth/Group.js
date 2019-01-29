@@ -119,6 +119,19 @@ foam.CLASS({
       value: null
     },
     {
+      class: 'Long',
+      name: 'softSessionLimit',
+      documentation: `
+        Users will be asked for providing a feedback once the soft session limit has been reached.
+        If the user doesn't provide any feedback, system will force the user logout.
+        
+        The unit is milliseconds, so if you want to set the time limit to 10 mins, the value would be:
+          600000 = 1000 * 60 * 10.
+        
+        Set the value to 0 to turn off this feature.
+      `
+    },
+    {
       class: 'String',
       name: 'supportEmail'
     }
