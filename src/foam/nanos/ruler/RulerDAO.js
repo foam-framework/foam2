@@ -23,7 +23,8 @@
     'foam.mlang.predicate.Predicate',
     'foam.mlang.sink.GroupBy',
     'java.util.List',
-    'static foam.mlang.MLang.*'
+    'static foam.mlang.MLang.*',
+    'foam.dao.Sink'
   ],
 
   properties: [
@@ -31,6 +32,36 @@
       class: 'String',
       name: 'daoKey',
       documentation: 'The dao name that rule needs to be applied on.'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.sink.GroupBy',
+      name: 'createBefore'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.sink.GroupBy',
+      name: 'createAfter'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.sink.GroupBy',
+      name: 'updateBefore'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.sink.GroupBy',
+      name: 'updateAfter'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.sink.GroupBy',
+      name: 'removeBefore'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.sink.GroupBy',
+      name: 'removeAfter'
     }
   ],
 
@@ -39,36 +70,19 @@
       name: 'put_',
       javaCode: `
       FObject oldObj = getDelegate().find_(x, obj);
-      Operations operation;
       if ( oldObj == null ) {
-        operation = Operations.CREATE;
+        applyRules(x, obj, oldObj, getCreateBefore());
       } else {
-        operation = Operations.UPDATE;
+        applyRules(x, obj, oldObj, getUpdateBefore());
       }
-
-      Predicate before = AND(
-        OR(
-          EQ(Rule.OPERATION, operation),
-          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
-        ),
-        EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, false)
-      );
-
-      applyRules(x, obj, oldObj, before);
 
       FObject ret =  getDelegate().put_(x, obj);
 
-      Predicate after = AND(
-        OR(
-          EQ(Rule.OPERATION, operation),
-          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
-        ),
-        EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, true)
-      );
-
-      applyRules(x, ret, oldObj, after);
+      if ( oldObj == null ) {
+        applyRules(x, obj, oldObj, getCreateAfter());
+      } else {
+        applyRules(x, obj, oldObj, getUpdateAfter());
+      }
       return ret;
       `
     },
@@ -76,23 +90,11 @@
       name: 'remove_',
       javaCode: `
       FObject oldObj = getDelegate().find_(x, obj);
-      Predicate before = AND(
-        EQ(Rule.OPERATION, Operations.REMOVE),
-        EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, false)
-      );
-
-      applyRules(x, obj, oldObj, before);
+      applyRules(x, obj, oldObj, getRemoveBefore());
 
       FObject ret =  getDelegate().put_(x, obj);
 
-      Predicate after = AND(
-        EQ(Rule.OPERATION, Operations.REMOVE),
-        EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, true)
-      );
-
-      applyRules(x, ret, oldObj, after);
+      applyRules(x, ret, oldObj, getRemoveAfter());
       return ret;
       `
     },
@@ -112,15 +114,11 @@
           of: 'foam.core.FObject'
         },
         {
-          name: 'predicate',
-          of: 'Predicate'
+          name: 'sink',
+          of: 'foam.mlang.sink.GroupBy'
         }
       ],
       javaCode: `
-      DAO ruleDAO = (DAO) x.get("ruleDAO");
-
-      GroupBy sink = (GroupBy) ruleDAO.where(predicate)
-      .orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
 
       for ( Object key : sink.getGroupKeys() ) {
         List<Rule> groups = ((ArraySink) sink.getGroups().get(key)).getArray();
@@ -134,6 +132,71 @@
         }
       }
       `
+    },
+    {
+      name: 'updateRules',
+      args: [
+        {
+          name: 'x',
+          of: 'foam.core.X'
+        }
+      ],
+      javaCode: `
+      DAO ruleDAO = (DAO) x.get("ruleDAO");
+      GroupBy createdBefore = (GroupBy) ruleDAO.where(AND(
+        OR(
+          EQ(Rule.OPERATION, Operations.CREATE),
+          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+        ),
+        EQ(Rule.DAO_KEY, getDaoKey()),
+        EQ(Rule.AFTER, false)
+      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+      setCreateBefore(createdBefore);
+
+      GroupBy updatedBefore = (GroupBy) ruleDAO.where(AND(
+        OR(
+          EQ(Rule.OPERATION, Operations.UPDATE),
+          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+        ),
+        EQ(Rule.DAO_KEY, getDaoKey()),
+        EQ(Rule.AFTER, false)
+      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+      setUpdateBefore(updatedBefore);
+
+      GroupBy createdAfter = (GroupBy) ruleDAO.where(AND(
+        OR(
+          EQ(Rule.OPERATION, Operations.CREATE),
+          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+        ),
+        EQ(Rule.DAO_KEY, getDaoKey()),
+        EQ(Rule.AFTER, true)
+      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+      setCreateAfter(createdAfter);
+
+      GroupBy updatedAfter = (GroupBy) ruleDAO.where(AND(
+        OR(
+          EQ(Rule.OPERATION, Operations.CREATE),
+          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+        ),
+        EQ(Rule.DAO_KEY, getDaoKey()),
+        EQ(Rule.AFTER, true)
+      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+      setUpdateAfter(updatedAfter);
+
+      GroupBy removedBefore = (GroupBy) ruleDAO.where(AND(
+        EQ(Rule.OPERATION, Operations.REMOVE),
+        EQ(Rule.DAO_KEY, getDaoKey()),
+        EQ(Rule.AFTER, false)
+      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+      setRemoveBefore(removedBefore);
+
+      GroupBy removedAfter = (GroupBy) ruleDAO.where(AND(
+        EQ(Rule.OPERATION, Operations.REMOVE),
+        EQ(Rule.DAO_KEY, getDaoKey()),
+        EQ(Rule.AFTER, true)
+      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+      setRemoveAfter(removedAfter);
+        `
     }
   ],
 
@@ -146,6 +209,7 @@
            setX(x);
            setDelegate(delegate);
            setDaoKey(serviceName);
+           updateRules(x);
          }
         `);
       }

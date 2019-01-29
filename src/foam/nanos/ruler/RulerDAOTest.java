@@ -15,9 +15,9 @@ public class RulerDAOTest extends Test {
 
   public void runTest(X x) {
     ruleDAO = ((DAO) x.get("ruleDAO"));
+    createRule(x);
     userDAO = new RulerDAO(x, (DAO)x.get("localUserDAO"), "localUserDAO");
     x = x.put(userDAO, "localUserDAO");
-    createRule(x);
     testUsers(x);
     removeData(x);
   }
