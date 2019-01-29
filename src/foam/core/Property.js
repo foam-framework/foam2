@@ -534,8 +534,10 @@ foam.CLASS({
           // If this is the result of a factory setting the initial value,
           // then don't fire a property change event, since it hasn't
           // really changed.
-          if ( ! factory || oldValue !== undefined )
+          if ( ! factory || oldValue !== undefined ) {
+            if ( prop.final ) prop.visibility = 'RO';
             this.pubPropertyChange_(prop, oldValue, newValue);
+          }
 
           // FUTURE: pub to a global topic to support dynamic()
 
