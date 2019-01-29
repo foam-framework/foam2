@@ -31,6 +31,36 @@
       class: 'String',
       name: 'daoKey',
       documentation: 'The dao name that rule needs to be applied on.'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'createBefore'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'createAfter'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'updateBefore'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'updateAfter'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'removeBefore'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'removeAfter'
     }
   ],
 
@@ -39,36 +69,19 @@
       name: 'put_',
       javaCode: `
       FObject oldObj = getDelegate().find_(x, obj);
-      Operations operation;
       if ( oldObj == null ) {
-        operation = Operations.CREATE;
+        applyRules(x, obj, oldObj, getCreateBefore());
       } else {
-        operation = Operations.UPDATE;
+        applyRules(x, obj, oldObj, getUpdateBefore());
       }
-
-      Predicate before = AND(
-        OR(
-          EQ(Rule.OPERATION, operation),
-          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
-        ),
-        EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, false)
-      );
-
-      applyRules(x, obj, oldObj, before);
 
       FObject ret =  getDelegate().put_(x, obj);
 
-      Predicate after = AND(
-        OR(
-          EQ(Rule.OPERATION, operation),
-          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
-        ),
-        EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, true)
-      );
-
-      applyRules(x, ret, oldObj, after);
+      if ( oldObj == null ) {
+        applyRules(x, obj, oldObj, getCreateAfter());
+      } else {
+        applyRules(x, obj, oldObj, getUpdateAfter());
+      }
       return ret;
       `
     },
@@ -76,23 +89,11 @@
       name: 'remove_',
       javaCode: `
       FObject oldObj = getDelegate().find_(x, obj);
-      Predicate before = AND(
-        EQ(Rule.OPERATION, Operations.REMOVE),
-        EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, false)
-      );
-
-      applyRules(x, obj, oldObj, before);
+      applyRules(x, obj, oldObj, getRemoveBefore());
 
       FObject ret =  getDelegate().put_(x, obj);
 
-      Predicate after = AND(
-        EQ(Rule.OPERATION, Operations.REMOVE),
-        EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, true)
-      );
-
-      applyRules(x, ret, oldObj, after);
+      applyRules(x, ret, oldObj, getRemoveAfter());
       return ret;
       `
     },
@@ -134,6 +135,53 @@
         }
       }
       `
+    },
+    {
+      name: 'updateRules',
+      javaCode: `
+      setCreateBefore(AND(
+          OR(
+            EQ(Rule.OPERATION, Operations.CREATE),
+            EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+          ),
+          EQ(Rule.DAO_KEY, getDaoKey()),
+          EQ(Rule.AFTER, false)
+        ));
+        setCreateAfter(AND(
+          OR(
+            EQ(Rule.OPERATION, Operations.CREATE),
+            EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+          ),
+          EQ(Rule.DAO_KEY, getDaoKey()),
+          EQ(Rule.AFTER, true)
+        ));
+        setUpdateBefore(AND(
+          OR(
+            EQ(Rule.OPERATION, Operations.UPDATE),
+            EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+          ),
+          EQ(Rule.DAO_KEY, getDaoKey()),
+          EQ(Rule.AFTER, false)
+        ));
+        setUpdateAfter(AND(
+          OR(
+            EQ(Rule.OPERATION, Operations.UPDATE),
+            EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+          ),
+          EQ(Rule.DAO_KEY, getDaoKey()),
+          EQ(Rule.AFTER, true)
+        ));
+        setRemoveBefore(AND(
+          EQ(Rule.OPERATION, Operations.REMOVE),
+          EQ(Rule.DAO_KEY, getDaoKey()),
+          EQ(Rule.AFTER, false)
+        ));
+        setRemoveAfter(AND(
+          EQ(Rule.OPERATION, Operations.REMOVE),
+          EQ(Rule.DAO_KEY, getDaoKey()),
+          EQ(Rule.AFTER, true)
+        ));
+        `
     }
   ],
 
@@ -146,6 +194,7 @@
            setX(x);
            setDelegate(delegate);
            setDaoKey(serviceName);
+           updateRules();
          }
         `);
       }
