@@ -145,6 +145,7 @@ var classes = [
   'foam.nanos.auth.LastModifiedByAware',
   'foam.nanos.auth.LastModifiedByAwareDAO',
   'foam.nanos.auth.Permission',
+  'foam.nanos.auth.Blacklist',
   'foam.nanos.auth.DayOfWeek',
   'foam.nanos.auth.Hours',
   'foam.nanos.auth.Address',
