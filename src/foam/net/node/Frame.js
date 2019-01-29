@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.net.node',
   name: 'Frame',
-
+  flags: ['node'],
   properties: [
     ['fin', 1],
     ['rsv1',0],

@@ -20,7 +20,7 @@ foam.CLASS({
   name: 'SimpleRouter',
   extends: 'foam.net.node.BaseHandler',
   implements: [ 'foam.net.node.Router' ],
-
+  flags: ['node'],
   requires: [
     'foam.net.node.RouteBinding',
     'foam.net.node.Router'

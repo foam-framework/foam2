@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'foam.net.node',
   name: 'ErrorHandler',
   extends: 'foam.net.node.BaseHandler',
-
+  flags: ['node'],
   constants: {
     CLIENT_MESSAGES: {
       '400': 'Bad request',

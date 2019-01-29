@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.net.node',
   name: 'BaseHandler',
+  flags: ['node'],
   implements: [ 'foam.net.node.Handler' ],
 
   documentation: `Abstract Handler class; handle() returns true if handled,
