@@ -13,14 +13,14 @@
 
    properties: [
      {
-       class: 'Long',
+       class: 'String',
        name: 'id',
-       documentation: 'Blacklist Id'
+       tableWidth: 400
      },
      {
        class: 'String',
-       name: 'name',
-       documentation: 'Name of blacklist permission'
+       name: 'description',
+       documentation: 'Description of the Blacklist'
      }
    ]
  });
