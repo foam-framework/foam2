@@ -16,7 +16,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.json.Outputter',
       name: 'outputter',
-      factory: function() { return foam.json.Storage; }
+      factory: function() { return foam.json.StorageStrict; }
     }
   ],
 
