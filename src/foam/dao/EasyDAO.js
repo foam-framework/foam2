@@ -67,12 +67,10 @@ foam.CLASS({
   imports: ['document'],
 
   javaImports: [
-    'foam.dao.java.SharedJournal',
-    'foam.dao.DAO',
-    'foam.dao.java.JDAO',
-    'foam.dao.java.FindJournalledDAO',
-    'foam.dao.ProxyDAO',
-    'foam.dao.RoutingJournal'
+    'foam.dao.RoutingJDAO',
+    'foam.dao.RoutingJournal',
+    'foam.dao.java.FindReplayDAO',
+    'foam.dao.DAO'
   ],
 
   constants: {
@@ -85,6 +83,35 @@ foam.CLASS({
       MDAO: 'foam.dao.MDAO'
     }
   },
+
+  classes: [
+    {
+      name: 'ReplaySharedJournal',
+      javaImplements: [ 'Runnable' ],
+      properties: [
+        {
+          class: 'FObjectProperty',
+          of: 'foam.dao.DAO',
+          name: 'delegate'
+        },
+        {
+          class: 'FObjectProperty',
+          of: 'foam.dao.RoutingJournal',
+          name: 'journal'
+        }
+      ],
+      methods: [
+        {
+          name: 'run',
+          javaCode: `
+            getJournal().replay(getX(), getDelegate());
+            getDelegate().cmd(RoutingJDAO.ROUTING_JDAO_REPAYED_CMD);
+            System.out.println("Dhiren debug: routingJournal replayed.");
+          `
+        }
+      ]
+    }
+  ],
 
   properties: [
     {
@@ -111,14 +138,21 @@ if ( getJournaled() && ! getSharedJournal() ) {
 }
 
 if ( getSharedJournal() ) {
-System.out.println("dhiren debug: find journalled dao is being decorated!");
-  delegate = new foam.dao.java.JDAO.Builder(getX())
+  // Adding a decorator to add a command for
+  delegate = new FindReplayDAO(delegate);
+
+  RoutingJournal routingJournal = (RoutingJournal) getX().get("routingJournal");
+
+  delegate = new RoutingJDAO.Builder(getX())
+    .setService(getName())
+    .setOf(delegate.getOf())
     .setDelegate(delegate)
-    .setOf(delegate.getOf()).build();
-  delegate = new foam.dao.java.FindJournalledDAO(delegate);
-  SharedJournal sharedJournal = (SharedJournal) ((foam.core.X) getX()).get("sharedJournal");
-  RoutingJournal routingJournal = (RoutingJournal) sharedJournal.getJournal();
-  routingJournal.replay(getX(), delegate);
+    .setJournal(routingJournal)
+    .build();
+  System.out.println("Dhiren debug: easydao shared journal created.");
+
+  Thread journalReplay = new Thread(new ReplaySharedJournal.Builder(getX()).setJournal(routingJournal).setDelegate(delegate).build());
+  journalReplay.start();
 }
 
 if ( getGuid() && getSeqNo() ) {
@@ -590,72 +624,6 @@ if ( getMdao() != null ) {
 }
 return this;
 `
-    },
-    {
-      name: 'put_',
-      documentation: `If this DAO is set to use sharedJournal (e.g.,
-          RoutingJournal), then send the put request to the sharedJournal
-          service, else put as usual.`,
-      javaCode: `
-        if ( getSharedJournal() ) {
-          SharedJournal journal = (SharedJournal) x.get("sharedJournal");
-          String name = getName();
-
-          if ( foam.util.SafetyUtil.isEmpty(name) ){
-            foam.nanos.logger.Logger log = (foam.nanos.logger.Logger) x.get("logger");
-            log.error("EasyDAO :: No name property set. Hence, I don't know how"
-              + " to identify myself to put this record into a sharedJournal.");
-            new RuntimeException("EasyDAO :: No name property set. Hence, I"
-              + " don't know how to identify myself to put this record into a"
-              + " sharedJournal.");
-          } else {
-            journal.put_(x, obj, name);
-          }
-          DAO delegateDAO = ((JDAO) cmd(getDelegate())).getDelegate();
-          return delegateDAO.put_(x, obj);
-        } else {
-          return getDelegate().put_(x, obj);
-        }
-      `
-    },
-    {
-      name: 'remove_',
-      documentation: `If this DAO is set to use sharedJournal (e.g.,
-          RoutingJournal), then send the remove request to the sharedJournal
-          service, else remove as usual.`,
-      javaCode: `
-        if ( getSharedJournal() ) {
-          SharedJournal journal = (SharedJournal) x.get("sharedJournal");
-          String name = getName();
-
-          if ( foam.util.SafetyUtil.isEmpty(name) ){
-            foam.nanos.logger.Logger log = (foam.nanos.logger.Logger) x.get("logger");
-            log.error("EasyDAO :: No name property set. Hence, I don't know how"
-              + " to identify myself to remove this record from the sharedJournal.");
-            new RuntimeException("EasyDAO :: No name property set. Hence, I"
-              + " don't know how to identify myself to remove this record from"
-              + " the sharedJournal.");
-          } else {
-            journal.remove_(x, obj, name);
-          }
-          DAO delegateDAO = ((JDAO) cmd(getDelegate())).getDelegate();
-          return delegateDAO.remove_(x, obj);
-        } else {
-          return getDelegate().remove_(x, obj);
-        }
-      `
-    },
-    {
-      name: 'cmd',
-      javaCode: `
-        ProxyDAO delegate = (ProxyDAO) getDelegate();
-        if ( getSharedJournal() ) {
-          while ( ! (delegate instanceof FindJournalledDAO) ) {
-            delegate = (ProxyDAO) delegate.getDelegate();
-          }
-        }
-        return delegate.cmd(delegate);
-      `
     }
   ]
 });

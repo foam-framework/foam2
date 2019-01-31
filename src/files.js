@@ -222,7 +222,6 @@ FOAM_FILES([
   { name: 'foam/dao/FileJournal', flags: ['java'] },
   { name: 'foam/dao/JDAO', flags: ['web'] },
   { name: 'foam/dao/java/JDAO', flags: ['java'] },
-  { name: 'foam/dao/java/SharedJournal', flags: ['java'] },
   { name: 'foam/dao/RoutingJournal', flags: ['java'] },
   { name: 'foam/dao/RoutingJournalTest', flags: ['java'] },
   { name: 'foam/dao/RoutingJDAO', flags: ['java'] },

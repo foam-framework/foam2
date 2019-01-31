@@ -14,7 +14,7 @@ foam.CLASS({
     entry into the correct DAO`,
 
   javaImports: [
-    'foam.dao.java.FindJournalledDAO'
+    'foam.dao.java.FindReplayDAO'
   ],
 
   axioms: [
@@ -80,6 +80,8 @@ foam.CLASS({
     },
     {
       name: 'replay',
+      synchronized: true,
+      documentation: 'Replays the journal file.',
       javaCode: `
         if ( ! journalReplayed_ ) {
           System.out.println("dhiren debug: replaying routingJournal!");
@@ -108,20 +110,19 @@ foam.CLASS({
                 line = line.trim().substring(2, length - 1);
 
                 dao = (foam.dao.DAO) x.get(service);
-                System.out.println("dhiren debug: debug " + String.valueOf(dao instanceof FindJournalledDAO));
-                foam.dao.java.JDAO delegateDAO = (foam.dao.java.JDAO) dao.cmd(new FindJournalledDAO(null));
-                dao = delegateDAO != null ? delegateDAO.getDelegate() : dao;
-                System.out.println("dhiren debug: debug 1!");
+
+                foam.dao.DAO innerDAO = (DAO) dao.cmd(FindReplayDAO.FIND_REPLAY_DAO_CMD);
+                dao = innerDAO != null ? innerDAO : dao;
+
                 foam.core.FObject obj = parser.parseString(line);
                 if ( obj == null ) {
                   getLogger().error("Parse error", getParsingErrorMessage(line), "line:", line);
                   continue;
                 }
-                System.out.println("dhiren debug: debug 2!");
+
                 switch (operation) {
                   case 'p':
                     foam.core.FObject old = dao.find(obj.getProperty("id"));
-                    System.out.println("dhiren debug: debug 3!");
                     dao.put(old != null ? mergeFObject(old, obj) : obj);
                     break;
 

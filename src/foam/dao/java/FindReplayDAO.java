@@ -19,24 +19,30 @@ package foam.dao.java;
 
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
+import foam.core.X;
 
 /**
- * This DAO is a decorator around the JDAO which returns the DAO that is
- * journalled.
+ * This DAO is a decorator around the innerDAO to return the DAO when replaying
+ * entries directly into the DAO.
  */
-public class FindJournalledDAO
+public class FindReplayDAO
   extends ProxyDAO {
 
-  public FindJournalledDAO(DAO d){
+  public final static Object FIND_REPLAY_DAO_CMD = new Object();
+
+  public FindReplayDAO (DAO d){
     setDelegate(d);
   }
 
-  public Object cmd(Object obj){
-    System.out.println("Djhiren debug: running command in FindJournal!");
-    if ( obj instanceof FindJournalledDAO ) {
+  public Object cmd (Object obj){
+    if ( obj == FIND_REPLAY_DAO_CMD ) {
       return getDelegate();
     }
 
     return super.cmd(obj);
+  }
+
+  public Object cmd_ (X x, Object obj) {
+    return cmd(obj);
   }
 }
