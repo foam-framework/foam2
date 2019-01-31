@@ -25,6 +25,7 @@ foam.CLASS({
     'foam.u2.tag.Select'
   ],
 
+  imports: [ 'window' ],
   exports: [ 'as data' ],
 
   css: `
@@ -32,20 +33,20 @@ foam.CLASS({
     ^ .error { border: 2px solid red; }
     ^title { font-size: 18px; }
     ^title, ^ button, ^ input, ^ select {
-      width: 160px; height: 24px; margin: 5px;
+      width: 160px; height: 24px; margin: 8px 0; display: block;
     }
   `,
 
   properties: [
     {
       class: 'Boolean',
-      name: 'oneWay',
+      name: 'isReturn',
       value: true,
       view: {
         class: 'foam.u2.view.ChoiceView',
         choices: [
-          [ true,  'one-way flight' ],
-          [ false, 'return flight'  ]
+          [ false, 'one-way flight' ],
+          [ true,  'return flight'  ]
         ]
       }
     },
@@ -63,13 +64,10 @@ foam.CLASS({
       class: 'Date',
       name: 'returnDate',
       factory: function() { return new Date(Date.now()+2*3600000*24); },
-      validateObj: function(oneWay, returnDate, departDate) {
-        if ( ! oneWay && foam.Date.compare(returnDate, departDate) < 0 ) return 'Must not be before depart date.';
+      visibility: function(isReturn) { return isReturn ? foam.u2.Visibility.RW : foam.u2.Visibility.HIDDEN; },
+      validateObj: function(isReturn, returnDate, departDate) {
+        if ( isReturn && foam.Date.compare(returnDate, departDate) < 0 ) return 'Must not be before depart date.';
       }
-    },
-    {
-      name: 'returnDateMode',
-      expression: function(oneWay) { return oneWay ? 'disabled' : 'rw'; }
     }
   ],
 
@@ -78,10 +76,12 @@ foam.CLASS({
       this.SUPER();
       this.nodeName = 'div';
       this.
-        start('div').addClass('^title').add('Book Flight').end().
-        add(this.ONE_WAY).tag('br').
-        add(this.DEPART_DATE).tag('br').
-        start(this.RETURN_DATE).attrs({mode: this.returnDateMode$}).end().tag('br').
+        add(foam.u2.DetailView.create({data: this})).
+        addClass(this.myClass()).
+        start('div').addClass(this.myClass('title')).add('Book Flight').end().
+        add(this.IS_RETURN).
+        add(this.DEPART_DATE).
+        start(this.RETURN_DATE)/*.show(this.isReturn$)*/.end().
         add(this.BOOK);
     }
   ],
@@ -93,9 +93,9 @@ foam.CLASS({
       code: function() {
         var depart = this.departDate.toLocaleDateString();
 
-        window.alert('You have booked a ' + (this.oneWay ?
-          'one-way flight on ' + depart :
-          'flight departing on ' + depart + ' and returning ' + this.returnDate.toLocaleDateString() ) + '.');
+        this.window.alert('You have booked a ' + (this.isReturn ?
+          'flight departing on ' + depart + ' and returning ' + this.returnDate.toLocaleDateString():
+          'one-way flight on ' + depart) + '.');
       }
     }
   ]

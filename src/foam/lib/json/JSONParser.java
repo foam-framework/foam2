@@ -9,6 +9,10 @@ package foam.lib.json;
 import foam.lib.parse.*;
 import foam.core.*;
 
+// Note: JSONParser.java has a limitation - the class has to be 
+// the first key, to avoid having to build an intermediate object 
+// to hold all the args while we parse
+
 public class JSONParser
   extends foam.core.ContextAwareSupport
 {

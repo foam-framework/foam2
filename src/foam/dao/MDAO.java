@@ -5,11 +5,7 @@
  */
 package foam.dao;
 
-import foam.core.AbstractFObject;
-import foam.core.ClassInfo;
-import foam.core.FObject;
-import foam.core.PropertyInfo;
-import foam.core.X;
+import foam.core.*;
 import foam.dao.index.*;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Or;
@@ -17,8 +13,6 @@ import foam.mlang.predicate.Predicate;
 import foam.mlang.sink.GroupBy;
 import foam.nanos.logger.Logger;
 import java.util.ArrayList;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.List;
 
 /**
@@ -47,13 +41,12 @@ import java.util.List;
 public class MDAO
   extends AbstractDAO
 {
-  protected AltIndex      index_;
-  protected Object        state_;
-  protected ReadWriteLock lock_ = new ReentrantReadWriteLock();
+  protected AltIndex index_;
+  protected Object   state_ = null;
+  protected Object   writeLock_ = new Object();
 
   public MDAO(ClassInfo of) {
     setOf(of);
-    state_ = null;
     index_ = new AltIndex(new TreeIndex((PropertyInfo) this.of_.getAxiomByName("id")));
   }
 
@@ -69,19 +62,28 @@ public class MDAO
     for ( PropertyInfo prop : props ) addUniqueIndex(prop);
   }
 
+  synchronized Object getState() {
+    return state_;
+  }
+
+  synchronized void setState(Object state) {
+    state_ = state;
+  }
+
   public FObject put_(X x, FObject obj) {
     // Clone and freeze outside of lock to minimize time spent under lock
     obj = obj.fclone();
     obj.freeze();
 
-    synchronized ( lock_.writeLock() ) {
+    synchronized ( writeLock_ ) {
       FObject oldValue = find(obj);
+      Object  state    = getState();
 
       if ( oldValue != null ) {
-        state_ = index_.remove(state_, oldValue);
+        state = index_.remove(state, oldValue);
       }
 
-      state_ = index_.put(state_, obj);
+      setState(index_.put(state, obj));
     }
 
     onPut(obj);
@@ -92,11 +94,12 @@ public class MDAO
     if ( obj == null ) return null;
 
     FObject found;
-    synchronized ( lock_.writeLock() ) {
+
+    synchronized ( writeLock_ ) {
       found = find(obj);
 
       if ( found != null ) {
-        state_ = index_.remove(state_, found);
+        setState(index_.remove(getState(), found));
       }
     }
 
@@ -110,16 +113,14 @@ public class MDAO
   public FObject find_(X x, Object o) {
     Object state;
 
-    synchronized ( lock_.readLock() ) {
-      state = state_;
-    }
+    state = getState();
 
     if ( o == null ) return null;
 
     return AbstractFObject.maybeClone(
         getOf().isInstance(o)
-            ? (FObject) index_.planFind(state, getPrimaryKey().get(o)).find(state, getPrimaryKey().get(o))
-            : (FObject) index_.planFind(state, o).find(state,o)
+          ? (FObject) index_.planFind(state, getPrimaryKey().get(o)).find(state, getPrimaryKey().get(o))
+          : (FObject) index_.planFind(state, o).find(state,o)
     );
   }
 
@@ -130,11 +131,7 @@ public class MDAO
     // use partialEval to wipe out such useless predicate such as: And(EQ()) ==> EQ(), And(And(EQ()),GT()) ==> And(EQ(),GT())
     if ( predicate != null ) simplePredicate = predicate.partialEval();
 
-    Object state;
-
-    synchronized ( lock_.readLock() ) {
-      state = state_;
-    }
+    Object state = getState();
 
     // We handle OR logic by seperate request from MDAO. We return different plan for each parameter of OR logic.
     if ( simplePredicate instanceof Or ) {
@@ -153,7 +150,7 @@ public class MDAO
     }
 
     // TODO: if plan cost is >= size, log a warning
-    if ( state != null && predicate != null && plan.cost() > 1000 && plan.cost() >= index_.size(state_) ) {
+    if ( state != null && predicate != null && plan.cost() > 1000 && plan.cost() >= index_.size(state) ) {
       Logger logger = (Logger) x.get("logger");
       logger.error(predicate.createStatement(), " Unindexed search on MDAO");
     }
@@ -164,8 +161,12 @@ public class MDAO
   }
 
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    synchronized ( lock_.writeLock() ) {
-      state_ = null;
+    if ( predicate == null ) {
+      synchronized ( writeLock_ ) {
+        setState(null);
+      }
+    } else {
+      super.removeAll_(x, skip, limit, order, predicate);
     }
   }
 }

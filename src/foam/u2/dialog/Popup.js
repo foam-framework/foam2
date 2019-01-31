@@ -60,11 +60,18 @@ foam.CLASS({
     }
     ^inner {
       z-index: 3;
+      /* The following line fixes a stacking problem in certain browsers. */
+      will-change: opacity;
     }
  `,
 
   properties: [
-    [ 'backgroundColor', '#fff' ]
+    [ 'backgroundColor', '#fff' ],
+    {
+      name: 'closeable',
+      class: 'Boolean',
+      value: true
+    }
   ],
 
   methods: [
@@ -77,7 +84,7 @@ foam.CLASS({
         .addClass(this.myClass('container'))
         .start()
             .addClass(this.myClass('background'))
-            .on('click', this.close)
+            .on('click', this.closeable ? this.close : null)
         .end()
         .start()
             .call(function() { content = this; })

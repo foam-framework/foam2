@@ -11,6 +11,7 @@ import foam.dao.DAO;
 import foam.nanos.auth.User;
 import foam.nanos.session.Session;
 
+import static foam.mlang.MLang.AND;
 import static foam.mlang.MLang.EQ;
 
 public class Auth {
@@ -20,7 +21,10 @@ public class Auth {
   }
 
   public static X sudo(X x, String email) {
-    return sudo(x, (User) ((DAO) x.get("userDAO")).inX(x).find(EQ(User.EMAIL, email)));
+    return sudo(x, (User) ((DAO) x.get("userDAO")).inX(x).find(AND(
+      EQ(User.EMAIL, email),
+      EQ(User.LOGIN_ENABLED, true)
+    )));
   }
 
   public static X sudo(X x, User user) {
