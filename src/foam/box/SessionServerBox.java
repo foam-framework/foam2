@@ -58,7 +58,8 @@ public class SessionServerBox
             new PrefixLogger(
                 new Object[] { user == null ? "" : user.getId() + " - " + user.label(), "[Service]", spec.getName() },
                 (Logger) session.getContext().get("logger")))
-          .put(HttpServletRequest.class, req);
+          .put(HttpServletRequest.class, req)
+          .put(NSpec.class, spec);
 
         session.touch();
 
