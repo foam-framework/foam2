@@ -26,6 +26,10 @@ foam.CLASS({
 
   css: '^:read-only { border: none; background: rgba(0,0,0,0); }',
 
+  imports: [
+    'ctrl'
+  ],
+
   properties: [
     [ 'placeholder', 'yyyy-mm-dd' ]
   ],
@@ -34,19 +38,36 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.setAttribute('type', 'date');
-      this.setAttribute('placeholder', 'yyyy/mm/dd');
+      this.on('change', () => {
+        this.checkDateFormat(this.getAttribute('value'));
+      });
     },
 
     function link() {
       this.data$.relateTo(
           this.attrSlot(null, this.onKey ? 'input' : null),
           function(date) {
-            return date ? date.toISOString().substring(0,10) : date;
+            return date ? date.toISOString().substring(0, 10) : date;
           },
           function(value) {
             return new Date(value);
           }
       );
+    }
+  ],
+
+  listeners: [
+    function checkDateFormat(value) {
+      oldDate = value.split(/[^0-9]/).map((str) => {
+        return parseInt(str, 10);
+      }).join('');
+
+      var newDate = new Date(oldDate);
+      newDate = `${newDate.getFullYear()}${newDate.getMonth() + 1}${newDate.getDate()}`;
+      if ( newDate !== oldDate ) {
+        ctrl.notify('Invalid Date.', 'error');
+        this.data = null;
+      }
     }
   ]
 });
