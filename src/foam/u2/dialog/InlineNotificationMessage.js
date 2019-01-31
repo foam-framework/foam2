@@ -29,9 +29,42 @@ foam.CLASS({
       class: 'String',
       name: 'type'
     },
-    'message',
-    'data'
+    {
+      name: 'isEmpty',
+      expression: function(message) {
+        return ! message || message.length === 0;
+      }
+    },
+    {
+      name: 'isError',
+      expression: function(type) {
+        return type === 'error';
+      }
+    },
+    {
+      name: 'isWarning',
+      expression: function(type) {
+        return type === 'warning';
+      }
+    },
+    {
+      name: 'iconImage',
+      expression: function(isError, isWarning) {
+        return isError ? this.ERROR_ICON : isWarning ?
+            this.WARNING_ICON : this.SUCCESS_ICON;
+      }
+    },
+    {
+      class: 'String',
+      name: 'message'
+    }
   ],
+
+  constants: {
+    ERROR_ICON: 'images/inline-error-icon.svg',
+    WARNING_ICON: 'images/information-small-purple.svg',
+    SUCCESS_ICON: 'images/checkmark-small-green.svg'
+  },
 
   css: `
     ^ {
@@ -64,6 +97,8 @@ foam.CLASS({
     ^message {
       display: inline-block;
       vertical-align: middle;
+      width: 85%;
+      margin-left: 10px;
     }
     ^error-background {
       background: #fff6f6;
@@ -77,30 +112,20 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      var img;
-      if ( this.type === 'error' ) {
-        img = 'images/inline-error-icon.svg';
-      } else if ( this.type === 'warning' ) {
-        img = 'images/information-small-purple.svg';
-      } else {
-        img = 'images/checkmark-small-green.svg';
-      }
       this
-        .hide(this.message$.map(function(msg) {
-          return msg == '' || msg == undefined;
-        }))
+        .hide(this.isEmpty$)
         .addClass(this.myClass())
         .start().addClass(this.myClass('inner'))
-          .enableClass(this.myClass('error-background'), this.type === 'error')
-          .enableClass(this.myClass('warning-background'), this.type === 'warning')
+          .enableClass(this.myClass('error-background'), this.isError$)
+          .enableClass(this.myClass('warning-background'), this.isWarning$)
           .start()
             .start('img')
               .addClass(this.myClass('status-icon'))
-              .attrs({ src: img })
+              .attrs({ src: this.iconImage$ })
             .end()
             .start()
               .addClass(this.myClass('message'))
-              .add(this.message)
+              .add(this.message$)
             .end()
           .end()
         .end();

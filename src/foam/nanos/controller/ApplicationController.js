@@ -43,6 +43,8 @@ foam.CLASS({
     'foam.u2.stack.Stack',
     'foam.u2.stack.StackView',
     'foam.u2.dialog.NotificationMessage',
+    'foam.nanos.session.SessionTimer',
+    'foam.u2.dialog.Popup'
   ],
 
   imports: [
@@ -68,7 +70,8 @@ foam.CLASS({
     'stack',
     'user',
     'webApp',
-    'wrapCSS as installCSS'
+    'wrapCSS as installCSS',
+    'sessionTimer'
   ],
 
   constants: {
@@ -148,6 +151,14 @@ foam.CLASS({
       name: 'loginSuccess'
     },
     { class: 'URL', name: 'logo' },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.session.SessionTimer',
+      name: 'sessionTimer',
+      factory: function () {
+        return this.SessionTimer.create();
+      }
+    },
     'currentMenu',
     'lastMenuLaunched',
     'webApp',
