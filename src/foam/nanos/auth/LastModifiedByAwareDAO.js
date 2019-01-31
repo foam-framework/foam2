@@ -21,7 +21,8 @@ foam.CLASS({
       javaCode: `
         if ( obj instanceof LastModifiedByAware ) {
           User user = (User) x.get("user");
-          ((LastModifiedByAware) obj).setLastModifiedBy(user.getId());
+          User agent = (User) x.get("agent");
+          ((LastModifiedByAware) obj).setLastModifiedBy(agent != null ? agent.getId() : user.getId());
         }
         return super.put_(x, obj);
       `

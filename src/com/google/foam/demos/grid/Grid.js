@@ -42,70 +42,66 @@ foam.CLASS({
     'com.google.foam.demos.grid.Resource'
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-        body {
-          font-family:Arial;
-          color:#3a3a3a;
-        }
-        ^list {
-          border:none;
-          text-align:left;
-          margin-bottom:20px;
-        }
-        ^list tr th {
-          background-color: #3b97d3;
-          color: #fff;
-          padding: 5px;
-          border-right: solid 1px #3b97d3;
-          border-left: solid 1px #fff;
-        }
-        ^list tr th:first-child {
-          border-left: solid 1px #3b97d3;
-        }
-        ^list tr td {
-          padding:5px;
-          padding: 5px;
-          border-right: solid 1px #d4d4d4;
-        }
-        ^list tr td:first-child {
-          border-left: solid 1px #d4d4d4;
-        }
-        ^list tr:last-child td {
-          border-bottom: solid 1px #d4d4d4;
-        }
-        input[type="text"] {
-          height:20px;
-          font-size:14px;
-        }
-        ^ .foam.u2-ActionView {
-          vertical-align: bottom;
-        }
-        button, ^ .foam-u2-ActionView {
-          border:none;
-          color:#fff;
-          background:#3b97d3;
-          padding:0px 10px;
-          height:26px;
-          display:inline-block;
-          line-height:26px;
-          text-decoration:none;
-          border-radius:3px;
-          -moz-border-radius:3px;
-          -webkit-border-radius:3px;
-          cursor:pointer;
-        }
-        ^ button:hover {
-          background-color:#73c7ff;
-        }
-        ^ .foam-u2-DetailView tr {
-          display: inline;
-          font-size: 16px;
-        }
-      */}
-    })
-  ],
+  css: `
+    body {
+      font-family:Arial;
+      color:#3a3a3a;
+    }
+    ^list {
+      border:none;
+      text-align:left;
+      margin-bottom:20px;
+    }
+    ^list tr th {
+      background-color: #3b97d3;
+      color: #fff;
+      padding: 5px;
+      border-right: solid 1px #3b97d3;
+      border-left: solid 1px #fff;
+    }
+    ^list tr th:first-child {
+      border-left: solid 1px #3b97d3;
+    }
+    ^list tr td {
+      padding:5px;
+      padding: 5px;
+      border-right: solid 1px #d4d4d4;
+    }
+    ^list tr td:first-child {
+      border-left: solid 1px #d4d4d4;
+    }
+    ^list tr:last-child td {
+      border-bottom: solid 1px #d4d4d4;
+    }
+    input[type="text"] {
+      height:20px;
+      font-size:14px;
+    }
+    ^ .foam.u2-ActionView {
+      vertical-align: bottom;
+    }
+    button, ^ .foam-u2-ActionView {
+      border:none;
+      color:#fff;
+      background:#3b97d3;
+      padding:0px 10px;
+      height:26px;
+      display:inline-block;
+      line-height:26px;
+      text-decoration:none;
+      border-radius:3px;
+      -moz-border-radius:3px;
+      -webkit-border-radius:3px;
+      cursor:pointer;
+    }
+    ^ button:hover {
+      background-color:#73c7ff;
+    }
+    ^ .foam-u2-DetailView tr {
+      display: inline;
+      font-size: 16px;
+    }
+  `,
 
   properties: [
     {

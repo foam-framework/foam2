@@ -139,7 +139,6 @@ public class UserAndGroupAuthService
     Session session = x.get(Session.class);
     session.setUserId(user.getId());
     session.setContext(session.getContext().put("user", user));
-    sessionDAO_.put(session);
 
     return user;
   }
@@ -284,7 +283,7 @@ public class UserAndGroupAuthService
   }
 
   public void validatePassword( String newPassword ) {
-    Pattern passwordValidationPattern = Pattern.compile(passwordValidationRegex()); 
+    Pattern passwordValidationPattern = Pattern.compile(passwordValidationRegex());
     String passwordErrorMessage = passwordValidationErrorMessage();
     if ( SafetyUtil.isEmpty(newPassword) || ! passwordValidationPattern.matcher(newPassword).matches() ) {
       throw new RuntimeException(passwordErrorMessage);
@@ -332,7 +331,7 @@ public class UserAndGroupAuthService
 
     // check if password is valid per validatePassword method
     validatePassword(newPassword);
-    
+
     // old password does not match
     if ( ! Password.verify(oldPassword, user.getPassword()) ) {
       throw new RuntimeException("Old password is incorrect");
