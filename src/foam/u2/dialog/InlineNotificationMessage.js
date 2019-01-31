@@ -68,14 +68,11 @@ foam.CLASS({
 
   css: `
     ^ {
-      display: flex;
       position: relative;
       justify-content: center;
       z-index: 15000;
     }
     ^inner {
-      width: 90vw;
-      max-width: 1024px;
       margin: auto;
       padding: 8px 24px;
       animation-name: fade;
@@ -87,7 +84,6 @@ foam.CLASS({
       box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.16);
       background: #f6fff2;
       border: 1px solid #03cf1f;
-      display: flex;
       justify-content: space-between;
     }
     ^status-icon {
@@ -108,6 +104,9 @@ foam.CLASS({
       background: #f5f4ff;
       border: 1px solid #604aff;
     }
+    ^icon {
+      display: inline-block;
+    }
   `,
 
   methods: [
@@ -119,9 +118,11 @@ foam.CLASS({
           .enableClass(this.myClass('error-background'), this.isError$)
           .enableClass(this.myClass('warning-background'), this.isWarning$)
           .start()
-            .start('img')
-              .addClass(this.myClass('status-icon'))
-              .attrs({ src: this.iconImage$ })
+            .start().addClass(this.myClass('icon'))
+              .start('img')
+                .addClass(this.myClass('status-icon'))
+                .attrs({ src: this.iconImage$ })
+              .end()
             .end()
             .start()
               .addClass(this.myClass('message'))
