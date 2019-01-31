@@ -34,7 +34,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'timeout',
-      value: 5000
+      value: 120000
     }
   ],
   methods: [
