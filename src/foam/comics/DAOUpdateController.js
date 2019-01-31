@@ -20,7 +20,8 @@ foam.CLASS({
   name: 'DAOUpdateController',
 
   topics: [
-    'finished'
+    'finished',
+    'throwError'
   ],
 
   properties: [
@@ -29,6 +30,9 @@ foam.CLASS({
     },
     {
       name: 'data'
+    },
+    {
+      name: 'exception'
     },
     {
       name: 'obj',
@@ -55,8 +59,8 @@ foam.CLASS({
         this.dao.put(this.obj.clone()).then(function() {
           self.finished.pub();
         }, function(e) {
-          // TODO: Display error in view.
-          console.error(e);
+          self.exception = e;
+          self.throwError.pub();
         });
       }
     },
@@ -69,8 +73,8 @@ foam.CLASS({
         this.dao.remove(this.obj).then(function() {
           self.finished.pub();
         }, function(e) {
-          // TODO: Display error in view.
-          console.error(e);
+          self.exception = e;
+          self.throwError.pub();
         });
       }
     }
