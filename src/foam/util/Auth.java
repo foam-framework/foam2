@@ -10,6 +10,8 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.auth.User;
 import foam.nanos.session.Session;
+import foam.nanos.app.AppConfig;
+import foam.nanos.app.Mode;
 
 import static foam.mlang.MLang.AND;
 import static foam.mlang.MLang.EQ;
@@ -29,6 +31,12 @@ public class Auth {
 
   public static X sudo(X x, User user) {
     if ( user == null ) throw new RuntimeException("Unknown user");
+
+    AppConfig appConfig = (AppConfig) x.get("appConfig");
+    if ( appConfig != null &&
+         appConfig.getMode() == Mode.PRODUCTION ) {
+      throw new IllegalStateException("sudo disable for mode: production.");
+    }
 
     Session session = new Session();
     x = x.put(Session.class, session);
