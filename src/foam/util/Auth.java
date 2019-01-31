@@ -35,7 +35,7 @@ public class Auth {
     AppConfig appConfig = (AppConfig) x.get("appConfig");
     if ( appConfig != null &&
          appConfig.getMode() == Mode.PRODUCTION ) {
-      throw new IllegalStateException("sudo disable for mode: production.");
+      throw new IllegalStateException("sudo disabled in mode: PRODUCTION.");
     }
 
     Session session = new Session();
