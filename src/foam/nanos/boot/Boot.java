@@ -6,10 +6,7 @@
 
 package foam.nanos.boot;
 
-import foam.core.Detachable;
-import foam.core.ProxyX;
-import foam.core.SingletonFactory;
-import foam.core.X;
+import foam.core.*;
 import foam.dao.AbstractSink;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
@@ -20,6 +17,9 @@ import foam.nanos.logger.ProxyLogger;
 import foam.nanos.logger.StdoutLogger;
 import foam.nanos.script.Script;
 import foam.nanos.session.Session;
+
+import java.util.List;
+
 import static foam.mlang.MLang.EQ;
 
 public class Boot {
@@ -54,6 +54,24 @@ public class Boot {
         root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory((ProxyX) root_, sp)));
       }
     });
+
+    serviceDAO_.listen(new AbstractSink() {
+      @Override
+      public void put(Object obj, Detachable sub) {
+        NSpec sp = (NSpec) obj;
+        FObject newService = sp.getService();
+
+        if ( newService != null ) {
+          logger.info("Updating service configuration: ", sp.getName());
+
+          FObject service = (FObject) root_.get(sp.getName());
+          List<PropertyInfo> props = service.getClassInfo().getAxioms();
+          for (PropertyInfo prop : props) {
+            prop.set(service, prop.get(newService));
+          }
+        }
+      }
+    }, null);
 
     /**
      * Revert root_ to non ProxyX to avoid letting children add new bindings.
