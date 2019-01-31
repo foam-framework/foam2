@@ -16,7 +16,7 @@ foam.CLASS({
 
   tableColumns: [ 'id', 'description', 'defaultMenu', 'parent' ],
 
-  searchColumns: [ ],
+  searchColumns: [ 'id', 'description' ],
 
   properties: [
     {
