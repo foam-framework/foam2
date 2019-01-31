@@ -84,7 +84,6 @@ foam.CLASS({
       documentation: 'Replays the journal file.',
       javaCode: `
         if ( ! journalReplayed_ ) {
-          System.out.println("dhiren debug: replaying routingJournal!");
           journalReplayed_ = true;
 
           // count number of lines successfully read

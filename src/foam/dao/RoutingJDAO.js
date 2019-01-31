@@ -44,15 +44,12 @@ foam.CLASS({
       name: 'put_',
       documentation: `Put object on the journal. If the journal hasn't been
         replayed yet- wait.`,
-       synchronized: true,
       javaCode: `
         if ( ! getReplayed() ) {
           try {
-            System.out.println("Dhiren debug: waiting in put.");
             this.wait();
           } catch (java.lang.InterruptedException i) {}
         }
-  System.out.println("Dhiren debug: done waiting in put.");
         return super.put_(x.put("service", getService()), obj);
       `
     },
@@ -60,15 +57,13 @@ foam.CLASS({
       name: 'remove_',
       documentation: `Remove object from the journal. If the journal hasn't been
         replayed yet- wait.`,
-      synchronized: true,
       javaCode: `
         if ( ! getReplayed() ) {
           try {
-            System.out.println("Dhiren debug: waiting in remove.");
             this.wait();
           } catch (java.lang.InterruptedException i) {}
         }
-System.out.println("Dhiren debug: done waiting in remove.");
+
         return super.remove_(x.put("service", getService()), obj);
       `
     },

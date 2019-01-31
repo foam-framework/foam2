@@ -106,7 +106,6 @@ foam.CLASS({
           javaCode: `
             getJournal().replay(getX(), getDelegate());
             getDelegate().cmd(RoutingJDAO.ROUTING_JDAO_REPAYED_CMD);
-            System.out.println("Dhiren debug: routingJournal replayed.");
           `
         }
       ]
@@ -149,7 +148,6 @@ if ( getSharedJournal() ) {
     .setDelegate(delegate)
     .setJournal(routingJournal)
     .build();
-  System.out.println("Dhiren debug: easydao shared journal created.");
 
   Thread journalReplay = new Thread(new ReplaySharedJournal.Builder(getX()).setJournal(routingJournal).setDelegate(delegate).build());
   journalReplay.start();
