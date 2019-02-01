@@ -21,7 +21,8 @@ foam.CLASS({
   name: 'DAOCreateController',
 
   topics: [
-    'finished'
+    'finished',
+    'throwError'
   ],
 
   properties: [
@@ -62,6 +63,7 @@ foam.CLASS({
         }, function(e) {
           self.inProgress = false;
           self.exception = e;
+          self.throwError.pub();
         });
       }
     },
