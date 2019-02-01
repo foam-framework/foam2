@@ -104,7 +104,7 @@ public class AuthWebAgent
     if ( ! SafetyUtil.isEmpty(sessionId) ) {  // we have a sessionID
       session = (Session) sessionDAO.find(sessionId);
       if ( session == null ) { // if session is not in sessionDAO, create and put one.
-        session = new Session(x); // this session.context is global context with null user
+        session = createSession(x); // this session.context is global context with null user
         session.setId(sessionId);
         session.setRemoteHost(req.getRemoteHost());
         sessionDAO.put(session);
@@ -115,22 +115,23 @@ public class AuthWebAgent
 
       // if there is a user in the session context, and not attempted login, return session contet
       if ( ! attemptLogin && session.getContext().get("user") != null ) {
-        return session.getContext();
+        return createRequestContext(x, session);
       }
     } else { // sessionId is empty
       // create a new session, put in sessionDAO, set a cookie in the response class
-      session = new Session(x); // this session.context is global context with null user
+      session = createSession(x); // this session.context is global context with null user
       session.setRemoteHost(req.getRemoteHost());
       createCookie(x, session);
       sessionDAO.put(session);
     }
 
-    X sessionX =  session.getContext()
-      .put(HttpServletRequest.class, req)
-      .put(HttpServletResponse.class, resp);
+
+    // X sessionX =  session.getContext()
+    //   .put(HttpServletRequest.class, req)
+    //   .put(HttpServletResponse.class, resp);
 
     if ( ! attemptLogin ) {
-      return sessionX;
+      return null;
     }
 
     // Support for Basic HTTP Authentication
@@ -162,14 +163,14 @@ public class AuthWebAgent
               logger.warning(e, "Unsupported authentication encoding, expecting Base64.");
               if ( ! SafetyUtil.isEmpty(authHeader) ) {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Supported Authentication Encodings: Base64");
-                return sessionX;
+                return null;
               }
             }
           } else {
             logger.warning("Unsupported authorization type, expecting Basic, received: " + basic);
             if ( ! SafetyUtil.isEmpty(authHeader) ) {
               resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Supported Authorizations: Basic");
-              return sessionX;
+              return null;
             }
           }
         }
@@ -177,8 +178,12 @@ public class AuthWebAgent
 
       try {
         // setting user in the context, email, password);
-        User user = auth.loginByEmail(sessionX, email, password);
-        if ( user != null ) {
+        User user = auth.loginByEmail(session.getContext()
+        // .put(HttpServletRequest.class, x.get(HttpServletRequest.class))
+        // .put(HttpServletResponse.class, x.get(HttpServletResponse.class))        
+        , email, password);
+
+          if ( user != null ) {
           // If user is attempting to, and can act as another entity, set the entity in session context
           if ( ! SafetyUtil.isEmpty(actAs) ) {
             AgentAuthService agentService = (AgentAuthService) x.get("agentAuth");
@@ -186,10 +191,11 @@ public class AuthWebAgent
             User entity = (User) localUserDAO.find(Long.parseLong(actAs));
             if ( agentService.canActAs(x, user, entity) ) {
               // set agent in session
-              sessionX = sessionX.put("agent", user).put("user", entity);
+              session.setContext(session.getContext().put("agent", user).put("user", entity));
             }
           }
-          return sessionX;
+          // session.setContext(sessionX);
+          return createRequestContext(x, session);
         }
         // user should not be null, any login failure should throw an Exception
         logger.error("AuthService.loginByEmail returned null user and did not throw AuthenticationException.");
@@ -212,16 +218,29 @@ public class AuthWebAgent
       logger.error(e);
     }
 
-    return sessionX;
+    return null;
+  }
+
+  public Session createSession(X x) {
+    return new Session(x
+      .put(HttpServletRequest.class, null)
+      .put(HttpServletResponse.class, null));
+  }
+
+  public X createRequestContext(X x, Session session) {
+    return session.getContext()
+          .put(PrintWriter.class, x.get(PrintWriter.class))
+          .put(HttpServletRequest.class,  x.get(HttpServletRequest.class))
+          .put(HttpServletResponse.class, x.get(HttpServletResponse.class));
   }
 
   public void execute(X x) {
     AuthService auth = (AuthService) x.get("auth");
     // pass x to authenticate, which will return a context with a session, and user and agent set
-    X sessionX = authenticate(x);
-    if ( sessionX.get("user") != null ) {
-      if ( auth.check(sessionX, permission_) ) {
-        getDelegate().execute(sessionX);
+    X requestX = authenticate(x);
+    if ( requestX != null && requestX.get("user") != null ) {
+      if ( auth.check(requestX, permission_) ) {
+        getDelegate().execute(requestX);
       } else {
         PrintWriter out = x.get(PrintWriter.class);
         out.println("Access denied. Need permission: " + permission_);
