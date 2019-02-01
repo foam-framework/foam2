@@ -46,9 +46,11 @@ foam.CLASS({
         replayed yet- wait.`,
       javaCode: `
         if ( ! getReplayed() ) {
-          try {
-            this.wait();
-          } catch (java.lang.InterruptedException i) {}
+          synchronized ( ROUTING_JDAO_REPAYED_CMD ) {
+            try {
+              ROUTING_JDAO_REPAYED_CMD.wait();
+            } catch (java.lang.InterruptedException i) {}
+          }
         }
         return super.put_(x.put("service", getService()), obj);
       `
@@ -59,9 +61,11 @@ foam.CLASS({
         replayed yet- wait.`,
       javaCode: `
         if ( ! getReplayed() ) {
-          try {
-            this.wait();
-          } catch (java.lang.InterruptedException i) {}
+          synchronized ( ROUTING_JDAO_REPAYED_CMD ) {
+            try {
+              ROUTING_JDAO_REPAYED_CMD.wait();
+            } catch (java.lang.InterruptedException i) {}
+          }
         }
 
         return super.remove_(x.put("service", getService()), obj);
@@ -71,7 +75,10 @@ foam.CLASS({
       name: 'cmd_',
       javaCode: `
         if ( obj == ROUTING_JDAO_REPAYED_CMD ) {
-          setReplayed(true);
+          synchronized ( ROUTING_JDAO_REPAYED_CMD ) {
+            setReplayed(true);
+            ROUTING_JDAO_REPAYED_CMD.notifyAll();
+          }
           return obj;
         }
 
