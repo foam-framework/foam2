@@ -45,7 +45,7 @@ public class NSpecFactory
 
       try {
         if (logger != null) logger.info("Creating Service", spec_.getName());
-        ns_ = spec_.createService(x_.getX());
+        ns_ = spec_.createService(x_.getX().put(NSpec.class, spec_));
         if (logger != null) logger.info("Created Service", spec_.getName());
 
         if (ns_ instanceof ContextAware) ((ContextAware) ns_).setX(x_.getX());

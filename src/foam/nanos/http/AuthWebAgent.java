@@ -12,6 +12,7 @@ import foam.nanos.auth.AgentAuthService;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.AuthenticationException;
 import foam.nanos.auth.User;
+import foam.nanos.boot.Boot;
 import foam.nanos.logger.Logger;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
@@ -106,7 +107,6 @@ public class AuthWebAgent
       if ( session == null ) { // if session is not in sessionDAO, create and put one.
         session = createSession(x); // this session.context is global context with null user
         session.setId(sessionId);
-        session.setRemoteHost(req.getRemoteHost());
         sessionDAO.put(session);
       }
 
@@ -120,7 +120,7 @@ public class AuthWebAgent
     } else { // sessionId is empty
       // create a new session, put in sessionDAO, set a cookie in the response class
       session = createSession(x); // this session.context is global context with null user
-      session.setRemoteHost(req.getRemoteHost());
+      // session.setRemoteHost(req.getRemoteHost());
       createCookie(x, session);
       sessionDAO.put(session);
     }
@@ -234,12 +234,19 @@ public class AuthWebAgent
           .put(HttpServletResponse.class, x.get(HttpServletResponse.class));
   }
 
+
   public void execute(X x) {
-    AuthService auth = (AuthService) x.get("auth");
-    // pass x to authenticate, which will return a context with a session, and user and agent set
-    X requestX = authenticate(x);
-    if ( requestX != null && requestX.get("user") != null ) {
-      if ( auth.check(requestX, permission_) ) {
+    AuthService auth    = (AuthService) x.get("auth");
+    Session     session = authenticate(x);
+
+    if ( session != null ) {
+      if ( auth.check(session.getContext(), permission_) ) {
+        // Create a per-request sub-context of the session context which
+        // contains necessary Servlet request/response objects.
+        X requestX = session.getContext()
+          .put(HttpServletRequest.class,  x.get(HttpServletRequest.class))
+          .put(HttpServletResponse.class, x.get(HttpServletResponse.class))
+          .put(PrintWriter.class,         x.get(PrintWriter.class));
         getDelegate().execute(requestX);
       } else {
         PrintWriter out = x.get(PrintWriter.class);
