@@ -114,7 +114,13 @@ foam.CLASS({
       targetDAOKey: 'countryDAO',
       name: 'countryId',
       of: 'foam.nanos.auth.Country',
-      documentation: 'Country address.'
+      documentation: 'Country address.',
+      required: true,
+      validateObj: function(countryId) {
+        if ( typeof countryId !== 'string' || countryId.length === 0 ) {
+          return 'Country required';
+        }
+      }
     },
     {
       class: 'Reference',
@@ -132,6 +138,21 @@ foam.CLASS({
           },
           dao$: choices
         });
+      },
+      required: true,
+      validateObj: function(regionId, countryId) {
+        // If the country hasn't been selected yet, don't show this error.
+        if ( countryId == null ) return;
+        if ( typeof regionId !== 'string' || regionId.length === 0 ) {
+          switch ( countryId ) {
+            case 'CA':
+              return 'Province required.';
+            case 'US':
+              return 'State required.';
+            default:
+              return 'Region required.';
+          }
+        }
       }
     },
     {
