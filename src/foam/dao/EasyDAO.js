@@ -132,11 +132,11 @@ foam.dao.DAO delegate = getInnerDAO() == null ?
 
 if ( delegate instanceof foam.dao.MDAO ) setMdao((foam.dao.MDAO)delegate);
 
-if ( getJournaled() && ! getSharedJournal() ) {
+if ( getJournaled() && ! getIsSharedJournal() ) {
   delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
 }
 
-if ( getSharedJournal() ) {
+if ( getIsSharedJournal() ) {
   // Adding a decorator to add a command for
   delegate = new FindReplayDAO(delegate);
 
@@ -383,7 +383,7 @@ return delegate;
       generateJava: false
     },
     {
-      name: 'sharedJournal',
+      name: 'isSharedJournal',
       documentation: `A journal can be either single or shared. A shared journal
         would mean that the journal is being shared with multiple DAOs, e.g.,
         RoutingJournal.`,
