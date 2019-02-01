@@ -46,6 +46,11 @@ foam.CLASS({
     {
       name: 'passedTests',
       class: 'Int'
+    },
+    {
+      name: 'failedTestsList',
+      class: 'FObjectArray',
+      of: 'Test'
     }
   ],
 
@@ -100,6 +105,17 @@ foam.CLASS({
 
         // Exit with the appropriate output.
         if ( getFailedTests() > 0 ) {
+          System.out.println(RED_COLOR + " FAILED TESTS: " + RESET_COLOR);
+          Test[] failedTests = getFailedTestsList();
+          for (Test test: failedTests ) {
+            System.out.println(test.getId());
+            String outputs[] = test.getOutput().split("\\n");
+            for( String output: outputs ) {
+              if ( output.startsWith("FAILURE") ) {
+                System.out.println("\\t" + RED_COLOR + " "+ CROSS_MARK + " " + output + " " + RESET_COLOR);
+              }
+            }
+          }
           System.exit(1);
         }
         System.exit(0);
@@ -139,13 +155,34 @@ foam.CLASS({
           test.runScript(x);
           setPassedTests(getPassedTests() + (int) test.getPassed());
           setFailedTests(getFailedTests() + (int) test.getFailed());
+          if ( (int) test.getFailed() > 0) {
+            addToFailedTestsList(test);
+          }
           printOutput(test);
         }
         catch ( Exception e ) {
           e.printStackTrace();
           setFailedTests(getFailedTests() + 1);
+          addToFailedTestsList(test);
         }
       `
+    },
+    {
+      name: 'addToFailedTestsList',
+      args: [
+        {
+          name: 'test', javaType: 'Test'
+        }
+      ],
+      javaReturns: 'void',
+      javaCode: `
+        Test[] failedTests = getFailedTestsList();
+        Test[] temp = new Test[failedTests.length+1];
+        for ( int i = 0;i < failedTests.length; i++ ) {
+          temp[i] = failedTests[i];
+        }
+        temp[failedTests.length]=test;
+        setFailedTestsList(temp);`
     },
     {
       name: 'printBold',

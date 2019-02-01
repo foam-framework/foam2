@@ -55,7 +55,7 @@ foam.CLASS({
       width: 135px;
       height: 40px;
       border-radius: 2px;
-      background-color: rgba(164, 179, 184, 0.1);
+      // background-color: rgba(164, 179, 184, 0.1);
       box-shadow: 0 0 1px 0 rgba(9, 54, 73, 0.8);
       font-family: Roboto;
       font-size: 14px;

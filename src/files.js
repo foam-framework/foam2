@@ -444,6 +444,7 @@ FOAM_FILES([
   { name: 'foam/u2/tag/Card', flags: ['web'] },
   { name: 'foam/u2/dialog/Popup', flags: ['web'] },
   { name: 'foam/u2/dialog/NotificationMessage', flags: ['web'] },
+  { name: 'foam/u2/dialog/InlineNotificationMessage', flags: ['web'] },
   { name: 'foam/u2/Autocompleter', flags: ['web'] },
   { name: 'foam/u2/search/FilterController', flags: ['web'] },
   { name: 'foam/u2/search/GroupCompleter', flags: ['web'] },
@@ -578,5 +579,7 @@ FOAM_FILES([
   { name: 'foam/dashboard/view/Bar' },
   { name: 'foam/dashboard/view/Line' },
   { name: 'foam/dashboard/view/DAOTable' },
-  { name: 'foam/dashboard/view/Card' }
+  { name: 'foam/dashboard/view/Card' },
+  { name: 'foam/nanos/ruler/Rule' },
+  { name: 'foam/nanos/ruler/Operations' }
 ]);
