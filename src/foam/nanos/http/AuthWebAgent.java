@@ -11,6 +11,7 @@ import foam.dao.DAO;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.AuthenticationException;
 import foam.nanos.auth.User;
+import foam.nanos.boot.Boot;
 import foam.nanos.logger.Logger;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
@@ -99,10 +100,8 @@ public class AuthWebAgent
     if ( ! SafetyUtil.isEmpty(sessionId) ) {
       session = (Session) sessionDAO.find(sessionId);
       if ( session == null ) {
-        // create new session
-        session = new Session();
+        session = createSession(x);
         session.setId(sessionId);
-        session.setRemoteHost(req.getRemoteHost());
         sessionDAO.put(session);
       }
 
@@ -113,8 +112,7 @@ public class AuthWebAgent
       }
     } else {
       // create new cookie
-      session = new Session();
-      session.setRemoteHost(req.getRemoteHost());
+      session = createSession(x);
       createCookie(x, session);
       sessionDAO.put(session);
     }
@@ -197,17 +195,30 @@ public class AuthWebAgent
     return null;
   }
 
+  public Session createSession(X x) {
+    HttpServletRequest  req     = x.get(HttpServletRequest.class);
+    Session             session = new Session((X) x.get(Boot.ROOT));
+
+    session.setRemoteHost(req.getRemoteHost());
+
+    return session;
+  }
+
   public void execute(X x) {
     AuthService auth    = (AuthService) x.get("auth");
     Session     session = authenticate(x);
 
-    if ( session != null && session.getContext() != null && session.getContext().get("user") != null ) {
+    if ( session != null ) {
       if ( auth.check(session.getContext(), permission_) ) {
-        getDelegate().execute(x.put(Session.class, session).put("user", session.getContext().get("user")));
+        X requestX = session.getContext()
+          .put(HttpServletRequest.class,  x.get(HttpServletRequest.class))
+          .put(HttpServletResponse.class, x.get(HttpServletResponse.class))
+          .put(PrintWriter.class,         x.get(PrintWriter.class));
+        getDelegate().execute(requestX);
       } else {
         PrintWriter out = x.get(PrintWriter.class);
         out.println("Access denied. Need permission: " + permission_);
-        ((foam.nanos.logger.Logger)x.get("logger")).debug("Access denied, requires permission:", permission_);
+        ((foam.nanos.logger.Logger) x.get("logger")).debug("Access denied, requires permission:", permission_);
       }
     } else {
       templateLogin(x);
