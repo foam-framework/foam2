@@ -166,7 +166,7 @@ public class AuthWebAgent
 
       try {
         User user = auth.loginByEmail(session.getContext()
-          .put(HttpServletRequest.class, req)
+          .put(HttpServletRequest.class,  req)
           .put(HttpServletResponse.class, resp), email, password);
 
         if ( user != null ) return session;
@@ -196,8 +196,8 @@ public class AuthWebAgent
   }
 
   public Session createSession(X x) {
-    HttpServletRequest  req     = x.get(HttpServletRequest.class);
-    Session             session = new Session((X) x.get(Boot.ROOT));
+    HttpServletRequest req     = x.get(HttpServletRequest.class);
+    Session            session = new Session((X) x.get(Boot.ROOT));
 
     session.setRemoteHost(req.getRemoteHost());
 
@@ -210,6 +210,8 @@ public class AuthWebAgent
 
     if ( session != null ) {
       if ( auth.check(session.getContext(), permission_) ) {
+        // Create a per-request sub-context of the session context which
+        // contains necessary Servlet request/response objects.
         X requestX = session.getContext()
           .put(HttpServletRequest.class,  x.get(HttpServletRequest.class))
           .put(HttpServletResponse.class, x.get(HttpServletResponse.class))
