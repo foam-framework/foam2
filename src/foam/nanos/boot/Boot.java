@@ -79,9 +79,14 @@ public class Boot {
     /**
      * Revert root_ to non ProxyX to avoid letting children add new bindings.
      */
+
+    root_ = root_.put(ROOT, new XFactory() {
+      public Object create(X x) {
+        return Boot.this.getX();
+      }
+    });
+
     root_ = ((ProxyX) root_).getX();
-    root_ = root_.put(ROOT, root_);
-    root_ = root_.put(ROOT, root_);
 
     // Export the ServiceDAO
     ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(
