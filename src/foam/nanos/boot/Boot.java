@@ -76,16 +76,14 @@ public class Boot {
       }
     }, null);
 
-    /**
-     * Revert root_ to non ProxyX to avoid letting children add new bindings.
-     */
-
+    // Use an XFactory so that the root context can contain itself.
     root_ = root_.put(ROOT, new XFactory() {
       public Object create(X x) {
         return Boot.this.getX();
       }
     });
 
+    // Revert root_ to non ProxyX to avoid letting children add new bindings.
     root_ = ((ProxyX) root_).getX();
 
     // Export the ServiceDAO
