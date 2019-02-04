@@ -470,7 +470,8 @@ return delegate;
               this.mdao :
               this.DeDupDAO.create({ delegate: this.mdao }),
             src: dao,
-            of: this.model });
+            of: this.model
+          });
         }
       }
 
