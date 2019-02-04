@@ -47,10 +47,6 @@ foam.INTERFACE({
       documentation: `Returns a boolean indicating whether the provided agent has adequate permission to actAs the provided entity.`,
       javaReturns: 'boolean',
       swiftReturns: 'Bool',
-      javaThrows: [
-        'foam.nanos.auth.AuthorizationException',
-        'foam.nanos.auth.AuthenticationException'
-      ],
       swiftThrows: true,
       args: [
         {
