@@ -96,7 +96,7 @@ public class AgentUserAuthService
       }
 
       if ( ! group.getEnabled() ) {
-        throw new AuthorizationException("Entity' group must be enabled.");
+        throw new AuthorizationException("Entity's group must be enabled.");
       }
 
       /*
