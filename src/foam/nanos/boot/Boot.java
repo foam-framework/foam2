@@ -77,7 +77,7 @@ public class Boot {
     }, null);
 
     // Use an XFactory so that the root context can contain itself.
-    root_ = root_.put(ROOT, new XFactory() {
+    root_ = root_.putFactory(ROOT, new XFactory() {
       public Object create(X x) {
         return Boot.this.getX();
       }
