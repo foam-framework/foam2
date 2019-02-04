@@ -175,8 +175,13 @@ public class AuthWebAgent
           if ( ! SafetyUtil.isEmpty(actAs) ) {
             AgentAuthService agentService = (AgentAuthService) x.get("agentAuth");
             DAO localUserDAO = (DAO) x.get("localUserDAO");
-            User entity = (User) localUserDAO.find(Long.parseLong(actAs));
-            agentService.actAs(session.getContext(), entity);
+            try {
+              User entity = (User) localUserDAO.find(Long.parseLong(actAs));
+              agentService.actAs(session.getContext(), entity);
+            } catch (java.lang.NumberFormatException e) {
+              logger.error("actAs must be a number:" + e);
+              return null;
+            }
           }
           return session;
         }
