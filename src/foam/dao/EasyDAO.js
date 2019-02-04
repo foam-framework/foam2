@@ -439,7 +439,7 @@ return delegate;
 
       if ( ! daoModel ) {
         this.warn(
-          'EasyDAO: Unknown DAO Type.  Add \'' + daoType + '\' to requires: list.'
+          `EasyDAO: Unknown DAO Type.  Add ${daoType} to requires: list.`
         );
       }
 
