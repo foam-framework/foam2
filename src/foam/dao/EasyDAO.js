@@ -482,7 +482,7 @@ return delegate;
         });
       }
 
-      if ( this.seqNo && this.guid ) throw 'EasyDAO \'seqNo\' and \'guid\' features are mutually exclusive.';
+      if ( this.seqNo && this.guid ) throw `EasyDAO 'seqNo' and 'guid' features are mutually exclusive.`;
 
       if ( this.seqNo ) {
         var args = { __proto__: params, delegate: dao, of: this.of };
