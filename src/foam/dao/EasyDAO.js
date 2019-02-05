@@ -440,7 +440,7 @@ return delegate;
 
       if ( ! daoModel ) {
         this.warn(
-          'EasyDAO: Unknown DAO Type.  Add \'' + daoType + '\' to requires: list.'
+          `EasyDAO: Unknown DAO Type.  Add ${daoType} to requires: list.`
         );
       }
 
@@ -463,7 +463,8 @@ return delegate;
               this.mdao :
               this.DeDupDAO.create({ delegate: this.mdao }),
             src: dao,
-            of: this.model });
+            of: this.model
+          });
         }
       }
 
@@ -474,7 +475,7 @@ return delegate;
         });
       }
 
-      if ( this.seqNo && this.guid ) throw 'EasyDAO \'seqNo\' and \'guid\' features are mutually exclusive.';
+      if ( this.seqNo && this.guid ) throw `EasyDAO 'seqNo' and 'guid' features are mutually exclusive.`;
 
       if ( this.seqNo ) {
         var args = { __proto__: params, delegate: dao, of: this.of };
