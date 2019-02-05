@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'com.foamdev.demos.helloMVC',
   name: 'Hello',
-  extends: 'foam.u2.Element',
+  // If the model is just a data object, it shouldn't extend Element.
 
   //exports: [ 'as data' ], //FOAM has DI (Dependency Injection) built-in at the object level.
 

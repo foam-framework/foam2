@@ -7,9 +7,10 @@
 foam.CLASS({
   package: 'com.foamdev.demos.helloMVC',
   name: 'Controller',
-  extends: 'foam.u2.Element',
+  extends: 'foam.u2.Controller',// it will automatically exports: ['as data']
 
-  exports: [ 'data as dataImported' ],  //FOAM has DI (Dependency Injection) built-in at the object level.
+  //exports: [ 'data as dataImported' ],  //FOAM has DI (Dependency Injection) built-in at the object level.
+  //exports: [ 'data' ],
 
   requires: [
     'com.foamdev.demos.helloMVC.Hello',
@@ -20,7 +21,7 @@ foam.CLASS({
   properties: [
     {
       name   : 'data',
-      factory: function() { return this.Hello.create().yourName; }
+      factory: function() { return this.Hello.create(); }//.yourName
     }
   ],
 
