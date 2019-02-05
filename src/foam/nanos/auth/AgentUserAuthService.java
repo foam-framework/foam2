@@ -108,6 +108,12 @@ public class AgentUserAuthService
         EQ(UserUserJunction.TARGET_ID, entity.getId())
       ));
 
+
+      // Object test = agent.getEntities().getJunctionDAO().find(entity);  
+
+
+
+
       if ( permissionJunction == null ) {
         throw new AuthorizationException("You don't have access to act as the requested entity.");
       }
