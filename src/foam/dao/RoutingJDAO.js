@@ -23,17 +23,16 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'replayed',
-      documentation: 'Has this journal been replayed yet?',
-      value: false
+      documentation: 'Has this journal been replayed yet?'
     }
   ],
 
   axioms: [
       {
         name: 'javaExtras',
-        buildJavaClass: function (cls) {
+        buildJavaClass: function(cls) {
           cls.extras.push(`
-            public final static Object ROUTING_JDAO_REPAYED_CMD = new Object();
+            public final static Object ROUTING_JDAO_REPLAYED_CMD = new Object();
           `);
         }
       }
@@ -46,9 +45,9 @@ foam.CLASS({
         replayed yet- wait.`,
       javaCode: `
         if ( ! getReplayed() ) {
-          synchronized ( ROUTING_JDAO_REPAYED_CMD ) {
+          synchronized ( ROUTING_JDAO_REPLAYED_CMD ) {
             try {
-              ROUTING_JDAO_REPAYED_CMD.wait();
+              ROUTING_JDAO_REPLAYED_CMD.wait();
             } catch (java.lang.InterruptedException i) {}
           }
         }
@@ -61,9 +60,9 @@ foam.CLASS({
         replayed yet- wait.`,
       javaCode: `
         if ( ! getReplayed() ) {
-          synchronized ( ROUTING_JDAO_REPAYED_CMD ) {
+          synchronized ( ROUTING_JDAO_REPLAYED_CMD ) {
             try {
-              ROUTING_JDAO_REPAYED_CMD.wait();
+              ROUTING_JDAO_REPLAYED_CMD.wait();
             } catch (java.lang.InterruptedException i) {}
           }
         }
@@ -74,10 +73,10 @@ foam.CLASS({
     {
       name: 'cmd_',
       javaCode: `
-        if ( obj == ROUTING_JDAO_REPAYED_CMD ) {
-          synchronized ( ROUTING_JDAO_REPAYED_CMD ) {
+        if ( obj == ROUTING_JDAO_REPLAYED_CMD ) {
+          synchronized ( ROUTING_JDAO_REPLAYED_CMD ) {
             setReplayed(true);
-            ROUTING_JDAO_REPAYED_CMD.notifyAll();
+            ROUTING_JDAO_REPLAYED_CMD.notifyAll();
           }
           return obj;
         }

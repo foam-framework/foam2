@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,27 +22,24 @@ import foam.dao.ProxyDAO;
 import foam.core.X;
 
 /**
- * This DAO is a decorator around the innerDAO to return the DAO when replaying
- * entries directly into the DAO.
+ * This DAO is a decorator around the innerDAO (MapDAO, MDAO, etc.). It returns
+ * the innerDAO when replaying journal directly into the innerDAO, bypassing
+ * all of the decorators.
  */
 public class FindReplayDAO
   extends ProxyDAO {
 
   public final static Object FIND_REPLAY_DAO_CMD = new Object();
 
-  public FindReplayDAO (DAO d){
+  public FindReplayDAO (DAO d) {
     setDelegate(d);
   }
 
-  public Object cmd (Object obj){
+  public Object cmd_ (X x, Object obj) {
     if ( obj == FIND_REPLAY_DAO_CMD ) {
       return getDelegate();
     }
 
-    return super.cmd(obj);
-  }
-
-  public Object cmd_ (X x, Object obj) {
-    return cmd(obj);
+    return super.cmd_(x, obj);
   }
 }

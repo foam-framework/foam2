@@ -87,7 +87,8 @@ foam.CLASS({
   classes: [
     {
       name: 'ReplaySharedJournal',
-      javaImplements: [ 'Runnable' ],
+      flags: ['java'],
+      javaImplements: ['Runnable'],
       properties: [
         {
           class: 'FObjectProperty',
@@ -105,7 +106,7 @@ foam.CLASS({
           name: 'run',
           javaCode: `
             getJournal().replay(getX(), getDelegate());
-            getDelegate().cmd(RoutingJDAO.ROUTING_JDAO_REPAYED_CMD);
+            getDelegate().cmd(RoutingJDAO.ROUTING_JDAO_REPLAYED_CMD);
           `
         }
       ]
@@ -368,12 +369,12 @@ return delegate;
           delegate: this.remoteListenerSupport ?
             this.WebSocketBox.create({ uri: this.serviceName }) :
             this.HTTPBox.create({ url: this.serviceName })
-        })
+        });
         if ( this.retryBoxMaxAttempts != 0 ) {
           box = this.RetryBox.create({
             maxAttempts: this.retryBoxMaxAttempts,
             delegate: box,
-          })
+          });
         }
         return this.SessionClientBox.create({ delegate: box });
       }
@@ -445,7 +446,6 @@ return delegate;
 
       if ( this.name && daoModel.getAxiomByName('name') ) params.name = this.name;
       if ( daoModel.getAxiomByName('autoIndex') ) params.autoIndex = this.autoIndex;
-      // if ( this.seqNo || this.guid ) params.property = this.seqProperty;
 
       var dao = daoModel.create(params, this.__subContext__);
 
@@ -456,13 +456,6 @@ return delegate;
         this.mdao = dao;
         if ( this.dedup ) dao = this.DeDupDAO.create({ delegate: dao });
       } else {
-//         if ( this.migrationRules && this.migrationRules.length ) {
-//           dao = this.MigrationDAO.create({
-//             delegate: dao,
-//             rules: this.migrationRules,
-//             name: this.model.id + "_" + daoModel.id + "_" + this.name
-//           });
-//         }
         if ( this.cache ) {
           this.mdao = this.MDAO.create({ of: params.of });
           dao = this.CachingDAO.create({
