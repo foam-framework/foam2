@@ -44,9 +44,7 @@ foam.CLASS({
       ],
       javaCode: `
         DAO delegate = new MDAO(DeletedAwareDummy.getOwnClassInfo());
-        DAO dao = (DAO) new DeletedAwareDAO.Builder(x)
-          .setDelegate(delegate)
-          .build();
+        DAO dao = (DAO) new DeletedAwareDAO(x, delegate);
 
         FObject object = new DeletedAwareDummy.Builder(x)
           .setId(1)
@@ -55,7 +53,8 @@ foam.CLASS({
         object = dao.put(object);
 
         dao.remove(object);
-        object = dao.find(object.getProperty("id"));
+
+        object = dao.inX(x).find(object.getProperty("id"));
 
         test(object != null, "DeletedAwareDAO does not remove DeletedAware object from DAO.");
         test(
@@ -71,9 +70,7 @@ foam.CLASS({
       ],
       javaCode: `
         DAO delegate = new MDAO(Country.getOwnClassInfo());
-        DAO dao = (DAO) new DeletedAwareDAO.Builder(x)
-          .setDelegate(delegate)
-          .build();
+        DAO dao = (DAO) new DeletedAwareDAO(x, delegate);
 
         FObject object = new Country.Builder(x)
           .setCode("CA")
@@ -93,9 +90,7 @@ foam.CLASS({
       ],
       javaCode: `
         DAO delegate = new MDAO(DeletedAwareDummy.getOwnClassInfo());
-        DAO dao = (DAO) new DeletedAwareDAO.Builder(x)
-          .setDelegate(delegate)
-          .build();
+        DAO dao = (DAO) new DeletedAwareDAO(x, delegate);
 
         dao.put(
           new DeletedAwareDummy.Builder(x)
@@ -121,9 +116,7 @@ foam.CLASS({
       ],
       javaCode: `
         DAO delegate = new MDAO(DeletedAwareDummy.getOwnClassInfo());
-        DAO dao = (DAO) new DeletedAwareDAO.Builder(x)
-          .setDelegate(delegate)
-          .build();
+        DAO dao = (DAO) new DeletedAwareDAO(x, delegate);
 
         FObject object = new DeletedAwareDummy.Builder(x)
           .setId(1)
@@ -144,9 +137,7 @@ foam.CLASS({
       ],
       javaCode: `
         DAO delegate = new MDAO(DeletedAwareDummy.getOwnClassInfo());
-        DAO dao = (DAO) new DeletedAwareDAO.Builder(x)
-          .setDelegate(delegate)
-          .build();
+        DAO dao = (DAO) new DeletedAwareDAO(x, delegate);
 
         FObject object = new DeletedAwareDummy.Builder(x)
           .setId(1)
