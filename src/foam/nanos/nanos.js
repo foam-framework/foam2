@@ -19,7 +19,6 @@ FOAM_FILES([
   { name: "foam/nanos/auth/ChangePassword" },
   { name: "foam/nanos/auth/EnabledAware" },
   { name: "foam/nanos/auth/DeletedAware" },
-  { name: "foam/nanos/auth/DeletedAwareDAO" },
   { name: "foam/nanos/auth/Group" },
   { name: "foam/nanos/auth/ServiceProvider" },
   { name: "foam/nanos/auth/Language" },

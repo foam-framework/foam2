@@ -181,8 +181,6 @@ var classes = [
   'foam.nanos.auth.LogoutDisabledUserDAO',
   'foam.nanos.auth.DeletedAware',
   'foam.nanos.auth.DeletedAwareDummy',
-  'foam.nanos.auth.DeletedAwareDAO',
-  'foam.nanos.auth.DeletedAwareSink',
   'foam.nanos.auth.DeletedAwareDAOTest',
   'foam.nanos.http.HttpParameters',
   'foam.nanos.http.DefaultHttpParameters',
