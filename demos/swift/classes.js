@@ -51,6 +51,7 @@ var classes = [
   'foam.nanos.demo.relationship.StudentCourseJunction',
   'foam.nanos.fs.File',
   'foam.nanos.menu.Menu',
+  'foam.nanos.mrac.MRACConfig',
   'foam.support.model.SupportEmail',
   'foam.support.model.Ticket',
   'foam.support.model.TicketMessage',
