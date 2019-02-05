@@ -7,9 +7,9 @@
 foam.CLASS({
   package: 'com.foamdev.demos.hello',
   name: 'Controller',
-  extends: 'foam.u2.Element',
+  extends: 'foam.u2.Controller',// it will automatically exports: ['as data']
 
-  exports: [ 'as data' ], //FOAM has DI (Dependency Injection) built-in at the object level.
+  //exports: [ 'as data' ], //FOAM has DI (Dependency Injection) built-in at the object level.
 
   css: `
     h1 { color: #aaa; }
