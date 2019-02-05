@@ -76,10 +76,12 @@ public class DeletedAwareDAO extends ProxyDAO {
   public FObject remove_(X x, FObject obj) {
 
     if ( obj instanceof DeletedAware ) {
-      ((DeletedAware) obj).setDeleted(true);
-      obj = getDelegate().put_(x, obj);
+      DeletedAware clone = (DeletedAware) obj.fclone();
+      clone.setDeleted(true);
+      obj = getDelegate().put_(x, (FObject) clone);
+    } else {
+      obj = getDelegate().remove_(x, obj); // can remove a non deleted Aware Obj
     }
-
     return obj;
   }
 
