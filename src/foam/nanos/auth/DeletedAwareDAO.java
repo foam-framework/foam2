@@ -6,7 +6,7 @@ import foam.dao.*;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
-/*
+/**
   DAO decorator that sets deleted property when an object
   is removing and filters out deleted=true objects based on permission.
 
@@ -19,7 +19,7 @@ import foam.mlang.predicate.Predicate;
   the user group has {name}.read.deleted permission where {name} is either
   the lowercase name of the model of the objects by default
   or the {name} provided by the user.
-*/
+**/
 
 
 
@@ -50,7 +50,7 @@ public class DeletedAwareDAO extends ProxyDAO {
 
   public DeletedAwareDAO(X x, DAO delegate) {
     super(x, delegate);
-    name_ = null;
+    name_ = getOf().getObjClass().getSimpleName().toLowerCase();
   }
 
   @Override
@@ -88,18 +88,10 @@ public class DeletedAwareDAO extends ProxyDAO {
     getDelegate().select_(x, new RemoveSink(x, this), skip, limit, order, predicate);
   }
 
-  private boolean canReadDeleted(X x, FObject obj) {
+  public boolean canReadDeleted(X x, FObject obj) {
+    String deletePermission =  name_ + ".read.deleted";
 
-    String deletePermission;
-    if(name_ == null) {
-      String of = obj.getClass().getSimpleName().toLowerCase();
-      deletePermission = of + ".read.deleted";
-    } else {
-      deletePermission =  name_ + ".read.deleted";
-    }
-
-
-    if( obj instanceof DeletedAware
+    if ( obj instanceof DeletedAware
       && ((DeletedAware) obj).getDeleted() ) {
       AuthService authService = (AuthService) getX().get("auth");
       return authService.check(x, deletePermission);
