@@ -16,7 +16,7 @@ foam.CLASS({
 
   documentation: `A DAO decorator that prevents users from updating / reading
       properties for which they do not have the update / read permission.
-      
+
       To require update / read permission on a property, set the permissionRequired
       to be true, and add the corresponding permissions,
       i.e. model.ro.prop / model.rw.prop to  the groups who are granted permissions
@@ -34,8 +34,8 @@ foam.CLASS({
     {
       name: 'find_',
       javaCode: `
-  FObject oldObj = getDelegate().find(id);
-  
+  FObject oldObj = getDelegate().find_(x, id);
+
   if ( oldObj != null ) {
     return hideProperties(x, oldObj);
   }
@@ -95,7 +95,7 @@ foam.CLASS({
     }
     propertyMap_.put(of, properties);
   }
-    
+
   return obj;
       `,
     },
@@ -137,7 +137,7 @@ foam.CLASS({
     }
     propertyMap_.put(of, properties);
   }
-    
+
   return obj;
       `,
     },
@@ -207,7 +207,7 @@ foam.CLASS({
     },
   ],
 });
-  
+
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'HidePropertiesSink',
