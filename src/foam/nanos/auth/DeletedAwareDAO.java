@@ -6,6 +6,23 @@ import foam.dao.*;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
+/*
+  DAO decorator that sets deleted property when an object
+  is removing and filters out deleted=true objects based on permission.
+
+  DeletedAwareDAO marks object as deleted instead of actually removing
+  the object from DAO then returns thus it should be placed at the end
+  of the decorator stack before MDAO so that it wouldn't cut-off other
+  decorators that also override "remove_" and "removeAll_".
+
+  For filtering, objects with deleted=true will be filtered out unless
+  the user group has {name}.read.deleted permission where {name} is either
+  the lowercase name of the model of the objects by default
+  or the {name} provided by the user.
+*/
+
+
+
 public class DeletedAwareDAO extends ProxyDAO {
 
   private String name_;
@@ -26,16 +43,21 @@ public class DeletedAwareDAO extends ProxyDAO {
   }
 
 
-  public DeletedAwareDAO(X x, String name,  DAO delegate) {
+  public DeletedAwareDAO(X x, String name, DAO delegate) {
     super(x, delegate);
     name_ = name;
+  }
+
+  public DeletedAwareDAO(X x, DAO delegate) {
+    super(x, delegate);
+    name_ = null;
   }
 
   @Override
   public FObject find_(X x, Object id) {
 
     FObject obj = getDelegate().find_(x, id);
-    if ( canReadDeleted(x, obj) ) {
+    if ( obj != null && canReadDeleted(x, obj) ) {
       return obj;
     }
 
@@ -67,14 +89,22 @@ public class DeletedAwareDAO extends ProxyDAO {
   }
 
   private boolean canReadDeleted(X x, FObject obj) {
-     String deletePermission = name_ + ".read.deleted";
 
-     if( obj instanceof DeletedAware
-       && ((DeletedAware) obj).getDeleted() ) {
-       AuthService authService = (AuthService) getX().get("auth");
-       return authService.check(x, deletePermission);
-     }
+    String deletePermission;
+    if(name_ == null) {
+      String of = obj.getClass().getSimpleName().toLowerCase();
+      deletePermission = of + ".read.deleted";
+    } else {
+      deletePermission =  name_ + ".read.deleted";
+    }
 
-     return true;
+
+    if( obj instanceof DeletedAware
+      && ((DeletedAware) obj).getDeleted() ) {
+      AuthService authService = (AuthService) getX().get("auth");
+      return authService.check(x, deletePermission);
+    }
+
+    return true;
   }
 }
