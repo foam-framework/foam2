@@ -9,8 +9,6 @@ foam.CLASS({
   name: 'Hello',
   // If the model is just a data object, it shouldn't extend Element.
 
-  //exports: [ 'as data' ], //FOAM has DI (Dependency Injection) built-in at the object level.
-
   properties: [
     {
       class: 'String',
