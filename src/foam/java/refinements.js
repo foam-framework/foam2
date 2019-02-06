@@ -24,7 +24,9 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'generateJava',
-      value: true
+      expression: function(flags) {
+        return foam.util.flagFilter(['java'])(this);
+      }
     },
     {
       class: 'String',
@@ -300,7 +302,9 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'generateJava',
-      value: true
+      expression: function(model) {
+        return foam.util.flagFilter(['java'])(model);
+      }
     }
   ],
   methods: [
@@ -363,10 +367,12 @@ foam.LIB({
 
       // TODO: instead of doing this here, we should walk all Axioms
       // and introuce a new buildJavaAncestorClass() method
+      var flagFilter = foam.util.flagFilter(['java']);
       cls.allProperties = this.getAxiomsByClass(foam.core.Property)
         .filter(function(p) {
           return !! p.javaType && p.javaInfoType && p.generateJava;
         })
+        .filter(flagFilter)
         .map(function(p) {
           return foam.java.Field.create({ name: p.name, type: p.javaType });
         });
@@ -378,6 +384,7 @@ foam.LIB({
           type: 'void',
           name: 'beforeFreeze',
           body: 'super.beforeFreeze();\n' + this.getAxiomsByClass(foam.core.Property).
+            filter(flagFilter).
             filter(function(p) { return !! p.javaType && p.javaInfoType && p.generateJava; }).
             filter(function(p) { return p.javaFactory; }).
             map(function(p) {
@@ -456,7 +463,9 @@ foam.LIB({
 
         if ( ! cls.abstract ) {
           // Apply builder pattern if more than 3 properties and not abstract.
-          foam.java.Builder.create({ properties: this.getAxiomsByClass(foam.core.Property).filter(function(p) {
+          foam.java.Builder.create({ properties: this.getAxiomsByClass(foam.core.Property)
+            .filter(flagFilter)
+            .filter(function(p) {
             return p.generateJava && p.javaInfoType;
           }) }).buildJavaClass(cls);
         }
@@ -503,7 +512,9 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'javaSupport',
-      value: true
+      expression: function(flags) {
+        return foam.util.flagFilter(['java'])(this);
+      }
     }
   ],
 
@@ -699,7 +710,7 @@ foam.CLASS({
           cls.implements = (this.implements || [])
             .concat(this.model_.javaExtends || []);
 
-          var axioms = this.getAxioms();
+          var axioms = this.getAxioms().filter(foam.util.flagFilter(['java']));
 
           for ( var i = 0 ; i < axioms.length ; i++ ) {
             axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
@@ -972,7 +983,7 @@ foam.CLASS({
             initializer: 'false'
           });
 
-          var axioms = this.getAxioms();
+          var axioms = this.getAxioms().filter(foam.util.flagFilter(['java']));
 
           for ( var i = 0 ; i < axioms.length ; i++ ) {
             axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
