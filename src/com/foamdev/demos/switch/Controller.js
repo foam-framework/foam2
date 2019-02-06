@@ -4,6 +4,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+// This example demonstrate the manner to use ChoiceView (combobox) in FOAM
+
 foam.CLASS({
   package: 'com.foamdev.demos.switch',
   name: 'Controller',
