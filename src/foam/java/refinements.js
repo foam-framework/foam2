@@ -1785,3 +1785,58 @@ foam.CLASS({
     ['javaType', 'java.util.function.Function']
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.core.Promised',
+  flags: [
+    'java'
+  ],
+  methods: [
+    function buildJavaClass(cls) {
+      var name = this.name;
+      var filter = foam.util.flagFilter(['java']);
+      var of = foam.lookup(this.of);
+      var methods = this.methods ?
+        this.methods.map(m => of.getAxiomByName(m)) :
+        of.getOwnAxiomsByClass(foam.core.Method);
+      methods = methods.filter(filter);
+
+      methods.forEach(function(m) {
+        var m2 = m.clone();
+        m2.javaCode = `
+try {
+  maybeWaitFor${name}();
+  ${m2.javaReturns != 'void' ? 'return ' : ''}get${foam.String.capitalize(name)}().${m2.name}(${m2.args.map(a => a.name).join(', ')});
+} catch (Exception e) {
+  throw new RuntimeException(e);
+}
+        `;
+        m2.buildJavaClass(cls);
+      });
+
+      cls.method({
+        type: 'void',
+        name: `maybeWaitFor${name}`,
+        synchronized: true,
+        throws: ['InterruptedException'],
+        body: `
+if ( ! isPropertySet("${name}") ) wait();
+else notifyAll();
+        `
+      });
+
+      foam.core.FObjectProperty.create({
+        of: of,
+        name: name,
+        javaPostSet: `
+try {
+  maybeWaitFor${name}();
+} catch (Exception e) {
+  throw new RuntimeException(e);
+}
+        `
+      }).buildJavaClass(cls);
+      return cls;
+    }
+  ]
+});
