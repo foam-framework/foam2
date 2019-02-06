@@ -3,6 +3,7 @@ package foam.nanos.auth;
 import foam.core.FObject;
 import foam.core.X;
 import foam.dao.*;
+import foam.mlang.MLang;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
@@ -27,22 +28,6 @@ public class DeletedAwareDAO extends ProxyDAO {
 
   private String name_;
 
-  private class DeletedAwareSink extends ProxySink {
-
-    public DeletedAwareSink(X x, Sink delegate) {
-      super(x, delegate);
-    }
-
-    @Override
-    public void put(Object obj, foam.core.Detachable sub) {
-
-      if ( canReadDeleted(getX(), (FObject) obj) ) {
-        getDelegate().put(obj, sub);
-      }
-    }
-  }
-
-
   public DeletedAwareDAO(X x, String name, DAO delegate) {
     super(x, delegate);
     name_ = name;
@@ -56,20 +41,28 @@ public class DeletedAwareDAO extends ProxyDAO {
   @Override
   public FObject find_(X x, Object id) {
 
-    FObject obj = getDelegate().find_(x, id);
-    if ( obj != null && canReadDeleted(x, obj) ) {
-      return obj;
+    DeletedAware obj = (DeletedAware) getDelegate().find_(x, id);
+
+    if ( obj == null || ( obj.getDeleted() && ! canReadDeleted(x) ) ) {
+      return null;
     }
 
-    return null;
+    return (FObject) obj;
   }
 
   @Override
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    Sink deletedAwareSink = new DeletedAwareSink(x, sink);
-    getDelegate().select_(x, deletedAwareSink, skip, limit, order, predicate);
+    if ( canReadDeleted(x) ) {
+      return getDelegate().select_(x, sink, skip, limit, order, predicate);
+    }
 
-    return sink;
+    return getDelegate()
+      .where(
+        MLang.EQ(
+          getOf().getAxiomByName("deleted"), false
+        )
+      ).select_(x, sink, skip, limit, order, predicate);
+
   }
 
   @Override
@@ -90,15 +83,9 @@ public class DeletedAwareDAO extends ProxyDAO {
     getDelegate().select_(x, new RemoveSink(x, this), skip, limit, order, predicate);
   }
 
-  public boolean canReadDeleted(X x, FObject obj) {
+  public boolean canReadDeleted(X x) {
     String deletePermission =  name_ + ".read.deleted";
-
-    if ( obj instanceof DeletedAware
-      && ((DeletedAware) obj).getDeleted() ) {
-      AuthService authService = (AuthService) getX().get("auth");
-      return authService.check(x, deletePermission);
-    }
-
-    return true;
+    AuthService authService = (AuthService) getX().get("auth");
+    return authService.check(x, deletePermission);
   }
 }
