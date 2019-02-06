@@ -9,6 +9,7 @@ package foam.nanos.auth;
 import foam.core.ContextAwareSupport;
 import foam.core.X;
 import foam.dao.DAO;
+import foam.nanos.logger.Logger;
 import foam.nanos.NanoService;
 import foam.nanos.session.Session;
 
@@ -54,14 +55,8 @@ public class AgentUserAuthService
       throw new AuthorizationException("Entity user doesn't exist.");
     }
 
-    Group group = (Group) groupDAO_.find(user.getGroup());
-
-    if ( group == null ) {
-      throw new AuthorizationException("Entity must exist within a group.");
-    }
-
-    if ( ! group.getEnabled() ) {
-      throw new AuthorizationException("Entity' group must be enabled.");
+    if ( ! canActAs(x, agent, user) ) {
+      return null;
     }
 
     /*
@@ -73,16 +68,8 @@ public class AgentUserAuthService
       EQ(UserUserJunction.TARGET_ID, user.getId())
     ));
 
-    if ( permissionJunction == null ) {
-      throw new AuthorizationException("You don't have access to act as the requested entity.");
-    }
-
     // Junction object contains a group which has a unique set of permissions specific to the relationship.
     Group actingWithinGroup = (Group) groupDAO_.find(permissionJunction.getGroup());
-
-    if ( actingWithinGroup == null || ! actingWithinGroup.getEnabled() ) {
-      throw new AuthorizationException("No permissions are appended to the entity relationship.");
-    }
 
     // Clone user and associate new junction group to user. Clone and freeze both user and agent.
     user = (User) user.fclone();
@@ -99,6 +86,52 @@ public class AgentUserAuthService
     session.setContext(session.getContext().put("agent", agent));
     return user;
   }
+
+  public boolean canActAs(X x, User agent, User entity) {
+    try {
+      Group group = (Group) groupDAO_.find(entity.getGroup());
+
+      if ( group == null ) {
+        throw new AuthorizationException("Entity must exist within a group.");
+      }
+
+      if ( ! group.getEnabled() ) {
+        throw new AuthorizationException("Entity's group must be enabled.");
+      }
+
+      /*
+      Finds the UserUserJunction object to see if user can act as the passed in user.
+      Source (agent) users are permitted to act as target (entity) users, not vice versa.
+      */
+      UserUserJunction permissionJunction = (UserUserJunction) agentJunctionDAO_.find(AND(
+        EQ(UserUserJunction.SOURCE_ID, agent.getId()),
+        EQ(UserUserJunction.TARGET_ID, entity.getId())
+      ));
+
+
+      // Object test = agent.getEntities().getJunctionDAO().find(entity);  
+
+
+
+
+      if ( permissionJunction == null ) {
+        throw new AuthorizationException("You don't have access to act as the requested entity.");
+      }
+
+      // Junction object contains a group which has a unique set of permissions specific to the relationship.
+      Group actingWithinGroup = (Group) groupDAO_.find(permissionJunction.getGroup());
+
+      if ( actingWithinGroup == null || ! actingWithinGroup.getEnabled() ) {
+        throw new AuthorizationException("No permissions are appended to the entity relationship.");
+      }
+      return true;
+    } catch (Throwable t) {
+      Logger logger = (Logger) x.get("logger");
+      logger.error("Unable to act as entity: ", t);
+      return false;
+    }
+  }
+
 
   /**
     Retrieves the agent user from the current sessions context.
