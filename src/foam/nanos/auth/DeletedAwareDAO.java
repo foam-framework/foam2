@@ -26,16 +26,17 @@ import foam.mlang.predicate.Predicate;
 
 public class DeletedAwareDAO extends ProxyDAO {
 
-  private String name_;
+  private String deletePermission_;
 
   public DeletedAwareDAO(X x, String name, DAO delegate) {
     super(x, delegate);
-    name_ = name;
+    deletePermission_ = name + ".read.deleted";
   }
 
   public DeletedAwareDAO(X x, DAO delegate) {
     super(x, delegate);
-    name_ = getOf().getObjClass().getSimpleName().toLowerCase();
+    String name = getOf().getObjClass().getSimpleName().toLowerCase();
+    deletePermission_ = name + ".read.deleted";
   }
 
   @Override
@@ -84,8 +85,7 @@ public class DeletedAwareDAO extends ProxyDAO {
   }
 
   public boolean canReadDeleted(X x) {
-    String deletePermission =  name_ + ".read.deleted";
     AuthService authService = (AuthService) getX().get("auth");
-    return authService.check(x, deletePermission);
+    return authService.check(x, deletePermission_);
   }
 }
