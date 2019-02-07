@@ -397,6 +397,7 @@ FOAM_FILES([
   { name: "foam/u2/CurrencyView", flags: ['web'] },
   { name: "foam/u2/CheckBox", flags: ['web'] },
   { name: "foam/u2/md/CheckBox", flags: ['web'] },
+  { name: "foam/u2/md/TextField", flags: ['web'] },
   { name: "foam/u2/CitationView", flags: ['web'] },
   { name: "foam/u2/PopupView", flags: ['web'] },
   { name: "foam/u2/DateView", flags: ['web'] },
