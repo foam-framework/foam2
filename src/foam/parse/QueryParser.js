@@ -333,6 +333,10 @@ foam.CLASS({
           },
 
           'equals': function(v) {
+            // TODO: Refactor so that properties provide a way to adapt the
+            // values rather than putting all of the value adaptation logic
+            // here.
+
             // v[2], the values, is an array, which might have an 'and', 'or' or
             // 'negated' property on it. The default is 'or'. The partial
             // evaluator for expressions can simplify the resulting Mlang further.
