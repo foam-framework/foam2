@@ -72,18 +72,18 @@ foam.CLASS({
       value: function(alt, literal, literalIC, not, notChars, optional, range,
           repeat, seq, seq1, str, sym) {
         return {
-          'START': sym('query'),
-          'query': sym('or'),
+          START: sym('query'),
+          query: sym('or'),
 
-          'or': repeat(sym('and'), alt(literalIC(' OR '), literal(' | ')), 1),
+          or: repeat(sym('and'), alt(literalIC(' OR '), literal(' | ')), 1),
 
-          'and': repeat(
+          and: repeat(
               sym('expr'),
               alt(literalIC(' AND '),
                   not(alt(literalIC(' OR'), literal(' |')), literal(' '))),
               1),
 
-          'expr': alt(
+          expr: alt(
               sym('paren'),
               sym('negate'),
               sym('has'),
@@ -94,64 +94,64 @@ foam.CLASS({
               sym('id')
           ),
 
-          'paren': seq1(1, '(', sym('query'), ')'),
+          paren: seq1(1, '(', sym('query'), ')'),
 
-          'negate': alt(
+          negate: alt(
               seq(literal('-'), sym('expr')),
               seq(literalIC('NOT '), sym('expr'))
           ),
 
-          'id': sym('number'),
+          id: sym('number'),
 
-          'has': seq(literalIC('has:'), sym('fieldname')),
+          has: seq(literalIC('has:'), sym('fieldname')),
 
-          'is': seq(literalIC('is:'), sym('fieldname')),
+          is: seq(literalIC('is:'), sym('fieldname')),
 
-          'equals': seq(sym('fieldname'), alt(':', '='), sym('valueList')),
+          equals: seq(sym('fieldname'), alt(':', '='), sym('valueList')),
 
           // TODO(kgr): Merge with 'equals'.
-          'before': seq(sym('fieldname'), alt('<=', '<', literalIC('-before:')),
+          before: seq(sym('fieldname'), alt('<=', '<', literalIC('-before:')),
               sym('value')),
-          'after': seq(sym('fieldname'), alt('>=', '>', literalIC('-after:')),
+          after: seq(sym('fieldname'), alt('>=', '>', literalIC('-after:')),
               sym('value')),
 
-          'value': alt(
+          value: alt(
               sym('me'),
               sym('date'),
               sym('string'),
               sym('number')
           ),
 
-          'compoundValue': alt(
+          compoundValue: alt(
               sym('negateValue'),
               sym('orValue'),
               sym('andValue')
           ),
 
-          'negateValue': seq(
+          negateValue: seq(
               '(',
               alt('-', literalIC('not ')),
               sym('value'),
               ')'
           ),
 
-          'orValue': seq(
+          orValue: seq(
               '(',
               repeat(sym('value'), alt('|', literalIC(' or '), ' | '), 1),
               ')'
           ),
 
-          'andValue': seq(
+          andValue: seq(
               '(',
               repeat(sym('value'), alt(literalIC(' and '), ' '), 1),
               ')'
           ),
 
-          'valueList': alt(sym('compoundValue'), repeat(sym('value'), ',', 1)),
+          valueList: alt(sym('compoundValue'), repeat(sym('value'), ',', 1)),
 
-          'me': seq(literalIC('me'), not(sym('char'))),
+          me: seq(literalIC('me'), not(sym('char'))),
 
-          'date': alt(
+          date: alt(
               sym('range date'),
               sym('literal date'),
               sym('relative date')
@@ -180,17 +180,17 @@ foam.CLASS({
           'relative date': seq(literalIC('today'),
                 optional(seq('-', sym('number')))),
 
-          'string': alt(sym('word'), sym('quoted string')),
+          string: alt(sym('word'), sym('quoted string')),
 
           'quoted string': seq1(1, '"',
                 repeat(alt(literal('\\"', '"'), notChars('"'))),
                 '"'),
 
-          'word': repeat(sym('char'), null, 1),
+          word: repeat(sym('char'), null, 1),
 
-          'char': alt(range('a', 'z'), range('A', 'Z'), range('0', '9'), '-', '^',
+          char: alt(range('a', 'z'), range('A', 'Z'), range('0', '9'), '-', '^',
               '_', '@', '%', '.'),
-          'number': repeat(range('0', '9'), null, 1)
+          number: repeat(range('0', '9'), null, 1)
         };
       }
     },
@@ -262,45 +262,45 @@ foam.CLASS({
 
         // TODO: Fix me to just build the object directly.
         var actions = {
-          'id': function(v) {
+          id: function(v) {
             return self.Eq.create({
               arg1: cls.ID,
               arg2: v
             });
           },
 
-          'or': function(v) {
+          or: function(v) {
             return self.Or.create({ args: v });
           },
 
-          'and': function(v) {
+          and: function(v) {
             return self.And.create({ args: v });
           },
 
-          'negate': function(v) {
+          negate: function(v) {
             return self.Not.create({ arg1: v[1] });
           },
 
-          'number': function(v) {
+          number: function(v) {
             return parseInt(compactToString(v));
           },
 
-          'me': function() {
+          me: function() {
             return self.me || '';
           },
 
-          'has': function(v) {
+          has: function(v) {
             return self.Has.create({ arg1: v[1] });
           },
 
-          'is': function(v) {
+          is: function(v) {
             return self.Eq.create({
               arg1: v[1],
               arg2: self.True.create()
             });
           },
 
-          'before': function(v) {
+          before: function(v) {
             // If the property (v[0]) is a Date(Time)Property, and the value
             // (v[2]) is a single number, expand it into a Date range for that
             // whole year.
@@ -316,7 +316,7 @@ foam.CLASS({
             });
           },
 
-          'after': function(v) {
+          after: function(v) {
             // If the property (v[0]) is a Date(Time)Property, and the value
             // (v[2]) is a single number, expand it into a Date range for that
             // whole year.
@@ -332,7 +332,7 @@ foam.CLASS({
             });
           },
 
-          'equals': function(v) {
+          equals: function(v) {
             // TODO: Refactor so that properties provide a way to adapt the
             // values rather than putting all of the value adaptation logic
             // here.
@@ -407,18 +407,18 @@ foam.CLASS({
             }
           },
 
-          'negateValue': function(v) {
+          negateValue: function(v) {
             v.negated = true;
             return v;
           },
 
-          'orValue': function(v) {
+          orValue: function(v) {
             v = v[1];
             v.or = true;
             return v;
           },
 
-          'andValue': function(v) {
+          andValue: function(v) {
             v = v[1];
             v.and = true;
             return v;
@@ -490,7 +490,7 @@ foam.CLASS({
           },
 
           'quoted string': compactToString,
-          'word': compactToString
+          word: compactToString
         };
 
         var g = this.ImperativeGrammar.create({
