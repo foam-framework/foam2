@@ -84,35 +84,6 @@ foam.CLASS({
     }
   },
 
-  classes: [
-    {
-      name: 'ReplaySharedJournal',
-      flags: ['java'],
-      javaImplements: ['Runnable'],
-      properties: [
-        {
-          class: 'FObjectProperty',
-          of: 'foam.dao.DAO',
-          name: 'delegate'
-        },
-        {
-          class: 'FObjectProperty',
-          of: 'foam.dao.RoutingJournal',
-          name: 'journal'
-        }
-      ],
-      methods: [
-        {
-          name: 'run',
-          javaCode: `
-            getJournal().replay(getX(), getDelegate());
-            getDelegate().cmd(RoutingJDAO.ROUTING_JDAO_REPLAYED_CMD);
-          `
-        }
-      ]
-    }
-  ],
-
   properties: [
     {
       /** The developer-friendly name for this EasyDAO. */
@@ -138,20 +109,28 @@ if ( getJournaled() && ! getIsSharedJournal() ) {
 }
 
 if ( getIsSharedJournal() ) {
-  // Adding a decorator to add a command for
-  delegate = new FindReplayDAO(delegate);
+  final X x = getX();
+  // Put the innerDAO in the context for replaying journal directly into it.
+  x.put("replayDAO", delegate);
 
-  RoutingJournal routingJournal = (RoutingJournal) getX().get("routingJournal");
+  RoutingJournal routingJournal = (RoutingJournal) x.get("routingJournal");
 
-  delegate = new RoutingJDAO.Builder(getX())
+  DAO promisedDAO = new foam.dao.PromisedDAO.Builder(x).setOf(delegate.getOf()).build();
+  final DAO destDAO = delegate;
+
+  delegate = new RoutingJDAO.Builder(x)
     .setService(getName())
     .setOf(delegate.getOf())
-    .setDelegate(delegate)
+    .setDelegate(promisedDAO)
     .setJournal(routingJournal)
     .build();
 
-  Thread journalReplay = new Thread(new ReplaySharedJournal.Builder(getX()).setJournal(routingJournal).setDelegate(delegate).build());
-  journalReplay.start();
+  new Thread() {
+    public void run() {
+      routingJournal.replay(x, destDAO);
+      promisedDAO.setPromise(destDAO);
+    }
+  }.start();
 }
 
 if ( getGuid() && getSeqNo() ) {

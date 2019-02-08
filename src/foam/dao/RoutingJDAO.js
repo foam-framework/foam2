@@ -28,15 +28,15 @@ foam.CLASS({
   ],
 
   axioms: [
-      {
-        name: 'javaExtras',
-        buildJavaClass: function(cls) {
-          cls.extras.push(`
-            public final static Object ROUTING_JDAO_REPLAYED_CMD = new Object();
-          `);
-        }
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+          public final static Object ROUTING_JDAO_REPLAYED_CMD = new Object();
+        `);
       }
-    ],
+    }
+  ],
 
   methods: [
     {
