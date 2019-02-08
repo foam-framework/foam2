@@ -235,6 +235,8 @@ public class Outputter
       outputList((java.util.List) value);
     } else if ( value instanceof Enum<?> ) {
       outputEnum((Enum<?>) value);
+    } else if ( value instanceof Object[] ) {
+      outputObjectArray((Object[]) value);
     } else /*if ( value == null )*/ {
       writer_.append("null");
     }
@@ -423,5 +425,21 @@ public class Outputter
   public void flush() throws IOException {
     if ( stringWriter_ != null ) stringWriter_.flush();
     if ( writer_ != null ) writer_.flush();
+  }
+
+  protected void outputObjectArray(Object[] objArrayValue) {
+    FObject obj = null;
+
+    writer_.append("[");
+
+    for ( int j = 0 ; j < objArrayValue.length ; j++ ) {
+      obj = (FObject) objArrayValue[j];
+      output(objArrayValue);
+
+      if ( j == (objArrayValue.length - 1) )
+        writer_.append(",");
+    }
+
+    writer_.append("]");
   }
 }
