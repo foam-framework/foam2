@@ -301,7 +301,6 @@ sendEmail(x, emailMessage);`
     },
     {
       name: 'start',
-      javaType: 'void',
       javaCode:
 `Properties props = new Properties();
 props.setProperty("mail.smtp.auth", getAuthenticate() ? "true" : "false");

@@ -34,7 +34,7 @@ foam.CLASS({
     {
       name: 'find_',
       javaCode: `
-  FObject oldObj = getDelegate().find(id);
+  FObject oldObj = getDelegate().find_(x, id);
 
   if ( oldObj != null ) {
     return hideProperties(x, oldObj);
@@ -151,7 +151,7 @@ foam.CLASS({
         },
         {
           name: 'of',
-          javaType: 'String'
+          type: 'String'
         },
         {
           name: 'x',

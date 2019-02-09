@@ -259,7 +259,7 @@ foam.CLASS({
       m.source = global.document.currentScript.src;
     }
 
-    if ( ! m.name ) throw new Error("Unnamed model" + m);
+    if ( ! m.name ) throw new Error("Unnamed model" + m.refines);
 
     m.order = foam.__count++;
     m.id = m.package ? m.package + '.' + m.name : m.name;

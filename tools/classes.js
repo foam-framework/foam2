@@ -182,7 +182,6 @@ var classes = [
   'foam.nanos.auth.twofactor.GoogleTOTPAuthService',
   'foam.nanos.auth.LogoutDisabledUserDAO',
   'foam.nanos.auth.DeletedAware',
-  'foam.nanos.auth.DeletedAwareDAO',
   'foam.nanos.auth.DeletedAwareDummy',
   'foam.nanos.auth.DeletedAwareDAOTest',
   'foam.nanos.http.HttpParameters',
@@ -321,6 +320,11 @@ var classes = [
   'foam.flow.Document',
   'foam.flow.DocumentationFolderDAO',
 
+  'foam.nanos.ruler.AbstractRule',
+  'foam.nanos.ruler.Rule',
+  'foam.nanos.ruler.RulerDAO',
+  'foam.nanos.ruler.Operations',
+  'foam.nanos.ruler.RuleAction',
   'foam.comics.SearchMode',
 
   //Support Files

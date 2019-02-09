@@ -6,22 +6,18 @@
 
 package foam.nanos.http;
 
-import com.sun.net.httpserver.*;
-import java.io.*;
+import foam.core.*;
+import java.io.PrintWriter;
 import java.util.Date;
 
 public class PingService
-  implements HttpHandler
+  implements WebAgent
 {
   public PingService() {}
 
   @Override
-  public void handle(HttpExchange t) throws IOException {
-    System.out.println("Pong");
-    String response = "Pong: " + new Date();
-    t.sendResponseHeaders(200, response.length());
-    OutputStream os = t.getResponseBody();
-    os.write(response.getBytes());
-    os.close();
+  public void execute(X x) {
+    PrintWriter out = x.get(PrintWriter.class);
+    out.println("Pong: " + new Date());
   }
 }

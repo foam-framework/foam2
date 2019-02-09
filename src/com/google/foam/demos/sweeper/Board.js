@@ -19,16 +19,12 @@ foam.CLASS({
   imports: [ 'setTimeout' ],
   exports: [ 'as board' ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-      ^ {
-        border: 1px solid gray;
-        display: inline-block;
-      }
-      */}
-    })
-  ],
+  css: `
+    ^ {
+      border: 1px solid gray;
+      display: inline-block;
+    }
+  `,
 
   properties: [
     [ 'width', 14 ],

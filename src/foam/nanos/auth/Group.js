@@ -16,7 +16,7 @@ foam.CLASS({
 
   tableColumns: [ 'id', 'description', 'defaultMenu', 'parent' ],
 
-  searchColumns: [ ],
+  searchColumns: [ 'id', 'description' ],
 
   properties: [
     {
@@ -118,14 +118,23 @@ foam.CLASS({
       name: 'replyTo',
       value: null
     },
-/*    {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.app.AppConfig',
-      name: 'appConfig',
-      factory: function() { return this.AppConfig.create(); },
-      documentation: 'Custom application configuration for group.'
+    {
+      class: 'Long',
+      name: 'softSessionLimit',
+      documentation: `
+        Users will be asked for providing a feedback once the soft session limit has been reached.
+        If the user doesn't provide any feedback, system will force the user logout.
+        
+        The unit is milliseconds, so if you want to set the time limit to 10 mins, the value would be:
+          600000 = 1000 * 60 * 10.
+        
+        Set the value to 0 to turn off this feature.
+      `
+    },
+    {
+      class: 'String',
+      name: 'supportEmail'
     }
-*/
     /*
       FUTURE
     {
@@ -202,6 +211,9 @@ if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
     Group group = (Group) groupDAO.find(user.getGroup());
     if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
       configUrl = group.getUrl();
+    }
+    if ( ! SafetyUtil.isEmpty(group.getSupportEmail()) ) {
+      config.setSupportEmail(group.getSupportEmail());
     }
   }
 }

@@ -109,7 +109,9 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'generateJava',
-      value: true
+      expression: function(flags) {
+        return foam.util.flagFilter(['java'])(this);
+      }
     },
     { class: 'foam.java.JavaType' },
     {
@@ -382,7 +384,9 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'generateJava',
-      value: true
+      expression: function(model) {
+        return foam.util.flagFilter(['java'])(model);
+      }
     }
   ],
   methods: [
@@ -446,11 +450,13 @@ foam.LIB({
 
       // TODO: instead of doing this here, we should walk all Axioms
       // and introuce a new buildJavaAncestorClass() method
+      var flagFilter = foam.util.flagFilter(['java']);
       cls.allProperties = this.getAxiomsByClass(foam.core.Property)
         .filter(flagFilter)
         .filter(function(p) {
           return !! p.javaType && p.javaInfoType && p.generateJava;
         })
+        .filter(flagFilter)
         .map(function(p) {
           return foam.java.Field.create({ name: p.name, type: p.javaType });
         });
@@ -462,6 +468,7 @@ foam.LIB({
           type: 'void',
           name: 'beforeFreeze',
           body: 'super.beforeFreeze();\n' + this.getAxiomsByClass(foam.core.Property).
+            filter(flagFilter).
             filter(function(p) { return !! p.javaType && p.javaInfoType && p.generateJava; }).
             filter(function(p) { return p.javaFactory; }).
             map(function(p) {
@@ -540,7 +547,9 @@ foam.LIB({
 
         if ( ! cls.abstract ) {
           // Apply builder pattern if more than 3 properties and not abstract.
-          foam.java.Builder.create({ properties: this.getAxiomsByClass(foam.core.Property).filter(flagFilter).filter(function(p) {
+          foam.java.Builder.create({ properties: this.getAxiomsByClass(foam.core.Property)
+            .filter(flagFilter)
+            .filter(function(p) {
             return p.generateJava && p.javaInfoType;
           }) }).buildJavaClass(cls);
         }
@@ -585,7 +594,9 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'javaSupport',
-      value: true
+      expression: function(flags) {
+        return foam.util.flagFilter(['java'])(this);
+      }
     }
   ],
 
@@ -1110,7 +1121,7 @@ foam.CLASS({
             initializer: 'false'
           });
 
-          var axioms = this.getAxioms();
+          var axioms = this.getAxioms().filter(foam.util.flagFilter(['java']));
 
           for ( var i = 0 ; i < axioms.length ; i++ ) {
             axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
@@ -1933,5 +1944,62 @@ foam.CLASS({
   flags: ['java'],
   properties: [
     ['javaType', 'java.util.function.Function']
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'PromisedJavaRefinement',
+  refines: 'foam.core.Promised',
+  flags: [
+    'java'
+  ],
+  methods: [
+    function buildJavaClass(cls) {
+      var name = this.name;
+      var filter = foam.util.flagFilter(['java']);
+      var of = foam.lookup(this.of);
+      var methods = this.methods ?
+        this.methods.map(m => of.getAxiomByName(m)) :
+        of.getOwnAxiomsByClass(foam.core.Method);
+      methods = methods.filter(filter);
+
+      methods.forEach(function(m) {
+        var m2 = m.clone();
+        m2.javaCode = `
+try {
+  maybeWaitFor${name}();
+  ${m2.javaType != 'void' ? 'return ' : ''}get${foam.String.capitalize(name)}().${m2.name}(${m2.args.map(a => a.name).join(', ')});
+} catch (Exception e) {
+  throw new RuntimeException(e);
+}
+        `;
+        m2.buildJavaClass(cls);
+      });
+
+      cls.method({
+        type: 'void',
+        name: `maybeWaitFor${name}`,
+        synchronized: true,
+        throws: ['InterruptedException'],
+        body: `
+if ( ! isPropertySet("${name}") ) wait();
+else notifyAll();
+        `
+      });
+
+      foam.core.FObjectProperty.create({
+        of: of,
+        name: name,
+        javaPostSet: `
+try {
+  maybeWaitFor${name}();
+} catch (Exception e) {
+  throw new RuntimeException(e);
+}
+        `
+      }).buildJavaClass(cls);
+      return cls;
+    }
   ]
 });

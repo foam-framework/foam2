@@ -227,7 +227,6 @@ foam.CLASS({
           name: 'x', type: 'Context'
         }
       ],
-      javaType: 'void',
       javaCode: `
         ByteArrayOutputStream baos  = new ByteArrayOutputStream();
         PrintStream           ps    = new PrintStream(baos);

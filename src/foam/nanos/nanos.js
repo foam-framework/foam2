@@ -32,7 +32,6 @@ FOAM_FILES([
   { name: "foam/nanos/auth/ChangePassword" },
   { name: "foam/nanos/auth/EnabledAware" },
   { name: "foam/nanos/auth/DeletedAware" },
-  { name: "foam/nanos/auth/DeletedAwareDAO" },
   { name: "foam/nanos/auth/Group" },
   { name: "foam/nanos/auth/ServiceProvider" },
   { name: "foam/nanos/auth/Language" },
@@ -177,4 +176,6 @@ FOAM_FILES([
   { name: 'foam/nanos/dig/Argument'},
   { name: 'foam/nanos/notification/email/ClientPOP3EmailService'},
   { name: 'foam/nanos/notification/email/POP3Email'},
+  { name: "foam/nanos/ruler/Rule" },
+  { name: "foam/nanos/ruler/Operations" },
 ]);

@@ -206,6 +206,7 @@ foam.CLASS({
   methods: [
     {
       name: 'listen_',
+      flags: ['js'],
       code: function(x, sink, predicate) {
         // TODO(adamvy): Temporary hack to fix regression.  listen_
         // didn't used to have a declared return type, as such it
