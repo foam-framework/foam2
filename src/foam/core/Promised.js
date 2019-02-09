@@ -128,10 +128,11 @@ foam.CLASS({
 
       var myAxioms = [
         foam.core.Proxy.create({
-          name:      stateName,
-          of:        this.of,
+          name: stateName,
+          flags: ['js', 'swift'],
+          of: this.of,
           delegates: methodNames,
-          forwards:  [],
+          forwards: [],
           factory: function() {
             return this[pendingState].create();
           },
@@ -140,6 +141,7 @@ foam.CLASS({
         }),
         foam.core.Property.create({
           name: delegateName,
+          flags: ['js', 'swift'],
           postSet: function() {
             this[stateName] = this[fulfilledState].create();
           },
@@ -156,17 +158,18 @@ foam.CLASS({
       for ( var i = 0 ; i < methods.length ; i++ ) {
         pendingMethods.push(foam.core.PromisedMethod.create({
           name: methods[i].name,
+          flags: ['js', 'swift'],
           property: myName,
           returns:  methods[i].returns,
           delegate: false
         }));
       }
 
-      var name = this.name;
       myAxioms = myAxioms.concat(
         foam.core.InnerClass.create({
           model: {
             name: pendingState,
+            flags: ['js', 'swift'],
             implements: [this.of],
             axioms: [
               foam.pattern.Singleton.create()
@@ -183,6 +186,7 @@ foam.CLASS({
         foam.core.InnerClass.create({
           model: {
             name: fulfilledState,
+            flags: ['js'],
             properties: [
               {
                 class:    'Proxy',
@@ -195,7 +199,6 @@ foam.CLASS({
             axioms: [
               foam.pattern.Singleton.create()
             ],
-            generateSwift: false,
           }
         }));
 
