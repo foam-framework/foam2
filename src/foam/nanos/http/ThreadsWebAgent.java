@@ -11,8 +11,6 @@ import foam.util.SafetyUtil;
 
 import java.io.PrintWriter;
 import java.lang.StackTraceElement;
-import java.lang.String;
-import java.lang.Thread;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
@@ -44,7 +42,7 @@ public class ThreadsWebAgent
     out.println("<th style=\"text-align: left\">Thread Name</th>");
     out.println("<th>Last Method Call</th>");
     out.println("</tr>");
-    for ( Thread thread : threadArray ){
+    for ( Thread thread : threadArray ) {
       StackTraceElement[] elements  = thread.getStackTrace();
       String methodName             = null;
 

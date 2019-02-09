@@ -6,10 +6,7 @@
 
 package foam.nanos.boot;
 
-import foam.core.Detachable;
-import foam.core.ProxyX;
-import foam.core.SingletonFactory;
-import foam.core.X;
+import foam.core.*;
 import foam.dao.AbstractSink;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
@@ -20,9 +17,15 @@ import foam.nanos.logger.ProxyLogger;
 import foam.nanos.logger.StdoutLogger;
 import foam.nanos.script.Script;
 import foam.nanos.session.Session;
+
+import java.util.List;
+
 import static foam.mlang.MLang.EQ;
 
 public class Boot {
+  // Context key used to store the top-level root context in the context.
+  public final static String ROOT = "_ROOT_";
+
   protected DAO serviceDAO_;
   protected X   root_ = new ProxyX();
 
@@ -55,17 +58,40 @@ public class Boot {
       }
     });
 
-    /**
-     * Revert root_ to non ProxyX to avoid letting children add new bindings.
-     */
+    serviceDAO_.listen(new AbstractSink() {
+      @Override
+      public void put(Object obj, Detachable sub) {
+        NSpec sp = (NSpec) obj;
+        FObject newService = sp.getService();
+
+        if ( newService != null ) {
+          logger.info("Updating service configuration: ", sp.getName());
+
+          FObject service = (FObject) root_.get(sp.getName());
+          List<PropertyInfo> props = service.getClassInfo().getAxioms();
+          for (PropertyInfo prop : props) {
+            prop.set(service, prop.get(newService));
+          }
+        }
+      }
+    }, null);
+
+    // Use an XFactory so that the root context can contain itself.
+    root_ = root_.putFactory(ROOT, new XFactory() {
+      public Object create(X x) {
+        return Boot.this.getX();
+      }
+    });
+
+    // Revert root_ to non ProxyX to avoid letting children add new bindings.
     root_ = ((ProxyX) root_).getX();
 
     // Export the ServiceDAO
     ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(
-        new foam.dao.PMDAO(new foam.dao.AuthenticatedDAO("service", false, serviceDAO_)));
+        new foam.dao.PMDAO(root_, new foam.dao.AuthenticatedDAO("service", false, serviceDAO_)));
     // 'read' authenticated version - for dig and docs
     ((ProxyDAO) root_.get("AuthenticatedNSpecDAO")).setDelegate(
-        new foam.dao.PMDAO(new foam.dao.AuthenticatedDAO("service", true, (DAO) root_.get("nSpecDAO"))));
+        new foam.dao.PMDAO(root_, new foam.dao.AuthenticatedDAO("service", true, (DAO) root_.get("nSpecDAO"))));
 
     serviceDAO_.where(EQ(NSpec.LAZY, false)).select(new AbstractSink() {
       @Override

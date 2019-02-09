@@ -1,0 +1,2 @@
+
+p({"class":"foam.nanos.ruler.Rule","predicate":{"class":"foam.mlang.predicate.True"},"action":null,"id":1,"name":"userDAO email filter","priority":60,"stops":true,"ruleGroup":"users:email filter","daoKey":"localUserDAO","operation":0,"after":false})

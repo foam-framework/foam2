@@ -151,6 +151,7 @@ foam.CLASS({
       for ( var i = 0 ; i < forwards.length ; i++ ) {
         var method = forwards[i];
         axioms.push(this.ProxiedMethod.create({
+          flags: this.flags,
           name: method.name,
           type: method.type,
           property: name,
@@ -162,6 +163,7 @@ foam.CLASS({
       for ( var i = 0 ; i < delegates.length ; i++ ) {
         var method = delegates[i];
         axioms.push(this.ProxiedMethod.create({
+          flags: this.flags,
           name: method.name,
           type: method.type,
           property: name,

@@ -18,13 +18,11 @@ import foam.nanos.session.Session;
 import foam.util.Email;
 import foam.util.Password;
 import foam.util.SafetyUtil;
-
 import javax.security.auth.AuthPermission;
 import java.security.Permission;
 import java.util.Calendar;
 import java.util.List;
 import java.util.regex.Pattern;
-
 import static foam.mlang.MLang.AND;
 import static foam.mlang.MLang.EQ;
 
@@ -139,7 +137,6 @@ public class UserAndGroupAuthService
     Session session = x.get(Session.class);
     session.setUserId(user.getId());
     session.setContext(session.getContext().put("user", user));
-    sessionDAO_.put(session);
 
     return user;
   }
@@ -283,7 +280,7 @@ public class UserAndGroupAuthService
   }
 
   public void validatePassword( String newPassword ) {
-    Pattern passwordValidationPattern = Pattern.compile(passwordValidationRegex()); 
+    Pattern passwordValidationPattern = Pattern.compile(passwordValidationRegex());
     String passwordErrorMessage = passwordValidationErrorMessage();
     if ( SafetyUtil.isEmpty(newPassword) || ! passwordValidationPattern.matcher(newPassword).matches() ) {
       throw new RuntimeException(passwordErrorMessage);
@@ -331,7 +328,7 @@ public class UserAndGroupAuthService
 
     // check if password is valid per validatePassword method
     validatePassword(newPassword);
-    
+
     // old password does not match
     if ( ! Password.verify(oldPassword, user.getPassword()) ) {
       throw new RuntimeException("Old password is incorrect");

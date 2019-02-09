@@ -29,11 +29,14 @@ public class DAOPMLogger
 
   @Override
   public void log(PM pm) {
-    if ( pm.getClassType().getName().indexOf("PM") != -1 ) return;
-    if ( pm.getName().indexOf("PM")                != -1 ) return;
-    if ( pm.getClassType().getName().indexOf("pm") != -1 ) return;
-    if ( pm.getName().indexOf("pm")                != -1 ) return;
+    if ( ! pm.getClassType().getName().equals("foam.dao.PMDAO") ) {
+      if ( pm.getClassType().getName().indexOf("PM") != -1 ) return;
+      if ( pm.getName().indexOf("PM")                != -1 ) return;
+      if ( pm.getClassType().getName().indexOf("pm") != -1 ) return;
+      if ( pm.getName().indexOf("pm")                != -1 ) return;
+    }
 
+    // TODO: could reuse the PMInfo by also using it as the lock object
     PMInfo pmi = new PMInfo();
     pmi.setClsName(pm.getClassType().getName());
     pmi.setPmName(pm.getName());

@@ -2245,7 +2245,6 @@ return getGroupKeys();`
     },
     {
       name: 'putInGroup_',
-      javaType: 'void',
       args: [
         {
           name: 'sub',

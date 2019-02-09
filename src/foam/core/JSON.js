@@ -686,6 +686,18 @@ foam.LIB({
       useShortNames: false,
       strict: false,
       propertyPredicate: function(o, p) { return ! p.storageTransient; }
+    }),
+
+    // Short, but exclude storage-transient properties and is proper JSON.
+    StorageStrict: foam.json.Outputter.create({
+      pretty: false,
+      formatDatesAsNumbers: true,
+      outputDefaultValues: false,
+      // TODO: No deserialization support for shortnames yet.
+      //      useShortNames: true,
+      useShortNames: false,
+      strict: true,
+      propertyPredicate: function(o, p) { return ! p.storageTransient; }
     })
   },
 

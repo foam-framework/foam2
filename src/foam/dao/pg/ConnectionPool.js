@@ -76,7 +76,6 @@ foam.CLASS({
   methods: [
     {
       name: 'start',
-      javaType: 'void',
       javaCode: `try {
   BasicDataSource pool = new BasicDataSource();
   pool.setUsername(getUsername());
