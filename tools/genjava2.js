@@ -71,6 +71,7 @@ externalFile.blacklist.forEach(function(cls) {
   'foam.dao.CompoundDAODecorator',
   'foam.dao.DAODecorator',
   'foam.dao.FlowControl',
+  'foam.dao.PromisedDAO',
   'foam.dao.sync.SyncRecord',
   'foam.dao.sync.VersionedSyncRecord',
   'foam.mlang.order.ThenBy',
