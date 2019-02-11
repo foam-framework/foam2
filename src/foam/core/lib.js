@@ -126,7 +126,11 @@ foam.LIB = function LIB(model) {
       typeof model.constants === 'object',
       'Constants must be a map.');
 
-    for ( var key in model.constants ) root[key] = model.constants[key];
+    for ( var key in model.constants ) {
+      root[key] = foam.json && foam.json.parse ?
+        foam.json.parse(model.constants[key]) :
+        model.constants[key];
+    }
   }
 
   if ( model.methods ) {
