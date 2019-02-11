@@ -624,71 +624,6 @@ foam.CLASS({
 foam.LIB({
   name: 'foam.json',
 
-  constants: {
-
-    // Pretty Print
-    Pretty: foam.json.Outputter.create({
-      strict: false
-    }),
-
-    // Strict means output as proper JSON.
-    Strict: foam.json.Outputter.create({
-      pretty: false,
-      strict: true
-    }),
-
-    // Pretty and proper JSON.
-    PrettyStrict: foam.json.Outputter.create({
-      pretty: true,
-      strict: true
-    }),
-
-    // Compact output (not pretty)
-    Compact: foam.json.Outputter.create({
-      pretty: false,
-      formatDatesAsNumbers: true,
-      outputDefaultValues: false,
-      strict: false
-    }),
-
-    // Shorter than Compact (uses short-names if available)
-    Short: foam.json.Outputter.create({
-      pretty: false,
-      formatDatesAsNumbers: true,
-      outputDefaultValues: false,
-      // TODO: No deserialization support for shortnames yet.
-      //      useShortNames: true,
-      useShortNames: false,
-      strict: false
-    }),
-
-    // Short, but exclude network-transient properties.
-    Network: foam.json.Outputter.create({
-      pretty: false,
-      formatDatesAsNumbers: true,
-      outputDefaultValues: false,
-      // TODO: No deserialization support for shortnames yet.
-      //      useShortNames: true,
-      useShortNames: false,
-      // TODO: Currently faster to use strict JSON and native JSON.parse
-      strict: true,
-      convertUnserializableToStubs: true,
-      propertyPredicate: function(o, p) { return ! p.networkTransient; }
-    }),
-
-    // Short, but exclude storage-transient properties.
-    Storage: foam.json.Outputter.create({
-      pretty: false,
-      formatDatesAsNumbers: true,
-      outputDefaultValues: false,
-      // TODO: No deserialization support for shortnames yet.
-      //      useShortNames: true,
-      useShortNames: false,
-      strict: false,
-      propertyPredicate: function(o, p) { return ! p.storageTransient; }
-    })
-  },
-
   methods: [
     {
       name: 'parse',
@@ -789,4 +724,71 @@ foam.LIB({
       return foam.json.Compact.objectify(o);
     }
   ]
+});
+
+foam.LIB({
+  name: 'foam.json',
+  constants: {
+    // Pretty Print
+    Pretty: foam.json.Outputter.create({
+      strict: false
+    }),
+
+    // Strict means output as proper JSON.
+    Strict: foam.json.Outputter.create({
+      pretty: false,
+      strict: true
+    }),
+
+    // Pretty and proper JSON.
+    PrettyStrict: foam.json.Outputter.create({
+      pretty: true,
+      strict: true
+    }),
+
+    // Compact output (not pretty)
+    Compact: foam.json.Outputter.create({
+      pretty: false,
+      formatDatesAsNumbers: true,
+      outputDefaultValues: false,
+      strict: false
+    }),
+
+    // Shorter than Compact (uses short-names if available)
+    Short: foam.json.Outputter.create({
+      pretty: false,
+      formatDatesAsNumbers: true,
+      outputDefaultValues: false,
+      // TODO: No deserialization support for shortnames yet.
+      //      useShortNames: true,
+      useShortNames: false,
+      strict: false
+    }),
+
+    // Short, but exclude network-transient properties.
+    Network: foam.json.Outputter.create({
+      pretty: false,
+      formatDatesAsNumbers: true,
+      outputDefaultValues: false,
+      // TODO: No deserialization support for shortnames yet.
+      //      useShortNames: true,
+      useShortNames: false,
+      // TODO: Currently faster to use strict JSON and native JSON.parse
+      strict: true,
+      convertUnserializableToStubs: true,
+      propertyPredicate: function(o, p) { return ! p.networkTransient; }
+    }),
+
+    // Short, but exclude storage-transient properties.
+    Storage: foam.json.Outputter.create({
+      pretty: false,
+      formatDatesAsNumbers: true,
+      outputDefaultValues: false,
+      // TODO: No deserialization support for shortnames yet.
+      //      useShortNames: true,
+      useShortNames: false,
+      strict: false,
+      propertyPredicate: function(o, p) { return ! p.storageTransient; }
+    })
+  }
 });
