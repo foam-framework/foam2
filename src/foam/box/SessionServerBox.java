@@ -47,9 +47,13 @@ public class SessionServerBox
           session.setRemoteHost(req.getRemoteHost());
           session.setContext(getX().put(Session.class, session));
           sessionDAO.put(session);
+        } else {
+          // Check that the remoteHost hasn't changed?
+          if ( ! session.getRemoteHost().equals(req.getRemoteHost()) ) {
+            logger.warning("Attempt to use session create for ", session.getRemoteHost(), " from ", req.getRemoteHost());
+            throw new RuntimeException("Attempt to use session from invalid host.");
+          }
         }
-
-        // TODO: should we check that the remoteHost hasn't changed?
 
         User user = (User) session.getContext().get("user");
         X    x    = session.getContext()

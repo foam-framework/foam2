@@ -66,7 +66,6 @@ externalFile.blacklist.forEach(function(cls) {
   'foam.dao.CompoundDAODecorator',
   'foam.dao.DAODecorator',
   'foam.dao.FlowControl',
-  'foam.dao.PromisedDAO',
   'foam.dao.sync.SyncRecord',
   'foam.dao.sync.VersionedSyncRecord',
   'foam.mlang.order.ThenBy',
@@ -87,7 +86,6 @@ externalFile.blacklist.forEach(function(cls) {
   'foam.dao.IDBDAO',
   'foam.dao.LoggingDAO',
   'foam.dao.MDAO',
-  'foam.dao.PromisedDAO',
   'foam.dao.RequestResponseClientDAO',
   'foam.dao.SyncDAO',
   'foam.dao.TimingDAO'
