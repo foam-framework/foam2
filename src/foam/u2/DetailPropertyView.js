@@ -65,14 +65,10 @@ foam.CLASS({
         var propName = prop.name.toLowerCase();
         var clsName = prop.forClass_;
         clsName = clsName.substring(clsName.lastIndexOf('.') + 1).toLowerCase();
-        var readPerm = await this.auth.check(null, `${clsName}.ro.${propName}`);
-        if ( ! readPerm ) {
-          prop.visibility = foam.u2.Visibility.HIDDEN;
-        } else {
-          var writePerm = await this.auth.check(null, `${clsName}.rw.${propName}`);
-          if ( ! writePerm ) {
-            prop.visibility = foam.u2.Visibility.RO;
-          }
+        var writePerm = await this.auth.check(null, `${clsName}.rw.${propName}`);
+        if ( ! writePerm ) {
+          var readPerm = await this.auth.check(null, `${clsName}.ro.${propName}`);
+          prop.visibility = readPerm ? foam.u2.Visibility.RO : foam.u2.Visibility.HIDDEN;
         }
       }
 
