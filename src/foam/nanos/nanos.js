@@ -77,6 +77,7 @@ FOAM_FILES([
   { name: "foam/nanos/menu/ListMenu" },
   { name: "foam/nanos/menu/Menu" },
   { name: "foam/nanos/menu/MenuBar" },
+  { name: "foam/nanos/mrac/MRACConfig" },
   { name: "foam/nanos/menu/PopupMenu" },
   { name: "foam/nanos/menu/SubMenu" },
   { name: "foam/nanos/menu/SubMenuView" },
