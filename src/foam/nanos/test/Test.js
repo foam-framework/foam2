@@ -148,7 +148,6 @@ foam.CLASS({
           name: 'x', type: 'Context'
         }
       ],
-      javaType: 'void',
       javaCode: `
         // disable tests in production
         if ( ((AppConfig) x.get("appConfig")).getMode() == Mode.PRODUCTION ) {

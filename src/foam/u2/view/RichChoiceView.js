@@ -232,8 +232,11 @@ foam.CLASS({
         .addClass(this.myClass())
         .start()
           .addClass(this.myClass('selection-view'))
+          .enableClass('disabled', this.mode$.map((mode) => mode === foam.u2.DisplayMode.DISABLED))
           .on('click', function() {
-            self.isOpen_ = ! self.isOpen_;
+            if ( self.mode === foam.u2.DisplayMode.RW ) {
+              self.isOpen_ = ! self.isOpen_;
+            }
           })
           .start()
             .addClass(this.myClass('custom-selection-view'))
@@ -299,6 +302,12 @@ foam.CLASS({
             });
           }))
         .end();
+    },
+
+    function updateMode_(mode) {
+      if ( mode !== foam.u2.DisplayMode.RW ) {
+        this.isOpen_ = false;
+      }
     }
   ],
 

@@ -42,6 +42,27 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'canActAs',
+      documentation: `Returns a boolean indicating whether the provided agent has adequate permission to actAs the provided entity.`,
+      type: 'Boolean',
+      async: true,
+      swiftThrows: true,
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'agent',
+          type: 'foam.nanos.auth.User'
+        },
+        {
+          name: 'entity',
+          type: 'foam.nanos.auth.User'
+        }
+      ]
+    },
+    {
       name: 'getCurrentAgent',
       type: 'foam.nanos.auth.User',
       async: true,

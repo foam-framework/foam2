@@ -20,7 +20,7 @@ public abstract class HttpContextListener
     Boot boot_ = new Boot();
     Object o = boot_.getX().get("httprouter");
     if ( o != null && o instanceof HttpServlet) {
-      servletContextEvent.getServletContext().addServlet("rout", (HttpServlet)o).addMapping("/");
+      servletContextEvent.getServletContext().addServlet("rout", (HttpServlet) o).addMapping("/");
     } else {
       System.out.println("Couldn't find httprouter servlet, exiting...");
       System.exit(1);

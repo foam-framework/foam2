@@ -39,7 +39,6 @@ public class SessionServerBox
         AuthService        auth       = (AuthService) getX().get("auth");
         DAO                sessionDAO = (DAO)         getX().get("localSessionDAO");
         DAO                groupDAO   = (DAO)         getX().get("groupDAO");
-
         Session            session    = (Session)     sessionDAO.find(sessionID);
 
         if ( session == null ) {
@@ -47,18 +46,25 @@ public class SessionServerBox
           session.setId(sessionID);
           session.setRemoteHost(req.getRemoteHost());
           session.setContext(getX().put(Session.class, session));
+          sessionDAO.put(session);
+        } else {
+          // Check that the remoteHost hasn't changed?
+          if ( ! session.getRemoteHost().equals(req.getRemoteHost()) ) {
+            logger.warning("Attempt to use session create for ", session.getRemoteHost(), " from ", req.getRemoteHost());
+            throw new RuntimeException("Attempt to use session from invalid host.");
+          }
         }
 
         User user = (User) session.getContext().get("user");
-        X    x    = session.getContext().put(
+        X    x    = session.getContext()
+          .put(
             "logger",
             new PrefixLogger(
                 new Object[] { user == null ? "" : user.getId() + " - " + user.label(), "[Service]", spec.getName() },
                 (Logger) session.getContext().get("logger")))
           .put(HttpServletRequest.class, req);
 
-        session.setLastUsed(new Date());
-        session.setUses(session.getUses()+1);
+        session.touch();
 
         if ( authenticate_ && session.getUserId() == 0 ) {
           msg.replyWithException(new AuthenticationException());
@@ -85,7 +91,7 @@ public class SessionServerBox
             throw new RuntimeException("User without a group.");
           }
         }
-        sessionDAO.put(session);
+
         msg.getLocalAttributes().put("x", x);
       }
     } catch (Throwable t) {

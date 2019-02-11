@@ -513,7 +513,7 @@ foam.CLASS({
       name: 'adapt',
       value: function(_, v, prop) {
         // All FObjects may be null.
-        if (v === null) return v;
+        if ( v === null ) return v;
 
         var type = foam.lookup(prop.type);
 

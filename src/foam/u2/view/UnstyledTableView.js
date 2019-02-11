@@ -15,7 +15,8 @@ foam.CLASS({
 
   requires: [
     'foam.u2.md.OverlayDropdown',
-    'foam.u2.view.EditColumnsView'
+    'foam.u2.view.EditColumnsView',
+    'foam.u2.tag.Image'
   ],
 
   exports: [
@@ -113,11 +114,19 @@ foam.CLASS({
       documentation: 'Ignores selection by user.'
     },
     {
-      name: 'sortingIcon',
-      documentation: 'HTML entity representing unicode Down-Pointing Triangle',
-      factory: function() {
-        return foam.u2.tag.Image.create({ data: '/foam2/src/foam/u2/images/double-arrow.svg' });
-      }
+      name: 'restingIcon',
+      documentation: 'Image for grayed out double arrow when table header is not sorting',
+      value: '/foam2/src/foam/u2/images/resting-arrow.svg'
+    },
+    {
+      name: 'ascIcon',
+      documentation: 'Image for table header ascending sorting arrow',
+      value: '/foam2/src/foam/u2/images/up-arrow.svg'
+    },
+    {
+      name: 'descIcon',
+      documentation: 'Image for table header descending sorting arrow',
+      value: '/foam2/src/foam/u2/images/down-arrow.svg'
     },
     {
       name: 'vertMenuIcon',
@@ -183,10 +192,16 @@ foam.CLASS({
                   callIf(column.tableWidth, function() {
                     this.style({ width: column.tableWidth });
                   }).
-                  on('click', function(e) { view.sortBy(column); }).
+                  on('click', function(e) {
+                    view.sortBy(column);
+                  }).
                   call(column.tableHeaderFormatter, [column]).
                   callIf(column.label != '', function() {
-                    this.add(view.sortingIcon);
+                    this.start('img').attr('src', this.slot(function(order) {
+                      return column === order ? view.ascIcon :
+                          (view.Desc.isInstance(order) && order.arg1 === column)
+                          ? view.descIcon : view.restingIcon;
+                    }, view.order$)).end();
                   }).
                 end();
               }).

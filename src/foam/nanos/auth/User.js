@@ -331,7 +331,6 @@ foam.CLASS({
       args: [
         { name: 'x', type: 'Context' }
       ],
-      javaType: 'void',
       javaThrows: ['AuthorizationException'],
       javaCode: `
         User user = (User) x.get("user");
@@ -355,7 +354,6 @@ foam.CLASS({
       args: [
         { name: 'x', type: 'Context' }
       ],
-      javaType: 'void',
       javaThrows: ['AuthorizationException'],
       javaCode: `
         User user = (User) x.get("user");
@@ -383,7 +381,6 @@ foam.CLASS({
         { name: 'x', type: 'Context' },
         { name: 'oldObj', type: 'foam.core.FObject' }
       ],
-      javaType: 'void',
       javaThrows: ['AuthorizationException'],
       javaCode: `
         User user = (User) x.get("user");
@@ -433,7 +430,6 @@ foam.CLASS({
       args: [
         { name: 'x', type: 'Context' }
       ],
-      javaType: 'void',
       javaThrows: ['AuthorizationException'],
       javaCode: `
         User user = (User) x.get("user");

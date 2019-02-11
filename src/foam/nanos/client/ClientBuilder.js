@@ -98,6 +98,7 @@ foam.CLASS({
                     if ( ! json.serviceName ) json.serviceName = 'service/' + spec.name;
                     if ( ! json.class       ) json.class       = 'foam.dao.EasyDAO'
                     if ( ! json.daoType     ) json.daoType     = 'CLIENT';
+                    if ( ! json.retryBoxMaxAttempts ) json.retryBoxMaxAttempts = 0;
                     return foam.json.parse(json, null, this.__subContext__);
                   }
                 });

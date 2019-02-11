@@ -17,7 +17,6 @@ foam.INTERFACE({
   methods: [
     {
       name: 'authorizeOnCreate',
-      javaType: 'void',
       args: [
         { name: 'x', type: 'Context' }
       ],
@@ -25,7 +24,6 @@ foam.INTERFACE({
     },
     {
       name: 'authorizeOnRead',
-      javaType: 'void',
       args: [
         { name: 'x', type: 'Context' }
       ],
@@ -33,7 +31,6 @@ foam.INTERFACE({
     },
     {
       name: 'authorizeOnUpdate',
-      javaType: 'void',
       args: [
         { name: 'x', type: 'Context' },
         { name: 'oldObj', type: 'foam.core.FObject' }
@@ -42,7 +39,6 @@ foam.INTERFACE({
     },
     {
       name: 'authorizeOnDelete',
-      javaType: 'void',
       args: [
         { name: 'x', type: 'Context' }
       ],

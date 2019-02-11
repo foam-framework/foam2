@@ -187,7 +187,7 @@ foam.CLASS({
     function initE() {
       // If no item is selected, and data has not been provided, select the 0th
       // entry.
-      if ( ! this.data && ! this.index ) {
+      if ( this.data == null && ! this.index ) {
         this.index = 0;
       }
 
@@ -249,7 +249,7 @@ foam.CLASS({
       code: function() {
         var d = this.data;
         if ( this.choices.length ) {
-          this.choice = ( d && this.findChoiceByData(d) ) || this.defaultValue;
+          this.choice = ( d != null && this.findChoiceByData(d) ) || this.defaultValue;
         }
       }
     },
@@ -259,7 +259,7 @@ foam.CLASS({
       code: function() {
         this.dao.select().then(function(s) {
           this.choices = s.array.map(this.objToChoice);
-          if ( ! this.data && this.index === -1 ) this.index = this.placeholder ? -1 : 0;
+          if ( this.data == null && this.index === -1 ) this.index = this.placeholder ? -1 : 0;
         }.bind(this));
       }
     }

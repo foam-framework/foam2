@@ -37,7 +37,6 @@ foam.CLASS({
   methods: [
     {
       name: 'start',
-      javaType: 'void',
       javaCode:
 `setLogger(java.util.logging.Logger.getAnonymousLogger());
 getLogger().setUseParentHandlers(false);
@@ -83,7 +82,6 @@ try {
           javaType: 'Object...'
         }
       ],
-      javaType: 'void',
       javaCode: "getLogger().info(combine(args));"
     },
     {
@@ -94,7 +92,6 @@ try {
           javaType: 'Object...'
         }
       ],
-      javaType: 'void',
       javaCode: "getLogger().info(combine(args));"
     },
     {
@@ -105,7 +102,6 @@ try {
           javaType: 'Object...'
         }
       ],
-      javaType: 'void',
       javaCode: "getLogger().warning(combine(args));"
     },
     {
@@ -116,7 +112,6 @@ try {
           javaType: 'Object...'
         }
       ],
-      javaType: 'void',
       javaCode: "getLogger().severe(combine(args));"
     },
     {
@@ -128,7 +123,6 @@ try {
           javaType: 'Object...'
         }
       ],
-      javaType: 'void',
       javaCode: "getLogger().fine(combine(args));"
     },
     {

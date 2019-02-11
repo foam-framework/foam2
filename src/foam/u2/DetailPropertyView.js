@@ -22,6 +22,10 @@ foam.CLASS({
 
   documentation: 'View for one row/property of a DetailView.',
 
+  imports: [
+    'auth'
+  ],
+
   properties: [
     'prop',
     [ 'nodeName', 'tr' ],
@@ -54,8 +58,19 @@ foam.CLASS({
   `,
 
   methods: [
-    function initE() {
+    async function initE() {
       var prop = this.prop;
+
+      if ( prop && prop.permissionRequired )  {
+        var propName = prop.name.toLowerCase();
+        var clsName = prop.forClass_;
+        clsName = clsName.substring(clsName.lastIndexOf('.') + 1).toLowerCase();
+        var writePerm = await this.auth.check(null, `${clsName}.rw.${propName}`);
+        if ( ! writePerm ) {
+          var readPerm = await this.auth.check(null, `${clsName}.ro.${propName}`);
+          prop.visibility = readPerm ? foam.u2.Visibility.RO : foam.u2.Visibility.HIDDEN;
+        }
+      }
 
       // TODO: hide this element if the prop changes its mode to HIDDEN.
       this.
