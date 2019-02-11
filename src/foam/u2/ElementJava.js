@@ -113,16 +113,16 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'AddressDetailView',
-  methods: [ 
-    function initE() { } ,
-  ],
+  methods: [
+    function initE() { }
+  ]
 });
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'PhoneDetailView',
-  methods: [ 
-    function initE() { } ,
-  ],
+  methods: [
+    function initE() { }
+  ]
 });
 foam.CLASS({
   package: 'foam.u2',
@@ -132,9 +132,9 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.u2',
   name: 'Element',
-  methods: [ 
+  methods: [
     function initE() { }
-  ],
+  ]
 });
 foam.CLASS({
   package: 'foam.u2',
@@ -143,53 +143,54 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.u2',
   name: 'Tabs',
-  methods: [ 
-    function add() { },
-  ],
+  methods: [
+    function add() { }
+  ]
 });
 foam.CLASS({
   package: 'foam.u2',
   name: 'TextField',
-  methods: [ 
-    function fromProperty() { } ,
-    function load() { },
-  ],
+  methods: [
+    function fromProperty() { },
+    function load() { }
+  ]
 });
 foam.CLASS({
   package: 'foam.u2',
   name: 'FloatView',
-  methods: [ 
-    function initE() { } ,
-  ],
+  methods: [
+    function initE() { }
+  ]
 });
 foam.CLASS({
   package: 'foam.u2',
   name: 'View',
-  methods: [ 
-    function fromProperty() { } 
-  ],
+  extends: 'foam.u2.Element',
+  methods: [
+    function fromProperty() { }
+  ]
 });
 foam.CLASS({
   package: 'foam.u2.tag',
   name: 'Input',
-  methods: [ 
-    function initE() { } 
-  ],
+  methods: [
+    function initE() { }
+  ]
 });
 foam.CLASS({
   package: 'foam.u2.tag',
   name: 'Select',
-  methods: [ 
-    function initE() { } 
-  ],
+  methods: [
+    function initE() { }
+  ]
 });
 foam.CLASS({
   package: 'foam.u2.tag',
   name: 'TextArea',
-  methods: [ 
+  methods: [
     function initE() { } ,
-    function load() { },
-  ],
+    function load() { }
+  ]
 });
 foam.CLASS({
   package: 'foam.graphics',
