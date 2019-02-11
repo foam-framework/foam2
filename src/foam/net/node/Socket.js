@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.net.node',
   name: 'Socket',
-
+  flags: ['node'],
   imports: [
     'me',
     'socketService'

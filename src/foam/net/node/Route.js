@@ -18,7 +18,7 @@
 foam.INTERFACE({
   package: 'foam.net.node',
   name: 'Route',
-
+  flags: ['node'],
   methods: [
     {
       name: 'match',

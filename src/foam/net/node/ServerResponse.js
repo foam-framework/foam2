@@ -18,7 +18,7 @@
 foam.INTERFACE({
   package: 'foam.net.node',
   name: 'ServerResponse',
-
+  flags: ['node'],
   documentation: `Reponse sent by HTTP server.`,
 
   methods: [

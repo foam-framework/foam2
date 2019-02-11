@@ -18,7 +18,7 @@
 foam.INTERFACE({
   package: 'foam.net.node',
   name: 'Handler',
-
+  flags: ['node'],
   methods: [
     {
       name: 'handle',

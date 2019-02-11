@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.net.node',
   name: 'RequestIdentifier',
-
+  flags: ['node'],
   documentation: `An object responsible for generating an identifier for a
       ServerRequest. This is leveraged by handlers that need to uniquely
       identify related requests, such as CacheHandler.`,
