@@ -558,10 +558,10 @@ foam.LIB({
           if ( pending == 0 ) then();
         }
 
-        function joinAbort() {
+        function joinAbort(e) {
           if ( pending > 0 ) {
             pending = -1;
-            abort();
+            abort(e);
           }
         }
 
