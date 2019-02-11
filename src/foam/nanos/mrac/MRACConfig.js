@@ -1,11 +1,17 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.ENUM({
     package: 'foam.nanos.mrac',
-    name: 'Type',
-  
+    name: 'NodeType',
+
     documentation: `
-      Type of a node in clustering
+      Type of a node/instance in a cluster.
     `,
-  
+
     values: [
       {
         name: 'PRIMARY',
@@ -24,15 +30,15 @@ foam.ENUM({
       }
     ]
   });
-  
+
   foam.ENUM({
     package: 'foam.nanos.mrac',
     name: 'Status',
-  
+
     documentation: `
-      Status of a node in clustering
+      Status of a node/instance in a cluster.
     `,
-  
+
     values: [
       {
         name: 'ONLINE',
@@ -42,61 +48,64 @@ foam.ENUM({
       {
         name: 'OFFLINE',
         label: 'Offline',
-        documentation: 'Removed from a clustering considerations: failed, maintenance, etc '
+        documentation: 'Removed from cluster considerations: failed, maintenance, etc '
       }
     ]
   });
-  
+
   foam.ENUM({
     package: 'foam.nanos.mrac',
-    name: 'Mode',
-  
+    name: 'AccessMode',
+
     documentation: `
-      Mode of a node in clustering
+      Mode of a node in a cluster.
     `,
-  
+
     values: [
       {
         name: 'RO',
         label: 'Read-Only'
       },
       {
-        name: 'RO',
+        name: 'RW',
         label: 'Read-Write'
       },
       {
         name: 'WO',
-        label: 'Write-Only'
+        label: 'Write-Only',
+        documentation: 'Example: External customer SQL databases.'
       }
     ]
   });
-  
+
   foam.CLASS({
     package: 'foam.nanos.mrac',
     name: 'MRACConfig',
-  
+
     documentation: 'Multi-role active clustering - used by high availability system and clustering.',
-  
+
     properties: [
       {
         class: 'String',
-        name: 'hostname',
-        documentation: 'Local instance hostname'
+        name: 'id',
+        aliases: '[name, hostname]',
+        documentation: 'Node name/id - hostname',
+        visibility: 'RO'
       },
       {
         class: 'String',
         name: 'realm',
-        documentation: 'Group of nodes'
+        documentation: 'Group of nodes. Encompases all nodes in all Regions for the same application.'
       },
       {
         class: 'String',
         name: 'region',
-        documentation: 'Geographic region of group nodes'
+        documentation: 'Geographic region of group nodes. A sub group in the Realm.'
       },
       {
         class: 'Enum',
-        of: 'foam.nanos.mrac.Type',
-        name: 'type',
+        of: 'foam.nanos.mrac.NodeType',
+        name: 'nodeType',
         documentation: 'Type of a node'
       },
       {
@@ -107,8 +116,8 @@ foam.ENUM({
       },
       {
         class: 'Enum',
-        of: 'foam.nanos.mrac.Mode',
-        name: 'mode',
+        of: 'foam.nanos.mrac.AccessMode',
+        name: 'accessMode',
         documentation: 'Mode of a node (read-only, read-write or write-only)'
       },
       {
@@ -118,4 +127,4 @@ foam.ENUM({
       },
     ]
   });
-  
+
