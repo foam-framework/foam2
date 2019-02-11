@@ -173,7 +173,7 @@ foam.CLASS({
       documentation: 'User\' profile picture.',
       view: {
         class: 'foam.nanos.auth.ProfilePictureView',
-        placeholderImage: 'images/ic-placeholder.png'
+        placeholderImage: 'images/merchant/ic-placeholder.png'
       }
     },
     {
