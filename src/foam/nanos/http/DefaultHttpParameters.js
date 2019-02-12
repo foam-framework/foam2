@@ -44,19 +44,16 @@ foam.CLASS({
     {
       name: 'values_',
       class: 'Map',
-      javaType: 'java.util.Map',
       hidden: true,
       transient: true,
       factory: function() {
         return {};
       },
-      javaType: 'java.util.Map',
       javaFactory: `return new java.util.HashMap();`
     },
     {
       name: 'props_',
       class: 'Map',
-      javaType: 'java.util.Map',
       hidden: true,
       transient: true,
       factory: function() {
@@ -67,7 +64,6 @@ foam.CLASS({
         }
         return map;
       },
-      javaType: 'java.util.Map',
       javaFactory: `
   java.util.List<foam.core.PropertyInfo> properties = (java.util.List<foam.core.PropertyInfo>) this.getClassInfo().getAxiomsByClass(foam.core.PropertyInfo.class);
   java.util.Map<String, foam.core.PropertyInfo> map = new java.util.HashMap<String, foam.core.PropertyInfo>();
@@ -84,10 +80,11 @@ foam.CLASS({
   methods: [
     {
       name: 'get',
+      type: 'Any',
       args: [
         {
           name: 'name',
-          javaType: 'Object'
+          type: 'Any'
         }
       ],
       code: function(name) {
@@ -97,7 +94,6 @@ foam.CLASS({
         }
         return this.values_[name];
       },
-      javaReturns: 'Object',
       javaCode: `
   Object obj = this.getProps_().get(name);
   Object value = null;
@@ -120,16 +116,16 @@ foam.CLASS({
     },
     {
       name: 'getParameter',
+      type: 'String',
       args: [
         {
           name: 'name',
-          javaType: 'String'
+          type: 'String',
         }
       ],
       code: function(name) {
         return this.get(name);
       },
-      javaReturns: 'String',
       javaCode: `
   Object obj = this.get(name);
   if ( obj != null ) {
@@ -140,10 +136,11 @@ foam.CLASS({
     },
     {
       name: 'getParameterValues',
+      type: 'String[]',
       args: [
         {
           name: 'name',
-          javaType: 'String'
+          type: 'String'
         }
       ],
       code: function(name) {
@@ -153,7 +150,6 @@ foam.CLASS({
         }
         return null;
       },
-      javaReturns: 'String[]',
       javaCode: `
   Object obj = this.get(name);
   if ( obj != null ) {
@@ -170,11 +166,11 @@ foam.CLASS({
       args: [
         {
           name: 'name',
-          javaType: 'Object'
+          type: 'Any'
         },
         {
           name: 'value',
-          javaType: 'Object'
+          type: 'Any'
         }
       ],
       code: function(name, value) {

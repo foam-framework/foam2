@@ -59,28 +59,29 @@ foam.CLASS({
     {
       /** Template method used to add additional code in subclasses. */
       name: 'runTest',
+      type: 'Void',
       code: function(x) {
         return eval(this.code);
       },
       args: [
         {
-          name: 'x', javaType: 'foam.core.X'
+          name: 'x',
+          type: 'Context'
         }
       ],
-      javaReturns: 'void',
       javaCode: '/* NOOP */'
     },
     {
       name: 'test',
+      type: 'Void',
       args: [
         {
-          name: 'exp', javaType: 'boolean'
+          name: 'exp', type: 'Boolean'
         },
         {
-          name: 'message', javaType: 'String'
+          name: 'message', type: 'String'
         }
       ],
-      javaReturns: 'void',
       javaCode: `
         if ( exp ) {
           setPassed(getPassed()+1);
@@ -92,12 +93,12 @@ foam.CLASS({
     },
     {
       name: 'print',
+      type: 'Void',
       args: [
         {
-          name: 'message', javaType: 'String'
+          name: 'message', type: 'String'
         }
       ],
-      javaReturns: 'void',
       javaCode: `
         setOutput(getOutput() + "\\n" + message);
       `
@@ -144,10 +145,9 @@ foam.CLASS({
       },
       args: [
         {
-          name: 'x', javaType: 'foam.core.X'
+          name: 'x', type: 'Context'
         }
       ],
-      javaReturns: 'void',
       javaCode: `
         // disable tests in production
         if ( ((AppConfig) x.get("appConfig")).getMode() == Mode.PRODUCTION ) {

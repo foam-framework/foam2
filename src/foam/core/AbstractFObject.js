@@ -94,10 +94,8 @@ foam.CLASS({
   methods: [
     {
       name: 'compareTo',
-      javaReturns: 'int',
-      args: [
-        { class: 'Object', name: 'o' }
-      ],
+      type: 'Integer',
+      args: [ { name: 'o', type: 'Any' } ],
       javaCode: `
         if ( o == this ) return 0;
         if ( o == null ) return 1;
@@ -121,20 +119,16 @@ foam.CLASS({
     },
     {
       name: 'equals',
-      javaReturns: 'boolean',
-      args: [
-        { class: 'Object', name: 'o' }
-      ],
+      type: 'Boolean',
+      args: [ { name: 'o', type: 'Any' } ],
       javaCode: `
         return compareTo(o) == 0;
       `
     },
     {
       name: 'diff',
-      javaReturns: 'java.util.Map',
-      args: [
-        { class: 'FObjectProperty', name: 'obj' }
-      ],
+      type: 'Map',
+      args: [ { name: 'obj', type: 'FObject' } ],
       javaCode: `
         List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
         Iterator i = props.iterator();
@@ -150,10 +144,8 @@ foam.CLASS({
     },
     {
       name: 'hardDiff',
-      javaReturns: 'foam.core.FObject',
-      args: [
-        { class: 'FObjectProperty', name: 'obj' }
-      ],
+      type: 'FObject',
+      args: [ { name: 'obj', type: 'FObject' } ],
       javaCode: `
         FObject ret = null;
         boolean isDiff = false;
@@ -178,7 +170,7 @@ foam.CLASS({
     },
     {
       name: 'fclone',
-      javaReturns: 'foam.core.FObject',
+      type: 'FObject',
       javaCode: `
         try {
           FObject ret = getClass().newInstance();
@@ -195,14 +187,14 @@ foam.CLASS({
     },
     {
       name: 'deepClone',
-      javaReturns: 'foam.core.FObject',
+      type: 'FObject',
       javaCode: `
         return fclone();
       `
     },
     {
       name: 'shallowClone',
-      javaReturns: 'foam.core.FObject',
+      type: 'FObject',
       javaCode: `
         try {
           FObject ret = getClass().newInstance();
@@ -219,10 +211,8 @@ foam.CLASS({
     },
     {
       name: 'copyFrom',
-      javaReturns: 'foam.core.FObject',
-      args: [
-        { class: 'FObjectProperty', name: 'obj' }
-      ],
+      type: 'FObject',
+      args: [ { name: 'obj', type: 'FObject' } ],
       javaCode: `
         List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
         for ( PropertyInfo p : props ) {
@@ -237,10 +227,8 @@ foam.CLASS({
     },
     {
       name: 'getProperty',
-      javaReturns: 'Object',
-      args: [
-        { class: 'String', name: 'prop' }
-      ],
+      type: 'Any',
+      args: [ { name: 'prop', type: 'String' } ],
       javaCode: `
         PropertyInfo property = ((PropertyInfo) getClassInfo().getAxiomByName(prop));
         return property == null ? null : property.get(this);
@@ -248,11 +236,9 @@ foam.CLASS({
     },
     {
       name: 'setProperty',
-      javaReturns: 'foam.core.FObject',
-      args: [
-        { class: 'String', name: 'prop' },
-        { class: 'Object', name: 'value' }
-      ],
+      type: 'FObject',
+      args: [ { name: 'prop', type: 'String' },
+              { name: 'value', type: 'Any' } ],
       javaCode: `
         PropertyInfo property = ((PropertyInfo) getClassInfo().getAxiomByName(prop));
         if ( property != null ) property.set(this, value);
@@ -261,10 +247,8 @@ foam.CLASS({
     },
     {
       name: 'isPropertySet',
-      javaReturns: 'boolean',
-      args: [
-        { class: 'String', name: 'prop' },
-      ],
+      type: 'Boolean',
+      args: [ { name: 'prop', type: 'String' } ],
       javaCode: `
         PropertyInfo property = (PropertyInfo) getClassInfo().getAxiomByName(prop);
         return property != null && property.isSet(this);
@@ -272,10 +256,8 @@ foam.CLASS({
     },
     {
       name: 'hasDefaultValue',
-      javaReturns: 'boolean',
-      args: [
-        { class: 'String', name: 'prop' }
-      ],
+      type: 'Boolean',
+      args: [ { name: 'prop', type: 'String' } ],
       javaCode: `
         if ( ! this.isPropertySet(prop) ) return true;
         PropertyInfo property = (PropertyInfo) getClassInfo().getAxiomByName(prop);
@@ -284,7 +266,7 @@ foam.CLASS({
     },
     {
       name: 'toJSON',
-      javaReturns: 'String',
+      type: 'String',
       javaCode: `
         Outputter out = new Outputter();
         return out.stringify(this);
@@ -292,7 +274,7 @@ foam.CLASS({
     },
     {
       name: 'toString',
-      javaReturns: 'String',
+      type: 'String',
       javaCode: `
         StringBuilder sb = new StringBuilder();
         append(sb);
@@ -301,9 +283,7 @@ foam.CLASS({
     },
     {
       name: 'append',
-      args: [
-        { class: 'Object', name: 'sb', javaType: 'java.lang.StringBuilder' }
-      ],
+      args: [ { name: 'sb', javaType: 'java.lang.StringBuilder' } ],
       javaCode: `
         List     props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
         Iterator i     = props.iterator();
@@ -332,11 +312,13 @@ foam.CLASS({
     },
     {
       name: 'beforeFreeze',
+      type: 'Void',
       javaCode: `
       `
     },
     {
       name: 'freeze',
+      type: 'Void',
       javaCode: `
         beforeFreeze();
         this.__frozen__ = true;
@@ -344,16 +326,16 @@ foam.CLASS({
     },
     {
       name: 'isFrozen',
-      javaReturns: 'boolean',
+      type: 'Boolean',
       javaCode: `
         return this.__frozen__;
       `
     },
     {
       name: 'hash',
-      javaReturns: 'byte[]',
+      type: 'Byte[]',
       args: [
-        { class: 'Object', name: 'md', javaType: 'java.security.MessageDigest' },
+        { name: 'md', javaType: 'java.security.MessageDigest' },
       ],
       javaCode: `
         List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
@@ -373,7 +355,7 @@ foam.CLASS({
     },
     {
       name: 'sign',
-      javaReturns: 'byte[]',
+      type: 'Byte[]',
       javaThrows: [
         'SignatureException'
       ],
@@ -396,13 +378,11 @@ foam.CLASS({
     },
     {
       name: 'verify',
-      javaReturns: 'boolean',
-      javaThrows: [
-        'SignatureException'
-      ],
+      type: 'Boolean',
+      javaThrows: [ 'java.security.SignatureException' ],
       args: [
-        { class: 'Object', name: 'signature', javaType: 'byte[]' },
-        { class: 'Object', name: 'verifier', javaType: 'java.security.Signature' },
+        { name: 'signature', type: 'Byte[]' },
+        { name: 'verifier', javaType: 'java.security.Signature' },
       ],
       javaCode: `
         List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);

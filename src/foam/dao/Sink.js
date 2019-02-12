@@ -24,44 +24,39 @@ foam.INTERFACE({
   methods: [
     {
       name: 'put',
-      returns: '',
       args: [
         {
           name: 'obj',
-          swiftType: 'Any'
+          type: 'Any',
         },
         {
           name: 'sub',
-          swiftType: 'Detachable',
+          type: 'foam.core.Detachable',
         },
       ],
     },
     {
       name: 'remove',
-      returns: '',
       args: [
         {
           name: 'obj',
-          swiftType: 'Any'
+          type: 'Any',
         },
         {
           name: 'sub',
-          swiftType: 'Detachable',
+          type: 'foam.core.Detachable',
         },
       ],
     },
     {
       name: 'eof',
-      returns: '',
-      args: [],
     },
     {
       name: 'reset',
-      returns: '',
       args: [
         {
           name: 'sub',
-          swiftType: 'Detachable',
+          type: 'foam.core.Detachable',
         },
       ],
     }
@@ -99,21 +94,25 @@ foam.CLASS({
       name: 'put',
       code: function() {},
       swiftCode: '// NOOP',
+      javaCode: '// NOOP'
     },
     {
       name: 'remove',
       code: function() {},
       swiftCode: '// NOOP',
+      javaCode: '// NOOP'
     },
     {
       name: 'eof',
       code: function() {},
       swiftCode: '// NOOP',
+      javaCode: '// NOOP'
     },
     {
       name: 'reset',
       code: function() {},
       swiftCode: '// NOOP',
+      javaCode: '// NOOP'
     }
   ]
 });
@@ -348,14 +347,21 @@ foam.CLASS({
       code: function put(obj, sub) {
         if ( this.predicate.f(obj) ) this.delegate.put(obj, sub);
       },
-      swiftCode: 'if predicate.f(obj) { delegate.put(obj, sub) }'
+      swiftCode: 'if predicate.f(obj) { delegate.put(obj, sub) }',
+      javaCode: `
+        try {
+          if ( getPredicate().f(obj) ) getDelegate().put(obj, sub);
+        } catch (ClassCastException exp) {
+        }
+      `
     },
     {
       name: 'remove',
       code: function remove(obj, sub) {
         if ( this.predicate.f(obj) ) this.delegate.remove(obj, sub);
       },
-      swiftCode: 'if predicate.f(obj) { delegate.remove(obj, sub) }'
+      swiftCode: 'if predicate.f(obj) { delegate.remove(obj, sub) }',
+      javaCode: 'if ( getPredicate().f(obj) ) getDelegate().remove(obj, sub);'
     }
   ]
 });
@@ -388,12 +394,16 @@ foam.CLASS({
           this.delegate.put(obj, sub);
         }
       },
-      swiftCode: function() {/*
-count += 1
+      swiftCode: `count += 1
 if count <= limit {
   delegate.put(obj, sub)
-}
-      */}
+}`,
+      javaCode: `if ( getCount() >= getLimit() ) {
+  if ( sub != null ) sub.detach();
+} else {
+  setCount(getCount() + 1);
+  getDelegate().put(obj, sub);
+}`
     },
     {
       name: 'remove',
@@ -404,12 +414,16 @@ if count <= limit {
           this.delegate.remove(obj, sub);
         }
       },
-      swiftCode: function() {/*
-count += 1
+      swiftCode: `count += 1
 if count <= limit {
   delegate.remove(obj, sub)
-}
-      */}
+}`,
+      javaCode: 'if ( getCount() >= getLimit() ) {\n'
+        + '  if ( sub != null ) sub.detach();\n'
+        + '} else {'
+        + '  setCount(getCount() + 1);\n'
+        + '  getDelegate().put(obj, sub);\n'
+        + '}\n'
     }
   ]
 });
@@ -443,26 +457,32 @@ foam.CLASS({
 
         this.delegate.put(obj, sub);
       },
-      swiftCode: function() {/*
-if count < skip {
+      swiftCode: `if count < skip {
   count += 1
   return
 }
-delegate.put(obj, sub)
-      */}
+delegate.put(obj, sub)`,
+      javaCode: 'if ( getCount() < getSkip() ) {\n'
+        + '  setCount(getCount() + 1);\n'
+        + '  return;'
+        + '}\n'
+        + 'getDelegate().put(obj, sub);'
     },
     {
       name: 'remove',
       code: function remove(obj, sub) {
         this.reset(sub);
       },
-      swiftCode: function() {/*
-if count < skip {
+      swiftCode: `if count < skip {
   count += 1
   return
 }
-delegate.remove(obj, sub)
-      */}
+delegate.remove(obj, sub)`,
+      javaCode: 'if ( getCount() < getSkip() ) {\n'
+        + '  setCount(getCount() + 1);\n'
+        + '  return;'
+        + '}\n'
+        + 'getDelegate().remove(obj, sub);'
     },
     {
       name: 'reset',
@@ -470,10 +490,9 @@ delegate.remove(obj, sub)
         this.count = 0;
         this.delegate.reset(sub);
       },
-      swiftCode: function() {/*
-count = 0;
-delegate.reset(sub);
-      */},
+      swiftCode: `count = 0;
+delegate.reset(sub);`,
+      javaCode: `setCount(0);getDelegate().reset(sub);`
     }
   ]
 });
@@ -487,7 +506,7 @@ foam.CLASS({
   properties: [
     {
       class: 'FObjectProperty',
-      of: 'foam.mlang.order.Comparator',
+      type: 'foam.mlang.order.Comparator',
       required: true,
       name: 'comparator'
     },
@@ -505,6 +524,8 @@ foam.CLASS({
         this.array.push(obj);
       },
       swiftCode: 'array.append(obj)',
+      javaCode: 'if ( getArray() == null ) setArray(new java.util.ArrayList());\n'
+        + 'getArray().add(obj);'
     },
     {
       name: 'eof',
@@ -522,8 +543,7 @@ foam.CLASS({
           if ( detached ) break;
         }
       },
-      swiftCode: function() {/*
-array.sort(by: {
+      swiftCode: `array.sort(by: {
   return comparator.compare($0, $1) < 0
 });
 
@@ -532,8 +552,16 @@ let sub = Subscription { detached = true }
 for obj in array {
   delegate.put(obj as! foam_core_FObject, sub)
   if detached { break }
-}
-      */}
+}`,
+      javaCode: 'if ( getArray() == null ) setArray(new java.util.ArrayList());\n'
+        + 'java.util.Collections.sort(getArray(), getComparator());\n'
+        + 'foam.dao.Subscription sub = new foam.dao.Subscription();\n'
+        + 'for ( Object o : getArray() ) {\n'
+        + '  if ( sub.getDetached() ) {\n'
+        + '    break;\n'
+        + '  }\n'
+        + '  getDelegate().put(o, sub);\n'
+        + '}'
     },
     {
       name: 'remove',
@@ -541,6 +569,7 @@ for obj in array {
         // TODO
       },
       swiftCode: '// TODO',
+      javaCode: '// TODO'
     },
   ]
 });
@@ -572,7 +601,12 @@ foam.CLASS({
           this.results[obj.id] = true;
           return this.delegate.put(obj, sub);
         }
-      }
+      },
+      javaCode: 'if ( getResults() == null ) setResults(new java.util.HashSet<>());\n' +
+        '    if ( ! getResults().contains(((foam.core.FObject)obj).getProperty("id")) ) {\n' +
+        '      getDelegate().put(obj, sub);\n' +
+        '      getResults().add(((foam.core.FObject)obj).getProperty("id"));\n' +
+        '    }'
     }
   ]
 });
@@ -613,7 +647,7 @@ foam.CLASS({
   properties: [
     {
       name: 'fn',
-      swiftType: '((String, Any?, Detachable) -> Void)',
+      swiftType: '((String, Any?, foam_core_Detachable) -> Void)',
       swiftRequiresEscaping: true,
     },
   ],

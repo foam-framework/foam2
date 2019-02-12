@@ -70,7 +70,6 @@ return String(str[startIndex..<endIndex])
     },
     {
       name: 'value',
-      swiftReturns: 'Any?',
       swiftCode: function() {/*
 return value_
       */},

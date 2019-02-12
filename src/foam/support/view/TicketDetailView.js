@@ -16,7 +16,6 @@ foam.CLASS({
     'foam.u2.PopupView',
     'foam.support.model.TicketMessage',
     'foam.support.view.ReplyView',
-    
   ],
 
   implements: [
@@ -29,7 +28,7 @@ foam.CLASS({
     'hideSummary',
     'user'
   ],
-  
+
   exports: [
     'as data',
     'viewData'

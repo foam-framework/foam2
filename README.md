@@ -71,13 +71,6 @@ to run the unit tests.
 
 # Documentation
 
-* _npm run doc_ generates HTML API documentation in doc/gen/.
-
-Documentation is created by JSDoc with a plugin to account for FOAM's package
-structure and declarative nature. JSDoc modules correspond with FOAM packages.
-See [/doc/guides/Documentation.md](/doc/guides/Documentation.md) for information on comment
-formatting.
-
 # Contributing
 
 Before contributing code to FOAM, you must complete the [Google Individual Contributor License Agreement](https://cla.developers.google.com/about/google-individual?csw=1).

@@ -6,6 +6,8 @@
 
 /* refinement to add device token property for Firebase */
 foam.CLASS({
+  package: 'foam.nanos.auth',
+  name: 'UserDeviceTokenRefinement',
   refines: 'foam.nanos.auth.User',
 
   properties: [

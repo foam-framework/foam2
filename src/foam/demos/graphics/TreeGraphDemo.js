@@ -1,4 +1,5 @@
 foam.CLASS({
+  package: 'foam.demo.graphics',
   name: 'TreeGraphDemo',
   extends: 'foam.graphics.TreeGraph',
 

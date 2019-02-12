@@ -82,13 +82,18 @@ foam.CLASS({
               // If this behavior isn't desired then the relationship should be
               // moved into its own file.
               self.find(jsonId).then(function(m) {
-                m.initRelationship();
+                m.initSource();
+                m.initTarget();
               });
             }
           };
 
           if ( foam.String.isInstance(text) ) {
-            with ( context ) { eval(text); }
+            try {
+              with ( context ) { eval(text); }
+            } catch ( e ) {
+              throw new Error("Error parsing " + id + " error was:" + e);
+            }
           } else {
             context.foam.CLASS(text);
           }
@@ -107,4 +112,3 @@ foam.CLASS({
     }
   ]
 });
-

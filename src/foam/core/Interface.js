@@ -51,7 +51,7 @@ foam.CLASS({
   name: 'InterfaceModel',
   extends: 'foam.core.Model',
 
-  documentation: 'An Interface Mode/definition. Created with foam.INTERFACE().',
+  documentation: 'An Interface definition. Created with foam.INTERFACE().',
 
   properties: [
     [ 'extends', 'foam.core.AbstractInterface' ],
@@ -63,6 +63,12 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'javaExtends'
+    }
+  ],
+  methods: [
+    function validate() {
+      if ( this.extends !== 'foam.core.AbstractInterface' )
+        throw 'INTERFACE: ' + this.id + ' does not extend AbstractInterface.  Did you mean impelments [ \'' + this.extends + '\' ], ?';
     }
   ]
 });
@@ -91,24 +97,7 @@ foam.LIB({
 
   methods: [
     function INTERFACE(m) {
-
       m.class = m.class || 'foam.core.InterfaceModel';
-      // if m.implements not defined, add it as an array, otherwise add its content
-      // in an array
-      if ( ! m.implements ) {
-        m.implements = [];
-      } else if ( typeof m.implements === 'string' ) {
-        m.implements = [m.implements];
-      }
-      // adds m.extends content to m.implements and then remove it
-      if ( m.extends ) {
-        if ( typeof m.extends === 'string' ) {
-          m.implements.push(m.extends);
-        } else if( m.extends.length > 0 ) {
-          m.implements = m.implements.concat(m.extends);
-        }
-        delete m.extends;
-      }
       foam.CLASS(m);
     }
   ]

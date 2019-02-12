@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'MessageAxiomSwiftRefinement',
   refines: 'foam.i18n.MessageAxiom',
   flags: ['swift'],
   requires: [

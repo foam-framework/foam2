@@ -13,12 +13,12 @@ foam.CLASS({
   constants: [
     {
       name: 'DEFAULT',
-      of: 'foam.swift.parse.json.output.Outputter',
+      type: 'foam.swift.parse.json.output.Outputter',
       swiftFactory: `return Context.GLOBAL.create(foam_swift_parse_json_output_Outputter.self)!`,
     },
     {
       name: 'PRETTY',
-      of: 'foam.swift.parse.json.output.Outputter',
+      type: 'foam.swift.parse.json.output.Outputter',
       swiftFactory: `
 let x = Context.GLOBAL
 return x.create(foam_swift_parse_json_output_Outputter.self, args: [
@@ -54,7 +54,7 @@ return x.create(foam_swift_parse_json_output_Outputter.self, args: [
       name: 'output',
       args: [
         {
-          of: 'foam.json2.Outputter',
+          type: 'foam.json2.Outputter',
           name: 'out',
         },
         {
@@ -116,11 +116,11 @@ if let data = data as? JSONOutputter {
       name: 'outputFObject',
       args: [
         {
-          of: 'foam.json2.Outputter',
+          type: 'foam.json2.Outputter',
           name: 'out',
         },
         {
-          of: 'FObject',
+          type: 'FObject',
           name: 'data',
         },
       ],
@@ -147,11 +147,11 @@ _ = out.end()
       name: 'swiftStringify',
       args: [
         {
-          of: 'FObject',
+          type: 'FObject',
           name: 'data',
         },
       ],
-      swiftReturns: 'String',
+      type: 'String',
       swiftCode: `
 let s = outputterFactory(__subContext__)
 output(s, data)

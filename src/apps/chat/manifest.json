@@ -1,7 +1,0 @@
-{
-  "name": "FOAM+Firebase Chat",
-  "short_name": "Chat",
-  "start_url": "/src/apps/chat/index.html",
-  "display": "standalone",
-  "gcm_sender_id": "1034261245915"
-}

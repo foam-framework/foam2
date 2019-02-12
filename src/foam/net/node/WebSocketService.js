@@ -9,7 +9,7 @@ foam.CLASS({
   package: 'foam.net.node',
   name: 'WebSocketService',
   extends: 'foam.net.web.WebSocketService',
-
+  flags: ['node'],
   requires: [
     'foam.net.node.WebSocket',
     'foam.box.HelloMessage'

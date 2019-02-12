@@ -18,7 +18,7 @@
 foam.INTERFACE({
   package: 'foam.net.node',
   name: 'Route',
-
+  flags: ['node'],
   methods: [
     {
       name: 'match',
@@ -28,10 +28,10 @@ foam.INTERFACE({
         {
           name: 'url',
           documentation: `The URL to test against this route.`,
-          typeName: 'URL'
+          // TODO type: 'URL'
         }
       ],
-      returns: 'Boolean',
+      type: 'Boolean',
       code: function(url) {}
     }
   ]

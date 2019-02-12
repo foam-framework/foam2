@@ -316,7 +316,7 @@ foam.CLASS({
   methods: [
     {
       name: 'label',
-      javaReturns: 'String',
+      type: 'String',
       code: function label() {
         return this.organization || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
       },
@@ -329,9 +329,8 @@ foam.CLASS({
     {
       name: 'authorizeOnCreate',
       args: [
-        { name: 'x', javaType: 'foam.core.X' }
+        { name: 'x', type: 'Context' }
       ],
-      javaReturns: 'void',
       javaThrows: ['AuthorizationException'],
       javaCode: `
         User user = (User) x.get("user");
@@ -353,9 +352,8 @@ foam.CLASS({
     {
       name: 'authorizeOnRead',
       args: [
-        { name: 'x', javaType: 'foam.core.X' }
+        { name: 'x', type: 'Context' }
       ],
-      javaReturns: 'void',
       javaThrows: ['AuthorizationException'],
       javaCode: `
         User user = (User) x.get("user");
@@ -380,10 +378,9 @@ foam.CLASS({
     {
       name: 'authorizeOnUpdate',
       args: [
-        { name: 'x', javaType: 'foam.core.X' },
-        { name: 'oldObj', javaType: 'foam.core.FObject' }
+        { name: 'x', type: 'Context' },
+        { name: 'oldObj', type: 'foam.core.FObject' }
       ],
-      javaReturns: 'void',
       javaThrows: ['AuthorizationException'],
       javaCode: `
         User user = (User) x.get("user");
@@ -431,9 +428,8 @@ foam.CLASS({
     {
       name: 'authorizeOnDelete',
       args: [
-        { name: 'x', javaType: 'foam.core.X' }
+        { name: 'x', type: 'Context' }
       ],
-      javaReturns: 'void',
       javaThrows: ['AuthorizationException'],
       javaCode: `
         User user = (User) x.get("user");
@@ -505,6 +501,8 @@ foam.RELATIONSHIP({
 });
 
 foam.CLASS({
+  package: 'foam.nanos.auth',
+  name: 'UserUserJunctionGroupRefinement',
   refines: 'foam.nanos.auth.UserUserJunction',
 
   properties: [

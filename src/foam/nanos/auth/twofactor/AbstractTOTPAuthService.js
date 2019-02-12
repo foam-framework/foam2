@@ -19,23 +19,23 @@ foam.CLASS({
   methods: [
     {
       name: 'checkCode',
-      javaReturns: 'boolean',
+      type: 'Boolean',
       args: [
         {
           name: 'key',
-          javaType: 'byte[]'
+          type: 'Byte[]'
         },
         {
           name: 'code',
-          javaType: 'long'
+          type: 'Long'
         },
         {
           name: 'stepsize',
-          javaType: 'long'
+          type: 'Long'
         },
         {
           name: 'window',
-          javaType: 'int'
+          type: 'Integer'
         }
       ],
       javaCode:

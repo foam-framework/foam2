@@ -95,11 +95,10 @@ foam.CLASS({
     },
     {
       name: 'applyAction',
-      javaReturns: 'void',
       args: [
-        { name: 'x', javaType: 'foam.core.X' },
-        { name: 'obj', javaType: 'foam.core.FObject' },
-        { name: 'oldObj', javaType: 'foam.core.FObject' }
+        { name: 'x', type: 'Context' },
+        { name: 'obj', type: 'foam.core.FObject' },
+        { name: 'oldObj', type: 'foam.core.FObject' }
       ],
       javaCode: ` `
     },
@@ -109,13 +108,12 @@ foam.CLASS({
     },
     {
       name: 'createStatement',
-      javaReturns: 'String',
+      type: 'String',
       javaCode: 'return "";'
     },
     {
       name: 'partialEval',
       javaCode: 'return this;',
-      javaReturns: 'foam.mlang.predicate.Predicate'
     },
   ]
 });
