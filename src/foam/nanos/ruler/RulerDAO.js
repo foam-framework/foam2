@@ -92,7 +92,7 @@
       FObject oldObj = getDelegate().find_(x, obj);
       applyRules(x, obj, oldObj, getRemoveBefore());
 
-      FObject ret =  getDelegate().put_(x, obj);
+      FObject ret =  getDelegate().remove_(x, obj);
 
       applyRules(x, ret, oldObj, getRemoveAfter());
       return ret;
