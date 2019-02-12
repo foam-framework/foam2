@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'PropertySwiftRefinement',
   refines: 'foam.core.Property',
   flags: ['swift'],
   requires: [
@@ -62,7 +64,7 @@ foam.CLASS({
       class: 'String',
       name: 'swiftValueType',
       expression: function(swiftType) {
-        return swiftType + (swiftType.match(/[?!]$/) ? '' : '!')
+        return swiftType + (foam.swift.isNullable(swiftType) ? '' : '!')
       },
     },
     {
@@ -70,9 +72,17 @@ foam.CLASS({
       name: 'swiftRequiresEscaping',
     },
     {
-      class: 'String',
-      name: 'swiftType',
-      value: 'Any?',
+      class: 'Boolean',
+      name: 'swiftOptional',
+      expression: function(required) {
+        return !required;
+      },
+    },
+    {
+      class: 'foam.swift.SwiftTypeProperty',
+      expression: function(type, swiftOptional) {
+        return foam.swift.toSwiftType(type, swiftOptional)
+      },
     },
     {
       class: 'String',
@@ -86,6 +96,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftValue',
+      expression: function(value) {
+        var v = foam.swift.asSwiftValue(value)
+        return v == 'nil' ? '' : v
+      },
     },
     {
       class: 'String',
@@ -117,13 +131,6 @@ foam.CLASS({
       expression: function(name) { return '_' + name + '_postSet_'; },
     },
     {
-      class: 'String',
-      name: 'swiftRequiresCast',
-      expression: function(swiftType) {
-        return swiftType != 'Any?' && swiftType != 'Any!';
-      },
-    },
-    {
       class: 'StringArray',
       name: 'swiftExpressionArgs',
     },
@@ -139,8 +146,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftAdapt',
-      expression: function(swiftType, swiftRequiresCast) {
-        if (!swiftRequiresCast) return 'return newValue';
+      expression: function(swiftType) {
+        if (!foam.swift.requiresCast(swiftType)) return 'return newValue';
         return 'return newValue as! ' + swiftType;
       },
     },
@@ -173,7 +180,7 @@ foam.CLASS({
       class: 'String',
       name: 'swiftJsonParser',
       factory: function() {
-        return `Context.GLOBAL.create(${foam.swift.parse.json.AnyParser.model_.swiftName}.self)!`;
+        return `Context.GLOBAL.create(foam_swift_parse_json_AnyParser.self)!`;
       },
     },
     {
@@ -357,7 +364,7 @@ if <%=this.swiftInitedName%> {
 }
 <% if ( this.swiftFactory ) { %>
 self.set(key: "<%=this.name%>", value: <%=this.swiftFactoryName%>())
-return <%=this.swiftValueName%><% if ( this.swiftRequiresCast ) { %>!<% } %>
+return <%=this.swiftValueName%><% if ( foam.swift.requiresCast(this.swiftType) ) { %>!<% } %>
 <% } else if ( this.swiftExpression ) { %>
 if <%= this.swiftExpressionSubscriptionName %> != nil { return <%= this.swiftValueName %> }
 let valFunc = { [unowned self] () -> <%= this.swiftType %> in
@@ -386,7 +393,7 @@ let detach: Listener = { [unowned self] _,_ in
 return <%=this.swiftValueName%>
 <% } else if ( this.swiftValue ) { %>
 return <%=this.swiftValue%>
-<% } else if ( this.swiftType.match(/[!?]$/) ) { %>
+<% } else if ( foam.swift.isNullable(this.swiftType) ) { %>
 return nil
 <% } else { %>
 fatalError("No default value for <%=this.name%>")
@@ -488,37 +495,14 @@ return PInfo(classInfo())
 });
 
 foam.CLASS({
-  refines: 'foam.core.FObjectProperty',
-  flags: ['swift'],
-  properties: [
-    {
-      name: 'swiftType',
-      expression: function(of, required) {
-        of = of ? of.model_.swiftName : 'foam_core_FObject';
-        return of + (required ? '' : '?');
-      },
-    },
-  ],
-});
-
-foam.CLASS({
-  refines: 'foam.core.Class',
-  flags: ['swift'],
-  properties: [
-    {
-      name: 'swiftType',
-      value: 'ClassInfo',
-    },
-  ],
-});
-
-foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'ListSwiftRefinement',
   refines: 'foam.core.List',
   flags: ['swift'],
   properties: [
     {
-      name: 'swiftType',
-      value: '[Any?]',
+      name: 'swiftOptional',
+      value: false,
     },
     {
       name: 'swiftFactory',
@@ -528,46 +512,78 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  refines: 'foam.core.Boolean',
-  flags: ['swift'],
-  properties: [
-    {
-      name: 'swiftType',
-      value: 'Bool',
-    },
-    {
-      name: 'swiftValue',
-      expression: function(value) { return foam.swift.stringify(value) },
-    },
-  ],
-});
-
-foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'MapSwiftRefinement',
   refines: 'foam.core.Map',
   flags: ['swift'],
   properties: [
     {
-      name: 'swiftType',
-      value: '[String:Any?]',
+      name: 'swiftOptional',
+      value: false,
     },
     {
-      name: 'swiftValue',
-      value: '[:]',
+      name: 'swiftFactory',
+      value: 'return [:]',
     },
   ],
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'ArraySwiftRefinement',
+  refines: 'foam.core.Array',
+  flags: ['swift'],
+  properties: [
+    {
+      name: 'swiftOptional',
+      value: false,
+    },
+    {
+      name: 'swiftFactory',
+      value: 'return []',
+    },
+  ],
+});
+
+foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'StringArraySwiftRefinement',
   refines: 'foam.core.StringArray',
   flags: ['swift'],
   properties: [
     {
-      name: 'swiftType',
-      value: '[String]',
+      name: 'swiftOptional',
+      value: false,
     },
     {
-      name: 'swiftValue',
-      value: '[]',
+      name: 'swiftFactory',
+      value: 'return []',
+    },
+  ],
+});
+
+foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'ClassSwiftRefinement',
+  refines: 'foam.core.Class',
+  flags: ['swift'],
+  properties: [
+    {
+      name: 'swiftOptional',
+      value: false,
+    },
+  ],
+});
+
+foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'BooleanSwiftRefinement',
+  refines: 'foam.core.Boolean',
+  flags: ['swift'],
+  properties: [
+    {
+      name: 'swiftOptional',
+      value: false,
     },
   ],
 });
@@ -639,15 +655,11 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'DateTimeSwiftRefinement',
   refines: 'foam.core.DateTime',
   flags: ['swift'],
   properties: [
-    {
-      name: 'swiftType',
-      expression: function(required) {
-        return 'Date' + (required ? '' : '?')
-      },
-    },
     {
       name: 'swiftAdapt',
       value: `
@@ -668,13 +680,16 @@ return Date()
 })
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'EnumSwiftRefinement',
   refines: 'foam.core.Enum',
   flags: ['swift'],
   properties: [
     {
-      name: 'swiftType',
-      expression: function(of, required) {
-        return (of ? of.model_.swiftName : 'AbstractEnum') + (required ? '' : '?');
+      name: 'swiftValue',
+      expression: function(type) {
+        var cls = foam.lookup(type);
+        return `${cls.model_.swiftName}.${cls.VALUES[0]}`;
       },
     },
     {
@@ -694,6 +709,8 @@ return newValue as! ${swiftType}
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'MultiPartIDSwitRefinement',
   refines: 'foam.core.MultiPartID',
   flags: [ 'swift' ],
   properties: [
@@ -701,7 +718,7 @@ foam.CLASS({
       name: 'swiftGetter',
       expression: function(propNames) {
         return `
-let propNames = ${foam.swift.stringify(propNames)}
+let propNames = ${foam.swift.asSwiftValue(propNames)}
 var args = [String:Any?]()
 for propName in propNames {
   let pInfo = self.ownClassInfo().axiom(byName: propName) as! PropertyInfo
@@ -715,7 +732,7 @@ return self.__subContext__.create(${this.of.model_.swiftName}.self, args: args)!
       name: 'swiftSetter',
       expression: function(propNames) {
         return `
-let propNames = ${foam.swift.stringify(propNames)}
+let propNames = ${foam.swift.asSwiftValue(propNames)}
 for propName in propNames {
   let selfPInfo = self.ownClassInfo().axiom(byName: propName) as! PropertyInfo
   let valuePInfo = value!.ownClassInfo().axiom(byName: propName) as! PropertyInfo
@@ -728,22 +745,24 @@ for propName in propNames {
 })
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'IDAliasSwiftRefinement',
   refines: 'foam.core.IDAlias',
   flags: [ 'swift' ],
   properties: [
     {
       name: 'swiftGetter',
-      expression: function(targetProperty) {
+      expression: function(propName) {
         return `
-return Swift.type(of: self).${targetProperty.swiftAxiomName}().get(self)
+return Swift.type(of: self).${foam.String.constantize(propName)}().get(self)
         `
       },
     },
     {
       name: 'swiftSetter',
-      expression: function(targetProperty) {
+      expression: function(propName) {
         return `
-return Swift.type(of: self).${targetProperty.swiftAxiomName}().set(self, value: value)
+return Swift.type(of: self).${foam.String.constantize(propName)}().set(self, value: value)
         `
       },
     },
@@ -751,6 +770,8 @@ return Swift.type(of: self).${targetProperty.swiftAxiomName}().set(self, value: 
 })
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'ReferenceSwiftRefinement',
   refines: 'foam.core.Reference',
   flags: [ 'swift' ],
   requires: [

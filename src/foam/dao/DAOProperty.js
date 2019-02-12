@@ -30,7 +30,12 @@ foam.CLASS({
       value: {class: 'foam.comics.InlineBrowserView'},
     },
     ['transient', true],
-    ['of', 'foam.dao.DAO']
+    ['of', 'foam.dao.DAO'],
+    {
+      name: 'javaInfoType',
+      flags: ['java'],
+      value: 'foam.core.AbstractDAOPropertyPropertyInfo',
+    },
   ],
 
   methods: [
@@ -53,6 +58,12 @@ foam.CLASS({
         },
         configurable: true
       });
+    },
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var compare = info.getMethod('compare');
+      compare.body = 'return 0;';
+      return info;
     }
   ]
 });

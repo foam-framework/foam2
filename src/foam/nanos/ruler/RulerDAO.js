@@ -103,19 +103,19 @@
       args: [
         {
           name: 'x',
-          of: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'obj',
-          of: 'foam.core.FObject'
+          type: 'foam.core.FObject'
         },
         {
           name: 'oldObj',
-          of: 'foam.core.FObject'
+          type: 'foam.core.FObject'
         },
         {
           name: 'sink',
-          of: 'foam.mlang.sink.GroupBy'
+          type: 'foam.mlang.sink.GroupBy'
         }
       ],
       javaCode: `
@@ -138,7 +138,7 @@
       args: [
         {
           name: 'x',
-          of: 'foam.core.X'
+          type: 'Context'
         }
       ],
       javaCode: `

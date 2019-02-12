@@ -7,7 +7,7 @@ Eg: https://github.com/foam-framework/foam2/blob/master/src/foam/nanos/auth/Auth
 
 
 If you method is returning some value to the client, make sure to include
-returns: 'Promise' so that the client can get the value returned
+async: true so that the client can get the value returned
 
 2. In classes.js, include the Interface for which a skeleton will be generated
 Eg:

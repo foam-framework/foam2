@@ -13,7 +13,8 @@ foam.CLASS({
   ],
   properties: [
     {
-      swiftType: 'String',
+      type: 'String',
+      required: true,
       name: 'chars',
     },
   ],

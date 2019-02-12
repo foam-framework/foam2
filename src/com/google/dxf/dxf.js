@@ -311,17 +311,13 @@ foam.CLASS({
     }
   },
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
+  css: `
         ^layers {
           display: inline-block;
         }
         ^ canvas {
         }
-      */}
-    })
-  ],
+`,
 
   properties: [
     {

@@ -45,14 +45,14 @@ foam.CLASS({
 
   constants: [
     {
-      type: 'int',
       name: 'MAX_OUTPUT_CHARS',
-      value: 20000,
+      type: 'Integer',
+      value: 20000
     },
     {
-      type: 'int',
       name: 'MAX_NOTIFICATION_OUTPUT_CHARS',
-      value: 200,
+      type: 'Integer',
+      value: 200
     }
   ],
 
@@ -191,9 +191,9 @@ foam.CLASS({
     {
       name: 'createInterpreter',
       args: [
-        { name: 'x', javaType: 'foam.core.X' }
+        { name: 'x', type: 'Context' }
       ],
-      javaReturns: 'Interpreter',
+      javaType: 'Interpreter',
       javaCode: `
         Interpreter shell = new Interpreter();
 
@@ -224,10 +224,9 @@ foam.CLASS({
       },
       args: [
         {
-          name: 'x', javaType: 'foam.core.X'
+          name: 'x', type: 'Context'
         }
       ],
-      javaReturns: 'void',
       javaCode: `
         ByteArrayOutputStream baos  = new ByteArrayOutputStream();
         PrintStream           ps    = new PrintStream(baos);

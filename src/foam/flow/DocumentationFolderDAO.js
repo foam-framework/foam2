@@ -64,8 +64,7 @@ return sink;`
     },
     {
       name: 'verifyId',
-      javaReturns: 'void',
-      args: [ { name: 'id', javaType: 'String' } ],
+      args: [ { name: 'id', type: 'String' } ],
       javaCode: `
 // Very conservative allowable characters to avoid any possible filename shennanigans.
 

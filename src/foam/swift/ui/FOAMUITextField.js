@@ -71,7 +71,7 @@ data = textField.text ?? ""
           swiftType: 'UITextField',
         },
       ],
-      swiftReturns: 'Bool',
+      type: 'Boolean',
       swiftCode: function() {/*
 textField.resignFirstResponder()
 return true

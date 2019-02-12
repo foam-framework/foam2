@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'TopicSwiftRefinement',
   refines: 'foam.core.Topic',
   flags: ['swift'],
   methods: [

@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'AbstractInterfaceSwiftRefinement',
   refines: 'foam.core.AbstractInterface',
   flags: ['swift'],
   axioms: [
@@ -14,7 +16,7 @@ foam.CLASS({
           var m = this.model_;
           // If the interface implements any other interfaces, ommit the 'class'
           // to remove a "Redundant constraint 'Self' : 'AnyObject'" warning.
-          var impls = ( (m.implements || []).length ? [] : ['class'] ).concat(m.swiftAllImplements)
+          var impls = ( (m.implements || []).length ? [] : ['class'] ).concat(m.swiftAllImplements())
           var cls = foam.lookup('foam.swift.Protocol').create({
             name: m.swiftName,
             implements: impls,
@@ -35,19 +37,26 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'ImplementsSwiftRefinement',
   refines: 'foam.core.Implements',
   flags: ['swift'],
   methods: [
     function writeToSwiftClass(cls, parentCls) {
       if ( ! parentCls.hasOwnAxiom(this.name) ) return;
+      this.writeToSwiftClass_(cls, parentCls);
+    },
+    function writeToSwiftClass_(cls, parentCls) {
       // Fill in any missing methods with a method that just calls fatalError().
       // We need to do this in swift because abstract classes aren't a thing so
       // we need to implement all methods.
       if ( ! foam.swift.SwiftClass.isInstance(cls) ) return;
       var of = foam.lookup(this.path);
-      var interfaceMethods = of.getOwnAxiomsByClass(foam.core.Method).filter(function(m) {
-        return m.swiftSupport;
-      });
+      var interfaceMethods = of.getOwnAxiomsByClass(foam.core.Method)
+        .filter(foam.util.flagFilter(['swift']))
+        .filter(function(m) {
+          return m.swiftSupport;
+        });
       var implementedMethods = parentCls.getOwnAxiomsByClass(foam.core.Method);
       var missingMethods = interfaceMethods.filter(function(m) {
         return !implementedMethods.find(function(m2) {
@@ -60,6 +69,10 @@ foam.CLASS({
         var method = foam.core.Method.create(m);
         method.swiftCode = m.swiftCode;
         method.writeToSwiftClass_(cls, parentCls);
+      });
+
+      of.getAxiomsByClass(foam.core.Implements).forEach(function(i) {
+        i.writeToSwiftClass_(cls, parentCls);
       });
     }
   ],

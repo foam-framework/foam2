@@ -25,7 +25,7 @@ foam.CLASS({
       // than having a property for "order" and one for
       // "ascending/descending"
       class: 'FObjectProperty',
-      of: 'foam.core.Property',
+      type: 'foam.core.Property',
       name: 'order',
       view: { class: 'foam.u2.view.ExprView' },
       hidden: true
@@ -64,7 +64,7 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.dao.Sink',
+      type: 'foam.dao.Sink',
       hidden: true,
       view: {
         class: 'foam.u2.view.FObjectView',
@@ -131,7 +131,7 @@ foam.CLASS({
     },
     {
       class: 'Enum',
-      of: 'foam.dashboard.model.VisualizationSize',
+      type: 'foam.dashboard.model.VisualizationSize',
       name: 'size',
       value: 'MEDIUM'
     },

@@ -11,20 +11,17 @@ foam.INTERFACE({
   methods: [
     {
       name: 'emailDoc',
-      returns: 'Promise',
-      javaReturns: 'boolean',
-      swiftReturns: 'Bool',
+      async: true,
+      type: 'Boolean',
       swiftThrows: true,
       args: [
         {
           name: 'user',
-          javaType: 'foam.nanos.auth.User',
-          swiftType: 'User'
+          type: 'foam.nanos.auth.User'
         },
         {
           name: 'docName',
-          javaType: 'String',
-          swiftType: 'String'
+          type: 'String'
         }
       ],
     },

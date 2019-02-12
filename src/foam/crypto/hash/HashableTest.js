@@ -55,9 +55,9 @@ foam.CLASS({
     {
       name: 'Hashable_HashWithValidAlgorithm',
       args: [
-        { class: 'FObjectProperty', name: 'input'     },
-        { class: 'String',          name: 'algorithm' },
-        { class: 'String',          name: 'expected'  }
+        { type: 'FObject', name: 'input'     },
+        { type: 'String',          name: 'algorithm' },
+        { type: 'String',          name: 'expected'  }
       ],
       javaCode: `
         try {
@@ -71,9 +71,9 @@ foam.CLASS({
     {
       name: 'Hashable_HashingSameObjects_ProducesSameDigest',
       args: [
-        { class: 'FObjectProperty', name: 'o1'      },
-        { class: 'FObjectProperty', name: 'o2'      },
-        { class: 'String',          name: 'message' }
+        { type: 'FObject', name: 'o1'      },
+        { type: 'FObject', name: 'o2'      },
+        { type: 'String',          name: 'message' }
       ],
       javaCode: `
         try {
@@ -87,7 +87,7 @@ foam.CLASS({
     },
     {
       name: 'Hashable_HashWithInvalidAlgorithm_NoSuchAlgorithmException',
-      args: [ { class: 'FObjectProperty', name: 'input' } ],
+      args: [ { type: 'FObject', name: 'input' } ],
       javaCode: `
         try {
           input.hash("asldkfjaksdjhf");
