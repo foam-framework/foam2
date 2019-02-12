@@ -38,5 +38,12 @@
       };`,
       documentation: 'The action to be executed if predicates returns true for passed object.'
     }
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: 'return getPredicate().f(obj);'
+    }
   ]
 });
