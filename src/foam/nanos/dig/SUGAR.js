@@ -290,7 +290,6 @@ foam.CLASS({
   actions: [
     {
       name: 'postButton',
-      hidden: true,
       label: 'Send POST Request',
       code: async function() {
         if ( ! (this.postURL === '') ) {
