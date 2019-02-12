@@ -51,7 +51,7 @@ foam.CLASS({
           console.warn('Unable to load ', path);
           console.warn(e);
         }
-        return Promise.resolve(null);
+        return Promise.reject(e);
       } finally {
         foam.CLASS = foamCLASS;
       }

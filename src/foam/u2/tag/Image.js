@@ -47,7 +47,8 @@ foam.CLASS({
 });
 
 foam.SCRIPT({
-  id: 'foam.u2.tag.ImageScript',
+  package: 'foam.u2.tag',
+  name: 'ImageScript',
   requires: [
     'foam.u2.U2ContextScript',
     'foam.u2.tag.Image',

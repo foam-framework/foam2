@@ -18,7 +18,7 @@
 foam.INTERFACE({
   package: 'foam.box',
   name: 'Skeleton',
-  extends: 'foam.box.Box',
+  implements: [ 'foam.box.Box' ],
   documentation: 'Skeleton marker interface.',
 
   methods: [
@@ -27,7 +27,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'obj',
-          javaType: 'Object'
+          type: 'Object'
         }
       ]
     }

@@ -19,9 +19,21 @@ foam.CLASS({
     'group'
   ],
 
+  javaImports: [
+    'foam.nanos.auth.AuthenticationException'
+  ],
+
   properties: [
-    'msg',
-    'clientBox'
+    {
+      class: 'FObjectProperty',
+      name: 'msg',
+      type: 'foam.box.Message'
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'clientBox',
+      type: 'foam.box.Box'
+    }
   ],
 
   methods: [
@@ -41,7 +53,16 @@ foam.CLASS({
 
           this.delegate.send(msg);
         }
-      }
+      },
+      javaCode: `Object object = msg.getObject();
+if ( object instanceof RPCErrorMessage && ((RPCErrorMessage) object).getData() instanceof RemoteException &&
+    "foam.nanos.auth.AuthenticationException".equals(((RemoteException) ((RPCErrorMessage) object).getData()).getId()) ) {
+  // TODO: should this be wrapped in new Thread() ?
+  ((Runnable) getX().get("requestLogin")).run();
+  getClientBox().send(getMsg());
+} else {
+  getDelegate().send(msg);
+}`
     }
   ]
 });
@@ -58,9 +79,7 @@ foam.CLASS({
     {
       name: 'SESSION_KEY',
       value: 'sessionId',
-      type: 'String',
-      swiftValue: '"sessionId"',
-      swiftType: 'String',
+      type: 'String'
     }
   ],
 
@@ -122,6 +141,11 @@ msg.attributes["replyBox"] = SessionReplyBox_create([
 ])
 try delegate.send(msg)
       `,
+      javaCode: `msg.getAttributes().put(SESSION_KEY, getSessionID());
+SessionReplyBox sessionReplyBox = new SessionReplyBox(getX(), msg,
+    this, (Box) msg.getAttributes().get("replyBox"));
+msg.getAttributes().put("replyBox", sessionReplyBox);
+getDelegate().send(msg);`
     }
   ]
 });

@@ -31,7 +31,7 @@ foam.CLASS({
     {
       name: 'MAX_URL_SIZE',
       value: 2000,
-      type: 'int'
+      type: 'Integer'
     }
   ],
 

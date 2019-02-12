@@ -66,16 +66,20 @@ foam.CLASS({
 
   imports: [ 'document' ],
 
-  constants: {
-    // Aliases for daoType
-    ALIASES: {
-      ARRAY:  'foam.dao.ArrayDAO',
-      CLIENT: 'foam.dao.RequestResponseClientDAO',
-      IDB:    'foam.dao.IDBDAO',
-      LOCAL:  'foam.dao.LocalStorageDAO',
-      MDAO:   'foam.dao.MDAO'
+  constants: [
+    {
+      // Aliases for daoType
+      name: 'aliases',
+      flags: [ 'js' ],
+      value: {
+        ARRAY:  'foam.dao.ArrayDAO',
+        CLIENT: 'foam.dao.RequestResponseClientDAO',
+        IDB:    'foam.dao.IDBDAO',
+        LOCAL:  'foam.dao.LocalStorageDAO',
+        MDAO:   'foam.dao.MDAO'
+      }
     }
-  },
+  ],
 
   properties: [
     {
@@ -136,7 +140,7 @@ return delegate;
     },
     {
       class: 'Object',
-      javaType: 'foam.dao.DAO',
+      type: 'foam.dao.DAO',
       name: 'innerDAO'
     },
     {
@@ -383,11 +387,11 @@ return delegate;
       }
 
       var daoModel = typeof daoType === 'string' ?
-        this.lookup(daoType) || global[daoType] :
+        this.__context__.lookup(daoType) || global[daoType] :
         daoType;
 
       if ( ! daoModel ) {
-        this.warn(
+        this.__context__.warn(
           "EasyDAO: Unknown DAO Type.  Add '" + daoType + "' to requires: list."
         );
       }
@@ -545,8 +549,7 @@ return delegate;
     */
     {
       name: 'addPropertyIndex',
-      returns: 'foam.dao.EasyDAO',
-      javaReturns: 'foam.dao.EasyDAO',
+      type: 'foam.dao.EasyDAO',
       args: [ { javaType: 'foam.core.PropertyInfo', name: 'prop' } ],
       code:     function addPropertyIndex() {
         this.mdao && this.mdao.addPropertyIndex.apply(this.mdao, arguments);
@@ -567,8 +570,8 @@ return this;
     */
     {
       name: 'addIndex',
-      returns: 'foam.dao.EasyDAO',
-      javaReturns: 'foam.dao.EasyDAO',
+      type: 'foam.dao.EasyDAO',
+      // TODO: The java Index interface conflicts with the js CLASS Index
       args: [ { javaType: 'foam.dao.index.Index', name: 'index' } ],
       code: function addIndex(index) {
         this.mdao && this.mdao.addIndex.apply(this.mdao, arguments);

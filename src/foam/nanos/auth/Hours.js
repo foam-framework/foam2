@@ -21,11 +21,14 @@ foam.CLASS({
       name: 'open'
     },
     {
-      class: 'Time',
+      // TODO: Time isn't modeled properly yet and used to be stored as a String in java.
+      // class: 'Time',
+      class: 'String',
       name: 'startTime'
     },
     {
-      class: 'Time',
+      // class: 'Time',
+      class: 'String',
       name: 'endTime'
     }
   ]

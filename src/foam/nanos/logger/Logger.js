@@ -9,11 +9,37 @@ foam.INTERFACE({
   name: 'Logger',
 
   methods: [
-    { name: 'log',   documentation: 'Synonym for info.'      , javaReturns: 'void', args: [ { name: 'args', javaType: 'Object...' } ] },
-    { name: 'info',  documentation: 'Log at info log level.' , javaReturns: 'void', args: [ { name: 'args', javaType: 'Object...' } ] },
+    {
+      name: 'log',
+      documentation: 'Synonym for info.',
+      type: 'Void',
+      // TODO: How do we capture Object... in our type system?
+      args: [ { name: 'args', javaType: 'Object...' } ]
+    },
+    {
+      name: 'info',
+      documentation: 'Log at info log level.' ,
+      type: 'Void',
+      args: [ { name: 'args', javaType: 'Object...' } ]
+    },
     // TODO: rename to warn
-    { name: 'warning',  documentation: 'Log at warn log level.' , javaReturns: 'void', args: [ { name: 'args', javaType: 'Object...' } ] },
-    { name: 'error', documentation: 'Log at error log level.', javaReturns: 'void', args: [ { name: 'args', javaType: 'Object...' } ] },
-    { name: 'debug', documentation: 'Log at debug log level.', javaReturns: 'void', args: [ { name: 'args', javaType: 'Object...' } ] }
+    {
+      name: 'warning',
+      documentation: 'Log at warn log level.' ,
+      type: 'Void',
+      args: [ { name: 'args', javaType: 'Object...' } ]
+    },
+    {
+      name: 'error',
+      documentation: 'Log at error log level.',
+      type: 'Void',
+      args: [ { name: 'args', javaType: 'Object...' } ]
+    },
+    {
+      name: 'debug',
+      documentation: 'Log at debug log level.',
+      type: 'Void',
+      args: [ { name: 'args', javaType: 'Object...' } ]
+    }
   ]
 });

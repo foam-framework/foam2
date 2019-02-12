@@ -46,7 +46,7 @@ foam.CLASS({
       class: 'Class',
       name: 'junctionCls',
       factory: function() {
-        return this.lookup(this.relationship.junctionModel);
+        return this.__context__.lookup(this.relationship.junctionModel);
       }
     },
     {

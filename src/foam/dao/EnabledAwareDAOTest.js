@@ -29,7 +29,7 @@ foam.CLASS({
     {
       name: 'setUp',
       args: [
-        { of: 'X', name: 'x' }
+        { type: 'Context', name: 'x' }
       ],
       javaCode: `
         DAO delegate = new foam.dao.MDAO(EnabledAwareDummy.getOwnClassInfo());

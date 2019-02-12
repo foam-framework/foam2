@@ -34,6 +34,7 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'requires'
-    }
+    },
+    'order'
   ]
 });

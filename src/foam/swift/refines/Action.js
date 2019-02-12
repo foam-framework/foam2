@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'ActionSwiftRefinement',
   refines: 'foam.core.Action',
   flags: ['swift'],
   requires: [
@@ -43,6 +45,7 @@ foam.CLASS({
       value: function() {},
     },
     {
+      class: 'Boolean',
       name: 'swiftSupport',
       expression: function(swiftCode) { return !!swiftCode },
     },

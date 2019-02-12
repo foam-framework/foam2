@@ -97,6 +97,10 @@ foam.CLASS({
   properties: [
     { name: 'of', required: true },
     {
+      name: 'type',
+      factory: function() { return this.of; }
+    },
+    {
       class: 'StringArray',
       name: 'topics'
     },
@@ -127,7 +131,7 @@ foam.CLASS({
       this.SUPER(cls);
 
       var name     = this.name;
-      var delegate = this.lookup(this.of);
+      var delegate = this.__context__.lookup(this.of);
 
       function resolveName(name) {
         var m = delegate.getAxiomByName(name);
@@ -149,8 +153,9 @@ foam.CLASS({
         axioms.push(this.ProxiedMethod.create({
           flags: this.flags,
           name: method.name,
-          returns: method.returns,
+          type: method.type,
           property: name,
+          flags: this.flags,
           args: method.args
         }));
       }
@@ -160,9 +165,10 @@ foam.CLASS({
         axioms.push(this.ProxiedMethod.create({
           flags: this.flags,
           name: method.name,
-          returns: method.returns,
+          type: method.type,
           property: name,
           args: method.args,
+          flags: this.flags,
           delegate: true
         }));
       }
@@ -170,6 +176,7 @@ foam.CLASS({
       if ( ! this.topics || this.topics.length ) {
         axioms.push(this.ProxySub.create({
           topics: this.topics,
+          flags: this.flags,
           prop:   this.name
         }));
       }
@@ -207,7 +214,7 @@ foam.CLASS({
     },
     {
       name: 'code',
-      expression: function(name, property, returns, delegate) {
+      expression: function(name, property, type, delegate) {
         return delegate ?
             function delegate() {
               return this[property][name].apply(this, arguments);
@@ -349,7 +356,7 @@ if let src = src as? Topic {
       args: [
         {
           name: 'c',
-          of: 'foam.core.EventProxy',
+          type: 'foam.core.EventProxy',
         },
       ],
       code: function removeChild(c) {
@@ -375,10 +382,10 @@ for (key, child) in children {
       args: [
         {
           name: 'key',
-          swiftType: 'String',
+          type: 'String',
         },
       ],
-      swiftReturns: 'foam_core_EventProxy',
+      type: 'foam.core.EventProxy',
       code: function getChild(key) {
         if ( ! this.children[key] ) {
           this.children[key] = this.cls_.create({
@@ -408,7 +415,7 @@ return children[key]!
       args: [
         {
           name: 'topics',
-          swiftType: '[String]',
+          type: 'String[]',
         },
       ],
       code: function addProxy(topic) {

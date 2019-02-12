@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'AbstractEnumSwiftRefinement',
   refines: 'foam.core.AbstractEnum',
   flags: ['swift'],
   axioms: [
@@ -23,10 +25,10 @@ foam.CLASS({
                 ${self.model_.swiftName}.self, args: [
                   ${v.cls_.getAxiomsByClass(foam.core.Property)
                       .filter(function(p) {
-                        return foam.swift.stringify(p.get(v));
+                        return foam.swift.asSwiftValue(p.get(v));
                       })
                       .map(function(p) {
-                        return `"${p.name}": ${foam.swift.stringify(p.get(v))}`
+                        return `"${p.name}": ${foam.swift.asSwiftValue(p.get(v))}`
                       }).join(',')}
                 ])!`,
             }));
@@ -60,6 +62,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'EnumSwiftRefinement',
   refines: 'foam.core.Enum',
   flags: ['swift'],
   properties: [

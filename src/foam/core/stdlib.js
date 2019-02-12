@@ -214,6 +214,7 @@ foam.LIB({
           },
           'memoize0(' + f.name + ')');
       ret.toString = function() {
+        return f.toString();
         return `foam.Function.memoize0(${f.toString()})`
       };
       ret.args = []
@@ -243,6 +244,7 @@ foam.LIB({
           },
           'memoize1(' + f.name + ')');
       ret.toString = function() {
+        return f.toString();
         return `foam.Function.memoize1(${f.toString()})`
       };
       ret.args = [];
@@ -326,12 +328,18 @@ foam.LIB({
       var ws = "\\s*";
       var comment = "(?:\\/\\*(?:.|\\s)*?\\*\\/)?";
       var skip = "(?:" + ws + comment + ws + ")*";
-      var header = "(?:function" + skip + ident + "?\\(|\\()" + skip;
-      var arg = "(?:" + ident + skip + ")";
+
+      var functionHeader = "(async )?" + "function" + skip + ident + "?" + ws + "\\(";
+
+      var arrowHeader = "\\(";
+
+      var arg = "(?:" + skip + ident + skip + ")";
       var nextArg = "(?:," + skip + arg + ")";
-      var argEnd = "\\)";
+      var argEnd = skip + "\\)";
       var headerToBody = skip + "(?:\\=\\>)?" + skip;
-      var body = "\\{((?:.|\\s)*)\\}";
+      var bodyText = "((?:.|\\s)*)";
+      var body = "\\{" + bodyText + "\\}";
+      var arrowBody = bodyText;
 
       var breakdown = {
         name: '',
@@ -360,10 +368,17 @@ foam.LIB({
         currentRegex.lastIndex = lastIndex;
       }
 
-      var match = next(header);
-      if ( ! match ) return null;
+      var isArrow = false;
 
-      if ( match[1] ) breakdown.name = match[1];
+      var match = next(functionHeader);
+      if ( match ) {
+        breakdown.async = !! match[1];
+        if ( match[2] ) breakdown.name = match[2];
+      } else {
+        match = next(arrowHeader);
+        if ( ! match ) return null;
+        isArrow = true;
+      }
 
       match = next(arg);
 
@@ -380,7 +395,9 @@ foam.LIB({
 
       if ( ! next(headerToBody) ) return null;
 
-      match = next(body);
+
+      match = isArrow ? next(arrowBody) : next(body);
+
       if ( ! match ) return null;
       breakdown.body = match[1];
 
@@ -693,6 +710,23 @@ foam.LIB({
 
 
 foam.LIB({
+  name: 'foam.RegExp',
+  methods: [
+    function isInstance(o) { return o instanceof RegExp; },
+    function is(a, b) { return a === b; },
+    function clone(o) { return new RegExp(o); },
+    function equals(a, b) { return this.compare(a, b) == 0 },
+    function compare(a, b) {
+      if ( ! foam.RegExp.isInstance(b) ) return 1;
+      return foam.String.compare(a.toString(), b.toString());
+    },
+    // Hash n & n: Truncate to 32 bits.
+    function hashCode(d) { foam.String.hashCode(d.toString()) },
+  ]
+});
+
+
+foam.LIB({
   name: 'foam.Date',
   methods: [
     function isInstance(o) { return o instanceof Date; },
@@ -831,6 +865,7 @@ foam.typeOf = (function() {
   var tFObject   = foam.core.FObject;
   var tFunction  = foam.Function;
   var tObject    = foam.Object;
+  var tRegExp    = foam.RegExp;
 
   return function typeOf(o) {
     if ( tNumber.isInstance(o) )    return tNumber;
@@ -842,6 +877,7 @@ foam.typeOf = (function() {
     if ( tDate.isInstance(o) )      return tDate;
     if ( tFunction.isInstance(o) )  return tFunction;
     if ( tFObject.isInstance(o) )   return tFObject;
+    if ( tRegExp.isInstance(o) )   return tRegExp;
     return tObject;
   };
 })();
@@ -854,14 +890,15 @@ foam.typeOf = (function() {
 
 foam.core.FObject.ordinal = 0;
 foam.Date.ordinal = 1;
-foam.Object.ordinal = 2;
-foam.Function.ordinal = 3;
-foam.Array.ordinal = 4;
-foam.String.ordinal = 5;
-foam.Number.ordinal = 6;
-foam.Boolean.ordinal = 7;
-foam.Null.ordinal = 8;
-foam.Undefined.ordinal = 9;
+foam.RegExp.ordinal = 2;
+foam.Object.ordinal = 3;
+foam.Function.ordinal = 4;
+foam.Array.ordinal = 5;
+foam.String.ordinal = 6;
+foam.Number.ordinal = 7;
+foam.Boolean.ordinal = 8;
+foam.Null.ordinal = 9;
+foam.Undefined.ordinal = 10;
 
 foam.LIB({
   name: 'foam',
@@ -871,6 +908,13 @@ foam.LIB({
       var uid = '__mmethod__' + foam.next$UID() + '__';
 
       var first = true;
+
+      var name;
+      for ( var key in map ) {
+        name = map[key].name;
+        break;
+      }
+
       var f = function(arg1) {
         if ( first ) {
           for ( var key in map ) {
@@ -892,7 +936,7 @@ foam.LIB({
               'and no default method provided');
           foam.assert(
               type[uid],
-              'Missing multi-method for type ', arg1, ' map: ', map,
+              'Missing ' + name + ' multi-method for type ', arg1, ' map: ', map,
               'and no deafult method provided');
         }
         return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
@@ -916,6 +960,8 @@ foam.LIB({
 
         return `foam.mmethod(${mapString}, ${defaultMethodStr})`;
       };
+      f.map = map;
+      f.defaultMethod = opt_defaultMethod;
       f.args = [];
       return f;
     }
@@ -931,7 +977,11 @@ foam.LIB({
 
     methods: [
       function clone(o)      { return typeOf(o).clone(o); },
-      function equals(a, b)  { return typeOf(a).equals(a, b); },
+      function equals(a, b)  {
+        var typeA = typeOf(a);
+        var typeB = typeOf(b);
+        return typeA === typeB && typeA.equals(a, b);
+      },
       function is(a, b) {
         var aType = typeOf(a);
         var bType = typeOf(b);
@@ -953,7 +1003,7 @@ foam.LIB({
       function flagFilter(flags) {
         return function(a) {
           if ( ! flags ) return true;
-          if ( ! a.flags ) return true;
+          if ( ! a.flags || ! a.flags.length ) return true;
           for ( var i = 0, f; f = flags[i]; i++ ) {
             if ( a.flags.indexOf(f) != -1 ) return true;
           }
@@ -982,31 +1032,6 @@ foam.LIB({
 
       var pkg = foam.package.ensurePackage(global, cls.package);
       pkg[cls.name] = cls;
-
-      foam.package.triggerClass_(cls);
-    },
-
-    function waitForClass(cls) {
-      if ( foam.lookup(cls, true) ) return Promise.resolve(foam.lookup(cls));
-
-      foam.package.__pending = foam.package.__pending || {};
-      foam.package.__pending[cls] = foam.package.__pending[cls] || [];
-
-      return new Promise(function(resolve, reject) {
-        foam.package.__pending[cls].push(resolve);
-      });
-    },
-
-    function triggerClass_(cls) {
-      if ( ! foam.package.__pending || ! foam.package.__pending[cls.id] ) return;
-
-      var pending = foam.package.__pending[cls.id];
-
-      foam.package.__pending[cls.id] = undefined;
-
-      for ( var i = 0 ; i < pending.length ; i++ ) {
-        pending[i](cls);
-      }
     },
 
     /**
@@ -1026,8 +1051,6 @@ foam.LIB({
             if ( tmp ) return tmp;
 
             tmp = thunk();
-
-            foam.package.triggerClass_(tmp);
 
             return tmp;
           }

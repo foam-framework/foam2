@@ -450,7 +450,7 @@ class SwiftTestsTests: XCTestCase {
     Async.aSeq([
       { ret, _, name in
         DispatchQueue.global(qos: .utility).async {
-          try? ret(dao.put(x.create(somepackage_Test.self, args: ["firstName": name])!)!)
+          try? ret(dao.put(x.create(somepackage_Test.self, args: ["firstName": name])!))
         }
       },
       { ret, _, t in
@@ -687,8 +687,8 @@ class SwiftTestsTests: XCTestCase {
       "name": "Alan Kay",
     ])!) as! foam_nanos_demo_relationship_Professor
 
-    let adam = try studentDAO.find(0) as! foam_nanos_demo_relationship_Student
-    let mike = try studentDAO.find(1) as! foam_nanos_demo_relationship_Student
+    let adam = try studentDAO.find(1) as! foam_nanos_demo_relationship_Student
+    let mike = try studentDAO.find(2) as! foam_nanos_demo_relationship_Student
 
     let cs101 = try courseDAO.find("CS 101") as! foam_nanos_demo_relationship_Course
     let cs201 = try courseDAO.find("CS 201") as! foam_nanos_demo_relationship_Course
@@ -774,7 +774,9 @@ class SwiftTestsTests: XCTestCase {
   }
 
   func testOrderBy() {
-    let exp = x.create(foam_mlang_Expressions.self)!
+    let desc = x.create(foam_mlang_order_Desc.self, args: [
+      "arg1": somepackage_Test.FIRST_NAME()
+    ])!
 
     let dao = x.create(foam_swift_dao_ArrayDAO.self, args: [
       "of": somepackage_Test.classInfo(),
@@ -797,7 +799,7 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertEqual((a.array[1] as! somepackage_Test).firstName, "Joe2")
     XCTAssertEqual((a.array[2] as! somepackage_Test).firstName, "Joe3")
 
-    a = try! dao.orderBy(exp.DESC(somepackage_Test.FIRST_NAME())).select()
+    a = try! dao.orderBy(desc).select()
     XCTAssertEqual((a.array[0] as! somepackage_Test).firstName, "Joe3")
     XCTAssertEqual((a.array[1] as! somepackage_Test).firstName, "Joe2")
     XCTAssertEqual((a.array[2] as! somepackage_Test).firstName, "Joe1")

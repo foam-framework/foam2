@@ -13,7 +13,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'includeInDigest',
-      javaReturns: 'boolean',
+      type: 'Boolean',
       documentation: 'Flag to determine if we should include this property as part of the message digest'
     },
     {
@@ -21,7 +21,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          type: 'foam.core.FObject'
         },
         {
           name: 'md',
