@@ -491,7 +491,7 @@ foam.CLASS({
     'java.io.FileOutputStream',
     'foam.nanos.fs.Storage'
   ],
-  
+
   constants: [
     {
       name: 'BUFFER_SIZE',
@@ -515,7 +515,7 @@ foam.CLASS({
       expression: function(root) {
         return root + '/tmp';
       },
-      javaFactory: 'return File.separator + "tmp";'      
+      javaFactory: 'return File.separator + "tmp";'
     },
     {
       class: 'String',
@@ -525,7 +525,7 @@ foam.CLASS({
       expression: function(root) {
         return root + '/sha256';
       },
-      javaFactory: 'return File.separator + "sha256";'      
+      javaFactory: 'return File.separator + "sha256";'
     },
     {
       class: 'Boolean',
@@ -786,7 +786,7 @@ try {
   return new FileBlob(file);
 } catch (Throwable t) {
   throw new RuntimeException(t);
-}`        
+}`
     },
     {
       name: 'urlFor_',
@@ -848,7 +848,7 @@ foam.CLASS({
       return req.send().then(function(resp) {
         return resp.payload;
       }).then(function(payload) {
-        return foam.json.Parser.create({ creationContext: self }).parseString(payload);
+        return foam.json.Parser.create({ creationContext: self.__context__ }).parseString(payload);
       });
     },
 
