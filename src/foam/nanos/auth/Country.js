@@ -21,6 +21,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'iso31661Code',
+      label: 'ISO Code',
       documentation: 'ISO 3166-1 alpha-3 country codes.'
     },
     {
@@ -38,7 +39,7 @@ foam.CLASS({
     returns: 'String',
     javaReturns: 'String',
     code: function() {
-      return 'Country: ' + this.code + ', ' + this.name; 
+      return 'Country: ' + this.code + ', ' + this.name;
     },
     javaCode: `
       return "{ code:" + this.getCode() + ", name:" + this.getName() + " }";
