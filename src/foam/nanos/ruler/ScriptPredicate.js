@@ -43,10 +43,10 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'Object'
+          type: 'Object'
         }
       ],
-      javaReturns: 'boolean',
+      type: 'Boolean',
       javaCode: `
       Interpreter shell = createInterpreter(getX());
 
@@ -61,9 +61,9 @@ foam.CLASS({
     {
       name: 'createInterpreter',
       args: [
-        { name: 'x', javaType: 'foam.core.X' }
+        { name: 'x', type: 'Context' }
       ],
-      javaReturns: 'Interpreter',
+      javaType: 'Interpreter',
       javaCode: `
         Interpreter shell = new Interpreter();
 
