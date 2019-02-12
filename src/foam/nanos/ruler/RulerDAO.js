@@ -79,9 +79,9 @@
       FObject ret =  getDelegate().put_(x, obj);
 
       if ( oldObj == null ) {
-        applyRules(x, obj, oldObj, getCreateAfter());
+        applyRules(x, ret, oldObj, getCreateAfter());
       } else {
-        applyRules(x, obj, oldObj, getUpdateAfter());
+        applyRules(x, ret, oldObj, getUpdateAfter());
       }
       return ret;
       `
