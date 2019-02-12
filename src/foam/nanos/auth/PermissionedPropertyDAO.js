@@ -57,19 +57,19 @@ foam.CLASS({
 
     {
       name: 'resetProperties',
-      javaReturns: 'foam.core.FObject',
+      type: 'foam.core.FObject',
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          type: 'foam.core.FObject'
         },
         {
           name: 'oldObj',
-          javaType: 'foam.core.FObject'
+          type: 'foam.core.FObject'
         }
       ],
       javaCode: `
@@ -102,15 +102,15 @@ foam.CLASS({
 
     {
       name: 'hideProperties',
-      javaReturns: 'foam.core.FObject',
+      type: 'foam.core.FObject',
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'oldObj',
-          javaType: 'foam.core.FObject'
+          type: 'foam.core.FObject'
         }
       ],
       javaCode: `
@@ -144,7 +144,6 @@ foam.CLASS({
 
     {
       name: 'checkPermission',
-      javaReturns: 'void',
       args: [
         {
           name: 'axiom',
@@ -152,23 +151,23 @@ foam.CLASS({
         },
         {
           name: 'of',
-          javaType: 'String'
+          type: 'String'
         },
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          type: 'foam.core.FObject'
         },
         {
           name: 'oldObj',
-          javaType: 'foam.core.FObject'
+          type: 'foam.core.FObject'
         },
         {
           name: 'write',
-          javaType: 'Boolean'
+          type: 'Boolean'
         }
       ],
       javaCode: `
@@ -220,7 +219,6 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      javaReturns: 'void',
       args: [
         {
           name: 'obj',

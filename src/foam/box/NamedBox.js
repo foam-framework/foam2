@@ -56,7 +56,7 @@ return self.LookupBox_create([
   methods: [
     {
       name: 'getParentBox',
-      returns: 'foam.box.Box',
+      type: 'foam.box.Box',
       code: function() {
         return this.cls_.create({
           name: this.name.substring(0, this.name.lastIndexOf('/'))
@@ -74,8 +74,7 @@ return ownClassInfo().create(args: [
     },
     {
       name: 'getBaseName',
-      returns: 'String',
-      swiftReturns: 'String',
+      type: 'String',
       code: function getBaseName() {
         return this.name.substring(this.name.lastIndexOf('/') + 1);
       },

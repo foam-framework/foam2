@@ -5,10 +5,7 @@
   "devDependencies": {
     "istanbul": "^0.4.2",
     "jasmine": "^2.4.1",
-    "jsdoc": "^3.4.0",
-    "node-inspector": "^1.1.1",
-    "jshint": "^2.9.1",
-    "jscs": "^2.11.0"
+    "jshint": "^2.9.1"
   },
   "scripts": {
     "test": "JASMINE_CONFIG_PATH=jasmine_node.json jasmine",
@@ -17,7 +14,6 @@
     "coverage": "JASMINE_CONFIG_PATH=jasmine_coverage.json istanbul cover -- jasmine \n istanbul instrument ./src/ -o ./tmp_cov___/ \n rm -rf ./tmp_cov___",
     "benchmarks": "JASMINE_CONFIG_PATH=jasmine_benchmarks.json jasmine",
     "benchmarksDebug": "JASMINE_CONFIG_PATH=jasmine_benchmarks.json node-debug -c node_modules/jasmine/bin/jasmine.js",
-    "doc": "rm -rf doc/gen && ./node_modules/jsdoc/jsdoc.js --debug -c jsdoc.conf -r -t ./doc/template -d ./doc/gen ./src/",
     "lint": "jshint -c .jshintrc  ./src/ && jscs -c .jscsrc ./src/"
   }
 }

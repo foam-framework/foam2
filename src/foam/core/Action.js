@@ -45,6 +45,10 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'documentation'
+    },
+    {
+      class: 'String',
       name: 'label',
       expression: function(name) { return foam.String.labelize(name); }
     },
@@ -184,7 +188,7 @@ foam.CLASS({
       adaptArrayElement: function(o, prop) {
         return typeof o === 'function' ?
             foam.core.Action.create({name: o.name, code: o}) :
-            this.lookup(prop.of).create(o) ;
+            this.__context__.lookup(prop.of).create(o) ;
       }
     }
   ]

@@ -25,10 +25,14 @@ public class DuringExpression
 
     foam.mlang.predicate.And expr = new foam.mlang.predicate.And();
     expr.setArgs(new foam.mlang.predicate.Predicate[] {
-        new foam.mlang.predicate.Gte((foam.mlang.Expr)x.get("arg1"),
-                                     (foam.mlang.Expr)result[0]),
-        new foam.mlang.predicate.Lt((foam.mlang.Expr)x.get("arg1"),
-                                    (foam.mlang.Expr)result[1])
+        new foam.mlang.predicate.Gte.Builder(null)
+          .setArg1((foam.mlang.Expr)x.get("arg1"))
+          .setArg2((foam.mlang.Expr)result[0])
+          .build(),
+        new foam.mlang.predicate.Lt.Builder(null)
+          .setArg1((foam.mlang.Expr)x.get("arg1"))
+          .setArg2((foam.mlang.Expr)result[1])
+          .build()
       });
 
     return ps.setValue(expr);

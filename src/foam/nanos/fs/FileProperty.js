@@ -11,7 +11,7 @@ foam.CLASS({
 
   properties: [
     [ 'of', 'foam.nanos.fs.File' ],
-    [ 'javaType', 'foam.nanos.fs.File' ],
+    [ 'type', 'foam.nanos.fs.File' ],
     [ 'tableCellView', function () {} ],
     [ 'view', { class: 'foam.u2.view.FileView' } ]
   ]

@@ -10,7 +10,7 @@ foam.CLASS({
   methods: [
     {
       name: 'swiftGet',
-      swiftReturns: 'Any?',
+      swiftType: 'Any?',
       swiftCode: 'fatalError()',
     },
     {
@@ -32,18 +32,18 @@ foam.CLASS({
           name: 'listener',
         },
       ],
-      swiftReturns: 'Subscription',
+      swiftType: 'Subscription',
       swiftCode: 'fatalError()',
     },
     {
       name: 'linkFrom',
       args: [
         {
-          of: 'foam.swift.core.Slot',
+          type: 'foam.swift.core.Slot',
           name: 's2',
         },
       ],
-      swiftReturns: 'Subscription',
+      swiftType: 'Subscription',
       swiftCode: function() {/*
 let s1 = self
 var feedback1 = false
@@ -88,11 +88,11 @@ return Subscription {
       name: 'linkTo',
       args: [
         {
-          of: 'foam.swift.core.Slot',
+          type: 'foam.swift.core.Slot',
           name: 'other',
         },
       ],
-      swiftReturns: 'Subscription',
+      swiftType: 'Subscription',
       swiftCode: function() {/*
 return other.linkFrom(self)
       */},
@@ -101,11 +101,11 @@ return other.linkFrom(self)
       name: 'follow',
       args: [
         {
-          of: 'foam.swift.core.Slot',
+          type: 'foam.swift.core.Slot',
           name: 'other',
         },
       ],
-      swiftReturns: 'Subscription',
+      swiftType: 'Subscription',
       swiftCode: function() {/*
 let l = { () -> Void in
   if !FOAM_utils.equals(self.swiftGet(), other.swiftGet()) {
@@ -120,7 +120,7 @@ return other.swiftSub { (_, _) in l() }
       name: 'mapFrom',
       args: [
         {
-          of: 'foam.swift.core.Slot',
+          type: 'foam.swift.core.Slot',
           name: 'other',
         },
         {
@@ -129,7 +129,7 @@ return other.swiftSub { (_, _) in l() }
           name: 'f',
         },
       ],
-      swiftReturns: 'Subscription',
+      swiftType: 'Subscription',
       swiftCode: function() {/*
 let l = { () -> Void in
   self.swiftSet(f(other.swiftGet()))
@@ -142,7 +142,7 @@ return other.swiftSub { (_, _) in l() }
       name: 'mapTo',
       args: [
         {
-          of: 'foam.swift.core.Slot',
+          type: 'foam.swift.core.Slot',
           name: 'other',
         },
         {
@@ -151,7 +151,7 @@ return other.swiftSub { (_, _) in l() }
           name: 'f',
         },
       ],
-      swiftReturns: 'Subscription',
+      swiftType: 'Subscription',
       swiftCode: function() {/*
 return other.mapFrom(self, f)
       */},
@@ -165,7 +165,7 @@ return other.mapFrom(self, f)
           name: 'f',
         },
       ],
-      returns: 'foam.swift.core.ExpressionSlot',
+      type: 'foam.swift.core.ExpressionSlot',
       swiftCode: function() {/*
 return foam_swift_core_ExpressionSlot([
   "code": { (args: [Any?]) -> Any? in f(args[0]) },
@@ -177,11 +177,11 @@ return foam_swift_core_ExpressionSlot([
       name: 'dot',
       args: [
         {
-          swiftType: 'String',
+          type: 'String',
           name: 'name',
         },
       ],
-      returns: 'foam.swift.core.SubSlot',
+      type: 'foam.swift.core.SubSlot',
       swiftCode: function() {/*
 let s = foam_swift_core_SubSlot([
   "parentSlot": self,

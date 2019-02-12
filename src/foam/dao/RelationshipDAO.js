@@ -77,7 +77,7 @@ foam.CLASS({
   methods: [
     {
       name: 'put_',
-      javaReturns: 'foam.core.FObject',
+      type: 'FObject',
       code: function put_(x, obj) {
         return this.SUPER(x, this.adaptTarget(obj));
       },
@@ -86,11 +86,11 @@ foam.CLASS({
     },
     {
       name: 'adaptTarget',
-      returns: 'foam.core.FObject',
+      type: 'FObject',
       args: [
         {
           name: 'target',
-          of: 'foam.core.FObject'
+          type: 'FObject'
         }
       ],
       javaCode: `

@@ -158,7 +158,7 @@ foam.CLASS({
   methods: [
     {
       name: 'implies',
-      javaReturns: 'Boolean',
+      type: 'Boolean',
       args: [
         {
           name: 'permission',
@@ -185,11 +185,11 @@ foam.CLASS({
     },
     {
       name: 'getAppConfig',
-      javaReturns: 'AppConfig',
+      type: 'foam.nanos.app.AppConfig',
       args: [
         {
           name: 'x',
-          javaType: 'X'
+          type: 'Context'
         }
       ],
       javaCode: `
@@ -248,10 +248,10 @@ return config;
         return parent.isDescendantOf(groupId, groupDAO);
       },
       args: [
-        { name: 'groupId',  javaType: 'String' },
-        { name: 'groupDAO', javaType: 'foam.dao.DAO' }
+        { name: 'groupId',  type: 'String' },
+        { name: 'groupDAO', type: 'foam.dao.DAO' }
       ],
-      javaReturns: 'boolean',
+      type: 'Boolean',
       javaCode: `
         if ( SafetyUtil.isEmpty(groupId) ) return false;
         if (

@@ -7,5 +7,6 @@
 foam.INTERFACE({
   package: 'foam.crypto.hash',
   name: 'Hashable',
+
   documentation: 'Hashable interface placeholder.'
 });

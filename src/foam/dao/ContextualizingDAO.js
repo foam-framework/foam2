@@ -53,10 +53,9 @@ foam.CLASS({
     },
     {
       name: 'maybeContextualize_',
-      returns: 'foam.core.FObject',
-      javaReturns: 'foam.core.FObject',
-      args: [ { name: 'x', javaType: 'foam.core.X' },
-              { name: 'obj', of: 'foam.core.FObject' } ],
+      type: 'FObject',
+      args: [ { name: 'x', type: 'Context' },
+              { name: 'obj', type: 'FObject' } ],
       code: function(x, obj) {
         return obj && obj.clone(this);
       },

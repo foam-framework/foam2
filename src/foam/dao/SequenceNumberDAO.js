@@ -10,7 +10,10 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   implements: [
-    'foam.mlang.Expressions'
+    {
+      path: 'foam.mlang.Expressions',
+      flags: ['js'],
+    },
   ],
 
   requires: [

@@ -21,11 +21,11 @@ return newValue + "EXTENDED"
   methods: [
     {
       name: 'methodWithAnArgAndReturn',
-      swiftReturns: 'String',
+      type: 'String',
       args: [
         {
           name: 'name',
-          swiftType: 'String',
+          type: 'String',
         },
       ],
       swiftCode: function() {/*

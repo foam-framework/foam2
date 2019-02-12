@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.net.node',
   name: 'EntityEncoding',
-
+  flags: ['node'],
   properties: [
     {
       class: 'String',

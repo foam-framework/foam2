@@ -161,7 +161,6 @@ foam.CLASS({
           javaType: 'final org.eclipse.jetty.server.Server'
         }
       ],
-      javaReturns: 'void',
       javaCode: `
         Runtime.getRuntime().addShutdownHook(new Thread() {
           @Override
