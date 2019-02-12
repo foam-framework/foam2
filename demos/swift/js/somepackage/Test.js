@@ -122,11 +122,11 @@ myListener()
   methods: [
     {
       name: 'methodWithAnArgAndReturn',
-      swiftReturns: 'String',
+      type: 'String',
       args: [
         {
           name: 'name',
-          swiftType: 'String',
+          type: 'String',
         },
       ],
       code: function() {},

@@ -84,7 +84,7 @@ foam.CLASS({
       args: [
         { name: 'o' },
       ],
-      returns: 'foam.swift.type.Type',
+      type: 'foam.swift.type.Type',
       swiftCode: `
         if tNull.isInstance(o) { return tNull }
         if tBoolean.isInstance(o) { return tBoolean }
@@ -103,7 +103,7 @@ foam.CLASS({
         { name: 'a' },
         { name: 'b' },
       ],
-      swiftReturns: 'Int',
+      swiftType: 'Int',
       swiftCode: `
         let aType = typeOf(a)
         let bType = typeOf(b)

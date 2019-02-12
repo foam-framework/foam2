@@ -31,7 +31,6 @@ foam.core.Property.SHADOW_MAP = {
   expression: [ 'value' ]
 };
 
-
 /** Add new Axiom types (Implements, Constants, Topics, Properties, Methods and Listeners) to Model. */
 foam.CLASS({
   refines: 'foam.core.Model',
@@ -56,7 +55,7 @@ foam.CLASS({
         }
 
         if ( o.class ) {
-          var m = this.lookup(o.class);
+          var m = this.__context__.lookup(o.class);
           if ( ! m ) throw 'Unknown class : ' + o.class;
           return m.create(o, this);
         }
@@ -72,13 +71,13 @@ foam.CLASS({
         if ( typeof o === 'function' ) {
           var name = foam.Function.getName(o);
           foam.assert(name, 'Method must be named');
-          var m = this.lookup(prop.of).create();
+          var m = this.__context__.lookup(prop.of).create();
           m.name = name;
           m.code = o;
           return m;
         }
-        if ( this.lookup(prop.of).isInstance(o) ) return o;
-        if ( o.class ) return this.lookup(o.class).create(o, this);
+        if ( this.__context__.lookup(prop.of).isInstance(o) ) return o;
+        if ( o.class ) return this.__context__.lookup(o.class).create(o, this);
         return foam.lookup(prop.of).create(o);
       }
     },
@@ -165,9 +164,7 @@ foam.CLASS({
     */
     function unknownArg(key, value) {
       // NOP
-    },
-
-    function lookup() { return this.__context__.lookup.apply(this.__context__, arguments); },
+    }
   ]
 });
 
@@ -220,10 +217,37 @@ foam.CLASS({
 
 
 /**
- * Replace foam.CLASS() with a lazy version which only
- * build the class when first accessed.
+ * Some final adjustments.
+ *
+ * Make foam.CLASS lazy so it only builds models and classes when
+ * first accessed.  Also make refinements lazy, so they only trigger
+ * when the class being refined is first referenced.
+ *
+ * Track definitions of LIBs and SCRIPTs
+ *
+ * Also track the order in which Classes, Scripts and Libraries are defined.
  */
 (function() {
+  // Track libraries and scripts created after boot
+  foam.__count = 0;
+
+  foam.__LIBS__ = [];
+  foam.__SCRIPTS__ = [];
+
+  var foamLIB = foam.LIB;
+  foam.LIB = function(model) {
+    foam.__LIBS__.push(model);
+    foamLIB(model);
+    model.order = foam.__count++;
+  };
+
+  var foamSCRIPT = foam.SCRIPT;
+  foam.SCRIPT = function(model) {
+    foam.__SCRIPTS__.push(model);
+    foamSCRIPT(model);
+    model.order = foam.__count++;
+  };
+
   // List of unused Models in the system.
   foam.USED      = {};
   foam.UNUSED    = {};
@@ -235,19 +259,36 @@ foam.CLASS({
       m.source = global.document.currentScript.src;
     }
 
-    if ( m.refines ) return CLASS(m);
+    if ( ! m.name ) throw new Error("Unnamed model" + m.refines);
 
+    m.order = foam.__count++;
     m.id = m.package ? m.package + '.' + m.name : m.name;
-    foam.UNUSED[m.id] = true;
+
+    foam.UNUSED[m.id] = m;
+
+    if ( m.refines ) {
+      if ( foam.__context__.isDefined(m.refines) ) {
+        delete foam.UNUSED[m.id];
+        CLASS(m);
+        foam.USED[m.id] = m;
+      } else {
+        foam.pubsub.sub("defineClass", m.refines, function(s) {
+          s.detach();
+          delete foam.UNUSED[m.id];
+          CLASS(m);
+          foam.USED[m.id] = m;
+        });
+      }
+      return;
+    }
 
     var f = foam.Function.memoize0(function() {
       delete foam.UNUSED[m.id];
       var c = CLASS(m);
-      foam.USED[m.id] = c;
+      foam.USED[m.id] = m;
       return c;
     });
 
     foam.__context__.registerFactory(m, f);
-    foam.package.registerClassFactory(m, f);
   };
 })();

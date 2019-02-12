@@ -26,6 +26,7 @@ foam.CLASS({
       name: 'send',
       code: function() {},
       swiftCode: '// NOOP',
+      javaCode: '// NOOP'
     }
   ]
 });

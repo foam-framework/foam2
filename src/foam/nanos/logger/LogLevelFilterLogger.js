@@ -35,46 +35,46 @@ foam.CLASS({
   methods: [
     {
       name: 'error',
+      type: 'Void',
       args: [
         {
           name: 'args',
           javaType: 'Object...'
         }
       ],
-      javaReturns: 'void',
       javaCode: "if ( getLogError() ) getDelegate().error(args);"
     },
     {
       name: 'warning',
+      type: 'Void',
       args: [
         {
           name: 'args',
           javaType: 'Object...'
         }
       ],
-      javaReturns: 'void',
       javaCode: "if ( getLogWarning() ) getDelegate().warning(args);"
     },
     {
       name: 'info',
+      type: 'Void',
       args: [
         {
           name: 'args',
           javaType: 'Object...'
         }
       ],
-      javaReturns: 'void',
       javaCode: "if ( getLogInfo() ) getDelegate().info(args);"
     },
     {
       name: 'debug',
+      type: 'Void',
       args: [
         {
           name: 'args',
           javaType: 'Object...'
         }
       ],
-      javaReturns: 'void',
       javaCode: "if ( getLogDebug() ) getDelegate().debug(args);"
     }
   ]

@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'DAOPropertySwiftRefinement',
   refines: 'foam.dao.DAOProperty',
   flags: ['swift'],
   properties: [

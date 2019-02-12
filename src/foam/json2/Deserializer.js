@@ -8,33 +8,27 @@ foam.CLASS({
   package: 'foam.json2',
   name: 'Deserializer',
   imports: [
-    'classloader',
+    'aref',
+    'acreate'
   ],
   properties: [
     {
       class: 'Boolean',
       name: 'parseFunctions',
-      value: false
+      value: true
+    },
+    {
+      name: 'asyncFunctionConstructor',
+      factory: function() {
+        return (async function(){}).constructor;
+      }
     }
   ],
   methods: [
     function aparseString(x, str) {
       return this.aparse(x, JSON.parse(str));
     },
-    function aparse(x, v) {
-      var self = this;
-      return new Promise(function(ret) {
-        if ( v['$DEPS$'] && v['$BODY$'] ) {
-          var load = self.classloader.load.bind(self.classloader);
-          Promise.all(v['$DEPS$'].map(load)).then(function() {
-            ret(self.parse(x, v['$BODY$']));
-          });
-        } else {
-          ret(self.parse(x, v));
-        }
-      });
-    },
-    function parse(x, v) {
+    async function aparse(x, v) {
       var type = foam.typeOf(v);
 
       if ( type == foam.Object ) {
@@ -44,25 +38,41 @@ foam.CLASS({
           d.setTime(v["$DATE"]);
           return d;
         }
+        if ( ! foam.Undefined.isInstance(v["$REGEXP$"]) ) {
+          return new RegExp(v["$REGEXP$"]);
+        }
         if ( ! foam.Undefined.isInstance(v["$FUNC$"]) ) {
           if ( this.parseFunctions ) {
             var name = v.name;
             var args = v.args;
             var body = v.body;
-            var f = Function.apply(null, args.concat(body));
+            var async = v.async;
+            var constructor = async ? this.asyncFunctionConstructor : Function;
+            var f = constructor.apply(null, args.concat(body));
             if ( name ) foam.Function.setName(f, name);
             return f;
           }
 
           return null;
         }
-        if ( ! foam.Undefined.isInstance(v["$INST$"]) ) {
-          // Is an instance of the class defined by $INST$ key
-          var cls = this.parse(x, v["$INST$"]);
+        if ( ! foam.Undefined.isInstance(v["$MMETHOD$"]) ) {
+          if ( this.parseFunctions ) {
+            var map = v["map"];
+            var defaultMethod = v["default"];
+
+            return defaultMethod ?
+              foam.mmethod(map, defaultMethod) :
+              foam.mmethod(map);
+          }
         }
         if ( ! foam.Undefined.isInstance(v["$CLS$"]) ) {
           // Defines a class referenced by $CLS$ key
+          return this.aref(v["$CLS$"]);
           return foam.lookup(v["$CLS$"]);
+        }
+        if ( ! foam.Undefined.isInstance(v["$INST$"]) ) {
+          // Is an instance of the class defined by $INST$ key
+          var cls = v["$INST$"];
         }
 
         var keys = Object.keys(v);
@@ -70,16 +80,16 @@ foam.CLASS({
         for ( var i = 0 ; i < keys.length ; i++ ) {
           if ( keys[i] == '$INST$' ) continue;
 
-          args[keys[i]] = this.parse(x, v[keys[i]]);
+          args[keys[i]] = await this.aparse(x, v[keys[i]]);
         }
 
         return cls ?
-          cls.create(args, x) :
+          await this.acreate(cls, args) :
           args;
 
       } else if ( type == foam.Array ) {
         for ( var i = 0 ; i < v.length ; i++ ) {
-          v[i] = this.parse(x, v[i]);
+          v[i] = await this.aparse(x, v[i]);
         }
         return v;
 /*      } else if ( type == foam.Null ) {

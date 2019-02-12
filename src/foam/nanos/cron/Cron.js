@@ -88,10 +88,11 @@ foam.CLASS({
       name: 'runScript',
       args: [
         {
-          name: 'x', javaType: 'foam.core.X'
+          name: 'x',
+          type: 'Context'
         }
       ],
-      javaReturns: 'void',
+      type: 'Void',
       javaCode:
 `DAO notification = (DAO) x.get("notificationDAO");
 
@@ -109,7 +110,7 @@ setScheduledTime(getNextScheduledTime());`
     },
     {
       name: 'getNextScheduledTime',
-      javaReturns: 'Date',
+      type: 'Date',
       javaCode:
 `Calendar next = Calendar.getInstance();
 next.add(Calendar.SECOND, 1);

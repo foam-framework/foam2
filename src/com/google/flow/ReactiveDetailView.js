@@ -16,6 +16,8 @@
  */
 
 foam.CLASS({
+  package: 'com.google.flow',
+  name: 'FObjectReactiveDetailViewRefinement',
   refines: 'FObject',
   properties: [
     {
@@ -88,9 +90,7 @@ foam.CLASS({
     'scope'
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
+  css: `
       ^label {
         color: #444;
         display: block;
@@ -118,9 +118,7 @@ foam.CLASS({
         padding: 4px;
         text-align: right;
       }
-      */}
-    })
-  ],
+`,
 
   properties: [
     {

@@ -40,8 +40,8 @@ foam.CLASS({
       name: 'call',
       args: [
         {
-          of: 'foam.box.Message',
           name: 'message',
+          type: 'foam.box.Message'
         },
       ],
       code: function(message) {

@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'foam.net.node',
   name: 'HTTPRequest',
   extends: 'foam.net.web.HTTPRequest',
-
+  flags: ['node'],
   requires: [
     'foam.net.node.HTTPResponse'
   ],

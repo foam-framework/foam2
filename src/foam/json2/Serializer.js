@@ -9,38 +9,37 @@ foam.CLASS({
   name: 'Serializer',
   requires: [
     'foam.json2.Outputter',
+    'foam.json2.PrettyOutputterOutput',
   ],
   methods: [
     function stringify(x, v) {
       var serializer = this.InnerSerializer.create();
       serializer.output(x, v);
       return serializer.getString();
-    }
+    },
   ],
   classes: [
     {
       name: 'InnerSerializer',
       requires: [
-        'foam.json2.Outputter'
+        'foam.json2.Outputter',
+        'foam.json2.PrettyOutputterOutput',
       ],
       properties: [
-        {
-          class: 'Map',
-          name: 'deps'
-        },
         {
           class: 'FObjectProperty',
           of: 'foam.json2.Outputter',
           name: 'out',
           factory: function() {
-            return this.Outputter.create();
+            return this.Outputter.create({
+              out: this.PrettyOutputterOutput.create(),
+            });
           }
         }
       ],
       methods: [
         function getString() {
-          var deps = Object.keys(this.deps).map(function(d) { return `"${d}"` }).join(',');
-          return `{"$DEPS$":[${deps}],"$BODY$":${this.out.str}}`
+          return this.out.getString();
         },
         function output(x, v) {
           var out = this.out;
@@ -70,16 +69,21 @@ foam.CLASS({
             out.key("$DATE$");
             out.n(v.getTime());
             out.end();
+          } else if ( type == foam.RegExp ) {
+            out.obj();
+            out.key("$REGEXP$");
+            out.s(v.toString());
+            out.end();
           } else if ( type == foam.Object ) {
             if ( foam.core.FObject.isSubClass(v) ) { // Is an actual class
               if ( v.id.indexOf('AnonymousClass') == 0 ) {
+                throw new Error("Anonymous Class support dropped.");
                 this.output(x, v.model_);
               } else {
                 out.obj();
                 out.key("$CLS$");
                 out.s(v.id);
                 out.end();
-                this.deps[v.id] = true;
               }
             } else { // is some other JS object
               if ( v.outputJSON2 ) {
@@ -107,7 +111,8 @@ foam.CLASS({
               var axioms = v.cls_.getAxioms();
 
               out.key("$INST$");
-              this.output(x, cls);
+              out.s(cls.id);
+//              this.output(x, cls);
 
               for ( var i = 0 ; i < axioms.length ; i++ ) {
                 var a = axioms[i];
@@ -117,52 +122,70 @@ foam.CLASS({
               out.end();
             }
           } else if ( type == foam.Function ) {
+            if ( v.toString().startsWith("foam.mmethod(") ) {
+              var map = v.map;
+              var defaultMethod = v.defaultMethod;
+              out.obj();
 
-            var breakdown = foam.Function.breakdown(v);
-            if ( breakdown == null ) {
-              debugger;
-              breakdown = foam.Function.breakdown(v);
+              out.key("$MMETHOD$");
+              out.b(true);
+
+              out.key("map");
+              out.obj();
+
+              for ( var key in map ) {
+                out.key(key);
+                this.output(map[key]);
+              }
+
+              out.end();
+
+              if ( defaultMethod ) {
+                out.key("default");
+
+                this.output(defaultMethod);
+              }
+
+              out.end();
+            } else {
+              var breakdown = foam.Function.breakdown(v);
+              if ( breakdown == null ) {
+                console.error('Unable to breakdown', v.toString());
+                breakdown = foam.Function.breakdown(function() {
+                  // Breakdown failed!
+                });
+              }
+
+              foam.assert(breakdown, "Failed to parse funciton, this is a bug!", "Function was ", v);
+
+              foam.assert(foam.String.isInstance(breakdown.body), "Breakdown contains no body text.");
+
+              out.obj();
+
+              out.key("$FUNC$");
+              out.b(true);
+
+              out.key("name")
+              out.s(breakdown.name);
+
+              out.key("async");
+              out.b(breakdown.async);
+
+              out.key("args");
+              out.array();
+              for ( var i = 0 ; i < breakdown.args.length ; i++ ) {
+                out.s(breakdown.args[i]);
+              }
+              out.end();
+
+              out.key("body");
+              out.s(breakdown.body);
+
+              out.end();
             }
-
-            foam.assert(breakdown, "Failed to parse funciton, this is a bug!");
-
-            out.obj();
-
-            out.key("$FUNC$");
-            out.b(true);
-
-            out.key("name")
-            out.s(breakdown.name);
-
-            out.key("args");
-            out.array();
-            for ( var i = 0 ; i < breakdown.args.length ; i++ ) {
-              out.s(breakdown.args[i]);
-            }
-            out.end();
-
-            out.key("body");
-            out.s(breakdown.body);
-
-            out.end();
           }
         }
       ]
-    }
-  ]
-});
-
-foam.CLASS({
-  refines: 'foam.core.Property',
-  methods: [
-    function outputPropertyJSON2(x, obj, outputter, out) {
-      if ( obj.hasDefaultValue(this.name) ) return;
-
-      if ( this.transient ) return;
-
-      out.key(this.name);
-
-      outputter.output(x, this.f(obj), out);
     }
   ]
 });

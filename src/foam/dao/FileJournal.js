@@ -252,11 +252,11 @@ foam.CLASS({
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          type: 'foam.core.FObject'
         }
       ],
       javaCode: `
@@ -325,7 +325,7 @@ foam.CLASS({
     {
       name: 'getParsingErrorMessage',
       documentation: 'Gets the result of a failed parsing of a journal line',
-      javaReturns: 'String',
+      type: 'String',
       args: [
         {
           class: 'String',
@@ -347,16 +347,16 @@ foam.CLASS({
     },
     {
       name: 'mergeFObject',
-      javaReturns: 'foam.core.FObject',
+      type: 'foam.core.FObject',
       documentation: 'Add diff property to old property',
       args: [
         {
-          class: 'FObjectProperty',
           name: 'oldFObject',
+          type: 'FObject'
         },
         {
-          class: 'FObjectProperty',
-          name: 'diffFObject'
+          name: 'diffFObject',
+          type: 'FObject'
         }
       ],
       javaCode: `
@@ -375,12 +375,12 @@ foam.CLASS({
       name: 'mergeProperty',
       args: [
         {
-          class: 'FObjectProperty',
           name: 'oldFObject',
+          type: 'FObject'
         },
         {
-          class: 'FObjectProperty',
-          name: 'diffFObject'
+          name: 'diffFObject',
+          type: 'FObject'
         },
         {
           name: 'prop',

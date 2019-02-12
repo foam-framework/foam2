@@ -82,7 +82,8 @@ foam.CLASS({
 
 
 foam.SCRIPT({
-  id: 'foam.u2.FoamTagLoaderScript',
+  package: 'foam.u2',
+  name: 'FoamTagLoaderScript',
   requires: [ 'foam.u2.FoamTagLoader' ],
   flags: [ 'web' ],
   code: function() { foam.u2.FoamTagLoader.create(); }

@@ -103,7 +103,7 @@ if let object = msg.object as? foam_box_SubBoxMessage {
         }
       },
       javaCode: `
-Object obj = message.getObject();
+Object obj = msg.getObject();
 
 if ( obj instanceof foam.box.SubBoxMessage ) {
   foam.box.SubBoxMessage sbm = (foam.box.SubBoxMessage)obj;
@@ -112,10 +112,10 @@ if ( obj instanceof foam.box.SubBoxMessage ) {
   Registration dest = (Registration)getRegistry_().get(name);
 
   if ( dest != null ) {
-    message.setObject(sbm.getObject());
-    dest.getLocalBox().send(message);
-  } else if ( message.getAttributes().containsKey("replyBox") ) {
-    foam.box.Box replyBox = (foam.box.Box)message.getAttributes().get("replyBox");
+    msg.setObject(sbm.getObject());
+    dest.getLocalBox().send(msg);
+  } else if ( msg.getAttributes().containsKey("replyBox") ) {
+    foam.box.Box replyBox = (foam.box.Box)msg.getAttributes().get("replyBox");
     foam.box.Message errorMessage = getX().create(foam.box.Message.class);
     errorMessage.setObject(getX().create(foam.box.NoSuchNameException.class));
 

@@ -13,18 +13,26 @@ foam.INTERFACE({
   methods: [
     {
       name: 'get',
-      returns: 'Promise',
-      args: [ 'x' ]
+      async: true,
+      type: 'foam.core.FObject',
+      args: [
+        { name: 'x', type: 'Context' }
+      ]
     },
     {
       name: 'setProperty',
-      returns: 'Promise',
-      args: [ 'x', 'name', 'value' ]
+      async: true,
+      type: 'FObject',
+      args: [ { name: 'x', type: 'Context' },
+              { name: 'name', type: 'String' },
+              { name: 'value', type: 'Any' } ]
     },
     {
       name: 'setProperties',
-      returns: 'Promise',
-      args: [ 'x', 'values' ]
+      async: true,
+      type: 'FObject',
+      args: [ { name: 'x', type: 'Context' },
+              { name: 'values', type: 'Map' } ]
     }
   ]
 });

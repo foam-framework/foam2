@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.net.node',
   name: 'RouteBinding',
-
+  flags: ['node'],
   properties: [
     {
       class: 'FObjectProperty',
