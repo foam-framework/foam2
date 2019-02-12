@@ -45,6 +45,10 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'documentation'
+    },
+    {
+      class: 'String',
       name: 'label',
       expression: function(name) { return foam.String.labelize(name); }
     },
