@@ -42,7 +42,6 @@ foam.CLASS({
     'foam.nanos.u2.navigation.FooterView',
     'foam.u2.stack.Stack',
     'foam.u2.stack.StackView',
-    'foam.u2.dialog.NotificationMessage',
     'foam.nanos.session.SessionTimer',
     'foam.u2.dialog.Popup'
   ],
@@ -321,7 +320,11 @@ foam.CLASS({
 
     // This method is for toast notification message
     function notify(message, type) {
-      this.add(this.NotificationMessage.create({ message, type }));
+      this.tag({
+        class: 'foam.u2.dialog.NotificationMessage',
+        message: message,
+        type: type
+      });
     }
   ],
 
