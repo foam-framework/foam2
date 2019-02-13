@@ -71,7 +71,8 @@ foam.CLASS({
       name: 'closeable',
       class: 'Boolean',
       value: true
-    }
+    },
+    'onClose'
   ],
 
   methods: [
@@ -104,6 +105,9 @@ foam.CLASS({
 
   listeners: [
     function close() {
+      if ( this.onClose ) {
+        this.onClose();
+      }
       this.remove();
     }
   ]
