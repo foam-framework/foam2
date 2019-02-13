@@ -242,6 +242,9 @@ public class SugarWebAgent
         case "String[]":
           arg = p.getParameterValues(pArray_.getName());
           break;
+        case "foam.core.X":
+          arg = x;
+          break;
         default:
           Class objClass = null;
 
