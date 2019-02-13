@@ -328,7 +328,10 @@ foam.CLASS({
           name: 'clear' + capitalized,
           visibility: 'public',
           type: 'void',
-          body: isSet + ' = false;'
+          body: `
+if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
+${isSet} = false;
+          `
         });
 
       if ( this.javaFactory ) {
