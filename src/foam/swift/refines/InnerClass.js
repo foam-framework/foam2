@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'InnerClassSwiftRefinement',
   refines: 'foam.core.InnerClass',
   flags: ['swift'],
   requires: [
@@ -24,7 +26,7 @@ foam.CLASS({
         name: this.model.swiftName + '_create',
         returnType: this.model.swiftName,
         visibility: 'public',
-	body: this.swiftInitializer(),
+        body: this.swiftInitializer(),
         args: [
           this.Argument.create({
             localName: 'args',

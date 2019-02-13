@@ -17,34 +17,30 @@ foam.INTERFACE({
   methods: [
     {
       name: 'authorizeOnCreate',
-      javaReturns: 'void',
       args: [
-        { name: 'x', javaType: 'foam.core.X' }
+        { name: 'x', type: 'Context' }
       ],
       javaThrows: ['AuthorizationException'],
     },
     {
       name: 'authorizeOnRead',
-      javaReturns: 'void',
       args: [
-        { name: 'x', javaType: 'foam.core.X' }
+        { name: 'x', type: 'Context' }
       ],
       javaThrows: ['AuthorizationException'],
     },
     {
       name: 'authorizeOnUpdate',
-      javaReturns: 'void',
       args: [
-        { name: 'x', javaType: 'foam.core.X' },
-        { name: 'oldObj', javaType: 'foam.core.FObject' }
+        { name: 'x', type: 'Context' },
+        { name: 'oldObj', type: 'foam.core.FObject' }
       ],
       javaThrows: ['AuthorizationException'],
     },
     {
       name: 'authorizeOnDelete',
-      javaReturns: 'void',
       args: [
-        { name: 'x', javaType: 'foam.core.X' }
+        { name: 'x', type: 'Context' }
       ],
       javaThrows: ['AuthorizationException'],
     }

@@ -54,7 +54,7 @@ public class InputStreamBlob
   }
 
   @Override
-  public void close() throws IOException {
+  protected void finalize() throws Throwable {
     in_.close();
   }
 }

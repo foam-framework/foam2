@@ -8,6 +8,7 @@ package foam.nanos.http;
 
 import foam.core.X;
 import foam.dao.DAO;
+import foam.nanos.auth.AgentAuthService;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.AuthenticationException;
 import foam.nanos.auth.User;
@@ -85,6 +86,7 @@ public class AuthWebAgent
     // query parameters
     String              email        = req.getParameter("user");
     String              password     = req.getParameter("password");
+    String              actAs        = req.getParameter("actAs");
     String              authHeader   = req.getHeader("Authorization");
 
     // instance parameters
@@ -169,7 +171,20 @@ public class AuthWebAgent
           .put(HttpServletRequest.class,  req)
           .put(HttpServletResponse.class, resp), email, password);
 
-        if ( user != null ) return session;
+        if ( user != null ) {
+          if ( ! SafetyUtil.isEmpty(actAs) ) {
+            AgentAuthService agentService = (AgentAuthService) x.get("agentAuth");
+            DAO localUserDAO = (DAO) x.get("localUserDAO");
+            try {
+              User entity = (User) localUserDAO.find(Long.parseLong(actAs));
+              agentService.actAs(session.getContext(), entity);
+            } catch (java.lang.NumberFormatException e) {
+              logger.error("actAs must be a number:" + e);
+              return null;
+            }
+          }
+          return session;
+        }
 
         // user should not be null, any login failure should throw an Exception
         logger.error("AuthService.loginByEmail returned null user and did not throw AuthenticationException.");
@@ -197,10 +212,8 @@ public class AuthWebAgent
 
   public Session createSession(X x) {
     HttpServletRequest req     = x.get(HttpServletRequest.class);
-    Session            session = new Session((X) x.get(Boot.ROOT));
-
+    Session            session = new Session((X) x.get(Boot.ROOT)); 
     session.setRemoteHost(req.getRemoteHost());
-
     return session;
   }
 

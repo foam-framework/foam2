@@ -27,17 +27,17 @@ foam.CLASS({
     {
       name: 'KEY_SIZE',
       value: 10,
-      type: 'int'
+      type: 'Integer'
     },
     {
       name: 'STEP_SIZE',
       value: 30 * 1000,
-      type: 'long'
+      type: 'Long'
     },
     {
       name: 'WINDOW',
       value: 3,
-      type: 'int'
+      type: 'Integer'
     }
   ],
 

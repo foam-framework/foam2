@@ -13,42 +13,38 @@ foam.INTERFACE({
   methods: [
     {
       name: 'generateToken',
-      returns: 'Promise',
-      javaReturns: 'boolean',
-      swiftReturns: 'Bool',
+      async: true,
+      type: 'Boolean',
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context?'
+          type: 'Context'
         },
         {
           name: 'user',
-          javaType: 'foam.nanos.auth.User',
-          of: 'foam.nanos.auth.User',
+          type: 'foam.nanos.auth.User'
         }
       ]
     },
     {
       name: 'generateTokenWithParameters',
-      returns: 'Promise',
-      javaReturns: 'boolean',
-      swiftReturns: 'Bool',
+      async: true,
+      type: 'Boolean',
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context?'
+          type: 'Context'
         },
         {
           name: 'user',
-          javaType: 'foam.nanos.auth.User',
-          of: 'foam.nanos.auth.User',
+          type: 'foam.nanos.auth.User'
         },
         {
           name: 'parameters',
+          type: 'Map',
+          // TODO: Can we encode this in type directly?
           javaType: 'java.util.Map<String, Object>',
           swiftType: '[String:Any]'
         }
@@ -56,25 +52,21 @@ foam.INTERFACE({
     },
     {
       name: 'processToken',
-      returns: 'Promise',
-      javaReturns: 'boolean',
-      swiftReturns: 'Bool',
+      async: true,
+      type: 'Boolean',
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context?'
+          type: 'Context'
         },
         {
           name: 'user',
-          javaType: 'foam.nanos.auth.User',
-          of: 'foam.nanos.auth.User',
+          type: 'foam.nanos.auth.User'
         },
         {
           name: 'token',
-          javaType: 'String',
-          swiftType: 'String'
+          type: 'String'
         }
       ]
     }

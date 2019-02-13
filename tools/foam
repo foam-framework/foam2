@@ -1,5 +1,14 @@
 #!/usr/bin/env node
 
+global.FOAM_FLAGS = {
+node: true,
+js: true,
+debug: true,
+java: true,
+swift: true
+};
+
 require('../src/foam.js');
+require('../src/foam/nanos/nanos.js');
 
 foam.classloader.NodeJsModelExecutor.create().fromArgs(process.argv.slice(2)).execute();

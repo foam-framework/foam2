@@ -20,7 +20,7 @@ foam.CLASS({
   name: 'PathnameRouter',
   extends: 'foam.net.node.SimpleRouter',
   implements: [ 'foam.net.node.PathnamePrefixHandler' ],
-
+  flags: ['node'],
   requires: [
     'foam.net.node.PathnamePrefixHandler',
     'foam.net.node.PathnameHandler',

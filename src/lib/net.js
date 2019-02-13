@@ -16,18 +16,18 @@ foam.SCRIPT({
     'foam.net.web.WebSocketService',
   ],
   code: function() {
-  var pkg = 'foam.net.web';
-  var clss = [
-    'BaseHTTPRequest',
-    'HTTPRequest',
-    'HTTPResponse',
-    'WebSocket',
-    'WebSocketService'
-  ];
+    var pkg = 'foam.net.web';
+    var clss = [
+      'BaseHTTPRequest',
+      'HTTPRequest',
+      'HTTPResponse',
+      'WebSocket',
+      'WebSocketService'
+    ];
 
-  // TODO: This should be provided via a sort of "ContextFactory" or similar.
-  for ( var i = 0; i < clss.length; i++ ) {
-    foam.register(foam.lookup(pkg + '.' + clss[i]), 'foam.net.' + clss[i]);
-  }
+    // TODO: This should be provided via a sort of "ContextFactory" or similar.
+    for ( var i = 0; i < clss.length; i++ ) {
+      foam.register(foam.lookup(pkg + '.' + clss[i]), 'foam.net.' + clss[i]);
+    }
   }
 })

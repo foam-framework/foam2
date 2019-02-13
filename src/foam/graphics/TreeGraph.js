@@ -51,6 +51,7 @@
 
        // List for 'click' events to expand/collapse Nodes.
        this.canvas.on('click', function(e) {
+
          var x = e.layerX+this.nodeWidth/2, y = e.layerY;
          var c = this.root.findFirstChildAt(x, y);
          if ( ! c ) return;
@@ -138,14 +139,19 @@
            if ( ! this.parentNode || this.parentNode.expanded ) this.SUPER(x);
          },
 
+         function hitTest(p) {
+           /** Needed to avoid handling click events when parent isn't expanded. **/
+           return ! this.parentNode || this.parentNode.expanded ? this.SUPER(p) : false;
+         },
+
          function paintSelf(x) {
            x.save();
 
            // Add shadow blur to box
-           x.shadowBlur = 5;
+           x.shadowBlur    = 5;
            x.shadowOffsetX = 5;
            x.shadowOffsetY = 5;
-           x.shadowColor = "gray";
+           x.shadowColor   = "gray";
 
            x.translate(-this.width/2, 0);
            this.SUPER(x);

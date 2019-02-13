@@ -58,7 +58,14 @@ foam.CLASS({
       name: 'property',
       required: true,
       postSet: function(o, property) {
-        if ( ! this.op ) this.op = foam.core.Int.isInstance(property) ? foam.mlang.predicate.Eq : foam.mlang.predicate.ContainsIC;
+        var isIntProp = foam.core.Int.isInstance(property) ||
+          foam.core.Reference.isInstance(property) &&
+          foam.core.Int.isInstance(property.of.ID);
+        if ( ! this.op ) {
+          this.op = isIntProp
+            ? foam.mlang.predicate.Eq
+            : foam.mlang.predicate.ContainsIC;
+        }
       }
     },
     {

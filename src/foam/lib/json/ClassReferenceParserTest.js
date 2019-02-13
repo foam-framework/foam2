@@ -26,22 +26,22 @@ foam.CLASS({
       name: 'ClassReferenceParserTest_StringWithValidClassReference',
       args: [
         {
-          class: 'Object',
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         },
         {
-          class: 'String',
-          name: 'data'
+          name: 'data',
+          type: 'String'
         },
         {
-          class: 'Object',
           name: 'expected',
+          // TODO(adamvy): Should Class vs ClassInfo be separate types?
+          // What should we store in Class properties.
           javaType: 'Class'
         },
         {
-          class: 'String',
-          name: 'message'
+          name: 'message',
+          type: 'String'
         },
       ],
       javaCode: `

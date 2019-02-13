@@ -224,7 +224,8 @@ foam.CLASS({
         return function compare(o1, o2) {
           return comparePropertyValues(f(o1), f(o2));
         };
-      }
+      },
+
     },
     // FUTURE: Move to refinement?
     {
@@ -270,7 +271,10 @@ foam.CLASS({
       */
       class: 'Boolean',
       name: 'containsDeletablePII'
-    }
+    },
+    {
+      name: 'type',
+    },
   ],
 
   methods: [
@@ -597,7 +601,7 @@ foam.CLASS({
           }
         }
         var ret = e.apply(this, args);
-        if ( ret === undefined ) this.warn('Expression returned undefined: ', e);
+        if ( ret === undefined ) this.__context__.warn('Expression returned undefined: ', e, this.name);
         return ret;
       };
     },
@@ -626,7 +630,7 @@ foam.CLASS({
            child.cls_ !== this.cls_ )
       {
         if ( this.cls_ !== foam.core.Property ) {
-          this.warn('Unsupported change of property type from', this.cls_.id, 'to', child.cls_.id);
+          this.__context__.warn('Unsupported change of property type from', this.cls_.id, 'to', child.cls_.id, 'property name', this.name);
         }
 
         return child;

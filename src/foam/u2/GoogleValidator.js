@@ -23,14 +23,18 @@ foam.CLASS({
   documentation: 'Standard Google Element validator, which is stricter than the default.',
 
   constants: [
-    DEFAULT_DISALLOWED_NODE_NAMES = {
-      APPLET: true,
-      EMBED: true,
-      META: true,
-      OBJECT: true,
-      SCRIPT: true,
-      STYLE: true,
-      TEMPLATE: true
+    {
+      name: 'defaultForbiddenNodeNames',
+      type: 'Map',
+      value: {
+        APPLET: true,
+        EMBED: true,
+        META: true,
+        OBJECT: true,
+        SCRIPT: true,
+        STYLE: true,
+        TEMPLATE: true
+      }
     }
   ],
 

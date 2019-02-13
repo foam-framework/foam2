@@ -1,28 +1,21 @@
 #!/usr/bin/env node
 
-var dir = __dirname;
-var root = dir + '/../..';
+global.FOAM_FLAGS = {
+  web: true,
+  js: true,
+  debug: true,
+};
 
-require(root + '/src/foam.js');
+require(__dirname + '/../../src/foam.js');
 
-var outDir = dir + '/build/src'
-var srcDirs = [
-  global.FOAM_ROOT,
-  dir + '/src',
-];
+foam.__context__.classloader.addClassPath(__dirname + '/src');
 
-// Clear the destination dir.
-var cp = require('child_process');
-cp.execSync('rm -rf ' + outDir)
-cp.execSync('mkdir -p ' + outDir)
-
-foam.__context__.classloader.load('foam.build.Builder').then(function(cls) {
-  cls.create({
-    srcDirs: srcDirs,
-    outDir: outDir,
-    required: [
-      'demo.build.ModelToBuild',
-    ],
-    flags: ['js', 'web'],
-  }).execute();
+Promise.all([
+  foam.__context__.classloader.load('foam.build.Builder'),
+  foam.__context__.classloader.load('demo.build.ModelToBuild'),
+]).then(function(cls) {
+  foam.build.Builder.create({
+    targetFile: __dirname + '/foam-bin.js',
+    enabledFeatures: ['web', 'js'],
+  }).execute()
 });

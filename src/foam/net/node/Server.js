@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.net.node',
   name: 'Server',
-
+  flags: ['node'],
   documentation: `An modeled HTTP server implementation.
 
       The server stores a Router, which is responsible for handling requests to
@@ -91,7 +91,7 @@ foam.CLASS({
       }
     },
     {
-      type: 'Int',
+      class: 'Int',
       name: 'port',
       value: 8000
     },

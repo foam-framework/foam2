@@ -11,24 +11,23 @@ foam.INTERFACE({
   methods: [
     {
       name: 'start',
-      javaReturns: 'void',
-      returns: 'Promise'
+      async: true,
     },
     {
       name: 'sendEmail',
-      javaReturns: 'String',
-      returns: 'Promise',  
+      type: 'String',
+      async: true,
       args: [
         {
-          class:'String',
+          type:'String',
           name:'requestor'
         },
         {
-          class:'String',
+          type:'String',
           name:'subject'
         },
         {
-          class:'String',
+          type:'String',
           name:'body'
         }
       ]

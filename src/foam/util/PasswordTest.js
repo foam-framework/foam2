@@ -46,8 +46,8 @@ foam.CLASS({
     {
       name: 'Password_HashWithInvalidInput_IllegalArgumentException',
       args: [
-        { class: 'String', name: 'input'    },
-        { class: 'String', name: 'message'  }
+        { type: 'String', name: 'input'    },
+        { type: 'String', name: 'message'  }
       ],
       javaCode: `
         try {
@@ -61,7 +61,7 @@ foam.CLASS({
     {
       name: 'Password_HashWithValidInput_Succeeds',
       args: [
-        { class: 'String', name: 'input' }
+        { type: 'String', name: 'input' }
       ],
       javaCode: `
         try {
@@ -74,10 +74,10 @@ foam.CLASS({
     {
       name: 'Password_Verify',
       args: [
-        { class: 'String',  name: 'password' },
-        { class: 'String',  name: 'hash'     },
-        { class: 'Boolean', name: 'expected' },
-        { class: 'String',  name: 'message'  }
+        { type: 'String',  name: 'password' },
+        { type: 'String',  name: 'hash'     },
+        { type: 'Boolean', name: 'expected' },
+        { type: 'String',  name: 'message'  }
       ],
       javaCode: `
         test(Password.verify(password, hash) == expected, message);
@@ -86,10 +86,10 @@ foam.CLASS({
     {
       name: 'Password_IsValid',
       args: [
-        { javaType: 'foam.core.X',  name: 'x'    },
-        { class: 'String',  name: 'input'    },
-        { class: 'Boolean', name: 'expected' },
-        { class: 'String',  name: 'message'  },
+        { type: 'Context', name: 'x'    },
+        { type: 'String',  name: 'input'    },
+        { type: 'Boolean', name: 'expected' },
+        { type: 'String',  name: 'message'  },
       ],
       javaCode: `
         test(Password.isValid(x, input) == expected, message);

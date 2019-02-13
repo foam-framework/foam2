@@ -29,7 +29,7 @@ foam.CLASS({
     {
       name: 'me',
       key: 'me',
-      javaType: 'foam.box.Box'
+      type: 'foam.box.Box'
     }
   ],
 
@@ -154,16 +154,7 @@ return exportBox;
       },
       swiftSynchronized: true,
       swiftCode: `
-if let name = name as? String {
-  registry_.removeValue(forKey: name)
-} else if let name = name as? foam_box_Box {
-  for key in registry_.keys {
-    if (registry_[key] as! Registration).exportBox === name {
-      registry_.removeValue(forKey: key)
-      return
-    }
-  }
-}
+registry_.removeValue(forKey: name)
       `,
       javaCode: `
 getRegistry_().remove(name);

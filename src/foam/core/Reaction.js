@@ -69,6 +69,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'ModelReactionsRefinement',
   refines: 'foam.core.Model',
 
   properties: [
@@ -79,8 +81,8 @@ foam.CLASS({
       adaptArrayElement: function(e, prop) {
         return foam.Array.isInstance(e) ?
           foam.core.Reaction.create({target: e[0], topic: e[1] ? e[1].split('.') : [], listener: e[2] }) :
-          e.class ? this.lookup(e.class).create(e, this) :
-          this.lookup(prop.of).create(e, this);
+          e.class ? this.__context__.lookup(e.class).create(e, this) :
+          this.__context__.lookup(prop.of).create(e, this);
       }
     }
   ]

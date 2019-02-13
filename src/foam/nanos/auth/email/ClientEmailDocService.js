@@ -7,13 +7,6 @@
 foam.CLASS({
   package: 'foam.nanos.auth.email',
   name: 'ClientEmailDocService',
-
-  implements: [
-    'foam.nanos.auth.email.EmailDocInterface',
-  ],
-  import: [
-    'registry'
-  ],
   properties: [
     {
       class: 'Stub',
