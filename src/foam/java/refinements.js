@@ -1764,8 +1764,7 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
-    // No point parsing it, multi part id is always transient.
-    ['javaJSONParser', 'new foam.lib.parse.Fail()'],
+    ['javaJSONParser', 'new foam.lib.json.FObjectParser()'],
     {
       name: 'javaGetter',
       factory: function() {
