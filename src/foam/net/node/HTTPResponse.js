@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'foam.net.node',
   name: 'HTTPResponse',
   extends: 'foam.net.web.HTTPResponse',
-
+  flags: ['node'],
   properties: [
     {
       name: 'payload',

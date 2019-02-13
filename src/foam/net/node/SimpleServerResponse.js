@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'foam.net.node',
   name: 'SimpleServerResponse',
   implements: [ 'foam.net.node.ServerResponse' ],
-
+  flags: ['node'],
   documentation: `Reponse sent by HTTP server. Underlying Node JS response
       should be injected upon creation but treated as private.`,
 

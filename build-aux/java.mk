@@ -42,6 +42,7 @@ BUILD_DIR ?= build
 $(BUILD_DIR):
 	$(MKDIR_P) $@
 
+.PHONY: gensrcs
 
 define JAVA_JAR_template
 $(1)_CLASSPATH = $$(subst $$(space),:,$$(foreach lib,$$($(1)_JAVA_LIBS),$$(abspath $$(lib))))
@@ -76,6 +77,8 @@ $$($(1)_SRC_HASH): $$(FOAM2_HOME)/tools/genjava2.js | $$($(1)_GEN_SRC_DIR)
 	find $$($(1)_GEN_SRC_DIR) -type f -iname '*.java' -delete
 	$$(foam_genjava) $$($(1)_CLASSES) $$($(1)_GEN_SRC_DIR) $$($(1)_SRC_DIR)
 	touch $$@
+
+gensrcs: $$($(1)_SRC_HASH)
 
 clean-$(1)-gensrcs:
 	-rm -rf $$($(1)_GEN_SRC_DIR)

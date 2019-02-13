@@ -17,8 +17,7 @@ foam.CLASS({
         var sep = require('path').sep;
         var path = self.root + sep + id.replace(/\./g, sep) + '.js';
         try {
-          var fs = require('fs');
-          var js = fs.readFileSync(path, 'utf8');
+          var js = require('fs').readFileSync(path, 'utf8');
           ret(js);
         } catch(e) {
           ret(null);

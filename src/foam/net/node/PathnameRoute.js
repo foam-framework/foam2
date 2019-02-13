@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'foam.net.node',
   name: 'PathnameRoute',
   implements: [ 'foam.net.node.Route' ],
-
+  flags: ['node'],
   imports: [ 'parentPrefix?' ],
   exports: [ 'pathname' ],
 

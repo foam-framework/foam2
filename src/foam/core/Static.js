@@ -32,6 +32,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'ModelStaticRefinement',
   refines: 'foam.core.Model',
 
   properties: [

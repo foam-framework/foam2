@@ -26,7 +26,8 @@ foam.CLASS({
 });
 
 foam.SCRIPT({
-  id: 'foam.dao.sync.VersionedSyncRecordScript',
+  package: 'foam.dao.sync',
+  name: 'VersionedSyncRecordScript',
   requires: [
     'foam.version.VersionedClassFactorySingleton',
     'foam.dao.sync.SyncRecord',

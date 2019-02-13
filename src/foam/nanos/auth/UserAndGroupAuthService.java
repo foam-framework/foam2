@@ -164,7 +164,6 @@ public class UserAndGroupAuthService
     if ( user == null ) {
       throw new AuthenticationException("User not found");
     }
-
     return userAndGroupContext(x, user, password);
   }
 

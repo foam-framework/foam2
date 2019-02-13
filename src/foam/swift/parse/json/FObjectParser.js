@@ -37,10 +37,10 @@ return
   methods: [
     {
       name: 'parseString',
-      swiftReturns: 'foam_core_FObject?',
+      swiftType: 'foam_core_FObject?',
       args: [
         {
-          swiftType: 'String',
+          type: 'String',
           name: 'str',
         },
         {

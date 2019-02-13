@@ -18,8 +18,8 @@
 foam.INTERFACE({
   package: 'foam.net.node',
   name: 'Router',
-  extends: [ 'foam.net.node.Handler' ],
-
+  implements: [ 'foam.net.node.Handler' ],
+  flags: ['node'],
   methods: [
     {
       name: 'addRoute',
@@ -30,15 +30,15 @@ foam.INTERFACE({
         {
           name: 'route',
           documentation: `The route specification to add.`,
-          typeName: 'foam.net.node.Route'
+          type: 'foam.net.node.Route'
         },
         {
           name: 'handler',
           documentation: `The handler responsible for the route.`,
-          typeName: 'foam.net.node.Handler'
+          type: 'foam.net.node.Handler'
         },
       ],
-      returns: 'foam.net.node.Handler',
+      type: 'foam.net.node.Handler',
       code: function(route, handler) {}
     }
   ]

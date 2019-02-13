@@ -59,10 +59,9 @@ foam.CLASS({
       name: 'runScript',
       args: [
         {
-          name: 'x', javaType: 'foam.core.X'
+          name: 'x', type: 'Context'
         }
       ],
-      javaReturns: 'void',
       javaCode: `
         // turn off logging to get rid of clutter.
         LogLevelFilterLogger loggerFilter = (LogLevelFilterLogger) x.get("logger");
@@ -125,10 +124,10 @@ foam.CLASS({
       name: 'runTests',
       args: [
         {
-          name: 'x', javaType: 'foam.core.X'
+          name: 'x', type: 'Context'
         },
         {
-          name: 'test', javaType: 'Test'
+          name: 'test', type: 'foam.nanos.test.Test'
         }
       ],
       javaCode: `
@@ -143,10 +142,10 @@ foam.CLASS({
       name: 'runServerSideTest',
       args: [
         {
-          name: 'x', javaType: 'foam.core.X'
+          name: 'x', type: 'Context'
         },
         {
-          name: 'test', javaType: 'Test'
+          name: 'test', type: 'foam.nanos.test.Test'
         }
       ],
       javaCode: `
@@ -174,7 +173,6 @@ foam.CLASS({
           name: 'test', javaType: 'Test'
         }
       ],
-      javaReturns: 'void',
       javaCode: `
         Test[] failedTests = getFailedTestsList();
         Test[] temp = new Test[failedTests.length+1];
@@ -188,20 +186,18 @@ foam.CLASS({
       name: 'printBold',
       args: [
         {
-          name: 'message', javaType: 'String'
+          name: 'message', type: 'String'
         }
       ],
-      javaReturns: 'void',
       javaCode: 'System.out.println("\\033[0;1m" + message + RESET_COLOR);'
     },
     {
       name: 'printOutput',
       args: [
         {
-          name: 'test', javaType: 'Test'
+          name: 'test', type: 'foam.nanos.test.Test'
         }
       ],
-      javaReturns: 'void',
       javaCode: `
         String outputs[] = test.getOutput().split("\\n");
         for( String output: outputs ) {

@@ -40,7 +40,7 @@ foam.CLASS({
     {
       name: 'DeletedAwareDAOTest_remove_DeletedAware',
       args: [
-        { of: 'X', name: 'x' }
+        { type: 'Context', name: 'x' }
       ],
       javaCode: `
         DAO delegate = new MDAO(DeletedAwareDummy.getOwnClassInfo());
@@ -66,7 +66,7 @@ foam.CLASS({
     {
       name: 'DeletedAwareDAOTest_remove_non_DeletedAware',
       args: [
-        { of: 'X', name: 'x' }
+        { type: 'Context', name: 'x' }
       ],
       javaCode: `
         DAO delegate = new MDAO(Country.getOwnClassInfo());
@@ -86,7 +86,7 @@ foam.CLASS({
     {
       name: 'DeletedAwareDAOTest_removeAll',
       args: [
-        { of: 'X', name: 'x' }
+        { type: 'Context', name: 'x' }
       ],
       javaCode: `
         DAO delegate = new MDAO(DeletedAwareDummy.getOwnClassInfo());
@@ -112,7 +112,7 @@ foam.CLASS({
     {
       name: 'DeletedAwareDAOTest_find_deleted_object_returns_null',
       args: [
-        { of: 'X', name: 'x' }
+        { type: 'Context', name: 'x' }
       ],
       javaCode: `
         DAO delegate = new MDAO(DeletedAwareDummy.getOwnClassInfo());
@@ -133,7 +133,7 @@ foam.CLASS({
     {
       name: 'DeletedAwareDAOTest_select_does_not_include_deleted_objects',
       args: [
-        { of: 'X', name: 'x' }
+        { type: 'Context', name: 'x' }
       ],
       javaCode: `
         DAO delegate = new MDAO(DeletedAwareDummy.getOwnClassInfo());
