@@ -65,9 +65,9 @@ public class TreeNode {
     }
     int m = start + (int) Math.floor((end-start+1)/2);
     TreeNode tree = this.putKeyValue(this, prop, prop.f(a[m]), a[m], tail);
-    tree.left = (TreeNode) this.bulkLoad(tail, prop, start, m-1, a);
+    tree.left  = (TreeNode) this.bulkLoad(tail, prop, start, m-1, a);
     tree.right = (TreeNode) this.bulkLoad(tail, prop, m+1, end, a);
-    tree.size = this.size(tree.left) + this.size(tree.right);
+    tree.size  = this.size(tree.left) + this.size(tree.right);
     return tree;
   }
 
