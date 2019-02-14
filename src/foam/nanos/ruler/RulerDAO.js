@@ -79,9 +79,9 @@
       FObject ret =  getDelegate().put_(x, obj);
 
       if ( oldObj == null ) {
-        applyRules(x, obj, oldObj, getCreateAfter());
+        applyRules(x, ret, oldObj, getCreateAfter());
       } else {
-        applyRules(x, obj, oldObj, getUpdateAfter());
+        applyRules(x, ret, oldObj, getUpdateAfter());
       }
       return ret;
       `
@@ -92,7 +92,7 @@
       FObject oldObj = getDelegate().find_(x, obj);
       applyRules(x, obj, oldObj, getRemoveBefore());
 
-      FObject ret =  getDelegate().put_(x, obj);
+      FObject ret =  getDelegate().remove_(x, obj);
 
       applyRules(x, ret, oldObj, getRemoveAfter());
       return ret;
