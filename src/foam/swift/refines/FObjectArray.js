@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'FObjectArraySwiftRefinement',
   refines: 'foam.core.FObjectArray',
   flags: ['swift'],
   properties: [

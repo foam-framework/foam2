@@ -23,9 +23,9 @@ foam.CLASS({
   properties: [
     {
       name: 'code',
-      expression: function(name, property, returns, delegate) {
+      expression: function(name, property, type, delegate) {
         if ( delegate ) {
-          return returns ?
+          return type ?
             function() {
               var self = this;
               var args = arguments;
@@ -41,7 +41,7 @@ foam.CLASS({
               });
             };
         }
-        return returns ?
+        return type ?
           function() {
             var self = this;
             var args = arguments;
@@ -112,7 +112,7 @@ foam.CLASS({
       var pendingState   = 'Pending' + foam.String.capitalize(myName);
       var fulfilledState = 'Fulfilled' + foam.String.capitalize(myName);
 
-      var delegate = this.lookup(this.of);
+      var delegate = this.__context__.lookup(this.of);
 
       function resolveName(name) {
         var m = delegate.getAxiomByName(name);
@@ -160,7 +160,7 @@ foam.CLASS({
           name: methods[i].name,
           flags: ['js', 'swift'],
           property: myName,
-          returns:  methods[i].returns,
+          type:  methods[i].type,
           delegate: false
         }));
       }

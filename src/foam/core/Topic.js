@@ -94,6 +94,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'ModelTopicRefinement',
   refines: 'foam.core.Model',
   properties: [
     {
@@ -111,6 +113,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'FObjectPropertyChangeTopicRefinement',
   refines: 'foam.core.FObject',
   topics: [ 'propertyChange' ]
 });

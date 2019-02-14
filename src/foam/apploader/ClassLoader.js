@@ -68,7 +68,8 @@ have multiple classloaders running alongside eachother`
     },
     {
       name: 'load',
-      returns: 'Promise',
+      type: 'Class',
+      async: true,
       args: [ { class: 'String', name: 'id' } ],
       code: function(id) {
         return this.load_(id, []);
@@ -76,25 +77,31 @@ have multiple classloaders running alongside eachother`
     },
     {
       name: 'maybeLoad',
-      returns: 'Promise',
+      type: 'Class',
+      async: true,
       documentation: "Like load, but don't throw if not found.",
-      args: [ { name: 'id', of: 'String' } ],
+      args: [ { name: 'id', type: 'String' } ],
       code: function(id) {
-        return this.load(id).catch(function() { return null; });
+        return this.load(id).catch(function() {
+          console.warn.apply(console, ["Failed to load", id].concat(Array.from(arguments)));
+          return null;
+        });
       }
     },
     {
       name: 'maybeLoad_',
-      returns: 'Promise',
-      args: [ { name: 'id', of: 'String' },
-              { name: 'path', of: 'StringArray' } ],
+      type: 'Class',
+      async: true,
+      args: [ { name: 'id', type: 'String' },
+              { name: 'path', type: 'String[]' } ],
       code: function(id, path) {
         return this.load_(id, path).catch(function() { return null; });
       }
     },
     {
       name: 'latch',
-      returns: 'Promise',
+      type: 'Class',
+      async: true,
       args: [ { name: 'json' } ],
       code: function(json) {
         var id = json.package ?
@@ -106,9 +113,10 @@ have multiple classloaders running alongside eachother`
     },
     {
       name: 'load_',
-      returns: 'Promise',
-      args: [ { class: 'String', name: 'id' },
-              { class: 'StringArray', name: 'path' } ],
+      type: 'Class',
+      async: true,
+      args: [ { name: 'id', type: 'String' },
+              { name: 'path', type: 'String[]' } ],
       code: function(id, path) {
         var self = this;
 
@@ -128,10 +136,11 @@ have multiple classloaders running alongside eachother`
           // tag).  We hook into those so that they can still use the
           // classloader to ensure any dependencies of that model are
           // loaded before they use it.
+          var subClassLoader = self.SubClassLoader.create({delegate: self, path: path});
           if ( this.latched[id] ) {
             var json = this.latched[id];
             delete this.latched[id];
-            return this.pending[id] = Promise.all(foam.json.references(this.__context__, json)).then(function() {
+            return this.pending[id] = Promise.all(foam.json.references(subClassLoader.__subContext__, json)).then(function() {
               var cls = json.class ? foam.lookup(json.class) : foam.core.Model;
               return self.modelDeps_(cls.create(json), path);
             }).then(function() {
@@ -143,8 +152,7 @@ have multiple classloaders running alongside eachother`
 
           if ( foam.lookup(id, true) ) return Promise.resolve(foam.lookup(id));
 
-          var x2 = self.SubClassLoader.create({delegate: self, path: path});
-          return this.pending[id] = this.modelDAO.inX(x2).find(id).then(function(m) {
+          return this.pending[id] = this.modelDAO.inX(subClassLoader).find(id).then(function(m) {
             if ( ! m ) return Promise.reject(new Error('Model Not Found: ' + id));
             if ( self.Relationship.isInstance(m) ) {
               return m.initRelationship();
@@ -159,7 +167,8 @@ have multiple classloaders running alongside eachother`
             }
             return this.buildClass_(m, path);
           }.bind(this), function(e) {
-            throw new Error("Failed to load class " + id + " reason: " + e);
+            throw e ? new Error("Failed to load class " + id + ".  Caused by: " + e.message) :
+              new Error("Failed to load class " + id);
           });
         }
 
@@ -172,7 +181,7 @@ have multiple classloaders running alongside eachother`
     },
     {
       name: 'modelDeps_',
-      args: [ { name: 'model', of: 'foam.core.Model' },
+      args: [ { name: 'model', type: 'Model' },
               { name: 'path' } ],
       code: function(model, path) {
         var self = this;
@@ -183,8 +192,8 @@ have multiple classloaders running alongside eachother`
     },
     {
       name: 'buildClass_',
-      args: [ { name: 'model', of: 'foam.core.Model' },
-              { name: 'path', of: 'StringArray' } ],
+      args: [ { name: 'model', type: 'Model' },
+              { name: 'path', type: 'String[]' } ],
       code: function(model, path) {
         var self = this;
 
@@ -211,6 +220,8 @@ have multiple classloaders running alongside eachother`
           //   debugger;
           // }
 
+          delete foam.UNUSED[model.id]
+          foam.USED[model.id] = model
           return cls;
         });
       }

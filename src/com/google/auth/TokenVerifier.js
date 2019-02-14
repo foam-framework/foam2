@@ -21,13 +21,12 @@ foam.INTERFACE({
   methods: [
     {
       name: 'verify',
-      returns: 'String',
-      javaReturns: 'String',
+      type: 'String',
       javaThrows: [ 'java.security.GeneralSecurityException' ],
       args: [
         {
           name: 'token',
-          javaType: 'String'
+          type: 'String'
         }
       ]
     }

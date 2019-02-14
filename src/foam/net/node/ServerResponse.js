@@ -18,14 +18,14 @@
 foam.INTERFACE({
   package: 'foam.net.node',
   name: 'ServerResponse',
-
+  flags: ['node'],
   documentation: `Reponse sent by HTTP server.`,
 
   methods: [
     {
       name: 'getStatusCode',
       documentation: 'Get HTTP status code.',
-      returns: 'Int',
+      type: 'Int',
       code: function() {}
     },
     {
@@ -34,7 +34,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'statusCode',
-          typeName: 'Int'
+          type: 'Integer'
         }
       ],
       code: function(statusCode) {}
@@ -46,12 +46,12 @@ foam.INTERFACE({
         {
           name: 'header',
           documentation: 'The header name.',
-          typeName: 'String'
+          type: 'String'
         },
         {
           name: 'value',
           documentation: 'The header value.',
-          typeName: 'String'
+          type: 'String'
         }
       ],
       code: function(header, value) {}

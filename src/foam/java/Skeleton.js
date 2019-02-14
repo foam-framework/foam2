@@ -53,9 +53,9 @@ foam.CLASS({
       cls.name    = this.name;
       cls.extends = 'foam.box.AbstractSkeleton',
 
-      foam.core.Object.create({
+      foam.core.FObjectProperty.create({
         name: 'delegate',
-        javaType: this.of.id
+        type: this.of.id
       }).buildJavaClass(cls);
 
       cls.method({
@@ -94,14 +94,15 @@ foam.CLASS({
       switch ( rpc.getName() ) {<%
   var methods = this.of.getOwnAxiomsByClass(foam.core.Method);
   for ( var i = 0 ; i < methods.length ; i++ ) {
-    var m = methods[i]; %>
+    var m = methods[i];
+    var hasReturn = m.javaType && m.javaType !== 'void';%>
         case "<%= m.name %>":
-          <% if ( m.javaReturns && m.javaReturns !== 'void' ) { %>result = <% } %>getDelegate().<%= m.name %>(
+          <% if ( hasReturn ) { %>result = <% } %>getDelegate().<%= m.name %>(
           <%
     for ( var j = 0 ; j < m.args.length ; j++ ) {
-      if ( m.args[j].javaType == 'foam.core.X' ) {
+      if ( m.args[j].type == 'Context' ) {
         %>getMessageX(message)<%
-      } else if ( foam.core.AbstractEnum.isSubClass(this.lookup(m.args[j].javaType, true)) ) {
+      } else if ( foam.core.AbstractEnum.isSubClass(this.__context__.lookup(m.args[j].type, true)) ) {
         %>rpc.getArgs() != null && rpc.getArgs().length > <%= j %> ? (<%= m.args[j].javaType %>) rpc.getArgs()[<%= j %>] : null<%
       } else {
         if ( {byte: 1, double: 1, float: 1, int: 1, long: 1, short: 1 }[m.args[j].javaType] ) {

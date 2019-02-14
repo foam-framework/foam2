@@ -18,13 +18,11 @@ import foam.nanos.session.Session;
 import foam.util.Email;
 import foam.util.Password;
 import foam.util.SafetyUtil;
-
 import javax.security.auth.AuthPermission;
 import java.security.Permission;
 import java.util.Calendar;
 import java.util.List;
 import java.util.regex.Pattern;
-
 import static foam.mlang.MLang.AND;
 import static foam.mlang.MLang.EQ;
 
@@ -166,7 +164,6 @@ public class UserAndGroupAuthService
     if ( user == null ) {
       throw new AuthenticationException("User not found");
     }
-
     return userAndGroupContext(x, user, password);
   }
 

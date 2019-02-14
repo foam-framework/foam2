@@ -24,6 +24,12 @@ foam.CLASS({
 
   properties: [
     { name: 'of', required: true },
+    {
+      name: 'type',
+      factory: function() {
+        return this.of + '[]';
+      }
+    },
     [
       'factory',
       function() { return []; }

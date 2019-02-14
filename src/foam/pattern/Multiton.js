@@ -65,7 +65,7 @@ foam.CLASS({
         }
 
         return instances[key] ||
-            ( instances[key] = oldCreate.apply(this, arguments) );
+          ( instances[key] = oldCreate.apply(this, arguments) );
       };
     },
 

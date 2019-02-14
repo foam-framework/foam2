@@ -31,7 +31,7 @@ foam.CLASS({
     {
       name: 'MAX_URL_SIZE',
       value: 2000,
-      type: 'int'
+      type: 'Integer'
     }
   ],
 
@@ -290,7 +290,6 @@ foam.CLASS({
   actions: [
     {
       name: 'postButton',
-      hidden: true,
       label: 'Send POST Request',
       code: async function() {
         if ( ! (this.postURL === '') ) {

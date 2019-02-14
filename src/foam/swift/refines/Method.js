@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'AbstractMethodSwiftRefinement',
   refines: 'foam.core.AbstractMethod',
   flags: ['swift'],
   requires: [
@@ -86,23 +88,18 @@ foam.CLASS({
       name: 'swiftOverride',
     },
     {
-      class: 'String',
+      class: 'Boolean',
       name: 'swiftSupport',
     },
     {
       class: 'Boolean',
-      name: 'swiftReturnsOptional',
+      name: 'returnsNullable',
     },
     {
       class: 'String',
-      name: 'swiftReturns',
-      expression: function(returns, swiftReturnsOptional) {
-        if (!returns) return '';
-        var cls = foam.lookup(returns, true)
-        if (cls) {
-          return cls.model_.swiftName + (swiftReturnsOptional ? '?' : '')
-        }
-        return 'Any?';
+      name: 'swiftType',
+      expression: function(type, returnsNullable) {
+        return foam.swift.toSwiftType(type, returnsNullable)
       },
     },
     {
@@ -157,7 +154,7 @@ foam.CLASS({
           name: this.swiftSynchronizedMethodName,
           body: this.getSwiftCode(parentCls),
           throws: this.swiftThrows,
-          returnType: this.swiftReturns,
+          returnType: this.swiftType,
           args: this.swiftArgs,
           visibility: 'private',
           annotations: this.swiftAnnotations,
@@ -166,7 +163,7 @@ foam.CLASS({
           name: this.swiftName,
           body: this.syncronizedCode(),
           throws: this.swiftThrows,
-          returnType: this.swiftReturns,
+          returnType: this.swiftType,
           args: this.swiftArgs,
           visibility: this.swiftVisibility,
           override: this.getSwiftOverride(parentCls),
@@ -177,7 +174,7 @@ foam.CLASS({
           name: this.swiftName,
           body: this.getSwiftCode(parentCls),
           throws: this.swiftThrows,
-          returnType: this.swiftReturns,
+          returnType: this.swiftType,
           args: this.swiftArgs,
           visibility: this.swiftVisibility,
           override: this.getSwiftOverride(parentCls),
@@ -256,12 +253,12 @@ return <%=foam.swift.core.ConstantSlot.model_.swiftName%>([
       args: [],
       template: function() {/*
 <%=this.swiftSynchronizedSemaphoreName%>.wait()
-<%if (this.swiftReturns) {%>let ret = <%}%><%=
+<%if (this.swiftType != 'Void') {%>let ret = <%}%><%=
     this.swiftThrows ? 'try ' : ''%><%=
     this.swiftSynchronizedMethodName%>(<%=
         this.swiftArgs.map(function(a) { return a.localName }).join(',')%>)
 <%=this.swiftSynchronizedSemaphoreName%>.signal()
-<%if (this.swiftReturns) {%>return ret<%}%>
+<%if (this.swiftType != 'Void') {%>return ret<%}%>
       */},
     },
     {

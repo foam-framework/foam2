@@ -54,8 +54,9 @@ foam.CLASS({
     {
       class: 'Object',
       name: 'context',
-      javaType: 'foam.core.X',
-      javaFactory: 'return foam.core.EmptyX.instance().put(Session.class, this);',
+      type: 'Context',
+      // Put a null user to prevent sytem user from leaking into subcontexts
+      javaFactory: 'return getX().put("user", null).put(Session.class, this);',
       hidden: true,
       transient: true
     }
@@ -66,7 +67,7 @@ foam.CLASS({
     // in the SessionDAO.
     {
       name: 'fclone',
-      javaReturns: 'foam.core.FObject',
+      type: 'foam.core.FObject',
       javaCode: 'return this;'
     },
     {

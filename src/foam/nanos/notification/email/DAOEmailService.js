@@ -68,11 +68,11 @@ foam.CLASS({
   methods: [
     {
       name: 'getConfig',
-      javaReturns: 'EnvironmentConfiguration',
+      javaType: 'EnvironmentConfiguration',
       args: [
         {
           name: 'group',
-          javaType: 'String'
+          type: 'String'
         }
       ],
       javaCode:

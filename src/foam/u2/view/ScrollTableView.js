@@ -18,7 +18,7 @@
 
   constants: [
     {
-      type: 'Int',
+      type: 'Integer',
       name: 'TABLE_HEAD_HEIGHT',
       value: 40
     }

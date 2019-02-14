@@ -23,6 +23,9 @@ import java.util.List;
 import static foam.mlang.MLang.EQ;
 
 public class Boot {
+  // Context key used to store the top-level root context in the context.
+  public final static String ROOT = "_ROOT_";
+
   protected DAO serviceDAO_;
   protected X   root_ = new ProxyX();
 
@@ -73,9 +76,14 @@ public class Boot {
       }
     }, null);
 
-    /**
-     * Revert root_ to non ProxyX to avoid letting children add new bindings.
-     */
+    // Use an XFactory so that the root context can contain itself.
+    root_ = root_.putFactory(ROOT, new XFactory() {
+      public Object create(X x) {
+        return Boot.this.getX();
+      }
+    });
+
+    // Revert root_ to non ProxyX to avoid letting children add new bindings.
     root_ = ((ProxyX) root_).getX();
 
     // Export the ServiceDAO

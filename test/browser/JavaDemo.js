@@ -40,7 +40,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'one',
-          javaType: 'String'
+          type: 'String'
         }
       ]
     }

@@ -1,4 +1,4 @@
-/**ß
+/**
  * @license
  * Copyright 2018 The FOAM Authors. All Rights Reserved.
  */
@@ -25,4 +25,4 @@ foam.CLASS({
       value: 'DAOReject'
     }
   ]
-})
+});

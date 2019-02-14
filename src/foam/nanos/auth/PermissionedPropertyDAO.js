@@ -16,7 +16,7 @@ foam.CLASS({
 
   documentation: `A DAO decorator that prevents users from updating / reading
       properties for which they do not have the update / read permission.
-      
+
       To require update / read permission on a property, set the permissionRequired
       to be true, and add the corresponding permissions,
       i.e. model.ro.prop / model.rw.prop to  the groups who are granted permissions
@@ -34,8 +34,8 @@ foam.CLASS({
     {
       name: 'find_',
       javaCode: `
-  FObject oldObj = getDelegate().find(id);
-  
+  FObject oldObj = getDelegate().find_(x, id);
+
   if ( oldObj != null ) {
     return hideProperties(x, oldObj);
   }
@@ -57,19 +57,19 @@ foam.CLASS({
 
     {
       name: 'resetProperties',
-      javaReturns: 'foam.core.FObject',
+      type: 'foam.core.FObject',
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          type: 'foam.core.FObject'
         },
         {
           name: 'oldObj',
-          javaType: 'foam.core.FObject'
+          type: 'foam.core.FObject'
         }
       ],
       javaCode: `
@@ -95,22 +95,22 @@ foam.CLASS({
     }
     propertyMap_.put(of, properties);
   }
-    
+
   return obj;
       `,
     },
 
     {
       name: 'hideProperties',
-      javaReturns: 'foam.core.FObject',
+      type: 'foam.core.FObject',
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'oldObj',
-          javaType: 'foam.core.FObject'
+          type: 'foam.core.FObject'
         }
       ],
       javaCode: `
@@ -137,14 +137,13 @@ foam.CLASS({
     }
     propertyMap_.put(of, properties);
   }
-    
+
   return obj;
       `,
     },
 
     {
       name: 'checkPermission',
-      javaReturns: 'void',
       args: [
         {
           name: 'axiom',
@@ -152,23 +151,23 @@ foam.CLASS({
         },
         {
           name: 'of',
-          javaType: 'String'
+          type: 'String'
         },
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          type: 'foam.core.FObject'
         },
         {
           name: 'oldObj',
-          javaType: 'foam.core.FObject'
+          type: 'foam.core.FObject'
         },
         {
           name: 'write',
-          javaType: 'Boolean'
+          type: 'Boolean'
         }
       ],
       javaCode: `
@@ -207,7 +206,7 @@ foam.CLASS({
     },
   ],
 });
-  
+
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'HidePropertiesSink',
@@ -220,7 +219,6 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      javaReturns: 'void',
       args: [
         {
           name: 'obj',

@@ -22,10 +22,9 @@ foam.INTERFACE({
       `,
       args: [
         {
-          name: 'x', javaType: 'foam.core.X'
+          name: 'x', type: 'Context'
         }
       ],
-      javaReturns: 'void',
       javaThrows: ['IllegalStateException'],
     }
   ]

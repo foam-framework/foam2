@@ -52,7 +52,7 @@ foam.CLASS({
       return Promise.all(promises).then(function() {
         var resources = [];
         for (var i = 0; i < self.models.length; i++) {
-          var model = self.lookup(self.models[i], self);
+          var model = self.__context__.lookup(self.models[i], self);
           resources = resources.concat(self.classToResources(model));
         }
         self.fs.writeFileSync(

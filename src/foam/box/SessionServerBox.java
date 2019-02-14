@@ -47,9 +47,14 @@ public class SessionServerBox
           session.setRemoteHost(req.getRemoteHost());
           session.setContext(getX().put(Session.class, session));
           sessionDAO.put(session);
+        } else if ( ! session.getRemoteHost().equals(req.getRemoteHost()) ) {
+          // If an existing session is reused with a different remote host then
+          // logout the session and force a re-login.
+          logger.warning("Attempt to use session create for ", session.getRemoteHost(), " from ", req.getRemoteHost());
+          session.setContext(getX().put(Session.class, session));
+          session.setRemoteHost(req.getRemoteHost());
+          sessionDAO.put(session);
         }
-
-        // TODO: should we check that the remoteHost hasn't changed?
 
         User user = (User) session.getContext().get("user");
         X    x    = session.getContext()

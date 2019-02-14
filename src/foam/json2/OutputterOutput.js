@@ -25,14 +25,14 @@ foam.INTERFACE({
     },
     {
       name: 'out',
-      args: [ { name: 's', swiftType: 'String' } ],
+      args: [ { name: 's', type: 'String' } ],
     },
     {
       name: 'comma',
     },
     {
       name: 'output',
-      swiftReturns: 'String',
+      type: 'String',
     },
   ],
 })
