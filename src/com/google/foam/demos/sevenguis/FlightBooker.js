@@ -53,6 +53,7 @@ foam.CLASS({
     {
       class: 'Date',
       name: 'departDate',
+      permissionRequired: true,
       factory: function() { return new Date(Date.now()+3600000*24); },
       validateObj: function(departDate) {
         var today = new Date();
@@ -64,7 +65,9 @@ foam.CLASS({
       class: 'Date',
       name: 'returnDate',
       factory: function() { return new Date(Date.now()+2*3600000*24); },
-      visibility: function(isReturn) { return isReturn ? foam.u2.Visibility.RW : foam.u2.Visibility.HIDDEN; },
+      visibilityExpression: function(isReturn) {
+        console.log('***************** isReturn', isReturn);
+        return isReturn ? foam.u2.Visibility.RW : foam.u2.Visibility.HIDDEN; },
       validateObj: function(isReturn, returnDate, departDate) {
         if ( isReturn && foam.Date.compare(returnDate, departDate) < 0 ) return 'Must not be before depart date.';
       }
@@ -76,9 +79,11 @@ foam.CLASS({
       this.SUPER();
       this.nodeName = 'div';
       this.
-        add(foam.u2.DetailView.create({data: this})).
+        add(foam.u2.DetailView.create({data: this, properties: [this.IS_RETURN, this.DEPART_DATE, this.RETURN_DATE]})).
+        add(foam.u2.DetailView.create({data: this, properties: [this.IS_RETURN, this.DEPART_DATE, this.RETURN_DATE]})).
         addClass(this.myClass()).
         start('div').addClass(this.myClass('title')).add('Book Flight').end().
+        add(this.IS_RETURN).
         add(this.IS_RETURN).
         add(this.DEPART_DATE).
         start(this.RETURN_DATE)/*.show(this.isReturn$)*/.end().
