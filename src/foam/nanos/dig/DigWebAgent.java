@@ -320,7 +320,7 @@ public class DigWebAgent
           logger.debug(this.getClass().getSimpleName(), "objects selected: " + sink.getArray().size());
 
           if ( Format.JSON == format ) {
-            foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+            foam.lib.json.Outputter outputterJson = new foam.lib.json.PermissionedOutputter(x, OutputterMode.NETWORK);
             outputterJson.setOutputDefaultValues(true);
             outputterJson.setOutputClassNames(true);
             outputterJson.output(sink.getArray().toArray());

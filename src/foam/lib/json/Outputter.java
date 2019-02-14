@@ -251,9 +251,13 @@ public class Outputter
   }
 
   protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
+
+    if ( ! this.propertyPredicate(fo, prop) ) {
+      return false;
+    }
+
     if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
     if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
-    if ( ! outputDefaultValues_ && ! prop.isSet(fo) ) return false;
 
     Object value = prop.get(fo);
     if ( value == null || ( isArray(value) && Array.getLength(value) == 0 ) ) {
@@ -263,6 +267,10 @@ public class Outputter
     if ( includeComma ) writer_.append(",");
     outputProperty(fo, prop);
     return true;
+  }
+
+  protected  boolean propertyPredicate( FObject fo, PropertyInfo prop) {
+    return ( outputDefaultValues_ || prop.isSet(fo) );
   }
 
   protected void outputFObjectDelta(FObject oldFObject, FObject newFObject) {
