@@ -328,7 +328,10 @@ foam.CLASS({
           name: 'clear' + capitalized,
           visibility: 'public',
           type: 'void',
-          body: isSet + ' = false;'
+          body: `
+if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
+${isSet} = false;
+          `
         });
 
       if ( this.javaFactory ) {
@@ -1764,8 +1767,7 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
-    // No point parsing it, multi part id is always transient.
-    ['javaJSONParser', 'new foam.lib.parse.Fail()'],
+    ['javaJSONParser', 'new foam.lib.json.FObjectParser()'],
     {
       name: 'javaGetter',
       factory: function() {
