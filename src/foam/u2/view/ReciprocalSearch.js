@@ -104,10 +104,7 @@ foam.CLASS({
         }
 
         return of.getAxiomsByClass(foam.core.Property)
-            .filter((prop) => prop.searchView
-              && ! prop.hidden
-              && ! foam.dao.OneToManyRelationshipProperty.isInstance(prop)
-              && ! foam.dao.ManyToManyRelationshipProperty.isInstance(prop))
+            .filter((prop) => prop.searchView && ! prop.hidden)
             .map(foam.core.Property.NAME.f);
       }
     },
