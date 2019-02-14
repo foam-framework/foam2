@@ -54,7 +54,8 @@ foam.CLASS({
             .orderBy(foam.nanos.boot.NSpec.ID),
           objToChoice: function(nspec) {
             return [nspec.id, nspec.id];
-          }
+          },
+          placeholder: 'Please select a service'
         });
       },
       postSet: function() {
@@ -69,7 +70,7 @@ foam.CLASS({
 
           return;
         }
-        var of = this.lookup(service.cls_.getAxiomByName('delegate').of);
+        var of = foam.lookup(service.cls_.getAxiomByName('delegate').of);
 
         if ( ! of ) return;
 
@@ -98,6 +99,7 @@ foam.CLASS({
       label: 'Method',
       documentation: 'the methods list of the picked service key',
       view: function(_, X) {
+      console.log("dfdafdaf");
         return X.data.slot(function(serviceKey) {
           var service = this.__context__[serviceKey];
 
@@ -105,7 +107,7 @@ foam.CLASS({
 
           if ( ! service.cls_.getAxiomByName('delegate') ) return;
 
-          var of = this.lookup(service.cls_.getAxiomByName('delegate').of);
+          var of = foam.lookup(service.cls_.getAxiomByName('delegate').of);
 
           if ( ! of ) return;
 
@@ -124,7 +126,7 @@ foam.CLASS({
 
           if ( ! service.cls_.getAxiomByName('delegate') ) return;
 
-          var of = this.lookup(service.cls_.getAxiomByName('delegate').of);
+          var of = foam.lookup(service.cls_.getAxiomByName('delegate').of);
 
           if ( ! of ) return;
 
