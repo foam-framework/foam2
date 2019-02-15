@@ -76,7 +76,7 @@ public class MDAO
     obj.freeze();
 
     synchronized ( writeLock_ ) {
-      FObject oldValue = find(obj);
+      FObject oldValue = find_(x, obj);
       Object  state    = getState();
 
       if ( oldValue != null ) {
@@ -96,7 +96,7 @@ public class MDAO
     FObject found;
 
     synchronized ( writeLock_ ) {
-      found = find(obj);
+      found = find_(x, obj);
 
       if ( found != null ) {
         setState(index_.remove(getState(), found));
