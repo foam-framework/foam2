@@ -76,11 +76,11 @@ foam.CLASS({
 
         this.interfaceName = of.id.toString();
         var methods = of.getOwnAxiomsByClass(foam.core.Method);
-        var methodName = methods.map(function(m) { return m.name; }).sort();
+        var methodNames = methods.map(function(m) { return m.name; }).sort();
 
-        if ( methodName.length > 0 ) {
+        if ( methodNames.length > 0 ) {
             methods.find((item) => {
-              if ( item.name == methodName[0] ) {
+              if ( item.name == methodNames[0] ) {
                 this.currentMethod = item.name;
                 this.argumentInfo = item.args;
               }
