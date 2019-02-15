@@ -93,14 +93,48 @@ foam.CLASS({
         @private */
       name: 'delegate',
       javaFactory: `
+foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+
 foam.dao.DAO delegate = getInnerDAO() == null ?
-  new foam.dao.MapDAO(getX(), getOf()) :
+  new foam.dao.MDAO(getOf()) :
   getInnerDAO();
 
-if ( delegate instanceof foam.dao.MDAO ) setMdao((foam.dao.MDAO)delegate);
+if ( delegate instanceof foam.dao.MDAO ) {
+  setMdao((foam.dao.MDAO)delegate);
+}
+
+// if ( getCluster() ) {
+//   // NOTE/REVIEW: explicitly setting delegate to MDAO
+//   delegate = new foam.nanos.mrac.ClusterDAO.Builder(getX()).setServiceName(getServiceName()).setDelegate(getMdao()).build();
+// }
 
 if ( getJournaled() ) {
   delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
+}
+
+if ( getDeletedAware() ||
+     foam.nanos.auth.DeletedAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+  delegate = new foam.nanos.auth.DeletedAwareDAO.Builder(getX()).setDelegate(delegate).build();
+}
+
+if ( getCreatedAware() ||
+  foam.nanos.auth.CreatedAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+  delegate = new foam.nanos.auth.CreatedAwareDAO.Builder(getX()).setDelegate(delegate).build();
+}
+
+if ( getCreatedByAware() ||
+  foam.nanos.auth.CreatedByAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+  delegate = new foam.nanos.auth.CreatedByAwareDAO.Builder(getX()).setDelegate(delegate).build();
+}
+
+if ( getLastModifiedAware() ||
+  foam.nanos.auth.LastModifiedAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+  delegate = new foam.nanos.auth.LastModifiedAwareDAO.Builder(getX()).setDelegate(delegate).build();
+}
+
+if ( getLastModifiedByAware() ||
+  foam.nanos.auth.LastModifiedByAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+  delegate = new foam.nanos.auth.LastModifiedByAwareDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
 if ( getGuid() && getSeqNo() ) {
@@ -133,6 +167,10 @@ if ( getAuthenticate() ) {
 
 if ( getPm() ) {
   delegate = new foam.dao.PMDAO(getX(), delegate);
+}
+
+if ( getCluster() ) {
+  // TODO: wrap top delegate in ClusterPrimaryDAO - which directs all puts to Primary node.
 }
 
 return delegate;
@@ -216,13 +254,11 @@ return delegate;
       class: 'Boolean',
       name: 'logging',
       value: false,
-      generateJava: false
     },
     {
       /** Enable time tracking for concurrent DAO operations. */
       class: 'Boolean',
       name: 'timing',
-      generateJava: false,
       value: false
     },
     {
@@ -317,6 +353,7 @@ return delegate;
     },
     {
       name: 'retryBoxMaxAttempts',
+      class: 'Boolean',
       generateJava: false,
     },
     {
@@ -340,9 +377,15 @@ return delegate;
       }
     },
     {
+      /** Cluster this DAO */
+      name: 'cluster',
+      class: 'Boolean',
+      value: false
+    },
+    {
       /** Simpler alternative than providing serverBox. */
       name: 'serviceName',
-      generateJava: false
+      class: 'String'
     },
     {
       class: 'FObjectArray',
@@ -353,6 +396,31 @@ return delegate;
     {
       name: 'testData',
       generateJava: false
+    },
+    {
+      name: 'deletedAware',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'createdAware',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'createdByAware',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'lastModifiedAware',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'lastModifiedByAware',
+      class: 'Boolean',
+      value: false
     }
   ],
 
