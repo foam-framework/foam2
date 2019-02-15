@@ -93,6 +93,7 @@ var classes = [
   'foam.dao.RoutingJournal',
   'foam.dao.RoutingJournalTest',
   'foam.dao.RoutingJDAO',
+  'foam.dao.JournalType',
   'foam.dao.WriteOnlyJDAO',
   'foam.dao.WriteOnlyFileJournal',
   'foam.dao.BaseClientDAO',
@@ -328,7 +329,7 @@ var classes = [
   'foam.nanos.ruler.ScriptPredicate',
   'foam.comics.SearchMode',
 
-  //Support Files
+  // Support Files
   'foam.support.model.TicketMessage',
   'foam.support.model.SupportEmail',
   'foam.support.model.Ticket',
@@ -388,4 +389,4 @@ module.exports = {
     skeletons: skeletons,
     proxies: proxies,
     blacklist: blacklist
-}
+};
