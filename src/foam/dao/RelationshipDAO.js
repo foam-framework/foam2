@@ -74,9 +74,7 @@ foam.CLASS({
         return ((foam.dao.DAO) getX().get(getTargetDAOKey())).inX(getX());
       } catch ( NullPointerException e ) {
         foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
-        if ( logger != null ) {
-          logger.error("DEVELOPER ERROR - TargetDAOKey", getTargetDAOKey(), "not found.", e);
-        }
+        logger.error("TargetDAOKey", getTargetDAOKey(), "not found.", e);
         throw e;
       }
       `,
