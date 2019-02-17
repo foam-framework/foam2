@@ -61,7 +61,6 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.core',
   name: 'Promised',
@@ -73,6 +72,10 @@ foam.CLASS({
     {
       name: 'of',
       required: true
+    },
+    {
+      name: 'type',
+      expression: function(of) { return of; }
     },
     {
       class: 'StringArray',
@@ -129,7 +132,6 @@ foam.CLASS({
       var myAxioms = [
         foam.core.Proxy.create({
           name: stateName,
-          flags: ['js', 'swift'],
           of: this.of,
           delegates: methodNames,
           forwards: [],
@@ -137,11 +139,15 @@ foam.CLASS({
             return this[pendingState].create();
           },
           swiftFactory: `return ${pendingState}_create(["obj": self])`,
+
+          // This is needed because the Proxy doesn't necessarily fully implement the 'of'.
+          javaType: pendingState,
+          javaFactory: `return new ${pendingState}.Builder(getX()).setObj(this).build();`,
+
           transient: true
         }),
         foam.core.Property.create({
           name: delegateName,
-          flags: ['js', 'swift'],
           postSet: function() {
             this[stateName] = this[fulfilledState].create();
           },
@@ -156,31 +162,33 @@ foam.CLASS({
       var pendingMethods = [];
 
       for ( var i = 0 ; i < methods.length ; i++ ) {
-        pendingMethods.push(foam.core.PromisedMethod.create({
-          name: methods[i].name,
-          flags: ['js', 'swift'],
+        var m = foam.core.PromisedMethod.create({
           property: myName,
-          type:  methods[i].type,
           delegate: false
-        }));
+        });
+        m.copyFrom(methods[i]);
+        pendingMethods.push(m);
       }
 
       myAxioms = myAxioms.concat(
         foam.core.InnerClass.create({
           model: {
             name: pendingState,
-            flags: ['js', 'swift'],
-            implements: [this.of],
             axioms: [
               foam.pattern.Singleton.create()
             ],
             methods: pendingMethods,
             properties: [
               {
-                swiftType: cls.model_.swiftName,
-                name: 'obj',
+                class: 'FObjectProperty',
+                of: cls.id,
+                name: 'obj'
               },
-            ],
+              {
+                name: 'javaPostSet',
+                value: `getObj().maybeWaitFor${myName}();`
+              }
+            ]
           }
         }),
         foam.core.InnerClass.create({

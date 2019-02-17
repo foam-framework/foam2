@@ -51,7 +51,6 @@ new Thread() {
   methods: [
     {
       name: 'find_',
-      flags: null,
       javaCode: `
 if ( x.get("replayingJournal") == getJournal() ) {
   return getDelegate().find_(x, id);
@@ -62,7 +61,6 @@ if ( x.get("replayingJournal") == getJournal() ) {
     },
     {
       name: 'put_',
-      flags: null,
       javaCode: `
 if ( x.get("replayingJournal") == getJournal() ) {
   return getDelegate().put_(x, obj);
@@ -73,7 +71,6 @@ if ( x.get("replayingJournal") == getJournal() ) {
     },
     {
       name: 'remove_',
-      flags: null,
       javaCode: `
 if ( x.get("replayingJournal") == getJournal() ) {
   return getDelegate().remove_(x, obj);

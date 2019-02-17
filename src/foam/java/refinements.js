@@ -719,24 +719,27 @@ foam.CLASS({
   properties: [
     {
       name: 'javaCode',
-      getter: function() {
+      setter: function() {
+        // Do not allow setting of javaCode.
+      },
+      expression: function(name, javaType, property, args) {
         // TODO: This could be an expression if the copyFrom in createChildMethod
         // didn't finalize its value
-        if ( this.name == 'find' ) {
-          console.log(this.name, 'returns', this.javaType);
+        if ( name == 'find' ) {
+          console.log(name, 'returns', javaType);
         }
         var code = '';
 
-        if ( this.javaType && this.javaType !== 'void' ) {
+        if ( javaType && javaType !== 'void' ) {
           code += 'return ';
         }
 
-        code += 'get' + foam.String.capitalize(this.property) + '()';
-        code += '.' + this.name + '(';
+        code += 'get' + foam.String.capitalize(property) + '()';
+        code += '.' + name + '(';
 
-        for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
-          code += this.args[i].name;
-          if ( i != this.args.length - 1 ) code += ', ';
+        for ( var i = 0 ; args && i < args.length ; i++ ) {
+          code += args[i].name;
+          if ( i != args.length - 1 ) code += ', ';
         }
         code += ');';
 
@@ -1951,57 +1954,62 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.java',
+  name: 'PromisedMethodJavaRefinement',
+  refines: 'foam.core.PromisedMethod',
+  flags: [
+    'java'
+  ],
+  properties: [
+    {
+      name: 'javaCode',
+      expression: function(property, javaType, args, name) {
+        return `
+getObj().maybeWaitFor${property}();
+${javaType != 'void' ? 'return ' : ''}getObj().get${foam.String.capitalize(property)}().${name}(${args.map(a => a.name).join(', ')});
+        `;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
   name: 'PromisedJavaRefinement',
   refines: 'foam.core.Promised',
   flags: [
     'java'
   ],
+  properties: [
+    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
+    {
+      name: 'javaJSONParser',
+      expression: function(of) {
+        return `new foam.lib.json.FObjectParser(${of ? of + '.class' : ''})`;
+      }
+    },
+    {
+      name: 'javaPostSet',
+      expression: function(name) {
+        return `maybeWaitFor${name}();`;
+      }
+    }
+  ],
   methods: [
     function buildJavaClass(cls) {
-      var name = this.name;
-      var filter = foam.util.flagFilter(['java']);
-      var of = foam.lookup(this.of);
-      var methods = this.methods ?
-        this.methods.map(m => of.getAxiomByName(m)) :
-        of.getOwnAxiomsByClass(foam.core.Method);
-      methods = methods.filter(filter);
-
-      methods.forEach(function(m) {
-        var m2 = m.clone();
-        m2.javaCode = `
-try {
-  maybeWaitFor${name}();
-  ${m2.javaType != 'void' ? 'return ' : ''}get${foam.String.capitalize(name)}().${m2.name}(${m2.args.map(a => a.name).join(', ')});
-} catch (Exception e) {
-  throw new RuntimeException(e);
-}
-        `;
-        m2.buildJavaClass(cls);
-      });
-
+      this.SUPER(cls);
       cls.method({
+        name: `maybeWaitFor${this.name}`,
         type: 'void',
-        name: `maybeWaitFor${name}`,
         synchronized: true,
-        throws: ['InterruptedException'],
         body: `
-if ( ! isPropertySet("${name}") ) wait();
-else notifyAll();
-        `
-      });
-
-      foam.core.FObjectProperty.create({
-        of: of,
-        name: name,
-        javaPostSet: `
 try {
-  maybeWaitFor${name}();
-} catch (Exception e) {
+  if ( ! isPropertySet("${this.name}") ) wait();
+  else notifyAll();
+} catch(InterruptedException e) {
   throw new RuntimeException(e);
 }
         `
-      }).buildJavaClass(cls);
-      return cls;
+      });
     }
   ]
 });
