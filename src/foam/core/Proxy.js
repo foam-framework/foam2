@@ -214,6 +214,9 @@ foam.CLASS({
     },
     {
       name: 'code',
+      setter: function() {
+        // Disallow the setting of the code property.
+      },
       expression: function(name, property, type, delegate) {
         return delegate ?
             function delegate() {
