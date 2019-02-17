@@ -723,8 +723,6 @@ foam.CLASS({
         // Do not allow setting of javaCode.
       },
       expression: function(name, javaType, property, args) {
-        // TODO: This could be an expression if the copyFrom in createChildMethod
-        // didn't finalize its value
         if ( name == 'find' ) {
           console.log(name, 'returns', javaType);
         }
