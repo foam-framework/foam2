@@ -7,8 +7,10 @@
 foam.CLASS({
   package: 'foam.dao',
   name: 'RoutingJDAO',
-  extends: 'foam.dao.java.JDAO',
-
+  extends: 'foam.dao.PromisedDAO',
+  requires: [
+    'foam.dao.JDAO'
+  ],
   documentation:
     `JDAO that adds the service name to the context to use for routing to correct DAO.
     Doing this allows the underlying journal implementation to output the DAO name
@@ -19,20 +21,65 @@ foam.CLASS({
       class: 'String',
       name: 'service',
       documentation: 'Name of the service'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.dao.DAO',
+      name: 'delegate'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.dao.RoutingJournal',
+      name: 'journal',
+      javaPostSet: `
+new Thread() {
+  public void run() {
+    getJournal().waitForReplay();
+    setPromise(
+      new foam.dao.java.JDAO.Builder(getX())
+        .setOf(getOf())
+        .setDelegate(getDelegate())
+        .setJournal(getJournal())
+        .build()
+    );
+  }
+}.start();
+      `
     }
   ],
 
   methods: [
     {
-      name: 'put_',
+      name: 'find_',
+      flags: null,
       javaCode: `
-        return super.put_(x.put("service", getService()), obj);
+if ( x.get("replayingJournal") == getJournal() ) {
+  return getDelegate().find_(x, id);
+} else {
+  return super.find_(x, id);
+}
+      `
+    },
+    {
+      name: 'put_',
+      flags: null,
+      javaCode: `
+if ( x.get("replayingJournal") == getJournal() ) {
+  return getDelegate().put_(x, obj);
+} else {
+  return super.put_(x.put("service", getService()), obj);
+}
       `
     },
     {
       name: 'remove_',
+      flags: null,
       javaCode: `
-        return super.remove_(x.put("service", getService()), obj);
+if ( x.get("replayingJournal") == getJournal() ) {
+  return getDelegate().remove_(x, obj);
+} else {
+  return super.remove_(x.put("service", getService()), obj);
+}
       `
     }
   ]
