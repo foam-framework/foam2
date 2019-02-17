@@ -47,7 +47,7 @@ public class ClassInfoImpl
       java.lang.reflect.Method m;
 
       try {
-        c = Class.forName(getId()).getSuperclass();
+        c = getObjClass().getSuperclass();
         m = c.getMethod("getOwnClassInfo");
 
         parent_ = (ClassInfo)m.invoke(null);
