@@ -27,6 +27,19 @@
     'foam.dao.Sink'
   ],
 
+  constants: [
+    {
+      name: 'OLD_OBJ',
+      value: 'RulerDAO.OLD_OBJ',
+      type: 'String'
+    },
+    {
+      name: 'NEW_OBJ',
+      value: 'RulerDAO.NEW_OBJ',
+      type: 'String'
+    }
+  ],
+
   properties: [
     {
       class: 'String',
