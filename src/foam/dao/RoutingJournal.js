@@ -10,16 +10,17 @@ foam.CLASS({
   extends: 'foam.dao.FileJournal',
 
   documentation:
-    `Journal interface that also adds the DAO name to the journal entry so that one may use
-    a single journal file and still be able to put the entry into the correct DAO`,
+    `Journal interface that prepends the DAO name to the journal entry so that
+      one may use a single journal file and still be able to put the entry into
+      the correct DAO.`,
 
   properties: [
     {
       class: 'Boolean',
       name: 'replayed',
+      documentation: 'If replayed is true, this will unblock anything waiting.',
       javaPostSet: `
-// If replayed is true, this will unblock anything waiting.
-waitForReplay();
+        waitForReplay();
       `
     }
   ],
@@ -28,17 +29,22 @@ waitForReplay();
     {
       name: 'waitForReplay',
       synchronized: true,
+      documentation: `By default Booleans are set to false in FOAM. This method
+        will ask all calling threads to wait until the journal is read, and
+        notify them once it is.`,
       javaCode: `
-try {
-  if ( ! getReplayed() ) wait();
-  else notifyAll();
-} catch (InterruptedException e) {
-  throw new RuntimeException(e);
-}
+        try {
+          if ( ! getReplayed() ) wait();
+          else notifyAll();
+        } catch (InterruptedException e) {
+          throw new RuntimeException(e);
+        }
       `
     },
     {
       name: 'put_',
+      documentation: `Prepend the service name (set in RoutingJDAO in context)
+        prior to putting in the journal.`,
       javaCode: `
         try {
           String service = (String) x.get("service");
@@ -56,13 +62,15 @@ try {
               .toString());
           }
         } catch ( Throwable t ) {
-          getLogger().error("Failed to write put entry to journal", t);
+          getLogger().error("RoutingJournal :: Failed to write put entry to the journal.", t);
           throw new RuntimeException(t);
         }
       `
     },
     {
       name: 'remove',
+      documentation: `Prepend the service name (set in RoutingJDAO in context)
+        prior to adding a remove in the journal.`,
       javaCode: `
         try {
           String service = (String) x.get("service");
@@ -80,14 +88,18 @@ try {
               .toString());
           }
         } catch ( Throwable t ) {
-          getLogger().error("Failed to write remove entry to journal", t);
+          getLogger().error("RoutingJournal :: Failed to write remove entry to the journal.", t);
           throw new RuntimeException(t);
         }
       `
     },
     {
       name: 'replay',
+      documentation: `Replaying the journal.`,
       javaCode: `
+        /* Adding the current object to the context so that the puts initiated
+          on replay will have it in their context. In RoutingJDAO, this is used
+          to distinguish between a regular put and a replaying put. */
         x = x.put("replayingJournal", this);
 
         // count number of lines successfully read

@@ -209,7 +209,8 @@ return delegate;
       /** Keep a history of all state changes to the DAO. */
       class: 'foam.core.Enum',
       of: 'foam.dao.JournalType',
-      name: 'journalType'
+      name: 'journalType',
+      value: 'JournalType.NO_JOURNAL'
     },
     {
       class: 'String',
@@ -402,13 +403,12 @@ return delegate;
 
       if ( ! daoModel ) {
         this.__context__.warn(
-          'EasyDAO: Unknown DAO Type.  Add \'' + daoType + '\' to requires: list.'
+          `EasyDAO: Unknown DAO Type.  Add ${daoType} to requires: list.`
         );
       }
 
       if ( this.name && daoModel.getAxiomByName('name') ) params.name = this.name;
       if ( daoModel.getAxiomByName('autoIndex') ) params.autoIndex = this.autoIndex;
-      // if ( this.seqNo || this.guid ) params.property = this.seqProperty;
 
       var dao = daoModel.create(params, this.__subContext__);
 
@@ -426,7 +426,8 @@ return delegate;
               this.mdao :
               this.DeDupDAO.create({ delegate: this.mdao }),
             src: dao,
-            of: this.model });
+            of: this.model
+          });
         }
       }
 
@@ -437,7 +438,7 @@ return delegate;
         });
       }
 
-      if ( this.seqNo && this.guid ) throw 'EasyDAO \'seqNo\' and \'guid\' features are mutually exclusive.';
+      if ( this.seqNo && this.guid ) throw `EasyDAO 'seqNo' and 'guid' features are mutually exclusive.`;
 
       if ( this.seqNo ) {
         var args = { __proto__: params, delegate: dao, of: this.of };
@@ -484,14 +485,6 @@ return delegate;
         });
       }
 
-//       if ( this.isServer ) {
-//         dao = this.VersionNoDAO.create({
-//           delegate: dao,
-//           property: this.syncProperty,
-//           version: 2
-//         });
-//       }
-
       if ( this.contextualize ) {
         dao = this.ContextualizingDAO.create({ delegate: dao });
       }
@@ -533,8 +526,8 @@ return delegate;
               self.log('Loading test data');
               Promise.all(foam.json.parse(self.testData, self.of, self).map(
                 function(o) {
- return delegate.put(o);
-}
+                  return delegate.put(o);
+                }
               )).then(function() {
                 self.log('Loaded', self.testData.length, 'records.');
                 resolve(delegate);
