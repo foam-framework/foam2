@@ -156,6 +156,9 @@ public class DigWebAgent
           XMLSupport      xmlSupport = new XMLSupport();
           XMLInputFactory factory    = XMLInputFactory.newInstance();
 
+          resp.setContentType("Content-Type: application/xml;");
+          foam.lib.xml.Outputter outputterXml = new foam.lib.xml.Outputter(OutputterMode.NETWORK);
+
           if ( SafetyUtil.isEmpty(data) ) {
             DigErrorMessage error = new EmptyDataException.Builder(x)
               .build();
@@ -182,9 +185,10 @@ public class DigWebAgent
           while ( i.hasNext() ) {
             obj = (FObject)i.next();
             obj = dao.put(obj);
+            outputterXml.output(obj);
           }
 
-          //returnMessage = "<objects>" + success + "</objects>";
+          out.println(outputterXml);
         } else if ( Format.CSV == format ) {
           if ( SafetyUtil.isEmpty(data) && SafetyUtil.isEmpty(fileAddress) ) {
             DigErrorMessage error = new EmptyDataException.Builder(x)
@@ -195,6 +199,7 @@ public class DigWebAgent
 
           CSVSupport csvSupport = new CSVSupport();
           csvSupport.setX(x);
+          foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);
 
           ArraySink arraySink = new ArraySink();
 
@@ -229,9 +234,15 @@ public class DigWebAgent
             return;
           }
 
+          if ( list.size() > 0 )
+            outputterCsv.output(list.toArray());
+
           for ( int i = 0 ; i < list.size() ; i++ ) {
             dao.put((FObject) list.get(i));
+            outputterCsv.put((FObject) list.get(i), null);
           }
+
+          out.println(outputterCsv);
         } else if ( Format.HTML == format ) {
           DigErrorMessage error = new UnsupportException.Builder(x)
                                         .setMessage("Unsupported Format: " + format)
@@ -301,7 +312,6 @@ public class DigWebAgent
             return;
           }
         }
-        out.println(returnMessage);
       } else if ( Command.select == command ) {
         PropertyInfo idProp = (PropertyInfo) cInfo.getAxiomByName("id");
         ArraySink sink = (ArraySink) ( ! SafetyUtil.isEmpty(id) ?
@@ -335,12 +345,12 @@ public class DigWebAgent
             foam.lib.xml.Outputter outputterXml = new foam.lib.xml.Outputter(OutputterMode.NETWORK);
             outputterXml.output(sink.getArray().toArray());
 
-            resp.setContentType("application/xml");
+            resp.setContentType("Content-Type: application/xml;");
+
             if ( emailSet ) {
               output(x, "<textarea style=\"width:700;height:400;\" rows=10 cols=120>" + outputterXml.toString() + "</textarea>");
             } else {
-              String simpleName = cInfo.getObjClass().getSimpleName().toString();
-              out.println("<" + simpleName + "s>"+ outputterXml.toString() + "</" + simpleName + "s>");
+              out.println(outputterXml.toString());
             }
           } else if ( Format.CSV == format ) {
             foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);

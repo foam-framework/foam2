@@ -93,8 +93,11 @@ public class Outputter
     } else if ( isArray(value) ) {
       if ( value.getClass().equals(byte[][].class) )
         outputByteArray((byte[][]) value);
-      else
+      else {
+        writer_.append("<objects>");
         outputArray((Object[]) value);
+        writer_.append("</objects>");
+      }
     }
   }
 
@@ -109,9 +112,9 @@ public class Outputter
   }
 
   protected void outputFObject(FObject obj) {
-    writer_.append("<").append(obj.getClass().getSimpleName()).append(">");
+    writer_.append("<object>");
     outputProperties_(obj);
-    writer_.append("</").append(obj.getClass().getSimpleName()).append(">");
+    writer_.append("</object>");
   }
 
   protected void outputNumber(Number value) {

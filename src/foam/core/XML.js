@@ -277,7 +277,7 @@ foam.CLASS({
             this.end('</' +  this.propertyName(p) + '>');
           }
         }
-      })
+      }, function(v, p) { this.outputPrimitive(v, p); })
     },
 
     function outputPrimitive(v, p){
@@ -356,10 +356,14 @@ foam.CLASS({
           }
         },
         Array: function(o, opt_cls) {
+
           this.start('<objects>\n');
           var cls = this.getCls(opt_cls);
+
           for ( var i = 0 ; i < o.length ; i++ ) {
+            this.start('<object>\n');
             this.output(o[i], cls);
+            this.start('\n</object>');
             if ( i < o.length-1 ) this.out('\n').nl().indent();
           }
           this.end('\n</objects>');
