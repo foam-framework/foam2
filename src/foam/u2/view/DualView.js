@@ -36,9 +36,9 @@ foam.CLASS({
   methods: [
     function initE() {
       var a = foam.u2.ViewSpec.createView(this.viewa, {
-        data$: this.data$ }, this, this);
+        data$: this.data$ }, this, this.__subSubContext__);
       var b = foam.u2.ViewSpec.createView(this.viewb, {
-        data$: this.data$ }, this, this);
+        data$: this.data$ }, this, this.__subSubContext__);
 
       if ( this.prop ) {
         a.fromProperty && a.fromProperty(this.prop);
