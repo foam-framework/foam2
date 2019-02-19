@@ -57,7 +57,10 @@ foam.CLASS({
     },
     'foam.dao.LoggingDAO',
     'foam.dao.MDAO',
-    'foam.dao.PromisedDAO',
+    {
+      path: 'foam.dao.PromisedDAO',
+      flags: ['js']
+    },
     'foam.dao.RequestResponseClientDAO',
     'foam.dao.SequenceNumberDAO',
     'foam.dao.SyncDAO',
