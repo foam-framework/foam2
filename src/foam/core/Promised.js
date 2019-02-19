@@ -183,10 +183,6 @@ foam.CLASS({
                 class: 'FObjectProperty',
                 of: cls.id,
                 name: 'obj'
-              },
-              {
-                name: 'javaPostSet',
-                value: `getObj().maybeWaitFor${myName}();`
               }
             ]
           }
