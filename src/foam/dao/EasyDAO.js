@@ -19,7 +19,11 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'EasyDAO',
   extends: 'foam.dao.ProxyDAO',
-  implements: [ 'foam.mlang.Expressions' ],
+
+  implements: [
+    'foam.mlang.Expressions',
+    'foam.nanos.boot.NSpecAware'
+  ],
 
   documentation: function() {/*
     Facade for easily creating decorated DAOs.
@@ -86,7 +90,13 @@ foam.CLASS({
       /** The developer-friendly name for this EasyDAO. */
       class: 'String',
       name: 'name',
-      factory: function() { return this.of.id; }
+      factory: function() { return this.of.id; },
+      javaFactory: `return getOf().getId();`
+    },
+    {
+      name: 'nSpec',
+      class: 'FObjectProperty',
+      type: 'foam.nanos.boot.NSpec'
     },
     {
       /** This is set automatically when you create an EasyDAO.
@@ -94,6 +104,7 @@ foam.CLASS({
       name: 'delegate',
       javaFactory: `
 foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+logger.info(this.getClass().getSimpleName(), "delegate", "NSpec.name", getNSpec().getName(), Thread.currentThread().getName());
 
 foam.dao.DAO delegate = getInnerDAO() == null ?
   new foam.dao.MDAO(getOf()) :
@@ -103,10 +114,10 @@ if ( delegate instanceof foam.dao.MDAO ) {
   setMdao((foam.dao.MDAO)delegate);
 }
 
-// if ( getCluster() ) {
-//   // NOTE/REVIEW: explicitly setting delegate to MDAO
-//   delegate = new foam.nanos.mrac.ClusterDAO.Builder(getX()).setServiceName(getServiceName()).setDelegate(getMdao()).build();
-// }
+// TODO: cluster needs to delegate to MDAO.   InnerDAO is an issue.
+if ( getCluster() ) {
+  delegate = new foam.nanos.mrac.ClusterDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(getMdao()).build();
+}
 
 if ( getJournaled() ) {
   delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
@@ -385,7 +396,8 @@ return delegate;
     {
       /** Simpler alternative than providing serverBox. */
       name: 'serviceName',
-      class: 'String'
+      class: 'String',
+      generateJava: false
     },
     {
       class: 'FObjectArray',
@@ -393,6 +405,11 @@ return delegate;
       generateJava: false,
       name: 'decorators'
     },
+    // {
+    //   name: 'orderBy',
+    //   class: 'FObjectProperty',
+    //   type: 'Any'
+    // },
     {
       name: 'testData',
       generateJava: false
@@ -514,6 +531,10 @@ return delegate;
         var args = {__proto__: params, delegate: dao, of: this.of};
         if ( this.seqProperty ) args.property = this.seqProperty;
         dao = this.GUIDDAO.create(args);
+      }
+
+      if ( this.orderBy ) {
+        //dao = dao.orderBy(this.orderBy);
       }
 
       var cls = this.of;

@@ -69,7 +69,7 @@ foam.CLASS({
     {
       name: 'port',
       class: 'Int',
-      value: 9001
+      value: 8080 // 9001
     },
     {
       documentation: 'Creation date.',

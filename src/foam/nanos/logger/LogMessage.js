@@ -18,7 +18,7 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
   ],
 
   searchColumns: [
-    'exception', 'message', 'severity'
+    'exception', 'message', 'severity', 'thread'
    ],
 
   properties: [
@@ -77,6 +77,12 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
     //   name: 'flags',
     //   class: 'Map'
     // },
+    {
+      name: 'thread',
+      class: 'String',
+      visibility: 'RO',
+      javaFactory: `return Thread.currentThread().getName();`
+    },
     {
       name: 'exception',
       class: 'Object',

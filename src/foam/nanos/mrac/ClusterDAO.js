@@ -16,19 +16,166 @@
  */
 
 foam.CLASS({
-  package: 'foam.dao',
+  package: 'foam.nanos.mrac',
   name: 'ClusterDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: ``,
+  documentation: `This DAO:
+  1. registers a 'server', via NSpec, to handle cluster Client requests which write directly to the delegate (MDAO).
+  2. creates Client DAOs.
+  3. on put() write through to delegate (MDAO), then send to Clients.
+  4. recreate clients on configuration changes.
+  `,
 
-  // create server and ANDDAO of clients
-  // server writes to delegate
-  // regular DAO operations execute then write to clients.
+  javaImports: [
+    'foam.dao.DAO',
+    'foam.dao.ArraySink',
+    'static foam.mlang.MLang.*',
+    'foam.nanos.boot.NSpec',
+    'foam.nanos.logger.Logger',
+    'java.util.List',
+    'java.util.ArrayList',
+  ],
+
+  implements: [
+    'foam.nanos.boot.NSpecAware'
+  ],
 
   properties: [
-    'serviceName'
-  ]
+    {
+      documentation: `Name by which the ClusterServer will be located by the NanoRouter.`,
+      name: 'serviceName',
+      class: 'String',
+      factory: function() { return getNSpec().getName()+'-cluster'; },
+      javaFactory: `return getNSpec().getName()+"-cluster";`
+    },
+    {
+      documentation: `nSpec of the DAO to be clustered.`,
+      name: 'nSpec',
+      class: 'FObjectProperty',
+      type: 'foam.nanos.boot.NSpec',
+      visibility: 'HIDDEN'
+    },
+    {
+      documentation: `Cluster configuration for 'this' (localhost) node.`,
+      name: 'config',
+      class: 'FObjectProperty',
+      type: 'foam.nanos.mrac.ClusterConfig',
+      visibility: 'RO'
+    },
+    {
+      documentation: `Array of all clients to put/remove to after a non-server operation.`,
+      name: 'clients',
+      class: 'FObjectArray',
+      of: 'foam.nanos.mrac.ClusterClientDAO',
+      visibility: 'HIDDEN'
+    },
+    {
+      documentation: `Reference to the ClusterConfigDAO to which we are subscribed/listening for updates to reconfigure.`,
+      name: 'clusterConfigDAO',
+      class: 'foam.dao.DAOProperty',
+      visibility: 'HIDDEN'
+    }
+  ],
 
+  methods: [
+    {
+      documentation: `Upon initialization create the ClusterServer configuration and register nSpec.`,
+      name: 'init_',
+      javaCode: `
+        Logger logger = (Logger) getX().get("logger");
+        logger.debug(this.getClass().getSimpleName(), "init_", getServiceName(), Thread.currentThread().getName(), new Exception());
+        DAO dao = (DAO) getX().get("nSpecDAO");
 
+        NSpec nspec = (NSpec) getNSpec().fclone();
+        nspec.setX(getX());
+        nspec.setId(getServiceName());
+        nspec.setName(getServiceName());
+        nspec.setAuthenticate(false);
+        nspec.setPm(true);
+        nspec.setServe(true);
+        nspec.setServiceScript("return new foam.nanos.mrac.ClusterServerDAO.Builder(x).setServiceName(\\""+getNSpec().getName()+"\\").build();\\n");
+
+        nspec = (NSpec) dao.put(nspec);
+        logger.debug("create NSpec", nspec);
+
+        reconfigure(getX());
+
+        // register ClusterConfig Listener
+        DAO clusterConfigDAO = (DAO) getX().get("clusterConfigDAO");
+        clusterConfigDAO.listen(new ClusterConfigSink(getX(), this), TRUE);
+        // REVIEW: need to keep a reference to the dao?
+        setClusterConfigDAO(clusterConfigDAO);
+      `
+    },
+    {
+      documentation: `Rebuild the client list.`,
+      name: 'reconfigure',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+      Logger logger = (Logger) x.get("logger");
+      logger.debug(this.getClass().getSimpleName(), "reconfigure", getServiceName());
+      DAO dao = (DAO) x.get("clusterConfigDAO");
+      List arr = (ArrayList) ((ArraySink) dao
+       .where(
+         AND(
+           EQ(ClusterConfig.ENABLED, true),
+           EQ(ClusterConfig.STATUS, Status.ONLINE)
+         )
+       )
+       .select(new ArraySink())).getArray();
+      ClusterClientDAO[] newClients = new ClusterClientDAO[arr.size()];
+      for ( int i = 0; i < arr.size(); i++ ) {
+        ClusterConfig config = (ClusterConfig) arr.get(i);
+        if ( "localhost".equals(config.getId()) ) {
+          setConfig(config);
+          continue;
+        }
+        newClients[i] = new ClusterClientDAO.Builder(x).setServiceName(getServiceName()).setConfig(config).build();
+      }
+      setClients(newClients);
+      `
+    },
+    {
+      name: 'put_',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'foam.core.FObject'
+        }
+      ],
+      javaCode: `
+      foam.core.FObject o = getDelegate().put_(x, obj);
+      // for each client, put
+      return o;
+     `
+    },
+    {
+      name: 'remove_',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'foam.core.FObject'
+        }
+      ],
+      javaCode: `
+      foam.core.FObject o = getDelegate().remove_(x, obj);
+      // for each client, remove
+      return o;
+     `
+    }
+ ]
 });
