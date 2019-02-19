@@ -43,11 +43,6 @@ foam.CLASS({
       name: 'uses'
     },
     {
-      class: 'DateTime',
-      name: 'expiry',
-      javaFactory: 'return new Date(System.currentTimeMillis()+8l*60l*60l*1000l);'
-    },
-    {
       class: 'String',
       name: 'remoteHost'
     },

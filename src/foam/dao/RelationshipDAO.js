@@ -69,7 +69,15 @@ foam.CLASS({
 
         return delegate;
       },
-      javaFactory: 'return ((foam.dao.DAO) getX().get(getTargetDAOKey())).inX(getX());',
+      javaFactory:`
+      try {
+        return ((foam.dao.DAO) getX().get(getTargetDAOKey())).inX(getX());
+      } catch ( NullPointerException e ) {
+        foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+        logger.error("TargetDAOKey", getTargetDAOKey(), "not found.", e);
+        throw e;
+      }
+      `,
       swiftFactory: `return __context__[targetDAOKey] as! foam_dao_DAO`,
     }
   ],

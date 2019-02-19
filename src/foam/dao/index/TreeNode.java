@@ -65,9 +65,9 @@ public class TreeNode {
     }
     int m = start + (int) Math.floor((end-start+1)/2);
     TreeNode tree = this.putKeyValue(this, prop, prop.f(a[m]), a[m], tail);
-    tree.left = (TreeNode) this.bulkLoad(tail, prop, start, m-1, a);
+    tree.left  = (TreeNode) this.bulkLoad(tail, prop, start, m-1, a);
     tree.right = (TreeNode) this.bulkLoad(tail, prop, m+1, end, a);
-    tree.size = this.size(tree.left) + this.size(tree.right);
+    tree.size  = this.size(tree.left) + this.size(tree.right);
     return tree;
   }
 
@@ -106,10 +106,10 @@ public class TreeNode {
       TreeNode l = maybeClone(node.left);
 
       node.left = l.right;
-      l.right = node;
+      l.right   = node;
+      node      = updateSize(node, tail);
+      l         = updateSize(l, tail);
 
-      node = updateSize(node, tail);
-      l = updateSize(l, tail);
       return l;
     }
     return node;
@@ -124,9 +124,9 @@ public class TreeNode {
       node.right = r.left;
       r.left = node;
       r.level++;
+      node   = updateSize(node, tail);
+      r      = updateSize(r, tail);
 
-      node = updateSize(node, tail);
-      r = updateSize(r, tail);
       return r;
     }
     return node;
@@ -137,7 +137,7 @@ public class TreeNode {
     if ( state == null ) return state;
 
     state = maybeClone(state);
-    long compareValue = prop.comparePropertyToValue(key,state.key);
+    long compareValue = prop.comparePropertyToValue(key, state.key);
 
     if ( compareValue == 0 ) {
       state.size -= tail.size(state.value);
@@ -148,13 +148,13 @@ public class TreeNode {
         return state;
       }
 
-      if ( state.left == null && state.right == null ) {
-        return null;
-      }
-      boolean isLeft = ( state.left != null );
-      TreeNode subs = isLeft ? predecessor(state) : successor(state);
-      state.key = subs.key;
+      if ( state.left == null && state.right == null ) return null;
+
+      boolean  isLeft = ( state.left != null );
+      TreeNode subs   = isLeft ? predecessor(state) : successor(state);
+      state.key   = subs.key;
       state.value = subs.value;
+
       if ( isLeft ) {
         state.left = removeNode(state.left, subs.key, prop);
       } else {
@@ -193,9 +193,8 @@ public class TreeNode {
     state  = maybeClone(state);
     long compareValue = prop.comparePropertyToValue(state.key, key);
 
-    if ( compareValue == 0 ) {
-      return state.left != null ? state.left : state.right;
-    }
+    if ( compareValue == 0 ) return state.left != null ? state.left : state.right;
+
     if ( compareValue > 0 ) {
       state.size -= size(state.left);
       state.left = removeNode(state.left, key, prop);
