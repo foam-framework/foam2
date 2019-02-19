@@ -132,12 +132,13 @@
         }
       ],
       javaCode: `
-
+      X newX = x.put(NEW_OBJ, old).put(OLD_OBJ, oldObj);
       for ( Object key : sink.getGroupKeys() ) {
         List<Rule> groups = ((ArraySink) sink.getGroups().get(key)).getArray();
         for ( Rule rule : groups ) {
-          if ( rule.getPredicate().f(obj) ) {
-            rule.getAction().applyAction(x, obj, oldObj);
+          Predicate predicate = rule.getPredicate();
+          if ( predicate.f(predicate instanceof RulePredicate ? newX : obj) ) {
+            rule.getAction().applyAction(newX, obj, oldObj);
             if ( rule.getStops() ) {
               break;
             }
