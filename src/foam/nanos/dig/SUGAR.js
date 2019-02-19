@@ -54,7 +54,8 @@ foam.CLASS({
             .orderBy(foam.nanos.boot.NSpec.ID),
           objToChoice: function(nspec) {
             return [nspec.id, nspec.id];
-          }
+          },
+          placeholder: 'Please select a service'
         });
       },
       postSet: function() {
@@ -69,28 +70,17 @@ foam.CLASS({
 
           return;
         }
-        var of = this.lookup(service.cls_.getAxiomByName('delegate').of);
+        var of = foam.lookup(service.cls_.getAxiomByName('delegate').of);
 
         if ( ! of ) return;
 
         this.interfaceName = of.id.toString();
         var methods = of.getOwnAxiomsByClass(foam.core.Method);
-        // var methodName = methods.map(function(m) { return m.name; }).sort();
+        var methodNames = methods.map(function(m) { return m.name; }).sort();
 
-        var filteredMethod =
-          methods.filter(function(fm) {
-            for ( var j = 0 ; j < fm.args.length ; j++ ) {
-               if ( fm.args[j].javaType.toString() == 'foam.core.X' ) {
-                  return false;
-               }
-               return true;
-             }
-             // return true;
-          }).map(function(m) { return m.name; }).sort();
-
-        if ( filteredMethod.length > 0 ) {
+        if ( methodNames.length > 0 ) {
             methods.find((item) => {
-              if ( item.name == filteredMethod[0] ) {
+              if ( item.name == methodNames[0] ) {
                 this.currentMethod = item.name;
                 this.argumentInfo = item.args;
               }
@@ -99,6 +89,8 @@ foam.CLASS({
           this.argumentInfo = null;
           this.currentMethod = '';
         }
+
+        this.postData = "";
       }
     },
     {
@@ -107,6 +99,7 @@ foam.CLASS({
       label: 'Method',
       documentation: 'the methods list of the picked service key',
       view: function(_, X) {
+      console.log("dfdafdaf");
         return X.data.slot(function(serviceKey) {
           var service = this.__context__[serviceKey];
 
@@ -114,24 +107,14 @@ foam.CLASS({
 
           if ( ! service.cls_.getAxiomByName('delegate') ) return;
 
-          var of = this.lookup(service.cls_.getAxiomByName('delegate').of);
+          var of = foam.lookup(service.cls_.getAxiomByName('delegate').of);
 
           if ( ! of ) return;
 
           var methods = of.getOwnAxiomsByClass(foam.core.Method);
-          // var methodNames = methods.map(function(m) { return m.name; }).sort();
+          var methodNames = methods.map(function(m) { return m.name; }).sort();
 
-          var filteredMethod =
-            methods.filter(function(fm) {
-              for ( var j = 0; j < fm.args.length; j++ ) {
-                 if ( fm.args[j].javaType == 'foam.core.X' ) {
-                    return false;
-                 }
-                 return true;
-              }
-            }).map(function(m) { return m.name; }).sort();
-
-          return foam.u2.view.ChoiceView.create({ choices: filteredMethod, data$: this.method$ });
+          return foam.u2.view.ChoiceView.create({ choices: methodNames, data$: this.method$ });
         });
       },
       postSet: function(old, nu) {
@@ -143,7 +126,7 @@ foam.CLASS({
 
           if ( ! service.cls_.getAxiomByName('delegate') ) return;
 
-          var of = this.lookup(service.cls_.getAxiomByName('delegate').of);
+          var of = foam.lookup(service.cls_.getAxiomByName('delegate').of);
 
           if ( ! of ) return;
 
@@ -159,6 +142,8 @@ foam.CLASS({
             }
           });
        }
+
+       this.postData = "";
       }
     },
     {
@@ -233,7 +218,9 @@ foam.CLASS({
         var query = false;
         var url = '/service/sugar';
 
-        if ( serviceKey ) {
+        this.postData = null;
+
+       if ( serviceKey ) {
           url += query ? '&' : '?';
           query = true;
           url += 'service=' + serviceKey;
@@ -275,6 +262,7 @@ foam.CLASS({
         if ( (url.length + this.postData.length) >= this.MAX_URL_SIZE ) {
           this.postURL = url;
         }
+
         return encodeURI(url + this.postData);
       }
     },
@@ -294,7 +282,7 @@ foam.CLASS({
       code: async function() {
         if ( ! (this.postURL === '') ) {
           var req = this.HTTPRequest.create({
-            url: window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + this.postURL,
+            url: window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + this.postURL + this.postData,
             method: 'POST',
             contentType: 'url',
             payload: this.postData.substring(1),
