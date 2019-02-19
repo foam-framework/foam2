@@ -17,6 +17,7 @@
 
   javaImports: [
     'foam.core.FObject',
+    'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.mlang.order.Desc',
@@ -132,7 +133,7 @@
         }
       ],
       javaCode: `
-      X newX = x.put(NEW_OBJ, old).put(OLD_OBJ, oldObj);
+      X newX = x.put(NEW_OBJ, obj).put(OLD_OBJ, oldObj);
       for ( Object key : sink.getGroupKeys() ) {
         List<Rule> groups = ((ArraySink) sink.getGroups().get(key)).getArray();
         for ( Rule rule : groups ) {
