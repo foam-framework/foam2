@@ -129,23 +129,19 @@ foam.CLASS({
       var myAxioms = [
         foam.core.Proxy.create({
           name: stateName,
-          flags: ['js', 'swift'],
           of: this.of,
           delegates: methodNames,
           forwards: [],
           factory: function() {
             return this[pendingState].create();
           },
-          swiftFactory: `return ${pendingState}_create(["obj": self])`,
           transient: true
         }),
         foam.core.Property.create({
           name: delegateName,
-          flags: ['js', 'swift'],
           postSet: function() {
             this[stateName] = this[fulfilledState].create();
-          },
-          swiftGetter: `return try! ${myName}.get() as! ${foam.lookup(this.of).model_.swiftName}`,
+          }
         }),
         foam.core.ProxySub.create({
           topics: this.topics,
@@ -158,7 +154,6 @@ foam.CLASS({
       for ( var i = 0 ; i < methods.length ; i++ ) {
         pendingMethods.push(foam.core.PromisedMethod.create({
           name: methods[i].name,
-          flags: ['js', 'swift'],
           property: myName,
           type:  methods[i].type,
           delegate: false
@@ -169,24 +164,17 @@ foam.CLASS({
         foam.core.InnerClass.create({
           model: {
             name: pendingState,
-            flags: ['js', 'swift'],
             implements: [this.of],
             axioms: [
               foam.pattern.Singleton.create()
             ],
             methods: pendingMethods,
-            properties: [
-              {
-                swiftType: cls.model_.swiftName,
-                name: 'obj',
-              },
-            ],
+            properties: ['obj']
           }
         }),
         foam.core.InnerClass.create({
           model: {
             name: fulfilledState,
-            flags: ['js'],
             properties: [
               {
                 class:    'Proxy',
