@@ -33,7 +33,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.dao.RoutingJournal',
       name: 'journal',
-      documentation: 'Shared journal where new entries are being put into.'
+      documentation: 'Shared journal where new entries are being put into.',
       javaPostSet: `
         new Thread() {
           public void run() {
