@@ -139,8 +139,8 @@
         for ( Rule rule : groups ) {
           Predicate predicate = rule.getPredicate();
           if ( predicate.f(predicate instanceof RulePredicate ? newX : obj) ) {
-            rule.getAction().applyAction(newX, obj, oldObj);
-            if ( rule.getStops() ) {
+            ActionResult result = rule.getAction().applyAction(newX, obj, oldObj);
+            if ( ActionResult.STOP == result ) {
               break;
             }
           }

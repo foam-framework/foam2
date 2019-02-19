@@ -40,11 +40,6 @@ foam.CLASS({
       'The convention for values is ints that are multiple of 10.'
     },
     {
-      class: 'Boolean',
-      name: 'stops',
-      documentation: 'When set to true, the rule prevents execution of the following rules within the same group.'
-    },
-    {
       class: 'String',
       name: 'ruleGroup',
       documentation: 'ruleGroup defines sets of rules related to the same action.'

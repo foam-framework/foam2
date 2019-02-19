@@ -45,7 +45,6 @@ public class RulerDAOTest extends Test {
     rule1.setDaoKey("localUserDAO");
     rule1.setOperation(Operations.CREATE);
     rule1.setAfter(false);
-    rule1.setStops(true);
     rule1.setPriority(60);
     rule1.setAction((x1, obj, oldObj) -> ActionResult.STOP);
     rule1 = (Rule) ruleDAO.put_(x, rule1);
