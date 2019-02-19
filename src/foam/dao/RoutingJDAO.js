@@ -59,7 +59,6 @@ foam.CLASS({
         the decorators. Otherwise, find on the decorator.`,
       flags: null,
       javaCode: `
-        /*  */
         if ( x.get("replayingJournal") == getJournal() ) {
           return getDelegate().find_(x, id);
         } else {
