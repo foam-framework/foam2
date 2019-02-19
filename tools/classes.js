@@ -324,6 +324,7 @@ var classes = [
   'foam.nanos.ruler.Rule',
   'foam.nanos.ruler.RulerDAO',
   'foam.nanos.ruler.Operations',
+  'foam.nanos.ruler.ActionResult',
   'foam.nanos.ruler.RuleAction',
   'foam.nanos.ruler.ScriptPredicate',
   'foam.nanos.ruler.RulePredicate',

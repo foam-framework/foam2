@@ -12,6 +12,7 @@
   methods: [
     {
       name: 'applyAction',
+      type: 'foam.nanos.ruler.ActionResult',
       args: [
         { name: 'x', type: 'Context' },
         { name: 'obj', type: 'foam.core.FObject' },

@@ -47,6 +47,7 @@ public class RulerDAOTest extends Test {
     rule1.setAfter(false);
     rule1.setStops(true);
     rule1.setPriority(60);
+    rule1.setAction((x1, obj, oldObj) -> ActionResult.STOP);
     rule1 = (Rule) ruleDAO.put_(x, rule1);
 
     //the rule has a higher priority than the first rule, changes user's email from nanos@nanos.net to foam@nanos.net
@@ -65,6 +66,7 @@ public class RulerDAOTest extends Test {
     RuleAction action2 = (x1, obj, oldObj) -> {
       User user = (User) obj;
       user.setEmail("foam@nanos.net");
+      return ActionResult.CONTINUE;
     };
     rule2.setAction(action2);
     rule2 = (Rule) ruleDAO.put_(x, rule2);
@@ -96,6 +98,7 @@ public class RulerDAOTest extends Test {
     RuleAction action4 = (x1, obj, oldObj) -> {
       User user = (User) obj;
       user.setLastName("Smirnova");
+      return ActionResult.CONTINUE;
     };
     rule4.setAction(action4);
     rule4 = (Rule) ruleDAO.put_(x, rule4);
@@ -112,6 +115,7 @@ public class RulerDAOTest extends Test {
     RuleAction action5 = (x1, obj, oldObj) -> {
       User user = (User) obj;
       user.setLastName("Unknown");
+      return ActionResult.CONTINUE;
     };
     rule5.setAction(action5);
     rule5 = (Rule) ruleDAO.put_(x, rule5);

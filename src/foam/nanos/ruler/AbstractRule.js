@@ -100,7 +100,7 @@ foam.CLASS({
         { name: 'obj', type: 'foam.core.FObject' },
         { name: 'oldObj', type: 'foam.core.FObject' }
       ],
-      javaCode: ` `
+      javaCode: `return ActionResult.CONTINUE;`
     },
     {
       name: 'prepareStatement',

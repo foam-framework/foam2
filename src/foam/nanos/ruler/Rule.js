@@ -34,7 +34,9 @@
       javaFactory: `
       return new RuleAction() {
         @Override
-        public void applyAction(X x, FObject obj, FObject oldObj) {}
+        public ActionResult applyAction(X x, FObject obj, FObject oldObj) {
+          return ActionResult.CONTINUE;
+        }
       };`,
       documentation: 'The action to be executed if predicates returns true for passed object.'
     }
