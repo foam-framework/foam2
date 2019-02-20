@@ -13,7 +13,30 @@ foam.CLASS({
     `Journal interface that also adds the DAO name to the journal entry so that one may use
     a single journal file and still be able to put the entry into the correct DAO`,
 
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'replayed',
+      javaPostSet: `
+// If replayed is true, this will unblock anything waiting.
+waitForReplay();
+      `
+    }
+  ],
+
   methods: [
+    {
+      name: 'waitForReplay',
+      synchronized: true,
+      javaCode: `
+try {
+  if ( ! getReplayed() ) wait();
+  else notifyAll();
+} catch (InterruptedException e) {
+  throw new RuntimeException(e);
+}
+      `
+    },
     {
       name: 'put_',
       javaCode: `
@@ -65,6 +88,8 @@ foam.CLASS({
     {
       name: 'replay',
       javaCode: `
+        x = x.put("replayingJournal", this);
+
         // count number of lines successfully read
         int successReading = 0;
         foam.lib.json.JSONParser parser = getParser();
@@ -96,12 +121,12 @@ foam.CLASS({
 
               switch (operation) {
                 case 'p':
-                  foam.core.FObject old = dao.find(obj.getProperty("id"));
-                  dao.put(old != null ? mergeFObject(old, obj) : obj);
+                  foam.core.FObject old = dao.inX(x).find(obj.getProperty("id"));
+                  dao.inX(x).put(old != null ? mergeFObject(old, obj) : obj);
                   break;
 
                 case 'r':
-                  dao.remove(obj);
+                  dao.inX(x).remove(obj);
                   break;
               }
 
@@ -114,6 +139,7 @@ foam.CLASS({
           getLogger().error("Failed to read from journal", t);
         } finally {
           getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename());
+          setReplayed(true);
         }
       `
     }
