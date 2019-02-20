@@ -21,3 +21,14 @@
     }
   ]
 });
+
+foam.INTERFACE({
+  package: 'foam.nanos.ruler',
+  name: 'AsyncRuleAction',
+
+  implements: [
+    'foam.nanos.ruler.RuleAction'
+  ],
+
+  documentation: 'Async rule action interface.'
+});

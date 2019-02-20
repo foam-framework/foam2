@@ -16,6 +16,7 @@
   `,
 
   javaImports: [
+    'foam.core.ContextAgent',
     'foam.core.FObject',
     'foam.core.X',
     'foam.dao.ArraySink',
@@ -136,16 +137,53 @@
       X newX = x.put(NEW_OBJ, obj).put(OLD_OBJ, oldObj);
       for ( Object key : sink.getGroupKeys() ) {
         List<Rule> groups = ((ArraySink) sink.getGroups().get(key)).getArray();
+        ExecutionStage stage = new ExecutionStage();
         for ( Rule rule : groups ) {
           Predicate predicate = rule.getPredicate();
           if ( predicate.f(predicate instanceof RulePredicate ? newX : obj) ) {
-            ActionResult result = rule.getAction().applyAction(newX, obj, oldObj);
+            ActionResult result = applyAction(newX, rule.getAction(), stage);
             if ( ActionResult.STOP == result ) {
               break;
             }
           }
         }
       }
+      `
+    },
+    {
+      name: 'applyAction',
+      type: 'foam.nanos.ruler.ActionResult',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'action',
+          type: 'foam.nanos.ruler.RuleAction'
+        },
+        {
+          name: 'stage',
+          type: 'foam.nanos.ruler.ExecutionStage'
+        }
+      ],
+      javaCode: `
+        FObject obj = (FObject) x.get(NEW_OBJ);
+        FObject oldObj = (FObject) x.get(OLD_OBJ);
+
+        if ( action instanceof AsyncRuleAction ) {
+          stage.submit(x, new ContextAgent() {
+            @Override
+            public void execute(X x) {
+              ActionResult result = action.applyAction(x, obj, oldObj);
+              if ( result == ActionResult.STOP ) {
+                stage.cancel();
+              }
+            }
+          });
+          return ActionResult.PENDING;
+        }
+        return action.applyAction(x, obj, oldObj);
       `
     },
     {
