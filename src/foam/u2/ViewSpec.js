@@ -30,6 +30,10 @@ foam.CLASS({
     {
       installInClass: function(cls) {
         cls.createView = function(spec, args, self, ctx, disableWarning) {
+          if ( foam.core.FObject.isInstance(ctx) ) {
+            ctx = ctx.__subContext__;
+          }
+
           if ( foam.u2.Element.isInstance(spec) ) {
             if ( foam.debug && ! disableWarning ) {
               console.warn('Warning: Use of literal View as ViewSpec: ', spec.cls_.id);
