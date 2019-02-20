@@ -10,7 +10,7 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   requires: [
-    'foam.dao.PromisedDAO',
+    'foam.dao.BlockingDAO',
     'foam.dao.DAOSink',
     'foam.dao.FnSink',
   ],
@@ -53,7 +53,7 @@ foam.CLASS({
       forwards: [ 'find_', 'select_' ],
       swiftExpressionArgs: ['src', 'cache'],
       swiftExpression: `
-let pDao = self.PromisedDAO_create(["of": self.of])
+let pDao = self.BlockingDAO_create(["of": self.of])
 DispatchQueue.global(qos: .background).async {
   try? cache.removeAll()
   let sink = self.DAOSink_create(["dao": cache])
@@ -69,7 +69,7 @@ DispatchQueue.global(qos: .background).async {
     } as (String, Any?, ${foam.core.Detachable.model_.swiftName}) -> Void,
   ]), nil)
 
-  pDao.promise.set(cache)
+  pDao.blocking = cache
 }
 return pDao
       `,
