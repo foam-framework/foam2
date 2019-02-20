@@ -78,11 +78,11 @@ foam.CLASS({
       name: 'aliases',
       flags: ['js'],
       value: {
-        ARRAY: 'foam.dao.ArrayDAO',
+        ARRAY:  'foam.dao.ArrayDAO',
         CLIENT: 'foam.dao.RequestResponseClientDAO',
-        IDB: 'foam.dao.IDBDAO',
-        LOCAL: 'foam.dao.LocalStorageDAO',
-        MDAO: 'foam.dao.MDAO'
+        IDB:    'foam.dao.IDBDAO',
+        LOCAL:  'foam.dao.LocalStorageDAO',
+        MDAO:   'foam.dao.MDAO'
       }
     }
   ],
