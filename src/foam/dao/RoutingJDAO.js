@@ -32,6 +32,7 @@ foam.CLASS({
       of: 'foam.dao.RoutingJournal',
       name: 'journal',
       javaPostSet: `
+getJournal().setDAOForName(getService(), getDelegate());
 new Thread() {
   public void run() {
     getJournal().waitForReplay();
@@ -50,36 +51,17 @@ new Thread() {
 
   methods: [
     {
-      name: 'find_',
-      flags: null,
-      javaCode: `
-if ( x.get("replayingJournal") == getJournal() ) {
-  return getDelegate().find_(x, id);
-} else {
-  return super.find_(x, id);
-}
-      `
-    },
-    {
       name: 'put_',
       flags: null,
       javaCode: `
-if ( x.get("replayingJournal") == getJournal() ) {
-  return getDelegate().put_(x, obj);
-} else {
-  return super.put_(x.put("service", getService()), obj);
-}
+return super.put_(x.put("service", getService()), obj);
       `
     },
     {
       name: 'remove_',
       flags: null,
       javaCode: `
-if ( x.get("replayingJournal") == getJournal() ) {
-  return getDelegate().remove_(x, obj);
-} else {
-  return super.remove_(x.put("service", getService()), obj);
-}
+return super.remove_(x.put("service", getService()), obj);
       `
     }
   ]

@@ -21,10 +21,22 @@ foam.CLASS({
 // If replayed is true, this will unblock anything waiting.
 waitForReplay();
       `
+    },
+    {
+      class: 'Map',
+      name: 'daos'
     }
   ],
 
   methods: [
+    {
+      name: 'setDAOForName',
+      args: [
+        { type: 'String', name: 'name' },
+        { type: 'foam.dao.DAO', name: 'dao' }
+      ],
+      javaCode: `getDaos().put(name, dao);`
+    },
     {
       name: 'waitForReplay',
       synchronized: true,
@@ -88,8 +100,6 @@ try {
     {
       name: 'replay',
       javaCode: `
-        x = x.put("replayingJournal", this);
-
         // count number of lines successfully read
         int successReading = 0;
         foam.lib.json.JSONParser parser = getParser();
@@ -112,7 +122,9 @@ try {
               int length = line.trim().length();
               line = line.trim().substring(2, length - 1);
 
-              dao = (foam.dao.DAO) x.get(service);
+              // Touch the service to potentially trigger factory.
+              x.get(service);
+              dao = (DAO)getDaos().get(service);
               foam.core.FObject obj = parser.parseString(line);
               if ( obj == null ) {
                 getLogger().error("Parse error", getParsingErrorMessage(line), "line:", line);
