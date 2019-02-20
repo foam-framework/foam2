@@ -8,9 +8,6 @@ foam.CLASS({
   package: 'foam.native',
   name: 'BlockingMethod',
   extends: 'foam.core.Method',
-  requires: [
-    'foam.core.Method'
-  ],
   properties: [
     {
       class: 'String',
@@ -26,6 +23,76 @@ ${this.javaType != 'void' ? 'return ' : ''}get${foam.String.capitalize(this.prop
   .${this.name}(${this.args.map(a => a.name).join(', ')});
         `;
       }
+    },
+    {
+      name: 'swiftCode',
+      getter: function() {
+        return `
+maybeWaitFor${this.property}()
+${this.swiftType != 'void' ? 'return ' : ''}${this.swiftThrows ? 'try ' : ''}self.${this.property}!
+  .${this.name}(${this.swiftArgs.map(a => a.localName).join(', ')});
+        `;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.native',
+  name: 'BlockingWaitMethod',
+  extends: 'foam.core.Method',
+  properties: [
+    ['synchronized', true],
+    {
+      class: 'String',
+      name: 'property'
+    },
+    {
+      name: 'name',
+      getter: function() {
+        return `maybeWaitFor${this.property}`;
+      }
+    },
+    {
+      name: 'javaCode',
+      flags: ['java'],
+      expression: function(property) {
+        return `
+try {
+  if ( ! isPropertySet("${property}") ) wait();
+  else notifyAll();
+} catch (Exception e) {
+  throw new RuntimeException(e);
+}
+        `;
+      }
+    },
+    {
+      name: 'swiftSynchronized',
+      flags: ['swift'],
+      value: false
+    },
+    {
+      name: 'swiftCode',
+      flags: ['swift'],
+      expression: function(property) {
+        return `
+if ( !hasOwnProperty("${property}") ) {
+  ${property}Sem.wait();
+} else {
+  while ${property}Sem.signal() > 0 {}
+}
+        `;
+      }
+    }
+  ],
+  methods: [
+    function writeToSwiftClass(cls, parentCls) {
+      this.SUPER(cls, parentCls);
+      cls.field({
+        name: `${this.property}Sem`,
+        defaultValue: 'DispatchSemaphore(value: 0)'
+      });
     }
   ]
 });
@@ -36,7 +103,7 @@ foam.CLASS({
   extends: 'FObjectProperty',
   requires: [
     'foam.native.BlockingMethod',
-    'foam.core.Method'
+    'foam.native.BlockingWaitMethod'
   ],
   properties: [
     {
@@ -47,7 +114,7 @@ foam.CLASS({
           m);
       },
       expression: function(of) {
-        return this.of.getOwnAxiomsByClass(this.Method);
+        return this.of.getOwnAxiomsByClass(foam.core.Method);
       }
     },
     {
@@ -55,27 +122,25 @@ foam.CLASS({
       expression: function(name) {
         return `maybeWaitFor${name}();`;
       }
+    },
+    {
+      name: 'swiftPostSet',
+      expression: function(name) {
+        return `maybeWaitFor${name}()`;
+      }
     }
   ],
   methods: [
     function installInClass(cls) {
       this.SUPER(cls);
       var axioms = this.methods.map(function(m) {
-        m = this.BlockingMethod.create(m);
-        m.property = this.name;
-        return m;
+        return this.BlockingMethod.create({
+          name: m.name,
+          property: this.name
+        });
       }.bind(this));
-      axioms.push(this.Method.create({
-        name: `maybeWaitFor${this.name}`,
-        synchronized: true,
-        javaCode: `
-try {
-  if ( ! isPropertySet("${this.name}") ) wait();
-  else notifyAll();
-} catch (Exception e) {
-  throw new RuntimeException(e);
-}
-        `
+      axioms.push(this.BlockingWaitMethod.create({
+        property: this.name
       }));
       cls.installAxioms(axioms);
     }

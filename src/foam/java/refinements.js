@@ -587,10 +587,6 @@ foam.CLASS({
       value: true
     },
     {
-      class: 'Boolean',
-      name: 'synchronized'
-    },
-    {
       class: 'StringArray',
       name: 'javaThrows'
     },
