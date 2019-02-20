@@ -92,9 +92,7 @@ foam.CLASS({
       /** The developer-friendly name for this EasyDAO. */
       class: 'String',
       name: 'name',
-      factory: function() {
- return this.of.id;
-}
+      factory: function() { return this.of.id; }
     },
     {
       /** This is set automatically when you create an EasyDAO.
@@ -110,7 +108,11 @@ if ( delegate instanceof foam.dao.MDAO ) setMdao((foam.dao.MDAO)delegate);
 if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
   delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
 } else if ( getJournalType().equals(JournalType.SHARED_JOURNAL) ) {
-  delegate = new RoutingJDAO.Builder(getX()).setDelegate(delegate).setService(getName()).setJournal((RoutingJournal) getX().get("routingJournal")).build();
+  delegate = new RoutingJDAO.Builder(getX())
+    .setDelegate(delegate)
+    .setService(getName())
+    .setJournal((RoutingJournal) getX().get("routingJournal"))
+    .build();
 }
 
 if ( getGuid() && getSeqNo() ) {
@@ -210,7 +212,8 @@ return delegate;
       class: 'foam.core.Enum',
       of: 'foam.dao.JournalType',
       name: 'journalType',
-      value: 'JournalType.NO_JOURNAL'
+      value: 'NO_JOURNAL',
+      flags: ['java']
     },
     {
       class: 'String',
@@ -525,9 +528,7 @@ return delegate;
 
               self.log('Loading test data');
               Promise.all(foam.json.parse(self.testData, self.of, self).map(
-                function(o) {
-                  return delegate.put(o);
-                }
+                function(o) { return delegate.put(o); }
               )).then(function() {
                 self.log('Loaded', self.testData.length, 'records.');
                 resolve(delegate);
