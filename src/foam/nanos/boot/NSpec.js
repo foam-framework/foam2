@@ -121,7 +121,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'serviceScript',
-      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 80 }
+      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 80 },
+      permissionRequired: true
     },
     {
       class: 'String',
@@ -132,7 +133,8 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'service',
-      view: { class: 'foam.u2.view.FObjectView' }
+      view: { class: 'foam.u2.view.FObjectView' },
+      permissionRequired: true
     }
     // TODO: permissions, keywords, lazy, parent
   ],
