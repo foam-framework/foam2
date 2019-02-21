@@ -2891,6 +2891,44 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.mlang',
+  name: 'NewObject',
+  extends: 'foam.mlang.AbstractExpr',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: 'An Expression that returns NEW object from the context.',
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: `
+        return ((foam.core.X) obj).get("NEW");
+      `
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'OldObject',
+  extends: 'foam.mlang.AbstractExpr',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: 'An Expression that returns OLD object from the context.',
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: `
+        return ((foam.core.X) obj).get("OLD");
+      `
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang',
   name: 'Expressions',
 
   documentation: 'Convenience mix-in for requiring all mlangs.',
