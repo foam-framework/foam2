@@ -23,7 +23,6 @@ foam.CLASS({
             setJournal(new foam.dao.WriteOnlyFileJournal.Builder(x)
               .setFilename(filename)
               .setCreateFile(true)
-              .setDao(new foam.dao.NullDAO())
               .setLogger(new foam.nanos.logger.StdoutLogger())
               .build());
           }

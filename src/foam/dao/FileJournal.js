@@ -86,10 +86,6 @@ foam.CLASS({
       javaFactory: `return getX().create(JSONParser.class);`
     },
     {
-      class: 'foam.dao.DAOProperty',
-      name: 'dao'
-    },
-    {
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
       name: 'logger',
@@ -98,7 +94,7 @@ foam.CLASS({
         if ( logger == null ) {
           logger = new StdoutLogger();
         }
-        return new PrefixLogger(new Object[] { "[JDAO]", getFilename() }, logger);
+        return new PrefixLogger(new Object[] { "[JDAO]", getFilename(), getPrefix() }, logger);
       `
     },
     {
@@ -142,25 +138,10 @@ foam.CLASS({
         }
       `
     },
-    // reader uses a getter because we want a new reader on file replay
-    {
-      class: 'Object',
-      name: 'reader',
-      javaType: 'java.io.BufferedReader',
-      javaGetter: `
-        try {
-          return new BufferedReader(new FileReader(getFile()));
-        } catch ( Throwable t ) {
-          getLogger().error("Failed to read from journal", t);
-          throw new RuntimeException(t);
-        }
-      `
-    },
-    // writer uses a factory because we want to use one writer for the lifetime of this journal object
     {
       class: 'Object',
       name: 'writer',
-      javaType: 'java.io.BufferedWriter',
+      javaType: 'java.io.Writer',
       javaFactory: `
         try {
           BufferedWriter writer = new BufferedWriter(new FileWriter(getFile(), true), 16 * 1024);
@@ -171,14 +152,27 @@ foam.CLASS({
           throw new RuntimeException(t);
         }
       `
+    },
+    {
+      class: 'Object',
+      name: 'lock',
+      javaType: 'java.util.concurrent.locks.Lock',
+      documentation: 'The lock to synchronize writing records on.  If multiple file journals write to the same file they should share a lock.',
+      javaFactory: 'return new java.util.concurrent.locks.ReentrantLock();',
+    },
+    {
+      class: 'String',
+      name: 'prefix',
+      documentation: 'If set, this journal will prefix all entries with the prefix, and when replaying will only process entries that start with the prefix.',
+      value: ''
     }
   ],
 
   methods: [
     {
       name: 'put_',
-      synchronized: true,
       javaCode: `
+        getLock().lock();
         try {
           String record = ( old != null ) ?
             getOutputter().stringifyDelta(old, nu) :
@@ -187,6 +181,7 @@ foam.CLASS({
           if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
             writeComment_(x, nu);
             write_(sb.get()
+              .append(getPrefix())
               .append("p(")
               .append(record)
               .append(")")
@@ -195,24 +190,27 @@ foam.CLASS({
         } catch ( Throwable t ) {
           getLogger().error("Failed to write put entry to journal", t);
           throw new RuntimeException(t);
+        } finally {
+          getLock().unlock();
         }
       `
     },
     {
       name: 'remove',
-      synchronized: true,
       javaCode: `
+        getLock().lock();
         try {
           // TODO: Would be more efficient to output the ID portion of the object.  But
           // if ID is an alias or multi part id we should only output the
           // true properties that ID/MultiPartID maps too.
-          FObject toWrite = (FObject) obj.getClassInfo().newInstance();
+          foam.core.FObject toWrite = (foam.core.FObject) obj.getClassInfo().newInstance();
           toWrite.setProperty("id", obj.getProperty("id"));
           String record = getOutputter().stringify(toWrite);
 
           if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
             writeComment_(x, obj);
             write_(sb.get()
+              .append(getPrefix())
               .append("r(")
               .append(record)
               .append(")")
@@ -221,6 +219,8 @@ foam.CLASS({
         } catch ( Throwable t ) {
           getLogger().error("Failed to write remove entry to journal", t);
           throw new RuntimeException(t);
+        } finally {
+          getLock().unlock();
         }
       `
     },
@@ -237,9 +237,12 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        BufferedWriter writer = getWriter();
+        java.io.Writer writer = getWriter();
         writer.write(data);
-        writer.newLine();
+        writer.write(System.getProperty("line.separator"));
+        // Should we flush() here?  It's probably faster not too as the writer
+        // can then buffer across multiple writes, but it's maybe
+        // "safer" if that complete records are written to the disk.
         writer.flush();
       `
     },
@@ -283,10 +286,17 @@ foam.CLASS({
         int successReading = 0;
         JSONParser parser = getParser();
 
-        try ( BufferedReader reader = getReader() ) {
+        try {
+          BufferedReader reader = new BufferedReader(new FileReader(getFile()));
+
           for ( String line ; ( line = reader.readLine() ) != null ; ) {
             if ( SafetyUtil.isEmpty(line)        ) continue;
             if ( COMMENT.matcher(line).matches() ) continue;
+
+            if ( ! SafetyUtil.isEmpty(getPrefix()) ) {
+              if ( ! line.startsWith(getPrefix()) ) continue;
+              line = line.substring(getPrefix().length());
+            }
 
             try {
               char operation = line.charAt(0);

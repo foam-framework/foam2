@@ -38,65 +38,70 @@ foam.CLASS({
         } catch ( Throwable t ) {
           throw new RuntimeException(t);
         }
+        
+        foam.dao.SharedJournalConfig config = new foam.dao.SharedJournalConfig.Builder(x).
+          setFile(file).
+          setFilename("doesnt-matter").
+          build();
 
-        foam.dao.DAO userDAODelegate = new foam.dao.MDAO(foam.nanos.auth.User.getOwnClassInfo());
-        foam.dao.DAO groupDAODelegate = new foam.dao.MDAO(foam.nanos.auth.Group.getOwnClassInfo());
-
-        x = x.put("userDAO", userDAODelegate);
-        x = x.put("groupDAO", groupDAODelegate);
-
-        foam.dao.RoutingJournal journal = new foam.dao.RoutingJournal.Builder(x).setFile(file).build();
-        foam.dao.DAO userDAO = new foam.dao.RoutingJDAO.Builder(x)
-          .setService("userDAO")
+        // Create new DAOs that should load from a shared journal
+        foam.dao.DAO replayTarget = new foam.dao.MDAO(foam.nanos.auth.User.getOwnClassInfo());
+        foam.dao.Journal journal = config.makeFileJournal("users");
+        
+        foam.dao.DAO userDAO = new foam.dao.java.JDAO.Builder(x)
           .setOf(foam.nanos.auth.User.getOwnClassInfo())
-          .setDelegate(userDAODelegate)
+          .setDelegate(replayTarget)
           .setJournal(journal)
           .build();
+          
+        journal.replay(x, replayTarget);
 
-        foam.dao.DAO groupDAO = new foam.dao.RoutingJDAO.Builder(x)
-          .setService("groupDAO")
+        replayTarget = new foam.dao.MDAO(foam.nanos.auth.Group.getOwnClassInfo());
+
+        journal = config.makeFileJournal("groups");
+        
+        foam.dao.DAO groupDAO = new foam.dao.java.JDAO.Builder(x)
           .setOf(foam.nanos.auth.Group.getOwnClassInfo())
-          .setDelegate(groupDAODelegate)
+          .setDelegate(replayTarget)
           .setJournal(journal)
           .build();
 
-        // Hack!
-        journal.setReplayed(true);
+        // Replay shouldn't actually do anything as journal is empty.
+        journal.replay(x, replayTarget);
+
+
 
         userDAO.put(new foam.nanos.auth.User.Builder(x).setId(1000).setFirstName("Kirk").setLastName("Eaton").build());
         groupDAO.put(new foam.nanos.auth.Group.Builder(x).setId("admin").setEnabled(true).build());
-
-        // check to see that lines are correctly output
-        try ( java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file)) ) {
-          boolean match = true;
-          for ( String line ; ( line = reader.readLine() ) != null ; ) {
-            if ( foam.util.SafetyUtil.isEmpty(line) ) continue;
-            match = USER_DAO_PUT.equals(line) || GROUP_DAO_PUT.equals(line);
-          }
-
-          test(match, "RoutingJournal correctly outputs expected lines");
-        } catch ( Throwable t ) {
-          throw new RuntimeException(t);
-        }
-
+        
         // verify userdao after put
         VerifyUserDAO(userDAO);
         // verify groupdao after put
         VerifyGroupDAO(groupDAO);
 
-        // empty daos
-        userDAODelegate.removeAll();
-        groupDAODelegate.removeAll();
+        // Create new DAOs that should load from the journals.
+        replayTarget = new foam.dao.MDAO(foam.nanos.auth.User.getOwnClassInfo());
+        journal = config.makeFileJournal("users");
+        
+        userDAO = new foam.dao.java.JDAO.Builder(x)
+          .setOf(foam.nanos.auth.User.getOwnClassInfo())
+          .setDelegate(replayTarget)
+          .setJournal(journal)
+          .build();
+          
+        journal.replay(x, replayTarget);
 
-        foam.mlang.sink.Count count = new foam.mlang.sink.Count();
-        count = (foam.mlang.sink.Count) userDAO.select(count);
-        test(count.getValue() == 0, "UserDAO is empty");
+        replayTarget = new foam.dao.MDAO(foam.nanos.auth.Group.getOwnClassInfo());
 
-        count = new foam.mlang.sink.Count();
-        count = (foam.mlang.sink.Count) groupDAO.select(count);
-        test(count.getValue() == 0, "GroupDAO is empty");
+        journal = config.makeFileJournal("groups");
+        
+        groupDAO = new foam.dao.java.JDAO.Builder(x)
+          .setOf(foam.nanos.auth.Group.getOwnClassInfo())
+          .setDelegate(replayTarget)
+          .setJournal(journal)
+          .build();
 
-        journal.replay(x, new foam.dao.NullDAO());
+        journal.replay(x, replayTarget);
 
         // verify userDAO after replay
         VerifyUserDAO(userDAO);

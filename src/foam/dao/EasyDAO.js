@@ -86,7 +86,8 @@ foam.CLASS({
       /** The developer-friendly name for this EasyDAO. */
       class: 'String',
       name: 'name',
-      factory: function() { return this.of.id; }
+      factory: function() { return this.of.id; },
+      javaFactory: 'return getOf().getId();'
     },
     {
       /** This is set automatically when you create an EasyDAO.
@@ -100,7 +101,26 @@ foam.dao.DAO delegate = getInnerDAO() == null ?
 if ( delegate instanceof foam.dao.MDAO ) setMdao((foam.dao.MDAO)delegate);
 
 if ( getJournaled() ) {
-  delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
+  if ( getSharedJournal() ) {
+    if ( foam.util.SafetyUtil.isEmpty(getName()) ) {
+      throw new RuntimeException("Cannot use the shared journal without a name set");
+    }
+
+    foam.dao.SharedJournalConfig config = (foam.dao.SharedJournalConfig)getX().get("sharedJournalConfig");
+
+    foam.dao.DAO replayTarget = delegate;
+
+    foam.dao.Journal journal = config.makeFileJournal(getName());
+
+    delegate = new foam.dao.java.JDAO.Builder(getX()).
+      setJournal(journal).
+      setDelegate(delegate).
+      build();
+
+    journal.replay(getX(), replayTarget);
+  } else {
+    delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
+  }
 }
 
 if ( getGuid() && getSeqNo() ) {
@@ -204,6 +224,11 @@ return delegate;
     {
       class: 'String',
       name: 'journalName'
+    },
+    {
+      class: 'Boolean',
+      name: 'sharedJournal',
+      value: false
     },
     {
       class: 'FObjectProperty',
