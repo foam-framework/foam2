@@ -32,7 +32,7 @@ foam.CLASS({
     {
       name: 'path',
       class: 'String',
-      value: 'server' // TODO: change to 'cluster'
+      value: 'service'
     },
     {
       documentation: `nSpec service name at the remote node.`,
@@ -54,17 +54,64 @@ foam.CLASS({
         try {
         ClusterConfig config = getConfig();
         java.net.URI uri = new java.net.URI("http", null, config.getId(), config.getPort(), "/"+getPath()+"/"+getServiceName(), null, null);
-        Box box = new HTTPBox.Builder(getX())
+        HTTPBox box = new HTTPBox.Builder(getX())
           .setUrl(uri.toURL().toString())
           .build();
-        // ProxyBox proxy = new RetryBox.Builder(getX())
-        //   .setDelegate(box)
-        //   .build();
-        // setDelegate(proxy);
         setDelegate(box);
        } catch (java.net.MalformedURLException | java.net.URISyntaxException e) {
          ((Logger) getX().get("logger")).error(e);
        }
+      `
+    },
+    {
+      name: 'put_',
+      code: function(x, obj) {
+        return request_(x, "put", obj);
+      },
+      javaCode: `
+        return request_(x, "put", obj);
+      `
+    },
+    {
+      name: 'remove_',
+      code: function(x, obj) {
+        return request_(x, "remove", obj);
+      },
+      javaCode: `
+        return request_(x, "remove", obj);
+      `
+    },
+    /* TODO: select, find, ... */
+    {
+      name: 'request_',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'cmd',
+          type: 'String'
+        },
+        {
+          name: 'obj',
+          type: 'foam.core.FObject'
+        }
+      ],
+      type: 'foam.core.FObject',
+      code: function(x, cmd, obj) {
+        var request = ClusterRequest.create({
+          cmd: cmd,
+          obj: obj
+        });
+        return getDelegate().cmd_(x, request);
+      },
+      javaCode: `
+        ClusterRequest request = new ClusterRequest.Builder(getX())
+          .setCmd(cmd)
+          .setObj(obj)
+          .build();
+        return (foam.core.FObject) getDelegate().cmd_(x, request);
       `
     }
   ]

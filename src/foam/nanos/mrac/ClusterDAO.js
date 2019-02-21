@@ -43,13 +43,12 @@ foam.CLASS({
 
   properties: [
     {
-      documentation: `Name by which the ClusterServer will be located by the NanoRouter.`,
+      // documentation: `Name by which the ClusterServer will be located by the NanoRouter.`,
       name: 'serviceName',
       class: 'String',
-      factory: function() { return getNSpec().getName()+'-cluster'; },
-      javaFactory: `return getNSpec().getName()+"-cluster";`
     },
     {
+      // REVIEW - this may no longer be required
       documentation: `nSpec of the DAO to be clustered.`,
       name: 'nSpec',
       class: 'FObjectProperty',
@@ -67,7 +66,7 @@ foam.CLASS({
       documentation: `Array of all clients to put/remove to after a non-server operation.`,
       name: 'clients',
       class: 'FObjectArray',
-      of: 'foam.nanos.mrac.ClusterClientDAO',
+      of: 'foam.dao.DAO',
       visibility: 'HIDDEN'
     },
     {
@@ -83,28 +82,12 @@ foam.CLASS({
       documentation: `Upon initialization create the ClusterServer configuration and register nSpec.`,
       name: 'init_',
       javaCode: `
-        Logger logger = (Logger) getX().get("logger");
-        logger.debug(this.getClass().getSimpleName(), "init_", getServiceName(), Thread.currentThread().getName(), new Exception());
-        DAO dao = (DAO) getX().get("nSpecDAO");
-
-        NSpec nspec = (NSpec) getNSpec().fclone();
-        nspec.setX(getX());
-        nspec.setId(getServiceName());
-        nspec.setName(getServiceName());
-        nspec.setAuthenticate(false);
-        nspec.setPm(true);
-        nspec.setServe(true);
-        nspec.setServiceScript("return new foam.nanos.mrac.ClusterServerDAO.Builder(x).setServiceName(\\""+getNSpec().getName()+"\\").build();\\n");
-
-        nspec = (NSpec) dao.put(nspec);
-        logger.debug("create NSpec", nspec);
-
         reconfigure(getX());
 
-        // register ClusterConfig Listener
+        /* register ClusterConfig Listener */
         DAO clusterConfigDAO = (DAO) getX().get("clusterConfigDAO");
-        clusterConfigDAO.listen(new ClusterConfigSink(getX(), this), TRUE);
-        // REVIEW: need to keep a reference to the dao?
+        clusterConfigDAO.listen(new ClusterConfigSink(getX(), this));
+        /* REVIEW: need to keep a reference to the dao?*/
         setClusterConfigDAO(clusterConfigDAO);
       `
     },
@@ -129,14 +112,15 @@ foam.CLASS({
          )
        )
        .select(new ArraySink())).getArray();
-      ClusterClientDAO[] newClients = new ClusterClientDAO[arr.size()];
+      DAO[] newClients = new DAO[arr.size()];
       for ( int i = 0; i < arr.size(); i++ ) {
         ClusterConfig config = (ClusterConfig) arr.get(i);
         if ( "localhost".equals(config.getId()) ) {
           setConfig(config);
           continue;
         }
-        newClients[i] = new ClusterClientDAO.Builder(x).setServiceName(getServiceName()).setConfig(config).build();
+        DAO client = new ClusterClientDAO.Builder(x).setServiceName(getServiceName()).setConfig(config).build();
+        newClients[i] = client;
       }
       setClients(newClients);
       `
@@ -155,7 +139,9 @@ foam.CLASS({
       ],
       javaCode: `
       foam.core.FObject o = getDelegate().put_(x, obj);
-      // for each client, put
+      for ( DAO client : getClients() ) {
+        client.put(o);
+      }
       return o;
      `
     },
@@ -173,9 +159,29 @@ foam.CLASS({
       ],
       javaCode: `
       foam.core.FObject o = getDelegate().remove_(x, obj);
-      // for each client, remove
+      for ( DAO client : getClients() ) {
+        client.put(o);
+      }
       return o;
      `
+    },
+    {
+      name: 'cmd_',
+      javaCode: `
+      if ( obj instanceof ClusterRequest ) {
+        ClusterRequest request = (ClusterRequest) obj;
+        Logger logger = (Logger) getX().get("logger");
+        logger.debug(this.getClass().getSimpleName(), "cmd_", request);
+        if ( "put".equals(request.getCmd()) ) {
+          return getDelegate().put_(x, request.getObj());
+        } else if ( "remove".equals(request.getCmd()) ) {
+          return getDelegate().remove_(x, request.getObj());
+        } else {
+          throw new UnsupportedOperationException(request.getCmd());
+        }
+      }
+      return getDelegate().cmd_(x, obj);
+      `
     }
  ]
 });

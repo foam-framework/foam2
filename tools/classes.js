@@ -220,6 +220,7 @@ var classes = [
   'foam.nanos.mrac.ClusterConfig',
   'foam.nanos.mrac.ClusterClientDAO',
   'foam.nanos.mrac.ClusterDAO',
+  'foam.nanos.mrac.ClusterRequest',
   'foam.nanos.mrac.ClusterServerDAO',
   'foam.nanos.mrac.NodeType',
   'foam.nanos.mrac.Status',
