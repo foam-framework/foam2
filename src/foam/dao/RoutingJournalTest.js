@@ -12,22 +12,6 @@ foam.CLASS({
 
   documentation: '',
 
-  constants: [
-    {
-      type: 'String',
-      name: 'USER_DAO_PUT',
-      documentation: 'UserDAO expected put line',
-      value: `userDAO.p({"class":"foam.nanos.auth.User","id":1000,"firstName":"Kirk","lastName":"Eaton"})`
-    },
-    {
-      type: 'String',
-      name: 'GROUP_DAO_PUT',
-      documentation: 'GroupDAO expected put line',
-      value: `groupDAO.p({"class":"foam.nanos.auth.Group","id":"admin","enabled":true})`
-
-    }
-  ],
-
   methods: [
     {
       name: 'runTest',
@@ -38,7 +22,7 @@ foam.CLASS({
         } catch ( Throwable t ) {
           throw new RuntimeException(t);
         }
-        
+
         foam.dao.SharedJournalConfig config = new foam.dao.SharedJournalConfig.Builder(x).
           setFile(file).
           setFilename("doesnt-matter").
@@ -47,19 +31,19 @@ foam.CLASS({
         // Create new DAOs that should load from a shared journal
         foam.dao.DAO replayTarget = new foam.dao.MDAO(foam.nanos.auth.User.getOwnClassInfo());
         foam.dao.Journal journal = config.makeFileJournal("users");
-        
+
         foam.dao.DAO userDAO = new foam.dao.java.JDAO.Builder(x)
           .setOf(foam.nanos.auth.User.getOwnClassInfo())
           .setDelegate(replayTarget)
           .setJournal(journal)
           .build();
-          
+
         journal.replay(x, replayTarget);
 
         replayTarget = new foam.dao.MDAO(foam.nanos.auth.Group.getOwnClassInfo());
 
         journal = config.makeFileJournal("groups");
-        
+
         foam.dao.DAO groupDAO = new foam.dao.java.JDAO.Builder(x)
           .setOf(foam.nanos.auth.Group.getOwnClassInfo())
           .setDelegate(replayTarget)
@@ -73,7 +57,7 @@ foam.CLASS({
 
         userDAO.put(new foam.nanos.auth.User.Builder(x).setId(1000).setFirstName("Kirk").setLastName("Eaton").build());
         groupDAO.put(new foam.nanos.auth.Group.Builder(x).setId("admin").setEnabled(true).build());
-        
+
         // verify userdao after put
         VerifyUserDAO(userDAO);
         // verify groupdao after put
@@ -82,19 +66,19 @@ foam.CLASS({
         // Create new DAOs that should load from the journals.
         replayTarget = new foam.dao.MDAO(foam.nanos.auth.User.getOwnClassInfo());
         journal = config.makeFileJournal("users");
-        
+
         userDAO = new foam.dao.java.JDAO.Builder(x)
           .setOf(foam.nanos.auth.User.getOwnClassInfo())
           .setDelegate(replayTarget)
           .setJournal(journal)
           .build();
-          
+
         journal.replay(x, replayTarget);
 
         replayTarget = new foam.dao.MDAO(foam.nanos.auth.Group.getOwnClassInfo());
 
         journal = config.makeFileJournal("groups");
-        
+
         groupDAO = new foam.dao.java.JDAO.Builder(x)
           .setOf(foam.nanos.auth.Group.getOwnClassInfo())
           .setDelegate(replayTarget)
