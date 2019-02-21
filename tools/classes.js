@@ -51,6 +51,8 @@ var classes = [
   'foam.mlang.expr.Dot',
   'foam.mlang.PredicatedExpr',
   'foam.box.Box',
+  'foam.mlang.NewObject',
+  'foam.mlang.OldObject',
   'foam.box.Skeleton',
   'foam.box.AbstractSkeleton',
   'foam.box.ProxyBox',
