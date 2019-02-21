@@ -8,6 +8,7 @@ package foam.mlang;
 
 import foam.core.ClassInfo;
 import foam.dao.Sink;
+import foam.mlang.expr.Dot;
 import foam.mlang.predicate.*;
 import foam.mlang.sink.*;
 import java.lang.reflect.InvocationTargetException;
@@ -142,5 +143,19 @@ public class MLang
     } catch(NoSuchMethodException|IllegalAccessException|InvocationTargetException e) {
       throw new RuntimeException("Attempt to call INSTANCE_OF on non Modelled class." + cls);
     }
+  }
+
+  public static Expr DOT(Expr o1, Expr o2) {
+    return new Dot.Builder(null)
+      .setArg1(o1)
+      .setArg2(o2)
+      .build();
+  }
+
+  public static Expr DOT(Expr o1, Predicate o2) {
+    return new Dot.Builder(null)
+      .setArg1(o1)
+      .setArg2(new PredicatedExpr(o2))
+      .build();
   }
 }

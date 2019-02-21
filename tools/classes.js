@@ -48,6 +48,8 @@ var classes = [
   'foam.mlang.predicate.Eq',
   'foam.mlang.Constant',
   'foam.mlang.ArrayConstant',
+  'foam.mlang.expr.Dot',
+  'foam.mlang.PredicatedExpr',
   'foam.box.Box',
   'foam.box.Skeleton',
   'foam.box.AbstractSkeleton',
@@ -373,7 +375,6 @@ var proxies = [
 
 var blacklist = [
   'foam.core.Property',
-  'foam.mlang.expr.Dot',
   'foam.mlang.expr.Mul',
   'foam.mlang.predicate.Func',
   'foam.u2.AttrSlot',
