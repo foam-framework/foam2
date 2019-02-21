@@ -45,7 +45,7 @@ foam.CLASS({
         x = x.put("userDAO", userDAODelegate);
         x = x.put("groupDAO", groupDAODelegate);
 
-        foam.dao.Journal journal = new foam.dao.RoutingJournal.Builder(x).setFile(file).build();
+        foam.dao.RoutingJournal journal = new foam.dao.RoutingJournal.Builder(x).setFile(file).build();
         foam.dao.DAO userDAO = new foam.dao.RoutingJDAO.Builder(x)
           .setService("userDAO")
           .setOf(foam.nanos.auth.User.getOwnClassInfo())
@@ -59,6 +59,9 @@ foam.CLASS({
           .setDelegate(groupDAODelegate)
           .setJournal(journal)
           .build();
+
+        // Hack!
+        journal.setReplayed(true);
 
         userDAO.put(new foam.nanos.auth.User.Builder(x).setId(1000).setFirstName("Kirk").setLastName("Eaton").build());
         groupDAO.put(new foam.nanos.auth.Group.Builder(x).setId("admin").setEnabled(true).build());

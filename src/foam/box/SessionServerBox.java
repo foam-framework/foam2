@@ -50,10 +50,10 @@ public class SessionServerBox
         } else if ( ! session.getRemoteHost().equals(req.getRemoteHost()) ) {
           // If an existing session is reused with a different remote host then
           // logout the session and force a re-login.
-          logger.warning("Attempt to use session create for ", session.getRemoteHost(), " from ", req.getRemoteHost());
-          session.setContext(getX().put(Session.class, session));
-          session.setRemoteHost(req.getRemoteHost());
-          sessionDAO.put(session);
+//          logger.warning("Attempt to use session create for ", session.getRemoteHost(), " from ", req.getRemoteHost());
+//          session.setContext(getX().put(Session.class, session));
+//          session.setRemoteHost(req.getRemoteHost());
+//          sessionDAO.put(session);
         }
 
         User user = (User) session.getContext().get("user");
