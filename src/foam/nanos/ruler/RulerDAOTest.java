@@ -2,11 +2,11 @@ package foam.nanos.ruler;
 
 import foam.core.X;
 import foam.dao.DAO;
-import foam.mlang.MLang;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.auth.User;
 import foam.nanos.test.Test;
 
+import static foam.mlang.MLang.*;
 
 public class RulerDAOTest extends Test {
   Rule rule1, rule2, rule3, rule4, rule5;
@@ -57,9 +57,9 @@ public class RulerDAOTest extends Test {
     rule2.setOperation(Operations.CREATE);
     rule2.setAfter(false);
     rule2.setPriority(80);
-    Predicate predicate2 = foam.mlang.MLang.AND(
-      foam.mlang.MLang.EQ(foam.nanos.auth.User.EMAIL, "nanos@nanos.net"),
-      foam.mlang.MLang.INSTANCE_OF(foam.nanos.auth.User.class)
+    Predicate predicate2 = AND(
+      EQ(DOT(NEW_OBJ, foam.nanos.auth.User.EMAIL), "nanos@nanos.net"),
+      EQ(DOT(NEW_OBJ, INSTANCE_OF(foam.nanos.auth.User.class)), true)
     );
     rule2.setPredicate(predicate2);
     RuleAction action2 = (x1, obj, oldObj) -> {
@@ -91,7 +91,7 @@ public class RulerDAOTest extends Test {
     rule4.setOperation(Operations.CREATE);
     rule4.setAfter(false);
     rule4.setPriority(10);
-    Predicate predicate4 = foam.mlang.MLang.INSTANCE_OF(foam.nanos.auth.User.class);
+    Predicate predicate4 = EQ(DOT(NEW_OBJ, INSTANCE_OF(foam.nanos.auth.User.class)), true);
     rule4.setPredicate(predicate4);
     RuleAction action4 = (x1, obj, oldObj) -> {
       User user = (User) obj;
@@ -107,7 +107,7 @@ public class RulerDAOTest extends Test {
    rule5.setDaoKey("localUserDAO");
     rule5.setOperation(Operations.UPDATE);
     rule5.setAfter(false);
-    Predicate predicate5 = foam.mlang.MLang.INSTANCE_OF(foam.nanos.auth.User.class);
+    Predicate predicate5 = EQ(DOT(NEW_OBJ, INSTANCE_OF(foam.nanos.auth.User.class)), true);
     rule5.setPredicate(predicate5);
     RuleAction action5 = (x1, obj, oldObj) -> {
       User user = (User) obj;

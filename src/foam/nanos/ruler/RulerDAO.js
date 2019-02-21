@@ -123,7 +123,7 @@
       for ( Object key : sink.getGroupKeys() ) {
         List<Rule> groups = ((ArraySink) sink.getGroups().get(key)).getArray();
         for ( Rule rule : groups ) {
-          if ( rule.getPredicate().f(obj) ) {
+          if ( rule.f(x, obj, oldObj) ) {
             rule.getAction().applyAction(x, obj, oldObj);
             if ( rule.getStops() ) {
               break;

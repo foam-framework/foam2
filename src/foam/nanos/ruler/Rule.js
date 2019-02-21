@@ -106,7 +106,26 @@
   methods: [
     {
       name: 'f',
-      javaCode: 'return getPredicate().f(obj);'
+      type: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'FObject'
+        },
+        {
+          name: 'oldObj',
+          type: 'FObject'
+        }
+      ],
+      javaCode: `
+        return getPredicate().f(
+          x.put("NEW", obj).put("OLD", oldObj)
+        );
+      `
     }
   ]
 });
