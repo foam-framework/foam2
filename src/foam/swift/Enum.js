@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.swift',
   name: 'Enum',
+  flags: ['swift'],
 
   requires: [
     'foam.swift.Outputter',
