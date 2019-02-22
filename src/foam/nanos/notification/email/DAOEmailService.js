@@ -127,7 +127,7 @@ if (foam.util.SafetyUtil.isEmpty(emailMessage.getSubject())) {
 // and sendTo is provided in the template, use the sendTo from template
 String sendTo = emailTemplate.getSendTo();
 if ( foam.util.SafetyUtil.isEmpty(emailMessage.getTo()) &&
-! foam.util.SafetyUtil.isEmpty(emailTemplate.getsendTo()) ) {
+  ! foam.util.SafetyUtil.isEmpty(emailTemplate.getsendTo()) ) {
   emailMessage.setTo(new String[] {sendTo});
 }
 
