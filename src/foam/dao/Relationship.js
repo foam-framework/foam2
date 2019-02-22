@@ -402,10 +402,12 @@ foam.CLASS({
       name: 'dao',
       label: '',
       factory: function() {
+        var targetDAO = this.__context__[this.targetDAOKey];
+        foam.assert(targetDAO, 'Missing DAO for targetDAAOKey', this.targetDAOKey);
         return foam.dao.ReadOnlyDAO.create({
           delegate: foam.dao.ManyToManyRelationshipDAO.create({
             relationship: this,
-            delegate: this.__context__[this.targetDAOKey]
+            delegate: targetDAO
           }, this)
         }, this);
       },
