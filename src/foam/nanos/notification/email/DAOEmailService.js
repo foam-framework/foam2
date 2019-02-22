@@ -123,9 +123,11 @@ if (foam.util.SafetyUtil.isEmpty(emailMessage.getSubject())) {
   emailMessage.setSubject(templateSubject.render(model));
 }
 
-// If emailTemplate has a send To address use that.
+// If sendTo isn't set in the message
+// and sendTo is provided in the template, use the sendTo from template
 String sendTo = emailTemplate.getSendTo();
-if (sendTo != null && !foam.util.SafetyUtil.isEmpty(sendTo)) {
+if ( foam.util.SafetyUtil.isEmpty(emailMessage.getTo()) &&
+! foam.util.SafetyUtil.isEmpty(emailTemplate.getsendTo()) ) {
   emailMessage.setTo(new String[] {sendTo});
 }
 
