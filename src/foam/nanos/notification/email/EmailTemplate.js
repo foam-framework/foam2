@@ -58,6 +58,11 @@ bodyAsByteArrayIsSet_ = false;`
     {
       class: 'String',
       name: 'displayName'
+    },
+    {
+      class: 'String',
+      name: 'sendTo',
+      documentation: `This property will set who the email is being sent too.`
     }
   ]
 });
