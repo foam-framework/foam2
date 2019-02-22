@@ -276,7 +276,8 @@ foam.CLASS({
             this.output(p.toXML(v, this));
             this.end('</' +  this.propertyName(p) + '>');
           }
-        }
+        },
+        Object: function(v, p) { this.outputPrimitive(v, p); },
       })
     },
 
