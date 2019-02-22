@@ -360,7 +360,9 @@ foam.CLASS({
           this.start('<objects>\n');
           var cls = this.getCls(opt_cls);
           for ( var i = 0 ; i < o.length ; i++ ) {
-            this.output(o[i], cls);
+            this.start('<object>\n');
+              this.output(o[i], cls);
+            this.end('\n</object>');
             if ( i < o.length-1 ) this.out('\n').nl().indent();
           }
           this.end('\n</objects>');
