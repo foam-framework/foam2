@@ -123,10 +123,18 @@ if (foam.util.SafetyUtil.isEmpty(emailMessage.getSubject())) {
   emailMessage.setSubject(templateSubject.render(model));
 }
 
+// If sendTo isn't set in the message
+// and sendTo is provided in the template, use the sendTo from template
+String sendTo = emailTemplate.getSendTo();
+if ( foam.util.SafetyUtil.isEmpty(emailMessage.getTo()) &&
+  ! foam.util.SafetyUtil.isEmpty(emailTemplate.getsendTo()) ) {
+  emailMessage.setTo(new String[] {sendTo});
+}
+
 // If the displayName doesn't set in the message
 // and the displayName provided in the template, use the displayName from template
 if ( foam.util.SafetyUtil.isEmpty(emailMessage.getDisplayName()) &&
-     ! foam.util.SafetyUtil.isEmpty(emailTemplate.getDisplayName()) ) {
+  ! foam.util.SafetyUtil.isEmpty(emailTemplate.getDisplayName()) ) {
   JtwigTemplate templateDisplayName = JtwigTemplate.inlineTemplate(emailTemplate.getDisplayName(), config);
   emailMessage.setDisplayName(templateDisplayName.render(model));
 }
