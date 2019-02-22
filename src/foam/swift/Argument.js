@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.swift',
   name: 'Argument',
+  flags: ['swift'],
 
   properties: [
     ['externalName', '_'],
