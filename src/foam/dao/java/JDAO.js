@@ -39,18 +39,15 @@ foam.CLASS({
 
             /* Create a composite journal of repo journal and runtime journal
               and load them all.*/
-            X initialStorageX = x;
-            try {
-              String initialStorageSource = System.getProperty("INITIAL_JOURNAL_SOURCE");
-              initialStorageX = x.put(foam.nanos.fs.Storage.class,
-                  new Storage(initialStorageSource));
-            } catch (Exception e){
-              /* No initial journal source specified. Will use JOURNAL_HOME. */
+            X resourceStorageX = x;
+            if ( System.getProperty("RESOURCES_JOURNAL_SOURCE") != null ) {
+              resourceStorageX = x.put(foam.nanos.fs.Storage.class,
+                  new Storage(System.getProperty("RESOURCES_JOURNAL_SOURCE"), true));
             }
 
             new foam.dao.CompositeJournal.Builder(x)
               .setDelegates(new foam.dao.Journal[]{
-                new foam.dao.FileJournal.Builder(initialStorageX)
+                new foam.dao.FileJournal.Builder(resourceStorageX)
                   .setFilename(filename + ".0")
                   .build(),
                 new foam.dao.FileJournal.Builder(x)
