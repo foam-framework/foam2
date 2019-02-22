@@ -2891,36 +2891,24 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.mlang',
-  name: 'NewObject',
+  name: 'ContextObject',
   extends: 'foam.mlang.AbstractExpr',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'An Expression that returns NEW object from the context.',
+  documentation: 'An Expression that returns object in the context using key.',
 
-  methods: [
+  properties: [
     {
-      name: 'f',
-      javaCode: `
-        return ((foam.core.X) obj).get("NEW");
-      `
+      class: 'String',
+      name: 'key'
     }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.mlang',
-  name: 'OldObject',
-  extends: 'foam.mlang.AbstractExpr',
-  implements: [ 'foam.core.Serializable' ],
-
-  documentation: 'An Expression that returns OLD object from the context.',
+  ],
 
   methods: [
     {
       name: 'f',
       javaCode: `
-        return ((foam.core.X) obj).get("OLD");
+        return ((foam.core.X) obj).get(getKey());
       `
     }
   ]

@@ -23,8 +23,8 @@ public class MLang
   public static final Predicate TRUE  = new True();
   public static final Predicate FALSE = new False();
 
-  public static final Expr NEW_OBJ    = new NewObject();
-  public static final Expr OLD_OBJ    = new OldObject();
+  public static final Expr NEW_OBJ    = new ContextObject("NEW");
+  public static final Expr OLD_OBJ    = new ContextObject("OLD");
 
   public static Expr prepare(Object o) {
     return o instanceof Expr ? (Expr) o :
