@@ -97,9 +97,20 @@
       javaFactory: `
       return new RuleAction() {
         @Override
-        public void applyAction(X x, FObject obj, FObject oldObj) {}
+        public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) { /*noop*/ }
       };`,
       documentation: 'The action to be executed if predicates returns true for passed object.'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.ruler.RuleAction',
+      name: 'asyncAction',
+      javaFactory: `
+      return new RuleAction() {
+        @Override
+        public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) { /*noop*/ }
+      };`,
+      documentation: 'The action to be executed asynchronously if predicates returns true for passed object.'
     }
   ],
 
@@ -125,6 +136,59 @@
         return getPredicate().f(
           x.put("NEW", obj).put("OLD", oldObj)
         );
+      `
+    },
+    {
+      name: 'apply',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'FObject'
+        },
+        {
+          name: 'oldObj',
+          type: 'FObject'
+        },
+        {
+          name: 'ruler',
+          type: 'foam.nanos.ruler.RuleEngine'
+        }
+      ],
+      javaCode: `
+        getAction().applyAction(x, obj, oldObj, ruler);
+      `
+    },
+    {
+      name: 'asyncApply',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'FObject'
+        },
+        {
+          name: 'oldObj',
+          type: 'FObject'
+        },
+        {
+          name: 'ruler',
+          type: 'foam.nanos.ruler.RuleEngine'
+        }
+      ],
+      javaCode: `
+        getAsyncAction().applyAction(x, obj, oldObj, ruler);
+        if ( ! getAfter()
+          && Operations.REMOVE != getOperation()
+        ) {
+          ruler.getDelegate().put_(x, obj);
+        }
       `
     }
   ]
