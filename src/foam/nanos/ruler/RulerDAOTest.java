@@ -53,7 +53,6 @@ public class RulerDAOTest extends Test {
     rule1.setDaoKey("localUserDAO");
     rule1.setOperation(Operations.CREATE);
     rule1.setAfter(false);
-    rule1.setStops(true);
     rule1.setPriority(60);
     RuleAction action1 = (x1, obj, oldObj, ruler) -> ruler.stop();
     rule1.setAction(action1);
