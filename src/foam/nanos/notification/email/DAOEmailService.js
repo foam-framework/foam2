@@ -123,11 +123,11 @@ if (foam.util.SafetyUtil.isEmpty(emailMessage.getSubject())) {
   emailMessage.setSubject(templateSubject.render(model));
 }
 
-// If sendTo isn't set in the message
-// and sendTo is provided in the template, use the sendTo from template
+/* If To isn't set in the message and sendTo is provided in the template, use
+  the sendTo from template. */
 String sendTo = emailTemplate.getSendTo();
-if ( foam.util.SafetyUtil.isEmpty(emailMessage.getTo()) &&
-  ! foam.util.SafetyUtil.isEmpty(emailTemplate.getsendTo()) ) {
+if ( emailMessage.getTo().length == 0  &&
+  ! foam.util.SafetyUtil.isEmpty(emailTemplate.getSendTo()) ) {
   emailMessage.setTo(new String[] {sendTo});
 }
 
