@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.swift',
   name: 'Method',
+  flags: ['swift'],
 
   properties: [
     'name',

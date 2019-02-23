@@ -6,6 +6,7 @@
 
 foam.LIB({
   name: 'foam.java',
+  flags: ['java'],
   methods: [
     {
       name: 'asJavaValue',
@@ -66,6 +67,7 @@ foam.CLASS({
   package: 'foam.java',
   name: 'JavaType',
   extends: 'String',
+  flags: ['java'],
   properties: [
     {
       name: 'flags',

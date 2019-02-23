@@ -3,6 +3,9 @@ package foam.nanos.fs;
 public class Storage {
   private java.io.File root_;
 
+  private boolean useResources_ = false;
+  private String resourceDir_;
+
   public Storage() {
     this(new java.io.File(""));
   }
@@ -15,7 +18,17 @@ public class Storage {
     root_ = root.getAbsoluteFile();
   }
 
+  public Storage (String root, boolean useResources) {
+    useResources_ = useResources;
+    resourceDir_ = root;
+  }
+
   public java.io.File get(String name) {
-    return new java.io.File(root_, name).getAbsoluteFile();
+    if ( useResources_ ) {
+      ClassLoader classLoader = getClass().getClassLoader();
+	    return new java.io.File(classLoader.getResource(resourceDir_ + "/" + name).getFile());
+    } else {
+      return new java.io.File(root_, name).getAbsoluteFile();
+    }
   }
 }
