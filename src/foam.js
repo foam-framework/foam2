@@ -83,22 +83,6 @@
     var load = getLoader();
 
     files.
-      filter(function(f) {
-        // Ignore all flags, load everything.
-        return true;
-
-        if ( f.flags ) {
-          for ( var i = 0; i < f.flags.length; i++ ) {
-            if ( ! flags[f.flags[i]] ) return false;
-          }
-        }
-        if ( f.notFlags ) {
-          for ( var i = 0; i < f.notFlags.length; i++ ) {
-            if ( flags[f.notFlags[i]] ) return false;
-          }
-        }
-        return true;
-      }).
       map(function(f) { return f.name; }).
       forEach(load);
 

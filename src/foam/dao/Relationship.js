@@ -725,6 +725,7 @@ foam.CLASS({
     },
     {
       name: 'javaCode',
+      flags: ['java'],
       expression: function(target, targetPropertyName, targetDAOKey) {
         return `
           return new foam.dao.RelationshipDAO.Builder(x)
@@ -890,6 +891,7 @@ foam.CLASS({
     },
     {
       name: 'javaCode',
+      flags: ['java'],
       expression: function(junction, sourceProperty, targetProperty, targetDAOKey, junctionDAOKey) {
         return `
           return new foam.dao.ManyToManyRelationshipImpl.Builder(x)
