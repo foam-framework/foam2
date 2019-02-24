@@ -40,9 +40,9 @@ foam.CLASS({
             /* Create a composite journal of repo journal and runtime journal
               and load them all.*/
             X resourceStorageX = x;
-            if ( System.getProperty("RESOURCES_JOURNAL_SOURCE") != null ) {
+            if ( System.getProperty("resource.journals.dir") != null ) {
               resourceStorageX = x.put(foam.nanos.fs.Storage.class,
-                  new Storage(System.getProperty("RESOURCES_JOURNAL_SOURCE"), true));
+                  new Storage(System.getProperty("resource.journals.dir"), true));
             }
 
             new foam.dao.CompositeJournal.Builder(x)
