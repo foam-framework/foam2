@@ -1,9 +1,18 @@
 package foam.nanos.fs;
 
+import foam.util.SafetyUtil;
+
+import java.io.*;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.*;
+import java.util.zip.*;
+import java.util.regex.*;
+
 public class Storage {
   private java.io.File root_;
 
-  private boolean useResources_ = false;
+  private boolean isResource_ = false;
   private String resourceDir_;
 
   public Storage() {
@@ -18,17 +27,24 @@ public class Storage {
     root_ = root.getAbsoluteFile();
   }
 
-  public Storage (String root, boolean useResources) {
-    useResources_ = useResources;
+  public Storage (String root, boolean isResource) {
+    isResource_ = isResource;
     resourceDir_ = root;
   }
 
+  public boolean isResource() {
+    return isResource_;
+  }
+  
   public java.io.File get(String name) {
-    if ( useResources_ ) {
-      ClassLoader classLoader = getClass().getClassLoader();
-	    return new java.io.File(classLoader.getResource(resourceDir_ + "/" + name).getFile());
-    } else {
-      return new java.io.File(root_, name).getAbsoluteFile();
+    return new java.io.File(root_, name).getAbsoluteFile();
+  }
+
+  public java.io.InputStream getResourceAsStream(String name) {
+    String path = "/" + name;
+    if ( ! SafetyUtil.isEmpty(resourceDir_) ) {
+      path = "/" + resourceDir_ + path;
     }
+    return getClass().getResourceAsStream(path);
   }
 }
