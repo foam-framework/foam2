@@ -6,6 +6,7 @@
 
 foam.LIB({
   name: 'foam.java',
+  flags: ['java'],
   methods: [
     {
       name: 'asJavaValue',
@@ -66,6 +67,7 @@ foam.CLASS({
   package: 'foam.java',
   name: 'JavaType',
   extends: 'String',
+  flags: ['java'],
   properties: [
     {
       name: 'flags',
@@ -932,7 +934,10 @@ foam.CLASS({
     ['javaInfoType', 'foam.core.AbstractLongPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.LongParser()'],
     ['javaCSVParser', 'new foam.lib.json.LongParser()'],
-    ['sqlType', 'BIGINT']
+    ['sqlType', 'BIGINT'],
+    ['javaCompare', 'return Long.compare(get_(o1), get_(o2));'],
+    [ 'javaComparePropertyToValue', 'return Long.compare(cast(key), cast(value));' ],
+    [ 'javaComparePropertyToObject', 'return Long.compare(cast(key), get_(o));' ]
   ],
 
   methods: [
@@ -941,10 +946,10 @@ foam.CLASS({
 
       var m = info.getMethod('cast');
       m.body = `return ( o instanceof Number ) ?
-        ((Number)o).longValue() :
+        ((Number) o).longValue() :
         ( o instanceof String ) ?
         Long.valueOf((String) o) :
-        (long)o;`;
+        (long) o;`;
 
       return info;
     }
@@ -1676,6 +1681,7 @@ foam.CLASS({
         return idProp;
       }
     },
+    { name: 'type',            factory: function() { return this.referencedProperty.type; } },
     { name: 'javaType',        factory: function() { return this.referencedProperty.javaType; } },
     { name: 'javaJSONParser',  factory: function() { return this.referencedProperty.javaJSONParser; } },
     { name: 'javaQueryParser', factory: function() { return this.referencedProperty.javaQueryParser; } },

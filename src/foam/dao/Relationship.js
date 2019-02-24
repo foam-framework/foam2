@@ -402,10 +402,12 @@ foam.CLASS({
       name: 'dao',
       label: '',
       factory: function() {
+        var targetDAO = this.__context__[this.targetDAOKey];
+        foam.assert(targetDAO, 'Missing DAO for targetDAAOKey', this.targetDAOKey);
         return foam.dao.ReadOnlyDAO.create({
           delegate: foam.dao.ManyToManyRelationshipDAO.create({
             relationship: this,
-            delegate: this.__context__[this.targetDAOKey]
+            delegate: targetDAO
           }, this)
         }, this);
       },
@@ -723,6 +725,7 @@ foam.CLASS({
     },
     {
       name: 'javaCode',
+      flags: ['java'],
       expression: function(target, targetPropertyName, targetDAOKey) {
         return `
           return new foam.dao.RelationshipDAO.Builder(x)
@@ -888,6 +891,7 @@ foam.CLASS({
     },
     {
       name: 'javaCode',
+      flags: ['java'],
       expression: function(junction, sourceProperty, targetProperty, targetDAOKey, junctionDAOKey) {
         return `
           return new foam.dao.ManyToManyRelationshipImpl.Builder(x)

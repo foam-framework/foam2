@@ -8,6 +8,7 @@ foam.CLASS({
   package: 'foam.swift',
   name: 'ProtocolArgument',
   extends: 'foam.swift.Argument',
+  flags: ['swift'],
   methods: [
     function outputSwift(o) {
       o.out(

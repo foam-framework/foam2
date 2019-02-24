@@ -18,9 +18,9 @@ foam.CLASS({
       class: 'String',
       name: 'objectClass',
       displayWidth: 70,
-      view: { class: 'foam.u2.DetailView', size: 60 },
+      view: { class: 'foam.u2.TextField', size: 60 },
       postSet: function(oldValue, newValue) {
-        if ( oldValue && newValue !== oldValue ) {
+        if ( newValue !== oldValue ) {
           var m = this.__context__.lookup(newValue, true);
           if ( m ) {
             this.data = m.create(this.data, this);

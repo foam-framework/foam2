@@ -121,14 +121,9 @@
       javaCode: `
 
       for ( Object key : sink.getGroupKeys() ) {
-        List<Rule> groups = ((ArraySink) sink.getGroups().get(key)).getArray();
-        for ( Rule rule : groups ) {
-          if ( rule.getPredicate().f(obj) ) {
-            rule.getAction().applyAction(x, obj, oldObj);
-            if ( rule.getStops() ) {
-              break;
-            }
-          }
+        List<Rule> group = ((ArraySink) sink.getGroups().get(key)).getArray();
+        if ( ! group.isEmpty() ) {
+          new RuleEngine(x, getDelegate()).execute(group, obj, oldObj);
         }
       }
       `
