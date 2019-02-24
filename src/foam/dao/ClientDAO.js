@@ -72,7 +72,7 @@ foam.CLASS({
     'foam.box.SkeletonBox',
     'foam.core.Serializable',
     'foam.dao.ArraySink',
-    'foam.dao.ClientSink',
+    'foam.dao.ClientSink'
   ],
 
   methods: [
@@ -81,30 +81,24 @@ foam.CLASS({
       code:     function put_(x, obj) {
         return this.SUPER(null, obj);
       },
-      javaCode: `
-return super.put_(null, obj);
-`,
-      swiftCode: 'return try super.put_(nil, obj)',
+      javaCode: 'return super.put_(null, obj);',
+      swiftCode: 'return try super.put_(nil, obj)'
     },
     {
       name: 'remove_',
       code: function remove_(x, obj) {
         return this.SUPER(null, obj);
       },
-      javaCode: `
-return super.remove_(null, obj);
-`,
-      swiftCode: 'return try super.remove_(nil, obj)',
+      javaCode: 'return super.remove_(null, obj);',
+      swiftCode: 'return try super.remove_(nil, obj)'
     },
     {
       name: 'find_',
       code:     function find_(x, key) {
         return this.SUPER(null, key);
       },
-      javaCode: `
-return super.find_(null, id);
-`,
-      swiftCode: 'return try super.find_(nil, id)',
+      javaCode: 'return super.find_(null, id);',
+      swiftCode: 'return try super.find_(nil, id)'
     },
     {
       name: 'select_',
@@ -139,9 +133,7 @@ return super.find_(null, id);
 
         return this.SUPER(null, sink, skip, limit, order, predicate);
       },
-      javaCode: `
-return super.select_(null, sink, skip, limit, order, predicate);
-`,
+      javaCode: 'return super.select_(null, sink, skip, limit, order, predicate);',
       swiftCode: `
 if sink is foam_core_Serializable {
   return try super.select_(nil, sink, skip, limit, order, predicate)
@@ -155,7 +147,7 @@ for o in result.array {
 }
 sink.eof()
 return sink
-`,
+`
     },
 
     {
@@ -167,10 +159,8 @@ return sink
 
         return this.SUPER(null, skip, limit, order, predicate);
       },
-      javaCode: `
-super.removeAll_(null, skip, limit, order, predicate);
-`,
-      swiftCode: 'try super.removeAll_(nil, skip, limit, order, predicate)',
+      javaCode: 'super.removeAll_(null, skip, limit, order, predicate);',
+      swiftCode: 'try super.removeAll_(nil, skip, limit, order, predicate)'
     },
 
     {
@@ -180,7 +170,7 @@ super.removeAll_(null, skip, limit, order, predicate);
         return foam.core.FObject.create();
       },
       javaCode: `super.listen_(null, sink, predicate);`,
-      swiftCode: `return try super.listen_(nil, sink, predicate)`,
+      swiftCode: `return try super.listen_(nil, sink, predicate)`
     }
   ]
 });
