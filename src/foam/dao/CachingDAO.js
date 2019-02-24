@@ -28,13 +28,13 @@
 */
 foam.CLASS({
   package: 'foam.dao',
-  name: 'CachingDAO',
+  name: 'LRUCachingDAO',
   extends: 'foam.dao.ProxyDAO',
 
   requires: [
     'foam.dao.DAOSink',
     'foam.dao.PromisedDAO',
-    'foam.dao.QuickSink',
+    'foam.dao.QuickSink'
   ],
 
   properties: [
@@ -48,7 +48,7 @@ foam.CLASS({
     {
       /** The cache to read items quickly. Cache contains a complete
         copy of src. */
-      name: 'cache',
+      name: 'cache'
     },
     {
       /**
@@ -79,7 +79,7 @@ foam.CLASS({
           promise: cacheFilled
         });
       }
-    },
+    }
   ],
 
   methods: [
