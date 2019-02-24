@@ -34,7 +34,7 @@ foam.CLASS({
             setJournal(new foam.dao.FileJournal.Builder(x)
               .setDao(delegate)
               .setFilename(filename)
-              .setCreateFile(false)
+              .setCreateFile(true)
               .build());
 
             /* Create a composite journal of repo journal and runtime journal
