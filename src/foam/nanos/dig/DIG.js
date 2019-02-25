@@ -101,7 +101,6 @@ foam.CLASS({
       expression: function(key, data, email, subject, daoKey, cmd, format, q, dataFile) {
         var query = false;
         var url = "/service/dig";
-        var q_;
 
         if ( daoKey ) {
           url += query ? "&" : "?";
