@@ -252,7 +252,7 @@ public class Outputter
 
   protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
 
-    if ( ! this.propertyPredicate(fo, prop) ) {
+    if ( ! propertyPredicate(fo, prop) ) {
       return false;
     }
 
@@ -270,7 +270,7 @@ public class Outputter
   }
 
   protected  boolean propertyPredicate( FObject fo, PropertyInfo prop) {
-    return ( outputDefaultValues_ || prop.isSet(fo) );
+    return outputDefaultValues_ || prop.isSet(fo);
   }
 
   protected void outputFObjectDelta(FObject oldFObject, FObject newFObject) {
