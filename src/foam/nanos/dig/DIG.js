@@ -131,33 +131,30 @@ foam.CLASS({
         if ( subject ) {
           url += query ? "&" : "?";
           query = true;
-          url += "subject=" + subject;
+          url += "subject=" + encodeURIComponent(subject);
         }
         if ( q ) {
-          //q_ is encoded query part
-          q_ = query ? "&" : "?";
+          url += query ? "&" : "?";
           query = true;
-          q_ += "q=" + encodeURIComponent(q);
+          url += "q=" + encodeURIComponent(q);
         }
         this.postURL = url;
 
-        if ( q_ ) this.postURL += q_;
 
         if ( dataFile ) {
           url += query ? "&" : "?";
           query = true;
-          url += "&fileaddress=" + dataFile.address;
+          url += "&fileaddress=" + encodeURIComponent(dataFile.address);
         }
         if ( data ) {
           if ( data.length + url.length < this.MAX_URL_SIZE ) {
             url += query ? "&" : "?";
             query = true;
-            url += "data=" + data;
+            url += "data=" + encodeURIComponent(data);
           }
         }
 
-        if ( q_ ) return encodeURI(url) +  q_;
-        else return encodeURI(url);
+        return url;
       }
     },
     {
