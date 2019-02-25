@@ -16,7 +16,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'code',
-      documentation: 'ISO 3166-1 alpha-2 Country codes.'
+      documentation: 'ISO 3166-1 alpha-2 Country codes.',
+      view: {
+        class: 'foam.u2.CompositeView',
+        views: [
+          { class: 'foam.u2.TextField' },
+          { class: 'foam.u2.tag.TextArea' }
+        ]
+      }
     },
     {
       class: 'String',
