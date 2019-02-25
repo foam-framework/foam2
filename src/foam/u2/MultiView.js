@@ -1,7 +1,16 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.u2',
-  name: 'CompositeView',
+  name: 'MultiView',
   extends: 'foam.u2.View',
+  documentation: `
+    A view that binds multiple views to the same data and renders them all.
+  `,
   properties: [
     {
       class: 'FObjectArray',

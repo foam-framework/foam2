@@ -18,9 +18,10 @@ foam.CLASS({
       name: 'code',
       documentation: 'ISO 3166-1 alpha-2 Country codes.',
       view: {
-        class: 'foam.u2.CompositeView',
+        class: 'foam.u2.MultiView',
         views: [
           { class: 'foam.u2.TextField' },
+          { class: 'foam.u2.Element', nodeName: 'br' },
           { class: 'foam.u2.tag.TextArea' }
         ]
       }
