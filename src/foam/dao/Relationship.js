@@ -864,13 +864,13 @@ foam.CLASS({
         return function(x) {
           return foam.dao.ManyToManyRelationshipImpl.create({
             sourceId: this.id,
-            sourceProperty: self.sourceProperty,
-            targetProperty: self.targetProperty,
+            sourceProperty: x.lookup(self.junction).getAxiomByName(self.sourceProperty),
+            targetProperty: x.lookup(self.junction).getAxiomByName(self.targetProperty),
             targetDAOKey: self.targetDAOKey,
             junctionDAOKey: self.junctionDAOKey,
-            junction: self.junction
+            junction: x.lookup(self.junction)
           }, x);
-        }
+        };
       },
     },
     {
