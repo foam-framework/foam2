@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -9,7 +9,8 @@ foam.CLASS({
   name: 'SessionTimer',
 
   properties: [
-    'timer', 'onSessionTimeout',
+    'timer',
+    'onSessionTimeout',
     {
       class: 'Boolean',
       name: 'enable',
@@ -18,18 +19,12 @@ foam.CLASS({
   ],
 
   methods: [
-    function startTimer ( sessionSoftLimit ) {
+    function startTimer(sessionSoftLimit) {
+      if ( ! this.enable ) return;
 
-      if ( ! this.enable ) {
-        return;
-      }
+      if ( this.timer !== null ) clearTimeout(this.timer);
 
-      if ( this.timer !== null ) {
-        clearTimeout(this.timer);
-        this.timer = null;
-      }
-
-      this.timer = setTimeout(this.onSessionTimeout, sessionSoftLimit )
+      this.timer = setTimeout(this.onSessionTimeout, sessionSoftLimit);
     }
   ]
 });
