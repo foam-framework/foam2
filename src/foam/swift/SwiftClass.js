@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.swift',
   name: 'SwiftClass',
+  flags: ['swift'],
 
   requires: [
     'foam.swift.Argument',

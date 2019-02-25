@@ -47,11 +47,12 @@ foam.CLASS({
     {
       name: 'select_',
       javaCode: `
-  if ( sink != null ) {
-    HidePropertiesSink hidePropertiesSink = new HidePropertiesSink(x, sink, this);
-  }
-
-  return super.select_(x, sink, skip, limit, order, predicate);
+      if ( x.get("auth") != null ) {
+        foam.dao.Sink sink2 = ( sink != null ) ? new HidePropertiesSink(x, sink, this) : sink;
+        super.select_(x, sink2, skip, limit, order, predicate);
+        return sink;
+      }
+      return super.select_(x, sink, skip, limit, order, predicate);
       `,
     },
 
@@ -219,22 +220,12 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      args: [
-        {
-          name: 'obj',
-          javaType: 'Object'
-        },
-        {
-          name: 'sub',
-          javaType: 'foam.core.Detachable'
-        }
-      ],
       javaCode: `
   FObject oldObj = this.dao.getDelegate().find(((FObject) obj).getProperty("id"));
   if (oldObj != null) {
-    super.put(this.dao.hideProperties(getX(), oldObj), sub);
+    getDelegate().put(this.dao.hideProperties(getX(), oldObj), sub);
   } else {
-    super.put(obj, sub);
+    getDelegate().put(obj, sub);
   }
       `
     }

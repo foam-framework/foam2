@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.swift',
   name: 'Protocol',
+  flags: ['swift'],
 
   requires: [
     'foam.swift.ProtocolMethod',
