@@ -101,6 +101,7 @@ foam.CLASS({
       expression: function(key, data, email, subject, daoKey, cmd, format, q, dataFile) {
         var query = false;
         var url = "/service/dig";
+        var q_;
 
         if ( daoKey ) {
           url += query ? "&" : "?";
@@ -133,11 +134,14 @@ foam.CLASS({
           url += "subject=" + subject;
         }
         if ( q ) {
-          url += query ? "&" : "?";
+          //q_ is encoded query part
+          q_ = query ? "&" : "?";
           query = true;
-          url += "q=" + q;
+          q_ += "q=" + encodeURIComponent(q);
         }
         this.postURL = url;
+
+        if ( q_ ) this.postURL += q_;
 
         if ( dataFile ) {
           url += query ? "&" : "?";
@@ -152,7 +156,8 @@ foam.CLASS({
           }
         }
 
-        return encodeURI(url);
+        if ( q_ ) return encodeURI(url) +  q_;
+        else return encodeURI(url);
       }
     },
     {
