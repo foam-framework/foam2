@@ -76,11 +76,11 @@ foam.CLASS({
       name: 'aliases',
       flags: ['js'],
       value: {
-        ARRAY: 'foam.dao.ArrayDAO',
+        ARRAY:  'foam.dao.ArrayDAO',
         CLIENT: 'foam.dao.RequestResponseClientDAO',
-        IDB: 'foam.dao.IDBDAO',
-        LOCAL: 'foam.dao.LocalStorageDAO',
-        MDAO: 'foam.dao.MDAO'
+        IDB:    'foam.dao.IDBDAO',
+        LOCAL:  'foam.dao.LocalStorageDAO',
+        MDAO:   'foam.dao.MDAO'
       }
     }
   ],
@@ -90,9 +90,7 @@ foam.CLASS({
       /** The developer-friendly name for this EasyDAO. */
       class: 'String',
       name: 'name',
-      factory: function() {
- return this.of.id;
-}
+      factory: function() { return this.of.id; }
     },
     {
       /** This is set automatically when you create an EasyDAO.
@@ -525,9 +523,7 @@ return delegate;
 
               self.log('Loading test data');
               Promise.all(foam.json.parse(self.testData, self.of, self).map(
-                function(o) {
- return delegate.put(o);
-}
+                function(o) { return delegate.put(o); }
               )).then(function() {
                 self.log('Loaded', self.testData.length, 'records.');
                 resolve(delegate);
