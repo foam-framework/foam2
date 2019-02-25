@@ -47,6 +47,7 @@ foam.CLASS({
           });
         } else {
 
+          // fetch the soft session limit from group, and then start the timer
           if ( this.group.id !== "" && this.group.softSessionLimit !== 0 ) {
             this.sessionTimer.startTimer(this.group.softSessionLimit);
           }
