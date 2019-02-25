@@ -53,7 +53,6 @@ foam.CLASS({
       var menu = this.menu;
       var X    = this.__subContext__;
 
-      //this.callSubMenus(menu, X);
       menu.children.orderBy(this.Menu.ORDER, this.Menu.LABEL).select({
         put: function(menu) {
           if ( ! menu.handler ) return;
@@ -63,41 +62,11 @@ foam.CLASS({
               .on('click', function() {
                 // TODO: if a submenu, don't close until child closed
                 self.close();
-
-                console.log("111 : " + menu.label);
-                self.callSubMenus(menu, X);
                 menu.launch_(X, e);
               })
-              .add(menu.label); // subMenu
+              .add(menu.label);
             })
           .end();
-        },
-        eof: function() {}
-      });
-    },
-
-    function callSubMenus(menu, X) {
-      var self = this;
-
-      menu.children.orderBy(menu.ORDER, menu.LABEL).select({
-        put: function(menu_) {
-        console.log("menu_ : " + menu_.label);
-          //if ( menu_.label ) {//return;
-            self.start('div').call(function() {
-              var e = self;
-              this
-                .on('mouseover', function() {
-                  // TODO: if a submenu, don't close until child closed
-                  self.close();
-
-                  console.log("fff: " + menu_.label);
-
-                  menu_.launch_(X, e);
-                })
-                .add(menu_.label); // subMenu
-              })
-            .end();
-          //}
         },
         eof: function() {}
       });
