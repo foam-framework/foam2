@@ -51,9 +51,11 @@ foam.CLASS({
       class: 'String',
       name: 'body',
       view: {
-        class: 'foam.u2.view.DualView',
-        viewa: { class: 'foam.u2.HTMLView' },
-        viewb: { class: 'foam.u2.tag.TextArea', rows: 30, cols: 130 }
+        class: 'foam.u2.MultiView',
+        views: [
+          { class: 'foam.u2.HTMLView' },
+          { class: 'foam.u2.tag.TextArea', rows: 30, cols: 130 }
+        ]
       }
     },
     {
