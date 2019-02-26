@@ -331,7 +331,7 @@ var classes = [
   'foam.nanos.ruler.ScriptPredicate',
   'foam.comics.SearchMode',
 
-  // Support Files
+  //Support Files
   'foam.support.model.TicketMessage',
   'foam.support.model.SupportEmail',
   'foam.support.model.Ticket',

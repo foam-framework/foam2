@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'EasyDAO',
   extends: 'foam.dao.ProxyDAO',
-  implements: ['foam.mlang.Expressions'],
+  implements: [ 'foam.mlang.Expressions' ],
 
   documentation: function() {/*
     Facade for easily creating decorated DAOs.
