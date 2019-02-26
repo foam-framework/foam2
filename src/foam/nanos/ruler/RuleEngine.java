@@ -25,6 +25,7 @@ public class RuleEngine extends ContextAwareSupport {
   private AtomicBoolean stops_ = new AtomicBoolean(false);
   private Map<Long, Object> results_ = new HashMap<>();
   private Map<Long, RuleHistory> ruleHistorySaved_ = new HashMap<>();
+  private Rule currentRule_ = null;
 
   public RuleEngine(X x, DAO delegate) {
     setX(x);
@@ -54,6 +55,7 @@ public class RuleEngine extends ContextAwareSupport {
     for (Rule rule : rules) {
       if ( stops_.get() ) return;
 
+      currentRule_ = rule;
       if ( rule.f(getX(), obj, oldObj) ) {
         rule.apply(getX(), obj, oldObj, this);
         saveHistory(rule, obj);
@@ -70,15 +72,15 @@ public class RuleEngine extends ContextAwareSupport {
   }
 
   /**
-   * Store result of rule execution
+   * Store result of current rule execution
    * @param result
    */
-  public void putResult(long key, Object result) {
-    results_.put(key, result);
+  public void putResult(Object result) {
+    results_.put(currentRule_.getId(), result);
   }
 
-  public Object getResult(long key) {
-    return results_.get(key);
+  public Object getResult(long ruleId) {
+    return results_.get(ruleId);
   }
 
   private void asyncApplyRules(List<Rule> rules, FObject obj, FObject oldObj) {
@@ -88,6 +90,7 @@ public class RuleEngine extends ContextAwareSupport {
         for (Rule rule : rules) {
           if ( stops_.get() ) return;
 
+          currentRule_ = rule;
           if ( rule.f(getX(), obj, oldObj) ) {
             rule.asyncApply(getX(), obj, oldObj, RuleEngine.this);
             saveHistory(rule, obj);
