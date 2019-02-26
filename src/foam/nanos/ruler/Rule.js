@@ -112,6 +112,12 @@
       name: 'enabled',
       value: true,
       documentation: 'Enables the rule.'
+    },
+    {
+      class: 'Boolean',
+      name: 'saveHistory',
+      value: false,
+      documentation: 'Determines if history of rule execution should be saved.'
     }
   ],
 
