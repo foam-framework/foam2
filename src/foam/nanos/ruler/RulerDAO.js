@@ -144,7 +144,8 @@
           EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
         ),
         EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, false)
+        EQ(Rule.AFTER, false),
+        EQ(Rule.ENABLED, true)
       )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
       setCreateBefore(createdBefore);
 
@@ -154,7 +155,8 @@
           EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
         ),
         EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, false)
+        EQ(Rule.AFTER, false),
+        EQ(Rule.ENABLED, true)
       )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
       setUpdateBefore(updatedBefore);
 
@@ -164,7 +166,8 @@
           EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
         ),
         EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, true)
+        EQ(Rule.AFTER, true),
+        EQ(Rule.ENABLED, true)
       )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
       setCreateAfter(createdAfter);
 
@@ -174,21 +177,24 @@
           EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
         ),
         EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, true)
+        EQ(Rule.AFTER, true),
+        EQ(Rule.ENABLED, true)
       )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
       setUpdateAfter(updatedAfter);
 
       GroupBy removedBefore = (GroupBy) ruleDAO.where(AND(
         EQ(Rule.OPERATION, Operations.REMOVE),
         EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, false)
+        EQ(Rule.AFTER, false),
+        EQ(Rule.ENABLED, true)
       )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
       setRemoveBefore(removedBefore);
 
       GroupBy removedAfter = (GroupBy) ruleDAO.where(AND(
         EQ(Rule.OPERATION, Operations.REMOVE),
         EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, true)
+        EQ(Rule.AFTER, true),
+        EQ(Rule.ENABLED, true)
       )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
       setRemoveAfter(removedAfter);
         `

@@ -106,6 +106,12 @@
         public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) { /*noop*/ }
       };`,
       documentation: 'The action to be executed asynchronously if predicates returns true for passed object.'
+    },
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      value: true,
+      documentation: 'Enables the rule.'
     }
   ],
 
