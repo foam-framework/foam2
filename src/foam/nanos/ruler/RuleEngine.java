@@ -52,15 +52,7 @@ public class RuleEngine extends ContextAwareSupport {
    * @param oldObj - Old FObject supplied to rules for execution
    */
   public void execute(List<Rule> rules, FObject obj, FObject oldObj) {
-    for (Rule rule : rules) {
-      if ( stops_.get() ) return;
-
-      currentRule_ = rule;
-      if ( rule.f(getX(), obj, oldObj) ) {
-        rule.apply(getX(), obj, oldObj, this);
-        saveHistory(rule, obj);
-      }
-    }
+    applyRules(rules, obj, oldObj);
     asyncApplyRules(rules, obj, oldObj);
   }
 
@@ -81,6 +73,18 @@ public class RuleEngine extends ContextAwareSupport {
 
   public Object getResult(long ruleId) {
     return results_.get(ruleId);
+  }
+
+  private void applyRules(List<Rule> rules, FObject obj, FObject oldObj) {
+    for (Rule rule : rules) {
+      if ( stops_.get() ) return;
+
+      currentRule_ = rule;
+      if ( rule.f(getX(), obj, oldObj) ) {
+        rule.apply(getX(), obj, oldObj, this);
+        saveHistory(rule, obj);
+      }
+    }
   }
 
   private void asyncApplyRules(List<Rule> rules, FObject obj, FObject oldObj) {
