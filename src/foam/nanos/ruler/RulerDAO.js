@@ -138,64 +138,57 @@
       ],
       javaCode: `
       DAO ruleDAO = (DAO) x.get("ruleDAO");
-      GroupBy createdBefore = (GroupBy) ruleDAO.where(AND(
-        OR(
-          EQ(Rule.OPERATION, Operations.CREATE),
-          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
-        ),
+      DAO beforeDAO = ruleDAO.where(AND(
         EQ(Rule.DAO_KEY, getDaoKey()),
         EQ(Rule.AFTER, false),
         EQ(Rule.ENABLED, true)
-      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+      )).orderBy(new Desc(Rule.PRIORITY));
+      DAO afterDAO = ruleDAO.where(AND(
+        EQ(Rule.DAO_KEY, getDaoKey()),
+        EQ(Rule.AFTER, true),
+        EQ(Rule.ENABLED, true)
+      )).orderBy(new Desc(Rule.PRIORITY));
+
+      GroupBy createdBefore = (GroupBy) beforeDAO.where(
+        OR(
+          EQ(Rule.OPERATION, Operations.CREATE),
+          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+        )
+      ).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
       setCreateBefore(createdBefore);
 
-      GroupBy updatedBefore = (GroupBy) ruleDAO.where(AND(
+      GroupBy updatedBefore = (GroupBy) beforeDAO.where(
         OR(
           EQ(Rule.OPERATION, Operations.UPDATE),
           EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
-        ),
-        EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, false),
-        EQ(Rule.ENABLED, true)
-      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+        )
+      ).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
       setUpdateBefore(updatedBefore);
 
-      GroupBy createdAfter = (GroupBy) ruleDAO.where(AND(
+      GroupBy createdAfter = (GroupBy) afterDAO.where(
         OR(
           EQ(Rule.OPERATION, Operations.CREATE),
           EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
-        ),
-        EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, true),
-        EQ(Rule.ENABLED, true)
-      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+        )
+      ).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
       setCreateAfter(createdAfter);
 
-      GroupBy updatedAfter = (GroupBy) ruleDAO.where(AND(
+      GroupBy updatedAfter = (GroupBy) afterDAO.where(
         OR(
           EQ(Rule.OPERATION, Operations.CREATE),
           EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
-        ),
-        EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, true),
-        EQ(Rule.ENABLED, true)
-      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+        )
+      ).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
       setUpdateAfter(updatedAfter);
 
-      GroupBy removedBefore = (GroupBy) ruleDAO.where(AND(
-        EQ(Rule.OPERATION, Operations.REMOVE),
-        EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, false),
-        EQ(Rule.ENABLED, true)
-      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+      GroupBy removedBefore = (GroupBy) beforeDAO.where(
+        EQ(Rule.OPERATION, Operations.REMOVE)
+      ).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
       setRemoveBefore(removedBefore);
 
-      GroupBy removedAfter = (GroupBy) ruleDAO.where(AND(
-        EQ(Rule.OPERATION, Operations.REMOVE),
-        EQ(Rule.DAO_KEY, getDaoKey()),
-        EQ(Rule.AFTER, true),
-        EQ(Rule.ENABLED, true)
-      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+      GroupBy removedAfter = (GroupBy) afterDAO.where(
+        EQ(Rule.OPERATION, Operations.REMOVE)
+      ).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
       setRemoveAfter(removedAfter);
         `
     }
