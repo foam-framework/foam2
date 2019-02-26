@@ -68,13 +68,13 @@ foam.CLASS({
     }
   ],
 
-  imports: ['document'],
+  imports: [ 'document' ],
 
   constants: [
     {
       // Aliases for daoType
       name: 'aliases',
-      flags: ['js'],
+      flags: [ 'js' ],
       value: {
         ARRAY:  'foam.dao.ArrayDAO',
         CLIENT: 'foam.dao.RequestResponseClientDAO',
@@ -323,12 +323,12 @@ return delegate;
           delegate: this.remoteListenerSupport ?
             this.WebSocketBox.create({ uri: this.serviceName }) :
             this.HTTPBox.create({ url: this.serviceName })
-        });
+        })
         if ( this.retryBoxMaxAttempts != 0 ) {
           box = this.RetryBox.create({
             maxAttempts: this.retryBoxMaxAttempts,
             delegate: box,
-          });
+          })
         }
         return this.SessionClientBox.create({ delegate: box });
       }
@@ -386,13 +386,13 @@ return delegate;
 
       if ( ! daoModel ) {
         this.__context__.warn(
-          'EasyDAO: Unknown DAO Type.  Add \'' + daoType + '\' to requires: list.'
+          "EasyDAO: Unknown DAO Type.  Add '" + daoType + "' to requires: list."
         );
       }
 
       if ( this.name && daoModel.getAxiomByName('name') ) params.name = this.name;
       if ( daoModel.getAxiomByName('autoIndex') ) params.autoIndex = this.autoIndex;
-      // if ( this.seqNo || this.guid ) params.property = this.seqProperty;
+      //if ( this.seqNo || this.guid ) params.property = this.seqProperty;
 
       var dao = daoModel.create(params, this.__subContext__);
 
@@ -401,7 +401,7 @@ return delegate;
 
       if ( this.MDAO.isInstance(dao) ) {
         this.mdao = dao;
-        if ( this.dedup ) dao = this.DeDupDAO.create({ delegate: dao });
+        if ( this.dedup ) dao = this.DeDupDAO.create({delegate: dao});
       } else {
 //         if ( this.migrationRules && this.migrationRules.length ) {
 //           dao = this.MigrationDAO.create({
@@ -411,13 +411,13 @@ return delegate;
 //           });
 //         }
         if ( this.cache ) {
-          this.mdao = this.MDAO.create({ of: params.of });
+          this.mdao = this.MDAO.create({of: params.of});
           dao = this.CachingDAO.create({
             cache: this.dedup ?
               this.mdao :
-              this.DeDupDAO.create({ delegate: this.mdao }),
+              this.DeDupDAO.create({delegate: this.mdao}),
             src: dao,
-            of: this.model });
+            of: this.model});
         }
       }
 
@@ -428,29 +428,29 @@ return delegate;
         });
       }
 
-      if ( this.seqNo && this.guid ) throw 'EasyDAO \'seqNo\' and \'guid\' features are mutually exclusive.';
+      if ( this.seqNo && this.guid ) throw "EasyDAO 'seqNo' and 'guid' features are mutually exclusive.";
 
       if ( this.seqNo ) {
-        var args = { __proto__: params, delegate: dao, of: this.of };
+        var args = {__proto__: params, delegate: dao, of: this.of};
         if ( this.seqProperty ) args.property = this.seqProperty;
         dao = this.SequenceNumberDAO.create(args);
       }
 
       if ( this.guid ) {
-        var args = { __proto__: params, delegate: dao, of: this.of };
+        var args = {__proto__: params, delegate: dao, of: this.of};
         if ( this.seqProperty ) args.property = this.seqProperty;
         dao = this.GUIDDAO.create(args);
       }
 
       var cls = this.of;
 
-      if ( this.syncWithServer && this.isServer ) throw 'isServer and syncWithServer are mutually exclusive.';
+      if ( this.syncWithServer && this.isServer ) throw "isServer and syncWithServer are mutually exclusive.";
 
       if ( this.syncWithServer || this.isServer ) {
         if ( ! this.syncProperty ) {
           this.syncProperty = cls.SYNC_PROPERTY;
           if ( ! this.syncProperty ) {
-            throw 'EasyDAO sync with class ' + cls.id + ' invalid. Sync requires a sync property be set, or be of a class including a property \'sync_property\'.';
+            throw "EasyDAO sync with class " + cls.id + " invalid. Sync requires a sync property be set, or be of a class including a property 'sync_property'.";
           }
         }
       }
@@ -484,7 +484,7 @@ return delegate;
 //       }
 
       if ( this.contextualize ) {
-        dao = this.ContextualizingDAO.create({ delegate: dao });
+        dao = this.ContextualizingDAO.create({delegate: dao});
       }
 
       if ( this.decorators.length ) {
@@ -521,11 +521,11 @@ return delegate;
                 return;
               }
 
-              self.log('Loading test data');
+              self.log("Loading test data");
               Promise.all(foam.json.parse(self.testData, self.of, self).map(
                 function(o) { return delegate.put(o); }
               )).then(function() {
-                self.log('Loaded', self.testData.length, 'records.');
+                self.log("Loaded", self.testData.length, "records.");
                 resolve(delegate);
               }, reject);
             });
@@ -544,8 +544,8 @@ return delegate;
     {
       name: 'addPropertyIndex',
       type: 'foam.dao.EasyDAO',
-      args: [{ javaType: 'foam.core.PropertyInfo', name: 'prop' }],
-      code: function addPropertyIndex() {
+      args: [ { javaType: 'foam.core.PropertyInfo', name: 'prop' } ],
+      code:     function addPropertyIndex() {
         this.mdao && this.mdao.addPropertyIndex.apply(this.mdao, arguments);
         return this;
       },
@@ -566,7 +566,7 @@ return this;
       name: 'addIndex',
       type: 'foam.dao.EasyDAO',
       // TODO: The java Index interface conflicts with the js CLASS Index
-      args: [{ javaType: 'foam.dao.index.Index', name: 'index' }],
+      args: [ { javaType: 'foam.dao.index.Index', name: 'index' } ],
       code: function addIndex(index) {
         this.mdao && this.mdao.addIndex.apply(this.mdao, arguments);
         return this;
