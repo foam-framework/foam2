@@ -223,7 +223,7 @@ FOAM_FILES([
   { name: "foam/dao/RoutingJournal", flags: ['java'] },
   { name: "foam/dao/RoutingJournalTest", flags: ['java'] },
   { name: "foam/dao/RoutingJDAO", flags: ['java'] },
-  { name: "foam/dao/JournalType", flags: ['java'] },
+  { name: 'foam/dao/JournalType' },
   { name: "foam/dao/Relationship" },
   { name: "foam/dao/RelationshipDAO" },
   { name: "foam/dao/ManyToManyRelationshipDAO" },
