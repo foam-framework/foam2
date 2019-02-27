@@ -62,10 +62,7 @@ foam.CLASS({
     'foam.dao.SequenceNumberDAO',
     'foam.dao.SyncDAO',
     'foam.dao.TimingDAO',
-    {
-      path: 'foam.dao.JournalType',
-      flags: ['java']
-    }
+    'foam.dao.JournalType'
   ],
 
   imports: [ 'document' ],
@@ -204,8 +201,7 @@ return delegate;
       class: 'foam.core.Enum',
       of: 'foam.dao.JournalType',
       name: 'journalType',
-      value: 'NO_JOURNAL',
-      flags: ['java']
+      value: 'NO_JOURNAL'
     },
     {
       class: 'String',
