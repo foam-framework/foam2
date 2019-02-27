@@ -8,6 +8,12 @@ foam.CLASS({
   package: 'foam.nanos.ruler',
   name: 'RuleHistory',
   documentation: 'Represents rule execution history.',
+
+  implements: [
+    'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.LastModifiedAware'
+  ],
+
   properties: [
     {
       class: 'Long',
