@@ -45,7 +45,12 @@ foam.CLASS({
     {
       class: 'Object',
       name: 'result',
-      documentation: 'Result of rule execution.'
+      documentation: 'Result of rule execution.',
+      tableCellFormatter: function (value) {
+        if (!!value) {
+          this.add(value.toString());
+        }
+      }
     }
   ]
 });
