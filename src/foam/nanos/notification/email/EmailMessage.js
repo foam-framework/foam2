@@ -49,7 +49,14 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'body'
+      name: 'body',
+      view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          { class: 'foam.u2.HTMLView' },
+          { class: 'foam.u2.tag.TextArea', rows: 30, cols: 130 }
+        ]
+      }
     },
     {
       class: 'String',

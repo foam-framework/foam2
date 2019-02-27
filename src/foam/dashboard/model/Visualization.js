@@ -131,7 +131,7 @@ foam.CLASS({
     },
     {
       class: 'Enum',
-      type: 'foam.dashboard.model.VisualizationSize',
+      of: 'foam.dashboard.model.VisualizationSize',
       name: 'size',
       value: 'MEDIUM'
     },
