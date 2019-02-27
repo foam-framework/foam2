@@ -51,6 +51,7 @@ public class RulerDAOTest extends Test {
   public void createRule(X x) {
     // first rule stops execution of rules with a lower priority within the same group
     rule1 = new Rule();
+    rule1.setId(1);
     rule1.setName("userDAO email filter");
     rule1.setRuleGroup("users:email filter");
     rule1.setDaoKey("localUserDAO");
@@ -63,6 +64,7 @@ public class RulerDAOTest extends Test {
 
     //the rule has a higher priority than the first rule, changes user's email from nanos@nanos.net to foam@nanos.net
     rule2 = new Rule();
+    rule2.setId(2);
     rule2.setName("userDAO email filter");
     rule2.setRuleGroup("users:email filter");
     rule2.setDaoKey("localUserDAO");
@@ -86,6 +88,7 @@ public class RulerDAOTest extends Test {
 
     //the rule has lower priority than the first one => should never be executed
     rule3 = new Rule();
+    rule3.setId(3);
     rule3.setName("userDAO email filter");
     rule3.setRuleGroup("users:email filter");
     rule3.setDaoKey("localUserDAO");
@@ -100,9 +103,10 @@ public class RulerDAOTest extends Test {
 
     //the rule has lower priority than the first one but has different group so should be executed
     rule4 = new Rule();
+    rule4.setId(4);
     rule4.setName("userDAO lastName filter");
     rule4.setRuleGroup("users:change lastName");
-   rule4.setDaoKey("localUserDAO");
+    rule4.setDaoKey("localUserDAO");
     rule4.setOperation(Operations.CREATE);
     rule4.setAfter(false);
     rule4.setPriority(10);
@@ -120,6 +124,7 @@ public class RulerDAOTest extends Test {
 
     //the rule has lower priority than the first one but has different group so should be executed
     rule5 = new Rule();
+    rule5.setId(5);
     rule5.setName("userDAO lastName filter");
     rule5.setRuleGroup("users:change lastName");
     rule5.setDaoKey("localUserDAO");
