@@ -15,10 +15,6 @@
     See RulerDAOTest for examples. 
   `,
 
-  imports: [
-    'ruleDAO'
-  ],
-
   javaImports: [
     'foam.core.FObject',
     'foam.dao.ArraySink',
@@ -41,7 +37,7 @@
       class: 'foam.dao.DAOProperty',
       name: 'beforeDao',
       javaFactory: `
-        return ((DAO) getRuleDAO()).where(AND(
+        return ((DAO) getX().get("ruleDAO")).where(AND(
           EQ(Rule.DAO_KEY, getDaoKey()),
           EQ(Rule.AFTER, false),
           EQ(Rule.ENABLED, true)
@@ -52,7 +48,7 @@
       class: 'foam.dao.DAOProperty',
       name: 'afterDao',
       javaFactory: `
-        return ((DAO) getRuleDAO()).where(AND(
+        return ((DAO) getX().get("ruleDAO")).where(AND(
           EQ(Rule.DAO_KEY, getDaoKey()),
           EQ(Rule.AFTER, true),
           EQ(Rule.ENABLED, true)
