@@ -16,7 +16,9 @@ public class RulerDAOTest extends Test {
   int asyncWait = 1000;
 
   public void runTest(X x) {
+    x = TestUtils.mockDAO(x, "ruleDAO");
     x = TestUtils.mockDAO(x, "localUserDAO");
+
     ruleDAO = ((DAO) x.get("ruleDAO"));
     userDAO = new RulerDAO(x, (DAO) x.get("localUserDAO"), "localUserDAO");
     createRule(x);
