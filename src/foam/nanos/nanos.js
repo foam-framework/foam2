@@ -83,6 +83,8 @@ FOAM_FILES([
   { name: "foam/nanos/bench/Benchmark" },
   { name: "foam/nanos/boot/NSpec" },
   { name: "foam/nanos/boot/NSpecAware" },
+  { name: "foam/nanos/session/Session" },
+  { name: "foam/nanos/session/SessionTimer" },
   { name: "foam/nanos/menu/AbstractMenu" },
   { name: "foam/nanos/menu/DAOMenu" },
   { name: "foam/nanos/menu/DocumentMenu" },

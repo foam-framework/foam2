@@ -6,6 +6,7 @@
 
 foam.LIB({
   name: 'foam.java',
+  flags: ['java'],
   methods: [
     {
       name: 'asJavaValue',
@@ -66,6 +67,7 @@ foam.CLASS({
   package: 'foam.java',
   name: 'JavaType',
   extends: 'String',
+  flags: ['java'],
   properties: [
     {
       name: 'flags',
@@ -1679,6 +1681,7 @@ foam.CLASS({
         return idProp;
       }
     },
+    { name: 'type',            factory: function() { return this.referencedProperty.type; } },
     { name: 'javaType',        factory: function() { return this.referencedProperty.javaType; } },
     { name: 'javaJSONParser',  factory: function() { return this.referencedProperty.javaJSONParser; } },
     { name: 'javaQueryParser', factory: function() { return this.referencedProperty.javaQueryParser; } },

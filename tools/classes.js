@@ -48,6 +48,9 @@ var classes = [
   'foam.mlang.predicate.Eq',
   'foam.mlang.Constant',
   'foam.mlang.ArrayConstant',
+  'foam.mlang.expr.Dot',
+  'foam.mlang.PredicatedExpr',
+  'foam.mlang.ContextObject',
   'foam.box.Box',
   'foam.box.Skeleton',
   'foam.box.AbstractSkeleton',
@@ -329,7 +332,6 @@ var classes = [
   'foam.flow.Document',
   'foam.flow.DocumentationFolderDAO',
 
-  'foam.nanos.ruler.AbstractRule',
   'foam.nanos.ruler.Rule',
   'foam.nanos.ruler.RulerDAO',
   'foam.nanos.ruler.Operations',
@@ -383,7 +385,6 @@ var proxies = [
 
 var blacklist = [
   'foam.core.Property',
-  'foam.mlang.expr.Dot',
   'foam.mlang.expr.Mul',
   'foam.mlang.predicate.Func',
   'foam.u2.AttrSlot',
