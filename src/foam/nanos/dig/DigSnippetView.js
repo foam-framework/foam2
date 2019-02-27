@@ -62,7 +62,7 @@ foam.CLASS({
     {
       name: 'dao',
       expression: function(data) {
-        if ( data ) return /dao=([^&]+)/.exec(data)[1];
+        if ( data ) return new URLSearchParams(data).get("dao");
       }
     },
     {
