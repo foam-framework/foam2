@@ -11,7 +11,6 @@ import foam.core.ContextAwareSupport;
 import foam.core.FObject;
 import foam.core.X;
 import foam.dao.DAO;
-import foam.nanos.boot.NSpec;
 import foam.nanos.pool.FixedThreadPool;
 
 import java.util.HashMap;
@@ -24,7 +23,7 @@ public class RuleEngine extends ContextAwareSupport {
   private DAO ruleHistoryDAO_ = null;
   private AtomicBoolean stops_ = new AtomicBoolean(false);
   private Map<Long, Object> results_ = new HashMap<>();
-  private Map<Long, RuleHistory> ruleHistorySaved_ = new HashMap<>();
+  private Map<Long, RuleHistory> savedRuleHistory_ = new HashMap<>();
   private Rule currentRule_ = null;
 
   public RuleEngine(X x, DAO delegate) {
@@ -109,15 +108,16 @@ public class RuleEngine extends ContextAwareSupport {
       return;
     }
 
-    RuleHistory record = ruleHistorySaved_.get(rule.getId());
+    RuleHistory record = savedRuleHistory_.get(rule.getId());
     if ( record == null ) {
       record = new RuleHistory.Builder(getX())
         .setRuleId(rule.getId())
         .setObjectId(obj.getProperty("id"))
-        .setObjectDaoKey((String) getX().get(NSpec.class).getId())
+        .setObjectDaoKey(rule.getDaoKey())
         .build();
     }
     record.setResult(getResult(rule.getId()));
-    ruleHistoryDAO_.put(record);
+    savedRuleHistory_.put(rule.getId(),
+      (RuleHistory) ruleHistoryDAO_.put(record).fclone());
   }
 }
