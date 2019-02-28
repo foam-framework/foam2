@@ -18,10 +18,10 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.auth.Group',
-    'foam.nanos.auth.Permission',
     'foam.graphics.Label',
-    'foam.graphics.ScrollCView'
+    'foam.graphics.ScrollCView',
+    'foam.nanos.auth.Group',
+    'foam.nanos.auth.Permission'
   ],
 
   constants: {
@@ -220,11 +220,11 @@ foam.CLASS({
         if ( pid == '*' ) return null;
         var i = pid.lastIndexOf('.');
         pid = ( i == -1 ) ? '*' : pid.substring(0, i) + '.*';
-        if ( pid in this.pMap ) return this.getGroupPermission(this.pMap[pid], g);
+        if ( pid in this.pMap ) return this.getGroupPermission(g, this.pMap[pid]);
       }
     },
 
-    function getGroupPermission(p, g) {
+    function getGroupPermission(g, p) {
       var key  = p.id + ':' + g.id;
       var data = this.gpMap[key];
 
@@ -239,7 +239,7 @@ foam.CLASS({
         if ( g.parent ) {
           var a = this.gMap[g.parent];
           if ( a ) {
-            var parent = g.parent && this.getGroupPermission(p, a);
+            var parent = g.parent && this.getGroupPermission(a, p);
             if ( parent ) {
               function update() {
                 data.impliedByParentGroup = parent.granted;
@@ -269,7 +269,7 @@ foam.CLASS({
     function createCheckBox(p, g) {
       var self = this;
       return function() {
-        var data = self.getGroupPermission(p, g);
+        var data = self.getGroupPermission(g, p);
         data.checked$.sub(function() {
           self.updateGroup(p, g, data.checked$, self);
         });
