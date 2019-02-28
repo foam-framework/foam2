@@ -270,13 +270,13 @@ return on.sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
   guard let topic = args[1] as? String else { return }
   switch topic {
     case "put":
-      mySink.put(args.last as! foam_core_FObject, sub)
+      mySink?.put(args.last as! foam_core_FObject, sub)
       break
     case "remove":
-      mySink.remove(args.last as! foam_core_FObject, sub)
+      mySink?.remove(args.last as! foam_core_FObject, sub)
       break
     case "reset":
-      mySink.reset(sub)
+      mySink?.reset(sub)
       break
     default:
       break
@@ -300,7 +300,6 @@ listeners_.add(new DAOListener(sink, listeners_));
         {
           name: 'predicate',
           type: 'foam.mlang.predicate.Predicate',
-          optional: true
         },
       ],
       code: function decorateListener_(sink, predicate) {
@@ -353,12 +352,10 @@ return sink;
         {
           name: 'order',
           type: 'foam.mlang.order.Comparator',
-          optional: true
         },
         {
           name: 'predicate',
           type: 'foam.mlang.predicate.Predicate',
-          optional: true
         },
       ],
       code: function decorateSink_(sink, skip, limit, order, predicate) {

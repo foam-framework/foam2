@@ -23,12 +23,12 @@ foam.CLASS({
     {
       name: 'parse',
       swiftCode: function() {/*
-var ps = ps
+var ps = ps!
 for i in 0..<string.count {
   if !ps.valid() || ps.head() != string.char(at: i) {
     return nil
   }
-  ps = ps.tail()
+  ps = ps.tail()!
 }
 return ps.setValue(self.value)
       */},

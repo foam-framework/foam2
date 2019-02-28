@@ -398,6 +398,7 @@ for (key, child) in children {
         return this.children[key];
       },
       swiftCode: `
+let key = key!
 if children[key] == nil {
   children[key] = __context__.create(foam_core_EventProxy.self, args: [
     "parent": self,
@@ -429,11 +430,12 @@ return children[key]!
         c.active = active;
       },
       swiftCode: `
+let topics = topics!
 var c = self
 var active = true
 for t in topics {
   active = active && !c.active
-  c = c.getChild(t)
+  c = c.getChild(t)!
 }
 
 c.active = active;

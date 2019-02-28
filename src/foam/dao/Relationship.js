@@ -20,6 +20,7 @@ foam.CLASS({
   ],
 
   properties: [
+    'flags',
     {
       name: 'id',
       hidden: true,
@@ -169,6 +170,7 @@ foam.CLASS({
     function initSource(x) {
       if ( this.sourceInitialized ) return;
       this.sourceInitialized = true;
+      if ( ! foam.util.flagFilter(global.FOAM_FLAGS)(this) ) return;
 
       var context = x || this.__context__;
 
@@ -210,6 +212,7 @@ foam.CLASS({
     function initTarget(x) {
       if ( this.targetInitialized ) return;
       this.targetInitialized = true;
+      if ( ! foam.util.flagFilter(global.FOAM_FLAGS)(this) ) return;
 
       var context = x || this.__context__;
 
@@ -249,6 +252,7 @@ foam.CLASS({
     function initJunction(x) {
       if ( this.junctionInitialized ) return;
       this.junctionInitialized = true;
+      if ( ! foam.util.flagFilter(global.FOAM_FLAGS)(this) ) return;
 
       // Only need a junction class if this is a Many to Many
       // relationship.
@@ -713,7 +717,7 @@ foam.CLASS({
       flags: ['swift'],
       expression: function(target, targetPropertyName, targetDAOKey) {
         return `
-          return x.create(foam_dao_RelationshipDAO.self, args: [
+          return x?.create(foam_dao_RelationshipDAO.self, args: [
             "sourceId": self.id,
             "targetProperty": ${foam.swift.toSwiftName(target)}.${foam.String.constantize(targetPropertyName)}(),
             "targetDAOKey": "${targetDAOKey}",
@@ -875,7 +879,7 @@ foam.CLASS({
       flags: ['swift'],
       expression: function(junction, sourceProperty, targetProperty, targetDAOKey, junctionDAOKey) {
         return `
-          return x.create(foam_dao_ManyToManyRelationshipImpl.self, args: [
+          return x!.create(foam_dao_ManyToManyRelationshipImpl.self, args: [
             "sourceId": self.id,
             "sourceProperty": ${foam.swift.toSwiftName(junction)}.${foam.String.constantize(sourceProperty)}(),
             "targetProperty": ${foam.swift.toSwiftName(junction)}.${foam.String.constantize(targetProperty)}(),

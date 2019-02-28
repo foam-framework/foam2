@@ -647,7 +647,7 @@ foam.CLASS({
   properties: [
     {
       name: 'fn',
-      swiftType: '((String, Any?, foam_core_Detachable) -> Void)',
+      swiftType: '((String?, Any?, foam_core_Detachable?) -> Void)',
       swiftRequiresEscaping: true,
     },
   ],

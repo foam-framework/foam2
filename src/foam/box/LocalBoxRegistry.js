@@ -73,6 +73,7 @@ foam.CLASS({
         throw this.NoSuchNameException.create({ name: name });
       },
       swiftCode: function() {/*
+let name = name!
 if let exportBox = (registry_[name] as? Registration)?.exportBox {
   return exportBox
 }

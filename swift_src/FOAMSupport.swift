@@ -19,19 +19,19 @@ public protocol Axiom {
 }
 
 public protocol GetterAxiom {
-  func get(_ obj: foam_core_FObject) -> Any?
+  func get(_ obj: foam_core_FObject?) -> Any?
 }
 
 public protocol SetterAxiom {
-  func set(_ obj: foam_core_FObject, value: Any?)
+  func set(_ obj: foam_core_FObject?, value: Any?)
 }
 
 public protocol SlotGetterAxiom {
-  func getSlot(_ obj: foam_core_FObject) -> foam_swift_core_Slot
+  func getSlot(_ obj: foam_core_FObject?) -> foam_swift_core_Slot?
 }
 
 public protocol SlotSetterAxiom {
-  func setSlot(_ obj: foam_core_FObject, value: foam_swift_core_Slot)
+  func setSlot(_ obj: foam_core_FObject?, value: foam_swift_core_Slot?)
 }
 
 class ListenerList {
@@ -51,9 +51,9 @@ public protocol PropertyInfo: Axiom, SlotGetterAxiom, SlotSetterAxiom, GetterAxi
   var visibility: foam_u2_Visibility { get }
   var jsonParser: foam_swift_parse_parser_Parser? { get }
   func viewFactory(x: Context) -> foam_core_FObject?
-  func hasOwnProperty(_ o: foam_core_FObject) -> Bool
-  func clearProperty(_ o: foam_core_FObject)
-  func toJSON(outputter: foam_swift_parse_json_output_Outputter, out: foam_json2_Outputter, value: Any?)
+  func hasOwnProperty(_ o: foam_core_FObject?) -> Bool
+  func clearProperty(_ o: foam_core_FObject?)
+  func toJSON(outputter: foam_swift_parse_json_output_Outputter?, out: foam_json2_Outputter?, value: Any?)
 }
 extension PropertyInfo {
   public func f(_ obj: Any?) -> Any? {
@@ -62,7 +62,7 @@ extension PropertyInfo {
     }
     return nil
   }
-  func `partialEval`() -> foam_mlang_Expr {
+  func `partialEval`() -> foam_mlang_Expr? {
     return self
   }
   func `compare`(_ o1: Any?, _ o2: Any?) -> Int {
@@ -72,7 +72,7 @@ extension PropertyInfo {
     }
     return FOAM_utils.compare(get(fo1), get(fo2))
   }
-  public func createStatement() -> String {
+  public func createStatement() -> String? {
     return ""
   }
   public func prepareStatement(_ stmt: Any?) {
@@ -80,7 +80,7 @@ extension PropertyInfo {
 }
 
 public protocol JSONOutputter {
-  func toJSON(outputter: foam_swift_parse_json_output_Outputter, out: foam_json2_Outputter)
+  func toJSON(outputter: foam_swift_parse_json_output_Outputter?, out: foam_json2_Outputter?)
 }
 
 public class MethodArg {
@@ -91,12 +91,12 @@ public protocol MethodInfo: Axiom, GetterAxiom, SlotGetterAxiom {
   var args: [MethodArg] { get }
 }
 extension MethodInfo {
-  public func call(_ obj: foam_core_FObject, args: [Any?] = []) throws -> Any? {
-    let callback = obj.getSlot(key: name)!.swiftGet() as! ([Any?]) throws -> Any?
+  public func call(_ obj: foam_core_FObject?, args: [Any?] = []) throws -> Any? {
+    let callback = obj!.getSlot(key: name)!.swiftGet() as! ([Any?]) throws -> Any?
     return try callback(args)
   }
-  public func get(_ obj: foam_core_FObject) -> Any? {
-    return obj.getSlot(key: name)!.swiftGet()
+  public func get(_ obj: foam_core_FObject?) -> Any? {
+    return obj?.getSlot(key: name)!.swiftGet()
   }
 }
 
@@ -119,8 +119,8 @@ public class Context {
     classNameMap[NSStringFromClass(cls.cls)] = cls.id
     _ = cls.ownAxioms
   }
-  public func lookup(_ id: String) -> ClassInfo? {
-    return classIdMap[id] ?? parent?.lookup(id)
+  public func lookup(_ id: String?) -> ClassInfo? {
+    return classIdMap[id!] ?? parent?.lookup(id)
   }
   func lookup_(_ cls: AnyClass) -> ClassInfo? {
     let str = NSStringFromClass(cls)
@@ -425,7 +425,7 @@ public class AbstractFObject: NSObject, foam_core_FObject, ContextAware {
   }
 
   public func toString() -> String {
-    return foam_swift_parse_json_output_Outputter.DEFAULT.swiftStringify(self)
+    return foam_swift_parse_json_output_Outputter.DEFAULT.swiftStringify(self)!
   }
 
   public func copyFrom(_ o: foam_core_FObject) {
@@ -451,8 +451,8 @@ public class AbstractFObject: NSObject, foam_core_FObject, ContextAware {
     return super.isEqual(object)
   }
 
-  public func toJSON(outputter: foam_swift_parse_json_output_Outputter, out: foam_json2_Outputter) {
-    outputter.outputFObject(out, self)
+  public func toJSON(outputter: foam_swift_parse_json_output_Outputter?, out: foam_json2_Outputter?) {
+    outputter?.outputFObject(out, self)
   }
 }
 
@@ -518,7 +518,7 @@ public class FoamError: Error {
   init(_ obj: Any?) { self.obj = obj }
   public func toString() -> String {
     if let obj = self.obj as? foam_core_FObject {
-      return foam_swift_parse_json_output_Outputter.DEFAULT.swiftStringify(obj)
+      return foam_swift_parse_json_output_Outputter.DEFAULT.swiftStringify(obj)!
     } else if let obj = self.obj as? FoamError {
       return "FoamError(" + obj.toString() + ")"
     }

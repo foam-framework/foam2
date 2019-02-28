@@ -56,6 +56,8 @@ foam.CLASS({
       return this.swiftImplements.concat(
         ( this.implements || [] )
         .filter(foam.util.flagFilter(['swift']))
+        // Remove anything that's not actually an interface to avoid multiple inheritence.
+        .filter(i => foam.core.InterfaceModel.isInstance(foam.lookup(i.path).model_))
         .map(function(i) {
           return foam.swift.toSwiftName(i.path)
         })

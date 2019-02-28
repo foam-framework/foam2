@@ -169,7 +169,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftToJSON',
-      value: 'outputter.output(out, value)',
+      value: 'outputter?.output(out, value)',
     },
     {
       class: 'Boolean',
@@ -369,7 +369,7 @@ return <%=this.swiftValueName%><% if ( foam.swift.requiresCast(this.swiftType) )
 if <%= this.swiftExpressionSubscriptionName %> != nil { return <%= this.swiftValueName %> }
 let valFunc = { [unowned self] () -> <%= this.swiftType %> in
   <% for (var i = 0, arg; arg = this.swiftExpressionArgs[i]; i++) { arg = arg.split('$') %>
-  let <%=arg.join('$')%> = self.<%=arg[0]%><% if (arg.length > 1) {%>$<% arg.slice(1).forEach(function(a) { %>.dot("<%=a%>")<% }) %>.swiftGet()<% } %>
+  let <%=arg.join('$')%> = self.<%=arg[0]%><% if (arg.length > 1) {%>$<% arg.slice(1).forEach(function(a) { %>.dot("<%=a%>")!<% }) %>.swiftGet()<% } %>
   <% } %>
   <%= this.swiftExpression %>
 }
@@ -383,7 +383,7 @@ let detach: Listener = { [unowned self] _,_ in
 }
 <%=this.swiftExpressionSubscriptionName%> = [
   <% for (var i = 0, arg; arg = this.swiftExpressionArgs[i]; i++) { arg = arg.split('$') %>
-  <%=arg[0]%>$<% arg.slice(1).forEach(function(a) { %>.dot("<%=a%>")<% }) %>.swiftSub(detach),
+  <%=arg[0]%>$<% arg.slice(1).forEach(function(a) { %>.dot("<%=a%>")!<% }) %>.swiftSub(detach),
   <% } %>
 ]
 <%=this.swiftExpressionSubscriptionName%>?.forEach({ s in
@@ -423,7 +423,7 @@ class PInfo: PropertyInfo {
     return <%=foam.u2.Visibility.model_.swiftName%>.<%=this.visibility.name%>
   }()
   lazy private(set) public var jsonParser: <%=foam.swift.parse.parser.Parser.model_.swiftName%>? = <%=this.swiftJsonParser%>
-  public func set(_ obj: foam_core_FObject, value: Any?) {
+  public func set(_ obj: foam_core_FObject?, value: Any?) {
     let obj = obj as! <%=parentCls.model_.swiftName%>
 <% var p = this %>
 <% if ( p.swiftSetter ) { %>
@@ -443,23 +443,24 @@ class PInfo: PropertyInfo {
     }
 <% } %>
   }
-  public func get(_ obj: foam_core_FObject) -> Any? {
+  public func get(_ obj: foam_core_FObject?) -> Any? {
     let obj = obj as! <%=parentCls.model_.swiftName%>
     return obj.<%=this.swiftVarName%>
   }
-  public func getSlot(_ obj: foam_core_FObject) -> <%=foam.swift.core.Slot.model_.swiftName%> {
+  public func getSlot(_ obj: foam_core_FObject?) -> <%=foam.swift.core.Slot.model_.swiftName%>? {
     let obj = obj as! <%=parentCls.model_.swiftName%>
     return obj.<%=this.swiftSlotName%>
   }
-  public func setSlot(_ obj: foam_core_FObject, value: <%=foam.swift.core.Slot.model_.swiftName%>) {
-    let obj = obj as! <%=parentCls.model_.swiftName%>
-    obj.<%=this.swiftSlotName%> = value
+  public func setSlot(_ obj: foam_core_FObject?, value: <%=foam.swift.core.Slot.model_.swiftName%>?) {
+    if let obj = obj as? <%=parentCls.model_.swiftName%>, let value = value {
+      obj.<%=this.swiftSlotName%> = value
+    }
   }
-  public func hasOwnProperty(_ obj: foam_core_FObject) -> Bool {
+  public func hasOwnProperty(_ obj: foam_core_FObject?) -> Bool {
     let obj = obj as! <%=parentCls.model_.swiftName%>
     return obj.`<%=p.swiftInitedName%>`
   }
-  public func clearProperty(_ obj: foam_core_FObject) {
+  public func clearProperty(_ obj: foam_core_FObject?) {
     let obj = obj as! <%=parentCls.model_.swiftName%>
     obj.<%= p.swiftInitedName %> = false
     obj.<%= p.swiftValueName %> = nil
@@ -484,7 +485,7 @@ class PInfo: PropertyInfo {
     return nil
 <% } %>
   }
-  public func toJSON(outputter: <%=foam.swift.parse.json.output.Outputter.model_.swiftName%>, out: foam_json2_Outputter, value: Any?) {
+  public func toJSON(outputter: <%=foam.swift.parse.json.output.Outputter.model_.swiftName%>?, out: foam_json2_Outputter?, value: Any?) {
     <%=p.swiftToJSON%>
   }
 }
@@ -668,7 +669,7 @@ if let n = newValue as? Date {
 } else if let n = newValue as? String {
   let dateFormatter = DateFormatter()
   dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-  return dateFormatter.date(from: n)
+  return dateFormatter.date(from: n)!
 } else if let n = newValue as? NSNumber {
   return Date(timeIntervalSince1970: n.doubleValue)
 }
