@@ -42,7 +42,6 @@ foam.CLASS({
   name: 'BlockingWaitMethod',
   extends: 'foam.core.Method',
   properties: [
-    ['synchronized', true],
     {
       class: 'String',
       name: 'property'
@@ -59,18 +58,16 @@ foam.CLASS({
       expression: function(property) {
         return `
 try {
-  if ( ! isPropertySet("${property}") ) wait();
-  else notifyAll();
+  if ( ! isPropertySet("${property}") )
+    get${foam.String.capitalize(property)}Sem().acquire();
+  else
+    get${foam.String.capitalize(property)}Sem().release(
+      get${foam.String.capitalize(property)}Sem().getQueueLength());
 } catch (Exception e) {
   throw new RuntimeException(e);
 }
         `;
       }
-    },
-    {
-      name: 'swiftSynchronized',
-      flags: ['swift'],
-      value: false
     },
     {
       name: 'swiftCode',
@@ -86,15 +83,6 @@ if ( !hasOwnProperty("${property}") ) {
       }
     }
   ],
-  methods: [
-    function writeToSwiftClass(cls, parentCls) {
-      this.SUPER(cls, parentCls);
-      cls.field({
-        name: `${this.property}Sem`,
-        defaultValue: 'DispatchSemaphore(value: 0)'
-      });
-    }
-  ]
 });
 
 foam.CLASS({
@@ -141,6 +129,16 @@ foam.CLASS({
       }.bind(this));
       axioms.push(this.BlockingWaitMethod.create({
         property: this.name
+      }));
+      axioms.push(foam.core.Property.create({
+        name: `${this.name}Sem`,
+
+        swiftType: 'DispatchSemaphore',
+        swiftFactory: 'return DispatchSemaphore(value: 0)',
+
+        javaType: 'java.util.concurrent.Semaphore',
+        javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
+        javaFactory: 'return new java.util.concurrent.Semaphore(0);'
       }));
       cls.installAxioms(axioms);
     }
