@@ -56,7 +56,7 @@ foam.CLASS({
       background: #FFCCCC;
     }
 
-    ^ tbody tr:hover {
+    ^ tbody tr:hover, ^hovered {
       background: #eee;
     }
 
@@ -125,6 +125,7 @@ foam.CLASS({
     },
     'ps',
     'gs',
+    'currentGroup',
     {
       name: 'filteredPs',
       expression: function(ps, query) {
@@ -173,7 +174,7 @@ foam.CLASS({
               .end()
               .start('tr')
                 .start('th').style({minWidth: '510px'}).end()
-                .call(function() { self.initTableColumns.call(this, gs); })
+                .call(function() { self.initTableColumns.call(this, gs, self); })
               .end()
             .end()
             .add(this.slot(function(skip, filteredPs) {
@@ -190,6 +191,9 @@ foam.CLASS({
                   .end()
                   .forEach(gs, function(g) {
                     this.start('td')
+                      .on('mouseover', function() { self.currentGroup = g; })
+                      .on('mouseout', function() { if ( self.currentGroup === g ) self.currentGroup = ''; })
+                      .enableClass(self.myClass('hovered'), self.currentGroup$.map(function(cg) { return cg === g; } ))
                       .attrs({title: g.id + ' : ' + p.id})
                       .tag(self.createCheckBox(p, g))
                     .end();
@@ -278,13 +282,17 @@ foam.CLASS({
       };
     },
 
-    function initTableColumns(gs) {
+    function initTableColumns(gs, matrix) {
       var self = this;
       this.forEach(gs, function(g) {
         this.start('th')
           .attrs({title: g.description})
           .call(function() {
-            var cv = foam.graphics.CView.create({width: 20, height: 200});
+            var cv = foam.graphics.Box.create({
+              color$: matrix.currentGroup$.map(function(cg) { return cg === g ? '#eee' : 'white'; }),
+              autoRepaint: true,
+              width: 20,
+              height: 200});
             var l  = foam.graphics.Label.create({
               text: g.id,
               x: 25,
