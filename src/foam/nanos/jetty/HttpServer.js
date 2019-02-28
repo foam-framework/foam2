@@ -78,7 +78,13 @@ foam.CLASS({
         org.eclipse.jetty.servlet.ServletContextHandler handler =
           new org.eclipse.jetty.servlet.ServletContextHandler();
 
-        handler.setResourceBase(System.getProperty("user.dir"));
+        String root = System.getProperty("nanos.webroot");
+        if ( root == null ) {
+          root = this.getClass().getResource("/webroot/index.html").toExternalForm();
+          root = root.substring(0, root.lastIndexOf("/"));
+        }
+
+        handler.setResourceBase(root);
         handler.setWelcomeFiles(getWelcomeFiles());
 
         handler.setAttribute("X", getX());

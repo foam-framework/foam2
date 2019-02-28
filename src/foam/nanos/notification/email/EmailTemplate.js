@@ -14,7 +14,7 @@ foam.CLASS({
     'java.nio.charset.StandardCharsets'
   ],
 
-  tableColumns: [ 'name', 'group' ],
+  tableColumns: ['name', 'group'],
 
   properties: [
     {
@@ -58,6 +58,12 @@ bodyAsByteArrayIsSet_ = false;`
     {
       class: 'String',
       name: 'displayName'
+    },
+    {
+      class: 'String',
+      name: 'sendTo',
+      documentation: `This property will set to whomever the email is being sent
+        to.`
     }
   ]
 });

@@ -7,6 +7,7 @@
 package foam.dao;
 
 import foam.box.RPCMessage;
+import foam.core.FObject;
 
 /**
  * Extend the generated DAOSkeleton and map all non Context-Oriented methods
@@ -34,6 +35,18 @@ public class SessionDAOSkeleton
     else if ( "listen".equals(n)    ) { rpc.setName("listen_"); }
     else if ( "pipe".equals(n)      ) { rpc.setName("pipe_"); }
     else if ( "cmd".equals(n)       ) { rpc.setName("cmd_"); }
+
+    if ( "put_".equals(n) ) {
+      synchronized ( this ) {
+        FObject obj = (foam.core.FObject)(rpc.getArgs() != null && rpc.getArgs().length > 1 ? rpc.getArgs()[1] : null);
+        if ( obj != null ) {
+          FObject oldObj = getDelegate().find(obj);
+          if ( oldObj != null ) {
+            rpc.getArgs()[1] = oldObj.copyFrom(obj);
+          }
+        }
+      }
+    }
 
     super.send(message);
   }

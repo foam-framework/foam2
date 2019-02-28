@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.swift',
   name: 'EmptyClass',
+  flags: ['swift'],
   methods: [
     function toSwiftSource() { return ' ' },
   ]

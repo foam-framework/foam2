@@ -937,12 +937,10 @@ foam.LIB({
           foam.assert(
               type[uid],
               'Missing ' + name + ' multi-method for type ', arg1, ' map: ', map,
-              'and no deafult method provided');
+              'and no default method provided');
         }
 
-        if ( type[uid] || opt_defaultMethod ) {
-          return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
-        }
+        return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
       };
       // The native toString on the function that's returned will never work on
       // its own because the args and vars declared above it won't exist so
