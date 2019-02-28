@@ -38,9 +38,9 @@ foam.CLASS({
     },
     {
       class: 'Object',
-      name: 'ObjectId',
+      name: 'objectId',
       visibility: 'RO',
-      documentation: 'Id of the object onwhich rule is applied.'
+      documentation: 'Id of the object on which rule is applied.'
     },
     {
       class: 'String',
@@ -53,7 +53,7 @@ foam.CLASS({
       name: 'result',
       documentation: 'Result of rule execution.',
       tableCellFormatter: function (value) {
-        if (!!value) {
+        if ( !!value ) {
           this.add(value.toString());
         }
       }
