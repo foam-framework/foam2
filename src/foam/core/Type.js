@@ -98,45 +98,49 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Byte',
-  extends: 'foam.core.type.SimpleType',
+  implements: ['foam.core.type.Type'],
   axioms: [ { class: 'foam.pattern.Singleton' } ],
-  properties: [
-    ['java', 'byte'],
-    ['swift', 'Int8'],
-  ],
+  methods: [
+    function refs() { return []; },
+    function toJavaType() { return 'byte'; },
+    function toSwiftType() { return 'Int8'; }
+  ]
 });
 
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Short',
-  extends: 'foam.core.type.SimpleType',
+  implements: ['foam.core.type.Type'],
   axioms: [ { class: 'foam.pattern.Singleton' } ],
-  properties: [
-    ['java', 'short'],
-    ['swift', 'Int16'],
-  ],
+  methods: [
+    function refs() { return []; },
+    function toJavaType() { return 'short'; },
+    function toSwiftType() { return 'Int16'; }
+  ]
 });
 
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Integer',
-  extends: 'foam.core.type.SimpleType',
+  implements: ['foam.core.type.Type'],
   axioms: [ { class: 'foam.pattern.Singleton' } ],
-  properties: [
-    ['java', 'int'],
-    ['swift', 'Int'],
-  ],
+  methods: [
+    function refs() { return []; },
+    function toJavaType() { return 'int'; },
+    function toSwiftType() { return 'Int'; }
+  ]
 });
 
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Void',
-  extends: 'foam.core.type.SimpleType',
+  implements: ['foam.core.type.Type'],
   axioms: [ { class: 'foam.pattern.Singleton' } ],
-  properties: [
-    ['java', 'void'],
-    ['swift', 'Void'],
-  ],
+  methods: [
+    function refs() { return []; },
+    function toJavaType() { return 'void'; },
+    function toSwiftType() { return 'Void'; }
+  ]
 });
 
 foam.CLASS({
@@ -153,12 +157,13 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Long',
-  extends: 'foam.core.type.SimpleType',
+  implements: ['foam.core.type.Type'],
   axioms: [ { class: 'foam.pattern.Singleton' } ],
-  properties: [
-    ['java', 'long'],
-    ['swift', 'Int'],
-  ],
+  methods: [
+    function refs() { return []; },
+    function toJavaType() { return 'long'; },
+    function toSwiftType() { return 'Int'; }
+  ]
 });
 
 foam.CLASS({
@@ -186,12 +191,13 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Boolean',
-  extends: 'foam.core.type.SimpleType',
+  implements: ['foam.core.type.Type'],
   axioms: [ { class: 'foam.pattern.Singleton' } ],
-  properties: [
-    ['java', 'boolean'],
-    ['swift', 'Bool'],
-  ],
+  methods: [
+    function refs() { return []; },
+    function toJavaType() { return 'boolean'; },
+    function toSwiftType() { return 'Bool'; }
+  ]
 });
 
 foam.CLASS({
@@ -217,12 +223,13 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.type',
   name: 'Char',
-  extends: 'foam.core.type.SimpleType',
+  implements: ['foam.core.type.Type'],
   axioms: [ { class: 'foam.pattern.Singleton' } ],
-  properties: [
-    ['java', 'char'],
-    ['swift', 'Character'],
-  ],
+  methods: [
+    function refs() { return []; },
+    function toJavaType() { return 'char'; },
+    function toSwiftType() { return 'Character'; }
+  ]
 });
 
 foam.CLASS({

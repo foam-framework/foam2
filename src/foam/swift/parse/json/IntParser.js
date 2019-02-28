@@ -15,7 +15,7 @@ foam.CLASS({
     {
       name: 'parse',
       swiftCode: function() {/*
-var ps = ps
+var ps = ps!
 var n = 0
 
 var negate = false
@@ -26,7 +26,7 @@ var c = ps.head()
 
 if c == "-" {
   negate = true
-  ps = ps.tail()
+  ps = ps.tail()!
   if !ps.valid() { return nil }
   c = ps.head()
 }
@@ -34,7 +34,7 @@ if c == "-" {
 if c.isDigit() { n = Int(String(c))! }
 else { return nil }
 
-ps = ps.tail()
+ps = ps.tail()!
 
 while ( ps.valid() ) {
   c = ps.head()
@@ -45,7 +45,7 @@ while ( ps.valid() ) {
   } else {
     break
   }
-  ps = ps.tail()
+  ps = ps.tail()!
 }
 
 if negate { n *= -1 }

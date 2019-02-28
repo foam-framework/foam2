@@ -50,7 +50,7 @@ foam.CLASS({
         return this.server ? this.server.create({ delegate: box }) : box;
       },
       swiftCode: function() {/*
-let box2: foam_box_Box = next?.serverBox(box) ?? box
+let box2: foam_box_Box = next?.serverBox(box) ?? box!
 return server.create(args: ["delegate": box2], x: __subContext__) as! foam_box_Box
       */},
     },

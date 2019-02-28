@@ -105,8 +105,8 @@ foam.CLASS({
       ],
       swiftType: 'Int',
       swiftCode: `
-        let aType = typeOf(a)
-        let bType = typeOf(b)
+        let aType = typeOf(a)!
+        let bType = typeOf(b)!
         return aType.ordinal > bType.ordinal ? 1 :
             aType.ordinal < bType.ordinal ? -1 : aType.compare(a, b);
       `,
