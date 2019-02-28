@@ -80,6 +80,10 @@ foam.CLASS({
       text-align: left;
       padding-left: 6px;
     }
+
+    ^ .property-groupQuery {
+      margin-left: 8px;
+    }
   `,
 
   properties: [
@@ -91,6 +95,16 @@ foam.CLASS({
         class: 'foam.u2.TextField',
         type: 'Search',
         placeholder: 'Permission Search',
+        onKey: true
+      }
+    },
+    {
+      class: 'String',
+      name: 'groupQuery',
+      view: {
+        class: 'foam.u2.TextField',
+        type: 'Search',
+        placeholder: 'Group Search',
         onKey: true
       }
     },
@@ -155,7 +169,7 @@ foam.CLASS({
             .style({gridColumn: '1/span 1', gridRow: '1/span 1'})
             .addClass(this.myClass('header'))
             .add('Permission Matrix')
-            .add(this.QUERY)
+            .add(this.GROUP_QUERY, ' ', this.QUERY)
           .end()
           .start('table')
             .on('wheel', this.onWheel)
@@ -191,6 +205,9 @@ foam.CLASS({
                   .end()
                   .forEach(gs, function(g) {
                     this.start('td')
+                      .show(self.groupQuery$.map(function(q) {
+                        return q == '' || g.id.indexOf(q) != -1;
+                      }))
                       .on('mouseover', function() { self.currentGroup = g; })
                       .on('mouseout', function() { if ( self.currentGroup === g ) self.currentGroup = ''; })
                       .enableClass(self.myClass('hovered'), self.currentGroup$.map(function(cg) { return cg === g; } ))
@@ -286,6 +303,9 @@ foam.CLASS({
       var self = this;
       this.forEach(gs, function(g) {
         this.start('th')
+          .show(matrix.groupQuery$.map(function(q) {
+            return q == '' || g.id.indexOf(q) != -1;
+          }))
           .attrs({title: g.description})
           .call(function() {
             var cv = foam.graphics.Box.create({
