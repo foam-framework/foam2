@@ -2825,14 +2825,31 @@ setValue((getValue() + ((Number)this.getArg1().f(obj)).doubleValue()) / getCount
 foam.CLASS({
   package: 'foam.mlang.expr',
   name: 'Dot',
-  extends: 'foam.mlang.predicate.Binary',
+  extends: 'foam.mlang.AbstractExpr',
   implements: [ 'foam.core.Serializable' ],
 
   documentation: 'A Binary Predicate which applies arg2.f() to arg1.f().',
 
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg1'
+    },
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg2'
+    }
+  ],
+
   methods: [
-    function f(o) {
-      return this.arg2.f(this.arg1.f(o));
+    {
+      name: 'f',
+      code: function(o) {
+        return this.arg2.f(this.arg1.f(o));
+      },
+      javaCode: `
+        return getArg2().f(getArg1().f(obj));
+      `
     },
 
     function comparePropertyValues(o1, o2) {
@@ -2841,6 +2858,58 @@ foam.CLASS({
          Used by GroupBy
       **/
       return this.arg2.comparePropertyValues(o1, o2);
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'PredicatedExpr',
+  extends: 'foam.mlang.AbstractExpr',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: 'An Expression that evaluates a predicate.',
+
+  properties: [
+    {
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'arg1'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: `
+        return getArg1().f(obj);
+      `
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'ContextObject',
+  extends: 'foam.mlang.AbstractExpr',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: 'An Expression that returns object in the context using key.',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'key'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: `
+        return ((foam.core.X) obj).get(getKey());
+      `
     }
   ]
 });

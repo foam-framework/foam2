@@ -793,13 +793,17 @@ foam.CLASS({
       }
     },
     {
+      name: 'type',
+      factory: function() { return this.referencedProperty.type; }
+    },
+    {
       name: 'swiftType',
       factory: function() { return this.referencedProperty.swiftType; }
     },
     {
       name: 'swiftJsonParser',
       factory: function() { return this.referencedProperty.swiftJsonParser; }
-    },
+    }
   ],
 
   methods: [

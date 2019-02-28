@@ -347,6 +347,7 @@ foam.CLASS({
     },
     {
       name: 'javaValue',
+      flags: ['java'],
       expression: function(type, value) {
         return foam.lookup(type).id + '.' + value;
       },
