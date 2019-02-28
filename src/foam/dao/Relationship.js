@@ -402,20 +402,31 @@ foam.CLASS({
       name: 'dao',
       label: '',
       factory: function() {
+        var targetDAO = this.__context__[this.targetDAOKey];
+        foam.assert(targetDAO, 'Missing DAO for targetDAOKey', this.targetDAOKey);
+
         return foam.dao.ReadOnlyDAO.create({
           delegate: foam.dao.ManyToManyRelationshipDAO.create({
             relationship: this,
-            delegate: this.__context__[this.targetDAOKey]
+            delegate: targetDAO
           }, this)
         }, this);
       },
-      javaFactory: `return new foam.dao.ReadOnlyDAO.Builder(getX()).
-  setDelegate(new foam.dao.ManyToManyRelationshipDAO.Builder(getX()).
-    setRelationship(this).
-    setDelegate((foam.dao.DAO)getX().get(getTargetDAOKey())).
-    build()).
-  build();`,
-
+      javaFactory: `
+        try {
+          return new foam.dao.ReadOnlyDAO.Builder(getX()).
+            setDelegate(new foam.dao.ManyToManyRelationshipDAO.Builder(getX()).
+              setRelationship(this).
+              setDelegate((foam.dao.DAO)getX().get(getTargetDAOKey())).
+              build()).
+            build();
+        } catch ( NullPointerException e ) {
+          foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+          logger.error("TargetDAOKey", getTargetDAOKey(), "not found.", e);
+          throw e;
+        }
+        `
+  ,
       swiftFactory:
 `return __context__.create(foam_dao_ReadOnlyDAO.self, args: [
   "delegate": __context__.create(foam_dao_ManyToManyRelationshipDAO.self, args: [
@@ -439,9 +450,20 @@ foam.CLASS({
       name: 'targetDAO',
       hidden: true,
       factory: function() {
-        return this.__context__[this.targetDAOKey];
+        var targetDAO = this.__context__[this.targetDAOKey];
+        foam.assert(targetDAO, 'Missing DAO for targetDAOKey', this.targetDAOKey);
+
+        return targetDAO;
       },
-      javaFactory: 'return (foam.dao.DAO)getX().get(getTargetDAOKey());',
+      javaFactory: `
+        try {
+          return (foam.dao.DAO)getX().get(getTargetDAOKey());
+        } catch ( NullPointerException e ) {
+          foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+          logger.error("TargetDAOKey", getTargetDAOKey(), "not found.", e);
+          throw e;
+        }
+      `,
       swiftFactory: 'return __context__[targetDAOKey] as? (foam_dao_DAO & foam_core_FObject)'
     }
   ],
@@ -723,6 +745,7 @@ foam.CLASS({
     },
     {
       name: 'javaCode',
+      flags: ['java'],
       expression: function(target, targetPropertyName, targetDAOKey) {
         return `
           return new foam.dao.RelationshipDAO.Builder(x)
@@ -861,13 +884,13 @@ foam.CLASS({
         return function(x) {
           return foam.dao.ManyToManyRelationshipImpl.create({
             sourceId: this.id,
-            sourceProperty: self.sourceProperty,
-            targetProperty: self.targetProperty,
+            sourceProperty: x.lookup(self.junction).getAxiomByName(self.sourceProperty),
+            targetProperty: x.lookup(self.junction).getAxiomByName(self.targetProperty),
             targetDAOKey: self.targetDAOKey,
             junctionDAOKey: self.junctionDAOKey,
-            junction: self.junction
+            junction: x.lookup(self.junction)
           }, x);
-        }
+        };
       },
     },
     {
@@ -888,6 +911,7 @@ foam.CLASS({
     },
     {
       name: 'javaCode',
+      flags: ['java'],
       expression: function(junction, sourceProperty, targetProperty, targetDAOKey, junctionDAOKey) {
         return `
           return new foam.dao.ManyToManyRelationshipImpl.Builder(x)

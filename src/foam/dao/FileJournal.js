@@ -28,6 +28,7 @@ foam.CLASS({
     'foam.util.SafetyUtil',
     'java.io.BufferedReader',
     'java.io.BufferedWriter',
+    'java.io.InputStreamReader',
     'java.io.File',
     'java.io.FileReader',
     'java.io.FileWriter',
@@ -148,12 +149,17 @@ foam.CLASS({
       name: 'reader',
       javaType: 'java.io.BufferedReader',
       javaGetter: `
-        try {
+      try {
+        Storage storage = (Storage) getX().get(Storage.class);
+        if ( storage.isResource() ) {
+          return new BufferedReader(new InputStreamReader(storage.getResourceAsStream(getFilename())));
+        } else {
           return new BufferedReader(new FileReader(getFile()));
-        } catch ( Throwable t ) {
-          getLogger().error("Failed to read from journal", t);
-          throw new RuntimeException(t);
         }
+      } catch ( Throwable t ) {
+        getLogger().error("Failed to read from journal", t);
+        throw new RuntimeException(t);
+      }
       `
     },
     // writer uses a factory because we want to use one writer for the lifetime of this journal object

@@ -15,7 +15,8 @@
       args: [
         { name: 'x', type: 'Context' },
         { name: 'obj', type: 'foam.core.FObject' },
-        { name: 'oldObj', type: 'foam.core.FObject' }
+        { name: 'oldObj', type: 'foam.core.FObject' },
+        { name: 'ruler', type: 'foam.nanos.ruler.RuleEngine' }
       ]
     }
   ]

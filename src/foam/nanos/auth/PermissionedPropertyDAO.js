@@ -27,7 +27,7 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
   FObject oldObj = getDelegate().find(obj.getProperty("id"));
-  return super.put_(x, resetProperties(x, obj, oldObj));
+  return super.put_(x, maybeResetProperties(x, obj, oldObj));
       `,
     },
 
@@ -37,7 +37,7 @@ foam.CLASS({
   FObject oldObj = getDelegate().find_(x, id);
 
   if ( oldObj != null ) {
-    return hideProperties(x, oldObj);
+    return maybeRemoveProperties(x, oldObj);
   }
 
   return null;
@@ -47,16 +47,17 @@ foam.CLASS({
     {
       name: 'select_',
       javaCode: `
-  if ( sink != null ) {
-    HidePropertiesSink hidePropertiesSink = new HidePropertiesSink(x, sink, this);
-  }
-
-  return super.select_(x, sink, skip, limit, order, predicate);
+      if ( x.get("auth") != null ) {
+        foam.dao.Sink sink2 = ( sink != null ) ? new HidePropertiesSink(x, sink, this) : sink;
+        super.select_(x, sink2, skip, limit, order, predicate);
+        return sink;
+      }
+      return super.select_(x, sink, skip, limit, order, predicate);
       `,
     },
 
     {
-      name: 'resetProperties',
+      name: 'maybeResetProperties',
       type: 'foam.core.FObject',
       args: [
         {
@@ -74,13 +75,14 @@ foam.CLASS({
       ],
       javaCode: `
   String of = obj.getClass().getSimpleName().toLowerCase();
+  AuthService auth = (AuthService) x.get("auth");
 
   if ( propertyMap_.containsKey(of) ) {
     List properties = propertyMap_.get(of);
     Iterator e = properties.iterator();
     while ( e.hasNext() ) {
       PropertyInfo axiom = (PropertyInfo) e.next();
-      checkPermission(axiom, of, x, obj, oldObj, true);
+      maybeReset(axiom, of, auth, x, obj, oldObj);
     }
   } else {
     List<PropertyInfo> properties = new ArrayList<>();
@@ -90,7 +92,7 @@ foam.CLASS({
       PropertyInfo axiom = (PropertyInfo) e.next();
       if ( axiom.getPermissionRequired() ) {
         properties.add(axiom);
-        checkPermission(axiom, of, x, obj, oldObj, true);
+        maybeReset(axiom, of, auth, x, obj, oldObj);
       }
     }
     propertyMap_.put(of, properties);
@@ -101,7 +103,7 @@ foam.CLASS({
     },
 
     {
-      name: 'hideProperties',
+      name: 'maybeRemoveProperties',
       type: 'foam.core.FObject',
       args: [
         {
@@ -116,13 +118,14 @@ foam.CLASS({
       javaCode: `
   String of = oldObj.getClass().getSimpleName().toLowerCase();
   FObject obj = oldObj.fclone();
+  AuthService auth = (AuthService) x.get("auth");
 
   if ( propertyMap_.containsKey(of) ) {
     List properties = propertyMap_.get(of);
     Iterator e = properties.iterator();
     while ( e.hasNext() ) {
       PropertyInfo axiom = (PropertyInfo) e.next();
-        checkPermission(axiom, of, x, obj, oldObj, false);
+      maybeRemove(axiom, of, auth, x, obj, oldObj);
     }
   } else {
     List<PropertyInfo> properties = new ArrayList<>();
@@ -132,7 +135,7 @@ foam.CLASS({
       PropertyInfo axiom = (PropertyInfo) e.next();
       if ( axiom.getPermissionRequired() ) {
         properties.add(axiom);
-        checkPermission(axiom, of, x, obj, oldObj, false);
+        maybeRemove(axiom, of,auth, x, obj, oldObj);
       }
     }
     propertyMap_.put(of, properties);
@@ -143,7 +146,7 @@ foam.CLASS({
     },
 
     {
-      name: 'checkPermission',
+      name: 'maybeReset',
       args: [
         {
           name: 'axiom',
@@ -152,6 +155,10 @@ foam.CLASS({
         {
           name: 'of',
           type: 'String'
+        },
+        {
+          name: 'auth',
+          type: 'AuthService'
         },
         {
           name: 'x',
@@ -164,29 +171,55 @@ foam.CLASS({
         {
           name: 'oldObj',
           type: 'foam.core.FObject'
-        },
-        {
-          name: 'write',
-          type: 'Boolean'
         }
       ],
       javaCode: `
-  AuthService auth = (AuthService) x.get("auth");
   String axiomName =  axiom.toString();
   axiomName = axiomName.substring(axiomName.lastIndexOf(".") + 1);
-  boolean hasPermission = auth.check(x, of + ".rw." + axiomName.toLowerCase());
-  if ( ! write ) {
-    hasPermission = hasPermission || auth.check(x, of + ".ro." + axiomName.toLowerCase());
-  }
 
-  if ( ! hasPermission ) {
-    if ( write && oldObj != null ) {
+  if ( ! auth.check(x, of + ".rw." + axiomName.toLowerCase()) ) {
+    if ( oldObj != null ) {
       Object oldValue = oldObj.getProperty(axiomName);
       axiom.set(obj, oldValue);
     } else {
       axiom.clear(obj);
     }
   }
+      `,
+    },
+    {
+      name: 'maybeRemove',
+      args: [
+        {
+          name: 'axiom',
+          javaType: 'PropertyInfo'
+        },
+        {
+          name: 'of',
+          type: 'String'
+        },
+        {
+          name: 'auth',
+          type: 'AuthService'
+        },
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'foam.core.FObject'
+        },
+        {
+          name: 'oldObj',
+          type: 'foam.core.FObject'
+        }
+      ],
+      javaCode: `
+  String axiomName =  axiom.toString();
+  axiomName = axiomName.substring(axiomName.lastIndexOf(".") + 1);
+
+  if ( ! auth.check(x, of + ".rw." + axiomName.toLowerCase()) && ! auth.check(x, of + ".ro." + axiomName.toLowerCase()) ) axiom.clear(obj);
       `,
     },
   ],
@@ -219,22 +252,12 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      args: [
-        {
-          name: 'obj',
-          javaType: 'Object'
-        },
-        {
-          name: 'sub',
-          javaType: 'foam.core.Detachable'
-        }
-      ],
       javaCode: `
   FObject oldObj = this.dao.getDelegate().find(((FObject) obj).getProperty("id"));
   if (oldObj != null) {
-    super.put(this.dao.hideProperties(getX(), oldObj), sub);
+    getDelegate().put(this.dao.maybeRemoveProperties(getX(), oldObj), sub);
   } else {
-    super.put(obj, sub);
+    getDelegate().put(obj, sub);
   }
       `
     }
