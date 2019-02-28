@@ -288,6 +288,11 @@ foam.CLASS({
     },
 
     function createCheckBox(p, g) {
+      // Disable adding a group role to that group itself.
+      // TODO: should be protected in the model as well to prevent
+      // updating through Group GUI, DIG or API. Also, should prevent
+      // loops.
+      if ( p.id == '@' + g.id ) return this.E().add('X');
       var self = this;
       return function() {
         var data = self.getGroupPermission(g, p);
