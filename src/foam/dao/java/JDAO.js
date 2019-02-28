@@ -10,17 +10,22 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
   flags: ['java'],
 
+  javaImports: [
+    'foam.nanos.fs.Storage',
+    'foam.core.X'
+  ],
+
   axioms: [
     {
       name: 'javaExtras',
-      buildJavaClass: function (cls) {
+      buildJavaClass: function(cls) {
         cls.extras.push(`
           // TODO: These convenience constructors should be removed and done using the facade pattern.
-          public JDAO(foam.core.X x, foam.core.ClassInfo classInfo, String filename) {
+          public JDAO(X x, foam.core.ClassInfo classInfo, String filename) {
             this(x, new foam.dao.MDAO(classInfo), filename);
           }
 
-          public JDAO(foam.core.X x, foam.dao.DAO delegate, String filename) {
+          public JDAO(X x, foam.dao.DAO delegate, String filename) {
             setX(x);
             setOf(delegate.getOf());
             setDelegate(delegate);
@@ -32,11 +37,17 @@ foam.CLASS({
               .setCreateFile(true)
               .build());
 
-            // create a composite journal of repo journal
-            // and runtime journal and load them all
+            /* Create a composite journal of repo journal and runtime journal
+              and load them all.*/
+            X resourceStorageX = x;
+            if ( System.getProperty("resource.journals.dir") != null ) {
+              resourceStorageX = x.put(foam.nanos.fs.Storage.class,
+                  new Storage(System.getProperty("resource.journals.dir"), true));
+            }
+
             new foam.dao.CompositeJournal.Builder(x)
               .setDelegates(new foam.dao.Journal[]{
-                new foam.dao.FileJournal.Builder(x)
+                new foam.dao.FileJournal.Builder(resourceStorageX)
                   .setFilename(filename + ".0")
                   .build(),
                 new foam.dao.FileJournal.Builder(x)

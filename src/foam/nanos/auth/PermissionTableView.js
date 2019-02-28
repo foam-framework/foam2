@@ -18,14 +18,14 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.auth.Group',
-    'foam.nanos.auth.Permission',
     'foam.graphics.Label',
-    'foam.graphics.ScrollCView'
+    'foam.graphics.ScrollCView',
+    'foam.nanos.auth.Group',
+    'foam.nanos.auth.Permission'
   ],
 
   constants: {
-    ROWS: 22
+    ROWS: 26
   },
 
   css: `
@@ -56,7 +56,7 @@ foam.CLASS({
       background: #FFCCCC;
     }
 
-    ^ tbody tr:hover {
+    ^ tbody tr:hover, ^hovered {
       background: #eee;
     }
 
@@ -80,6 +80,10 @@ foam.CLASS({
       text-align: left;
       padding-left: 6px;
     }
+
+    ^ .property-groupQuery {
+      margin-left: 8px;
+    }
   `,
 
   properties: [
@@ -91,6 +95,16 @@ foam.CLASS({
         class: 'foam.u2.TextField',
         type: 'Search',
         placeholder: 'Permission Search',
+        onKey: true
+      }
+    },
+    {
+      class: 'String',
+      name: 'groupQuery',
+      view: {
+        class: 'foam.u2.TextField',
+        type: 'Search',
+        placeholder: 'Group Search',
         onKey: true
       }
     },
@@ -125,6 +139,7 @@ foam.CLASS({
     },
     'ps',
     'gs',
+    'currentGroup',
     {
       name: 'filteredPs',
       expression: function(ps, query) {
@@ -154,7 +169,7 @@ foam.CLASS({
             .style({gridColumn: '1/span 1', gridRow: '1/span 1'})
             .addClass(this.myClass('header'))
             .add('Permission Matrix')
-            .add(this.QUERY)
+            .add(this.GROUP_QUERY, ' ', this.QUERY)
           .end()
           .start('table')
             .on('wheel', this.onWheel)
@@ -173,7 +188,7 @@ foam.CLASS({
               .end()
               .start('tr')
                 .start('th').style({minWidth: '510px'}).end()
-                .call(function() { self.initTableColumns.call(this, gs); })
+                .call(function() { self.initTableColumns.call(this, gs, self); })
               .end()
             .end()
             .add(this.slot(function(skip, filteredPs) {
@@ -190,6 +205,12 @@ foam.CLASS({
                   .end()
                   .forEach(gs, function(g) {
                     this.start('td')
+                      .show(self.groupQuery$.map(function(q) {
+                        return q == '' || g.id.indexOf(q) != -1;
+                      }))
+                      .on('mouseover', function() { self.currentGroup = g; })
+                      .on('mouseout', function() { if ( self.currentGroup === g ) self.currentGroup = ''; })
+                      .enableClass(self.myClass('hovered'), self.currentGroup$.map(function(cg) { return cg === g; } ))
                       .attrs({title: g.id + ' : ' + p.id})
                       .tag(self.createCheckBox(p, g))
                     .end();
@@ -201,11 +222,11 @@ foam.CLASS({
           .start(self.ScrollCView.create({
             value$: self.skip$,
             extent: self.ROWS,
-            height: self.ROWS*24.5,
+            height: self.ROWS*22,
             width: 26,
-            size$: self.filteredRows$
+            size$: self.filteredRows$.map(function(m){return m-1;})
           }))
-            .style({gridColumn: '2/span 1', gridRow: '2/span 2', 'margin-top':'242px'})
+            .style({gridColumn: '2/span 1', gridRow: '2/span 2', 'margin-top':'238px'})
           .end()
         .end();
     },
@@ -220,11 +241,11 @@ foam.CLASS({
         if ( pid == '*' ) return null;
         var i = pid.lastIndexOf('.');
         pid = ( i == -1 ) ? '*' : pid.substring(0, i) + '.*';
-        if ( pid in this.pMap ) return this.getGroupPermission(this.pMap[pid], g);
+        if ( pid in this.pMap ) return this.getGroupPermission(g, this.pMap[pid]);
       }
     },
 
-    function getGroupPermission(p, g) {
+    function getGroupPermission(g, p) {
       var key  = p.id + ':' + g.id;
       var data = this.gpMap[key];
 
@@ -239,7 +260,7 @@ foam.CLASS({
         if ( g.parent ) {
           var a = this.gMap[g.parent];
           if ( a ) {
-            var parent = g.parent && this.getGroupPermission(p, a);
+            var parent = g.parent && this.getGroupPermission(a, p);
             if ( parent ) {
               function update() {
                 data.impliedByParentGroup = parent.granted;
@@ -267,9 +288,14 @@ foam.CLASS({
     },
 
     function createCheckBox(p, g) {
+      // Disable adding a group role to that group itself.
+      // TODO: should be protected in the model as well to prevent
+      // updating through Group GUI, DIG or API. Also, should prevent
+      // loops.
+      if ( p.id == '@' + g.id ) return this.E().add('X');
       var self = this;
       return function() {
-        var data = self.getGroupPermission(p, g);
+        var data = self.getGroupPermission(g, p);
         data.checked$.sub(function() {
           self.updateGroup(p, g, data.checked$, self);
         });
@@ -278,13 +304,20 @@ foam.CLASS({
       };
     },
 
-    function initTableColumns(gs) {
+    function initTableColumns(gs, matrix) {
       var self = this;
       this.forEach(gs, function(g) {
         this.start('th')
+          .show(matrix.groupQuery$.map(function(q) {
+            return q == '' || g.id.indexOf(q) != -1;
+          }))
           .attrs({title: g.description})
           .call(function() {
-            var cv = foam.graphics.CView.create({width: 20, height: 200});
+            var cv = foam.graphics.Box.create({
+              color$: matrix.currentGroup$.map(function(cg) { return cg === g ? '#eee' : 'white'; }),
+              autoRepaint: true,
+              width: 20,
+              height: 200});
             var l  = foam.graphics.Label.create({
               text: g.id,
               x: 25,

@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.swift',
   name: 'ProtocolField',
-
+  flags: ['swift'],
   properties: [
     'name',
     'type',

@@ -56,7 +56,12 @@ foam.CLASS({
   package: 'foam.swift',
   name: 'SwiftTypeProperty',
   extends: 'String',
+  flags: ['swift'],
   properties: [
+    {
+      name: 'flags',
+      value: ['swift']
+    },
     {
       name: 'expression',
       value: function(type) {
