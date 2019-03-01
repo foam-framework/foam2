@@ -57,7 +57,7 @@ foam.CLASS({
     }
 
     ^ tbody tr:hover, ^hovered {
-      background: #eee;
+      background: #ccc;
     }
 
     ^ table {
@@ -137,8 +137,8 @@ foam.CLASS({
       class: 'Int',
       name: 'skip'
     },
-    'ps',
-    'gs',
+    'ps', /* permissions array */
+    'gs', /* groups array */
     'currentGroup',
     {
       name: 'filteredPs',
@@ -248,28 +248,21 @@ foam.CLASS({
     function getGroupPermission(g, p) {
       var key  = p.id + ':' + g.id;
       var data = this.gpMap[key];
+      var self = this;
 
       if ( ! data ) {
         data = this.GroupPermission.create({
           checked: this.checkPermissionForGroup(p.id, g)
         });
 
+        data.checked$.sub(function() {
+          self.updateGroup(p, g, data.checked$, self);
+        });
+
         // data.impliedByParentPermission = ! data.checked && g.implies(p.id);
 
         // Parent Group Inheritance
-        if ( g.parent ) {
-          var a = this.gMap[g.parent];
-          if ( a ) {
-            var parent = g.parent && this.getGroupPermission(a, p);
-            if ( parent ) {
-              function update() {
-                data.impliedByParentGroup = parent.granted;
-              }
-              update();
-              parent.granted$.sub(update);
-            }
-          }
-        }
+        this.dependOnGroup(g.parent, p, data);
 
         // Parent Permission Inheritance (wildcarding)
         var pParent = this.getParentGroupPermission(p, g);
@@ -278,13 +271,34 @@ foam.CLASS({
             data.impliedByParentPermission = pParent.granted;
           }
           update2();
-          pParent.granted$.sub(update2);
+          this.onDetach(pParent.granted$.sub(update2));
         }
 
         this.gpMap[key] = data;
       }
 
       return data;
+    },
+
+    function dependOnGroup(g, p, data) {
+      if ( ! g ) return;
+
+      var a = this.gMap[g];
+      if ( a ) {
+        var parent = g && this.getGroupPermission(a, p);
+        if ( parent ) {
+          function update() {
+            if ( parent.granted ) {
+              data.impliedByGroups[parent.id] = true;
+            } else {
+              delete data.impliedByGroups[parent.id];
+            }
+            data.impliedByGroup = !! Object.keys(data.impliedByGroups).length;
+          }
+          update();
+          this.onDetach(parent.granted$.sub(update));
+        }
+      }
     },
 
     function createCheckBox(p, g) {
@@ -295,12 +309,7 @@ foam.CLASS({
       if ( p.id == '@' + g.id ) return this.E().add('X');
       var self = this;
       return function() {
-        var data = self.getGroupPermission(g, p);
-        data.checked$.sub(function() {
-          self.updateGroup(p, g, data.checked$, self);
-        });
-
-        return self.GroupPermissionView.create({data: data});
+        return self.GroupPermissionView.create({data: self.getGroupPermission(g, p)});
       };
     },
 
@@ -314,7 +323,7 @@ foam.CLASS({
           .attrs({title: g.description})
           .call(function() {
             var cv = foam.graphics.Box.create({
-              color$: matrix.currentGroup$.map(function(cg) { return cg === g ? '#eee' : 'white'; }),
+              color$: matrix.currentGroup$.map(function(cg) { return cg === g ? '#ccc' : 'white'; }),
               autoRepaint: true,
               width: 20,
               height: 200});
@@ -415,14 +424,18 @@ foam.CLASS({
           name: 'impliedByParentPermission'
         },
         {
+          class: 'Map',
+          name: 'impliedByGroups'
+        },
+        {
           class: 'Boolean',
-          name: 'impliedByParentGroup'
+          name: 'impliedByGroup'
         },
         {
           class: 'Boolean',
           name: 'implied',
-          expression: function(impliedByParentPermission, impliedByParentGroup) {
-            return impliedByParentPermission || impliedByParentGroup;
+          expression: function(impliedByParentPermission, impliedByGroup) {
+            return impliedByParentPermission || impliedByGroup;
           }
         },
         {
