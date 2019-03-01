@@ -11,6 +11,8 @@ import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
+import foam.lib.PropertyPredicate;
+import foam.lib.PermissionedPropertyPredicate;
 import foam.util.SafetyUtil;
 import java.io.*;
 import java.lang.reflect.Array;
@@ -32,33 +34,43 @@ public class Outputter
     }
   };
 
-  protected PrintWriter   writer_;
-  protected OutputterMode mode_;
-  protected StringWriter  stringWriter_        = null;
-  protected boolean       outputShortNames_    = false;
-  protected boolean       outputDefaultValues_ = false;
-  protected boolean       outputClassNames_    = true;
+  protected foam.core.X x_;
+  protected PrintWriter       writer_;
+  protected StringWriter      stringWriter_        = null;
+  protected boolean           outputShortNames_    = false;
+  protected boolean           outputDefaultValues_ = false;
+  protected boolean           outputClassNames_    = true;
+  protected PropertyPredicate propertyPredicate_;
 
-  public Outputter() {
-    this(OutputterMode.FULL);
+  public Outputter(foam.core.X x) {
+    this(x, new PermissionedPropertyPredicate());
   }
 
-  public Outputter(OutputterMode mode) {
-    this((PrintWriter) null, mode);
+  public Outputter(foam.core.X x, PropertyPredicate propertyPredicate) {
+    this(x, (PrintWriter) null, propertyPredicate);
   }
 
-  public Outputter(File file, OutputterMode mode) throws FileNotFoundException {
-    this(new PrintWriter(file), mode);
+  public Outputter(foam.core.X x, File file) throws FileNotFoundException {
+    this(x, file, new PermissionedPropertyPredicate());
   }
 
-  public Outputter(PrintWriter writer, OutputterMode mode) {
+  public Outputter(foam.core.X x, File file, PropertyPredicate propertyPredicate) throws FileNotFoundException {
+    this(x, new PrintWriter(file), propertyPredicate);
+  }
+
+  public Outputter(foam.core.X x, PrintWriter writer) {
+    this(x, writer, new PermissionedPropertyPredicate());
+  }
+
+  public Outputter(foam.core.X x, PrintWriter writer, PropertyPredicate propertyPredicate) {
     if ( writer == null ) {
       stringWriter_ = new StringWriter();
       writer        = new PrintWriter(stringWriter_);
     }
 
-    this.mode_   = mode;
+    this.x_ = x;
     this.writer_ = writer;
+    this.propertyPredicate_ = propertyPredicate;
   }
 
   public String stringify(FObject obj) {
@@ -252,12 +264,11 @@ public class Outputter
 
   protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
 
-    if ( ! propertyPredicate(fo, prop) ) {
+    if ( ! propertyPredicate_.propertyPredicateCheck(this.x_, fo, prop) ) {
       return false;
     }
 
-    if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
-    if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
+    if ( ! outputDefaultValues_ && ! prop.isSet(fo) ) return false;
 
     Object value = prop.get(fo);
     if ( value == null || ( isArray(value) && Array.getLength(value) == 0 ) ) {
@@ -267,10 +278,6 @@ public class Outputter
     if ( includeComma ) writer_.append(",");
     outputProperty(fo, prop);
     return true;
-  }
-
-  protected  boolean propertyPredicate( FObject fo, PropertyInfo prop) {
-    return outputDefaultValues_ || prop.isSet(fo);
   }
 
   protected void outputFObjectDelta(FObject oldFObject, FObject newFObject) {
@@ -313,8 +320,9 @@ public class Outputter
   }
 
   protected boolean maybeOutputPropertyDelta(FObject oldFObject, FObject newFObject, PropertyInfo prop) {
-    if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
-    if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
+    if ( ! propertyPredicate_.propertyPredicateCheck(this.x_, newFObject, prop) ) {
+      return false;
+    }
 
     return prop.compare(oldFObject, newFObject) != 0;
   }

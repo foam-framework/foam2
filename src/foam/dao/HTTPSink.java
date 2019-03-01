@@ -43,7 +43,7 @@ public class HTTPSink
       conn.setDoInput(true);
       conn.setDoOutput(true);
       if ( format_ == Format.JSON ) {
-        outputter = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+        outputter = new foam.lib.json.Outputter(getX(), new foam.lib.NetworkPropertyPredicate());
         conn.addRequestProperty("Accept", "application/json");
         conn.addRequestProperty("Content-Type", "application/json");
       } else if ( format_ == Format.XML ) {

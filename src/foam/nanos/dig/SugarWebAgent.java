@@ -133,7 +133,7 @@ public class SugarWebAgent
       jsonParser.setX(x);
       resp.setContentType("application/json");
 
-      Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+      Outputter outputterJson = new foam.lib.json.Outputter(x, new foam.lib.NetworkPropertyPredicate());
       outputterJson.setOutputDefaultValues(true);
       outputterJson.setOutputClassNames(true);
 
@@ -164,7 +164,7 @@ public class SugarWebAgent
       JSONParser jsonParser = new JSONParser();
       jsonParser.setX(x);
 
-      Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+      Outputter outputterJson = new foam.lib.json.Outputter(x, new foam.lib.NetworkPropertyPredicate());
       outputterJson.setOutputDefaultValues(true);
       outputterJson.setOutputClassNames(true);
       outputterJson.output(error);
