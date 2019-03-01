@@ -25,7 +25,6 @@ import foam.nanos.notification.email.EmailMessage;
 import foam.nanos.notification.email.EmailService;
 import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
@@ -110,8 +109,7 @@ public class DigWebAgent
           outputterJson.setOutputClassNames(true);
           // let FObjectArray parse first
           if ( SafetyUtil.isEmpty(data) ) {
-              DigErrorMessage error = new EmptyDataException.Builder(x)
-                                            .build();
+              DigErrorMessage error = new EmptyDataException.Builder(x).build();
               outputException(x, resp, format, out, error);
               return;
           }
@@ -133,12 +131,12 @@ public class DigWebAgent
               Object[] objs = (Object[]) o;
               for ( int j = 0 ; j < objs.length ; j++ ) {
                 obj = (FObject) objs[j];
-                dao.put(obj);
+                daoPut(dao, obj);
               }
               outputterJson.output(objs);
             } else {
               obj = (FObject) o;
-              obj = dao.put(obj);
+              obj = daoPut(dao, obj);
               outputterJson.output(obj);
             }
 
@@ -183,7 +181,7 @@ public class DigWebAgent
           Iterator i = objList.iterator();
           while ( i.hasNext() ) {
             obj = (FObject)i.next();
-            obj = dao.put(obj);
+            obj = daoPut(dao, obj);
           }
 
           //returnMessage = "<objects>" + success + "</objects>";
@@ -232,7 +230,7 @@ public class DigWebAgent
           }
 
           for ( int i = 0 ; i < list.size() ; i++ ) {
-            dao.put((FObject) list.get(i));
+            daoPut(dao, (FObject) list.get(i));
           }
         } else if ( Format.HTML == format ) {
           DigErrorMessage error = new UnsupportException.Builder(x)
@@ -283,11 +281,11 @@ public class DigWebAgent
               Object[] objs = (Object[]) o;
               for ( int j = 0 ; j < objs.length ; j++ ) {
                 obj = (FObject) objs[j];
-                dao.put(obj);
+                daoPut(dao, obj);
               }
             } else {
               obj = (FObject) o;
-              obj = dao.put(obj);
+              obj = daoPut(dao, obj);
             }
             outputterJson.output(o);
             out.println(outputterJson);
@@ -483,6 +481,18 @@ public class DigWebAgent
 
       emailService.sendEmail(x, message);
     }
+  }
+
+  /**
+   * Put an FObject to the DAO, but merge with current object stored in DAO
+   * if it exists.
+   * TODO: improve synchronization
+   */
+  protected synchronized FObject daoPut(DAO dao, FObject obj)
+    throws Exception
+  {
+    FObject oldObj = dao.find(obj);
+    return dao.put(oldObj == null ? obj : oldObj.copyFrom(obj));
   }
 
   /**

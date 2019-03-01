@@ -217,7 +217,7 @@ foam.CLASS({
         List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
         for ( PropertyInfo p : props ) {
           try {
-            p.set(this, p.get(obj));
+            if ( p.isSet(obj) ) p.set(this, p.get(obj));
           } catch (java.lang.ClassCastException e) {
             // nop - ignore - only copy common properties.
           }
