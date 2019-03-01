@@ -42,7 +42,7 @@ if let o = o as? Error {
   throw o
 }
 
-<% if (this.swiftType) { %>
+<% if (this.swiftType != 'Void') { %>
   <% if (this.swiftType == 'Any?') { %>
 return o
   <% } else { %>

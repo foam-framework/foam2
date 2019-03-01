@@ -9,7 +9,9 @@ var path_ = require('path');
 
 // Enable FOAM swift support.
 global.FOAM_FLAGS = {
-  'node': true,
+  'js': false,
+  'java': false,
+  'node': false,
   'swift': true,
   'debug': true,
 };

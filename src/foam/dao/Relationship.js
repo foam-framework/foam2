@@ -157,7 +157,16 @@ foam.CLASS({
       value: false,
       transient: true
     },
-    'order'
+    'order',
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      expression: function(flags) {
+        var enabledFlags = Object.keys(global.FOAM_FLAGS)
+          .filter(f => global.FOAM_FLAGS[f]);
+        return foam.util.flagFilter(enabledFlags)(this);
+      }
+    }
     /* FUTURE:
     {
       name: 'deleteStrategy'
@@ -170,7 +179,7 @@ foam.CLASS({
     function initSource(x) {
       if ( this.sourceInitialized ) return;
       this.sourceInitialized = true;
-      if ( ! foam.util.flagFilter(global.FOAM_FLAGS)(this) ) return;
+      if ( ! this.enabled ) return;
 
       var context = x || this.__context__;
 
@@ -212,7 +221,7 @@ foam.CLASS({
     function initTarget(x) {
       if ( this.targetInitialized ) return;
       this.targetInitialized = true;
-      if ( ! foam.util.flagFilter(global.FOAM_FLAGS)(this) ) return;
+      if ( ! this.enabled ) return;
 
       var context = x || this.__context__;
 
@@ -252,7 +261,7 @@ foam.CLASS({
     function initJunction(x) {
       if ( this.junctionInitialized ) return;
       this.junctionInitialized = true;
-      if ( ! foam.util.flagFilter(global.FOAM_FLAGS)(this) ) return;
+      if ( ! this.enabled ) return;
 
       // Only need a junction class if this is a Many to Many
       // relationship.
