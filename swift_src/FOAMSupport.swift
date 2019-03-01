@@ -258,7 +258,7 @@ public class AbstractFObject: NSObject, foam_core_FObject, ContextAware {
   public func set(key: String, value: Any?) {
     if key.last == "$" && value is foam_swift_core_Slot {
       let slot = String(key[..<(key.index(before: key.endIndex))])
-      (self.ownClassInfo().axiom(byName: slot) as? SlotSetterAxiom)?.setSlot(self, value: value as! foam_swift_core_Slot)
+      (self.ownClassInfo().axiom(byName: slot) as? SlotSetterAxiom)?.setSlot(self, value: value as? foam_swift_core_Slot)
     } else {
       (self.ownClassInfo().axiom(byName: key) as? SetterAxiom)?.set(self, value: value)
     }

@@ -41,7 +41,7 @@ foam.CLASS({
       swiftFactory: function() {/*
 return UITableViewRowAction(style: .destructive, title: "Delete") { (_, indexPath) in
   _ = try? self.dataSource?.dao?.remove(
-      self.dataSource?.daoContents[indexPath.row] as! foam_core_FObject)
+      self.dataSource?.daoContents[indexPath.row] as! foam_core_FObject?)
 }
       */},
     },
