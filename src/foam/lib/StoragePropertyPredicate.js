@@ -26,7 +26,7 @@ foam.CLASS({
           }
         ],
         javaCode: `
-        if ( ! prop.getStorageTransient()) return false;
+        if ( prop.getStorageTransient()) return false;
         return super.propertyPredicateCheck(x, fo, prop);
   `
       }

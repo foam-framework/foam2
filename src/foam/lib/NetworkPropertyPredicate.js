@@ -26,7 +26,7 @@ foam.CLASS({
           }
         ],
         javaCode: `
-        if ( ! prop.getNetworkTransient()) return false;
+        if ( prop.getNetworkTransient()) return false;
         return super.propertyPredicateCheck(x, fo, prop);
   `
       }
