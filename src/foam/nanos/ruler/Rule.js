@@ -166,9 +166,7 @@
         }
       ],
       javaCode: `
-        if ( getAction() != null ) {
-          getAction().applyAction(x, obj, oldObj, ruler);
-        }
+        getAction().applyAction(x, obj, oldObj, ruler);
       `
     },
     {
@@ -192,13 +190,11 @@
         }
       ],
       javaCode: `
-        if ( getAsyncAction() != null ) {
-          getAsyncAction().applyAction(x, obj, oldObj, ruler);
-          if ( ! getAfter()
-            && Operations.REMOVE != getOperation()
-          ) {
-            ruler.getDelegate().put_(x, obj);
-          }
+        getAsyncAction().applyAction(x, obj, oldObj, ruler);
+        if ( ! getAfter()
+          && Operations.REMOVE != getOperation()
+        ) {
+          ruler.getDelegate().put_(x, obj);
         }
       `
     }
