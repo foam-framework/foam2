@@ -5,11 +5,11 @@ foam.INTERFACE({
   methods: [
     {
       name: 'propertyPredicateCheck',
-      type: 'boolean',
+      type: 'Boolean',
       args: [
         {
           name: 'x',
-          type: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'fo',
@@ -17,7 +17,7 @@ foam.INTERFACE({
         },
         {
           name: 'prop',
-          type: 'foam.core.PropertyInfo'
+          javaType: 'foam.core.PropertyInfo'
         }
       ]
     }
