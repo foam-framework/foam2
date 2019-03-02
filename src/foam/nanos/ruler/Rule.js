@@ -118,6 +118,11 @@
       name: 'saveHistory',
       value: false,
       documentation: 'Determines if history of rule execution should be saved.'
+    },
+    {
+      class: 'Int',
+      name: 'validity',
+      documentation: 'Validity of the rule (in days) for automatic rescheduling.'
     }
   ],
 
