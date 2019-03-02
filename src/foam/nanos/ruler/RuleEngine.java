@@ -13,6 +13,9 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.pool.FixedThreadPool;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,6 +124,12 @@ public class RuleEngine extends ContextAwareSupport {
         .build();
     }
     record.setResult(getResult(rule.getId()));
+    if ( rule.getValidity() > 0 ) {
+      Duration validity = Duration.ofDays(rule.getValidity());
+      Date expirationDate = Date.from(Instant.now().plus(validity));
+      record.setExpirationDate(expirationDate);
+    }
+
     savedRuleHistory_.put(rule.getId(),
       (RuleHistory) ruleHistoryDAO_.put(record).fclone());
   }

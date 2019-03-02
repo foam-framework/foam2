@@ -57,6 +57,17 @@ foam.CLASS({
           this.add(value.toString());
         }
       }
-    }
+    },
+    {
+      class: 'DateTime',
+      name: 'expirationDate',
+      documentation: 'Expiration date to be rescheduled.'
+    },
+    {
+      class: 'Boolean',
+      name: 'wasRenew',
+      value: false,
+      documentation: 'Renewal indicator.'
+    },
   ]
 });
