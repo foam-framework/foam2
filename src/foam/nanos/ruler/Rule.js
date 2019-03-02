@@ -172,6 +172,13 @@
       ],
       javaCode: `
         getAction().applyAction(x, obj, oldObj, ruler);
+        if ( ! getAfter()
+          && Operations.CREATE == getOperation()
+          || Operations.UPDATE == getOperation()
+          || Operations.CREATE_OR_UPDATE == getOperation()
+        ) {
+          ruler.getDelegate().put_(x, obj);
+        }
       `
     },
     {
