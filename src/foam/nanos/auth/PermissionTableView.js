@@ -4,7 +4,12 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
- // TODO: update permission dependency graph
+ // TODO:
+ // permission dependency graph is too complex given @group permissions
+ // so instead of maintaining graph just invalidate all states and then just
+ // recalculate lazily whenever any checkbox is clicked
+ // invalidated values should still maintain their previous value while
+ // being recalculated
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'PermissionTableView',
