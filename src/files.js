@@ -100,6 +100,7 @@ FOAM_FILES([
   { name: "foam/swift/Argument", flags: ['swift'] },
   { name: "foam/swift/ProtocolArgument", flags: ['swift'] },
   { name: "foam/swift/refines/Action", flags: ['swift'] },
+  { name: "foam/swift/refines/Promised", flags: ['swift'] },
   { name: "foam/swift/refines/InnerClass", flags: ['swift'] },
   { name: "foam/swift/refines/AbstractInterface", flags: ['swift'] },
   { name: "foam/swift/refines/Argument", flags: ['swift'] },
@@ -571,6 +572,4 @@ FOAM_FILES([
   { name: "foam/dashboard/view/Card" },
   { name: "foam/build/Library" },
   { name: "foam/build/EmbeddedModelDAO" },
-  { name: "foam/native/Blocking" },
-  { name: "foam/dao/BlockingDAO" },
 ]);

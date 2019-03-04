@@ -1950,3 +1950,57 @@ foam.CLASS({
     ['javaType', 'java.util.function.Function']
   ]
 });
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'PromisedMethodRefinement',
+  refines: 'foam.core.PromisedMethod',
+  flags: ['java'],
+  properties: [
+    {
+      name: 'javaCode',
+      getter: function() {
+        return `
+try {
+  synchronized ( getObj() ) {
+    if ( ! getObj().isPropertySet("${this.property}") ) getObj().wait();
+  }
+} catch (Exception e) {
+  throw new RuntimeException(e);
+}
+${this.javaType != 'void' ? 'return ' : ''}getObj()
+    .${this.name}(${this.args.map(a => a.name).join(', ')});
+        `;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'PromisedRefinement',
+  refines: 'foam.core.Promised',
+  flags: ['java'],
+  properties: [
+    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
+    {
+      name: 'javaType',
+      expression: function(of) { return of; }
+    },
+    {
+      name: 'javaPostSet',
+      expression: function(name, stateName) {
+        return `
+set${foam.String.capitalize(stateName)}(val);
+try {
+  synchronized ( this ) {
+    this.notifyAll();
+  }
+} catch (Exception e) {
+  throw new RuntimeException(e);
+}
+        `;
+      }
+    }
+  ]
+});
