@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.dao',
   name: 'RoutingJDAO',
-  extends: 'foam.dao.BlockingDAO',
+  extends: 'foam.dao.PromisedDAO',
   requires: [
     'foam.dao.java.JDAO'
   ],
@@ -35,7 +35,7 @@ foam.CLASS({
 new Thread() {
   public void run() {
     getJournal().waitForReplay();
-    setBlocking(
+    setPromise(
       new foam.dao.java.JDAO.Builder(getX())
         .setOf(getOf())
         .setDelegate(getDelegate())
