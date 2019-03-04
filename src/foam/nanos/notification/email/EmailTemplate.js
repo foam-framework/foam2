@@ -8,7 +8,8 @@ foam.CLASS({
   package: 'foam.nanos.notification.email',
   name: 'EmailTemplate',
 
-  documentation: 'Represents an email template',
+  documentation: `Represents an email template that stores the default properties of a specific email, 
+  mimics the EmailMessage which is the end obj that is processed into email.`,
 
   javaImports: [
     'java.nio.charset.StandardCharsets'
@@ -42,10 +43,10 @@ foam.CLASS({
       documentation: 'Template body',
       view: { class: 'foam.u2.tag.TextArea', rows: 40, cols: 150 },
       javaSetter:
-`body_ = val;
-bodyIsSet_ = true;
-bodyAsByteArray_ = null;
-bodyAsByteArrayIsSet_ = false;`
+        `body_ = val;
+        bodyIsSet_ = true;
+        bodyAsByteArray_ = null;
+        bodyAsByteArrayIsSet_ = false;`
     },
     {
       class: 'Array',
@@ -57,13 +58,20 @@ bodyAsByteArrayIsSet_ = false;`
     },
     {
       class: 'String',
-      name: 'displayName'
+      name: 'displayName',
+      documentation: `Displayed as the name in the email from field.`
     },
     {
       class: 'String',
       name: 'sendTo',
       documentation: `This property will set to whomever the email is being sent
         to.`
-    }
+    },
+    {
+      class: 'String',
+      name: 'replyTo',
+      documentation: `Displayed as the from email field.`
+    },
+
   ]
 });

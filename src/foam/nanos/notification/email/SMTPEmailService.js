@@ -11,8 +11,7 @@ foam.CLASS({
   documentation: 'Implementation of Email Service using SMTP',
 
   implements: [
-    'foam.nanos.NanoService',
-    'foam.nanos.notification.email.EmailService'
+    'foam.nanos.NanoService'
   ],
 
   imports: [
@@ -40,11 +39,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Group',
-    'foam.nanos.app.AppConfig',
-    'foam.dao.ArraySink',
-    'foam.dao.Sink',
-    'foam.mlang.MLang',
-    'java.util.List'
+    'foam.nanos.app.AppConfig'
   ],
 
   axioms: [
@@ -114,17 +109,7 @@ protected EnvironmentConfiguration config_ = null;`
     },
     {
       class: 'String',
-      name: 'from',
-      value: null
-    },
-    {
-      class: 'String',
       name: 'displayName',
-      value: null
-    },
-    {
-      class: 'String',
-      name: 'replyTo',
       value: null
     }
   ],
@@ -155,6 +140,7 @@ return config_;`
     {
       name: 'createMimeMessage',
       javaType: 'MimeMessage',
+      documentation: `Create a MimeMessage from the passed EmailMessage`,
       args: [
         {
           name: 'emailMessage',
@@ -250,7 +236,7 @@ if ( ! this.getEnabled() ) return;
   @Override
   public void execute(X x) {
     try {
-      MimeMessage message = createMimeMessage(finalizeEmailConfig(x, emailMessage));
+      MimeMessage message = createMimeMessage(emailMessage);
       if ( message == null ) {
         return;
       }
@@ -266,39 +252,16 @@ if ( ! this.getEnabled() ) return;
   }
 });`
     },
-    {
-      name: 'sendEmailFromTemplate',
-      javaCode: `
-if ( ! this.getEnabled() ) return;
-
-String group = user != null ? (String) user.getGroup() : null;
-EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(getX(), name, group);
-if ( emailMessage == null )
-  return;
-
-for ( String key : templateArgs.keySet() ) {
-  Object value = templateArgs.get(key);
-  if ( value instanceof String ) {
-    String s = (String) value;
-    templateArgs.put(key, new String(s.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
-  }
-}
-
-EnvironmentConfiguration config = getConfig(group);
-JtwigModel model = JtwigModel.newModel(templateArgs);
-emailMessage = (EmailMessage) emailMessage.fclone();
-
-JtwigTemplate templateBody =    JtwigTemplate.inlineTemplate(emailTemplate.getBody(), config);
-emailMessage.setBody(templateBody.render(model));
-
-// If subject has already provided, then we don't want to use template subject.
-if (SafetyUtil.isEmpty(emailMessage.getSubject())) {
-  JtwigTemplate templateSubject = JtwigTemplate.inlineTemplate(emailTemplate.getSubject(), config);
-  emailMessage.setSubject(templateSubject.render(model));
-}
-
-sendEmail(x, emailMessage);`
-    },
+    // {
+    //   name: 'sendEmailFromTemplate',
+    //   documentation: `This should never be called. Put in to reuse the existing email interface,
+    //   however we should write one for SMTP and take this incorrect implementation out.
+    //   sendEmailFromTemplate should only be called from the 'email' service which does the logic,
+    //   for filling in the proper email fields.`,
+    //   javaCode: `
+    //   sendEmail(x, emailMessage);
+    //   `
+    // },
     {
       name: 'start',
       javaCode:
@@ -312,91 +275,6 @@ if ( getAuthenticate() ) {
 } else {
   session_ = Session.getInstance(props);
 }`
-    },
-    {
-      name: 'finalizeEmailConfig',
-      type: 'foam.nanos.notification.email.EmailMessage',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'emailMessage',
-          javaType: 'final foam.nanos.notification.email.EmailMessage'
-        }
-      ],
-      javaCode:
-        `
-User user      = findUser(x, emailMessage);
-
-DAO groupDAO   = (DAO) x.get("groupDAO");
-Group group    = (Group) groupDAO.find(user.getGroup());
-
-if ( SafetyUtil.isEmpty(emailMessage.getFrom()) ) {
-  emailMessage.setFrom(
-    ! SafetyUtil.isEmpty(group.getFrom()) ?
-      group.getFrom() : getFrom()
-  );
-}
-
-if ( SafetyUtil.isEmpty(emailMessage.getReplyTo()) ) {
-  emailMessage.setReplyTo(
-    ! SafetyUtil.isEmpty(group.getReplyTo()) ?
-      group.getReplyTo() : getReplyTo()
-  );
-}
-
-if ( SafetyUtil.isEmpty(emailMessage.getDisplayName()) ) {
-  emailMessage.setDisplayName(
-    ! SafetyUtil.isEmpty(group.getDisplayName()) ? group.getDisplayName() : getDisplayName()
-  );
-}
-
-return emailMessage;
-      `
-    },
-    {
-      name: 'findUser',
-      type: 'foam.nanos.auth.User',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'emailMessage',
-          javaType: 'final foam.nanos.notification.email.EmailMessage'
-        }
-      ],
-      javaCode:
-        `
-foam.nanos.session.Session session = x.get(foam.nanos.session.Session.class);
-
-DAO userDAO         = (DAO) x.get("localUserDAO");
-User user           = (User) userDAO.find(session.getUserId());
-
-// 1. If the user doesn't login at this time, get the user from localUserDao
-// 2. If the user is the system user, get the real user from localUserDao
-if ( user == null || user.getId() == 1 ) {
-
-  Sink sink = new ArraySink();
-  sink = userDAO.where(MLang.EQ(User.EMAIL, emailMessage.getTo()[0]))
-    .limit(1).select(sink);
-
-  List list = ((ArraySink) sink).getArray();
-  if ( list == null || list.size() == 0 ) {
-    throw new RuntimeException("User not found");
-  }
-
-  user = (User) list.get(0);
-  if ( user == null ) {
-    throw new RuntimeException("User not found");
-  }
-}
-
-return user;
-      `
     }
   ]
 });
