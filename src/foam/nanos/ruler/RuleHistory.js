@@ -56,6 +56,14 @@ foam.CLASS({
         if ( !!value ) {
           this.add(value.toString());
         }
+      },
+      view: function (_, X) {
+        return X.data.slot(function(result) {
+          return foam.u2.TextField.create({
+            mode: foam.u2.DisplayMode.RO,
+            data: result.toString()
+          });
+        });
       }
     },
     {
