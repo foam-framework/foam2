@@ -22,6 +22,7 @@ foam.CLASS({
     'foam.mlang.MLang',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Group',
+    'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil',
     'java.nio.charset.StandardCharsets',
     'java.util.List',
@@ -165,11 +166,11 @@ return config_;`
       ],
       javaCode: `
         // VARIABLE SET UP:
-        // emailMessage = ( EmailMessage) emailMessage.fclone();
-        User user      = findUser(x, emailMessage);
+        User user     = findUser(x, emailMessage);
+        Logger logger = (Logger) x.get("logger");
 
         if ( user == null || user.getId() == 0 ) {
-          throw new RuntimeException("User Error @ DAOEmailService.fillInEmailProperties()");
+          logger.error("User null or unverified through DAO: failing at DAOEmailService.fillInEmailProperties()");
         }
 
         EnvironmentConfiguration config = getConfig(user.getGroup());
@@ -177,7 +178,7 @@ return config_;`
         Group group    = (Group) groupDAO.find(user.getGroup());
 
         if ( group == null || group.getId() == "0" ) {
-          throw new RuntimeException("Group Error @ DAOEmailService.fillInEmailProperties()");
+          logger.error("group null or unverified through DAO: failing at DAOEmailService.fillInEmailProperties()");
         }
 
         // BODY:
