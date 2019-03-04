@@ -139,7 +139,7 @@ return config_;`
     {
       name: 'fillInEmailProperties',
       documentation: `
-        Prioritiesations:
+      Prioritisations:
         1) Properties set on the EmailMessage,
         2) Properties set on the EmailTemplate,
         3) Properties set on the Group,
