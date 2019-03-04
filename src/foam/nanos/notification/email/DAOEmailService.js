@@ -169,8 +169,7 @@ return config_;`
         User user      = findUser(x, emailMessage);
 
         if ( user == null || user.getId() == 0 ) {
-          // TODO
-          System.out.println("User Error @ DAOEmailService.fillInEmailProperties()");
+          throw new RuntimeException("User Error @ DAOEmailService.fillInEmailProperties()");
         }
 
         EnvironmentConfiguration config = getConfig(user.getGroup());
@@ -178,8 +177,7 @@ return config_;`
         Group group    = (Group) groupDAO.find(user.getGroup());
 
         if ( group == null || group.getId() == "0" ) {
-          // TODO
-          System.out.println("Group Error @ DAOEmailService.fillInEmailProperties()");
+          throw new RuntimeException("Group Error @ DAOEmailService.fillInEmailProperties()");
         }
 
         // BODY:
