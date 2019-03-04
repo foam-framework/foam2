@@ -99,12 +99,19 @@
       adapt: function(_, v) {
         return v % this.rowHeight;
       }
+    },
+    {
+      name: 'scrollbar_',
+      documentation: `
+        A reference to the scrollbar element so we can update the height after
+        the view has loaded.
+      `
     }
   ],
 
   methods: [
     function init() {
-      this.onDetach(this.data$proxy.listen(this.FnSink.create({fn:this.onDAOUpdate})));
+      this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.onDAOUpdate })));
       this.onDAOUpdate();
     },
 
@@ -163,7 +170,7 @@
         var self = this;
         this.data$proxy.select(this.Count.create()).then(function(s) {
           self.daoCount = s.value;
-        })
+        });
       }
     },
     {
