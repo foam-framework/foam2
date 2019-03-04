@@ -16,6 +16,12 @@
     'foam.u2.view.TableView'
   ],
 
+  css: `
+    ^ {
+      display: flex;
+    }
+  `,
+
   constants: [
     {
       type: 'Integer',
@@ -103,23 +109,18 @@
     },
 
     function initE() {
-      // TODO probably shouldn't be using a table.
-      this.start('table').
-        on('wheel', this.onWheel).
-        start('tr').
-          start('td').
-            style({ 'vertical-align': 'top' }).
-            start(this.TableView, {
-              data$: this.scrolledDAO$,
-              columns: this.columns,
-              contextMenuActions: this.contextMenuActions,
-              selection$: this.selection$,
-              editColumnsEnabled: this.editColumnsEnabled
-            }, this.table_$).
-            end().
-          end().
-          start('td').
-            style({ 'vertical-align': 'top' }).
+      this.
+        start().
+          addClass(this.myClass()).
+          on('wheel', this.onWheel).
+          tag(this.TableView, {
+            data$: this.scrolledDAO$,
+            columns: this.columns,
+            contextMenuActions: this.contextMenuActions,
+            selection$: this.selection$,
+            editColumnsEnabled: this.editColumnsEnabled
+          }, this.table_$).
+          start().
             show(this.daoCount$.map((count) => count >= this.limit)).
             add(this.slot(function(limit) {
               return this.ScrollCView.create({
@@ -131,8 +132,7 @@
               });
             })).
           end().
-        end().
-      end();
+        end();
 
       if ( this.fitInScreen ) {
         this.onload.sub(this.updateTableHeight);
