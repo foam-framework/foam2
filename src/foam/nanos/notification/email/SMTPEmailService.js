@@ -252,16 +252,6 @@ if ( ! this.getEnabled() ) return;
   }
 });`
     },
-    // {
-    //   name: 'sendEmailFromTemplate',
-    //   documentation: `This should never be called. Put in to reuse the existing email interface,
-    //   however we should write one for SMTP and take this incorrect implementation out.
-    //   sendEmailFromTemplate should only be called from the 'email' service which does the logic,
-    //   for filling in the proper email fields.`,
-    //   javaCode: `
-    //   sendEmail(x, emailMessage);
-    //   `
-    // },
     {
       name: 'start',
       javaCode:
