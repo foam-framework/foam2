@@ -1,5 +1,5 @@
 foam.CLASS({
-    package: 'foam.u2.modalForm',
+    package: 'foam.u2',
     name: 'PrecisionFloatView',
     extends: 'foam.u2.FloatView',
     
