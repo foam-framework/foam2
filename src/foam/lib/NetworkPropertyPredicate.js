@@ -1,18 +1,16 @@
-foam.CLASS({
+  foam.CLASS({
     package: 'foam.lib',
     name: 'NetworkPropertyPredicate',
-    extends: 'foam.lib.PermissionedPropertyPredicate',
+    implements: [ 'foam.lib.PropertyPredicate'],
     javaImports: [
-        'foam.nanos.auth.AuthService',
-        'foam.lib.PermissionedPropertyPredicate'
+      'foam.nanos.auth.AuthService'
     ],
     
     methods: [
       {
         name: 'propertyPredicateCheck',
         javaCode: `
-        if ( prop.getNetworkTransient()) return false;
-        return super.propertyPredicateCheck(x, fo, prop);
+  return ! prop.getNetworkTransient();
   `
       }
     ]

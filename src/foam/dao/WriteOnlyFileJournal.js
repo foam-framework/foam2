@@ -12,7 +12,7 @@ foam.CLASS({
     {
       name: 'outputter',
       javaFactory: `
-        return new foam.lib.json.Outputter(getX(), new foam.lib.StoragePropertyPredicate())
+        return new foam.lib.json.StorageTransientOutputter(getX())
           .setOutputClassNames(getOutputClassNames());
       `
     }

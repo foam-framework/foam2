@@ -42,27 +42,16 @@ public class Outputter
   protected boolean           outputClassNames_    = true;
   protected PropertyPredicate propertyPredicate_;
 
-  public Outputter(foam.core.X x) {
-    this(x, new PermissionedPropertyPredicate());
-  }
 
-  public Outputter(foam.core.X x, PropertyPredicate propertyPredicate) {
-    this(x, (PrintWriter) null, propertyPredicate);
+  public Outputter(foam.core.X x) {
+    this(x, (PrintWriter) null);
   }
 
   public Outputter(foam.core.X x, File file) throws FileNotFoundException {
-    this(x, file, new PermissionedPropertyPredicate());
-  }
-
-  public Outputter(foam.core.X x, File file, PropertyPredicate propertyPredicate) throws FileNotFoundException {
-    this(x, new PrintWriter(file), propertyPredicate);
+    this(x, new PrintWriter(file));
   }
 
   public Outputter(foam.core.X x, PrintWriter writer) {
-    this(x, writer, new PermissionedPropertyPredicate());
-  }
-
-  public Outputter(foam.core.X x, PrintWriter writer, PropertyPredicate propertyPredicate) {
     if ( writer == null ) {
       stringWriter_ = new StringWriter();
       writer        = new PrintWriter(stringWriter_);
@@ -70,7 +59,6 @@ public class Outputter
 
     this.x_ = x;
     this.writer_ = writer;
-    this.propertyPredicate_ = propertyPredicate;
   }
 
   public String stringify(FObject obj) {
@@ -264,7 +252,7 @@ public class Outputter
 
   protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
 
-    if ( ! propertyPredicate_.propertyPredicateCheck(this.x_, fo, prop) ) {
+    if ( propertyPredicate_ != null && ! propertyPredicate_.propertyPredicateCheck(this.x_, fo, prop) ) {
       return false;
     }
 
@@ -320,7 +308,7 @@ public class Outputter
   }
 
   protected boolean maybeOutputPropertyDelta(FObject oldFObject, FObject newFObject, PropertyInfo prop) {
-    if ( ! propertyPredicate_.propertyPredicateCheck(this.x_, newFObject, prop) ) {
+    if ( propertyPredicate_ != null && ! propertyPredicate_.propertyPredicateCheck(this.x_, newFObject, prop) ) {
       return false;
     }
 

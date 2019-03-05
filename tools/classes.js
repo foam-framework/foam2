@@ -254,6 +254,7 @@ var classes = [
   'foam.lib.PermissionedPropertyPredicate',
   'foam.lib.NetworkPropertyPredicate',
   'foam.lib.StoragePropertyPredicate',
+  'foam.lib.AndPropertyPredicate',
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
   'foam.lib.json.OutputJSON',

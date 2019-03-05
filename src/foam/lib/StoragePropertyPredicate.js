@@ -1,20 +1,18 @@
 foam.CLASS({
-    package: 'foam.lib',
-    name: 'StoragePropertyPredicate',
-    extends: 'foam.lib.PermissionedPropertyPredicate',
-    javaImports: [
-        'foam.nanos.auth.AuthService',
-        'foam.lib.PermissionedPropertyPredicate'
-    ],
-    
-    methods: [
-      {
-        name: 'propertyPredicateCheck',
-        javaCode: `
-        if ( prop.getStorageTransient()) return false;
-        return super.propertyPredicateCheck(x, fo, prop);
-  `
-      }
-    ]
-  });
-    
+  package: 'foam.lib',
+  name: 'StoragePropertyPredicate',
+  implements: [ 'foam.lib.PropertyPredicate'],
+  javaImports: [
+    'foam.nanos.auth.AuthService'
+  ],
+  
+  methods: [
+    {
+      name: 'propertyPredicateCheck',
+      javaCode: `
+return ! prop.getStorageTransient();
+`
+    }
+  ]
+});
+  
