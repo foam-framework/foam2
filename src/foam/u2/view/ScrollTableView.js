@@ -87,10 +87,9 @@
       `
     },
     {
-      type: 'Int',
+      class: 'Int',
       name: 'accumulator',
-      value: 0,
-      documentation: `Used internally to mimic native scrolling speed.`,
+      documentation: 'Used internally to mimic native scrolling speed.',
       adapt: function(_, v) {
         return v % this.rowHeight;
       }
