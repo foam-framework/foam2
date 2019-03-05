@@ -170,7 +170,7 @@ return config_;`
         Logger logger = (Logger) x.get("logger");
 
         if ( user == null || user.getId() == 0 ) {
-          logger.error("User null or unverified through DAO: failing at DAOEmailService.fillInEmailProperties()");
+          logger.warning("User null or unverified through DAO: failing at DAOEmailService.fillInEmailProperties()", new Exception());
         }
 
         EnvironmentConfiguration config = getConfig(user.getGroup());
@@ -178,7 +178,7 @@ return config_;`
         Group group    = (Group) groupDAO.find(user.getGroup());
 
         if ( group == null || group.getId() == "0" ) {
-          logger.error("group null or unverified through DAO: failing at DAOEmailService.fillInEmailProperties()");
+          logger.warning("group null or unverified through DAO: failing at DAOEmailService.fillInEmailProperties()", new Exception());
         }
 
         // BODY:
