@@ -11,14 +11,28 @@
 
   requires: [
     'foam.dao.FnSink',
-    'foam.graphics.ScrollCView',
     'foam.mlang.sink.Count',
     'foam.u2.view.TableView'
   ],
 
   css: `
     ^ {
-      display: flex;
+      position: relative;
+    }
+
+    ^scrollbar {
+      box-sizing: border-box;
+    }
+
+    ^scrollbarContainer {
+      overflow: scroll;
+    }
+
+    ^table {
+      /* The following line is required for Safari. */
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
     }
   `,
 
@@ -101,11 +115,33 @@
       }
     },
     {
-      name: 'scrollbar_',
+      name: 'scrollbarContainer_',
       documentation: `
-        A reference to the scrollbar element so we can update the height after
-        the view has loaded.
+        A reference to the scrollbar's container element so we can update the
+        height after the view has loaded.
       `
+    },
+    {
+      type: 'Int',
+      name: 'accumulator',
+      value: 0,
+      adapt: function(_, v) {
+        return v % this.rowHeight;
+      }
+    },
+    {
+      type: 'String',
+      name: 'scrollHeight',
+      expression: function(daoCount, limit, rowHeight) {
+        this.lastScrollTop_ = 0;
+        this.skip = 0;
+        return rowHeight * daoCount + this.TABLE_HEAD_HEIGHT + 'px';
+      }
+    },
+    {
+      type: 'Int',
+      name: 'lastScrollTop_',
+      value: 0
     }
   ],
 
@@ -117,27 +153,23 @@
 
     function initE() {
       this.
-        start().
-          addClass(this.myClass()).
-          on('wheel', this.onWheel).
-          tag(this.TableView, {
+        addClass(this.myClass()).
+        start('div', undefined, this.scrollbarContainer_$).
+          addClass(this.myClass('scrollbarContainer')).
+          on('scroll', this.onScroll).
+          start(this.TableView, {
             data$: this.scrolledDAO$,
             columns: this.columns,
             contextMenuActions: this.contextMenuActions,
             selection$: this.selection$,
             editColumnsEnabled: this.editColumnsEnabled
           }, this.table_$).
+            addClass(this.myClass('table')).
+          end().
           start().
             show(this.daoCount$.map((count) => count >= this.limit)).
-            add(this.slot(function(limit) {
-              return this.ScrollCView.create({
-                value$: this.skip$,
-                extent$: this.limit$,
-                height: this.rowHeight * limit + this.TABLE_HEAD_HEIGHT,
-                width: 12,
-                size$: this.daoCount$,
-              });
-            })).
+            addClass(this.myClass('scrollbar')).
+            style({ height: this.scrollHeight$ }).
           end().
         end();
 
@@ -153,13 +185,16 @@
 
   listeners: [
     {
-      name: 'onWheel',
+      name: 'onScroll',
       code: function(e) {
-        var negative = e.deltaY < 0;
-        var rows = Math.floor(Math.abs(this.accumulator + e.deltaY) / this.rowHeight);
-        this.accumulator += e.deltaY;
+        var deltaY = e.target.scrollTop - this.lastScrollTop_;
+        var negative = deltaY < 0;
+        var rows = Math.floor(Math.abs(this.accumulator + deltaY) / this.rowHeight);
+        this.accumulator += deltaY;
+        var oldSkip = this.skip;
         this.skip = Math.max(0, this.skip + (negative ? -rows : rows));
-        if ( e.deltaY !== 0 ) e.preventDefault();
+        if ( this.skip > this.daoCount - this.limit ) this.skip = oldSkip;
+        this.lastScrollTop_ = e.target.scrollTop;
       }
     },
     {
@@ -185,6 +220,8 @@
         // Set the limit such that we make maximum use of the space without
         // overflowing.
         this.limit = Math.max(1, Math.floor((remainingSpace - this.TABLE_HEAD_HEIGHT) / this.rowHeight));
+
+        this.scrollbarContainer_.el().style.height = (this.limit * this.rowHeight) + this.TABLE_HEAD_HEIGHT + 'px';
       }
     }
   ]
