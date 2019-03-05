@@ -96,6 +96,7 @@ var classes = [
   'foam.dao.RoutingJournal',
   'foam.dao.RoutingJournalTest',
   'foam.dao.RoutingJDAO',
+  'foam.dao.JournalType',
   'foam.dao.WriteOnlyJDAO',
   'foam.dao.WriteOnlyFileJournal',
   'foam.dao.BaseClientDAO',
@@ -390,4 +391,4 @@ module.exports = {
     skeletons: skeletons,
     proxies: proxies,
     blacklist: blacklist
-}
+};
