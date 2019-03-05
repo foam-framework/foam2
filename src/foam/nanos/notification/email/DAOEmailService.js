@@ -15,6 +15,7 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.NullDAO',
@@ -140,7 +141,7 @@ return config_;`
     {
       name: 'fillInEmailProperties',
       documentation: `
-      Prioritisations:
+        Order of precedence:
         1) Properties set on the EmailMessage,
         2) Properties set on the EmailTemplate,
         3) Properties set on the Group,
@@ -168,16 +169,11 @@ return config_;`
         // VARIABLE SET UP:
         User user     = findUser(x, emailMessage);
         Logger logger = (Logger) x.get("logger");
-
-        if ( user == null || user.getId() == 0 ) {
-          logger.warning("User null or unverified through DAO: failing at DAOEmailService.fillInEmailProperties()", new Exception());
-        }
-
         EnvironmentConfiguration config = getConfig(user.getGroup());
-        DAO groupDAO   = (DAO) x.get("groupDAO");
+        DAO groupDAO   = ((DAO) x.get("groupDAO")).inX(x);
         Group group    = (Group) groupDAO.find(user.getGroup());
 
-        if ( group == null || group.getId() == "0" ) {
+        if ( group == null ) {
           logger.warning("group null or unverified through DAO: failing at DAOEmailService.fillInEmailProperties()", new Exception());
         }
 
@@ -231,7 +227,7 @@ return config_;`
         // Since sendTo is very specific to each email there is no group field or default value for this property.
         if ( emailMessage.getTo().length == 0 &&
           ! foam.util.SafetyUtil.isEmpty(emailTemplate.getSendTo()) ) {
-            JtwigTemplate templateSendTo= JtwigTemplate.inlineTemplate(emailTemplate.getSendTo(), config);
+            JtwigTemplate templateSendTo = JtwigTemplate.inlineTemplate(emailTemplate.getSendTo(), config);
             emailMessage.setTo(new String[] {templateSendTo.render(model)});
         }
 
@@ -253,27 +249,18 @@ return config_;`
       ],
       javaCode:
         `
+        Logger logger = (Logger) x.get("logger");
         foam.nanos.session.Session session = x.get(foam.nanos.session.Session.class);
 
-        DAO userDAO         = (DAO) x.get("localUserDAO");
+        DAO userDAO         = ((DAO) x.get("localUserDAO")).inX(x);
         User user           = (User) userDAO.find(session.getUserId());
 
         // 1. If the user doesn't login at this time, get the user from localUserDao
         // 2. If the user is the system user, get the real user from localUserDao
         if ( user == null || user.getId() == 1 ) {
-
-          Sink sink = new ArraySink();
-          sink = userDAO.where(MLang.EQ(User.EMAIL, emailMessage.getTo()[0]))
-            .limit(1).select(sink);
-
-          List list = ((ArraySink) sink).getArray();
-          if ( list == null || list.size() == 0 ) {
-            throw new RuntimeException("User not found");
-          }
-
-          user = (User) list.get(0);
-          if ( user == null ) {
-            throw new RuntimeException("User not found");
+          user = (User) userDAO.find(MLang.EQ(User.EMAIL, emailMessage.getTo()[0]));
+          if ( user == null || user.getId() == 0) {
+            logger.warning("User not found:", new Exception());
           }
         }
 

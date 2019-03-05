@@ -17,7 +17,7 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      SMTPEmailService service = (SMTPEmailService) x.get("smtpEmailService");
+        SMTPEmailService service = (SMTPEmailService) x.get("smtpEmailService");
         if ( service != null ) {
           try {
             service.sendEmail(x, (EmailMessage) obj);
