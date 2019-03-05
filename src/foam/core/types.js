@@ -594,6 +594,12 @@ foam.CLASS({
           newValue.id :
           newValue ;
       }
+    },
+    {
+      name: 'value',
+      expression: function(of) {
+        if ( of ) return of.ID.value;
+      }
     }
   ],
 
