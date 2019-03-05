@@ -27,6 +27,10 @@
     'foam.dao.Sink'
   ],
 
+  constants: {
+    PUT_CMD: 'PUT_CMD'
+  },
+
   properties: [
     {
       class: 'String',
@@ -86,6 +90,16 @@
 
       applyRules(x, ret, oldObj, getAfterGroup(Operations.REMOVE));
       return ret;
+      `
+    },
+    {
+      name: 'cmd_',
+      javaCode: `
+        if ( PUT_CMD == obj ) {
+          getDelegate().put((FObject) x.get("OBJ"));
+          return true;
+        }
+        return super.cmd(obj);
       `
     },
     {

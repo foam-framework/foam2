@@ -123,6 +123,21 @@
       class: 'Int',
       name: 'validity',
       documentation: 'Validity of the rule (in days) for automatic rescheduling.'
+    },
+    {
+      class: 'Object',
+      name: 'cmd',
+      transient: true,
+      hidden: true,
+      javaFactory: `
+        if ( Operations.CREATE == getOperation()
+          || Operations.UPDATE == getOperation()
+          || Operations.CREATE_OR_UPDATE == getOperation()
+        ) {
+          return RulerDAO.PUT_CMD;
+        }
+        return null;
+      `
     }
   ],
 
@@ -172,12 +187,8 @@
       ],
       javaCode: `
         getAction().applyAction(x, obj, oldObj, ruler);
-        if ( ! getAfter()
-          && Operations.CREATE == getOperation()
-          || Operations.UPDATE == getOperation()
-          || Operations.CREATE_OR_UPDATE == getOperation()
-        ) {
-          ruler.getDelegate().put_(x, obj);
+        if ( ! getAfter() ) {
+          ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }
       `
     },
@@ -203,12 +214,8 @@
       ],
       javaCode: `
         getAsyncAction().applyAction(x, obj, oldObj, ruler);
-        if ( ! getAfter()
-          && Operations.CREATE == getOperation()
-          || Operations.UPDATE == getOperation()
-          || Operations.CREATE_OR_UPDATE == getOperation()
-        ) {
-          ruler.getDelegate().put_(x, obj);
+        if ( ! getAfter() ) {
+          ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }
       `
     }
