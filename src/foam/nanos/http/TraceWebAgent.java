@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.HashMap;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class TraceWebAgent
   implements WebAgent
@@ -29,11 +30,13 @@ public class TraceWebAgent
     Logger              logger = (Logger) x.get("logger");
 
     try {
-      PrintWriter        out = x.get(PrintWriter.class);
-      HttpServletRequest req = x.get(HttpServletRequest.class);
-      HttpParameters     params = x.get(HttpParameters.class);
-      Map                kv  = new HashMap();
+      PrintWriter         out = x.get(PrintWriter.class);
+      HttpServletRequest  req = x.get(HttpServletRequest.class);
+      HttpServletResponse resp = x.get(HttpServletResponse.class);
+      HttpParameters      params = x.get(HttpParameters.class);
+      Map                 kv  = new HashMap();
 
+      resp.setContentType("text/html");
       out.println("<HTML>\n" +
           "<HEAD><TITLE>trace</TITLE></HEAD>\n" +
           "<BODY BGCOLOR=\"#FDF5E6\">\n" +
