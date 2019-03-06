@@ -77,5 +77,14 @@ foam.CLASS({
       value: false,
       documentation: 'Renewal indicator.'
     },
+    {
+      class: 'String',
+      name: 'note',
+      documentation: 'Note appended to the rule history.',
+      view: {
+        class: 'foam.u2.tag.TextArea',
+        rows: 20, cols: 80
+      }
+    }
   ]
 });

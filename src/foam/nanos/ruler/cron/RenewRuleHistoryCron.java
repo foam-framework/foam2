@@ -6,6 +6,7 @@ import foam.core.FObject;
 import foam.core.X;
 import foam.dao.AbstractSink;
 import foam.dao.DAO;
+import foam.nanos.logger.Logger;
 import foam.nanos.ruler.Rule;
 import foam.nanos.ruler.RuleEngine;
 import foam.nanos.ruler.RuleHistory;
@@ -31,19 +32,45 @@ public class RenewRuleHistoryCron implements ContextAgent {
       public void put(Object obj, Detachable sub) {
         RuleHistory ruleHistory = (RuleHistory) ((FObject) obj).fclone();
         ruleHistory.setWasRenew(true);
-        ruleHistoryDAO.put(ruleHistory);
 
-        // Execute the associated rule via rule engine.
-        // The rule engine's arguments:
-        //   - delegate : DAO looked up using RuleHistory.objectDaoKey
-        //   - rule     : The rule to be executed
-        //   - obj      : null - as object is not being put
-        //   - oldObj   : The object retrieved from the DAO using RuleHistory.objectId
-        Rule rule = (Rule) ruleDAO.find(ruleHistory.getRuleId());
-        DAO delegate = (DAO) x.get(ruleHistory.getObjectDaoKey());
-        FObject oldObj = delegate.find(ruleHistory.getObjectId());
-        new RuleEngine(x, delegate).execute(
-          Arrays.asList(rule), null, oldObj);
+        try {
+          // Execute the associated rule via rule engine.
+          // The rule engine's arguments:
+          //   - delegate : DAO looked up using RuleHistory.objectDaoKey
+          //   - rule     : The rule to be executed
+          //   - obj      : null - as object is not being put
+          //   - oldObj   : The object retrieved from the DAO using RuleHistory.objectId
+          Rule rule = (Rule) ruleDAO.find(ruleHistory.getRuleId());
+          if ( rule == null ) {
+            throw new Exception(
+              String.format("Rule with id %d is not found.",
+                ruleHistory.getId()));
+          }
+          DAO delegate = (DAO) x.get(ruleHistory.getObjectDaoKey());
+          FObject oldObj = delegate.find(ruleHistory.getObjectId());
+          if ( oldObj == null ) {
+            throw new Exception(
+              String.format("Object with id %d in %s is not found.",
+                ruleHistory.getId(),
+                ruleHistory.getObjectDaoKey()));
+          }
+          new RuleEngine(x, delegate).execute(
+            Arrays.asList(rule), null, oldObj);
+        } catch (Throwable t) {
+          StringBuilder sb = new StringBuilder();
+          sb.append(String.format(
+            "RuleHistory with id %d failed to execute", ruleHistory.getId()));
+
+          // Log the error
+          Logger logger = (Logger) x.get("logger");
+          logger.error(sb.toString() , t);
+
+          // Add note to rule history
+          sb.append(" : ").append(t.getMessage());
+          ruleHistory.setNote(sb.toString());
+        } finally {
+          ruleHistoryDAO.put(ruleHistory);
+        }
       }
     });
   }
