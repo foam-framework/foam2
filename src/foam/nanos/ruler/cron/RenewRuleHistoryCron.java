@@ -35,14 +35,15 @@ public class RenewRuleHistoryCron implements ContextAgent {
 
         // Execute the associated rule via rule engine.
         // The rule engine's arguments:
-        //   - delegate : DAO lookup using RuleHistory.objectDaoKey
+        //   - delegate : DAO looked up using RuleHistory.objectDaoKey
         //   - rule     : The rule to be executed
-        //   - object   : Uses as both obj and oldObj when executing the rule
+        //   - obj      : null - as object is not being put
+        //   - oldObj   : The object retrieved from the DAO using RuleHistory.objectId
         Rule rule = (Rule) ruleDAO.find(ruleHistory.getRuleId());
         DAO delegate = (DAO) x.get(ruleHistory.getObjectDaoKey());
-        FObject object = delegate.find(ruleHistory.getObjectId());
+        FObject oldObj = delegate.find(ruleHistory.getObjectId());
         new RuleEngine(x, delegate).execute(
-          Arrays.asList(rule), object, object);
+          Arrays.asList(rule), null, oldObj);
       }
     });
   }
