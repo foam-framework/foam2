@@ -82,7 +82,7 @@ public class AgentUserAuthService
     // Set user and agent objects into the session context and place into sessionDAO.
     Session session = x.get(Session.class);
     session.setUserId(user.getId());
-    session.setUserId(agent.getId());
+    session.setAgentId(agent.getId());
     session.setContext(session.getContext().put("user", user));
     session.setContext(session.getContext().put("agent", agent));
     return user;
