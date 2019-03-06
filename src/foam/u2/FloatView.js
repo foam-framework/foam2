@@ -54,10 +54,29 @@ foam.CLASS({
     },
 
     function link() {
-      this.attrSlot(null, this.onKey ? 'input' : null).relateFrom(
+      if ( foam.Undefined.isInstance(this.precision) ) {
+        this.attrSlot(null, this.onKey ? 'input' : null).relateFrom(
           this.data$,
           this.textToData.bind(this),
           this.dataToText.bind(this));
+        return;
+      }
+
+      // limit to precision;
+      var data = this.data$;
+      var view = this.attrSlot(null, this.onKey ? 'input' : null);
+
+      if ( ! foam.Undefined.isInstance(this.data) ) view.set(this.formatNumber(this.data));
+
+      view.sub(function() {
+        var text = view.value;
+        data.set(this.textToData(text));
+
+        if ( text.indexOf('.') > 0 && text.length - text.indexOf('.') - 1 > this.precision ) {
+          view.set(text.substring(0, text.indexOf('.') + this.precision + 1));
+        }
+
+      }.bind(this));
     },
 
     function fromProperty(p) {
