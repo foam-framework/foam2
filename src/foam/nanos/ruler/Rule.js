@@ -171,9 +171,10 @@
         }
       ],
       javaCode: `
-        return getPredicate().f(
-          x.put("NEW", obj).put("OLD", oldObj)
-        );
+        return getEnabled()
+          && getPredicate().f(
+            x.put("NEW", obj).put("OLD", oldObj)
+          );
       `
     },
     {
