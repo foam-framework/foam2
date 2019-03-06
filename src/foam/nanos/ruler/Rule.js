@@ -117,12 +117,23 @@
       class: 'Boolean',
       name: 'saveHistory',
       value: false,
-      documentation: 'Determines if history of rule execution should be saved.'
+      documentation: 'Determines if history of rule execution should be saved.',
+      help: 'Automatically sets to true when validity is greater than zero.',
+      adapt: function(_, nu) {
+        return nu || this.validity > 0;
+      }
     },
     {
       class: 'Int',
       name: 'validity',
-      documentation: 'Validity of the rule (in days) for automatic rescheduling.'
+      documentation: 'Validity of the rule (in days) for automatic rescheduling.',
+      postSet: function(_, nu) {
+        if ( nu > 0
+          && ! this.saveHistory
+        ) {
+          this.saveHistory = true;
+        }
+      }
     },
     {
       class: 'Object',
