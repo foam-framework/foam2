@@ -1013,7 +1013,7 @@ foam.CLASS({
       }
    },
 
-    function toE(X) {
+    function toE(args, X) {
       return this.Canvas.create({ cview: this }, X).attrs({
         width: this.x + this.radius + this.arcWidth,
         height: this.y + this.radius + this.arcWidth

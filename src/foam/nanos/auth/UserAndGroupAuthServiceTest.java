@@ -26,7 +26,7 @@ public class UserAndGroupAuthServiceTest
   }
 
   @Override
-  public void start() {
+  public void start() throws java.lang.Exception {
     System.out.println("Starting");
     super.start();
     createGroupsAndPermissions();

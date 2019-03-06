@@ -25,12 +25,12 @@ foam.CLASS({
   // author: Sebastian Greer (age 11)
 
   requires: [
+    'foam.graphics.Arc',
+    'foam.graphics.Box as Rectangle',
+    'foam.graphics.Circle',
     'foam.graphics.CView',
     'foam.graphics.ImageCView',
-    'foam.util.Timer',
-    'foam.graphics.Arc',
-    'foam.graphics.Circle',
-    'foam.graphics.Box as Rectangle'
+    'foam.util.Timer'
   ],
 
   properties: [
@@ -50,9 +50,9 @@ foam.CLASS({
       this.SUPER();
 
       var body = this.Rectangle.create({
-        width: 20,
+        width:  20,
         height: 30,
-        color: '#ccc'
+        color:  '#ccc'
       });
       this.add(body);
 
@@ -60,19 +60,19 @@ foam.CLASS({
 //      body.add(logo);
 
       var neck = this.Rectangle.create({
-        color: 'black',
-        width: 2,
-        y: -13,
-        x: 9,
+        color:  'black',
+        width:  2,
+        y:     -13,
+        x:      9,
         height: 15
       });
       body.add(neck);
 
       var head = this.Circle.create({
         radius: 8,
-        color: 'purple',
-        x: 0,
-        y: -5
+        color:  'purple',
+        x:      0,
+        y:      -5
       });
       neck.add(head);
 
@@ -89,13 +89,13 @@ foam.CLASS({
 
       var eye = this.Circle.create({
         radius: 5,
-        color: 'white'
+        color:  'white'
       });
       head.add(eye);
 
       var pupil = this.Circle.create({
         radius: 2,
-        color: 'lightblue'
+        color:  'lightblue'
       });
       eye.add(pupil);
 

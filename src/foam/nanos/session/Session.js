@@ -29,6 +29,17 @@ foam.CLASS({
       }
     },
     {
+      class: 'Long',
+      name: 'agentId',
+      tableCellFormatter: function(value, obj) {
+        if ( ! value ) return;
+        this.add(value);
+        this.__context__.userDAO.find(value).then(function(user) {
+          this.add(' ', user.label());
+        }.bind(this));
+      }
+    },
+    {
       class: 'DateTime',
       name: 'created',
       factory: function() { return new Date(); },
