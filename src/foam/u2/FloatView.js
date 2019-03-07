@@ -65,18 +65,30 @@ foam.CLASS({
       // limit to precision;
       var data = this.data$;
       var view = this.attrSlot(null, this.onKey ? 'input' : null);
+      var self = this;
 
       if ( ! foam.Undefined.isInstance(this.data) ) view.set(this.formatNumber(this.data));
 
+      if ( this.onKey ) {
+        this.on('blur', function() {
+          var value = data.get();
+          view.set(self.formatNumber(value));
+        });
+       }
+
       view.sub(function() {
-        var text = view.value;
-        data.set(this.textToData(text));
+        var text = view.get();
+        data.set(self.textToData(text));
 
-        if ( text.indexOf('.') > 0 && text.length - text.indexOf('.') - 1 > this.precision ) {
-          view.set(text.substring(0, text.indexOf('.') + this.precision + 1));
+        if ( text.indexOf('.') > 0 && text.length - text.indexOf('.') - 1 > self.precision ) {
+          view.set(text.substring(0, text.indexOf('.') + self.precision + 1));
         }
+      });
 
-      }.bind(this));
+      data.sub(function() {
+        if ( data.get() == parseFloat(view.get()) ) return;
+        view.set(self.formatNumber(data.get()));
+      });
     },
 
     function fromProperty(p) {
