@@ -27,13 +27,13 @@ foam.CLASS({
         return type ?
           function() {
             var args = arguments;
-            return this.obj[property].then(function(d) {
+            return this.delegate[property].then(function(d) {
               return d[name].apply(d, args);
             });
           } :
           function() {
             var args = arguments;
-            this.obj[property].then(function(d) {
+            this.delegate[property].then(function(d) {
               d[name].apply(d, args);
             });
           };
@@ -112,13 +112,13 @@ foam.CLASS({
           of: this.of,
           forwards: methodNames,
           factory: function() {
-            return this[pendingState].create({obj: this});
+            return this[pendingState].create({ delegate: this });
           },
           swiftFactory: `
-            return ${pendingState}_create(["obj": self])
+            return ${pendingState}_create(["delegate": self])
           `,
           javaFactory: `
-            return new ${pendingState}.Builder(getX()).setObj(this).build();
+            return new ${pendingState}.Builder(getX()).setDelegate(this).build();
           `,
           transient: true
         }),
@@ -152,7 +152,7 @@ foam.CLASS({
               {	
                 class: 'FObjectProperty',
                 of: cls.id,	
-                name: 'obj'	
+                name: 'delegate'	
               }
             ]
           }
