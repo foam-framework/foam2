@@ -41,7 +41,7 @@ foam.CLASS({
   }
 
   Count count = new Count();
-  count = (Count) ((DAO) getX().get("localUserDAO"))
+  count = (Count) getDelegate()
       .where(MLang.AND(
         MLang.EQ(User.EMAIL, user.getEmail()),
         MLang.NEQ(User.ID,  user.getId())
