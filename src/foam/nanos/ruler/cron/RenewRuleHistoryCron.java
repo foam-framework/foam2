@@ -10,6 +10,7 @@ import foam.nanos.logger.Logger;
 import foam.nanos.ruler.Rule;
 import foam.nanos.ruler.RuleEngine;
 import foam.nanos.ruler.RuleHistory;
+import foam.nanos.ruler.RuleHistoryStatus;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -25,13 +26,14 @@ public class RenewRuleHistoryCron implements ContextAgent {
     ruleHistoryDAO.where(
       AND(
         LTE(RuleHistory.EXPIRATION_DATE, new Date()),
-        EQ(RuleHistory.WAS_RENEW, false)
+        EQ(RuleHistory.STATUS, RuleHistoryStatus.SCHEDULED)
       )
     ).select(new AbstractSink() {
       @Override
       public void put(Object obj, Detachable sub) {
         RuleHistory ruleHistory = (RuleHistory) ((FObject) obj).fclone();
-        ruleHistory.setWasRenew(true);
+        ruleHistory.setStatus(RuleHistoryStatus.RUNNING);
+        ruleHistory = (RuleHistory) ruleHistoryDAO.put(ruleHistory).fclone();
 
         try {
           // Execute the associated rule via rule engine.
@@ -56,6 +58,7 @@ public class RenewRuleHistoryCron implements ContextAgent {
           }
           new RuleEngine(x, delegate).execute(
             Arrays.asList(rule), null, oldObj);
+          ruleHistory.setStatus(RuleHistoryStatus.SUCCESS);
         } catch (Throwable t) {
           StringBuilder sb = new StringBuilder();
           sb.append(String.format(
@@ -67,6 +70,7 @@ public class RenewRuleHistoryCron implements ContextAgent {
 
           // Add note to rule history
           sb.append(" : ").append(t.getMessage());
+          ruleHistory.setStatus(RuleHistoryStatus.ERROR);
           ruleHistory.setNote(sb.toString());
         } finally {
           ruleHistoryDAO.put(ruleHistory);
