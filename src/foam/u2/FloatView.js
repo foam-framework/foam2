@@ -78,16 +78,19 @@ foam.CLASS({
 
       view.sub(function() {
         var text = view.get();
-        data.set(self.textToData(text));
-
-        if ( text.indexOf('.') > 0 && text.length - text.indexOf('.') - 1 > self.precision ) {
+        var val = data.get();
+        if ( val == self.textToData(text) && self.needsTrim(text, self.precision) ) {
+          // trim trailing 0's
           view.set(text.substring(0, text.indexOf('.') + self.precision + 1));
-        }
+        };
+        data.set(self.textToData(view.get()));
       });
 
       data.sub(function() {
-        if ( data.get() == parseFloat(view.get()) ) return;
-        view.set(self.formatNumber(data.get()));
+        var text = view.get();
+        // no need to trim input if its value is the same as data, and it's not too long 
+        if ( parseFloat(text) == data.get() && ! self.needsTrim(text, self.precision) ) return;
+        view.set(self.dataToText(data.get()));
       });
     },
 
@@ -102,9 +105,7 @@ foam.CLASS({
     function formatNumber(val) {
       if ( ! val ) return '0';
       val = val.toFixed(this.precision);
-      var i = val.length - 1;
-      for ( ; i > 0 && val.charAt(i) === '0' ; i-- ) {}
-      return val.substring(0, val.charAt(i) === '.' ? i : i + 1);
+      return val;
     },
 
     function dataToText(val) {
@@ -115,6 +116,10 @@ foam.CLASS({
 
     function textToData(text) {
       return parseFloat(text) || 0;
+    },
+
+    function needsTrim(text, precision) {
+      return text.indexOf('.') > 0 && text.length - text.indexOf('.') - 1 > precision;
     }
   ]
 });
