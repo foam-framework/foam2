@@ -19,6 +19,14 @@ foam.CLASS({
       }
     },
     {
+      name: 'xAxis',
+      postSet: function(_, v) {
+        if ( this.chart ) {
+          this.chart.options.scales.xAxes = [v];
+        }
+      }
+    },
+    {
       name: 'config',
       factory: function() {
         return {
@@ -26,7 +34,10 @@ foam.CLASS({
           data: this.data,
           options: {
             responsive: false,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            scales: {
+              xAxes: this.xAxis ? [ this.xAxis ] : []
+            }
           }
         };
       }
