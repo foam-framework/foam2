@@ -385,7 +385,6 @@ FOAM_FILES([
   { name: "foam/u2/TextField", flags: ['web'] },
   { name: "foam/u2/IntView", flags: ['web'] },
   { name: "foam/u2/FloatView", flags: ['web'] },
-  { name: "foam/u2/PrecisionFloatView", flags: ['web'] },
   { name: "foam/u2/CurrencyView", flags: ['web'] },
   { name: "foam/u2/CheckBox", flags: ['web'] },
   { name: "foam/u2/md/CheckBox", flags: ['web'] },
