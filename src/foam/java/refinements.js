@@ -1962,13 +1962,13 @@ foam.CLASS({
       getter: function() {
         return `
 try {
-  synchronized ( getObj() ) {
-    if ( ! getObj().isPropertySet("${this.property}") ) getObj().wait();
+  synchronized ( getDelegate() ) {
+    if ( ! getDelegate().isPropertySet("${this.property}") ) getDelegate().wait();
   }
 } catch (Exception e) {
   throw new RuntimeException(e);
 }
-${this.javaType != 'void' ? 'return ' : ''}getObj()
+${this.javaType != 'void' ? 'return ' : ''}getDelegate()
     .${this.name}(${this.args.map(a => a.name).join(', ')});
         `;
       }
