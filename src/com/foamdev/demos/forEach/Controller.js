@@ -10,7 +10,6 @@ foam.CLASS({
   package: 'com.foamdev.demos.forEach',
   name: 'Controller',
   extends: 'foam.u2.Controller',// it will automatically exports: ['this as data']
-  //extends: 'foam.u2.Element',
 
   properties: [
     {
