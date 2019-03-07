@@ -86,7 +86,7 @@ foam.CLASS({
 
         /* register ClusterConfig Listener */
         DAO clusterConfigDAO = (DAO) getX().get("clusterConfigDAO");
-        clusterConfigDAO.listen(new ClusterConfigSink(getX(), this));
+        clusterConfigDAO.listen(new ClusterConfigSink(getX(), this), TRUE);
         /* REVIEW: need to keep a reference to the dao?*/
         setClusterConfigDAO(clusterConfigDAO);
       `

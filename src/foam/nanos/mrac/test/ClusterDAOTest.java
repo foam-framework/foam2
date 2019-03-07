@@ -37,7 +37,7 @@ public class ClusterDAOTest
       .setPort(8080)
       .build();
 
-    DAO client = new foam.orb.ORBRequestCmdDAO.Builder(x).setDelegate(new ClusterClientDAO.Builder(x).setServiceName(serviceName).setConfig(config).build()).build();
+    DAO client = new ClusterClientDAO.Builder(x).setServiceName(serviceName).setConfig(config).build();
 
     DAO countryDAO1 = (DAO) x.get("countryDAO1");
     Sink sink = countryDAO1.select(new ArraySink());
