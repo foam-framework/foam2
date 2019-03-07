@@ -10,16 +10,8 @@ foam.CLASS({
   //extends: 'foam.u2.tag.Input',
   extends: 'foam.u2.TextField',
 
-  properties: [
-
-  ],
-
   methods: [    
     function initE() {
-      this.SUPER();
-    },
-
-    function load() {
       this.SUPER();
     },
 

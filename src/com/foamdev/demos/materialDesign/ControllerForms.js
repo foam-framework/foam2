@@ -10,8 +10,8 @@ foam.CLASS({
   extends: 'foam.u2.Element',
   
   requires: [ 
-    'foam.u2.md.TextField',
     'foam.u2.md.CheckBox',
+    'foam.u2.md.TextField'
   ],
 
   exports: [ 'as data' ],
@@ -41,7 +41,6 @@ foam.CLASS({
         type: 'text',
       }
     },
-
     {
       class: 'Boolean',
       name: 'checkTest',
@@ -97,8 +96,5 @@ foam.CLASS({
           end().
         end();
     }
-  ],
-  listeners: [
-    
-  ],
+  ]
 });
