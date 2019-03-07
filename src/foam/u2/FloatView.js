@@ -54,10 +54,41 @@ foam.CLASS({
     },
 
     function link() {
-      this.attrSlot(null, this.onKey ? 'input' : null).relateFrom(
+      if ( foam.Undefined.isInstance(this.precision) ) {
+        this.attrSlot(null, this.onKey ? 'input' : null).relateFrom(
           this.data$,
           this.textToData.bind(this),
           this.dataToText.bind(this));
+        return;
+      }
+
+      // limit to precision;
+      var data = this.data$;
+      var view = this.attrSlot(null, this.onKey ? 'input' : null);
+      var self = this;
+
+      if ( ! foam.Undefined.isInstance(this.data) ) view.set(this.formatNumber(this.data));
+
+      if ( this.onKey ) {
+        this.on('blur', function() {
+          var value = data.get();
+          view.set(self.formatNumber(value));
+        });
+       }
+
+      view.sub(function() {
+        var text = view.get();
+        data.set(self.textToData(text));
+
+        if ( text.indexOf('.') > 0 && text.length - text.indexOf('.') - 1 > self.precision ) {
+          view.set(text.substring(0, text.indexOf('.') + self.precision + 1));
+        }
+      });
+
+      data.sub(function() {
+        if ( data.get() == parseFloat(view.get()) ) return;
+        view.set(self.formatNumber(data.get()));
+      });
     },
 
     function fromProperty(p) {
