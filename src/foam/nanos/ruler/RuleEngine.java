@@ -128,6 +128,7 @@ public class RuleEngine extends ContextAwareSupport {
       Duration validity = Duration.ofDays(rule.getValidity());
       Date expirationDate = Date.from(Instant.now().plus(validity));
       record.setExpirationDate(expirationDate);
+      record.setStatus(RuleHistoryStatus.SCHEDULED);
     }
 
     savedRuleHistory_.put(rule.getId(),

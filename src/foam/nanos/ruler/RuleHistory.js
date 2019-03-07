@@ -72,10 +72,10 @@ foam.CLASS({
       documentation: 'Expiration date to be rescheduled.'
     },
     {
-      class: 'Boolean',
-      name: 'wasRenew',
-      value: false,
-      documentation: 'Renewal indicator.'
+      class: 'Enum',
+      of: 'foam.nanos.ruler.RuleHistoryStatus',
+      name: 'status',
+      documentation: 'Rule history status.'
     },
     {
       class: 'String',
