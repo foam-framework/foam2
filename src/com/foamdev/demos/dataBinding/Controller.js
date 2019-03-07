@@ -79,13 +79,14 @@ foam.CLASS({
       start('div').add('Costs: ').add(this.COST).end().     
       start('div').add('Total: ').add(this.TOT).end().
       start('div').add('Total :',
-        /*foam.core.ExpressionSlot.create({
-          args: [ this.cost$,this.qty$ ],
-          code: function(f, l) { return f * l; }
-         })*/
         this.slot(function(cost, qty) {
           return cost * qty;
         })
+        //another alternate approach is to use the expression
+        /*foam.core.ExpressionSlot.create({
+            args: [ this.cost$,this.qty$ ],
+            code: function(f, l) { return f * l; }
+          })*/
       ).end();
       //start('div').add('Total1: ').add(this.cost * this.qty).end(); // wrong result
       //start('div').add('Total2: ').add(this.cost$.prop.value * this.qty$.prop.value).end().// wrong result
