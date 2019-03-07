@@ -21,18 +21,18 @@ foam.CLASS({
   methods: [
     function initE() {
       this.
-        start(this.ADD_ELEMENT_TO_DSL, {label: 'add element to the HTML using the DSL'}).end();
+        start(this.ADD_ELEMENT_TO_DOM, {label: 'add element to the HTML using the DOM'}).end();
     }
   ],
   actions: [
     {
-      name:  'addElementToDSL',
-      label: 'add a DSL',
+      name:  'addElementToDOM',
+      label: 'add a DOM',
       help:  'Add HTML element to the view',
 
       code: function() {
         this.start('div').add('here you are').end();
       }
-    },
+    }
   ],
 });
