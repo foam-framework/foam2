@@ -65,7 +65,8 @@ foam.CLASS({
     'foam.dao.RequestResponseClientDAO',
     'foam.dao.SequenceNumberDAO',
     'foam.dao.SyncDAO',
-    'foam.dao.TimingDAO'
+    'foam.dao.TimingDAO',
+    'foam.dao.JournalType'
   ],
 
   imports: [ 'document' ],
@@ -119,7 +120,7 @@ if ( getCluster() ) {
   delegate = new foam.nanos.mrac.ClusterDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(getMdao()).build();
 }
 
-if ( getJournaled() ) {
+if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
   delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
 }
 
@@ -246,9 +247,10 @@ return delegate;
     },
     {
       /** Keep a history of all state changes to the DAO. */
-      class: 'Boolean',
-      name: 'journaled',
-      value: false
+      class: 'foam.core.Enum',
+      of: 'foam.dao.JournalType',
+      name: 'journalType',
+      value: 'NO_JOURNAL'
     },
     {
       class: 'String',
@@ -284,12 +286,6 @@ return delegate;
       name: 'contextualize',
       value: false
     },
-//     {
-//       class: 'Boolean',
-//       name: 'cloning',
-//       value: false,
-//       //documentation: "True to clone results on select"
-//     },
     {
       /**
         <p>Selects the basic functionality this EasyDAO should provide.
@@ -318,12 +314,6 @@ return delegate;
       name: 'autoIndex',
       value: false
     },
-//     {
-//       /** Creates an internal MigrationDAO and applies the given array of MigrationRule. */
-//       class: 'FObjectArray',
-//       name: 'migrationRules',
-//       of: 'foam.core.dao.MigrationRule',
-//     },
     {
       /** Turn on to activate synchronization with a server. Specify serverUri
         and syncProperty as well. */
@@ -592,7 +582,7 @@ return delegate;
         dao = decorated;
       }
 
-      if ( this.timing  ) {
+      if ( this.timing ) {
         dao = this.TimingDAO.create({ name: this.name + 'DAO', delegate: dao });
       }
 

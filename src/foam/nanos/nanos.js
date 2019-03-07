@@ -189,4 +189,5 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/email/POP3Email'},
   { name: "foam/nanos/ruler/Rule" },
   { name: "foam/nanos/ruler/Operations" },
+  { name: "foam/nanos/ruler/RuleHistory" },
 ]);
