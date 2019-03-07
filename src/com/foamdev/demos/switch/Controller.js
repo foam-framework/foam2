@@ -10,10 +10,8 @@ foam.CLASS({
   package: 'com.foamdev.demos.switch',
   name: 'Controller',
   extends: 'foam.u2.Controller',// it will automatically exports: ['this as data']
-  //extends: 'foam.u2.Element',
-  //you can avoid extending any model to get the default model presentation
 
-  //exports: [ 'as data' ],
+  //you can avoid extending any model to get the default model presentation
 
   properties: [
     {
