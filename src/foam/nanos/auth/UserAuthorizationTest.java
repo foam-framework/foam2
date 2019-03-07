@@ -17,11 +17,7 @@ public class UserAuthorizationTest extends foam.nanos.test.Test {
 
     // need to start auth service
     UserAndGroupAuthService newAuthService = new UserAndGroupAuthService(x);
-    try {
-      newAuthService.start();
-    } catch ( Throwable t ) {
-      test(false, "User and group auth shouldn't be throwing exceptions.");
-    }
+    newAuthService.start();
     x = x.put("auth", newAuthService);
 
     // create mock userDAO
