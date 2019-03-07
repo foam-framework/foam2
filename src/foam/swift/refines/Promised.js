@@ -14,8 +14,8 @@ foam.CLASS({
       name: 'swiftCode',
       getter: function() {
         return `
-if !self.obj!.hasOwnProperty("${this.property}") { self.obj!.${this.property}Sem.wait() }
-${this.swiftType != 'void' ? 'return ' : ''}${this.swiftThrows ? 'try ' : ''}self.obj!
+if !self.delegate!.hasOwnProperty("${this.property}") { self.delegate!.${this.property}Sem.wait() }
+${this.swiftType != 'void' ? 'return ' : ''}${this.swiftThrows ? 'try ' : ''}self.delegate!
   .${this.name}(${this.swiftArgs.map(a => a.localName).join(', ')});
         `;
       }
