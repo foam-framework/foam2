@@ -11,8 +11,6 @@ foam.CLASS({
 
   exports: [ 'as data' ],
 
-  imports: [ 'window' ], //To add bootstrap JavaScript
-
   properties: [
     {
       class: 'String',
@@ -29,8 +27,7 @@ foam.CLASS({
       name: 'checkBoxTest',
       value: true,
       view: {
-        class: 'foam.u2.CheckBox',
-        onKey: true
+        class: 'foam.u2.CheckBox'
       }
     }
   ],
@@ -176,8 +173,9 @@ foam.CLASS({
         start('div').addClass('invalid-feedback').add('Example invalid feedback text').end();
     }
   ],
-  listeners: [
-    function MyEvent() {
+  
+  actions: [
+    /*function MyEvent() {
       var forms = document.getElementsByClassName('needs-validation');
       // Loop over them and prevent submission
       var validation = Array.prototype.filter.call(forms, function(form) {
@@ -189,6 +187,15 @@ foam.CLASS({
           form.classList.add('was-validated');
         }, false);
       });
-    },
+    },*/
+    {
+      name: 'MyEvent',
+      isEnabled: function(form) { 
+        return form.checkValidity();
+      },
+      code: function() {
+        
+      }  
+    }
   ],
 });
