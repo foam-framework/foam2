@@ -14,6 +14,9 @@ foam.CLASS({
     .com.foam.demos.addCssToClass-bgRed {
       color: red;
     }
+    .green {
+      color: green;
+    }
     .red {
       color: red;
     }
@@ -49,7 +52,7 @@ foam.CLASS({
       name: 'colorStyle',
       value: 'red',
       expression: function(colorStyle) {
-        return this.myClass(true ? 'color' : 'red' ? 'color' : 'green');
+        return this.myClass(colorStyle);// === 'red' ? 'red' : 'green');
       }
     },
   ],
@@ -59,11 +62,12 @@ foam.CLASS({
       let self = this;
       this.start('div').add('Name:').end().add(this.slot(function(animals) {
         return this.E('span').forEach(animals, function(d, index) {
+          var self2 = this;
           if ( self.selectedAnimal === d ) {
-            var self2 = this;
             this.start('span').                                
               add(index).add(' ').add(d).on('click', function(e) {
               self.selectedAnimal = d;
+              self.colorStyle='red';
               console.log('yes');
               self2.addClass(self.COLOR_STYLE.value);
             }).end();
@@ -73,8 +77,9 @@ foam.CLASS({
               add(index).add(' ').add(d).on('click',
               function() {
                 self.selectedAnimal = d;
+                self.colorStyle='green';
                 console.log('no');
-                return self.start('div').add(d).addClass(self.myClass('bgRed')).end();
+                return self.start('div').add(d).addClass(self.myClass('green')).end();
               }).end();
         })
       })).end();
