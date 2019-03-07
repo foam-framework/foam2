@@ -11,12 +11,8 @@ foam.CLASS({
   package: 'com.foamdev.demos.filter',
   name: 'Controller',
   extends: 'foam.u2.Controller',// it will automatically exports: ['this as data']
-  //extends: 'foam.u2.Element',
-
-  //exports: [ 'as data' ],
 
   css: `
-    h2 { color: #aaa; }
     body, input[text] { color: #888; font-family: Cambria, Georgia; }
     div.spicy div {
       padding: 10px;
@@ -47,7 +43,7 @@ foam.CLASS({
           name: 'Brad'
         }
       ]
-    },
+    }
   ],
 
   methods: [
