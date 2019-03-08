@@ -68,7 +68,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'async',
+      name: 'async'
+    },
+    {
+      class: 'Boolean',
+      name: 'synchronized'
     },
     {
       name: 'args',
