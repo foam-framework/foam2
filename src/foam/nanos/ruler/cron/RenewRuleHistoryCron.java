@@ -36,12 +36,6 @@ public class RenewRuleHistoryCron implements ContextAgent {
         ruleHistory = (RuleHistory) ruleHistoryDAO.put(ruleHistory).fclone();
 
         try {
-          // Execute the associated rule via rule engine.
-          // The rule engine's arguments:
-          //   - delegate : DAO looked up using RuleHistory.objectDaoKey
-          //   - rule     : The rule to be executed
-          //   - obj      : null - as object is not being put
-          //   - oldObj   : The object retrieved from the DAO using RuleHistory.objectId
           Rule rule = (Rule) ruleDAO.find(ruleHistory.getRuleId());
           if ( rule == null ) {
             throw new Exception(
@@ -49,15 +43,22 @@ public class RenewRuleHistoryCron implements ContextAgent {
                 ruleHistory.getId()));
           }
           DAO delegate = (DAO) x.get(ruleHistory.getObjectDaoKey());
-          FObject oldObj = delegate.find(ruleHistory.getObjectId());
-          if ( oldObj == null ) {
+          FObject object = delegate.find(ruleHistory.getObjectId());
+          if ( object == null ) {
             throw new Exception(
               String.format("Object with id %d in %s is not found.",
                 ruleHistory.getId(),
                 ruleHistory.getObjectDaoKey()));
           }
-          new RuleEngine(x, delegate).execute(
-            Arrays.asList(rule), null, oldObj);
+
+          // Execute the associated rule via rule engine.
+          // The rule engine's arguments:
+          //   - x        : Context with isScheduledRule=true
+          //   - delegate : DAO looked up using RuleHistory.objectDaoKey
+          //   - rule     : The rule to be executed
+          //   - object   : Uses as both obj and oldObj
+          new RuleEngine(x.put("isScheduledRule", true), delegate).execute(
+            Arrays.asList(rule), object, object);
           ruleHistory.setStatus(RuleHistoryStatus.SUCCESS);
         } catch (Throwable t) {
           StringBuilder sb = new StringBuilder();
