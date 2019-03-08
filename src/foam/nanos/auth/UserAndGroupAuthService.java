@@ -70,10 +70,10 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Login disabled");
     }
 
-    // check if user group enabled
-    Group group = (Group) groupDAO_.find(user.getGroup());
+    // check if group enabled
+    Group group = (Group) x.get("group");
     if ( group != null && ! group.getEnabled() ) {
-      throw new AuthenticationException("User group disabled");
+      throw new AuthenticationException("Group disabled");
     }
 
     // check for two-factor authentication
@@ -82,6 +82,13 @@ public class UserAndGroupAuthService
     }
 
     return user;
+  }
+
+  /**
+   * Gets the effective group from a context.
+   */
+  public Group getCurrentGroup(X x) {
+    return (Group) x.get("group");
   }
 
   /**
@@ -120,10 +127,10 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Login disabled");
     }
 
-    // check if user group enabled
-    Group group = (Group) groupDAO_.find(user.getGroup());
+    // check if group enabled
+    Group group = user.findGroup(x);
     if ( group != null && ! group.getEnabled() ) {
-      throw new AuthenticationException("User group disabled");
+      throw new AuthenticationException("Group disabled");
     }
 
     if ( ! Password.verify(password, user.getPassword()) ) {
@@ -136,7 +143,7 @@ public class UserAndGroupAuthService
 
     Session session = x.get(Session.class);
     session.setUserId(user.getId());
-    session.setContext(session.getContext().put("user", user));
+    session.setContext(session.getContext().put("user", user).put("group", group));
 
     return user;
   }
@@ -221,11 +228,6 @@ public class UserAndGroupAuthService
       return false;
     }
 
-    // NOTE: It's important that we use the User from the context here instead
-    // of looking it up in a DAO because if the user is actually an entity that
-    // an agent is acting as, then the user we get from the DAO won't have the
-    // correct group, which is the group set on the junction between the agent
-    // and the entity.
     User user = (User) x.get("user");
 
     // check if user exists and is enabled
@@ -234,28 +236,18 @@ public class UserAndGroupAuthService
     }
 
     try {
-      String groupId = (String) user.getGroup();
+      Group group = (Group) x.get("group");
 
-      while ( ! SafetyUtil.isEmpty(groupId) ) {
-        Group group = (Group) groupDAO_.find(groupId);
-
-        // if group is null break
-        if ( group == null ) {
-          break;
-        }
+      while ( group != null ) {
 
         // check if group is enabled
-        if ( ! group.getEnabled() ) {
-          return false;
-        }
+        if ( ! group.getEnabled() ) return false;
 
         // check permission
-        if ( group.implies(permission) ) {
-          return true;
-        }
+        if ( group.implies(permission) ) return true;
 
         // check parent group
-        groupId = group.getParent();
+        group = (Group) groupDAO_.find(group.getParent());
       }
     } catch (IllegalArgumentException e) {
       Logger logger = (Logger) x.get("logger");
@@ -320,10 +312,10 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Login disabled");
     }
 
-    // check if user group enabled
-    Group group = (Group) groupDAO_.find(user.getGroup());
+    // check if group enabled
+    Group group = user.findGroup(x);
     if ( group != null && ! group.getEnabled() ) {
-      throw new AuthenticationException("User group disabled");
+      throw new AuthenticationException("Group disabled");
     }
 
     // check if password is valid per validatePassword method
@@ -347,7 +339,7 @@ public class UserAndGroupAuthService
     // TODO: modify line to allow actual setting of password expiry in cases where users are required to periodically update their passwords
     user.setPasswordExpiry(null);
     user = (User) userDAO_.put(user);
-    session.setContext(session.getContext().put("user", user));
+    session.setContext(session.getContext().put("user", user).put("group", group));
     return user;
   }
 

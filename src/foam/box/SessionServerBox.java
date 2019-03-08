@@ -11,8 +11,11 @@ import foam.dao.DAO;
 import foam.nanos.app.AppConfig;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.*;
+import foam.nanos.auth.AuthenticationException;
+import foam.nanos.auth.AuthorizationException;
 import foam.nanos.boot.NSpec;
 import foam.nanos.logger.*;
+import foam.nanos.logger.PrefixLogger;
 import foam.nanos.session.Session;
 import java.util.Date;
 import javax.naming.NoPermissionException;
@@ -38,14 +41,14 @@ public class SessionServerBox
         HttpServletRequest req        = getX().get(HttpServletRequest.class);
         AuthService        auth       = (AuthService) getX().get("auth");
         DAO                sessionDAO = (DAO)         getX().get("localSessionDAO");
-        DAO                groupDAO   = (DAO)         getX().get("groupDAO");
         Session            session    = (Session)     sessionDAO.find(sessionID);
 
         if ( session == null ) {
           session = new Session();
           session.setId(sessionID);
           session.setRemoteHost(req.getRemoteHost());
-          session.setContext(getX().put(Session.class, session));
+          // Prevent the system user and group from leaking into new contexts.
+          session.setContext(getX().put("user", null).put("group", null).put(Session.class, session));
           sessionDAO.put(session);
         } else if ( ! session.getRemoteHost().equals(req.getRemoteHost()) ) {
           // If an existing session is reused with a different remote host then
@@ -75,23 +78,19 @@ public class SessionServerBox
         }
 
         if ( user != null ) {
-          Group group = (Group) groupDAO.find(user.getGroup());
+          Group group = (Group) x.get("group");
 
-          if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
-            logger.debug("missing permission", group != null ? group.getId() : "NO GROUP" , "service." + spec.getName());
-            // msg.replyWithException(new NoPermissionException("No permission"));
-            // return;
-          }
-
-          // padding this cause if group is null this can cause an NPE
-          // technically the user shouldn't be created without a group
-          if ( group != null ) {
+          if ( group == null ) {
+            logger.warning(String.format("The context with id = %s does not have the group set in the context.", session.getId()));
+          } else {
             AppConfig appConfig = group.getAppConfig(x);
             x = x.put("appConfig", appConfig);
             session.getContext().put("appConfig", appConfig);
-          } else {
-            logger.error("missing group: ", String.format("User: [%d]", user.getId()));
-            throw new RuntimeException("User without a group.");
+          }
+
+          if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
+            msg.replyWithException(new AuthorizationException("You do not have permission to access to that service."));
+            return;
           }
         }
 

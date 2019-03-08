@@ -23,6 +23,17 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'getCurrentGroup',
+      async: true,
+      type: 'foam.nanos.auth.Group',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ]
+    },
+    {
       name: 'generateChallenge',
       async: true,
       type: 'String',
