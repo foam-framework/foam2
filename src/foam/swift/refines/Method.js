@@ -39,6 +39,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'swiftSynchronized',
+      expression: function(synchronized) { return !! synchronized; }
     },
     {
       class: 'String',

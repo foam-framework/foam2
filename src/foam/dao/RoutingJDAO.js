@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'RoutingJDAO',
   extends: 'foam.dao.PromisedDAO',
   requires: [
-    'foam.dao.JDAO'
+    'foam.dao.java.JDAO'
   ],
   documentation:
     `JDAO that adds the service name to the context to use for routing to correct DAO.
