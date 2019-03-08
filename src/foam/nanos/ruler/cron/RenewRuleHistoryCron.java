@@ -59,7 +59,7 @@ public class RenewRuleHistoryCron implements ContextAgent {
           //   - object   : Uses as both obj and oldObj
           new RuleEngine(x.put("isScheduledRule", true), delegate).execute(
             Arrays.asList(rule), object, object);
-          ruleHistory.setStatus(RuleHistoryStatus.SUCCESS);
+          ruleHistory.setStatus(RuleHistoryStatus.FINISHED);
         } catch (Throwable t) {
           StringBuilder sb = new StringBuilder();
           sb.append(String.format(

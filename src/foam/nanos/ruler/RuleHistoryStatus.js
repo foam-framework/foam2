@@ -11,9 +11,9 @@ foam.ENUM({
 
   values: [
     {
-      name: 'NOT_SCHEDULED',
-      label: 'Not scheduled',
-      documentation: 'Indicates rule history is not scheduled.'
+      name: 'UNSCHEDULED',
+      label: 'Unscheduled',
+      documentation: 'Indicates rule history is unscheduled.'
     },
     {
       name: 'SCHEDULED',
@@ -26,9 +26,9 @@ foam.ENUM({
       documentation: 'Indicates rule history is being run.'
     },
     {
-      name: 'SUCCESS',
-      label: 'Success',
-      documentation: 'Indicates success when running rule history.'
+      name: 'FINISHED',
+      label: 'Finished',
+      documentation: 'Indicates rule history finished running.'
     },
     {
       name: 'ERROR',
