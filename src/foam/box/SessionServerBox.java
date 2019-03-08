@@ -67,6 +67,8 @@ public class SessionServerBox
 
         session.touch();
 
+        // If this service has been configured to require authentication, then
+        // throw an error if there's no user in the context.
         if ( authenticate_ && session.getUserId() == 0 ) {
           msg.replyWithException(new AuthenticationException());
           return;
