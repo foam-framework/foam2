@@ -666,7 +666,7 @@ foam.LIB({
     Network: foam.json.Outputter.create({
       pretty: false,
       formatDatesAsNumbers: true,
-      outputDefaultValues: false,
+      outputDefaultValues: true,
       // TODO: No deserialization support for shortnames yet.
       //      useShortNames: true,
       useShortNames: false,
