@@ -257,9 +257,9 @@ return config_;`
 
         // 1. If the user doesn't login at this time, get the user from localUserDao
         // 2. If the user is the system user, get the real user from localUserDao
-        if ( user == null || user.getId() == 1 ) {
+        if ( user == null || user.getId() == 1 || ! user.getLoginEnabled() ) {
           user = (User) userDAO.find(MLang.EQ(User.EMAIL, emailMessage.getTo()[0]));
-          if ( user == null || user.getId() == 0) {
+          if ( user == null || user.getId() == 0 || user.getLoginEnabled() ) {
             logger.warning("User not found:", new Exception());
           }
         }
