@@ -12,6 +12,8 @@ import foam.dao.DAO;
 import foam.nanos.logger.Logger;
 import foam.nanos.NanoService;
 import foam.nanos.session.Session;
+import foam.nanos.auth.AuthenticationException;
+import foam.nanos.auth.AuthorizationException;
 
 import static foam.mlang.MLang.EQ;
 import static foam.mlang.MLang.AND;
@@ -71,9 +73,8 @@ public class AgentUserAuthService
     // Junction object contains a group which has a unique set of permissions specific to the relationship.
     Group actingWithinGroup = (Group) groupDAO_.find(permissionJunction.getGroup());
 
-    // Clone user and associate new junction group to user. Clone and freeze both user and agent.
+    // Clone and freeze both user and agent.
     user = (User) user.fclone();
-    user.setGroup(actingWithinGroup.getId());
     user.freeze();
 
     agent = (User) agent.fclone();
@@ -85,6 +86,7 @@ public class AgentUserAuthService
     session.setAgentId(agent.getId());
     session.setContext(session.getContext().put("user", user));
     session.setContext(session.getContext().put("agent", agent));
+    session.setContext(session.getContext().put("group", actingWithinGroup));
     return user;
   }
 

@@ -205,16 +205,12 @@ if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
   configUrl = ((Request) req).getRootURL().toString();
 } else {
   // populate AppConfig url with group url
-  Session session = x.get(Session.class);
-  User user = (User) userDAO.find(session.getUserId());
-  if ( user != null ) {
-    Group group = (Group) groupDAO.find(user.getGroup());
-    if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
-      configUrl = group.getUrl();
-    }
-    if ( ! SafetyUtil.isEmpty(group.getSupportEmail()) ) {
-      config.setSupportEmail(group.getSupportEmail());
-    }
+  Group group = (Group) x.get("group");
+  if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
+    configUrl = group.getUrl();
+  }
+  if ( ! SafetyUtil.isEmpty(group.getSupportEmail()) ) {
+    config.setSupportEmail(group.getSupportEmail());
   }
 }
 
