@@ -41,7 +41,7 @@ foam.CLASS({
   }
 
   Count count = new Count();
-  count = (Count) ((DAO) getX().get("localUserDAO"))
+  count = (Count) getDelegate()
       .where(MLang.AND(
         MLang.EQ(User.EMAIL, user.getEmail()),
         MLang.NEQ(User.ID,  user.getId())
@@ -54,17 +54,5 @@ foam.CLASS({
   return super.put_(x, obj);
       `,
    }
-  ],
-
-  axioms: [
-    {
-      buildJavaClass: function(cls) {
-        cls.extras.push(`
-public PreventDuplicateEmailDAO(foam.core.X x, foam.dao.DAO delegate) {
-  super(x, delegate);
-}
-        `);
-      },
-    },
   ],
 });

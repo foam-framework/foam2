@@ -224,6 +224,7 @@ FOAM_FILES([
   { name: "foam/dao/RoutingJournal", flags: ['java'] },
   { name: "foam/dao/RoutingJournalTest", flags: ['java'] },
   { name: "foam/dao/RoutingJDAO", flags: ['java'] },
+  { name: 'foam/dao/JournalType' },
   { name: "foam/dao/Relationship" },
   { name: "foam/dao/RelationshipDAO" },
   { name: "foam/dao/ManyToManyRelationshipDAO" },
@@ -358,6 +359,7 @@ FOAM_FILES([
   { name: "foam/box/AuthServiceClientBox" },
 
   { name: "foam/swift/refines/Stub", flags: ['swift'] },
+  { name: "foam/swift/refines/Promised", flags: ['swift'] },
   { name: "foam/swift/refines/Topic", flags: ['swift'] },
   { name: "foam/swift/refines/Remote", flags: ['swift'] },
 
@@ -571,6 +573,4 @@ FOAM_FILES([
   { name: "foam/dashboard/view/Card" },
   { name: "foam/build/Library" },
   { name: "foam/build/EmbeddedModelDAO" },
-  { name: "foam/native/Blocking" },
-  { name: "foam/dao/BlockingDAO" },
 ]);

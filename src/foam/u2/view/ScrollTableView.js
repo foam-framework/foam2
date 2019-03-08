@@ -85,6 +85,14 @@
       documentation: `
         A reference to the table element we use in the fitInScreen calculations.
       `
+    },
+    {
+      class: 'Int',
+      name: 'accumulator',
+      documentation: 'Used internally to mimic native scrolling speed.',
+      adapt: function(_, v) {
+        return v % this.rowHeight;
+      }
     }
   ],
 
@@ -141,11 +149,10 @@
       name: 'onWheel',
       code: function(e) {
         var negative = e.deltaY < 0;
-        // Convert to rows, rounding up. (Therefore minumum 1.)
-        var rows = Math.ceil(Math.abs(e.deltaY) / 40);
-        var oldSkip = this.skip;
+        var rows = Math.floor(Math.abs(this.accumulator + e.deltaY) / this.rowHeight);
+        this.accumulator += e.deltaY;
         this.skip = Math.max(0, this.skip + (negative ? -rows : rows));
-        if ( e.deltaY !== 0 && oldSkip != this.skip ) e.preventDefault();
+        if ( e.deltaY !== 0 ) e.preventDefault();
       }
     },
     {

@@ -106,6 +106,18 @@
         public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) { /*noop*/ }
       };`,
       documentation: 'The action to be executed asynchronously if predicates returns true for passed object.'
+    },
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      value: true,
+      documentation: 'Enables the rule.'
+    },
+    {
+      class: 'Boolean',
+      name: 'saveHistory',
+      value: false,
+      documentation: 'Determines if history of rule execution should be saved.'
     }
   ],
 
@@ -180,7 +192,9 @@
       javaCode: `
         getAsyncAction().applyAction(x, obj, oldObj, ruler);
         if ( ! getAfter()
-          && Operations.REMOVE != getOperation()
+          && Operations.CREATE == getOperation()
+          || Operations.UPDATE == getOperation()
+          || Operations.CREATE_OR_UPDATE == getOperation()
         ) {
           ruler.getDelegate().put_(x, obj);
         }
