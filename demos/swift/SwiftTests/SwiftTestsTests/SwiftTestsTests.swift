@@ -516,14 +516,14 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertEqual(t2.firstName, "a")
   }
 
-  func testBlockingDAO() {
+  func testPromisedDAO() {
     let dao = x.create(foam_swift_dao_ArrayDAO.self, args: ["of": somepackage_Test.classInfo()])!
-    let pDao = x.create(foam_dao_BlockingDAO.self)!
+    let pDao = x.create(foam_dao_PromisedDAO.self)!
 
     DispatchQueue.global(qos: .background).async {
       _ = try? dao.put(self.x.create(somepackage_Test.self, args: ["firstName": "A"])!)
       _ = try? dao.put(self.x.create(somepackage_Test.self, args: ["firstName": "B"])!)
-      pDao.blocking = dao
+      pDao.promise = dao
     }
 
     let a = try? pDao.select()

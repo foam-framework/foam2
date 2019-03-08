@@ -1,53 +1,88 @@
 package foam.nanos.ruler;
 
 import foam.core.X;
+import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.auth.User;
 import foam.nanos.test.Test;
+import foam.test.TestUtils;
+
+import java.util.List;
 
 import static foam.mlang.MLang.*;
 
 public class RulerDAOTest extends Test {
-  Rule rule1, rule2, rule3, rule4, rule5;
-  User user;
-  DAO ruleDAO, userDAO;
+  Rule rule1, rule2, rule3, rule4, rule5, rule6;
+  User user1, user2;
+  DAO ruleDAO, userDAO, ruleHistoryDAO;
   int asyncWait = 1000;
 
   public void runTest(X x) {
-    ruleDAO = ((DAO) x.get("ruleDAO"));
+    x = TestUtils.mockDAO(x, "ruleDAO");
+    x = TestUtils.mockDAO(x, "localUserDAO");
+    x = TestUtils.mockDAO(x, "ruleHistoryDAO");
+
+    ruleDAO = (DAO) x.get("ruleDAO");
+    userDAO = new RulerDAO(x, (DAO) x.get("localUserDAO"), "localUserDAO");
+    ruleHistoryDAO = (DAO) x.get("ruleHistoryDAO");
     createRule(x);
-    userDAO = new RulerDAO(x, (DAO)x.get("localUserDAO"), "localUserDAO");
-    x = x.put(userDAO, "localUserDAO");
     testUsers(x);
+    testRuleHistory(x);
     removeData(x);
   }
 
   public void testUsers(X x) {
-    user = new User();
-    user.setFirstName("Kristina");
-    user.setEmail("nanos@nanos.net");
-    user = (User) userDAO.put_(x, user).fclone();
-    test(user instanceof User, "No exception thrown: first rule prevented execution of the rule 3");
+    user1 = new User();
+    user1.setId(10);
+    user1.setFirstName("Kristina");
+    user1.setEmail("nanos@nanos.net");
+    user1 = (User) userDAO.put_(x, user1).fclone();
+    test(user1 instanceof User, "No exception thrown: first rule prevented execution of the rule 3");
     //test
-    test(user.getEmail().equals("foam@nanos.net"), "RuleDAO changes the email for passed user object");
-    test(user.getLastName().equals("Smirnova"), "the last rule updated user's last name");
-    user.setEmail("nanos@nanos.net");
-    user = (User) userDAO.put_(x, user);
-    test(user.getEmail().equals("nanos@nanos.net"), "user's email is nanos@nanos.net: on object update 'create' rules are not executed");
-    test(user.getLastName().equals("Unknown"), "user's lastName is 'Unknown': update rule was executed");
+    test(user1.getEmail().equals("foam@nanos.net"), "RuleDAO changes the email for passed user object");
+    test(user1.getLastName().equals("Smirnova"), "the last rule updated user's last name");
+    user1.setEmail("nanos@nanos.net");
+    user1 = (User) userDAO.put_(x, user1);
+    test(user1.getEmail().equals("nanos@nanos.net"), "user's email is nanos@nanos.net: on object update 'create' rules are not executed");
+    test(user1.getLastName().equals("Unknown"), "user's lastName is 'Unknown': update rule was executed");
 
     // wait for async
     try {
       Thread.sleep(asyncWait + 100);
     } catch (InterruptedException e) { }
-    user = (User) userDAO.find(user.getId());
-    test(user.getLastName().equals("Smith"), "user's lastName is 'Smith': async update rule was executed");
+    user1 = (User) userDAO.find(user1.getId());
+    test(user1.getLastName().equals("Smith"), "user's lastName is 'Smith': async update rule was executed");
+  }
+
+  public void testRuleHistory(X x) {
+    user2 = new User();
+    user2.setId(11);
+    user2.setEmail("user2@nanos.net");
+    user2 = (User) userDAO.put_(x, user2).fclone();
+    user2.setLastName("Smith");
+    user2 = (User) userDAO.put_(x, user2);
+    // test
+    List list = ((ArraySink) ruleHistoryDAO.select(new ArraySink())).getArray();
+    RuleHistory ruleHistory = (RuleHistory) list.get(0);
+    test(list.size() == 1 && ruleHistory.getResult().equals("Pending"),
+      "Create rule history with result = Pending in rule 6 action"
+    );
+
+    // wait for async
+    try {
+      Thread.sleep(asyncWait + 100);
+    } catch (InterruptedException e) { }
+    ruleHistory = (RuleHistory) ruleHistoryDAO.find(ruleHistory.getId());
+    test(ruleHistory.getResult().equals("Done"),
+      "Update rule history result = Done in rule 6 async action"
+    );
   }
 
   public void createRule(X x) {
     // first rule stops execution of rules with a lower priority within the same group
     rule1 = new Rule();
+    rule1.setId(1);
     rule1.setName("userDAO email filter");
     rule1.setRuleGroup("users:email filter");
     rule1.setDaoKey("localUserDAO");
@@ -60,6 +95,7 @@ public class RulerDAOTest extends Test {
 
     //the rule has a higher priority than the first rule, changes user's email from nanos@nanos.net to foam@nanos.net
     rule2 = new Rule();
+    rule2.setId(2);
     rule2.setName("userDAO email filter");
     rule2.setRuleGroup("users:email filter");
     rule2.setDaoKey("localUserDAO");
@@ -83,6 +119,7 @@ public class RulerDAOTest extends Test {
 
     //the rule has lower priority than the first one => should never be executed
     rule3 = new Rule();
+    rule3.setId(3);
     rule3.setName("userDAO email filter");
     rule3.setRuleGroup("users:email filter");
     rule3.setDaoKey("localUserDAO");
@@ -97,9 +134,10 @@ public class RulerDAOTest extends Test {
 
     //the rule has lower priority than the first one but has different group so should be executed
     rule4 = new Rule();
+    rule4.setId(4);
     rule4.setName("userDAO lastName filter");
     rule4.setRuleGroup("users:change lastName");
-   rule4.setDaoKey("localUserDAO");
+    rule4.setDaoKey("localUserDAO");
     rule4.setOperation(Operations.CREATE);
     rule4.setAfter(false);
     rule4.setPriority(10);
@@ -117,6 +155,7 @@ public class RulerDAOTest extends Test {
 
     //the rule has lower priority than the first one but has different group so should be executed
     rule5 = new Rule();
+    rule5.setId(5);
     rule5.setName("userDAO lastName filter");
     rule5.setRuleGroup("users:change lastName");
     rule5.setDaoKey("localUserDAO");
@@ -139,6 +178,26 @@ public class RulerDAOTest extends Test {
       user.setLastName("Smith");
     });
     rule5 = (Rule) ruleDAO.put_(x, rule5);
+
+    //the rule only applied to user2
+    rule6 = new Rule();
+    rule6.setName("user2 update");
+    rule6.setRuleGroup("user2 update");
+    rule6.setDaoKey("localUserDAO");
+    rule6.setOperation(Operations.UPDATE);
+    rule6.setAfter(false);
+    rule6.setSaveHistory(true);
+    rule6.setPredicate(EQ(DOT(NEW_OBJ, foam.nanos.auth.User.EMAIL), "user2@nanos.net"));
+    rule6.setAction((x1, obj, oldObj, ruler) -> ruler.putResult("Pending"));
+    rule6.setAsyncAction((x1, obj, oldObj, ruler) -> {
+      // simulate async
+      try {
+        Thread.sleep(asyncWait);
+      } catch (InterruptedException e) { }
+
+      ruler.putResult("Done");
+    });
+    rule6 = (Rule) ruleDAO.put_(x, rule6);
   }
   public void removeData(X x) {
     ruleDAO.remove_(x, rule1);
@@ -146,6 +205,8 @@ public class RulerDAOTest extends Test {
     ruleDAO.remove_(x, rule3);
     ruleDAO.remove_(x, rule4);
     ruleDAO.remove_(x, rule5);
-    userDAO.remove_(x, user);
+    ruleDAO.remove_(x, rule6);
+    userDAO.remove_(x, user1);
+    userDAO.remove_(x, user2);
   }
 }
