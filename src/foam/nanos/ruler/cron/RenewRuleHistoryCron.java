@@ -40,14 +40,14 @@ public class RenewRuleHistoryCron implements ContextAgent {
           if ( rule == null ) {
             throw new Exception(
               String.format("Rule with id %d is not found.",
-                ruleHistory.getId()));
+                ruleHistory.getRuleId()));
           }
           DAO delegate = (DAO) x.get(ruleHistory.getObjectDaoKey());
           FObject object = delegate.find(ruleHistory.getObjectId());
           if ( object == null ) {
             throw new Exception(
               String.format("Object with id %d in %s is not found.",
-                ruleHistory.getId(),
+                ruleHistory.getObjectId(),
                 ruleHistory.getObjectDaoKey()));
           }
 
