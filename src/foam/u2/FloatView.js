@@ -67,7 +67,7 @@ foam.CLASS({
       var view = this.attrSlot(null, this.onKey ? 'input' : null);
       var self = this;
 
-      if ( ! foam.Undefined.isInstance(this.data) ) view.set(this.formatNumber(this.data));
+      if ( ! foam.Undefined.isInstance(this.data) ) view.set(this.dataToText(this.data));
 
       if ( this.onKey ) {
         this.on('blur', function() {
@@ -89,7 +89,7 @@ foam.CLASS({
       data.sub(function() {
         var text = view.get();
         // no need to trim input if its value is the same as data, and it's not too long 
-        if ( parseFloat(text) == data.get() && ! self.needsTrim(text, self.precision) ) return;
+        if ( self.textToData(text) == data.get() && ! self.needsTrim(text, self.precision) ) return;
         view.set(self.dataToText(data.get()));
       });
     },
