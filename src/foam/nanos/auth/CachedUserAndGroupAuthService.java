@@ -10,6 +10,7 @@ import foam.util.LRULinkedHashMap;
 import java.util.Map;
 import java.util.HashMap;
 
+// TODO: Why isn't this a decorator
 public class CachedUserAndGroupAuthService
   extends UserAndGroupAuthService
 {
@@ -48,8 +49,7 @@ public class CachedUserAndGroupAuthService
 
     if ( userMap.containsKey(user.getId()) ) {
       permissionMap = userMap.get(user.getId());
-    }
-    else {
+    } else {
       permissionMap = new HashMap<>();
     }
 
@@ -57,7 +57,7 @@ public class CachedUserAndGroupAuthService
       return permissionMap.get(permission.getName());
     }
 
-    boolean permissionCheck = group.implies(permission);
+    boolean permissionCheck = group.implies(x, permission);
     permissionMap.put(permission.getName(), permissionCheck);
     userMap.put(user.getId(), permissionMap);
 
