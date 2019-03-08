@@ -103,9 +103,9 @@ public class UserAndGroupAuthService
   }
 
   /**
-    Logs user and sets user group into the current sessions context.
+   * Helper function to reduce duplicated code.
    */
-  private User userAndGroupContext(X x, User user, String password) throws AuthenticationException {
+  private User loginHelper(X x, User user, String password) throws AuthenticationException {
     if ( user == null ) {
       throw new AuthenticationException("User not found");
     }
@@ -150,7 +150,7 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Invalid Parameters");
     }
 
-    return userAndGroupContext(x, (User) userDAO_.find(userId), password);
+    return loginHelper(x, (User) userDAO_.find(userId), password);
   }
 
   public User loginByEmail(X x, String email, String password) throws AuthenticationException {
@@ -164,7 +164,7 @@ public class UserAndGroupAuthService
     if ( user == null ) {
       throw new AuthenticationException("User not found");
     }
-    return userAndGroupContext(x, user, password);
+    return loginHelper(x, user, password);
   }
 
   /**
@@ -183,7 +183,7 @@ public class UserAndGroupAuthService
     }
 
     try {
-      String groupId = (String) user.getGroup();
+      String groupId = user.getGroup();
 
       while ( ! SafetyUtil.isEmpty(groupId) ) {
         Group group = (Group) groupDAO_.find(groupId);

@@ -183,13 +183,11 @@ foam.CLASS({
         foam.__context__.register(foam.u2.UnstyledActionView, 'foam.u2.ActionView');
         self.getCurrentUser();
 
-        window.onpopstate = function(event) {
-          if ( location.hash != null) {
-            var hid = location.hash.substr(1);
-
-            hid && self.client.menuDAO.find(hid).then(function(menu) {
-              menu && menu.launch(this, null);
-            });
+        window.onpopstate = async function(event) {
+          var hid = location.hash.substr(1);
+          if ( hid ) {
+            var menu = await self.client.menuDAO.find(hid);
+            menu && menu.launch(this);
           }
         };
       });
@@ -200,11 +198,16 @@ foam.CLASS({
       self.clientPromise.then(function() {
         self
           .addClass(self.myClass())
-          .start('div', null, self.topNavigation_$).end()
-          .start('div').addClass('stack-wrapper')
-            .tag({class: 'foam.u2.stack.StackView', data: self.stack, showActions: false})
+          .tag('div', null, self.topNavigation_$)
+          .start()
+            .addClass('stack-wrapper')
+            .tag({
+              class: 'foam.u2.stack.StackView',
+              data: self.stack,
+              showActions: false
+            })
           .end()
-          .start('div', null, self.footerView_$).end();
+          .tag('div', null, self.footerView_$);
 
           // Sets up application view
           self.topNavigation_.add(self.TopNavigation.create());
@@ -252,7 +255,7 @@ foam.CLASS({
       var M = m.toUpperCase();
 
       return css.replace(
-        new RegExp("%" + M + "%", 'g'),
+        new RegExp('%' + M + '%', 'g'),
         '/*%' + M + '%*/ ' + this[m]);
     },
 
@@ -300,18 +303,21 @@ foam.CLASS({
 
     function pushMenu(menuId) {
       /** Use to load a specific menu. **/
-      if ( window.location.hash.substr(1) != menuId ) window.location.hash = menuId;
+      if ( window.location.hash.substr(1) != menuId ) {
+        window.location.hash = menuId;
+      }
     },
 
     function requestLogin() {
       var self = this;
 
       // don't go to log in screen if going to reset password screen
-      if ( location.hash != null && location.hash === '#reset')
-        return new Promise(function (resolve, reject) {
+      if ( location.hash != null && location.hash === '#reset' ) {
+        return new Promise(function(resolve, reject) {
           self.stack.push({ class: 'foam.nanos.auth.resetPassword.ResetView' });
           self.loginSuccess$.sub(resolve);
         });
+      }
 
       return new Promise(function(resolve, reject) {
         self.stack.push({ class: 'foam.nanos.auth.SignInView' });
