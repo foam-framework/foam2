@@ -117,7 +117,38 @@
       class: 'Boolean',
       name: 'saveHistory',
       value: false,
-      documentation: 'Determines if history of rule execution should be saved.'
+      documentation: 'Determines if history of rule execution should be saved.',
+      help: 'Automatically sets to true when validity is greater than zero.',
+      adapt: function(_, nu) {
+        return nu || this.validity > 0;
+      }
+    },
+    {
+      class: 'Int',
+      name: 'validity',
+      documentation: 'Validity of the rule (in days) for automatic rescheduling.',
+      postSet: function(_, nu) {
+        if ( nu > 0
+          && ! this.saveHistory
+        ) {
+          this.saveHistory = true;
+        }
+      }
+    },
+    {
+      class: 'Object',
+      name: 'cmd',
+      transient: true,
+      hidden: true,
+      javaFactory: `
+        if ( Operations.CREATE == getOperation()
+          || Operations.UPDATE == getOperation()
+          || Operations.CREATE_OR_UPDATE == getOperation()
+        ) {
+          return RulerDAO.PUT_CMD;
+        }
+        return null;
+      `
     }
   ],
 
@@ -140,9 +171,10 @@
         }
       ],
       javaCode: `
-        return getPredicate().f(
-          x.put("NEW", obj).put("OLD", oldObj)
-        );
+        return getEnabled()
+          && getPredicate().f(
+            x.put("NEW", obj).put("OLD", oldObj)
+          );
       `
     },
     {
@@ -167,6 +199,9 @@
       ],
       javaCode: `
         getAction().applyAction(x, obj, oldObj, ruler);
+        if ( ! getAfter() ) {
+          ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
+        }
       `
     },
     {
@@ -191,12 +226,8 @@
       ],
       javaCode: `
         getAsyncAction().applyAction(x, obj, oldObj, ruler);
-        if ( ! getAfter()
-          && Operations.CREATE == getOperation()
-          || Operations.UPDATE == getOperation()
-          || Operations.CREATE_OR_UPDATE == getOperation()
-        ) {
-          ruler.getDelegate().put_(x, obj);
+        if ( ! getAfter() ) {
+          ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }
       `
     }
