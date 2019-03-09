@@ -27,6 +27,10 @@
     'foam.dao.Sink'
   ],
 
+  constants: {
+    PUT_CMD: 'PUT_CMD'
+  },
+
   properties: [
     {
       class: 'String',
@@ -89,6 +93,16 @@
       `
     },
     {
+      name: 'cmd_',
+      javaCode: `
+        if ( PUT_CMD == obj ) {
+          getDelegate().put((FObject) x.get("OBJ"));
+          return true;
+        }
+        return super.cmd(obj);
+      `
+    },
+    {
       name: 'applyRules',
       args: [
         {
@@ -113,7 +127,7 @@
       for ( Object key : sink.getGroupKeys() ) {
         List<Rule> group = ((ArraySink) sink.getGroups().get(key)).getArray();
         if ( ! group.isEmpty() ) {
-          new RuleEngine(x, getDelegate()).execute(group, obj, oldObj);
+          new RuleEngine(x, this).execute(group, obj, oldObj);
         }
       }
       `
