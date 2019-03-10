@@ -180,4 +180,5 @@ FOAM_FILES([
   { name: "foam/nanos/ruler/Rule" },
   { name: "foam/nanos/ruler/Operations" },
   { name: "foam/nanos/ruler/RuleHistory" },
+  { name: "foam/nanos/ruler/RuleHistoryStatus" },
 ]);
