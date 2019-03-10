@@ -619,6 +619,10 @@ foam.CLASS({
       name: 'textField',
     },
     {
+      class: 'Boolean',
+      name: 'booleanField',
+    },
+    {
       class: 'String',
       name: 'textArea',
       view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 40}
