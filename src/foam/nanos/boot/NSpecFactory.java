@@ -46,9 +46,9 @@ public class NSpecFactory
       try {
         if (logger != null) logger.info("Creating Service", spec_.getName());
         ns_ = spec_.createService(x_.getX().put(NSpec.class, spec_));
-        if (logger != null) logger.info("Created Service", spec_.getName());
-
+        if (logger != null) logger.info("Created Service", spec_.getName(), ns_);
         if (ns_ instanceof ContextAware) ((ContextAware) ns_).setX(x_.getX());
+        if (ns_ instanceof NSpecAware) ((NSpecAware) ns_).setNSpec(spec_);
         if (ns_ instanceof NanoService) ((NanoService) ns_).start();
       } catch (Throwable t) {
         if (logger != null) logger.error("Error Creating Service", spec_.getName(), t);

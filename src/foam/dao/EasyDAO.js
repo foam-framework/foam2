@@ -19,7 +19,11 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'EasyDAO',
   extends: 'foam.dao.ProxyDAO',
-  implements: [ 'foam.mlang.Expressions' ],
+
+  implements: [
+    'foam.mlang.Expressions',
+    'foam.nanos.boot.NSpecAware'
+  ],
 
   documentation: function() {/*
     Facade for easily creating decorated DAOs.
@@ -87,21 +91,62 @@ foam.CLASS({
       /** The developer-friendly name for this EasyDAO. */
       class: 'String',
       name: 'name',
-      factory: function() { return this.of.id; }
+      factory: function() { return this.of.id; },
+      javaFactory: `return getOf().getId();`
+    },
+    {
+      name: 'nSpec',
+      class: 'FObjectProperty',
+      type: 'foam.nanos.boot.NSpec'
     },
     {
       /** This is set automatically when you create an EasyDAO.
         @private */
       name: 'delegate',
       javaFactory: `
+foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+logger.info(this.getClass().getSimpleName(), "delegate", "NSpec.name", getNSpec().getName(), Thread.currentThread().getName());
+
 foam.dao.DAO delegate = getInnerDAO() == null ?
-  new foam.dao.MapDAO(getX(), getOf()) :
+  new foam.dao.MDAO(getOf()) :
   getInnerDAO();
 
-if ( delegate instanceof foam.dao.MDAO ) setMdao((foam.dao.MDAO)delegate);
+if ( delegate instanceof foam.dao.MDAO ) {
+  setMdao((foam.dao.MDAO)delegate);
+}
+
+// TODO: cluster needs to delegate to MDAO.   InnerDAO is an issue.
+if ( getCluster() ) {
+  delegate = new foam.nanos.mrac.ClusterDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(getMdao()).build();
+}
 
 if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
   delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
+}
+
+if ( getDeletedAware() ||
+     foam.nanos.auth.DeletedAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+  delegate = new foam.nanos.auth.DeletedAwareDAO.Builder(getX()).setDelegate(delegate).build();
+}
+
+if ( getCreatedAware() ||
+  foam.nanos.auth.CreatedAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+  delegate = new foam.nanos.auth.CreatedAwareDAO.Builder(getX()).setDelegate(delegate).build();
+}
+
+if ( getCreatedByAware() ||
+  foam.nanos.auth.CreatedByAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+  delegate = new foam.nanos.auth.CreatedByAwareDAO.Builder(getX()).setDelegate(delegate).build();
+}
+
+if ( getLastModifiedAware() ||
+  foam.nanos.auth.LastModifiedAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+  delegate = new foam.nanos.auth.LastModifiedAwareDAO.Builder(getX()).setDelegate(delegate).build();
+}
+
+if ( getLastModifiedByAware() ||
+  foam.nanos.auth.LastModifiedByAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+  delegate = new foam.nanos.auth.LastModifiedByAwareDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
 if ( getGuid() && getSeqNo() ) {
@@ -134,6 +179,10 @@ if ( getAuthenticate() ) {
 
 if ( getPm() ) {
   delegate = new foam.dao.PMDAO(getX(), delegate);
+}
+
+if ( getCluster() ) {
+  // TODO: wrap top delegate in ClusterPrimaryDAO - which directs all puts to Primary node.
 }
 
 return delegate;
@@ -218,13 +267,11 @@ return delegate;
       class: 'Boolean',
       name: 'logging',
       value: false,
-      generateJava: false
     },
     {
       /** Enable time tracking for concurrent DAO operations. */
       class: 'Boolean',
       name: 'timing',
-      generateJava: false,
       value: false
     },
     {
@@ -307,6 +354,7 @@ return delegate;
     },
     {
       name: 'retryBoxMaxAttempts',
+      class: 'Boolean',
       generateJava: false,
     },
     {
@@ -330,8 +378,15 @@ return delegate;
       }
     },
     {
+      /** Cluster this DAO */
+      name: 'cluster',
+      class: 'Boolean',
+      value: false
+    },
+    {
       /** Simpler alternative than providing serverBox. */
       name: 'serviceName',
+      class: 'String',
       generateJava: false
     },
     {
@@ -340,9 +395,39 @@ return delegate;
       generateJava: false,
       name: 'decorators'
     },
+    // {
+    //   name: 'orderBy',
+    //   class: 'FObjectProperty',
+    //   type: 'Any'
+    // },
     {
       name: 'testData',
       generateJava: false
+    },
+    {
+      name: 'deletedAware',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'createdAware',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'createdByAware',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'lastModifiedAware',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'lastModifiedByAware',
+      class: 'Boolean',
+      value: false
     }
   ],
 
@@ -436,6 +521,10 @@ return delegate;
         var args = {__proto__: params, delegate: dao, of: this.of};
         if ( this.seqProperty ) args.property = this.seqProperty;
         dao = this.GUIDDAO.create(args);
+      }
+
+      if ( this.orderBy ) {
+        //dao = dao.orderBy(this.orderBy);
       }
 
       var cls = this.of;
