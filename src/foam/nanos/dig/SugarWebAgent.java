@@ -101,7 +101,7 @@ public class SugarWebAgent
               Class paramObj_ = null;
               Object obj_ = null;
 
-              if ( ! SafetyUtil.isEmpty(p.getParameter(pArray[j].getName())) ) {
+              if ( ! SafetyUtil.isEmpty(p.getParameter(pArray[j].getName())) || typeName.equals("foam.core.X") ) {
                 arglist[j] = setParameterType(x, resp, out, p, typeName, pArray[j]);
               } else {
                 DigErrorMessage error = new GeneralException.Builder(x)
