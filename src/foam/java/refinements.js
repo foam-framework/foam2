@@ -589,10 +589,6 @@ foam.CLASS({
       value: true
     },
     {
-      class: 'Boolean',
-      name: 'synchronized'
-    },
-    {
       class: 'StringArray',
       name: 'javaThrows'
     },
@@ -1957,57 +1953,54 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.java',
-  name: 'PromisedJavaRefinement',
-  refines: 'foam.core.Promised',
-  flags: [
-    'java'
-  ],
-  methods: [
-    function buildJavaClass(cls) {
-      var name = this.name;
-      var filter = foam.util.flagFilter(['java']);
-      var of = foam.lookup(this.of);
-      var methods = this.methods ?
-        this.methods.map(m => of.getAxiomByName(m)) :
-        of.getOwnAxiomsByClass(foam.core.Method);
-      methods = methods.filter(filter);
-
-      methods.forEach(function(m) {
-        var m2 = m.clone();
-        m2.javaCode = `
+  name: 'PromisedMethodRefinement',
+  refines: 'foam.core.PromisedMethod',
+  flags: ['java'],
+  properties: [
+    {
+      name: 'javaCode',
+      getter: function() {
+        return `
 try {
-  maybeWaitFor${name}();
-  ${m2.javaType != 'void' ? 'return ' : ''}get${foam.String.capitalize(name)}().${m2.name}(${m2.args.map(a => a.name).join(', ')});
+  synchronized ( getDelegate() ) {
+    if ( ! getDelegate().isPropertySet("${this.property}") ) getDelegate().wait();
+  }
+} catch (Exception e) {
+  throw new RuntimeException(e);
+}
+${this.javaType != 'void' ? 'return ' : ''}getDelegate()
+    .${this.name}(${this.args.map(a => a.name).join(', ')});
+        `;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'PromisedRefinement',
+  refines: 'foam.core.Promised',
+  flags: ['java'],
+  properties: [
+    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
+    {
+      name: 'javaType',
+      expression: function(of) { return of; }
+    },
+    {
+      name: 'javaPostSet',
+      expression: function(name, stateName) {
+        return `
+set${foam.String.capitalize(stateName)}(val);
+try {
+  synchronized ( this ) {
+    this.notifyAll();
+  }
 } catch (Exception e) {
   throw new RuntimeException(e);
 }
         `;
-        m2.buildJavaClass(cls);
-      });
-
-      cls.method({
-        type: 'void',
-        name: `maybeWaitFor${name}`,
-        synchronized: true,
-        throws: ['InterruptedException'],
-        body: `
-if ( ! isPropertySet("${name}") ) wait();
-else notifyAll();
-        `
-      });
-
-      foam.core.FObjectProperty.create({
-        of: of,
-        name: name,
-        javaPostSet: `
-try {
-  maybeWaitFor${name}();
-} catch (Exception e) {
-  throw new RuntimeException(e);
-}
-        `
-      }).buildJavaClass(cls);
-      return cls;
+      }
     }
   ]
 });

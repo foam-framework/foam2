@@ -285,7 +285,7 @@ public final class QrCode {
     sb.append(String.format(
         "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 %1$d %1$d\" stroke=\"none\">\n",
         size + border * 2));
-    sb.append("\t<rect width=\"100%\" height=\"100%\" fill=\"#FFFFFF\"/>\n");
+    sb.append("\t<rect width=\"100%\" height=\"100%\" fill=\"rgb(255, 255, 255)\"/>\n");
     sb.append("\t<path d=\"");
     boolean head = true;
     for (int y = -border; y < size + border; y++) {
@@ -299,7 +299,7 @@ public final class QrCode {
         }
       }
     }
-    sb.append("\" fill=\"#000000\"/>\n");
+    sb.append("\" fill=\"rgb(0, 0, 0)\"/>\n");
     sb.append("</svg>\n");
     return sb.toString();
   }
