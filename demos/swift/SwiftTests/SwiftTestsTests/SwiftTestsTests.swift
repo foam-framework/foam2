@@ -514,7 +514,7 @@ class SwiftTestsTests: XCTestCase {
     DispatchQueue.global(qos: .background).async {
       _ = try? dao.put(self.x.create(somepackage_Test.self, args: ["firstName": "A"])!)
       _ = try? dao.put(self.x.create(somepackage_Test.self, args: ["firstName": "B"])!)
-      pDao.promise.set(dao)
+      pDao.promise = dao
     }
 
     let a = try? pDao.select()

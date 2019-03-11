@@ -174,13 +174,9 @@ public class UserAndGroupAuthService
   */
   public boolean checkUserPermission(foam.core.X x, User user, Permission permission) {
     // check whether user has permission to check user permissions
-    if ( ! check(x, CHECK_USER_PERMISSION) ) {
-      throw new AuthorizationException();
-    }
+    if ( ! check(x, CHECK_USER_PERMISSION) ) throw new AuthorizationException();
 
-    if ( user == null || permission == null ) {
-      return false;
-    }
+    if ( user == null || permission == null ) return false;
 
     try {
       String groupId = (String) user.getGroup();
@@ -189,14 +185,10 @@ public class UserAndGroupAuthService
         Group group = (Group) groupDAO_.find(groupId);
 
         // if group is null break
-        if ( group == null ) {
-          break;
-        }
+        if ( group == null ) break;
 
         // check permission
-        if ( group.implies(permission) ) {
-          return true;
-        }
+        if ( group.implies(x, permission) ) return true;
 
         // check parent group
         groupId = group.getParent();
@@ -212,14 +204,10 @@ public class UserAndGroupAuthService
    * Return Boolean for this
    */
   public boolean checkPermission(foam.core.X x, Permission permission) {
-    if ( x == null || permission == null ) {
-      return false;
-    }
+    if ( x == null || permission == null ) return false;
 
     Session session = x.get(Session.class);
-    if ( session == null || session.getUserId() == 0 ) {
-      return false;
-    }
+    if ( session == null || session.getUserId() == 0 ) return false;
 
     // NOTE: It's important that we use the User from the context here instead
     // of looking it up in a DAO because if the user is actually an entity that
@@ -229,9 +217,7 @@ public class UserAndGroupAuthService
     User user = (User) x.get("user");
 
     // check if user exists and is enabled
-    if ( user == null || ! user.getEnabled() ) {
-      return false;
-    }
+    if ( user == null || ! user.getEnabled() ) return false;
 
     try {
       String groupId = (String) user.getGroup();
@@ -240,19 +226,13 @@ public class UserAndGroupAuthService
         Group group = (Group) groupDAO_.find(groupId);
 
         // if group is null break
-        if ( group == null ) {
-          break;
-        }
+        if ( group == null ) break;
 
         // check if group is enabled
-        if ( ! group.getEnabled() ) {
-          return false;
-        }
+        if ( ! group.getEnabled() ) return false;
 
         // check permission
-        if ( group.implies(permission) ) {
-          return true;
-        }
+        if ( group.implies(x, permission) ) return true;
 
         // check parent group
         groupId = group.getParent();

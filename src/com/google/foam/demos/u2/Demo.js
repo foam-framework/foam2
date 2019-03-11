@@ -609,8 +609,18 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Float',
+      name: 'floatViewTest',
+      precision: 2,
+      view: { class: 'foam.u2.FloatView', min: 0.01, max: 0.99, onKey: true }
+    },
+    {
       class: 'String',
       name: 'textField',
+    },
+    {
+      class: 'Boolean',
+      name: 'booleanField',
     },
     {
       class: 'String',

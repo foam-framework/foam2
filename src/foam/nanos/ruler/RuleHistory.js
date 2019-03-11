@@ -56,6 +56,34 @@ foam.CLASS({
         if ( !!value ) {
           this.add(value.toString());
         }
+      },
+      view: function (_, X) {
+        return X.data.slot(function(result) {
+          return foam.u2.TextField.create({
+            mode: foam.u2.DisplayMode.RO,
+            data: result.toString()
+          });
+        });
+      }
+    },
+    {
+      class: 'DateTime',
+      name: 'expirationDate',
+      documentation: 'Expiration date to be rescheduled.'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.nanos.ruler.RuleHistoryStatus',
+      name: 'status',
+      documentation: 'Rule history status.'
+    },
+    {
+      class: 'String',
+      name: 'note',
+      documentation: 'Note appended to the rule history.',
+      view: {
+        class: 'foam.u2.tag.TextArea',
+        rows: 20, cols: 80
       }
     }
   ]

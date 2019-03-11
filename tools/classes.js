@@ -330,6 +330,7 @@ var classes = [
   'foam.nanos.ruler.RuleAction',
   'foam.nanos.ruler.ScriptPredicate',
   'foam.nanos.ruler.RuleHistory',
+  'foam.nanos.ruler.RuleHistoryStatus',
   'foam.comics.SearchMode',
 
   //Support Files
