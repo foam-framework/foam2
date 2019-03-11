@@ -102,10 +102,24 @@ public class RuleEngine extends ContextAwareSupport {
           if ( rule.f(getX(), obj, oldObj)
             && rule.getAsyncAction() != null
           ) {
-            rule.asyncApply(getX(), obj, oldObj, RuleEngine.this);
-            saveHistory(rule, obj);
+            try {
+              rule.asyncApply(x, obj, oldObj, RuleEngine.this);
+              saveHistory(rule, obj);
+            } catch (Exception ex) {
+              retryAsyncApply(x, rule, obj, oldObj);
+            }
           }
         }
+      }
+    });
+  }
+
+  private void retryAsyncApply(X x, Rule rule, FObject obj, FObject oldObj) {
+    new RetryManager().submit(x, new ContextAgent() {
+      @Override
+      public void execute(X x) {
+        rule.asyncApply(getX(), obj, oldObj, RuleEngine.this);
+        saveHistory(rule, obj);
       }
     });
   }
