@@ -45,7 +45,12 @@ public class SessionServerBox
           session = new Session();
           session.setId(sessionID);
           session.setRemoteHost(req.getRemoteHost());
-          session.setContext(getX().put(Session.class, session));
+
+          // Set the user to null to avoid the system user from leaking into
+          // newly created sessions. If we don't do this, then a user has admin
+          // privileges before they log in, which is obviously a big security
+          // issue.
+          session.setContext(getX().put("user", null).put(Session.class, session));
           sessionDAO.put(session);
         } else if ( ! session.getRemoteHost().equals(req.getRemoteHost()) ) {
           // If an existing session is reused with a different remote host then
