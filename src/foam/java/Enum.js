@@ -27,109 +27,15 @@ foam.CLASS({
       value: true
     },
     {
-      name: 'labelsOutput',
-      expression: function() {
-        var out = 'return new String[] { ';
-
-        for ( var i = 0, value ; value = this.values[i] ; i++ ) {
-          out += this.labelForValue(value);
-          if ( i < this.values.length - 1 ) out += ', ';
-        }
-
-        out += ' };';
-
-        return out;
-      }
-    },
-    {
-      name: 'forOrdinal',
-      expression: function() {
-        var out = 'switch (ordinal) {\n';
-
-        for ( var i = 0, value ; value = this.values[i] ; i++ ) {
-          out += '  case ' + value.ordinal + ': return ' + this.name + '.' + value.name + ';\n';
-        }
-
-        out += '}\nreturn null;';
-
-        return out;
-      }
-    },
-    {
-      name: 'forLabel',
-      expression: function() {
-        var out = 'switch (label) {\n';
-
-        for ( var i = 0, value ; value = this.values[i] ; i++ ) {
-          out += '  case ' + '"' + value.label + '"' +
-                  ': return ' + this.name + '.' + value.name + ';\n';
-        }
-
-        out += '}\nreturn null;';
-
-        return out;
-      }
-    },
-    {
-      name: 'methods',
-      factory: function() {
-        return [
-          {
-            name: this.name,
-            args: [
-              {
-                name: 'ordinal',
-                type: 'int'
-              },
-              {
-                name: 'label',
-                type: 'String'
-              },
-            ],
-            body: 'setOrdinal(ordinal);\nsetLabel(label);\nsetName(name());'
-          },
-          {
-            name: 'forOrdinal',
-            type: this.name,
-            visibility: 'public',
-            static: true,
-            args: [ { name: 'ordinal', type: 'int' } ],
-            body: this.forOrdinal
-          },
-          {
-            name: 'forLabel',
-            type: this.name,
-            visibility: 'public',
-            static: true,
-            args: [ { name: 'label', type: 'String' } ],
-            body: this.forLabel
-          },
-          {
-            name: 'labels',
-            type: 'String[]',
-            visibility: 'public',
-            static: true,
-            body: this.labelsOutput
-          }
-        ]
-      }
+      class: 'String',
+      name: 'declarations'
     }
   ],
 
   methods: [
-    function labelForValue(value) {
-      return '"' + value.label + '"';
-    },
     function writeDeclarations(o) {
       o.indent();
-
-      // Outputs declared enums
-      for ( var i = 0 ; i < this.values.length ; i++ ) {
-        var value = this.values[i];
-        o.out(value.name, '(', value.ordinal, ',', this.labelForValue(value),')');
-        o.out(( i == this.values.length - 1 ) ? ';\n\n' : ', ');
-      }
-
+      o.out(this.declarations, ';\n\n');
       this.out = o;
     }
   ]
