@@ -230,6 +230,11 @@
           ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }
       `
+    },
+    {
+      name: 'canExecute',
+      type: 'Boolean',
+      javaCode: `return true;`
     }
   ]
 });

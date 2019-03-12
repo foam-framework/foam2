@@ -15,10 +15,7 @@ import foam.nanos.pool.FixedThreadPool;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RuleEngine extends ContextAwareSupport {
@@ -78,6 +75,7 @@ public class RuleEngine extends ContextAwareSupport {
   }
 
   private void applyRules(List<Rule> rules, FObject obj, FObject oldObj) {
+    List<Rule> updateList = new ArrayList<>();
     for (Rule rule : rules) {
       if ( stops_.get() ) return;
 
@@ -85,9 +83,16 @@ public class RuleEngine extends ContextAwareSupport {
       if ( rule.f(getX(), obj, oldObj)
         && rule.getAction() != null
       ) {
-        rule.apply(getX(), obj, oldObj, this);
-        saveHistory(rule, obj);
+        if ( rule.canExecute() ) {
+          updateList.add(rule);
+        } else {
+          return;
+        }
       }
+    }
+    for ( Rule rule : updateList ) {
+      rule.apply(getX(), obj, oldObj, this);
+      saveHistory(rule, obj);
     }
   }
 
