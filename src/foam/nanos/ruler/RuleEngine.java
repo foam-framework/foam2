@@ -77,7 +77,7 @@ public class RuleEngine extends ContextAwareSupport {
   private void applyRules(List<Rule> rules, FObject obj, FObject oldObj) {
     List<Rule> updateList = new ArrayList<>();
     for (Rule rule : rules) {
-      if ( stops_.get() ) return;
+      //if ( stops_.get() ) return;
 
       currentRule_ = rule;
       if ( rule.f(getX(), obj, oldObj)
@@ -91,6 +91,7 @@ public class RuleEngine extends ContextAwareSupport {
       }
     }
     for ( Rule rule : updateList ) {
+      if ( stops_.get() ) return;
       rule.apply(getX(), obj, oldObj, this);
       saveHistory(rule, obj);
     }

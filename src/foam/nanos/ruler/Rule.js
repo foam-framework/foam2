@@ -14,6 +14,7 @@
     'foam.core.FObject',
     'foam.core.X'
   ],
+  
 
   properties: [
     {

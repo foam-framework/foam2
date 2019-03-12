@@ -24,9 +24,9 @@ public class RulerDAOTest extends Test {
     x = TestUtils.mockDAO(x, "ruleHistoryDAO");
 
     ruleDAO = (DAO) x.get("ruleDAO");
+    createRule(x);
     userDAO = new RulerDAO(x, (DAO) x.get("localUserDAO"), "localUserDAO");
     ruleHistoryDAO = (DAO) x.get("ruleHistoryDAO");
-    createRule(x);
     testUsers(x);
     testRuleHistory(x);
     removeData(x);
@@ -156,6 +156,7 @@ public class RulerDAOTest extends Test {
     //the rule has lower priority than the first one but has different group so should be executed
     rule5 = new Rule();
     rule5.setId(5);
+    rule5.setPriority(30);
     rule5.setName("userDAO lastName filter");
     rule5.setRuleGroup("users:change lastName");
     rule5.setDaoKey("localUserDAO");

@@ -4,7 +4,7 @@
  *     http://www.apache.org/licenses/LICENSE-2.0
  */
 
- foam.CLASS({
+foam.CLASS({
   package: 'foam.nanos.ruler',
   name: 'RulerDAO',
   extends: 'foam.dao.ProxyDAO',
@@ -38,26 +38,34 @@
       documentation: 'The dao name that rule needs to be applied on.'
     },
     {
-      class: 'foam.dao.DAOProperty',
-      name: 'beforeDao',
-      javaFactory: `
-        return ((DAO) getX().get("ruleDAO")).where(AND(
-          EQ(Rule.DAO_KEY, getDaoKey()),
-          EQ(Rule.AFTER, false),
-          EQ(Rule.ENABLED, true)
-        )).orderBy(new Desc(Rule.PRIORITY));
-      `
+      class: 'FObjectProperty',
+      of: 'foam.mlang.sink.GroupBy',
+      name: 'createBefore'
     },
     {
-      class: 'foam.dao.DAOProperty',
-      name: 'afterDao',
-      javaFactory: `
-        return ((DAO) getX().get("ruleDAO")).where(AND(
-          EQ(Rule.DAO_KEY, getDaoKey()),
-          EQ(Rule.AFTER, true),
-          EQ(Rule.ENABLED, true)
-        )).orderBy(new Desc(Rule.PRIORITY));
-      `
+      class: 'FObjectProperty',
+      of: 'foam.mlang.sink.GroupBy',
+      name: 'createAfter'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.sink.GroupBy',
+      name: 'updateBefore'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.sink.GroupBy',
+      name: 'updateAfter'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.sink.GroupBy',
+      name: 'removeBefore'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.sink.GroupBy',
+      name: 'removeAfter'
     }
   ],
 
@@ -66,17 +74,17 @@
       name: 'put_',
       javaCode: `
       FObject oldObj = getDelegate().find_(x, obj);
-      applyRules(x, obj, oldObj,
-        getBeforeGroup( oldObj == null ? Operations.CREATE : Operations.UPDATE
-          , Operations.CREATE_OR_UPDATE
-      ));
-
+      if ( oldObj == null ) {
+        applyRules(x, obj, oldObj, getCreateBefore());
+      } else {
+        applyRules(x, obj, oldObj, getUpdateBefore());
+      }
       FObject ret =  getDelegate().put_(x, obj);
-
-      applyRules(x, obj, oldObj,
-        getAfterGroup( oldObj == null ? Operations.CREATE : Operations.UPDATE
-          , Operations.CREATE_OR_UPDATE
-      ));
+      if ( oldObj == null ) {
+        applyRules(x, obj, oldObj, getCreateAfter());
+      } else {
+        applyRules(x, obj, oldObj, getUpdateAfter());
+      }
       return ret;
       `
     },
@@ -84,22 +92,10 @@
       name: 'remove_',
       javaCode: `
       FObject oldObj = getDelegate().find_(x, obj);
-      applyRules(x, obj, oldObj, getBeforeGroup(Operations.REMOVE));
-
+      applyRules(x, obj, oldObj, getRemoveBefore());
       FObject ret =  getDelegate().remove_(x, obj);
-
-      applyRules(x, ret, oldObj, getAfterGroup(Operations.REMOVE));
+      applyRules(x, ret, oldObj, getRemoveAfter());
       return ret;
-      `
-    },
-    {
-      name: 'cmd_',
-      javaCode: `
-        if ( PUT_CMD == obj ) {
-          getDelegate().put((FObject) x.get("OBJ"));
-          return true;
-        }
-        return super.cmd(obj);
       `
     },
     {
@@ -123,13 +119,82 @@
         }
       ],
       javaCode: `
-
       for ( Object key : sink.getGroupKeys() ) {
         List<Rule> group = ((ArraySink) sink.getGroups().get(key)).getArray();
         if ( ! group.isEmpty() ) {
-          new RuleEngine(x, this).execute(group, obj, oldObj);
+          new RuleEngine(x, getDelegate()).execute(group, obj, oldObj);
         }
       }
+      `
+    },
+    {
+      name: 'updateRules',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+      DAO ruleDAO = (DAO) x.get("ruleDAO");
+      GroupBy createdBefore = (GroupBy) ruleDAO.where(AND(
+        OR(
+          EQ(Rule.OPERATION, Operations.CREATE),
+          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+        ),
+        EQ(Rule.DAO_KEY, getDaoKey()),
+        EQ(Rule.AFTER, false)
+      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+      setCreateBefore(createdBefore);
+      GroupBy updatedBefore = (GroupBy) ruleDAO.where(AND(
+        OR(
+          EQ(Rule.OPERATION, Operations.UPDATE),
+          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+        ),
+        EQ(Rule.DAO_KEY, getDaoKey()),
+        EQ(Rule.AFTER, false)
+      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+      setUpdateBefore(updatedBefore);
+      GroupBy createdAfter = (GroupBy) ruleDAO.where(AND(
+        OR(
+          EQ(Rule.OPERATION, Operations.CREATE),
+          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+        ),
+        EQ(Rule.DAO_KEY, getDaoKey()),
+        EQ(Rule.AFTER, true)
+      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+      setCreateAfter(createdAfter);
+      GroupBy updatedAfter = (GroupBy) ruleDAO.where(AND(
+        OR(
+          EQ(Rule.OPERATION, Operations.CREATE),
+          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+        ),
+        EQ(Rule.DAO_KEY, getDaoKey()),
+        EQ(Rule.AFTER, true)
+      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+      setUpdateAfter(updatedAfter);
+      GroupBy removedBefore = (GroupBy) ruleDAO.where(AND(
+        EQ(Rule.OPERATION, Operations.REMOVE),
+        EQ(Rule.DAO_KEY, getDaoKey()),
+        EQ(Rule.AFTER, false)
+      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+      setRemoveBefore(removedBefore);
+      GroupBy removedAfter = (GroupBy) ruleDAO.where(AND(
+        EQ(Rule.OPERATION, Operations.REMOVE),
+        EQ(Rule.DAO_KEY, getDaoKey()),
+        EQ(Rule.AFTER, true)
+      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+      setRemoveAfter(removedAfter);
+        `
+    },
+    {
+      name: 'cmd_',
+      javaCode: `
+        if ( PUT_CMD == obj ) {
+          getDelegate().put((FObject) x.get("OBJ"));
+          return true;
+        }
+        return super.cmd(obj);
       `
     }
   ],
@@ -139,23 +204,12 @@
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
-          public RulerDAO(foam.core.X x, foam.dao.DAO delegate, String serviceName) {
-            setX(x);
-            setDelegate(delegate);
-            setDaoKey(serviceName);
-          }
-
-          private GroupBy getBeforeGroup(Operations... args) {
-            return (GroupBy) getBeforeDao().where(
-              IN(Rule.OPERATION, args)
-            ).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-          }
-
-          private GroupBy getAfterGroup(Operations... args) {
-            return (GroupBy) getAfterDao().where(
-              IN(Rule.OPERATION, args)
-            ).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-          }
+         public RulerDAO(foam.core.X x, foam.dao.DAO delegate, String serviceName) {
+           setX(x);
+           setDelegate(delegate);
+           setDaoKey(serviceName);
+           updateRules(x);
+         }
         `);
       }
     }
