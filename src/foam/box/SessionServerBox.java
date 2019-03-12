@@ -89,7 +89,7 @@ public class SessionServerBox
           }
 
           if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
-            msg.replyWithException(new AuthorizationException("You do not have permission to access to that service."));
+            msg.replyWithException(new AuthorizationException("You do not have permission to access that service."));
             return;
           }
         }
