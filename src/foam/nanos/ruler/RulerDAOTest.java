@@ -156,7 +156,6 @@ public class RulerDAOTest extends Test {
     //the rule has lower priority than the first one but has different group so should be executed
     rule5 = new Rule();
     rule5.setId(5);
-    rule5.setPriority(30);
     rule5.setName("userDAO lastName filter");
     rule5.setRuleGroup("users:change lastName");
     rule5.setDaoKey("localUserDAO");

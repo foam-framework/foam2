@@ -136,13 +136,12 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      DAO ruleDAO = (DAO) x.get("ruleDAO");
+      DAO ruleDAO = ((DAO) x.get("ruleDAO")).where(EQ(Rule.DAO_KEY, getDaoKey()));
       GroupBy createdBefore = (GroupBy) ruleDAO.where(AND(
         OR(
           EQ(Rule.OPERATION, Operations.CREATE),
           EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
         ),
-        EQ(Rule.DAO_KEY, getDaoKey()),
         EQ(Rule.AFTER, false)
       )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
       setCreateBefore(createdBefore);
@@ -151,7 +150,6 @@ foam.CLASS({
           EQ(Rule.OPERATION, Operations.UPDATE),
           EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
         ),
-        EQ(Rule.DAO_KEY, getDaoKey()),
         EQ(Rule.AFTER, false)
       )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
       setUpdateBefore(updatedBefore);
@@ -160,7 +158,6 @@ foam.CLASS({
           EQ(Rule.OPERATION, Operations.CREATE),
           EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
         ),
-        EQ(Rule.DAO_KEY, getDaoKey()),
         EQ(Rule.AFTER, true)
       )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
       setCreateAfter(createdAfter);
@@ -169,19 +166,16 @@ foam.CLASS({
           EQ(Rule.OPERATION, Operations.CREATE),
           EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
         ),
-        EQ(Rule.DAO_KEY, getDaoKey()),
         EQ(Rule.AFTER, true)
       )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
       setUpdateAfter(updatedAfter);
       GroupBy removedBefore = (GroupBy) ruleDAO.where(AND(
         EQ(Rule.OPERATION, Operations.REMOVE),
-        EQ(Rule.DAO_KEY, getDaoKey()),
         EQ(Rule.AFTER, false)
       )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
       setRemoveBefore(removedBefore);
       GroupBy removedAfter = (GroupBy) ruleDAO.where(AND(
         EQ(Rule.OPERATION, Operations.REMOVE),
-        EQ(Rule.DAO_KEY, getDaoKey()),
         EQ(Rule.AFTER, true)
       )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
       setRemoveAfter(removedAfter);
