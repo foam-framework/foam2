@@ -44,21 +44,21 @@ foam.CLASS({
       name: 'minuteHand',
       hidden: 'true',
       factory: function() {
-        return this.Hand.create({radius:this.radius-6, width:5, color: this.GREEN});
+        return this.Hand.create({width:5, color: this.GREEN});
       }
     },
     {
       name: 'hourHand',
       hidden: 'true',
       factory: function() {
-        return this.Hand.create({radius:this.radius-15, width:7, color: this.YELLOW});
+        return this.Hand.create({width:7, color: this.YELLOW});
       }
     },
     {
       name: 'secondHand',
       hidden: 'true',
       factory: function() {
-        return this.Hand.create({radius:this.radius-6, width:3, color: this.RED});
+        return this.Hand.create({width:3, color: this.RED});
       }
     }
   ],
@@ -75,9 +75,12 @@ foam.CLASS({
 
       var date = new Date();
 
-      this.secondHand.angle = Math.PI/2 - Math.PI*2 * date.getSeconds() / 60 ;
-      this.minuteHand.angle = Math.PI/2 - Math.PI*2 * date.getMinutes() / 60 ;
-      this.hourHand.angle   = Math.PI/2 - Math.PI*2 * (date.getHours() % 12) / 12 + this.minuteHand.angle / 12;
+      this.secondHand.radius = this.radius-8;
+      this.minuteHand.radius = this.radius-8;
+      this.hourHand.radius   = this.radius-15;
+      this.secondHand.angle  = Math.PI/2 - Math.PI*2 * date.getSeconds() / 60 ;
+      this.minuteHand.angle  = Math.PI/2 - Math.PI*2 * date.getMinutes() / 60 ;
+      this.hourHand.angle    = Math.PI/2 - Math.PI*2 * (date.getHours() % 12) / 12 + this.minuteHand.angle / 12;
 
       if ( ! this.drawTicks ) return;
 
