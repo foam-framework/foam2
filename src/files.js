@@ -558,6 +558,8 @@ FOAM_FILES([
   { name: "org/chartjs/Bar" },
   { name: "org/chartjs/Line" },
   { name: "org/chartjs/Line2" },
+  { name: "org/chartjs/Bar2" },
+  { name: "org/chartjs/Pie2" },
 
   { name: "foam/dashboard/model/VisualizationSize" },
   { name: "foam/dashboard/model/Visualization" },
