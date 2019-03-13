@@ -49,7 +49,7 @@ foam.CLASS({
       javaCode: `
       if ( x.get("auth") != null ) {
         if ( predicate != null && ! predicate.authorize(x) ) {
-          throw new AuthenticationException("You do not have access to the querying property / properties");
+          throw new AuthenticationException("Access denied: property protected");
         }
         foam.dao.Sink sink2 = ( sink != null ) ? new HidePropertiesSink(x, sink, this) : sink;
         super.select_(x, sink2, skip, limit, order, predicate);
