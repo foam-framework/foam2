@@ -122,7 +122,7 @@ foam.CLASS({
       for ( Object key : sink.getGroupKeys() ) {
         List<Rule> group = ((ArraySink) sink.getGroups().get(key)).getArray();
         if ( ! group.isEmpty() ) {
-          new RuleEngine(x, getDelegate()).execute(group, obj, oldObj);
+          new RuleEngine(x, this).execute(group, obj, oldObj);
         }
       }
       `
