@@ -281,6 +281,32 @@ foam.INTERFACE({
       flags: ['js', 'java'],
       javaSupport: false,
       type: 'foam.mlang.predicate.Predicate',
+    },
+    {
+      name:'authorize',
+      flags: [ 'java' ],
+      type: 'Boolean',
+      args:[
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ]
+    },
+    {
+      name:'authorizeArg',
+      flags: [ 'java'],
+      type: 'Boolean',
+      args:[
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'arg',
+          type: 'foam.mlang.Expr'
+        }
+      ]
     }
   ]
 });
@@ -342,6 +368,9 @@ foam.CLASS({
   name: 'AbstractPredicate',
   abstract: true,
   implements: [ 'foam.mlang.predicate.Predicate' ],
+  javaImports: [
+    'foam.nanos.auth.AuthService',
+  ],
 
   documentation: 'Abstract Predicate base-class.',
 
@@ -409,6 +438,27 @@ foam.CLASS({
       ],
       javaCode: '//noop',
       swiftCode: '//noop'
+    },
+    {
+      name: 'authorize',
+      javaCode:`
+  return true;
+  `
+    },
+    {
+      name:'authorizeArg',
+      javaCode:`
+  if ( arg instanceof foam.core.PropertyInfo ) {
+    foam.core.PropertyInfo prop =  (foam.core.PropertyInfo) arg;
+
+    if ( prop.getPermissionRequired() ) {
+      AuthService auth = (AuthService) x.get("auth");
+      return auth.check(x, prop.getClassInfo().getObjClass().getSimpleName() + ".rw." + prop.getName()) || auth.check(x, prop.getClassInfo().getObjClass().getSimpleName() + ".ro." + prop.getName());
+    }
+  }
+
+  return true;
+  `
     }
   ]
 });
@@ -522,6 +572,12 @@ foam.CLASS({
     {
       name: 'prepareStatement',
       javaCode: 'getArg1().prepareStatement(stmt);'
+    },
+    {
+      name: 'authorize',
+      javaCode:`
+  return authorizeArg(x, getArg1());
+  `
     }
   ]
 });
@@ -667,6 +723,12 @@ foam.CLASS({
       name: 'prepareStatement',
       javaCode: `getArg1().prepareStatement(stmt);
 getArg2().prepareStatement(stmt);`
+    },
+    {
+      name: 'authorize',
+      javaCode:`
+  return authorizeArg(x, getArg1()) && authorizeArg(x, getArg2());
+  `
     }
   ]
 });
@@ -716,6 +778,15 @@ foam.CLASS({
       javaCode:`for ( Predicate predicate : getArgs() ) {
   predicate.prepareStatement(stmt);
 }`
+    },
+    {
+      name: 'authorize',
+      javaCode:`
+  for ( Predicate predicate : getArgs() ) {
+    if ( ! predicate.authorize(x) ) return false;
+  }
+  return true;
+  `
     }
   ]
 });
@@ -2046,6 +2117,12 @@ return this;`
       name: 'prepareStatement',
       javaCode: 'getArg1().prepareStatement(stmt);'
     },
+    {
+      name: 'authorize',
+      javaCode:`
+  return getArg1().authorize(x);
+  `
+    }
 
 
     /*

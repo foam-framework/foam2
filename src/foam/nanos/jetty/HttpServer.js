@@ -60,8 +60,20 @@ foam.CLASS({
       javaCode: `
       try {
         System.out.println("Starting Jetty http server.");
+        int port = getPort();
+        String portStr = System.getProperty("http.port");
+        if ( portStr != null && ! portStr.isEmpty() ) {
+          try {
+            port = Integer.parseInt(portStr);
+            setPort(port);
+          } catch ( NumberFormatException e ) {
+            System.err.println(this.getClass().getSimpleName()+" invalid http.port '"+portStr+"'");
+            port = getPort();
+          }
+        }
+
         org.eclipse.jetty.server.Server server =
-          new org.eclipse.jetty.server.Server(getPort());
+          new org.eclipse.jetty.server.Server(port);
 
         /*
           Prevent Jetty server from broadcasting its version number in the HTTP
