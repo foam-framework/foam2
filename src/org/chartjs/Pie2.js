@@ -11,6 +11,7 @@ foam.CLASS({
       name: 'data',
       factory: function() {
         return {
+          labels: [],
           datasets: []
         };
       },

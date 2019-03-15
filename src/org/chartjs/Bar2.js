@@ -3,45 +3,33 @@ foam.CLASS({
   name: 'Bar2',
   extends: 'foam.graphics.CView',
   requires: [
-    'org.chartjs.Lib'
+    'org.chartjs.Lib',
   ],
   properties: [
     'chart',
     {
       name: 'data',
-      setter: function(v) {
-        if ( this.chart ) this.chart.data = v;
-        else this.instance_.data = v;
-        this.update();
+      factory: function() {
+        return {
+          datasets: []
+        };
       },
-      getter: function(v) {
-        return this.chart ? this.chart.data :
-          foam.Undefined.isInstance(this.instance_.data) ? ( this.instance_.data = { datasets: [] } ) :
-          this.instance_.data;
+      postSet: function() {
+        this.update();
       }
     },
     {
-      name: 'options',
-      getter: function() {
-        return this.chart ? this.chart.options :
-          foam.Undefined.isInstance(this.instance_.options) ? ( this.instance_.options = { responsive: false, maintainAspectRation: false } ) :
-          this.instance_.options;
-      },
-      setter: function(v) {
-        if ( this.chart )
-          this.chart.options = v
-        else
-          this.instance_.options = v;
-      }
-    },
+      name: 'config',
+      required: true
+    }
+  ],
+  reactions: [
+    ['', 'propertyChange.data', 'update' ],
   ],
   methods: [
     function initCView(x) {
-      this.chart = new this.Lib.CHART(x, {
-        type: 'bar',
-        data: this.data,
-        options: this.options
-      });
+      this.chart = new this.Lib.CHART(x, this.config);
+      this.update();
     },
     function paintSelf(x) {
       this.chart.render();
@@ -52,7 +40,10 @@ foam.CLASS({
       name: 'update',
       isFramed: true,
       code: function() {
-        this.chart && this.chart.update();
+        if ( ! this.chart ) return;
+
+        this.chart.data = this.data;
+        this.chart.update();
       }
     }
   ]
