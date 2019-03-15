@@ -71,7 +71,7 @@ public class UserAndGroupAuthService
     }
 
     // check if group enabled
-    Group group = (Group) x.get("group");
+    Group group = getCurrentGroup(x);
     if ( group != null && ! group.getEnabled() ) {
       throw new AuthenticationException("Group disabled");
     }
@@ -88,7 +88,43 @@ public class UserAndGroupAuthService
    * Gets the effective group from a context.
    */
   public Group getCurrentGroup(X x) {
-    return (Group) x.get("group");
+
+    // Highest precedence: Just return the group from the context if it's already
+    // been set.
+    Group group = (Group) x.get("group");
+
+    if ( group != null ) return group;
+
+    User user = (User) x.get("user");
+    User agent = (User) x.get("agent");
+
+    // Second highest precedence: If one user is acting as another, return the
+    // group on the junction between them.
+    if ( user != null ) {
+      if ( agent != null ) {
+        DAO agentJunctionDAO = (DAO) x.get("agentJunctionDAO");
+        UserUserJunction junction = (UserUserJunction) agentJunctionDAO.inX(x).find(
+          AND(
+            EQ(UserUserJunction.SOURCE_ID, agent.getId()),
+            EQ(UserUserJunction.TARGET_ID, user.getId())
+          )
+        );
+
+        if ( junction == null ) {
+          throw new RuntimeException("There was a user and an agent in the context, but a junction between then was not found.");
+        }
+
+        return (Group) groupDAO_.inX(x).find(junction.getGroup());
+      }
+
+      // Third highest precedence: If a user is logged in but not acting as
+      // another user, return their group.
+      return user.findGroup(x);
+    }
+
+    // If none of the cases above match, return null.
+    // TODO: Should this throw an error instead?
+    return null;
   }
 
   /**
@@ -208,7 +244,6 @@ public class UserAndGroupAuthService
 
   /**
    * Check if the user in the context supplied has the right permission
-   * Return Boolean for this
    */
   public boolean checkPermission(foam.core.X x, Permission permission) {
     if ( x == null || permission == null ) return false;
@@ -222,7 +257,7 @@ public class UserAndGroupAuthService
     if ( user == null || ! user.getEnabled() ) return false;
 
     try {
-      Group group = (Group) x.get("group");
+      Group group = getCurrentGroup(x);
 
       while ( group != null ) {
 
