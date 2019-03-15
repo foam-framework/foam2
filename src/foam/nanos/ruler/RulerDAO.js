@@ -127,7 +127,7 @@ foam.CLASS({
       class: 'Map',
       name: 'hm',
       javaFactory: `
-      return new java.util.HashMap<Predicate, DAO>();
+      return new java.util.HashMap<Predicate, GroupBy>();
       `
     }
   ],
@@ -139,15 +139,15 @@ foam.CLASS({
       FObject oldObj = getDelegate().find_(x, obj);
       Map hm = getHm();
       if ( oldObj == null ) {
-        applyRules(x, obj, oldObj, (DAO) hm.get(getCreateBefore()));
+        applyRules(x, obj, oldObj, (GroupBy) hm.get(getCreateBefore()));
       } else {
-        applyRules(x, obj, oldObj, (DAO) hm.get(getUpdateBefore()));
+        applyRules(x, obj, oldObj, (GroupBy) hm.get(getUpdateBefore()));
       }
       FObject ret =  getDelegate().put_(x, obj);
       if ( oldObj == null ) {
-        applyRules(x, ret, oldObj, (DAO) hm.get(getCreateAfter()));
+        applyRules(x, ret, oldObj, (GroupBy) hm.get(getCreateAfter()));
       } else {
-        applyRules(x, ret, oldObj, (DAO) hm.get(getUpdateAfter()));
+        applyRules(x, ret, oldObj, (GroupBy) hm.get(getUpdateAfter()));
       }
       return ret;
       `
@@ -156,9 +156,9 @@ foam.CLASS({
       name: 'remove_',
       javaCode: `
       FObject oldObj = getDelegate().find_(x, obj);
-      applyRules(x, obj, oldObj, (DAO) getHm().get(getRemoveBefore()));
+      applyRules(x, obj, oldObj, (GroupBy) getHm().get(getRemoveBefore()));
       FObject ret =  getDelegate().remove_(x, obj);
-      applyRules(x, ret, oldObj, (DAO) getHm().get(getRemoveBefore()));
+      applyRules(x, ret, oldObj, (GroupBy) getHm().get(getRemoveAfter()));
       return ret;
       `
     },
@@ -178,14 +178,14 @@ foam.CLASS({
           type: 'foam.core.FObject'
         },
         {
-          name: 'dao',
-          type: 'foam.dao.DAO'
+          name: 'sink',
+          type: 'foam.mlang.sink.GroupBy'
         }
       ],
       javaCode: `
-      GroupBy groups = (GroupBy) dao.select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-      for ( Object key : groups.getGroupKeys() ) {
-        List<Rule> group = ((ArraySink) groups.getGroups().get(key)).getArray();
+      //GroupBy groups = (GroupBy) dao.select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+      for ( Object key : sink.getGroupKeys() ) {
+        List<Rule> group = ((ArraySink) sink.getGroups().get(key)).getArray();
         if ( ! group.isEmpty() ) {
           new RuleEngine(x, this).execute(group, obj, oldObj);
         }
@@ -202,33 +202,20 @@ foam.CLASS({
       ],
       javaCode: `DAO ruleDAO = ((DAO) x.get("ruleDAO")).where(EQ(Rule.DAO_KEY, getDaoKey()))
       .orderBy(new Desc(Rule.PRIORITY));
-
 Map hm = getHm();
-
-DAO createdBefore = ruleDAO.where(getCreateBefore());
+GroupBy createdBefore = (GroupBy) ruleDAO.where(getCreateBefore()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
 hm.put(getCreateBefore(), createdBefore);
-
-
-DAO updatedBefore = ruleDAO.where(getUpdateBefore());
+GroupBy updatedBefore = (GroupBy) ruleDAO.where(getUpdateBefore()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
 hm.put(getUpdateBefore(), updatedBefore);
-
-
-DAO createdAfter = ruleDAO.where(getCreateAfter());
+GroupBy createdAfter = (GroupBy) ruleDAO.where(getCreateAfter()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
 hm.put(getCreateAfter(), createdAfter);
-
-
-DAO updatedAfter = ruleDAO.where(getUpdateAfter());
+GroupBy updatedAfter = (GroupBy) ruleDAO.where(getUpdateAfter()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
 hm.put(getUpdateAfter(), updatedAfter);
-
-
-DAO removedBefore = ruleDAO.where(getRemoveBefore());
+GroupBy removedBefore = (GroupBy) ruleDAO.where(getRemoveBefore()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
 hm.put(getRemoveBefore(), removedBefore);
-
-
-DAO removedAfter = ruleDAO.where(getRemoveAfter());
+GroupBy removedAfter = (GroupBy) ruleDAO.where(getRemoveAfter()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
 hm.put(getRemoveAfter(), removedAfter);
 setHm(hm);
-
 // ruleDAO.listen(new AbstractSink() {
 //   @Override
 //   public void put(Object obj, Detachable sub) {
@@ -239,7 +226,6 @@ setHm(hm);
 //          //setHm(hm);
 //       }
 //     }
-
 //   }
 // }, null);
         `
