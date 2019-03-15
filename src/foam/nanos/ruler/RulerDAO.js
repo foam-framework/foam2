@@ -24,7 +24,11 @@ foam.CLASS({
     'foam.mlang.sink.GroupBy',
     'java.util.List',
     'static foam.mlang.MLang.*',
-    'foam.dao.Sink'
+    'foam.dao.Sink',
+    'foam.dao.AbstractSink',
+    'foam.core.Detachable',
+    'java.util.HashMap',
+    'java.util.Map'
   ],
 
   constants: {
@@ -37,35 +41,94 @@ foam.CLASS({
       name: 'daoKey',
       documentation: 'The dao name that rule needs to be applied on.'
     },
+    // {
+    //   class: 'FObjectProperty',
+    //   of: 'foam.mlang.sink.GroupBy',
+    //   name: 'createBefore'
+    // },
     {
       class: 'FObjectProperty',
-      of: 'foam.mlang.sink.GroupBy',
-      name: 'createBefore'
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'createBefore',
+      javaFactory: `
+      return AND(
+        OR(
+          EQ(Rule.OPERATION, Operations.CREATE),
+          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+        ),
+        EQ(Rule.AFTER, false)
+      );`
+    },
+    // {
+    //   class: 'FObjectProperty',
+    //   of: 'foam.mlang.predicate.Predicate',
+    //   name: 'createAfter'
+    // },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'createAfter',
+      javaFactory: `
+      return AND(
+        OR(
+          EQ(Rule.OPERATION, Operations.CREATE),
+          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+        ),
+        EQ(Rule.AFTER, true)
+      );`
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.mlang.sink.GroupBy',
-      name: 'createAfter'
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'updateBefore',
+      javaFactory: `
+      return AND(
+        OR(
+          EQ(Rule.OPERATION, Operations.UPDATE),
+          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+        ),
+        EQ(Rule.AFTER, false)
+      );`
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.mlang.sink.GroupBy',
-      name: 'updateBefore'
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'updateAfter',
+      javaFactory: `
+      return AND(
+        OR(
+          EQ(Rule.OPERATION, Operations.UPDATE),
+          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+        ),
+        EQ(Rule.AFTER, true)
+      );`
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.mlang.sink.GroupBy',
-      name: 'updateAfter'
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'removeBefore',
+      javaFactory: `
+      return AND(
+        EQ(Rule.OPERATION, Operations.REMOVE),
+        EQ(Rule.AFTER, false)
+      );`
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.mlang.sink.GroupBy',
-      name: 'removeBefore'
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'removeAfter',
+      javaFactory: `
+      return AND(
+        EQ(Rule.OPERATION, Operations.REMOVE),
+        EQ(Rule.AFTER, true)
+      );`
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.mlang.sink.GroupBy',
-      name: 'removeAfter'
+      class: 'Map',
+      name: 'hm',
+      javaFactory: `
+      return new java.util.HashMap<Predicate, DAO>();
+      `
     }
   ],
 
@@ -74,16 +137,17 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       FObject oldObj = getDelegate().find_(x, obj);
+      Map hm = getHm();
       if ( oldObj == null ) {
-        applyRules(x, obj, oldObj, getCreateBefore());
+        applyRules(x, obj, oldObj, (DAO) hm.get(getCreateBefore()));
       } else {
-        applyRules(x, obj, oldObj, getUpdateBefore());
+        applyRules(x, obj, oldObj, (DAO) hm.get(getUpdateBefore()));
       }
       FObject ret =  getDelegate().put_(x, obj);
       if ( oldObj == null ) {
-        applyRules(x, obj, oldObj, getCreateAfter());
+        applyRules(x, ret, oldObj, (DAO) hm.get(getCreateAfter()));
       } else {
-        applyRules(x, obj, oldObj, getUpdateAfter());
+        applyRules(x, ret, oldObj, (DAO) hm.get(getUpdateAfter()));
       }
       return ret;
       `
@@ -92,9 +156,9 @@ foam.CLASS({
       name: 'remove_',
       javaCode: `
       FObject oldObj = getDelegate().find_(x, obj);
-      applyRules(x, obj, oldObj, getRemoveBefore());
+      applyRules(x, obj, oldObj, (DAO) getHm().get(getRemoveBefore()));
       FObject ret =  getDelegate().remove_(x, obj);
-      applyRules(x, ret, oldObj, getRemoveAfter());
+      applyRules(x, ret, oldObj, (DAO) getHm().get(getRemoveBefore()));
       return ret;
       `
     },
@@ -114,13 +178,14 @@ foam.CLASS({
           type: 'foam.core.FObject'
         },
         {
-          name: 'sink',
-          type: 'foam.mlang.sink.GroupBy'
+          name: 'dao',
+          type: 'foam.dao.DAO'
         }
       ],
       javaCode: `
-      for ( Object key : sink.getGroupKeys() ) {
-        List<Rule> group = ((ArraySink) sink.getGroups().get(key)).getArray();
+      GroupBy groups = (GroupBy) dao.select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
+      for ( Object key : groups.getGroupKeys() ) {
+        List<Rule> group = ((ArraySink) groups.getGroups().get(key)).getArray();
         if ( ! group.isEmpty() ) {
           new RuleEngine(x, this).execute(group, obj, oldObj);
         }
@@ -135,50 +200,48 @@ foam.CLASS({
           type: 'Context'
         }
       ],
-      javaCode: `
-      DAO ruleDAO = ((DAO) x.get("ruleDAO")).where(EQ(Rule.DAO_KEY, getDaoKey()));
-      GroupBy createdBefore = (GroupBy) ruleDAO.where(AND(
-        OR(
-          EQ(Rule.OPERATION, Operations.CREATE),
-          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
-        ),
-        EQ(Rule.AFTER, false)
-      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-      setCreateBefore(createdBefore);
-      GroupBy updatedBefore = (GroupBy) ruleDAO.where(AND(
-        OR(
-          EQ(Rule.OPERATION, Operations.UPDATE),
-          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
-        ),
-        EQ(Rule.AFTER, false)
-      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-      setUpdateBefore(updatedBefore);
-      GroupBy createdAfter = (GroupBy) ruleDAO.where(AND(
-        OR(
-          EQ(Rule.OPERATION, Operations.CREATE),
-          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
-        ),
-        EQ(Rule.AFTER, true)
-      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-      setCreateAfter(createdAfter);
-      GroupBy updatedAfter = (GroupBy) ruleDAO.where(AND(
-        OR(
-          EQ(Rule.OPERATION, Operations.CREATE),
-          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
-        ),
-        EQ(Rule.AFTER, true)
-      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-      setUpdateAfter(updatedAfter);
-      GroupBy removedBefore = (GroupBy) ruleDAO.where(AND(
-        EQ(Rule.OPERATION, Operations.REMOVE),
-        EQ(Rule.AFTER, false)
-      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-      setRemoveBefore(removedBefore);
-      GroupBy removedAfter = (GroupBy) ruleDAO.where(AND(
-        EQ(Rule.OPERATION, Operations.REMOVE),
-        EQ(Rule.AFTER, true)
-      )).orderBy(new Desc(Rule.PRIORITY)).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-      setRemoveAfter(removedAfter);
+      javaCode: `DAO ruleDAO = ((DAO) x.get("ruleDAO")).where(EQ(Rule.DAO_KEY, getDaoKey()))
+      .orderBy(new Desc(Rule.PRIORITY));
+
+Map hm = getHm();
+
+DAO createdBefore = ruleDAO.where(getCreateBefore());
+hm.put(getCreateBefore(), createdBefore);
+
+
+DAO updatedBefore = ruleDAO.where(getUpdateBefore());
+hm.put(getUpdateBefore(), updatedBefore);
+
+
+DAO createdAfter = ruleDAO.where(getCreateAfter());
+hm.put(getCreateAfter(), createdAfter);
+
+
+DAO updatedAfter = ruleDAO.where(getUpdateAfter());
+hm.put(getUpdateAfter(), updatedAfter);
+
+
+DAO removedBefore = ruleDAO.where(getRemoveBefore());
+hm.put(getRemoveBefore(), removedBefore);
+
+
+DAO removedAfter = ruleDAO.where(getRemoveAfter());
+hm.put(getRemoveAfter(), removedAfter);
+setHm(hm);
+
+// ruleDAO.listen(new AbstractSink() {
+//   @Override
+//   public void put(Object obj, Detachable sub) {
+//     Map hm = getHm();
+//     for ( Object key : hm.keySet() ) {
+//       if ( ((Predicate) key).f(obj) ) {
+//          //((DAO)hm.get(key)).put((FObject)obj);
+//          //setHm(hm);
+//       }
+//     }
+
+//   }
+// }, null);
         `
     },
     {

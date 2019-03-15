@@ -24,9 +24,9 @@ public class RulerDAOTest extends Test {
     x = TestUtils.mockDAO(x, "ruleHistoryDAO");
 
     ruleDAO = (DAO) x.get("ruleDAO");
-    createRule(x);
     userDAO = new RulerDAO(x, (DAO) x.get("localUserDAO"), "localUserDAO");
     ruleHistoryDAO = (DAO) x.get("ruleHistoryDAO");
+    createRule(x);
     testUsers(x);
     testRuleHistory(x);
     removeData(x);
