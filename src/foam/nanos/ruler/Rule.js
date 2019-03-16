@@ -236,6 +236,18 @@
       name: 'canExecute',
       type: 'Boolean',
       javaCode: `return true;`
+    },
+    {
+      name: 'updateRule',
+      type: 'foam.nanos.ruler.Rule',
+      args: [
+        {
+          name: 'rule',
+          type: 'foam.nanos.ruler.Rule'
+        }
+      ],
+      javaCode: `
+      return rule;`
     }
   ]
 });
