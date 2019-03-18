@@ -33,7 +33,7 @@ foam.CLASS({
       code: function send(m) {
         this.fn(m.object);
       },
-      swiftCode: 'fn(msg.object)',
+      swiftCode: 'fn(msg?.object)'
     },
   ]
 });

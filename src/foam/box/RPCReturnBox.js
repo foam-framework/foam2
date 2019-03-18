@@ -85,6 +85,7 @@ setMessage(msg);
 getSemaphore().release();
 `,
       swiftCode: `
+let msg = msg!
 if let o = msg.object as? foam_box_RPCReturnMessage {
   promise.set(o.data)
   return

@@ -134,6 +134,7 @@ return uuid;`
         this.delegate.send(msg);
       },
       swiftCode: `
+let msg = msg!
 msg.attributes[foam_box_SessionClientBox.SESSION_KEY] = sessionID
 msg.attributes["replyBox"] = SessionReplyBox_create([
   "msg": msg,
