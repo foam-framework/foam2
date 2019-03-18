@@ -16,10 +16,10 @@ foam.CLASS({
       name: 'parse',
       swiftCode: function() {/*
 let escape_: Character = "\\"
-let delim_ = ps.head()
+let delim_ = ps!.head()
 if delim_ != "\"" && delim_ != "'" { return nil }
 
-var ps = ps.tail();
+var ps = ps!.tail()!;
 var lastc = delim_;
 
 var sb = ""
@@ -30,9 +30,9 @@ while ps.valid() {
   }
   if c != escape_ { sb.append(c) }
   lastc = c
-  ps = ps.tail()
+  ps = ps.tail()!
 }
-return ps.tail().setValue(sb)
+return ps.tail()!.setValue(sb)
       */},
     },
   ]

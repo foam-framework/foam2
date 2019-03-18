@@ -12,7 +12,7 @@ foam.CLASS({
     {
       name: 'parse',
       swiftCode: function() {/*
-let start = ps
+let start = ps!
 let ps = super.parse(ps, x)
 if ps != nil {
   return ps!.setValue(start.substring(ps!))
