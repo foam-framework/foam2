@@ -256,6 +256,7 @@ FOAM_FILES([
   { name: "foam/dao/NoDisjunctionDAO" },
   { name: "foam/dao/NoNeqDAO" },
   { name: "foam/dao/FixedSizeDAO" },
+  { name: "foam/glang/glang" },
   { name: "foam/parse/QueryParser" },
   { name: "foam/parse/QueryParserUserTest" },
   { name: "foam/physics/Physical" },
@@ -557,6 +558,8 @@ FOAM_FILES([
   { name: "org/chartjs/Bar" },
   { name: "org/chartjs/Line" },
   { name: "org/chartjs/Line2" },
+  { name: "org/chartjs/Bar2" },
+  { name: "org/chartjs/Pie2" },
 
   { name: "foam/dashboard/model/VisualizationSize" },
   { name: "foam/dashboard/model/Visualization" },
