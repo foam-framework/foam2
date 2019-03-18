@@ -29,7 +29,7 @@ return newValue + "EXTENDED"
         },
       ],
       swiftCode: function() {/*
-return String(format: type(of: self).greeting, name, "OVERRIDE!!!")
+return String(format: type(of: self).greeting, name!, "OVERRIDE!!!")
       */},
     }
   ]

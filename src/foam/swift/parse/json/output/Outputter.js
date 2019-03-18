@@ -63,23 +63,24 @@ return x.create(foam_swift_parse_json_output_Outputter.self, args: [
         },
       ],
       swiftCode: `
+let out = out!
 if let data = data as? JSONOutputter {
   data.toJSON(outputter: self, out: out)
 } else if let data = data as? ClassInfo {
-  _ = out.obj()
-    .key("class")
-    .s("__Class__")
-    .key("forClass_")
-    .s(data.id)
+  _ = out.obj()!
+    .key("class")!
+    .s("__Class__")!
+    .key("forClass_")!
+    .s(data.id)!
     .end()
 } else if let data = data as? PropertyInfo {
-  _ = out.obj()
-    .key("class")
-    .s("__Property__")
-    .key("forClass_")
-    .s(data.classInfo.id)
-    .key("name")
-    .s(data.name)
+  _ = out.obj()!
+    .key("class")!
+    .s("__Property__")!
+    .key("forClass_")!
+    .s(data.classInfo.id)!
+    .key("name")!
+    .s(data.name)!
     .end()
 } else if let data = data as? String {
   _ = out.s(data)
@@ -125,10 +126,12 @@ if let data = data as? JSONOutputter {
         },
       ],
       swiftCode: `
+let data = data!
+let out = out!
 let info = data.ownClassInfo()
 _ = out.obj()
 
-_ = out.key("class").s(info.id)
+_ = out.key("class")!.s(info.id)
 
 for p in info.axioms(byType: PropertyInfo.self) {
   if !data.hasOwnProperty(p.name) { continue }

@@ -75,6 +75,7 @@ return super.output(&out, data)
     {
       name: 'send',
       swiftCode: `
+let msg = msg!
 let replyBox = msg.attributes["replyBox"] as? Box
 if replyBox != nil {
   let export = registry.register(nil, nil, replyBox!) as! SubBox
