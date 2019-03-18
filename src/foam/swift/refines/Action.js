@@ -91,7 +91,7 @@ class ActionInfo_: ActionInfo {
   let args: [MethodArg] = []
   let label = "<%=this.label%>" // TODO localize
   let name = "<%=this.swiftName%>"
-  public func getSlot(_ obj: foam_core_FObject) -> foam_swift_core_Slot {
+  public func getSlot(_ obj: foam_core_FObject?) -> foam_swift_core_Slot? {
     let obj = obj as! <%=parentCls.model_.swiftName%>
     return obj.<%=this.swiftSlotName%>
   }

@@ -21,7 +21,8 @@ foam.CLASS({
     {
       name: 'parse',
       swiftCode: function() {/*
-return ps.valid() && ps.head() != ch ? ps.tail().setValue(ps.head()) : nil
+let ps = ps!
+return ps.valid() && ps.head() != ch ? ps.tail()!.setValue(ps.head()) : nil
       */},
     },
   ]

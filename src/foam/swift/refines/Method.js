@@ -93,14 +93,10 @@ foam.CLASS({
       name: 'swiftSupport',
     },
     {
-      class: 'Boolean',
-      name: 'returnsNullable',
-    },
-    {
       class: 'String',
       name: 'swiftType',
-      expression: function(type, returnsNullable) {
-        return foam.swift.toSwiftType(type, returnsNullable)
+      expression: function(type) {
+        return foam.swift.toSwiftType(type, true);
       },
     },
     {
@@ -271,7 +267,7 @@ class MInfo: MethodInfo {
   let args: [MethodArg] = [] //TODO
   let classInfo: ClassInfo
   init(_ ci: ClassInfo) { classInfo = ci }
-  public func getSlot(_ obj: <%=foam.core.FObject.model_.swiftName%>) -> <%=foam.swift.core.Slot.model_.swiftName%> {
+  public func getSlot(_ obj: <%=foam.core.FObject.model_.swiftName%>?) -> <%=foam.swift.core.Slot.model_.swiftName%>? {
     let obj = obj as! <%=parentCls.model_.swiftName%>
     return obj.<%=this.swiftSlotName%>
   }

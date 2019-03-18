@@ -45,7 +45,7 @@ foam.CLASS({
     {
       name: 'out',
       code: function(s) { this.str += s },
-      swiftCode: `str += s`,
+      swiftCode: `str += s!`,
     },
     {
       name: 'comma',

@@ -37,11 +37,6 @@ foam.CLASS({
       }
     },
     {
-      class: 'Boolean',
-      name: 'optional',
-      value: false
-    },
-    {
       class: 'String',
       name: 'documentation',
       value: ''
