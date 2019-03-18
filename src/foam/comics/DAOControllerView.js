@@ -62,7 +62,8 @@ foam.CLASS({
     }
 
     ^container {
-      display: flex;
+      display: grid;
+      grid-template-columns: fit-content(100%) auto;
     }
 
     ^container > * + * {
@@ -172,7 +173,6 @@ foam.CLASS({
               .end();
             })
             .start()
-              .style({ 'overflow-x': 'auto' })
               .start()
                 .addClass(this.myClass('separate'))
                 .callIf(this.data.searchMode === this.SearchMode.SIMPLE, function() {
