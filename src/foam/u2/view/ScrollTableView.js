@@ -122,14 +122,6 @@
       `
     },
     {
-      type: 'Int',
-      name: 'accumulator',
-      value: 0,
-      adapt: function(_, v) {
-        return v % this.rowHeight;
-      }
-    },
-    {
       type: 'String',
       name: 'scrollHeight',
       expression: function(daoCount, limit, rowHeight) {
