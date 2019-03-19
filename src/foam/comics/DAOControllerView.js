@@ -39,6 +39,7 @@ foam.CLASS({
       width: fit-content;
       max-width: 100vw;
       margin: auto;
+      max-width: calc(100vw - 80px);
     }
 
     ^top-row {
@@ -64,6 +65,7 @@ foam.CLASS({
     ^container {
       display: grid;
       grid-template-columns: fit-content(100%) auto;
+      overflow-x: scroll;
     }
 
     ^container > * + * {
