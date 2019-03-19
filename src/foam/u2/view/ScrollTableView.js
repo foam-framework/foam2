@@ -166,12 +166,14 @@
         end();
 
       if ( this.fitInScreen ) {
-        this.onload.sub(this.updateTableHeight);
+        this.onDetach(this.onload.sub(this.updateTableHeight));
         window.addEventListener('resize', this.updateTableHeight);
         this.onDetach(() => {
           window.removeEventListener('resize', this.updateTableHeight);
         });
       }
+
+      this.onDetach(this.onload.sub(this.updateScrollbarContainerHeight));
     }
   ],
 
@@ -213,6 +215,12 @@
         // overflowing.
         this.limit = Math.max(1, Math.floor((remainingSpace - this.TABLE_HEAD_HEIGHT) / this.rowHeight));
 
+        this.updateScrollbarContainerHeight();
+      }
+    },
+    {
+      name: 'updateScrollbarContainerHeight',
+      code: function() {
         this.scrollbarContainer_.el().style.height = (this.limit * this.rowHeight) + this.TABLE_HEAD_HEIGHT + 'px';
       }
     }
