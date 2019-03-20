@@ -6,23 +6,13 @@ foam.CLASS({
     'foam.u2.DetailView'
   ],
   exports: [ 'updateData' ],
-  properties: [
-    {
-      class: 'FObjectProperty',
-      name: 'newRow',
-      factory: function() {
-        return this.KeyValueRow.create();
-      }
-    }
-  ],
   actions: [
     {
       name: 'addRow',
       label: 'add',
       code: function() {
-        this.data[this.newRow.key] = this.newRow.value;
+        this.data[Date.now()] = '';
         this.updateData();
-        this.clearProperty('newRow');
       }
     }
   ],
@@ -50,7 +40,6 @@ foam.CLASS({
       actions: [
         {
           name: 'remove',
-          label: 'X',
           code: function() {
             delete this.data[this.key];
             this.updateData();
@@ -59,7 +48,6 @@ foam.CLASS({
       ]
     }
   ],
-
   listeners: [
     {
       name: 'updateData',
@@ -71,20 +59,17 @@ foam.CLASS({
       }
     }
   ],
-
   methods: [
     function initE() {
       var self = this;
       this
         .add(this.slot(function(data) {
-          if ( ! data ) return '';
           return self.E().forEach(Object.entries(data), function(e) {
             var row = self.KeyValueRow.create({ key: e[0], value: e[1] });
             this.start(self.DetailView, { data: row, showActions: true }).end();
             row.onDetach(row.sub(self.updateData));
           });
         }))
-        .start(self.DetailView, { data$: self.newRow$ }).end()
         .startContext({ data: this }).add(this.ADD_ROW).endContext();
     }
   ]
