@@ -31,22 +31,6 @@ foam.CLASS({
         be able to update a TestObj. If the only property was 'id', you wouldn't
         be able to update a TestObj.
       `
-    },
-    {
-      class: 'Map',
-      name: 'map',
-      factory: function() {
-        return {
-          hello: 'world'
-        };
-      },
-      view: {
-        class: 'foam.u2.MultiView',
-        views: [
-          { class: 'foam.u2.view.JSONTextView' },
-          { class: 'foam.u2.view.JSONView' },
-        ]
-      }
     }
   ]
 });
