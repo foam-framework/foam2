@@ -78,7 +78,8 @@ foam.CLASS({
     },
     {
       name: 'freeze',
-      javaCode: ' //nop '
+      type: 'foam.core.FObject',
+      javaCode: ' return this; '
     },
     {
       name: 'touch',
