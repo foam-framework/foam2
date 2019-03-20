@@ -185,9 +185,8 @@
         var negative = deltaY < 0;
         var rows = Math.floor(Math.abs(this.accumulator + deltaY) / this.rowHeight);
         this.accumulator += deltaY;
-        var oldSkip = this.skip;
-        this.skip = Math.max(0, this.skip + (negative ? -rows : rows));
-        if ( this.skip > this.daoCount - this.limit ) this.skip = oldSkip;
+        var newSkip = Math.max(0, this.skip + (negative ? -rows : rows));
+        if ( this.skip <= this.daoCount - this.limit ) this.skip = newSkip;
         this.lastScrollTop_ = e.target.scrollTop;
       }
     },
