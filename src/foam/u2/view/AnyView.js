@@ -13,10 +13,10 @@ foam.CLASS({
       name: 'types',
       factory: function() {
         return [
-         [[foam.String, this.TextField], 'String'],
-         [[foam.Boolean, this.CheckBox], 'Boolean'],
-         [[foam.Data, this.DateTimeView], 'Date']
-        ]
+          [[foam.String, this.TextField], 'String'],
+          [[foam.Boolean, this.CheckBox], 'Boolean'],
+          [[foam.Data, this.DateTimeView], 'Date']
+        ];
       }
     },
     {
@@ -33,14 +33,14 @@ foam.CLASS({
     function initE() {
       var self = this;
       this
+        .add(this.slot(function(selected) {
+          return self.E().start(selected[1], { data$: self.data$ }).end();
+        }))
         .start(this.ChoiceView, {
           choices$: this.types$,
           data$: this.selected$
         })
-        .end()
-        .add(this.slot(function(selected) {
-          return self.E().start(selected[1], { data$: self.data$ }).end();
-        }))
+        .end();
     }
   ]
 });
