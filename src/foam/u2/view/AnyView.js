@@ -1,12 +1,18 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'AnyView',
   extends: 'foam.u2.View',
   requires: [
-    'foam.u2.view.ChoiceView',
     'foam.u2.CheckBox',
+    'foam.u2.DateTimeView',
     'foam.u2.TextField',
-    'foam.u2.DateTimeView'
+    'foam.u2.view.ChoiceView'
   ],
   constants: [
     {
@@ -63,15 +69,23 @@ foam.CLASS({
       name: 'Choice',
       properties: [
         {
+          class: 'String',
           name: 'label'
         },
         {
           name: 'type'
         },
         {
+          class: 'foam.u2.ViewSpec',
           name: 'view'
         },
         {
+          class: 'Function',
+          documentation: `
+            A function that takes an argument and makes a best effort in
+            converting that into the current type. See DEFAULT_TYPES for
+            examples.
+          `,
           name: 'toType'
         }
       ]
