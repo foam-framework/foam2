@@ -158,6 +158,7 @@ foam.CLASS({
       },
       swiftCode: `
         // TODO handle more stuff
+        let s = s!
         return "\\"" + s.replacingOccurrences(of: "\\"", with: "\\\\\\"") + "\\""
       `,
     },
