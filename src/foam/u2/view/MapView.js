@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.u2.view',
-  name: 'JSONView',
+  name: 'MapView',
   extends: 'foam.u2.View',
   requires: [
     'foam.u2.DetailView'
