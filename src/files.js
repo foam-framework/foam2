@@ -575,6 +575,6 @@ FOAM_FILES([
   { name: "foam/build/EmbeddedModelDAO" },
 
   { name: "foam/u2/view/JSONTextView" },
-  { name: "foam/u2/view/JSONView" },
+  { name: "foam/u2/view/MapView" },
   { name: "foam/u2/view/AnyView" },
 ]);

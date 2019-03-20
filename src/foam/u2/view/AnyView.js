@@ -46,7 +46,7 @@ foam.CLASS({
           foam.u2.view.AnyView.Choice.create({
             label: 'Map',
             type: foam.Object,
-            view: foam.u2.view.JSONView,
+            view: foam.u2.view.MapView,
             toType: function(o) {
               return foam.Object.isInstance(o) ? o : {};
             }
