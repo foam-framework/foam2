@@ -42,7 +42,7 @@ foam.CLASS({
             type: foam.Object,
             view: foam.u2.view.JSONView,
             toType: function(o) {
-              return foam.Object.isInstance(o) ? o : { data: o };
+              return foam.Object.isInstance(o) ? o : {};
             }
           }),
           foam.u2.view.AnyView.Choice.create({

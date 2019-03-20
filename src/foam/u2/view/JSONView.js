@@ -9,7 +9,7 @@ foam.CLASS({
   actions: [
     {
       name: 'addRow',
-      label: 'add',
+      label: 'Add',
       code: function() {
         this.data[Date.now()] = '';
         this.updateData();
