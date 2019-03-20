@@ -24,8 +24,18 @@ foam.CLASS({
     'foam.box.Box',
     'foam.box.HTTPBox',
     'foam.box.ProxyBox',
-    //    'foam.box.RetryBox',
-    'foam.nanos.logger.Logger'
+    'foam.core.FObject',
+    'foam.lib.Outputter',
+    'foam.lib.json.OutputterMode',
+    'foam.nanos.logger.Logger',
+    'java.io.BufferedWriter',
+    'java.io.OutputStream',
+    'java.io.OutputStreamWriter',
+    'java.nio.charset.StandardCharsets',
+    'java.net.HttpURLConnection',
+    'java.net.URL',
+    'javax.servlet.http.HttpServletResponse',
+    'org.apache.commons.io.IOUtils'
   ],
 
   properties: [
@@ -44,6 +54,12 @@ foam.CLASS({
       name: 'config',
       class: 'FObjectProperty',
       type: 'foam.nanos.mrac.ClusterConfig'
+    },
+    {
+      name: 'url',
+      class: 'String',
+      transient: true,
+      visibility: 'HIDDEN'
     }
   ],
 
@@ -54,10 +70,7 @@ foam.CLASS({
         try {
         ClusterConfig config = getConfig();
         java.net.URI uri = new java.net.URI("http", null, config.getId(), config.getPort(), "/"+getPath()+"/"+getServiceName(), null, null);
-        HTTPBox box = new HTTPBox.Builder(getX())
-          .setUrl(uri.toURL().toString())
-          .build();
-        setDelegate(box);
+        setUrl(uri.toURL().toString());
        } catch (java.net.MalformedURLException | java.net.URISyntaxException e) {
          ((Logger) getX().get("logger")).error(e);
        }
@@ -66,24 +79,24 @@ foam.CLASS({
     {
       name: 'put_',
       code: function(x, obj) {
-        return request_(x, "put", obj);
+        return send_(x, "put", obj);
       },
       javaCode: `
-        return request_(x, "put", obj);
+        return send_(x, "put", obj);
       `
     },
     {
       name: 'remove_',
       code: function(x, obj) {
-        return request_(x, "remove", obj);
+        return send_(x, "remove", obj);
       },
       javaCode: `
-        return request_(x, "remove", obj);
+        return send_(x, "remove", obj);
       `
     },
     /* TODO: select, find, ... */
     {
-      name: 'request_',
+      name: 'send_',
       args: [
         {
           name: 'x',
@@ -107,11 +120,56 @@ foam.CLASS({
         return getDelegate().cmd_(x, request);
       },
       javaCode: `
-        ClusterRequest request = new ClusterRequest.Builder(getX())
-          .setCmd(cmd)
-          .setObj(obj)
-          .build();
-        return (foam.core.FObject) getDelegate().cmd_(x, request);
+   // Simple client
+   // - sends one message at a time
+   // - does not handle failture/retry
+
+   ClusterRequest request = new ClusterRequest.Builder(getX())
+      .setCmd(cmd)
+      .setObj(obj)
+      .build();
+
+    HttpURLConnection conn = null;
+    OutputStream os = null;
+    BufferedWriter writer = null;
+
+    try {
+      String url = getUrl() + "?cmd=cmd";
+
+      Outputter outputter = null;
+      conn = (HttpURLConnection) new URL(url_).openConnection();
+      conn.setRequestMethod("POST");
+      conn.setDoInput(true);
+      conn.setDoOutput(true);
+        outputter = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+        conn.addRequestProperty("Accept", "application/json");
+        conn.addRequestProperty("Content-Type", "application/json");
+      conn.connect();
+
+      os = conn.getOutputStream();
+      writer = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
+      writer.write(outputter.stringify((FObject)request));
+      writer.flush();
+      writer.close();
+      os.close();
+
+      // check response code
+      int code = conn.getResponseCode();
+      if ( code != HttpServletResponse.SC_OK ) {
+       ((Logger) getX().get("logger")).error(this.getClass().getSimpleName(), "send", "response", code, "request", request);
+        throw new RuntimeException("Http server did not return 200.");
+      }
+      return new ClusterResponse.Builder(getX()).setCmd(cmd).setMessage(Integer.toString(code)).build();
+    } catch (Throwable t) {
+       ((Logger) getX().get("logger")).error(this.getClass().getSimpleName(), "send", "request", request, t);
+      throw new RuntimeException(t);
+    } finally {
+      IOUtils.closeQuietly(writer);
+      IOUtils.closeQuietly(os);
+      if ( conn != null ) {
+        conn.disconnect();
+      }
+    }
       `
     }
   ]

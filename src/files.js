@@ -575,5 +575,5 @@ FOAM_FILES([
   { name: "foam/dashboard/view/DAOTable" },
   { name: "foam/dashboard/view/Card" },
   { name: "foam/build/Library" },
-  { name: "foam/build/EmbeddedModelDAO" },
+  { name: "foam/build/EmbeddedModelDAO" }
 ]);

@@ -43,11 +43,6 @@ foam.CLASS({
 
   properties: [
     {
-      // documentation: `Name by which the ClusterServer will be located by the NanoRouter.`,
-      name: 'serviceName',
-      class: 'String',
-    },
-    {
       // REVIEW - this may no longer be required
       documentation: `nSpec of the DAO to be clustered.`,
       name: 'nSpec',
@@ -102,7 +97,7 @@ foam.CLASS({
       ],
       javaCode: `
       Logger logger = (Logger) x.get("logger");
-      logger.debug(this.getClass().getSimpleName(), "reconfigure", getServiceName());
+      logger.debug(this.getClass().getSimpleName(), "reconfigure", getNSpec().getName());
       DAO dao = (DAO) x.get("clusterConfigDAO");
       List arr = (ArrayList) ((ArraySink) dao
        .where(
@@ -119,7 +114,7 @@ foam.CLASS({
           setConfig(config);
           continue;
         }
-        DAO client = new ClusterClientDAO.Builder(x).setServiceName(getServiceName()).setConfig(config).build();
+        DAO client = new ClusterClientDAO.Builder(x).setServiceName(getNSpec().getName()).setConfig(config).build();
         newClients[i] = client;
       }
       setClients(newClients);
