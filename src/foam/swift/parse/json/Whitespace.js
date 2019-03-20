@@ -15,11 +15,11 @@ foam.CLASS({
     {
       name: 'parse',
       swiftCode: function() {/*
-var ps = ps
+var ps = ps!
 while ps.valid() {
   let c = ps.head()
   if c == " "  || c == "\t" || c == "\r" || c == "\n" {
-    ps = ps.tail()
+    ps = ps.tail()!
   } else {
     return ps;
   }
