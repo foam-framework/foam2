@@ -2,42 +2,30 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'JSONView',
   extends: 'foam.u2.View',
+  requires: [
+    'foam.u2.DetailView'
+  ],
   exports: [ 'updateData' ],
-  // properties: [
-  //   {
-  //     name: 'data_',
-  //     expression: function(data) {
-  //       return data;
-  //     },
-  //     postSet: function(_, n) {
-  //       this.data = foam.json.parseString(n);
-  //       // this.clearProperty('data_'); 
-  //     }
-  //   }
   properties: [
     {
-      name: 'newKey',
-      class: 'String'
-    },
-    {
-      name: 'newValue',
-      view: { class: 'foam.u2.view.AnyView' }
+      class: 'FObjectProperty',
+      name: 'newRow',
+      factory: function() {
+        return this.KeyValueRow.create();
+      }
     }
   ],
-
   actions: [
     {
       name: 'addRow',
       label: 'add',
       code: function() {
-        this.data[this.newKey] = this.newValue;
+        this.data[this.newRow.key] = this.newRow.value;
         this.updateData();
-        this.clearProperty('newKey');
-        this.clearProperty('newValue');
+        this.clearProperty('newRow');
       }
     }
   ],
-
   classes: [
     {
       name: 'KeyValueRow',
@@ -87,38 +75,17 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-      this.add(this.slot(function(data) {
-        if ( ! data ) return '';
-        return self.E().forEach(Object.entries(data), function(e) {
-          var row = self.KeyValueRow.create({ key: e[0], value: e[1] })
-          this.startContext({ data: row })
-            .start('div')
-              .add(self.KeyValueRow.KEY)
-              .start('div').add(self.KeyValueRow.VALUE).end()
-              .add(self.KeyValueRow.REMOVE)
-            .end()
-          .endContext()
-
-          row.onDetach(row.sub(self.updateData));
-
-          // self.onDetach(row.key$.sub(function(_, _, _, event) {
-          //   delete data[event.oldValue];
-          //   data[row.key] = row.value;
-          //   console.log(foam.json.Pretty.stringify(self.data));
-          // }));
-
-          // self.onDetach(row.value$.sub(function() {
-          //   data[row.key] = row.value;
-          //   console.log(foam.json.Pretty.stringify(self.data));
-          // }));
-        }) 
-      }));
-
-      this.startContext({ data: this })
-        .start('div')
-          .add(this.NEW_KEY, this.NEW_VALUE, this.ADD_ROW)
-        .end()
-      .endContext();
+      this
+        .add(this.slot(function(data) {
+          if ( ! data ) return '';
+          return self.E().forEach(Object.entries(data), function(e) {
+            var row = self.KeyValueRow.create({ key: e[0], value: e[1] });
+            this.start(self.DetailView, { data: row, showActions: true }).end();
+            row.onDetach(row.sub(self.updateData));
+          });
+        }))
+        .start(self.DetailView, { data$: self.newRow$ }).end()
+        .startContext({ data: this }).add(this.ADD_ROW).endContext();
     }
   ]
 });
