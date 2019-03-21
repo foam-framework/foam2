@@ -14,6 +14,7 @@ import foam.nanos.auth.*;
 import foam.nanos.boot.NSpec;
 import foam.nanos.logger.*;
 import foam.nanos.session.Session;
+import foam.util.SafetyUtil;
 import java.util.Date;
 import javax.naming.NoPermissionException;
 import javax.servlet.http.HttpServletRequest;
@@ -52,7 +53,7 @@ public class SessionServerBox
           // issue.
           session.setContext(getX().put("user", null).put(Session.class, session));
           sessionDAO.put(session);
-        } else if ( ! session.getRemoteHost().equals(req.getRemoteHost()) ) {
+        } else if ( req != null && ! SafetyUtil.equals(session.getRemoteHost(), req.getRemoteHost()) ) {
           // If an existing session is reused with a different remote host then
           // logout the session and force a re-login.
 //          logger.warning("Attempt to use session create for ", session.getRemoteHost(), " from ", req.getRemoteHost());
