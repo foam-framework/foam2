@@ -103,12 +103,12 @@ foam.CLASS({
       var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
       exportDriver = foam.lookup(exportDriver.driverName).create();
 
-      this.downloadCSV(this.exportData, exportDriver);
+      this.downloadCSVv(this.exportData, exportDriver);
     }
   ],
 
   listeners: [
-    function downloadCSV(data, exportDriver) {
+    function downloadCSVv(data, exportDriver) {
       exportDriver.exportDAO(this.__context__, this.exportData)
       .then(function(result) {
         result = 'data:text/csv;charset=utf-8,' + result;
