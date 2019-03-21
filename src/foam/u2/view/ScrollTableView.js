@@ -8,7 +8,7 @@
 //   [ ] Make sure all column widths are consistent. Only way to do this is to
 //       have one table and add rows, not have many tables.
 //   [ ] Fix overlays.
-//   [ ] Handle when a user scrolls more than an entire page in one event.
+//   [x] Handle when a user scrolls more than an entire page in one event.
 //   [x] Make sure table height isn't broken.
 //   [ ] Fix jump in scrollbar when tables are added/removed.
 //   [x] Make sure filtering didn't break.
@@ -135,7 +135,7 @@
     {
       type: 'Int',
       name: 'pageSize',
-      value: 40,
+      value: 30,
       documentation: 'The number of items in each "page". There are three pages.'
     },
     {
@@ -282,6 +282,68 @@
           this.bottomBufferTable_.data = this.initialPage3DAO_;
         }
       }
+    },
+    {
+      name: 'scrollDownOnePage',
+      code: function() {
+        // Update the bounds.
+        if ( this.currentUpperBound > this.daoCount ) return;
+
+        this.currentUpperBound += this.pageSize;
+        this.currentLowerBound += this.pageSize;
+
+        // Remove the top buffer table.
+        this.topBufferTable_.remove();
+        this.tablesRemoved_ += 1;
+
+        // Update the table references.
+        this.topBufferTable_ = this.visibleTable_;
+        this.visibleTable_   = this.bottomBufferTable_;
+
+        // Add a new bottom buffer table.
+        this.tablesContainer_.start(this.TableView, {
+          data: this.data.skip(this.currentUpperBound - this.pageSize).limit(this.pageSize),
+          columns: this.columns,
+          contextMenuActions: this.contextMenuActions,
+          selection$: this.selection$,
+          editColumnsEnabled: this.editColumnsEnabled,
+          showHeader: false
+        }, this.bottomBufferTable_$).
+          addClass(this.myClass('table')).
+        end();
+      }
+    },
+    {
+      name: 'scrollUpOnePage',
+      code: function() {
+        // Update the bounds.
+        if ( this.currentLowerBound <= 0 ) return;
+
+        this.currentLowerBound -= this.pageSize;
+        this.currentUpperBound -= this.pageSize;
+
+        // Remove the bottom buffer table.
+        this.bottomBufferTable_.remove();
+        this.tablesRemoved_ -= 1;
+
+        // Update the table references.
+        this.bottomBufferTable_ = this.visibleTable_;
+        this.visibleTable_      = this.topBufferTable_;
+
+        // Add a new top buffer table.
+        var table = this.TableView.create({
+          data: this.data.skip(this.currentLowerBound).limit(this.pageSize),
+          columns: this.columns,
+          contextMenuActions: this.contextMenuActions,
+          selection$: this.selection$,
+          editColumnsEnabled: this.editColumnsEnabled,
+          showHeader: this.currentLowerBound === 0 // To make sure the header is shown for the top table.
+        });
+        table.addClass(this.myClass('table'));
+        this.topBufferTable_ = table;
+
+        this.tablesContainer_.insertAfter(table, this.spacer_);
+      }
     }
   ],
 
@@ -297,77 +359,22 @@
         this.skip = Math.min(this.daoCount - this.limit, Math.max(0, this.skip + (negative ? -rows : rows)));
         this.lastScrollTop_ = e.target.scrollTop;
 
-        console.log('Lower bound: ' + (this.currentLowerBound + this.pageSize));
-        console.log('Upper bound: ' + (this.currentUpperBound - this.pageSize - Math.floor(this.limit / 2)));
-        console.log(`${oldSkip} -> ${this.skip}`);
+        var uBound = () => this.currentUpperBound - this.pageSize;
+        var lBound = () => this.currentLowerBound + this.pageSize;
 
-        // Check if we scrolled over a page boundary. If we did, remove one of
-        // the tables, add another, and update the dummy element's height to
-        // make sure the tables are pushed down far enough.
-        if (
-          oldSkip   <= this.currentUpperBound - this.pageSize - Math.floor(this.limit / 2) &&
-          this.skip >  this.currentUpperBound - this.pageSize - Math.floor(this.limit / 2)
-        ) {
+        if ( oldSkip <= uBound() && this.skip > uBound() ) {
           // The user scrolled down past a page boundary.
-
-          // Update the bounds.
-          if ( this.currentUpperBound > this.daoCount ) return;
-
-          this.currentUpperBound += this.pageSize;
-          this.currentLowerBound += this.pageSize;
-
-          // Remove the top buffer table.
-          this.topBufferTable_.remove();
-          this.tablesRemoved_ += 1;
-
-          // Update the table references.
-          this.topBufferTable_ = this.visibleTable_;
-          this.visibleTable_   = this.bottomBufferTable_;
-
-          // Add a new bottom buffer table.
-          this.tablesContainer_.start(this.TableView, {
-            data: this.data.skip(this.currentUpperBound - this.pageSize).limit(this.pageSize),
-            columns: this.columns,
-            contextMenuActions: this.contextMenuActions,
-            selection$: this.selection$,
-            editColumnsEnabled: this.editColumnsEnabled,
-            showHeader: false
-          }, this.bottomBufferTable_$).
-            addClass(this.myClass('table')).
-          end();
-        } else if (
-          oldSkip   >  this.currentLowerBound + this.pageSize &&
-          this.skip <= this.currentLowerBound + this.pageSize
-        ) {
+          while (
+            this.skip > uBound() &&
+            this.currentUpperBound < this.daoCount
+          ) {
+            this.scrollDownOnePage();
+          }
+        } else if ( oldSkip > lBound() && this.skip <= lBound() ) {
           // The user scrolled up past a page boundary.
-
-          // Update the bounds.
-          if ( this.currentLowerBound <= 0 ) return;
-
-          this.currentLowerBound -= this.pageSize;
-          this.currentUpperBound -= this.pageSize;
-
-          // Remove the bottom buffer table.
-          this.bottomBufferTable_.remove();
-          this.tablesRemoved_ -= 1;
-
-          // Update the table references.
-          this.bottomBufferTable_ = this.visibleTable_;
-          this.visibleTable_      = this.topBufferTable_;
-
-          // Add a new top buffer table.
-          var table = this.TableView.create({
-            data: this.data.skip(this.currentLowerBound).limit(this.pageSize),
-            columns: this.columns,
-            contextMenuActions: this.contextMenuActions,
-            selection$: this.selection$,
-            editColumnsEnabled: this.editColumnsEnabled,
-            showHeader: this.currentLowerBound === 0 // To make sure the header is shown for the top table.
-          });
-          table.addClass(this.myClass('table'));
-          this.topBufferTable_ = table;
-
-          this.tablesContainer_.insertAfter(table, this.spacer_);
+          while ( this.skip <= lBound() && this.currentLowerBound > 0 ) {
+            this.scrollUpOnePage();
+          }
         }
       }
     },
