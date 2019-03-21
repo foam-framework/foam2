@@ -15,8 +15,6 @@
 //           the tables are indistinguishable from each other. This feels like
 //           too much of a constraint though.
 //   [ ] Fix overlays.
-//   [x] Handle when a user scrolls more than an entire page in one event.
-//   [x] Make sure table height isn't broken.
 //   [ ] Fix jump in scrollbar when tables are added/removed.
 //         * `position: absolute` would solve this perfectly if it weren't for
 //           the fact that the conainer wouldn't use the table to calculate its
@@ -25,9 +23,11 @@
 //         * Note that the jumping only happens when scrolling down, which is
 //           surprising. I'm not sure why that's the case, I'd expect it happen
 //           while scrolling either way.
+//   [ ] Make the table header sticky.
+//   [x] Handle when a user scrolls more than an entire page in one event.
+//   [x] Make sure table height isn't broken.
 //   [x] Make sure filtering didn't break.
 //   [x] Make sure sorting didn't break.
-//   [ ] Make the table header sticky.
 //   [x] Fix bug where table header is gone if you scroll back up after it was
 //       removed when previously scrolling down far enough for it to be removed.
 
