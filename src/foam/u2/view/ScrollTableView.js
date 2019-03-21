@@ -5,16 +5,16 @@
  */
 
 // TODO:
-//   [ ] Make sure all tables are the same width. Only way to do this is to have
-//       one table and add rows, not have many tables.
+//   [ ] Make sure all column widths are consistent. Only way to do this is to
+//       have one table and add rows, not have many tables.
 //   [ ] Fix overlays.
 //   [ ] Handle when a user scrolls more than an entire page in one event.
-//   [ ] Make sure fitInScreen isn't broken.
+//   [x] Make sure table height isn't broken.
 //   [ ] Fix jump in scrollbar when tables are added/removed.
-//   [ ] Make sure filtering didn't break.
-//   [ ] Make sure sorting didn't break.
+//   [x] Make sure filtering didn't break.
+//   [x] Make sure sorting didn't break.
 //   [ ] Make the table header sticky.
-//   [ ] Fix bug where table header is gone if you scroll back up after it was
+//   [x] Fix bug where table header is gone if you scroll back up after it was
 //       removed when previously scrolling down far enough for it to be removed.
 
  foam.CLASS({
@@ -99,15 +99,6 @@
       value: 48
     },
     {
-      class: 'Boolean',
-      name: 'fitInScreen',
-      documentation: `
-        If true, the table height will be dynamically set such that the table
-        will not overflow off of the bottom of the page.
-      `,
-      value: false
-    },
-    {
       name: 'table_',
       documentation: `
         A reference to the table element we use in the fitInScreen calculations.
@@ -132,8 +123,7 @@
       type: 'String',
       name: 'scrollHeight',
       expression: function(daoCount, limit, rowHeight) {
-        this.lastScrollTop_ = 0;
-        this.skip = 0;
+        this.refresh();
         return rowHeight * daoCount /* + this.TABLE_HEAD_HEIGHT */ + 'px';
       }
     },
@@ -150,21 +140,21 @@
     },
     {
       class: 'foam.dao.DAOProperty',
-      name: 'page1DAO',
+      name: 'initialPage1DAO_',
       expression: function(data, pageSize) {
         return data && data.limit(pageSize);
       }
     },
     {
       class: 'foam.dao.DAOProperty',
-      name: 'page2DAO',
+      name: 'initialPage2DAO_',
       expression: function(data, pageSize) {
         return data && data.skip(pageSize).limit(pageSize);
       }
     },
     {
       class: 'foam.dao.DAOProperty',
-      name: 'page3DAO',
+      name: 'initialPage3DAO_',
       expression: function(data, pageSize) {
         return data && data.skip(pageSize * 2).limit(pageSize);
       }
@@ -201,6 +191,13 @@
       documentation: `
         The number of tables that have been removed due to scrolling down.
       `
+    },
+    {
+      type: 'String',
+      name: 'spacerHeight_',
+      expression: function(tablesRemoved_, pageSize, rowHeight) {
+        return tablesRemoved_ * pageSize * rowHeight + 'px';
+      }
     }
   ],
 
@@ -222,9 +219,11 @@
             style({ height: this.scrollHeight$ }).
           end().
           start('div', undefined, this.tablesContainer_$).
-            tag('div', undefined, this.spacer_$).
+            start('div', undefined, this.spacer_$).
+              style({ height: this.spacerHeight_$ }).
+            end().
             start(this.TableView, {
-              data$: this.page1DAO$,
+              data$: this.initialPage1DAO_$,
               columns: this.columns,
               contextMenuActions: this.contextMenuActions,
               selection$: this.selection$,
@@ -233,7 +232,7 @@
               addClass(this.myClass('table')).
             end().
             start(this.TableView, {
-              data$: this.page2DAO$,
+              data$: this.initialPage2DAO_$,
               columns: this.columns,
               contextMenuActions: this.contextMenuActions,
               selection$: this.selection$,
@@ -243,7 +242,7 @@
               addClass(this.myClass('table')).
             end().
             start(this.TableView, {
-              data$: this.page3DAO$,
+              data$: this.initialPage3DAO_$,
               columns: this.columns,
               contextMenuActions: this.contextMenuActions,
               selection$: this.selection$,
@@ -255,25 +254,34 @@
           end().
         end();
 
-      if ( this.fitInScreen ) {
-        // this.onDetach(this.onload.sub(this.updateTableHeight));
-        // window.addEventListener('resize', this.updateTableHeight);
-        // this.onDetach(() => {
-        //   window.removeEventListener('resize', this.updateTableHeight);
-        // });
+      this.onDetach(this.onload.sub(this.updateTableHeight));
+      window.addEventListener('resize', this.updateTableHeight);
+      this.onDetach(() => {
+        window.removeEventListener('resize', this.updateTableHeight);
+      });
+    },
+    {
+      name: 'refresh',
+      code: function() {
+        this.lastScrollTop_ = 0;
+        this.skip = 0;
+        this.currentLowerBound = 0;
+        this.currentUpperBound = this.pageSize * 3;
+        this.tablesRemoved_ = 0;
 
-        this.onload.sub(() => {
-          // Find the distance from the top of the table to the top of the screen.
-          var distanceFromTop = this.topBufferTable_.el().getBoundingClientRect().y;
+        if ( this.topBufferTable_ ) {
+          this.topBufferTable_.data = this.initialPage1DAO_;
+          this.topBufferTable_.showHeader = true;
+        }
 
-          // Calculate the remaining space we have to make use of.
-          var remainingSpace = window.innerHeight - distanceFromTop;
+        if ( this.visibleTable_ ) {
+          this.visibleTable_.data = this.initialPage2DAO_;
+        }
 
-          this.scrollbarContainer_.style({ height: `${remainingSpace}px` });
-        });
+        if ( this.bottomBufferTable_ ) {
+          this.bottomBufferTable_.data = this.initialPage3DAO_;
+        }
       }
-
-      this.onDetach(this.onload.sub(this.updateScrollbarContainerHeight));
     }
   ],
 
@@ -316,12 +324,9 @@
           this.topBufferTable_ = this.visibleTable_;
           this.visibleTable_   = this.bottomBufferTable_;
 
-          // Update the spacer element height.
-          this.spacer_.style({ height: `${this.tablesRemoved_ * this.pageSize * this.rowHeight}px` });
-
           // Add a new bottom buffer table.
           this.tablesContainer_.start(this.TableView, {
-            data$: this.data$.map((dao) => dao.skip(this.currentUpperBound - this.pageSize).limit(this.pageSize)),
+            data: this.data.skip(this.currentUpperBound - this.pageSize).limit(this.pageSize),
             columns: this.columns,
             contextMenuActions: this.contextMenuActions,
             selection$: this.selection$,
@@ -350,20 +355,17 @@
           this.bottomBufferTable_ = this.visibleTable_;
           this.visibleTable_      = this.topBufferTable_;
 
-          // Update the spacer element height.
-          this.spacer_.style({ height: `${this.tablesRemoved_ * this.pageSize * this.rowHeight}px` });
-
           // Add a new top buffer table.
-          var table = this.E().start(this.TableView, {
-            data$: this.data$.map((dao) => dao.skip(this.currentLowerBound).limit(this.pageSize)),
+          var table = this.TableView.create({
+            data: this.data.skip(this.currentLowerBound).limit(this.pageSize),
             columns: this.columns,
             contextMenuActions: this.contextMenuActions,
             selection$: this.selection$,
             editColumnsEnabled: this.editColumnsEnabled,
-            showHeader: this.currentLowerBound === 0
-          }, this.topBufferTable_$).
-            addClass(this.myClass('table')).
-          end();
+            showHeader: this.currentLowerBound === 0 // To make sure the header is shown for the top table.
+          });
+          table.addClass(this.myClass('table'));
+          this.topBufferTable_ = table;
 
           this.tablesContainer_.insertAfter(table, this.spacer_);
         }
@@ -380,26 +382,20 @@
         });
       }
     },
-    // {
-    //   name: 'updateTableHeight',
-    //   code: function() {
-    //     // Find the distance from the top of the table to the top of the screen.
-    //     var distanceFromTop = this.table_.el().getBoundingClientRect().y;
-
-    //     // Calculate the remaining space we have to make use of.
-    //     var remainingSpace = window.innerHeight - distanceFromTop;
-
-    //     // Set the limit such that we make maximum use of the space without
-    //     // overflowing.
-    //     this.limit = Math.max(1, Math.floor((remainingSpace - this.TABLE_HEAD_HEIGHT) / this.rowHeight));
-
-    //     this.updateScrollbarContainerHeight();
-    //   }
-    // },
     {
-      name: 'updateScrollbarContainerHeight',
+      name: 'updateTableHeight',
       code: function() {
-        this.scrollbarContainer_.el().style.height = (this.limit * this.rowHeight) + this.TABLE_HEAD_HEIGHT + 'px';
+        // Find the distance from the top of the table to the top of the screen.
+        var distanceFromTop = this.bottomBufferTable_.el().getBoundingClientRect().y;
+
+        // Calculate the remaining space we have to make use of.
+        var remainingSpace = window.innerHeight - distanceFromTop;
+
+        // TODO: Do we want to do this?
+        // Leave space for the footer.
+        remainingSpace -= 44;
+
+        this.scrollbarContainer_.style({ height: `${remainingSpace}px` });
       }
     }
   ]
