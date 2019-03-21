@@ -7,10 +7,24 @@
 // TODO:
 //   [ ] Make sure all column widths are consistent. Only way to do this is to
 //       have one table and add rows, not have many tables.
+//         * <table>'s can have multiple <tbody>'s, so that's one option. The
+//           hard part about doing this is that we need each of the <tbody>'s
+//           to have a different DAO/data source. We could try to support
+//           multiple DAOs in a single table.
+//         * We could also sidestep the issue by using `table-layout: fixed` so
+//           the tables are indistinguishable from each other. This feels like
+//           too much of a constraint though.
 //   [ ] Fix overlays.
 //   [x] Handle when a user scrolls more than an entire page in one event.
 //   [x] Make sure table height isn't broken.
 //   [ ] Fix jump in scrollbar when tables are added/removed.
+//         * `position: absolute` would solve this perfectly if it weren't for
+//           the fact that the conainer wouldn't use the table to calculate its
+//           width anymore so it breaks the layout.
+//             * Note that using `table-layout: fixed` would solve this too.
+//         * Note that the jumping only happens when scrolling down, which is
+//           surprising. I'm not sure why that's the case, I'd expect it happen
+//           while scrolling either way.
 //   [x] Make sure filtering didn't break.
 //   [x] Make sure sorting didn't break.
 //   [ ] Make the table header sticky.
