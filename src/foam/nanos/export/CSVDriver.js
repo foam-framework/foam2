@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'CSVDriver',
   implements: [ 'foam.nanos.export.ExportDriver' ],
 
+  requires: [
+    'foam.dao.CSVSink'
+  ],
+
   documentation: 'Class for exporting data from a DAO to CSV',
 
   properties: [
@@ -25,10 +29,9 @@ foam.CLASS({
       return this.outputter.toCSV(obj);
     },
     function exportDAO(X, dao) {
-      var self = this;
-      return dao.select().then(function (sink) {
-        return self.outputter.toCSV(sink.array);
-      });
+      var sink = this.CSVSink.create();
+      sink.reset();
+      return dao.select(sink).then( (s) => s.csv);
     }
   ]
 });

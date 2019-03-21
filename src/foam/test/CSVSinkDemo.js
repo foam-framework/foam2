@@ -1,10 +1,13 @@
 foam.CLASS({
   package: 'foam.test',
   name: 'CSVSinkDemo',
+
   requires: [
     'foam.dao.CSVSink',
-    'foam.dao.EasyDAO'
+    'foam.dao.EasyDAO',
+    'foam.nanos.auth.Phone'
   ],
+
   properties: [
     {
       class: 'foam.dao.DAOProperty',
@@ -22,10 +25,11 @@ foam.CLASS({
       of: 'foam.dao.CSVSink',
       name: 'sink',
       factory: function() {
-        return this.CSVSink.create();
+        return this.CSVSink.create({ of: this.TestModel });
       }
     }
   ],
+
   classes: [
     {
       name: 'TestModel',
@@ -41,10 +45,20 @@ foam.CLASS({
         {
           class: 'Boolean',
           name: 'bool'
+        },
+        {
+          class: 'Array',
+          name: 'arr'
+        },
+        {
+          class: 'FObjectProperty',
+          name: 'fop',
+          of: 'foam.nanos.auth.Phone'
         }
       ]
     }
   ],
+
   actions: [
     {
       name: 'toCsv',
@@ -59,7 +73,9 @@ foam.CLASS({
         for ( var i = 0 ; i < 100 ; i++ ) {
           this.dao.put(this.TestModel.create({
             str: 'Random data ' + i,
-            bool: Math.random() < 0.5
+            bool: Math.random() < 0.5,
+            arr: [Math.random()],
+            fop: this.Phone.create({ number: '111-111-1111' })
           }));
         }
       }
