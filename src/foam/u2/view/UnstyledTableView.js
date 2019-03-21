@@ -141,7 +141,13 @@ foam.CLASS({
     },
     'hoverSelection',
     'dropdownOrigin',
-    'overlayOrigin'
+    'overlayOrigin',
+    {
+      type: 'Boolean',
+      name: 'showHeader',
+      value: true,
+      documentation: 'Set to false to not render the header.'
+    }
   ],
 
   methods: [
@@ -184,6 +190,7 @@ foam.CLASS({
         addClass(this.myClass(this.of.id.replace(/\./g, '-'))).
         setNodeName('table').
         start('thead').
+          show(this.showHeader$).
           add(this.slot(function(columns_) {
             return this.E('tr').
               forEach(columns_, function(column) {
