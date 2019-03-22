@@ -28,6 +28,8 @@ foam.CLASS({
   `,
 
   javaImports: [
+    'foam.box.HTTPBox',
+    'foam.dao.ClientDAO',
     'foam.dao.DAO',
     'foam.dao.ArraySink',
     'static foam.mlang.MLang.*',
@@ -114,7 +116,8 @@ foam.CLASS({
           setConfig(config);
           continue;
         }
-        DAO client = new ClusterClientDAO.Builder(x).setServiceName(getNSpec().getName()).setConfig(config).build();
+        // DAO client = new ClusterClientDAO.Builder(x).setServiceName(getNSpec().getName()).setConfig(config).build();
+        DAO client = new ClientDAO.Builder(x).setDelegate(new HTTPBox.Builder(x).build()).build();
         newClients[i] = client;
       }
       setClients(newClients);
@@ -135,7 +138,8 @@ foam.CLASS({
       javaCode: `
       foam.core.FObject o = getDelegate().put_(x, obj);
       for ( DAO client : getClients() ) {
-        client.put(o);
+        // client.put(o);
+        client.cmd_(x, new ClusterRequest(x, "PUT", o));
       }
       return o;
      `
@@ -155,7 +159,8 @@ foam.CLASS({
       javaCode: `
       foam.core.FObject o = getDelegate().remove_(x, obj);
       for ( DAO client : getClients() ) {
-        client.put(o);
+        // client.put(o);
+        client.cmd_(x, new ClusterRequest(x, "REMOVE", o));
       }
       return o;
      `

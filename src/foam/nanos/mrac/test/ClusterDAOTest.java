@@ -21,41 +21,41 @@ public class ClusterDAOTest
 
   @Override
   public void runTest(X x) {
-    x_ = x;
-    Logger logger = (Logger) x.get("logger");
+     x_ = x;
+     Logger logger = (Logger) x.get("logger");
 
-    String serviceName = "countryDAO1";
-    addNSpec(x, serviceName);
+     String serviceName = "countryDAO1";
+     addNSpec(x, serviceName);
 
-    // DAO clusterDAO = new ClusterDAO.Builder(x)
-    //   .setDelegate(new NullDAO.Builder(x).build())
-    //   .setServiceName(serviceName)
-    //   .build();
-    ClusterConfig config = new ClusterConfig.Builder(x)
-      .setId("localhost")
-      .setNodeType(NodeType.PRIMARY)
-      .setPort(8080)
-      .build();
+     // DAO clusterDAO = new ClusterDAO.Builder(x)
+     //   .setDelegate(new NullDAO.Builder(x).build())
+     //   .setServiceName(serviceName)
+     //   .build();
+     ClusterConfig config = new ClusterConfig.Builder(x)
+       .setId("localhost")
+       .setNodeType(NodeType.PRIMARY)
+       .setPort(8080)
+       .build();
 
-    DAO client = new ClusterClientDAO.Builder(x).setServiceName(serviceName).setConfig(config).build();
+     DAO client = new ClusterClientDAO.Builder(x).setServiceName(serviceName).setConfig(config).build();
 
-    DAO countryDAO1 = (DAO) x.get("countryDAO1");
-    Sink sink = countryDAO1.select(new ArraySink());
-    List countries = ((ArraySink) sink).getArray();
-    test ( countries.size() == 0, "countryDAO1 empty");
+     DAO countryDAO1 = (DAO) x.get("countryDAO1");
+     Sink sink = countryDAO1.select(new ArraySink());
+     List countries = ((ArraySink) sink).getArray();
+     test ( countries.size() == 0, "countryDAO1 empty");
 
-    DAO countryDAO = (DAO) x.get("countryDAO");
-    sink = countryDAO.select(new ArraySink());
-    countries = ((ArraySink) sink).getArray();
-    for ( Object c : countries ) {
-      Country country = (Country) c;
-      client.put(country);
-    }
+     DAO countryDAO = (DAO) x.get("countryDAO");
+     sink = countryDAO.select(new ArraySink());
+     countries = ((ArraySink) sink).getArray();
+     for ( Object c : countries ) {
+       Country country = (Country) c;
+       client.put(country);
+     }
 
-    int numCountries = countries.size();
-    sink = countryDAO1.select(new ArraySink());
-    countries = ((ArraySink) sink).getArray();
-    test ( countries.size() == numCountries, "countryDAO1 equal to countryDAO");
+     int numCountries = countries.size();
+     sink = countryDAO1.select(new ArraySink());
+     countries = ((ArraySink) sink).getArray();
+     test ( countries.size() == numCountries, "countryDAO1 equal to countryDAO");
   }
 
   public void addNSpec(X x, String serviceName) {
