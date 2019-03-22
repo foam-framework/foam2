@@ -51,12 +51,6 @@
       display: grid;
       grid-template-columns: auto auto;
     }
-
-    /*
-    ^table {
-      border-bottom: 3px solid red !important;
-    }
-    */
   `,
 
   constants: [
@@ -110,7 +104,7 @@
     {
       name: 'table_',
       documentation: `
-        A reference to the table element we use in the fitInScreen calculations.
+        A reference to the table element we use in various calculations.
       `
     },
     {
