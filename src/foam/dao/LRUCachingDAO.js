@@ -67,7 +67,6 @@
     function init() {
       this.SUPER();
       var self = this;
-      console.log("LRU CachingDAO");
 
       self.delegate.listen(self.QuickSink.create({
         putFn: this.onPut,
@@ -115,6 +114,7 @@
 
     function put(x, obj) {
       var self = this;
+
       return this.trackingDAO.put(
          this.LRUCacheItem.create({
            id: obj.id,

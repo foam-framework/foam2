@@ -172,13 +172,13 @@ return delegate;
       generateJava: false,
       class: 'Property'
     },
-    {
-      /** Enable local in-memory caching of the DAO. */
-      class: 'Boolean',
-      name: 'cache',
-      generateJava: false,
-      value: false
-    },
+//    {
+//      /** Enable local in-memory caching of the DAO. */
+//      class: 'Boolean',
+//      name: 'cache',
+//      generateJava: false,
+//      value: false
+//    },
     {
       class: 'foam.core.Enum',
       of: 'foam.dao.CacheType',
@@ -414,7 +414,7 @@ return delegate;
 //             name: this.model.id + "_" + daoModel.id + "_" + this.name
 //           });
 //         }
-        if ( this.cacheType == 'FULL' ) {
+        if ( this.cacheType == 'FULL') {
           this.mdao = this.MDAO.create({of: params.of});
           dao = this.CachingDAO.create({
             cache: this.dedup ?
@@ -429,7 +429,7 @@ return delegate;
           dao = this.LRUCachingDAO.create({
             dao : this.mdao,
             delegate: dao
-            });
+          });
         }
       }
 
@@ -481,7 +481,7 @@ return delegate;
         });
         dao.syncRecordDAO = foam.dao.EasyDAO.create({
           of: dao.SyncRecord,
-          cache: true,
+          cacheType: true,
           daoType: this.daoType,
           name: this.name + '_SyncRecords'
         });
