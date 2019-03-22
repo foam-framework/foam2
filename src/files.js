@@ -232,6 +232,7 @@ FOAM_FILES([
   { name: "foam/dao/grid/ManyToManyGridDAO" },
   { name: "foam/dao/LazyCacheDAO" },
   { name: "foam/dao/CachingDAO" },
+  { name: "foam/dao/LRUCachingDAO" },
   { name: "foam/dao/DeDupDAO" },
   { name: "foam/dao/LRUDAOManager" },
   { name: "foam/dao/SequenceNumberDAO" },
@@ -576,4 +577,6 @@ FOAM_FILES([
   { name: "foam/dashboard/view/Card" },
   { name: "foam/build/Library" },
   { name: "foam/build/EmbeddedModelDAO" },
+
+  { name: "foam/dao/CacheType" },
 ]);

@@ -39,6 +39,7 @@ foam.CLASS({
     'foam.box.TimeoutBox',
     'foam.box.WebSocketBox',
     'foam.dao.CachingDAO',
+    'foam.dao.CacheType',
     'foam.dao.ClientDAO',
     'foam.dao.CompoundDAODecorator',
     'foam.dao.ContextualizingDAO',
@@ -46,6 +47,7 @@ foam.CLASS({
     'foam.dao.DecoratedDAO',
     'foam.dao.GUIDDAO',
     'foam.dao.IDBDAO',
+    'foam.dao.LRUCachingDAO',
     {
       path: 'foam.dao.JDAO',
       flags: ['js'],
@@ -176,6 +178,12 @@ return delegate;
       name: 'cache',
       generateJava: false,
       value: false
+    },
+    {
+      class: 'foam.core.Enum',
+      of: 'foam.dao.CacheType',
+      name: 'cacheType',
+      value: 'NONE' /* 'None'*/
     },
     {
       /** Enable standard authentication. */
@@ -406,7 +414,7 @@ return delegate;
 //             name: this.model.id + "_" + daoModel.id + "_" + this.name
 //           });
 //         }
-        if ( this.cache ) {
+        if ( this.cacheType == 'FULL' ) {
           this.mdao = this.MDAO.create({of: params.of});
           dao = this.CachingDAO.create({
             cache: this.dedup ?
@@ -414,6 +422,14 @@ return delegate;
               this.DeDupDAO.create({delegate: this.mdao}),
             src: dao,
             of: this.model});
+        }
+
+        if ( this.cacheType == 'LRU' ) {
+          this.mdao = this.MDAO.create({of: params.of});
+          dao = this.LRUCachingDAO.create({
+            dao : this.mdao,
+            delegate: dao
+            });
         }
       }
 

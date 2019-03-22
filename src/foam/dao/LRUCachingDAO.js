@@ -17,7 +17,7 @@
 
   documentation: `
      Least Recently Used CachingDAO :
-     Manages a DAO\'s size by removing old items. Commonly applied inside a cache to limit the cache\'s size. Item freshness is tracked in a separate DAO.
+     Manages a DAO\'s size by removing old items. Commonly applied inside a cache to limit the cache\'s size.
   `,
 
   classes: [
@@ -67,6 +67,7 @@
     function init() {
       this.SUPER();
       var self = this;
+      console.log("LRU CachingDAO");
 
       self.delegate.listen(self.QuickSink.create({
         putFn: this.onPut,
@@ -96,39 +97,23 @@
     function find_(x, id) {
       var self = this;
 
-      self.trackingDAO.select().then(function(o) {
-        console.log("select : ", o.array.length);
+      return this.trackingDAO.find_(x, id).then(function(o) {
+        if ( o ) {
+          return o;
+        } else {
+          return self.delegate.find_(x, id).then(function(o) {
+            if ( o ) {
+              self.put(x, o)
+              return o;
+            } else {
+              return null;
+            }
+          })
+        }
       });
-        return this.trackingDAO.find_(x, id).then(function(o) {
-        console.log("id : " + id);
-          if ( o ) {
-            console.log("1 : ", o);
-            return o;
-          } else {
-            self.delegate.find_(x, id).then(function(o) {
-              if ( o ) {
-                console.log("2 : ", o);
-                self.put(x, o)
-                return o;
-              } else {
-                console.log("3 : ", o);
-                return null;
-              }
-            })
-          }
-        });
-
-
-//      return self.trackingDAO.find_(x, id).then(function(o) {
-//        if ( o ) return o || self.delegate.find_(x, id).then(function(o) {
-//        console.log("2 : " + o);
-//          return o ? self.trackingDAO.put(x, o) : null;
-//        });
-//      });
     },
 
     function put(x, obj) {
-    console.log("LRU put : " + obj.id);
       var self = this;
       return this.trackingDAO.put(
          this.LRUCacheItem.create({
@@ -137,29 +122,18 @@
          })
        ).then(function() {
          self.cleanup();
-         //self.delegate.put_(x, obj);
-         console.log("here I am");
-
-         self.trackingDAO.select().then(function(tCount) {
-                 console.log("tCount 2: " + tCount.array.length);
-               })
       });
     },
 
     function remove(x, o) {
-    console.log("LRU remove");
       var self = this;
-      return self.trackingDAO.remove(o).then(function() {
-        return self.delegate.remove_(x, o);
-      });
+      return self.trackingDAO.remove(o);
     }
   ],
 
   listeners: [
     /** Adds the put() item to the tracking dao, runs cleanup() to check the dao size. */
     function onPut(obj) {
-      console.log("onPut");
-
       var self = this;
       this.trackingDAO.put(
         this.LRUCacheItem.create({
@@ -174,11 +148,7 @@
     /** Clears the remove()'d item from the trackingDAO. */
     function onRemove(obj) {
       var self = this;
-      console.log("onRemove");
       this.trackingDAO.remove(obj);
-      this.trackingDAO.select().then(function(tCount) {
-                       console.log("tCount 3: " + tCount.array.length);
-                     })
     }
   ]
 });
