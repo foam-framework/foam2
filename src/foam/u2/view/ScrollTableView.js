@@ -6,15 +6,8 @@
 
 // TODO:
 //   [ ] Fix overlays.
-//   [ ] Fix jump in scrollbar when tables are added/removed.
-//         * `position: absolute` would solve this perfectly if it weren't for
-//           the fact that the conainer wouldn't use the table to calculate its
-//           width anymore so it breaks the layout.
-//             * Note that using `table-layout: fixed` would solve this.
-//         * Note that the jumping only happens when scrolling down, which is
-//           surprising. I'm not sure why that's the case, I'd expect it happen
-//           while scrolling either way.
 //   [ ] Make the table header sticky.
+//   [x] Fix jump in scrollbar when tables are added/removed.
 //   [x] See if I can get it so that the DOM elements aren't removed and
 //       re-added when filtering. It would be nicer to just change the
 //       underlying DAO so you don't see the flicker.
@@ -44,6 +37,8 @@
 
     ^scrollbar {
       box-sizing: border-box;
+      width: 1px;
+      background: rgba(0, 0, 0, 0);
     }
 
     ^scrollbarContainer {
@@ -207,7 +202,6 @@
     'topBufferTable_',
     'visibleTable_',
     'bottomBufferTable_',
-    'tablesContainer_',
     {
       type: 'Int',
       name: 'tablesRemoved_',
@@ -242,7 +236,7 @@
             addClass(this.myClass('scrollbar')).
             style({ height: this.scrollHeight$ }).
           end().
-          start('div', undefined, this.tablesContainer_$).
+          start().
             start('div', undefined, this.spacer_$).
               style({ height: this.spacerHeight_$ }).
             end().
