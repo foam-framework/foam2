@@ -13,7 +13,7 @@ import java.util.List;
 import static foam.mlang.MLang.*;
 
 public class RulerDAOTest extends Test {
-  Rule rule1, rule2, rule3, rule4, rule5, rule6;
+  Rule rule1, rule2, rule3, rule4, rule5, rule6, rule7;
   User user1, user2;
   DAO ruleDAO, userDAO, ruleHistoryDAO;
   int asyncWait = 1000;
@@ -29,6 +29,7 @@ public class RulerDAOTest extends Test {
     createRule(x);
     testUsers(x);
     testRuleHistory(x);
+    testUpdatedRule(x);
     removeData(x);
   }
 
@@ -77,6 +78,30 @@ public class RulerDAOTest extends Test {
     test(ruleHistory.getResult().equals("Done"),
       "Update rule history result = Done in rule 6 async action"
     );
+  }
+
+  public void testUpdatedRule(X x) {
+
+    //the rule with the highest priority in "users:email filter" group and stops execution of the rest.
+    rule7 = new Rule();
+    rule7.setId(7);
+    rule7.setName("userDAO email filter");
+    rule7.setRuleGroup("users:email filter");
+    rule7.setDaoKey("localUserDAO");
+    rule7.setOperation(Operations.CREATE);
+    rule7.setAfter(false);
+    rule7.setPriority(100);
+    RuleAction action7 = (x1, obj, oldObj, ruler) -> ruler.stop();
+    rule7.setAction(action7);
+    rule7 = (Rule) ruleDAO.put_(x, rule7);
+
+    user1 = new User();
+    user1.setId(12);
+    user1.setFirstName("Kristina");
+    user1.setEmail("nanos@nanos.net");
+    user1 = (User) userDAO.put_(x, user1).fclone();
+    test(user1.getEmail().equals("nanos@nanos.net"), "new rule stops execution of others within `userDAO email filter` group. " +
+    " Email is not upated");
   }
 
   public void createRule(X x) {
@@ -206,6 +231,7 @@ public class RulerDAOTest extends Test {
     ruleDAO.remove_(x, rule4);
     ruleDAO.remove_(x, rule5);
     ruleDAO.remove_(x, rule6);
+    ruleDAO.remove_(x, rule7);
     userDAO.remove_(x, user1);
     userDAO.remove_(x, user2);
   }

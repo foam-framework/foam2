@@ -12,9 +12,9 @@
 
   javaImports: [
     'foam.core.FObject',
-    'foam.core.X'
+    'foam.core.X',
+    'java.util.Collection'
   ],
-  
 
   properties: [
     {
@@ -235,11 +235,15 @@
     {
       name: 'canExecute',
       type: 'Boolean',
+      documentation: 'the purpose of the method is to check whether all rules within a group allow execution.' +
+      `Only if all rules in the group return true, RuleEngine starts execution each rule's action one by one.`,
       javaCode: `return true;`
     },
     {
       name: 'updateRule',
       type: 'foam.nanos.ruler.Rule',
+      documentation: 'since rules are stored as lists in the RulerDAO we use listeners to update them whenever ruleDAO is updated.' +
+      'the method provides logic for modifying already stored rule. If not overridden, the incoming rule will be stored in the list as it is.',
       args: [
         {
           name: 'rule',
@@ -248,6 +252,19 @@
       ],
       javaCode: `
       return rule;`
+    }
+  ],
+
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+        public static Rule findById(Collection<Rule> listRule, Long passedId) {
+          return listRule.stream().filter(rule -> passedId.equals(rule.getId())).findFirst().orElse(null);
+      }
+        `);
+      }
     }
   ]
 });
