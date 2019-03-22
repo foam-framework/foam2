@@ -3,14 +3,7 @@ foam.CLASS({
   name: 'CSVSink',
   extends: 'foam.dao.AbstractSink',
 
-  documentation: ``,
-
-  requires: [
-    'foam.core.FObject',
-    'foam.dao.AbstractSink',
-    'foam.lib.json.OutputterMode',
-    'foam.util.SafetyUtil'
-  ],
+  documentation: `Sink runs the csv outputter, and contains the resulting string in this.csv`,
 
   properties: [
     {
@@ -105,7 +98,6 @@ foam.CLASS({
     function reset() {
       ['csv', 'isNewLine', 'isHeadersOutput']
         .forEach( (s) => this.clearProperty(s) );
-      return this;
     }
   ]
 });
@@ -113,6 +105,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'PropertyCSVRefinement',
+
+  documentation: `Refinement on Properties to handle toCSV() and toCSVLabel().`,
 
   refines: 'foam.core.Property',
 
@@ -138,6 +132,9 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'FObjectPropertyCSVRefinement',
 
+  documentation: `Refinement on FObjects to override toCSV() and toCSVLabel().
+  Purpose is to output a dot annotated format, to handle the nested properties on the FObject.`,
+
   refines: 'foam.core.FObjectProperty',
 
   properties: [
@@ -145,7 +142,10 @@ foam.CLASS({
       name: 'toCSV',
       class: 'Function',
       value: function(obj, outputter, prop) {
-        if ( ! prop.of ) return; // TODO JSON
+        if ( ! prop.of ) {
+          outputter.output(obj ? obj[prop.name] : null);
+          return;
+        }
         prop.of.getAxiomsByClass(foam.core.Property)
           .forEach((axiom) => {
             axiom.toCSV(obj ? obj[prop.name] : null, outputter, axiom);
@@ -156,7 +156,11 @@ foam.CLASS({
       name: 'toCSVLabel',
       class: 'Function',
       value: function(outputter, prop) {
-        if ( ! prop.of ) return; // TODO JSON
+        if ( ! prop.of ) {
+          outputter.output(prop.name);
+          return;
+        }
+        // mini decorator
         var prefixedOutputter = {
           output: function(value) {
             outputter.output(`${prop.name}.${value}`);
