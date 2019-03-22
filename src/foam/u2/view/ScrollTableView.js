@@ -5,7 +5,7 @@
  */
 
 // TODO:
-//   [ ] Fix overlays.
+//   [x] Fix overlays.
 //   [x] Make the table header sticky.
 //   [x] Fix jump in scrollbar when tables are added/removed.
 //   [x] See if I can get it so that the DOM elements aren't removed and

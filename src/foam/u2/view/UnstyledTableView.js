@@ -27,6 +27,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'ctrl',
     'dblclick?',
     'editRecord?',
     'selection? as importSelection'
@@ -165,19 +166,10 @@ foam.CLASS({
       var view = this;
       var columnSelectionE;
 
-      this.
-        start('div', null, this.overlayOrigin$).
-          style({
-            float: 'right',
-            // Make sure the dropdown to edit the table columns is in the
-            // correct position.
-            transform: 'translate(-67px, 2px)'
-          }).
-          callIf(view.editColumnsEnabled, function() {
-            columnSelectionE = view.createColumnSelection();
-            this.add(columnSelectionE);
-          }).
-        end();
+      if ( this.editColumnsEnabled ) {
+        columnSelectionE = this.createColumnSelection();
+        this.ctrl.add(columnSelectionE);
+      }
 
       this.
         addClass(this.myClass()).
@@ -211,7 +203,7 @@ foam.CLASS({
                   callIf(view.editColumnsEnabled, function() {
                     this.addClass(view.myClass('th-editColumns')).
                     on('click', function(e) {
-                      columnSelectionE.open();
+                      columnSelectionE.open(e.clientX, e.clientY);
                     }).
                     add(' ', view.vertMenuIcon).
                     addClass(view.myClass('vertDots')).
@@ -301,7 +293,7 @@ foam.CLASS({
                             }).
                           end();
                       });
-                      this.add(overlay);
+                      view.ctrl.add(overlay);
                     }).
                     style({ 'text-align': 'right' }).
                     start('span').
@@ -310,7 +302,7 @@ foam.CLASS({
                       enableClass('disabled', actions.length === 0).
                       callIf(actions.length > 0, function() {
                         this.on('click', function(evt) {
-                          overlay.open();
+                          overlay.open(evt.clientX, evt.clientY);
                         });
                       }).
                       add(view.vertMenuIcon).
