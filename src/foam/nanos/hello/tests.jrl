@@ -1,0 +1,2 @@
+p({"class":"foam.nanos.hello.HelloTest","id":"HelloTest"})
+p({"class":"foam.nanos.test.Test","id":"HelloTestJS","server":false,"status":2,"code":"var hello = foam.nanos.hello.ClientHelloService.create({\n  delegate: foam.box.HTTPBox.create({\n    url: 'service/hello'\n  }, x)\n}, x);\nhello.hello().then(function(msg) { log(msg); });"})
