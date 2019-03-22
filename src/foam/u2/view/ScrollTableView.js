@@ -5,25 +5,20 @@
  */
 
 // TODO:
-//   [ ] Make sure all column widths are consistent. Only way to do this is to
-//       have one table and add rows, not have many tables.
-//         * <table>'s can have multiple <tbody>'s, so that's one option. The
-//           hard part about doing this is that we need each of the <tbody>'s
-//           to have a different DAO/data source. We could try to support
-//           multiple DAOs in a single table.
-//         * We could also sidestep the issue by using `table-layout: fixed` so
-//           the tables are indistinguishable from each other. This feels like
-//           too much of a constraint though.
+//   [ ] See if I can get it so that the DOM elements aren't removed and
+//       re-added when filtering. It would be nicer to just change the
+//       underlying DAO so you don't see the flicker.
 //   [ ] Fix overlays.
 //   [ ] Fix jump in scrollbar when tables are added/removed.
 //         * `position: absolute` would solve this perfectly if it weren't for
 //           the fact that the conainer wouldn't use the table to calculate its
 //           width anymore so it breaks the layout.
-//             * Note that using `table-layout: fixed` would solve this too.
+//             * Note that using `table-layout: fixed` would solve this.
 //         * Note that the jumping only happens when scrolling down, which is
 //           surprising. I'm not sure why that's the case, I'd expect it happen
 //           while scrolling either way.
 //   [ ] Make the table header sticky.
+//   [x] Make sure all column widths are consistent.
 //   [x] Handle when a user scrolls more than an entire page in one event.
 //   [x] Make sure table height isn't broken.
 //   [x] Make sure filtering didn't break.
@@ -138,7 +133,7 @@
       name: 'scrollHeight',
       expression: function(daoCount, limit, rowHeight) {
         this.refresh();
-        return rowHeight * daoCount /* + this.TABLE_HEAD_HEIGHT */ + 'px';
+        return rowHeight * daoCount + this.TABLE_HEAD_HEIGHT + 'px';
       }
     },
     {
@@ -237,36 +232,18 @@
               style({ height: this.spacerHeight_$ }).
             end().
             start(this.TableView, {
-              data$: this.initialPage1DAO_$,
+              data: this.initialPage1DAO_,
               columns: this.columns,
               contextMenuActions: this.contextMenuActions,
               selection$: this.selection$,
               editColumnsEnabled: this.editColumnsEnabled
-            }, this.topBufferTable_$).
-              addClass(this.myClass('table')).
-            end().
-            start(this.TableView, {
-              data$: this.initialPage2DAO_$,
-              columns: this.columns,
-              contextMenuActions: this.contextMenuActions,
-              selection$: this.selection$,
-              editColumnsEnabled: this.editColumnsEnabled,
-              showHeader: false
-            }, this.visibleTable_$).
-              addClass(this.myClass('table')).
-            end().
-            start(this.TableView, {
-              data$: this.initialPage3DAO_$,
-              columns: this.columns,
-              contextMenuActions: this.contextMenuActions,
-              selection$: this.selection$,
-              editColumnsEnabled: this.editColumnsEnabled,
-              showHeader: false
-            }, this.bottomBufferTable_$).
+            }, this.table_$).
               addClass(this.myClass('table')).
             end().
           end().
         end();
+
+      this.onDetach(this.onload.sub(this.addTbodies));
 
       this.onDetach(this.onload.sub(this.updateTableHeight));
       window.addEventListener('resize', this.updateTableHeight);
@@ -283,18 +260,23 @@
         this.currentUpperBound = this.pageSize * 3;
         this.tablesRemoved_ = 0;
 
-        if ( this.topBufferTable_ ) {
-          this.topBufferTable_.data = this.initialPage1DAO_;
-          this.topBufferTable_.showHeader = true;
-        }
+        // Remove all of the <tbody> elements.
+        if ( ! this.table_ ) return;
 
-        if ( this.visibleTable_ ) {
-          this.visibleTable_.data = this.initialPage2DAO_;
-        }
+        this.table_.childNodes
+          .filter((x) => x.nodeName === 'TBODY')
+          .forEach((x) => x.remove());
 
-        if ( this.bottomBufferTable_ ) {
-          this.bottomBufferTable_.data = this.initialPage3DAO_;
-        }
+        // Re-add them.
+        this.table_.add(this.table_.rowsFrom(this.initialPage1DAO_));
+        this.table_.add(this.table_.rowsFrom(this.initialPage2DAO_));
+        this.table_.add(this.table_.rowsFrom(this.initialPage3DAO_));
+
+        // Update references.
+        var tbodies = this.table_.childNodes.filter((x) => x.nodeName === 'TBODY');
+        this.topBufferTable_ = tbodies[0];
+        this.visibleTable_ = tbodies[1];
+        this.bottomBufferTable_ = tbodies[2];
       }
     },
     {
@@ -315,16 +297,11 @@
         this.visibleTable_   = this.bottomBufferTable_;
 
         // Add a new bottom buffer table.
-        this.tablesContainer_.start(this.TableView, {
-          data: this.data.skip(this.currentUpperBound - this.pageSize).limit(this.pageSize),
-          columns: this.columns,
-          contextMenuActions: this.contextMenuActions,
-          selection$: this.selection$,
-          editColumnsEnabled: this.editColumnsEnabled,
-          showHeader: false
-        }, this.bottomBufferTable_$).
-          addClass(this.myClass('table')).
-        end();
+        var rows = this.table_.rowsFrom(this.data.skip(this.currentUpperBound - this.pageSize).limit(this.pageSize));
+        this.table_.add(rows);
+        this.bottomBufferTable_ = this.table_.childNodes
+          .filter((x) => x.nodeName === 'TBODY')
+          .pop();
       }
     },
     {
@@ -345,18 +322,11 @@
         this.visibleTable_      = this.topBufferTable_;
 
         // Add a new top buffer table.
-        var table = this.TableView.create({
-          data: this.data.skip(this.currentLowerBound).limit(this.pageSize),
-          columns: this.columns,
-          contextMenuActions: this.contextMenuActions,
-          selection$: this.selection$,
-          editColumnsEnabled: this.editColumnsEnabled,
-          showHeader: this.currentLowerBound === 0 // To make sure the header is shown for the top table.
-        });
-        table.addClass(this.myClass('table'));
-        this.topBufferTable_ = table;
-
-        this.tablesContainer_.insertAfter(table, this.spacer_);
+        var rows = this.table_.rowsFrom(this.data.skip(this.currentLowerBound).limit(this.pageSize));
+        this.table_.insertBefore(this.table_.slotE_(rows), this.visibleTable_);
+        this.topBufferTable_ = this.table_.childNodes
+          .filter((x) => x.nodeName === 'TBODY')
+          .shift();
       }
     }
   ],
@@ -400,6 +370,7 @@
         var self = this;
         this.data$proxy.select(this.Count.create()).then(function(s) {
           self.daoCount = s.value;
+          self.refresh();
         });
       }
     },
@@ -407,7 +378,7 @@
       name: 'updateTableHeight',
       code: function() {
         // Find the distance from the top of the table to the top of the screen.
-        var distanceFromTop = this.bottomBufferTable_.el().getBoundingClientRect().y;
+        var distanceFromTop = this.table_.el().getBoundingClientRect().y;
 
         // Calculate the remaining space we have to make use of.
         var remainingSpace = window.innerHeight - distanceFromTop;
@@ -417,6 +388,17 @@
         remainingSpace -= 44;
 
         this.scrollbarContainer_.style({ height: `${remainingSpace}px` });
+      }
+    },
+    {
+      name: 'addTbodies',
+      code: function() {
+        this.table_.add(this.table_.rowsFrom(this.initialPage2DAO_));
+        this.table_.add(this.table_.rowsFrom(this.initialPage3DAO_));
+        var tbodies = this.table_.childNodes.filter((x) => x.nodeName === 'TBODY');
+        this.topBufferTable_ = tbodies[0];
+        this.visibleTable_ = tbodies[1];
+        this.bottomBufferTable_ = tbodies[2];
       }
     }
   ]
