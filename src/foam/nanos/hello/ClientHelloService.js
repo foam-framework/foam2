@@ -17,12 +17,6 @@ foam.CLASS({
       class: 'Stub',
       name: 'delegate',
       of: 'foam.nanos.hello.HelloService'
-    //   factory: function() {
-    //     return this.HTTPBox.create({
-    //       method: 'POST',
-    //       url: this.serviceName
-    //     });
-    //   },
     }
   ]
 });
