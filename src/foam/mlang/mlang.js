@@ -453,7 +453,13 @@ foam.CLASS({
 
     if ( prop.getPermissionRequired() ) {
       AuthService auth = (AuthService) x.get("auth");
-      return auth.check(x, prop.getClassInfo().getObjClass().getSimpleName() + ".rw." + prop.getName()) || auth.check(x, prop.getClassInfo().getObjClass().getSimpleName() + ".ro." + prop.getName());
+      String permission =
+        prop.getClassInfo().getObjClass().getSimpleName().toLowerCase() +
+        ".%s." +
+        prop.getName().toLowerCase();
+
+      return auth.check(x, String.format(permission, "rw"))
+        || auth.check(x, String.format(permission, "ro"));
     }
   }
 
