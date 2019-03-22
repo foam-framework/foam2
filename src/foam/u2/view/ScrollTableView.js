@@ -5,9 +5,6 @@
  */
 
 // TODO:
-//   [ ] See if I can get it so that the DOM elements aren't removed and
-//       re-added when filtering. It would be nicer to just change the
-//       underlying DAO so you don't see the flicker.
 //   [ ] Fix overlays.
 //   [ ] Fix jump in scrollbar when tables are added/removed.
 //         * `position: absolute` would solve this perfectly if it weren't for
@@ -18,6 +15,9 @@
 //           surprising. I'm not sure why that's the case, I'd expect it happen
 //           while scrolling either way.
 //   [ ] Make the table header sticky.
+//   [x] See if I can get it so that the DOM elements aren't removed and
+//       re-added when filtering. It would be nicer to just change the
+//       underlying DAO so you don't see the flicker.
 //   [x] Make sure all column widths are consistent.
 //   [x] Handle when a user scrolls more than an entire page in one event.
 //   [x] Make sure table height isn't broken.
@@ -163,6 +163,27 @@
       }
     },
     {
+      class: 'foam.dao.DAOProperty',
+      name: 'page1DAO_',
+      factory: function() {
+        return this.initialPage1DAO_;
+      }
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'page2DAO_',
+      factory: function() {
+        return this.initialPage2DAO_;
+      }
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'page3DAO_',
+      factory: function() {
+        return this.initialPage3DAO_;
+      }
+    },
+    {
       type: 'Int',
       name: 'currentLowerBound',
       value: 0
@@ -226,7 +247,7 @@
               style({ height: this.spacerHeight_$ }).
             end().
             start(this.TableView, {
-              data: this.initialPage1DAO_,
+              data: this.page1DAO_$proxy,
               columns: this.columns,
               contextMenuActions: this.contextMenuActions,
               selection$: this.selection$,
@@ -253,24 +274,9 @@
         this.currentLowerBound = 0;
         this.currentUpperBound = this.pageSize * 3;
         this.tablesRemoved_ = 0;
-
-        // Remove all of the <tbody> elements.
-        if ( ! this.table_ ) return;
-
-        this.table_.childNodes
-          .filter((x) => x.nodeName === 'TBODY')
-          .forEach((x) => x.remove());
-
-        // Re-add them.
-        this.table_.add(this.table_.rowsFrom(this.initialPage1DAO_));
-        this.table_.add(this.table_.rowsFrom(this.initialPage2DAO_));
-        this.table_.add(this.table_.rowsFrom(this.initialPage3DAO_));
-
-        // Update references.
-        var tbodies = this.table_.childNodes.filter((x) => x.nodeName === 'TBODY');
-        this.topBufferTable_ = tbodies[0];
-        this.visibleTable_ = tbodies[1];
-        this.bottomBufferTable_ = tbodies[2];
+        this.page1DAO_ = this.initialPage1DAO_;
+        this.page2DAO_ = this.initialPage2DAO_;
+        this.page3DAO_ = this.initialPage3DAO_;
       }
     },
     {
@@ -291,7 +297,9 @@
         this.visibleTable_   = this.bottomBufferTable_;
 
         // Add a new bottom buffer table.
-        var rows = this.table_.rowsFrom(this.data.skip(this.currentUpperBound - this.pageSize).limit(this.pageSize));
+        var daoName = ['page1DAO_', 'page2DAO_', 'page3DAO_'][this.tablesRemoved_ % 3];
+        this[daoName] = this.data.skip(this.currentUpperBound - this.pageSize).limit(this.pageSize);
+        var rows = this.table_.rowsFrom(this[daoName + '$proxy']);
         this.table_.add(rows);
         this.bottomBufferTable_ = this.table_.childNodes
           .filter((x) => x.nodeName === 'TBODY')
@@ -316,7 +324,9 @@
         this.visibleTable_      = this.topBufferTable_;
 
         // Add a new top buffer table.
-        var rows = this.table_.rowsFrom(this.data.skip(this.currentLowerBound).limit(this.pageSize));
+        var daoName = ['page1DAO_', 'page2DAO_', 'page3DAO_'][this.tablesRemoved_ % 3];
+        this[daoName] = this.data.skip(this.currentLowerBound).limit(this.pageSize);
+        var rows = this.table_.rowsFrom(this[daoName + '$proxy']);
         this.table_.insertBefore(this.table_.slotE_(rows), this.visibleTable_);
         this.topBufferTable_ = this.table_.childNodes
           .filter((x) => x.nodeName === 'TBODY')
@@ -387,8 +397,8 @@
     {
       name: 'addTbodies',
       code: function() {
-        this.table_.add(this.table_.rowsFrom(this.initialPage2DAO_));
-        this.table_.add(this.table_.rowsFrom(this.initialPage3DAO_));
+        this.table_.add(this.table_.rowsFrom(this.page2DAO_$proxy));
+        this.table_.add(this.table_.rowsFrom(this.page3DAO_$proxy));
         var tbodies = this.table_.childNodes.filter((x) => x.nodeName === 'TBODY');
         this.topBufferTable_ = tbodies[0];
         this.visibleTable_ = tbodies[1];
