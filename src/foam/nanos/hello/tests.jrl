@@ -1,2 +1,2 @@
 p({"class":"foam.nanos.hello.HelloTest","id":"HelloTest"})
-p({"class":"foam.nanos.test.Test","id":"HelloTestJS","server":false,"status":2,"code":"var hello = foam.nanos.hello.ClientHelloService.create({\ndelegate: foam.box.HTTPBox.create({\nurl: 'service/hello'\n}, x)\n}, x);\nhello.hello(\"JS\").then(function(msg) { foam.assert(msg === (\"helloJS\"), \"ClientHelloService succeed\") });"})
+p({"class":"foam.nanos.test.Test","id":"HelloTestJS","server":false,"status":2,"code":"var hello = foam.nanos.hello.ClientHelloService.create({\ndelegate: foam.box.HTTPBox.create({\nurl: 'service/hello'\n}, x)\n}, x);\nhello.hello(\"JS\").then(function(msg) { test(msg === (\"helloJS\"), \"ClientHelloService JS\") });"})
