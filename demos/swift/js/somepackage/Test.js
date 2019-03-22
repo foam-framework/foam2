@@ -131,7 +131,7 @@ myListener()
       ],
       code: function() {},
       swiftCode: function() {/*
-return String(format: type(of: self).greeting, name, "LASTNAME")
+return String(format: type(of: self).greeting, name!, "LASTNAME")
       */},
     }
   ],

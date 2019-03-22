@@ -23,8 +23,6 @@ foam.CLASS({
     table.foam-u2-view-TableView {
       border-collapse: collapse;
       border-style: hidden;
-      margin: auto;
-      width: 962px;
     }
     .foam-u2-view-TableView thead > tr > th {
       color: #2b2b2b;

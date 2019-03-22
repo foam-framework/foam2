@@ -523,7 +523,7 @@ foam.CLASS({
   listeners: [
     {
       name: 'paint',
-      isMerged: 100,
+      isFramed: true,
       code: function() {
         var batch = ++this.batch;
         var self = this;
