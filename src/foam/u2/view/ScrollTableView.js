@@ -6,7 +6,7 @@
 
 // TODO:
 //   [ ] Fix overlays.
-//   [ ] Make the table header sticky.
+//   [x] Make the table header sticky.
 //   [x] Fix jump in scrollbar when tables are added/removed.
 //   [x] See if I can get it so that the DOM elements aren't removed and
 //       re-added when filtering. It would be nicer to just change the
@@ -45,6 +45,12 @@
       overflow: scroll;
       display: grid;
       grid-template-columns: auto auto;
+    }
+
+    ^ th {
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
     }
   `,
 
