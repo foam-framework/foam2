@@ -14,6 +14,7 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.dao.ProxyDAO',
     'foam.u2.md.OverlayDropdown',
     'foam.u2.view.EditColumnsView',
     'foam.u2.tag.Image'
@@ -41,13 +42,6 @@ foam.CLASS({
       name: 'data',
       postSet: function(_, data) {
         if ( ! this.of && data ) this.of = data.of;
-      }
-    },
-    {
-      class: 'foam.dao.DAOProperty',
-      name: 'orderedDAO',
-      expression: function(data, order) {
-        return data ? data.orderBy(order) : foam.dao.NullDAO.create();
       }
     },
     {
@@ -227,89 +221,105 @@ foam.CLASS({
                 end();
               });
           })).
-          add(this.slot(function(columns_) {
-            return this.
-              E('tbody').
-              select(this.orderedDAO$proxy, function(obj) {
-                return this.E('tr').
-                  on('mouseover', function() { view.hoverSelection = obj; }).
-                  callIf(view.dblclick && ! view.disableUserSelection, function() {
-                    this.on('dblclick', function() {
-                      view.dblclick && view.dblclick(obj);
-                    });
-                  }).
-                  callIf( ! view.disableUserSelection, function() {
-                    this.on('click', function(evt) {
-                      // If we're clicking somewhere to close the context menu,
-                      // don't do anything.
-                      if (
-                        evt.target.nodeName === 'DROPDOWN-OVERLAY' ||
-                        evt.target.classList.contains(view.myClass('vertDots'))
-                      ) return;
+        end().
+        add(this.rowsFrom(this.data));
+    },
+    {
+      name: 'rowsFrom',
+      code: function(dao) {
+        var view = this;
+        return this.slot(function(columns_) {
+          // Make sure the DAO set here responds to ordering when a user clicks
+          // on a table column header to sort by that column.
+          if ( this.order ) dao = dao.orderBy(this.order);
+          var proxy = view.ProxyDAO.create({ delegate: dao });
+          view.sub('propertyChange', 'order', function(_, __, ___, s) {
+            proxy.delegate = dao.orderBy(s.get());
+          });
 
-                      view.selection = obj;
-                      if ( view.importSelection$ ) view.importSelection = obj;
-                      if ( view.editRecord$ ) view.editRecord(obj);
-                    });
-                  }).
-                  addClass(view.slot(function(selection) {
-                    return selection && foam.util.equals(obj.id, selection.id) ?
-                        view.myClass('selected') : '';
-                  })).
-                  addClass(view.myClass('row')).
-                  forEach(columns_, function(column) {
-                    this.
-                      start('td').
-                        callOn(column.tableCellFormatter, 'format', [
-                          column.f ? column.f(obj) : null, obj, column
-                        ]).
-                      end();
-                  }).
-                  call(function() {
-                    var modelActions = view.of.getAxiomsByClass(foam.core.Action);
-                    var allActions = Array.isArray(view.contextMenuActions) ?
-                      view.contextMenuActions.concat(modelActions) :
-                      modelActions;
-                    var actions = allActions.filter(function(action) {
-                      return action.isAvailableFor(obj);
-                    });
-                    var overlay = view.OverlayDropdown.create();
-                    return this.start('td').
-                      callIf(actions.length > 0, function() {
-                        overlay.forEach(actions, function(action) {
-                          this.
-                            start().
-                              addClass(view.myClass('context-menu-item')).
-                              add(action.label).
-                              call(async function() {
-                                if ( await action.isEnabledFor(obj) ) {
-                                  this.on('click', function(evt) {
-                                    action.maybeCall(view.__subContext__, obj);
-                                  });
-                                } else {
-                                  this.addClass('disabled');
-                                }
-                              }).
-                            end();
-                        });
-                        this.add(overlay);
-                      }).
-                      style({ 'text-align': 'right' }).
-                      start('span').
-                        addClass(view.myClass('vertDots')).
-                        addClass(view.myClass('noselect')).
-                        enableClass('disabled', actions.length === 0).
-                        callIf(actions.length > 0, function() {
-                          this.on('click', function(evt) {
-                            overlay.open();
-                          });
-                        }).
-                        add(view.vertMenuIcon).
-                      end().
-                    end();
+          return this.
+            E('tbody').
+            select(proxy, function(obj) {
+              return this.E('tr').
+                on('mouseover', function() { view.hoverSelection = obj; }).
+                callIf(view.dblclick && ! view.disableUserSelection, function() {
+                  this.on('dblclick', function() {
+                    view.dblclick && view.dblclick(obj);
                   });
-              });
-          }));
+                }).
+                callIf( ! view.disableUserSelection, function() {
+                  this.on('click', function(evt) {
+                    // If we're clicking somewhere to close the context menu,
+                    // don't do anything.
+                    if (
+                      evt.target.nodeName === 'DROPDOWN-OVERLAY' ||
+                      evt.target.classList.contains(view.myClass('vertDots'))
+                    ) return;
+
+                    view.selection = obj;
+                    if ( view.importSelection$ ) view.importSelection = obj;
+                    if ( view.editRecord$ ) view.editRecord(obj);
+                  });
+                }).
+                addClass(view.slot(function(selection) {
+                  return selection && foam.util.equals(obj.id, selection.id) ?
+                      view.myClass('selected') : '';
+                })).
+                addClass(view.myClass('row')).
+                forEach(columns_, function(column) {
+                  this.
+                    start('td').
+                      callOn(column.tableCellFormatter, 'format', [
+                        column.f ? column.f(obj) : null, obj, column
+                      ]).
+                    end();
+                }).
+                call(function() {
+                  var modelActions = view.of.getAxiomsByClass(foam.core.Action);
+                  var allActions = Array.isArray(view.contextMenuActions) ?
+                    view.contextMenuActions.concat(modelActions) :
+                    modelActions;
+                  var actions = allActions.filter(function(action) {
+                    return action.isAvailableFor(obj);
+                  });
+                  var overlay = view.OverlayDropdown.create();
+                  return this.start('td').
+                    callIf(actions.length > 0, function() {
+                      overlay.forEach(actions, function(action) {
+                        this.
+                          start().
+                            addClass(view.myClass('context-menu-item')).
+                            add(action.label).
+                            call(async function() {
+                              if ( await action.isEnabledFor(obj) ) {
+                                this.on('click', function(evt) {
+                                  action.maybeCall(view.__subContext__, obj);
+                                });
+                              } else {
+                                this.addClass('disabled');
+                              }
+                            }).
+                          end();
+                      });
+                      this.add(overlay);
+                    }).
+                    style({ 'text-align': 'right' }).
+                    start('span').
+                      addClass(view.myClass('vertDots')).
+                      addClass(view.myClass('noselect')).
+                      enableClass('disabled', actions.length === 0).
+                      callIf(actions.length > 0, function() {
+                        this.on('click', function(evt) {
+                          overlay.open();
+                        });
+                      }).
+                      add(view.vertMenuIcon).
+                    end().
+                  end();
+                });
+            });
+        });
+      }
     }
   ]
 });
