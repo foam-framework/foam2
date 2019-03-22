@@ -481,7 +481,7 @@ return delegate;
         });
         dao.syncRecordDAO = foam.dao.EasyDAO.create({
           of: dao.SyncRecord,
-          cacheType: true,
+          cacheType: 'FULL',
           daoType: this.daoType,
           name: this.name + '_SyncRecords'
         });
