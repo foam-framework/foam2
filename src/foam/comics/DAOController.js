@@ -91,8 +91,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'exportCSVEnabled',
-      documentation: 'True to enable export csv button',
-      value: true
+      documentation: 'True to enable export csv button'
     },
     {
       class: 'Boolean',

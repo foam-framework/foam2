@@ -31,6 +31,8 @@ foam.CLASS({
     function exportDAO(X, dao) {
       var sink = this.CSVSink.create();
       sink.reset();
+      // passing in our CSVSink runs our CSV outputter and
+      // s.csv is accessing our csv property string.
       return dao.select(sink).then( (s) => s.csv);
     }
   ]
