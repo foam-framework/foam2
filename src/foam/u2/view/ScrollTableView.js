@@ -4,21 +4,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-// TODO:
-//   [x] Fix overlays.
-//   [x] Make the table header sticky.
-//   [x] Fix jump in scrollbar when tables are added/removed.
-//   [x] See if I can get it so that the DOM elements aren't removed and
-//       re-added when filtering. It would be nicer to just change the
-//       underlying DAO so you don't see the flicker.
-//   [x] Make sure all column widths are consistent.
-//   [x] Handle when a user scrolls more than an entire page in one event.
-//   [x] Make sure table height isn't broken.
-//   [x] Make sure filtering didn't break.
-//   [x] Make sure sorting didn't break.
-//   [x] Fix bug where table header is gone if you scroll back up after it was
-//       removed when previously scrolling down far enough for it to be removed.
-
  foam.CLASS({
   package: 'foam.u2.view',
   name: 'ScrollTableView',
@@ -71,7 +56,6 @@
       class: 'Int',
       name: 'limit',
       value: 18,
-      // TODO make this a funciton of the height.
     },
     {
       class: 'Int',
