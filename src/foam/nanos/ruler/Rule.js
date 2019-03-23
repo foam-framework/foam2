@@ -80,6 +80,7 @@
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'predicate',
+      storageTransient: true,
       javaFactory: `
       return foam.mlang.MLang.TRUE;
       `,
@@ -90,6 +91,7 @@
       class: 'FObjectProperty',
       of: 'foam.nanos.ruler.RuleAction',
       name: 'action',
+      storageTransient: true,
       javaFactory: `
       return new RuleAction() {
         @Override
@@ -100,6 +102,7 @@
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.ruler.RuleAction',
+      storageTransient: true,
       name: 'asyncAction',
       javaFactory: `
       return new RuleAction() {
@@ -233,11 +236,19 @@
       `
     },
     {
-      name: 'canExecute',
-      type: 'Boolean',
-      documentation: 'the purpose of the method is to check whether all rules within a group allow execution.' +
-      `Only if all rules in the group return true, RuleEngine starts execution each rule's action one by one.`,
-      javaCode: `return true;`
+      name: 'reverseAction',
+      args: [
+        {
+          name: 'obj',
+          type: 'foam.core.FObject'
+        },
+        {
+          name: 'x',
+          type: 'foam.core.X'
+        }
+      ],
+      documentation: 'if one of the rules in a group throws an exception we need a way to reverse actions for previously executed rules.',
+      javaCode: ` `
     },
     {
       name: 'updateRule',
