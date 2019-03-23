@@ -104,7 +104,7 @@ FOAM_FILES([
   { name: "foam/nanos/mrac/ClusterDAO" },
   // { name: "foam/nanos/mrac/ClusterClientDAO" },
   { name: "foam/nanos/mrac/ClusterConfig" },
-  { name: "foam/nanos/mrac/ClusterRequest" },
+  { name: "foam/nanos/mrac/ClusterCommand" },
   //  { name: "foam/nanos/mrac/ClusterResponse" },
   { name: "foam/nanos/mrac/ClusterServerDAO" },
   { name: "foam/nanos/mrac/NodeType" },

@@ -224,7 +224,7 @@ var classes = [
   'foam.nanos.mrac.ClusterConfig',
   // 'foam.nanos.mrac.ClusterClientDAO',
   'foam.nanos.mrac.ClusterDAO',
-  'foam.nanos.mrac.ClusterRequest',
+  'foam.nanos.mrac.ClusterCommand',
   // 'foam.nanos.mrac.ClusterResponse',
   'foam.nanos.mrac.ClusterServerDAO',
   'foam.nanos.mrac.NodeType',

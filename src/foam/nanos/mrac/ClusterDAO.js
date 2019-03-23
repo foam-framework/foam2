@@ -139,7 +139,7 @@ foam.CLASS({
       foam.core.FObject o = getDelegate().put_(x, obj);
       for ( DAO client : getClients() ) {
         // client.put(o);
-        client.cmd_(x, new ClusterRequest(x, "PUT", o));
+        client.cmd_(x, new ClusterCommand(x, "PUT", o));
       }
       return o;
      `
@@ -160,7 +160,7 @@ foam.CLASS({
       foam.core.FObject o = getDelegate().remove_(x, obj);
       for ( DAO client : getClients() ) {
         // client.put(o);
-        client.cmd_(x, new ClusterRequest(x, "REMOVE", o));
+        client.cmd_(x, new ClusterCommand(x, "REMOVE", o));
       }
       return o;
      `
@@ -168,8 +168,8 @@ foam.CLASS({
     {
       name: 'cmd_',
       javaCode: `
-      if ( obj instanceof ClusterRequest ) {
-        ClusterRequest request = (ClusterRequest) obj;
+      if ( obj instanceof ClusterCommand ) {
+        ClusterCommand request = (ClusterCommand) obj;
         Logger logger = (Logger) getX().get("logger");
         logger.debug(this.getClass().getSimpleName(), "cmd_", request);
         if ( "put".equals(request.getCmd()) ) {

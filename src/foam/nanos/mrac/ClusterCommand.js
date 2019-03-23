@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.mrac',
-  name: 'ClusterRequest',
+  name: 'ClusterCommand',
 
   documentation: ``,
 
