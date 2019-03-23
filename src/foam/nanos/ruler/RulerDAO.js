@@ -224,11 +224,27 @@ ruleDAO.listen(new AbstractSink() {
             rules.add(obj);
           }
         } else {
-          ArraySink sink = new ArraySink();
-          sink.put(obj, sub);
           group.putInGroup_(sub, ruleGroup, obj);
         }
-        break;
+      }
+    }
+  }
+  
+  @Override
+  public void remove(Object obj, Detachable sub) {
+    Map hm = getHm();
+    Rule rule = (Rule) obj;
+    String ruleGroup = rule.getRuleGroup();
+    for ( Object key : hm.keySet() ) {
+      if ( ((Predicate) key).f(obj) ) {
+        GroupBy group = (GroupBy) hm.get(key);
+        if ( group.getGroupKeys().contains(ruleGroup) ) {
+          ArrayList rules = (ArrayList) ((ArraySink)group.getGroups().get(ruleGroup)).getArray();
+          Rule foundRule = Rule.findById(rules, rule.getId());
+          if ( foundRule != null ) {
+            rules.remove(foundRule);
+          }
+        }
       }
     }
   }

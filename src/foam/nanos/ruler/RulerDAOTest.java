@@ -98,10 +98,19 @@ public class RulerDAOTest extends Test {
     user1 = new User();
     user1.setId(12);
     user1.setFirstName("Kristina");
+    user1.setLastName("Smir");
     user1.setEmail("nanos@nanos.net");
     user1 = (User) userDAO.put_(x, user1).fclone();
     test(user1.getEmail().equals("nanos@nanos.net"), "new rule stops execution of others within `userDAO email filter` group. " +
     " Email is not upated");
+    test(user1.getLastName().equals("Smirnova"), "Last name was updated based on the rule4 from a different group");
+
+    ruleDAO.remove_(x, rule4);
+    ruleDAO.remove_(x, rule5);
+
+    user1.setLastName("foam");
+    user1 = (User) userDAO.put_(x, user1).fclone();
+    test(user1.getLastName().equals("foam"), "Last name is not updated after rules were removed");
   }
 
   public void createRule(X x) {
@@ -228,8 +237,6 @@ public class RulerDAOTest extends Test {
     ruleDAO.remove_(x, rule1);
     ruleDAO.remove_(x, rule2);
     ruleDAO.remove_(x, rule3);
-    ruleDAO.remove_(x, rule4);
-    ruleDAO.remove_(x, rule5);
     ruleDAO.remove_(x, rule6);
     ruleDAO.remove_(x, rule7);
     userDAO.remove_(x, user1);
