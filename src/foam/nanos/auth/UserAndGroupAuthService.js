@@ -21,14 +21,14 @@ foam.CLASS({
   flags: ['java'],
 
   implements: [
-    'foam.nanos.NanoService',
-    'foam.nanos.auth.AuthService'
+    'foam.nanos.auth.AuthService',
+    'foam.nanos.NanoService'
   ],
 
   imports: [
-    'localUserDAO',
     'localGroupDAO',
-    'localSessionDAO'
+    'localSessionDAO',
+    'localUserDAO'
   ],
 
   javaImports: [
@@ -45,25 +45,14 @@ foam.CLASS({
     'foam.util.Password',
     'foam.util.SafetyUtil',
 
-    'javax.security.auth.AuthPermission',
     'java.security.Permission',
     'java.util.Calendar',
     'java.util.List',
     'java.util.regex.Pattern',
+    'javax.security.auth.AuthPermission',
 
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ'
-  ],
-
-  axioms: [
-    {
-      name: 'javaExtras',
-      buildJavaClass: function(cls) {
-        cls.extras.push(`
-          public final static String CHECK_USER_PERMISSION = "service.auth.checkUser";
-        `);
-      }
-    }
   ],
 
   constants: [
@@ -76,6 +65,11 @@ foam.CLASS({
       name: 'PASSWORD_VALIDATION_ERROR_MESSAGE',
       type: 'String',
       value: 'Password must be at least 6 characters long.'
+    },
+    {
+      name: 'CHECK_USER_PERMISSION',
+      type: 'String',
+      value: 'service.auth.checkUser'
     }
   ],
 
@@ -100,22 +94,10 @@ foam.CLASS({
   methods: [
     {
       name: 'start',
-      javaCode: `
-        getUserDAO();
-        getGroupDAO();
-        getSessionDAO();
-      `
+      javaCode: '// nothing here'
     },
     {
       name: 'getCurrentUser',
-      type: 'foam.nanos.auth.User',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      javaThrows: ['foam.nanos.auth.AuthenticationException'],
       javaCode: `
         // fetch context and check if not null or user id is 0
         Session session = x.get(Session.class);
@@ -157,14 +139,6 @@ foam.CLASS({
       name: 'generateChallenge',
       documentation: `A challenge is generated from the userID provided. This is
         saved in a LinkedHashMap with TTL of 5.`,
-      type: 'String',
-      args: [
-        {
-          class: 'Long',
-          name: 'userID'
-        }
-      ],
-      javaThrows: ['foam.nanos.auth.AuthenticationException'],
       javaCode: `
         throw new UnsupportedOperationException("Unsupported operation: generateChallenge");
       `
@@ -175,22 +149,6 @@ foam.CLASS({
         supplied is correct and the TTL is still valid.
 
         How often should we purge this map for challenges that have expired?`,
-      type: 'foam.nanos.auth.User',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'userID',
-          type: 'Long'
-        },
-        {
-          name: 'challenge',
-          type: 'String'
-        }
-      ],
-      javaThrows: ['foam.nanos.auth.AuthenticationException'],
       javaCode: `
         throw new UnsupportedOperationException("Unsupported operation: challengedLogin");
       `
@@ -255,48 +213,16 @@ foam.CLASS({
       name: 'login',
       documentation: `Login a user by the id provided, validate the password and
         return the user in the context`,
-      type: 'foam.nanos.auth.User',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'userID',
-          type: 'Long'
-        },
-        {
-          name: 'password',
-          type: 'String'
-        }
-      ],
-      javaThrows: ['foam.nanos.auth.AuthenticationException'],
       javaCode: `
-        if ( userID < 1 || SafetyUtil.isEmpty(password) ) {
+        if ( userId < 1 || SafetyUtil.isEmpty(password) ) {
           throw new AuthenticationException("Invalid Parameters");
         }
 
-        return userAndGroupContext(x, (User) userDAO_.find(userID), password);
+        return userAndGroupContext(x, (User) userDAO_.find(userId), password);
       `
     },
     {
       name: 'loginByEmail',
-      type: 'foam.nanos.auth.User',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'email',
-          type: 'String'
-        },
-        {
-          name: 'password',
-          type: 'String'
-        }
-      ],
-      javaThrows: ['foam.nanos.auth.AuthenticationException'],
       javaCode: `
         User user = (User) userDAO_.find(
           AND(
@@ -316,21 +242,6 @@ foam.CLASS({
       documentation: `Checks if the user passed into the method has the passed
         in permission attributed to it by checking their group. No check on User
         and group enabled flags.`,
-      type: 'boolean',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'user',
-          type: 'foam.nanos.auth.User'
-        },
-        {
-          name: 'permission',
-          type: 'java.security.Permission'
-        }
-      ],
       javaCode: `
         // check whether user has permission to check user permissions
         if ( ! check(x, CHECK_USER_PERMISSION) ) throw new AuthorizationException();
@@ -362,17 +273,6 @@ foam.CLASS({
       name: 'checkPermission',
       documentation: `Check if the user in the context supplied has the right
         permission.`,
-      type: 'Boolean',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'permission',
-          type: 'java.security.Permission'
-        }
-      ],
       javaCode: `
         if ( x == null || permission == null ) return false;
 
@@ -418,52 +318,20 @@ foam.CLASS({
     },
     {
       name: 'check',
-      type: 'Boolean',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'permission',
-          type: 'String'
-        }
-      ],
       javaCode: `
         return checkPermission(x, new AuthPermission(permission));
       `
     },
     {
       name: 'validatePassword',
-      args: [
-        {
-          name: 'newPassword',
-          type: 'String'
-        }
-      ],
       javaCode: `
-        if ( SafetyUtil.isEmpty(newPassword) || ! (Pattern.compile(PASSWORD_VALIDATE_REGEX)).matcher(newPassword).matches() ) {
+        if ( SafetyUtil.isEmpty(potentialPassword) || ! (Pattern.compile(PASSWORD_VALIDATE_REGEX)).matcher(potentialPassword).matches() ) {
           throw new RuntimeException(PASSWORD_VALIDATION_ERROR_MESSAGE);
         }
       `
     },
     {
       name: 'checkUser',
-      type: 'Boolean',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'user',
-          type: 'foam.nanos.auth.User'
-        },
-        {
-          name: 'permission',
-          type: 'String'
-        }
-      ],
       javaCode: `
         return checkUserPermission(x, user, new AuthPermission(permission));
       `
@@ -472,22 +340,6 @@ foam.CLASS({
       name: 'updatePassword',
       documentation: `Given a context with a user, validate the password to be
         updated and return a context with the updated user information.`,
-      type: 'foam.nanos.auth.User',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'oldPassword',
-          type: 'String'
-        },
-        {
-          name: 'newPassword',
-          type: 'String'
-        }
-      ],
-      javaThrows: ['foam.nanos.auth.AuthenticationException'],
       javaCode: `
         if ( x == null || SafetyUtil.isEmpty(oldPassword) || SafetyUtil.isEmpty(newPassword) ) {
           throw new RuntimeException("Password fields cannot be blank");
@@ -549,17 +401,6 @@ foam.CLASS({
       documentation: `Used to validate properties of a user. This will be called
         on registration of users. Will mainly be used as a veto method. Users
         should have id, email, first name, last name, password for registration`,
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'user',
-          type: 'foam.nanos.auth.User'
-        },
-      ],
-      javaThrows: ['foam.nanos.auth.AuthenticationException'],
       javaCode: `
         if ( user == null ) {
           throw new AuthenticationException("Invalid User");
@@ -592,12 +433,6 @@ foam.CLASS({
       name: 'logout',
       documentation: `Just return a null user for now. Not sure how to handle
         the cleanup of the current context.`,
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
       javaCode: `
         Session session = x.get(Session.class);
         if ( session != null && session.getUserId() != 0 ) {
