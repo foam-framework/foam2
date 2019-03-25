@@ -149,6 +149,17 @@ foam.INTERFACE({
     {
       name: 'partialEval',
       type: 'foam.mlang.Expr'
+    },
+    {
+      name: 'authorize',
+      flags: [ 'java' ],
+      type: 'Void',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ]
     }
   ]
 });
@@ -292,21 +303,6 @@ foam.INTERFACE({
           type: 'Context'
         }
       ]
-    },
-    {
-      name: 'authorizeArg',
-      flags: [ 'java' ],
-      type: 'Void',
-      args:[
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'arg',
-          type: 'foam.mlang.Expr'
-        }
-      ]
     }
   ]
 });
@@ -442,30 +438,6 @@ foam.CLASS({
     {
       name: 'authorize',
       javaCode: `//noop`
-    },
-    {
-      name: 'authorizeArg',
-      javaCode: `
-  if ( arg instanceof foam.core.PropertyInfo ) {
-    foam.core.PropertyInfo prop =  (foam.core.PropertyInfo) arg;
-
-    if ( prop.getPermissionRequired() ) {
-      AuthService auth = (AuthService) x.get("auth");
-      String simpleName = prop.getClassInfo().getObjClass().getSimpleName();
-      String permission =
-        simpleName.toLowerCase() +
-        ".%s." +
-        prop.getName().toLowerCase();
-
-      if (
-        ! auth.check(x, String.format(permission, "rw")) &&
-        ! auth.check(x, String.format(permission, "ro"))
-      ) {
-        throw new foam.nanos.auth.AuthorizationException(String.format("Access denied. User lacks permission to access property '%s' on model '%s'.", prop.getName(), simpleName));
-      };
-    }
-  }
-  `
     }
   ]
 });
@@ -500,6 +472,11 @@ foam.CLASS({
         }
       ],
       javaCode: ' '
+    },
+    {
+      name: 'authorize',
+      type: 'Void',
+      javaCode: `//noop`
     }
   ]
 });
@@ -583,7 +560,7 @@ foam.CLASS({
     {
       name: 'authorize',
       javaCode: `
-        authorizeArg(x, getArg1());
+        getArg1().authorize(x);
       `
     }
   ]
@@ -734,8 +711,8 @@ getArg2().prepareStatement(stmt);`
     {
       name: 'authorize',
       javaCode: `
-        authorizeArg(x, getArg1());
-        authorizeArg(x, getArg2());
+        getArg1().authorize(x);
+        getArg2().authorize(x);
       `
     }
   ]
