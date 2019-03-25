@@ -581,4 +581,8 @@ FOAM_FILES([
   { name: "foam/dashboard/view/Card" },
   { name: "foam/build/Library" },
   { name: "foam/build/EmbeddedModelDAO" },
+
+  { name: "foam/u2/texteditor/FontFace" },
+  { name: "foam/u2/texteditor/FontSize" },
+  { name: "foam/u2/texteditor/Popup" },
 ]);
