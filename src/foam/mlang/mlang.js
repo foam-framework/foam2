@@ -2198,6 +2198,11 @@ foam.CLASS({
       path: 'foam.core.String',
       flags: ['js'],
     },
+    {
+      name: 'FObjectProperty',
+      path: 'foam.core.FObjectProperty',
+      flags: ['js'],
+    }
   ],
 
   methods: [
@@ -2216,22 +2221,38 @@ foam.CLASS({
           if ( s.toLowerCase().indexOf(arg) >= 0 ) return true;
         }
 
+        var objectProps = obj.cls_.getAxiomsByClass(this.FObjectProperty);
+        for ( var i = 0; i < objectProps.length; i++ ) {
+          var prop = objectProps[i];
+          var subObject = prop.f(obj);
+          try {
+            if ( this.f(subObject) ) return true;
+          } catch (err) {}
+        }
+
         return false;
       },
       javaCode: `
-if ( ! ( getArg1().f(obj) instanceof String) )
-  return false;
+if ( ! ( getArg1().f(obj) instanceof String ) ) return false;
 
 String arg1 = ((String) getArg1().f(obj)).toUpperCase();
-List props = ((foam.core.FObject)obj).getClassInfo().getAxiomsByClass(PropertyInfo.class);
+List props = ((foam.core.FObject) obj).getClassInfo().getAxiomsByClass(PropertyInfo.class);
 Iterator i = props.iterator();
+
 while ( i.hasNext() ) {
   PropertyInfo prop = (PropertyInfo) i.next();
-  if ( ! ( prop.f(obj) instanceof String ) )
-    continue;
+
+  if ( prop instanceof foam.core.AbstractFObjectPropertyInfo ) {
+    try {
+      if ( this.f(prop.f(obj)) ) return true;
+    } catch (Throwable t) {}
+  }
+
+  if ( ! ( prop instanceof foam.core.AbstractStringPropertyInfo ) ) continue;
+
   String s = ((String) prop.f(obj)).toUpperCase();
-  if ( s.contains(arg1) )
-    return true;
+
+  if ( s.contains(arg1) ) return true;
 }
 
 return false;`
