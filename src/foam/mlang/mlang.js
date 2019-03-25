@@ -2225,7 +2225,9 @@ foam.CLASS({
         for ( var i = 0; i < objectProps.length; i++ ) {
           var prop = objectProps[i];
           var subObject = prop.f(obj);
-          if ( this.f(subObject) ) return true;
+          try {
+            if ( this.f(subObject) ) return true;
+          } catch (err) {}
         }
 
         return false;
