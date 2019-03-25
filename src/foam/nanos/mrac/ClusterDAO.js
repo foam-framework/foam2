@@ -136,12 +136,33 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      foam.core.FObject o = getDelegate().put_(x, obj);
-      for ( DAO client : getClients() ) {
-        // client.put(o);
-        client.cmd_(x, new ClusterCommand(x, "PUT", o));
-      }
-      return o;
+      if ( ! this.getConfig().getNodeType().equals(NodeType.PRIMARY) ) {
+        List arr = (ArrayList) ((ArraySink) this.getClusterConfigDAO()
+          .where(
+            AND(
+              AND(
+                EQ(ClusterConfig.ENABLED, true),
+                EQ(ClusterConfig.STATUS, Status.ONLINE)
+               ),
+               EQ(ClusterConfig.NODE_TYPE, NodeType.SECONDARY)
+            )
+          )
+          .select(new ArraySink())).getArray();
+          if ( arr.isEmpty() ) {
+            throw new NullPointerException("No primary node is found.");
+          }
+          
+          ClusterConfig primaryConfig = (ClusterConfig) arr.get(0);
+          ClusterDAO primary = new ClusterDAO();
+          primary.setConfig(primaryConfig);
+          return primary.put_(x, obj);
+      } else {
+        foam.core.FObject o = getDelegate().put_(x, obj);
+        for ( DAO client : getClients() ) {
+          client.cmd_(x, new ClusterCommand(x, "PUT", o));
+        }
+        return o;
+      }    
      `
     },
     {
@@ -157,12 +178,33 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      foam.core.FObject o = getDelegate().remove_(x, obj);
-      for ( DAO client : getClients() ) {
-        // client.put(o);
-        client.cmd_(x, new ClusterCommand(x, "REMOVE", o));
+      if ( ! this.getConfig().getNodeType().equals(NodeType.PRIMARY) ) {
+        List arr = (ArrayList) ((ArraySink) this.getClusterConfigDAO()
+          .where(
+            AND(
+              AND(
+                EQ(ClusterConfig.ENABLED, true),
+                EQ(ClusterConfig.STATUS, Status.ONLINE)
+               ),
+               EQ(ClusterConfig.NODE_TYPE, NodeType.SECONDARY)
+            )
+          )
+          .select(new ArraySink())).getArray();
+          if ( arr.isEmpty() ) {
+            throw new NullPointerException("No primary node is found.");
+          }
+          
+          ClusterConfig primaryConfig = (ClusterConfig) arr.get(0);
+          ClusterDAO primary = new ClusterDAO();
+          primary.setConfig(primaryConfig);
+          return primary.remove_(x, obj);
+      } else {
+        foam.core.FObject o = getDelegate().remove_(x, obj);
+        for ( DAO client : getClients() ) {
+          client.cmd_(x, new ClusterCommand(x, "REMOVE", o));
+        }
+        return o;
       }
-      return o;
      `
     },
     {
