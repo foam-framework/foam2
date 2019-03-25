@@ -283,7 +283,7 @@ foam.INTERFACE({
       type: 'foam.mlang.predicate.Predicate',
     },
     {
-      name:'authorize',
+      name: 'authorize',
       flags: [ 'java' ],
       type: 'Void',
       args: [
@@ -294,8 +294,8 @@ foam.INTERFACE({
       ]
     },
     {
-      name:'authorizeArg',
-      flags: [ 'java'],
+      name: 'authorizeArg',
+      flags: [ 'java' ],
       type: 'Void',
       args:[
         {
@@ -444,8 +444,8 @@ foam.CLASS({
       javaCode: `//noop`
     },
     {
-      name:'authorizeArg',
-      javaCode:`
+      name: 'authorizeArg',
+      javaCode: `
   if ( arg instanceof foam.core.PropertyInfo ) {
     foam.core.PropertyInfo prop =  (foam.core.PropertyInfo) arg;
 
