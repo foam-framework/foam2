@@ -207,7 +207,7 @@ foam.CLASS({
         },
         {
           name: 'user',
-          of: 'foam.nanos.auth.User'
+          type: 'foam.nanos.auth.User'
         },
         {
           name: 'password',
@@ -324,11 +324,11 @@ foam.CLASS({
         },
         {
           name: 'user',
-          of: 'foam.nanos.auth.User'
+          type: 'foam.nanos.auth.User'
         },
         {
           name: 'permission',
-          of: 'java.security.Permission'
+          type: 'java.security.Permission'
         }
       ],
       javaCode: `
@@ -370,7 +370,7 @@ foam.CLASS({
         },
         {
           name: 'permission',
-          of: 'java.security.Permission'
+          type: 'java.security.Permission'
         }
       ],
       javaCode: `
@@ -457,7 +457,7 @@ foam.CLASS({
         },
         {
           name: 'user',
-          of: 'foam.nanos.auth.User'
+          type: 'foam.nanos.auth.User'
         },
         {
           name: 'permission',
@@ -556,7 +556,7 @@ foam.CLASS({
         },
         {
           name: 'user',
-          of: 'foam.nanos.auth.User'
+          type: 'foam.nanos.auth.User'
         },
       ],
       javaThrows: ['foam.nanos.auth.AuthenticationException'],
