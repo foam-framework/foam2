@@ -127,7 +127,7 @@
       expression: function(daoCount, limit, rowHeight) {
         this.lastScrollTop_ = 0;
         this.skip = 0;
-        return rowHeight * daoCount + this.TABLE_HEAD_HEIGHT + 'px';
+        return rowHeight * (daoCount - limit) + this.TABLE_HEAD_HEIGHT + 'px';
       }
     },
     {
