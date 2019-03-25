@@ -10,10 +10,19 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
+    'foam.u2.texteditor.FontFace as FontFace2',
+    'foam.u2.texteditor.FontSize as FontSize2',
+    'foam.u2.texteditor.Popup',
+    'foam.u2.DetailView',
+
     'foam.u2.view.FontSize',
     'foam.u2.view.FontFace',
     'foam.u2.view.TextAlignment',
     'foam.u2.view.TextFormat'
+  ],
+
+  exports: [
+   'document'
   ],
 
   css: `
@@ -103,6 +112,9 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'document'
+    },
+    {
       class: 'Boolean',
       name: 'onKey',
       attribute: true
@@ -166,6 +178,8 @@ foam.CLASS({
       postSet: function (_, n) {
         var self = this;
         n.onload.sub(function () {
+          self.document = n.el().contentDocument;
+
           n.el().contentDocument.body.style.whiteSpace = 'pre-wrap';
           n.el().contentDocument.head.insertAdjacentHTML(
             'afterbegin',
@@ -219,6 +233,12 @@ foam.CLASS({
               .end()
             .end()
           .endContext()
+
+          .start(this.DetailView, {data: this.FontFace2.create(), showActions: true}).end()
+          .tag(this.Popup, {
+            button: 'CLICK',
+            view: this.DetailView.create({data: this.FontSize2.create(), showActions: true})
+          })
         .end();
     },
 
