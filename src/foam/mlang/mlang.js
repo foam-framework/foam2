@@ -285,8 +285,8 @@ foam.INTERFACE({
     {
       name:'authorize',
       flags: [ 'java' ],
-      type: 'Boolean',
-      args:[
+      type: 'Void',
+      args: [
         {
           name: 'x',
           type: 'Context'
@@ -296,7 +296,7 @@ foam.INTERFACE({
     {
       name:'authorizeArg',
       flags: [ 'java'],
-      type: 'Boolean',
+      type: 'Void',
       args:[
         {
           name: 'x',
@@ -441,9 +441,7 @@ foam.CLASS({
     },
     {
       name: 'authorize',
-      javaCode:`
-  return true;
-  `
+      javaCode: `//noop`
     },
     {
       name:'authorizeArg',
@@ -453,17 +451,20 @@ foam.CLASS({
 
     if ( prop.getPermissionRequired() ) {
       AuthService auth = (AuthService) x.get("auth");
+      String simpleName = prop.getClassInfo().getObjClass().getSimpleName();
       String permission =
-        prop.getClassInfo().getObjClass().getSimpleName().toLowerCase() +
+        simpleName.toLowerCase() +
         ".%s." +
         prop.getName().toLowerCase();
 
-      return auth.check(x, String.format(permission, "rw"))
-        || auth.check(x, String.format(permission, "ro"));
+      if (
+        ! auth.check(x, String.format(permission, "rw")) &&
+        ! auth.check(x, String.format(permission, "ro"))
+      ) {
+        throw new foam.nanos.auth.AuthorizationException(String.format("Access denied. User lacks permission to access property '%s' on model '%s'.", prop.getName(), simpleName));
+      };
     }
   }
-
-  return true;
   `
     }
   ]
@@ -581,9 +582,9 @@ foam.CLASS({
     },
     {
       name: 'authorize',
-      javaCode:`
-  return authorizeArg(x, getArg1());
-  `
+      javaCode: `
+        authorizeArg(x, getArg1());
+      `
     }
   ]
 });
@@ -732,9 +733,10 @@ getArg2().prepareStatement(stmt);`
     },
     {
       name: 'authorize',
-      javaCode:`
-  return authorizeArg(x, getArg1()) && authorizeArg(x, getArg2());
-  `
+      javaCode: `
+        authorizeArg(x, getArg1());
+        authorizeArg(x, getArg2());
+      `
     }
   ]
 });
@@ -781,18 +783,19 @@ foam.CLASS({
     },
     {
       name: 'prepareStatement',
-      javaCode:`for ( Predicate predicate : getArgs() ) {
-  predicate.prepareStatement(stmt);
-}`
+      javaCode: `
+        for ( Predicate predicate : getArgs() ) {
+          predicate.prepareStatement(stmt);
+        }
+      `
     },
     {
       name: 'authorize',
-      javaCode:`
-  for ( Predicate predicate : getArgs() ) {
-    if ( ! predicate.authorize(x) ) return false;
-  }
-  return true;
-  `
+      javaCode: `
+        for ( Predicate predicate : getArgs() ) {
+          predicate.authorize(x);
+        }
+      `
     }
   ]
 });
@@ -2125,9 +2128,9 @@ return this;`
     },
     {
       name: 'authorize',
-      javaCode:`
-  return getArg1().authorize(x);
-  `
+      javaCode: `
+        getArg1().authorize(x);
+      `
     }
 
 
