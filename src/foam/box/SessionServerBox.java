@@ -53,13 +53,16 @@ public class SessionServerBox
           // issue.
           session.setContext(getX().put("user", null).put(Session.class, session));
           sessionDAO.put(session);
-        } else if ( req != null && ! SafetyUtil.equals(session.getRemoteHost(), req.getRemoteHost()) ) {
-          // If an existing session is reused with a different remote host then
-          // logout the session and force a re-login.
+        } else if ( req != null ) {
+          // if req == null it means that we're being accessed via webSockets
+          if ( ! SafetyUtil.equals(session.getRemoteHost(), req.getRemoteHost()) ) {
+            // If an existing session is reused with a different remote host then
+            // logout the session and force a re-login.
 //          logger.warning("Attempt to use session create for ", session.getRemoteHost(), " from ", req.getRemoteHost());
 //          session.setContext(getX().put(Session.class, session));
 //          session.setRemoteHost(req.getRemoteHost());
 //          sessionDAO.put(session);
+          }
         }
 
         User user = (User) session.getContext().get("user");
