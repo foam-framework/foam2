@@ -41,7 +41,7 @@ foam.CLASS({
       text-decoration: none;
     }
 
-    ^unavailable {
+    button^unavailable {
       display: none;
     }
 
