@@ -17,7 +17,7 @@ foam.INTERFACE({
     {
       name: 'freeze',
       async: true,
-      type: 'Void'
+      type: 'FObject'
     },
     {
       name: 'isFrozen',
