@@ -86,8 +86,13 @@ public class SessionServerBox
 
           if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
             logger.debug("missing permission", group != null ? group.getId() : "NO GROUP" , "service." + spec.getName());
-            // msg.replyWithException(new NoPermissionException("No permission"));
-            // return;
+            /**
+             * for security purposes we uncommented the following two lines
+             * we needed to remove basicUser and SME wildcard permissions to service.*
+             * and enforce explicit service permissions
+             */
+            msg.replyWithException(new NoPermissionException("No permission"));
+            return;
           }
 
           // padding this cause if group is null this can cause an NPE
