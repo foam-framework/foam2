@@ -37,7 +37,6 @@ foam.CLASS({
       font-weight: 900;
       line-height: 1.5;
       letter-spacing: 0.4px;
-      background: transparent;
     }
     .foam-u2-view-TableView-row > th > td {
       font-size: 12px;
