@@ -88,7 +88,6 @@ foam.CLASS({
       ],
       javaCode: `
       Logger logger = (Logger) x.get("logger");
-      // logger.debug(this.getClass().getSimpleName(), "reconfigure", getNSpec().getName());
       DAO dao = (DAO) x.get("clusterConfigDAO");
       List arr = (ArrayList) ((ArraySink) dao
        .where(
@@ -105,7 +104,6 @@ foam.CLASS({
           setConfig(config);
           continue;
         }
-        // DAO client = new ClusterClientDAO.Builder(x).setServiceName(getNSpec().getName()).setConfig(config).build();
         DAO client = new ClientDAO.Builder(x).setDelegate(new HTTPBox.Builder(x).build()).build();
         newClients[i] = client;
       }
@@ -133,7 +131,7 @@ foam.CLASS({
                 EQ(ClusterConfig.ENABLED, true),
                 EQ(ClusterConfig.STATUS, Status.ONLINE)
                ),
-               EQ(ClusterConfig.NODE_TYPE, NodeType.SECONDARY)
+               EQ(ClusterConfig.NODE_TYPE, NodeType.PRIMARY)
             )
           )
           .select(new ArraySink())).getArray();
