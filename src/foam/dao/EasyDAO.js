@@ -414,7 +414,8 @@ return delegate;
 //             name: this.model.id + "_" + daoModel.id + "_" + this.name
 //           });
 //         }
-        if ( this.cacheType == 'FULL') {
+
+        if ( this.cacheType == foam.dao.CacheType.FULL ) {
           this.mdao = this.MDAO.create({of: params.of});
           dao = this.CachingDAO.create({
             cache: this.dedup ?
@@ -424,10 +425,9 @@ return delegate;
             of: this.model});
         }
 
-        if ( this.cacheType == 'LRU' ) {
+        if ( this.cacheType == foam.dao.CacheType.LRU ) {
           this.mdao = this.MDAO.create({of: params.of});
           dao = this.LRUCachingDAO.create({
-            dao : this.mdao,
             delegate: dao
           });
         }
@@ -481,7 +481,7 @@ return delegate;
         });
         dao.syncRecordDAO = foam.dao.EasyDAO.create({
           of: dao.SyncRecord,
-          cacheType: 'FULL',
+          cacheType: foam.dao.CacheType.FULL,
           daoType: this.daoType,
           name: this.name + '_SyncRecords'
         });

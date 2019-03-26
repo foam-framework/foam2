@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -22,7 +22,7 @@
 
   classes: [
     {
-      /** Links an object id to a last-accessed timestamp */
+      /** Links an object id to a last-accessed seqNo */
       name: 'LRUCacheItem',
       properties: [
         {
@@ -30,7 +30,12 @@
         },
         {
           class: 'Int',
-          name: 'timestamp'
+          name: 'seqNo'
+        },
+        {
+          class: 'Boolean',
+          name: 'hasSourceObj',
+          value: false
         }
       ]
     }
@@ -41,7 +46,7 @@
       /** The maximum size to allow the target dao to be. */
       class: 'Int',
       name: 'maxSize',
-      value: 100
+      value: 10000
     },
     {
       /** Tracks the age of items in the target dao. */
@@ -52,14 +57,17 @@
       }
     },
     {
-      /** By starting at the current time */
+      /** By starting at 0 */
       class: 'Int',
       name: 'lastTimeUsed_',
-      factory: function() { return Date.now(); }
+      factory: function() { return 0; }
     },
     {
       class: 'foam.dao.DAOProperty',
-      name: 'dao'
+      name: 'cacheDAO',
+      factory: function() {
+        return this.MDAO.create({ of: this.of });
+      }
     }
   ],
 
@@ -68,14 +76,13 @@
       this.SUPER();
       var self = this;
 
-      self.delegate.listen(self.QuickSink.create({
-        putFn: this.onPut,
-        removeFn: this.onRemove
-      }));
+      self.delegate.sub('on', 'put',    this.onPut);
+      self.delegate.sub('on', 'remove', this.onRemove);
+      self.delegate.sub('on', 'reset',  this.onReset);
     },
 
-    /** Calculates a timestamp to use in the tracking dao. */
-    function getTimestamp() {
+    /** Calculates a seqNo to use in the tracking dao. */
+    function getSeqNO() {
       // Just increment on each request.
       return this.lastTimeUsed_++;
     },
@@ -83,12 +90,14 @@
     /** to keep the dao size. */
     function cleanup() {
       var self = this;
+
       self.trackingDAO
-        .orderBy(self.DESC(self.LRUCacheItem.TIMESTAMP))
+        .orderBy(self.DESC(self.LRUCacheItem.SEQ_NO))
         .skip(self.maxSize)
         .select({
           put: function(obj) {
-            self.dao.remove(obj);
+            self.cacheDAO.remove(obj);
+            self.trackingDAO.remove(obj);
           }
         });
     },
@@ -98,13 +107,15 @@
 
       return this.trackingDAO.find_(x, id).then(function(o) {
         if ( o ) {
+          self.put(x, o.id, true);
           return o;
         } else {
           return self.delegate.find_(x, id).then(function(o) {
             if ( o ) {
-              self.put(x, o)
+              self.put(x, o.id, true);
               return o;
             } else {
+              self.put(x, id, false);
               return null;
             }
           })
@@ -112,13 +123,16 @@
       });
     },
 
-    function put(x, obj) {
+    function put(x, objId, hasSrcObj) {
       var self = this;
 
+      console.log("put : " + objId);
+      console.log("put : " + hasSrcObj);
       return this.trackingDAO.put(
          this.LRUCacheItem.create({
-           id: obj.id,
-           timestamp: self.getTimestamp()
+           id: objId,
+           seqNo: self.getSeqNO(),
+           hasSourceObj: hasSrcObj
          })
        ).then(function() {
          self.cleanup();
@@ -135,10 +149,12 @@
     /** Adds the put() item to the tracking dao, runs cleanup() to check the dao size. */
     function onPut(obj) {
       var self = this;
+
       this.trackingDAO.put(
         this.LRUCacheItem.create({
           id: obj.id,
-          timestamp: self.getTimestamp()
+          seqNo: self.getSeqNO(),
+          hasSourceObj: true
         })
       ).then(function() {
         self.cleanup();
@@ -147,8 +163,12 @@
 
     /** Clears the remove()'d item from the trackingDAO. */
     function onRemove(obj) {
-      var self = this;
       this.trackingDAO.remove(obj);
+    },
+
+    /** On reset, clear the tracking dao. */
+    function onReset(obj) {
+      this.trackingDAO.removeAll(obj);
     }
   ]
 });

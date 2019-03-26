@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -13,17 +13,17 @@ foam.ENUM({
   values: [
     {
       name: 'NONE',
-      documentation: 'NO CacheDAO used',
+      documentation: 'No caching',
       label: 'None'
     },
     {
       name: 'FULL',
-      documentation: 'Using Regular CacheDAO',
+      documentation: 'Using full caching',
       label: 'Full'
     },
     {
       name: 'LRU',
-      documentation: 'Using LRU CacheDAO',
+      documentation: 'Using a LRU (Least Recently Used) partial cache',
       label: 'LRU'
     }
   ]
