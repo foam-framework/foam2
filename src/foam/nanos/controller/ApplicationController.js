@@ -78,6 +78,11 @@ foam.CLASS({
     MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor', 'secondaryHoverColor', 'secondaryDisabledColor', 'groupCSS', 'backgroundColor' ]
   },
 
+  messages: [
+    { name: 'GROUP_FETCH_ERR', message: 'Error fetching group' },
+    { name: 'GROUP_NULL_ERR', message: 'Group was null' }
+  ],
+
   css: `
     body {
       font-family: 'Roboto', sans-serif;
@@ -137,7 +142,9 @@ foam.CLASS({
       class: 'foam.core.FObjectProperty',
       of: 'foam.nanos.auth.Group',
       name: 'group',
-      factory: function() { return this.Group.create(); }
+      postSet: function(oldValue, newValue) {
+        if ( newValue ) this.onGroupUpdate(newValue);
+      }
     },
     {
       class: 'Boolean',
@@ -179,20 +186,23 @@ foam.CLASS({
     function init() {
       this.SUPER();
       var self = this;
-      self.clientPromise.then(function(client) {
+      self.clientPromise.then(async function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
         foam.__context__.register(foam.u2.UnstyledActionView, 'foam.u2.ActionView');
-        self.getCurrentUser();
 
-        window.onpopstate = function(event) {
-          if ( location.hash != null) {
-            var hid = location.hash.substr(1);
-
-            hid && self.client.menuDAO.find(hid).then(function(menu) {
-              menu && menu.launch(this, null);
-            });
+        window.onpopstate = async function(event) {
+          var hid = location.hash.substr(1);
+          if ( hid ) {
+            var menu = await self.client.menuDAO.find(hid);
+            menu && menu.launch(this);
           }
         };
+
+        self.fetchAgent();
+        await self.fetchUser();
+        // Fetch the group only once the user has logged in. That's why we await
+        // the line above before executing this one.
+        self.fetchGroup();
       });
     },
 
@@ -201,11 +211,16 @@ foam.CLASS({
       self.clientPromise.then(function() {
         self
           .addClass(self.myClass())
-          .start('div', null, self.topNavigation_$).end()
-          .start('div').addClass('stack-wrapper')
-            .tag({class: 'foam.u2.stack.StackView', data: self.stack, showActions: false})
+          .tag('div', null, self.topNavigation_$)
+          .start()
+            .addClass('stack-wrapper')
+            .tag({
+              class: 'foam.u2.stack.StackView',
+              data: self.stack,
+              showActions: false
+            })
           .end()
-          .start('div', null, self.footerView_$).end();
+          .tag('div', null, self.footerView_$);
 
           // Sets up application view
           self.topNavigation_.add(self.TopNavigation.create());
@@ -226,26 +241,38 @@ foam.CLASS({
       );
     },
 
-    function getCurrentUser() {
-      var self = this;
+    async function fetchGroup() {
+      try {
+        var group = await this.client.auth.getCurrentGroup();
+        if ( group == null ) throw new Error(this.GROUP_NULL_ERR);
+        this.group = group;
+      } catch (err) {
+        this.notify(this.GROUP_FETCH_ERR, 'error');
+        console.error(err.message || this.GROUP_FETCH_ERR);
+      }
+    },
 
-      // get current user, else show login
-      this.client.auth.getCurrentUser(null).then(function (result) {
-        self.loginSuccess = !! result;
-        if ( result ) {
-          self.user.copyFrom(result);
-          if ( ! self.user.emailVerified ) {
-            self.stack.push({ class: 'foam.nanos.auth.ResendVerificationEmail' });
-            return;
-          }
-          self.onUserUpdate();
-        }
-      })
-      .catch(function (err) {
-        self.requestLogin().then(function() {
-          self.getCurrentUser();
-        });
-      });
+    /**
+     * Get current user, else show login.
+     */
+    async function fetchUser() {
+      try {
+        var result = await this.client.auth.getCurrentUser(null);
+        this.loginSuccess = !! result;
+
+        if ( ! result ) throw new Error();
+
+        this.user = result;
+        this.onUserLoad();
+      } catch (err) {
+        await this.requestLogin();
+        return this.fetchUser();
+      }
+    },
+
+    async function fetchAgent() {
+      // Is there a reason we do = here and copyFrom for user?
+      this.agent = await this.client.agentAuth.getCurrentAgent();
     },
 
     function expandShortFormMacro(css, m) {
@@ -253,7 +280,7 @@ foam.CLASS({
       var M = m.toUpperCase();
 
       return css.replace(
-        new RegExp("%" + M + "%", 'g'),
+        new RegExp('%' + M + '%', 'g'),
         '/*%' + M + '%*/ ' + this[m]);
     },
 
@@ -301,18 +328,21 @@ foam.CLASS({
 
     function pushMenu(menuId) {
       /** Use to load a specific menu. **/
-      if ( window.location.hash.substr(1) != menuId ) window.location.hash = menuId;
+      if ( window.location.hash.substr(1) != menuId ) {
+        window.location.hash = menuId;
+      }
     },
 
     function requestLogin() {
       var self = this;
 
       // don't go to log in screen if going to reset password screen
-      if ( location.hash != null && location.hash === '#reset')
-        return new Promise(function (resolve, reject) {
+      if ( location.hash != null && location.hash === '#reset' ) {
+        return new Promise(function(resolve, reject) {
           self.stack.push({ class: 'foam.nanos.auth.resetPassword.ResetView' });
           self.loginSuccess$.sub(resolve);
         });
+      }
 
       return new Promise(function(resolve, reject) {
         self.stack.push({ class: 'foam.nanos.auth.SignInView' });
@@ -327,10 +357,13 @@ foam.CLASS({
   ],
 
   listeners: [
-    async function onUserUpdate() {
-      var group = await this.client.groupDAO.find(this.user.group);
-
-      this.group.copyFrom(group);
+    /**
+     * Called whenever the group updates.
+     *   - Updates the portal view based on the group
+     *   - Update the macros list based on the group
+     *   - Go to a menu based on either the hash or the group
+     */
+    async function onGroupUpdate(group) {
       this.setPortalView(group);
 
       for ( var i = 0; i < this.MACROS.length; i++ ) {
@@ -345,6 +378,17 @@ foam.CLASS({
         window.onpopstate();
       } else if ( group ) {
         this.window.location.hash = group.defaultMenu;
+      }
+    },
+
+    /**
+     * Called when the user is loaded after signing in. Can be implemented by
+     * subclasses for custom behaviour.
+     */
+    function onUserLoad() {
+      if ( ! this.user.emailVerified ) {
+        this.loginSuccess = false;
+        this.stack.push({ class: 'foam.nanos.auth.ResendVerificationEmail' });
       }
     },
 

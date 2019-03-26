@@ -13,7 +13,7 @@ foam.CLASS({
 
   css: `
     body {
-      font-family: 'Roboto', sans-serif;
+      font-family: Roboto, 'Helvetica Neue', helvetica, sans-serif;
       font-size: 14px;
       letter-spacing: 0.2px;
       color: #373a3c;
@@ -30,7 +30,7 @@ foam.CLASS({
       text-align: left;
       padding-left: 15px;
       height: 40px;
-      font-family: 'Roboto';
+      font-family: Roboto, 'Helvetica Neue', helvetica, sans-serif;
       font-size: 14px;
       font-style: normal;
       font-stretch: normal;
@@ -47,7 +47,7 @@ foam.CLASS({
       height: 60px;
     }
     .foam-u2-view-TableView th {
-      font-family: 'Roboto';
+      font-family: Roboto, 'Helvetica Neue', helvetica, sans-serif;
       padding-left: 15px;
       font-size: 14px;
       line-height: 1;
@@ -55,7 +55,7 @@ foam.CLASS({
       color: #093649;
     }
     .foam-u2-view-TableView td {
-      font-family: 'Roboto';
+      font-family: Roboto, 'Helvetica Neue', helvetica, sans-serif;
       font-size: 12px;
       line-height: 1.33;
       letter-spacing: 0.2px;
@@ -99,7 +99,7 @@ foam.CLASS({
     }
     ^ .generic-status {
       display: inline-block;
-      font-family: Roboto;
+      font-family: Roboto, 'Helvetica Neue', helvetica, sans-serif;
       font-size: 12px;
       font-weight: normal;
       font-style: normal;

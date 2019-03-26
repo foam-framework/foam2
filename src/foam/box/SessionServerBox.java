@@ -11,9 +11,13 @@ import foam.dao.DAO;
 import foam.nanos.app.AppConfig;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.*;
+import foam.nanos.auth.AuthenticationException;
+import foam.nanos.auth.AuthorizationException;
 import foam.nanos.boot.NSpec;
 import foam.nanos.logger.*;
+import foam.nanos.logger.PrefixLogger;
 import foam.nanos.session.Session;
+import foam.util.SafetyUtil;
 import java.util.Date;
 import javax.naming.NoPermissionException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +42,6 @@ public class SessionServerBox
         HttpServletRequest req        = getX().get(HttpServletRequest.class);
         AuthService        auth       = (AuthService) getX().get("auth");
         DAO                sessionDAO = (DAO)         getX().get("localSessionDAO");
-        DAO                groupDAO   = (DAO)         getX().get("groupDAO");
         Session            session    = (Session)     sessionDAO.find(sessionID);
 
         if ( session == null ) {
@@ -50,15 +53,18 @@ public class SessionServerBox
           // newly created sessions. If we don't do this, then a user has admin
           // privileges before they log in, which is obviously a big security
           // issue.
-          session.setContext(getX().put("user", null).put(Session.class, session));
+          session.setContext(getX().put("user", null).put("group", null).put(Session.class, session));
           sessionDAO.put(session);
-        } else if ( ! session.getRemoteHost().equals(req.getRemoteHost()) ) {
-          // If an existing session is reused with a different remote host then
-          // logout the session and force a re-login.
+        } else if ( req != null ) {
+          // if req == null it means that we're being accessed via webSockets
+          if ( ! SafetyUtil.equals(session.getRemoteHost(), req.getRemoteHost()) ) {
+            // If an existing session is reused with a different remote host then
+            // logout the session and force a re-login.
 //          logger.warning("Attempt to use session create for ", session.getRemoteHost(), " from ", req.getRemoteHost());
 //          session.setContext(getX().put(Session.class, session));
 //          session.setRemoteHost(req.getRemoteHost());
 //          sessionDAO.put(session);
+          }
         }
 
         User user = (User) session.getContext().get("user");
@@ -72,29 +78,35 @@ public class SessionServerBox
 
         session.touch();
 
+        // If this service has been configured to require authentication, then
+        // throw an error if there's no user in the context.
         if ( authenticate_ && session.getUserId() == 0 ) {
           msg.replyWithException(new AuthenticationException());
           return;
         }
 
         if ( user != null ) {
-          Group group = (Group) groupDAO.find(user.getGroup());
+          Group group = (Group) x.get("group");
 
           if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
             logger.debug("missing permission", group != null ? group.getId() : "NO GROUP" , "service." + spec.getName());
-            // msg.replyWithException(new NoPermissionException("No permission"));
-            // return;
+            msg.replyWithException(new NoPermissionException("No permission"));
+            return;
           }
 
           // padding this cause if group is null this can cause an NPE
           // technically the user shouldn't be created without a group
-          if ( group != null ) {
+          if ( group == null ) {
+            logger.warning(String.format("The context with id = %s does not have the group set in the context.", session.getId()));
+          } else {
             AppConfig appConfig = group.getAppConfig(x);
             x = x.put("appConfig", appConfig);
             session.getContext().put("appConfig", appConfig);
-          } else {
-            logger.error("missing group: ", String.format("User: [%d]", user.getId()));
-            throw new RuntimeException("User without a group.");
+          }
+
+          if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
+            msg.replyWithException(new AuthorizationException("You do not have permission to access that service."));
+            return;
           }
         }
 
