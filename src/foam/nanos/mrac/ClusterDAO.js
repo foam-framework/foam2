@@ -33,25 +33,14 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.dao.ArraySink',
     'static foam.mlang.MLang.*',
-    'foam.nanos.boot.NSpec',
     'foam.nanos.logger.Logger',
     'java.util.List',
     'java.util.ArrayList',
   ],
 
-  implements: [
-    'foam.nanos.boot.NSpecAware'
-  ],
+
 
   properties: [
-    {
-      // REVIEW - this may no longer be required
-      documentation: `nSpec of the DAO to be clustered.`,
-      name: 'nSpec',
-      class: 'FObjectProperty',
-      type: 'foam.nanos.boot.NSpec',
-      visibility: 'HIDDEN'
-    },
     {
       documentation: `Cluster configuration for 'this' (localhost) node.`,
       name: 'config',
@@ -99,7 +88,7 @@ foam.CLASS({
       ],
       javaCode: `
       Logger logger = (Logger) x.get("logger");
-      logger.debug(this.getClass().getSimpleName(), "reconfigure", getNSpec().getName());
+      // logger.debug(this.getClass().getSimpleName(), "reconfigure", getNSpec().getName());
       DAO dao = (DAO) x.get("clusterConfigDAO");
       List arr = (ArrayList) ((ArraySink) dao
        .where(
