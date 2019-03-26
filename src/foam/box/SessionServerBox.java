@@ -88,6 +88,14 @@ public class SessionServerBox
         if ( user != null ) {
           Group group = (Group) x.get("group");
 
+          if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
+            logger.debug("missing permission", group != null ? group.getId() : "NO GROUP" , "service." + spec.getName());
+            msg.replyWithException(new NoPermissionException("No permission"));
+            return;
+          }
+
+          // padding this cause if group is null this can cause an NPE
+          // technically the user shouldn't be created without a group
           if ( group == null ) {
             logger.warning(String.format("The context with id = %s does not have the group set in the context.", session.getId()));
           } else {
