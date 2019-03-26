@@ -149,6 +149,17 @@ foam.INTERFACE({
     {
       name: 'partialEval',
       type: 'foam.mlang.Expr'
+    },
+    {
+      name: 'authorize',
+      flags: [ 'java' ],
+      type: 'Void',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ]
     }
   ]
 });
@@ -283,28 +294,13 @@ foam.INTERFACE({
       type: 'foam.mlang.predicate.Predicate',
     },
     {
-      name:'authorize',
+      name: 'authorize',
       flags: [ 'java' ],
-      type: 'Boolean',
-      args:[
+      type: 'Void',
+      args: [
         {
           name: 'x',
           type: 'Context'
-        }
-      ]
-    },
-    {
-      name:'authorizeArg',
-      flags: [ 'java'],
-      type: 'Boolean',
-      args:[
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'arg',
-          type: 'foam.mlang.Expr'
         }
       ]
     }
@@ -441,30 +437,7 @@ foam.CLASS({
     },
     {
       name: 'authorize',
-      javaCode:`
-  return true;
-  `
-    },
-    {
-      name:'authorizeArg',
-      javaCode:`
-  if ( arg instanceof foam.core.PropertyInfo ) {
-    foam.core.PropertyInfo prop =  (foam.core.PropertyInfo) arg;
-
-    if ( prop.getPermissionRequired() ) {
-      AuthService auth = (AuthService) x.get("auth");
-      String permission =
-        prop.getClassInfo().getObjClass().getSimpleName().toLowerCase() +
-        ".%s." +
-        prop.getName().toLowerCase();
-
-      return auth.check(x, String.format(permission, "rw"))
-        || auth.check(x, String.format(permission, "ro"));
-    }
-  }
-
-  return true;
-  `
+      javaCode: `//noop`
     }
   ]
 });
@@ -499,6 +472,11 @@ foam.CLASS({
         }
       ],
       javaCode: ' '
+    },
+    {
+      name: 'authorize',
+      type: 'Void',
+      javaCode: `//noop`
     }
   ]
 });
@@ -581,9 +559,9 @@ foam.CLASS({
     },
     {
       name: 'authorize',
-      javaCode:`
-  return authorizeArg(x, getArg1());
-  `
+      javaCode: `
+        getArg1().authorize(x);
+      `
     }
   ]
 });
@@ -732,9 +710,10 @@ getArg2().prepareStatement(stmt);`
     },
     {
       name: 'authorize',
-      javaCode:`
-  return authorizeArg(x, getArg1()) && authorizeArg(x, getArg2());
-  `
+      javaCode: `
+        getArg1().authorize(x);
+        getArg2().authorize(x);
+      `
     }
   ]
 });
@@ -781,18 +760,19 @@ foam.CLASS({
     },
     {
       name: 'prepareStatement',
-      javaCode:`for ( Predicate predicate : getArgs() ) {
-  predicate.prepareStatement(stmt);
-}`
+      javaCode: `
+        for ( Predicate predicate : getArgs() ) {
+          predicate.prepareStatement(stmt);
+        }
+      `
     },
     {
       name: 'authorize',
-      javaCode:`
-  for ( Predicate predicate : getArgs() ) {
-    if ( ! predicate.authorize(x) ) return false;
-  }
-  return true;
-  `
+      javaCode: `
+        for ( Predicate predicate : getArgs() ) {
+          predicate.authorize(x);
+        }
+      `
     }
   ]
 });
@@ -2125,9 +2105,9 @@ return this;`
     },
     {
       name: 'authorize',
-      javaCode:`
-  return getArg1().authorize(x);
-  `
+      javaCode: `
+        getArg1().authorize(x);
+      `
     }
 
 

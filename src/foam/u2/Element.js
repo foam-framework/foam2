@@ -2290,6 +2290,19 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
+  name: 'MapViewRefinement',
+  refines: 'foam.core.Map',
+  properties: [
+    {
+      name: 'view',
+      value: { class: 'foam.u2.view.MapView' },
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
   name: 'ClassViewRefinement',
   refines: 'foam.core.Class',
   properties: [
