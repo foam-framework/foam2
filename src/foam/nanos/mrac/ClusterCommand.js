@@ -6,18 +6,14 @@
 
 foam.CLASS({
   package: 'foam.nanos.mrac',
-  name: 'ClusterResponse',
+  name: 'ClusterCommand',
 
-  documentation: `Temporary object while creating Cluster... Really haven't thought through what the response object should be. `,
+  documentation: ``,
 
   properties: [
     {
       name: 'cmd',
       class: 'String'
-    },
-    {
-      name: 'message',
-      class: 'String',
     },
     {
       name: 'obj',

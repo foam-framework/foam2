@@ -28,28 +28,19 @@ foam.CLASS({
   `,
 
   javaImports: [
+    'foam.box.HTTPBox',
+    'foam.dao.ClientDAO',
     'foam.dao.DAO',
     'foam.dao.ArraySink',
     'static foam.mlang.MLang.*',
-    'foam.nanos.boot.NSpec',
     'foam.nanos.logger.Logger',
     'java.util.List',
     'java.util.ArrayList',
   ],
 
-  implements: [
-    'foam.nanos.boot.NSpecAware'
-  ],
+
 
   properties: [
-    {
-      // REVIEW - this may no longer be required
-      documentation: `nSpec of the DAO to be clustered.`,
-      name: 'nSpec',
-      class: 'FObjectProperty',
-      type: 'foam.nanos.boot.NSpec',
-      visibility: 'HIDDEN'
-    },
     {
       documentation: `Cluster configuration for 'this' (localhost) node.`,
       name: 'config',
@@ -97,7 +88,6 @@ foam.CLASS({
       ],
       javaCode: `
       Logger logger = (Logger) x.get("logger");
-      logger.debug(this.getClass().getSimpleName(), "reconfigure", getNSpec().getName());
       DAO dao = (DAO) x.get("clusterConfigDAO");
       List arr = (ArrayList) ((ArraySink) dao
        .where(
@@ -114,7 +104,7 @@ foam.CLASS({
           setConfig(config);
           continue;
         }
-        DAO client = new ClusterClientDAO.Builder(x).setServiceName(getNSpec().getName()).setConfig(config).build();
+        DAO client = new ClientDAO.Builder(x).setDelegate(new HTTPBox.Builder(x).build()).build();
         newClients[i] = client;
       }
       setClients(newClients);
@@ -133,11 +123,33 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      foam.core.FObject o = getDelegate().put_(x, obj);
-      for ( DAO client : getClients() ) {
-        client.put(o);
-      }
-      return o;
+      if ( ! this.getConfig().getNodeType().equals(NodeType.PRIMARY) ) {
+        List arr = (ArrayList) ((ArraySink) this.getClusterConfigDAO()
+          .where(
+            AND(
+              AND(
+                EQ(ClusterConfig.ENABLED, true),
+                EQ(ClusterConfig.STATUS, Status.ONLINE)
+               ),
+               EQ(ClusterConfig.NODE_TYPE, NodeType.PRIMARY)
+            )
+          )
+          .select(new ArraySink())).getArray();
+          if ( arr.isEmpty() ) {
+            throw new NullPointerException("No primary node is found.");
+          }
+          
+          ClusterConfig primaryConfig = (ClusterConfig) arr.get(0);
+          ClusterDAO primary = new ClusterDAO();
+          primary.setConfig(primaryConfig);
+          return primary.put_(x, obj);
+      } else {
+        foam.core.FObject o = getDelegate().put_(x, obj);
+        for ( DAO client : getClients() ) {
+          client.cmd_(x, new ClusterCommand(x, "PUT", o));
+        }
+        return o;
+      }    
      `
     },
     {
@@ -153,18 +165,40 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      foam.core.FObject o = getDelegate().remove_(x, obj);
-      for ( DAO client : getClients() ) {
-        client.put(o);
+      if ( ! this.getConfig().getNodeType().equals(NodeType.PRIMARY) ) {
+        List arr = (ArrayList) ((ArraySink) this.getClusterConfigDAO()
+          .where(
+            AND(
+              AND(
+                EQ(ClusterConfig.ENABLED, true),
+                EQ(ClusterConfig.STATUS, Status.ONLINE)
+               ),
+               EQ(ClusterConfig.NODE_TYPE, NodeType.PRIMARY)
+            )
+          )
+          .select(new ArraySink())).getArray();
+          if ( arr.isEmpty() ) {
+            throw new NullPointerException("No primary node is found.");
+          }
+          
+          ClusterConfig primaryConfig = (ClusterConfig) arr.get(0);
+          ClusterDAO primary = new ClusterDAO();
+          primary.setConfig(primaryConfig);
+          return primary.remove_(x, obj);
+      } else {
+        foam.core.FObject o = getDelegate().remove_(x, obj);
+        for ( DAO client : getClients() ) {
+          client.cmd_(x, new ClusterCommand(x, "REMOVE", o));
+        }
+        return o;
       }
-      return o;
      `
     },
     {
       name: 'cmd_',
       javaCode: `
-      if ( obj instanceof ClusterRequest ) {
-        ClusterRequest request = (ClusterRequest) obj;
+      if ( obj instanceof ClusterCommand ) {
+        ClusterCommand request = (ClusterCommand) obj;
         Logger logger = (Logger) getX().get("logger");
         logger.debug(this.getClass().getSimpleName(), "cmd_", request);
         if ( "put".equals(request.getCmd()) ) {

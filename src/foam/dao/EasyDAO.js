@@ -22,7 +22,6 @@ foam.CLASS({
 
   implements: [
     'foam.mlang.Expressions',
-    'foam.nanos.boot.NSpecAware'
   ],
 
   documentation: function() {/*
@@ -95,17 +94,11 @@ foam.CLASS({
       javaFactory: `return getOf().getId();`
     },
     {
-      name: 'nSpec',
-      class: 'FObjectProperty',
-      type: 'foam.nanos.boot.NSpec'
-    },
-    {
       /** This is set automatically when you create an EasyDAO.
         @private */
       name: 'delegate',
       javaFactory: `
 foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
-logger.info(this.getClass().getSimpleName(), "delegate", "NSpec.name", getNSpec().getName(), Thread.currentThread().getName());
 
 foam.dao.DAO delegate = getInnerDAO() == null ?
   new foam.dao.MDAO(getOf()) :
@@ -117,7 +110,7 @@ if ( delegate instanceof foam.dao.MDAO ) {
 
 // TODO: cluster needs to delegate to MDAO.   InnerDAO is an issue.
 if ( getCluster() ) {
-  delegate = new foam.nanos.mrac.ClusterDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(getMdao()).build();
+  delegate = new foam.nanos.mrac.ClusterDAO.Builder(getX()).setDelegate(getMdao()).build();
 }
 
 if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
