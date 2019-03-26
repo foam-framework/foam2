@@ -12,7 +12,9 @@ foam.CLASS({
     'foam.u2.CheckBox',
     'foam.u2.DateTimeView',
     'foam.u2.TextField',
-    'foam.u2.view.ChoiceView'
+    'foam.u2.view.ArrayView',
+    'foam.u2.view.ChoiceView',
+    'foam.u2.view.MapView'
   ],
   constants: [
     {
@@ -49,6 +51,14 @@ foam.CLASS({
             view: foam.u2.view.MapView,
             toType: function(o) {
               return foam.Object.isInstance(o) ? o : {};
+            }
+          }),
+          foam.u2.view.AnyView.Choice.create({
+            label: 'Array',
+            type: foam.Array,
+            view: foam.u2.view.ArrayView,
+            toType: function(o) {
+              return foam.Array.isInstance(o) ? o : [];
             }
           }),
           foam.u2.view.AnyView.Choice.create({
