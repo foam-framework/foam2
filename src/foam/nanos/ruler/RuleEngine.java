@@ -75,8 +75,8 @@ public class RuleEngine extends ContextAwareSupport {
   }
 
   private void applyRules(List<Rule> rules, FObject obj, FObject oldObj) {
+    List<Rule> completedRules = null;
     for (Rule rule : rules) {
-      List<Rule> completedRules = null;
       if ( stops_.get() ) return;
 
       currentRule_ = rule;
