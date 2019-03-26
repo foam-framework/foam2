@@ -17,6 +17,7 @@ foam.CLASS({
   javaImports: [
     'foam.dao.DAO',
     'foam.dao.NullDAO',
+    'foam.nanos.auth.Group',
     'java.nio.charset.StandardCharsets',
     'org.jtwig.environment.EnvironmentConfiguration',
     'org.jtwig.environment.EnvironmentConfigurationBuilder',
@@ -97,8 +98,9 @@ return config_;`
     {
       name: 'sendEmailFromTemplate',
       javaCode: `
-String group = user != null ? (String) user.getGroup() : null;
-EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(getX(), name, group);
+Group group = (Group) x.get("group");
+String groupId = group != null ? group.getId() : null;
+EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(getX(), name, groupId);
 if ( emailMessage == null )
   return;
 
@@ -110,7 +112,7 @@ for ( String key : templateArgs.keySet() ) {
   }
 }
 
-EnvironmentConfiguration config = getConfig(group);
+EnvironmentConfiguration config = getConfig(groupId);
 JtwigModel model = JtwigModel.newModel(templateArgs);
 emailMessage = (EmailMessage) emailMessage.fclone();
 

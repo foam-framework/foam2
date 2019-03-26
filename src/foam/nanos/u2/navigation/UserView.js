@@ -243,7 +243,7 @@ foam.CLASS({
       name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
-        var group = this.user.group;
+        var group = this.group.id;
         var id    = this.user.id;
         if ( id != 0 ) {
           this.notificationDAO.where(
