@@ -173,7 +173,7 @@ foam.CLASS({
                 EQ(ClusterConfig.ENABLED, true),
                 EQ(ClusterConfig.STATUS, Status.ONLINE)
                ),
-               EQ(ClusterConfig.NODE_TYPE, NodeType.SECONDARY)
+               EQ(ClusterConfig.NODE_TYPE, NodeType.PRIMARY)
             )
           )
           .select(new ArraySink())).getArray();
