@@ -75,14 +75,17 @@ public class RuleEngine extends ContextAwareSupport {
   }
 
   private void applyRules(List<Rule> rules, FObject obj, FObject oldObj) {
-    List<Rule> completedRules = new ArrayList<>();
     for (Rule rule : rules) {
+      List<Rule> completedRules = null;
       if ( stops_.get() ) return;
 
       currentRule_ = rule;
       if ( rule.f(getX(), obj, oldObj)
         && rule.getAction() != null
       ) {
+        if ( completedRules == null ) {
+          completedRules = new ArrayList<>();
+        }
         try {
           rule.apply(getX(), obj, oldObj, this);
           completedRules.add(rule);

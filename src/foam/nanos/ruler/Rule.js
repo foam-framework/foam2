@@ -48,21 +48,21 @@
       }
     },
     {
-      class: 'Reference',
-      of: 'foam.nanos.boot.NSpec',
+      class: 'String',
       name: 'daoKey',
       documentation: 'dao name that the rule is applied on.',
       view: function(_, X) {
         var E = foam.mlang.Expressions.create();
-        return foam.u2.view.ChoiceView.create({
-          dao: X.nSpecDAO
-            .where(E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO'))
-            .orderBy(foam.nanos.boot.NSpec.ID),
-          objToChoice: function(nspec) {
-            return [nspec.id, nspec.id];
-          }
-        });
-      }
+        return {
+          class: 'foam.u2.view.RichChoiceView',
+          sections: [
+            {
+              heading: 'Services',
+              dao: X.nSpecDAO.where(E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO'))
+            }
+          ]
+        };
+      },
     },
     {
       class: 'Enum',

@@ -114,7 +114,7 @@ foam.CLASS({
     },
     {
       class: 'Map',
-      name: 'hm',
+      name: 'rulesList',
       javaFactory: `
       return new java.util.HashMap<Predicate, GroupBy>();
       `
@@ -126,7 +126,7 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       FObject oldObj = getDelegate().find_(x, obj);
-      Map hm = getHm();
+      Map hm = getRulesList();
       if ( oldObj == null ) {
         applyRules(x, obj, oldObj, (GroupBy) hm.get(getCreateBefore()));
       } else {
@@ -145,9 +145,9 @@ foam.CLASS({
       name: 'remove_',
       javaCode: `
       FObject oldObj = getDelegate().find_(x, obj);
-      applyRules(x, obj, oldObj, (GroupBy) getHm().get(getRemoveBefore()));
+      applyRules(x, obj, oldObj, (GroupBy) getRulesList().get(getRemoveBefore()));
       FObject ret =  getDelegate().remove_(x, obj);
-      applyRules(x, ret, oldObj, (GroupBy) getHm().get(getRemoveAfter()));
+      applyRules(x, ret, oldObj, (GroupBy) getRulesList().get(getRemoveAfter()));
       return ret;
       `
     },
@@ -175,8 +175,7 @@ foam.CLASS({
       for ( Object key : sink.getGroupKeys() ) {
         List<Rule> group = ((ArraySink) sink.getGroups().get(key)).getArray();
         if ( ! group.isEmpty() ) {
-          Collections.sort(group, Rule.PRIORITY);
-          Collections.reverse(group);
+          Collections.sort(group, new foam.mlang.order.Desc(Rule.PRIORITY));
           new RuleEngine(x, this).execute(group, obj, oldObj);
         }
       }
@@ -191,7 +190,7 @@ foam.CLASS({
         }
       ],
       javaCode: `DAO ruleDAO = ((DAO) x.get("ruleDAO")).where(EQ(Rule.DAO_KEY, getDaoKey()));
-Map hm = getHm();
+Map hm = getRulesList();
 GroupBy createdBefore = (GroupBy) ruleDAO.where(getCreateBefore()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
 hm.put(getCreateBefore(), createdBefore);
 GroupBy updatedBefore = (GroupBy) ruleDAO.where(getUpdateBefore()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
@@ -208,7 +207,7 @@ hm.put(getRemoveAfter(), removedAfter);
 ruleDAO.listen(new AbstractSink() {
   @Override
   public void put(Object obj, Detachable sub) {
-    Map hm = getHm();
+    Map hm = getRulesList();
     Rule rule = (Rule) obj;
     String ruleGroup = rule.getRuleGroup();
     for ( Object key : hm.keySet() ) {
@@ -232,7 +231,7 @@ ruleDAO.listen(new AbstractSink() {
   
   @Override
   public void remove(Object obj, Detachable sub) {
-    Map hm = getHm();
+    Map hm = getRulesList();
     Rule rule = (Rule) obj;
     String ruleGroup = rule.getRuleGroup();
     for ( Object key : hm.keySet() ) {
