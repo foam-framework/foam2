@@ -49,11 +49,11 @@ public class DAOResourceLoader
     return null;
   }
 
-  protected String groupId_;
+  protected EmailTemplate template_;
 
-  public DAOResourceLoader(X x, String groupId) {
+  public DAOResourceLoader(X x, EmailTemplate template) {
     setX(x);
-    this.groupId_ = groupId;
+    this.template_ = template;
   }
 
   @Override
@@ -63,8 +63,7 @@ public class DAOResourceLoader
 
   @Override
   public InputStream load(String s) {
-    EmailTemplate template = DAOResourceLoader.findTemplate(getX(), s, this.groupId_);
-    return template == null ? null : new ByteArrayInputStream(template.getBodyAsByteArray());
+    return this.template_ == null ? null : new ByteArrayInputStream(template.getBodyAsByteArray());
   }
 
   @Override

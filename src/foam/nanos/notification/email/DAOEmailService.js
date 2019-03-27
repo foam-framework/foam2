@@ -14,6 +14,10 @@ foam.CLASS({
     'foam.nanos.notification.email.EmailService'
   ],
 
+  imports: [
+    'logger?'
+  ],
+
   javaImports: [
     'foam.core.X',
     'foam.dao.ArraySink',
@@ -24,6 +28,8 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.nanos.auth.Group',
     'foam.nanos.logger.Logger',
+    'foam.nanos.notification.email.EmailMessage',
+    'foam.nanos.notification.email.EmailTemplate',
     'foam.util.SafetyUtil',
     'java.nio.charset.StandardCharsets',
     'java.util.List',
@@ -31,7 +37,8 @@ foam.CLASS({
     'org.jtwig.environment.EnvironmentConfigurationBuilder',
     'org.jtwig.JtwigModel',
     'org.jtwig.JtwigTemplate',
-    'org.jtwig.resource.loader.TypedResourceLoader'
+    'org.jtwig.resource.loader.TypedResourceLoader',
+    'static foam.mlang.MLang.*'
   ],
 
   properties: [
@@ -88,28 +95,6 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'getConfig',
-      javaType: 'EnvironmentConfiguration',
-      args: [
-        {
-          name: 'group',
-          type: 'String'
-        }
-      ],
-      javaCode:
-`if ( config_ == null ) {
-  config_ = EnvironmentConfigurationBuilder
-    .configuration()
-    .resources()
-      .resourceLoaders()
-        .add(new TypedResourceLoader("dao", new DAOResourceLoader(getX(), group)))
-      .and()
-    .and()
-  .build();
-}
-return config_;`
-    },
-    {
       name: 'sendEmail',
       javaCode: `
         getDao().inX(x).put(emailMessage);
@@ -117,155 +102,151 @@ return config_;`
     },
     {
       name: 'sendEmailFromTemplate',
+      documentation: `Purpose of this function/service is to facilitate the populations of an email and then to actually send the email. 
+      STEP 1) find the EmailTemplate,
+      STEP 2) apply the template to the emailMessage,
+      STEP 3) set defaults to emailMessage where property is empty,
+      STEP 4) then to store and send the email we just have to do a dao.put.
+      `,
       javaCode: `
-        String group = user != null ? (String) user.getGroup() : null;
-        EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(getX(), name, group);
-        if ( emailMessage == null )
-          return;
+        EmailTemplate emailTemplateObj = null;
 
-        for ( String key : templateArgs.keySet() ) {
-          Object value = templateArgs.get(key);
-          if ( value instanceof String ) {
-            String s = (String) value;
-            templateArgs.put(key, new String(s.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
+        if ( user == null && (emailMessage == null || SafetyUtil.isEmpty(emailMessage.getTo()[0]) ) ) {
+          ((Logger)getLogger()).warning("user and emailMessage.getTo() is not set. Email can't magically know where to go.", new Exception());
+          return;
+        }
+
+        if ( ! SafetyUtil.isEmpty(name) && user != null) {
+
+          // STEP 1) Find EmailTemplate
+          
+          emailTemplateObj = findTemplate(x, name, user.getGroup());
+          if ( emailMessage == null ) {
+            if ( emailTemplateObj != null ) {
+              emailMessage = new EmailMessage();
+            } else {
+              ((Logger)getLogger()).warning("emailTemplate not found and emailMessage is null. Invalid use of emailService", new Exception());
+              return;
+            }
+          }
+        } else {
+          if ( emailMessage == null ) {
+            // no template specified and no emailMessage means nothing to send.
+            ((Logger)getLogger()).warning("emailTemplate name missing and emailMessage is null. Invalid use of emailService", new Exception());
+            return;
           }
         }
 
-        JtwigModel model = JtwigModel.newModel(templateArgs);
+        // emailMessage not null if we have reached here
 
-        emailMessage = fillInEmailProperties(x, emailMessage, emailTemplate, model);
+        // Possible that emailTemplateObj is null and emailMessage was passed in for sending, without the use of a template.
+        // in this case bypass step 2.
+        if ( emailTemplateObj != null) {
 
+          // STEP 2) Apply Template to emailMessage
+
+          try {
+            emailMessage = emailTemplateObj.apply(x, user, emailMessage, templateArgs);
+            if ( emailMessage == null) {
+              ((Logger)getLogger()).warning("emailTemplate.apply has returned null. Which implies an uncaught error", new Exception());
+            }
+          } catch (Exception e) {
+            ((Logger)getLogger()).warning("emailTemplate.apply has failed, with a caught exception", e);
+            return;
+          }
+        }
+
+        // STEP 3) set defaults to properties that have not been set
+
+        if ( SafetyUtil.isEmpty(emailMessage.getFrom()) ) {
+          emailMessage.setFrom(getFrom());
+        }
+        if ( SafetyUtil.isEmpty(emailMessage.getDisplayName()) ) {
+          emailMessage.setDisplayName(getDisplayName());
+        }
+        if ( SafetyUtil.isEmpty(emailMessage.getReplyTo()) ) {
+          emailMessage.setReplyTo(getReplyTo());
+        }
+
+        // STEP 4) Pass populated emailMessage through email pipeline 
         sendEmail(x, emailMessage);
       `
     },
     {
-      name: 'fillInEmailProperties',
-      documentation: `
-        Order of precedence:
-        1) Properties set on the EmailMessage,
-        2) Properties set on the EmailTemplate,
-        3) Properties set on the Group,
-        4) Properties set as default`,
-      type: 'foam.nanos.notification.email.EmailMessage',
+      name: 'findTemplate',
+      visibility: 'private',
+      type: 'EmailTemplate',
       args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'emailMessage',
-          javaType: 'final foam.nanos.notification.email.EmailMessage'
-        },
-        {
-          name: 'emailTemplate',
-          javaType: 'final foam.nanos.notification.email.EmailTemplate'
-        },
-        {
-          name: 'model',
-          javaType: 'org.jtwig.JtwigModel'
-        }
+        { name: 'x',       type: 'Context' },
+        { name: 'name',    type: 'String' },
+        { name: 'groupId', type: 'String' }
       ],
       javaCode: `
-        // VARIABLE SET UP:
-        User user     = findUser(x, emailMessage);
-        Logger logger = (Logger) x.get("logger");
-        EnvironmentConfiguration config = getConfig(user.getGroup());
-        DAO groupDAO   = ((DAO) x.get("groupDAO")).inX(x);
-        Group group    = (Group) groupDAO.find(user.getGroup());
+        DAO groupDAO = (DAO) x.get("groupDAO");
+        DAO emailTemplateDAO = (DAO) x.get("emailTemplateDAO");
+        groupId = ! SafetyUtil.isEmpty(groupId) ? groupId : "*";
+        Group group = null;
+        Sink sink = null;
+        List data = null;
 
-        if ( group == null ) {
-          logger.warning("group null or unverified through DAO: failing at DAOEmailService.fillInEmailProperties()", new Exception());
-        }
-
-        // BODY:
-        JtwigTemplate templateBody = JtwigTemplate.inlineTemplate(emailTemplate.getBody(), config);
-        emailMessage.setBody(templateBody.render(model));
-
-        // FROM:
-        // The from property is the one property not on emailTemplate
-        if ( SafetyUtil.isEmpty(emailMessage.getFrom()) ) {
-          emailMessage.setFrom(
-            ! SafetyUtil.isEmpty(group.getFrom()) ?
-              group.getFrom() : getFrom()
-          );
-        }
-
-        // REPLY TO:
-        if ( SafetyUtil.isEmpty(emailMessage.getReplyTo()) ) {
-          if ( ! foam.util.SafetyUtil.isEmpty(emailTemplate.getReplyTo()) ) {
-            JtwigTemplate templateDisplayName = JtwigTemplate.inlineTemplate(emailTemplate.getReplyTo(), config);
-            emailMessage.setReplyTo(templateDisplayName.render(model));
-          } else {
-            emailMessage.setReplyTo(
-              ! SafetyUtil.isEmpty(group.getReplyTo()) ?
-                group.getReplyTo() : getReplyTo()
-            );
+        // do {} while () is a loop through not only passed in groupId but through all parents
+        do {
+          sink = emailTemplateDAO.where(
+              AND(
+                EQ(EmailTemplate.NAME, name),
+                EQ(EmailTemplate.GROUP, groupId)
+              )
+            ).limit(1).select(null);
+    
+          data = ((ArraySink) sink).getArray();
+          if ( data != null && data.size() == 1 ) {
+            return checkForExtensions(x, groupId, (EmailTemplate) data.get(0));
           }
-        }
-
-        // DISPLAY NAME:
-        if ( SafetyUtil.isEmpty(emailMessage.getDisplayName()) ) {
-          if ( ! foam.util.SafetyUtil.isEmpty(emailTemplate.getDisplayName()) ) {
-            JtwigTemplate templateDisplayName = JtwigTemplate.inlineTemplate(emailTemplate.getDisplayName(), config);
-            emailMessage.setDisplayName(templateDisplayName.render(model));
-          } else {
-            emailMessage.setDisplayName(
-              ! SafetyUtil.isEmpty(group.getDisplayName()) ? group.getDisplayName() : getDisplayName()
-            );
+    
+          // exit condition, no emails even with * group so return null
+          if ( "*".equals(groupId) ) {
+            return null;
           }
-        }
-
-        // SUBJECT:
-        // Since subject is very specific to each email there is no group field or default value for this property.
-        if ( foam.util.SafetyUtil.isEmpty(emailMessage.getSubject()) &&
-          ! foam.util.SafetyUtil.isEmpty(emailTemplate.getSubject()) ) {
-            JtwigTemplate templateSubject = JtwigTemplate.inlineTemplate(emailTemplate.getSubject(), config);
-            emailMessage.setSubject(templateSubject.render(model));
-        }
-
-        // SEND TO:
-        // Since sendTo is very specific to each email there is no group field or default value for this property.
-        if ( emailMessage.getTo().length == 0 &&
-          ! foam.util.SafetyUtil.isEmpty(emailTemplate.getSendTo()) ) {
-            JtwigTemplate templateSendTo = JtwigTemplate.inlineTemplate(emailTemplate.getSendTo(), config);
-            emailMessage.setTo(new String[] {templateSendTo.render(model)});
-        }
-
-        return emailMessage;
+          
+          // Search for groupId obj and replace groupId string with parent groupId string.
+          group = (Group) groupDAO.find(groupId);
+          groupId = ( group != null && ! SafetyUtil.isEmpty(group.getParent()) ) ? group.getParent() : "*";
+        } while ( ! SafetyUtil.isEmpty(groupId) );
+    
+        return null;
       `
     },
-    {
-      name: 'findUser',
-      type: 'foam.nanos.auth.User',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'emailMessage',
-          javaType: 'final foam.nanos.notification.email.EmailMessage'
-        }
-      ],
-      javaCode:
-        `
-        Logger logger = (Logger) x.get("logger");
-        foam.nanos.session.Session session = x.get(foam.nanos.session.Session.class);
+    // {
+    //   name: 'checkForExtensions',
+    //   documentation: `ASSUMING THIS EXACT FORMATING: EX {% extends 'extended-email-base'%}`,
+    //   type: 'EmailTemplate',
+    //   args: [
+    //     { name: 'x',       type: 'Context' },
+    //     { name: 'groupId', type: 'String' },
+    //     { name: 'template',    type: 'EmailTemplate' }
+    //   ],
+    //   javaCode: `
+    //     int position = 0;
+    //     int endPosition = 0;
+    //     String body = template.getBody();
+    //     String extendTemplateName = "";
 
-        DAO userDAO         = ((DAO) x.get("localUserDAO")).inX(x);
-        User user           = (User) userDAO.find(session.getUserId());
-
-        // 1. If the user doesn't login at this time, get the user from localUserDao
-        // 2. If the user is the system user, get the real user from localUserDao
-        if ( user == null || user.getId() == 1 || ! user.getLoginEnabled() ) {
-          user = (User) userDAO.find(MLang.EQ(User.EMAIL, emailMessage.getTo()[0]));
-          if ( user == null || user.getId() == 0 || user.getLoginEnabled() ) {
-            logger.warning("User not found:", new Exception());
-          }
-        }
-
-        return user;
-      `
-    }
+    //     if ( (position = body.indexOf("{% extends")) > -1 ) {
+    //       position = body.indexOf("'", position);
+    //       endPosition  = body.indexOf("'", position+1);
+    //       if ( position > -1 && endPosition > -1 ) {
+    //         extendTemplateName = body.substring(position+1, endPosition);
+    //         EmailTemplate extendedTemplate = findTemplate(x, extendTemplateName, groupId);
+    //         if ( extendedTemplate != null ) {
+    //           body = body.replaceAll("{% extends '" + extendTemplateName + "'%}", extendedTemplate.getBody());
+    //         } else {
+    //           body = body.replaceAll("{% extends '" + extendTemplateName + "'%}", "");
+    //         }
+    //         template.setBody(body);
+    //       }
+    //     }
+    //     return template;
+    //   `
+    // }
   ]
 });

@@ -16,7 +16,6 @@ foam.CLASS({
 
   imports: [
     'threadPool?', // Only imported in Java
-    'appConfig?'
   ],
 
   javaImports: [
@@ -31,41 +30,38 @@ foam.CLASS({
     'javax.mail.internet.InternetAddress',
     'javax.mail.internet.MimeMessage',
     'org.apache.commons.lang3.StringUtils',
-    'org.jtwig.environment.EnvironmentConfiguration',
-    'org.jtwig.environment.EnvironmentConfigurationBuilder',
     'org.jtwig.JtwigModel',
     'org.jtwig.JtwigTemplate',
     'org.jtwig.resource.loader.TypedResourceLoader',
     'foam.dao.DAO',
     'foam.nanos.auth.User',
-    'foam.nanos.auth.Group',
-    'foam.nanos.app.AppConfig'
+    'foam.nanos.auth.Group'
   ],
 
   axioms: [
     {
       name: 'javaExtras',
-      buildJavaClass: function (cls) {
+      buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data:
-`private class SMTPAuthenticator extends javax.mail.Authenticator {
-  protected String username_;
-  protected String password_;
+            `private class SMTPAuthenticator extends javax.mail.Authenticator {
+              protected String username_;
+              protected String password_;
 
-  public SMTPAuthenticator(String username, String password) {
-    this.username_ = username;
-    this.password_ = password;
-  }
+              public SMTPAuthenticator(String username, String password) {
+                this.username_ = username;
+                this.password_ = password;
+              }
 
-  @Override
-  protected PasswordAuthentication getPasswordAuthentication() {
-    return new PasswordAuthentication(this.username_, this.password_);
-  }
-}
+              @Override
+              protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(this.username_, this.password_);
+              }
+            }
 
-protected Session session_ = null;
-protected EnvironmentConfiguration config_ = null;`
-        }))
+            protected Session session_ = null;
+            `
+        }));
       }
     }
   ],
@@ -115,28 +111,6 @@ protected EnvironmentConfiguration config_ = null;`
   ],
 
   methods: [
-    {
-      name: 'getConfig',
-      javaType: 'EnvironmentConfiguration',
-      args: [
-        {
-          name: 'group',
-          type: 'String'
-        }
-      ],
-      javaCode:
-`if ( config_ == null ) {
-  config_ = EnvironmentConfigurationBuilder
-    .configuration()
-    .resources()
-      .resourceLoaders()
-        .add(new TypedResourceLoader("dao", new DAOResourceLoader(getX(), group)))
-      .and()
-    .and()
-  .build();
-}
-return config_;`
-    },
     {
       name: 'createMimeMessage',
       javaType: 'MimeMessage',
