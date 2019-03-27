@@ -24,7 +24,6 @@ foam.CLASS({
     'java.nio.charset.StandardCharsets',
     'java.util.List',
     'org.jtwig.environment.EnvironmentConfiguration',
-    'org.jtwig.environment.EnvironmentConfigurationBuilder',
     'org.jtwig.JtwigModel',
     'org.jtwig.JtwigTemplate',
     'org.jtwig.resource.loader.TypedResourceLoader'
@@ -112,6 +111,10 @@ foam.CLASS({
           type: 'Map',
           javaType: 'java.util.Map<String, Object>',
           documentation: 'Template arguments'
+        },
+        {
+          name: 'config',
+          javaType: 'EnvironmentConfiguration'
         }
       ],
       javaCode: `
@@ -149,7 +152,7 @@ foam.CLASS({
         }
 
         // should have all properties necessary set by here, therefore process this template onto an emailMessage
-        return fillInEmailProperties(x, emailMessage, model, group);
+        return fillInEmailProperties(x, emailMessage, model, group, config);
       `
     },
     {
@@ -181,11 +184,14 @@ foam.CLASS({
         {
           name: 'group',
           javaType: 'foam.nanos.auth.Group'
+        },
+        {
+          name: 'config',
+          javaType: 'EnvironmentConfiguration'
         }
       ],
       javaCode: `
         // BODY:
-        EnvironmentConfiguration config = getConfig();
         JtwigTemplate templateBody = JtwigTemplate.inlineTemplate(getBody(), config);
         emailMessage.setBody(templateBody.render(model));
 
@@ -236,21 +242,6 @@ foam.CLASS({
         }
 
         return emailMessage;
-      `
-    },
-    {
-      name: 'getConfig',
-      javaType: 'EnvironmentConfiguration',
-      javaCode:
-      `
-      return EnvironmentConfigurationBuilder
-        .configuration()
-        .resources()
-          .resourceLoaders()
-            .add(new TypedResourceLoader("dao", new DAOResourceLoader(getX(), this)))
-          .and()
-        .and()
-        .build();
       `
     }
   ]

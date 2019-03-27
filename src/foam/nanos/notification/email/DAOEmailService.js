@@ -87,13 +87,37 @@ foam.CLASS({
             };
 
             protected EnvironmentConfiguration config_ = null;
-`
+          `
         }));
       }
     }
   ],
 
   methods: [
+    {
+      name: 'getConfig',
+      javaType: 'EnvironmentConfiguration',
+      args: [
+        {
+          name: 'group',
+          type: 'String'
+        }
+      ],
+      javaCode:
+      `
+      if ( config_ == null ) {
+        config_ = EnvironmentConfigurationBuilder
+          .configuration()
+          .resources()
+            .resourceLoaders()
+              .add(new TypedResourceLoader("dao", new DAOResourceLoader(getX(), group)))
+            .and()
+          .and()
+        .build();
+      }
+      return config_;
+      `
+    },
     {
       name: 'sendEmail',
       javaCode: `
@@ -116,11 +140,12 @@ foam.CLASS({
           return;
         }
 
+        EnvironmentConfiguration config = getConfig(user.getGroup());
+
         if ( ! SafetyUtil.isEmpty(name) && user != null) {
 
           // STEP 1) Find EmailTemplate
-          
-          emailTemplateObj = findTemplate(x, name, user.getGroup());
+          emailTemplateObj = DAOResourceLoader.findTemplate(getX(), name, user.getGroup());
           if ( emailMessage == null ) {
             if ( emailTemplateObj != null ) {
               emailMessage = new EmailMessage();
@@ -146,7 +171,7 @@ foam.CLASS({
           // STEP 2) Apply Template to emailMessage
 
           try {
-            emailMessage = emailTemplateObj.apply(x, user, emailMessage, templateArgs);
+            emailMessage = emailTemplateObj.apply(x, user, emailMessage, templateArgs, config);
             if ( emailMessage == null) {
               ((Logger)getLogger()).warning("emailTemplate.apply has returned null. Which implies an uncaught error", new Exception());
             }
@@ -171,82 +196,6 @@ foam.CLASS({
         // STEP 4) Pass populated emailMessage through email pipeline 
         sendEmail(x, emailMessage);
       `
-    },
-    {
-      name: 'findTemplate',
-      visibility: 'private',
-      type: 'EmailTemplate',
-      args: [
-        { name: 'x',       type: 'Context' },
-        { name: 'name',    type: 'String' },
-        { name: 'groupId', type: 'String' }
-      ],
-      javaCode: `
-        DAO groupDAO = (DAO) x.get("groupDAO");
-        DAO emailTemplateDAO = (DAO) x.get("emailTemplateDAO");
-        groupId = ! SafetyUtil.isEmpty(groupId) ? groupId : "*";
-        Group group = null;
-        Sink sink = null;
-        List data = null;
-
-        // do {} while () is a loop through not only passed in groupId but through all parents
-        do {
-          sink = emailTemplateDAO.where(
-              AND(
-                EQ(EmailTemplate.NAME, name),
-                EQ(EmailTemplate.GROUP, groupId)
-              )
-            ).limit(1).select(null);
-    
-          data = ((ArraySink) sink).getArray();
-          if ( data != null && data.size() == 1 ) {
-            return checkForExtensions(x, groupId, (EmailTemplate) data.get(0));
-          }
-    
-          // exit condition, no emails even with * group so return null
-          if ( "*".equals(groupId) ) {
-            return null;
-          }
-          
-          // Search for groupId obj and replace groupId string with parent groupId string.
-          group = (Group) groupDAO.find(groupId);
-          groupId = ( group != null && ! SafetyUtil.isEmpty(group.getParent()) ) ? group.getParent() : "*";
-        } while ( ! SafetyUtil.isEmpty(groupId) );
-    
-        return null;
-      `
-    },
-    // {
-    //   name: 'checkForExtensions',
-    //   documentation: `ASSUMING THIS EXACT FORMATING: EX {% extends 'extended-email-base'%}`,
-    //   type: 'EmailTemplate',
-    //   args: [
-    //     { name: 'x',       type: 'Context' },
-    //     { name: 'groupId', type: 'String' },
-    //     { name: 'template',    type: 'EmailTemplate' }
-    //   ],
-    //   javaCode: `
-    //     int position = 0;
-    //     int endPosition = 0;
-    //     String body = template.getBody();
-    //     String extendTemplateName = "";
-
-    //     if ( (position = body.indexOf("{% extends")) > -1 ) {
-    //       position = body.indexOf("'", position);
-    //       endPosition  = body.indexOf("'", position+1);
-    //       if ( position > -1 && endPosition > -1 ) {
-    //         extendTemplateName = body.substring(position+1, endPosition);
-    //         EmailTemplate extendedTemplate = findTemplate(x, extendTemplateName, groupId);
-    //         if ( extendedTemplate != null ) {
-    //           body = body.replaceAll("{% extends '" + extendTemplateName + "'%}", extendedTemplate.getBody());
-    //         } else {
-    //           body = body.replaceAll("{% extends '" + extendTemplateName + "'%}", "");
-    //         }
-    //         template.setBody(body);
-    //       }
-    //     }
-    //     return template;
-    //   `
-    // }
+      }
   ]
 });
