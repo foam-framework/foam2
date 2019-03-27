@@ -11,7 +11,6 @@ foam.INTERFACE({
     {
       name: 'parse',
       type: 'foam.swift.parse.PStream',
-      returnsNullable: true,
       args: [
         {
           type: 'foam.swift.parse.PStream',

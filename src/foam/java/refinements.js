@@ -551,7 +551,7 @@ foam.LIB({
         }
 
         if ( ! cls.abstract ) {
-          // Apply builder pattern if more than 3 properties and not abstract.
+          // Apply builder pattern if not abstract.
           foam.java.Builder.create({ properties: this.getAxiomsByClass(foam.core.Property)
             .filter(flagFilter)
             .filter(function(p) {
@@ -587,10 +587,6 @@ foam.CLASS({
       class: 'Boolean',
       name: 'abstract',
       value: true
-    },
-    {
-      class: 'Boolean',
-      name: 'synchronized'
     },
     {
       class: 'StringArray',
@@ -1129,11 +1125,72 @@ foam.CLASS({
             initializer: 'false'
           });
 
-          var axioms = this.getAxioms().filter(foam.util.flagFilter(['java']));
-
+          var flagFilter = foam.util.flagFilter(['java']);
+          var axioms = this.getAxioms().filter(flagFilter);
           for ( var i = 0 ; i < axioms.length ; i++ ) {
             axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
           }
+
+          var properties = this.getAxiomsByClass(foam.core.Property)
+            .filter(flagFilter)
+            .filter(p => p.generateJava && p.javaInfoType);
+
+          cls.method({
+            name: cls.name,
+            args: properties.map(function(p) {
+              return {
+                name: p.name,
+                type: p.javaType
+              };
+            }),
+            body: properties.map(function(p) {
+              return `set${foam.String.capitalize(p.name)}(${p.name});`;
+            }).join('\n')
+          });
+
+          cls.declarations = this.VALUES.map(function(v) {
+            return `${v.name}(${properties.map(p => foam.java.asJavaValue(v[p])).join(', ')})`;
+          }).join(', ');
+
+          cls.method({
+            name: 'labels',
+            type: 'String[]',
+            visibility: 'public',
+            static: true,
+            body: `
+return new String[] {
+  ${this.VALUES.map(v => foam.java.asJavaValue(v.label)).join(', ')}
+};
+            `
+          });
+
+          cls.method({
+            name: 'forOrdinal',
+            type: cls.name,
+            visibility: 'public',
+            static: true,
+            args: [ { name: 'ordinal', type: 'int' } ],
+            body: `
+switch (ordinal) {
+${this.VALUES.map(v => `\tcase ${v.ordinal}: return ${cls.name}.${v.name};`).join('\n')}
+}
+return null;
+            `
+          });
+
+          cls.method({
+            name: 'forLabel',
+            type: cls.name,
+            visibility: 'public',
+            static: true,
+            args: [ { name: 'label', type: 'String' } ],
+            body: `
+switch (label) {
+${this.VALUES.map(v => `\tcase "${v.label}": return ${cls.name}.${v.name};`).join('\n')}
+}
+return null;
+            `
+          });
 
           return cls;
         };
@@ -1957,57 +2014,54 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.java',
-  name: 'PromisedJavaRefinement',
-  refines: 'foam.core.Promised',
-  flags: [
-    'java'
-  ],
-  methods: [
-    function buildJavaClass(cls) {
-      var name = this.name;
-      var filter = foam.util.flagFilter(['java']);
-      var of = foam.lookup(this.of);
-      var methods = this.methods ?
-        this.methods.map(m => of.getAxiomByName(m)) :
-        of.getOwnAxiomsByClass(foam.core.Method);
-      methods = methods.filter(filter);
-
-      methods.forEach(function(m) {
-        var m2 = m.clone();
-        m2.javaCode = `
+  name: 'PromisedMethodRefinement',
+  refines: 'foam.core.PromisedMethod',
+  flags: ['java'],
+  properties: [
+    {
+      name: 'javaCode',
+      getter: function() {
+        return `
 try {
-  maybeWaitFor${name}();
-  ${m2.javaType != 'void' ? 'return ' : ''}get${foam.String.capitalize(name)}().${m2.name}(${m2.args.map(a => a.name).join(', ')});
+  synchronized ( getDelegate() ) {
+    if ( ! getDelegate().isPropertySet("${this.property}") ) getDelegate().wait();
+  }
+} catch (Exception e) {
+  throw new RuntimeException(e);
+}
+${this.javaType != 'void' ? 'return ' : ''}getDelegate()
+    .${this.name}(${this.args.map(a => a.name).join(', ')});
+        `;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'PromisedRefinement',
+  refines: 'foam.core.Promised',
+  flags: ['java'],
+  properties: [
+    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
+    {
+      name: 'javaType',
+      expression: function(of) { return of; }
+    },
+    {
+      name: 'javaPostSet',
+      expression: function(name, stateName) {
+        return `
+set${foam.String.capitalize(stateName)}(val);
+try {
+  synchronized ( this ) {
+    this.notifyAll();
+  }
 } catch (Exception e) {
   throw new RuntimeException(e);
 }
         `;
-        m2.buildJavaClass(cls);
-      });
-
-      cls.method({
-        type: 'void',
-        name: `maybeWaitFor${name}`,
-        synchronized: true,
-        throws: ['InterruptedException'],
-        body: `
-if ( ! isPropertySet("${name}") ) wait();
-else notifyAll();
-        `
-      });
-
-      foam.core.FObjectProperty.create({
-        of: of,
-        name: name,
-        javaPostSet: `
-try {
-  maybeWaitFor${name}();
-} catch (Exception e) {
-  throw new RuntimeException(e);
-}
-        `
-      }).buildJavaClass(cls);
-      return cls;
+      }
     }
   ]
 });

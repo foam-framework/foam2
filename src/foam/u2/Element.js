@@ -523,7 +523,7 @@ foam.CLASS({
   listeners: [
     {
       name: 'paint',
-      isMerged: 100,
+      isFramed: true,
       code: function() {
         var batch = ++this.batch;
         var self = this;
@@ -2283,6 +2283,19 @@ foam.CLASS({
     {
       name: 'view',
       value: { class: 'foam.u2.view.FObjectArrayView' },
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'MapViewRefinement',
+  refines: 'foam.core.Map',
+  properties: [
+    {
+      name: 'view',
+      value: { class: 'foam.u2.view.MapView' },
     }
   ]
 });

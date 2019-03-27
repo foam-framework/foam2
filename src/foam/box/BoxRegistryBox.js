@@ -62,6 +62,7 @@ self.onDetach(Subscription(detach: {
     {
       name: 'send',
       swiftCode: function() {/*
+let msg = msg!
 if let object = msg.object as? foam_box_SubBoxMessage {
   let name = object.name
 

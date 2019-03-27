@@ -23,6 +23,7 @@ foam.CLASS({
     {
       name: 'put_',
       swiftCode: function() {/*
+let obj = obj!
 var found = false
 for (i, o) in array.enumerated() {
   if primaryKey.compare(obj, o) == 0 {
@@ -69,9 +70,9 @@ let sub = Subscription(detach: { detached = true })
 
 for o in array {
   if detached { break }
-  sink.put(o, sub)
+  sink?.put(o, sub)
 }
-sink.eof()
+sink?.eof()
 
 return resultSink
       */},

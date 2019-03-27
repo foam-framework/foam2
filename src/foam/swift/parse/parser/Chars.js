@@ -21,8 +21,9 @@ foam.CLASS({
     {
       name: 'parse',
       swiftCode: function() {/*
+let ps = ps!
 if ps.valid() && chars.index(of: ps.head()) != -1 {
-  return ps.tail().setValue(ps.head())
+  return ps.tail()!.setValue(ps.head())
 }
 return nil
       */},

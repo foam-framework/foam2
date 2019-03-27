@@ -9,6 +9,8 @@ package foam.mlang;
 import foam.core.ClassInfo;
 import foam.dao.Sink;
 import foam.mlang.expr.Dot;
+import foam.mlang.order.Comparator;
+import foam.mlang.order.Desc;
 import foam.mlang.predicate.*;
 import foam.mlang.sink.*;
 import java.lang.reflect.InvocationTargetException;
@@ -25,6 +27,10 @@ public class MLang
 
   public static final Expr NEW_OBJ    = new ContextObject("NEW");
   public static final Expr OLD_OBJ    = new ContextObject("OLD");
+
+  public static Comparator DESC(Comparator c) {
+    return new Desc(c);
+  }
 
   public static Expr prepare(Object o) {
     return o instanceof Expr ? (Expr) o :

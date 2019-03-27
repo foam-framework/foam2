@@ -173,12 +173,13 @@ protected class ResponseThread implements Runnable {
         });
       },
       swiftCode: function() {/*
+let msg = msg!
 let replyBox = msg.attributes["replyBox"] as? foam_box_Box
 msg.attributes["replyBox"] = HTTPReplyBox_create()
 
 var request = URLRequest(url: Foundation.URL(string: self.url)!)
 request.httpMethod = "POST"
-request.httpBody = outputter.swiftStringify(msg).data(using: .utf8)
+request.httpBody = outputter.swiftStringify(msg)!.data(using: .utf8)
 
 msg.attributes["replyBox"] = replyBox
 

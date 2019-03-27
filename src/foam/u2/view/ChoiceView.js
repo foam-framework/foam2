@@ -53,16 +53,19 @@ foam.CLASS({
 
         this.feedback_ = true;
 
-        if ( ! n && this.placeholder ) {
-          this.data = undefined;
-          this.text = this.placeholder;
-          this.index = -1;
-        } else {
-          this.data = n && n[0];
-          this.text = n && n[1];
-          this.index = this.findIndexOfChoice(n);
+        try {
+          if ( ! n && this.placeholder ) {
+            this.data  = undefined;
+            this.text  = this.placeholder;
+            this.index = -1;
+          } else {
+            this.data  = n && n[0];
+            this.text  = n && n[1];
+            this.index = this.findIndexOfChoice(n);
+          }
+        } finally {
+          this.feedback_ = false;
         }
-        this.feedback_ = false;
       }
     },
     {
