@@ -31,12 +31,12 @@ foam.CLASS({
           this.Argument.create({
             localName: 'outputter',
             externalName: 'outputter',
-            type: foam.swift.parse.json.output.Outputter.model_.swiftName,
+            type: foam.swift.parse.json.output.Outputter.model_.swiftName + '?',
           }),
           this.Argument.create({
             localName: 'out',
             externalName: 'out',
-            type: 'foam_json2_Outputter',
+            type: foam.json2.Outputter.model_.swiftName + '?'
           }),
         ],
         body: this.swiftCode(),
@@ -47,11 +47,13 @@ foam.CLASS({
     {
       name: 'swiftCode',
       template: `
+let out = out!
+let outputter = outputter!
 let X = __subContext__
 let registry = X["registry"] as! foam_box_BoxRegistry
 
 var box: foam_box_Box = X.create(foam_box_SkeletonBox.self, args: ["data": self])!
-box = registry.register(nil, nil, box)
+box = registry.register(nil, nil, box)!
 
 let obj = __context__.create(<%=foam.swift.toSwiftName(this.clientClass)%>.self)!
 obj.delegate = box;

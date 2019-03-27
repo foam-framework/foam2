@@ -38,6 +38,30 @@ return 0
 
 foam.CLASS({
   package: 'foam.swift.refines',
+  name: 'ShortSwiftRefinement',
+  refines: 'foam.core.Short',
+  flags: ['swift'],
+  properties: [
+    {
+      name: 'swiftAdapt',
+      factory: function() {
+        return `
+var newValue = newValue
+if let str = newValue as? String { newValue = Int(str) }
+if let i = newValue as? Int {
+  let max = Int(Int16.max)
+  let min = Int(Int16.min)
+  return Int16(i > max ? max : i < min ? min : i)
+}
+return 0
+        `;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.swift.refines',
   name: 'LongSwiftRefinement',
   refines: 'foam.core.Long',
   flags: ['swift'],

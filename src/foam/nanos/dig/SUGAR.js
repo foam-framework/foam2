@@ -99,7 +99,6 @@ foam.CLASS({
       label: 'Method',
       documentation: 'the methods list of the picked service key',
       view: function(_, X) {
-      console.log("dfdafdaf");
         return X.data.slot(function(serviceKey) {
           var service = this.__context__[serviceKey];
 

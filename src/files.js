@@ -591,4 +591,7 @@ FOAM_FILES([
   { name: "foam/u2/texteditor/FontFace" },
   { name: "foam/u2/texteditor/FontSize" },
   { name: "foam/u2/texteditor/Popup" },
+  { name: "foam/u2/view/JSONTextView" },
+  { name: "foam/u2/view/MapView" },
+  { name: "foam/u2/view/AnyView" },
 ]);

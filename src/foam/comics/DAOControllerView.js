@@ -39,6 +39,7 @@ foam.CLASS({
       width: fit-content;
       max-width: 100vw;
       margin: auto;
+      max-width: calc(100vw - 80px);
     }
 
     ^top-row {
@@ -62,7 +63,9 @@ foam.CLASS({
     }
 
     ^container {
-      display: flex;
+      display: grid;
+      grid-template-columns: fit-content(100%) auto;
+      overflow-x: scroll;
     }
 
     ^container > * + * {
@@ -99,8 +102,7 @@ foam.CLASS({
       name: 'summaryView',
       factory: function() {
         return this.data.summaryView || this.importedSummaryView || {
-          class: 'foam.u2.view.ScrollTableView',
-          fitInScreen: true
+          class: 'foam.u2.view.ScrollTableView'
         };
       }
     },
@@ -172,7 +174,6 @@ foam.CLASS({
               .end();
             })
             .start()
-              .style({ 'overflow-x': 'auto' })
               .start()
                 .addClass(this.myClass('separate'))
                 .callIf(this.data.searchMode === this.SearchMode.SIMPLE, function() {

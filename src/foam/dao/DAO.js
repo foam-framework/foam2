@@ -43,7 +43,6 @@ foam.INTERFACE({
         {
           name: 'x',
           type: 'Context',
-          optional: true
         },
         {
           name: 'obj',
@@ -55,7 +54,6 @@ foam.INTERFACE({
       name: 'remove',
       async: true,
       type: 'FObject',
-      returnsNullable: true,
       swiftThrows: true,
       args: [
         {
@@ -68,13 +66,11 @@ foam.INTERFACE({
       name: 'remove_',
       async: true,
       type: 'FObject',
-      returnsNullable: true,
       swiftThrows: true,
       args: [
         {
           name: 'x',
           type: 'Context',
-          optional: true
         },
         {
           name: 'obj',
@@ -86,7 +82,6 @@ foam.INTERFACE({
       name: 'find',
       async: true,
       type: 'FObject',
-      returnsNullable: true,
       swiftThrows: true,
       args: [
         {
@@ -99,13 +94,11 @@ foam.INTERFACE({
       name: 'find_',
       async: true,
       type: 'FObject',
-      returnsNullable: true,
       swiftThrows: true,
       args: [
         {
           name: 'x',
           type: 'Context',
-          optional: true
         },
         {
           name: 'id',
@@ -134,7 +127,6 @@ foam.INTERFACE({
         {
           name: 'x',
           type: 'Context',
-          optional: true,
         },
         {
           name: 'sink',
@@ -154,13 +146,11 @@ foam.INTERFACE({
         {
           name: 'order',
           type: 'foam.mlang.order.Comparator',
-          optional: true,
           swiftDefaultValue: 'nil',
         },
         {
           name: 'predicate',
           type: 'foam.mlang.predicate.Predicate',
-          optional: true,
           swiftDefaultValue: 'nil',
         }
       ]
@@ -179,7 +169,6 @@ foam.INTERFACE({
         {
           name: 'x',
           type: 'Context',
-          optional: true
         },
         {
           name: 'skip',
@@ -194,13 +183,11 @@ foam.INTERFACE({
         {
           name: 'order',
           type: 'foam.mlang.order.Comparator',
-          optional: true,
           swiftDefaultValue: 'nil',
         },
         {
           name: 'predicate',
           type: 'foam.mlang.predicate.Predicate',
-          optional: true,
           swiftDefaultValue: 'nil',
         }
       ]
@@ -220,7 +207,6 @@ foam.INTERFACE({
         {
           name: 'predicate',
           type: 'foam.mlang.predicate.Predicate',
-          optional: true,
           swiftDefaultValue: 'nil',
         }
       ]
@@ -235,7 +221,6 @@ foam.INTERFACE({
         {
           name: 'x',
           type: 'Context',
-          optional: true
         },
         {
           name: 'sink',
@@ -245,7 +230,6 @@ foam.INTERFACE({
         {
           name: 'predicate',
           type: 'foam.mlang.predicate.Predicate',
-          optional: true,
           swiftDefaultValue: 'nil',
         }
       ]
@@ -277,7 +261,6 @@ foam.INTERFACE({
         {
           name: 'predicate',
           type: 'foam.mlang.predicate.Predicate',
-          optional: true,
           swiftDefaultValue: 'nil',
         }
       ]
@@ -290,7 +273,6 @@ foam.INTERFACE({
         {
           name: 'predicate',
           type: 'foam.mlang.predicate.Predicate',
-          optional: true,
           swiftDefaultValue: 'nil',
         }
       ]

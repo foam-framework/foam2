@@ -52,7 +52,7 @@ foam.CLASS({
       },
       swiftCode: function() {/*
 record[id] = id;
-return X.lookup(id)
+return X!.lookup(id)
       */}
     }
   ]
