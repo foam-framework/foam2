@@ -34,19 +34,34 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'static foam.mlang.MLang.*',
     'foam.nanos.logger.Logger',
+    'java.net.HttpURLConnection',
+    'java.net.URL',
     'java.util.List',
     'java.util.ArrayList',
   ],
 
-
-
   properties: [
+    {
+      name: 'path',
+      class: 'String',
+      value: 'service'
+    },
+    {
+      documentation: `nSpec service name at the remote node.`,
+      name: 'serviceName',
+      class: 'String'
+    },
     {
       documentation: `Cluster configuration for 'this' (localhost) node.`,
       name: 'config',
       class: 'FObjectProperty',
       type: 'foam.nanos.mrac.ClusterConfig',
       visibility: 'RO'
+    },
+    {
+      name: 'primary',
+      class: 'foam.dao.DAOProperty',
+      visibility: 'HIDDEN'
     },
     {
       documentation: `Array of all clients to put/remove to after a non-server operation.`,
@@ -60,7 +75,7 @@ foam.CLASS({
       name: 'clusterConfigDAO',
       class: 'foam.dao.DAOProperty',
       visibility: 'HIDDEN'
-    }
+    },
   ],
 
   methods: [
@@ -68,13 +83,13 @@ foam.CLASS({
       documentation: `Upon initialization create the ClusterServer configuration and register nSpec.`,
       name: 'init_',
       javaCode: `
-        reconfigure(getX());
-
         /* register ClusterConfig Listener */
         DAO clusterConfigDAO = (DAO) getX().get("clusterConfigDAO");
         clusterConfigDAO.listen(new ClusterConfigSink(getX(), this), TRUE);
         /* REVIEW: need to keep a reference to the dao?*/
         setClusterConfigDAO(clusterConfigDAO);
+
+        reconfigure(getX());
       `
     },
     {
@@ -88,6 +103,7 @@ foam.CLASS({
       ],
       javaCode: `
       Logger logger = (Logger) x.get("logger");
+      logger.debug(this.getClass().getSimpleName(), "reconfigure", getServiceName());
       DAO dao = (DAO) x.get("clusterConfigDAO");
       List arr = (ArrayList) ((ArraySink) dao
        .where(
@@ -97,17 +113,30 @@ foam.CLASS({
          )
        )
        .select(new ArraySink())).getArray();
-      DAO[] newClients = new DAO[arr.size()];
+      List<DAO> newClients = new ArrayList<DAO>();
       for ( int i = 0; i < arr.size(); i++ ) {
         ClusterConfig config = (ClusterConfig) arr.get(i);
         if ( "localhost".equals(config.getId()) ) {
           setConfig(config);
-          continue;
-        }
-        DAO client = new ClientDAO.Builder(x).setDelegate(new HTTPBox.Builder(x).build()).build();
-        newClients[i] = client;
+        } else if ( config.getNodeType() == NodeType.PRIMARY ) {
+          DAO primary = new ClientDAO.Builder(x).setDelegate(new HTTPBox.Builder(x).setUrl(buildURL(x, config)).build()).build();
+          setPrimary(primary);
+        } else if ( config.getNodeType() == NodeType.SECONDARY ) {
+          DAO client = new ClientDAO.Builder(x).setDelegate(new HTTPBox.Builder(x).setUrl(buildURL(x, config)).build()).build();
+          newClients.add(client);
+        } 
       }
-      setClients(newClients);
+      setClients(newClients.toArray(new DAO[newClients.size()]));
+      if ( getConfig() == null ) {
+        logger.error(this.getClass().getSimpleName(), "reconfigure", getServiceName(), "cluster configuration for LOCALHOST not found.");
+      } else if ( ! this.getConfig().getNodeType().equals(NodeType.PRIMARY) &&
+        getPrimary() == null ) {
+        logger.error(this.getClass().getSimpleName(), "reconfigure", getServiceName(), "cluster configuration for PRIMARY not found.");
+      } else if ( getClients().length == 0 ) {
+        logger.error(this.getClass().getSimpleName(), "reconfigure", getServiceName(), "cluster configuration for SECONDARY not found.");
+      } else {
+        logger.info(this.getClass().getSimpleName(), "reconfigure", getServiceName(), "cluster configuration for SECONDARY "+getClients().length+" found");
+      }
       `
     },
     {
@@ -123,33 +152,24 @@ foam.CLASS({
         }
       ],
       javaCode: `
+      Logger logger = (Logger) getX().get("logger");
       if ( ! this.getConfig().getNodeType().equals(NodeType.PRIMARY) ) {
-        List arr = (ArrayList) ((ArraySink) this.getClusterConfigDAO()
-          .where(
-            AND(
-              AND(
-                EQ(ClusterConfig.ENABLED, true),
-                EQ(ClusterConfig.STATUS, Status.ONLINE)
-               ),
-               EQ(ClusterConfig.NODE_TYPE, NodeType.PRIMARY)
-            )
-          )
-          .select(new ArraySink())).getArray();
-          if ( arr.isEmpty() ) {
-            throw new NullPointerException("No primary node is found.");
-          }
-          
-          ClusterConfig primaryConfig = (ClusterConfig) arr.get(0);
-          ClusterDAO primary = new ClusterDAO();
-          primary.setConfig(primaryConfig);
-          return primary.put_(x, obj);
+        logger.debug(this.getClass().getSimpleName(), "put_", getServiceName(), "to primary", obj);
+        return getPrimary().put_(x, obj);
       } else {
         foam.core.FObject o = getDelegate().put_(x, obj);
+        logger.debug(this.getClass().getSimpleName(), "put_", getServiceName(), "to secondaries("+getClients().length+")", o);
+        ClusterCommand cmd = new ClusterCommand.Builder(x).setCommand(ClusterCommand.PUT).setObj(o).build();
         for ( DAO client : getClients() ) {
-          client.cmd_(x, new ClusterCommand(x, "PUT", o));
+          try {
+            Object response = client.cmd_(x, cmd);
+            logger.debug(this.getClass().getSimpleName(), "put_", getServiceName(), " to secondary, response", response);
+          } catch ( Exception e ) {
+            logger.debug(this.getClass().getSimpleName(), "put_", getServiceName(), e);
+          }
         }
         return o;
-      }    
+      }
      `
     },
     {
@@ -165,30 +185,21 @@ foam.CLASS({
         }
       ],
       javaCode: `
+      Logger logger = (Logger) getX().get("logger");
       if ( ! this.getConfig().getNodeType().equals(NodeType.PRIMARY) ) {
-        List arr = (ArrayList) ((ArraySink) this.getClusterConfigDAO()
-          .where(
-            AND(
-              AND(
-                EQ(ClusterConfig.ENABLED, true),
-                EQ(ClusterConfig.STATUS, Status.ONLINE)
-               ),
-               EQ(ClusterConfig.NODE_TYPE, NodeType.PRIMARY)
-            )
-          )
-          .select(new ArraySink())).getArray();
-          if ( arr.isEmpty() ) {
-            throw new NullPointerException("No primary node is found.");
-          }
-          
-          ClusterConfig primaryConfig = (ClusterConfig) arr.get(0);
-          ClusterDAO primary = new ClusterDAO();
-          primary.setConfig(primaryConfig);
-          return primary.remove_(x, obj);
+        logger.debug(this.getClass().getSimpleName(), "remove_", getServiceName(), "to primary", obj);
+        return getPrimary().remove_(x, obj);
       } else {
         foam.core.FObject o = getDelegate().remove_(x, obj);
+        logger.debug(this.getClass().getSimpleName(), "remove_", getServiceName(), "to secondaries("+getClients().length+")", o);
+        ClusterCommand cmd = new ClusterCommand.Builder(x).setCommand(ClusterCommand.REMOVE).setObj(o).build();
         for ( DAO client : getClients() ) {
-          client.cmd_(x, new ClusterCommand(x, "REMOVE", o));
+          try {
+            Object response = client.cmd_(x, cmd);
+            logger.debug(this.getClass().getSimpleName(), "remove_", getServiceName(), " to secondary, response", response);
+          } catch ( Exception e ) {
+            logger.debug(this.getClass().getSimpleName(), "remove_", getServiceName(), e);
+          }
         }
         return o;
       }
@@ -200,17 +211,41 @@ foam.CLASS({
       if ( obj instanceof ClusterCommand ) {
         ClusterCommand request = (ClusterCommand) obj;
         Logger logger = (Logger) getX().get("logger");
-        logger.debug(this.getClass().getSimpleName(), "cmd_", request);
-        if ( "put".equals(request.getCmd()) ) {
+        logger.debug(this.getClass().getSimpleName(), "cmd_", getServiceName(), request);
+        if ( ClusterCommand.PUT.equals(request.getCommand()) ) {
           return getDelegate().put_(x, request.getObj());
-        } else if ( "remove".equals(request.getCmd()) ) {
+        } else if ( ClusterCommand.REMOVE.equals(request.getCommand()) ) {
           return getDelegate().remove_(x, request.getObj());
         } else {
-          throw new UnsupportedOperationException(request.getCmd());
+          throw new UnsupportedOperationException(request.getCommand());
         }
       }
       return getDelegate().cmd_(x, obj);
       `
+    },
+    {
+      name: 'buildURL',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'config',
+          type: 'foam.nanos.mrac.ClusterConfig'
+        }
+      ],
+      type: 'String',
+      javaCode: `
+      try {
+        // TODO: protocol - http will do for now as we are behind the load balancers.
+        java.net.URI uri = new java.net.URI("http", null, config.getId(), config.getPort(), "/"+getPath()+"/"+getServiceName(), null, null);
+        return uri.toURL().toString();
+      } catch (java.net.MalformedURLException | java.net.URISyntaxException e) {
+        ((Logger) getX().get("logger")).error(e);
+        return ""; // TODO: 
+      }
+      `
     }
- ]
+  ]
 });

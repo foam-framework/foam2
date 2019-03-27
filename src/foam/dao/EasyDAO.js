@@ -22,6 +22,7 @@ foam.CLASS({
 
   implements: [
     'foam.mlang.Expressions',
+    'foam.nanos.boot.NSpecAware'
   ],
 
   documentation: function() {/*
@@ -94,12 +95,17 @@ foam.CLASS({
       javaFactory: `return getOf().getId();`
     },
     {
+      name: 'nSpec',
+      class: 'FObjectProperty',
+      type: 'foam.nanos.boot.NSpec'
+    },
+    {
       /** This is set automatically when you create an EasyDAO.
         @private */
       name: 'delegate',
       javaFactory: `
 foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
-
+logger.info(this.getClass().getSimpleName(), "delegate", "NSpec.name", getNSpec().getName(), Thread.currentThread().getName());
 foam.dao.DAO delegate = getInnerDAO() == null ?
   new foam.dao.MDAO(getOf()) :
   getInnerDAO();
@@ -108,13 +114,14 @@ if ( delegate instanceof foam.dao.MDAO ) {
   setMdao((foam.dao.MDAO)delegate);
 }
 
-// TODO: cluster needs to delegate to MDAO.   InnerDAO is an issue.
-if ( getCluster() ) {
-  delegate = new foam.nanos.mrac.ClusterDAO.Builder(getX()).setDelegate(getMdao()).build();
-}
-
 if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
   delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
+}
+
+// TODO: cluster needs to delegate to MDAO.   InnerDAO is an issue.
+if ( getCluster() ) {
+  logger.debug(this.getClass().getSimpleName(), getOf(), "cluster", getCluster());
+  delegate = new foam.nanos.mrac.ClusterDAO.Builder(getX()).setServiceName(getNSpec().getName()).setDelegate(getMdao()).build();
 }
 
 if ( getDeletedAware() ||
@@ -172,10 +179,6 @@ if ( getAuthenticate() ) {
 
 if ( getPm() ) {
   delegate = new foam.dao.PMDAO(getX(), delegate);
-}
-
-if ( getCluster() ) {
-  // TODO: wrap top delegate in ClusterPrimaryDAO - which directs all puts to Primary node.
 }
 
 return delegate;

@@ -9,10 +9,27 @@ foam.CLASS({
   name: 'ClusterCommand',
 
   documentation: ``,
+  constants: [
+    {
+      name: 'PUT',
+      type: 'String',
+      value: 'put'
+    },
+    {
+      name: 'REMOVE',
+      type: 'String',
+      value: 'remove'
+    },
+    {
+      name: 'CMD',
+      type: 'String',
+      value: 'cmd'
+    }
+  ],
 
   properties: [
     {
-      name: 'cmd',
+      name: 'command',
       class: 'String'
     },
     {
