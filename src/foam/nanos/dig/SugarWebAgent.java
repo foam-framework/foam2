@@ -101,8 +101,10 @@ public class SugarWebAgent
               Class paramObj_ = null;
               Object obj_ = null;
 
-              if ( ! SafetyUtil.isEmpty(p.getParameter(pArray[j].getName())) || typeName.equals("foam.core.X") ) {
-                arglist[j] = setParameterType(x, resp, out, p, typeName, pArray[j]);
+              if ( typeName.equals("foam.core.X") ) {
+                arglist[j] = x;
+              } else if ( ! SafetyUtil.isEmpty(p.getParameter(pArray[j].getName())) ) {
+                arglist[j] = setParameterValue(x, resp, out, p, typeName, pArray[j]);
               } else {
                 DigErrorMessage error = new GeneralException.Builder(x)
                   .setMessage("Empty Parameter values : " + pArray[j].getName())
@@ -219,7 +221,7 @@ public class SugarWebAgent
     return clsObj;
   }
 
-  protected Object setParameterType(X x, HttpServletResponse resp, PrintWriter out, HttpParameters p, String typeName, Parameter pArray_) {
+  protected Object setParameterValue(X x, HttpServletResponse resp, PrintWriter out, HttpParameters p, String typeName, Parameter pArray_) {
     Object arg = null;
 
     if ( ! SafetyUtil.isEmpty(typeName) ) {
