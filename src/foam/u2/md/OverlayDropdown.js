@@ -19,7 +19,7 @@ foam.CLASS({
 
   css: `
     ^overlay {
-      position: fixed;
+      position: absolute;
       z-index: 1009;
     }
 
@@ -35,7 +35,7 @@ foam.CLASS({
       padding-bottom: -20px;
       margin-bottom: -20px;
       z-index: 1010;
-      transform: translate(-60%, 33px);
+      transform: translate(-100%, 12px);
     }
 
     ^open {
@@ -76,6 +76,14 @@ foam.CLASS({
     {
       name: 'addToSelf_',
       value: false
+    },
+    {
+      type: 'Int',
+      name: 'x'
+    },
+    {
+      type: 'Int',
+      name: 'y'
     }
   ],
 
@@ -91,7 +99,9 @@ foam.CLASS({
       return this;
     },
 
-    function open() {
+    function open(x, y) {
+      this.x = x;
+      this.y = y;
       this.opened = true;
     },
 
@@ -110,6 +120,7 @@ foam.CLASS({
 
       this.start('dropdown-overlay')
         .addClass(this.myClass('overlay'))
+        .show(this.opened$)
         .addClass(this.slot(function(opened) {
           return opened
             ? view.myClass('zeroOverlay')
@@ -119,9 +130,11 @@ foam.CLASS({
       .end();
 
       this.dropdownE_.addClass(this.myClass())
-        .addClass(this.slot(function(opened) {
-          return opened ? this.myClass('open') : '';
-        }, this.opened$))
+        .show(this.opened$)
+        .style({
+          top: this.y$,
+          left: this.x$
+        })
         .on('mouseleave', this.onMouseLeave)
         .on('click', this.onClick);
 
