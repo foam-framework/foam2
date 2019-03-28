@@ -32,6 +32,7 @@ foam.CLASS({
     'foam.dao.ClientDAO',
     'foam.dao.DAO',
     'foam.dao.ArraySink',
+    'foam.util.SafetyUtil',
     'static foam.mlang.MLang.*',
     'foam.nanos.logger.Logger',
     'java.net.HttpURLConnection',
@@ -52,13 +53,6 @@ foam.CLASS({
       class: 'String'
     },
     {
-      documentation: `Cluster configuration for 'this' (localhost) node.`,
-      name: 'config',
-      class: 'FObjectProperty',
-      type: 'foam.nanos.mrac.ClusterConfig',
-      visibility: 'RO'
-    },
-    {
       name: 'primary',
       class: 'foam.dao.DAOProperty',
       visibility: 'HIDDEN'
@@ -70,15 +64,28 @@ foam.CLASS({
       of: 'foam.dao.DAO',
       visibility: 'HIDDEN'
     },
-    {
-      documentation: `Reference to the ClusterConfigDAO to which we are subscribed/listening for updates to reconfigure.`,
-      name: 'clusterConfigDAO',
-      class: 'foam.dao.DAOProperty',
-      visibility: 'HIDDEN'
-    },
   ],
 
   methods: [
+    {
+      documentation: `Find the cluster configuration for 'this' (localhost) node.`,
+      name: 'findConfig',
+      type: 'foam.nanos.mrac.ClusterConfig',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+      DAO dao = (DAO) x.get("clusterConfigDAO");
+      String hostname = System.getProperty("hostname");
+      if ( SafetyUtil.isEmpty(hostname) ) {
+        hostname = "localhost";
+      }
+      return ((ClusterConfig) dao.find_(x, hostname));
+      `
+    },
     {
       documentation: `Upon initialization create the ClusterServer configuration and register nSpec.`,
       name: 'init_',
@@ -86,8 +93,6 @@ foam.CLASS({
         /* register ClusterConfig Listener */
         DAO clusterConfigDAO = (DAO) getX().get("clusterConfigDAO");
         clusterConfigDAO.listen(new ClusterConfigSink(getX(), this), TRUE);
-        /* REVIEW: need to keep a reference to the dao?*/
-        setClusterConfigDAO(clusterConfigDAO);
 
         reconfigure(getX());
       `
@@ -104,32 +109,36 @@ foam.CLASS({
       javaCode: `
       Logger logger = (Logger) x.get("logger");
       logger.debug(this.getClass().getSimpleName(), "reconfigure", getServiceName());
-      DAO dao = (DAO) x.get("clusterConfigDAO");
-      List arr = (ArrayList) ((ArraySink) dao
-       .where(
-         AND(
-           EQ(ClusterConfig.ENABLED, true),
-           EQ(ClusterConfig.STATUS, Status.ONLINE)
-         )
-       )
+      ClusterConfig config = findConfig(x);
+      List arr = (ArrayList) ((ArraySink) ((DAO) x.get("clusterConfigDAO"))
+      .where(
+        AND(
+          AND(
+            EQ(ClusterConfig.REALM, config.getRealm()),
+            EQ(ClusterConfig.REGION, config.getRegion())
+          ),
+          AND(
+            EQ(ClusterConfig.ENABLED, true),
+            EQ(ClusterConfig.STATUS, Status.ONLINE)
+          )
+        )
+      )
        .select(new ArraySink())).getArray();
       List<DAO> newClients = new ArrayList<DAO>();
       for ( int i = 0; i < arr.size(); i++ ) {
-        ClusterConfig config = (ClusterConfig) arr.get(i);
-        if ( "localhost".equals(config.getId()) ) {
-          setConfig(config);
-        } else if ( config.getNodeType() == NodeType.PRIMARY ) {
-          DAO primary = new ClientDAO.Builder(x).setDelegate(new HTTPBox.Builder(x).setUrl(buildURL(x, config)).build()).build();
+        ClusterConfig clientConfig = (ClusterConfig) arr.get(i);
+        if ( clientConfig.getNodeType() == NodeType.PRIMARY ) {
+          DAO primary = new ClientDAO.Builder(x).setDelegate(new HTTPBox.Builder(x).setUrl(buildURL(x, clientConfig)).build()).build();
           setPrimary(primary);
-        } else if ( config.getNodeType() == NodeType.SECONDARY ) {
-          DAO client = new ClientDAO.Builder(x).setDelegate(new HTTPBox.Builder(x).setUrl(buildURL(x, config)).build()).build();
+        } else if ( clientConfig.getNodeType() == NodeType.SECONDARY ) {
+          DAO client = new ClientDAO.Builder(x).setDelegate(new HTTPBox.Builder(x).setUrl(buildURL(x, clientConfig)).build()).build();
           newClients.add(client);
         } 
       }
       setClients(newClients.toArray(new DAO[newClients.size()]));
-      if ( getConfig() == null ) {
+      if ( config == null ) {
         logger.error(this.getClass().getSimpleName(), "reconfigure", getServiceName(), "cluster configuration for LOCALHOST not found.");
-      } else if ( ! this.getConfig().getNodeType().equals(NodeType.PRIMARY) &&
+      } else if ( ! config.getNodeType().equals(NodeType.PRIMARY) &&
         getPrimary() == null ) {
         logger.error(this.getClass().getSimpleName(), "reconfigure", getServiceName(), "cluster configuration for PRIMARY not found.");
       } else if ( getClients().length == 0 ) {
@@ -153,7 +162,10 @@ foam.CLASS({
       ],
       javaCode: `
       Logger logger = (Logger) getX().get("logger");
-      if ( ! this.getConfig().getNodeType().equals(NodeType.PRIMARY) ) {
+
+      ClusterConfig config = findConfig(x);
+
+      if ( ! config.getNodeType().equals(NodeType.PRIMARY) ) {
         logger.debug(this.getClass().getSimpleName(), "put_", getServiceName(), "to primary", obj);
         return getPrimary().put_(x, obj);
       } else {
@@ -186,7 +198,10 @@ foam.CLASS({
       ],
       javaCode: `
       Logger logger = (Logger) getX().get("logger");
-      if ( ! this.getConfig().getNodeType().equals(NodeType.PRIMARY) ) {
+
+     ClusterConfig config = findConfig(x);
+
+      if ( ! config.getNodeType().equals(NodeType.PRIMARY) ) {
         logger.debug(this.getClass().getSimpleName(), "remove_", getServiceName(), "to primary", obj);
         return getPrimary().remove_(x, obj);
       } else {
