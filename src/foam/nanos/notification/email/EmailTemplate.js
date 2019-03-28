@@ -89,7 +89,7 @@ foam.CLASS({
     {
       name: 'apply',
       documentation: `Throws exception if any errors - calling Service will/should catch.`,
-      type: 'EmailMessage',
+      type: 'foam.nanos.notification.email.EmailMessage',
       javaThrows: ['java.lang.NoSuchFieldException'],
       args: [
         {
@@ -109,12 +109,11 @@ foam.CLASS({
         {
           name: 'templateArgs',
           type: 'Map',
-          javaType: 'java.util.Map<String, Object>',
           documentation: 'Template arguments'
         },
         {
           name: 'config',
-          javaType: 'EnvironmentConfiguration'
+          javaType: 'org.jtwig.environment.EnvironmentConfiguration'
         }
       ],
       javaCode: `
@@ -152,13 +151,12 @@ foam.CLASS({
         }
 
         // should have all properties necessary set by here, therefore process this template onto an emailMessage
-        return fillInEmailProperties(x, emailMessage, model, group, config);
+        return fillInEmailProperties_(x, emailMessage, model, group, config);
       `
     },
     {
-      name: 'fillInEmailProperties',
-      type: 'EmailMessage',
-      visibility: 'private',
+      name: 'fillInEmailProperties_',
+      type: 'foam.nanos.notification.email.EmailMessage',
       documentation: `
         Order of precedence:
         1) Properties set on the EmailMessage,

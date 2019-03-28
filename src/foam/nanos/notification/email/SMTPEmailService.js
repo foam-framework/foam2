@@ -30,7 +30,6 @@ foam.CLASS({
     'javax.mail.internet.InternetAddress',
     'javax.mail.internet.MimeMessage',
     'org.apache.commons.lang3.StringUtils',
-    'org.jtwig.JtwigModel',
     'org.jtwig.JtwigTemplate',
     'org.jtwig.resource.loader.TypedResourceLoader',
     'foam.dao.DAO',
