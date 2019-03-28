@@ -271,9 +271,8 @@ if ( ! this.getEnabled() ) return;
       javaCode: `
 if ( ! this.getEnabled() ) return;
 
-Group group = (Group) x.get("group");
-String groupId = group != null ? group.getId() : null;
-EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(getX(), name, groupId);
+String group = user != null ? (String) user.getGroup() : null;
+EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(getX(), name, group);
 if ( emailMessage == null )
   return;
 
@@ -285,7 +284,7 @@ for ( String key : templateArgs.keySet() ) {
   }
 }
 
-EnvironmentConfiguration config = getConfig(groupId);
+EnvironmentConfiguration config = getConfig(group);
 JtwigModel model = JtwigModel.newModel(templateArgs);
 emailMessage = (EmailMessage) emailMessage.fclone();
 
@@ -329,7 +328,10 @@ if ( getAuthenticate() ) {
       ],
       javaCode:
         `
-Group group    = (Group) x.get("group");
+User user      = findUser(x, emailMessage);
+
+DAO groupDAO   = (DAO) x.get("groupDAO");
+Group group    = (Group) groupDAO.find(user.getGroup());
 
 if ( SafetyUtil.isEmpty(emailMessage.getFrom()) ) {
   emailMessage.setFrom(
@@ -352,6 +354,48 @@ if ( SafetyUtil.isEmpty(emailMessage.getDisplayName()) ) {
 }
 
 return emailMessage;
+      `
+    },
+    {
+      name: 'findUser',
+      type: 'foam.nanos.auth.User',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'emailMessage',
+          javaType: 'final foam.nanos.notification.email.EmailMessage'
+        }
+      ],
+      javaCode:
+        `
+foam.nanos.session.Session session = x.get(foam.nanos.session.Session.class);
+
+DAO userDAO         = (DAO) x.get("localUserDAO");
+User user           = (User) userDAO.find(session.getUserId());
+
+// 1. If the user doesn't login at this time, get the user from localUserDao
+// 2. If the user is the system user, get the real user from localUserDao
+if ( user == null || user.getId() == 1 ) {
+
+  Sink sink = new ArraySink();
+  sink = userDAO.where(MLang.EQ(User.EMAIL, emailMessage.getTo()[0]))
+    .limit(1).select(sink);
+
+  List list = ((ArraySink) sink).getArray();
+  if ( list == null || list.size() == 0 ) {
+    throw new RuntimeException("User not found");
+  }
+
+  user = (User) list.get(0);
+  if ( user == null ) {
+    throw new RuntimeException("User not found");
+  }
+}
+
+return user;
       `
     }
   ]

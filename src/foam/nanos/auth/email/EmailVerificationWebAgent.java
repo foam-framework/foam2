@@ -8,7 +8,6 @@ package foam.nanos.auth.email;
 
 import foam.core.X;
 import foam.dao.DAO;
-import foam.nanos.auth.Group;
 import foam.nanos.auth.User;
 import foam.nanos.http.WebAgent;
 import foam.nanos.notification.email.DAOResourceLoader;
@@ -65,19 +64,17 @@ public class EmailVerificationWebAgent
     } catch (Throwable t) {
       message = "Problem verifying your email.<br>" + t.getMessage();
     } finally {
-      Group group = (Group) x.get("group");
-
       if ( config_ == null ) {
         config_ = EnvironmentConfigurationBuilder
             .configuration()
             .resources()
             .resourceLoaders()
-            .add(new TypedResourceLoader("dao", new DAOResourceLoader(x, group.getId())))
+            .add(new TypedResourceLoader("dao", new DAOResourceLoader(x, (String) user.getGroup())))
             .and().and()
             .build();
       }
 
-      EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(x, "verify-email-link", group.getId());
+      EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(x, "verify-email-link", (String) user.getGroup());
       JtwigTemplate template = JtwigTemplate.inlineTemplate(emailTemplate.getBody(), config_);
       JtwigModel model = JtwigModel.newModel(Collections.<String, Object>singletonMap("msg", message));
       out.write(template.render(model));
