@@ -41,7 +41,7 @@ foam.CLASS({
       value: 'FOAM Powered'
     },
     {
-      class:'String',
+      class: 'String',
       name: 'termsAndCondLabel',
       value: 'Terms and Conditions'
     },
@@ -72,6 +72,21 @@ foam.CLASS({
     {
       class: 'String',
       name: 'supportEmail'
+    },
+    {
+      class: 'String',
+      name: 'emailsFrom',
+      value: 'info@nanopay.net'
+    },
+    {
+      class: 'String',
+      name: 'emailsDisplayName',
+      value: 'nanopay Corporation'
+    },
+    {
+      class: 'String',
+      name: 'emailsReplyTo',
+      value: 'noreply@nanopay.net'
     }
   ]
 });

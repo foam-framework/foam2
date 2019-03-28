@@ -2,6 +2,7 @@ package foam.nanos.notification.email;
 
 import foam.core.ContextAwareSupport;
 import foam.core.X;
+import foam.nanos.app.AppConfig;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.notification.email.EmailMessage;
@@ -74,15 +75,15 @@ public class EmailsUtility extends ContextAwareSupport {
     }
 
     // STEP 3) set defaults to properties that have not been set
-
+    AppConfig appConfig = (AppConfig) getX().get("appConfig");
     if ( SafetyUtil.isEmpty(emailMessage.getFrom()) ) {
-      emailMessage.setFrom(getFrom());
+      emailMessage.setFrom(appConfig.getEmailsFrom());
     }
     if ( SafetyUtil.isEmpty(emailMessage.getDisplayName()) ) {
-      emailMessage.setDisplayName(getDisplayName());
+      emailMessage.setDisplayName(appConfig.getEmailsDisplayName());
     }
     if ( SafetyUtil.isEmpty(emailMessage.getReplyTo()) ) {
-      emailMessage.setReplyTo(getReplyTo());
+      emailMessage.setReplyTo(appConfig.getEmailsReplyTo());
     }
 
     // STEP 4) return populated emailMessage
