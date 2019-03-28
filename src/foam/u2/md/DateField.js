@@ -14,10 +14,6 @@ foam.CLASS({
     'foam.u2.md.DatePicker'
   ],
 
-  imports: [
-    'document'
-  ],
-
   properties: [
     ['nodeName', 'div'],
     {
@@ -75,7 +71,7 @@ foam.CLASS({
           .addClass(this.slot(function(data, focused) {
             return (typeof data !== 'undefined' && data !== '') ||
                 focused ? self.myClass('label-offset') : '';
-          }, this.realData$, this.focused_$))
+          }, this.realData$, this.focused$))
           .add(this.label$)
         .end();
       } else {

@@ -189,7 +189,7 @@ foam.CLASS({
       name: 'titleE',
       documentation: 'Element for the header portion, used by the Dialog.',
       factory: function() {
-        var header = this.X.E()
+        var header = this.E()
             .addClass(this.myClass('header'))
             .addClass('foam-u2-md-toolbar-colors');
         header.start()
@@ -215,8 +215,8 @@ foam.CLASS({
       name: 'bodyE',
       documentation: 'Element for the body portion, used by the Dialog.',
       factory: function() {
-        var body = this.X.E().addClass(this.myClass('body'));
-        body.x({ data: this });
+        var body = this.E().addClass(this.myClass('body'));
+// TODO:        body.({ data: this });
         body.start('span')
           .addClass(this.myClass('switcher'))
           .addClass(this.myClass('switcher-left'))
@@ -242,7 +242,7 @@ foam.CLASS({
 
         body.enableClass(this.myClass('hidden'), this.showYears_$);
 
-        var years = this.X.E().addClass(this.myCls('years'));
+        var years = this.E().addClass(this.myCls('years'));
         for ( var i = 1900 ; i <= 2100 ; i++ ) {
           years.start('span')
             .setID(this.id + '-year-' + i)
@@ -337,7 +337,7 @@ foam.CLASS({
         // Since scrollIntoView() puts it at the top, we actually want to scroll
         // three years earlier to the top. Clamp to 1900.
         var targetYear = Math.max(1900, this.viewYear - 3);
-        var e = this.X.$(this.id + '-year-' + targetYear);
+        var e = this.getElementById(this.id + '-year-' + targetYear);
         if ( e ) e.scrollIntoView();
       }
     },
