@@ -60,9 +60,7 @@ foam.CLASS({
   properties: [
     {
       name: 'data',
-      postSet: function(old, nu) {
-        this.softData = nu;
-      },
+      postSet: function(old, nu) { this.softData = nu; },
       factory: function() { return new Date(); }
     },
     {
