@@ -214,8 +214,7 @@ foam.CLASS({
       documentation: 'Element for the body portion, used by the Dialog.',
       factory: function() {
         var body = this.E().addClass(this.myClass('body'));
-// TODO:        body.({ data: this });
-        body.start('span')
+        body.startContext({data: this}).start('span')
           .addClass(this.myClass('switcher'))
           .addClass(this.myClass('switcher-left'))
           .add(this.LEFT)
@@ -384,6 +383,7 @@ foam.CLASS({
             self.viewMonth = month;
       //    })();
     },
+
     function rawAdjustX(x) {
       var str = 'translate3d(-' + x + 'px, 0, 0)';
       this.sliderE.style({ transform: str });
@@ -412,9 +412,7 @@ foam.CLASS({
     {
       name: 'right',
       label: '>',
-      code: function() {
-        this.snapToView(1);
-      }
+      code: function() { this.snapToView(1); }
     }
   ],
 

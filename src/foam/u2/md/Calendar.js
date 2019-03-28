@@ -141,8 +141,9 @@ foam.CLASS({
     {
       name: 'onClick',
       code: function(e) {
-        var point = e.pointMap[Object.keys(e.pointMap)[0]];
-        var element = this.document.elementFromPoint(point.x, point.y);
+//         var point = e.pointMap[Object.keys(e.pointMap)[0]];
+//        var element = this.document.elementFromPoint(point.x, point.y);
+var element = e.target;
         if ( element && element.tagName === 'TD' ) {
           var newDay = element.innerText;
           this.data = new Date(this.year, this.month, newDay, this.hour, this.minute);
