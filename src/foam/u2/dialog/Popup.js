@@ -20,10 +20,10 @@ foam.CLASS({
   name: 'Popup',
   extends: 'foam.u2.Element',
 
-  documentation: 'This is a container for a whole-screen, modal overlay. It ' +
-      'fills the viewport with a transparent grey background, and then ' +
-      'centers the "content" element. Clicking the background closes the ' +
-      'dialog. Exports itself as "overlay", for use by OK and CANCEL buttons.',
+  documentation: `This is a container for a whole-screen, modal overlay. It
+      'fills the viewport with a transparent grey background, and then
+      'centers the "content" element. Clicking the background closes the
+      'dialog. Exports itself as "overlay", for use by OK and CANCEL buttons.`
 
   exports: [
     'close as closeDialog'
