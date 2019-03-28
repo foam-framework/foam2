@@ -17,6 +17,7 @@ foam.CLASS({
 
   imports: [
     'auth',
+    'group',
     'notificationDAO',
     'stack',
     'user',
@@ -196,7 +197,7 @@ foam.CLASS({
       return this.call(function() {
         self.notifications.where(self.OR(
           self.EQ(self.Notification.USER_ID, self.user.id),
-          self.EQ(self.Notification.GROUP_ID, self.user.group),
+          self.EQ(self.Notification.GROUP_ID, self.group.id),
           self.EQ(self.Notification.BROADCASTED, true)
         )).select(
           self.GROUP_BY(
@@ -227,7 +228,7 @@ foam.CLASS({
     return this.call(function() {
       self.notifications.where(self.OR(
         self.EQ(self.Notification.USER_ID, self.user.id),
-        self.EQ(self.Notification.GROUP_ID, self.user.group),
+        self.EQ(self.Notification.GROUP_ID, self.group.id),
         self.EQ(self.Notification.BROADCASTED, true)
       )).select(
         self.GROUP_BY(
