@@ -73,24 +73,6 @@ foam.CLASS({
     }
   ],
 
-  properties: [
-    {
-      class: 'foam.dao.DAOProperty',
-      name: 'userDAO',
-      javaFactory: 'return (DAO) getLocalUserDAO();'
-    },
-    {
-      class: 'foam.dao.DAOProperty',
-      name: 'groupDAO',
-      javaFactory: 'return (DAO) getLocalGroupDAO();'
-    },
-    {
-      class: 'foam.dao.DAOProperty',
-      name: 'sessionDAO',
-      javaFactory: 'return (DAO) getLocalSessionDAO();'
-    }
-  ],
-
   methods: [
     {
       name: 'start',
@@ -106,7 +88,7 @@ foam.CLASS({
         }
 
         // get user from session id
-        User user = (User) userDAO_.find(session.getUserId());
+        User user = (User) ((DAO) getLocalUserDAO()).find(session.getUserId());
         if ( user == null ) {
           throw new AuthenticationException("User not found: " + session.getUserId());
         }
@@ -122,7 +104,7 @@ foam.CLASS({
         }
 
         // check if user group enabled
-        Group group = (Group) groupDAO_.find(user.getGroup());
+        Group group = user.findGroup(x);
         if ( group != null && ! group.getEnabled() ) {
           throw new AuthenticationException("User group disabled");
         }
@@ -133,14 +115,6 @@ foam.CLASS({
         }
 
         return user;
-      `
-    },
-    {
-      name: 'generateChallenge',
-      documentation: `A challenge is generated from the userID provided. This is
-        saved in a LinkedHashMap with TTL of 5.`,
-      javaCode: `
-        throw new UnsupportedOperationException("Unsupported operation: generateChallenge");
       `
     },
     {
@@ -189,7 +163,7 @@ foam.CLASS({
         }
 
         // check if user group enabled
-        Group group = (Group) groupDAO_.find(user.getGroup());
+        Group group = user.findGroup(x);
         if ( group != null && ! group.getEnabled() ) {
           throw new AuthenticationException("User group disabled");
         }
@@ -218,13 +192,13 @@ foam.CLASS({
           throw new AuthenticationException("Invalid Parameters");
         }
 
-        return userAndGroupContext(x, (User) userDAO_.find(userId), password);
+        return userAndGroupContext(x, (User) ((DAO) getLocalUserDAO()).find(userId), password);
       `
     },
     {
       name: 'loginByEmail',
       javaCode: `
-        User user = (User) userDAO_.find(
+        User user = (User) ((DAO) getLocalUserDAO()).find(
           AND(
             EQ(User.EMAIL, email.toLowerCase()),
             EQ(User.LOGIN_ENABLED, true)
@@ -252,7 +226,7 @@ foam.CLASS({
           String groupId = (String) user.getGroup();
 
           while ( ! SafetyUtil.isEmpty(groupId) ) {
-            Group group = (Group) groupDAO_.find(groupId);
+            Group group = (Group) ((DAO) getLocalGroupDAO()).find(groupId);
 
             // if group is null break
             if ( group == null ) break;
@@ -293,7 +267,7 @@ foam.CLASS({
           String groupId = (String) user.getGroup();
 
           while ( ! SafetyUtil.isEmpty(groupId) ) {
-            Group group = (Group) groupDAO_.find(groupId);
+            Group group = (Group) ((DAO) getLocalGroupDAO()).find(groupId);
 
             // if group is null break
             if ( group == null ) break;
@@ -350,7 +324,7 @@ foam.CLASS({
           throw new AuthenticationException("User not found");
         }
 
-        User user = (User) userDAO_.find(session.getUserId());
+        User user = (User) ((DAO) getLocalUserDAO()).find(session.getUserId());
         if ( user == null ) {
           throw new AuthenticationException("User not found");
         }
@@ -366,7 +340,7 @@ foam.CLASS({
         }
 
         // check if user group enabled
-        Group group = (Group) groupDAO_.find(user.getGroup());
+        Group group = user.findGroup(x);
         if ( group != null && ! group.getEnabled() ) {
           throw new AuthenticationException("User group disabled");
         }
@@ -391,7 +365,7 @@ foam.CLASS({
         user.setPassword(Password.hash(newPassword));
         // TODO: modify line to allow actual setting of password expiry in cases where users are required to periodically update their passwords
         user.setPasswordExpiry(null);
-        user = (User) userDAO_.put(user);
+        user = (User) ((DAO) getLocalUserDAO()).put(user);
         session.setContext(session.getContext().put("user", user));
         return user;
       `
@@ -436,7 +410,7 @@ foam.CLASS({
       javaCode: `
         Session session = x.get(Session.class);
         if ( session != null && session.getUserId() != 0 ) {
-          sessionDAO_.remove(session);
+          ((DAO) getLocalSessionDAO()).remove(session);
         }
       `
     }
