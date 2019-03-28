@@ -211,8 +211,6 @@ foam.CLASS({
         }
       ],
       javaCode: `
-DAO userDAO      = (DAO) x.get("localUserDAO");
-DAO groupDAO     = (DAO) x.get("groupDAO");
 AppConfig config = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
 
 String configUrl = config.getUrl();

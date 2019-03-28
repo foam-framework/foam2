@@ -18,9 +18,9 @@ import foam.nanos.logger.*;
 import foam.nanos.logger.PrefixLogger;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
-import java.util.Date;
 import javax.naming.NoPermissionException;
 import javax.servlet.http.HttpServletRequest;
+import org.eclipse.jetty.server.Request;
 
 public class SessionServerBox
   extends ProxyBox
@@ -85,12 +85,23 @@ public class SessionServerBox
           return;
         }
 
+        // If there is no user in the session (which happens when a user is
+        // signing up, for example) then set the URL in the app configuration to
+        // the URL that the request is coming from.
+        if ( req != null && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
+          AppConfig appConfig = (AppConfig) x.get("appConfig");
+          appConfig = (AppConfig) appConfig.fclone();
+          String configUrl = ((Request) req).getRootURL().toString();
+          appConfig.setUrl(configUrl);
+          x = x.put("appConfig", appConfig);
+          session.getContext().put("appConfig", appConfig);
+        }
+
         if ( user != null ) {
           Group group = (Group) x.get("group");
 
           if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
-            logger.debug("missing permission", group != null ? group.getId() : "NO GROUP" , "service." + spec.getName());
-            msg.replyWithException(new NoPermissionException("No permission"));
+            msg.replyWithException(new AuthorizationException("You do not have permission to access that service."));
             return;
           }
 
@@ -102,11 +113,6 @@ public class SessionServerBox
             AppConfig appConfig = group.getAppConfig(x);
             x = x.put("appConfig", appConfig);
             session.getContext().put("appConfig", appConfig);
-          }
-
-          if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
-            msg.replyWithException(new AuthorizationException("You do not have permission to access that service."));
-            return;
           }
         }
 
