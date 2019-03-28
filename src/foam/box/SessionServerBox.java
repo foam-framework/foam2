@@ -92,6 +92,17 @@ public class SessionServerBox
           AppConfig appConfig = (AppConfig) x.get("appConfig");
           appConfig = (AppConfig) appConfig.fclone();
           String configUrl = ((Request) req).getRootURL().toString();
+
+          if ( appConfig.getForceHttps() ) {
+            if ( configUrl.startsWith("https://") ) {
+              // Don't need to do anything.
+            } else if ( configUrl.startsWith("http://") ) {
+              configUrl = "https" + configUrl.substring(4);
+            } else {
+              configUrl = "https://" + configUrl;
+            }
+          }
+
           appConfig.setUrl(configUrl);
           x = x.put("appConfig", appConfig);
           session.getContext().put("appConfig", appConfig);
