@@ -11,6 +11,8 @@ import foam.dao.AbstractSink;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
 import foam.dao.java.JDAO;
+import foam.nanos.auth.Group;
+import foam.nanos.auth.Permission;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.ProxyLogger;
@@ -125,6 +127,13 @@ public class Boot {
 
     root_.put("user", user);
     root_.put(Session.class, session);
+
+    Group group = new Group();
+    group.setId("system");
+    Permission[] permissions = {new Permission("*", "All access")};
+    group.setPermissions(permissions);
+    group.setDefaultMenu("set-personal");
+    root_.put("group", group);
   }
 
   public X getX() { return root_; }

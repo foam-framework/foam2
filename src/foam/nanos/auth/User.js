@@ -304,12 +304,6 @@ foam.CLASS({
       class: 'DateTime',
       name: 'lastModified',
       documentation: 'Last modified date.'
-    },
-    {
-      class: 'Boolean',
-      name: 'system',
-      value: false,
-      documentation: 'Indicate system accounts.'
     }
   ],
 
@@ -333,7 +327,6 @@ foam.CLASS({
       ],
       javaThrows: ['AuthorizationException'],
       javaCode: `
-        User user = (User) x.get("user");
         AuthService auth = (AuthService) x.get("auth");
 
         // Prevent privilege escalation by only allowing a user's group to be
@@ -341,11 +334,6 @@ foam.CLASS({
         boolean hasGroupUpdatePermission = auth.check(x, "group.update." + this.getGroup());
         if ( ! hasGroupUpdatePermission ) {
           throw new AuthorizationException("You do not have permission to set that user's group to '" + this.getGroup() + "'.");
-        }
-
-        // Prevent everyone but admins from changing the 'system' property. 
-        if ( this.getSystem() && ! user.getGroup().equals("admin") ) {
-          throw new AuthorizationException("You do not have permission to change the 'system' flag.");
         }
       `
     },
@@ -414,14 +402,6 @@ foam.CLASS({
           } else if ( ! (hasOldGroupUpdatePermission && hasNewGroupUpdatePermission) ) {
             throw new AuthorizationException("You do not have permission to change that user's group to '" + this.getGroup() + "'.");
           }
-        }
-
-        // Prevent everyone but admins from changing the 'system' property. 
-        if (
-          ! SafetyUtil.equals(oldUser.getSystem(), this.getSystem()) &&
-          ! user.getGroup().equals("admin")
-        ) {
-          throw new AuthorizationException("You do not have permission to change the 'system' flag.");
         }
       `
     },
