@@ -163,7 +163,7 @@ foam.CLASS({
         // mini decorator
         var prefixedOutputter = {
           output: function(value) {
-            outputter.output(`${prop.name}.${value}`);
+            outputter.output(prop.name + '.' + value);
           }
         };
         prop.of.getAxiomsByClass(foam.core.Property)
