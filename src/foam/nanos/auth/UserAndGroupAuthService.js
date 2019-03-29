@@ -103,10 +103,10 @@ foam.CLASS({
           throw new AuthenticationException("Login disabled");
         }
 
-        // check if user group enabled
-        Group group = user.findGroup(x);
+        // check if group enabled
+        Group group = getCurrentGroup(x);
         if ( group != null && ! group.getEnabled() ) {
-          throw new AuthenticationException("User group disabled");
+          throw new AuthenticationException("Group disabled");
         }
 
         // check for two-factor authentication
@@ -118,19 +118,8 @@ foam.CLASS({
       `
     },
     {
-      name: 'challengedLogin',
-      documentation: `Checks the LinkedHashMap to see if the the challenge
-        supplied is correct and the TTL is still valid.
-
-        How often should we purge this map for challenges that have expired?`,
-      javaCode: `
-        throw new UnsupportedOperationException("Unsupported operation: challengedLogin");
-      `
-    },
-    {
-      name: 'userAndGroupContext',
-      documentation: `Logs user and sets user group into the current sessions
-        context.`,
+      name: 'loginHelper',
+      documentation: `Helper function to reduce duplicated code.`,
       type: 'foam.nanos.auth.User',
       args: [
         {
@@ -162,10 +151,10 @@ foam.CLASS({
           throw new AuthenticationException("Login disabled");
         }
 
-        // check if user group enabled
+        // check if group enabled
         Group group = user.findGroup(x);
         if ( group != null && ! group.getEnabled() ) {
-          throw new AuthenticationException("User group disabled");
+          throw new AuthenticationException("Group disabled");
         }
 
         if ( ! Password.verify(password, user.getPassword()) ) {
@@ -178,7 +167,7 @@ foam.CLASS({
 
         Session session = x.get(Session.class);
         session.setUserId(user.getId());
-        session.setContext(session.getContext().put("user", user));
+        session.setContext(session.getContext().put("user", user).put("group", group));
 
         return user;
       `
@@ -192,7 +181,7 @@ foam.CLASS({
           throw new AuthenticationException("Invalid Parameters");
         }
 
-        return userAndGroupContext(x, (User) ((DAO) getLocalUserDAO()).find(userId), password);
+        return loginHelper(x, (User) ((DAO) getLocalUserDAO()).find(userId), password);
       `
     },
     {
@@ -208,7 +197,7 @@ foam.CLASS({
         if ( user == null ) {
           throw new AuthenticationException("User not found");
         }
-        return userAndGroupContext(x, user, password);
+        return loginHelper(x, user, password);
       `
     },
     {
@@ -253,24 +242,15 @@ foam.CLASS({
         Session session = x.get(Session.class);
         if ( session == null || session.getUserId() == 0 ) return false;
 
-        // NOTE: It's important that we use the User from the context here instead
-        // of looking it up in a DAO because if the user is actually an entity that
-        // an agent is acting as, then the user we get from the DAO won't have the
-        // correct group, which is the group set on the junction between the agent
-        // and the entity.
         User user = (User) x.get("user");
 
         // check if user exists and is enabled
         if ( user == null || ! user.getEnabled() ) return false;
 
         try {
-          String groupId = (String) user.getGroup();
+          Group group = getCurrentGroup(x);
 
-          while ( ! SafetyUtil.isEmpty(groupId) ) {
-            Group group = (Group) ((DAO) getLocalGroupDAO()).find(groupId);
-
-            // if group is null break
-            if ( group == null ) break;
+          while ( group != null ) {
 
             // check if group is enabled
             if ( ! group.getEnabled() ) return false;
@@ -279,7 +259,7 @@ foam.CLASS({
             if ( group.implies(x, permission) ) return true;
 
             // check parent group
-            groupId = group.getParent();
+            group = (Group) groupDAO_.find(group.getParent());
           }
         } catch (IllegalArgumentException e) {
           Logger logger = (Logger) x.get("logger");
@@ -340,9 +320,9 @@ foam.CLASS({
         }
 
         // check if user group enabled
-        Group group = user.findGroup(x);
+        Group group = getCurrentGroup(x);
         if ( group != null && ! group.getEnabled() ) {
-          throw new AuthenticationException("User group disabled");
+          throw new AuthenticationException("Group disabled");
         }
 
         // check if password is valid per validatePassword method
@@ -412,6 +392,48 @@ foam.CLASS({
         if ( session != null && session.getUserId() != 0 ) {
           ((DAO) getLocalSessionDAO()).remove(session);
         }
+      `
+    },
+    {
+      name: 'getCurrentGroup',
+      documentation: `Gets the effective group from a context.`,
+      javaCode: `
+        // Highest precedence: Just return the group from the context if it's already
+        // been set.
+        Group group = (Group) x.get("group");
+
+        if ( group != null ) return group;
+
+        User user = (User) x.get("user");
+        User agent = (User) x.get("agent");
+
+        // Second highest precedence: If one user is acting as another, return the
+        // group on the junction between them.
+        if ( user != null ) {
+          if ( agent != null ) {
+            DAO agentJunctionDAO = (DAO) x.get("agentJunctionDAO");
+            UserUserJunction junction = (UserUserJunction) agentJunctionDAO.inX(x).find(
+              AND(
+                EQ(UserUserJunction.SOURCE_ID, agent.getId()),
+                EQ(UserUserJunction.TARGET_ID, user.getId())
+              )
+            );
+
+            if ( junction == null ) {
+              throw new RuntimeException("There was a user and an agent in the context, but a junction between then was not found.");
+            }
+
+            return (Group) groupDAO_.inX(x).find(junction.getGroup());
+          }
+
+          // Third highest precedence: If a user is logged in but not acting as
+          // another user, return their group.
+          return user.findGroup(x);
+        }
+
+        // If none of the cases above match, return null.
+        // TODO: Should this throw an error instead?
+        return null;
       `
     }
   ]
