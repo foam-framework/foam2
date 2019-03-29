@@ -69,8 +69,8 @@ foam.CLASS({
   return getDelegate().where(foam.mlang.MLang.IN(getPrimaryKey(), ((foam.dao.ArraySink)(junction.getDelegate())).getArray().toArray())).select_(
     x, sink, skip, limit, order, predicate);`,
 
-      swiftCode: function () {
-        /* let pred = __context__.create(foam_mlang_predicate_Eq.self, args: [
+      swiftCode: `
+        let pred = __context__.create(foam_mlang_predicate_Eq.self, args: [
           "arg1": relationship?.sourceProperty,
           "arg2": relationship?.sourceId
         ])
@@ -80,14 +80,14 @@ foam.CLASS({
           "delegate": __context__.create(foam_dao_ArraySink.self)
         ])
 
-        let junction: foam_mlang_sink_Map = try relationship!.junctionDAO!.`where`(pred).select(map!) as! foam_mlang_sink_Map
-        return try delegate.`where`(__context__.create(foam_mlang_predicate_In.self, args: [
+        let junction: foam_mlang_sink_Map = try relationship!.junctionDAO!.\`where\`(pred)!.select(map!) as! foam_mlang_sink_Map
+        return try delegate.\`where\`(__context__.create(foam_mlang_predicate_In.self, args: [
           "arg1": primaryKey,
           "arg2": __context__.create(foam_mlang_ArrayConstant.self, args: [
             "value": (junction.delegate as? foam_dao_ArraySink)?.array
           ])
-        ])).select_(x, sink, skip, limit, order, predicate)  */
-      }
+        ]))!.select_(x, sink, skip, limit, order, predicate)
+      `
     }
   ]
 });

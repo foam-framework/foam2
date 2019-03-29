@@ -14,7 +14,7 @@ foam.CLASS({
       swiftCode: function() {/*
 let ret = delegate.parse(ps, x)
 if ret != nil { return ret }
-return ps.setValue(nil)
+return ps?.setValue(nil)
       */},
     },
   ]

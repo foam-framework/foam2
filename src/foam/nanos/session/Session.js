@@ -62,7 +62,7 @@ foam.CLASS({
       name: 'context',
       type: 'Context',
       // Put a null user to prevent sytem user from leaking into subcontexts
-      javaFactory: 'return getX().put("user", null).put(Session.class, this);',
+      javaFactory: 'return getX().put("user", null).put("group", null).put(Session.class, this);',
       hidden: true,
       transient: true
     }
@@ -78,7 +78,8 @@ foam.CLASS({
     },
     {
       name: 'freeze',
-      javaCode: ' //nop '
+      type: 'foam.core.FObject',
+      javaCode: ' return this; '
     },
     {
       name: 'touch',

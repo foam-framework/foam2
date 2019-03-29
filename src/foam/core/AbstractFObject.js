@@ -318,10 +318,11 @@ foam.CLASS({
     },
     {
       name: 'freeze',
-      type: 'Void',
+      type: 'FObject',
       javaCode: `
         beforeFreeze();
         this.__frozen__ = true;
+        return this;
       `
     },
     {

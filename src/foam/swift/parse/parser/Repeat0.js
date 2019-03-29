@@ -31,7 +31,7 @@ foam.CLASS({
       name: 'parse',
       swiftCode: function() {/*
 var first = true
-var ps = ps
+var ps = ps!
 var result: foam_swift_parse_PStream?
 
 var i = 0

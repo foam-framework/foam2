@@ -48,7 +48,7 @@ foam.CLASS({
         } else {
 
           // fetch the soft session limit from group, and then start the timer
-          if ( this.group.id !== "" && this.group.softSessionLimit !== 0 ) {
+          if ( this.group && this.group.id !== '' && this.group.softSessionLimit !== 0 ) {
             this.sessionTimer.startTimer(this.group.softSessionLimit);
           }
 
@@ -134,6 +134,7 @@ return uuid;`
         this.delegate.send(msg);
       },
       swiftCode: `
+let msg = msg!
 msg.attributes[foam_box_SessionClientBox.SESSION_KEY] = sessionID
 msg.attributes["replyBox"] = SessionReplyBox_create([
   "msg": msg,
