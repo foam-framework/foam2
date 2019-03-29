@@ -130,13 +130,12 @@ tokenResult = (Token) tokenResult.fclone();
 tokenResult.setProcessed(true);
 tokenDAO.put(tokenResult);
 
-EmailService email = (EmailService) getEmail();
+
 EmailMessage message = new EmailMessage();
 message.setTo(new String[] { userResult.getEmail() });
 HashMap<String, Object> args = new HashMap<>();
 args.put("name", userResult.getFirstName());
-message = EmailsUtility.sendEmailFromTemplate(x, userResult, message, "password-changed", args);
-email.sendEmail(getX(), message);
+EmailsUtility.sendEmailFromTemplate(x, userResult, message, "password-changed", args);
 return true;`
     }
   ]

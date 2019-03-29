@@ -6,6 +6,7 @@ import foam.nanos.app.AppConfig;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.notification.email.EmailMessage;
+import foam.nanos.notification.email.EmailService;
 import foam.nanos.notification.email.EmailTemplate;
 import foam.util.SafetyUtil;
 import java.util.Map;
@@ -14,8 +15,6 @@ import org.jtwig.environment.EnvironmentConfigurationBuilder;
 import org.jtwig.resource.loader.TypedResourceLoader;
 
 public class EmailsUtility extends ContextAwareSupport {
-
-  protected static EnvironmentConfiguration config_ = null;
 
   /*
   documentation: 
@@ -37,7 +36,14 @@ public class EmailsUtility extends ContextAwareSupport {
       return;
     }
 
-    EnvironmentConfiguration config = getConfig(x, user.getGroup());
+    EnvironmentConfiguration config = EnvironmentConfigurationBuilder
+      .configuration()
+        .resources()
+          .resourceLoaders()
+          .add(new TypedResourceLoader("dao", new DAOResourceLoader(x, groupId)))
+            .and()
+          .and()
+      .build();
 
     if ( ! SafetyUtil.isEmpty(name) && user != null) {
 
@@ -66,7 +72,6 @@ public class EmailsUtility extends ContextAwareSupport {
     if ( emailTemplateObj != null) {
 
       // STEP 2) Apply Template to emailMessage
-
       try {
         emailMessage = emailTemplateObj.apply(x, user, emailMessage, templateArgs, config);
         if ( emailMessage == null) {
@@ -92,21 +97,7 @@ public class EmailsUtility extends ContextAwareSupport {
 
     // STEP 4) passing emailMessage through to actual email service.
     EmailService email = (EmailService) x.get("email");
-    email.sendEmail(x, message);
-  }
-
-  private static EnvironmentConfiguration getConfig(X x, String groupId) {
-     if ( config_ == null ) {
-      config_ = EnvironmentConfigurationBuilder
-        .configuration()
-        .resources()
-          .resourceLoaders()
-            .add(new TypedResourceLoader("dao", new DAOResourceLoader(x, groupId)))
-          .and()
-        .and()
-      .build();
-    }
-    return config_;
+    email.sendEmail(x, emailMessage);
   }
 
 }
