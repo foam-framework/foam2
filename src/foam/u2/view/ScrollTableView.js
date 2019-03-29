@@ -29,13 +29,17 @@
     ^scrollbarContainer {
       overflow: scroll;
       display: grid;
-      grid-template-columns: auto auto;
+      grid-template-columns: 1px minmax(968px, 1fr);
     }
 
     ^ th {
       position: -webkit-sticky;
       position: sticky;
       top: 0;
+    }
+
+    ^ table {
+      min-width: 100%;
     }
   `,
 
@@ -222,7 +226,6 @@
           addClass(this.myClass('scrollbarContainer')).
           on('scroll', this.onScroll).
           start().
-            show(this.daoCount$.map((count) => count >= this.limit)).
             addClass(this.myClass('scrollbar')).
             style({ height: this.scrollHeight$ }).
           end().
