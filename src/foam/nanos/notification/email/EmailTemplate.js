@@ -17,7 +17,6 @@ foam.CLASS({
     'foam.mlang.MLang',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Group',
-    'foam.nanos.notification.email.DAOResourceLoader',
     'foam.nanos.notification.email.EmailMessage',
     'foam.util.SafetyUtil',
     'java.lang.NoSuchFieldException',
@@ -125,11 +124,11 @@ foam.CLASS({
         Object value = null;
 
         // process templateArgs
-        for ( String key : templateArgs.keySet() ) {
-          value = templateArgs.get(key);
+        for ( Object key : templateArgs.keySet() ) {
+          value = templateArgs.get((String)key);
           if ( value instanceof String ) {
             tempKeyString = (String) value;
-            templateArgs.put(key, new String(tempKeyString.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
+            templateArgs.put((String) key, new String(tempKeyString.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
           }
         }
 

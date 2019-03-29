@@ -24,7 +24,5 @@ foam.INTERFACE({
         }
       ]
     }
-      ]
-    }
   ]
 });

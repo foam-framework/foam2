@@ -16,7 +16,8 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.X',
-    'foam.dao.DAO'
+    'foam.dao.DAO',
+    'foam.dao.NullDAO'
   ],
 
   properties: [

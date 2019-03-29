@@ -27,7 +27,7 @@ foam.CLASS({
     'foam.nanos.auth.token.Token',
     'foam.nanos.auth.User',
     'foam.nanos.notification.email.EmailMessage',
-    'foam.nanos.notification.email.EmailService',
+    'foam.nanos.notification.email.EmailsUtility',
     'foam.util.Email',
     'foam.util.Password',
     'foam.util.SafetyUtil',
@@ -72,7 +72,6 @@ token.setExpiry(generateExpiryDate());
 token.setData(UUID.randomUUID().toString());
 token = (Token) tokenDAO.put(token);
 
-EmailService email = (EmailService) getEmail();
 EmailMessage message = new EmailMessage();
 message.setTo(new String[] { user.getEmail() });
 
@@ -80,7 +79,8 @@ HashMap<String, Object> args = new HashMap<>();
 args.put("name", String.format("%s %s", user.getFirstName(), user.getLastName()));
 args.put("link", url +"?token=" + token.getData() + "#reset");
 
-email.sendEmailFromTemplate(x, user, message, "reset-password", args);
+EmailsUtility.sendEmailFromTemplate(x, user, message, "reset-password", args);
+
 return true;`
     },
     {
@@ -135,7 +135,8 @@ EmailMessage message = new EmailMessage();
 message.setTo(new String[] { userResult.getEmail() });
 HashMap<String, Object> args = new HashMap<>();
 args.put("name", userResult.getFirstName());
-email.sendEmailFromTemplate(x, userResult, message, "password-changed", args);
+message = EmailsUtility.sendEmailFromTemplate(x, userResult, message, "password-changed", args);
+email.sendEmail(getX(), message);
 return true;`
     }
   ]

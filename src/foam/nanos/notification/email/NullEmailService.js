@@ -15,11 +15,6 @@ foam.CLASS({
       name: 'sendEmail',
       javaCode: '// NOOP',
       code: function() { return Promise.resolve(); }
-    },
-    {
-      name: 'sendEmailFromTemplate',
-      javaCode: '// NOOP',
-      code: function() { return Promise.resolve(); }
     }
   ]
 });
