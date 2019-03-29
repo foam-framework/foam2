@@ -20,7 +20,7 @@ foam.CLASS({
       name: 'props',
       expression: function(of) {
         return of.getAxiomsByClass(foam.core.Property)
-          .filter( (p) => ! p.transient || ! p.storageTransient );
+          .filter( (p) => ! p.networkTransient );
       },
       visibility: 'HIDDEN'
     },
