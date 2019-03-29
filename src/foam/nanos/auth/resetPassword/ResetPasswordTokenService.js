@@ -41,7 +41,15 @@ foam.CLASS({
     {
       name: 'generateTokenWithParameters',
       javaCode:
-`AppConfig appConfig = (AppConfig) x.get("appConfig");
+`
+// Don't use the context passed to us because it won't have a user in it,
+// because obviously the user isn't logged in if they're resetting their
+// password.
+// Make sure we replace the appConfig with the given one so the URL in the
+// appConfig isn't lost.
+AppConfig appConfig = (AppConfig) x.get("appConfig");
+x = getX().put("appConfig", appConfig);
+
 DAO userDAO = (DAO) getLocalUserDAO();
 DAO tokenDAO = (DAO) getTokenDAO();
 String url = appConfig.getUrl()
@@ -89,6 +97,14 @@ return true;`
 `if ( user == null || SafetyUtil.isEmpty(user.getDesiredPassword()) ) {
   throw new RuntimeException("Cannot leave new password field empty");
 }
+
+// Don't use the context passed to us because it won't have a user in it,
+// because obviously the user isn't logged in if they're resetting their
+// password.
+// Make sure we replace the appConfig with the given one so the URL in the
+// appConfig isn't lost.
+AppConfig appConfig = (AppConfig) x.get("appConfig");
+x = getX().put("appConfig", appConfig);
 
 String newPassword = user.getDesiredPassword();
 
