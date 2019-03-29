@@ -40,7 +40,7 @@ public class EmailsUtility extends ContextAwareSupport {
       .configuration()
         .resources()
           .resourceLoaders()
-          .add(new TypedResourceLoader("dao", new DAOResourceLoader(x, groupId)))
+          .add(new TypedResourceLoader("dao", new DAOResourceLoader(x, user.getGroup())))
             .and()
           .and()
       .build();

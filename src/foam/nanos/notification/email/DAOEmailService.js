@@ -22,18 +22,6 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'String',
-      name: 'replyTo'
-    },
-    {
-      class: 'String',
-      name: 'from'
-    },
-    {
-      class: 'String',
-      name: 'displayName'
-    },
-    {
       name: 'dao',
       class: 'foam.dao.DAOProperty',
       javaFactory: `
