@@ -576,4 +576,8 @@ FOAM_FILES([
   { name: "foam/dashboard/view/Card" },
   { name: "foam/build/Library" },
   { name: "foam/build/EmbeddedModelDAO" },
+
+  { name: "foam/u2/view/JSONTextView" },
+  { name: "foam/u2/view/MapView" },
+  { name: "foam/u2/view/AnyView" },
 ]);

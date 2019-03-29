@@ -23,23 +23,13 @@ foam.INTERFACE({
       ]
     },
     {
-      name: 'challengedLogin',
+      name: 'getCurrentGroup',
       async: true,
-      type: 'foam.nanos.auth.User',
-      javaThrows: ['foam.nanos.auth.AuthenticationException'],
-      swiftThrows: true,
+      type: 'foam.nanos.auth.Group',
       args: [
         {
           name: 'x',
           type: 'Context'
-        },
-        {
-          name: 'userId',
-          type: 'Long'
-        },
-        {
-          name: 'challenge',
-          type: 'String'
         }
       ]
     },

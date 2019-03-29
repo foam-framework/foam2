@@ -24,6 +24,7 @@ foam.CLASS({
 
   imports: [
     'blobService',
+    'group',
     'regulatoryNotice',
     'regulatoryNoticeAudit',
     'regulatoryNoticeDAO',
@@ -511,7 +512,7 @@ foam.CLASS({
         notificationType : "New Post On RegulatoryNotice",
         userId: this.user.id,
         body: self.title_,
-        groupId: this.user.group
+        groupId: this.group.id
       });
 
       self.notificationDAO.put(notification);
