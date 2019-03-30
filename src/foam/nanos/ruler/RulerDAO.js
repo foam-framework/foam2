@@ -126,17 +126,17 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       FObject oldObj = getDelegate().find_(x, obj);
-      Map hm = getRulesList();
+      Map rulesList = getRulesList();
       if ( oldObj == null ) {
-        applyRules(x, obj, oldObj, (GroupBy) hm.get(getCreateBefore()));
+        applyRules(x, obj, oldObj, (GroupBy) rulesList.get(getCreateBefore()));
       } else {
-        applyRules(x, obj, oldObj, (GroupBy) hm.get(getUpdateBefore()));
+        applyRules(x, obj, oldObj, (GroupBy) rulesList.get(getUpdateBefore()));
       }
       FObject ret =  getDelegate().put_(x, obj);
       if ( oldObj == null ) {
-        applyRules(x, ret, oldObj, (GroupBy) hm.get(getCreateAfter()));
+        applyRules(x, ret, oldObj, (GroupBy) rulesList.get(getCreateAfter()));
       } else {
-        applyRules(x, ret, oldObj, (GroupBy) hm.get(getUpdateAfter()));
+        applyRules(x, ret, oldObj, (GroupBy) rulesList.get(getUpdateAfter()));
       }
       return ret;
       `
@@ -190,29 +190,29 @@ foam.CLASS({
         }
       ],
       javaCode: `DAO ruleDAO = ((DAO) x.get("ruleDAO")).where(EQ(Rule.DAO_KEY, getDaoKey()));
-Map hm = getRulesList();
+Map rulesList = getRulesList();
 GroupBy createdBefore = (GroupBy) ruleDAO.where(getCreateBefore()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-hm.put(getCreateBefore(), createdBefore);
+rulesList.put(getCreateBefore(), createdBefore);
 GroupBy updatedBefore = (GroupBy) ruleDAO.where(getUpdateBefore()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-hm.put(getUpdateBefore(), updatedBefore);
+rulesList.put(getUpdateBefore(), updatedBefore);
 GroupBy createdAfter = (GroupBy) ruleDAO.where(getCreateAfter()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-hm.put(getCreateAfter(), createdAfter);
+rulesList.put(getCreateAfter(), createdAfter);
 GroupBy updatedAfter = (GroupBy) ruleDAO.where(getUpdateAfter()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-hm.put(getUpdateAfter(), updatedAfter);
+rulesList.put(getUpdateAfter(), updatedAfter);
 GroupBy removedBefore = (GroupBy) ruleDAO.where(getRemoveBefore()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-hm.put(getRemoveBefore(), removedBefore);
+rulesList.put(getRemoveBefore(), removedBefore);
 GroupBy removedAfter = (GroupBy) ruleDAO.where(getRemoveAfter()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-hm.put(getRemoveAfter(), removedAfter);
+rulesList.put(getRemoveAfter(), removedAfter);
 
 ruleDAO.listen(new AbstractSink() {
   @Override
   public void put(Object obj, Detachable sub) {
-    Map hm = getRulesList();
+    Map rulesList = getRulesList();
     Rule rule = (Rule) obj;
     String ruleGroup = rule.getRuleGroup();
-    for ( Object key : hm.keySet() ) {
+    for ( Object key : rulesList.keySet() ) {
       if ( ((Predicate) key).f(obj) ) {
-        GroupBy group = (GroupBy) hm.get(key);
+        GroupBy group = (GroupBy) rulesList.get(key);
         if ( group.getGroupKeys().contains(ruleGroup) ) {
           ArrayList rules = (ArrayList) ((ArraySink)group.getGroups().get(ruleGroup)).getArray();
           Rule foundRule = Rule.findById(rules, rule.getId());
@@ -231,12 +231,12 @@ ruleDAO.listen(new AbstractSink() {
   
   @Override
   public void remove(Object obj, Detachable sub) {
-    Map hm = getRulesList();
+    Map rulesList = getRulesList();
     Rule rule = (Rule) obj;
     String ruleGroup = rule.getRuleGroup();
-    for ( Object key : hm.keySet() ) {
+    for ( Object key : rulesList.keySet() ) {
       if ( ((Predicate) key).f(obj) ) {
-        GroupBy group = (GroupBy) hm.get(key);
+        GroupBy group = (GroupBy) rulesList.get(key);
         if ( group.getGroupKeys().contains(ruleGroup) ) {
           ArrayList rules = (ArrayList) ((ArraySink)group.getGroups().get(ruleGroup)).getArray();
           Rule foundRule = Rule.findById(rules, rule.getId());
