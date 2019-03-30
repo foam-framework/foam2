@@ -96,6 +96,8 @@
       return new RuleAction() {
         @Override
         public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) { /*noop*/ }
+        @Override
+        public void applyReverseAction(X x, FObject obj) { /*noop*/ }
       };`,
       documentation: 'The action to be executed if predicates returns true for passed object.'
     },
@@ -108,6 +110,9 @@
       return new RuleAction() {
         @Override
         public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) { /*noop*/ }
+
+        @Override
+        public void applyReverseAction(X x, FObject obj) { /*noop*/ }
       };`,
       documentation: 'The action to be executed asynchronously if predicates returns true for passed object.'
     },
@@ -234,21 +239,6 @@
           ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }
       `
-    },
-    {
-      name: 'reverseAction',
-      args: [
-        {
-          name: 'obj',
-          type: 'foam.core.FObject'
-        },
-        {
-          name: 'x',
-          type: 'foam.core.X'
-        }
-      ],
-      documentation: 'if one of the rules in a group throws an exception we need a way to reverse actions for previously executed rules.',
-      javaCode: ` `
     },
     {
       name: 'updateRule',

@@ -1,5 +1,6 @@
 package foam.nanos.ruler;
 
+import foam.core.FObject;
 import foam.core.X;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
@@ -91,7 +92,17 @@ public class RulerDAOTest extends Test {
     rule7.setOperation(Operations.CREATE);
     rule7.setAfter(false);
     rule7.setPriority(100);
-    RuleAction action7 = (x1, obj, oldObj, ruler) -> ruler.stop();
+    RuleAction action7 = new RuleAction() {
+      @Override
+      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        ruler.stop();
+      }
+
+      @Override
+      public void applyReverseAction(X x ,FObject obj) {
+
+      }
+    };
     rule7.setAction(action7);
     rule7 = (Rule) ruleDAO.put_(x, rule7);
 
@@ -123,7 +134,17 @@ public class RulerDAOTest extends Test {
     rule1.setOperation(Operations.CREATE);
     rule1.setAfter(false);
     rule1.setPriority(60);
-    RuleAction action1 = (x1, obj, oldObj, ruler) -> ruler.stop();
+    RuleAction action1 = new RuleAction() {
+      @Override
+      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        ruler.stop();
+      }
+
+      @Override
+      public void applyReverseAction(X x ,FObject obj) {
+
+      }
+    };
     rule1.setAction(action1);
     rule1 = (Rule) ruleDAO.put_(x, rule1);
 
@@ -141,14 +162,31 @@ public class RulerDAOTest extends Test {
       EQ(DOT(NEW_OBJ, INSTANCE_OF(foam.nanos.auth.User.class)), true)
     );
     rule2.setPredicate(predicate2);
-    RuleAction action2 = (x1, obj, oldObj, ruler) -> {
-      User user = (User) obj;
-      user.setEmail("foam@nanos.net");
+    RuleAction action2 = new RuleAction() {
+      @Override
+      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        User user = (User) obj;
+        user.setEmail("foam@nanos.net");
+      }
+
+      @Override
+      public void applyReverseAction(X x ,FObject obj) {
+
+      }
     };
     rule2.setAction(action2);
-    rule2.setAsyncAction((x1, obj, oldObj, ruler) -> {
-      throw new RuntimeException("this async action is not supposed to be executed.");
-    });
+    RuleAction asyncAction2 = new RuleAction() {
+      @Override
+      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        throw new RuntimeException("this async action is not supposed to be executed.");
+      }
+
+      @Override
+      public void applyReverseAction(X x ,FObject obj) {
+
+      }
+    };
+    rule2.setAsyncAction(asyncAction2);
     rule2 = (Rule) ruleDAO.put_(x, rule2);
 
     //the rule has lower priority than the first one => should never be executed
@@ -160,8 +198,16 @@ public class RulerDAOTest extends Test {
     rule3.setOperation(Operations.CREATE);
     rule3.setAfter(false);
     rule3.setPriority(20);
-    RuleAction action3 = (x1, obj, oldObj, ruler) -> {
-      throw new RuntimeException("this rule is not supposed to be executed");
+    RuleAction action3 = new RuleAction() {
+      @Override
+      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        throw new RuntimeException("this rule is not supposed to be executed");
+      }
+
+      @Override
+      public void applyReverseAction(X x ,FObject obj) {
+
+      }
     };
     rule3.setAction(action3);
     rule3 = (Rule) ruleDAO.put_(x, rule3);
@@ -177,14 +223,31 @@ public class RulerDAOTest extends Test {
     rule4.setPriority(10);
     Predicate predicate4 = EQ(DOT(NEW_OBJ, INSTANCE_OF(foam.nanos.auth.User.class)), true);
     rule4.setPredicate(predicate4);
-    RuleAction action4 = (x1, obj, oldObj, ruler) -> {
-      User user = (User) obj;
-      user.setLastName("Smirnova");
+    RuleAction action4 = new RuleAction() {
+      @Override
+      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        User user = (User) obj;
+        user.setLastName("Smirnova");
+      }
+
+      @Override
+      public void applyReverseAction(X x ,FObject obj) {
+
+      }
     };
     rule4.setAction(action4);
-    rule4.setAsyncAction((x1, obj, oldObj, ruler) -> {
-      ruler.stop();
-    });
+    RuleAction asyncAction4 = new RuleAction() {
+      @Override
+      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        ruler.stop();
+      }
+
+      @Override
+      public void applyReverseAction(X x ,FObject obj) {
+
+      }
+    };
+    rule4.setAsyncAction(asyncAction4);
     rule4 = (Rule) ruleDAO.put_(x, rule4);
 
     //the rule has lower priority than the first one but has different group so should be executed
@@ -197,20 +260,37 @@ public class RulerDAOTest extends Test {
     rule5.setAfter(false);
     Predicate predicate5 = EQ(DOT(NEW_OBJ, INSTANCE_OF(foam.nanos.auth.User.class)), true);
     rule5.setPredicate(predicate5);
-    RuleAction action5 = (x1, obj, oldObj, ruler) -> {
-      User user = (User) obj;
-      user.setLastName("Unknown");
+    RuleAction action5 = new RuleAction() {
+      @Override
+      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        User user = (User) obj;
+        user.setLastName("Unknown");
+      }
+
+      @Override
+      public void applyReverseAction(X x ,FObject obj) {
+
+      }
     };
     rule5.setAction(action5);
-    rule5.setAsyncAction((x1, obj, oldObj, ruler) -> {
-      // simulate async
-      try {
-        Thread.sleep(asyncWait);
-      } catch (InterruptedException e) { }
+    RuleAction asyncAction5 = new RuleAction() {
+      @Override
+      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        // simulate async
+        try {
+          Thread.sleep(asyncWait);
+        } catch (InterruptedException e) { }
 
-      User user = (User) obj;
-      user.setLastName("Smith");
-    });
+        User user = (User) obj;
+        user.setLastName("Smith");
+      }
+
+      @Override
+      public void applyReverseAction(X x ,FObject obj) {
+
+      }
+    };
+    rule5.setAsyncAction(asyncAction5);
     rule5 = (Rule) ruleDAO.put_(x, rule5);
 
     //the rule only applied to user2
@@ -222,15 +302,35 @@ public class RulerDAOTest extends Test {
     rule6.setAfter(false);
     rule6.setSaveHistory(true);
     rule6.setPredicate(EQ(DOT(NEW_OBJ, foam.nanos.auth.User.EMAIL), "user2@nanos.net"));
-    rule6.setAction((x1, obj, oldObj, ruler) -> ruler.putResult("Pending"));
-    rule6.setAsyncAction((x1, obj, oldObj, ruler) -> {
-      // simulate async
-      try {
-        Thread.sleep(asyncWait);
-      } catch (InterruptedException e) { }
+    RuleAction action6 = new RuleAction() {
+      @Override
+      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        ruler.putResult("Pending");
+      }
 
-      ruler.putResult("Done");
-    });
+      @Override
+      public void applyReverseAction(X x ,FObject obj) {
+
+      }
+    };
+    rule6.setAction(action6);
+    RuleAction asyncAction6 = new RuleAction() {
+      @Override
+      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        // simulate async
+        try {
+          Thread.sleep(asyncWait);
+        } catch (InterruptedException e) { }
+
+        ruler.putResult("Done");
+      }
+
+      @Override
+      public void applyReverseAction(X x ,FObject obj) {
+
+      }
+    };
+    rule6.setAsyncAction(asyncAction6);
     rule6 = (Rule) ruleDAO.put_(x, rule6);
   }
   public void removeData(X x) {
