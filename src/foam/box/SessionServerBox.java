@@ -112,7 +112,8 @@ public class SessionServerBox
           Group group = (Group) x.get("group");
 
           if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
-            msg.replyWithException(new AuthorizationException("You do not have permission to access that service."));
+            logger.warning("Missing permission", group != null ? group.getId() : "NO GROUP" , "service." + spec.getName());
+            msg.replyWithException(new AuthorizationException(String.format("You do not have permission to access the service named '%s'.", spec.getName())));
             return;
           }
 
