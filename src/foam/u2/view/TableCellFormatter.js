@@ -152,7 +152,7 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(date) {
-        if ( date ) this.add('*****', date.toISOString().substring(0,10));
+        if ( date ) this.add(date.toISOString().substring(0,10));
       }
     }
   ]
