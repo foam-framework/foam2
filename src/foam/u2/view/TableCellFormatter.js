@@ -170,7 +170,7 @@ foam.CLASS({
       name: 'tableCellFormatter',
       value: function(date) {
         // Output as yyyy-mm-dd hh:mm[a/p]
-        if ( date ) this.add(date.toISOString().substring(0,10) + date.toLocaleString().substring(10,16) + date.toLocaleString().substring(20,21).toLowerCase());
+        if ( date ) this.add(date.toISOString().substring(0,10) + date.toLocaleString().substr(-11,5) + date.toLocaleString().substr(-2,1).toLowerCase());
       }
     }
   ]
