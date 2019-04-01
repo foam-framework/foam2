@@ -15,7 +15,7 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.dao.NullDAO',
-    'foam.nanos.logger.LogLevel'
+    'foam.log.LogLevel'
   ],
 
   properties: [
@@ -65,7 +65,7 @@ return dao;
       args: [
         {
           name: 'severity',
-          type: 'foam.nanos.logger.LogLevel'
+          type: 'foam.log.LogLevel'
         },
         {
           name: 'message',
@@ -112,7 +112,7 @@ getDao().put_(getX().put("logger", (Logger) getLogger()), lm);
           javaType: 'Object...'
         }
       ],
-      javaCode: 'submit(LogLevel.WARNING, combine(args));'
+      javaCode: 'submit(LogLevel.WARN, combine(args));'
     },
     {
       name: 'error',
