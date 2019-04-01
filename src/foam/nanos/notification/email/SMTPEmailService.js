@@ -11,6 +11,7 @@ foam.CLASS({
   documentation: 'Implementation of Email Service using SMTP',
 
   implements: [
+    'foam.nanos.notification.email.EmailService',
     'foam.nanos.NanoService'
   ],
 

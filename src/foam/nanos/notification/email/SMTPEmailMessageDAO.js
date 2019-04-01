@@ -9,15 +9,11 @@ foam.CLASS({
   name: 'SMTPEmailMessageDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  javaImports: [
-    'foam.nanos.notification.email.SMTPEmailService'
-  ],
-
   methods: [
     {
       name: 'put_',
       javaCode: `
-        SMTPEmailService service = (SMTPEmailService) x.get("smtpEmailService");
+        EmailService service = (EmailService) x.get("smtpEmailService");
         if ( service != null ) {
           try {
             service.sendEmail(x, (EmailMessage) obj);
