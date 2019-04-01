@@ -192,6 +192,7 @@ foam.CLASS({
     },
     {
       name: 'sendEmail',
+      javaThrows: ['IllegalStateException'],
       args: [
         {
           name: 'x',
@@ -202,42 +203,49 @@ foam.CLASS({
           type: 'foam.nanos.notification.email.EmailMessage'
         }
       ],
-      javaCode: `
-if ( ! this.getEnabled() ) return;
+      javaCode:
+        `
+        if ( ! this.getEnabled() ) return;
+        if ( emailMessage.getTo().length < 1 || SafetyUtil.isEmpty(emailMessage.getFrom())) {
+          throw new IllegalStateException("Email that is being transported out does not have basic fields set.");
+        }
 
-((FixedThreadPool) getThreadPool()).submit(x, new ContextAgent() {
-  @Override
-  public void execute(X x) {
-    try {
-      MimeMessage message = createMimeMessage(emailMessage);
-      if ( message == null ) {
-        return;
-      }
+        ((FixedThreadPool) getThreadPool()).submit(x, new ContextAgent() {
+          @Override
+          public void execute(X x) {
+            try {
+              MimeMessage message = createMimeMessage(emailMessage);
+              if ( message == null ) {
+                return;
+              }
 
-      // send message
-      Transport transport = session_.getTransport("smtp");
-      transport.connect();
-      transport.sendMessage(message, message.getAllRecipients());
-      transport.close();
-    } catch (Throwable t) {
-      t.printStackTrace();
-    }
-  }
-});`
+              // send message
+              Transport transport = session_.getTransport("smtp");
+              transport.connect();
+              transport.sendMessage(message, message.getAllRecipients());
+              transport.close();
+            } catch (Throwable t) {
+              t.printStackTrace();
+            }
+          }
+        });
+        `
     },
     {
       name: 'start',
       javaCode:
-`Properties props = new Properties();
-props.setProperty("mail.smtp.auth", getAuthenticate() ? "true" : "false");
-props.setProperty("mail.smtp.starttls.enable", getStarttls() ? "true" : "false");
-props.setProperty("mail.smtp.host", getHost());
-props.setProperty("mail.smtp.port", getPort());
-if ( getAuthenticate() ) {
-  session_ = Session.getInstance(props, new SMTPAuthenticator(getUsername(), getPassword()));
-} else {
-  session_ = Session.getInstance(props);
-}`
+        `
+        Properties props = new Properties();
+        props.setProperty("mail.smtp.auth", getAuthenticate() ? "true" : "false");
+        props.setProperty("mail.smtp.starttls.enable", getStarttls() ? "true" : "false");
+        props.setProperty("mail.smtp.host", getHost());
+        props.setProperty("mail.smtp.port", getPort());
+        if ( getAuthenticate() ) {
+          session_ = Session.getInstance(props, new SMTPAuthenticator(getUsername(), getPassword()));
+        } else {
+          session_ = Session.getInstance(props);
+        }
+        `
     }
   ]
 });

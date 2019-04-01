@@ -117,7 +117,6 @@ foam.CLASS({
       ],
       javaCode: `
         // Check basic properties
-        if ( user == null ) throw new NoSuchFieldException("user is Null");
         if ( emailMessage == null ) throw new NoSuchFieldException("emailMessage is Null");
 
         String tempKeyString = "";
@@ -136,17 +135,14 @@ foam.CLASS({
         JtwigModel model = JtwigModel.newModel(templateArgs);
         if ( model == null ) throw new NoSuchFieldException("JtwigModel is Null");
 
-        // confirm user group
-        DAO groupDAO   = ((DAO) x.get("groupDAO")).inX(x);
-        Group group    = (Group) groupDAO.find(user.getGroup());
-        if ( group == null ) {
-          if ( SafetyUtil.isEmpty(getGroup())) {
-            throw new NoSuchFieldException("Group is Null");
-          }
-          group    = (Group) groupDAO.find(getGroup());
-          if ( group == null ) {
-            throw new NoSuchFieldException("Group is Null");
-          }
+        // Try to locate user group
+        DAO groupDAO = ((DAO) x.get("groupDAO")).inX(x);
+        Group group = null;
+        if ( user != null ) {
+          group = (Group) groupDAO.find(user.getGroup());
+        }
+        if ( group == null && ! SafetyUtil.isEmpty(getGroup()) ) {
+          group = (Group) groupDAO.find(getGroup());
         }
 
         // should have all properties necessary set by here, therefore process this template onto an emailMessage
@@ -161,9 +157,9 @@ foam.CLASS({
         1) Properties set on the EmailMessage,
         2) Properties set on the EmailTemplate(this),
         3) Properties set on the Group,
-        4) Properties set as default: 
+        4) [not set here] Properties set as default on appConfig: 
             which exists for 'From', 'ReplyTo' and 'DisplayName' email properties.
-            passed onto emailMessage obj from service.email
+            These values are set from EmailsUtility.java
         `,
       args: [
         {
@@ -202,7 +198,7 @@ foam.CLASS({
             JtwigTemplate templateDisplayName = JtwigTemplate.inlineTemplate(getReplyTo(), config);
             emailMessage.setReplyTo(templateDisplayName.render(model));
           } else {
-            if ( ! SafetyUtil.isEmpty(group.getReplyTo()) ) {
+            if ( group != null && ! SafetyUtil.isEmpty(group.getReplyTo()) ) {
               emailMessage.setReplyTo(group.getReplyTo());
             }
           }
@@ -214,7 +210,7 @@ foam.CLASS({
             JtwigTemplate templateDisplayName = JtwigTemplate.inlineTemplate(getDisplayName(), config);
             emailMessage.setDisplayName(templateDisplayName.render(model));
           } else {
-            if (! SafetyUtil.isEmpty(group.getDisplayName())) {
+            if ( group != null && ! SafetyUtil.isEmpty(group.getDisplayName())) {
               emailMessage.setDisplayName(group.getDisplayName());
             }
           }

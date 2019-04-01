@@ -1,7 +1,8 @@
 package foam.nanos.notification.email;
 
-import foam.core.ContextAwareSupport;
 import foam.core.X;
+import foam.dao.DAO;
+import foam.dao.ArraySink;
 import foam.nanos.app.AppConfig;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
@@ -13,9 +14,9 @@ import java.util.Map;
 import org.jtwig.environment.EnvironmentConfiguration;
 import org.jtwig.environment.EnvironmentConfigurationBuilder;
 import org.jtwig.resource.loader.TypedResourceLoader;
+import static foam.mlang.MLang.*;
 
-public class EmailsUtility extends ContextAwareSupport {
-
+public class EmailsUtility {
   /*
   documentation: 
   Purpose of this function/service is to facilitate the populations of an email and then to actually send the email. 
@@ -25,60 +26,74 @@ public class EmailsUtility extends ContextAwareSupport {
     STEP 4) then to store and send the email we just have to pass the emailMessage through to actual email service.
 
   Note:
-  If error and want to return, we return the passed in emailMessage and log the errors.
+  For email service to work correctly: parameters should be as follows:
+  @param x:             Is necessary
+  @param user:          Is only necessary to find the right template associated to the group of the user.
+                        If null default is * group.
+  @param emailMessage:  The obj that gets filled with all the properties that have been passed.
+                        eventually becoming the email that is transported out.
+  @param templateName:  The template name that is used for this email. It is found and applied based on user.group
+  @param templateArgs:  The arguments that are used to fill the template model body.
   */
-  public static void sendEmailFromTemplate(X x, User user, EmailMessage emailMessage, String name, Map templateArgs) {
+  public static void sendEmailFromTemplate(X x, User user, EmailMessage emailMessage, String templateName, Map templateArgs) {
+    if ( x == null ) return;
     Logger logger = (Logger) x.get("logger");
     EmailTemplate emailTemplateObj = null;
+    String userGroupId = "";
 
-    if ( user == null && (emailMessage == null || SafetyUtil.isEmpty(emailMessage.getTo()[0]) ) ) {
-      logger.warning("user and emailMessage.getTo() is not set. Email can't magically know where to go.");
-      return;
+    // Try to account for a null passed in user
+    if ( user == null && emailMessage != null && emailMessage.getTo().length > 1) {
+      // try to find user from emailMessage. Assuming that the first user group applies to all that this email is being sent to.
+      user = (User) ((DAO) x.get("localUserDAO")).where(EQ(User.EMAIL, emailMessage.getTo()[0])).select(new ArraySink());
     }
 
+    // userGroupId will be used to find the correct template
+    userGroupId = user == null ? "" : user.getGroup();
+
+    // config is used by the DAOResourceLoader which is necessary for implementing Jtwig templating
     EnvironmentConfiguration config = EnvironmentConfigurationBuilder
       .configuration()
         .resources()
           .resourceLoaders()
-          .add(new TypedResourceLoader("dao", new DAOResourceLoader(x, user.getGroup())))
+          .add(new TypedResourceLoader("dao", new DAOResourceLoader(x, userGroupId)))
             .and()
           .and()
       .build();
 
-    if ( ! SafetyUtil.isEmpty(name) && user != null) {
-
+    // If we have a templateName process the template
+    if ( ! SafetyUtil.isEmpty(templateName) ) {
       // STEP 1) Find EmailTemplate
-      emailTemplateObj = DAOResourceLoader.findTemplate(x, name, user.getGroup());
+      emailTemplateObj = DAOResourceLoader.findTemplate(x, templateName, userGroupId);
       if ( emailMessage == null ) {
+        // Need either an emailMessage or a template to create an email
+        // checking here if above condition is met
         if ( emailTemplateObj != null ) {
           emailMessage = new EmailMessage();
         } else {
-          logger.warning("emailTemplate not found and emailMessage is null. Invalid use of emailService");
+          logger.error("@EmailsUtility: emailTemplate not found and emailMessage is null. Invalid use of emailService");
           return;
         }
       }
     } else {
+      // flow for no EmailTemplate given
       if ( emailMessage == null ) {
         // no template specified and no emailMessage means nothing to send.
-        logger.warning("emailTemplate name missing and emailMessage is null. Invalid use of emailService");
+        logger.error("@EmailsUtility: emailTemplate templateName missing and emailMessage is null. Invalid use of emailService");
         return;
       }
     }
 
-    // emailMessage not null if we have reached here
-
     // Possible that emailTemplateObj is null and emailMessage was passed in for sending, without the use of a template.
     // in this case bypass step 2.
     if ( emailTemplateObj != null) {
-
       // STEP 2) Apply Template to emailMessage
       try {
         emailMessage = emailTemplateObj.apply(x, user, emailMessage, templateArgs, config);
         if ( emailMessage == null) {
-          logger.warning("emailTemplate.apply has returned null. Which implies an uncaught error");
+          logger.warning("@EmailsUtility: emailTemplate.apply has returned null. Which implies an uncaught error");
         }
       } catch (Exception e) {
-        logger.warning("emailTemplate.apply has failed, with a caught exception", e);
+        logger.warning("@EmailsUtility: emailTemplate.apply has failed, with a thrown exception. ", e);
         return;
       }
     }
