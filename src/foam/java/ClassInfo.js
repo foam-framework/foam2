@@ -18,10 +18,6 @@
 foam.CLASS({
   package: 'foam.java',
   name: 'ClassInfo',
-//
-//  implements: [
-//    'java.lang.Comparable'
-//  ],
 
   properties: [
     {
