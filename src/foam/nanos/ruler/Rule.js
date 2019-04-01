@@ -80,7 +80,6 @@
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'predicate',
-      storageTransient: true,
       javaFactory: `
       return foam.mlang.MLang.TRUE;
       `,
@@ -91,29 +90,12 @@
       class: 'FObjectProperty',
       of: 'foam.nanos.ruler.RuleAction',
       name: 'action',
-      storageTransient: true,
-      javaFactory: `
-      return new RuleAction() {
-        @Override
-        public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) { /*noop*/ }
-        @Override
-        public void applyReverseAction(X x, FObject obj) { /*noop*/ }
-      };`,
       documentation: 'The action to be executed if predicates returns true for passed object.'
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.ruler.RuleAction',
-      storageTransient: true,
       name: 'asyncAction',
-      javaFactory: `
-      return new RuleAction() {
-        @Override
-        public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) { /*noop*/ }
-
-        @Override
-        public void applyReverseAction(X x, FObject obj) { /*noop*/ }
-      };`,
       documentation: 'The action to be executed asynchronously if predicates returns true for passed object.'
     },
     {
