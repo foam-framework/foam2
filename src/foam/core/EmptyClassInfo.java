@@ -39,6 +39,10 @@ public class EmptyClassInfo
     return null;
   }
 
+  public int compareTo(Object obj) {
+    return getId().compareTo(((ClassInfo)obj).getId());
+  }
+
   public ClassInfo setObjClass(Class cls) {
     return null;
   }
