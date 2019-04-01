@@ -196,7 +196,6 @@ var classes = [
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',
-  'foam.nanos.logger.LogLevel',
   'foam.nanos.logger.LogMessage',
   'foam.nanos.logger.LogLevelFilterLogger',
   'foam.nanos.logger.AbstractLogger',
