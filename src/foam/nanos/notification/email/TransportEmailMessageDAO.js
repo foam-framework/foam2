@@ -6,14 +6,14 @@
 
 foam.CLASS({
   package: 'foam.nanos.notification.email',
-  name: 'SMTPEmailMessageDAO',
+  name: 'TransportEmailMessageDAO',
   extends: 'foam.dao.ProxyDAO',
 
   methods: [
     {
       name: 'put_',
       javaCode: `
-        EmailService service = (EmailService) x.get("smtpEmailService");
+        EmailService service = (EmailService) x.get("transportEmailService");
         if ( service != null ) {
           try {
             service.sendEmail(x, (EmailMessage) obj);
@@ -21,7 +21,7 @@ foam.CLASS({
             e.printStackTrace();
           }
         } else {
-           System.out.println("SMTPEmailService not found");
+           System.out.println("transportEmailService not found");
         }
         return super.put_(x, obj);
 `

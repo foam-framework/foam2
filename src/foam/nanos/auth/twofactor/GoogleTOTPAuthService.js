@@ -16,7 +16,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.User',
-    'foam.nanos.notification.email.SMTPEmailService',
+    'foam.nanos.notification.email.EmailService',
     'foam.nanos.session.Session',
     'foam.util.SafetyUtil',
     'io.nayuki.qrcodegen.QrCode',
@@ -72,7 +72,7 @@ foam.CLASS({
 
         try {
           AppConfig config = (AppConfig) x.get("appConfig");
-          SMTPEmailService service = (SMTPEmailService) x.get("smtpEmailService");
+          EmailService service = (EmailService) x.get("transportEmailService");
           String name = service == null ? "FOAM" : service.getDisplayName();
           String path = String.format("/%s:%s", name, user.getEmail());
           String query = String.format("secret=%s&issuer=%s&algorithm=%s", key, name, getAlgorithm());
