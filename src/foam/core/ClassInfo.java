@@ -13,7 +13,7 @@ import java.util.Iterator;
 
 /** Provides runtime information about a Class. **/
 // KGR: Why is this mutable?
-public interface ClassInfo {
+public interface ClassInfo extends java.lang.Comparable {
   String      getId();
   ClassInfo   setId(String id);
 
