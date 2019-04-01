@@ -14,7 +14,7 @@ FOAM_FILES([
   { name: "foam/nanos/logger/ProxyLogger" },
   { name: "foam/nanos/logger/FileLogger" },
   { name: "foam/nanos/logger/LogLevelFilterLogger" },
-  { name: "foam/nanos/logger/LogsView" },
+  { name: "foam/nanos/logger/LogMessageController", flags: ['web'] },
   { name: "foam/nanos/logger/NotificationLogMessageDAO" },
   { name: "foam/nanos/logger/RepeatLogMessageDAO" },
   { name: "foam/nanos/dig/exception/DigErrorMessage" },

@@ -17,9 +17,18 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
     'foam.nanos.auth.LastModifiedByAware'
   ],
 
+  tableColumns: [
+    'created',
+    'severity',
+    'createdBy',
+    'lastModifiedBy',
+    'message'
+  ],
+
   searchColumns: [
-    'exception', 'message', 'severity'
-   ],
+    'severity',
+    'exception'
+  ],
 
   properties: [
     {
@@ -36,7 +45,27 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
       javaFromJSON: `return forLabel(value);`,
       visibility: 'RO',
       tableCellFormatter: function(severity, obj, axiom) {
-         this.start('div').setAttribute('title', severity.label).add(severity.label).end();
+        var colour;
+        switch ( severity.label ) {
+          case 'Warning':
+            colour = '#ffa500';
+            break;
+          case 'Info':
+            colour = '#0000cc';
+            break;
+          case 'Error':
+            colour = '#ff0000';
+            break;
+          default:
+            colour = 'auto';
+            break;
+        }
+         this
+          .start()
+            .setAttribute('title', severity.label)
+            .add(severity.label)
+            .style({ color: colour })
+          .end();
       },
     },
     {
