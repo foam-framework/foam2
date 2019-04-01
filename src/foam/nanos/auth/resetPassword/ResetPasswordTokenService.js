@@ -41,7 +41,18 @@ foam.CLASS({
     {
       name: 'generateTokenWithParameters',
       javaCode:
-`AppConfig appConfig = (AppConfig) x.get("appConfig");
+`
+AppConfig appConfig = (AppConfig) x.get("appConfig");
+
+// The context passed to us won't have a user in it because obviously the user
+// isn't logged in if they're resetting their password. However, decorators on
+// DAOs we access down the line from here will want to use the user from the
+// context. Therefore we put the system user in the context here so that
+// decorators down the line won't throw NPEs when trying to access the user in
+// the context.
+User systemUser = (User) getX().get("user");
+x = x.put("user", systemUser);
+
 DAO userDAO = (DAO) getLocalUserDAO();
 DAO tokenDAO = (DAO) getTokenDAO();
 String url = appConfig.getUrl()
@@ -89,6 +100,15 @@ return true;`
 `if ( user == null || SafetyUtil.isEmpty(user.getDesiredPassword()) ) {
   throw new RuntimeException("Cannot leave new password field empty");
 }
+
+// The context passed to us won't have a user in it because obviously the user
+// isn't logged in if they're resetting their password. However, decorators on
+// DAOs we access down the line from here will want to use the user from the
+// context. Therefore we put the system user in the context here so that
+// decorators down the line won't throw NPEs when trying to access the user in
+// the context.
+User systemUser = (User) getX().get("user");
+x = x.put("user", systemUser);
 
 String newPassword = user.getDesiredPassword();
 
