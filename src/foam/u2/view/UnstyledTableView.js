@@ -209,6 +209,7 @@ foam.CLASS({
                     addClass(view.myClass('vertDots')).
                     addClass(view.myClass('noselect'));
                   }).
+                  style({ width: 40 }).
                   tag('div', null, view.dropdownOrigin$).
                 end();
               });

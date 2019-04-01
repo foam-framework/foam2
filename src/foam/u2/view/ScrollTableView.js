@@ -29,7 +29,7 @@
     ^scrollbarContainer {
       overflow: scroll;
       display: grid;
-      grid-template-columns: 1px minmax(968px, 1fr);
+      grid-template-columns: 1px 1fr;
     }
 
     ^ th {
@@ -39,7 +39,15 @@
     }
 
     ^ table {
-      min-width: 100%;
+      table-layout: fixed;
+      width: 1024px;
+    }
+
+    ^ td,
+    ^ th {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
   `,
 
