@@ -265,6 +265,9 @@ foam.CLASS({
                       callOn(column.tableCellFormatter, 'format', [
                         column.f ? column.f(obj) : null, obj, column
                       ]).
+                      callIf(column.f, function() {
+                        this.attr('title', column.f(obj));
+                      }).
                     end();
                 }).
                 call(function() {
