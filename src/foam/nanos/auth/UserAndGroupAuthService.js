@@ -34,10 +34,7 @@ foam.CLASS({
   javaImports: [
     'foam.core.ContextAwareSupport',
     'foam.core.X',
-    'foam.dao.ArraySink',
     'foam.dao.DAO',
-    'foam.dao.Sink',
-    'foam.mlang.MLang',
     'foam.nanos.logger.Logger',
     'foam.nanos.NanoService',
     'foam.nanos.session.Session',
@@ -47,7 +44,6 @@ foam.CLASS({
 
     'java.security.Permission',
     'java.util.Calendar',
-    'java.util.List',
     'java.util.regex.Pattern',
     'javax.security.auth.AuthPermission',
 
@@ -259,7 +255,7 @@ foam.CLASS({
             if ( group.implies(x, permission) ) return true;
 
             // check parent group
-            group = (Group) groupDAO_.find(group.getParent());
+            group = (Group) ((DAO) getLocalGroupDAO()).find(group.getParent());
           }
         } catch (IllegalArgumentException e) {
           Logger logger = (Logger) x.get("logger");
@@ -319,8 +315,8 @@ foam.CLASS({
           throw new AuthenticationException("Login disabled");
         }
 
-        // check if user group enabled
-        Group group = getCurrentGroup(x);
+        // check if group enabled
+        Group group = user.findGroup(x);
         if ( group != null && ! group.getEnabled() ) {
           throw new AuthenticationException("Group disabled");
         }
@@ -346,7 +342,7 @@ foam.CLASS({
         // TODO: modify line to allow actual setting of password expiry in cases where users are required to periodically update their passwords
         user.setPasswordExpiry(null);
         user = (User) ((DAO) getLocalUserDAO()).put(user);
-        session.setContext(session.getContext().put("user", user));
+        session.setContext(session.getContext().put("user", user).put("group", group));
         return user;
       `
     },
@@ -423,7 +419,7 @@ foam.CLASS({
               throw new RuntimeException("There was a user and an agent in the context, but a junction between then was not found.");
             }
 
-            return (Group) groupDAO_.inX(x).find(junction.getGroup());
+            return (Group) ((DAO) getLocalGroupDAO()).inX(x).find(junction.getGroup());
           }
 
           // Third highest precedence: If a user is logged in but not acting as
