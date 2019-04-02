@@ -7,13 +7,10 @@
 package foam.core;
 
 import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 
 /** Provides runtime information about a Class. **/
 // KGR: Why is this mutable?
-public interface ClassInfo {
+public interface ClassInfo extends java.lang.Comparable {
   String      getId();
   ClassInfo   setId(String id);
 
