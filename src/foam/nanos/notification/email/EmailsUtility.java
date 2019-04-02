@@ -111,8 +111,8 @@ public class EmailsUtility {
     }
 
     // STEP 4) passing emailMessage through to actual email service.
-    EmailService email = (EmailService) x.get("email");
-    email.sendEmail(x, emailMessage);
+    DAO email = (DAO) x.get("emailMessageDAO");
+    email.put(emailMessage);
   }
 
 }
