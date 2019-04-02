@@ -209,6 +209,7 @@ foam.CLASS({
                     addClass(view.myClass('vertDots')).
                     addClass(view.myClass('noselect'));
                   }).
+                  style({ width: 40 }).
                   tag('div', null, view.dropdownOrigin$).
                 end();
               });
@@ -264,6 +265,9 @@ foam.CLASS({
                       callOn(column.tableCellFormatter, 'format', [
                         column.f ? column.f(obj) : null, obj, column
                       ]).
+                      callIf(column.f, function() {
+                        this.attr('title', column.f(obj));
+                      }).
                     end();
                 }).
                 call(function() {
