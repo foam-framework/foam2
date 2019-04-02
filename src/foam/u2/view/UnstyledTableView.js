@@ -266,7 +266,12 @@ foam.CLASS({
                         column.f ? column.f(obj) : null, obj, column
                       ]).
                       callIf(column.f, function() {
-                        this.attr('title', column.f(obj));
+                        try {
+                          var value = column.f(obj);
+                          if ( foam.util.isPrimitive(value) ) {
+                            this.attr('title', value);
+                          }
+                        } catch (err) {}
                       }).
                     end();
                 }).
