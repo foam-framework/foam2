@@ -3,7 +3,12 @@ foam.CLASS({
   name: 'LogMessageController',
   extends: 'foam.comics.DAOController',
 
-  documentation: 'A custom DAOController to work with log messages.',
+  documentation: `
+    A custom DAOController to work with log messages.
+
+    Customizations:
+      * Sort the DAO by creation date
+  `,
 
   requires: ['foam.nanos.logger.LogMessage'],
 
