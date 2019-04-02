@@ -39,7 +39,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'lazy',
-      tableWidth: 60,
+      tableWidth: 65,
       value: true,
       tableCellFormatter: function(value, obj, property) {
         this
@@ -54,7 +54,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'serve',
-      tableWidth: 50,
+      tableWidth: 72,
       tableCellFormatter: function(value, obj, property) {
         this
           .start()
