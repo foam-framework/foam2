@@ -21,8 +21,7 @@ public class ASCIIEscapeParser
         new Literal("t"),
         new Literal("r"),
         new Literal("f"),
-        new Literal("b")),
-      new Whitespace()));
+        new Literal("b"))));
   }
 
   public PStream parse(PStream ps, ParserContext x) {
