@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'Address',
 
-  documentation: 'Postal address.',
+  documentation: 'The postal address of the entity.',
 
   implements: [
     {
@@ -27,23 +27,26 @@ foam.CLASS({
     {
       class: 'String',
       name: 'type',
-      documentation: 'Address type.'
+      documentation: 'Address type. COMMENT: What is this?'
     },
     {
       class: 'Boolean',
       name: 'verified',
-      documentation: 'Identifies if address has been verified.'
+      documentation: 'Verifies that the address exists.'
     },
     {
       class: 'Boolean',
       name: 'deleted',
-      documentation: 'Marks address as deleted.'
+      documentation: 'Indicates the address as deleted.'
     },
     {
       class: 'Boolean',
       name: 'structured',
       value: true,
-      documentation: 'Checked, shown Street Number, Street Name, Suite. Unchecked, shown Address1, Address2.'
+      documentation: `Verifies that the address is shown in the following structure: 
+      Street Number, Street Name, Suite Number. For an unstructured address field, use address1 and/or
+      address2.
+      `
     },
     {
       class: 'String',
@@ -51,7 +54,7 @@ foam.CLASS({
       // required: true
       width: 70,
       displayWidth: 50,
-      documentation: 'for an unstructured address, use this as a main address field.',
+      documentation: 'For an unstructured address, use this as a main address field.',
       validateObj: function(address1) {
         var address1Regex = /^[a-zA-Z0-9 ]{1,70}$/;
 
@@ -65,7 +68,7 @@ foam.CLASS({
       name: 'address2',
       width: 70,
       displayWidth: 50,
-      documentation: 'for an unstructured address, use this as a sub address field.',
+      documentation: 'For an unstructured address, use this as a sub address field.',
       validateObj: function(address2) {
         var address2Regex = /^[a-zA-Z0-9 ]{1,70}$/;
 
@@ -79,7 +82,8 @@ foam.CLASS({
       targetDAOKey: 'countryDAO',
       name: 'countryId',
       of: 'foam.nanos.auth.Country',
-      documentation: 'Country address.',
+      documentation: `A generated name that doesn't contain any special characters which represents
+         the country.`,
       required: true,
       validateObj: function(countryId) {
         if ( typeof countryId !== 'string' || countryId.length === 0 ) {
@@ -97,7 +101,8 @@ foam.CLASS({
       targetDAOKey: 'regionDAO',
       name: 'regionId',
       of: 'foam.nanos.auth.Region',
-      documentation: 'Region address.',
+      documentation: `A generated name that doesn't contain any special characters which represents
+      the region of the country.`,
       view: function(_, X) {
         var choices = X.data.slot(function(countryId) {
           return X.regionDAO.where(X.data.EQ(X.data.Region.COUNTRY_ID, countryId || ""));
@@ -129,7 +134,7 @@ foam.CLASS({
       class: 'String',
       name: 'streetNumber',
       width: 16,
-      documentation: 'for an structured address, use this field.',
+      documentation: 'For a structured address, use this field for the street number.',
       validateObj: function(streetNumber) {
         if ( streetNumber.trim() === '' ) {
           return 'Street number required.';
@@ -144,7 +149,7 @@ foam.CLASS({
       class: 'String',
       name: 'streetName',
       width: 70,
-      documentation: 'for an structured address, use this field.',
+      documentation: 'For a structured address, use this field for the street name.',
       validateObj: function(streetName) {
         if ( streetName.trim() === '' ) {
           return 'Street name required.';
@@ -158,7 +163,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'suite',
-      documentation: 'Suite pertaining to address.',
+      documentation: 'For a structured address, use this field for the suite number.',
       width: 16,
       validateObj: function(suite) {
         var suiteRegex = /^[a-zA-Z0-9 ]{1,70}$/;
@@ -170,7 +175,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'city',
-      documentation: 'City pertaining to address.',
+      documentation: 'The city pertaining to the address.',
       required: true,
       validateObj: function(city) {
         if ( city.trim().length === 0 ) {
@@ -185,7 +190,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'postalCode',
-      documentation: 'Postal code pertaining to address.',
+      documentation: 'The postal code pertaining to the address.',
       preSet: function(oldValue, newValue) {
         return newValue.toUpperCase();
       },
@@ -221,23 +226,23 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'encrypted',
-      documentation: 'Determines if address should be or is encrypted.'
+      documentation: 'Verifies if the address is encrypted.'
     },
     {
       class: 'Double',
       name: 'latitude',
-      documentation: 'Latitude of address location.'
+      documentation: 'The latitude of the address location.'
     },
     {
       class: 'Double',
       name: 'longitude',
-      documentation: 'Longitude of address location.'
+      documentation: 'The longitude of the address location.'
     },
     {
       class: 'FObjectArray',
       of: 'foam.nanos.auth.Hours',
       name: 'hours',
-      documentation: 'Opening and closing hours for this address',
+      documentation: 'The opening and closing hours for this address',
       factory: function () { return []; },
       javaFactory: 'return new Hours[] {};'
     }

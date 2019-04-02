@@ -33,8 +33,9 @@ foam.CLASS({
     'foam.util.SafetyUtil',
     'static foam.mlang.MLang.EQ'
   ],
-
-  documentation: '',
+  
+  documentation: `Authenticates a user in the system. 
+     It requires personal information and permits certain actions.`,
 
   tableColumns: [
     'id', 'enabled', 'type', 'group', 'spid', 'firstName', 'lastName', 'organization', 'email'
@@ -59,19 +60,19 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'enabled',
-      documentation: 'Enables user to permit certain actions.',
+      documentation: 'Enables the user to permit certain actions.',
       value: true
     },
     {
       class: 'Boolean',
       name: 'loginEnabled',
-      documentation: 'Enables user to login',
+      documentation: 'Enables the user to login',
       value: true
     },
     {
       class: 'DateTime',
       name: 'lastLogin',
-      documentation: 'Date and time user last logged in.'
+      documentation: 'The date and time of last login by user.'
     },
     'firstName',
     'middleName',
@@ -80,7 +81,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'organization',
-      documentation: 'Organization/Business the user is accompanied to.',
+      documentation: 'The organization/business associated with the user.',
       displayWidth: 80,
       width: 100,
       tableWidth: 160,
@@ -93,14 +94,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'department',
-      documentation: 'Department the user is accompanied to within the organization.',
+      documentation: 'The department associated with the organization/business of the user.',
       width: 50
     },
     {
       class: 'EMail',
       name: 'email',
       label: 'Email Address',
-      documentation: 'Email address of user.',
+      documentation: 'The email address of the user.',
       displayWidth: 80,
       width: 100,
       preSet: function(_, val) {
@@ -120,14 +121,14 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'emailVerified',
-      documentation: 'Email verified flag',
+      documentation: 'A flag that verifies the email address of the user.',
       permissionRequired: true
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'phone',
-      documentation: 'Personal phone number of user.',
+      documentation: 'The personal phone number of the user.',
       factory: function() {
         return this.Phone.create();
       },
@@ -137,7 +138,7 @@ foam.CLASS({
       class: 'String',
       name: 'phoneNumber',
       transient: true,
-      documentation: 'Omits properties of phone number object and returns the number.',
+      documentation: 'Omits properties of the phone number object and returns the phone number.',
       expression: function(phone) {
         return phone.number;
       }
@@ -146,7 +147,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'mobile',
-      documentation: 'Mobile phone number of user.',
+      documentation: 'The mobile phone number of the user.',
       factory: function() {
         return this.Phone.create();
       },
@@ -155,7 +156,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'type',
-      documentation: 'Type of user. (Business, Personal etc.)',
+      documentation: 'Defines the type of user.',
       tableWidth: 91,
       view: {
         class: 'foam.u2.view.ChoiceView',
@@ -165,12 +166,12 @@ foam.CLASS({
     {
       class: 'Date',
       name: 'birthday',
-      documentation: 'User\' birthday.'
+      documentation: 'The date of birth of the user.'
     },
     {
       class: 'foam.nanos.fs.FileProperty',
       name: 'profilePicture',
-      documentation: 'User\' profile picture.',
+      documentation: 'A placeholder for the profile picture of the user.',
       view: {
         class: 'foam.nanos.auth.ProfilePictureView',
         placeholderImage: 'images/ic-placeholder.png'
@@ -180,7 +181,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Address',
       name: 'address',
-      documentation: 'User\' Address.',
+      documentation: 'The mailing address of the user.',
       factory: function() {
         return this.Address.create();
       },
@@ -189,14 +190,14 @@ foam.CLASS({
     {
       class: 'Reference',
       name: 'language',
-      documentation: 'User\' default language. Can be used to determine displayed language.',
+      documentation: 'The default language preferred by the user.',
       of: 'foam.nanos.auth.Language',
       value: 'en'
     },
     {
       class: 'String',
       name: 'timeZone',
-      documentation: 'User\' preferred timezone.',
+      documentation: 'The preferred time zone of the user.',
       width: 5
       // TODO: create custom view or DAO
     },
@@ -204,7 +205,7 @@ foam.CLASS({
       class: 'Password',
       name: 'desiredPassword',
       label: 'Password',
-      documentation: 'A password user would like to have during registration process.',
+      documentation: 'A password that the user wishes to use as a password.',
       displayWidth: 30,
       width: 100,
       storageTransient: true,
@@ -231,19 +232,19 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'passwordLastModified',
-      documentation: 'Date and time password was last modified.'
+      documentation: 'The last date and time that the password was modified.'
     },
     {
       class: 'DateTime',
       name: 'passwordExpiry',
-      documentation: 'Date and time password expires.'
+      documentation: 'The expiry date and time for the current password of the user.'
     },
     // TODO: startDate, endDate,
     // TODO: do we want to replace 'note' with a simple ticket system?
     {
       class: 'String',
       name: 'note',
-      documentation: 'Note appended to user.',
+      documentation: '**What is the purpose of this note?**  Note appended to user.',
       displayWidth: 70,
       view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 }
     },
@@ -251,7 +252,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'businessName',
-      documentation: 'Name of business user is accompanied to.',
+      documentation: 'The name of the business associated with the user.',
       width: 50,
       validateObj: function(businessName) {
         if ( businessName.length > 35 ) {
@@ -263,28 +264,28 @@ foam.CLASS({
       class: 'String',
       name: 'bankIdentificationCode',
       width: 20,
-      documentation: 'Bank Identification Code (BIC)'
+      documentation: 'The Bank Identification Code (BIC): an international bank code that identifies particular banks worldwide.'
     },
     {
       class: 'Boolean',
       name: 'businessHoursEnabled',
-      documentation: 'Enables business hours.',
+      documentation: 'Enables business hours to be set by the user.',
       value: false
     },
     {
       class: 'StringArray',
       name: 'disabledTopics',
-      documentation: 'disabled types for notifications'
+      documentation: 'Disables types for notifications.'
     },
     {
       class: 'StringArray',
       name: 'disabledTopicsEmail',
-      documentation: 'disabled types for Email notifications'
+      documentation: 'Disables types for email notifications'
     },
     {
       class: 'URL',
       name: 'website',
-      documentation: 'User\' website.',
+      documentation: 'The website of the user.',
       displayWidth: 80,
       width: 2048,
       validateObj: function(website) {
@@ -298,12 +299,12 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'created',
-      documentation: 'Creation date.'
+      documentation: 'The date and time the user was created in the system.'
     },
     {
       class: 'DateTime',
       name: 'lastModified',
-      documentation: 'Last modified date.'
+      documentation: 'The date and time the user account was last modified.'
     }
   ],
 
