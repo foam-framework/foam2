@@ -7,7 +7,6 @@
 FOAM_FILES([
   { name: 'foam/nanos/client/ClientBuilder' },
   { name: 'foam/nanos/controller/AppStyles', flags: ['web'] },
-  { name: "foam/nanos/logger/LogLevel" },
   { name: "foam/nanos/logger/LogMessage" },
   { name: "foam/nanos/logger/Logger" },
   { name: "foam/nanos/logger/AbstractLogger" },
