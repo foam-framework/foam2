@@ -24,6 +24,7 @@ foam.CLASS({
       letter-spacing: 0.4px;
       color: #2b2b2b;
       background: %BACKGROUNDCOLOR%;
+      box-sizing: border-box;
     }
 
     ^ th > img {
