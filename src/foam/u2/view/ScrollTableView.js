@@ -29,13 +29,25 @@
     ^scrollbarContainer {
       overflow: scroll;
       display: grid;
-      grid-template-columns: auto auto;
+      grid-template-columns: 1px 1fr;
     }
 
     ^ th {
       position: -webkit-sticky;
       position: sticky;
       top: 0;
+    }
+
+    ^ table {
+      table-layout: fixed;
+      width: 1024px;
+    }
+
+    ^ td,
+    ^ th {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
   `,
 
@@ -112,7 +124,7 @@
       name: 'scrollHeight',
       expression: function(daoCount, limit, rowHeight) {
         this.refresh();
-        return rowHeight * (daoCount - limit) + this.TABLE_HEAD_HEIGHT + 'px';
+        return rowHeight * Math.max(0, daoCount - limit) + this.TABLE_HEAD_HEIGHT + 'px';
       }
     },
     {
@@ -222,7 +234,6 @@
           addClass(this.myClass('scrollbarContainer')).
           on('scroll', this.onScroll).
           start().
-            show(this.daoCount$.map((count) => count >= this.limit)).
             addClass(this.myClass('scrollbar')).
             style({ height: this.scrollHeight$ }).
           end().
