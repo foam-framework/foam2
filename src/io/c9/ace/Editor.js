@@ -8,7 +8,7 @@ foam.CLASS({
   ],
   reactions: [
     ['container', 'onload', 'initEditor'],
-    ['config', 'propertyChange', 'updateEditor'],
+    ['config', 'propertyChange', 'updateEditor']
   ],
   properties: [
     {
@@ -22,6 +22,10 @@ foam.CLASS({
       factory: function() {
         return this.Config.create();
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'showConfig'
     }
   ],
   classes: [
@@ -60,6 +64,7 @@ foam.CLASS({
   ],
   methods: [
     function initE() {
+      var self = this;
       this
         .start('div', null, this.container$)
           .style({
@@ -67,7 +72,16 @@ foam.CLASS({
             width: this.config$.dot('width').map(h => h + 'px')
           })
         .end()
-        .tag(this.DetailView, { data$: this.config$ });
+        .start('span')
+          .style({cursor: 'pointer'})
+          .add(self.showConfig$.map(b => b ? 'Hide Editor Config' : 'Show Editor Config'))
+          .on('click', function() { self.showConfig = ! self.showConfig; })
+        .end()
+        .add(this.slot(function(showConfig) {
+          return this.E().callIf(showConfig, function() {
+            this.tag(self.DetailView, { data$: self.config$ });
+          });
+        }));
     }
   ],
   listeners: [
