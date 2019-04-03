@@ -13,7 +13,7 @@ foam.CLASS({
   documentation: `catches and consolidates repeated identical log messages`,
 
   requires: [
-    'foam.nanos.logger.LogLevel'
+    'foam.log.LogLevel'
   ],
 
   properties: [
@@ -27,9 +27,9 @@ foam.CLASS({
     },
     {
       class: 'Enum',
-      of: 'foam.nanos.logger.LogLevel',
+      of: 'foam.log.LogLevel',
       name: 'previousLogSeverity',
-      factory: function() { return foam.nanos.logger.LogLevel.INFO; }
+      factory: function() { return foam.log.INFO; }
     }
   ],
 
