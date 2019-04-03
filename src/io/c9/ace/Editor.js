@@ -8,9 +8,14 @@ foam.CLASS({
   ],
   reactions: [
     ['container', 'onload', 'initEditor'],
-    ['config', 'propertyChange', 'updateEditor']
+    ['config', 'propertyChange', 'updateEditor'],
+    ['', 'propertyChange.data', 'dataToEditor']
   ],
   properties: [
+    {
+      class: 'Boolean',
+      name: 'preventFeedback'
+    },
     {
       name: 'container'
     },
@@ -89,8 +94,28 @@ foam.CLASS({
       var self = this;
       self.Lib.ACE.then(function(ace) {
         self.editor = ace.edit(self.container.id);
+        self.editor.session.on('change', self.editorToData);
         self.updateEditor();
+        self.dataToEditor();
       });
+    },
+    {
+      name: 'editorToData',
+      isFramed: true,
+      code: function() {
+        if ( ! this.editor ) return;
+        this.preventFeedback = true;
+        this.data = this.editor.session.getValue();
+        this.preventFeedback = false;
+      }
+    },
+    {
+      name: 'dataToEditor',
+      code: function() {
+        if ( ! this.editor ) return;
+        if ( this.preventFeedback ) return;
+        this.editor.session.setValue(this.data || '');
+      }
     },
     function updateEditor() {
       if ( ! this.editor ) return;
