@@ -188,6 +188,7 @@ var classes = [
   'foam.nanos.auth.DeletedAware',
   'foam.nanos.auth.DeletedAwareDummy',
   'foam.nanos.auth.DeletedAwareDAOTest',
+  'foam.nanos.auth.UserAndGroupAuthService',
   'foam.nanos.http.HttpParameters',
   'foam.nanos.http.DefaultHttpParameters',
   'foam.nanos.session.Session',
@@ -331,7 +332,7 @@ var classes = [
   'foam.nanos.ruler.RuleHistoryStatus',
   'foam.comics.SearchMode',
 
-  //Support Files
+  // Support Files
   'foam.support.model.TicketMessage',
   'foam.support.model.SupportEmail',
   'foam.support.model.Ticket',
