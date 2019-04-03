@@ -2,6 +2,7 @@ package foam.nanos.auth;
 
 import foam.core.X;
 import foam.dao.ArraySink;
+import foam.dao.DAO;
 import foam.util.Password;
 
 import javax.security.auth.AuthPermission;
@@ -26,7 +27,7 @@ public class UserAndGroupAuthServiceTest
   }
 
   @Override
-  public void start() {
+  public void start() throws java.lang.Exception {
     System.out.println("Starting");
     super.start();
     createGroupsAndPermissions();
@@ -34,7 +35,6 @@ public class UserAndGroupAuthServiceTest
     testlogin();
     testCheck();
     testCachedCheck();
-    testChallengedLogin();
     testUpdatePassword();
     testLogout();
   }
@@ -60,7 +60,7 @@ public class UserAndGroupAuthServiceTest
       }
 
       group.setPermissions(permissions);
-      groupDAO_.put(group);
+      ((DAO) getLocalGroupDAO()).put(group);
     }
 
     long endTime                = System.nanoTime();
@@ -71,7 +71,7 @@ public class UserAndGroupAuthServiceTest
   public void addTestUsers() {
     System.out.println("Registering " + numUsers + " Users");
     long startTime  = System.nanoTime();
-    ArraySink sink   = (ArraySink) groupDAO_.select(new ArraySink());
+    ArraySink sink   = (ArraySink) ((DAO) getLocalGroupDAO()).select(new ArraySink());
 
     /**
      * For each user, randomly select a group from the groups created
@@ -89,7 +89,7 @@ public class UserAndGroupAuthServiceTest
       Group group = (Group) sink.getArray().get(randomGroup);
 
       user.setGroup(group.getId());
-      userDAO_.put(user);
+      ((DAO) getLocalUserDAO()).put(user);
     }
 
     long endTime                = System.nanoTime();
@@ -121,7 +121,7 @@ public class UserAndGroupAuthServiceTest
   public void testCheck() {
     System.out.println("Permissions Check for " + numUsers + " users");
     long startTime = System.nanoTime();
-    ArraySink sink  = (ArraySink) groupDAO_.select(new ArraySink());
+    ArraySink sink  = (ArraySink) ((DAO) getLocalGroupDAO()).select(new ArraySink());
 
     /**
      * For each user, we check if they have access to a random permission
@@ -155,35 +155,6 @@ public class UserAndGroupAuthServiceTest
     long endTime                = System.nanoTime();
     long durationInMilliseconds = (endTime - startTime) / 1000000;
     System.out.println("Duration: " + durationInMilliseconds + "ms \n");
-  }
-
-  public void testChallengedLogin() {
-    System.out.println("Challenge Login " + numUsers + " Users");
-    long startTime = System.nanoTime();
-
-    for ( int i = 0 ; i < numUsers ; i++ ) {
-      try {
-        challengedLogin(xArray.get(i), i, generateChallenge(i));
-      } catch (AuthenticationException e) {
-        e.printStackTrace();
-      }
-    }
-
-    long endTime                = System.nanoTime();
-    long durationInMilliseconds = (endTime - startTime) / 1000000;
-    System.out.println("Duration: " + durationInMilliseconds + "ms \n");
-  }
-
-  public void testChallengedLoginWithExpiredChallenge() {
-    try {
-      String challenge = generateChallenge(0);
-      TimeUnit.SECONDS.sleep(6);
-      challengedLogin(xArray.get(0),0, challenge);
-    } catch (AuthenticationException e) {
-      e.printStackTrace();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
   }
 
   public void testUpdatePassword() {
