@@ -23,6 +23,8 @@ foam.CLASS({
       line-height: 1;
       letter-spacing: 0.4px;
       color: #2b2b2b;
+      background: %BACKGROUNDCOLOR%;
+      box-sizing: border-box;
     }
 
     ^ th > img {
@@ -42,10 +44,6 @@ foam.CLASS({
     ^row:hover {
       background: #eee;
       cursor: pointer;
-    }
-
-    ^ tbody {
-      box-shadow: 0 2px 2px 0 #dae1e9;
     }
 
     ^ tbody > tr {

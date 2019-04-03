@@ -75,7 +75,7 @@ foam.CLASS({
   ],
 
   constants: {
-    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor', 'secondaryHoverColor', 'secondaryDisabledColor', 'groupCSS' ]
+    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor', 'secondaryHoverColor', 'secondaryDisabledColor', 'groupCSS', 'backgroundColor' ]
   },
 
   messages: [
@@ -141,10 +141,7 @@ foam.CLASS({
     {
       class: 'foam.core.FObjectProperty',
       of: 'foam.nanos.auth.Group',
-      name: 'group',
-      postSet: function(oldValue, newValue) {
-        if ( newValue ) this.onGroupUpdate(newValue);
-      }
+      name: 'group'
     },
     {
       class: 'Boolean',
@@ -176,6 +173,7 @@ foam.CLASS({
     'tableColor',
     'tableHoverColor',
     'accentColor',
+    'backgroundColor',
     'groupCSS',
     'topNavigation_',
     'footerView_'
@@ -197,11 +195,13 @@ foam.CLASS({
           }
         };
 
-        self.fetchAgent();
+        await self.fetchAgent();
         await self.fetchUser();
+
         // Fetch the group only once the user has logged in. That's why we await
         // the line above before executing this one.
-        self.fetchGroup();
+        await self.fetchGroup();
+        self.onUserAgentAndGroupLoaded();
       });
     },
 
@@ -262,15 +262,13 @@ foam.CLASS({
         if ( ! result ) throw new Error();
 
         this.user = result;
-        this.onUserLoad();
       } catch (err) {
         await this.requestLogin();
-        return this.fetchUser();
+        return await this.fetchUser();
       }
     },
 
     async function fetchAgent() {
-      // Is there a reason we do = here and copyFrom for user?
       this.agent = await this.client.agentAuth.getCurrentAgent();
     },
 
@@ -362,12 +360,18 @@ foam.CLASS({
      *   - Update the macros list based on the group
      *   - Go to a menu based on either the hash or the group
      */
-    async function onGroupUpdate(group) {
-      this.setPortalView(group);
+    function onUserAgentAndGroupLoaded() {
+      this.setPortalView(this.group);
 
       for ( var i = 0; i < this.MACROS.length; i++ ) {
         var m = this.MACROS[i];
-        if ( group[m] ) this[m] = group[m];
+        if ( this.group[m] ) this[m] = this.group[m];
+      }
+
+      if ( ! this.user.emailVerified ) {
+        this.loginSuccess = false;
+        this.stack.push({ class: 'foam.nanos.auth.ResendVerificationEmail' });
+        return;
       }
 
       var hash = this.window.location.hash;
@@ -375,19 +379,8 @@ foam.CLASS({
 
       if ( hash ) {
         window.onpopstate();
-      } else if ( group ) {
-        this.window.location.hash = group.defaultMenu;
-      }
-    },
-
-    /**
-     * Called when the user is loaded after signing in. Can be implemented by
-     * subclasses for custom behaviour.
-     */
-    function onUserLoad() {
-      if ( ! this.user.emailVerified ) {
-        this.loginSuccess = false;
-        this.stack.push({ class: 'foam.nanos.auth.ResendVerificationEmail' });
+      } else if ( this.group ) {
+        this.window.location.hash = this.group.defaultMenu;
       }
     },
 

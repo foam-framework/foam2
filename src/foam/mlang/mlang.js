@@ -2228,17 +2228,17 @@ Iterator i = props.iterator();
 while ( i.hasNext() ) {
   PropertyInfo prop = (PropertyInfo) i.next();
 
-  if ( prop instanceof foam.core.AbstractFObjectPropertyInfo ) {
-    try {
+  try {
+    if ( prop instanceof foam.core.AbstractFObjectPropertyInfo ) {
       if ( this.f(prop.f(obj)) ) return true;
-    } catch (Throwable t) {}
-  }
+    }
 
-  if ( ! ( prop instanceof foam.core.AbstractStringPropertyInfo ) ) continue;
+    if ( ! ( prop instanceof foam.core.AbstractStringPropertyInfo ) ) continue;
 
-  String s = ((String) prop.f(obj)).toUpperCase();
+    String s = ((String) prop.f(obj)).toUpperCase();
 
-  if ( s.contains(arg1) ) return true;
+    if ( s.contains(arg1) ) return true;
+  } catch (Throwable t) {}
 }
 
 return false;`
