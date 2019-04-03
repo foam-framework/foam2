@@ -3,7 +3,7 @@ foam.CLASS({
   name: 'CSVSink',
   extends: 'foam.dao.AbstractSink',
 
-  documentation: `Sink runs the csv outputter, and contains the resulting string in this.csv`,
+  documentation: 'Sink runs the csv outputter, and contains the resulting string in this.csv',
 
   properties: [
     {
