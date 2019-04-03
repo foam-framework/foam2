@@ -124,7 +124,7 @@
       name: 'scrollHeight',
       expression: function(daoCount, limit, rowHeight) {
         this.refresh();
-        return rowHeight * (daoCount - limit) + this.TABLE_HEAD_HEIGHT + 'px';
+        return rowHeight * Math.max(0, daoCount - limit) + this.TABLE_HEAD_HEIGHT + 'px';
       }
     },
     {
