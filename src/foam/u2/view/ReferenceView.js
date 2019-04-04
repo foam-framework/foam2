@@ -64,7 +64,7 @@ foam.CLASS({
     function fromProperty(prop) {
       this.SUPER(prop);
       if ( ! this.dao ) {
-        var dao = this.parentObj.__context__[prop.targetDAOKey];
+        var dao = this.parentObj.__subContext__[prop.targetDAOKey];
         this.dao = dao;
       }
     }
