@@ -33,7 +33,7 @@ foam.CLASS({
       name: 'error'
     },
     'rows',
-    'columns',
+    'columns'
   ],
   methods: [
     function initE() {
@@ -42,7 +42,7 @@ foam.CLASS({
           data$: this.data_$,
           mode$: this.mode$,
           rows: this.rows,
-          cols: this.cols,
+          cols: this.cols
         }).end()
         .start('div').add(this.error$).end();
     }
