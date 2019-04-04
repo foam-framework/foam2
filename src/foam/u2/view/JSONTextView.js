@@ -31,12 +31,19 @@ foam.CLASS({
     {
       class: 'String',
       name: 'error'
-    }
+    },
+    'rows',
+    'columns',
   ],
   methods: [
     function initE() {
       this
-        .start(this.TextArea, { data$: this.data_$ }).end()
+        .start(this.TextArea, {
+          data$: this.data_$,
+          mode$: this.mode$,
+          rows: this.rows,
+          cols: this.cols,
+        }).end()
         .start('div').add(this.error$).end();
     }
   ]
