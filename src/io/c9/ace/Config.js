@@ -33,7 +33,11 @@ foam.CLASS({
       class: 'Enum',
       of: 'io.c9.ace.KeyBinding',
       name: 'keyBinding',
-      value: 'VIM'
+      value: 'ACE'
+    },
+    {
+      class: 'Boolean',
+      name: 'isReadOnly'
     }
   ]
 });

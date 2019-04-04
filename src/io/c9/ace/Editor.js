@@ -112,6 +112,7 @@ foam.CLASS({
     function updateEditor() {
       if ( ! this.editor ) return;
       this.editor.setTheme(this.config.theme.path);
+      this.editor.setReadOnly(this.config.isReadOnly);
       this.editor.resize();
       this.editor.session.setMode(this.config.mode.path); 
       this.editor.setKeyboardHandler(this.config.keyBinding.path);
