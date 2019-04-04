@@ -193,6 +193,7 @@ FOAM_FILES([
   { name: "foam/dao/FilteredDAO" },
   { name: "foam/dao/DAOProperty" },
   { name: "foam/dao/SQLStatement" },
+  { name: "foam/dao/CSVSink" },
   { name: "foam/mlang/order/Comparator" },
 //  { name: "foam/mlang/order/ComparatorJava", flags: ['java'] },
   { name: "foam/mlang/mlang" },
