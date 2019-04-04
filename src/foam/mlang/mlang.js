@@ -3111,6 +3111,32 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'IsClassOf',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: 'Predicate which checks if the class of object is a specified class.',
+
+  properties: [
+    {
+      class: 'Class',
+      name: 'targetClass'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: `
+        return getTargetClass().getObjClass() == obj.getClass();
+      `
+    }
+  ]
+});
+
+
+foam.CLASS({
   package: 'foam.mlang',
   name: 'Expressions',
 
