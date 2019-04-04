@@ -2172,8 +2172,13 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.PropertyInfo',
+    'java.lang.reflect.Method',
+    'java.text.DateFormat',
+    'java.text.SimpleDateFormat',
+    'java.util.Date',
     'java.util.Iterator',
-    'java.util.List'
+    'java.util.List',
+    'java.util.TimeZone'
   ],
 
   documentation: 'Unary Predicate for generic keyword search (searching all String properties for argument substring).',
@@ -2188,6 +2193,21 @@ foam.CLASS({
       name: 'FObjectProperty',
       path: 'foam.core.FObjectProperty',
       flags: ['js'],
+    },
+    {
+      name: 'Long',
+      path: 'foam.core.Long',
+      flags: ['js']
+    },
+    {
+      name: 'Enum',
+      path: 'foam.core.Enum',
+      flags: ['js']
+    },
+    {
+      name: 'Date',
+      path: 'foam.core.Date',
+      flags: ['js']
     }
   ],
 
@@ -2200,21 +2220,39 @@ foam.CLASS({
 
         arg = arg.toLowerCase();
 
-        var props = obj.cls_.getAxiomsByClass(this.String);
-        for ( var i = 0; i < props.length; i++ ) {
-          var s = props[i].f(obj);
-          if ( ! s || typeof s !== 'string' ) continue;
-          if ( s.toLowerCase().indexOf(arg) >= 0 ) return true;
-        }
+        try {
+          var props = obj.cls_.getAxiomsByClass(this.String);
+          for ( var i = 0; i < props.length; i++ ) {
+            s = props[i].f(obj);
+            if ( ! s || typeof s !== 'string' ) continue;
+            if ( s.toLowerCase().includes(arg) ) return true;
+          }
 
-        var objectProps = obj.cls_.getAxiomsByClass(this.FObjectProperty);
-        for ( var i = 0; i < objectProps.length; i++ ) {
-          var prop = objectProps[i];
-          var subObject = prop.f(obj);
-          try {
+          var objectProps = obj.cls_.getAxiomsByClass(this.FObjectProperty);
+          for ( var i = 0; i < objectProps.length; i++ ) {
+            var prop = objectProps[i];
+            var subObject = prop.f(obj);
             if ( this.f(subObject) ) return true;
-          } catch (err) {}
-        }
+          }
+
+          var longProps = obj.cls_.getAxiomsByClass(this.Long);
+          for ( var i = 0; i < longProps.length; i++ ) {
+            var s = (longProps[i]).toString();
+            if ( s.toLowerCase().includes(arg) ) return true;
+          }
+
+          var enumProps = obj.cls_.getAxiomsByClass(this.Enum);
+          for ( var i = 0; i < enumProps.length; i++ ) {
+            var s = (enumProps[i]).label;
+            if ( s.toLowerCase().includes(arg) ) return true;
+          }
+
+          var dateProps = obj.cls_.getAxiomsByClass(this.Date);
+          for ( var i = 0; i < dateProps.length; i++ ) {
+            var s = (dateProps[i]).toISOString();
+            if ( s.toLowerCase().includes(arg) ) return true;
+          }
+        } catch (err) {}
 
         return false;
       },
@@ -2229,15 +2267,37 @@ while ( i.hasNext() ) {
   PropertyInfo prop = (PropertyInfo) i.next();
 
   try {
+    String s = "";
     if ( prop instanceof foam.core.AbstractFObjectPropertyInfo ) {
       if ( this.f(prop.f(obj)) ) return true;
+    } else if ( prop instanceof foam.core.AbstractEnumPropertyInfo ) {
+      Object value = prop.f(obj);
+      if ( value == null ) continue;
+      Class c = value.getClass();
+      try {
+        Method m = c.getMethod("getLabel");
+        s = (String) m.invoke(value);
+      } catch (Throwable t) {
+        s = value.toString();
+      }
+    } else if ( prop instanceof foam.core.AbstractLongPropertyInfo ) {
+      s = Long.toString((long) prop.f(obj));
+    } else if ( prop instanceof foam.core.AbstractDatePropertyInfo ) {
+      Date d = (Date) prop.f(obj);
+      if ( d == null ) continue;
+
+      // We do this to match JavaScript's 'toISOString' method which we use to
+      // display dates in tables.
+      DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
+      df.setTimeZone(TimeZone.getTimeZone("UTC"));
+      s = df.format(d);
+    } else if ( ! ( prop instanceof foam.core.AbstractStringPropertyInfo ) ) {
+      continue;
+    } else {
+      s = ((String) prop.f(obj));
     }
 
-    if ( ! ( prop instanceof foam.core.AbstractStringPropertyInfo ) ) continue;
-
-    String s = ((String) prop.f(obj)).toUpperCase();
-
-    if ( s.contains(arg1) ) return true;
+    if ( s.toUpperCase().contains(arg1) ) return true;
   } catch (Throwable t) {}
 }
 
