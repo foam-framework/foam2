@@ -150,9 +150,7 @@ foam.CLASS({
       class: 'String',
       name: 'code',
       view: {
-        class: 'foam.u2.tag.TextArea',
-        rows: 20, cols: 120,
-        css: { 'font-family': 'monospace' }
+        class: 'io.c9.ace.Editor'
       }
     },
     {
