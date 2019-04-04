@@ -50,7 +50,7 @@ foam.CLASS({
         return data;
       },
       factory: function() {
-        return this.of && this.of.create();
+        return this.of && this.of.create(null, this);
       }
     },
     'currentData',

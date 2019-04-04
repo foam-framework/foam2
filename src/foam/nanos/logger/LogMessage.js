@@ -17,9 +17,18 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
     'foam.nanos.auth.LastModifiedByAware'
   ],
 
+  tableColumns: [
+    'created',
+    'severity',
+    'createdBy',
+    'lastModifiedBy',
+    'message'
+  ],
+
   searchColumns: [
-    'exception', 'message', 'severity'
-   ],
+    'severity',
+    'exception'
+  ],
 
   properties: [
     {
@@ -30,13 +39,18 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
     {
       name: 'severity',
       class: 'Enum',
-      of: 'foam.nanos.logger.LogLevel',
+      of: 'foam.log.LogLevel',
       toJSON: function(value) { return value && value.label; },
-      javaJSONOutput: `((foam.nanos.logger.LogLevel) value).getLabel()`,
+      javaJSONOutput: `((foam.log.LogLevel) value).getLabel()`,
       javaFromJSON: `return forLabel(value);`,
       visibility: 'RO',
       tableCellFormatter: function(severity, obj, axiom) {
-         this.start('div').setAttribute('title', severity.label).add(severity.label).end();
+         this
+          .start()
+            .setAttribute('title', severity.label)
+            .add(severity.label)
+            .style({ color: severity.color })
+          .end();
       },
     },
     {
