@@ -54,17 +54,13 @@ public class StringParser
       if ( c == ESCAPE ) {
         char   nextChar        = ps.tail().head();
         Parser escapeSeqParser = nextChar == 'u' ?
-          unicodeParser.get() : nextChar == 'n' ?
-          asciiEscapeParser.get() : null;
+          unicodeParser.get() : asciiEscapeParser.get();
+        PStream escapePS = ps.apply(escapeSeqParser, x);
+        if ( escapePS != null ) {
+          builder.append(escapePS.value());
+          tail = escapePS;
 
-        if ( escapeSeqParser != null ) {
-          PStream escapePS = ps.apply(escapeSeqParser, x);
-          if ( escapePS != null ) {
-            builder.append(escapePS.value());
-            tail = escapePS;
-
-            c = (Character) escapePS.value();
-          }
+          c = (Character) escapePS.value();
         }
       } else {
         builder.append(c);
