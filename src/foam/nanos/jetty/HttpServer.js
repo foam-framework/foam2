@@ -17,8 +17,7 @@ foam.CLASS({
     'org.eclipse.jetty.websocket.server.WebSocketUpgradeFilter',
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest',
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse',
-    'org.eclipse.jetty.websocket.servlet.WebSocketCreator',
-    'org.eclipse.jetty.server.ForwardedRequestCustomizer'
+    'org.eclipse.jetty.websocket.servlet.WebSocketCreator'
   ],
 
   properties: [
@@ -77,20 +76,13 @@ foam.CLASS({
           new org.eclipse.jetty.server.Server(port);
 
         /*
-          The following for loop will accomplish the following:
-          1. Prevent Jetty server from broadcasting its version number in the HTTP
+          Prevent Jetty server from broadcasting its version number in the HTTP
           response headers.
-          2. Configure Jetty server to interpret the X-Fowarded-for header
         */
         for ( org.eclipse.jetty.server.Connector conn : server.getConnectors() ) {
           for ( org.eclipse.jetty.server.ConnectionFactory f : conn.getConnectionFactories() ) {
             if ( f instanceof org.eclipse.jetty.server.HttpConnectionFactory ) {
-              
-              // 1. hiding the version number in response headers
               ((org.eclipse.jetty.server.HttpConnectionFactory) f).getHttpConfiguration().setSendServerVersion(false);
-
-              // 2. interpret X-Forwarded-for headers
-              ((org.eclipse.jetty.server.HttpConnectionFactory) f).getHttpConfiguration().addCustomizer(new ForwardedRequestCustomizer());
             }
           }
         }
