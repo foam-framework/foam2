@@ -37,7 +37,23 @@ foam.CLASS({
   documentation: '',
 
   tableColumns: [
-    'id', 'enabled', 'type', 'group', 'spid', 'firstName', 'lastName', 'organization', 'email'
+    'id',
+    'type',
+    'group',
+    'legalName',
+    'organization',
+    'email'
+  ],
+
+  searchColumns: [
+    'id',
+    'type',
+    'spid',
+    'group',
+    'firstName',
+    'lastName',
+    'organization',
+    'email'
   ],
 
   // TODO: The following properties don't have to be defined here anymore once
