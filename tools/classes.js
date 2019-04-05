@@ -40,6 +40,7 @@ var classes = [
   'foam.mlang.predicate.Has',
   'foam.mlang.predicate.Keyword',
   'foam.mlang.predicate.IsInstanceOf',
+  'foam.mlang.predicate.IsClassOf',
   'foam.mlang.sink.Count',
   'foam.mlang.sink.GroupBy',
   'foam.mlang.F',
@@ -188,6 +189,7 @@ var classes = [
   'foam.nanos.auth.DeletedAware',
   'foam.nanos.auth.DeletedAwareDummy',
   'foam.nanos.auth.DeletedAwareDAOTest',
+  'foam.nanos.auth.UserAndGroupAuthService',
   'foam.nanos.http.HttpParameters',
   'foam.nanos.http.DefaultHttpParameters',
   'foam.nanos.session.Session',
@@ -196,7 +198,6 @@ var classes = [
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',
-  'foam.nanos.logger.LogLevel',
   'foam.nanos.logger.LogMessage',
   'foam.nanos.logger.LogLevelFilterLogger',
   'foam.nanos.logger.AbstractLogger',
@@ -206,7 +207,6 @@ var classes = [
   'foam.nanos.logger.NotificationLogMessageDAO',
   'foam.nanos.logger.RepeatLogMessageDAO',
   'foam.nanos.logger.ProxyLogger',
-  'foam.nanos.logger.LogsView',
   'foam.nanos.menu.Menu',
   'foam.nanos.menu.DAOMenu',
   'foam.nanos.menu.DocumentMenu',
@@ -333,7 +333,7 @@ var classes = [
   'foam.nanos.ruler.RuleHistoryStatus',
   'foam.comics.SearchMode',
 
-  //Support Files
+  // Support Files
   'foam.support.model.TicketMessage',
   'foam.support.model.SupportEmail',
   'foam.support.model.Ticket',
