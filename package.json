@@ -15,5 +15,8 @@
     "benchmarks": "JASMINE_CONFIG_PATH=jasmine_benchmarks.json jasmine",
     "benchmarksDebug": "JASMINE_CONFIG_PATH=jasmine_benchmarks.json node-debug -c node_modules/jasmine/bin/jasmine.js",
     "lint": "jshint -c .jshintrc  ./src/ && jscs -c .jscsrc ./src/"
+  },
+  "dependencies": {
+    "ace-builds": "^1.4.3"
   }
 }
