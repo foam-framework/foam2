@@ -57,7 +57,7 @@ foam.CLASS({
       class: 'Long',
       name: 'id',
       final: true,
-      tableWidth: 45
+      tableWidth: 50
     },
     {
       class: 'Boolean',
