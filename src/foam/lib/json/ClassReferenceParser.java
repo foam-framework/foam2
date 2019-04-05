@@ -8,6 +8,8 @@ package foam.lib.json;
 
 import foam.lib.parse.*;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class ClassReferenceParser
   extends ProxyParser
 {
@@ -41,9 +43,18 @@ public class ClassReferenceParser
 
       String classId = (String) ps.value();
       Class cls = Class.forName(classId);
-      return cls != null ? ps.setValue(cls) : null;
+      return cls != null ? ps.setValue(resolve(cls)) : null;
     } catch ( Throwable t ) {
       return null;
     }
+  }
+
+  private Object resolve(Class cls)
+    throws InvocationTargetException, IllegalAccessException
+  {
+    try {
+      return cls.getMethod("getOwnClassInfo").invoke(null);
+    } catch ( NoSuchMethodException ex ) { }
+    return cls;
   }
 }
