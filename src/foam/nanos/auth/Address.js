@@ -37,7 +37,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'deleted',
-      documentation: 'Indicates the address as deleted.'
+      documentation: 'A deleted address.'
     },
     {
       class: 'Boolean',
@@ -82,8 +82,7 @@ foam.CLASS({
       targetDAOKey: 'countryDAO',
       name: 'countryId',
       of: 'foam.nanos.auth.Country',
-      documentation: `A generated name that doesn't contain any special characters which represents
-         the country.`,
+      documentation: `A foreign key into the CountryDAO which represents the country.`,
       required: true,
       validateObj: function(countryId) {
         if ( typeof countryId !== 'string' || countryId.length === 0 ) {
@@ -101,7 +100,7 @@ foam.CLASS({
       targetDAOKey: 'regionDAO',
       name: 'regionId',
       of: 'foam.nanos.auth.Region',
-      documentation: `A generated name that doesn't contain any special characters which represents
+      documentation: `A foreign key into the RegionDAO  which represents
       the region of the country.`,
       view: function(_, X) {
         var choices = X.data.slot(function(countryId) {
@@ -242,7 +241,9 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.nanos.auth.Hours',
       name: 'hours',
-      documentation: 'The opening and closing hours for this address',
+      documentation: `The opening and closing hours for this address if the address 
+        represents a business.',
+
       factory: function () { return []; },
       javaFactory: 'return new Hours[] {};'
     }

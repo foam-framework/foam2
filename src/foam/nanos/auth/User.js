@@ -34,8 +34,10 @@ foam.CLASS({
     'static foam.mlang.MLang.EQ'
   ],
   
-  documentation: `Authenticates a user in the system. 
-     It requires personal information and permits certain actions.`,
+  documentation: `The user represents a person with the ability to use a username and password 
+      to log into and use the system as well as act on behalf of a business, 
+      if permissions are granted. It holds personal information and permits certain actions.
+  `,
 
   tableColumns: [
     'id', 'enabled', 'type', 'group', 'spid', 'firstName', 'lastName', 'organization', 'email'
