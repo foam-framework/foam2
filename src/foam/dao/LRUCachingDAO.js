@@ -30,12 +30,14 @@
         },
         {
           class: 'Int',
-          name: 'seqNo'
+          name: 'seqNo',
+          documentation: 'The lowest value is the oldest'
         },
         {
           class: 'Boolean',
           name: 'hasSourceObj',
-          value: false
+          value: false,
+          documentation: 'Flag for checking if there is the original object in the delegate too'
         }
       ]
     }
@@ -43,24 +45,24 @@
 
   properties: [
     {
-      /** The maximum size to allow the target dao to be. */
       class: 'Int',
       name: 'maxSize',
-      value: 10000
+      value: 10000,
+      documentation: 'The maximum size to allow the target dao to be'
     },
     {
-      /** Tracks the age of items in the target dao. */
       name: 'trackingDAO',
       of: 'foam.dao.DAO',
       factory: function() {
         return this.MDAO.create({ of: this.LRUCacheItem });
-      }
+      },
+      documentation: 'Tracks the age of items in the target dao'
     },
     {
-      /** By starting at 0 */
       class: 'Int',
       name: 'lastTimeUsed_',
-      factory: function() { return 0; }
+      factory: function() { return 0; },
+      documentation: 'By starting at 0, the lowest value means the oldest'
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -126,8 +128,6 @@
     function put(x, objId, hasSrcObj) {
       var self = this;
 
-      console.log("put : " + objId);
-      console.log("put : " + hasSrcObj);
       return this.trackingDAO.put(
          this.LRUCacheItem.create({
            id: objId,
