@@ -70,6 +70,9 @@ foam.CLASS({
     {
       class: 'String',
       name: 'detailView'
+    },
+    {
+      name: 'of'
     }
   ],
 
@@ -98,8 +101,11 @@ foam.CLASS({
                 add(this.data.cls_.getAxiomsByClass(foam.core.Action)).
               end().
             end().
-            tag({class: this.detailView}, {data: this.data.obj}).
-            add(this.DAOUpdateController.OBJ).
+            tag({
+              class: this.detailView,
+              of: this.of,
+              data$: this.data$.dot('obj')
+            }).
           end().
         end().
       end();
