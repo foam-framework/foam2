@@ -231,7 +231,6 @@ foam.CLASS({
     function onEdit(s, edit, id) {
       this.stack.push({
         class: this.updateView.class,
-        of: this.data.data.of,
         detailView: this.data.detailView,
         key: id
       }, this);
