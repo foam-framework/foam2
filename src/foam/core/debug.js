@@ -332,26 +332,26 @@ foam.SCRIPT({
   name: 'DebugDescribeScript',
   flags: ['debug'],
   code: function() {
-/* Add describe support to contexts. */
-foam.__context__ = foam.__context__.createSubContext({
-  describe: function() {
-    this.__context__.log(
-        'Context:',
-        this.hasOwnProperty('NAME') ? this.NAME : ('anonymous ' + this.$UID));
-    this.__context__.log('KEY                  Type           Value');
-    this.__context__.log('----------------------------------------------------');
-    for ( var key in this ) {
-      var value = this[key];
-      var type = foam.core.FObject.isInstance(value) ?
-          value.cls_.name :
-          typeof value    ;
-      this.__context__.log(
-        foam.String.pad(key,  20),
-        foam.String.pad(type, 14),
-        typeof value === 'string' || typeof value === 'number' ? value : '');
-    }
-    this.__context__.log('\n');
-}});
+    /* Add describe support to contexts. */
+    foam.__context__ = foam.__context__.createSubContext({
+      describe: function() {
+        this.log(
+            'Context:',
+            this.hasOwnProperty('NAME') ? this.NAME : ('anonymous ' + this.$UID));
+        this.log('KEY                  Type           Value');
+        this.log('----------------------------------------------------');
+        for ( var key in this ) {
+          var value = this[key];
+          var type = foam.core.FObject.isInstance(value) ?
+              value.cls_.name :
+              typeof value    ;
+          this.log(
+            foam.String.pad(key,  20),
+            foam.String.pad(type, 14),
+            typeof value === 'string' || typeof value === 'number' ? value : '');
+        }
+        this.log('\n');
+    }});
   }
 });
 
