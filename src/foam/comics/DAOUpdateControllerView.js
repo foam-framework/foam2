@@ -70,9 +70,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'detailView'
-    },
-    {
-      name: 'of'
     }
   ],
 
@@ -103,7 +100,7 @@ foam.CLASS({
             end().
             tag({
               class: this.detailView,
-              of: this.of,
+              of: this.dao.of,
               data$: this.data$.dot('obj')
             }).
           end().
