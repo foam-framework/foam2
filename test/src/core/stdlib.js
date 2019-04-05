@@ -743,7 +743,11 @@ describe('foam.Date', function() {
     expect(foam.util.equals(new Date(7487474), new Date(23423432))).toBe(false);
 
     expect(foam.util.equals((new Date(7487474), null))).toBe(false);
-    expect(foam.util.equals(new Date(7487474), 7487474)).toBe(true);
+    // NOTE: In pressure-wash mass cleanup, foam.util.equals was modified to
+    //       only compare objects of the same type and returns false otherwise.
+    //       Question: Do we want to preserve the behavior of comparing
+    //                 a date to a number?
+    expect(foam.util.equals(new Date(7487474), 7487474)).toBe(false);
   });
 
   it('compare', function() {
@@ -841,12 +845,12 @@ describe('foam.Object', function() {
   });
   it('clone', function() {
     var a = { d: "hello" };
-    expect(foam.Object.clone(a)).toBe(a);
+    expect(foam.Object.clone(a)).toEqual(a);
   });
   it('equals', function() {
     var a = { d: "hello" };
     var b = { d: "hello" };
-    expect(foam.Object.equals(a, b)).toBe(false);
+    expect(foam.Object.equals(a, b)).toBe(true);
     expect(foam.Object.equals(a, a)).toBe(true);
     expect(foam.Object.equals(a, null)).toBe(false);
   });
@@ -893,7 +897,7 @@ describe('foam.Object', function() {
 
 });
 
-describe('foam.mmethod', function() {
+describe('foam.method', function() {
   it('handles primitive types', function() {
     var mm = foam.mmethod({
       String: function(val) { return foam.String.isInstance(val); },
