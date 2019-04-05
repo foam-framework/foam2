@@ -103,7 +103,7 @@ describe('box pipeline', function() {
       }, 10);
     });
   }
-  it('works with complex pipelines', function(done) {
+  xit('works with complex pipelines', function(done) {
 
     // Construct:
     // ^2 --           -- ^2

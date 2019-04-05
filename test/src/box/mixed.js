@@ -19,7 +19,7 @@ describe('mixed registry types', function() {
   // TODO(markdittmer): Come up with a non-manual test that will confirm all
   // registries clean up properly.
 
-  it('should appropriately manage mixed registry types', function(done) {
+  xit('should appropriately manage mixed registry types', function(done) {
     // Load code shared with forks.
     require(`${__dirname}/../../ipc/box_mixed_shared.js`);
 
