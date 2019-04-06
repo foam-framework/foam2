@@ -24,7 +24,9 @@ foam.CLASS({
 
   requires: [
     'foam.core.Property',
-    'foam.u2.DetailPropertyView'
+    'foam.u2.DetailPropertyView',
+    'foam.u2.Tab',
+    'foam.u2.Tabs'
   ],
 
   exports: [
@@ -162,6 +164,7 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
+      var hasTabs = false;
       this.add(this.slot(function(of, properties, actions) {
         if ( ! of ) return '';
 
@@ -177,6 +180,8 @@ foam.CLASS({
             add(self.title$).
           end();
 
+        var tabs = foam.u2.Tabs.create().style({width: '1200px'});
+
         return self.actionBorder(
           this.
             E('table').
@@ -184,6 +189,7 @@ foam.CLASS({
             add(title).
             forEach(properties, function(p) {
               var config = self.config && self.config[p.name];
+              var expr = foam.mlang.Expressions.create();
 
               if ( config ) {
                 p = p.clone();
@@ -191,10 +197,26 @@ foam.CLASS({
                   p[key] = config[key];
                 }
               }
-
-              this.tag(self.DetailPropertyView, { prop: p });
+              if ( p.cls_ == foam.dao.OneToManyRelationshipProperty || p.cls_ == foam.dao.ManyToManyRelationshipProperty ) {
+                hasTabs = true;
+                var label = p.label;
+                let tab = self.Tab.create({label: label});
+                var dao = p.cls_ == foam.dao.ManyToManyRelationshipProperty ? p.get(self.data).getJunctionDAO() : p.get(self.data);
+                dao.select(expr.COUNT()).then(function(c) {
+                  tab.label = label + ' (' + c.value + ')';
+                });
+                p = p.clone();
+                p.label = '';
+                tab.start('table').tag(self.DetailPropertyView, {prop: p});
+                tabs.add(tab);
+              } else {
+                this.tag(self.DetailPropertyView, {prop: p});
+              }
+            }).
+            callIf(hasTabs, function() {
+              this.start('tr').start('td').setAttribute('colspan','2').add(tabs).end().end();
             }));
-      }));
+          }));
     },
 
     function actionBorder(e) {
