@@ -33,9 +33,9 @@ foam.CLASS({
     'foam.util.SafetyUtil',
     'static foam.mlang.MLang.EQ'
   ],
-  
-  documentation: `The user represents a person with the ability to use a username and password 
-      to log into and use the system as well as act on behalf of a business, 
+
+  documentation: `The user represents a person with the ability to use a username and password
+      to log into and use the system as well as act on behalf of a business,
       if permissions are granted. It holds personal information and permits certain actions.
   `,
 
@@ -53,6 +53,7 @@ foam.CLASS({
     'type',
     'spid',
     'group',
+    'enabled',
     'firstName',
     'lastName',
     'organization',
@@ -366,13 +367,13 @@ foam.CLASS({
         User user = (User) x.get("user");
         User agent = (User) x.get("agent");
         AuthService auth = (AuthService) x.get("auth");
-        
+
         boolean findSelf = SafetyUtil.equals(this.getId(), user.getId()) ||
           (
             agent != null &&
             SafetyUtil.equals(agent.getId(), this.getId())
           );
-        
+
         if (
           ! findSelf &&
           ! auth.check(x, "user.read." + this.getId()) &&
