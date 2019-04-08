@@ -15,6 +15,7 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.mlang.MLang',
+    'foam.nanos.app.EmailConfig',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Group',
     'foam.nanos.notification.email.EmailMessage',
@@ -62,18 +63,17 @@ foam.CLASS({
     {
       class: 'String',
       name: 'displayName',
-      documentation: `Displayed as the name in the email from field.`
+      documentation: 'Displayed as the name in the email from field.'
     },
     {
       class: 'String',
       name: 'sendTo',
-      documentation: `This property will set to whomever the email is being sent
-        to.`
+      documentation: 'This property will set to whomever the email is being sent to.'
     },
     {
       class: 'String',
       name: 'replyTo',
-      documentation: `Displayed as the from email field.`
+      documentation: 'Displayed as the from email field.'
     },
     {
       class: 'Array',
@@ -87,7 +87,7 @@ foam.CLASS({
   methods: [
     {
       name: 'apply',
-      documentation: `Throws exception if any errors - calling Service will/should catch.`,
+      documentation: 'Throws exception if any errors - calling Service will/should catch.',
       type: 'foam.nanos.notification.email.EmailMessage',
       javaThrows: ['java.lang.NoSuchFieldException'],
       args: [
@@ -116,34 +116,28 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        // Check basic properties
         if ( emailMessage == null ) throw new NoSuchFieldException("emailMessage is Null");
 
         String tempKeyString = "";
         Object value = null;
+        JtwigModel model = null;
 
-        // process templateArgs
-        for ( Object key : templateArgs.keySet() ) {
-          value = templateArgs.get((String)key);
-          if ( value instanceof String ) {
-            tempKeyString = (String) value;
-            templateArgs.put((String) key, new String(tempKeyString.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
+        // checking for scenerio where Template is just populating defaults for an emailMessage
+        if ( getId() != 0 ){
+          for ( Object key : templateArgs.keySet() ) {
+            value = templateArgs.get((String)key);
+            if ( value instanceof String ) {
+              tempKeyString = (String) value;
+              templateArgs.put((String) key, new String(tempKeyString.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
+            }
           }
+
+          model = JtwigModel.newModel(templateArgs);
+          if ( model == null ) throw new NoSuchFieldException("JtwigModel is Null");
         }
 
-        // build model, and confirm it was built
-        JtwigModel model = JtwigModel.newModel(templateArgs);
-        if ( model == null ) throw new NoSuchFieldException("JtwigModel is Null");
-
-        // Try to locate user group
-        DAO groupDAO = ((DAO) x.get("groupDAO")).inX(x);
-        Group group = null;
-        if ( user != null ) {
-          group = (Group) groupDAO.find(user.getGroup());
-        }
-        if ( group == null && ! SafetyUtil.isEmpty(getGroup()) ) {
-          group = (Group) groupDAO.find(getGroup());
-        }
+        // Try to locate user group, from template
+        Group group = user != null ? user.findGroup(x) : null;
 
         // should have all properties necessary set by here, therefore process this template onto an emailMessage
         return fillInEmailProperties_(x, emailMessage, model, group, config);
@@ -157,9 +151,8 @@ foam.CLASS({
         1) Properties set on the EmailMessage,
         2) Properties set on the EmailTemplate(this),
         3) Properties set on the Group,
-        4) [not set here] Properties set as default on appConfig: 
+        4) Properties set as default on emailConfig: 
             which exists for 'From', 'ReplyTo' and 'DisplayName' email properties.
-            These values are set from EmailsUtility.java
         `,
       args: [
         {
@@ -184,13 +177,14 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        // BODY:
-        JtwigTemplate templateBody = JtwigTemplate.inlineTemplate(getBody(), config);
-        emailMessage.setBody(templateBody.render(model));
+        EmailConfig emailConfig = (EmailConfig) x.get("emailConfig");
 
-        // FROM:
-        // The from property is the one property not on emailTemplate(this)
-        // if not already on the emailMessage default values will/should be set after this.apply returns
+        // BODY:
+        if ( SafetyUtil.isEmpty(emailMessage.getBody()) ) {
+          JtwigTemplate templateBody = JtwigTemplate.inlineTemplate(getBody(), config);
+          emailMessage.setBody(templateBody.render(model));
+        }
+        
 
         // REPLY TO:
         if ( SafetyUtil.isEmpty(emailMessage.getReplyTo()) ) {
@@ -200,6 +194,8 @@ foam.CLASS({
           } else {
             if ( group != null && ! SafetyUtil.isEmpty(group.getReplyTo()) ) {
               emailMessage.setReplyTo(group.getReplyTo());
+            } else {
+              emailMessage.setReplyTo(emailConfig.getReplyTo());
             }
           }
         }
@@ -212,6 +208,8 @@ foam.CLASS({
           } else {
             if ( group != null && ! SafetyUtil.isEmpty(group.getDisplayName())) {
               emailMessage.setDisplayName(group.getDisplayName());
+            } else {
+              emailMessage.setDisplayName(emailConfig.getDisplayName());
             }
           }
         }
@@ -227,11 +225,14 @@ foam.CLASS({
 
         // SEND TO:
         //  Since sendTo is very specific to each email there is no group field or default value for this property.
-        if ( emailMessage.getTo().length == 0 &&
-          ! foam.util.SafetyUtil.isEmpty(getSendTo())
-        ) {
+        if ( emailMessage.getTo().length == 0 && ! foam.util.SafetyUtil.isEmpty(getSendTo()) ) {
           JtwigTemplate templateSendTo = JtwigTemplate.inlineTemplate(getSendTo(), config);
           emailMessage.setTo(new String[] {templateSendTo.render(model)});
+        }
+
+        // FROM:
+        if ( SafetyUtil.isEmpty(emailMessage.getFrom()) ) {
+          emailMessage.setFrom(emailConfig.getFrom());
         }
 
         return emailMessage;

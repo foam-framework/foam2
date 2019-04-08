@@ -225,7 +225,6 @@ var classes = [
   'foam.nanos.notification.email.SMTPEmailService',
   'foam.nanos.notification.email.ClientEmailService',
   'foam.nanos.notification.email.NullEmailService',
-  'foam.nanos.notification.email.DAOEmailService',
   'foam.nanos.notification.email.EmailServiceDAO',
   'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.email.ClientPOP3EmailService',
@@ -339,7 +338,9 @@ var classes = [
   'foam.support.model.Ticket',
 
   'foam.nanos.dig.exception.EmptyParameterException',
-  'foam.nanos.dig.exception.GeneralException'
+  'foam.nanos.dig.exception.GeneralException',
+
+  'foam.nanos.app.EmailConfig',
 ];
 
 var abstractClasses = [

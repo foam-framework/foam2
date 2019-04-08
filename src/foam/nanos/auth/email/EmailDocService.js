@@ -34,7 +34,7 @@ foam.CLASS({
     'foam.nanos.auth.HtmlDoc',
     'foam.nanos.logger.Logger',
     'foam.nanos.notification.email.EmailMessage',
-    'foam.nanos.notification.email.EmailsUtility',
+    'foam.util.Email.EmailsUtility',
     'foam.util.Password',
     'foam.util.SafetyUtil',
     'java.util.Calendar',

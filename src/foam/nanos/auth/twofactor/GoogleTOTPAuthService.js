@@ -14,7 +14,7 @@ foam.CLASS({
   javaImports: [
     'com.google.common.io.BaseEncoding',
     'foam.dao.DAO',
-    'foam.nanos.app.AppConfig',
+    'foam.nanos.app.EmailConfig',
     'foam.nanos.auth.User',
     'foam.nanos.notification.email.EmailService',
     'foam.nanos.session.Session',
