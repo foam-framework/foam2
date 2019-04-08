@@ -71,10 +71,10 @@ foam.CLASS({
         }
 
         try {
-          EmailConfig config = (EmailConfig) x.get("emailConfig");
-          String name = config == null ? "FOAM" : config.getDisplayName();
-          String path = String.format("/%s", user.getEmail());
-          String query = String.format("secret=%s&issuer=%s&algorithm=%s", key, path, getAlgorithm());
+          EmailConfig service = (EmailConfig) x.get("emailConfig");
+          String name = service == null ? "FOAM" : service.getDisplayName();
+          String path = String.format("/%s:%s", name, user.getEmail());
+          String query = String.format("secret=%s&issuer=%s&algorithm=%s", key, name, getAlgorithm());
           URI uri = new URI("otpauth", "totp", path, query, null);
           return "data:image/svg+xml;charset=UTF-8," + QrCode.encodeText(uri.toASCIIString(), QrCode.Ecc.MEDIUM).toSvgString(0);
         } catch ( Throwable t ) {

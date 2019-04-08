@@ -185,7 +185,6 @@ foam.CLASS({
           emailMessage.setBody(templateBody.render(model));
         }
         
-
         // REPLY TO:
         if ( SafetyUtil.isEmpty(emailMessage.getReplyTo()) ) {
           if ( ! foam.util.SafetyUtil.isEmpty(getReplyTo()) ) {
