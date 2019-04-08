@@ -38,7 +38,7 @@ foam.CLASS({
     {
       name: 'objToChoice',
       value: function(obj) {
-        return obj.toSummary();
+        return [ obj.id, obj.toSummary() ];
       }
     }
   ],
