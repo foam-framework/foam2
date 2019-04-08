@@ -42,7 +42,6 @@ foam.CLASS({
     },
     {
       name: 'data',
-      view: { class: 'foam.u2.DetailView' },
       factory: function() {
         return this.dao ? this.dao.of.create({}, this) : null;
       }
