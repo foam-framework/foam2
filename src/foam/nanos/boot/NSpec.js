@@ -121,14 +121,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'serviceScript',
-      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 120 },
+      view: { class: 'io.c9.ace.Editor' },
       permissionRequired: true
     },
     {
       class: 'String',
       name: 'client',
       value: '{}',
-      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 120 }
+      view: { class: 'io.c9.ace.Editor' }
     },
     {
       class: 'FObjectProperty',
