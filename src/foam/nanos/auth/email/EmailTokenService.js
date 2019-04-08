@@ -20,7 +20,7 @@ foam.CLASS({
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.token.Token',
     'foam.nanos.notification.email.EmailMessage',
-    'foam.util.Email.EmailsUtility',
+    'foam.util.Emails.EmailsUtility',
     'java.util.Calendar',
     'java.util.HashMap',
     'java.util.List',

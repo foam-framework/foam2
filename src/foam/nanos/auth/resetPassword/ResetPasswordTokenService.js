@@ -27,7 +27,7 @@ foam.CLASS({
     'foam.nanos.auth.token.Token',
     'foam.nanos.auth.User',
     'foam.nanos.notification.email.EmailMessage',
-    'foam.util.Email.EmailsUtility',
+    'foam.util.Emails.EmailsUtility',
     'foam.util.Email',
     'foam.util.Password',
     'foam.util.SafetyUtil',

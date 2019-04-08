@@ -1,10 +1,11 @@
-package foam.util.Email;
+package foam.util.Emails;
 
 import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.ArraySink;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
+import foam.nanos.notification.email.DAOResourceLoader;
 import foam.nanos.notification.email.EmailMessage;
 import foam.nanos.notification.email.EmailService;
 import foam.nanos.notification.email.EmailTemplate;
