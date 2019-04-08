@@ -182,14 +182,6 @@ foam.CLASS({
       class: 'String',
       name: 'notes',
       view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 144 }
-    },
-    {
-      class: 'FObjectProperty',
-      name: 'clientFObjectOutput',
-      documentation: `
-        A property that can be set to output an FObject.
-      `,
-      transient: true
     }
   ],
 
@@ -221,7 +213,7 @@ foam.CLASS({
           this.output += Array.from(arguments).join('') + '\n';
         }.bind(this);
         try {
-          with ({ log: log, print: log, x: this.__context__, script: this })
+          with ({ log: log, print: log, x: this.__context__ })
           return Promise.resolve(eval(this.code));
         } catch (err) {
           this.output += err;
