@@ -19,7 +19,6 @@ import foam.nanos.boot.NSpecAware;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 import foam.nanos.pm.PMWebAgent;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -46,8 +45,8 @@ public class NanoRouter
   @Override
   public void init(javax.servlet.ServletConfig config) throws javax.servlet.ServletException {
     Object x = config.getServletContext().getAttribute("X");
-    if ( x != null && x instanceof foam.core.X ) x_ = (foam.core.X)x;
-    
+    if ( x != null && x instanceof foam.core.X ) x_ = (foam.core.X) x;
+
     super.init(config);
   }
 
@@ -127,14 +126,23 @@ public class NanoRouter
         ex.printStackTrace();
         ((Logger) getX().get("logger")).error("Unable to create NSPec servlet: " + spec.getName());
       }
-    } else if ( service instanceof WebAgent ) {
-      WebAgent pmService = (WebAgent) service;
+    } else {
+      if ( service instanceof WebAgent ) {
+        WebAgent pmService = (WebAgent) service;
 
-      if ( spec.getParameters() ) {
-        service = new HttpParametersWebAgent((WebAgent) service);
-      }
-      if ( spec.getPm() ) {
-        service = new PMWebAgent(pmService.getClass(), spec.getName(), (WebAgent) service);
+        if ( spec.getParameters() ) {
+          service = new HttpParametersWebAgent((WebAgent) service);
+        }
+        if ( spec.getPm() ) {
+          service = new PMWebAgent(pmService.getClass(), spec.getName(), (WebAgent) service);
+        }
+
+        //
+        // NOTE: Authentication must be last as HttpParametersWebAgent will consume the authentication parameters.
+        //
+        if ( spec.getAuthenticate() ) {
+          service = new AuthWebAgent("service.run." + spec.getName(), (WebAgent) service);
+        }
       }
 
       //
@@ -180,7 +188,6 @@ public class NanoRouter
 
   @Override
   public void start() {
-
   }
 
   @Override

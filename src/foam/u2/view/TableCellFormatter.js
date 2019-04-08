@@ -169,7 +169,8 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(date) {
-        if ( date ) this.add(date.toISOString().substring(0,10) + ' ' + date.toDateString());
+        // Output as yyyy-mm-dd hh:mm[a/p]
+        if ( date ) this.add(date.toISOString().substring(0,10) + " " + date.toLocaleString().substr(-11,5) + date.toLocaleString().substr(-2,1).toLowerCase());
       }
     }
   ]

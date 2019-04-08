@@ -32,6 +32,10 @@ public class ClassInfoImpl
     return this;
   }
 
+      public int compareTo(Object obj) {
+    return getId().compareTo(((ClassInfo)obj).getId());
+  }
+
   public Class getObjClass() {
     return class_;
   }
@@ -60,6 +64,7 @@ public class ClassInfoImpl
 
     return parent_;
   }
+
 
   public ClassInfo addAxiom(Axiom a) {
     // TODO: Should all axioms have setClassInfo? If not, create an interface

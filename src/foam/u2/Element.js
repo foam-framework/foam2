@@ -523,7 +523,7 @@ foam.CLASS({
   listeners: [
     {
       name: 'paint',
-      isMerged: 100,
+      isFramed: true,
       code: function() {
         var batch = ++this.batch;
         var self = this;
@@ -1181,9 +1181,7 @@ foam.CLASS({
         if ( foam.core.Slot.isInstance(value) ) {
           this.slotAttr_(name, value);
         } else {
-          foam.assert(
-              typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || foam.Date.isInstance(value),
-              'Attribute value must be a primitive type.');
+          foam.assert(foam.util.isPrimitive(value), 'Attribute value must be a primitive type.');
 
           var attr = this.getAttributeNode(name);
 
@@ -2283,6 +2281,19 @@ foam.CLASS({
     {
       name: 'view',
       value: { class: 'foam.u2.view.FObjectArrayView' },
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'MapViewRefinement',
+  refines: 'foam.core.Map',
+  properties: [
+    {
+      name: 'view',
+      value: { class: 'foam.u2.view.MapView' },
     }
   ]
 });

@@ -13,7 +13,7 @@ foam.INTERFACE({
       name: 'getCurrentUser',
       async: true,
       type: 'foam.nanos.auth.User',
-      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
+      javaThrows: ['foam.nanos.auth.AuthenticationException'],
       swiftThrows: true,
       args: [
         {
@@ -23,36 +23,13 @@ foam.INTERFACE({
       ]
     },
     {
-      name: 'generateChallenge',
+      name: 'getCurrentGroup',
       async: true,
-      type: 'String',
-      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
-      swiftThrows: true,
-      args: [
-        {
-          name: 'userId',
-          type:  'Long'
-        }
-      ]
-    },
-    {
-      name: 'challengedLogin',
-      async: true,
-      type: 'foam.nanos.auth.User',
-      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
-      swiftThrows: true,
+      type: 'foam.nanos.auth.Group',
       args: [
         {
           name: 'x',
           type: 'Context'
-        },
-        {
-          name: 'userId',
-          type: 'Long'
-        },
-        {
-          name: 'challenge',
-          type: 'String'
         }
       ]
     },
@@ -60,7 +37,7 @@ foam.INTERFACE({
       name: 'login',
       async: true,
       type: 'foam.nanos.auth.User',
-      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
+      javaThrows: ['foam.nanos.auth.AuthenticationException'],
       swiftThrows: true,
       args: [
         {
@@ -81,7 +58,7 @@ foam.INTERFACE({
       name: 'loginByEmail',
       async: true,
       type: 'foam.nanos.auth.User',
-      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
+      javaThrows: ['foam.nanos.auth.AuthenticationException'],
       swiftThrows: true,
       args: [
         {
@@ -101,7 +78,7 @@ foam.INTERFACE({
     {
       name: 'validatePassword',
       async: true,
-      javaThrows: [ 'java.lang.RuntimeException' ],
+      javaThrows: ['java.lang.RuntimeException'],
       swiftThrows: true,
       args: [
         {
@@ -186,7 +163,7 @@ foam.INTERFACE({
       name: 'updatePassword',
       async: true,
       type: 'foam.nanos.auth.User',
-      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
+      javaThrows: ['foam.nanos.auth.AuthenticationException'],
       swiftThrows: true,
       args: [
         {
@@ -207,7 +184,7 @@ foam.INTERFACE({
       name: 'validateUser',
       async: true,
       type: 'Void',
-      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
+      javaThrows: ['foam.nanos.auth.AuthenticationException'],
       swiftThrows: true,
       args: [
         {

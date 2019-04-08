@@ -46,8 +46,8 @@ foam.CLASS({
     },
     {
       class: 'foam.swift.SwiftTypeProperty',
-      expression: function(type, optional) {
-        return foam.swift.toSwiftType(type, optional)
+      expression: function(type) {
+        return foam.swift.toSwiftType(type, true);
       },
     },
   ],

@@ -46,6 +46,7 @@ foam.CLASS({
       swiftType: 'Subscription',
       swiftCode: function() {/*
 let s1 = self
+let s2 = s2!
 var feedback1 = false
 var feedback2 = false
 
@@ -94,7 +95,7 @@ return Subscription {
       ],
       swiftType: 'Subscription',
       swiftCode: function() {/*
-return other.linkFrom(self)
+return other!.linkFrom(self)
       */},
     },
     {
@@ -107,6 +108,7 @@ return other.linkFrom(self)
       ],
       swiftType: 'Subscription',
       swiftCode: function() {/*
+let other = other!
 let l = { () -> Void in
   if !FOAM_utils.equals(self.swiftGet(), other.swiftGet()) {
     self.swiftSet(other.swiftGet())
@@ -131,6 +133,7 @@ return other.swiftSub { (_, _) in l() }
       ],
       swiftType: 'Subscription',
       swiftCode: function() {/*
+let other = other!
 let l = { () -> Void in
   self.swiftSet(f(other.swiftGet()))
 }
@@ -153,7 +156,7 @@ return other.swiftSub { (_, _) in l() }
       ],
       swiftType: 'Subscription',
       swiftCode: function() {/*
-return other.mapFrom(self, f)
+return other!.mapFrom(self, f)
       */},
     },
     {

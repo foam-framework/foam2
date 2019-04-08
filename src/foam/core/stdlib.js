@@ -1011,6 +1011,12 @@ foam.LIB({
           return false;
         }
       },
+      function isPrimitive(value) {
+        return typeof value === 'string' ||
+          typeof value === 'number' ||
+          typeof value === 'boolean' ||
+          foam.Date.isInstance(value);
+      }
     ]
   });
 })();

@@ -48,9 +48,7 @@ foam.CLASS({
       name: 'select_',
       javaCode: `
       if ( x.get("auth") != null ) {
-        if ( predicate != null && ! predicate.authorize(x) ) {
-          throw new AuthenticationException("Access denied: property protected");
-        }
+        if ( predicate != null ) predicate.authorize(x);
         foam.dao.Sink sink2 = ( sink != null ) ? new HidePropertiesSink(x, sink, this) : sink;
         super.select_(x, sink2, skip, limit, order, predicate);
         return sink;
@@ -271,7 +269,7 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(`
   private PermissionedPropertyDAO dao;
-  public HidePropertiesSink(foam.core.X  x, foam.dao.Sink delegate, PermissionedPropertyDAO dao) {
+  public HidePropertiesSink(foam.core.X x, foam.dao.Sink delegate, PermissionedPropertyDAO dao) {
     setX(x);
     setDelegate(delegate);
     this.dao = dao;
