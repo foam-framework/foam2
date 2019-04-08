@@ -44,19 +44,10 @@ foam.CLASS({
         .forEach(this.columns, function(columnName) {
           var axiom = this.table.getAxiomByName(columnName);
           var localStorageKey = this.table.id + '.' + columnName;
-          var valueFromLocalStorage = localStorage.getItem(localStorageKey);
-
-          // This will be true only when seeing a new model for the first time.
-          if ( valueFromLocalStorage === null ) {
-            localStorage.setItem(localStorageKey, 'Y');
-            valueFromLocalStorage = true;
-          }
 
           var checkBox = this.CheckBox.create({
             label: axiom.label,
-
-            // Double negate to cast String to Boolean.
-            data: !! valueFromLocalStorage
+            data: localStorage.getItem(localStorageKey) === null
           });
 
           checkBox.data$.sub(this.updateCols(axiom, index++, localStorageKey));
@@ -71,8 +62,7 @@ foam.CLASS({
       return (_, __, ___, propSlot) => {
         var checked = propSlot.get();
         if ( checked ) {
-          // Any truthy string will suffice.
-          localStorage.setItem(localStorageKey, 'Y');
+          localStorage.removeItem(localStorageKey);
 
           // Put the column back in the correct position.
           this.columns_.splice(index, 0, axiom);
@@ -80,10 +70,9 @@ foam.CLASS({
           // Force the view to update.
           this.columns_ = this.columns_.slice();
         } else {
-          // Set to the only falsey string. We can't just set the items to true
-          // and false because localStorage only stores strings as values.
-          localStorage.setItem(localStorageKey, '');
-
+          // The string isn't important, all that matters is that there's some
+          // value for this key.
+          localStorage.setItem(localStorageKey, 'Y');
           this.columns_ = this.columns_.filter((col) => col.name !== axiom.name);
         }
       };
