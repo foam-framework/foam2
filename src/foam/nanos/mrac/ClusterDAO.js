@@ -32,16 +32,32 @@ foam.CLASS({
     'foam.dao.ClientDAO',
     'foam.dao.DAO',
     'foam.dao.ArraySink',
+    'foam.nanos.mrac.Vote',
     'foam.util.SafetyUtil',
     'static foam.mlang.MLang.*',
     'foam.nanos.logger.Logger',
     'java.net.HttpURLConnection',
     'java.net.URL',
-    'java.util.List',
     'java.util.ArrayList',
+    'java.util.concurrent.ThreadLocalRandom',
+    'java.util.List'
   ],
 
   properties: [
+    {
+      name: 'cluster',
+      class: 'Boolean',
+      value: true
+    },
+    {
+      name: 'quorum',
+      class: 'Boolean',
+      value: true
+    },
+    {
+      name: 'electoralService',
+      class: 'foam.nanos.mrac.Vote'
+    },
     {
       name: 'path',
       class: 'String',
@@ -87,6 +103,24 @@ foam.CLASS({
       `
     },
     {
+      documentation: `Update cluster configuration for 'this' (localhost) node.`,
+      name: 'updateConfig',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'config',
+          type: 'foam.nanos.mrac.ClusterConfig'
+        }
+      ],
+      javaCode: `
+      DAO dao = (DAO) x.get("clusterConfigDAO");
+      dao.put_(x, config);
+      `
+    },
+    {
       documentation: `Upon initialization create the ClusterServer configuration and register nSpec.`,
       name: 'init_',
       javaCode: `
@@ -124,6 +158,12 @@ foam.CLASS({
         )
       )
        .select(new ArraySink())).getArray();
+
+       if ( arr.size() < 3 ) {
+        setCluster(false);
+        return;
+      }
+
       List<DAO> newClients = new ArrayList<DAO>();
       for ( int i = 0; i < arr.size(); i++ ) {
         ClusterConfig clientConfig = (ClusterConfig) arr.get(i);
@@ -161,17 +201,31 @@ foam.CLASS({
         }
       ],
       javaCode: `
+      if ( ! getCluster() ) {
+        return getDelegate().put_(x, obj);
+      }
+
       Logger logger = (Logger) getX().get("logger");
 
       ClusterConfig config = findConfig(x);
 
       if ( ! config.getNodeType().equals(NodeType.PRIMARY) ) {
         logger.debug(this.getClass().getSimpleName(), "put_", getServiceName(), "to primary", obj);
-        return getPrimary().put_(x, obj);
+        foam.core.FObject o = null;
+        
+        try {
+          o = getPrimary().put_(x, obj);
+        } catch ( Exception e ) {
+          // vote.dissolve();
+        }
+        return o;
       } else {
-        foam.core.FObject o = getDelegate().put_(x, obj);
-        logger.debug(this.getClass().getSimpleName(), "put_", getServiceName(), "to secondaries("+getClients().length+")", o);
-        ClusterCommand cmd = new ClusterCommand.Builder(x).setCommand(ClusterCommand.PUT).setObj(o).build();
+        if ( ! config.getStatus().equals(Status.ONLINE) ) {
+          throw new RuntimeException("Primary node is offline");
+        }
+        
+        logger.debug(this.getClass().getSimpleName(), "put_", getServiceName(), "to secondaries("+getClients().length+")", obj);
+        ClusterCommand cmd = new ClusterCommand.Builder(x).setCommand(ClusterCommand.PUT).setObj(obj).build();
         for ( DAO client : getClients() ) {
           try {
             Object response = client.cmd_(x, cmd);
@@ -180,6 +234,26 @@ foam.CLASS({
             logger.debug(this.getClass().getSimpleName(), "put_", getServiceName(), e);
           }
         }
+        if ( ! getQuorum() ) {
+          config.setStatus(Status.OFFLINE);
+          updateConfig(x, config);
+          throw new RuntimeException("Quorum is not available");
+        }
+
+        foam.core.FObject o = null;
+        try {
+          o = getDelegate().put_(x, obj);
+        } catch ( Exception e ) {
+          config.setStatus(Status.OFFLINE);
+          updateConfig(x, config);
+
+          ClientDAO secondary = (ClientDAO) getClients()[ThreadLocalRandom.current().nextInt(getClients().length)];
+          ClusterCommand dissolve = new ClusterCommand.Builder(x).setCommand(ClusterCommand.DISSOLVE).setObj(getClients()).build();
+          secondary.cmd_(x, dissolve);
+
+          throw new RuntimeException(e);
+        }
+        
         return o;
       }
      `
@@ -199,7 +273,7 @@ foam.CLASS({
       javaCode: `
       Logger logger = (Logger) getX().get("logger");
 
-     ClusterConfig config = findConfig(x);
+      ClusterConfig config = findConfig(x);
 
       if ( ! config.getNodeType().equals(NodeType.PRIMARY) ) {
         logger.debug(this.getClass().getSimpleName(), "remove_", getServiceName(), "to primary", obj);
@@ -231,6 +305,22 @@ foam.CLASS({
           return getDelegate().put_(x, request.getObj());
         } else if ( ClusterCommand.REMOVE.equals(request.getCommand()) ) {
           return getDelegate().remove_(x, request.getObj());
+        } else if ( ClusterCommand.DISSOLVE.equals(request.getCommand()) ) {
+          if ( getElectoralService() == null ) {
+            setElectoralService((Vote) x.get("vote"));
+          }
+          getElectoralService().setState(State.IN_SESSION);
+          getElectoralService().dissolve((DAO[]) request.getObj());
+          return 0;
+        } else if ( ClusterCommand.VOTE.equals(request.getCommand()) ) {
+          if ( getElectoralService() == null ) {
+            setElectoralService((Vote) x.get("vote"));
+          }
+          return getElectoralService().vote((Date) request.getObj());
+        } else if ( ClusterCommand.UPDATE_CONFIG.equals(request.getCommand()) ) {
+          ClusterConfig config = findConfig(x).setNodeType(request.getObj());
+          updateConfig(config);
+          return config;
         } else {
           throw new UnsupportedOperationException(request.getCommand());
         }
@@ -262,5 +352,16 @@ foam.CLASS({
       }
       `
     }
-  ]
+  ],
+
+  axioms: [
+    {
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+  protected Map<Integer, DAO> results = new HashMap<>();
+  protected State state_;
+        `);
+      },
+    },
+  ],
 });

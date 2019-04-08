@@ -121,7 +121,7 @@ if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
 // TODO: cluster needs to delegate to MDAO.   InnerDAO is an issue.
 if ( getCluster() ) {
   logger.debug(this.getClass().getSimpleName(), getOf(), "cluster", getCluster());
-  delegate = new foam.nanos.mrac.ClusterDAO.Builder(getX()).setServiceName(getNSpec().getName()).setDelegate(getMdao()).build();
+  delegate = new foam.nanos.mrac.ClusterDAO.Builder(getX()).setServiceName(getNSpec().getName()).setDelegate(delegate).build();
 }
 
 if ( getDeletedAware() ||

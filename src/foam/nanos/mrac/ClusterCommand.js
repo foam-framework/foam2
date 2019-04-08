@@ -21,6 +21,21 @@ foam.CLASS({
       value: 'remove'
     },
     {
+      name: 'DISSOLVE',
+      type: 'String',
+      value: 'Dissolve'
+    },
+    {
+      name: 'VOTE',
+      type: 'String',
+      value: 'vote'
+    },
+    {
+      name: 'UPDATE_CONFIG',
+      type: 'String',
+      value: 'Update config'
+    },
+    {
       name: 'CMD',
       type: 'String',
       value: 'cmd'
