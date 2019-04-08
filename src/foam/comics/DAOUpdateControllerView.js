@@ -101,7 +101,8 @@ foam.CLASS({
             tag({
               class: this.detailView,
               of: this.dao.of,
-              data$: this.data$.dot('obj')
+              data$: this.data$.dot('obj'),
+              showActions: true
             }).
           end().
         end().
