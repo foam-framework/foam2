@@ -22,14 +22,6 @@ foam.CLASS({
     },
     {
       name: 'columns_'
-    },
-    {
-      name: 'selected'
-    },
-    {
-      class: 'Boolean',
-      name: 'displaySorted',
-      value: false
     }
   ],
 
@@ -46,46 +38,36 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.addClass(this.myClass());
+      var index = 0;
+      this
+        .addClass(this.myClass())
+        .forEach(this.columns, function(columnName) {
+          var axiom = this.table.getAxiomByName(columnName);
+          var checkBox = this.CheckBox.create({
+            label: axiom.label,
+            data: true // TODO: Load from localStorage.
+          });
 
-      this.selected = [];
+          checkBox.data$.sub(this.updateCols(axiom, index++));
 
-      for ( var i = 0; i < this.columns_.length; i++ ) {
-        var cb = this.CheckBox.create({
-          label: this.columns_[i].label,
-          data: true
+          this.start().tag(checkBox).end();
         });
-
-        this.selected.push(cb.data$);
-        var name = this.columns_[i].name;
-
-        cb.data$.sub(this.updateTable.bind(this, name));
-
-        this.add(cb);
-
-        if ( i != this.columns_.length - 1 ) this.start('br').end();
-      }
     }
   ],
 
   listeners: [
-    function updateTable(changedProp) {
-      var cols = [];
+    function updateCols(axiom, index) {
+      return (_, __, ___, propSlot) => {
+        var checked = propSlot.get();
+        if ( checked ) {
+          this.columns_.splice(index, 0, axiom);
 
-      for ( var i = 0; i < this.columns.length; i++ ) {
-        var cbData = this.selected[i].obj.data;
-        var isColShown = this.columns_.some((c) => c.name === this.columns[i]);
-        var curProp = this.columns[i];
-
-        if (
-          ((changedProp == curProp) && cbData) ||
-          ((changedProp != curProp) && isColShown)
-        ) {
-          cols.push(this.table.getAxiomByName(curProp));
+          // Force the view to update.
+          this.columns_ = this.columns_.slice();
+        } else {
+          this.columns_ = this.columns_.filter((col) => col.name !== axiom.name);
         }
-      }
-
-      this.columns_ = cols;
+      };
     }
   ]
 });
