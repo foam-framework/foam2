@@ -1,11 +1,24 @@
 foam.CLASS({
   package: 'foam.nanos.analytics',
   name: 'Candlestick',
-  ids: ['end'],
+  ids: ['end', 'grouping'],
+  tableColumns: [
+    'grouping',
+    'end',
+    'open',
+    'close',
+    'min',
+    'max',
+    'average'
+  ],
   properties: [
     {
       class: 'DateTime',
       name: 'end'
+    },
+    {
+      class: 'Array',
+      name: 'grouping'
     },
     {
       class: 'Float',

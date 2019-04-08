@@ -22,6 +22,10 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'periodLengthMs'
+    },
+    {
+      class: 'StringArray',
+      name: 'groupBy'
     }
   ],
   methods: [
@@ -35,10 +39,21 @@ foam.CLASS({
         java.util.Date end = new java.util.Date();
         end.setTime((ms / periodMs) * periodMs + periodMs);
 
+        Object[] grouping = new Object[getGroupBy().length];
+        for ( int i = 0 ; i < getGroupBy().length ; i++ ) {
+          grouping[i] = obj.getProperty(getGroupBy()[i]);
+        }
+
+        foam.nanos.analytics.CandlestickId id = new foam.nanos.analytics.CandlestickId.Builder(x)
+          .setEnd(end)
+          .setGrouping(grouping)
+          .build();
+
         foam.nanos.analytics.Candlestick c =
-          (foam.nanos.analytics.Candlestick) getCandlestickDAO().find(end);
+          (foam.nanos.analytics.Candlestick) getCandlestickDAO().find(id);
         c = c != null ? c : new foam.nanos.analytics.Candlestick.Builder(x)
           .setEnd(end)
+          .setGrouping(grouping)
           .build();
         c.add(
           ((java.lang.Number) obj.getProperty(getValueProp())).floatValue(),
