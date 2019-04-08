@@ -11,18 +11,15 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'from',
-      value: 'info@nanopay.net'
+      name: 'from'
     },
     {
       class: 'String',
-      name: 'displayName',
-      value: 'nanopay Corporation'
+      name: 'displayName'
     },
     {
       class: 'String',
-      name: 'replyTo',
-      value: 'noreply@nanopay.net'
+      name: 'replyTo'
     }
   ]
 });
