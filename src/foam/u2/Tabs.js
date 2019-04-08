@@ -36,10 +36,8 @@ foam.CLASS({
     ^ {
       background: gray;
       display: block;
-      height: 200px;
       padding: 10px 4px;
       width: 600px;
-      // width: 100%;
     }
     ^tabRow { height: 38px; }
     ^tab {
