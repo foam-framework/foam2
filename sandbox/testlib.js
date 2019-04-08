@@ -13,14 +13,16 @@ foam.CLASS({
     {
       name: 'greet',
       args: [],
-      returns: 'Promise',
+      async: true,
+      type: 'String',
       code: function() {
         return Promise.resolve("hello world");
      }
     },
     {
       name: 'greetUser',
-      returns: 'Promise',
+      async: true,
+      type: 'String',
       args: [
         {
           name: 'user',

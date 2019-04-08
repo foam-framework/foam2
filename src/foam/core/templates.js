@@ -245,7 +245,7 @@ foam.CLASS({
       class: 'AxiomArray',
       of: 'foam.templates.TemplateAxiom',
       adaptArrayElement: function(o, prop) {
-        return this.lookup(prop.of).create(o);
+        return this.__context__.lookup(prop.of).create(o);
       }
     }
   ]

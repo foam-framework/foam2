@@ -52,17 +52,7 @@ foam.CLASS({
       class: 'Long',
       name: 'totalTime',
       label: 'Total',
-      tableCellFormatter: {
-        class: {
-          implements: [ 'foam.u2.view.Formatter' ],
-          requires: [ 'foam.nanos.pm.TemperatureCView' ],
-          methods: [
-            function format(e, value, obj, axiom) {
-              e.tag({ class: 'foam.nanos.pm.TemperatureCView', totalTime: value })
-            }
-          ]
-        }
-      }
+      tableCellFormatter: { class: 'foam.nanos.pm.PMTemperatureCellFormatter' }
     }
   ]
 });

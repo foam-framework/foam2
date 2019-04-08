@@ -21,7 +21,8 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
-    'foam.comics.DAOUpdateController'
+    'foam.comics.DAOUpdateController',
+    'foam.u2.dialog.NotificationMessage'
   ],
 
   imports: [
@@ -73,7 +74,8 @@ foam.CLASS({
   ],
 
   reactions: [
-    [ 'data', 'finished', 'onFinished' ]
+    [ 'data', 'finished', 'onFinished' ],
+    [ 'data', 'throwError', 'onThrowError' ]
   ],
 
   methods: [
@@ -96,8 +98,11 @@ foam.CLASS({
                 add(this.data.cls_.getAxiomsByClass(foam.core.Action)).
               end().
             end().
-            tag({class: this.detailView}, {data: this.data.obj}).
-            add(this.DAOUpdateController.OBJ).
+            tag({
+              class: this.detailView,
+              of: this.dao.of,
+              data$: this.data$.dot('obj')
+            }).
           end().
         end().
       end();
@@ -107,6 +112,13 @@ foam.CLASS({
   listeners: [
     function onFinished() {
       this.stack.back();
+    },
+    function onThrowError() {
+      var self = this;
+      this.add(this.NotificationMessage.create({
+        message: self.data.exception.message,
+        type: 'error'
+     }));
     }
   ]
 });

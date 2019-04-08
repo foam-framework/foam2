@@ -20,10 +20,12 @@
   var isWorker = typeof importScripts !== 'undefined';
   var isServer = ( ! isWorker ) && typeof window === 'undefined';
 
-  var flags    = this.FOAM_FLAGS || {};
+  var flags    = this.FOAM_FLAGS = this.FOAM_FLAGS || {};
   flags.web    = ! isServer,
   flags.node   = isServer;
   flags.loader = ! isServer;
+  if ( ! flags.hasOwnProperty('java') ) flags.java   = true;
+  if ( ! flags.hasOwnProperty('swift') ) flags.swift = true;
   if ( ! flags.hasOwnProperty('debug') ) flags.debug = true;
   if ( ! flags.hasOwnProperty('js')    ) flags.js    = true;
 
@@ -44,8 +46,8 @@
 
     path = path.substring(0, path.lastIndexOf('src/')+4);
 
-    if ( typeof global !== 'undefined' ) global.FOAM_ROOT = path;
-    if ( typeof window !== 'undefined' ) window.FOAM_ROOT = path;
+    if ( typeof global !== 'undefined' && ! global.FOAM_ROOT ) global.FOAM_ROOT = path;
+    if ( typeof window !== 'undefined' && ! window.FOAM_ROOT ) window.FOAM_ROOT = path;
 
     return function(filename) {
       document.writeln(
@@ -57,7 +59,7 @@
     var caller = flags.src || __filename;
     var path = caller.substring(0, caller.lastIndexOf('src/')+4);
 
-    if ( typeof global !== 'undefined' ) global.FOAM_ROOT = path;
+    if ( typeof global !== 'undefined' && ! global.FOAM_ROOT ) global.FOAM_ROOT = path;
 
     return function (filename) {
       require(path + filename + '.js');
@@ -81,19 +83,6 @@
     var load = getLoader();
 
     files.
-      filter(function(f) {
-        if ( f.flags ) {
-          for ( var i = 0; i < f.flags.length; i++ ) {
-            if ( ! flags[f.flags[i]] ) return false;
-          }
-        }
-        if ( f.notFlags ) {
-          for ( var i = 0; i < f.notFlags.length; i++ ) {
-            if ( flags[f.notFlags[i]] ) return false;
-          }
-        }
-        return true;
-      }).
       map(function(f) { return f.name; }).
       forEach(load);
 

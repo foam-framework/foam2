@@ -156,13 +156,23 @@ class SwiftTestsTests: XCTestCase {
 
     do {
       let sink = foam_dao_ArraySink()
-      _ = try! dao.`where`(foam_mlang_predicate_Eq(["arg1": somepackage_Test.LAST_NAME(), "arg2": foam_mlang_Constant(["value": "Bob"])])).select(sink)
+      _ = try! dao
+        .`where`(foam_mlang_predicate_Eq([
+          "arg1": somepackage_Test.LAST_NAME(),
+          "arg2": foam_mlang_Constant(["value": "Bob"])
+        ]))!
+        .select(sink)
       XCTAssertEqual(2, sink.array.count)
     }
 
     do {
       let sink = foam_dao_ArraySink()
-      _ = try! dao.`where`(foam_mlang_predicate_Eq(["arg1": somepackage_Test.FIRST_NAME(), "arg2": foam_mlang_Constant(["value": "Joe2"])])).select(sink)
+      _ = try! dao
+        .`where`(foam_mlang_predicate_Eq([
+          "arg1": somepackage_Test.FIRST_NAME(),
+          "arg2": foam_mlang_Constant(["value": "Joe2"])
+        ]))!
+        .select(sink)
       XCTAssertEqual(1, sink.array.count)
       XCTAssertTrue(t2.isEqual(sink.array[0]))
     }
@@ -176,7 +186,7 @@ class SwiftTestsTests: XCTestCase {
     ])
 
     let sink = foam_mlang_sink_Count()
-    let detach = (try? dao.listen(sink))
+    let detach = try! dao.listen(sink)
 
     _ = (try? dao.put(somepackage_Test(["firstName": "A"]))) as! somepackage_Test
     XCTAssertEqual(sink.value, 1)
@@ -201,7 +211,7 @@ class SwiftTestsTests: XCTestCase {
       _ = (try? dao.put(somepackage_Test(["firstName": i])))
     }
 
-    let sink = (try? dao.skip(2).limit(5).select())!
+    let sink = (try? dao.skip(2)!.limit(5)!.select())!
     XCTAssertEqual(sink.array.count, 5)
     XCTAssertEqual("3", (sink.array[0] as! somepackage_Test).firstName)
   }
@@ -266,7 +276,7 @@ class SwiftTestsTests: XCTestCase {
     t2.firstName = "YO"
     t.anyProp = t2
 
-    let s = t.anyProp$.dot("firstName")
+    let s = t.anyProp$.dot("firstName")!
     XCTAssertEqual(s.swiftGet() as? String, "YO")
 
     var i = 0
@@ -289,17 +299,17 @@ class SwiftTestsTests: XCTestCase {
 
     var subSlot = 0
     let t2 = somepackage_Test(["anyProp": t])
-    let s2 = t2.anyProp$.dot("firstName").swiftSub { (_, _) in
+    let s2 = t2.anyProp$.dot("firstName")!.swiftSub { (_, _) in
       subSlot += 1
     }
 
-    XCTAssertEqual(t2.anyProp$.dot("firstName").swiftGet() as! String, "a")
+    XCTAssertEqual(t2.anyProp$.dot("firstName")!.swiftGet() as! String, "a")
     XCTAssertEqual(slot, 0)
     XCTAssertEqual(subSlot, 0)
 
     t.firstName = "B"
 
-    XCTAssertEqual(t2.anyProp$.dot("firstName").swiftGet() as! String, "B")
+    XCTAssertEqual(t2.anyProp$.dot("firstName")!.swiftGet() as! String, "B")
     XCTAssertEqual(slot, 1)
     XCTAssertEqual(subSlot, 1)
 
@@ -362,8 +372,8 @@ class SwiftTestsTests: XCTestCase {
 
     class somepackage_TestBox: foam_box_Box {
       var o: Any?
-      func send(_ msg: foam_box_Message) throws {
-        o = msg.object
+      func send(_ msg: foam_box_Message?) throws {
+        o = msg?.object
       }
     }
     let testBox = somepackage_TestBox()
@@ -382,8 +392,8 @@ class SwiftTestsTests: XCTestCase {
         self.outputter = outputter
         self.parser = parser
       }
-      func send(_ msg: foam_box_Message) throws {
-        let reply = msg.attributes["replyBox"] as? foam_box_Box
+      func send(_ msg: foam_box_Message?) throws {
+        let reply = msg!.attributes["replyBox"] as? foam_box_Box
 
         let str = outputter.swiftStringify(msg)
         let obj = parser.parseString(str) as! foam_box_Message
@@ -396,7 +406,6 @@ class SwiftTestsTests: XCTestCase {
     let clientBoxRegistry = foam_box_ClientBoxRegistry(X: X)
     clientBoxRegistry.delegate =
         RegistryDelegate(registry: boxContext.registry!, outputter: outputter, parser: parser)
-
     do {
       let box = try clientBoxRegistry.doLookup("TestBox") as? foam_box_SubBox
       XCTAssertNotNil(box)
@@ -450,7 +459,7 @@ class SwiftTestsTests: XCTestCase {
     Async.aSeq([
       { ret, _, name in
         DispatchQueue.global(qos: .utility).async {
-          try? ret(dao.put(x.create(somepackage_Test.self, args: ["firstName": name])!)!)
+          try? ret(dao.put(x.create(somepackage_Test.self, args: ["firstName": name])!))
         }
       },
       { ret, _, t in
@@ -514,7 +523,7 @@ class SwiftTestsTests: XCTestCase {
     DispatchQueue.global(qos: .background).async {
       _ = try? dao.put(self.x.create(somepackage_Test.self, args: ["firstName": "A"])!)
       _ = try? dao.put(self.x.create(somepackage_Test.self, args: ["firstName": "B"])!)
-      pDao.promise.set(dao)
+      pDao.promise = dao
     }
 
     let a = try? pDao.select()
@@ -660,9 +669,9 @@ class SwiftTestsTests: XCTestCase {
       ])!,
     ])
 
-    let studentDAO = (x["studentDAO"] as! foam_dao_DAO).inX(x)
-    let courseDAO = (x["courseDAO"] as! foam_dao_DAO).inX(x)
-    let professorDAO = (x["professorDAO"] as! foam_dao_DAO).inX(x)
+    let studentDAO = (x["studentDAO"] as! foam_dao_DAO).inX(x)!
+    let courseDAO = (x["courseDAO"] as! foam_dao_DAO).inX(x)!
+    let professorDAO = (x["professorDAO"] as! foam_dao_DAO).inX(x)!
 
     _ = try studentDAO.put(x.create(foam_nanos_demo_relationship_Student.self, args: [
       "name": "Adam"
@@ -687,36 +696,36 @@ class SwiftTestsTests: XCTestCase {
       "name": "Alan Kay",
     ])!) as! foam_nanos_demo_relationship_Professor
 
-    let adam = try studentDAO.find(0) as! foam_nanos_demo_relationship_Student
-    let mike = try studentDAO.find(1) as! foam_nanos_demo_relationship_Student
+    let adam = try studentDAO.find(1) as! foam_nanos_demo_relationship_Student
+    let mike = try studentDAO.find(2) as! foam_nanos_demo_relationship_Student
 
     let cs101 = try courseDAO.find("CS 101") as! foam_nanos_demo_relationship_Course
     let cs201 = try courseDAO.find("CS 201") as! foam_nanos_demo_relationship_Course
 
     // Assign professors
-    _ = try donald.getCourses(x).put(cs101)
-    _ = try alan.getCourses(x).put(cs201)
+    _ = try donald.getCourses(x)!.put(cs101)
+    _ = try alan.getCourses(x)!.put(cs201)
 
     // Enroll students
-    _ = try cs101.getStudents(x).add(adam)
-    _ = try mike.getCourses(x).add(cs201)
-    _ = try mike.getCourses(x).add(cs101)
+    _ = try cs101.getStudents(x)!.add(adam)
+    _ = try mike.getCourses(x)!.add(cs201)
+    _ = try mike.getCourses(x)!.add(cs101)
 
     let course = cs101
     try XCTAssertEqual(course.findProfessor(x).name, "Donald Knuth")
 
-    let donaldsCourses = try donald.getCourses(x).select().array as! [foam_nanos_demo_relationship_Course]
+    let donaldsCourses = try donald.getCourses(x)!.select().array as! [foam_nanos_demo_relationship_Course]
     XCTAssertEqual(donaldsCourses[0].code, "CS 101")
 
-    let students = try course.getStudents(x).getDAO().select().array as! [foam_nanos_demo_relationship_Student]
+    let students = try course.getStudents(x)!.getDAO()!.select().array as! [foam_nanos_demo_relationship_Student]
     XCTAssertEqual(students.count, 2)
     XCTAssertEqual(students[0].name, "Adam")
 
-    let adamsCourses = try adam.getCourses(x).getDAO().select().array as! [foam_nanos_demo_relationship_Course]
+    let adamsCourses = try adam.getCourses(x)!.getDAO()!.select().array as! [foam_nanos_demo_relationship_Course]
     XCTAssertEqual(adamsCourses.count, 1)
     XCTAssertEqual(adamsCourses[0].code, "CS 101")
 
-    let mikesCourses = try mike.getCourses(x).getDAO().select().array as! [foam_nanos_demo_relationship_Course]
+    let mikesCourses = try mike.getCourses(x)!.getDAO()!.select().array as! [foam_nanos_demo_relationship_Course]
     XCTAssertEqual(mikesCourses.count, 2)
 
     var containsCourses = true;
@@ -734,7 +743,7 @@ class SwiftTestsTests: XCTestCase {
       print("Instructor: " + prof.name)
       print("");
       print("*** Students ***");
-      let a = try course.getStudents(x).getDAO().select().array as! [foam_nanos_demo_relationship_Student]
+      let a = try course.getStudents(x)!.getDAO()!.select().array as! [foam_nanos_demo_relationship_Student]
       for s in a { print(s.name) }
       print("");
     }
@@ -746,7 +755,7 @@ class SwiftTestsTests: XCTestCase {
       print("");
       print("**** " + professor.name + " ****");
       print("*** Courses ***");
-      let a = try professor.getCourses(x).select().array as! [foam_nanos_demo_relationship_Course]
+      let a = try professor.getCourses(x)!.select().array as! [foam_nanos_demo_relationship_Course]
       for c in a { print(c.code) }
       print("");
     }
@@ -774,7 +783,9 @@ class SwiftTestsTests: XCTestCase {
   }
 
   func testOrderBy() {
-    let exp = x.create(foam_mlang_Expressions.self)!
+    let desc = x.create(foam_mlang_order_Desc.self, args: [
+      "arg1": somepackage_Test.FIRST_NAME()
+    ])!
 
     let dao = x.create(foam_swift_dao_ArrayDAO.self, args: [
       "of": somepackage_Test.classInfo(),
@@ -792,12 +803,12 @@ class SwiftTestsTests: XCTestCase {
       "lastName": "Bob",
     ]))
 
-    var a = try! dao.orderBy(somepackage_Test.FIRST_NAME()).select()
+    var a = try! dao.orderBy(somepackage_Test.FIRST_NAME())!.select()
     XCTAssertEqual((a.array[0] as! somepackage_Test).firstName, "Joe1")
     XCTAssertEqual((a.array[1] as! somepackage_Test).firstName, "Joe2")
     XCTAssertEqual((a.array[2] as! somepackage_Test).firstName, "Joe3")
 
-    a = try! dao.orderBy(exp.DESC(somepackage_Test.FIRST_NAME())).select()
+    a = try! dao.orderBy(desc)!.select()
     XCTAssertEqual((a.array[0] as! somepackage_Test).firstName, "Joe3")
     XCTAssertEqual((a.array[1] as! somepackage_Test).firstName, "Joe2")
     XCTAssertEqual((a.array[2] as! somepackage_Test).firstName, "Joe1")

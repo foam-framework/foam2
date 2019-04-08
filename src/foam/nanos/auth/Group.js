@@ -124,10 +124,10 @@ foam.CLASS({
       documentation: `
         Users will be asked for providing a feedback once the soft session limit has been reached.
         If the user doesn't provide any feedback, system will force the user logout.
-        
+
         The unit is milliseconds, so if you want to set the time limit to 10 mins, the value would be:
           600000 = 1000 * 60 * 10.
-        
+
         Set the value to 0 to turn off this feature.
       `
     },
@@ -158,8 +158,12 @@ foam.CLASS({
   methods: [
     {
       name: 'implies',
-      javaReturns: 'Boolean',
+      type: 'Boolean',
       args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
         {
           name: 'permission',
           javaType: 'java.security.Permission'
@@ -167,14 +171,28 @@ foam.CLASS({
       ],
       javaCode: `
         if ( getPermissions() == null ) return false;
+
         for ( int i = 0 ; i < permissions_.length ; i++ ) {
-          if ( new javax.security.auth.AuthPermission(permissions_[i].getId()).implies(permission) ) {
-            return true;
+          foam.nanos.auth.Permission p = permissions_[i];
+
+          if ( p.getId().startsWith("@") ) {
+            DAO   dao   = (DAO) x.get("groupDAO");
+            Group group = (Group) dao.find(p.getId().substring(1));
+
+            if ( group != null && group.implies(x, permission) ) {
+              return true;
+            }
+          } else {
+            if ( new javax.security.auth.AuthPermission(p.getId()).implies(permission) ) {
+              return true;
+            }
           }
         }
         return false;`
       ,
-      code: function(permissionId) {
+      code: function(x, permissionId) {
+        if ( arguments.length != 2 ) debugger;
+
         if ( this.permissions == null ) return false;
 
         for ( var i = 0 ; i < this.permissions.length ; i++ )
@@ -185,16 +203,14 @@ foam.CLASS({
     },
     {
       name: 'getAppConfig',
-      javaReturns: 'AppConfig',
+      type: 'foam.nanos.app.AppConfig',
       args: [
         {
           name: 'x',
-          javaType: 'X'
+          type: 'Context'
         }
       ],
       javaCode: `
-DAO userDAO      = (DAO) x.get("localUserDAO");
-DAO groupDAO     = (DAO) x.get("groupDAO");
 AppConfig config = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
 
 String configUrl = config.getUrl();
@@ -205,16 +221,12 @@ if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
   configUrl = ((Request) req).getRootURL().toString();
 } else {
   // populate AppConfig url with group url
-  Session session = x.get(Session.class);
-  User user = (User) userDAO.find(session.getUserId());
-  if ( user != null ) {
-    Group group = (Group) groupDAO.find(user.getGroup());
-    if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
-      configUrl = group.getUrl();
-    }
-    if ( ! SafetyUtil.isEmpty(group.getSupportEmail()) ) {
-      config.setSupportEmail(group.getSupportEmail());
-    }
+  Group group = (Group) x.get("group");
+  if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
+    configUrl = group.getUrl();
+  }
+  if ( ! SafetyUtil.isEmpty(group.getSupportEmail()) ) {
+    config.setSupportEmail(group.getSupportEmail());
   }
 }
 
@@ -248,10 +260,10 @@ return config;
         return parent.isDescendantOf(groupId, groupDAO);
       },
       args: [
-        { name: 'groupId',  javaType: 'String' },
-        { name: 'groupDAO', javaType: 'foam.dao.DAO' }
+        { name: 'groupId',  type: 'String' },
+        { name: 'groupDAO', type: 'foam.dao.DAO' }
       ],
-      javaReturns: 'boolean',
+      type: 'Boolean',
       javaCode: `
         if ( SafetyUtil.isEmpty(groupId) ) return false;
         if (

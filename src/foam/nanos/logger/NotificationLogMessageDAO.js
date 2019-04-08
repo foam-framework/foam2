@@ -25,7 +25,7 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.logger.LogLevel',
+    'foam.log.LogLevel',
     'foam.nanos.notification.Notification',
   ],
 
@@ -37,13 +37,13 @@ foam.CLASS({
     },
     {
       class: 'Enum',
-      of: 'foam.nanos.logger.LogLevel',
+      of: 'foam.log.LogLevel',
       name: 'threshold',
       factory: function() {
-        return foam.nanos.logger.LogLevel.ERROR;
+        return foam.log.LogLevel.ERROR;
       },
       javaFactory: `
-        return foam.nanos.logger.LogLevel.ERROR;
+        return foam.log.LogLevel.ERROR;
 `,
       documentation: `The value of Threshhold control when this logger executes.
       Ordinal values for LogLevels are: DEBUG -> 0, INFO -> 1, WARNING -> 2, ERROR -> 3.
@@ -80,11 +80,11 @@ foam.CLASS({
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'log',
-          javaType: 'foam.nanos.logger.LogMessage'
+          type: 'foam.nanos.logger.LogMessage'
         },
       ],
       javaCode: `

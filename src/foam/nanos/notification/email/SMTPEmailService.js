@@ -132,11 +132,11 @@ protected EnvironmentConfiguration config_ = null;`
   methods: [
     {
       name: 'getConfig',
-      javaReturns: 'EnvironmentConfiguration',
+      javaType: 'EnvironmentConfiguration',
       args: [
         {
           name: 'group',
-          javaType: 'String'
+          type: 'String'
         }
       ],
       javaCode:
@@ -154,11 +154,11 @@ return config_;`
     },
     {
       name: 'createMimeMessage',
-      javaReturns: 'MimeMessage',
+      javaType: 'MimeMessage',
       args: [
         {
           name: 'emailMessage',
-          javaType: 'foam.nanos.notification.email.EmailMessage'
+          type: 'foam.nanos.notification.email.EmailMessage'
         }
       ],
       javaCode:
@@ -236,11 +236,11 @@ return config_;`
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'emailMessage',
-          javaType: 'final foam.nanos.notification.email.EmailMessage'
+          type: 'foam.nanos.notification.email.EmailMessage'
         }
       ],
       javaCode: `
@@ -301,7 +301,6 @@ sendEmail(x, emailMessage);`
     },
     {
       name: 'start',
-      javaReturns: 'void',
       javaCode:
 `Properties props = new Properties();
 props.setProperty("mail.smtp.auth", getAuthenticate() ? "true" : "false");
@@ -316,11 +315,11 @@ if ( getAuthenticate() ) {
     },
     {
       name: 'finalizeEmailConfig',
-      javaReturns: 'foam.nanos.notification.email.EmailMessage',
+      type: 'foam.nanos.notification.email.EmailMessage',
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'emailMessage',
@@ -359,11 +358,11 @@ return emailMessage;
     },
     {
       name: 'findUser',
-      javaReturns: 'foam.nanos.auth.User',
+      type: 'foam.nanos.auth.User',
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'emailMessage',

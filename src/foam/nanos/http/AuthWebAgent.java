@@ -8,9 +8,11 @@ package foam.nanos.http;
 
 import foam.core.X;
 import foam.dao.DAO;
+import foam.nanos.auth.AgentAuthService;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.AuthenticationException;
 import foam.nanos.auth.User;
+import foam.nanos.boot.Boot;
 import foam.nanos.logger.Logger;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
@@ -84,6 +86,7 @@ public class AuthWebAgent
     // query parameters
     String              email        = req.getParameter("user");
     String              password     = req.getParameter("password");
+    String              actAs        = req.getParameter("actAs");
     String              authHeader   = req.getHeader("Authorization");
 
     // instance parameters
@@ -99,10 +102,8 @@ public class AuthWebAgent
     if ( ! SafetyUtil.isEmpty(sessionId) ) {
       session = (Session) sessionDAO.find(sessionId);
       if ( session == null ) {
-        // create new session
-        session = new Session();
+        session = createSession(x);
         session.setId(sessionId);
-        session.setRemoteHost(req.getRemoteHost());
         sessionDAO.put(session);
       }
 
@@ -113,8 +114,7 @@ public class AuthWebAgent
       }
     } else {
       // create new cookie
-      session = new Session();
-      session.setRemoteHost(req.getRemoteHost());
+      session = createSession(x);
       createCookie(x, session);
       sessionDAO.put(session);
     }
@@ -168,10 +168,23 @@ public class AuthWebAgent
 
       try {
         User user = auth.loginByEmail(session.getContext()
-          .put(HttpServletRequest.class, req)
+          .put(HttpServletRequest.class,  req)
           .put(HttpServletResponse.class, resp), email, password);
 
-        if ( user != null ) return session;
+        if ( user != null ) {
+          if ( ! SafetyUtil.isEmpty(actAs) ) {
+            AgentAuthService agentService = (AgentAuthService) x.get("agentAuth");
+            DAO localUserDAO = (DAO) x.get("localUserDAO");
+            try {
+              User entity = (User) localUserDAO.find(Long.parseLong(actAs));
+              agentService.actAs(session.getContext(), entity);
+            } catch (java.lang.NumberFormatException e) {
+              logger.error("actAs must be a number:" + e);
+              return null;
+            }
+          }
+          return session;
+        }
 
         // user should not be null, any login failure should throw an Exception
         logger.error("AuthService.loginByEmail returned null user and did not throw AuthenticationException.");
@@ -197,17 +210,30 @@ public class AuthWebAgent
     return null;
   }
 
+  public Session createSession(X x) {
+    HttpServletRequest req     = x.get(HttpServletRequest.class);
+    Session            session = new Session((X) x.get(Boot.ROOT)); 
+    session.setRemoteHost(req.getRemoteHost());
+    return session;
+  }
+
   public void execute(X x) {
     AuthService auth    = (AuthService) x.get("auth");
     Session     session = authenticate(x);
 
-    if ( session != null && session.getContext() != null && session.getContext().get("user") != null ) {
+    if ( session != null ) {
       if ( auth.check(session.getContext(), permission_) ) {
-        getDelegate().execute(x.put(Session.class, session).put("user", session.getContext().get("user")));
+        // Create a per-request sub-context of the session context which
+        // contains necessary Servlet request/response objects.
+        X requestX = session.getContext()
+          .put(HttpServletRequest.class,  x.get(HttpServletRequest.class))
+          .put(HttpServletResponse.class, x.get(HttpServletResponse.class))
+          .put(PrintWriter.class,         x.get(PrintWriter.class));
+        getDelegate().execute(requestX);
       } else {
         PrintWriter out = x.get(PrintWriter.class);
         out.println("Access denied. Need permission: " + permission_);
-        ((foam.nanos.logger.Logger)x.get("logger")).debug("Access denied, requires permission:", permission_);
+        ((foam.nanos.logger.Logger) x.get("logger")).debug("Access denied, requires permission:", permission_);
       }
     } else {
       templateLogin(x);

@@ -29,7 +29,7 @@ foam.CLASS({
       preSet: function(o, d) {
         var f = ! d || typeof d === 'string' || typeof d === 'number' || typeof d === 'boolean' || foam.Date.isInstance(d);
         if ( ! f ) {
-          this.warn('Set Input data to non-primitive:' + d);
+          this.__context__.warn('Set Input data to non-primitive:' + d);
           return o;
         }
         return d;

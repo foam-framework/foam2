@@ -205,6 +205,14 @@ foam.CLASS({
           });
         });
       }
+    },
+    {
+      type: 'Action',
+      name: 'action',
+      documentation: `
+        Optional. If this is provided, an action will be included at the bottom
+        of the dropdown.
+      `
     }
   ],
 
@@ -300,6 +308,14 @@ foam.CLASS({
                   index++;
               });
             });
+          }))
+          .add(this.slot(function(action) {
+            if ( action ) {
+              return this.E()
+                .start(self.DefaultActionView, { action: action })
+                  .addClass(self.myClass('action'))
+                .end();
+            }
           }))
         .end();
     },
@@ -400,6 +416,36 @@ foam.CLASS({
           return this.add(this.data || this.CHOOSE_FROM + plural);
         }
       ]
+    },
+    {
+      name: 'DefaultActionView',
+      extends: 'foam.u2.UnstyledActionView',
+
+      documentation: `
+        This is the view that gets rendered at the bottom of the dropdown if an
+        action is provided.
+      `,
+
+      css: `
+        ^ {
+          border: 0;
+          border-top: 1px solid #f4f4f9;
+          color: %SECONDARYCOLOR%;
+          display: flex;
+          font-size: 12px;
+          text-align: left;
+          width: 100%;
+        }
+
+        ^:hover {
+          cursor: pointer;
+          color: %SECONDARYHOVERCOLOR%;
+        }
+
+        ^ img + span {
+          margin-left: 6px;
+        }
+      `
     }
   ]
 });

@@ -22,7 +22,7 @@ foam.CLASS({
   methods: [
     {
       name: 'generateExpiryDate',
-      javaReturns: 'java.util.Date',
+      type: 'Date',
       javaCode:
 `Calendar calendar = Calendar.getInstance();
 calendar.add(java.util.Calendar.DAY_OF_MONTH, 1);

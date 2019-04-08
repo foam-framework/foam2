@@ -6,7 +6,9 @@
 
 var classes = [
   'foam.core.Axiom',
+  'foam.core.Detachable',
   'foam.core.Serializable',
+  'foam.core.ContextAware',
   'foam.core.Exception',
   'foam.core.Freezable',
   'foam.core.ContextAgent',
@@ -38,6 +40,7 @@ var classes = [
   'foam.mlang.predicate.Has',
   'foam.mlang.predicate.Keyword',
   'foam.mlang.predicate.IsInstanceOf',
+  'foam.mlang.predicate.IsClassOf',
   'foam.mlang.sink.Count',
   'foam.mlang.sink.GroupBy',
   'foam.mlang.F',
@@ -46,6 +49,9 @@ var classes = [
   'foam.mlang.predicate.Eq',
   'foam.mlang.Constant',
   'foam.mlang.ArrayConstant',
+  'foam.mlang.expr.Dot',
+  'foam.mlang.PredicatedExpr',
+  'foam.mlang.ContextObject',
   'foam.box.Box',
   'foam.box.Skeleton',
   'foam.box.AbstractSkeleton',
@@ -91,6 +97,7 @@ var classes = [
   'foam.dao.RoutingJournal',
   'foam.dao.RoutingJournalTest',
   'foam.dao.RoutingJDAO',
+  'foam.dao.JournalType',
   'foam.dao.WriteOnlyJDAO',
   'foam.dao.WriteOnlyFileJournal',
   'foam.dao.BaseClientDAO',
@@ -181,9 +188,8 @@ var classes = [
   'foam.nanos.auth.LogoutDisabledUserDAO',
   'foam.nanos.auth.DeletedAware',
   'foam.nanos.auth.DeletedAwareDummy',
-  'foam.nanos.auth.DeletedAwareDAO',
-  'foam.nanos.auth.DeletedAwareSink',
   'foam.nanos.auth.DeletedAwareDAOTest',
+  'foam.nanos.auth.UserAndGroupAuthService',
   'foam.nanos.http.HttpParameters',
   'foam.nanos.http.DefaultHttpParameters',
   'foam.nanos.session.Session',
@@ -192,7 +198,6 @@ var classes = [
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',
-  'foam.nanos.logger.LogLevel',
   'foam.nanos.logger.LogMessage',
   'foam.nanos.logger.LogLevelFilterLogger',
   'foam.nanos.logger.AbstractLogger',
@@ -202,7 +207,6 @@ var classes = [
   'foam.nanos.logger.NotificationLogMessageDAO',
   'foam.nanos.logger.RepeatLogMessageDAO',
   'foam.nanos.logger.ProxyLogger',
-  'foam.nanos.logger.LogsView',
   'foam.nanos.menu.Menu',
   'foam.nanos.menu.DAOMenu',
   'foam.nanos.menu.DocumentMenu',
@@ -239,6 +243,10 @@ var classes = [
   'foam.dao.FixedSizeDAO',
   'foam.mop.MOP',
   'foam.u2.Element',
+  'foam.u2.ControllerMode',
+  'foam.u2.ElementState',
+  'foam.u2.DefaultValidator',
+  'foam.u2.DisplayMode',
   'foam.u2.Visibility',
   'foam.nanos.export.ExportDriverRegistry',
   'foam.dao.pg.ConnectionPool',
@@ -251,7 +259,6 @@ var classes = [
   'foam.lib.json.UnknownFObjectArray',
   'foam.lib.json.ClassReferenceParserTest',
   'foam.lib.xml.OutputXML',
-  'foam.blob.Buffer',
   'foam.blob.Blob',
   'foam.blob.BlobService',
   'foam.blob.AbstractBlob',
@@ -298,8 +305,6 @@ var classes = [
 
   'foam.lib.query.TestModel',
   'foam.lib.query.FooEnum',
-  'foam.demos.net.nap.web.model.RegulatoryNotice',
-  'foam.demos.net.nap.web.model.RegulatoryNoticeAudit',
 
   'foam.parse.QueryParserUserTest',
   'foam.util.EmailTest',
@@ -323,9 +328,12 @@ var classes = [
   'foam.nanos.ruler.RulerDAO',
   'foam.nanos.ruler.Operations',
   'foam.nanos.ruler.RuleAction',
+  'foam.nanos.ruler.ScriptPredicate',
+  'foam.nanos.ruler.RuleHistory',
+  'foam.nanos.ruler.RuleHistoryStatus',
   'foam.comics.SearchMode',
 
-  //Support Files
+  // Support Files
   'foam.support.model.TicketMessage',
   'foam.support.model.SupportEmail',
   'foam.support.model.Ticket',
@@ -370,6 +378,12 @@ var proxies = [
 ];
 
 var blacklist = [
+  'foam.core.Property',
+  'foam.mlang.expr.Mul',
+  'foam.mlang.predicate.Func',
+  'foam.u2.AttrSlot',
+  'foam.u2.RenderSink',
+  'foam.u2.ViewSpec',
 ];
 
 module.exports = {
@@ -378,4 +392,4 @@ module.exports = {
     skeletons: skeletons,
     proxies: proxies,
     blacklist: blacklist
-}
+};

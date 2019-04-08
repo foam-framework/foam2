@@ -24,56 +24,62 @@ foam.INTERFACE({
   methods: [
     {
       name: 'write',
-      returns: 'Promise',
-      javaReturns: 'foam.core.FObject',
+      type: 'foam.core.FObject',
+      async: true,
       args: [
         {
-          name: 'context'
+          name: 'context',
+          type: 'Context'
         },
         {
-          name: 'dao'
+          name: 'dao',
+          type: 'foam.dao.DAO'
         },
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          type: 'FObject'
         },
         {
           name: 'existing',
-          javaType: 'foam.core.FObject'
+          type: 'FObject'
         }
       ]
     },
     {
       name: 'read',
-      returns: 'Promise',
-      javaReturns: 'foam.core.FObject',
+      type: 'foam.core.FObject',
+      async: true,
       args: [
         {
-          name: 'context'
+          name: 'context',
+          type: 'Context'
         },
         {
-          name: 'dao'
+          name: 'dao',
+          type: 'foam.dao.DAO'
         },
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          type: 'FObject'
         }
       ]
     },
     {
       name: 'remove',
-      returns: 'Promise',
-      javaReturns: 'foam.core.FObject',
+      type: 'foam.core.FObject',
+      async: true,
       args: [
         {
-          name: 'context'
+          name: 'context',
+          type: 'Context'
         },
         {
-          name: 'dao'
+          name: 'dao',
+          type: 'foam.dao.DAO'
         },
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          type: 'FObject'
         }
       ]
     }

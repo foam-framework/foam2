@@ -20,7 +20,7 @@ public interface FObject extends
   FObject deepClone();
   FObject shallowClone();
   Map diff(FObject obj);
-  void freeze();
+  FObject freeze();
   boolean isFrozen();
   //Return is FObject that contain different fields between two FObjects.
   FObject hardDiff(FObject obj);

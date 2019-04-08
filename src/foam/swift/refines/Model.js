@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'ModelSwiftRefinement',
   refines: 'foam.core.Model',
   flags: ['swift'],
   requires: [
@@ -15,7 +17,8 @@ foam.CLASS({
       class: 'String',
       name: 'swiftName',
       expression: function(id) {
-        return id.replace(/\./g, '_')
+        // TODO: remove this property.
+        return foam.swift.toSwiftName(id);
       },
     },
     {
@@ -34,7 +37,7 @@ foam.CLASS({
         // TODO: This should be an expression on extends but putting extends in
         // the args makes js unhappy.
         if ( this.extends == 'FObject' ) return 'AbstractFObject';
-        return foam.lookup(this.extends).model_.swiftName;
+        return foam.swift.toSwiftType(this.extends)
       },
     },
     {
@@ -42,21 +45,23 @@ foam.CLASS({
       name: 'swiftImplements',
     },
     {
-      name: 'swiftAllImplements',
-      expression: function(swiftImplements) {
-        return this.swiftImplements.concat(
-          ( this.implements || [] )
-            .map(function(i) { return foam.lookup(i.path).model_ })
-            .filter(function(i) {
-              return foam.core.InterfaceModel.isInstance(i);
-            })
-            .map(function(i) { return i.swiftName })
-        );
-      },
-    },
-    {
       class: 'String',
       name: 'swiftCode',
+    },
+  ],
+  methods: [
+    function swiftAllImplements() {
+      // Return a list of everything the model implements including swift
+      // specific protocols and models that are implemented.
+      return this.swiftImplements.concat(
+        ( this.implements || [] )
+        .filter(foam.util.flagFilter(['swift']))
+        // Remove anything that's not actually an interface to avoid multiple inheritence.
+        .filter(i => foam.core.InterfaceModel.isInstance(foam.lookup(i.path).model_))
+        .map(function(i) {
+          return foam.swift.toSwiftName(i.path)
+        })
+      );
     },
   ],
 });

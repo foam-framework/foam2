@@ -23,6 +23,7 @@ foam.CLASS({
   documentation: 'A Property for Boolean values.',
 
   properties: [
+    [ 'type', 'Boolean' ],
     [ 'value', false ],
     [ 'adapt', function adaptBoolean(_, v) { return !!v; } ]
   ]

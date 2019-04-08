@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'ArgumentSwiftRefinement',
   refines: 'foam.core.Argument',
   flags: ['swift'],
   requires: [
@@ -43,11 +45,9 @@ foam.CLASS({
       name: 'swiftMutable',
     },
     {
-      class: 'String',
-      name: 'swiftType',
-      expression: function(of, optional) {
-        of = foam.String.isInstance(of) ? foam.lookup(of, true) : of;
-        return of ? of.model_.swiftName + (optional ? '?' : '') : 'Any?';
+      class: 'foam.swift.SwiftTypeProperty',
+      expression: function(type) {
+        return foam.swift.toSwiftType(type, true);
       },
     },
   ],

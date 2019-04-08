@@ -47,6 +47,7 @@ foam.CLASS({
     },
     [ 'extends', 'FObject' ],
     'refines',
+    'order',
     { name: 'documentation', adapt: function(_, d) { return typeof d === 'function' ? foam.String.multiline(d).trim() : d; } },
     {
       // List of all axioms, including methods, properties, listeners,
@@ -87,19 +88,6 @@ foam.CLASS({
   ],
 
   methods: [
-    foam.boot.buildClass,
-    function init() {
-      if ( this.hasOwnProperty('refines') && ! this.hasOwnProperty('name') ) {
-        // A refinement without a name won't have a valid ID so set the name and
-        // package based on the model getting refined. Also use the first axiom
-        // that's found so models that are refined multiple times are less
-        // likely to have a duplicate ID.
-        var i = this.refines.lastIndexOf('.');
-        var n = this.refines.substring(i + 1) + 'Refines';
-        if ( this.axioms_.length ) n = n + this.axioms_[0].name;
-        this.name = n;
-        this.package = this.refines.substring(0, i);
-      }
-    },
+    foam.boot.buildClass
   ]
 });

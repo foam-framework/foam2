@@ -1,4 +1,6 @@
 foam.CLASS({
+  package: 'org.chartjs',
+  name: 'ChartJSPropertyFormatterRefinement',
   refines: 'foam.core.Property',
   properties: [
     {
@@ -9,6 +11,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'org.chartjs',
+  name: 'ChartJSDateFormatterRefinement',
   refines: 'foam.core.Date',
   properties: [
     {
@@ -27,6 +31,8 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'org.chartjs',
+  name: 'ChartJSDateTimeFormatterRefinement',
   refines: 'foam.core.DateTime',
   properties: [
     {
@@ -57,7 +63,6 @@ foam.CLASS({
     'foam.dao.ProxySink',
     'foam.mlang.sink.AbstractUnarySink',
     'foam.mlang.sink.GroupBy',
-    'foam.mlang.sink.Plot',
     'org.chartjs.Lib',
   ],
   properties: [
@@ -110,7 +115,7 @@ foam.CLASS({
       name: 'dataProperties_',
       expression: function(data) {
         var getData = function(data) {
-          if ( this.GroupBy.isInstance(data) || this.Plot.isInstance(data) ) {
+          if ( this.GroupBy.isInstance(data) ) {
             return getData(data.arg1).concat(getData(data.arg2));
           } else if ( this.ProxySink.isInstance(data) ) {
             return getData(data.delegate);
@@ -209,8 +214,6 @@ foam.CLASS({
             }))
           });
           return Promise.all(ps).then(function() { return o });
-        } else if ( this.Plot.isInstance(data) ) {
-          return Promise.resolve(data.points);
         } else if ( this.ProxySink.isInstance(data) ) {
           return getData(data.delegate);
         } else if ( data && data.value ) {

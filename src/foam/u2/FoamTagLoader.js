@@ -21,7 +21,7 @@ foam.CLASS({
     function findPropertyIC(cls, name) {
       var ps = cls.getAxiomsByClass(foam.core.Property);
       for ( var i = 0 ; i < ps.length ; i++ ) {
-        if ( name === ps[i].name.toLowerCase() ) return ps[i];
+        if ( name == ps[i].name.toLowerCase() ) return ps[i];
       }
     },
 
@@ -31,14 +31,7 @@ foam.CLASS({
       this.classloader.load(clsName).then(function(cls) {
         var obj = cls.create(null, foam.__context__);
 
-        /*
-        if ( obj.then ) {
-          var p = new Promise(function(resolve) {
-            obj.then(function() { resolve(); });
-          });
-          return p;
-        }
-        */
+        this.setAttributes(el, obj);
 
         if ( obj.promiseE ) {
           obj.promiseE().then(function(view) { this.installView(el, view); });
@@ -56,17 +49,21 @@ foam.CLASS({
     function installView(el, view) {
       var id = el.id;
 
-      for ( var j = 0 ; j < el.attributes.length ; j++ ) {
-        var attr = el.attributes[j];
-        var p    = this.findPropertyIC(view.cls_, attr.name);
-        if ( p ) p.set(view, attr.value);
-      }
+      // this.setAttributes(el, view);
 
       el.outerHTML = view.outerHTML;
       view.load();
 
       // Store view in global variable if named. Useful for testing.
       if ( id ) global[id] = view;
+    },
+
+    function setAttributes(el, obj) {
+      for ( var j = 0 ; j < el.attributes.length ; j++ ) {
+        var attr = el.attributes[j];
+        var p    = this.findPropertyIC(obj.cls_, attr.name);
+        if ( p ) p.set(obj, attr.value);
+      }
     }
   ],
 
@@ -82,7 +79,8 @@ foam.CLASS({
 
 
 foam.SCRIPT({
-  id: 'foam.u2.FoamTagLoaderScript',
+  package: 'foam.u2',
+  name: 'FoamTagLoaderScript',
   requires: [ 'foam.u2.FoamTagLoader' ],
   flags: [ 'web' ],
   code: function() { foam.u2.FoamTagLoader.create(); }

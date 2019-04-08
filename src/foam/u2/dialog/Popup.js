@@ -20,10 +20,10 @@ foam.CLASS({
   name: 'Popup',
   extends: 'foam.u2.Element',
 
-  documentation: 'This is a container for a whole-screen, modal overlay. It ' +
-      'fills the viewport with a transparent grey background, and then ' +
-      'centers the "content" element. Clicking the background closes the ' +
-      'dialog. Exports itself as "overlay", for use by OK and CANCEL buttons.',
+  documentation: `This is a container for a whole-screen, modal overlay. It
+    fills the viewport with a transparent grey background, and then
+    centers the "content" element. Clicking the background closes the
+    dialog. Exports itself as "overlay", for use by OK and CANCEL buttons.`,
 
   exports: [
     'close as closeDialog'
@@ -71,7 +71,8 @@ foam.CLASS({
       name: 'closeable',
       class: 'Boolean',
       value: true
-    }
+    },
+    'onClose'
   ],
 
   methods: [
@@ -83,13 +84,13 @@ foam.CLASS({
         .start()
         .addClass(this.myClass('container'))
         .start()
-            .addClass(this.myClass('background'))
-            .on('click', this.closeable ? this.close : null)
+          .addClass(this.myClass('background'))
+          .on('click', this.closeable ? this.close : null)
         .end()
         .start()
-            .call(function() { content = this; })
-            .addClass(this.myClass('inner'))
-            .style({ 'background-color': this.backgroundColor })
+          .call(function() { content = this; })
+          .addClass(this.myClass('inner'))
+          .style({ 'background-color': this.backgroundColor })
         .end()
       .end();
 
@@ -104,6 +105,7 @@ foam.CLASS({
 
   listeners: [
     function close() {
+      if ( this.onClose ) this.onClose();
       this.remove();
     }
   ]

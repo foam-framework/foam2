@@ -50,15 +50,15 @@ return w
     {
       class: 'ContextMethod',
       name: 'lookup',
-      swiftReturns: 'ClassInfo?',
+      swiftType: 'ClassInfo?',
       swiftThrows: true,
       args: [
         {
-          swiftType: 'Context',
+          type: 'Context',
           name: 'X',
         },
         {
-          swiftType: 'String',
+          type: 'String',
           name: 'id',
         },
       ],
@@ -69,10 +69,11 @@ return w
         return this.__context__.lookup.call(X, id);
       },
       swiftCode: function() {/*
+let id = id!
 if whitelist.contains(id) {
   throw FoamError("Class " + id + " is not whitelisted.")
 }
-return X.lookup(id)
+return X!.lookup(id)
       */}
     }
   ]

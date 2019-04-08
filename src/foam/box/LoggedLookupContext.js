@@ -34,15 +34,15 @@ foam.CLASS({
     {
       class: 'ContextMethod',
       name: 'lookup',
-      swiftReturns: 'ClassInfo?',
+      swiftType: 'ClassInfo?',
       swiftThrows: true,
       args: [
         {
-          swiftType: 'Context',
+          type: 'Context',
           name: 'X',
         },
         {
-          swiftType: 'String',
+          type: 'String',
           name: 'id',
         },
       ],
@@ -52,7 +52,7 @@ foam.CLASS({
       },
       swiftCode: function() {/*
 record[id] = id;
-return X.lookup(id)
+return X!.lookup(id)
       */}
     }
   ]

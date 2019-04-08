@@ -69,8 +69,8 @@ public class SessionWebAgent
       }
 
       // execute delegate
-      getDelegate().execute(x.put(Session.class, session).put("user", user));
-    } catch ( Throwable t ) {
+      getDelegate().execute(session.getContext().put(HttpServletResponse.class, resp).put(HttpServletRequest.class, req));
+  } catch ( Throwable t ) {
       logger.error("Unexpected exception in SessionWebAgent", t);
       // throw unauthorized on error
       resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

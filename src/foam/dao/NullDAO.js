@@ -72,7 +72,7 @@ return null;
         return Promise.resolve(sink);
       },
       swiftCode: `
-sink.eof()
+sink?.eof()
 return sink
       `,
       javaCode: `

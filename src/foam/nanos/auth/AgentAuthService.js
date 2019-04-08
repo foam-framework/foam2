@@ -23,8 +23,8 @@ foam.INTERFACE({
   methods: [
     {
       name: 'actAs',
-      javaReturns: 'foam.nanos.auth.User',
-      swiftReturns: 'foam_nanos_auth_User',
+      type: 'foam.nanos.auth.User',
+      async: true,
       javaThrows: [
         'foam.nanos.auth.AuthorizationException',
         'foam.nanos.auth.AuthenticationException'
@@ -33,19 +33,39 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
+          type: 'Context',
         },
         {
           name: 'entity',
-          javaType: 'foam.nanos.auth.User'
+          type: 'foam.nanos.auth.User'
+        }
+      ]
+    },
+    {
+      name: 'canActAs',
+      documentation: `Returns a boolean indicating whether the provided agent has adequate permission to actAs the provided entity.`,
+      type: 'Boolean',
+      async: true,
+      swiftThrows: true,
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'agent',
+          type: 'foam.nanos.auth.User'
+        },
+        {
+          name: 'entity',
+          type: 'foam.nanos.auth.User'
         }
       ]
     },
     {
       name: 'getCurrentAgent',
-      javaReturns: 'foam.nanos.auth.User',
-      swiftReturns: 'foam_nanos_auth_User?',
+      type: 'foam.nanos.auth.User',
+      async: true,
       javaThrows: [
         'foam.nanos.auth.AuthorizationException',
         'foam.nanos.auth.AuthenticationException'
@@ -54,8 +74,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
+          type: 'Context'
         }
       ]
     }

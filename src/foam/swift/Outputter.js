@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.swift', // TODO: Copied from java. Move somewhere central.
   name: 'Outputter',
+  flags: ['swift'],
 
   properties: [
     {

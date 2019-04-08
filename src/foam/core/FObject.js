@@ -33,7 +33,10 @@ foam.LIB({
     // Each class has a prototype object which is the prototype of all
     // instances of the class. A classes prototype extends its parent
     // classes prototype.
-    prototype: {},
+    prototype: {
+      // Bootstrap context getter, upgraded in EndBoot.js
+      get __context__() { return foam.__context__; }
+    },
 
     // Each class has a map of Axioms added to the class.
     // Map keys are the name of the axiom.
@@ -198,10 +201,13 @@ foam.LIB({
        * if it implements this class (directly or indirectly).
        */
 
-      if ( ! c || ! c.id ) return false;
+      if ( ! c || ! c.id || ! c.prototype ) return false;
+
+      // This optimization means we can't use foam.core.isSubClass() to check
+      // if an object is a class or not.
 
       // Optimize most common case and avoid creating cache
-      if ( this === foam.core.FObject ) return true;
+      // if ( this === foam.core.FObject ) return true;
 
       var cache = this.private_.isSubClassCache ||
         ( this.private_.isSubClassCache = {} );
@@ -499,25 +505,6 @@ foam.CLASS({
       }
     },
 
-
-    /************************************************
-     * Console
-     ************************************************/
-
-    // Imports aren't implemented yet, so mimic:
-    //   imports: [ 'lookup', 'assert', 'error', 'log', 'warn' ],
-
-
-    // Bootstrap form replaced after this.__context__ is added.
-    function lookup() { return foam.lookup.apply(foam, arguments); },
-
-    function error() { this.__context__.error.apply(null, arguments); },
-
-    function log() { this.__context__.log.apply(null, arguments); },
-
-    function warn() { this.__context__.warn.apply(null, arguments); },
-
-
     /************************************************
      * Publish and Subscribe
      ************************************************/
@@ -597,7 +584,9 @@ foam.CLASS({
             case 9: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]); break;
             default: l.apply(l, [s].concat(Array.from(a)));
           }
-        } catch (x) {}
+        } catch (x) {
+          if ( foam._IS_DEBUG_ ) console.warn("Listener threw exception", x);
+        }
         count++;
       }
       return count;
@@ -999,10 +988,6 @@ foam.CLASS({
       // Distinguish between prototypes and instances.
       return this.cls_.id + (
           this.cls_.prototype === this ? 'Proto' : '');
-    },
-
-    function toJSON() {
-      return foam.json.stringify(this);
     },
 
     function dot(name) {

@@ -203,7 +203,7 @@ return new LimitedDAO(this.getX(), count, this);
         this.pipe_(this.__context__, sink, undefined);
       },
       swiftCode: 'return try pipe_(__context__, sink)',
-      javaCode: `this.pipe_(this.getX(), sink);`,
+      javaCode: `this.pipe_(this.getX(), sink, null);`,
     },
 
     {
@@ -270,13 +270,13 @@ return on.sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
   guard let topic = args[1] as? String else { return }
   switch topic {
     case "put":
-      mySink.put(args.last as! foam_core_FObject, sub)
+      mySink?.put(args.last as! foam_core_FObject, sub)
       break
     case "remove":
-      mySink.remove(args.last as! foam_core_FObject, sub)
+      mySink?.remove(args.last as! foam_core_FObject, sub)
       break
     case "reset":
-      mySink.reset(sub)
+      mySink?.reset(sub)
       break
     default:
       break
@@ -291,19 +291,15 @@ listeners_.add(new DAOListener(sink, listeners_));
 
     {
       name: 'decorateListener_',
-      swiftReturns: 'foam_dao_Sink',
-      javaReturns: 'Sink',
+      type: 'foam.dao.Sink',
       args: [
         {
-          of: 'foam.dao.Sink',
           name: 'sink',
-          javaType: 'Sink',
+          type: 'foam.dao.Sink'
         },
         {
-          of: 'foam.mlang.predicate.Predicate',
-          optional: true,
           name: 'predicate',
-          javaType: 'foam.mlang.predicate.Predicate',
+          type: 'foam.mlang.predicate.Predicate',
         },
       ],
       code: function decorateListener_(sink, predicate) {
@@ -339,35 +335,27 @@ return sink;
     */
     {
       name: 'decorateSink_',
-      swiftReturns: 'foam_dao_Sink',
-      javaReturns: 'foam.dao.Sink',
+      type: 'foam.dao.Sink',
       args: [
         {
-          of: 'foam.dao.Sink',
           name: 'sink',
-          javaType: 'foam.dao.Sink',
+          type: 'foam.dao.Sink'
         },
         {
           name: 'skip',
-          swiftType: 'Int?',
-          javaType: 'long',
+          type: 'Long'
         },
         {
           name: 'limit',
-          swiftType: 'Int?',
-          javaType: 'long',
+          type: 'Long'
         },
         {
-          of: 'foam.mlang.order.Comparator',
           name: 'order',
-          optional: true,
-          javaType: 'foam.mlang.order.Comparator',
+          type: 'foam.mlang.order.Comparator',
         },
         {
-          of: 'foam.mlang.predicate.Predicate',
           name: 'predicate',
-          optional: true,
-          javaType: 'foam.mlang.predicate.Predicate',
+          type: 'foam.mlang.predicate.Predicate',
         },
       ],
       code: function decorateSink_(sink, skip, limit, order, predicate) {
@@ -405,13 +393,13 @@ return sink;
       },
       swiftCode: function() {/*
 var sink = sink
-if limit != nil {
+if limit > 0 {
   sink = LimitedSink_create([
     "limit": limit,
     "delegate": sink
   ])
 }
-if skip != nil {
+if skip > 0 {
   sink = SkipSink_create([
     "skip": skip,
     "delegate": sink
@@ -559,31 +547,31 @@ this.select_(x, new RemoveSink(x, this), skip, limit, order, predicate);
   static: [
     {
       name: 'decorateSink',
-      javaReturns: 'foam.dao.Sink',
+      type: 'foam.dao.Sink',
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
+          type: 'Context'
         },
         {
           name: 'sink',
-          javaType: 'foam.dao.Sink',
+          type: 'foam.dao.Sink',
         },
         {
           name: 'skip',
-          javaType: 'long',
+          type: 'Long'
         },
         {
           name: 'limit',
-          javaType: 'long',
+          type: 'Long'
         },
         {
           name: 'order',
-          javaType: 'foam.mlang.order.Comparator',
+          type: 'foam.mlang.order.Comparator'
         },
         {
           name: 'predicate',
-          javaType: 'foam.mlang.predicate.Predicate',
+          type: 'foam.mlang.predicate.Predicate'
         },
       ],
       javaCode: `
@@ -724,7 +712,7 @@ foam.CLASS({
   properties: [
     {
       class: 'FObjectProperty',
-      of: 'foam.mlang.order.Comparator',
+      type: 'foam.mlang.order.Comparator',
       name: 'comparator'
     }
   ],

@@ -61,21 +61,26 @@ foam.CLASS({
     'foam.dao.RequestResponseClientDAO',
     'foam.dao.SequenceNumberDAO',
     'foam.dao.SyncDAO',
-    'foam.dao.TimingDAO'
+    'foam.dao.TimingDAO',
+    'foam.dao.JournalType'
   ],
 
   imports: [ 'document' ],
 
-  constants: {
-    // Aliases for daoType
-    ALIASES: {
-      ARRAY:  'foam.dao.ArrayDAO',
-      CLIENT: 'foam.dao.RequestResponseClientDAO',
-      IDB:    'foam.dao.IDBDAO',
-      LOCAL:  'foam.dao.LocalStorageDAO',
-      MDAO:   'foam.dao.MDAO'
+  constants: [
+    {
+      // Aliases for daoType
+      name: 'aliases',
+      flags: [ 'js' ],
+      value: {
+        ARRAY:  'foam.dao.ArrayDAO',
+        CLIENT: 'foam.dao.RequestResponseClientDAO',
+        IDB:    'foam.dao.IDBDAO',
+        LOCAL:  'foam.dao.LocalStorageDAO',
+        MDAO:   'foam.dao.MDAO'
+      }
     }
-  },
+  ],
 
   properties: [
     {
@@ -95,7 +100,7 @@ foam.dao.DAO delegate = getInnerDAO() == null ?
 
 if ( delegate instanceof foam.dao.MDAO ) setMdao((foam.dao.MDAO)delegate);
 
-if ( getJournaled() ) {
+if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
   delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
 }
 
@@ -136,7 +141,7 @@ return delegate;
     },
     {
       class: 'Object',
-      javaType: 'foam.dao.DAO',
+      type: 'foam.dao.DAO',
       name: 'innerDAO'
     },
     {
@@ -193,9 +198,10 @@ return delegate;
     },
     {
       /** Keep a history of all state changes to the DAO. */
-      class: 'Boolean',
-      name: 'journaled',
-      value: false
+      class: 'foam.core.Enum',
+      of: 'foam.dao.JournalType',
+      name: 'journalType',
+      value: 'NO_JOURNAL'
     },
     {
       class: 'String',
@@ -233,12 +239,6 @@ return delegate;
       name: 'contextualize',
       value: false
     },
-//     {
-//       class: 'Boolean',
-//       name: 'cloning',
-//       value: false,
-//       //documentation: "True to clone results on select"
-//     },
     {
       /**
         <p>Selects the basic functionality this EasyDAO should provide.
@@ -267,12 +267,6 @@ return delegate;
       name: 'autoIndex',
       value: false
     },
-//     {
-//       /** Creates an internal MigrationDAO and applies the given array of MigrationRule. */
-//       class: 'FObjectArray',
-//       name: 'migrationRules',
-//       of: 'foam.core.dao.MigrationRule',
-//     },
     {
       /** Turn on to activate synchronization with a server. Specify serverUri
         and syncProperty as well. */
@@ -383,11 +377,11 @@ return delegate;
       }
 
       var daoModel = typeof daoType === 'string' ?
-        this.lookup(daoType) || global[daoType] :
+        this.__context__.lookup(daoType) || global[daoType] :
         daoType;
 
       if ( ! daoModel ) {
-        this.warn(
+        this.__context__.warn(
           "EasyDAO: Unknown DAO Type.  Add '" + daoType + "' to requires: list."
         );
       }
@@ -499,7 +493,7 @@ return delegate;
         dao = decorated;
       }
 
-      if ( this.timing  ) {
+      if ( this.timing ) {
         dao = this.TimingDAO.create({ name: this.name + 'DAO', delegate: dao });
       }
 
@@ -545,8 +539,7 @@ return delegate;
     */
     {
       name: 'addPropertyIndex',
-      returns: 'foam.dao.EasyDAO',
-      javaReturns: 'foam.dao.EasyDAO',
+      type: 'foam.dao.EasyDAO',
       args: [ { javaType: 'foam.core.PropertyInfo', name: 'prop' } ],
       code:     function addPropertyIndex() {
         this.mdao && this.mdao.addPropertyIndex.apply(this.mdao, arguments);
@@ -567,8 +560,8 @@ return this;
     */
     {
       name: 'addIndex',
-      returns: 'foam.dao.EasyDAO',
-      javaReturns: 'foam.dao.EasyDAO',
+      type: 'foam.dao.EasyDAO',
+      // TODO: The java Index interface conflicts with the js CLASS Index
       args: [ { javaType: 'foam.dao.index.Index', name: 'index' } ],
       code: function addIndex(index) {
         this.mdao && this.mdao.addIndex.apply(this.mdao, arguments);

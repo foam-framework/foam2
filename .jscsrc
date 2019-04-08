@@ -24,9 +24,6 @@
     mark: "'",
     escape: true
   },
-  "jsDoc": {
-    "checkAnnotations": "jsdoc3"
-  },
 
   "foamExplodedStatements": true,
   "foamRequireCurlyBraces": true,

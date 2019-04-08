@@ -29,6 +29,17 @@ foam.CLASS({
       }
     },
     {
+      class: 'Long',
+      name: 'agentId',
+      tableCellFormatter: function(value, obj) {
+        if ( ! value ) return;
+        this.add(value);
+        this.__context__.userDAO.find(value).then(function(user) {
+          this.add(' ', user.label());
+        }.bind(this));
+      }
+    },
+    {
       class: 'DateTime',
       name: 'created',
       factory: function() { return new Date(); },
@@ -43,19 +54,15 @@ foam.CLASS({
       name: 'uses'
     },
     {
-      class: 'DateTime',
-      name: 'expiry',
-      javaFactory: 'return new Date(System.currentTimeMillis()+8l*60l*60l*1000l);'
-    },
-    {
       class: 'String',
       name: 'remoteHost'
     },
     {
       class: 'Object',
       name: 'context',
-      javaType: 'foam.core.X',
-      javaFactory: 'return foam.core.EmptyX.instance().put(Session.class, this);',
+      type: 'Context',
+      // Put a null user to prevent sytem user from leaking into subcontexts
+      javaFactory: 'return getX().put("user", null).put("group", null).put(Session.class, this);',
       hidden: true,
       transient: true
     }
@@ -66,12 +73,13 @@ foam.CLASS({
     // in the SessionDAO.
     {
       name: 'fclone',
-      javaReturns: 'foam.core.FObject',
+      type: 'foam.core.FObject',
       javaCode: 'return this;'
     },
     {
       name: 'freeze',
-      javaCode: ' //nop '
+      type: 'foam.core.FObject',
+      javaCode: ' return this; '
     },
     {
       name: 'touch',

@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.swift',
   name: 'Method',
+  flags: ['swift'],
 
   properties: [
     'name',
@@ -50,7 +51,7 @@ foam.CLASS({
       o.out(
         ')',
         this.throws ? ' throws' : '',
-        this.returnType ? ' -> ' + this.returnType : '',
+        this.returnType && this.returnType != 'Void' ? ' -> ' + this.returnType : '',
         ' {\n');
 
       o.increaseIndent();

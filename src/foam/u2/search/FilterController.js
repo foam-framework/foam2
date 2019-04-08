@@ -606,3 +606,33 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.CLASS({
+  package: 'foam.u2.search',
+  name: 'DAOPropertyRefinement',
+  refines: 'foam.dao.DAOProperty',
+
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'searchView',
+      value: null
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2.search',
+  name: 'ManyToManyRelationshipPropertyRefinement',
+  refines: 'foam.dao.ManyToManyRelationshipProperty',
+
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'searchView',
+      value: null
+    }
+  ]
+});

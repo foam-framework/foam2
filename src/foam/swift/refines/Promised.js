@@ -5,44 +5,54 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'PromisedMethodSwiftRefinement',
   refines: 'foam.core.PromisedMethod',
   flags: ['swift'],
   properties: [
     {
       name: 'swiftCode',
       getter: function() {
-        return this.swiftThrows ? this.swiftCodeGenerator() : 'fatalError()';
+        return `
+if !self.delegate!.hasOwnProperty("${this.property}") { self.delegate!.${this.property}Sem.wait() }
+${this.swiftType != 'void' ? 'return ' : ''}${this.swiftThrows ? 'try ' : ''}self.delegate!
+  .${this.name}(${this.swiftArgs.map(a => a.localName).join(', ')});
+        `;
       }
     }
-  ],
-  templates: [
-    {
-      name: 'swiftCodeGenerator',
-      template: function() {/*
-let delegate = try! self.obj.<%=this.property%>.get()
-let method = delegate.getSlot(key: "<%=this.swiftName%>")!.swiftGet() as! MethodSlotClosure
-let args = [<%=this.swiftArgs.map(function(a) { return a.localName }).join(', ')%>] as [Any?]
-<% if (this.swiftReturns) { %>
-return try! method(args) as! <%=this.swiftReturns%>
-<% } else { %>
-_ = try! method(args)
-<% } %>
-      */},
-    },
-  ],
+  ]
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'PromisedSwiftRefinement',
   refines: 'foam.core.Promised',
   flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
-      value: 'Future<foam_core_FObject>',
+      expression: function(of) {
+        return foam.lookup(of).model_.swiftName;
+      }
     },
     {
-      name: 'swiftFactory',
-      value: 'return Future<foam_core_FObject>()',
-    },
+      name: 'swiftPostSet',
+      expression: function(name, stateName) {
+        return `
+${stateName} = newValue
+while ${name}Sem.signal() > 0 {}
+        `;
+      }
+    }
+  ],
+  methods: [
+    function writeToSwiftClass(cls, parentCls) {
+      this.SUPER(cls, parentCls);
+      cls.field({
+        name: `${this.name}Sem`,
+        type: 'DispatchSemaphore',
+        initializer: 'DispatchSemaphore(value: 0)'
+      });
+    }
   ]
 });

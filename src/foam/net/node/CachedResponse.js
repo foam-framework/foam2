@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.net.node',
   name: 'CachedResponse',
-
+  flags: ['node'],
   documentation: `Finalized HTTP response that can be replayed.`,
 
   imports: [ 'info' ],

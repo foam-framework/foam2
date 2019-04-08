@@ -23,36 +23,17 @@ foam.CLASS({
   properties: [
     {
       name: 'code',
-      expression: function(name, property, returns, delegate) {
-        if ( delegate ) {
-          return returns ?
-            function() {
-              var self = this;
-              var args = arguments;
-              return this[property].then(function(d) {
-                return d[name].apply(self, args);
-              });
-            } :
-            function() {
-              var self = this;
-              var args = arguments;
-              this[property].then(function(d) {
-                d[name].apply(self, args);
-              });
-            };
-        }
-        return returns ?
+      expression: function(name, property, type) {
+        return type ?
           function() {
-            var self = this;
             var args = arguments;
-            return this[property].then(function(d) {
+            return this.delegate[property].then(function(d) {
               return d[name].apply(d, args);
             });
           } :
           function() {
-            var self = this;
             var args = arguments;
-            this[property].then(function(d) {
+            this.delegate[property].then(function(d) {
               d[name].apply(d, args);
             });
           };
@@ -67,7 +48,7 @@ foam.CLASS({
   name: 'Promised',
   extends: 'Property',
   requires: [
-    'foam.core.PromisedMethod',
+    'foam.core.PromisedMethod'
   ],
   properties: [
     {
@@ -87,16 +68,17 @@ foam.CLASS({
       factory: null
     },
     {
+      class: 'String',
+      name: 'stateName',
+      expression: function(name) { return name + 'State'; }
+    },
+    {
       name: 'postSet',
-      expression: function(name) {
-        var stateName    = name + 'State';
-        var delegateName = name + 'Delegate';
+      expression: function(stateName) {
         return function(_, p) {
           var self = this;
-          this[stateName]    = undefined;
-          this[delegateName] = undefined;
-
-          p.then(function(d) { self[delegateName] = d; });
+          this[stateName] = undefined;
+          p.then(function(d) { self[stateName] = d; });
         };
       }
     }
@@ -107,12 +89,10 @@ foam.CLASS({
       this.SUPER(cls);
 
       var myName         = this.name;
-      var stateName      = this.name + 'State';
-      var delegateName   = this.name + 'Delegate';
+      var stateName      = this.stateName;
       var pendingState   = 'Pending' + foam.String.capitalize(myName);
-      var fulfilledState = 'Fulfilled' + foam.String.capitalize(myName);
 
-      var delegate = this.lookup(this.of);
+      var delegate = this.__context__.lookup(this.of);
 
       function resolveName(name) {
         var m = delegate.getAxiomByName(name);
@@ -128,76 +108,56 @@ foam.CLASS({
 
       var myAxioms = [
         foam.core.Proxy.create({
-          name:      stateName,
-          of:        this.of,
-          delegates: methodNames,
-          forwards:  [],
+          name: stateName,
+          of: this.of,
+          forwards: methodNames,
           factory: function() {
-            return this[pendingState].create();
+            return this[pendingState].create({ delegate: this });
           },
-          swiftFactory: `return ${pendingState}_create(["obj": self])`,
+          swiftFactory: `
+            return ${pendingState}_create(["delegate": self])
+          `,
+          javaFactory: `
+            return new ${pendingState}.Builder(getX()).setDelegate(this).build();
+          `,
           transient: true
-        }),
-        foam.core.Property.create({
-          name: delegateName,
-          postSet: function() {
-            this[stateName] = this[fulfilledState].create();
-          },
-          swiftGetter: `return try! ${myName}.get() as! ${foam.lookup(this.of).model_.swiftName}`,
         }),
         foam.core.ProxySub.create({
           topics: this.topics,
-          prop:   delegateName
+          prop:   stateName
         })
       ];
 
       var pendingMethods = [];
 
+      // Use all methods from here on in to satisfy the interface.
+      // Methods that aren't part of this.methods should never get called
+      // but they need to be added to make compilers happy.
+      methods = delegate.getOwnAxiomsByClass(foam.core.Method);
       for ( var i = 0 ; i < methods.length ; i++ ) {
         pendingMethods.push(foam.core.PromisedMethod.create({
           name: methods[i].name,
           property: myName,
-          returns:  methods[i].returns,
           delegate: false
         }));
       }
 
-      var name = this.name;
       myAxioms = myAxioms.concat(
         foam.core.InnerClass.create({
           model: {
             name: pendingState,
             implements: [this.of],
-            axioms: [
-              foam.pattern.Singleton.create()
-            ],
             methods: pendingMethods,
             properties: [
-              {
-                swiftType: cls.model_.swiftName,
-                name: 'obj',
-              },
-            ],
-          }
-        }),
-        foam.core.InnerClass.create({
-          model: {
-            name: fulfilledState,
-            properties: [
-              {
-                class:    'Proxy',
-                name:     delegateName,
-                of:       this.of,
-                topics:   this.topics,
-                forwards: methodNames
+              {	
+                class: 'FObjectProperty',
+                of: cls.id,	
+                name: 'delegate'	
               }
-            ],
-            axioms: [
-              foam.pattern.Singleton.create()
-            ],
-            generateSwift: false,
+            ]
           }
-        }));
+        })
+      );
 
       cls.installAxioms(myAxioms);
     }

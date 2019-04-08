@@ -41,8 +41,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'type',
-      expression: function(axiom$returns) {
-        return axiom$returns || 'Void';
+      expression: function(axiom$type) {
+        return axiom$type || 'Void';
       },
       tableCellFormatter: function(v) {
         this.start('code').add(v).end();

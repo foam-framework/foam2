@@ -93,6 +93,9 @@ foam.CLASS({
     'key',
     'of',
     {
+      name: 'type'
+    },
+    {
       class: 'Boolean',
       name: 'required',
       value: true
@@ -126,7 +129,9 @@ foam.CLASS({
         get: function importsGetter()  {
           var slot = this[slotName];
           if ( slot ) return slot.get();
-          if ( required ) console.warn('Access missing import:', name);
+          if ( required ) {
+            console.warn('Access missing import:', name);
+          }
           return undefined;
         },
         set: function importsSetter(v) {

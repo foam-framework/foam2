@@ -28,6 +28,7 @@ foam.CLASS({
     'foam.util.SafetyUtil',
     'java.io.BufferedReader',
     'java.io.BufferedWriter',
+    'java.io.InputStreamReader',
     'java.io.File',
     'java.io.FileReader',
     'java.io.FileWriter',
@@ -148,12 +149,17 @@ foam.CLASS({
       name: 'reader',
       javaType: 'java.io.BufferedReader',
       javaGetter: `
-        try {
+      try {
+        Storage storage = (Storage) getX().get(Storage.class);
+        if ( storage.isResource() ) {
+          return new BufferedReader(new InputStreamReader(storage.getResourceAsStream(getFilename())));
+        } else {
           return new BufferedReader(new FileReader(getFile()));
-        } catch ( Throwable t ) {
-          getLogger().error("Failed to read from journal", t);
-          throw new RuntimeException(t);
         }
+      } catch ( Throwable t ) {
+        getLogger().error("Failed to read from journal", t);
+        throw new RuntimeException(t);
+      }
       `
     },
     // writer uses a factory because we want to use one writer for the lifetime of this journal object
@@ -252,11 +258,11 @@ foam.CLASS({
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          type: 'foam.core.FObject'
         }
       ],
       javaCode: `
@@ -325,7 +331,7 @@ foam.CLASS({
     {
       name: 'getParsingErrorMessage',
       documentation: 'Gets the result of a failed parsing of a journal line',
-      javaReturns: 'String',
+      type: 'String',
       args: [
         {
           class: 'String',
@@ -347,16 +353,16 @@ foam.CLASS({
     },
     {
       name: 'mergeFObject',
-      javaReturns: 'foam.core.FObject',
+      type: 'foam.core.FObject',
       documentation: 'Add diff property to old property',
       args: [
         {
-          class: 'FObjectProperty',
           name: 'oldFObject',
+          type: 'FObject'
         },
         {
-          class: 'FObjectProperty',
-          name: 'diffFObject'
+          name: 'diffFObject',
+          type: 'FObject'
         }
       ],
       javaCode: `
@@ -375,12 +381,12 @@ foam.CLASS({
       name: 'mergeProperty',
       args: [
         {
-          class: 'FObjectProperty',
           name: 'oldFObject',
+          type: 'FObject'
         },
         {
-          class: 'FObjectProperty',
-          name: 'diffFObject'
+          name: 'diffFObject',
+          type: 'FObject'
         },
         {
           name: 'prop',

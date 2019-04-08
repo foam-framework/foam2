@@ -145,8 +145,7 @@ foam.CLASS({
 });
 
 
-// TODO(adamvy): Remove the need to store this relationship globally.
-var relationship = foam.RELATIONSHIP({
+foam.RELATIONSHIP({
   forwardName: 'children',
   inverseName: 'parent',
   cadinality: '1:*',
@@ -197,9 +196,7 @@ foam.CLASS({
     'updateMemento'
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
+  css: `
       body { overflow: hidden; user-select: none; font-family: 'Roboto', sans-serif; color: #444; }
       ^ { display: flex; }
       ^ > * { padding-left: 16px; padding-right: 16px; }
@@ -218,9 +215,7 @@ foam.CLASS({
       .foam-u2-Tabs { padding-top: 0 !important; margin-right: -8px; }
       input[type="range"] { width: 60px; height: 15px; }
       input[type="color"] { width: 60px; }
-      */}
-    })
-  ],
+`,
 
   properties: [
     {
@@ -321,7 +316,9 @@ foam.CLASS({
     'feedback_',
     {
       name: 'currentTool',
-      value: com.google.flow.Select.model_
+      factory: function() {
+        return com.google.flow.Select.model_;
+      }
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -388,16 +385,18 @@ foam.CLASS({
     },
     {
       name: 'properties',
-      view: {
-        class: 'com.google.flow.TreeView',
-        relationship: relationship,
-        startExpanded: true,
-        formatter: function() {
-          var X = this.__subSubContext__;
-          this.start('span').add(X.data.name).end().
-            start('span').nbsp().style({ display: 'inline-block', width: '50px' }).end().
-            start('span').add(com.google.flow.Property.DELETE_ROW).end();
-        }
+      view: function(args, x) {
+        return {
+          class: 'com.google.flow.TreeView',
+          relationship: com.gogle.flow.PropertyPropertyRelationship,
+          startExpanded: true,
+          formatter: function() {
+            var X = this.__subSubContext__;
+            this.start('span').add(X.data.name).end().
+              start('span').nbsp().style({ display: 'inline-block', width: '50px' }).end().
+              start('span').add(com.google.flow.Property.DELETE_ROW).end();
+          }
+        };
       },
       factory: function() {
         var dao = this.EasyDAO.create({
@@ -677,7 +676,7 @@ foam.CLASS({
       if ( c === this.canvas ) {
         var tool = this.currentTool;
         if ( tool === this.CURRENT_TOOL.value ) return;
-        var cls = this.lookup(tool.id);
+        var cls = this.__context__.lookup(tool.id);
         var o = cls.create({x: x, y: y}, this.__subContext__);
         var p = this.addProperty(o, null, null, 'canvas1');
         // TODO: hack because addProperty is asyn

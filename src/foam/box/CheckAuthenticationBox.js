@@ -29,7 +29,22 @@ foam.CLASS({
       name: 'send',
       code: function send() {
         throw new Error('Unimplemented.');
-      }
+      },
+      javaCode: `try {
+  String token = (String)msg.getAttributes().get("idToken");
+
+  if ( token == null ) {
+    throw new java.security.GeneralSecurityException("No ID Token present.");
+  }
+
+  String principal = ((com.google.auth.TokenVerifier)getTokenVerifier()).verify(token);
+
+  msg.getAttributes().put("principal", principal);
+
+  super.send(msg);
+} catch ( java.security.GeneralSecurityException e) {
+  throw new RuntimeException("Failed to verify token.", e);
+}`
     }
   ]
 });

@@ -17,12 +17,12 @@ public class ASCIIEscapeParser
       new Whitespace(),
       new Literal("\\"),
       new Alt(
+        new Literal("\\"),
         new Literal("n"),
         new Literal("t"),
         new Literal("r"),
         new Literal("f"),
-        new Literal("b")),
-      new Whitespace()));
+        new Literal("b"))));
   }
 
   public PStream parse(PStream ps, ParserContext x) {
@@ -34,6 +34,8 @@ public class ASCIIEscapeParser
       char c = values[2].toString().charAt(0);
 
       switch ( c ) {
+        case '\\': c = '\\';
+          break;
         case 'n': c = '\n';
           break;
         case 't': c = '\t';

@@ -106,9 +106,7 @@ foam.CLASS({
     },
 
     function warn() {
-      var msg = Array.prototype.join.call(arguments, '');
-      if ( SUPPRESSED_WARNINGS[msg] ) return;
-      this.console.warn(msg)
+      this.console.warn.apply(this.console, arguments);
     },
 
     function async(l) {
@@ -208,6 +206,21 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'WindowNodeJSRefinement',
+  refines: 'foam.core.Window',
+  flags: [ 'node' ],
+  methods: [
+    function requestAnimationFrame(f) {
+      return this.setTimeout(f, 16);
+    },
+    function cancelAnimationFrame(id) {
+      this.clearTimeout(id);
+    }
+  ]
+});
+
 
 // Replace top-level Context with one which includes Window's exports.
 foam.SCRIPT({
@@ -217,25 +230,6 @@ foam.SCRIPT({
     'foam.core.Window',
   ],
   code: function() {
-    /*
-     * requestAnimationFrame is not available on nodejs,
-     * so swap out with calls to setTimeout.
-     */
-    // TODO put this in a script that has a node flag.
-    if ( foam.isServer ) {
-      foam.CLASS({
-        refines: 'foam.core.Window',
-        methods: [
-          function requestAnimationFrame(f) {
-            return this.setTimeout(f, 16);
-          },
-          function cancelAnimationFrame(id) {
-            this.clearTimeout(id);
-          }
-        ]
-      });
-    }
-
     foam.__context__ = foam.core.Window.create(
       { window: global },
       foam.__context__

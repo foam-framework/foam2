@@ -34,7 +34,7 @@ foam.CLASS({
   requires: [
     'foam.dao.DAOSink',
     'foam.dao.PromisedDAO',
-    'foam.dao.QuickSink',
+    'foam.dao.QuickSink'
   ],
 
   properties: [
@@ -48,7 +48,7 @@ foam.CLASS({
     {
       /** The cache to read items quickly. Cache contains a complete
         copy of src. */
-      name: 'cache',
+      name: 'cache'
     },
     {
       /**
@@ -79,7 +79,7 @@ foam.CLASS({
           promise: cacheFilled
         });
       }
-    },
+    }
   ],
 
   methods: [
@@ -90,7 +90,7 @@ foam.CLASS({
       proxy.listen(this.QuickSink.create({
         putFn: this.onSrcPut,
         removeFn: this.onSrcRemove,
-        resetFn: this.onSrcReset,
+        resetFn: this.onSrcReset
       }));
     },
 
@@ -101,7 +101,7 @@ foam.CLASS({
       // ensure the returned object from src is cached.
       return self.src.put(o).then(function(srcObj) {
         return self.delegate.put_(x, srcObj);
-      })
+      });
     },
 
     /** Removes are sent to the cache and to the source, ensuring both
@@ -110,15 +110,15 @@ foam.CLASS({
       var self = this;
       return self.src.remove(o).then(function() {
         return self.delegate.remove_(x, o);
-      })
+      });
     },
-   /** removeAll is executed on the cache and the source, ensuring both
+    /** removeAll is executed on the cache and the source, ensuring both
       are up to date. */
     function removeAll_(x, skip, limit, order, predicate) {
       var self = this;
       return self.src.removeAll_(x, skip, limit, order, predicate).then(function() {
         return self.delegate.removeAll_(x, skip, limit, order, predicate);
-      })
+      });
     }
   ],
 

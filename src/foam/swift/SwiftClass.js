@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.swift',
   name: 'SwiftClass',
+  flags: ['swift'],
 
   requires: [
     'foam.swift.Argument',
@@ -79,6 +80,7 @@ foam.CLASS({
       });
     },
     function field(f) {
+      if ( ! foam.core.FObject.isInstance(f) ) f = this.Field.create(f);
       this.fields.push(f);
       return this;
     },

@@ -41,13 +41,17 @@ foam.CLASS({
         });
         this.delegate.send(msg);
       },
-      swiftCode: function() {/*
-msg.object = SubBoxMessage_create([
+      swiftCode: `
+msg?.object = SubBoxMessage_create([
   "name": name,
-  "object": msg.object
+  "object": msg?.object
 ])
-try delegate.send(msg);
-      */}
+try delegate.send(msg);`,
+      javaCode: `foam.box.SubBoxMessage subBoxMessage = getX().create(foam.box.SubBoxMessage.class);
+subBoxMessage.setName(getName());
+subBoxMessage.setObject(msg.getObject());
+msg.setObject(subBoxMessage);
+getDelegate().send(msg);`
     }
   ]
 });

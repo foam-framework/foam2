@@ -76,7 +76,6 @@ foam.CLASS({
   methods: [
     {
       name: 'start',
-      javaReturns: 'void',
       javaCode: `try {
   BasicDataSource pool = new BasicDataSource();
   pool.setUsername(getUsername());
@@ -90,7 +89,7 @@ foam.CLASS({
     },
     {
       name: 'getConnection',
-      javaReturns: 'java.sql.Connection',
+      javaType: 'java.sql.Connection',
       javaThrows: ['java.sql.SQLException'],
       javaCode: 'return getPool().getConnection();'
     }
