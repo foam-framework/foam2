@@ -897,7 +897,7 @@ describe('foam.Object', function() {
 
 });
 
-describe('foam.method', function() {
+describe('foam.mmethod', function() {
   it('handles primitive types', function() {
     var mm = foam.mmethod({
       String: function(val) { return foam.String.isInstance(val); },
