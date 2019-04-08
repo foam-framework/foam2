@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'foam.net.node',
   name: 'RestDAOHandler',
   extends: 'foam.net.node.PathnamePrefixHandler',
-
+  flags: ['node'],
   documentation: `Server-side handler that is the dual of a client-side
       foam.dao.RestDAO.
 

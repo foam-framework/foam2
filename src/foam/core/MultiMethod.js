@@ -37,7 +37,7 @@ foam.CLASS({
       name: 'name',
       factory: function() {
         return this.methodName +
-          this.args.map(function(a) { return a.typeName; }).join(':');
+          this.args.map(function(a) { return a.type; }).join(':');
       }
     },
     {

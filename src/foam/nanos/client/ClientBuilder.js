@@ -67,7 +67,7 @@ foam.CLASS({
             client.properties.push({
               name: spec.name,
               factory: function() {
-                return foam.json.parse(appConfig, null, this);
+                return foam.json.parse(appConfig, null, this.__subContext__);
               }
             });
 
@@ -99,7 +99,7 @@ foam.CLASS({
                     if ( ! json.class       ) json.class       = 'foam.dao.EasyDAO'
                     if ( ! json.daoType     ) json.daoType     = 'CLIENT';
                     if ( ! json.retryBoxMaxAttempts ) json.retryBoxMaxAttempts = 0;
-                    return foam.json.parse(json, null, this);
+                    return foam.json.parse(json, null, this.__subContext__);
                   }
                 });
               }

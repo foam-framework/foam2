@@ -85,8 +85,8 @@ public class HttpParametersWebAgent
 
     // Capture 'data' on all requests
     if ( ! SafetyUtil.isEmpty(req.getParameter("data")) ) {
-      logger.debug("data", req.getParameter("data"));
-      logger.debug("cmd", req.getParameter("cmd"));
+      logger.debug("data",   req.getParameter("data"));
+      logger.debug("cmd",    req.getParameter("cmd"));
       logger.debug("format", req.getParameter("format"));
 
       parameters.set("data", req.getParameter("data"));

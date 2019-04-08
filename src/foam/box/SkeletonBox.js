@@ -40,8 +40,8 @@ foam.CLASS({
       name: 'call',
       args: [
         {
-          of: 'foam.box.Message',
           name: 'message',
+          type: 'foam.box.Message'
         },
       ],
       code: function(message) {
@@ -90,6 +90,7 @@ foam.CLASS({
         }
       },
       swiftCode: function() {/*
+let message = message!
 do {
   guard let object = message.object as? foam_box_RPCMessage,
         let data = self.data as? foam_core_FObject,
@@ -132,6 +133,7 @@ do {
         });
       },
       swiftCode: function() {/*
+let msg = msg!
 if let _ = msg.object as? foam_box_RPCMessage {
   call(msg)
   return

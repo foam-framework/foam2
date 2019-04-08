@@ -34,11 +34,6 @@
       'The convention for values is ints that are multiple of 10.'
     },
     {
-      class: 'Boolean',
-      name: 'stops',
-      documentation: 'When set to true, the rule prevents execution of the following rules within the same group.'
-    },
-    {
       class: 'String',
       name: 'ruleGroup',
       documentation: 'ruleGroup defines sets of rules related to the same action.'
@@ -50,27 +45,6 @@
         class: 'foam.u2.tag.TextArea',
         rows: 12, cols: 80
       }
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.mlang.predicate.Predicate',
-      name: 'predicate',
-      javaFactory: `
-      return foam.mlang.MLang.TRUE;
-      `,
-      documentation: 'predicate is checked against an object; if returns true, the action is executed.'+
-      'Defaults to return true.'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.ruler.RuleAction',
-      name: 'action',
-      javaFactory: `
-      return new RuleAction() {
-        @Override
-        public void applyAction(X x, FObject obj, FObject oldObj) {}
-      };`,
-      documentation: 'The action to be executed if predicates returns true for passed object.'
     },
     {
       class: 'Reference',
@@ -100,6 +74,162 @@
       name: 'after',
       documentation: 'Defines if the rule needs to be applied before or after operation is completed'+
       'E.g. on dao.put: before object was stored in a dao or after.'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'predicate',
+      javaFactory: `
+      return foam.mlang.MLang.TRUE;
+      `,
+      documentation: 'predicate is checked against an object; if returns true, the action is executed.'+
+      'Defaults to return true.'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.ruler.RuleAction',
+      name: 'action',
+      javaFactory: `
+      return new RuleAction() {
+        @Override
+        public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) { /*noop*/ }
+      };`,
+      documentation: 'The action to be executed if predicates returns true for passed object.'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.ruler.RuleAction',
+      name: 'asyncAction',
+      javaFactory: `
+      return new RuleAction() {
+        @Override
+        public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) { /*noop*/ }
+      };`,
+      documentation: 'The action to be executed asynchronously if predicates returns true for passed object.'
+    },
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      value: true,
+      documentation: 'Enables the rule.'
+    },
+    {
+      class: 'Boolean',
+      name: 'saveHistory',
+      value: false,
+      documentation: 'Determines if history of rule execution should be saved.',
+      help: 'Automatically sets to true when validity is greater than zero.',
+      adapt: function(_, nu) {
+        return nu || this.validity > 0;
+      }
+    },
+    {
+      class: 'Int',
+      name: 'validity',
+      documentation: 'Validity of the rule (in days) for automatic rescheduling.',
+      postSet: function(_, nu) {
+        if ( nu > 0
+          && ! this.saveHistory
+        ) {
+          this.saveHistory = true;
+        }
+      }
+    },
+    {
+      class: 'Object',
+      name: 'cmd',
+      transient: true,
+      hidden: true,
+      javaFactory: `
+        if ( Operations.CREATE == getOperation()
+          || Operations.UPDATE == getOperation()
+          || Operations.CREATE_OR_UPDATE == getOperation()
+        ) {
+          return RulerDAO.PUT_CMD;
+        }
+        return null;
+      `
+    }
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      type: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'FObject'
+        },
+        {
+          name: 'oldObj',
+          type: 'FObject'
+        }
+      ],
+      javaCode: `
+        return getEnabled()
+          && getPredicate().f(
+            x.put("NEW", obj).put("OLD", oldObj)
+          );
+      `
+    },
+    {
+      name: 'apply',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'FObject'
+        },
+        {
+          name: 'oldObj',
+          type: 'FObject'
+        },
+        {
+          name: 'ruler',
+          type: 'foam.nanos.ruler.RuleEngine'
+        }
+      ],
+      javaCode: `
+        getAction().applyAction(x, obj, oldObj, ruler);
+        if ( ! getAfter() ) {
+          ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
+        }
+      `
+    },
+    {
+      name: 'asyncApply',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'FObject'
+        },
+        {
+          name: 'oldObj',
+          type: 'FObject'
+        },
+        {
+          name: 'ruler',
+          type: 'foam.nanos.ruler.RuleEngine'
+        }
+      ],
+      javaCode: `
+        getAsyncAction().applyAction(x, obj, oldObj, ruler);
+        if ( ! getAfter() ) {
+          ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
+        }
+      `
     }
   ]
 });

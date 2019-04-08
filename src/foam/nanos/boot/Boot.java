@@ -6,23 +6,28 @@
 
 package foam.nanos.boot;
 
-import foam.core.Detachable;
-import foam.core.ProxyX;
-import foam.core.SingletonFactory;
-import foam.core.X;
+import foam.core.*;
 import foam.dao.AbstractSink;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
 import foam.dao.java.JDAO;
+import foam.nanos.auth.Group;
+import foam.nanos.auth.Permission;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.ProxyLogger;
 import foam.nanos.logger.StdoutLogger;
 import foam.nanos.script.Script;
 import foam.nanos.session.Session;
+
+import java.util.List;
+
 import static foam.mlang.MLang.EQ;
 
 public class Boot {
+  // Context key used to store the top-level root context in the context.
+  public final static String ROOT = "_ROOT_";
+
   protected DAO serviceDAO_;
   protected X   root_ = new ProxyX();
 
@@ -42,7 +47,7 @@ public class Boot {
         new foam.nanos.fs.Storage(datadir));
 
     // Used for all the services that will be required when Booting
-    serviceDAO_ = new JDAO(((foam.core.ProxyX) root_).getX(), NSpec.getOwnClassInfo(), "services");
+    serviceDAO_ = new foam.nanos.auth.PermissionedPropertyDAO(root_, new JDAO(((foam.core.ProxyX) root_).getX(), NSpec.getOwnClassInfo(), "services"));
 
     installSystemUser();
 
@@ -55,9 +60,32 @@ public class Boot {
       }
     });
 
-    /**
-     * Revert root_ to non ProxyX to avoid letting children add new bindings.
-     */
+    serviceDAO_.listen(new AbstractSink() {
+      @Override
+      public void put(Object obj, Detachable sub) {
+        NSpec sp = (NSpec) obj;
+        FObject newService = sp.getService();
+
+        if ( newService != null ) {
+          logger.info("Updating service configuration: ", sp.getName());
+
+          FObject service = (FObject) root_.get(sp.getName());
+          List<PropertyInfo> props = service.getClassInfo().getAxioms();
+          for (PropertyInfo prop : props) {
+            prop.set(service, prop.get(newService));
+          }
+        }
+      }
+    }, null);
+
+    // Use an XFactory so that the root context can contain itself.
+    root_ = root_.putFactory(ROOT, new XFactory() {
+      public Object create(X x) {
+        return Boot.this.getX();
+      }
+    });
+
+    // Revert root_ to non ProxyX to avoid letting children add new bindings.
     root_ = ((ProxyX) root_).getX();
 
     // Export the ServiceDAO
@@ -99,6 +127,13 @@ public class Boot {
 
     root_.put("user", user);
     root_.put(Session.class, session);
+
+    Group group = new Group();
+    group.setId("system");
+    Permission[] permissions = {new Permission("*", "All access")};
+    group.setPermissions(permissions);
+    group.setDefaultMenu("set-personal");
+    root_.put("group", group);
   }
 
   public X getX() { return root_; }

@@ -21,15 +21,15 @@ return newValue + "EXTENDED"
   methods: [
     {
       name: 'methodWithAnArgAndReturn',
-      swiftReturns: 'String',
+      type: 'String',
       args: [
         {
           name: 'name',
-          swiftType: 'String',
+          type: 'String',
         },
       ],
       swiftCode: function() {/*
-return String(format: type(of: self).greeting, name, "OVERRIDE!!!")
+return String(format: type(of: self).greeting, name!, "OVERRIDE!!!")
       */},
     }
   ]

@@ -27,7 +27,7 @@ foam.CLASS({
     {
       name: 'MAX_URL_SIZE',
       value: 2000,
-      type: 'int'
+      type: 'Integer'
     }
   ],
 
@@ -130,29 +130,30 @@ foam.CLASS({
         if ( subject ) {
           url += query ? "&" : "?";
           query = true;
-          url += "subject=" + subject;
+          url += "subject=" + encodeURIComponent(subject);
         }
         if ( q ) {
           url += query ? "&" : "?";
           query = true;
-          url += "q=" + q;
+          url += "q=" + encodeURIComponent(q);
         }
         this.postURL = url;
+
 
         if ( dataFile ) {
           url += query ? "&" : "?";
           query = true;
-          url += "&fileaddress=" + dataFile.address;
+          url += "&fileaddress=" + encodeURIComponent(dataFile.address);
         }
         if ( data ) {
           if ( data.length + url.length < this.MAX_URL_SIZE ) {
             url += query ? "&" : "?";
             query = true;
-            url += "data=" + data;
+            url += "data=" + encodeURIComponent(data);
           }
         }
 
-        return encodeURI(url);
+        return url;
       }
     },
     {

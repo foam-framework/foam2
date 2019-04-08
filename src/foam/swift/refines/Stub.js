@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'StubMethodSwiftRefinement',
   refines: 'foam.core.StubMethod',
   flags: ['swift'],
   properties: [
@@ -40,14 +42,14 @@ if let o = o as? Error {
   throw o
 }
 
-<% if (this.swiftReturns) { %>
-  <% if (this.swiftReturns == 'Any?') { %>
+<% if (this.swiftType != 'Void') { %>
+  <% if (this.swiftType == 'Any?') { %>
 return o
   <% } else { %>
-if let o = o as? <%=this.swiftReturns%> {
+if let o = o as? <%=this.swiftType%> {
   return o
 }
-throw FoamError(o ?? "Failed to cast response to <%=this.swiftName%> as <%=this.swiftReturns%>")
+throw FoamError(o ?? "Failed to cast response to <%=this.swiftName%> as <%=this.swiftType%>")
   <% } %>
 <% } %>
       */},
@@ -57,12 +59,14 @@ throw FoamError(o ?? "Failed to cast response to <%=this.swiftName%> as <%=this.
 
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'StubNotificationSwiftRefinement',
   refines: 'foam.core.StubNotification',
   flags: ['swift'],
   properties: [
     {
       name: 'swiftCode',
-      expression: function(swiftName, swiftReturns, swiftArgs, swiftThrows) {
+      expression: function(swiftName, swiftType, swiftArgs, swiftThrows) {
         return swiftThrows ? this.swiftCodeGenerator() : 'fatalError()';
       }
     }
@@ -85,6 +89,8 @@ try? delegate.send(msg)
 });
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'StubSwiftRefinement',
   refines: 'foam.core.Stub',
   flags: ['swift'],
   properties: [

@@ -18,10 +18,7 @@ foam.CLASS( {
     'foam.graphics.PlotGraph',
   ],
 
-  axioms: [
-    foam.u2.CSS.create( {
-      code: function () {
-        /*
+  css: `
               ^ {
                 background: #607d8b;
                 border: none;
@@ -37,21 +34,18 @@ foam.CLASS( {
                 background: #eee;
                 color: #607d8b;
               }
-        	  ^:Box {
+                  ^:Box {
                 background: #eee;
                 color: #607d8b;
               }
-        	  ^ .foam-u2-ActionView-onClick{
+                  ^ .foam-u2-ActionView-onClick{
                 position: relative;
                 top: -40px;
                 width: 125px;
                 cursor: pointer;
                 opacity: 0.01;
               }
-              */
-      }
-    } )
-  ],
+`,
 
   properties: [ {
       name: 'elementMap'
@@ -75,7 +69,7 @@ foam.CLASS( {
 
       dataSource.LegendEntries[ 0 ] = foam.graphics.LegendEntries.create( {} );
       dataSource.LegendEntries[ 0 ].seriesName = 'Day';
-      dataSource.LegendEntries[ 0 ].seriesValues = [ 10, 20, 30, 20, 20 ] 
+      dataSource.LegendEntries[ 0 ].seriesValues = [ 10, 20, 30, 20, 20 ]
 
       dataSource.LegendEntries[ 1 ] = foam.graphics.LegendEntries.create( {} );
       dataSource.LegendEntries[ 1 ].seriesName = 'Month';
@@ -103,7 +97,7 @@ foam.CLASS( {
       var margin = 1.3;
       var lengthX = 792,
         lengthY = 300;
-      var columnMaxLength = 200; 
+      var columnMaxLength = 200;
 
       var w, h;
 
@@ -113,7 +107,7 @@ foam.CLASS( {
         seriesValues: dataSource.LegendEntries[ 0 ].seriesValues,
         radius: 200,
         margin: margin,
-        graphColors: graphColors, 
+        graphColors: graphColors,
         symbol: '%',
         fontValue: '16px Roboto'
       } ); //support just one set of values
@@ -141,7 +135,7 @@ foam.CLASS( {
         x: 150,
         y: 350,
         dataSource: dataSource,
-        radius: 4,       
+        radius: 4,
         pointGap: gap,
         w: w,
         h: h,
@@ -153,7 +147,7 @@ foam.CLASS( {
         color: '#093649',
         symbol: 'M',
         lineDash: [ 10, 12 ]
-      } );      
+      } );
       this.canvas = presentationPlotGraph;
 
       var presentationBarGraph = foam.graphics.BarGraph.create( {

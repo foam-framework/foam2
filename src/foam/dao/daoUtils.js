@@ -83,6 +83,7 @@ return listener
       `,
       javaCode: `
         // TODO: Support changing of delegate
+        // TODO: Return a detachable
         getDelegate().listen_(getX(), sink, predicate);
       `
     }
@@ -124,15 +125,15 @@ foam.CLASS({
     },
     {
       name: 'innerSub',
-      swiftType: 'Detachable?',
+      type: 'foam.core.Detachable',
       postSet: function(_, s) {
         if (s) this.onDetach(s);
       },
       swiftPostSet: 'if let s = newValue { onDetach(s) }',
     },
     {
+      class: 'foam.dao.DAOProperty',
       name: 'dao',
-      swiftType: 'foam_dao_DAO?',
       swiftPostSet: `
 self.innerSub?.detach()
 try? self.innerSub = newValue?.listen_(__context__, self, predicate)
@@ -199,6 +200,29 @@ foam.CLASS({
       of: 'foam.dao.DAO',
       methods: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_', 'listen_', 'cmd_' ],
       name: 'promise'
+    }
+  ],
+  
+  methods: [
+    {
+      name: 'listen_',
+      flags: ['js'],
+      code: function(x, sink, predicate) {
+        // TODO(adamvy): Temporary hack to fix regression.  listen_
+        // didn't used to have a declared return type, as such it
+        // would return void when Promised, but a detachable when not.
+        //
+        // This sort of worked in that ProxyListener and others
+        // wouldn't throw an exception when undefined was returned,
+        // but will throw if a Promise is return.
+        //
+        // To fix this we should automagically return a
+        // PromisedDetachable as .detach() can be async since it has
+        // no return value.
+        this.promise.then(function(dao) {
+          dao.listen_(x, sink, predicate);
+        });
+      }
     }
   ]
 });

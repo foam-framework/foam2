@@ -17,7 +17,8 @@ foam.CLASS({
     'org.eclipse.jetty.websocket.server.WebSocketUpgradeFilter',
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest',
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse',
-    'org.eclipse.jetty.websocket.servlet.WebSocketCreator'
+    'org.eclipse.jetty.websocket.servlet.WebSocketCreator',
+    'org.eclipse.jetty.server.ForwardedRequestCustomizer'
   ],
 
   properties: [
@@ -60,17 +61,36 @@ foam.CLASS({
       javaCode: `
       try {
         System.out.println("Starting Jetty http server.");
+        int port = getPort();
+        String portStr = System.getProperty("http.port");
+        if ( portStr != null && ! portStr.isEmpty() ) {
+          try {
+            port = Integer.parseInt(portStr);
+            setPort(port);
+          } catch ( NumberFormatException e ) {
+            System.err.println(this.getClass().getSimpleName()+" invalid http.port '"+portStr+"'");
+            port = getPort();
+          }
+        }
+
         org.eclipse.jetty.server.Server server =
-          new org.eclipse.jetty.server.Server(getPort());
+          new org.eclipse.jetty.server.Server(port);
 
         /*
-          Prevent Jetty server from broadcasting its version number in the HTTP
+          The following for loop will accomplish the following:
+          1. Prevent Jetty server from broadcasting its version number in the HTTP
           response headers.
+          2. Configure Jetty server to interpret the X-Fowarded-for header
         */
         for ( org.eclipse.jetty.server.Connector conn : server.getConnectors() ) {
           for ( org.eclipse.jetty.server.ConnectionFactory f : conn.getConnectionFactories() ) {
             if ( f instanceof org.eclipse.jetty.server.HttpConnectionFactory ) {
+              
+              // 1. hiding the version number in response headers
               ((org.eclipse.jetty.server.HttpConnectionFactory) f).getHttpConfiguration().setSendServerVersion(false);
+
+              // 2. interpret X-Forwarded-for headers
+              ((org.eclipse.jetty.server.HttpConnectionFactory) f).getHttpConfiguration().addCustomizer(new ForwardedRequestCustomizer());
             }
           }
         }
@@ -78,7 +98,13 @@ foam.CLASS({
         org.eclipse.jetty.servlet.ServletContextHandler handler =
           new org.eclipse.jetty.servlet.ServletContextHandler();
 
-        handler.setResourceBase(System.getProperty("user.dir"));
+        String root = System.getProperty("nanos.webroot");
+        if ( root == null ) {
+          root = this.getClass().getResource("/webroot/index.html").toExternalForm();
+          root = root.substring(0, root.lastIndexOf("/"));
+        }
+
+        handler.setResourceBase(root);
         handler.setWelcomeFiles(getWelcomeFiles());
 
         handler.setAttribute("X", getX());
@@ -161,7 +187,6 @@ foam.CLASS({
           javaType: 'final org.eclipse.jetty.server.Server'
         }
       ],
-      javaReturns: 'void',
       javaCode: `
         Runtime.getRuntime().addShutdownHook(new Thread() {
           @Override

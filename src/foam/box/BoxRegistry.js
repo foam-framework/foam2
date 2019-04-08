@@ -21,48 +21,43 @@ foam.INTERFACE({
   methods: [
     {
       name: 'doLookup',
-      returns: 'foam.box.Box',
-      javaReturns: 'foam.box.Box',
+      async: true,
+      type: 'foam.box.Box',
       swiftThrows: true,
       args: [
         {
           name: 'name',
-          swiftType: 'String',
-          javaType: 'String'
+          type: 'String'
         }
       ]
     },
     {
       name: 'register',
-      returns: 'foam.box.Box',
-      javaReturns: 'foam.box.Box',
+      async: true,
+      type: 'foam.box.Box',
       args: [
         {
           name: 'name',
-          swiftType: 'String?',
-          javaType: 'String'
+          type: 'String'
         },
         {
           name: 'service',
-          of: 'foam.box.BoxService',
-          optional: true,
-          javaType: 'foam.box.BoxService'
+          type: 'foam.box.BoxService'
         },
         {
           name: 'box',
-          of: 'foam.box.Box',
-          javaType: 'foam.box.Box'
+          type: 'foam.box.Box'
         }
       ],
     },
     {
       name: 'unregister',
-      returns: '',
-      javaReturns: 'void',
+      async: true,
+      type: 'Void',
       args: [
         {
           name: 'name',
-          javaType: 'String'
+          type: 'String'
         }
       ]
     }

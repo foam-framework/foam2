@@ -202,6 +202,9 @@ foam.CLASS({
       class: 'AxiomArray',
       of: 'foam.core.internal.EnumValueAxiom',
       name: 'values',
+      toJSON: function(values, out) {
+        return values.map(function(v) { return v.definition; });
+      },
       adapt: function(_, v) {
         var used = {}; // map of ordinals used to check for duplicates
 
@@ -214,7 +217,7 @@ foam.CLASS({
           }
 
           def = this.EnumValueAxiom.isInstance(def) ? def :
-            def.class ? this.lookup(def.class).create(def) :
+            def.class ? this.__context__.lookup(def.class).create(def) :
             this.EnumValueAxiom.create({definition: def});
 
           v[i] = def;
@@ -320,49 +323,63 @@ foam.CLASS({
   documentation: 'A Property type for storing enum values.',
 
   properties: [
+    // TODO: 'of' or 'type'?
     {
       class: 'Class',
       name: 'of',
       required: true
     },
     {
+      name: 'type',
+      factory: function() { return this.of.id; }
+    },
+    {
       name: 'value',
       adapt: function(_, n) {
-        if ( foam.String.isInstance(n) ) n = this.of[n];
+        if ( foam.String.isInstance(n) ) n = foam.lookup(this.type)[n];
         if ( foam.Object.isInstance(n) && n.class )
           n = foam.lookup(n.class).create(n);
         return n
       },
-      expression: function(of) {
-        return of && of.VALUES[0];
+      expression: function(type) {
+        return type && foam.lookup(type).VALUES[0];
       },
     },
     {
       name: 'javaValue',
-      expression: function(of, value) {
-        return of.id + '.' + value;
+      flags: ['java'],
+      expression: function(type, value) {
+        return foam.lookup(type).id + '.' + value;
       },
     },
     [
       'adapt',
       function(o, n, prop) {
-        var of = prop.of;
+        var type = foam.lookup(prop.type);
 
-        if ( n && n.cls_ === of ) return n;
+        if ( n && n.cls_ === type ) return n;
 
-        var type = foam.typeOf(n), ret;
+        var valueType = foam.typeOf(n), ret;
 
-        if ( type === foam.String ) {
-          ret = of[foam.String.constantize(n)];
-        } else if ( type === foam.Number ) {
-          ret = of.create({ordinal: n}, foam.__context__);
-        } else if ( type === foam.Object ) {
-          ret = of.create(n, foam.__context__);
+        if ( valueType === foam.String ) {
+          ret = type[foam.String.constantize(n)];
+        } else if ( valueType === foam.Number ) {
+          ret = type.create({ordinal: n}, foam.__context__);
+        } else if ( valueType === foam.Object ) {
+          ret = type.create(n, foam.__context__);
         }
 
         if ( ret ) return ret;
 
-        throw 'Attempt to set invalid Enum value. Enum: ' + of.id + ', value: ' + n;
+        console.log("*** adamvy");
+        console.log("** name:",prop.name);
+        console.log("** of:",prop.of);
+        console.log("** type:",prop.type);
+        console.log("** typecls:", type);
+        console.log("** o: ", o);
+        console.log("** n: ", n);
+
+        throw new Error('Attempt to set invalid Enum value. Enum: ' + type.id + ', value: ' + n);
       }
     ],
     {

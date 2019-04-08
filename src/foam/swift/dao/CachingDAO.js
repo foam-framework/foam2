@@ -58,18 +58,18 @@ DispatchQueue.global(qos: .background).async {
   try? cache.removeAll()
   let sink = self.DAOSink_create(["dao": cache])
   _ = try? src.select(sink)
-  let listenSub = try? src.listen(sink, nil)
+  let listenSub = try! src.listen(sink, nil)
 
   _ = try? src.listen(self.FnSink_create([
     "fn": { [weak self] str, obj, sub in
       if str != "reset" { return }
       listenSub?.detach()
-      sub.detach()
+      sub?.detach()
       self?.clearProperty("delegate")
-    } as (String, Any?, Detachable) -> Void,
+    } as (String?, Any?, ${foam.core.Detachable.model_.swiftName}?) -> Void,
   ]), nil)
 
-  pDao.promise.set(cache)
+  pDao.promise = cache
 }
 return pDao
       `,

@@ -5,6 +5,8 @@ http://www.apache.org/licenses/LICENSE-2.0
 */
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'PropertyXMLRefinement',
   refines: 'foam.core.Property',
 
   properties: [
@@ -49,7 +51,7 @@ foam.CLASS({
       Use for debugging/testing purposes. If you want actual
       XML output, use foam.xml.* instead.
     */
-    function stringify() {
+    function toXML() {
       return foam.xml.Pretty.stringify(this);
     }
   ]
@@ -274,7 +276,8 @@ foam.CLASS({
             this.output(p.toXML(v, this));
             this.end('</' +  this.propertyName(p) + '>');
           }
-        }
+        },
+        Object: function(v, p) { this.outputPrimitive(v, p); },
       })
     },
 
@@ -357,7 +360,9 @@ foam.CLASS({
           this.start('<objects>\n');
           var cls = this.getCls(opt_cls);
           for ( var i = 0 ; i < o.length ; i++ ) {
-            this.output(o[i], cls);
+            this.start('<object>\n');
+              this.output(o[i], cls);
+            this.end('\n</object>');
             if ( i < o.length-1 ) this.out('\n').nl().indent();
           }
           this.end('\n</objects>');

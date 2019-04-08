@@ -184,7 +184,7 @@ if let bottom: UIView = actionViews.first ?? labelViews.last {
           swiftType: 'PropertyInfo',
         }
       ],
-      swiftReturns: 'foam_core_FObject?',
+      swiftType: 'foam_core_FObject?',
       swiftCode: function() {/*
 if let c = config[a.name] as? [String:Any?],
     let vf = c["viewFactory"] as? (Context) -> foam_core_FObject? {

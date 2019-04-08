@@ -16,11 +16,20 @@ foam.CLASS({
     {
       class: 'String',
       name: 'code',
-      documentation: 'ISO 3166-1 alpha-2 Country codes.'
+      documentation: 'ISO 3166-1 alpha-2 Country codes.',
+      view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          { class: 'foam.u2.TextField' },
+          { class: 'foam.u2.Element', nodeName: 'br' },
+          { class: 'foam.u2.tag.TextArea' }
+        ]
+      }
     },
     {
       class: 'String',
       name: 'iso31661Code',
+      label: 'ISO Code',
       documentation: 'ISO 3166-1 alpha-3 country codes.'
     },
     {
@@ -35,10 +44,9 @@ foam.CLASS({
   ],
   methods: [{
     name: 'toString',
-    returns: 'String',
-    javaReturns: 'String',
+    type: 'String',
     code: function() {
-      return 'Country: ' + this.code + ', ' + this.name; 
+      return 'Country: ' + this.code + ', ' + this.name;
     },
     javaCode: `
       return "{ code:" + this.getCode() + ", name:" + this.getName() + " }";

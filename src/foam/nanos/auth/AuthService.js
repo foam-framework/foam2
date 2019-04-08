@@ -11,150 +11,115 @@ foam.INTERFACE({
   methods: [
     {
       name: 'getCurrentUser',
-      javaReturns: 'foam.nanos.auth.User',
-      swiftReturns: 'foam_nanos_auth_User?',
-      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
+      async: true,
+      type: 'foam.nanos.auth.User',
+      javaThrows: ['foam.nanos.auth.AuthenticationException'],
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
+          type: 'Context'
         }
       ]
     },
     {
-      name: 'generateChallenge',
-      javaReturns: 'String',
-      swiftReturns: 'String',
-      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
-      swiftThrows: true,
-      args: [
-        {
-          name: 'userId',
-          javaType: 'long',
-          swiftType: 'Int'
-        }
-      ]
-    },
-    {
-      name: 'challengedLogin',
-      javaReturns: 'foam.nanos.auth.User',
-      swiftReturns: 'foam_nanos_auth_User',
-      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
-      swiftThrows: true,
+      name: 'getCurrentGroup',
+      async: true,
+      type: 'foam.nanos.auth.Group',
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
-        },
-        {
-          name: 'userId',
-          javaType: 'long',
-          swiftType: 'Int'
-        },
-        {
-          name: 'challenge',
-          javaType: 'String',
-          swiftType: 'String'
+          type: 'Context'
         }
       ]
     },
     {
       name: 'login',
-      javaReturns: 'foam.nanos.auth.User',
-      swiftReturns: 'foam_nanos_auth_User',
-      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
+      async: true,
+      type: 'foam.nanos.auth.User',
+      javaThrows: ['foam.nanos.auth.AuthenticationException'],
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
+          type: 'Context'
         },
         {
           name: 'userId',
-          javaType: 'long',
-          swiftType: 'Int'
+          type: 'Long'
         },
         {
           name: 'password',
-          javaType: 'String',
-          swiftType: 'String'
+          type: 'String'
         }
       ]
     },
     {
       name: 'loginByEmail',
-      javaReturns: 'foam.nanos.auth.User',
-      swiftReturns: 'foam_nanos_auth_User',
-      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
+      async: true,
+      type: 'foam.nanos.auth.User',
+      javaThrows: ['foam.nanos.auth.AuthenticationException'],
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
+          type: 'Context'
         },
         {
           name: 'email',
-          javaType: 'String',
-          swiftType: 'String'
+          type: 'String'
         },
         {
           name: 'password',
-          javaType: 'String',
-          swiftType: 'String'
+          type: 'String'
         }
       ]
     },
     {
       name: 'validatePassword',
-      javaThrows: [ 'java.lang.RuntimeException' ],
+      async: true,
+      javaThrows: ['java.lang.RuntimeException'],
       swiftThrows: true,
       args: [
         {
           name: 'potentialPassword',
-          javaType: 'String',
+          type: 'String',
         }
       ]
     },
     {
       name: 'checkUser',
-      javaReturns: 'boolean',
-      swiftReturns: 'Bool',
+      type: 'Boolean',
+      async: true,
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
+          type: 'Context'
         },
         {
           name: 'user',
-          javaType: 'foam.nanos.auth.User'
+          type: 'foam.nanos.auth.User'
         },
         {
           name: 'permission',
-          javaType: 'String',
+          type: 'String'
         }
       ]
     },
     {
       name: 'checkUserPermission',
-      javaReturns: 'boolean',
-      swiftReturns: 'Bool',
+      type: 'Boolean',
+      async: true,
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
+          type: 'Context'
         },
         {
           name: 'user',
-          javaType: 'foam.nanos.auth.User'
+          type: 'foam.nanos.auth.User'
         },
         {
           name: 'permission',
@@ -164,14 +129,13 @@ foam.INTERFACE({
     },
     {
       name: 'checkPermission',
-      javaReturns: 'boolean',
-      swiftReturns: 'Bool',
+      async: true,
+      type: 'Boolean',
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
+          type: 'Context'
         },
         {
           name: 'permission',
@@ -181,71 +145,67 @@ foam.INTERFACE({
     },
     {
       name: 'check',
-      javaReturns: 'boolean',
-      swiftReturns: 'Bool',
+      async: true,
+      type: 'Boolean',
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
+          type: 'Context'
         },
         {
           name: 'permission',
-          javaType: 'String',
+          type: 'String',
         }
       ]
     },
     {
       name: 'updatePassword',
-      javaReturns: 'foam.nanos.auth.User',
-      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
+      async: true,
+      type: 'foam.nanos.auth.User',
+      javaThrows: ['foam.nanos.auth.AuthenticationException'],
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
+          type: 'Context'
         },
         {
           name: 'oldPassword',
-          javaType: 'String',
-          swiftType: 'String'
+          type: 'String'
         },
         {
           name: 'newPassword',
-          javaType: 'String',
-          swiftType: 'String'
+          type: 'String'
         }
       ]
     },
     {
       name: 'validateUser',
-      javaReturns: 'void',
-      javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
+      async: true,
+      type: 'Void',
+      javaThrows: ['foam.nanos.auth.AuthenticationException'],
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
+          type: 'Context'
         },
         {
           name: 'user',
-          javaType: 'User',
-          of: 'foam.nanos.auth.User'
+          type: 'foam.nanos.auth.User'
         }
       ]
     },
     {
       name: 'logout',
-      javaReturns: 'void',
+      async: true,
+      type: 'Void',
       swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
+          type: 'Context'
         }
       ]
     }

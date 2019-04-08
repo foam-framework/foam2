@@ -5,6 +5,8 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift.refines',
+  name: 'DAOPropertySwiftRefinement',
   refines: 'foam.dao.DAOProperty',
   flags: ['swift'],
   properties: [
@@ -24,6 +26,7 @@ foam.CLASS({
       this.SUPER(cls, parentCls);
       cls.fields.push(
         foam.swift.Field.create({
+          override: !!parentCls.getSuperAxiomByName(this.name),
           lazy: true,
           visibility: 'public',
           name: this.name + '$proxy',

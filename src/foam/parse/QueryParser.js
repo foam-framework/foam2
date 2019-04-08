@@ -333,6 +333,10 @@ foam.CLASS({
           },
 
           equals: function(v) {
+            // TODO: Refactor so that properties provide a way to adapt the
+            // values rather than putting all of the value adaptation logic
+            // here.
+
             // v[2], the values, is an array, which might have an 'and', 'or' or
             // 'negated' property on it. The default is 'or'. The partial
             // evaluator for expressions can simplify the resulting Mlang further.
@@ -340,7 +344,10 @@ foam.CLASS({
             var values = v[2];
             // Int is actually the parent of Float and Long, so this captures all
             // numeric properties.
-            var isNum = foam.core.Int.isInstance(prop);
+            var isNum = foam.core.Int.isInstance(prop) ||
+              foam.core.Reference.isInstance(prop) &&
+              foam.core.Int.isInstance(prop.of.ID);
+
             var isFloat = foam.core.Float.isInstance(prop);
 
             var isDateField = foam.core.Date.isInstance(prop) ||
@@ -507,7 +514,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.parse',
-  name: 'PropertyRefinement',
+  name: 'PropertyAliasesRefinement',
   refines: 'foam.core.Property',
 
   properties: [

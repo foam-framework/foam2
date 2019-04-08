@@ -24,7 +24,7 @@ foam.CLASS({
     {
       name: 'registry',
       key: 'registry',
-      javaType: 'foam.box.BoxRegistry'
+      type: 'foam.box.BoxRegistry'
     }
   ],
 
@@ -59,7 +59,7 @@ try delegate.send(msg)
       */},
       javaCode: `
 getRegistry().unregister(getId());
-getDelegate().send(message);
+getDelegate().send(msg);
 `
     }
   ]

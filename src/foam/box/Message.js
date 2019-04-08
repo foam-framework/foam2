@@ -40,7 +40,7 @@ foam.CLASS({
   methods: [
     {
       name: 'replyWithException',
-      javaReturns: 'void',
+      type: 'Void',
       args: [
         { name: 't', javaType: 'Throwable' }
       ],

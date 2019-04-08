@@ -22,27 +22,23 @@ foam.CLASS({
 
   imports: [ 'editHero' ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-      ^ {
-        background: #607d8b;
-        border: none;
-        border-radius: 2px;
-        color: white;
-        display: block;
-        margin: 10px;
-        padding: 30px 20px;
-        text-align: center;
-        min-width: 100px;
-      }
-      ^:hover {
-        background: #eee;
-        color: #607d8b;
-      }
-      */}
-    })
-  ],
+  css: `
+    ^ {
+      background: #607d8b;
+      border: none;
+      border-radius: 2px;
+      color: white;
+      display: block;
+      margin: 10px;
+      padding: 30px 20px;
+      text-align: center;
+      min-width: 100px;
+    }
+    ^:hover {
+      background: #eee;
+      color: #607d8b;
+    }
+  `,
 
   methods: [
     function initE() {

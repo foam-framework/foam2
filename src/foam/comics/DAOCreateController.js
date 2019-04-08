@@ -21,7 +21,8 @@ foam.CLASS({
   name: 'DAOCreateController',
 
   topics: [
-    'finished'
+    'finished',
+    'throwError'
   ],
 
   properties: [
@@ -41,7 +42,6 @@ foam.CLASS({
     },
     {
       name: 'data',
-      view: { class: 'foam.u2.DetailView' },
       factory: function() {
         return this.dao ? this.dao.of.create({}, this) : null;
       }
@@ -62,6 +62,7 @@ foam.CLASS({
         }, function(e) {
           self.inProgress = false;
           self.exception = e;
+          self.throwError.pub();
         });
       }
     },

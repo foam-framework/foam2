@@ -45,9 +45,10 @@ foam.CLASS({
   ],
 
   properties: [
+    [ 'border', null ],
     [ 'color', 'white' ],
     [ 'width', 20 ],
-    [ 'height', 80 ],
+    [ 'height', 180 ],
     {
       name: 'mass',
       factory: function() { return this.INFINITE_MASS; }
@@ -77,7 +78,7 @@ foam.CLASS({
   properties: [
     {
       name: 'canvas',
-      factory: function() { return this.Box.create({width: 800, height: 300, color: 'lightgray'}); }
+      factory: function() { return this.Box.create({width: 1000, height: 300, color: 'lightgray'}); }
     },
     {
       name: 'ball',

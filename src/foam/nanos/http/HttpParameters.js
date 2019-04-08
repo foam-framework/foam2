@@ -16,13 +16,13 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         }
       ]
     },
     {
       name: 'getX',
-      javaReturns: 'foam.core.X'
+      type: 'Context'
     },
     {
       name: 'set',
@@ -30,11 +30,11 @@ foam.INTERFACE({
         {
           name: 'name',
           documentation: 'Return single value for named parameter, or null if not found.',
-          javaType: 'Object'
+          type: 'Any'
         },
         {
           name: 'value',
-          javaType: 'Object'
+          type: 'Any'
         }
       ]
     },
@@ -44,10 +44,10 @@ foam.INTERFACE({
         {
           name: 'name',
           documentation: 'Return single value for named parameter, or null if not found.',
-          javaType: 'Object'
+          type: 'Any'
         }
       ],
-      javaReturns: 'Object'
+      type: 'Any'
     },
     {
       name: 'getParameter',
@@ -55,10 +55,10 @@ foam.INTERFACE({
         {
           name: 'name',
           documentation: 'Return single value for named parameter, or null if not found.',
-          javaType: 'String'
+          type: 'String'
         }
       ],
-      javaReturns: 'String'
+      type: 'String'
     },
     {
       name: 'getParameterValues',
@@ -66,10 +66,10 @@ foam.INTERFACE({
         {
           name: 'name',
           documentation: 'Return array of vales for named parameter, or null if not found.',
-          javaType: 'String'
+          type: 'String'
         }
       ],
-      javaReturns: 'String[]'
+      type: 'String[]'
     }
   ]
 });

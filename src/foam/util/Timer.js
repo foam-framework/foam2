@@ -107,7 +107,7 @@ return newValue as! Int
          cycle(frequency, start, end) - cycle between start and end frequency times a second
       */
       name: 'cycle',
-      swiftReturns: 'Float',
+      swiftType: 'Float',
       args: [
         {
           name: 'frequency',
@@ -142,8 +142,12 @@ return a! + (1 + s) * (b!-a!)/2;
       name:  'start',
       help:  'Start the timer.',
       isEnabled: function(isStarted) { return ! isStarted; },
-      code:      function() { this.isStarted = true; this.tick(); },
-      swiftCode: 'isStarted = true; tick()',
+      code:      function() { this.startTime_ = Date.now(); this.isStarted = true; this.tick(); },
+      swiftCode: `
+        startTime_ = Int(Date().timeIntervalSince1970 * Double(1000))
+        isStarted = true
+        tick()
+      `,
     },
     {
       name:  'step',
@@ -181,7 +185,7 @@ hour   = time / 3600000 % 24 << 0;
 
         var prevTime = this.startTime_;
         this.startTime_ = Date.now();
-        this.interval = Math.min(100, this.startTime_ - prevTime);
+        this.interval = this.startTime_ - prevTime;
         this.step();
         this.tick();
       },
@@ -190,7 +194,7 @@ if !isStarted { return }
 
 let prevTime = startTime_
 startTime_ = Int(Date().timeIntervalSince1970 * Double(1000))
-interval = min(100, startTime_ - prevTime)
+interval = startTime_ - prevTime
 step()
 tick()
       */}

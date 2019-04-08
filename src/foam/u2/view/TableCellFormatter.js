@@ -71,6 +71,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'ActionTableCellFormatterRefinement',
   refines: 'foam.core.Action',
 
   properties: [
@@ -95,6 +97,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'EnumTableCellFormatterRefinement',
   refines: 'foam.core.Enum',
 
   properties: [
@@ -110,6 +114,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'FObjectPropertyTableCellFormatterRefinement',
   refines: 'foam.core.FObjectProperty',
 
   properties: [ [ 'tableCellFormatter', null ] ]
@@ -117,6 +123,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'CurrencyTableCellFormatterRefinement',
   refines: 'foam.core.Currency',
 
   properties: [
@@ -135,6 +143,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'DateTableCellFormatterRefinement',
   refines: 'foam.core.Date',
 
   properties: [
@@ -142,7 +152,7 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(date) {
-        if ( date ) this.add(date.toLocaleDateString())
+        if ( date ) this.add(date.toISOString().substring(0,10));
       }
     }
   ]
@@ -150,6 +160,8 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'DateTimeTableCellFormatterRefinement',
   refines: 'foam.core.DateTime',
 
   properties: [
@@ -157,9 +169,9 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(date) {
-        if ( date ) this.add(date.toLocaleString());
+        // Output as yyyy-mm-dd hh:mm[a/p]
+        if ( date ) this.add(date.toISOString().substring(0,10) + " " + date.toLocaleString().substr(-11,5) + date.toLocaleString().substr(-2,1).toLowerCase());
       }
     }
   ]
 });
-

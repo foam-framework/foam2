@@ -32,7 +32,7 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'dao',
-      swiftPostSet: function() {/*
+      swiftPostSet: `
 if newValue == nil { return }
 
 
@@ -44,7 +44,7 @@ let findIndex = { (o: foam_core_FObject) -> Int? in
   })
 }
 
-daoSub = try? newValue!.listen(FnSink_create([
+daoSub = try! newValue!.listen(FnSink_create([
   "fn": { [weak self] str, obj, sub in
     if self == nil { return }
     if str == "add" {
@@ -63,17 +63,17 @@ daoSub = try? newValue!.listen(FnSink_create([
     } else {
       self?.onDAOUpdate()
     }
-  } as (String, Any?, Detachable) -> Void,
+  } as (String?, Any?, ${foam.core.Detachable.model_.swiftName}?) -> Void,
 ]), nil)
 
 onDetach(daoSub)
 onDAOUpdate()
-      */},
+      `
     },
     {
-      swiftType: 'Detachable?',
+      type: 'foam.core.Detachable',
       name: 'daoSub',
-      swiftPostSet: 'if let o = oldValue as? Detachable { o.detach() }',
+      swiftPostSet: `if let o = oldValue as? ${foam.core.Detachable.model_.swiftName} { o.detach() }`,
     },
     {
       swiftType: 'UITableView?',

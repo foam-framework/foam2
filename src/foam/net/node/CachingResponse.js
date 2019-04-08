@@ -20,7 +20,7 @@ foam.CLASS({
   name: 'CachingResponse',
   extends: 'foam.net.node.CachedResponse',
   implements: [ 'foam.net.node.ServerResponse' ],
-
+  flags: ['node'],
   documentation: `Response decorator that stores response data and produces
       a CachedResponse when this response is finalized.`,
 

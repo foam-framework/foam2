@@ -21,9 +21,8 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   label: 'Cascading Remove DAO',
-  help: "Removes children from relationship",
 
-  documentation: function(){/*
+  documentation: `
        DAO Decorator which cascades removes to relationship DAOs.
 
        TODO:
@@ -32,7 +31,7 @@ foam.CLASS({
        types: RelationshiipTarget and RelationshipSource, both of which
        just contain a reference to the Relationship. EasyDAO could make use
        of this as could a Relationship-Aware DAOController. - Kevin
-  */},
+  `,
 
   properties: [
     {

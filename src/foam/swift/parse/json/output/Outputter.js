@@ -13,12 +13,12 @@ foam.CLASS({
   constants: [
     {
       name: 'DEFAULT',
-      of: 'foam.swift.parse.json.output.Outputter',
+      type: 'foam.swift.parse.json.output.Outputter',
       swiftFactory: `return Context.GLOBAL.create(foam_swift_parse_json_output_Outputter.self)!`,
     },
     {
       name: 'PRETTY',
-      of: 'foam.swift.parse.json.output.Outputter',
+      type: 'foam.swift.parse.json.output.Outputter',
       swiftFactory: `
 let x = Context.GLOBAL
 return x.create(foam_swift_parse_json_output_Outputter.self, args: [
@@ -54,7 +54,7 @@ return x.create(foam_swift_parse_json_output_Outputter.self, args: [
       name: 'output',
       args: [
         {
-          of: 'foam.json2.Outputter',
+          type: 'foam.json2.Outputter',
           name: 'out',
         },
         {
@@ -63,23 +63,24 @@ return x.create(foam_swift_parse_json_output_Outputter.self, args: [
         },
       ],
       swiftCode: `
+let out = out!
 if let data = data as? JSONOutputter {
   data.toJSON(outputter: self, out: out)
 } else if let data = data as? ClassInfo {
-  _ = out.obj()
-    .key("class")
-    .s("__Class__")
-    .key("forClass_")
-    .s(data.id)
+  _ = out.obj()!
+    .key("class")!
+    .s("__Class__")!
+    .key("forClass_")!
+    .s(data.id)!
     .end()
 } else if let data = data as? PropertyInfo {
-  _ = out.obj()
-    .key("class")
-    .s("__Property__")
-    .key("forClass_")
-    .s(data.classInfo.id)
-    .key("name")
-    .s(data.name)
+  _ = out.obj()!
+    .key("class")!
+    .s("__Property__")!
+    .key("forClass_")!
+    .s(data.classInfo.id)!
+    .key("name")!
+    .s(data.name)!
     .end()
 } else if let data = data as? String {
   _ = out.s(data)
@@ -116,19 +117,21 @@ if let data = data as? JSONOutputter {
       name: 'outputFObject',
       args: [
         {
-          of: 'foam.json2.Outputter',
+          type: 'foam.json2.Outputter',
           name: 'out',
         },
         {
-          of: 'FObject',
+          type: 'FObject',
           name: 'data',
         },
       ],
       swiftCode: `
+let data = data!
+let out = out!
 let info = data.ownClassInfo()
 _ = out.obj()
 
-_ = out.key("class").s(info.id)
+_ = out.key("class")!.s(info.id)
 
 for p in info.axioms(byType: PropertyInfo.self) {
   if !data.hasOwnProperty(p.name) { continue }
@@ -147,11 +150,11 @@ _ = out.end()
       name: 'swiftStringify',
       args: [
         {
-          of: 'FObject',
+          type: 'FObject',
           name: 'data',
         },
       ],
-      swiftReturns: 'String',
+      type: 'String',
       swiftCode: `
 let s = outputterFactory(__subContext__)
 output(s, data)

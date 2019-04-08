@@ -22,7 +22,8 @@ foam.CLASS({
   methods: [
     {
       name: 'report',
-      returns: 'Promise',
+      async: true,
+      type: 'Integer',
       code: function() { return Promise.resolve(require('process').pid); }
     }
   ]
@@ -35,7 +36,8 @@ foam.CLASS({
   methods: [
     {
       name: 'report',
-      returns: 'Promise',
+      async: true,
+      type: 'Integer',
       code: function() { return Promise.resolve(require('process').pid); }
     }
   ]
@@ -48,7 +50,8 @@ foam.CLASS({
   methods: [
     {
       name: 'report',
-      returns: 'Promise',
+      async: true,
+      type: 'Integer',
       code: function() { return Promise.resolve(require('process').pid); }
     }
   ]

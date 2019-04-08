@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'foam.net.node',
   name: 'FileHandler',
   extends: 'foam.net.node.PathnameHandler',
-
+  flags: ['node'],
   documentation: 'HTTP(S) server handler for a single file.',
 
   imports: [ 'info' ],

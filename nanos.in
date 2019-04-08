@@ -47,4 +47,4 @@ fi
 
 shift $(($OPTIND - 1))
 
-exec java $DEBUG_ARGS -cp @CLASSPATH@$EXTRA_CP foam.nanos.boot.Boot "$@"
+exec java $DEBUG_ARGS -Dnanos.webroot="$PWD" -cp @CLASSPATH@$EXTRA_CP foam.nanos.boot.Boot "$@"

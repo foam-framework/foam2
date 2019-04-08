@@ -39,14 +39,15 @@ foam.CLASS({
     }],
     ['setter', function(v) {
       this.cls_.ID.targetProperty.set(this, v);
-    }]
+    }],
+    'value'
   ],
   methods: [
     function installInClass(c) {
       var prop = c.getAxiomByName(this.propName);
       foam.assert(foam.core.Property.isInstance(prop), 'Ids property: ' + c.id + '.' + this.propName, 'is not a Property');
       this.targetProperty = prop;
-
+      this.value = prop.value;
       this.SUPER(c);
     }
   ]

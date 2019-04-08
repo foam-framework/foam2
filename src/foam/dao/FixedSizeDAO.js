@@ -37,9 +37,8 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'internalArraySize',
-      private: true,
       javaFactory: `return ((int)  (1.1 *  (double) getFixedDAOSize() )); `,
-      documentation: `array larger than FixedDAOSize, to allow for a point in 
+      documentation: `array larger than FixedDAOSize, to allow for a point in
                       time view without blocking write access.
       `
     },
@@ -63,11 +62,11 @@ foam.CLASS({
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          type: 'Context'
         },
         {
           name: 'obj',
-          of: 'foam.core.FObject',
+          type: 'FObject'
         }
       ],
       javaCode: `
@@ -75,7 +74,7 @@ foam.CLASS({
   foam.core.FObject delegatedObject = getDelegate().put_(x, obj);
   getLock().lock();
   try {
-    insertAt = getNextIndex();  
+    insertAt = getNextIndex();
     if ( insertAt == getInternalArraySize() ) {
       insertAt = 0;
     }
@@ -89,7 +88,6 @@ foam.CLASS({
     },
     {
       name: 'select_',
-      javaReturns: 'foam.dao.Sink',
       javaCode: `
   if ( sink == null ) sink = new ArraySink();
   sink = prepareSink(sink);
@@ -98,7 +96,7 @@ foam.CLASS({
   Integer backCounter;
 
   if ( getNextIndex() <= 0 ) {
-    backCounter = ( getInternalArraySize() - 1 ); 
+    backCounter = ( getInternalArraySize() - 1 );
   } else {
     backCounter = ( getNextIndex() - 1 );
   }
@@ -111,7 +109,7 @@ foam.CLASS({
       decorated.put(getFixedSizeArray()[backCounter], null);
       if ( backCounter == 0 ) {
         backCounter = getInternalArraySize();
-      } 
+      }
       backCounter--;
     } catch (Exception e) {
       e.printStackTrace();
@@ -136,4 +134,3 @@ foam.CLASS({
 
   ]
 });
-

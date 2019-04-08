@@ -8,10 +8,13 @@ foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'Address',
 
-  documentation: 'Postal address.',
+  documentation: 'The postal address of the entity.',
 
   implements: [
-    'foam.mlang.Expressions',
+    {
+      path: 'foam.mlang.Expressions',
+      flags: ['js'],
+    },
   ],
 
   requires: [
@@ -24,23 +27,26 @@ foam.CLASS({
     {
       class: 'String',
       name: 'type',
-      documentation: 'Address type.'
+      documentation: 'Address type. COMMENT: What is this?'
     },
     {
       class: 'Boolean',
       name: 'verified',
-      documentation: 'Identifies if address has been verified.'
+      documentation: 'Verifies that the address exists.'
     },
     {
       class: 'Boolean',
       name: 'deleted',
-      documentation: 'Marks address as deleted.'
+      documentation: 'A deleted address.'
     },
     {
       class: 'Boolean',
       name: 'structured',
       value: true,
-      documentation: 'Checked, shown Street Number, Street Name, Suite. Unchecked, shown Address1, Address2.'
+      documentation: `Verifies that the address is shown in the following structure: 
+      Street Number, Street Name, Suite Number. For an unstructured address field, use address1 and/or
+      address2.
+      `
     },
     {
       class: 'String',
@@ -48,7 +54,7 @@ foam.CLASS({
       // required: true
       width: 70,
       displayWidth: 50,
-      documentation: 'for an unstructured address, use this as a main address field.',
+      documentation: 'For an unstructured address, use this as a main address field.',
       validateObj: function(address1) {
         var address1Regex = /^[a-zA-Z0-9 ]{1,70}$/;
 
@@ -62,7 +68,7 @@ foam.CLASS({
       name: 'address2',
       width: 70,
       displayWidth: 50,
-      documentation: 'for an unstructured address, use this as a sub address field.',
+      documentation: 'For an unstructured address, use this as a sub address field.',
       validateObj: function(address2) {
         var address2Regex = /^[a-zA-Z0-9 ]{1,70}$/;
 
@@ -72,56 +78,30 @@ foam.CLASS({
       }
     },
     {
-      class: 'String',
-      name: 'suite',
-      documentation: 'Suite pertaining to address.',
-      width: 16,
-      validateObj: function(suite) {
-        var suiteRegex = /^[a-zA-Z0-9 ]{1,70}$/;
-
-        if ( suite.length > 0 && ! suiteRegex.test(suite) ) {
-          return 'Invalid address line.';
-        }
-      }
-    },
-    {
-      class: 'String',
-      name: 'city',
-      documentation: 'City pertaining to address.',
-      required: true,
-      validateObj: function(city) {
-        var cityRegex = /^[a-zA-Z ]{1,35}$/;
-
-        if ( ! cityRegex.test(city) ) {
-          return 'Invalid city name.';
-        }
-      }
-    },
-    {
-      class: 'String',
-      name: 'postalCode',
-      documentation: 'Postal code pertaining to address.',
-      required: true,
-      preSet: function(oldValue, newValue) {
-        return newValue.toUpperCase();
-      },
-      javaSetter:
-        `postalCode_ = val.toUpperCase();
-        postalCodeIsSet_ = true;`
-    },
-    {
       class: 'Reference',
       targetDAOKey: 'countryDAO',
       name: 'countryId',
       of: 'foam.nanos.auth.Country',
-      documentation: 'Country address.'
+      documentation: `A foreign key into the CountryDAO which represents the country.`,
+      required: true,
+      validateObj: function(countryId) {
+        if ( typeof countryId !== 'string' || countryId.length === 0 ) {
+          return 'Country required';
+        }
+      },
+      postSet: function(oldValue, newValue) {
+        if ( oldValue !== newValue ) {
+          this.regionId = undefined;
+        }
+      }
     },
     {
       class: 'Reference',
       targetDAOKey: 'regionDAO',
       name: 'regionId',
       of: 'foam.nanos.auth.Region',
-      documentation: 'Region address.',
+      documentation: `A foreign key into the RegionDAO  which represents
+      the region of the country.`,
       view: function(_, X) {
         var choices = X.data.slot(function(countryId) {
           return X.regionDAO.where(X.data.EQ(X.data.Region.COUNTRY_ID, countryId || ""));
@@ -132,31 +112,33 @@ foam.CLASS({
           },
           dao$: choices
         });
+      },
+      required: true,
+      validateObj: function(regionId, countryId) {
+        // If the country hasn't been selected yet, don't show this error.
+        if ( countryId == null ) return;
+        if ( typeof regionId !== 'string' || regionId.length === 0 ) {
+          switch ( countryId ) {
+            case 'CA':
+              return 'Province required.';
+            case 'US':
+              return 'State required.';
+            default:
+              return 'Region required.';
+          }
+        }
       }
-    },
-    {
-      class: 'Boolean',
-      name: 'encrypted',
-      documentation: 'Determines if address should be or is encrypted.'
-    },
-    {
-      class: 'Double',
-      name: 'latitude',
-      documentation: 'Latitude of address location.'
-    },
-    {
-      class: 'Double',
-      name: 'longitude',
-      documentation: 'Longitude of address location.'
     },
     {
       class: 'String',
       name: 'streetNumber',
       width: 16,
-      documentation: 'for an structured address, use this field.',
+      documentation: 'For a structured address, use this field for the street number.',
       validateObj: function(streetNumber) {
+        if ( streetNumber.trim() === '' ) {
+          return 'Street number required.';
+        }
         var streetNumberRegex = /^[0-9]{1,16}$/;
-
         if ( ! streetNumberRegex.test(streetNumber) ) {
           return 'Invalid street number.';
         }
@@ -166,21 +148,104 @@ foam.CLASS({
       class: 'String',
       name: 'streetName',
       width: 70,
-      documentation: 'for an structured address, use this field.',
+      documentation: 'For a structured address, use this field for the street name.',
       validateObj: function(streetName) {
+        if ( streetName.trim() === '' ) {
+          return 'Street name required.';
+        }
         var streetNameRegex = /^[a-zA-Z0-9 ]{1,70}$/;
-
         if ( ! streetNameRegex.test(streetName) ) {
-          return 'Invalid street name.'
+          return 'Invalid street name.';
         }
       }
+    },
+    {
+      class: 'String',
+      name: 'suite',
+      documentation: 'For a structured address, use this field for the suite number.',
+      width: 16,
+      validateObj: function(suite) {
+        var suiteRegex = /^[a-zA-Z0-9 ]{1,70}$/;
+        if ( suite.length > 0 && ! suiteRegex.test(suite) ) {
+          return 'Invalid address line 2.';
+        }
+      }
+    },
+    {
+      class: 'String',
+      name: 'city',
+      documentation: 'The city pertaining to the address.',
+      required: true,
+      validateObj: function(city) {
+        if ( city.trim().length === 0 ) {
+          return 'City required.';
+        }
+        var cityRegex = /^[a-zA-Z ]{1,35}$/;
+        if ( ! cityRegex.test(city) ) {
+          return 'Invalid city name.';
+        }
+      }
+    },
+    {
+      class: 'String',
+      name: 'postalCode',
+      documentation: 'The postal code pertaining to the address.',
+      preSet: function(oldValue, newValue) {
+        return newValue.toUpperCase();
+      },
+      required: true,
+      validateObj: function(postalCode, countryId) {
+        if ( postalCode.trim().length === 0 ) {
+          switch ( countryId ) {
+            case 'CA':
+              return 'Postal code required.';
+            case 'US':
+              return 'Zip code required.';
+          }
+        }
+        var caRe = /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i; // Canadian Format
+        var usRe = /^^\d{5}(?:[-\s]\d{4})?$/i; // US Format
+        switch ( countryId ) {
+          case 'CA':
+            if ( ! caRe.test(postalCode) ) {
+              return 'Invalid postal code.';
+            }
+            break;
+          case 'US':
+            if ( ! usRe.test(postalCode) ) {
+              return 'Invalid zip code.';
+            }
+            break;
+        }
+      },
+      javaSetter:
+        `postalCode_ = val.toUpperCase();
+        postalCodeIsSet_ = true;`
+    },
+    {
+      class: 'Boolean',
+      name: 'encrypted',
+      documentation: 'Verifies if the address is encrypted.'
+    },
+    {
+      class: 'Double',
+      name: 'latitude',
+      documentation: 'The latitude of the address location.'
+    },
+    {
+      class: 'Double',
+      name: 'longitude',
+      documentation: 'The longitude of the address location.'
     },
     {
       class: 'FObjectArray',
       of: 'foam.nanos.auth.Hours',
       name: 'hours',
-      documentation: 'Opening and closing hours for this address',
-      factory: function () { return []; },
+      documentation: `
+        The opening and closing hours for this address if the address represents
+        a business.
+      `,
+      factory: function() { return []; },
       javaFactory: 'return new Hours[] {};'
     }
   ],
@@ -188,7 +253,7 @@ foam.CLASS({
   methods: [
     {
       name: 'getAddress',
-      javaReturns: 'String',
+      type: 'String',
       code: function() { return this.structured ? this.streetNumber + ' ' + this.streetName : this.address1; },
       javaCode: `return getStructured() ? getStreetNumber() + " " + getStreetName() : getAddress1();`
     }

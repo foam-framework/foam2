@@ -39,7 +39,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'lazy',
-      tableWidth: 60,
+      tableWidth: 65,
       value: true,
       tableCellFormatter: function(value, obj, property) {
         this
@@ -54,7 +54,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'serve',
-      tableWidth: 50,
+      tableWidth: 72,
       tableCellFormatter: function(value, obj, property) {
         this
           .start()
@@ -121,18 +121,26 @@ foam.CLASS({
     {
       class: 'String',
       name: 'serviceScript',
-      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 80 }
+      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 120 },
+      permissionRequired: true
     },
     {
       class: 'String',
       name: 'client',
       value: '{}',
-      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 80 }
+      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 120 }
     },
     {
       class: 'FObjectProperty',
       name: 'service',
-      view: { class: 'foam.u2.view.FObjectView' }
+      view: { class: 'foam.u2.view.FObjectView' },
+      permissionRequired: true
+    },
+    {
+      class: 'String',
+      name: 'documentation',
+      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 120 },
+      permissionRequired: true
     }
     // TODO: permissions, keywords, lazy, parent
   ],
@@ -141,8 +149,8 @@ foam.CLASS({
     {
       name: 'saveService',
       args: [
-        { name: 'x', javaType: 'foam.core.X' },
-        { name: 'service', javaType: 'Object' }
+        { name: 'x', type: 'Context' },
+        { name: 'service', type: 'Any' }
       ],
       javaCode: `
       /*
@@ -158,9 +166,9 @@ foam.CLASS({
     {
       name: 'createService',
       args: [
-        { name: 'x', javaType: 'foam.core.X' }
+        { name: 'x', type: 'Context' }
       ],
-      javaReturns: 'java.lang.Object',
+      javaType: 'java.lang.Object',
       javaCode: `
         if ( getService() != null ) return getService();
 

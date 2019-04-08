@@ -21,7 +21,7 @@ foam.CLASS({
     {
       name: 'send',
       swiftCode: `
-let str = Outputter_create().swiftStringify(msg)
+let str = Outputter_create().swiftStringify(msg)!
 let data = str.data(using: .utf8)!
 try data.write(to: path)
       `,

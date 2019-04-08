@@ -8,6 +8,8 @@ package foam.core;
 
 import foam.dao.pg.IndexedPreparedStatement;
 import foam.lib.xml.Outputter;
+import foam.nanos.auth.AuthService;
+import foam.nanos.auth.AuthorizationException;
 import foam.nanos.logger.Logger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -71,12 +73,17 @@ public abstract class AbstractPropertyInfo
     }
   }
 
+  public int compareTo(Object obj) {
+    int result = getName().compareTo(((PropertyInfo)obj).getName());
+    return result != 0 ? result : getClassInfo().compareTo(((PropertyInfo)obj).getClassInfo());
+  }
+
   @Override
   public boolean hardDiff(FObject o1, FObject o2, FObject diff){
     // compare the property value of o1 and o2
     // If value is Object reference, only compare reference. (AbstractObjectPropertyInfo will override hardDiff method)
     // use to compare String and primitive type
-    int same = this.comparePropertyToValue(this.get(o1), this.get(o2));
+    int same = comparePropertyToValue(this.get(o1), this.get(o2));
     //return the value of o2 if o1 and o2 are different
     if ( same != 0 ) {
       //set o2 prop into diff
@@ -148,6 +155,25 @@ public abstract class AbstractPropertyInfo
   @Override
   public boolean containsDeletablePII(){
     return false;
+  }
+
+  @Override
+  public void authorize(X x) {
+    if ( this.getPermissionRequired() ) {
+      AuthService auth = (AuthService) x.get("auth");
+      String simpleName = this.getClassInfo().getObjClass().getSimpleName();
+      String permission =
+        simpleName.toLowerCase() +
+        ".%s." +
+        this.getName().toLowerCase();
+
+      if (
+        ! auth.check(x, String.format(permission, "rw")) &&
+        ! auth.check(x, String.format(permission, "ro"))
+      ) {
+        throw new AuthorizationException(String.format("Access denied. User lacks permission to access property '%s' on model '%s'.", this.getName(), simpleName));
+      };
+    }
   }
 
   @Override

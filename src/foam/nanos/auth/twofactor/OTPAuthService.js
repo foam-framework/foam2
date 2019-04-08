@@ -13,56 +13,47 @@ foam.INTERFACE({
   methods: [
     {
       name: 'generateKey',
-      returns: 'Promise',
-      javaReturns: 'String',
-      swiftReturns: 'String',
+      async: true,
+      type: 'String',
       javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
+          type: 'Context'
         },
         {
           name: 'generateQrCode',
-          javaType: 'boolean',
-          swiftType: 'Bool'
+          type: 'Boolean'
         }
       ]
     },
     {
       name: 'verifyToken',
-      returns: 'Promise',
-      javaReturns: 'boolean',
-      swiftReturns: 'Bool',
+      async: true,
+      type: 'Boolean',
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
+          type: 'Context'
         },
         {
           name: 'token',
-          javaType: 'String',
-          swiftType: 'String'
+          type: 'String'
         }
       ]
     },
     {
       name: 'disable',
-      returns: 'Promise',
-      javaReturns: 'boolean',
-      swiftReturns: 'Bool',
+      async: true,
+      type: 'Boolean',
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X',
-          swiftType: 'Context'
+          type: 'Context'
         },
         {
           name: 'token',
-          javaType: 'String',
-          swiftType: 'String'
+          type: 'String'
         }
       ]
     }
