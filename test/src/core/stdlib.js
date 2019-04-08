@@ -894,7 +894,13 @@ describe('foam.Object', function() {
     a.d = "fail";
     expect(a.d).toEqual("hello");
   });
-
+  it('is', function() {
+    var a = { d: "hello" };
+    var b = { d: "hello" };
+    expect(foam.Object.is(a, b)).toBe(false);
+    expect(foam.Object.is(a, a)).toBe(true);
+    expect(foam.Object.is(a, null)).toBe(false);
+  });
 });
 
 describe('foam.mmethod', function() {
