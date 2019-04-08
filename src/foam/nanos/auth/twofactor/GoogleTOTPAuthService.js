@@ -71,8 +71,8 @@ foam.CLASS({
         }
 
         try {
-          AppConfig config = (AppConfig) x.get("appConfig");
-          String name = config == null ? "FOAM" : config.getEmailsDisplayName();
+          EmailConfig config = (EmailConfig) x.get("emailConfig");
+          String name = config == null ? "FOAM" : config.getDisplayName();
           String path = String.format("/%s", user.getEmail());
           String query = String.format("secret=%s&issuer=%s&algorithm=%s", key, path, getAlgorithm());
           URI uri = new URI("otpauth", "totp", path, query, null);

@@ -3,7 +3,7 @@ package foam.nanos.notification.email;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.ArraySink;
-import foam.nanos.app.AppConfig;
+import foam.nanos.app.EmailConfig;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.notification.email.EmailMessage;
@@ -99,15 +99,15 @@ public class EmailsUtility {
     }
 
     // STEP 3) set defaults to properties that have not been set
-    AppConfig appConfig = (AppConfig) x.get("appConfig");
+    EmailConfig emailConfig = (EmailConfig) x.get("emailConfig");
     if ( SafetyUtil.isEmpty(emailMessage.getFrom()) ) {
-      emailMessage.setFrom(appConfig.getEmailsFrom());
+      emailMessage.setFrom(emailConfig.getFrom());
     }
     if ( SafetyUtil.isEmpty(emailMessage.getDisplayName()) ) {
-      emailMessage.setDisplayName(appConfig.getEmailsDisplayName());
+      emailMessage.setDisplayName(emailConfig.getDisplayName());
     }
     if ( SafetyUtil.isEmpty(emailMessage.getReplyTo()) ) {
-      emailMessage.setReplyTo(appConfig.getEmailsReplyTo());
+      emailMessage.setReplyTo(emailConfig.getReplyTo());
     }
 
     // STEP 4) passing emailMessage through to actual email service.
