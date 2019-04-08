@@ -32,6 +32,10 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'placeholder',
+      factory: function() { return '--'; }
+    },
+    {
       name: 'objToChoice',
       value: function(obj) {
         return obj.toSummary();
