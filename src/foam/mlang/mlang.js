@@ -1452,7 +1452,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'upperCase_',
+      name: 'upperCase_'
     }
   ],
 
