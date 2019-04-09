@@ -22,6 +22,13 @@
 // This will run a suite of generic DAO tests against it, that should work
 // against any DAO.
 
+if ( global.indexedDB === undefined
+  && global.webkitIndexedDB === undefined
+  && global.mozIndexedDB === undefined
+) {
+  // Load fake indexedDB into global
+  require('fake-indexeddb/auto');
+}
 
 global.genericDAOTestBattery = function(daoFactory) {
   describe('generic DAO tests', function() {

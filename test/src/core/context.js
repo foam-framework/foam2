@@ -20,6 +20,8 @@ describe('ConteXt object', function() {
     expect(foam).toBeTruthy();
 
     var someClass = {
+      package: 'com.acme',
+      name: 'Foo',
       id: 'com.acme.Foo'
     };
 
@@ -48,6 +50,8 @@ describe('ConteXt object', function() {
     expect(unNamed.NAME).toEqual("HELLO");
 
     var foo = {
+      package: 'some.package',
+      name: 'Foo',
       id: 'some.packaged.Foo'
     };
 

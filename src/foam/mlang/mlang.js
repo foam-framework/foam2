@@ -2038,6 +2038,7 @@ foam.CLASS({
     },
     {
       name: 'partialEval',
+      code: function() { return this; },
       javaCode:
       `Not predicate = (Not) this.fclone();
     if ( this.arg1_ instanceof Not )
