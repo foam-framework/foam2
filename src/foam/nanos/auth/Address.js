@@ -241,10 +241,11 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.nanos.auth.Hours',
       name: 'hours',
-      documentation: `The opening and closing hours for this address if the address 
-        represents a business.',
-
-      factory: function () { return []; },
+      documentation: `
+        The opening and closing hours for this address if the address represents
+        a business.
+      `,
+      factory: function() { return []; },
       javaFactory: 'return new Hours[] {};'
     }
   ],

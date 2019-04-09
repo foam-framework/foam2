@@ -110,6 +110,7 @@ foam.CLASS({
 
   css: `
     ^toolbar {
+      display: flex;
       padding-top: 4px;
     }
   `,
