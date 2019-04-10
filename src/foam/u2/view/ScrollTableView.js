@@ -122,9 +122,8 @@
     {
       type: 'String',
       name: 'scrollHeight',
-      expression: function(daoCount, limit, rowHeight) {
-        this.refresh();
-        return rowHeight * Math.max(0, daoCount - limit) + this.TABLE_HEAD_HEIGHT + 'px';
+      expression: function(daoCount, rowHeight) {
+        return rowHeight * daoCount + this.TABLE_HEAD_HEIGHT + 'px';
       }
     },
     {
@@ -272,6 +271,14 @@
         this.page1DAO_ = this.initialPage1DAO_;
         this.page2DAO_ = this.initialPage2DAO_;
         this.page3DAO_ = this.initialPage3DAO_;
+        this.table_.childNodes
+          .filter((x) => x.nodeName === 'TBODY')
+          .forEach((x) => x.remove());
+        this.table_.add(this.table_.rowsFrom(this.page1DAO_$proxy));
+        this.addTbodies();
+        if ( this.scrollbarContainer_ && this.scrollbarContainer_.el() ) {
+          this.scrollbarContainer_.el().scrollTop = 0;
+        }
       }
     },
     {
@@ -285,7 +292,6 @@
 
         // Remove the top buffer table.
         this.topBufferTable_.remove();
-        this.tablesRemoved_ += 1;
 
         // Update the table references.
         this.topBufferTable_ = this.visibleTable_;
@@ -293,12 +299,12 @@
 
         // Add a new bottom buffer table.
         var daoName = ['page1DAO_', 'page2DAO_', 'page3DAO_'][this.tablesRemoved_ % 3];
+        this.tablesRemoved_ += 1;
         this[daoName] = this.data.skip(this.currentUpperBound - this.pageSize).limit(this.pageSize);
         var rows = this.table_.rowsFrom(this[daoName + '$proxy']);
         this.table_.add(rows);
-        this.bottomBufferTable_ = this.table_.childNodes
-          .filter((x) => x.nodeName === 'TBODY')
-          .pop();
+        var x = this.table_.childNodes.filter((x) => x.nodeName === 'TBODY');
+        this.bottomBufferTable_ = x[x.length - 1];
       }
     },
     {
@@ -323,9 +329,8 @@
         this[daoName] = this.data.skip(this.currentLowerBound).limit(this.pageSize);
         var rows = this.table_.rowsFrom(this[daoName + '$proxy']);
         this.table_.insertBefore(this.table_.slotE_(rows), this.visibleTable_);
-        this.topBufferTable_ = this.table_.childNodes
-          .filter((x) => x.nodeName === 'TBODY')
-          .shift();
+        var x = this.table_.childNodes.filter((x) => x.nodeName === 'TBODY');
+        this.topBufferTable_ = x[0];
       }
     }
   ],
