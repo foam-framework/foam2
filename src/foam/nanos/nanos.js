@@ -108,7 +108,7 @@ FOAM_FILES([
   { name: "foam/nanos/mrac/NodeType" },
   { name: "foam/nanos/mrac/ClientElectoralService" },
   { name: "foam/nanos/mrac/ElectoralService" },
-  { name: "foam/nanos/mrac/State" },
+  { name: "foam/nanos/mrac/ElectoralServiceState" },
   { name: "foam/nanos/mrac/Status" },
   { name: "foam/nanos/mrac/Vote" },
   { name: "foam/nanos/session/Session" },

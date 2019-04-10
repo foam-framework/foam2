@@ -1,6 +1,6 @@
 foam.ENUM({
     package: 'foam.nanos.mrac',
-    name: 'State',
+    name: 'ElectoralServiceState',
   
     documentation: `
         Voting state of a node/instance in a cluster.

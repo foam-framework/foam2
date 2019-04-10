@@ -1,25 +1,21 @@
 foam.INTERFACE({
   package: 'foam.nanos.mrac',
   name: 'ElectoralService',
+  javaImports: [
+    'java.util.List'
+  ],
 
   methods: [
     {
-      name: 'dissolve',
-      args: [
-        {
-          name: 'clients',
-          class: 'FObjectArray',
-          of: 'foam.dao.DAO'
-        }
-      ]
+      name: 'dissolve'
     },
     {
       name: 'vote',
       type: 'Integer',
       args: [
         {
-          name: 'client',
-          type: 'foam.dao.DAO'
+          name: 'time',
+          type: 'Date'
         }
       ]
     },
@@ -27,9 +23,8 @@ foam.INTERFACE({
       name: 'report',
       args: [
         {
-          name: 'clients',
-          class: 'FObjectArray',
-          of: 'foam.dao.DAO'
+          name: 'winner',
+          type: 'foam.nanos.mrac.ClusterConfig'
         }
       ]
     }

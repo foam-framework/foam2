@@ -40,6 +40,7 @@ foam.CLASS({
     'java.net.URL',
     'java.util.ArrayList',
     'java.util.concurrent.ThreadLocalRandom',
+    'java.util.Date',
     'java.util.List'
   ],
 
@@ -56,7 +57,8 @@ foam.CLASS({
     },
     {
       name: 'electoralService',
-      class: 'foam.nanos.mrac.Vote'
+      class: 'foam.core.FObjectProperty',
+      of: 'foam.nanos.mrac.Vote'
     },
     {
       name: 'path',
@@ -216,7 +218,8 @@ foam.CLASS({
         try {
           o = getPrimary().put_(x, obj);
         } catch ( Exception e ) {
-          // vote.dissolve();
+          ClientElectoralService electoralService = (ClientElectoralService) x.get("electoralService");
+          electoralService.dissolve();
         }
         return o;
       } else {
@@ -247,9 +250,24 @@ foam.CLASS({
           config.setStatus(Status.OFFLINE);
           updateConfig(x, config);
 
-          ClientDAO secondary = (ClientDAO) getClients()[ThreadLocalRandom.current().nextInt(getClients().length)];
-          ClusterCommand dissolve = new ClusterCommand.Builder(x).setCommand(ClusterCommand.DISSOLVE).setObj(getClients()).build();
-          secondary.cmd_(x, dissolve);
+          List arr = (ArrayList) ((ArraySink) ((DAO) x.get("clusterConfigDAO"))
+            .where(
+              AND(
+                AND(
+                  EQ(ClusterConfig.REALM, config.getRealm()),
+                  EQ(ClusterConfig.REGION, config.getRegion())
+                ),
+                AND(
+                  EQ(ClusterConfig.ENABLED, true),
+                  EQ(ClusterConfig.STATUS, Status.ONLINE)
+                )
+              )
+            )
+            .select(new ArraySink())).getArray();
+
+          ClusterConfig secondary = (ClusterConfig) arr.get(ThreadLocalRandom.current().nextInt(arr.size()));
+          ClientElectoralService electoralService = new ClientElectoralService.Builder(getX()).setDelegate(new HTTPBox.Builder(getX()).setUrl(buildURL(x, secondary)).build()).build();
+          electoralService.dissolve();
 
           throw new RuntimeException(e);
         }
@@ -305,22 +323,6 @@ foam.CLASS({
           return getDelegate().put_(x, request.getObj());
         } else if ( ClusterCommand.REMOVE.equals(request.getCommand()) ) {
           return getDelegate().remove_(x, request.getObj());
-        } else if ( ClusterCommand.DISSOLVE.equals(request.getCommand()) ) {
-          if ( getElectoralService() == null ) {
-            setElectoralService((Vote) x.get("vote"));
-          }
-          getElectoralService().setState(State.IN_SESSION);
-          getElectoralService().dissolve((DAO[]) request.getObj());
-          return 0;
-        } else if ( ClusterCommand.VOTE.equals(request.getCommand()) ) {
-          if ( getElectoralService() == null ) {
-            setElectoralService((Vote) x.get("vote"));
-          }
-          return getElectoralService().vote((Date) request.getObj());
-        } else if ( ClusterCommand.UPDATE_CONFIG.equals(request.getCommand()) ) {
-          ClusterConfig config = findConfig(x).setNodeType(request.getObj());
-          updateConfig(config);
-          return config;
         } else {
           throw new UnsupportedOperationException(request.getCommand());
         }
@@ -352,16 +354,5 @@ foam.CLASS({
       }
       `
     }
-  ],
-
-  axioms: [
-    {
-      buildJavaClass: function(cls) {
-        cls.extras.push(`
-  protected Map<Integer, DAO> results = new HashMap<>();
-  protected State state_;
-        `);
-      },
-    },
-  ],
+  ]
 });
