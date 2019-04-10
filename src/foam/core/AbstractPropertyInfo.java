@@ -73,6 +73,11 @@ public abstract class AbstractPropertyInfo
     }
   }
 
+  public int compareTo(Object obj) {
+    int result = getName().compareTo(((PropertyInfo)obj).getName());
+    return result != 0 ? result : getClassInfo().compareTo(((PropertyInfo)obj).getClassInfo());
+  }
+
   @Override
   public boolean hardDiff(FObject o1, FObject o2, FObject diff){
     // compare the property value of o1 and o2

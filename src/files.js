@@ -193,6 +193,7 @@ FOAM_FILES([
   { name: "foam/dao/FilteredDAO" },
   { name: "foam/dao/DAOProperty" },
   { name: "foam/dao/SQLStatement" },
+  { name: "foam/dao/CSVSink" },
   { name: "foam/mlang/order/Comparator" },
 //  { name: "foam/mlang/order/ComparatorJava", flags: ['java'] },
   { name: "foam/mlang/mlang" },
@@ -580,4 +581,7 @@ FOAM_FILES([
   { name: "foam/u2/view/JSONTextView" },
   { name: "foam/u2/view/MapView" },
   { name: "foam/u2/view/AnyView" },
+  { name: "foam/u2/view/ArrayView" },
+
+  { name: "io/c9/ace/Lib" },
 ]);

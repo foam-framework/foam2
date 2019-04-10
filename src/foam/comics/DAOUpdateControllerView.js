@@ -98,8 +98,12 @@ foam.CLASS({
                 add(this.data.cls_.getAxiomsByClass(foam.core.Action)).
               end().
             end().
-            tag({class: this.detailView}, {data: this.data.obj}).
-            add(this.DAOUpdateController.OBJ).
+            tag({
+              class: this.detailView,
+              of: this.dao.of,
+              data$: this.data$.dot('obj'),
+              showActions: true
+            }).
           end().
         end().
       end();

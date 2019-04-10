@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "main": "src/foam.js",
   "devDependencies": {
+    "fake-indexeddb": "^2.1.0",
     "istanbul": "^0.4.2",
     "jasmine": "^2.4.1",
     "jshint": "^2.9.1"
@@ -15,5 +16,8 @@
     "benchmarks": "JASMINE_CONFIG_PATH=jasmine_benchmarks.json jasmine",
     "benchmarksDebug": "JASMINE_CONFIG_PATH=jasmine_benchmarks.json node-debug -c node_modules/jasmine/bin/jasmine.js",
     "lint": "jshint -c .jshintrc  ./src/ && jscs -c .jscsrc ./src/"
+  },
+  "dependencies": {
+    "ace-builds": "^1.4.3"
   }
 }
