@@ -70,12 +70,14 @@ foam.CLASS({
     {
       name: 'path',
       transient: true,
-      factory: function() { return require('path'); }
+      factory: function() { return require('path'); },
+      cloneProperty: function() {}
     },
     {
       name: 'fs',
       transient: true,
-      factory: function() { return require('fs'); }
+      factory: function() { return require('fs'); },
+      cloneProperty: function() {}
     }
   ],
 
