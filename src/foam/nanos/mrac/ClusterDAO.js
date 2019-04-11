@@ -32,7 +32,8 @@ foam.CLASS({
     'foam.dao.ClientDAO',
     'foam.dao.DAO',
     'foam.dao.ArraySink',
-    'foam.nanos.mrac.Vote',
+    'foam.nanos.mrac.ElectoralServiceServer',
+    'foam.nanos.mrac.ElectoralServiceState',
     'foam.util.SafetyUtil',
     'static foam.mlang.MLang.*',
     'foam.nanos.logger.Logger',
@@ -58,7 +59,7 @@ foam.CLASS({
     {
       name: 'electoralService',
       class: 'foam.core.FObjectProperty',
-      of: 'foam.nanos.mrac.Vote'
+      of: 'foam.nanos.mrac.ElectoralServiceServer'
     },
     {
       name: 'path',
@@ -164,16 +165,18 @@ foam.CLASS({
        if ( arr.size() < 3 ) {
         setCluster(false);
         return;
+      } else {
+        setCluster(true);
       }
 
       List<DAO> newClients = new ArrayList<DAO>();
       for ( int i = 0; i < arr.size(); i++ ) {
         ClusterConfig clientConfig = (ClusterConfig) arr.get(i);
         if ( clientConfig.getNodeType() == NodeType.PRIMARY ) {
-          DAO primary = new ClientDAO.Builder(x).setDelegate(new HTTPBox.Builder(x).setUrl(buildURL(x, clientConfig)).build()).build();
+          DAO primary = new ClientDAO.Builder(x).setDelegate(new HTTPBox.Builder(x).setUrl(buildURL(x, clientConfig, getServiceName())).build()).build();
           setPrimary(primary);
         } else if ( clientConfig.getNodeType() == NodeType.SECONDARY ) {
-          DAO client = new ClientDAO.Builder(x).setDelegate(new HTTPBox.Builder(x).setUrl(buildURL(x, clientConfig)).build()).build();
+          DAO client = new ClientDAO.Builder(x).setDelegate(new HTTPBox.Builder(x).setUrl(buildURL(x, clientConfig, getServiceName())).build()).build();
           newClients.add(client);
         } 
       }
@@ -246,6 +249,7 @@ foam.CLASS({
         foam.core.FObject o = null;
         try {
           o = getDelegate().put_(x, obj);
+          int k = 0/0;
         } catch ( Exception e ) {
           config.setStatus(Status.OFFLINE);
           updateConfig(x, config);
@@ -254,19 +258,22 @@ foam.CLASS({
             .where(
               AND(
                 AND(
-                  EQ(ClusterConfig.REALM, config.getRealm()),
-                  EQ(ClusterConfig.REGION, config.getRegion())
+                  AND(
+                    EQ(ClusterConfig.REALM, config.getRealm()),
+                    EQ(ClusterConfig.REGION, config.getRegion())
+                  ),
+                  AND(
+                    EQ(ClusterConfig.ENABLED, true),
+                    EQ(ClusterConfig.STATUS, Status.ONLINE)
+                  )
                 ),
-                AND(
-                  EQ(ClusterConfig.ENABLED, true),
-                  EQ(ClusterConfig.STATUS, Status.ONLINE)
-                )
+                NEQ(ClusterConfig.ID, config.getId())
               )
             )
             .select(new ArraySink())).getArray();
 
           ClusterConfig secondary = (ClusterConfig) arr.get(ThreadLocalRandom.current().nextInt(arr.size()));
-          ClientElectoralService electoralService = new ClientElectoralService.Builder(getX()).setDelegate(new HTTPBox.Builder(getX()).setUrl(buildURL(x, secondary)).build()).build();
+          ClientElectoralService electoralService = new ClientElectoralService.Builder(getX()).setDelegate(new HTTPBox.Builder(getX()).setUrl(buildURL(x, secondary, "electoralService")).build()).build();
           electoralService.dissolve();
 
           throw new RuntimeException(e);
@@ -340,13 +347,17 @@ foam.CLASS({
         {
           name: 'config',
           type: 'foam.nanos.mrac.ClusterConfig'
+        },
+        {
+          name: 'name',
+          type: 'String'
         }
       ],
       type: 'String',
       javaCode: `
       try {
         // TODO: protocol - http will do for now as we are behind the load balancers.
-        java.net.URI uri = new java.net.URI("http", null, config.getId(), config.getPort(), "/"+getPath()+"/"+getServiceName(), null, null);
+        java.net.URI uri = new java.net.URI("http", null, config.getId(), config.getPort(), "/"+getPath()+"/"+name, null, null);
         return uri.toURL().toString();
       } catch (java.net.MalformedURLException | java.net.URISyntaxException e) {
         ((Logger) getX().get("logger")).error(e);

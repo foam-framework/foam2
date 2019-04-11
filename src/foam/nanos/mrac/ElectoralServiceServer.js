@@ -1,7 +1,12 @@
 foam.CLASS({
   package: 'foam.nanos.mrac',
-  name: 'Vote',
-  implements: [ 'foam.nanos.mrac.ElectoralService' ],
+  name: 'ElectoralServiceServer',
+
+  implements: [
+    'foam.nanos.mrac.ElectoralService',
+    // 'foam.nanos.NanoService'
+  ],
+
   javaImports: [
     'foam.box.HTTPBox',
     'foam.core.FObject',
@@ -11,9 +16,11 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil',
     'java.util.ArrayList',
-    'java.util.List',
+    'java.util.concurrent.ExecutorService',
+    'java.util.concurrent.Executors',
     'java.util.concurrent.ThreadLocalRandom',
     'java.util.Date',
+    'java.util.List',
     'static foam.mlang.MLang.*'
   ],
 
@@ -21,7 +28,8 @@ foam.CLASS({
     {
       name: 'state',
       class: 'Enum',
-      of: 'foam.nanos.mrac.ElectoralServiceState'
+      of: 'foam.nanos.mrac.ElectoralServiceState',
+      value: 'oam.nanos.mrac.ElectoralServiceState.VOTING'
     },
     {
       name: 'electionTime',
@@ -55,7 +63,7 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      return getVotes() >= (2 * total + 1);
+      return getVotes() >= (total / 2 + 1);
     `
     },
     {
@@ -122,12 +130,10 @@ foam.CLASS({
       name: 'dissolve',
       javaCode: `
     ClusterConfig config = findConfig(getX());
-    if ( getState().equals(ElectoralServiceState.IN_SESSION) ) {
+    // if ( getState().equals(ElectoralServiceState.IN_SESSION) ) {
       setElectionTime(new Date());
       setState(ElectoralServiceState.ELECTION);
-
-      setCurrentSeq(vote(getElectionTime()));
-      setWinner(config);
+      recordResult(vote(getElectionTime()), config);
 
       List arr = (ArrayList) ((ArraySink) ((DAO) getX().get("clusterConfigDAO"))
         .where(
@@ -143,48 +149,54 @@ foam.CLASS({
           )
         )
         .select(new ArraySink())).getArray();
-      for (int i = 0; i < arr.size(); i++) {
-        ClusterConfig clientConfig = (ClusterConfig) arr.get(i);
-        if ( clientConfig.getId().equals(config.getId())) {
-          break;
-        }
-        ClientElectoralService electoralService = new ClientElectoralService.Builder(getX()).setDelegate(new HTTPBox.Builder(getX()).setUrl(buildURL(clientConfig)).build()).build();
-        Thread getVote = new Thread(() -> {
-          int result = electoralService.vote(getElectionTime());
-          recordResult(result, clientConfig);
-        });
-        getVote.start();
 
-        if (getState().equals(ElectoralServiceState.VOTING)) {
-          break;
-        }
-        if (getState().equals(ElectoralServiceState.ELECTION) && hasQuorum(arr.size())) {
-          report(getWinner());
-          for (int j = 0; j < arr.size(); j++) {
-            ClusterConfig clientConfig2 = (ClusterConfig) arr.get(j);
-            if ( clientConfig2.getId().equals(config.getId())) {
+      ExecutorService pool = Executors.newFixedThreadPool(arr.size());
+
+      for (int i = 0; i < arr.size(); i++) {
+            ClusterConfig clientConfig = (ClusterConfig) arr.get(i);
+            if ( clientConfig.getId().equals(config.getId())) {
               break;
             }
-            ClientElectoralService electoralService2 = new ClientElectoralService.Builder(getX()).setDelegate(new HTTPBox.Builder(getX()).setUrl(buildURL(clientConfig2)).build()).build();
-            Thread updateConfig = new Thread(() -> {
-              electoralService2.report(getWinner());
-            });
-            updateConfig.start();
-          }
+            ClientElectoralService electoralService = new ClientElectoralService.Builder(getX()).setDelegate(new HTTPBox.Builder(getX()).setUrl(buildURL(clientConfig)).build()).build();
 
-          break;
-        }
-      }
-    }
+
+            pool.execute(() -> {
+              int result = electoralService.vote(getElectionTime());
+              recordResult(result, clientConfig);
+            });
+    
+            if (getState().equals(ElectoralServiceState.VOTING)) {
+              break;
+            }
+            if (getState().equals(ElectoralServiceState.ELECTION) && hasQuorum(arr.size())) {
+              ClusterConfig winner = getWinner();
+              report(winner);
+              for (int j = 0; j < arr.size(); j++) {
+                ClusterConfig clientConfig2 = (ClusterConfig) arr.get(j);
+                if ( ! clientConfig2.getId().equals(config.getId())) {
+                  ClientElectoralService electoralService2 = new ClientElectoralService.Builder(getX()).setDelegate(new HTTPBox.Builder(getX()).setUrl(buildURL(clientConfig2)).build()).build();
+                  pool.execute(() -> {
+                    electoralService2.report(winner);
+                  });
+                }
+              }
+              break;
+            }
+          }
+          pool.shutdown();
+    // }
      `
     },
     {
       name: 'vote',
       javaCode: `
-      if ( getState().equals(ElectoralServiceState.ELECTION) && ( time.before(getElectionTime()) ) ) {
-        setState(ElectoralServiceState.VOTING);
+      if ( findConfig(getX()).getStatus().equals(Status.ONLINE) ) {
+        if ( getState().equals(ElectoralServiceState.ELECTION) && ( time.before(getElectionTime()) ) ) {
+          setState(ElectoralServiceState.VOTING);
+        }
+        return ThreadLocalRandom.current().nextInt(255);
       }
-      return ThreadLocalRandom.current().nextInt();
+      return -1;
      `
     },
     {
@@ -196,25 +208,22 @@ foam.CLASS({
       List arr = (ArrayList) ((ArraySink) dao
         .where(
           AND(
-            AND(
-              EQ(ClusterConfig.REALM, config.getRealm()),
-              EQ(ClusterConfig.REGION, config.getRegion())
-            ),
-            AND(
-              EQ(ClusterConfig.ENABLED, true),
-              EQ(ClusterConfig.STATUS, Status.ONLINE)
-            )
+            EQ(ClusterConfig.REALM, config.getRealm()),
+            EQ(ClusterConfig.REGION, config.getRegion())
           )
         )
         .select(new ArraySink())).getArray();
       for (int i = 0; i < arr.size(); i++) {
         ClusterConfig clientConfig = (ClusterConfig) arr.get(i);
         if ( winner.getId().equals(clientConfig.getId()) ) {
-          clientConfig.setNodeType(NodeType.PRIMARY);
+          ClusterConfig newConfig = (ClusterConfig) (clientConfig.fclone());
+          newConfig.setNodeType(NodeType.PRIMARY);
+          dao.put_(getX(), newConfig);
         } else if (clientConfig.getNodeType().equals(NodeType.PRIMARY)) {
-          clientConfig.setNodeType(NodeType.SECONDARY);
+          ClusterConfig newConfig = (ClusterConfig) (clientConfig.fclone());
+          newConfig.setNodeType(NodeType.SECONDARY);
+          dao.put_(getX(), newConfig);
         }
-        dao.put_(getX(), clientConfig);
       }  
      `
     },

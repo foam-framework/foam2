@@ -232,7 +232,7 @@ var classes = [
   'foam.nanos.mrac.ElectoralService',
   'foam.nanos.mrac.ElectoralServiceState',
   'foam.nanos.mrac.Status',
-  'foam.nanos.mrac.Vote',
+  'foam.nanos.mrac.ElectoralServiceServer',
   'foam.nanos.notification.email.EmailMessage',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.EmailTemplate',
