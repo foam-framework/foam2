@@ -12,11 +12,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
-      expression: function(package, name) {
-        // Can't reference 'package' directly as a local variable, it's a
-        // keyword and makes Closure compiler fail to parse the expression.
-        const pkg = arguments[0];
-        return pkg ? pkg + '.' + name : name;
+      getter: function() {
+        return this.package ? this.package + '.' + this.name : this.name;
       },
     },
     {
