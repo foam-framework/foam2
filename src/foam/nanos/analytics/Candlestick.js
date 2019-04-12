@@ -7,10 +7,9 @@
 foam.CLASS({
   package: 'foam.nanos.analytics',
   name: 'Candlestick',
-  ids: ['end', 'grouping'],
+  ids: ['closeTime', 'key'],
   tableColumns: [
-    'grouping',
-    'end',
+    'key',
     'open',
     'close',
     'min',
@@ -19,12 +18,8 @@ foam.CLASS({
   ],
   properties: [
     {
-      class: 'DateTime',
-      name: 'end'
-    },
-    {
-      class: 'Array',
-      name: 'grouping'
+      class: 'Object',
+      name: 'key'
     },
     {
       class: 'Float',
@@ -75,23 +70,12 @@ foam.CLASS({
         {
           type: 'Float',
           name: 'v'
-        },
-        {
-          type: 'Date',
-          name: 'time'
         }
       ],
       javaCode: `
         setMin(isPropertySet("min") ? Math.min(v, getMin()) : v);
         setMax(isPropertySet("max") ? Math.max(v, getMax()) : v);
-        if ( ! isPropertySet("openTime") || time.compareTo(getOpenTime()) < 0 ) {
-          setOpenTime(time);
-          setOpen(v);
-        }
-        if ( ! isPropertySet("closeTime") || time.compareTo(getCloseTime()) > 0 ) {
-          setCloseTime(time);
-          setClose(v);
-        }
+        setClose(v);
         setTotal(getTotal() + v);
         setCount(getCount() + 1);
       `

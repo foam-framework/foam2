@@ -7,6 +7,9 @@
 foam.CLASS({
   package: 'foam.demos.analytics',
   name: 'StockSnapshot',
+  implements: [
+    'foam.nanos.analytics.Foldable'
+  ],
   ids: ['time', 'symbol'],
   properties: [
     {
@@ -20,6 +23,14 @@ foam.CLASS({
     {
       class: 'Float',
       name: 'price'
+    }
+  ],
+  methods: [
+    {
+      name: 'doFolds',
+      javaCode: `
+fm.foldForState(getSymbol(), getPrice());
+      `
     }
   ]
 });
