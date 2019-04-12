@@ -186,7 +186,7 @@ foam.CLASS({
         return typeof v === 'number' ? v : v ? parseFloat(v) : 0.0 ;
       }
     ],
-    [ 'type', 'Double' ]
+    [ 'type', 'Float' ]
   ]
 });
 
