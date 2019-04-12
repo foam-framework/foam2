@@ -19,11 +19,11 @@ foam.CLASS({
   axioms: [
     foam.u2.CSS.create({
       code: function() {/*
-        ^selected_day_cell, ^calendar_table td^selected_day_cell:hover {
-          background-color: green;
+        ^selected_day_cell {
+          background-color: #e5f1fc;
         }
         ^prev_month_cell, ^next_month_cell {
-          color: lightgray;
+          color: lightgray !important;
         }
         ^calendar_table td {
           text-align: center;
@@ -34,8 +34,26 @@ foam.CLASS({
         ^calendar_table td {
           cursor: pointer;
         }
+
         ^calendar_table td:hover {
           background-color: gray;
+        }
+
+        ^calendar_table tr > td {
+          border:1px solid #cbcfd4;
+          color: #5e6061;
+          padding: 6px 7px 6px 7px;
+        }
+
+        ^calendar_table  {
+          border-collapse: collapse;
+          width: 224px;
+          height: 160px;
+        }
+
+        ^calendar_table tbody > tr > th {
+          font-size: 10px;
+          color: #5e6061;
         }
       */}
     })
