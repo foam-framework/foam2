@@ -342,7 +342,8 @@ var classes = [
   'foam.nanos.dig.exception.GeneralException',
 
   'foam.demos.analytics.StockSnapshot',
-  'foam.nanos.analytics.CandlestickDAODecorator'
+  'foam.nanos.analytics.FoldManagerDAODecorator',
+  'foam.nanos.analytics.DAOFoldManager'
 ];
 
 var abstractClasses = [
