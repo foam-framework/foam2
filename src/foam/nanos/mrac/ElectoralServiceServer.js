@@ -29,7 +29,7 @@ foam.CLASS({
       name: 'state',
       class: 'Enum',
       of: 'foam.nanos.mrac.ElectoralServiceState',
-      value: 'oam.nanos.mrac.ElectoralServiceState.VOTING'
+      value: 'foam.nanos.mrac.ElectoralServiceState.IN_SESSION'
     },
     {
       name: 'electionTime',
@@ -130,7 +130,7 @@ foam.CLASS({
       name: 'dissolve',
       javaCode: `
     ClusterConfig config = findConfig(getX());
-    // if ( getState().equals(ElectoralServiceState.IN_SESSION) ) {
+    if ( getState().equals(ElectoralServiceState.IN_SESSION) ) {
       setElectionTime(new Date());
       setState(ElectoralServiceState.ELECTION);
       recordResult(vote(getElectionTime()), config);
@@ -184,7 +184,7 @@ foam.CLASS({
             }
           }
           pool.shutdown();
-    // }
+    }
      `
     },
     {

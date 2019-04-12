@@ -249,7 +249,6 @@ foam.CLASS({
         foam.core.FObject o = null;
         try {
           o = getDelegate().put_(x, obj);
-          int k = 0/0;
         } catch ( Exception e ) {
           config.setStatus(Status.OFFLINE);
           updateConfig(x, config);
