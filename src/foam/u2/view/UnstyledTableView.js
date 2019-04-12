@@ -97,6 +97,14 @@ foam.CLASS({
       `
     },
     {
+      type: 'Boolean',
+      name: 'ignoreModelActions',
+      documentation: `
+        If set to true, actions declared on the model won't be used to populate
+        the context menu.
+      `
+    },
+    {
       class: 'Boolean',
       name: 'editColumnsEnabled',
       value: true,
@@ -276,10 +284,13 @@ foam.CLASS({
                     end();
                 }).
                 call(function() {
+                  var contextMenuActions = Array.isArray(view.contextMenuActions)
+                    ? view.contextMenuActions
+                    : [];
                   var modelActions = view.of.getAxiomsByClass(foam.core.Action);
-                  var allActions = Array.isArray(view.contextMenuActions) ?
-                    view.contextMenuActions.concat(modelActions) :
-                    modelActions;
+                  var allActions = view.ignoreModelActions
+                    ? contextMenuActions
+                    : contextMenuActions.concat(modelActions);
                   var actions = allActions.filter(function(action) {
                     return action.isAvailableFor(obj);
                   });

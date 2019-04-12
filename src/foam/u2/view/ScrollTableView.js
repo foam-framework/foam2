@@ -80,6 +80,10 @@
       name: 'contextMenuActions'
     },
     {
+      type: 'Boolean',
+      name: 'ignoreModelActions'
+    },
+    {
       class: 'Int',
       name: 'daoCount'
     },
@@ -244,6 +248,7 @@
               data: this.page1DAO_$proxy,
               columns: this.columns,
               contextMenuActions: this.contextMenuActions,
+              ignoreModelActions: this.ignoreModelActions,
               selection$: this.selection$,
               editColumnsEnabled: this.editColumnsEnabled
             }, this.table_$).
