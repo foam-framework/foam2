@@ -36,12 +36,10 @@ public class SessionServerBox
     String sessionID = (String) msg.getAttributes().get("sessionId");
     Logger logger    = (Logger) getX().get("logger");
 
-/*
     if ( sessionID == null ) {
-      msg.replyWithException(new IllegalArgumentException("SessionID is required"));
+      msg.replyWithException(new IllegalArgumentException("sessionid is missing"));
       return;
     }
-    */
     try {
       NSpec              spec       = getX().get(NSpec.class);
       HttpServletRequest req        = getX().get(HttpServletRequest.class);
