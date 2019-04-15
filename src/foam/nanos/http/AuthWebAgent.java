@@ -214,18 +214,30 @@ public class AuthWebAgent
     HttpServletRequest req     = x.get(HttpServletRequest.class);
     Session            session = new Session((X) x.get(Boot.ROOT));
 
-    // need to handle case for proxies
-    // check if 'x-forwarded-for' exists
+    /**
+     * Since we are now accounting for requests which are sent through proxies which have the X-Forwarded-For header
+     * We need to take care of 2 cases:
+     * 1. if the request was sent through a proxy (X-Forwarded-For != null)
+     * 2. if the request was not sent through a proxy (X-Forwarded-For == null)
+     */
     if ( req.getHeader("X-Forwarded-For") != null ) {
-      // set x forwarded for as sourceHost
-      // set req.getRemoteHost() as proxyHost
+
+      /**
+       * Case 1. Sent through proxy
+       * SourceHost should be the IP stored in the X-Forwarded-For header
+       * ProxyHost should the IP returned by getRemoteHost() since it is the most recent node that the request was passed through
+       */
       session.setSourceHost(req.getHeader("X-Forwarded-For"));
       session.setProxyHost(req.getRemoteHost());
     } else {
-      // otherwise set source host as remote host because not going through a proxy
+      /**
+       * Case 2. Not sent through proxy
+       * SourceHost should be the IP returned by getRemoteHost() since there are no proxies
+       * ProxyHost should be null by default
+       */
       session.setSourceHost(req.getRemoteHost());
-      // ProxyHost will be null by default
     }
+    
     return session;
   }
 

@@ -53,9 +53,17 @@ foam.CLASS({
       class: 'Long',
       name: 'uses'
     },
+
+    /**
+     * NOTE: sourceHost and proxyHost:
+     * were put in place to account for requests who have the X-Forwarded-For header
+     * sourceHost would be the IP detailed in the X-Forwarded-For header
+     * proxyHost would be what ever req.getRemoteHost returns (which is always the last node that sent the request which in this case is the proxy)
+     * in cases without proxies, sourceHost would be req.getRemoteHost and proxyHost would be null
+     */
     {
       class: 'String',
-      name: 'sourceHost'
+      name: 'sourceHost',
     },
     {
       class: 'String',
