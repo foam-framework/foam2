@@ -216,7 +216,7 @@ public class AuthWebAgent
 
     // need to handle case for proxies
     // check if 'x-forwarded-for' exists
-    if ( req.getHeader("X-Forwarded-For") ) {
+    if ( req.getHeader("X-Forwarded-For") != null ) {
       // set x forwarded for as sourceHost
       // set req.getRemoteHost() as proxyHost
       session.setSourceHost(req.getHeader("X-Forwarded-For"));

@@ -52,7 +52,7 @@ public class SessionServerBox
         session.setId(sessionID);
 
         // check if 'x-forwarded-for' exists
-        if ( req.getHeader("X-Forwarded-For") ) {
+        if ( req.getHeader("X-Forwarded-For") != null ) {
           // set x forwarded for as sourceHost
           // set req.getRemoteHost() as proxyHost
           session.setSourceHost(req.getHeader("X-Forwarded-For"));
@@ -74,7 +74,7 @@ public class SessionServerBox
 
         // check if 'x-forwarded-for' exists
         // could probably refactor this into one conditional
-        if ( req.getHeader("X-Forwarded-For") ) {
+        if ( req.getHeader("X-Forwarded-For") != null ) {
           if ( ! SafetyUtil.equals(session.getSourceHost(), req.getHeader("X-Forwarded-For")) ) {
             // If an existing session is reused with a different remote host then
             // logout the session and force a re-login.
