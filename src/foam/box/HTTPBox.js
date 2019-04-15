@@ -55,7 +55,28 @@ foam.CLASS({
     'window'
   ],
 
+  constants: [
+    {
+      name: 'SESSION_KEY',
+      value: 'sessionId',
+      type: 'String'
+    }
+  ],
+
   properties: [
+    {
+      class: 'String',
+      name: 'sessionName',
+      value: 'defaultSession'
+    },
+    {
+      class: 'String',
+      name: 'sessionID',
+      factory: function() {
+        return localStorage[this.sessionName] ||
+          ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
+      }
+    },
     {
       class: 'String',
       name: 'url'
@@ -142,6 +163,8 @@ protected class ResponseThread implements Runnable {
     {
       name: 'send',
       code: function(msg) {
+        msg.attributes[this.SESSION_KEY] = this.sessionID;
+
         // TODO: We should probably clone here, but often the message
         // contains RPC arguments that don't clone properly.  So
         // instead we will mutate replyBox and put it back after.
