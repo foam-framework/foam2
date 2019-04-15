@@ -66,6 +66,7 @@ var classes = [
   'foam.box.HTTPReplyBox',
   'foam.box.AuthServiceClientBox',
   'foam.nanos.app.AppConfig',
+  'foam.nanos.app.ContextLookupAppConfigService',
   'foam.nanos.http.WebAgent',
   'com.google.foam.demos.heroes.Hero',
   'com.google.auth.TokenVerifier',
@@ -351,6 +352,7 @@ var abstractClasses = [
 var skeletons = [
   'foam.dao.DAO',
   'foam.mop.MOP',
+  'foam.nanos.app.AppConfigService',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.AgentAuthService',
   'foam.nanos.auth.email.EmailDocInterface',
