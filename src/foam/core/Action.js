@@ -153,10 +153,11 @@ foam.CLASS({
         slot ;
     },
 
-    function isAvailableFor(data) {
-      return this.isAvailable ?
+    async function isAvailableFor(ctx, data) {
+      var available = this.isAvailable ?
         foam.Function.withArgs(this.isAvailable, data) :
-        true ;
+        true;
+      return available && await this.checkPermission(ctx);
     },
 
     function createIsAvailable$(data$) {
@@ -170,9 +171,11 @@ foam.CLASS({
         slot ;
     },
 
-    function maybeCall(ctx, data) {
-      // TODO: permission check
-      if ( this.isEnabledFor(data) && this.isAvailableFor(data) ) {
+    async function maybeCall(ctx, data) {
+      if (
+        this.isEnabledFor(data) &&
+        await this.isAvailableFor(ctx, data)
+      ) {
         this.code.call(data, ctx, this);
         // primitive types won't have a pub method
         // Why are we publishing this event anyway? KGR

@@ -275,14 +275,15 @@ foam.CLASS({
                       }).
                     end();
                 }).
-                call(function() {
+                call(async function() {
                   var modelActions = view.of.getAxiomsByClass(foam.core.Action);
                   var allActions = Array.isArray(view.contextMenuActions) ?
                     view.contextMenuActions.concat(modelActions) :
                     modelActions;
-                  var actions = allActions.filter(function(action) {
-                    return action.isAvailableFor(obj);
-                  });
+                  var availableActions = await Promise.all(allActions.map(async (action) => {
+                    return await action.isAvailableFor(this.__context__, obj);
+                  }));
+                  var actions = allActions.filter((_, i) => availableActions[i]);
                   var overlay = view.OverlayDropdown.create();
                   return this.start('td').
                     callIf(actions.length > 0, function() {
