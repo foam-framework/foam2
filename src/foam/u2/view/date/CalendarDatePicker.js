@@ -36,7 +36,7 @@ foam.CLASS({
         }
 
         ^calendar_table td:hover {
-          background-color: gray;
+          background-color: #F5F7FA;
         }
 
         ^calendar_table tr > td {
@@ -54,6 +54,12 @@ foam.CLASS({
         ^calendar_table tbody > tr > th {
           font-size: 10px;
           color: #5e6061;
+          font-size: 10px;
+          font-weight: normal;
+          font-style: normal;
+          font-stretch: normal;
+          line-height: 1.5;
+          letter-spacing: normal;
         }
       */}
     })

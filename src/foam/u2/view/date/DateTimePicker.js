@@ -118,6 +118,10 @@ foam.CLASS({
           text-align: center;
           margin-left: 54px;
         }
+
+        ^ .time-of-day {
+          display: inline-block;
+        }
       */}
     })
   ],
@@ -158,7 +162,7 @@ foam.CLASS({
             .start()
               .addClass('year')
               .start('img')
-                .attrs({ src: '/src/foam/u2/images/arrow-left-white.svg' })
+                .attrs({ src: 'images/arrow-left-white.svg' })
                 .addClass('arrow-left')
                 .on('click', function() { self.year--; })
               .end()
@@ -166,7 +170,7 @@ foam.CLASS({
                 .add(this.year$).addClass('year-number')
               .end()
               .start('img')
-                .attrs({ src: '/src/foam/u2/images/arrow-right-white.svg' })
+                .attrs({ src: 'images/arrow-right-white.svg' })
                 .addClass('arrow-right')
                 .on('click', function() { self.year++; })
               .end()
@@ -177,7 +181,7 @@ foam.CLASS({
               .start()
                 .addClass('arrow-container').addClass('arrow-container-left')
                 .start('img')
-                  .attrs({ src: '/src/foam/u2/images/arrow-left-black.svg' })
+                  .attrs({ src: 'images/arrow-left-black.svg' })
                   .addClass('arrow-black')
                   .on('click', function() { self.monthIndex--; })
                 .end()
@@ -189,7 +193,7 @@ foam.CLASS({
               .start()
                 .addClass('arrow-container').addClass('arrow-container-right')
                 .start('img')
-                  .attrs({ src: '/src/foam/u2/images/arrow-right-black.svg' })
+                  .attrs({ src: 'images/arrow-right-black.svg' })
                   .addClass('arrow-black')
                   .on('click', function() { self.monthIndex++; })
                 .end()
@@ -204,24 +208,33 @@ foam.CLASS({
             .start()
               .addClass('time-of-day')
               .show(this.showTimeOfDay$)
-              .tag(this.NOON, { data: this })
+              .start()
+                .tag(this.NOON, { data: this })
+                .addClass('time-of-day')
+              .end()
               .start(this.ChoiceView, {
                 choices: zeroLeadingNumArray(1, 12),
                 data$: this.hour12$
-              })
+              }).addClass('time-of-day')
                 .attrs({ size: 2, maxlength: 2 })
               .end().
               start()
                 .add(':')
                 .addClass('colon')
+                .addClass('time-of-day')
               .end()
               .start(this.ChoiceView, {
                 choices: zeroLeadingNumArray(0, 59),
                 data$: this.minute$
               })
                 .attrs({ size: 2, maxlength: 2 })
+                .addClass('time-of-day')
               .end()
-              .add(this.PERIOD)
+              .start()
+                .add(this.PERIOD)
+                .addClass('time-of-day')
+              .end()
+            .end()
           .end()
         .endContext()
       .end();
