@@ -50,8 +50,18 @@ public class SessionServerBox
       if ( session == null ) {
         session = new Session();
         session.setId(sessionID);
-        session.setRemoteHost(req.getRemoteHost());
 
+        // check if 'x-forwarded-for' exists
+        if ( req.getHeader("X-Forwarded-For") ) {
+          // set x forwarded for as sourceHost
+          // set req.getRemoteHost() as proxyHost
+          session.setSourceHost(req.getHeader("X-Forwarded-For"));
+          session.setProxyHost(req.getRemoteHost());
+        } else {
+          // otherwise set source host as remote host because not going through a proxy
+          session.setSourceHost(req.getRemoteHost());
+          // ProxyHost will be null by default
+        }
         // Set the user to null to avoid the system user from leaking into
         // newly created sessions. If we don't do this, then a user has admin
         // privileges before they log in, which is obviously a big security
@@ -60,13 +70,28 @@ public class SessionServerBox
         sessionDAO.put(session);
       } else if ( req != null ) {
         // if req == null it means that we're being accessed via webSockets
-        if ( ! SafetyUtil.equals(session.getRemoteHost(), req.getRemoteHost()) ) {
-          // If an existing session is reused with a different remote host then
-          // logout the session and force a re-login.
-//          logger.warning("Attempt to use session create for ", session.getRemoteHost(), " from ", req.getRemoteHost());
-//          session.setContext(getX().put(Session.class, session));
-//          session.setRemoteHost(req.getRemoteHost());
-//          sessionDAO.put(session);
+        // we should be sure to handle both cases
+
+        // check if 'x-forwarded-for' exists
+        // could probably refactor this into one conditional
+        if ( req.getHeader("X-Forwarded-For") ) {
+          if ( ! SafetyUtil.equals(session.getSourceHost(), req.getHeader("X-Forwarded-For")) ) {
+            // If an existing session is reused with a different remote host then
+            // logout the session and force a re-login.
+            // logger.warning("Attempt to use session create for ", session.getRemoteHost(), " from ", req.getRemoteHost());
+            // session.setContext(getX().put(Session.class, session));
+            // session.setRemoteHost(req.getRemoteHost());
+            // sessionDAO.put(session);
+          }
+        } else {
+          if ( ! SafetyUtil.equals(session.getSourceHost(), req.getRemoteHost()) ) {
+            // If an existing session is reused with a different remote host then
+            // logout the session and force a re-login.
+            // logger.warning("Attempt to use session create for ", session.getRemoteHost(), " from ", req.getRemoteHost());
+            // session.setContext(getX().put(Session.class, session));
+            // session.setRemoteHost(req.getRemoteHost());
+            // sessionDAO.put(session);
+          }
         }
       }
 

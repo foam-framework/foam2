@@ -212,8 +212,20 @@ public class AuthWebAgent
 
   public Session createSession(X x) {
     HttpServletRequest req     = x.get(HttpServletRequest.class);
-    Session            session = new Session((X) x.get(Boot.ROOT)); 
-    session.setRemoteHost(req.getRemoteHost());
+    Session            session = new Session((X) x.get(Boot.ROOT));
+
+    // need to handle case for proxies
+    // check if 'x-forwarded-for' exists
+    if ( req.getHeader("X-Forwarded-For") ) {
+      // set x forwarded for as sourceHost
+      // set req.getRemoteHost() as proxyHost
+      session.setSourceHost(req.getHeader("X-Forwarded-For"));
+      session.setProxyHost(req.getRemoteHost());
+    } else {
+      // otherwise set source host as remote host because not going through a proxy
+      session.setSourceHost(req.getRemoteHost());
+      // ProxyHost will be null by default
+    }
     return session;
   }
 
