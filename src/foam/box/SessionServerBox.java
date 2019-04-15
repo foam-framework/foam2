@@ -36,20 +36,21 @@ public class SessionServerBox
     String sessionID = (String) msg.getAttributes().get("sessionId");
     Logger logger    = (Logger) getX().get("logger");
 
-    if ( sessionID == null ) {
-      msg.replyWithException(new IllegalArgumentException("sessionid is missing"));
+    if ( sessionID == null && authenticate_ ) {
+      msg.replyWithException(new IllegalArgumentException("sessionid required for authenticated services"));
       return;
     }
+
     try {
       NSpec              spec       = getX().get(NSpec.class);
       HttpServletRequest req        = getX().get(HttpServletRequest.class);
       AuthService        auth       = (AuthService) getX().get("auth");
       DAO                sessionDAO = (DAO)         getX().get("localSessionDAO");
-      Session            session    = (Session)     sessionDAO.find(sessionID);
+      Session            session    = sessionID == null ? null : (Session) sessionDAO.find(sessionID);
 
       if ( session == null ) {
         session = new Session();
-        session.setId(sessionID);
+        session.setId(sessionID == null ? "anonymous" : sessionID);
         session.setRemoteHost(req.getRemoteHost());
 
         // Set the user to null to avoid the system user from leaking into
@@ -57,7 +58,7 @@ public class SessionServerBox
         // privileges before they log in, which is obviously a big security
         // issue.
         session.setContext(getX().put("user", null).put("group", null).put(Session.class, session));
-        sessionDAO.put(session);
+        if ( sessionID != null ) sessionDAO.put(session);
       } else if ( req != null ) {
         // if req == null it means that we're being accessed via webSockets
         if ( ! SafetyUtil.equals(session.getRemoteHost(), req.getRemoteHost()) ) {
@@ -120,7 +121,7 @@ public class SessionServerBox
           return;
         }
 
-        // padding this cause if group is null this can cause an NPE
+        // padding this because if group is null this can cause an NPE
         // technically the user shouldn't be created without a group
         if ( group == null ) {
           logger.warning(String.format("The context with id = %s does not have the group set in the context.", session.getId()));
