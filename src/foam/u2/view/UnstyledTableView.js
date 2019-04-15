@@ -14,6 +14,7 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.core.ConstantSlot',
     'foam.dao.ProxyDAO',
     'foam.u2.md.OverlayDropdown',
     'foam.u2.view.EditColumnsView',
@@ -277,18 +278,16 @@ foam.CLASS({
                 }).
                 call(function() {
                   var modelActions = view.of.getAxiomsByClass(foam.core.Action);
-                  var allActions = Array.isArray(view.contextMenuActions) ?
+                  var actions = Array.isArray(view.contextMenuActions) ?
                     view.contextMenuActions.concat(modelActions) :
                     modelActions;
-                  var actions = allActions.filter(function(action) {
-                    return action.isAvailableFor(obj);
-                  });
                   var overlay = view.OverlayDropdown.create();
                   return this.start('td').
                     callIf(actions.length > 0, function() {
                       overlay.forEach(actions, function(action) {
                         this.
                           start().
+                            show(action.createIsAvailable$(view.ConstantSlot.create({ value: obj }))).
                             addClass(view.myClass('context-menu-item')).
                             add(action.label).
                             call(async function() {

@@ -94,14 +94,14 @@ foam.CLASS({
       name: 'isAvailable',
       label: 'Available',
       help: 'Function to determine if action is available.',
-      value: null
+      value: function() { return true; }
     },
     {
       class: 'Function',
       name: 'isEnabled',
       label: 'Enabled',
       help: 'Function to determine if action is enabled.',
-      value: null
+      value: function() { return true; }
     },
     {
       class: 'Function',
