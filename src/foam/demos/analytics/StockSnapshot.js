@@ -29,7 +29,7 @@ foam.CLASS({
     {
       name: 'doFolds',
       javaCode: `
-fm.foldForState(getSymbol(), getPrice());
+fm.foldForState(getSymbol(), getTime(), getPrice());
       `
     }
   ]

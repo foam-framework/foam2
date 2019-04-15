@@ -10,8 +10,15 @@ foam.CLASS({
   ids: ['closeTime', 'key'],
   tableColumns: [
     'key',
+    'openTime',
+    'closeTime',
+
     'open',
+    'openValueTime',
+
     'close',
+    'closeValueTime',
+
     'min',
     'max',
     'average'
@@ -39,11 +46,19 @@ foam.CLASS({
     },
     {
       class: 'DateTime',
+      name: 'openValueTime'
+    },
+    {
+      class: 'DateTime',
       name: 'closeTime'
     },
     {
       class: 'Float',
       name: 'close'
+    },
+    {
+      class: 'DateTime',
+      name: 'closeValueTime'
     },
     {
       class: 'Float',
@@ -70,12 +85,23 @@ foam.CLASS({
         {
           type: 'Float',
           name: 'v'
+        },
+        {
+          type: 'Date',
+          name: 'time'
         }
       ],
       javaCode: `
         setMin(isPropertySet("min") ? Math.min(v, getMin()) : v);
         setMax(isPropertySet("max") ? Math.max(v, getMax()) : v);
-        setClose(v);
+        if ( ! isPropertySet("openValueTime") || time.compareTo(getOpenValueTime()) < 0 ) {
+          setOpenValueTime(time);
+          setOpen(v);
+        }
+        if ( ! isPropertySet("closeValueTime") || time.compareTo(getCloseValueTime()) > 0 ) {
+          setCloseValueTime(time);
+          setClose(v);
+        }
         setTotal(getTotal() + v);
         setCount(getCount() + 1);
       `

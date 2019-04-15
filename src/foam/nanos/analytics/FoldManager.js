@@ -10,6 +10,10 @@ foam.INTERFACE({
           name: 'key'
         },
         {
+          type: 'DateTime',
+          name: 'time'
+        },
+        {
           type: 'Float',
           name: 'value'
         }

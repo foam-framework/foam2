@@ -19,22 +19,13 @@ foam.CLASS({
   ],
   methods: [
     {
-      name: 'getCurrentCloseTime',
-      type: 'Date',
-      javaCode: `
-long periodMs = getPeriodLengthMs();
-long currentMs = new java.util.Date().getTime();
-
-java.util.Date close = new java.util.Date();
-close.setTime((currentMs / periodMs) * periodMs + periodMs);
-return close;
-      `
-    },
-    {
       name: 'foldForState',
       javaCode: `
 foam.core.X x = getX();
-java.util.Date closeTime = getCurrentCloseTime();
+
+long periodMs = getPeriodLengthMs();
+java.util.Date closeTime = new java.util.Date();
+closeTime.setTime((time.getTime() / periodMs) * periodMs + periodMs);
 
 foam.nanos.analytics.CandlestickId id = new foam.nanos.analytics.CandlestickId.Builder(x)
   .setCloseTime(closeTime)
@@ -52,7 +43,7 @@ if ( c == null ) {
     .setKey(key)
     .build();
 }
-c.add(value);
+c.add(value, time);
 
 getDao().put(c);
       `
