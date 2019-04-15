@@ -44,7 +44,10 @@ foam.CLASS({
   EmailConfig emailConfig = (EmailConfig) x.get("emailConfig");
 
   // Service property check
-  if ( emailConfig == null || SafetyUtil.isEmpty(emailConfig.getReplyTo()) || SafetyUtil.isEmpty(emailConfig.getDisplayName()) || SafetyUtil.isEmpty(emailConfig.getFrom()) ) {
+  if ( emailConfig == null
+    || SafetyUtil.isEmpty(emailConfig.getReplyTo())
+    || SafetyUtil.isEmpty(emailConfig.getDisplayName())
+    || SafetyUtil.isEmpty(emailConfig.getFrom()) ) {
     logger.error( "EmailConfig service has invalid property settings.");
     return emailMessage;
   }

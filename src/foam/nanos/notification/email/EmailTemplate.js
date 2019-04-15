@@ -23,6 +23,7 @@ foam.CLASS({
     'java.nio.charset.StandardCharsets',
     'java.util.List',
     'org.jtwig.environment.EnvironmentConfiguration',
+    'org.jtwig.environment.EnvironmentConfigurationBuilder',
     'org.jtwig.JtwigModel',
     'org.jtwig.JtwigTemplate',
     'org.jtwig.resource.loader.TypedResourceLoader'
@@ -116,7 +117,7 @@ foam.CLASS({
         String tempKeyString = "";
         Object value = null;
         JtwigModel model = null;
-        config = EnvironmentConfigurationBuilder
+        EnvironmentConfiguration config = EnvironmentConfigurationBuilder
           .configuration()
             .resources()
               .resourceLoaders()

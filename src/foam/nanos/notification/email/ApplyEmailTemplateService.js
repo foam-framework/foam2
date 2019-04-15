@@ -16,7 +16,6 @@ foam.CLASS({
     {
       name: 'apply',
       type: 'foam.nanos.notification.email.EmailMessage',
-      // javaThrows: ['java.lang.NoSuchFieldException'],
       args: [
         {
           name: 'x',
@@ -39,13 +38,14 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      EnvironmentConfiguration config = null;
+      Logger logger = (Logger) x.get("logger");
       String templateName = templateArgs.get("template");
+      if ( SafetyUtil.isEmpty(templateName) ) return emailMessage;
 
       // STEP 1) Find EmailTemplate
       EmailTemplate emailTemplateObj = DAOResourceLoader.findTemplate(x, templateName, group);
       if ( emailTemplateObj == null ) {
-        logger.warning("@EmailsUtility: emailTemplate not found.");
+        logger.warning("@ApplyEmailTemplateService: emailTemplate not found.");
         return emailMessage;
       } 
 
@@ -53,7 +53,7 @@ foam.CLASS({
       try {
         emailMessage = emailTemplateObj.apply(x, group, emailMessage, templateArgs);
       } catch (Exception e) {
-        logger.warning("@EmailsUtility: emailTemplate.apply has failed, with a thrown exception. ", e);
+        logger.warning("@ApplyEmailTemplateService: emailTemplate.apply has failed, with a thrown exception. ", e);
         return;
       }
 

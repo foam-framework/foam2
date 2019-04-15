@@ -225,6 +225,8 @@ var classes = [
   'foam.nanos.notification.email.SMTPEmailService',
   'foam.nanos.notification.email.ClientEmailService',
   'foam.nanos.notification.email.NullEmailService',
+  'foam.nanos.notification.email.ChainedTemplateService',
+  'foam.nanos.notification.email.EmailPropertyService',
   'foam.nanos.notification.email.EmailServiceDAO',
   'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.email.ClientPOP3EmailService',
