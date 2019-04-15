@@ -16,7 +16,6 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.mlang.MLang',
     'foam.nanos.app.EmailConfig',
-    'foam.nanos.auth.User',
     'foam.nanos.auth.Group',
     'foam.nanos.notification.email.EmailMessage',
     'foam.util.SafetyUtil',
@@ -96,9 +95,9 @@ foam.CLASS({
           type: 'Context',
         },
         {
-          name: 'user',
-          type: 'foam.nanos.auth.User',
-          documentation: 'user whose the recipient of the email being sent'
+          name: 'group',
+          class: 'String',
+          documentation: 'group of user whose the recipient of the email being sent'
         },
         {
           name: 'emailMessage',
@@ -109,10 +108,6 @@ foam.CLASS({
           name: 'templateArgs',
           type: 'Map',
           documentation: 'Template arguments'
-        },
-        {
-          name: 'config',
-          javaType: 'org.jtwig.environment.EnvironmentConfiguration'
         }
       ],
       javaCode: `
@@ -121,39 +116,34 @@ foam.CLASS({
         String tempKeyString = "";
         Object value = null;
         JtwigModel model = null;
+        config = EnvironmentConfigurationBuilder
+          .configuration()
+            .resources()
+              .resourceLoaders()
+                .add(new TypedResourceLoader("dao", new DAOResourceLoader(x, group)))
+                .and()
+            .and()
+          .build();
 
         // checking for scenerio where Template is just populating defaults for an emailMessage
-        if ( getId() != 0 ){
-          for ( Object key : templateArgs.keySet() ) {
-            value = templateArgs.get((String)key);
-            if ( value instanceof String ) {
-              tempKeyString = (String) value;
-              templateArgs.put((String) key, new String(tempKeyString.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
-            }
+        for ( Object key : templateArgs.keySet() ) {
+          value = templateArgs.get((String)key);
+          if ( value instanceof String ) {
+            tempKeyString = (String) value;
+            templateArgs.put((String) key, new String(tempKeyString.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
           }
 
           model = JtwigModel.newModel(templateArgs);
           if ( model == null ) throw new NoSuchFieldException("JtwigModel is Null");
         }
 
-        // Try to locate user group, from template
-        Group group = user != null ? user.findGroup(x) : null;
-
-        // should have all properties necessary set by here, therefore process this template onto an emailMessage
-        return fillInEmailProperties_(x, emailMessage, model, group, config);
+        return fillInEmailProperties_(x, emailMessage, model, config);
       `
     },
     {
       name: 'fillInEmailProperties_',
       type: 'foam.nanos.notification.email.EmailMessage',
-      documentation: `
-        Order of precedence:
-        1) Properties set on the EmailMessage,
-        2) Properties set on the EmailTemplate(this),
-        3) Properties set on the Group,
-        4) Properties set as default on emailConfig: 
-            which exists for 'From', 'ReplyTo' and 'DisplayName' email properties.
-        `,
+      documentation: 'Applies template properties to emailMessage, where emailMessage property is empty',
       args: [
         {
           name: 'x',
@@ -161,15 +151,11 @@ foam.CLASS({
         },
         {
           name: 'emailMessage',
-          javaType: 'final foam.nanos.notification.email.EmailMessage'
+          type: 'foam.nanos.notification.email.EmailMessage'
         },
         {
           name: 'model',
           javaType: 'org.jtwig.JtwigModel'
-        },
-        {
-          name: 'group',
-          javaType: 'foam.nanos.auth.Group'
         },
         {
           name: 'config',
@@ -177,8 +163,6 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        EmailConfig emailConfig = (EmailConfig) x.get("emailConfig");
-
         // BODY:
         if ( SafetyUtil.isEmpty(emailMessage.getBody()) ) {
           JtwigTemplate templateBody = JtwigTemplate.inlineTemplate(getBody(), config);
@@ -186,52 +170,35 @@ foam.CLASS({
         }
         
         // REPLY TO:
-        if ( SafetyUtil.isEmpty(emailMessage.getReplyTo()) ) {
-          if ( ! foam.util.SafetyUtil.isEmpty(getReplyTo()) ) {
+        if ( SafetyUtil.isEmpty(emailMessage.getReplyTo()) &&
+          ! foam.util.SafetyUtil.isEmpty(getReplyTo()) )
+          {
             JtwigTemplate templateDisplayName = JtwigTemplate.inlineTemplate(getReplyTo(), config);
             emailMessage.setReplyTo(templateDisplayName.render(model));
-          } else {
-            if ( group != null && ! SafetyUtil.isEmpty(group.getReplyTo()) ) {
-              emailMessage.setReplyTo(group.getReplyTo());
-            } else {
-              emailMessage.setReplyTo(emailConfig.getReplyTo());
-            }
-          }
-        }
+        } 
 
         // DISPLAY NAME:
-        if ( SafetyUtil.isEmpty(emailMessage.getDisplayName()) ) {
-          if ( ! foam.util.SafetyUtil.isEmpty(getDisplayName()) ) {
-            JtwigTemplate templateDisplayName = JtwigTemplate.inlineTemplate(getDisplayName(), config);
-            emailMessage.setDisplayName(templateDisplayName.render(model));
-          } else {
-            if ( group != null && ! SafetyUtil.isEmpty(group.getDisplayName())) {
-              emailMessage.setDisplayName(group.getDisplayName());
-            } else {
-              emailMessage.setDisplayName(emailConfig.getDisplayName());
-            }
-          }
+        if ( SafetyUtil.isEmpty(emailMessage.getDisplayName()) &&
+          ! foam.util.SafetyUtil.isEmpty(getDisplayName()) )
+          {
+          JtwigTemplate templateDisplayName = JtwigTemplate.inlineTemplate(getDisplayName(), config);
+          emailMessage.setDisplayName(templateDisplayName.render(model));
         }
 
         // SUBJECT:
-        //  Since subject is very specific to each email there is no group field or default value for this property.
         if ( foam.util.SafetyUtil.isEmpty(emailMessage.getSubject()) &&
-          ! foam.util.SafetyUtil.isEmpty(getSubject())
-        ) {
+          ! foam.util.SafetyUtil.isEmpty(getSubject()))
+          {
           JtwigTemplate templateSubject = JtwigTemplate.inlineTemplate(getSubject(), config);
           emailMessage.setSubject(templateSubject.render(model));
         }
 
         // SEND TO:
-        //  Since sendTo is very specific to each email there is no group field or default value for this property.
-        if ( emailMessage.getTo().length == 0 && ! foam.util.SafetyUtil.isEmpty(getSendTo()) ) {
+        if ( emailMessage.getTo().length == 0 &&
+          ! foam.util.SafetyUtil.isEmpty(getSendTo()) )
+          {
           JtwigTemplate templateSendTo = JtwigTemplate.inlineTemplate(getSendTo(), config);
           emailMessage.setTo(new String[] {templateSendTo.render(model)});
-        }
-
-        // FROM:
-        if ( SafetyUtil.isEmpty(emailMessage.getFrom()) ) {
-          emailMessage.setFrom(emailConfig.getFrom());
         }
 
         return emailMessage;

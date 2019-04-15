@@ -5,6 +5,7 @@ import foam.dao.DAO;
 import foam.dao.ArraySink;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
+import foam.nanos.notification.email.ChainedTemplateService;
 import foam.nanos.notification.email.DAOResourceLoader;
 import foam.nanos.notification.email.EmailMessage;
 import foam.nanos.notification.email.EmailService;
@@ -37,46 +38,33 @@ public class EmailsUtility {
   public static void sendEmailFromTemplate(X x, User user, EmailMessage emailMessage, String templateName, Map templateArgs) {
     // EXIT CASES && VARIABLE SET UP
     if ( x == null ) return;
+
     Logger logger = (Logger) x.get("logger");
+
     if ( SafetyUtil.isEmpty(templateName) && emailMessage == null ) {
       logger.error("@EmailsUtility: no email message available to be sent"); // TODO put in meaning ful exception
       return;
     }
-    String userGroupId = user != null ? user.getGroup() : "";
-    EnvironmentConfiguration config = null;
 
-    // STEP 1) Find EmailTemplate
-    EmailTemplate emailTemplateObj = null;
-    if ( ! SafetyUtil.isEmpty(templateName) ) {
-      emailTemplateObj = DAOResourceLoader.findTemplate(x, templateName, userGroupId);
-      if ( emailTemplateObj == null ) {
-        logger.error("@EmailsUtility: emailTemplate not found and emailMessage is null. Invalid use of emailService");
-        return;
-      }
-    } else {
-      emailTemplateObj = new EmailTemplate();
+    // Try to locate user group, from template
+    Group group = user != null ? user.findGroup(x) : null;
+
+    // 
+    templateArgs.add("template", templateName);
+
+    // TODO : call emailtemplateService and chained services and pass proper args ... group being one
+    ChainedTemplateService cts = x.get("emailPropertyService");
+    List propertyApplied = cts.getData();
+    for ( EmailPropertyService eps: propertyApplied ) {
+      emailMessage = eps.apply(x, group, emailMessage, templateArgs);
     }
 
-    // STEP 2) Apply Template to emailMessage and set all possible properties
-    if ( emailTemplateObj.getId() != 0 ) {
-      config = EnvironmentConfigurationBuilder
-        .configuration()
-          .resources()
-            .resourceLoaders()
-              .add(new TypedResourceLoader("dao", new DAOResourceLoader(x, userGroupId)))
-              .and()
-          .and()
-        .build();
-    }
-    try {
-      emailMessage = emailTemplateObj.apply(x, user, emailMessage, templateArgs, config);
-      if ( emailMessage == null) {
-        logger.warning("@EmailsUtility: emailTemplate.apply has returned null. Which implies an uncaught error");
-      }
-    } catch (Exception e) {
-      logger.warning("@EmailsUtility: emailTemplate.apply has failed, with a thrown exception. ", e);
-      return;
-    }
+
+
+
+
+
+    
 
     // STEP 3) passing emailMessage through to actual email service.
     DAO email = (DAO) x.get("emailMessageDAO");
