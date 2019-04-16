@@ -63,16 +63,10 @@ foam.CLASS({
           var references = [];
 
           // Force hard reload when app version updates
-          var appConfigService = self.ClientAppConfigService.create({
-            delegate: self.RetryBox.create({
-              maxAttempts: 2,
-              delegate: self.HTTPBox.create({
-                method: 'POST',
-                url: 'service/appConfigService'
-              })
-            })
-          });
-          var appConfigPromise = appConfigService.getAppConfig().then(function(appConfig) {
+          var appConfigPromise = self.nSpecDAO.find('appConfigService').then(function(a) {
+            a = foam.json.parseString(a.client, self.__context__);
+            return a.getAppConfig();
+          }).then(function(appConfig) {
             client.exports.push('appConfig');
             references = references.concat(foam.json.references(self.__context__, appConfig));
             client.properties.push({

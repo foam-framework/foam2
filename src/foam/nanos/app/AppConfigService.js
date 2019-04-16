@@ -11,7 +11,13 @@ foam.INTERFACE({
     {
       name: 'getAppConfig',
       async: true,
-      type: 'foam.nanos.app.AppConfig'
+      type: 'foam.nanos.app.AppConfig',
+      args: [
+        {
+          type: 'Context',
+          name: 'x'
+        }
+      ]
     }
   ]
 });
