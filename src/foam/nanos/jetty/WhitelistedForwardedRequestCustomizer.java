@@ -2,11 +2,11 @@ package foam2.src.foam.nanos.jetty;
 
 import org.eclipse.jetty.http.HttpField;
 import org.eclipse.jetty.http.HttpFields;
-import foam.util.SafetyUtil;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.ForwardedRequestCustomizer;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.util.HostPort;
 
 import java.net.InetSocketAddress;
 import java.util.Set;
@@ -35,6 +35,8 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
   {
     HttpFields httpFields = request.getHttpFields();
 
+    HostPort forwardedFor = null;
+
     // we can configure SSL later on if we want to use the forwarded Cipher Suite and forwarded SSL Session Id header
 //    // Do SSL first
 //    if (getForwardedCipherSuiteHeader()!=null)
@@ -54,9 +56,13 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
 //    }
 
     // Retrieving headers from the request
-    String forwardedFor = getLeftMostFieldValue(httpFields,getForwardedForHeader());
+     forwardedFor = getLeftMostFieldValue(httpFields,getForwardedForHeader());
 
-    System.out.println("Inside WhitelistedForwardedRequestCustomizer");
+    System.out.println("Checking out whitelist");
+    System.out.println(this.forwardedForProxyWhitelist);
+
+    System.out.println("Checking out address");
+    System.out.println(request.getRemoteAddr());
 
     // we only care about X-Forwarded For, later on we can deal with hostHeader, forwardedHost, forwardedProto once we need them and have whitelists for them
     if ( forwardedFor != null )
@@ -64,13 +70,17 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
       // grab the proxy IP
       String proxyAddress = request.getRemoteAddr();
 
-      System.out.println("Checking the whitelist");
-      System.out.println(proxyAddress);
-
-      if ( this.forwardedForProxyWhitelist.contains(proxyAddress) )
-        request.setRemoteAddr(InetSocketAddress.createUnresolved(forwardedFor, request.getRemotePort()));
-
-      // TODO: what to do with the unauthorized proxy IPs
+      if ( this.forwardedForProxyWhitelist.contains(proxyAddress) ) {
+        System.out.println("request before");
+        System.out.println(request.getRemoteAddr());
+        request.setRemoteAddr(InetSocketAddress.createUnresolved(forwardedFor.getHost(), (forwardedFor.getPort() > 0) ? forwardedFor.getPort() : request.getRemotePort()));
+        System.out.println("request after");
+        System.out.println(request.getRemoteAddr());
+        System.out.println("SUCCESS: Proxy IP is on the whitelist");
+      } else {
+        // TODO: what to do with the unauthorized proxy IPs
+        System.out.println("FAILURE: Proxy IP is not on the whitelist");
+      }
     }
 
     // we do not care about the other forwarded headers at the moment, can deal with these once we do enable them and have a whitelist
