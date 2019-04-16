@@ -79,6 +79,18 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'toJSON',
+      value: function toJSON(value, outputter) {
+        // A Date property can be transmitted as a plain timestamp.
+        // Since we know the type information we will adapt a timestamp
+        // back to a
+        return value == null ? null :
+          outputter.formatDatesAsNumbers ?
+          value.toISOString() :
+          value.getTime();
+      }
+    },
+    {
       name: 'adapt',
       value: function (_, d) {
         if ( typeof d === 'number' ) return new Date(d);
