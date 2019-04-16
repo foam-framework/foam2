@@ -1,5 +1,6 @@
 package foam2.src.foam.nanos.jetty;
 
+import org.eclipse.jetty.http.HttpField;
 import org.eclipse.jetty.http.HttpFields;
 import foam.util.SafetyUtil;
 import org.eclipse.jetty.server.Connector;
@@ -69,7 +70,7 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
       if ( this.forwardedForProxyWhitelist.contains(proxyAddress) )
         request.setRemoteAddr(InetSocketAddress.createUnresolved(forwardedFor, request.getRemotePort()));
 
-      // TODO: implement a logger for the unauthorized IPs
+      // TODO: what to do with the unauthorized proxy IPs
     }
 
     // we do not care about the other forwarded headers at the moment, can deal with these once we do enable them and have a whitelist
@@ -121,7 +122,12 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
     if (header == null)
       return null;
 
-    String headerValue = fields.getField(header).toString();
+    HttpField headerField = fields.getField(header);
+
+    if (headerField == null)
+      return null;
+
+    String headerValue = headerField.toString();
 
     if (headerValue == null)
       return null;
