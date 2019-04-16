@@ -83,11 +83,31 @@ describe('ArrayDAO', function() {
   });
 });
 
-if ( foam.dao.IDBDAO ) {
+function idbAvailable() {
+  if ( ! foam.dao.IDBDAO ) return false;
+
+  if ( global.indexedDB !== undefined
+    || global.webkitIndexedDB !== undefined
+    || global.mozIndexedDB !== undefined
+  ) {
+    return true;
+  }
+
+  try {
+    require('fake-indexeddb/auto');
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+if ( idbAvailable() ) {
   describe('IDBDAO', function() {
     genericDAOTestBattery(function(model) {
       var dao = foam.dao.IDBDAO.create({ of: model });
-      return dao.removeAll().then(function() { return Promise.resolve(dao); } );
+      return dao.removeAll().then(function() {
+        return Promise.resolve(dao);
+      } );
     });
   });
 }
@@ -155,8 +175,9 @@ xdescribe('LazyCacheDAO', function() {
 
 describe('CachingDAO', function() {
   genericDAOTestBattery(function(model) {
-    var idbDAO = ( foam.dao.IDBDAO || foam.dao.LocalStorageDAO )
-      .create({ name: '_test_readCache_', of: model });
+    var daoType = idbAvailable() ?
+        (foam.dao.IDBDAO || foam.dao.LocalStorageDAO) : foam.dao.MDAO;
+    var idbDAO = daoType.create({ name: '_test_readCache_', of: model });
     return idbDAO.removeAll().then(function() {
       var mDAO = foam.dao.MDAO.create({ of: model });
       return foam.dao.CachingDAO.create({ src: idbDAO, cache: mDAO });
