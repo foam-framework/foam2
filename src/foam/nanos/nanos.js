@@ -22,6 +22,8 @@ FOAM_FILES([
   { name: 'foam/nanos/fs/FileArray' },
   { name: 'foam/nanos/fs/FileArrayDAODecorator' },
   { name: "foam/nanos/app/AppConfig" },
+  { name: "foam/nanos/app/AppConfigService" },
+  { name: "foam/nanos/app/ClientAppConfigService" },
   { name: "foam/nanos/controller/ApplicationController" },
   { name: "foam/nanos/app/Mode" },
   { name: "foam/nanos/auth/DayOfWeek" },
