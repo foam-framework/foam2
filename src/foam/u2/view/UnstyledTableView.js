@@ -14,9 +14,9 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.core.ConstantSlot',
     'foam.dao.ProxyDAO',
     'foam.u2.md.OverlayDropdown',
+    'foam.u2.view.OverlayActionListView',
     'foam.u2.view.EditColumnsView',
     'foam.u2.tag.Image'
   ],
@@ -125,13 +125,6 @@ foam.CLASS({
       value: 'images/down-arrow.svg'
     },
     {
-      name: 'vertMenuIcon',
-      documentation: 'HTML entity representing unicode Vertical Ellipsis',
-      factory: function() {
-        return this.Entity.create({ name: '#8942' });
-      }
-    },
-    {
       name: 'selection',
       expression: function(importSelection) { return importSelection || null; },
     },
@@ -206,11 +199,11 @@ foam.CLASS({
                     on('click', function(e) {
                       columnSelectionE.open(e.clientX, e.clientY);
                     }).
-                    add(' ', view.vertMenuIcon).
-                    addClass(view.myClass('vertDots')).
-                    addClass(view.myClass('noselect'));
+                    tag(view.Image, { data: '/images/Icon_More_Resting.svg' }).
+                    addClass('vertDots').
+                    addClass('noselect');
                   }).
-                  style({ width: 40 }).
+                  style({ width: 60 }).
                   tag('div', null, view.dropdownOrigin$).
                 end();
               });
@@ -231,6 +224,11 @@ foam.CLASS({
             proxy.delegate = dao.orderBy(s.get());
           });
 
+          var modelActions = view.of.getAxiomsByClass(foam.core.Action);
+          var actions = Array.isArray(view.contextMenuActions)
+            ? view.contextMenuActions.concat(modelActions)
+            : modelActions;
+
           return this.
             E('tbody').
             select(proxy, function(obj) {
@@ -247,7 +245,7 @@ foam.CLASS({
                     // don't do anything.
                     if (
                       evt.target.nodeName === 'DROPDOWN-OVERLAY' ||
-                      evt.target.classList.contains(view.myClass('vertDots'))
+                      evt.target.classList.contains('vertDots')
                     ) return;
 
                     view.selection = obj;
@@ -276,47 +274,14 @@ foam.CLASS({
                       }).
                     end();
                 }).
-                call(function() {
-                  var modelActions = view.of.getAxiomsByClass(foam.core.Action);
-                  var actions = Array.isArray(view.contextMenuActions) ?
-                    view.contextMenuActions.concat(modelActions) :
-                    modelActions;
-                  var overlay = view.OverlayDropdown.create();
-                  return this.start('td').
-                    callIf(actions.length > 0, function() {
-                      overlay.forEach(actions, function(action) {
-                        this.
-                          start().
-                            show(action.createIsAvailable$(view.ConstantSlot.create({ value: obj }))).
-                            addClass(view.myClass('context-menu-item')).
-                            add(action.label).
-                            call(async function() {
-                              if ( await action.isEnabledFor(obj) ) {
-                                this.on('click', function(evt) {
-                                  action.maybeCall(view.__subContext__, obj);
-                                });
-                              } else {
-                                this.addClass('disabled');
-                              }
-                            }).
-                          end();
-                      });
-                      view.ctrl.add(overlay);
-                    }).
-                    style({ 'text-align': 'right' }).
-                    start('span').
-                      addClass(view.myClass('vertDots')).
-                      addClass(view.myClass('noselect')).
-                      enableClass('disabled', actions.length === 0).
-                      callIf(actions.length > 0, function() {
-                        this.on('click', function(evt) {
-                          overlay.open(evt.clientX, evt.clientY);
-                        });
-                      }).
-                      add(view.vertMenuIcon).
-                    end().
-                  end();
-                });
+                start('td').
+                  addClass(view.myClass('context-menu-cell')).
+                  tag({
+                    class: 'foam.u2.view.OverlayActionListView',
+                    data: actions,
+                    obj: obj
+                  }).
+                end();
             });
         });
       }

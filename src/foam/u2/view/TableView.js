@@ -27,7 +27,7 @@ foam.CLASS({
       box-sizing: border-box;
     }
 
-    ^ th > img {
+    ^ th:not(:last-child) > img {
       margin-left: 8px;
     }
 
@@ -70,13 +70,13 @@ foam.CLASS({
       background: #eee;
     }
 
-    ^vertDots {
+    ^ .vertDots {
       font-size: 20px;
       font-weight: bold;
       padding-right: 12px;
     }
 
-    ^noselect {
+    ^ .noselect {
       -webkit-touch-callout: none;
       -webkit-user-select: none;
       -khtml-user-select: none;
@@ -85,17 +85,12 @@ foam.CLASS({
       user-select: none;
     }
 
-    ^context-menu-item {
-      padding: 10px;
-    }
-
     ^ .disabled {
       color: #aaa;
     }
 
-    ^context-menu-item:hover:not(.disabled) {
-      cursor: pointer;
-      background-color: %ACCENTCOLOR%;
+    ^context-menu-cell {
+      margin-right: 12px;
     }
   `,
 });
