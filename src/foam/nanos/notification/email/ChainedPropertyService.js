@@ -6,7 +6,11 @@
 
 foam.CLASS({
   package: 'foam.nanos.notification.email',
-  name: 'ChainedTemplateService',
+  name: 'ChainedPropertyService',
+
+  documentation: `
+  Model that stores the array of decorators that fills the emailMessage
+  with service level precedence on properties.`,
 
   properties: [
     {

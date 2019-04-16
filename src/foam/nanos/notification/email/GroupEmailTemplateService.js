@@ -8,8 +8,17 @@ foam.CLASS({
   package: 'foam.nanos.notification.email',
   name: 'GroupEmailTemplateService',
 
+  documentation: 'Used in conjuction with ChainedPropertyService',
+
   implements: [
     'foam.nanos.notification.email.EmailPropertyService'
+  ],
+
+  javaImports: [
+    'foam.dao.DAO',
+    'foam.nanos.auth.Group',
+    'foam.nanos.logger.Logger',
+    'foam.util.SafetyUtil',
   ],
 
   methods: [
@@ -23,7 +32,7 @@ foam.CLASS({
         },
         {
           name: 'group',
-          type: 'foam.nanos.auth.Group',
+          class: 'String',
           documentation: 'group of user whose the recipient of the email being sent'
         },
         {
@@ -37,21 +46,29 @@ foam.CLASS({
           documentation: 'Template arguments'
         }
       ],
+      documentation:
+      `Looks for group email properties on passed in group and then up the chain to root group.
+       Note: It is possible that only one of the properties is set on the group.`,
       javaCode: `
-        if ( group == null ) return emailMessage;
+        Group grp = null;
+        do {
+          grp = (Group)((DAO) x.get("groupDAO")).find(group);
+          if ( grp == null ) return emailMessage;
+          group = grp.getParent();
+        } while ( SafetyUtil.isEmpty(grp.getReplyTo()) && SafetyUtil.isEmpty(grp.getDisplayName()) );
 
         // REPLY TO:
         if ( SafetyUtil.isEmpty(emailMessage.getReplyTo()) &&
-          ! SafetyUtil.isEmpty(group.getReplyTo()))
+          ! SafetyUtil.isEmpty(grp.getReplyTo()))
           {
-          emailMessage.setReplyTo(group.getReplyTo());
+          emailMessage.setReplyTo(grp.getReplyTo());
         }
     
         // DISPLAY NAME:
         if ( SafetyUtil.isEmpty(emailMessage.getDisplayName()) &&
-          ! SafetyUtil.isEmpty(group.getDisplayName()))
+          ! SafetyUtil.isEmpty(grp.getDisplayName()))
           {
-          emailMessage.setDisplayName(group.getDisplayName());
+          emailMessage.setDisplayName(grp.getDisplayName());
         }
     
         return emailMessage;

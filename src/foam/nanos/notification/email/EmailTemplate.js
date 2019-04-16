@@ -13,15 +13,10 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.X',
-    'foam.dao.DAO',
-    'foam.mlang.MLang',
-    'foam.nanos.app.EmailConfig',
-    'foam.nanos.auth.Group',
+    'foam.nanos.logger.Logger',
     'foam.nanos.notification.email.EmailMessage',
     'foam.util.SafetyUtil',
-    'java.lang.NoSuchFieldException',
     'java.nio.charset.StandardCharsets',
-    'java.util.List',
     'org.jtwig.environment.EnvironmentConfiguration',
     'org.jtwig.environment.EnvironmentConfigurationBuilder',
     'org.jtwig.JtwigModel',
@@ -87,9 +82,7 @@ foam.CLASS({
   methods: [
     {
       name: 'apply',
-      documentation: 'Throws exception if any errors - calling Service will/should catch.',
       type: 'foam.nanos.notification.email.EmailMessage',
-      javaThrows: ['java.lang.NoSuchFieldException'],
       args: [
         {
           name: 'x',
@@ -112,7 +105,12 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        if ( emailMessage == null ) throw new NoSuchFieldException("emailMessage is Null");
+        Logger logger = (Logger) x.get("logger");
+        
+        if ( emailMessage == null ) {
+          logger.error("emailMessage is Null");
+          return null;
+        }
 
         String tempKeyString = "";
         Object value = null;
@@ -126,16 +124,17 @@ foam.CLASS({
             .and()
           .build();
 
-        // checking for scenerio where Template is just populating defaults for an emailMessage
         for ( Object key : templateArgs.keySet() ) {
           value = templateArgs.get((String)key);
           if ( value instanceof String ) {
             tempKeyString = (String) value;
             templateArgs.put((String) key, new String(tempKeyString.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
           }
-
           model = JtwigModel.newModel(templateArgs);
-          if ( model == null ) throw new NoSuchFieldException("JtwigModel is Null");
+          if ( model == null ) {
+            logger.error("JtwigModel is Null");
+            return null;
+          }
         }
 
         return fillInEmailProperties_(x, emailMessage, model, config);
@@ -165,7 +164,8 @@ foam.CLASS({
       ],
       javaCode: `
         // BODY:
-        if ( SafetyUtil.isEmpty(emailMessage.getBody()) ) {
+        if ( SafetyUtil.isEmpty(emailMessage.getBody()) ) 
+        {
           JtwigTemplate templateBody = JtwigTemplate.inlineTemplate(getBody(), config);
           emailMessage.setBody(templateBody.render(model));
         }
@@ -173,7 +173,7 @@ foam.CLASS({
         // REPLY TO:
         if ( SafetyUtil.isEmpty(emailMessage.getReplyTo()) &&
           ! foam.util.SafetyUtil.isEmpty(getReplyTo()) )
-          {
+        {
             JtwigTemplate templateDisplayName = JtwigTemplate.inlineTemplate(getReplyTo(), config);
             emailMessage.setReplyTo(templateDisplayName.render(model));
         } 
@@ -181,7 +181,7 @@ foam.CLASS({
         // DISPLAY NAME:
         if ( SafetyUtil.isEmpty(emailMessage.getDisplayName()) &&
           ! foam.util.SafetyUtil.isEmpty(getDisplayName()) )
-          {
+        {
           JtwigTemplate templateDisplayName = JtwigTemplate.inlineTemplate(getDisplayName(), config);
           emailMessage.setDisplayName(templateDisplayName.render(model));
         }
@@ -189,7 +189,7 @@ foam.CLASS({
         // SUBJECT:
         if ( foam.util.SafetyUtil.isEmpty(emailMessage.getSubject()) &&
           ! foam.util.SafetyUtil.isEmpty(getSubject()))
-          {
+        {
           JtwigTemplate templateSubject = JtwigTemplate.inlineTemplate(getSubject(), config);
           emailMessage.setSubject(templateSubject.render(model));
         }
@@ -197,7 +197,7 @@ foam.CLASS({
         // SEND TO:
         if ( emailMessage.getTo().length == 0 &&
           ! foam.util.SafetyUtil.isEmpty(getSendTo()) )
-          {
+        {
           JtwigTemplate templateSendTo = JtwigTemplate.inlineTemplate(getSendTo(), config);
           emailMessage.setTo(new String[] {templateSendTo.render(model)});
         }

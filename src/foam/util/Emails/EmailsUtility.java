@@ -2,20 +2,14 @@ package foam.util.Emails;
 
 import foam.core.X;
 import foam.dao.DAO;
-import foam.dao.ArraySink;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
-import foam.nanos.notification.email.ChainedTemplateService;
-import foam.nanos.notification.email.DAOResourceLoader;
+import foam.nanos.notification.email.ChainedPropertyService;
 import foam.nanos.notification.email.EmailMessage;
 import foam.nanos.notification.email.EmailPropertyService;
-import foam.nanos.notification.email.EmailService;
-import foam.nanos.notification.email.EmailTemplate;
 import foam.util.SafetyUtil;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
-import static foam.mlang.MLang.*;
 
 public class EmailsUtility {
   /*
@@ -62,7 +56,7 @@ public class EmailsUtility {
     }
 
     // SERVICE CALL: to fill in email properties. 
-    ChainedTemplateService cts = (ChainedTemplateService) x.get("emailPropertyService");
+    ChainedPropertyService cts = (ChainedPropertyService) x.get("emailPropertyService");
     EmailPropertyService[] propertyApplied = cts.getData();
     for ( EmailPropertyService eps: propertyApplied ) {
       emailMessage = (eps).apply(x, group, emailMessage, templateArgs);
