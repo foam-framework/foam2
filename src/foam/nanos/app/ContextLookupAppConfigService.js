@@ -15,7 +15,7 @@ foam.CLASS({
       name: 'getAppConfig',
       type: 'foam.nanos.app.AppConfig',
       javaCode: `
-return (foam.nanos.app.AppConfig) getX().get("appConfig");
+return (foam.nanos.app.AppConfig) x.get("appConfig");
       `
     }
   ]
