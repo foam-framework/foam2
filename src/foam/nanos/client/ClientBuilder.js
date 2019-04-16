@@ -15,9 +15,10 @@ foam.CLASS({
   requires: [
     'foam.box.HTTPBox',
     'foam.box.RetryBox',
+    'foam.box.SessionClientBox',
     'foam.dao.EasyDAO',
     'foam.dao.RequestResponseClientDAO',
-    'foam.nanos.boot.NSpec',
+    'foam.nanos.boot.NSpec'
   ],
 
   properties: [
@@ -29,13 +30,15 @@ foam.CLASS({
         return this.RequestResponseClientDAO.create({
           of: this.NSpec,
           cache: true,
-          delegate: this.RetryBox.create({
+          delegate: this.SessionClientBox.create({
+            delegate: this.RetryBox.create({
             maxAttempts: -1,
             delegate: this.HTTPBox.create({
               method: 'POST',
               url: 'service/nSpecDAO'
             })
           })
+        })
         });
       }
     },

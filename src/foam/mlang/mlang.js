@@ -3180,6 +3180,7 @@ foam.CLASS({
     'foam.mlang.sink.Sum',
     'foam.mlang.sink.Unique',
     'foam.mlang.Absolute',
+    'foam.mlang.sink.Average',
     'foam.mlang.Mux',
     'foam.mlang.Partition'
   ],

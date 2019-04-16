@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 /**
@@ -31,8 +20,9 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'Action',
+
   requires: [
-    'foam.core.ExpressionSlot',
+    'foam.core.ExpressionSlot'
   ],
 
   documentation: 'An Action is a method with extra GUI support.',
@@ -104,35 +94,63 @@ foam.CLASS({
       name: 'isAvailable',
       label: 'Available',
       help: 'Function to determine if action is available.',
-      value: null
+      value: function() { return true; }
     },
     {
       class: 'Function',
       name: 'isEnabled',
       label: 'Enabled',
       help: 'Function to determine if action is enabled.',
-      value: null
+      value: function() { return true; }
     },
     {
       class: 'Function',
       name: 'code',
       required: true,
       value: null
+    },
+    {
+      class: 'Boolean',
+      name: 'permissionRequired',
+      documentation: 'When set to true, package.model.permission.action is needed to execute this action.'
     }
   ],
 
   methods: [
+    function andSlots(a, b) {
+      return foam.core.ExpressionSlot.create({
+        args: [ a, b ],
+        code: function(a, b) {
+          return a && b;
+        }
+      });
+    },
+
+    function andSlotAndPromise(slot, promise) {
+      return this.andSlots(slot, foam.core.PromiseSlot.create({promise: promise}));
+    },
+
+    function checkPermission(x) {
+      if ( ! this.permissionRequired || ! x.auth ) return Promise.resolve(true);
+      var permission = this.sourceCls_.id + ".permission." + this.name;
+      return x.auth.check(null, permission)
+    },
+
     function isEnabledFor(data) {
       return this.isEnabled ?
         data.slot(this.isEnabled).get() :
-        true;
+        true ;
     },
 
     function createIsEnabled$(data$) {
-      return foam.core.ExpressionSlot.create({
-        obj$: data$,
-        code: this.isEnabled
-      });
+      var slot = foam.core.ExpressionSlot.create({
+         obj$: data$,
+         code: this.isEnabled
+       });
+
+      return this.permissionRequired ?
+        this.andSlotAndPromise(slot, this.checkPermission(data$.get().__subContext__)) :
+        slot ;
     },
 
     function isAvailableFor(data) {
@@ -142,13 +160,18 @@ foam.CLASS({
     },
 
     function createIsAvailable$(data$) {
-      return foam.core.ExpressionSlot.create({
-        obj$: data$,
-        code: this.isAvailable
-      });
+      var slot = foam.core.ExpressionSlot.create({
+         obj$: data$,
+         code: this.isAvailable
+       });
+
+      return this.permissionRequired ?
+        this.andSlotAndPromise(slot, this.checkPermission(data$.get().__subContext__)) :
+        slot ;
     },
 
     function maybeCall(ctx, data) {
+      // TODO: permission check
       if ( this.isEnabledFor(data) && this.isAvailableFor(data) ) {
         this.code.call(data, ctx, this);
         // primitive types won't have a pub method
