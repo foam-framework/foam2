@@ -56,7 +56,7 @@ foam.CLASS({
             package: 'foam.nanos.client',
             name: 'Client',
             exports: [],
-            properties: [],
+            properties: []
           };
 
           var references = [];
@@ -114,7 +114,7 @@ foam.CLASS({
             }
           });
         })
-      },
-    },
-  ],
+      }
+    }
+  ]
 });
