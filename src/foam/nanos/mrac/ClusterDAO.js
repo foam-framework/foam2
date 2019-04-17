@@ -57,11 +57,6 @@ foam.CLASS({
       value: true
     },
     {
-      name: 'electoralService',
-      class: 'foam.core.FObjectProperty',
-      of: 'foam.nanos.mrac.ElectoralServiceServer'
-    },
-    {
       name: 'path',
       class: 'String',
       value: 'service'

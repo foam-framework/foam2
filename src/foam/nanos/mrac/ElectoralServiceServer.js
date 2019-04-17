@@ -9,13 +9,13 @@ foam.CLASS({
 
   javaImports: [
     'foam.box.HTTPBox',
-    'foam.core.FObject',
     'foam.dao.ArraySink',
-    'foam.dao.ClientDAO',
     'foam.dao.DAO',
     'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil',
     'java.util.ArrayList',
+    'java.util.concurrent.*',
+    'java.util.concurrent.Callable',
     'java.util.concurrent.ExecutorService',
     'java.util.concurrent.Executors',
     'java.util.concurrent.ThreadLocalRandom',
@@ -80,10 +80,12 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      setVotes(getVotes() + 1);
-      if ( result > getCurrentSeq() ) {
-        setCurrentSeq(result);
-        setWinner(config);
+      if ( result >= 0 ) {
+        setVotes(getVotes() + 1);
+        if ( result > getCurrentSeq() ) {
+          setCurrentSeq(result);
+          setWinner(config);
+        }
       }
     `
     },
@@ -130,7 +132,7 @@ foam.CLASS({
       name: 'dissolve',
       javaCode: `
     ClusterConfig config = findConfig(getX());
-    if ( getState().equals(ElectoralServiceState.IN_SESSION) ) {
+    // if ( getState().equals(ElectoralServiceState.IN_SESSION) ) {
       setElectionTime(new Date());
       setState(ElectoralServiceState.ELECTION);
       recordResult(vote(getElectionTime()), config);
@@ -139,59 +141,90 @@ foam.CLASS({
         .where(
           AND(
             AND(
-              EQ(ClusterConfig.REALM, config.getRealm()),
-              EQ(ClusterConfig.REGION, config.getRegion())
+              AND(
+                EQ(ClusterConfig.REALM, config.getRealm()),
+                EQ(ClusterConfig.REGION, config.getRegion())
+              ),
+              AND(
+                EQ(ClusterConfig.ENABLED, true),
+                EQ(ClusterConfig.STATUS, Status.ONLINE)
+              )
             ),
-            AND(
-              EQ(ClusterConfig.ENABLED, true),
-              EQ(ClusterConfig.STATUS, Status.ONLINE)
-            )
+            NEQ(ClusterConfig.NODE_TYPE,NodeType.REPLICA)
           )
         )
         .select(new ArraySink())).getArray();
 
-      ExecutorService pool = Executors.newFixedThreadPool(arr.size());
+        ExecutorService pool = Executors.newFixedThreadPool(arr.size());
+        List<Callable<Integer>> voteCallables = new ArrayList<>();
+  
+        for (int i = 0; i < arr.size(); i++) {
+          ClusterConfig clientConfig = (ClusterConfig) arr.get(i);
+          if ( clientConfig.getId().equals(config.getId())) {
+            continue;
+          }
+          ClientElectoralService electoralService = new ClientElectoralService.Builder(getX()).setDelegate(new HTTPBox.Builder(getX()).setUrl(buildURL(clientConfig)).build()).build();
+          
+          voteCallables.add(() -> {
+            int result = electoralService.vote(getElectionTime());
+            recordResult(result, clientConfig);
+            return result;
+          });
+        }
 
-      for (int i = 0; i < arr.size(); i++) {
-            ClusterConfig clientConfig = (ClusterConfig) arr.get(i);
-            if ( clientConfig.getId().equals(config.getId())) {
-              break;
+        try {
+          List<Future<Integer>> voteResults =  pool.invokeAll(voteCallables);
+          for( Future<Integer> voteResult : voteResults ) {
+            try {
+              int vote = voteResult.get(5, TimeUnit.SECONDS);
+            } catch(Exception e) {
+              e.printStackTrace();
             }
-            ClientElectoralService electoralService = new ClientElectoralService.Builder(getX()).setDelegate(new HTTPBox.Builder(getX()).setUrl(buildURL(clientConfig)).build()).build();
-
-
-            pool.execute(() -> {
-              int result = electoralService.vote(getElectionTime());
-              recordResult(result, clientConfig);
-            });
-    
             if (getState().equals(ElectoralServiceState.VOTING)) {
               break;
             }
             if (getState().equals(ElectoralServiceState.ELECTION) && hasQuorum(arr.size())) {
               ClusterConfig winner = getWinner();
               report(winner);
+              List<Callable<String>> reportCallables = new ArrayList<>();
               for (int j = 0; j < arr.size(); j++) {
                 ClusterConfig clientConfig2 = (ClusterConfig) arr.get(j);
                 if ( ! clientConfig2.getId().equals(config.getId())) {
                   ClientElectoralService electoralService2 = new ClientElectoralService.Builder(getX()).setDelegate(new HTTPBox.Builder(getX()).setUrl(buildURL(clientConfig2)).build()).build();
-                  pool.execute(() -> {
+                  reportCallables.add(() -> {
                     electoralService2.report(winner);
+                    return clientConfig2.getId();
                   });
                 }
+              }
+              try {
+                List<Future<String>> reportResults =  pool.invokeAll(reportCallables);
+                for( Future<String> reportResult : reportResults ) {
+                  try {
+                    String reportConfig = reportResult.get(5, TimeUnit.SECONDS);
+                  } catch(Exception e) {
+                    e.printStackTrace();
+                  }
+                }
+              } catch ( Exception e) {
+          
               }
               break;
             }
           }
-          pool.shutdown();
-    }
+
+        } catch ( Exception e) {
+          
+        }
+        pool.shutdown();
+      // }
      `
     },
     {
       name: 'vote',
       javaCode: `
       if ( findConfig(getX()).getStatus().equals(Status.ONLINE) ) {
-        if ( getState().equals(ElectoralServiceState.ELECTION) && ( time.before(getElectionTime()) ) ) {
+        if ( getState().equals(ElectoralServiceState.ELECTION) && getElectionTime() != null && time.before(getElectionTime()) ) {
           setState(ElectoralServiceState.VOTING);
         }
         return ThreadLocalRandom.current().nextInt(255);

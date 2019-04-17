@@ -15,7 +15,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'time',
-          type: 'Date'
+          type: 'DateTime'
         }
       ]
     },
