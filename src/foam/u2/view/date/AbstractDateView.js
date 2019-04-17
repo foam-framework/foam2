@@ -6,7 +6,13 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'data',
-      value: new Date()
+      value: new Date(),
+      preSet: function(old, n) {
+        if ( n == null || n == undefined ) {
+          return new Date();
+        }
+        return n;
+      }
     },
     {
       class: 'Int',
