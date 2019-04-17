@@ -250,7 +250,7 @@ public class AuthWebAgent
         ((foam.nanos.logger.Logger) x.get("logger")).debug("Access denied, requires permission:", permission_);
       }
     } else {
-        templateLogin(x);
+      templateLogin(x);
     }
   }
 }
