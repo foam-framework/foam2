@@ -218,11 +218,9 @@ foam.CLASS({
         }
         return a;
       };
-console.log(this.mode);
       if ( ! this.mode ) {
         this.mode = foam.u2.DisplayMode.RW;
       }
-      console.log(this.mode);
 
       var self = this;
       this
