@@ -36,6 +36,8 @@ foam.CLASS({
           border: solid 1px #cbcfd4;
           background-color: #ffffff;
           padding-bottom: 25px;
+          z-index: 10001;
+          position: absolute;
         }
 
         .time-of-day {
@@ -67,13 +69,13 @@ foam.CLASS({
         }
 
         ^ .arrow-left {
-          padding-top: 15px;
-          padding-left: 30px;
+          margin-top: 15px;
+          margin-left: 30px;
         }
 
         ^ .arrow-right {
-          padding-top: 15px;
-          padding-right: 30px;
+          margin-top: 15px;
+          margin-right: 30px;
         }
 
         ^ .month {
@@ -116,11 +118,44 @@ foam.CLASS({
 
         ^ .calendar {
           text-align: center;
-          margin-left: 54px;
         }
 
         ^ .time-of-day {
           display: inline-block;
+        }
+
+        ^overlay {
+          position: fixed;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          z-index: 10000;
+        }
+
+        ^ .date-display-box {
+          height: 36px;
+          width: 216px;
+          font-size: 14px;
+          background-color: #ffffff;
+          border: 1px solid #406dea;
+          border-radius: 3px;
+        }
+
+        ^ .date-display-text {
+          display: inline-block;
+          color: #9ba1a6;
+          margin-top: 9px;
+          margin-left: 8px;
+          width: 176px;
+          height: 18px;
+        }
+
+        ^ .date-display-image {
+          float: right;
+          display: inline-block;
+          margin-top: 10px;
+          margin-right: 8px;
         }
       */}
     })
@@ -138,6 +173,39 @@ foam.CLASS({
       expression: function(monthIndex) {
         return this.Month.VALUES[monthIndex].label + ' ' + this.year;
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'isOpen_',
+      value: false,
+      documentation: `Used to show/hide the calendar.`
+    },
+    {
+      class: 'String',
+      name: 'date',
+      expression: function(day, year, month, showPlaceholder) {
+        if ( this.showPlaceholder ) {
+          this.showPlaceholder = false;
+          return 'mm dd yyyy';
+        }
+        return this.formatMonth(month.name) + ' ' + day + ' ' + year;
+      }
+    },
+    {
+      class: 'String',
+      name: 'dateTime',
+      expression: function(day, year, month, hour12, minute, period, showPlaceholder) {
+        if ( this.showPlaceholder ) {
+          this.showPlaceholder = false;
+          return 'mm dd yyyy --:-- --';
+        }
+        return this.formatMonth(month.name) + ' ' + day + ' ' + year + ', ' + hour12 + ':' + minute + ' ' + period;
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'showPlaceholder',
+      value: false
     }
   ],
 
@@ -150,15 +218,50 @@ foam.CLASS({
         }
         return a;
       };
+console.log(this.mode);
+      if ( ! this.mode ) {
+        this.mode = foam.u2.DisplayMode.RW;
+      }
+      console.log(this.mode);
 
       var self = this;
       this
       .start()
         .addClass(this.myClass())
+        .start()
+          .addClass('date-display-box')
+          .call(function() {
+            let display = self.showTimeOfDay ? self.dateTime$ : self.date$;
+            this
+              .start()
+                .addClass('date-display-text')
+                .add(display)
+              .end()
+              .start()
+                .addClass('date-display-image')
+                .start('img')
+                  .attrs({ src: 'images/cancel-round.svg' })
+                  .on('click', self.clearDate)
+                .end()
+              .end();
+          })
+          .on('click', function() {
+            if ( self.mode === foam.u2.DisplayMode.RW ) {
+              self.isOpen_ = ! self.isOpen_;
+            }
+          })
+        .end()
+
+        .start()
+          .addClass(this.myClass('overlay'))
+          .show(this.isOpen_$)
+          .on('click', this.onCancel)
+        .end()
+
         .startContext({ data: this })
           .start()
+            .show(this.isOpen_$)
             .addClass('date-time-picker')
-
             .start()
               .addClass('year')
               .start('img')
@@ -180,10 +283,10 @@ foam.CLASS({
               .addClass('month')
               .start()
                 .addClass('arrow-container').addClass('arrow-container-left')
+                .on('click', function() { self.monthIndex--; })
                 .start('img')
                   .attrs({ src: 'images/arrow-left-black.svg' })
                   .addClass('arrow-black')
-                  .on('click', function() { self.monthIndex--; })
                 .end()
               .end()
               .start()
@@ -192,10 +295,10 @@ foam.CLASS({
               .end()
               .start()
                 .addClass('arrow-container').addClass('arrow-container-right')
+                .on('click', function() { self.monthIndex++; })
                 .start('img')
                   .attrs({ src: 'images/arrow-right-black.svg' })
                   .addClass('arrow-black')
-                  .on('click', function() { self.monthIndex++; })
                 .end()
               .end()
             .end()
@@ -208,10 +311,6 @@ foam.CLASS({
             .start()
               .addClass('time-of-day')
               .show(this.showTimeOfDay$)
-              .start()
-                .tag(this.NOON, { data: this })
-                .addClass('time-of-day')
-              .end()
               .start(this.ChoiceView, {
                 choices: zeroLeadingNumArray(1, 12),
                 data$: this.hour12$
@@ -238,6 +337,21 @@ foam.CLASS({
           .end()
         .endContext()
       .end();
+    },
+    function formatMonth(month) {
+      return month[0] + month.slice(1).toLowerCase();
+    }
+  ],
+
+  listeners: [
+    function onCancel() {
+      this.isOpen_ = false;
+    },
+
+    function clearDate(event) {
+      event.stopPropagation();
+      this.showPlaceholder = true;
+      this.data$.clear();
     }
   ]
 });
