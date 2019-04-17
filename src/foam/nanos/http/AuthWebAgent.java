@@ -30,10 +30,17 @@ public class AuthWebAgent
   public final static String SESSION_ID = "sessionId";
 
   protected String permission_;
+  protected String serviceName_;
 
   public AuthWebAgent(String permission, WebAgent delegate) {
     setDelegate(delegate);
     permission_ = permission;
+  }
+
+  public AuthWebAgent(String permission, WebAgent delegate, String serviceName) {
+    setDelegate(delegate);
+    permission_ = permission;
+    serviceName_ = serviceName;
   }
 
   public Cookie getCookie(HttpServletRequest req) {
@@ -212,7 +219,7 @@ public class AuthWebAgent
 
   public Session createSession(X x) {
     HttpServletRequest req     = x.get(HttpServletRequest.class);
-    Session            session = new Session((X) x.get(Boot.ROOT)); 
+    Session            session = new Session((X) x.get(Boot.ROOT));
     session.setRemoteHost(req.getRemoteHost());
     return session;
   }
@@ -220,6 +227,13 @@ public class AuthWebAgent
   public void execute(X x) {
     AuthService auth    = (AuthService) x.get("auth");
     Session     session = authenticate(x);
+
+    if ( serviceName_.equals("dig") || serviceName_.equals("sugar") ) {
+      Session cur_session = x.get(Session.class);
+
+      if ( cur_session != null )
+        session = cur_session;
+    }
 
     if ( session != null ) {
       if ( auth.check(session.getContext(), permission_) ) {
@@ -236,7 +250,7 @@ public class AuthWebAgent
         ((foam.nanos.logger.Logger) x.get("logger")).debug("Access denied, requires permission:", permission_);
       }
     } else {
-      templateLogin(x);
+        templateLogin(x);
     }
   }
 }
