@@ -95,12 +95,6 @@ foam.CLASS({
         // so that it makes more  sense algorithmically to check against IPs
         Set<String> forwardedForProxyWhitelist = new HashSet<>(Arrays.asList(getForwardedForProxyWhitelist()));
 
-        System.out.println("Testing if values exist");
-        System.out.println("Whitelist Array");
-        System.out.println(getForwardedForProxyWhitelist());
-        System.out.println("Whitelist Set");
-        System.out.println(forwardedForProxyWhitelist);
-
         for ( org.eclipse.jetty.server.Connector conn : server.getConnectors() ) {
           for ( org.eclipse.jetty.server.ConnectionFactory f : conn.getConnectionFactories() ) {
             if ( f instanceof org.eclipse.jetty.server.HttpConnectionFactory ) {
