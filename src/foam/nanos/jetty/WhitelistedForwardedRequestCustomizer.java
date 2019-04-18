@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package foam2.src.foam.nanos.jetty;
+package foam.nanos.jetty;
 
 import org.eclipse.jetty.http.*;
 import org.eclipse.jetty.server.*;
@@ -69,7 +69,6 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
   @Override
   public void customize(Connector connector, HttpConfiguration config, Request request)
   {
-
     // grabbing the X-Forwarded-For header in the form of a HostPort object
     HostPort forwardedFor = convertAddressToHostPort(request.getHeader(_forwardedForHeader));
 
