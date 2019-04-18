@@ -128,6 +128,7 @@ var classes = [
   'foam.dao.index.PersistedIndexTest',
   'foam.dao.SequenceNumberDAO',
   'foam.dao.SequenceNumberDAOTest',
+  'foam.dao.LinkPropertiesDAO',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
