@@ -18,7 +18,7 @@ foam.CLASS({
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest',
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse',
     'org.eclipse.jetty.websocket.servlet.WebSocketCreator',
-    'foam2.src.foam.nanos.jetty.WhitelistedForwardedRequestCustomizer',
+    'foam.nanos.jetty.WhitelistedForwardedRequestCustomizer',
     'java.util.Set',
     'java.util.HashSet',
     'java.util.Arrays'
