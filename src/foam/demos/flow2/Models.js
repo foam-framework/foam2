@@ -5,12 +5,16 @@ foam.CLASS({
     'foam.demos.flow2.Transaction'
   ],
   imports: [
-    'transactionDAO'
+    'flow2TransactionDAO as transactionDAO'
   ],
   properties: [
     {
       class: 'Int',
       name: 'id'
+    },
+    {
+      class: 'String',
+      name: 'name'
     },
     {
       class: 'Currency',
