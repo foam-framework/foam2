@@ -45,7 +45,7 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
   private String _forwardedForHeader = HttpHeader.X_FORWARDED_FOR.toString();
   private Set<String> forwardedForProxyWhitelist;
 
-  // these are patterns being declared here to handle proper parsing of ipv6 addresses
+  // these are patterns being declared here to handle proper normalization of IPv6 addresses
   private static final Pattern IPV6_STD_PATTERN = Pattern.compile("^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$");
   private static final Pattern IPV6_HEX_COMPRESSED_PATTERN = Pattern.compile("^((?:[0-9A-Fa-f]{1,4}(?::[0-9A-Fa-f]{1,4})*)?)::((?:[0-9A-Fa-f]{1,4}(?::[0-9A-Fa-f]{1,4})*)?)$");
 
