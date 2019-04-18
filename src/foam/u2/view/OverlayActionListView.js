@@ -109,6 +109,15 @@ foam.CLASS({
     ^icon:hover {
       cursor: pointer;
     }
+
+    ^noselect {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
   `,
 
   methods: [
@@ -123,7 +132,7 @@ foam.CLASS({
 
       this.
         start('span').
-          addClass('noselect').
+          addClass(this.myClass('noselect')).
           start().
             addClass(this.myClass('icon')).
             style({ 'background-image': this.imageURL_$ }).

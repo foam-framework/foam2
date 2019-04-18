@@ -70,13 +70,13 @@ foam.CLASS({
       background: #eee;
     }
 
-    ^ .vertDots {
+    ^vertDots {
       font-size: 20px;
       font-weight: bold;
-      padding-right: 12px;
+      padding-right: 21px;
     }
 
-    ^ .noselect {
+    ^noselect {
       -webkit-touch-callout: none;
       -webkit-user-select: none;
       -khtml-user-select: none;
