@@ -549,6 +549,8 @@ FOAM_FILES([
   { name: "foam/core/FObjectTest" },
   { name: "com/google/foam/demos/bubbles/Bubbles" },
 
+  { name: "foam/flow/Parser"},
+  { name: "foam/flow/Method" },
   { name: "foam/flow/Document" },
   { name: "foam/flow/MarkupEditor" },
   { name: "foam/flow/DocumentationFolderDAO" },
@@ -586,4 +588,5 @@ FOAM_FILES([
   { name: "io/c9/ace/Lib" },
 
   { name: "foam/demos/flow2/Models" },
+  { name: "foam/demos/flow2/UserDetailView" }
 ]);

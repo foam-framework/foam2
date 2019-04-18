@@ -80,3 +80,21 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.demos.flow2',
+  name: 'Flow2Demo',
+  extends: 'foam.u2.Element',
+  requires: [
+    'foam.demos.flow2.User',
+    'foam.demos.flow2.UserDetailView'
+  ],
+  methods: [
+    function initE() {
+      var obj = this.User.create();
+      this.tag(
+        this.UserDetailView,
+        { data: obj });
+    }
+  ]
+});
