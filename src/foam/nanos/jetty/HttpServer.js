@@ -92,7 +92,7 @@ foam.CLASS({
         */
         
         // we are converting the ForwardedForProxyWhitelist array into a set here
-        // so that it makes more  sense algorithmically to check against IPs
+        // so that it makes more sense algorithmically to check against IPs
         Set<String> forwardedForProxyWhitelist = new HashSet<>(Arrays.asList(getForwardedForProxyWhitelist()));
 
         for ( org.eclipse.jetty.server.Connector conn : server.getConnectors() ) {

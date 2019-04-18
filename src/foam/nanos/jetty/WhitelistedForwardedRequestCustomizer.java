@@ -9,14 +9,13 @@ package foam2.src.foam.nanos.jetty;
 import org.eclipse.jetty.http.*;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.util.HostPort;
-import org.eclipse.jetty.util.log.Log;
-import org.eclipse.jetty.util.log.Logger;
 
 import java.net.InetSocketAddress;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import foam.core.X;
+import foam.nanos.logger.Logger;
 
 import javax.ws.rs.NotAuthorizedException;
 
@@ -41,8 +40,7 @@ import javax.ws.rs.NotAuthorizedException;
  */
 public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCustomizer
 {
-  private static final Logger LOG = Log.getLogger(ForwardedRequestCustomizer.class);
-
+  private Logger logger;
   private String _forwardedForHeader = HttpHeader.X_FORWARDED_FOR.toString();
   private Set<String> forwardedForProxyWhitelist;
   private X x;
@@ -59,6 +57,7 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
     super();
     this.forwardedForProxyWhitelist = forwardedForProxyWhitelist;
     this.x = x;
+    this.logger = (Logger) x.get("logger");
   }
 
   /**
@@ -70,6 +69,7 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
   @Override
   public void customize(Connector connector, HttpConfiguration config, Request request)
   {
+
     // grabbing the X-Forwarded-For header in the form of a HostPort object
     HostPort forwardedFor = convertAddressToHostPort(request.getHeader(_forwardedForHeader));
 
@@ -79,10 +79,13 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
       // then we will configure X-Forwarded-For to work with all requests that flow through
       
       /**
-       * There are three cases to handle for the whitelist
-       * 1. If the whitelist is not configured (whitelist array in journal is empty) then allow all proxies to pass
-       * 2. If the whitelist is configured and the Proxy IP is authorized, proceed to set the new remote address the value in X-Forwarded-For
-       * 3. If the whitelist is configured and the Proxy IP is unauthorized, fail the request by throwing an error and log the Proxy's IP
+       * There are three cases to handle for the whitelist:
+       * 1. If the whitelist is not configured (whitelist array in journal is empty) then allow all proxies to set
+       *    the new remote address to the X-Forwarded-For value
+       * 2. If the whitelist is configured and the Proxy IP is authorized, proceed to set the new remote address
+       *    the value in X-Forwarded-For
+       * 3. If the whitelist is configured and the Proxy IP is unauthorized, fail the request by throwing
+       *    an error and log the Proxy's IP
        */
       if ( this.forwardedForProxyWhitelist.isEmpty() ){
         // System.out.printf("SUCCESS: Whitelist is not configured and so request will pass %s %n", request.getRemoteAddr());
@@ -108,13 +111,8 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
         // System.out.printf("SUCCESS: New remote address is: %s %n", request.getRemoteAddr());
         // System.out.printf("SUCCESS: New remote port is: %i %n", request.getRemotePort());
       } else {
-        System.out.printf("FAILURE: Proxy IP is NOT on the whitelist %n");
-        System.out.printf("FAILURE: Unauthorized proxy remote address is: %s %n", request.getRemoteAddr());
+        logger.warning("UNAUTHORIZED: Unauthorized proxy remote address is: " + request.getRemoteAddr());
 
-        // TODO: error handling could be handled better later on in the future
-        // for now the default error thrown page is unauthorizedAccess.html
-        // currently this is the quickest and simplest way to stop the request
-        // in the future will need to throw a NotAuthorizedException
         throw new NotAuthorizedException("Unauthorized proxy with the IP Address: %s", request.getRemoteAddr());
       }
     }
@@ -132,7 +130,7 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
   private HostPort convertAddressToHostPort(String headerValue)
   {
     String leftMost = super.getLeftMost(headerValue);
-    if (leftMost == null)
+    if ( leftMost == null )
     {
       return null;
     }
@@ -164,7 +162,7 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
      * Just for reference, a properly structured ipv6 address with ports should look like this: [2001:DB8::21f:5bff:febf:ce22:8a2e]:60
      * If in the future we get X-Forwarded-For headers injected in this style, it should be handled normally by HostPort
      */
-    if (isIPv6HexCompressedAddress(leftMost) || isIPv6StdAddress(leftMost)) {
+    if ( isIPv6HexCompressedAddress(leftMost) || isIPv6StdAddress(leftMost) ) {
       // we need to enclose the string with square brackets
       StringBuffer ipv6Formatted = new StringBuffer(leftMost);
       ipv6Formatted.append(']');
@@ -180,7 +178,7 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
     }
     catch (Exception e) {
       // failed to parse in host[:port] format
-      LOG.ignore(e);
+      logger.warning(e);
       return null;
     }
   }
