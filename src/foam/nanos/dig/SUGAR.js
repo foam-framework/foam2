@@ -281,7 +281,7 @@ foam.CLASS({
       code: async function() {
         if ( ! (this.postURL === '') ) {
           var req = this.HTTPRequest.create({
-            url: window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + this.postURL + this.postData,
+            url: window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + this.postURL + this.postData+ "&sessionId=" + localStorage.defaultSession,
             method: 'POST',
             contentType: 'url',
             payload: this.postData.substring(1),
