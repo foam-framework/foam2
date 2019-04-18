@@ -200,8 +200,8 @@ foam.CLASS({
                       columnSelectionE.open(e.clientX, e.clientY);
                     }).
                     tag(view.Image, { data: '/images/Icon_More_Resting.svg' }).
-                    addClass('vertDots').
-                    addClass('noselect');
+                    addClass(view.myClass('vertDots')).
+                    addClass(view.myClass('noselect'));
                   }).
                   style({ width: '60px' }).
                   tag('div', null, view.dropdownOrigin$).
@@ -245,7 +245,7 @@ foam.CLASS({
                     // don't do anything.
                     if (
                       evt.target.nodeName === 'DROPDOWN-OVERLAY' ||
-                      evt.target.classList.contains('vertDots')
+                      evt.target.classList.contains(view.myClass('vertDots'))
                     ) return;
 
                     view.selection = obj;
