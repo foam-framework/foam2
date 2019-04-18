@@ -157,6 +157,9 @@ foam.CLASS({
           margin-top: 10px;
           margin-right: 8px;
         }
+        ^ {
+          position: relative;
+        }
       */}
     })
   ],
@@ -170,8 +173,8 @@ foam.CLASS({
     {
       type: 'String',
       name: 'monthName',
-      expression: function(monthIndex) {
-        return this.Month.VALUES[monthIndex].label + ' ' + this.year;
+      expression: function(month) {
+        return this.month.label;
       }
     },
     {
@@ -183,9 +186,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'date',
-      expression: function(day, year, month, showPlaceholder) {
-        if ( this.showPlaceholder ) {
-          this.showPlaceholder = false;
+      expression: function(day, year, month) {
+        if ( ! this.data ) {
           return 'mm dd yyyy';
         }
         return this.formatMonth(month.name) + ' ' + day + ' ' + year;
@@ -194,18 +196,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'dateTime',
-      expression: function(day, year, month, hour12, minute, period, showPlaceholder) {
-        if ( this.showPlaceholder ) {
-          this.showPlaceholder = false;
+      expression: function(day, year, month, hour12, minute, period) {
+        if ( ! this.data ) {
           return 'mm dd yyyy --:-- --';
         }
         return this.formatMonth(month.name) + ' ' + day + ' ' + year + ', ' + hour12 + ':' + minute + ' ' + period;
       }
-    },
-    {
-      class: 'Boolean',
-      name: 'showPlaceholder',
-      value: false
     }
   ],
 
@@ -265,6 +261,7 @@ foam.CLASS({
               .start('img')
                 .attrs({ src: 'images/arrow-left-white.svg' })
                 .addClass('arrow-left')
+                .on('click', this.updateDate)
                 .on('click', function() { self.year--; })
               .end()
               .start()
@@ -273,6 +270,7 @@ foam.CLASS({
               .start('img')
                 .attrs({ src: 'images/arrow-right-white.svg' })
                 .addClass('arrow-right')
+                .on('click', this.updateDate)
                 .on('click', function() { self.year++; })
               .end()
             .end()
@@ -281,6 +279,7 @@ foam.CLASS({
               .addClass('month')
               .start()
                 .addClass('arrow-container').addClass('arrow-container-left')
+                .on('click', this.updateDate)
                 .on('click', function() { self.monthIndex--; })
                 .start('img')
                   .attrs({ src: 'images/arrow-left-black.svg' })
@@ -293,6 +292,7 @@ foam.CLASS({
               .end()
               .start()
                 .addClass('arrow-container').addClass('arrow-container-right')
+                .on('click', this.updateDate)
                 .on('click', function() { self.monthIndex++; })
                 .start('img')
                   .attrs({ src: 'images/arrow-right-black.svg' })
@@ -304,6 +304,11 @@ foam.CLASS({
             .start()
               .addClass('calendar')
               .start(this.CalendarDatePicker, { data$: this.data$ }).end()
+              .on('click', function() {
+                if ( self.mode === foam.u2.DisplayMode.RW ) {
+                  self.isOpen_ = ! self.isOpen_;
+                }
+              })
             .end()
 
             .start()
@@ -312,7 +317,9 @@ foam.CLASS({
               .start(this.ChoiceView, {
                 choices: zeroLeadingNumArray(1, 12),
                 data$: this.hour12$
-              }).addClass('time-of-day')
+              })
+                .on('click', this.updateDate)
+                .addClass('time-of-day')
                 .attrs({ size: 2, maxlength: 2 })
               .end().
               start()
@@ -324,11 +331,13 @@ foam.CLASS({
                 choices: zeroLeadingNumArray(0, 59),
                 data$: this.minute$
               })
+                .on('click', this.updateDate)
                 .attrs({ size: 2, maxlength: 2 })
                 .addClass('time-of-day')
               .end()
               .start()
                 .add(this.PERIOD)
+                .on('click', this.updateDate)
                 .addClass('time-of-day')
               .end()
             .end()
@@ -348,8 +357,13 @@ foam.CLASS({
 
     function clearDate(event) {
       event.stopPropagation();
-      this.showPlaceholder = true;
-      this.data$.clear();
+      this.data = null;
+    },
+
+    function updateDate() {
+      if ( ! this.data || this.data === undefined ) {
+        this.data = new Date();
+      }
     }
   ]
 });
