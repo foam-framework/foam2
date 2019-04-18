@@ -7,10 +7,7 @@
 package foam2.src.foam.nanos.jetty;
 
 import org.eclipse.jetty.http.*;
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.ForwardedRequestCustomizer;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.util.HostPort;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
@@ -18,6 +15,10 @@ import org.eclipse.jetty.util.log.Logger;
 import java.net.InetSocketAddress;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import foam.core.X;
+
+import javax.ws.rs.NotAuthorizedException;
 
 /**
  * A whitelist-featured customizer which looks at an HTTP request for headers which indicate it
@@ -44,6 +45,7 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
 
   private String _forwardedForHeader = HttpHeader.X_FORWARDED_FOR.toString();
   private Set<String> forwardedForProxyWhitelist;
+  private X x;
 
   // these are patterns being declared here to handle proper normalization of IPv6 addresses
   private static final Pattern IPV6_STD_PATTERN = Pattern.compile("^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$");
@@ -53,9 +55,10 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
    * A constructor which can take in an Set of whitelisted Proxy IP Addresses
    * @param forwardedForProxyWhitelist a set of whitelisted IP addresses
    */
-  public WhitelistedForwardedRequestCustomizer( Set<String> forwardedForProxyWhitelist ) {
+  public WhitelistedForwardedRequestCustomizer( Set<String> forwardedForProxyWhitelist, X x ) {
     super();
     this.forwardedForProxyWhitelist = forwardedForProxyWhitelist;
+    this.x = x;
   }
 
   /**
@@ -70,25 +73,31 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
     // grabbing the X-Forwarded-For header in the form of a HostPort object
     HostPort forwardedFor = convertAddressToHostPort(request.getHeader(_forwardedForHeader));
 
-    // TODO: Use the foam logger
     if ( forwardedFor != null ) {
 
       // if whitelist is not yet configured (i.e. whitelist array is empty)
       // then we will configure X-Forwarded-For to work with all requests that flow through
+      
+      /**
+       * There are three cases to handle for the whitelist
+       * 1. If the whitelist is not configured (whitelist array in journal is empty) then allow all proxies to pass
+       * 2. If the whitelist is configured and the Proxy IP is authorized, proceed to set the new remote address the value in X-Forwarded-For
+       * 3. If the whitelist is configured and the Proxy IP is unauthorized, fail the request by throwing an error and log the Proxy's IP
+       */
       if ( this.forwardedForProxyWhitelist.isEmpty() ){
-        System.out.printf("SUCCESS: Whitelist is not configured and so request will pass %s %n", request.getRemoteAddr());
+        // System.out.printf("SUCCESS: Whitelist is not configured and so request will pass %s %n", request.getRemoteAddr());
 
         String forwardedForHost = forwardedFor.getHost();
         int forwardedForPort = (forwardedFor.getPort() > 0) ? forwardedFor.getPort() : request.getRemotePort();
 
         request.setRemoteAddr(InetSocketAddress.createUnresolved(forwardedForHost, forwardedForPort));
 
-        System.out.printf("SUCCESS: New remote address is: %s %n", request.getRemoteAddr());
-        System.out.printf("SUCCESS: New remote port is: %i %n", request.getRemotePort());
+        // System.out.printf("SUCCESS: New remote address is: %s %n", request.getRemoteAddr());
+        // System.out.printf("SUCCESS: New remote port is: %i %n", request.getRemotePort());
 
 
       } else if ( this.forwardedForProxyWhitelist.contains(request.getRemoteAddr()) ) {
-        System.out.printf("SUCCESS: Proxy IP is on the whitelist %s %n", request.getRemoteAddr());
+        // System.out.printf("SUCCESS: Proxy IP is on the whitelist %s %n", request.getRemoteAddr());
 
         String forwardedForHost = forwardedFor.getHost();
 
@@ -96,13 +105,17 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
 
         request.setRemoteAddr(InetSocketAddress.createUnresolved(forwardedForHost, forwardedForPort));
         
-        System.out.printf("SUCCESS: New remote address is: %s %n", request.getRemoteAddr());
-        System.out.printf("SUCCESS: New remote port is: %i %n", request.getRemotePort());
+        // System.out.printf("SUCCESS: New remote address is: %s %n", request.getRemoteAddr());
+        // System.out.printf("SUCCESS: New remote port is: %i %n", request.getRemotePort());
       } else {
         System.out.printf("FAILURE: Proxy IP is NOT on the whitelist %n");
         System.out.printf("FAILURE: Unauthorized proxy remote address is: %s %n", request.getRemoteAddr());
 
-        throw new Error("failing the whitelist");
+        // TODO: error handling could be handled better later on in the future
+        // for now the default error thrown page is unauthorizedAccess.html
+        // currently this is the quickest and simplest way to stop the request
+        // in the future will need to throw a NotAuthorizedException
+        throw new NotAuthorizedException("Unauthorized proxy with the IP Address: %s", request.getRemoteAddr());
       }
     }
   }
@@ -172,10 +185,20 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
     }
   }
 
+  /**
+   * A helper function to do a RegEx check to see if the input is a standard IPv6 address
+   * @param input the address to be checked
+   * @return true or false
+   */
   private static boolean isIPv6StdAddress(final String input) {
     return IPV6_STD_PATTERN.matcher(input).matches();
   }
        
+    /**
+   * A helper function to do a RegEx check to see if the input is a compressed IPv6 address (empty octets removed)
+   * @param input the address to be checked
+   * @return true or false
+   */
   private static boolean isIPv6HexCompressedAddress(final String input) {
     return IPV6_HEX_COMPRESSED_PATTERN.matcher(input).matches();
   }
