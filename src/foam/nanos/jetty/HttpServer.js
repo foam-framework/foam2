@@ -104,7 +104,7 @@ foam.CLASS({
 
               // 2. handle the X-Forwarded-For headers only if they pass our whitelist
               // we need to pass the context into this customizer so that we can effectively log unauthorized proxies
-              ((org.eclipse.jetty.server.HttpConnectionFactory) f).getHttpConfiguration().addCustomizer(new WhitelistedForwardedRequestCustomizer(forwardedForProxyWhitelist));
+              ((org.eclipse.jetty.server.HttpConnectionFactory) f).getHttpConfiguration().addCustomizer(new WhitelistedForwardedRequestCustomizer(forwardedForProxyWhitelist, getX()));
             }
           }
         }
