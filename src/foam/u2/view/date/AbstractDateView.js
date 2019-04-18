@@ -6,18 +6,14 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'data',
-      value: new Date(),
-      preSet: function(old, n) {
-        if ( n == null || n == undefined ) {
-          return new Date();
-        }
-        return n;
-      }
     },
     {
       class: 'Int',
       name: 'year',
       expression: function(data) {
+        if ( ! data || isNaN(data.getYear()) ) {
+          return new Date().getYear() + 1900;
+        }
         return data.getYear() + 1900;
       },
       postSet: function(_, n) {
@@ -31,6 +27,9 @@ foam.CLASS({
       class: 'Int',
       name: 'monthIndex',
       expression: function(data) {
+        if ( ! data || isNaN(data.getMonth()) ) {
+          return new Date().getMonth();
+        }
         return data.getMonth();
       },
       postSet: function(_, n) {
@@ -56,6 +55,9 @@ foam.CLASS({
       class: 'Int',
       name: 'day',
       expression: function(data) {
+        if ( ! data || isNaN(data.getDate()) ) {
+          return new Date().getDate();
+        }
         return data.getDate();
       },
       postSet: function(_, n) {
@@ -68,6 +70,9 @@ foam.CLASS({
     {
       name: 'hour24',
       expression: function(data) {
+        if ( ! data || isNaN(data.getDate()) ) {
+          return new Date().getHours();
+        }
         return data.getHours();
       },
       postSet: function(_, n) {
@@ -94,7 +99,12 @@ foam.CLASS({
     {
       name: 'minute',
       expression: function(data) {
-        var m = data.getMinutes();
+        var m;
+        if ( ! data || isNaN(data.getDate()) ) {
+          m = new Date().getMinutes();
+        } else { 
+          m = data.getMinutes();
+        }
         return (m < 10 ? '0' : '') + m;
       },
       postSet: function(_, n) {
@@ -107,6 +117,9 @@ foam.CLASS({
     {
       name: 'second',
       expression: function(data) {
+        if ( ! data || isNaN(data.getDate()) ) {
+          return new Date().getSeconds();
+        }
         return data.getSeconds();
       },
       postSet: function(_, n) {
