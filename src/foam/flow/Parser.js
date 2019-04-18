@@ -28,6 +28,8 @@ foam.CLASS({
                                          chars('<')),
                                      anyChar()))),
 
+          'debugger': literal('<debugger/>'),
+
           'axiom': seq1(1, '$$', sym('identifier')),
 
           'identifier': substring(
@@ -45,6 +47,7 @@ foam.CLASS({
           // does not actually take effect during Element.start/tag/add
           'tag': alt(sym('foam'),
                      sym('code'),
+                     sym('debugger'),
                      sym('self-closed-tag'),
                      sym('normal-tag')),
 
@@ -148,6 +151,12 @@ foam.CLASS({
         'content': function(children) {
           return function(x) {
             this.forEach(children, function(c) { c.call(this, x); });
+          };
+        },
+
+        'debugger': function() {
+          return function(x) {
+            debugger;
           };
         },
 

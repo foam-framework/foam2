@@ -2025,9 +2025,10 @@ foam.CLASS({
       code: function E(ctx, opt_nodeName) {
         var nodeName = (opt_nodeName || 'div').toUpperCase();
 
-        return (
-          ctx.elementForName(nodeName) || foam.u2.Element).
-          create({nodeName: nodeName}, ctx);
+        var e = ctx.elementForName(nodeName);
+
+        return e ? e.create(null, ctx) :
+          foam.u2.Element.create({ nodeName: nodeName }, ctx);
       }
     },
 

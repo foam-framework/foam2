@@ -71,7 +71,8 @@ foam.CLASS({
           }
 
           if ( foam.String.isInstance(spec) || spec === undefined || spec === null )
-            return foam.u2.Element.create({ nodeName: spec || 'div' }, ctx);
+            return ctx.E(spec);
+//            return foam.u2.Element.create({ nodeName: spec || 'div' }, ctx);
 
           throw 'Invalid ViewSpec, must provide an Element, Slot, toE()-able, Function, {create: function() {}}, {class: \'name\'}, Class, or String, but received: ' + spec;
         };
