@@ -177,7 +177,7 @@ foam.CLASS({
                 this.start('th').
                   addClass(view.myClass('th-' + column.name)).
                   callIf(column.tableWidth, function() {
-                    this.style({ width: column.tableWidth });
+                    this.style({ width: column.tableWidth + 'px' });
                   }).
                   on('click', function(e) {
                     view.sortBy(column);
@@ -203,7 +203,7 @@ foam.CLASS({
                     addClass('vertDots').
                     addClass('noselect');
                   }).
-                  style({ width: 60 }).
+                  style({ width: '60px' }).
                   tag('div', null, view.dropdownOrigin$).
                 end();
               });
@@ -276,8 +276,7 @@ foam.CLASS({
                 }).
                 start('td').
                   addClass(view.myClass('context-menu-cell')).
-                  tag({
-                    class: 'foam.u2.view.OverlayActionListView',
+                  tag(view.OverlayActionListView, {
                     data: actions,
                     obj: obj
                   }).
