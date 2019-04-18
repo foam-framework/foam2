@@ -66,7 +66,7 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
   public void customize(Connector connector, HttpConfiguration config, Request request)
   {
     // grabbing the X-Forwarded-For header in the form of a HostPort object
-    HostPort forwardedFor = getRemoteAddr(request.getHeader(_forwardedForHeader));
+    HostPort forwardedFor = convertAddressToHostPort(request.getHeader(_forwardedForHeader));
 
     // TODO: Use better logger
     if ( forwardedFor != null ) {
@@ -97,7 +97,7 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
         System.out.printf("FAILURE: Proxy IP is NOT on the whitelist %n");
         System.out.printf("FAILURE: Unauthorized proxy remote address is: %s %n", request.getRemoteAddr());
 
-        // TODO: Figure out how to fail the request
+        throw new Error("failing the whitelist");
       }
     }
   }
@@ -111,7 +111,7 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
    * @param headerValue the header value to parse the source IP address from
    * @return a HostPort object with the left most value from headerValue
    */
-  protected HostPort getRemoteAddr(String headerValue)
+  protected HostPort convertAddressToHostPort(String headerValue)
   {
     String leftMost = super.getLeftMost(headerValue);
     if (leftMost == null)
