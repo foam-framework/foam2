@@ -1075,6 +1075,8 @@ foam.LIB({
 
             tmp = thunk();
 
+            Object.defineProperty(pkg, m.name, { value: tmp });
+
             return tmp;
           }
         }
