@@ -584,4 +584,6 @@ FOAM_FILES([
   { name: "foam/u2/view/ArrayView" },
 
   { name: "io/c9/ace/Lib" },
+
+  { name: "foam/demos/flow2/Models" },
 ]);
