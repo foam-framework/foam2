@@ -124,8 +124,8 @@ foam.CLASS({
     },
     {
       name: 'appConfig',
-      expression: function(client) {
-        return client && client.appConfig || null;
+      expression: function(client$appConfig) {
+        return client$appConfig || null;
       }
     },
     {
