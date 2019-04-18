@@ -155,9 +155,7 @@ foam.CLASS({
       this.overlay_.forEach(this.data, function(action) {
         this.
           start().
-            show(action.createIsAvailable$(self.ConstantSlot.create({
-              value: self.obj
-            }))).
+            show(action.createIsAvailable$(self.obj$)).
             addClass(self.myClass('action')).
             add(action.label).
             on('click', function(evt) {
