@@ -54,13 +54,9 @@ foam.CLASS({
       class: 'URL',
       name: 'imageURL_',
       expression: function(restingImageURL, hoverImageURL, disabledImageURL, activeImageURL, hovered_, disabled_, active_) {
-        if ( disabled_ ) {
-          return `url(${disabledImageURL})`;
-        } else if ( active_ ) {
-          return `url(${activeImageURL})`;
-        } else if ( hovered_ ) {
-          return `url(${hoverImageURL})`;
-        }
+        if ( disabled_ ) return `url(${disabledImageURL})`;
+        if ( active_ ) return `url(${activeImageURL})`;
+        if ( hovered_ ) return `url(${hoverImageURL})`;
         return `url(${restingImageURL})`;
       }
     },
