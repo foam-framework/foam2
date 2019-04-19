@@ -40,13 +40,13 @@ import javax.ws.rs.NotAuthorizedException;
  */
 public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCustomizer
 {
-  private X x;
-  private Logger logger;
-  private Set<String> forwardedForProxyWhitelist;
-
   private final static String FORWARDED_FOR_HEADER = HttpHeader.X_FORWARDED_FOR.toString();
   private final static Pattern IPV6_STD_PATTERN = Pattern.compile("^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$");
   private final static Pattern IPV6_HEX_COMPRESSED_PATTERN = Pattern.compile("^((?:[0-9A-Fa-f]{1,4}(?::[0-9A-Fa-f]{1,4})*)?)::((?:[0-9A-Fa-f]{1,4}(?::[0-9A-Fa-f]{1,4})*)?)$");
+
+  private X x;
+  private Logger logger;
+  private Set<String> forwardedForProxyWhitelist;
 
   /**
    * A constructor which can take in an Set of whitelisted Proxy IP Addresses
