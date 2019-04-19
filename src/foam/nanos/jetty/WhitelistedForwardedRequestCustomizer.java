@@ -50,9 +50,10 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
 
   /**
    * A constructor which can take in an Set of whitelisted Proxy IP Addresses
+   * @param x the context
    * @param forwardedForProxyWhitelist a set of whitelisted IP addresses
    */
-  public WhitelistedForwardedRequestCustomizer( Set<String> forwardedForProxyWhitelist, X x ) {
+  public WhitelistedForwardedRequestCustomizer( X x, Set<String> forwardedForProxyWhitelist ) {
     super();
     this.forwardedForProxyWhitelist = forwardedForProxyWhitelist;
     this.x = x;
