@@ -72,6 +72,7 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
     // grabbing the X-Forwarded-For header in the form of a HostPort object
     HostPort forwardedFor = convertAddressToHostPort(request.getHeader(_forwardedForHeader));
 
+    // if requests don't even have the X-Forwarded-For header, then it will go through as normal skipping the code below
     if ( forwardedFor != null ) {
       
       /**
