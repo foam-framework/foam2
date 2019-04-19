@@ -73,9 +73,6 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
     HostPort forwardedFor = convertAddressToHostPort(request.getHeader(_forwardedForHeader));
 
     if ( forwardedFor != null ) {
-
-      // if whitelist is not yet configured (i.e. whitelist array is empty)
-      // then we will configure X-Forwarded-For to work with all requests that flow through
       
       /**
        * There are three cases to handle for the whitelist:
