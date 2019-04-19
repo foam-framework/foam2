@@ -121,7 +121,17 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
 
   /**
    * This function is made to get the left most header value from the X-Forwarded-For header
-   * in the case that it was sent through numerous proxies like so (X-Forwarded-For: 203.0.113.195, 70.41.3.18, 150.172.238.178)
+   * in the case that it was sent through numerous proxies like so 
+   * X-Forwarded-For: 203.0.113.195, 70.41.3.18, 150.172.238.178
+   * 
+   * This is because the leftMost header contains the client's IP as according to RFC
+   * New Message-Header fields with the same field-name get APPENDED at the tail end of the list like so:
+   * X-Forwarded-For: client, proxy1, proxy2
+   * 
+   * For more info  on message-header fields w ith the same field-names,
+   * @see <a href="https://tools.ietf.org/html/rfc2616#section-4.2">message-header fields</a>
+   * 
+   * 
    * and finally convert it into a HostPort object
    * @param headerValue the header value to parse the source IP address from
    * @return a HostPort object with the left most value from headerValue
