@@ -161,9 +161,9 @@ foam.CLASS({
 
     function createIsAvailable$(data$) {
       var slot = foam.core.ExpressionSlot.create({
-         obj$: data$,
-         code: this.isAvailable
-       });
+        obj$: data$,
+        code: this.isAvailable
+      });
 
       return this.permissionRequired ?
         this.andSlotAndPromise(slot, this.checkPermission(data$.get().__subContext__)) :
