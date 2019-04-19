@@ -47,6 +47,25 @@ foam.CLASS({
       name: 'hidden',
       value: 'testing...',
       visibility: foam.u2.Visibility.HIDDEN
+    },
+    {
+      class: 'Boolean',
+      name: 'flag',
+      value: true
+    },
+    {
+      class: 'String',
+      name: 'expression',
+      visibilityExpression: function(flag) {
+        return foam.u2.Visibility[flag ? 'RW' : 'DISABLED'];
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'expression2',
+      visibilityExpression: function(flag) {
+        return foam.u2.Visibility[flag ? 'RW' : 'DISABLED'];
+      }
     }
   ]
 });
