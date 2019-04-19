@@ -55,9 +55,9 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
    */
   public WhitelistedForwardedRequestCustomizer( X x, Set<String> forwardedForProxyWhitelist ) {
     super();
-    this.forwardedForProxyWhitelist = forwardedForProxyWhitelist;
     this.x = x;
     this.logger = (Logger) x.get("logger");
+    this.forwardedForProxyWhitelist = forwardedForProxyWhitelist;
   }
 
   /**
