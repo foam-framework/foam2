@@ -54,11 +54,13 @@ foam.CLASS({
         .end();
       }
     },
+
     function updateMode_(mode) {
       var disabled = mode === foam.u2.DisplayMode.RO ||
                      mode === foam.u2.DisplayMode.DISABLED;
       this.setAttribute('disabled', disabled);
     },
+
     function link() {
       this.data$.linkTo(this.attrSlot('checked'));
     }
