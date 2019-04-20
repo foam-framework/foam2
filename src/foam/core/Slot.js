@@ -363,7 +363,15 @@ foam.CLASS({
       throw new Error('Tried to mutate immutable ConstantSlot.');
     },
 
-    function sub(l) { /* nop */ }
+    function sub(l) { /* nop */ },
+
+    function follow(other) { /* nop */ },
+
+    function linkFrom(s2) { /* nop */ },
+
+    function linkTo(s2) { s2.set(this.get()); },
+
+    function mapFrom(other, f) { /* nop */ }
   ]
 });
 
