@@ -21,10 +21,6 @@ foam.CLASS({
         String input = "{\\"class\\":\\"__Class__\\",\\"forClass_\\":\\"foam.nanos.auth.User\\"}";
         ClassReferenceParserTest_StringWithValidClassReference(
           x, input, User.getOwnClassInfo(), "Parsed modelled Class reference parser successfully");
-
-        String input2 = "{\\"class\\":\\"__Class__\\",\\"forClass_\\":\\"foam.lib.json.ClassReferenceParserTest$Dummy\\"}";
-        ClassReferenceParserTest_StringWithValidClassReference(
-          x, input2, Dummy.class, "Parsed Java Class reference parser successfully");
       `
     },
     {
@@ -40,9 +36,8 @@ foam.CLASS({
         },
         {
           name: 'expected',
-          // TODO(adamvy): Should Class vs ClassInfo be separate types?
-          // What should we store in Class properties.
-          type: 'Object'
+          // NOTE: ClassReferenceParser returns classInfo of the modelled class instead of the actual Java class.
+          type: 'Class'
         },
         {
           name: 'message',
@@ -60,18 +55,6 @@ foam.CLASS({
         ps = (StringPStream) ps.apply(classReferenceParser, psx);
         test(expected.equals(ps.value()), message);
       `
-    }
-  ],
-
-  axioms: [
-    {
-      name: 'javaExtras',
-      buildJavaClass: function (cls) {
-        cls.extras.push(`
-          // inner dummy class
-          class Dummy {}
-        `);
-      }
     }
   ]
 });

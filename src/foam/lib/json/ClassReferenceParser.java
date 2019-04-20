@@ -6,9 +6,8 @@
 
 package foam.lib.json;
 
+import foam.core.ClassInfo;
 import foam.lib.parse.*;
-
-import java.lang.reflect.InvocationTargetException;
 
 public class ClassReferenceParser
   extends ProxyParser
@@ -36,25 +35,27 @@ public class ClassReferenceParser
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    try {
-      if ( ( ps = super.parse(ps, x)) == null ) {
-        return null;
-      }
-
-      String classId = (String) ps.value();
-      Class cls = Class.forName(classId);
-      return cls != null ? ps.setValue(resolve(cls)) : null;
-    } catch ( Throwable t ) {
+    if ( ( ps = super.parse(ps, x)) == null ) {
       return null;
     }
-  }
 
-  private Object resolve(Class cls)
-    throws InvocationTargetException, IllegalAccessException
-  {
+    String classId = (String) ps.value();
+    // NOTE: ClassReferenceParser expects fully qualified name of a modelled class for class lookup
+    // and returns ClassInfo of the modelled class if found, otherwise return null.
+    //
+    // Eg.,
+    // When parsing { "class": "__Class__", "forClass_": "foam.nanos.auth.User" }
+    // it would return User.getOwnClassInfo() instead of the actual User class.
+    //
+    // And when parsing { "class": "__Class__", "forClass_": "java.lang.Object" }
+    // it would return null because java.lang.Object is not a modelled class.
     try {
-      return cls.getMethod("getOwnClassInfo").invoke(null);
-    } catch ( NoSuchMethodException ex ) { }
-    return cls;
+      Class cls = Class.forName(classId);
+      ClassInfo info = (ClassInfo) cls.getMethod("getOwnClassInfo") .invoke(null);
+      return ps.setValue(info);
+    } catch ( Throwable t ) {
+      System.err.println(classId + " is not a modelled class.");
+      return null;
+    }
   }
 }
