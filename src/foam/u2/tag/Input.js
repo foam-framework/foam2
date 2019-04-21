@@ -129,6 +129,12 @@ foam.CLASS({
       this.attrSlot(null, this.onKey ? 'input' : null).linkFrom(this.data$);
     },
 
+    function fromProperty(prop) {
+      this.SUPER(prop);
+
+      this.visibility$.follow(prop.createVisibilityFor(this.__context__.data$));
+    },
+
     function updateMode_(mode) {
       // TODO: make sure that DOM is updated if values don't change
       this.setAttribute('readonly', mode === foam.u2.DisplayMode.RO);
