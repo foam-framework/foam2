@@ -13,13 +13,46 @@ foam.CLASS({
       name: 'defaultInt'
     },
     {
+      class: 'Int',
+      name: 'intWithMinAndMax',
+      min: 1,
+      max: 5,
+      value: 3,
+      units: ' rating (1-5)'
+    },
+    {
+      class: 'Int',
+      name: 'intWithRangeView',
+      view: {
+        class: 'foam.u2.RangeView'
+      }
+    },
+    {
+      class: 'Int',
+      name: 'intWithDualView',
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: 'foam.u2.RangeView',
+        viewb: 'foam.u2.IntView'
+      }
+    },
+    {
       class: 'String',
       name: 'defaultString'
     },
     {
       class: 'String',
       name: 'stringWithDisplayWidth',
-      displayWidth: 40
+      displayWidth: 4
+    },
+    {
+      class: 'String',
+      name: 'stringWithTextFieldWithSize',
+      displayWidth: 4,
+      view: {
+        class: 'foam.u2.TextField',
+        maxLength: 4
+      }
     },
     {
       class: 'String',
@@ -56,6 +89,11 @@ foam.CLASS({
     {
       class: 'Float',
       name: 'defaultFloat'
+    },
+    {
+      class: 'Float',
+      name: 'floatWithPrecision',
+      precision: 2
     },
     {
       class: 'Double',
