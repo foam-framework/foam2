@@ -42,6 +42,38 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'textFieldWithPlaceholder',
+      view: {
+        class: 'foam.u2.TextField',
+        placeholder: 'placeholder'
+      }
+    },
+    {
+      class: 'String',
+      name: 'textFieldWithChoices',
+      view: {
+        class: 'foam.u2.TextField',
+        choices: ['Yes', 'No', 'Maybe']
+      }
+    },
+    {
+      class: 'String',
+      name: 'choiceView',
+      view: {
+        class: 'foam.u2.view.ChoiceView',
+        choices: ['Yes', 'No', 'Maybe']
+      }
+    },
+    {
+      class: 'String',
+      name: 'radioView',
+      view: {
+        class: 'foam.u2.view.RadioView',
+        choices: ['Yes', 'No', 'Maybe']
+      }
+    },
+    {
+      class: 'String',
       name: 'stringWithDisplayWidth',
       displayWidth: 4
     },
@@ -112,8 +144,27 @@ foam.CLASS({
       name: 'defaultImage'
     },
     {
+      class: 'Image',
+      name: 'imageView',
+      view: 'foam.u2.view.ImageView',
+      value: 'Dragon.png'
+    },
+    {
       class: 'URL',
       name: 'defaultURL'
+    },
+    {
+      class: 'Color',
+      name: 'defaultColor'
+    },
+    {
+      class: 'Password',
+      name: 'defaultPassword'
+    },
+    {
+      class: 'Password',
+      name: 'passwordView',
+      view: 'foam.u2.view.PasswordView'
     },
     {
       class: 'PhoneNumber',
@@ -140,6 +191,12 @@ foam.CLASS({
       view: { class: 'foam.u2.md.CheckBox' }
     },
     {
+      class: 'String',
+      name: 'htmlView',
+      value: '<b>bold</b>  <i>italic</i>',
+      view: 'foam.u2.HTMLView'
+    },
+    {
       class: 'FObjectProperty',
       name: 'fObjectViewWithChoices',
       view: {
@@ -155,6 +212,6 @@ foam.CLASS({
       class: 'FObjectProperty',
       name: 'fObjectView',
       view: { class: 'foam.u2.view.FObjectView' }
-    }
+    },
   ]
 })
