@@ -68,6 +68,13 @@ foam.CLASS({
       }
     },
     {
+      class: 'Date',
+      name: 'disabledDateExpression',
+      visibilityExpression: function(flag) {
+        return foam.u2.Visibility[flag ? 'RW' : 'DISABLED'];
+      }
+    },
+    {
       class: 'String',
       name: 'readOnlyExpression',
       visibilityExpression: function(flag) {
@@ -77,6 +84,13 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'readOnlyBooleanExpression',
+      visibilityExpression: function(flag) {
+        return foam.u2.Visibility[flag ? 'RW' : 'RO'];
+      }
+    },
+    {
+      class: 'Date',
+      name: 'readOnlyDateExpression',
       visibilityExpression: function(flag) {
         return foam.u2.Visibility[flag ? 'RW' : 'RO'];
       }
