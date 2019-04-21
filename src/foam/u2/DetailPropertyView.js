@@ -63,7 +63,7 @@ foam.CLASS({
 
       if ( prop && prop.permissionRequired )  {
         var propName = prop.name.toLowerCase();
-        var clsName = prop.forClass_;
+        var clsName  = prop.forClass_;
         clsName = clsName.substring(clsName.lastIndexOf('.') + 1).toLowerCase();
         var writePerm = await this.auth.check(null, `${clsName}.rw.${propName}`);
         if ( ! writePerm ) {
@@ -71,6 +71,8 @@ foam.CLASS({
           prop.visibility = readPerm ? foam.u2.Visibility.RO : foam.u2.Visibility.HIDDEN;
         }
       }
+
+      // TODO: check/make visibility and permissions work together
 
       this.
         show(prop.createVisibilityFor(this.__context__.data$).map(function(m) { return m != foam.u2.Visibility.HIDDEN; })).
