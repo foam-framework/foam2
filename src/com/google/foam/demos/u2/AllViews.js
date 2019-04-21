@@ -9,6 +9,74 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Int',
+      name: 'defaultInt'
+    },
+    {
+      class: 'String',
+      name: 'defaultString'
+    },
+    {
+      class: 'Date',
+      name: 'defaultDate'
+    },
+    {
+      class: 'DateTime',
+      name: 'defaultDateTime'
+    },
+    {
+      class: 'Time',
+      name: 'defaultTime'
+    },
+    {
+      class: 'Byte',
+      name: 'defaultByte'
+    },
+    {
+      class: 'Short',
+      name: 'defaultShort'
+    },
+    {
+      class: 'Long',
+      name: 'defaultLong'
+    },
+    {
+      class: 'Float',
+      name: 'defaultFloat'
+    },
+    {
+      class: 'Double',
+      name: 'defaultDouble'
+    },
+    {
+      class: 'StringArray',
+      name: 'defaultStringArray'
+    },
+    {
+      class: 'EMail',
+      name: 'defaultEMail'
+    },
+    {
+      class: 'Image',
+      name: 'defaultImage'
+    },
+    {
+      class: 'URL',
+      name: 'defaultURL'
+    },
+    {
+      class: 'PhoneNumber',
+      name: 'defaultPhoneNumber'
+    },
+    {
+      class: 'Currency',
+      name: 'defaultCurrency'
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'defaultFObjectProperty'
+    },
+    {
       class: 'Boolean',
       name: 'defaultBoolean',
       label: 'CheckBox',
