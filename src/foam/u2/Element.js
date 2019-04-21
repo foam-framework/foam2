@@ -2149,7 +2149,7 @@ foam.CLASS({
         });
       }
 
-      return foam.core.ConstantSlot({value: this.visibility});
+      return foam.core.ConstantSlot.create({value: this.visibility});
     }
   ]
 });
