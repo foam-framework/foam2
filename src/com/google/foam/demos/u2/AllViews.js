@@ -27,6 +27,23 @@ foam.CLASS({
         class: 'foam.u2.RangeView'
       }
     },
+    /*
+    {
+      class: 'Int',
+      name: 'intWithTemperatureView',
+      view: {
+        class: 'foam.nanos.pm.TemperatureCView'
+      }
+    },
+    */
+    {
+      class: 'Int',
+      name: 'intWithProgressView',
+      view: {
+        class: 'foam.u2.ProgressView'
+      },
+      value: 42
+    },
     {
       class: 'Int',
       name: 'intWithDualView',
@@ -134,6 +151,11 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'defaultStringArray'
+    },
+    {
+      class: 'StringArray',
+      name: 'stringArrayRowView',
+      view: 'foam.u2.view.StringArrayRowView'
     },
     {
       class: 'EMail',
