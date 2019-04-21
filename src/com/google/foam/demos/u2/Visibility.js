@@ -55,16 +55,37 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'expression',
+      name: 'disabledExpression',
       visibilityExpression: function(flag) {
         return foam.u2.Visibility[flag ? 'RW' : 'DISABLED'];
       }
     },
     {
       class: 'Boolean',
-      name: 'expression2',
+      name: 'disabledBooleanExpression',
       visibilityExpression: function(flag) {
         return foam.u2.Visibility[flag ? 'RW' : 'DISABLED'];
+      }
+    },
+    {
+      class: 'String',
+      name: 'readOnlyExpression',
+      visibilityExpression: function(flag) {
+        return foam.u2.Visibility[flag ? 'RW' : 'RO'];
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'readOnlyBooleanExpression',
+      visibilityExpression: function(flag) {
+        return foam.u2.Visibility[flag ? 'RW' : 'RO'];
+      }
+    },
+    {
+      class: 'String',
+      name: 'hiddenExpression',
+      visibilityExpression: function(flag) {
+        return foam.u2.Visibility[flag ? 'RW' : 'HIDDEN'];
       }
     }
   ]
