@@ -17,6 +17,19 @@ foam.CLASS({
       name: 'defaultString'
     },
     {
+      class: 'String',
+      name: 'stringWithDisplayWidth',
+      displayWidth: 40
+    },
+    {
+      class: 'String',
+      name: 'stringWithTextArea',
+      view: {
+        class: 'foam.u2.tag.TextArea',
+        rows: 8, cols: 80,
+      }
+    },
+    {
       class: 'Date',
       name: 'defaultDate'
     },
