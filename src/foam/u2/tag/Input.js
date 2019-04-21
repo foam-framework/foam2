@@ -139,6 +139,7 @@ foam.CLASS({
       // TODO: make sure that DOM is updated if values don't change
       this.setAttribute('readonly', mode === foam.u2.DisplayMode.RO);
       this.setAttribute('disabled', mode === foam.u2.DisplayMode.DISABLED);
+      this.show(mode !== foam.u2.DisplayMode.HIDDEN);
     }
   ]
 });
