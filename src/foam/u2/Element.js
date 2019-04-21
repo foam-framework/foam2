@@ -2422,6 +2422,10 @@ foam.CLASS({
       attribute: true,
       postSet: function(_, mode) { this.updateMode_(mode); },
       expression: function(visibility, controllerMode) {
+        if ( visibility === foam.u2.Visibility.HIDDEN ) {
+          return foam.u2.DisplayMode.HIDDEN;
+        }
+
         if ( visibility === foam.u2.Visibility.RO ) {
           return foam.u2.DisplayMode.RO;
         }
