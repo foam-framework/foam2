@@ -165,7 +165,8 @@ foam.CLASS({
     },
     {
       class: 'Image',
-      name: 'defaultImage'
+      name: 'defaultImage',
+      value: 'Dragon.png'
     },
     {
       class: 'Image',
