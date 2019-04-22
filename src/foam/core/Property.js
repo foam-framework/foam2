@@ -387,6 +387,7 @@ foam.CLASS({
       var eFactory    = this.exprFactory(prop.expression);
       var FIP         = factory && ( prop.name + '_fip' ); // Factory In Progress
       var fip         = 0;
+      var trim        = prop.trim;
 
       // Factory In Progress (FIP) Support
       // When a factory method is in progress, the object sets a private
@@ -522,6 +523,7 @@ foam.CLASS({
           if ( assertValue ) assertValue.call(this, newValue, prop);
 
           if ( preSet ) newValue = preSet.call(this, oldValue, newValue, prop);
+          if ( trim ) newValue = newValue.trim();
 
           // ???: Should newValue === undefined check go here instead?
 
