@@ -199,7 +199,7 @@
       ],
       javaCode: `
         getAction().applyAction(x, obj, oldObj, ruler);
-        if ( ! getAfter() && getCmd() != null ) {
+        if ( ! getAfter() ) {
           ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }
       `
@@ -226,7 +226,7 @@
       ],
       javaCode: `
         getAsyncAction().applyAction(x, obj, oldObj, ruler);
-        if ( ! getAfter() && getCmd() != null ) {
+        if ( ! getAfter() ) {
           ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }
       `
