@@ -144,7 +144,6 @@
         if ( Operations.CREATE == getOperation()
           || Operations.UPDATE == getOperation()
           || Operations.CREATE_OR_UPDATE == getOperation()
-          || Operations.REMOVE == getOperation()
         ) {
           return RulerDAO.PUT_CMD;
         }
@@ -200,7 +199,7 @@
       ],
       javaCode: `
         getAction().applyAction(x, obj, oldObj, ruler);
-        if ( ! getAfter() ) {
+        if ( ! getAfter() && getCmd() != null ) {
           ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }
       `
@@ -227,7 +226,7 @@
       ],
       javaCode: `
         getAsyncAction().applyAction(x, obj, oldObj, ruler);
-        if ( ! getAfter() ) {
+        if ( ! getAfter() && getCmd() != null ) {
           ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }
       `
