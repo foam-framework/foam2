@@ -30,7 +30,8 @@ foam.CLASS({
 
           'debugger': literal('<debugger/>'),
 
-          'axiom': seq1(1, '$$', sym('identifier')),
+          'axiom': seq1(1, '$$', optional(sym('axiom-target')), sym('identifier')),
+          'axiom-target': seq1(0, sym('identifier'), '.'),
 
           'identifier': substring(
             repeat(alt(range('a-z'),
@@ -391,7 +392,7 @@ foam.CLASS({
 
         'axiom': function(v) {
           return function(x) {
-            this.add('Axiom:', v);
+            var
           };
         }
       }
