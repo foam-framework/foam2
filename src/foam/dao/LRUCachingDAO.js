@@ -22,8 +22,9 @@
 
   classes: [
     {
-      /** Links an object id to a last-accessed seqNo */
       name: 'LRUCacheItem',
+      documentation: 'Links an object id to a last-accessed seqNo',
+
       properties: [
         {
           name: 'id'
