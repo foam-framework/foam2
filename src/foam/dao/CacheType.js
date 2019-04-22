@@ -23,8 +23,7 @@ foam.ENUM({
     },
     {
       name: 'LRU',
-      documentation: 'Using a LRU (Least Recently Used) partial cache',
-      label: 'LRU'
+      documentation: 'Using a LRU (Least Recently Used) partial cache'
     }
   ]
 });

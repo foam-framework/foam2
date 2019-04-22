@@ -426,7 +426,7 @@ return delegate;
         }
 
         if ( this.cacheType == foam.dao.CacheType.LRU ) {
-          this.mdao = this.MDAO.create({of: params.of});
+//          this.mdao = this.MDAO.create({of: params.of});
           dao = this.LRUCachingDAO.create({
             delegate: dao
           });

@@ -17,7 +17,7 @@
 
   documentation: `
      Least Recently Used CachingDAO :
-     Manages a DAO\'s size by removing old items. Commonly applied inside a cache to limit the cache\'s size.
+     Manages size of DAO by removing old items. Commonly applied inside a cache to limit the size of cache.
   `,
 
   classes: [
@@ -26,7 +26,7 @@
       name: 'LRUCacheItem',
       properties: [
         {
-          name: 'id',
+          name: 'id'
         },
         {
           class: 'Int',
@@ -60,7 +60,7 @@
     },
     {
       class: 'Int',
-      name: 'lastTimeUsed_',
+      name: 'nextSeqNo',
       factory: function() { return 0; },
       documentation: 'By starting at 0, the lowest value means the oldest'
     },
@@ -86,7 +86,7 @@
     /** Calculates a seqNo to use in the tracking dao. */
     function getSeqNO() {
       // Just increment on each request.
-      return this.lastTimeUsed_++;
+      return this.nextSeqNo++;
     },
 
     /** to keep the dao size. */
