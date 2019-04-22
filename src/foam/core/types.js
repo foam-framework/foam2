@@ -83,7 +83,7 @@ foam.CLASS({
       value: function toJSON(value, outputter) {
         // A Date property can be transmitted as a plain timestamp.
         // Since we know the type information we will adapt a timestamp
-        // back to a
+        // back to a Date.
         return value == null ? null :
           outputter.formatDatesAsNumbers ?
           value.toISOString() :
