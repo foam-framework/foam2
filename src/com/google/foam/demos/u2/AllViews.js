@@ -226,6 +226,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'fObjectViewWithChoices',
+      label: 'FObjectView With Choices',
       view: {
         class: 'foam.u2.view.FObjectView',
         choices: [
@@ -238,7 +239,9 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'fObjectView',
-      view: { class: 'foam.u2.view.FObjectView' }
+      label: 'FObjectView',
+      view: { class: 'foam.u2.view.FObjectView' },
+      value: foam.util.Timer.create()
     },
   ]
 })
