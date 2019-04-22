@@ -144,6 +144,7 @@
         if ( Operations.CREATE == getOperation()
           || Operations.UPDATE == getOperation()
           || Operations.CREATE_OR_UPDATE == getOperation()
+          || Operations.REMOVE == getOperation()
         ) {
           return RulerDAO.PUT_CMD;
         }
