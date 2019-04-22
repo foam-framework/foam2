@@ -155,11 +155,13 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'stringArrayRowView',
-      view: 'foam.u2.view.StringArrayRowView'
+      view: 'foam.u2.view.StringArrayRowView',
+      factory: function() { return ['row1', 'row2', 'row3']; }
     },
     {
       class: 'EMail',
-      name: 'defaultEMail'
+      name: 'defaultEMail',
+      value: 'someone@somewhere.com'
     },
     {
       class: 'Image',
@@ -181,12 +183,14 @@ foam.CLASS({
     },
     {
       class: 'Password',
-      name: 'defaultPassword'
+      name: 'defaultPassword',
+      value: 'secret'
     },
     {
       class: 'Password',
       name: 'passwordView',
-      view: 'foam.u2.view.PasswordView'
+      view: 'foam.u2.view.PasswordView',
+      value: 'secret'
     },
     {
       class: 'PhoneNumber',
