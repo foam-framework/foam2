@@ -202,10 +202,6 @@ foam.CLASS({
       name: 'defaultCurrency'
     },
     {
-      class: 'FObjectProperty',
-      name: 'defaultFObjectProperty'
-    },
-    {
       class: 'Boolean',
       name: 'defaultBoolean',
       label: 'CheckBox',
@@ -220,8 +216,20 @@ foam.CLASS({
     {
       class: 'String',
       name: 'htmlView',
-      value: '<b>bold</b>  <i>italic</i>',
+      value: '<b>bold</b><br/><i>italic</i>',
       view: 'foam.u2.HTMLView'
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'defaultFObjectProperty',
+      value: foam.util.Timer.create()
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'fObjectView',
+      label: 'FObjectView',
+      view: { class: 'foam.u2.view.FObjectView' },
+      value: foam.util.Timer.create()
     },
     {
       class: 'FObjectProperty',
@@ -235,13 +243,6 @@ foam.CLASS({
           [ 'foam.nanos.menu.TabsMenu', 'Tabs'    ]
         ]
       }
-    },
-    {
-      class: 'FObjectProperty',
-      name: 'fObjectView',
-      label: 'FObjectView',
-      view: { class: 'foam.u2.view.FObjectView' },
-      value: foam.util.Timer.create()
-    },
+    }
   ]
 })
