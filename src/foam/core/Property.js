@@ -518,12 +518,13 @@ foam.CLASS({
                   undefined ) :
             this[name] ;
 
+          if ( trim ) newValue = newValue.trim();
+
           if ( adapt ) newValue = adapt.call(this, oldValue, newValue, prop);
 
           if ( assertValue ) assertValue.call(this, newValue, prop);
 
           if ( preSet ) newValue = preSet.call(this, oldValue, newValue, prop);
-          if ( trim ) newValue = newValue.trim();
 
           // ???: Should newValue === undefined check go here instead?
 
