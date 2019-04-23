@@ -15,6 +15,7 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.nanos.notification.email.DAOResourceLoader',
     'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil'
   ],
@@ -23,27 +24,6 @@ foam.CLASS({
     {
       name: 'apply',
       type: 'foam.nanos.notification.email.EmailMessage',
-      args: [
-        {
-          name: 'x',
-          type: 'Context',
-        },
-        {
-          name: 'group',
-          class: 'String',
-          documentation: 'group of user whose the recipient of the email being sent'
-        },
-        {
-          name: 'emailMessage',
-          type: 'foam.nanos.notification.email.EmailMessage',
-          documentation: 'Email message'
-        },
-        {
-          name: 'templateArgs',
-          type: 'Map',
-          documentation: 'Template arguments'
-        }
-      ],
       documentation: 'application of template args to emailTemplate and then onto the emailMessage',
       javaCode: `
       Logger logger = (Logger) x.get("logger");
