@@ -138,7 +138,7 @@ foam.CLASS({
 
     function isEnabledFor(data) {
       return this.isEnabled ?
-        data.slot(this.isEnabled).get() :
+        foam.Function.withArgs(this.isEnabled, data) :
         true ;
     },
 
