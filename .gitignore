@@ -22,3 +22,4 @@ build/*
 nano.log*
 /cronjobs
 .vscode/
+.history/

@@ -58,7 +58,7 @@ foam.CLASS({
         box-align: center;
       }
   
-      .iframeContainer {
+      .textarea {
         background: white;
         width: 100%;
         border: none;
@@ -103,35 +103,13 @@ foam.CLASS({
     `,
   
     properties: [
-      // {
-      //   name: 'document'
-      // },
       {
         class: 'Boolean',
         name: 'onKey',
         attribute: true
       },
       {
-        name: 'frame',
-        // postSet: function (_, n) {
-        //   var self = this;
-        //   n.onload.sub(function () {
-        //     self.document = n.el().contentDocument;
-  
-        //     n.el().contentDocument.body.style.whiteSpace = 'pre-wrap';
-        //     n.el().contentDocument.head.insertAdjacentHTML(
-        //       'afterbegin',
-        //       '<style>blockquote{border-left-color:#fff;border-left-style:none;padding-left:1ex;}</style>');
-        //     n.el().contentDocument.body.style.overflow = 'auto';
-        //     n.el().contentDocument.body.style.margin = '5px';
-        //     n.el().contentDocument.body.contentEditable = true;
-        //     n.el().contentDocument.body.insertAdjacentHTML('beforeend', self.data);
-        //     n.el().contentDocument.body.addEventListener('input', function () {
-        //       self.data = n.el().contentDocument.body.innerHTML;
-        //     }, false);
-  
-        //   });
-        // }
+        name: 'textarea',
       },
     ],
   
@@ -140,9 +118,9 @@ foam.CLASS({
         this.SUPER();
         this
             .start('div').addClass('foam-flow-Document')
-            .start('div', null, this.frame$).addClass('iframeContainer')
+            .start('div', null, this.textarea$).addClass('textarea')
             .attrs({
-                id: 'frame',
+                id: 'textarea',
                 contenteditable: true,
             })
             .end()
