@@ -186,4 +186,10 @@ public class MLang
     .setArg2(MLang.prepare(o2))
       .build();
   }
+
+  public static Predicate HAS(Object o) {
+    return new Has.Builder(null)
+      .setArg1(MLang.prepare(o))
+      .build();
+  }
 }

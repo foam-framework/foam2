@@ -18,7 +18,10 @@ foam.CLASS({
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest',
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse',
     'org.eclipse.jetty.websocket.servlet.WebSocketCreator',
-    'org.eclipse.jetty.server.ForwardedRequestCustomizer'
+    'foam.nanos.jetty.WhitelistedForwardedRequestCustomizer',
+    'java.util.Set',
+    'java.util.HashSet',
+    'java.util.Arrays'
   ],
 
   properties: [
@@ -35,6 +38,10 @@ foam.CLASS({
           '/src/foam/nanos/controller/index.html'
         ];
       }
+    },
+    {
+      class: 'StringArray',
+      name: 'forwardedForProxyWhitelist',
     },
     {
       class: 'FObjectArray',
@@ -82,6 +89,11 @@ foam.CLASS({
           response headers.
           2. Configure Jetty server to interpret the X-Fowarded-for header
         */
+        
+        // we are converting the ForwardedForProxyWhitelist array into a set here
+        // so that it makes more sense algorithmically to check against IPs
+        Set<String> forwardedForProxyWhitelist = new HashSet<>(Arrays.asList(getForwardedForProxyWhitelist()));
+
         for ( org.eclipse.jetty.server.Connector conn : server.getConnectors() ) {
           for ( org.eclipse.jetty.server.ConnectionFactory f : conn.getConnectionFactories() ) {
             if ( f instanceof org.eclipse.jetty.server.HttpConnectionFactory ) {
@@ -89,8 +101,9 @@ foam.CLASS({
               // 1. hiding the version number in response headers
               ((org.eclipse.jetty.server.HttpConnectionFactory) f).getHttpConfiguration().setSendServerVersion(false);
 
-              // 2. interpret X-Forwarded-for headers
-              ((org.eclipse.jetty.server.HttpConnectionFactory) f).getHttpConfiguration().addCustomizer(new ForwardedRequestCustomizer());
+              // 2. handle the X-Forwarded-For headers depending on whether a whitelist is set up or not
+              // we need to pass the context into this customizer so that we can effectively log unauthorized proxies
+              ((org.eclipse.jetty.server.HttpConnectionFactory) f).getHttpConfiguration().addCustomizer(new WhitelistedForwardedRequestCustomizer(getX(), forwardedForProxyWhitelist));
             }
           }
         }

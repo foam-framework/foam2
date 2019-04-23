@@ -9,23 +9,21 @@ foam.CLASS({
   name: 'StringArrayRowView',
   extends: 'foam.u2.View',
 
-  exports: [ 'as self' ],
-
   methods: [
     function initE() {
       this.SUPER();
       var self = this;
 
       this.
-        add(this.data$.map(function(p) { return p.map(function(p, index) {
-          var view = self.RowView.create({data: p, index: index}, self);
+        add(this.data$.map(function(array) { return array.map(function(p, index) {
+          var view = self.RowView.create({data: p, index: index});
           view.focus();
           view.data$.sub(function() {
             self.data[index] = view.data;
           });
           return view;
         })})).
-        add(this.ADD_ROW);
+        startContext({data: this}).add(this.ADD_ROW).endContext();
     }
   ],
 
@@ -33,7 +31,7 @@ foam.CLASS({
     {
       name: 'addRow',
       label: 'Add',
-      code: function(X) { X.self.data = this.concat(''); }
+      code: function(X) { this.data = this.data.concat(''); }
     }
   ],
 
@@ -53,10 +51,11 @@ foam.CLASS({
 
       methods: [
         function initE() {
+          this.SUPER();
           this.
             addClass(this.myClass()).
             add(this.DATA).
-            start(this.REMOVE_ROW, { data: this }).end();
+            tag(this.REMOVE_ROW, {data: this});
         }
       ],
 
