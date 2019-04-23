@@ -55,7 +55,8 @@
       name: 'trackingDAO',
       of: 'foam.dao.DAO',
       factory: function() {
-        return this.MDAO.create({ of: this.LRUCacheItem });
+        return this.MDAO.create({ of: this.LRUCacheItem })
+          .addPropertyIndex(this.LRUCacheItem.SEQ_NO);
       },
       documentation: 'Tracks the age of items in the target dao'
     },
