@@ -15,9 +15,11 @@ foam.CLASS({
   requires: [
     'foam.box.HTTPBox',
     'foam.box.RetryBox',
+    'foam.box.SessionClientBox',
     'foam.dao.EasyDAO',
     'foam.dao.RequestResponseClientDAO',
-    'foam.nanos.boot.NSpec',
+    'foam.nanos.app.ClientAppConfigService',
+    'foam.nanos.boot.NSpec'
   ],
 
   properties: [
@@ -29,11 +31,13 @@ foam.CLASS({
         return this.RequestResponseClientDAO.create({
           of: this.NSpec,
           cache: true,
-          delegate: this.RetryBox.create({
-            maxAttempts: -1,
-            delegate: this.HTTPBox.create({
-              method: 'POST',
-              url: 'service/nSpecDAO'
+          delegate: this.SessionClientBox.create({
+            delegate: this.RetryBox.create({
+              maxAttempts: -1,
+              delegate: this.HTTPBox.create({
+                method: 'POST',
+                url: 'service/nSpecDAO'
+              })
             })
           })
         });
@@ -53,26 +57,27 @@ foam.CLASS({
             package: 'foam.nanos.client',
             name: 'Client',
             exports: [],
-            properties: [],
+            properties: []
           };
 
           var references = [];
 
           // Force hard reload when app version updates
-          self.nSpecDAO.find("appConfig").then(function(spec) {
-            var appConfig = spec.service;
-
-            client.exports.push(spec.name);
+          var appConfigPromise = self.nSpecDAO.find('appConfigService').then(function(a) {
+            a = foam.json.parseString(a.client, self.__context__);
+            return a.getAppConfig();
+          }).then(function(appConfig) {
+            client.exports.push('appConfig');
             references = references.concat(foam.json.references(self.__context__, appConfig));
             client.properties.push({
-              name: spec.name,
+              name: 'appConfig',
               factory: function() {
-                return foam.json.parse(appConfig, null, this.__subContext__);
+                return appConfig.clone(this.__subContext__);
               }
             });
 
             var version   = appConfig.version;
-            if ( "CLIENT_VERSION" in localStorage ) {
+            if ( 'CLIENT_VERSION' in localStorage ) {
               var oldVersion = localStorage.CLIENT_VERSION;
               if ( version != oldVersion ) {
                 localStorage.CLIENT_VERSION = version;
@@ -96,7 +101,7 @@ foam.CLASS({
                   name: spec.name,
                   factory: function() {
                     if ( ! json.serviceName ) json.serviceName = 'service/' + spec.name;
-                    if ( ! json.class       ) json.class       = 'foam.dao.EasyDAO'
+                    if ( ! json.class       ) json.class       = 'foam.dao.EasyDAO';
                     if ( ! json.daoType     ) json.daoType     = 'CLIENT';
                     if ( ! json.retryBoxMaxAttempts ) json.retryBoxMaxAttempts = 0;
                     return foam.json.parse(json, null, this.__subContext__);
@@ -105,13 +110,13 @@ foam.CLASS({
               }
             },
             eof: function() {
-              Promise.all(references).then(function() {
+              Promise.all(references.concat(appConfigPromise)).then(function() {
                 resolve(foam.core.Model.create(client).buildClass());
               });
             }
           });
-        })
-      },
-    },
-  ],
+        });
+      }
+    }
+  ]
 });

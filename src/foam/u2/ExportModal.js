@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'ExportModal',
@@ -93,9 +99,11 @@ foam.CLASS({
       exportDriver = foam.lookup(exportDriver.driverName).create();
 
       if ( this.exportData ) {
-        this.note = await exportDriver.exportDAO(this.__context__, this.exportData);
+        this.note = await exportDriver
+          .exportDAO(this.__context__, this.exportData);
       } else {
-        this.note = await exportDriver.exportFObject(this.__context__, this.exportObj);
+        this.note = await exportDriver
+          .exportFObject(this.__context__, this.exportObj);
       }
     },
 
@@ -103,22 +111,16 @@ foam.CLASS({
       var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
       exportDriver = foam.lookup(exportDriver.driverName).create();
 
-      this.downloadCSV(this.exportData, exportDriver);
-    }
-  ],
-
-  listeners: [
-    function downloadCSV(data, exportDriver) {
       exportDriver.exportDAO(this.__context__, this.exportData)
-      .then(function(result) {
-        result = 'data:text/csv;charset=utf-8,' + result;
-        var encodedUri = encodeURI(result);
-        var link = document.createElement('a');
-        link.setAttribute('href', encodedUri);
-        link.setAttribute('download', 'data.csv');
-        document.body.appendChild(link);
-        link.click();
-      });
+        .then(function(result) {
+          result = 'data:text/csv;charset=utf-8,' + result;
+          var link = document.createElement('a');
+          link.setAttribute('href', encodeURI(result));
+          link.setAttribute('download', 'data.csv');
+          document.body.appendChild(link);
+          link.click();
+        });
     }
   ]
+
 });
