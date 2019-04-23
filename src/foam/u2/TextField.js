@@ -43,10 +43,6 @@ foam.CLASS({
       if ( ! this.size ) {
         this.size = this.displayWidth;
       }
-
-      if ( prop.visibility ) {
-        this.visibility = prop.visibility;
-      }
     }
   ]
 });

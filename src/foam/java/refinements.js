@@ -1004,7 +1004,7 @@ foam.CLASS({
         ((Number)o).floatValue() :
         ( o instanceof String ) ?
         Float.parseFloat((String) o) :
-        (double)o;`;
+        (float)o;`;
 
       return info;
     }

@@ -2117,6 +2117,11 @@ foam.CLASS({
       of: 'foam.u2.Visibility',
       name: 'visibility',
       value: 'RW'
+    },
+    {
+      class: 'Function',
+      name: 'visibilityExpression',
+      value: null
     }
   ],
 
@@ -2124,16 +2129,27 @@ foam.CLASS({
     function toE(args, X) {
       var e = foam.u2.ViewSpec.createView(this.view, args, this, X);
 
-      e.fromProperty && e.fromProperty(this);
-
       if ( X.data$ && ! ( args && ( args.data || args.data$ ) ) ) {
         e.data$ = X.data$.dot(this.name);
       }
+
+      e.fromProperty && e.fromProperty(this);
 
       // e could be a Slot, so check if addClass exists
       e.addClass && e.addClass('property-' + this.name);
 
       return e;
+    },
+
+    function createVisibilityFor(data$) {
+      if ( this.visibilityExpression ) {
+        return foam.core.ExpressionSlot.create({
+          obj$: data$,
+          code: this.visibilityExpression
+        });
+      }
+
+      return foam.core.ConstantSlot.create({value: this.visibility});
     }
   ]
 });
@@ -2406,6 +2422,10 @@ foam.CLASS({
       attribute: true,
       postSet: function(_, mode) { this.updateMode_(mode); },
       expression: function(visibility, controllerMode) {
+        if ( visibility === foam.u2.Visibility.HIDDEN ) {
+          return foam.u2.DisplayMode.HIDDEN;
+        }
+
         if ( visibility === foam.u2.Visibility.RO ) {
           return foam.u2.DisplayMode.RO;
         }

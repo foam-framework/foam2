@@ -99,7 +99,7 @@
           getDelegate().put((FObject) x.get("OBJ"));
           return true;
         }
-        return super.cmd(obj);
+        getDelegate().cmd(obj);
       `
     },
     {
