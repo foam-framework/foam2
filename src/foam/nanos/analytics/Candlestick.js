@@ -92,18 +92,40 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        setMin(isPropertySet("min") ? Math.min(v, getMin()) : v);
-        setMax(isPropertySet("max") ? Math.max(v, getMax()) : v);
-        if ( ! isPropertySet("openValueTime") || time.compareTo(getOpenValueTime()) < 0 ) {
-          setOpenValueTime(time);
-          setOpen(v);
+setMin(isPropertySet("min") ? Math.min(v, getMin()) : v);
+setMax(isPropertySet("max") ? Math.max(v, getMax()) : v);
+if ( ! isPropertySet("openValueTime") || time.compareTo(getOpenValueTime()) < 0 ) {
+  setOpenValueTime(time);
+  setOpen(v);
+}
+if ( ! isPropertySet("closeValueTime") || time.compareTo(getCloseValueTime()) > 0 ) {
+  setCloseValueTime(time);
+  setClose(v);
+}
+setTotal(getTotal() + v);
+setCount(getCount() + 1);
+      `
+    },
+    {
+      name: 'reduce',
+      args: [
+        {
+          type: 'foam.nanos.analytics.Candlestick',
+          name: 'c'
         }
-        if ( ! isPropertySet("closeValueTime") || time.compareTo(getCloseValueTime()) > 0 ) {
-          setCloseValueTime(time);
-          setClose(v);
-        }
-        setTotal(getTotal() + v);
-        setCount(getCount() + 1);
+      ],
+      javaCode: `
+setOpenValueTime(getOpenValueTime().compareTo(c.getOpenValueTime()) < 0 ? getOpenValueTime() : c.getOpenValueTime());
+setOpen(getOpenValueTime().compareTo(c.getOpenValueTime()) < 0 ? getOpen() : c.getOpen());
+
+setCloseValueTime(getCloseValueTime().compareTo(c.getCloseValueTime()) < 0 ? getCloseValueTime() : c.getCloseValueTime());
+setClose(getCloseValueTime().compareTo(c.getCloseValueTime()) < 0 ? getClose() : c.getClose());
+
+setMin(Math.min(getMin(), c.getMin()));
+setMax(Math.max(getMax(), c.getMax()));
+
+setTotal(getTotal() + c.getTotal());
+setCount(getCount() + c.getCount());
       `
     }
   ]

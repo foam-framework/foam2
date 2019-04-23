@@ -19,11 +19,11 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-        obj = getDelegate().put_(x, obj);
-        if ( obj instanceof foam.nanos.analytics.Foldable ) {
-          ((foam.nanos.analytics.Foldable) obj).doFolds(getFm());
-        }
-        return obj;
+obj = getDelegate().put_(x, obj);
+if ( obj instanceof foam.nanos.analytics.Foldable ) {
+  ((foam.nanos.analytics.Foldable) obj).doFolds(getFm());
+}
+return obj;
       `
     }
   ]

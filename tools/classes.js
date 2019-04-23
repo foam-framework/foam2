@@ -343,7 +343,8 @@ var classes = [
 
   'foam.demos.analytics.StockSnapshot',
   'foam.nanos.analytics.FoldManagerDAODecorator',
-  'foam.nanos.analytics.DAOFoldManager'
+  'foam.nanos.analytics.DAOFoldManager',
+  'foam.nanos.analytics.DAOReduceManager'
 ];
 
 var abstractClasses = [
