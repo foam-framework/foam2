@@ -137,9 +137,7 @@ foam.CLASS({
     },
 
     function isEnabledFor(data) {
-      return this.isEnabled ?
-        foam.Function.withArgs(this.isEnabled, data) :
-        true ;
+      return foam.Function.withArgs(this.isEnabled, data);
     },
 
     function createIsEnabled$(data$) {
@@ -154,9 +152,7 @@ foam.CLASS({
     },
 
     function isAvailableFor(data) {
-      return this.isAvailable ?
-        foam.Function.withArgs(this.isAvailable, data) :
-        true ;
+      return foam.Function.withArgs(this.isAvailable, data);
     },
 
     function createIsAvailable$(data$) {
