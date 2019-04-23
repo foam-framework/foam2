@@ -2,6 +2,7 @@ foam.CLASS({
   package: 'foam.nanos.analytics',
   name: 'DAOReduceManager',
   javaImports: [
+    'java.util.Date',
     'foam.nanos.analytics.Candlestick',
     'static foam.mlang.MLang.*'
   ],
@@ -28,43 +29,30 @@ long periodMs = getPeriodLengthMs();
 
 foam.mlang.sink.Max lastReduceSink = (foam.mlang.sink.Max) getDestDAO()
   .select(MAX(Candlestick.OPEN_TIME));
-java.util.Date lastReduce = (java.util.Date) lastReduceSink.getValue();
+Date lastReduce = (Date) lastReduceSink.getValue();
 
-foam.dao.ArraySink dataToReduce = (foam.dao.ArraySink) getSourceDAO()
+foam.mlang.sink.GroupBy dataToReduce = (foam.mlang.sink.GroupBy) getSourceDAO()
   .where(GTE(Candlestick.OPEN_TIME, lastReduce))
-  .orderBy(Candlestick.OPEN_TIME)
-  .select(new foam.dao.ArraySink.Builder(getX()).build());
+  .select(GROUP_BY(Candlestick.KEY, new foam.dao.ArraySink.Builder(x).build()));
 
-getDestDAO()
-  .where(GTE(Candlestick.OPEN_TIME, lastReduce))
-  .removeAll();
-
-java.util.Iterator i = dataToReduce.getArray().iterator();
-while(i.hasNext()) {
-  Candlestick c = (Candlestick) i.next();
-  long cCloseTimeMs = c.getCloseTime().getTime();
-
-  long rCloseTimeMs = cCloseTimeMs - ( cCloseTimeMs % periodMs );
-  java.util.Date rCloseTime = new java.util.Date();
-  rCloseTime.setTime(rCloseTimeMs);
-  foam.nanos.analytics.CandlestickId rId = new foam.nanos.analytics.CandlestickId.Builder(x)
-    .setCloseTime(rCloseTime)
-    .setKey(c.getKey())
-    .build();
-
-  Candlestick r = (Candlestick) getDestDAO().find(rId);
-  if ( r == null ) {
-    java.util.Date rOpenTime = new java.util.Date();
-    rOpenTime.setTime(rCloseTimeMs - periodMs);
-    r = (Candlestick) c.fclone();
-    r.setOpenTime(rOpenTime);
-    r.setCloseTime(rCloseTime);
-    r.setKey(c.getKey());
-  } else {
-    r.reduce(c);
+for ( Object key : dataToReduce.getGroups().keySet() ) {
+  java.util.Map<Long, Candlestick> reducedData = new java.util.HashMap<Long, Candlestick>();
+  for ( Object o : ((foam.dao.ArraySink) dataToReduce.getGroups().get(key)).getArray() ) {
+    Candlestick c = (Candlestick) o;
+    long cCloseTimeMs = c.getCloseTime().getTime();
+    long rCloseTimeMs = cCloseTimeMs - ( cCloseTimeMs % periodMs ) + periodMs;
+    if ( ! reducedData.containsKey(rCloseTimeMs) ) {
+      reducedData.put(rCloseTimeMs, new Candlestick.Builder(x)
+        .setOpenTime(new Date(rCloseTimeMs - periodMs))
+        .setCloseTime(new Date(rCloseTimeMs))
+        .setKey(key)
+        .build());
+    }
+    reducedData.get(rCloseTimeMs).reduce(c);
   }
-
-  getDestDAO().put(r);
+  for ( Candlestick c : reducedData.values() ) {
+    getDestDAO().put(c);
+  }
 }
       `
     }
