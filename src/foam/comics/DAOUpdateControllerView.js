@@ -37,10 +37,25 @@ foam.CLASS({
   ],
 
   css: `
+    ^ {
+      width: 1024px;
+      margin: auto;
+    }
+    ^action-container {
+      display: flex;
+      justify-content: space-between;
+      margin: 8px 0;
+    }
+    ^detail-container {
+      overflow-x: scroll;
+    }
+    /* TODO: Remove references to nanopay */
     ^ .net-nanopay-ui-ActionView {
       background: #59aadd;
       color: white;
-      margin-right: 4px;
+    }
+    ^ .net-nanopay-ui-ActionView + .net-nanopay-ui-ActionView {
+      margin-left: 4px;
     }
     ^ .net-nanopay-ui-ActionView-delete {
       background: #d55;
@@ -92,7 +107,6 @@ foam.CLASS({
   ],
 
   reactions: [
-    [ 'data', 'finished', 'onFinished' ],
     [ 'data', 'throwError', 'onThrowError' ]
   ],
 
@@ -103,82 +117,82 @@ foam.CLASS({
         .add(this.data.dao.of.getAxiomsByClass(foam.core.Action))
       .endContext()
       */
-      this.
-      addClass(this.myClass()).
-      start('table').
-        start('tr').
-          start('td', [], this.container_$).style({'vertical-align': 'top', 'width': '100%'}).
-            start('span').
-              style({background: 'rgba(0,0,0,0)'}).
-              show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
-              start().
-                style({'padding-bottom': '4px'}).
-                startContext({ data: this }).
-                  add(this.VIEW).
-                endContext().
-                add(this.data.cls_.getAxiomsByClass(foam.core.Action)).
-              end().
-            end().
-            start('span').
-              style({background: 'rgba(0,0,0,0)'}).
-              show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RO; })).
-              start().
-                style({'padding-bottom': '4px'}).
-                startContext({ data: this }).
-                  add(this.EDIT).
-                endContext().
-              end().
-            end().
-            tag({
-              class: this.detailView,
-              of: this.dao.of,
-              data$: this.data$.dot('obj'),
-              showActions: true
-            }, [], this.detailViewElement_$).
-          end().
-        end().
-      end();
-    },
+      this
+        .addClass(this.myClass())
 
-    function setControllerMode(mode) {
-      this.controllerMode = mode;
-      this.container_.controllerMode = mode;
-      var newE = this.container_.createChild_({
-        class: this.detailView,
-        of: this.dao.of,
-        data$: this.data$.dot('obj'),
-        showActions: true
-      }, []);
-      this.container_.replaceChild(newE, this.detailViewElement_);
-      this.detailViewElement_ = newE;
+        // Container for the actions
+        .start()
+          .addClass(this.myClass('action-container'))
+
+          // Actions grouped to the left
+          .start()
+            .startContext({ data: this })
+              .add(this.CANCEL)
+            .endContext()
+          .end()
+
+          // Actions grouped to the right
+          .start()
+            .start()
+              .show(this.mode$.map(function(m) {
+                return m == foam.u2.DisplayMode.RW;
+              }))
+              .startContext({ data: this })
+                .add(this.VIEW)
+              .endContext()
+              .add(this.data.cls_.getAxiomsByClass(foam.core.Action))
+            .end()
+            .start()
+              .show(this.mode$.map(function(m) {
+                return m == foam.u2.DisplayMode.RO;
+              }))
+              .startContext({ data: this })
+                .add(this.EDIT)
+              .endContext()
+            .end()
+          .end()
+        .end()
+        
+        // Container for the detailview
+        .start('div', [], this.container_$)
+          .addClass(this.myClass('detail-container'))
+          .tag({
+            class: this.detailView,
+            of: this.dao.of,
+            data$: this.data$.dot('obj'),
+            showActions: true
+          }, [], this.detailViewElement_$)
+        .end();
     }
   ],
 
   actions: [
+    {
+      name: 'cancel',
+      code: function() {
+        this.stack.back();
+      }
+    },
     {
       name: 'edit',
       isAvailable: function(controllerMode) {
         return controllerMode === this.ControllerMode.VIEW;
       },
       code: function() {
-        this.setControllerMode(this.ControllerMode.EDIT);
-      }
-    },
-    {
-      name: 'view',
-      isAvailable: function(controllerMode) {
-        return controllerMode === this.ControllerMode.EDIT;
-      },
-      code: function() {
-        this.setControllerMode(this.ControllerMode.VIEW);
+        this.controllerMode = this.ControllerMode.EDIT;
+        var newE = this.container_.createChild_({
+          class: this.detailView,
+          of: this.dao.of,
+          data$: this.data$.dot('obj'),
+          showActions: true
+        }, []);
+        this.container_.replaceChild(newE, this.detailViewElement_);
+        this.detailViewElement_ = newE;
       }
     }
   ],
 
   listeners: [
-    function onFinished() {
-      this.stack.back();
-    },
     function onThrowError() {
       var self = this;
       this.add(this.NotificationMessage.create({
