@@ -110,9 +110,15 @@ foam.CLASS({
   ],
 
   css: `
+    /* Temporary fix until we refactor DetailView to not use a table. */
+    ^ {
+      margin: auto;
+      width: 100%;
+    }
+
     ^toolbar {
       display: flex;
-      padding-top: 4px;
+      padding-top: 8px;
     }
   `,
 

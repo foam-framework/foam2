@@ -585,4 +585,10 @@ FOAM_FILES([
   { name: "foam/u2/view/ArrayView" },
 
   { name: "io/c9/ace/Lib" },
+
+  { name: "foam/u2/view/date/AbstractDateView"},
+  { name: "foam/u2/view/date/CalendarDatePicker"},
+  { name: "foam/u2/view/date/DateTimePicker"},
+  { name: "foam/u2/view/date/Month"},
+  { name: "foam/u2/view/date/Weekday"},
 ]);
