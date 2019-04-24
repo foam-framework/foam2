@@ -56,7 +56,7 @@ foam.CLASS({
       color: white;
     }
     ^ .net-nanopay-ui-ActionView + .net-nanopay-ui-ActionView {
-      margin-left: 4px;
+      margin-left: 8px;
     }
     ^ .net-nanopay-ui-ActionView-delete {
       background: #d55;
