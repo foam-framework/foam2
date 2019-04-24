@@ -21,6 +21,7 @@ foam.CLASS({
   extends: 'foam.u2.tag.Input',
 
   css: `
+    .foam-u2-TextField.error { outline: 1px solid red; border: 1px solid red; }
     input[type="search"] { -webkit-appearance: textfield !important; }
     ^:read-only { border: none; background: rgba(0,0,0,0); }
   `,
