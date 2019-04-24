@@ -4,7 +4,6 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
-import foam.nanos.notification.email.ChainedPropertyService;
 import foam.nanos.notification.email.EmailMessage;
 import foam.nanos.notification.email.EmailPropertyService;
 import foam.util.SafetyUtil;
@@ -56,11 +55,8 @@ public class EmailsUtility {
     }
 
     // SERVICE CALL: to fill in email properties. 
-    ChainedPropertyService cts = (ChainedPropertyService) x.get("emailPropertyService");
-    EmailPropertyService[] propertyApplied = cts.getData();
-    for ( EmailPropertyService eps: propertyApplied ) {
-      emailMessage = (eps).apply(x, group, emailMessage, templateArgs);
-    }
+    EmailPropertyService cts = (EmailPropertyService) x.get("emailPropertyService");
+    cts.apply(x, group, emailMessage, templateArgs);
 
     // SERVICE CALL: passing emailMessage through to actual email service.
     DAO email = (DAO) x.get("emailMessageDAO");

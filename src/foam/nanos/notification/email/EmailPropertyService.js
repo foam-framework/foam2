@@ -12,7 +12,6 @@ foam.INTERFACE({
     {
       name: 'apply',
       type: 'foam.nanos.notification.email.EmailMessage',
-      // javaThrows: ['java.lang.NoSuchFieldException'],
       args: [
         {
           name: 'x',
