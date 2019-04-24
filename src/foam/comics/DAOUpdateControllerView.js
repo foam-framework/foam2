@@ -47,19 +47,11 @@ foam.CLASS({
       justify-content: space-between;
       margin: 8px 0;
     }
-    ^detail-container {
-      overflow-x: scroll;
-    }
-    /* TODO: Remove references to nanopay */
-    ^ .net-nanopay-ui-ActionView {
-      background: #59aadd;
-      color: white;
-    }
-    ^ .net-nanopay-ui-ActionView + .net-nanopay-ui-ActionView {
+    ^action-container > div > div > * + * {
       margin-left: 8px;
     }
-    ^ .net-nanopay-ui-ActionView-delete {
-      background: #d55;
+    ^detail-container {
+      overflow-x: scroll;
     }
   `,
 
