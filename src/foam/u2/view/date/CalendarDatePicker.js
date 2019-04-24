@@ -67,6 +67,8 @@ foam.CLASS({
           border:1px solid #cbcfd4;
           color: #5e6061;
           padding: 6px 7px 6px 7px;
+          font-size: 14px;
+          font-weight: 300;
         }
 
         ^calendar_table  {
@@ -78,8 +80,7 @@ foam.CLASS({
         ^calendar_table tbody > tr > th {
           font-size: 10px;
           color: #5e6061;
-          font-size: 10px;
-          font-weight: normal;
+          font-weight: 300;
           font-style: normal;
           font-stretch: normal;
           line-height: 1.5;
@@ -179,7 +180,7 @@ foam.CLASS({
           return this.E('tbody').
               start('tr').
                 forEach(self.Weekday.VALUES, function(wd) {
-                  this.start('th').add(wd.name).end();
+                  this.start('th').add(wd.label).end();
                 }).
               end().
               forEach(weeks, function(w) {
