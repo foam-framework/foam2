@@ -14,22 +14,46 @@ foam.CLASS({
   properties: [
     {
       class: 'Date',
+      name: 'data_',
+      value: new Date(),
+      postSet(_, n) {
+        if ( this.skipDateUpdate ) {
+          this.skipDateUpdate = false;
+          return;
+        }
+        this.data = this.data_;
+      }
+    },
+    {
+      class: 'Date',
       name: 'data',
-      value: new Date()
+      postSet(_, n) {
+        this.skipDateUpdate = true;
+        if ( ! n || n === undefined || isNaN(n.getDate()) )  {
+          this.data_ = new Date();
+        } else {
+          this.data_ = n;
+        }
+      }
     },
     {
       name: 'nodeName',
       value: 'table'
+    },
+    {
+      class: 'Boolean',
+      name: 'skipDateUpdate',
+      value: false
     }
   ],
   axioms: [
     foam.u2.CSS.create({
       code: function() {/*
-        ^selected_day_cell, ^calendar_table td^selected_day_cell:hover {
-          background-color: green;
+        ^selected_day_cell {
+          background-color: #e5f1fc;
         }
         ^prev_month_cell, ^next_month_cell {
-          color: lightgray;
+          color: lightgray !important;
         }
         ^calendar_table td {
           text-align: center;
@@ -40,8 +64,32 @@ foam.CLASS({
         ^calendar_table td {
           cursor: pointer;
         }
+
         ^calendar_table td:hover {
-          background-color: gray;
+          background-color: #F5F7FA;
+        }
+
+        ^calendar_table tr > td {
+          border:1px solid #cbcfd4;
+          color: #5e6061;
+          padding: 6px 7px 6px 7px;
+        }
+
+        ^calendar_table  {
+          border-collapse: collapse;
+          width: 224px;
+          height: 160px;
+        }
+
+        ^calendar_table tbody > tr > th {
+          font-size: 10px;
+          color: #5e6061;
+          font-size: 10px;
+          font-weight: normal;
+          font-style: normal;
+          font-stretch: normal;
+          line-height: 1.5;
+          letter-spacing: normal;
         }
       */}
     })
@@ -76,22 +124,22 @@ foam.CLASS({
     },
     function initE() {
       var self = this;
-      this.startContext({data: this}).
+      this.startContext({ data_: this.data_ }).
         addClass(this.myClass('calendar_table')).
-        add(this.slot(function(data) {
-          var month = data.getMonth();
-          var year = data.getYear() + 1900;
+        add(this.slot(function(data_) {
+          var month = data_.getMonth();
+          var year = data_.getYear() + 1900;
 
           var prevMonthLastWeek = self.weeksOfMonth(month-1, year).pop()
             .map(function(day) {
               return self.E('td').
                 add(day).
                 on('click', function() {
-                  var d = new Date(data);
+                  var d = new Date(data_);
                   d.setDate(1);
                   d.setMonth(d.getMonth()-1);
                   d.setDate(day);
-                  self.data = d;
+                  self.data_ = d;
                 }).
                 addClass(self.myClass('prev_month_cell'));
             });
@@ -102,11 +150,11 @@ foam.CLASS({
                 return self.E('td').
                   add(day).
                   on('click', function() {
-                    var d = new Date(data);
+                    var d = new Date(data_);
                     d.setDate(day);
-                    self.data = d;
+                    self.data_ = d;
                   }).
-                  addClass(day == self.data.getDate() ? self.myClass('selected_day_cell') : '').
+                  addClass(day == self.data_.getDate() ? self.myClass('selected_day_cell') : '').
                   addClass(self.myClass('cur_month_cell'));
               });
             });
@@ -116,11 +164,11 @@ foam.CLASS({
               return self.E('td').
                 add(day).
                 on('click', function() {
-                  var d = new Date(data);
+                  var d = new Date(data_);
                   d.setDate(1);
                   d.setMonth(d.getMonth()+1);
                   d.setDate(day);
-                  self.data = d;
+                  self.data_ = d;
                 }).
                 addClass(self.myClass('next_month_cell'));
             }).filter(function(d) { return d; });
