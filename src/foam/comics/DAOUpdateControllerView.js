@@ -23,6 +23,7 @@ foam.CLASS({
   requires: [
     'foam.comics.DAOUpdateController',
     'foam.u2.ControllerMode',
+    'foam.u2.DisplayMode',
     'foam.u2.dialog.NotificationMessage'
   ],
 
@@ -134,18 +135,11 @@ foam.CLASS({
           // Actions grouped to the right
           .start()
             .start()
-              .show(this.mode$.map(function(m) {
-                return m == foam.u2.DisplayMode.RW;
-              }))
-              .startContext({ data: this })
-                .add(this.VIEW)
-              .endContext()
+              .show(this.mode$.map((m) => m === this.DisplayMode.RW))
               .add(this.data.cls_.getAxiomsByClass(foam.core.Action))
             .end()
             .start()
-              .show(this.mode$.map(function(m) {
-                return m == foam.u2.DisplayMode.RO;
-              }))
+              .show(this.mode$.map((m) => m === this.DisplayMode.RO))
               .startContext({ data: this })
                 .add(this.EDIT)
               .endContext()
