@@ -22,6 +22,7 @@ foam.CLASS({
 
   requires: [
     'foam.comics.DAOUpdateController',
+    'foam.u2.ControllerMode',
     'foam.u2.dialog.NotificationMessage'
   ],
 
@@ -31,6 +32,7 @@ foam.CLASS({
   ],
 
   exports: [
+    'controllerMode',
     'data'
   ],
 
@@ -70,6 +72,22 @@ foam.CLASS({
     {
       class: 'String',
       name: 'detailView'
+    },
+    {
+      name: 'controllerMode',
+      factory: function() {
+        return this.ControllerMode.VIEW;
+      }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.u2.Element',
+      name: 'container_'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.u2.Element',
+      name: 'detailViewElement_'
     }
   ],
 
@@ -89,13 +107,26 @@ foam.CLASS({
       addClass(this.myClass()).
       start('table').
         start('tr').
-          start('td').style({'vertical-align': 'top', 'width': '100%'}).
+          start('td', [], this.container_$).style({'vertical-align': 'top', 'width': '100%'}).
             start('span').
               style({background: 'rgba(0,0,0,0)'}).
               show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
               start().
                 style({'padding-bottom': '4px'}).
+                startContext({ data: this }).
+                  add(this.VIEW).
+                endContext().
                 add(this.data.cls_.getAxiomsByClass(foam.core.Action)).
+              end().
+            end().
+            start('span').
+              style({background: 'rgba(0,0,0,0)'}).
+              show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RO; })).
+              start().
+                style({'padding-bottom': '4px'}).
+                startContext({ data: this }).
+                  add(this.EDIT).
+                endContext().
               end().
             end().
             tag({
@@ -103,10 +134,44 @@ foam.CLASS({
               of: this.dao.of,
               data$: this.data$.dot('obj'),
               showActions: true
-            }).
+            }, [], this.detailViewElement_$).
           end().
         end().
       end();
+    },
+
+    function setControllerMode(mode) {
+      this.controllerMode = mode;
+      this.container_.controllerMode = mode;
+      var newE = this.container_.createChild_({
+        class: this.detailView,
+        of: this.dao.of,
+        data$: this.data$.dot('obj'),
+        showActions: true
+      }, []);
+      this.container_.replaceChild(newE, this.detailViewElement_);
+      this.detailViewElement_ = newE;
+    }
+  ],
+
+  actions: [
+    {
+      name: 'edit',
+      isAvailable: function(controllerMode) {
+        return controllerMode === this.ControllerMode.VIEW;
+      },
+      code: function() {
+        this.setControllerMode(this.ControllerMode.EDIT);
+      }
+    },
+    {
+      name: 'view',
+      isAvailable: function(controllerMode) {
+        return controllerMode === this.ControllerMode.EDIT;
+      },
+      code: function() {
+        this.setControllerMode(this.ControllerMode.VIEW);
+      }
     }
   ],
 
