@@ -43,7 +43,7 @@ public class EmailsUtility {
       emailMessage = new EmailMessage();
     }
 
-    String group = user != null ? user.getGroup() : null;
+    String group = user != null ? user.getGroup() : "";
 
     // Add template name to templateArgs, to avoid extra parameter passing
     if ( ! SafetyUtil.isEmpty(templateName) ) {

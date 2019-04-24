@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.notification.email',
   name: 'GroupEmailTemplateService',
 
-  documentation: 'Used in conjuction with ChainedPropertyService',
+  documentation: 'Fills unset properties on an email with values from the group.',
 
   implements: [
     'foam.nanos.notification.email.EmailPropertyService'
@@ -27,27 +27,37 @@ foam.CLASS({
       type: 'foam.nanos.notification.email.EmailMessage',
       documentation:
       `Looks for group email properties on passed in group and then up the chain to root group.
-       Note: It is possible that only one of the properties is set on the group.`,
+       Keeping the first set properties while looping through the parents.
+       Note: It is possible that only one of the properties is set on the group. Thus keeping that
+       property and continuing to look up to parent to find remaining empty property.
+       `,
       javaCode: `
-        Group grp = null;
+        Group grp = (Group)((DAO) x.get("groupDAO")).find(group);
+        if ( grp == null ) return emailMessage;
+
+        String  dspName      = "";
+        String  rpyTo        = "";
+        boolean dspNameIsSet = false;
+        boolean rpyToIsSet        = false;
         do {
-          grp = (Group)((DAO) x.get("groupDAO")).find(group);
-          if ( grp == null ) return emailMessage;
+          rpyTo = rpyToIsSet ? rpyTo : grp.getReplyTo();
+          dspName = dspNameIsSet ? dspName : grp.getDisplayName();
+          
+          rpyToIsSet = rpyToIsSet ? rpyToIsSet : ! SafetyUtil.isEmpty(rpyTo);
+          dspNameIsSet = dspNameIsSet ? dspNameIsSet : ! SafetyUtil.isEmpty(dspName);
+
           group = grp.getParent();
-        } while ( SafetyUtil.isEmpty(grp.getReplyTo()) && SafetyUtil.isEmpty(grp.getDisplayName()) );
+          grp = (Group)((DAO) x.get("groupDAO")).find(group);
+        } while ( grp != null && ! ( rpyToIsSet && dspNameIsSet ) );
 
         // REPLY TO:
-        if ( SafetyUtil.isEmpty(emailMessage.getReplyTo()) &&
-          ! SafetyUtil.isEmpty(grp.getReplyTo()))
-          {
-          emailMessage.setReplyTo(grp.getReplyTo());
+        if ( SafetyUtil.isEmpty(emailMessage.getReplyTo()) && rpyToIsSet ) {
+          emailMessage.setReplyTo(rpyTo);
         }
     
         // DISPLAY NAME:
-        if ( SafetyUtil.isEmpty(emailMessage.getDisplayName()) &&
-          ! SafetyUtil.isEmpty(grp.getDisplayName()))
-          {
-          emailMessage.setDisplayName(grp.getDisplayName());
+        if ( SafetyUtil.isEmpty(emailMessage.getDisplayName()) && dspNameIsSet ) {
+          emailMessage.setDisplayName(dspName);
         }
     
         return emailMessage;
