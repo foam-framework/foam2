@@ -110,9 +110,13 @@ foam.CLASS({
           foam.__context__;
 
         // Install our own CSS, and then all parent models as well.
-        if ( X.document && ! axiom.installedDocuments_.has(X.document) ) {
-          X.installCSS(axiom.expandCSS(this, axiom.code), cls.id);
-          axiom.installedDocuments_.set(X.document, true);
+        if ( X.document ) {
+          var map = axiom.installedDocuments_.get(X.document) || {};
+          if ( ! map[this.id] ) {
+            X.installCSS(axiom.expandCSS(this, axiom.code), this.id);
+            map[this.id] = true;
+            axiom.installedDocuments_.set(X.document, map);
+          }
         }
 
         // Now call through to the original create.
