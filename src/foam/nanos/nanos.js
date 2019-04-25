@@ -120,6 +120,7 @@ FOAM_FILES([
   { name: "foam/nanos/servlet/VirtualHostRoutingServlet" },
   { name: "foam/nanos/test/Test" },
   { name: "foam/nanos/test/TestBorder" },
+  { name: "foam/nanos/test/ConcurrencyTest" },
   { name: "foam/nanos/cron/Cron" },
   { name: "foam/nanos/export/ExportDriverRegistry"},
   { name: "foam/nanos/export/ExportDriver" },

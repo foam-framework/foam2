@@ -240,6 +240,7 @@ var classes = [
 //  'foam.nanos.script.JavaShellScriptCompiler',
   'foam.nanos.script.TestRunnerScript',
   'foam.nanos.test.Test',
+  'foam.nanos.test.ConcurrencyTest',
   'foam.nanos.cron.Cron',
   'foam.dao.history.PropertyUpdate',
   'foam.dao.history.HistoryRecord',
@@ -313,6 +314,7 @@ var classes = [
   'foam.util.EmailTest',
   'foam.util.PasswordTest',
   'foam.util.SecurityUtilTest',
+  'foam.util.regex.SafePattern',
   'foam.test.TestObj',
   'foam.core.FObjectTest',
 
