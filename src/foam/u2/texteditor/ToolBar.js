@@ -135,29 +135,35 @@ foam.CLASS({
       this.addClass('richtext-actions');
       this
         .start(this.DetailView, { data: this.DefaultTextFormats.create(), showActions: true, title: ''})
-        .addClass('toolbar-item').end()
+          .addClass('toolbar-item')
+        .end()
         .start(this.Popup, {
           button: this.Image.create({ data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAAANpJREFUOMvtkyFuw0AQRd+sCiwrICC8zilKAnqIHKAjXyA3aHKDEtN1YY5Q6CP4CAtSKSDAYQXRTohBW7WODYycz3b/7pv/V1qYtKTLLMtyHmPc9IU5595VNTzcODcXkdcBISsguDHqdyYNIRyyLFt+3zOzPfAEfIrI6teV4w9oURSzNE0XHTMaVW2891/t+qKqoTNpkiRrMyv/I5rZDtj2qT/umzrn6hjjDkBEXoBH4Gxmb61fDYaqag3UAN775xba5Hneq/Lo9ScO/fNHmdmHiATgNMS7azxdAX9WQ9Rz12fXAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE5LTAzLTEzVDAzOjE0OjAzKzAwOjAwnW3t/gAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxOS0wMy0xM1QwMzoxNDowMyswMDowMOwwVUIAAAAodEVYdHN2ZzpiYXNlLXVyaQBmaWxlOi8vL3RtcC9tYWdpY2stN2xlZW1xSTPhtKVNAAAAAElFTkSuQmCC'}),
           view: this.DetailView.create({ data: this.FontSize.create(), showActions: true, title: ''})
         })
-        .addClass('toolbar-item').end()
+          .addClass('toolbar-item')
+        .end()
         .start(this.Popup, {
           button: 'Font Face',
           view: this.DetailView.create({ data: this.FontFace.create(), showActions: true, title: ''})
         })
-        .addClass('toolbar-item').end()
+          .addClass('toolbar-item')
+        .end()
         .start(this.Popup, {
           button: this.Image.create({ data: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNS4wLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAgLS0+DQo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiIFsNCgk8IUVOVElUWSBuc19mbG93cyAiaHR0cDovL25zLmFkb2JlLmNvbS9GbG93cy8xLjAvIj4NCl0+DQo8c3ZnIHZlcnNpb249IjEuMSINCgkgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeG1sbnM6YT0iaHR0cDovL25zLmFkb2JlLmNvbS9BZG9iZVNWR1ZpZXdlckV4dGVuc2lvbnMvMy4wLyINCgkgeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSIyMXB4IiBoZWlnaHQ9IjIxcHgiIHZpZXdCb3g9IjAgMCAyMSAyMSIgb3ZlcmZsb3c9InZpc2libGUiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDIxIDIxIg0KCSB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxkZWZzPg0KPC9kZWZzPg0KPHBhdGggZmlsbD0iIzg4OCIgZD0iTTMsMTZoMTB2LTFIM1YxNnogTTEzLDExSDN2MWgxMFYxMXogTTEzLDdIM3YxaDEwVjd6IE0zLDE0aDE0di0xSDNWMTR6IE0zLDEwaDE0VjlIM1YxMHogTTMsNXYxaDE0VjVIM3oiLz4NCjxyZWN0IG9wYWNpdHk9IjAiIGZpbGw9IiM0Mzg3RkQiIHdpZHRoPSIyMSIgaGVpZ2h0PSIyMSIvPg0KPC9zdmc+DQo='}),
           view: this.DetailView.create({ data: this.TextAlignment.create(), showActions: true, title: ''})
         })
-        .addClass('toolbar-item').end()
+          .addClass('toolbar-item')
+        .end()
         .start(this.DetailView, { data: this.ListStyle.create(), showActions: true, title: ''})
-        .addClass('toolbar-item').end()
+          .addClass('toolbar-item')
+        .end()
         .start(this.Popup, {
           button: this.Image.create({ data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAAAE5JREFUOMtjYBgFo2DwA0Y8ciYMDAwCeOQ/MDAwnCHVQgMGBoY3DAwM/7Hg9wwMDKbk+gSbwRQZiM1gqhiIbPAdahoIAyzUNnAUjAIiAQDT0RL+029yOwAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOS0wMy0xM1QwMzo0NzozOSswMDowMC3yohIAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTktMDMtMTNUMDM6NDc6MzkrMDA6MDBcrxquAAAAKHRFWHRzdmc6YmFzZS11cmkAZmlsZTovLy90bXAvbWFnaWNrLUhTRzNjcjJw9l8U4QAAAABJRU5ErkJggg=='}),
           view: this.DetailView.create({ data: this.TextFormats.create(), showActions: true, title: ''})
         })
-        .addClass('toolbar-item').end();
+          .addClass('toolbar-item')
+        .end();
     },
   ]
 });
