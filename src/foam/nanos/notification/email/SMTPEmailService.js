@@ -203,10 +203,7 @@ foam.CLASS({
       javaCode:
         `
         if ( ! this.getEnabled() ) return;
-        if ( emailMessage.getTo().length < 1 || SafetyUtil.isEmpty(emailMessage.getFrom())) {
-          throw new IllegalStateException("Email that is being transported out does not have basic fields set.");
-        }
-
+        
         ((FixedThreadPool) getThreadPool()).submit(x, new ContextAgent() {
           @Override
           public void execute(X x) {
