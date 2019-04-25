@@ -83,6 +83,7 @@ foam.CLASS({
     {
       name: 'apply',
       type: 'foam.nanos.notification.email.EmailMessage',
+      javaThrows: ['java.lang.NoSuchFieldException'],
       args: [
         {
           name: 'x',
@@ -108,8 +109,7 @@ foam.CLASS({
         Logger logger = (Logger) x.get("logger");
         
         if ( emailMessage == null ) {
-          logger.error("emailMessage is Null");
-          return null;
+          throw new NoSuchFieldException("emailMessage is Null");
         }
 
         String tempKeyString = "";
@@ -132,8 +132,7 @@ foam.CLASS({
           }
           model = JtwigModel.newModel(templateArgs);
           if ( model == null ) {
-            logger.error("JtwigModel is Null");
-            return null;
+            throw new NoSuchFieldException("JtwigModel is Null");
           }
         }
 

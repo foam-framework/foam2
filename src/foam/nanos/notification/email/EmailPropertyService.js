@@ -8,10 +8,15 @@ foam.INTERFACE({
   package: 'foam.nanos.notification.email',
   name: 'EmailPropertyService',
 
+  javaImports: [
+    'java.lang.NoSuchFieldException'
+  ],
+
   methods: [
     {
       name: 'apply',
       type: 'foam.nanos.notification.email.EmailMessage',
+      javaThrows: ['NoSuchFieldException'],
       args: [
         {
           name: 'x',

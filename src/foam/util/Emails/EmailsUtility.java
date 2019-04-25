@@ -56,7 +56,12 @@ public class EmailsUtility {
 
     // SERVICE CALL: to fill in email properties. 
     EmailPropertyService cts = (EmailPropertyService) x.get("emailPropertyService");
-    cts.apply(x, group, emailMessage, templateArgs);
+    try {
+      cts.apply(x, group, emailMessage, templateArgs);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return;
+    }
 
     // SERVICE CALL: passing emailMessage through to actual email service.
     DAO email = (DAO) x.get("emailMessageDAO");
