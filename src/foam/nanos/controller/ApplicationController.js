@@ -188,6 +188,10 @@ foam.CLASS({
         foam.__context__.register(foam.u2.UnstyledActionView, 'foam.u2.ActionView');
 
         window.onpopstate = async function(event) {
+          if ( ! self.loginSuccess ) {
+            return;
+          }
+
           var hid = location.hash.substr(1);
           if ( hid ) {
             var menu = await self.client.menuDAO.find(hid);
