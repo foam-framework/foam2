@@ -518,7 +518,7 @@ foam.CLASS({
                   undefined ) :
             this[name] ;
 
-          if ( trim ) newValue = newValue.trim();
+          if ( trim && typeof newValue === 'string' ) newValue = newValue.trim();
 
           if ( adapt ) newValue = adapt.call(this, oldValue, newValue, prop);
 
