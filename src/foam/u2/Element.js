@@ -95,7 +95,7 @@ foam.CLASS({
     },
     {
       name: 'installedDocuments_',
-      factory: function() { return new WeakMap(); },
+      factory: function() { return {}; },
       transient: true
     },
     {
@@ -107,7 +107,7 @@ foam.CLASS({
 
   methods: [
     function asKey(document, cls) {
-      return this.expands_ ? [document, cls.id]: document;
+      return this.expands_ ? document.$UID + "." + cls.id : document.$UID;
     },
 
     function installInClass(cls) {
@@ -134,9 +134,9 @@ foam.CLASS({
         if ( ! lastClassToInstallCSSFor || lastClassToInstallCSSFor == cls ) {
           // Install CSS if not already installed in this document for this cls
           var key = axiom.asKey(X.document, cls);
-          if ( X.document && ! axiom.installedDocuments_.has(key) ) {
+          if ( X.document && ! axiom.installedDocuments_[key] ) {
             X.installCSS(axiom.expandCSS(this, axiom.code), cls.id);
-            axiom.installedDocuments_.set(key, true);
+            axiom.installedDocuments_[key] = true;
           }
         }
 
