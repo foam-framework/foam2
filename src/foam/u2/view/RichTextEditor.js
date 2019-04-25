@@ -18,88 +18,14 @@ foam.CLASS({
     ],
   
     css: `
-     ^ .foam-flow-Document {
-       width: 600px;
-       margin: 0px;
-       background-color: #ffffff;
-       border-radius: 4px;
-       box-shadow: inset 0 0 1px 0 rgba(0, 0, 0, 0.5);
-     }
-  
-     .richtext-actions {
-        -webkit-align-items: center;
-        align-items: center;
-        border: none;
-        -webkit-border-radius: 2px;
-        border-radius: 2px;
-        -webkit-box-shadow: 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12), 0 2px 4px -1px rgba(0,0,0,0.2);
-        box-shadow: 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12), 0 2px 4px -1px rgba(0,0,0,0.2);
-        display: -webkit-inline-box;
-        display: -webkit-inline-flex;
-        display: -ms-inline-flexbox;
-        display: inline-flex;
+      .textarea {
+        min-height: 200px;
         margin: 16px;
         padding: 8px 2px;
-        white-space: nowrap;
-  
-        /* Firefox */
-        display: -moz-box;
-        -moz-box-pack: center;
-        -moz-box-align: center;
-  
-        /* Safari and Chrome */
-        display: -webkit-box;
-        -webkit-box-pack: center;
-        -webkit-box-align: center;
-  
-        /* W3C */
-        display: box;
-        box-pack: center;
-        box-align: center;
-      }
-  
-      .textarea {
-        background: white;
-        width: 100%;
-        border: none;
-        margin: 0;
-      }
-  
-      .richtext-button {
-        width: auto;
-        height: 40px;
+        background-color: #ffffff;
         border-radius: 4px;
-        text-align: center;
-        display: inline-block;
-        font-size: 14px;
-        background: none !important;
-        color: #373a3c !important;
-        padding: 16px;
+        box-shadow: inset 0 0 1px 0 rgba(0, 0, 0, 0.5);
       }
-      
-      .richtext-button:hover {
-        background: #f0f0f0 !important;
-      }
-  
-      .dropdown-content {
-        position: absolute;
-        background-color: #f0f0f0;
-        min-width: 50px;
-        min-height: 50px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-        z-index: 1;
-      }
-  
-      /* Links inside the dropdown */
-      .dropdown-content a {
-        color: black;
-        padding: 12px 16px;
-        text-decoration: none;
-        display: block;
-      }
-  
-      /* Change color of dropdown links on hover */
-      .dropdown-content a:hover {background-color: #ddd}    
     `,
   
     properties: [
@@ -117,7 +43,7 @@ foam.CLASS({
       function initE() {
         this.SUPER();
         this
-            .start('div').addClass('foam-flow-Document')
+            .start('div')
             .start('div', null, this.textarea$).addClass('textarea')
             .attrs({
                 id: 'textarea',
