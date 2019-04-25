@@ -407,6 +407,7 @@ FOAM_FILES([
   { name: "foam/u2/view/FObjectArrayView", flags: ['web'] },
   { name: "foam/u2/view/ChoiceView", flags: ['web'] },
   { name: "foam/u2/view/RichChoiceView", flags: ['web'] },
+  { name: "foam/u2/view/OverlayActionListView", flags: ['web'] },
   { name: "foam/u2/view/RadioView", flags: ['web'] },
   { name: "foam/u2/view/TextField", flags: ['web'] },
   { name: "foam/u2/view/TreeView", flags: ['web'] },
@@ -581,6 +582,13 @@ FOAM_FILES([
   { name: "foam/u2/view/JSONTextView" },
   { name: "foam/u2/view/MapView" },
   { name: "foam/u2/view/AnyView" },
+  { name: "foam/u2/view/ArrayView" },
 
   { name: "io/c9/ace/Lib" },
+
+  { name: "foam/u2/view/date/AbstractDateView"},
+  { name: "foam/u2/view/date/CalendarDatePicker"},
+  { name: "foam/u2/view/date/DateTimePicker"},
+  { name: "foam/u2/view/date/Month"},
+  { name: "foam/u2/view/date/Weekday"},
 ]);

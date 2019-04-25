@@ -62,7 +62,8 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'showActions'
+      name: 'showActions',
+      value: true
     },
     {
       name: 'properties',
@@ -109,8 +110,15 @@ foam.CLASS({
   ],
 
   css: `
+    /* Temporary fix until we refactor DetailView to not use a table. */
+    ^ {
+      margin: auto;
+      width: 100%;
+    }
+
     ^toolbar {
-      padding-top: 4px;
+      display: flex;
+      padding-top: 8px;
     }
   `,
 
