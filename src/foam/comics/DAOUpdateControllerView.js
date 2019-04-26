@@ -100,6 +100,7 @@ foam.CLASS({
   ],
 
   reactions: [
+    [ 'data', 'finished', 'onFinished' ],
     [ 'data', 'throwError', 'onThrowError' ]
   ],
 
@@ -155,6 +156,7 @@ foam.CLASS({
   actions: [
     {
       name: 'cancel',
+      isSecondary: true,
       code: function() {
         this.stack.back();
       }
@@ -179,6 +181,9 @@ foam.CLASS({
   ],
 
   listeners: [
+    function onFinished() {
+      this.stack.back();
+    },
     function onThrowError() {
       var self = this;
       this.add(this.NotificationMessage.create({

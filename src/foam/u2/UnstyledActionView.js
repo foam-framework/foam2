@@ -109,6 +109,14 @@ foam.CLASS({
         if ( this.action.isEnabled ) {
           this.attrs({disabled: this.action.createIsEnabled$(this.data$).map(function(e) { return e ? false : 'disabled'; })});
         }
+
+        if ( this.action.isDestructive && this.action.isSecondary ) {
+          this.addClass(this.myClass('secondary-destructive'));
+        } else if ( this.action.isDestructive ) {
+          this.addClass(this.myClass('destructive'));
+        } else if ( this.action.isSecondary ) {
+          this.addClass(this.myClass('secondary'));
+        }
       }
     },
 

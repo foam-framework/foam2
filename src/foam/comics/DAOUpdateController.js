@@ -20,6 +20,7 @@ foam.CLASS({
   name: 'DAOUpdateController',
 
   topics: [
+    'finished',
     'throwError'
   ],
 
@@ -63,6 +64,7 @@ foam.CLASS({
       name: 'delete',
       isEnabled: function(obj) { return !! obj; },
       confirmationRequired: true,
+      isDestructive: true,
       code: function() {
         var self = this;
         this.dao.remove(this.obj).then(function() {
