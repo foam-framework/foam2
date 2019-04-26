@@ -95,18 +95,15 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'firstName',
-      trim: true
+      name: 'firstName'
     },
     {
       class: 'String',
-      name: 'middleName',
-      trim: true
+      name: 'middleName'
     },
     {
       class: 'String',
-      name: 'lastName',
-      trim: true
+      name: 'lastName'
     },
     'legalName',
     {
