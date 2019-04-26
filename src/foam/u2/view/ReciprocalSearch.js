@@ -147,7 +147,11 @@ foam.CLASS({
               {
                 richSearch: true,
                 of: self.dao.of.id,
-                onKey: true
+                onKey: true,
+                viewSpec: {
+                  class: 'foam.u2.tag.Input',
+                  focused: true
+                }
               },
               this,
               this.__subSubContext__);
