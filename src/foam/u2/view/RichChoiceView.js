@@ -225,7 +225,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'searchPlaceholder',
-      documentation: 'Replaces search box placeholder with passed in string.'
+      documentation: 'Replaces search box placeholder with passed in string.',
+      value: 'Search...'
     },
     {
       type: 'Action',
@@ -287,11 +288,14 @@ foam.CLASS({
             if ( ! searchEnabled ) return null;
             return this.E()
               .start()
+                .start('img')
+                  .attrs({ src: 'images/ic-search.svg' })
+                .end()
                 .startContext({ data: self })
                   .addClass('search')
                   .add(self.FILTER_.clone().copyFrom({ view: {
                     class: 'foam.u2.view.TextField',
-                    placeholder: this.searchPlaceholder ? this.searchPlaceholder : 'Search...',
+                    placeholder: this.searchPlaceholder,
                     onKey: true
                   } }))
                 .endContext()
