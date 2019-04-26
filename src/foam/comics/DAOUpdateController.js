@@ -20,6 +20,7 @@ foam.CLASS({
   name: 'DAOUpdateController',
 
   topics: [
+    'finished',
     'throwError'
   ],
 
