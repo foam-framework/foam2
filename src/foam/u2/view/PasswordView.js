@@ -79,7 +79,7 @@ foam.CLASS({
 
       this.addClass(this.myClass()).start().
         addClass('input-field-container').
-        start(foam.u2.tag.Input, {
+        start(foam.u2.TextField, {
           type: this.type,
           data$: this.data$,
           onKey: true
