@@ -40,7 +40,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'trim',
-      value: false
+      value: true
     },
     { class: 'Int', name: 'width', value: 30 },
     [ 'adapt', function(_, a) {
