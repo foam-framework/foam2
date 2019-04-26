@@ -33,21 +33,21 @@ foam.CLASS({
   ],
 
   css: `
-    ^{
+    ^ {
       width: 490px;
       margin: auto;
     }
-    ^ .sign-in-container{
+    ^ .sign-in-container {
       padding-top: 20px;
       width: 490px;
       height: 230px;
       border-radius: 2px;
       background-color: #ffffff;
     }
-    ^ p{
+    ^ p {
       display: inline-block;
     }
-    ^ .full-width-button{
+    ^ .full-width-button {
       width: 90%;
       height: 40px;
       border-radius: 2px;
@@ -60,7 +60,7 @@ foam.CLASS({
       color: #ffffff;
       margin-top: 10px;
     }
-    ^ .full-width-input{
+    ^ .full-width-input {
       width: 90%;
       height: 40px;
       margin-left: 5%;
@@ -77,7 +77,7 @@ foam.CLASS({
       outline: none;
       padding: 10px;
     }
-    ^ .label{
+    ^ .label {
       height: 16px;
       font-family: Roboto;
       font-size: 14px;
@@ -87,20 +87,20 @@ foam.CLASS({
       margin-bottom: 8px;
       margin-left: 25px;
     }
-    ^ .foam-u2-ActionView-signIn{
+    ^ .foam-u2-ActionView-signIn {
       width: 90%;
       margin-left: 25px;
     }
-    ^ .foam-u2-ActionView-signIn > span{
+    ^ .foam-u2-ActionView-signIn > span {
       position: relative;
       top: -5px;
     }
-    ^ .link{
+    ^ .link {
       margin-left: 2px;
       color: #59a5d5;
       cursor: pointer;
     }
-    ^ .forgot-link{
+    ^ .forgot-link {
       margin-left: 2px;
       color: #59a5d5;
       cursor: pointer;
