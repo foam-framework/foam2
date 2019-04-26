@@ -637,8 +637,11 @@ foam.CLASS({
     'document',
     'elementValidator',
     'framed',
-    'getElementById'
+    'getElementById',
+    'nameAttributePrefix?'
   ],
+
+  exports: [ 'nameAttributePrefix_ as nameAttributePrefix'],
 
   topics: [
     'onload',
@@ -964,7 +967,8 @@ foam.CLASS({
       name: '__subSubContext__',
       factory: function() { return this.__subContext__; }
     },
-    'keyMap_'
+    'keyMap_',
+    'nameAttributePrefix_'
   ],
 
   methods: [
@@ -978,6 +982,11 @@ foam.CLASS({
         just before Element is output().
       */
       this.initKeyboardShortcuts();
+    },
+
+    function fromProperty(p) {
+      this.nameAttributePrefix_ = ( this.nameAttributePrefix || '' ) + p.name;
+      this.attr("name", this.nameAttributePrefix_$);
     },
 
     function observeScrollHeight() {
@@ -2476,6 +2485,8 @@ foam.CLASS({
     },
 
     function fromProperty(p) {
+      this.SUPER(p);
+
       this.visibility = p.visibility;
 
       if ( p.validateObj ) {
