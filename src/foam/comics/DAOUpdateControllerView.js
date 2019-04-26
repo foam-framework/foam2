@@ -100,6 +100,7 @@ foam.CLASS({
   ],
 
   reactions: [
+    [ 'data', 'finished', 'onFinished' ],
     [ 'data', 'throwError', 'onThrowError' ]
   ],
 
@@ -180,6 +181,9 @@ foam.CLASS({
   ],
 
   listeners: [
+    function onFinished() {
+      this.stack.back();
+    },
     function onThrowError() {
       var self = this;
       this.add(this.NotificationMessage.create({
