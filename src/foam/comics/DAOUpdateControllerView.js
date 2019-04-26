@@ -155,6 +155,7 @@ foam.CLASS({
   actions: [
     {
       name: 'cancel',
+      isSecondary: true,
       code: function() {
         this.stack.back();
       }
