@@ -1,0 +1,2 @@
+p({"class":"foam.nanos.menu.Menu","id":"admin.p","label":"Performance","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pmInfoDAO","summaryView":{"class":"foam.nanos.pm.PMTableView"}},"order":1000,"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.p.1day","label":"Performance - 1 Day","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pmInfo1dayDAO","summaryView":{"class":"foam.nanos.pm.PMTableView"}},"order":1000,"parent":"admin"})
