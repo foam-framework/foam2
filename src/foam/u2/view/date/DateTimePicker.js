@@ -40,9 +40,11 @@ foam.CLASS({
           text-align: center;
           box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 2px 8px 0 rgba(0, 0, 0, 0.16);
           border: solid 1px #cbcfd4;
+          border-radius: 5px;
           background-color: #ffffff;
           padding-bottom: 25px;
-          z-index: 10001;
+          margin-top: 16px;
+          z-index: 100002;
           position: absolute;
         }
 
@@ -58,7 +60,9 @@ foam.CLASS({
         }
 
         ^ .year {
+          border-radius: 5px 5px 0px 0px;
           background-color: #406dea;
+          background-color: %SECONDARYCOLOR%;
           color: #ffffff;
           display: inline-block;
           align-items: center;
@@ -68,20 +72,24 @@ foam.CLASS({
         }
 
         ^ .year-number {
-          margin-left: 100px;
-          margin-right: 100px;
+          margin-left: 90px;
+          margin-right: 90px;
           display: inline-block;
-          padding-top: 15px;
+          margin-top: 15px;
         }
 
         ^ .arrow-left {
-          margin-top: 15px;
-          margin-left: 30px;
+          float: left;
+          padding: 10px;
+          margin-top: 10px;
+          margin-left: 23px;
         }
 
         ^ .arrow-right {
-          margin-top: 15px;
-          margin-right: 30px;
+          float: right;
+          padding: 10px;
+          margin-top: 10px;
+          margin-right: 23px;
         }
 
         ^ .month {
@@ -106,11 +114,16 @@ foam.CLASS({
           height: 24px;
           background-image: linear-gradient(#ffffff, #e7eaec);
           text-align: center;
+          border: 1px solid #cbcfd4;
         }
 
         ^ .arrow-container-left{
           margin-left: 25px;
           float: left;
+        }
+
+        .arrow-container-left:hover, .arrow-container-right:hover, .arrow-left:hover, .arrow-right:hover {
+          cursor: pointer;
         }
 
         ^ .arrow-container-right{
@@ -144,8 +157,18 @@ foam.CLASS({
           width: 216px;
           font-size: 14px;
           background-color: #ffffff;
-          border: 1px solid #406dea;
+          border: 1px solid #cbcfd4;
           border-radius: 3px;
+        }
+
+        ^ .date-display-box:hover {
+          border-color: #9ba1a6;
+        }
+
+        ^ .focus-border {
+          border-radius: 1px;
+          border: solid 1px #406dea;
+          box-shadow: inset 0 2px 1px 0 rgba(32, 46, 120, 0.42);
         }
 
         ^ .date-display-text {
@@ -162,7 +185,13 @@ foam.CLASS({
           display: inline-block;
           margin-top: 10px;
           margin-right: 8px;
+          position: relative;
         }
+
+        ^ .date-display-image-cancel {
+          z-index: 10001;
+        }
+
         ^ {
           position: relative;
         }
@@ -194,7 +223,7 @@ foam.CLASS({
       name: 'date',
       expression: function(day, year, month) {
         if ( ! this.data ) {
-          return 'mm dd yyyy';
+          return 'Select date';
         }
         return this.formatMonth(month.name) + ' ' + day + ' ' + year;
       }
@@ -204,9 +233,16 @@ foam.CLASS({
       name: 'dateTime',
       expression: function(day, year, month, hour12, minute, period) {
         if ( ! this.data ) {
-          return 'mm dd yyyy --:-- --';
+          return 'Select date';
         }
         return this.formatMonth(month.name) + ' ' + day + ' ' + year + ', ' + hour12 + ':' + minute + ' ' + period;
+      }
+    },
+    {
+      class: 'String',
+      name: 'icon',
+      expression: function(isOpen_) {
+        return this.data && isOpen_ ? 'images/cancel-round.svg' : 'images/calendar.svg';
       }
     }
   ],
@@ -230,6 +266,7 @@ foam.CLASS({
         .addClass(this.myClass())
         .start()
           .addClass('date-display-box')
+          .enableClass('focus-border', this.isOpen_$)
           .call(function() {
             let display = self.showTimeOfDay ? self.dateTime$ : self.date$;
             this
@@ -238,9 +275,11 @@ foam.CLASS({
                 .add(display)
               .end()
               .start()
-                .addClass('date-display-image')
+                .addClass('date-display-image').enableClass('date-display-image-cancel', self.slot(function(icon) {
+                  return icon === 'images/cancel-round.svg';
+                }))
                 .start('img')
-                  .attrs({ src: 'images/cancel-round.svg' })
+                  .attrs({ src: self.icon$ })
                   .on('click', self.clearDate)
                 .end()
               .end();
@@ -362,8 +401,11 @@ foam.CLASS({
     },
 
     function clearDate(event) {
-      event.stopPropagation();
-      this.data = null;
+      if ( this.icon === 'images/cancel-round.svg' ) {
+        event.stopPropagation();
+        this.data = null;
+        this.isOpen_ = false;
+      }
     },
 
     function updateDate() {
