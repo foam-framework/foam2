@@ -93,9 +93,18 @@ foam.CLASS({
       name: 'lastLogin',
       documentation: 'The date and time of last login by user.'
     },
-    'firstName',
-    'middleName',
-    'lastName',
+    {
+      class: 'String',
+      name: 'firstName'
+    },
+    {
+      class: 'String',
+      name: 'middleName'
+    },
+    {
+      class: 'String',
+      name: 'lastName'
+    },
     'legalName',
     {
       class: 'String',
