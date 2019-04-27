@@ -1,0 +1,2 @@
+p({"class":"foam.nanos.menu.Menu","id":"admin.o","label":"Operation Measures","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"omInfoDAO"},"order":1000,"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.o","label":"Operation Measures - 1 Day","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"omInfo1dayDAO"},"order":1000,"parent":"admin"})
