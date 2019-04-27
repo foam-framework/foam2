@@ -342,7 +342,12 @@ var classes = [
   'foam.support.model.Ticket',
 
   'foam.nanos.dig.exception.EmptyParameterException',
-  'foam.nanos.dig.exception.GeneralException'
+  'foam.nanos.dig.exception.GeneralException',
+
+  'foam.demos.analytics.StockSnapshot',
+  'foam.nanos.analytics.FoldManagerDAODecorator',
+  'foam.nanos.analytics.DAOFoldManager',
+  'foam.nanos.analytics.DAOReduceManager'
 ];
 
 var abstractClasses = [
