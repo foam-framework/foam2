@@ -23,3 +23,4 @@ nano.log*
 /cronjobs
 .vscode/
 android/nanos_example_client/.settings/
+.history/
