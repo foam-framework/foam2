@@ -21,10 +21,6 @@ foam.CLASS({
   extends: 'foam.u2.UnstyledActionView',
 
   css: `
-    ^unavailable {
-      display: none !important;
-    }
-
     button^ {
       -webkit-box-shadow: inset 0 1px 0 0 #ffffff;
       box-shadow: inset 0 1px 0 0 #ffffff;
