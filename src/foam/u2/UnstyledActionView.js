@@ -103,7 +103,7 @@ foam.CLASS({
 
       if ( this.action ) {
         if ( this.action.isAvailable ) {
-          this.enableClass(this.myClass('unavailable'), this.action.createIsAvailable$(this.data$), true);
+          this.show(this.action.createIsAvailable$(this.data$));
         }
 
         if ( this.action.isEnabled ) {
