@@ -1,3 +1,7 @@
+p({"class":"foam.nanos.boot.NSpec", "name":"pmLogger","lazy":true,"serve":false,"serviceClass":"foam.nanos.pm.DAOPMLogger"})
+
+p({"class":"foam.nanos.boot.NSpec", "name":"pmInfoDAO","lazy":true,"serve":true,"serviceScript":"return new foam.dao.ProxyDAO.Builder(x).setDelegate(new foam.dao.MDAO(foam.nanos.pm.PMInfo.getOwnClassInfo())).build();","client":"{\"of\":\"foam.nanos.pm.PMInfo\", \"remoteListenerSupport\": true}" })
+
 p({"class":"foam.nanos.boot.NSpec", "name":"pm1MinuteDAO","lazy":true,"serve":true,"serviceScript":"return new foam.dao.MDAO(foam.nanos.analytics.Candlestick.getOwnClassInfo());","client":"{\"of\":\"foam.nanos.analytics.Candlestick\"}" })
 
 p({"class":"foam.nanos.boot.NSpec", "name":"pm5MinuteDAO","lazy":true,"serve":true,"serviceScript":"return new foam.dao.MDAO(foam.nanos.analytics.Candlestick.getOwnClassInfo());","client":"{\"of\":\"foam.nanos.analytics.Candlestick\"}" })
