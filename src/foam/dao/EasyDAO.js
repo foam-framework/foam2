@@ -386,11 +386,6 @@ return delegate;
       generateJava: false,
       name: 'decorators'
     },
-    // {
-    //   name: 'orderBy',
-    //   class: 'FObjectProperty',
-    //   type: 'Any'
-    // },
     {
       name: 'testData',
       generateJava: false
@@ -525,10 +520,6 @@ return delegate;
         if ( this.seqProperty ) args.property = this.seqProperty;
         dao = this.GUIDDAO.create(args);
       }
-
-      // if ( this.orderBy ) {
-      //   dao = dao.orderBy(this.orderBy);
-      // }
 
       var cls = this.of;
 
@@ -665,25 +656,6 @@ if ( getMdao() != null ) {
 }
 return this;
 `
-    },
-    {
-      // from AbstractDAO
-      /**
-         Returns a filtered DAO that orders select() by the given
-         ordering.
-      */
-      name: 'orderBy',
-      code: function orderBy() {
-        //return this.delegate.orderBy();
-        return this.OrderedDAO.create({
-          delegate: this.delegate,
-          comparator: foam.compare.toCompare(Array.from(arguments))
-        });
-      },
-      javaCode: `
-//return this.getDelegate().orderBy(comparator);
-return new foam.dao.OrderedDAO(this.getX(), comparator, this.getDelegate());
-      `,
     }
   ]
 });
