@@ -1,0 +1,4 @@
+// Presently no way to specify 5 minute intervals in our cron
+//p({"class":"foam.nanos.cron.Cron","minute":5,"id":"PM5MinuteReduce","code":"rm = x.get(\"pm5MinuteReduceManager\");\nrm.doReduce();"})
+p({"class":"foam.nanos.cron.Cron","minute":0,"id":"PMHourlyReduce","enabled":true,"code":"rm = x.get(\"pmHourlyReduceManager\");\nrm.doReduce();"})
+p({"class":"foam.nanos.cron.Cron","hour":0,"id":"PMDailyReduce","enabled":true,"code":"rm = x.get(\"pmDailyReduceManager\");\nrm.doReduce();"})

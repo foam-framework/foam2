@@ -18,7 +18,7 @@ foam.CLASS({
     'foam.core.X'
   ],
 
-  ids: [ 'classType', 'name' ],
+  ids: [ 'classType', 'name', 'startTime' ],
 
   properties: [
     {
@@ -54,18 +54,29 @@ foam.CLASS({
         }
       ],
       javaCode: `
-    if ( x == null ) return;
     setEndTime(new java.util.Date());
+    if ( x == null ) return;
+    // PMLogger logger = (PMLogger) x.get("pmLogger");
+    // if ( logger != null ) {
+    //   logger.log(this);
+    // }
+    if ( ! this.getClassType().getId().equals("foam.dao.PMDAO") ) {
+      if ( this.getClassType().getId().indexOf("PM") != -1 ) return;
+      if ( this.getName().indexOf("PM")              != -1 ) return;
+      if ( this.getClassType().getId().indexOf("pm") != -1 ) return;
+      if ( this.getName().indexOf("pm")              != -1 ) return;
+    }
+    
     foam.dao.DAO dao = (foam.dao.DAO) x.get("pmDAO");
     if ( dao != null ) {
       dao.put(this);
     } else {
-      foam.nanos.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
+      foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
       if ( logger != null ) {
         logger.warning("PM.log:", "pmDAO not found in context");
       } else {
         System.out.println("PM.log: pmDAO and logger not found in context.");
-}
+      }
     }
 `
     },
@@ -79,7 +90,7 @@ foam.CLASS({
     {
       name: 'doFolds',
       javaCode: `
-    fm.foldForState(getId(), getStartTime(), getTime());
+    fm.foldForState(getClassType().getId()+":"+getName(), getStartTime(), getTime());
       `
     }
   ],

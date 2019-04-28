@@ -1,0 +1,3 @@
+//p({"class":"foam.nanos.menu.Menu","id":"admin.p","label":"Performance","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pmDAO","summaryView":{"class":"foam.nanos.pm.PMTableView"}},"order":1000,"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.p.1minute","label":"Performance - 1 Minute","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pm1MinuteDAO"},"order":1000,"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.p.5minute","label":"Performance - 5 Minute","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pm5MinuteDAO"},"order":1000,"parent":"admin"})

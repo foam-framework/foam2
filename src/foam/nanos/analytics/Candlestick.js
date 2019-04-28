@@ -19,6 +19,8 @@ foam.CLASS({
     'close',
     'closeValueTime',
 
+    'count',
+
     'min',
     'max',
     'average'
