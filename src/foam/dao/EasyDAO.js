@@ -19,7 +19,11 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'EasyDAO',
   extends: 'foam.dao.ProxyDAO',
-  implements: [ 'foam.mlang.Expressions' ],
+
+  implements: [
+    'foam.mlang.Expressions',
+    'foam.nanos.boot.NSpecAware'
+  ],
 
   documentation: function() {/*
     Facade for easily creating decorated DAOs.
@@ -62,7 +66,8 @@ foam.CLASS({
     'foam.dao.SequenceNumberDAO',
     'foam.dao.SyncDAO',
     'foam.dao.TimingDAO',
-    'foam.dao.JournalType'
+    'foam.dao.JournalType',
+    'foam.nanos.ruler.RulerDAO'
   ],
 
   imports: [ 'document' ],
@@ -87,21 +92,59 @@ foam.CLASS({
       /** The developer-friendly name for this EasyDAO. */
       class: 'String',
       name: 'name',
-      factory: function() { return this.of.id; }
+      factory: function() { return this.of.id; },
+      javaFactory: `return getOf().getId();`
+    },
+    {
+      name: 'nSpec',
+      class: 'FObjectProperty',
+      type: 'foam.nanos.boot.NSpec'
     },
     {
       /** This is set automatically when you create an EasyDAO.
         @private */
       name: 'delegate',
       javaFactory: `
+//foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+//logger.info(this.getClass().getSimpleName(), "delegate", "NSpec.name", getNSpec().getName(), Thread.currentThread().getName());
 foam.dao.DAO delegate = getInnerDAO() == null ?
-  new foam.dao.MapDAO(getX(), getOf()) :
+  new foam.dao.MDAO(getOf()) :
   getInnerDAO();
 
-if ( delegate instanceof foam.dao.MDAO ) setMdao((foam.dao.MDAO)delegate);
+if ( delegate instanceof foam.dao.MDAO ) {
+  setMdao((foam.dao.MDAO)delegate);
+}
 
 if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
   delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
+}
+
+if ( getDeletedAware() ||
+     foam.nanos.auth.DeletedAware.class.isAssignableFrom(delegate.getOf().getObjClass()) ) {
+  delegate = new foam.nanos.auth.DeletedAwareDAO.Builder(getX()).setDelegate(delegate).build();
+}
+
+if ( getRuler() ) {
+  delegate = new foam.nanos.ruler.RulerDAO.Builder(getX()).setDelegate(delegate).setDaoKey(getRulerDaoKey()).build();
+}
+if ( getCreatedAware() ||
+  foam.nanos.auth.CreatedAware.class.isAssignableFrom(delegate.getOf().getObjClass()) ) {
+  delegate = new foam.nanos.auth.CreatedAwareDAO.Builder(getX()).setDelegate(delegate).build();
+}
+
+if ( getCreatedByAware() ||
+  foam.nanos.auth.CreatedByAware.class.isAssignableFrom(delegate.getOf().getObjClass()) ) {
+  delegate = new foam.nanos.auth.CreatedByAwareDAO.Builder(getX()).setDelegate(delegate).build();
+}
+
+if ( getLastModifiedAware() ||
+  foam.nanos.auth.LastModifiedAware.class.isAssignableFrom(delegate.getOf().getObjClass()) ) {
+  delegate = new foam.nanos.auth.LastModifiedAwareDAO.Builder(getX()).setDelegate(delegate).build();
+}
+
+if ( getLastModifiedByAware() ||
+  foam.nanos.auth.LastModifiedByAware.class.isAssignableFrom(delegate.getOf().getObjClass()) ) {
+  delegate = new foam.nanos.auth.LastModifiedByAwareDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
 if ( getGuid() && getSeqNo() ) {
@@ -218,13 +261,11 @@ return delegate;
       class: 'Boolean',
       name: 'logging',
       value: false,
-      generateJava: false
     },
     {
       /** Enable time tracking for concurrent DAO operations. */
       class: 'Boolean',
       name: 'timing',
-      generateJava: false,
       value: false
     },
     {
@@ -307,6 +348,7 @@ return delegate;
     },
     {
       name: 'retryBoxMaxAttempts',
+      class: 'Boolean',
       generateJava: false,
     },
     {
@@ -332,6 +374,10 @@ return delegate;
     {
       /** Simpler alternative than providing serverBox. */
       name: 'serviceName',
+      class: 'String',
+      factory: function() {
+        return this.nSpec && this.nSpec.name;
+      },
       generateJava: false
     },
     {
@@ -340,9 +386,51 @@ return delegate;
       generateJava: false,
       name: 'decorators'
     },
+    // {
+    //   name: 'orderBy',
+    //   class: 'FObjectProperty',
+    //   type: 'Any'
+    // },
     {
       name: 'testData',
       generateJava: false
+    },
+    {
+      name: 'ruler',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'rulerDaoKey',
+      class: 'String',
+      factory: function() {
+        return this.serviceName;
+      }
+    },
+    {
+      name: 'deletedAware',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'createdAware',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'createdByAware',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'lastModifiedAware',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'lastModifiedByAware',
+      class: 'Boolean',
+      value: false
     }
   ],
 
@@ -437,6 +525,10 @@ return delegate;
         if ( this.seqProperty ) args.property = this.seqProperty;
         dao = this.GUIDDAO.create(args);
       }
+
+      // if ( this.orderBy ) {
+      //   dao = dao.orderBy(this.orderBy);
+      // }
 
       var cls = this.of;
 
@@ -573,6 +665,25 @@ if ( getMdao() != null ) {
 }
 return this;
 `
+    },
+    {
+      // from AbstractDAO
+      /**
+         Returns a filtered DAO that orders select() by the given
+         ordering.
+      */
+      name: 'orderBy',
+      code: function orderBy() {
+        //return this.delegate.orderBy();
+        return this.OrderedDAO.create({
+          delegate: this.delegate,
+          comparator: foam.compare.toCompare(Array.from(arguments))
+        });
+      },
+      javaCode: `
+//return this.getDelegate().orderBy(comparator);
+return new foam.dao.OrderedDAO(this.getX(), comparator, this.getDelegate());
+      `,
     }
   ]
 });
