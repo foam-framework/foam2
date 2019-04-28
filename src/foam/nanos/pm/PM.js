@@ -59,9 +59,14 @@ foam.CLASS({
     foam.dao.DAO dao = (foam.dao.DAO) x.get("pmDAO");
     if ( dao != null ) {
       dao.put(this);
+    } else {
+      foam.nanos.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
+      if ( logger != null ) {
+        logger.warning("PM.log:", "pmDAO not found in context");
+      } else {
+        System.out.println("PM.log: pmDAO and logger not found in context.");
+}
     }
-//    PMLogger logger = (PMLogger) x.get(DAOPMLogger.SERVICE_NAME);
-//    if ( logger != null ) logger.log(this);
 `
     },
     {
