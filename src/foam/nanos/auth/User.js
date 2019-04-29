@@ -336,6 +336,7 @@ foam.CLASS({
       },
       javaCode: `
         if ( ! SafetyUtil.isEmpty(getOrganization()) ) return getOrganization();
+        if ( ! SafetyUtil.isEmpty(getBusinessName()) ) return getBusinessName();
         if ( SafetyUtil.isEmpty(getLastName()) ) return getFirstName();
         return getFirstName() + " " + getLastName();
       `
