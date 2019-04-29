@@ -84,10 +84,7 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'code',
-      postSet: function(_, code) {
-        this.expands_ = code.indexOf('^') != -1;
-      }
+      name: 'code'
     },
     {
       name: 'name',
@@ -101,7 +98,10 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'expands_',
-      documentation: 'True iff the CSS contains a ^ which needs to be expanded.'
+      documentation: 'True iff the CSS contains a ^ which needs to be expanded.',
+      expression: function(code) {
+        return code.includes('^');
+      }
     }
   ],
 
