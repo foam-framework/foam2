@@ -2478,6 +2478,8 @@ foam.CLASS({
     function fromProperty(p) {
       this.visibility = p.visibility;
 
+      this.attr('name', p.name);
+
       if ( p.validateObj ) {
         var s = foam.core.ExpressionSlot.create({
           obj$: this.__context__.data$,
