@@ -15,7 +15,9 @@ foam.CLASS({
       name: 'f',
       javaCode: `
     Logger logger = (Logger) getX().get("logger");
-    logger.info(this.getClass().getSimpleName(), "f");
+    if ( logger != null ) {
+      logger.info(this.getClass().getSimpleName(), "f");
+    }
 
     return AND(
       EQ(DOT(NEW_OBJ, INSTANCE_OF(Monitor.getOwnClassInfo())), true),

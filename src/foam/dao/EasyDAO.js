@@ -378,7 +378,7 @@ return delegate;
       factory: function() {
         return this.nSpec && this.nSpec.name;
       },
-      generateJava: false
+      javaFactory: `return getNSpec() != null ? getNSpec().getName() : null;`
     },
     {
       class: 'FObjectArray',
@@ -400,7 +400,8 @@ return delegate;
       class: 'String',
       factory: function() {
         return this.serviceName;
-      }
+      },
+      javaFactory: `return getServiceName();`
     },
     {
       name: 'deletedAware',
