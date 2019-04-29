@@ -2387,6 +2387,10 @@ foam.CLASS({
   name: 'View',
   extends: 'foam.u2.Element',
 
+  requires: [
+    'foam.core.Slot'
+  ],
+
   documentation: `
     A View is an Element used to display data.
     // TODO: Should the following be properties?
@@ -2480,12 +2484,9 @@ foam.CLASS({
 
       this.attr('name', p.name);
 
-      if ( p.validateObj ) {
-        var s = foam.core.ExpressionSlot.create({
-          obj$: this.__context__.data$,
-          code: p.validateObj
-        });
-        this.error_$.follow(s);
+      if ( p.validateObj && this.Slot.isInstance(this.__context__.data$) ) {
+        var s = this.__context__.data$.dot('errors_').map((errs) => (errs || []).filter((e) => e[0] === p).length > 0);
+        this.onDetach(this.error_$.follow(s));
       }
     }
   ]
