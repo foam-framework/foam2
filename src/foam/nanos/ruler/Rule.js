@@ -169,16 +169,11 @@
         {
           name: 'oldObj',
           type: 'FObject'
-        },
-        {
-          name: 'isAsync',
-          type: 'Boolean'
         }
       ],
       javaCode: `
-        Boolean isAvailable = null != (isAsync ? getAsyncAction() : getAction());
         try {
-          return getEnabled() && isAvailable
+          return getEnabled()
             && getPredicate().f(
               x.put("NEW", obj).put("OLD", oldObj)
             );
