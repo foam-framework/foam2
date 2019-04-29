@@ -22,7 +22,9 @@ foam.CLASS({
   name: 'Action',
 
   requires: [
-    'foam.core.ExpressionSlot'
+    'foam.core.ConstantSlot',
+    'foam.core.ExpressionSlot',
+    'foam.core.PromiseSlot'
   ],
 
   documentation: 'An Action is a method with extra GUI support.',
@@ -134,7 +136,7 @@ foam.CLASS({
 
   methods: [
     function andSlots(a, b) {
-      return foam.core.ExpressionSlot.create({
+      return this.ExpressionSlot.create({
         args: [ a, b ],
         code: function(a, b) {
           return a && b;
@@ -143,13 +145,15 @@ foam.CLASS({
     },
 
     function andSlotAndPromise(slot, promise) {
-      return this.andSlots(slot, foam.core.PromiseSlot.create({promise: promise}));
+      return this.andSlots(slot, this.PromiseSlot.create({
+        promise: promise
+      }));
     },
 
     function checkPermission(x) {
       if ( ! this.permissionRequired || ! x.auth ) return Promise.resolve(true);
-      var permission = this.sourceCls_.id + ".permission." + this.name;
-      return x.auth.check(null, permission)
+      var permission = this.sourceCls_.id + '.permission.' + this.name;
+      return x.auth.check(null, permission);
     },
 
     function isEnabledFor(data) {
