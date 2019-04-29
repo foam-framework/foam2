@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.monitor',
   name: 'Monitor',
 
-  documentation: ``,
+  documentation: '',
 
   implements: [
     'foam.nanos.auth.EnabledAware',
@@ -80,6 +80,7 @@ foam.CLASS({
     },
     {
       name: 'alarm',
+      label: 'Status',
       class: 'Reference',
       of: 'foam.nanos.monitor.Alarm',
       visibility: 'RO'

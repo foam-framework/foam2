@@ -23,7 +23,7 @@ foam.CLASS({
     'key',
     'name',
     'message',
-    'count',
+    'repeated',
     'lastModified'
   ],
 

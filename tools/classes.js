@@ -199,6 +199,8 @@ var classes = [
   'foam.nanos.pm.PMInfo',
   'foam.nanos.monitor.Alarm',
   'foam.nanos.monitor.Monitor',
+  'foam.nanos.monitor.test.TestMonitor',
+  'foam.nanos.monitor.test.TestMonitorPredicate',
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',

@@ -144,6 +144,8 @@ FOAM_FILES([
   { name: "foam/nanos/monitor/Alarm" },
   { name: "foam/nanos/monitor/Monitor" },
   { name: "foam/nanos/monitor/Relationships" },
+  { name: "foam/nanos/monitor/test/TestMonitor" },
+  { name: "foam/nanos/monitor/test/TestMonitorPredicate" },
   { name: 'foam/nanos/notification/email/EmailMessage' },
   { name: 'foam/nanos/notification/email/EmailService' },
   { name: 'foam/nanos/notification/email/EmailTemplate' },

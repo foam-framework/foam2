@@ -1,0 +1,1 @@
+p({"class":"foam.nanos.ruler.Rule","id":61,"name":"TestMonitor","priority":90,"ruleGroup":"TestMonitor","documentation":"Test Monitor","daoKey":"monitorDAO","operation":3,"after":false,"predicate":{"class":"foam.nanos.monitor.test.TestMonitorPredicate"},"action":{"class":"foam.nanos.monitor.test.TestMonitor"},"enabled":true,"saveHistory":true})
