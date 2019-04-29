@@ -96,14 +96,14 @@ foam.CLASS({
       name: 'isAvailable',
       label: 'Available',
       help: 'Function to determine if action is available.',
-      value: function() { return true; }
+      value: null
     },
     {
       class: 'Function',
       name: 'isEnabled',
       label: 'Enabled',
       help: 'Function to determine if action is enabled.',
-      value: function() { return true; }
+      value: null
     },
     {
       class: 'Function',
@@ -157,33 +157,23 @@ foam.CLASS({
     },
 
     function isEnabledFor(data) {
-      return foam.Function.withArgs(this.isEnabled, data);
+      return this.isEnabled
+        ? foam.Function.withArgs(this.isEnabled, data)
+        : true;
     },
 
     function createIsEnabled$(data$) {
-      var slot = foam.core.ExpressionSlot.create({
-         obj$: data$,
-         code: this.isEnabled
-       });
-
-      return this.permissionRequired ?
-        this.andSlotAndPromise(slot, this.checkPermission(data$.get().__subContext__)) :
-        slot ;
+      return this.createSlot_(this.isEnabled, data$);
     },
 
     function isAvailableFor(data) {
-      return foam.Function.withArgs(this.isAvailable, data);
+      return this.isAvailable
+        ? foam.Function.withArgs(this.isAvailable, data)
+        : true;
     },
 
     function createIsAvailable$(data$) {
-      var slot = foam.core.ExpressionSlot.create({
-        obj$: data$,
-        code: this.isAvailable
-      });
-
-      return this.permissionRequired ?
-        this.andSlotAndPromise(slot, this.checkPermission(data$.get().__subContext__)) :
-        slot ;
+      return this.createSlot_(this.isAvailable, data$);
     },
 
     function maybeCall(ctx, data) {
@@ -208,6 +198,26 @@ foam.CLASS({
       proto[this.name] = function() {
         return action.maybeCall(this.__context__, this);
       };
+    },
+
+    function createSlot_(fn, data$) {
+      if ( fn == null ) {
+        if ( ! this.permissionRequired ) {
+          return this.ConstantSlot.create({ value: true });
+        }
+        return this.PromiseSlot.create({
+          promise: this.checkPermission(data$.get().__subContext__)
+        });
+      }
+
+      var slot = this.ExpressionSlot.create({
+        obj$: data$,
+        code: fn
+      });
+
+      return this.permissionRequired ?
+        this.andSlotAndPromise(slot, this.checkPermission(data$.get().__subContext__)) :
+        slot;
     }
   ]
 });
