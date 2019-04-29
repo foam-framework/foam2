@@ -341,10 +341,11 @@ foam.CLASS({
       name: 'label',
       type: 'String',
       code: function label() {
-        return this.organization || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
+        return this.organization || this.businessName || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
       },
       javaCode: `
         if ( ! SafetyUtil.isEmpty(getOrganization()) ) return getOrganization();
+        if ( ! SafetyUtil.isEmpty(getBusinessName()) ) return getBusinessName();
         if ( SafetyUtil.isEmpty(getLastName()) ) return getFirstName();
         return getFirstName() + " " + getLastName();
       `
