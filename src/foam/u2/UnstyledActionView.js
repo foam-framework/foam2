@@ -103,7 +103,19 @@ foam.CLASS({
 
       if ( this.action ) {
         this.enableClass(this.myClass('unavailable'), this.action.createIsAvailable$(this.data$), true);
-        this.attrs({disabled: this.action.createIsEnabled$(this.data$).map(function(e) { return e ? false : 'disabled'; })});
+        this.attrs({
+          disabled: this.action.createIsEnabled$(this.data$).map(function(e) {
+            return e ? false : 'disabled';
+          })
+        });
+
+        if ( this.action.isDestructive && this.action.isSecondary ) {
+          this.addClass(this.myClass('secondary-destructive'));
+        } else if ( this.action.isDestructive ) {
+          this.addClass(this.myClass('destructive'));
+        } else if ( this.action.isSecondary ) {
+          this.addClass(this.myClass('secondary'));
+        }
       }
     },
 
