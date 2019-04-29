@@ -82,9 +82,7 @@ public class RuleEngine extends ContextAwareSupport {
       if ( stops_.get() ) return;
 
       currentRule_ = rule;
-      if ( rule.f(getX(), obj, oldObj)
-        && rule.getAction() != null
-      ) {
+      if ( rule.f(getX(), obj, oldObj, false) ) {
         rule.apply(getX(), obj, oldObj, this);
         saveHistory(rule, obj);
       }
@@ -99,9 +97,7 @@ public class RuleEngine extends ContextAwareSupport {
           if ( stops_.get() ) return;
 
           currentRule_ = rule;
-          if ( rule.f(getX(), obj, oldObj)
-            && rule.getAsyncAction() != null
-          ) {
+          if ( rule.f(getX(), obj, oldObj, true) ) {
             try {
               rule.asyncApply(x, obj, oldObj, RuleEngine.this);
               saveHistory(rule, obj);

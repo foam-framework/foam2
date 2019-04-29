@@ -12,7 +12,8 @@
 
   javaImports: [
     'foam.core.FObject',
-    'foam.core.X'
+    'foam.core.X',
+    'foam.nanos.logger.Logger'
   ],
 
   properties: [
@@ -168,13 +169,24 @@
         {
           name: 'oldObj',
           type: 'FObject'
+        },
+        {
+          name: 'isAsync',
+          type: 'Boolean'
         }
       ],
       javaCode: `
-        return getEnabled()
-          && getPredicate().f(
-            x.put("NEW", obj).put("OLD", oldObj)
-          );
+        Boolean isAvailable = null != (isAsync ? getAsyncAction() : getAction());
+        try {
+          return getEnabled() && isAvailable
+            && getPredicate().f(
+              x.put("NEW", obj).put("OLD", oldObj)
+            );
+        } catch ( Throwable t ) {
+          ((Logger) x.get("logger")).error(
+            "Failed to evaluate predicate of rule: " + getId(), t);
+          return false;
+        }
       `
     },
     {
