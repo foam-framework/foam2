@@ -24,7 +24,8 @@ foam.CLASS({
     [ 'type', 'range' ],
     [ 'step', 0 ],
     [ 'minValue', 0 ],
-    [ 'maxValue', 100 ]
+    [ 'maxValue', 100 ],
+    [ 'onKey', true ]
   ],
 
   methods: [

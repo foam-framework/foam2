@@ -12,7 +12,8 @@
 
   javaImports: [
     'foam.core.FObject',
-    'foam.core.X'
+    'foam.core.X',
+    'foam.nanos.logger.Logger'
   ],
 
   properties: [
@@ -171,10 +172,16 @@
         }
       ],
       javaCode: `
-        return getEnabled()
-          && getPredicate().f(
-            x.put("NEW", obj).put("OLD", oldObj)
-          );
+        try {
+          return getEnabled()
+            && getPredicate().f(
+              x.put("NEW", obj).put("OLD", oldObj)
+            );
+        } catch ( Throwable t ) {
+          ((Logger) x.get("logger")).error(
+            "Failed to evaluate predicate of rule: " + getId(), t);
+          return false;
+        }
       `
     },
     {

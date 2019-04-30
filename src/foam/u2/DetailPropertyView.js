@@ -63,7 +63,7 @@ foam.CLASS({
 
       if ( prop && prop.permissionRequired )  {
         var propName = prop.name.toLowerCase();
-        var clsName = prop.forClass_;
+        var clsName  = prop.forClass_;
         clsName = clsName.substring(clsName.lastIndexOf('.') + 1).toLowerCase();
         var writePerm = await this.auth.check(null, `${clsName}.rw.${propName}`);
         if ( ! writePerm ) {
@@ -72,8 +72,10 @@ foam.CLASS({
         }
       }
 
-      // TODO: hide this element if the prop changes its mode to HIDDEN.
+      // TODO: check/make visibility and permissions work together
+
       this.
+        show(prop.createVisibilityFor(this.__context__.data$).map(function(m) { return m != foam.u2.Visibility.HIDDEN; })).
         addClass('foam-u2-PropertyView').
         addClass('foam-u2-PropertyView-' + prop.name).
         start('td').addClass('foam-u2-PropertyView-label').add(this.label).end().

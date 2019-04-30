@@ -354,6 +354,12 @@ var classes = [
   'foam.nanos.dig.exception.GeneralException',
 
   'foam.nanos.app.EmailConfig',
+
+  // Testing support
+  'foam.test.TestEnum',
+  'foam.test.AllSerializableProperties',
+  'foam.nanos.test.EchoService',
+  'foam.nanos.test.SerializationTestEchoService'
 ];
 
 var abstractClasses = [
@@ -373,7 +379,8 @@ var skeletons = [
   'foam.nanos.auth.token.TokenService',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.POP3Email',
-  'foam.nanos.notification.push.PushService'
+  'foam.nanos.notification.push.PushService',
+  'foam.nanos.test.EchoService'
 ];
 
 var proxies = [
