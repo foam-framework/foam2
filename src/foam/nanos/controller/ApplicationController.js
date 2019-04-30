@@ -75,7 +75,7 @@ foam.CLASS({
   ],
 
   constants: {
-    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor', 'secondaryHoverColor', 'secondaryDisabledColor', 'destructiveColor', 'destructiveHoverColor', 'destructiveDisabledColor', 'groupCSS', 'backgroundColor' ]
+    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor', 'secondaryHoverColor', 'secondaryDisabledColor', 'destructiveColor', 'destructiveHoverColor', 'destructiveDisabledColor', 'groupCSS', 'backgroundColor', 'headerColor' ]
   },
 
   messages: [
@@ -177,6 +177,7 @@ foam.CLASS({
     'tableHoverColor',
     'accentColor',
     'backgroundColor',
+    'headerColor',
     'groupCSS',
     'topNavigation_',
     'footerView_'
