@@ -346,7 +346,6 @@ var classes = [
 
 
   // Testing support
-  'foam.test.AllProperties',
   'foam.test.TestEnum',
   'foam.test.AllSerializableProperties',
   'foam.nanos.test.EchoService',
