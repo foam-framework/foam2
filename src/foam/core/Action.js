@@ -131,6 +131,20 @@ foam.CLASS({
         When set to true, this action should be styled in a way that indicates
         that this action is not as important as other actions.
       `
+    },
+    {
+      class: 'Boolean',
+      name: 'isLink',
+      documentation: `
+        When set to true, this action should be styled without a background or
+        border.
+      `
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.ButtonSize',
+      name: 'size',
+      value: 'MEDIUM'
     }
   ],
 
