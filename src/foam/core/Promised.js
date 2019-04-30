@@ -94,7 +94,15 @@ foam.CLASS({
           this[stateName]    = undefined;
           this[delegateName] = undefined;
 
-          p.then(function(d) { self[delegateName] = d; });
+          p.then(function(d) {
+            self[delegateName] = d;
+          }).catch(function(err) {
+            // Silently do nothing to avoid unhandled promise rejections
+            // in this fork of the promise chain. As long as some other code
+            // uses the promise (`p.then` or similar) then there would still
+            // be an unhandled promise rejection if *that* fork of the promise
+            // chain lacks error handling.
+          });
         };
       }
     }
