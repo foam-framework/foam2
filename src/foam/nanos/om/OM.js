@@ -10,6 +10,10 @@ foam.CLASS({
 
   documentation: `An Operational Measure which captures the count of some event.`,
 
+  implements: [
+    'foam.nanos.auth.CreatedAware'
+  ],
+
   javaImports: [
     'foam.core.X'
   ],
@@ -25,11 +29,7 @@ foam.CLASS({
     },
     {
       name: 'created',
-      class: 'DateTime',
-      factory: function() {
-        return new Date();
-      },
-      javaFactory: `return new java.util.Date();`
+      class: 'DateTime'
     }
   ],
 

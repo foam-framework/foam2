@@ -45,7 +45,7 @@ public class DAOOMLogger
     DAO dao = (DAO) getX().get(DAO_NAME);
 
     synchronized ( getLock(info) ) {
-      OMInfo i = (OMInfo) dao.find(info);
+      OMInfo i = (OMInfo) dao.inX(getX()).find(info);
       if ( i == null ) {
         i = info;
         i.setCount(1);
