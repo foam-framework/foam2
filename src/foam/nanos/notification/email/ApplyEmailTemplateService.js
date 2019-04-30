@@ -33,18 +33,14 @@ foam.CLASS({
       // STEP 1) Find EmailTemplate
       EmailTemplate emailTemplateObj = DAOResourceLoader.findTemplate(x, templateName, group);
       if ( emailTemplateObj == null ) {
-        throw new NoSuchFieldException("@ApplyEmailTemplateService: emailTemplate( id = " +
-          templateName + ": group = " + group + ") not found.");
+        throw new NoSuchFieldException("@ApplyEmailTemplateService: emailTemplate( id = " + templateName + ": group = " + group + ") not found.");
       } 
 
       // STEP 2) Apply Template to emailMessage
       try {
         emailMessage = emailTemplateObj.apply(x, group, emailMessage, templateArgs);
       } catch (Exception e) {
-        throw new NoSuchFieldException(
-          "@ApplyEmailTemplateService: emailTemplate.apply has failed. emailTemplate = {id:" + 
-          templateName + ", group:" + group + "}\n" + e
-        );
+        throw new NoSuchFieldException("@ApplyEmailTemplateService: emailTemplate.apply has failed. emailTemplate = {id:" + templateName + ", group:" + group + "}" + e);
       }
 
       return emailMessage;

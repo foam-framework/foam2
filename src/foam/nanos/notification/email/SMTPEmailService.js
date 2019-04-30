@@ -17,7 +17,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'threadPool?', // Only imported in Java
+    'threadPool?'
   ],
 
   javaImports: [
@@ -118,128 +118,74 @@ foam.CLASS({
         }
       ],
       javaCode:
-`try {
-  MimeMessage message = new MimeMessage(session_);
+      `try {
+        MimeMessage message = new MimeMessage(session_);
 
-  // don't send email if no sender
-  String from = emailMessage.getFrom();
-  if ( SafetyUtil.isEmpty(from) )
-    return null;
+        // don't send email if no sender
+        String from = emailMessage.getFrom();
+        if ( SafetyUtil.isEmpty(from) )
+          return null;
 
-  // add display name if present
-  String displayName = emailMessage.getDisplayName();
-  if ( SafetyUtil.isEmpty(displayName) ) {
-    message.setFrom(new InternetAddress(from));
-  } else {
-    message.setFrom(new InternetAddress(from, displayName));
-  }
-
-  // attach reply to if present
-  String replyTo = emailMessage.getReplyTo();
-  if ( ! SafetyUtil.isEmpty(replyTo) ) {
-    message.setReplyTo(InternetAddress.parse(replyTo));
-  }
-
-  // don't send email if no subject
-  String subject = emailMessage.getSubject();
-  if ( SafetyUtil.isEmpty(subject) )
-    return null;
-  message.setSubject(subject);
-
-  // don't send email if no body
-  String body = emailMessage.getBody();
-  if ( SafetyUtil.isEmpty(body) )
-    return null;
-  message.setContent(body, "text/html; charset=utf-8");
-
-  // don't send email if no recipient
-  String[] to = emailMessage.getTo();
-  if ( to == null || to.length <= 0 )
-    return null;
-
-  if ( to.length == 1 ) {
-    message.setRecipient(Message.RecipientType.TO, new InternetAddress(to[0], false));
-  } else {
-    message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(StringUtils.join(to, ",")));
-  }
-
-  // send email even if no CC
-  String[] cc = emailMessage.getCc();
-  if ( cc != null && cc.length == 1 ) {
-    message.setRecipient(Message.RecipientType.CC, new InternetAddress(cc[0], false));
-  } else if ( cc != null && cc.length > 1 ) {
-    message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(StringUtils.join(cc, ",")));
-  }
-
-  // send email even if no BCC
-  String[] bcc = emailMessage.getBcc();
-  if ( bcc != null && bcc.length == 1 ) {
-    message.setRecipient(Message.RecipientType.BCC, new InternetAddress(bcc[0], false));
-  } else if ( bcc != null && bcc.length > 1 ) {
-    message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(StringUtils.join(bcc, ",")));
-  }
-
-  // set date
-  message.setSentDate(new Date());
-  return message;
-} catch (Throwable t) {
-  t.printStackTrace();
-  return null;
-}`
-    },
-    {
-      name: 'sendEmail',
-      javaThrows: ['IllegalStateException'],
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'emailMessage',
-          type: 'foam.nanos.notification.email.EmailMessage'
-        }
-      ],
-      javaCode:
-        `
-        if ( ! this.getEnabled() ) return;
-        
-        ((FixedThreadPool) getThreadPool()).submit(x, new ContextAgent() {
-          @Override
-          public void execute(X x) {
-            try {
-              MimeMessage message = createMimeMessage(emailMessage);
-              if ( message == null ) {
-                return;
-              }
-
-              // send message
-              Transport transport = session_.getTransport("smtp");
-              transport.connect();
-              transport.sendMessage(message, message.getAllRecipients());
-              transport.close();
-            } catch (Throwable t) {
-              t.printStackTrace();
-            }
-          }
-        });
-        `
-    },
-    {
-      name: 'start',
-      javaCode:
-        `
-        Properties props = new Properties();
-        props.setProperty("mail.smtp.auth", getAuthenticate() ? "true" : "false");
-        props.setProperty("mail.smtp.starttls.enable", getStarttls() ? "true" : "false");
-        props.setProperty("mail.smtp.host", getHost());
-        props.setProperty("mail.smtp.port", getPort());
-        if ( getAuthenticate() ) {
-          session_ = Session.getInstance(props, new SMTPAuthenticator(getUsername(), getPassword()));
+        // add display name if present
+        String displayName = emailMessage.getDisplayName();
+        if ( SafetyUtil.isEmpty(displayName) ) {
+          message.setFrom(new InternetAddress(from));
         } else {
-          session_ = Session.getInstance(props);
+          message.setFrom(new InternetAddress(from, displayName));
         }
-        `
+
+        // attach reply to if present
+        String replyTo = emailMessage.getReplyTo();
+        if ( ! SafetyUtil.isEmpty(replyTo) ) {
+          message.setReplyTo(InternetAddress.parse(replyTo));
+        }
+
+        // don't send email if no subject
+        String subject = emailMessage.getSubject();
+        if ( SafetyUtil.isEmpty(subject) )
+          return null;
+        message.setSubject(subject);
+
+        // don't send email if no body
+        String body = emailMessage.getBody();
+        if ( SafetyUtil.isEmpty(body) )
+          return null;
+        message.setContent(body, "text/html; charset=utf-8");
+
+        // don't send email if no recipient
+        String[] to = emailMessage.getTo();
+        if ( to == null || to.length <= 0 )
+          return null;
+
+        if ( to.length == 1 ) {
+          message.setRecipient(Message.RecipientType.TO, new InternetAddress(to[0], false));
+        } else {
+          message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(StringUtils.join(to, ",")));
+        }
+
+        // send email even if no CC
+        String[] cc = emailMessage.getCc();
+        if ( cc != null && cc.length == 1 ) {
+          message.setRecipient(Message.RecipientType.CC, new InternetAddress(cc[0], false));
+        } else if ( cc != null && cc.length > 1 ) {
+          message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(StringUtils.join(cc, ",")));
+        }
+
+        // send email even if no BCC
+        String[] bcc = emailMessage.getBcc();
+        if ( bcc != null && bcc.length == 1 ) {
+          message.setRecipient(Message.RecipientType.BCC, new InternetAddress(bcc[0], false));
+        } else if ( bcc != null && bcc.length > 1 ) {
+          message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(StringUtils.join(bcc, ",")));
+        }
+
+        // set date
+        message.setSentDate(new Date());
+        return message;
+      } catch (Throwable t) {
+        t.printStackTrace();
+        return null;
+      }`
     }
   ]
 });

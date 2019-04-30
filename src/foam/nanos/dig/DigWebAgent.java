@@ -20,7 +20,7 @@ import foam.nanos.http.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.PrefixLogger;
 import foam.nanos.notification.email.EmailMessage;
-import foam.nanos.notification.email.EmailService;
+import foam.util.Emails.EmailsUtility;
 import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
 import javax.servlet.http.HttpServletResponse;
@@ -463,8 +463,7 @@ public class DigWebAgent
 
       out.print(data);
     } else {
-      EmailService emailService = (EmailService) x.get("email");
-      EmailMessage message      = new EmailMessage();
+      EmailMessage message = new EmailMessage();
 
       // For multiple receiver
       String[]  email = emailParam.split(",");
@@ -477,7 +476,7 @@ public class DigWebAgent
 
       message.setBody(newData);
 
-      emailService.sendEmail(x, message);
+      EmailsUtility.sendEmailFromTemplate(getX(), null, message, null, null);
     }
   }
 
