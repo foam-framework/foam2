@@ -460,6 +460,12 @@ foam.CLASS({
       }
     },
 
+    function outputClassInfo(o) {
+      this.out('{"class":"__Class__","forClass_":');
+      this.outputString(o.id);
+      this.out('}');
+    },
+
     {
       name: 'output',
       code: foam.mmethod({
@@ -484,7 +490,7 @@ foam.CLASS({
         },
         Object: function(o) {
           if ( foam.core.FObject.isSubClass(o) ) {
-            this.output({ class: '__Class__', forClass_: o.id });
+            this.outputClassInfo(o);
           } else if ( o.outputJSON ) {
             o.outputJSON(this);
           } else {
