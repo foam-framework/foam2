@@ -88,6 +88,12 @@ foam.CLASS({
     {
       name: 'label',
       factory: function(action) { return this.action.label; }
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.ButtonSize',
+      name: 'size',
+      value: 'MEDIUM'
     }
   ],
 
@@ -110,9 +116,7 @@ foam.CLASS({
           this.attrs({ disabled: this.action.createIsEnabled$(this.data$).map((e) => e ? false : 'disabled') });
         }
 
-        if ( this.action.isLink ) {
-          this.addClass(this.myClass('link'));
-        } else if ( this.action.isDestructive && this.action.isSecondary ) {
+        if ( this.action.isDestructive && this.action.isSecondary ) {
           this.addClass(this.myClass('secondary-destructive'));
         } else if ( this.action.isDestructive ) {
           this.addClass(this.myClass('destructive'));
@@ -120,7 +124,7 @@ foam.CLASS({
           this.addClass(this.myClass('secondary'));
         }
 
-        this.addClass(this.myClass(this.action.size.label.toLowerCase()));
+        this.addClass(this.myClass(this.size.label.toLowerCase()));
       }
     },
 
