@@ -58,8 +58,6 @@ foam.CLASS({
     }
 
     ^ .net-nanopay-ui-ActionView-clear {
-      width: 60px;
-      height: 32px;
       margin: 20px;
     }
   `,
