@@ -32,30 +32,13 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'placeholder',
+      factory: function() { return '--'; }
+    },
+    {
       name: 'objToChoice',
-      factory: function() {
-        var f;
-        return function(obj) {
-          if ( f ) return f(obj);
-          var props = obj.cls_.getAxiomsByClass(foam.core.String);
-
-          // Find the first non-hidden string property.
-          for ( var i = 0 ; i < props.length ; i++ ) {
-            var p = props[i];
-            if ( ! p.hidden ) {
-              f = function(obj) {
-                return [obj.id, p.f(obj)];
-              };
-              return f(obj);
-            }
-          }
-
-          f = function(obj) {
-            return [obj.id, obj.id];
-          };
-
-          return f(obj);
-        };
+      value: function(obj) {
+        return [ obj.id, obj.toSummary() ];
       }
     }
   ],
@@ -64,7 +47,7 @@ foam.CLASS({
     function fromProperty(prop) {
       this.SUPER(prop);
       if ( ! this.dao ) {
-        var dao = this.parentObj.__context__[prop.targetDAOKey];
+        var dao = this.parentObj.__subContext__[prop.targetDAOKey];
         this.dao = dao;
       }
     }

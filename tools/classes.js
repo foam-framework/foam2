@@ -66,6 +66,7 @@ var classes = [
   'foam.box.HTTPReplyBox',
   'foam.box.AuthServiceClientBox',
   'foam.nanos.app.AppConfig',
+  'foam.nanos.app.ContextLookupAppConfigService',
   'foam.nanos.http.WebAgent',
   'com.google.foam.demos.heroes.Hero',
   'com.google.auth.TokenVerifier',
@@ -235,6 +236,8 @@ var classes = [
   'foam.nanos.notification.NotificationTemplateDAO',
   'foam.nanos.notification.notifications.ScriptRunNotification',
   'foam.nanos.script.Script',
+//  'foam.nanos.script.ScriptCompiler',
+//  'foam.nanos.script.JavaShellScriptCompiler',
   'foam.nanos.script.TestRunnerScript',
   'foam.nanos.test.Test',
   'foam.nanos.cron.Cron',
@@ -339,7 +342,14 @@ var classes = [
   'foam.support.model.Ticket',
 
   'foam.nanos.dig.exception.EmptyParameterException',
-  'foam.nanos.dig.exception.GeneralException'
+  'foam.nanos.dig.exception.GeneralException',
+
+
+  // Testing support
+  'foam.test.TestEnum',
+  'foam.test.AllSerializableProperties',
+  'foam.nanos.test.EchoService',
+  'foam.nanos.test.SerializationTestEchoService'
 ];
 
 var abstractClasses = [
@@ -351,6 +361,7 @@ var abstractClasses = [
 var skeletons = [
   'foam.dao.DAO',
   'foam.mop.MOP',
+  'foam.nanos.app.AppConfigService',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.AgentAuthService',
   'foam.nanos.auth.email.EmailDocInterface',
@@ -358,7 +369,8 @@ var skeletons = [
   'foam.nanos.auth.token.TokenService',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.POP3Email',
-  'foam.nanos.notification.push.PushService'
+  'foam.nanos.notification.push.PushService',
+  'foam.nanos.test.EchoService'
 ];
 
 var proxies = [

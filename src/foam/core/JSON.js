@@ -52,23 +52,6 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
-  name: 'ObjectToJSONRefinement',
-  refines: 'foam.core.Object',
-
-  properties: [
-    {
-      name: 'toJSON',
-      value: function toJSON(value, outputter) {
-        return value instanceof Date ?
-            { class: '__Timestamp__', value: value.getTime() } :
-            value;
-      }
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.core',
   name: '__Property__',
 
   axioms: [
@@ -110,13 +93,29 @@ foam.CLASS({
   axioms: [
     {
       name: 'create',
-      installInClass: function(clsName) {
-        return foam.lookup(clsName, true);
+      installInClass: function(cls) {
+        cls.create = function(args, x) {
+          return foam.lookup(args.forClass_, true);
+        };
       }
     }
   ]
 });
 
+foam.CLASS({
+  package: 'foam.core',
+  name: '__Timestamp__',
+  axioms: [
+    {
+      name: 'create',
+      installInClass: function(cls) {
+        cls.create = function(args) {
+          return new Date(args.value);
+        }
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.core',
@@ -382,11 +381,12 @@ foam.CLASS({
     },
 
     function outputDate(o) {
-      if ( this.formatDatesAsNumbers ) {
-        this.out(o.valueOf());
-      } else {
-        this.out(JSON.stringify(o));
-      }
+      // Serialize an unambiguous timestamp.  Date and DateTime
+      // property can provide an alternative toJSON() and
+      // adapt/javaJSONParser mechanism to save space.
+      this.out('{"class":"__Timestamp__","value":');
+      this.output(this.formatDatesAsNumbers ? o.getTime() : o.toISOString());
+      this.out('}');
     },
 
     function outputFunction(o) {

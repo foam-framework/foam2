@@ -75,7 +75,7 @@ foam.CLASS({
   ],
 
   constants: {
-    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor', 'secondaryHoverColor', 'secondaryDisabledColor', 'groupCSS', 'backgroundColor' ]
+    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor', 'secondaryHoverColor', 'secondaryDisabledColor', 'destructiveColor', 'destructiveHoverColor', 'destructiveDisabledColor', 'groupCSS', 'backgroundColor' ]
   },
 
   messages: [
@@ -124,8 +124,8 @@ foam.CLASS({
     },
     {
       name: 'appConfig',
-      expression: function(client) {
-        return client && client.appConfig || null;
+      expression: function(client$appConfig) {
+        return client$appConfig || null;
       }
     },
     {
@@ -170,6 +170,9 @@ foam.CLASS({
     'secondaryColor',
     'secondaryHoverColor',
     'secondaryDisabledColor',
+    'destructiveColor',
+    'destructiveHoverColor',
+    'destructiveDisabledColor',
     'tableColor',
     'tableHoverColor',
     'accentColor',

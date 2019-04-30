@@ -47,6 +47,60 @@ foam.CLASS({
       name: 'hidden',
       value: 'testing...',
       visibility: foam.u2.Visibility.HIDDEN
+    },
+    {
+      class: 'Boolean',
+      name: 'flag',
+      value: true
+    },
+    {
+      class: 'String',
+      name: 'disabledExpression',
+      visibilityExpression: function(flag) {
+        return foam.u2.Visibility[flag ? 'RW' : 'DISABLED'];
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'disabledBooleanExpression',
+      visibilityExpression: function(flag) {
+        return foam.u2.Visibility[flag ? 'RW' : 'DISABLED'];
+      }
+    },
+    {
+      class: 'Date',
+      name: 'disabledDateExpression',
+      visibilityExpression: function(flag) {
+        return foam.u2.Visibility[flag ? 'RW' : 'DISABLED'];
+      }
+    },
+    {
+      class: 'String',
+      name: 'readOnlyExpression',
+      visibilityExpression: function(flag) {
+        return foam.u2.Visibility[flag ? 'RW' : 'RO'];
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'readOnlyBooleanExpression',
+      visibilityExpression: function(flag) {
+        return foam.u2.Visibility[flag ? 'RW' : 'RO'];
+      }
+    },
+    {
+      class: 'Date',
+      name: 'readOnlyDateExpression',
+      visibilityExpression: function(flag) {
+        return foam.u2.Visibility[flag ? 'RW' : 'RO'];
+      }
+    },
+    {
+      class: 'String',
+      name: 'hiddenExpression',
+      visibilityExpression: function(flag) {
+        return foam.u2.Visibility[flag ? 'RW' : 'HIDDEN'];
+      }
     }
   ]
 });

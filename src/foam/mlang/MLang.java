@@ -179,4 +179,17 @@ public class MLang
       throw new RuntimeException("Attempt to call CLASS_OF on non Modelled class." + cls);
     }
   }
+
+  public static Predicate CONTAINS_IC(Object o1, Object o2) {
+    return new ContainsIC.Builder(null)
+    .setArg1(MLang.prepare(o1))
+    .setArg2(MLang.prepare(o2))
+      .build();
+  }
+
+  public static Predicate HAS(Object o) {
+    return new Has.Builder(null)
+      .setArg1(MLang.prepare(o))
+      .build();
+  }
 }

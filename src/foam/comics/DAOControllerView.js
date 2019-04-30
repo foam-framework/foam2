@@ -38,12 +38,12 @@ foam.CLASS({
     ^ {
       width: fit-content;
       max-width: 100vw;
-      margin: auto;
+      margin: 24px auto 0 auto;
       max-width: calc(100vw - 80px);
     }
 
     ^top-row {
-      align-items: flex-end;
+      align-items: center;
       margin-bottom: 10px;
     }
 
@@ -54,12 +54,7 @@ foam.CLASS({
 
     ^title-container > * {
       color: #555;
-      display: inline-block;
-      margin: 0.67rem 0;
-    }
-
-    ^title-container > * + * {
-      margin-left: 1rem;
+      margin: 0;
     }
 
     ^container {
@@ -147,7 +142,9 @@ foam.CLASS({
               .start('h1')
                 .add(this.data.title$)
               .end()
-              .add(this.data.subtitle$)
+              .start()
+                .add(this.data.subtitle$)
+              .end()
             .end()
             .callIfElse(this.data.primaryAction, function() {
               this.startContext({ data: self })

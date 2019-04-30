@@ -1452,7 +1452,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'upperCase_',
+      name: 'upperCase_'
     }
   ],
 
@@ -2038,6 +2038,7 @@ foam.CLASS({
     },
     {
       name: 'partialEval',
+      code: function() { return this; },
       javaCode:
       `Not predicate = (Not) this.fclone();
     if ( this.arg1_ instanceof Not )
@@ -3179,6 +3180,7 @@ foam.CLASS({
     'foam.mlang.sink.Sum',
     'foam.mlang.sink.Unique',
     'foam.mlang.Absolute',
+    'foam.mlang.sink.Average',
     'foam.mlang.Mux',
     'foam.mlang.Partition'
   ],

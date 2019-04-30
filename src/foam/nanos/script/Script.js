@@ -59,17 +59,7 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'id',
-      tableCellFormatter: function(value) {
-        this.start()
-          .style({
-            'overflow': 'hidden',
-            'max-width': '25ch',
-            'min-width': '25ch',
-            'text-overflow': 'ellipsis'
-          }).add(value)
-        .end();
-      }
+      name: 'id'
     },
     {
       class: 'Boolean',
@@ -86,17 +76,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'description',
-      documentation: 'Description of the script.',
-      tableCellFormatter: function(value) {
-        this.start()
-          .style({
-            'overflow': 'hidden',
-            'max-width': '25ch',
-            'min-width': '25ch',
-            'text-overflow': 'ellipsis'
-          }).add(value)
-        .end();
-      }
+      documentation: 'Description of the script.'
     },
     {
       class: 'DateTime',
@@ -111,15 +91,22 @@ foam.CLASS({
       visibility: 'RO',
       units: 'ms',
       tableCellFormatter: function(value) {
-        this.start()
-          .style({
-            'overflow': 'hidden',
-            'max-width': '5ch',
-            'min-width': '5ch',
-            'text-overflow': 'ellipsis'
-          }).add(value)
-        .end();
-      }
+        var hours = Math.floor(value / 3600000);
+        var minutes = Math.floor(value / 60000);
+        var seconds = Math.floor(value / 1000);
+        var milliseconds = value % 1000;
+
+        if ( hours ) {
+          this.add(`${hours}h ${minutes}m ${seconds}s ${milliseconds}ms`);
+        } else if ( minutes ) {
+          this.add(`${minutes}m ${seconds}s ${milliseconds}ms`);
+        } else if ( seconds ) {
+          this.add(`${seconds}s ${milliseconds}ms`);
+        } else {
+          this.add(`${milliseconds}ms`);
+        }
+      },
+      tableWidth: 125
     },
     /*
     {
@@ -135,7 +122,8 @@ foam.CLASS({
       class: 'Boolean',
       name: 'server',
       documentation: 'Runs on server side if enabled.',
-      value: true
+      value: true,
+      tableWidth: 80
     },
     {
       class: 'foam.core.Enum',
@@ -144,7 +132,8 @@ foam.CLASS({
       documentation: 'Status of script.',
       visibility: 'RO',
       value: 'UNSCHEDULED',
-      javaValue: 'ScriptStatus.UNSCHEDULED'
+      javaValue: 'ScriptStatus.UNSCHEDULED',
+      tableWidth: 100
     },
     {
       class: 'String',
@@ -284,6 +273,7 @@ foam.CLASS({
   actions: [
     {
       name: 'run',
+      tableWidth: 60,
       code: function() {
         var self = this;
         this.output = '';
