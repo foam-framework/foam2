@@ -7,14 +7,21 @@
 foam.CLASS({
   package: 'foam.nanos.notification.email',
   name: 'NullEmailService',
+
   implements: [
     'foam.nanos.notification.email.EmailService'
   ],
+
   methods: [
     {
       name: 'sendEmail',
       javaCode: 'return null;',
       code: function() { return null; }
+    },
+    {
+      name: 'start',
+      javaCode: '//NOOP',
+      code: function() { return; }
     }
   ]
 });

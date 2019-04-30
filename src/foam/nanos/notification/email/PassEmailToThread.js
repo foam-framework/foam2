@@ -7,15 +7,10 @@
 foam.CLASS({
   package: 'foam.nanos.notification.email',
   name: 'PassEmailToThread',
-  extends: 'foam.dao.ProxyDAO',
-
-  implements: [
-    'foam.nanos.NanoService',
-    // 'foam.nanos.notification.email.EmailService'
-  ],
+  extends: 'foam.nanos.notification.ProxyEmailService',
 
   imports: [
-    'threadPool?', // Only imported in Java
+    'threadPool?'
   ],
 
   javaImports: [
@@ -37,55 +32,9 @@ foam.CLASS({
     'foam.nanos.auth.Group'
   ],
 
-  properties: [
-    {
-      name: 'emailService',
-      documentation: `This property determines how to process the email.`,
-      of: 'foam.nanos.notification.email.EmailService',
-      class: 'FObjectProperty'
-    },
-    {
-      class: 'Boolean',
-      name: 'enabled',
-      value: true,
-      javaFactory: 'return true;'
-    },
-    {
-      class: 'String',
-      name: 'host',
-      value: '127.0.0.1'
-    },
-    {
-      class: 'String',
-      name: 'port',
-      value: '25'
-    },
-    {
-      class: 'Boolean',
-      name: 'authenticate',
-      value: false
-    },
-    {
-      class: 'Boolean',
-      name: 'starttls',
-      value: false
-    },
-    {
-      class: 'String',
-      name: 'username',
-      value: null
-    },
-    {
-      class: 'String',
-      name: 'password',
-      value: null
-    }
-  ],
-
   methods: [
     {
-      name: 'put_',
-      javaThrows: ['IllegalStateException'],
+      name: 'sendEmail',
       javaCode:
         `
         if ( ! this.getEnabled() ) return;
@@ -94,18 +43,10 @@ foam.CLASS({
           @Override
           public void execute(X x) {
             try {
-              MimeMessage message = createMimeMessage(emailMessage);
-              if ( message == null ) {
-                return;
-              }
-
-              // send message
-              Transport transport = session_.getTransport("smtp");
-              transport.connect();
-              transport.sendMessage(message, message.getAllRecipients());
-              transport.close();
+              getDelegate().sendEmail(x, (foam.nanos.notification.email.EmailMessage)obj);
             } catch (Throwable t) {
               t.printStackTrace();
+              System.out.println("ANNA PASSEmailToThread");
             }
           }
         });
@@ -114,18 +55,14 @@ foam.CLASS({
     {
       name: 'start',
       javaCode:
-        `
-        Properties props = new Properties();
-        props.setProperty("mail.smtp.auth", getAuthenticate() ? "true" : "false");
-        props.setProperty("mail.smtp.starttls.enable", getStarttls() ? "true" : "false");
-        props.setProperty("mail.smtp.host", getHost());
-        props.setProperty("mail.smtp.port", getPort());
-        if ( getAuthenticate() ) {
-          session_ = Session.getInstance(props, new SMTPAuthenticator(getUsername(), getPassword()));
-        } else {
-          session_ = Session.getInstance(props);
-        }
-        `
+      `
+      try{
+        getDelegate().start();
+      } catch(Exception e) {
+        e.printStackTrace();
+        System.out.println("ANNNA PASSEmailToThread");
+      }
+      `
     }
   ]
 });

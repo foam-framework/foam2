@@ -8,13 +8,11 @@ foam.CLASS({
   package: 'foam.nanos.notification.email',
   name: 'SMTPEmailService',
 
-  documentation: 'Implementation of Email Service using SMTP',
-
   implements: [
-    'foam.nanos.NanoService',
     'foam.nanos.notification.email.EmailService'
-
   ],
+
+  documentation: 'Implementation of Email Service using SMTP',
 
   imports: [
     'threadPool?'
@@ -184,8 +182,25 @@ foam.CLASS({
         return message;
       } catch (Throwable t) {
         t.printStackTrace();
+        System.out.println("ANNNA SMTPEMAILSERVICE");
         return null;
       }`
+    },
+    {
+      name: 'start',
+      javaCode:
+        `
+        Properties props = new Properties();
+        props.setProperty("mail.smtp.auth", getAuthenticate() ? "true" : "false");
+        props.setProperty("mail.smtp.starttls.enable", getStarttls() ? "true" : "false");
+        props.setProperty("mail.smtp.host", getHost());
+        props.setProperty("mail.smtp.port", getPort());
+        if ( getAuthenticate() ) {
+          session_ = Session.getInstance(props, new SMTPAuthenticator(getUsername(), getPassword()));
+        } else {
+          session_ = Session.getInstance(props);
+        }
+        `
     }
   ]
 });

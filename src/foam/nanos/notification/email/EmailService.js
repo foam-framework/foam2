@@ -8,6 +8,10 @@ foam.INTERFACE({
   package: 'foam.nanos.notification.email',
   name: 'EmailService',
 
+  implements: [
+    'foam.nanos.NanoService',
+  ],
+
   methods: [
     {
       name: 'sendEmail',
