@@ -73,7 +73,7 @@
 
       FObject ret =  getDelegate().put_(x, obj);
 
-      applyRules(x, obj, oldObj,
+      applyRules(x, ret, oldObj,
         getAfterGroup( oldObj == null ? Operations.CREATE : Operations.UPDATE
           , Operations.CREATE_OR_UPDATE
       ));

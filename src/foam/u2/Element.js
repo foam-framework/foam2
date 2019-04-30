@@ -84,10 +84,7 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'code',
-      postSet: function(_, code) {
-        this.expands_ = code.indexOf('^') != -1;
-      }
+      name: 'code'
     },
     {
       name: 'name',
@@ -101,7 +98,10 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'expands_',
-      documentation: 'True iff the CSS contains a ^ which needs to be expanded.'
+      documentation: 'True iff the CSS contains a ^ which needs to be expanded.',
+      expression: function(code) {
+        return code.includes('^');
+      }
     }
   ],
 
@@ -2420,10 +2420,10 @@ foam.CLASS({
       name: 'data',
       attribute: true
     },
-    {
-      class: 'String',
-      name: 'error_'
-    },
+    // {
+    //   class: 'String',
+    //   name: 'error_'
+    // },
     {
       class: 'Enum',
       of: 'foam.u2.Visibility',
@@ -2467,7 +2467,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.updateMode_(this.mode);
-      this.enableClass('error', this.error_$);
+      // this.enableClass('error', this.error_$);
       this.setAttribute('title', this.error_$);
     },
 
@@ -2478,13 +2478,15 @@ foam.CLASS({
     function fromProperty(p) {
       this.visibility = p.visibility;
 
-      if ( p.validateObj ) {
-        var s = foam.core.ExpressionSlot.create({
-          obj$: this.__context__.data$,
-          code: p.validateObj
-        });
-        this.error_$.follow(s);
-      }
+      this.attr('name', p.name);
+
+      // if ( p.validateObj ) {
+      //   var s = foam.core.ExpressionSlot.create({
+      //     obj$: this.__context__.data$,
+      //     code: p.validateObj
+      //   });
+      //   this.error_$.follow(s);
+      // }
     }
   ]
 });
