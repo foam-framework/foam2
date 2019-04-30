@@ -89,7 +89,7 @@ foam.CLASS({
       font-size: 14px;
       letter-spacing: 0.2px;
       color: #373a3c;
-      background: #edf0f5;
+      background: %BACKGROUNDCOLOR%;
       margin: 0;
     }
     .foam-u2-UnstyledActionView-signIn {

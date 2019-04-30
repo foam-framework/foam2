@@ -53,7 +53,7 @@ foam.CLASS({
     }
 
     ^title-container > * {
-      color: #555;
+      color: %PRIMARYCOLOR%;
       margin: 0;
     }
 
