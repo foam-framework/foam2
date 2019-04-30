@@ -62,7 +62,6 @@ foam.CLASS({
     ^ h1 {
       font-size: 16px;
       font-weight: 100;
-      color: white;
     }
     ^carrot {
       width: 0;
@@ -138,7 +137,6 @@ foam.CLASS({
     }
     ^ .foam-nanos-menu-SubMenuView-inner > div:hover {
       background-color: %SECONDARYCOLOR%;
-      color: white;
       cursor: pointer;
     }
     ^ .foam-nanos-menu-SubMenuView-inner::before {

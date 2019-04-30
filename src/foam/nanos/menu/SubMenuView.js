@@ -39,7 +39,6 @@ foam.CLASS({
       border-bottom-right-radius: 5px;
     }
     ^inner div:hover {
-      color: white;
       background: %ACCENTCOLOR% !important;
       border-left: solid 1px %ACCENTCOLOR%;
       border-right: solid 1px %ACCENTCOLOR%;
