@@ -12,7 +12,7 @@ import foam.dao.DAO;
 import foam.dao.ProxySink;
 
 /**
- * Copy an PMInfoDAO entries into other PMInfoDAOs.
+ * Copy a PMInfoDAO entries into other PMInfoDAOs.
  * Used for PM Rollup from, for example,
  * 1 minute into 5 minute.
  */
@@ -31,7 +31,7 @@ public class DAOPMLoggerCopySink
     }
     PMInfo info = (PMInfo) obj;
     for ( DAO dao : toDAOs_ ) {
-      PMInfo i = (PMInfo) dao.find(info);
+      PMInfo i = (PMInfo) dao.inX(getX()).find(info);
       if ( i == null ) {
         i = (PMInfo) info.fclone();
       } else {
