@@ -29,12 +29,14 @@ foam.CLASS({
   css: `
     ^ {
       width: 85%;
-      
       min-width: 992px;
       margin: auto;
       position: relative;
       overflow: hidden;
       zoom: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
     ^ div {
       font-size:14px;
@@ -81,6 +83,11 @@ foam.CLASS({
     }
     ^ .mini-links {
       float: left;
+    }
+    ^ button {
+      border: none !important;
+      box-shadow: none !important;
+      background: none !important;
     }
   `,
 
