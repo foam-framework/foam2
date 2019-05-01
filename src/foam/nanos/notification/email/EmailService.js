@@ -23,12 +23,6 @@ foam.INTERFACE({
           type: 'foam.nanos.notification.email.EmailMessage'
         }
       ]
-    },
-    {
-      name: 'start',
-      javaThrows: [
-        'java.lang.Exception'
-      ]
     }
   ]
 });

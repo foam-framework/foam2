@@ -174,6 +174,7 @@ foam.CLASS({
       `
       if ( ! this.getEnabled() ) return;
         try {
+          start();
           MimeMessage message = createMimeMessage(emailMessage);
           // send message
           Transport transport = session_.getTransport("smtp");

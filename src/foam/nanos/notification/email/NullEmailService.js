@@ -17,11 +17,6 @@ foam.CLASS({
       name: 'sendEmail',
       javaCode: 'return;',
       code: function() { return; }
-    },
-    {
-      name: 'start',
-      javaCode: 'return;',
-      code: function() { return; }
     }
   ]
 });
