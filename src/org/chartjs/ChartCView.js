@@ -65,7 +65,7 @@ foam.CLASS({
   ],
 
   reactions: [
-    ['', 'propertyChange.config', 'configUpdate']
+
   ],
 
   methods: [
@@ -85,11 +85,6 @@ foam.CLASS({
   ],
 
   listeners: [
-    {
-      name: 'configUpdate',
-      code: function() {
-
-      }
-    }
+    
   ]
 });
