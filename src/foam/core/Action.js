@@ -22,7 +22,9 @@ foam.CLASS({
   name: 'Action',
 
   requires: [
-    'foam.core.ExpressionSlot'
+    'foam.core.ConstantSlot',
+    'foam.core.ExpressionSlot',
+    'foam.core.PromiseSlot'
   ],
 
   documentation: 'An Action is a method with extra GUI support.',
@@ -94,14 +96,14 @@ foam.CLASS({
       name: 'isAvailable',
       label: 'Available',
       help: 'Function to determine if action is available.',
-      value: function() { return true; }
+      value: null
     },
     {
       class: 'Function',
       name: 'isEnabled',
       label: 'Enabled',
       help: 'Function to determine if action is enabled.',
-      value: function() { return true; }
+      value: null
     },
     {
       class: 'Function',
@@ -134,7 +136,7 @@ foam.CLASS({
 
   methods: [
     function andSlots(a, b) {
-      return foam.core.ExpressionSlot.create({
+      return this.ExpressionSlot.create({
         args: [ a, b ],
         code: function(a, b) {
           return a && b;
@@ -143,47 +145,35 @@ foam.CLASS({
     },
 
     function andSlotAndPromise(slot, promise) {
-      return this.andSlots(slot, foam.core.PromiseSlot.create({promise: promise}));
+      return this.andSlots(slot, this.PromiseSlot.create({
+        promise: promise
+      }));
     },
 
     function checkPermission(x) {
       if ( ! this.permissionRequired || ! x.auth ) return Promise.resolve(true);
-      var permission = this.sourceCls_.id + ".permission." + this.name;
-      return x.auth.check(null, permission)
+      var permission = this.sourceCls_.id + '.permission.' + this.name;
+      return x.auth.check(null, permission);
     },
 
     function isEnabledFor(data) {
-      return this.isEnabled ?
-        data.slot(this.isEnabled).get() :
-        true ;
+      return this.isEnabled
+        ? foam.Function.withArgs(this.isEnabled, data)
+        : true;
     },
 
     function createIsEnabled$(data$) {
-      var slot = foam.core.ExpressionSlot.create({
-         obj$: data$,
-         code: this.isEnabled
-       });
-
-      return this.permissionRequired ?
-        this.andSlotAndPromise(slot, this.checkPermission(data$.get().__subContext__)) :
-        slot ;
+      return this.createSlot_(this.isEnabled, data$);
     },
 
     function isAvailableFor(data) {
-      return this.isAvailable ?
-        foam.Function.withArgs(this.isAvailable, data) :
-        true ;
+      return this.isAvailable
+        ? foam.Function.withArgs(this.isAvailable, data)
+        : true;
     },
 
     function createIsAvailable$(data$) {
-      var slot = foam.core.ExpressionSlot.create({
-        obj$: data$,
-        code: this.isAvailable
-      });
-
-      return this.permissionRequired ?
-        this.andSlotAndPromise(slot, this.checkPermission(data$.get().__subContext__)) :
-        slot ;
+      return this.createSlot_(this.isAvailable, data$);
     },
 
     function maybeCall(ctx, data) {
@@ -208,6 +198,26 @@ foam.CLASS({
       proto[this.name] = function() {
         return action.maybeCall(this.__context__, this);
       };
+    },
+
+    function createSlot_(fn, data$) {
+      if ( fn == null ) {
+        if ( ! this.permissionRequired ) {
+          return this.ConstantSlot.create({ value: true });
+        }
+        return this.PromiseSlot.create({
+          promise: this.checkPermission(data$.get().__subContext__)
+        });
+      }
+
+      var slot = this.ExpressionSlot.create({
+        obj$: data$,
+        code: fn
+      });
+
+      return this.permissionRequired ?
+        this.andSlotAndPromise(slot, this.checkPermission(data$.get().__subContext__)) :
+        slot;
     }
   ]
 });

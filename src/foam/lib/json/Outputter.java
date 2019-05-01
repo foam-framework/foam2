@@ -21,8 +21,8 @@ import org.apache.commons.io.IOUtils;
 
 public class Outputter
   extends AbstractSink
-  implements foam.lib.Outputter
-{
+  implements foam.lib.Outputter {
+  
   protected static ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
     protected SimpleDateFormat initialValue() {
@@ -38,6 +38,7 @@ public class Outputter
   protected boolean       outputShortNames_    = false;
   protected boolean       outputDefaultValues_ = false;
   protected boolean       outputClassNames_    = true;
+  protected boolean       outputReadableDates_ = true;
 
   public Outputter() {
     this(OutputterMode.FULL);
@@ -246,8 +247,17 @@ public class Outputter
         value.getClass().isArray();
   }
 
+  public void outputDateValue(java.util.Date date) {
+    if ( outputReadableDates_ )
+      outputString(sdf.get().format(date));
+    else
+      outputNumber(date.getTime());
+  }
+
   protected void outputDate(java.util.Date date) {
-    outputString(sdf.get().format(date));
+    writer_.append("{\"class\":\"__Timestamp__\",\"value\":");
+    outputDateValue(date);
+    writer_.append("}");
   }
 
   protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {

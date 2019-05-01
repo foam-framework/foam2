@@ -103,11 +103,11 @@ foam.CLASS({
 
       if ( this.action ) {
         if ( this.action.isAvailable ) {
-          this.show(this.action.createIsAvailable$(this.data$));
+          this.enableClass(this.myClass('unavailable'), this.action.createIsAvailable$(this.data$), true);
         }
 
         if ( this.action.isEnabled ) {
-          this.attrs({disabled: this.action.createIsEnabled$(this.data$).map(function(e) { return e ? false : 'disabled'; })});
+          this.attrs({ disabled: this.action.createIsEnabled$(this.data$).map((e) => e ? false : 'disabled') });
         }
 
         if ( this.action.isDestructive && this.action.isSecondary ) {
