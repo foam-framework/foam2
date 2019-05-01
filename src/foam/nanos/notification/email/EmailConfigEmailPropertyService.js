@@ -29,27 +29,23 @@ foam.CLASS({
         EmailConfig emailConfig = (EmailConfig) x.get("emailConfig");
 
         // Service property check
-        if ( emailConfig == null
-          || SafetyUtil.isEmpty(emailConfig.getReplyTo())
-          || SafetyUtil.isEmpty(emailConfig.getDisplayName())
-          || SafetyUtil.isEmpty(emailConfig.getFrom()) 
-        ) {
+        if ( emailConfig == null ) {
           logger.error( "EmailConfig service has invalid property settings.");
           return emailMessage;
         }
 
         // REPLY TO:
-        if ( SafetyUtil.isEmpty(emailMessage.getReplyTo()) ) {
+        if ( ! emailMessage.isPropertySet("replyTo") ) {
           emailMessage.setReplyTo(emailConfig.getReplyTo());
         }
 
         // DISPLAY NAME:
-        if ( SafetyUtil.isEmpty(emailMessage.getDisplayName()) ) {
+        if ( ! emailMessage.isPropertySet("displayName") ) {
           emailMessage.setDisplayName(emailConfig.getDisplayName());
         }
 
         // FROM:
-        if ( SafetyUtil.isEmpty(emailMessage.getFrom()) ) {
+        if ( ! emailMessage.isPropertySet("from") ) {
           emailMessage.setFrom(emailConfig.getFrom());
         }
 
