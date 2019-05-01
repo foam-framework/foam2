@@ -366,9 +366,13 @@ public class Outputter
     writer_.append("}");
   }
 
+  public void outputClassInfoValue(ClassInfo info) {
+    outputString(info.getId());
+  }
+
   protected void outputClassInfo(ClassInfo info) {
     writer_.append("{\"class\":\"__Class__\",\"forClass_\":");
-    outputString(info.getId());
+    outputClassInfoValue(info);
     writer_.append("}");
   }
 

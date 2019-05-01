@@ -188,12 +188,6 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'passClassesByReference',
-      help: 'If true, Class objects are passed as __Class__ references rather than by value.',
-      value: true
-    },
-    {
-      class: 'Boolean',
       name: 'formatDatesAsNumbers',
       value: false
     },
@@ -659,7 +653,6 @@ foam.LIB({
     Compact: foam.json.Outputter.create({
       pretty: false,
       strict: false,
-      passClassesByReference: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false
     }),
@@ -668,7 +661,6 @@ foam.LIB({
     Short: foam.json.Outputter.create({
       pretty: false,
       strict: false,
-      passClassesByReference: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
       // TODO: No deserialization support for shortnames yet.
@@ -680,7 +672,6 @@ foam.LIB({
     Network: foam.json.Outputter.create({
       pretty: false,
       strict: true,
-      passClassesByReference: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: true,
       // TODO: No deserialization support for shortnames yet.
@@ -695,7 +686,6 @@ foam.LIB({
     Storage: foam.json.Outputter.create({
       pretty: false,
       strict: false,
-      passClassesByReference: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
       // TODO: No deserialization support for shortnames yet.

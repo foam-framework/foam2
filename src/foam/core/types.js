@@ -344,9 +344,8 @@ foam.CLASS({
   properties: [
     {
       name: 'toJSON',
-      value: function toJSON(value, outputter) {
-        return value == null ? null :
-          outputter.passClassesByReference ? value : value.id;
+      value: function toJSON(value, _) {
+        return value.id;
       }
     },
     [
