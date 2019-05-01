@@ -53,9 +53,9 @@ foam.CLASS({
       vertical-align: middle;
     }
     ^ .copyright-label,
-    ^ .net-nanopay-ui-ActionView-goToTerm,
-    ^ .net-nanopay-ui-ActionView-goToPrivacy,
-    ^ .net-nanopay-ui-ActionView-goTo, 
+    ^ .foam-u2-ActionView-goToTerm,
+    ^ .foam-u2-ActionView-goToPrivacy,
+    ^ .foam-u2-ActionView-goTo,
     ^ .mode {
       background: transparent;
       opacity: 0.6;
@@ -70,12 +70,12 @@ foam.CLASS({
       width: auto !important;
       padding: 0 10px !important;
     }
-    ^ .net-nanopay-ui-ActionView-goToTerm:hover,
-    ^ .net-nanopay-ui-ActionView-goToPrivacy:hover,
-    ^ .net-nanopay-ui-ActionView-goTo:hover {
+    ^ .foam-u2-ActionView-goToTerm:hover,
+    ^ .foam-u2-ActionView-goToPrivacy:hover,
+    ^ .foam-u2-ActionView-goTo:hover {
       text-decoration: underline;
     }
-    ^ .net-nanopay-ui-ActionView-goTo {
+    ^ .foam-u2-ActionView-goTo {
       margin-left: 50px;
     }
     ^ .copyright-label{

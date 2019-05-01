@@ -24,7 +24,6 @@ foam.CLASS({
     'as data'
   ],
 
-  // TODO: CSS classname shouldn't be .net-nanopay-ui-ActionView, fix.
   css: `
     ^ {
       background-color: white;
@@ -57,7 +56,7 @@ foam.CLASS({
       margin: 20px 20px 0 20px;
     }
 
-    ^ .net-nanopay-ui-ActionView-clear {
+    ^ .foam-u2-ActionView-clear {
       margin: 20px;
     }
   `,

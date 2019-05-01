@@ -58,7 +58,7 @@ foam.CLASS({
       vertical-align: top;
       margin-top: 5px;
     }
-    ^ .net-nanopay-ui-ActionView-uploadImage {
+    ^ .foam-u2-ActionView-uploadImage {
       width: 136px;
       height: 40px;
       background: transparent;
