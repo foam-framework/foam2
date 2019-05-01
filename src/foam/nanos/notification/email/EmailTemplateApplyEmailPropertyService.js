@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.notification.email',
   name: 'EmailTemplateApplyEmailPropertyService',
 
-  documentation: 'Used in conjuction with ChainedPropertyService',
+  documentation: 'Fills unset properties on an email with values from the emailTemplate.',
 
   implements: [
     'foam.nanos.notification.email.EmailPropertyService'
