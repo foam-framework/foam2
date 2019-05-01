@@ -149,6 +149,38 @@ foam.CLASS({
       value: ''
     },
     {
+      class: 'Boolean',
+      name: 'pretty',
+      value: true,
+      postSet: function(_, p) {
+        if ( p ) {
+          this.clearProperty('indentStr');
+          this.clearProperty('nlStr');
+          this.clearProperty('postColonStr');
+          this.clearProperty('useShortNames');
+        } else {
+          this.indentStr = this.nlStr = this.postColonStr = null;
+        }
+      }
+    },
+    {
+      // TODO: rename to FON
+      class: 'Boolean',
+      name: 'strict',
+      value: true,
+      postSet: function(_, s) {
+        if ( s ) {
+          this.useShortNames            = false;
+          this.formatDatesAsNumbers     = false;
+          this.alwaysQuoteKeys          = true;
+          this.formatFunctionsAsStrings = true;
+        } else {
+          this.alwaysQuoteKeys          = false;
+          this.formatFunctionsAsStrings = false;
+        }
+      }
+    },
+    {
       class: 'Int',
       name: 'indentLevel_',
       value: 0
@@ -237,38 +269,6 @@ foam.CLASS({
       class: 'Boolean',
       name: 'convertUnserializableToStubs',
       value: false
-    },
-    {
-      class: 'Boolean',
-      name: 'pretty',
-      value: true,
-      postSet: function(_, p) {
-        if ( p ) {
-          this.clearProperty('indentStr');
-          this.clearProperty('nlStr');
-          this.clearProperty('postColonStr');
-          this.clearProperty('useShortNames');
-        } else {
-          this.indentStr = this.nlStr = this.postColonStr = null;
-        }
-      }
-    },
-    {
-      // TODO: rename to FON
-      class: 'Boolean',
-      name: 'strict',
-      value: true,
-      postSet: function(_, s) {
-        if ( s ) {
-          this.useShortNames            = false;
-          this.formatDatesAsNumbers     = false;
-          this.alwaysQuoteKeys          = true;
-          this.formatFunctionsAsStrings = true;
-        } else {
-          this.alwaysQuoteKeys          = false;
-          this.formatFunctionsAsStrings = false;
-        }
-      }
     }
     /*
     {
