@@ -1,4 +1,4 @@
-package foam.nanos.ruler;
+package foam.nanos.ruler.test;
 
 import foam.core.FObject;
 import foam.core.X;
@@ -6,6 +6,7 @@ import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.auth.User;
+import foam.nanos.ruler.*;
 import foam.nanos.test.Test;
 import foam.test.TestUtils;
 
@@ -40,9 +41,9 @@ public class RulerDAOTest extends Test {
     user1.setFirstName("Kristina");
     user1.setEmail("nanos@nanos.net");
     user1 = (User) userDAO.put_(x, user1).fclone();
-    test(user1 instanceof User, "No exception thrown: first rule prevented execution of the rule 3");
+    test(user1 instanceof User, "No exception thrown: first rule prevented execution of the rule 3, and rule 7 with erroneous predicate is not executed.");
     //test
-    test(user1.getEmail().equals("foam@nanos.net"), "RuleDAO changes the email for passed user object");
+    test(user1.getEmail().equals("foam@nanos.net"), "RulerDAO changes the email for passed user object");
     test(user1.getLastName().equals("Smirnova"), "the last rule updated user's last name");
     user1.setEmail("nanos@nanos.net");
     user1 = (User) userDAO.put_(x, user1);
@@ -295,11 +296,11 @@ public class RulerDAOTest extends Test {
 
     //the rule only applied to user2
     rule6 = new Rule();
+    rule6.setId(6);
     rule6.setName("user2 update");
     rule6.setRuleGroup("user2 update");
     rule6.setDaoKey("localUserDAO");
     rule6.setOperation(Operations.UPDATE);
-    rule6.setAfter(false);
     rule6.setSaveHistory(true);
     rule6.setPredicate(EQ(DOT(NEW_OBJ, foam.nanos.auth.User.EMAIL), "user2@nanos.net"));
     RuleAction action6 = new RuleAction() {
@@ -332,6 +333,20 @@ public class RulerDAOTest extends Test {
     };
     rule6.setAsyncAction(asyncAction6);
     rule6 = (Rule) ruleDAO.put_(x, rule6);
+
+    //the rule with erroneous predicate
+    rule7 = new Rule();
+    rule7.setId(7);
+    rule7.setName("Erroneous rule predicate");
+    rule7.setRuleGroup("user created");
+    rule7.setDaoKey("localUserDAO");
+    rule7.setOperation(Operations.CREATE);
+    rule7.setAfter(false);
+    rule7.setPredicate(new DummyErroneousPredicate());
+    rule7.setAction((x1, obj, oldObj, ruler) -> {
+      throw new RuntimeException("this action is not supposed to be executed.");
+    });
+    rule7 = (Rule) ruleDAO.put_(x, rule7);
   }
   public void removeData(X x) {
     ruleDAO.remove_(x, rule1);

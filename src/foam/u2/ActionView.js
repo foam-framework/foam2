@@ -41,10 +41,6 @@ foam.CLASS({
       text-decoration: none;
     }
 
-    ^unavailable {
-      display: none;
-    }
-
     ^:hover {
       background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) );
       background: -moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% );

@@ -111,7 +111,11 @@ public class AuthenticatedDAOTest
 
     // Mock the AuthService.
     UserAndGroupAuthService auth = new UserAndGroupAuthService(x);
-    auth.start();
+    try {
+      auth.start();
+    } catch ( Throwable t ) {
+      test(false, "User and group auth service shouldn't be throwing exceptions.");
+    }
     x = x.put("auth", auth);
 
     return x;

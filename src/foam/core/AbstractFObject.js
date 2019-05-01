@@ -175,7 +175,7 @@ foam.CLASS({
         try {
           FObject ret = getClass().newInstance();
           List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
-          for( PropertyInfo prop : props ) {
+          for ( PropertyInfo prop : props ) {
             if ( ! prop.isSet(this) ) continue;
             prop.cloneProperty(this, ret);
           }

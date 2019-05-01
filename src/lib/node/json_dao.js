@@ -50,7 +50,7 @@ foam.CLASS({
       } catch(e) { }
 
       if ( data && data.length )
-        this.array = foam.json.parseString(data, this);
+        this.array = foam.json.parseString(data, this.__context__);
 
       this.on.put.sub(this.onUpdate);
       this.on.remove.sub(this.onUpdate);

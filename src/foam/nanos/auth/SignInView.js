@@ -111,7 +111,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'email'
+      name: 'email',
+      view: { class: 'foam.u2.TextField', focused: true }
     },
     {
       class: 'Password',

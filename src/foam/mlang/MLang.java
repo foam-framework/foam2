@@ -167,4 +167,29 @@ public class MLang
       .setArg2(new PredicatedExpr(o2))
       .build();
   }
+
+  public static Predicate CLASS_OF(ClassInfo info) {
+    return new IsClassOf(info);
+  }
+
+  public static Predicate CLASS_OF(Class cls) {
+    try {
+      return CLASS_OF((ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null));
+    } catch(NoSuchMethodException|IllegalAccessException|InvocationTargetException e) {
+      throw new RuntimeException("Attempt to call CLASS_OF on non Modelled class." + cls);
+    }
+  }
+
+  public static Predicate CONTAINS_IC(Object o1, Object o2) {
+    return new ContainsIC.Builder(null)
+    .setArg1(MLang.prepare(o1))
+    .setArg2(MLang.prepare(o2))
+      .build();
+  }
+
+  public static Predicate HAS(Object o) {
+    return new Has.Builder(null)
+      .setArg1(MLang.prepare(o))
+      .build();
+  }
 }
