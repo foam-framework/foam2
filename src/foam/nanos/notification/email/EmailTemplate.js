@@ -50,10 +50,7 @@ foam.CLASS({
       class: 'String',
       name: 'body',
       documentation: 'Template body',
-      view: { class: 'foam.u2.tag.TextArea', rows: 40, cols: 150 },
-      javaSetter:
-        `body_ = val;
-        bodyIsSet_ = true;`
+      view: { class: 'foam.u2.tag.TextArea', rows: 40, cols: 150 }
     },
     {
       class: 'String',
@@ -83,6 +80,7 @@ foam.CLASS({
     {
       name: 'apply',
       type: 'foam.nanos.notification.email.EmailMessage',
+      documentation: 'Applies template properties to emailMessage, where emailMessage property is empty',
       javaThrows: ['java.lang.NoSuchFieldException'],
       args: [
         {
@@ -115,6 +113,7 @@ foam.CLASS({
         String tempKeyString = "";
         Object value = null;
         JtwigModel model = null;
+
         EnvironmentConfiguration config = EnvironmentConfigurationBuilder
           .configuration()
             .resources()
@@ -124,6 +123,7 @@ foam.CLASS({
             .and()
           .build();
 
+        // Creating model from template
         for ( Object key : templateArgs.keySet() ) {
           value = templateArgs.get((String)key);
           if ( value instanceof String ) {
@@ -136,69 +136,29 @@ foam.CLASS({
           }
         }
 
-        return fillInEmailProperties_(x, emailMessage, model, config);
-      `
-    },
-    {
-      name: 'fillInEmailProperties_',
-      type: 'foam.nanos.notification.email.EmailMessage',
-      documentation: 'Applies template properties to emailMessage, where emailMessage property is empty',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'emailMessage',
-          type: 'foam.nanos.notification.email.EmailMessage'
-        },
-        {
-          name: 'model',
-          javaType: 'org.jtwig.JtwigModel'
-        },
-        {
-          name: 'config',
-          javaType: 'EnvironmentConfiguration'
-        }
-      ],
-      javaCode: `
-        // BODY:
-        if ( SafetyUtil.isEmpty(emailMessage.getBody()) ) 
-        {
-          JtwigTemplate templateBody = JtwigTemplate.inlineTemplate(getBody(), config);
-          emailMessage.setBody(templateBody.render(model));
+        // Setting properties from template onto EmailMessage
+        if ( ! emailMessage.isPropertySet("body") ) {
+          emailMessage.setBody((JtwigTemplate.inlineTemplate(getBody(), config)).render(model));
         }
         
         // REPLY TO:
-        if ( SafetyUtil.isEmpty(emailMessage.getReplyTo()) &&
-          ! foam.util.SafetyUtil.isEmpty(getReplyTo()) )
-        {
-            JtwigTemplate templateDisplayName = JtwigTemplate.inlineTemplate(getReplyTo(), config);
-            emailMessage.setReplyTo(templateDisplayName.render(model));
+        if ( ! emailMessage.isPropertySet("replyTo") && ! SafetyUtil.isEmpty(getReplyTo()) ) {
+            emailMessage.setReplyTo((JtwigTemplate.inlineTemplate(getReplyTo(), config)).render(model));
         } 
 
         // DISPLAY NAME:
-        if ( SafetyUtil.isEmpty(emailMessage.getDisplayName()) &&
-          ! foam.util.SafetyUtil.isEmpty(getDisplayName()) )
-        {
-          JtwigTemplate templateDisplayName = JtwigTemplate.inlineTemplate(getDisplayName(), config);
-          emailMessage.setDisplayName(templateDisplayName.render(model));
+        if ( ! emailMessage.isPropertySet("displayName") && ! SafetyUtil.isEmpty(getDisplayName()) ) {
+          emailMessage.setDisplayName((JtwigTemplate.inlineTemplate(getDisplayName(), config)).render(model));
         }
 
         // SUBJECT:
-        if ( foam.util.SafetyUtil.isEmpty(emailMessage.getSubject()) &&
-          ! foam.util.SafetyUtil.isEmpty(getSubject()))
-        {
-          JtwigTemplate templateSubject = JtwigTemplate.inlineTemplate(getSubject(), config);
-          emailMessage.setSubject(templateSubject.render(model));
+        if ( ! emailMessage.isPropertySet("subject") && ! SafetyUtil.isEmpty(getSubject()) ) {
+          emailMessage.setSubject((JtwigTemplate.inlineTemplate(getSubject(), config)).render(model));
         }
 
         // SEND TO:
-        if ( emailMessage.getTo().length == 0 &&
-          ! foam.util.SafetyUtil.isEmpty(getSendTo()) )
-        {
-          JtwigTemplate templateSendTo = JtwigTemplate.inlineTemplate(getSendTo(), config);
-          emailMessage.setTo(new String[] {templateSendTo.render(model)});
+        if ( ! emailMessage.isPropertySet("to") && ! SafetyUtil.isEmpty(getSendTo()) ) {
+          emailMessage.setTo(new String[] { (JtwigTemplate.inlineTemplate(getSendTo(), config)).render(model) });
         }
 
         return emailMessage;
