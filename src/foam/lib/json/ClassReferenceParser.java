@@ -44,15 +44,18 @@ public class ClassReferenceParser
     }
 
     String classId = (String) ps.value();
-    // NOTE: ClassReferenceParser expects fully qualified name of a modelled class for class lookup
-    // and returns ClassInfo of the modelled class if found, otherwise return null.
+    // Expects classId be a fully qualified name of a modelled class
+    // with Java code generation for class lookup and returns 
+    // ClassInfo of the modelled class if found, otherwise return null.
     //
     // Eg.,
-    // When parsing { "class": "__Class__", "forClass_": "foam.nanos.auth.User" }
-    // it would return User.getOwnClassInfo() instead of the actual User class.
+    // When parsing
+    //   { "class": "__Class__", "forClass_": "foam.nanos.auth.User" }
+    // returns User.getOwnClassInfo() instead of the actual User class.
     //
-    // And when parsing { "class": "__Class__", "forClass_": "java.lang.Object" }
-    // it would return null because java.lang.Object is not a modelled class.
+    // And when parsing
+    //   { "class": "__Class__", "forClass_": "java.lang.Object" }
+    // returns null because java.lang.Object is not a modelled class.
     try {
       Class cls = Class.forName(classId);
       ClassInfo info = (ClassInfo) cls.getMethod("getOwnClassInfo") .invoke(null);
