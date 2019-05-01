@@ -104,8 +104,7 @@ foam.CLASS({
     },
     {
       class: 'foam.u2.view.TableCellFormatter',
-      name: 'tableCellFormatterProp',
-      generateJava: false
+      name: 'tableCellFormatterProp'
     },
     {
       class: 'foam.core.Byte',
@@ -289,8 +288,7 @@ foam.CLASS({
     {
       class: 'foam.u2.view.TableCellFormatter',
       transient: true,
-      name: 'transientTableCellFormatter',
-      generateJava: false
+      name: 'transientTableCellFormatter'
     },
     {
       class: 'foam.core.Byte',
