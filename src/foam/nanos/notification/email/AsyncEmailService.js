@@ -23,11 +23,7 @@ foam.CLASS({
         ( (FixedThreadPool) x.get("threadPool") ).submit(x, new ContextAgent() {
           @Override
           public void execute(X x) {
-            try {
               getDelegate().sendEmail(x, emailMessage);
-            } catch (Throwable t) {
-              t.printStackTrace();
-            }
           }
         });
       `
