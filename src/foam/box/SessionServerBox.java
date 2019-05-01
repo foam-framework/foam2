@@ -65,7 +65,7 @@ public class SessionServerBox
           // If an existing session is reused with a different remote host then
           // logout the session and force a re-login.
           // logger.warning("Attempt to use session create for ", session.getRemoteHost(), " from ", req.getRemoteHost());
-          msg.replyWithException(new AuthenticationException("Attempt to use session from invalid host."));
+          msg.replyWithException(new AuthenticationException());
           return;
         }
       }
