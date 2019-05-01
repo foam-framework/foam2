@@ -36,7 +36,7 @@ public class FileWebAgent
     EXTS.put("html",  "text/html");
   }
 
-  protected NSpec nspec_;
+  protected NSpec  nspec_;
   protected String path_;
   protected String cwd_;
 
@@ -86,9 +86,7 @@ public class FileWebAgent
               + file.getName() + "\"?>" + file.getName() + "</a></li>");
         }
 
-        pw.write("</ul>\n" +
-            "</body>\n" +
-            "</html>");
+        pw.write("</ul></body></html>");
         return;
       }
 
