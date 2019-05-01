@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.notification.email',
-  name: 'DefaultPropertyEmailTemplateService',
+  name: 'EmailConfigEmailPropertyService',
 
   documentation: 'Used in conjuction with ChainedPropertyService',
 

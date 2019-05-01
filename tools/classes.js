@@ -232,9 +232,9 @@ var classes = [
   'foam.nanos.notification.email.ProxyEmailService',
   // Property set on Emails
   'foam.nanos.notification.email.ChainedPropertyService',
-  'foam.nanos.notification.email.ApplyEmailTemplateService',
+  'foam.nanos.notification.email.EmailTemplateApplyEmailPropertyService',
   'foam.nanos.notification.email.GroupEmailTemplateService',
-  'foam.nanos.notification.email.DefaultPropertyEmailTemplateService',
+  'foam.nanos.notification.email.EmailConfigEmailPropertyService',
   // EmailMessageDAO(service) decorator
   'foam.nanos.notification.email.EmailServiceDAO',
 
