@@ -6,26 +6,13 @@
 
 foam.CLASS({
   package: 'foam.nanos.notification.email',
-  name: 'PassEmailToThread',
+  name: 'AsyncEmailService',
   extends: 'foam.nanos.notification.email.ProxyEmailService',
 
   javaImports: [
     'foam.core.ContextAgent',
     'foam.core.X',
-    'foam.nanos.pool.FixedThreadPool',
-    'foam.util.SafetyUtil',
-    'java.nio.charset.StandardCharsets',
-    'java.util.Date',
-    'java.util.Properties',
-    'javax.mail.*',
-    'javax.mail.internet.InternetAddress',
-    'javax.mail.internet.MimeMessage',
-    'org.apache.commons.lang3.StringUtils',
-    'org.jtwig.JtwigTemplate',
-    'org.jtwig.resource.loader.TypedResourceLoader',
-    'foam.dao.DAO',
-    'foam.nanos.auth.User',
-    'foam.nanos.auth.Group'
+    'foam.nanos.pool.FixedThreadPool'
   ],
 
   methods: [
@@ -40,7 +27,6 @@ foam.CLASS({
               getDelegate().sendEmail(x, emailMessage);
             } catch (Throwable t) {
               t.printStackTrace();
-              System.out.println("ANNA PASSEmailToThread");
             }
           }
         });

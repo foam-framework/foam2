@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'ProxyEmailService',
 
   documentation: 'This class is used for the purpose of decorating the email(serivce)',
+
   implements: [
     'foam.nanos.notification.email.EmailService',
     'foam.nanos.NanoService'
