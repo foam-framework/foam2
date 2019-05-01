@@ -162,7 +162,7 @@ foam.CLASS({
 
       if ( this.editColumnsEnabled ) {
         columnSelectionE = this.createColumnSelection();
-        this.ctrl.add(columnSelectionE);
+        // this.ctrl.add(columnSelectionE);
       }
 
       this.
