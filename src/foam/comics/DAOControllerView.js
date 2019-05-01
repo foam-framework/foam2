@@ -149,14 +149,17 @@ foam.CLASS({
             .callIfElse(this.data.primaryAction, function() {
               this.startContext({ data: self })
                 .start()
-                  .add(self.data.primaryAction)
+                  .tag(self.data.primaryAction, { size: 'LARGE' })
                 .end()
               .endContext();
             }, function() {
               if ( self.data.createLabel ) {
-                this.tag(self.cls.CREATE, { label$: self.data.createLabel$ });
+                this.tag(self.cls.CREATE, {
+                  label$: self.data.createLabel$,
+                  size: 'LARGE'
+                });
               } else {
-                this.start().add(self.cls.CREATE).end();
+                this.start().tag(self.cls.CREATE, { size: 'LARGE' }).end();
               }
             })
           .end()
