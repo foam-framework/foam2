@@ -189,7 +189,6 @@ foam.CLASS({
       var self = this;
       self.clientPromise.then(async function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
-        foam.__context__.register(foam.u2.UnstyledActionView, 'foam.u2.ActionView');
 
         window.onpopstate = async function(event) {
           var hid = location.hash.substr(1);

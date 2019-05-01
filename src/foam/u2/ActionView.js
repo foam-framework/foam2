@@ -21,111 +21,150 @@ foam.CLASS({
   extends: 'foam.u2.UnstyledActionView',
 
   css: `
-    button^ {
-      -webkit-box-shadow: inset 0 1px 0 0 #ffffff;
-      box-shadow: inset 0 1px 0 0 #ffffff;
-      background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
-      background: -moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );
-      background-color: #ededed;
-      -moz-border-radius: 3px;
-      -webkit-border-radius: 3px;
+    ^ {
       border-radius: 3px;
-      border: 1px solid #dcdcdc;
+      text-align: center;
       display: inline-block;
-      color: #777777;
-      font-family: Arial;
-      font-size: 12px;
-      font-weight: bold;
-      margin: 2px;
-      padding: 4px 16px;
-      text-decoration: none;
+      padding: 9px 16px;
+      background-color: %SECONDARYCOLOR%;
+      color: white;
+      border: 1px solid #355bc4;
     }
 
-    ^:hover {
-      background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) );
-      background: -moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% );
-      background-color: #dfdfdf;
+    ^ + ^ {
+      margin-left: 8px;
+    }
+
+    ^ img {
+      margin-right: 4px;
+    }
+
+    ^:focus:not(:hover) {
+      border-width: 2px;
+      box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
+      padding: 8px 15px;
+    }
+
+    ^:hover:not(:disabled) {
+      cursor: pointer;
+    }
+
+    ^:hover:not(:disabled):not(^secondary):not(^secondary-destructive):not(^destructive) {
+      border: 1px solid #294798;
+      background-color: %SECONDARYHOVERCOLOR%;
+    }
+
+    ^:disabled:not(^secondary):not(^secondary-destructive):not(^destructive) {
+      border: 1px solid #a7beff;
+      background-color: %SECONDARYDISABLEDCOLOR%;
+    }
+
+    ^unavailable {
+      display: none;
     }
 
     ^ img {
       vertical-align: middle;
     }
 
-    ^:disabled { filter: grayscale(80%); }
-
     ^.material-icons {
       cursor: pointer;
     }
-  `,
 
-  properties: [
-    {
-      class: 'URL',
-      name: 'icon',
-      factory: function(action) { return this.action.icon; }
-    },
-    {
-      class: 'String',
-      name: 'iconFontFamily',
-      factory: function(action) { return this.action.iconFontFamily; }
-    },
-    {
-      class: 'String',
-      name: 'iconFontClass',
-      factory: function(action) { return this.action.iconFontClass; }
-    },
-    {
-      class: 'String',
-      name: 'iconFontName',
-      factory: function(action) { return this.action.iconFontName; }
-    },
-    'data',
-    'action',
-    [ 'nodeName', 'button' ],
-    {
-      name: 'label',
-      factory: function(action) { return this.action.label; }
+    ^back {
+      display: none;
     }
-  ],
 
-  methods: [
-    function initE() {
-      this.initCls();
-
-      this.
-        on('click', this.click);
-
-      if ( this.icon ) {
-        // this.nodeName = 'a';
-        this.start('img').attr('src', this.icon).end();
-      } else if ( this.iconFontName ) {
-        this.nodeName = 'i';
-        this.cssClass(this.action.name);
-        this.cssClass(this.iconFontClass); // required by font package
-        this.style({'font-family': this.iconFontFamily});
-        this.add(this.iconFontName);
-      }
-
-      if ( this.label ) {
-        this.add(this.label$);
-      }
-
-      this.setAttribute('title', this.action.toolTip); // hover text
-
-      if ( this.action ) {
-        if ( this.action.isAvailable ) {
-          this.enableClass(this.myClass('unavailable'), this.action.createIsAvailable$(this.data$), true);
-        }
-
-        if ( this.action.isEnabled ) {
-          this.attrs({disabled: this.action.createIsEnabled$(this.data$).map(function(e) { return e ? false : 'disabled'; })});
-        }
-      }
-    },
-
-    function initCls() {
-      this.addClass(this.myClass());
-      this.addClass(this.myClass(this.action.name));
+    ^forward {
+      display: none;
     }
-  ]
+
+    ^secondary {
+      border: 1px solid #cbcfd4;
+      background-image: linear-gradient(to bottom, #ffffff, #e7eaec);
+      color: %PRIMARYCOLOR%;
+    }
+
+    ^secondary:hover {
+      border-color: #cbcfd4;
+      background-image: linear-gradient(to bottom, #ffffff, #d3d6d8);
+      color: %PRIMARYHOVERCOLOR%;
+    }
+
+    ^secondary:focus {
+      background-image: linear-gradient(to bottom, #ffffff, #d3d6d8);
+      border: 2px solid %SECONDARYCOLOR%;
+      padding: 7px 15px;
+    }
+
+    ^secondary:disabled {
+      border-color: #e7eaec;
+      color: %PRIMARYDISABLEDCOLOR%;
+    }
+
+    ^secondary-destructive {
+      border: 1px solid %DESTRUCTIVECOLOR%;
+      background-color: white;
+      color: %DESTRUCTIVECOLOR%;
+    }
+
+    ^secondary-destructive:hover {
+      border-color: %DESTRUCTIVEHOVERCOLOR%;
+      background-color: white;
+      color: %DESTRUCTIVEHOVERCOLOR%;
+    }
+
+    ^secondary-destructive:disabled {
+      border-color: %DESTRUCTIVEDISABLEDCOLOR%;
+      color: %DESTRUCTIVEDISABLEDCOLOR%;
+    }
+
+    ^destructive {
+      background-color: %DESTRUCTIVECOLOR%;
+      border: 1px solid %DESTRUCTIVECOLOR%;
+    }
+
+    ^destructive:hover {
+      background-color: %DESTRUCTIVEHOVERCOLOR%;
+      border-color: #a61414;
+    }
+
+    ^destructive:focus {
+      border: 2px solid #a61414;
+      padding: 7px 15px;
+      box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
+    }
+
+    ^destructive:disabled {
+      background-color: %DESTRUCTIVEDISABLEDCOLOR%;
+      border-color: #ed8e8d;
+    }
+
+    ^small {
+      font-size: 12px;
+      padding: 8px 16px;
+    }
+
+    ^small:focus:not(:hover) {
+      padding: 7px 15px;
+    }
+
+    ^medium {
+      font-size: 14px;
+      padding: 9px 16px;
+    }
+
+    ^medium:focus:not(:hover) {
+      padding: 8px 15px;
+    }
+
+    ^large {
+      font-size: 16px;
+      padding: 10px 16px;
+    }
+
+    ^large:focus:not(:hover) {
+      padding: 9px 15px;
+    }
+  `
 });
