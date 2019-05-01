@@ -116,80 +116,99 @@ foam.CLASS({
         }
       ],
       javaCode:
-      `try {
-        MimeMessage message = new MimeMessage(session_);
+      `
+        try {
+          MimeMessage message = new MimeMessage(session_);
 
-        // don't send email if no sender
-        String from = emailMessage.getFrom();
-        if ( SafetyUtil.isEmpty(from) )
+          // don't send email if no sender
+          String from = emailMessage.getFrom();
+          if ( SafetyUtil.isEmpty(from) )
+            return null;
+
+          // add display name if present
+          String displayName = emailMessage.getDisplayName();
+          if ( SafetyUtil.isEmpty(displayName) ) {
+            message.setFrom(new InternetAddress(from));
+          } else {
+            message.setFrom(new InternetAddress(from, displayName));
+          }
+
+          // attach reply to if present
+          String replyTo = emailMessage.getReplyTo();
+          if ( ! SafetyUtil.isEmpty(replyTo) ) {
+            message.setReplyTo(InternetAddress.parse(replyTo));
+          }
+
+          // don't send email if no subject
+          String subject = emailMessage.getSubject();
+          if ( SafetyUtil.isEmpty(subject) )
+            return null;
+          message.setSubject(subject);
+
+          // don't send email if no body
+          String body = emailMessage.getBody();
+          if ( SafetyUtil.isEmpty(body) )
+            return null;
+          message.setContent(body, "text/html; charset=utf-8");
+
+          // don't send email if no recipient
+          String[] to = emailMessage.getTo();
+          if ( to == null || to.length <= 0 )
+            return null;
+
+          if ( to.length == 1 ) {
+            message.setRecipient(Message.RecipientType.TO, new InternetAddress(to[0], false));
+          } else {
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(StringUtils.join(to, ",")));
+          }
+
+          // send email even if no CC
+          String[] cc = emailMessage.getCc();
+          if ( cc != null && cc.length == 1 ) {
+            message.setRecipient(Message.RecipientType.CC, new InternetAddress(cc[0], false));
+          } else if ( cc != null && cc.length > 1 ) {
+            message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(StringUtils.join(cc, ",")));
+          }
+
+          // send email even if no BCC
+          String[] bcc = emailMessage.getBcc();
+          if ( bcc != null && bcc.length == 1 ) {
+            message.setRecipient(Message.RecipientType.BCC, new InternetAddress(bcc[0], false));
+          } else if ( bcc != null && bcc.length > 1 ) {
+            message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(StringUtils.join(bcc, ",")));
+          }
+
+          // set date
+          message.setSentDate(new Date());
+          return message;
+        } catch (Throwable t) {
+          t.printStackTrace();
           return null;
-
-        // add display name if present
-        String displayName = emailMessage.getDisplayName();
-        if ( SafetyUtil.isEmpty(displayName) ) {
-          message.setFrom(new InternetAddress(from));
-        } else {
-          message.setFrom(new InternetAddress(from, displayName));
         }
-
-        // attach reply to if present
-        String replyTo = emailMessage.getReplyTo();
-        if ( ! SafetyUtil.isEmpty(replyTo) ) {
-          message.setReplyTo(InternetAddress.parse(replyTo));
+      `
+    },
+    {
+      name: 'sendEmail',
+      javaCode:
+      `
+      if ( ! this.getEnabled() ) return;
+        try {
+          MimeMessage message = createMimeMessage(emailMessage);
+          // send message
+          Transport transport = session_.getTransport("smtp");
+          transport.connect();
+          transport.sendMessage(message, message.getAllRecipients());
+          transport.close();
+        } catch (Exception e) {
+          e.printStackTrace();
         }
-
-        // don't send email if no subject
-        String subject = emailMessage.getSubject();
-        if ( SafetyUtil.isEmpty(subject) )
-          return null;
-        message.setSubject(subject);
-
-        // don't send email if no body
-        String body = emailMessage.getBody();
-        if ( SafetyUtil.isEmpty(body) )
-          return null;
-        message.setContent(body, "text/html; charset=utf-8");
-
-        // don't send email if no recipient
-        String[] to = emailMessage.getTo();
-        if ( to == null || to.length <= 0 )
-          return null;
-
-        if ( to.length == 1 ) {
-          message.setRecipient(Message.RecipientType.TO, new InternetAddress(to[0], false));
-        } else {
-          message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(StringUtils.join(to, ",")));
-        }
-
-        // send email even if no CC
-        String[] cc = emailMessage.getCc();
-        if ( cc != null && cc.length == 1 ) {
-          message.setRecipient(Message.RecipientType.CC, new InternetAddress(cc[0], false));
-        } else if ( cc != null && cc.length > 1 ) {
-          message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(StringUtils.join(cc, ",")));
-        }
-
-        // send email even if no BCC
-        String[] bcc = emailMessage.getBcc();
-        if ( bcc != null && bcc.length == 1 ) {
-          message.setRecipient(Message.RecipientType.BCC, new InternetAddress(bcc[0], false));
-        } else if ( bcc != null && bcc.length > 1 ) {
-          message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(StringUtils.join(bcc, ",")));
-        }
-
-        // set date
-        message.setSentDate(new Date());
-        return message;
-      } catch (Throwable t) {
-        t.printStackTrace();
-        System.out.println("ANNNA SMTPEMAILSERVICE");
-        return null;
-      }`
+        
+      `
     },
     {
       name: 'start',
       javaCode:
-        `
+      `
         Properties props = new Properties();
         props.setProperty("mail.smtp.auth", getAuthenticate() ? "true" : "false");
         props.setProperty("mail.smtp.starttls.enable", getStarttls() ? "true" : "false");
@@ -200,7 +219,7 @@ foam.CLASS({
         } else {
           session_ = Session.getInstance(props);
         }
-        `
+      `
     }
   ]
 });

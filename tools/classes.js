@@ -228,6 +228,8 @@ var classes = [
   // Email service Files
   'foam.nanos.notification.email.SMTPEmailService',
   'foam.nanos.notification.email.NullEmailService',
+  'foam.nanos.notification.email.PassEmailToThread',
+  'foam.nanos.notification.email.ProxyEmailService',
   // Property set on Emails
   'foam.nanos.notification.email.ChainedPropertyService',
   'foam.nanos.notification.email.ApplyEmailTemplateService',
@@ -236,7 +238,6 @@ var classes = [
   // EmailMessageDAO(service) decorator
   'foam.nanos.notification.email.EmailServiceDAO',
 
-  'foam.nanos.notification.email.ClientEmailService',
   'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.email.ClientPOP3EmailService',
   'foam.nanos.notification.push.PushService',

@@ -8,13 +8,38 @@ foam.CLASS({
   package: 'foam.nanos.notification.email',
   name: 'ProxyEmailService',
 
-  implements: ['foam.nanos.notification.email.EmailService'],
+  documentation: 'This class is used for the purpose of decorating the email(serivce)',
+  implements: [
+    'foam.nanos.notification.email.EmailService',
+    'foam.nanos.NanoService'
+  ],
 
   properties: [
     {
       class: 'Proxy',
       of: 'foam.nanos.notification.email.EmailService',
       name: 'delegate'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'sendEmail',
+      javaCode:
+      `
+        getDelegate().sendEmail(x, emailMessage);
+      `
+    },
+    {
+      name: 'start',
+      javaCode:
+      `
+        try {
+          getDelegate().start();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      `
     }
   ]
 });

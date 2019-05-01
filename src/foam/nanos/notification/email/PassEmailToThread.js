@@ -7,11 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.notification.email',
   name: 'PassEmailToThread',
-  extends: 'foam.nanos.notification.ProxyEmailService',
-
-  imports: [
-    'threadPool?'
-  ],
+  extends: 'foam.nanos.notification.email.ProxyEmailService',
 
   javaImports: [
     'foam.core.ContextAgent',
@@ -36,32 +32,18 @@ foam.CLASS({
     {
       name: 'sendEmail',
       javaCode:
-        `
-        if ( ! this.getEnabled() ) return;
-        
-        ((FixedThreadPool) getThreadPool()).submit(x, new ContextAgent() {
+      `
+        ( (FixedThreadPool) x.get("threadPool") ).submit(x, new ContextAgent() {
           @Override
           public void execute(X x) {
             try {
-              getDelegate().sendEmail(x, (foam.nanos.notification.email.EmailMessage)obj);
+              getDelegate().sendEmail(x, emailMessage);
             } catch (Throwable t) {
               t.printStackTrace();
               System.out.println("ANNA PASSEmailToThread");
             }
           }
         });
-        `
-    },
-    {
-      name: 'start',
-      javaCode:
-      `
-      try{
-        getDelegate().start();
-      } catch(Exception e) {
-        e.printStackTrace();
-        System.out.println("ANNNA PASSEmailToThread");
-      }
       `
     }
   ]

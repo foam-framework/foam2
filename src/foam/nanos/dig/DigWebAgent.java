@@ -476,7 +476,7 @@ public class DigWebAgent
 
       message.setBody(newData);
 
-      EmailsUtility.sendEmailFromTemplate(getX(), null, message, null, null);
+      EmailsUtility.sendEmailFromTemplate(x, null, message, null, null);
     }
   }
 

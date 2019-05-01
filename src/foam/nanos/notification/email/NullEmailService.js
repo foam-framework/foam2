@@ -15,12 +15,12 @@ foam.CLASS({
   methods: [
     {
       name: 'sendEmail',
-      javaCode: 'return null;',
-      code: function() { return null; }
+      javaCode: 'return;',
+      code: function() { return; }
     },
     {
       name: 'start',
-      javaCode: '//NOOP',
+      javaCode: 'return;',
       code: function() { return; }
     }
   ]
