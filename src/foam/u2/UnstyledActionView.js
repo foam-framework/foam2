@@ -29,10 +29,14 @@ foam.CLASS({
     link: <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"></link>
   `,
 
+  requires: [
+    'foam.u2.ButtonSize',
+    'foam.u2.ButtonStyle'
+  ],
+
   enums: [
     {
       name: 'ButtonState',
-
       values: [
         { name: 'NO_CONFIRM' }, // No confirmation required, fire on click
         { name: 'CONFIRM' },    // Confirmation required, debounce on click
@@ -88,6 +92,18 @@ foam.CLASS({
     {
       name: 'label',
       factory: function(action) { return this.action.label; }
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.ButtonStyle',
+      name: 'buttonStyle',
+      value: 'PRIMARY'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.ButtonSize',
+      name: 'size',
+      value: 'MEDIUM'
     }
   ],
 
@@ -117,6 +133,8 @@ foam.CLASS({
         } else if ( this.action.isSecondary ) {
           this.addClass(this.myClass('secondary'));
         }
+
+        this.addClass(this.myClass(this.size.label.toLowerCase()));
       }
     },
 
