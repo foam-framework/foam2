@@ -86,8 +86,8 @@ foam.CLASS({
         // back to a Date.
         return value == null ? null :
           outputter.formatDatesAsNumbers ?
-          value.toISOString() :
-          value.getTime();
+          value.getTime() :
+          value.toISOString();
       }
     },
     {
@@ -342,6 +342,13 @@ foam.CLASS({
   extends: 'Property',
 
   properties: [
+    {
+      name: 'toJSON',
+      value: function toJSON(value, outputter) {
+        return value == null ? null :
+          outputter.passClassesByReference ? value : value.id;
+      }
+    },
     [
       'adapt',
       function(_, v) {

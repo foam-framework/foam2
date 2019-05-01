@@ -13,25 +13,29 @@ public class ClassReferenceParser
   extends ProxyParser
 {
   public ClassReferenceParser() {
-    super(new Seq1(15,
-      new Whitespace(),
-      new Literal("{"),
-      new Whitespace(),
-      new KeyParser("class"),
-      new Whitespace(),
-      new Literal(":"),
-      new Whitespace(),
-      new Literal("\"__Class__\""),
-      new Whitespace(),
-      new Literal(","),
-      new Whitespace(),
-      new KeyParser("forClass_"),
-      new Whitespace(),
-      new Literal(":"),
-      new Whitespace(),
-      new StringParser(),
-      new Whitespace(),
-      new Literal("}")));
+    super(new Alt(
+      new NullParser(),
+      new Seq1(15,
+        new Whitespace(),
+        new Literal("{"),
+        new Whitespace(),
+        new KeyParser("class"),
+        new Whitespace(),
+        new Literal(":"),
+        new Whitespace(),
+        new Literal("\"__Class__\""),
+        new Whitespace(),
+        new Literal(","),
+        new Whitespace(),
+        new KeyParser("forClass_"),
+        new Whitespace(),
+        new Literal(":"),
+        new Whitespace(),
+        new StringParser(),
+        new Whitespace(),
+        new Literal("}")),
+      new StringParser()
+    ));
   }
 
   public PStream parse(PStream ps, ParserContext x) {
