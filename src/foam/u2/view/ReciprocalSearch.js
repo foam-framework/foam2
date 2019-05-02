@@ -179,7 +179,7 @@ foam.CLASS({
           .entity('nbsp')
           .add('selected')
         .end()
-        .add(this.CLEAR);
+        .tag(this.CLEAR, { buttonStyle: 'SECONDARY' });
     },
 
     function addFilter(key) {
@@ -196,7 +196,6 @@ foam.CLASS({
   actions: [
     {
       name: 'clear',
-      isSecondary: true,
       code: function() {
         this.data = undefined;
         this.filters = this.filters.slice();

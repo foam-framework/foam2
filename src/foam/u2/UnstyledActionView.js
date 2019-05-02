@@ -126,11 +126,14 @@ foam.CLASS({
           this.attrs({ disabled: this.action.createIsEnabled$(this.data$).map((e) => e ? false : 'disabled') });
         }
 
-        if ( this.action.isDestructive && this.action.isSecondary ) {
+        if (
+          this.action.isDestructive &&
+          this.buttonStyle === this.ButtonStyle.SECONDARY
+        ) {
           this.addClass(this.myClass('secondary-destructive'));
         } else if ( this.action.isDestructive ) {
           this.addClass(this.myClass('destructive'));
-        } else if ( this.action.isSecondary ) {
+        } else if ( this.buttonStyle === this.ButtonStyle.SECONDARY ) {
           this.addClass(this.myClass('secondary'));
         }
 
