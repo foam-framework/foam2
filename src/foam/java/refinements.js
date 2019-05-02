@@ -209,6 +209,10 @@ foam.CLASS({
       class: 'Boolean',
       name: 'includeInSignature',
       value: true
+    },
+    {
+      class: 'String',
+      name: 'javaValidateObj'
     }
   ],
 
@@ -240,7 +244,8 @@ foam.CLASS({
         includeInDigest:         this.includeInDigest,
         includeInSignature:      this.includeInSignature,
         containsPII:             this.containsPII,
-        containsDeletablePII:    this.containsDeletablePII
+        containsDeletablePII:    this.containsDeletablePII,
+        validateObj:             this.javaValidateObj
       });
     },
 
