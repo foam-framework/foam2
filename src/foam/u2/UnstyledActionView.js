@@ -115,6 +115,14 @@ foam.CLASS({
       of: 'foam.u2.ButtonSize',
       name: 'size',
       value: 'MEDIUM'
+    },
+    {
+      class: 'String',
+      name: 'cssClass',
+      expression: function(isDestructive, buttonStyle) {
+        var s = buttonStyle.name.toLowerCase();
+        return isDestructive ? s + '-destructive' : s;
+      }
     }
   ],
 
@@ -137,17 +145,7 @@ foam.CLASS({
           this.attrs({ disabled: this.action.createIsEnabled$(this.data$).map((e) => e ? false : 'disabled') });
         }
 
-        if (
-          this.isDestructive &&
-          this.buttonStyle === this.ButtonStyle.SECONDARY
-        ) {
-          this.addClass(this.myClass('secondary-destructive'));
-        } else if ( this.isDestructive ) {
-          this.addClass(this.myClass('destructive'));
-        } else if ( this.buttonStyle === this.ButtonStyle.SECONDARY ) {
-          this.addClass(this.myClass('secondary'));
-        }
-
+        this.addClass(this.myClass(this.cssClass));
         this.addClass(this.myClass(this.size.label.toLowerCase()));
       }
     },

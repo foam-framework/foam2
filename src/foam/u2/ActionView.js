@@ -71,13 +71,42 @@ foam.CLASS({
       cursor: pointer;
     }
 
-    ^back {
-      display: none;
+
+    /*
+     * Primary
+     */
+
+    ^primary {
+      border-color: #355bc4;
+      background-color: %SECONDARYCOLOR%;
+      color: white;
     }
 
-    ^forward {
-      display: none;
+    ^primary-destructive {
+      background-color: %DESTRUCTIVECOLOR%;
+      border: 1px solid %DESTRUCTIVECOLOR%;
     }
+
+    ^primary-destructive:hover {
+      background-color: %DESTRUCTIVEHOVERCOLOR%;
+      border-color: #a61414;
+    }
+
+    ^primary-destructive:focus {
+      border: 2px solid #a61414;
+      padding: 7px 15px;
+      box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
+    }
+
+    ^primary-destructive:disabled {
+      background-color: %DESTRUCTIVEDISABLEDCOLOR%;
+      border-color: #ed8e8d;
+    }
+
+
+    /*
+     * Secondary
+     */
 
     ^secondary {
       border: 1px solid #cbcfd4;
@@ -119,26 +148,17 @@ foam.CLASS({
       color: %DESTRUCTIVEDISABLEDCOLOR%;
     }
 
-    ^destructive {
-      background-color: %DESTRUCTIVECOLOR%;
-      border: 1px solid %DESTRUCTIVECOLOR%;
-    }
 
-    ^destructive:hover {
-      background-color: %DESTRUCTIVEHOVERCOLOR%;
-      border-color: #a61414;
-    }
+    /*
+     * Tertiary
+     */
 
-    ^destructive:focus {
-      border: 2px solid #a61414;
-      padding: 7px 15px;
-      box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
-    }
+    /* Tertiary is the same as primary for now. */
 
-    ^destructive:disabled {
-      background-color: %DESTRUCTIVEDISABLEDCOLOR%;
-      border-color: #ed8e8d;
-    }
+
+    /*
+     * Sizes
+     */
 
     ^small {
       font-size: 12px;
