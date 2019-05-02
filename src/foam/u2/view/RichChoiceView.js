@@ -444,13 +444,14 @@ foam.CLASS({
     },
     {
       name: 'DefaultActionView',
-      extends: 'foam.u2.UnstyledActionView',
+      extends: 'foam.u2.ActionView',
 
       documentation: `
         This is the view that gets rendered at the bottom of the dropdown if an
         action is provided.
       `,
 
+      inheritCSS: false,
       css: `
         ^ {
           border: 0;

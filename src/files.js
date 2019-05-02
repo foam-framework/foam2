@@ -378,7 +378,6 @@ FOAM_FILES([
   { name: "foam/u2/Scroller", flags: ['web'] },
   { name: "foam/u2/ButtonSize", flags: ['web'] },
   { name: "foam/u2/ButtonStyle", flags: ['web'] },
-  { name: "foam/u2/UnstyledActionView", flags: ['web'] },
   { name: "foam/u2/ActionView", flags: ['web'] },
   { name: "foam/u2/DetailPropertyView", flags: ['web'] },
   { name: "foam/u2/DetailView", flags: ['web'] },

@@ -92,9 +92,6 @@ foam.CLASS({
       background: %BACKGROUNDCOLOR%;
       margin: 0;
     }
-    .foam-u2-UnstyledActionView-signIn {
-      margin-left: 25px !important;
-    }
     .stack-wrapper {
       margin-bottom: -10px;
       min-height: calc(80% - 60px);
@@ -102,9 +99,6 @@ foam.CLASS({
     .stack-wrapper:after {
       content: "";
       display: block;
-    }
-    .foam-u2-UnstyledActionView:focus{
-      outline: none;
     }
   `,
 
