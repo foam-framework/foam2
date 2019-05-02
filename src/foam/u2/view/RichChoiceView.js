@@ -323,7 +323,7 @@ foam.CLASS({
                           .callIf(! section.disabled, function() {
                             this.on('click', () => {
                               self.fullObject_ = obj;
-                              self.data = obj;
+                              self.data = obj.id;
                               self.isOpen_ = false;
                             });
                           })
