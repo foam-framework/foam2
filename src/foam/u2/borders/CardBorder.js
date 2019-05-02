@@ -11,15 +11,21 @@ foam.CLASS({
 
   css: `
     ^ {
-      border: solid 1px #e7eaec;
-      background-color: #ffffff;
       border-radius: 3px;
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+      border: solid 1px #e7eaec;
+      background-color: #ffffff;
+      height: 500px;
     }
-  `
+  `,
 
   documentation: `
-    An unstyled border. Intended for use as a default value for
-    border properties.
-  `
+    An sylized border. Intended for use when creating cards.
+  `,
+
+  methods: [
+    function initE() {
+      this.addClass(this.myClass())
+    }
+  ]
 });
