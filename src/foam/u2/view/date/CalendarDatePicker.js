@@ -16,7 +16,7 @@ foam.CLASS({
       class: 'Date',
       name: 'data_',
       value: new Date(),
-      postSet(_, n) {
+      postSet: function(_, n) {
         if ( this.skipDateUpdate ) {
           this.skipDateUpdate = false;
           return;
@@ -27,7 +27,7 @@ foam.CLASS({
     {
       class: 'Date',
       name: 'data',
-      postSet(_, n) {
+      postSet: function(_, n) {
         this.skipDateUpdate = true;
         if ( ! n || n === undefined || isNaN(n.getDate()) )  {
           this.data_ = new Date();
