@@ -344,6 +344,10 @@ var classes = [
   'foam.nanos.dig.exception.EmptyParameterException',
   'foam.nanos.dig.exception.GeneralException',
 
+  'foam.demos.analytics.StockSnapshot',
+  'foam.nanos.analytics.FoldManagerDAODecorator',
+  'foam.nanos.analytics.DAOFoldManager',
+  'foam.nanos.analytics.DAOReduceManager',
 
   // Testing support
   'foam.test.TestEnum',
