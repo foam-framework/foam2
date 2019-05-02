@@ -64,9 +64,10 @@ public class SessionServerBox
         if ( ! SafetyUtil.equals(session.getRemoteHost(), req.getRemoteHost()) ) {
           // If an existing session is reused with a different remote host then
           // logout the session and force a re-login.
-          // logger.warning("Attempt to use session create for ", session.getRemoteHost(), " from ", req.getRemoteHost());
-          msg.replyWithException(new AuthenticationException());
-          return;
+//          logger.warning("Attempt to use session create for ", session.getRemoteHost(), " from ", req.getRemoteHost());
+//          session.setContext(getX().put(Session.class, session));
+//          session.setRemoteHost(req.getRemoteHost());
+//          sessionDAO.put(session);
         }
       }
 
