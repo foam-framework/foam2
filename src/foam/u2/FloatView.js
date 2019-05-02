@@ -69,14 +69,11 @@ foam.CLASS({
 
       if ( ! foam.Undefined.isInstance(this.data) ) view.set(this.dataToText(this.data));
 
-      if ( this.onKey ) {
-        // When onKey is enabled, we aren't notified when the view is blurred.
-        // This forces reformatting of the field when the view is blurred.
-        // Reformatting on the keystroke makes for a poor user experience.
-        this.on('blur', function () {
-          view.set(self.dataToText(data.get()));
-        });
-      }
+      // When focus is lost on the view, force the view's value to equal the data
+      // to ensure it's formatted properly.
+      this.on('blur', function () {
+        view.set(self.dataToText(data.get()));
+      });
 
       var preventFeedback = false;
       view.sub(function() {
