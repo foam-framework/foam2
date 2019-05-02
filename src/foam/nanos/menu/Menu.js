@@ -33,6 +33,7 @@ foam.CLASS({
         class: 'foam.u2.view.FObjectView',
         choices: [
           [ 'foam.nanos.menu.DAOMenu',      'DAO' ],
+          [ 'foam.nanos.menu.DAOMenu2',      'DAO2' ],
           [ 'foam.nanos.menu.DocumentMenu', 'Document' ],
           [ 'foam.nanos.menu.DocumentFileMenu', 'External Document' ],
           [ 'foam.nanos.menu.LinkMenu',     'Link' ],

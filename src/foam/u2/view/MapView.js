@@ -70,7 +70,7 @@ foam.CLASS({
       var self = this;
       this
         .add(this.slot(function(data) {
-          return self.E().forEach(Object.entries(data), function(e) {
+          return self.E().forEach(Object.entries(data || {}), function(e) {
             var row = self.KeyValueRow.create({ key: e[0], value: e[1] });
             this.start(self.DetailView, { data: row, showActions: true }).end();
             row.onDetach(row.sub(self.updateData));

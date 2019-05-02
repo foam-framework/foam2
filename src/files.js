@@ -450,6 +450,7 @@ FOAM_FILES([
   { name: 'foam/u2/search/FloatSearchView', flags: ['web'] },
   { name: 'foam/u2/search/CurrencySearchView', flags: ['web'] },
   { name: 'foam/u2/search/DateSearchView', flags: ['web'] },
+  { name: 'foam/u2/search/Toolbar' },
   { name: "foam/u2/stack/Stack", flags: ['web'] },
   { name: "foam/u2/stack/StackView", flags: ['web'] },
   { name: "foam/apploader/ModelRefines" },
@@ -594,4 +595,7 @@ FOAM_FILES([
   { name: "foam/u2/view/date/DateTimePicker"},
   { name: "foam/u2/view/date/Month"},
   { name: "foam/u2/view/date/Weekday"},
+
+  { name: "foam/comics/v2/Comics"},
+  { name: "foam/u2/layout/Layouts"},
 ]);
