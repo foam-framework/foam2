@@ -209,6 +209,9 @@ ruleDAO.listen(new AbstractSink() {
   public void put(Object obj, Detachable sub) {
     Map rulesList = getRulesList();
     Rule rule = (Rule) obj;
+    if ( rule.getDaoKey() != getDaoKey() ) {
+      return;
+    }
     String ruleGroup = rule.getRuleGroup();
     for ( Object key : rulesList.keySet() ) {
       if ( ((Predicate) key).f(obj) ) {
@@ -233,6 +236,9 @@ ruleDAO.listen(new AbstractSink() {
   public void remove(Object obj, Detachable sub) {
     Map rulesList = getRulesList();
     Rule rule = (Rule) obj;
+    if ( rule.getDaoKey() != getDaoKey() ) {
+      return;
+    }
     String ruleGroup = rule.getRuleGroup();
     for ( Object key : rulesList.keySet() ) {
       if ( ((Predicate) key).f(obj) ) {
