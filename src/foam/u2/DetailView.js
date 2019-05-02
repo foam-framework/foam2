@@ -70,10 +70,10 @@ foam.CLASS({
       // TODO: Make an FObjectArray when it validates properly
       preSet: function(_, ps) {
         foam.assert(ps, 'Properties required.');
-        for ( var i = 0 ; i < ps.length ; i++ ) {
+        for ( var i = 0; i < ps.length; i++ ) {
           foam.assert(
               foam.core.Property.isInstance(ps[i]),
-              "Non-Property in 'properties' list:",
+              `Non-Property in 'properties' list:`,
               ps);
         }
         return ps;
@@ -82,7 +82,9 @@ foam.CLASS({
         if ( ! of ) return [];
         return this.of.getAxiomsByClass(foam.core.Property).
           // TODO: this is a temporary fix, but Visibility.HIDDEN should be included and could be switched
-          filter(function(p) { return ! ( p.hidden || p.visibility === foam.u2.Visibility.HIDDEN ); });
+          filter(function(p) {
+            return ! ( p.hidden || p.visibility === foam.u2.Visibility.HIDDEN );
+          });
       }
     },
     {
@@ -100,13 +102,11 @@ foam.CLASS({
     {
       name: 'title',
       attribute: true,
-      expression: function(of) { return this.of ? this.of.model_.label : ''; },
-      // documentation: function() {/*
-      //  <p>The display title for the $$DOC{ref:'foam.ui.View'}.
-      //  </p>
-      //*/}
+      expression: function(of) {
+        return this.of ? this.of.model_.label : '';
+      },
     },
-    [ 'nodeName', 'div' ]
+    ['nodeName', 'div']
   ],
 
   css: `
@@ -184,11 +184,11 @@ foam.CLASS({
         self.currentData = self.data;
 
         var title = self.title && this.E('tr').
-          start('td').addClass(this.myClass('title')).attrs({colspan: 2}).
+          start('td').addClass(this.myClass('title')).attrs({ colspan: 2 }).
             add(self.title$).
           end();
 
-        var tabs = foam.u2.Tabs.create().style({width: '1200px'});
+        var tabs = foam.u2.Tabs.create().style({ width: '1200px' });
 
         return self.actionBorder(
           this.
@@ -202,27 +202,35 @@ foam.CLASS({
               if ( config ) {
                 p = p.clone();
                 for ( var key in config ) {
-                  p[key] = config[key];
+                  if ( config.hasOwnProperty(key) ) {
+                    p[key] = config[key];
+                  }
                 }
               }
-              if ( p.cls_ == foam.dao.OneToManyRelationshipProperty || p.cls_ == foam.dao.ManyToManyRelationshipProperty ) {
+
+              if (
+                p.cls_ == foam.dao.OneToManyRelationshipProperty ||
+                p.cls_ == foam.dao.ManyToManyRelationshipProperty
+              ) {
                 hasTabs = true;
                 var label = p.label;
-                let tab = self.Tab.create({label: label});
-                var dao = p.cls_ == foam.dao.ManyToManyRelationshipProperty ? p.get(self.data).getJunctionDAO() : p.get(self.data);
+                let tab = self.Tab.create({ label: label });
+                var dao = p.cls_ == foam.dao.ManyToManyRelationshipProperty
+                  ? p.get(self.data).getJunctionDAO()
+                  : p.get(self.data);
                 dao.select(expr.COUNT()).then(function(c) {
                   tab.label = label + ' (' + c.value + ')';
                 });
                 p = p.clone();
                 p.label = '';
-                tab.start('table').tag(self.DetailPropertyView, {prop: p});
+                tab.start('table').tag(self.DetailPropertyView, { prop: p });
                 tabs.add(tab);
               } else {
-                this.tag(self.DetailPropertyView, {prop: p});
+                this.tag(self.DetailPropertyView, { prop: p });
               }
             }).
             callIf(hasTabs, function() {
-              this.start('tr').start('td').setAttribute('colspan','2').add(tabs).end().end();
+              this.start('tr').start('td').setAttribute('colspan', '2').add(tabs).end().end();
             }));
           }));
     },
