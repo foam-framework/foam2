@@ -188,7 +188,7 @@ foam.CLASS({
                   .addClass('actions')
                   .show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW))
                   .start()
-                    .add(self.cls.getAxiomsByClass(foam.core.Action).filter((action) => {
+                    .forEach(self.cls.getAxiomsByClass(foam.core.Action).filter((action) => {
                       var rtn = true;
                       if ( ! self.primaryAction ) {
                         rtn = rtn && action.name !== 'create';
@@ -197,7 +197,10 @@ foam.CLASS({
                         rtn = rtn && action.name !== 'toggleFilters';
                       }
                       return rtn;
-                    }))
+                    }), function(action) {
+                      this.tag(action, { buttonStyle: 'TERTIARY' });
+                    })
+                    .add()
                   .end()
                 .end()
               .end()
