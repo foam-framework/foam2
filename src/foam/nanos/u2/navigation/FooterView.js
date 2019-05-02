@@ -84,11 +84,6 @@ foam.CLASS({
     ^ .mini-links {
       float: left;
     }
-    ^ button {
-      border: none !important;
-      box-shadow: none !important;
-      background: none !important;
-    }
   `,
 
   methods: [
@@ -98,11 +93,20 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start('div').addClass('col').addClass('mini-links')
-          .start(this.GO_TO, { label$: this.appConfig.urlLabel$ }).end()
+          .tag(this.GO_TO, {
+            label$: this.appConfig.urlLabel$,
+            buttonStyle: 'UNSTYLED'
+          })
           .add('|')
-          .start(this.GO_TO_TERM, { label$: this.appConfig.termsAndCondLabel$ }).end()
+          .tag(this.GO_TO_TERM, {
+            label$: this.appConfig.termsAndCondLabel$,
+            buttonStyle: 'UNSTYLED'
+          })
           .add('|')
-          .start(this.GO_TO_PRIVACY, { label$: this.appConfig.privacy$ }).end()
+          .tag(this.GO_TO_PRIVACY, {
+            label$: this.appConfig.privacy$,
+            buttonStyle: 'UNSTYLED'
+          })
           .add('|')
           .start().addClass('mode').add(this.appConfig.mode$.map(function(m) { return m.label; }), ' version: ', this.appConfig.version$).end()
         .end()

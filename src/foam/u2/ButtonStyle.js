@@ -9,6 +9,7 @@ foam.ENUM({
   name: 'ButtonStyle',
 
   values: [
+    { name: 'UNSTYLED' },
     { name: 'PRIMARY' },
     { name: 'SECONDARY' },
     { name: 'TERTIARY' }

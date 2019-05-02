@@ -25,10 +25,7 @@ foam.CLASS({
       border-radius: 3px;
       text-align: center;
       display: inline-block;
-      padding: 9px 16px;
-      background-color: %SECONDARYCOLOR%;
-      color: white;
-      border: 1px solid #355bc4;
+      border: 1px solid transparent;
     }
 
     ^ + ^ {
@@ -39,24 +36,12 @@ foam.CLASS({
       margin-right: 4px;
     }
 
-    ^:focus:not(:hover) {
+    ^:focus {
       border-width: 2px;
-      box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
-      padding: 8px 15px;
     }
 
     ^:hover:not(:disabled) {
       cursor: pointer;
-    }
-
-    ^:hover:not(:disabled):not(^secondary):not(^secondary-destructive):not(^destructive) {
-      border: 1px solid #294798;
-      background-color: %SECONDARYHOVERCOLOR%;
-    }
-
-    ^:disabled:not(^secondary):not(^secondary-destructive):not(^destructive) {
-      border: 1px solid #a7beff;
-      background-color: %SECONDARYDISABLEDCOLOR%;
     }
 
     ^unavailable {
@@ -82,25 +67,39 @@ foam.CLASS({
       color: white;
     }
 
-    ^primary-destructive {
-      background-color: %DESTRUCTIVECOLOR%;
-      border: 1px solid %DESTRUCTIVECOLOR%;
+    ^primary:hover:not(:disabled) {
+      border-color: #294798;
+      background-color: %SECONDARYHOVERCOLOR%;
     }
 
-    ^primary-destructive:hover {
-      background-color: %DESTRUCTIVEHOVERCOLOR%;
+    ^primary:focus {
+      box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
+    }
+
+    ^primary:disabled {
+      border-color: %SECONDARYDISABLEDCOLOR%;
+      background-color: %SECONDARYDISABLEDCOLOR%;
+    }
+
+    ^primary-destructive {
+      border-color: %DESTRUCTIVECOLOR%;
+      background-color: %DESTRUCTIVECOLOR%;
+      color: white;
+    }
+
+    ^primary-destructive:hover:not(:disabled) {
       border-color: #a61414;
+      background-color: %DESTRUCTIVEHOVERCOLOR%;
     }
 
     ^primary-destructive:focus {
-      border: 2px solid #a61414;
-      padding: 7px 15px;
+      border-color: #a61414;
       box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
     }
 
     ^primary-destructive:disabled {
-      background-color: %DESTRUCTIVEDISABLEDCOLOR%;
       border-color: #ed8e8d;
+      background-color: %DESTRUCTIVEDISABLEDCOLOR%;
     }
 
 
@@ -109,7 +108,7 @@ foam.CLASS({
      */
 
     ^secondary {
-      border: 1px solid #cbcfd4;
+      border-color: #cbcfd4;
       background-image: linear-gradient(to bottom, #ffffff, #e7eaec);
       color: %PRIMARYCOLOR%;
     }
@@ -122,8 +121,7 @@ foam.CLASS({
 
     ^secondary:focus {
       background-image: linear-gradient(to bottom, #ffffff, #d3d6d8);
-      border: 2px solid %SECONDARYCOLOR%;
-      padding: 7px 15px;
+      border-color: %SECONDARYCOLOR%;
     }
 
     ^secondary:disabled {
@@ -132,7 +130,7 @@ foam.CLASS({
     }
 
     ^secondary-destructive {
-      border: 1px solid %DESTRUCTIVECOLOR%;
+      border-color: %DESTRUCTIVECOLOR%;
       background-color: white;
       color: %DESTRUCTIVECOLOR%;
     }
@@ -153,7 +151,46 @@ foam.CLASS({
      * Tertiary
      */
 
-    /* Tertiary is the same as primary for now. */
+    ^tertiary {
+      border-color: #355bc4;
+      background-color: %SECONDARYCOLOR%;
+      color: white;
+    }
+
+    ^tertiary:hover:not(:disabled) {
+      border-color: #294798;
+      background-color: %SECONDARYHOVERCOLOR%;
+    }
+
+    ^tertiary:focus {
+      box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
+    }
+
+    ^tertiary:disabled {
+      border-color: %SECONDARYDISABLEDCOLOR%;
+      background-color: %SECONDARYDISABLEDCOLOR%;
+    }
+
+    ^tertiary-destructive {
+      border-color: %DESTRUCTIVECOLOR%;
+      background-color: %DESTRUCTIVECOLOR%;
+      color: white;
+    }
+
+    ^tertiary-destructive:hover:not(:disabled) {
+      border-color: #a61414;
+      background-color: %DESTRUCTIVEHOVERCOLOR%;
+    }
+
+    ^tertiary-destructive:focus {
+      border-color: #a61414;
+      box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
+    }
+
+    ^tertiary-destructive:disabled {
+      border-color: #ed8e8d;
+      background-color: %DESTRUCTIVEDISABLEDCOLOR%;
+    }
 
 
     /*
@@ -165,7 +202,7 @@ foam.CLASS({
       padding: 8px 16px;
     }
 
-    ^small:focus:not(:hover) {
+    ^small:focus {
       padding: 7px 15px;
     }
 
@@ -174,7 +211,7 @@ foam.CLASS({
       padding: 9px 16px;
     }
 
-    ^medium:focus:not(:hover) {
+    ^medium:focus {
       padding: 8px 15px;
     }
 
@@ -183,7 +220,7 @@ foam.CLASS({
       padding: 10px 16px;
     }
 
-    ^large:focus:not(:hover) {
+    ^large:focus {
       padding: 9px 15px;
     }
   `

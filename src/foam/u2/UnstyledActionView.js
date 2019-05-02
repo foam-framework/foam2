@@ -118,7 +118,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'cssClass',
+      name: 'styleClass',
       expression: function(isDestructive, buttonStyle) {
         var s = buttonStyle.name.toLowerCase();
         return isDestructive ? s + '-destructive' : s;
@@ -145,7 +145,7 @@ foam.CLASS({
           this.attrs({ disabled: this.action.createIsEnabled$(this.data$).map((e) => e ? false : 'disabled') });
         }
 
-        this.addClass(this.myClass(this.cssClass));
+        this.addClass(this.myClass(this.styleClass));
         this.addClass(this.myClass(this.size.label.toLowerCase()));
       }
     },
