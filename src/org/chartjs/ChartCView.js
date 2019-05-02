@@ -60,7 +60,7 @@ foam.CLASS({
       }
     },
     ['width', 300],
-    ['height', 300]
+    ['height', 300],
     // 'config'
   ],
 
@@ -85,6 +85,6 @@ foam.CLASS({
   ],
 
   listeners: [
-    
+
   ]
 });

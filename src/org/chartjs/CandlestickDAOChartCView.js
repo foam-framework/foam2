@@ -15,25 +15,15 @@ foam.CLASS({
 
   requires: [
     'foam.dao.FnSink',
-    'foam.sink.ArraySink',
+    'foam.dao.ArraySink',
     'foam.nanos.analytics.Candlestick',
     'org.chartjs.ChartCView'
-  ],
-
-  reactions: [
-    ['', 'propertyChange.chart', 'candlesticksUpdate'],
-    ['', 'propertyChange.candlestickMap', 'candlestickMapUpdate'],
   ],
 
   properties: [
     {
       class: 'foam.dao.DAOProperty',
       name: 'data'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'org.chartjs.ChartCView',
-      name: 'chart'
     },
     {
       class: 'String',
@@ -45,13 +35,27 @@ foam.CLASS({
     },
     {
       class: 'Map',
+      name: 'config'
+    },
+    {
+      class: 'Map',
       name: 'candlestickMap'
     },
     {
       class: 'Map',
-      name: 'keyCustomStyling',
+      name: 'customDatasetStyling',
       documentation: `
         Property map that would hold the customization for each key type in the candlestickDAO.
+        1. Key must equal the candlestick's key.
+        2. Value mapped with key must be a 1:1 mapping defined in chartjs.org's documentation.
+      `
+    },
+    {
+      class: 'Map',
+      name: 'customChartOptions',
+      documentation: `
+        Property map that would hold the options customization for the chart.
+        1. Key Value pairs must be a 1:1 mapping defined in chartjs.org's documentation.
       `
     },
     {
@@ -66,48 +70,64 @@ foam.CLASS({
   methods: [
     function initE() {
       this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.dataUpdate })));
-      this.tag(this.ChartCView, null, this.chart$);
+      var self = this;
+      this.add(this.slot(function( config ) {
+        if ( config ) {
+          return this.E().tag(self.ChartCView, { config: self.config });
+        }
+      }));
     },
 
     function generateConfig() {
-      var config = {};
-
-      config.type = this.chartType;
-      config.data = this.generateData();
-      config.options = this.generateOptions();
+      var config = {
+        type: this.chartType,
+        data: this.generateData(),
+        options: this.generateOptions()
+      };
 
       return config;
     },
 
     function generateData() {
-      var configData = {};
-
-      configData.datasets = this.generateDataSets();
+      var configData = {
+        datasets: this.generateDataSets()
+      };
 
       return configData;
     },
 
     function generateDataSets() {
+      var self = this;
       var datasets = [];
-
-      for ( const [key, value] of this.candlestickMap.entries() ) {
+      Object.keys(this.candlestickMap).forEach(function( key ) {
+        const value = self.candlestickMap[key].array;
         var dataset = {};
-        // TODO: get custom label if it exists to use as label for this dataset
-        dataset.label = key;
-        // TODO: get steppedLine customization
-        var data = [];
+        // default label will be the key of the candlestick
+        dataset['label'] = key;
+        var pointData = [];
 
-        value.map( candlestick =>
-          data.push({
-            x: candlestick.closeTime,
-            y: candlestick[this.dataPointProperty.name]
-          });
-        );
+        value.forEach(function ( candlestick ) {
+          var point = {};
+          point['x'] = candlestick.closeTime;
+          point['y'] = candlestick[self.dataPointProperty.name];
+          pointData.push(point);
+        });
 
-        // TODO: get custom css and put into the data set.
+        dataset['data'] = pointData;
 
+        // This should allow maximum configurability by devs.
+        if ( self.customDatasetStyling ) {
+          // If custom styling is provided for any key
+          var customStyling = self.customDatasetStyling[key];
+          if ( customStyling ) {
+            // If custom styling is provided for this specific key
+            Object.keys(customStyling).forEach(function( key ) {
+              dataset[key] = customStyling[key];
+            });
+          }
+        }
         datasets.push(dataset);
-      }
+      });
 
       return datasets;
     },
@@ -116,12 +136,19 @@ foam.CLASS({
       var options = {};
 
       // Default X-Axis scale
-      options.scales = {
+      options['scales'] = {
         xAxes: [{
           type: 'time',
           distribution: 'linear'
         }]
       };
+
+      if ( this.customChartOptions ) {
+        var self = this;
+        Object.keys(this.customChartOptions).forEach(function( key ) {
+          options[key] = self.customChartOptions[key];
+        });
+      }
 
       return options;
     }
@@ -137,24 +164,11 @@ foam.CLASS({
           // data was set to null
           return;
         }
-
         var self = this;
         this.data.orderBy(this.Candlestick.CLOSE_TIME).select(this.GROUP_BY(this.Candlestick.KEY, this.ArraySink.create())).then( function(a) {
           self.candlestickMap = a.groups;
+          self.config = self.generateConfig();
         })
-      }
-    },
-    {
-      name: 'candlestickMapUpdate',
-      isFramed: true,
-      code: function() {
-        // candlesticks has been updated
-        if ( ! this.candlestickMap || ! this.chart ) {
-          // neither candlesticks or chart exists
-          return;
-        }
-
-        this.chart.config = this.generateConfig();
       }
     }
   ]
