@@ -32,17 +32,13 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.ContextAwareSupport',
-    'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.logger.Logger',
-    'foam.nanos.NanoService',
     'foam.nanos.session.Session',
     'foam.util.Email',
     'foam.util.Password',
     'foam.util.SafetyUtil',
 
-    'java.security.Permission',
     'java.util.Calendar',
     'java.util.regex.Pattern',
     'javax.security.auth.AuthPermission',
@@ -77,8 +73,9 @@ foam.CLASS({
     {
       name: 'getCurrentUser',
       javaCode: `
-        // fetch context and check if not null or user id is 0
         Session session = x.get(Session.class);
+        
+        // fetch context and check if not null or user id is 0
         if ( session == null || session.getUserId() == 0 ) {
           throw new AuthenticationException("Not logged in");
         }
@@ -103,11 +100,6 @@ foam.CLASS({
         Group group = getCurrentGroup(x);
         if ( group != null && ! group.getEnabled() ) {
           throw new AuthenticationException("Group disabled");
-        }
-
-        // check for two-factor authentication
-        if ( user.getTwoFactorEnabled() && ! session.getContext().getBoolean("twoFactorSuccess") ) {
-          throw new AuthenticationException("User requires two-factor authentication");
         }
 
         return user;
