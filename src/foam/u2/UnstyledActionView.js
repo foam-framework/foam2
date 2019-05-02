@@ -100,6 +100,17 @@ foam.CLASS({
       value: 'PRIMARY'
     },
     {
+      class: 'Boolean',
+      name: 'isDestructive',
+      documentation: `
+        When set to true, this action should be styled in a way that indicates
+        that data is deleted in some way.
+      `,
+      factory: function() {
+        return this.action.confirmationRequired;
+      }
+    },
+    {
       class: 'Enum',
       of: 'foam.u2.ButtonSize',
       name: 'size',
@@ -127,11 +138,11 @@ foam.CLASS({
         }
 
         if (
-          this.action.isDestructive &&
+          this.isDestructive &&
           this.buttonStyle === this.ButtonStyle.SECONDARY
         ) {
           this.addClass(this.myClass('secondary-destructive'));
-        } else if ( this.action.isDestructive ) {
+        } else if ( this.isDestructive ) {
           this.addClass(this.myClass('destructive'));
         } else if ( this.buttonStyle === this.ButtonStyle.SECONDARY ) {
           this.addClass(this.myClass('secondary'));
