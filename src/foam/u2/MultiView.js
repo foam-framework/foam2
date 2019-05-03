@@ -13,8 +13,7 @@ foam.CLASS({
   `,
   properties: [
     {
-      class: 'FObjectArray',
-      of: 'foam.u2.ViewSpec',
+      class: 'Array',
       name: 'views'
     }
   ],
