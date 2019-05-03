@@ -40,7 +40,7 @@ foam.CLASS({
       factory: function () {
         return {
           type: 'line',
-          dataset: [],
+          data: { datasets: [] },
           options: {
             scales: {
               xAxes: [{
@@ -49,7 +49,7 @@ foam.CLASS({
               }]
             }
           }
-        }
+        };
       }
     },
     {
@@ -81,7 +81,7 @@ foam.CLASS({
   methods: [
     function initE() {
       this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.dataUpdate })));
-      this.tag(this.ChartCView, { config$: this.config$ });
+      this.add(this.ChartCView.create({ config$: this.config$ }));
     }
   ],
 
@@ -95,7 +95,8 @@ foam.CLASS({
           .orderBy(this.xExpr)
           .select(this.GROUP_BY(this.keyExpr, this.PLOT(this.xExpr, this.yExpr)))
           .then(function(sink) {
-            self.config.data = {
+            var config = foam.Object.clone(self.config);
+            config.data = {
               datasets: Object.keys(sink.groups).map(key => {
                 var data = {
                   label: key,
@@ -108,10 +109,7 @@ foam.CLASS({
                 return data;
               })
             };
-            // Set to null and back to trigger anything bound to config to be aware of changes.
-            var c = self.config;
-            self.config = null;
-            self.config = c;
+            self.config = config;
           });
       }
     }
