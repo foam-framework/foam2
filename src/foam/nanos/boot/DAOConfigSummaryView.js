@@ -21,11 +21,14 @@
      ^dao {
        color: #555;
      }
+     ^dao:hover {
+       background: lightgray;
+     }
      ^section {
        display: inline-grid;
      }
      ^header {
-       background: red;
+       background: %PRIMARYCOLOR%;
        color: white;
        font-weight: 800;
      }
