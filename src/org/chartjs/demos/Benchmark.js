@@ -27,19 +27,22 @@ foam.CLASS({
           },
           {
             class: 'org.chartjs.CandlestickDAOChartCView',
+            // chartType: 'bar',
             customDatasetStyling: {
               TSLA: {
                 steppedLine: true,
                 borderColor: [
                   'rgba(255, 99, 132, 1)'
                 ],
+                backgroundColor: 'rgba(255, 99, 132, 0.3)',
                 label: 'Red Team (TSLA)'
               },
               NFLX: {
                 borderColor: [
                   'rgba(54, 162, 235, 1)'
                 ],
-                label: 'Blue Team (TSLA)'
+                backgroundColor: 'rgba(54, 162, 235, 0.3)',
+                label: 'Blue Team (NFLX)'
               }
             }
           }

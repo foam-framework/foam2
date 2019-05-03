@@ -15,57 +15,9 @@ foam.CLASS({
 
   properties: [
     'chart',
-    {
-      name: 'config',
-      factory: function() {
-        return {
-          type: 'line',
-          data: {
-            datasets: [{
-              label: '# of Votes',
-              steppedLine: true,
-              data: [
-                {
-                  x: new Date(),
-                  y: 10
-                },
-                {
-                  x: this.addDays(new Date(), 1),
-                  y: 13
-                },
-                {
-                  x: this.addDays(new Date(), 2),
-                  y: 6
-                },
-                {
-                  x: this.addDays(new Date(), 3),
-                  y: 10
-                },
-                {
-                  x: this.addDays(new Date(), 4),
-                  y: 12
-                }
-              ]
-            }]
-          },
-          options: {
-            scales: {
-              xAxes: [{
-                type: 'time',
-                distribution: 'linear'
-              }]
-            }
-          }
-        }
-      }
-    },
+    'config',
     ['width', 300],
-    ['height', 300],
-    // 'config'
-  ],
-
-  reactions: [
-
+    ['height', 300]
   ],
 
   methods: [
@@ -74,17 +26,6 @@ foam.CLASS({
     },
     function paintSelf(x) {
       this.chart.render();
-    },
-
-    // TODO: PLACEHOLDER METHOD
-    function addDays(prevDate, days) {
-      var date = new Date(prevDate.valueOf());
-      date.setDate(date.getDate() + days);
-      return date;
     }
-  ],
-
-  listeners: [
-
   ]
 });

@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'CandlestickDAOChartCView',
   extends: 'foam.u2.View',
 
+  documentation: `
+    A view that would generate a chart using chartjs and a supplied CandlestickDAO.
+  `,
+
   implements: [
     'foam.mlang.Expressions'
   ],
@@ -23,23 +27,37 @@ foam.CLASS({
   properties: [
     {
       class: 'foam.dao.DAOProperty',
-      name: 'data'
+      name: 'data',
+      documentation: `
+        The supplied CandlestickDAO.
+      `
     },
     {
       class: 'String',
       name: 'chartType',
-      documentation: `Refer to 'https://www.chartjs.org/docs/latest/charts/' for the various types of charts`,
+      documentation: `
+        Refer to 'https://www.chartjs.org/docs/latest/charts/' for the various types of charts.
+        Currently supported by this file: line, bar.
+      `,
       factory: function() {
         return 'line';
       }
     },
     {
       class: 'Map',
-      name: 'config'
+      name: 'config',
+      documentation: `
+        The config map that is expected by chartjs. Structure and information can be found in chartjs.org's documentation.
+      `
     },
     {
       class: 'Map',
-      name: 'candlestickMap'
+      name: 'candlestickMap',
+      hidden: true,
+      documentation: `
+        Map returned from the provided CandlestickDAO. This will be used by the various methods extracting the
+        information to be placed in the chart.
+      `
     },
     {
       class: 'Map',
@@ -61,6 +79,9 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'dataPointProperty',
+      documentation: `
+        The Candlestick property we wish to represent on the y-axis on the chart.
+      `,
       factory: function() {
         return this.Candlestick.AVERAGE;
       }
@@ -99,23 +120,26 @@ foam.CLASS({
     function generateDataSets() {
       var self = this;
       var datasets = [];
+      // Each dataset is represented by a key in the CandlestickDAO
       Object.keys(this.candlestickMap).forEach(function( key ) {
-        const value = self.candlestickMap[key].array;
+        const candlesticks = self.candlestickMap[key].array;
         var dataset = {};
-        // default label will be the key of the candlestick
-        dataset['label'] = key;
-        var pointData = [];
 
-        value.forEach(function ( candlestick ) {
+        // Array of points that will represent all the candlesticks that share the same key
+        var pointData = [];
+        candlesticks.forEach(function ( candlestick ) {
           var point = {};
           point['x'] = candlestick.closeTime;
           point['y'] = candlestick[self.dataPointProperty.name];
           pointData.push(point);
         });
-
         dataset['data'] = pointData;
 
+        // Default title to represent the dataset
+        dataset['label'] = key;
+
         // This should allow maximum configurability by devs.
+        // Refer to chartjs.org documentation for dataset properties
         if ( self.customDatasetStyling ) {
           // If custom styling is provided for any key
           var customStyling = self.customDatasetStyling[key];
@@ -126,6 +150,7 @@ foam.CLASS({
             });
           }
         }
+
         datasets.push(dataset);
       });
 
@@ -135,7 +160,7 @@ foam.CLASS({
     function generateOptions() {
       var options = {};
 
-      // Default X-Axis scale
+      // Default X-Axis scale for candlesticks.
       options['scales'] = {
         xAxes: [{
           type: 'time',
@@ -143,6 +168,8 @@ foam.CLASS({
         }]
       };
 
+      // This should allow maximum configurability by devs.
+      // Refer to chartjs.org documentation for dataset properties
       if ( this.customChartOptions ) {
         var self = this;
         Object.keys(this.customChartOptions).forEach(function( key ) {
@@ -164,11 +191,13 @@ foam.CLASS({
           // data was set to null
           return;
         }
+
         var self = this;
+        // Get all candlesticks categorized by their key, and ordered in ascending order by their closeTime.
         this.data.orderBy(this.Candlestick.CLOSE_TIME).select(this.GROUP_BY(this.Candlestick.KEY, this.ArraySink.create())).then( function(a) {
           self.candlestickMap = a.groups;
           self.config = self.generateConfig();
-        })
+        });
       }
     }
   ]
