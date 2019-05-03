@@ -1,0 +1,4 @@
+p({"class":"foam.nanos.menu.Menu","id":"admin.p","label":"Performance","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pmInfoDAO","summaryView":{"class":"foam.nanos.pm.PMTableView"}},"order":1000,"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.p.1minute","label":"Performance - 1 Minute","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pm1MinuteDAO"},"order":1000,"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.p.hourly","label":"Performance - Hourly","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pmHourlyDAO"},"order":1000,"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.p.daily","label":"Performance - Daily","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pmDailyDAO"},"order":1000,"parent":"admin"})
