@@ -11,21 +11,26 @@
 
    css: `
      ^ {
+       padding: 6px;
      }
      ^dao, ^header {
        display: inline-block;
+       font-size: smaller;
        margin: 2px;
        padding: 2px;
-       width: 220px;
+       width: 190px;
      }
      ^dao {
        color: #555;
+     }
+     ^dao:hover {
+       background: lightgray;
      }
      ^section {
        display: inline-grid;
      }
      ^header {
-       background: red;
+       background: %PRIMARYCOLOR%;
        color: white;
        font-weight: 800;
      }
