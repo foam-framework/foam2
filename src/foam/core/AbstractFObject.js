@@ -196,14 +196,14 @@ foam.CLASS({
       name: 'validate',
       args: [
         {
-          name: 'X',
+          name: 'x',
           type: 'Context'
         }
       ],
       javaCode: `
         List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
         for ( PropertyInfo prop : props ) {
-          prop.validateObj(this);
+          prop.validateObj(x, this);
         }
       `
     },

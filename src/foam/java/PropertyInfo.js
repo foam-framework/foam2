@@ -280,7 +280,10 @@ foam.CLASS({
             name: 'validateObj',
             visibility: 'public',
             type: 'void',
-            args: [{ name: 'obj', type: 'foam.core.FObject' }],
+            args: [
+              { name: 'x', type: 'foam.core.X' },
+              { name: 'obj', type: 'foam.core.FObject' }
+            ],
             body: this.validateObj
           }
         ];
