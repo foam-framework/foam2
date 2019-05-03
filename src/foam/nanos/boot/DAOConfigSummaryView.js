@@ -11,12 +11,14 @@
 
    css: `
      ^ {
+       padding: 6px;
      }
      ^dao, ^header {
        display: inline-block;
+       font-size: smaller;
        margin: 2px;
        padding: 2px;
-       width: 220px;
+       width: 190px;
      }
      ^dao {
        color: #555;
