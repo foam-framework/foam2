@@ -387,7 +387,6 @@ foam.CLASS({
       var eFactory    = this.exprFactory(prop.expression);
       var FIP         = factory && ( prop.name + '_fip' ); // Factory In Progress
       var fip         = 0;
-      var trim        = prop.trim;
 
       // Factory In Progress (FIP) Support
       // When a factory method is in progress, the object sets a private
@@ -517,8 +516,6 @@ foam.CLASS({
                   this[name] :
                   undefined ) :
             this[name] ;
-
-          if ( trim && typeof newValue === 'string' ) newValue = newValue.trim();
 
           if ( adapt ) newValue = adapt.call(this, oldValue, newValue, prop);
 
