@@ -102,6 +102,11 @@ foam.CLASS({
           throw new AuthenticationException("Group disabled");
         }
 
+        // check for two-factor authentication
+        if ( user.getTwoFactorEnabled() && ! session.getContext().getBoolean("twoFactorSuccess") ) {
+          throw new AuthenticationException("User requires two-factor authentication");
+        }
+
         return user;
       `
     },
