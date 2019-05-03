@@ -45,6 +45,12 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'init_',
+      javaCode: `
+      getStartTime();
+      `
+    },
+    {
       name: 'log',
       type: 'Void',
       args: [
@@ -88,6 +94,7 @@ foam.CLASS({
     classInfo.setObjClass(cls);
     classInfo.setId(cls.getName());
     setClassType(classInfo);
+    init_();
   }
 `
         }));
