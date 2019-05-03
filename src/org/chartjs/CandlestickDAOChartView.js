@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'org.chartjs',
-  name: 'CandlestickDAOChartCView',
+  name: 'CandlestickDAOChartView',
   extends: 'foam.u2.View',
 
   documentation: `

@@ -23,10 +23,7 @@ foam.CLASS({
         class: 'foam.u2.MultiView',
         views: [
           {
-            class: 'foam.u2.TableView'
-          },
-          {
-            class: 'org.chartjs.CandlestickDAOChartCView',
+            class: 'org.chartjs.CandlestickDAOChartView',
             /*
             config: {
               type: 'bar',
@@ -57,6 +54,9 @@ foam.CLASS({
                 label: 'Blue Team (NFLX)'
               }
             }
+          },
+          {
+            class: 'foam.u2.TableView'
           }
         ]
       }
