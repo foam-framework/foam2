@@ -21,6 +21,9 @@
      ^dao {
        color: #555;
      }
+     ^section {
+       display: inline-grid;
+     }
      ^header {
        background: red;
        color: white;
@@ -32,9 +35,15 @@
 
    implements: [ 'foam.mlang.Expressions' ],
 
-   imports: [ 'stack' ],
+   imports: [ 'nSpecDAO', 'stack' ],
 
    properties: [
+     {
+       name: 'data',
+       factory: function() {
+         return this.nSpecDAO;
+       }
+     },
      {
        name: 'filteredDAO',
        factory: function() {
@@ -54,6 +63,7 @@
 
        var self          = this;
        var currentLetter = '';
+       var section;
 
        this.addClass(this.myClass());
 
@@ -63,12 +73,12 @@
 
          if ( l != currentLetter ) {
            currentLetter = l;
-           self.start('span').addClass(self.myClass('header')).add(l).end();
+           section = self.start('span').addClass(self.myClass('section')).start('span').addClass(self.myClass('header')).add(l).end();
          }
 
-         self.start('span')
+         section.start('span')
            .addClass(self.myClass('dao'))
-           .add(' ', label + (spec.authenticate ? '' :' (P)'))
+           .add(label)
            .attrs({title: spec.description})
            .on('click', function() {
              self.stack.push(self.BrowserView.create({
