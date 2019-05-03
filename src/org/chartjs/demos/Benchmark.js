@@ -27,7 +27,19 @@ foam.CLASS({
           },
           {
             class: 'org.chartjs.CandlestickDAOChartCView',
-            // chartType: 'bar',
+            /*
+            config: {
+              type: 'bar',
+              options: {
+                scales: {
+                  xAxes: [{
+                    type: 'time',
+                    distribution: 'linear'
+                  }]
+                }
+              }
+            },
+            */
             customDatasetStyling: {
               TSLA: {
                 steppedLine: true,

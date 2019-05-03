@@ -10,22 +10,22 @@ foam.CLASS({
   extends: 'foam.graphics.CView',
 
   requires: [
-    'org.chartjs.Lib',
+    'org.chartjs.Lib'
   ],
 
   properties: [
-    'chart',
     'config',
     ['width', 300],
     ['height', 300]
   ],
 
+  reactions: [
+    ['', 'propertyChange.config', 'invalidate']
+  ],
+
   methods: [
-    function initCView(x) {
-      this.chart = new this.Lib.CHART(x, this.config);
-    },
     function paintSelf(x) {
-      this.chart.render();
+      new this.Lib.CHART(x, this.config).render();
     }
   ]
 });
