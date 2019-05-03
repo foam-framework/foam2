@@ -57,18 +57,6 @@ foam.CLASS({
     }
 
     ^ .net-nanopay-ui-ActionView-clear {
-      // background-color: rgba(164, 179, 184, 0.1);
-      border: solid 1px rgba(164, 179, 184, 0.5);
-      border-radius: 2px;
-      color: #093649;
-      font-family: Roboto;
-      font-size: 14px;
-      font-stretch: normal;
-      font-style: normal;
-      font-weight: normal;
-      height: 30px;
-      letter-spacing: 0.2px;
-      text-align: center;
       width: 60px;
       height: 32px;
       margin: 20px;
@@ -147,7 +135,11 @@ foam.CLASS({
               {
                 richSearch: true,
                 of: self.dao.of.id,
-                onKey: true
+                onKey: true,
+                viewSpec: {
+                  class: 'foam.u2.tag.Input',
+                  focused: true
+                }
               },
               this,
               this.__subSubContext__);
@@ -189,7 +181,7 @@ foam.CLASS({
           .entity('nbsp')
           .add('selected')
         .end()
-        .tag(this.CLEAR);
+        .add(this.CLEAR);
     },
 
     function addFilter(key) {
@@ -206,6 +198,7 @@ foam.CLASS({
   actions: [
     {
       name: 'clear',
+      isSecondary: true,
       code: function() {
         this.data = undefined;
         this.filters = this.filters.slice();

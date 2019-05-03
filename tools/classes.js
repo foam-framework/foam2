@@ -347,7 +347,13 @@ var classes = [
   'foam.demos.analytics.StockSnapshot',
   'foam.nanos.analytics.FoldManagerDAODecorator',
   'foam.nanos.analytics.DAOFoldManager',
-  'foam.nanos.analytics.DAOReduceManager'
+  'foam.nanos.analytics.DAOReduceManager',
+
+  // Testing support
+  'foam.test.TestEnum',
+  'foam.test.AllSerializableProperties',
+  'foam.nanos.test.EchoService',
+  'foam.nanos.test.SerializationTestEchoService'
 ];
 
 var abstractClasses = [
@@ -367,7 +373,8 @@ var skeletons = [
   'foam.nanos.auth.token.TokenService',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.POP3Email',
-  'foam.nanos.notification.push.PushService'
+  'foam.nanos.notification.push.PushService',
+  'foam.nanos.test.EchoService'
 ];
 
 var proxies = [

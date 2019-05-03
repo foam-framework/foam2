@@ -11,6 +11,7 @@ foam2_MAVEN_DEPS = \
 	javax.mail:javax.mail-api:1.5.5 \
 	javax.servlet:javax.servlet-api:3.1.0 \
 	javax.websocket:javax.websocket-api:1.1 \
+	javax.ws.rs:javax.ws.rs-api:2.0 \
 	jstl:jstl:1.2 \
 	org.apache.commons:commons-text:1.1 \
 	org.apache.commons:commons-dbcp2:2.0.1 \

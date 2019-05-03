@@ -22,6 +22,7 @@ FOAM_FILES([
   { name: 'foam/nanos/fs/FileArray' },
   { name: 'foam/nanos/fs/FileArrayDAODecorator' },
   { name: "foam/nanos/app/AppConfig" },
+  { name: "foam/nanos/app/ContextLookupAppConfigService"},
   { name: "foam/nanos/app/AppConfigService" },
   { name: "foam/nanos/app/ClientAppConfigService" },
   { name: "foam/nanos/controller/ApplicationController" },
@@ -82,6 +83,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/UserAndGroupAuthService" },
   { name: "foam/nanos/bench/Benchmark" },
   { name: "foam/nanos/boot/NSpec" },
+  { name: "foam/nanos/boot/DAOConfigSummaryView", flags: ['web'] },
   { name: "foam/nanos/session/Session" },
   { name: "foam/nanos/session/SessionTimer" },
   { name: "foam/nanos/menu/AbstractMenu" },
@@ -182,4 +184,8 @@ FOAM_FILES([
   { name: "foam/nanos/ruler/Operations" },
   { name: "foam/nanos/ruler/RuleHistory" },
   { name: "foam/nanos/ruler/RuleHistoryStatus" },
+  { name: "foam/nanos/test/EchoService" },
+  { name: "foam/nanos/test/SerializationTestEchoService" },
+  { name: "foam/nanos/analytics/Candlestick" },
+  { name: "foam/nanos/test/ClientEchoService" }
 ]);

@@ -97,7 +97,8 @@ public class AuthenticatedDAO
 
   @Override
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( authenticateRead_ ) {
+    // x.get("auth") != null added so that system user can act during booting when the auth service is not loaded yet.
+    if ( authenticateRead_ && x.get("auth") != null ) {
       super.select_(x, new AuthenticatedSink(x, createPermission("read"), sink), skip, limit, order, predicate);
       return sink;
     }

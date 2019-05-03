@@ -299,7 +299,7 @@ foam.LIB({
         this.private_.initAgentsCache = [];
         for ( var key in this.axiomMap_ ) {
           var axiom = this.axiomMap_[key];
-          if (axiom.initObject) this.private_.initAgentsCache.push(axiom);
+          if ( axiom.initObject ) this.private_.initAgentsCache.push(axiom);
         }
       }
       return this.private_.initAgentsCache;

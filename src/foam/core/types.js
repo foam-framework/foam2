@@ -37,6 +37,11 @@ foam.CLASS({
   documentation: 'StringProperties coerce their arguments into Strings.',
 
   properties: [
+    {
+      class: 'Boolean',
+      name: 'trim',
+      value: false
+    },
     { class: 'Int', name: 'width', value: 30 },
     [ 'adapt', function(_, a) {
         return typeof a === 'function' ? foam.String.multiline(a) :
@@ -73,6 +78,18 @@ foam.CLASS({
   label: 'Date',
 
   properties: [
+    {
+      name: 'toJSON',
+      value: function toJSON(value, outputter) {
+        // A Date property can be transmitted as a plain timestamp.
+        // Since we know the type information we will adapt a timestamp
+        // back to a Date.
+        return value == null ? null :
+          outputter.formatDatesAsNumbers ?
+          value.toISOString() :
+          value.getTime();
+      }
+    },
     {
       name: 'adapt',
       value: function (_, d) {

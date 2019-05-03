@@ -22,7 +22,7 @@ foam.CLASS({
 
   css: `
     ^:read-only { border: none; background: rgba(0,0,0,0); }
-    /* Still show outline when focused as read-only to help accessibility */
+    /* Still show outline when focused as read-only to help accessibility *
     ^:read-only:focus { outline: 1px solid rgb(238, 238, 238); }
   `,
 
@@ -133,10 +133,11 @@ foam.CLASS({
       this.attrSlot(null, this.onKey ? 'input' : null).linkFrom(this.data$);
     },
 
-    function fromProperty(prop) {
-      this.SUPER(prop);
+    function fromProperty(p) {
+      this.SUPER(p);
 
-      this.visibility$.follow(prop.createVisibilityFor(this.__context__.data$));
+      this.visibility$.follow(p.createVisibilityFor(this.__context__.data$));
+      if ( ! this.onKey && p.validateObj ) this.onKey = true;
     },
 
     function updateMode_(mode) {
