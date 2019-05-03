@@ -52,15 +52,6 @@ foam.CLASS({
     },
     {
       class: 'Map',
-      name: 'candlestickMap',
-      hidden: true,
-      documentation: `
-        Map returned from the provided CandlestickDAO. This will be used by the various methods extracting the
-        information to be placed in the chart.
-      `
-    },
-    {
-      class: 'Map',
       name: 'customDatasetStyling',
       documentation: `
         Property map that would hold the customization for each key type in the candlestickDAO.
@@ -99,25 +90,24 @@ foam.CLASS({
       }));
     },
 
-    function generateConfig() {
+    function generateConfig(candlestickMap) {
       var config = {
         type: this.chartType,
-        data: this.generateData(),
+        data: this.generateData(candlestickMap),
         options: this.generateOptions()
       };
 
       return config;
     },
 
-    function generateData() {
+    function generateData(candlestickMap) {
       var self = this;
 
       var datasets = [];
       // Each dataset is represented by a key in the CandlestickDAO
-      Object.keys(this.candlestickMap).forEach(function( key ) {
-        const candlesticks = self.candlestickMap[key].array;
-        var dataset = {};
-
+      Object.keys(candlestickMap).forEach(function( key ) {
+        const candlesticks = candlestickMap[key].array;
+        
         // Create the various points on the chart
         var points = [];
         candlesticks.forEach(function ( candlestick ) {
@@ -194,8 +184,7 @@ foam.CLASS({
         var self = this;
         // Get all candlesticks categorized by their key, and ordered in ascending order by their closeTime.
         this.data.orderBy(this.Candlestick.CLOSE_TIME).select(this.GROUP_BY(this.Candlestick.KEY, this.ArraySink.create())).then( function(a) {
-          self.candlestickMap = a.groups;
-          self.config = self.generateConfig();
+          self.config = self.generateConfig(a.groups);
         });
       }
     }
