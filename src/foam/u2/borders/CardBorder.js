@@ -20,7 +20,7 @@ foam.CLASS({
   `,
 
   documentation: `
-    An sylized border. Intended for use when creating cards.
+    A stylized border. Intended for use when creating cards.
   `,
 
   methods: [
