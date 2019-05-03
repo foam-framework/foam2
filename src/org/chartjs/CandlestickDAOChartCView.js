@@ -94,7 +94,7 @@ foam.CLASS({
       var self = this;
       this.add(this.slot(function( config ) {
         if ( config ) {
-          return this.E().tag(self.ChartCView, { config: self.config });
+          return this.E().tag(self.ChartCView, { config: config });
         }
       }));
     },
@@ -110,33 +110,28 @@ foam.CLASS({
     },
 
     function generateData() {
-      var configData = {
-        datasets: this.generateDataSets()
-      };
-
-      return configData;
-    },
-
-    function generateDataSets() {
       var self = this;
+
       var datasets = [];
       // Each dataset is represented by a key in the CandlestickDAO
       Object.keys(this.candlestickMap).forEach(function( key ) {
         const candlesticks = self.candlestickMap[key].array;
         var dataset = {};
 
-        // Array of points that will represent all the candlesticks that share the same key
-        var pointData = [];
+        // Create the various points on the chart
+        var points = [];
         candlesticks.forEach(function ( candlestick ) {
-          var point = {};
-          point['x'] = candlestick.closeTime;
-          point['y'] = candlestick[self.dataPointProperty.name];
-          pointData.push(point);
+          var point = {
+            x: candlestick.closeTime,
+            y: candlestick[self.dataPointProperty.name]
+          };
+          points.push(point);
         });
-        dataset['data'] = pointData;
 
-        // Default title to represent the dataset
-        dataset['label'] = key;
+        var dataset = {
+          label: key,
+          data: points
+        };
 
         // This should allow maximum configurability by devs.
         // Refer to chartjs.org documentation for dataset properties
@@ -154,18 +149,22 @@ foam.CLASS({
         datasets.push(dataset);
       });
 
-      return datasets;
+      const configData = {
+        datasets: datasets
+      };
+
+      return configData;
     },
 
     function generateOptions() {
-      var options = {};
-
       // Default X-Axis scale for candlesticks.
-      options['scales'] = {
-        xAxes: [{
-          type: 'time',
-          distribution: 'linear'
-        }]
+      var options = {
+        scales: {
+          xAxes: [{
+            type: 'time',
+            distribution: 'linear'
+          }]
+        }
       };
 
       // This should allow maximum configurability by devs.
