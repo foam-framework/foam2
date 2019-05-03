@@ -26,6 +26,8 @@ foam.CLASS({
   methods: [
     {
       name: 'foldForState',
+      // TODO: use a more efficient key based lock
+      synchronized: true,
       javaCode: `
 foam.core.X x = getX();
 
