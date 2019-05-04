@@ -92,7 +92,7 @@ public class Outputter
   protected void outputNull() {
   }
 
-  protected void outputString(String s) {
+  public void outputString(String s) {
     writer_.append("\"");
     writer_.append(escape(s));
     writer_.append("\"");
@@ -366,13 +366,9 @@ public class Outputter
     writer_.append("}");
   }
 
-  public void outputClassInfoValue(ClassInfo info) {
-    outputString(info.getId());
-  }
-
   protected void outputClassInfo(ClassInfo info) {
     writer_.append("{\"class\":\"__Class__\",\"forClass_\":");
-    outputClassInfoValue(info);
+    outputString(info.getId());
     writer_.append("}");
   }
 

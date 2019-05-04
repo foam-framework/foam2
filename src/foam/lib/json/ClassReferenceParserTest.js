@@ -20,7 +20,11 @@ foam.CLASS({
       javaCode: `
         String input = "{\\"class\\":\\"__Class__\\",\\"forClass_\\":\\"foam.nanos.auth.User\\"}";
         ClassReferenceParserTest_StringWithValidClassReference(
-          x, input, User.getOwnClassInfo(), "Parsed modelled Class reference parser successfully");
+          x, input, User.getOwnClassInfo(), "Parsed long form modelled Class reference parser successfully");
+          
+        String input2 = "\\"foam.nanos.auth.User\\"";
+        ClassReferenceParserTest_StringWithValidClassReference(
+          x, input2, User.getOwnClassInfo(), "Parsed short form modelled Class reference parser successfully");
       `
     },
     {

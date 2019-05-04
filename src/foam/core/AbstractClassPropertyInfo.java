@@ -5,6 +5,6 @@ import foam.lib.json.Outputter;
 public abstract class AbstractClassPropertyInfo extends AbstractObjectPropertyInfo {
   @Override
   public void toJSON(Outputter outputter, Object value) {
-    outputter.outputClassInfoValue((ClassInfo) value);
+    outputter.outputString(((ClassInfo) value).getId());
   }
 }
