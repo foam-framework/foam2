@@ -18,15 +18,16 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'customDAOController'
-    },
-    {
-      class: 'String',
       name: 'title'
     },
     {
       class: 'String',
       name: 'subtitle'
+    },
+    {
+      class: 'String',
+      name: 'customDAOController',
+      displayWidth: 80
     },
     {
       class: 'foam.u2.ViewSpec',
@@ -60,6 +61,12 @@ foam.CLASS({
       fromJSON: function fromJSON(value, ctx, prop, json) {
         return value;
       }
+    },
+    {
+      class: 'String',
+      name: 'detailView',
+      value: 'foam.u2.DetailView',
+      displayWidth: 80
     },
     {
       class: 'String',
@@ -117,11 +124,6 @@ foam.CLASS({
       name: 'toggleEnabled',
       documentation: 'True to enable the toggle filters button.',
       value: true
-    },
-    {
-      class: 'String',
-      name: 'detailView',
-      value: 'foam.u2.DetailView'
     }
   ],
 

@@ -195,6 +195,7 @@ var classes = [
   'foam.nanos.http.DefaultHttpParameters',
   'foam.nanos.session.Session',
   'foam.nanos.pool.AbstractFixedThreadPool',
+  'foam.nanos.pm.PM',
   'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
@@ -344,6 +345,10 @@ var classes = [
   'foam.nanos.dig.exception.EmptyParameterException',
   'foam.nanos.dig.exception.GeneralException',
 
+  'foam.nanos.test.StockSnapshot',
+  'foam.nanos.analytics.FoldManagerDAODecorator',
+  'foam.nanos.analytics.DAOFoldManager',
+  'foam.nanos.analytics.DAOReduceManager',
 
   // Testing support
   'foam.test.TestEnum',
