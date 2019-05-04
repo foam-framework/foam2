@@ -49,13 +49,10 @@ public class ClassReferenceParser
     // ClassInfo of the modelled class if found, otherwise return null.
     //
     // Eg.,
-    // When parsing
-    //   { "class": "__Class__", "forClass_": "foam.nanos.auth.User" }
-    // returns User.getOwnClassInfo() instead of the actual User class.
+    // When parsing "foam.nanos.auth.User", returns User.getOwnClassInfo().
     //
-    // And when parsing
-    //   { "class": "__Class__", "forClass_": "java.lang.Object" }
-    // returns null because java.lang.Object is not a modelled class.
+    // And when parsing "java.lang.Object", returns null
+    // because java.lang.Object is not a modelled class.
     try {
       Class cls = Class.forName(classId);
       ClassInfo info = (ClassInfo) cls.getMethod("getOwnClassInfo") .invoke(null);
