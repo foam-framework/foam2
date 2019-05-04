@@ -138,9 +138,10 @@ FOAM_FILES([
   { name: "foam/nanos/auth/ClientLoginAuthService" },
   { name: "foam/nanos/auth/AgentAuthService" },
   { name: "foam/nanos/auth/ClientAgentAuthService" },
-  { name: "foam/nanos/pm/PMTemperatureCellFormatter" },
+  { name: "foam/nanos/pm/PM" },
   { name: "foam/nanos/pm/PMInfo" },
   { name: "foam/nanos/pm/PMTableView", flags:['web'] },
+  { name: "foam/nanos/pm/PMTemperatureCellFormatter" },
   { name: "foam/nanos/pm/TemperatureCView" },
   { name: 'foam/nanos/notification/email/EmailMessage' },
   { name: 'foam/nanos/notification/email/EmailService' },
@@ -186,5 +187,6 @@ FOAM_FILES([
   { name: "foam/nanos/ruler/RuleHistoryStatus" },
   { name: "foam/nanos/test/EchoService" },
   { name: "foam/nanos/test/SerializationTestEchoService" },
+  { name: "foam/nanos/analytics/Candlestick" },
   { name: "foam/nanos/test/ClientEchoService" }
 ]);

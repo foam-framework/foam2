@@ -12,13 +12,8 @@ foam.CLASS({
     'key',
     'openTime',
     'closeTime',
-
     'open',
-    'openValueTime',
-
     'close',
-    'closeValueTime',
-
     'min',
     'max',
     'average'
@@ -46,7 +41,8 @@ foam.CLASS({
     },
     {
       class: 'DateTime',
-      name: 'openValueTime'
+      name: 'openValueTime',
+      hidden: true
     },
     {
       class: 'DateTime',
@@ -58,7 +54,8 @@ foam.CLASS({
     },
     {
       class: 'DateTime',
-      name: 'closeValueTime'
+      name: 'closeValueTime',
+      hidden: true
     },
     {
       class: 'Float',
