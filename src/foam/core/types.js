@@ -345,7 +345,7 @@ foam.CLASS({
     {
       name: 'toJSON',
       value: function toJSON(value, _) {
-        return value.id;
+        return value && value.id;
       }
     },
     [
