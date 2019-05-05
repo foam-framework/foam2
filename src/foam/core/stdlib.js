@@ -740,6 +740,19 @@ foam.LIB({
     },
     // Hash n & n: Truncate to 32 bits.
     function hashCode(d) { var n = d.getTime(); return n & n; },
+    function toDate(d) {
+      if (foam.Object.isInstance(d) && d.class == '__Timestamp__')
+        return new Date(d.value);
+      if (typeof d === 'number') return new Date(d);
+      if (typeof d === 'string') {
+        var ret = new Date(d);
+
+        if (isNaN(ret.getTime())) throw 'Invalid Date: ' + d;
+
+        return ret;
+      }
+      return d;
+    },
     function relativeDateString(date) {
       // FUTURE: make this translatable for i18n, including plurals
       //   "hours" vs. "hour"

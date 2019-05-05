@@ -94,18 +94,12 @@ foam.CLASS({
       }
     },
     {
+      name: 'value',
+      adapt: function (_, d) { return foam.Date.toDate(d); }
+    },
+    {
       name: 'adapt',
-      value: function (_, d) {
-        if ( typeof d === 'number' ) return new Date(d);
-        if ( typeof d === 'string' ) {
-          var ret = new Date(d);
-
-          if ( isNaN(ret.getTime()) ) throw 'Invalid Date: ' + d;
-
-          return ret;
-        }
-        return d;
-      }
+      value: function (_, d) { return foam.Date.toDate(d); }
     },
     [ 'type', 'Date' ],
     {
