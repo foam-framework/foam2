@@ -15,7 +15,7 @@ foam.CLASS({
     {
       class: 'Date',
       name: 'data_',
-      value: new Date(),
+      factory: function() { return new Date(); },
       postSet: function(_, n) {
         if ( this.skipDateUpdate ) {
           this.skipDateUpdate = false;
