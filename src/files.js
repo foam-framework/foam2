@@ -181,6 +181,7 @@ FOAM_FILES([
   { name: 'foam/u2/view/SearchViewWrapper', flags: ['web'] },
   { name: 'foam/u2/view/StringArrayRowView', flags: ['web'] },
   { name: 'foam/u2/borders/NullBorder', flags: ['web'] },
+  { name: 'foam/u2/borders/CardBorder', flags: ['web'] },
   { name: "foam/version/VersionTrait" },
   { name: "foam/version/VersionedClass" },
   { name: "foam/version/VersionedClassFactory" },
@@ -560,6 +561,7 @@ FOAM_FILES([
 
   { name: "org/chartjs/Lib" },
   { name: "org/chartjs/AbstractChartCView" },
+  { name: "org/chartjs/CandlestickDAOChartView" },
   { name: "org/chartjs/Pie" },
   { name: "org/chartjs/Bar" },
   { name: "org/chartjs/Line" },

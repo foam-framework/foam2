@@ -29,12 +29,13 @@ foam.CLASS({
     {
       class: 'String',
       name: 'name',
+      displayWidth: '60',
       tableWidth: 460
     },
     {
       class: 'String',
       name: 'description',
-      width: 80
+      width: 120
     },
     {
       class: 'Boolean',
@@ -109,6 +110,12 @@ foam.CLASS({
       }
     },
     {
+      class: 'FObjectProperty',
+      name: 'service',
+      view: { class: 'foam.u2.view.FObjectView' },
+      permissionRequired: true
+    },
+    {
       class: 'String',
       name: 'serviceClass',
       displayWidth: 80
@@ -131,15 +138,15 @@ foam.CLASS({
       view: { class: 'io.c9.ace.Editor' }
     },
     {
-      class: 'FObjectProperty',
-      name: 'service',
-      view: { class: 'foam.u2.view.FObjectView' },
+      class: 'String',
+      name: 'documentation',
+      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
       permissionRequired: true
     },
     {
       class: 'String',
-      name: 'documentation',
-      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 120 },
+      name: 'authNotes',
+      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
       permissionRequired: true
     }
     // TODO: permissions, keywords, lazy, parent

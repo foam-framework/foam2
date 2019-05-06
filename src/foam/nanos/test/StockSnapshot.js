@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.demos.analytics',
+  package: 'foam.nanos.test',
   name: 'StockSnapshot',
   implements: [
     'foam.nanos.analytics.Foldable'
