@@ -149,6 +149,38 @@ foam.CLASS({
       value: ''
     },
     {
+      class: 'Boolean',
+      name: 'pretty',
+      value: true,
+      postSet: function(_, p) {
+        if ( p ) {
+          this.clearProperty('indentStr');
+          this.clearProperty('nlStr');
+          this.clearProperty('postColonStr');
+          this.clearProperty('useShortNames');
+        } else {
+          this.indentStr = this.nlStr = this.postColonStr = null;
+        }
+      }
+    },
+    {
+      // TODO: rename to FON
+      class: 'Boolean',
+      name: 'strict',
+      value: true,
+      postSet: function(_, s) {
+        if ( s ) {
+          this.useShortNames            = false;
+          this.formatDatesAsNumbers     = false;
+          this.alwaysQuoteKeys          = true;
+          this.formatFunctionsAsStrings = true;
+        } else {
+          this.alwaysQuoteKeys          = false;
+          this.formatFunctionsAsStrings = false;
+        }
+      }
+    },
+    {
       class: 'Int',
       name: 'indentLevel_',
       value: 0
@@ -237,38 +269,6 @@ foam.CLASS({
       class: 'Boolean',
       name: 'convertUnserializableToStubs',
       value: false
-    },
-    {
-      class: 'Boolean',
-      name: 'pretty',
-      value: true,
-      postSet: function(_, p) {
-        if ( p ) {
-          this.clearProperty('indentStr');
-          this.clearProperty('nlStr');
-          this.clearProperty('postColonStr');
-          this.clearProperty('useShortNames');
-        } else {
-          this.indentStr = this.nlStr = this.postColonStr = null;
-        }
-      }
-    },
-    {
-      // TODO: rename to FON
-      class: 'Boolean',
-      name: 'strict',
-      value: true,
-      postSet: function(_, s) {
-        if ( s ) {
-          this.useShortNames            = false;
-          this.formatDatesAsNumbers     = false;
-          this.alwaysQuoteKeys          = true;
-          this.formatFunctionsAsStrings = true;
-        } else {
-          this.alwaysQuoteKeys          = false;
-          this.formatFunctionsAsStrings = false;
-        }
-      }
     }
     /*
     {
@@ -460,6 +460,12 @@ foam.CLASS({
       }
     },
 
+    function outputClassInfo(o) {
+      this.out('{"class":"__Class__","forClass_":');
+      this.outputString(o.id);
+      this.out('}');
+    },
+
     {
       name: 'output',
       code: foam.mmethod({
@@ -484,7 +490,7 @@ foam.CLASS({
         },
         Object: function(o) {
           if ( foam.core.FObject.isSubClass(o) ) {
-            this.output({ class: '__Class__', forClass_: o.id });
+            this.outputClassInfo(o);
           } else if ( o.outputJSON ) {
             o.outputJSON(this);
           } else {
@@ -646,32 +652,32 @@ foam.LIB({
     // Compact output (not pretty)
     Compact: foam.json.Outputter.create({
       pretty: false,
+      strict: false,
       formatDatesAsNumbers: true,
-      outputDefaultValues: false,
-      strict: false
+      outputDefaultValues: false
     }),
 
     // Shorter than Compact (uses short-names if available)
     Short: foam.json.Outputter.create({
       pretty: false,
+      strict: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
       // TODO: No deserialization support for shortnames yet.
       //      useShortNames: true,
-      useShortNames: false,
-      strict: false
+      useShortNames: false
     }),
 
     // Short, but exclude network-transient properties.
     Network: foam.json.Outputter.create({
       pretty: false,
+      strict: true,
       formatDatesAsNumbers: true,
       outputDefaultValues: true,
       // TODO: No deserialization support for shortnames yet.
       //      useShortNames: true,
       useShortNames: false,
       // TODO: Currently faster to use strict JSON and native JSON.parse
-      strict: true,
       convertUnserializableToStubs: true,
       propertyPredicate: function(o, p) { return ! p.networkTransient; }
     }),
@@ -679,24 +685,24 @@ foam.LIB({
     // Short, but exclude storage-transient properties.
     Storage: foam.json.Outputter.create({
       pretty: false,
+      strict: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
       // TODO: No deserialization support for shortnames yet.
       //      useShortNames: true,
       useShortNames: false,
-      strict: false,
       propertyPredicate: function(o, p) { return ! p.storageTransient; }
     }),
 
     // Short, but exclude storage-transient properties and is proper JSON.
     StorageStrict: foam.json.Outputter.create({
       pretty: false,
+      strict: true,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
       // TODO: No deserialization support for shortnames yet.
       //      useShortNames: true,
       useShortNames: false,
-      strict: true,
       propertyPredicate: function(o, p) { return ! p.storageTransient; }
     })
   },

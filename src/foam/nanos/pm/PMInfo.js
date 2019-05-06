@@ -10,7 +10,7 @@ foam.CLASS({
 
   documentation: 'Performance Measurement database entry.',
 
-  ids: [ 'clsName', 'pmName' ],
+  ids: [ 'clsName', 'name' ],
 
   searchColumns: [ ],
 
@@ -22,8 +22,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'pmName',
-      label: 'Name'
+      name: 'name',
     },
     {
       class: 'Int',

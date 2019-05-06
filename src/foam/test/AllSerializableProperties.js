@@ -149,7 +149,7 @@ foam.CLASS({
         objectProp: [1, 'foo', new Date(), foam.test.AllSerializableProperties, [3, 4]],
 //        function: null,
         stringArrayProp: ['Hello', 'World'],
-        classProp: foam.test.AllProperties,
+        classProp: foam.test.AllSerializableProperties,
         fObjectPropertyProp: foam.test.TestObj.create({ description: 'some object' }),
         emailProp: 'test@example.com',
         enumProp: foam.test.TestEnum.BAR,
