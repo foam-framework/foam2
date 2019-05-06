@@ -108,6 +108,7 @@ foam.CLASS({
     'cloneProperty',
     'queryParser',
     'diffProperty',
+    'toJSON',
     {
       name: 'methods',
       factory: function() {
@@ -276,6 +277,19 @@ foam.CLASS({
             body: `return foam.util.SafetyUtil.compare(get_(o), ${this.propValue}) == 0;`
           }
         ];
+
+        if ( this.toJSON ) {
+          m.push({
+            name: 'toJSON',
+            visibility: 'public',
+            type: 'void',
+            args: [
+              { type: 'foam.lib.json.Outputter', name: 'outputter' },
+              { type: 'Object', name: 'value' }
+            ],
+            body: this.toJSON
+          });
+        }
 
         if ( this.cloneProperty != null ) {
           m.push({

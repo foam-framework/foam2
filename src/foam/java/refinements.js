@@ -118,6 +118,10 @@ foam.CLASS({
     { class: 'foam.java.JavaType' },
     {
       class: 'String',
+      name: 'javaToJSON'
+    },
+    {
+      class: 'String',
       name: 'javaJSONParser',
       value: 'foam.lib.json.AnyParser.instance()'
     },
@@ -240,7 +244,8 @@ foam.CLASS({
         includeInDigest:         this.includeInDigest,
         includeInSignature:      this.includeInSignature,
         containsPII:             this.containsPII,
-        containsDeletablePII:    this.containsDeletablePII
+        containsDeletablePII:    this.containsDeletablePII,
+        toJSON:                  this.javaToJSON
       });
     },
 
