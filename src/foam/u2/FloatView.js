@@ -69,28 +69,25 @@ foam.CLASS({
 
       if ( ! foam.Undefined.isInstance(this.data) ) view.set(this.dataToText(this.data));
 
-      if ( this.onKey ) {
-        this.on('blur', function() {
-          var value = data.get();
-          view.set(self.formatNumber(value));
-        });
-       }
+      // When focus is lost on the view, force the view's value to equal the data
+      // to ensure it's formatted properly.
+      this.on('blur', function () {
+        view.set(self.dataToText(data.get()));
+      });
 
+      var preventFeedback = false;
       view.sub(function() {
-        var text = view.get();
-        var val = data.get();
-        if ( val == self.textToData(text) && self.needsTrim(text, self.precision) ) {
-          // trim trailing 0's
-          view.set(text.substring(0, text.indexOf('.') + self.precision + 1));
-        };
+        if ( preventFeedback ) return;
+        preventFeedback = true;
         data.set(self.textToData(view.get()));
+        preventFeedback = false;
       });
 
       data.sub(function() {
-        var text = view.get();
-        // no need to trim input if its value is the same as data, and it's not too long 
-        if ( self.textToData(text) == data.get() && ! self.needsTrim(text, self.precision) ) return;
+        if ( preventFeedback ) return;
+        preventFeedback = true;
         view.set(self.dataToText(data.get()));
+        preventFeedback = false;
       });
     },
 
@@ -103,7 +100,7 @@ foam.CLASS({
     },
 
     function formatNumber(val) {
-      if ( ! val ) return '0';
+      if ( ! val ) val = 0;
       val = val.toFixed(this.precision);
       return val;
     },
@@ -116,10 +113,6 @@ foam.CLASS({
 
     function textToData(text) {
       return parseFloat(text) || 0;
-    },
-
-    function needsTrim(text, precision) {
-      return text.indexOf('.') > 0 && text.length - text.indexOf('.') - 1 > precision;
     }
   ]
 });
