@@ -13,8 +13,18 @@ foam.CLASS({
   implements: [
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
-    'foam.nanos.auth.LastModifiedByAware'
+    'foam.nanos.auth.LastModifiedByAware',
+    'foam.nanos.notification.email.EmailService'
  ],
+
+  imports: [
+    'email',
+    'notify'
+  ],
+
+  messages: [
+    { name: 'RESEND_MSG', message: 'Email has been resent.'},
+  ],
 
   properties: [
     {
@@ -82,6 +92,17 @@ foam.CLASS({
       hidden: true,
       documentation: 'Added to suppress journal comments regarding "modified by". Also, a non-null value is required.',
       javaFactory: 'return 1L;'
+    }
+  ],
+
+  actions: [
+    {
+      name: 'resendEmail',
+      label: 'Resend Email',
+      code: function(X) {
+        this.email.sendEmail(X, this);
+        this.notify(this.RESEND_MSG);
+      }
     }
   ]
 });
