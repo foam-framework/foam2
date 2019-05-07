@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.notification.email',
   name: 'ProxyEmailService',
 
-  documentation: 'This class is used for the purpose of decorating the email(serivce)',
+  documentation: 'This class is used for the purpose of decorating the email(service)',
 
   implements: [
     'foam.nanos.notification.email.EmailService'

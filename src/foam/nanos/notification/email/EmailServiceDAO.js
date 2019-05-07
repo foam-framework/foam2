@@ -14,7 +14,9 @@ foam.CLASS({
       name: 'emailService',
       documentation: `This property determines how to process the email.`,
       of: 'foam.nanos.notification.email.EmailService',
-      class: 'FObjectProperty'
+      class: 'FObjectProperty',
+      javaGetter:
+      `return (foam.nanos.notification.email.EmailService)getX().get("email");`
     }
   ],
 
