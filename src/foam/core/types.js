@@ -43,13 +43,16 @@ foam.CLASS({
       value: false
     },
     { class: 'Int', name: 'width', value: 30 },
-    [ 'adapt', function(_, a) {
-        return typeof a === 'function' ? foam.String.multiline(a) :
-               typeof a === 'number'   ? String(a)                :
-               a && a.toString         ? a.toString()             :
-                                         ''                       ;
+    {
+      name: 'adapt',
+      value: function(_, a, p) {
+        var s = typeof a === 'function' ? foam.String.multiline(a) :
+                typeof a === 'number'   ? String(a)                :
+                a && a.toString         ? a.toString()             :
+                                          ''                       ;
+        return p.trim ? s.trim() : s;
       }
-    ],
+    },
     [ 'type', 'String' ],
     [ 'value', '' ]
   ]
@@ -78,6 +81,18 @@ foam.CLASS({
   label: 'Date',
 
   properties: [
+    {
+      name: 'toJSON',
+      value: function toJSON(value, outputter) {
+        // A Date property can be transmitted as a plain timestamp.
+        // Since we know the type information we will adapt a timestamp
+        // back to a Date.
+        return value == null ? null :
+          outputter.formatDatesAsNumbers ?
+          value.getTime() :
+          value.toISOString();
+      }
+    },
     {
       name: 'adapt',
       value: function (_, d) {
@@ -330,6 +345,12 @@ foam.CLASS({
   extends: 'Property',
 
   properties: [
+    {
+      name: 'toJSON',
+      value: function toJSON(value, _) {
+        return value && value.id;
+      }
+    },
     [
       'adapt',
       function(_, v) {
@@ -523,10 +544,10 @@ foam.CLASS({
         var type = foam.lookup(prop.type);
 
         return type.isInstance(v) ?
-            v :
-            ( v.class ?
-                this.__context__.lookup(v.class) :
-                type ).create(v, this.__subContext__);
+          v :
+          ( v.class ?
+            this.__context__.lookup(v.class) :
+            type ).create(v, this.__subContext__);
       }
     }
   ],

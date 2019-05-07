@@ -42,7 +42,9 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .forEach(this.columns, function(columnName) {
-          var axiom = this.table.getAxiomByName(columnName);
+          var axiom = typeof columnName === 'string'
+            ? this.table.getAxiomByName(columnName)
+            : columnName;
           var localStorageKey = this.table.id + '.' + columnName;
 
           var checkBox = this.CheckBox.create({

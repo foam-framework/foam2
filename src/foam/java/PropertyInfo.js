@@ -108,6 +108,7 @@ foam.CLASS({
     'cloneProperty',
     'queryParser',
     'diffProperty',
+    'validateObj',
     {
       name: 'methods',
       factory: function() {
@@ -274,6 +275,16 @@ foam.CLASS({
             args: [{ name: 'o', type: 'Object' }],
             /* TODO: revise when/if expression support is added to Java */
             body: `return foam.util.SafetyUtil.compare(get_(o), ${this.propValue}) == 0;`
+          },
+          {
+            name: 'validateObj',
+            visibility: 'public',
+            type: 'void',
+            args: [
+              { name: 'x', type: 'foam.core.X' },
+              { name: 'obj', type: 'foam.core.FObject' }
+            ],
+            body: this.validateObj
           }
         ];
 

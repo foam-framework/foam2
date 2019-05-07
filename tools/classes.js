@@ -198,6 +198,7 @@ var classes = [
   'foam.nanos.om.OM',
   'foam.nanos.om.OMInfo',
   'foam.nanos.om.OMLogger',
+  'foam.nanos.pm.PM',
   'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
@@ -345,7 +346,18 @@ var classes = [
   'foam.support.model.Ticket',
 
   'foam.nanos.dig.exception.EmptyParameterException',
-  'foam.nanos.dig.exception.GeneralException'
+  'foam.nanos.dig.exception.GeneralException',
+
+  'foam.nanos.test.StockSnapshot',
+  'foam.nanos.analytics.FoldManagerDAODecorator',
+  'foam.nanos.analytics.DAOFoldManager',
+  'foam.nanos.analytics.DAOReduceManager',
+
+  // Testing support
+  'foam.test.TestEnum',
+  'foam.test.AllSerializableProperties',
+  'foam.nanos.test.EchoService',
+  'foam.nanos.test.SerializationTestEchoService'
 ];
 
 var abstractClasses = [
@@ -365,7 +377,8 @@ var skeletons = [
   'foam.nanos.auth.token.TokenService',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.POP3Email',
-  'foam.nanos.notification.push.PushService'
+  'foam.nanos.notification.push.PushService',
+  'foam.nanos.test.EchoService'
 ];
 
 var proxies = [

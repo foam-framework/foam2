@@ -18,9 +18,16 @@ foam.CLASS({
   "Takes a views property which should be the value of an array containing arrays that contain desired views, and label." +
   "Ex. views: [[ { class: 'foam.u2.view.TableView' }, 'Table' ]]",
 
-  requires: [
-    'foam.u2.stack.Stack'
-  ],
+  css: `
+    ^ {
+      margin: auto;
+    }
+    ^ .foam-u2-tag-Select {
+      float: right;
+      width: 100px;
+      height: 28px;
+    }
+  `,
 
   properties: [
     {
@@ -29,59 +36,38 @@ foam.CLASS({
     },
     {
       name: 'views',
-      value: []
+      factory: function() { return []; }
     },
     {
-      name: 'altStack'
-    },
-    {
-      name: 'viewChoices',
+      name: 'selectedView',
       view: function(_, X) {
-        return foam.u2.view.ChoiceView.create({
-          choices: X.data.views
-        });
+        return foam.u2.view.ChoiceView.create({choices: X.data.views});
       }
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'data'
     }
   ],
-
-  css: `
-    ^ {
-      margin: auto;
-    }
-    ^ .foam-u2-tag-Select {
-      width: 100px;
-      height: 28px;
-    }
-  `,
 
   methods: [
     function initE() {
       this.SUPER();
       var self = this;
-      this.altStack = null;
-      this.altStack = this.Stack.create();
-      this.viewChoices$.sub(this.changeView);
 
-      this.views.forEach(function(view) {
-        view[0].data$ = view[0].data$ ? view[0].data$ : self.data$;
-      });
-      this.altStack.push(this.views[0][0]);
+     this.selectedView = this.views[0][0];
 
       this.addClass(this.myClass())
       this.startContext({data: this})
         this.start()
-          .add(this.VIEW_CHOICES)
+          .add(this.SELECTED_VIEW)
         .end()
       .endContext()
-      .start('div').addClass('stack-wrapper')
-        .tag({class: 'foam.u2.stack.StackView', data: this.altStack, showActions: false})
+      .start('div')
+        .add(this.selectedView$.map(function(v) {
+          return self.E().tag(v, {data: self.data$proxy});
+        }))
       .end();
-    }
-  ],
-
-  listeners: [
-    function changeView() {
-      this.altStack.push(this.viewChoices);
     }
   ]
 });
