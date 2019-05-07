@@ -186,25 +186,17 @@ foam.CLASS({
     function init() {
       this.SUPER();
       var self = this;
-
-      window.onpopstate = async function(event) {
-        var hid = location.hash.substr(1);
-        if ( hid ) {
-          if ( self.client ) {
-            var menu = await self.client.menuDAO.find(hid);
-            menu && menu.launch(this);
-          } else {
-            self.clientPromise.then(async () => {
-              var menu = await self.client.menuDAO.find(hid);
-              menu && menu.launch(this);
-            });
-          }
-        }
-      };
-
-      this.clientPromise.then(async function(client) {
+      self.clientPromise.then(async function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
         foam.__context__.register(foam.u2.UnstyledActionView, 'foam.u2.ActionView');
+
+        window.onpopstate = async function(event) {
+          var hid = location.hash.substr(1);
+          if ( hid ) {
+            var menu = await self.client.menuDAO.find(hid);
+            menu && menu.launch(this);
+          }
+        };
 
         await self.fetchAgent();
         await self.fetchUser();
