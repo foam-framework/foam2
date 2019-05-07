@@ -98,7 +98,7 @@ foam.CLASS({
       name: 'firstName',
       validateObj: function(firstNameField) {
         if (!(firstNameField.trim())){
-          return 'First Name Field Required.'
+          return 'First Name Required.'
         } if ( firstNameField.length > 70 ) {
           return 'First name cannot exceed 70 characters.';
         } if(/\d/.test(this.firstNameField)) {
@@ -115,7 +115,7 @@ foam.CLASS({
       name: 'lastName',
       validateObj: function(lastNameField) {
         if (!(lastNameField.trim())){
-          return 'Last Name Field Required.'
+          return 'Last Name Required.'
         } if ( lastNameField.length > 70 ) {
           return 'Last name cannot exceed 70 characters.';
         } if(/\d/.test(this.lastNameField)) {
@@ -135,7 +135,7 @@ foam.CLASS({
         if ( organization.length > 70 ) {
           return 'Company name cannot exceed 70 characters.';
         } if (!(organization.trim())) {
-          return 'Company Name Field Required.';
+          return 'Company Name Required.';
         }
       }
     },
@@ -162,7 +162,7 @@ foam.CLASS({
         var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         
         if (!(email.trim())) {
-          return 'Email Field Required.';
+          return 'Email Required.';
         }
         if ( ! emailRegex.test(email.trim()) ) {
           return 'Invalid email address.';
