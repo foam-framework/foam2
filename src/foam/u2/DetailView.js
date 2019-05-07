@@ -106,7 +106,7 @@ foam.CLASS({
         return this.of ? this.of.model_.label : '';
       },
     },
-    ['nodeName', 'div']
+    ['nodeName', 'DIV']
   ],
 
   css: `
