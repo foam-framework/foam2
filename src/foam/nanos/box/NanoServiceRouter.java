@@ -6,7 +6,10 @@
 
 package foam.nanos.box;
 
+import foam.box.Box;
+import foam.box.Message;
 import foam.box.Skeleton;
+import foam.box.SubBoxMessage;
 import foam.core.ContextAware;
 import foam.core.X;
 import foam.dao.DAO;
@@ -26,7 +29,7 @@ import javax.servlet.ServletException;
 
 public class NanoServiceRouter
   extends HttpServlet
-  implements NanoService, ContextAware
+  implements NanoService, ContextAware, Box
 {
   protected X x_;
 
@@ -101,6 +104,18 @@ public class NanoServiceRouter
   protected void informService(Object service, NSpec spec) {
     if ( service instanceof ContextAware ) ((ContextAware) service).setX(getX());
     if ( service instanceof NSpecAware   ) ((NSpecAware) service).setNSpec(spec);
+  }
+
+  public void send(Message msg) {
+    Logger        logger   = (Logger)getX().get("logger");
+
+    if ( ! ( msg instanceof foam.box.SubBoxMessage ) ) {
+      logger.warning("Message was not a SubBoxMessage, therefore has no serviceKey.", msg);
+      return;
+    } 
+
+    foam.box.SubBoxMessage subBoxMsg = (foam.box.SubBoxMessage)msg;
+    service(subBoxMsg.getName(), msg);
   }
 
   @Override

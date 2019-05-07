@@ -22,6 +22,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.*',
+    'foam.nanos.box.NanoServiceRouter',
     'foam.nanos.logger.Logger',
     'foam.lib.json.JSONParser',
     'foam.lib.json.Outputter',
@@ -59,7 +60,23 @@ foam.CLASS({
       name: 'parser',
       javaType: 'foam.lib.json.JSONParser',
       javaFactory: `return getX().create(JSONParser.class);`
+    },
+    {
+      class: 'Object',
+      name: 'router',
+      javaType: 'foam.nanos.box.NanoServiceRouter',
+      javaFactory: `
+        return getX().create(NanoServiceRouter.class);
+      `
     }
+  ],
+
+  constants: [
+    {
+      type: 'Integer',
+      name: 'BUFFERSIZE',
+      value: 1024
+    },
   ],
 
   methods: [
@@ -77,7 +94,7 @@ foam.CLASS({
           setServerSocket(serverSocket); 
           setPort_(port);
           while (true) {
-            new SocketClientHandler(getX(), getServerSocket().accept(), getParser()).start();
+            new SocketClientHandler(getX(), getServerSocket().accept(), getParser(), getRouter()).start();
           }
         } catch (IOException e) {
           port = 10000 + (new Random().nextInt(10000) + 1);
@@ -102,24 +119,24 @@ foam.CLASS({
         cls.extras.push(foam.java.Code.create({
           data:
             `
-            protected static int bufferSize = 1024;
             private static class SocketClientHandler extends Thread {
               private X x;
               private Socket clientSocket;
               private JSONParser parser;
+              private NanoServiceRouter router;
           
-              public SocketClientHandler(X x, Socket socket, JSONParser parser) {
+              public SocketClientHandler(X x, Socket socket, JSONParser parser, NanoServiceRouter router) {
                 this.x = x;
                 this.parser = parser;
                 this.clientSocket = socket;
+                this.router = router;
               }
 
               public void run() {
                 try {
                   String mStr = Base64.getEncoder().encodeToString(read(this.clientSocket));
                   Message message = (Message) this.parser.parseString(mStr);
-                  SocketServiceBox box = new SocketServiceBox(this.clientSocket);
-                  box.send(message);                  
+                  this.router.send(message);
                 } catch (java.lang.Exception ex) {
                   ((Logger) this.x.get("logger")).error(ex);
                 } finally {
@@ -132,7 +149,7 @@ foam.CLASS({
               }
             }
             public static byte[] read(Socket socket) throws IOException{
-              byte[] buffer = new byte[bufferSize];
+              byte[] buffer = new byte[BUFFERSIZE];
               ByteArrayOutputStream data = new ByteArrayOutputStream();
               int read;
               try {
@@ -153,6 +170,10 @@ foam.CLASS({
                 }
               }
               return data.toByteArray();
+            }
+
+            public void onMessage(Socket socket, String message) {
+
             }
             `
         }));

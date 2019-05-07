@@ -18,7 +18,6 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'ClusterSyncRequestMessage',
-  extends: 'foam.box.Message',
 
   properties: [
     {

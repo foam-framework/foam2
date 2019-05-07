@@ -88,7 +88,6 @@ var classes = [
   'foam.box.SessionReplyBox',
   'foam.box.SessionClientBox',
   'foam.box.SocketService',
-  'foam.box.SocketServiceBox',
   'foam.box.ClusterSyncRequestMessage',
   'foam.dao.DAO',
   'foam.dao.java.JDAO',
