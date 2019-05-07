@@ -1,0 +1,30 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+foam.CLASS({
+  package: 'com.foam.demos.forEach',
+  name: 'Controller',
+  extends: 'foam.u2.Element',
+
+  properties: [
+    {
+      name: 'names',
+      value: [ 'Michal', 'Kevin', 'Eminem' ]
+    }
+  ],
+
+  methods: [
+    function initE() {
+      this.start('div').add('Foreach :').end().
+        start('div').add(this.slot(function(names) {
+          return this.E('span').forEach(names, function(d, index) {
+            this.start().add(index).add(' ').add(d).end();
+          })
+        })).
+        end();
+    }
+  ]
+});
