@@ -636,6 +636,26 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.java',
+  name: 'MessageJavaRefinement',
+  refines: 'foam.i18n.MessageAxiom',
+  flags: ['java'],
+
+  methods: [
+    function buildJavaClass(cls) {
+      if ( this.flags && this.flags.length && this.flags.indexOf('java') == -1 ) {
+        return;
+      }
+      cls.constant({
+        name: this.name,
+        type: 'String',
+        value: foam.java.asJavaValue(this.message)
+      });
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
   name: 'ConstantJavaRefinement',
   refines: 'foam.core.Constant',
   flags: ['java'],
