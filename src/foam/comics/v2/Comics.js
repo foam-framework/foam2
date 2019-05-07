@@ -1,4 +1,20 @@
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ViewSpecWithJava',
+  extends: 'foam.u2.ViewSpec',
+  properties: [
+    ['view', { class: 'foam.u2.view.MapView' }],
+    ['type', 'foam.lib.json.UnknownFObject'],
+    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
+    ['javaJSONParser', 'new foam.lib.json.UnknownFObjectParser()'],
+    // TODO: remove next line when permanently fixed in ViewSpec
+    ['fromJSON', function fromJSON(value, ctx, prop, json) {
+      return value;
+    }]
+  ]
+});
+
+foam.CLASS({
   package: 'foam.comics.v2',
   name: 'BrowseView',
   properties: [
@@ -7,7 +23,7 @@ foam.CLASS({
       name: 'name'
     },
     {
-      class: 'foam.u2.ViewSpec',
+      class: 'foam.u2.ViewSpecWithJava',
       name: 'view'
     }
   ]
@@ -56,9 +72,13 @@ foam.CLASS({
       expression: function(of) { return of.name; }
     },
     {
-      class: 'foam.u2.ViewSpec',
+      class: 'foam.u2.ViewSpecWithJava',
       name: 'browseBorder',
-      value: { class: 'foam.u2.borders.NullBorder' }
+      expression: function() {
+        // Can't use a value here because java tries to generate a HasMap
+        // for it which doesn't jive with the AbstractFObjectPropertyInfo.
+        return { class: 'foam.u2.borders.NullBorder' };
+      }
     },
     {
       class: 'FObjectArray',
@@ -160,7 +180,7 @@ foam.CLASS({
       }
     },
     {
-      class: 'foam.u2.ViewSpec',
+      class: 'foam.u2.ViewSpecWithJava',
       name: 'browseView',
       expression: function(data$browseViews) {
         return data$browseViews[0].view;
