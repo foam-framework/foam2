@@ -12,6 +12,12 @@ foam.CLASS({
     'foam.u2.DetailView'
   ],
   exports: [ 'updateData' ],
+  properties: [
+    {
+      class: 'Map',
+      name: 'data'
+    }
+  ],
   actions: [
     {
       name: 'addRow',
