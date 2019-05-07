@@ -14,27 +14,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Date',
-      name: 'data_',
-      value: new Date(),
-      postSet: function(_, n) {
-        if ( this.skipDateUpdate ) {
-          this.skipDateUpdate = false;
-          return;
-        }
-        this.data = this.data_;
-      }
-    },
-    {
-      class: 'Date',
-      name: 'data',
-      postSet: function(_, n) {
-        this.skipDateUpdate = true;
-        if ( ! n || n === undefined || isNaN(n.getDate()) )  {
-          this.data_ = new Date();
-        } else {
-          this.data_ = n;
-        }
-      }
+      name: 'data'
     },
     {
       name: 'nodeName',
@@ -125,22 +105,24 @@ foam.CLASS({
     },
     function initE() {
       var self = this;
-      this.startContext({ data_: this.data_ }).
+      this.startContext({ data: this.data }).
         addClass(this.myClass('calendar_table')).
-        add(this.slot(function(data_) {
-          var month = data_.getMonth();
-          var year = data_.getYear() + 1900;
+        add(this.slot(function(data) {
+          data = data || new Date();
+
+          var month = data.getMonth();
+          var year = data.getYear() + 1900;
 
           var prevMonthLastWeek = self.weeksOfMonth(month-1, year).pop()
             .map(function(day) {
               return self.E('td').
                 add(day).
                 on('click', function() {
-                  var d = new Date(data_);
+                  var d = new Date(data);
                   d.setDate(1);
                   d.setMonth(d.getMonth()-1);
                   d.setDate(day);
-                  self.data_ = d;
+                  self.data = d;
                 }).
                 addClass(self.myClass('prev_month_cell'));
             });
@@ -151,11 +133,11 @@ foam.CLASS({
                 return self.E('td').
                   add(day).
                   on('click', function() {
-                    var d = new Date(data_);
+                    var d = new Date(data);
                     d.setDate(day);
-                    self.data_ = d;
-                  }).
-                  addClass(day == self.data_.getDate() ? self.myClass('selected_day_cell') : '').
+                      self.data = d;
+                    }).
+                    addClass(day == data.getDate() ? self.myClass('selected_day_cell') : '').
                   addClass(self.myClass('cur_month_cell'));
               });
             });
@@ -165,11 +147,11 @@ foam.CLASS({
               return self.E('td').
                 add(day).
                 on('click', function() {
-                  var d = new Date(data_);
+                  var d = new Date(data);
                   d.setDate(1);
                   d.setMonth(d.getMonth()+1);
                   d.setDate(day);
-                  self.data_ = d;
+                  self.data = d;
                 }).
                 addClass(self.myClass('next_month_cell'));
             }).filter(function(d) { return d; });
