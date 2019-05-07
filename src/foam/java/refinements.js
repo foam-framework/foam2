@@ -209,6 +209,10 @@ foam.CLASS({
       class: 'Boolean',
       name: 'includeInSignature',
       value: true
+    },
+    {
+      class: 'String',
+      name: 'javaValidateObj'
     }
   ],
 
@@ -240,7 +244,8 @@ foam.CLASS({
         includeInDigest:         this.includeInDigest,
         includeInSignature:      this.includeInSignature,
         containsPII:             this.containsPII,
-        containsDeletablePII:    this.containsDeletablePII
+        containsDeletablePII:    this.containsDeletablePII,
+        validateObj:             this.javaValidateObj
       });
     },
 
@@ -625,6 +630,26 @@ foam.CLASS({
     },
     function isStatic() {
       return false;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'MessageJavaRefinement',
+  refines: 'foam.i18n.MessageAxiom',
+  flags: ['java'],
+
+  methods: [
+    function buildJavaClass(cls) {
+      if ( this.flags && this.flags.length && this.flags.indexOf('java') == -1 ) {
+        return;
+      }
+      cls.constant({
+        name: this.name,
+        type: 'String',
+        value: foam.java.asJavaValue(this.message)
+      });
     }
   ]
 });
