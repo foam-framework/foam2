@@ -32,7 +32,7 @@ foam.CLASS({
 
   css: `
     ^ {
-      background: %PRIMARYCOLOR%;
+      background: %HEADERCOLOR%;
       width: 100%;
       min-width: 992px;
       height: 60px;
