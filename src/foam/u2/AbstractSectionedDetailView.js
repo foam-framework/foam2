@@ -51,21 +51,21 @@ foam.CLASS({
               .filter(a => a.section == sectionAxiom.name)
           }))
 
-          // need to abide by the Order property and sort in increasing order
-          var orderedSectionAxioms = sectionAxioms.sort((a,b) => a.order -  b.order);
+        // need to abide by the Order property and sort in increasing order
+        var orderedSectionAxioms = sectionAxioms.sort((a,b) => a.order -  b.order);
 
-          /**
-           * We are gathering all the unsectioned properties 
-           * and placing them in their own section at the  end
-           */
-          orderedSectionAxioms.push(this.Section.create({
-            title: 'Unsectioned Properties',
-            properties: of.getAxiomsByClass(this.Property)
-              .filter(p => ! p.section)
-              .filter(p => ! p.hidden),
-            actions: of.getAxiomsByClass(this.Action)
-              .filter(a => ! a.section)
-          }));
+        /**
+         * We are gathering all the unsectioned properties 
+         * and placing them in their own section at the  end
+         */
+        orderedSectionAxioms.push(this.Section.create({
+          title: 'Unsectioned Properties',
+          properties: of.getAxiomsByClass(this.Property)
+            .filter(p => ! p.section)
+            .filter(p => ! p.hidden),
+          actions: of.getAxiomsByClass(this.Action)
+            .filter(a => ! a.section)
+        }));
 
         return orderedSectionAxioms;
       }
