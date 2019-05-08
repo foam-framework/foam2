@@ -92,7 +92,7 @@ foam.CLASS({
           // Actions grouped to the left
           .start()
             .startContext({ data: this })
-              .tag(this.CANCEL, { buttonStyle: 'SECONDARY' })
+              .add(this.CANCEL)
             .endContext()
           .end()
 
@@ -120,6 +120,7 @@ foam.CLASS({
   actions: [
     {
       name: 'cancel',
+      isSecondary: true,
       code: function() {
         this.stack.back();
       }

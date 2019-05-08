@@ -53,7 +53,7 @@ foam.CLASS({
     }
 
     ^title-container > * {
-      color: %PRIMARYCOLOR%;
+      color: #555;
       margin: 0;
     }
 
@@ -149,17 +149,14 @@ foam.CLASS({
             .callIfElse(this.data.primaryAction, function() {
               this.startContext({ data: self })
                 .start()
-                  .tag(self.data.primaryAction, { size: 'LARGE' })
+                  .add(self.data.primaryAction)
                 .end()
               .endContext();
             }, function() {
               if ( self.data.createLabel ) {
-                this.tag(self.cls.CREATE, {
-                  label$: self.data.createLabel$,
-                  size: 'LARGE'
-                });
+                this.tag(self.cls.CREATE, { label$: self.data.createLabel$ });
               } else {
-                this.start().tag(self.cls.CREATE, { size: 'LARGE' }).end();
+                this.start().add(self.cls.CREATE).end();
               }
             })
           .end()
@@ -188,7 +185,7 @@ foam.CLASS({
                   .addClass('actions')
                   .show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW))
                   .start()
-                    .forEach(self.cls.getAxiomsByClass(foam.core.Action).filter((action) => {
+                    .add(self.cls.getAxiomsByClass(foam.core.Action).filter((action) => {
                       var rtn = true;
                       if ( ! self.primaryAction ) {
                         rtn = rtn && action.name !== 'create';
@@ -197,10 +194,7 @@ foam.CLASS({
                         rtn = rtn && action.name !== 'toggleFilters';
                       }
                       return rtn;
-                    }), function(action) {
-                      this.tag(action, { buttonStyle: 'TERTIARY' });
-                    })
-                    .add()
+                    }))
                   .end()
                 .end()
               .end()

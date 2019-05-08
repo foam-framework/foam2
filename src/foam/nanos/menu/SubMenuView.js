@@ -31,14 +31,15 @@ foam.CLASS({
       cursor: pointer;
       background: white;
       color: black;
-      border-left: solid 1px %BACKGROUNDCOLOR%;
-      border-right: solid 1px %BACKGROUNDCOLOR%;
+      border-left: solid 1px #edf0f5;
+      border-right: solid 1px #edf0f5;
     }
     ^inner div:last-child {
       border-bottom-left-radius: 5px;
       border-bottom-right-radius: 5px;
     }
     ^inner div:hover {
+      color: white;
       background: %ACCENTCOLOR% !important;
       border-left: solid 1px %ACCENTCOLOR%;
       border-right: solid 1px %ACCENTCOLOR%;

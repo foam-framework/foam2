@@ -107,6 +107,9 @@ foam.CLASS({
       border-bottom: 3px solid #1cc2b7;
       font-weight:bold
     }
+    ^ .foam-u2-UnstyledActionView:focus{
+      outline: none;
+    }
   `,
 
   methods: [

@@ -20,10 +20,6 @@ foam.CLASS({
   name: 'PasswordView',
   extends: 'foam.u2.View',
 
-  requires: [
-    'foam.u2.TextField'
-  ],
-
   css: `
     ^ .input-field-container {
       position: relative;
@@ -83,7 +79,7 @@ foam.CLASS({
 
       this.addClass(this.myClass()).start().
         addClass('input-field-container').
-        start(this.TextField, {
+        start(foam.u2.tag.Input, {
           type: this.type,
           data$: this.data$,
           onKey: true
