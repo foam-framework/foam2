@@ -28,7 +28,7 @@ foam.CLASS({
       var self = this;
       this.SUPER();
 
-       this
+      this
         .addClass(this.myClass())
         .add(this.slot(function(prop) {
           var errorSlot = self.slot(function(data, prop$validateObj){

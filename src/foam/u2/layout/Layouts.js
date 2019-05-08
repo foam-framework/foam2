@@ -40,7 +40,7 @@ foam.CLASS({
       return c;
     },
 
-     /**
+    /**
      * This expects all child elements to be instances of foam.u2.layout.Col 
      * so we override the add method to enforce this.
      */
@@ -130,14 +130,14 @@ foam.CLASS({
     function initE() {
       this.SUPER();
 
-       this.addClass(this.myClass())
+      this.addClass(this.myClass())
 
-       // we can add to this list as we go on when we have more style properties to consider
+      // we can add to this list as we go on when we have more style properties to consider
       const styles = {
         'flex-grow': this.flex$,
       }
 
-       this.style(styles);
+      this.style(styles);
     }
   ],
 });
@@ -166,14 +166,14 @@ foam.CLASS({
     function initE() {
       this.SUPER();
 
-       this.addClass(this.myClass())
+      this.addClass(this.myClass())
 
-       // we can add to this list as we go on when we have more style properties to consider
+      // we can add to this list as we go on when we have more style properties to consider
       const styles = {
         'flex-grow': this.flex$,
       }
 
-       this.style(styles);
+      this.style(styles);
     },
   ]
 });

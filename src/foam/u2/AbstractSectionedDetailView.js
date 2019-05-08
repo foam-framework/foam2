@@ -39,7 +39,7 @@ foam.CLASS({
       expression: function(of) { // We should fix this!
         if ( ! of ) return [];
 
-         var sectionAxioms = of.getAxiomsByClass(this.SectionAxiom)
+        var sectionAxioms = of.getAxiomsByClass(this.SectionAxiom)
           .map(sectionAxiom => this.Section.create({
             isAvailable: sectionAxiom.isAvailable,
             order: sectionAxiom.order,
@@ -51,10 +51,10 @@ foam.CLASS({
               .filter(a => a.section == sectionAxiom.name)
           }))
 
-           // need to abide by the Order property and sort in increasing order
+          // need to abide by the Order property and sort in increasing order
           var orderedSectionAxioms = sectionAxioms.sort((a,b) => a.order -  b.order);
 
-           /**
+          /**
            * We are gathering all the unsectioned properties 
            * and placing them in their own section at the  end
            */
