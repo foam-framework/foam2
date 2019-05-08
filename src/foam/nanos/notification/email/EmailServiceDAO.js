@@ -9,14 +9,24 @@ foam.CLASS({
   name: 'EmailServiceDAO',
   extends: 'foam.dao.ProxyDAO',
 
+  requires: [
+    'foam.nanos.notification.email.EmailMessage',
+    'foam.nanos.notification.email.EmailService'
+  ],
+
+  imports: [
+    'email?'
+  ],
+
   properties: [
     {
       name: 'emailService',
       documentation: `This property determines how to process the email.`,
-      of: 'foam.nanos.notification.email.EmailService',
+      of: 'EmailService',
       class: 'FObjectProperty',
-      javaGetter:
-      `return (foam.nanos.notification.email.EmailService)getX().get("email");`
+      factory: function() {
+        return this.email;
+      }
     }
   ],
 
@@ -25,7 +35,7 @@ foam.CLASS({
       name: 'put_',
       javaCode:
       `
-        getEmailService().sendEmail(x, (foam.nanos.notification.email.EmailMessage)obj);
+        getEmailService().sendEmail(x, (EmailMessage)obj);
         return getDelegate().inX(x).put(obj);
       `
     }
