@@ -93,6 +93,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      this.attrs({name: this.action.name});
       this.initCls();
 
       this.on('click', this.click);
