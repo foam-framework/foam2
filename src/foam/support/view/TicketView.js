@@ -27,7 +27,7 @@ foam.CLASS({
     ^ .foam-support-view-SummaryCard{
       width: 15.8%;
     }
-    ^ .foam-u2-UnstyledActionView-create {
+    ^ .foam-u2-ActionView-create {
       float: right;
       width: 135px;
       height: 40px;
