@@ -18,45 +18,242 @@
 foam.CLASS({
   package: 'foam.u2',
   name: 'ActionView',
-  extends: 'foam.u2.UnstyledActionView',
+  extends: 'foam.u2.Element',
+
+  documentation: `
+    A button View for triggering Actions.
+
+    Icon Fonts
+    If using icon-fonts a css stylesheet link to the fonts is required in index.html.
+    The default of foam.core.Action.js is 'Material Icons' supported by the following
+    link: <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"></link>
+  `,
+
+  requires: [
+    'foam.u2.ButtonSize',
+    'foam.u2.ButtonStyle'
+  ],
 
   css: `
-    button^ {
-      -webkit-box-shadow: inset 0 1px 0 0 #ffffff;
-      box-shadow: inset 0 1px 0 0 #ffffff;
-      background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
-      background: -moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );
-      background-color: #ededed;
-      -moz-border-radius: 3px;
-      -webkit-border-radius: 3px;
+    ^ {
       border-radius: 3px;
-      border: 1px solid #dcdcdc;
+      text-align: center;
       display: inline-block;
-      color: #777777;
-      font-family: Arial;
-      font-size: 12px;
-      font-weight: bold;
-      margin: 2px;
-      padding: 4px 16px;
-      text-decoration: none;
+      border: 1px solid transparent;
     }
 
-    ^:hover {
-      background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) );
-      background: -moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% );
-      background-color: #dfdfdf;
+    ^ + ^ {
+      margin-left: 8px;
+    }
+
+    ^ img {
+      margin-right: 4px;
+    }
+
+    ^:focus {
+      border-width: 2px;
+    }
+
+    ^:hover:not(:disabled) {
+      cursor: pointer;
+    }
+
+    ^unavailable {
+      display: none;
     }
 
     ^ img {
       vertical-align: middle;
     }
 
-    ^:disabled { filter: grayscale(80%); }
-
     ^.material-icons {
       cursor: pointer;
     }
+
+
+    /*
+     * Primary
+     */
+
+    ^primary {
+      border-color: #355bc4;
+      background-color: %SECONDARYCOLOR%;
+      color: white;
+    }
+
+    ^primary:hover:not(:disabled) {
+      border-color: #294798;
+      background-color: %SECONDARYHOVERCOLOR%;
+    }
+
+    ^primary:focus {
+      box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
+    }
+
+    ^primary:disabled {
+      border-color: %SECONDARYDISABLEDCOLOR%;
+      background-color: %SECONDARYDISABLEDCOLOR%;
+    }
+
+    ^primary-destructive {
+      border-color: %DESTRUCTIVECOLOR%;
+      background-color: %DESTRUCTIVECOLOR%;
+      color: white;
+    }
+
+    ^primary-destructive:hover:not(:disabled) {
+      border-color: #a61414;
+      background-color: %DESTRUCTIVEHOVERCOLOR%;
+    }
+
+    ^primary-destructive:focus {
+      border-color: #a61414;
+      box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
+    }
+
+    ^primary-destructive:disabled {
+      border-color: #ed8e8d;
+      background-color: %DESTRUCTIVEDISABLEDCOLOR%;
+    }
+
+
+    /*
+     * Secondary
+     */
+
+    ^secondary {
+      border-color: #cbcfd4;
+      background-image: linear-gradient(to bottom, #ffffff, #e7eaec);
+      color: %PRIMARYCOLOR%;
+    }
+
+    ^secondary:hover {
+      border-color: #cbcfd4;
+      background-image: linear-gradient(to bottom, #ffffff, #d3d6d8);
+      color: %PRIMARYHOVERCOLOR%;
+    }
+
+    ^secondary:focus {
+      background-image: linear-gradient(to bottom, #ffffff, #d3d6d8);
+      border-color: %SECONDARYCOLOR%;
+    }
+
+    ^secondary:disabled {
+      border-color: #e7eaec;
+      color: %PRIMARYDISABLEDCOLOR%;
+    }
+
+    ^secondary-destructive {
+      border-color: %DESTRUCTIVECOLOR%;
+      background-color: white;
+      color: %DESTRUCTIVECOLOR%;
+    }
+
+    ^secondary-destructive:hover {
+      border-color: %DESTRUCTIVEHOVERCOLOR%;
+      background-color: white;
+      color: %DESTRUCTIVEHOVERCOLOR%;
+    }
+
+    ^secondary-destructive:disabled {
+      border-color: %DESTRUCTIVEDISABLEDCOLOR%;
+      color: %DESTRUCTIVEDISABLEDCOLOR%;
+    }
+
+
+    /*
+     * Tertiary
+     */
+
+    ^tertiary {
+      border-color: #355bc4;
+      background-color: %SECONDARYCOLOR%;
+      color: white;
+    }
+
+    ^tertiary:hover:not(:disabled) {
+      border-color: #294798;
+      background-color: %SECONDARYHOVERCOLOR%;
+    }
+
+    ^tertiary:focus {
+      box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
+    }
+
+    ^tertiary:disabled {
+      border-color: %SECONDARYDISABLEDCOLOR%;
+      background-color: %SECONDARYDISABLEDCOLOR%;
+    }
+
+    ^tertiary-destructive {
+      border-color: %DESTRUCTIVECOLOR%;
+      background-color: %DESTRUCTIVECOLOR%;
+      color: white;
+    }
+
+    ^tertiary-destructive:hover:not(:disabled) {
+      border-color: #a61414;
+      background-color: %DESTRUCTIVEHOVERCOLOR%;
+    }
+
+    ^tertiary-destructive:focus {
+      border-color: #a61414;
+      box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
+    }
+
+    ^tertiary-destructive:disabled {
+      border-color: #ed8e8d;
+      background-color: %DESTRUCTIVEDISABLEDCOLOR%;
+    }
+
+
+    /*
+     * Sizes
+     */
+
+    ^small {
+      font-size: 12px;
+      padding: 8px 16px;
+    }
+
+    ^small:focus {
+      padding: 7px 15px;
+    }
+
+    ^medium {
+      font-size: 14px;
+      padding: 9px 16px;
+    }
+
+    ^medium:focus {
+      padding: 8px 15px;
+    }
+
+    ^large {
+      font-size: 16px;
+      padding: 10px 16px;
+    }
+
+    ^large:focus {
+      padding: 9px 15px;
+    }
   `,
+
+  enums: [
+    {
+      name: 'ButtonState',
+      values: [
+        { name: 'NO_CONFIRM' }, // No confirmation required, fire on click
+        { name: 'CONFIRM' },    // Confirmation required, debounce on click
+        { name: 'DEBOUNCE' },   // Move to Armed after delay, NOP on click
+        { name: 'ARMED' }       // Waiting for confirmation, fire on click
+      ]
+    }
+  ],
+
+  messages: [
+    { name: 'confirm', message: 'Confirm' }
+  ],
 
   properties: [
     {
@@ -79,12 +276,58 @@ foam.CLASS({
       name: 'iconFontName',
       factory: function(action) { return this.action.iconFontName; }
     },
-    'data',
+    {
+      class: 'String',
+      name: 'labelPlaceholder',
+      expression: function(label) { return this.action.label; }
+    },
+    {
+      name: 'buttonState',
+      factory: function() { return this.action && this.action.confirmationRequired ? this.ButtonState.CONFIRM : this.ButtonState.NO_CONFIRM; }
+    },
+    {
+      name: 'data',
+      postSet: function() {
+        // Reset state
+        this.buttonState = undefined;
+      }
+    },
     'action',
     [ 'nodeName', 'button' ],
     {
       name: 'label',
       factory: function(action) { return this.action.label; }
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.ButtonStyle',
+      name: 'buttonStyle',
+      value: 'PRIMARY'
+    },
+    {
+      class: 'Boolean',
+      name: 'isDestructive',
+      documentation: `
+        When set to true, this action should be styled in a way that indicates
+        that data is deleted in some way.
+      `,
+      factory: function() {
+        return this.action.confirmationRequired;
+      }
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.ButtonSize',
+      name: 'size',
+      value: 'MEDIUM'
+    },
+    {
+      class: 'String',
+      name: 'styleClass_',
+      expression: function(isDestructive, buttonStyle) {
+        var s = buttonStyle.name.toLowerCase();
+        return isDestructive ? s + '-destructive' : s;
+      }
     }
   ],
 
@@ -92,23 +335,9 @@ foam.CLASS({
     function initE() {
       this.initCls();
 
-      this.
-        on('click', this.click);
+      this.on('click', this.click);
 
-      if ( this.icon ) {
-        // this.nodeName = 'a';
-        this.start('img').attr('src', this.icon).end();
-      } else if ( this.iconFontName ) {
-        this.nodeName = 'i';
-        this.cssClass(this.action.name);
-        this.cssClass(this.iconFontClass); // required by font package
-        this.style({'font-family': this.iconFontFamily});
-        this.add(this.iconFontName);
-      }
-
-      if ( this.label ) {
-        this.add(this.label$);
-      }
+      this.addContent();
 
       this.setAttribute('title', this.action.toolTip); // hover text
 
@@ -118,14 +347,78 @@ foam.CLASS({
         }
 
         if ( this.action.isEnabled ) {
-          this.attrs({disabled: this.action.createIsEnabled$(this.data$).map(function(e) { return e ? false : 'disabled'; })});
+          this.attrs({ disabled: this.action.createIsEnabled$(this.data$).map((e) => e ? false : 'disabled') });
         }
+
+        this.addClass(this.myClass(this.styleClass_));
+        this.addClass(this.myClass(this.size.label.toLowerCase()));
       }
     },
 
     function initCls() {
       this.addClass(this.myClass());
       this.addClass(this.myClass(this.action.name));
+    },
+
+    function addContent() {
+      /** Add text or icon to button. **/
+      if ( this.icon ) {
+        // this.nodeName = 'a';
+        this.start('img').attr('src', this.icon$).end();
+      } else if ( this.iconFontName ) {
+        this.nodeName = 'i';
+        this.cssClass(this.action.name);
+        this.cssClass(this.iconFontClass); // required by font package
+        this.style({ 'font-family': this.iconFontFamily });
+        this.add(this.iconFontName);
+      }
+
+      if ( this.label ) {
+        this.add(this.label$);
+      }
+    }
+  ],
+
+  listeners: [
+    function click(e) {
+      if ( this.buttonState == this.ButtonState.NO_CONFIRM ) {
+        this.action && this.action.maybeCall(this.__subContext__, this.data);
+      } else if ( this.buttonState == this.ButtonState.CONFIRM ) {
+        this.buttonState = this.ButtonState.DEBOUNCE;
+        this.removeAllChildren();
+        this.add(this.confirm);
+        this.debounce();
+      } else if ( this.buttonState == this.ButtonState.ARMED ) {
+        this.buttonState = this.ButtonState.CONFIRM;
+        this.removeAllChildren();
+        this.addContent();
+        this.action && this.action.maybeCall(this.__subContext__, this.data);
+      }
+
+      e.preventDefault();
+      e.stopPropagation();
+    },
+    {
+      name: 'debounce',
+      isMerged: true,
+      mergeDelay: 200,
+      code: function() {
+        if ( this.buttonState != this.ButtonState.DEBOUNCE ) return;
+
+        this.buttonState = this.ButtonState.ARMED;
+        this.deactivateConfirm();
+      }
+    },
+    {
+      name: 'deactivateConfirm',
+      isMerged: true,
+      mergeDelay: 6000,
+      code: function() {
+        if ( this.buttonState != this.ButtonState.ARMED ) return;
+        this.removeAllChildren();
+        this.addContent();
+        this.buttonState = this.ButtonState.CONFIRM;
+      }
     }
   ]
 });
