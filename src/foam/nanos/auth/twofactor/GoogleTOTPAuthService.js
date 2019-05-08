@@ -84,7 +84,7 @@ foam.CLASS({
     {
       name: 'verifyToken',
       javaCode: `
-        long code      = Long.parseLong(token);
+        long code;
         try {
           code = Long.parseLong(token, 10);
         } catch(Exception e){
