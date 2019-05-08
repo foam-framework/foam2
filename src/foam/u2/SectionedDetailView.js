@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'SectionedDetailView',
   extends: 'foam.u2.AbstractSectionedDetailView',
 
-   methods: [
+  methods: [
     /**
      * first render the properties row by row using Rows, then at the end
      * render all the actions together in a single row with Cols

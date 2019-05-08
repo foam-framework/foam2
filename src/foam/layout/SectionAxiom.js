@@ -36,7 +36,7 @@ foam.CLASS({
   ]
 });
 
- foam.CLASS({
+foam.CLASS({
   package: 'foam.layout',
   name: 'PropertySectionRefine',
   refines: 'foam.core.Property',
@@ -48,7 +48,7 @@ foam.CLASS({
   ]
 });
 
- foam.CLASS({
+foam.CLASS({
   package: 'foam.layout',
   name: 'ActionSectionRefine',
   refines: 'foam.core.Action',
@@ -60,7 +60,7 @@ foam.CLASS({
   ]
 });
 
- foam.CLASS({
+foam.CLASS({
   package: 'foam.layout',
   name: 'ModelSectionRefine',
   refines: 'foam.core.Model',

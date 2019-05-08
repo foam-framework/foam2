@@ -9,11 +9,11 @@ foam.CLASS({
   name: 'AbstractSectionedDetailView',
   extends: 'foam.u2.View',
 
-   documentation : `
+  documentation: `
     The abstract for property-sheet style Views with sections for editing an FObject.
   `,
 
-   requires: [
+  requires: [
     'foam.u2.SectionedDetailPropertyView',
     'foam.u2.layout.Rows',
     'foam.u2.layout.Cols',
@@ -23,7 +23,7 @@ foam.CLASS({
     'foam.layout.SectionAxiom',
   ],
 
-   properties: [
+  properties: [
     {
       class: 'Class',
       name: 'of',
@@ -39,7 +39,7 @@ foam.CLASS({
       expression: function(of) { // We should fix this!
         if ( ! of ) return [];
 
-         var sectionAxioms = of.getAxiomsByClass(this.SectionAxiom)
+        var sectionAxioms = of.getAxiomsByClass(this.SectionAxiom)
           .map(sectionAxiom => this.Section.create({
             isAvailable: sectionAxiom.isAvailable,
             order: sectionAxiom.order,
@@ -51,23 +51,23 @@ foam.CLASS({
               .filter(a => a.section == sectionAxiom.name)
           }))
 
-           // need to abide by the Order property and sort in increasing order
-          var orderedSectionAxioms = sectionAxioms.sort((a,b) => a.order -  b.order);
+        // need to abide by the Order property and sort in increasing order
+        var orderedSectionAxioms = sectionAxioms.sort((a,b) => a.order -  b.order);
 
-           /**
-           * We are gathering all the unsectioned properties 
-           * and placing them in their own section at the  end
-           */
-          orderedSectionAxioms.push(this.Section.create({
-            title: 'Unsectioned Properties',
-            properties: of.getAxiomsByClass(this.Property)
-              .filter(p => ! p.section)
-              .filter(p => ! p.hidden),
-            actions: of.getAxiomsByClass(this.Action)
-              .filter(a => ! a.section)
-          }));
+        /**
+         * We are gathering all the unsectioned properties 
+         * and placing them in their own section at the  end
+         */
+        orderedSectionAxioms.push(this.Section.create({
+          title: 'Unsectioned Properties',
+          properties: of.getAxiomsByClass(this.Property)
+            .filter(p => ! p.section)
+            .filter(p => ! p.hidden),
+          actions: of.getAxiomsByClass(this.Action)
+            .filter(a => ! a.section)
+        }));
 
-           return orderedSectionAxioms;
+        return orderedSectionAxioms;
       }
     }
   ]
