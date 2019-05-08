@@ -93,7 +93,6 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.attrs({name: this.action.name});
       this.initCls();
 
       this.on('click', this.click);
@@ -103,6 +102,8 @@ foam.CLASS({
       this.setAttribute('title', this.action.toolTip); // hover text
 
       if ( this.action ) {
+        this.attrs({ name: this.action.name });
+        
         if ( this.action.isAvailable ) {
           this.enableClass(this.myClass('unavailable'), this.action.createIsAvailable$(this.data$), true);
         }
