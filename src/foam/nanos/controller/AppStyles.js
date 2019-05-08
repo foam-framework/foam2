@@ -17,7 +17,7 @@ foam.CLASS({
       font-size: 14px;
       letter-spacing: 0.2px;
       color: #373a3c;
-      background: %BACKGROUNDCOLOR%;
+      background: #edf0f5;
       margin: 0;
     }
     table.foam-u2-view-TableView {

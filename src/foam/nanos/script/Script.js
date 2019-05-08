@@ -273,7 +273,7 @@ foam.CLASS({
   actions: [
     {
       name: 'run',
-      tableWidth: 70,
+      tableWidth: 60,
       code: function() {
         var self = this;
         this.output = '';

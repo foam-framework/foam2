@@ -25,10 +25,10 @@ foam.CLASS({
     ^ {
       padding: 2px;
     }
-    ^ .foam-u2-ActionView-create {
+    ^ .foam-u2-UnstyledActionView-create {
       display: none;
     }
-    ^ .foam-u2-ActionView-newEmail {
+    ^ .foam-u2-UnstyledActionView-newEmail {
       width: 135px;
       height: 40px;
       border-radius: 2px;

@@ -82,10 +82,7 @@ foam.CLASS({
       value: function(_, obj, axiom) {
         this.
           startContext({ data: obj }).
-          tag(axiom, {
-            size: 'SMALL',
-            buttonStyle: 'SECONDARY'
-          }).
+          add(axiom).
           endContext();
       }
     },
