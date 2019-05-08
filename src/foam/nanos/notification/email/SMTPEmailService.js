@@ -65,8 +65,8 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'session',
-      type: 'javax.mail.Session',
+      name: 'session_',
+      class: 'Object',
       javaFactory:
       `
         Properties props = new Properties();
@@ -79,12 +79,6 @@ foam.CLASS({
         }
         return Session.getInstance(props);
       `
-    },
-    {
-      class: 'Boolean',
-      name: 'enabled',
-      value: true,
-      javaFactory: 'return true;'
     },
     {
       class: 'String',
@@ -132,7 +126,7 @@ foam.CLASS({
       javaCode:
       `
         try {
-          MimeMessage message = new MimeMessage(getSession());
+          MimeMessage message = new MimeMessage((Session)getSession_());
 
           if ( emailMessage.isPropertySet("displayName") ) {
             message.setFrom( new InternetAddress(emailMessage.getFrom(), emailMessage.getDisplayName()) );
@@ -186,11 +180,10 @@ foam.CLASS({
       name: 'sendEmail',
       javaCode:
       `
-      if ( ! this.getEnabled() ) return;
         try {
           MimeMessage message = createMimeMessage(emailMessage);
           // send message
-          Transport transport = getSession().getTransport("smtp");
+          Transport transport = ((Session)getSession_()).getTransport("smtp");
           transport.connect();
           transport.send(message, getUsername(), getPassword());
           transport.close();
