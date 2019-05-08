@@ -24,7 +24,6 @@ foam.CLASS({
     'as data'
   ],
 
-  // TODO: CSS classname shouldn't be .net-nanopay-ui-ActionView, fix.
   css: `
     ^ {
       background-color: white;
@@ -41,9 +40,10 @@ foam.CLASS({
       width: 100%;
     }
 
-    ^ input:not([type="checkbox"]):focus, ^ select:focus {
+    ^ input:not([type="checkbox"]):focus,
+    ^ select:focus {
       outline: none;
-      border: 1px solid #59a5d5;
+      border: 1px solid %SECONDARYCOLOR%;
     }
 
     ^ .general-query {
@@ -56,9 +56,7 @@ foam.CLASS({
       margin: 20px 20px 0 20px;
     }
 
-    ^ .net-nanopay-ui-ActionView-clear {
-      width: 60px;
-      height: 32px;
+    ^ .foam-u2-ActionView-clear {
       margin: 20px;
     }
   `,
@@ -181,7 +179,7 @@ foam.CLASS({
           .entity('nbsp')
           .add('selected')
         .end()
-        .add(this.CLEAR);
+        .tag(this.CLEAR, { buttonStyle: 'SECONDARY' });
     },
 
     function addFilter(key) {
@@ -198,7 +196,6 @@ foam.CLASS({
   actions: [
     {
       name: 'clear',
-      isSecondary: true,
       code: function() {
         this.data = undefined;
         this.filters = this.filters.slice();
