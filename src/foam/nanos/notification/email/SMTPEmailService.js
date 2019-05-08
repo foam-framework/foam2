@@ -57,8 +57,6 @@ foam.CLASS({
                 return new PasswordAuthentication(this.username_, this.password_);
               }
             }
-
-            protected Session session_ = null;
             `
         }));
       }
@@ -66,6 +64,22 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      name: 'session',
+      type: 'javax.mail.Session',
+      javaFactory:
+      `
+        Properties props = new Properties();
+        props.setProperty("mail.smtp.auth", getAuthenticate() ? "true" : "false");
+        props.setProperty("mail.smtp.starttls.enable", getStarttls() ? "true" : "false");
+        props.setProperty("mail.smtp.host", getHost());
+        props.setProperty("mail.smtp.port", getPort());
+        if ( getAuthenticate() ) {
+          return Session.getInstance(props, new SMTPAuthenticator(getUsername(), getPassword()));
+        }
+        return Session.getInstance(props);
+      `
+    },
     {
       class: 'Boolean',
       name: 'enabled',
@@ -118,7 +132,7 @@ foam.CLASS({
       javaCode:
       `
         try {
-          MimeMessage message = new MimeMessage(session_);
+          MimeMessage message = new MimeMessage(getSession());
 
           if ( emailMessage.isPropertySet("displayName") ) {
             message.setFrom( new InternetAddress(emailMessage.getFrom(), emailMessage.getDisplayName()) );
@@ -174,10 +188,9 @@ foam.CLASS({
       `
       if ( ! this.getEnabled() ) return;
         try {
-          start();
           MimeMessage message = createMimeMessage(emailMessage);
           // send message
-          Transport transport = session_.getTransport("smtp");
+          Transport transport = getSession().getTransport("smtp");
           transport.connect();
           transport.send(message, getUsername(), getPassword());
           transport.close();
@@ -185,22 +198,6 @@ foam.CLASS({
           e.printStackTrace();
         }
         
-      `
-    },
-    {
-      name: 'start',
-      javaCode:
-      `
-        Properties props = new Properties();
-        props.setProperty("mail.smtp.auth", getAuthenticate() ? "true" : "false");
-        props.setProperty("mail.smtp.starttls.enable", getStarttls() ? "true" : "false");
-        props.setProperty("mail.smtp.host", getHost());
-        props.setProperty("mail.smtp.port", getPort());
-        if ( getAuthenticate() ) {
-          session_ = Session.getInstance(props, new SMTPAuthenticator(getUsername(), getPassword()));
-        } else {
-          session_ = Session.getInstance(props);
-        }
       `
     }
   ]

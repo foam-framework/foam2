@@ -22,11 +22,14 @@ foam.CLASS({
     {
       name: 'emailService',
       documentation: `This property determines how to process the email.`,
-      of: 'EmailService',
+      of: 'foam.nanos.notification.email.EmailService',
       class: 'FObjectProperty',
       factory: function() {
         return this.email;
-      }
+      },
+      javaFactory: `
+      return (EmailService)getEmail();
+      `
     }
   ],
 
