@@ -6,6 +6,7 @@
 
 package foam.nanos.pm;
 
+import foam.core.X;
 import foam.core.ContextAwareSupport;
 import foam.dao.DAO;
 
@@ -14,8 +15,10 @@ public class DAOPMLogger
   implements PMLogger
 {
   public final static String SERVICE_NAME = "pmLogger";
-  public final static String DAO_NAME     = "pmInfoDAO";
+  public final static String PM_DAO_NAME  = "pmDAO";
+  public final static String PM_INFO_DAO_NAME  = "pmInfoDAO";
 
+  protected X x_;
   protected final Object[] locks_ = new Object[128];
 
   public DAOPMLogger() {
@@ -23,25 +26,39 @@ public class DAOPMLogger
   }
 
   protected Object getLock(PMInfo pmi) {
-    int hash = pmi.getClsName().hashCode() * 31 + pmi.getPmName().hashCode();
+    int hash = pmi.getClsName().hashCode() * 31 + pmi.getName().hashCode();
     return locks_[(int) (Math.abs(hash) % locks_.length)];
   }
 
   @Override
   public void log(PM pm) {
-    if ( ! pm.getClassType().getName().equals("foam.dao.PMDAO") ) {
-      if ( pm.getClassType().getName().indexOf("PM") != -1 ) return;
-      if ( pm.getName().indexOf("PM")                != -1 ) return;
-      if ( pm.getClassType().getName().indexOf("pm") != -1 ) return;
-      if ( pm.getName().indexOf("pm")                != -1 ) return;
+    if ( ! pm.getClassType().getId().equals("foam.dao.PMDAO") ) {
+      if ( pm.getClassType().getId().indexOf("PM") != -1 ) return;
+      if ( pm.getName().indexOf("PM")              != -1 ) return;
+      if ( pm.getClassType().getId().indexOf("pm") != -1 ) return;
+      if ( pm.getName().indexOf("pm")              != -1 ) return;
     }
 
+    // Candlestick
+    foam.dao.DAO dao = (foam.dao.DAO) getX().get(PM_DAO_NAME);
+    if ( dao != null ) {
+      dao.put(pm);
+    } else {
+      foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+      if ( logger != null ) {
+        logger.warning(this.getClass().getName(), "pmDAO not found in context for", pm.getId());
+      } else {
+        System.out.println(this.getClass().getName()+": pmDAO and logger not found in context for "+pm.getId());
+      }
+    }
+
+    // Regular PMInfo
     // TODO: could reuse the PMInfo by also using it as the lock object
     PMInfo pmi = new PMInfo();
-    pmi.setClsName(pm.getClassType().getName());
-    pmi.setPmName(pm.getName());
+    pmi.setClsName(pm.getClassType().getId());
+    pmi.setName(pm.getName());
 
-    DAO pmd = (DAO) getX().get(DAO_NAME);
+    DAO pmd = (DAO) getX().get(PM_INFO_DAO_NAME);
 
     synchronized ( getLock(pmi) ) {
       PMInfo dpmi = (PMInfo) pmd.find(pmi);

@@ -1,0 +1,17 @@
+p({"class":"foam.nanos.boot.NSpec", "name":"pmLogger","lazy":true,"serve":false,"serviceClass":"foam.nanos.pm.DAOPMLogger"})
+
+p({"class":"foam.nanos.boot.NSpec", "name":"pmInfoDAO","lazy":true,"serve":true,"serviceScript":"return new foam.dao.ProxyDAO.Builder(x).setDelegate(new foam.dao.MDAO(foam.nanos.pm.PMInfo.getOwnClassInfo())).build();","client":"{\"of\":\"foam.nanos.pm.PMInfo\", \"remoteListenerSupport\": true}" })
+
+p({"class":"foam.nanos.boot.NSpec", "name":"pm1MinuteDAO","lazy":true,"serve":true,"serviceScript":"return new foam.dao.MDAO(foam.nanos.analytics.Candlestick.getOwnClassInfo());","client":"{\"of\":\"foam.nanos.analytics.Candlestick\"}" })
+
+p({"class":"foam.nanos.boot.NSpec", "name":"pmHourlyDAO", "lazy":true,  "serve":true, "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"PMHourly\").setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo()).build();","client":"{\"of\":\"foam.nanos.analytics.Candlestick\"}"})
+
+p({"class":"foam.nanos.boot.NSpec", "name":"pmHourlyReduceManager","lazy":true,"serve":true,"serviceScript":"return new foam.nanos.analytics.DAOReduceManager.Builder(x).setSourceDAO((foam.dao.DAO) x.get(\"pm1MinuteDAO\")).setDestDAO((foam.dao.DAO) x.get(\"pmHourlyDAO\")).setPeriodLengthMs(60*60*1000).build();"})
+
+p({"class":"foam.nanos.boot.NSpec", "name":"pmDailyDAO", "lazy":true,  "serve":true, "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"PMDaily\").setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo()).build();","client":"{\"of\":\"foam.nanos.analytics.Candlestick\"}"})
+
+p({"class":"foam.nanos.boot.NSpec", "name":"pmDailyReduceManager","lazy":true,"serve":true,"serviceScript":"return new foam.nanos.analytics.DAOReduceManager.Builder(x).setSourceDAO((foam.dao.DAO) x.get(\"pmHourlyDAO\")).setDestDAO((foam.dao.DAO) x.get(\"pmDailyDAO\")).setPeriodLengthMs(24*60*60*1000).build();"})
+
+p({"class":"foam.nanos.boot.NSpec", "name":"pmFoldManager","lazy":true,"serve":true,"serviceScript":"return new foam.nanos.analytics.DAOFoldManager.Builder(x).setDao((foam.dao.DAO) x.get(\"pm1MinuteDAO\")).setPeriodLengthMs(60*1000).build();" })
+
+p({"class":"foam.nanos.boot.NSpec", "name":"pmDAO","lazy":true,"serve":true,"serviceScript":"return new foam.nanos.analytics.FoldManagerDAODecorator.Builder(x).setDelegate(new foam.dao.MDAO(foam.nanos.pm.PM.getOwnClassInfo())).setFm((foam.nanos.analytics.DAOFoldManager) x.get(\"pmFoldManager\")).build();","client":"{\"of\":\"foam.nanos.pm.PM\", \"remoteListenerSupport\": true}" })

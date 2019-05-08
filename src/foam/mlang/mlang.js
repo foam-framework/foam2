@@ -222,7 +222,7 @@ foam.CLASS({
     ['of', 'foam.mlang.Expr'],
     {
       name: 'adaptArrayElement',
-      value: function(_, o, p) {
+      value: function(o) {
         // TODO: This is probably a little hacky, should have a more
         // declarative way of saying all the ways things can be
         // adapted to an expression.
@@ -2552,6 +2552,33 @@ return clone;`
 
 foam.CLASS({
   package: 'foam.mlang.sink',
+  name: 'Plot',
+  extends: 'foam.dao.AbstractSink',
+  implements: [ 'foam.core.Serializable' ],
+  properties: [
+    {
+      class: 'foam.mlang.ExprArrayProperty',
+      name: 'args'
+    },
+    {
+      class: 'Array',
+      name: 'data',
+      factory: function() { return []; }
+    }
+  ],
+  methods: [
+    {
+      name: 'put',
+      code: function put(obj) {
+        this.data.push(this.args.map(a => a.f(obj)));
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang.sink',
   name: 'Unique',
   extends: 'foam.dao.ProxySink',
   implements: [ 'foam.core.Serializable' ],
@@ -3176,6 +3203,7 @@ foam.CLASS({
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Max',
     'foam.mlang.sink.Min',
+    'foam.mlang.sink.Plot',
     'foam.mlang.sink.Sequence',
     'foam.mlang.sink.Sum',
     'foam.mlang.sink.Unique',
@@ -3232,7 +3260,7 @@ foam.CLASS({
 
     function UNIQUE(expr, sink) { return this.Unique.create({ expr: expr, delegate: sink }); },
     function GROUP_BY(expr, sinkProto) { return this.GroupBy.create({ arg1: expr, arg2: sinkProto }); },
-    function PLOT(x, y) { return this.Plot.create({ arg1: x, arg2: y }); },
+    function PLOT() { return this._nary_('Plot', arguments); },
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
     function COUNT() { return this.Count.create(); },

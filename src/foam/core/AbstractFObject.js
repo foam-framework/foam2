@@ -193,6 +193,21 @@ foam.CLASS({
       `
     },
     {
+      name: 'validate',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+        List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+        for ( PropertyInfo prop : props ) {
+          prop.validateObj(x, this);
+        }
+      `
+    },
+    {
       name: 'shallowClone',
       type: 'FObject',
       javaCode: `

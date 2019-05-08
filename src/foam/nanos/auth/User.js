@@ -95,7 +95,16 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'firstName'
+      name: 'firstName',
+      validateObj: function(firstNameField) {
+        if (!(firstNameField.trim())){
+          return 'First Name Required.'
+        } if ( firstNameField.length > 70 ) {
+          return 'First name cannot exceed 70 characters.';
+        } if(/\d/.test(this.firstNameField)) {
+          return 'First name cannot contain numbers';
+        } 
+      }
     },
     {
       class: 'String',
@@ -103,7 +112,16 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'lastName'
+      name: 'lastName',
+      validateObj: function(lastNameField) {
+        if (!(lastNameField.trim())){
+          return 'Last Name Required.'
+        } if ( lastNameField.length > 70 ) {
+          return 'Last name cannot exceed 70 characters.';
+        } if(/\d/.test(this.lastNameField)) {
+          return 'Last name cannot contain numbers';
+        } 
+      }
     },
     'legalName',
     {
@@ -114,8 +132,10 @@ foam.CLASS({
       width: 100,
       tableWidth: 160,
       validateObj: function(organization) {
-        if ( organization.length > 35 ) {
-          return 'Organization name cannot exceed 35 characters.';
+        if ( organization.length > 70 ) {
+          return 'Company name cannot exceed 70 characters.';
+        } if (!(organization.trim())) {
+          return 'Company Name Required.';
         }
       }
     },
@@ -140,10 +160,13 @@ foam.CLASS({
        emailIsSet_ = true;`,
       validateObj: function (email) {
         var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-        if ( ! emailRegex.test(email) ) {
-          return 'Invalid email address.';
+        
+        if (!(email.trim())) {
+          return 'Email Required.';
         }
+        if ( ! emailRegex.test(email.trim()) ) {
+          return 'Invalid email address.';
+        } 
       }
     },
     {
