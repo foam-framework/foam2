@@ -9,11 +9,11 @@ foam.CLASS({
   name: 'AbstractSectionedDetailView',
   extends: 'foam.u2.View',
 
-   documentation : `
+  documentation: `
     The abstract for property-sheet style Views with sections for editing an FObject.
   `,
 
-   requires: [
+  requires: [
     'foam.u2.SectionedDetailPropertyView',
     'foam.u2.layout.Rows',
     'foam.u2.layout.Cols',
@@ -23,7 +23,7 @@ foam.CLASS({
     'foam.layout.SectionAxiom',
   ],
 
-   properties: [
+  properties: [
     {
       class: 'Class',
       name: 'of',
@@ -67,7 +67,7 @@ foam.CLASS({
               .filter(a => ! a.section)
           }));
 
-           return orderedSectionAxioms;
+        return orderedSectionAxioms;
       }
     }
   ]

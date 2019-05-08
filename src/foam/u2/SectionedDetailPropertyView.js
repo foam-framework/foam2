@@ -9,21 +9,21 @@ foam.CLASS({
   name: 'SectionedDetailPropertyView',
   extends: 'foam.u2.View',
 
-   documentation: `
+  documentation: `
     View for one property of a SectionedDetailView.
   `,
 
-   requires: [
+  requires: [
     'foam.u2.layout.Rows',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Col'
   ],
 
-   properties: [
+  properties: [
     'prop',
   ],
 
-   methods: [
+  methods: [
     function initE() {
       var self = this;
       this.SUPER();

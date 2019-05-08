@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.u2.layout',
   name: 'AbstractLayout',
@@ -24,7 +30,7 @@ foam.CLASS({
     }
   ],
 
-   methods: [
+  methods: [
     function start(spec, args, slot) {
       var c = this.SUPER(spec, args, slot);
       // Force the parent to this because the add() override could cause
@@ -55,7 +61,7 @@ foam.CLASS({
       return this;
     },
 
-     function initE() {
+    function initE() {
       this.SUPER();
       this
         .addClass(this.myClass())
@@ -64,7 +70,7 @@ foam.CLASS({
   ]
 });
 
- foam.CLASS({
+foam.CLASS({
   package: 'foam.u2.layout',
   name: 'Rows',
   extends: 'foam.u2.layout.AbstractLayout',
@@ -82,7 +88,7 @@ foam.CLASS({
   ]
 });
 
- foam.CLASS({
+foam.CLASS({
   package: 'foam.u2.layout',
   name: 'Cols',
   extends: 'foam.u2.layout.AbstractLayout',
@@ -99,16 +105,16 @@ foam.CLASS({
   ]
 });
 
- foam.CLASS({
+foam.CLASS({
   package: 'foam.u2.layout',
   name: 'Row',
   extends: 'foam.u2.Element',
 
-   documentation: `
+  documentation: `
     An individual row element within a group of rows.
   `,
 
-   properties: [
+  properties: [
     {
       class: 'Float',
       name: 'flex',
@@ -120,7 +126,7 @@ foam.CLASS({
     },
   ],
 
-   methods: [
+  methods: [
     function initE() {
       this.SUPER();
 
@@ -136,16 +142,16 @@ foam.CLASS({
   ],
 });
 
- foam.CLASS({
+foam.CLASS({
   package: 'foam.u2.layout',
   name: 'Col',
   extends: 'foam.u2.Element',
 
-   documentation: `
+  documentation: `
     An individual column element within a group of columns.
   `,
 
-   properties: [
+  properties: [
     {
       class: 'Float',
       name: 'flex',
@@ -156,7 +162,7 @@ foam.CLASS({
     },
   ],
 
-   methods: [
+  methods: [
     function initE() {
       this.SUPER();
 

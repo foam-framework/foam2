@@ -1,12 +1,18 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.ENUM({
   package: 'foam.u2.layout',
   name: 'AlignmentType',
 
-   documentation: `
-      An enum of alignment types for the Layout Package
+  documentation: `
+    An enum of alignment types for the Layout Package
   `,
 
-   values: [
+  values: [
     { name: "START", webFlexProp: 'flex-start' },
     { name: "END", webFlexProp: 'flex-end' },
     { name: "CENTER", webFlexProp: 'center' },
@@ -15,7 +21,7 @@ foam.ENUM({
     { name: "SPACE_EVENLY", webFlexProp: 'space-evenly' },
   ],
 
-   properties:  [
+  properties:  [
     {
       class: 'String',
       name: 'webFlexProp',
