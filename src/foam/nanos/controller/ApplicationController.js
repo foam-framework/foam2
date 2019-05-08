@@ -61,7 +61,7 @@ foam.CLASS({
     'lastMenuLaunched',
     'lastMenuLaunchedListener',
     'loginSuccess',
-    'logo',
+    'lookAndFeel',
     'menuListener',
     'notify',
     'pushMenu',
@@ -75,12 +75,27 @@ foam.CLASS({
   ],
 
   constants: {
-    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor', 'secondaryHoverColor', 'secondaryDisabledColor', 'destructiveColor', 'destructiveHoverColor', 'destructiveDisabledColor', 'groupCSS', 'backgroundColor', 'headerColor' ]
+    MACROS: [
+      'primaryColor',
+      'secondaryColor',
+      'tableColor',
+      'tableHoverColor',
+      'accentColor',
+      'secondaryHoverColor',
+      'secondaryDisabledColor',
+      'destructiveColor',
+      'destructiveHoverColor',
+      'destructiveDisabledColor',
+      'customCSS',
+      'backgroundColor',
+      'headerColor'
+    ]
   },
 
   messages: [
     { name: 'GROUP_FETCH_ERR', message: 'Error fetching group' },
-    { name: 'GROUP_NULL_ERR', message: 'Group was null' }
+    { name: 'GROUP_NULL_ERR', message: 'Group was null' },
+    { name: 'LOOK_AND_FEEL_NOT_FOUND', message: 'Could not fetch look and feel object.' }
   ],
 
   css: `
@@ -148,31 +163,26 @@ foam.CLASS({
       class: 'Boolean',
       name: 'loginSuccess'
     },
-    { class: 'URL', name: 'logo' },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.session.SessionTimer',
       name: 'sessionTimer',
-      factory: function () {
+      factory: function() {
         return this.SessionTimer.create();
       }
     },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.LookAndFeel',
+      name: 'lookAndFeel'
+    },
+
+    // TODO: Get rid of all of the LookAndFeel-related properties on
+    // ApplicationController and just read them off of the 'lookAndFeel'
+    // property instead.
     'currentMenu',
     'lastMenuLaunched',
     'webApp',
-    'primaryColor',
-    'secondaryColor',
-    'secondaryHoverColor',
-    'secondaryDisabledColor',
-    'destructiveColor',
-    'destructiveHoverColor',
-    'destructiveDisabledColor',
-    'tableColor',
-    'tableHoverColor',
-    'accentColor',
-    'backgroundColor',
-    'headerColor',
-    'groupCSS',
     'topNavigation_',
     'footerView_'
   ],
@@ -215,38 +225,26 @@ foam.CLASS({
     },
 
     function initE() {
-      var self = this;
-      self.clientPromise.then(function() {
-        self
-          .addClass(self.myClass())
-          .tag('div', null, self.topNavigation_$)
-          .start()
-            .addClass('stack-wrapper')
-            .tag({
-              class: 'foam.u2.stack.StackView',
-              data: self.stack,
-              showActions: false
-            })
-          .end()
-          .tag('div', null, self.footerView_$);
-
-          // Sets up application view
-          self.topNavigation_.add(self.TopNavigation.create());
-          self.footerView_.add(self.FooterView.create());
+      this.clientPromise.then(() => {
+        this.fetchLookAndFeel().then(() => {
+          this
+            .addClass(this.myClass())
+            .start('div', null, this.topNavigation_$)
+              .tag(this.TopNavigation)
+            .end()
+            .start()
+              .addClass('stack-wrapper')
+              .tag({
+                class: 'foam.u2.stack.StackView',
+                data: this.stack,
+                showActions: false
+              })
+            .end()
+            .start('div', null, this.footerView_$)
+              .tag(this.FooterView)
+            .end();
+          });
       });
-    },
-
-    function setPortalView(group) {
-      // Replaces contents of top navigation and footer view with group views
-      this.topNavigation_ && this.topNavigation_.replaceChild(
-        foam.lookup(group.topNavigation).create(null, this),
-        this.topNavigation_.children[0]
-      );
-
-      this.footerView_ && this.footerView_.replaceChild(
-        foam.lookup(group.footerView).create(null, this),
-        this.footerView_.children[0]
-      );
     },
 
     async function fetchGroup() {
@@ -287,7 +285,7 @@ foam.CLASS({
 
       return css.replace(
         new RegExp('%' + M + '%', 'g'),
-        '/*%' + M + '%*/ ' + this[m]);
+        '/*%' + M + '%*/ ' + this.lookAndFeel[m]);
     },
 
     function expandLongFormMacro(css, m) {
@@ -296,22 +294,13 @@ foam.CLASS({
 
       return css.replace(
         new RegExp('/\\*%' + M + '%\\*/[^;]*', 'g'),
-        '/*%' + M + '%*/ ' + this[m]);
+        '/*%' + M + '%*/ ' + this.lookAndFeel[m]);
     },
 
     // CSS preprocessor, works on classes instantiated in subContext
     function wrapCSS(text, id) {
       if ( text ) {
-        if ( ! this.accentColor ) {
-          var self = this;
-
-          this.accentColor$.sub(function(s) {
-            self.wrapCSS(text, id);
-            s.detach();
-          });
-        }
-
-        let eid = foam.u2.Element.NEXT_ID();
+        var eid = foam.u2.Element.NEXT_ID();
 
         for ( var i = 0 ; i < this.MACROS.length ; i++ ) {
           let m     = this.MACROS[i];
@@ -321,10 +310,10 @@ foam.CLASS({
             // and update the CSS if it changes.
             if ( text != text2 ) {
               text = text2;
-              this.slot(m).sub(function() {
+              this.onDetach(this.lookAndFeel$.dot(m).sub(() => {
                 var el = this.getElementById(eid);
                 el.innerText = this.expandLongFormMacro(el.innerText, m);
-              }.bind(this));
+              }));
             }
         }
 
@@ -369,17 +358,10 @@ foam.CLASS({
     /**
      * Called whenever the group updates.
      *   - Updates the portal view based on the group
-     *   - Update the macros list based on the group
+     *   - Update the look and feel of the app based on the group or user
      *   - Go to a menu based on either the hash or the group
      */
     function onUserAgentAndGroupLoaded() {
-      this.setPortalView(this.group);
-
-      for ( var i = 0; i < this.MACROS.length; i++ ) {
-        var m = this.MACROS[i];
-        if ( this.group[m] ) this[m] = this.group[m];
-      }
-
       if ( ! this.user.emailVerified ) {
         this.loginSuccess = false;
         this.stack.push({ class: 'foam.nanos.auth.ResendVerificationEmail' });
@@ -394,6 +376,10 @@ foam.CLASS({
       } else if ( this.group ) {
         this.window.location.hash = this.group.defaultMenu;
       }
+
+      // Update the look and feel now that the user is logged in since there
+      // might be a more specific one to use now.
+      this.fetchLookAndFeel();
     },
 
     // This listener should be called when a Menu item has been launched
@@ -406,6 +392,35 @@ foam.CLASS({
     // not navigate to a new screen. Typically for SubMenus
     function lastMenuLaunchedListener(m) {
       this.lastMenuLaunched = m;
+    },
+
+    // Get the most appropriate LookAndFeel object from the server and use it to
+    // customize the look and feel of the application.
+    async function fetchLookAndFeel() {
+      try {
+        this.lookAndFeel = await this.client.lookAndFeelService.getLookAndFeel(null, this.webApp);
+      } catch (err) {
+        this.notify(this.LOOK_AND_FEEL_NOT_FOUND, 'error');
+        console.error(err);
+        return;
+      }
+
+      this.useCustomElements();
+    },
+
+    // Use custom elements if supplied by the LookAndFeel.
+    function useCustomElements() {
+      if ( ! this.lookAndFeel ) throw new Error(this.LOOK_AND_FEEL_NOT_FOUND);
+
+      if ( this.lookAndFeel.topNavigation && this.topNavigation_ ) {
+        this.topNavigation_.removeAllChildren();
+        this.topNavigation_.tag({ class: this.lookAndFeel.topNavigation });
+      }
+
+      if ( this.lookAndFeel.footerView && this.footerView_ ) {
+        this.footerView_.removeAllChildren();
+        this.footerView_.tag({ class: this.lookAndFeel.footerView });
+      }
     }
   ]
 });

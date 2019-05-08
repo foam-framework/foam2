@@ -36,3 +36,15 @@ foam.RELATIONSHIP({
   }
 });
 */
+
+foam.RELATIONSHIP({
+  sourceModel: 'foam.nanos.auth.LookAndFeel',
+  targetModel: 'foam.nanos.auth.User',
+  cardinality: '1:*',
+  forwardName: 'users',
+  inverseName: 'personalLookAndFeel',
+  sourceProperty: {
+    hidden: true,
+    visibility: 'HIDDEN'
+  }
+});
