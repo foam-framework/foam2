@@ -134,7 +134,7 @@ foam.CLASS({
       validateObj: function(organization) {
         if ( organization.length > 70 ) {
           return 'Company name cannot exceed 70 characters.';
-        } if ( !(organization.trim()) ) {
+        } if (!(organization.trim())) {
           return 'Company Name Required.';
         }
       }
