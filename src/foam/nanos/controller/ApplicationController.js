@@ -199,7 +199,6 @@ foam.CLASS({
 
       this.clientPromise.then(async function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
-        foam.__context__.register(foam.u2.UnstyledActionView, 'foam.u2.ActionView');
 
         await self.fetchAgent();
         await self.fetchUser();
