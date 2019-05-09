@@ -36,7 +36,6 @@ foam.CLASS({
     function fromSectionAxiom(a, cls) {
       this.copyFrom({
         isAvailable: a.isAvailable,
-        order: a.order,
         title: a.title,
         properties: cls.getAxiomsByClass(this.Property)
           .filter(p => p.section == a.name)
