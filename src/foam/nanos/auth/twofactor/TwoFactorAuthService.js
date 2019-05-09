@@ -7,10 +7,6 @@ foam.CLASS({
     'foam.nanos.NanoService'
   ],
 
-  imports: [
-    'localUserDAO'
-  ],
-
   javaImports: [
     'foam.dao.DAO',
     'foam.nanos.auth.User',
@@ -31,9 +27,7 @@ foam.CLASS({
       name: 'check',
       javaCode: `
         Session session = x.get(Session.class);
-
-        // get user from session id
-        User user = (User) ((DAO) getLocalUserDAO()).find(session.getUserId());
+        User user = (User) x.get("user");
 
         return user != null &&
           user.getTwoFactorEnabled() &&
