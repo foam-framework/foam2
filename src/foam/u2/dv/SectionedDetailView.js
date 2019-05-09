@@ -5,12 +5,12 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2',
+  package: 'foam.u2.dv',
   name: 'SectionedDetailView',
-  extends: 'foam.u2.AbstractSectionedDetailView',
+  extends: 'foam.u2.dv.AbstractSectionedDetailView',
 
   requires: [
-    'foam.u2.SectionedDetailPropertyView',
+    'foam.u2.dv.SectionedDetailPropertyView',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows'
   ],

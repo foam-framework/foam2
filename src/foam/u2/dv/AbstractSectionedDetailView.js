@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2',
+  package: 'foam.u2.dv',
   name: 'AbstractSectionedDetailView',
   extends: 'foam.u2.View',
 
