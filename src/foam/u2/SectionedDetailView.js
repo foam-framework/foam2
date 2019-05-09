@@ -9,6 +9,12 @@ foam.CLASS({
   name: 'SectionedDetailView',
   extends: 'foam.u2.AbstractSectionedDetailView',
 
+  requires: [
+    'foam.u2.SectionedDetailPropertyView',
+    'foam.u2.layout.Cols',
+    'foam.u2.layout.Rows'
+  ],
+
   methods: [
     /**
      * first render the properties row by row using Rows, then at the end

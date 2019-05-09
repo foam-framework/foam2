@@ -7,6 +7,10 @@
 foam.CLASS({
   package: 'foam.layout',
   name: 'Section',
+  requires: [
+    'foam.core.Action',
+    'foam.core.Property'
+  ],
   properties: [
     {
       class: 'Function',
@@ -26,6 +30,21 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.core.Action',
       name: 'actions'
+    }
+  ],
+  methods: [
+    function fromSectionAxiom(a, cls) {
+      this.copyFrom({
+        isAvailable: a.isAvailable,
+        order: a.order,
+        title: a.title,
+        properties: cls.getAxiomsByClass(this.Property)
+          .filter(p => p.section == a.name)
+          .filter(p => ! p.hidden),
+        actions: cls.getAxiomsByClass(this.Action)
+          .filter(a => a.section == a.name)
+      });
+      return this;
     }
   ]
 }); 

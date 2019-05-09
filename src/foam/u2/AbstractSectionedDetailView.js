@@ -14,13 +14,10 @@ foam.CLASS({
   `,
 
   requires: [
-    'foam.u2.SectionedDetailPropertyView',
-    'foam.u2.layout.Rows',
-    'foam.u2.layout.Cols',
     'foam.core.Action',
     'foam.core.Property',
     'foam.layout.Section',
-    'foam.layout.SectionAxiom',
+    'foam.layout.SectionAxiom'
   ],
 
   properties: [
@@ -36,38 +33,34 @@ foam.CLASS({
       of: 'foam.layout.Section',
       name: 'sections',
       factory: null,
-      expression: function(of) { // We should fix this!
+      expression: function(of) {
         if ( ! of ) return [];
 
-        var sectionAxioms = of.getAxiomsByClass(this.SectionAxiom)
-          .map(sectionAxiom => this.Section.create({
-            isAvailable: sectionAxiom.isAvailable,
-            order: sectionAxiom.order,
-            title: sectionAxiom.label,
-            properties: of.getAxiomsByClass(this.Property)
-              .filter(p => p.section == sectionAxiom.name)
-              .filter(p => ! p.hidden),
-            actions: of.getAxiomsByClass(this.Action)
-              .filter(a => a.section == sectionAxiom.name)
-          }))
+        sections = of.getAxiomsByClass(this.SectionAxiom)
+          .sort((a, b) => a.order - b.order)
+          .map(a => this.Section.create().fromSectionAxiom(a, of));
 
-        // need to abide by the Order property and sort in increasing order
-        var orderedSectionAxioms = sectionAxioms.sort((a,b) => a.order -  b.order);
+        var usedAxioms = sections
+          .map(s => s.properties.concat(s.actions))
+          .flat()
+          .reduce((map, a) => {
+            map[a.name] = true;
+            return map;
+          }, {});
+        var unusedProperties = of.getAxiomsByClass(this.Property)
+            .filter(p => ! usedAxioms[p.name])
+            .filter(p => ! p.hidden);
+        var unusedActions = of.getAxiomsByClass(this.Action)
+            .filter(a => ! usedAxioms[a.name]);
+        if ( unusedProperties.length || unusedActions.length ) {
+          sections.push(this.Section.create({
+            title: 'Unsectioned Axioms',
+            properties: unusedProperties,
+            actions: unusedActions
+          }));
+        }
 
-        /**
-         * We are gathering all the unsectioned properties 
-         * and placing them in their own section at the  end
-         */
-        orderedSectionAxioms.push(this.Section.create({
-          title: 'Unsectioned Properties',
-          properties: of.getAxiomsByClass(this.Property)
-            .filter(p => ! p.section)
-            .filter(p => ! p.hidden),
-          actions: of.getAxiomsByClass(this.Action)
-            .filter(a => ! a.section)
-        }));
-
-        return orderedSectionAxioms;
+        return sections;
       }
     }
   ]
