@@ -1829,8 +1829,7 @@ foam.CLASS({
       }.bind(this));
 
       var index = before ? i : (i + 1);
-      this.childNodes.splice.apply(this.childNodes,
-          [ index, 0 ].concat(children));
+      this.childNodes.splice.apply(this.childNodes, [index, 0].concat(children));
 
       this.state.onInsertChildren.call(
         this,
@@ -2056,10 +2055,9 @@ foam.CLASS({
       class: 'foam.core.ContextMethod',
       name: 'E',
       code: function E(ctx, opt_nodeName) {
-        var nodeName = (opt_nodeName || 'div').toUpperCase();
+        var nodeName = (opt_nodeName || 'DIV').toUpperCase();
 
-        return (
-          ctx.elementForName(nodeName) || foam.u2.Element).
+        return (ctx.elementForName(nodeName) || foam.u2.Element).
           create({nodeName: nodeName}, ctx);
       }
     },
