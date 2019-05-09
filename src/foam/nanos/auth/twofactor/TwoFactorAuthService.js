@@ -7,10 +7,6 @@ foam.CLASS({
     'foam.nanos.NanoService'
   ],
 
-  imports: [
-    'localUserDAO'
-  ],
-
   javaImports: [
     'foam.dao.DAO',
     'foam.nanos.auth.User',
