@@ -39,7 +39,7 @@ foam.CLASS({
               .add(prop.label$)
               .start(self.Cols, { alignmentType: foam.u2.layout.AlignmentType.START })
                 .add(prop)
-                .start({class: 'foam.u2.tag.Image', data: 'images/inline-error-icon.svg'})
+                .start({class: 'foam.u2.tag.Image', data: 'images/question-icon.svg'})
                   .show(prop.help$.map((help) => typeof help === 'string' && help.length > 0)).attrs({ title: prop.help$ })
                 .end()
               .end()
