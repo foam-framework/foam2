@@ -604,7 +604,7 @@ FOAM_FILES([
   { name: "foam/layout/Section" },
   { name: "foam/layout/SectionAxiom" },
   
-  { name: "foam/u2/dv/AbstractSectionedDetailView" },
-  { name: "foam/u2/dv/SectionedDetailView" },
-  { name: "foam/u2/dv/SectionedDetailPropertyView" }
+  { name: "foam/u2/detail/AbstractSectionedDetailView" },
+  { name: "foam/u2/detail/SectionedDetailView" },
+  { name: "foam/u2/detail/SectionedDetailPropertyView" }
 ]);
