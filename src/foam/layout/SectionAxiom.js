@@ -15,18 +15,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'title',
-    },
-    {
-      class: 'String',
-      name: 'label',
-      expression: function(title) {
-        return foam.String.capitalize(title);
+      expression: function(name) {
+        return foam.String.capitalize(name);
       }
     },
     {
       class: 'Int',
       name: 'order',
-      value: Number.MAX_VALUE,  // if no order is specified
+      value: Number.MAX_VALUE
     },
     {
       class: 'Function',
