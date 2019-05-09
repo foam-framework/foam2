@@ -96,12 +96,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'firstName',
-      validateObj: function(firstNameField) {
-        if (!(firstNameField.trim())){
+      validateObj: function(firstName) {
+        if ( ! firstName.trim() ){
           return 'First Name Required.'
-        } if ( firstNameField.length > 70 ) {
+        } if ( firstName.length > 70 ) {
           return 'First name cannot exceed 70 characters.';
-        } if(/\d/.test(this.firstNameField)) {
+        } if( /\d/.test(this.firstName) ) {
           return 'First name cannot contain numbers';
         } 
       }
@@ -113,12 +113,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'lastName',
-      validateObj: function(lastNameField) {
-        if (!(lastNameField.trim())){
+      validateObj: function(lastName) {
+        if ( ! lastName.trim() ){
           return 'Last Name Required.'
-        } if ( lastNameField.length > 70 ) {
+        } if ( lastName.length > 70 ) {
           return 'Last name cannot exceed 70 characters.';
-        } if(/\d/.test(this.lastNameField)) {
+        } if( /\d/.test(this.lastName) ) {
           return 'Last name cannot contain numbers';
         } 
       }

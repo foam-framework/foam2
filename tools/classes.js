@@ -186,6 +186,7 @@ var classes = [
   'foam.nanos.auth.twofactor.AbstractTOTPAuthService',
   'foam.nanos.auth.twofactor.ClientOTPAuthService',
   'foam.nanos.auth.twofactor.GoogleTOTPAuthService',
+  'foam.nanos.auth.twofactor.TwoFactorAuthService',
   'foam.nanos.auth.LogoutDisabledUserDAO',
   'foam.nanos.auth.DeletedAware',
   'foam.nanos.auth.DeletedAwareDummy',
