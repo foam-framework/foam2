@@ -20,6 +20,10 @@ foam.CLASS({
       }
     },
     {
+      class: 'String',
+      name: 'help'
+    },
+    {
       class: 'Int',
       name: 'order',
       value: Number.MAX_VALUE
