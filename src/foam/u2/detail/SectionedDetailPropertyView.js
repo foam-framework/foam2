@@ -42,13 +42,11 @@ foam.CLASS({
           return self.E()
             .start(self.Rows)
               .add(prop.label$)
-              .start(self.Cols, { alignmentType: foam.u2.layout.AlignmentType.START })
-                .add(prop)
-                .callIf(prop.help, function() { 
-                  this.start({class: 'foam.u2.tag.Image', data: 'images/question-icon.svg'})
-                    .attrs({ title: prop.help })
-                  .end();
-                })
+              .start(self.Cols)
+                .start(self.Col, { flex: 1 })
+                  .add(prop)
+                .end()
+                .add(prop.help$)
               .end()
               .add(errorSlot.map((s) => {
                 return self.E().add(s);
