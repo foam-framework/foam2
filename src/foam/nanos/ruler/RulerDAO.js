@@ -21,6 +21,7 @@ foam.CLASS({
     'foam.dao.AbstractSink',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.mlang.order.Desc',
     'foam.mlang.predicate.Predicate',
     'foam.mlang.sink.GroupBy',
     'java.util.ArrayList',
@@ -175,7 +176,6 @@ foam.CLASS({
       for ( Object key : sink.getGroupKeys() ) {
         List<Rule> group = ((ArraySink) sink.getGroups().get(key)).getArray();
         if ( ! group.isEmpty() ) {
-          Collections.sort(group, new foam.mlang.order.Desc(Rule.PRIORITY));
           new RuleEngine(x, this).execute(group, obj, oldObj);
         }
       }
@@ -189,7 +189,14 @@ foam.CLASS({
           type: 'Context'
         }
       ],
-      javaCode: `DAO ruleDAO = ((DAO) x.get("ruleDAO")).where(EQ(Rule.DAO_KEY, getDaoKey()));
+      javaCode: `
+        DAO ruleDAO = ((DAO) x.get("ruleDAO")).where(
+          AND(
+            EQ(Rule.ENABLED, true),
+            EQ(Rule.DAO_KEY, getDaoKey())
+          )
+        ).orderBy(new Desc(Rule.PRIORITY));
+
 Map rulesList = getRulesList();
 GroupBy createdBefore = (GroupBy) ruleDAO.where(getCreateBefore()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
 rulesList.put(getCreateBefore(), createdBefore);
@@ -217,14 +224,15 @@ ruleDAO.listen(new AbstractSink() {
       if ( ((Predicate) key).f(obj) ) {
         GroupBy group = (GroupBy) rulesList.get(key);
         if ( group.getGroupKeys().contains(ruleGroup) ) {
-          ArrayList rules = (ArrayList) ((ArraySink)group.getGroups().get(ruleGroup)).getArray();
+          List<Rule> rules = ((ArraySink) group.getGroups().get(ruleGroup)).getArray();
           Rule foundRule = Rule.findById(rules, rule.getId());
           if ( foundRule != null ) {
             rules.remove(foundRule);
             rules.add(foundRule.updateRule(rule));
           } else {
-            rules.add(obj);
+            rules.add(rule);
           }
+          Collections.sort(rules, new Desc(Rule.PRIORITY));
         } else {
           group.putInGroup_(sub, ruleGroup, obj);
         }
@@ -244,7 +252,7 @@ ruleDAO.listen(new AbstractSink() {
       if ( ((Predicate) key).f(obj) ) {
         GroupBy group = (GroupBy) rulesList.get(key);
         if ( group.getGroupKeys().contains(ruleGroup) ) {
-          ArrayList rules = (ArrayList) ((ArraySink)group.getGroups().get(ruleGroup)).getArray();
+          List<Rule> rules = ((ArraySink) group.getGroups().get(ruleGroup)).getArray();
           Rule foundRule = Rule.findById(rules, rule.getId());
           if ( foundRule != null ) {
             rules.remove(foundRule);
