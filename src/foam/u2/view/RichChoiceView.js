@@ -139,6 +139,11 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
+      name: 'name',
+      factory: function() { return "select"; }
+    },
+    {
       class: 'foam.u2.ViewSpec',
       name: 'rowView',
       documentation: `
@@ -259,6 +264,7 @@ foam.CLASS({
       }
 
       this
+        .attrs({ name: this.name })
         .addClass(this.myClass())
         .start()
           .addClass(this.myClass('selection-view'))
