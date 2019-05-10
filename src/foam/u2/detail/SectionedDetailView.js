@@ -31,7 +31,7 @@ foam.CLASS({
           return self.E()
             .start(self.Rows, { border: 'foam.u2.borders.CardBorder' })
               .forEach(sections, function(s) {
-                this.start(self.Rows).show(s.isAvailable$)
+                this.start(self.Rows)
                   .start('h2').add(s.title$).end()
                   .forEach(s.properties,  function(p) {
                     this.tag(self.SectionedDetailPropertyView, { prop: p, data: data })
