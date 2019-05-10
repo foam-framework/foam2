@@ -78,7 +78,10 @@ foam.CLASS({
       class: 'Object',
       name: 'outputter',
       javaType: 'foam.lib.json.Outputter',
-      javaFactory: `return new Outputter(OutputterMode.STORAGE);`
+      javaFactory: `
+      Outputter out = new Outputter(OutputterMode.STORAGE);
+      out.setX(getX());
+      return out;`
     },
     {
       class: 'Object',

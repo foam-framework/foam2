@@ -38,7 +38,7 @@
         opacity: 1;
         box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.19);
       }
-      ^ .net-nanopay-ui-ActionView-optionsDropDown {
+      ^ .foam-u2-ActionView-optionsDropDown {
         width: 26px !important;
         height: 26px !important;
         border: none !important;
@@ -47,7 +47,7 @@
         margin-right:20px !important;
         margin-top:20px !important;
       }
-      ^ .net-nanopay-ui-ActionView-optionsDropDown > img {
+      ^ .foam-u2-ActionView-optionsDropDown > img {
         height:23px;
       }
       ^ .dot{
@@ -56,7 +56,7 @@
         border-radius: 50%;
         color:black;
       }
-      ^ .net-nanopay-ui-ActionView-optionsDropDown:hover {
+      ^ .foam-u2-ActionView-optionsDropDown:hover {
         background-color: rgba(164, 179, 184, 0.3);
       }
       ^ .popUpDropDown > div {
@@ -72,7 +72,7 @@
         color: white;
         cursor: pointer;
       }
-      ^ .net-nanopay-ui-ActionView {
+      ^ .foam-u2-ActionView {
         background-color: rgba(201, 76, 76, 0.0);
         width: 135px;
         height: 40px;
@@ -81,10 +81,10 @@
         margin-left:20px;
         margin-top:10px;
       }
-      ^ .net-nanopay-ui-ActionView:hover {
+      ^ .foam-u2-ActionView:hover {
         background-color: #d2e2ef;
       }
-      ^ .net-nanopay-ui-ActionView > span {
+      ^ .foam-u2-ActionView > span {
         height: 40px;
         font-family: Roboto;
         font-size: 14px;
@@ -94,7 +94,7 @@
         text-align: center;
         color: #59a5d5;
       }
-      ^ .net-nanopay-ui-ActionView-popup {
+      ^ .foam-u2-ActionView-popup {
         background-color: rgba(201, 76, 76, 0.0);
         width: 135px;
         height: 40px;
@@ -104,7 +104,7 @@
         margin-left:20px;
         margin-top:10px;
       }
-      ^ .net-nanopay-ui-ActionView-popup > span {
+      ^ .foam-u2-ActionView-popup > span {
         height: 40px;
         font-family: Roboto;
         font-size: 14px;

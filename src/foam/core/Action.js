@@ -115,22 +115,6 @@ foam.CLASS({
       class: 'Boolean',
       name: 'permissionRequired',
       documentation: 'When set to true, package.model.permission.action is needed to execute this action.'
-    },
-    {
-      class: 'Boolean',
-      name: 'isDestructive',
-      documentation: `
-        When set to true, this action should be styled in a way that indicates
-        that data is deleted in some way.
-      `
-    },
-    {
-      class: 'Boolean',
-      name: 'isSecondary',
-      documentation: `
-        When set to true, this action should be styled in a way that indicates
-        that this action is not as important as other actions.
-      `
     }
   ],
 

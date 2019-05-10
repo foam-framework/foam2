@@ -209,7 +209,7 @@ ruleDAO.listen(new AbstractSink() {
   public void put(Object obj, Detachable sub) {
     Map rulesList = getRulesList();
     Rule rule = (Rule) obj;
-    if ( rule.getDaoKey() != getDaoKey() ) {
+    if ( ! rule.getDaoKey().equals(getDaoKey()) ) {
       return;
     }
     String ruleGroup = rule.getRuleGroup();
