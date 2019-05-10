@@ -105,6 +105,10 @@ public class Boot {
       }
     });
 
+    DAO documentDAO = (DAO) root_.get("documentDAO");
+    documentDAO.find("intro");
+    documentDAO.find("intro");
+
     String startScript = System.getProperty("foam.main", "main");
     if ( startScript != null ) {
       DAO    scriptDAO = (DAO) root_.get("scriptDAO");
@@ -144,6 +148,8 @@ public class Boot {
     System.out.println("Starting Nanos Server");
 
     boolean datadirFlag = false;
+
+    System.setProperty("flow.uri.scheme", "jar");
 
     String datadir = "";
     for ( int i = 0 ; i < args.length ; i++ ) {

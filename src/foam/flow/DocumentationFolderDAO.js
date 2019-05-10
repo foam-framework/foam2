@@ -10,6 +10,15 @@ foam.CLASS({
   requires: [
     'foam.flow.Document'
   ],
+  javaImports: [
+    'java.io.InputStream',
+    'foam.nanos.fs.Storage',
+    'java.net.URI',
+    'java.net.URISyntaxException',
+    'java.nio.file.FileSystemNotFoundException',
+    'java.util.HashMap',
+    'java.util.Map'
+  ],
   documentation: 'Loads/stores documentation models from a directory of HTML markup.  Useful for saving and editing documentation in a version control repository.',
   extends: 'foam.dao.AbstractDAO',
   properties: [
@@ -109,10 +118,39 @@ return obj;`
     },
     {
       name: 'find_',
-      javaCode: `// TODO: Escape/sanitize file name
+      javaCode: `
+// TODO: Escape/sanitize file name
 verifyId((String)id);
 
-java.nio.file.FileSystem fs = java.nio.file.FileSystems.getDefault();
+java.nio.file.FileSystem fs;
+switch(System.getProperty("flow.uri.scheme", "file")) {
+  case "jar":
+    String nanopayJar = System.getenv("NANOPAY_JAR");
+    java.nio.file.Path nanopayJarPath = java.nio.file.Paths.get(nanopayJar);
+    try {
+      URI nanopayJarURI = new URI("jar", nanopayJarPath.toUri().toString(), null);
+      try {
+        fs = java.nio.file.FileSystems.getFileSystem(nanopayJarURI);
+      } catch (FileSystemNotFoundException e) {
+        Map<String, String> env = new HashMap<>();
+        env.put("create", "true");
+
+        try {
+          fs = java.nio.file.FileSystems.newFileSystem(nanopayJarURI, env);
+        } catch (java.io.IOException ex) {
+          throw new RuntimeException(ex);
+        }
+      }
+    } catch(URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
+    break;
+  case "file":
+  default:
+    fs = java.nio.file.FileSystems.getDefault();
+    break;
+}
+
 java.nio.file.Path path = fs.getPath(getDir(), ((String)id) + ".flow");
 if ( ! java.nio.file.Files.isReadable(path) ) return null;
 
