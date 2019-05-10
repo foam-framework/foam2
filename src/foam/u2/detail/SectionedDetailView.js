@@ -12,8 +12,20 @@ foam.CLASS({
   requires: [
     'foam.u2.detail.SectionedDetailPropertyView',
     'foam.u2.layout.Cols',
-    'foam.u2.layout.Rows'
+    'foam.u2.layout.Rows',
+    'foam.u2.borders.CardBorder',
   ],
+
+  css: `
+    .section-header {
+      font-weight: bold;
+      font-size: 1.5em;
+    }
+
+    .inner-card {
+      padding: 32px 16px
+    }
+  `,
 
   methods: [
     /**
@@ -24,20 +36,23 @@ foam.CLASS({
       var self = this;
       this.SUPER();
       this
+        .addClass(this.myClass())
         .add(this.slot(function(sections, data) {
           if ( ! data ) return;
           return self.E()
-            .start(self.Rows, { border: 'foam.u2.borders.CardBorder' })
+            .start(self.Rows, { defaultChildConfig: { padding: '16px 0' } })
               .forEach(sections, function(s) {
-                this.start(self.Rows)
-                  .start('h2').add(s.title$).end()
-                  .forEach(s.properties,  function(p) {
-                    this.tag(self.SectionedDetailPropertyView, { prop: p, data: data })
-                  })
-                  .start(self.Cols)
-                    .forEach(s.actions, function(a) {
-                      this.add(a);
+                this.start(self.Row).add(s.title$).addClass('section-header').end()
+                .start(self.CardBorder).addClass('inner-card')
+                  .start(self.Rows)
+                    .forEach(s.properties,  function(p) {
+                      this.tag(self.SectionedDetailPropertyView, { prop: p, data: data })
                     })
+                    .start(self.Cols)
+                      .forEach(s.actions, function(a) {
+                        this.add(a);
+                      })
+                    .end()
                   .end()
                 .end();
               })

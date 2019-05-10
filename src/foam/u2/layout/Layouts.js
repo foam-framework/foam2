@@ -180,6 +180,10 @@ foam.CLASS({
       `,
       value: 0
     },
+    {
+      class: 'String',
+      name: 'padding',
+    }
   ],
 
   methods: [
@@ -191,6 +195,7 @@ foam.CLASS({
       // we can add to this list as we go on when we have more style properties to consider
       const styles = {
         'flex-grow': this.flex$,
+        'padding': this.padding$
       }
 
       this.style(styles);
@@ -214,8 +219,13 @@ foam.CLASS({
       documentation: `
         Defines how much this specific column will grow (take up space) relative 
         to the other Col elements within its Cols group
-      `
+      `,
+      value: 0,
     },
+    {
+      class: 'String',
+      name: 'padding',
+    }
   ],
 
   methods: [
@@ -227,6 +237,7 @@ foam.CLASS({
       // we can add to this list as we go on when we have more style properties to consider
       const styles = {
         'flex-grow': this.flex$,
+        'padding': this.padding$
       }
 
       this.style(styles);
