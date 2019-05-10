@@ -545,7 +545,7 @@ foam.CLASS({
     },
 
     function sub(l) {
-      if ( this.arguments.length != 1 ) return this.SUPER.apply(this, arguments);
+      if ( arguments.length != 1 ) return this.SUPER.apply(this, arguments);
       var subs = this.slots.map(s => s.sub(l));
       return {
         detach: function() { subs.forEach(s => s.detach()); }

@@ -22,10 +22,6 @@ foam.CLASS({
 
   documentation: 'View for one row/property of a DetailView.',
 
-  imports: [
-    'auth'
-  ],
-
   properties: [
     'prop',
     [ 'nodeName', 'tr' ],
@@ -61,7 +57,9 @@ foam.CLASS({
     function initE() {
       var prop = this.prop;
       this.
-        show(prop.createVisibilityFor(this.__context__.data$).map(function(m) { return m != foam.u2.Visibility.HIDDEN; })).
+        show(prop.createVisibilityFor(this.__context__.data$).map(function(m) {
+          return m != foam.u2.Visibility.HIDDEN;
+        })).
         addClass('foam-u2-PropertyView').
         addClass('foam-u2-PropertyView-prop-' + prop.name).
         start('td').addClass('foam-u2-PropertyView-label').add(this.label).end().

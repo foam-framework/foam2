@@ -2108,10 +2108,6 @@ foam.CLASS({
   name: 'PropertyViewRefinements',
   refines: 'foam.core.Property',
 
-  imports: [
-    'auth?'
-  ],
-
   requires: [
     'foam.u2.TextField'
   ],
@@ -2167,9 +2163,12 @@ foam.CLASS({
         foam.core.ConstantSlot.create({value: this.visibility});
       
       if ( this.permissionRequired ) {
+        // TODO: Is this a good place to get the auth from?
+        var auth = data.__subContext__.auth;
+
         // If permission is required but there's no auth service, the safest thing to
         // do is to hide the property completely.
-        if ( ! this.auth ) foam.core.ConstantSlot.create({value: Visibility.HIDDEN});
+        if ( ! auth ) foam.core.ConstantSlot.create({value: Visibility.HIDDEN});
 
         var propName = this.name.toLowerCase();
         var clsName  = this.forClass_;
@@ -2178,10 +2177,10 @@ foam.CLASS({
         var permissionSlot = foam.core.PromiseSlot.create({
           // Default to HIDDEN until the promise completes.
           value: Visibility.HIDDEN,
-          promise: this.auth.check(null, `${clsName}.rw.${propName}`)
+          promise: auth.check(null, `${clsName}.rw.${propName}`)
             .then(function(rw) {
               if ( rw ) return Visibility.RW;
-              else return this.auth.check(null, `${clsName}.ro.${propName}`)
+              else return auth.check(null, `${clsName}.ro.${propName}`)
                 .then(ro => ro ? Visibility.RO : Visibility.HIDDEN);
             })
         });
