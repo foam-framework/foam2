@@ -37,7 +37,7 @@ foam.CLASS({
           return self.E()
             .start(self.Rows)
               .add(prop.label$)
-              .start(self.Cols, { alignmentType: foam.u2.layout.AlignmentType.START })
+              .start(self.Cols, { contentJustification: foam.u2.layout.ContentJustification.START })
                 .add(prop)
                 .callIf(prop.help, function() { 
                   this.start({class: 'foam.u2.tag.Image', data: 'images/question-icon.svg'})
