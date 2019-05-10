@@ -220,7 +220,7 @@ foam.CLASS({
 
     function hasPermissions_(configKey, data$) {
       if ( this.permissionConfig == null ) return Promise.resolve(true);
-      return Promise.all(this.permissionConfig[configKey].map((p) => this.checkPermission(data$.get().__subContext__, p))).then((values) => values.reduce((l, r) => l && r), true);
+      return Promise.all(this.permissionConfig[configKey].map((p) => this.checkPermission(data$.get().__subContext__, p))).then((values) => values.reduce((l, r) => l && r, true));
     }
   ]
 });
