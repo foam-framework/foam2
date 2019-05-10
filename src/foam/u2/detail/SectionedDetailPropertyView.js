@@ -24,6 +24,21 @@ foam.CLASS({
     .foam-u2-view-RadioView label {
       margin-left: 12px;
     }
+    .validation-container {
+      margin-top: 4px;
+      color: #d9170e;
+    }
+    .helper-icon {
+      width: 20px;
+      height: 20px;
+    }
+    .error-icon {
+      width: 16px;
+      height: 16px;
+    }
+    .error .foam-u2-TextField {
+      background-color: red!important;
+    }
   `,
 
   requires: [
@@ -46,23 +61,39 @@ foam.CLASS({
         .addClass(this.myClass())
         .start(self.Rows, { defaultChildConfig: { padding: '8px 0'} })
           .add(this.slot(function(prop) {
-            var errorSlot = self.slot(function(data, prop$validateObj){
-              return data && prop$validateObj && data.slot(prop$validateObj);
+            
+            var errorSlot = foam.core.SimpleSlot.create();
+            var slotSub;
+            self.slot(function(data, prop$validateObj) {
+              if ( ! ( data && prop$validateObj ) ) return;
+              slotSub && slotSub.detach();
+              slotSub = errorSlot.follow(data.slot(prop$validateObj));
             });
+
             return self.E()
               .start(self.Rows, { defaultChildConfig:  { lineHeight: '2' } })
                 .start().add(prop.label$).addClass('label').end()
                 .start(self.Cols, { contentJustification: foam.u2.layout.ContentJustification.START, defaultChildConfig: { margin: '0 16px 0 0' } })
-                  .add(prop)
+                  .add(prop).enableClass('error', errorSlot)
                   .callIf(prop.help, function() { 
                     this.start({class: 'foam.u2.tag.Image', data: 'images/question-icon.svg'})
+                      .addClass('helper-icon')
                       .attrs({ title: prop.help })
                     .end();
                   })
                 .end()
-                .add(errorSlot.map((s) => {
-                  return self.E().add(s);
-                }));
+                .start(self.Cols, { 
+                  contentJustification: foam.u2.layout.ContentJustification.START, 
+                  itemAlignment: foam.u2.layout.ItemAlignment.CENTER, defaultChildConfig: { margin: '0 8px 0 0' }
+                }).addClass('validation-container').show(errorSlot)
+                  .start({class: 'foam.u2.tag.Image', data: 'images/inline-error-icon.svg'})
+                    .addClass('error-icon')
+                  .end()
+                  .add(errorSlot.map((s) => {
+                    return self.E().add(s);
+                  }))
+                .end()
+              .end()
           }));
     }
   ]
