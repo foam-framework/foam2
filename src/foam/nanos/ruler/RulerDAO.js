@@ -192,22 +192,19 @@ foam.CLASS({
             EQ(Rule.DAO_KEY, getDaoKey())
           )
         ).orderBy(new Desc(Rule.PRIORITY));
+        addRuleList(ruleDAO, getCreateBefore());
+        addRuleList(ruleDAO, getUpdateBefore());
+        addRuleList(ruleDAO, getRemoveBefore());
+        addRuleList(ruleDAO, getCreateAfter());
+        addRuleList(ruleDAO, getUpdateAfter());
+        addRuleList(ruleDAO, getRemoveAfter());
 
-Map rulesList = getRulesList();
-GroupBy createdBefore = (GroupBy) ruleDAO.where(getCreateBefore()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-rulesList.put(getCreateBefore(), createdBefore);
-GroupBy updatedBefore = (GroupBy) ruleDAO.where(getUpdateBefore()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-rulesList.put(getUpdateBefore(), updatedBefore);
-GroupBy createdAfter = (GroupBy) ruleDAO.where(getCreateAfter()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-rulesList.put(getCreateAfter(), createdAfter);
-GroupBy updatedAfter = (GroupBy) ruleDAO.where(getUpdateAfter()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-rulesList.put(getUpdateAfter(), updatedAfter);
-GroupBy removedBefore = (GroupBy) ruleDAO.where(getRemoveBefore()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-rulesList.put(getRemoveBefore(), removedBefore);
-GroupBy removedAfter = (GroupBy) ruleDAO.where(getRemoveAfter()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-rulesList.put(getRemoveAfter(), removedAfter);
-
-        ruleDAO.listen(new UpdateRulesListSink(x, this), null);
+        ruleDAO.listen(
+          new UpdateRulesListSink.Builder(x)
+            .setDao(this)
+            .build()
+          , null
+        );
       `
     },
     {
@@ -218,6 +215,26 @@ rulesList.put(getRemoveAfter(), removedAfter);
           return true;
         }
         return getDelegate().cmd(obj);
+      `
+    },
+    {
+      name: 'addRuleList',
+      args: [
+        {
+          name: 'dao',
+          type: 'foam.dao.DAO'
+        },
+        {
+          name: 'predicate',
+          type: 'foam.mlang.predicate.Predicate'
+        }
+      ],
+      javaCode: `
+        getRulesList().put(
+          predicate,
+          dao.where(predicate)
+            .select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()))
+        );
       `
     }
   ],
