@@ -183,6 +183,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'padding',
+    },
+    {
+      class: 'String',
+      name: 'margin'
+    },
+    {
+      class: 'String',
+      name: 'lineHeight'
     }
   ],
 
@@ -195,8 +203,12 @@ foam.CLASS({
       // we can add to this list as we go on when we have more style properties to consider
       const styles = {
         'flex-grow': this.flex$,
-        'padding': this.padding$
+        'padding': this.padding$,
+        'margin': this.margin$,
+        'line-height': this.lineHeight
       }
+
+      console.log(this.lineHeight);
 
       this.style(styles);
     }
@@ -225,6 +237,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'padding',
+    },
+    {
+      class: 'String',
+      name: 'margin'
     }
   ],
 
@@ -237,7 +253,8 @@ foam.CLASS({
       // we can add to this list as we go on when we have more style properties to consider
       const styles = {
         'flex-grow': this.flex$,
-        'padding': this.padding$
+        'padding': this.padding$,
+        'margin': this.margin$
       }
 
       this.style(styles);

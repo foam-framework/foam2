@@ -13,6 +13,7 @@ foam.CLASS({
     'foam.u2.detail.SectionedDetailPropertyView',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
+    'foam.u2.layout.Row',
     'foam.u2.borders.CardBorder',
   ],
 
@@ -23,7 +24,7 @@ foam.CLASS({
     }
 
     .inner-card {
-      padding: 32px 16px
+      padding: 24px 16px
     }
   `,
 
@@ -42,7 +43,8 @@ foam.CLASS({
           return self.E()
             .start(self.Rows, { defaultChildConfig: { padding: '16px 0' } })
               .forEach(sections, function(s) {
-                this.start(self.Row).add(s.title$).addClass('section-header').end()
+                this
+                .start(self.Row).add(s.title$).addClass('section-header').end()
                 .start(self.CardBorder).addClass('inner-card')
                   .start(self.Rows)
                     .forEach(s.properties,  function(p) {
