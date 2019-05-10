@@ -37,7 +37,24 @@ foam.CLASS({
       height: 16px;
     }
     .error .foam-u2-TextField {
-      background-color: red!important;
+      background-color: #fbedec;
+      border: solid 1px #d9170e;
+      font-size: 12px;
+    }
+    .error .foam-u2-tag-TextArea {
+      background-color: #fbedec;
+      border: solid 1px #d9170e;
+      font-size: 12px;
+    }
+    .error .foam-u2-tag-Select {
+      background-color: #fbedec;
+      border: solid 1px #d9170e;
+      font-size: 12px;
+    }
+    .error .foam-u2-view-date-DateTimePicker .date-display-box {
+      background-color: #fbedec;
+      border: solid 1px #d9170e;
+      font-size: 12px;
     }
   `,
 
@@ -62,13 +79,13 @@ foam.CLASS({
         .start(self.Rows, { defaultChildConfig: { padding: '8px 0'} })
           .add(this.slot(function(prop) {
             
-            var errorSlot = foam.core.SimpleSlot.create();
+            var errorSlot = foam.core.SimpleSlot.create({value: null});
             var slotSub;
             self.slot(function(data, prop$validateObj) {
               if ( ! ( data && prop$validateObj ) ) return;
               slotSub && slotSub.detach();
               slotSub = errorSlot.follow(data.slot(prop$validateObj));
-            });
+            }).get();
 
             return self.E()
               .start(self.Rows, { defaultChildConfig:  { lineHeight: '2' } })
