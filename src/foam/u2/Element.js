@@ -2164,46 +2164,32 @@ foam.CLASS({
       
       if ( this.permissionRequired ) {
         var visSlot = slot;
-        slot = foam.core.SimpleSlot.create();
-
-        var sub;
-        var onDataUpdate = function(data) {
-          // When permission is required, always set the value to hidden first
-          // so we don't accidentally forget to do it if/when data changes later.
-          sub && sub.detach();
-          slot.set(Visibility.HIDDEN);
-
-          if ( ! data ) return;
+        var permSlot = data$.map(data => {
+          if ( ! data || ! data.__subContext__.auth ) return Visibility.HIDDEN;
           var auth = data.__subContext__.auth;
-          if ( ! auth ) return;
 
           var propName = this.name.toLowerCase();
           var clsName  = this.forClass_;
           clsName = clsName.substring(clsName.lastIndexOf('.') + 1).toLowerCase();
 
-          var permissionSlot = foam.core.PromiseSlot.create({
-            // Default to HIDDEN until the promise completes.
-            value: Visibility.HIDDEN,
-            promise: auth.check(null, `${clsName}.rw.${propName}`)
+          return auth.check(null, `${clsName}.rw.${propName}`)
               .then(function(rw) {
                 if ( rw ) return Visibility.RW;
                 else return auth.check(null, `${clsName}.ro.${propName}`)
                   .then(ro => ro ? Visibility.RO : Visibility.HIDDEN);
-              })
-          });
+              });
+        });
 
-          sub = slot.follow(foam.core.ArraySlot.create({slots: [visSlot, permissionSlot]}).map(arr => {
-            var vis = arr[0];
-            var perm = arr[1];
-            return perm === Visibility.HIDDEN ? perm :
-              vis === Visibility.HIDDEN ? vis :
-              perm === Visibility.RO ? perm :
-              vis;
-          }));
-        }.bind(this);
-        data$.sub(onDataUpdate);
-        onDataUpdate(data$.get());
+        slot = foam.core.ArraySlot.create({slots: [visSlot, permSlot]}).map(arr => {
+          var vis = arr[0];
+          var perm = arr[1] || Visibility.HIDDEN;
+          return perm === Visibility.HIDDEN ? perm :
+            vis === Visibility.HIDDEN ? vis :
+            perm === Visibility.RO ? perm :
+            vis;
+        });
       }
+
       return slot;
     }
   ]

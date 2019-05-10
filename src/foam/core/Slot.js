@@ -379,8 +379,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'ExpressionSlot',
-  implements: [ 'foam.core.Slot' ],
-
+  extends: 'foam.core.PromiseSlot',
   documentation: `
     Tracks dependencies for a dynamic function and invalidates if they change.
 
@@ -435,6 +434,13 @@ foam.CLASS({
     },
     {
       name: 'value',
+      preSet: function(_, n) {
+        if ( n && n.then ) {
+          this.promise = n;
+          n = null;
+        }
+        return n;
+      },
       factory: function() {
         return this.code.apply(this.obj || this, this.args.map(function(a) {
           return a.get();
@@ -446,17 +452,7 @@ foam.CLASS({
 
   methods: [
     function init() { this.onDetach(this.cleanup); },
-
-    function get() { return this.value; },
-
     function set() { /* nop */ },
-
-    function sub(l) {
-      return arguments.length === 1 ?
-        this.SUPER('propertyChange', 'value', l) :
-        this.SUPER.apply(this, arguments);
-    },
-
     function subToArgs_(args) {
       this.cleanup();
 
@@ -496,7 +492,7 @@ foam.CLASS({
   ],
   methods: [
     function set() {
-      throw new Error('PromiseSlot does not support setting.');
+      throw new Error(this.cls_.id + ' does not support setting.');
     }
   ]
 });
