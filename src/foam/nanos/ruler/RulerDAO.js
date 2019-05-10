@@ -16,16 +16,12 @@ foam.CLASS({
   `,
 
   javaImports: [
-    'foam.core.Detachable',
     'foam.core.FObject',
-    'foam.dao.AbstractSink',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.mlang.order.Desc',
     'foam.mlang.predicate.Predicate',
     'foam.mlang.sink.GroupBy',
-    'java.util.ArrayList',
-    'java.util.Collections',
     'java.util.List',
     'java.util.Map',
     'static foam.mlang.MLang.*'
@@ -211,58 +207,8 @@ rulesList.put(getRemoveBefore(), removedBefore);
 GroupBy removedAfter = (GroupBy) ruleDAO.where(getRemoveAfter()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
 rulesList.put(getRemoveAfter(), removedAfter);
 
-ruleDAO.listen(new AbstractSink() {
-  @Override
-  public void put(Object obj, Detachable sub) {
-    Map rulesList = getRulesList();
-    Rule rule = (Rule) obj;
-    if ( ! rule.getDaoKey().equals(getDaoKey()) ) {
-      return;
-    }
-    String ruleGroup = rule.getRuleGroup();
-    for ( Object key : rulesList.keySet() ) {
-      if ( ((Predicate) key).f(obj) ) {
-        GroupBy group = (GroupBy) rulesList.get(key);
-        if ( group.getGroupKeys().contains(ruleGroup) ) {
-          List<Rule> rules = ((ArraySink) group.getGroups().get(ruleGroup)).getArray();
-          Rule foundRule = Rule.findById(rules, rule.getId());
-          if ( foundRule != null ) {
-            rules.remove(foundRule);
-            rules.add(foundRule.updateRule(rule));
-          } else {
-            rules.add(rule);
-          }
-          Collections.sort(rules, new Desc(Rule.PRIORITY));
-        } else {
-          group.putInGroup_(sub, ruleGroup, obj);
-        }
-      }
-    }
-  }
-  
-  @Override
-  public void remove(Object obj, Detachable sub) {
-    Map rulesList = getRulesList();
-    Rule rule = (Rule) obj;
-    if ( rule.getDaoKey() != getDaoKey() ) {
-      return;
-    }
-    String ruleGroup = rule.getRuleGroup();
-    for ( Object key : rulesList.keySet() ) {
-      if ( ((Predicate) key).f(obj) ) {
-        GroupBy group = (GroupBy) rulesList.get(key);
-        if ( group.getGroupKeys().contains(ruleGroup) ) {
-          List<Rule> rules = ((ArraySink) group.getGroups().get(ruleGroup)).getArray();
-          Rule foundRule = Rule.findById(rules, rule.getId());
-          if ( foundRule != null ) {
-            rules.remove(foundRule);
-          }
-        }
-      }
-    }
-  }
-}, null);
-        `
+        ruleDAO.listen(new UpdateRulesListSink(x, this), null);
+      `
     },
     {
       name: 'cmd_',
