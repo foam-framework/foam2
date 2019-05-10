@@ -14,7 +14,7 @@ foam.CLASS({
   `,
 
   css: `
-    .label {
+    .card-label {
       font-size: 16px;
       font-weight: bold;
     }
@@ -89,7 +89,7 @@ foam.CLASS({
 
             return self.E()
               .start(self.Rows, { defaultChildConfig:  { lineHeight: '2' } })
-                .start().add(prop.label$).addClass('label').end()
+                .start().add(prop.label$).addClass('card-label').end()
                 .start(self.Cols, { contentJustification: foam.u2.layout.ContentJustification.START, defaultChildConfig: { margin: '0 16px 0 0' } })
                   .add(prop).enableClass('error', errorSlot)
                   .callIf(prop.help, function() { 
