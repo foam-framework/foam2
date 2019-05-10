@@ -197,9 +197,6 @@
       ],
       javaCode: `
         getAction().applyAction(x, obj, oldObj, ruler);
-        if ( ! getAfter() ) {
-          ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
-        }
       `
     },
     {
