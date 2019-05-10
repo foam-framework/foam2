@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'Country',
 
-  documentation: 'Country information.',
+  documentation: 'The base model for country information.',
 
   ids: ['code'],
 
@@ -27,7 +27,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'name',
-      documentation: 'Country name.'
+      documentation: 'The name of the country.'
     },
     {
       class: 'StringArray',
