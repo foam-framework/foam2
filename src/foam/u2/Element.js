@@ -2108,6 +2108,10 @@ foam.CLASS({
   name: 'PropertyViewRefinements',
   refines: 'foam.core.Property',
 
+  imports: [
+    'auth?'
+  ],
+
   requires: [
     'foam.u2.TextField'
   ],
@@ -2153,14 +2157,46 @@ foam.CLASS({
     },
 
     function createVisibilityFor(data$) {
-      if ( this.visibilityExpression ) {
-        return foam.core.ExpressionSlot.create({
+      var Visibility = foam.u2.Visibility;
+
+      var slot = this.visibilityExpression ?
+        foam.core.ExpressionSlot.create({
           obj$: data$,
           code: this.visibilityExpression
+        }) :
+        foam.core.ConstantSlot.create({value: this.visibility});
+      
+      if ( this.permissionRequired ) {
+        // If permission is required but there's no auth service, the safest thing to
+        // do is to hide the property completely.
+        if ( ! this.auth ) foam.core.ConstantSlot.create({value: Visibility.HIDDEN});
+
+        var propName = this.name.toLowerCase();
+        var clsName  = this.forClass_;
+        clsName = clsName.substring(clsName.lastIndexOf('.') + 1).toLowerCase();
+
+        var permissionSlot = foam.core.PromiseSlot.create({
+          // Default to HIDDEN until the promise completes.
+          value: Visibility.HIDDEN,
+          promise: this.auth.check(null, `${clsName}.rw.${propName}`)
+            .then(function(rw) {
+              if ( rw ) return Visibility.RW;
+              else return this.auth.check(null, `${clsName}.ro.${propName}`)
+                .then(ro => ro ? Visibility.RO : Visibility.HIDDEN);
+            })
+        });
+
+        slot = foam.core.ArraySlot.create({slots: [slot, permissionSlot]}).map(arr => {
+          var vis = arr[0];
+          var perm = arr[1];
+          return perm === Visibility.HIDDEN ? perm :
+            vis === Visibility.HIDDEN ? vis :
+            perm === Visibility.RO ? perm :
+            vis;
         });
       }
 
-      return foam.core.ConstantSlot.create({value: this.visibility});
+      return slot;
     }
   ]
 });

@@ -516,3 +516,40 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'ArraySlot',
+
+  implements: [ 'foam.core.Slot' ],
+
+  documentation: `
+    A slot that takes an array of Slots and notifies when either changes.
+  `,
+
+  properties: [
+    {
+      name: 'slots'
+    }
+  ],
+
+  methods: [
+    function get() {
+      return this.slots.map(s => s.get());
+    },
+
+    function set(arr) {
+      if ( ! foam.Array.isInstance(arr) )
+        throw new Error('ArraySlot can only set an array.');
+      arr.forEach((v, i) => this.slots[i].set(v));
+    },
+
+    function sub(l) {
+      if ( this.arguments.length != 1 ) return this.SUPER.apply(this, arguments);
+      var subs = this.slots.map(s => s.sub(l));
+      return {
+        detach: function() { subs.forEach(s => s.detach()); }
+      };
+    }
+  ]
+});
