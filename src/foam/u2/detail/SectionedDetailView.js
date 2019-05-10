@@ -22,10 +22,12 @@ foam.CLASS({
      */
     function initE() {
       var self = this;
+
       this.SUPER();
       this
         .add(this.slot(function(sections, data) {
           if ( ! data ) return;
+
           return self.E()
             .start(self.Rows, { border: 'foam.u2.borders.CardBorder' })
               .forEach(sections, function(s) {
