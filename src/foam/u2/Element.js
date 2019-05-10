@@ -2163,38 +2163,47 @@ foam.CLASS({
         foam.core.ConstantSlot.create({value: this.visibility});
       
       if ( this.permissionRequired ) {
-        // TODO: Is this a good place to get the auth from?
-        var auth = data.__subContext__.auth;
+        var visSlot = slot;
+        slot = foam.core.SimpleSlot.create();
 
-        // If permission is required but there's no auth service, the safest thing to
-        // do is to hide the property completely.
-        if ( ! auth ) foam.core.ConstantSlot.create({value: Visibility.HIDDEN});
+        var sub;
+        var onDataUpdate = function(data) {
+          // When permission is required, always set the value to hidden first
+          // so we don't accidentally forget to do it if/when data changes later.
+          sub && sub.detach();
+          slot.set(Visibility.HIDDEN);
 
-        var propName = this.name.toLowerCase();
-        var clsName  = this.forClass_;
-        clsName = clsName.substring(clsName.lastIndexOf('.') + 1).toLowerCase();
+          if ( ! data ) return;
+          var auth = data.__subContext__.auth;
+          if ( ! auth ) return;
 
-        var permissionSlot = foam.core.PromiseSlot.create({
-          // Default to HIDDEN until the promise completes.
-          value: Visibility.HIDDEN,
-          promise: auth.check(null, `${clsName}.rw.${propName}`)
-            .then(function(rw) {
-              if ( rw ) return Visibility.RW;
-              else return auth.check(null, `${clsName}.ro.${propName}`)
-                .then(ro => ro ? Visibility.RO : Visibility.HIDDEN);
-            })
-        });
+          var propName = this.name.toLowerCase();
+          var clsName  = this.forClass_;
+          clsName = clsName.substring(clsName.lastIndexOf('.') + 1).toLowerCase();
 
-        slot = foam.core.ArraySlot.create({slots: [slot, permissionSlot]}).map(arr => {
-          var vis = arr[0];
-          var perm = arr[1];
-          return perm === Visibility.HIDDEN ? perm :
-            vis === Visibility.HIDDEN ? vis :
-            perm === Visibility.RO ? perm :
-            vis;
-        });
+          var permissionSlot = foam.core.PromiseSlot.create({
+            // Default to HIDDEN until the promise completes.
+            value: Visibility.HIDDEN,
+            promise: auth.check(null, `${clsName}.rw.${propName}`)
+              .then(function(rw) {
+                if ( rw ) return Visibility.RW;
+                else return auth.check(null, `${clsName}.ro.${propName}`)
+                  .then(ro => ro ? Visibility.RO : Visibility.HIDDEN);
+              })
+          });
+
+          sub = slot.follow(foam.core.ArraySlot.create({slots: [visSlot, permissionSlot]}).map(arr => {
+            var vis = arr[0];
+            var perm = arr[1];
+            return perm === Visibility.HIDDEN ? perm :
+              vis === Visibility.HIDDEN ? vis :
+              perm === Visibility.RO ? perm :
+              vis;
+          }));
+        }.bind(this);
+        data$.sub(onDataUpdate);
+        onDataUpdate(data$.get());
       }
-
       return slot;
     }
   ]
