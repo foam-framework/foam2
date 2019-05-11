@@ -37,18 +37,22 @@ foam.CLASS({
 
         String  dspName      = "";
         String  rpyTo        = "";
+        String  from         = "";
         boolean dspNameIsSet = false;
-        boolean rpyToIsSet        = false;
+        boolean rpyToIsSet   = false;
+        boolean fromIsSet    = false;
         do {
-          rpyTo = rpyToIsSet ? rpyTo : grp.getReplyTo();
+          rpyTo   = rpyToIsSet   ? rpyTo   : grp.getReplyTo();
           dspName = dspNameIsSet ? dspName : grp.getDisplayName();
+          from    = fromIsSet    ? from    : grp.getFrom();
           
-          rpyToIsSet = rpyToIsSet ? rpyToIsSet : ! SafetyUtil.isEmpty(rpyTo);
+          rpyToIsSet   = rpyToIsSet   ? rpyToIsSet   : ! SafetyUtil.isEmpty(rpyTo);
           dspNameIsSet = dspNameIsSet ? dspNameIsSet : ! SafetyUtil.isEmpty(dspName);
+          fromIsSet    = fromIsSet    ? fromIsSet    : ! SafetyUtil.isEmpty(from);
 
           group = grp.getParent();
           grp = (Group)((DAO) x.get("groupDAO")).find(group);
-        } while ( grp != null && ! ( rpyToIsSet && dspNameIsSet ) );
+        } while ( grp != null && ! ( rpyToIsSet && dspNameIsSet && fromIsSet ) );
 
         // REPLY TO:
         if ( SafetyUtil.isEmpty(emailMessage.getReplyTo()) && rpyToIsSet ) {
@@ -58,6 +62,11 @@ foam.CLASS({
         // DISPLAY NAME:
         if ( SafetyUtil.isEmpty(emailMessage.getDisplayName()) && dspNameIsSet ) {
           emailMessage.setDisplayName(dspName);
+        }
+
+        // FROM:
+        if ( SafetyUtil.isEmpty(emailMessage.getFrom()) && fromIsSet ) {
+          emailMessage.setDisplayName(from);
         }
     
         return emailMessage;
