@@ -598,7 +598,6 @@ FOAM_FILES([
   { name: "foam/u2/view/date/Month"},
   { name: "foam/u2/view/date/Weekday"},
 
-  { name: "foam/u2/layout/AlignmentType"},
   { name: "foam/u2/layout/Layouts"},
 
   { name: "foam/layout/Section" },

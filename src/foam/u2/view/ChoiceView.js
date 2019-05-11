@@ -38,6 +38,11 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
+      name: 'name',
+      factory: function() { return "select"; }
+    },
+    {
+      class: 'String',
       name: 'label',
       documentation: 'User-visible label. Not to be confused with "text", ' +
           'which is the user-visible name of the currently selected choice.'
@@ -204,7 +209,9 @@ foam.CLASS({
         placeholder$: this.placeholder$,
         mode$: this.mode$,
         size$: this.size$
-      }).end();
+      })
+      .attrs({ name: this.name })
+      .end();
 
       this.dao$proxy.on.sub(this.onDAOUpdate);
     },

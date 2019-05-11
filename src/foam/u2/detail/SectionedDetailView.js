@@ -22,14 +22,17 @@ foam.CLASS({
      */
     function initE() {
       var self = this;
+
       this.SUPER();
       this
         .add(this.slot(function(sections, data) {
           if ( ! data ) return;
+
           return self.E()
             .start(self.Rows, { border: 'foam.u2.borders.CardBorder' })
               .forEach(sections, function(s) {
                 this.start(self.Rows)
+                  .show(s.createIsAvailableFor(self.data$))
                   .start('h2').add(s.title$).end()
                   .forEach(s.properties,  function(p) {
                     this.tag(self.SectionedDetailPropertyView, { prop: p, data: data })

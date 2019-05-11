@@ -4,6 +4,55 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+foam.ENUM({
+  package: 'foam.u2.layout',
+  name: 'ContentJustification',
+
+  documentation: `
+    The various ways to justify content in a layout.
+    i.e. How should the content be spaced relative to eachother and their container?
+  `,
+
+  values: [
+    { name: 'START', css: 'flex-start' },
+    { name: 'END', css: 'flex-end' },
+    { name: 'CENTER', css: 'center' },
+    { name: 'SPACE_AROUND', css: 'space-around' },
+    { name: 'SPACE_BETWEEN', css: 'space-between' },
+    { name: 'SPACE_EVENLY', css: 'space-evenly' }
+  ],
+
+  properties:  [
+    {
+      class: 'String',
+      name: 'css'
+    }
+  ]
+});
+
+foam.ENUM({
+  package: 'foam.u2.layout',
+  name: 'ItemAlignment',
+
+  documentation: `
+    The various ways to align items within a layout.
+  `,
+
+  values: [
+    { name: 'STRETCH', css: 'stretch' },
+    { name: 'START', css: 'flex-start' },
+    { name: 'END', css: 'flex-end' },
+    { name: 'CENTER', css: 'center' }
+  ],
+
+  properties:  [
+    {
+      class: 'String',
+      name: 'css'
+    }
+  ]
+});
+
 foam.CLASS({
   package: 'foam.u2.layout',
   name: 'AbstractLayout',
@@ -24,9 +73,15 @@ foam.CLASS({
     },
     {
       class: 'Enum',
-      of: 'foam.u2.layout.AlignmentType',
-      name: 'alignmentType',
+      of: 'foam.u2.layout.ContentJustification',
+      name: 'contentJustification',
       value: 'SPACE_BETWEEN'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.layout.ItemAlignment',
+      name: 'itemAlignment',
+      value: 'STRETCH'
     }
   ],
 
@@ -57,7 +112,7 @@ foam.CLASS({
               .end()
             .end();
         }
-      })
+      });
       return this;
     },
 
@@ -65,7 +120,8 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .style({ 'justify-content': this.alignmentType$.dot('webFlexProp') });
+        .style({ 'justify-content': this.contentJustification$.dot('css') })
+        .style({ 'align-items': this.itemAlignment$.dot('css') });
     }
   ]
 });
