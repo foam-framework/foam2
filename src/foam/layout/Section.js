@@ -7,15 +7,18 @@
 foam.CLASS({
   package: 'foam.layout',
   name: 'Section',
+  requires: [
+    'foam.core.Action',
+    'foam.core.Property'
+  ],
   properties: [
-    {
-      class: 'Function',
-      name: 'isAvailable',
-      value: function() { return true; }
-    },
     {
       class: 'String',
       name: 'title'
+    },
+    {
+      class: 'String',
+      name: 'help'
     },
     {
       class:  'FObjectArray',
@@ -26,6 +29,27 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.core.Action',
       name: 'actions'
+    },
+    {
+      class: 'Function',
+      name: 'createIsAvailableFor',
+      value: function(data$) {
+        return foam.core.ConstantSlot.create({value: true});
+      }
+    }
+  ],
+  methods: [
+    function fromSectionAxiom(a, cls) {
+      this.copyFrom({
+        createIsAvailableFor: a.createIsAvailableFor.bind(a),
+        title: a.title,
+        properties: cls.getAxiomsByClass(this.Property)
+          .filter(p => p.section == a.name)
+          .filter(p => ! p.hidden),
+        actions: cls.getAxiomsByClass(this.Action)
+          .filter(a => a.section == a.name)
+      });
+      return this;
     }
   ]
 }); 

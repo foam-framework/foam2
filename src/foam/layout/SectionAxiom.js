@@ -15,23 +15,36 @@ foam.CLASS({
     {
       class: 'String',
       name: 'title',
+      expression: function(name) {
+        return foam.String.capitalize(name);
+      }
     },
     {
       class: 'String',
-      name: 'label',
-      expression: function(title) {
-        return foam.String.capitalize(title);
-      }
+      name: 'help'
     },
     {
       class: 'Int',
       name: 'order',
-      value: Number.MAX_VALUE,  // if no order is specified
+      value: Number.MAX_VALUE
+    },
+    {
+      class: 'Boolean',
+      name: 'permissionRequired'
     },
     {
       class: 'Function',
       name: 'isAvailable',
       value: function() { return true; }
+    }
+  ],
+  methods: [
+    function createIsAvailableFor(data$) {
+      // TODO: permission check.
+      return foam.core.ExpressionSlot.create({
+        obj$: data$,
+        code: this.isAvailable
+      });
     }
   ]
 });

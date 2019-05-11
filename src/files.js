@@ -598,13 +598,12 @@ FOAM_FILES([
   { name: "foam/u2/view/date/Month"},
   { name: "foam/u2/view/date/Weekday"},
 
-  { name: "foam/u2/layout/AlignmentType"},
   { name: "foam/u2/layout/Layouts"},
 
   { name: "foam/layout/Section" },
   { name: "foam/layout/SectionAxiom" },
   
-  { name: "foam/u2/AbstractSectionedDetailView" },
-  { name: "foam/u2/SectionedDetailView" },
-  { name: "foam/u2/SectionedDetailPropertyView" }
+  { name: "foam/u2/detail/AbstractSectionedDetailView" },
+  { name: "foam/u2/detail/SectionedDetailView" },
+  { name: "foam/u2/detail/SectionedDetailPropertyView" }
 ]);

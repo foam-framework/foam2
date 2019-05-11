@@ -5,9 +5,15 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2',
+  package: 'foam.u2.detail',
   name: 'SectionedDetailView',
-  extends: 'foam.u2.AbstractSectionedDetailView',
+  extends: 'foam.u2.detail.AbstractSectionedDetailView',
+
+  requires: [
+    'foam.u2.detail.SectionedDetailPropertyView',
+    'foam.u2.layout.Cols',
+    'foam.u2.layout.Rows'
+  ],
 
   methods: [
     /**
@@ -16,14 +22,17 @@ foam.CLASS({
      */
     function initE() {
       var self = this;
+
       this.SUPER();
       this
         .add(this.slot(function(sections, data) {
           if ( ! data ) return;
+
           return self.E()
             .start(self.Rows, { border: 'foam.u2.borders.CardBorder' })
               .forEach(sections, function(s) {
                 this.start(self.Rows)
+                  .show(s.createIsAvailableFor(self.data$))
                   .start('h2').add(s.title$).end()
                   .forEach(s.properties,  function(p) {
                     this.tag(self.SectionedDetailPropertyView, { prop: p, data: data })
