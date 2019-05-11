@@ -66,6 +66,7 @@ foam.CLASS({
   properties: [
     {
       name: 'session_',
+      javaType: 'Session',
       class: 'Object',
       javaFactory:
       `
@@ -126,7 +127,7 @@ foam.CLASS({
       javaCode:
       `
         try {
-          MimeMessage message = new MimeMessage((Session)getSession_());
+          MimeMessage message = new MimeMessage(getSession_());
 
           if ( emailMessage.isPropertySet("displayName") ) {
             message.setFrom( new InternetAddress(emailMessage.getFrom(), emailMessage.getDisplayName()) );
@@ -183,7 +184,7 @@ foam.CLASS({
         try {
           MimeMessage message = createMimeMessage(emailMessage);
           // send message
-          Transport transport = ((Session)getSession_()).getTransport("smtp");
+          Transport transport = getSession_().getTransport("smtp");
           transport.connect();
           transport.send(message, getUsername(), getPassword());
           transport.close();
