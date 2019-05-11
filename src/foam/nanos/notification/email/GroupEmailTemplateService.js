@@ -66,7 +66,7 @@ foam.CLASS({
 
         // FROM:
         if ( SafetyUtil.isEmpty(emailMessage.getFrom()) && fromIsSet ) {
-          emailMessage.setDisplayName(from);
+          emailMessage.setFrom(from);
         }
     
         return emailMessage;
