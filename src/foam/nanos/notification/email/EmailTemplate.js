@@ -68,6 +68,11 @@ foam.CLASS({
       documentation: 'Displayed as the from email field.'
     },
     {
+      class: 'String',
+      name: 'from',
+      documentation: 'Displayed as the from email address field.'
+    },
+    {
       class: 'Array',
       name: 'bodyAsByteArray',
       hidden: true,
@@ -136,10 +141,15 @@ foam.CLASS({
           }
         }
 
-        // Setting properties from template onto EmailMessage
+        // BODY:
         if ( ! emailMessage.isPropertySet("body") ) {
           emailMessage.setBody((JtwigTemplate.inlineTemplate(getBody(), config)).render(model));
         }
+
+        // FROM:
+        if ( ! emailMessage.isPropertySet("from") && ! SafetyUtil.isEmpty(getFrom()) ) {
+            emailMessage.setFrom((JtwigTemplate.inlineTemplate(getFrom(), config)).render(model));
+        } 
         
         // REPLY TO:
         if ( ! emailMessage.isPropertySet("replyTo") && ! SafetyUtil.isEmpty(getReplyTo()) ) {
