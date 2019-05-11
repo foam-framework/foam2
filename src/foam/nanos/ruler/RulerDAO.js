@@ -16,15 +16,12 @@ foam.CLASS({
   `,
 
   javaImports: [
-    'foam.core.Detachable',
     'foam.core.FObject',
-    'foam.dao.AbstractSink',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.mlang.order.Desc',
     'foam.mlang.predicate.Predicate',
     'foam.mlang.sink.GroupBy',
-    'java.util.ArrayList',
-    'java.util.Collections',
     'java.util.List',
     'java.util.Map',
     'static foam.mlang.MLang.*'
@@ -175,7 +172,6 @@ foam.CLASS({
       for ( Object key : sink.getGroupKeys() ) {
         List<Rule> group = ((ArraySink) sink.getGroups().get(key)).getArray();
         if ( ! group.isEmpty() ) {
-          Collections.sort(group, new foam.mlang.order.Desc(Rule.PRIORITY));
           new RuleEngine(x, this).execute(group, obj, oldObj);
         }
       }
@@ -189,72 +185,27 @@ foam.CLASS({
           type: 'Context'
         }
       ],
-      javaCode: `DAO ruleDAO = ((DAO) x.get("ruleDAO")).where(EQ(Rule.DAO_KEY, getDaoKey()));
-Map rulesList = getRulesList();
-GroupBy createdBefore = (GroupBy) ruleDAO.where(getCreateBefore()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-rulesList.put(getCreateBefore(), createdBefore);
-GroupBy updatedBefore = (GroupBy) ruleDAO.where(getUpdateBefore()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-rulesList.put(getUpdateBefore(), updatedBefore);
-GroupBy createdAfter = (GroupBy) ruleDAO.where(getCreateAfter()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-rulesList.put(getCreateAfter(), createdAfter);
-GroupBy updatedAfter = (GroupBy) ruleDAO.where(getUpdateAfter()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-rulesList.put(getUpdateAfter(), updatedAfter);
-GroupBy removedBefore = (GroupBy) ruleDAO.where(getRemoveBefore()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-rulesList.put(getRemoveBefore(), removedBefore);
-GroupBy removedAfter = (GroupBy) ruleDAO.where(getRemoveAfter()).select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()));
-rulesList.put(getRemoveAfter(), removedAfter);
+      javaCode: `
+        DAO ruleDAO = ((DAO) x.get("ruleDAO")).where(
+          AND(
+            EQ(Rule.ENABLED, true),
+            EQ(Rule.DAO_KEY, getDaoKey())
+          )
+        ).orderBy(new Desc(Rule.PRIORITY));
+        addRuleList(ruleDAO, getCreateBefore());
+        addRuleList(ruleDAO, getUpdateBefore());
+        addRuleList(ruleDAO, getRemoveBefore());
+        addRuleList(ruleDAO, getCreateAfter());
+        addRuleList(ruleDAO, getUpdateAfter());
+        addRuleList(ruleDAO, getRemoveAfter());
 
-ruleDAO.listen(new AbstractSink() {
-  @Override
-  public void put(Object obj, Detachable sub) {
-    Map rulesList = getRulesList();
-    Rule rule = (Rule) obj;
-    if ( ! rule.getDaoKey().equals(getDaoKey()) ) {
-      return;
-    }
-    String ruleGroup = rule.getRuleGroup();
-    for ( Object key : rulesList.keySet() ) {
-      if ( ((Predicate) key).f(obj) ) {
-        GroupBy group = (GroupBy) rulesList.get(key);
-        if ( group.getGroupKeys().contains(ruleGroup) ) {
-          ArrayList rules = (ArrayList) ((ArraySink)group.getGroups().get(ruleGroup)).getArray();
-          Rule foundRule = Rule.findById(rules, rule.getId());
-          if ( foundRule != null ) {
-            rules.remove(foundRule);
-            rules.add(foundRule.updateRule(rule));
-          } else {
-            rules.add(obj);
-          }
-        } else {
-          group.putInGroup_(sub, ruleGroup, obj);
-        }
-      }
-    }
-  }
-  
-  @Override
-  public void remove(Object obj, Detachable sub) {
-    Map rulesList = getRulesList();
-    Rule rule = (Rule) obj;
-    if ( rule.getDaoKey() != getDaoKey() ) {
-      return;
-    }
-    String ruleGroup = rule.getRuleGroup();
-    for ( Object key : rulesList.keySet() ) {
-      if ( ((Predicate) key).f(obj) ) {
-        GroupBy group = (GroupBy) rulesList.get(key);
-        if ( group.getGroupKeys().contains(ruleGroup) ) {
-          ArrayList rules = (ArrayList) ((ArraySink)group.getGroups().get(ruleGroup)).getArray();
-          Rule foundRule = Rule.findById(rules, rule.getId());
-          if ( foundRule != null ) {
-            rules.remove(foundRule);
-          }
-        }
-      }
-    }
-  }
-}, null);
-        `
+        ruleDAO.listen(
+          new UpdateRulesListSink.Builder(x)
+            .setDao(this)
+            .build()
+          , null
+        );
+      `
     },
     {
       name: 'cmd_',
@@ -264,6 +215,26 @@ ruleDAO.listen(new AbstractSink() {
           return true;
         }
         return getDelegate().cmd(obj);
+      `
+    },
+    {
+      name: 'addRuleList',
+      args: [
+        {
+          name: 'dao',
+          type: 'foam.dao.DAO'
+        },
+        {
+          name: 'predicate',
+          type: 'foam.mlang.predicate.Predicate'
+        }
+      ],
+      javaCode: `
+        getRulesList().put(
+          predicate,
+          dao.where(predicate)
+            .select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()))
+        );
       `
     }
   ],
