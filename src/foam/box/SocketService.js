@@ -26,7 +26,9 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'foam.lib.json.JSONParser',
     'foam.lib.json.Outputter',
+    'java.io.BufferedInputStream',
     'java.net.ServerSocket',
+    'java.nio.ByteBuffer',
     'java.util.Random',
     'java.util.Base64',
     'java.net.Socket',
@@ -69,14 +71,6 @@ foam.CLASS({
         return getX().create(NanoServiceRouter.class);
       `
     }
-  ],
-
-  constants: [
-    {
-      type: 'Integer',
-      name: 'BUFFERSIZE',
-      value: 1024
-    },
   ],
 
   methods: [
@@ -134,9 +128,7 @@ foam.CLASS({
 
               public void run() {
                 try {
-                  String mStr = Base64.getEncoder().encodeToString(read(this.clientSocket));
-                  Message message = (Message) this.parser.parseString(mStr);
-                  this.router.send(message);
+                  read(this.clientSocket);
                 } catch (java.lang.Exception ex) {
                   ((Logger) this.x.get("logger")).error(ex);
                 } finally {
@@ -147,33 +139,50 @@ foam.CLASS({
                   }
                 }
               }
-            }
-            public static byte[] read(Socket socket) throws IOException{
-              byte[] buffer = new byte[BUFFERSIZE];
-              ByteArrayOutputStream data = new ByteArrayOutputStream();
-              int read;
-              try {
-                while ((read = socket.getInputStream().read(buffer, 0, buffer.length)) != -1) {
-                  data.write(buffer, 0, read);
-                }
-                data.flush();
-          
-              } catch (IOException e) {
-                //((Logger) getX().get("logger")).error(e);
-                throw new IOException(e);
-              } finally {
+
+              public  void onData(byte[] data) {
+                String mStr = new String(data);
+                Message message = (Message) this.parser.parseString(mStr);
+                this.router.send(message);
+              }
+  
+              public  void read(Socket socket) throws IOException{
+                BufferedInputStream bis ;
                 try {
-                  socket.getOutputStream().close();
-                  socket.close();
+                  int start = 0;
+                  int read = 0;
+                  bis = new BufferedInputStream(socket.getInputStream());
+                  while (true) {
+                    int nextSize = 0;
+                    byte[] lenbuffer = new byte[4];
+                    bis.mark(lenbuffer.length);
+                    read = bis.read(lenbuffer, 0, lenbuffer.length);
+                    if ( read == -1 ) break;
+                    nextSize = ByteBuffer.wrap(lenbuffer).getInt();
+                    bis.reset();
+                    
+                    bis.read(lenbuffer, 0, lenbuffer.length);
+                    start += lenbuffer.length;
+
+                    byte[] data = new byte[nextSize];
+                    bis.read(data, 0, nextSize);
+                    start += data.length;
+              
+                    onData(data);
+              
+                  }
                 } catch (IOException e) {
-                  //((Logger) getX().get("logger")).error(e);
+                  ((Logger) this.x.get("logger")).error(e);
+                  throw new IOException(e);
+                } finally {
+                  try {
+                    socket.getOutputStream().close();
+                    socket.close();
+                  } catch (IOException e) {
+                    ((Logger) this.x.get("logger")).error(e);
+                  }
                 }
               }
-              return data.toByteArray();
-            }
-
-            public void onMessage(Socket socket, String message) {
-
             }
             `
         }));
