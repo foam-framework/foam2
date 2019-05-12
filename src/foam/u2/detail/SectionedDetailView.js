@@ -18,14 +18,22 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
+
       this.SUPER();
       this
         .add(this.slot(function(sections, data) {
           if ( ! data ) return;
-          return self.Rows.create({ border: 'foam.u2.borders.CardBorder' })
-            .forEach(sections, function (s) {
-              this.tag(self.SectionView, { data: s });
-            });
+
+          return self.E()
+            .start(self.Rows, { border: 'foam.u2.borders.CardBorder' })
+              .forEach(sections, function(s) {
+                this.start(self.Rows)
+                  .show(s.createIsAvailableFor(self.data$))
+                  .start('h2').add(s.title$).end()
+                  .tag(self.SectionView, { data: s })
+                .end();
+              })
+            .end();
         }));
     }
   ]

@@ -29,6 +29,11 @@ foam.CLASS({
       this.SUPER();
 
       this
+        .show(this.prop.createVisibilityFor(this.data$)
+          .map(function(m) { 
+            return m != foam.u2.Visibility.HIDDEN; 
+          }
+        ))
         .addClass(this.myClass())
         .add(this.slot(function(prop) {
           var errorSlot = self.slot(function(data, prop$validateObj){
