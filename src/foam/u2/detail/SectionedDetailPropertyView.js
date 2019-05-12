@@ -73,19 +73,14 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.SUPER();
-
       this
         .addClass(this.myClass())
         .start(self.Rows, { defaultChildConfig: { padding: '8px 0'} })
-          .add(this.slot(function(prop) {
-            
-            var errorSlot = foam.core.SimpleSlot.create({value: null});
-            var slotSub;
-            self.slot(function(data, prop$validateObj) {
-              if ( ! ( data && prop$validateObj ) ) return;
-              slotSub && slotSub.detach();
-              slotSub = errorSlot.follow(data.slot(prop$validateObj));
-            }).get();
+          .add(this.slot(function(data, prop) {
+
+            var errorSlot = prop.validateObj ?
+              data.slot(prop.validateObj) :
+              foam.core.ConstantSlot.create({ value: null });
 
             return self.E()
               .start(self.Rows, { defaultChildConfig:  { lineHeight: '2' } })
@@ -110,7 +105,7 @@ foam.CLASS({
                     return self.E().add(s);
                   }))
                 .end()
-              .end()
+              .end();
           }));
     }
   ]
