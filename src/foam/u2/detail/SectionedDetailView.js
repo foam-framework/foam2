@@ -39,7 +39,7 @@ foam.CLASS({
                 this
                   .start(self.Row)
                     .show(s.createIsAvailableFor(self.data$))
-                    .start('h1').add(s.title$).end()
+                    .start('h2').add(s.title$).end()
                     .start(self.CardBorder)
                       .addClass('inner-card')
                       .tag(self.SectionView, { data: s })
