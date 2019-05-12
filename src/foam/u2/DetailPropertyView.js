@@ -22,10 +22,6 @@ foam.CLASS({
 
   documentation: 'View for one row/property of a DetailView.',
 
-  imports: [
-    'auth'
-  ],
-
   properties: [
     'prop',
     [ 'nodeName', 'tr' ],
@@ -58,24 +54,12 @@ foam.CLASS({
   `,
 
   methods: [
-    async function initE() {
+    function initE() {
       var prop = this.prop;
-
-      if ( prop && prop.permissionRequired )  {
-        var propName = prop.name.toLowerCase();
-        var clsName  = prop.forClass_;
-        clsName = clsName.substring(clsName.lastIndexOf('.') + 1).toLowerCase();
-        var writePerm = await this.auth.check(null, `${clsName}.rw.${propName}`);
-        if ( ! writePerm ) {
-          var readPerm = await this.auth.check(null, `${clsName}.ro.${propName}`);
-          prop.visibility = readPerm ? foam.u2.Visibility.RO : foam.u2.Visibility.HIDDEN;
-        }
-      }
-
-      // TODO: check/make visibility and permissions work together
-
       this.
-        show(prop.createVisibilityFor(this.__context__.data$).map(function(m) { return m != foam.u2.Visibility.HIDDEN; })).
+        show(prop.createVisibilityFor(this.__context__.data$).map(function(m) {
+          return m != foam.u2.Visibility.HIDDEN;
+        })).
         addClass('foam-u2-PropertyView').
         addClass('foam-u2-PropertyView-prop-' + prop.name).
         start('td').addClass('foam-u2-PropertyView-label').add(this.label).end().

@@ -2153,14 +2153,44 @@ foam.CLASS({
     },
 
     function createVisibilityFor(data$) {
-      if ( this.visibilityExpression ) {
-        return foam.core.ExpressionSlot.create({
+      var Visibility = foam.u2.Visibility;
+
+      var slot = this.visibilityExpression ?
+        foam.core.ExpressionSlot.create({
           obj$: data$,
           code: this.visibilityExpression
+        }) :
+        foam.core.ConstantSlot.create({value: this.visibility});
+      
+      if ( this.permissionRequired ) {
+        var visSlot = slot;
+        var permSlot = data$.map(data => {
+          if ( ! data || ! data.__subContext__.auth ) return Visibility.HIDDEN;
+          var auth = data.__subContext__.auth;
+
+          var propName = this.name.toLowerCase();
+          var clsName  = this.forClass_;
+          clsName = clsName.substring(clsName.lastIndexOf('.') + 1).toLowerCase();
+
+          return auth.check(null, `${clsName}.rw.${propName}`)
+              .then(function(rw) {
+                if ( rw ) return Visibility.RW;
+                else return auth.check(null, `${clsName}.ro.${propName}`)
+                  .then(ro => ro ? Visibility.RO : Visibility.HIDDEN);
+              });
+        });
+
+        slot = foam.core.ArraySlot.create({slots: [visSlot, permSlot]}).map(arr => {
+          var vis = arr[0];
+          var perm = arr[1] || Visibility.HIDDEN;
+          return perm === Visibility.HIDDEN ? perm :
+            vis === Visibility.HIDDEN ? vis :
+            perm === Visibility.RO ? perm :
+            vis;
         });
       }
 
-      return foam.core.ConstantSlot.create({value: this.visibility});
+      return slot;
     }
   ]
 });
