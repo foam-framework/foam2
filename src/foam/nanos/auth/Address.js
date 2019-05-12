@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'Address',
 
-  documentation: 'The postal address of the entity.',
+  documentation: 'The base model for the postal address.',
 
   implements: [
     {
@@ -27,7 +27,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'type',
-      documentation: 'Address type. COMMENT: What is this?'
+      documentation: 'The type of address.'
     },
     {
       class: 'Boolean',
@@ -37,15 +37,15 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'deleted',
-      documentation: 'A deleted address.'
+      documentation: 'Verifies that the address is deleted.'
     },
     {
       class: 'Boolean',
       name: 'structured',
       value: true,
       documentation: `Verifies that the address is shown in the following structure: 
-      Street Number, Street Name, Suite Number. For an unstructured address field, use address1 and/or
-      address2.
+        Street Number, Street Name, Suite Number. For an unstructured address field, 
+        use address1 and/or address2.
       `
     },
     {
@@ -54,7 +54,7 @@ foam.CLASS({
       // required: true
       width: 70,
       displayWidth: 50,
-      documentation: 'For an unstructured address, use this as a main address field.',
+      documentation: 'An unstructured field for the main postal address.',
       validateObj: function(address1) {
         var address1Regex = /^[a-zA-Z0-9 ]{1,70}$/;
 
@@ -68,7 +68,7 @@ foam.CLASS({
       name: 'address2',
       width: 70,
       displayWidth: 50,
-      documentation: 'For an unstructured address, use this as a sub address field.',
+      documentation: 'An unstructured field for the sub postal address.',
       validateObj: function(address2) {
         var address2Regex = /^[a-zA-Z0-9 ]{1,70}$/;
 
@@ -100,8 +100,8 @@ foam.CLASS({
       targetDAOKey: 'regionDAO',
       name: 'regionId',
       of: 'foam.nanos.auth.Region',
-      documentation: `A foreign key into the RegionDAO  which represents
-      the region of the country.`,
+      documentation: `A foreign key into the RegionDAO which represents
+        the region of the country.`,
       view: function(_, X) {
         var choices = X.data.slot(function(countryId) {
           return X.regionDAO.where(X.data.EQ(X.data.Region.COUNTRY_ID, countryId || ""));
@@ -133,7 +133,7 @@ foam.CLASS({
       class: 'String',
       name: 'streetNumber',
       width: 16,
-      documentation: 'For a structured address, use this field for the street number.',
+      documentation: 'The structured field for the street number of the postal address.',
       validateObj: function(streetNumber) {
         if ( streetNumber.trim() === '' ) {
           return 'Street number required.';
@@ -148,7 +148,7 @@ foam.CLASS({
       class: 'String',
       name: 'streetName',
       width: 70,
-      documentation: 'For a structured address, use this field for the street name.',
+      documentation: 'The structured field for the street name of the postal address.',
       validateObj: function(streetName) {
         if ( streetName.trim() === '' ) {
           return 'Street name required.';
@@ -162,7 +162,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'suite',
-      documentation: 'For a structured address, use this field for the suite number.',
+      documentation: 'The structured field for the suite number of the postal address.',
       width: 16,
       validateObj: function(suite) {
         var suiteRegex = /^[a-zA-Z0-9 ]{1,70}$/;
@@ -174,7 +174,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'city',
-      documentation: 'The city pertaining to the address.',
+      documentation: 'The city of the postal address.',
       required: true,
       validateObj: function(city) {
         if ( city.trim().length === 0 ) {
@@ -189,7 +189,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'postalCode',
-      documentation: 'The postal code pertaining to the address.',
+      documentation: 'The postal code of the postal address.',
       preSet: function(oldValue, newValue) {
         return newValue.toUpperCase();
       },
@@ -225,17 +225,17 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'encrypted',
-      documentation: 'Verifies if the address is encrypted.'
+      documentation: 'Verifies that the address is encrypted.'
     },
     {
       class: 'Double',
       name: 'latitude',
-      documentation: 'The latitude of the address location.'
+      documentation: 'The latitude of the postal address location.'
     },
     {
       class: 'Double',
       name: 'longitude',
-      documentation: 'The longitude of the address location.'
+      documentation: 'The longitude of the postal address location.'
     },
     {
       class: 'FObjectArray',

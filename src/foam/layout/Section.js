@@ -13,13 +13,12 @@ foam.CLASS({
   ],
   properties: [
     {
-      class: 'Function',
-      name: 'isAvailable',
-      value: function() { return true; }
+      class: 'String',
+      name: 'title'
     },
     {
       class: 'String',
-      name: 'title'
+      name: 'help'
     },
     {
       class:  'FObjectArray',
@@ -30,12 +29,19 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.core.Action',
       name: 'actions'
+    },
+    {
+      class: 'Function',
+      name: 'createIsAvailableFor',
+      value: function(data$) {
+        return foam.core.ConstantSlot.create({value: true});
+      }
     }
   ],
   methods: [
     function fromSectionAxiom(a, cls) {
       this.copyFrom({
-        isAvailable: a.isAvailable,
+        createIsAvailableFor: a.createIsAvailableFor.bind(a),
         title: a.title,
         properties: cls.getAxiomsByClass(this.Property)
           .filter(p => p.section == a.name)

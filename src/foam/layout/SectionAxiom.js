@@ -20,14 +20,31 @@ foam.CLASS({
       }
     },
     {
+      class: 'String',
+      name: 'help'
+    },
+    {
       class: 'Int',
       name: 'order',
       value: Number.MAX_VALUE
     },
     {
+      class: 'Boolean',
+      name: 'permissionRequired'
+    },
+    {
       class: 'Function',
       name: 'isAvailable',
       value: function() { return true; }
+    }
+  ],
+  methods: [
+    function createIsAvailableFor(data$) {
+      // TODO: permission check.
+      return foam.core.ExpressionSlot.create({
+        obj$: data$,
+        code: this.isAvailable
+      });
     }
   ]
 });
