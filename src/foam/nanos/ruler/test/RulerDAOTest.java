@@ -105,7 +105,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
         return true;
       }
 
@@ -157,7 +157,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
         return true;
       }
 
@@ -196,7 +196,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
         return true;
       }
 
@@ -218,7 +218,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
         return true;
       }
 
@@ -251,7 +251,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
         return true;
       }
 
@@ -287,7 +287,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
         return true;
       }
 
@@ -309,7 +309,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
         return true;
       }
 
@@ -344,7 +344,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
         return true;
       }
 
@@ -372,7 +372,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
         return true;
       }
 
@@ -405,7 +405,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
         return true;
       }
 
@@ -432,7 +432,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
         return true;
       }
 
@@ -465,7 +465,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
         return true;
       }
 

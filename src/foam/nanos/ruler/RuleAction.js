@@ -35,7 +35,8 @@
       args: [
         { name: 'x', type: 'Context' },
         { name: 'obj', type: 'FObject' },
-        { name: 'oldObj', type: 'FObject' }
+        { name: 'oldObj', type: 'FObject' },
+        { name: 'ruler', type: 'foam.nanos.ruler.RuleEngine' }
       ],
       documentation: 'Predicts effect of the action without actually applying it.' +
       'E.g. if exception is expected, returns false.'
