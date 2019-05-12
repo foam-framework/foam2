@@ -103,6 +103,16 @@ public class RulerDAOTest extends Test {
       public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
       }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
+      }
     };
     rule7.setAction(action7);
     rule7 = (Rule) ruleDAO.put_(x, rule7);
@@ -145,6 +155,16 @@ public class RulerDAOTest extends Test {
       public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
       }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
+      }
     };
     rule1.setAction(action1);
     rule1 = (Rule) ruleDAO.put_(x, rule1);
@@ -174,6 +194,16 @@ public class RulerDAOTest extends Test {
       public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
       }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
+      }
     };
     rule2.setAction(action2);
     RuleAction asyncAction2 = new RuleAction() {
@@ -185,6 +215,16 @@ public class RulerDAOTest extends Test {
       @Override
       public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
+      }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
       }
     };
     rule2.setAsyncAction(asyncAction2);
@@ -208,6 +248,16 @@ public class RulerDAOTest extends Test {
       @Override
       public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
+      }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
       }
     };
     rule3.setAction(action3);
@@ -235,6 +285,16 @@ public class RulerDAOTest extends Test {
       public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
       }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
+      }
     };
     rule4.setAction(action4);
     RuleAction asyncAction4 = new RuleAction() {
@@ -246,6 +306,16 @@ public class RulerDAOTest extends Test {
       @Override
       public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
+      }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
       }
     };
     rule4.setAsyncAction(asyncAction4);
@@ -272,6 +342,16 @@ public class RulerDAOTest extends Test {
       public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
       }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
+      }
     };
     rule5.setAction(action5);
     RuleAction asyncAction5 = new RuleAction() {
@@ -289,6 +369,16 @@ public class RulerDAOTest extends Test {
       @Override
       public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
+      }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
       }
     };
     rule5.setAsyncAction(asyncAction5);
@@ -313,6 +403,16 @@ public class RulerDAOTest extends Test {
       public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
       }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
+      }
     };
     rule6.setAction(action6);
     RuleAction asyncAction6 = new RuleAction() {
@@ -329,6 +429,16 @@ public class RulerDAOTest extends Test {
       @Override
       public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
+      }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
       }
     };
     rule6.setAsyncAction(asyncAction6);
@@ -352,6 +462,16 @@ public class RulerDAOTest extends Test {
       @Override
       public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
+      }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
       }
     };
     rule8.setAction(action8);

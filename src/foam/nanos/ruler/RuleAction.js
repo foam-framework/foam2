@@ -28,6 +28,22 @@
         { name: 'ruler', type: 'foam.nanos.ruler.RuleEngine' }
       ],
       documentation: 'if one of the rules in a group throws an exception we need a way to reverse actions for previously executed rules.'
+    },
+    {
+      name: 'canExecute',
+      type: 'Boolean',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'obj', type: 'FObject' },
+        { name: 'oldObj', type: 'FObject' }
+      ],
+      documentation: 'Predicts effect of the action without actually applying it.' +
+      'E.g. if exception is expected, returns false.'
+    },
+    {
+      name: 'describe',
+      type: 'String',
+      documentation: 'Describes purpose of the action and possible output.'
     }
   ]
 });
