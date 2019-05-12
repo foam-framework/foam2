@@ -31,7 +31,6 @@ foam.CLASS({
         .add(self.slot(function(data) {
           return self.Rows.create()
             .show(data.createIsAvailableFor(self.fobj$))
-            .start('h2').add(data.title$).end()
             .forEach(data.properties, function (p) {
               this.tag(self.SectionedDetailPropertyView, { prop: p, data$: self.fobj$ });
             })
