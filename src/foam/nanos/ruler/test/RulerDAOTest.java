@@ -100,7 +100,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
       }
     };
@@ -142,7 +142,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
       }
     };
@@ -171,7 +171,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
       }
     };
@@ -183,7 +183,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
       }
     };
@@ -206,7 +206,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
       }
     };
@@ -232,7 +232,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
       }
     };
@@ -244,7 +244,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
       }
     };
@@ -269,7 +269,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
       }
     };
@@ -287,7 +287,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
       }
     };
@@ -310,7 +310,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
       }
     };
@@ -327,7 +327,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
       }
     };
@@ -350,7 +350,7 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
       }
     };

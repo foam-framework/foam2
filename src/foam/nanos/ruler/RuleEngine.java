@@ -92,7 +92,7 @@ public class RuleEngine extends ContextAwareSupport {
           saveHistory(rule, obj);
         } catch (Exception e ) {
           for (Rule completedRule : completedRules ) {
-            completedRule.getAction().applyReverseAction(getX(), obj);
+            completedRule.applyReverse(getX(), obj, oldObj, this);
           }
           throw e;
         }
