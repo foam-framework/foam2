@@ -11,8 +11,6 @@ foam.CLASS({
     'foam.flow.Document'
   ],
   javaImports: [
-    'java.io.InputStream',
-    'foam.nanos.fs.Storage',
     'java.net.URI',
     'java.net.URISyntaxException',
     'java.nio.file.FileSystemNotFoundException',
@@ -44,28 +42,22 @@ sink = prepareSink(sink);
 foam.dao.Sink         decorated = decorateSink_(sink, skip, limit, order, predicate);
 foam.dao.Subscription sub       = new foam.dao.Subscription();
 
-java.nio.file.FileSystem fs = java.nio.file.FileSystems.getDefault();
-java.nio.file.DirectoryStream<java.nio.file.Path> contents;
+Map<String, java.io.InputStream> iStreamMap = new foam.nanos.fs.Storage(getDir(), true).getDirectoryAsStream("");
 
-try {
-  contents = java.nio.file.Files.newDirectoryStream(fs.getPath(getDir()), "*.flow");
-} catch ( java.io.IOException e ) {
-  throw new RuntimeException(e);
-}
-
-for ( java.nio.file.Path path : contents ) {
+for ( Map.Entry<String, java.io.InputStream> path : iStreamMap.entrySet() ) {
   if ( sub.getDetached() ) break;
 
 
   foam.flow.Document obj = new foam.flow.Document();
-  String id = path.getFileName().toString().substring(0, path.getFileName().toString().lastIndexOf(".flow"));
+  String id = path.getKey().substring(0, path.getKey().lastIndexOf(".flow"));
 
   obj.setId(id);
 
   // TODO: We could parse the markup on the server to get the embedded title.
 
   try {
-    byte[] data = java.nio.file.Files.readAllBytes(path);
+    byte[] data = new byte[path.getValue().available()];
+    path.getValue().read(data);
     obj.setMarkup(new String(data, java.nio.charset.Charset.forName("UTF-8")));
     decorated.put(obj, sub);
   } catch(java.io.IOException e) {
@@ -122,37 +114,12 @@ return obj;`
 // TODO: Escape/sanitize file name
 verifyId((String)id);
 
-java.nio.file.FileSystem fs;
-switch(System.getProperty("flow.uri.scheme", "file")) {
-  case "jar":
-    String nanopayJar = System.getenv("NANOPAY_JAR");
-    java.nio.file.Path nanopayJarPath = java.nio.file.Paths.get(nanopayJar);
-    try {
-      URI nanopayJarURI = new URI("jar", nanopayJarPath.toUri().toString(), null);
-      try {
-        fs = java.nio.file.FileSystems.getFileSystem(nanopayJarURI);
-      } catch (FileSystemNotFoundException e) {
-        Map<String, String> env = new HashMap<>();
-        env.put("create", "true");
+foam.nanos.fs.Storage storage = new foam.nanos.fs.Storage(getDir(), true);
+java.io.InputStream iStream = storage.getResourceAsStream(id + ".flow");
 
-        try {
-          fs = java.nio.file.FileSystems.newFileSystem(nanopayJarURI, env);
-        } catch (java.io.IOException ex) {
-          throw new RuntimeException(ex);
-        }
-      }
-    } catch(URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
-    break;
-  case "file":
-  default:
-    fs = java.nio.file.FileSystems.getDefault();
-    break;
+if ( iStream == null ) {
+  return null;
 }
-
-java.nio.file.Path path = fs.getPath(getDir(), ((String)id) + ".flow");
-if ( ! java.nio.file.Files.isReadable(path) ) return null;
 
 foam.flow.Document obj = new foam.flow.Document();
 obj.setId((String)id);
@@ -160,7 +127,8 @@ obj.setId((String)id);
 // TODO: We could parse the markup on the server to get the embedded title.
 
 try {
-  byte[] data = java.nio.file.Files.readAllBytes(path);
+  byte[] data = new byte[iStream.available()];
+  iStream.read(data);
   obj.setMarkup(new String(data, java.nio.charset.Charset.forName("UTF-8")));
 } catch(java.io.IOException e) {
   e.printStackTrace();
