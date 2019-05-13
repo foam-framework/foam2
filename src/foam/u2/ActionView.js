@@ -344,11 +344,11 @@ foam.CLASS({
       if ( this.action ) {
         this.attrs({ name: this.action.name });
 
-        if ( this.action.isAvailable ) {
+        if ( this.action.isAvailable || this.action.permissionConfig != null ) {
           this.enableClass(this.myClass('unavailable'), this.action.createIsAvailable$(this.data$), true);
         }
 
-        if ( this.action.isEnabled ) {
+        if ( this.action.isEnabled || this.action.permissionConfig != null ) {
           this.attrs({ disabled: this.action.createIsEnabled$(this.data$).map((e) => e ? false : 'disabled') });
         }
 
