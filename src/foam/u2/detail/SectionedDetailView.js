@@ -10,7 +10,7 @@ foam.CLASS({
   extends: 'foam.u2.detail.AbstractSectionedDetailView',
 
   requires: [
-    'foam.u2.detail.SectionedDetailPropertyView',
+    'foam.u2.detail.SectionView',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.layout.Row',
@@ -29,17 +29,15 @@ foam.CLASS({
   `,
 
   methods: [
-    /**
-     * first render the properties row by row using Rows, then at the end
-     * render all the actions together in a single row with Cols
-     */
     function initE() {
       var self = this;
+
       this.SUPER();
       this
         .addClass(this.myClass())
         .add(this.slot(function(sections, data) {
           if ( ! data ) return;
+
           return self.E()
             .start(self.Rows, { defaultChildConfig: { padding: '16px 0' } })
               .forEach(sections, function(s) {

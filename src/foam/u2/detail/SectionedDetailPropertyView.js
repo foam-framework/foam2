@@ -75,6 +75,11 @@ foam.CLASS({
       this.SUPER();
 
       this
+        .show(this.prop.createVisibilityFor(this.data$)
+          .map(function(m) { 
+            return m != foam.u2.Visibility.HIDDEN; 
+          }
+        ))
         .addClass(this.myClass())
         .start(self.Rows, { defaultChildConfig: { padding: '8px 0'} })
           .add(this.slot(function(prop) {

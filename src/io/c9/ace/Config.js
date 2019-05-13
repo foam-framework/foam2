@@ -11,12 +11,12 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'height',
-      value: 500
+      value: 400
     },
     {
       class: 'Int',
       name: 'width',
-      value: 700
+      value: 500
     },
     {
       class: 'Enum',
