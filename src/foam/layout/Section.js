@@ -44,7 +44,7 @@ foam.CLASS({
         return foam.core.ArraySlot.create({
           slots: this.properties
             .filter(p => p.validateObj)
-            .map(p => data.slot(p.validateObj))
+            .map(p => d.slot(p.validateObj))
         });
       });
 

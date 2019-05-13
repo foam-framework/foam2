@@ -78,7 +78,9 @@ foam.CLASS({
       code: function() { this.currentIndex = this.nextIndex; },
       isAvailable: function(nextIndex) { return nextIndex != -1; },
       isEnabled: function(lastUpdate, data, sections, currentIndex) {
-        return sections[currentIndex].createErrorSlotFor(this.data$).get().length == 0;
+        return sections[currentIndex]
+          .createErrorSlotFor(this.data$).get()
+          .filter(e => e).length == 0;
       }
     }
   ],
