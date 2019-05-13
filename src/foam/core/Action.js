@@ -114,7 +114,15 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'permissionRequired',
-      documentation: 'When set to true, package.model.permission.action is needed to execute this action.'
+      documentation: 'When set to true, a permission is needed to execute this action.'
+    },
+    {
+      class: 'String',
+      name: 'permission',
+      documentation: 'The permission required to view this action.',
+      factory: function() {
+        return this.sourceCls_.id + '.permission.' + this.name;
+      }
     }
   ],
 
@@ -136,8 +144,7 @@ foam.CLASS({
 
     function checkPermission(x) {
       if ( ! this.permissionRequired || ! x.auth ) return Promise.resolve(true);
-      var permission = this.sourceCls_.id + '.permission.' + this.name;
-      return x.auth.check(null, permission);
+      return x.auth.check(null, this.permission);
     },
 
     function isEnabledFor(data) {
