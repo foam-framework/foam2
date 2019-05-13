@@ -39,6 +39,22 @@ foam.CLASS({
     }
   ],
   methods: [
+    function createErrorSlotFor(data$) {
+      var errorSlots = data$.map(d => {
+        return foam.core.ArraySlot.create({
+          slots: this.properties
+            .filter(p => p.validateObj)
+            .map(p => d.slot(p.validateObj))
+        });
+      });
+
+      var retSlot = foam.core.ProxySlot.create({ delegate: errorSlots.get() });
+      this.onDetach(errorSlots.sub(slot => {
+        retSlot.delegate = slot;
+      }));
+
+      return retSlot;
+    },
     function fromSectionAxiom(a, cls) {
       this.copyFrom({
         createIsAvailableFor: a.createIsAvailableFor.bind(a),
