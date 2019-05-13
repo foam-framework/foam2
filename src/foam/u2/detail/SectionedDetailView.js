@@ -42,7 +42,7 @@ foam.CLASS({
                     .start('h2').add(s.title$).end()
                     .start(self.CardBorder)
                       .addClass('inner-card')
-                      .tag(self.SectionView, { data: s })
+                      .tag(self.SectionView, { data: s, showTitle: false })
                     .end()
                   .end();
               })

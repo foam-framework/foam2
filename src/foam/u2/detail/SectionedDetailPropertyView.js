@@ -56,6 +56,53 @@ foam.CLASS({
       border: solid 1px #d9170e;
       font-size: 12px;
     }
+
+    /*
+      For the following inputs below, we are planning 
+      encode these changes in the actual foam files
+    */
+    ^ .foam-u2-TextField {
+      
+      width: 100%;
+      padding: 10px 8px;
+      font-size: 14px;
+    }
+
+    ^ .foam-u2-CheckBox {
+    }
+
+    ^ .foam-u2-view-date-DateTimePicker {
+      cursor: pointer;
+    }
+
+    ^ .foam-u2-tag-Select {
+      width: 100%;
+      font-size: 14px;
+      border: solid 1px #8e9090;
+      border-radius: 3px;
+      font-weight: 400;
+      padding: 10px 8px;
+      box-shadow: none;
+      background: #ffffff url('images/dropdown-icon.svg') no-repeat 99% 50%;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    ^ .foam-u2-view-RichChoiceView {
+      display: flex;
+    }
+
+    ^ .foam-u2-view-RichChoiceView-selection-view {
+      padding: 10px 8px;
+      width: 100%;
+      border-radius: 3px;
+      border: solid 1px #8e9090;
+      background-color: #ffffff;
+      font-size: 14px;
+      box-sizing: border-box;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
   `,
 
   requires: [
@@ -91,7 +138,7 @@ foam.CLASS({
               .start(self.Rows, { defaultChildConfig:  { lineHeight: '2' } })
                 .start().add(prop.label$).addClass('card-label').end()
                 .start(self.Cols, { contentJustification: foam.u2.layout.ContentJustification.START, defaultChildConfig: { margin: '0 16px 0 0' } })
-                  .add(prop).enableClass('error', errorSlot)
+                  .start(self.Col, { flex: 1 }).add(prop).enableClass('error', errorSlot).end()
                   .callIf(prop.help, function() { 
                     this.start({class: 'foam.u2.tag.Image', data: 'images/question-icon.svg'})
                       .addClass('helper-icon')
