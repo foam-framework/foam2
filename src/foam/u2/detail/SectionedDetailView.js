@@ -10,35 +10,27 @@ foam.CLASS({
   extends: 'foam.u2.detail.AbstractSectionedDetailView',
 
   requires: [
-    'foam.u2.detail.SectionedDetailPropertyView',
+    'foam.u2.detail.SectionView',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows'
   ],
 
   methods: [
-    /**
-     * first render the properties row by row using Rows, then at the end
-     * render all the actions together in a single row with Cols
-     */
     function initE() {
       var self = this;
+
       this.SUPER();
       this
         .add(this.slot(function(sections, data) {
           if ( ! data ) return;
+
           return self.E()
             .start(self.Rows, { border: 'foam.u2.borders.CardBorder' })
               .forEach(sections, function(s) {
                 this.start(self.Rows)
+                  .show(s.createIsAvailableFor(self.data$))
                   .start('h2').add(s.title$).end()
-                  .forEach(s.properties,  function(p) {
-                    this.tag(self.SectionedDetailPropertyView, { prop: p, data: data })
-                  })
-                  .start(self.Cols)
-                    .forEach(s.actions, function(a) {
-                      this.add(a);
-                    })
-                  .end()
+                  .tag(self.SectionView, { data: s })
                 .end();
               })
             .end();
