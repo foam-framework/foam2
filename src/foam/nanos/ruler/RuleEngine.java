@@ -10,7 +10,10 @@ import foam.core.ContextAgent;
 import foam.core.ContextAwareSupport;
 import foam.core.FObject;
 import foam.core.X;
+import foam.dao.ArraySink;
 import foam.dao.DAO;
+import foam.dao.Sink;
+import foam.mlang.sink.GroupBy;
 import foam.nanos.pool.FixedThreadPool;
 
 import java.time.Duration;
@@ -53,6 +56,16 @@ public class RuleEngine extends ContextAwareSupport {
   public void execute(List<Rule> rules, FObject obj, FObject oldObj) {
     applyRules(rules, obj, oldObj);
     asyncApplyRules(rules, obj, oldObj);
+  }
+
+  public void probe(List<Rule> rules, RulerProbe rulerProbe, FObject oldObj) {
+      for (Rule rule : rules) {
+        if ( rule.f(x_, (FObject) rulerProbe.getObject(), oldObj) ) {
+          if ( rule.getAction().canExecute(x_, (FObject) rulerProbe.getObject(), oldObj, this) ) {
+
+          }
+        }
+      }
   }
 
   /**

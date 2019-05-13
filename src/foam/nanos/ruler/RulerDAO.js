@@ -24,7 +24,8 @@ foam.CLASS({
     'foam.mlang.sink.GroupBy',
     'java.util.List',
     'java.util.Map',
-    'static foam.mlang.MLang.*'
+    'static foam.mlang.MLang.*',
+    'static foam.nanos.ruler.Operations.*'
   ],
 
   constants: {
@@ -210,12 +211,45 @@ foam.CLASS({
     {
       name: 'cmd_',
       javaCode: `
-        if ( PUT_CMD == obj ) {
-          getDelegate().put((FObject) x.get("OBJ"));
-          return true;
+      if ( PUT_CMD == obj ) {
+        getDelegate().put((FObject) x.get("OBJ"));
+        return true;
+      }
+      if ( obj instanceof RulerProbe ) {
+        GroupBy groups;
+        RulerProbe probe = (RulerProbe) obj;
+        RuleEngine engine = new RuleEngine(x, this);
+        Map rulesList = getRulesList();
+        FObject oldObj = getDelegate().find_(x_, probe.getObject());
+        switch ( probe.getOperation() ) {
+          case UPDATE :
+            groups = (GroupBy)rulesList.get(getUpdateBefore());
+            for ( Object key : groups.getGroupKeys() ) {
+              List<Rule> rules = ((ArraySink)(groups.getGroups().get(key))).getArray();
+              engine.probe(rules, probe, oldObj);
+            }
+            break;
+          case CREATE :
+            groups = (GroupBy)rulesList.get(getCreateBefore());
+            for ( Object key : groups.getGroupKeys() ) {
+              List<Rule> rules = ((ArraySink)(groups.getGroups().get(key))).getArray();
+              engine.probe(rules, probe, oldObj);
+            }
+            break;
+          case REMOVE :
+            groups = (GroupBy)rulesList.get(getRemoveBefore());
+            for ( Object key : groups.getGroupKeys() ) {
+              List<Rule> rules = ((ArraySink)(groups.getGroups().get(key))).getArray();
+              engine.probe(rules, probe, oldObj);
+            }
+            break;
+          default :
+            throw new RuntimeException("Unsupported operation type " + probe.getOperation() + " on dao.cmd(RulerProbe)");
+
         }
-        return getDelegate().cmd(obj);
-      `
+      }
+      return getDelegate().cmd(obj);
+    `
     },
     {
       name: 'addRuleList',

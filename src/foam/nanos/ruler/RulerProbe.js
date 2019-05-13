@@ -13,5 +13,23 @@ foam.CLASS({
   'rulerProbe = new RulerProbe();' +
   'rulerProbe.setObject(user);' +
   'rulerProbe.setOperation(CREATE);' +
-  'rulerProbe = userDAO.cmd(rulerProbe);'
+  'rulerProbe = userDAO.cmd(rulerProbe);',
+
+  properties: [
+    {
+      class: 'Map',
+      javaType: 'java.util.Map<Rule, Boolean>',
+      name: 'appliedRules',
+      javaFactory: 'return new java.util.HashMap<Rule, Boolean>();'
+    },
+    {
+      class: 'Object',
+      name: 'object'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.nanos.ruler.Operations',
+      name: 'operation'
+    }
+  ]
 });
