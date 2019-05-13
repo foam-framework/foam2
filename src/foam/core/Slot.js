@@ -553,3 +553,21 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'ProxySlot',
+  extends: 'foam.core.SimpleSlot',
+  properties: [
+    {
+      name: 'sub_'
+    },
+    {
+      name: 'delegate',
+      postSet: function(_, n) {
+        this.sub_ && this.sub_.detach();
+        this.sub_ = n && this.linkFrom(n);
+      }
+    }
+  ]
+});
