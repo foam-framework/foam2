@@ -434,10 +434,13 @@ foam.CLASS({
     },
     {
       name: 'value',
-      preSet: function(_, n) {
+      preSet: function(o, n) {
         if ( n && n.then ) {
           this.promise = n;
-          n = null;
+          n = o;
+        } else {
+          // Ensure an old promise doesn't fire and clobber the value.
+          this.promise = null;
         }
         return n;
       },
@@ -484,7 +487,7 @@ foam.CLASS({
     {
       name: 'promise',
       postSet: function(_, n) {
-        n.then(function(v) {
+        n && n.then(function(v) {
           if ( n === this.promise ) this.value = v;
         }.bind(this));
       }
