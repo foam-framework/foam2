@@ -110,6 +110,46 @@ foam.CLASS({
       cursor: pointer;
       font-size: 14px;
     }
+
+    ^ .foam-u2-view-RichChoiceView .search {
+      padding: 8px 16px;
+      font-size: 14px;
+      border-bottom: 1px solid #f4f4f9;
+    }
+
+    ^ .foam-u2-detail-SectionedDetailPropertyView .property-filter {
+      font-size: 14px;
+      padding-left: 16px;
+    }
+
+    ^ .foam-u2-view-RichChoiceView .search input {
+      border-bottom: none;
+    }
+
+    ^ .foam-u2-view-RichChoiceView .search img {
+      top: 8px;
+    }
+
+    ^ .foam-u2-view-RichChoiceView-heading {
+      border-bottom: 1px solid #f4f4f9;
+      line-height: 24px;
+      font-size: 14px;
+      color: #333;
+      font-weight: 900;
+      padding: 6px 16px;
+    }
+
+    ^ .DefaultRowView-row {
+      background: white;
+      padding: 8px 16px;
+      font-size: 12px;
+      color: #424242;
+    }
+
+    ^ .DefaultRowView-row:hover {
+      background: #f4f4f9;
+      cursor: pointer;
+    }
   `,
 
   requires: [
