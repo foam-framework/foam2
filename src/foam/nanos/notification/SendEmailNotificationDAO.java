@@ -8,25 +8,16 @@ package foam.nanos.notification;
 
 import foam.core.FObject;
 import foam.core.X;
-import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
-import foam.mlang.sink.Map;
 import foam.nanos.app.AppConfig;
 import foam.nanos.auth.User;
-import foam.nanos.logger.Logger;
 import foam.nanos.notification.email.EmailMessage;
 import foam.nanos.notification.email.EmailService;
-import foam.util.SafetyUtil;
+import java.util.Arrays;
+import java.util.List;
 
-import java.util.*;
-
-import static foam.mlang.MLang.EQ;
-import static foam.mlang.MLang.MAP;
-
-// If notification's emailEnabled is true, the decorator creates an email based
-// on provided or default emailTemplate, sets the receiver based on notification
-// userId/groupId/broadcasted.
+// If notification's emailEnabled is true, the decorator creates an email based on provided or default emailTemplate, sets the reciever based on notification userId/groupId/broadcasted
 public class SendEmailNotificationDAO extends ProxyDAO {
 
   public SendEmailNotificationDAO(DAO delegate) {
@@ -37,84 +28,48 @@ public class SendEmailNotificationDAO extends ProxyDAO {
     setX(x);
     setDelegate(delegate);
   }
-
   @Override
   public FObject put_(X x, FObject obj) {
-    DAO localUserDAO  = (DAO) x.get("localUserDAO");
+    DAO userDAO = (DAO) x.get("localUserDAO");
+    AppConfig config     = (AppConfig) x.get("appConfig");
+    EmailService email      = (EmailService) x.get("email");
     Notification notif = (Notification) obj;
+    User user = (User) userDAO.find(notif.getUserId());
     Notification oldNotif = (Notification) getDelegate().find(obj);
 
-    // Check if the notification should send emails.
-    if ( oldNotif != null || ! notif.getEmailIsEnabled() ) return super.put_(x, obj);
+    if ( oldNotif != null )
+      return super.put_(x, obj);
 
-    // A list of user ids we're going to send emails to.
-    Set ids = new HashSet<Long>();
+    if ( ! notif.getEmailIsEnabled() )
+      return super.put_(x, obj);
 
-    // If `broadcasted` is set, add all users in the system to the list.
-    if ( notif.getBroadcasted() ) {
-      ArraySink arraySink = new ArraySink();
-      Map s = (Map) localUserDAO.select(MAP(User.ID, arraySink));
-      List<Long> userIds = ((ArraySink) s.getDelegate()).getArray();
-      ids.addAll(userIds);
-    } else {
-      // If `userId` is set, add to the list.
-      long userId = notif.getUserId();
-      if ( userId != 0 ) {
-        ids.add(userId);
-      }
-
-      // If `groupId` is set, add all users in that group to the list.
-      String groupId = notif.getGroupId();
-      if ( ! SafetyUtil.isEmpty(groupId) ) {
-        ArraySink arraySink = new ArraySink();
-        Map s = (Map) localUserDAO.where(EQ(User.GROUP, groupId)).select(MAP(User.ID, arraySink));
-        List<Long> userIds = ((ArraySink) s.getDelegate()).getArray();
-        ids.addAll(userIds);
-      }
-    }
-
-    // Send the email to each user in the list.
-    for ( Object id : ids ) {
-      User u = (User) localUserDAO.inX(x).find(id);
-      sendEmail(x, notif, u);
-    }
-
-    return super.put_(x,notif);
-  }
-
-  /**
-   * Send an email to a User based on a Notification.
-   * @param x The context to use.
-   * @param notification The notification.
-   * @param user The user to send the email to.
-   */
-  public void sendEmail(X x, Notification notification, User user) {
     if ( user.getDisabledTopicsEmail() != null ) {
       List disabledTopics = Arrays.asList(user.getDisabledTopicsEmail());
-      if ( disabledTopics.contains(notification.getNotificationType()) ) return;
+      if ( disabledTopics.contains(notif.getNotificationType()) ) {
+        return super.put_(x,obj);
+      }
     }
 
-    AppConfig config = (AppConfig) x.get("appConfig");
-    if ( "notification".equals(notification.getEmailName()) ) {
-      notification.getEmailArgs().put("type", notification.getNotificationType());
-      notification.getEmailArgs().put("link", config.getUrl());
+    if ( "notification".equals(notif.getEmailName()) ) {
+      notif.getEmailArgs().put("type", notif.getNotificationType());
+      notif.getEmailArgs().put("link", config.getUrl());
     }
 
     EmailMessage message = new EmailMessage();
     message.setTo(new String[]{user.getEmail()});
 
     try {
-      EmailService email = (EmailService) x.get("email");
-      if ( foam.util.SafetyUtil.isEmpty(notification.getEmailName()) ) {
-        message.setSubject(notification.getTemplate());
-        message.setBody(notification.getBody());
+      if ( foam.util.SafetyUtil.isEmpty(notif.getEmailName()) ) {
+        message.setSubject(notif.getTemplate());
+        message.setBody(notif.getBody());
         email.sendEmail(x, message);
       } else {
-        email.sendEmailFromTemplate(x, user, message, notification.getEmailName(), notification.getEmailArgs());
+        email.sendEmailFromTemplate(x, user, message, notif.getEmailName(), notif.getEmailArgs());
       }
     } catch(Throwable t) {
-      Logger logger = (Logger) x.get("logger");
-      logger.error("Error sending notification email message: " + message + ". Error: " + t);
+      System.err.println("Error sending notification email message: "+message+". Error: " + t);
     }
+
+    return super.put_(x,notif);
   }
 }
