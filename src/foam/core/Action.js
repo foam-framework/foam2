@@ -134,59 +134,64 @@ foam.CLASS({
   ],
 
   methods: [
-    function andSlots(a, b) {
-      return this.ExpressionSlot.create({
-        args: [ a, b ],
-        code: function(a, b) {
-          return a && b;
-        }
+
+    function hasPermissions_(data, property) {
+      if ( ! this.permissionRequired ) return true;
+      if ( ! data || ! data.__subContext__.auth ) return false;
+      return Promise.all(this.permissionConfig[property].map(p => {
+        return data.__subContext__.auth.check(null, p);
+      })).then(arr => arr.every(b => b));
+    },
+
+    function createPermissionCheckFor_(data$, property) {
+      return foam.core.ExpressionSlot.create({
+        args: [data$],
+        code: function(data) {
+          return this.hasPermissions_(data, property);
+        }.bind(this)
       });
     },
 
-    function andSlotAndPromise(slot, promise) {
-      return this.andSlots(slot, this.PromiseSlot.create({
-        promise: promise
-      }));
-    },
-
-    function checkPermission(x, permission) {
-      if ( ! this.permissionConfig || ! x.auth ) return Promise.resolve(true);
-      return x.auth.check(null, permission);
-    },
-
-    function isEnabledFor(data) {
-      return this.isEnabled
-        ? foam.Function.withArgs(this.isEnabled, data)
-        : true;
+    function createPermissionlessCheckFor_(data$, property) {
+      if ( ! this[property] ) return foam.core.ConstantSlot.create({value: true});
+      return foam.core.ExpressionSlot.create({
+        obj$: data$,
+        code: this[property]
+      });
     },
 
     function createIsEnabled$(data$) {
-      return this.createSlot_(this.isEnabled, 'enabled', data$);
-    },
-
-    function isAvailableFor(data) {
-      return this.isAvailable
-        ? foam.Function.withArgs(this.isAvailable, data)
-        : true;
+      return foam.core.ArraySlot.create({
+        slots: [
+          this.createPermissionCheckFor_(data$, 'enabled'),
+          this.createPermissionlessCheckFor_(data$, 'isEnabled')
+        ]
+      }).map(arr => arr.every(b => b));
     },
 
     function createIsAvailable$(data$) {
-      return this.createSlot_(this.isAvailable, 'available', data$);
+      return foam.core.ArraySlot.create({
+        slots: [
+          this.createPermissionCheckFor_(data$, 'available'),
+          this.createPermissionlessCheckFor_(data$, 'isAvailable')
+        ]
+      }).map(arr => arr.every(b => b));
     },
 
-    async function maybeCall(ctx, data) {
+    function maybeCall(ctx, data) {
       var data$ = this.ConstantSlot.create({ value: data });
-      if (
-        this.isEnabledFor(data) &&
-        this.isAvailableFor(data) &&
-        await this.hasPermissions_('enabled', data$) &&
-        await this.hasPermissions_('available', data$)
-      ) {
+      Promise.all([
+        Promise.resolve(this.createPermissionlessCheckFor_(data$, 'isEnabled').get()),
+        Promise.resolve(this.createPermissionlessCheckFor_(data$, 'isAvailable').get()),
+        this.hasPermissions_(data, 'available'),
+        this.hasPermissions_(data, 'enabled')
+      ]).then(arr => {
+        if ( ! arr.every(b => b) ) return;
         this.code.call(data, ctx, this);
         // primitive types won't have a pub method
         // Why are we publishing this event anyway? KGR
         data && data.pub && data.pub('action', this.name, this);
-      }
+      });
     },
 
     function installInClass(c) {
@@ -198,29 +203,6 @@ foam.CLASS({
       proto[this.name] = function() {
         action.maybeCall(this.__context__, this);
       };
-    },
-
-    function createSlot_(fn, configKey, data$) {
-      if ( fn == null ) {
-        if ( this.permissionConfig == null ) {
-          return this.ConstantSlot.create({ value: true });
-        }
-        return this.PromiseSlot.create({ promise: this.hasPermissions_(configKey, data$) });
-      }
-
-      var slot = this.ExpressionSlot.create({
-        obj$: data$,
-        code: fn
-      });
-
-      return this.permissionConfig
-        ? this.andSlotAndPromise(slot, this.hasPermissions_(configKey, data$))
-        : slot;
-    },
-
-    function hasPermissions_(configKey, data$) {
-      if ( this.permissionConfig == null ) return Promise.resolve(true);
-      return Promise.all(this.permissionConfig[configKey].map((p) => this.checkPermission(data$.get().__subContext__, p))).then((values) => values.reduce((l, r) => l && r, true));
     }
   ]
 });
