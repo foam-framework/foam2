@@ -131,6 +131,7 @@ foam.CLASS({
       })));
 
       this.
+        addClass(this.myClass()).
         start('span').
           addClass(this.myClass('noselect')).
           start().
