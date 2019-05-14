@@ -25,8 +25,7 @@ foam.CLASS({
     'foam.mlang.sink.GroupBy',
     'java.util.List',
     'java.util.Map',
-    'static foam.mlang.MLang.*',
-    'static foam.nanos.ruler.Operations.*'
+    'static foam.mlang.MLang.*'
   ],
 
   constants: {
@@ -43,112 +42,100 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'createBefore',
-      javaFactory: `
-      return AND(
-        OR(
-          EQ(Rule.OPERATION, Operations.CREATE),
-          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
-        ),
-        EQ(Rule.AFTER, false)
-      );`
+      javaFactory: `return AND(
+  OR(
+    EQ(Rule.OPERATION, Operations.CREATE),
+    EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+  ),
+  EQ(Rule.AFTER, false)
+);`
     },
     {
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'createAfter',
-      javaFactory: `
-      return AND(
-        OR(
-          EQ(Rule.OPERATION, Operations.CREATE),
-          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
-        ),
-        EQ(Rule.AFTER, true)
-      );`
+      javaFactory: `return AND(
+  OR(
+    EQ(Rule.OPERATION, Operations.CREATE),
+    EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+  ),
+  EQ(Rule.AFTER, true)
+);`
     },
     {
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'updateBefore',
-      javaFactory: `
-      return AND(
-        OR(
-          EQ(Rule.OPERATION, Operations.UPDATE),
-          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
-        ),
-        EQ(Rule.AFTER, false)
-      );`
+      javaFactory: `return AND(
+  OR(
+    EQ(Rule.OPERATION, Operations.UPDATE),
+    EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+  ),
+  EQ(Rule.AFTER, false)
+);`
     },
     {
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'updateAfter',
-      javaFactory: `
-      return AND(
-        OR(
-          EQ(Rule.OPERATION, Operations.UPDATE),
-          EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
-        ),
-        EQ(Rule.AFTER, true)
-      );`
+      javaFactory: `return AND(
+  OR(
+    EQ(Rule.OPERATION, Operations.UPDATE),
+    EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+  ),
+  EQ(Rule.AFTER, true)
+);`
     },
     {
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'removeBefore',
-      javaFactory: `
-      return AND(
-        EQ(Rule.OPERATION, Operations.REMOVE),
-        EQ(Rule.AFTER, false)
-      );`
+      javaFactory: `return AND(
+  EQ(Rule.OPERATION, Operations.REMOVE),
+  EQ(Rule.AFTER, false)
+);`
     },
     {
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'removeAfter',
-      javaFactory: `
-      return AND(
-        EQ(Rule.OPERATION, Operations.REMOVE),
-        EQ(Rule.AFTER, true)
-      );`
+      javaFactory: `return AND(
+  EQ(Rule.OPERATION, Operations.REMOVE),
+  EQ(Rule.AFTER, true)
+);`
     },
     {
       class: 'Map',
       name: 'rulesList',
-      javaFactory: `
-      return new java.util.HashMap<Predicate, GroupBy>();
-      `
+      javaFactory: `return new java.util.HashMap<Predicate, GroupBy>();`
     }
   ],
 
   methods: [
     {
       name: 'put_',
-      javaCode: `
-      FObject oldObj = getDelegate().find_(x, obj);
-      Map rulesList = getRulesList();
-      if ( oldObj == null ) {
-        applyRules(x, obj, oldObj, (GroupBy) rulesList.get(getCreateBefore()));
-      } else {
-        applyRules(x, obj, oldObj, (GroupBy) rulesList.get(getUpdateBefore()));
-      }
-      FObject ret =  getDelegate().put_(x, obj);
-      if ( oldObj == null ) {
-        applyRules(x, ret, oldObj, (GroupBy) rulesList.get(getCreateAfter()));
-      } else {
-        applyRules(x, ret, oldObj, (GroupBy) rulesList.get(getUpdateAfter()));
-      }
-      return ret;
-      `
+      javaCode: `FObject oldObj = getDelegate().find_(x, obj);
+Map rulesList = getRulesList();
+if ( oldObj == null ) {
+  applyRules(x, obj, oldObj, (GroupBy) rulesList.get(getCreateBefore()));
+} else {
+  applyRules(x, obj, oldObj, (GroupBy) rulesList.get(getUpdateBefore()));
+}
+FObject ret =  getDelegate().put_(x, obj);
+if ( oldObj == null ) {
+  applyRules(x, ret, oldObj, (GroupBy) rulesList.get(getCreateAfter()));
+} else {
+  applyRules(x, ret, oldObj, (GroupBy) rulesList.get(getUpdateAfter()));
+}
+return ret;`
     },
     {
       name: 'remove_',
-      javaCode: `
-      FObject oldObj = getDelegate().find_(x, obj);
-      applyRules(x, obj, oldObj, (GroupBy) getRulesList().get(getRemoveBefore()));
-      FObject ret =  getDelegate().remove_(x, obj);
-      applyRules(x, ret, oldObj, (GroupBy) getRulesList().get(getRemoveAfter()));
-      return ret;
-      `
+      javaCode: `FObject oldObj = getDelegate().find_(x, obj);
+applyRules(x, obj, oldObj, (GroupBy) getRulesList().get(getRemoveBefore()));
+FObject ret =  getDelegate().remove_(x, obj);
+applyRules(x, ret, oldObj, (GroupBy) getRulesList().get(getRemoveAfter()));
+return ret;`
     },
     {
       name: 'applyRules',
@@ -170,14 +157,12 @@ foam.CLASS({
           type: 'foam.mlang.sink.GroupBy'
         }
       ],
-      javaCode: `
-      for ( Object key : sink.getGroupKeys() ) {
-        List<Rule> group = ((ArraySink) sink.getGroups().get(key)).getArray();
-        if ( ! group.isEmpty() ) {
-          new RuleEngine(x, this).execute(group, obj, oldObj);
-        }
-      }
-      `
+      javaCode: `for ( Object key : sink.getGroupKeys() ) {
+  List<Rule> group = ((ArraySink) sink.getGroups().get(key)).getArray();
+  if ( ! group.isEmpty() ) {
+    new RuleEngine(x, this).execute(group, obj, oldObj);
+  }
+}`
     },
     {
       name: 'updateRules',
@@ -187,27 +172,25 @@ foam.CLASS({
           type: 'Context'
         }
       ],
-      javaCode: `
-        DAO ruleDAO = ((DAO) x.get("ruleDAO")).where(
-          AND(
-            EQ(Rule.ENABLED, true),
-            EQ(Rule.DAO_KEY, getDaoKey())
-          )
-        ).orderBy(new Desc(Rule.PRIORITY));
-        addRuleList(ruleDAO, getCreateBefore());
-        addRuleList(ruleDAO, getUpdateBefore());
-        addRuleList(ruleDAO, getRemoveBefore());
-        addRuleList(ruleDAO, getCreateAfter());
-        addRuleList(ruleDAO, getUpdateAfter());
-        addRuleList(ruleDAO, getRemoveAfter());
+      javaCode: `DAO ruleDAO = ((DAO) x.get("ruleDAO")).where(
+  AND(
+    EQ(Rule.ENABLED, true),
+    EQ(Rule.DAO_KEY, getDaoKey())
+  )
+).orderBy(new Desc(Rule.PRIORITY));
+addRuleList(ruleDAO, getCreateBefore());
+addRuleList(ruleDAO, getUpdateBefore());
+addRuleList(ruleDAO, getRemoveBefore());
+addRuleList(ruleDAO, getCreateAfter());
+addRuleList(ruleDAO, getUpdateAfter());
+addRuleList(ruleDAO, getRemoveAfter());
 
-        ruleDAO.listen(
-          new UpdateRulesListSink.Builder(x)
-            .setDao(this)
-            .build()
-          , null
-        );
-      `
+ruleDAO.listen(
+  new UpdateRulesListSink.Builder(x)
+    .setDao(this)
+    .build()
+  , null
+);`
     },
     {
       name: 'cmd_',
@@ -262,13 +245,11 @@ for ( Object key : groups.getGroupKeys() ) {
           type: 'foam.mlang.predicate.Predicate'
         }
       ],
-      javaCode: `
-        getRulesList().put(
-          predicate,
-          dao.where(predicate)
-            .select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()))
-        );
-      `
+      javaCode: `getRulesList().put(
+  predicate,
+  dao.where(predicate)
+    .select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()))
+);`
     }
   ],
 
@@ -277,13 +258,13 @@ for ( Object key : groups.getGroupKeys() ) {
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
-         public RulerDAO(foam.core.X x, foam.dao.DAO delegate, String serviceName) {
-           setX(x);
-           setDelegate(delegate);
-           setDaoKey(serviceName);
-           updateRules(x);
-         }
-        `);
+    public RulerDAO(foam.core.X x, foam.dao.DAO delegate, String serviceName) {
+      setX(x);
+      setDelegate(delegate);
+      setDaoKey(serviceName);
+      updateRules(x);
+    }`
+         );
       }
     }
   ]
