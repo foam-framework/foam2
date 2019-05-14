@@ -42,11 +42,15 @@ sink = prepareSink(sink);
 foam.dao.Sink         decorated = decorateSink_(sink, skip, limit, order, predicate);
 foam.dao.Subscription sub       = new foam.dao.Subscription();
 
-Map<String, java.io.InputStream> iStreamMap = new foam.nanos.fs.Storage(getDir(), true).getDirectoryAsStream("");
+// Load files from both the Jar and regular FileSystem
+Map<String, java.io.InputStream> iRStreamMap = new foam.nanos.fs.Storage(getDir(), true).getDirectoryAsStream("");
+Map<String, java.io.InputStream> iFSStreamMap = new foam.nanos.fs.Storage(getDir(), false).getDirectoryAsStream("");
 
-for ( Map.Entry<String, java.io.InputStream> path : iStreamMap.entrySet() ) {
+// Merge both maps, preferring values in iFSStream
+iFSStreamMap.forEach((key, value) -> iRStreamMap.merge(key, value, (oldValue, newValue) -> newValue));
+
+for ( Map.Entry<String, java.io.InputStream> path : iRStreamMap.entrySet() ) {
   if ( sub.getDetached() ) break;
-
 
   foam.flow.Document obj = new foam.flow.Document();
   String id = path.getKey().substring(0, path.getKey().lastIndexOf(".flow"));
@@ -86,6 +90,18 @@ if ( ! id.matches("^[a-zA-Z0-9_-]+$") ) {
 String id = (String)getPK(obj);
 verifyId(id);
 
+java.nio.file.Path path = new foam.nanos.fs.Storage(getDir(), false).getPath(id + ".flow");
+if ( ! java.nio.file.Files.exists(path) ) {
+  try {
+    if ( ! java.nio.file.Files.isDirectory(path.getParent()) ) {
+      java.nio.file.Files.createDirectories(path.getParent());
+    }
+    java.nio.file.Files.createFile(path);
+  } catch (java.io.IOException e) {
+    throw new RuntimeException(e);
+  }
+}
+
 java.io.OutputStream oStream = new foam.nanos.fs.Storage(getDir(), false).getResourceOutputStream(id + ".flow");
 
 if ( oStream == null ) {
@@ -118,10 +134,10 @@ return obj;`
 // TODO: Escape/sanitize file name
 verifyId((String)id);
 
-java.io.InputStream iStream = new foam.nanos.fs.Storage(getDir(), false).getResourceAsStream(id + ".flow");
+java.io.InputStream iStream = new foam.nanos.fs.Storage(getDir(), false).getResourceInputStream(id + ".flow");
 
 if ( iStream == null ) {
-  iStream = new foam.nanos.fs.Storage(getDir(), true).getResourceAsStream(id + ".flow");
+  iStream = new foam.nanos.fs.Storage(getDir(), true).getResourceInputStream(id + ".flow");
   if ( iStream == null ) return null;
 }
 

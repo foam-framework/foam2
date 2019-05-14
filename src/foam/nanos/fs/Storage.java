@@ -60,7 +60,8 @@ public class Storage {
     return fs;
   }
 
-  protected Path getPath(FileSystem fs, String name) {
+  public Path getPath(String name) {
+    FileSystem fs = getFS();
     if ( fs == null ) return null;
 
     Path path;
@@ -92,7 +93,7 @@ public class Storage {
   public Map<String, InputStream> getDirectoryAsStream(String name) {
     Map<String, InputStream> iStreamMap = new HashMap<>();
 
-    Path path = getPath(getFS(), name);
+    Path path = getPath(name);
     if ( path == null ) return null;
 
     DirectoryStream<Path> contents;
@@ -105,7 +106,8 @@ public class Storage {
 
     for ( Path p : contents ) {
       try {
-        iStreamMap.put(p.getFileName().toString(), Files.newInputStream(p));
+        String pname = getFS().getPath(resourceDir_, name, p.getName(p.getNameCount()-1).toString()).toString();
+        iStreamMap.put(pname, Files.newInputStream(p));
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -117,10 +119,9 @@ public class Storage {
   public OutputStream getResourceOutputStream(String name) {
     if ( isResource() ) return null;
 
-    Path path = getPath(getFS(), name);
+    Path path = getPath(name);
     if ( path == null ) return null;
 
-    if ( ! Files.isWritable(path) ) return null;
     try {
       return Files.newOutputStream(path);
     } catch (IOException e) {
@@ -128,15 +129,19 @@ public class Storage {
     }
   }
 
-  public java.io.InputStream getResourceAsStream(String name) {
-    Path path = getPath(getFS(), name);
+  public java.io.InputStream getResourceInputStream(String name) {
+    Path path = getPath(name);
     if ( path == null ) return null;
 
-    if ( ! Files.isReadable(path) ) return null;
     try {
       return Files.newInputStream(path);
     } catch (IOException e) {
       return null;
     }
+  }
+
+  @Deprecated
+  public java.io.InputStream getResourceAsStream(String name) {
+    return getResourceInputStream(name);
   }
 }
