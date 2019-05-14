@@ -56,9 +56,9 @@ foam.CLASS({
       return retSlot;
     },
     function fromSectionAxiom(a, cls) {
+      this.copyFrom(a);
       this.copyFrom({
         createIsAvailableFor: a.createIsAvailableFor.bind(a),
-        title: a.title,
         properties: cls.getAxiomsByClass(this.Property)
           .filter(p => p.section == a.name)
           .filter(p => ! p.hidden),

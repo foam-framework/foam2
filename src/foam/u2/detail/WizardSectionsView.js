@@ -9,7 +9,6 @@ foam.CLASS({
   name: 'WizardSectionsView',
   extends: 'foam.u2.detail.AbstractSectionedDetailView',
   requires: [
-    'foam.u2.detail.SectionView',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows'
   ],
@@ -41,6 +40,11 @@ foam.CLASS({
         }
         return -1;
       }
+    },
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'sectionView',
+      value: { class: 'foam.u2.detail.SectionView' }
     }
   ],
   reactions: [
@@ -91,7 +95,8 @@ foam.CLASS({
       self
         .start(self.Rows)
           .add(self.slot(function(sections, currentIndex) {
-            return self.SectionView.create({ data: sections[currentIndex] });
+            return self.E()
+              .tag(self.sectionView, { data: sections[currentIndex] });
           }))
           .startContext({ data: this })
             .start(self.Cols)
