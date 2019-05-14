@@ -234,6 +234,11 @@ foam.CLASS({
       value: 'Search...'
     },
     {
+      class: 'String',
+      name: 'choosePlaceholder',
+      documentation: 'Replaces choose from placeholder with passed in string.'
+    },
+    {
       type: 'Action',
       name: 'action',
       documentation: `
@@ -278,8 +283,9 @@ foam.CLASS({
             .addClass(this.myClass('custom-selection-view'))
             .add(this.slot((data) => {
               return this.E().tag(self.selectionView, {
-                data: data,
-                fullObject$: this.fullObject_$
+                data: data ? data.toSummary() : data,
+                fullObject$: this.fullObject_$,
+                defaultSelectionPrompt: this.choosePlaceholder
               });
             }))
           .end()
@@ -392,7 +398,7 @@ foam.CLASS({
           return this
             .start()
               .addClass(this.myClass('row'))
-              .add(this.data.id)
+              .add(this.data.toSummary())
             .end();
         }
       ]
@@ -428,7 +434,14 @@ foam.CLASS({
       properties: [
         {
           name: 'data',
-          documentation: 'The id of the selected object.'
+          documentation: 'The id of the selected object.',
+        },
+        {
+          name: 'defaultSelectionPrompt',
+          expression: function(of) {
+            var plural = of.model_.plural.toLowerCase();
+            return this.CHOOSE_FROM + plural;
+          }
         },
         {
           name: 'fullObject',
@@ -443,8 +456,7 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          var plural = this.of.model_.plural.toLowerCase();
-          return this.add(this.data || this.CHOOSE_FROM + plural);
+          return this.add(this.data || this.defaultSelectionPrompt);
         }
       ]
     },

@@ -92,13 +92,19 @@ foam.CLASS({
       display: flex;
     }
 
+    ^ .foam-u2-view-RichChoiceView-chevron {
+      content: '▾';
+      padding-left: 0px;
+      font-size: 16px;
+      color: #8D9090;
+    }
+
     ^ .foam-u2-view-RichChoiceView-selection-view {
-      padding: 10px 8px;
+      padding: 2px 12px 0px;
       width: 100%;
       border-radius: 3px;
       border: solid 1px #8e9090;
       background-color: #ffffff;
-      font-size: 14px;
       box-sizing: border-box;
       -webkit-appearance: none;
       cursor: pointer;
