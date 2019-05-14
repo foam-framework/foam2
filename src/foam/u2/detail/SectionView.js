@@ -21,6 +21,11 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.layout.Section',
       name: 'data'
+    },
+    {
+      class: 'Boolean',
+      name: 'showTitle',
+      value: true
     }
   ],
   methods: [
@@ -28,9 +33,12 @@ foam.CLASS({
       var self = this;
       self.SUPER();
       self
-        .add(self.slot(function(data) {
+        .add(self.slot(function(data, showTitle) {
           return self.Rows.create()
             .show(data.createIsAvailableFor(self.fobj$))
+            .callIf(showTitle, function () {
+              this.start('h2').add(data.title$).end();
+            })
             .forEach(data.properties, function (p) {
               this.tag(self.SectionedDetailPropertyView, { prop: p, data$: self.fobj$ });
             })
