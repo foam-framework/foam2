@@ -83,13 +83,17 @@ if ( ! id.matches("^[a-zA-Z0-9_-]+$") ) {
     {
       name: 'put_',
       javaCode: `
-verifyId(((String)getPK(obj)));
+String id = (String)getPK(obj);
+verifyId(id);
 
-java.nio.file.FileSystem fs = java.nio.file.FileSystems.getDefault();
+java.io.OutputStream oStream = new foam.nanos.fs.Storage(getDir(), false).getResourceOutputStream(id + ".flow");
+
+if ( oStream == null ) {
+  return obj;
+}
 
 try {
-  java.nio.file.Path path = fs.getPath(getDir(), ((String)getPK(obj)) + ".flow");
-  java.nio.file.Files.write(path, ((foam.flow.Document)obj).getMarkup().getBytes(java.nio.charset.Charset.forName("UTF-8")));
+  oStream.write(((foam.flow.Document)obj).getMarkup().getBytes(java.nio.charset.Charset.forName("UTF-8")));
 } catch ( java.io.IOException e ) {
   throw new RuntimeException(e);
 }
@@ -114,11 +118,11 @@ return obj;`
 // TODO: Escape/sanitize file name
 verifyId((String)id);
 
-foam.nanos.fs.Storage storage = new foam.nanos.fs.Storage(getDir(), true);
-java.io.InputStream iStream = storage.getResourceAsStream(id + ".flow");
+java.io.InputStream iStream = new foam.nanos.fs.Storage(getDir(), false).getResourceAsStream(id + ".flow");
 
 if ( iStream == null ) {
-  return null;
+  iStream = new foam.nanos.fs.Storage(getDir(), true).getResourceAsStream(id + ".flow");
+  if ( iStream == null ) return null;
 }
 
 foam.flow.Document obj = new foam.flow.Document();

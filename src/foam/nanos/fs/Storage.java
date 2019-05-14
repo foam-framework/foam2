@@ -32,38 +32,37 @@ public class Storage {
   }
 
   protected FileSystem getFS() {
-    FileSystem fs;
-    switch(System.getProperty("flow.uri.scheme", "file")) {
-      case "jar":
-        if ( isResource() ) {
-          String nanopayJar = System.getenv("NANOPAY_JAR");
-          if ( ! SafetyUtil.isEmpty(nanopayJar) ) {
-            Path nanopayJarPath = Paths.get(nanopayJar);
-            try {
-              URI nanopayJarURI = new URI("jar", nanopayJarPath.toUri().toString(), null);
-              try {
-                fs = FileSystems.getFileSystem(nanopayJarURI);
-              } catch (FileSystemNotFoundException e) {
-                Map<String, String> env = new HashMap<>();
-                env.put("create", "true");
-                fs = FileSystems.newFileSystem(nanopayJarURI, env);
-              }
-            } catch(URISyntaxException | IOException e) {
-              throw new RuntimeException(e);
-            }
-            break;
+    FileSystem fs = null;
+
+    if ( isResource() ) {
+      String nanopayJar = System.getenv("NANOPAY_JAR");
+      if (!SafetyUtil.isEmpty(nanopayJar)) {
+        Path nanopayJarPath = Paths.get(nanopayJar);
+        try {
+          URI nanopayJarURI = new URI("jar", nanopayJarPath.toUri().toString(), null);
+          try {
+            fs = FileSystems.getFileSystem(nanopayJarURI);
+            return fs;
+          } catch (FileSystemNotFoundException e) {
+            Map<String, String> env = new HashMap<>();
+            env.put("create", "true");
+            fs = FileSystems.newFileSystem(nanopayJarURI, env);
+            return fs;
           }
+        } catch (URISyntaxException | IOException e) {
+          throw new RuntimeException(e);
         }
-      case "file":
-      default:
-        fs = FileSystems.getDefault();
-        break;
+      }
+    } else {
+      fs = FileSystems.getDefault();
     }
 
     return fs;
   }
 
   protected Path getPath(FileSystem fs, String name) {
+    if ( fs == null ) return null;
+
     Path path;
     if ( isResource() ) {
       if ( ! SafetyUtil.isEmpty(resourceDir_) ) {
@@ -78,6 +77,7 @@ public class Storage {
         path = fs.getPath(name);
       }
     }
+
     return path;
   }
 
@@ -93,6 +93,7 @@ public class Storage {
     Map<String, InputStream> iStreamMap = new HashMap<>();
 
     Path path = getPath(getFS(), name);
+    if ( path == null ) return null;
 
     DirectoryStream<Path> contents;
 
@@ -113,8 +114,23 @@ public class Storage {
     return iStreamMap;
   }
 
+  public OutputStream getResourceOutputStream(String name) {
+    if ( isResource() ) return null;
+
+    Path path = getPath(getFS(), name);
+    if ( path == null ) return null;
+
+    if ( ! Files.isWritable(path) ) return null;
+    try {
+      return Files.newOutputStream(path);
+    } catch (IOException e) {
+      return null;
+    }
+  }
+
   public java.io.InputStream getResourceAsStream(String name) {
     Path path = getPath(getFS(), name);
+    if ( path == null ) return null;
 
     if ( ! Files.isReadable(path) ) return null;
     try {

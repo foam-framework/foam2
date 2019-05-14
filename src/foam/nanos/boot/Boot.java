@@ -7,9 +7,7 @@
 package foam.nanos.boot;
 
 import foam.core.*;
-import foam.dao.AbstractSink;
-import foam.dao.DAO;
-import foam.dao.ProxyDAO;
+import foam.dao.*;
 import foam.dao.java.JDAO;
 import foam.nanos.auth.Group;
 import foam.nanos.auth.Permission;
@@ -106,8 +104,11 @@ public class Boot {
     });
 
     DAO documentDAO = (DAO) root_.get("documentDAO");
+    FObject d = documentDAO.find("intro");
+    documentDAO.put(d);
     documentDAO.find("intro");
-    documentDAO.find("intro");
+    Sink someSink = new ArraySink.Builder(root_).build();
+    documentDAO.select(someSink);
 
     String startScript = System.getProperty("foam.main", "main");
     if ( startScript != null ) {
@@ -149,7 +150,7 @@ public class Boot {
 
     boolean datadirFlag = false;
 
-    System.setProperty("flow.uri.scheme", "jar");
+    System.setProperty("fs.scheme", "jar");
 
     String datadir = "";
     for ( int i = 0 ; i < args.length ; i++ ) {
