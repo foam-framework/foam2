@@ -325,6 +325,7 @@ foam.CLASS({
                     .select(section.filtered || section.dao, (obj) => {
                       return this.E()
                         .start(self.rowView, { data: obj })
+                          .attrs({ name: (obj.name).replace(/[^\w\d]/g,'') })
                           .enableClass('disabled', section.disabled)
                           .callIf(! section.disabled, function() {
                             this.on('click', () => {
