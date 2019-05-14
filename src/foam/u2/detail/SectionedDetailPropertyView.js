@@ -64,7 +64,6 @@ foam.CLASS({
     }
 
     ^ .foam-u2-TextField {
-      
       width: 100%;
       padding: 10px 8px;
       font-size: 14px;
@@ -139,6 +138,12 @@ foam.CLASS({
       color: #333;
       font-weight: 900;
       padding: 6px 16px;
+    }
+
+    ^ .foam-u2-IntView {
+      width: 100%;
+      padding: 10px 8px;
+      font-size: 14px;
     }
 
     ^ .DefaultRowView-row {
