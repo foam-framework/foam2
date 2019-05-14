@@ -103,13 +103,6 @@ public class Boot {
       }
     });
 
-    DAO documentDAO = (DAO) root_.get("documentDAO");
-    FObject d = documentDAO.find("intro");
-    documentDAO.put(d);
-    documentDAO.find("intro");
-    Sink someSink = new ArraySink.Builder(root_).build();
-    documentDAO.select(someSink);
-
     String startScript = System.getProperty("foam.main", "main");
     if ( startScript != null ) {
       DAO    scriptDAO = (DAO) root_.get("scriptDAO");

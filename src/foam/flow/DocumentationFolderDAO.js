@@ -10,13 +10,6 @@ foam.CLASS({
   requires: [
     'foam.flow.Document'
   ],
-  javaImports: [
-    'java.net.URI',
-    'java.net.URISyntaxException',
-    'java.nio.file.FileSystemNotFoundException',
-    'java.util.HashMap',
-    'java.util.Map'
-  ],
   documentation: 'Loads/stores documentation models from a directory of HTML markup.  Useful for saving and editing documentation in a version control repository.',
   extends: 'foam.dao.AbstractDAO',
   properties: [
@@ -43,13 +36,13 @@ foam.dao.Sink         decorated = decorateSink_(sink, skip, limit, order, predic
 foam.dao.Subscription sub       = new foam.dao.Subscription();
 
 // Load files from both the Jar and regular FileSystem
-Map<String, java.io.InputStream> iRStreamMap = new foam.nanos.fs.Storage(getDir(), true).getDirectoryAsStream("");
-Map<String, java.io.InputStream> iFSStreamMap = new foam.nanos.fs.Storage(getDir(), false).getDirectoryAsStream("");
+java.util.Map<String, java.io.InputStream> iRStreamMap = new foam.nanos.fs.Storage(getDir(), true).getDirectoryAsStream("");
+java.util.Map<String, java.io.InputStream> iFSStreamMap = new foam.nanos.fs.Storage(getDir(), false).getDirectoryAsStream("");
 
 // Merge both maps, preferring values in iFSStream
 iFSStreamMap.forEach((key, value) -> iRStreamMap.merge(key, value, (oldValue, newValue) -> newValue));
 
-for ( Map.Entry<String, java.io.InputStream> path : iRStreamMap.entrySet() ) {
+for ( java.util.Map.Entry<String, java.io.InputStream> path : iRStreamMap.entrySet() ) {
   if ( sub.getDetached() ) break;
 
   foam.flow.Document obj = new foam.flow.Document();
