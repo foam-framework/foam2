@@ -35,18 +35,18 @@ public class Storage {
     FileSystem fs = null;
 
     if ( isResource() ) {
-      String nanopayJar = System.getenv("NANOPAY_JAR");
-      if (!SafetyUtil.isEmpty(nanopayJar)) {
-        Path nanopayJarPath = Paths.get(nanopayJar);
+      String resourceJar = System.getenv("RES_JAR_HOME");
+      if (!SafetyUtil.isEmpty(resourceJar)) {
+        Path resourceJarPath = Paths.get(resourceJar);
         try {
-          URI nanopayJarURI = new URI("jar", nanopayJarPath.toUri().toString(), null);
+          URI resourceJarURI = new URI("jar", resourceJarPath.toUri().toString(), null);
           try {
-            fs = FileSystems.getFileSystem(nanopayJarURI);
+            fs = FileSystems.getFileSystem(resourceJarURI);
             return fs;
           } catch (FileSystemNotFoundException e) {
             Map<String, String> env = new HashMap<>();
             env.put("create", "true");
-            fs = FileSystems.newFileSystem(nanopayJarURI, env);
+            fs = FileSystems.newFileSystem(resourceJarURI, env);
             return fs;
           }
         } catch (URISyntaxException | IOException e) {
