@@ -208,8 +208,6 @@ foam.CLASS({
         'line-height': this.lineHeight
       }
 
-      console.log(this.lineHeight);
-
       this.style(styles);
     }
   ],

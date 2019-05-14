@@ -283,7 +283,7 @@ foam.CLASS({
             .addClass(this.myClass('custom-selection-view'))
             .add(this.slot((data) => {
               return this.E().tag(self.selectionView, {
-                data: data ? data.toSummary() : data,
+                data: data,
                 fullObject$: this.fullObject_$,
                 defaultSelectionPrompt: this.choosePlaceholder
               });
@@ -398,7 +398,7 @@ foam.CLASS({
           return this
             .start()
               .addClass(this.myClass('row'))
-              .add(this.data.toSummary())
+              .add(this.data && this.data.toSummary ? this.data.toSummary() : this.data.id)
             .end();
         }
       ]
@@ -456,7 +456,8 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          return this.add(this.data || this.defaultSelectionPrompt);
+          var selection = this.data && this.fullObject.toSummary ? this.fullObject.toSummary() : this.data;
+          return this.add(selection || this.defaultSelectionPrompt);
         }
       ]
     },
