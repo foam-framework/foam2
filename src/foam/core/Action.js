@@ -135,21 +135,11 @@ foam.CLASS({
 
   methods: [
 
-    function hasPermissions_(x, data, property) {
-      if ( ! this.permissionRequired ) return true;
-      if ( ! data || ! x.auth ) return true;
+    function hasPermissions_(x, property) {
+      if ( ! this.permissionRequired || ! x.auth ) return Promise.resolve(true);
       return Promise.all(this.permissionConfig[property].map(p => {
         return x.auth.check(null, p);
       })).then(arr => arr.every(b => b));
-    },
-
-    function createPermissionCheckFor_(x, data$, property) {
-      return foam.core.ExpressionSlot.create({
-        args: [data$],
-        code: function(data) {
-          return this.hasPermissions_(x, data, property);
-        }.bind(this)
-      });
     },
 
     function createPermissionlessCheckFor_(data$, property) {
@@ -163,7 +153,9 @@ foam.CLASS({
     function createIsEnabled$(x, data$) {
       return foam.core.ArraySlot.create({
         slots: [
-          this.createPermissionCheckFor_(x, data$, 'enabled'),
+          foam.core.PromiseSlot.create({
+            promise: this.hasPermissions_(x, 'enabled')
+          }),
           this.createPermissionlessCheckFor_(data$, 'isEnabled')
         ]
       }).map(arr => arr.every(b => b));
@@ -172,7 +164,9 @@ foam.CLASS({
     function createIsAvailable$(x, data$) {
       return foam.core.ArraySlot.create({
         slots: [
-          this.createPermissionCheckFor_(x, data$, 'available'),
+          foam.core.PromiseSlot.create({
+            promise: this.hasPermissions_(x, 'available')
+          }),
           this.createPermissionlessCheckFor_(data$, 'isAvailable')
         ]
       }).map(arr => arr.every(b => b));
@@ -183,8 +177,8 @@ foam.CLASS({
       Promise.all([
         Promise.resolve(this.createPermissionlessCheckFor_(data$, 'isEnabled').get()),
         Promise.resolve(this.createPermissionlessCheckFor_(data$, 'isAvailable').get()),
-        this.hasPermissions_(ctx, data, 'available'),
-        this.hasPermissions_(ctx, data, 'enabled')
+        this.hasPermissions_(ctx, 'available'),
+        this.hasPermissions_(ctx, 'enabled')
       ]).then(arr => {
         if ( ! arr.every(b => b) ) return;
         this.code.call(data, ctx, this);
