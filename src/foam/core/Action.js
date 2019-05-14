@@ -137,7 +137,7 @@ foam.CLASS({
 
     function hasPermissions_(data, property) {
       if ( ! this.permissionRequired ) return true;
-      if ( ! data || ! data.__subContext__.auth ) return false;
+      if ( ! data || ! data.__subContext__.auth ) return true;
       return Promise.all(this.permissionConfig[property].map(p => {
         return data.__subContext__.auth.check(null, p);
       })).then(arr => arr.every(b => b));
