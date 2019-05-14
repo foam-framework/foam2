@@ -188,7 +188,7 @@ foam.CLASS({
             add(self.title$).
           end();
 
-        var tabs = foam.u2.Tabs.create().style({ width: '1200px' });
+        var tabs = foam.u2.Tabs.create({}, self);
 
         return self.actionBorder(
           this.
