@@ -398,7 +398,7 @@ foam.CLASS({
           return this
             .start()
               .addClass(this.myClass('row'))
-              .add(this.data && this.data.toSummary ? this.data.toSummary() : this.data.id)
+              .add(this.data.toSummary())
             .end();
         }
       ]
@@ -456,8 +456,7 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          var selection = this.data && this.fullObject.toSummary ? this.fullObject.toSummary() : this.data;
-          return this.add(selection || this.defaultSelectionPrompt);
+          return this.add(this.fullObject && this.fullObject.toSummary() || this.defaultSelectionPrompt);
         }
       ]
     },
