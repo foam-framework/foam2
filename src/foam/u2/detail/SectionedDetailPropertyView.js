@@ -14,44 +14,38 @@ foam.CLASS({
   `,
 
   css: `
-    .card-label {
+    ^card-label {
       font-size: 16px;
       font-weight: bold;
     }
-    .foam-u2-CheckBox-label {
-      margin-left: 12px;
-    }
-    .foam-u2-view-RadioView label {
-      margin-left: 12px;
-    }
-    .validation-container {
+    ^validation-container {
       margin-top: 4px;
       color: #d9170e;
     }
-    .helper-icon {
+    ^helper-icon {
       width: 20px;
       height: 20px;
     }
-    .error-icon {
+    ^error-icon {
       width: 16px;
       height: 16px;
     }
-    .error .foam-u2-TextField {
+    ^error .foam-u2-TextField {
       background-color: #fbedec;
       border: solid 1px #d9170e;
       font-size: 12px;
     }
-    .error .foam-u2-tag-TextArea {
+    ^error .foam-u2-tag-TextArea {
       background-color: #fbedec;
       border: solid 1px #d9170e;
       font-size: 12px;
     }
-    .error .foam-u2-tag-Select {
+    ^error .foam-u2-tag-Select {
       background-color: #fbedec;
       border: solid 1px #d9170e;
       font-size: 12px;
     }
-    .error .foam-u2-view-date-DateTimePicker .date-display-box {
+    ^error .foam-u2-view-date-DateTimePicker .date-display-box {
       background-color: #fbedec;
       border: solid 1px #d9170e;
       font-size: 12px;
@@ -61,6 +55,14 @@ foam.CLASS({
       For the following inputs below, we are planning 
       encode these changes in the actual foam files
     */
+    ^ .foam-u2-CheckBox-label {
+      margin-left: 12px;
+    }
+
+    ^ .foam-u2-view-RadioView label {
+      margin-left: 12px;
+    }
+
     ^ .foam-u2-TextField {
       
       width: 100%;
@@ -183,12 +185,12 @@ foam.CLASS({
 
             return self.E()
               .start(self.Rows, { defaultChildConfig:  { lineHeight: '2' } })
-                .start().add(prop.label$).addClass('card-label').end()
+                .start().add(prop.label$).addClass(this.myClass('card-label')).end()
                 .start(self.Cols, { contentJustification: foam.u2.layout.ContentJustification.START, defaultChildConfig: { margin: '0 16px 0 0' } })
-                  .start(self.Col, { flex: 1 }).add(prop).enableClass('error', errorSlot).end()
+                  .start(self.Col, { flex: 1 }).add(prop).enableClass(this.myClass('error'), errorSlot).end()
                   .callIf(prop.help, function() { 
                     this.start({class: 'foam.u2.tag.Image', data: 'images/question-icon.svg'})
-                      .addClass('helper-icon')
+                      .addClass(this.myClass('helper-icon'))
                       .attrs({ title: prop.help })
                     .end();
                   })
@@ -196,9 +198,9 @@ foam.CLASS({
                 .start(self.Cols, { 
                   contentJustification: foam.u2.layout.ContentJustification.START, 
                   itemAlignment: foam.u2.layout.ItemAlignment.CENTER, defaultChildConfig: { margin: '0 8px 0 0' }
-                }).addClass('validation-container').show(errorSlot)
+                }).addClass(this.myClass('validation-container')).show(errorSlot)
                   .start({class: 'foam.u2.tag.Image', data: 'images/inline-error-icon.svg'})
-                    .addClass('error-icon')
+                    .addClass(this.myClass('error-icon'))
                   .end()
                   .add(errorSlot.map((s) => {
                     return self.E().add(s);
