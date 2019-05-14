@@ -48,6 +48,7 @@ public class SendNotificationDAO extends ProxyDAO {
 
   public void send(User user, Notification notif, X x) {
     Notification notification = (Notification) notif.fclone();
+    notification.setId(0L);
     notification.setUserId(user.getId());
     notification.setBroadcasted(false);
     notification.setGroupId(null);

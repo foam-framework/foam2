@@ -42,7 +42,8 @@ foam.CLASS({
           return self.E()
             .start(self.Rows)
               .add(prop.label$)
-              .start(self.Cols, { contentJustification: foam.u2.layout.ContentJustification.START })
+              .start(self.Cols)
+                .style({ 'justify-content': 'start' })
                 .add(prop)
                 .callIf(prop.help, function() { 
                   this.start({class: 'foam.u2.tag.Image', data: 'images/question-icon.svg'})

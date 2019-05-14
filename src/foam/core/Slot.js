@@ -437,7 +437,7 @@ foam.CLASS({
       preSet: function(o, n) {
         if ( n && n.then ) {
           this.promise = n;
-          n = o;
+          n = foam.Undefined.isInstance(o) ? null : o;
         } else {
           // Ensure an old promise doesn't fire and clobber the value.
           this.promise = null;
@@ -553,6 +553,24 @@ foam.CLASS({
       return arguments.length === 1 ?
         this.SUPER('propertyChange', 'value', l) :
         this.SUPER.apply(this, arguments);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'ProxySlot',
+  extends: 'foam.core.SimpleSlot',
+  properties: [
+    {
+      name: 'sub_'
+    },
+    {
+      name: 'delegate',
+      postSet: function(_, n) {
+        this.sub_ && this.sub_.detach();
+        this.sub_ = n && this.linkFrom(n);
+      }
     }
   ]
 });

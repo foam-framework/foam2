@@ -2169,7 +2169,7 @@ foam.CLASS({
           var auth = data.__subContext__.auth;
 
           var propName = this.name.toLowerCase();
-          var clsName  = this.forClass_.substring(clsName.lastIndexOf('.') + 1).toLowerCase();
+          var clsName  = this.forClass_.substring(this.forClass_.lastIndexOf('.') + 1).toLowerCase();
 
           return auth.check(null, `${clsName}.rw.${propName}`)
               .then(function(rw) {
