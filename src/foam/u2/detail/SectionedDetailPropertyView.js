@@ -100,7 +100,7 @@ foam.CLASS({
     }
 
     ^ .foam-u2-view-RichChoiceView-selection-view {
-      padding: 2px 12px 0px;
+      padding: 2px 12px 0px 8px;
       width: 100%;
       border-radius: 3px;
       border: solid 1px #8e9090;
@@ -108,6 +108,7 @@ foam.CLASS({
       box-sizing: border-box;
       -webkit-appearance: none;
       cursor: pointer;
+      font-size: 14px;
     }
   `,
 
