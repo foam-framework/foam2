@@ -7,7 +7,9 @@
 package foam.nanos.boot;
 
 import foam.core.*;
-import foam.dao.*;
+import foam.dao.AbstractSink;
+import foam.dao.DAO;
+import foam.dao.ProxyDAO;
 import foam.dao.java.JDAO;
 import foam.nanos.auth.Group;
 import foam.nanos.auth.Permission;
@@ -142,8 +144,6 @@ public class Boot {
     System.out.println("Starting Nanos Server");
 
     boolean datadirFlag = false;
-
-    System.setProperty("fs.scheme", "jar");
 
     String datadir = "";
     for ( int i = 0 ; i < args.length ; i++ ) {
