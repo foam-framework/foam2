@@ -9,20 +9,19 @@ foam.CLASS({
   name: 'MapView',
   extends: 'foam.u2.View',
   requires: [
-    'foam.u2.DetailView'
+    'foam.u2.layout.Cols',
+    'foam.u2.layout.Rows'
   ],
   exports: [ 'updateData' ],
-  properties: [
-    {
-      class: 'Map',
-      name: 'data'
-    }
-  ],
   actions: [
     {
       name: 'addRow',
       label: 'Add',
+      isAvailable: function(controllerMode) {
+        return controllerMode !== foam.u2.ControllerMode.VIEW;
+      },
       code: function() {
+        this.data = this.data || {};
         this.data[Date.now()] = '';
         this.updateData();
       }
@@ -31,7 +30,11 @@ foam.CLASS({
   classes: [
     {
       name: 'KeyValueRow',
-      imports: [ 'data', 'updateData' ],
+      imports: [
+        'controllerMode',
+        'data',
+        'updateData'
+      ],
       properties: [
         {
           class: 'String',
@@ -52,6 +55,9 @@ foam.CLASS({
       actions: [
         {
           name: 'remove',
+          isAvailable: function(controllerMode) {
+            return controllerMode !== foam.u2.ControllerMode.VIEW;
+          },
           code: function() {
             delete this.data[this.key];
             this.updateData();
@@ -66,7 +72,7 @@ foam.CLASS({
       isFramed: true,
       code: function() {
         var d = this.data;
-        this.data = {};
+        this.data = null;
         this.data = d;
       }
     }
@@ -76,11 +82,22 @@ foam.CLASS({
       var self = this;
       this
         .add(this.slot(function(data) {
-          return self.E().forEach(Object.entries(data || {}), function(e) {
-            var row = self.KeyValueRow.create({ key: e[0], value: e[1] });
-            this.start(self.DetailView, { data: row, showActions: true }).end();
-            row.onDetach(row.sub(self.updateData));
-          });
+          return self.Rows.create()
+            .forEach(Object.entries(data || {}), function(e) {
+              var row = self.KeyValueRow.create({ key: e[0], value: e[1] });
+              this
+                .startContext({ data: row })
+                  .start(self.Cols, {
+                    contentJustification: 'START',
+                    itemAlignment: 'CENTER'
+                  })
+                    .add(self.KeyValueRow.KEY)
+                    .add(self.KeyValueRow.VALUE)
+                    .add(self.KeyValueRow.REMOVE)
+                  .end()
+                .endContext();
+              row.onDetach(row.sub(self.updateData));
+            });
         }))
         .startContext({ data: this }).add(this.ADD_ROW).endContext();
     }
