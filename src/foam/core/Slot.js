@@ -437,7 +437,7 @@ foam.CLASS({
       preSet: function(o, n) {
         if ( n && n.then ) {
           this.promise = n;
-          n = o;
+          n = foam.Undefined.isInstance(o) ? null : o;
         } else {
           // Ensure an old promise doesn't fire and clobber the value.
           this.promise = null;
