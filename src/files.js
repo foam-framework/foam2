@@ -602,10 +602,11 @@ FOAM_FILES([
 
   { name: "foam/layout/Section" },
   { name: "foam/layout/SectionAxiom" },
-  
+
   { name: "foam/u2/detail/AbstractSectionedDetailView" },
   { name: "foam/u2/detail/SectionView" },
   { name: "foam/u2/detail/SectionedDetailView" },
   { name: "foam/u2/detail/WizardSectionsView" },
+  { name: "foam/u2/detail/SimpleProgressBar" },
   { name: "foam/u2/detail/SectionedDetailPropertyView" }
 ]);
