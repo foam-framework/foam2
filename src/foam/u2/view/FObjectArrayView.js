@@ -47,17 +47,9 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-
-      var controllerMode = this.mode === foam.u2.DisplayMode.RW &&
-          (this.data.visibility === foam.u2.Visibility.RW ||
-           this.controllerMode === foam.u2.ControllerMode.CREATE) ?
-          this.controllerMode : foam.u2.ControllerMode.VIEW;
       this.add(this.ADD_ITEM).add(this.slot(function(data) {
         return this.E().forEach(data, function(o, index) {
-          var tag = this.tag({
-            class: self.detailView,
-            controllerMode: controllerMode,
-          }, {data: o});
+          var tag = this.tag({ class: self.detailView }, {data: o});
           if ( this.mode === foam.u2.DisplayMode.RW ) {
             tag.start().add('Remove').addClass('rmv-button')
                 .on('click', function(){ self.removeIt(index) }).end();

@@ -12,7 +12,9 @@
 
   javaImports: [
     'foam.core.FObject',
-    'foam.core.X'
+    'foam.core.X',
+    'foam.nanos.logger.Logger',
+    'java.util.Collection'
   ],
 
   properties: [
@@ -47,21 +49,21 @@
       }
     },
     {
-      class: 'Reference',
-      of: 'foam.nanos.boot.NSpec',
+      class: 'String',
       name: 'daoKey',
       documentation: 'dao name that the rule is applied on.',
       view: function(_, X) {
         var E = foam.mlang.Expressions.create();
-        return foam.u2.view.ChoiceView.create({
-          dao: X.nSpecDAO
-            .where(E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO'))
-            .orderBy(foam.nanos.boot.NSpec.ID),
-          objToChoice: function(nspec) {
-            return [nspec.id, nspec.id];
-          }
-        });
-      }
+        return {
+          class: 'foam.u2.view.RichChoiceView',
+          sections: [
+            {
+              heading: 'Services',
+              dao: X.nSpecDAO.where(E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO'))
+            }
+          ]
+        };
+      },
     },
     {
       class: 'Enum',
@@ -89,22 +91,12 @@
       class: 'FObjectProperty',
       of: 'foam.nanos.ruler.RuleAction',
       name: 'action',
-      javaFactory: `
-      return new RuleAction() {
-        @Override
-        public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) { /*noop*/ }
-      };`,
       documentation: 'The action to be executed if predicates returns true for passed object.'
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.ruler.RuleAction',
       name: 'asyncAction',
-      javaFactory: `
-      return new RuleAction() {
-        @Override
-        public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) { /*noop*/ }
-      };`,
       documentation: 'The action to be executed asynchronously if predicates returns true for passed object.'
     },
     {
@@ -171,10 +163,16 @@
         }
       ],
       javaCode: `
-        return getEnabled()
-          && getPredicate().f(
-            x.put("NEW", obj).put("OLD", oldObj)
-          );
+        try {
+          return getEnabled()
+            && getPredicate().f(
+              x.put("NEW", obj).put("OLD", oldObj)
+            );
+        } catch ( Throwable t ) {
+          ((Logger) x.get("logger")).error(
+            "Failed to evaluate predicate of rule: " + getId(), t);
+          return false;
+        }
       `
     },
     {
@@ -199,9 +197,30 @@
       ],
       javaCode: `
         getAction().applyAction(x, obj, oldObj, ruler);
-        if ( ! getAfter() ) {
-          ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
+      `
+    },
+    {
+      name: 'applyReverse',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'FObject'
+        },
+        {
+          name: 'oldObj',
+          type: 'FObject'
+        },
+        {
+          name: 'ruler',
+          type: 'foam.nanos.ruler.RuleEngine'
         }
+      ],
+      javaCode: `
+        getAction().applyReverseAction(x, obj, oldObj, ruler);
       `
     },
     {
@@ -230,6 +249,33 @@
           ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }
       `
+    },
+    {
+      name: 'updateRule',
+      type: 'foam.nanos.ruler.Rule',
+      documentation: 'since rules are stored as lists in the RulerDAO we use listeners to update them whenever ruleDAO is updated.' +
+      'the method provides logic for modifying already stored rule. If not overridden, the incoming rule will be stored in the list as it is.',
+      args: [
+        {
+          name: 'rule',
+          type: 'foam.nanos.ruler.Rule'
+        }
+      ],
+      javaCode: `
+      return rule;`
+    }
+  ],
+
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+        public static Rule findById(Collection<Rule> listRule, Long passedId) {
+          return listRule.stream().filter(rule -> passedId.equals(rule.getId())).findFirst().orElse(null);
+      }
+        `);
+      }
     }
   ]
 });

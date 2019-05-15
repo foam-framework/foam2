@@ -131,6 +131,7 @@ foam.CLASS({
       })));
 
       this.
+        addClass(this.myClass()).
         start('span').
           addClass(this.myClass('noselect')).
           start().
@@ -160,7 +161,7 @@ foam.CLASS({
             add(action.label).
             on('click', function(evt) {
               self.overlay_.close();
-              action.maybeCall(self.obj.__subContext__, self.obj);
+              action.maybeCall(self.__subContext__, self.obj);
             }).
             attrs({
               disabled: action.createIsEnabled$(self.obj$).map(function(e) {

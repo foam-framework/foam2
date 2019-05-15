@@ -157,7 +157,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'filterAreaSpec',
-      value: 'div'
+      value: 'DIV'
     },
     {
       class: 'Boolean',

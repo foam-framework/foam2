@@ -65,12 +65,6 @@ foam.CLASS({
           self.throwError.pub();
         });
       }
-    },
-    {
-      name: 'cancel',
-      code: function() {
-        this.finished.pub();
-      }
     }
   ]
 });

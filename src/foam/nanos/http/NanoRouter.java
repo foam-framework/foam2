@@ -51,7 +51,7 @@ public class NanoRouter
 
   @Override
   protected void service(final HttpServletRequest req, final HttpServletResponse resp)
-      throws ServletException, IOException
+    throws ServletException, IOException
   {
     String   path       = req.getRequestURI();
     String[] urlParams  = path.split("/");

@@ -33,85 +33,66 @@ foam.CLASS({
   ],
 
   css: `
-    ^{
-      width: 490px;
+    ^ {
+      width: 448px;
       margin: auto;
     }
-    ^ .sign-in-container{
-      padding-top: 20px;
-      width: 490px;
-      height: 230px;
-      border-radius: 2px;
+    ^ .sign-in-container {
+      padding: 24px 16px;
+      border-radius: 3px;
       background-color: #ffffff;
+      border: 1px solid #e7eaec;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
     }
-    ^ p{
+    ^ p {
       display: inline-block;
     }
-    ^ .full-width-button{
-      width: 90%;
-      height: 40px;
-      border-radius: 2px;
-      border: solid 1px #59a5d5;
-      margin: 0 auto;
-      background-color: #59aadd;
-      text-align: center;
-      line-height: 40px;
-      cursor: pointer;
-      color: #ffffff;
-      margin-top: 10px;
+    ^ input {
+      width: 100%;
+      margin-bottom: 16px;
+      padding: 8px;
+      border-radius: 3px;
+      border: 1px solid #cbcfd4;
+      font-size: 14px;
     }
-    ^ .full-width-input{
-      width: 90%;
-      height: 40px;
-      margin-left: 5%;
-      margin-bottom: 15px;
-      outline: none;
-      padding: 10px;
+    ^ button {
+      margin-top: 8px;
     }
-    ^ .full-width-input-password {
-      /* Required for password input field */
-      width: 90%;
-      height: 40px;
-      margin-left: 5%;
-      margin-bottom: 15px;
-      outline: none;
-      padding: 10px;
-    }
-    ^ .label{
+    ^ .label {
       height: 16px;
       font-family: Roboto;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 300;
       text-align: left;
       color: #093649;
       margin-bottom: 8px;
-      margin-left: 25px;
     }
-    ^ .foam-u2-ActionView-signIn{
-      width: 90%;
-      margin-left: 25px;
-    }
-    ^ .foam-u2-ActionView-signIn > span{
-      position: relative;
-      top: -5px;
-    }
-    ^ .link{
+    ^ .link {
       margin-left: 2px;
-      color: #59a5d5;
+      color: %SECONDARYCOLOR%;
       cursor: pointer;
     }
-    ^ .forgot-link{
+    ^ .forgot-link {
       margin-left: 2px;
-      color: #59a5d5;
+      color: %SECONDARYCOLOR%;
       cursor: pointer;
       float: right;
+    }
+    ^align-left {
+      display: flex;
+      justify-content: flex-end;
+    }
+    ^separate {
+      display: flex;
+      justify-content: space-between;
     }
   `,
 
   properties: [
     {
       class: 'String',
-      name: 'email'
+      name: 'email',
+      view: { class: 'foam.u2.TextField', focused: true }
     },
     {
       class: 'Password',
@@ -130,20 +111,32 @@ foam.CLASS({
         .start('h1').add('Sign In').end()
         .start('form').addClass('sign-in-container')
           .start().addClass('label').add('Email Address').end()
-          .start(this.EMAIL).addClass('full-width-input').end()
+          .add(this.EMAIL)
           .start().addClass('label').add('Password').end()
           .add(this.PASSWORD)
-          .start(this.SIGN_IN).addClass('full-width-button').end()
+          .start()
+            .addClass(this.myClass('align-left'))
+            .add(this.SIGN_IN)
+          .end()
         .end()
         .start('div')
+          .addClass(this.myClass('separate'))
           .callIf(this.signUpEnabled, function() {
-            this.start('p').add('Don\'t have an account?').end()
-            .start('p').style({ 'margin-left': '2px' }).addClass('link')
-              .add('Sign up.')
-              .on('click', self.signUp)
-            .end();
+            this
+              .start()
+                .start('p')
+                  .add('Don\'t have an account?')
+                .end()
+                .start('p')
+                  .style({ 'margin-left': '3px' })
+                  .addClass('link')
+                  .add('Sign up.')
+                  .on('click', self.signUp)
+                .end()
+              .end();
           })
-          .start('p').style({ 'margin-left': '150px' }).addClass('forgot-link')
+          .start('p')
+            .addClass('forgot-link')
             .add('Forgot Password?')
             .on('click', function() {
               self.stack.push({ class: 'foam.nanos.auth.resetPassword.EmailView' })

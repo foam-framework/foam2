@@ -84,10 +84,7 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'code',
-      postSet: function(_, code) {
-        this.expands_ = code.indexOf('^') != -1;
-      }
+      name: 'code'
     },
     {
       name: 'name',
@@ -95,19 +92,22 @@ foam.CLASS({
     },
     {
       name: 'installedDocuments_',
-      factory: function() { return new WeakMap(); },
+      factory: function() { return {}; },
       transient: true
     },
     {
       class: 'Boolean',
       name: 'expands_',
-      documentation: 'True iff the CSS contains a ^ which needs to be expanded.'
+      documentation: 'True iff the CSS contains a ^ which needs to be expanded.',
+      expression: function(code) {
+        return code.includes('^');
+      }
     }
   ],
 
   methods: [
     function asKey(document, cls) {
-      return this.expands_ ? [document, cls.id]: document;
+      return this.expands_ ? document.$UID + "." + cls.id : document.$UID;
     },
 
     function installInClass(cls) {
@@ -134,9 +134,9 @@ foam.CLASS({
         if ( ! lastClassToInstallCSSFor || lastClassToInstallCSSFor == cls ) {
           // Install CSS if not already installed in this document for this cls
           var key = axiom.asKey(X.document, cls);
-          if ( X.document && ! axiom.installedDocuments_.has(key) ) {
+          if ( X.document && ! axiom.installedDocuments_[key] ) {
             X.installCSS(axiom.expandCSS(this, axiom.code), cls.id);
-            axiom.installedDocuments_.set(key, true);
+            axiom.installedDocuments_[key] = true;
           }
         }
 
@@ -1829,8 +1829,7 @@ foam.CLASS({
       }.bind(this));
 
       var index = before ? i : (i + 1);
-      this.childNodes.splice.apply(this.childNodes,
-          [ index, 0 ].concat(children));
+      this.childNodes.splice.apply(this.childNodes, [index, 0].concat(children));
 
       this.state.onInsertChildren.call(
         this,
@@ -2056,10 +2055,9 @@ foam.CLASS({
       class: 'foam.core.ContextMethod',
       name: 'E',
       code: function E(ctx, opt_nodeName) {
-        var nodeName = (opt_nodeName || 'div').toUpperCase();
+        var nodeName = (opt_nodeName || 'DIV').toUpperCase();
 
-        return (
-          ctx.elementForName(nodeName) || foam.u2.Element).
+        return (ctx.elementForName(nodeName) || foam.u2.Element).
           create({nodeName: nodeName}, ctx);
       }
     },
@@ -2155,14 +2153,44 @@ foam.CLASS({
     },
 
     function createVisibilityFor(data$) {
-      if ( this.visibilityExpression ) {
-        return foam.core.ExpressionSlot.create({
+      var Visibility = foam.u2.Visibility;
+
+      var slot = this.visibilityExpression ?
+        foam.core.ExpressionSlot.create({
           obj$: data$,
           code: this.visibilityExpression
+        }) :
+        foam.core.ConstantSlot.create({value: this.visibility});
+
+      if ( this.permissionRequired ) {
+        var visSlot  = slot;
+        var permSlot = data$.map(data => {
+          if ( ! data || ! data.__subContext__.auth ) return Visibility.HIDDEN;
+          var auth = data.__subContext__.auth;
+
+          var propName = this.name.toLowerCase();
+          var clsName  = this.forClass_.substring(this.forClass_.lastIndexOf('.') + 1).toLowerCase();
+
+          return auth.check(null, `${clsName}.rw.${propName}`)
+              .then(function(rw) {
+                if ( rw ) return Visibility.RW;
+                return auth.check(null, `${clsName}.ro.${propName}`)
+                  .then(ro => ro ? Visibility.RO : Visibility.HIDDEN);
+              });
+        });
+
+        slot = foam.core.ArraySlot.create({slots: [visSlot, permSlot]}).map(arr => {
+          var vis  = arr[0];
+          var perm = arr[1] || Visibility.HIDDEN;
+
+          return perm === Visibility.HIDDEN ? perm :
+            vis  === Visibility.HIDDEN ? vis :
+            perm === Visibility.RO ? perm :
+            vis;
         });
       }
 
-      return foam.core.ConstantSlot.create({value: this.visibility});
+      return slot;
     }
   ]
 });
@@ -2420,10 +2448,10 @@ foam.CLASS({
       name: 'data',
       attribute: true
     },
-    {
-      class: 'String',
-      name: 'error_'
-    },
+    // {
+    //   class: 'String',
+    //   name: 'error_'
+    // },
     {
       class: 'Enum',
       of: 'foam.u2.Visibility',
@@ -2467,7 +2495,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.updateMode_(this.mode);
-      this.enableClass('error', this.error_$);
+      // this.enableClass('error', this.error_$);
       this.setAttribute('title', this.error_$);
     },
 
@@ -2478,13 +2506,15 @@ foam.CLASS({
     function fromProperty(p) {
       this.visibility = p.visibility;
 
-      if ( p.validateObj ) {
-        var s = foam.core.ExpressionSlot.create({
-          obj$: this.__context__.data$,
-          code: p.validateObj
-        });
-        this.error_$.follow(s);
-      }
+      this.attr('name', p.name);
+
+      // if ( p.validateObj ) {
+      //   var s = foam.core.ExpressionSlot.create({
+      //     obj$: this.__context__.data$,
+      //     code: p.validateObj
+      //   });
+      //   this.error_$.follow(s);
+      // }
     }
   ]
 });

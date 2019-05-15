@@ -24,7 +24,6 @@ foam.CLASS({
     'as data'
   ],
 
-  // TODO: CSS classname shouldn't be .net-nanopay-ui-ActionView, fix.
   css: `
     ^ {
       background-color: white;
@@ -41,9 +40,10 @@ foam.CLASS({
       width: 100%;
     }
 
-    ^ input:not([type="checkbox"]):focus, ^ select:focus {
+    ^ input:not([type="checkbox"]):focus,
+    ^ select:focus {
       outline: none;
-      border: 1px solid #59a5d5;
+      border: 1px solid %SECONDARYCOLOR%;
     }
 
     ^ .general-query {
@@ -56,21 +56,7 @@ foam.CLASS({
       margin: 20px 20px 0 20px;
     }
 
-    ^ .net-nanopay-ui-ActionView-clear {
-      // background-color: rgba(164, 179, 184, 0.1);
-      border: solid 1px rgba(164, 179, 184, 0.5);
-      border-radius: 2px;
-      color: #093649;
-      font-family: Roboto;
-      font-size: 14px;
-      font-stretch: normal;
-      font-style: normal;
-      font-weight: normal;
-      height: 30px;
-      letter-spacing: 0.2px;
-      text-align: center;
-      width: 60px;
-      height: 32px;
+    ^ .foam-u2-ActionView-clear {
       margin: 20px;
     }
   `,
@@ -147,7 +133,11 @@ foam.CLASS({
               {
                 richSearch: true,
                 of: self.dao.of.id,
-                onKey: true
+                onKey: true,
+                viewSpec: {
+                  class: 'foam.u2.tag.Input',
+                  focused: true
+                }
               },
               this,
               this.__subSubContext__);
@@ -189,7 +179,7 @@ foam.CLASS({
           .entity('nbsp')
           .add('selected')
         .end()
-        .tag(this.CLEAR);
+        .tag(this.CLEAR, { buttonStyle: 'SECONDARY' });
     },
 
     function addFilter(key) {

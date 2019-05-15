@@ -106,10 +106,26 @@ foam.CLASS({
     ^ .search input {
       width: 100%;
       border: none;
+      border-bottom: 1px solid #f4f4f9;
     }
 
     ^ .search input:focus {
       border: none;
+    }
+
+    ^ .search img {
+      width: 15px;
+      position: absolute;
+      left: 10px;
+      top: 13px;
+    }
+
+    ^ .search {
+      border-bottom: 1px solid #f4f4f9;
+    }
+
+    ^ .property-filter_ {
+      padding-left: 25px;
     }
 
     ^ .disabled {
@@ -122,6 +138,11 @@ foam.CLASS({
   `,
 
   properties: [
+    {
+      class: 'String',
+      name: 'name',
+      factory: function() { return "select"; }
+    },
     {
       class: 'foam.u2.ViewSpec',
       name: 'rowView',
@@ -207,6 +228,12 @@ foam.CLASS({
       }
     },
     {
+      class: 'String',
+      name: 'searchPlaceholder',
+      documentation: 'Replaces search box placeholder with passed in string.',
+      value: 'Search...'
+    },
+    {
       type: 'Action',
       name: 'action',
       documentation: `
@@ -237,6 +264,7 @@ foam.CLASS({
       }
 
       this
+        .attrs({ name: this.name })
         .addClass(this.myClass())
         .start()
           .addClass(this.myClass('selection-view'))
@@ -266,11 +294,14 @@ foam.CLASS({
             if ( ! searchEnabled ) return null;
             return this.E()
               .start()
+                .start('img')
+                  .attrs({ src: 'images/ic-search.svg' })
+                .end()
                 .startContext({ data: self })
                   .addClass('search')
                   .add(self.FILTER_.clone().copyFrom({ view: {
                     class: 'foam.u2.view.TextField',
-                    placeholder: 'Search...',
+                    placeholder: this.searchPlaceholder,
                     onKey: true
                   } }))
                 .endContext()
@@ -286,7 +317,7 @@ foam.CLASS({
               var index = 0;
               return this.E().forEach(sections, function(section) {
                 this
-                  .start().hide(!! section.hideIfEmpty && resp[index].value <= 0)
+                  .start().hide(!! section.hideIfEmpty && resp[index].value <= 0 || ! section.heading)
                     .addClass(self.myClass('heading'))
                     .add(section.heading)
                   .end()
@@ -298,7 +329,7 @@ foam.CLASS({
                           .callIf(! section.disabled, function() {
                             this.on('click', () => {
                               self.fullObject_ = obj;
-                              self.data = obj;
+                              self.data = obj.id;
                               self.isOpen_ = false;
                             });
                           })
@@ -419,13 +450,14 @@ foam.CLASS({
     },
     {
       name: 'DefaultActionView',
-      extends: 'foam.u2.UnstyledActionView',
+      extends: 'foam.u2.ActionView',
 
       documentation: `
         This is the view that gets rendered at the bottom of the dropdown if an
         action is provided.
       `,
 
+      inheritCSS: false,
       css: `
         ^ {
           border: 0;

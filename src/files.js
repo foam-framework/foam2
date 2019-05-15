@@ -181,6 +181,7 @@ FOAM_FILES([
   { name: 'foam/u2/view/SearchViewWrapper', flags: ['web'] },
   { name: 'foam/u2/view/StringArrayRowView', flags: ['web'] },
   { name: 'foam/u2/borders/NullBorder', flags: ['web'] },
+  { name: 'foam/u2/borders/CardBorder', flags: ['web'] },
   { name: "foam/version/VersionTrait" },
   { name: "foam/version/VersionedClass" },
   { name: "foam/version/VersionedClassFactory" },
@@ -376,7 +377,8 @@ FOAM_FILES([
   { name: "foam/u2/TableView", flags: ['web'] },
   { name: "foam/u2/TableSelection", flags: ['web'] },
   { name: "foam/u2/Scroller", flags: ['web'] },
-  { name: "foam/u2/UnstyledActionView", flags: ['web'] },
+  { name: "foam/u2/ButtonSize", flags: ['web'] },
+  { name: "foam/u2/ButtonStyle", flags: ['web'] },
   { name: "foam/u2/ActionView", flags: ['web'] },
   { name: "foam/u2/DetailPropertyView", flags: ['web'] },
   { name: "foam/u2/DetailView", flags: ['web'] },
@@ -546,6 +548,9 @@ FOAM_FILES([
   { name: "foam/crypto/sign/Signer" },
   { name: "foam/crypto/sign/Signable" },
   { name: "foam/crypto/sign/SignableTest" },
+  { name: "foam/test/AllProperties" },
+  { name: "foam/test/AllSerializableProperties" },
+  { name: "foam/test/TestEnum" },
   { name: "foam/test/TestObj" },
   { name: "foam/core/FObjectTest" },
   { name: "com/google/foam/demos/bubbles/Bubbles" },
@@ -556,6 +561,7 @@ FOAM_FILES([
 
   { name: "org/chartjs/Lib" },
   { name: "org/chartjs/AbstractChartCView" },
+  { name: "org/chartjs/CandlestickDAOChartView" },
   { name: "org/chartjs/Pie" },
   { name: "org/chartjs/Bar" },
   { name: "org/chartjs/Line" },
@@ -591,4 +597,15 @@ FOAM_FILES([
   { name: "foam/u2/view/date/DateTimePicker"},
   { name: "foam/u2/view/date/Month"},
   { name: "foam/u2/view/date/Weekday"},
+
+  { name: "foam/u2/layout/Layouts"},
+
+  { name: "foam/layout/Section" },
+  { name: "foam/layout/SectionAxiom" },
+  
+  { name: "foam/u2/detail/AbstractSectionedDetailView" },
+  { name: "foam/u2/detail/SectionView" },
+  { name: "foam/u2/detail/SectionedDetailView" },
+  { name: "foam/u2/detail/WizardSectionsView" },
+  { name: "foam/u2/detail/SectionedDetailPropertyView" }
 ]);
