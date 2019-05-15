@@ -14,7 +14,7 @@ foam.CLASS({
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.layout.Item',
-    'foam.u2.borders.CardBorder',
+    'foam.u2.borders.CardBorder'
   ],
 
   css: `
