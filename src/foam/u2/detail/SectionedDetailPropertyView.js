@@ -33,6 +33,9 @@ foam.CLASS({
       width: 16px;
       height: 16px;
     }
+
+    // FIXME: the errors are coming out weird
+
     ^error .foam-u2-TextField {
       background-color: #fbedec;
       border: solid 1px #d9170e;
