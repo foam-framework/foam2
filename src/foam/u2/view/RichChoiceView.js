@@ -285,7 +285,7 @@ foam.CLASS({
               return this.E().tag(self.selectionView, {
                 data: data,
                 fullObject$: this.fullObject_$,
-                defaultSelectionPrompt: this.choosePlaceholder
+                defaultSelectionPrompt$: this.choosePlaceholder$
               });
             }))
           .end()
@@ -456,7 +456,9 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          return this.add(this.fullObject && this.fullObject.toSummary() || this.defaultSelectionPrompt);
+          return this.add(this.fullObject$.map(o => {
+            return o ? o.toSummary() : this.defaultSelectionPrompt;
+          }));
         }
       ]
     },
