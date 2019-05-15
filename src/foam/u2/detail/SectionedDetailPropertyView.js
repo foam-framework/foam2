@@ -256,7 +256,7 @@ foam.CLASS({
           }
         ))
         .addClass(this.myClass())
-        .start(self.Rows, { defaultChildConfig: { padding: '8px 0'} })
+        .start(self.Rows, { defaultChildStyle: { padding: '8px 0'} })
           .add(this.slot(function(data, prop) {
 
             var errorSlot = prop.validateObj ?
