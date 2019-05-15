@@ -14,7 +14,7 @@ foam.CLASS({
   `,
 
   css: `
-    ^card-label {
+    ^ m3 {
       font-size: 16px;
       font-weight: bold;
     }
@@ -25,10 +25,6 @@ foam.CLASS({
     ^helper-icon {
       width: 20px;
       height: 20px;
-    }
-
-    ^prop-slot {
-      flex-grow: 1
     }
 
     ^error-icon {
@@ -194,9 +190,9 @@ foam.CLASS({
   `,
 
   requires: [
-    'foam.u2.layout.Rows',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Item',
+    'foam.u2.layout.Rows'
   ],
 
   properties: [
@@ -209,10 +205,7 @@ foam.CLASS({
       this.SUPER();
       this
         .show(this.prop.createVisibilityFor(this.data$)
-          .map(function(m) { 
-            return m != foam.u2.Visibility.HIDDEN; 
-          }
-        ))
+          .map(m => m != foam.u2.Visibility.HIDDEN))
         .addClass(this.myClass())
         .start(self.Rows, { defaultChildConfig: { padding: '8px 0'} })
           .add(this.slot(function(data, prop) {
@@ -221,23 +214,39 @@ foam.CLASS({
               data.slot(prop.validateObj) :
               foam.core.ConstantSlot.create({ value: null });
 
-            // TODO: Conditionally render if the input is a checkbox or a radio
-
             return self.E()
               .start(self.Rows, { defaultChildStyle:  { 'line-height': '2' } })
-                .start().add(prop.label$).addClass(this.myClass('card-label')).end()
-                .start(self.Cols, { defaultChildStyle: { margin: '0 16px 0 0', 'justify-content': 'flex-start' }})
-                  .start(self.Item).addClass(this.myClass('prop-slot')).add(prop).enableClass(this.myClass('error'), errorSlot).end()
+                .start('m3').add(prop.label$).end()
+                .start(self.Cols, { defaultChildStyle: {
+                  'margin': '0 16px 0 0',
+                  'justify-content': 'flex-start'
+                }})
+                  .start(self.Item)
+                    .style({'flex-grow': 1})
+                    .add(prop)
+                    .enableClass(this.myClass('error'), errorSlot)
+                  .end()
                   .callIf(prop.help, function() { 
-                    this.start({class: 'foam.u2.tag.Image', data: 'images/question-icon.svg'})
+                    this.start({
+                      class: 'foam.u2.tag.Image',
+                      data: 'images/question-icon.svg'
+                    })
                       .addClass(this.myClass('helper-icon'))
                       .attrs({ title: prop.help })
                     .end();
                   })
                 .end()
-                .start(self.Cols, { defaultChildStyle: { 'justify-content': 'flex-start', 'align-items': 'center', margin: '0 8px 0 0' } }
-                ).addClass(this.myClass('validation-container')).show(errorSlot)
-                  .start({class: 'foam.u2.tag.Image', data: 'images/inline-error-icon.svg'})
+                .start(self.Cols, { defaultChildStyle: {
+                  'justify-content': 'flex-start',
+                  'align-items': 'center',
+                  'margin': '0 8px 0 0'
+                }})
+                  .addClass(this.myClass('validation-container'))
+                  .show(errorSlot)
+                  .start({
+                    class: 'foam.u2.tag.Image',
+                    data: 'images/inline-error-icon.svg'
+                  })
                     .addClass(this.myClass('error-icon'))
                   .end()
                   .add(errorSlot.map((s) => {
