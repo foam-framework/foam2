@@ -26,6 +26,11 @@ foam.CLASS({
       width: 20px;
       height: 20px;
     }
+
+    ^prop-slot {
+      flex-grow: 1
+    }
+
     ^error-icon {
       width: 16px;
       height: 16px;
@@ -190,9 +195,8 @@ foam.CLASS({
 
   requires: [
     'foam.u2.layout.Rows',
-    'foam.u2.layout.Row',
     'foam.u2.layout.Cols',
-    'foam.u2.layout.Col'
+    'foam.u2.layout.Item',
   ],
 
   properties: [
@@ -217,11 +221,13 @@ foam.CLASS({
               data.slot(prop.validateObj) :
               foam.core.ConstantSlot.create({ value: null });
 
+            // TODO: Conditionally render if the input is a checkbox or a radio
+
             return self.E()
-              .start(self.Rows, { defaultChildConfig:  { lineHeight: '2' } })
+              .start(self.Rows, { defaultChildStyle:  { 'line-height': '2' } })
                 .start().add(prop.label$).addClass(this.myClass('card-label')).end()
-                .start(self.Cols, { contentJustification: foam.u2.layout.ContentJustification.START, defaultChildConfig: { margin: '0 16px 0 0' } })
-                  .start(self.Col, { flex: 1 }).add(prop).enableClass(this.myClass('error'), errorSlot).end()
+                .start(self.Cols, { defaultChildStyle: { margin: '0 16px 0 0', 'justify-content': 'flex-start' }})
+                  .start(self.Item).addClass(this.myClass('prop-slot')).add(prop).enableClass(this.myClass('error'), errorSlot).end()
                   .callIf(prop.help, function() { 
                     this.start({class: 'foam.u2.tag.Image', data: 'images/question-icon.svg'})
                       .addClass(this.myClass('helper-icon'))
@@ -229,10 +235,8 @@ foam.CLASS({
                     .end();
                   })
                 .end()
-                .start(self.Cols, { 
-                  contentJustification: foam.u2.layout.ContentJustification.START, 
-                  itemAlignment: foam.u2.layout.ItemAlignment.CENTER, defaultChildConfig: { margin: '0 8px 0 0' }
-                }).addClass(this.myClass('validation-container')).show(errorSlot)
+                .start(self.Cols, { defaultChildStyle: { 'justify-content': 'flex-start', 'align-items': 'center', margin: '0 8px 0 0' } }
+                ).addClass(this.myClass('validation-container')).show(errorSlot)
                   .start({class: 'foam.u2.tag.Image', data: 'images/inline-error-icon.svg'})
                     .addClass(this.myClass('error-icon'))
                   .end()
