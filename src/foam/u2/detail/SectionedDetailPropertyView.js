@@ -140,6 +140,10 @@ foam.CLASS({
       font-size: 14px;
     }
 
+    ^ .foam-u2-view-RichChoiceView-container {
+      z-index: 1000;
+    }
+
     ^ .DefaultRowView-row {
       background: white;
       padding: 8px 16px;
