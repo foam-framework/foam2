@@ -18,10 +18,12 @@ foam.CLASS({
       font-size: 16px;
       font-weight: bold;
     }
+
     ^validation-container {
       margin-top: 4px;
       color: #d9170e;
     }
+
     ^helper-icon {
       width: 20px;
       height: 20px;
@@ -57,10 +59,6 @@ foam.CLASS({
       For the following inputs below, we are planning 
       encode these changes in the actual foam files
     */
-
-    ^ .foam-u2-view-RadioView label {
-      margin-left: 12px;
-    }
 
     ^ .foam-u2-TextField {
       width: 100%;
@@ -187,6 +185,50 @@ foam.CLASS({
     ^ .foam-u2-CheckBox:checked:after {
       content: url(data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2048%2048%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2215%22%20height%3D%2215%22%20version%3D%221.1%22%3E%0A%20%20%20%3Cpath%20fill%3D%22white%22%20stroke-width%3D%223%22%20d%3D%22M18%2032.34L9.66%2024l-2.83%202.83L18%2038l24-24-2.83-2.83z%22/%3E%0A%3C/svg%3E);
     }
+
+    ^ input[type="radio" i] {
+      -webkit-appearance: none;
+      border-radius: 8px;
+      background-color: #ffffff;
+      border: solid 1px #8e9090;
+      box-sizing: border-box;
+      display: inline-block;
+      fill: rgba(0, 0, 0, 0);
+
+      vertical-align: middle;
+
+      height: 16px;
+      width: 16px;
+
+      opacity: 1;
+
+      transition: background-color 140ms, border-color 140ms;
+    }
+
+    ^ input[type="radio" i]:checked {
+      background-color: #604aff;
+    }
+
+    ^ input[type="radio" i]:checked:after {
+      content: url('images/active-radio.svg');
+    }
+
+    ^ .foam-u2-view-RadioView .foam-u2-view-RadioView:active {
+      border: solid 1px #604aff !important;
+    }
+
+    ^ .foam-u2-view-RadioView .foam-u2-view-RadioView {
+      padding: 16px 10px;
+      border-radius: 4px;
+      box-shadow: 0 1px 0 0 rgba(22, 29, 37, 0.05);
+      border: solid 1px #8e9090;
+      width: 330px;
+    }
+
+
+    ^ .foam-u2-view-RadioView label {
+      margin-left: 12px;
+    }
   `,
 
   requires: [
@@ -207,7 +249,7 @@ foam.CLASS({
         .show(this.prop.createVisibilityFor(this.data$)
           .map(m => m != foam.u2.Visibility.HIDDEN))
         .addClass(this.myClass())
-        .start(self.Rows, { defaultChildConfig: { padding: '8px 0'} })
+        .start(self.Rows, { defaultChildStyle: { padding: '8px 0'} })
           .add(this.slot(function(data, prop) {
 
             var errorSlot = prop.validateObj ?
