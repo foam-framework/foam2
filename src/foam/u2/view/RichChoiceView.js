@@ -257,11 +257,8 @@ foam.CLASS({
       // Custom views might need the full object to render though, not just the
       // id, so we do a lookup here for the full object here. This then gets
       // passed to the selectionView to use it if it wants to.
-      if ( this.data ) {
-        this.sections[0].dao.find(this.data).then((result) => {
-          this.fullObject_ = result;
-        });
-      }
+      this.onDetach(this.data$.sub(this.onDataUpdate));
+      this.onDataUpdate();
 
       this
         .attrs({ name: this.name })
@@ -354,6 +351,19 @@ foam.CLASS({
     function updateMode_(mode) {
       if ( mode !== foam.u2.DisplayMode.RW ) {
         this.isOpen_ = false;
+      }
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'onDataUpdate',
+      code: function() {
+        if ( this.data ) {
+          this.sections[0].dao.find(this.data).then((result) => {
+            this.fullObject_ = result;
+          });
+        }
       }
     }
   ],
