@@ -2295,7 +2295,19 @@ foam.CLASS({
   refines: 'foam.core.Boolean',
   requires: [ 'foam.u2.CheckBox' ],
   properties: [
-    [ 'view', { class: 'foam.u2.CheckBox' } ],
+    {
+      name: 'view',
+      expression: function(label2) {
+        return {
+          class: 'foam.u2.CheckBox',
+          label: label2
+        };
+      }
+    },
+    {
+      class: 'String',
+      name: 'label2'
+    }
   ]
 });
 
