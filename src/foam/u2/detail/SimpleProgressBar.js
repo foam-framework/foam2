@@ -38,6 +38,8 @@ foam.CLASS({
       class: 'Int',
       name: 'percentage',
       expression: function(current, max) {
+        if ( current > max ) return 100;
+        if ( current < 0 ) return 0;
         return Math.floor(( current / max ) * 100);
       }
     }
