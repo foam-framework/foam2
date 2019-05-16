@@ -90,30 +90,27 @@ public class Storage {
     return new java.io.File(root_, name).getAbsoluteFile();
   }
 
-  public Map<String, InputStream> getDirectoryAsStream(String name) {
-    Map<String, InputStream> iStreamMap = new HashMap<>();
+  public DirectoryStream<Path> getDirectoryAsStream(String name) {
+    return getDirectoryStream(name, "");
+  }
 
+  public DirectoryStream<Path> getDirectoryStream(String name, String glob) {
     Path path = getPath(name);
     if ( path == null ) return null;
 
     DirectoryStream<Path> contents;
 
     try {
-      contents = java.nio.file.Files.newDirectoryStream(path);
+      if ( ! SafetyUtil.isEmpty(glob) ) {
+        contents = java.nio.file.Files.newDirectoryStream(path);
+      } else {
+        contents = java.nio.file.Files.newDirectoryStream(path, glob);
+      }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
 
-    for ( Path p : contents ) {
-      try {
-        String pname = getFS().getPath(resourceDir_, name, p.getName(p.getNameCount()-1).toString()).toString();
-        iStreamMap.put(pname, Files.newInputStream(p));
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-
-    return iStreamMap;
+    return contents;
   }
 
   public OutputStream getResourceOutputStream(String name) {
