@@ -30,6 +30,53 @@ foam.CLASS({
       margin-top 4px;
     }
 
+    ^tooltip {
+      display: inline-flex;
+      overflow:overlay;
+      direction: rtl;
+      float: right;
+      width: 20px;
+      height: 20px;
+    }
+
+    ^tooltip-container {
+      z-index: -1;
+      display: none;
+      width: 80%;
+      height: auto;
+      line-height: 1.5;
+      margin-right: 3px;
+    }
+
+    ^helper-text {
+      background-color: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      border-radius: 5px;
+      border-top-right-radius: 0px;
+      direction: ltr;
+      padding: 2px;
+      text-align: center;
+    }
+
+    ^arrow-right {
+      width: 0; 
+      height: 0; 
+      border-top: 10px solid transparent;
+      border-bottom: 10px solid transparent; 
+      border-left:10px solid rgba(0, 0, 0, 0.8); 
+    }
+
+    ^tooltip:hover {
+      position: absolute;
+      width: 100%;
+      height: auto;
+    }
+    
+    ^tooltip:hover .foam-u2-detail-SectionedDetailPropertyView-tooltip-container{
+      display: inline-flex;
+      z-index: 10;
+    }
+    
     ^error-icon {
       width: 16px;
       height: 16px;
@@ -260,7 +307,6 @@ foam.CLASS({
         .addClass(this.myClass())
         .start(self.Rows, { defaultChildStyle: { padding: '8px 0' } })
           .add(this.slot(function(data, prop) {
-
             var errorSlot = prop.validateObj ?
               data.slot(prop.validateObj) :
               foam.core.ConstantSlot.create({ value: null });
@@ -268,29 +314,44 @@ foam.CLASS({
             return self.E()
               .start(self.Rows, { defaultChildStyle:  { 'line-height': '2' } })
                 .start('m3').add(prop.label$).end()
-                .start(self.Cols, { defaultChildStyle: {
-                  'margin': '0 16px 0 0',
-                  'justify-content': 'flex-start'
-                }})
+                .start()
+                  .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                   .start(self.Item)
                     .style({'flex-grow': 1})
                     .add(prop)
                     .enableClass(this.myClass('error'), errorSlot)
                   .end()
                   .callIf(prop.help, function() { 
-                    this.start({
-                      class: 'foam.u2.tag.Image',
-                      data: 'images/question-icon.svg'
-                    })
-                      .addClass(this.myClass('helper-icon'))
-                      .attrs({ title: prop.help })
-                    .end();
+                    this.start()
+                      .addClass(self.myClass('tooltip'))
+                      .start({
+                        class: 'foam.u2.tag.Image',
+                        data: 'images/question-icon.svg'
+                      })
+                        .addClass(self.myClass('helper-icon'))
+                        .attrs({ title: prop.help })
+                      .end()
+
+                      .start()
+                        .addClass(self.myClass('tooltip-container'))
+                        .start()
+                          .addClass(self.myClass('arrow-right'))
+                        .end()
+                        .start()
+                          .addClass(self.myClass('helper-text'))
+                          .start('p').style({ 'padding': '3px' })
+                            .add(prop.help)
+                          .end()
+                        .end()
+                      .end()
+                    .end()
                   })
                 .end()
                 .start(this.Item).style({'align-items': 'center'})
                   .start(self.Cols, { defaultChildStyle: {
                     'justify-content': 'flex-start',
                     'margin': '0 8px 0 0',
+                    'position': 'absolute'
                   }})
                     .addClass(this.myClass('validation-container'))
                     .show(errorSlot)
@@ -300,7 +361,8 @@ foam.CLASS({
                     })
                       .addClass(this.myClass('error-icon'))
                     .end()
-                    .start(this.Item).style({ 'flex-grow': 1 })
+                    .start(this.Item)
+                    .style({ 'flex-grow': 1 })
                       .add(errorSlot.map((s) => {
                         return self.E().add(s);
                       }))
