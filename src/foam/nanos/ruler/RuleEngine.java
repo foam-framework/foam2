@@ -6,16 +6,14 @@
 
 package foam.nanos.ruler;
 
-import foam.core.ContextAgent;
-import foam.core.ContextAwareSupport;
-import foam.core.FObject;
-import foam.core.X;
+import foam.core.*;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.dao.Sink;
 import foam.mlang.sink.GroupBy;
 import foam.nanos.pool.FixedThreadPool;
 
+import java.lang.Exception;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -54,18 +52,31 @@ public class RuleEngine extends ContextAwareSupport {
    * @param oldObj - Old FObject supplied to rules for execution
    */
   public void execute(List<Rule> rules, FObject obj, FObject oldObj) {
-    applyRules(rules, obj, oldObj);
+    CompoundContextAgent agent = new CompoundContextAgent();
+    for (Rule rule : rules) {
+      if ( stops_.get() ) return;
+      applyRule(rule, obj, oldObj, agent);
+    }
+    agent.execute(x_);
+
     asyncApplyRules(rules, obj, oldObj);
   }
 
-  public void probe(List<Rule> rules, RulerProbe rulerProbe, FObject oldObj) {
-      for (Rule rule : rules) {
-        if ( rule.f(x_, (FObject) rulerProbe.getObject(), oldObj) ) {
-          if ( rule.getAction().canExecute(x_, (FObject) rulerProbe.getObject(), oldObj, this) ) {
-
-          }
-        }
+  public void probe(List<Rule> rules, RulerProbe rulerProbe, FObject obj, FObject oldObj) {
+    for (Rule rule : rules) {
+      RuleAgency ruleAgent = new RuleAgency(rule);
+      if ( stops_.get() ) {
+        //rulerProbe.add(new ProbeModel(ruleId, "not executed because was overridden", false));
+        continue;
       }
+      try {
+        applyRule(rule, obj, oldObj, ruleAgent);
+        //rulerProbe.add(new ProbeModel(ruleId, ruleAgent.toString(), true));
+      } catch (Exception e ) {
+        //rulerProbe.add(new ProbeModel(ruleId, e.getMessage(), false));
+      }
+    }
+    asyncApplyRules(rules, obj, oldObj);
   }
 
   /**
@@ -87,9 +98,7 @@ public class RuleEngine extends ContextAwareSupport {
     return results_.get(ruleId);
   }
 
-  private void applyRules(List<Rule> rules, FObject obj, FObject oldObj) {
-    for (Rule rule : rules) {
-      if ( stops_.get() ) return;
+  private void applyRule(Rule rule, FObject obj, FObject oldObj, ContextAgent agent) {
 
       currentRule_ = rule;
       if ( rule.getAction() != null
@@ -98,7 +107,6 @@ public class RuleEngine extends ContextAwareSupport {
         rule.apply(getX(), obj, oldObj, this);
         saveHistory(rule, obj);
       }
-    }
   }
 
   private void asyncApplyRules(List<Rule> rules, FObject obj, FObject oldObj) {

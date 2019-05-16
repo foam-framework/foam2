@@ -230,7 +230,7 @@ FObject oldObj = getDelegate().find_(x, probe.getObject());
 groups = (GroupBy)rulesList.get(predicate);
 for ( Object key : groups.getGroupKeys() ) {
   List<Rule> rules = ((ArraySink)(groups.getGroups().get(key))).getArray();
-  engine.probe(rules, probe, oldObj);
+  engine.probe(rules, probe, (FObject)probe.getObject(), oldObj);
 }`
     },
     {
