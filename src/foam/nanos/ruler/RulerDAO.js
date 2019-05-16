@@ -188,6 +188,16 @@ foam.CLASS({
       javaCode: `
         DAO ruleDAO = ((DAO) x.get("ruleDAO")).where(
           EQ(Rule.DAO_KEY, getDaoKey())
+        );
+        ruleDAO.listen(
+          new UpdateRulesListSink.Builder(x)
+            .setDao(this)
+            .build()
+          , null
+        );
+
+        ruleDAO = ruleDAO.where(
+          EQ(Rule.ENABLED, true)
         ).orderBy(new Desc(Rule.PRIORITY));
         addRuleList(ruleDAO, getCreateBefore());
         addRuleList(ruleDAO, getUpdateBefore());
@@ -195,13 +205,6 @@ foam.CLASS({
         addRuleList(ruleDAO, getCreateAfter());
         addRuleList(ruleDAO, getUpdateAfter());
         addRuleList(ruleDAO, getRemoveAfter());
-
-        ruleDAO.listen(
-          new UpdateRulesListSink.Builder(x)
-            .setDao(this)
-            .build()
-          , null
-        );
       `
     },
     {
