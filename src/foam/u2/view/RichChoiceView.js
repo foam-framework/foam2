@@ -139,6 +139,11 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
+      name: 'name',
+      factory: function() { return "select"; }
+    },
+    {
       class: 'foam.u2.ViewSpec',
       name: 'rowView',
       documentation: `
@@ -229,6 +234,11 @@ foam.CLASS({
       value: 'Search...'
     },
     {
+      class: 'String',
+      name: 'choosePlaceholder',
+      documentation: 'Replaces choose from placeholder with passed in string.'
+    },
+    {
       type: 'Action',
       name: 'action',
       documentation: `
@@ -252,13 +262,11 @@ foam.CLASS({
       // Custom views might need the full object to render though, not just the
       // id, so we do a lookup here for the full object here. This then gets
       // passed to the selectionView to use it if it wants to.
-      if ( this.data ) {
-        this.sections[0].dao.find(this.data).then((result) => {
-          this.fullObject_ = result;
-        });
-      }
+      this.onDetach(this.data$.sub(this.onDataUpdate));
+      this.onDataUpdate();
 
       this
+        .attrs({ name: this.name })
         .addClass(this.myClass())
         .start()
           .addClass(this.myClass('selection-view'))
@@ -273,7 +281,8 @@ foam.CLASS({
             .add(this.slot((data) => {
               return this.E().tag(self.selectionView, {
                 data: data,
-                fullObject$: this.fullObject_$
+                fullObject$: this.fullObject_$,
+                defaultSelectionPrompt$: this.choosePlaceholder$
               });
             }))
           .end()
@@ -352,6 +361,19 @@ foam.CLASS({
     }
   ],
 
+  listeners: [
+    {
+      name: 'onDataUpdate',
+      code: function() {
+        if ( this.data ) {
+          this.sections[0].dao.find(this.data).then((result) => {
+            this.fullObject_ = result;
+          });
+        }
+      }
+    }
+  ],
+
   classes: [
     {
       name: 'DefaultRowView',
@@ -386,7 +408,7 @@ foam.CLASS({
           return this
             .start()
               .addClass(this.myClass('row'))
-              .add(this.data.id)
+              .add(this.data.toSummary())
             .end();
         }
       ]
@@ -422,7 +444,14 @@ foam.CLASS({
       properties: [
         {
           name: 'data',
-          documentation: 'The id of the selected object.'
+          documentation: 'The id of the selected object.',
+        },
+        {
+          name: 'defaultSelectionPrompt',
+          expression: function(of) {
+            var plural = of.model_.plural.toLowerCase();
+            return this.CHOOSE_FROM + plural;
+          }
         },
         {
           name: 'fullObject',
@@ -437,8 +466,9 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          var plural = this.of.model_.plural.toLowerCase();
-          return this.add(this.data || this.CHOOSE_FROM + plural);
+          return this.add(this.fullObject$.map(o => {
+            return o ? o.toSummary() : this.defaultSelectionPrompt;
+          }));
         }
       ]
     },

@@ -336,6 +336,7 @@ var classes = [
   'foam.nanos.ruler.ScriptPredicate',
   'foam.nanos.ruler.RuleHistory',
   'foam.nanos.ruler.RuleHistoryStatus',
+  'foam.nanos.ruler.UpdateRulesListSink',
   'foam.comics.SearchMode',
 
   // Support Files
@@ -355,7 +356,14 @@ var classes = [
   'foam.test.TestEnum',
   'foam.test.AllSerializableProperties',
   'foam.nanos.test.EchoService',
-  'foam.nanos.test.SerializationTestEchoService'
+  'foam.nanos.test.SerializationTestEchoService',
+
+  // Ace Editor
+  'io.c9.ace.Config',
+  'io.c9.ace.Editor',
+  'io.c9.ace.KeyBinding',
+  'io.c9.ace.Mode',
+  'io.c9.ace.Theme'
 ];
 
 var abstractClasses = [
