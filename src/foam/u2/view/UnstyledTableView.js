@@ -209,7 +209,7 @@ foam.CLASS({
               });
           })).
         end().
-        add(this.rowsFrom(this.data));
+        add(this.rowsFrom(this.data$proxy));
     },
     {
       name: 'rowsFrom',
