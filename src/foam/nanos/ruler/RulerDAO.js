@@ -187,10 +187,7 @@ foam.CLASS({
       ],
       javaCode: `
         DAO ruleDAO = ((DAO) x.get("ruleDAO")).where(
-          AND(
-            EQ(Rule.ENABLED, true),
-            EQ(Rule.DAO_KEY, getDaoKey())
-          )
+          EQ(Rule.DAO_KEY, getDaoKey())
         ).orderBy(new Desc(Rule.PRIORITY));
         addRuleList(ruleDAO, getCreateBefore());
         addRuleList(ruleDAO, getUpdateBefore());
