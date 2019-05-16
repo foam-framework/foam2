@@ -27,6 +27,7 @@ foam.CLASS({
     ^helper-icon {
       width: 20px;
       height: 20px;
+      margin-top 4px;
     }
 
     ^error-icon {
@@ -226,16 +227,11 @@ foam.CLASS({
       content: url('images/active-radio.svg');
     }
 
-    ^ .foam-u2-view-RadioView .foam-u2-view-RadioView:active {
-      border: solid 1px #604aff !important;
-    }
-
     ^ .foam-u2-view-RadioView .foam-u2-view-RadioView {
-      padding: 16px 10px;
-      border-radius: 4px;
-      box-shadow: 0 1px 0 0 rgba(22, 29, 37, 0.05);
-      border: solid 1px #8e9090;
-      width: 330px;
+      margin-bottom:16px;
+      display: flex;
+      align-items: center;
+      font-size: 16px;
     }
 
 
