@@ -96,7 +96,10 @@ foam.CLASS({
         .start(self.Rows)
           .add(self.slot(function(sections, currentIndex) {
             return self.E()
-              .tag(self.sectionView, { data: sections[currentIndex] });
+              .tag(self.sectionView, {
+                section: sections[currentIndex],
+                data$: self.data$
+              });
           }))
           .startContext({ data: this })
             .start(self.Cols)
