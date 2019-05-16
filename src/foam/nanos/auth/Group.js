@@ -211,39 +211,39 @@ foam.CLASS({
         }
       ],
       javaCode: `
-AppConfig config = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
+        AppConfig config = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
+        String configUrl = "";
 
-String configUrl = config.getUrl();
+        // FIND URL
+        Group group = (Group) x.get("group");
+        if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
+          configUrl = group.getUrl();
+        } else {
+          // populate AppConfig url with request's RootUrl
+          HttpServletRequest req = x.get(HttpServletRequest.class);
+          if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
+            configUrl = ((Request) req).getRootURL().toString();
+          }
+        }
+        // FORCE HTTPS IN URL?
+        if ( config.getForceHttps() ) {
+          if ( ! configUrl.startsWith("https://") ) {
+            if ( configUrl.startsWith("http://") ) {
+              configUrl = "https" + configUrl.substring(4);
+            } else {
+              configUrl = "https://" + configUrl;
+            }
+          }
+        }
+        // SET URL
+        config.setUrl(configUrl);
 
-HttpServletRequest req = x.get(HttpServletRequest.class);
-if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
-  // populate AppConfig url with request's RootUrl
-  configUrl = ((Request) req).getRootURL().toString();
-} else {
-  // populate AppConfig url with group url
-  Group group = (Group) x.get("group");
-  if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
-    configUrl = group.getUrl();
-  }
-  if ( ! SafetyUtil.isEmpty(group.getSupportEmail()) ) {
-    config.setSupportEmail(group.getSupportEmail());
-  }
-}
+        // SET SupportEmail
+        if ( ! SafetyUtil.isEmpty(group.getSupportEmail()) ) {
+          config.setSupportEmail(group.getSupportEmail());
+        }
 
-if ( config.getForceHttps() ) {
-  if ( configUrl.startsWith("https://") ) {
-    config.setUrl(configUrl);
-    return config;
-  } else if ( configUrl.startsWith("http://") ) {
-    configUrl = "https" + configUrl.substring(4);
-  } else {
-    configUrl = "https://" + configUrl;
-  }
-}
-
-config.setUrl(configUrl);
-
-return config;
+        return config;
         `
     },
     {
