@@ -42,7 +42,9 @@ foam.CLASS({
               Rule foundRule = Rule.findById(rules, rule.getId());
               if ( foundRule != null ) {
                 rules.remove(foundRule);
-                rules.add(foundRule.updateRule(rule));
+                if ( rule.getEnabled() ) {
+                  rules.add(foundRule.updateRule(rule));
+                }
               } else {
                 rules.add(rule);
               }
