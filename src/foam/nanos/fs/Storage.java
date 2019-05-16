@@ -90,7 +90,7 @@ public class Storage {
     return new java.io.File(root_, name).getAbsoluteFile();
   }
 
-  public DirectoryStream<Path> getDirectoryAsStream(String name) {
+  public DirectoryStream<Path> getDirectoryStream(String name) {
     return getDirectoryStream(name, "");
   }
 
