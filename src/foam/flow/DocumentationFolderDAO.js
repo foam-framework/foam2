@@ -35,29 +35,18 @@ sink = prepareSink(sink);
 foam.dao.Sink         decorated = decorateSink_(sink, skip, limit, order, predicate);
 foam.dao.Subscription sub       = new foam.dao.Subscription();
 
-// Load files from both the Jar and regular FileSystem
-java.util.Map<String, java.io.InputStream> iRStreamMap = new foam.nanos.fs.Storage(getDir(), true).getDirectoryAsStream("");
-java.util.Map<String, java.io.InputStream> iFSStreamMap = new foam.nanos.fs.Storage(getDir(), false).getDirectoryAsStream("");
+java.nio.file.DirectoryStream<java.nio.file.Path> paths = new foam.nanos.fs.Storage(getDir(), true).getDirectoryStream("", "*.flow");
 
-// Merge both maps, preferring values in iFSStream
-iFSStreamMap.forEach((key, value) -> iRStreamMap.merge(key, value, (oldValue, newValue) -> newValue));
-
-for ( java.util.Map.Entry<String, java.io.InputStream> path : iRStreamMap.entrySet() ) {
-  if ( sub.getDetached() ) break;
-
+for ( java.nio.file.Path p : paths ) {
   foam.flow.Document obj = new foam.flow.Document();
-  String id = path.getKey().substring(0, path.getKey().lastIndexOf(".flow"));
-
+  String id = p.getFileName().toString().substring(0, p.getFileName().toString().lastIndexOf(".flow"));
   obj.setId(id);
 
-  // TODO: We could parse the markup on the server to get the embedded title.
-
   try {
-    byte[] data = new byte[path.getValue().available()];
-    path.getValue().read(data);
-    obj.setMarkup(new String(data, java.nio.charset.Charset.forName("UTF-8")));
+    byte[] bytes = java.nio.file.Files.readAllBytes(p);
+    obj.setMarkup(new String(bytes, java.nio.charset.Charset.forName("UTF-8")));
     decorated.put(obj, sub);
-  } catch(java.io.IOException e) {
+  } catch (java.io.IOException e) {
     e.printStackTrace();
   }
 }
