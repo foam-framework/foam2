@@ -27,7 +27,8 @@ foam.CLASS({
   properties: [
     {
       class: 'Boolean',
-      name: 'verified'
+      name: 'verified',
+      permissionRequired: true
     },
     {
       class: 'PhoneNumber',
