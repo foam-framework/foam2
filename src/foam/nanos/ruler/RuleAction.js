@@ -20,16 +20,6 @@
       ]
     },
     {
-      name: 'applyReverseAction',
-      args: [
-        { name: 'x', type: 'foam.core.X' },
-        { name: 'obj', type: 'foam.core.FObject' },
-        { name: 'oldObj', type: 'foam.core.FObject' },
-        { name: 'ruler', type: 'foam.nanos.ruler.RuleEngine' }
-      ],
-      documentation: 'if one of the rules in a group throws an exception we need a way to reverse actions for previously executed rules.'
-    },
-    {
       name: 'canExecute',
       type: 'Boolean',
       args: [

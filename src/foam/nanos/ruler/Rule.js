@@ -200,30 +200,6 @@
       `
     },
     {
-      name: 'applyReverse',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'obj',
-          type: 'FObject'
-        },
-        {
-          name: 'oldObj',
-          type: 'FObject'
-        },
-        {
-          name: 'ruler',
-          type: 'foam.nanos.ruler.RuleEngine'
-        }
-      ],
-      javaCode: `
-        getAction().applyReverseAction(x, obj, oldObj, ruler);
-      `
-    },
-    {
       name: 'asyncApply',
       args: [
         {

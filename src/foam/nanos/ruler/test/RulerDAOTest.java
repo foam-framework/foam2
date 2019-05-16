@@ -100,11 +100,6 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-
-      }
-
-      @Override
       public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
         return true;
       }
@@ -152,11 +147,6 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-
-      }
-
-      @Override
       public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
         return true;
       }
@@ -191,11 +181,6 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-
-      }
-
-      @Override
       public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
         return true;
       }
@@ -212,10 +197,6 @@ public class RulerDAOTest extends Test {
         throw new RuntimeException("this async action is not supposed to be executed.");
       }
 
-      @Override
-      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-
-      }
 
       @Override
       public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
@@ -243,11 +224,6 @@ public class RulerDAOTest extends Test {
       @Override
       public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
         throw new RuntimeException("this rule is not supposed to be executed");
-      }
-
-      @Override
-      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-
       }
 
       @Override
@@ -281,10 +257,6 @@ public class RulerDAOTest extends Test {
         user.setLastName("Smirnova");
       }
 
-      @Override
-      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-
-      }
 
       @Override
       public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
@@ -303,10 +275,6 @@ public class RulerDAOTest extends Test {
         ruler.stop();
       }
 
-      @Override
-      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-
-      }
 
       @Override
       public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
@@ -339,11 +307,6 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-
-      }
-
-      @Override
       public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
         return true;
       }
@@ -364,11 +327,6 @@ public class RulerDAOTest extends Test {
 
         User user = (User) obj;
         user.setLastName("Smith");
-      }
-
-      @Override
-      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-
       }
 
       @Override
@@ -400,11 +358,6 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-
-      }
-
-      @Override
       public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
         return true;
       }
@@ -424,11 +377,6 @@ public class RulerDAOTest extends Test {
         } catch (InterruptedException e) { }
 
         ruler.putResult("Done");
-      }
-
-      @Override
-      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-
       }
 
       @Override
@@ -457,11 +405,6 @@ public class RulerDAOTest extends Test {
       @Override
       public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
         ruler.stop();
-      }
-
-      @Override
-      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-
       }
 
       @Override
