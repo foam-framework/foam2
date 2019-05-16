@@ -70,6 +70,12 @@ foam.CLASS({
       font-size: 14px;
     }
 
+    ^ .foam-u2-tag-TextArea {
+      width: 100%;
+      padding: 10px 8px;
+      font-size: 14px;
+    }
+
     ^ .foam-u2-view-date-DateTimePicker {
       cursor: pointer;
     }
