@@ -544,10 +544,10 @@ foam.CLASS({
         var type = foam.lookup(prop.type);
 
         return type.isInstance(v) ?
-            v :
-            ( v.class ?
-                this.__context__.lookup(v.class) :
-                type ).create(v, this.__subContext__);
+          v :
+          ( v.class ?
+            this.__context__.lookup(v.class) :
+            type ).create(v, this.__subContext__);
       }
     }
   ],

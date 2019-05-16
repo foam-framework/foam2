@@ -60,7 +60,7 @@ foam.CLASS({
             }).
             setID(id = self.NEXT_ID()).
             on('change', function(evt) {
-              self.data = evt.srcElement.value;
+              self.data = c[0];
             }).
           end().
           start('label').

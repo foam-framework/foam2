@@ -39,6 +39,7 @@ foam.CLASS({
       documentation: 'When true, $$DOC{ref:".data"} is updated on every ' +
           'keystroke, rather than on blur.',
     },
+    'placeholder',
   ],
 
   methods: [
@@ -46,7 +47,7 @@ foam.CLASS({
       this.SUPER();
       this.addClass(this.myClass());
       this.style({'white-space': 'pre'});
-      this.attrs({rows: this.rows, cols: this.cols});
+      this.attrs({rows: this.rows, cols: this.cols, placeholder: this.placeholder$});
 
       // This is required because textarea accepts setting the 'value'
       // after it's output, but before requires output to be between

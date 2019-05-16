@@ -33,7 +33,7 @@ foam.CLASS({
       background-color: white;
       padding: 20px;
     }
-    ^ .net-nanopay-ui-ActionView-resendEmail {
+    ^ .foam-u2-ActionView-resendEmail {
       width: 100%;
       height: 40px;
       background: white;
@@ -43,7 +43,7 @@ foam.CLASS({
       margin-top: 35px;
       outline: none;
     }
-    ^ .net-nanopay-ui-ActionView-goBack {
+    ^ .foam-u2-ActionView-goBack {
       background: none;
       color: #59a5d5;
     }

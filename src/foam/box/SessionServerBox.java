@@ -41,8 +41,9 @@ public class SessionServerBox
       return;
     }
 
+    NSpec spec = getX().get(NSpec.class);
+
     try {
-      NSpec              spec       = getX().get(NSpec.class);
       HttpServletRequest req        = getX().get(HttpServletRequest.class);
       AuthService        auth       = (AuthService) getX().get("auth");
       DAO                sessionDAO = (DAO)         getX().get("localSessionDAO");
@@ -134,8 +135,9 @@ public class SessionServerBox
 
       msg.getLocalAttributes().put("x", x);
     } catch (Throwable t) {
-      logger.error(t);
+      logger.error("Error throw in SessionServerBox: " + t, " ,service: " + spec.getName());
       t.printStackTrace();
+      msg.replyWithException(t);
       return;
     }
 
