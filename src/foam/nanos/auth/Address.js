@@ -32,18 +32,18 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'verified',
-      documentation: 'Verifies that the address exists.'
+      documentation: 'Determines whether the address exists.'
     },
     {
       class: 'Boolean',
       name: 'deleted',
-      documentation: 'Verifies that the address is deleted.'
+      documentation: 'Determines whether the address is deleted.'
     },
     {
       class: 'Boolean',
       name: 'structured',
       value: true,
-      documentation: `Verifies that the address is shown in the following structure: 
+      documentation: `Determines whether the address is shown in the following structure: 
         Street Number, Street Name, Suite Number. For an unstructured address field, 
         use address1 and/or address2.
       `
@@ -225,7 +225,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'encrypted',
-      documentation: 'Verifies that the address is encrypted.'
+      documentation: 'Determines whether the address is encrypted.'
     },
     {
       class: 'Double',
