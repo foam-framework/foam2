@@ -80,7 +80,6 @@ FOAM_FILES([
   { name: "foam/nanos/auth/twofactor/TwoFactorSignInView" },
   { name: "foam/nanos/auth/twofactor/refinements" },
   { name: "foam/nanos/auth/UserAndGroupAuthService" },
-  { name: "foam/nanos/auth/ActionPermissionConfiguration" },
   { name: "foam/nanos/bench/Benchmark" },
   { name: "foam/nanos/boot/NSpec" },
   { name: "foam/nanos/boot/DAOConfigSummaryView", flags: ['web'] },
