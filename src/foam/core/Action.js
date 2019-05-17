@@ -24,8 +24,7 @@ foam.CLASS({
   requires: [
     'foam.core.ConstantSlot',
     'foam.core.ExpressionSlot',
-    'foam.core.PromiseSlot',
-    'foam.nanos.auth.ActionPermissionConfiguration'
+    'foam.core.PromiseSlot'
   ],
 
   documentation: 'An Action is a method with extra GUI support.',
@@ -118,69 +117,77 @@ foam.CLASS({
       documentation: 'When set to true, a permission is needed to execute this action.'
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.ActionPermissionConfiguration',
-      name: 'permissionConfig',
+      class: 'StringArray',
+      name: 'availablePermissions',
+      documentation: 'If null then we will compute the expected permission name at runtime.  If set to an empty array, then no permission is required even if permissionRequired is set to true.',
       factory: function() {
-        if ( this.permissionRequired ) {
-          var defaultPermission = this.sourceCls_.id + '.permission.' + this.name;
-          return this.ActionPermissionConfiguration.create({
-            available: [defaultPermission],
-            enabled: [defaultPermission]
-          });
-        }
+        return null;
       }
+    },
+    {
+      name: 'enabledPermissions'
     }
   ],
 
   methods: [
+    function addPermissionCheck_(x, slot, data, permissions) {
+      // Decorates an isEnabled/isAvailable slot with a permission
+      // check if appropriate.
 
-    function hasPermissions_(x, property) {
-      if ( ! this.permissionRequired || ! x.auth ) return Promise.resolve(true);
-      return Promise.all(this.permissionConfig[property].map(p => {
-        return x.auth.check(null, p);
-      })).then(arr => arr.every(b => b));
+      // If no auth service exists in the context, then fail open.
+      // Assume we have permission and let the server reject it.  this
+      // way client context bugs won't prevent users from completing
+      // actions.
+      if ( ! this.permissionRequired || ! x.auth )
+        return slot;
+
+      if ( foam.Null.isInstance(permissions) && data && data.cls_ )
+        permissions = [ data.cls_.id + '.permission.' + this.name ];
+
+      // If permissions is empty array then no permission check is needed.
+      return permissions.length ?
+        foam.core.ArraySlot.create({
+          slots: [
+            foam.core.PromiseSlot.create({
+              promise: Promise.all(permissions.map(p => x.auth.check(null, p)))
+            }),
+            slot
+          ]
+        }) :
+        slot;
     },
 
-    function createPermissionlessCheckFor_(data$, property) {
-      if ( ! this[property] ) return foam.core.ConstantSlot.create({value: true});
-      return foam.core.ExpressionSlot.create({
-        obj$: data$,
-        code: this[property]
-      });
+    function createSlotFor_(x, data, expression, permissions) {
+      // Helper method for creating isEnabled/isAvailable slots.
+
+      var slot = expression ?
+          foam.core.ExpressionSlot.create({
+            obj: data,
+            code: expression
+          }) :
+          foam.core.ConstantSlot.create({ value: true });
+
+      return this.addPermissionsCheck_(x, slot, data, permissions);
     },
 
-    function createIsEnabled$(x, data$) {
-      return foam.core.ArraySlot.create({
+    function createIsEnabled$(x, data) {
+      return this.createSlotFor_(x, data, this.isEnabled, this.enabledPermissions);
+    },
+
+    function createIsAvailable$(x, data) {
+      return this.createSlotFor_(x, data, this.isAvailable, this.availablePermissions);
+    },
+
+    function maybeCall(x, data) {
+      foam.core.ArraySlot.create({
         slots: [
-          foam.core.PromiseSlot.create({
-            promise: this.hasPermissions_(x, 'enabled')
-          }),
-          this.createPermissionlessCheckFor_(data$, 'isEnabled')
+          this.createIsAvailable$(x, data),
+          this.createIsEnabled$(x, data)
         ]
-      }).map(arr => arr.every(b => b));
-    },
-
-    function createIsAvailable$(x, data$) {
-      return foam.core.ArraySlot.create({
-        slots: [
-          foam.core.PromiseSlot.create({
-            promise: this.hasPermissions_(x, 'available')
-          }),
-          this.createPermissionlessCheckFor_(data$, 'isAvailable')
-        ]
-      }).map(arr => arr.every(b => b));
-    },
-
-    function maybeCall(ctx, data) {
-      var data$ = this.ConstantSlot.create({ value: data });
-      Promise.all([
-        Promise.resolve(this.createPermissionlessCheckFor_(data$, 'isEnabled').get()),
-        Promise.resolve(this.createPermissionlessCheckFor_(data$, 'isAvailable').get()),
-        this.hasPermissions_(ctx, 'available'),
-        this.hasPermissions_(ctx, 'enabled')
-      ]).then(arr => {
+      }).sub(function(s, arr) {
+        s.detach();
         if ( ! arr.every(b => b) ) return;
+
         this.code.call(data, ctx, this);
         // primitive types won't have a pub method
         // Why are we publishing this event anyway? KGR
