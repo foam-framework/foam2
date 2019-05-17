@@ -235,6 +235,7 @@ foam.CLASS({
     ^ .foam-u2-CheckBox-label {
       margin-left: 12px;
       vertical-align: middle;
+      white-space: pre-wrap;
     }
 
     ^ .foam-u2-CheckBox:checked {
