@@ -145,7 +145,7 @@ foam.CLASS({
           this.firstTime_ = false;
         }
       } else {
-        this.searchView.clear();
+        if ( this.view_ ) this.view_.clear();
       }
     }
   ]
