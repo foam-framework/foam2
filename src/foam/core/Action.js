@@ -192,14 +192,14 @@ If set to an empty array, then no permission is required even if permissionRequi
     function maybeCall(x, data) {
       var self = this;
       function call() {
-        self.code.call(data, ctx, self);
+        self.code.call(data, x, self);
         // primitive types won't have a pub method
         // Why are we publishing this event anyway? KGR
         data && data.pub && data.pub('action', self.name, self);
       }
 
-      if ( ! foam.Function.withArgs(this.isAvailable, data) ||
-           ! foam.Function.withArgs(this.isEnabled, data) )
+      if ( ( this.isAvailable && ! foam.Function.withArgs(this.isAvailable, data) ) ||
+           ( this.isEnabled   && ! foam.Function.withArgs(this.isEnabled, data) ) )
         return;
 
       if ( this.permissionsRequired && x.auth ) {
@@ -213,14 +213,16 @@ If set to an empty array, then no permission is required even if permissionRequi
 
         permissions = foam.Array.unique(permissions);
 
-        Promise.all(permissions.map(p => x.auth.check(null, p))).
+        if ( permissions.length ) {
+          Promise.all(permissions.map(p => x.auth.check(null, p))).
           then(function(...args) {
             if ( args.every(b => b) ) call();
           });
-        return;
-      } else {
-        call();
+          return;
+        }
       }
+
+      call();
     },
 
     function installInClass(c) {
