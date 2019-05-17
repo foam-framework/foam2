@@ -221,13 +221,15 @@ foam.CLASS({
         String grp                = "";
         DAO groupDAO              = (DAO) x.get("groupDAO");
 
-        while ( group != null && ! (urlFound && supportEmailFound)) {
+        while ( group != null ) {
           configUrl          = urlFound ? configUrl : group.getUrl();
           configSupportEmail = supportEmailFound ? configSupportEmail : group.getSupportEmail();
       
           // Once true, stay true
           urlFound          = urlFound   ? urlFound   : ! SafetyUtil.isEmpty(configUrl);
           supportEmailFound = supportEmailFound ? supportEmailFound : ! SafetyUtil.isEmpty(configSupportEmail);
+
+          if ( urlFound && supportEmailFound ) break;
 
           grp   = group.getParent();
           group = (Group)groupDAO.find(grp);
