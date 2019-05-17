@@ -160,10 +160,7 @@ If empty than no permissions are required.`,
       // Helper method for creating isEnabled/isAvailable slots.
 
       var slot = expression ?
-          foam.core.ExpressionSlot.create({
-            obj: data,
-            code: expression
-          }) :
+          data.slot(expression) :
           foam.core.ConstantSlot.create({ value: true });
 
       return this.addPermissionsCheck_(x, slot, data, permissions);
