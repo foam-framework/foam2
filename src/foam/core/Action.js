@@ -226,9 +226,9 @@ If set to an empty array, then no permission is required even if permissionRequi
 
         if ( permissions.length ) {
           Promise.all(permissions.map(p => x.auth.check(null, p))).
-          then(function(...args) {
-            if ( args.every(b => b) ) call();
-          });
+            then(function(args) {
+              if ( args.every(b => b) ) call();
+            });
           return;
         }
       }
