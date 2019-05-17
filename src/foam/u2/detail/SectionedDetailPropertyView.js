@@ -358,8 +358,7 @@ foam.CLASS({
                 .start(this.Item).style({'align-items': 'center'})
                   .start(self.Cols, { defaultChildStyle: {
                     'justify-content': 'flex-start',
-                    'margin': '0 8px 0 0',
-                    'position': 'absolute'
+                    'margin': '0 8px 0 0'
                   }})
                     .addClass(this.myClass('validation-container'))
                     .show(errorSlot)
