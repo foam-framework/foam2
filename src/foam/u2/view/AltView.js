@@ -22,11 +22,6 @@ foam.CLASS({
     ^ {
       margin: auto;
     }
-    ^ .foam-u2-tag-Select {
-      float: right;
-      width: 100px;
-      height: 28px;
-    }
   `,
 
   properties: [
