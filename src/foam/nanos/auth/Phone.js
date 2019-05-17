@@ -41,7 +41,7 @@ foam.CLASS({
       },
       javaValidateObj: `
         String number = ((Phone) obj).getNumber();
-        if ( number.length > 0 ) {
+        if ( SafetyUtil.isEmpty(number) ) {
           throw new IllegalStateException(Phone.INVALID_NUMBER);
         }
       `
