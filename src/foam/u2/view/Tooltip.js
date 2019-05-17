@@ -14,7 +14,7 @@ foam.CLASS({
       overflow:overlay;
       width: 20px;
       height: 20px;
-      position: absolute;
+      // position: absolute;
     }
 
     ^tooltip img {

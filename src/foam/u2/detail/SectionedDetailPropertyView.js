@@ -290,7 +290,8 @@ foam.CLASS({
   requires: [
     'foam.u2.layout.Cols',
     'foam.u2.layout.Item',
-    'foam.u2.layout.Rows'
+    'foam.u2.layout.Rows',
+    'foam.u2.view.Tooltip'
   ],
 
   properties: [
@@ -321,32 +322,13 @@ foam.CLASS({
                     .add(prop)
                     .enableClass(this.myClass('error'), errorSlot)
                   .end()
-                  .callIf(prop.help, function() { 
-                    this.start()
-                      .addClass(self.myClass('tooltip'))
-                      .start({
-                        class: 'foam.u2.tag.Image',
-                        data: 'images/question-icon.svg'
-                      })
-                        .addClass(self.myClass('helper-icon'))
-                        .attrs({ title: prop.help })
-                      .end()
-
-                      .start()
-                        .addClass(self.myClass('tooltip-container'))
-                        .start()
-                          .addClass(self.myClass('arrow-right'))
-                        .end()
-                        .start()
-                          .addClass(self.myClass('helper-text'))
-                          .start('p').style({ 'padding': '3px' })
-                            .add(prop.help)
-                          .end()
-                        .end()
-                      .end()
-                    .end()
-                  })
-                .end()
+                    .callIf(prop.help, function() { 
+                      this.start({
+                        class: 'foam.u2.view.Tooltip',
+                        data: prop.help,
+                        dir: 'l'
+                      }).end()
+                    })
                 .start(this.Item).style({'align-items': 'center'})
                   .start(self.Cols, { defaultChildStyle: {
                     'justify-content': 'flex-start',
