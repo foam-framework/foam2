@@ -8,8 +8,8 @@ foam.CLASS({
   package: 'foam.nanos.ruler',
   name: 'TestedRule',
   documentation: `The model is for reporting purposes when probing rules.
-  rulerProbe = dao.cmd(RulerProbe) object will be returned with array of TestedRules
-  that describe whether the rule was applied and summary of the rule's activities.`,
+  rulerProbe = dao.cmd(RulerProbe) object will be returned with list of TestedRules
+  where each describes whether the rule was applied and summary of the rule's activities.`,
 
   properties: [
     {
@@ -19,7 +19,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'descrition'
+      name: 'description'
     },
     {
       class: 'Boolean',

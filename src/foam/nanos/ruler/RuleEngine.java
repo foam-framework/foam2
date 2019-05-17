@@ -56,6 +56,7 @@ public class RuleEngine extends ContextAwareSupport {
     for (Rule rule : rules) {
       if ( stops_.get() ) return;
       applyRule(rule, obj, oldObj, agent);
+      saveHistory(rule, obj);
     }
     agent.execute(x_);
 
@@ -66,17 +67,21 @@ public class RuleEngine extends ContextAwareSupport {
     for (Rule rule : rules) {
       RuleAgency ruleAgent = new RuleAgency(rule);
       if ( stops_.get() ) {
-        //rulerProbe.add(new ProbeModel(ruleId, "not executed because was overridden", false));
+        rulerProbe.getAppliedRules().add(new TestedRule(rule.getId(),rule.getDocumentation() + "Not executed because was overridden and forced to stop.", false));
         continue;
       }
       try {
         applyRule(rule, obj, oldObj, ruleAgent);
-        //rulerProbe.add(new ProbeModel(ruleId, ruleAgent.toString(), true));
+        rulerProbe.getAppliedRules().add(new TestedRule(rule.getId(), rule.getDocumentation() + ruleAgent.toString(), true));
       } catch (Exception e ) {
-        //rulerProbe.add(new ProbeModel(ruleId, e.getMessage(), false));
+        rulerProbe.getAppliedRules().add(new TestedRule(rule.getId(), rule.getDocumentation() + e.getMessage(), false));
       }
     }
-    asyncApplyRules(rules, obj, oldObj);
+    for (Rule rule : rules) {
+      if ( rule.getAsyncAction() != null ) {
+        rulerProbe.getAppliedRules().add(new TestedRule(rule.getId(), "AsyncAction: " + rule.getDocumentation(), true));
+      }
+    }
   }
 
   /**
@@ -105,7 +110,6 @@ public class RuleEngine extends ContextAwareSupport {
         && rule.f(getX(), obj, oldObj)
       ) {
         rule.apply(getX(), obj, oldObj, this);
-        saveHistory(rule, obj);
       }
   }
 
