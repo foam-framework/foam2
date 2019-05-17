@@ -18,6 +18,19 @@ foam.CLASS({
       height: 90%;
       background-color: white;
     }
+
+    ^footer {
+      padding: 0px 128px;
+    }
+
+    ^next-button {
+      width: 156px;
+      height: 48px;
+    }
+
+    ^ net-nanopay-sme-ui-AbliiActionView-next {
+      height: 
+    }
   `,
 
   properties: [
@@ -113,7 +126,7 @@ foam.CLASS({
               });
           })).addClass(this.myClass('wizard-body'))
           .startContext({ data: this })
-            .start(self.Cols)
+            .start(self.Cols).addClass(this.myClass('footer'))
               .add(this.PREV)
               .add(this.NEXT)
             .end()
