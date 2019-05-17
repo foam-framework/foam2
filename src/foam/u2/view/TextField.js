@@ -48,17 +48,17 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.elm_ = this.start(this.view, {
+      this.start(this.view, {
         data$:            this.data$,
         label$:           this.label$,
         alwaysFloatLabel: this.alwaysFloatLabel,
         type:             this.type,
         onKey:            this.onKey
-      });
-      this.elm_.attrs({
-        placeholder: this.placeholder$,
-      });
-      this.elm_.end();
+      }, this.elm_$)
+        .attrs({
+          placeholder: this.placeholder$,
+        })
+      .end();
 
       if ( this.autocompleter ) {
         this.onDetach(this.onload.sub(this.loaded));
@@ -75,7 +75,7 @@ foam.CLASS({
       });
 
       // Actually set the list attribute on our input field.
-      this.elm_.attrs({ list: this.autocompleteList_.id });
+      this.elm_ && this.elm_.attrs({ list: this.autocompleteList_.id });
     }
   ],
 
