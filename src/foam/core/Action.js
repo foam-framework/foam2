@@ -119,13 +119,22 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'availablePermissions',
-      documentation: 'If null then we will compute the expected permission name at runtime.  If set to an empty array, then no permission is required even if permissionRequired is set to true.',
+      documentation: `Permissions required for the action to be available.
+If null then we will compute the expected permission name at runtime.
+If set to an empty array, then no permission is required even if permissionRequired is set to true.`,
       factory: function() {
         return null;
       }
     },
     {
-      name: 'enabledPermissions'
+      class: 'StringArray',
+      name: 'enabledPermissions',
+      documentation: `Permissions required for the action to be enabled.
+If null then we will compute the expected permission name at runtime.
+If set to an empty array, then no permission is required even if permissionRequired is set to true.`,
+      factory: function() {
+        return null;
+      }
     }
   ],
 
