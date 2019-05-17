@@ -139,7 +139,7 @@ If set to an empty array, then no permission is required even if permissionRequi
   ],
 
   methods: [
-    function addPermissionCheck_(x, slot, data, permissions) {
+    function addPermissionsCheck_(x, slot, data, permissions) {
       // Decorates an isEnabled/isAvailable slot with a permission
       // check if appropriate.
 
