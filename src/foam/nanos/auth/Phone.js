@@ -19,9 +19,9 @@ foam.CLASS({
   constants: [
     {
       name: 'PHONE_REGEX',
-      type: 'Regex',
-      // TODO: Verify this is a good regex. It seems very specific to north american numbers.
-      value: /([+]?\d{1,2}[\.\-\s]?)?(\d{3}[.-]?){2}\d{4}/g
+      factory: function() {
+        return /([+]?\d{1,2}[\.\-\s]?)?(\d{3}[.-]?){2}\d{4}/g;
+      }
     }
   ],
 
