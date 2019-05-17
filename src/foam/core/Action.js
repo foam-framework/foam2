@@ -112,29 +112,16 @@ foam.CLASS({
       value: null
     },
     {
-      class: 'Boolean',
-      name: 'permissionRequired',
-      documentation: 'When set to true, a permission is needed to execute this action.'
-    },
-    {
       class: 'StringArray',
       name: 'availablePermissions',
       documentation: `Permissions required for the action to be available.
-If null then we will compute the expected permission name at runtime if permissionRequired is true.
-If set to an empty array, then no permission is required even if permissionRequired is set to true.`,
-      factory: function() {
-        return null;
-      }
+If empty than no permissions are required.`
     },
     {
       class: 'StringArray',
       name: 'enabledPermissions',
       documentation: `Permissions required for the action to be enabled.
-If null then we will compute the expected permission name at runtime if permissionRequired is true.
-If set to an empty array, then no permission is required even if permissionRequired is set to true.`,
-      factory: function() {
-        return null;
-      }
+If empty than no permissions are required.`,
     }
   ],
 
@@ -143,19 +130,9 @@ If set to an empty array, then no permission is required even if permissionRequi
       // Decorates an isEnabled/isAvailable slot with a permission
       // check if appropriate.
 
-      // If no auth service, then nothing to check for.
-      if ( ! x.auth ) return slot;
-
-      // If permissions is null and permissionRequired is false then nothing to check for.
-      if ( ! permissions && ! this.permissionRequired ) return slot;
-
-      // If permissions is an empty array, then nothing to check for.
-      if ( permissions && permissions.length == 0 ) return slot;
-
-      // If permissionRequired is true, but permissions is null, then compute
-      // a reasonable default permission.
-      if ( foam.Null.isInstance(permissions) && data && data.cls_ )
-        permissions = [ data.cls_.id + '.permission.' + this.name ];
+      // If no auth service, or no permissions to check then nothing to do.
+      if ( ! x.auth || ! permissions.length )
+        return slot;
 
       return foam.core.ExpressionSlot.create({
         args: [
@@ -213,27 +190,21 @@ If set to an empty array, then no permission is required even if permissionRequi
            ( this.isEnabled   && ! foam.Function.withArgs(this.isEnabled, data) ) )
         return;
 
-      if ( this.permissionsRequired && x.auth ) {
-        var permissions = [].concat(
-          foam.Null.isInstance(this.availablePermissions) ?
-            [ data.cls_.id + '.permission.' + this.name ] :
-            this.availablePermissions,
-          foam.Null.isInstance(this.enabledPermissions) ?
-            [ data.cls_.id + '.permission.' + this.name ] :
-            this.enabledPermissions);
 
-        permissions = foam.Array.unique(permissions);
-
-        if ( permissions.length ) {
-          Promise.all(permissions.map(p => x.auth.check(null, p))).
-            then(function(args) {
-              if ( args.every(b => b) ) call();
-            });
-          return;
-        }
+      // No permission check if no auth service or no permissions to check.
+      if ( ! x.auth ||
+           ! ( this.availablePermissions.length || this.enabledPermissions.length ) ) {
+        call();
+        return;
       }
 
-      call();
+      var permissions = this.availablePermissions.concat(this.enabledPermissions);
+
+      permissions = foam.Array.unique(permissions);
+      Promise.all(permissions.map(p => x.auth.check(null, p))).
+        then(function(args) {
+          if ( args.every(b => b) ) call();
+        });
     },
 
     function installInClass(c) {
