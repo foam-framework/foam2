@@ -93,22 +93,7 @@ public class RulerDAOTest extends Test {
     rule7.setOperation(Operations.CREATE);
     rule7.setAfter(false);
     rule7.setPriority(100);
-    RuleAction action7 = new RuleAction() {
-      @Override
-      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        ruler.stop();
-      }
-
-      @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        return true;
-      }
-
-      @Override
-      public String describe() {
-        return "";
-      }
-    };
+    RuleAction action7 = (x1, obj, oldObj, ruler) -> ruler.stop();
     rule7.setAction(action7);
     rule7 = (Rule) ruleDAO.put_(x, rule7);
 
@@ -140,22 +125,7 @@ public class RulerDAOTest extends Test {
     rule1.setOperation(Operations.CREATE);
     rule1.setAfter(false);
     rule1.setPriority(60);
-    RuleAction action1 = new RuleAction() {
-      @Override
-      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        ruler.stop();
-      }
-
-      @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        return true;
-      }
-
-      @Override
-      public String describe() {
-        return "";
-      }
-    };
+    RuleAction action1 = (x1, obj, oldObj, ruler) -> ruler.stop();
     rule1.setAction(action1);
     rule1 = (Rule) ruleDAO.put_(x, rule1);
 
@@ -173,40 +143,13 @@ public class RulerDAOTest extends Test {
       EQ(DOT(NEW_OBJ, INSTANCE_OF(foam.nanos.auth.User.class)), true)
     );
     rule2.setPredicate(predicate2);
-    RuleAction action2 = new RuleAction() {
-      @Override
-      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        User user = (User) obj;
-        user.setEmail("foam@nanos.net");
-      }
-
-      @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        return true;
-      }
-
-      @Override
-      public String describe() {
-        return "";
-      }
+    RuleAction action2 = (x12, obj, oldObj, ruler) -> {
+      User user = (User) obj;
+      user.setEmail("foam@nanos.net");
     };
     rule2.setAction(action2);
-    RuleAction asyncAction2 = new RuleAction() {
-      @Override
-      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        throw new RuntimeException("this async action is not supposed to be executed.");
-      }
-
-
-      @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        return true;
-      }
-
-      @Override
-      public String describe() {
-        return "";
-      }
+    RuleAction asyncAction2 = (x13, obj, oldObj, ruler) -> {
+      throw new RuntimeException("this async action is not supposed to be executed.");
     };
     rule2.setAsyncAction(asyncAction2);
     rule2 = (Rule) ruleDAO.put_(x, rule2);
@@ -220,21 +163,8 @@ public class RulerDAOTest extends Test {
     rule3.setOperation(Operations.CREATE);
     rule3.setAfter(false);
     rule3.setPriority(20);
-    RuleAction action3 = new RuleAction() {
-      @Override
-      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        throw new RuntimeException("this rule is not supposed to be executed");
-      }
-
-      @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        return true;
-      }
-
-      @Override
-      public String describe() {
-        return "";
-      }
+    RuleAction action3 = (x14, obj, oldObj, ruler) -> {
+      throw new RuntimeException("this rule is not supposed to be executed");
     };
     rule3.setAction(action3);
     rule3 = (Rule) ruleDAO.put_(x, rule3);
@@ -250,42 +180,12 @@ public class RulerDAOTest extends Test {
     rule4.setPriority(10);
     Predicate predicate4 = EQ(DOT(NEW_OBJ, INSTANCE_OF(foam.nanos.auth.User.class)), true);
     rule4.setPredicate(predicate4);
-    RuleAction action4 = new RuleAction() {
-      @Override
-      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        User user = (User) obj;
-        user.setLastName("Smirnova");
-      }
-
-
-      @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        return true;
-      }
-
-      @Override
-      public String describe() {
-        return "";
-      }
+    RuleAction action4 = (x15, obj, oldObj, ruler) -> {
+      User user = (User) obj;
+      user.setLastName("Smirnova");
     };
     rule4.setAction(action4);
-    RuleAction asyncAction4 = new RuleAction() {
-      @Override
-      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        ruler.stop();
-      }
-
-
-      @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        return true;
-      }
-
-      @Override
-      public String describe() {
-        return "";
-      }
-    };
+    RuleAction asyncAction4 = (x16, obj, oldObj, ruler) -> ruler.stop();
     rule4.setAsyncAction(asyncAction4);
     rule4 = (Rule) ruleDAO.put_(x, rule4);
 
@@ -299,45 +199,19 @@ public class RulerDAOTest extends Test {
     rule5.setAfter(false);
     Predicate predicate5 = EQ(DOT(NEW_OBJ, INSTANCE_OF(foam.nanos.auth.User.class)), true);
     rule5.setPredicate(predicate5);
-    RuleAction action5 = new RuleAction() {
-      @Override
-      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        User user = (User) obj;
-        user.setLastName("Unknown");
-      }
-
-      @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        return true;
-      }
-
-      @Override
-      public String describe() {
-        return "";
-      }
+    RuleAction action5 = (x17, obj, oldObj, ruler) -> {
+      User user = (User) obj;
+      user.setLastName("Unknown");
     };
     rule5.setAction(action5);
-    RuleAction asyncAction5 = new RuleAction() {
-      @Override
-      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        // simulate async
-        try {
-          Thread.sleep(asyncWait);
-        } catch (InterruptedException e) { }
+    RuleAction asyncAction5 = (x18, obj, oldObj, ruler) -> {
+      // simulate async
+      try {
+        Thread.sleep(asyncWait);
+      } catch (InterruptedException e) { }
 
-        User user = (User) obj;
-        user.setLastName("Smith");
-      }
-
-      @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        return true;
-      }
-
-      @Override
-      public String describe() {
-        return "";
-      }
+      User user = (User) obj;
+      user.setLastName("Smith");
     };
     rule5.setAsyncAction(asyncAction5);
     rule5 = (Rule) ruleDAO.put_(x, rule5);
@@ -351,43 +225,15 @@ public class RulerDAOTest extends Test {
     rule6.setOperation(Operations.UPDATE);
     rule6.setSaveHistory(true);
     rule6.setPredicate(EQ(DOT(NEW_OBJ, foam.nanos.auth.User.EMAIL), "user2@nanos.net"));
-    RuleAction action6 = new RuleAction() {
-      @Override
-      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        ruler.putResult("Pending");
-      }
-
-      @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        return true;
-      }
-
-      @Override
-      public String describe() {
-        return "";
-      }
-    };
+    RuleAction action6 = (x19, obj, oldObj, ruler) -> ruler.putResult("Pending");
     rule6.setAction(action6);
-    RuleAction asyncAction6 = new RuleAction() {
-      @Override
-      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        // simulate async
-        try {
-          Thread.sleep(asyncWait);
-        } catch (InterruptedException e) { }
+    RuleAction asyncAction6 = (x110, obj, oldObj, ruler) -> {
+      // simulate async
+      try {
+        Thread.sleep(asyncWait);
+      } catch (InterruptedException e) { }
 
-        ruler.putResult("Done");
-      }
-
-      @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        return true;
-      }
-
-      @Override
-      public String describe() {
-        return "";
-      }
+      ruler.putResult("Done");
     };
     rule6.setAsyncAction(asyncAction6);
     rule6 = (Rule) ruleDAO.put_(x, rule6);
@@ -401,22 +247,7 @@ public class RulerDAOTest extends Test {
     rule8.setOperation(Operations.CREATE);
     rule8.setAfter(false);
     rule8.setPredicate(new DummyErroneousPredicate());
-    RuleAction action8 = new RuleAction() {
-      @Override
-      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        ruler.stop();
-      }
-
-      @Override
-      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
-        return true;
-      }
-
-      @Override
-      public String describe() {
-        return "";
-      }
-    };
+    RuleAction action8 = (x111, obj, oldObj, ruler) -> ruler.stop();
     rule8.setAction(action8);
     rule8 = (Rule) ruleDAO.put_(x, rule8);
   }

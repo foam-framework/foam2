@@ -18,23 +18,6 @@
         { name: 'oldObj', type: 'foam.core.FObject' },
         { name: 'ruler', type: 'foam.nanos.ruler.RuleEngine' }
       ]
-    },
-    {
-      name: 'canExecute',
-      type: 'Boolean',
-      args: [
-        { name: 'x', type: 'Context' },
-        { name: 'obj', type: 'FObject' },
-        { name: 'oldObj', type: 'FObject' },
-        { name: 'ruler', type: 'foam.nanos.ruler.RuleEngine' }
-      ],
-      documentation: 'Predicts effect of the action without actually applying it.' +
-      'E.g. if exception is expected, returns false.'
-    },
-    {
-      name: 'describe',
-      type: 'String',
-      documentation: 'Describes purpose of the action and possible output.'
     }
   ]
 });
