@@ -211,20 +211,37 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        AppConfig config = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
-        String configUrl = "";
+        // Find Group details, by iterating up through group.parent
+        AppConfig config          = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
+        String configUrl          = "";
+        String configSupportEmail = "";
+        Boolean urlFound          = false;
+        Boolean supportEmailFound = false;
+        Group group               = this;
+        String grp                = "";
+        DAO groupDAO              = (DAO) x.get("groupDAO");
+
+        while ( group != null && ! (urlFound && supportEmailFound)) {
+          configUrl          = urlFound ? configUrl : group.getUrl();
+          configSupportEmail = supportEmailFound ? configSupportEmail : group.getSupportEmail();
+      
+          // Once true, stay true
+          urlFound          = urlFound   ? urlFound   : ! SafetyUtil.isEmpty(configUrl);
+          supportEmailFound = supportEmailFound ? supportEmailFound : ! SafetyUtil.isEmpty(configSupportEmail);
+
+          grp   = group.getParent();
+          group = (Group)groupDAO.find(grp);
+        }
 
         // FIND URL
-        Group group = (Group) x.get("group");
-        if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
-          configUrl = group.getUrl();
-        } else {
+        if ( ! urlFound ) {
           // populate AppConfig url with request's RootUrl
           HttpServletRequest req = x.get(HttpServletRequest.class);
           if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
             configUrl = ((Request) req).getRootURL().toString();
           }
         }
+
         // FORCE HTTPS IN URL?
         if ( config.getForceHttps() ) {
           if ( ! configUrl.startsWith("https://") ) {
@@ -235,12 +252,13 @@ foam.CLASS({
             }
           }
         }
+
         // SET URL
         config.setUrl(configUrl);
 
         // SET SupportEmail
-        if ( ! SafetyUtil.isEmpty(group.getSupportEmail()) ) {
-          config.setSupportEmail(group.getSupportEmail());
+        if ( supportEmailFound ) {
+          config.setSupportEmail(configSupportEmail);
         }
 
         return config;
