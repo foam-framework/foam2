@@ -33,6 +33,7 @@ foam.CLASS({
     {
       class: 'PhoneNumber',
       name: 'number',
+      label: '',
       required: true,
       validateObj: function (number) {
         if ( ! this.PHONE_REGEX.test(number) ) {
