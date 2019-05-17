@@ -313,14 +313,16 @@ foam.CLASS({
           .map(m => m != foam.u2.Visibility.HIDDEN))
         .addClass(this.myClass())
         .start(self.Rows, { defaultChildStyle: { padding: '8px 0' } })
-          .add(this.slot(function(data, prop) {
+          .add(this.slot(function(data, prop, prop$label) {
             var errorSlot = prop.validateObj ?
               data.slot(prop.validateObj) :
               foam.core.ConstantSlot.create({ value: null });
 
             return self.E()
               .start(self.Rows, { defaultChildStyle:  { 'line-height': '2' } })
-                .start('m3').add(prop.label$).end()
+                .callIf(prop$label, function() {
+                  this.start('m3').add(prop$label).end();
+                })
                 .start()
                   .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                   .start(self.Item)

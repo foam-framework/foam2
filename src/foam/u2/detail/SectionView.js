@@ -41,11 +41,11 @@ foam.CLASS({
       var self = this;
       self.SUPER();
       self
-        .add(self.slot(function(section, showTitle) {
+        .add(self.slot(function(section, showTitle, section$title) {
           return self.Rows.create()
             .show(section.createIsAvailableFor(self.data$))
-            .callIf(showTitle, function () {
-              this.start('h2').add(section.title$).end();
+            .callIf(showTitle && section$title, function () {
+              this.start('h2').add(section$title).end();
             })
             .forEach(section.properties, function (p) {
               this.tag(self.SectionedDetailPropertyView, { prop: p, data$: self.data$ });

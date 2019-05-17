@@ -20,19 +20,16 @@ foam.CLASS({
     {
       name: 'PHONE_REGEX',
       type: 'Regex',
+      // TODO: Verify this is a good regex. It seems very specific to north american numbers.
       value: /([+]?\d{1,2}[\.\-\s]?)?(\d{3}[.-]?){2}\d{4}/g
     }
   ],
 
   properties: [
     {
-      class: 'Boolean',
-      name: 'verified',
-      permissionRequired: true
-    },
-    {
       class: 'PhoneNumber',
       name: 'number',
+      label: '',
       required: true,
       validateObj: function (number) {
         if ( ! this.PHONE_REGEX.test(number) ) {
@@ -48,6 +45,11 @@ foam.CLASS({
           throw new IllegalStateException(Phone.INVALID_NUMBER);
         }
       `
+    },
+    {
+      class: 'Boolean',
+      name: 'verified',
+      permissionRequired: true
     }
   ]
 });
