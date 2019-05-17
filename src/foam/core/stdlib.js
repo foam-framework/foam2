@@ -706,6 +706,11 @@ foam.LIB({
       }
     },
     function unique(a, comparator) {
+      // Returns a sorted array with all duplicate values removed.
+      // Sorting and comparison is done by the "comparator" parameter.
+      // If "comparator" is not specified then foam.util.compare will
+      // be used.
+
       var comparator = comparator || foam.util.compare;
       var sorted =  a.sort(comparator);
       return sorted.reduce(function(acc, value) {
