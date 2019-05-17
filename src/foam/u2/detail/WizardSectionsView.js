@@ -12,6 +12,13 @@ foam.CLASS({
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows'
   ],
+
+  css: `
+    ^wizard-body {
+      height: 90%
+    }
+  `,
+
   properties: [
     {
       class: 'DateTime',
@@ -91,6 +98,9 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
+
+      this.addClass(this.myClass());
+
       self.SUPER();
       self
         .start(self.Rows)
@@ -100,7 +110,7 @@ foam.CLASS({
                 section: sections[currentIndex],
                 data$: self.data$
               });
-          }))
+          })).addClass(this.myClass('wizard-body'))
           .startContext({ data: this })
             .start(self.Cols)
               .add(this.PREV)

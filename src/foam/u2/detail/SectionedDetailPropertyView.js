@@ -333,7 +333,6 @@ foam.CLASS({
                         data: 'images/question-icon.svg'
                       })
                         .addClass(self.myClass('helper-icon'))
-                        .attrs({ title: prop.help })
                       .end()
 
                       .start()
