@@ -2216,46 +2216,7 @@ foam.CLASS({
     {
       name: 'f',
       code: function f(obj) {
-        var arg = this.arg1.f(obj);
-        if ( ! arg || typeof arg !== 'string' ) return false;
-
-        arg = arg.toLowerCase();
-
-        try {
-          var props = obj.cls_.getAxiomsByClass(this.String);
-          for ( var i = 0; i < props.length; i++ ) {
-            s = props[i].f(obj);
-            if ( ! s || typeof s !== 'string' ) continue;
-            if ( s.toLowerCase().includes(arg) ) return true;
-          }
-
-          var objectProps = obj.cls_.getAxiomsByClass(this.FObjectProperty);
-          for ( var i = 0; i < objectProps.length; i++ ) {
-            var prop = objectProps[i];
-            var subObject = prop.f(obj);
-            if ( this.f(subObject) ) return true;
-          }
-
-          var longProps = obj.cls_.getAxiomsByClass(this.Long);
-          for ( var i = 0; i < longProps.length; i++ ) {
-            var s = (longProps[i]).toString();
-            if ( s.toLowerCase().includes(arg) ) return true;
-          }
-
-          var enumProps = obj.cls_.getAxiomsByClass(this.Enum);
-          for ( var i = 0; i < enumProps.length; i++ ) {
-            var s = (enumProps[i]).label;
-            if ( s.toLowerCase().includes(arg) ) return true;
-          }
-
-          var dateProps = obj.cls_.getAxiomsByClass(this.Date);
-          for ( var i = 0; i < dateProps.length; i++ ) {
-            var s = (dateProps[i]).toISOString();
-            if ( s.toLowerCase().includes(arg) ) return true;
-          }
-        } catch (err) {}
-
-        return false;
+        return this.fInner_(obj, true);
       },
       javaCode: `
 if ( ! ( getArg1().f(obj) instanceof String ) ) return false;
@@ -2303,6 +2264,58 @@ while ( i.hasNext() ) {
 }
 
 return false;`
+    },
+    {
+      name: 'fInner_',
+      documentation: `
+        A private convenience method so we don't break the interface for the 'f'
+        method. The second argument determines whether the MLang should
+        recursively apply to nested FObjects or not.
+      `,
+      code: function(obj, checkSubObjects) {
+        var arg = this.arg1.f(obj);
+        if ( ! arg || typeof arg !== 'string' ) return false;
+
+        arg = arg.toLowerCase();
+
+        try {
+          var props = obj.cls_.getAxiomsByClass(this.String);
+          for ( var i = 0; i < props.length; i++ ) {
+            s = props[i].f(obj);
+            if ( ! s || typeof s !== 'string' ) continue;
+            if ( s.toLowerCase().includes(arg) ) return true;
+          }
+
+          if ( checkSubObjects ) {
+            var objectProps = obj.cls_.getAxiomsByClass(this.FObjectProperty);
+            for ( var i = 0; i < objectProps.length; i++ ) {
+              var prop = objectProps[i];
+              var subObject = prop.f(obj);
+              if ( this.fInner_(subObject, false) ) return true;
+            }
+          }
+
+          var longProps = obj.cls_.getAxiomsByClass(this.Long);
+          for ( var i = 0; i < longProps.length; i++ ) {
+            var s = (longProps[i]).toString();
+            if ( s.toLowerCase().includes(arg) ) return true;
+          }
+
+          var enumProps = obj.cls_.getAxiomsByClass(this.Enum);
+          for ( var i = 0; i < enumProps.length; i++ ) {
+            var s = (enumProps[i]).label;
+            if ( s.toLowerCase().includes(arg) ) return true;
+          }
+
+          var dateProps = obj.cls_.getAxiomsByClass(this.Date);
+          for ( var i = 0; i < dateProps.length; i++ ) {
+            var s = (dateProps[i]).toISOString();
+            if ( s.toLowerCase().includes(arg) ) return true;
+          }
+        } catch (err) {}
+
+        return false;
+      }
     }
   ]
 });
