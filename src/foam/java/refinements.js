@@ -591,7 +591,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'abstract',
-      value: true
+      value: false
     },
     {
       class: 'StringArray',
@@ -616,6 +616,7 @@ foam.CLASS({
         type: this.javaType || 'void',
         visibility: 'public',
         static: this.isStatic(),
+        abstract: this.abstract,
         final: this.final,
         synchronized: this.synchronized,
         throws: this.javaThrows,
