@@ -155,13 +155,15 @@ If set to an empty array, then no permission is required even if permissionRequi
 
       // If permissions is empty array then no permission check is needed.
       return permissions.length ?
-        foam.core.ArraySlot.create({
-          slots: [
+        foam.core.ExpressionSlot.create({
+          args: [
             foam.core.PromiseSlot.create({
-              promise: Promise.all(permissions.map(p => x.auth.check(null, p)))
+              promise: Promise.all(permissions.map(p => x.auth.check(null, p))).
+                then(function(...args) { return args.every(p => p); })
             }),
             slot
-          ]
+          ],
+          code: function(a, b) { return a && b; }
         }) :
         slot;
     },
@@ -188,20 +190,37 @@ If set to an empty array, then no permission is required even if permissionRequi
     },
 
     function maybeCall(x, data) {
-      foam.core.ArraySlot.create({
-        slots: [
-          this.createIsAvailable$(x, data),
-          this.createIsEnabled$(x, data)
-        ]
-      }).sub(function(s, arr) {
-        s.detach();
-        if ( ! arr.every(b => b) ) return;
-
-        this.code.call(data, ctx, this);
+      var self = this;
+      function call() {
+        self.code.call(data, ctx, self);
         // primitive types won't have a pub method
         // Why are we publishing this event anyway? KGR
-        data && data.pub && data.pub('action', this.name, this);
-      });
+        data && data.pub && data.pub('action', self.name, self);
+      }
+
+      if ( ! foam.Function.withArgs(this.isAvailable, data) ||
+           ! foam.Function.withArgs(this.isEnabled, data) )
+        return;
+
+      if ( this.permissionsRequired && x.auth ) {
+        var permissions = [].concat(
+          foam.Null.isInstance(this.availablePermissions) ?
+            [ data.cls_.id + '.permission.' + this.name ] :
+            this.availablePermissions,
+          foam.Null.isInstance(this.enabledPermissions) ?
+            [ data.cls_.id + '.permission.' + this.name ] :
+            this.enabledPermissions);
+
+        permissions = foam.Array.unique(permissions);
+
+        Promise.all(permissions.map(p => x.auth.check(null, p))).
+          then(function(...args) {
+            if ( args.every(b => b) ) call();
+          });
+        return;
+      } else {
+        call();
+      }
     },
 
     function installInClass(c) {
