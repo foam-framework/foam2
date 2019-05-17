@@ -99,7 +99,6 @@ foam.CLASS({
       label: 'Method',
       documentation: 'the methods list of the picked service key',
       view: function(_, X) {
-      console.log("dfdafdaf");
         return X.data.slot(function(serviceKey) {
           var service = this.__context__[serviceKey];
 
@@ -282,7 +281,7 @@ foam.CLASS({
       code: async function() {
         if ( ! (this.postURL === '') ) {
           var req = this.HTTPRequest.create({
-            url: window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + this.postURL + this.postData,
+            url: window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + this.postURL + this.postData+ "&sessionId=" + localStorage.defaultSession,
             method: 'POST',
             contentType: 'url',
             payload: this.postData.substring(1),

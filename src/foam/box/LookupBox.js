@@ -55,7 +55,7 @@ return ClientBoxRegistry_create([
       factory: function() {
         return this.registry.doLookup(this.name);
       },
-      swiftFactory: 'return try! registry!.doLookup(name)',
+      swiftFactory: 'return try! registry!.doLookup(name)!',
     }
   ],
   methods: [

@@ -34,7 +34,7 @@ public class PreventDuplicateEmailDAOTest
   private void PreventsDuplicateEmail(X x) {
     User userWithDuplicateEmail = TestUtils.createTestUser();
     userWithDuplicateEmail.setId(2); // Make sure the id is different.
-    DAO dao = new PreventDuplicateEmailDAO(x, userDAO_);
+    DAO dao = new PreventDuplicateEmailDAO.Builder(x).setDelegate(userDAO_).build();
     test(
       TestUtils.testThrows(
         () -> dao.put_(x, userWithDuplicateEmail),

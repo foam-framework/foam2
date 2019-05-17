@@ -23,8 +23,8 @@ import org.apache.commons.io.IOUtils;
 
 public class Outputter
   extends AbstractSink
-  implements foam.lib.Outputter
-{
+  implements foam.lib.Outputter {
+  
   protected static ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
     protected SimpleDateFormat initialValue() {
@@ -91,7 +91,7 @@ public class Outputter
   protected void outputNull() {
   }
 
-  protected void outputString(String s) {
+  public void outputString(String s) {
     writer_.append("\"");
     writer_.append(escape(s));
     writer_.append("\"");
@@ -246,8 +246,17 @@ public class Outputter
         value.getClass().isArray();
   }
 
+  public void outputDateValue(java.util.Date date) {
+    if ( outputReadableDates_ )
+      outputString(sdf.get().format(date));
+    else
+      outputNumber(date.getTime());
+  }
+
   protected void outputDate(java.util.Date date) {
-    outputString(sdf.get().format(date));
+    writer_.append("{\"class\":\"__Timestamp__\",\"value\":");
+    outputDateValue(date);
+    writer_.append("}");
   }
 
   protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
@@ -361,13 +370,7 @@ public class Outputter
   }
 
   protected void outputClassInfo(ClassInfo info) {
-    writer_.append("{");
-    outputString("class");
-    writer_.append(":");
-    outputString("__Class__");
-    writer_.append(",");
-    outputString("forClass_");
-    writer_.append(":");
+    writer_.append("{\"class\":\"__Class__\",\"forClass_\":");
     outputString(info.getId());
     writer_.append("}");
   }

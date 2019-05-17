@@ -106,10 +106,26 @@ foam.CLASS({
     ^ .search input {
       width: 100%;
       border: none;
+      border-bottom: 1px solid #f4f4f9;
     }
 
     ^ .search input:focus {
       border: none;
+    }
+
+    ^ .search img {
+      width: 15px;
+      position: absolute;
+      left: 10px;
+      top: 13px;
+    }
+
+    ^ .search {
+      border-bottom: 1px solid #f4f4f9;
+    }
+
+    ^ .property-filter_ {
+      padding-left: 25px;
     }
 
     ^ .disabled {
@@ -122,6 +138,11 @@ foam.CLASS({
   `,
 
   properties: [
+    {
+      class: 'String',
+      name: 'name',
+      factory: function() { return "select"; }
+    },
     {
       class: 'foam.u2.ViewSpec',
       name: 'rowView',
@@ -205,6 +226,25 @@ foam.CLASS({
           });
         });
       }
+    },
+    {
+      class: 'String',
+      name: 'searchPlaceholder',
+      documentation: 'Replaces search box placeholder with passed in string.',
+      value: 'Search...'
+    },
+    {
+      class: 'String',
+      name: 'choosePlaceholder',
+      documentation: 'Replaces choose from placeholder with passed in string.'
+    },
+    {
+      type: 'Action',
+      name: 'action',
+      documentation: `
+        Optional. If this is provided, an action will be included at the bottom
+        of the dropdown.
+      `
     }
   ],
 
@@ -222,13 +262,11 @@ foam.CLASS({
       // Custom views might need the full object to render though, not just the
       // id, so we do a lookup here for the full object here. This then gets
       // passed to the selectionView to use it if it wants to.
-      if ( this.data ) {
-        this.sections[0].dao.find(this.data).then((result) => {
-          this.fullObject_ = result;
-        });
-      }
+      this.onDetach(this.data$.sub(this.onDataUpdate));
+      this.onDataUpdate();
 
       this
+        .attrs({ name: this.name })
         .addClass(this.myClass())
         .start()
           .addClass(this.myClass('selection-view'))
@@ -243,7 +281,8 @@ foam.CLASS({
             .add(this.slot((data) => {
               return this.E().tag(self.selectionView, {
                 data: data,
-                fullObject$: this.fullObject_$
+                fullObject$: this.fullObject_$,
+                defaultSelectionPrompt$: this.choosePlaceholder$
               });
             }))
           .end()
@@ -258,11 +297,14 @@ foam.CLASS({
             if ( ! searchEnabled ) return null;
             return this.E()
               .start()
+                .start('img')
+                  .attrs({ src: 'images/ic-search.svg' })
+                .end()
                 .startContext({ data: self })
                   .addClass('search')
                   .add(self.FILTER_.clone().copyFrom({ view: {
                     class: 'foam.u2.view.TextField',
-                    placeholder: 'Search...',
+                    placeholder: this.searchPlaceholder,
                     onKey: true
                   } }))
                 .endContext()
@@ -278,7 +320,7 @@ foam.CLASS({
               var index = 0;
               return this.E().forEach(sections, function(section) {
                 this
-                  .start().hide(!! section.hideIfEmpty && resp[index].value <= 0)
+                  .start().hide(!! section.hideIfEmpty && resp[index].value <= 0 || ! section.heading)
                     .addClass(self.myClass('heading'))
                     .add(section.heading)
                   .end()
@@ -290,7 +332,7 @@ foam.CLASS({
                           .callIf(! section.disabled, function() {
                             this.on('click', () => {
                               self.fullObject_ = obj;
-                              self.data = obj;
+                              self.data = obj.id;
                               self.isOpen_ = false;
                             });
                           })
@@ -301,12 +343,33 @@ foam.CLASS({
               });
             });
           }))
+          .add(this.slot(function(action) {
+            if ( action ) {
+              return this.E()
+                .start(self.DefaultActionView, { action: action })
+                  .addClass(self.myClass('action'))
+                .end();
+            }
+          }))
         .end();
     },
 
     function updateMode_(mode) {
       if ( mode !== foam.u2.DisplayMode.RW ) {
         this.isOpen_ = false;
+      }
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'onDataUpdate',
+      code: function() {
+        if ( this.data ) {
+          this.sections[0].dao.find(this.data).then((result) => {
+            this.fullObject_ = result;
+          });
+        }
       }
     }
   ],
@@ -345,7 +408,7 @@ foam.CLASS({
           return this
             .start()
               .addClass(this.myClass('row'))
-              .add(this.data.id)
+              .add(this.data.toSummary())
             .end();
         }
       ]
@@ -381,7 +444,14 @@ foam.CLASS({
       properties: [
         {
           name: 'data',
-          documentation: 'The id of the selected object.'
+          documentation: 'The id of the selected object.',
+        },
+        {
+          name: 'defaultSelectionPrompt',
+          expression: function(of) {
+            var plural = of.model_.plural.toLowerCase();
+            return this.CHOOSE_FROM + plural;
+          }
         },
         {
           name: 'fullObject',
@@ -396,10 +466,42 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          var plural = this.of.model_.plural.toLowerCase();
-          return this.add(this.data || this.CHOOSE_FROM + plural);
+          return this.add(this.fullObject$.map(o => {
+            return o ? o.toSummary() : this.defaultSelectionPrompt;
+          }));
         }
       ]
+    },
+    {
+      name: 'DefaultActionView',
+      extends: 'foam.u2.ActionView',
+
+      documentation: `
+        This is the view that gets rendered at the bottom of the dropdown if an
+        action is provided.
+      `,
+
+      inheritCSS: false,
+      css: `
+        ^ {
+          border: 0;
+          border-top: 1px solid #f4f4f9;
+          color: %SECONDARYCOLOR%;
+          display: flex;
+          font-size: 12px;
+          text-align: left;
+          width: 100%;
+        }
+
+        ^:hover {
+          cursor: pointer;
+          color: %SECONDARYHOVERCOLOR%;
+        }
+
+        ^ img + span {
+          margin-left: 6px;
+        }
+      `
     }
   ]
 });

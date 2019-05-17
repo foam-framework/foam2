@@ -43,7 +43,7 @@ return
       swiftCode: function() {/*
 var ps: foam_swift_parse_PStream? = ps
 guard let ps1 = delegate.parse(ps!, x),
-      let c: ClassInfo = __subContext__.lookup(ps1.value() as! String) else {
+      let c: ClassInfo = __subContext__.lookup(ps1.value() as? String) else {
   return nil
 }
 ps = ps1

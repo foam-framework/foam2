@@ -704,6 +704,22 @@ foam.LIB({
           a.splice(i, 1);
         }
       }
+    },
+    function unique(a, comparator) {
+      // Returns a sorted array with all duplicate values removed.
+      // Sorting and comparison is done by the "comparator" parameter.
+      // If "comparator" is not specified then foam.util.compare will
+      // be used.
+
+      var comparator = comparator || foam.util.compare;
+      var sorted =  a.sort(comparator);
+      return sorted.reduce(function(acc, value) {
+        if ( ! acc.length ||
+             comparator(acc[acc.length - 1], value) != 0 )
+          acc.push(value);
+
+        return acc;
+      }, []);
     }
   ]
 });
@@ -827,7 +843,23 @@ foam.LIB({
 
       return newObj;
     },
-    function equals(a, b) { return a === b; },
+    function keys(o) { return Object.keys(o); },
+    function equals(a, b) {
+      if ( foam.Object.is(a, b) ) return true;
+      if ( ! foam.Object.isInstance(a)
+        || ! foam.Object.isInstance(b) ) return false;
+      if ( this.keys(a).length !== this.keys(b).length ) return false;
+
+      for ( var key in a ) {
+        if ( ! a.hasOwnProperty(key)
+          || ! b.hasOwnProperty(key)
+          || ! foam.util.equals(a[key], b[key])
+        ) {
+          return false;
+        }
+      }
+      return true;
+    },
     function compare(a, b) {
       if ( ! foam.Object.isInstance(b) ) return 1;
       return foam.Number.compare(a.$UID, b ? b.$UID : -1);
@@ -1011,6 +1043,12 @@ foam.LIB({
           return false;
         }
       },
+      function isPrimitive(value) {
+        return typeof value === 'string' ||
+          typeof value === 'number' ||
+          typeof value === 'boolean' ||
+          foam.Date.isInstance(value);
+      }
     ]
   });
 })();

@@ -18,7 +18,6 @@ import foam.nanos.boot.NSpecAware;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 import foam.nanos.pm.PMWebAgent;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -45,14 +44,14 @@ public class NanoRouter
   @Override
   public void init(javax.servlet.ServletConfig config) throws javax.servlet.ServletException {
     Object x = config.getServletContext().getAttribute("X");
-    if ( x != null && x instanceof foam.core.X ) x_ = (foam.core.X)x;
-    
+    if ( x != null && x instanceof foam.core.X ) x_ = (foam.core.X) x;
+
     super.init(config);
   }
 
   @Override
   protected void service(final HttpServletRequest req, final HttpServletResponse resp)
-      throws ServletException, IOException
+    throws ServletException, IOException
   {
     String   path       = req.getRequestURI();
     String[] urlParams  = path.split("/");
@@ -140,7 +139,7 @@ public class NanoRouter
         //
         // NOTE: Authentication must be last as HttpParametersWebAgent will consume the authentication parameters.
         //
-        if (spec.getAuthenticate() ) {
+        if ( spec.getAuthenticate() ) {
           service = new AuthWebAgent("service.run." + spec.getName(), (WebAgent) service);
         }
       }
@@ -167,7 +166,6 @@ public class NanoRouter
 
   @Override
   public void start() {
-
   }
 
   @Override

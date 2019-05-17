@@ -55,7 +55,28 @@ foam.CLASS({
     'window'
   ],
 
+  constants: [
+    {
+      name: 'SESSION_KEY',
+      value: 'sessionId',
+      type: 'String'
+    }
+  ],
+
   properties: [
+    {
+      class: 'String',
+      name: 'sessionName',
+      value: 'defaultSession'
+    },
+    {
+      class: 'String',
+      name: 'sessionID',
+      factory: function() {
+        return localStorage[this.sessionName] ||
+          ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
+      }
+    },
     {
       class: 'String',
       name: 'url'
@@ -142,6 +163,8 @@ protected class ResponseThread implements Runnable {
     {
       name: 'send',
       code: function(msg) {
+        msg.attributes[this.SESSION_KEY] = this.sessionID;
+
         // TODO: We should probably clone here, but often the message
         // contains RPC arguments that don't clone properly.  So
         // instead we will mutate replyBox and put it back after.
@@ -173,12 +196,13 @@ protected class ResponseThread implements Runnable {
         });
       },
       swiftCode: function() {/*
+let msg = msg!
 let replyBox = msg.attributes["replyBox"] as? foam_box_Box
 msg.attributes["replyBox"] = HTTPReplyBox_create()
 
 var request = URLRequest(url: Foundation.URL(string: self.url)!)
 request.httpMethod = "POST"
-request.httpBody = outputter.swiftStringify(msg).data(using: .utf8)
+request.httpBody = outputter.swiftStringify(msg)!.data(using: .utf8)
 
 msg.attributes["replyBox"] = replyBox
 

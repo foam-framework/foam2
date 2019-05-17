@@ -299,7 +299,7 @@ foam.LIB({
         this.private_.initAgentsCache = [];
         for ( var key in this.axiomMap_ ) {
           var axiom = this.axiomMap_[key];
-          if (axiom.initObject) this.private_.initAgentsCache.push(axiom);
+          if ( axiom.initObject ) this.private_.initAgentsCache.push(axiom);
         }
       }
       return this.private_.initAgentsCache;
@@ -988,6 +988,12 @@ foam.CLASS({
       // Distinguish between prototypes and instances.
       return this.cls_.id + (
           this.cls_.prototype === this ? 'Proto' : '');
+    },
+
+    function toSummary() {
+      var prop = this.cls_.getAxiomsByClass(foam.core.String)
+        .find(p => !p.hidden);
+      return prop ? prop.f(this) : this.toString();
     },
 
     function dot(name) {

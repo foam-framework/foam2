@@ -13,9 +13,9 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.pool.FixedThreadPool;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RuleEngine extends ContextAwareSupport {
@@ -75,15 +75,27 @@ public class RuleEngine extends ContextAwareSupport {
   }
 
   private void applyRules(List<Rule> rules, FObject obj, FObject oldObj) {
+    List<Rule> completedRules = null;
     for (Rule rule : rules) {
       if ( stops_.get() ) return;
 
       currentRule_ = rule;
-      if ( rule.f(getX(), obj, oldObj)
-        && rule.getAction() != null
+      if ( rule.getAction() != null
+        && rule.f(getX(), obj, oldObj)
       ) {
-        rule.apply(getX(), obj, oldObj, this);
-        saveHistory(rule, obj);
+        if ( completedRules == null ) {
+          completedRules = new ArrayList<>();
+        }
+        try {
+          rule.apply(getX(), obj, oldObj, this);
+          completedRules.add(rule);
+          saveHistory(rule, obj);
+        } catch (Exception e ) {
+          for (Rule completedRule : completedRules ) {
+            completedRule.applyReverse(getX(), obj, oldObj, this);
+          }
+          throw e;
+        }
       }
     }
   }
@@ -96,13 +108,27 @@ public class RuleEngine extends ContextAwareSupport {
           if ( stops_.get() ) return;
 
           currentRule_ = rule;
-          if ( rule.f(getX(), obj, oldObj)
-            && rule.getAsyncAction() != null
+          if ( rule.getAsyncAction() != null
+            && rule.f(getX(), obj, oldObj)
           ) {
-            rule.asyncApply(getX(), obj, oldObj, RuleEngine.this);
-            saveHistory(rule, obj);
+            try {
+              rule.asyncApply(x, obj, oldObj, RuleEngine.this);
+              saveHistory(rule, obj);
+            } catch (Exception ex) {
+              retryAsyncApply(x, rule, obj, oldObj);
+            }
           }
         }
+      }
+    });
+  }
+
+  private void retryAsyncApply(X x, Rule rule, FObject obj, FObject oldObj) {
+    new RetryManager().submit(x, new ContextAgent() {
+      @Override
+      public void execute(X x) {
+        rule.asyncApply(getX(), obj, oldObj, RuleEngine.this);
+        saveHistory(rule, obj);
       }
     });
   }
@@ -121,6 +147,13 @@ public class RuleEngine extends ContextAwareSupport {
         .build();
     }
     record.setResult(getResult(rule.getId()));
+    if ( rule.getValidity() > 0 ) {
+      Duration validity = Duration.ofDays(rule.getValidity());
+      Date expirationDate = Date.from(Instant.now().plus(validity));
+      record.setExpirationDate(expirationDate);
+      record.setStatus(RuleHistoryStatus.SCHEDULED);
+    }
+
     savedRuleHistory_.put(rule.getId(),
       (RuleHistory) ruleHistoryDAO_.put(record).fclone());
   }

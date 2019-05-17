@@ -44,7 +44,7 @@ let findIndex = { (o: foam_core_FObject) -> Int? in
   })
 }
 
-daoSub = try? newValue!.listen(FnSink_create([
+daoSub = try! newValue!.listen(FnSink_create([
   "fn": { [weak self] str, obj, sub in
     if self == nil { return }
     if str == "add" {
@@ -63,7 +63,7 @@ daoSub = try? newValue!.listen(FnSink_create([
     } else {
       self?.onDAOUpdate()
     }
-  } as (String, Any?, ${foam.core.Detachable.model_.swiftName}) -> Void,
+  } as (String?, Any?, ${foam.core.Detachable.model_.swiftName}?) -> Void,
 ]), nil)
 
 onDetach(daoSub)

@@ -25,7 +25,7 @@ foam.CLASS({
         [ { class: 'foam.u2.view.TableView' }, 'Table' ],
         [ {
             class: 'foam.u2.view.TreeView',
-            relationship: foam.nanos.menu.MenuMenuchildrenRelationship,
+            relationship: foam.nanos.menu.MenuMenuChildrenRelationship,
             startExpanded: true,
             formatter: function(data) { this.add(data.label); }
           }, 'Tree' ]

@@ -8,6 +8,8 @@ package foam.core;
 
 import foam.dao.pg.IndexedPreparedStatement;
 import foam.lib.xml.Outputter;
+import foam.nanos.auth.AuthService;
+import foam.nanos.auth.AuthorizationException;
 import foam.nanos.logger.Logger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -69,6 +71,11 @@ public abstract class AbstractPropertyInfo
     if ( prop.f(o1) == null || ! prop.f(o1).equals(prop.f(o2)) ) {
       diff.put(prop.getName(), prop.f(o2));
     }
+  }
+
+  public int compareTo(Object obj) {
+    int result = getName().compareTo(((PropertyInfo)obj).getName());
+    return result != 0 ? result : getClassInfo().compareTo(((PropertyInfo)obj).getClassInfo());
   }
 
   @Override
@@ -148,6 +155,25 @@ public abstract class AbstractPropertyInfo
   @Override
   public boolean containsDeletablePII(){
     return false;
+  }
+
+  @Override
+  public void authorize(X x) {
+    if ( this.getPermissionRequired() ) {
+      AuthService auth = (AuthService) x.get("auth");
+      String simpleName = this.getClassInfo().getObjClass().getSimpleName();
+      String permission =
+        simpleName.toLowerCase() +
+        ".%s." +
+        this.getName().toLowerCase();
+
+      if (
+        ! auth.check(x, String.format(permission, "rw")) &&
+        ! auth.check(x, String.format(permission, "ro"))
+      ) {
+        throw new AuthorizationException(String.format("Access denied. User lacks permission to access property '%s' on model '%s'.", this.getName(), simpleName));
+      };
+    }
   }
 
   @Override

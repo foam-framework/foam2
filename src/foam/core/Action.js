@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 /**
@@ -31,8 +20,11 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'Action',
+
   requires: [
+    'foam.core.ConstantSlot',
     'foam.core.ExpressionSlot',
+    'foam.core.PromiseSlot'
   ],
 
   documentation: 'An Action is a method with extra GUI support.',
@@ -118,46 +110,98 @@ foam.CLASS({
       name: 'code',
       required: true,
       value: null
+    },
+    {
+      class: 'StringArray',
+      name: 'availablePermissions',
+      documentation: `Permissions required for the action to be available.
+If empty than no permissions are required.`
+    },
+    {
+      class: 'StringArray',
+      name: 'enabledPermissions',
+      documentation: `Permissions required for the action to be enabled.
+If empty than no permissions are required.`,
     }
   ],
 
   methods: [
-    function isEnabledFor(data) {
-      return this.isEnabled ?
-        data.slot(this.isEnabled).get() :
-        true;
-    },
+    function addPermissionsCheck_(x, slot, data, permissions) {
+      // Decorates an isEnabled/isAvailable slot with a permission
+      // check if appropriate.
 
-    function createIsEnabled$(data$) {
+      // If no auth service, or no permissions to check then nothing to do.
+      if ( ! x.auth || ! permissions.length )
+        return slot;
+
       return foam.core.ExpressionSlot.create({
-        obj$: data$,
-        code: this.isEnabled
+        args: [
+          foam.core.PromiseSlot.create({
+            promise: Promise.all(permissions.map(p => x.auth.check(null, p))).
+              then(function(perms) {
+                return perms.every(p => p);
+              })
+          }),
+          slot
+        ],
+        code: function(a, b) {
+          return a && b;
+        }
       });
     },
 
-    function isAvailableFor(data) {
-      return this.isAvailable ?
-        foam.Function.withArgs(this.isAvailable, data) :
-        true ;
-    },
-
-    function createIsAvailable$(data$) {
-      return foam.core.ExpressionSlot.create({
-        obj$: data$,
-        code: this.isAvailable
-      });
-    },
-
-    function maybeCall(ctx, data) {
-      if ( this.isEnabledFor(data) && this.isAvailableFor(data) ) {
-        this.code.call(data, ctx, this);
-        // primitive types won't have a pub method
-        // Why are we publishing this event anyway? KGR
-        data && data.pub && data.pub('action', this.name, this);
-        return true;
+    function createSlotFor_(x, data, expression, permissions) {
+      // Handle old code that might try to pass data as a slot
+      if ( foam.core.Slot.isInstance(data) ) {
+        console.warn("Action createIsEnabled$ and createIsAvailable$ does not support data as a slot.");
+        data = data.get();
       }
 
-      return false;
+      // Helper method for creating isEnabled/isAvailable slots.
+
+      var slot = expression ?
+          data.slot(expression) :
+          foam.core.ConstantSlot.create({ value: true });
+
+      return this.addPermissionsCheck_(x, slot, data, permissions);
+    },
+
+    function createIsEnabled$(x, data) {
+      return this.createSlotFor_(x, data, this.isEnabled, this.enabledPermissions);
+    },
+
+    function createIsAvailable$(x, data) {
+      return this.createSlotFor_(x, data, this.isAvailable, this.availablePermissions);
+    },
+
+    function maybeCall(x, data) {
+      var self = this;
+      function call() {
+        self.code.call(data, x, self);
+        // primitive types won't have a pub method
+        // Why are we publishing this event anyway? KGR
+        data && data.pub && data.pub('action', self.name, self);
+      }
+
+      if ( ( this.isAvailable && ! foam.Function.withArgs(this.isAvailable, data) ) ||
+           ( this.isEnabled   && ! foam.Function.withArgs(this.isEnabled, data) ) )
+        return;
+
+
+      // No permission check if no auth service or no permissions to check.
+      if ( ! x.auth ||
+           ! ( this.availablePermissions.length || this.enabledPermissions.length ) ) {
+        call();
+        return;
+      }
+
+      var permissions = this.availablePermissions.concat(this.enabledPermissions);
+
+      permissions = foam.Array.unique(permissions);
+      Promise.all(permissions.map(p => x.auth.check(null, p))).
+        then(function(args) {
+          if ( args.every(b => b) ) call();
+        });
     },
 
     function installInClass(c) {
@@ -167,7 +211,7 @@ foam.CLASS({
     function installInProto(proto) {
       var action = this;
       proto[this.name] = function() {
-        return action.maybeCall(this.__context__, this);
+        action.maybeCall(this.__context__, this);
       };
     }
   ]

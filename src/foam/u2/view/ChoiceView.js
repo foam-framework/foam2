@@ -38,6 +38,11 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
+      name: 'name',
+      factory: function() { return "select"; }
+    },
+    {
+      class: 'String',
       name: 'label',
       documentation: 'User-visible label. Not to be confused with "text", ' +
           'which is the user-visible name of the currently selected choice.'
@@ -53,16 +58,19 @@ foam.CLASS({
 
         this.feedback_ = true;
 
-        if ( ! n && this.placeholder ) {
-          this.data = undefined;
-          this.text = this.placeholder;
-          this.index = -1;
-        } else {
-          this.data = n && n[0];
-          this.text = n && n[1];
-          this.index = this.findIndexOfChoice(n);
+        try {
+          if ( ! n && this.placeholder ) {
+            this.data  = undefined;
+            this.text  = this.placeholder;
+            this.index = -1;
+          } else {
+            this.data  = n && n[0];
+            this.text  = n && n[1];
+            this.index = this.findIndexOfChoice(n);
+          }
+        } finally {
+          this.feedback_ = false;
         }
-        this.feedback_ = false;
       }
     },
     {
@@ -201,7 +209,9 @@ foam.CLASS({
         placeholder$: this.placeholder$,
         mode$: this.mode$,
         size$: this.size$
-      }).end();
+      })
+      .attrs({ name: this.name })
+      .end();
 
       this.dao$proxy.on.sub(this.onDAOUpdate);
     },

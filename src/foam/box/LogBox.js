@@ -63,11 +63,11 @@ foam.CLASS({
         this.delegate && this.delegate.send(message);
       },
       swiftCode: `
-let output = msg.object;
+let output = msg!.object;
 let logMsg = [
   name,
   output is Error ? (output as! Error).localizedDescription :
-  foam_swift_parse_json_output_Outputter.PRETTY.swiftStringify(msg)
+  foam_swift_parse_json_output_Outputter.PRETTY.swiftStringify(msg)!
 ].joined(separator: " ")
 if let logLevelStr = logLevel?.consoleMethodName,
    let logMethod = get(key: logLevelStr) as? (String) -> Void {

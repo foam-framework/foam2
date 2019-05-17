@@ -33,6 +33,7 @@ public class Auth {
     Session session = new Session();
     x = x.put(Session.class, session);
     x = x.put("user", user);
+    x = x.put("group", ((DAO) x.get("localGroupDAO")).inX(x).find(user.getGroup()));
     session.setUserId(user.getId());
     session.setContext(x);
 

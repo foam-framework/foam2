@@ -52,12 +52,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'description',
-      documentation: 'Menu item explaination.'
+      documentation: 'Menu item explaination.',
+      displayWidth: 80
     },
     {
       class: 'String',
       name: 'icon',
-      documentation: 'Icon associated to the menu item.'
+      documentation: 'Icon associated to the menu item.',
+      displayWidth: 80
     }
   ],
 

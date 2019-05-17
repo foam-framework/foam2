@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 foam.CLASS({
   package: 'foam.nanos.u2.navigation',
   name: 'UserView',
@@ -63,7 +62,6 @@ foam.CLASS({
     ^ h1 {
       font-size: 16px;
       font-weight: 100;
-      color: white;
     }
     ^carrot {
       width: 0;
@@ -139,7 +137,6 @@ foam.CLASS({
     }
     ^ .foam-nanos-menu-SubMenuView-inner > div:hover {
       background-color: %SECONDARYCOLOR%;
-      color: white;
       cursor: pointer;
     }
     ^ .foam-nanos-menu-SubMenuView-inner::before {
@@ -147,7 +144,6 @@ foam.CLASS({
       position: absolute;
       height: 0;
       width: 0;
-      border: 8px solid transparent;
       border-bottom-color: white;
       -ms-transform: translate(110px, -16px);
       transform: translate(110px, -16px);
@@ -165,7 +161,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'showCountUnread',
-      expression: (countUnread) => countUnread > 0,
+      expression: (countUnread) => countUnread > 0
     },
     {
       name: 'userCur',
@@ -180,9 +176,7 @@ foam.CLASS({
       this.onDAOUpdate();
       this
         .addClass(this.myClass())
-
-         //currency menu
-         this.otherViews();
+        this.otherViews();  //currency menu
 
         // The notifications container
         this.start('div')
@@ -197,15 +191,15 @@ foam.CLASS({
           .on('click', this.changeToNotificationsPage.bind(this))
 
           .start('img')
-            .attrs({ src: 'images/bell.png' })
+            .attrs({src: 'images/bell.png'})
           .end()
 
           // The unread notification count bubble. Only shown if there is at
           // least one unread notification.
           .start('span')
             .addClass('dot')
-            .add( this.countUnread$ )
-            .show( this.showCountUnread$ )
+            .add(this.countUnread$)
+            .show(this.showCountUnread$)
           .end()
         .end()
 
@@ -228,13 +222,13 @@ foam.CLASS({
     function changeToNotificationsPage() {
       this.menuDAO.find('notifications').then((queryResult) => {
         if ( queryResult == null ) {
-          throw new Error(`No menu in menuDAO with id "notifications".`);
+          throw new Error('No menu in menuDAO with id "notifications".');
         }
         queryResult.launch();
       });
     },
     function otherViews() {
-     
+
     }
   ],
 
@@ -243,7 +237,7 @@ foam.CLASS({
       name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
-        var group = this.user.group;
+        var group = this.group.id;
         var id    = this.user.id;
         if ( id != 0 ) {
           this.notificationDAO.where(
@@ -255,11 +249,11 @@ foam.CLASS({
                 this.EQ(this.Notification.BROADCASTED, true)
               ),
               this.NOT(this.IN(
-                  this.Notification.NOTIFICATION_TYPE,
-                  this.user.disabledTopics))
+                this.Notification.NOTIFICATION_TYPE,
+                this.user.disabledTopics))
             )
           ).select(this.COUNT()).then((count) => {
-              this.countUnread = count.value;
+            this.countUnread = count.value;
           });
         }
       }

@@ -42,7 +42,7 @@ public class PMDAO
 
   @Override
   public FObject put_(X x, FObject obj) {
-    PM pm = new PM(PMDAO.class, putName_);
+    PM pm = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(putName_).build();
 
     try {
       return super.put_(x, obj);
@@ -53,7 +53,7 @@ public class PMDAO
 
   @Override
   public FObject find_(X x, Object id) {
-    PM pm = new PM(PMDAO.class, findName_);
+    PM pm = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(findName_).build();
 
     try {
       return super.find_(x, id);
@@ -64,7 +64,7 @@ public class PMDAO
 
   @Override
   public FObject remove_(X x, FObject obj) {
-    PM pm = new PM(PMDAO.class, removeName_);
+    PM pm = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(removeName_).build();
 
     try {
       return super.remove_(x, obj);
@@ -75,7 +75,7 @@ public class PMDAO
 
   @Override
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    PM pm = new PM(PMDAO.class, removeAllName_);
+    PM pm = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(removeAllName_).build();
 
     try {
       super.removeAll_(x, skip, limit, order, predicate);

@@ -20,7 +20,7 @@ import java.util.Map;
 
 // ???: Why is this interface mutable?
 public interface PropertyInfo
-    extends Axiom, Comparator, Expr, SQLStatement, Validator, Hasher, Signer
+    extends Axiom, Comparator, Expr, SQLStatement, Validator, Hasher, Signer, Comparable
 {
   public PropertyInfo setClassInfo(ClassInfo p);
   public ClassInfo getClassInfo();
@@ -62,4 +62,5 @@ public interface PropertyInfo
   public void cloneProperty(FObject source, FObject dest);
   public boolean containsPII();
   public boolean containsDeletablePII();
+  public void validateObj(foam.core.X x, foam.core.FObject obj);
 }

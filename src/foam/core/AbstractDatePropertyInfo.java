@@ -68,6 +68,11 @@ public abstract class AbstractDatePropertyInfo
   }
 
   @Override
+  public void toJSON(foam.lib.json.Outputter outputter, Object value) {
+    outputter.outputDateValue((Date)value);
+  }
+
+  @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {
     if ( ! includeInSignature() ) return;
     Date date = (Date) get(obj);

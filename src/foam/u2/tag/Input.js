@@ -20,7 +20,11 @@ foam.CLASS({
   name: 'Input',
   extends: 'foam.u2.View',
 
-  css: '^:read-only { border: none; background: rgba(0,0,0,0); }',
+  css: `
+    ^:read-only { border: none; background: rgba(0,0,0,0); }
+    /* Still show outline when focused as read-only to help accessibility *
+    ^:read-only:focus { outline: 1px solid rgb(238, 238, 238); }
+  `,
 
   properties: [
     [ 'nodeName', 'input' ],
@@ -129,10 +133,18 @@ foam.CLASS({
       this.attrSlot(null, this.onKey ? 'input' : null).linkFrom(this.data$);
     },
 
+    function fromProperty(p) {
+      this.SUPER(p);
+
+      this.visibility$.follow(p.createVisibilityFor(this.__context__.data$));
+      if ( ! this.hasOwnProperty('onKey') && p.validateObj ) this.onKey = true;
+    },
+
     function updateMode_(mode) {
       // TODO: make sure that DOM is updated if values don't change
       this.setAttribute('readonly', mode === foam.u2.DisplayMode.RO);
       this.setAttribute('disabled', mode === foam.u2.DisplayMode.DISABLED);
+      this.show(mode !== foam.u2.DisplayMode.HIDDEN);
     }
   ]
 });

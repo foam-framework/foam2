@@ -24,6 +24,17 @@ foam.CLASS({
       tableCellFormatter: function(value, obj) {
         this.add(value);
         this.__context__.userDAO.find(value).then(function(user) {
+          this.add(' ', user && user.label());
+        }.bind(this));
+      }
+    },
+    {
+      class: 'Long',
+      name: 'agentId',
+      tableCellFormatter: function(value, obj) {
+        if ( ! value ) return;
+        this.add(value);
+        this.__context__.userDAO.find(value).then(function(user) {
           this.add(' ', user.label());
         }.bind(this));
       }
@@ -51,7 +62,7 @@ foam.CLASS({
       name: 'context',
       type: 'Context',
       // Put a null user to prevent sytem user from leaking into subcontexts
-      javaFactory: 'return getX().put("user", null).put(Session.class, this);',
+      javaFactory: 'return getX().put("user", null).put("group", null).put(Session.class, this);',
       hidden: true,
       transient: true
     }
@@ -67,7 +78,8 @@ foam.CLASS({
     },
     {
       name: 'freeze',
-      javaCode: ' //nop '
+      type: 'foam.core.FObject',
+      javaCode: ' return this; '
     },
     {
       name: 'touch',

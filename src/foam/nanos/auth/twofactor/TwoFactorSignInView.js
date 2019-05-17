@@ -17,7 +17,9 @@ foam.CLASS({
     'user'
   ],
 
-  exports: [ 'as data' ],
+  exports: [
+    'as data'
+  ],
 
   requires: [
     'foam.u2.dialog.NotificationMessage'
@@ -70,7 +72,6 @@ foam.CLASS({
       margin-top: 10px;
       margin-left: 25px;
     }
-    }
     ^ .full-width-button > span {
       position: relative;
       top: -5px;
@@ -93,7 +94,6 @@ foam.CLASS({
   methods: [
     function initE() {
       this.SUPER();
-      var self = this;
 
       this
         .addClass(this.myClass())
@@ -111,7 +111,7 @@ foam.CLASS({
   actions: [
     {
       name: 'verify',
-      code: function (X) {
+      code: function(X) {
         var self = this;
 
         if ( ! this.twoFactorToken ) {
@@ -120,7 +120,7 @@ foam.CLASS({
         }
 
         this.twofactor.verifyToken(null, this.twoFactorToken)
-        .then(function (result) {
+        .then(function(result) {
           if ( result ) {
             self.loginSuccess = true;
             self.add(self.NotificationMessage.create({ message: self.TwoFactorSuccess }));

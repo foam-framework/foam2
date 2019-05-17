@@ -66,10 +66,10 @@ foam.CLASS({
 
     function detectCollisions() {
       /* implicit k-d-tree divide-and-conquer algorithm */
-            this.detectCollisions_(0, this.children.length-1, 'x', false, '');
+      this.detectCollisions_(0, this.children.length-1, 'x', false, '');
 
       // TODO: put back above line when properly supports mixing circles and squares
-      //this.detectCollisions__(0, this.children.length-1, 'x', false, '');
+      // this.detectCollisions__(0, this.children.length-1, 'x', false, '');
     },
 
     function detectCollisions__(start, end) {

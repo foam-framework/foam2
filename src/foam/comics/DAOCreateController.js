@@ -42,7 +42,6 @@ foam.CLASS({
     },
     {
       name: 'data',
-      view: { class: 'foam.u2.DetailView' },
       factory: function() {
         return this.dao ? this.dao.of.create({}, this) : null;
       }
@@ -65,12 +64,6 @@ foam.CLASS({
           self.exception = e;
           self.throwError.pub();
         });
-      }
-    },
-    {
-      name: 'cancel',
-      code: function() {
-        this.finished.pub();
       }
     }
   ]

@@ -69,7 +69,7 @@ if let index = self.name.range(of: "/", options: .backwards)?.lowerBound {
 }
 return ownClassInfo().create(args: [
   "name": name
-], x: __subContext__) as! foam_box_Box
+], x: __subContext__) as? foam_box_Box
       */},
     },
     {

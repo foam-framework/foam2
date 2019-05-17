@@ -54,10 +54,41 @@ foam.CLASS({
     },
 
     function link() {
-      this.attrSlot(null, this.onKey ? 'input' : null).relateFrom(
+      if ( foam.Undefined.isInstance(this.precision) ) {
+        this.attrSlot(null, this.onKey ? 'input' : null).relateFrom(
           this.data$,
           this.textToData.bind(this),
           this.dataToText.bind(this));
+        return;
+      }
+
+      // limit to precision;
+      var data = this.data$;
+      var view = this.attrSlot(null, this.onKey ? 'input' : null);
+      var self = this;
+
+      if ( ! foam.Undefined.isInstance(this.data) ) view.set(this.dataToText(this.data));
+
+      // When focus is lost on the view, force the view's value to equal the data
+      // to ensure it's formatted properly.
+      this.on('blur', function () {
+        view.set(self.dataToText(data.get()));
+      });
+
+      var preventFeedback = false;
+      view.sub(function() {
+        if ( preventFeedback ) return;
+        preventFeedback = true;
+        data.set(self.textToData(view.get()));
+        preventFeedback = false;
+      });
+
+      data.sub(function() {
+        if ( preventFeedback ) return;
+        preventFeedback = true;
+        view.set(self.dataToText(data.get()));
+        preventFeedback = false;
+      });
     },
 
     function fromProperty(p) {
@@ -69,11 +100,9 @@ foam.CLASS({
     },
 
     function formatNumber(val) {
-      if ( ! val ) return '0';
+      if ( ! val ) val = 0;
       val = val.toFixed(this.precision);
-      var i = val.length - 1;
-      for ( ; i > 0 && val.charAt(i) === '0' ; i-- ) {}
-      return val.substring(0, val.charAt(i) === '.' ? i : i + 1);
+      return val;
     },
 
     function dataToText(val) {

@@ -102,12 +102,17 @@ foam.CLASS({
       this.setAttribute('title', this.action.toolTip); // hover text
 
       if ( this.action ) {
-        if ( this.action.isAvailable ) {
-          this.enableClass(this.myClass('unavailable'), this.action.createIsAvailable$(this.data$), true);
-        }
+        this.attrs({ name: this.action.name });
 
-        if ( this.action.isEnabled ) {
-          this.attrs({disabled: this.action.createIsEnabled$(this.data$).map(function(e) { return e ? false : 'disabled'; })});
+        this.enableClass(this.myClass('unavailable'), this.action.createIsAvailable$(this.__context__, this.data), true);
+        this.attrs({ disabled: this.action.createIsEnabled$(this.__context__, this.data).map((e) => e ? false : 'disabled') });
+
+        if ( this.action.isDestructive && this.action.isSecondary ) {
+          this.addClass(this.myClass('secondary-destructive'));
+        } else if ( this.action.isDestructive ) {
+          this.addClass(this.myClass('destructive'));
+        } else if ( this.action.isSecondary ) {
+          this.addClass(this.myClass('secondary'));
         }
       }
     },

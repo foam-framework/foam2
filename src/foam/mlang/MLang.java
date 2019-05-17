@@ -9,6 +9,8 @@ package foam.mlang;
 import foam.core.ClassInfo;
 import foam.dao.Sink;
 import foam.mlang.expr.Dot;
+import foam.mlang.order.Comparator;
+import foam.mlang.order.Desc;
 import foam.mlang.predicate.*;
 import foam.mlang.sink.*;
 import java.lang.reflect.InvocationTargetException;
@@ -25,6 +27,10 @@ public class MLang
 
   public static final Expr NEW_OBJ    = new ContextObject("NEW");
   public static final Expr OLD_OBJ    = new ContextObject("OLD");
+
+  public static Comparator DESC(Comparator c) {
+    return new Desc(c);
+  }
 
   public static Expr prepare(Object o) {
     return o instanceof Expr ? (Expr) o :
@@ -159,6 +165,31 @@ public class MLang
     return new Dot.Builder(null)
       .setArg1(o1)
       .setArg2(new PredicatedExpr(o2))
+      .build();
+  }
+
+  public static Predicate CLASS_OF(ClassInfo info) {
+    return new IsClassOf(info);
+  }
+
+  public static Predicate CLASS_OF(Class cls) {
+    try {
+      return CLASS_OF((ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null));
+    } catch(NoSuchMethodException|IllegalAccessException|InvocationTargetException e) {
+      throw new RuntimeException("Attempt to call CLASS_OF on non Modelled class." + cls);
+    }
+  }
+
+  public static Predicate CONTAINS_IC(Object o1, Object o2) {
+    return new ContainsIC.Builder(null)
+    .setArg1(MLang.prepare(o1))
+    .setArg2(MLang.prepare(o2))
+      .build();
+  }
+
+  public static Predicate HAS(Object o) {
+    return new Has.Builder(null)
+      .setArg1(MLang.prepare(o))
       .build();
   }
 }

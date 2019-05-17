@@ -29,17 +29,18 @@ foam.CLASS({
     {
       class: 'String',
       name: 'name',
+      displayWidth: '60',
       tableWidth: 460
     },
     {
       class: 'String',
       name: 'description',
-      width: 80
+      width: 120
     },
     {
       class: 'Boolean',
       name: 'lazy',
-      tableWidth: 60,
+      tableWidth: 65,
       value: true,
       tableCellFormatter: function(value, obj, property) {
         this
@@ -54,7 +55,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'serve',
-      tableWidth: 50,
+      tableWidth: 72,
       tableCellFormatter: function(value, obj, property) {
         this
           .start()
@@ -109,6 +110,12 @@ foam.CLASS({
       }
     },
     {
+      class: 'FObjectProperty',
+      name: 'service',
+      view: { class: 'foam.u2.view.FObjectView' },
+      permissionRequired: true
+    },
+    {
       class: 'String',
       name: 'serviceClass',
       displayWidth: 80
@@ -121,19 +128,25 @@ foam.CLASS({
     {
       class: 'String',
       name: 'serviceScript',
-      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 80 },
+      view: { class: 'io.c9.ace.Editor' },
       permissionRequired: true
     },
     {
       class: 'String',
       name: 'client',
       value: '{}',
-      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 80 }
+      view: { class: 'io.c9.ace.Editor' }
     },
     {
-      class: 'FObjectProperty',
-      name: 'service',
-      view: { class: 'foam.u2.view.FObjectView' },
+      class: 'String',
+      name: 'documentation',
+      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
+      permissionRequired: true
+    },
+    {
+      class: 'String',
+      name: 'authNotes',
+      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
       permissionRequired: true
     }
     // TODO: permissions, keywords, lazy, parent

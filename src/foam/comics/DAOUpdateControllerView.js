@@ -22,6 +22,8 @@ foam.CLASS({
 
   requires: [
     'foam.comics.DAOUpdateController',
+    'foam.u2.ControllerMode',
+    'foam.u2.DisplayMode',
     'foam.u2.dialog.NotificationMessage'
   ],
 
@@ -31,17 +33,25 @@ foam.CLASS({
   ],
 
   exports: [
+    'controllerMode',
     'data'
   ],
 
   css: `
-    ^ .net-nanopay-ui-ActionView {
-      background: #59aadd;
-      color: white;
-      margin-right: 4px;
+    ^ {
+      width: 1024px;
+      margin: auto;
     }
-    ^ .net-nanopay-ui-ActionView-delete {
-      background: #d55;
+    ^action-container {
+      display: flex;
+      justify-content: space-between;
+      margin: 8px 0;
+    }
+    ^action-container > div > div > * + * {
+      margin-left: 8px;
+    }
+    ^detail-container {
+      overflow-x: scroll;
     }
   `,
 
@@ -70,6 +80,22 @@ foam.CLASS({
     {
       class: 'String',
       name: 'detailView'
+    },
+    {
+      name: 'controllerMode',
+      factory: function() {
+        return this.ControllerMode.VIEW;
+      }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.u2.Element',
+      name: 'container_'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.u2.Element',
+      name: 'detailViewElement_'
     }
   ],
 
@@ -85,24 +111,71 @@ foam.CLASS({
         .add(this.data.dao.of.getAxiomsByClass(foam.core.Action))
       .endContext()
       */
-      this.
-      addClass(this.myClass()).
-      start('table').
-        start('tr').
-          start('td').style({'vertical-align': 'top', 'width': '100%'}).
-            start('span').
-              style({background: 'rgba(0,0,0,0)'}).
-              show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
-              start().
-                style({'padding-bottom': '4px'}).
-                add(this.data.cls_.getAxiomsByClass(foam.core.Action)).
-              end().
-            end().
-            tag({class: this.detailView}, {data: this.data.obj}).
-            add(this.DAOUpdateController.OBJ).
-          end().
-        end().
-      end();
+      this
+        .addClass(this.myClass())
+
+        // Container for the actions
+        .start()
+          .addClass(this.myClass('action-container'))
+
+          // Actions grouped to the left
+          .start()
+            .startContext({ data: this })
+              .tag(this.CANCEL, { buttonStyle: 'SECONDARY' })
+            .endContext()
+          .end()
+
+          // Actions grouped to the right
+          .start()
+            .start()
+              .show(this.mode$.map((m) => m === this.DisplayMode.RW))
+              .add(this.data.cls_.getAxiomsByClass(foam.core.Action))
+            .end()
+            .start()
+              .show(this.mode$.map((m) => m === this.DisplayMode.RO))
+              .startContext({ data: this })
+                .add(this.EDIT)
+              .endContext()
+            .end()
+          .end()
+        .end()
+        
+        // Container for the detailview
+        .start('div', [], this.container_$)
+          .addClass(this.myClass('detail-container'))
+          .tag({
+            class: this.detailView,
+            of: this.dao.of,
+            data$: this.data$.dot('obj'),
+            showActions: true
+          }, [], this.detailViewElement_$)
+        .end();
+    }
+  ],
+
+  actions: [
+    {
+      name: 'cancel',
+      code: function() {
+        this.stack.back();
+      }
+    },
+    {
+      name: 'edit',
+      isAvailable: function(controllerMode) {
+        return controllerMode === this.ControllerMode.VIEW;
+      },
+      code: function() {
+        this.controllerMode = this.ControllerMode.EDIT;
+        var newE = this.container_.createChild_({
+          class: this.detailView,
+          of: this.dao.of,
+          data$: this.data$.dot('obj'),
+          showActions: true
+        }, []);
+        this.container_.replaceChild(newE, this.detailViewElement_);
+        this.detailViewElement_ = newE;
+      }
     }
   ],
 

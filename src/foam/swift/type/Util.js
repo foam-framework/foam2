@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.swift.type',
   name: 'Util',
@@ -105,8 +111,8 @@ foam.CLASS({
       ],
       swiftType: 'Int',
       swiftCode: `
-        let aType = typeOf(a)
-        let bType = typeOf(b)
+        let aType = typeOf(a)!
+        let bType = typeOf(b)!
         return aType.ordinal > bType.ordinal ? 1 :
             aType.ordinal < bType.ordinal ? -1 : aType.compare(a, b);
       `,

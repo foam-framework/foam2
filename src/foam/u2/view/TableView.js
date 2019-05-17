@@ -17,21 +17,23 @@ foam.CLASS({
     ^ th {
       text-align: left;
       white-space: nowrap;
-      font-family: 'Roboto';
+      font-family: Roboto, 'Helvetica Neue', helvetica, sans-serif;
       padding-left: 15px;
       font-size: 14px;
       line-height: 1;
       letter-spacing: 0.4px;
       color: #2b2b2b;
+      background: %BACKGROUNDCOLOR%;
+      box-sizing: border-box;
     }
 
-    ^ th > img {
+    ^ th:not(:last-child) > img {
       margin-left: 8px;
     }
 
     ^ td {
       white-space: nowrap;
-      font-family: Roboto;
+      font-family: Roboto, 'Helvetica Neue', helvetica, sans-serif;
       line-height: 1.33;
       letter-spacing: 0.2px;
       padding-left: 15px;
@@ -42,10 +44,6 @@ foam.CLASS({
     ^row:hover {
       background: #eee;
       cursor: pointer;
-    }
-
-    ^ tbody {
-      box-shadow: 0 2px 2px 0 #dae1e9;
     }
 
     ^ tbody > tr {
@@ -62,7 +60,7 @@ foam.CLASS({
       border-top-left-radius: 5px;
       border-left: solid 1px #e2e2e3;
     }
-    
+
     ^ tbody > tr > td:last-child {
       border-top-right-radius: 5px;
       border-right: solid 1px #e2e2e3;
@@ -75,7 +73,7 @@ foam.CLASS({
     ^vertDots {
       font-size: 20px;
       font-weight: bold;
-      padding-right: 12px;
+      padding-right: 21px;
     }
 
     ^noselect {
@@ -87,17 +85,12 @@ foam.CLASS({
       user-select: none;
     }
 
-    ^context-menu-item {
-      padding: 10px;
-    }
-
     ^ .disabled {
       color: #aaa;
     }
 
-    ^context-menu-item:hover:not(.disabled) {
-      cursor: pointer;
-      background-color: %ACCENTCOLOR%;
+    ^context-menu-cell {
+      margin-right: 12px;
     }
   `,
 });

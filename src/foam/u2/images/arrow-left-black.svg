@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g id="3.-Components" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Text-fields,-Inputs-&amp;-Forms" transform="translate(-751.000000, -2645.000000)">
+            <g id="Group-3" transform="translate(720.000000, 2514.000000)">
+                <g id="Group-11" transform="translate(0.000000, 41.000000)">
+                    <g id="Group-13" transform="translate(0.000000, 72.000000)">
+                        <g id="Button/actions/arrowleft" transform="translate(29.000000, 16.000000)">
+                            <g id="Group" transform="translate(8.000000, 8.000000) scale(-1, 1) translate(-8.000000, -8.000000) ">
+                                <g id="round-arrow_forward-24px">
+                                    <polygon id="Path" points="0 0 16 0 16 16 0 16"></polygon>
+                                    <path d="M3.33333333,8.66666667 L10.78,8.66666667 L7.52666667,11.92 C7.26666667,12.18 7.26666667,12.6066667 7.52666667,12.8666667 C7.78666667,13.1266667 8.20666667,13.1266667 8.46666667,12.8666667 L12.86,8.47333333 C13.12,8.21333333 13.12,7.79333333 12.86,7.53333333 L8.47333333,3.13333333 C8.21333333,2.87333333 7.79333333,2.87333333 7.53333333,3.13333333 C7.27333333,3.39333333 7.27333333,3.81333333 7.53333333,4.07333333 L10.78,7.33333333 L3.33333333,7.33333333 C2.96666667,7.33333333 2.66666667,7.63333333 2.66666667,8 C2.66666667,8.36666667 2.96666667,8.66666667 3.33333333,8.66666667 Z" id="Path" fill="#000000"></path>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

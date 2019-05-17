@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'PermissionedPropertyDAO',
@@ -48,6 +54,7 @@ foam.CLASS({
       name: 'select_',
       javaCode: `
       if ( x.get("auth") != null ) {
+        if ( predicate != null ) predicate.authorize(x);
         foam.dao.Sink sink2 = ( sink != null ) ? new HidePropertiesSink(x, sink, this) : sink;
         super.select_(x, sink2, skip, limit, order, predicate);
         return sink;
@@ -268,7 +275,7 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(`
   private PermissionedPropertyDAO dao;
-  public HidePropertiesSink(foam.core.X  x, foam.dao.Sink delegate, PermissionedPropertyDAO dao) {
+  public HidePropertiesSink(foam.core.X x, foam.dao.Sink delegate, PermissionedPropertyDAO dao) {
     setX(x);
     setDelegate(delegate);
     this.dao = dao;

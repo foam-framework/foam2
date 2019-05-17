@@ -17,7 +17,11 @@ foam.CLASS({
     'org.eclipse.jetty.websocket.server.WebSocketUpgradeFilter',
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest',
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse',
-    'org.eclipse.jetty.websocket.servlet.WebSocketCreator'
+    'org.eclipse.jetty.websocket.servlet.WebSocketCreator',
+    'foam.nanos.jetty.WhitelistedForwardedRequestCustomizer',
+    'java.util.Set',
+    'java.util.HashSet',
+    'java.util.Arrays'
   ],
 
   properties: [
@@ -34,6 +38,10 @@ foam.CLASS({
           '/src/foam/nanos/controller/index.html'
         ];
       }
+    },
+    {
+      class: 'StringArray',
+      name: 'forwardedForProxyWhitelist',
     },
     {
       class: 'FObjectArray',
@@ -60,17 +68,42 @@ foam.CLASS({
       javaCode: `
       try {
         System.out.println("Starting Jetty http server.");
+        int port = getPort();
+        String portStr = System.getProperty("http.port");
+        if ( portStr != null && ! portStr.isEmpty() ) {
+          try {
+            port = Integer.parseInt(portStr);
+            setPort(port);
+          } catch ( NumberFormatException e ) {
+            System.err.println(this.getClass().getSimpleName()+" invalid http.port '"+portStr+"'");
+            port = getPort();
+          }
+        }
+
         org.eclipse.jetty.server.Server server =
-          new org.eclipse.jetty.server.Server(getPort());
+          new org.eclipse.jetty.server.Server(port);
 
         /*
-          Prevent Jetty server from broadcasting its version number in the HTTP
+          The following for loop will accomplish the following:
+          1. Prevent Jetty server from broadcasting its version number in the HTTP
           response headers.
+          2. Configure Jetty server to interpret the X-Fowarded-for header
         */
+        
+        // we are converting the ForwardedForProxyWhitelist array into a set here
+        // so that it makes more sense algorithmically to check against IPs
+        Set<String> forwardedForProxyWhitelist = new HashSet<>(Arrays.asList(getForwardedForProxyWhitelist()));
+
         for ( org.eclipse.jetty.server.Connector conn : server.getConnectors() ) {
           for ( org.eclipse.jetty.server.ConnectionFactory f : conn.getConnectionFactories() ) {
             if ( f instanceof org.eclipse.jetty.server.HttpConnectionFactory ) {
+              
+              // 1. hiding the version number in response headers
               ((org.eclipse.jetty.server.HttpConnectionFactory) f).getHttpConfiguration().setSendServerVersion(false);
+
+              // 2. handle the X-Forwarded-For headers depending on whether a whitelist is set up or not
+              // we need to pass the context into this customizer so that we can effectively log unauthorized proxies
+              ((org.eclipse.jetty.server.HttpConnectionFactory) f).getHttpConfiguration().addCustomizer(new WhitelistedForwardedRequestCustomizer(getX(), forwardedForProxyWhitelist));
             }
           }
         }
