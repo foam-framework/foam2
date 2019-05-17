@@ -704,6 +704,22 @@ foam.LIB({
           a.splice(i, 1);
         }
       }
+    },
+    function unique(a, comparator) {
+      // Returns a sorted array with all duplicate values removed.
+      // Sorting and comparison is done by the "comparator" parameter.
+      // If "comparator" is not specified then foam.util.compare will
+      // be used.
+
+      var comparator = comparator || foam.util.compare;
+      var sorted =  a.sort(comparator);
+      return sorted.reduce(function(acc, value) {
+        if ( ! acc.length ||
+             comparator(acc[acc.length - 1], value) != 0 )
+          acc.push(value);
+
+        return acc;
+      }, []);
     }
   ]
 });

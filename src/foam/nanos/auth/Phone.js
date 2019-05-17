@@ -19,20 +19,17 @@ foam.CLASS({
   constants: [
     {
       name: 'PHONE_REGEX',
-      type: 'Regex',
-      value: /([+]?\d{1,2}[\.\-\s]?)?(\d{3}[.-]?){2}\d{4}/g
+      factory: function() {
+        return /([+]?\d{1,2}[\.\-\s]?)?(\d{3}[.-]?){2}\d{4}/g;
+      }
     }
   ],
 
   properties: [
     {
-      class: 'Boolean',
-      name: 'verified',
-      permissionRequired: true
-    },
-    {
       class: 'PhoneNumber',
       name: 'number',
+      label: '',
       required: true,
       validateObj: function (number) {
         if ( ! this.PHONE_REGEX.test(number) ) {
@@ -42,12 +39,17 @@ foam.CLASS({
       preSet: function(o, n) {
         return n.replace(/[- )(]/g, '');
       },
-      javaValidateObj: `
-        String number = ((Phone) obj).getNumber();
-        if ( ! Phone.PHONE_REGEX.matcher(number).matches() ) {
-          throw new IllegalStateException(Phone.INVALID_NUMBER);
-        }
-      `
+      // javaValidateObj: `
+      //   String number = ((Phone) obj).getNumber();
+      //   if ( ! Phone.PHONE_REGEX.matcher(number).matches() ) {
+      //     throw new IllegalStateException(Phone.INVALID_NUMBER);
+      //   }
+      // `
+    },
+    {
+      class: 'Boolean',
+      name: 'verified',
+      permissionRequired: true
     }
   ]
 });

@@ -235,6 +235,7 @@ foam.CLASS({
     ^ .foam-u2-CheckBox-label {
       margin-left: 12px;
       vertical-align: middle;
+      white-space: pre-wrap;
     }
 
     ^ .foam-u2-CheckBox:checked {
@@ -243,10 +244,14 @@ foam.CLASS({
       border: solid 1px #604aff;
     }
 
+    /*
     ^ .foam-u2-CheckBox:checked:after {
       content: url(data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2048%2048%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2215%22%20height%3D%2215%22%20version%3D%221.1%22%3E%0A%20%20%20%3Cpath%20fill%3D%22white%22%20stroke-width%3D%223%22%20d%3D%22M18%2032.34L9.66%2024l-2.83%202.83L18%2038l24-24-2.83-2.83z%22/%3E%0A%3C/svg%3E);
     }
+    */
 
+
+    /*
     ^ input[type="radio" i] {
       -webkit-appearance: none;
       border-radius: 8px;
@@ -273,6 +278,8 @@ foam.CLASS({
     ^ input[type="radio" i]:checked:after {
       content: url('images/active-radio.svg');
     }
+
+    */
 
     ^ .foam-u2-view-RadioView .foam-u2-view-RadioView {
       margin-bottom:16px;
@@ -306,14 +313,16 @@ foam.CLASS({
           .map(m => m != foam.u2.Visibility.HIDDEN))
         .addClass(this.myClass())
         .start(self.Rows, { defaultChildStyle: { padding: '8px 0' } })
-          .add(this.slot(function(data, prop) {
+          .add(this.slot(function(data, prop, prop$label) {
             var errorSlot = prop.validateObj ?
               data.slot(prop.validateObj) :
               foam.core.ConstantSlot.create({ value: null });
 
             return self.E()
               .start(self.Rows, { defaultChildStyle:  { 'line-height': '2' } })
-                .start('m3').add(prop.label$).end()
+                .callIf(prop$label, function() {
+                  this.start('m3').add(prop$label).end();
+                })
                 .start()
                   .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                   .start(self.Item)
@@ -329,7 +338,6 @@ foam.CLASS({
                         data: 'images/question-icon.svg'
                       })
                         .addClass(self.myClass('helper-icon'))
-                        .attrs({ title: prop.help })
                       .end()
 
                       .start()
@@ -350,8 +358,7 @@ foam.CLASS({
                 .start(this.Item).style({'align-items': 'center'})
                   .start(self.Cols, { defaultChildStyle: {
                     'justify-content': 'flex-start',
-                    'margin': '0 8px 0 0',
-                    'position': 'absolute'
+                    'margin': '0 8px 0 0'
                   }})
                     .addClass(this.myClass('validation-container'))
                     .show(errorSlot)
