@@ -63,7 +63,7 @@ foam.CLASS({
           .filter(p => p.section == a.name)
           .filter(p => ! p.hidden),
         actions: cls.getAxiomsByClass(this.Action)
-          .filter(a => a.section == a.name)
+          .filter(action => action.section == a.name)
       });
       return this;
     }
