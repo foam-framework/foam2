@@ -169,6 +169,12 @@ If set to an empty array, then no permission is required even if permissionRequi
     },
 
     function createSlotFor_(x, data, expression, permissions) {
+      // Handle old code that might try to pass data as a slot
+      if ( foam.core.Slot.isInstance(data) ) {
+        console.warn("Action createIsEnabled$ and createIsAvailable$ does not support data as a slot.");
+        data = data.get();
+      }
+
       // Helper method for creating isEnabled/isAvailable slots.
 
       var slot = expression ?

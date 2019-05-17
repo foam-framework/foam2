@@ -49,10 +49,10 @@ foam.CLASS({
           .add(this.label$);
 
       this.enableClass(this.myClass('unavailable'),
-            this.action.createIsAvailable$(this.__context__, this.data$), true /* negate */);
+            this.action.createIsAvailable$(this.__context__, this.data), true /* negate */);
 
       this.attrs({
-        disabled: this.action.createIsEnabled$(this.__context__, this.data$).map(function(e) {
+        disabled: this.action.createIsEnabled$(this.__context__, this.data).map(function(e) {
           return e ? false : 'disabled';
         })
       });
