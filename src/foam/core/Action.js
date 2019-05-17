@@ -120,7 +120,7 @@ foam.CLASS({
       class: 'StringArray',
       name: 'availablePermissions',
       documentation: `Permissions required for the action to be available.
-If null then we will compute the expected permission name at runtime.
+If null then we will compute the expected permission name at runtime if permissionRequired is true.
 If set to an empty array, then no permission is required even if permissionRequired is set to true.`,
       factory: function() {
         return null;
@@ -130,7 +130,7 @@ If set to an empty array, then no permission is required even if permissionRequi
       class: 'StringArray',
       name: 'enabledPermissions',
       documentation: `Permissions required for the action to be enabled.
-If null then we will compute the expected permission name at runtime.
+If null then we will compute the expected permission name at runtime if permissionRequired is true.
 If set to an empty array, then no permission is required even if permissionRequired is set to true.`,
       factory: function() {
         return null;
@@ -143,29 +143,34 @@ If set to an empty array, then no permission is required even if permissionRequi
       // Decorates an isEnabled/isAvailable slot with a permission
       // check if appropriate.
 
-      // If no auth service exists in the context, then fail open.
-      // Assume we have permission and let the server reject it.  this
-      // way client context bugs won't prevent users from completing
-      // actions.
-      if ( ! this.permissionRequired || ! x.auth )
-        return slot;
+      // If no auth service, then nothing to check for.
+      if ( ! x.auth ) return slot;
 
+      // If permissions is null and permissionRequired is false then nothing to check for.
+      if ( ! permissions && ! this.permissionRequired ) return slot;
+
+      // If permissions is an empty array, then nothing to check for.
+      if ( permissions && permissions.length == 0 ) return slot;
+
+      // If permissionRequired is true, but permissions is null, then compute
+      // a reasonable default permission.
       if ( foam.Null.isInstance(permissions) && data && data.cls_ )
         permissions = [ data.cls_.id + '.permission.' + this.name ];
 
-      // If permissions is empty array then no permission check is needed.
-      return permissions.length ?
-        foam.core.ExpressionSlot.create({
-          args: [
-            foam.core.PromiseSlot.create({
-              promise: Promise.all(permissions.map(p => x.auth.check(null, p))).
-                then(function(...args) { return args.every(p => p); })
-            }),
-            slot
-          ],
-          code: function(a, b) { return a && b; }
-        }) :
-        slot;
+      return foam.core.ExpressionSlot.create({
+        args: [
+          foam.core.PromiseSlot.create({
+            promise: Promise.all(permissions.map(p => x.auth.check(null, p))).
+              then(function(perms) {
+                return perms.every(p => p);
+              })
+          }),
+          slot
+        ],
+        code: function(a, b) {
+          return a && b;
+        }
+      });
     },
 
     function createSlotFor_(x, data, expression, permissions) {
