@@ -7,20 +7,20 @@
 foam.CLASS({
   package: 'foam.nanos.ruler',
   name: 'RulerProbe',
-  documentation: 'A helper model used to test dao operation for provided `obj`.' +
-  'Returned with populated appliedRules(Map<Rule, boolean>) property that describes what rules will be applied successfully/unsuccessfully.' +
-  'Usage example: user = new User();' +
-  'rulerProbe = new RulerProbe();' +
-  'rulerProbe.setObject(user);' +
-  'rulerProbe.setOperation(CREATE);' +
-  'rulerProbe = userDAO.cmd(rulerProbe);',
+  documentation: `A helper model used to test dao operation for provided "obj".
+  Returned with populated appliedRules(Map<Rule, boolean>) property that describes what rules will be applied successfully/unsuccessfully.
+  Usage example: user = new User();
+  rulerProbe = new RulerProbe();
+  rulerProbe.setObject(user);
+  rulerProbe.setOperation(CREATE);
+  rulerProbe = userDAO.cmd(rulerProbe);`,
 
   properties: [
     {
-      class: 'Map',
-      javaType: 'java.util.Map<Rule, Boolean>',
+      class: 'List',
+      javaType: 'java.util.ArrayList<TestedRule>',
       name: 'appliedRules',
-      javaFactory: 'return new java.util.HashMap<Rule, Boolean>();'
+      javaFactory: 'return new java.util.ArrayList<TestedRule>();'
     },
     {
       class: 'Object',
