@@ -3367,7 +3367,14 @@ foam.CLASS({
       code: function(o) {
         var v1 = this.arg1.f(o);
         return v1 && Date.now() - v1.getTime() > this.timeMs;
-      }
+      },
+      javaCode: `
+        Object v1 = getArg1().f(obj);
+        if ( v1 instanceof java.util.Date ) {
+          return new java.util.Date().getTime() - ((java.util.Date)v1).getTime() > getTimeMs();
+        }
+        return false;
+      `
     }
   ]
 });
