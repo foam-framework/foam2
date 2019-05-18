@@ -225,6 +225,7 @@ foam.CLASS({
       display: flex;
       align-items: center;
       font-size: 16px;
+      margin-right: auto;
     }
 
 
