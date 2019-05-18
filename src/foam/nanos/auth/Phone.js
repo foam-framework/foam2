@@ -27,14 +27,7 @@ foam.CLASS({
           },
           errorString: 'Invalid phone number.'
         }
-      ],
-      // TODO: Remove javaValidateObj
-      javaValidateObj: `
-        String number = ((Phone) obj).getNumber();
-        if ( foam.util.SafetyUtil.isEmpty(number) ) {
-          throw new IllegalStateException(Phone.INVALID_NUMBER);
-        }
-      `
+      ]
     },
     {
       class: 'Boolean',

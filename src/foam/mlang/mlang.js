@@ -3331,6 +3331,8 @@ foam.CLASS({
   implements: [ 'foam.core.Serializable' ],
   properties: [
     {
+      type: 'Regex',
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
       name: 'regExp'
     }
   ],
@@ -3340,7 +3342,10 @@ foam.CLASS({
       code: function(o) {
         var v1 = this.arg1.f(o);
         return v1.toString().match(this.regExp);
-      }
+      },
+      javaCode: `
+        return getRegExp().matcher(getArg1().f(obj).toString()).matches();
+      `
     }
   ]
 });
@@ -3381,7 +3386,10 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      code: function(o) { return o[this.property]; }
+      code: function(o) { return o[this.property]; },
+      javaCode: `
+        return ((foam.core.FObject) obj).getProperty(getProperty());
+      `
     }
   ]
 });

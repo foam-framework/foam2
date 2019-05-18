@@ -52,6 +52,8 @@ var classes = [
   'foam.mlang.expr.Dot',
   'foam.mlang.PredicatedExpr',
   'foam.mlang.ContextObject',
+  'foam.mlang.predicate.RegExp',
+  'foam.mlang.FObjectPropertyExpr',
   'foam.box.Box',
   'foam.box.Skeleton',
   'foam.box.AbstractSkeleton',

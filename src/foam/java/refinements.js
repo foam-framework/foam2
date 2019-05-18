@@ -29,8 +29,8 @@ foam.LIB({
           // a number of places.
           return null;
         },
-        Array: function(a) {
-          return "new Object[] {" +
+        Array: function(a, prop) {
+          return "new " + (prop ? prop.javaType : 'Object[]') + " {" +
             a.map(foam.java.asJavaValue).join(',') +
             '}';
         },
@@ -212,7 +212,14 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'javaValidateObj'
+      name: 'javaValidateObj',
+      expression: function(validationPredicates) {
+        return validationPredicates
+          .map(vp => {
+            return `${foam.java.asJavaValue(vp.predicate)}.f(obj);`;
+          })
+          .join('');
+      }
     }
   ],
 
@@ -809,10 +816,10 @@ foam.CLASS({
             return self.hasOwnProperty(a.name);
           })
           .map(function(p) {
-            return `.set${foam.String.capitalize(p.name)}(${foam.java.asJavaValue(self[p.name])})`
+            return `.set${foam.String.capitalize(p.name)}(${foam.java.asJavaValue(self[p.name], p)})`
           })
         return `
-new ${self.cls_.id}.Builder(EmptyX.instance())
+new ${self.cls_.id}.Builder(foam.core.EmptyX.instance())
   ${props.join('\n')}
   .build()
         `
