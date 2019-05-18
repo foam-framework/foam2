@@ -193,10 +193,14 @@
         {
           name: 'ruler',
           type: 'foam.nanos.ruler.RuleEngine'
+        },
+        {
+          name: 'agent',
+          type: 'foam.core.ContextAgent'
         }
       ],
       javaCode: `
-        getAction().applyAction(x, obj, oldObj, ruler);
+        getAction().applyAction(x, obj, oldObj, ruler, agent);
       `
     },
     {
@@ -217,10 +221,14 @@
         {
           name: 'ruler',
           type: 'foam.nanos.ruler.RuleEngine'
+        },
+        {
+          name: 'agent',
+          type: 'foam.core.ContextAgent'
         }
       ],
       javaCode: `
-        getAsyncAction().applyAction(x, obj, oldObj, ruler);
+        getAsyncAction().applyAction(x, obj, oldObj, ruler, agent);
         if ( ! getAfter() ) {
           ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }
