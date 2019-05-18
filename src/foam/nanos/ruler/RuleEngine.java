@@ -9,6 +9,7 @@ package foam.nanos.ruler;
 import foam.core.*;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
+import foam.dao.ReadOnlyDAO;
 import foam.dao.Sink;
 import foam.mlang.sink.GroupBy;
 import foam.nanos.pool.FixedThreadPool;
@@ -56,7 +57,7 @@ public class RuleEngine extends ContextAwareSupport {
     for (Rule rule : rules) {
       if ( stops_.get() ) return;
       applyRule(rule, obj, oldObj, agent);
-      saveHistory(rule, obj);
+      agent.submit(x_, x -> saveHistory(rule, obj));
     }
     agent.execute(x_);
 
@@ -104,7 +105,6 @@ public class RuleEngine extends ContextAwareSupport {
   }
 
   private void applyRule(Rule rule, FObject obj, FObject oldObj, ContextAgent agent) {
-
       currentRule_ = rule;
       if ( rule.getAction() != null
         && rule.f(getX(), obj, oldObj)
