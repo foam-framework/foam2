@@ -9,33 +9,26 @@ foam.CLASS({
 
   documentation: 'Phone number information.',
 
-  messages: [
-    {
-      name: 'INVALID_NUMBER',
-      message: 'Invalid phone number.'
-    }
-  ],
-
-  constants: [
-    {
-      name: 'PHONE_REGEX',
-      factory: function() {
-        return /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/
-      }
-    }
-  ],
-
   properties: [
     {
       class: 'PhoneNumber',
       name: 'number',
       label: '',
-      required: true,
-      validateObj: function (number) {
-        if ( ! this.PHONE_REGEX.test(number) ) {
-          return this.INVALID_NUMBER;
+      validationPredicates: [
+        {
+          args: ['number'],
+          predicate: {
+            class: 'foam.mlang.predicate.RegExp',
+            arg1: {
+              class: 'foam.mlang.FObjectPropertyExpr',
+              property: 'number'
+            },
+            regExp: /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/
+          },
+          errorString: 'Invalid phone number.'
         }
-      },
+      ],
+      // TODO: Remove javaValidateObj
       javaValidateObj: `
         String number = ((Phone) obj).getNumber();
         if ( foam.util.SafetyUtil.isEmpty(number) ) {
