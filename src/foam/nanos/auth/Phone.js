@@ -39,12 +39,12 @@ foam.CLASS({
       preSet: function(o, n) {
         return n.replace(/[- )(]/g, '');
       },
-      // javaValidateObj: `
-      //   String number = ((Phone) obj).getNumber();
-      //   if ( ! Phone.PHONE_REGEX.matcher(number).matches() ) {
-      //     throw new IllegalStateException(Phone.INVALID_NUMBER);
-      //   }
-      // `
+      javaValidateObj: `
+        String number = ((Phone) obj).getNumber();
+        if ( foam.util.SafetyUtil.isEmpty(number) ) {
+          throw new IllegalStateException(Phone.INVALID_NUMBER);
+        }
+      `
     },
     {
       class: 'Boolean',

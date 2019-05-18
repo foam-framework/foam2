@@ -27,10 +27,6 @@ foam.CLASS({
       width: 156px;
       height: 48px;
     }
-
-    ^ net-nanopay-sme-ui-AbliiActionView-next {
-      height: 
-    }
   `,
 
   properties: [
@@ -95,11 +91,13 @@ foam.CLASS({
   actions: [
     {
       name: 'prev',
+      label: 'Go back',
       code: function() { this.currentIndex = this.prevIndex; },
       isAvailable: function(prevIndex) { return prevIndex != -1; }
     },
     {
       name: 'next',
+      label: 'Continue',
       code: function() { this.currentIndex = this.nextIndex; },
       isAvailable: function(nextIndex) { return nextIndex != -1; },
       isEnabled: function(lastUpdate, data, sections, currentIndex) {
