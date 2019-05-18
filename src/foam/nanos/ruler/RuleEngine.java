@@ -104,7 +104,7 @@ public class RuleEngine extends ContextAwareSupport {
     return results_.get(ruleId);
   }
 
-  private void applyRule(Rule rule, FObject obj, FObject oldObj, ContextAgent agent) {
+  private void applyRule(Rule rule, FObject obj, FObject oldObj, CompoundContextAgent agent) {
       currentRule_ = rule;
       if ( rule.getAction() != null
         && rule.f(getX(), obj, oldObj)

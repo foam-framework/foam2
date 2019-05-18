@@ -196,7 +196,7 @@
         },
         {
           name: 'agent',
-          type: 'foam.core.ContextAgent'
+          type: 'foam.core.CompoundContextAgent'
         }
       ],
       javaCode: `
@@ -224,7 +224,7 @@
         },
         {
           name: 'agent',
-          type: 'foam.core.ContextAgent'
+          type: 'foam.core.CompoundContextAgent'
         }
       ],
       javaCode: `
