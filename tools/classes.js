@@ -53,6 +53,7 @@ var classes = [
   'foam.mlang.PredicatedExpr',
   'foam.mlang.ContextObject',
   'foam.mlang.predicate.RegExp',
+  'foam.mlang.predicate.OlderThan',
   'foam.mlang.FObjectPropertyExpr',
   'foam.box.Box',
   'foam.box.Skeleton',
