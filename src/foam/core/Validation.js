@@ -17,13 +17,154 @@
 
 foam.CLASS({
   package: 'foam.core',
+  name: 'ValidationPredicate',
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'predicate'
+    },
+    {
+      class: 'StringArray',
+      name: 'args'
+    },
+    {
+      class: 'Function',
+      name: 'jsFunc',
+      expression: function(predicate, jsErr) {
+        return function() {
+          if ( ! predicate.f(this) ) return jsErr(this);
+        };
+      }
+    },
+    {
+      class: 'String',
+      name: 'errorString'
+    },
+    {
+      class: 'Function',
+      name: 'jsErr',
+      expression: function(errorString) {
+        return function() { return errorString; };
+      }
+    }
+  ],
+  methods: [
+    function createErrorSlotFor(data) {
+      return this.ExpressionSlot.create({
+        args: this.args.map(a => data[a+'$']),
+        code: this.jsFunc.bind(data)
+      });
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
   name: 'PropertyValidationRefinement',
   refines: 'foam.core.Property',
 
   properties: [
     {
+      class: 'FObjectArray',
+      of: 'foam.core.ValidationPredicate',
+      name: 'validationPredicates'
+    },
+    {
       name: 'validateObj',
-      expression: function(name, label, required) {
+      expression: function(name, label, required, validationPredicates) {
+        if ( validationPredicates.length ) {
+          var args = Object.keys(validationPredicates
+            .map(vp => vp.args)
+            .flat()
+            .reduce((map, a) => {
+              map[a] = true;
+              return map;
+            }, {}));
+          return [args, function() {
+            for ( var i = 0 ; i < validationPredicates.length ; i++ ) {
+              var vp = validationPredicates[i];
+              if ( vp.jsFunc.bind(this)() ) return vp.jsErr.bind(this)();
+            }
+            return null;
+          }];
+        }
+        return !required ? null : [[name],
+          function() {
+            return !this.hasOwnProperty(name) && (label + ' is required.');
+          }]
+      },
+    },
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'StringPropertyValidationRefinement',
+  refines: 'foam.core.String',
+  properties: [
+    'min',
+    'max',
+    {
+      class: 'FObjectArray',
+      of: 'foam.core.ValidationPredicate',
+      name: 'validationPredicates',
+      factory: function() {
+        var a = [];
+        if ( foam.Number.isInstance(this.min) ) {
+          a.push({
+            args: [this.name],
+            predicate: {
+              class: 'foam.mlang.predicate.RegExp',
+              arg1: {
+                class: 'foam.mlang.FObjectPropertyExpr',
+                property: this.name
+              },
+              regExp: new RegExp('^.{'+this.min+',}$')
+            },
+            errorString: `${this.label} must be at least ${this.min} character${this.min>1?'s':''}`
+          });
+        }
+        if ( foam.Number.isInstance(this.max) ) {
+          a.push({
+            args: [this.name],
+            predicate: {
+              class: 'foam.mlang.predicate.RegExp',
+              arg1: {
+                class: 'foam.mlang.FObjectPropertyExpr',
+                property: this.name
+              },
+              regExp: new RegExp('^.{0,'+this.max+'}$')
+            },
+            errorString: `${this.label} must be at most ${this.max} character${this.max>1?'s':''}`
+          });
+        }
+        return a;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'FObjectPropertyValidationRefinement',
+  refines: 'foam.core.FObjectProperty',
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'autoValidate'
+    },
+    {
+      name: 'validateObj',
+      expression: function(autoValidate, name, label, required) {
+        if ( autoValidate ) {
+          return [
+            [`${name}$errors_`],
+            function(errs) {
+              return errs ? label + ' is invalid.' : null;
+            }
+          ];
+        }
         return !required ? null : [[name],
           function() {
             return !this.hasOwnProperty(name) && (label + ' is required.');

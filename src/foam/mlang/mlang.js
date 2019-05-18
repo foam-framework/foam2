@@ -202,6 +202,9 @@ foam.CLASS({
         if ( ! foam.Function.isInstance(o.f) )      return foam.mlang.Constant.create({ value: o });
         return o;
       }
+      if ( o.class && this.__context__.lookup(o.class, true) ) {
+        return this.adaptValue(this.__context__.lookup(o.class).create(o, this));
+      }
 
       console.error('Invalid expression value: ', o);
     }
@@ -352,6 +355,9 @@ foam.CLASS({
         if ( o === true ) return foam.mlang.predicate.True.create();
         if ( o === false ) return foam.mlang.predicate.False.create();
         if ( foam.core.FObject.isInstance(o) ) return o;
+        if ( o.class && this.__context__.lookup(o.class, true) ) {
+          return this.adaptArrayElement(this.__context__.lookup(o.class).create(o, this));
+        }
         console.error('Invalid expression value: ', o);
       }
     }
@@ -3317,3 +3323,65 @@ foam.CLASS({
 // TODO(braden): We removed Expr.pipe(). That may still be useful to bring back,
 // probably with a different name. It doesn't mean the same as DAO.pipe().
 // remove eof()
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'RegExp',
+  extends: 'foam.mlang.predicate.Unary',
+  implements: [ 'foam.core.Serializable' ],
+  properties: [
+    {
+      name: 'regExp'
+    }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(o) {
+        var v1 = this.arg1.f(o);
+        return v1.toString().match(this.regExp);
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'OlderThan',
+  extends: 'foam.mlang.predicate.Unary',
+  implements: [ 'foam.core.Serializable' ],
+  properties: [
+    {
+      class: 'Long',
+      name: 'timeMs'
+    }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(o) {
+        var v1 = this.arg1.f(o);
+        return v1 && Date.now() - v1.getTime() > this.timeMs;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'FObjectPropertyExpr',
+  extends: 'foam.mlang.AbstractExpr',
+  implements: [ 'foam.core.Serializable' ],
+  properties: [
+    {
+      class: 'String',
+      name: 'property'
+    }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(o) { return o[this.property]; }
+    }
+  ]
+});

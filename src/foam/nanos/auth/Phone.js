@@ -20,7 +20,7 @@ foam.CLASS({
     {
       name: 'PHONE_REGEX',
       factory: function() {
-        return /([+]?\d{1,2}[\.\-\s]?)?(\d{3}[.-]?){2}\d{4}/g;
+        return /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/
       }
     }
   ],
@@ -35,9 +35,6 @@ foam.CLASS({
         if ( ! this.PHONE_REGEX.test(number) ) {
           return this.INVALID_NUMBER;
         }
-      },
-      preSet: function(o, n) {
-        return n.replace(/[- )(]/g, '');
       },
       javaValidateObj: `
         String number = ((Phone) obj).getNumber();
