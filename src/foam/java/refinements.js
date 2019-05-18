@@ -216,7 +216,11 @@ foam.CLASS({
       expression: function(validationPredicates) {
         return validationPredicates
           .map(vp => {
-            return `${foam.java.asJavaValue(vp.predicate)}.f(obj);`;
+            return `
+if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
+  throw new IllegalStateException(${foam.java.asJavaValue(vp.errorString)});
+}
+            `;
           })
           .join('');
       }
