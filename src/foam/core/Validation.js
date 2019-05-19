@@ -118,17 +118,13 @@ foam.CLASS({
       of: 'foam.core.ValidationPredicate',
       name: 'validationPredicates',
       factory: function() {
+        var self = this;
         var a = [];
         if ( foam.Number.isInstance(this.min) ) {
           a.push({
             args: [this.name],
-            predicate: {
-              class: 'foam.mlang.predicate.RegExp',
-              arg1: {
-                class: 'foam.mlang.FObjectPropertyExpr',
-                property: this.name
-              },
-              regExp: new RegExp('^.{'+this.min+',}$')
+            predicateFactory: function(e) {
+              return e.REG_EXP(self, new RegExp('^.{'+this.min+',}$'));
             },
             errorString: `${this.label} must be at least ${this.min} character${this.min>1?'s':''}`
           });
@@ -136,13 +132,8 @@ foam.CLASS({
         if ( foam.Number.isInstance(this.max) ) {
           a.push({
             args: [this.name],
-            predicate: {
-              class: 'foam.mlang.predicate.RegExp',
-              arg1: {
-                class: 'foam.mlang.FObjectPropertyExpr',
-                property: this.name
-              },
-              regExp: new RegExp('^.{0,'+this.max+'}$')
+            predicateFactory: function(e) {
+              return e.REG_EXP(self, new RegExp('^.{0,'+this.max+'}$'));
             },
             errorString: `${this.label} must be at most ${this.max} character${this.max>1?'s':''}`
           });

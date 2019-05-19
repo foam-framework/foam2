@@ -175,57 +175,25 @@ foam.CLASS({
       validationPredicates: [
         {
           args: ['postalCode', 'countryId'],
-          predicate: {
-            class: 'foam.mlang.predicate.Or',
-            args: [
-              {
-                class: 'foam.mlang.predicate.Neq',
-                arg1: {
-                  class: 'foam.mlang.FObjectPropertyExpr',
-                  property: 'countryId'
-                },
-                arg2: {
-                  class: 'foam.mlang.Constant',
-                  value: 'CA'
-                },
-              },
-              {
-                class: 'foam.mlang.predicate.RegExp',
-                arg1: {
-                  class: 'foam.mlang.FObjectPropertyExpr',
-                  property: 'postalCode'
-                },
-                regExp: /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i
-              }
-            ]
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'CA'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i)
+            );
           },
           errorString: 'Invalid postal code'
         },
         {
           args: ['postalCode', 'countryId'],
-          predicate: {
-            class: 'foam.mlang.predicate.Or',
-            args: [
-              {
-                class: 'foam.mlang.predicate.Neq',
-                arg1: {
-                  class: 'foam.mlang.FObjectPropertyExpr',
-                  property: 'countryId'
-                },
-                arg2: {
-                  class: 'foam.mlang.Constant',
-                  value: 'US'
-                }
-              },
-              {
-                class: 'foam.mlang.predicate.RegExp',
-                arg1: {
-                  class: 'foam.mlang.FObjectPropertyExpr',
-                  property: 'postalCode'
-                },
-                regExp: /^^\d{5}(?:[-\s]\d{4})?$/i
-              }
-            ]
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'US'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^^\d{5}(?:[-\s]\d{4})?$/i)
+            );
           },
           errorString: 'Invalid zip code'
         }

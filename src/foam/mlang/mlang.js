@@ -3379,25 +3379,3 @@ foam.CLASS({
     }
   ]
 });
-
-foam.CLASS({
-  package: 'foam.mlang',
-  name: 'FObjectPropertyExpr',
-  extends: 'foam.mlang.AbstractExpr',
-  implements: [ 'foam.core.Serializable' ],
-  properties: [
-    {
-      class: 'String',
-      name: 'property'
-    }
-  ],
-  methods: [
-    {
-      name: 'f',
-      code: function(o) { return o[this.property]; },
-      javaCode: `
-        return ((foam.core.FObject) obj).getProperty(getProperty());
-      `
-    }
-  ]
-});
