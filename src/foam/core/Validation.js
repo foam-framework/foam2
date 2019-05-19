@@ -82,13 +82,9 @@ foam.CLASS({
       name: 'validateObj',
       expression: function(name, label, required, validationPredicates) {
         if ( validationPredicates.length ) {
-          var args = Object.keys(validationPredicates
+          var args = foam.Array.unique(validationPredicates
             .map(vp => vp.args)
-            .flat()
-            .reduce((map, a) => {
-              map[a] = true;
-              return map;
-            }, {}));
+            .flat());
           return [args, function() {
             for ( var i = 0 ; i < validationPredicates.length ; i++ ) {
               var vp = validationPredicates[i];
@@ -111,8 +107,8 @@ foam.CLASS({
   name: 'StringPropertyValidationRefinement',
   refines: 'foam.core.String',
   properties: [
-    'min',
-    'max',
+    'minLength',
+    'maxLength',
     {
       class: 'FObjectArray',
       of: 'foam.core.ValidationPredicate',
@@ -120,22 +116,22 @@ foam.CLASS({
       factory: function() {
         var self = this;
         var a = [];
-        if ( foam.Number.isInstance(this.min) ) {
+        if ( foam.Number.isInstance(this.minLength) ) {
           a.push({
             args: [this.name],
             predicateFactory: function(e) {
-              return e.REG_EXP(self, new RegExp('^.{'+this.min+',}$'));
+              return e.REG_EXP(self, new RegExp('^.{'+this.minLength+',}$'));
             },
-            errorString: `${this.label} must be at least ${this.min} character${this.min>1?'s':''}`
+            errorString: `${this.label} must be at least ${this.minLength} character${this.minLength>1?'s':''}`
           });
         }
-        if ( foam.Number.isInstance(this.max) ) {
+        if ( foam.Number.isInstance(this.maxLength) ) {
           a.push({
             args: [this.name],
             predicateFactory: function(e) {
-              return e.REG_EXP(self, new RegExp('^.{0,'+this.max+'}$'));
+              return e.REG_EXP(self, new RegExp('^.{0,'+this.maxLength+'}$'));
             },
-            errorString: `${this.label} must be at most ${this.max} character${this.max>1?'s':''}`
+            errorString: `${this.label} must be at most ${this.maxLength} character${this.maxLength>1?'s':''}`
           });
         }
         return a;

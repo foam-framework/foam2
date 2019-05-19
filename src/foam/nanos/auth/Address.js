@@ -57,7 +57,7 @@ foam.CLASS({
       expression: function(structured, streetNumber, streetName) {
         return structured ? streetNumber + ' ' + streetName : '';
       },
-      min: 1
+      minLength: 1
     },
     {
       class: 'String',
@@ -163,7 +163,7 @@ foam.CLASS({
       name: 'city',
       documentation: 'The city of the postal address.',
       required: true,
-      min: 1
+      minLength: 1
     },
     {
       class: 'String',
