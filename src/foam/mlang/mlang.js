@@ -3320,11 +3320,6 @@ foam.CLASS({
   ]
 });
 
-
-// TODO(braden): We removed Expr.pipe(). That may still be useful to bring back,
-// probably with a different name. It doesn't mean the same as DAO.pipe().
-// remove eof()
-
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'RegExp',
@@ -3379,3 +3374,27 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'StringLength',
+  extends: 'foam.mlang.AbstractExpr',
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg1'
+    }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(o) { return this.arg1.f(o).length; },
+      javaCode: 'return ((String) getArg1().f(obj)).length();'
+    }
+  ]
+});
+
+
+// TODO(braden): We removed Expr.pipe(). That may still be useful to bring back,
+// probably with a different name. It doesn't mean the same as DAO.pipe().
+// remove eof()

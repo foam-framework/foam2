@@ -120,7 +120,7 @@ foam.CLASS({
           a.push({
             args: [this.name],
             predicateFactory: function(e) {
-              return e.REG_EXP(self, new RegExp('^.{'+this.minLength+',}$'));
+              return e.GTE(foam.mlang.StringLength.create({ arg1: self }), self.minLength);
             },
             errorString: `${this.label} must be at least ${this.minLength} character${this.minLength>1?'s':''}`
           });
@@ -129,7 +129,7 @@ foam.CLASS({
           a.push({
             args: [this.name],
             predicateFactory: function(e) {
-              return e.REG_EXP(self, new RegExp('^.{0,'+this.maxLength+'}$'));
+              return e.LTE(foam.mlang.StringLength.create({ arg1: self }), self.maxLength);
             },
             errorString: `${this.label} must be at most ${this.maxLength} character${this.maxLength>1?'s':''}`
           });

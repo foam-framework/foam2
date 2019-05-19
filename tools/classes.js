@@ -44,6 +44,7 @@ var classes = [
   'foam.mlang.sink.Count',
   'foam.mlang.sink.GroupBy',
   'foam.mlang.F',
+  'foam.mlang.StringLength',
   'foam.mlang.Expr',
   'foam.mlang.AbstractExpr',
   'foam.mlang.predicate.Eq',
