@@ -51,31 +51,20 @@ foam.CLASS({
     {
       class: 'String',
       name: 'address1',
-      // required: true
       width: 70,
       displayWidth: 50,
       documentation: 'An unstructured field for the main postal address.',
-      validateObj: function(address1) {
-        var address1Regex = /^[a-zA-Z0-9 ]{1,70}$/;
-
-        if ( address1.length > 0 && ! address1Regex.test(address1) ) {
-          return 'Invalid address line.';
-        }
-      }
+      expression: function(structured, streetNumber, streetName) {
+        return structured ? streetNumber + ' ' + streetName : '';
+      },
+      minLength: 1
     },
     {
       class: 'String',
       name: 'address2',
       width: 70,
       displayWidth: 50,
-      documentation: 'An unstructured field for the sub postal address.',
-      validateObj: function(address2) {
-        var address2Regex = /^[a-zA-Z0-9 ]{1,70}$/;
-
-        if ( address2.length > 0 && ! address2Regex.test(address2) ) {
-          return 'Invalid address line.';
-        }
-      }
+      documentation: 'An unstructured field for the sub postal address.'
     },
     {
       class: 'Reference',
@@ -134,7 +123,8 @@ foam.CLASS({
       name: 'streetNumber',
       width: 16,
       documentation: 'The structured field for the street number of the postal address.',
-      validateObj: function(streetNumber) {
+      validateObj: function(structured, streetNumber) {
+        if ( ! structured ) return;
         if ( streetNumber.trim() === '' ) {
           return 'Street number required.';
         }
@@ -149,42 +139,31 @@ foam.CLASS({
       name: 'streetName',
       width: 70,
       documentation: 'The structured field for the street name of the postal address.',
-      validateObj: function(streetName) {
-        if ( streetName.trim() === '' ) {
-          return 'Street name required.';
+      validationPredicates: [
+        {
+          args: ['structured', 'streetName'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.EQ(foam.nanos.auth.Address.STRUCTURED, false),
+              e.REG_EXP(foam.nanos.auth.Address.STREET_NAME, /^\s*.+\s*$/)
+            );
+          },
+          errorString: 'Invalid street name.'
         }
-        var streetNameRegex = /^[a-zA-Z0-9 ]{1,70}$/;
-        if ( ! streetNameRegex.test(streetName) ) {
-          return 'Invalid street name.';
-        }
-      }
+      ]
     },
     {
       class: 'String',
       name: 'suite',
       documentation: 'The structured field for the suite number of the postal address.',
-      width: 16,
-      validateObj: function(suite) {
-        var suiteRegex = /^[a-zA-Z0-9 ]{1,70}$/;
-        if ( suite.length > 0 && ! suiteRegex.test(suite) ) {
-          return 'Invalid address line 2.';
-        }
-      }
+      width: 16
     },
     {
       class: 'String',
       name: 'city',
       documentation: 'The city of the postal address.',
       required: true,
-      validateObj: function(city) {
-        if ( city.trim().length === 0 ) {
-          return 'City required.';
-        }
-        var cityRegex = /^[a-zA-Z ]{1,35}$/;
-        if ( ! cityRegex.test(city) ) {
-          return 'Invalid city name.';
-        }
-      }
+      minLength: 1
     },
     {
       class: 'String',
@@ -193,31 +172,32 @@ foam.CLASS({
       preSet: function(oldValue, newValue) {
         return newValue.toUpperCase();
       },
-      required: true,
-      validateObj: function(postalCode, countryId) {
-        if ( postalCode.trim().length === 0 ) {
-          switch ( countryId ) {
-            case 'CA':
-              return 'Postal code required.';
-            case 'US':
-              return 'Zip code required.';
-          }
+      validationPredicates: [
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'CA'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i)
+            );
+          },
+          errorString: 'Invalid postal code'
+        },
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'US'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^^\d{5}(?:[-\s]\d{4})?$/i)
+            );
+          },
+          errorString: 'Invalid zip code'
         }
-        var caRe = /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i; // Canadian Format
-        var usRe = /^^\d{5}(?:[-\s]\d{4})?$/i; // US Format
-        switch ( countryId ) {
-          case 'CA':
-            if ( ! caRe.test(postalCode) ) {
-              return 'Invalid postal code.';
-            }
-            break;
-          case 'US':
-            if ( ! usRe.test(postalCode) ) {
-              return 'Invalid zip code.';
-            }
-            break;
-        }
-      },
+      ],
       javaSetter:
         `postalCode_ = val.toUpperCase();
         postalCodeIsSet_ = true;`
