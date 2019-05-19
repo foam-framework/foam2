@@ -46,6 +46,7 @@ var classes = [
   'foam.mlang.F',
   'foam.mlang.StringLength',
   'foam.mlang.Expr',
+  'foam.mlang.IsValid',
   'foam.mlang.AbstractExpr',
   'foam.mlang.predicate.Eq',
   'foam.mlang.Constant',

@@ -3394,6 +3394,34 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'IsValid',
+  extends: 'foam.mlang.AbstractExpr',
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg1'
+    }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(o) {
+        return this.arg1.f(o).errors_ ? false : true;
+      },
+      javaCode: `
+try {
+  ((foam.core.FObject) getArg1().f(obj)).validate(getX());
+} catch(Exception e) {
+  return false;
+}
+return true;
+      `
+    }
+  ]
+});
+
 
 // TODO(braden): We removed Expr.pipe(). That may still be useful to bring back,
 // probably with a different name. It doesn't mean the same as DAO.pipe().
