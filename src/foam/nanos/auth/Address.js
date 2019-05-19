@@ -142,29 +142,11 @@ foam.CLASS({
       validationPredicates: [
         {
           args: ['structured', 'streetName'],
-          predicate: {
-            class: 'foam.mlang.predicate.Or',
-            args: [
-              {
-                class: 'foam.mlang.predicate.Eq',
-                arg1: {
-                  class: 'foam.mlang.FObjectPropertyExpr',
-                  property: 'structured'
-                },
-                arg2: {
-                  class: 'foam.mlang.Constant',
-                  value: false
-                }
-              },
-              {
-                class: 'foam.mlang.predicate.RegExp',
-                arg1: {
-                  class: 'foam.mlang.FObjectPropertyExpr',
-                  property: 'streetName'
-                },
-                regExp: /^\s*.+\s*$/
-              }
-            ]
+          predicateFactory: function(e) {
+            return e.OR(
+              e.EQ(foam.nanos.auth.Address.STRUCTURED, false),
+              e.REG_EXP(foam.nanos.auth.Address.STREET_NAME, /^\s*.+\s*$/)
+            );
           },
           errorString: 'Invalid street name.'
         }

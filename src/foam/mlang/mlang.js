@@ -3211,6 +3211,7 @@ foam.CLASS({
     'foam.mlang.predicate.Neq',
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
+    'foam.mlang.predicate.RegExp',
     'foam.mlang.predicate.IsInstanceOf',
     'foam.mlang.predicate.StartsWith',
     'foam.mlang.predicate.StartsWithIC',
@@ -3291,7 +3292,7 @@ foam.CLASS({
     function MUX(cond, a, b) { return this.Mux.create({ cond: cond, a: a, b: b }); },
     function PARTITION_BY(arg1, delegate) { return this.Partition.create({ arg1: arg1, delegate: delegate }); },
     function SEQ() { return this._nary_("Sequence", arguments); },
-
+    function REG_EXP(arg1, regExp) { return this.RegExp.create({ arg1: arg1, regExp: regExp }); },
     {
       name: 'DESC',
       args: [ { name: 'a', type: 'foam.mlang.order.Comparator' } ],

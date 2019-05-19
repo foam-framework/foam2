@@ -230,6 +230,12 @@ if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
   ],
 
   methods: [
+    {
+      name: 'asJavaValue',
+      code: function() {
+        return `${this.sourceCls_.id}.${foam.String.constantize(this.name)}`;
+      }
+    },
     function createJavaPropertyInfo_(cls) {
       return foam.java.PropertyInfo.create({
         sourceCls:               cls,

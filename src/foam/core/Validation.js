@@ -20,9 +20,17 @@ foam.CLASS({
   name: 'ValidationPredicate',
   properties: [
     {
+      name: 'predicateFactory'
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
-      name: 'predicate'
+      name: 'predicate',
+      expression: function(predicateFactory) {
+        return predicateFactory ?
+          predicateFactory(foam.mlang.ExpressionsSingleton.create()) :
+          null;
+      }
     },
     {
       class: 'StringArray',

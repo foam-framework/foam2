@@ -17,13 +17,10 @@ foam.CLASS({
       validationPredicates: [
         {
           args: ['number'],
-          predicate: {
-            class: 'foam.mlang.predicate.RegExp',
-            arg1: {
-              class: 'foam.mlang.FObjectPropertyExpr',
-              property: 'number'
-            },
-            regExp: /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/
+          predicateFactory: function(e) {
+            return e.REG_EXP(
+              foam.nanos.auth.Phone.NUMBER,
+              /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/);
           },
           errorString: 'Invalid phone number.'
         }
