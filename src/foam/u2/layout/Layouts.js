@@ -43,11 +43,11 @@ foam.CLASS({
     },
 
     /**
-     * This expects all child elements to be instances of foam.u2.layout.Col 
+     * This expects all child elements to be instances of foam.u2.layout.Col
      * so we override the add method to enforce this.
      */
-    function add() {
-      [...arguments].forEach(value => {
+    function add(...args) {
+      args.forEach(value => {
         if ( this.Item.isInstance(value) ) {
           this.SUPER(value);
         }
