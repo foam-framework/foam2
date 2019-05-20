@@ -100,7 +100,7 @@ foam.CLASS({
       label: 'Continue',
       code: function() { this.currentIndex = this.nextIndex; },
       isAvailable: function(nextIndex) { return nextIndex != -1; },
-      isEnabled: function(lastUpdate, data, sections, currentIndex) {
+      isEnabled: function(lastUpdate, data$errors_, sections, currentIndex) {
         return sections[currentIndex]
           .createErrorSlotFor(this.data$).get()
           .filter(e => e).length == 0;
