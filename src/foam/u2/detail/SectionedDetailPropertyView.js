@@ -358,27 +358,30 @@ foam.CLASS({
                     .end()
                   })
                 .end()
-                .start(this.Item).style({'align-items': 'center'})
-                  .start(self.Cols, { defaultChildStyle: {
-                    'justify-content': 'flex-start',
-                    'margin': '0 8px 0 0'
-                  }})
-                    .addClass(this.myClass('validation-container'))
-                    .show(errorSlot)
-                    .start({
-                      class: 'foam.u2.tag.Image',
-                      data: 'images/inline-error-icon.svg'
-                    })
-                      .addClass(this.myClass('error-icon'))
-                    .end()
-                    .start(this.Item)
-                    .style({ 'flex-grow': 1 })
-                      .add(errorSlot.map((s) => {
-                        return self.E().add(s);
-                      }))
-                    .end()
-                  .end()
-                .end()
+                .callIf(prop.validationVisible, function() {
+                  this
+                    .start(this.Item).style({'align-items': 'center'})
+                      .start(self.Cols, { defaultChildStyle: {
+                        'justify-content': 'flex-start',
+                        'margin': '0 8px 0 0'
+                      }})
+                        .addClass(this.myClass('validation-container'))
+                        .show(errorSlot)
+                        .start({
+                          class: 'foam.u2.tag.Image',
+                          data: 'images/inline-error-icon.svg'
+                        })
+                          .addClass(this.myClass('error-icon'))
+                        .end()
+                        .start(this.Item)
+                        .style({ 'flex-grow': 1 })
+                          .add(errorSlot.map((s) => {
+                            return self.E().add(s);
+                          }))
+                        .end()
+                      .end()
+                    .end();
+                })
               .end();
           }));
     }

@@ -2133,6 +2133,11 @@ foam.CLASS({
       class: 'Function',
       name: 'visibilityExpression',
       value: null
+    },
+    {
+      class: 'Boolean',
+      name: 'validationVisible',
+      value: true
     }
   ],
 
@@ -2341,6 +2346,15 @@ foam.CLASS({
     {
       name: 'view',
       value: { class: 'foam.u2.DetailView' },
+    },
+    {
+      name: 'validationVisible',
+      documentation: `
+        Hide FObjectProperty validation because their inner view should provide its
+        own validation so having it on the outer view and the inner view is redundant
+        and jarring.
+      `,
+      value: false
     }
   ]
 });
