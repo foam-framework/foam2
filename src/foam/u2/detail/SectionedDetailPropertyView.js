@@ -317,7 +317,7 @@ foam.CLASS({
         .addClass(this.myClass())
         .start(self.Rows, { defaultChildStyle: { padding: '8px 0' } })
           .add(this.slot(function(data, prop, prop$label) {
-            var errorSlot = prop.validateObj ?
+            var errorSlot = prop.validateObj && prop.validationVisible ?
               data.slot(prop.validateObj) :
               foam.core.ConstantSlot.create({ value: null });
 
