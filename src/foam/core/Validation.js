@@ -166,6 +166,45 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'IntPropertyValidationRefinement',
+  refines: 'foam.core.Int',
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'autoValidate'
+    },
+    {
+      name: 'validationPredicates',
+      factory: function() {
+        if ( ! this.autoValidate ) return [];
+        var self = this;
+        var a = [];
+        if ( foam.Number.isInstance(self.min) ) {
+          a.push({
+            args: [self.name],
+            predicateFactory: function(e) {
+              return e.GTE(self, self.min);
+            },
+            errorString: `${self.label} must be at least ${self.min}.`
+          });
+        }
+        if ( foam.Number.isInstance(self.max) ) {
+          a.push({
+            args: [self.name],
+            predicateFactory: function(e) {
+              return e.LTE(self, self.max);
+            },
+            errorString: `${self.label} must be at most ${self.max}`
+          });
+        }
+        return a;
+      }
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.core.internal',
