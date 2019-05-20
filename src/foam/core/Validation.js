@@ -151,7 +151,7 @@ foam.CLASS({
     },
     {
       name: 'validateObj',
-      expression: function(autoValidate, name, label, required) {
+      expression: function(name, label, required, validationPredicates, autoValidate) {
         if ( autoValidate ) {
           return [
             [`${name}$errors_`],
@@ -160,10 +160,7 @@ foam.CLASS({
             }
           ];
         }
-        return !required ? null : [[name],
-          function() {
-            return !this.hasOwnProperty(name) && (label + ' is required.');
-          }]
+        return foam.core.Property.VALIDATE_OBJ.expression.apply(this, arguments);
       },
     },
   ]
