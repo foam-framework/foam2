@@ -2520,13 +2520,16 @@ foam.CLASS({
 
       this.attr('name', p.name);
 
-      // if ( p.validateObj ) {
-      //   var s = foam.core.ExpressionSlot.create({
-      //     obj$: this.__context__.data$,
-      //     code: p.validateObj
-      //   });
-      //   this.error_$.follow(s);
-      // }
+      if ( p.validateObj ) {
+        /*
+        var s = foam.core.ExpressionSlot.create({
+          obj$: this.__context__.data$,
+          code: p.validateObj
+        });
+        this.error_$.follow(s);
+        */
+//        this.error_$.follow(this.__context__.data.slot(p.validateObj));
+      }
     }
   ]
 });
