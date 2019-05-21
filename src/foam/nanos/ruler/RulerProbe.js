@@ -9,11 +9,12 @@ foam.CLASS({
   name: 'RulerProbe',
   documentation: `A helper model used to test dao operation for provided "obj".
   Returned with populated appliedRules(Map<Rule, boolean>) property that describes what rules will be applied successfully/unsuccessfully.
-  Usage example: user = new User();
-  rulerProbe = new RulerProbe();
-  rulerProbe.setObject(user);
-  rulerProbe.setOperation(CREATE);
-  rulerProbe = userDAO.cmd(rulerProbe);`,
+  Usage example: 
+      user = new User();
+      rulerProbe = new RulerProbe();
+      rulerProbe.setObject(user);
+      rulerProbe.setOperation(CREATE);
+      rulerProbe = userDAO.cmd(rulerProbe);`,
 
   properties: [
     {
