@@ -11,10 +11,16 @@ class ContextAgentRunnable
 {
   final X            x_;
   final ContextAgent agent_;
+  final String description_;
 
-  public ContextAgentRunnable(X x, ContextAgent agent) {
+  public ContextAgentRunnable(X x, ContextAgent agent, String description) {
     x_     = x;
     agent_ = agent;
+    description_ = description;
+  }
+
+  public String toString() {
+    return description_;
   }
 
   public void run() {

@@ -21,8 +21,12 @@ public class CompoundContextAgent
   public CompoundContextAgent() {
   }
 
+  public void submit(X x, ContextAgent agent, String description) {
+    agents_.add(new ContextAgentRunnable(x, agent, description));
+  }
+
   public void submit(X x, ContextAgent agent) {
-    agents_.add(new ContextAgentRunnable(x, agent));
+    submit(x, agent, "");
   }
 
   public void execute(X x) {

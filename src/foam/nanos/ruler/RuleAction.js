@@ -7,7 +7,21 @@
  foam.INTERFACE({
   package: 'foam.nanos.ruler',
   name: 'RuleAction',
-  documentation: 'Interface for an action implemented in a rule.',
+  documentation: `Interface to be implemented for 'action' and 'asyncAction' properties on a Rule object.
+  
+  ********** VERY IMPORTANT NOTE **********
+  
+  ------ Rule.action
+  When implementing applyAction() for Rule.action, use agent for all the write/delete operations.
+  Example: 
+  RuleAction action = (x, obj, oldObj, ruler, agent) -> {
+    User user = (User) userDAO.find(888).fclone();
+    user.setFirstName("Jimmy");
+    userDAO.put(user); // WILL NOT WORK
+    // use agent instead 
+    agent.submit(x, x1 -> userDAO.put(user));
+  };
+  `,
 
   methods: [
     {

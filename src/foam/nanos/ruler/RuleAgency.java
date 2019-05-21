@@ -16,6 +16,8 @@ public class RuleAgency
   }
 
   public String toString() {
-    return "Rule " + rule_.getId() + "{ " + super.toString() + "}";
+    StringBuilder sb = new StringBuilder();
+    return sb.append("Rule ").append(rule_.getId()).append(". Description: ").append(rule_.getDocumentation()).
+      append( "{ ").append(super.toString()).append("}").toString();
   }
 }
