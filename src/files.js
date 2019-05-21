@@ -377,7 +377,8 @@ FOAM_FILES([
   { name: "foam/u2/TableView", flags: ['web'] },
   { name: "foam/u2/TableSelection", flags: ['web'] },
   { name: "foam/u2/Scroller", flags: ['web'] },
-  { name: "foam/u2/UnstyledActionView", flags: ['web'] },
+  { name: "foam/u2/ButtonSize", flags: ['web'] },
+  { name: "foam/u2/ButtonStyle", flags: ['web'] },
   { name: "foam/u2/ActionView", flags: ['web'] },
   { name: "foam/u2/DetailPropertyView", flags: ['web'] },
   { name: "foam/u2/DetailView", flags: ['web'] },
@@ -596,4 +597,16 @@ FOAM_FILES([
   { name: "foam/u2/view/date/DateTimePicker"},
   { name: "foam/u2/view/date/Month"},
   { name: "foam/u2/view/date/Weekday"},
+
+  { name: "foam/u2/layout/Layouts"},
+
+  { name: "foam/layout/Section" },
+  { name: "foam/layout/SectionAxiom" },
+  
+  { name: "foam/u2/detail/AbstractSectionedDetailView" },
+  { name: "foam/u2/detail/SectionView" },
+  { name: "foam/u2/detail/SectionedDetailView" },
+  { name: "foam/u2/detail/VerticalDetailView" },
+  { name: "foam/u2/detail/WizardSectionsView" },
+  { name: "foam/u2/detail/SectionedDetailPropertyView" }
 ]);

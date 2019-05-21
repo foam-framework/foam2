@@ -202,6 +202,9 @@ foam.CLASS({
         if ( ! foam.Function.isInstance(o.f) )      return foam.mlang.Constant.create({ value: o });
         return o;
       }
+      if ( o.class && this.__context__.lookup(o.class, true) ) {
+        return this.adaptValue(this.__context__.lookup(o.class).create(o, this));
+      }
 
       console.error('Invalid expression value: ', o);
     }
@@ -352,6 +355,9 @@ foam.CLASS({
         if ( o === true ) return foam.mlang.predicate.True.create();
         if ( o === false ) return foam.mlang.predicate.False.create();
         if ( foam.core.FObject.isInstance(o) ) return o;
+        if ( o.class && this.__context__.lookup(o.class, true) ) {
+          return this.adaptArrayElement(this.__context__.lookup(o.class).create(o, this));
+        }
         console.error('Invalid expression value: ', o);
       }
     }
@@ -2216,46 +2222,7 @@ foam.CLASS({
     {
       name: 'f',
       code: function f(obj) {
-        var arg = this.arg1.f(obj);
-        if ( ! arg || typeof arg !== 'string' ) return false;
-
-        arg = arg.toLowerCase();
-
-        try {
-          var props = obj.cls_.getAxiomsByClass(this.String);
-          for ( var i = 0; i < props.length; i++ ) {
-            s = props[i].f(obj);
-            if ( ! s || typeof s !== 'string' ) continue;
-            if ( s.toLowerCase().includes(arg) ) return true;
-          }
-
-          var objectProps = obj.cls_.getAxiomsByClass(this.FObjectProperty);
-          for ( var i = 0; i < objectProps.length; i++ ) {
-            var prop = objectProps[i];
-            var subObject = prop.f(obj);
-            if ( this.f(subObject) ) return true;
-          }
-
-          var longProps = obj.cls_.getAxiomsByClass(this.Long);
-          for ( var i = 0; i < longProps.length; i++ ) {
-            var s = (longProps[i]).toString();
-            if ( s.toLowerCase().includes(arg) ) return true;
-          }
-
-          var enumProps = obj.cls_.getAxiomsByClass(this.Enum);
-          for ( var i = 0; i < enumProps.length; i++ ) {
-            var s = (enumProps[i]).label;
-            if ( s.toLowerCase().includes(arg) ) return true;
-          }
-
-          var dateProps = obj.cls_.getAxiomsByClass(this.Date);
-          for ( var i = 0; i < dateProps.length; i++ ) {
-            var s = (dateProps[i]).toISOString();
-            if ( s.toLowerCase().includes(arg) ) return true;
-          }
-        } catch (err) {}
-
-        return false;
+        return this.fInner_(obj, true);
       },
       javaCode: `
 if ( ! ( getArg1().f(obj) instanceof String ) ) return false;
@@ -2303,6 +2270,58 @@ while ( i.hasNext() ) {
 }
 
 return false;`
+    },
+    {
+      name: 'fInner_',
+      documentation: `
+        A private convenience method so we don't break the interface for the 'f'
+        method. The second argument determines whether the MLang should
+        recursively apply to nested FObjects or not.
+      `,
+      code: function(obj, checkSubObjects) {
+        var arg = this.arg1.f(obj);
+        if ( ! arg || typeof arg !== 'string' ) return false;
+
+        arg = arg.toLowerCase();
+
+        try {
+          var props = obj.cls_.getAxiomsByClass(this.String);
+          for ( var i = 0; i < props.length; i++ ) {
+            s = props[i].f(obj);
+            if ( ! s || typeof s !== 'string' ) continue;
+            if ( s.toLowerCase().includes(arg) ) return true;
+          }
+
+          if ( checkSubObjects ) {
+            var objectProps = obj.cls_.getAxiomsByClass(this.FObjectProperty);
+            for ( var i = 0; i < objectProps.length; i++ ) {
+              var prop = objectProps[i];
+              var subObject = prop.f(obj);
+              if ( this.fInner_(subObject, false) ) return true;
+            }
+          }
+
+          var longProps = obj.cls_.getAxiomsByClass(this.Long);
+          for ( var i = 0; i < longProps.length; i++ ) {
+            var s = (longProps[i]).toString();
+            if ( s.toLowerCase().includes(arg) ) return true;
+          }
+
+          var enumProps = obj.cls_.getAxiomsByClass(this.Enum);
+          for ( var i = 0; i < enumProps.length; i++ ) {
+            var s = (enumProps[i]).label;
+            if ( s.toLowerCase().includes(arg) ) return true;
+          }
+
+          var dateProps = obj.cls_.getAxiomsByClass(this.Date);
+          for ( var i = 0; i < dateProps.length; i++ ) {
+            var s = (dateProps[i]).toISOString();
+            if ( s.toLowerCase().includes(arg) ) return true;
+          }
+        } catch (err) {}
+
+        return false;
+      }
     }
   ]
 });
@@ -3192,6 +3211,7 @@ foam.CLASS({
     'foam.mlang.predicate.Neq',
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
+    'foam.mlang.predicate.RegExp',
     'foam.mlang.predicate.IsInstanceOf',
     'foam.mlang.predicate.StartsWith',
     'foam.mlang.predicate.StartsWithIC',
@@ -3272,7 +3292,7 @@ foam.CLASS({
     function MUX(cond, a, b) { return this.Mux.create({ cond: cond, a: a, b: b }); },
     function PARTITION_BY(arg1, delegate) { return this.Partition.create({ arg1: arg1, delegate: delegate }); },
     function SEQ() { return this._nary_("Sequence", arguments); },
-
+    function REG_EXP(arg1, regExp) { return this.RegExp.create({ arg1: arg1, regExp: regExp }); },
     {
       name: 'DESC',
       args: [ { name: 'a', type: 'foam.mlang.order.Comparator' } ],
@@ -3297,6 +3317,108 @@ foam.CLASS({
 
   axioms: [
     foam.pattern.Singleton.create()
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'RegExp',
+  extends: 'foam.mlang.predicate.Unary',
+  implements: [ 'foam.core.Serializable' ],
+  properties: [
+    {
+      type: 'Regex',
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
+      name: 'regExp'
+    }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(o) {
+        var v1 = this.arg1.f(o);
+        return v1.toString().match(this.regExp);
+      },
+      javaCode: `
+        return getRegExp().matcher(getArg1().f(obj).toString()).matches();
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'OlderThan',
+  extends: 'foam.mlang.predicate.Unary',
+  implements: [ 'foam.core.Serializable' ],
+  properties: [
+    {
+      class: 'Long',
+      name: 'timeMs'
+    }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(o) {
+        var v1 = this.arg1.f(o);
+        return v1 && Date.now() - v1.getTime() > this.timeMs;
+      },
+      javaCode: `
+        Object v1 = getArg1().f(obj);
+        if ( v1 instanceof java.util.Date ) {
+          return new java.util.Date().getTime() - ((java.util.Date)v1).getTime() > getTimeMs();
+        }
+        return false;
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'StringLength',
+  extends: 'foam.mlang.AbstractExpr',
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg1'
+    }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(o) { return this.arg1.f(o).length; },
+      javaCode: 'return ((String) getArg1().f(obj)).length();'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'IsValid',
+  extends: 'foam.mlang.AbstractExpr',
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg1'
+    }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(o) {
+        return this.arg1.f(o).errors_ ? false : true;
+      },
+      javaCode: `
+try {
+  ((foam.core.FObject) getArg1().f(obj)).validate(getX());
+} catch(Exception e) {
+  return false;
+}
+return true;
+      `
+    }
   ]
 });
 

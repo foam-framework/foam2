@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'AnyView',
   extends: 'foam.u2.View',
   requires: [
+    'foam.u2.layout.Cols',
     'foam.u2.CheckBox',
     'foam.u2.DateTimeView',
     'foam.u2.TextField',
@@ -128,17 +129,19 @@ foam.CLASS({
     function initE() {
       var self = this;
       this
-        .add(this.slot(function(selected) {
-          self.data = selected.toType(self.data);
-          return self.E()
-            .startContext({data: null})
-              .start(selected.view, null, this.view$).end()
-            .endContext();
-        }))
-        .start(this.ChoiceView, {
-          choices$: this.types$.map(types => types.map(t => [t, t.label])),
-          data$: this.selected$
-        })
+        .start(self.Cols)
+          .add(this.slot(function(selected) {
+            self.data = selected.toType(self.data);
+            return self.E()
+              .startContext({data: null})
+                .start(selected.view, null, this.view$).end()
+              .endContext();
+          }))
+          .start(this.ChoiceView, {
+            choices$: this.types$.map(types => types.map(t => [t, t.label])),
+            data$: this.selected$
+          })
+          .end()
         .end();
     }
   ]

@@ -65,11 +65,11 @@ foam.CLASS({
     ^ .foam-doc-UMLDiagram canvas{
       width: 700px;
     }
-    ^ .net-nanopay-ui-ActionView-printPage{
+    ^ .foam-u2-ActionView-printPage{
       margin-top: 20px;
     }
     @media print{
-      ^ .net-nanopay-ui-ActionView-printPage{
+      ^ .foam-u2-ActionView-printPage{
         display: none;
       }
       .net-nanopay-ui-topNavigation-TopNav{

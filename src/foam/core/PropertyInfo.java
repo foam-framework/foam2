@@ -62,4 +62,5 @@ public interface PropertyInfo
   public void cloneProperty(FObject source, FObject dest);
   public boolean containsPII();
   public boolean containsDeletablePII();
+  public void validateObj(foam.core.X x, foam.core.FObject obj);
 }

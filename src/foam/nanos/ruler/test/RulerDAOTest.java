@@ -100,8 +100,18 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
+      }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
       }
     };
     rule7.setAction(action7);
@@ -142,8 +152,18 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
+      }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
       }
     };
     rule1.setAction(action1);
@@ -171,8 +191,18 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
+      }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
       }
     };
     rule2.setAction(action2);
@@ -183,8 +213,18 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
+      }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
       }
     };
     rule2.setAsyncAction(asyncAction2);
@@ -206,8 +246,18 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
+      }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
       }
     };
     rule3.setAction(action3);
@@ -232,8 +282,18 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
+      }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
       }
     };
     rule4.setAction(action4);
@@ -244,8 +304,18 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
+      }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
       }
     };
     rule4.setAsyncAction(asyncAction4);
@@ -269,8 +339,18 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
+      }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
       }
     };
     rule5.setAction(action5);
@@ -287,8 +367,18 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
+      }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
       }
     };
     rule5.setAsyncAction(asyncAction5);
@@ -310,8 +400,18 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
+      }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
       }
     };
     rule6.setAction(action6);
@@ -327,8 +427,18 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
+      }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
       }
     };
     rule6.setAsyncAction(asyncAction6);
@@ -350,8 +460,18 @@ public class RulerDAOTest extends Test {
       }
 
       @Override
-      public void applyReverseAction(X x ,FObject obj) {
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
 
+      }
+
+      @Override
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        return true;
+      }
+
+      @Override
+      public String describe() {
+        return "";
       }
     };
     rule8.setAction(action8);

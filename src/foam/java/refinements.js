@@ -20,7 +20,9 @@ foam.LIB({
         Boolean: function(b) {
           return b ? "true" : "false";
         },
-        Number: function(n) { return '' + n; },
+        Number: function(n) {
+          return '' + n + (n > Math.pow(2, 31) ? 'L' : '');
+        },
         FObject: function(o) {
           return o.asJavaValue();
         },
@@ -29,8 +31,8 @@ foam.LIB({
           // a number of places.
           return null;
         },
-        Array: function(a) {
-          return "new Object[] {" +
+        Array: function(a, prop) {
+          return "new " + (prop ? prop.javaType : 'Object[]') + " {" +
             a.map(foam.java.asJavaValue).join(',') +
             '}';
         },
@@ -209,10 +211,31 @@ foam.CLASS({
       class: 'Boolean',
       name: 'includeInSignature',
       value: true
+    },
+    {
+      class: 'String',
+      name: 'javaValidateObj',
+      expression: function(validationPredicates) {
+        return validationPredicates
+          .map(vp => {
+            return `
+if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
+  throw new IllegalStateException(${foam.java.asJavaValue(vp.errorString)});
+}
+            `;
+          })
+          .join('');
+      }
     }
   ],
 
   methods: [
+    {
+      name: 'asJavaValue',
+      code: function() {
+        return `${this.sourceCls_.id}.${foam.String.constantize(this.name)}`;
+      }
+    },
     function createJavaPropertyInfo_(cls) {
       return foam.java.PropertyInfo.create({
         sourceCls:               cls,
@@ -240,7 +263,8 @@ foam.CLASS({
         includeInDigest:         this.includeInDigest,
         includeInSignature:      this.includeInSignature,
         containsPII:             this.containsPII,
-        containsDeletablePII:    this.containsDeletablePII
+        containsDeletablePII:    this.containsDeletablePII,
+        validateObj:             this.javaValidateObj
       });
     },
 
@@ -586,7 +610,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'abstract',
-      value: true
+      value: false
     },
     {
       class: 'StringArray',
@@ -611,6 +635,7 @@ foam.CLASS({
         type: this.javaType || 'void',
         visibility: 'public',
         static: this.isStatic(),
+        abstract: this.abstract,
         final: this.final,
         synchronized: this.synchronized,
         throws: this.javaThrows,
@@ -625,6 +650,26 @@ foam.CLASS({
     },
     function isStatic() {
       return false;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'MessageJavaRefinement',
+  refines: 'foam.i18n.MessageAxiom',
+  flags: ['java'],
+
+  methods: [
+    function buildJavaClass(cls) {
+      if ( this.flags && this.flags.length && this.flags.indexOf('java') == -1 ) {
+        return;
+      }
+      cls.constant({
+        name: this.name,
+        type: 'String',
+        value: foam.java.asJavaValue(this.message)
+      });
     }
   ]
 });
@@ -783,10 +828,10 @@ foam.CLASS({
             return self.hasOwnProperty(a.name);
           })
           .map(function(p) {
-            return `.set${foam.String.capitalize(p.name)}(${foam.java.asJavaValue(self[p.name])})`
+            return `.set${foam.String.capitalize(p.name)}(${foam.java.asJavaValue(self[p.name], p)})`
           })
         return `
-new ${self.cls_.id}.Builder(EmptyX.instance())
+new ${self.cls_.id}.Builder(foam.core.EmptyX.instance())
   ${props.join('\n')}
   .build()
         `

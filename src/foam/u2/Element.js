@@ -1829,8 +1829,7 @@ foam.CLASS({
       }.bind(this));
 
       var index = before ? i : (i + 1);
-      this.childNodes.splice.apply(this.childNodes,
-          [ index, 0 ].concat(children));
+      this.childNodes.splice.apply(this.childNodes, [index, 0].concat(children));
 
       this.state.onInsertChildren.call(
         this,
@@ -2056,10 +2055,9 @@ foam.CLASS({
       class: 'foam.core.ContextMethod',
       name: 'E',
       code: function E(ctx, opt_nodeName) {
-        var nodeName = (opt_nodeName || 'div').toUpperCase();
+        var nodeName = (opt_nodeName || 'DIV').toUpperCase();
 
-        return (
-          ctx.elementForName(nodeName) || foam.u2.Element).
+        return (ctx.elementForName(nodeName) || foam.u2.Element).
           create({nodeName: nodeName}, ctx);
       }
     },
@@ -2135,6 +2133,11 @@ foam.CLASS({
       class: 'Function',
       name: 'visibilityExpression',
       value: null
+    },
+    {
+      class: 'Boolean',
+      name: 'validationVisible',
+      value: true
     }
   ],
 
@@ -2155,14 +2158,44 @@ foam.CLASS({
     },
 
     function createVisibilityFor(data$) {
-      if ( this.visibilityExpression ) {
-        return foam.core.ExpressionSlot.create({
+      var Visibility = foam.u2.Visibility;
+
+      var slot = this.visibilityExpression ?
+        foam.core.ExpressionSlot.create({
           obj$: data$,
           code: this.visibilityExpression
+        }) :
+        foam.core.ConstantSlot.create({value: this.visibility});
+
+      if ( this.permissionRequired ) {
+        var visSlot  = slot;
+        var permSlot = data$.map(data => {
+          if ( ! data || ! data.__subContext__.auth ) return Visibility.HIDDEN;
+          var auth = data.__subContext__.auth;
+
+          var propName = this.name.toLowerCase();
+          var clsName  = this.forClass_.substring(this.forClass_.lastIndexOf('.') + 1).toLowerCase();
+
+          return auth.check(null, `${clsName}.rw.${propName}`)
+              .then(function(rw) {
+                if ( rw ) return Visibility.RW;
+                return auth.check(null, `${clsName}.ro.${propName}`)
+                  .then(ro => ro ? Visibility.RO : Visibility.HIDDEN);
+              });
+        });
+
+        slot = foam.core.ArraySlot.create({slots: [visSlot, permSlot]}).map(arr => {
+          var vis  = arr[0];
+          var perm = arr[1] || Visibility.HIDDEN;
+
+          return perm === Visibility.HIDDEN ? perm :
+            vis  === Visibility.HIDDEN ? vis :
+            perm === Visibility.RO ? perm :
+            vis;
         });
       }
 
-      return foam.core.ConstantSlot.create({value: this.visibility});
+      return slot;
     }
   ]
 });
@@ -2267,7 +2300,23 @@ foam.CLASS({
   refines: 'foam.core.Boolean',
   requires: [ 'foam.u2.CheckBox' ],
   properties: [
-    [ 'view', { class: 'foam.u2.CheckBox' } ],
+    {
+      name: 'view',
+      expression: function(label2, label2Formatter) {
+        return {
+          class: 'foam.u2.CheckBox',
+          label: label2,
+          labelFormatter: label2Formatter
+        };
+      }
+    },
+    {
+      class: 'String',
+      name: 'label2'
+    },
+    {
+      name: 'label2Formatter'
+    }
   ]
 });
 
@@ -2297,6 +2346,15 @@ foam.CLASS({
     {
       name: 'view',
       value: { class: 'foam.u2.DetailView' },
+    },
+    {
+      name: 'validationVisible',
+      documentation: `
+        Hide FObjectProperty validation because their inner view should provide its
+        own validation so having it on the outer view and the inner view is redundant
+        and jarring.
+      `,
+      value: false
     }
   ]
 });
@@ -2480,13 +2538,16 @@ foam.CLASS({
 
       this.attr('name', p.name);
 
-      // if ( p.validateObj ) {
-      //   var s = foam.core.ExpressionSlot.create({
-      //     obj$: this.__context__.data$,
-      //     code: p.validateObj
-      //   });
-      //   this.error_$.follow(s);
-      // }
+      if ( p.validateObj ) {
+        /*
+        var s = foam.core.ExpressionSlot.create({
+          obj$: this.__context__.data$,
+          code: p.validateObj
+        });
+        this.error_$.follow(s);
+        */
+//        this.error_$.follow(this.__context__.data.slot(p.validateObj));
+      }
     }
   ]
 });
