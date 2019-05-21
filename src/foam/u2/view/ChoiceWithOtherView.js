@@ -48,7 +48,8 @@ foam.CLASS({
       expression: function(choiceData_, otherKey) {
         return foam.util.equals(choiceData_, otherKey);
       }
-    }
+    },
+    'preventFeedback_'
   ],
   reactions: [
     ['', 'propertyChange.choiceData_', 'toData'],
@@ -60,13 +61,17 @@ foam.CLASS({
     {
       name: 'toData',
       code: function() {
+        if ( this.preventFeedback_ ) return;
+        this.preventFeedback_ = true;
         this.data = this.showOther_ ? this.otherData_ : this.choiceData_;
+        this.preventFeedback_ = false;
       }
     },
     {
       name: 'fromData',
       code: function() {
-        if ( ! this.choiceView_ ) return;
+        if ( ! this.choiceView_ || this.preventFeedback_ ) return;
+        this.preventFeedback_ = true;
         this.choiceView_.data = this.data;
         if ( this.choiceView_.choice == null ) {
           this.choiceData_ = this.otherKey;
@@ -74,6 +79,7 @@ foam.CLASS({
         } else {
           this.otherData_ = this.otherDefault;
         }
+        this.preventFeedback_ = false;
       }
     }
   ],
