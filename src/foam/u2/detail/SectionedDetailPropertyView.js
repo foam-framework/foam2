@@ -27,16 +27,11 @@ foam.CLASS({
     ^helper-icon {
       width: 20px;
       height: 20px;
-      margin-top 4px;
     }
 
     ^tooltip {
-      display: inline-flex;
-      overflow:overlay;
-      direction: rtl;
-      float: right;
-      width: 20px;
-      height: 20px;
+      align-self: center;
+      position: relative;
     }
 
     ^tooltip-container {
@@ -59,24 +54,24 @@ foam.CLASS({
     }
 
     ^arrow-right {
-      width: 0; 
-      height: 0; 
+      width: 0;
+      height: 0;
       border-top: 10px solid transparent;
-      border-bottom: 10px solid transparent; 
-      border-left:10px solid rgba(0, 0, 0, 0.8); 
+      border-bottom: 10px solid transparent;
+      border-left:10px solid rgba(0, 0, 0, 0.8);
     }
 
-    ^tooltip:hover {
-      position: absolute;
-      width: 100%;
-      height: auto;
-    }
-    
     ^tooltip:hover .foam-u2-detail-SectionedDetailPropertyView-tooltip-container{
-      display: inline-flex;
+      position: absolute;
+      display: flex;
+      justify-content: flex-end;
+
+      top: 0;
+      right: 25px;
+      width: 380px;
       z-index: 10;
     }
-    
+
     ^error-icon {
       width: 16px;
       height: 16px;
@@ -108,7 +103,7 @@ foam.CLASS({
 
     /*
       !IMPORTANT!
-      For the following inputs below, we are planning 
+      For the following inputs below, we are planning
       encode these changes in the actual foam files
     */
 
@@ -235,11 +230,11 @@ foam.CLASS({
 
     /*
       !IMPORTANT!
-      For the following inputs below, we are planning 
+      For the following inputs below, we are planning
       encode these changes in the actual foam files
     */
 
-    /* 
+    /*
     ^ .foam-u2-CheckBox {
       -webkit-appearance: none;
       border-radius: 2px;
@@ -333,7 +328,7 @@ foam.CLASS({
                     .add(prop)
                     .enableClass(this.myClass('error'), errorSlot)
                   .end()
-                  .callIf(prop.help, function() { 
+                  .callIf(prop.help, function() {
                     this.start()
                       .addClass(self.myClass('tooltip'))
                       .start({
@@ -346,13 +341,13 @@ foam.CLASS({
                       .start()
                         .addClass(self.myClass('tooltip-container'))
                         .start()
-                          .addClass(self.myClass('arrow-right'))
-                        .end()
-                        .start()
                           .addClass(self.myClass('helper-text'))
                           .start('p').style({ 'padding': '3px' })
                             .add(prop.help)
                           .end()
+                        .end()
+                        .start()
+                          .addClass(self.myClass('arrow-right'))
                         .end()
                       .end()
                     .end()
