@@ -408,6 +408,7 @@ FOAM_FILES([
   { name: "foam/u2/view/FObjectView", flags: ['web'] },
   { name: "foam/u2/view/FObjectArrayView", flags: ['web'] },
   { name: "foam/u2/view/ChoiceView", flags: ['web'] },
+  { name: "foam/u2/view/ChoiceWithOtherView", flags: ['web'] },
   { name: "foam/u2/view/RichChoiceView", flags: ['web'] },
   { name: "foam/u2/view/OverlayActionListView", flags: ['web'] },
   { name: "foam/u2/view/RadioView", flags: ['web'] },
@@ -606,6 +607,7 @@ FOAM_FILES([
   { name: "foam/u2/detail/AbstractSectionedDetailView" },
   { name: "foam/u2/detail/SectionView" },
   { name: "foam/u2/detail/SectionedDetailView" },
+  { name: "foam/u2/detail/VerticalDetailView" },
   { name: "foam/u2/detail/WizardSectionsView" },
   { name: "foam/u2/detail/SectionedDetailPropertyView" }
 ]);

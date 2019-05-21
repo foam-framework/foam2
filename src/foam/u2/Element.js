@@ -2133,6 +2133,11 @@ foam.CLASS({
       class: 'Function',
       name: 'visibilityExpression',
       value: null
+    },
+    {
+      class: 'Boolean',
+      name: 'validationVisible',
+      value: true
     }
   ],
 
@@ -2295,7 +2300,23 @@ foam.CLASS({
   refines: 'foam.core.Boolean',
   requires: [ 'foam.u2.CheckBox' ],
   properties: [
-    [ 'view', { class: 'foam.u2.CheckBox' } ],
+    {
+      name: 'view',
+      expression: function(label2, label2Formatter) {
+        return {
+          class: 'foam.u2.CheckBox',
+          label: label2,
+          labelFormatter: label2Formatter
+        };
+      }
+    },
+    {
+      class: 'String',
+      name: 'label2'
+    },
+    {
+      name: 'label2Formatter'
+    }
   ]
 });
 
@@ -2325,6 +2346,15 @@ foam.CLASS({
     {
       name: 'view',
       value: { class: 'foam.u2.DetailView' },
+    },
+    {
+      name: 'validationVisible',
+      documentation: `
+        Hide FObjectProperty validation because their inner view should provide its
+        own validation so having it on the outer view and the inner view is redundant
+        and jarring.
+      `,
+      value: false
     }
   ]
 });
@@ -2508,13 +2538,16 @@ foam.CLASS({
 
       this.attr('name', p.name);
 
-      // if ( p.validateObj ) {
-      //   var s = foam.core.ExpressionSlot.create({
-      //     obj$: this.__context__.data$,
-      //     code: p.validateObj
-      //   });
-      //   this.error_$.follow(s);
-      // }
+      if ( p.validateObj ) {
+        /*
+        var s = foam.core.ExpressionSlot.create({
+          obj$: this.__context__.data$,
+          code: p.validateObj
+        });
+        this.error_$.follow(s);
+        */
+//        this.error_$.follow(this.__context__.data.slot(p.validateObj));
+      }
     }
   ]
 });

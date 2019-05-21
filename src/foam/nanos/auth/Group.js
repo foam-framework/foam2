@@ -211,39 +211,59 @@ foam.CLASS({
         }
       ],
       javaCode: `
-AppConfig config = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
+        // Find Group details, by iterating up through group.parent
+        AppConfig config          = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
+        String configUrl          = "";
+        String configSupportEmail = "";
+        Boolean urlFound          = false;
+        Boolean supportEmailFound = false;
+        Group group               = this;
+        String grp                = "";
+        DAO groupDAO              = (DAO) x.get("groupDAO");
 
-String configUrl = config.getUrl();
+        while ( group != null ) {
+          configUrl          = urlFound ? configUrl : group.getUrl();
+          configSupportEmail = supportEmailFound ? configSupportEmail : group.getSupportEmail();
+      
+          // Once true, stay true
+          urlFound          = urlFound   ? urlFound   : ! SafetyUtil.isEmpty(configUrl);
+          supportEmailFound = supportEmailFound ? supportEmailFound : ! SafetyUtil.isEmpty(configSupportEmail);
 
-HttpServletRequest req = x.get(HttpServletRequest.class);
-if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
-  // populate AppConfig url with request's RootUrl
-  configUrl = ((Request) req).getRootURL().toString();
-} else {
-  // populate AppConfig url with group url
-  Group group = (Group) x.get("group");
-  if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
-    configUrl = group.getUrl();
-  }
-  if ( ! SafetyUtil.isEmpty(group.getSupportEmail()) ) {
-    config.setSupportEmail(group.getSupportEmail());
-  }
-}
+          if ( urlFound && supportEmailFound ) break;
 
-if ( config.getForceHttps() ) {
-  if ( configUrl.startsWith("https://") ) {
-    config.setUrl(configUrl);
-    return config;
-  } else if ( configUrl.startsWith("http://") ) {
-    configUrl = "https" + configUrl.substring(4);
-  } else {
-    configUrl = "https://" + configUrl;
-  }
-}
+          grp   = group.getParent();
+          group = (Group)groupDAO.find(grp);
+        }
 
-config.setUrl(configUrl);
+        // FIND URL
+        if ( ! urlFound ) {
+          // populate AppConfig url with request's RootUrl
+          HttpServletRequest req = x.get(HttpServletRequest.class);
+          if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
+            configUrl = ((Request) req).getRootURL().toString();
+          }
+        }
 
-return config;
+        // FORCE HTTPS IN URL?
+        if ( config.getForceHttps() ) {
+          if ( ! configUrl.startsWith("https://") ) {
+            if ( configUrl.startsWith("http://") ) {
+              configUrl = "https" + configUrl.substring(4);
+            } else {
+              configUrl = "https://" + configUrl;
+            }
+          }
+        }
+
+        // SET URL
+        config.setUrl(configUrl);
+
+        // SET SupportEmail
+        if ( supportEmailFound ) {
+          config.setSupportEmail(configSupportEmail);
+        }
+
+        return config;
         `
     },
     {

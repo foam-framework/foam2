@@ -82,13 +82,13 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'enabled',
-      documentation: 'Verifies that the User is permitted certain actions.',
+      documentation: 'Determines whether the User is permitted certain actions.',
       value: true
     },
     {
       class: 'Boolean',
       name: 'loginEnabled',
-      documentation: 'Verifies that the User can login to the platform.',
+      documentation: 'Determines whether the User can login to the platform.',
       value: true
     },
     {
@@ -179,7 +179,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'emailVerified',
-      documentation: 'Verifies that the email address of the User is valid.',
+      documentation: 'Determines whether the email address of the User is valid.',
       permissionRequired: true
     },
     {
@@ -190,7 +190,7 @@ foam.CLASS({
       factory: function() {
         return this.Phone.create();
       },
-      view: { class: 'foam.nanos.auth.PhoneDetailView' }
+      view: { class: 'foam.u2.detail.VerticalDetailView' }
     },
     {
       class: 'String',
@@ -210,7 +210,7 @@ foam.CLASS({
       factory: function() {
         return this.Phone.create();
       },
-      view: { class: 'foam.nanos.auth.PhoneDetailView' }
+      view: { class: 'foam.u2.detail.VerticalDetailView' }
     },
     {
       class: 'String',
@@ -335,7 +335,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'businessHoursEnabled',
-      documentation: 'Verifies that business hours are enabled for the User to set.',
+      documentation: 'Determines whether business hours are enabled for the User to set.',
       value: false
     },
     {
