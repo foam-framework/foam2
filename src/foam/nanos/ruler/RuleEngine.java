@@ -66,7 +66,7 @@ public class RuleEngine extends ContextAwareSupport {
 
   /**
    * Probes rules execution by applying actions and skipping
-   * execution of the parts that have any effect on the system
+   * execution of agents that contain code that effects the system
    *
    * @param rules - Rules to be considered applying
    * @param obj - FObject supplied to rules for execution
