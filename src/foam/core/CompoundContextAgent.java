@@ -17,12 +17,13 @@ public class CompoundContextAgent
   implements ContextAgent, Agency
 {
   protected ArrayList<Runnable> agents_ = new ArrayList();
-
-  public CompoundContextAgent() {
+  protected X x_;
+  public CompoundContextAgent(X x) {
+    x_ = x;
   }
 
   public void submit(X x, ContextAgent agent, String description) {
-    agents_.add(new ContextAgentRunnable(x, agent, description));
+    agents_.add(new ContextAgentRunnable(x_, agent, description));
   }
 
   public void submit(X x, ContextAgent agent) {

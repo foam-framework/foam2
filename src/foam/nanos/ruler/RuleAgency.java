@@ -1,13 +1,15 @@
 package foam.nanos.ruler;
 
 import foam.core.CompoundContextAgent;
+import foam.core.X;
 
 public class RuleAgency
   extends CompoundContextAgent
 {
   protected Rule rule_;
 
-  public RuleAgency(Rule rule) {
+  public RuleAgency(X x, Rule rule) {
+    super(x);
     rule_ = rule;
   }
 
