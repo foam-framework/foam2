@@ -20,7 +20,7 @@ foam.CLASS({
     }
 
     ^validation-container {
-      margin-top: 4px;
+      margin-top: 6px;
       color: #d9170e;
     }
 
@@ -72,11 +72,6 @@ foam.CLASS({
       z-index: 10;
     }
 
-    ^error-icon {
-      width: 16px;
-      height: 16px;
-    }
-
     ^error .foam-u2-TextField {
       background-color: #fbedec;
       border: solid 1px #d9170e;
@@ -111,6 +106,7 @@ foam.CLASS({
       width: 100%;
       padding: 10px 8px;
       font-size: 14px;
+      height: 40px;
     }
 
     ^ .foam-u2-tag-TextArea {
@@ -317,14 +313,17 @@ foam.CLASS({
               foam.core.ConstantSlot.create({ value: null });
 
             return self.E()
-              .start(self.Rows, { defaultChildStyle:  { 'line-height': '2' } })
+              .start(self.Rows)
                 .callIf(prop$label, function() {
-                  this.start('m3').add(prop$label).end();
+                  this.start('m3')
+                    .add(prop$label)
+                    .style({ 'line-height': '2' })
+                  .end();
                 })
                 .start()
                   .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                   .start(self.Item)
-                    .style({'flex-grow': 1})
+                    .style({ 'flex-grow': 1 })
                     .add(prop)
                     .enableClass(this.myClass('error'), errorSlot)
                   .end()
@@ -355,20 +354,21 @@ foam.CLASS({
                 .end()
                 .callIf(prop.validationVisible, function() {
                   this
-                    .start(this.Item).style({'align-items': 'center'})
+                    .start(self.Item).style({ 'align-items': 'center' })
                       .start(self.Cols, { defaultChildStyle: {
                         'justify-content': 'flex-start',
                         'margin': '0 8px 0 0'
                       }})
-                        .addClass(this.myClass('validation-container'))
+                        .addClass(self.myClass('validation-container'))
                         .show(errorSlot)
                         .start({
                           class: 'foam.u2.tag.Image',
-                          data: 'images/inline-error-icon.svg'
+                          data: 'images/inline-error-icon.svg',
+                          displayHeight: 16,
+                          displayWeight: 16
                         })
-                          .addClass(this.myClass('error-icon'))
                         .end()
-                        .start(this.Item)
+                        .start(self.Item)
                         .style({ 'flex-grow': 1 })
                           .add(errorSlot.map((s) => {
                             return self.E().add(s);
