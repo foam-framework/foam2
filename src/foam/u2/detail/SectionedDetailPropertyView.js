@@ -14,7 +14,7 @@ foam.CLASS({
   `,
 
   css: `
-    ^ m3 {
+    ^ h3 {
       font-size: 16px;
       font-weight: bold;
     }
@@ -324,7 +324,7 @@ foam.CLASS({
             return self.E()
               .start(self.Rows, { defaultChildStyle:  { 'line-height': '2' } })
                 .callIf(prop$label, function() {
-                  this.start('m3').add(prop$label).end();
+                  this.start('h3').add(prop$label).end();
                 })
                 .start()
                   .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
