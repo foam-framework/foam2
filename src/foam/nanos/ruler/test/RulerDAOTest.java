@@ -210,7 +210,7 @@ public class RulerDAOTest extends Test {
       Account account = new DigitalAccount();
       account.setOwner(user.getId());
       account.setDenomination("INR");
-      agent.submit(x17, x112 -> {
+      agent.submit(x112 -> {
         DAO accountDao = (DAO) x112.get("localAccountDAO");
         accountDao.put(account);
       }, "RulerDAOTest add account");

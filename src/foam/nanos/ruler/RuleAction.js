@@ -21,7 +21,7 @@
           user.setFirstName("Jimmy");
           userDAO.put(user); // WILL NOT WORK
           // use agent instead 
-          agent.submit(x, x1 -> {
+          agent.submit(x1 -> {
             DAO crudUserDAO = x1.get("userDAO); // CRUD DAO
             crudUserDAO.put(user); }, "Updating user's first name"
             );
