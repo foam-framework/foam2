@@ -31,5 +31,17 @@ foam.CLASS({
       of: 'foam.nanos.ruler.Operations',
       name: 'operation'
     }
+  ],
+
+  methods: [
+    {
+      name: 'addTestedRule',
+      args: [
+        { name: 'id', type: 'Long' },
+        { name: 'description', type: 'String' },
+        { name: 'applied', type: 'Boolean' }
+       ],
+      javaCode: `getAppliedRules().add(new TestedRule(id, description, applied));`
+    }
   ]
 });
