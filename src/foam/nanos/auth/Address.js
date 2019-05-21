@@ -57,7 +57,20 @@ foam.CLASS({
       expression: function(structured, streetNumber, streetName) {
         return structured ? streetNumber + ' ' + streetName : '';
       },
-      minLength: 1
+      validationPredicates: [
+        {
+          args: ['structured', 'address1'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.EQ(foam.nanos.auth.Address.STRUCTURED, true),
+              e.GTE(foam.mlang.StringLength.create({
+                arg1: foam.nanos.auth.Address.ADDRESS1
+              }), 1)
+            );
+          },
+          errorString: 'Invalid value for address 1.'
+        }
+      ]
     },
     {
       class: 'String',
@@ -70,6 +83,7 @@ foam.CLASS({
       class: 'Reference',
       targetDAOKey: 'countryDAO',
       name: 'countryId',
+      label: 'Country',
       of: 'foam.nanos.auth.Country',
       documentation: `A foreign key into the CountryDAO which represents the country.`,
       required: true,
@@ -88,6 +102,7 @@ foam.CLASS({
       class: 'Reference',
       targetDAOKey: 'regionDAO',
       name: 'regionId',
+      label: 'Region',
       of: 'foam.nanos.auth.Region',
       documentation: `A foreign key into the RegionDAO which represents
         the region of the country.`,
@@ -119,20 +134,26 @@ foam.CLASS({
       }
     },
     {
+      // TODO: Remove structured, street number, and street name. This should be a view concern
+      // and not baked into the model.
       class: 'String',
       name: 'streetNumber',
       width: 16,
       documentation: 'The structured field for the street number of the postal address.',
-      validateObj: function(structured, streetNumber) {
-        if ( ! structured ) return;
-        if ( streetNumber.trim() === '' ) {
-          return 'Street number required.';
+      validationPredicates: [
+        {
+          args: ['structured', 'streetNumber'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.EQ(foam.nanos.auth.Address.STRUCTURED, false),
+              e.GTE(foam.mlang.StringLength.create({
+                arg1: foam.nanos.auth.Address.STREET_NUMBER
+              }), 1)
+            );
+          },
+          errorString: 'Invalid street number.'
         }
-        var streetNumberRegex = /^[0-9]{1,16}$/;
-        if ( ! streetNumberRegex.test(streetNumber) ) {
-          return 'Invalid street number.';
-        }
-      }
+      ]
     },
     {
       class: 'String',
