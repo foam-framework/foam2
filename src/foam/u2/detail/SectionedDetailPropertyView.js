@@ -72,6 +72,19 @@ foam.CLASS({
       z-index: 10;
     }
 
+    ^ .foam-u2-tag-Select {
+      width: 100%;
+      font-size: 14px;
+      border: solid 1px #8e9090;
+      border-radius: 3px;
+      font-weight: 400;
+      padding: 10px 8px;
+      box-shadow: none;
+      background: #ffffff url('images/dropdown-icon.svg') no-repeat 99% 50%;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
     ^error .foam-u2-TextField,
     ^error .foam-u2-tag-TextArea,
     ^error .foam-u2-tag-Select,
@@ -102,19 +115,6 @@ foam.CLASS({
     }
 
     ^ .foam-u2-view-date-DateTimePicker {
-      cursor: pointer;
-    }
-
-    ^ .foam-u2-tag-Select {
-      width: 100%;
-      font-size: 14px;
-      border: solid 1px #8e9090;
-      border-radius: 3px;
-      font-weight: 400;
-      padding: 10px 8px;
-      box-shadow: none;
-      background: #ffffff url('images/dropdown-icon.svg') no-repeat 99% 50%;
-      -webkit-appearance: none;
       cursor: pointer;
     }
 
