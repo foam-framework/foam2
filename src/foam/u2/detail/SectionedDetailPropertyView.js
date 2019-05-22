@@ -120,6 +120,57 @@ foam.CLASS({
       cursor: pointer;
     }
 
+    ^ .foam-u2-view-RichChoiceView {
+      display: flex;
+    }
+
+    ^ .foam-u2-view-RichChoiceView-chevron {
+      content: '▾';
+      padding-left: 0px;
+      font-size: 16px;
+      color: #8D9090;
+    }
+
+    ^ .foam-u2-view-RichChoiceView-selection-view {
+      padding: 2px 12px 0px 8px;
+      width: 100%;
+      border-radius: 3px;
+      border: solid 1px #8e9090;
+      background-color: #ffffff;
+      box-sizing: border-box;
+      -webkit-appearance: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    ^ .foam-u2-view-RichChoiceView .search {
+      padding: 8px 16px;
+      font-size: 14px;
+      border-bottom: 1px solid #f4f4f9;
+    }
+
+    ^ .foam-u2-detail-SectionedDetailPropertyView .property-filter {
+      font-size: 14px;
+      padding-left: 16px;
+    }
+
+    ^ .foam-u2-view-RichChoiceView .search input {
+      border-bottom: none;
+    }
+
+    ^ .foam-u2-view-RichChoiceView .search img {
+      top: 8px;
+    }
+
+    ^ .foam-u2-view-RichChoiceView-heading {
+      border-bottom: 1px solid #f4f4f9;
+      line-height: 24px;
+      font-size: 14px;
+      color: #333;
+      font-weight: 900;
+      padding: 6px 16px;
+    }
+
     ^ .foam-u2-IntView {
       width: 100%;
       padding: 10px 8px;
