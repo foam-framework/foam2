@@ -72,25 +72,11 @@ foam.CLASS({
       z-index: 10;
     }
 
-    ^error .foam-u2-TextField {
-      background-color: #fbedec;
-      border: solid 1px #d9170e;
-      font-size: 12px;
-    }
-
-    ^error .foam-u2-tag-TextArea {
-      background-color: #fbedec;
-      border: solid 1px #d9170e;
-      font-size: 12px;
-    }
-
-    ^error .foam-u2-tag-Select {
-      background-color: #fbedec;
-      border: solid 1px #d9170e;
-      font-size: 12px;
-    }
-
-    ^error .foam-u2-view-date-DateTimePicker .date-display-box {
+    ^error .foam-u2-TextField,
+    ^error .foam-u2-tag-TextArea,
+    ^error .foam-u2-tag-Select,
+    ^error .foam-u2-view-date-DateTimePicker .date-display-box
+    {
       background-color: #fbedec;
       border: solid 1px #d9170e;
       font-size: 12px;
