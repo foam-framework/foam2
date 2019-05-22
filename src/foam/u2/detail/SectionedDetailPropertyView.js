@@ -249,13 +249,6 @@ foam.CLASS({
               data.slot(prop.validateObj) :
               foam.core.ConstantSlot.create({ value: null });
 
-            // Don't set the CSS class "^error" if the property is an
-            // FObjectProperty. Otherwise when the FObject is invalid, all of
-            // the inputs for it will be highlighted in red.
-            var cssClassErrorSlot = foam.core.FObjectProperty.isInstance(prop)
-              ? foam.core.ConstantSlot.create({ value: null })
-              : errorSlot;
-
             return self.E()
               .start(self.Rows)
                 .callIf(prop$label, function() {
@@ -269,7 +262,9 @@ foam.CLASS({
                   .start(self.Item)
                     .style({ 'flex-grow': 1 })
                     .add(prop)
-                    .enableClass(this.myClass('error'), cssClassErrorSlot)
+                    .callIf(prop.validationStyleEnabled, function() {
+                      this.enableClass(self.myClass('error'), errorSlot);
+                    })
                   .end()
                   .callIf(prop.help, function() {
                     this.start()
