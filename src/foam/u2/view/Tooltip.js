@@ -1,4 +1,3 @@
-// TODO RUBY
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'Tooltip',
@@ -8,84 +7,52 @@ foam.CLASS({
     A 20x20 px question mark icon that shows a tooltip on hover.
   `,
 
+  imports: [
+    'document',
+    'setTimeout',
+    'window'
+  ],
+
   css: `
     ^tooltip {
       display: inline-flex;
       overflow:overlay;
       width: 20px;
       height: 20px;
-      // position: absolute;
     }
 
     ^tooltip img {
       position: absolute;
     }
-    
-    ^tooltip-container {
-      z-index: -1;
-      display: none;
-      width: 80%;
-      height: auto;
-      line-height: 1.5;
-    }
-
-    ^helper-text {
-      background-color: rgba(0, 0, 0, 0.8);
-      color: #fff;
-      border-radius: 5px;
-      direction: ltr;
-      padding: 2px;
-      text-align: center;
-    }
-
-    ^arrow-right {
-      width: 0; 
-      height: 0; 
-      top: 50%;
-      border-top: 10px solid transparent;
-      border-bottom: 10px solid transparent; 
-      border-left:10px solid rgba(0, 0, 0, 0.8); 
-    }
-
-    ^arrow-left {
-      width: 0; 
-      height: 0; 
-      border-top: 10px solid transparent;
-      border-bottom: 10px solid transparent; 
-      border-right:10px solid rgba(0, 0, 0, 0.8); 
-    }
-
-    ^arrow-top {
-      width: 0; 
-      height: 0; 
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent; 
-      border-bottom:10px solid rgba(0, 0, 0, 0.8); 
-    }
-
-    ^arrow-bottom {
-      width: 0; 
-      height: 0; 
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent; 
-      border-top:10px solid rgba(0, 0, 0, 0.8); 
-    }
 
     ^tooltip:hover {
-      position: absolute;
-      width: 100%;
       height: auto;
       z-index: 100;
     }
 
-    ^tooltip:hover .foam-u2-view-Tooltip-tooltip-container{
-      display: inline-flex;
-      z-index: 100;
-    }    
+    ^tooltip:hover .foam-u2-view-Tooltip-tip {
+      display: block;
+    }
+
+    ^tip {
+      display: none;
+      background: rgba(80, 80, 80, 0.9);
+      border-radius: 4px;
+      color: white;
+      padding: 5px 8px;
+      position: fixed;
+      transform: translate3d(0, 0, 2px);
+      z-index: 2000;
+      width: auto;
+      height: auto;
+    }
   `,
 
   properties: [
-    'dir'
+    'domRect', 
+    'screenWidth', 
+    'screenHeight', 
+    'scrollY'
   ],
 
   methods: [
@@ -94,47 +61,51 @@ foam.CLASS({
       var self = this;
       this.SUPER();
       this.addClass(self.myClass('tooltip'))
-        .callIf(self.dir == 'l', function() {
-          this.style({ 'direction': 'rtl', 'float': 'right' });
-        })
-        .callIf(self.dir == 'r', function() {
-          this.style({ 'direction': 'ltr', 'float': 'left' });
-        })
-        .start({
+        this.start({
           class: 'foam.u2.tag.Image',
           data: 'images/question-icon.svg'
         })
-        .end()
+        .end();
+        this.onload.sub(function() {
+          self.loadTooltip();
+          self.window.addEventListener('loadTooltip', self.loadTooltip());
+        })
+      
+    }
+  ], 
 
-        .start()
-          .addClass(self.myClass('tooltip-container'))
-          .callIf(self.dir == 'l', function() {
-            this.style({ 'margin-right': '23px' });
-          })
-          .callIf(self.dir == 'r', function() {
-            this.style({ 'margin-left': '23px' });
-          })
-          .start()
-            .callIf(self.dir == 'l', function() {
-              this.addClass(self.myClass('arrow-right'))
+  listeners: [
+    {
+      name: 'loadTooltip',
+      isFramed: true,
+      code: function() {
+        var self = this;
+        setTimeout(function(){
+          if ( ! self.el() ) return;
+          self.domRect = self.el().getBoundingClientRect(); 
+          self.screenWidth = self.window.innerWidth;
+          self.screenHeight = self.window.innerHeight;
+          self.scrollY = self.window.scrollY;
+          var above = self.domRect.top - scrollY > self.screenHeight / 2;
+          var left = self.domRect.left > self.screenWidth / 2;
+          self.start()
+            .addClass(self.myClass('tip'))
+            .add(self.data)
+            .callIf(above, function() {
+              this.style({ 'bottom': (self.screenHeight - self.domRect.bottom + 22) + 'px'});
             })
-            .callIf(self.dir == 'r', function() {
-              this.addClass(self.myClass('arrow-left'))
+            .callIf(!above, function() {
+              this.style({ 'top': (self.domRect.top + 22) + 'px'});
             })
-          .end()
-          .start()
-            .addClass(self.myClass('helper-text'))
-            .callIf(self.dir == 'l', function() {
-              this.style({ 'border-top-right-radius': '0px' })
+            .callIf(left, function() {
+              this.style({ 'right': (self.screenWidth - self.domRect.right + 22) + 'px'});
             })
-            .callIf(self.dir == 'r', function() {
-              this.style({ 'border-top-left-radius': '0px' })
+            .callIf(!left, function() {
+              this.style({ 'left': (self.domRect.left + 22) + 'px'});
             })
-            .start('p').style({ 'padding': '3px' })
-              .add(self.data)
-            .end()
-          .end()  
-      .end()
+          .end();
+        }, 100);
+      }
     }
   ]
 });
