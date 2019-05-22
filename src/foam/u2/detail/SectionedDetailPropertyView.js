@@ -24,59 +24,6 @@ foam.CLASS({
       color: #d9170e;
     }
 
-    ^helper-icon {
-      width: 20px;
-      height: 20px;
-      margin-top 4px;
-    }
-
-    ^tooltip {
-      display: inline-flex;
-      overflow:overlay;
-      direction: rtl;
-      float: right;
-      width: 20px;
-      height: 20px;
-    }
-
-    ^tooltip-container {
-      z-index: -1;
-      display: none;
-      width: 80%;
-      height: auto;
-      line-height: 1.5;
-      margin-right: 3px;
-    }
-
-    ^helper-text {
-      background-color: rgba(0, 0, 0, 0.8);
-      color: #fff;
-      border-radius: 5px;
-      border-top-right-radius: 0px;
-      direction: ltr;
-      padding: 2px;
-      text-align: center;
-    }
-
-    ^arrow-right {
-      width: 0; 
-      height: 0; 
-      border-top: 10px solid transparent;
-      border-bottom: 10px solid transparent; 
-      border-left:10px solid rgba(0, 0, 0, 0.8); 
-    }
-
-    ^tooltip:hover {
-      position: absolute;
-      width: 100%;
-      height: auto;
-    }
-    
-    ^tooltip:hover .foam-u2-detail-SectionedDetailPropertyView-tooltip-container{
-      display: inline-flex;
-      z-index: 10;
-    }
-    
     ^error-icon {
       width: 16px;
       height: 16px;
@@ -322,37 +269,36 @@ foam.CLASS({
                     .add(prop)
                     .enableClass(this.myClass('error'), errorSlot)
                   .end()
-                    .callIf(prop.help, function() { 
-                      this.start({
-                        class: 'foam.u2.view.Tooltip',
-                        data: prop.help,
-                        dir: 'l'
-                      }).end()
-                    })
-                .start(this.Item).style({'align-items': 'center'})
-                  .start(self.Cols, { defaultChildStyle: {
-                    'justify-content': 'flex-start',
-                    'margin': '0 8px 0 0',
-                    'position': 'absolute'
-                  }})
-                    .addClass(this.myClass('validation-container'))
-                    .show(errorSlot)
-                    .start({
-                      class: 'foam.u2.tag.Image',
-                      data: 'images/inline-error-icon.svg'
-                    })
-                      .addClass(this.myClass('error-icon'))
-                    .end()
-                    .start(this.Item)
-                    .style({ 'flex-grow': 1 })
-                      .add(errorSlot.map((s) => {
-                        return self.E().add(s);
-                      }))
+                  .callIf(prop.help, function() { 
+                    this.start({
+                      class: 'foam.u2.view.Tooltip',
+                      data: prop.help
+                    }).end()
+                  })
+                  .start(this.Item).style({'align-items': 'center'})
+                    .start(self.Cols, { defaultChildStyle: {
+                      'justify-content': 'flex-start',
+                      'margin': '0 8px 0 0',
+                      'position': 'absolute'
+                    }})
+                      .addClass(this.myClass('validation-container'))
+                      .show(errorSlot)
+                      .start({
+                        class: 'foam.u2.tag.Image',
+                        data: 'images/inline-error-icon.svg'
+                      })
+                        .addClass(this.myClass('error-icon'))
+                      .end()
+                      .start(this.Item)
+                        .style({ 'flex-grow': 1 })
+                        .add(errorSlot.map((s) => {
+                          return self.E().add(s);
+                        }))
+                      .end()
                     .end()
                   .end()
-                .end()
-              .end();
-          }));
+        .end();
+      }));
     }
   ]
 });
