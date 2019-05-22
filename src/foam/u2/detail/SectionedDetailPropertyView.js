@@ -120,19 +120,6 @@ foam.CLASS({
       cursor: pointer;
     }
 
-    ^ .foam-u2-tag-Select {
-      width: 100%;
-      font-size: 14px;
-      border: solid 1px #8e9090;
-      border-radius: 3px;
-      font-weight: 400;
-      padding: 10px 8px;
-      box-shadow: none;
-      background: #ffffff url('images/dropdown-icon.svg') no-repeat 99% 50%;
-      -webkit-appearance: none;
-      cursor: pointer;
-    }
-
     ^ .foam-u2-view-RichChoiceView {
       display: flex;
     }
