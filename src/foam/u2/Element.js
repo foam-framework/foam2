@@ -2229,9 +2229,8 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'DateViewRefinement',
   refines: 'foam.core.Date',
-  requires: [ 'foam.u2.view.date.DateTimePicker' ],
   properties: [
-    [ 'view', { class: 'foam.u2.view.date.DateTimePicker' } ]
+    [ 'view', { class: 'foam.u2.DateView' } ]
   ]
 });
 
@@ -2240,9 +2239,8 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'DateTimeViewRefinement',
   refines: 'foam.core.DateTime',
-  requires: [ 'foam.u2.view.date.DateTimePicker' ],
   properties: [
-    [ 'view', { class: 'foam.u2.view.date.DateTimePicker', showTimeOfDay: true } ]
+    [ 'view', { class: 'foam.u2.DateTimeView' } ]
   ]
 });
 
