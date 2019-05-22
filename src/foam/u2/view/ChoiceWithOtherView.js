@@ -74,8 +74,11 @@ foam.CLASS({
         this.preventFeedback_ = true;
         this.choiceView_.data = this.data;
         if ( this.choiceView_.choice == null ) {
-          this.choiceData_ = this.otherKey;
-          this.otherData_ = this.data;
+          if(!this.data) this.choiceData = this.choiceView.placeholder;
+          else {
+            this.choiceData_ = this.otherKey;
+            this.otherData_ = this.data;
+          }
         } else {
           this.otherData_ = this.otherDefault;
         }
