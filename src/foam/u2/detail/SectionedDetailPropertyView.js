@@ -245,7 +245,7 @@ foam.CLASS({
         .addClass(this.myClass())
         .start(self.Rows, { defaultChildStyle: { padding: '8px 0' } })
           .add(this.slot(function(data, prop, prop$label) {
-            var errorSlot = prop.validateObj && prop.validationVisible ?
+            var errorSlot = prop.validateObj && prop.validationTextVisible ?
               data.slot(prop.validateObj) :
               foam.core.ConstantSlot.create({ value: null });
 
@@ -296,7 +296,7 @@ foam.CLASS({
                     .end()
                   })
                 .end()
-                .callIf(prop.validationVisible, function() {
+                .callIf(prop.validationTextVisible, function() {
                   this
                     .start(self.Item).style({ 'align-items': 'center' })
                       .start(self.Cols, { defaultChildStyle: {
