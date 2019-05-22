@@ -23,6 +23,15 @@ foam.CLASS({
       required: true
     },
     {
+      documentation: `
+        When copying in the data, if it is this value, we deem it to be unselected.
+        This is so we can differentiate the value not being selected and the value
+        being "other".
+      `,
+      name: 'noSelectionValue',
+      value: ''
+    },
+    {
       documentation: 'The label to display above the "Other" view.',
       name: 'otherLabel',
       value: 'Please specify'
@@ -74,8 +83,10 @@ foam.CLASS({
         this.preventFeedback_ = true;
         this.choiceView_.data = this.data;
         if ( this.choiceView_.choice == null ) {
-          this.choiceData_ = this.otherKey;
-          this.otherData_ = this.data;
+          if ( ! foam.util.equals(this.data, this.noSelectionValue) ) {
+            this.choiceData_ = this.otherKey;
+            this.otherData_ = this.data;
+          }
         } else {
           this.otherData_ = this.otherDefault;
         }
