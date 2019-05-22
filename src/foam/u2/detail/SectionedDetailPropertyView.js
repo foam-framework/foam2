@@ -88,6 +88,8 @@ foam.CLASS({
     ^error .foam-u2-TextField,
     ^error .foam-u2-tag-TextArea,
     ^error .foam-u2-tag-Select,
+    ^error .foam-u2-IntView,
+    ^error .foam-u2-FloatView,
     ^error .foam-u2-view-date-DateTimePicker .date-display-box
     {
       background-color: #fbedec;
