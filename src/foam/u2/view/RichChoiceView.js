@@ -54,8 +54,9 @@ foam.CLASS({
 
   css: `
     ^ {
-      position: relative;
       display: inline-block;
+      position: relative;
+      z-index: 1;
     }
 
     ^container {
