@@ -631,6 +631,7 @@ foam.CLASS({
     'foam.u2.AttrSlot',
     'foam.u2.Entity',
     'foam.u2.RenderSink',
+    'foam.u2.Tooltip'
   ],
 
   imports: [
@@ -848,6 +849,10 @@ foam.CLASS({
       }
     },
     {
+      class: 'String',
+      name: 'tooltip'
+    },
+    {
       name: 'parentNode',
       transient: true
     },
@@ -977,6 +982,7 @@ foam.CLASS({
         Template method for adding addtion element initialization
         just before Element is output().
       */
+      this.initTooltip();
       this.initKeyboardShortcuts();
     },
 
@@ -1041,6 +1047,10 @@ foam.CLASS({
       }
 
       return count;
+    },
+
+    function initTooltip() {
+      if ( this.tooltip ) this.Tooltip.create({target: this});
     },
 
     function initKeyboardShortcuts() {
