@@ -2136,7 +2136,14 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'validationVisible',
+      name: 'validationTextVisible',
+      documentation: "If true, validation text will be displayed below the input when it's in an invalid state.",
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'validationStyleEnabled',
+      documentation: 'If true, inputs will be styled when they are in an invalid state.',
       value: true
     }
   ],
@@ -2346,12 +2353,16 @@ foam.CLASS({
       value: { class: 'foam.u2.DetailView' },
     },
     {
-      name: 'validationVisible',
+      name: 'validationTextVisible',
       documentation: `
         Hide FObjectProperty validation because their inner view should provide its
         own validation so having it on the outer view and the inner view is redundant
         and jarring.
       `,
+      value: false
+    },
+    {
+      name: 'validationStyleEnabled',
       value: false
     }
   ]

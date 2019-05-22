@@ -72,25 +72,26 @@ foam.CLASS({
       z-index: 10;
     }
 
-    ^error .foam-u2-TextField {
-      background-color: #fbedec;
-      border: solid 1px #d9170e;
-      font-size: 12px;
+    ^ .foam-u2-tag-Select {
+      width: 100%;
+      font-size: 14px;
+      border: solid 1px #8e9090;
+      border-radius: 3px;
+      font-weight: 400;
+      padding: 10px 8px;
+      box-shadow: none;
+      background: #ffffff url('images/dropdown-icon.svg') no-repeat 99% 50%;
+      -webkit-appearance: none;
+      cursor: pointer;
     }
 
-    ^error .foam-u2-tag-TextArea {
-      background-color: #fbedec;
-      border: solid 1px #d9170e;
-      font-size: 12px;
-    }
-
-    ^error .foam-u2-tag-Select {
-      background-color: #fbedec;
-      border: solid 1px #d9170e;
-      font-size: 12px;
-    }
-
-    ^error .foam-u2-view-date-DateTimePicker .date-display-box {
+    ^error .foam-u2-TextField,
+    ^error .foam-u2-tag-TextArea,
+    ^error .foam-u2-tag-Select,
+    ^error .foam-u2-IntView,
+    ^error .foam-u2-FloatView,
+    ^error .foam-u2-view-date-DateTimePicker .date-display-box
+    {
       background-color: #fbedec;
       border: solid 1px #d9170e;
       font-size: 12px;
@@ -119,17 +120,55 @@ foam.CLASS({
       cursor: pointer;
     }
 
-    ^ .foam-u2-tag-Select {
+    ^ .foam-u2-view-RichChoiceView {
+      display: flex;
+    }
+
+    ^ .foam-u2-view-RichChoiceView-chevron {
+      content: '▾';
+      padding-left: 0px;
+      font-size: 16px;
+      color: #8D9090;
+    }
+
+    ^ .foam-u2-view-RichChoiceView-selection-view {
+      padding: 2px 12px 0px 8px;
       width: 100%;
-      font-size: 14px;
-      border: solid 1px #8e9090;
       border-radius: 3px;
-      font-weight: 400;
-      padding: 10px 8px;
-      box-shadow: none;
-      background: #ffffff url('images/dropdown-icon.svg') no-repeat 99% 50%;
+      border: solid 1px #8e9090;
+      background-color: #ffffff;
+      box-sizing: border-box;
       -webkit-appearance: none;
       cursor: pointer;
+      font-size: 14px;
+    }
+
+    ^ .foam-u2-view-RichChoiceView .search {
+      padding: 8px 16px;
+      font-size: 14px;
+      border-bottom: 1px solid #f4f4f9;
+    }
+
+    ^ .foam-u2-detail-SectionedDetailPropertyView .property-filter {
+      font-size: 14px;
+      padding-left: 16px;
+    }
+
+    ^ .foam-u2-view-RichChoiceView .search input {
+      border-bottom: none;
+    }
+
+    ^ .foam-u2-view-RichChoiceView .search img {
+      top: 8px;
+    }
+
+    ^ .foam-u2-view-RichChoiceView-heading {
+      border-bottom: 1px solid #f4f4f9;
+      line-height: 24px;
+      font-size: 14px;
+      color: #333;
+      font-weight: 900;
+      padding: 6px 16px;
     }
 
     ^ .foam-u2-IntView {
@@ -257,7 +296,7 @@ foam.CLASS({
         .addClass(this.myClass())
         .start(self.Rows, { defaultChildStyle: { padding: '8px 0' } })
           .add(this.slot(function(data, prop, prop$label) {
-            var errorSlot = prop.validateObj && prop.validationVisible ?
+            var errorSlot = prop.validateObj && prop.validationTextVisible ?
               data.slot(prop.validateObj) :
               foam.core.ConstantSlot.create({ value: null });
 
@@ -274,7 +313,9 @@ foam.CLASS({
                   .start(self.Item)
                     .style({ 'flex-grow': 1 })
                     .add(prop)
-                    .enableClass(this.myClass('error'), errorSlot)
+                    .callIf(prop.validationStyleEnabled, function() {
+                      this.enableClass(self.myClass('error'), errorSlot);
+                    })
                   .end()
                   .callIf(prop.help, function() {
                     this.start()
@@ -301,7 +342,7 @@ foam.CLASS({
                     .end()
                   })
                 .end()
-                .callIf(prop.validationVisible, function() {
+                .callIf(prop.validationTextVisible, function() {
                   this
                     .start(self.Item).style({ 'align-items': 'center' })
                       .start(self.Cols, { defaultChildStyle: {

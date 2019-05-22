@@ -22,6 +22,8 @@ foam.CLASS({
       name: 'otherKey',
       required: true
     },
+    // TODO(mcarcaso): HACK!  This isn't robust.  I think this would be simpler to just roll it into the ChoiceView
+    // and have it render an "other" option if "otherAvialable" is true.
     {
       documentation: `
         When copying in the data, if it is this value, we deem it to be unselected.
