@@ -216,6 +216,7 @@ FOAM_FILES([
   { name: "foam/dao/TimestampDAO" },
   { name: "foam/dao/AdapterDAO" },
   { name: "foam/dao/GUIDDAO" },
+  { name: "foam/dao/KeyValueDAO" },
   { name: "foam/dao/ReadOnlyDAO" },
   { name: "foam/dao/StoreAndForwardDAO" },
   { name: "foam/dao/Journal" },
@@ -603,7 +604,7 @@ FOAM_FILES([
 
   { name: "foam/layout/Section" },
   { name: "foam/layout/SectionAxiom" },
-  
+
   { name: "foam/u2/detail/AbstractSectionedDetailView" },
   { name: "foam/u2/detail/SectionView" },
   { name: "foam/u2/detail/SectionedDetailView" },
