@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -30,7 +30,7 @@ foam.CLASS({
     'id',
     'label',
     'amount',
-    { class: 'Date', name: 'date' },
+    { class: 'Date', name: 'date' }
   ]
 });
 
@@ -69,7 +69,7 @@ foam.CLASS({
     'bankDAO',
     'customerDAO',
     'accountDAO',
-    'transactionDAO',
+    'transactionDAO'
   ],
   properties: [
     { name: 'bankDAO', factory: function() {
@@ -98,7 +98,7 @@ foam.CLASS({
         seqNo: true,
         of: this.Transaction, daoType: 'MDAO'
       });
-    }},
+    }}
   ]
 });
 
@@ -114,7 +114,7 @@ Promise.all([
 
   app.customerDAO.put(app.Customer.create({ firstName: 'Herman',  lastName: 'Blackbeard', bank: 'tt' })),
   app.customerDAO.put(app.Customer.create({ firstName: 'Hector',  lastName: 'Barbossa',   bank: 'tt' })),
-  app.customerDAO.put(app.Customer.create({ firstName: 'William', lastName: 'Roberts',    bank: 'tt' })),
+  app.customerDAO.put(app.Customer.create({ firstName: 'William', lastName: 'Roberts',    bank: 'tt' }))
 ]);
 
 /* TODO to complete
@@ -159,7 +159,6 @@ app.bankDAO.select().then(function(sink) {
 // dao.where(this.EQ(this.Todo.IS_COMPLETED, true)).skip(40).limit(20).select(sink)
 
 /*
-
 dao.where(
   this.AND(
     this.EQ(this.Todo.IS_COMPLETED, true),

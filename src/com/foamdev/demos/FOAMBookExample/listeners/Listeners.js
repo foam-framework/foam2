@@ -167,7 +167,6 @@ async function doCode2() {
   return new Promise(function(res) {
     setTimeout(res, 16);
   });
-
 }
 
 doCode2();// l2l2l1l1

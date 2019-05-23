@@ -4,8 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-//***Context methods***
-
+// Context methods
 //Classes can specify a package
 foam.CLASS({
   package: 'com.acme',

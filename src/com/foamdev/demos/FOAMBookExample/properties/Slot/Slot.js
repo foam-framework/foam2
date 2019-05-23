@@ -224,7 +224,6 @@ t.c = 100;
 console.log("Set(c=100)  f:", t.f, " c:", t.c);
 
 
-
 // Data Binding one way: The .follow() method binds in one direction only
 // Calling .linkFrom()/.linkTo() creates a two-way data-binding, meaning a
 // change in either value is reflected in the other. But FOAM supports one-way

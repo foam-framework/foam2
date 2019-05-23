@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -12,7 +12,6 @@ properties: [ 'id', 'name', 'color', 'brand', 'price' ]
 });
 
 // array to populate it with data.
-
 var guitarArray = foam.dao.ArrayDAO.create();
 
 guitarArray.put(Guitar.create({
@@ -77,7 +76,7 @@ guitarDAO.bulkLoad(guitarArray);
 // in simple terms, mlang is foam's own "SQL syntax"
 // it's used to filter and manipulate DAO operations.
 // https://github.com/foam-framework/foam2/blob/master/src/foam/mlang/mlang.js
-var expr = foam.mlang.Expressions.create();//foam.mlang.Expressions.create();
+var expr = foam.mlang.Expressions.create();// foam.mlang.Expressions.create();
 
 // give me all fenders and order by price
 // this is a custom sink function
@@ -98,7 +97,7 @@ guitarDAO.limit(2)
   console.log(g.a.length);
 });
 
-var expr = foam.mlang.ExpressionsSingleton.create();//foam.mlang.Expressions.create();
+var expr = foam.mlang.ExpressionsSingleton.create();// foam.mlang.Expressions.create();
 
 // counts the guitars 
 // short-circuits it and returns only the count number

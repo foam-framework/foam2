@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -48,7 +48,6 @@ foam.dao.EasyDAO.create({ seqNo: true, seqProperty: 'id' });
 //or
 foam.dao.EasyDAO.create({ guid: true, seqProperty: 'id' });
 */
-
 
 
 //TODO the complete list

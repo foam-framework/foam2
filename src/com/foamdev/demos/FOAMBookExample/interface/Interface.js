@@ -47,7 +47,7 @@ console.log("Is C2 a Thing3I?", test.Thing3I.isSubClass(test.C2)); // false
 console.log("Is o a ThingI?", test.ThingI.isInstance(o));   // true
 console.log("Is o a Thing2I?", test.Thing2I.isInstance(o)); // true
 console.log("Is o a Thing3I?", test.Thing3I.isInstance(o)); // false
-console.log("Is o a C2?", test.C2.isInstance(o)); //true
+console.log("Is o a C2?", test.C2.isInstance(o));           //true
 
 
 // Interface inheritance: Interfaces copy Axioms from another class
