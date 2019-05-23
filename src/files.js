@@ -176,6 +176,7 @@ FOAM_FILES([
   { name: "foam/u2/RowFormatter" },
   { name: "foam/u2/WeakMap", flags: ['web'] },
   { name: "foam/u2/Element", flags: ['js'] },
+  { name: "foam/u2/Tooltip", flags: ['web'] },
   { name: "foam/u2/MNRowFormatter", flags: ['web'] },
   { name: "foam/u2/ProgressView", flags: ['web'] },
   { name: "foam/u2/ListCreateController", flags: ['web'] },
@@ -217,6 +218,7 @@ FOAM_FILES([
   { name: "foam/dao/TimestampDAO" },
   { name: "foam/dao/AdapterDAO" },
   { name: "foam/dao/GUIDDAO" },
+  { name: "foam/dao/KeyValueDAO" },
   { name: "foam/dao/ReadOnlyDAO" },
   { name: "foam/dao/StoreAndForwardDAO" },
   { name: "foam/dao/Journal" },
@@ -604,7 +606,7 @@ FOAM_FILES([
 
   { name: "foam/layout/Section" },
   { name: "foam/layout/SectionAxiom" },
-  
+
   { name: "foam/u2/detail/AbstractSectionedDetailView" },
   { name: "foam/u2/detail/SectionView" },
   { name: "foam/u2/detail/SectionedDetailView" },
