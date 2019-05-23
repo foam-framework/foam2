@@ -490,6 +490,16 @@ public class DigWebAgent
     throws Exception
   {
     FObject oldObj = dao.find(obj);
+
+    /**
+     * Only for the case of Simplified api user entity
+     * switching to auth.user from api.user to merge
+     */
+    if ( obj instanceof net.nanopay.api.User ) {
+      net.nanopay.api.User apiUser = new net.nanopay.api.User();
+      obj = apiUser.getUser(obj);
+    }
+
     return dao.put(oldObj == null ? obj : oldObj.copyFrom(obj));
   }
 
