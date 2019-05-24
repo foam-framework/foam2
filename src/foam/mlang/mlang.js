@@ -1650,7 +1650,7 @@ foam.CLASS({
     },
     {
       name: 'createStatement',
-      javaCode: 'return getValue().toString(); '
+      javaCode: 'return " ? "; '
     },
     {
       name: 'prepareStatement',
@@ -1722,7 +1722,7 @@ foam.CLASS({
     },
     {
       name: 'createStatement',
-      javaCode: 'return toString();'
+      javaCode: 'return " ? "; '
     },
     {
       name: 'prepareStatement',
