@@ -13,12 +13,6 @@ foam.CLASS({
     'foam.u2.layout.Rows'
   ],
   exports: [ 'updateData' ],
-  properties: [
-    {
-      class: 'Map',
-      name: 'data'
-    }
-  ],
   actions: [
     {
       name: 'addRow',
