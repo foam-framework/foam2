@@ -282,6 +282,14 @@ foam.CLASS({
             .end()
           .end()
         .end()
+        .start('ul')
+          .addClass('specs')
+            .start('a')
+              .attrs({ href: '#' })
+              .add('back to the citation view')
+            .end()
+          .end()
+        .end();
     }
   ]
 });
