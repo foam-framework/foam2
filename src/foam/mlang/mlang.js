@@ -703,11 +703,16 @@ foam.CLASS({
     function toIndex(tail) {
       return this.arg1 && this.arg1.toIndex(tail);
     },
-
-    function toString() {
-      return foam.String.constantize(this.cls_.name) + '(' +
-          this.arg1.toString() + ', ' +
-          this.arg2.toString() + ')';
+    {
+      name: 'toString',
+      code: function() {
+        return foam.String.constantize(this.cls_.name) + '(' +
+            this.arg1.toString() + ', ' +
+            this.arg2.toString() + ')';
+      },
+      javaCode: `
+        return String.format("%s(%s, %s)", getClass().getSimpleName(), getArg1().toString(), getArg2().toString());
+      `
     },
     {
       name: 'prepareStatement',
