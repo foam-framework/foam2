@@ -495,10 +495,8 @@ public class DigWebAgent
      * Only for the case of Simplified api user entity
      * switching to auth.user from api.user to merge
      */
-    if ( obj instanceof net.nanopay.api.User ) {
-      net.nanopay.api.User apiUser = new net.nanopay.api.User();
-      obj = apiUser.getUser(obj);
-    }
+    if ( obj instanceof net.nanopay.api.User )
+      obj = ((net.nanopay.api.User) obj).getUser();
 
     return dao.put(oldObj == null ? obj : oldObj.copyFrom(obj));
   }
