@@ -48,18 +48,14 @@ foam.CLASS({
           .on('click', this.click)
           .add(this.label$);
 
-      if ( this.action.isAvailable ) {
-        this.enableClass(this.myClass('unavailable'),
-              this.action.createIsAvailable$(this.data$), true /* negate */);
-      }
+      this.enableClass(this.myClass('unavailable'),
+            this.action.createIsAvailable$(this.__context__, this.data), true /* negate */);
 
-      if ( this.action.isEnabled ) {
-        this.attrs({
-          disabled: this.action.createIsEnabled$(this.data$).map(function(e) {
-            return e ? false : 'disabled';
-          })
-        });
-      }
+      this.attrs({
+        disabled: this.action.createIsEnabled$(this.__context__, this.data).map(function(e) {
+          return e ? false : 'disabled';
+        })
+      });
     }
   ],
 

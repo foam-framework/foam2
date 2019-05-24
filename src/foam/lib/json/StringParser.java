@@ -35,6 +35,7 @@ public class StringParser
   }
 
   public PStream parse(PStream ps, ParserContext x) {
+    if ( ! ps.valid() ) return null;
     char delim = ps.head();
 
     if ( delim != '"' && delim != '\'' ) return null;

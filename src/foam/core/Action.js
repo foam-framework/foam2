@@ -112,81 +112,96 @@ foam.CLASS({
       value: null
     },
     {
-      class: 'Boolean',
-      name: 'permissionRequired',
-      documentation: 'When set to true, package.model.permission.action is needed to execute this action.'
+      class: 'StringArray',
+      name: 'availablePermissions',
+      documentation: `Permissions required for the action to be available.
+If empty than no permissions are required.`
     },
     {
-      class: 'Boolean',
-      name: 'isDestructive',
-      documentation: `
-        When set to true, this action should be styled in a way that indicates
-        that data is deleted in some way.
-      `
-    },
-    {
-      class: 'Boolean',
-      name: 'isSecondary',
-      documentation: `
-        When set to true, this action should be styled in a way that indicates
-        that this action is not as important as other actions.
-      `
+      class: 'StringArray',
+      name: 'enabledPermissions',
+      documentation: `Permissions required for the action to be enabled.
+If empty than no permissions are required.`,
     }
   ],
 
   methods: [
-    function andSlots(a, b) {
-      return this.ExpressionSlot.create({
-        args: [ a, b ],
+    function addPermissionsCheck_(x, slot, data, permissions) {
+      // Decorates an isEnabled/isAvailable slot with a permission
+      // check if appropriate.
+
+      // If no auth service, or no permissions to check then nothing to do.
+      if ( ! x.auth || ! permissions.length )
+        return slot;
+
+      return foam.core.ExpressionSlot.create({
+        args: [
+          foam.core.PromiseSlot.create({
+            promise: Promise.all(permissions.map(p => x.auth.check(null, p))).
+              then(function(perms) {
+                return perms.every(p => p);
+              })
+          }),
+          slot
+        ],
         code: function(a, b) {
           return a && b;
         }
       });
     },
 
-    function andSlotAndPromise(slot, promise) {
-      return this.andSlots(slot, this.PromiseSlot.create({
-        promise: promise
-      }));
-    },
-
-    function checkPermission(x) {
-      if ( ! this.permissionRequired || ! x.auth ) return Promise.resolve(true);
-      var permission = this.sourceCls_.id + '.permission.' + this.name;
-      return x.auth.check(null, permission);
-    },
-
-    function isEnabledFor(data) {
-      return this.isEnabled
-        ? foam.Function.withArgs(this.isEnabled, data)
-        : true;
-    },
-
-    function createIsEnabled$(data$) {
-      return this.createSlot_(this.isEnabled, data$);
-    },
-
-    function isAvailableFor(data) {
-      return this.isAvailable
-        ? foam.Function.withArgs(this.isAvailable, data)
-        : true;
-    },
-
-    function createIsAvailable$(data$) {
-      return this.createSlot_(this.isAvailable, data$);
-    },
-
-    function maybeCall(ctx, data) {
-      // TODO: permission check
-      if ( this.isEnabledFor(data) && this.isAvailableFor(data) ) {
-        this.code.call(data, ctx, this);
-        // primitive types won't have a pub method
-        // Why are we publishing this event anyway? KGR
-        data && data.pub && data.pub('action', this.name, this);
-        return true;
+    function createSlotFor_(x, data, expression, permissions) {
+      // Handle old code that might try to pass data as a slot
+      if ( foam.core.Slot.isInstance(data) ) {
+        console.warn("Action createIsEnabled$ and createIsAvailable$ does not support data as a slot.");
+        data = data.get();
       }
 
-      return false;
+      // Helper method for creating isEnabled/isAvailable slots.
+
+      var slot = expression ?
+          data.slot(expression) :
+          foam.core.ConstantSlot.create({ value: true });
+
+      return this.addPermissionsCheck_(x, slot, data, permissions);
+    },
+
+    function createIsEnabled$(x, data) {
+      return this.createSlotFor_(x, data, this.isEnabled, this.enabledPermissions);
+    },
+
+    function createIsAvailable$(x, data) {
+      return this.createSlotFor_(x, data, this.isAvailable, this.availablePermissions);
+    },
+
+    function maybeCall(x, data) {
+      var self = this;
+      function call() {
+        self.code.call(data, x, self);
+        // primitive types won't have a pub method
+        // Why are we publishing this event anyway? KGR
+        data && data.pub && data.pub('action', self.name, self);
+      }
+
+      if ( ( this.isAvailable && ! foam.Function.withArgs(this.isAvailable, data) ) ||
+           ( this.isEnabled   && ! foam.Function.withArgs(this.isEnabled, data) ) )
+        return;
+
+
+      // No permission check if no auth service or no permissions to check.
+      if ( ! x.auth ||
+           ! ( this.availablePermissions.length || this.enabledPermissions.length ) ) {
+        call();
+        return;
+      }
+
+      var permissions = this.availablePermissions.concat(this.enabledPermissions);
+
+      permissions = foam.Array.unique(permissions);
+      Promise.all(permissions.map(p => x.auth.check(null, p))).
+        then(function(args) {
+          if ( args.every(b => b) ) call();
+        });
     },
 
     function installInClass(c) {
@@ -196,28 +211,8 @@ foam.CLASS({
     function installInProto(proto) {
       var action = this;
       proto[this.name] = function() {
-        return action.maybeCall(this.__context__, this);
+        action.maybeCall(this.__context__, this);
       };
-    },
-
-    function createSlot_(fn, data$) {
-      if ( fn == null ) {
-        if ( ! this.permissionRequired ) {
-          return this.ConstantSlot.create({ value: true });
-        }
-        return this.PromiseSlot.create({
-          promise: this.checkPermission(data$.get().__subContext__)
-        });
-      }
-
-      var slot = this.ExpressionSlot.create({
-        obj$: data$,
-        code: fn
-      });
-
-      return this.permissionRequired ?
-        this.andSlotAndPromise(slot, this.checkPermission(data$.get().__subContext__)) :
-        slot;
     }
   ]
 });

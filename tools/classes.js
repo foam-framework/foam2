@@ -44,7 +44,9 @@ var classes = [
   'foam.mlang.sink.Count',
   'foam.mlang.sink.GroupBy',
   'foam.mlang.F',
+  'foam.mlang.StringLength',
   'foam.mlang.Expr',
+  'foam.mlang.IsValid',
   'foam.mlang.AbstractExpr',
   'foam.mlang.predicate.Eq',
   'foam.mlang.Constant',
@@ -52,6 +54,8 @@ var classes = [
   'foam.mlang.expr.Dot',
   'foam.mlang.PredicatedExpr',
   'foam.mlang.ContextObject',
+  'foam.mlang.predicate.RegExp',
+  'foam.mlang.predicate.OlderThan',
   'foam.box.Box',
   'foam.box.Skeleton',
   'foam.box.AbstractSkeleton',
@@ -117,6 +121,7 @@ var classes = [
   'foam.dao.SkipSink',
   'foam.dao.DedupSink',
   'foam.dao.ReadOnlyDAO',
+  'foam.dao.KeyValueDAO',
   'foam.dao.RelationshipDAO',
   'foam.dao.ManyToManyRelationship',
   'foam.dao.ManyToManyRelationshipImpl',
@@ -186,6 +191,7 @@ var classes = [
   'foam.nanos.auth.twofactor.AbstractTOTPAuthService',
   'foam.nanos.auth.twofactor.ClientOTPAuthService',
   'foam.nanos.auth.twofactor.GoogleTOTPAuthService',
+  'foam.nanos.auth.twofactor.TwoFactorAuthService',
   'foam.nanos.auth.LogoutDisabledUserDAO',
   'foam.nanos.auth.DeletedAware',
   'foam.nanos.auth.DeletedAwareDummy',
@@ -338,6 +344,7 @@ var classes = [
   'foam.nanos.ruler.ScriptPredicate',
   'foam.nanos.ruler.RuleHistory',
   'foam.nanos.ruler.RuleHistoryStatus',
+  'foam.nanos.ruler.UpdateRulesListSink',
   'foam.comics.SearchMode',
 
   // Support Files
@@ -357,7 +364,14 @@ var classes = [
   'foam.test.TestEnum',
   'foam.test.AllSerializableProperties',
   'foam.nanos.test.EchoService',
-  'foam.nanos.test.SerializationTestEchoService'
+  'foam.nanos.test.SerializationTestEchoService',
+
+  // Ace Editor
+  'io.c9.ace.Config',
+  'io.c9.ace.Editor',
+  'io.c9.ace.KeyBinding',
+  'io.c9.ace.Mode',
+  'io.c9.ace.Theme'
 ];
 
 var abstractClasses = [

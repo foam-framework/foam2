@@ -75,7 +75,7 @@ foam.CLASS({
   ],
 
   constants: {
-    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor', 'secondaryHoverColor', 'secondaryDisabledColor', 'destructiveColor', 'destructiveHoverColor', 'destructiveDisabledColor', 'groupCSS', 'backgroundColor' ]
+    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor', 'secondaryHoverColor', 'secondaryDisabledColor', 'destructiveColor', 'destructiveHoverColor', 'destructiveDisabledColor', 'groupCSS', 'backgroundColor', 'headerColor' ]
   },
 
   messages: [
@@ -89,11 +89,8 @@ foam.CLASS({
       font-size: 14px;
       letter-spacing: 0.2px;
       color: #373a3c;
-      background: #edf0f5;
+      background: %BACKGROUNDCOLOR%;
       margin: 0;
-    }
-    .foam-u2-UnstyledActionView-signIn {
-      margin-left: 25px !important;
     }
     .stack-wrapper {
       margin-bottom: -10px;
@@ -102,9 +99,6 @@ foam.CLASS({
     .stack-wrapper:after {
       content: "";
       display: block;
-    }
-    .foam-u2-UnstyledActionView:focus{
-      outline: none;
     }
   `,
 
@@ -177,6 +171,7 @@ foam.CLASS({
     'tableHoverColor',
     'accentColor',
     'backgroundColor',
+    'headerColor',
     'groupCSS',
     'topNavigation_',
     'footerView_'
@@ -186,17 +181,24 @@ foam.CLASS({
     function init() {
       this.SUPER();
       var self = this;
-      self.clientPromise.then(async function(client) {
-        self.setPrivate_('__subContext__', client.__subContext__);
-        foam.__context__.register(foam.u2.UnstyledActionView, 'foam.u2.ActionView');
 
-        window.onpopstate = async function(event) {
-          var hid = location.hash.substr(1);
-          if ( hid ) {
+      window.onpopstate = async function(event) {
+        var hid = location.hash.substr(1);
+        if ( hid ) {
+          if ( self.client ) {
             var menu = await self.client.menuDAO.find(hid);
             menu && menu.launch(this);
+          } else {
+            self.clientPromise.then(async () => {
+              var menu = await self.client.menuDAO.find(hid);
+              menu && menu.launch(this);
+            });
           }
-        };
+        }
+      };
+
+      this.clientPromise.then(async function(client) {
+        self.setPrivate_('__subContext__', client.__subContext__);
 
         await self.fetchAgent();
         await self.fetchUser();

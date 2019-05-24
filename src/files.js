@@ -175,6 +175,7 @@ FOAM_FILES([
   { name: "foam/u2/RowFormatter" },
   { name: "foam/u2/WeakMap", flags: ['web'] },
   { name: "foam/u2/Element", flags: ['js'] },
+  { name: "foam/u2/Tooltip", flags: ['web'] },
   { name: "foam/u2/MNRowFormatter", flags: ['web'] },
   { name: "foam/u2/ProgressView", flags: ['web'] },
   { name: "foam/u2/ListCreateController", flags: ['web'] },
@@ -216,6 +217,7 @@ FOAM_FILES([
   { name: "foam/dao/TimestampDAO" },
   { name: "foam/dao/AdapterDAO" },
   { name: "foam/dao/GUIDDAO" },
+  { name: "foam/dao/KeyValueDAO" },
   { name: "foam/dao/ReadOnlyDAO" },
   { name: "foam/dao/StoreAndForwardDAO" },
   { name: "foam/dao/Journal" },
@@ -377,7 +379,8 @@ FOAM_FILES([
   { name: "foam/u2/TableView", flags: ['web'] },
   { name: "foam/u2/TableSelection", flags: ['web'] },
   { name: "foam/u2/Scroller", flags: ['web'] },
-  { name: "foam/u2/UnstyledActionView", flags: ['web'] },
+  { name: "foam/u2/ButtonSize", flags: ['web'] },
+  { name: "foam/u2/ButtonStyle", flags: ['web'] },
   { name: "foam/u2/ActionView", flags: ['web'] },
   { name: "foam/u2/DetailPropertyView", flags: ['web'] },
   { name: "foam/u2/DetailView", flags: ['web'] },
@@ -407,6 +410,7 @@ FOAM_FILES([
   { name: "foam/u2/view/FObjectView", flags: ['web'] },
   { name: "foam/u2/view/FObjectArrayView", flags: ['web'] },
   { name: "foam/u2/view/ChoiceView", flags: ['web'] },
+  { name: "foam/u2/view/ChoiceWithOtherView", flags: ['web'] },
   { name: "foam/u2/view/RichChoiceView", flags: ['web'] },
   { name: "foam/u2/view/OverlayActionListView", flags: ['web'] },
   { name: "foam/u2/view/RadioView", flags: ['web'] },
@@ -600,4 +604,14 @@ FOAM_FILES([
 
   { name: "foam/comics/v2/Comics"},
   { name: "foam/u2/layout/Layouts"},
+
+  { name: "foam/layout/Section" },
+  { name: "foam/layout/SectionAxiom" },
+
+  { name: "foam/u2/detail/AbstractSectionedDetailView" },
+  { name: "foam/u2/detail/SectionView" },
+  { name: "foam/u2/detail/SectionedDetailView" },
+  { name: "foam/u2/detail/VerticalDetailView" },
+  { name: "foam/u2/detail/WizardSectionsView" },
+  { name: "foam/u2/detail/SectionedDetailPropertyView" }
 ]);

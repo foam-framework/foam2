@@ -30,11 +30,14 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'showLabel',
-      factory: function() { return !! this.label },
+      factory: function() { return !! this.label || this.labelFormatter },
     },
     {
       class: 'String',
       name: 'label'
+    },
+    {
+      name: 'labelFormatter'
     }
   ],
 
@@ -43,11 +46,15 @@ foam.CLASS({
       this.SUPER();
       this.setAttribute('type', 'checkbox');
 
+      var self = this;
+
       if ( this.showLabel ) {
         this.start('label')
           .addClass(this.myClass('label'))
           .addClass(this.myClass('noselect'))
-          .add(this.label$)
+          .callIfElse(this.labelFormatter,
+                      this.labelFormatter,
+                      function() { this.add(self.label$); })
           .on('click', function() {
             this.data = ! this.data;
           }.bind(this))
