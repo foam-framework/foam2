@@ -1449,6 +1449,12 @@ foam.CLASS({
 
   requires: [ 'foam.mlang.Constant' ],
 
+  javaImports: [
+    'foam.mlang.ArrayConstant',
+    'foam.mlang.Constant',
+    'foam.mlang.predicate.False'
+  ],
+
   properties: [
     {
       name: 'arg1',
@@ -1551,12 +1557,30 @@ return false
       type: 'String',
       javaCode: 'return " " + getArg1().createStatement() + " in " + getArg2().createStatement();'
     },
+    {
+      name: 'partialEval',
+      code: function partialEval() {
+        if ( ! this.Constant.isInstance(this.arg2) ) return this;
 
-    function partialEval() {
-      if ( ! this.Constant.isInstance(this.arg2) ) return this;
+        return ( ! this.arg2.value ) || this.arg2.value.length === 0 ?
+            this.FALSE : this;
+      },
+      javaCode: `
+        if ( ! (getArg2() instanceof ArrayConstant) ) return this;
 
-      return ( ! this.arg2.value ) || this.arg2.value.length === 0 ?
-          this.FALSE : this;
+        Object[] arr = ((ArrayConstant) getArg2()).getValue();
+
+        if ( arr.length == 0 ) {
+          return new False();
+        } else if ( arr.length == 1 ) {
+          return new Eq.Builder(getX())
+            .setArg1(getArg1())
+            .setArg2(new Constant(arr[0]))
+            .build();
+        }
+
+        return this;
+      `
     }
   ]
 });
