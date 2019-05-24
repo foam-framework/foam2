@@ -1645,7 +1645,7 @@ foam.CLASS({
     },
     {
       name: 'createStatement',
-      javaCode: 'return " ? "; '
+      javaCode: 'return getValue().toString(); '
     },
     {
       name: 'prepareStatement',
@@ -1682,6 +1682,8 @@ foam.CLASS({
     }
   ],
 
+  javaImports: [ 'java.util.Arrays' ],
+
   axioms: [
     {
       name: 'javaExtras',
@@ -1715,7 +1717,7 @@ foam.CLASS({
     },
     {
       name: 'createStatement',
-      javaCode: 'return " ? "; '
+      javaCode: 'return toString();'
     },
     {
       name: 'prepareStatement',
@@ -1764,14 +1766,17 @@ s = s.replace(",", "\\\\,");
 builder.append(s);
 `
     },
-
-    function toString_(x) {
-      return Array.isArray(x) ? '[' + x.map(this.toString_.bind(this)).join(', ') + ']' :
-        x.toString ? x.toString :
-        x;
-    },
-
-    function toString() { return this.toString_(this.value); }
+    {
+      name: 'toString',
+      code: function() {
+        return Array.isArray(this.value) ? '[' + this.value.map(this.toString_.bind(this)).join(', ') + ']' :
+          this.value.toString ? this.value.toString :
+          x;
+      },
+      javaCode: `
+        return Arrays.toString(getValue());
+      `
+    }
   ]
 });
 
