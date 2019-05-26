@@ -169,6 +169,10 @@
               x.put("NEW", obj).put("OLD", oldObj)
             );
         } catch ( Throwable t ) {
+          try {
+            return getPredicate().f(obj);
+          } catch ( Throwable th ) { }
+
           ((Logger) x.get("logger")).error(
             "Failed to evaluate predicate of rule: " + getId(), t);
           return false;
