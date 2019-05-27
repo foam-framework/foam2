@@ -353,8 +353,15 @@ foam.CLASS({
     },
 
     // This method is for toast notification message
-    function notify(message, type) {
-      this.add(this.NotificationMessage.create({ message, type }));
+    function notify(contentElement, type) {
+      if ( foam.String.isInstance(contentElement) ) {
+        this.add(this.NotificationMessage.create({
+          message: contentElement,
+          type: type
+        }));
+      } else {
+        this.add(this.NotificationMessage.create({ contentElement, type }));
+      }
     }
   ],
 
