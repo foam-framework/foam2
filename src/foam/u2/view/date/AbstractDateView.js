@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.u2.view.date',
   name: 'AbstractDateView',
-  extends: 'foam.u2.Element',
+  extends: 'foam.u2.View',
   properties: [
     {
       class: 'DateTime',

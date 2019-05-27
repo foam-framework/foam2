@@ -126,11 +126,12 @@ foam.CLASS({
 
       this.onDetach(this.active_$.follow(this.overlay_.opened$));
       this.onDetach(this.disabled_$.follow(this.ExpressionSlot.create({
-        args: this.data.map((action) => action.createIsAvailable$(this.obj$)),
+        args: this.data.map((action) => action.createIsAvailable$(this.__context__, this.obj)),
         code: (...rest) => ! rest.reduce((l, r) => l || r, false)
       })));
 
       this.
+        addClass(this.myClass()).
         start('span').
           addClass(this.myClass('noselect')).
           start().
@@ -155,7 +156,7 @@ foam.CLASS({
       this.overlay_.forEach(this.data, function(action) {
         this.
           start().
-            show(action.createIsAvailable$(self.obj$)).
+            show(action.createIsAvailable$(self.__context__, self.obj)).
             addClass(self.myClass('action')).
             add(action.label).
             on('click', function(evt) {
@@ -163,7 +164,7 @@ foam.CLASS({
               action.maybeCall(self.__subContext__, self.obj);
             }).
             attrs({
-              disabled: action.createIsEnabled$(self.obj$).map(function(e) {
+              disabled: action.createIsEnabled$(self.__context__, self.obj).map(function(e) {
                 return e ? false : 'disabled';
               })
             }).

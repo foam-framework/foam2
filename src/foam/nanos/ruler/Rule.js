@@ -169,6 +169,10 @@
               x.put("NEW", obj).put("OLD", oldObj)
             );
         } catch ( Throwable t ) {
+          try {
+            return getPredicate().f(obj);
+          } catch ( Throwable th ) { }
+
           ((Logger) x.get("logger")).error(
             "Failed to evaluate predicate of rule: " + getId(), t);
           return false;
@@ -197,9 +201,30 @@
       ],
       javaCode: `
         getAction().applyAction(x, obj, oldObj, ruler);
-        if ( ! getAfter() ) {
-          ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
+      `
+    },
+    {
+      name: 'applyReverse',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'FObject'
+        },
+        {
+          name: 'oldObj',
+          type: 'FObject'
+        },
+        {
+          name: 'ruler',
+          type: 'foam.nanos.ruler.RuleEngine'
         }
+      ],
+      javaCode: `
+        getAction().applyReverseAction(x, obj, oldObj, ruler);
       `
     },
     {

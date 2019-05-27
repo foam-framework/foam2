@@ -210,7 +210,8 @@ foam.CLASS({
         mode$: this.mode$,
         size$: this.size$
       })
-      .attrs({ name: this.name })
+        .attrs({ name: this.name })
+        .enableClass('selection-made', this.index$.map((index) => index !== -1))
       .end();
 
       this.dao$proxy.on.sub(this.onDAOUpdate);
