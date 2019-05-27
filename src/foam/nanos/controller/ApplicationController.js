@@ -180,6 +180,10 @@ foam.CLASS({
   methods: [
     function init() {
       this.SUPER();
+
+      // Added in an autochanging of all detail views to the sectioneddetailview
+      foam.__context__.register(foam.u2.detail.SectionedDetailView, 'foam.u2.DetailView');
+
       var self = this;
 
       window.onpopstate = async function(event) {
