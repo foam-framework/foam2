@@ -181,7 +181,7 @@ foam.CLASS({
     function init() {
       this.SUPER();
 
-      // Added in an autochanging of all detail views to the sectioneddetailview
+      // done to start using SectionedDetailViews instead of DetailViews
       foam.__context__.register(foam.u2.detail.SectionedDetailView, 'foam.u2.DetailView');
 
       var self = this;
