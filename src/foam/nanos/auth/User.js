@@ -34,10 +34,10 @@ foam.CLASS({
     'static foam.mlang.MLang.EQ'
   ],
 
-  documentation: `The User represents a person or entity with the ability 
-    to use a username and password to log into and use the system as well 
-    as act on behalf of a business, if permissions are granted. It holds 
-    personal information and permits certain actions.  In this documentation, 
+  documentation: `The User represents a person or entity with the ability
+    to use a username and password to log into and use the system as well
+    as act on behalf of a business, if permissions are granted. It holds
+    personal information and permits certain actions.  In this documentation,
     the term 'real user' refers exclusively to an individual person.
   `,
 
@@ -82,13 +82,13 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'enabled',
-      documentation: 'Verifies that the User is permitted certain actions.',
+      documentation: 'Determines whether the User is permitted certain actions.',
       value: true
     },
     {
       class: 'Boolean',
       name: 'loginEnabled',
-      documentation: 'Verifies that the User can login to the platform.',
+      documentation: 'Determines whether the User can login to the platform.',
       value: true
     },
     {
@@ -107,7 +107,7 @@ foam.CLASS({
           return 'First name cannot exceed 70 characters.';
         } if( /\d/.test(this.firstName) ) {
           return 'First name cannot contain numbers';
-        } 
+        }
       }
     },
     {
@@ -126,7 +126,7 @@ foam.CLASS({
           return 'Last name cannot exceed 70 characters.';
         } if( /\d/.test(this.lastName) ) {
           return 'Last name cannot contain numbers';
-        } 
+        }
       }
     },
     'legalName',
@@ -148,7 +148,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'department',
-      documentation: `The department associated with the organization/business 
+      documentation: `The department associated with the organization/business
         of the User.`,
       width: 50
     },
@@ -167,19 +167,19 @@ foam.CLASS({
        emailIsSet_ = true;`,
       validateObj: function (email) {
         var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        
+
         if (!(email.trim())) {
           return 'Email Required.';
         }
         if ( ! emailRegex.test(email.trim()) ) {
           return 'Invalid email address.';
-        } 
+        }
       }
     },
     {
       class: 'Boolean',
       name: 'emailVerified',
-      documentation: 'Verifies that the email address of the User is valid.',
+      documentation: 'Determines whether the email address of the User is valid.',
       permissionRequired: true
     },
     {
@@ -190,13 +190,13 @@ foam.CLASS({
       factory: function() {
         return this.Phone.create();
       },
-      view: { class: 'foam.nanos.auth.PhoneDetailView' }
+      view: { class: 'foam.u2.detail.VerticalDetailView' }
     },
     {
       class: 'String',
       name: 'phoneNumber',
       transient: true,
-      documentation: `Omits properties of the phone number object and returns 
+      documentation: `Omits properties of the phone number object and returns
         the phone number.`,
       expression: function(phone) {
         return phone.number;
@@ -210,7 +210,7 @@ foam.CLASS({
       factory: function() {
         return this.Phone.create();
       },
-      view: { class: 'foam.nanos.auth.PhoneDetailView' }
+      view: { class: 'foam.u2.detail.VerticalDetailView' }
     },
     {
       class: 'String',
@@ -230,7 +230,7 @@ foam.CLASS({
     {
       class: 'foam.nanos.fs.FileProperty',
       name: 'profilePicture',
-      documentation: `The profile picture of the individual user, initially 
+      documentation: `The profile picture of the individual user, initially
         defaulting to a placeholder picture.`,
       view: {
         class: 'foam.nanos.auth.ProfilePictureView',
@@ -265,7 +265,7 @@ foam.CLASS({
       class: 'Password',
       name: 'desiredPassword',
       label: 'Password',
-      documentation: `The password that the individual person, or real user, 
+      documentation: `The password that the individual person, or real user,
         chooses to be used as a password but may or may not pass as valid.`,
       displayWidth: 30,
       width: 100,
@@ -300,7 +300,7 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'passwordExpiry',
-      documentation: `The date and time that the current password of the User 
+      documentation: `The date and time that the current password of the User
         will expire.`,
     },
     // TODO: startDate, endDate,
@@ -328,14 +328,14 @@ foam.CLASS({
       class: 'String',
       name: 'bankIdentificationCode',
       width: 20,
-      documentation: `The Bank Identification Code (BIC): an international bank code that 
+      documentation: `The Bank Identification Code (BIC): an international bank code that
       identifies particular banks worldwide.
       `,
     },
     {
       class: 'Boolean',
       name: 'businessHoursEnabled',
-      documentation: 'Verifies that business hours are enabled for the User to set.',
+      documentation: 'Determines whether business hours are enabled for the User to set.',
       value: false
     },
     {
@@ -521,7 +521,6 @@ foam.RELATIONSHIP({
     transient: true
   }
 });
-
 
 foam.RELATIONSHIP({
   cardinality: '1:*',

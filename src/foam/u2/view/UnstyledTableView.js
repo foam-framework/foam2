@@ -209,7 +209,7 @@ foam.CLASS({
               });
           })).
         end().
-        add(this.rowsFrom(this.data));
+        add(this.rowsFrom(this.data$proxy));
     },
     {
       name: 'rowsFrom',
@@ -274,7 +274,8 @@ foam.CLASS({
                       }).
                     end();
                 }).
-                start('td').
+                start('td')
+                  .attrs({ name:'contextMenuCell' }).
                   addClass(view.myClass('context-menu-cell')).
                   tag(view.OverlayActionListView, {
                     data: actions,
