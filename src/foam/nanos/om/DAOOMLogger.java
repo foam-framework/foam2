@@ -14,6 +14,7 @@ public class DAOOMLogger
   implements OMLogger
 {
   public final static String SERVICE_NAME = "omLogger";
+  public final static String OM_DAO_NAME = "omDAO";
   public final static String DAO_NAME     = "omInfoDAO";
 
   protected final Object[] locks_ = new Object[128];
@@ -36,16 +37,29 @@ public class DAOOMLogger
       if ( om.getName().indexOf("om")                != -1 ) return;
     }
 
+    // Candlestick
+    foam.dao.DAO dao = (foam.dao.DAO) getX().get(OM_DAO_NAME);
+    if ( dao != null ) {
+      dao.put(om);
+    } else {
+      foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+      if ( logger != null ) {
+        logger.warning(this.getClass().getName(), "omDAO not found in context for", om.getId());
+      } else {
+        System.out.println(this.getClass().getName()+": omDAO and logger not found in context for "+om.getId());
+      }
+    }
+
     // TODO: could reuse the OMInfo by also using it as the lock object
     OMInfo info = new OMInfo.Builder(getX())
       .setClsName(om.getClassType().getId())
       .setName(om.getName())
       .build();
 
-    DAO dao = (DAO) getX().get(DAO_NAME);
+    DAO omDAO = (DAO) getX().get(DAO_NAME);
 
     synchronized ( getLock(info) ) {
-      OMInfo i = (OMInfo) dao.inX(getX()).find(info);
+      OMInfo i = (OMInfo) omDAO.inX(getX()).find(info);
       if ( i == null ) {
         i = info;
         i.setCount(1);
@@ -54,7 +68,7 @@ public class DAOOMLogger
         i.setCount(i.getCount() + 1);
       }
       i.setLastModified(om.getCreated());
-      dao.put(i);
+      omDAO.put(i);
     }
   }
 }

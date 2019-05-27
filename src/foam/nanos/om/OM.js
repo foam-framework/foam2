@@ -10,9 +10,15 @@ foam.CLASS({
 
   documentation: `An Operational Measure which captures the count of some event.`,
 
+  implements: [
+    'foam.nanos.analytics.Foldable'
+  ],
+
   javaImports: [
     'foam.core.X'
   ],
+
+  ids: ['classType', 'name', 'created'],
 
   properties: [
     {
@@ -48,6 +54,12 @@ foam.CLASS({
     OMLogger logger = (OMLogger) x.get(DAOOMLogger.SERVICE_NAME);
     if ( logger != null ) logger.log(this);
 `
+    },
+    {
+      name: 'doFolds',
+      javaCode: `
+    fm.foldForState(getClassType().getId()+":"+getName(), getCreated(), 0);
+      `
     }
   ]
 });
