@@ -32,7 +32,8 @@ foam.CLASS({
        property and continuing to look up to parent to find remaining empty property.
        `,
       javaCode: `
-        Group grp = (Group)((DAO) x.get("groupDAO")).find(group);
+        DAO groupDAO = (DAO) x.get("groupDAO");
+        Group grp = (Group)groupDAO.find(group);
         if ( grp == null ) return emailMessage;
 
         String  dspName      = "";
@@ -50,9 +51,11 @@ foam.CLASS({
           dspNameIsSet = dspNameIsSet ? dspNameIsSet : ! SafetyUtil.isEmpty(dspName);
           fromIsSet    = fromIsSet    ? fromIsSet    : ! SafetyUtil.isEmpty(from);
 
+          if (rpyToIsSet && dspNameIsSet && fromIsSet) break;
+
           group = grp.getParent();
-          grp = (Group)((DAO) x.get("groupDAO")).find(group);
-        } while ( grp != null && ! ( rpyToIsSet && dspNameIsSet && fromIsSet ) );
+          grp = (Group) groupDAO.find(group);
+        } while ( grp != null );
 
         // REPLY TO:
         if ( SafetyUtil.isEmpty(emailMessage.getReplyTo()) && rpyToIsSet ) {
