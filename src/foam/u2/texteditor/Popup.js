@@ -63,7 +63,7 @@ foam.CLASS({
           .end()
           .start('div').addClass(this.myClass('menu')).hide(self.hidden$)
             .tag(self.view)
-        .end();
+          .end();
     }
   ]
 });
