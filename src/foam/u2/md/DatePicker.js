@@ -218,12 +218,12 @@ foam.CLASS({
           .addClass(this.myClass('switcher'))
           .addClass(this.myClass('switcher-left'))
           .add(this.LEFT)
-          .end();
+        .end();
         body.start('span')
           .addClass(this.myClass('switcher'))
           .addClass(this.myClass('switcher-right'))
           .add(this.RIGHT)
-          .end();
+        .end();
 
         this.sliderE = body.start()
           .addClass(this.myClass('slider'))
@@ -237,6 +237,7 @@ foam.CLASS({
         this.innerE.end();
         this.sliderE.end();
 
+        // TODO: use show()
         body.enableClass(this.myClass('hidden'), this.showYears_$);
 
         var years = this.E().addClass(this.myCls('years'));
@@ -252,6 +253,7 @@ foam.CLASS({
           .end();
         }
 
+        // TODO: use show()
         years.enableClass(this.myCls('hidden'), this.showYears_$, true /* negate */);
 
         return [body, years];

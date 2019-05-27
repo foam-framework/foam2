@@ -59,6 +59,19 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'emptyRequiredString',
+      validateObj: function(emptyRequiredString) { return emptyRequiredString ? '' : 'value required'; }
+//      required: true
+    },
+    {
+      class: 'String',
+      name: 'requiredString',
+      value: 'someValue',
+      validateObj: function(requiredString) { return requiredString ? '' : 'value required'; }
+//      required: true
+    },
+    {
+      class: 'String',
       name: 'textFieldWithPlaceholder',
       view: {
         class: 'foam.u2.TextField',

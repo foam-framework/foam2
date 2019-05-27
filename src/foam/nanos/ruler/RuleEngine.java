@@ -15,10 +15,7 @@ import foam.nanos.pool.FixedThreadPool;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RuleEngine extends ContextAwareSupport {
@@ -78,15 +75,27 @@ public class RuleEngine extends ContextAwareSupport {
   }
 
   private void applyRules(List<Rule> rules, FObject obj, FObject oldObj) {
+    List<Rule> completedRules = null;
     for (Rule rule : rules) {
       if ( stops_.get() ) return;
 
       currentRule_ = rule;
-      if ( rule.f(getX(), obj, oldObj)
-        && rule.getAction() != null
+      if ( rule.getAction() != null
+        && rule.f(getX(), obj, oldObj)
       ) {
-        rule.apply(getX(), obj, oldObj, this);
-        saveHistory(rule, obj);
+        if ( completedRules == null ) {
+          completedRules = new ArrayList<>();
+        }
+        try {
+          rule.apply(getX(), obj, oldObj, this);
+          completedRules.add(rule);
+          saveHistory(rule, obj);
+        } catch (Exception e ) {
+          for (Rule completedRule : completedRules ) {
+            completedRule.applyReverse(getX(), obj, oldObj, this);
+          }
+          throw e;
+        }
       }
     }
   }
@@ -99,8 +108,8 @@ public class RuleEngine extends ContextAwareSupport {
           if ( stops_.get() ) return;
 
           currentRule_ = rule;
-          if ( rule.f(getX(), obj, oldObj)
-            && rule.getAsyncAction() != null
+          if ( rule.getAsyncAction() != null
+            && rule.f(getX(), obj, oldObj)
           ) {
             try {
               rule.asyncApply(x, obj, oldObj, RuleEngine.this);

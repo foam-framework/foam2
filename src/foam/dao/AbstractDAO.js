@@ -490,13 +490,23 @@ return this.select_(this.getX(), sink, 0, this.MAX_SAFE_INTEGER, null, null);
     {
       name: 'find',
       code: function find(id) {
+        // Temporary until DAO supports find_(Predicate) directly
+        if ( foam.mlang.predicate.Predicate.isInstance(id) ) {
+          var self = this;
+          return new Promise(function (resolve) {
+            self.where(id).limit(1).select().then(function (a) {
+              resolve(a.array.length ? a.array[0] : null);
+            });
+          });
+        }
+
         return this.find_(this.__context__, id);
       },
       swiftCode: 'return try find_(__context__, id)',
       javaCode: `
 // Temporary until DAO supports find_(Predicate) directly
 if ( id instanceof foam.mlang.predicate.Predicate ) {
-  java.util.List l = ((ArraySink) this.where((foam.mlang.predicate.Predicate) id).limit(1).select(new ArraySink())).getArray();
+  java.util.List l = ((ArraySink) where((foam.mlang.predicate.Predicate) id).limit(1).select(new ArraySink())).getArray();
   return l.size() == 1 ? (foam.core.FObject) l.get(0) : null;
 }
 

@@ -11,23 +11,25 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Boolean',
-      name: 'verified'
-    },
-    {
       class: 'PhoneNumber',
       name: 'number',
-      required: true,
-      validateObj: function (number) {
-        var numberRegex = /([+]?\d{1,2}[.-\s]?)?(\d{3}[.-]?){2}\d{4}/g;
-        
-        if ( ! numberRegex.test(number) ) {
-          return 'Invalid phone number.';
+      label: '',
+      validationPredicates: [
+        {
+          args: ['number'],
+          predicateFactory: function(e) {
+            return e.REG_EXP(
+              foam.nanos.auth.Phone.NUMBER,
+              /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/);
+          },
+          errorString: 'Invalid phone number.'
         }
-      },
-      preSet: function(o, n) {
-        return n.replace(/[- )(]/g, '');
-      }
+      ]
+    },
+    {
+      class: 'Boolean',
+      name: 'verified',
+      permissionRequired: true
     }
   ]
 });

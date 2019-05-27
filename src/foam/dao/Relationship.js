@@ -15,7 +15,6 @@ foam.CLASS({
     'foam.dao.ManyToManyRelationshipAxiom',
     'foam.dao.ManyToManyRelationshipDAO',
     'foam.dao.OneToManyRelationshipAxiom',
-    'foam.dao.ReadOnlyDAO',
     'foam.dao.RelationshipDAO'
   ],
 
@@ -418,20 +417,16 @@ foam.CLASS({
         var targetDAO = this.__context__[this.targetDAOKey];
         foam.assert(targetDAO, 'Missing DAO for targetDAOKey', this.targetDAOKey);
 
-        return foam.dao.ReadOnlyDAO.create({
-          delegate: foam.dao.ManyToManyRelationshipDAO.create({
-            relationship: this,
-            delegate: targetDAO
-          }, this)
+        return foam.dao.ManyToManyRelationshipDAO.create({
+          relationship: this,
+          delegate: targetDAO
         }, this);
       },
       javaFactory: `
         try {
-          return new foam.dao.ReadOnlyDAO.Builder(getX()).
-            setDelegate(new foam.dao.ManyToManyRelationshipDAO.Builder(getX()).
-              setRelationship(this).
-              setDelegate((foam.dao.DAO)getX().get(getTargetDAOKey())).
-              build()).
+          return new foam.dao.ManyToManyRelationshipDAO.Builder(getX()).
+            setRelationship(this).
+            setDelegate((foam.dao.DAO)getX().get(getTargetDAOKey())).
             build();
         } catch ( NullPointerException e ) {
           foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
@@ -441,11 +436,9 @@ foam.CLASS({
         `
   ,
       swiftFactory:
-`return __context__.create(foam_dao_ReadOnlyDAO.self, args: [
-  "delegate": __context__.create(foam_dao_ManyToManyRelationshipDAO.self, args: [
-    "relationship": self,
-    "delegate": __context__[targetDAOKey]
-  ])
+`return __context__.create(foam_dao_ManyToManyRelationshipDAO.self, args: [
+  "relationship": self,
+  "delegate": __context__[targetDAOKey]
 ])`
     },
     {

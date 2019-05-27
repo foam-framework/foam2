@@ -379,8 +379,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'ExpressionSlot',
-  implements: [ 'foam.core.Slot' ],
-
+  extends: 'foam.core.PromiseSlot',
   documentation: `
     Tracks dependencies for a dynamic function and invalidates if they change.
 
@@ -435,6 +434,16 @@ foam.CLASS({
     },
     {
       name: 'value',
+      preSet: function(o, n) {
+        if ( n && n.then ) {
+          this.promise = n;
+          n = foam.Undefined.isInstance(o) ? null : o;
+        } else {
+          // Ensure an old promise doesn't fire and clobber the value.
+          this.promise = null;
+        }
+        return n;
+      },
       factory: function() {
         return this.code.apply(this.obj || this, this.args.map(function(a) {
           return a.get();
@@ -446,17 +455,7 @@ foam.CLASS({
 
   methods: [
     function init() { this.onDetach(this.cleanup); },
-
-    function get() { return this.value; },
-
     function set() { /* nop */ },
-
-    function sub(l) {
-      return arguments.length === 1 ?
-        this.SUPER('propertyChange', 'value', l) :
-        this.SUPER.apply(this, arguments);
-    },
-
     function subToArgs_(args) {
       this.cleanup();
 
@@ -476,43 +475,102 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.core',
   name: 'PromiseSlot',
-
-  implements: [ 'foam.core.Slot' ],
-
+  extends: 'foam.core.SimpleSlot',
   documentation: `
     A slot that takes a promise and sets its value to its value when it
     resolves.
   `,
-
   properties: [
     {
       name: 'promise',
       postSet: function(_, n) {
-        n.then(function(v) {
+        n && n.then(function(v) {
           if ( n === this.promise ) this.value = v;
         }.bind(this));
       }
-    },
+    }
+  ],
+  methods: [
+    function set() {
+      throw new Error(this.cls_.id + ' does not support setting.');
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'ArraySlot',
+
+  implements: [ 'foam.core.Slot' ],
+
+  documentation: `
+    A slot that takes an array of Slots and notifies when either changes.
+  `,
+
+  properties: [
     {
-      name: 'value',
+      name: 'slots'
     }
   ],
 
   methods: [
-    function get() { return this.value; },
+    function get() {
+      return this.slots.map(s => s.get());
+    },
 
-    function set() {
-      throw new Error('PromiseSlot does not support setting.');
+    function set(arr) {
+      if ( ! foam.Array.isInstance(arr) )
+        throw new Error('ArraySlot can only set an array.');
+      arr.forEach((v, i) => this.slots[i].set(v));
     },
 
     function sub(l) {
+      if ( arguments.length != 1 ) return this.SUPER.apply(this, arguments);
+      var subs = this.slots.map(s => s.sub(l));
+      return {
+        detach: function() { subs.forEach(s => s.detach()); }
+      };
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'SimpleSlot',
+  implements: [ 'foam.core.Slot' ],
+  properties: [
+    {
+      name: 'value'
+    }
+  ],
+  methods: [
+    function get() { return this.value; },
+    function set(v) { this.value = v; },
+    function sub(l) {
       return arguments.length === 1 ?
         this.SUPER('propertyChange', 'value', l) :
-        this.SUPER.apply(this,arguments);
+        this.SUPER.apply(this, arguments);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'ProxySlot',
+  extends: 'foam.core.SimpleSlot',
+  properties: [
+    {
+      name: 'sub_'
+    },
+    {
+      name: 'delegate',
+      postSet: function(_, n) {
+        this.sub_ && this.sub_.detach();
+        this.sub_ = n && this.linkFrom(n);
+      }
     }
   ]
 });
