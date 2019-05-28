@@ -55,7 +55,7 @@ public class RuleEngine extends ContextAwareSupport {
   public void execute(List<Rule> rules, FObject obj, FObject oldObj) {
     CompoundContextAgent agent = new CompoundContextAgent(x_);
     for (Rule rule : rules) {
-      if ( stops_.get() ) return;
+      if ( stops_.get() ) break;
       applyRule(rule, obj, oldObj, agent);
       agent.submit(x_, x -> saveHistory(rule, obj));
     }
