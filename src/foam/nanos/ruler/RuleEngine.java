@@ -133,7 +133,7 @@ public class RuleEngine extends ContextAwareSupport {
           && rule.f(getX(), obj, oldObj)
         ) {
           try {
-            rule.asyncApply(x, obj, oldObj, RuleEngine.this, null);
+            rule.asyncApply(x, obj, oldObj, RuleEngine.this);
             saveHistory(rule, obj);
           } catch (Exception ex) {
             retryAsyncApply(x, rule, obj, oldObj);
@@ -145,7 +145,7 @@ public class RuleEngine extends ContextAwareSupport {
 
   private void retryAsyncApply(X x, Rule rule, FObject obj, FObject oldObj) {
     new RetryManager().submit(x, x1 -> {
-      rule.asyncApply(getX(), obj, oldObj, RuleEngine.this, null);
+      rule.asyncApply(getX(), obj, oldObj, RuleEngine.this);
       saveHistory(rule, obj);
     });
   }

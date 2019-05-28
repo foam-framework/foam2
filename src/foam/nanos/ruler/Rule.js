@@ -225,14 +225,10 @@
         {
           name: 'ruler',
           type: 'foam.nanos.ruler.RuleEngine'
-        },
-        {
-          name: 'agent',
-          type: 'foam.core.CompoundContextAgent'
         }
       ],
       javaCode: `
-        getAsyncAction().applyAction(x, obj, oldObj, ruler, agent);
+        getAsyncAction().applyAction(x, obj, oldObj, ruler, null);
         if ( ! getAfter() ) {
           ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }
