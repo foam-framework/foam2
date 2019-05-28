@@ -102,7 +102,7 @@ foam.CLASS({
         .addClass(this.myClass())
         .enableClass(this.myClass('error-background'), this.type === 'error')
         .start()
-          .callIfElse(foam.String.isIntance(this.message), function() {
+          .callIfElse(foam.String.isInstance(this.message), function() {
             this.add(self.message);
           }, function() {
             this.tag(self.message);
