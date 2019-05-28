@@ -70,10 +70,17 @@ public class MDAO
     state_ = state;
   }
 
+  public FObject objIn(FObject obj) {
+    return obj.fclone().freeze();
+  }
+
+  public FObject objOut(FObject obj) {
+    return AbstractFObject.maybeClone(obj);
+  }
+
   public FObject put_(X x, FObject obj) {
     // Clone and freeze outside of lock to minimize time spent under lock
-    obj = obj.fclone();
-    obj.freeze();
+    obj = objIn(obj);
 
     synchronized ( writeLock_ ) {
       FObject oldValue = find_(x, obj);
@@ -117,7 +124,7 @@ public class MDAO
 
     if ( o == null ) return null;
 
-    return AbstractFObject.maybeClone(
+    return objOut(
         getOf().isInstance(o)
           ? (FObject) index_.planFind(state, getPrimaryKey().get(o)).find(state, getPrimaryKey().get(o))
           : (FObject) index_.planFind(state, o).find(state,o)
@@ -149,10 +156,10 @@ public class MDAO
       plan = index_.planSelect(state, sink, skip, limit, order, simplePredicate);
     }
 
-    // TODO: if plan cost is >= size, log a warning
     if ( state != null && predicate != null && plan.cost() > 1000 && plan.cost() >= index_.size(state) ) {
       Logger logger = (Logger) x.get("logger");
-      logger.error(predicate.createStatement(), " Unindexed search on MDAO");
+      if ( ! predicate.equals(simplePredicate) ) logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
+      logger.warning("Unindexed search on MDAO", simplePredicate.toString());
     }
 
     plan.select(state, sink, skip, limit, order, simplePredicate);

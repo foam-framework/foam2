@@ -45,7 +45,9 @@ var classes = [
   'foam.mlang.sink.Count',
   'foam.mlang.sink.GroupBy',
   'foam.mlang.F',
+  'foam.mlang.StringLength',
   'foam.mlang.Expr',
+  'foam.mlang.IsValid',
   'foam.mlang.AbstractExpr',
   'foam.mlang.predicate.Eq',
   'foam.mlang.Constant',
@@ -53,6 +55,8 @@ var classes = [
   'foam.mlang.expr.Dot',
   'foam.mlang.PredicatedExpr',
   'foam.mlang.ContextObject',
+  'foam.mlang.predicate.RegExp',
+  'foam.mlang.predicate.OlderThan',
   'foam.box.Box',
   'foam.box.Skeleton',
   'foam.box.AbstractSkeleton',
@@ -118,6 +122,7 @@ var classes = [
   'foam.dao.SkipSink',
   'foam.dao.DedupSink',
   'foam.dao.ReadOnlyDAO',
+  'foam.dao.KeyValueDAO',
   'foam.dao.RelationshipDAO',
   'foam.dao.ManyToManyRelationship',
   'foam.dao.ManyToManyRelationshipImpl',
@@ -223,14 +228,24 @@ var classes = [
   'foam.nanos.menu.SubMenuView',
   'foam.nanos.menu.TabsMenu',
   'foam.nanos.menu.ViewMenu',
+  // Email base model or interface
   'foam.nanos.notification.email.EmailMessage',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.EmailTemplate',
+  'foam.nanos.notification.email.EmailPropertyService',
+  // Email service Files
   'foam.nanos.notification.email.SMTPEmailService',
-  'foam.nanos.notification.email.ClientEmailService',
   'foam.nanos.notification.email.NullEmailService',
-  'foam.nanos.notification.email.DAOEmailService',
-  'foam.nanos.notification.email.SMTPEmailMessageDAO',
+  'foam.nanos.notification.email.AsyncEmailService',
+  'foam.nanos.notification.email.ProxyEmailService',
+  // Property set on Emails
+  'foam.nanos.notification.email.ChainedPropertyService',
+  'foam.nanos.notification.email.EmailTemplateApplyEmailPropertyService',
+  'foam.nanos.notification.email.GroupEmailTemplateService',
+  'foam.nanos.notification.email.EmailConfigEmailPropertyService',
+  // EmailMessageDAO(service) decorator
+  'foam.nanos.notification.email.EmailServiceDAO',
+
   'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.email.ClientPOP3EmailService',
   'foam.nanos.notification.push.PushService',
@@ -350,6 +365,8 @@ var classes = [
   'foam.nanos.dig.exception.EmptyParameterException',
   'foam.nanos.dig.exception.GeneralException',
 
+  'foam.nanos.app.EmailConfig',
+  
   'foam.nanos.test.StockSnapshot',
   'foam.nanos.analytics.FoldManagerDAODecorator',
   'foam.nanos.analytics.DAOFoldManager',
@@ -359,7 +376,14 @@ var classes = [
   'foam.test.TestEnum',
   'foam.test.AllSerializableProperties',
   'foam.nanos.test.EchoService',
-  'foam.nanos.test.SerializationTestEchoService'
+  'foam.nanos.test.SerializationTestEchoService',
+
+  // Ace Editor
+  'io.c9.ace.Config',
+  'io.c9.ace.Editor',
+  'io.c9.ace.KeyBinding',
+  'io.c9.ace.Mode',
+  'io.c9.ace.Theme'
 ];
 
 var abstractClasses = [

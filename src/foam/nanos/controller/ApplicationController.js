@@ -180,6 +180,10 @@ foam.CLASS({
   methods: [
     function init() {
       this.SUPER();
+
+      // done to start using SectionedDetailViews instead of DetailViews
+      foam.__context__.register(foam.u2.detail.SectionedDetailView, 'foam.u2.DetailView');
+
       var self = this;
 
       window.onpopstate = async function(event) {
@@ -353,8 +357,11 @@ foam.CLASS({
     },
 
     // This method is for toast notification message
-    function notify(message, type) {
-      this.add(this.NotificationMessage.create({ message, type }));
+    function notify(data, type) {
+      this.add(this.NotificationMessage.create({
+        message: data,
+        type: type
+      }));
     }
   ],
 

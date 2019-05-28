@@ -18,7 +18,7 @@ import java.util.List;
 import static foam.mlang.MLang.*;
 
 public class RulerDAOTest extends Test {
-  Rule rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8;
+  Rule rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9;
   User user1, user2;
   DAO ruleDAO, userDAO, ruleHistoryDAO;
   int asyncWait = 1000;
@@ -52,8 +52,7 @@ public class RulerDAOTest extends Test {
     user1 = (User) userDAO.put_(x, user1);
     test(user1.getEmail().equals("nanos@nanos.net"), "user's email is nanos@nanos.net: on object update 'create' rules are not executed");
     test(user1.getLastName().equals("Unknown"), "user's lastName is 'Unknown': update rule was executed");
-    Account account = (Account) ((DAO) x.get("localAccountDAO")).find(AND(EQ(Account.OWNER, user1.getId()), EQ(Account.DENOMINATION, "INR")));
-    test(account != null, "Account for INR was added successfully");
+    test(user1.getEmailVerified(), "Set emailVerified to true in rule 9");
 
     // wait for async
     try {
@@ -263,6 +262,27 @@ public class RulerDAOTest extends Test {
     RuleAction action8 = (x111, obj, oldObj, ruler, agent) -> ruler.stop();
     rule8.setAction(action8);
     rule8 = (Rule) ruleDAO.put_(x, rule8);
+
+    //the rule with FObject predicate
+    rule9 = new Rule();
+    rule9.setId(9);
+    rule9.setName("FObject rule predicate");
+    rule9.setRuleGroup("user updated");
+    rule9.setDaoKey("localUserDAO");
+    rule9.setOperation(Operations.UPDATE);
+    rule9.setAfter(false);
+    rule9.setPredicate(EQ(foam.nanos.auth.User.EMAIL, "nanos@nanos.net"));
+    RuleAction action9 = new RuleAction() {
+      public void applyAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) {
+        User user = (User) obj;
+        user.setEmailVerified(true);
+      }
+      public void applyReverseAction(X x, FObject obj, FObject oldObj, RuleEngine ruler) { }
+      public boolean canExecute(X x, FObject obj, FObject oldObj, RuleEngine ruler) { return true; }
+      public String describe() { return ""; }
+    };
+    rule9.setAction(action9);
+    rule9 = (Rule) ruleDAO.put_(x, rule9);
   }
   public void removeData(X x) {
     ruleDAO.remove_(x, rule1);
@@ -271,6 +291,7 @@ public class RulerDAOTest extends Test {
     ruleDAO.remove_(x, rule6);
     ruleDAO.remove_(x, rule7);
     ruleDAO.remove_(x, rule8);
+    ruleDAO.remove_(x, rule9);
     userDAO.remove_(x, user1);
     userDAO.remove_(x, user2);
   }

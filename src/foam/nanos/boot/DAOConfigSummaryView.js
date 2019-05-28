@@ -78,7 +78,12 @@
 
          if ( l != currentLetter ) {
            currentLetter = l;
-           section = self.start('span').addClass(self.myClass('section')).start('span').addClass(self.myClass('header')).add(l).end();
+           section = self.start('span')
+             .addClass(self.myClass('section'))
+             .start('span')
+               .addClass(self.myClass('header'))
+               .add(l)
+             .end();
          }
 
          section.start('span')

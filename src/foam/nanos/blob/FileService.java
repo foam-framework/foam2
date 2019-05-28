@@ -57,11 +57,15 @@ public class FileService
         return;
       }
 
-      // check to see if current user has access to file owner
-      if ( userDAO_.find_(x, file.getOwner()) == null ) {
-        resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        return;
-      }
+      // TODO: Add better ACL support for files.  In the meantime,
+      // fileDAO has been decorated to disallow enumeration and File
+      // IDs are unguessable cryptographically strong UUIDs, so no
+      // permission check is really necessary.
+      
+// if ( userDAO_.find_(x, file.getOwner()) == null ) {
+//  resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//  return;
+// }
 
       // get blob and blob size
       // TODO: figure out why delegate is not being set for IdentifiedBlob

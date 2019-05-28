@@ -54,7 +54,6 @@ foam.CLASS({
             .filter(a => ! usedAxioms[a.name]);
         if ( unusedProperties.length || unusedActions.length ) {
           sections.push(this.Section.create({
-            title: 'Unsectioned Axioms',
             properties: unusedProperties,
             actions: unusedActions
           }));
