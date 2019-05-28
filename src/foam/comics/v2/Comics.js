@@ -208,6 +208,13 @@ foam.CLASS({
     'foam.u2.layout.Item',
     'foam.u2.search.Toolbar'
   ],
+
+  css: `
+    ^ .foam-u2-ActionView-export {
+      margin-left: 16px;
+    }
+  `,
+
   imports: [
     'stack?'
   ],
@@ -259,42 +266,45 @@ foam.CLASS({
     },
     function initE() {
       var self = this;
-    this.SUPER();
-    this
-      .add(self.slot(function(data$cannedQueries, data$browseViews) {
-        return self.E()
-          .start(self.Rows)
-            .start(self.Cols)
+      this.addClass(this.myClass());
+      this.SUPER();
+      this
+        .add(self.slot(function(data$cannedQueries, data$browseViews) {
+          return self.E()
+            .start(self.Rows)
               .start(self.Cols)
-                .forEach(data$cannedQueries, function(q) {
-                  this.add(q.name); // TODO: make these do something.
-                })
-              .end()
-              .start(self.Cols)
-                .forEach(data$browseViews, function(o) {
-                  // TODO: make these do something.
-                  // TODO: make these icons.
-                  this.add(o.name);
-                })
-              .end()
-            .end()
-            .start(self.Cols)
-              .start(self.Item)
-                .style({'flex-grow': 1 })
-                  .tag(self.Toolbar, { data$: self.predicate$ })
+                .start(self.Cols)
+                  .forEach(data$cannedQueries, function(q) {
+                    this.add(q.name); // TODO: make these do something.
+                  })
                 .end()
-              .startContext({data: self}).add(self.EXPORT).endContext()
-            .end()
-            .start(self.Item)
-              .style({ margin: 'auto' })
-              .add(self.slot(function(browseView) {
-                return self.E().tag(browseView, {
-                  data: self.predicatedDAO$proxy
-                });
-              }))
-            .end()
-          .end();
-      }));
+                .start(self.Cols)
+                  .callIf(data$browseViews.length > 1, function() {
+                    this.forEach(data$browseViews, function(o) {
+                      // TODO: make these do something.
+                      // TODO: make these icons.
+                      this.add(o.name);
+                    })
+                  })
+                .end()
+              .end()
+              .start(self.Cols).style({ 'align-items': 'center'})
+                .start(self.Item)
+                  .style({'flex-grow': 1 })
+                    .tag(self.Toolbar, { data$: self.predicate$ })
+                  .end()
+                .startContext({data: self}).add(self.EXPORT).endContext()
+              .end()
+              .start(self.Item)
+                .style({ margin: 'auto' })
+                .add(self.slot(function(browseView) {
+                  return self.E().tag(browseView, {
+                    data: self.predicatedDAO$proxy
+                  });
+                }))
+              .end()
+            .end();
+        }));
     }
   ]
 }); 
