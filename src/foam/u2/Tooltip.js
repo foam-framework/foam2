@@ -18,7 +18,6 @@ foam.CLASS({
 
   methods: [
     function init() {
-      console.log('TODO: tooltip stuff');
       this.target.setAttribute('title', this.target.tooltip);
     }
   ]
