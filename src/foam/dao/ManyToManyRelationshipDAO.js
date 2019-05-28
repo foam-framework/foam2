@@ -62,13 +62,15 @@ foam.CLASS({
               self.IN(self.of.ID, map.delegate.array)));
           });
       },
-      javaCode: `foam.mlang.sink.Map junction = (foam.mlang.sink.Map)getRelationship().getJunctionDAO().where(
-    foam.mlang.MLang.EQ(getRelationship().getSourceProperty(), getRelationship().getSourceId())).
-  select(foam.mlang.MLang.MAP(getRelationship().getTargetProperty(), new foam.dao.ArraySink()));
+      javaCode: `
+        foam.mlang.sink.Map junction = (foam.mlang.sink.Map) getRelationship().getJunctionDAO()
+          .where(foam.mlang.MLang.EQ(getRelationship().getSourceProperty(), getRelationship().getSourceId()))
+          .select(foam.mlang.MLang.MAP(getRelationship().getTargetProperty(), new foam.dao.ArraySink()));
 
-  return getDelegate().where(foam.mlang.MLang.IN(getPrimaryKey(), ((foam.dao.ArraySink)(junction.getDelegate())).getArray().toArray())).select_(
-    x, sink, skip, limit, order, predicate);`,
-
+        return getDelegate()
+          .where(foam.mlang.MLang.IN(getPrimaryKey(), ((foam.dao.ArraySink) (junction.getDelegate())).getArray().toArray()))
+          .select_(x, sink, skip, limit, order, predicate);
+      `,
       swiftCode: `
         let pred = __context__.create(foam_mlang_predicate_Eq.self, args: [
           "arg1": relationship?.sourceProperty,
