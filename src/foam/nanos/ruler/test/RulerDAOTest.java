@@ -1,7 +1,5 @@
 package foam.nanos.ruler.test;
 
-import foam.core.ContextAgent;
-import foam.core.FObject;
 import foam.core.X;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
@@ -10,8 +8,6 @@ import foam.nanos.auth.User;
 import foam.nanos.ruler.*;
 import foam.nanos.test.Test;
 import foam.test.TestUtils;
-import net.nanopay.account.Account;
-import net.nanopay.account.DigitalAccount;
 
 import java.util.List;
 
@@ -52,8 +48,9 @@ public class RulerDAOTest extends Test {
     user1 = (User) userDAO.put_(x, user1);
     test(user1.getEmail().equals("nanos@nanos.net"), "user's email is nanos@nanos.net: on object update 'create' rules are not executed");
     test(user1.getLastName().equals("Unknown"), "user's lastName is 'Unknown': update rule was executed");
-    Account account = (Account) ((DAO) x.get("localAccountDAO")).find(AND(EQ(Account.OWNER, user1.getId()), EQ(Account.DENOMINATION, "INR")));
-    test(account != null, "Account for INR was added successfully");
+    User executeUser = (User) userDAO.find(666L);
+    test(executeUser != null, "Test user from executor was added successfully");
+    test(executeUser.getFirstName().equals("ExecutorTest"), "Test user's first name is ExecutorTest.");
 
     // wait for async
     try {
@@ -207,12 +204,11 @@ public class RulerDAOTest extends Test {
     RuleAction action5 = (x17, obj, oldObj, ruler, agent) -> {
       User user = (User) obj;
       user.setLastName("Unknown");
-      Account account = new DigitalAccount();
-      account.setOwner(user.getId());
-      account.setDenomination("INR");
+      User executeUser = new User();
+      executeUser.setId(666L);
+      executeUser.setFirstName("ExecutorTest");
       agent.submit(x112 -> {
-        DAO accountDao = (DAO) x112.get("localAccountDAO");
-        accountDao.put(account);
+        userDAO.put(executeUser);
       }, "RulerDAOTest add account");
 
     };
