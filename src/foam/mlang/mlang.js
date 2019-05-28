@@ -1450,15 +1450,12 @@ foam.CLASS({
     { path: 'foam.mlang.Expressions', flags: ['js'], java: false }
   ],
 
-  javaImports: [
-    'java.util.List'
-  ],
-
   documentation: 'Predicate returns true iff arg1 is a substring of arg2, or if arg2 is an array, arg1 is an element of arg2.',
 
   requires: [ 'foam.mlang.Constant' ],
 
   javaImports: [
+    'java.util.List',
     'foam.mlang.ArrayConstant',
     'foam.mlang.Constant',
     'foam.mlang.predicate.False'
