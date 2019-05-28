@@ -631,6 +631,7 @@ foam.CLASS({
     'foam.u2.AttrSlot',
     'foam.u2.Entity',
     'foam.u2.RenderSink',
+    'foam.u2.Tooltip'
   ],
 
   imports: [
@@ -848,6 +849,10 @@ foam.CLASS({
       }
     },
     {
+      class: 'String',
+      name: 'tooltip'
+    },
+    {
       name: 'parentNode',
       transient: true
     },
@@ -977,6 +982,7 @@ foam.CLASS({
         Template method for adding addtion element initialization
         just before Element is output().
       */
+      this.initTooltip();
       this.initKeyboardShortcuts();
     },
 
@@ -1041,6 +1047,10 @@ foam.CLASS({
       }
 
       return count;
+    },
+
+    function initTooltip() {
+      if ( this.tooltip ) this.Tooltip.create({target: this});
     },
 
     function initKeyboardShortcuts() {
@@ -2133,6 +2143,18 @@ foam.CLASS({
       class: 'Function',
       name: 'visibilityExpression',
       value: null
+    },
+    {
+      class: 'Boolean',
+      name: 'validationTextVisible',
+      documentation: "If true, validation text will be displayed below the input when it's in an invalid state.",
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'validationStyleEnabled',
+      documentation: 'If true, inputs will be styled when they are in an invalid state.',
+      value: true
     }
   ],
 
@@ -2153,14 +2175,44 @@ foam.CLASS({
     },
 
     function createVisibilityFor(data$) {
-      if ( this.visibilityExpression ) {
-        return foam.core.ExpressionSlot.create({
+      var Visibility = foam.u2.Visibility;
+
+      var slot = this.visibilityExpression ?
+        foam.core.ExpressionSlot.create({
           obj$: data$,
           code: this.visibilityExpression
+        }) :
+        foam.core.ConstantSlot.create({value: this.visibility});
+
+      if ( this.permissionRequired ) {
+        var visSlot  = slot;
+        var permSlot = data$.map(data => {
+          if ( ! data || ! data.__subContext__.auth ) return Visibility.HIDDEN;
+          var auth = data.__subContext__.auth;
+
+          var propName = this.name.toLowerCase();
+          var clsName  = this.forClass_.substring(this.forClass_.lastIndexOf('.') + 1).toLowerCase();
+
+          return auth.check(null, `${clsName}.rw.${propName}`)
+              .then(function(rw) {
+                if ( rw ) return Visibility.RW;
+                return auth.check(null, `${clsName}.ro.${propName}`)
+                  .then(ro => ro ? Visibility.RO : Visibility.HIDDEN);
+              });
+        });
+
+        slot = foam.core.ArraySlot.create({slots: [visSlot, permSlot]}).map(arr => {
+          var vis  = arr[0];
+          var perm = arr[1] || Visibility.HIDDEN;
+
+          return perm === Visibility.HIDDEN ? perm :
+            vis  === Visibility.HIDDEN ? vis :
+            perm === Visibility.RO ? perm :
+            vis;
         });
       }
 
-      return foam.core.ConstantSlot.create({value: this.visibility});
+      return slot;
     }
   ]
 });
@@ -2194,9 +2246,8 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'DateViewRefinement',
   refines: 'foam.core.Date',
-  requires: [ 'foam.u2.view.date.DateTimePicker' ],
   properties: [
-    [ 'view', { class: 'foam.u2.view.date.DateTimePicker' } ]
+    [ 'view', { class: 'foam.u2.DateView' } ]
   ]
 });
 
@@ -2205,9 +2256,8 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'DateTimeViewRefinement',
   refines: 'foam.core.DateTime',
-  requires: [ 'foam.u2.view.date.DateTimePicker' ],
   properties: [
-    [ 'view', { class: 'foam.u2.view.date.DateTimePicker', showTimeOfDay: true } ]
+    [ 'view', { class: 'foam.u2.DateTimeView' } ]
   ]
 });
 
@@ -2265,7 +2315,23 @@ foam.CLASS({
   refines: 'foam.core.Boolean',
   requires: [ 'foam.u2.CheckBox' ],
   properties: [
-    [ 'view', { class: 'foam.u2.CheckBox' } ],
+    {
+      name: 'view',
+      expression: function(label2, label2Formatter) {
+        return {
+          class: 'foam.u2.CheckBox',
+          label: label2,
+          labelFormatter: label2Formatter
+        };
+      }
+    },
+    {
+      class: 'String',
+      name: 'label2'
+    },
+    {
+      name: 'label2Formatter'
+    }
   ]
 });
 
@@ -2295,6 +2361,19 @@ foam.CLASS({
     {
       name: 'view',
       value: { class: 'foam.u2.DetailView' },
+    },
+    {
+      name: 'validationTextVisible',
+      documentation: `
+        Hide FObjectProperty validation because their inner view should provide its
+        own validation so having it on the outer view and the inner view is redundant
+        and jarring.
+      `,
+      value: false
+    },
+    {
+      name: 'validationStyleEnabled',
+      value: false
     }
   ]
 });
@@ -2478,13 +2557,16 @@ foam.CLASS({
 
       this.attr('name', p.name);
 
-      // if ( p.validateObj ) {
-      //   var s = foam.core.ExpressionSlot.create({
-      //     obj$: this.__context__.data$,
-      //     code: p.validateObj
-      //   });
-      //   this.error_$.follow(s);
-      // }
+      if ( p.validateObj ) {
+        /*
+        var s = foam.core.ExpressionSlot.create({
+          obj$: this.__context__.data$,
+          code: p.validateObj
+        });
+        this.error_$.follow(s);
+        */
+//        this.error_$.follow(this.__context__.data.slot(p.validateObj));
+      }
     }
   ]
 });
