@@ -34,7 +34,8 @@ foam.CLASS({
     'org.jtwig.resource.loader.TypedResourceLoader',
     'foam.dao.DAO',
     'foam.nanos.auth.User',
-    'foam.nanos.auth.Group'
+    'foam.nanos.auth.Group',
+    'foam.nanos.logger.Logger'
   ],
 
   axioms: [
@@ -126,6 +127,7 @@ foam.CLASS({
       ],
       javaCode:
       `
+        Logger logger = (Logger) getX().get("logger");
         try {
           MimeMessage message = new MimeMessage(getSession_());
 
@@ -169,10 +171,10 @@ foam.CLASS({
           }
           
           message.setSentDate(new Date());
-
+          logger.info("SMTPEmailService Created MimeMessage.");
           return message;
         } catch (Throwable t) {
-          t.printStackTrace();
+          logger.error("SMTPEmailService failed to created MimeMessage. " + t);
           return null;
         }
       `
@@ -181,15 +183,18 @@ foam.CLASS({
       name: 'sendEmail',
       javaCode:
       `
+      Logger logger = (Logger) getX().get("logger");
         try {
           MimeMessage message = createMimeMessage(emailMessage);
-          // send message
           Transport transport = getSession_().getTransport("smtp");
           transport.connect();
+          logger.info("SMTPEmailService connected.");
           transport.send(message, getUsername(), getPassword());
+          logger.info("SMTPEmailService sent MimeMessage.");
           transport.close();
+          logger.info("SMTPEmailService finish.");
         } catch (Exception e) {
-          e.printStackTrace();
+          logger.error("SMTPEmailService failed to finish. " + e);
         }
         
       `

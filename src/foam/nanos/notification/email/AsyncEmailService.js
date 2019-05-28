@@ -12,6 +12,7 @@ foam.CLASS({
   javaImports: [
     'foam.core.ContextAgent',
     'foam.core.X',
+    'foam.nanos.logger.Logger',
     'foam.nanos.pool.FixedThreadPool'
   ],
 
@@ -23,7 +24,13 @@ foam.CLASS({
         ( (FixedThreadPool) x.get("threadPool") ).submit(x, new ContextAgent() {
           @Override
           public void execute(X x) {
+            Logger logger = (Logger) x.get("logger");
+            try {
+              logger.info("AsyncEmailService RUNNING");
               getDelegate().sendEmail(x, emailMessage);
+            } catch(Exception e) {
+              logger.error("@AsyncEmailService: " + e);
+            }
           }
         });
       `
