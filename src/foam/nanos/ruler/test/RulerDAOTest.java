@@ -1,7 +1,6 @@
 package foam.nanos.ruler.test;
 
-import foam.core.CompoundContextAgent;
-import foam.core.FObject;
+
 import foam.core.X;
 import foam.dao.ArraySink;
 import foam.dao.DAO;

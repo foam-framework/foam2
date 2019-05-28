@@ -12,7 +12,7 @@
 
   Rule.action
     When implementing applyAction() for Rule.action, use agent for all the write/delete operations.
-    Only operrations that modify other system components should be part of the agent executor. 
+    Only operations that modify other system components should be part of the agent executor. 
     When implementing execute() method inside the action, provide description of the operation as the third argument.
     Example: 
         RuleAction action = (x, obj, oldObj, ruler, agent) -> {
