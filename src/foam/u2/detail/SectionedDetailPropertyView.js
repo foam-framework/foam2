@@ -356,7 +356,7 @@ foam.CLASS({
                           class: 'foam.u2.tag.Image',
                           data: 'images/inline-error-icon.svg',
                           displayHeight: 16,
-                          displayWeight: 16
+                          displayWidth: 16
                         })
                         .end()
                         .start(self.Item)
