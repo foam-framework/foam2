@@ -1450,6 +1450,10 @@ foam.CLASS({
     { path: 'foam.mlang.Expressions', flags: ['js'], java: false }
   ],
 
+  javaImports: [
+    'java.util.List'
+  ],
+
   documentation: 'Predicate returns true iff arg1 is a substring of arg2, or if arg2 is an array, arg1 is an element of arg2.',
 
   requires: [ 'foam.mlang.Constant' ],
@@ -1538,7 +1542,14 @@ return false
   // boolean uppercase = lhs.getClass().isEnum(); TODO: Account for ENUMs? (See js)
   Object rhs = getArg2().f(obj);
 
-  if ( rhs instanceof Object[] ) {
+  if ( rhs instanceof List ) {
+    List list = (List) rhs;
+    for ( Object o : list ) {
+      if ( ( ( (Comparable) lhs ).compareTo( (Comparable) o ) ) == 0 ) {
+        return true;
+      }
+    }
+  } else if ( rhs instanceof Object[] ) {
     // Checks if rhs array contains the lhs object
     Object[] values = (Object[])rhs;
 
