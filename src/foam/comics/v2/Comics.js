@@ -93,7 +93,7 @@ foam.CLASS({
           {
             name: 'Table',
             view: { class: 'foam.u2.view.ScrollTableView' },
-            icon: ''
+            icon: 'images/bulleted-list.svg'
           }
         ];
       }
@@ -121,7 +121,7 @@ foam.CLASS({
           {
             name: 'SDV',
             view: { class: 'foam.u2.detail.SectionedDetailView' },
-            icon: ''
+            icon: 'images/sdv-icon.svg'
           }
         ];
       }
@@ -149,7 +149,7 @@ foam.CLASS({
     }
 
     ^inner-table {
-      padding: 16px 24px;
+      padding: 0px 24px;
     }
 
     ^ .foam-u2-view-ScrollTableView-table {
@@ -184,7 +184,7 @@ foam.CLASS({
           .start(self.Rows).addClass(this.myClass('container'))
             .start(self.Cols).style({'align-items': 'center'})
               .start('h1').add(data.browseTitle$).end()
-              .startContext({data: self}).tag(self.CREATE, {  }).endContext()
+              .startContext({data: self}).tag(self.CREATE).endContext()
             .end()
             .start(this.CardBorder)
               .start(data$browseBorder).addClass(this.myClass('inner-table'))
@@ -212,6 +212,17 @@ foam.CLASS({
   css: `
     ^ .foam-u2-ActionView-export {
       margin-left: 16px;
+    }
+
+    ^top-bar {
+      padding: 20px 0px;
+      border-bottom: solid 1px #e7eaec;
+    }
+
+
+    ^query-bar {
+      margin-top: 32px;
+      margin-bottom: 24px;
     }
   `,
 
@@ -250,6 +261,8 @@ foam.CLASS({
   actions: [
     {
       name: 'export',
+      label: '',
+      icon: 'images/export-icon-resting.svg',
       code: function() {
         alert('TODO');
       }
@@ -272,7 +285,7 @@ foam.CLASS({
         .add(self.slot(function(data$cannedQueries, data$browseViews) {
           return self.E()
             .start(self.Rows)
-              .start(self.Cols)
+              .start(self.Cols).addClass(this.myClass('top-bar'))
                 .start(self.Cols)
                   .forEach(data$cannedQueries, function(q) {
                     this.add(q.name); // TODO: make these do something.
@@ -280,20 +293,25 @@ foam.CLASS({
                 .end()
                 .start(self.Cols)
                   .callIf(data$browseViews.length > 1, function() {
+
+                    
                     this.forEach(data$browseViews, function(o) {
                       // TODO: make these do something.
                       // TODO: make these icons.
-                      this.add(o.name);
+                      this.start({ class: 'foam.u2.tag.Image', data: o.icon})
                     })
                   })
                 .end()
               .end()
-              .start(self.Cols).style({ 'align-items': 'center'})
+              .start(self.Cols).addClass(this.myClass('query-bar')).style({ 'align-items': 'center'})
                 .start(self.Item)
                   .style({'flex-grow': 1 })
                     .tag(self.Toolbar, { data$: self.predicate$ })
                   .end()
-                .startContext({data: self}).add(self.EXPORT).endContext()
+                .startContext({data: self}).tag(self.EXPORT, {
+                  buttonStyle: foam.u2.ButtonStyle.SECONDARY
+                })
+                .endContext()
               .end()
               .start(self.Item)
                 .style({ margin: 'auto' })
