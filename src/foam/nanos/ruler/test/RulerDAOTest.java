@@ -83,7 +83,7 @@ public class RulerDAOTest extends Test {
     } catch (InterruptedException e) { }
     ruleHistory = (RuleHistory) ruleHistoryDAO.find(ruleHistory.getId());
     test(ruleHistory.getResult().equals("Done"),
-      "Update rule history result = Done in rule 6 async action"
+      "Expected: Update rule history result = Done in rule 6 async action. Actual: " + ruleHistory.getResult()
     );
   }
 
