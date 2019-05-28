@@ -16,7 +16,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.comics.v2',
-  name: 'BrowseView',
+  name: 'NamedView',
   properties: [
     {
       class: 'String',
@@ -82,7 +82,7 @@ foam.CLASS({
     },
     {
       class: 'FObjectArray',
-      of: 'foam.comics.v2.BrowseView',
+      of: 'foam.comics.v2.NamedView',
       name: 'browseViews',
       factory: function() {
         return [
@@ -97,6 +97,28 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.comics.v2.CannedQuery',
       name: 'cannedQueries'
+    },
+    {
+      class: 'foam.u2.ViewSpecWithJava',
+      name: 'viewBorder',
+      expression: function() {
+        // Can't use a value here because java tries to generate a HasMap
+        // for it which doesn't jive with the AbstractFObjectPropertyInfo.
+        return { class: 'foam.u2.borders.NullBorder' };
+      }
+    },
+    {
+      class: 'FObjectArray',
+      of: 'foam.comics.v2.NamedView',
+      name: 'viewViews',
+      factory: function() {
+        return [
+          {
+            name: 'SDV',
+            view: { class: 'foam.u2.detail.SectionedDetailView' }
+          }
+        ];
+      }
     }
   ]
 });
@@ -110,9 +132,11 @@ foam.CLASS({
   ],
   requires: [
     'foam.comics.v2.DAOBrowserView',
-    'foam.u2.layout.ColumnLayout',
-    'foam.u2.layout.RowLayout'
+    'foam.u2.layout.Cols',
+    'foam.u2.layout.Rows',
+    'foam.u2.borders.CardBorder'
   ],
+
   properties: [
     {
       class: 'FObjectProperty',
@@ -130,23 +154,23 @@ foam.CLASS({
   ],
   methods: [
     function initE() {
-      var self = this;
-      this
-        .add(this.slot(function(data) {
-          return self.E()
-            .start(self.RowLayout)
-              .start(self.ColumnLayout)
-                .start('h1').add(data.browseTitle$).end()
-                .startContext({data: self}).add(self.CREATE).endContext()
-              .end()
-              .add(data.slot(function(browseBorder) {
-                return self.E()
-                  .start(browseBorder)
-                    .tag(self.DAOBrowserView, { data: data })
-                  .end();
-              }))
-            .end();
-        }));
+    this.SUPER();
+
+    var self = this;
+
+      this.addClass(this.myClass())
+      .add(this.slot(function(data, data$browseBorder) {
+        return self.E()
+          .start(self.Rows)
+            .start(self.Cols)
+              .start('h1').add(data.browseTitle$).end()
+              .startContext({data: self}).add(self.CREATE).endContext()
+            .end()
+            .start(data$browseBorder)
+              .tag(self.DAOBrowserView, { data: data })
+            .end()
+          .end();
+      }));
     }
   ]
 });
@@ -157,9 +181,16 @@ foam.CLASS({
   extends: 'foam.u2.View',
   requires: [
     'foam.u2.ScrollTableView',
-    'foam.u2.layout.ColumnLayout',
-    'foam.u2.layout.RowLayout',
+    'foam.u2.layout.Cols',
+    'foam.u2.layout.Rows',
+    'foam.u2.layout.Item',
     'foam.u2.search.Toolbar'
+  ],
+  imports: [
+    'stack?'
+  ],
+  exports: [
+    'dblclick'
   ],
   properties: [
     {
@@ -196,35 +227,156 @@ foam.CLASS({
     }
   ],
   methods: [
+    function dblclick(obj) {
+      if ( ! this.stack ) return;
+      this.stack.push({
+        class: 'foam.comics.v2.DAOUpdateView',
+        data$: this.data$,
+        obj: obj
+      });
+    },
+    function initE() {
+      var self = this;
+    this.SUPER();
+    this
+      .add(self.slot(function(data$cannedQueries, data$browseViews) {
+        return self.E()
+          .start(self.Rows)
+            .start(self.Cols)
+              .start(self.Cols)
+                .forEach(data$cannedQueries, function(q) {
+                  this.add(q.name); // TODO: make these do something.
+                })
+              .end()
+              .start(self.Cols)
+                .forEach(data$browseViews, function(o) {
+                  // TODO: make these do something.
+                  // TODO: make these icons.
+                  this.add(o.name);
+                })
+              .end()
+            .end()
+            .start(self.Cols)
+              .start(self.Item)
+                .style({'flex-grow': 1 })
+                  .tag(self.Toolbar, { data$: self.predicate$ })
+                .end()
+              .startContext({data: self}).add(self.EXPORT).endContext()
+            .end()
+            .start(self.Item)
+              .style({ margin: 'auto' })
+              .add(self.slot(function(browseView) {
+                return self.E().tag(browseView, {
+                  data: self.predicatedDAO$proxy
+                });
+              }))
+            .end()
+          .end();
+      }));
+    }
+  ]
+}); 
+
+foam.CLASS({
+  package: 'foam.comics.v2',
+  name: 'DAOUpdateView',
+  extends: 'foam.u2.View',
+  requires: [
+    'foam.u2.layout.Cols',
+    'foam.u2.layout.Rows',
+    'foam.u2.ControllerMode',
+    'foam.u2.layout.Item'
+  ],
+  imports: [
+    'stack'
+  ],
+  exports: [
+    'controllerMode'
+  ],
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.comics.v2.DAOControllerConfig',
+      name: 'data'
+    },
+    {
+      name: 'controllerMode',
+      factory: function() {
+        return this.ControllerMode.VIEW;
+      }
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'obj'
+    },
+    {
+      class: 'foam.u2.ViewSpecWithJava',
+      name: 'viewView',
+      expression: function(data$viewViews) {
+        return data$viewViews[0].view;
+      }
+    }
+  ],
+  actions: [
+    {
+      name: 'primary',
+      code: function() {
+        alert('TODO');
+      }
+    },
+    {
+      name: 'edit',
+      code: function() {
+        this.controllerMode = this.ControllerMode.EDIT;
+      }
+    },
+    {
+      name: 'delete',
+      code: function() {
+        alert('TODO');
+      }
+    }
+  ],
+  methods: [
     function initE() {
       var self = this;
       this.SUPER();
       this
-        .start(this.RowLayout)
-          .start(this.ColumnLayout)
-            .add(this.slot(function(data$cannedQueries) {
-              return self.E().forEach(data$cannedQueries, function(q) {
-                this.add(q.name); // TODO: make these do something.
-              });
-            }))
-            .add(this.slot(function(data$browseViews) {
-              return self.E().forEach(data$browseViews, function(o) {
-                // TODO: make these do something.
-                // TODO: make these icons.
-                this.add(o.name);
-              });
-            }))
-          .end()
-          .start(this.ColumnLayout)
-            .tag(self.Toolbar, { data$: self.predicate$ })
-            .startContext({data: self}).add(self.EXPORT).endContext()
-          .end()
-          .add(self.slot(function(browseView) {
-            return self.E().tag(browseView, {
-              data: self.predicatedDAO$proxy
-            });
-          }))
-        .end();
+        .add(self.slot(function(obj, data$viewBorder, data$viewViews) {
+          return self.E()
+            .start(self.Rows)
+              .start(self.Cols)
+                .start(self.Rows)
+                  .startContext({ data: self.stack }).add(self.stack.BACK).endContext()
+                  .start('h1').add(obj.toSummary()).end()
+                .end()
+                .startContext({data: self}).add(self.PRIMARY).endContext()
+              .end()
+
+              .start(self.Cols)
+                .startContext({data: self}).add(self.EDIT).endContext()
+                .startContext({data: self}).add(self.DELETE).endContext()
+              .end()
+
+              .start(data$viewBorder)
+                .start(self.Cols)
+                  .forEach(data$viewViews, function(o) {
+                    // TODO: make these do something.
+                    // TODO: make these icons.
+                    this.add(o.name);
+                  })
+                .end()
+                .start(self.Item)
+                  .style({ margin: 'auto' })
+                  .add(self.slot(function(viewView) {
+                    return self.E().tag(viewView, {
+                      data: obj
+                    });
+                  }))
+                .end()
+              .end()
+            .end();
+        }));
     }
   ]
-});
+}); 

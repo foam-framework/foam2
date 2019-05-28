@@ -10,12 +10,23 @@ foam.CLASS({
       factory: function() {
         return foam.mlang.predicate.True.create();
       }
+    },
+    {
+      class: 'String', // TODO remove.
+      name: 'data_',
+      label: 'Search',
+      view: { class: 'foam.u2.TextField' },
+      maxLength: 0
     }
   ],
   methods: [
     function initE() {
       this.SUPER();
-      this.add('TODO MAKE TOOLBAR');
+      this.tag({
+        class: 'foam.u2.detail.SectionedDetailPropertyView',
+        data: this,
+        prop: this.DATA_
+      });
     }
   ]
 });

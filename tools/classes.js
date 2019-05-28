@@ -229,7 +229,7 @@ var classes = [
   'foam.nanos.menu.TabsMenu',
   'foam.nanos.menu.ViewMenu',
   'foam.comics.v2.CannedQuery',
-  'foam.comics.v2.BrowseView',
+  'foam.comics.v2.NamedView',
   'foam.nanos.notification.email.EmailMessage',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.EmailTemplate',
