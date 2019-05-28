@@ -50,9 +50,9 @@ public class RulerDAOTest extends Test {
     test(user1.getEmail().equals("nanos@nanos.net"), "user's email is nanos@nanos.net: on object update 'create' rules are not executed");
     test(user1.getLastName().equals("Unknown"), "user's lastName is 'Unknown': update rule was executed");
     test(user1.getEmailVerified(), "Set emailVerified to true in rule 9");
-    User executeUser = (User) userDAO.find(666L);
-    test(executeUser != null, "Test user from executor was added successfully");
-    test(executeUser.getFirstName().equals("ExecutorTest"), "Test user's first name is ExecutorTest.");
+    Rule executeRule = (Rule) ruleDAO.find(666L);
+    test(executeRule != null, "Test rule from executor was added successfully");
+    test(executeRule.getRuleGroup().equals("fake test group"), "Test rule's group name is fake test group.");
 
     // wait for async
     try {
@@ -206,11 +206,12 @@ public class RulerDAOTest extends Test {
     RuleAction action5 = (x17, obj, oldObj, ruler, agent) -> {
       User user = (User) obj;
       user.setLastName("Unknown");
-      User executeUser = new User();
-      executeUser.setId(666L);
-      executeUser.setFirstName("ExecutorTest");
+      Rule executeRule = new Rule();
+      executeRule.setId(666L);
+      executeRule.setRuleGroup("fake test group");
+      executeRule.setDaoKey("fakeDaoKey");
       agent.submit(x112 -> {
-        userDAO.put(executeUser);
+        ruleDAO.put(executeRule);
       }, "RulerDAOTest add account");
 
     };
