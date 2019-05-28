@@ -184,7 +184,7 @@ foam.CLASS({
           .start(self.Rows).addClass(this.myClass('container'))
             .start(self.Cols).style({'align-items': 'center'})
               .start('h1').add(data.browseTitle$).end()
-              .startContext({data: self}).tag(self.CREATE).endContext()
+              .startContext({data: self}).add(self.CREATE).endContext()
             .end()
             .start(this.CardBorder)
               .start(data$browseBorder).addClass(this.myClass('inner-table'))
