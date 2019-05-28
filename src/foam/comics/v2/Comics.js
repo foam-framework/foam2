@@ -25,6 +25,10 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpecWithJava',
       name: 'view'
+    },
+    {
+      class: 'String',
+      name: 'icon'
     }
   ]
 }); 
@@ -88,7 +92,8 @@ foam.CLASS({
         return [
           {
             name: 'Table',
-            view: { class: 'foam.u2.view.ScrollTableView' }
+            view: { class: 'foam.u2.view.ScrollTableView' },
+            icon: ''
           }
         ];
       }
@@ -115,7 +120,8 @@ foam.CLASS({
         return [
           {
             name: 'SDV',
-            view: { class: 'foam.u2.detail.SectionedDetailView' }
+            view: { class: 'foam.u2.detail.SectionedDetailView' },
+            icon: ''
           }
         ];
       }
@@ -136,6 +142,20 @@ foam.CLASS({
     'foam.u2.layout.Rows',
     'foam.u2.borders.CardBorder'
   ],
+
+  css: `
+    ^container {
+      padding: 32px;
+    }
+
+    ^inner-table {
+      padding: 16px 24px;
+    }
+
+    ^ .foam-u2-view-ScrollTableView-table {
+      width: 100%;
+    }
+  `,
 
   properties: [
     {
@@ -161,13 +181,15 @@ foam.CLASS({
       this.addClass(this.myClass())
       .add(this.slot(function(data, data$browseBorder) {
         return self.E()
-          .start(self.Rows)
-            .start(self.Cols)
+          .start(self.Rows).addClass(this.myClass('container'))
+            .start(self.Cols).style({'align-items': 'center'})
               .start('h1').add(data.browseTitle$).end()
-              .startContext({data: self}).add(self.CREATE).endContext()
+              .startContext({data: self}).tag(self.CREATE, {  }).endContext()
             .end()
-            .start(data$browseBorder)
-              .tag(self.DAOBrowserView, { data: data })
+            .start(this.CardBorder)
+              .start(data$browseBorder).addClass(this.myClass('inner-table'))
+                .tag(self.DAOBrowserView, { data: data })
+              .end()
             .end()
           .end();
       }));

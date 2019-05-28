@@ -24,15 +24,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function initE() {
-      this.SUPER();
-      this.addClass(this.myClass());
-      this.style({
-        'justify-content': 'space-between',
-        'align-items': 'stretch'
-      });
-    },
-
     function start(spec, args, slot) {
       var c = this.SUPER(spec, args, slot);
       // Force the parent to this because the add() override could cause
@@ -74,8 +65,16 @@ foam.CLASS({
     ^ {
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
+      align-items: stretch;
     }
-  `
+  `,
+  methods: [
+    function initE() {
+      this.SUPER();
+      this.addClass(this.myClass());
+    },
+  ]
 });
 
 foam.CLASS({
@@ -85,8 +84,16 @@ foam.CLASS({
   css: `
     ^ {
       display: flex;
+      justify-content: space-between;
+      align-items: stretch;
     }
-  `
+  `,
+  methods: [
+    function initE() {
+      this.SUPER();
+      this.addClass(this.myClass());
+    },
+  ]
 });
 
 foam.CLASS({
