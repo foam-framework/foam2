@@ -46,7 +46,9 @@ foam.CLASS({
                   rules.add(foundRule.updateRule(rule));
                 }
               } else {
-                rules.add(rule);
+                if ( rule.getEnabled() ) {
+                  rules.add(rule);
+                }
               }
               Collections.sort(rules, new Desc(Rule.PRIORITY));
             } else {
