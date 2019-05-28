@@ -1531,7 +1531,7 @@ return false
   // boolean uppercase = lhs.getClass().isEnum(); TODO: Account for ENUMs? (See js)
   Object rhs = getArg2().f(obj);
 
-  if ( rhs instanceof List) {
+  if ( rhs instanceof List ) {
     List list = (List) rhs;
     for ( Object o : list ) {
       if ( ( ( (Comparable) lhs ).compareTo( (Comparable) o ) ) == 0 ) {
