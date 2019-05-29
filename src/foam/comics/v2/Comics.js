@@ -223,7 +223,8 @@ foam.CLASS({
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.layout.Item',
-    'foam.u2.search.Toolbar'
+    'foam.u2.search.Toolbar',
+    'foam.u2.ActionView'
   ],
 
   css: `
@@ -294,6 +295,9 @@ foam.CLASS({
         obj: obj
       });
     },
+    function toggleCannedQuery(cannedQueryPredicate, predicate) {
+        predicate = cannedQueryPredicate;
+    },
     function initE() {
       var self = this;
       this.addClass(this.myClass());
@@ -306,6 +310,8 @@ foam.CLASS({
                 .start(self.Cols)
                   .forEach(data$cannedQueries, function(q) {
                     this.add(q.name); // TODO: make these do something.
+                    this.tag(self.ActionView, { actions: this.TOGGLE_CANNED_QUERY }
+                    )
                   })
                 .end()
                 .start(self.Cols)
