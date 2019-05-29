@@ -101,7 +101,20 @@ foam.CLASS({
     {
       class: 'FObjectArray',
       of: 'foam.comics.v2.CannedQuery',
-      name: 'cannedQueries'
+      name: 'cannedQueries',
+      // ! These are just for testing purposes until we wire up the cannedQueries with the models
+      factory: function(){
+        return [
+          {
+            name: 'All',
+            predicate: foam.mlang.predicate.True.create()
+          },
+          {
+            name: 'None',
+            predicate: foam.mlang.predicate.False.create()
+          }
+        ]
+      }
     },
     {
       class: 'foam.u2.ViewSpecWithJava',
