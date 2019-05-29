@@ -8,7 +8,7 @@ foam.RELATIONSHIP({
   cardinality: '*:*',
   sourceModel: 'foam.nanos.auth.Group',
   targetModel: 'foam.nanos.auth.Permission',
-  forwardName: 'permissions2',
+  forwardName: 'permissions',
   inverseName: 'groups',
   junctionDAOKey: 'groupPermissionJunctionDAO'
 });

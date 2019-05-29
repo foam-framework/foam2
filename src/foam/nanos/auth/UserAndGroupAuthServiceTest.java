@@ -7,6 +7,7 @@ import foam.util.Password;
 
 import javax.security.auth.AuthPermission;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -51,16 +52,13 @@ public class UserAndGroupAuthServiceTest
       group.setId("" + i);
       group.setDescription("Group " + i + " users");
 
-      Permission[] permissions = new Permission[numPermissions];
+      group = (Group) ((DAO) getLocalGroupDAO()).put(group);
       for ( int j = 0 ; j < numPermissions ; j++ ) {
         foam.nanos.auth.Permission permission = new foam.nanos.auth.Permission();
         permission.setId(i + "" + j);
         permission.setDescription("Group" + i + " permissions-" + j);
-        permissions[j] = permission;
+        group.getPermissions(getX()).add(permission);
       }
-
-      group.setPermissions(permissions);
-      ((DAO) getLocalGroupDAO()).put(group);
     }
 
     long endTime                = System.nanoTime();
@@ -131,8 +129,9 @@ public class UserAndGroupAuthServiceTest
       int randomGroup = ThreadLocalRandom.current().nextInt(0, sink.getArray().size());
       Group group     = (Group) sink.getArray().get(randomGroup);
 
-      int randomPermission  = ThreadLocalRandom.current().nextInt(0, group.getPermissions().length);
-      Permission permission = group.getPermissions()[randomPermission];
+      List<Permission> groupPermissions = ((ArraySink) group.getPermissions(getX()).getDAO().select(new ArraySink())).getArray();
+      int randomPermission  = ThreadLocalRandom.current().nextInt(0, groupPermissions.size());
+      Permission permission = groupPermissions.get(randomPermission);
       permissions.add(permission);
 
       AuthPermission authAdminpermission = new AuthPermission(permission.getId());
