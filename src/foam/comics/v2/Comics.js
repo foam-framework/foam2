@@ -152,6 +152,10 @@ foam.CLASS({
       padding: 0px 24px;
     }
 
+    ^inner-table .foam-u2-view-TableView th {
+      background: #ffffff
+    }
+
     ^ .foam-u2-view-ScrollTableView-table {
       width: 100%;
     }
