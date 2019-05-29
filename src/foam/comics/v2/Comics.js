@@ -284,6 +284,12 @@ foam.CLASS({
       code: function() {
         alert('TODO');
       }
+    },
+    {
+      name: 'toggleCannedQuery',
+      code: function(cannedQueryPredicate) {
+        this.predicate = cannedQueryPredicate;
+      }
     }
   ],
   methods: [
@@ -295,9 +301,6 @@ foam.CLASS({
         obj: obj
       });
     },
-    function toggleCannedQuery(cannedQueryPredicate, predicate) {
-        predicate = cannedQueryPredicate;
-    },
     function initE() {
       var self = this;
       this.addClass(this.myClass());
@@ -308,11 +311,20 @@ foam.CLASS({
             .start(self.Rows)
               .start(self.Cols).addClass(this.myClass('top-bar'))
                 .start(self.Cols)
-                  .forEach(data$cannedQueries, function(q) {
-                    this.add(q.name); // TODO: make these do something.
-                    this.tag(self.ActionView, { actions: this.TOGGLE_CANNED_QUERY }
-                    )
-                  })
+                //callif
+                .tag( foam.u2.view.RadioView, { choices: data$cannedQueries.map(o => [o.predicate, o.name]), data$: self.predicate$, isHorizontal: true })
+                  // .forEach(data$cannedQueries, function(q) {              
+                  //   this.tag(self.ActionView, { 
+                  //     action: foam.core.Action.create({
+                  //       name: q.name,
+                  //       code: function() {
+                  //         self.predicate = q.predicate
+                  //       }}), 
+                  //       data: self ,
+                  //       buttonStyle: foam.u2.ButtonStyle.UNSTYLED
+                  //     }
+                  //   )
+                  // })
                 .end()
                 .start(self.Cols)
                   .callIf(data$browseViews.length > 1, function() {
