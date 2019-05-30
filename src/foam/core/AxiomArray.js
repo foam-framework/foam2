@@ -68,6 +68,12 @@ foam.CLASS({
     {
       name: 'adaptArrayElement',
       value: function(a, prop) {
+        if ( a.class ) {
+          var m = this.__context__.lookup(a.class);
+          if ( ! m ) throw 'Unknown class : ' + a.class;
+          return m.create(a, this);
+        }
+
         var of = this.__context__.lookup(prop.of);
         return of.isInstance(a) ? a : of.create(a, this);
       }

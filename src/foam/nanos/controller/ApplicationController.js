@@ -357,8 +357,11 @@ foam.CLASS({
     },
 
     // This method is for toast notification message
-    function notify(message, type) {
-      this.add(this.NotificationMessage.create({ message, type }));
+    function notify(data, type) {
+      this.add(this.NotificationMessage.create({
+        message: data,
+        type: type
+      }));
     }
   ],
 

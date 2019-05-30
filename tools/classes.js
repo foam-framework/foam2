@@ -230,14 +230,24 @@ var classes = [
   'foam.nanos.menu.ViewMenu',
   'foam.comics.v2.CannedQuery',
   'foam.comics.v2.NamedView',
+  // Email base model or interface
   'foam.nanos.notification.email.EmailMessage',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.EmailTemplate',
+  'foam.nanos.notification.email.EmailPropertyService',
+  // Email service Files
   'foam.nanos.notification.email.SMTPEmailService',
-  'foam.nanos.notification.email.ClientEmailService',
   'foam.nanos.notification.email.NullEmailService',
-  'foam.nanos.notification.email.DAOEmailService',
-  'foam.nanos.notification.email.SMTPEmailMessageDAO',
+  'foam.nanos.notification.email.AsyncEmailService',
+  'foam.nanos.notification.email.ProxyEmailService',
+  // Property set on Emails
+  'foam.nanos.notification.email.ChainedPropertyService',
+  'foam.nanos.notification.email.EmailTemplateApplyEmailPropertyService',
+  'foam.nanos.notification.email.GroupEmailTemplateService',
+  'foam.nanos.notification.email.EmailConfigEmailPropertyService',
+  // EmailMessageDAO(service) decorator
+  'foam.nanos.notification.email.EmailServiceDAO',
+
   'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.email.ClientPOP3EmailService',
   'foam.nanos.notification.push.PushService',
@@ -355,6 +365,8 @@ var classes = [
   'foam.nanos.dig.exception.EmptyParameterException',
   'foam.nanos.dig.exception.GeneralException',
 
+  'foam.nanos.app.EmailConfig',
+  
   'foam.nanos.test.StockSnapshot',
   'foam.nanos.analytics.FoldManagerDAODecorator',
   'foam.nanos.analytics.DAOFoldManager',

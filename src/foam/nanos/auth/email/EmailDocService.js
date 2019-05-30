@@ -34,7 +34,7 @@ foam.CLASS({
     'foam.nanos.auth.HtmlDoc',
     'foam.nanos.logger.Logger',
     'foam.nanos.notification.email.EmailMessage',
-    'foam.nanos.notification.email.EmailService',
+    'foam.util.Emails.EmailsUtility',
     'foam.util.Password',
     'foam.util.SafetyUtil',
     'java.util.Calendar',
@@ -54,14 +54,13 @@ foam.CLASS({
         ArraySink listSink = (ArraySink) htmlDocDAO.orderBy(new foam.mlang.order.Desc(HtmlDoc.ID)).limit(1).select(new ArraySink());
         HtmlDoc doc = (HtmlDoc) listSink.getArray().get(0);
         
-        EmailService email = (EmailService) getEmail();
         EmailMessage message = new EmailMessage();
         message.setTo(new String[] { user.getEmail() });
       
         HashMap<String, Object> args = new HashMap<>();
         args.put("doc", doc.getBody());
       
-        email.sendEmailFromTemplate(getX(), user, message, "docEmail", args);
+        EmailsUtility.sendEmailFromTemplate(getX(), user, message, "docEmail", args);
         return true;
       }catch(Throwable t){
         ((Logger) getLogger()).error("Error retrieving Terms and Conditions.", t);
