@@ -28,7 +28,11 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'icon'
+      name: 'enabledIcon'
+    },
+    {
+      class: 'String',
+      name: 'disabledIcon'
     }
   ]
 }); 
@@ -85,6 +89,7 @@ foam.CLASS({
       }
     },
     {
+      // TODO: add an enabled and disabled icon
       class: 'FObjectArray',
       of: 'foam.comics.v2.NamedView',
       name: 'browseViews',
@@ -93,17 +98,14 @@ foam.CLASS({
           {
             name: 'Table',
             view: { class: 'foam.u2.view.ScrollTableView' },
-            icon: 'images/bulleted-list.svg'
-          },
-          {
-            name: 'TableTest',
-            view: { class: 'foam.u2.view.ScrollTableView' },
-            icon: 'images/bulleted-list.svg'
+            enabledIcon: 'images/list-view-enabled.svg',
+            disabledIcon: 'images/list-view-disabled.svg'
           },
           {
             name: 'Tree',
-            view: { class: 'foam.u2.view.TreeView' },
-            icon: 'images/bulleted-list.svg' 
+            view: { class: 'foam.u2.view.ScrollTableView' },
+            enabledIcon: 'images/account-structure-enabled.svg',
+            disabledIcon: 'images/account-structure-disabled.svg'  
           }
         ];
       }
@@ -144,7 +146,9 @@ foam.CLASS({
           {
             name: 'SDV',
             view: { class: 'foam.u2.detail.SectionedDetailView' },
-            icon: 'images/sdv-icon.svg'
+            // TODO: Add a disabled icon later when we have more viewViews
+            enabledIcon: 'images/sdv-icon.svg',
+            disabledIcon: 'images/sdv-icon.svg'
           }
         ];
       }
@@ -337,17 +341,11 @@ foam.CLASS({
                 .end()
                 .start(self.Cols)
                   .callIf(data$browseViews.length > 1, function() {
-                    console.log(data$browseViews.length);
-                    this.tag( foam.u2.view.TabChoiceView, { 
-                        choices: data$browseViews.map(o => [o.view, o.name]),
+                    this.tag( foam.u2.view.IconChoiceView, { 
+                        choices: data$browseViews.map(o => [o.view, o.enabledIcon]),
                         data$: self.browseView$,
                       }
                     )
-                    // this.forEach(data$browseViews, function(o) {
-                    //   // TODO: make these do something.
-                    //   // DONE: make these icons.
-                    //   this.start({ class: 'foam.u2.tag.Image', data: o.icon})
-                    // })
                   })
                 .end()
               .end()
