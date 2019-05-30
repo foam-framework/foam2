@@ -61,6 +61,7 @@ foam.CLASS({
       this.removeAllChildren();
 
       this.add(this.choices.map(function(c) {
+        console.log(c);
         return this.E('div').
           addClass(this.myClass()).
           start('input').
@@ -78,7 +79,10 @@ foam.CLASS({
           start('label').
             attrs({for: id}).
             start('span').
-              start({ class: 'foam.u2.tag.Image', data: c[1] }).
+              start({ 
+                      class: 'foam.u2.tag.Image',
+                      data: self.slot(function (data) { return data === c[0] ? c[1] : c[2]})
+                  }).
               end().
             end().
           end();

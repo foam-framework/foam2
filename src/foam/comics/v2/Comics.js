@@ -353,7 +353,7 @@ foam.CLASS({
                   .start(self.Cols)
                     .callIf(data$browseViews.length > 1, function() {
                       this.tag( foam.u2.view.IconChoiceView, { 
-                          choices: data$browseViews.map(o => [o.view, o.enabledIcon]),
+                          choices: data$browseViews.map(o => [o.view, o.enabledIcon, o.disabledIcon]),
                           data$: self.browseView$,
                         }
                       )
