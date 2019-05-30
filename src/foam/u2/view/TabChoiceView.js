@@ -39,11 +39,22 @@ foam.CLASS({
       cursor: pointer;
       line-height: 48px;
       /* will need to figure out a better way for the width */
-      width: 80px;
+      width: 112px;
       text-align:center;
       font-size: 14px;
     }
   `,
+
+  properties: [
+    {
+      class: 'String',
+      name: 'defaultTabWidth',
+      documentation: `
+        TBD implemented, need to figure out how to conditionally style ^ label
+      `,
+      value: '112px'
+    }
+  ],
 
   methods: [
     function initE() {
