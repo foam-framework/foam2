@@ -316,21 +316,17 @@ foam.CLASS({
               .start(self.Cols).addClass(this.myClass('top-bar'))
                 .start(self.Cols)
                 .callIf(data$cannedQueries.length > 0, function() {
-                    this.callIf
+                  // TODO: Add conditional to not show the options if only one canned query
                     this.tag( foam.u2.view.TabChoiceView, { 
                       choices: data$cannedQueries.map(o => [o.predicate, o.name]),
                       data$: self.predicate$,
                     }
                   )
                 })
-                .callIfElse(data$cannedQueries.length == 0, function() {
-
-                })
+                // TODO: Add another conditional to show ALL if no canned queries specified
                 .end()
                 .start(self.Cols)
-                  .callIf(data$browseViews.length >= 1, function() {
-
-                    
+                  .callIf(data$browseViews.length > 1, function() {
                     this.forEach(data$browseViews, function(o) {
                       // TODO: make these do something.
                       // DONE: make these icons.
