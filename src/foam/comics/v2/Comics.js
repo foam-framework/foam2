@@ -359,6 +359,9 @@ foam.CLASS({
                         }
                       )
                     })
+                    /**
+                     * By default the browseView should always be a table view
+                     */
                   .end()
                 .end()
               })
