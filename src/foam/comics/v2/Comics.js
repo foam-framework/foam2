@@ -312,19 +312,12 @@ foam.CLASS({
               .start(self.Cols).addClass(this.myClass('top-bar'))
                 .start(self.Cols)
                 //callif
-                .tag( foam.u2.view.RadioView, { choices: data$cannedQueries.map(o => [o.predicate, o.name]), data$: self.predicate$, isHorizontal: true })
-                  // .forEach(data$cannedQueries, function(q) {              
-                  //   this.tag(self.ActionView, { 
-                  //     action: foam.core.Action.create({
-                  //       name: q.name,
-                  //       code: function() {
-                  //         self.predicate = q.predicate
-                  //       }}), 
-                  //       data: self ,
-                  //       buttonStyle: foam.u2.ButtonStyle.UNSTYLED
-                  //     }
-                  //   )
-                  // })
+                .tag( foam.u2.view.TabChoiceView, { 
+                    choices: data$cannedQueries.map(o => [o.predicate, o.name]),
+                    data$: self.predicate$,
+                    isHorizontal: true
+                  }
+                )
                 .end()
                 .start(self.Cols)
                   .callIf(data$browseViews.length > 1, function() {
