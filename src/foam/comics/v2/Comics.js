@@ -102,12 +102,12 @@ foam.CLASS({
             enabledIcon: 'images/list-view-enabled.svg',
             disabledIcon: 'images/list-view-disabled.svg'
           },
-          // {
-          //   name: 'Tree',
-          //   view: { class: 'foam.u2.view.ScrollTableView' },
-          //   enabledIcon: 'images/account-structure-enabled.svg',
-          //   disabledIcon: 'images/account-structure-disabled.svg'  
-          // }
+          {
+            name: 'Tree',
+            view: { class: 'foam.u2.view.ScrollTableView' },
+            enabledIcon: 'images/account-structure-enabled.svg',
+            disabledIcon: 'images/account-structure-disabled.svg'  
+          }
         ];
       }
     },
@@ -252,7 +252,6 @@ foam.CLASS({
     }
 
     ^top-bar {
-      padding-top: 20px;
       border-bottom: solid 1px #e7eaec;
     }
 
@@ -333,7 +332,7 @@ foam.CLASS({
           return self.E()
             .start(self.Rows)
               .callIf(data$cannedQueries.length > 1 || data$browseViews > 1, function() {
-                this.start(self.Cols).addClass(self.myClass('top-bar'))
+                this.start(self.Cols).addClass(self.myClass('top-bar')).style({ 'align-items': 'center' })
                   .start(self.Cols)
                     .callIf(data$cannedQueries.length > 1, function() {
                         this.tag( foam.u2.view.TabChoiceView, { 

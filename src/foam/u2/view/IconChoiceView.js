@@ -25,8 +25,14 @@ foam.CLASS({
       display: flex;
     }
 
+    ^ input[type="radio"] {
+      display: none;
+    }
+
     ^ label {
-      position: relative;
+      cursor: pointer;
+      line-height: 48px;
+      margin-left: 16px;
     }
   `,
 
@@ -72,7 +78,8 @@ foam.CLASS({
           start('label').
             attrs({for: id}).
             start('span').
-              add(c[1]).
+              start({ class: 'foam.u2.tag.Image', data: c[1] }).
+              end().
             end().
           end();
       }.bind(this)));
