@@ -25,8 +25,22 @@ foam.CLASS({
       display: flex;
     }
 
+    ^ input[type="radio"] {
+      display: none;
+    }
+
+    ^ [type=radio]:checked ~ label {
+      border-bottom: solid 3px #406dea;
+      font-weight: bold;
+      color: #406dea;
+    }
+
     ^ label {
-      position: relative;
+      cursor: pointer;
+      line-height: 48px;
+      width: 80px;
+      text-align:center;
+      font-size: 14px;
     }
   `,
 

@@ -252,7 +252,7 @@ foam.CLASS({
     }
 
     ^top-bar {
-      padding: 20px 0px;
+      padding-top: 20px;
       border-bottom: solid 1px #e7eaec;
     }
 
