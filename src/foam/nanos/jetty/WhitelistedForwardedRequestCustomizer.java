@@ -93,7 +93,7 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
         request.setRemoteAddr(InetSocketAddress.createUnresolved(forwardedForHost, forwardedForPort));
 
         // System.out.printf("SUCCESS: New remote address is: %s %n", request.getRemoteAddr());
-        // System.out.printf("SUCCESS: New remote port is: %i %n", request.getRemotePort());
+        // System.out.printf("SUCCESS: New remote port is: %d %n", request.getRemotePort());
 
 
       } else if ( this.forwardedForProxyWhitelist.contains(request.getRemoteAddr()) ) {
@@ -106,7 +106,7 @@ public class WhitelistedForwardedRequestCustomizer extends ForwardedRequestCusto
         request.setRemoteAddr(InetSocketAddress.createUnresolved(forwardedForHost, forwardedForPort));
         
         // System.out.printf("SUCCESS: New remote address is: %s %n", request.getRemoteAddr());
-        // System.out.printf("SUCCESS: New remote port is: %i %n", request.getRemotePort());
+        // System.out.printf("SUCCESS: New remote port is: %d %n", request.getRemotePort());
       } else {
         logger.warning("UNAUTHORIZED: Unauthorized proxy remote address is: " + request.getRemoteAddr());
 
