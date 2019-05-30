@@ -336,7 +336,7 @@ foam.CLASS({
                 // TODO: Add another conditional to show ALL if no canned queries specified
                 .end()
                 .start(self.Cols)
-                  .callIf(data$browseViews.length >= 1, function() {
+                  .callIf(data$browseViews.length > 1, function() {
                     console.log(data$browseViews.length);
                     this.tag( foam.u2.view.TabChoiceView, { 
                         choices: data$browseViews.map(o => [o.view, o.name]),
