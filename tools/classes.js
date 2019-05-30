@@ -202,8 +202,6 @@ var classes = [
   'foam.nanos.session.Session',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.om.OM',
-  'foam.nanos.om.OMInfo',
-  'foam.nanos.om.OMLogger',
   'foam.nanos.pm.PM',
   'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',

@@ -15,16 +15,13 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.X'
+    'foam.core.X',
+    'foam.dao.DAO'
   ],
 
-  ids: ['classType', 'name', 'created'],
+  ids: ['name', 'created'],
 
   properties: [
-    {
-      class: 'Class',
-      name: 'classType'
-    },
     {
       class: 'String',
       name: 'name'
@@ -50,15 +47,16 @@ foam.CLASS({
         }
       ],
       javaCode: `
-    if ( x == null ) return;
-    OMLogger logger = (OMLogger) x.get(DAOOMLogger.SERVICE_NAME);
-    if ( logger != null ) logger.log(this);
+      if ( x == null ) return;
+      DAO omDAO = (DAO) x.get("omDAO");
+      if ( omDAO != null ) omDAO.put(this);
 `
     },
     {
       name: 'doFolds',
       javaCode: `
-    fm.foldForState(getClassType().getId()+":"+getName(), getCreated(), 0);
+      // We only care about the name, everything else is filler 
+      fm.foldForState(getName(), getCreated(), 1);
       `
     }
   ]
