@@ -232,6 +232,10 @@ foam.CLASS({
       margin-left: 16px;
     }
 
+    ^ .foam-u2-ActionView img {
+      margin-right: 0;
+    }
+
     ^top-bar {
       padding: 20px 0px;
       border-bottom: solid 1px #e7eaec;
@@ -280,7 +284,7 @@ foam.CLASS({
     {
       name: 'export',
       label: '',
-      icon: 'images/export-icon-resting.svg',
+      icon: 'images/export-arrow-icon.svg',
       code: function() {
         alert('TODO');
       }
@@ -311,21 +315,25 @@ foam.CLASS({
             .start(self.Rows)
               .start(self.Cols).addClass(this.myClass('top-bar'))
                 .start(self.Cols)
-                //callif
-                .tag( foam.u2.view.TabChoiceView, { 
-                    choices: data$cannedQueries.map(o => [o.predicate, o.name]),
-                    data$: self.predicate$,
-                    isHorizontal: true
-                  }
-                )
+                .callIf(data$cannedQueries.length > 0, function() {
+                    this.callIf
+                    this.tag( foam.u2.view.TabChoiceView, { 
+                      choices: data$cannedQueries.map(o => [o.predicate, o.name]),
+                      data$: self.predicate$,
+                    }
+                  )
+                })
+                .callIfElse(data$cannedQueries.length == 0, function() {
+
+                })
                 .end()
                 .start(self.Cols)
-                  .callIf(data$browseViews.length > 1, function() {
+                  .callIf(data$browseViews.length >= 1, function() {
 
                     
                     this.forEach(data$browseViews, function(o) {
                       // TODO: make these do something.
-                      // TODO: make these icons.
+                      // DONE: make these icons.
                       this.start({ class: 'foam.u2.tag.Image', data: o.icon})
                     })
                   })
