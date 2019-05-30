@@ -94,6 +94,16 @@ foam.CLASS({
             name: 'Table',
             view: { class: 'foam.u2.view.ScrollTableView' },
             icon: 'images/bulleted-list.svg'
+          },
+          {
+            name: 'TableTest',
+            view: { class: 'foam.u2.view.ScrollTableView' },
+            icon: 'images/bulleted-list.svg'
+          },
+          {
+            name: 'Tree',
+            view: { class: 'foam.u2.view.TreeView' },
+            icon: 'images/bulleted-list.svg' 
           }
         ];
       }
@@ -316,7 +326,7 @@ foam.CLASS({
               .start(self.Cols).addClass(this.myClass('top-bar'))
                 .start(self.Cols)
                 .callIf(data$cannedQueries.length > 0, function() {
-                  // TODO: Add conditional to not show the options if only one canned query
+                    // TODO: Add conditional to not show the options if only one canned query
                     this.tag( foam.u2.view.TabChoiceView, { 
                       choices: data$cannedQueries.map(o => [o.predicate, o.name]),
                       data$: self.predicate$,
@@ -326,12 +336,18 @@ foam.CLASS({
                 // TODO: Add another conditional to show ALL if no canned queries specified
                 .end()
                 .start(self.Cols)
-                  .callIf(data$browseViews.length > 1, function() {
-                    this.forEach(data$browseViews, function(o) {
-                      // TODO: make these do something.
-                      // DONE: make these icons.
-                      this.start({ class: 'foam.u2.tag.Image', data: o.icon})
-                    })
+                  .callIf(data$browseViews.length >= 1, function() {
+                    console.log(data$browseViews.length);
+                    this.tag( foam.u2.view.TabChoiceView, { 
+                        choices: data$browseViews.map(o => [o.view, o.name]),
+                        data$: self.browseView$,
+                      }
+                    )
+                    // this.forEach(data$browseViews, function(o) {
+                    //   // TODO: make these do something.
+                    //   // DONE: make these icons.
+                    //   this.start({ class: 'foam.u2.tag.Image', data: o.icon})
+                    // })
                   })
                 .end()
               .end()

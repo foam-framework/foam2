@@ -17,7 +17,7 @@
 
 foam.CLASS({
   package: 'foam.u2.view',
-  name: 'TabChoiceView',
+  name: 'IconChoiceView',
   extends: 'foam.u2.view.ChoiceView',
 
   css: `
