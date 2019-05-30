@@ -277,7 +277,11 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
-      name: 'predicate'
+      name: 'predicate',
+      factory: function() {
+        // showing all by default if no cannedQueries are specified, see below in the initE
+        return foam.mlang.predicate.True.create();
+      }
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -329,15 +333,21 @@ foam.CLASS({
             .start(self.Rows)
               .start(self.Cols).addClass(this.myClass('top-bar'))
                 .start(self.Cols)
-                .callIf(data$cannedQueries.length > 0, function() {
-                    // TODO: Add conditional to not show the options if only one canned query
-                    this.tag( foam.u2.view.TabChoiceView, { 
-                      choices: data$cannedQueries.map(o => [o.predicate, o.name]),
-                      data$: self.predicate$,
+                  .callIf(data$cannedQueries.length > 1, function() {
+                      this.tag( foam.u2.view.TabChoiceView, { 
+                        choices: data$cannedQueries.map(o => [o.predicate, o.name]),
+                        data$: self.predicate$,
+                      }
+                    )
+                  })
+                  .callIf(data$cannedQueries.length === 1, function() {
+                      self.predicate = data$cannedQueries[0].predicate;
                     }
                   )
-                })
-                // TODO: Add another conditional to show ALL if no canned queries specified
+                  /**
+                   * otherwise if no cannedQueries are specified then the default
+                   * will show all entries so that we do not break history code
+                   */
                 .end()
                 .start(self.Cols)
                   .callIf(data$browseViews.length > 1, function() {
