@@ -34,7 +34,6 @@ FOAM_FILES([
   { name: "foam/nanos/auth/EnabledAware" },
   { name: "foam/nanos/auth/DeletedAware" },
   { name: "foam/nanos/auth/Group" },
-  { name: "foam/nanos/auth/AddMissingPermissionsRule" },
   { name: "foam/nanos/auth/ServiceProvider" },
   { name: "foam/nanos/auth/Language" },
   { name: "foam/nanos/auth/CreatedAware" },
