@@ -176,10 +176,6 @@ foam.CLASS({
       of: 'foam.nanos.auth.LookAndFeel',
       name: 'lookAndFeel'
     },
-
-    // TODO: Get rid of all of the LookAndFeel-related properties on
-    // ApplicationController and just read them off of the 'lookAndFeel'
-    // property instead.
     'currentMenu',
     'lastMenuLaunched',
     'webApp',
