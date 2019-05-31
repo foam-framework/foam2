@@ -12,27 +12,26 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.pm.PM;
 
-protected PM chainPM;
-protected PipePMDAO chainStart_;
-
-public class PipePMDAO
+public class PipelinedPMDAO
   extends PMDAO
 {
-    public PipePMDAO(X x, DAO delagate) {
-        chainStart_ = null;
+
+  protected PM chainPM;
+  protected PipelinedPMDAO chainStart_;
+  
+    public PipelinedPMDAO(X x, DAO delegate) {
         super(x, delegate);
-        init();
+        chainStart_ = null;
     }
 
-    public PipePMDAO(X x, DAO delegate, ChainedPMDAO chainStart) {
-        chainStart_ = chainStart;
+    public PipelinedPMDAO(X x, DAO delegate, PipelinedPMDAO chainStart) {
         super(x, delegate);
-        init();
+        chainStart_ = chainStart;
     }
 
     @Override
     public FObject put_(X x, FObject obj) {
-        if(chainStart == null) 
+        if(chainStart_ == null)
             chainPM = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(putName_).build();
         else
             chainStart_.chainPM.log(x);
@@ -42,7 +41,7 @@ public class PipePMDAO
     @Override
     public FObject find_(X x, Object id) {
         PM pm;
-        if(chainStart == null) 
+        if(chainStart_ == null)
             chainPM = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(putName_).build();
         else
             chainStart_.chainPM.log(x);
@@ -52,7 +51,7 @@ public class PipePMDAO
     @Override
     public FObject remove_(X x, FObject obj) {
         PM pm;
-        if(chainStart == null) 
+        if(chainStart_ == null)
             chainPM = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(putName_).build();
         else
             chainStart_.chainPM.log(x);
@@ -61,7 +60,7 @@ public class PipePMDAO
 
     @Override
     public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-        if(chainStart == null) 
+        if(chainStart_ == null)
             chainPM = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(putName_).build();
         else
             chainStart_.chainPM.log(x);

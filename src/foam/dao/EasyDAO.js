@@ -100,16 +100,72 @@ foam.dao.DAO delegate = getInnerDAO() == null ?
 
 if ( delegate instanceof foam.dao.MDAO ) setMdao((foam.dao.MDAO)delegate);
 
+PipelinedPMDAO pipelineDAO = null;
+
+if(getPipelinedPMDAO()){
+  pipelineDAO = new foam.dao.PipelinedPMDAO(getX(), delegate);
+  delegate = pipelineDAO;
+}
+
 if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
   delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
+}
+
+if(getPipelinedPMDAO()){
+  delegate = new foam.dao.PipelinedPMDAO(getX(), delegate, pipelineDAO);
+}
+
+if(getPipelinedPMDAO()){
+  pipelineDAO = new foam.dao.PipelinedPMDAO(getX(), delegate);
+  delegate = pipelineDAO;
+}
+
+if(getPipelinedPMDAO()) delegate = new foam.dao.PipelinedPMDAO(getX(), delegate);
+
+if(getPipelinedPMDAO()){
+  delegate = new foam.dao.PipelinedPMDAO(getX(), delegate, pipelineDAO);
+}
+
+if(getPipelinedPMDAO()){
+  pipelineDAO = new foam.dao.PipelinedPMDAO(getX(), delegate);
+  delegate = pipelineDAO;
+}
+
+if(getPipelinedPMDAO()) delegate = new foam.dao.PipelinedPMDAO(getX(), delegate);
+
+if(getPipelinedPMDAO()){
+  delegate = new foam.dao.PipelinedPMDAO(getX(), delegate, pipelineDAO);
+}
+
+if(getPipelinedPMDAO()){
+  pipelineDAO = new foam.dao.PipelinedPMDAO(getX(), delegate);
+  delegate = pipelineDAO;
 }
 
 if ( getGuid() && getSeqNo() ) {
   throw new RuntimeException("EasyDAO GUID and SeqNo are mutually exclusive");
 }
 
+if(getPipelinedPMDAO()){
+  delegate = new foam.dao.PipelinedPMDAO(getX(), delegate, pipelineDAO);
+}
+
+if(getPipelinedPMDAO()){
+  pipelineDAO = new foam.dao.PipelinedPMDAO(getX(), delegate);
+  delegate = pipelineDAO;
+}
+
 if ( getGuid() ) {
   delegate = new foam.dao.GUIDDAO.Builder(getX()).setDelegate(delegate).build();
+}
+
+if(getPipelinedPMDAO()){
+  delegate = new foam.dao.PipelinedPMDAO(getX(), delegate, pipelineDAO);
+}
+
+if(getPipelinedPMDAO()){
+  pipelineDAO = new foam.dao.PipelinedPMDAO(getX(), delegate);
+  delegate = pipelineDAO;
 }
 
 if ( getSeqNo() ) {
@@ -119,10 +175,28 @@ if ( getSeqNo() ) {
     build();
 }
 
+if(getPipelinedPMDAO()){
+  delegate = new foam.dao.PipelinedPMDAO(getX(), delegate, pipelineDAO);
+}
+
+if(getPipelinedPMDAO()){
+  pipelineDAO = new foam.dao.PipelinedPMDAO(getX(), delegate);
+  delegate = pipelineDAO;
+}
+
 if ( getContextualize() ) {
   delegate = new foam.dao.ContextualizingDAO.Builder(getX()).
     setDelegate(delegate).
     build();
+}
+
+if(getPipelinedPMDAO()){
+  delegate = new foam.dao.PipelinedPMDAO(getX(), delegate, pipelineDAO);
+}
+
+if(getPipelinedPMDAO()){
+  pipelineDAO = new foam.dao.PipelinedPMDAO(getX(), delegate);
+  delegate = pipelineDAO;
 }
 
 if ( getAuthenticate() ) {
@@ -130,6 +204,10 @@ if ( getAuthenticate() ) {
     getName(),
     getAuthenticateRead(),
     delegate);
+}
+
+if(getPipelinedPMDAO()){
+  delegate = new foam.dao.PipelinedPMDAO(getX(), delegate, pipelineDAO);
 }
 
 if ( getPm() ) {
@@ -147,7 +225,7 @@ return delegate;
     {
       /** Have EasyDAO create pipeline of PMs which measure the performance of each node in the decorator chain */
       class: 'Boolean',
-      name: 'pipePMDAO',
+      name: 'pipelinedPMDAO',
       value: false
     },
     {
