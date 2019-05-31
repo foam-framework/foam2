@@ -13,18 +13,18 @@ import foam.mlang.predicate.Predicate;
 import foam.nanos.pm.PM;
 
 protected PM chainPM;
-protected ChainedPMDAO chainStart_;
+protected PipePMDAO chainStart_;
 
-public class ChainedPMDAO
+public class PipePMDAO
   extends PMDAO
 {
-    public ChainedPMDAO(X x, DAO delagate) {
+    public PipePMDAO(X x, DAO delagate) {
         chainStart_ = null;
         super(x, delegate);
         init();
     }
 
-    public ChainedPMDAO(X x, DAO delegate, ChainedPMDAO chainStart) {
+    public PipePMDAO(X x, DAO delegate, ChainedPMDAO chainStart) {
         chainStart_ = chainStart;
         super(x, delegate);
         init();

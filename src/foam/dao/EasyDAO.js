@@ -145,6 +145,12 @@ return delegate;
       name: 'innerDAO'
     },
     {
+      /** Have EasyDAO create pipeline of PMs which measure the performance of each node in the decorator chain */
+      class: 'Boolean',
+      name: 'pipedPM',
+      value: false
+    },
+    {
       /** Have EasyDAO use a sequence number to index items. Note that
         .seqNo and .guid features are mutually
         exclusive. */
