@@ -28,11 +28,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'enabledIcon'
-    },
-    {
-      class: 'String',
-      name: 'disabledIcon'
+      name: 'icon'
     }
   ]
 }); 
@@ -99,14 +95,12 @@ foam.CLASS({
           {
             name: 'Table',
             view: { class: 'foam.u2.view.ScrollTableView' },
-            enabledIcon: 'images/list-view-enabled.svg',
-            disabledIcon: 'images/list-view-disabled.svg'
+            icon: 'images/list-view-enabled.svg',
           },
           {
             name: 'Tree',
             view: { class: 'foam.u2.view.ScrollTableView' },
-            enabledIcon: 'images/account-structure-enabled.svg',
-            disabledIcon: 'images/account-structure-disabled.svg'  
+            icon: 'images/account-structure-enabled.svg',
           }
         ];
       }
@@ -148,8 +142,7 @@ foam.CLASS({
             name: 'SDV',
             view: { class: 'foam.u2.detail.SectionedDetailView' },
             // TODO: Add a disabled icon later when we have more viewViews
-            enabledIcon: 'images/sdv-icon.svg',
-            disabledIcon: 'images/sdv-icon.svg'
+            icon: 'images/sdv-icon.svg',
           }
         ];
       }
@@ -353,7 +346,7 @@ foam.CLASS({
                   .start(self.Cols)
                     .callIf(data$browseViews.length > 1, function() {
                       this.tag( foam.u2.view.IconChoiceView, { 
-                          choices: data$browseViews.map(o => [o.view, o.enabledIcon, o.disabledIcon]),
+                          choices: data$browseViews.map(o => [o.view, o.icon]),
                           data$: self.browseView$,
                         }
                       )

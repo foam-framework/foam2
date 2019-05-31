@@ -34,6 +34,11 @@ foam.CLASS({
       line-height: 48px;
       margin-left: 16px;
     }
+
+
+    ^disabled-icon {
+      opacity: 0.2;
+    }
   `,
 
   methods: [
@@ -81,9 +86,10 @@ foam.CLASS({
             start('span').
               start({ 
                       class: 'foam.u2.tag.Image',
-                      data: self.slot(function (data) { return data === c[0] ? c[1] : c[2]})
+                      data: c[1]
                   }).
               end().
+              enableClass(this.myClass('disabled-icon'), self.slot(function (data) { return data !== c[0] })).
             end().
           end();
       }.bind(this)));
