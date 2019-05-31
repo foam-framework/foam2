@@ -141,7 +141,6 @@ foam.CLASS({
           {
             name: 'SDV',
             view: { class: 'foam.u2.detail.SectionedDetailView' },
-            // TODO: Add a disabled icon later when we have more viewViews
             icon: 'images/sdv-icon.svg',
           }
         ];
@@ -357,7 +356,7 @@ foam.CLASS({
                   .end()
                 .end()
               })
-              .start(self.Cols).addClass(this.myClass('query-bar')).style({ 'align-items': 'center'})
+              .start(self.Cols).addClass(this.myClass('query-bar')).style({ 'align-items': 'flex-end'})
                 .start(self.Item)
                   .style({'flex-grow': 1 })
                     .tag(self.Toolbar, { data$: self.predicate$ })
@@ -385,6 +384,27 @@ foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOUpdateView',
   extends: 'foam.u2.View',
+
+  css:`
+    ^ {
+      padding: 32px
+    }
+
+    ^ .foam-u2-ActionView-back{
+      position: inherit;
+    }
+
+    ^account-name {
+      font-size: 36px;
+      font-weight: 600;
+    }
+
+    ^actions-header .foam-u2-ActionView {
+      margin-right: 24px;
+      line-height: 1.5
+    }
+  `,
+
   requires: [
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
@@ -446,31 +466,48 @@ foam.CLASS({
       var self = this;
       this.SUPER();
       this
+        .addClass(this.myClass())
         .add(self.slot(function(obj, data$viewBorder, data$viewViews) {
           return self.E()
             .start(self.Rows)
-              .start(self.Cols)
-                .start(self.Rows)
-                  // we will handle this in the StackView instead
-                  .startContext({ data: self.stack }).add(self.stack.BACK).endContext()
-                  .start('h1').add(obj.toSummary()).end()
+              .start(self.Rows)
+                // we will handle this in the StackView instead
+                .startContext({ data: self.stack }).tag(self.stack.BACK, {
+                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                    icon: 'images/edit-icon.svg'
+                  }).endContext()
+                .start(self.Cols).style({ 'align-items': 'center' })
+                  .start()
+                    .add(obj.toSummary())
+                      .addClass(this.myClass('account-name'))
+                  .end()
+                  .startContext({data: obj}).add(self.PRIMARY).endContext()
                 .end()
-                .startContext({data: self}).add(self.PRIMARY).endContext()
               .end()
 
               .start(self.Cols)
-                .startContext({data: self}).add(self.EDIT).endContext()
-                .startContext({data: self}).add(self.DELETE).endContext()
+                .start(self.Cols).addClass(this.myClass('actions-header'))
+                  .startContext({data: self}).tag(self.EDIT, {
+                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                    icon: 'images/edit-icon.svg'
+                  }).endContext()
+                  .startContext({data: self}).tag(self.DELETE, {
+                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                    icon: 'images/delete-icon.svg'
+                  }).endContext()
+                .end()
+                .start(self.Cols)
+                  .callIf(data$viewViews.length > 1, function() {
+                    this.tag( foam.u2.view.IconChoiceView, { 
+                        choices: data$viewViews.map(o => [o.view, o.icon]),
+                        data$: self.viewView$,
+                      }
+                    )
+                  })
+                .end()
               .end()
 
               .start(data$viewBorder)
-                .start(self.Cols)
-                  .forEach(data$viewViews, function(o) {
-                    // TODO: make these do something.
-                    // TODO: make these icons.
-                    this.add(o.name);
-                  })
-                .end()
                 .start(self.Item)
                   .style({ margin: 'auto' })
                   .add(self.slot(function(viewView) {
