@@ -21,7 +21,7 @@ public class ReadOnlyDAOContext
   }
 
   @Override
-  public Object get(Object name) {
+  public Object get(X x, Object name) {
     Object ret =  getX().get(this, name);
     if ( ret instanceof DAO ) {
       return new ReadOnlyDAO.Builder(x_).setDelegate((DAO)ret).build();
