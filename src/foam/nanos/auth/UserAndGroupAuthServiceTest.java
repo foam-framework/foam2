@@ -129,9 +129,9 @@ public class UserAndGroupAuthServiceTest
       int randomGroup = ThreadLocalRandom.current().nextInt(0, sink.getArray().size());
       Group group     = (Group) sink.getArray().get(randomGroup);
 
-      List<Permission> groupPermissions = ((ArraySink) group.getPermissions(getX()).getDAO().select(new ArraySink())).getArray();
-      int randomPermission  = ThreadLocalRandom.current().nextInt(0, groupPermissions.size());
-      Permission permission = groupPermissions.get(randomPermission);
+      List<GroupPermissionJunction> junctions = ((ArraySink) group.getPermissions(getX()).getJunctionDAO().where(foam.mlang.MLang.EQ(GroupPermissionJunction.SOURCE_ID, group.getId())).select(new ArraySink())).getArray();
+      int randomPermission  = ThreadLocalRandom.current().nextInt(0, junctions.size());
+      Permission permission = new Permission.Builder(getX()).setId(junctions.get(randomPermission).getTargetId()).build();
       permissions.add(permission);
 
       AuthPermission authAdminpermission = new AuthPermission(permission.getId());

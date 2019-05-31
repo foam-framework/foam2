@@ -135,15 +135,15 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.nanos.app.AppConfig',
-    'foam.nanos.session.Session',
     'foam.util.SafetyUtil',
     'org.eclipse.jetty.server.Request',
+    'javax.security.auth.AuthPermission',
+    'javax.servlet.http.HttpServletRequest',
     'java.util.List',
-    'javax.servlet.http.HttpServletRequest'
+    'static foam.mlang.MLang.EQ'
   ],
 
   methods: [
@@ -162,18 +162,18 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        List<Permission> permissions = ((ArraySink) getPermissions(x).getDAO().select(new ArraySink())).getArray();
+        List<GroupPermissionJunction> junctions = ((ArraySink) getPermissions(x).getJunctionDAO().where(EQ(GroupPermissionJunction.SOURCE_ID, getId())).select(new ArraySink())).getArray();
 
-        for ( Permission p : permissions ) {
-          if ( p.getId().startsWith("@") ) {
+        for ( GroupPermissionJunction j : junctions ) {
+          if ( j.getTargetId().startsWith("@") ) {
             DAO   dao   = (DAO) x.get("groupDAO");
-            Group group = (Group) dao.find(p.getId().substring(1));
+            Group group = (Group) dao.find(j.getTargetId().substring(1));
 
             if ( group != null && group.implies(x, permission) ) {
               return true;
             }
           } else {
-            if ( new javax.security.auth.AuthPermission(p.getId()).implies(permission) ) {
+            if ( new AuthPermission(j.getTargetId()).implies(permission) ) {
               return true;
             }
           }
@@ -182,11 +182,14 @@ foam.CLASS({
         return false;
       `,
       code: async function(x, permissionId) {
-        var arraySink = await this.permissions.dao.select();
-        var permissions = arraySink != null && Array.isArray(arraySink.array)
+        // TODO: Support inheritance via @
+        var arraySink = await this.permissions.junctionDAO
+          .where(foam.mlang.Expressions.EQ(foam.nanos.auth.GroupPermissionJunction.SOURCE_ID, this.id))
+          .select();
+        var junctions = arraySink != null && Array.isArray(arraySink.array)
           ? arraySink.array
           : [];
-        return permissions.some((p) => p.implies(permissionId));
+        return junctions.some((j) => foam.nanos.auth.Permission.create({ id: j.targetId }).implies(permissionId));
       }
     },
     {
@@ -350,7 +353,7 @@ foam.CLASS({
         { name: 'group', type: 'foam.nanos.auth.Group' }
       ],
       javaCode: `
-        group.getPermissions(x).getDAO().select(new CheckPermissionsSink(x));
+        group.getPermissions(x).getJunctionDAO().where(EQ(GroupPermissionJunction.SOURCE_ID, group.getId())).select(new CheckPermissionsSink(x));
       `
     },
     {
@@ -383,7 +386,15 @@ foam.CLASS({
   name: 'CheckPermissionsSink',
   extends: 'foam.dao.AbstractSink',
 
+  documentation: `
+    This sink will make sure that the user in the context it's initialized in
+    has the permission referenced by each GroupPermissionJunction passed into
+    it.
+  `,
+
   imports: ['auth'],
+
+  javaImports: ['foam.dao.DAO'],
 
   messages: [
     {
@@ -396,11 +407,19 @@ foam.CLASS({
     {
       name: 'put',
       javaCode: `
+        DAO groupDAO = (DAO) getX().get("groupDAO");
         AuthService auth = (AuthService) getAuth();
-        Permission permission = (Permission) obj;
-        String id = permission.getId();
+        GroupPermissionJunction junction = (GroupPermissionJunction) obj;
+        String permissionId = junction.getTargetId();
 
-        if ( ! auth.check(getX(), id) ) {
+        // If a permission starts with the @ symbol, then it inherits from
+        // another group. For example, a permission with the id "@admin" will
+        // inherit all of the permissions of the group with id "admin".
+        if ( permissionId.startsWith("@") ) {
+          String groupId = permissionId.substring(1);
+          Group group = (Group) groupDAO.inX(getX()).find(groupId);
+          group.checkUserHasAllPermissionsInGroupAndAncestors(getX(), group);
+        } else if ( ! auth.check(getX(), permissionId) ) {
           throw new AuthorizationException(ERROR_MESSAGE);
         }
       `
