@@ -22,6 +22,12 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'data',
+      postSet: function() {
+        this.of = undefined;
+      }
+    },
+    {
       class: 'Class',
       name: 'of',
       expression: function(data) {
