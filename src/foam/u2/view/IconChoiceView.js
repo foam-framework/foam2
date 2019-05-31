@@ -66,7 +66,6 @@ foam.CLASS({
       this.removeAllChildren();
 
       this.add(this.choices.map(function(c) {
-        console.log(c);
         return this.E('div').
           addClass(this.myClass()).
           start('input').

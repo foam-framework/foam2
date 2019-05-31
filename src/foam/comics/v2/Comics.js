@@ -451,6 +451,7 @@ foam.CLASS({
             .start(self.Rows)
               .start(self.Cols)
                 .start(self.Rows)
+                  // we will handle this in the StackView instead
                   .startContext({ data: self.stack }).add(self.stack.BACK).endContext()
                   .start('h1').add(obj.toSummary()).end()
                 .end()
