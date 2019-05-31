@@ -147,7 +147,7 @@ return delegate;
     {
       /** Have EasyDAO create pipeline of PMs which measure the performance of each node in the decorator chain */
       class: 'Boolean',
-      name: 'pipedPM',
+      name: 'pipePMDAO',
       value: false
     },
     {
