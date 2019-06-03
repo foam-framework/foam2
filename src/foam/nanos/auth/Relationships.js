@@ -4,22 +4,14 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-/*
 foam.RELATIONSHIP({
   cardinality: '*:*',
   sourceModel: 'foam.nanos.auth.Group',
   targetModel: 'foam.nanos.auth.Permission',
-  forwardName: 'permissions',
+  forwardName: 'permissions2',
   inverseName: 'groups',
-  sourceProperty: {
-    hidden: true
-  },
-  targetProperty: {
-    hidden: true
-  }
+  junctionDAOKey: 'groupPermissionJunctionDAO'
 });
-*/
-
 
 /*
 foam.RELATIONSHIP({
