@@ -124,18 +124,8 @@ foam.CLASS({
       of: 'foam.comics.v2.CannedQuery',
       name: 'cannedQueries',
       factory: function() {
-        const cannedQueries = this.of.getAxiomsByClass(foam.comics.v2.CannedQuery);
-
         // For legacy purposes and by default, if no cannedQueries are specified on the model then we will show all results
-        return cannedQueries.length > 0 
-                  ? cannedQueries 
-                  : [
-                      {
-                        name: 'All__CannedQuery',
-                        label: 'All',
-                        predicate: foam.mlang.predicate.True.create()
-                      }
-                    ]
+        return  this.of.getAxiomsByClass(foam.comics.v2.CannedQuery);
       }
     },
     {
@@ -207,7 +197,11 @@ foam.CLASS({
     {
       name: 'create',
       code: function() {
-        alert('TODO');
+        if ( ! this.stack ) return;
+        this.stack.push({
+          class: 'foam.comics.v2.DAOCreateView',
+          data$: this.data$,
+        });
       }
     }
   ],
@@ -284,6 +278,11 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'predicate',
+      expression: function(data$cannedQueries) {
+        return data$cannedQueries && data$cannedQueries.length 
+          ? data$cannedQueries[0].predicate
+          : foam.mlang.predicate.True.create();
+      }
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -525,4 +524,89 @@ foam.CLASS({
         }));
     }
   ]
-}); 
+});
+
+foam.CLASS({
+  package: 'foam.comics.v2',
+  name: 'DAOCreateView',
+  extends: 'foam.u2.View',
+
+  css:`
+    ^ {
+      padding: 32px
+    }
+
+    ^ .foam-u2-ActionView-back{
+      position: inherit;
+    }
+
+    ^account-name {
+      font-size: 36px;
+      font-weight: 600;
+    }
+  `,
+
+  requires: [
+    'foam.u2.layout.Cols',
+    'foam.u2.layout.Rows',
+    'foam.u2.ControllerMode',
+    'foam.u2.layout.Item'
+  ],
+  imports: [
+    'stack'
+  ],
+  exports: [
+    'controllerMode'
+  ],
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.comics.v2.DAOControllerConfig',
+      name: 'data'
+    },
+    {
+      name: 'controllerMode',
+      factory: function() {
+        return this.ControllerMode.CREATE;
+      }
+    },
+    {
+      class: 'foam.u2.ViewSpecWithJava',
+      name: 'viewView',
+      expression: function(data$viewViews) {
+        return data$viewViews[0].view;
+      }
+    }
+  ],
+  methods: [
+    function initE() {
+      var self = this;
+      this.SUPER();
+      this
+        .addClass(this.myClass())
+        .add(self.slot(function(data$viewBorder, data$browseTitle, data) {
+          return self.E()
+            .start(self.Rows)
+              .start(self.Rows)
+                // we will handle this in the StackView instead
+                .startContext({ data: self.stack }).tag(self.stack.BACK, {
+                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                    icon: 'images/back-icon.svg'
+                  }).endContext()
+                .start(self.Cols).style({ 'align-items': 'center' })
+                  .start()
+                    .add(`Create your ${data$browseTitle}`)
+                      .addClass(this.myClass('account-name'))
+                  .end()
+                .end()
+              .end()
+              .start(data$viewBorder)
+                .start(self.Item)
+                  .style({ margin: 'auto' })
+                  .tag(foam.u2.detail.SectionedDetailView, { data: data })
+                .end()
+              .end()
+        }));
+    }
+  ]
+});

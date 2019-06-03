@@ -18,7 +18,7 @@ foam.CLASS({
       class: 'foam.comics.v2.CannedQuery',
       label: 'Test Tings All',
       predicateFactory: function(e) {
-        return e.FALSE;
+        return e.TRUE;
       }
     },
     {
