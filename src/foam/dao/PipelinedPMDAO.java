@@ -13,7 +13,7 @@ import foam.mlang.predicate.Predicate;
 import foam.nanos.pm.PM;
 
 public class PipelinedPMDAO
-  extends PMDAO
+  extends ProxyDAO
 {
 
   protected PM chainPM;
@@ -32,7 +32,7 @@ public class PipelinedPMDAO
     @Override
     public FObject put_(X x, FObject obj) {
         if(chainStart_ == null)
-            chainPM = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(putName_).build();
+            chainPM = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(getDelegate().getClass().getName() + "_put").build();
         else
             chainStart_.chainPM.log(x);
         return super.put_(x, obj);
@@ -40,9 +40,8 @@ public class PipelinedPMDAO
 
     @Override
     public FObject find_(X x, Object id) {
-        PM pm;
         if(chainStart_ == null)
-            chainPM = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(putName_).build();
+            chainPM = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(getDelegate().getClass().getName() + "_find").build();
         else
             chainStart_.chainPM.log(x);
         return super.find_(x, id);
@@ -50,9 +49,8 @@ public class PipelinedPMDAO
 
     @Override
     public FObject remove_(X x, FObject obj) {
-        PM pm;
         if(chainStart_ == null)
-            chainPM = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(putName_).build();
+            chainPM = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(getDelegate().getClass().getName() + "_remove").build();
         else
             chainStart_.chainPM.log(x);
         return super.remove_(x, obj);
@@ -61,7 +59,7 @@ public class PipelinedPMDAO
     @Override
     public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
         if(chainStart_ == null)
-            chainPM = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(putName_).build();
+            chainPM = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(getDelegate().getClass().getName() + "_removeAll").build();
         else
             chainStart_.chainPM.log(x);
         super.removeAll_(x, skip, limit, order, predicate);
