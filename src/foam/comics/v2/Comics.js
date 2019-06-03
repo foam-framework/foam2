@@ -325,7 +325,6 @@ foam.CLASS({
       this.SUPER();
       this
         .add(self.slot(function(data$cannedQueries, data$browseViews) {
-          console.log(data$cannedQueries);
           return self.E()
             .start(self.Rows)
               .callIf(data$cannedQueries.length >= 1 || data$browseViews > 1, function() {

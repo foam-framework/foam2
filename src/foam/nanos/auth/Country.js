@@ -13,6 +13,7 @@ foam.CLASS({
   ids: ['code'],
 
   axioms: [
+    // ! Temporary remember to remove
     {
       class: 'foam.comics.v2.CannedQuery',
       label: 'Test Tings All',
