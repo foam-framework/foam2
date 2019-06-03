@@ -102,7 +102,7 @@ if ( delegate instanceof foam.dao.MDAO ) setMdao((foam.dao.MDAO)delegate);
 
 PipelinedPMDAO pipelineDAO = null;
 
-boolean pipePMDAO = getPipelinePMDAO();
+boolean pipePMDAO = getPipelinedPMDAO();
 
 if(pipePMDAO){
   pipelineDAO = new foam.dao.PipelinedPMDAO(getX(), delegate);

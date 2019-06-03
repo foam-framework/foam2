@@ -24,8 +24,7 @@ public class PipelinedPMDAO
         chainStart_ = null;
     }
 
-    public PipelinedPMDAO(X x, DAO delegate, PipelinedPMDAO chainStart) {
-        super(x, delegate);
+    public setChainStart(PipelinedPMDAO chainStart) {
         chainStart_ = chainStart;
     }
 
