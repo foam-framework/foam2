@@ -41,6 +41,19 @@ foam.CLASS({
       predicateFactory: function(e) {
         return e.FALSE;
       }
+    },
+    // TODO: Figure out how to distinguish between viewViews and browseViews since they both use foam.comics.v2.NamedView
+    {
+      class: 'foam.comics.v2.NamedView',
+      name: 'Table',
+      view: { class: 'foam.u2.view.ScrollTableView' },
+      icon: 'images/list-view-enabled.svg',
+    },
+    {
+      class: 'foam.comics.v2.NamedView',
+      name: 'Tree',
+      view: { class: 'foam.u2.view.ScrollTableView' },
+      icon: 'images/account-structure-enabled.svg',
     }
   ],
 

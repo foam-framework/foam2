@@ -104,18 +104,7 @@ foam.CLASS({
       of: 'foam.comics.v2.NamedView',
       name: 'browseViews',
       factory: function() {
-        return [
-          {
-            name: 'Table',
-            view: { class: 'foam.u2.view.ScrollTableView' },
-            icon: 'images/list-view-enabled.svg',
-          },
-          {
-            name: 'Tree',
-            view: { class: 'foam.u2.view.ScrollTableView' },
-            icon: 'images/account-structure-enabled.svg',
-          }
-        ];
+        return this.of.getAxiomsByClass(foam.comics.v2.NamedView);
       }
     },
     {
@@ -123,8 +112,7 @@ foam.CLASS({
       of: 'foam.comics.v2.CannedQuery',
       name: 'cannedQueries',
       factory: function() {
-        // For legacy purposes and by default, if no cannedQueries are specified on the model then we will show all results
-        return  this.of.getAxiomsByClass(foam.comics.v2.CannedQuery);
+        return this.of.getAxiomsByClass(foam.comics.v2.CannedQuery);
       }
     },
     {
@@ -296,7 +284,9 @@ foam.CLASS({
       class: 'foam.u2.ViewSpecWithJava',
       name: 'browseView',
       expression: function(data$browseViews) {
-        return data$browseViews[0].view;
+        return data$browseViews && data$browseViews.length
+          ? data$browseViews[0].view
+          : foam.u2.view.ScrollTableView
       }
     }
   ],
@@ -330,7 +320,7 @@ foam.CLASS({
         .add(self.slot(function(data$cannedQueries, data$browseViews) {
           return self.E()
             .start(self.Rows)
-              .callIf(data$cannedQueries.length >= 1 || data$browseViews > 1, function() {
+              .callIf(data$cannedQueries.length >= 1 || data$browseViews >= 1, function() {
                 this.start(self.Cols).addClass(self.myClass('top-bar')).style({ 'align-items': 'center' })
                   .start(self.Cols)
                     .callIf(data$cannedQueries.length > 1, function() {
@@ -358,9 +348,14 @@ foam.CLASS({
                         }
                       )
                     })
-                    /**
-                     * By default the browseView should always be a table view
-                     */
+                    .callIf(data$browseViews.length === 1, function() {
+                      self.browseView = data$browseViews[0].view;
+                    }
+                )
+                  /**
+                   * otherwise if no browseViews are specified then the default
+                   * will render a ScrollTableView so that we do not break history code
+                   */
                   .end()
                 .end()
               })
