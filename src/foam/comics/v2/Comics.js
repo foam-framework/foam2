@@ -279,6 +279,7 @@ foam.CLASS({
       of: 'foam.mlang.predicate.Predicate',
       name: 'predicate',
       expression: function(data$cannedQueries) {
+        debugger;
         return data$cannedQueries && data$cannedQueries.length 
           ? data$cannedQueries[0].predicate
           : foam.mlang.predicate.True.create();
@@ -336,6 +337,7 @@ foam.CLASS({
                         this.tag( foam.u2.view.TabChoiceView, { 
                             choices: data$cannedQueries.map(o => [o.predicate, o.label]),
                             data$: self.predicate$,
+                            defaultTabWidth: '144px'
                           }
                         )
                     })
@@ -362,7 +364,7 @@ foam.CLASS({
                   .end()
                 .end()
               })
-              .start(self.Cols).addClass(this.myClass('query-bar')).style({ 'align-items': 'flex-end'})
+              .start(self.Cols).addClass(this.myClass('query-bar')).style({ 'align-items': 'center'})
                 .start(self.Item)
                   .style({'flex-grow': 1 })
                     .tag(self.Toolbar, { /* data$: self.predicate$ */ })

@@ -12,6 +12,38 @@ foam.CLASS({
 
   ids: ['code'],
 
+  axioms: [
+    // ! Temporary remember to remove
+    {
+      class: 'foam.comics.v2.CannedQuery',
+      label: 'All',
+      predicateFactory: function(e) {
+        return e.TRUE;
+      }
+    },
+    {
+      class: 'foam.comics.v2.CannedQuery',
+      label: 'Shadow Accounts',
+      predicateFactory: function(e) {
+        return e.FALSE;
+      }
+    },
+    {
+      class: 'foam.comics.v2.CannedQuery',
+      label: 'Aggregate Accounts',
+      predicateFactory: function(e) {
+        return e.TRUE;
+      }
+    },
+    {
+      class: 'foam.comics.v2.CannedQuery',
+      label: 'Virtual Accounts',
+      predicateFactory: function(e) {
+        return e.FALSE;
+      }
+    }
+  ],
+
   properties: [
     {
       class: 'String',
@@ -46,5 +78,13 @@ foam.CLASS({
     javaCode: `
       return "{ code:" + this.getCode() + ", name:" + this.getName() + " }";
     `
-  }]
+  }],
+  actions: [
+    {
+      name: 'helloWorld',
+      code: function() {
+        alert('Hello World!');
+      }
+    },
+  ]
 });

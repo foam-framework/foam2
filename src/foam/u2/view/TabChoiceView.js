@@ -38,8 +38,7 @@ foam.CLASS({
     ^ label {
       cursor: pointer;
       line-height: 48px;
-      /* will need to figure out a better way for the width */
-      width: 112px;
+      width: 144px;
       text-align:center;
       font-size: 14px;
     }
@@ -52,7 +51,7 @@ foam.CLASS({
       documentation: `
         TBD implemented, need to figure out how to conditionally style ^ label
       `,
-      value: '112px'
+      value: '144px'
     }
   ],
 
