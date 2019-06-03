@@ -15,28 +15,16 @@ foam.CLASS({
   axioms: [
     {
       class: 'foam.comics.v2.CannedQuery',
-<<<<<<< Updated upstream
-      label: 'Test Tings None',
-      predicateFactory: function(e) {
-        return false;
-=======
       label: 'Test Tings All',
       predicateFactory: function(e) {
         return e.FALSE;
->>>>>>> Stashed changes
       }
     },
     {
       class: 'foam.comics.v2.CannedQuery',
-<<<<<<< Updated upstream
-      label: 'Test Tings All',
-      predicateFactory: function(e) {
-        return true;
-=======
       label: 'Test Tings None',
       predicateFactory: function(e) {
         return e.FALSE;
->>>>>>> Stashed changes
       }
     }
   ],

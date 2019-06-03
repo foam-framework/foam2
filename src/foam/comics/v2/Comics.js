@@ -123,14 +123,8 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.comics.v2.CannedQuery',
       name: 'cannedQueries',
-<<<<<<< Updated upstream
-      factory: null,
-      expression: function(of) {
-        const cannedQueries = of.getAxiomsByClass(foam.comics.v2.CannedQuery);
-=======
       factory: function() {
         const cannedQueries = this.of.getAxiomsByClass(foam.comics.v2.CannedQuery);
->>>>>>> Stashed changes
 
         // For legacy purposes and by default, if no cannedQueries are specified on the model then we will show all results
         return cannedQueries.length > 0 
@@ -339,17 +333,10 @@ foam.CLASS({
                   .start(self.Cols)
                     .callIf(data$cannedQueries.length > 1, function() {
                         this.tag( foam.u2.view.TabChoiceView, { 
-<<<<<<< Updated upstream
-                          choices: data$cannedQueries.map(o => [o.predicate, o.label]),
-                          data$: self.predicate$,
-                        }
-                      )
-=======
                             choices: data$cannedQueries.map(o => [o.predicate, o.label]),
                             data$: self.predicate$,
                           }
                         )
->>>>>>> Stashed changes
                     })
                     .callIf(data$cannedQueries.length === 1, function() {
                         self.predicate = data$cannedQueries[0].predicate;
