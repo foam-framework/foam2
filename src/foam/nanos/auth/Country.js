@@ -12,6 +12,23 @@ foam.CLASS({
 
   ids: ['code'],
 
+  axioms: [
+    {
+      class: 'foam.comics.v2.CannedQuery',
+      label: 'Test Tings None',
+      predicateFactory: function(e) {
+        return false;
+      }
+    },
+    {
+      class: 'foam.comics.v2.CannedQuery',
+      label: 'Test Tings All',
+      predicateFactory: function(e) {
+        return true;
+      }
+    }
+  ],
+
   properties: [
     {
       class: 'String',

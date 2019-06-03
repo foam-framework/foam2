@@ -39,12 +39,26 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'name'
+      name: 'name',
+      expression: function(label) {
+        // take only alpha num chars and append __CannedQuery
+        return label.replace(/[^0-9a-z]/gi, '') + '__CannedQuery';
+      }
+    },
+    {
+      class: 'String',
+      name: 'label'
     },
     {
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
-      name: 'predicate'
+      name: 'predicate',
+      expression: function(predicateFactory) {
+        return predicateFactory ? predicateFactory(foam.mlang.ExpressionsSingleton.create()) : null;
+      }
+    },
+    {
+      name: 'predicateFactory'
     }
   ]
 }); 
@@ -109,18 +123,20 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.comics.v2.CannedQuery',
       name: 'cannedQueries',
-      // ! These are just for testing purposes until we wire up the cannedQueries with the models
-      factory: function(){
-        return [
-          {
-            name: 'All',
-            predicate: foam.mlang.predicate.True.create()
-          },
-          {
-            name: 'None',
-            predicate: foam.mlang.predicate.False.create()
-          }
-        ]
+      factory: null,
+      expression: function(of) {
+        const cannedQueries = of.getAxiomsByClass(foam.comics.v2.CannedQuery);
+
+        // For legacy purposes and by default, if no cannedQueries are specified on the model then we will show all results
+        return cannedQueries.length > 0 
+                  ? cannedQueries 
+                  : [
+                      {
+                        name: 'All__CannedQuery',
+                        label: 'All',
+                        predicate: foam.mlang.predicate.True.create()
+                      }
+                    ]
       }
     },
     {
@@ -270,10 +286,6 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'predicate',
-      factory: function() {
-        // showing all by default if no cannedQueries are specified, see below in the initE
-        return foam.mlang.predicate.True.create();
-      }
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -321,6 +333,7 @@ foam.CLASS({
       this.SUPER();
       this
         .add(self.slot(function(data$cannedQueries, data$browseViews) {
+          console.log(data$cannedQueries);
           return self.E()
             .start(self.Rows)
               .callIf(data$cannedQueries.length > 1 || data$browseViews > 1, function() {
@@ -328,7 +341,7 @@ foam.CLASS({
                   .start(self.Cols)
                     .callIf(data$cannedQueries.length > 1, function() {
                         this.tag( foam.u2.view.TabChoiceView, { 
-                          choices: data$cannedQueries.map(o => [o.predicate, o.name]),
+                          choices: data$cannedQueries.map(o => [o.predicate, o.label]),
                           data$: self.predicate$,
                         }
                       )
@@ -474,7 +487,7 @@ foam.CLASS({
                 // we will handle this in the StackView instead
                 .startContext({ data: self.stack }).tag(self.stack.BACK, {
                     buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                    icon: 'images/edit-icon.svg'
+                    icon: 'images/back-icon.svg'
                   }).endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })
                   .start()
