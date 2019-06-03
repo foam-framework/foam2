@@ -99,7 +99,6 @@ foam.CLASS({
       }
     },
     {
-      // TODO: add an enabled and disabled icon
       // we should always have a table as the first index
       class: 'FObjectArray',
       of: 'foam.comics.v2.NamedView',
@@ -448,7 +447,6 @@ foam.CLASS({
       }
     },
     {
-      class: 'foam.core.Action',
       name: 'primary',
       expression: function(data$of){
         var allActions = data$of.getAxiomsByClass(foam.core.Action)
@@ -491,7 +489,7 @@ foam.CLASS({
                     .add(obj.toSummary())
                       .addClass(this.myClass('account-name'))
                   .end()
-                  .startContext({data: obj}).add(self.PRIMARY).endContext()
+                  .startContext({data: obj}).add(self.primary).endContext()
                 .end()
               .end()
 
@@ -591,7 +589,7 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(data$viewBorder, data$browseTitle, data) {
+        .add(self.slot(function(data$viewBorder, data$browseTitle, data$of) {
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -610,7 +608,7 @@ foam.CLASS({
               .start(data$viewBorder)
                 .start(self.Item)
                   .style({ margin: 'auto' })
-                  .tag(foam.u2.detail.SectionedDetailView, { data: data })
+                  .tag(foam.u2.detail.SectionedDetailView, { data: data$of.create() })
                 .end()
               .end()
         }));
