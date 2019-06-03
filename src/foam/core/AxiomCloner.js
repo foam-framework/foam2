@@ -42,16 +42,16 @@ foam.CLASS({
   ]
 });
 
-foam.SCRIPT({
-  package: 'foam.core',
-  name: 'AxiomClonerConvenienceMethod',
-  code: function() {
-    foam.axiomCloner = function(from, axiom, config) {
-      return foam.core.AxiomCloner.create({
+foam.LIB({
+  name: 'foam',
+  methods: [
+    function axiomCloner(from, axiom, config) {
+      return {
+        class: 'foam.core.AxiomCloner',
         from: from,
         axiom: axiom,
         config: config
-      });
-    };
-  }
+      };
+    }
+  ]
 });
