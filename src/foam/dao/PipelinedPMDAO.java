@@ -31,8 +31,11 @@ public class PipelinedPMDAO
 
     @Override
     public FObject put_(X x, FObject obj) {
-        if(chainStart_ == null)
-            chainPM = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(getDelegate().getClass().getName() + "_put").build();
+        if(chainStart_ == null) {
+            PM pm = new PM();
+            pm.setClassType(PMDAO.getOwnClassInfo());
+            pm.setName(getDelegate().getClass().getName() + "_put");
+        }
         else
             chainStart_.chainPM.log(x);
         return super.put_(x, obj);
@@ -40,8 +43,11 @@ public class PipelinedPMDAO
 
     @Override
     public FObject find_(X x, Object id) {
-        if(chainStart_ == null)
-            chainPM = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(getDelegate().getClass().getName() + "_find").build();
+        if(chainStart_ == null) {
+            PM pm = new PM();
+            pm.setClassType(PMDAO.getOwnClassInfo());
+            pm.setName(getDelegate().getClass().getName() + "_find");
+        }
         else
             chainStart_.chainPM.log(x);
         return super.find_(x, id);
@@ -49,8 +55,11 @@ public class PipelinedPMDAO
 
     @Override
     public FObject remove_(X x, FObject obj) {
-        if(chainStart_ == null)
-            chainPM = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(getDelegate().getClass().getName() + "_remove").build();
+        if(chainStart_ == null) {
+            PM pm = new PM();
+            pm.setClassType(PMDAO.getOwnClassInfo());
+            pm.setName(getDelegate().getClass().getName() + "_remove");
+        }
         else
             chainStart_.chainPM.log(x);
         return super.remove_(x, obj);
@@ -58,8 +67,11 @@ public class PipelinedPMDAO
 
     @Override
     public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-        if(chainStart_ == null)
-            chainPM = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(getDelegate().getClass().getName() + "_removeAll").build();
+        if(chainStart_ == null) {
+            PM pm = new PM();
+            pm.setClassType(PMDAO.getOwnClassInfo());
+            pm.setName(getDelegate().getClass().getName() + "_removeAll");
+        }
         else
             chainStart_.chainPM.log(x);
         super.removeAll_(x, skip, limit, order, predicate);
