@@ -25,6 +25,7 @@ FOAM_FILES([
   { name: "foam/nanos/app/ContextLookupAppConfigService"},
   { name: "foam/nanos/app/AppConfigService" },
   { name: "foam/nanos/app/ClientAppConfigService" },
+  { name: "foam/nanos/theme/Theme" },
   { name: "foam/nanos/controller/ApplicationController" },
   { name: "foam/nanos/app/Mode" },
   { name: "foam/nanos/auth/DayOfWeek" },
@@ -188,8 +189,5 @@ FOAM_FILES([
   { name: "foam/nanos/test/SerializationTestEchoService" },
   { name: "foam/nanos/analytics/Foldable" },
   { name: "foam/nanos/analytics/Candlestick" },
-  { name: "foam/nanos/test/ClientEchoService" },
-  { name: "foam/nanos/theme/Theme" },
-  { name: "foam/nanos/theme/ClientThemeService" },
-  { name: "foam/nanos/theme/SimpleThemeService", flags: ['java'] }
+  { name: "foam/nanos/test/ClientEchoService" }
 ]);

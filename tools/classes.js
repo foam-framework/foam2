@@ -383,10 +383,7 @@ var classes = [
   'io.c9.ace.Theme',
 
   // Themes
-  'foam.nanos.theme.Theme',
-  'foam.nanos.theme.ThemeService',
-  'foam.nanos.theme.ClientThemeService',
-  'foam.nanos.theme.SimpleThemeService'
+  'foam.nanos.theme.Theme'
 ];
 
 var abstractClasses = [
@@ -407,8 +404,7 @@ var skeletons = [
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.push.PushService',
-  'foam.nanos.test.EchoService',
-  'foam.nanos.theme.ThemeService'
+  'foam.nanos.test.EchoService'
 ];
 
 var proxies = [

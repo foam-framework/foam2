@@ -28,6 +28,7 @@ foam.CLASS({
 
   implements: [
     'foam.box.Context',
+    'foam.mlang.Expressions',
     'foam.nanos.controller.AppStyles'
   ],
 
@@ -38,6 +39,7 @@ foam.CLASS({
     'foam.nanos.auth.SignInView',
     'foam.nanos.auth.User',
     'foam.nanos.auth.resetPassword.ResetView',
+    'foam.nanos.theme.Theme',
     'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.u2.navigation.FooterView',
     'foam.u2.stack.Stack',
@@ -393,9 +395,32 @@ foam.CLASS({
     // Get the most appropriate Theme object from the server and use it to
     // customize the look and feel of the application.
     async function fetchTheme() {
-      // TODO: Don't use a service. Just hit the DAO directly.
       try {
-        this.theme = await this.client.themeService.getTheme(null, this.webApp);
+        if ( this.user && this.user.personalTheme ) {
+          // If the user has a personal theme, use that.
+          this.theme = await this.user.personalTheme$find;
+        } else {
+          // If they don't, then we fetch the most appropriate theme based on
+          // a few different parameters.
+          var predicates = [];
+
+          if ( this.webApp ) {
+            predicates.push(this.EQ(this.Theme.APP_NAME, this.webApp));
+          }
+
+          if ( this.user && this.user.spid ) {
+            predicates.push(this.EQ(this.Theme.SPID, this.user.spid));
+          }
+
+          var dao = this.client.themeDAO;
+          var predicate = this.TRUE;
+
+          if ( predicates.length ) {
+            predicate = this.Or.create({ args: predicates });
+          }
+
+          this.theme = await dao.find(predicate);
+        }
       } catch (err) {
         this.notify(this.LOOK_AND_FEEL_NOT_FOUND, 'error');
         console.error(err);

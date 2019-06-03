@@ -36,6 +36,10 @@ foam.CLASS({
       name: 'appName'
     },
     {
+      class: 'String',
+      name: 'spid'
+    },
+    {
       class: 'Long',
       name: 'priority',
       documentation: `
