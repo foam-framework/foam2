@@ -382,7 +382,10 @@ var classes = [
   'io.c9.ace.Editor',
   'io.c9.ace.KeyBinding',
   'io.c9.ace.Mode',
-  'io.c9.ace.Theme'
+  'io.c9.ace.Theme',
+
+  // Themes
+  'foam.nanos.theme.Theme'
 ];
 
 var abstractClasses = [
