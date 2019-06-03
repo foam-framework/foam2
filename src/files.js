@@ -593,7 +593,12 @@ FOAM_FILES([
   { name: "foam/u2/view/AnyView" },
   { name: "foam/u2/view/ArrayView" },
 
+  { name: "io/c9/ace/Config" },
+  { name: "io/c9/ace/Editor" },
+  { name: "io/c9/ace/KeyBinding" },
   { name: "io/c9/ace/Lib" },
+  { name: "io/c9/ace/Mode" },
+  { name: "io/c9/ace/Theme" },
 
   { name: "foam/u2/view/date/AbstractDateView"},
   { name: "foam/u2/view/date/CalendarDatePicker"},

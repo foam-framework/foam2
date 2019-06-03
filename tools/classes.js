@@ -149,6 +149,8 @@ var classes = [
   'foam.nanos.bench.Benchmark',
   'foam.nanos.auth.EnabledAware',
   'foam.nanos.auth.EnabledAwareDummy',
+  'foam.nanos.auth.GroupPermissionJunction',
+  'foam.nanos.auth.GroupPermissionJunctionRefinement',
   'foam.nanos.auth.Group',
   'foam.nanos.auth.CreatedAware',
   'foam.nanos.auth.CreatedAwareDAO',
@@ -383,7 +385,10 @@ var classes = [
   'io.c9.ace.Editor',
   'io.c9.ace.KeyBinding',
   'io.c9.ace.Mode',
-  'io.c9.ace.Theme'
+  'io.c9.ace.Theme',
+
+  // Themes
+  'foam.nanos.theme.Theme'
 ];
 
 var abstractClasses = [
