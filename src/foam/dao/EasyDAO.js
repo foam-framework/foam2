@@ -140,14 +140,19 @@ if ( getPipelinedPMDAO() ) {
   foam.dao.DAO currentDelegate = delegate;
   foam.dao.DAO tempDelegate;
   foam.dao.PipelinedPMDAO chainStart;
+  currentDelegate = new foam.dao.PipelinedPMDAO(getX(), currentDelegate);
+  chainStart = (PipelinedPMDAO) currentDelegate;
+  currentDelegate = currentDelegate.getDelegate();
   while ( ( currentDelegate != null ) && ( currentDelegate instanceof ProxyDAO ) ) {
-    currentDelegate = new foam.dao.PipelinedPMDAO(getX(), currentDelegate);
-    chainStart = (PipelinedPMDAO) currentDelegate;
-    currentDelegate = currentDelegate.getDelegate();
     tempDelegate = new foam.dao.PipelinedPMDAO(getX(), currentDelegate.getDelegate());
     tempDelegate.setChainStart(chainStart);
     currentDelegate.setDelegate(tempDelegate);
-    currentDelegate = tempDelegate.getDelegate();
+    if( ( tempDelegate.getDelegate() != null ) && ( tempDelegate.getDelegate() instanceof ProxyDAO ) ) {
+      chainstart = new foam.dao.PipelinedPMDAO(getX(), tempDelegate.getDelegate());
+      tempDelegate.setDelegate(chainStart);
+      currentDelegate = chainStart.getDelegate();
+      break;
+    }
   }
 }
 
