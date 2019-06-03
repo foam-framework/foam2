@@ -240,7 +240,8 @@ foam.CLASS({
     'foam.u2.layout.Rows',
     'foam.u2.layout.Item',
     'foam.u2.search.Toolbar',
-    'foam.u2.ActionView'
+    'foam.u2.ActionView',
+    'foam.u2.dialog.Popup'
   ],
 
   css: `
@@ -305,7 +306,10 @@ foam.CLASS({
       label: '',
       icon: 'images/export-arrow-icon.svg',
       code: function() {
-        alert('TODO');
+        this.add(this.Popup.create().tag({
+          class: 'foam.u2.ExportModal',
+          exportData: this.predicatedDAO
+        }));
       }
     }
   ],
@@ -442,15 +446,18 @@ foam.CLASS({
       expression: function(data$viewViews) {
         return data$viewViews[0].view;
       }
+    },
+    {
+      class: 'foam.core.Action',
+      name: 'primary',
+      expression: function(data$of){
+        var allActions = data$of.getAxiomsByClass(foam.core.Action)
+        var defaultAction = allActions.filter(a => a.isDefault);
+        return defaultAction.length >= 1 ? defaultAction[0] : allActions[0];
+      }
     }
   ],
   actions: [
-    {
-      name: 'primary',
-      code: function() {
-        alert('TODO');
-      }
-    },
     {
       name: 'edit',
       code: function() {
