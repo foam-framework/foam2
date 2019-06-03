@@ -21,7 +21,7 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   imports: [
-    'lookAndFeel'
+    'theme'
   ],
 
   documentation: 'View to display business logo and name.',
@@ -75,7 +75,7 @@ foam.CLASS({
         .start()
           .tag({
             class: 'foam.u2.tag.Image',
-            data$: this.lookAndFeel$.dot('logo')
+            data$: this.theme$.dot('logo')
           })
           .on('click', this.goToDefault)
         .end();

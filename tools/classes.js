@@ -164,10 +164,6 @@ var classes = [
   'foam.nanos.auth.Phone',
   'foam.nanos.auth.HumanNameTrait',
   'foam.nanos.auth.User',
-  'foam.nanos.auth.LookAndFeel',
-  'foam.nanos.auth.LookAndFeelService',
-  'foam.nanos.auth.ClientLookAndFeelService',
-  'foam.nanos.auth.SimpleLookAndFeelService',
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.UserUserJunction',
@@ -384,7 +380,13 @@ var classes = [
   'io.c9.ace.Editor',
   'io.c9.ace.KeyBinding',
   'io.c9.ace.Mode',
-  'io.c9.ace.Theme'
+  'io.c9.ace.Theme',
+
+  // Themes
+  'foam.nanos.theme.Theme',
+  'foam.nanos.theme.ThemeService',
+  'foam.nanos.theme.ClientThemeService',
+  'foam.nanos.theme.SimpleThemeService'
 ];
 
 var abstractClasses = [
@@ -397,7 +399,6 @@ var skeletons = [
   'foam.dao.DAO',
   'foam.mop.MOP',
   'foam.nanos.app.AppConfigService',
-  'foam.nanos.auth.LookAndFeelService',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.AgentAuthService',
   'foam.nanos.auth.email.EmailDocInterface',
@@ -406,7 +407,8 @@ var skeletons = [
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.push.PushService',
-  'foam.nanos.test.EchoService'
+  'foam.nanos.test.EchoService',
+  'foam.nanos.theme.ThemeService'
 ];
 
 var proxies = [

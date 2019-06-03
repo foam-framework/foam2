@@ -38,11 +38,11 @@ foam.RELATIONSHIP({
 */
 
 foam.RELATIONSHIP({
-  sourceModel: 'foam.nanos.auth.LookAndFeel',
+  sourceModel: 'foam.nanos.theme.Theme',
   targetModel: 'foam.nanos.auth.User',
   cardinality: '1:*',
   forwardName: 'users',
-  inverseName: 'personalLookAndFeel',
+  inverseName: 'personalTheme',
   sourceProperty: {
     hidden: true,
     visibility: 'HIDDEN'

@@ -5,8 +5,8 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.auth',
-  name: 'LookAndFeel',
+  package: 'foam.nanos.theme',
+  name: 'Theme',
 
   documentation: `
     An object that specifies how the web app should look and feel. Anything that
@@ -39,16 +39,16 @@ foam.CLASS({
       class: 'Long',
       name: 'priority',
       documentation: `
-        When multiple LookAndFeel objects could be applied to a given situation,
+        When multiple Theme objects could be applied to a given situation,
         this property is used to determine which one will be used.
 
-        For example, if an application has a default LookAndFeel but a user
-        copies it and modifies it to create their own LookAndFeel object, then
-        when that user logs in, we could either give them their own LookAndFeel
-        or the app's default LookAndFeel. Whichever LookAndFeel has the higher
+        For example, if an application has a default Theme but a user
+        copies it and modifies it to create their own Theme object, then
+        when that user logs in, we could either give them their own Theme
+        or the app's default Theme. Whichever Theme has the higher
         priority will be used, which in this case should be the user's custom
-        LookAndFeel (assuming its priority was set to be greater than the
-        default LookAndFeel's priority).
+        Theme (assuming its priority was set to be greater than the
+        default Theme's priority).
       `,
       tableWidth: 100
     },
@@ -107,7 +107,7 @@ foam.CLASS({
       name: 'preview',
       tableWidth: 100,
       code: function(X) {
-        X.ctrl.lookAndFeel = this;
+        X.ctrl.theme = this;
       }
     }
   ]

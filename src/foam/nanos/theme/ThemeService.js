@@ -5,14 +5,14 @@
  */
 
 foam.INTERFACE({
-  package: 'foam.nanos.auth',
-  name: 'LookAndFeelService',
+  package: 'foam.nanos.theme',
+  name: 'ThemeService',
 
   methods: [
     {
-      name: 'getLookAndFeel',
+      name: 'getTheme',
       async: true,
-      type: 'foam.nanos.auth.LookAndFeel',
+      type: 'foam.nanos.theme.Theme',
       args: [
         {
           name: 'x',

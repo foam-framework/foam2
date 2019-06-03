@@ -5,11 +5,11 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.auth',
-  name: 'ClientLookAndFeelService',
+  package: 'foam.nanos.theme',
+  name: 'ClientThemeService',
 
   implements: [
-    'foam.nanos.auth.LookAndFeelService'
+    'foam.nanos.theme.ThemeService'
   ],
 
   requires: [
@@ -25,7 +25,7 @@ foam.CLASS({
     {
       class: 'Stub',
       name: 'delegate',
-      of: 'foam.nanos.auth.LookAndFeelService',
+      of: 'foam.nanos.theme.ThemeService',
       factory: function() {
         return this.SessionClientBox.create({
           delegate: this.HTTPBox.create({

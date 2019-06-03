@@ -61,7 +61,7 @@ foam.CLASS({
     'lastMenuLaunched',
     'lastMenuLaunchedListener',
     'loginSuccess',
-    'lookAndFeel',
+    'theme',
     'menuListener',
     'notify',
     'pushMenu',
@@ -173,8 +173,8 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.nanos.auth.LookAndFeel',
-      name: 'lookAndFeel'
+      of: 'foam.nanos.theme.Theme',
+      name: 'theme'
     },
     'currentMenu',
     'lastMenuLaunched',
@@ -222,7 +222,7 @@ foam.CLASS({
 
     function initE() {
       this.clientPromise.then(() => {
-        this.fetchLookAndFeel().then(() => {
+        this.fetchTheme().then(() => {
           this
             .addClass(this.myClass())
             .start('div', null, this.topNavigation_$)
@@ -281,7 +281,7 @@ foam.CLASS({
 
       return css.replace(
         new RegExp('%' + M + '%', 'g'),
-        '/*%' + M + '%*/ ' + this.lookAndFeel[m]);
+        '/*%' + M + '%*/ ' + this.theme[m]);
     },
 
     function expandLongFormMacro(css, m) {
@@ -290,7 +290,7 @@ foam.CLASS({
 
       return css.replace(
         new RegExp('/\\*%' + M + '%\\*/[^;]*', 'g'),
-        '/*%' + M + '%*/ ' + this.lookAndFeel[m]);
+        '/*%' + M + '%*/ ' + this.theme[m]);
     },
 
     // CSS preprocessor, works on classes instantiated in subContext
@@ -306,7 +306,7 @@ foam.CLASS({
             // and update the CSS if it changes.
             if ( text != text2 ) {
               text = text2;
-              this.onDetach(this.lookAndFeel$.dot(m).sub(() => {
+              this.onDetach(this.theme$.dot(m).sub(() => {
                 var el = this.getElementById(eid);
                 el.innerText = this.expandLongFormMacro(el.innerText, m);
               }));
@@ -375,7 +375,7 @@ foam.CLASS({
 
       // Update the look and feel now that the user is logged in since there
       // might be a more specific one to use now.
-      this.fetchLookAndFeel();
+      this.fetchTheme();
     },
 
     // This listener should be called when a Menu item has been launched
@@ -390,11 +390,12 @@ foam.CLASS({
       this.lastMenuLaunched = m;
     },
 
-    // Get the most appropriate LookAndFeel object from the server and use it to
+    // Get the most appropriate Theme object from the server and use it to
     // customize the look and feel of the application.
-    async function fetchLookAndFeel() {
+    async function fetchTheme() {
+      // TODO: Don't use a service. Just hit the DAO directly.
       try {
-        this.lookAndFeel = await this.client.lookAndFeelService.getLookAndFeel(null, this.webApp);
+        this.theme = await this.client.themeService.getTheme(null, this.webApp);
       } catch (err) {
         this.notify(this.LOOK_AND_FEEL_NOT_FOUND, 'error');
         console.error(err);
@@ -404,18 +405,18 @@ foam.CLASS({
       this.useCustomElements();
     },
 
-    // Use custom elements if supplied by the LookAndFeel.
+    // Use custom elements if supplied by the Theme.
     function useCustomElements() {
-      if ( ! this.lookAndFeel ) throw new Error(this.LOOK_AND_FEEL_NOT_FOUND);
+      if ( ! this.theme ) throw new Error(this.LOOK_AND_FEEL_NOT_FOUND);
 
-      if ( this.lookAndFeel.topNavigation && this.topNavigation_ ) {
+      if ( this.theme.topNavigation && this.topNavigation_ ) {
         this.topNavigation_.removeAllChildren();
-        this.topNavigation_.tag({ class: this.lookAndFeel.topNavigation });
+        this.topNavigation_.tag({ class: this.theme.topNavigation });
       }
 
-      if ( this.lookAndFeel.footerView && this.footerView_ ) {
+      if ( this.theme.footerView && this.footerView_ ) {
         this.footerView_.removeAllChildren();
-        this.footerView_.tag({ class: this.lookAndFeel.footerView });
+        this.footerView_.tag({ class: this.theme.footerView });
       }
     }
   ]
