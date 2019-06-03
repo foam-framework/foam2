@@ -103,16 +103,18 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.comics.v2.NamedView',
       name: 'browseViews',
-      factory: function() {
-        return this.of.getAxiomsByClass(foam.comics.v2.NamedView);
+      factory: null,
+      expression: function(of) {
+        return of.getAxiomsByClass(foam.comics.v2.NamedView);
       }
     },
     {
       class: 'FObjectArray',
       of: 'foam.comics.v2.CannedQuery',
       name: 'cannedQueries',
-      factory: function() {
-        return this.of.getAxiomsByClass(foam.comics.v2.CannedQuery);
+      factory: null,
+      expression: function(of) {
+        return of.getAxiomsByClass(foam.comics.v2.CannedQuery);
       }
     },
     {
