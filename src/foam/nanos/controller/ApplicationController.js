@@ -256,10 +256,8 @@ foam.CLASS({
       }
     },
 
-    /**
-     * Get current user, else show login.
-     */
     async function fetchUser() {
+      /** Get current user, else show login. */
       try {
         var result = await this.client.auth.getCurrentUser(null);
         this.loginSuccess = !! result;
@@ -295,8 +293,8 @@ foam.CLASS({
         '/*%' + M + '%*/ ' + this.theme[m]);
     },
 
-    // CSS preprocessor, works on classes instantiated in subContext
     function wrapCSS(text, id) {
+      /** CSS preprocessor, works on classes instantiated in subContext. */
       if ( text ) {
         var eid = foam.u2.Element.NEXT_ID();
 
@@ -343,8 +341,8 @@ foam.CLASS({
       });
     },
 
-    // This method is for toast notification message
     function notify(data, type) {
+      /** Convenience method to create toast notifications. */
       this.add(this.NotificationMessage.create({
         message: data,
         type: type
@@ -353,13 +351,13 @@ foam.CLASS({
   ],
 
   listeners: [
-    /**
-     * Called whenever the group updates.
-     *   - Updates the portal view based on the group
-     *   - Update the look and feel of the app based on the group or user
-     *   - Go to a menu based on either the hash or the group
-     */
     function onUserAgentAndGroupLoaded() {
+      /**
+       * Called whenever the group updates.
+       *   - Updates the portal view based on the group
+       *   - Update the look and feel of the app based on the group or user
+       *   - Go to a menu based on either the hash or the group
+       */
       if ( ! this.user.emailVerified ) {
         this.loginSuccess = false;
         this.stack.push({ class: 'foam.nanos.auth.ResendVerificationEmail' });
@@ -380,21 +378,27 @@ foam.CLASS({
       this.fetchTheme();
     },
 
-    // This listener should be called when a Menu item has been launched
-    // by some Menu View. Is exported.
     function menuListener(m) {
+      /**
+       * This listener should be called when a Menu item has been launched
+       * by some Menu View. Is exported.
+       */
       this.currentMenu = m;
     },
 
-    // This listener should be called when a Menu has been launched but does
-    // not navigate to a new screen. Typically for SubMenus
     function lastMenuLaunchedListener(m) {
+      /**
+       * This listener should be called when a Menu has been launched but does
+       * not navigate to a new screen. Typically for SubMenus.
+       */
       this.lastMenuLaunched = m;
     },
 
-    // Get the most appropriate Theme object from the server and use it to
-    // customize the look and feel of the application.
     async function fetchTheme() {
+      /**
+       * Get the most appropriate Theme object from the server and use it to
+       * customize the look and feel of the application.
+       */
       try {
         if ( this.user && this.user.personalTheme ) {
           // If the user has a personal theme, use that.
@@ -430,8 +434,8 @@ foam.CLASS({
       this.useCustomElements();
     },
 
-    // Use custom elements if supplied by the Theme.
     function useCustomElements() {
+      /** Use custom elements if supplied by the Theme. */
       if ( ! this.theme ) throw new Error(this.LOOK_AND_FEEL_NOT_FOUND);
 
       if ( this.theme.topNavigation && this.topNavigation_ ) {
