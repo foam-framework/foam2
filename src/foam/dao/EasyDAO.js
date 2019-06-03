@@ -102,7 +102,9 @@ if ( delegate instanceof foam.dao.MDAO ) setMdao((foam.dao.MDAO)delegate);
 
 PipelinedPMDAO pipelineDAO = null;
 
-if(getPipelinedPMDAO()){
+boolean pipePMDAO = getPipelinePMDAO();
+
+if(pipePMDAO){
   pipelineDAO = new foam.dao.PipelinedPMDAO(getX(), delegate);
   delegate = pipelineDAO;
 }
@@ -111,33 +113,33 @@ if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
   delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
 }
 
-if(getPipelinedPMDAO()){
+if(pipePMDAO){
   delegate = new foam.dao.PipelinedPMDAO(getX(), delegate, pipelineDAO);
 }
 
-if(getPipelinedPMDAO()){
+if(pipePMDAO){
   pipelineDAO = new foam.dao.PipelinedPMDAO(getX(), delegate);
   delegate = pipelineDAO;
 }
 
-if(getPipelinedPMDAO()) delegate = new foam.dao.PipelinedPMDAO(getX(), delegate);
+if(pipePMDAO) delegate = new foam.dao.PipelinedPMDAO(getX(), delegate);
 
-if(getPipelinedPMDAO()){
+if(pipePMDAO){
   delegate = new foam.dao.PipelinedPMDAO(getX(), delegate, pipelineDAO);
 }
 
-if(getPipelinedPMDAO()){
+if(pipePMDAO){
   pipelineDAO = new foam.dao.PipelinedPMDAO(getX(), delegate);
   delegate = pipelineDAO;
 }
 
-if(getPipelinedPMDAO()) delegate = new foam.dao.PipelinedPMDAO(getX(), delegate);
+if(pipePMDAO) delegate = new foam.dao.PipelinedPMDAO(getX(), delegate);
 
-if(getPipelinedPMDAO()){
+if(pipePMDAO){
   delegate = new foam.dao.PipelinedPMDAO(getX(), delegate, pipelineDAO);
 }
 
-if(getPipelinedPMDAO()){
+if(pipePMDAO){
   pipelineDAO = new foam.dao.PipelinedPMDAO(getX(), delegate);
   delegate = pipelineDAO;
 }
@@ -146,11 +148,11 @@ if ( getGuid() && getSeqNo() ) {
   throw new RuntimeException("EasyDAO GUID and SeqNo are mutually exclusive");
 }
 
-if(getPipelinedPMDAO()){
+if(pipePMDAO){
   delegate = new foam.dao.PipelinedPMDAO(getX(), delegate, pipelineDAO);
 }
 
-if(getPipelinedPMDAO()){
+if(pipePMDAO){
   pipelineDAO = new foam.dao.PipelinedPMDAO(getX(), delegate);
   delegate = pipelineDAO;
 }
@@ -159,11 +161,11 @@ if ( getGuid() ) {
   delegate = new foam.dao.GUIDDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
-if(getPipelinedPMDAO()){
+if(pipePMDAO){
   delegate = new foam.dao.PipelinedPMDAO(getX(), delegate, pipelineDAO);
 }
 
-if(getPipelinedPMDAO()){
+if(pipePMDAO){
   pipelineDAO = new foam.dao.PipelinedPMDAO(getX(), delegate);
   delegate = pipelineDAO;
 }
@@ -175,11 +177,11 @@ if ( getSeqNo() ) {
     build();
 }
 
-if(getPipelinedPMDAO()){
+if(pipePMDAO){
   delegate = new foam.dao.PipelinedPMDAO(getX(), delegate, pipelineDAO);
 }
 
-if(getPipelinedPMDAO()){
+if(pipePMDAO){
   pipelineDAO = new foam.dao.PipelinedPMDAO(getX(), delegate);
   delegate = pipelineDAO;
 }
@@ -190,11 +192,11 @@ if ( getContextualize() ) {
     build();
 }
 
-if(getPipelinedPMDAO()){
+if(pipePMDAO){
   delegate = new foam.dao.PipelinedPMDAO(getX(), delegate, pipelineDAO);
 }
 
-if(getPipelinedPMDAO()){
+if(pipePMDAO){
   pipelineDAO = new foam.dao.PipelinedPMDAO(getX(), delegate);
   delegate = pipelineDAO;
 }
@@ -206,7 +208,7 @@ if ( getAuthenticate() ) {
     delegate);
 }
 
-if(getPipelinedPMDAO()){
+if(pipePMDAO){
   delegate = new foam.dao.PipelinedPMDAO(getX(), delegate, pipelineDAO);
 }
 
