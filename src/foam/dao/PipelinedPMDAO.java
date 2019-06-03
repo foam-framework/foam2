@@ -24,8 +24,9 @@ public class PipelinedPMDAO
         chainStart_ = null;
     }
 
-    public setChainStart(PipelinedPMDAO chainStart) {
+    public PipelinedPMDAO setChainStart(PipelinedPMDAO chainStart) {
         chainStart_ = chainStart;
+        return this;
     }
 
     @Override
