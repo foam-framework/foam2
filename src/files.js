@@ -91,6 +91,7 @@ FOAM_FILES([
   { name: "foam/core/AbstractFObject" },
   { name: "foam/core/ContextAgent" },
   { name: "foam/core/Validatable" },
+  { name: "foam/core/AxiomCloner" },
   { name: "foam/java/Authorizable" },
   { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
   { name: "foam/swift/SwiftLib", flags: ['swift'] },
