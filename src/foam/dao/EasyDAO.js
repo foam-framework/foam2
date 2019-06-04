@@ -136,7 +136,7 @@ if ( getPm() ) {
   delegate = new foam.dao.PMDAO(getX(), delegate);
 }
 
-if ( getPipelinedPMDAO() &&  ( ( (foam.dao.ProxyDAO) tempDelegate).getDelegate() != null ) && ( ( (foam.dao.ProxyDAO) tempDelegate).getDelegate() instanceof ProxyDAO ) ) {
+if ( getPipelinedPMDAO() &&  ( delegate != null ) && ( delegate instanceof ProxyDAO ) ) {
   foam.dao.DAO currentDelegate = delegate;
   foam.dao.DAO tempDelegate;
   foam.dao.PipelinedPMDAO chainStart;
