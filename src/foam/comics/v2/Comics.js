@@ -279,7 +279,6 @@ foam.CLASS({
       of: 'foam.mlang.predicate.Predicate',
       name: 'predicate',
       expression: function(data$cannedQueries) {
-        debugger;
         return data$cannedQueries && data$cannedQueries.length 
           ? data$cannedQueries[0].predicate
           : foam.mlang.predicate.True.create();
@@ -402,8 +401,9 @@ foam.CLASS({
       padding: 32px
     }
 
-    ^ .foam-u2-ActionView-back{
-      position: inherit;
+    ^ .foam-u2-ActionView-back {
+      display: flex;
+      align-items: center;
     }
 
     ^account-name {
@@ -489,10 +489,12 @@ foam.CLASS({
             .start(self.Rows)
               .start(self.Rows)
                 // we will handle this in the StackView instead
-                .startContext({ data: self.stack }).tag(self.stack.BACK, {
-                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                    icon: 'images/back-icon.svg'
-                  }).endContext()
+                .startContext({ data: self.stack })
+                    .tag(self.stack.BACK, {
+                      buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                      icon: 'images/back-icon.svg'
+                    })
+                .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })
                   .start()
                     .add(obj.toSummary())
@@ -549,8 +551,9 @@ foam.CLASS({
       padding: 32px
     }
 
-    ^ .foam-u2-ActionView-back{
-      position: inherit;
+    ^ .foam-u2-ActionView-back {
+      display: flex;
+      align-items: center;
     }
 
     ^account-name {
@@ -605,10 +608,12 @@ foam.CLASS({
             .start(self.Rows)
               .start(self.Rows)
                 // we will handle this in the StackView instead
-                .startContext({ data: self.stack }).tag(self.stack.BACK, {
-                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                    icon: 'images/back-icon.svg'
-                  }).endContext()
+                .startContext({ data: self.stack })
+                    .tag(self.stack.BACK, {
+                      buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                      icon: 'images/back-icon.svg'
+                    })
+                .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })
                   .start()
                     .add(`Create your ${data$browseTitle}`)
