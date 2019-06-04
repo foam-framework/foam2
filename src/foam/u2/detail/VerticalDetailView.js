@@ -11,8 +11,7 @@ foam.CLASS({
 
   requires: [
     'foam.u2.detail.SectionView',
-    'foam.u2.layout.Rows',
-    'foam.u2.layout.Item'
+    'foam.u2.layout.Rows'
   ],
 
   methods: [
@@ -27,12 +26,11 @@ foam.CLASS({
             .start(self.Rows)
               .forEach(sections, function(s) {
                 this
-                  .start(self.Item)
+                  .start(self.SectionView, {
+                    data$: self.data$,
+                    section: s
+                  })
                     .show(s.createIsAvailableFor(self.data$))
-                    .tag(self.SectionView, {
-                      data$: self.data$,
-                      section: s
-                    })
                   .end();
               })
             .end();
