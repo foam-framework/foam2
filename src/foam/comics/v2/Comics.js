@@ -227,7 +227,6 @@ foam.CLASS({
     'foam.u2.ScrollTableView',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
-    'foam.u2.layout.Item',
     'foam.u2.search.Toolbar',
     'foam.u2.ActionView',
     'foam.u2.dialog.Popup'
@@ -362,7 +361,7 @@ foam.CLASS({
                 .end()
               })
               .start(self.Cols).addClass(this.myClass('query-bar')).style({ 'align-items': 'center'})
-                .start(self.Item)
+                .start()
                   .style({'flex-grow': 1 })
                     .tag(self.Toolbar, { /* data$: self.predicate$ */ })
                   .end()
@@ -371,7 +370,7 @@ foam.CLASS({
                 })
                 .endContext()
               .end()
-              .start(self.Item)
+              .start()
                 .style({ margin: 'auto' })
                 .add(self.slot(function(browseView) {
                   return self.E().tag(browseView, {
@@ -414,7 +413,6 @@ foam.CLASS({
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.ControllerMode',
-    'foam.u2.layout.Item'
   ],
   imports: [
     'stack'
@@ -515,7 +513,7 @@ foam.CLASS({
               .end()
 
               .start(data$viewBorder)
-                .start(self.Item)
+                .start()
                   .style({ margin: 'auto' })
                   .add(self.slot(function(viewView) {
                     return self.E().tag(viewView, {
@@ -554,7 +552,6 @@ foam.CLASS({
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.ControllerMode',
-    'foam.u2.layout.Item'
   ],
   imports: [
     'stack'
@@ -605,7 +602,7 @@ foam.CLASS({
                 .end()
               .end()
               .start(data$viewBorder)
-                .start(self.Item)
+                .start()
                   .style({ margin: 'auto' })
                   .tag(foam.u2.detail.SectionedDetailView, { data: data$of.create() })
                 .end()
