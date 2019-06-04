@@ -294,83 +294,83 @@ foam.CLASS({
         .show(this.prop.createVisibilityFor(this.data$)
           .map(m => m != foam.u2.Visibility.HIDDEN))
         .addClass(this.myClass())
-        .start(self.Rows, { defaultChildStyle: { padding: '8px 0' } })
-          .add(this.slot(function(data, prop, prop$label) {
-            var errorSlot = prop.validateObj && prop.validationTextVisible ?
-              data.slot(prop.validateObj) :
-              foam.core.ConstantSlot.create({ value: null });
+        .add(this.slot(function(data, prop, prop$label) {
+          var errorSlot = prop.validateObj && prop.validationTextVisible ?
+            data.slot(prop.validateObj) :
+            foam.core.ConstantSlot.create({ value: null });
 
-            return self.E()
-              .start(self.Rows)
-                .callIf(prop$label, function() {
-                  this.start('m3')
-                    .add(prop$label)
-                    .style({ 'line-height': '2' })
-                  .end();
-                })
+          return self.E()
+            .style({ padding: '8px 0' })
+            .start(self.Rows)
+              .callIf(prop$label, function() {
+                this.start('m3')
+                  .add(prop$label)
+                  .style({ 'line-height': '2' })
+                .end();
+              })
+              .start()
+                .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                 .start()
-                  .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
-                  .start()
-                    .style({ 'flex-grow': 1 })
-                    .add(prop)
-                    .callIf(prop.validationStyleEnabled, function() {
-                      this.enableClass(self.myClass('error'), errorSlot);
-                    })
-                  .end()
-                  .callIf(prop.help, function() {
-                    this.start()
-                      .addClass(self.myClass('tooltip'))
-                      .start({
-                        class: 'foam.u2.tag.Image',
-                        data: 'images/question-icon.svg'
-                      })
-                        .addClass(self.myClass('helper-icon'))
-                      .end()
-
-                      .start()
-                        .addClass(self.myClass('tooltip-container'))
-                        .start()
-                          .addClass(self.myClass('helper-text'))
-                          .start('p').style({ 'padding': '3px' })
-                            .add(prop.help)
-                          .end()
-                        .end()
-                        .start()
-                          .addClass(self.myClass('arrow-right'))
-                        .end()
-                      .end()
-                    .end()
+                  .style({ 'flex-grow': 1 })
+                  .add(prop)
+                  .callIf(prop.validationStyleEnabled, function() {
+                    this.enableClass(self.myClass('error'), errorSlot);
                   })
                 .end()
-                .callIf(prop.validationTextVisible, function() {
-                  this
+                .callIf(prop.help, function() {
+                  this.start()
+                    .addClass(self.myClass('tooltip'))
+                    .start({
+                      class: 'foam.u2.tag.Image',
+                      data: 'images/question-icon.svg'
+                    })
+                      .addClass(self.myClass('helper-icon'))
+                    .end()
+
                     .start()
-                      .style({ 'align-items': 'center' })
-                      .start(self.Cols)
-                        .addClass(self.myClass('validation-container'))
-                        .show(errorSlot)
-                        .start({
-                          class: 'foam.u2.tag.Image',
-                          data: 'images/inline-error-icon.svg',
-                          displayHeight: 16,
-                          displayWidth: 16
-                        })
-                          .style({
-                            'justify-content': 'flex-start',
-                            'margin': '0 8px 0 0'
-                          })
-                        .end()
-                        .start()
-                          .style({ 'flex-grow': 1 })
-                          .add(errorSlot.map((s) => {
-                            return self.E().add(s);
-                          }))
+                      .addClass(self.myClass('tooltip-container'))
+                      .start()
+                        .addClass(self.myClass('helper-text'))
+                        .start('p').style({ 'padding': '3px' })
+                          .add(prop.help)
                         .end()
                       .end()
-                    .end();
+                      .start()
+                        .addClass(self.myClass('arrow-right'))
+                      .end()
+                    .end()
+                  .end()
                 })
-              .end();
-          }));
+              .end()
+              .callIf(prop.validationTextVisible, function() {
+                this
+                  .start()
+                    .style({ 'align-items': 'center' })
+                    .start(self.Cols)
+                      .addClass(self.myClass('validation-container'))
+                      .show(errorSlot)
+                      .start({
+                        class: 'foam.u2.tag.Image',
+                        data: 'images/inline-error-icon.svg',
+                        displayHeight: 16,
+                        displayWidth: 16
+                      })
+                        .style({
+                          'justify-content': 'flex-start',
+                          'margin': '0 8px 0 0'
+                        })
+                      .end()
+                      .start()
+                        .style({ 'flex-grow': 1 })
+                        .add(errorSlot.map((s) => {
+                          return self.E().add(s);
+                        }))
+                      .end()
+                    .end()
+                  .end();
+              })
+            .end();
+        }));
     }
   ]
 });
