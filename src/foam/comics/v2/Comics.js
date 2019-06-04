@@ -161,12 +161,18 @@ foam.CLASS({
       padding: 32px;
     }
 
+    /*
     ^inner-table {
       padding: 0px 24px;
     }
+    */
 
     ^inner-table .foam-u2-view-TableView th {
       background: #ffffff
+    }
+
+    ^inner-table .foam-u2-view-TableView td {
+      padding-left: 16px;
     }
 
     ^ .foam-u2-view-ScrollTableView-table {
@@ -176,9 +182,10 @@ foam.CLASS({
     /*
       Had to hack this in place because we had to seperate the browse view and controller
     */
-    ^ .foam-u2-view-IconChoiceView {
-      float: right;
-      padding-top: 8px;
+    ^inner-table > .foam-u2-view-IconChoiceView {
+      position: absolute;
+      display: flex;
+      right: 0;
     }
   `,
 
@@ -224,11 +231,10 @@ foam.CLASS({
               .start('h1').add(data.browseTitle$).end()
               .startContext({data: self}).add(self.CREATE).endContext()
             .end()
-            .start(this.CardBorder)
+            .start(this.CardBorder).style({ position: 'relative' })
               .start(data$browseBorder).addClass(this.myClass('inner-table'))
                   .callIf(data$browseViews.length > 1, function() {
-                    this
-                      .tag( foam.u2.view.IconChoiceView, { 
+                      this.tag( foam.u2.view.IconChoiceView, { 
                           choices: data$browseViews.map(o => [o.view, o.icon]),
                           data$: self.browseView$,
                         }
@@ -287,6 +293,10 @@ foam.CLASS({
     ^browse-view-container {
       margin: auto;
       padding-bottom: 72px;
+    }
+
+    ^ .foam-u2-view-TabChoiceView {
+      padding: 0 16px;
     }
   `,
 

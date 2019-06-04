@@ -25,6 +25,10 @@ foam.CLASS({
       display: flex;
     }
 
+    ^item {
+      display: flex;
+    }
+
     ^ input[type="radio"] {
       display: none;
     }
@@ -67,7 +71,7 @@ foam.CLASS({
 
       this.add(this.choices.map(function(c) {
         return this.E('div').
-          addClass(this.myClass()).
+          addClass(this.myClass('item')).
           start('input').
             attrs({
               type: 'radio',
