@@ -161,11 +161,9 @@ foam.CLASS({
       padding: 32px;
     }
 
-    /*
     ^inner-table {
-      padding: 0px 24px;
+      padding: 20px 0px 72px 0px;
     }
-    */
 
     ^inner-table .foam-u2-view-TableView th {
       background: #ffffff
@@ -175,6 +173,10 @@ foam.CLASS({
       padding-left: 16px;
     }
 
+    ^ .foam-u2-view-ScrollTableView {
+      border-bottom: solid 1px #e7eaec;
+    }
+
     ^ .foam-u2-view-ScrollTableView-table {
       width: 100%;
     }
@@ -182,10 +184,10 @@ foam.CLASS({
     /*
       Had to hack this in place because we had to seperate the browse view and controller
     */
-    ^inner-table > .foam-u2-view-IconChoiceView {
+    ^ .foam-u2-view-IconChoiceView {
       position: absolute;
-      display: flex;
       right: 0;
+      padding: 12px 16px 0 0;
     }
   `,
 
@@ -281,8 +283,7 @@ foam.CLASS({
     }
 
     ^query-bar {
-      margin-top: 32px;
-      margin-bottom: 24px;
+      padding: 24px 16px;
       align-items: center;
     }
 
@@ -292,7 +293,6 @@ foam.CLASS({
 
     ^browse-view-container {
       margin: auto;
-      padding-bottom: 72px;
     }
 
     ^ .foam-u2-view-TabChoiceView {
