@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'MapView',
   extends: 'foam.u2.View',
   requires: [
+    'foam.u2.layout.Item',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows'
   ],
@@ -31,7 +32,7 @@ foam.CLASS({
     {
       name: 'KeyValueRow',
       imports: [
-        'controllerMode',
+        'controllerMode?',
         'data',
         'updateData'
       ],
@@ -87,12 +88,12 @@ foam.CLASS({
               var row = self.KeyValueRow.create({ key: e[0], value: e[1] });
               this
                 .startContext({ data: row })
-                  .start(self.Cols, {
-                    contentJustification: 'START',
-                    itemAlignment: 'CENTER'
-                  })
+                  .start(self.Cols)
                     .add(self.KeyValueRow.KEY)
-                    .add(self.KeyValueRow.VALUE)
+                    .start(self.Item)
+                      .style({ 'flex-grow': 1 })
+                      .add(self.KeyValueRow.VALUE)
+                    .end()
                     .add(self.KeyValueRow.REMOVE)
                   .end()
                 .endContext();

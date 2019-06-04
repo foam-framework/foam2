@@ -10,6 +10,7 @@ foam.CLASS({
   extends: 'foam.u2.View',
   requires: [
     'foam.u2.layout.Cols',
+    'foam.u2.layout.Item',
     'foam.u2.CheckBox',
     'foam.u2.DateTimeView',
     'foam.u2.TextField',
@@ -25,7 +26,7 @@ foam.CLASS({
           foam.u2.view.AnyView.Choice.create({
             label: 'String',
             type: foam.String,
-            view: foam.u2.view.TextField,
+            view: foam.u2.TextField,
             toType: function(o) {
               return o + '';
             }
@@ -130,13 +131,16 @@ foam.CLASS({
       var self = this;
       this
         .start(self.Cols)
-          .add(this.slot(function(selected) {
-            self.data = selected.toType(self.data);
-            return self.E()
-              .startContext({data: null})
-                .start(selected.view, null, this.view$).end()
-              .endContext();
-          }))
+          .start(self.Item)
+            .style({flex: 1})
+            .add(this.slot(function(selected) {
+              self.data = selected.toType(self.data);
+              return self.E()
+                .startContext({data: null})
+                  .start(selected.view, null, this.view$).end()
+                .endContext();
+            }))
+          .end()
           .start(this.ChoiceView, {
             choices$: this.types$.map(types => types.map(t => [t, t.label])),
             data$: this.selected$
