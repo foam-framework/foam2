@@ -52,7 +52,7 @@ foam.CLASS({
     {
       class: 'foam.comics.v2.NamedView',
       name: 'Tree',
-      view: { class: 'foam.u2.view.ScrollTableView' },
+      view: { class: 'foam.comics.v2.DAOBrowserView' },
       icon: 'images/account-structure-enabled.svg',
     }
   ],

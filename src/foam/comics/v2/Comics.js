@@ -184,10 +184,9 @@ foam.CLASS({
       class: 'foam.u2.ViewSpecWithJava',
       name: 'browseView',
       expression: function(data$browseViews) {
-        debugger;
         return data$browseViews && data$browseViews.length
           ? data$browseViews[0].view
-          : foam.u2.view.ScrollTableView
+          : foam.comics.v2.DAOBrowserView
       }
     },
   ],
@@ -219,11 +218,18 @@ foam.CLASS({
             .end()
             .start(this.CardBorder)
               .start(data$browseBorder).addClass(this.myClass('inner-table'))
-                  .callIf(data$browseViews.length === 1, function() {
-                    self.browseView = data$browseViews[0].view;
-                  }
-              )
-                .tag(self.DAOBrowserView, { data: data })
+                  .callIf(data$browseViews.length > 1, function() {
+                    this.tag( foam.u2.view.IconChoiceView, { 
+                        choices: data$browseViews.map(o => [o.view, o.icon]),
+                        data$: self.browseView$,
+                      }
+                    )
+                  })
+                .add(self.slot(function(browseView) {
+                  return self.E().tag(browseView, {
+                    data: data
+                  });
+                }))
               .end()
             .end()
           .end();
