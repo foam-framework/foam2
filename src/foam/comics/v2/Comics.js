@@ -99,7 +99,6 @@ foam.CLASS({
       }
     },
     {
-      // we should always have a table as the first index
       class: 'FObjectArray',
       of: 'foam.comics.v2.NamedView',
       name: 'browseViews',
