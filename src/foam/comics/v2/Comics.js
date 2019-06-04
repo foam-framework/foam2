@@ -172,6 +172,14 @@ foam.CLASS({
     ^ .foam-u2-view-ScrollTableView-table {
       width: 100%;
     }
+
+    /*
+      Had to hack this in place because we had to seperate the browse view and controller
+    */
+    ^ .foam-u2-view-IconChoiceView {
+      float: right;
+      padding-top: 8px;
+    }
   `,
 
   properties: [
@@ -219,11 +227,12 @@ foam.CLASS({
             .start(this.CardBorder)
               .start(data$browseBorder).addClass(this.myClass('inner-table'))
                   .callIf(data$browseViews.length > 1, function() {
-                    this.tag( foam.u2.view.IconChoiceView, { 
-                        choices: data$browseViews.map(o => [o.view, o.icon]),
-                        data$: self.browseView$,
-                      }
-                    )
+                    this
+                      .tag( foam.u2.view.IconChoiceView, { 
+                          choices: data$browseViews.map(o => [o.view, o.icon]),
+                          data$: self.browseView$,
+                        }
+                      )
                   })
                 .add(self.slot(function(browseView) {
                   return self.E().tag(browseView, {
