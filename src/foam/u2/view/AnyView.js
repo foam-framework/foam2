@@ -10,7 +10,6 @@ foam.CLASS({
   extends: 'foam.u2.View',
   requires: [
     'foam.u2.layout.Cols',
-    'foam.u2.layout.Item',
     'foam.u2.CheckBox',
     'foam.u2.DateTimeView',
     'foam.u2.TextField',
@@ -131,7 +130,7 @@ foam.CLASS({
       var self = this;
       this
         .start(self.Cols)
-          .start(self.Item)
+          .start()
             .style({flex: 1})
             .add(this.slot(function(selected) {
               self.data = selected.toType(self.data);

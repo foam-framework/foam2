@@ -9,7 +9,6 @@ foam.CLASS({
   name: 'ArrayView',
   extends: 'foam.u2.View',
   requires: [
-    'foam.u2.layout.Item',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows'
   ],
@@ -93,9 +92,8 @@ foam.CLASS({
                 this
                   .startContext({ data: row })
                     .start(self.Cols)
-                      .start(self.Item)
+                      .start(valueView, { data$: row.value$ })
                         .style({ flex: 1 })
-                        .tag(valueView, { data$: row.value$ })
                       .end()
                       .add(self.Row.REMOVE)
                     .end()

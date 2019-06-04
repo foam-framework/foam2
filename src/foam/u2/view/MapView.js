@@ -9,7 +9,6 @@ foam.CLASS({
   name: 'MapView',
   extends: 'foam.u2.View',
   requires: [
-    'foam.u2.layout.Item',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows'
   ],
@@ -90,7 +89,7 @@ foam.CLASS({
                 .startContext({ data: row })
                   .start(self.Cols)
                     .add(self.KeyValueRow.KEY)
-                    .start(self.Item)
+                    .start()
                       .style({ 'flex-grow': 1 })
                       .add(self.KeyValueRow.VALUE)
                     .end()

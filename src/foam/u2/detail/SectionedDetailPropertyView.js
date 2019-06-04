@@ -279,7 +279,6 @@ foam.CLASS({
 
   requires: [
     'foam.u2.layout.Cols',
-    'foam.u2.layout.Item',
     'foam.u2.layout.Rows'
   ],
 
@@ -311,7 +310,7 @@ foam.CLASS({
                 })
                 .start()
                   .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
-                  .start(self.Item)
+                  .start()
                     .style({ 'flex-grow': 1 })
                     .add(prop)
                     .callIf(prop.validationStyleEnabled, function() {
@@ -345,11 +344,9 @@ foam.CLASS({
                 .end()
                 .callIf(prop.validationTextVisible, function() {
                   this
-                    .start(self.Item).style({ 'align-items': 'center' })
-                      .start(self.Cols, { defaultChildStyle: {
-                        'justify-content': 'flex-start',
-                        'margin': '0 8px 0 0'
-                      }})
+                    .start()
+                      .style({ 'align-items': 'center' })
+                      .start(self.Cols)
                         .addClass(self.myClass('validation-container'))
                         .show(errorSlot)
                         .start({
@@ -358,9 +355,13 @@ foam.CLASS({
                           displayHeight: 16,
                           displayWidth: 16
                         })
+                          .style({
+                            'justify-content': 'flex-start',
+                            'margin': '0 8px 0 0'
+                          })
                         .end()
-                        .start(self.Item)
-                        .style({ 'flex-grow': 1 })
+                        .start()
+                          .style({ 'flex-grow': 1 })
                           .add(errorSlot.map((s) => {
                             return self.E().add(s);
                           }))
