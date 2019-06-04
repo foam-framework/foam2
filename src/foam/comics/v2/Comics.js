@@ -179,7 +179,17 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.comics.v2.DAOControllerConfig',
       name: 'data'
-    }
+    },
+    {
+      class: 'foam.u2.ViewSpecWithJava',
+      name: 'browseView',
+      expression: function(data$browseViews) {
+        debugger;
+        return data$browseViews && data$browseViews.length
+          ? data$browseViews[0].view
+          : foam.u2.view.ScrollTableView
+      }
+    },
   ],
   actions: [
     {
@@ -200,7 +210,7 @@ foam.CLASS({
     var self = this;
 
       this.addClass(this.myClass())
-      .add(this.slot(function(data, data$browseBorder) {
+      .add(this.slot(function(data, data$browseBorder, data$browseViews) {
         return self.E()
           .start(self.Rows).addClass(this.myClass('container'))
             .start(self.Cols).style({'align-items': 'center'})
@@ -209,6 +219,10 @@ foam.CLASS({
             .end()
             .start(this.CardBorder)
               .start(data$browseBorder).addClass(this.myClass('inner-table'))
+                  .callIf(data$browseViews.length === 1, function() {
+                    self.browseView = data$browseViews[0].view;
+                  }
+              )
                 .tag(self.DAOBrowserView, { data: data })
               .end()
             .end()
@@ -223,7 +237,7 @@ foam.CLASS({
   name: 'DAOBrowserView',
   extends: 'foam.u2.View',
   requires: [
-    'foam.u2.ScrollTableView',
+    'foam.u2.view.ScrollTableView',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.search.Toolbar',
@@ -290,15 +304,6 @@ foam.CLASS({
         return data.dao$proxy.where(predicate);
       }
     },
-    {
-      class: 'foam.u2.ViewSpecWithJava',
-      name: 'browseView',
-      expression: function(data$browseViews) {
-        return data$browseViews && data$browseViews.length
-          ? data$browseViews[0].view
-          : foam.u2.view.ScrollTableView
-      }
-    }
   ],
   actions: [
     {
@@ -327,10 +332,10 @@ foam.CLASS({
       this.addClass(this.myClass());
       this.SUPER();
       this
-        .add(self.slot(function(data$cannedQueries, data$browseViews) {
+        .add(self.slot(function(data$cannedQueries) {
           return self.E()
             .start(self.Rows)
-              .callIf(data$cannedQueries.length >= 1 || data$browseViews >= 1, function() {
+              .callIf(data$cannedQueries.length >= 1, function() {
                 this.start(self.Cols).addClass(self.myClass('top-bar'))
                   .start(self.Cols)
                     .callIf(data$cannedQueries.length > 1, function() {
@@ -349,23 +354,6 @@ foam.CLASS({
                      * will show all entries so that we do not break history code
                      */
                   .end()
-                  .start(self.Cols)
-                    .callIf(data$browseViews.length > 1, function() {
-                      this.tag( foam.u2.view.IconChoiceView, { 
-                          choices: data$browseViews.map(o => [o.view, o.icon]),
-                          data$: self.browseView$,
-                        }
-                      )
-                    })
-                    .callIf(data$browseViews.length === 1, function() {
-                      self.browseView = data$browseViews[0].view;
-                    }
-                )
-                  /**
-                   * otherwise if no browseViews are specified then the default
-                   * will render a ScrollTableView so that we do not break history code
-                   */
-                  .end()
                 .end()
               })
               .start(self.Cols).addClass(this.myClass('query-bar'))
@@ -378,11 +366,7 @@ foam.CLASS({
                 .endContext()
               .end()
               .start().addClass(this.myClass('browse-view-container'))
-                .add(self.slot(function(browseView) {
-                  return self.E().tag(browseView, {
-                    data: self.predicatedDAO$proxy
-                  });
-                }))
+                .tag(self.ScrollTableView, { data: self.predicatedDAO$proxy })
               .end()
             .end();
         }));
