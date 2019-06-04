@@ -143,7 +143,6 @@ FOAM_FILES([
   { name: "foam/nanos/pm/PM" },
   { name: "foam/nanos/pm/PMInfo" },
   { name: "foam/nanos/pm/PMTableView", flags:['web'] },
-  { name: "foam/nanos/pm/PMTemperatureCellFormatter" },
   { name: "foam/nanos/pm/TemperatureCView" },
   { name: 'foam/nanos/notification/email/EmailMessage' },
   { name: 'foam/nanos/notification/email/EmailService' },
