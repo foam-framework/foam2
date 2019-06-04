@@ -34,7 +34,7 @@ public class PipelinedPMDAO
         if(chainStart_ == null) {
             PM pm = new PM();
             pm.setClassType(PMDAO.getOwnClassInfo());
-            pm.setName(getDelegate().getClass().getName() + "_put");
+            pm.setName(getDelegate().getClass().getName() + ":pipePut");
         }
         else
             chainStart_.chainPM.log(x);
@@ -46,7 +46,7 @@ public class PipelinedPMDAO
         if(chainStart_ == null) {
             PM pm = new PM();
             pm.setClassType(PMDAO.getOwnClassInfo());
-            pm.setName(getDelegate().getClass().getName() + "_find");
+            pm.setName(getDelegate().getClass().getName() + ":pipeFind");
         }
         else
             chainStart_.chainPM.log(x);
@@ -58,7 +58,7 @@ public class PipelinedPMDAO
         if(chainStart_ == null) {
             PM pm = new PM();
             pm.setClassType(PMDAO.getOwnClassInfo());
-            pm.setName(getDelegate().getClass().getName() + "_remove");
+            pm.setName(getDelegate().getClass().getName() + ":pipeRemove");
         }
         else
             chainStart_.chainPM.log(x);
@@ -70,7 +70,7 @@ public class PipelinedPMDAO
         if(chainStart_ == null) {
             PM pm = new PM();
             pm.setClassType(PMDAO.getOwnClassInfo());
-            pm.setName(getDelegate().getClass().getName() + "_removeAll");
+            pm.setName(getDelegate().getClass().getName() + ":pipeRemoveAll");
         }
         else
             chainStart_.chainPM.log(x);
