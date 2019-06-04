@@ -161,6 +161,25 @@ foam.CLASS({
       padding: 32px;
     }
 
+    ^header-container {
+      padding-bottom: 32px;
+      align-items: center;
+    }
+
+    ^browse-title {
+      font-size: 36px;
+      font-weight: 600;
+      line-height: 1.33;
+      color: #1e1f21;
+    }
+
+    /*
+      Need to figure out a way here without the !important override
+    */
+    ^ .foam-u2-view-ScrollTableView-scrollbarContainer {
+      height: 424px !important;
+    }
+
     ^inner-table {
       padding: 20px 0px 72px 0px;
     }
@@ -229,8 +248,8 @@ foam.CLASS({
       .add(this.slot(function(data, data$browseBorder, data$browseViews) {
         return self.E()
           .start(self.Rows).addClass(this.myClass('container'))
-            .start(self.Cols).style({'align-items': 'center'})
-              .start('h1').add(data.browseTitle$).end()
+            .start(self.Cols).addClass(this.myClass('header-container'))
+              .start().addClass(this.myClass('browse-title')).add(data.browseTitle$).end()
               .startContext({data: self}).add(self.CREATE).endContext()
             .end()
             .start(this.CardBorder).style({ position: 'relative' })
