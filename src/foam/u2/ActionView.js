@@ -286,10 +286,6 @@ foam.CLASS({
       factory: function() { return this.action && this.action.confirmationRequired ? this.ButtonState.CONFIRM : this.ButtonState.NO_CONFIRM; }
     },
     {
-      class: 'Boolean',
-      name: 'disabled'
-    },
-    {
       name: 'data',
       postSet: function() {
         // Reset state
@@ -350,7 +346,7 @@ foam.CLASS({
         this.attrs({ name: this.action.name });
 
         this.enableClass(this.myClass('unavailable'), this.action.createIsAvailable$(this.__context__, this.data), true);
-        this.attrs({ disabled: this.disabled ? 'disabled' : this.action.createIsEnabled$(this.__context__, this.data).map((e) => e ? false : 'disabled') });
+        this.attrs({ disabled: this.action.createIsEnabled$(this.__context__, this.data).map((e) => e ? false : 'disabled') });
 
         this.addClass(this.myClass(this.styleClass_));
         this.addClass(this.myClass(this.size.label.toLowerCase()));
@@ -378,34 +374,13 @@ foam.CLASS({
       if ( this.label ) {
         this.add(this.label$);
       }
-    },
-
-    function asyncCall(x, data) {
-      var self = this;
-      var promise = self.action.maybeCall(self.__subContext__, self.data);
-      if ( promise ) {
-        this.disabled = true;
-        promise.then(function() {
-          self.disabled = false;
-          self.attrs({ disabled: false});
-        });
-        this.attrs({ disabled: 'disabled' });
-      }
-    },
-
-    function maybeCall(x, data) {
-      if (  this.action &&  this.action.isAsync ) {
-        this.asyncCall(x,data);
-      } else {
-        this.action.maybeCall(this.__subContext__, this.data);
-      }
-    },
+    }
   ],
 
   listeners: [
     function click(e) {
       if ( this.buttonState == this.ButtonState.NO_CONFIRM ) {
-        this.action && this.maybeCall(this.__subContext__, this.data);
+        this.action && this.action.maybeCall(this.__subContext__, this.data);
       } else if ( this.buttonState == this.ButtonState.CONFIRM ) {
         this.buttonState = this.ButtonState.DEBOUNCE;
         this.removeAllChildren();
@@ -415,7 +390,7 @@ foam.CLASS({
         this.buttonState = this.ButtonState.CONFIRM;
         this.removeAllChildren();
         this.addContent();
-        this.action && this.maybeCall(this.__subContext__, this.data);
+        this.action && this.action.maybeCall(this.__subContext__, this.data);
       }
 
       e.preventDefault();

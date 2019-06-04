@@ -64,11 +64,6 @@ foam.CLASS({
       documentation: 'If confirmation is required. Recommended for destructive actions.'
     },
     {
-      class: 'Boolean',
-      name: 'isAsync',
-      documentation: 'If action is asynchronous.'
-    },
-    {
       class: 'String',
       name: 'iconFontFamily',
       value: 'Material Icons'
@@ -127,7 +122,8 @@ If empty than no permissions are required.`
       name: 'enabledPermissions',
       documentation: `Permissions required for the action to be enabled.
 If empty than no permissions are required.`,
-    }
+    },
+    { name: 'runningMap', factory: function() { return new WeakMap(); }, transient: true }
   ],
 
   methods: [
@@ -172,7 +168,19 @@ If empty than no permissions are required.`,
     },
 
     function createIsEnabled$(x, data) {
-      return this.createSlotFor_(x, data, this.isEnabled, this.enabledPermissions);
+      var running = foam.core.SimpleSlot.create({ value: false });
+      if ( data ) this.runningMap.set(data, running);
+
+      var slot = this.createSlotFor_(x, data, this.isEnabled, this.enabledPermissions);
+      return foam.core.ExpressionSlot.create({
+        args: [
+          running,
+          slot
+        ],
+        code: function(a, b) {
+          return (! a) && b;
+        }
+      });
     },
 
     function createIsAvailable$(x, data) {
@@ -182,11 +190,21 @@ If empty than no permissions are required.`,
     function maybeCall(x, data) {
       var self = this;
       function call() {
-        var promise =  self.code.call(data, x, self);
+        var running = self.runningMap.get(data);
+        if ( ! running ) {
+          running = foam.core.SimpleSlot.create({ value: false });
+          if ( data ) self.runningMap.set(data, running);
+        }
+        if ( running.get() ) { console.warn("Attempted to call action that is in progress."); }
+        var ret = self.code.call(data, x, self);
+        if ( ret && ret.then ) {
+          running.set(true);
+          ret.then(function() { running.set(false); }, function() { running.set(false);});
+        }
         // primitive types won't have a pub method
         // Why are we publishing this event anyway? KGR
         data && data.pub && data.pub('action', self.name, self);
-        return promise;
+        return ret;
       }
 
       if ( ( this.isAvailable && ! foam.Function.withArgs(this.isAvailable, data) ) ||
@@ -197,7 +215,8 @@ If empty than no permissions are required.`,
       // No permission check if no auth service or no permissions to check.
       if ( ! x.auth ||
            ! ( this.availablePermissions.length || this.enabledPermissions.length ) ) {
-        return call();
+        call();
+        return;
       }
 
       var permissions = this.availablePermissions.concat(this.enabledPermissions);
@@ -205,7 +224,7 @@ If empty than no permissions are required.`,
       permissions = foam.Array.unique(permissions);
       Promise.all(permissions.map(p => x.auth.check(null, p))).
         then(function(args) {
-          if ( args.every(b => b) ) return call();
+          if ( args.every(b => b) ) call();
         });
     },
 
