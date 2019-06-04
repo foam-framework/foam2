@@ -44,17 +44,6 @@ foam.CLASS({
     }
   `,
 
-  properties: [
-    {
-      class: 'String',
-      name: 'defaultTabWidth',
-      documentation: `
-        TBD implemented, need to figure out how to conditionally style ^ label
-      `,
-      value: '144px'
-    }
-  ],
-
   methods: [
     function initE() {
       // If no item is selected, and data has not been provided, select the 0th

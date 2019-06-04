@@ -243,11 +243,22 @@ foam.CLASS({
 
     ^top-bar {
       border-bottom: solid 1px #e7eaec;
+      align-items: center;
     }
 
     ^query-bar {
       margin-top: 32px;
       margin-bottom: 24px;
+      align-items: center;
+    }
+
+    ^toolbar {
+      flex-grow: 1;
+    }
+
+    ^browse-view-container {
+      margin: auto;
+      padding-bottom: 72px;
     }
   `,
 
@@ -322,13 +333,12 @@ foam.CLASS({
           return self.E()
             .start(self.Rows)
               .callIf(data$cannedQueries.length >= 1 || data$browseViews >= 1, function() {
-                this.start(self.Cols).addClass(self.myClass('top-bar')).style({ 'align-items': 'center' })
+                this.start(self.Cols).addClass(self.myClass('top-bar'))
                   .start(self.Cols)
                     .callIf(data$cannedQueries.length > 1, function() {
                         this.tag( foam.u2.view.TabChoiceView, { 
                             choices: data$cannedQueries.map(o => [o.predicate, o.label]),
-                            data$: self.predicate$,
-                            defaultTabWidth: '144px'
+                            data$: self.predicate$
                           }
                         )
                     })
@@ -360,18 +370,16 @@ foam.CLASS({
                   .end()
                 .end()
               })
-              .start(self.Cols).addClass(this.myClass('query-bar')).style({ 'align-items': 'center'})
-                .start()
-                  .style({'flex-grow': 1 })
-                    .tag(self.Toolbar, { /* data$: self.predicate$ */ })
-                  .end()
+              .start(self.Cols).addClass(this.myClass('query-bar'))
+                .start().addClass(this.myClass('toolbar'))
+                  .tag(self.Toolbar, { /* data$: self.predicate$ */ })
+                .end()
                 .startContext({data: self}).tag(self.EXPORT, {
                   buttonStyle: foam.u2.ButtonStyle.SECONDARY
                 })
                 .endContext()
               .end()
-              .start()
-                .style({ margin: 'auto' })
+              .start().addClass(this.myClass('browse-view-container'))
                 .add(self.slot(function(browseView) {
                   return self.E().tag(browseView, {
                     data: self.predicatedDAO$proxy
@@ -406,6 +414,10 @@ foam.CLASS({
     ^actions-header .foam-u2-ActionView {
       margin-right: 24px;
       line-height: 1.5
+    }
+
+    ^view-container {
+      margin: auto;
     }
   `,
 
@@ -513,8 +525,7 @@ foam.CLASS({
               .end()
 
               .start(data$viewBorder)
-                .start()
-                  .style({ margin: 'auto' })
+                .start().addClass(this.myClass('view-container'))
                   .add(self.slot(function(viewView) {
                     return self.E().tag(viewView, {
                       data: obj
@@ -545,6 +556,10 @@ foam.CLASS({
     ^account-name {
       font-size: 36px;
       font-weight: 600;
+    }
+
+    ^create-view-container {
+      margin: auto;
     }
   `,
 
@@ -602,8 +617,7 @@ foam.CLASS({
                 .end()
               .end()
               .start(data$viewBorder)
-                .start()
-                  .style({ margin: 'auto' })
+                .start().addClass(this.myClass('create-view-container'))
                   .tag(foam.u2.detail.SectionedDetailView, { data: data$of.create() })
                 .end()
               .end()
