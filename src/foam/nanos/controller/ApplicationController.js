@@ -190,7 +190,7 @@ foam.CLASS({
       this.SUPER();
 
       // done to start using SectionedDetailViews instead of DetailViews
-      foam.__context__.register(foam.u2.detail.SectionedDetailView, 'foam.u2.DetailView');
+      this.__subContext__.register(foam.u2.detail.SectionedDetailView, 'foam.u2.DetailView');
 
       var self = this;
 

@@ -228,7 +228,7 @@
   methods: [
     function init() {
       this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.onDAOUpdate })));
-      this.onDAOUpdate();
+      this.updateCount();
     },
 
     function initE() {
@@ -340,6 +340,14 @@
         var x = this.table_.childNodes.filter((x) => x.nodeName === 'TBODY');
         this.topBufferTable_ = x[0];
       }
+    },
+    {
+      name: 'updateCount',
+      code: function() {
+        return this.data$proxy.select(this.Count.create()).then((s) => {
+          this.daoCount = s.value;
+        });
+      }
     }
   ],
 
@@ -379,11 +387,7 @@
       name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
-        var self = this;
-        this.data$proxy.select(this.Count.create()).then(function(s) {
-          self.daoCount = s.value;
-          self.refresh();
-        });
+        this.updateCount().then(() => this.refresh());
       }
     },
     {

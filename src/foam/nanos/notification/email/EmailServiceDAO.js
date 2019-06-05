@@ -35,7 +35,12 @@ foam.CLASS({
       name: 'put_',
       javaCode:
       `
-        getEmailService().sendEmail(x, (EmailMessage)obj);
+        EmailService service = getEmailService();
+        if ( service != null ) {
+          service.sendEmail(x, (EmailMessage)obj);
+        } else {
+          ((foam.nanos.logger.Logger) x.get("logger")).debug("EmailServiceDAO emailService null");
+        }
         return getDelegate().inX(x).put(obj);
       `
     }

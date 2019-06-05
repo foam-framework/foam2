@@ -49,7 +49,8 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.nanos.auth.Permission',
       name: 'permissions',
-      documentation: 'Permissions set on group.'
+      documentation: 'Permissions set on group.',
+      hidden: true
     },
     // {
     //   class: 'StringArray',

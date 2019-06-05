@@ -2129,6 +2129,10 @@ foam.CLASS({
       value: false
     },
     {
+      class: 'String',
+      name: 'placeholder'
+    },
+    {
       class: 'foam.u2.ViewSpec',
       name: 'view',
       value: { class: 'foam.u2.TextField' }
