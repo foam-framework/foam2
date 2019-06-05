@@ -24,7 +24,6 @@ nano.log*
 .vscode/
 android/nanos_example_client/.settings/
 logs/logs
-src/cronjobs
 src/notifications
 src/ruleHistory
 src/agentJunctions

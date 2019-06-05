@@ -106,7 +106,7 @@ foam.CLASS({
       font-size: 14px;
       letter-spacing: 0.2px;
       color: #373a3c;
-      background: #f5f7fa;
+      background: %BACKGROUNDCOLOR%;
       margin: 0;
     }
     .stack-wrapper {
