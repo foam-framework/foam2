@@ -48,34 +48,34 @@ public class PipelinePMDAO
     }
   }
 
-  private void createPM(String name) {
+  private X createPM(String name) {
     PM pm = new PM();
     pm.setClassType(PipelinePMDAO.getOwnClassInfo());
     pm.setName(name);
-    X pipeX = getX().put("pipePmStart", pm);
+    return getX().put("pipePmStart", pm);
   }
 
   @Override
   public FObject put_(X x, FObject obj) {
-    createPM(putName_);
+    X pipeX = createPM(putName_);
     return super.put_(pipeX, obj);
   }
 
   @Override
   public FObject find_(X x, Object id) {
-    createPM(findName_);
+    X pipeX = createPM(findName_);
     return super.find_(pipeX, id);
   }
 
   @Override
   public FObject remove_(X x, FObject obj) {
-    createPM(removeName_);
+    X pipeX = createPM(removeName_);
     return super.remove_(pipeX, obj);
   }
 
   @Override
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    createPM(removeAllName_);
+    X pipeX = createPM(removeAllName_);
     super.removeAll_(pipeX, skip, limit, order, predicate);
   }
 
