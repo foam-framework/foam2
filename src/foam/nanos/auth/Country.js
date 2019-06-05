@@ -12,51 +12,6 @@ foam.CLASS({
 
   ids: ['code'],
 
-  axioms: [
-    // ! Temporary remember to remove
-    {
-      class: 'foam.comics.v2.CannedQuery',
-      label: 'All',
-      predicateFactory: function(e) {
-        return e.TRUE;
-      }
-    },
-    {
-      class: 'foam.comics.v2.CannedQuery',
-      label: 'Shadow Accounts',
-      predicateFactory: function(e) {
-        return e.FALSE;
-      }
-    },
-    {
-      class: 'foam.comics.v2.CannedQuery',
-      label: 'Aggregate Accounts',
-      predicateFactory: function(e) {
-        return e.TRUE;
-      }
-    },
-    {
-      class: 'foam.comics.v2.CannedQuery',
-      label: 'Virtual Accounts',
-      predicateFactory: function(e) {
-        return e.FALSE;
-      }
-    },
-    // TODO: Figure out how to distinguish between viewViews and browseViews since they both use foam.comics.v2.NamedView
-    {
-      class: 'foam.comics.v2.NamedView',
-      name: 'Table',
-      view: { class: 'foam.comics.v2.DAOBrowserView' },
-      icon: 'images/list-view-enabled.svg',
-    },
-    {
-      class: 'foam.comics.v2.NamedView',
-      name: 'Tree',
-      view: { class: 'foam.comics.v2.DAOBrowserView' },
-      icon: 'images/account-structure-enabled.svg',
-    }
-  ],
-
   properties: [
     {
       class: 'String',
@@ -91,13 +46,5 @@ foam.CLASS({
     javaCode: `
       return "{ code:" + this.getCode() + ", name:" + this.getName() + " }";
     `
-  }],
-  actions: [
-    {
-      name: 'helloWorld',
-      code: function() {
-        alert('Hello World!');
-      }
-    },
-  ]
+  }]
 });
