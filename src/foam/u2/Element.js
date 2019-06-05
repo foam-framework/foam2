@@ -2135,7 +2135,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'view',
-      value: 'foam.u2.TextField'
+      value: { class: 'foam.u2.TextField' }
     },
     {
       class: 'Enum',
