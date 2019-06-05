@@ -150,7 +150,7 @@ return delegate;
     },
     {
       class: 'Boolean',
-      name: 'piplinePm',
+      name: 'pipelinePm',
       value: false
     },
     {
