@@ -14,7 +14,12 @@ import foam.nanos.pm.PM;
 
 public class PipelinePMDAO
   extends ProxyDAO
-{ 
+{
+  protected String putName_;
+  protected String findName_;
+  protected String removeName_;
+  protected String removeAllName_;
+
   public PMDAO(X x, DAO delegate) {
     super(x, delegate);
     init();
@@ -22,15 +27,17 @@ public class PipelinePMDAO
 
   void init() {
     createPipeline();
-    putName_       = getOf().getId() + ":put";
-    findName_      = getOf().getId() + ":find";
-    removeName_    = getOf().getId() + ":remove";
-    removeAllName_ = getOf().getId() + ":removeAll";
+    putName_       = getDelegate().getClass().getName() + ":pipePut"
+    findName_      = getDelegate().getClass().getName() + ":pipeFind"
+    removeName_    = getDelegate().getClass().getName() + ":pipeRemove"
+    removeAllName_ = getDelegate().getClass().getName() + ":pipeRemoveAll"
   }
 
   private void createPipeline() {
-    if( getDelagate() instanceof ProxyDAO ) {
-
+    DAO delegate = getDelagate();
+    DAO secondaryDelagate = delagate.getDelagate();
+    if( delegate instanceof ProxyDAO ) {
+      delegate.setDelegate(new);
     }
   }
 
@@ -56,5 +63,9 @@ public class PipelinePMDAO
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
 
     super.removeAll_(x, skip, limit, order, predicate);
+  }
+
+  public class EndPipelinePMDAO extends ProxyDAO {
+
   }
 }
