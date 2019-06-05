@@ -20,7 +20,7 @@ public class PipelinePMDAO
   protected String removeName_;
   protected String removeAllName_;
 
-  public PMDAO(X x, DAO delegate) {
+  public PipelinePMDAO(X x, DAO delegate) {
     super(x, delegate);
     init();
   }
