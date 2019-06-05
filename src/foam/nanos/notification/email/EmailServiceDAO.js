@@ -37,8 +37,9 @@ foam.CLASS({
       `
         EmailService service = getEmailService();
         if ( service != null ) {
-          ((foam.nanos.logger.Logger) x.get("logger")).debug("EmailServiceDAO emailService null");
           service.sendEmail(x, (EmailMessage)obj);
+        } else {
+          ((foam.nanos.logger.Logger) x.get("logger")).debug("EmailServiceDAO emailService null");
         }
         return getDelegate().inX(x).put(obj);
       `
