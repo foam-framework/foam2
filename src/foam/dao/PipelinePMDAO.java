@@ -35,9 +35,14 @@ public class PipelinePMDAO
 
   private void createPipeline() {
     DAO delegate = getDelagate();
-    DAO secondaryDelagate = delagate.getDelagate();
+    DAO secondaryDelagate;
     if( delegate instanceof ProxyDAO ) {
-      delegate.setDelegate(new);
+      secondaryDelagate = delagate.getDelagate();
+      delegate.setDelegate(new EndPipelinePMDAO(getX(), secondaryDelagate));
+      delegate = delagate.getDelegate();
+      if(secondaryDelagate instanceof ProxyDAO) {
+        delegate.setDelegate(new PipelinePMDAO(x, secondaryDelagate));
+      }
     }
   }
 
@@ -66,6 +71,28 @@ public class PipelinePMDAO
   }
 
   public class EndPipelinePMDAO extends ProxyDAO {
+    @Override
+    public FObject put_(X x, FObject obj) {
 
+      return super.put_(x, obj);
+    }
+
+    @Override
+    public FObject find_(X x, Object id) {
+
+      return super.find_(x, id);
+    } 
+
+    @Override
+    public FObject remove_(X x, FObject obj) {
+
+      return super.remove_(x, obj);
+    }
+
+    @Override
+    public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
+
+      super.removeAll_(x, skip, limit, order, predicate);
+    }
   }
 }
