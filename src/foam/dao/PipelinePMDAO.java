@@ -40,7 +40,7 @@ public class PipelinePMDAO
       secondaryDelegate = ((ProxyDAO) delegate).getDelegate();
       ((ProxyDAO) delegate).setDelegate(new EndPipelinePMDAO(getX(), secondaryDelegate));
       delegate = ((ProxyDAO) delegate).getDelegate();
-      if(secondaryDelegate instanceof ProxyDAO) {
+      if( secondaryDelegate instanceof ProxyDAO ) {
         ((ProxyDAO) delegate).setDelegate(new PipelinePMDAO(getX(), secondaryDelegate));
       }
     }
