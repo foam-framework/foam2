@@ -2135,12 +2135,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'view',
-      expression: function (placeholder) {
-        return {
-          class: 'foam.u2.TextField',
-          placeholder: placeholder
-        };
-      }
+      value: 'foam.u2.TextField'
     },
     {
       class: 'Enum',
