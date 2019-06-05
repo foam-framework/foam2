@@ -172,12 +172,8 @@ foam.CLASS({
       line-height: 1.33;
       color: #1e1f21;
     }
-
-    /*
-      Need to figure out a way here without the !important override
-    */
     ^ .foam-u2-view-ScrollTableView-scrollbarContainer {
-      height: 424px !important;
+      height: 424px;
     }
 
     ^inner-table {
@@ -410,7 +406,7 @@ foam.CLASS({
                 .endContext()
               .end()
               .start().addClass(this.myClass('browse-view-container'))
-                .tag(self.ScrollTableView, { data: self.predicatedDAO$proxy })
+                .tag(self.ScrollTableView, { data: self.predicatedDAO$proxy, enableDynamicTableHeight: false })
               .end()
             .end();
         }));

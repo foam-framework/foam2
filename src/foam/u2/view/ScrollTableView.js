@@ -217,6 +217,11 @@
       expression: function(tablesRemoved_, pageSize, rowHeight) {
         return tablesRemoved_ * pageSize * rowHeight + 'px';
       }
+    },
+    {
+      type: 'Boolean',
+      name: 'enableDynamicTableHeight',
+      value: true,
     }
   ],
 
@@ -254,11 +259,14 @@
 
       this.onDetach(this.onload.sub(this.addTbodies));
 
-      this.onDetach(this.onload.sub(this.updateTableHeight));
-      window.addEventListener('resize', this.updateTableHeight);
-      this.onDetach(() => {
-        window.removeEventListener('resize', this.updateTableHeight);
-      });
+      // set this in an if statement
+      if (this.enableDynamicTableHeight) {
+        this.onDetach(this.onload.sub(this.updateTableHeight));
+        window.addEventListener('resize', this.updateTableHeight);
+        this.onDetach(() => {
+          window.removeEventListener('resize', this.updateTableHeight);
+        });
+      }
     },
     {
       name: 'refresh',
