@@ -41,6 +41,10 @@ foam.CLASS({
             return spec.copyFrom(args);
           }
 
+          if ( foam.String.isInstance(spec) ) {
+            spec = { class: spec };
+          }
+
           if ( foam.core.Slot.isInstance(spec) )
             return spec;
 
@@ -95,15 +99,6 @@ foam.CLASS({
     ],
     */
     ['view', { class: 'foam.u2.view.MapView' }],
-    {
-      name: 'value',
-      adapt: function(_, spec) {
-        return foam.String.isInstance(spec) ? { class: spec } : spec;
-      }
-    },
-    [ 'adapt', function(_, spec, prop) {
-      return foam.String.isInstance(spec) ? { class: spec } : spec ;
-    } ],
     [ 'displayWidth', 80 ]
     /*
     [ 'toJSON', function(value) {
