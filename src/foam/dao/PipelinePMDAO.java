@@ -48,25 +48,37 @@ public class PipelinePMDAO
 
   @Override
   public FObject put_(X x, FObject obj) {
-
+    PM pm = new PM();
+    pm.setClassType(PMDAO.getOwnClassInfo());
+    pm.setName(putName_);
+    setX(getX().put('pipePmStart', pm));
     return super.put_(x, obj);
   }
 
   @Override
   public FObject find_(X x, Object id) {
-
+    PM pm = new PM();
+    pm.setClassType(PMDAO.getOwnClassInfo());
+    pm.setName(findName_);
+    setX(getX().put('pipePmStart', pm));
     return super.find_(x, id);
   }
 
   @Override
   public FObject remove_(X x, FObject obj) {
-
+    PM pm = new PM();
+    pm.setClassType(PMDAO.getOwnClassInfo());
+    pm.setName(removeName_);
+    setX(getX().put('pipePmStart', pm));
     return super.remove_(x, obj);
   }
 
   @Override
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-
+    PM pm = new PM();
+    pm.setClassType(PMDAO.getOwnClassInfo());
+    pm.setName(removeAllName_);
+    setX(getX().put('pipePmStart', pm));
     super.removeAll_(x, skip, limit, order, predicate);
   }
 
