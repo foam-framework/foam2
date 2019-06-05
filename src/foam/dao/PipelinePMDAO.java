@@ -36,11 +36,11 @@ public class PipelinePMDAO
   private void createPipeline() {
     DAO delegate = getDelegate();
     DAO secondaryDelegate;
-    if( delegate instanceof ProxyDAO ) {
+    if ( delegate instanceof ProxyDAO ) {
       secondaryDelegate = ((ProxyDAO) delegate).getDelegate();
       ((ProxyDAO) delegate).setDelegate(new EndPipelinePMDAO(getX(), secondaryDelegate));
       delegate = ((ProxyDAO) delegate).getDelegate();
-      if( secondaryDelegate instanceof ProxyDAO ) {
+      if ( secondaryDelegate instanceof ProxyDAO ) {
         ((ProxyDAO) delegate).setDelegate(new PipelinePMDAO(getX(), secondaryDelegate));
       }
     }
