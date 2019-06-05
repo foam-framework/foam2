@@ -19,18 +19,20 @@ public class PipelinePMDAO
   protected String findName_;
   protected String removeName_;
   protected String removeAllName_;
+  protected String delegateName_;
 
   public PipelinePMDAO(X x, DAO delegate) {
     super(x, delegate);
+    delegateName_ = getDelegate().getClass().getName();
     init();
   }
 
   void init() {
     createPipeline();
-    putName_       = getDelegate().getClass().getName() + ":pipePut";
-    findName_      = getDelegate().getClass().getName() + ":pipeFind";
-    removeName_    = getDelegate().getClass().getName() + ":pipeRemove";
-    removeAllName_ = getDelegate().getClass().getName() + ":pipeRemoveAll";
+    putName_       = delegateName_ + ":pipePut";
+    findName_      = delegateName_ + ":pipeFind";
+    removeName_    = delegateName_ + ":pipeRemove";
+    removeAllName_ = delegateName_ + ":pipeRemoveAll";
   }
 
   private void createPipeline() {
