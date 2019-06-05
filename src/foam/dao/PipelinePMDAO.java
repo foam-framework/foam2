@@ -51,7 +51,7 @@ public class PipelinePMDAO
     PM pm = new PM();
     pm.setClassType(PMDAO.getOwnClassInfo());
     pm.setName(putName_);
-    X pipeX = getX().put('pipePmStart', pm);
+    X pipeX = getX().put("pipePmStart", pm);
     return super.put_(pipeX, obj);
   }
 
@@ -60,7 +60,7 @@ public class PipelinePMDAO
     PM pm = new PM();
     pm.setClassType(PMDAO.getOwnClassInfo());
     pm.setName(findName_);
-    X pipeX = getX().put('pipePmStart', pm);
+    X pipeX = getX().put("pipePmStart", pm);
     return super.find_(pipeX, id);
   }
 
@@ -69,7 +69,7 @@ public class PipelinePMDAO
     PM pm = new PM();
     pm.setClassType(PMDAO.getOwnClassInfo());
     pm.setName(removeName_);
-    X pipeX = getX().put('pipePmStart', pm);
+    X pipeX = getX().put("pipePmStart", pm);
     return super.remove_(pipeX, obj);
   }
 
@@ -78,32 +78,32 @@ public class PipelinePMDAO
     PM pm = new PM();
     pm.setClassType(PMDAO.getOwnClassInfo());
     pm.setName(removeAllName_);
-    X pipeX = getX().put('pipePmStart', pm);
+    X pipeX = getX().put("pipePmStart", pm);
     super.removeAll_(pipeX, skip, limit, order, predicate);
   }
 
   public class EndPipelinePMDAO extends ProxyDAO {
     @Override
     public FObject put_(X x, FObject obj) {
-      getX().get('pipePmStart').log(x);
+      getX().get("pipePmStart").log(x);
       return super.put_(x, obj);
     }
 
     @Override
     public FObject find_(X x, Object id) {
-      getX().get('pipePmStart').log(x);
+      getX().get("pipePmStart").log(x);
       return super.find_(x, id);
     } 
 
     @Override
     public FObject remove_(X x, FObject obj) {
-      getX().get('pipePmStart').log(x);
+      getX().get("pipePmStart").log(x);
       return super.remove_(x, obj);
     }
 
     @Override
     public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-      getX().get('pipePmStart').log(x);
+      getX().get("pipePmStart").log(x);
       super.removeAll_(x, skip, limit, order, predicate);
     }
   }
