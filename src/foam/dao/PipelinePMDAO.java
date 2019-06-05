@@ -27,10 +27,10 @@ public class PipelinePMDAO
 
   void init() {
     createPipeline();
-    putName_       = getDelegate().getClass().getName() + ":pipePut"
-    findName_      = getDelegate().getClass().getName() + ":pipeFind"
-    removeName_    = getDelegate().getClass().getName() + ":pipeRemove"
-    removeAllName_ = getDelegate().getClass().getName() + ":pipeRemoveAll"
+    putName_       = getDelegate().getClass().getName() + ":pipePut";
+    findName_      = getDelegate().getClass().getName() + ":pipeFind";
+    removeName_    = getDelegate().getClass().getName() + ":pipeRemove";
+    removeAllName_ = getDelegate().getClass().getName() + ":pipeRemoveAll";
   }
 
   private void createPipeline() {
