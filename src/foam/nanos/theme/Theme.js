@@ -104,6 +104,9 @@ foam.CLASS({
     { class: 'Color', name: 'tableColor' },
     { class: 'Color', name: 'tableHoverColor' },
     { class: 'Color', name: 'accentColor' },
+    { class: 'Color', name: 'tertiaryColor'},
+    { class: 'Color', name: 'tertiaryHoverColor' },
+    { class: 'Color', name: 'tertiaryDisabledColor' }
   ],
 
   actions: [

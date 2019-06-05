@@ -167,14 +167,14 @@ foam.CLASS({
 
     ^tertiary {
       border: 2px solid;
-      border-color: %TERTIARYCOLOR%
-      background-color: %TERTIARYCOLOR%;
-      color: #5e6061;
+      border-color: transparent;
+      background-color: transparent;
+      color: %TERTIARYCOLOR%;
     }
 
     ^tertiary:hover:not(:disabled) {
-      border-color: %TERTIARYCOLOR%;
-      background-color: %TERTIARYCOLOR%;
+      border-color: transparent;
+      background-color: transparent;
     }
 
     ^tertiary:focus:not(:hover) {
@@ -182,8 +182,7 @@ foam.CLASS({
     }
 
     ^tertiary:disabled {
-      border-color: %TERTIARYDISABLEDCOLOR%;
-      background-color: %TERTIARYDISABLEDCOLOR%;
+      color: %TERTIARYDISABLEDCOLOR%;
     }
 
     ^tertiary-destructive {
