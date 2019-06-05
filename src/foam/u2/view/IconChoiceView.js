@@ -92,7 +92,7 @@ foam.CLASS({
                       data: c[1]
                   }).
               end().
-              enableClass(this.myClass('disabled-icon'), self.slot(function (data) { return data !== c[0] })).
+              enableClass(this.myClass('disabled-icon'), self.slot(function (data) { return data === c[0] })).
             end().
           end();
       }.bind(this)));
