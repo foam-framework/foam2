@@ -34,14 +34,14 @@ public class PipelinePMDAO
   }
 
   private void createPipeline() {
-    DAO delegate = getDelagate();
-    DAO secondaryDelagate;
+    DAO delegate = getDelegate();
+    DAO secondaryDelegate;
     if( delegate instanceof ProxyDAO ) {
-      secondaryDelagate = delagate.getDelagate();
-      delegate.setDelegate(new EndPipelinePMDAO(getX(), secondaryDelagate));
-      delegate = delagate.getDelegate();
-      if(secondaryDelagate instanceof ProxyDAO) {
-        delegate.setDelegate(new PipelinePMDAO(x, secondaryDelagate));
+      secondaryDelegate = ((ProxyDAO) delegate).getDelegate();
+      delegate.setDelegate(new EndPipelinePMDAO(getX(), secondaryDelegate));
+      delegate = ((ProxyDAO) delegate).getDelegate();
+      if(secondaryDelegate instanceof ProxyDAO) {
+        delegate.setDelegate(new PipelinePMDAO(x, secondaryDelegate));
       }
     }
   }
@@ -85,25 +85,25 @@ public class PipelinePMDAO
   public class EndPipelinePMDAO extends ProxyDAO {
     @Override
     public FObject put_(X x, FObject obj) {
-      getX().get("pipePmStart").log(x);
+      ((PM) getX().get("pipePmStart")).log(x);
       return super.put_(x, obj);
     }
 
     @Override
     public FObject find_(X x, Object id) {
-      getX().get("pipePmStart").log(x);
+      ((PM) getX().get("pipePmStart")).log(x);
       return super.find_(x, id);
     } 
 
     @Override
     public FObject remove_(X x, FObject obj) {
-      getX().get("pipePmStart").log(x);
+      ((PM) getX().get("pipePmStart")).log(x);
       return super.remove_(x, obj);
     }
 
     @Override
     public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-      getX().get("pipePmStart").log(x);
+      ((PM) getX().get("pipePmStart")).log(x);
       super.removeAll_(x, skip, limit, order, predicate);
     }
   }
