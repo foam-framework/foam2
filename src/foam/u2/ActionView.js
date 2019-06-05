@@ -166,23 +166,24 @@ foam.CLASS({
      */
 
     ^tertiary {
-      border: 2px solid transparent;
-      background-color: transparent;
+      border: 2px solid;
+      border-color: %TERTIARYCOLOR%
+      background-color: %TERTIARYCOLOR%;
       color: #5e6061;
     }
 
     ^tertiary:hover:not(:disabled) {
-      border-color: transparent;
-      background-color: transparent;
+      border-color: %TERTIARYCOLOR%;
+      background-color: %TERTIARYCOLOR%;
     }
 
     ^tertiary:focus:not(:hover) {
-      border-bottom-color: #4a33f4;
+      border-bottom-color: %TERTIARYHOVERCOLOR%;
     }
 
     ^tertiary:disabled {
-      border-color: %SECONDARYDISABLEDCOLOR%;
-      background-color: %SECONDARYDISABLEDCOLOR%;
+      border-color: %TERTIARYDISABLEDCOLOR%;
+      background-color: %TERTIARYDISABLEDCOLOR%;
     }
 
     ^tertiary-destructive {
@@ -202,7 +203,7 @@ foam.CLASS({
     }
 
     ^tertiary-destructive:disabled {
-      border-color: #ed8e8d;
+      border-color: %DESTRUCTIVEDISABLEDCOLOR%;
       background-color: %DESTRUCTIVEDISABLEDCOLOR%;
     }
 

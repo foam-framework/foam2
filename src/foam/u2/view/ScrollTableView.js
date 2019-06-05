@@ -259,7 +259,11 @@
 
       this.onDetach(this.onload.sub(this.addTbodies));
 
-      // set this in an if statement
+      /*
+        to be used in cases where we don't want the whole table to
+        take the whole page (i.e. we need multiple tables)
+        and enableDynamicTableHeight can be switched off
+      */
       if (this.enableDynamicTableHeight) {
         this.onDetach(this.onload.sub(this.updateTableHeight));
         window.addEventListener('resize', this.updateTableHeight);
