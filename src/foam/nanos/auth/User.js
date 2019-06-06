@@ -83,18 +83,21 @@ foam.CLASS({
       class: 'Boolean',
       name: 'enabled',
       documentation: 'Determines whether the User is permitted certain actions.',
-      value: true
+      value: true,
+      permissionRequired: true
     },
     {
       class: 'Boolean',
       name: 'loginEnabled',
       documentation: 'Determines whether the User can login to the platform.',
-      value: true
+      value: true,
+      permissionRequired: true
     },
     {
       class: 'DateTime',
       name: 'lastLogin',
-      documentation: 'The date and time of last login by User.'
+      documentation: 'The date and time of last login by User.',
+      permissionRequired: true
     },
     {
       class: 'String',
@@ -108,12 +111,14 @@ foam.CLASS({
         } if( /\d/.test(this.firstName) ) {
           return 'First name cannot contain numbers';
         }
-      }
+      },
+      permissionRequired: true
     },
     {
       class: 'String',
       name: 'middleName',
-      documentation: 'The middle name of the User.'
+      documentation: 'The middle name of the User.',
+      permissionRequired: true
     },
     {
       class: 'String',
@@ -127,7 +132,8 @@ foam.CLASS({
         } if( /\d/.test(this.lastName) ) {
           return 'Last name cannot contain numbers';
         }
-      }
+      },
+      permissionRequired: true
     },
     'legalName',
     {
@@ -143,14 +149,16 @@ foam.CLASS({
         } if (!(organization.trim())) {
           return 'Company Name Required.';
         }
-      }
+      },
+      permissionRequired: true
     },
     {
       class: 'String',
       name: 'department',
       documentation: `The department associated with the organization/business
         of the User.`,
-      width: 50
+      width: 50,
+      permissionRequired: true
     },
     {
       class: 'EMail',
@@ -174,7 +182,8 @@ foam.CLASS({
         if ( ! emailRegex.test(email.trim()) ) {
           return 'Invalid email address.';
         }
-      }
+      },
+      permissionRequired: true
     },
     {
       class: 'Boolean',
@@ -190,7 +199,8 @@ foam.CLASS({
       factory: function() {
         return this.Phone.create();
       },
-      view: { class: 'foam.u2.detail.VerticalDetailView' }
+      view: { class: 'foam.u2.detail.VerticalDetailView' },
+      permissionRequired: true
     },
     {
       class: 'String',
@@ -200,7 +210,8 @@ foam.CLASS({
         the phone number.`,
       expression: function(phone) {
         return phone.number;
-      }
+      },
+      permissionRequired: true
     },
     {
       class: 'FObjectProperty',
@@ -210,7 +221,8 @@ foam.CLASS({
       factory: function() {
         return this.Phone.create();
       },
-      view: { class: 'foam.u2.detail.VerticalDetailView' }
+      view: { class: 'foam.u2.detail.VerticalDetailView' },
+      permissionRequired: true
     },
     {
       class: 'String',
@@ -220,7 +232,8 @@ foam.CLASS({
       view: {
         class: 'foam.u2.view.ChoiceView',
         choices: [ 'Personal', 'Business', 'Merchant', 'Broker', 'Bank', 'Processor' ]
-      }
+      },
+      permissionRequired: true
     },
     {
       class: 'Date',
@@ -235,7 +248,8 @@ foam.CLASS({
       view: {
         class: 'foam.nanos.auth.ProfilePictureView',
         placeholderImage: 'images/ic-placeholder.png'
-      }
+      },
+      permissionRequired: true
     },
     {
       class: 'FObjectProperty',
@@ -245,20 +259,23 @@ foam.CLASS({
       factory: function() {
         return this.Address.create();
       },
-      view: { class: 'foam.nanos.auth.AddressDetailView' }
+      view: { class: 'foam.nanos.auth.AddressDetailView' },
+      permissionRequired: true
     },
     {
       class: 'Reference',
       name: 'language',
       documentation: 'The default language preferred by the User.',
       of: 'foam.nanos.auth.Language',
-      value: 'en'
+      value: 'en',
+      permissionRequired: true
     },
     {
       class: 'String',
       name: 'timeZone',
       documentation: 'The preferred time zone of the User.',
-      width: 5
+      width: 5,
+      permissionRequired: true
       // TODO: create custom view or DAO
     },
     {
@@ -276,32 +293,37 @@ foam.CLASS({
         if ( password.length > 0 && ! re.test(password) ) {
           return 'Password must contain one lowercase letter, one uppercase letter, one digit, and be between 7 and 32 characters in length.';
         }
-      }
+      },
+      permissionRequired: true
     },
     {
       class: 'Password',
       name: 'password',
       documentation: 'The password that is currently active with the User.',
       hidden: true,
-      networkTransient: true
+      networkTransient: true,
+      permissionRequired: true
     },
     {
       class: 'Password',
       name: 'previousPassword',
       documentation: 'The password that was previously active with the User.',
       hidden: true,
-      networkTransient: true
+      networkTransient: true,
+      permissionRequired: true
     },
     {
       class: 'DateTime',
       name: 'passwordLastModified',
-      documentation: 'The date and time that the password was last modified.'
+      documentation: 'The date and time that the password was last modified.',
+      permissionRequired: true
     },
     {
       class: 'DateTime',
       name: 'passwordExpiry',
       documentation: `The date and time that the current password of the User
         will expire.`,
+      permissionRequired: true
     },
     // TODO: startDate, endDate,
     // TODO: do we want to replace 'note' with a simple ticket system?
@@ -310,7 +332,8 @@ foam.CLASS({
       name: 'note',
       documentation: 'A field for a note that can be added and appended to the User.',
       displayWidth: 70,
-      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 }
+      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 },
+      permissionRequired: true
     },
     // TODO: remove after demo
     {
@@ -322,7 +345,8 @@ foam.CLASS({
         if ( businessName.length > 35 ) {
           return 'Business name cannot be greater than 35 characters.';
         }
-      }
+      },
+      permissionRequired: true
     },
     {
       class: 'String',
@@ -331,22 +355,26 @@ foam.CLASS({
       documentation: `The Bank Identification Code (BIC): an international bank code that
       identifies particular banks worldwide.
       `,
+      permissionRequired: true
     },
     {
       class: 'Boolean',
       name: 'businessHoursEnabled',
       documentation: 'Determines whether business hours are enabled for the User to set.',
-      value: false
+      value: false,
+      permissionRequired: true
     },
     {
       class: 'StringArray',
       name: 'disabledTopics',
-      documentation: 'Disables types for notifications.'
+      documentation: 'Disables types for notifications.',
+      permissionRequired: true
     },
     {
       class: 'StringArray',
       name: 'disabledTopicsEmail',
-      documentation: 'Disables types for email notifications.'
+      documentation: 'Disables types for email notifications.',
+      permissionRequired: true
     },
     {
       class: 'URL',
@@ -360,17 +388,20 @@ foam.CLASS({
         if ( website.length > 0 && ! websiteRegex.test(website) ) {
           return 'Invalid website';
         }
-      }
+      },
+      permissionRequired: true
     },
     {
       class: 'DateTime',
       name: 'created',
-      documentation: 'The date and time of when the User was created in the system.'
+      documentation: 'The date and time of when the User was created in the system.',
+      permissionRequired: true
     },
     {
       class: 'DateTime',
       name: 'lastModified',
-      documentation: 'The date and time the User was last modified.'
+      documentation: 'The date and time the User was last modified.',
+      permissionRequired: true
     }
   ],
 
