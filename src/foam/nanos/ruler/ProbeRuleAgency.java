@@ -1,20 +1,32 @@
 package foam.nanos.ruler;
 
 import foam.core.CompoundContextAgent;
+import foam.core.ContextAgent;
+import foam.core.ContextAware;
 import foam.core.X;
 
-public class RuleAgency
+public class ProbeRuleAgency
   extends CompoundContextAgent
 {
   protected Rule rule_;
 
-  public RuleAgency(X x, Rule rule) {
-    super(x);
+  public ProbeRuleAgency(Rule rule) {
     rule_ = rule;
   }
 
   public Rule getRule() {
     return rule_;
+  }
+
+  public void submit(X x, ContextAgent agent) {
+    if ( agent instanceof ContextAware)
+      System.out.print("s");
+      //((ContextAware) agent).setX(getX());
+    super.submit(x, agent);
+  }
+
+  public void execute() {
+     // Probe Agency should never be executed
   }
 
   public String toString() {

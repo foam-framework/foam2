@@ -53,7 +53,7 @@ public class RuleEngine extends ContextAwareSupport {
    * @param oldObj - Old FObject supplied to rules for execution
    */
   public void execute(List<Rule> rules, FObject obj, FObject oldObj) {
-    CompoundContextAgent agent = new CompoundContextAgent(x_);
+    CompoundContextAgent agent = new CompoundContextAgent();
     for (Rule rule : rules) {
       if ( stops_.get() ) break;
       applyRule(rule, obj, oldObj, agent);
@@ -75,7 +75,7 @@ public class RuleEngine extends ContextAwareSupport {
    */
   public void probe(List<Rule> rules, RulerProbe rulerProbe, FObject obj, FObject oldObj) {
     for (Rule rule : rules) {
-      RuleAgency ruleAgent = new RuleAgency(x_,rule);
+      ProbeRuleAgency ruleAgent = new ProbeRuleAgency(rule);
       if ( stops_.get() ) {
         rulerProbe.addTestedRule(rule.getId(), ruleAgent.toString() + "Not executed because was overridden and forced to stop.", false);
         continue;

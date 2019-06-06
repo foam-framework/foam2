@@ -210,7 +210,7 @@ public class RulerDAOTest extends Test {
       executeRule.setId(666L);
       executeRule.setRuleGroup("fake test group");
       executeRule.setDaoKey("fakeDaoKey");
-      agent.submit(x112 -> {
+      agent.submit(x, x112 -> {
         ruleDAO.put(executeRule);
       }, "RulerDAOTest add account");
 
