@@ -288,7 +288,7 @@ foam.CLASS({
     ^browse-view-container {
       margin: auto;
       border-bottom: solid 1px #e7eaec;
-      padding: 20px 0px 72px 0px;
+      margin: 20px 0px 72px 0px;
     }
 
     ^canned-queries {
@@ -475,8 +475,8 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpecWithJava',
       name: 'viewView',
-      expression: function(data$viewViews) {
-        return data$viewViews[0].view;
+      expression: function() {
+        return foam.u2.detail.SectionedDetailView;
       }
     },
     {
@@ -508,7 +508,7 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(obj, data$viewBorder, data$viewViews) {
+        .add(self.slot(function(obj, data$viewBorder) {
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -538,15 +538,6 @@ foam.CLASS({
                     buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                     icon: 'images/delete-icon.svg'
                   }).endContext()
-                .end()
-                .start(self.Cols)
-                  .callIf(data$viewViews.length > 1, function() {
-                    this.tag( foam.u2.view.IconChoiceView, { 
-                        choices: data$viewViews.map(o => [o.view, o.icon]),
-                        data$: self.viewView$,
-                      }
-                    )
-                  })
                 .end()
               .end()
 
@@ -616,8 +607,8 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpecWithJava',
       name: 'viewView',
-      expression: function(data$viewViews) {
-        return data$viewViews[0].view;
+      expression: function() {
+        return foam.u2.detail.SectionedDetailView;
       }
     }
   ],
@@ -647,7 +638,7 @@ foam.CLASS({
               .end()
               .start(data$viewBorder)
                 .start().addClass(this.myClass('create-view-container'))
-                  .tag(foam.u2.detail.SectionedDetailView, { data: data$of.create() })
+                  .tag(this.viewView, { data: data$of.create() })
                 .end()
               .end()
         }));
