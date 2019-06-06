@@ -80,6 +80,11 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'textFieldWithPlaceholder2',
+      placeholder: 'placeholder'
+    },
+    {
+      class: 'String',
       name: 'textFieldWithChoices',
       view: {
         class: 'foam.u2.TextField',
