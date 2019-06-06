@@ -27,6 +27,7 @@ public class PipelinePMDAO
     init();
   }
 
+  /** Calls a method to create the PM pipeline and sets the name variables of each operation of interest */
   void init() {
     createPipeline();
     putName_       = delegateName_ + ":pipePut";
@@ -35,6 +36,8 @@ public class PipelinePMDAO
     removeAllName_ = delegateName_ + ":pipeRemoveAll";
   }
 
+  /** Creates the PM pipeline by adding an EndPipelinePMDAO after of this class only if it is a ProxyDAO. 
+  *   If the delegate of that is also a ProxyDAO, creates a new PipelinedPMDAO in the chain beofre it which repeats this procedure recursively. */
   private void createPipeline() {
     DAO delegate = getDelegate();
     DAO secondaryDelegate;
@@ -48,6 +51,8 @@ public class PipelinePMDAO
     }
   }
 
+  /** Creates the PM that will measure the performance of each operation and creates a new context with it as a variable which the EndPipelinePMDAO
+   *  will use to access the pm after it is passed onto it through the arguments of the DAO operations */
   private X createPM(String name) {
     PM pm = new PM();
     pm.setClassType(PipelinePMDAO.getOwnClassInfo());
