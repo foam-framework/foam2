@@ -123,7 +123,15 @@ If empty than no permissions are required.`
       documentation: `Permissions required for the action to be enabled.
 If empty than no permissions are required.`,
     },
-    { name: 'runningMap', factory: function() { return new WeakMap(); }, transient: true }
+    { 
+      name: 'runningMap', 
+      factory: function() {
+        return new WeakMap(); 
+      }, 
+      hidden: true,
+      transient: true,
+      documentation: 'A weak Map to track the running state of action on a per object basis.'
+    }
   ],
 
   methods: [
@@ -168,9 +176,7 @@ If empty than no permissions are required.`,
     },
 
     function createIsEnabled$(x, data) {
-      var running = foam.core.SimpleSlot.create({ value: false });
-      if ( data ) this.runningMap.set(data, running);
-
+      var running = this.getRunning$(data);
       var slot = this.createSlotFor_(x, data, this.isEnabled, this.enabledPermissions);
       return foam.core.ExpressionSlot.create({
         args: [
@@ -187,15 +193,26 @@ If empty than no permissions are required.`,
       return this.createSlotFor_(x, data, this.isAvailable, this.availablePermissions);
     },
 
+    function getRunning$(data) {
+      var running = this.runningMap.get(data);
+      if ( ! running ) {
+        running = foam.core.SimpleSlot.create({ value: false });
+        if ( data ) this.runningMap.set(data, running);
+      }
+      return running;
+    },
+
     function maybeCall(x, data) {
       var self = this;
       function call() {
-        var running = self.runningMap.get(data);
-        if ( ! running ) {
-          running = foam.core.SimpleSlot.create({ value: false });
-          if ( data ) self.runningMap.set(data, running);
+        var running = self.getRunning$(data);
+        // If action is in progress do not call again. Problem with this is that if action returns a 
+        // promise that never resolves then the action is stuck in a running state. Not returning does not solves 
+        // this problem either since there is no guarantee that such promise would resolve on a second run. 
+        if ( running.get() ) {
+          x.warn("Attempted to call action that is in progress."); 
+          return;
         }
-        if ( running.get() ) { console.warn("Attempted to call action that is in progress."); }
         var ret = self.code.call(data, x, self);
         if ( ret && ret.then ) {
           running.set(true);
