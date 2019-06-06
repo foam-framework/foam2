@@ -68,7 +68,6 @@ foam.CLASS({
             attrs({
               type: 'radio',
               name: this.id,
-              value: c[0],
               checked: self.slot(function (data) { return data === c[0]; })
             }).
             setID(id = self.NEXT_ID()).
