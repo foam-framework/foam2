@@ -81,6 +81,7 @@ foam.CLASS({
   methods: [
     function initE() {
       this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.dataUpdate })));
+      this.dataUpdate();
       this.add(this.ChartCView.create({ config$: this.config$ }));
     }
   ],
