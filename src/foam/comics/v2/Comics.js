@@ -46,8 +46,9 @@ foam.CLASS({
     {
       class: 'String',
       name: 'name',
+      hidden: true,
       expression: function(label) {
-        // take only alpha num chars and append __CannedQuery
+        // Since these can be used as axioms, provide a unique name based on the label.
         return label.replace(/[^0-9a-z]/gi, '') + '__CannedQuery';
       }
     },
@@ -56,22 +57,28 @@ foam.CLASS({
       name: 'label'
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.mlang.predicate.Predicate',
+      class: 'foam.mlang.predicate.PredicateProperty',
       name: 'predicate',
       expression: function(predicateFactory) {
-        return predicateFactory ? predicateFactory(foam.mlang.ExpressionsSingleton.create()) : null;
+        return predicateFactory ?
+          predicateFactory(foam.mlang.ExpressionsSingleton.create()) :
+          null;
       }
     },
     {
-      name: 'predicateFactory'
+      name: 'predicateFactory',
+      hidden: true
     }
   ]
 }); 
 
 foam.CLASS({
   package: 'foam.comics.v2',
-  name: 'DAOControllerConfig', // EasyDAOController?
+  name: 'DAOControllerConfig',
+  requires: [
+    'foam.comics.v2.CannedQuery',
+    'foam.comics.v2.NamedView'
+  ],
   properties: [
     {
       class: 'String',
@@ -110,7 +117,7 @@ foam.CLASS({
       name: 'browseViews',
       factory: null,
       expression: function(of) {
-        return of.getAxiomsByClass(foam.comics.v2.NamedView);
+        return of.getAxiomsByClass(this.NamedView);
       }
     },
     {
@@ -119,7 +126,7 @@ foam.CLASS({
       name: 'cannedQueries',
       factory: null,
       expression: function(of) {
-        return of.getAxiomsByClass(foam.comics.v2.CannedQuery);
+        return of.getAxiomsByClass(this.CannedQuery);
       }
     },
     {
@@ -129,20 +136,6 @@ foam.CLASS({
         // Can't use a value here because java tries to generate a HasMap
         // for it which doesn't jive with the AbstractFObjectPropertyInfo.
         return { class: 'foam.u2.borders.NullBorder' };
-      }
-    },
-    {
-      class: 'FObjectArray',
-      of: 'foam.comics.v2.NamedView',
-      name: 'viewViews',
-      factory: function() {
-        return [
-          {
-            name: 'SDV',
-            view: { class: 'foam.u2.detail.SectionedDetailView' },
-            icon: 'images/sdv-icon.svg',
-          }
-        ];
       }
     }
   ]
@@ -157,11 +150,11 @@ foam.CLASS({
   ],
   requires: [
     'foam.comics.v2.DAOBrowserView',
+    'foam.u2.borders.CardBorder',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
-    'foam.u2.borders.CardBorder'
+    'foam.u2.view.IconChoiceView'
   ],
-
   css: `
     ^container {
       padding: 32px;
@@ -178,40 +171,13 @@ foam.CLASS({
       line-height: 1.33;
       color: #1e1f21;
     }
-    ^ .foam-u2-view-ScrollTableView-scrollbarContainer {
-      height: 424px;
-    }
 
-    ^inner-table {
-      padding: 20px 0px 72px 0px;
-    }
-
-    ^inner-table .foam-u2-view-TableView th {
-      background: #ffffff
-    }
-
-    ^inner-table .foam-u2-view-TableView td {
-      padding-left: 16px;
-    }
-
-    ^ .foam-u2-view-ScrollTableView {
-      border-bottom: solid 1px #e7eaec;
-    }
-
-    ^ .foam-u2-view-ScrollTableView-table {
-      width: 100%;
-    }
-
-    /*
-      Had to hack this in place because we had to seperate the browse view and controller
-    */
-    ^ .foam-u2-view-IconChoiceView {
+    ^altview-container {
       position: absolute;
       right: 0;
       padding: 12px 16px 0 0;
     }
   `,
-
   properties: [
     {
       class: 'FObjectProperty',
@@ -224,9 +190,9 @@ foam.CLASS({
       expression: function(data$browseViews) {
         return data$browseViews && data$browseViews.length
           ? data$browseViews[0].view
-          : foam.comics.v2.DAOBrowserView
+          : this.DAOBrowserView;
       }
-    },
+    }
   ],
   actions: [
     {
@@ -235,7 +201,7 @@ foam.CLASS({
         if ( ! this.stack ) return;
         this.stack.push({
           class: 'foam.comics.v2.DAOCreateView',
-          data$: this.data$,
+          data$: this.data$
         });
       }
     }
@@ -249,24 +215,30 @@ foam.CLASS({
       this.addClass(this.myClass())
       .add(this.slot(function(data, data$browseBorder, data$browseViews) {
         return self.E()
-          .start(self.Rows).addClass(this.myClass('container'))
-            .start(self.Cols).addClass(this.myClass('header-container'))
-              .start().addClass(this.myClass('browse-title')).add(data.browseTitle$).end()
+          .start(self.Rows)
+            .addClass(self.myClass('container'))
+            .start(self.Cols)
+              .addClass(self.myClass('header-container'))
+              .start()
+                .addClass(self.myClass('browse-title'))
+                .add(data.browseTitle$)
+              .end()
               .startContext({data: self}).add(self.CREATE).endContext()
             .end()
-            .start(this.CardBorder).style({ position: 'relative' })
-              .start(data$browseBorder).addClass(this.myClass('inner-table'))
-                  .callIf(data$browseViews.length > 1, function() {
-                      this.tag( foam.u2.view.IconChoiceView, { 
-                          choices: data$browseViews.map(o => [o.view, o.icon]),
-                          data$: self.browseView$,
-                        }
-                      )
-                  })
+            .start(self.CardBorder)
+              .style({ position: 'relative' })
+              .start(data$browseBorder)
+                .callIf(data$browseViews.length > 1, function() {
+                  this
+                    .start(self.IconChoiceView, { 
+                      choices: data$browseViews.map(o => [o.view, o.icon]),
+                      data$: self.browseView$
+                    })
+                      .addClass(self.myClass('altview-container'))
+                    .end();
+                })
                 .add(self.slot(function(browseView) {
-                  return self.E().tag(browseView, {
-                    data: data
-                  });
+                  return browseView.create({data: data});
                 }))
               .end()
             .end()
@@ -281,20 +253,21 @@ foam.CLASS({
   name: 'DAOBrowserView',
   extends: 'foam.u2.View',
   requires: [
-    'foam.u2.view.ScrollTableView',
+    'foam.u2.ActionView',
+    'foam.u2.dialog.Popup',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.search.Toolbar',
-    'foam.u2.ActionView',
-    'foam.u2.dialog.Popup'
+    'foam.u2.view.ScrollTableView',
+    'foam.u2.view.TabChoiceView'
   ],
 
   css: `
-    ^ .foam-u2-ActionView-export {
+    ^export {
       margin-left: 16px;
     }
 
-    ^ .foam-u2-ActionView img {
+    ^export img {
       margin-right: 0;
     }
 
@@ -314,10 +287,31 @@ foam.CLASS({
 
     ^browse-view-container {
       margin: auto;
+      border-bottom: solid 1px #e7eaec;
+      padding: 20px 0px 72px 0px;
     }
 
-    ^ .foam-u2-view-TabChoiceView {
+    ^canned-queries {
       padding: 0 16px;
+    }
+
+    /*
+      TODO: Don't manually target these classes like this.
+     */
+    ^ .foam-u2-view-ScrollTableView-table {
+      width: 100%;
+    }
+
+    ^ .foam-u2-view-ScrollTableView-scrollbarContainer {
+      height: 424px;
+    }
+
+    ^ .foam-u2-view-TableView th {
+      background: #ffffff
+    }
+
+    ^ .foam-u2-view-TableView td {
+      padding-left: 16px;
     }
   `,
 
@@ -334,8 +328,7 @@ foam.CLASS({
       name: 'data'
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.mlang.predicate.Predicate',
+      class: 'foam.mlang.predicate.PredicateProperty',
       name: 'predicate',
       expression: function(data$cannedQueries) {
         return data$cannedQueries && data$cannedQueries.length 
@@ -349,7 +342,7 @@ foam.CLASS({
       expression: function(data, predicate) {
         return data.dao$proxy.where(predicate);
       }
-    },
+    }
   ],
   actions: [
     {
@@ -359,7 +352,7 @@ foam.CLASS({
       code: function() {
         this.add(this.Popup.create().tag({
           class: 'foam.u2.ExportModal',
-          exportData: this.predicatedDAO
+          exportData: this.predicatedDAO$proxy
         }));
       }
     }
@@ -382,37 +375,39 @@ foam.CLASS({
           return self.E()
             .start(self.Rows)
               .callIf(data$cannedQueries.length >= 1, function() {
-                this.start(self.Cols).addClass(self.myClass('top-bar'))
+                this
                   .start(self.Cols)
-                    .callIf(data$cannedQueries.length > 1, function() {
-                        this.tag( foam.u2.view.TabChoiceView, { 
+                    .addClass(self.myClass('top-bar'))
+                    .start(self.Cols)
+                      .callIf(data$cannedQueries.length > 1, function() {
+                        this
+                          .start(self.TabChoiceView, { 
                             choices: data$cannedQueries.map(o => [o.predicate, o.label]),
                             data$: self.predicate$
-                          }
-                        )
-                    })
-                    .callIf(data$cannedQueries.length === 1, function() {
-                        self.predicate = data$cannedQueries[0].predicate;
-                      }
-                    )
-                    /**
-                     * otherwise if no cannedQueries are specified then the default
-                     * will show all entries so that we do not break history code
-                     */
-                  .end()
-                .end()
+                          })
+                            .addClass(self.myClass('canned-queries'))
+                          .end();
+                      })
+                    .end()
+                  .end();
               })
-              .start(self.Cols).addClass(this.myClass('query-bar'))
-                .start().addClass(this.myClass('toolbar'))
+              .start(self.Cols).addClass(self.myClass('query-bar'))
+                .start().addClass(self.myClass('toolbar'))
                   .tag(self.Toolbar, { /* data$: self.predicate$ */ })
                 .end()
-                .startContext({data: self}).tag(self.EXPORT, {
-                  buttonStyle: foam.u2.ButtonStyle.SECONDARY
-                })
+                .startContext({data: self})
+                  .start(self.EXPORT, {
+                    buttonStyle: foam.u2.ButtonStyle.SECONDARY
+                  })
+                    .addClass(self.myClass('export'))
+                  .end()
                 .endContext()
               .end()
-              .start().addClass(this.myClass('browse-view-container'))
-                .tag(self.ScrollTableView, { data: self.predicatedDAO$proxy, enableDynamicTableHeight: false })
+              .start(self.ScrollTableView, {
+                data: self.predicatedDAO$proxy,
+                enableDynamicTableHeight: false
+              })
+                .addClass(self.myClass('browse-view-container'))
               .end()
             .end();
         }));
