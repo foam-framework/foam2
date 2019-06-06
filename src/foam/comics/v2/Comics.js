@@ -238,7 +238,7 @@ foam.CLASS({
                     .end();
                 })
                 .add(self.slot(function(browseView) {
-                  return browseView.create({data: data});
+                  return self.E().tag(browseView, {data: data});
                 }))
               .end()
             .end()
