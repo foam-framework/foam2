@@ -15,7 +15,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'csv',
-      view: 'foam.u2.tag.TextArea'
+      view: 'foam.u2.tag.TextArea',
+      postSet: function(o,n) {
+        console.log(`position 5 - ${n}`);
+      }
     },
     {
       class: 'Class',
@@ -44,10 +47,11 @@ foam.CLASS({
   ],
 
   methods: [
-    function output(value) {
+    async function output(value) {
+      console.log(`position 4 value = ${value}`);
       if ( ! this.isNewLine ) this.csv += ',';
       this.isNewLine = false;
-      this.output_(value);
+      await this.output_(value);
     },
     {
       name: 'output_',
@@ -84,7 +88,7 @@ foam.CLASS({
       this.isNewLine = true;
     },
 
-    function put(obj) {
+    async function put(obj) {
       if ( ! this.of ) this.of = obj.cls_;
 
       if ( ! this.isHeadersOutput ) {
@@ -95,9 +99,12 @@ foam.CLASS({
         this.isHeadersOutput = true;
       }
 
-      this.props.forEach((element) => {
-        element.toCSV(obj, this, element);
-      });
+      for ( let i = 0; i < this.props.length; i++ ) {
+        let element = this.props[i];
+        console.log('position 3 - ' + element.name + ` index:${i} `+( obj ? obj[element.name] : 'null' ));
+        await element.toCSV(obj, this, element);
+      }
+      console.log('position 6 - ' + this.csv);
       this.newLine_();
     },
 
@@ -121,6 +128,7 @@ foam.CLASS({
       name: 'toCSV',
       class: 'Function',
       value: function(obj, outputter, prop) {
+        console.log('position 2 ' + obj[prop.name]);
         outputter.output(obj ? obj[prop.name] : null);
       }
     },

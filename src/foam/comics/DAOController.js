@@ -172,6 +172,10 @@ foam.CLASS({
       class: 'String',
       name: 'detailView',
       value: 'foam.u2.DetailView'
+    },
+    {
+      name: 'propList',
+      hidden: true
     }
   ],
 
@@ -238,14 +242,14 @@ foam.CLASS({
       icon: 'images/export-icon-resting.svg',
       isAvailable: function(exportCSVEnabled) { return exportCSVEnabled; },
       code: function() {
-        this.downloadCSV(this.filteredDAO);
+        this.downloadCSV(this.filteredDAO, this.propList);
       }
     }
   ],
 
   listeners: [
-    function downloadCSV(data) {
-      this.csvDriver.exportDAO(this.__context__, data)
+    function downloadCSV(data, propList) {
+      this.csvDriver.exportDAO(this.__context__, data, propList)
       .then(function(result) {
         result = 'data:text/csv;charset=utf-8,' + result;
         var encodedUri = encodeURI(result);
