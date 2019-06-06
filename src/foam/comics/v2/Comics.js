@@ -323,9 +323,17 @@ foam.CLASS({
   ],
   properties: [
     {
+      class: 'foam.dao.DAOProperty',
+      name: 'data',
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.comics.v2.DAOControllerConfig',
-      name: 'data'
+      name: 'daoControllerConfig',
+      factory: function(data) {
+        debugger;
+        return foam.comics.v2.DAOControllerConfig.create({ data })
+      }
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
@@ -371,18 +379,18 @@ foam.CLASS({
       this.addClass(this.myClass());
       this.SUPER();
       this
-        .add(self.slot(function(data$cannedQueries) {
+        .add(self.slot(function(daoControllerConfig$cannedQueries) {
           return self.E()
             .start(self.Rows)
-              .callIf(data$cannedQueries.length >= 1, function() {
+              .callIf(daoControllerConfig$cannedQueries.length >= 1, function() {
                 this
                   .start(self.Cols)
                     .addClass(self.myClass('top-bar'))
                     .start(self.Cols)
-                      .callIf(data$cannedQueries.length > 1, function() {
+                      .callIf(daoControllerConfig$cannedQueries.length > 1, function() {
                         this
                           .start(self.TabChoiceView, { 
-                            choices: data$cannedQueries.map(o => [o.predicate, o.label]),
+                            choices: daoControllerConfig$cannedQueries.map(o => [o.predicate, o.label]),
                             data$: self.predicate$
                           })
                             .addClass(self.myClass('canned-queries'))
@@ -475,9 +483,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpecWithJava',
       name: 'viewView',
-      expression: function(data$viewViews) {
-        return data$viewViews[0].view;
-      }
+      factory: function() { return foam.u2.detail.SectionedDetailView }
     },
     {
       name: 'primary',
@@ -508,7 +514,7 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(obj, data$viewBorder, data$viewViews) {
+        .add(self.slot(function(obj, data$viewBorder) {
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -538,15 +544,6 @@ foam.CLASS({
                     buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                     icon: 'images/delete-icon.svg'
                   }).endContext()
-                .end()
-                .start(self.Cols)
-                  .callIf(data$viewViews.length > 1, function() {
-                    this.tag( foam.u2.view.IconChoiceView, { 
-                        choices: data$viewViews.map(o => [o.view, o.icon]),
-                        data$: self.viewView$,
-                      }
-                    )
-                  })
                 .end()
               .end()
 
@@ -616,9 +613,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpecWithJava',
       name: 'viewView',
-      expression: function(data$viewViews) {
-        return data$viewViews[0].view;
-      }
+      factory: function() { return foam.u2.detail.SectionedDetailView }
     }
   ],
   methods: [
@@ -627,7 +622,7 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(data$viewBorder, data$browseTitle, data$of) {
+        .add(self.slot(function(data$viewBorder, data$browseTitle, data$of, viewView) {
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -647,7 +642,7 @@ foam.CLASS({
               .end()
               .start(data$viewBorder)
                 .start().addClass(this.myClass('create-view-container'))
-                  .tag(foam.u2.detail.SectionedDetailView, { data: data$of.create() })
+                  .tag(viewView, { data: data$of.create() })
                 .end()
               .end()
         }));
