@@ -491,6 +491,11 @@ public class DigWebAgent
   {
     FObject oldObj = dao.find(obj);
 
+    /**
+     * Only for the case of Simplified api user entity
+     * switching to auth.user from api.user to merge
+     */
+
     if ( obj instanceof net.nanopay.api.Business )
       obj = ((net.nanopay.api.Business) obj).getUser();
 
