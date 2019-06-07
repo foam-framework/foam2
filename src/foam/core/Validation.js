@@ -297,3 +297,28 @@ foam.CLASS({
     foam.core.internal.Errors.create()
   ]
 });
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'EmailPropertyValidationRefinement',
+  refines: 'foam.core.EMail',
+  properties: [
+    {
+      class: 'FObjectArray',
+      of: 'foam.core.ValidationPredicate',
+      name: 'validationPredicates',
+      factory: function() {
+        var self = this;
+        return [
+          {
+            args: [this.name],
+            predicateFactory: function(e) {
+              return e.REG_EXP(self, /.+@.+\..+/);
+            },
+            errorString: `${this.label} is not an email address`
+          }
+        ];
+      }
+    }
+  ]
+});

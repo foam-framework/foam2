@@ -91,6 +91,7 @@ FOAM_FILES([
   { name: "foam/core/AbstractFObject" },
   { name: "foam/core/ContextAgent" },
   { name: "foam/core/Validatable" },
+  { name: "foam/core/AxiomCloner" },
   { name: "foam/java/Authorizable" },
   { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
   { name: "foam/swift/SwiftLib", flags: ['swift'] },
@@ -401,6 +402,7 @@ FOAM_FILES([
   { name: "foam/u2/RangeView", flags: ['web'] },
   { name: "foam/u2/ReadWriteView", flags: ['web'] },
   { name: "foam/u2/HTMLElement", flags: ['web'] },
+  { name: "foam/u2/HTMLView", flags: ['web'] },
   { name: "foam/u2/tag/Select", flags: ['web'] },
   { name: "foam/u2/UnstyledTabs", flags: ['web'] },
   { name: "foam/u2/Tabs", flags: ['web'] },
@@ -593,7 +595,12 @@ FOAM_FILES([
   { name: "foam/u2/view/AnyView" },
   { name: "foam/u2/view/ArrayView" },
 
+  { name: "io/c9/ace/Config" },
+  { name: "io/c9/ace/Editor" },
+  { name: "io/c9/ace/KeyBinding" },
   { name: "io/c9/ace/Lib" },
+  { name: "io/c9/ace/Mode" },
+  { name: "io/c9/ace/Theme" },
 
   { name: "foam/u2/view/date/AbstractDateView"},
   { name: "foam/u2/view/date/CalendarDatePicker"},

@@ -2622,7 +2622,7 @@ foam.CLASS({
       name: 'args'
     },
     {
-      class: 'Array',
+      class: 'List',
       name: 'data',
       factory: function() { return []; }
     }
@@ -2632,7 +2632,14 @@ foam.CLASS({
       name: 'put',
       code: function put(obj) {
         this.data.push(this.args.map(a => a.f(obj)));
-      }
+      },
+      javaCode: `
+        Object[] args = new Object[getArgs().length];
+        for ( int i = 0; i < getArgs().length ; i++ ) {
+          args[i] = getArgs()[i].f(obj);
+        }
+        getData().add(args);
+      `
     }
   ]
 });
