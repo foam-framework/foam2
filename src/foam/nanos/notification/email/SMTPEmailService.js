@@ -131,10 +131,12 @@ foam.CLASS({
         try {
           MimeMessage message = new MimeMessage(getSession_());
 
-          if ( emailMessage.isPropertySet("displayName") ) {
-            message.setFrom( new InternetAddress(emailMessage.getFrom(), emailMessage.getDisplayName()) );
-          } else {
-            message.setFrom(new InternetAddress(emailMessage.getFrom()));
+          if ( emailMessage.isPropertySet("from") ) {
+            if ( emailMessage.isPropertySet("displayName") ) {
+              message.setFrom( new InternetAddress(emailMessage.getFrom(), emailMessage.getDisplayName()) );
+            } else {
+              message.setFrom(new InternetAddress(emailMessage.getFrom()));
+            }
           }
 
           if ( emailMessage.isPropertySet("replyTo") )
