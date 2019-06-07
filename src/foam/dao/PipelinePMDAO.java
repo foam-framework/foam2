@@ -85,25 +85,25 @@ public class PipelinePMDAO
 
     @Override
     public FObject put_(X x, FObject obj) {
-      ((PM) getX().get("pipePmStart")).log(x);
+      ((PM) x.get("pipePmStart")).log(x);
       return super.put_(x, obj);
     }
 
     @Override
     public FObject find_(X x, Object id) {
-      ((PM) getX().get("pipePmStart")).log(x);
+      ((PM) x.get("pipePmStart")).log(x);
       return super.find_(x, id);
     } 
 
     @Override
     public FObject remove_(X x, FObject obj) {
-      ((PM) getX().get("pipePmStart")).log(x);
+      ((PM) x.get("pipePmStart")).log(x);
       return super.remove_(x, obj);
     }
 
     @Override
     public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-      ((PM) getX().get("pipePmStart")).log(x);
+      ((PM) x.get("pipePmStart")).log(x);
       super.removeAll_(x, skip, limit, order, predicate);
     }
   }
