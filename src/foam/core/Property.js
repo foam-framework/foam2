@@ -308,6 +308,10 @@ foam.CLASS({
       if ( this.forClass_ && this.forClass_ !== c.id && prop === this ) {
         // Clone this property if it's been installed before.
         prop = this.clone();
+
+        // sourceCls_ isn't a real property so it gets lost during the clone.
+        prop.sourceCls_ = c; 
+
         c.axiomMap_[prop.name] = prop;
       }
 

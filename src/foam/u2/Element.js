@@ -2129,6 +2129,10 @@ foam.CLASS({
       value: false
     },
     {
+      class: 'String',
+      name: 'placeholder'
+    },
+    {
       class: 'foam.u2.ViewSpec',
       name: 'view',
       value: { class: 'foam.u2.TextField' }
@@ -2386,7 +2390,12 @@ foam.CLASS({
   properties: [
     {
       name: 'view',
-      value: { class: 'foam.u2.view.FObjectArrayView' },
+      expression: function(of) {
+        return {
+          class: 'foam.u2.view.FObjectArrayView',
+          of: of
+        };
+      }
     }
   ]
 });
@@ -2673,6 +2682,18 @@ foam.CLASS({
       postSet: function(_, cs) {
         this.axioms_.push(foam.u2.SearchColumns.create({columns: cs}));
       }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'PredicatePropertyRefine',
+  refines: 'foam.mlang.predicate.PredicateProperty',
+  properties: [
+    {
+      name: 'view',
+      value: { class: 'foam.u2.view.JSONTextView' }
     }
   ]
 });

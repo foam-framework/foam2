@@ -1455,6 +1455,7 @@ foam.CLASS({
   requires: [ 'foam.mlang.Constant' ],
 
   javaImports: [
+    'java.util.List',
     'foam.mlang.ArrayConstant',
     'foam.mlang.Constant',
     'foam.mlang.predicate.False'
@@ -1538,7 +1539,14 @@ return false
   // boolean uppercase = lhs.getClass().isEnum(); TODO: Account for ENUMs? (See js)
   Object rhs = getArg2().f(obj);
 
-  if ( rhs instanceof Object[] ) {
+  if ( rhs instanceof List ) {
+    List list = (List) rhs;
+    for ( Object o : list ) {
+      if ( ( ( (Comparable) lhs ).compareTo( (Comparable) o ) ) == 0 ) {
+        return true;
+      }
+    }
+  } else if ( rhs instanceof Object[] ) {
     // Checks if rhs array contains the lhs object
     Object[] values = (Object[])rhs;
 
@@ -2614,7 +2622,7 @@ foam.CLASS({
       name: 'args'
     },
     {
-      class: 'Array',
+      class: 'List',
       name: 'data',
       factory: function() { return []; }
     }
@@ -2624,7 +2632,14 @@ foam.CLASS({
       name: 'put',
       code: function put(obj) {
         this.data.push(this.args.map(a => a.f(obj)));
-      }
+      },
+      javaCode: `
+        Object[] args = new Object[getArgs().length];
+        for ( int i = 0; i < getArgs().length ; i++ ) {
+          args[i] = getArgs()[i].f(obj);
+        }
+        getData().add(args);
+      `
     }
   ]
 });

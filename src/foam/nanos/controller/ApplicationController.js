@@ -28,6 +28,7 @@ foam.CLASS({
 
   implements: [
     'foam.box.Context',
+    'foam.mlang.Expressions',
     'foam.nanos.controller.AppStyles'
   ],
 
@@ -38,6 +39,7 @@ foam.CLASS({
     'foam.nanos.auth.SignInView',
     'foam.nanos.auth.User',
     'foam.nanos.auth.resetPassword.ResetView',
+    'foam.nanos.theme.Theme',
     'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.u2.navigation.FooterView',
     'foam.u2.stack.Stack',
@@ -61,7 +63,7 @@ foam.CLASS({
     'lastMenuLaunched',
     'lastMenuLaunchedListener',
     'loginSuccess',
-    'logo',
+    'theme',
     'menuListener',
     'notify',
     'pushMenu',
@@ -75,12 +77,27 @@ foam.CLASS({
   ],
 
   constants: {
-    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor', 'secondaryHoverColor', 'secondaryDisabledColor', 'destructiveColor', 'destructiveHoverColor', 'destructiveDisabledColor', 'groupCSS', 'backgroundColor', 'headerColor' ]
+    MACROS: [
+      'primaryColor',
+      'secondaryColor',
+      'tableColor',
+      'tableHoverColor',
+      'accentColor',
+      'secondaryHoverColor',
+      'secondaryDisabledColor',
+      'destructiveColor',
+      'destructiveHoverColor',
+      'destructiveDisabledColor',
+      'customCSS',
+      'backgroundColor',
+      'headerColor'
+    ]
   },
 
   messages: [
     { name: 'GROUP_FETCH_ERR', message: 'Error fetching group' },
-    { name: 'GROUP_NULL_ERR', message: 'Group was null' }
+    { name: 'GROUP_NULL_ERR', message: 'Group was null' },
+    { name: 'LOOK_AND_FEEL_NOT_FOUND', message: 'Could not fetch look and feel object.' }
   ],
 
   css: `
@@ -148,31 +165,22 @@ foam.CLASS({
       class: 'Boolean',
       name: 'loginSuccess'
     },
-    { class: 'URL', name: 'logo' },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.session.SessionTimer',
       name: 'sessionTimer',
-      factory: function () {
+      factory: function() {
         return this.SessionTimer.create();
       }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.theme.Theme',
+      name: 'theme'
     },
     'currentMenu',
     'lastMenuLaunched',
     'webApp',
-    'primaryColor',
-    'secondaryColor',
-    'secondaryHoverColor',
-    'secondaryDisabledColor',
-    'destructiveColor',
-    'destructiveHoverColor',
-    'destructiveDisabledColor',
-    'tableColor',
-    'tableHoverColor',
-    'accentColor',
-    'backgroundColor',
-    'headerColor',
-    'groupCSS',
     'topNavigation_',
     'footerView_'
   ],
@@ -182,7 +190,7 @@ foam.CLASS({
       this.SUPER();
 
       // done to start using SectionedDetailViews instead of DetailViews
-      foam.__context__.register(foam.u2.detail.SectionedDetailView, 'foam.u2.DetailView');
+      this.__subContext__.register(foam.u2.detail.SectionedDetailView, 'foam.u2.DetailView');
 
       var self = this;
 
@@ -215,38 +223,26 @@ foam.CLASS({
     },
 
     function initE() {
-      var self = this;
-      self.clientPromise.then(function() {
-        self
-          .addClass(self.myClass())
-          .tag('div', null, self.topNavigation_$)
-          .start()
-            .addClass('stack-wrapper')
-            .tag({
-              class: 'foam.u2.stack.StackView',
-              data: self.stack,
-              showActions: false
-            })
-          .end()
-          .tag('div', null, self.footerView_$);
-
-          // Sets up application view
-          self.topNavigation_.add(self.TopNavigation.create());
-          self.footerView_.add(self.FooterView.create());
+      this.clientPromise.then(() => {
+        this.fetchTheme().then(() => {
+          this
+            .addClass(this.myClass())
+            .start('div', null, this.topNavigation_$)
+              .tag(this.TopNavigation)
+            .end()
+            .start()
+              .addClass('stack-wrapper')
+              .tag({
+                class: 'foam.u2.stack.StackView',
+                data: this.stack,
+                showActions: false
+              })
+            .end()
+            .start('div', null, this.footerView_$)
+              .tag(this.FooterView)
+            .end();
+          });
       });
-    },
-
-    function setPortalView(group) {
-      // Replaces contents of top navigation and footer view with group views
-      this.topNavigation_ && this.topNavigation_.replaceChild(
-        foam.lookup(group.topNavigation).create(null, this),
-        this.topNavigation_.children[0]
-      );
-
-      this.footerView_ && this.footerView_.replaceChild(
-        foam.lookup(group.footerView).create(null, this),
-        this.footerView_.children[0]
-      );
     },
 
     async function fetchGroup() {
@@ -260,10 +256,8 @@ foam.CLASS({
       }
     },
 
-    /**
-     * Get current user, else show login.
-     */
     async function fetchUser() {
+      /** Get current user, else show login. */
       try {
         var result = await this.client.auth.getCurrentUser(null);
         this.loginSuccess = !! result;
@@ -287,7 +281,7 @@ foam.CLASS({
 
       return css.replace(
         new RegExp('%' + M + '%', 'g'),
-        '/*%' + M + '%*/ ' + this[m]);
+        '/*%' + M + '%*/ ' + this.theme[m]);
     },
 
     function expandLongFormMacro(css, m) {
@@ -296,22 +290,13 @@ foam.CLASS({
 
       return css.replace(
         new RegExp('/\\*%' + M + '%\\*/[^;]*', 'g'),
-        '/*%' + M + '%*/ ' + this[m]);
+        '/*%' + M + '%*/ ' + this.theme[m]);
     },
 
-    // CSS preprocessor, works on classes instantiated in subContext
     function wrapCSS(text, id) {
+      /** CSS preprocessor, works on classes instantiated in subContext. */
       if ( text ) {
-        if ( ! this.accentColor ) {
-          var self = this;
-
-          this.accentColor$.sub(function(s) {
-            self.wrapCSS(text, id);
-            s.detach();
-          });
-        }
-
-        let eid = foam.u2.Element.NEXT_ID();
+        var eid = foam.u2.Element.NEXT_ID();
 
         for ( var i = 0 ; i < this.MACROS.length ; i++ ) {
           let m     = this.MACROS[i];
@@ -321,10 +306,10 @@ foam.CLASS({
             // and update the CSS if it changes.
             if ( text != text2 ) {
               text = text2;
-              this.slot(m).sub(function() {
+              this.onDetach(this.theme$.dot(m).sub(() => {
                 var el = this.getElementById(eid);
                 el.innerText = this.expandLongFormMacro(el.innerText, m);
-              }.bind(this));
+              }));
             }
         }
 
@@ -356,8 +341,8 @@ foam.CLASS({
       });
     },
 
-    // This method is for toast notification message
     function notify(data, type) {
+      /** Convenience method to create toast notifications. */
       this.add(this.NotificationMessage.create({
         message: data,
         type: type
@@ -366,20 +351,13 @@ foam.CLASS({
   ],
 
   listeners: [
-    /**
-     * Called whenever the group updates.
-     *   - Updates the portal view based on the group
-     *   - Update the macros list based on the group
-     *   - Go to a menu based on either the hash or the group
-     */
     function onUserAgentAndGroupLoaded() {
-      this.setPortalView(this.group);
-
-      for ( var i = 0; i < this.MACROS.length; i++ ) {
-        var m = this.MACROS[i];
-        if ( this.group[m] ) this[m] = this.group[m];
-      }
-
+      /**
+       * Called whenever the group updates.
+       *   - Updates the portal view based on the group
+       *   - Update the look and feel of the app based on the group or user
+       *   - Go to a menu based on either the hash or the group
+       */
       if ( ! this.user.emailVerified ) {
         this.loginSuccess = false;
         this.stack.push({ class: 'foam.nanos.auth.ResendVerificationEmail' });
@@ -394,18 +372,81 @@ foam.CLASS({
       } else if ( this.group ) {
         this.window.location.hash = this.group.defaultMenu;
       }
+
+      // Update the look and feel now that the user is logged in since there
+      // might be a more specific one to use now.
+      this.fetchTheme();
     },
 
-    // This listener should be called when a Menu item has been launched
-    // by some Menu View. Is exported.
     function menuListener(m) {
+      /**
+       * This listener should be called when a Menu item has been launched
+       * by some Menu View. Is exported.
+       */
       this.currentMenu = m;
     },
 
-    // This listener should be called when a Menu has been launched but does
-    // not navigate to a new screen. Typically for SubMenus
     function lastMenuLaunchedListener(m) {
+      /**
+       * This listener should be called when a Menu has been launched but does
+       * not navigate to a new screen. Typically for SubMenus.
+       */
       this.lastMenuLaunched = m;
+    },
+
+    async function fetchTheme() {
+      /**
+       * Get the most appropriate Theme object from the server and use it to
+       * customize the look and feel of the application.
+       */
+      try {
+        if ( this.user && this.user.personalTheme ) {
+          // If the user has a personal theme, use that.
+          this.theme = await this.user.personalTheme$find;
+        } else {
+          // If they don't, then we fetch the most appropriate theme based on
+          // a few different parameters.
+          var predicates = [];
+
+          if ( this.webApp ) {
+            predicates.push(this.EQ(this.Theme.APP_NAME, this.webApp));
+          }
+
+          if ( this.user && this.user.spid ) {
+            predicates.push(this.EQ(this.Theme.SPID, this.user.spid));
+          }
+
+          var dao = this.client.themeDAO;
+          var predicate = this.TRUE;
+
+          if ( predicates.length ) {
+            predicate = this.Or.create({ args: predicates });
+          }
+
+          this.theme = await dao.find(predicate);
+        }
+      } catch (err) {
+        this.notify(this.LOOK_AND_FEEL_NOT_FOUND, 'error');
+        console.error(err);
+        return;
+      }
+
+      this.useCustomElements();
+    },
+
+    function useCustomElements() {
+      /** Use custom elements if supplied by the Theme. */
+      if ( ! this.theme ) throw new Error(this.LOOK_AND_FEEL_NOT_FOUND);
+
+      if ( this.theme.topNavigation && this.topNavigation_ ) {
+        this.topNavigation_.removeAllChildren();
+        this.topNavigation_.tag({ class: this.theme.topNavigation });
+      }
+
+      if ( this.theme.footerView && this.footerView_ ) {
+        this.footerView_.removeAllChildren();
+        this.footerView_.tag({ class: this.theme.footerView });
+      }
     }
   ]
 });

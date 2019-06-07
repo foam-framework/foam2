@@ -39,7 +39,7 @@ public class SendEmailNotificationDAO extends ProxyDAO {
     if ( oldNotif != null )
       return super.put_(x, obj);
 
-    if ( ! notif.getEmailIsEnabled() )
+    if ( ! notif.getEmailIsEnabled() || user == null )
       return super.put_(x, obj);
 
     if ( user.getDisabledTopicsEmail() != null ) {
