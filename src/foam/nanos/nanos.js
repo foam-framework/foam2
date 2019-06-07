@@ -101,6 +101,7 @@ FOAM_FILES([
   { name: "foam/nanos/menu/SubMenuView" },
   { name: "foam/nanos/menu/TabsMenu" },
   { name: "foam/nanos/menu/ViewMenu" },
+  { name: "foam/nanos/menu/ScriptMenu" },
   { name: "foam/nanos/menu/TreeAltView", flags: ['web'] },
   { name: "foam/nanos/menu/TreeGraphAltView" },
   { name: "foam/nanos/auth/PermissionTableView", flags: ['web'] },
@@ -182,11 +183,17 @@ FOAM_FILES([
   { name: 'foam/nanos/dig/Argument'},
   { name: 'foam/nanos/notification/email/ClientPOP3EmailService'},
   { name: 'foam/nanos/notification/email/POP3Email'},
-  { name: "foam/nanos/ruler/Rule" },
+
+  // foam/nanos/ruler
   { name: "foam/nanos/ruler/Operations" },
+  { name: "foam/nanos/ruler/Rule" },
+  { name: "foam/nanos/ruler/RuleAction" },
   { name: "foam/nanos/ruler/RuleHistory" },
   { name: "foam/nanos/ruler/RuleHistoryStatus" },
+  { name: "foam/nanos/ruler/RulerDAO" },
+  { name: "foam/nanos/ruler/ScriptPredicate"},
   { name: "foam/nanos/ruler/UpdateRulesListSink" },
+  
   { name: "foam/nanos/test/EchoService" },
   { name: "foam/nanos/test/SerializationTestEchoService" },
   { name: "foam/nanos/analytics/Foldable" },
