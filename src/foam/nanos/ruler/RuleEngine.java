@@ -27,11 +27,13 @@ public class RuleEngine extends ContextAwareSupport {
   private Map<Long, Object> results_ = new HashMap<>();
   private Map<Long, RuleHistory> savedRuleHistory_ = new HashMap<>();
   private Rule currentRule_ = null;
+  private X systemX_;
 
-  public RuleEngine(X x, DAO delegate) {
+  public RuleEngine(X x, X systemX, DAO delegate) {
     setX(x);
     setDelegate(delegate);
     ruleHistoryDAO_ = (DAO) x.get("ruleHistoryDAO");
+    systemX_ = systemX;
   }
 
   public DAO getDelegate() {
@@ -53,7 +55,7 @@ public class RuleEngine extends ContextAwareSupport {
    * @param oldObj - Old FObject supplied to rules for execution
    */
   public void execute(List<Rule> rules, FObject obj, FObject oldObj) {
-    CompoundContextAgent agent = new CompoundContextAgent();
+    ContextualizingRuleAgency agent = new ContextualizingRuleAgency(x_, systemX_);
     for (Rule rule : rules) {
       if ( stops_.get() ) break;
       applyRule(rule, obj, oldObj, agent);

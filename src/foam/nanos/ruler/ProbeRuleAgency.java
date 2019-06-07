@@ -18,12 +18,12 @@ public class ProbeRuleAgency
     return rule_;
   }
 
-  public void submit(X x, ContextAgent agent) {
-    if ( agent instanceof ContextAware)
-      System.out.print("s");
-      //((ContextAware) agent).setX(getX());
-    super.submit(x, agent);
-  }
+//  public void submit(X x, ContextAgent agent) {
+//    if ( agent instanceof ContextAware)
+//      System.out.print("s");
+//      //((ContextAware) agent).setX(getX());
+//    super.submit(x, agent);
+//  }
 
   public void execute() {
      // Probe Agency should never be executed

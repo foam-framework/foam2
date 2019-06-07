@@ -31,6 +31,7 @@ public class CompoundContextAgent
       try {
         agent.run();
       } catch (Throwable t) {
+        throw t;
       }
     }
   }

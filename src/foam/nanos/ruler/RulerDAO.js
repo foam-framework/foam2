@@ -12,7 +12,7 @@ foam.CLASS({
   documentation: `
     RulerDAO selects all the rules that can be applied to specific dao depending on type of operation(create/update/remove). Selected rules are applied
     in the order specified in rule.priority until all are executed or until one of the rules forces execution to stop.
-    See RulerDAOTest for examples. 
+    See RulerDAOTest for examples.
   `,
 
   javaImports: [
@@ -160,7 +160,7 @@ return ret;`
       javaCode: `for ( Object key : sink.getGroupKeys() ) {
   List<Rule> group = ((ArraySink) sink.getGroups().get(key)).getArray();
   if ( ! group.isEmpty() ) {
-    new RuleEngine(x, this).execute(group, obj, oldObj);
+    new RuleEngine(x, getX(), this).execute(group, obj, oldObj);
   }
 }`
     },
@@ -224,7 +224,7 @@ return getDelegate().cmd(obj);`
         { name: 'predicate', type: 'foam.mlang.predicate.Predicate' }
       ],
       javaCode: `GroupBy groups;
-RuleEngine engine = new RuleEngine(x, this);
+RuleEngine engine = new RuleEngine(x, getX(), this);
 Map rulesList = getRulesList();
 FObject oldObj = getDelegate().find_(x, probe.getObject());
 groups = (GroupBy)rulesList.get(predicate);

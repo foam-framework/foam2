@@ -27,6 +27,7 @@ class ContextAgentRunnable
     try {
       agent_.execute(x_);
     } catch (Throwable t) {
+      throw t;
     }
   }
 }

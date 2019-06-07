@@ -18,6 +18,12 @@ public class ContextualizingRuleAgency
   public void submit(X x, ContextAgent agent) {
     if ( agent instanceof ContextAware) ((ContextAware) agent).setX(systemX_);
 
-    super.submit(userX_, agent);
+    submit(userX_, agent, "");
+  }
+
+  public void submit(X x, ContextAgent agent, String description) {
+    if ( agent instanceof ContextAware) ((ContextAware) agent).setX(systemX_);
+
+    super.submit(userX_, agent, description);
   }
 }
