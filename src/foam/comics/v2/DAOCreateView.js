@@ -1,0 +1,95 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+foam.CLASS({
+  package: 'foam.comics.v2',
+  name: 'DAOCreateView',
+  extends: 'foam.u2.View',
+
+  css:`
+    ^ {
+      padding: 32px
+    }
+
+    ^ .foam-u2-ActionView-back {
+      display: flex;
+      align-items: center;
+    }
+
+    ^account-name {
+      font-size: 36px;
+      font-weight: 600;
+    }
+
+    ^create-view-container {
+      margin: auto;
+    }
+  `,
+
+  requires: [
+    'foam.u2.layout.Cols',
+    'foam.u2.layout.Rows',
+    'foam.u2.ControllerMode',
+  ],
+  imports: [
+    'stack'
+  ],
+  exports: [
+    'controllerMode'
+  ],
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.comics.v2.DAOControllerConfig',
+      name: 'data'
+    },
+    {
+      name: 'controllerMode',
+      factory: function() {
+        return this.ControllerMode.CREATE;
+      }
+    },
+    {
+      class: 'foam.u2.ViewSpecWithJava',
+      name: 'viewView',
+      expression: function() {
+        return foam.u2.detail.SectionedDetailView;
+      }
+    }
+  ],
+  methods: [
+    function initE() {
+      var self = this;
+      this.SUPER();
+      this
+        .addClass(this.myClass())
+        .add(self.slot(function(data$viewBorder, data$browseTitle, data$of) {
+          return self.E()
+            .start(self.Rows)
+              .start(self.Rows)
+                // we will handle this in the StackView instead
+                .startContext({ data: self.stack })
+                    .tag(self.stack.BACK, {
+                      buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                      icon: 'images/back-icon.svg'
+                    })
+                .endContext()
+                .start(self.Cols).style({ 'align-items': 'center' })
+                  .start()
+                    .add(`Create your ${data$browseTitle}`)
+                      .addClass(this.myClass('account-name'))
+                  .end()
+                .end()
+              .end()
+              .start(data$viewBorder)
+                .start().addClass(this.myClass('create-view-container'))
+                  .tag(this.viewView, { data: data$of.create() })
+                .end()
+              .end()
+        }));
+    }
+  ]
+});

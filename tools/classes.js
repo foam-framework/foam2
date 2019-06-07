@@ -233,7 +233,8 @@ var classes = [
   'foam.nanos.menu.TabsMenu',
   'foam.nanos.menu.ViewMenu',
   'foam.comics.v2.CannedQuery',
-  'foam.comics.v2.NamedView',
+  'foam.comics.v2.namedViews.NamedViewCollection',
+  'foam.comics.v2.namedViews.NamedViewInstance',
   'foam.nanos.menu.ScriptMenu',
   // Email base model or interface
   'foam.nanos.notification.email.EmailMessage',
