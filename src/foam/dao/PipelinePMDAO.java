@@ -38,7 +38,7 @@ public class PipelinePMDAO
 
   /** Creates the PM pipeline by adding an EndPipelinePMDAO after of this class only if it is a ProxyDAO. 
   *   If the delegate of that is also a ProxyDAO, creates a new PipelinedPMDAO in the chain beofre it which repeats this procedure recursively. */
-  private void createPipeline() {
+  void createPipeline() {
     DAO delegate = getDelegate();
     DAO secondaryDelegate;
     if ( delegate instanceof ProxyDAO ) {
@@ -53,7 +53,7 @@ public class PipelinePMDAO
 
   /** Creates the PM that will measure the performance of each operation and creates a new context with it as a variable which the EndPipelinePMDAO
    *  will use to access the pm after it is passed onto it through the arguments of the DAO operations */
-  private X createPM(String name) {
+  X createPM(String name) {
     PM pm = new PM();
     pm.setClassType(PipelinePMDAO.getOwnClassInfo());
     pm.setName(name);
@@ -84,7 +84,7 @@ public class PipelinePMDAO
     super.removeAll_(pipeX, skip, limit, order, predicate);
   }
 
-  public class EndPipelinePMDAO extends ProxyDAO {
+  class EndPipelinePMDAO extends ProxyDAO {
     public EndPipelinePMDAO(X x, DAO delegate) {
       super(x, delegate);
     }
