@@ -48,18 +48,18 @@ foam.CLASS({
   properties: [
     {
       class: 'FObjectProperty',
-      of: 'foam.comics.v2.DAOControllerConfig',
       name: 'data'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.comics.v2.DAOControllerConfig',
+      name: 'config'
     },
     {
       name: 'controllerMode',
       factory: function() {
         return this.ControllerMode.VIEW;
       }
-    },
-    {
-      class: 'FObjectProperty',
-      name: 'obj'
     },
     {
       class: 'foam.u2.ViewSpecWithJava',
@@ -70,8 +70,8 @@ foam.CLASS({
     },
     {
       name: 'primary',
-      expression: function(data$of){
-        var allActions = data$of.getAxiomsByClass(foam.core.Action)
+      expression: function(config$of){
+        var allActions = config$of.getAxiomsByClass(foam.core.Action)
         var defaultAction = allActions.filter(a => a.isDefault);
         return defaultAction.length >= 1 ? defaultAction[0] : allActions[0];
       }
@@ -97,7 +97,7 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(obj, data$viewBorder) {
+        .add(self.slot(function(data, config$viewBorder) {
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -110,10 +110,10 @@ foam.CLASS({
                 .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })
                   .start()
-                    .add(obj.toSummary())
+                    .add(data.toSummary())
                       .addClass(this.myClass('account-name'))
                   .end()
-                  .startContext({data: obj}).add(self.primary).endContext()
+                  .startContext({data: data}).add(self.primary).endContext()
                 .end()
               .end()
 
@@ -130,11 +130,11 @@ foam.CLASS({
                 .end()
               .end()
 
-              .start(data$viewBorder)
+              .start(config$viewBorder)
                 .start().addClass(this.myClass('view-container'))
                   .add(self.slot(function(viewView) {
                     return self.E().tag(viewView, {
-                      data: obj
+                      data: data
                     });
                   }))
                 .end()

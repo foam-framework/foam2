@@ -79,24 +79,31 @@ foam.CLASS({
   ],
   properties: [
     {
+      class: 'foam.dao.DAOProperty',
+      name: 'data'
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.comics.v2.DAOControllerConfig',
-      name: 'data'
+      name: 'config',
+      factory: function() {
+        return foam.comics.v2.DAOControllerConfig.create({ dao: this.data });
+      }
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'predicate',
-      expression: function(data$cannedQueries) {
-        return data$cannedQueries && data$cannedQueries.length 
-          ? data$cannedQueries[0].predicate
+      expression: function(config$cannedQueries) {
+        return config$cannedQueries && config$cannedQueries.length 
+          ? config$cannedQueries[0].predicate
           : foam.mlang.predicate.True.create();
       }
     },
     {
       class: 'foam.dao.DAOProperty',
       name: 'predicatedDAO',
-      expression: function(data, predicate) {
-        return data.dao$proxy.where(predicate);
+      expression: function(config, predicate) {
+        return config.dao$proxy.where(predicate);
       }
     }
   ],
@@ -118,8 +125,8 @@ foam.CLASS({
       if ( ! this.stack ) return;
       this.stack.push({
         class: 'foam.comics.v2.DAOUpdateView',
-        data$: this.data$,
-        obj: obj
+        data: obj,
+        config: this.config
       });
     },
     function initE() {
@@ -127,18 +134,18 @@ foam.CLASS({
       this.addClass(this.myClass());
       this.SUPER();
       this
-        .add(self.slot(function(data$cannedQueries) {
+        .add(self.slot(function(config$cannedQueries) {
           return self.E()
             .start(self.Rows)
-              .callIf(data$cannedQueries.length >= 1, function() {
+              .callIf(config$cannedQueries.length >= 1, function() {
                 this
                   .start(self.Cols)
                     .addClass(self.myClass('top-bar'))
                     .start(self.Cols)
-                      .callIf(data$cannedQueries.length > 1, function() {
+                      .callIf(config$cannedQueries.length > 1, function() {
                         this
                           .start(self.TabChoiceView, { 
-                            choices: data$cannedQueries.map(o => [o.predicate, o.label]),
+                            choices: config$cannedQueries.map(o => [o.predicate, o.label]),
                             data$: self.predicate$
                           })
                             .addClass(self.myClass('canned-queries'))

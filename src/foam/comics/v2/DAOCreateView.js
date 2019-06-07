@@ -43,8 +43,12 @@ foam.CLASS({
   properties: [
     {
       class: 'FObjectProperty',
-      of: 'foam.comics.v2.DAOControllerConfig',
       name: 'data'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.comics.v2.DAOControllerConfig',
+      name: 'config'
     },
     {
       name: 'controllerMode',
@@ -66,7 +70,7 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(data$viewBorder, data$browseTitle, data$of) {
+        .add(self.slot(function(config$viewBorder, config$browseTitle, data) {
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -79,14 +83,14 @@ foam.CLASS({
                 .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })
                   .start()
-                    .add(`Create your ${data$browseTitle}`)
+                    .add(`Create your ${config$browseTitle}`)
                       .addClass(this.myClass('account-name'))
                   .end()
                 .end()
               .end()
-              .start(data$viewBorder)
+              .start(config$viewBorder)
                 .start().addClass(this.myClass('create-view-container'))
-                  .tag(this.viewView, { data: data$of.create() })
+                  .tag(this.viewView, { data: data })
                 .end()
               .end()
         }));

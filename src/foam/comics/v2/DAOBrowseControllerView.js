@@ -43,17 +43,25 @@ foam.CLASS({
   `,
   properties: [
     {
+      class: 'foam.dao.DAOProperty',
+      name: 'data'
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.comics.v2.DAOControllerConfig',
-      name: 'data'
+      name: 'config',
+      factory: function() {
+        return foam.comics.v2.DAOControllerConfig.create({ dao: this.data });
+      }
     },
     {
       class: 'foam.u2.ViewSpecWithJava',
       name: 'browseView',
-      expression: function(data$browseViews) {
-        return data$browseViews && data$browseViews.length
-          ? data$browseViews[0].view
-          : this.DAOBrowserView;
+      expression: function(config$browseViews) {
+        return config$browseViews && config$browseViews.length
+          ? config$browseViews[0].view
+          : this.DAOBrowserView
+          ;
       }
     }
   ],
@@ -61,10 +69,14 @@ foam.CLASS({
     {
       name: 'create',
       code: function() {
+        debugger;
+        console.log(this.config);
+        console.log(this.data);
         if ( ! this.stack ) return;
         this.stack.push({
           class: 'foam.comics.v2.DAOCreateView',
-          data$: this.data$
+          data$: this.data$,
+          config$: this.config$
         });
       }
     }
@@ -76,7 +88,8 @@ foam.CLASS({
     var self = this;
 
       this.addClass(this.myClass())
-      .add(this.slot(function(data, data$browseBorder, data$browseViews) {
+      .add(this.slot(function(data, config, config$browseBorder, config$browseViews,
+         config$browseTitle) {
         return self.E()
           .start(self.Rows)
             .addClass(self.myClass('container'))
@@ -84,24 +97,24 @@ foam.CLASS({
               .addClass(self.myClass('header-container'))
               .start()
                 .addClass(self.myClass('browse-title'))
-                .add(data.browseTitle$)
+                .add(config$browseTitle)
               .end()
               .startContext({data: self}).add(self.CREATE).endContext()
             .end()
             .start(self.CardBorder)
               .style({ position: 'relative' })
-              .start(data$browseBorder)
-                .callIf(data$browseViews.length > 1, function() {
+              .start(config$browseBorder)
+                .callIf(config$browseViews.length > 1, function() {
                   this
                     .start(self.IconChoiceView, { 
-                      choices: data$browseViews.map(o => [o.view, o.icon]),
+                      choices:config$browseViews.map(o => [o.view, o.icon]),
                       data$: self.browseView$
                     })
                       .addClass(self.myClass('altview-container'))
                     .end();
                 })
                 .add(self.slot(function(browseView) {
-                  return self.E().tag(browseView, {data: data});
+                  return self.E().tag(browseView, {data: data, config: config});
                 }))
               .end()
             .end()

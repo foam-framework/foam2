@@ -25,7 +25,8 @@ foam.CLASS({
     function createView(X) {
       return {
         class: 'foam.comics.v2.DAOBrowseControllerView',
-        data: this.config
+        data: this.config.dao,
+        config: this.config
       };
     }
   ]
