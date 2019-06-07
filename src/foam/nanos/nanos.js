@@ -100,6 +100,7 @@ FOAM_FILES([
   { name: "foam/nanos/menu/SubMenuView" },
   { name: "foam/nanos/menu/TabsMenu" },
   { name: "foam/nanos/menu/ViewMenu" },
+  { name: "foam/nanos/menu/ScriptMenu" },
   { name: "foam/nanos/menu/TreeAltView", flags: ['web'] },
   { name: "foam/nanos/menu/TreeGraphAltView" },
   { name: "foam/nanos/auth/PermissionTableView", flags: ['web'] },

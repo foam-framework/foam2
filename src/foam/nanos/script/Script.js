@@ -71,6 +71,7 @@ foam.CLASS({
           .add(value ? 'Y' : 'N')
         .end();
       },
+      tableWidth: 90,
       value: true
     },
     {
@@ -82,7 +83,8 @@ foam.CLASS({
       class: 'DateTime',
       name: 'lastRun',
       documentation: 'Date and time the script ran last.',
-      visibility: 'RO'
+      visibility: 'RO',
+      tableWidth: 140
     },
     {
       class: 'Long',

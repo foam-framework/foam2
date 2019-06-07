@@ -8,7 +8,10 @@ foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'Group',
 
-  implements: [ 'foam.nanos.auth.EnabledAware' ],
+  implements: [
+    'foam.nanos.auth.Authorizable',
+    'foam.nanos.auth.EnabledAware'
+  ],
 
   requires: [ 'foam.nanos.app.AppConfig' ],
 
@@ -45,21 +48,6 @@ foam.CLASS({
       },
       documentation: 'Parent group to inherit permissions from.'
     },
-    {
-      class: 'FObjectArray',
-      of: 'foam.nanos.auth.Permission',
-      name: 'permissions',
-      documentation: 'Permissions set on group.',
-      hidden: true
-    },
-    // {
-    //   class: 'StringArray',
-    //   of: 'foam.nanos.auth.Permission',
-    //   name: 'permissions2',
-    //   hidden: true,
-    //   view: 'foam.u2.view.StringArrayRowView',
-    //   documentation: 'Permissions set on group.'
-    // },
     {
       class: 'Reference',
       targetDAOKey: 'menuDAO',
@@ -115,19 +103,22 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.X',
+    'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.nanos.app.AppConfig',
-    'foam.nanos.session.Session',
     'foam.util.SafetyUtil',
     'org.eclipse.jetty.server.Request',
-    'javax.servlet.http.HttpServletRequest'
+    'javax.security.auth.AuthPermission',
+    'javax.servlet.http.HttpServletRequest',
+    'java.util.List',
+    'static foam.mlang.MLang.EQ'
   ],
 
   methods: [
     {
       name: 'implies',
       type: 'Boolean',
+      async: true,
       args: [
         {
           name: 'x',
@@ -139,35 +130,34 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        if ( getPermissions() == null ) return false;
+        List<GroupPermissionJunction> junctions = ((ArraySink) getPermissions(x).getJunctionDAO().where(EQ(GroupPermissionJunction.SOURCE_ID, getId())).select(new ArraySink())).getArray();
 
-        for ( int i = 0 ; i < permissions_.length ; i++ ) {
-          foam.nanos.auth.Permission p = permissions_[i];
-
-          if ( p.getId().startsWith("@") ) {
+        for ( GroupPermissionJunction j : junctions ) {
+          if ( j.getTargetId().startsWith("@") ) {
             DAO   dao   = (DAO) x.get("groupDAO");
-            Group group = (Group) dao.find(p.getId().substring(1));
+            Group group = (Group) dao.find(j.getTargetId().substring(1));
 
             if ( group != null && group.implies(x, permission) ) {
               return true;
             }
           } else {
-            if ( new javax.security.auth.AuthPermission(p.getId()).implies(permission) ) {
+            if ( new AuthPermission(j.getTargetId()).implies(permission) ) {
               return true;
             }
           }
         }
-        return false;`
-      ,
-      code: function(x, permissionId) {
-        if ( arguments.length != 2 ) debugger;
-
-        if ( this.permissions == null ) return false;
-
-        for ( var i = 0 ; i < this.permissions.length ; i++ )
-          if ( this.permissions[i].implies(permissionId) ) return true;
 
         return false;
+      `,
+      code: async function(x, permissionId) {
+        // TODO: Support inheritance via @
+        var arraySink = await this.permissions.junctionDAO
+          .where(foam.mlang.Expressions.EQ(foam.nanos.auth.GroupPermissionJunction.SOURCE_ID, this.id))
+          .select();
+        var junctions = arraySink != null && Array.isArray(arraySink.array)
+          ? arraySink.array
+          : [];
+        return junctions.some((j) => foam.nanos.auth.Permission.create({ id: j.targetId }).implies(permissionId));
       }
     },
     {
@@ -262,6 +252,144 @@ foam.CLASS({
         Group parent = (Group) groupDAO.find(this.getParent());
         if ( parent == null ) return false;
         return parent.isDescendantOf(groupId, groupDAO);
+      `
+    },
+    {
+      name: 'authorizeOnCreate',
+      javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
+        String permissionId = String.format("group.create.%s", getId());
+
+        if ( ! auth.check(x, permissionId) ) {
+          throw new AuthorizationException("You do not have permission to create this group.");
+        }
+
+        // Prevents privilege escalation via setting a group's parent.
+        checkUserHasAllPermissionsInGroupAndAncestors(x, this);
+      `
+    },
+    {
+      name: 'authorizeOnRead',
+      javaCode: '// NOOP'
+    },
+    {
+      name: 'authorizeOnUpdate',
+      javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
+        String permissionId = String.format("group.update.%s", getId());
+
+        if ( ! auth.check(x, permissionId) ) {
+          throw new AuthorizationException("You don't have permission to update that group.");
+        }
+
+        // Prevents privilege escalation via setting a group's parent.
+        if ( ! getParent().equals(((Group) oldObj).getParent()) ) {
+          checkUserHasAllPermissionsInGroupAndAncestors(x, this);
+        }
+      `
+    },
+    {
+      name: 'authorizeOnDelete',
+      javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
+        String permissionId = String.format("group.remove.%s", getId());
+
+        if ( ! auth.check(x, permissionId) ) {
+          throw new AuthorizationException("You don't have permission to delete that group.");
+        }
+      `
+    },
+    {
+      name: 'checkUserHasAllPermissionsInGroupAndAncestors',
+      type: 'Void',
+      args: [
+        { name: 'x', type: 'foam.core.X' },
+        { name: 'group', type: 'foam.nanos.auth.Group' }
+      ],
+      javaCode: `
+        do {
+          checkUserHasAllPermissionsInGroup(x, group);
+          group = getAncestor(x, group);
+        } while ( group != null );
+      `
+    },
+    {
+      name: 'checkUserHasAllPermissionsInGroup',
+      type: 'Void',
+      args: [
+        { name: 'x', type: 'foam.core.X' },
+        { name: 'group', type: 'foam.nanos.auth.Group' }
+      ],
+      javaCode: `
+        group.getPermissions(x).getJunctionDAO().where(EQ(GroupPermissionJunction.SOURCE_ID, group.getId())).select(new CheckPermissionsSink(x));
+      `
+    },
+    {
+      name: 'getAncestor',
+      type: 'Group',
+      args: [
+        { name: 'x', type: 'foam.core.X' },
+        { name: 'group', type: 'foam.nanos.auth.Group' }
+      ],
+      javaCode: `
+        String ancestorGroupId = group.getParent();
+
+        if ( SafetyUtil.isEmpty(ancestorGroupId) ) return null;
+
+        DAO localGroupDAO = ((DAO) x.get("localGroupDAO")).inX(x);
+        Group ancestor = (Group) localGroupDAO.inX(x).find(ancestorGroupId);
+
+        if ( ancestor == null ) {
+          throw new RuntimeException("The '" + group.getId() + "' group has a null ancestor named '" + ancestorGroupId + "'.");
+        }
+
+        return ancestor;
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.nanos.auth',
+  name: 'CheckPermissionsSink',
+  extends: 'foam.dao.AbstractSink',
+
+  documentation: `
+    This sink will make sure that the user in the context it's initialized in
+    has the permission referenced by each GroupPermissionJunction passed into
+    it.
+  `,
+
+  imports: ['auth'],
+
+  javaImports: ['foam.dao.DAO'],
+
+  messages: [
+    {
+      name: 'ERROR_MESSAGE',
+      message: 'Permission denied. You cannot change the parent of a group if doing so grants that group permissions that you do not have.',
+    }
+  ],
+
+  methods: [
+    {
+      name: 'put',
+      javaCode: `
+        DAO groupDAO = (DAO) getX().get("groupDAO");
+        AuthService auth = (AuthService) getAuth();
+        GroupPermissionJunction junction = (GroupPermissionJunction) obj;
+        String permissionId = junction.getTargetId();
+
+        // If a permission starts with the @ symbol, then it inherits from
+        // another group. For example, a permission with the id "@admin" will
+        // inherit all of the permissions of the group with id "admin".
+        if ( permissionId.startsWith("@") ) {
+          String groupId = permissionId.substring(1);
+          Group group = (Group) groupDAO.inX(getX()).find(groupId);
+          group.checkUserHasAllPermissionsInGroupAndAncestors(getX(), group);
+        } else if ( ! auth.check(getX(), permissionId) ) {
+          throw new AuthorizationException(ERROR_MESSAGE);
+        }
       `
     }
   ]
