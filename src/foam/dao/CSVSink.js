@@ -25,8 +25,13 @@ foam.CLASS({
     {
       name: 'props',
       expression: function(of) {
-        return of.getAxiomsByClass(foam.core.Property)
-          .filter( (p) => ! p.networkTransient );
+        if ( this.axioms.length == 0 ) {
+          return of.getAxiomsByClass(foam.core.Property)
+            .filter( (p) => ! p.networkTransient );
+        }
+        return this.axioms.map((tableCol) => {
+          return of.getAxiomByName(tableCol);
+        });
       },
       visibility: 'HIDDEN'
     },
@@ -40,6 +45,12 @@ foam.CLASS({
       name: 'isNewLine',
       value: true,
       visibility: 'HIDDEN'
+    },
+    {
+      name: 'axioms',
+      factory: function() {
+        return this.of.getAxiomByName('tableColumns').columns;
+      }
     }
   ],
 
