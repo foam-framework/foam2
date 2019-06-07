@@ -131,14 +131,21 @@ foam.CLASS({
         try {
           MimeMessage message = new MimeMessage(getSession_());
 
+          // the From Property is mainly to hide our smtp user credetials.
           if ( emailMessage.isPropertySet("from") ) {
             if ( emailMessage.isPropertySet("displayName") ) {
               message.setFrom( new InternetAddress(emailMessage.getFrom(), emailMessage.getDisplayName()) );
             } else {
               message.setFrom(new InternetAddress(emailMessage.getFrom()));
             }
+          } else if ( emailMessage.isPropertySet("replyTo") ) {
+              if ( emailMessage.isPropertySet("displayName") ) {
+                message.setFrom( new InternetAddress(emailMessage.getReplyTo(), emailMessage.getDisplayName()) );
+              } else {
+                message.setFrom(new InternetAddress(emailMessage.getReplyTo()));
+              }
           }
-
+          
           if ( emailMessage.isPropertySet("replyTo") )
             message.setReplyTo(InternetAddress.parse(emailMessage.getReplyTo()));
 
