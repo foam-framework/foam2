@@ -69,13 +69,10 @@ foam.CLASS({
     {
       name: 'create',
       code: function() {
-        debugger;
-        console.log(this.config);
-        console.log(this.data);
         if ( ! this.stack ) return;
         this.stack.push({
           class: 'foam.comics.v2.DAOCreateView',
-          data$: this.data$,
+          data: this.data.of.create({}, this),
           config$: this.config$
         });
       }
