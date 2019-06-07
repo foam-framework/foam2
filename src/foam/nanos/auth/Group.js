@@ -49,7 +49,8 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.nanos.auth.Permission',
       name: 'permissions',
-      documentation: 'Permissions set on group.'
+      documentation: 'Permissions set on group.',
+      hidden: true
     },
     // {
     //   class: 'StringArray',
@@ -66,38 +67,6 @@ foam.CLASS({
       documentation: 'Menu user redirects to after login.',
       of: 'foam.nanos.menu.Menu'
     },
-    {
-      class: 'Image',
-      name: 'logo',
-      documentation: 'Group logo.',
-      displayWidth: 60
-    },
-    {
-      class: 'String',
-      name: 'topNavigation',
-      value: 'foam.nanos.u2.navigation.TopNavigation',
-      displayWidth: 45
-    },
-    {
-      class: 'String',
-      name: 'footerView',
-      value: 'foam.nanos.u2.navigation.FooterView',
-      displayWidth: 45
-    },
-    {
-      class: 'String',
-      name: 'groupCSS',
-      view: { class: 'foam.u2.tag.TextArea', rows: 16, cols: 60 },
-    },
-    {
-      class: 'Color',
-      name: 'primaryColor',
-      documentation: 'The following color properties can determine the color scheme of the GUI.'
-    },
-    { class: 'Color', name: 'secondaryColor' },
-    { class: 'Color', name: 'accentColor' },
-    { class: 'Color', name: 'tableColor' },
-    { class: 'Color', name: 'tableHoverColor' },
     {
       class: 'String',
       name: 'url',
