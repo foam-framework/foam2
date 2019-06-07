@@ -48,6 +48,10 @@ foam.CLASS({
     'foam.mlang.Expressions'
   ],
 
+  requires: [
+    'foam.u2.DisplayMode'
+  ],
+
   exports: [
     'of'
   ],
@@ -57,6 +61,14 @@ foam.CLASS({
       display: inline-block;
       position: relative;
       z-index: 1;
+    }
+
+    ^:focus {
+      outline: none;
+    }
+
+    ^:focus ^selection-view {
+      border-color: %SECONDARYCOLOR%;
     }
 
     ^container {
@@ -267,16 +279,18 @@ foam.CLASS({
       this.onDataUpdate();
 
       this
-        .attrs({ name: this.name })
+        .attrs({
+          name: this.name,
+          tabIndex: 0
+        })
         .addClass(this.myClass())
+        .on('keydown', function(evt) {
+          if ( evt.which === 13 || evt.keyCode === 13 ) self.toggle();
+        })
         .start()
           .addClass(this.myClass('selection-view'))
           .enableClass('disabled', this.mode$.map((mode) => mode === foam.u2.DisplayMode.DISABLED))
-          .on('click', function() {
-            if ( self.mode === foam.u2.DisplayMode.RW ) {
-              self.isOpen_ = ! self.isOpen_;
-            }
-          })
+          .on('click', this.toggle)
           .start()
             .addClass(this.myClass('custom-selection-view'))
             .add(this.slot((data) => {
@@ -329,6 +343,15 @@ foam.CLASS({
                     .select(section.filtered || section.dao, (obj) => {
                       return this.E()
                         .start(self.rowView, { data: obj })
+                          .attr('tabindex', 0)
+                          .on('keydown', function(evt) {
+                            if ( evt.which === 13 || evt.keyCode === 13 ) {
+                              self.fullObject_ = obj;
+                              self.data = obj.id;
+                              self.isOpen_ = false;
+                            }
+                            evt.stopPropagation();
+                          })
                           .enableClass('disabled', section.disabled)
                           .callIf(! section.disabled, function() {
                             this.on('click', () => {
@@ -363,6 +386,14 @@ foam.CLASS({
   ],
 
   listeners: [
+    {
+      name: 'toggle',
+      code: function() {
+        if ( this.mode === this.DisplayMode.RW ) {
+          this.isOpen_ = ! this.isOpen_;
+        }
+      }
+    },
     {
       name: 'onDataUpdate',
       code: function() {
