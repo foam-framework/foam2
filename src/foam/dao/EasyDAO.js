@@ -132,7 +132,7 @@ if ( getAuthenticate() ) {
     delegate);
 }
 
-if ( getPipelinePm() ) {
+if ( getPipelinePm() && ( delegate instanceof ProxyDAO ) ) {
   delegate = new foam.dao.PipelinePMDAO(getX(), delegate);
 }
 
