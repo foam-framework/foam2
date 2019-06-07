@@ -149,9 +149,9 @@ return delegate;
       name: 'innerDAO'
     },
     {
+      /**  Creates pipelinePMDAO's around each decorator to measure their performance */
       class: 'Boolean',
-      name: 'pipelinePm',
-      value: false
+      name: 'pipelinePm'
     },
     {
       /** Have EasyDAO use a sequence number to index items. Note that
