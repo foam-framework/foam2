@@ -30,10 +30,10 @@ public class PipelinePMDAO
   /** Calls a method to create the PM pipeline and sets the name variables of each operation of interest */
   void init() {
     createPipeline();
-    putName_       = delegateName_ + ":pipePut";
-    findName_      = delegateName_ + ":pipeFind";
-    removeName_    = delegateName_ + ":pipeRemove";
-    removeAllName_ = delegateName_ + ":pipeRemoveAll";
+    putName_       = getOf().getId() + ":" + delegateName_ + ":pipePut";
+    findName_      = getOf().getId() + ":" + delegateName_ + ":pipeFind";
+    removeName_    = getOf().getId() + ":" + delegateName_ + ":pipeRemove";
+    removeAllName_ = getOf().getId() + ":" + delegateName_ + ":pipeRemoveAll";
   }
 
   /** Creates the PM pipeline by adding an EndPipelinePMDAO after of this class only if it is a ProxyDAO. 
