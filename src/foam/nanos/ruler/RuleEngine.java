@@ -78,7 +78,7 @@ public class RuleEngine extends ContextAwareSupport {
    */
   public void probe(List<Rule> rules, RulerProbe rulerProbe, FObject obj, FObject oldObj) {
     for (Rule rule : rules) {
-      ProbeAgency probeAgenjt = new ProbeAgency();
+      ProbeAgency probeAgent = new ProbeAgency();
       if ( stops_.get() ) {
         rulerProbe.addTestedRule(rule.getId(), probeAgent.toString() + "Not executed because was overridden and forced to stop.", false);
         continue;
