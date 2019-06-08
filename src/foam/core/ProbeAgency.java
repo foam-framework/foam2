@@ -1,6 +1,4 @@
-package foam.nanos.ruler;
-
-import foam.core.*;
+package foam.core;
 
 public class ProbeAgency
   implements Agency
