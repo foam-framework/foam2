@@ -56,7 +56,7 @@ public class RuleEngine extends ContextAwareSupport {
    */
   public void execute(List<Rule> rules, FObject obj, FObject oldObj) {
     CompoundContextAgent compoundAgent = new CompoundContextAgent();
-    ContextualizingRuleAgency agency = new ContextualizingRuleAgency(new CompoundAgency(compoundAgent), x_, systemX_);
+    ContextualizingAgency agency = new ContextualizingAgency(new CompoundAgency(compoundAgent), x_, systemX_);
     for (Rule rule : rules) {
       if ( stops_.get() ) break;
       applyRule(rule, obj, oldObj, agency);

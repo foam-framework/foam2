@@ -2,12 +2,12 @@ package foam.nanos.ruler;
 
 import foam.core.*;
 
-public class ContextualizingRuleAgency
+public class ContextualizingAgency
   extends ProxyAgency
 {
   X userX_, systemX_;
 
-  public ContextualizingRuleAgency(Agency delegate, X userX, X systemX) {
+  public ContextualizingAgency(Agency delegate, X userX, X systemX) {
     super(delegate);
     userX_   = userX;
     systemX_ = systemX;
