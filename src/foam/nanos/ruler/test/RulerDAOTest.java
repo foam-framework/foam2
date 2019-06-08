@@ -1,6 +1,7 @@
 package foam.nanos.ruler.test;
 
 
+import foam.core.ContextAwareAgent;
 import foam.core.X;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
@@ -210,8 +211,11 @@ public class RulerDAOTest extends Test {
       executeRule.setId(666L);
       executeRule.setRuleGroup("fake test group");
       executeRule.setDaoKey("fakeDaoKey");
-      agency.submit(x, x112 -> {
-        ruleDAO.put(executeRule);
+      agency.submit(x, new ContextAwareAgent() {
+        @Override
+        public void execute(X x) {
+          ruleDAO.put(executeRule);
+        }
       }, "RulerDAOTest add account");
 
     };
