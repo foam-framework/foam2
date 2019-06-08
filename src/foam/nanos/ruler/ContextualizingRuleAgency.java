@@ -1,24 +1,16 @@
 package foam.nanos.ruler;
 
-import foam.core.CompoundContextAgent;
-import foam.core.ContextAgent;
-import foam.core.ContextAware;
-import foam.core.X;
+import foam.core.*;
 
 public class ContextualizingRuleAgency
-  extends CompoundContextAgent
+  extends ProxyAgency
 {
   X userX_, systemX_;
 
-  public ContextualizingRuleAgency(X userX, X systemX) {
+  public ContextualizingRuleAgency(Agency delegate, X userX, X systemX) {
+    super(delegate);
     userX_   = userX;
     systemX_ = systemX;
-  }
-
-  public void submit(X x, ContextAgent agent) {
-    if ( agent instanceof ContextAware) ((ContextAware) agent).setX(systemX_);
-
-    submit(userX_, agent, "");
   }
 
   public void submit(X x, ContextAgent agent, String description) {

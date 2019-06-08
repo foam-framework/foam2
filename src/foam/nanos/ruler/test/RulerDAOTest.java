@@ -203,14 +203,14 @@ public class RulerDAOTest extends Test {
     rule5.setAfter(false);
     Predicate predicate5 = EQ(DOT(NEW_OBJ, INSTANCE_OF(foam.nanos.auth.User.class)), true);
     rule5.setPredicate(predicate5);
-    RuleAction action5 = (x17, obj, oldObj, ruler, agent) -> {
+    RuleAction action5 = (x17, obj, oldObj, ruler, agency) -> {
       User user = (User) obj;
       user.setLastName("Unknown");
       Rule executeRule = new Rule();
       executeRule.setId(666L);
       executeRule.setRuleGroup("fake test group");
       executeRule.setDaoKey("fakeDaoKey");
-      agent.submit(x, x112 -> {
+      agency.submit(x, x112 -> {
         ruleDAO.put(executeRule);
       }, "RulerDAOTest add account");
 

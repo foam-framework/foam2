@@ -55,13 +55,14 @@ public class RuleEngine extends ContextAwareSupport {
    * @param oldObj - Old FObject supplied to rules for execution
    */
   public void execute(List<Rule> rules, FObject obj, FObject oldObj) {
-    ContextualizingRuleAgency agent = new ContextualizingRuleAgency(x_, systemX_);
+    CompoundContextAgent compoundAgent = new CompoundContextAgent();
+    ContextualizingRuleAgency agency = new ContextualizingRuleAgency(new CompoundAgency(compoundAgent), x_, systemX_);
     for (Rule rule : rules) {
       if ( stops_.get() ) break;
-      applyRule(rule, obj, oldObj, agent);
-      agent.submit(x_, x -> saveHistory(rule, obj));
+      applyRule(rule, obj, oldObj, agency);
+      agency.submit(x_, x -> saveHistory(rule, obj));
     }
-    agent.execute(x_);
+    compoundAgent.execute(x_);
 
     asyncApplyRules(rules, obj, oldObj);
   }
@@ -77,16 +78,16 @@ public class RuleEngine extends ContextAwareSupport {
    */
   public void probe(List<Rule> rules, RulerProbe rulerProbe, FObject obj, FObject oldObj) {
     for (Rule rule : rules) {
-      ProbeRuleAgency ruleAgent = new ProbeRuleAgency(rule);
+      ProbeAgency probeAgent = new ProbeAgency();
       if ( stops_.get() ) {
-        rulerProbe.addTestedRule(rule.getId(), ruleAgent.toString() + "Not executed because was overridden and forced to stop.", false);
+        rulerProbe.addTestedRule(rule.getId(), probeAgent.toString() + "Not executed because was overridden and forced to stop.", false);
         continue;
       }
       try {
-        applyRule(rule, obj, oldObj, ruleAgent);
-        rulerProbe.addTestedRule(rule.getId(), ruleAgent.toString(), true);
+        applyRule(rule, obj, oldObj, probeAgent);
+        rulerProbe.addTestedRule(rule.getId(), probeAgent.toString(), true);
       } catch (Exception e ) {
-        rulerProbe.addTestedRule(rule.getId(), ruleAgent.toString() + e.getMessage(), false);
+        rulerProbe.addTestedRule(rule.getId(), probeAgent.toString() + e.getMessage(), false);
       }
     }
     for (Rule rule : rules) {
@@ -115,13 +116,13 @@ public class RuleEngine extends ContextAwareSupport {
     return results_.get(ruleId);
   }
 
-  private void applyRule(Rule rule, FObject obj, FObject oldObj, CompoundContextAgent agent) {
+  private void applyRule(Rule rule, FObject obj, FObject oldObj, Agency agency) {
     ProxyX readOnlyX = new ReadOnlyDAOContext(getX());
       currentRule_ = rule;
       if ( rule.getAction() != null
         && rule.f(readOnlyX, obj, oldObj)
       ) {
-        rule.apply(readOnlyX, obj, oldObj, this, agent);
+        rule.apply(readOnlyX, obj, oldObj, this, agency);
       }
   }
 

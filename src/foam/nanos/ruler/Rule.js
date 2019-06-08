@@ -199,12 +199,12 @@
           type: 'foam.nanos.ruler.RuleEngine'
         },
         {
-          name: 'agent',
-          type: 'foam.core.CompoundContextAgent'
+          name: 'agency',
+          type: 'foam.core.Agency'
         }
       ],
       javaCode: `
-        getAction().applyAction(x, obj, oldObj, ruler, agent);
+        getAction().applyAction(x, obj, oldObj, ruler, agency);
       `
     },
     {

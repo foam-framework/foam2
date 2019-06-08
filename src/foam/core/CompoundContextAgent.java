@@ -14,24 +14,16 @@ import java.util.ArrayList;
  * but doesn't execute them until it is itself executed.
  **/
 public class CompoundContextAgent
-  implements ContextAgent, Agency
+  implements ContextAgent
 {
-  protected ArrayList<Runnable> agents_ = new ArrayList();
-
-  public void submit(X x, ContextAgent agent, String description) {
-    agents_.add(new ContextAgentRunnable(x, agent, description));
-  }
-
-  public void submit(X x, ContextAgent agent) {
-    submit(x, agent, "");
-  }
+  public ArrayList<Runnable> agents_ = new ArrayList();
 
   public void execute(X x) {
     for ( Runnable agent : agents_ ) {
       try {
         agent.run();
       } catch (Throwable t) {
-        throw t;
+        //throw t;
       }
     }
   }
