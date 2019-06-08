@@ -11,6 +11,10 @@ foam.CLASS({
   rulerProbe = dao.cmd(RulerProbe) object will be returned with list of TestedRules
   where each describes whether the rule was applied and summary of the rule's activities.`,
 
+  javaImports: [
+    'foam.nanos.ruler.Rule'
+  ],
+
   properties: [
     {
       class: 'Reference',
@@ -19,12 +23,28 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'description'
+      name: 'message'
     },
     {
       class: 'Boolean',
       name: 'passed',
       value: true
+    }
+  ],
+  methods: [
+    {
+      name: 'describe',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      type: 'String',
+      javaCode: `Rule rule = findRule(x);
+  StringBuilder sb = new StringBuilder();
+  return sb.append("Rule ").append(rule.getId()).append(". Description: ").append(rule.getDocumentation()).
+  append( "{ ").append(super.toString()).append("}").toString();`
     }
   ]
 });

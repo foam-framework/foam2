@@ -78,21 +78,20 @@ public class RuleEngine extends ContextAwareSupport {
    */
   public void probe(List<Rule> rules, RulerProbe rulerProbe, FObject obj, FObject oldObj) {
     for (Rule rule : rules) {
-      ProbeAgency probeAgent = new ProbeAgency();
       if ( stops_.get() ) {
-        rulerProbe.addTestedRule(rule.getId(), probeAgent.toString() + "Not executed because was overridden and forced to stop.", false);
+        rulerProbe.addTestedRule(rule.getId(), "SyncAction: Not executed because was overridden and forced to stop.", false);
         continue;
       }
       try {
         applyRule(rule, obj, oldObj, new ProbeAgency());
-        rulerProbe.addTestedRule(rule.getId(), probeAgent.toString(), true);
+        rulerProbe.addTestedRule(rule.getId(), "SyncAction: Successfully applied", true);
       } catch (Exception e ) {
-        rulerProbe.addTestedRule(rule.getId(), probeAgent.toString() + e.getMessage(), false);
+        rulerProbe.addTestedRule(rule.getId(), "SyncAction: " + e.getMessage(), false);
       }
     }
     for (Rule rule : rules) {
       if ( rule.getAsyncAction() != null && rule.f(x_, obj, oldObj) ) {
-        rulerProbe.addTestedRule(rule.getId(), "AsyncAction: " + rule.getId() + " " + rule.getDocumentation(), true);
+        rulerProbe.addTestedRule(rule.getId(), "AsyncAction.", true);
       }
     }
   }
