@@ -16,6 +16,8 @@ foam.CLASS({
   `,
 
   javaImports: [
+    'foam.dao.AbstractSink',
+    'foam.core.Detachable',
     'foam.core.FObject',
     'foam.core.X',
     'foam.dao.ArraySink',
@@ -176,7 +178,7 @@ return ret;`
   EQ(Rule.DAO_KEY, getDaoKey())
 );
 ruleDAO.listen(
-  new UpdateRulesListSink.Builder(x)
+  new UpdateRulesListSink.Builder(getX())
     .setDao(this)
     .build()
   , null
@@ -185,6 +187,14 @@ ruleDAO.listen(
 ruleDAO = ruleDAO.where(
   EQ(Rule.ENABLED, true)
 ).orderBy(new Desc(Rule.PRIORITY));
+ruleDAO.select(new AbstractSink() {
+  @Override
+    public void put(Object obj, Detachable sub) {
+      Rule rule = (Rule) obj;
+      rule.setX(getX());
+    }
+
+});
 addRuleList(ruleDAO, getCreateBefore());
 addRuleList(ruleDAO, getUpdateBefore());
 addRuleList(ruleDAO, getRemoveBefore());

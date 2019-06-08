@@ -11,9 +11,10 @@
   documentation: 'Rule model represents rules(actions) that need to be applied in case passed object satisfies provided predicate.',
 
   javaImports: [
+    'foam.core.ContextAware',
     'foam.core.FObject',
-    'foam.core.X',
     'foam.core.ProbeAgency',
+    'foam.core.X',
     'foam.nanos.logger.Logger',
     'java.util.Collection'
   ],
@@ -258,6 +259,15 @@
         cls.extras.push(`
         public static Rule findById(Collection<Rule> listRule, Long passedId) {
           return listRule.stream().filter(rule -> passedId.equals(rule.getId())).findFirst().orElse(null);
+      }
+      public void setX(X x) {
+        super.setX(x);
+        if ( getAction() instanceof ContextAware ) {
+          ((ContextAware)getAction()).setX(x);
+        }
+        if ( getAsyncAction() instanceof ContextAware ) {
+          ((ContextAware)getAsyncAction()).setX(x);
+        }
       }
         `);
       }

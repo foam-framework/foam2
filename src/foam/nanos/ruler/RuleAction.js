@@ -29,7 +29,7 @@
 
   Rule.AsyncAction
     When implementing applyAction for Rule.asyncAction, do not use agent.
-    The passed agent is null (!!). All the DAOs inside applyAction of AsyncAction are CRUDable.
+    The passed agency is a ProbeAgency and will not store any agents. All the DAOs inside applyAction of AsyncAction are CRUDable.
   `,
 
   methods: [
