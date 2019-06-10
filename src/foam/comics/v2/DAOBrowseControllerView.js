@@ -10,7 +10,6 @@ foam.CLASS({
   documentation: `
     The inline DAO controller for a collection of instances. 
     Can switch between multiple views for rendering the collection.
-    Currently supports accepting a config.
   `,
 
   extends: 'foam.u2.View',

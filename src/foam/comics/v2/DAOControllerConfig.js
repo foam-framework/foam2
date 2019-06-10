@@ -7,10 +7,15 @@
 foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOControllerConfig',
+  documentation: `
+    A customizable model to configure any DAOController
+  `,
+
   requires: [
     'foam.comics.v2.CannedQuery',
     'foam.comics.v2.namedViews.NamedViewCollection'
   ],
+
   properties: [
     {
       class: 'String',

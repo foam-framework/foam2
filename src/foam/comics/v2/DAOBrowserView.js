@@ -18,6 +18,10 @@ foam.CLASS({
     'foam.u2.view.TabChoiceView'
   ],
 
+  documentation: `
+    A scrolling table view customized for the inline DAOController to render a collection
+  `,
+
   css: `
     ^export {
       margin-left: 16px;

@@ -7,6 +7,10 @@
 foam.CLASS({
   package: 'foam.comics.v2',
   name: 'CannedQuery',
+  documentation: `
+    A common query that can be stored in a model
+  `,
+
   properties: [
     {
       class: 'String',

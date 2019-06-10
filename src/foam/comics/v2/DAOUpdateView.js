@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'DAOUpdateView',
   extends: 'foam.u2.View',
 
+  documentation: `
+    A configurable view to update a specific instance
+  `,
+
   css:`
     ^ {
       padding: 32px
