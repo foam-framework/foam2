@@ -149,8 +149,8 @@ return delegate;
       name: 'innerDAO'
     },
     {
-      /**  Creates pipelinePMDAO's around each decorator to measure their performance */
       class: 'Boolean',
+      documentation: 'Creates pipelinePMDAOs around each decorator to measure their performance',
       name: 'pipelinePm'
     },
     {
