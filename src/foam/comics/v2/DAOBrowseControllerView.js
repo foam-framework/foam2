@@ -7,6 +7,12 @@
 foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOBrowseControllerView',
+  documentation: `
+    The inline DAO controller for a collection of instances. 
+    Can switch between multiple views for rendering the collection.
+    Currently supports accepting a config.
+  `,
+
   extends: 'foam.u2.View',
   imports: [
     'stack'
@@ -18,6 +24,7 @@ foam.CLASS({
     'foam.u2.layout.Rows',
     'foam.u2.view.IconChoiceView'
   ],
+
   css: `
     ^container {
       padding: 32px;
@@ -41,6 +48,7 @@ foam.CLASS({
       padding: 12px 16px 0 0;
     }
   `,
+
   properties: [
     {
       class: 'foam.dao.DAOProperty',
