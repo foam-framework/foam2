@@ -36,7 +36,7 @@ foam.CLASS({
       class: 'FObjectArray',
       expression: function(of) {
         if ( this.axioms.length == 0 ) {
-          return of.getAxiomsByClass(foam.core.Property)
+          return of.getAxiomsByClass(foam.java.PropertyInfo)
             .filter( (p) => ! p.networkTransient );
         }
         return this.axioms.map((tableCol) => {
@@ -220,110 +220,37 @@ foam.CLASS({
   ]
 });
 
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'PropertyCSVRefinement',
+// foam.CLASS({
+//   package: 'foam.dao',
+//   name: 'PropertyCSVRefinement',
 
-  documentation: `Refinement on Properties to handle toCSV() and toCSVLabel().`,
+//   documentation: `Refinement on Properties to handle toCSV() and toCSVLabel().`,
 
-  refines: 'foam.core.Property',
+//   refines: 'foam.core.Property',
 
-  properties: [
-    {
-      name: 'toCSV',
-      class: 'Function',
-      value: function(obj, outputter, prop) {
-        outputter.output(obj ? obj[prop.name] : null);
-      }
-    },
-    {
-      name: 'toCSVLabel',
-      class: 'Function',
-      value: function(outputter, prop) {
-        outputter.output(prop.name);
-      }
-    }
-  ]
-});
+//   properties: [
+//     {
+//       name: 'toCSV',
+//       class: 'Function',
+//       value: function(obj, outputter, prop) {
+//         outputter.output(obj ? obj[prop.name] : null);
+//       }
+//     },
+//     {
+//       name: 'toCSVLabel',
+//       class: 'Function',
+//       value: function(outputter, prop) {
+//         outputter.output(prop.name);
+//       }
+//     }
+//   ]
+// });
 
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'FObjectPropertyCSVRefinement',
-
-  documentation: `Refinement on FObjects to override toCSV() and toCSVLabel().
-  Purpose is to output a dot annotated format, to handle the nested properties on the FObject.`,
-
-  refines: 'foam.core.FObjectProperty',
-
-  properties: [
-    {
-      name: 'javaToCSV',
-      class: 'Function',
-      value: function(obj, outputter, prop) {
-        if ( ! prop.of ) {
-          outputter.output(obj ? obj[prop.name] : null);
-          return;
-        }
-        prop.of.getAxiomsByClass(foam.core.Property)
-          .forEach((axiom) => {
-            axiom.javaToCSV(obj ? obj[prop.name] : null, outputter, axiom);
-          });
-      }
-    },
-    {
-      name: 'javaToCSVLabel',
-      class: 'Function',
-      value: function(outputter, prop) {
-        if ( ! prop.of ) {
-          outputter.output(prop.name);
-          return;
-        }
-        // mini decorator
-        var prefixedOutputter = {
-          output: function(value) {
-            outputter.output(prop.name + '.' + value);
-          }
-        };
-        prop.of.getAxiomsByClass(foam.core.Property)
-          .forEach((axiom) => {
-            axiom.javaToCSVLabel(prefixedOutputter, axiom);
-          });
-      }
-    }
-  ]
-});
-
-  // foam.CLASS({
-  //   package: 'foam.dao',
-  //   name: 'PropertyInfoCSVRefinement',
-  
-  //   documentation: `Refinement on Properties to handle javaToCSV() and javaToCSVLabel().`,
-  
-  //   refines: 'foam.java.PropertyInfo',
-  
-  //   properties: [
-  //     {
-  //       name: 'javaToCSV',
-  //       class: 'Function',
-  //       value: function(obj, outputter, prop) {
-  //         outputter.output(obj ? obj[prop.name] : null);
-  //       }
-  //     },
-  //     {
-  //       name: 'javaToCSVLabel',
-  //       class: 'Function',
-  //       value: function(outputter, prop) {
-  //         outputter.output(prop.name);
-  //       }
-  //     }
-  //   ]
-  // });
-
-//   foam.CLASS({
+// foam.CLASS({
 //   package: 'foam.dao',
 //   name: 'FObjectPropertyCSVRefinement',
 
-//   documentation: `Refinement on FObjects to override javaToCSV() and javaToCSVLabel().
+//   documentation: `Refinement on FObjects to override toCSV() and toCSVLabel().
 //   Purpose is to output a dot annotated format, to handle the nested properties on the FObject.`,
 
 //   refines: 'foam.core.FObjectProperty',
@@ -339,7 +266,7 @@ foam.CLASS({
 //         }
 //         prop.of.getAxiomsByClass(foam.core.Property)
 //           .forEach((axiom) => {
-//             axiom.toCSV(obj ? obj[prop.name] : null, outputter, axiom);
+//             axiom.javaToCSV(obj ? obj[prop.name] : null, outputter, axiom);
 //           });
 //       }
 //     },
@@ -359,9 +286,82 @@ foam.CLASS({
 //         };
 //         prop.of.getAxiomsByClass(foam.core.Property)
 //           .forEach((axiom) => {
-//             axiom.toCSVLabel(prefixedOutputter, axiom);
+//             axiom.javaToCSVLabel(prefixedOutputter, axiom);
 //           });
 //       }
 //     }
 //   ]
 // });
+
+  foam.CLASS({
+    package: 'foam.dao',
+    name: 'PropertyInfoCSVRefinement',
+  
+    documentation: `Refinement on Properties to handle javaToCSV() and javaToCSVLabel().`,
+  
+    refines: 'foam.java.PropertyInfo',
+  
+    properties: [
+      {
+        name: 'javaToCSV',
+        class: 'Function',
+        value: function(obj, outputter, prop) {
+          outputter.output(obj ? obj[prop.name] : null);
+        }
+      },
+      {
+        name: 'javaToCSVLabel',
+        class: 'Function',
+        value: function(outputter, prop) {
+          outputter.output(prop.name);
+        }
+      }
+    ]
+  });
+
+  foam.CLASS({
+  package: 'foam.dao',
+  name: 'FObjectPropertyCSVRefinement',
+
+  documentation: `Refinement on FObjects to override javaToCSV() and javaToCSVLabel().
+  Purpose is to output a dot annotated format, to handle the nested properties on the FObject.`,
+
+  refines: 'foam.core.FObjectProperty',
+
+  properties: [
+    {
+      name: 'javaToCSV',
+      class: 'Function',
+      value: function(obj, outputter, prop) {
+        if ( ! prop.of ) {
+          outputter.output(obj ? obj[prop.name] : null);
+          return;
+        }
+        prop.of.getAxiomsByClass(foam.java.PropertyInfo)
+          .forEach((axiom) => {
+            axiom.toCSV(obj ? obj[prop.name] : null, outputter, axiom);
+          });
+      }
+    },
+    {
+      name: 'javaToCSVLabel',
+      class: 'Function',
+      value: function(outputter, prop) {
+        if ( ! prop.of ) {
+          outputter.output(prop.name);
+          return;
+        }
+        // mini decorator
+        var prefixedOutputter = {
+          output: function(value) {
+            outputter.output(prop.name + '.' + value);
+          }
+        };
+        prop.of.getAxiomsByClass(foam.java.PropertyInfo)
+          .forEach((axiom) => {
+            axiom.toCSVLabel(prefixedOutputter, axiom);
+          });
+      }
+    }
+  ]
+});
