@@ -7,8 +7,8 @@ foam2_CLASSES = tools/classes.js
 # <groupId>:<artifactId>:<version>
 foam2_MAVEN_DEPS = \
 	javax.json:javax.json-api:1.0 \
-	javax.mail:mail:1.4.7 \
-	javax.mail:javax.mail-api:1.5.5 \
+	javax.mail:javax.mail-api:1.6.2 \
+	com.sun.mail:imap:1.6.3 \
 	javax.servlet:javax.servlet-api:3.1.0 \
 	javax.websocket:javax.websocket-api:1.1 \
 	javax.ws.rs:javax.ws.rs-api:2.0 \

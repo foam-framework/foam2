@@ -631,6 +631,7 @@ foam.CLASS({
     'foam.u2.AttrSlot',
     'foam.u2.Entity',
     'foam.u2.RenderSink',
+    'foam.u2.Tooltip'
   ],
 
   imports: [
@@ -848,6 +849,10 @@ foam.CLASS({
       }
     },
     {
+      class: 'String',
+      name: 'tooltip'
+    },
+    {
       name: 'parentNode',
       transient: true
     },
@@ -977,6 +982,7 @@ foam.CLASS({
         Template method for adding addtion element initialization
         just before Element is output().
       */
+      this.initTooltip();
       this.initKeyboardShortcuts();
     },
 
@@ -1041,6 +1047,10 @@ foam.CLASS({
       }
 
       return count;
+    },
+
+    function initTooltip() {
+      if ( this.tooltip ) this.Tooltip.create({target: this});
     },
 
     function initKeyboardShortcuts() {
@@ -2119,6 +2129,10 @@ foam.CLASS({
       value: false
     },
     {
+      class: 'String',
+      name: 'placeholder'
+    },
+    {
       class: 'foam.u2.ViewSpec',
       name: 'view',
       value: { class: 'foam.u2.TextField' }
@@ -2136,7 +2150,14 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'validationVisible',
+      name: 'validationTextVisible',
+      documentation: "If true, validation text will be displayed below the input when it's in an invalid state.",
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'validationStyleEnabled',
+      documentation: 'If true, inputs will be styled when they are in an invalid state.',
       value: true
     }
   ],
@@ -2229,9 +2250,8 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'DateViewRefinement',
   refines: 'foam.core.Date',
-  requires: [ 'foam.u2.view.date.DateTimePicker' ],
   properties: [
-    [ 'view', { class: 'foam.u2.view.date.DateTimePicker' } ]
+    [ 'view', { class: 'foam.u2.DateView' } ]
   ]
 });
 
@@ -2240,9 +2260,8 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'DateTimeViewRefinement',
   refines: 'foam.core.DateTime',
-  requires: [ 'foam.u2.view.date.DateTimePicker' ],
   properties: [
-    [ 'view', { class: 'foam.u2.view.date.DateTimePicker', showTimeOfDay: true } ]
+    [ 'view', { class: 'foam.u2.DateTimeView' } ]
   ]
 });
 
@@ -2348,12 +2367,16 @@ foam.CLASS({
       value: { class: 'foam.u2.DetailView' },
     },
     {
-      name: 'validationVisible',
+      name: 'validationTextVisible',
       documentation: `
         Hide FObjectProperty validation because their inner view should provide its
         own validation so having it on the outer view and the inner view is redundant
         and jarring.
       `,
+      value: false
+    },
+    {
+      name: 'validationStyleEnabled',
       value: false
     }
   ]
@@ -2367,7 +2390,12 @@ foam.CLASS({
   properties: [
     {
       name: 'view',
-      value: { class: 'foam.u2.view.FObjectArrayView' },
+      expression: function(of) {
+        return {
+          class: 'foam.u2.view.FObjectArrayView',
+          of: of
+        };
+      }
     }
   ]
 });
@@ -2654,6 +2682,18 @@ foam.CLASS({
       postSet: function(_, cs) {
         this.axioms_.push(foam.u2.SearchColumns.create({columns: cs}));
       }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'PredicatePropertyRefine',
+  refines: 'foam.mlang.predicate.PredicateProperty',
+  properties: [
+    {
+      name: 'view',
+      value: { class: 'foam.u2.view.JSONTextView' }
     }
   ]
 });

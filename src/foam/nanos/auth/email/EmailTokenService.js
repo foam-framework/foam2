@@ -20,7 +20,7 @@ foam.CLASS({
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.token.Token',
     'foam.nanos.notification.email.EmailMessage',
-    'foam.nanos.notification.email.EmailService',
+    'foam.util.Emails.EmailsUtility',
     'java.util.Calendar',
     'java.util.HashMap',
     'java.util.List',
@@ -44,14 +44,14 @@ token.setExpiry(generateExpiryDate());
 token.setData(UUID.randomUUID().toString());
 token = (Token) tokenDAO.put(token);
 
-EmailService email = (EmailService) getX().get("email");
 EmailMessage message = new EmailMessage();
 message.setTo(new String[]{user.getEmail()});
 
 HashMap<String, Object> args = new HashMap<>();
 args.put("name", user.getFirstName());
 args.put("link", url + "/service/verifyEmail?userId=" + user.getId() + "&token=" + token.getData() + "&redirect=/" );
-email.sendEmailFromTemplate(x, user, message, "verifyEmail", args);
+
+EmailsUtility.sendEmailFromTemplate(getX(), user, message, "verifyEmail", args);
 return true;
 } catch(Throwable t) {
   t.printStackTrace();

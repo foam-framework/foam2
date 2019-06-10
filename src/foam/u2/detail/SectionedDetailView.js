@@ -13,7 +13,6 @@ foam.CLASS({
     'foam.u2.detail.SectionView',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
-    'foam.u2.layout.Item',
     'foam.u2.borders.CardBorder'
   ],
 
@@ -34,10 +33,11 @@ foam.CLASS({
           if ( ! data ) return;
 
           return self.E()
-            .start(self.Rows, { defaultChildStyle: { padding: '16px 0' } })
+            .start(self.Rows)
               .forEach(sections, function(s) {
                 this
-                  .start(self.Item)
+                  .start()
+                    .style({ padding: '16px 0' })
                     .show(s.createIsAvailableFor(self.data$))
                     .start('h2').add(s.title$).end()
                     .start(self.CardBorder)

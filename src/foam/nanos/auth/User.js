@@ -190,7 +190,6 @@ foam.CLASS({
       name: 'emailVerified',
       documentation: 'Determines whether the email address of the User is valid.',
       permissionRequired: true,
-      permissionRequired: true
     },
     {
       class: 'FObjectProperty',
@@ -554,7 +553,6 @@ foam.RELATIONSHIP({
     transient: true
   }
 });
-
 
 foam.RELATIONSHIP({
   cardinality: '1:*',
