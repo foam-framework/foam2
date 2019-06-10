@@ -22,13 +22,11 @@ foam.CLASS({
     },
     {
       type: 'Boolean',
-      name: 'opened',
-      value: false
+      name: 'opened'
     },
     {
       type: 'Boolean',
-      name: 'closed',
-      value: false
+      name: 'closed'
     },
   ],
 
@@ -45,7 +43,7 @@ foam.CLASS({
   listeners: [
     function close() {
       this.closed = true;
-      if (this.opened) {
+      if ( this.opened ) {
         this.remove();
         this.opened = false;
       }
@@ -53,10 +51,10 @@ foam.CLASS({
     
     function loadTooltip() {
 
-      if (!this.target || !this.target.el()) return;
+      if ( ! this.target || ! this.target.el() ) return;
 
       var oldTips = this.document.getElementsByClassName(this.myCls());
-      for (var i = 0; i < oldTips.length; i++) {
+      for ( var i = 0; i < oldTips.length; i++ ) {
         oldTips[i].remove();
       }
 
@@ -65,7 +63,6 @@ foam.CLASS({
       this.target.on('touchstart', this.close);
       this.target.on('unload', this.close);
       this.document.body.insertAdjacentHTML('beforeend', this.outerHTML);
-
 
       var domRect = this.target.el().getBoundingClientRect();
       var screenWidth = this.window.innerWidth;
