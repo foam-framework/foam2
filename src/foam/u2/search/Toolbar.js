@@ -8,6 +8,11 @@ foam.CLASS({
   package: 'foam.u2.search',
   name: 'Toolbar',
   extends: 'foam.u2.View',
+
+  documentation: `
+    A toolbar which features filtering, searching and exporting
+  `,
+
   properties: [
     {
       class: 'FObjectProperty',
