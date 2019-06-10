@@ -230,8 +230,8 @@ foam.CLASS({
 
           if ( used[def.ordinal] ) {
             throw this.id +
-                ' Enum error: duplicate ordinal found ' + def.name + ' ' +
-                used[def.ordinal] + ' both have an ordinal of ' + def.ordinal;
+              ' Enum error: duplicate ordinal found ' + def.name + ' ' +
+              used[def.ordinal] + ' both have an ordinal of ' + def.ordinal;
           }
 
           used[def.ordinal] = def.name;
@@ -277,7 +277,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'documentation',
-      transient: true,
+      transient: true
     },
     {
       class: 'Int',
@@ -300,9 +300,7 @@ foam.CLASS({
       name: 'label',
       final: true,
       transient: true,
-      factory: function() {
-        return this.name;
-      }
+      factory: function() { return this.name; }
     }
   ],
 
@@ -335,6 +333,7 @@ foam.CLASS({
     },
     {
       name: 'value',
+      // TODO: shouldn't be required
       adapt: function(_, n) {
         if ( foam.String.isInstance(n) ) n = foam.lookup(this.type)[n];
         if ( foam.Object.isInstance(n) && n.class )
@@ -343,14 +342,14 @@ foam.CLASS({
       },
       expression: function(type) {
         return type && foam.lookup(type).VALUES[0];
-      },
+      }
     },
     {
       name: 'javaValue',
       flags: ['java'],
       expression: function(type, value) {
         return foam.lookup(type).id + '.' + value;
-      },
+      }
     },
     [
       'adapt',
