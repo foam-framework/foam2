@@ -90,6 +90,7 @@ var classes = [
   'foam.box.CheckAuthenticationBox',
   'foam.box.SessionReplyBox',
   'foam.box.SessionClientBox',
+  'foam.dao.CSVSink',
   'foam.dao.DAO',
   'foam.dao.java.JDAO',
   'foam.dao.FilteredDAO',
