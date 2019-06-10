@@ -333,11 +333,11 @@ foam.CLASS({
 
   methods: [
     function initE() {
-
+      
       this.tooltip = this.action.toolTip;
 
       this.SUPER();
-
+      
       this.initCls();
 
       this.on('click', this.click);
