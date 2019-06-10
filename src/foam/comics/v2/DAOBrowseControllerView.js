@@ -8,10 +8,10 @@ foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOBrowseControllerView',
   documentation: `
-    The inline DAO controller for a collection of instances. 
-    Can switch between multiple views for rendering the collection.
+    The inline DAO controller for a collection of instances of a model that can 
+    switch between multiple views
   `,
-
+  
   extends: 'foam.u2.View',
   imports: [
     'stack'

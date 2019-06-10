@@ -19,7 +19,8 @@ foam.CLASS({
   ],
 
   documentation: `
-    A scrolling table view customized for the inline DAOController to render a collection
+    A scrolling table view customized for the inline DAOController 
+    with canned queries and a searchbar
   `,
 
   css: `
