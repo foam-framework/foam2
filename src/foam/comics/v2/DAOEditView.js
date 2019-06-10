@@ -102,54 +102,10 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-      debugger;
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(data, config$viewBorder) {
-          return self.E()
-            .start(self.Rows)
-              .start(self.Rows)
-                // we will handle this in the StackView instead
-                .startContext({ data: self.stack })
-                    .tag(self.stack.BACK, {
-                      buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                      icon: 'images/back-icon.svg'
-                    })
-                .endContext()
-                .start(self.Cols).style({ 'align-items': 'center' })
-                  .start()
-                    .add(data.toSummary())
-                      .addClass(this.myClass('account-name'))
-                  .end()
-                  .startContext({data: data}).add(self.primary).endContext()
-                .end()
-              .end()
-
-              .start(self.Cols)
-                .start(self.Cols).addClass(this.myClass('actions-header'))
-                  .startContext({data: self}).tag(self.EDIT, {
-                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                    icon: 'images/edit-icon.svg'
-                  }).endContext()
-                  .startContext({data: self}).tag(self.DELETE, {
-                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                    icon: 'images/delete-icon.svg'
-                  }).endContext()
-                .end()
-              .end()
-
-              .start(config$viewBorder)
-                .start().addClass(this.myClass('view-container'))
-                  .add(self.slot(function(viewView) {
-                    return self.E().tag(viewView, {
-                      data: data
-                    });
-                  }))
-                .end()
-              .end()
-            .end();
-        }));
+        .tag('TEST');
     }
   ]
 });
