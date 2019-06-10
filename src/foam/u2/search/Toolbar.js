@@ -18,8 +18,8 @@ foam.CLASS({
       }
     },
     {
-      class: 'String', // TODO remove.
-      name: 'data_',
+      class: 'String', // TODO: remove.
+      name: 'search',
       label: 'Search',
       view: { class: 'foam.u2.TextField' },
       maxLength: 0
