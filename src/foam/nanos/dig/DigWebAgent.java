@@ -496,6 +496,7 @@ public class DigWebAgent
     */
     if ( obj instanceof net.nanopay.api.User )
       obj = ((net.nanopay.api.User) obj).getUser();
+
     return dao.put(oldObj == null ? obj : oldObj.copyFrom(obj));
   }
 
