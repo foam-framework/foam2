@@ -155,6 +155,16 @@ foam.LIB({
         this.axiomMap_[a.name] = a;
       }
 
+      // Sort axioms by priority, higher priority gets installed first.
+      // Default to 100.
+      axs = axs.sort(function(a, b) {
+        var p1 = foam.Number.isInstance(a.priority) ? a.priority : 100;
+        var p2 = foam.Number.isInstance(b.priority) ? b.priority : 100;
+
+        // compare p2 vs p1, as we want higher priority values first.
+        return foam.Number.compare(p2, p1);
+      });
+
       for ( var i = 0 ; i < axs.length ; i++ ) {
         var a = axs[i];
 

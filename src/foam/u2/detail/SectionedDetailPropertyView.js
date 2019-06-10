@@ -20,23 +20,18 @@ foam.CLASS({
     }
 
     ^validation-container {
-      margin-top: 4px;
+      margin-top: 6px;
       color: #d9170e;
     }
 
     ^helper-icon {
       width: 20px;
       height: 20px;
-      margin-top 4px;
     }
 
     ^tooltip {
-      display: inline-flex;
-      overflow:overlay;
-      direction: rtl;
-      float: right;
-      width: 20px;
-      height: 20px;
+      align-self: center;
+      position: relative;
     }
 
     ^tooltip-container {
@@ -59,73 +54,22 @@ foam.CLASS({
     }
 
     ^arrow-right {
-      width: 0; 
-      height: 0; 
+      width: 0;
+      height: 0;
       border-top: 10px solid transparent;
-      border-bottom: 10px solid transparent; 
-      border-left:10px solid rgba(0, 0, 0, 0.8); 
+      border-bottom: 10px solid transparent;
+      border-left:10px solid rgba(0, 0, 0, 0.8);
     }
 
-    ^tooltip:hover {
-      position: absolute;
-      width: 100%;
-      height: auto;
-    }
-    
     ^tooltip:hover .foam-u2-detail-SectionedDetailPropertyView-tooltip-container{
-      display: inline-flex;
+      position: absolute;
+      display: flex;
+      justify-content: flex-end;
+
+      top: 0;
+      right: 25px;
+      width: 380px;
       z-index: 10;
-    }
-    
-    ^error-icon {
-      width: 16px;
-      height: 16px;
-    }
-
-    ^error .foam-u2-TextField {
-      background-color: #fbedec;
-      border: solid 1px #d9170e;
-      font-size: 12px;
-    }
-
-    ^error .foam-u2-tag-TextArea {
-      background-color: #fbedec;
-      border: solid 1px #d9170e;
-      font-size: 12px;
-    }
-
-    ^error .foam-u2-tag-Select {
-      background-color: #fbedec;
-      border: solid 1px #d9170e;
-      font-size: 12px;
-    }
-
-    ^error .foam-u2-view-date-DateTimePicker .date-display-box {
-      background-color: #fbedec;
-      border: solid 1px #d9170e;
-      font-size: 12px;
-    }
-
-    /*
-      !IMPORTANT!
-      For the following inputs below, we are planning 
-      encode these changes in the actual foam files
-    */
-
-    ^ .foam-u2-TextField {
-      width: 100%;
-      padding: 10px 8px;
-      font-size: 14px;
-    }
-
-    ^ .foam-u2-tag-TextArea {
-      width: 100%;
-      padding: 10px 8px;
-      font-size: 14px;
-    }
-
-    ^ .foam-u2-view-date-DateTimePicker {
-      cursor: pointer;
     }
 
     ^ .foam-u2-tag-Select {
@@ -138,6 +82,42 @@ foam.CLASS({
       box-shadow: none;
       background: #ffffff url('images/dropdown-icon.svg') no-repeat 99% 50%;
       -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    ^error .foam-u2-TextField,
+    ^error .foam-u2-tag-TextArea,
+    ^error .foam-u2-tag-Select,
+    ^error .foam-u2-IntView,
+    ^error .foam-u2-FloatView,
+    ^error .foam-u2-DateView,
+    ^error .foam-u2-view-date-DateTimePicker .date-display-box
+    {
+      background-color: #fbedec;
+      border: solid 1px #d9170e;
+      font-size: 12px;
+    }
+
+    /*
+      !IMPORTANT!
+      For the following inputs below, we are planning
+      encode these changes in the actual foam files
+    */
+
+    ^ .foam-u2-TextField {
+      width: 100%;
+      padding: 10px 8px;
+      font-size: 14px;
+      height: 40px;
+    }
+
+    ^ .foam-u2-tag-TextArea {
+      width: 100%;
+      padding: 10px 8px;
+      font-size: 14px;
+    }
+
+    ^ .foam-u2-view-date-DateTimePicker {
       cursor: pointer;
     }
 
@@ -235,11 +215,11 @@ foam.CLASS({
 
     /*
       !IMPORTANT!
-      For the following inputs below, we are planning 
+      For the following inputs below, we are planning
       encode these changes in the actual foam files
     */
 
-    /* 
+    /*
     ^ .foam-u2-CheckBox {
       -webkit-appearance: none;
       border-radius: 2px;
@@ -299,7 +279,6 @@ foam.CLASS({
 
   requires: [
     'foam.u2.layout.Cols',
-    'foam.u2.layout.Item',
     'foam.u2.layout.Rows'
   ],
 
@@ -315,75 +294,83 @@ foam.CLASS({
         .show(this.prop.createVisibilityFor(this.data$)
           .map(m => m != foam.u2.Visibility.HIDDEN))
         .addClass(this.myClass())
-        .start(self.Rows, { defaultChildStyle: { padding: '8px 0' } })
-          .add(this.slot(function(data, prop, prop$label) {
-            var errorSlot = prop.validateObj && prop.validationVisible ?
-              data.slot(prop.validateObj) :
-              foam.core.ConstantSlot.create({ value: null });
+        .add(this.slot(function(data, prop, prop$label) {
+          var errorSlot = prop.validateObj && prop.validationTextVisible ?
+            data.slot(prop.validateObj) :
+            foam.core.ConstantSlot.create({ value: null });
 
-            return self.E()
-              .start(self.Rows, { defaultChildStyle:  { 'line-height': '2' } })
-                .callIf(prop$label, function() {
-                  this.start('m3').add(prop$label).end();
-                })
+          return self.E()
+            .style({ padding: '8px 0' })
+            .start(self.Rows)
+              .callIf(prop$label, function() {
+                this.start('m3')
+                  .add(prop$label)
+                  .style({ 'line-height': '2' })
+                .end();
+              })
+              .start()
+                .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                 .start()
-                  .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
-                  .start(self.Item)
-                    .style({'flex-grow': 1})
-                    .add(prop)
-                    .enableClass(this.myClass('error'), errorSlot)
-                  .end()
-                  .callIf(prop.help, function() { 
-                    this.start()
-                      .addClass(self.myClass('tooltip'))
-                      .start({
-                        class: 'foam.u2.tag.Image',
-                        data: 'images/question-icon.svg'
-                      })
-                        .addClass(self.myClass('helper-icon'))
-                      .end()
-
-                      .start()
-                        .addClass(self.myClass('tooltip-container'))
-                        .start()
-                          .addClass(self.myClass('arrow-right'))
-                        .end()
-                        .start()
-                          .addClass(self.myClass('helper-text'))
-                          .start('p').style({ 'padding': '3px' })
-                            .add(prop.help)
-                          .end()
-                        .end()
-                      .end()
-                    .end()
+                  .style({ 'flex-grow': 1 })
+                  .add(prop)
+                  .callIf(prop.validationStyleEnabled, function() {
+                    this.enableClass(self.myClass('error'), errorSlot);
                   })
                 .end()
-                .callIf(prop.validationVisible, function() {
-                  this
-                    .start(this.Item).style({'align-items': 'center'})
-                      .start(self.Cols, { defaultChildStyle: {
-                        'justify-content': 'flex-start',
-                        'margin': '0 8px 0 0'
-                      }})
-                        .addClass(this.myClass('validation-container'))
-                        .show(errorSlot)
-                        .start({
-                          class: 'foam.u2.tag.Image',
-                          data: 'images/inline-error-icon.svg'
-                        })
-                          .addClass(this.myClass('error-icon'))
-                        .end()
-                        .start(this.Item)
-                        .style({ 'flex-grow': 1 })
-                          .add(errorSlot.map((s) => {
-                            return self.E().add(s);
-                          }))
+                .callIf(prop.help, function() {
+                  this.start()
+                    .addClass(self.myClass('tooltip'))
+                    .start({
+                      class: 'foam.u2.tag.Image',
+                      data: 'images/question-icon.svg'
+                    })
+                      .addClass(self.myClass('helper-icon'))
+                    .end()
+
+                    .start()
+                      .addClass(self.myClass('tooltip-container'))
+                      .start()
+                        .addClass(self.myClass('helper-text'))
+                        .start('p').style({ 'padding': '3px' })
+                          .add(prop.help)
                         .end()
                       .end()
-                    .end();
+                      .start()
+                        .addClass(self.myClass('arrow-right'))
+                      .end()
+                    .end()
+                  .end()
                 })
-              .end();
-          }));
+              .end()
+              .callIf(prop.validationTextVisible, function() {
+                this
+                  .start()
+                    .style({ 'align-items': 'center' })
+                    .start(self.Cols)
+                      .addClass(self.myClass('validation-container'))
+                      .show(errorSlot)
+                      .start({
+                        class: 'foam.u2.tag.Image',
+                        data: 'images/inline-error-icon.svg',
+                        displayHeight: 16,
+                        displayWidth: 16
+                      })
+                        .style({
+                          'justify-content': 'flex-start',
+                          'margin': '0 8px 0 0'
+                        })
+                      .end()
+                      .start()
+                        .style({ 'flex-grow': 1 })
+                        .add(errorSlot.map((s) => {
+                          return self.E().add(s);
+                        }))
+                      .end()
+                    .end()
+                  .end();
+              })
+            .end();
+        }));
     }
   ]
 });

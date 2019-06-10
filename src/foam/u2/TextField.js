@@ -37,6 +37,10 @@ foam.CLASS({
     function fromProperty(prop) {
       this.SUPER(prop);
 
+      if ( ! this.placeholder && prop.placeholder ) {
+        this.placeholder = prop.placeholder;
+      }
+
       if ( ! this.displayWidth ) {
         this.displayWidth = prop.displayWidth;
       }

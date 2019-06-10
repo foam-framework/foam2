@@ -91,6 +91,7 @@ FOAM_FILES([
   { name: "foam/core/AbstractFObject" },
   { name: "foam/core/ContextAgent" },
   { name: "foam/core/Validatable" },
+  { name: "foam/core/AxiomCloner" },
   { name: "foam/java/Authorizable" },
   { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
   { name: "foam/swift/SwiftLib", flags: ['swift'] },
@@ -175,6 +176,7 @@ FOAM_FILES([
   { name: "foam/u2/RowFormatter" },
   { name: "foam/u2/WeakMap", flags: ['web'] },
   { name: "foam/u2/Element", flags: ['js'] },
+  { name: "foam/u2/Tooltip", flags: ['web'] },
   { name: "foam/u2/MNRowFormatter", flags: ['web'] },
   { name: "foam/u2/ProgressView", flags: ['web'] },
   { name: "foam/u2/ListCreateController", flags: ['web'] },
@@ -216,6 +218,7 @@ FOAM_FILES([
   { name: "foam/dao/TimestampDAO" },
   { name: "foam/dao/AdapterDAO" },
   { name: "foam/dao/GUIDDAO" },
+  { name: "foam/dao/KeyValueDAO" },
   { name: "foam/dao/ReadOnlyDAO" },
   { name: "foam/dao/StoreAndForwardDAO" },
   { name: "foam/dao/Journal" },
@@ -399,6 +402,7 @@ FOAM_FILES([
   { name: "foam/u2/RangeView", flags: ['web'] },
   { name: "foam/u2/ReadWriteView", flags: ['web'] },
   { name: "foam/u2/HTMLElement", flags: ['web'] },
+  { name: "foam/u2/HTMLView", flags: ['web'] },
   { name: "foam/u2/tag/Select", flags: ['web'] },
   { name: "foam/u2/UnstyledTabs", flags: ['web'] },
   { name: "foam/u2/Tabs", flags: ['web'] },
@@ -408,6 +412,7 @@ FOAM_FILES([
   { name: "foam/u2/view/FObjectView", flags: ['web'] },
   { name: "foam/u2/view/FObjectArrayView", flags: ['web'] },
   { name: "foam/u2/view/ChoiceView", flags: ['web'] },
+  { name: "foam/u2/view/ChoiceWithOtherView", flags: ['web'] },
   { name: "foam/u2/view/RichChoiceView", flags: ['web'] },
   { name: "foam/u2/view/OverlayActionListView", flags: ['web'] },
   { name: "foam/u2/view/RadioView", flags: ['web'] },
@@ -590,7 +595,12 @@ FOAM_FILES([
   { name: "foam/u2/view/AnyView" },
   { name: "foam/u2/view/ArrayView" },
 
+  { name: "io/c9/ace/Config" },
+  { name: "io/c9/ace/Editor" },
+  { name: "io/c9/ace/KeyBinding" },
   { name: "io/c9/ace/Lib" },
+  { name: "io/c9/ace/Mode" },
+  { name: "io/c9/ace/Theme" },
 
   { name: "foam/u2/view/date/AbstractDateView"},
   { name: "foam/u2/view/date/CalendarDatePicker"},
@@ -602,7 +612,7 @@ FOAM_FILES([
 
   { name: "foam/layout/Section" },
   { name: "foam/layout/SectionAxiom" },
-  
+
   { name: "foam/u2/detail/AbstractSectionedDetailView" },
   { name: "foam/u2/detail/SectionView" },
   { name: "foam/u2/detail/SectionedDetailView" },

@@ -23,6 +23,7 @@ foam.CLASS({
     'name',
     { class: 'String', name: 'visibility' },
     'static',
+    'abstract',
     'final',
     'type',
     'synchronized',
@@ -39,10 +40,11 @@ foam.CLASS({
     function outputJava(o) {
       o.indent();
       o.out(this.visibility, this.visibility ? ' ' : '',
-        this.static ? 'static ' : '',
-        this.final ? 'final ' : '',
+        this.abstract     ? 'abstract ' : '',
+        this.static       ? 'static ' : '',
+        this.final        ? 'final ' : '',
         this.synchronized ? 'synchronized ' : '',
-        this.type ? this.type + ' ' : '',
+        this.type         ? this.type + ' ' : '',
         this.name, '(');
 
       for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
@@ -60,13 +62,17 @@ foam.CLASS({
         }
       }
 
-      o.out(' {\n');
+      if ( this.abstract ) {
+        o.out(';');
+      } else {
+        o.out(' {\n');
 
-      o.increaseIndent();
-      o.out(this.body);
-      o.decreaseIndent();
-      o.indent();
-      o.out('}');
+        o.increaseIndent();
+        o.out(this.body);
+        o.decreaseIndent();
+        o.indent();
+        o.out('}');
+      }
     }
   ]
 });

@@ -703,11 +703,16 @@ foam.CLASS({
     function toIndex(tail) {
       return this.arg1 && this.arg1.toIndex(tail);
     },
-
-    function toString() {
-      return foam.String.constantize(this.cls_.name) + '(' +
-          this.arg1.toString() + ', ' +
-          this.arg2.toString() + ')';
+    {
+      name: 'toString',
+      code: function() {
+        return foam.String.constantize(this.cls_.name) + '(' +
+            this.arg1.toString() + ', ' +
+            this.arg2.toString() + ')';
+      },
+      javaCode: `
+        return String.format("%s(%s, %s)", getClass().getSimpleName(), getArg1().toString(), getArg2().toString());
+      `
     },
     {
       name: 'prepareStatement',
@@ -1449,6 +1454,13 @@ foam.CLASS({
 
   requires: [ 'foam.mlang.Constant' ],
 
+  javaImports: [
+    'java.util.List',
+    'foam.mlang.ArrayConstant',
+    'foam.mlang.Constant',
+    'foam.mlang.predicate.False'
+  ],
+
   properties: [
     {
       name: 'arg1',
@@ -1527,7 +1539,14 @@ return false
   // boolean uppercase = lhs.getClass().isEnum(); TODO: Account for ENUMs? (See js)
   Object rhs = getArg2().f(obj);
 
-  if ( rhs instanceof Object[] ) {
+  if ( rhs instanceof List ) {
+    List list = (List) rhs;
+    for ( Object o : list ) {
+      if ( ( ( (Comparable) lhs ).compareTo( (Comparable) o ) ) == 0 ) {
+        return true;
+      }
+    }
+  } else if ( rhs instanceof Object[] ) {
     // Checks if rhs array contains the lhs object
     Object[] values = (Object[])rhs;
 
@@ -1551,12 +1570,30 @@ return false
       type: 'String',
       javaCode: 'return " " + getArg1().createStatement() + " in " + getArg2().createStatement();'
     },
+    {
+      name: 'partialEval',
+      code: function partialEval() {
+        if ( ! this.Constant.isInstance(this.arg2) ) return this;
 
-    function partialEval() {
-      if ( ! this.Constant.isInstance(this.arg2) ) return this;
+        return ( ! this.arg2.value ) || this.arg2.value.length === 0 ?
+            this.FALSE : this;
+      },
+      javaCode: `
+        if ( ! (getArg2() instanceof ArrayConstant) ) return this;
 
-      return ( ! this.arg2.value ) || this.arg2.value.length === 0 ?
-          this.FALSE : this;
+        Object[] arr = ((ArrayConstant) getArg2()).getValue();
+
+        if ( arr.length == 0 ) {
+          return new False();
+        } else if ( arr.length == 1 ) {
+          return new Eq.Builder(getX())
+            .setArg1(getArg1())
+            .setArg2(new Constant(arr[0]))
+            .build();
+        }
+
+        return this;
+      `
     }
   ]
 });
@@ -1658,6 +1695,8 @@ foam.CLASS({
     }
   ],
 
+  javaImports: [ 'java.util.Arrays' ],
+
   axioms: [
     {
       name: 'javaExtras',
@@ -1740,14 +1779,17 @@ s = s.replace(",", "\\\\,");
 builder.append(s);
 `
     },
-
-    function toString_(x) {
-      return Array.isArray(x) ? '[' + x.map(this.toString_.bind(this)).join(', ') + ']' :
-        x.toString ? x.toString :
-        x;
-    },
-
-    function toString() { return this.toString_(this.value); }
+    {
+      name: 'toString',
+      code: function() {
+        return Array.isArray(this.value) ? '[' + this.value.map(this.toString_.bind(this)).join(', ') + ']' :
+          this.value.toString ? this.value.toString :
+          x;
+      },
+      javaCode: `
+        return Arrays.toString(getValue());
+      `
+    }
   ]
 });
 
@@ -2580,7 +2622,7 @@ foam.CLASS({
       name: 'args'
     },
     {
-      class: 'Array',
+      class: 'List',
       name: 'data',
       factory: function() { return []; }
     }
@@ -2590,7 +2632,14 @@ foam.CLASS({
       name: 'put',
       code: function put(obj) {
         this.data.push(this.args.map(a => a.f(obj)));
-      }
+      },
+      javaCode: `
+        Object[] args = new Object[getArgs().length];
+        for ( int i = 0; i < getArgs().length ; i++ ) {
+          args[i] = getArgs()[i].f(obj);
+        }
+        getData().add(args);
+      `
     }
   ]
 });

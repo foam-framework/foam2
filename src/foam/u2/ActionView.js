@@ -333,13 +333,14 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      this.tooltip = this.action.toolTip;
+
+      this.SUPER();
       this.initCls();
 
       this.on('click', this.click);
 
       this.addContent();
-
-      this.setAttribute('title', this.action.toolTip); // hover text
 
       if ( this.action ) {
         this.attrs({ name: this.action.name });

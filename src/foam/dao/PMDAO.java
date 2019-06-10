@@ -21,13 +21,6 @@ public class PMDAO
   protected String removeName_;
   protected String removeAllName_;
 
-/*
-  public PMDAO(DAO delegate) {
-    setDelegate(delegate);
-    init();
-    System.err.println("*************************** WARNING: FAILURE TO SET PMDAO CONTEXT IN CONSTRUCTOR!");
-  }
-*/
   public PMDAO(X x, DAO delegate) {
     super(x, delegate);
     init();
@@ -42,7 +35,9 @@ public class PMDAO
 
   @Override
   public FObject put_(X x, FObject obj) {
-    PM pm = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(putName_).build();
+    PM pm = new PM();
+    pm.setClassType(PMDAO.getOwnClassInfo());
+    pm.setName(putName_);
 
     try {
       return super.put_(x, obj);
@@ -53,7 +48,9 @@ public class PMDAO
 
   @Override
   public FObject find_(X x, Object id) {
-    PM pm = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(findName_).build();
+    PM pm = new PM();
+    pm.setClassType(PMDAO.getOwnClassInfo());
+    pm.setName(findName_);
 
     try {
       return super.find_(x, id);
@@ -64,7 +61,9 @@ public class PMDAO
 
   @Override
   public FObject remove_(X x, FObject obj) {
-    PM pm = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(removeName_).build();
+    PM pm = new PM();
+    pm.setClassType(PMDAO.getOwnClassInfo());
+    pm.setName(removeName_);
 
     try {
       return super.remove_(x, obj);
@@ -75,7 +74,9 @@ public class PMDAO
 
   @Override
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    PM pm = new PM.Builder(x).setClassType(PMDAO.getOwnClassInfo()).setName(removeAllName_).build();
+    PM pm = new PM();
+    pm.setClassType(PMDAO.getOwnClassInfo());
+    pm.setName(removeAllName_);
 
     try {
       super.removeAll_(x, skip, limit, order, predicate);
