@@ -7,6 +7,11 @@
 foam.CLASS({
   package: 'foam.nanos.menu',
   name: 'DAOMenu2',
+  documentation: `
+    A DAOMenu which can accept a DAOControllerConfig and uses
+    the v2 DAOController
+  `,
+
   extends: 'foam.nanos.menu.AbstractMenu',
   requires: [
     'foam.comics.v2.DAOControllerConfig'

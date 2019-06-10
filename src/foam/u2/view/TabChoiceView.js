@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'TabChoiceView',
   extends: 'foam.u2.view.ChoiceView',
 
+  documentation: `
+    A choice view that outputs user-specified tabs
+  `,
+
   css: `
     ^ {
       display: flex;

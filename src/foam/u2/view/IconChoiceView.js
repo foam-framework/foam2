@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'IconChoiceView',
   extends: 'foam.u2.view.ChoiceView',
 
+  documentation: `
+    A choice view that outputs user-specified icons
+  `,
+
   css: `
     ^ {
       display: flex;

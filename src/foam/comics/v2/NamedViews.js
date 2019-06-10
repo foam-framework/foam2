@@ -7,6 +7,10 @@
 foam.CLASS({
   package: 'foam.comics.v2.namedViews',
   name: 'NamedViewCollection',
+  documentation: `
+    The model for a named view that renders a collection of a model
+  `,
+
   properties: [
     {
       class: 'String',
@@ -26,6 +30,10 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.comics.v2.namedViews',
   name: 'NamedViewInstance',
+  documentation: `
+    The model for a named view that renders a single instance of a model
+  `,
+
   properties: [
     {
       class: 'String',
