@@ -490,6 +490,10 @@ public class DigWebAgent
     throws Exception
   {
     FObject oldObj = dao.find(obj);
+
+    if ( obj instanceof net.nanopay.api.Business )
+      obj = ((net.nanopay.api.Business) obj).getUser();
+
     return dao.put(oldObj == null ? obj : oldObj.copyFrom(obj));
   }
 
