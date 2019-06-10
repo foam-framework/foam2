@@ -36,7 +36,7 @@ foam.CLASS({
       this.tag({
         class: 'foam.u2.detail.SectionedDetailPropertyView',
         data: this,
-        prop: this.DATA_
+        prop: this.SEARCH
       });
     }
   ]
