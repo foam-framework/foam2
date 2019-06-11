@@ -1050,7 +1050,7 @@ foam.CLASS({
     },
 
     function initTooltip() {
-      if ( this.tooltip ) this.Tooltip.create({target: this});
+      if ( this.tooltip ) this.Tooltip.create({target: this, text:this.tooltip});
     },
 
     function initKeyboardShortcuts() {
