@@ -89,6 +89,7 @@ FOAM_FILES([
   { name: "foam/nanos/session/SessionTimer" },
   { name: "foam/nanos/menu/AbstractMenu" },
   { name: "foam/nanos/menu/DAOMenu" },
+  { name: "foam/nanos/menu/DAOMenu2" },
   { name: "foam/nanos/menu/DocumentMenu" },
   { name: "foam/nanos/menu/DocumentFileMenu" },
   { name: "foam/nanos/menu/LinkMenu" },
