@@ -59,7 +59,7 @@ foam.CLASS({
       if ( ! this.target || ! this.target.el() ) return;
 
       var oldTips = this.document.getElementsByClassName(this.myCls());
-      for ( var i = 0; i < oldTips.length; i++ ) {
+      for ( var i = 0 ; i < oldTips.length ; i++ ) {
         oldTips[i].remove();
       }
 
