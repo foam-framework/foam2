@@ -166,23 +166,23 @@ foam.CLASS({
      */
 
     ^tertiary {
-      border-color: #355bc4;
-      background-color: %SECONDARYCOLOR%;
-      color: white;
+      border: 2px solid;
+      border-color: transparent;
+      background-color: transparent;
+      color: %TERTIARYCOLOR%;
     }
 
     ^tertiary:hover:not(:disabled) {
-      border-color: #294798;
-      background-color: %SECONDARYHOVERCOLOR%;
+      border-color: transparent;
+      background-color: transparent;
     }
 
-    ^tertiary:focus {
-      box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
+    ^tertiary:focus:not(:hover) {
+      border-bottom-color: %TERTIARYHOVERCOLOR%;
     }
 
     ^tertiary:disabled {
-      border-color: %SECONDARYDISABLEDCOLOR%;
-      background-color: %SECONDARYDISABLEDCOLOR%;
+      color: %TERTIARYDISABLEDCOLOR%;
     }
 
     ^tertiary-destructive {
@@ -202,7 +202,7 @@ foam.CLASS({
     }
 
     ^tertiary-destructive:disabled {
-      border-color: #ed8e8d;
+      border-color: %DESTRUCTIVEDISABLEDCOLOR%;
       background-color: %DESTRUCTIVEDISABLEDCOLOR%;
     }
 
@@ -220,6 +220,11 @@ foam.CLASS({
       padding: 7px 15px;
     }
 
+    ^tertiary^small {
+      font-size: 12px;
+      padding: 8px 0px;
+    }
+
     ^medium {
       font-size: 14px;
       padding: 9px 16px;
@@ -229,6 +234,10 @@ foam.CLASS({
       padding: 8px 15px;
     }
 
+    ^tertiary^medium {
+      padding: 8px 0px;
+    }
+
     ^large {
       font-size: 16px;
       padding: 10px 16px;
@@ -236,6 +245,10 @@ foam.CLASS({
 
     ^large:focus {
       padding: 9px 15px;
+    }
+
+    ^tertiary^large {
+      padding: 10px 0px;
     }
   `,
 

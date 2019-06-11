@@ -221,6 +221,7 @@ var classes = [
   'foam.nanos.logger.ProxyLogger',
   'foam.nanos.menu.Menu',
   'foam.nanos.menu.DAOMenu',
+  'foam.nanos.menu.DAOMenu2',
   'foam.nanos.menu.DocumentMenu',
   'foam.nanos.menu.DocumentFileMenu',
   'foam.nanos.menu.LinkMenu',
@@ -231,6 +232,9 @@ var classes = [
   'foam.nanos.menu.SubMenuView',
   'foam.nanos.menu.TabsMenu',
   'foam.nanos.menu.ViewMenu',
+  'foam.comics.v2.CannedQuery',
+  'foam.comics.v2.namedViews.NamedViewCollection',
+  'foam.comics.v2.namedViews.NamedViewInstance',
   'foam.nanos.menu.ScriptMenu',
   // Email base model or interface
   'foam.nanos.notification.email.EmailMessage',
