@@ -85,7 +85,6 @@ foam.CLASS({
       cursor: pointer;
     }
 
-    ^error .foam-u2-TextField,
     ^error .foam-u2-tag-TextArea,
     ^error .foam-u2-tag-Select,
     ^error .foam-u2-IntView,
@@ -106,9 +105,6 @@ foam.CLASS({
 
     ^ .foam-u2-TextField {
       width: 100%;
-      padding: 10px 8px;
-      font-size: 14px;
-      height: 40px;
     }
 
     ^ .foam-u2-tag-TextArea {
@@ -312,7 +308,9 @@ foam.CLASS({
                 .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                 .start()
                   .style({ 'flex-grow': 1 })
-                  .add(prop)
+                  .start(prop)
+                    .enableClass('error', errorSlot)
+                  .end()
                   .callIf(prop.validationStyleEnabled, function() {
                     this.enableClass(self.myClass('error'), errorSlot);
                   })

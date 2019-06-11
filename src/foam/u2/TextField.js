@@ -21,9 +21,52 @@ foam.CLASS({
   extends: 'foam.u2.tag.Input',
 
   css: `
-    .foam-u2-TextField.error { outline: 1px solid red; border: 1px solid red; }
-    input[type="search"] { -webkit-appearance: textfield !important; }
-    ^:read-only { border: none; background: rgba(0,0,0,0); }
+    ^ {
+      font-size: 14px;
+      padding: %INPUTVERTICALPADDING% %INPUTHORIZONTALPADDING%;
+      border: 1px solid;
+      border-radius: 3px;
+      color: %INPUTTEXTCOLOR%;
+      background-color: %INPUTBACKGROUNDCOLOR%;
+      border-color: %INPUTBORDERCOLOR%;
+    }
+
+    ^:hover {
+      background-color: %INPUTHOVERBACKGROUNDCOLOR%;
+      border-color: %INPUTHOVERBORDERCOLOR%;
+    }
+
+    ^:hover::placeholder,
+    ^:hover:-ms-input-placeholder,
+    ^:hover::-ms-input-placeholder {
+      color: %INPUTHOVERTEXTCOLOR%;
+    }
+
+    ^:focus {
+      border-color: %SECONDARYCOLOR%;
+    }
+
+    ^:disabled {
+      color: %INPUTDISABLEDTEXTCOLOR%;
+      background-color: %INPUTDISABLEDBACKGROUNDCOLOR%;
+      border-color: %INPUTDISABLEDBORDERCOLOR%;
+    }
+
+    ^.error {
+      outline: none;
+      color: %INPUTERRORTEXTCOLOR%;
+      background-color: %INPUTERRORBACKGROUNDCOLOR%;
+      border-color: %INPUTERRORBORDERCOLOR%;
+    }
+
+    input[type="search"] {
+      -webkit-appearance: textfield !important;
+    }
+
+    ^:read-only {
+      border: none;
+      background: rgba(0,0,0,0);
+    }
   `,
 
   properties: [

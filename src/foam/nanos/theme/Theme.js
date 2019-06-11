@@ -21,6 +21,13 @@ foam.CLASS({
     'preview'
   ],
 
+  sections: [
+    {
+      name: 'inputs',
+      title: 'Inputs'
+    }
+  ],
+
   properties: [
     {
       class: 'Long',
@@ -106,7 +113,77 @@ foam.CLASS({
     { class: 'Color', name: 'accentColor' },
     { class: 'Color', name: 'tertiaryColor'},
     { class: 'Color', name: 'tertiaryHoverColor' },
-    { class: 'Color', name: 'tertiaryDisabledColor' }
+    { class: 'Color', name: 'tertiaryDisabledColor' },
+    {
+      class: 'Color',
+      name: 'inputBorderColor',
+      section: 'inputs'
+    },
+    {
+      class: 'Color',
+      name: 'inputTextColor',
+      section: 'inputs'
+    },
+    {
+      class: 'Color',
+      name: 'inputBackgroundColor',
+      section: 'inputs'
+    },
+    {
+      class: 'Color',
+      name: 'inputHoverBorderColor',
+      section: 'inputs'
+    },
+    {
+      class: 'Color',
+      name: 'inputHoverTextColor',
+      section: 'inputs'
+    },
+    {
+      class: 'Color',
+      name: 'inputHoverBackgroundColor',
+      section: 'inputs'
+    },
+    {
+      class: 'Color',
+      name: 'inputErrorBorderColor',
+      section: 'inputs'
+    },
+    {
+      class: 'Color',
+      name: 'inputErrorTextColor',
+      section: 'inputs'
+    },
+    {
+      class: 'Color',
+      name: 'inputErrorBackgroundColor',
+      section: 'inputs'
+    },
+    {
+      class: 'Color',
+      name: 'inputDisabledBorderColor',
+      section: 'inputs'
+    },
+    {
+      class: 'Color',
+      name: 'inputDisabledTextColor',
+      section: 'inputs'
+    },
+    {
+      class: 'Color',
+      name: 'inputDisabledBackgroundColor',
+      section: 'inputs'
+    },
+    {
+      class: 'String',
+      name: 'inputVerticalPadding',
+      section: 'inputs'
+    },
+    {
+      class: 'String',
+      name: 'inputHorizontalPadding',
+      section: 'inputs'
+    }
   ],
 
   actions: [
