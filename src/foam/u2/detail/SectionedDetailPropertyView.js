@@ -21,7 +21,7 @@ foam.CLASS({
 
     ^validation-container {
       margin-top: 6px;
-      color: #d9170e;
+      color: %DESTRUCTIVECOLOR%;
     }
 
     ^helper-icon {
