@@ -19,6 +19,17 @@ foam.CLASS({
       name: 'fileInput_'
     }
   ],
+  actions: [
+    {
+      name: 'upload',
+      isAvailable: function(fileInput_) {
+        return !! fileInput_;
+      },
+      code: function() {
+        this.fileInput_.el().click();
+      }
+    }
+  ],
   listeners: [
     {
       name: 'onFileUpload',
@@ -42,12 +53,18 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this
-        .start('input', null, this.fileInput_$)
-          .attrs({type: 'file'})
-          .on('change', this.onFileUpload)
-        .end()
-        .startContext({data: this})
-          .add(this.IS_SET)
+        .startContext({ data: this })
+          .addClass(this.myClass())
+          .start('input', null, this.fileInput_$)
+            .hide()
+            .attrs({ type: 'file' })
+            .on('change', this.onFileUpload)
+          .end()
+          .add(this.UPLOAD)
+          .start('span')
+            .style({'margin-left': '8px'})
+            .add(this.IS_SET)
+          .end()
         .endContext();
     }
   ]
