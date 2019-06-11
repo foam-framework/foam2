@@ -23,7 +23,7 @@ foam.CLASS({
     },
 
     function textToData(text) {
-      return this.SUPER(text) * 100;
+      return Math.round(this.SUPER(text) * 100);
     },
 
     function formatNumber(val) {

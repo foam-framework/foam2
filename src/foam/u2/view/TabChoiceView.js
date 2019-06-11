@@ -1,42 +1,45 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
   package: 'foam.u2.view',
-  name: 'RadioView',
+  name: 'TabChoiceView',
   extends: 'foam.u2.view.ChoiceView',
 
-  css: `
-    ^ label {
-      position: relative;
-    }
-
-    ^horizontal-radio {
-      display: flex;
-    }
+  documentation: `
+    A choice view that outputs user-specified tabs
   `,
 
-  properties: [
-    {
-      class: 'Boolean',
-      name: 'isHorizontal',
-      value: false
+  css: `
+    ^ {
+      display: flex;
     }
-  ],
+
+    ^item {
+      display: flex;
+    }
+
+    ^ input[type="radio"] {
+      display: none;
+    }
+
+    ^ [type=radio]:checked ~ label {
+      border-bottom: solid 3px #406dea;
+      font-weight: bold;
+      color: #406dea;
+    }
+
+    ^ label {
+      cursor: pointer;
+      line-height: 48px;
+      padding: 0 32px;
+      text-align:center;
+      font-size: 14px;
+    }
+  `,
 
   methods: [
     function initE() {
@@ -44,7 +47,6 @@ foam.CLASS({
       // entry.
       this
         .addClass(this.myClass())
-        .enableClass(this.myClass('horizontal-radio'), this.isHorizontal);
 
       if ( ! this.data && ! this.index ) {
         this.index = 0;
@@ -65,13 +67,11 @@ foam.CLASS({
 
       this.add(this.choices.map(function(c) {
         return this.E('div').
-          // TODO: why is the radio item getting assigned the same class as the radio whole
-          addClass(this.myClass()).
+          addClass(this.myClass('item')).
           start('input').
             attrs({
               type: 'radio',
               name: this.id,
-              value: c[0],
               checked: self.slot(function (data) { return data === c[0]; })
             }).
             setID(id = self.NEXT_ID()).
