@@ -128,9 +128,8 @@ foam.CLASS({
   methods: [
     function dblclick(obj) {
       if ( ! this.stack ) return;
-      debugger;
       this.stack.push({
-        class: 'foam.comics.v2.DAOUpdateView',
+        class: 'foam.comics.v2.DAOSummaryView',
         data: obj,
         config: this.config,
         of: this.config.of

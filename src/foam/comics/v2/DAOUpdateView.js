@@ -10,12 +10,12 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   documentation: `
-    A configurable view to update a specific instance
+    A configurable summary view for a specific instance
   `,
 
-  axioms: [
-    foam.pattern.Faceted.create()
-  ],
+  // axioms: [
+  //   foam.pattern.Faceted.create()
+  // ],
 
   css:`
     ^ {
@@ -102,11 +102,10 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-      debugger;
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(data, config$viewBorder) {
+        .add(self.slot(function(data, config$viewBorder, data$name) {
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -114,7 +113,8 @@ foam.CLASS({
                 .startContext({ data: self.stack })
                     .tag(self.stack.BACK, {
                       buttonStyle: foam.u2.ButtonStyle.TERTIARY,
-                      icon: 'images/back-icon.svg'
+                      icon: 'images/back-icon.svg',
+                      label: data$name
                     })
                 .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })

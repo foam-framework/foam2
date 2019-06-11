@@ -6,11 +6,11 @@
 
 foam.CLASS({
   package: 'foam.comics.v2',
-  name: 'DAOUpdateView',
+  name: 'DAOSummaryView',
   extends: 'foam.u2.View',
 
   documentation: `
-    A configurable view to update a specific instance
+    A configurable summary view for a specific instance
   `,
 
   // axioms: [
@@ -89,7 +89,13 @@ foam.CLASS({
     {
       name: 'edit',
       code: function() {
-        this.controllerMode = this.ControllerMode.EDIT;
+        if ( ! this.stack ) return;
+        this.stack.push({
+          class: 'foam.comics.v2.DAOUpdateView',
+          data: this.data,
+          config: this.config,
+          of: this.config.of
+        });
       }
     },
     {
@@ -105,7 +111,41 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .tag('TEST');
+        .add(self.slot(function(data, config) {
+          return self.E()
+            .start(self.Rows)
+              .start(self.Rows)
+                // we will handle this in the StackView instead
+                .startContext({ data: self.stack })
+                    .tag(self.stack.BACK, {
+                      buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                      icon: 'images/back-icon.svg',
+                      label: `All ${config.of.name}s`
+                    })
+                .endContext()
+                .start(self.Cols).style({ 'align-items': 'center' })
+                  .start()
+                    .add(data.toSummary())
+                      .addClass(this.myClass('account-name'))
+                  .end()
+                  .startContext({data: data}).add(self.primary).endContext()
+                .end()
+              .end()
+
+              .start(self.Cols)
+                .start(self.Cols).addClass(this.myClass('actions-header'))
+                  .startContext({data: self}).tag(self.EDIT, {
+                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                    icon: 'images/edit-icon.svg'
+                  }).endContext()
+                  .startContext({data: self}).tag(self.DELETE, {
+                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                    icon: 'images/delete-icon.svg'
+                  }).endContext()
+                .end()
+              .end()
+            .end();
+        }));
     }
   ]
 });
