@@ -130,9 +130,6 @@ public class Boot {
 
     Group group = new Group();
     group.setId("system");
-    Permission[] permissions = {new Permission("*", "All access")};
-    group.setPermissions(permissions);
-    group.setDefaultMenu("set-personal");
     root_.put("group", group);
   }
 

@@ -22,6 +22,16 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'FObjectProperty',
+      name: 'data',
+      factory: function() {
+        return this.of ? this.of.create(null, this) : null;
+      },
+      postSet: function() {
+        this.of = undefined;
+      }
+    },
+    {
       class: 'Class',
       name: 'of',
       expression: function(data) {
