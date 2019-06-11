@@ -29,7 +29,7 @@ foam.CLASS({
 
   imports: [
     'stack',
-    'dao as importedDAO?'
+    'dao? as importedDAO'
   ],
 
   exports: [
