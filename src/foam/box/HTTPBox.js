@@ -123,9 +123,9 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-protected class Outputter extends foam.lib.json.Outputter {
-  public Outputter() {
-    super(foam.lib.json.OutputterMode.NETWORK);
+protected class Outputter extends foam.lib.json.PermissionedNetworkOutputter {
+  public Outputter(foam.core.X x) {
+    super(x);
   }
 
   protected void outputFObject(foam.core.FObject o) {
@@ -243,8 +243,7 @@ try {
   msg.getAttributes().put("replyBox", getX().create(foam.box.HTTPReplyBox.class));
 
 
-  foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(foam.lib.json.OutputterMode.NETWORK);
-  outputter.setX(getX());
+  foam.lib.json.NetworkTransientOutputter outputter = new foam.lib.json.NetworkTransientOutputter(getX());
   output.write(outputter.stringify(msg));
 
   msg.getAttributes().put("replyBox", replyBox);

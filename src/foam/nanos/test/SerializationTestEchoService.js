@@ -7,7 +7,7 @@ foam.CLASS({
     {
       name: 'echo',
       javaCode: `
-foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(foam.lib.json.OutputterMode.NETWORK);
+foam.lib.json.PermissionedNetworkOutputter outputter = new foam.lib.json.PermissionedNetworkOutputter(getX());
 obj = new foam.lib.json.JSONParser().parseString(outputter.stringify(obj));
 return obj;
 `

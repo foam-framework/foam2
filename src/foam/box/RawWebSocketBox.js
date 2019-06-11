@@ -91,7 +91,7 @@ foam.CLASS({
         }
       },
       javaCode: `
-foam.lib.json.Outputter outputter = new Outputter();
+foam.lib.json.Outputter outputter = new Outputter(getX());
 outputter.setX(getX());
 
 // TODO: Clone message or something when it clones safely.
@@ -124,9 +124,9 @@ try {
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-protected class Outputter extends foam.lib.json.Outputter {
-  public Outputter() {
-    super(foam.lib.json.OutputterMode.NETWORK);
+protected class Outputter extends foam.lib.json.PermissionedNetworkOutputter {
+  public Outputter(foam.core.X x) {
+    super(x);
   }
 
   protected void outputFObject(foam.core.FObject o) {

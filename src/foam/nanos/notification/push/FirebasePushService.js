@@ -27,8 +27,7 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.lib.json.Outputter',
-    'foam.lib.json.OutputterMode',
+    'foam.lib.json.NetworkTransientOutputter',
     'foam.util.SafetyUtil',
     'java.io.OutputStreamWriter',
     'java.net.HttpURLConnection',
@@ -88,7 +87,7 @@ try {
     body.put("data", data);
   }
 
-  Outputter outputter = new Outputter(OutputterMode.NETWORK);
+  NetworkTransientOutputter outputter = new NetworkTransientOutputter(getX());
   outputter.output(body);
 
   wr = new OutputStreamWriter(conn.getOutputStream());

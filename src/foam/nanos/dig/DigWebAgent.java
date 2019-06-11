@@ -12,6 +12,8 @@ import foam.dao.DAO;
 import foam.lib.csv.CSVSupport;
 import foam.lib.json.JSONParser;
 import foam.lib.json.OutputterMode;
+import foam.lib.json.PermissionedNetworkOutputter;
+import foam.lib.json.PermissionedStorageOutputter;;
 import foam.lib.parse.*;
 import foam.mlang.MLang;
 import foam.mlang.predicate.Predicate;
@@ -102,7 +104,7 @@ public class DigWebAgent
         if ( Format.JSON == format ) {
           JSONParser jsonParser = new JSONParser();
           jsonParser.setX(x);
-          foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+          PermissionedNetworkOutputter outputterJson = new PermissionedNetworkOutputter(x);
           outputterJson.setOutputDefaultValues(true);
           outputterJson.setOutputClassNames(true);
           // let FObjectArray parse first
@@ -251,7 +253,7 @@ public class DigWebAgent
           // JSON part from above
           JSONParser jsonParser = new JSONParser();
           jsonParser.setX(x);
-          foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+          PermissionedNetworkOutputter outputterJson = new PermissionedNetworkOutputter(x);
           outputterJson.setOutputDefaultValues(true);
           outputterJson.setOutputClassNames(true);
           // let FObjectArray parse first
@@ -318,7 +320,7 @@ public class DigWebAgent
           logger.debug(this.getClass().getSimpleName(), "objects selected: " + sink.getArray().size());
 
           if ( Format.JSON == format ) {
-            foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+            PermissionedNetworkOutputter outputterJson = new PermissionedNetworkOutputter(x);
             outputterJson.setOutputDefaultValues(true);
             outputterJson.setOutputClassNames(true);
             outputterJson.output(sink.getArray().toArray());
@@ -378,7 +380,7 @@ public class DigWebAgent
               out.println(outputterHtml.toString());
             }
           } else if ( Format.JSONJ == format ) {
-            foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.STORAGE);
+            PermissionedStorageOutputter outputterJson = new PermissionedStorageOutputter(x);
             List a = sink.getArray();
             String dataToString = "";
 
@@ -517,7 +519,7 @@ public class DigWebAgent
 
       JSONParser jsonParser = new JSONParser();
       jsonParser.setX(x);
-      foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+      PermissionedNetworkOutputter outputterJson = new PermissionedNetworkOutputter(x);
       outputterJson.setOutputDefaultValues(true);
       outputterJson.setOutputClassNames(true);
       outputterJson.output(error);
@@ -552,7 +554,7 @@ public class DigWebAgent
 
       JSONParser jsonParser = new JSONParser();
       jsonParser.setX(x);
-      foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.STORAGE);
+      PermissionedStorageOutputter outputterJson = new PermissionedStorageOutputter(x);
       outputterJson.setOutputDefaultValues(true);
       outputterJson.setOutputClassNames(true);
       outputterJson.outputJSONJFObject(error);
