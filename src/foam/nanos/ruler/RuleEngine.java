@@ -79,13 +79,14 @@ public class RuleEngine extends ContextAwareSupport {
    * @param oldObj - Old FObject supplied to rules for execution
    */
   public void probe(List<Rule> rules, RulerProbe rulerProbe, FObject obj, FObject oldObj) {
+    CompoundContextAgency agent = new CompoundContextAgency();
     for (Rule rule : rules) {
       if ( stops_.get() ) {
         rulerProbe.addTestedRule(rule.getId(), "SyncAction: Not executed because was overridden and forced to stop.", false);
         continue;
       }
       try {
-        applyRule(rule, obj, oldObj, new ProbeAgency());
+        applyRule(rule, obj, oldObj, agent);
         rulerProbe.addTestedRule(rule.getId(), "SyncAction: Successfully applied", true);
       } catch (Exception e ) {
         rulerProbe.addTestedRule(rule.getId(), "SyncAction: " + e.getMessage(), false);

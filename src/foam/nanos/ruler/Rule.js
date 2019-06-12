@@ -13,7 +13,6 @@
   javaImports: [
     'foam.core.ContextAware',
     'foam.core.FObject',
-    'foam.core.ProbeAgency',
     'foam.core.X',
     'foam.nanos.logger.Logger',
     'java.util.Collection'
@@ -230,7 +229,7 @@
         }
       ],
       javaCode: `
-        getAsyncAction().applyAction(x, obj, oldObj, ruler, new ProbeAgency());
+        getAsyncAction().applyAction(x, obj, oldObj, ruler, null);
         if ( ! getAfter() ) {
           ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }
