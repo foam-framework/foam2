@@ -176,6 +176,12 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'inputHeight',
+      documentation: 'Used to enforce consistent height across text-based inputs.',
+      section: 'inputs'
+    },
+    {
+      class: 'String',
       name: 'inputVerticalPadding',
       section: 'inputs'
     },

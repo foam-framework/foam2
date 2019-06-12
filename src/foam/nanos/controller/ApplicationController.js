@@ -106,6 +106,7 @@ foam.CLASS({
       'inputDisabledBorderColor',
       'inputDisabledTextColor',
       'inputDisabledBackgroundColor',
+      'inputHeight',
       'inputVerticalPadding',
       'inputHorizontalPadding',
     ]
