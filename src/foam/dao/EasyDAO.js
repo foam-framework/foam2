@@ -132,6 +132,10 @@ if ( getAuthenticate() ) {
     delegate);
 }
 
+if ( getPipelinePm() && ( delegate instanceof ProxyDAO ) ) {
+  delegate = new foam.dao.PipelinePMDAO(getX(), delegate);
+}
+
 if ( getPm() ) {
   delegate = new foam.dao.PMDAO(getX(), delegate);
 }
@@ -143,6 +147,11 @@ return delegate;
       class: 'Object',
       type: 'foam.dao.DAO',
       name: 'innerDAO'
+    },
+    {
+      class: 'Boolean',
+      documentation: 'Creates pipelinePMDAOs around each decorator to measure their performance',
+      name: 'pipelinePm'
     },
     {
       /** Have EasyDAO use a sequence number to index items. Note that

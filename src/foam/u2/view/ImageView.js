@@ -25,6 +25,7 @@ foam.CLASS({
   ],
   methods: [
     function initE() {
+      this.SUPER();
       this.attrs({ src: this.data$ });
     }
   ]

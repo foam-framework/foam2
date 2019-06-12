@@ -50,10 +50,6 @@ foam.CLASS({
     ^ input {
       width: 100%;
       margin-bottom: 16px;
-      padding: 8px;
-      border-radius: 3px;
-      border: 1px solid #cbcfd4;
-      font-size: 14px;
     }
     ^ button {
       margin-top: 8px;
