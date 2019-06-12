@@ -19,12 +19,16 @@ public class CompoundContextAgency
   public ArrayList<Runnable> agents_ = new ArrayList();
 
   public void execute(X x) {
+    CompoundException e = new CompoundException();
     for ( Runnable agent : agents_ ) {
       try {
         agent.run();
       } catch (Throwable t) {
-        throw t;
+        e.exceptions.add(t);
       }
+    }
+    if ( e.exceptions.size() != 0 ) {
+      throw e;
     }
   }
 

@@ -24,10 +24,6 @@ class ContextAgentRunnable
   }
 
   public void run() {
-    try {
-      agent_.execute(x_);
-    } catch (Throwable t) {
-      throw t;
-    }
+    agent_.execute(x_);
   }
 }
