@@ -285,7 +285,7 @@ foam.CLASS({
         })
         .addClass(this.myClass())
         .on('keydown', function(evt) {
-          if ( evt.which === 13 || evt.keyCode === 13 ) self.toggle();
+          if ( evt.key === 'Enter' ) self.toggle();
         })
         .start()
           .addClass(this.myClass('selection-view'))
@@ -345,7 +345,7 @@ foam.CLASS({
                         .start(self.rowView, { data: obj })
                           .attr('tabindex', 0)
                           .on('keydown', function(evt) {
-                            if ( evt.which === 13 || evt.keyCode === 13 ) {
+                            if ( evt.key === 'Enter' ) {
                               self.fullObject_ = obj;
                               self.data = obj.id;
                               self.isOpen_ = false;
