@@ -15,6 +15,10 @@ foam.CLASS({
     'foam.core.Serializable'
   ],
 
+  javaImports: `
+  'foam.java.PropertyInfo
+  `,
+
   properties: [
     {
       class: 'String',
@@ -150,7 +154,7 @@ foam.CLASS({
     {
       name: 'put',
       args: [
-        { class: 'FObject', name: 'obj' }
+        { type: 'FObject', name: 'obj' }
       ],
       code: function(obj) {
         if ( ! this.of ) this.of = obj.cls_;
@@ -170,17 +174,17 @@ foam.CLASS({
       },
       javaCode: `
         if ( ! isPropertySet(getOf()) ) setOf(obj.getClassInfo());
-        FObjectArray props = getProps();
+        PropertyInfo[] props = getProps();
         if ( ! getIsHeadersOutput() ) {
-          for (foam.core.Property element : props) {// *
+          for (PropertyInfo element : props) {// *
             element.javaToCSVLabel(this, element);
           }
           newLine_();
           setIsHeadersOutput(true);
         }
 
-        for (foam.core.Property element : props) {// *
-          element.javaToCSV(obj, this, element);
+        for (PropertyInfo element : props) {// *
+          element.javaToCSV(this, element);
         }
         newLine_();
       `
