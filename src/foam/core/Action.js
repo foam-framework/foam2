@@ -52,8 +52,7 @@ foam.CLASS({
     {
       documentation: 'displayed on :hover',
       class: 'String',
-      name: 'toolTip',
-      expression: function(label) { return label; }
+      name: 'toolTip'
     },
     {
       name: 'icon'
@@ -123,11 +122,11 @@ If empty than no permissions are required.`
       documentation: `Permissions required for the action to be enabled.
 If empty than no permissions are required.`,
     },
-    { 
-      name: 'runningMap', 
+    {
+      name: 'runningMap',
       factory: function() {
-        return new WeakMap(); 
-      }, 
+        return new WeakMap();
+      },
       hidden: true,
       transient: true,
       documentation: 'A weak Map to track the running state of action on a per object basis.'
@@ -206,11 +205,11 @@ If empty than no permissions are required.`,
       var self = this;
       function call() {
         var running = self.getRunning$(data);
-        // If action is in progress do not call again. Problem with this is that if action returns a 
-        // promise that never resolves then the action is stuck in a running state. Not returning does not solves 
-        // this problem either since there is no guarantee that such promise would resolve on a second run. 
+        // If action is in progress do not call again. Problem with this is that if action returns a
+        // promise that never resolves then the action is stuck in a running state. Not returning does not solves
+        // this problem either since there is no guarantee that such promise would resolve on a second run.
         if ( running.get() ) {
-          x.warn("Attempted to call action that is in progress."); 
+          x.warn("Attempted to call action that is in progress.");
           return;
         }
         var ret = self.code.call(data, x, self);
