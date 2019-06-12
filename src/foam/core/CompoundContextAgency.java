@@ -13,8 +13,8 @@ import java.util.ArrayList;
  * When ContextAgents are submit()'ed to the service it queues them
  * but doesn't execute them until it is itself executed.
  **/
-public class CompoundContextAgent
-  implements ContextAgent
+public class CompoundContextAgency
+  implements ContextAgent, Agency
 {
   public ArrayList<Runnable> agents_ = new ArrayList();
 
@@ -26,6 +26,13 @@ public class CompoundContextAgent
         throw t;
       }
     }
+  }
+
+  public void submit(X x, ContextAgent agent, String description) {
+    agents_.add(new ContextAgentRunnable(x, agent, description));
+  }
+  public void submit(X x, ContextAgent agent) {
+    submit(x, agent, "");
   }
 
   public String toString() {
