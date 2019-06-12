@@ -93,7 +93,22 @@ foam.CLASS({
       'headerColor',
       'tertiaryColor',
       'tertiaryHoverColor',
-      'tertiaryDisabledColor'
+      'tertiaryDisabledColor',
+      'inputBorderColor',
+      'inputTextColor',
+      'inputBackgroundColor',
+      'inputHoverBorderColor',
+      'inputHoverTextColor',
+      'inputHoverBackgroundColor',
+      'inputErrorBorderColor',
+      'inputErrorTextColor',
+      'inputErrorBackgroundColor',
+      'inputDisabledBorderColor',
+      'inputDisabledTextColor',
+      'inputDisabledBackgroundColor',
+      'inputHeight',
+      'inputVerticalPadding',
+      'inputHorizontalPadding',
     ]
   },
 

@@ -393,6 +393,7 @@ FOAM_FILES([
   { name: "foam/u2/tag/Input", flags: ['web'] },
   { name: "foam/u2/tag/TextArea", flags: ['web'] },
   { name: "foam/u2/TextField", flags: ['web'] },
+  { name: "foam/u2/TextInputCSS", flags: ['web'] },
   { name: "foam/u2/IntView", flags: ['web'] },
   { name: "foam/u2/FloatView", flags: ['web'] },
   { name: "foam/u2/CurrencyView", flags: ['web'] },
@@ -502,8 +503,12 @@ FOAM_FILES([
   { name: "foam/net/auth/AuthAwareHTTPRequest" },
   { name: "foam/net/auth/TokenBearerHTTPRequest" },
   { name: "foam/net/auth/AuthAgent" },
+
+  // Doc
   { name: "foam/doc/ClassLink", flags: ['debug', 'web'] },
+  { name: "foam/doc/CodeTabs" },
   { name: "foam/doc/DocBrowser", flags: ['debug', 'web'] },
+
   { name: "com/google/net/node/Google2LOAuthAgent", flags: ['node', 'gcloud'] },
   { name: "com/google/cloud/datastore/types", flags: ['gcloud'] },
   { name: "com/google/cloud/datastore/mlang", flags: ['gcloud'] },
