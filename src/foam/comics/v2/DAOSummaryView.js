@@ -70,13 +70,6 @@ foam.CLASS({
       }
     },
     {
-      class: 'foam.u2.ViewSpecWithJava',
-      name: 'viewView',
-      expression: function() {
-        return foam.u2.detail.SectionedDetailView;
-      }
-    },
-    {
       name: 'primary',
       expression: function(config$of){
         var allActions = config$of.getAxiomsByClass(foam.core.Action)
@@ -111,7 +104,7 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(data, config) {
+        .add(self.slot(function(data, config, config$viewBorder) {
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -142,6 +135,12 @@ foam.CLASS({
                     buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                     icon: 'images/delete-icon.svg'
                   }).endContext()
+                .end()
+              .end()
+
+              .start(config$viewBorder)
+                .start(foam.u2.detail.SectionedDetailView, { data: data })
+                  .addClass(this.myClass('view-container'))
                 .end()
               .end()
             .end();
