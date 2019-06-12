@@ -345,20 +345,12 @@ foam.CLASS({
                         .start(self.rowView, { data: obj })
                           .attr('tabindex', 0)
                           .on('keydown', function(evt) {
-                            if ( evt.key === 'Enter' ) {
-                              self.fullObject_ = obj;
-                              self.data = obj.id;
-                              self.isOpen_ = false;
-                            }
+                            if ( evt.key === 'Enter' ) self.selectRow(obj);
                             evt.stopPropagation();
                           })
                           .enableClass('disabled', section.disabled)
                           .callIf(! section.disabled, function() {
-                            this.on('click', () => {
-                              self.fullObject_ = obj;
-                              self.data = obj.id;
-                              self.isOpen_ = false;
-                            });
+                            this.on('click', () => self.selectRow(obj));
                           })
                         .end();
                     })
@@ -392,6 +384,14 @@ foam.CLASS({
         if ( this.mode === this.DisplayMode.RW ) {
           this.isOpen_ = ! this.isOpen_;
         }
+      }
+    },
+    {
+      name: 'selectRow',
+      code: function(obj) {
+        this.fullObject_ = obj;
+        this.data = obj.id;
+        this.isOpen_ = false;
       }
     },
     {
