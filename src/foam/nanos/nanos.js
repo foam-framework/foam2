@@ -15,7 +15,6 @@ FOAM_FILES([
   { name: "foam/nanos/logger/LogLevelFilterLogger" },
   { name: "foam/nanos/logger/NotificationLogMessageDAO" },
   { name: "foam/nanos/logger/RepeatLogMessageDAO" },
-  { name: "foam/nanos/dig/exception/DigErrorMessage" },
   { name: 'foam/nanos/fs/File' },
   { name: 'foam/nanos/fs/FileProperty' },
   { name: 'foam/nanos/fs/FileDAODecorator' },
@@ -161,9 +160,6 @@ FOAM_FILES([
   { name: "foam/nanos/http/HttpParameters" },
   { name: "foam/nanos/http/DefaultHttpParameters" },
   { name: "foam/nanos/doc/DocumentationView" },
-  { name: 'foam/nanos/dig/DIG' },
-  { name: 'foam/nanos/dig/DUG' },
-  { name: 'foam/nanos/dig/LinkView' },
   { name: 'foam/nanos/demo/relationship/CourseType' },
   { name: 'foam/nanos/demo/relationship/Course' },
   { name: 'foam/nanos/demo/relationship/Professor' },
@@ -178,9 +174,17 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/NotificationNotificationView'},
   { name: 'foam/nanos/notification/notifications/ScriptRunNotificationNotificationView'},
   { name: 'foam/nanos/dashboard/Demo' },
-  { name: 'foam/nanos/dig/SUGAR' },
-  { name: 'foam/nanos/dig/DigFileUploadView'},
+
+  // Dig
+  { name: "foam/nanos/dig/exception/DigErrorMessage" },
   { name: 'foam/nanos/dig/Argument'},
+  { name: 'foam/nanos/dig/DIG' },
+  { name: 'foam/nanos/dig/DigFileUploadView' },
+  { name: 'foam/nanos/dig/DigSnippetView' },
+  { name: 'foam/nanos/dig/DUG' },
+  { name: 'foam/nanos/dig/LinkView' },
+  { name: 'foam/nanos/dig/SUGAR' },
+
   { name: 'foam/nanos/notification/email/ClientPOP3EmailService'},
   { name: 'foam/nanos/notification/email/POP3Email'},
 
