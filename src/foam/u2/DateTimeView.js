@@ -24,6 +24,10 @@ foam.CLASS({
 
   documentation: 'View for editing DateTime values.',
 
+  axioms: [
+    { class: 'foam.u2.TextInputCSS' }
+  ],
+
   methods: [
     function initE() {
       this.SUPER();
