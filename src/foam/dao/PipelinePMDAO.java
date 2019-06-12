@@ -39,7 +39,6 @@ public class PipelinePMDAO
   /** Creates the PM pipeline by adding an EndPipelinePMDAO after of this class only if it is a ProxyDAO. 
   *   If the delegate of that is also a ProxyDAO, creates a new PipelinedPMDAO in the chain beofre it which repeats this procedure recursively. */
   void createPipeline() {
-    removePipelineFragmentation();
     DAO delegate = getDelegate();
     DAO secondaryDelegate;
     secondaryDelegate = ((ProxyDAO) delegate).getDelegate();
@@ -115,18 +114,6 @@ public class PipelinePMDAO
       if ( pm != null )
         pm.log(x);
       super.removeAll_(x, skip, limit, order, predicate);
-    }
-  }
-
-  void removePipelineFragmentation() {
-    DAO head = this;
-    DAO delegate;
-    while ( head instanceof ProxyDAO ) {
-      delegate = ( (ProxyDAO) head ).getDelegate();
-      if ( isPipelinePMDAO(delegate) )
-        ( (ProxyDAO) head ).setDelegate(( (ProxyDAO) delegate).getDelegate());
-      if ( ! isPipelinePMDAO(( (ProxyDAO) head ).getDelegate()) )
-        head = ( (ProxyDAO) head ).getDelegate();
     }
   }
 
