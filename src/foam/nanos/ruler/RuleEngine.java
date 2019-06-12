@@ -7,11 +7,8 @@
 package foam.nanos.ruler;
 
 import foam.core.*;
-import foam.dao.ArraySink;
 import foam.dao.DAO;
-import foam.dao.ReadOnlyDAO;
-import foam.dao.Sink;
-import foam.mlang.sink.GroupBy;
+import foam.nanos.logger.Logger;
 import foam.nanos.pool.FixedThreadPool;
 
 import java.lang.Exception;
@@ -62,7 +59,12 @@ public class RuleEngine extends ContextAwareSupport {
       applyRule(rule, obj, oldObj, agency);
       agency.submit(x_, x -> saveHistory(rule, obj));
     }
-    compoundAgency.execute(x_);
+    try {
+      compoundAgency.execute(x_);
+    } catch (Exception e) {
+      Logger logger = (Logger) x_.get("logger");
+      logger.error(e.getMessage());
+    }
 
     asyncApplyRules(rules, obj, oldObj);
   }
