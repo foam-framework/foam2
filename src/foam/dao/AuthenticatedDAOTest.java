@@ -12,6 +12,7 @@ import foam.test.TestObj;
 import foam.test.TestUtils;
 import foam.util.Auth;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AuthenticatedDAOTest
@@ -34,7 +35,7 @@ public class AuthenticatedDAOTest
 
     // Set the test user to be part of a basic user group with no permissions.
     testUser_.setGroup(basicUserGroup_.getId());
-    userDAO_.put(testUser_);
+    testUser_ = (User) userDAO_.put(testUser_).fclone();
     X basicUserContext = Auth.sudo(x, testUser_);
 
     AuthenticatedDAO_ContextMethods_UnauthorizedUser_find(basicUserContext);
@@ -45,7 +46,7 @@ public class AuthenticatedDAOTest
 
     // Set the test user to be part of a user group with all permissions.
     testUser_.setGroup(adminGroup_.getId());
-    userDAO_.put(testUser_);
+    testUser_ = (User) userDAO_.put(testUser_).fclone();
     X adminUserContext = Auth.sudo(x, testUser_);
 
     AuthenticatedDAO_ContextMethods_AuthorizedUser_find(adminUserContext);
@@ -60,54 +61,55 @@ public class AuthenticatedDAOTest
     // Mock the userDAO and put a test user in it.
     x = TestUtils.mockDAO(x, "localUserDAO");
     userDAO_ = (DAO) x.get("localUserDAO");
-    testUser_ = TestUtils.createTestUser();
-    userDAO_.put(testUser_);
+    testUser_ = (User) userDAO_.put(TestUtils.createTestUser()).fclone();
 
-    // Mock the groupDAO.
+    // Mock the groupDAO and localGroupDAO.
     x = TestUtils.mockDAO(x, "localGroupDAO");
     DAO groupDAO = (DAO) x.get("localGroupDAO");
+    x = x.put("groupDAO", groupDAO);
+
+    // Mock the groupPermissionJunctionDAO.
+    x = TestUtils.mockDAO(x, "groupPermissionJunctionDAO");
+    DAO groupPermissionJunctionDAO = (DAO) x.get("groupPermissionJunctionDAO");
+
+    // Mock the permissionDAO.
+    x = TestUtils.mockDAO(x, "permissionDAO");
+    DAO permissionDAO = (DAO) x.get("permissionDAO");
+
+    List<Permission> adminPermissions = new ArrayList<>();
+    adminPermissions.add(new Permission.Builder(x).setId("testObj.read.*").build());
+    adminPermissions.add(new Permission.Builder(x).setId("testObj.create").build());
+    adminPermissions.add(new Permission.Builder(x).setId("testObj.update.*").build());
+    adminPermissions.add(new Permission.Builder(x).setId("testObj.remove.*").build());
+    adminPermissions.add(new Permission.Builder(x).setId("testObj.delete.*").build());
 
     // Put a group in the groupDAO with permission to read, update, and delete the testObjDAO.
-    Permission adminPermissions[] = new Permission[5];
-    Permission READ_PERMISSION = new Permission();
-    Permission CREATE_PERMISSION = new Permission();
-    Permission UPDATE_PERMISSION = new Permission();
-    Permission REMOVE_PERMISSION = new Permission();
-    Permission DELETE_PERMISSION = new Permission();
-    READ_PERMISSION.setId("testObj.read.*");
-    CREATE_PERMISSION.setId("testObj.create");
-    UPDATE_PERMISSION.setId("testObj.update.*");
-    REMOVE_PERMISSION.setId("testObj.remove.*");
-    DELETE_PERMISSION.setId("testObj.delete.*");
-    adminPermissions[0] = READ_PERMISSION;
-    adminPermissions[1] = CREATE_PERMISSION;
-    adminPermissions[2] = UPDATE_PERMISSION;
-    adminPermissions[3] = REMOVE_PERMISSION;
-    adminPermissions[4] = DELETE_PERMISSION;
-
     adminGroup_ = new Group();
     adminGroup_.setId("admin");
     adminGroup_.setEnabled(true);
-    adminGroup_.setPermissions(adminPermissions);
+
     groupDAO.put(adminGroup_);
 
-    // Put a group in the groupDAO with permission to read only one specific testObj.
-    Permission basicUserPermissions[] = new Permission[3];
-    Permission READ_SPECIFIC_TESTOBJ = new Permission();
-    Permission DELETE_SPECIFIC_TESTOBJ = new Permission();
-    Permission REMOVE_SPECIFIC_TESTOBJ = new Permission();
-    READ_SPECIFIC_TESTOBJ.setId("testObj.read.public");
-    DELETE_SPECIFIC_TESTOBJ.setId("testObj.delete.public");
-    REMOVE_SPECIFIC_TESTOBJ.setId("testObj.remove.public");
-    basicUserPermissions[0] = READ_SPECIFIC_TESTOBJ;
-    basicUserPermissions[1] = DELETE_SPECIFIC_TESTOBJ;
-    basicUserPermissions[2] = REMOVE_SPECIFIC_TESTOBJ;
+    for ( Permission p : adminPermissions ) {
+      permissionDAO.put(p);
+      adminGroup_.getPermissions(x).add(p);
+    }
 
     basicUserGroup_ = new Group();
     basicUserGroup_.setId("basic");
     basicUserGroup_.setEnabled(true);
-    basicUserGroup_.setPermissions(basicUserPermissions);
+
+    List<Permission> basicPermissions = new ArrayList<>();
+    basicPermissions.add(new Permission.Builder(x).setId("testObj.read.public").build());
+    basicPermissions.add(new Permission.Builder(x).setId("testObj.remove.public").build());
+    basicPermissions.add(new Permission.Builder(x).setId("testObj.delete.public").build());
+
     groupDAO.put(basicUserGroup_);
+
+    for ( Permission p : basicPermissions ) {
+      permissionDAO.put(p);
+      basicUserGroup_.getPermissions(x).add(p);
+    }
 
     // Mock the AuthService.
     UserAndGroupAuthService auth = new UserAndGroupAuthService(x);

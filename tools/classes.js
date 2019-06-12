@@ -150,6 +150,7 @@ var classes = [
   'foam.nanos.auth.EnabledAwareDummy',
   'foam.nanos.auth.GroupPermissionJunction',
   'foam.nanos.auth.GroupPermissionJunctionRefinement',
+  'foam.nanos.auth.CheckPermissionsSink',
   'foam.nanos.auth.Group',
   'foam.nanos.auth.CreatedAware',
   'foam.nanos.auth.CreatedAwareDAO',
@@ -220,6 +221,7 @@ var classes = [
   'foam.nanos.logger.ProxyLogger',
   'foam.nanos.menu.Menu',
   'foam.nanos.menu.DAOMenu',
+  'foam.nanos.menu.DAOMenu2',
   'foam.nanos.menu.DocumentMenu',
   'foam.nanos.menu.DocumentFileMenu',
   'foam.nanos.menu.LinkMenu',
@@ -230,6 +232,10 @@ var classes = [
   'foam.nanos.menu.SubMenuView',
   'foam.nanos.menu.TabsMenu',
   'foam.nanos.menu.ViewMenu',
+  'foam.comics.v2.CannedQuery',
+  'foam.comics.v2.namedViews.NamedViewCollection',
+  'foam.comics.v2.namedViews.NamedViewInstance',
+  'foam.nanos.menu.ScriptMenu',
   // Email base model or interface
   'foam.nanos.notification.email.EmailMessage',
   'foam.nanos.notification.email.EmailService',
@@ -366,7 +372,7 @@ var classes = [
   'foam.nanos.dig.exception.GeneralException',
 
   'foam.nanos.app.EmailConfig',
-  
+
   'foam.nanos.test.StockSnapshot',
   'foam.nanos.analytics.FoldManagerDAODecorator',
   'foam.nanos.analytics.DAOFoldManager',

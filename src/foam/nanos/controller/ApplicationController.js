@@ -90,7 +90,10 @@ foam.CLASS({
       'destructiveDisabledColor',
       'customCSS',
       'backgroundColor',
-      'headerColor'
+      'headerColor',
+      'tertiaryColor',
+      'tertiaryHoverColor',
+      'tertiaryDisabledColor'
     ]
   },
 

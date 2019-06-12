@@ -406,7 +406,7 @@ console.log("Done.");
       var serializer = foam.json.Outputter.create({
         pretty: true,
         strict: false,
-        outputDefaultValues: false,
+        outputDefaultValues: true, // TODO This makes it impossible to remove the label on an action.
         passPropertiesByReference: false,
         propertyPredicate: function(o, p) {
           return o.hasOwnProperty(p.name) &&
