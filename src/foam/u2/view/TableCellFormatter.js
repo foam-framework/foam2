@@ -127,7 +127,7 @@ foam.CLASS({
       name: 'tableCellFormatter',
       value: function(obj) {
         this.start()
-          .add(obj.id)
+          .add(obj.toSummary())
         .end();
       }
     }
