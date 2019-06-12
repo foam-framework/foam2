@@ -360,8 +360,9 @@ foam.CLASS({
       if ( this.outputOwnPropertiesOnly && ! o.hasOwnProperty(p.name) )
         return false;
 
-      if ( foam.Array.isInstance(v) && v.length == 0 )
-        return false;
+      // empty array should be included in the json in case it's being updated to be empty
+      // if ( foam.Array.isInstance(v) && v.length == 0 )
+      //   return false;
 
       if ( includeComma ) this.out(',');
 

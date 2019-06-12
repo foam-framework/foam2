@@ -21,7 +21,7 @@ foam.CLASS({
 
     ^validation-container {
       margin-top: 6px;
-      color: #d9170e;
+      color: %DESTRUCTIVECOLOR%;
     }
 
     ^helper-icon {
@@ -72,30 +72,26 @@ foam.CLASS({
       z-index: 10;
     }
 
+    /* Necessary to style the border radius. This should probably be in Select itself. */
     ^ .foam-u2-tag-Select {
       width: 100%;
-      font-size: 14px;
-      border: solid 1px #8e9090;
-      border-radius: 3px;
-      font-weight: 400;
-      padding: 10px 8px;
       box-shadow: none;
       background: #ffffff url('images/dropdown-icon.svg') no-repeat 99% 50%;
       -webkit-appearance: none;
       cursor: pointer;
     }
 
-    ^error .foam-u2-TextField,
     ^error .foam-u2-tag-TextArea,
     ^error .foam-u2-tag-Select,
+    ^error .foam-u2-TextField,
     ^error .foam-u2-IntView,
     ^error .foam-u2-FloatView,
     ^error .foam-u2-DateView,
     ^error .foam-u2-view-date-DateTimePicker .date-display-box
     {
-      background-color: #fbedec;
-      border: solid 1px #d9170e;
-      font-size: 12px;
+      color: %INPUTERRORTEXTCOLOR% !important;
+      background-color: %INPUTERRORBACKGROUNDCOLOR% !important;
+      border-color: %INPUTERRORBORDERCOLOR% !important;
     }
 
     /*
@@ -104,17 +100,11 @@ foam.CLASS({
       encode these changes in the actual foam files
     */
 
-    ^ .foam-u2-TextField {
+    ^ .foam-u2-TextField,
+    ^ .foam-u2-tag-Select,
+    ^ .foam-u2-tag-TextArea,
+    ^ .foam-u2-IntView {
       width: 100%;
-      padding: 10px 8px;
-      font-size: 14px;
-      height: 40px;
-    }
-
-    ^ .foam-u2-tag-TextArea {
-      width: 100%;
-      padding: 10px 8px;
-      font-size: 14px;
     }
 
     ^ .foam-u2-view-date-DateTimePicker {
@@ -133,7 +123,6 @@ foam.CLASS({
     }
 
     ^ .foam-u2-view-RichChoiceView-selection-view {
-      padding: 2px 12px 0px 8px;
       width: 100%;
       border-radius: 3px;
       border: solid 1px #8e9090;
@@ -170,12 +159,6 @@ foam.CLASS({
       color: #333;
       font-weight: 900;
       padding: 6px 16px;
-    }
-
-    ^ .foam-u2-IntView {
-      width: 100%;
-      padding: 10px 8px;
-      font-size: 14px;
     }
 
     ^ .foam-u2-view-RichChoiceView-container {
