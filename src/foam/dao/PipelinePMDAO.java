@@ -45,17 +45,18 @@ public class PipelinePMDAO
     secondaryDelegate = ((ProxyDAO) delegate).getDelegate();
     ((ProxyDAO) delegate).setDelegate(new EndPipelinePMDAO(getX(), secondaryDelegate));
     delegate = ((ProxyDAO) delegate).getDelegate();
-    if ( secondaryDelegate instanceof ProxyDAO ) {
+    if ( secondaryDelegate instanceof ProxyDAO && ! secondaryDelegate instanceof PipelinePMDAO) {
       ((ProxyDAO) delegate).setDelegate(new PipelinePMDAO(getX(), secondaryDelegate));
     }
   }
 
   /** Creates the PM that will measure the performance of each operation and creates a new context with it as a variable which the EndPipelinePMDAO
    *  will use to access the pm after it is passed onto it through the arguments of the DAO operations */
-  X createPMX(String name, X x) {
+  X createPMX(X x, String name) {
     PM pm = new PM();
     pm.setClassType(PipelinePMDAO.getOwnClassInfo());
     pm.setName(name);
+    pm.init_();
     return x.put("pipePmStart", pm);
   }
 
