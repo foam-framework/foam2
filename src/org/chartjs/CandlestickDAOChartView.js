@@ -42,6 +42,8 @@ foam.CLASS({
           type: 'line',
           data: { datasets: [] },
           options: {
+            responsive: false,
+            maintainAspectRatio: false,
             scales: {
               xAxes: [{
                 type: 'time',
@@ -75,6 +77,20 @@ foam.CLASS({
       class: 'foam.mlang.ExprProperty',
       name: 'yExpr',
       factory: function() { return this.Candlestick.AVERAGE; }
+    },
+    {
+      class: 'Int',
+      name: 'width',
+      factory: function() {
+        return 750;
+      }
+    },
+    {
+      class: 'Int',
+      name: 'height',
+      factory: function() {
+        return 750;
+      }
     }
   ],
 
@@ -82,7 +98,7 @@ foam.CLASS({
     function initE() {
       this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.dataUpdate })));
       this.dataUpdate();
-      this.add(this.ChartCView.create({ config$: this.config$ }));
+      this.add(this.ChartCView.create({ config$: this.config$, width$: this.width$, height$: this.height$ }));
     }
   ],
 
