@@ -18,10 +18,6 @@ foam.CLASS({
     A configurable summary view for a specific instance
   `,
 
-  // axioms: [
-  //   foam.pattern.Faceted.create()
-  // ],
-
   css:`
     ^ {
       padding: 32px
@@ -91,6 +87,7 @@ foam.CLASS({
           self.finished.pub();
           self.stack.back();
         }, function() {
+
           self.throwError.pub();
         });
       }
