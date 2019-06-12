@@ -109,6 +109,8 @@ foam.CLASS({
     'queryParser',
     'diffProperty',
     'validateObj',
+    'toCSV',
+    'toCSVLabel',
     {
       name: 'methods',
       factory: function() {

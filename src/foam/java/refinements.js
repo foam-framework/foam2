@@ -226,7 +226,17 @@ if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
           })
           .join('');
       }
-    }
+    },
+    {
+      class: 'String',
+      name: 'javaToCSV',
+      value: null
+    },
+    {
+      class: 'String',
+      name: 'javaToCSVLabel',
+      value: null
+    },
   ],
 
   methods: [
@@ -264,7 +274,9 @@ if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
         includeInSignature:      this.includeInSignature,
         containsPII:             this.containsPII,
         containsDeletablePII:    this.containsDeletablePII,
-        validateObj:             this.javaValidateObj
+        validateObj:             this.javaValidateObj,
+        toCSV:                   this.javaToCSV,
+        toCSVLabel:              this.javaToCSVLabel
       });
     },
 
