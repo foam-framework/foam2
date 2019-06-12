@@ -287,6 +287,24 @@ foam.CLASS({
               { name: 'obj', type: 'foam.core.FObject' }
             ],
             body: this.validateObj
+          },
+          {
+            name: 'toCSV',
+            visibility: 'public',
+            type: 'void',
+            args: [
+              { name: 'value', type: 'Object' }
+            ],
+            body: this.toCSV
+          },
+          {
+            name: 'toCSVLabel',
+            visibility: 'public',
+            type: 'void',
+            args: [
+              { name: 'value', type: 'Object' }
+            ],
+            body: this.toCSVLabel
           }
         ];
 

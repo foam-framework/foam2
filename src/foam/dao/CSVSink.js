@@ -15,9 +15,10 @@ foam.CLASS({
     'foam.core.Serializable'
   ],
 
-  javaImports: `
-  'foam.java.PropertyInfo
-  `,
+  javaImports: [
+    'foam.java.PropertyInfo',
+    'java.lang.StringBuilder'
+  ],
 
   properties: [
     {
@@ -31,15 +32,15 @@ foam.CLASS({
       visibility: 'HIDDEN'
     },
     {
-      name: 'props',
+      name: 'columns',
       class: 'FObjectArray',
       of: 'foam.core.Property', // *
       expression: function(of) {
-        if ( this.axioms.length == 0 ) {
+        if ( this.columns_.length == 0 ) {
           return of.getAxiomsByClass(foam.core.Property) // *
             .filter( (p) => ! p.networkTransient );
         }
-        return this.axioms.map((tableCol) => {
+        return this.columns_.map((tableCol) => {
           return of.getAxiomByName(tableCol);
         });
       },
@@ -57,7 +58,7 @@ foam.CLASS({
       visibility: 'HIDDEN'
     },
     {
-      name: 'axioms',
+      name: 'columns_',
       factory: function() {
         return this.of.getAxiomByName('tableColumns').columns;
       }
@@ -76,7 +77,12 @@ foam.CLASS({
         this.output_(value);
       },
       javaCode: `
-        if ( ! getIsNewLine() ) setCsv(getCsv() + ",");
+        StringBuilder sb = new StringBuilder();
+        if ( ! getIsNewLine() ) {
+          sb.append(getCsv());
+          sb.append(",");
+          setCsv(sb.toString());
+        }
         setIsNewLine(false);
         output_(value);
       `
@@ -85,13 +91,13 @@ foam.CLASS({
     {
       name: 'output_',
       args: [
-        { name: 'value' }
+        { type: 'Any', name: 'value' }
       ],
       code:
         foam.mmethod(
           {
             String: function(value) {
-              this.csv += `\"${value.replace(/\"/g, '\"\"')}\"`;
+              this.csv += `"${value.replace(/\"/g, '""')}"`;
             },
             Number: function(value) {
               this.csv += value.toString();
@@ -114,30 +120,12 @@ foam.CLASS({
             this.output_(value.toString());
         }),
       javaCode: `
-        switch (value) {
-          case value == null: 
-            break;
-          case value instanceof String:
-            setCsv(getCsv() +  value.replace("\\"", "\\"\\""));
-            break;
-          case value instanceof Number:
-            setCsv(getCsv() + value.toString());
-            break;
-          case value instanceof Boolean: 
-            setCsv(getCsv() + value.toString());
-            break;
-          case value instanceof Date:
-            output_(value.toDateString());
-            break;
-          case value instanceof Array:
-            output_(foam.json.Pretty.stringify(value));
-            break;
-          case value instanceof FObject: 
-            output_(foam.json.Pretty.stringify(value));
-            break;
-          default:
-            output_(value.toString());
-        }
+        StringBuilder sb = new StringBuilder();
+        String s = value.toString();
+        if (s.indexOf("\"") != -1)
+          sb.append("\""+ escape(s) + "\"");
+        else
+          sb.append(s);
       `
     },
     {
@@ -147,7 +135,11 @@ foam.CLASS({
         this.isNewLine = true;
       },
       javaCode: `
-        setCsv(getCsv() + "\\n");
+        StringBuilder sb = new StringBuilder();
+        sb.append(getCsv());
+        sb.append("\\n");
+        setCsv(sb.toString());
+        sb.setLength(0);
         setIsNewLine(true);
       `
     },
@@ -160,30 +152,30 @@ foam.CLASS({
         if ( ! this.of ) this.of = obj.cls_;
 
         if ( ! this.isHeadersOutput ) {
-          this.props.forEach((element) => {
+          this.columns.forEach((element) => {
             element.toCSVLabel(this, element);
           });
           this.newLine_();
           this.isHeadersOutput = true;
         }
 
-        this.props.forEach((element) => {
-          element.toCSV(obj, this, element);
+        this.columns.forEach((element) => {
+          element.toCSV(this, element);
         });
         this.newLine_();
       },
       javaCode: `
         if ( ! isPropertySet(getOf()) ) setOf(obj.getClassInfo());
-        PropertyInfo[] props = getProps();
+        PropertyInfo[] columns = getProps();
         if ( ! getIsHeadersOutput() ) {
-          for (PropertyInfo element : props) {// *
+          for (PropertyInfo element : columns) {// *
             element.javaToCSVLabel(this, element);
           }
           newLine_();
           setIsHeadersOutput(true);
         }
 
-        for (PropertyInfo element : props) {// *
+        for (PropertyInfo element : columns) {// *
           element.javaToCSV(this, element);
         }
         newLine_();
@@ -278,75 +270,75 @@ foam.CLASS({
   ]
 });
 
-  foam.CLASS({
-    package: 'foam.dao',
-    name: 'PropertyInfoCSVRefinement',
+//   foam.CLASS({
+//     package: 'foam.dao',
+//     name: 'PropertyInfoCSVRefinement',
 
-    documentation: `Refinement on Properties to handle javaToCSV() and javaToCSVLabel().`,
+//     documentation: `Refinement on Properties to handle javaToCSV() and javaToCSVLabel().`,
 
-    refines: 'foam.java.PropertyInfo',
+//     refines: 'foam.java.PropertyInfo',
 
-    properties: [
-      {
-        name: 'javaToCSV',
-        class: 'Function',
-        value: function(outputter, prop) {
-          outputter.output(prop);
-        }
-      },
-      {
-        name: 'javaToCSVLabel',
-        class: 'Function',
-        value: function(outputter, prop) {
-          outputter.output(prop.name);
-        }
-      }
-    ]
-  });
+//     properties: [
+//       {
+//         name: 'javaToCSV',
+//         class: 'Function',
+//         value: function(outputter, prop) {
+//           outputter.output(prop);
+//         }
+//       },
+//       {
+//         name: 'javaToCSVLabel',
+//         class: 'Function',
+//         value: function(outputter, prop) {
+//           outputter.output(prop.name);
+//         }
+//       }
+//     ]
+//   });
 
-  foam.CLASS({
-  package: 'foam.dao',
-  name: 'FObjectPropertyCSVRefinement',
+//   foam.CLASS({
+//   package: 'foam.dao',
+//   name: 'FObjectPropertyCSVRefinement',
 
-  documentation: `Refinement on FObjects to override javaToCSV() and javaToCSVLabel().
-  Purpose is to output a dot annotated format, to handle the nested properties on the FObject.`,
+//   documentation: `Refinement on FObjects to override javaToCSV() and javaToCSVLabel().
+//   Purpose is to output a dot annotated format, to handle the nested properties on the FObject.`,
 
-  refines: 'foam.core.FObjectProperty',
+//   refines: 'foam.core.FObjectProperty',
 
-  properties: [
-    {
-      name: 'javaToCSV',
-      class: 'Function',
-      value: function(outputter, prop) {
-        if ( ! prop.of ) {
-          outputter.output(prop);
-          return;
-        }
-        prop.of.getAxiomsByClass(foam.java.PropertyInfo)
-          .forEach((axiom) => {
-            axiom.javaToCSV(outputter, axiom);
-          });
-      }
-    },
-    {
-      name: 'javaToCSVLabel',
-      class: 'Function',
-      value: function(outputter, prop) {
-        if ( ! prop.of ) {
-          outputter.output(prop.name);
-          return;
-        }
-        // mini decorator
-        var prefixedOutputter = {
-          output: function(value) {
-            outputter.output(prop.name + '.' + value);
-          }
-        };
-        prop.of.getAxiomsByClass(foam.java.PropertyInfo)
-          .forEach((axiom) => {
-            axiom.javaToCSVLabel(prefixedOutputter, axiom);
-          });
-      }
-    }
-  ]
-});
+//   properties: [
+//     {
+//       name: 'javaToCSV',
+//       class: 'Function',
+//       value: function(outputter, prop) {
+//         if ( ! prop.of ) {
+//           outputter.output(prop);
+//           return;
+//         }
+//         prop.of.getAxiomsByClass(foam.java.PropertyInfo)
+//           .forEach((axiom) => {
+//             axiom.javaToCSV(outputter, axiom);
+//           });
+//       }
+//     },
+//     {
+//       name: 'javaToCSVLabel',
+//       class: 'Function',
+//       value: function(outputter, prop) {
+//         if ( ! prop.of ) {
+//           outputter.output(prop.name);
+//           return;
+//         }
+//         // mini decorator
+//         var prefixedOutputter = {
+//           output: function(value) {
+//             outputter.output(prop.name + '.' + value);
+//           }
+//         };
+//         prop.of.getAxiomsByClass(foam.java.PropertyInfo)
+//           .forEach((axiom) => {
+//             axiom.javaToCSVLabel(prefixedOutputter, axiom);
+//           });
+//       }
+//     }
+//   ]
+// });

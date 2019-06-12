@@ -230,12 +230,16 @@ if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
     {
       class: 'String',
       name: 'javaToCSV',
-      value: null
+      expression: function() {
+        return this.javaValue;
+      }
     },
     {
       class: 'String',
       name: 'javaToCSVLabel',
-      value: null
+      expression: function() {
+        return this.name;
+      }
     },
   ],
 
