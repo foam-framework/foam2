@@ -136,8 +136,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'title',
-      expression: function(data$data$of) {
-        return 'Browse ' + data$data$of.model_.plural;
+      expression: function(data$of) {
+        return 'Browse ' + data$of.model_.plural;
       }
     },
     {
