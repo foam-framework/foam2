@@ -151,7 +151,14 @@ foam.CLASS({
       documentation: `
         The most important action on the page. The view for this controller may
         choose to display this action prominently.
-      `
+      `,
+      factory: function() {
+        return this.relationship
+          ? this.addEnabled
+            ? this.ADD_SELECTION
+            : this.SELECT
+          : this.cls_.CREATE;
+      }
     },
     {
       class: 'foam.u2.ViewSpec',
