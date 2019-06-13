@@ -216,6 +216,7 @@ foam.CLASS({
       name: 'addSelection',
       label: 'Add',
       isAvailable: function(addEnabled) { return addEnabled; },
+      isEnabled: function(selection) { return !! selection },
       code: function() {
         var self = this;
         this.relationship.add(this.selection).then(function() {
