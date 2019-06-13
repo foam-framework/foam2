@@ -81,16 +81,12 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'width',
-      factory: function() {
-        return 750;
-      }
+      value: 750
     },
     {
       class: 'Int',
       name: 'height',
-      factory: function() {
-        return 750;
-      }
+      value: 750
     }
   ],
 
