@@ -14,6 +14,8 @@ import foam.mlang.sink.GroupBy;
 import foam.nanos.logger.Logger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  The MDAO class for an ordering, fast lookup, single value,
@@ -44,6 +46,7 @@ public class MDAO
   protected AltIndex index_;
   protected Object   state_ = null;
   protected Object   writeLock_ = new Object();
+  protected Set      unindexed_ = new HashSet();
 
   public MDAO(ClassInfo of) {
     setOf(of);
@@ -159,7 +162,10 @@ public class MDAO
     if ( state != null && predicate != null && plan.cost() > 1000 && plan.cost() >= index_.size(state) ) {
       Logger logger = (Logger) x.get("logger");
       if ( ! predicate.equals(simplePredicate) ) logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
-      logger.warning("Unindexed search on MDAO", simplePredicate.toString());
+      if ( ! unindexed_.contains(simplePredicate.toString())) {
+        unindexed_.add(simplePredicate.toString());
+        logger.warning("Unindexed search on MDAO", getOf().getId(), simplePredicate.toString());
+      }
     }
 
     plan.select(state, sink, skip, limit, order, simplePredicate);
