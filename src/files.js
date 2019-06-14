@@ -165,6 +165,7 @@ FOAM_FILES([
   { name: "foam/memento/MementoMgr" },
   { name: "foam/web/DetachedURLState", flags: ['web'] },
   { name: "foam/web/URLState", flags: ['web'] },
+  { name: "foam/web/KeyboardUtil", flags: ['web'] },
   { name: "lib/input", flags: ['web'] },
   { name: "foam/box/Remote" },
   { name: 'foam/u2/ModalHeader', flags: ['web'] },
