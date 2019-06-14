@@ -57,8 +57,7 @@ public class MDAO
   /** Add an Index which is for a unique value. **/
   public void addUniqueIndex(PropertyInfo... props) {
     Index i = ValueIndex.instance();
-    for ( PropertyInfo prop : props ) i = new AltIndex(prop, i);
-    return i;
+    for ( PropertyInfo prop : props ) i = new TreeIndex(prop, i);
   }
 
   /** Add an Index which is for a non-unique value. The 'id' property is
@@ -66,8 +65,7 @@ public class MDAO
    **/
   public void addIndex(PropertyInfo... props) {
     Index i = new TreeIndex((PropertyInfo) this.of_.getAxiomByName("id"));
-    for ( PropertyInfo prop : props ) i = new AltIndex(prop, i);
-    return i;
+    for ( PropertyInfo prop : props ) i = new TreeIndex(prop, i);
   }
 
   synchronized Object getState() {

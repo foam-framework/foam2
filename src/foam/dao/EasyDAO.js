@@ -623,14 +623,14 @@ return delegate;
     {
       name: 'addPropertyIndex',
       type: 'foam.dao.EasyDAO',
-      args: [ { javaType: 'foam.core.PropertyInfo', name: 'prop' } ],
+      args: [ { javaType: 'foam.core.PropertyInfo...', name: 'props' } ],
       code:     function addPropertyIndex() {
         this.mdao && this.mdao.addPropertyIndex.apply(this.mdao, arguments);
         return this;
       },
       javaCode: `
 if ( getMdao() != null ) {
-  getMdao().addIndex(prop);
+  getMdao().addIndex(props);
 }
 return this;
 `
