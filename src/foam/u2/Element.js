@@ -133,15 +133,18 @@ foam.CLASS({
 
         if ( ! lastClassToInstallCSSFor || lastClassToInstallCSSFor == cls ) {
           // Install CSS if not already installed in this document for this cls
-          var key = axiom.asKey(X.document, cls);
+          var key = axiom.asKey(X.document, this);
           if ( X.document && ! axiom.installedDocuments_[key] ) {
-            X.installCSS(axiom.expandCSS(this, axiom.code), cls.id);
+            X.installCSS(axiom.expandCSS(this, axiom.code), this.id);
             axiom.installedDocuments_[key] = true;
           }
         }
 
-        if ( ! lastClassToInstallCSSFor && ! cls.model_.inheritCSS ) {
-          X = X.createSubContext({lastClassToInstallCSSFor: cls, originalX: X});
+        if ( ! lastClassToInstallCSSFor && ! this.model_.inheritCSS ) {
+          X = X.createSubContext({
+            lastClassToInstallCSSFor: this,
+            originalX: X
+          });
         }
 
         if ( lastClassToInstallCSSFor && isFirstCSS ) X = X.originalX;
@@ -1050,7 +1053,7 @@ foam.CLASS({
     },
 
     function initTooltip() {
-      if ( this.tooltip ) this.Tooltip.create({target: this});
+      if ( this.tooltip ) this.Tooltip.create({target: this, text:this.tooltip});
     },
 
     function initKeyboardShortcuts() {

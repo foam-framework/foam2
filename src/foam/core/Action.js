@@ -52,8 +52,7 @@ foam.CLASS({
     {
       documentation: 'displayed on :hover',
       class: 'String',
-      name: 'toolTip',
-      expression: function(label) { return label; }
+      name: 'toolTip'
     },
     {
       name: 'icon'
@@ -122,6 +121,15 @@ If empty than no permissions are required.`
       name: 'enabledPermissions',
       documentation: `Permissions required for the action to be enabled.
 If empty than no permissions are required.`,
+    },
+    {
+      name: 'runningMap',
+      factory: function() {
+        return new WeakMap();
+      },
+      hidden: true,
+      transient: true,
+      documentation: 'A weak Map to track the running state of action on a per object basis.'
     }
   ],
 
@@ -167,20 +175,52 @@ If empty than no permissions are required.`,
     },
 
     function createIsEnabled$(x, data) {
-      return this.createSlotFor_(x, data, this.isEnabled, this.enabledPermissions);
+      var running = this.getRunning$(data);
+      var slot = this.createSlotFor_(x, data, this.isEnabled, this.enabledPermissions);
+      return foam.core.ExpressionSlot.create({
+        args: [
+          running,
+          slot
+        ],
+        code: function(a, b) {
+          return (! a) && b;
+        }
+      });
     },
 
     function createIsAvailable$(x, data) {
       return this.createSlotFor_(x, data, this.isAvailable, this.availablePermissions);
     },
 
+    function getRunning$(data) {
+      var running = this.runningMap.get(data);
+      if ( ! running ) {
+        running = foam.core.SimpleSlot.create({ value: false });
+        if ( data ) this.runningMap.set(data, running);
+      }
+      return running;
+    },
+
     function maybeCall(x, data) {
       var self = this;
       function call() {
-        self.code.call(data, x, self);
+        var running = self.getRunning$(data);
+        // If action is in progress do not call again. Problem with this is that if action returns a
+        // promise that never resolves then the action is stuck in a running state. Not returning does not solves
+        // this problem either since there is no guarantee that such promise would resolve on a second run.
+        if ( running.get() ) {
+          x.warn("Attempted to call action that is in progress.");
+          return;
+        }
+        var ret = self.code.call(data, x, self);
+        if ( ret && ret.then ) {
+          running.set(true);
+          ret.then(function() { running.set(false); }, function() { running.set(false);});
+        }
         // primitive types won't have a pub method
         // Why are we publishing this event anyway? KGR
         data && data.pub && data.pub('action', self.name, self);
+        return ret;
       }
 
       if ( ( this.isAvailable && ! foam.Function.withArgs(this.isAvailable, data) ) ||

@@ -34,7 +34,7 @@ foam.CLASS({
         [{
             class: 'foam.graphics.TreeGraph',
             width: 1000,
-            heigh: 1000
+            height: 1000
           }, 'Graph']];
         }
       ]
