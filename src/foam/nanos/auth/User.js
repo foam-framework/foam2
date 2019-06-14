@@ -491,6 +491,12 @@ foam.CLASS({
           throw new RuntimeException("You do not have permission to delete that user.");
         }
       `
+    },
+    {
+      name: 'toSummary',
+      code: function() {
+        return this.label();
+      }
     }
   ]
 });
