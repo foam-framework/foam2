@@ -37,7 +37,7 @@ public class PMDAO
     PM pm = new PM();
     // TODO: should be modelled
     pm.setClassType(PMDAO.getOwnClassInfo());
-    pm.setName(putName_);
+    pm.setName(name);
     pm.init_();
     return pm;
   }
