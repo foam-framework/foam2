@@ -130,20 +130,6 @@ foam.CLASS({
       value: function(outputter, prop) {
         outputter.output(prop.name);
       }
-    },
-    {
-      class: 'Function',
-      name: 'fromCSVLabelMapping',
-      value: function(map, prop) {
-        map[prop.name] = prop;
-      }
-    },
-    {
-      class: 'Function',
-      name: 'fromCSV',
-      value: function(obj, value, label, prop) {
-        obj[prop.name] = value;
-      }
     }
   ]
 });
@@ -191,33 +177,6 @@ foam.CLASS({
             axiom.toCSVLabel(prefixedOutputter, axiom);
           });
       }
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'CSVParser',
-  methods: [
-    function parse(ps, dao) {
-      var labelPropertyMap = dao.of.getAxiomsByClass(foam.core.Property)
-        .reduce((map, p) => {
-          p.fromCSVLabelMapping(map, p);
-          return map;
-        }, {});
-
-      /*
-      // TODO parse headers.
-      var headers;
-
-      for each row
-        var o = {};
-        for each value, index
-          label = headers[index];
-          prop = labelPropertyMap[label];
-          prop.fromCSV(o, value, label, prop)
-        dao.put(dao.of.create(o));
-      */
     }
   ]
 });
