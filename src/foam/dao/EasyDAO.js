@@ -105,8 +105,8 @@ foam.CLASS({
 //foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
 //logger.info(this.getClass().getSimpleName(), "delegate", "NSpec.name", getNSpec().getName(), "of_", of_); //Thread.currentThread().getName());
 foam.dao.DAO delegate = getInnerDAO() == null ?
-  new foam.dao.MDAO(getOf()):
-   getInnerDAO();
+  new foam.dao.MDAO(getOf()) :
+  getInnerDAO();
 
 if ( delegate instanceof foam.dao.MDAO ) {
   setMdao((foam.dao.MDAO)delegate);
