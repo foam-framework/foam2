@@ -9,6 +9,7 @@ package foam.nanos.ruler;
 import foam.core.*;
 import foam.dao.DAO;
 import foam.nanos.logger.Logger;
+import foam.nanos.pm.PM;
 import foam.nanos.pool.FixedThreadPool;
 
 import java.lang.Exception;
@@ -56,7 +57,12 @@ public class RuleEngine extends ContextAwareSupport {
     ContextualizingAgency agency = new ContextualizingAgency(compoundAgency, x_, systemX_);
     for (Rule rule : rules) {
       if ( stops_.get() ) break;
+      PM pm = new PM();
+      pm.setClassType(RulerDAO.getOwnClassInfo());
+      pm.setName(rule.getName());
+      pm.init_();
       applyRule(rule, obj, oldObj, agency);
+      pm.log(x_);
       agency.submit(x_, x -> saveHistory(rule, obj));
     }
     compoundAgency.execute(x_);
