@@ -25,13 +25,13 @@ public class RuleEngine extends ContextAwareSupport {
   private Map<Long, Object> results_ = new HashMap<>();
   private Map<Long, RuleHistory> savedRuleHistory_ = new HashMap<>();
   private Rule currentRule_ = null;
-  private X systemX_;
+  private X userX_;
 
   public RuleEngine(X x, X systemX, DAO delegate) {
-    setX(x);
+    setX(systemX);
     setDelegate(delegate);
     ruleHistoryDAO_ = (DAO) x.get("ruleHistoryDAO");
-    systemX_ = systemX;
+    userX_ = x;
   }
 
   public DAO getDelegate() {
@@ -54,7 +54,7 @@ public class RuleEngine extends ContextAwareSupport {
    */
   public void execute(List<Rule> rules, FObject obj, FObject oldObj) {
     CompoundContextAgency compoundAgency = new CompoundContextAgency();
-    ContextualizingAgency agency = new ContextualizingAgency(compoundAgency, x_, systemX_);
+    ContextualizingAgency agency = new ContextualizingAgency(compoundAgency, userX_, getX());
     for (Rule rule : rules) {
       if ( stops_.get() ) break;
       if ( ! isRuleApplicable(rule, obj, oldObj)) continue;
@@ -146,7 +146,7 @@ public class RuleEngine extends ContextAwareSupport {
   }
 
   private void applyRule(Rule rule, FObject obj, FObject oldObj, Agency agency) {
-    ProxyX readOnlyX = new ReadOnlyDAOContext(getX());
+    ProxyX readOnlyX = new ReadOnlyDAOContext(userX_);
     rule.apply(readOnlyX, obj, oldObj, this, agency);
   }
 

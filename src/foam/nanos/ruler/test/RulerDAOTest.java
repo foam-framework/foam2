@@ -216,7 +216,7 @@ public class RulerDAOTest extends Test {
         public void execute(X x) {
           ruleDAO.put(executeRule);
         }
-      }, "RulerDAOTest add account");
+      }, "RulerDAOTest add fake rule");
 
     };
     rule5.setAction(action5);
