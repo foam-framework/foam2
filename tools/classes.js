@@ -12,6 +12,7 @@ var classes = [
   'foam.core.Exception',
   'foam.core.Freezable',
   'foam.core.ContextAgent',
+  'foam.core.CompoundContextAgency',
   'foam.core.Identifiable',
   'foam.core.AbstractFObject',
   'foam.core.Validatable',
