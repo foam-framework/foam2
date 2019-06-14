@@ -7,6 +7,8 @@
 foam.LIB({
   name: 'foam.web.KeyboardUtil',
 
+  documentation: 'A utility library to make it easier to work with keyboard events.',
+
   constants: {
     CONVERSION_TABLE: {
       8: 'Backspace',
@@ -152,8 +154,20 @@ foam.LIB({
   methods: [
     function getKey(keyboardEvent) {
       /**
-       * This method returns a string that represents the key pressed. Only
-       * works for `keydown` events, not `keypress`.
+       * Returns a string that represents the key pressed.
+       *
+       * WARNING: Only works for `keydown` or `keyup` events if the browser does
+       * not support `KeyboardEvent.key`. All major browsers at the time of
+       * writing do support that property. For the older browsers that don't,
+       * we fall back to `KeyboardEvent.which` and `KeyboardEvent.keyCode`. In
+       * those cases we use a lookup table to return what `KeyboardEvent.key`
+       * would have returned. We also handle a few browser quirks where browsers
+       * do support `KeyboardEvent.key` but return a non-standard value. The
+       * reason we don't support `keypress` though is because that event sets
+       * different values for `KeyboardEvent.which` and `KeyboardEvent.keyCode`
+       * than `keydown` and `keyup` do. So in it's current state, this method
+       * doesn't support `keypress` events on browsers that don't support
+       * `KeyboardEvent.key`.
        */
 
       var key = keyboardEvent.key;
