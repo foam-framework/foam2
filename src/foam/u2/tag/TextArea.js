@@ -20,6 +20,19 @@ foam.CLASS({
   name: 'TextArea',
   extends: 'foam.u2.View',
 
+  css: `
+    /* Override a few of the styles in foam.u2.TextInputCSS */
+    ^ {
+      height: auto;
+      padding-top: %INPUTVERTICALPADDING%;
+      padding-bottom: %INPUTVERTICALPADDING%;
+    }
+  `,
+
+  axioms: [
+    { class: 'foam.u2.TextInputCSS' }
+  ],
+
   properties: [
     [ 'nodeName', 'textarea' ],
     {
