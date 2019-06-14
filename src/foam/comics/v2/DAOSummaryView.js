@@ -6,17 +6,16 @@
 
 foam.CLASS({
   package: 'foam.comics.v2',
-  name: 'DAOUpdateView',
+  name: 'DAOSummaryView',
   extends: 'foam.u2.View',
-
-  topics: [
-    'finished',
-    'throwError'
-  ],
 
   documentation: `
     A configurable summary view for a specific instance
   `,
+
+  axioms: [
+    foam.pattern.Faceted.create()
+  ],
 
   css:`
     ^ {
@@ -67,42 +66,45 @@ foam.CLASS({
     {
       name: 'controllerMode',
       factory: function() {
-        return this.ControllerMode.EDIT;
+        return this.ControllerMode.VIEW;
       }
     },
     {
-      class: 'foam.u2.ViewSpecWithJava',
-      name: 'viewView',
-      expression: function() {
-        return foam.u2.detail.SectionedDetailView;
+      name: 'primary',
+      expression: function(config$of){
+        var allActions = config$of.getAxiomsByClass(foam.core.Action)
+        var defaultAction = allActions.filter(a => a.isDefault);
+        return defaultAction.length >= 1 ? defaultAction[0] : allActions[0];
       }
     }
   ],
   actions: [
     {
-      name: 'save',
+      name: 'edit',
       code: function() {
-        var self = this;
-        this.config.dao.put(this.data.clone()).then(function() {
-          self.finished.pub();
-          self.stack.back();
-        }, function() {
-
-          self.throwError.pub();
+        if ( ! this.stack ) return;
+        this.stack.push({
+          class: 'foam.comics.v2.DAOUpdateView',
+          data: this.data,
+          config: this.config,
+          of: this.config.of
         });
       }
     },
+    {
+      name: 'delete',
+      code: function() {
+        alert('TODO');
+      }
+    }
   ],
   methods: [
     function initE() {
       var self = this;
       this.SUPER();
-      
-      const originalName = this.data.name
-
       this
         .addClass(this.myClass())
-        .add(self.slot(function(data, config$viewBorder) {
+        .add(self.slot(function(data, config, config$viewBorder) {
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -111,7 +113,7 @@ foam.CLASS({
                     .tag(self.stack.BACK, {
                       buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                       icon: 'images/back-icon.svg',
-                      label: originalName
+                      label: `All ${config.of.name}s`
                     })
                 .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })
@@ -119,17 +121,26 @@ foam.CLASS({
                     .add(data.toSummary())
                       .addClass(this.myClass('account-name'))
                   .end()
-                  .startContext({data: self}).add(self.SAVE).endContext()
+                  .startContext({data: data}).add(self.primary).endContext()
+                .end()
+              .end()
+
+              .start(self.Cols)
+                .start(self.Cols).addClass(this.myClass('actions-header'))
+                  .startContext({data: self}).tag(self.EDIT, {
+                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                    icon: 'images/edit-icon.svg'
+                  }).endContext()
+                  .startContext({data: self}).tag(self.DELETE, {
+                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                    icon: 'images/delete-icon.svg'
+                  }).endContext()
                 .end()
               .end()
 
               .start(config$viewBorder)
-                .start().addClass(this.myClass('view-container'))
-                  .add(self.slot(function(viewView) {
-                    return self.E().tag(viewView, {
-                      data: data
-                    });
-                  }))
+                .start(foam.u2.detail.SectionedDetailView, { data: data })
+                  .addClass(this.myClass('view-container'))
                 .end()
               .end()
             .end();

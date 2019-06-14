@@ -626,6 +626,7 @@ FOAM_FILES([
   { name: "foam/comics/v2/DAOBrowserView" },
   { name: "foam/comics/v2/DAOControllerConfig" },
   { name: "foam/comics/v2/DAOCreateView" },
+  { name: "foam/comics/v2/DAOSummaryView" },
   { name: "foam/comics/v2/DAOUpdateView" },
   { name: "foam/comics/v2/NamedViews" },
   { name: "foam/comics/v2/ViewSpecWithJava" },
