@@ -87,6 +87,10 @@ public class RuleEngine extends ContextAwareSupport {
    * @param oldObj - Old FObject supplied to rules for execution
    */
   public void probe(List<Rule> rules, RulerProbe rulerProbe, FObject obj, FObject oldObj) {
+    PM pm = new PM();
+      pm.setClassType(RulerProbe.getOwnClassInfo());
+      pm.setName("Ruler Probe on " + obj.getClassInfo() + ". id: " + obj.getProperty("id"));
+      pm.init_();
     for (Rule rule : rules) {
       if ( ! isRuleApplicable(rule, obj, oldObj) ) {
         continue;
@@ -119,6 +123,7 @@ public class RuleEngine extends ContextAwareSupport {
         rulerProbe.appliedRules_.add(asyncAgent);
       }
     }
+    pm.log(x_);
   }
 
   /**
