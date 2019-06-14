@@ -31,17 +31,17 @@ foam.CLASS({
       cursor: pointer;
       background: white;
       color: black;
-      border-left: solid 1px %BACKGROUNDCOLOR%;
-      border-right: solid 1px %BACKGROUNDCOLOR%;
+      border-left: solid 1px %GREY5%;
+      border-right: solid 1px %GREY5%;
     }
     ^inner div:last-child {
       border-bottom-left-radius: 5px;
       border-bottom-right-radius: 5px;
     }
     ^inner div:hover {
-      background: %ACCENTCOLOR% !important;
-      border-left: solid 1px %ACCENTCOLOR%;
-      border-right: solid 1px %ACCENTCOLOR%;
+      background: %PRIMARY5% !important;
+      border-left: solid 1px %PRIMARY5%;
+      border-right: solid 1px %PRIMARY5%;
     }
   `,
 

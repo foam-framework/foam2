@@ -50,7 +50,7 @@ foam.CLASS({
       line-height: 1.33;
       letter-spacing: 0.2px;
       text-align: left;
-      color: #093649;
+      color: %BLACK%;
       margin-top:20px;
       margin-left:20px;
       margin-bottom: 79px;
@@ -64,7 +64,7 @@ foam.CLASS({
     ^ .Rectangle-13 {
       width: 448px;
       height: 40px;
-      background-color: #093649;
+      background-color: %BLACK%;
     }
     ^ .input {
       margin-top: 15px;

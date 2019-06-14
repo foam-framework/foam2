@@ -22,37 +22,36 @@ foam.CLASS({
           padding-right: %INPUTHORIZONTALPADDING%;
           border: 1px solid;
           border-radius: 3px;
-          color: %INPUTTEXTCOLOR%;
-          background-color: %INPUTBACKGROUNDCOLOR%;
-          border-color: %INPUTBORDERCOLOR%;
+          color: %BLACK%;
+          background-color: white;
+          border-color: %GREY3%;
         }
 
         ^:hover {
-          background-color: %INPUTHOVERBACKGROUNDCOLOR%;
-          border-color: %INPUTHOVERBORDERCOLOR%;
+          border-color: %GREY2%;
         }
 
         ^:hover::placeholder,
         ^:hover:-ms-input-placeholder,
         ^:hover::-ms-input-placeholder {
-          color: %INPUTHOVERTEXTCOLOR%;
+          color: %GREY2%;
         }
 
         ^:focus {
           outline: none;
-          border-color: %SECONDARYCOLOR%;
+          border-color: %PRIMARY3%;
         }
 
         ^:disabled {
-          color: %INPUTDISABLEDTEXTCOLOR%;
-          background-color: %INPUTDISABLEDBACKGROUNDCOLOR%;
-          border-color: %INPUTDISABLEDBORDERCOLOR%;
+          color: %GREY2%;
+          background-color: %GREY5%;
+          border-color: %GREY3%;
         }
 
         ^.error {
-          color: %INPUTERRORTEXTCOLOR%;
-          background-color: %INPUTERRORBACKGROUNDCOLOR%;
-          border-color: %INPUTERRORBORDERCOLOR%;
+          color: %DESTRUCTIVE3%;
+          background-color: %DESTRUCTIVE5%;
+          border-color: %DESTRUCTIVE3%;
         }
       `,
     },

@@ -32,7 +32,7 @@ foam.CLASS({
 
   css: `
     ^ {
-      background: %HEADERCOLOR%;
+      background: %PRIMARY1%;
       width: 100%;
       min-width: 992px;
       height: 60px;
@@ -75,7 +75,7 @@ foam.CLASS({
       border-bottom: 1px solid white;
     }
     ^ .selected {
-      border-bottom: 4px solid %ACCENTCOLOR% !important;
+      border-bottom: 4px solid %PRIMARY5% !important;
       padding-bottom: 5px;
       text-shadow: 0 0 0px white, 0 0 0px white;
     }

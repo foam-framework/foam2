@@ -30,7 +30,7 @@
        display: inline-grid;
      }
      ^header {
-       background: %PRIMARYCOLOR%;
+       background: %BLACK%;
        color: white;
        font-weight: 800;
      }

@@ -52,7 +52,7 @@ foam.CLASS({
       line-height: 1;
       letter-spacing: 0.3px;
       text-align: left;
-      color: #093649;
+      color: %BLACK%;
       display: inline-block;
     }
     ^ h2{
@@ -62,7 +62,7 @@ foam.CLASS({
       font-weight: 300;
       letter-spacing: 0.2px;
       text-align: left;
-      color: #093649;
+      color: %BLACK%;
       display: inline-block;
     }
     ^ .update-BTN{
@@ -76,14 +76,14 @@ foam.CLASS({
       text-align: center;
       color: #ffffff;
       cursor: pointer;
-      border: 1px solid %SECONDARYCOLOR%;
-      background-color: %SECONDARYCOLOR%;
+      border: 1px solid %PRIMARY3%;
+      background-color: %PRIMARY3%;
       margin-left: 20px;
       margin-top: 19px;
     }
     ^ .update-BTN:hover {
       opacity: 0.9;
-      border: 1px solid %SECONDARYCOLOR%;
+      border: 1px solid %PRIMARY3%;
     }
     ^ .check-Box{
       border: solid 1px rgba(164, 179, 184, 0.5);
@@ -130,7 +130,7 @@ foam.CLASS({
       display: inline-block;
       letter-spacing: 0.2px;
       margin-left: 20px;
-      color: #093649;
+      color: %BLACK%;
       padding-bottom: 10px;
     }
   `,

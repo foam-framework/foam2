@@ -22,8 +22,8 @@ foam.CLASS({
       font-size: 14px;
       line-height: 1;
       letter-spacing: 0.4px;
-      color: #2b2b2b;
-      background: %BACKGROUNDCOLOR%;
+      color: %BLACK%;
+      background: %GREY5%;
       box-sizing: border-box;
     }
 
@@ -38,7 +38,7 @@ foam.CLASS({
       letter-spacing: 0.2px;
       padding-left: 15px;
       font-size: 14px;
-      color: #2b2b2b;
+      color: %BLACK%;
     }
 
     ^row:hover {

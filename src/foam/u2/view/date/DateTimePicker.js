@@ -62,7 +62,7 @@ foam.CLASS({
     ^ .year {
       border-radius: 5px 5px 0px 0px;
       background-color: #406dea;
-      background-color: %SECONDARYCOLOR%;
+      background-color: %PRIMARY3%;
       color: #ffffff;
       display: inline-block;
       align-items: center;

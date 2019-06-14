@@ -97,7 +97,7 @@ foam.CLASS({
 
     ^action:hover:not([disabled]) {
       cursor: pointer;
-      background-color: %ACCENTCOLOR%;
+      background-color: %PRIMARY5%;
     }
 
     ^icon {
