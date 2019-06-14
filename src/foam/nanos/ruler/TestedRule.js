@@ -7,12 +7,15 @@
 foam.CLASS({
   package: 'foam.nanos.ruler',
   name: 'TestedRule',
+  extends: 'foam.core.CompoundContextAgency',
   documentation: `The model is for reporting purposes when probing rules.
   rulerProbe = dao.cmd(RulerProbe) object will be returned with list of TestedRules
   where each describes whether the rule was applied and summary of the rule's activities.`,
 
   javaImports: [
-    'foam.nanos.ruler.Rule'
+    'foam.nanos.ruler.Rule',
+    'java.util.ArrayList',
+    'foam.core.X'
   ],
 
   properties: [
@@ -33,7 +36,14 @@ foam.CLASS({
   ],
   methods: [
     {
-      name: 'describe',
+      name: 'execute',
+      args: [
+        { name: 'x', type: 'X' }
+      ],
+      javaCode: `// the agent is not to be executed.`
+    },
+    {
+      name: 'describeRule',
       args: [
         {
           name: 'x',

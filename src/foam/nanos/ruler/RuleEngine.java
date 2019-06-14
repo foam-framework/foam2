@@ -57,6 +57,7 @@ public class RuleEngine extends ContextAwareSupport {
     ContextualizingAgency agency = new ContextualizingAgency(compoundAgency, x_, systemX_);
     for (Rule rule : rules) {
       if ( stops_.get() ) break;
+      if ( ! isRuleApplicable(rule, obj, oldObj)) continue;
       PM pm = new PM();
       pm.setClassType(RulerDAO.getOwnClassInfo());
       pm.setName(rule.getName());
@@ -86,22 +87,36 @@ public class RuleEngine extends ContextAwareSupport {
    * @param oldObj - Old FObject supplied to rules for execution
    */
   public void probe(List<Rule> rules, RulerProbe rulerProbe, FObject obj, FObject oldObj) {
-    CompoundContextAgency agent = new CompoundContextAgency();
     for (Rule rule : rules) {
+      if ( ! isRuleApplicable(rule, obj, oldObj) ) {
+        continue;
+      }
+      TestedRule agent = new TestedRule();
+      agent.setRule(rule.getId());
       if ( stops_.get() ) {
-        rulerProbe.addTestedRule(rule.getId(), "SyncAction: Not executed because was overridden and forced to stop.", false);
+        agent.setMessage("SyncAction: Not executed because was overridden and forced to stop.");
+        agent.setPassed(false);
+        rulerProbe.appliedRules_.add(agent);
         continue;
       }
       try {
         applyRule(rule, obj, oldObj, agent);
-        rulerProbe.addTestedRule(rule.getId(), "SyncAction: Successfully applied", true);
+        agent.setPassed(true);
+        agent.setMessage("SyncAction: Successfully applied");
+        rulerProbe.appliedRules_.add(agent);
       } catch (Exception e ) {
-        rulerProbe.addTestedRule(rule.getId(), "SyncAction: " + e.getMessage(), false);
+        agent.setPassed(false);
+        agent.setMessage("SyncAction: " + e.getMessage());
       }
+      rulerProbe.appliedRules_.add(agent);
     }
     for (Rule rule : rules) {
       if ( rule.getAsyncAction() != null && rule.f(x_, obj, oldObj) ) {
-        rulerProbe.addTestedRule(rule.getId(), "AsyncAction.", true);
+        TestedRule asyncAgent = new TestedRule();
+        asyncAgent.setRule(rule.getId());
+        asyncAgent.setMessage("AsyncAction.");
+        asyncAgent.setPassed(true);
+        rulerProbe.appliedRules_.add(asyncAgent);
       }
     }
   }
@@ -127,12 +142,13 @@ public class RuleEngine extends ContextAwareSupport {
 
   private void applyRule(Rule rule, FObject obj, FObject oldObj, Agency agency) {
     ProxyX readOnlyX = new ReadOnlyDAOContext(getX());
-      currentRule_ = rule;
-      if ( rule.getAction() != null
-        && rule.f(readOnlyX, obj, oldObj)
-      ) {
-        rule.apply(readOnlyX, obj, oldObj, this, agency);
-      }
+    rule.apply(readOnlyX, obj, oldObj, this, agency);
+  }
+
+  private boolean isRuleApplicable(Rule rule, FObject obj, FObject oldObj) {
+    currentRule_ = rule;
+    return rule.getAction() != null
+      && rule.f(x_, obj, oldObj);
   }
 
   private void asyncApplyRules(List<Rule> rules, FObject obj, FObject oldObj) {

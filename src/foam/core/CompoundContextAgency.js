@@ -32,7 +32,7 @@ foam.CLASS({
         { name: 'x', type: 'X' }
       ],
       javaCode: `CompoundException e = new CompoundException();
-for ( Runnable agent : agents_ ) {
+for ( Runnable agent : getAgents() ) {
   try {
     agent.run();
   } catch (Throwable t) {
@@ -76,7 +76,7 @@ for ( Runnable agent : agents_ ) {
 return sb.toString();`
     },
     {
-      name: 'describe',
+      name: 'describeAgents',
       type: 'String[]',
       javaCode: `String[] desc = new String[agents_.size()];
 for ( int i = 0 ; i < agents_.size() ; i++ ) {

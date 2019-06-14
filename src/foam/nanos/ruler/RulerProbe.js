@@ -35,14 +35,14 @@ foam.CLASS({
   ],
 
   methods: [
-    {
-      name: 'addTestedRule',
-      args: [
-        { name: 'id', type: 'Long' },
-        { name: 'message', type: 'String' },
-        { name: 'applied', type: 'Boolean' }
-       ],
-      javaCode: `getAppliedRules().add(new TestedRule(id, message, applied));`
-    }
+    // {
+    //   name: 'addTestedRule',
+    //   args: [
+    //     { name: 'id', type: 'Long' },
+    //     { name: 'message', type: 'String' },
+    //     { name: 'applied', type: 'Boolean' }
+    //    ],
+    //   javaCode: `getAppliedRules().add(new TestedRule(id, message, applied));`
+    // }
   ]
 });
