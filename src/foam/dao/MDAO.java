@@ -141,6 +141,7 @@ public class MDAO
   }
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+    Logger logger = (Logger) x.get("logger");
     SelectPlan plan;
     Predicate  simplePredicate = null;
 
@@ -166,10 +167,11 @@ public class MDAO
     }
 
     if ( state != null && predicate != null && plan.cost() > 1000 && plan.cost() >= index_.size(state) ) {
-      Logger logger = (Logger) x.get("logger");
-      if ( ! predicate.equals(simplePredicate) ) logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
-      if ( ! unindexed_.contains(simplePredicate.toString())) {
-        unindexed_.add(simplePredicate.toString());
+      if ( ! unindexed_.contains(getOf().getId())) {
+        if ( ! predicate.equals(simplePredicate) ) {
+          logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
+        }
+        unindexed_.add(getOf().getId());
         logger.warning("Unindexed search on MDAO", getOf().getId(), simplePredicate.toString());
       }
     }
