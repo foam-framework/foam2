@@ -111,10 +111,67 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.lib.csv',
+  name: 'FObjectArrayFromCSV',
+  refines: 'foam.core.FObjectArray',
+  properties: [
+    {
+      class: 'Function',
+      name: 'fromCSVLabelMapping',
+      value: function(map, prop) {
+        map[prop.name] = {
+          set: function(o, value) {
+            o[prop.name] = foam.json.parseString(value);
+          }
+        };
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.lib.csv',
+  name: 'ArrayFromCSV',
+  refines: 'foam.core.Array',
+  properties: [
+    {
+      class: 'Function',
+      name: 'fromCSVLabelMapping',
+      value: function(map, prop) {
+        map[prop.name] = {
+          set: function(o, value) {
+            o[prop.name] = foam.json.parseString(value);
+          }
+        };
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.lib.csv',
+  name: 'StringArrayFromCSV',
+  refines: 'foam.core.StringArray',
+  properties: [
+    {
+      class: 'Function',
+      name: 'fromCSVLabelMapping',
+      value: function(map, prop) {
+        map[prop.name] = {
+          set: function(o, value) {
+            o[prop.name] = foam.json.parseString(value);
+          }
+        };
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.lib.csv',
   name: 'UploadDemo',
   requires: [
+    'foam.dao.CSVSink',
     'foam.dao.DAOSink',
-    'foam.dao.ArraySink',
     'foam.dao.EasyDAO',
     'foam.lib.csv.CSVParser2'
   ],
@@ -133,8 +190,8 @@ foam.CLASS({
       name: 'csv',
       view: { class: 'foam.u2.tag.TextArea' },
       value: `
-id,legalName,email,phone.number,address.city,address.postalCode
-1,Mike C,mike@c.com,416-123-1234,sauga,l4w2l2
+id,legalName,email,phone.number,address.city,address.postalCode,lastLogin,birthday,passwordLastModified,passwordExpiry,created,lastModified
+1,Mike C,mike@c.com,416-123-1234,sauga,l4w2l2,0,1,2,3,4,5
       `
     },
     {
@@ -150,15 +207,19 @@ id,legalName,email,phone.number,address.city,address.postalCode
     },
     {
       class: 'String',
-      name: 'json',
-      view: { class: 'foam.u2.tag.TextArea', rows: 50 }
+      name: 'csvOut',
+      view: {
+        class: 'foam.u2.HTMLView',
+        nodeName: 'pre'
+      },
+      visibiliy: 'RO'
     }
   ],
   actions: [
     {
       name: 'parse',
       code: function() {
-        var a = this.ArraySink.create();
+        var a = this.CSVSink.create();
         var sinks = [
           a,
           this.DAOSink.create({ dao: this.dao })
@@ -169,7 +230,17 @@ id,legalName,email,phone.number,address.city,address.postalCode
           }
         };
         this.CSVParser2.create().fromCSV(this.dao.of, this.csv.trim(), sink);
-        this.json = foam.json.Pretty.stringify(a.array);
+        this.csvOut = a.csv;
+      }
+    },
+    {
+      name: 'useOutputAsInput',
+      isEnabled: function(csvOut) {
+        return !! csvOut;
+      },
+      code: function() {
+        this.csv = this.csvOut;
+        this.csvOut = undefined;
       }
     }
   ]
