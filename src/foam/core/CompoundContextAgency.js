@@ -65,7 +65,7 @@ if ( e.exceptions.size() != 0 ) {
       type: 'String',
       javaCode: `StringBuilder sb = new StringBuilder();
 boolean first = true;
-for ( Runnable agent : agents_ ) {
+for ( Runnable agent : getAgents() ) {
   if ( first ) {
     first = false;
   } else {
@@ -78,9 +78,9 @@ return sb.toString();`
     {
       name: 'describeAgents',
       type: 'String[]',
-      javaCode: `String[] desc = new String[agents_.size()];
-for ( int i = 0 ; i < agents_.size() ; i++ ) {
-  desc[i] = agents_.get(i).toString();
+      javaCode: `String[] desc = new String[getAgents().size()];
+for ( int i = 0 ; i < getAgents().size() ; i++ ) {
+  desc[i] = getAgents().get(i).toString();
 }
 return desc;`
     }

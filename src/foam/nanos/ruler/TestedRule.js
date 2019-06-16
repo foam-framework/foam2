@@ -43,18 +43,11 @@ foam.CLASS({
       javaCode: `// the agent is not to be executed.`
     },
     {
-      name: 'describeRule',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
+      name: 'toString',
       type: 'String',
-      javaCode: `Rule rule = findRule(x);
-  StringBuilder sb = new StringBuilder();
-  return sb.append("Rule ").append(rule.getId()).append(". Description: ").append(rule.getDocumentation()).
-  append( "{ ").append(super.toString()).append("}").toString();`
+      javaCode: `StringBuilder sb = new StringBuilder();
+      return sb.append("Rule id: ").append(getRule()).append(". Passed: ").append(getPassed()).
+      append( ". Message: ").append(getMessage()).toString();`
     }
   ]
 });
