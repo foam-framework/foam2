@@ -6,10 +6,17 @@
 
 foam.CLASS({
   package: 'foam.glang',
-  name: 'EndOfDay',
+  name: 'StartOfTimeSpan',
+  extends: 'foam.mlang.AbstractExpr',
+  implements: [ 'foam.core.Serializable' ],
   properties: [
     {
+      class: 'foam.mlang.ExprProperty',
       name: 'delegate'
+    },
+    {
+      class: 'Long',
+      name: 'timeSpanMs'
     }
   ],
   methods: [
@@ -17,10 +24,58 @@ foam.CLASS({
       name: 'f',
       code: function(obj) {
         var ts = new Date(this.delegate.f(obj));
-        ts.setHours(23, 59, 59);
-        ts.setMilliseconds(999);
-        return ts;
-      }
+        var ms = this.timeSpanMs;
+        return new Date((ts.getTime() / ms) * ms);
+      },
+      javaCode: `
+        java.util.Date ts = (java.util.Date) getDelegate().f(obj);
+        long ms = getTimeSpanMs();
+        return new java.util.Date((ts.getTime() / ms) * ms);
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'EndOfTimeSpan',
+  extends: 'foam.mlang.AbstractExpr',
+  implements: [ 'foam.core.Serializable' ],
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'delegate'
+    },
+    {
+      class: 'Long',
+      name: 'timeSpanMs'
+    }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        var ms = this.timeSpanMs;
+        return new Date(Math.floor(ts.getTime() / ms) * ms + ms - 1);
+      },
+      javaCode: `
+        java.util.Date ts = (java.util.Date) getDelegate().f(obj);
+        long ms = getTimeSpanMs();
+        return new java.util.Date((ts.getTime() / ms) * ms + ms - 1);
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'EndOfDay',
+  extends: 'foam.glang.EndOfTimeSpan',
+  properties: [
+    {
+      name: 'timeSpanMs',
+      value: 24 * 60 * 60 * 1000
     }
   ]
 });
