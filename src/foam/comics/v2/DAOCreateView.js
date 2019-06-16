@@ -68,6 +68,21 @@ foam.CLASS({
       }
     }
   ],
+  actions: [
+    {
+      name: 'save',
+      code: function() {
+        var self = this;
+        this.config.dao.put(this.data.clone()).then(function() {
+          self.finished.pub();
+          self.stack.back();
+        }, function() {
+
+          self.throwError.pub();
+        });
+      }
+    },
+  ],
   methods: [
     function initE() {
       var self = this;
@@ -90,6 +105,7 @@ foam.CLASS({
                     .add(`Create your ${config$browseTitle}`)
                       .addClass(this.myClass('account-name'))
                   .end()
+                  .startContext({data: self}).add(self.SAVE).endContext()
                 .end()
               .end()
               .start(config$viewBorder)
