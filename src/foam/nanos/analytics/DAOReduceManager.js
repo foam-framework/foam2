@@ -48,6 +48,7 @@ setCloseTimeExpr(new foam.glang.EndOfTimeSpan.Builder(getX())
   methods: [
     {
       name: 'doReduce',
+      synchronized: true,
       javaCode: `
 foam.core.X x = getX();
 
