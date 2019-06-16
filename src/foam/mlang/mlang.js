@@ -3445,6 +3445,22 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.mlang',
+  name: 'IdentityExpr',
+  extends: 'foam.mlang.AbstractExpr',
+  axioms: [
+    { class: 'foam.pattern.Singleton' }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(o) { return o; },
+      javaCode: 'return obj;'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang',
   name: 'IsValid',
   extends: 'foam.mlang.AbstractExpr',
   properties: [
