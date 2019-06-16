@@ -22,6 +22,18 @@ foam.CLASS({
 
   documentation: 'A Null pattern (do-nothing) DAO implementation.',
 
+  properties: [
+    {
+      name: 'of',
+      factory: function() {
+        return this.cls_;
+      },
+//  ??     swiftExpressionArgs: ['of'],
+//  ??    swiftExpression: 'return of as! ClassInfo',
+      javaFactory: `return getClassInfo();`,
+    }
+  ],
+
   methods: [
     {
       name: 'put_',
