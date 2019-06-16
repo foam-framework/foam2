@@ -20,7 +20,26 @@ foam.CLASS({
     },
     {
       class: 'Long',
-      name: 'periodLengthMs'
+      name: 'periodLengthMs',
+      documentation: 'Convenience property for setting openTimeExpr and closeTimeExpr',
+      javaSetter: `
+setOpenTimeExpr(new foam.glang.StartOfTimeSpan.Builder(getX())
+  .setDelegate(new foam.mlang.IdentityExpr.Builder(getX()).build())
+  .setTimeSpanMs(val)
+  .build());
+setCloseTimeExpr(new foam.glang.EndOfTimeSpan.Builder(getX())
+  .setDelegate(new foam.mlang.IdentityExpr.Builder(getX()).build())
+  .setTimeSpanMs(val)
+  .build());
+      `
+    },
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'openTimeExpr'
+    },
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'closeTimeExpr'
     }
   ],
   methods: [
@@ -31,23 +50,16 @@ foam.CLASS({
       javaCode: `
 foam.core.X x = getX();
 
-long periodMs = getPeriodLengthMs();
-java.util.Date closeTime = new java.util.Date();
-closeTime.setTime((time.getTime() / periodMs) * periodMs + periodMs);
-
 foam.nanos.analytics.CandlestickId id = new foam.nanos.analytics.CandlestickId.Builder(x)
-  .setCloseTime(closeTime)
+  .setCloseTime((java.util.Date) getCloseTimeExpr().f(time))
   .setKey(key)
   .build();
 
 foam.nanos.analytics.Candlestick c = (foam.nanos.analytics.Candlestick) getDao().find(id);
 if ( c == null ) {
-  java.util.Date openTime = new java.util.Date();
-  openTime.setTime(closeTime.getTime() - getPeriodLengthMs());
-
   c = new foam.nanos.analytics.Candlestick.Builder(x)
-    .setCloseTime(closeTime)
-    .setOpenTime(openTime)
+    .setCloseTime(id.getCloseTime())
+    .setOpenTime((java.util.Date) getOpenTimeExpr().f(time))
     .setKey(key)
     .build();
 }
