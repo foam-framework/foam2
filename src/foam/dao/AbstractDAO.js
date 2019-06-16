@@ -526,7 +526,7 @@ return this.find_(this.getX(), id);
       },
       javaCode: `
 // TODO
-return null;
+return obj;
       `,
     },
 
