@@ -16,10 +16,11 @@ foam.CLASS({
   `,
 
   javaImports: [
-    'foam.dao.AbstractSink',
     'foam.core.Detachable',
     'foam.core.FObject',
+    'foam.core.ReadOnlyDAOContext',
     'foam.core.X',
+    'foam.dao.AbstractSink',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.mlang.order.Desc',
@@ -187,14 +188,13 @@ ruleDAO.listen(
 ruleDAO = ruleDAO.where(
   EQ(Rule.ENABLED, true)
 ).orderBy(new Desc(Rule.PRIORITY));
-ruleDAO.select(new AbstractSink() {
-  @Override
-    public void put(Object obj, Detachable sub) {
-      Rule rule = (Rule) obj;
-      rule.setX(getX());
-    }
-
-});
+ruleDAO.select(new AbstractSink(new ReadOnlyDAOContext(getX())) {
+      @Override
+      public void put(Object obj, Detachable sub) {
+        Rule rule = (Rule) obj;
+        rule.setX(getX());
+      }
+    });
 addRuleList(ruleDAO, getCreateBefore());
 addRuleList(ruleDAO, getUpdateBefore());
 addRuleList(ruleDAO, getRemoveBefore());
@@ -256,10 +256,10 @@ for ( Object key : groups.getGroupKeys() ) {
         }
       ],
       javaCode: `getRulesList().put(
-  predicate,
-  dao.where(predicate)
-    .select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()))
-);`
+     predicate,
+     dao.where(predicate)
+       .select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()))
+   );`
     }
   ],
 
@@ -273,7 +273,8 @@ for ( Object key : groups.getGroupKeys() ) {
       setDelegate(delegate);
       setDaoKey(serviceName);
       updateRules(x);
-    }`
+    }
+      `
          );
       }
     }
