@@ -424,6 +424,7 @@ FOAM_FILES([
   { name: "foam/u2/view/RadioView", flags: ['web'] },
   { name: "foam/u2/view/TextField", flags: ['web'] },
   { name: "foam/u2/view/TreeView", flags: ['web'] },
+  { name: "foam/u2/view/FileUploadTextField", flags: ['web'] },
   { name: "foam/u2/view/AltView", flags: ['web'] },
   { name: "foam/u2/view/SimpleAltView", flags: ['web'] },
   { name: "foam/u2/view/DualView", flags: ['web'] },
