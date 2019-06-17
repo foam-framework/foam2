@@ -522,11 +522,11 @@ return this.find_(this.getX(), id);
           this.on.reset.pub();
           return true;
         }
-        return obj;
+        return undefined;
       },
       javaCode: `
 // TODO
-return obj;
+return null;
       `,
     },
 
