@@ -14,6 +14,8 @@ import foam.mlang.sink.GroupBy;
 import foam.nanos.logger.Logger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  The MDAO class for an ordering, fast lookup, single value,
@@ -44,22 +46,29 @@ public class MDAO
   protected AltIndex index_;
   protected Object   state_ = null;
   protected Object   writeLock_ = new Object();
+  protected Set      unindexed_ = new HashSet();
 
   public MDAO(ClassInfo of) {
     setOf(of);
     index_ = new AltIndex(new TreeIndex((PropertyInfo) this.of_.getAxiomByName("id")));
   }
 
-  public void addUniqueIndex(PropertyInfo prop) {
-    index_.addIndex(new TreeIndex(prop, new TreeIndex((PropertyInfo) this.of_.getAxiomByName("id"))));
-  }
-
   public void addIndex(Index index) {
     index_.addIndex(index);
   }
 
+  /** Add an Index which is for a unique value. **/
+  public void addUniqueIndex(PropertyInfo... props) {
+    Index i = ValueIndex.instance();
+    for ( PropertyInfo prop : props ) i = new TreeIndex(prop, i);
+  }
+
+  /** Add an Index which is for a non-unique value. The 'id' property is
+   * appended to property list to make it unique.
+   **/
   public void addIndex(PropertyInfo... props) {
-    for ( PropertyInfo prop : props ) addUniqueIndex(prop);
+    Index i = new TreeIndex((PropertyInfo) this.of_.getAxiomByName("id"));
+    for ( PropertyInfo prop : props ) i = new TreeIndex(prop, i);
   }
 
   synchronized Object getState() {
@@ -132,6 +141,7 @@ public class MDAO
   }
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+    Logger logger = (Logger) x.get("logger");
     SelectPlan plan;
     Predicate  simplePredicate = null;
 
@@ -157,9 +167,13 @@ public class MDAO
     }
 
     if ( state != null && predicate != null && plan.cost() > 1000 && plan.cost() >= index_.size(state) ) {
-      Logger logger = (Logger) x.get("logger");
-      if ( ! predicate.equals(simplePredicate) ) logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
-      logger.warning("Unindexed search on MDAO", simplePredicate.toString());
+      if ( ! unindexed_.contains(getOf().getId())) {
+        if ( ! predicate.equals(simplePredicate) ) {
+          logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
+        }
+        unindexed_.add(getOf().getId());
+        logger.warning("Unindexed search on MDAO", getOf().getId(), simplePredicate.toString());
+      }
     }
 
     plan.select(state, sink, skip, limit, order, simplePredicate);

@@ -82,6 +82,7 @@
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'predicate',
+      hidden: true,
       javaFactory: `
       return foam.mlang.MLang.TRUE;
       `,
@@ -92,12 +93,14 @@
       class: 'FObjectProperty',
       of: 'foam.nanos.ruler.RuleAction',
       name: 'action',
+      hidden: true,
       documentation: 'The action to be executed if predicates returns true for passed object.'
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.ruler.RuleAction',
       name: 'asyncAction',
+      hidden: true,
       documentation: 'The action to be executed asynchronously if predicates returns true for passed object.'
     },
     {
