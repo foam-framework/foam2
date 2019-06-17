@@ -522,7 +522,7 @@ return this.find_(this.getX(), id);
           this.on.reset.pub();
           return true;
         }
-        return undefined;
+        return obj;
       },
       javaCode: `
 // TODO

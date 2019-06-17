@@ -52,14 +52,6 @@ if ( e.exceptions.size() != 0 ) {
       ],
       javaCode: `getAgents().add(new ContextAgentRunnable(x, agent, description));`
     },
-    // {
-    //   name: 'submit',
-    //   args: [
-    //     { name: 'x', type: 'X' },
-    //     { name: 'agent', type: 'ContextAgent' }
-    //   ],
-    //   javaCode: `submit(x, agent, "");`
-    // },
     {
       name: 'toString',
       type: 'String',

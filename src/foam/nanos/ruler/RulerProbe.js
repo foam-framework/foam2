@@ -19,9 +19,12 @@ foam.CLASS({
   properties: [
     {
       class: 'List',
-      javaType: 'java.util.ArrayList<TestedRule>',
+      //javaType: 'java.util.ArrayList<TestedRule>',
       name: 'appliedRules',
-      javaFactory: 'return new java.util.ArrayList<TestedRule>();'
+      factory: function() {
+        return [];
+      },
+      javaFactory: 'return new java.util.ArrayList();'
     },
     {
       class: 'Object',
@@ -31,18 +34,23 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.ruler.Operations',
       name: 'operation'
+    },
+    {
+      name: 'passed',
+      class: 'Boolean',
+      javaGetter: `
+      for ( Object rule : getAppliedRules() ) {
+        if ( ! ((TestedRule)rule).getPassed() ) return false;
+      }
+        return true;
+      `,
+      expression: function(appliedRules) {
+        console.log(this);
+        for ( rule in appliedRules ) {
+          if ( ! rule.passed ) return false;
+        }
+        return true;
+      }
     }
-  ],
-
-  methods: [
-    // {
-    //   name: 'addTestedRule',
-    //   args: [
-    //     { name: 'id', type: 'Long' },
-    //     { name: 'message', type: 'String' },
-    //     { name: 'applied', type: 'Boolean' }
-    //    ],
-    //   javaCode: `getAppliedRules().add(new TestedRule(id, message, applied));`
-    // }
   ]
 });

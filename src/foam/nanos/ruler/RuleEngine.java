@@ -105,7 +105,6 @@ public class RuleEngine extends ContextAwareSupport {
       }
       try {
         applyRule(rule, obj, oldObj, agent);
-        agent.setPassed(true);
         agent.setMessage("Successfully applied");
       } catch (Exception e ) {
         agent.setPassed(false);
@@ -118,7 +117,6 @@ public class RuleEngine extends ContextAwareSupport {
         TestedRule asyncAgent = new TestedRule();
         asyncAgent.setRule(rule.getId());
         asyncAgent.setMessage("AsyncAction.");
-        asyncAgent.setPassed(true);
         rulerProbe.appliedRules_.add(asyncAgent);
       }
     }
