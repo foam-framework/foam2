@@ -21,16 +21,16 @@ foam.CLASS({
   extends: 'foam.dao.AbstractDAO',
 
   documentation: 'A Null pattern (do-nothing) DAO implementation.',
-
-  properties: [
+  axioms: [
     {
-      name: 'of',
-      factory: function() {
-        return this.cls_;
-      },
-//  ??     swiftExpressionArgs: ['of'],
-//  ??    swiftExpression: 'return of as! ClassInfo',
-      javaFactory: `return getClassInfo();`,
+      name: 'javaExtras',
+      buildJavaClass: function (cls) {
+        cls.extras.push(`
+    public NullDAO(foam.core.ClassInfo of) {
+      setOf(of);
+    }
+      `);
+      }
     }
   ],
 
