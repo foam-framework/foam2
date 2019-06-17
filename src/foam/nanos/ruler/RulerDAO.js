@@ -204,11 +204,8 @@ addRuleList(ruleDAO, getRemoveAfter());`
     },
     {
       name: 'cmd_',
-      javaCode: `if ( PUT_CMD == obj ) {
-  getDelegate().put((FObject) x.get("OBJ"));
-  return true;
-}
-if ( obj instanceof RulerProbe ) {
+      javaCode: `
+if ( ! ( obj instanceof RulerProbe ) ) return getDelegate().cmd_(x, obj);
   RulerProbe probe = (RulerProbe) obj;
   switch ( probe.getOperation() ) {
     case UPDATE :
@@ -222,10 +219,8 @@ if ( obj instanceof RulerProbe ) {
       break;
     default :
       throw new RuntimeException("Unsupported operation type " + probe.getOperation() + " on dao.cmd(RulerProbe)");
-  }
-  return probe;
-}
-return getDelegate().cmd(obj);`
+    }
+    return probe;`
     },
     {
       name: 'probeRules',
