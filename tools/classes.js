@@ -15,7 +15,6 @@ var classes = [
   'foam.core.Identifiable',
   'foam.core.AbstractFObject',
   'foam.core.Validatable',
-  'foam.glang.StartOfTimeSpan',
   'foam.glang.EndOfTimeSpan',
   'foam.glang.EndOfDay',
   'foam.mlang.predicate.Predicate',
