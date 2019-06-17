@@ -36,12 +36,10 @@ for ( Runnable agent : getAgents() ) {
   try {
     agent.run();
   } catch (Throwable t) {
-    e.exceptions.add(t);
+    e.add(t);
   }
 }
-if ( e.exceptions.size() != 0 ) {
-  throw e;
-}`
+e.maybeThrow();`
     },
     {
       name: 'submit',

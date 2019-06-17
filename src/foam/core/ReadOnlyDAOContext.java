@@ -6,7 +6,6 @@
 
 package foam.core;
 
-
 import foam.dao.DAO;
 import foam.dao.ReadOnlyDAO;
 
