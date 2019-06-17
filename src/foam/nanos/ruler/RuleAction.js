@@ -7,7 +7,30 @@
  foam.INTERFACE({
   package: 'foam.nanos.ruler',
   name: 'RuleAction',
-  documentation: 'Interface for an action implemented in a rule.',
+  documentation: `Interface to be implemented for 'action' and 'asyncAction' properties on a Rule object.
+  ********** VERY IMPORTANT NOTE **********
+
+  Rule.action
+    When implementing applyAction() for Rule.action, use agent for all the write/delete operations.
+    Only operations that modify other system components should be part of the agent executor.
+    When implementing execute() method inside the action, provide description of the operation as the third argument.
+    Example:
+        RuleAction action = (x, obj, oldObj, ruler, agent) -> {
+          DAO userDAO = x.get("userDAO"); // ReadOnlyDAO
+          User user = (User) userDAO.find(888).fclone();
+          user.setFirstName("Jimmy");
+          userDAO.put(user); // WILL NOT WORK
+          // use agent instead
+          agency.submit(x1 -> {
+            DAO crudUserDAO = x1.get("userDAO); // CRUD DAO
+            crudUserDAO.put(user); }, "Updating user's first name"
+            );
+        };
+
+  Rule.AsyncAction
+    When implementing applyAction for Rule.asyncAction, do not use agent.
+    The passed agency is null. All the DAOs inside applyAction of AsyncAction are CRUDable.
+  `,
 
   methods: [
     {
@@ -16,35 +39,9 @@
         { name: 'x', type: 'Context' },
         { name: 'obj', type: 'foam.core.FObject' },
         { name: 'oldObj', type: 'foam.core.FObject' },
-        { name: 'ruler', type: 'foam.nanos.ruler.RuleEngine' }
+        { name: 'ruler', type: 'foam.nanos.ruler.RuleEngine' },
+        { name: 'agency', type: 'foam.core.Agency' }
       ]
-    },
-    {
-      name: 'applyReverseAction',
-      args: [
-        { name: 'x', type: 'foam.core.X' },
-        { name: 'obj', type: 'foam.core.FObject' },
-        { name: 'oldObj', type: 'foam.core.FObject' },
-        { name: 'ruler', type: 'foam.nanos.ruler.RuleEngine' }
-      ],
-      documentation: 'if one of the rules in a group throws an exception we need a way to reverse actions for previously executed rules.'
-    },
-    {
-      name: 'canExecute',
-      type: 'Boolean',
-      args: [
-        { name: 'x', type: 'Context' },
-        { name: 'obj', type: 'FObject' },
-        { name: 'oldObj', type: 'FObject' },
-        { name: 'ruler', type: 'foam.nanos.ruler.RuleEngine' }
-      ],
-      documentation: 'Predicts effect of the action without actually applying it.' +
-      'E.g. if exception is expected, returns false.'
-    },
-    {
-      name: 'describe',
-      type: 'String',
-      documentation: 'Describes purpose of the action and possible output.'
     }
   ]
 });
