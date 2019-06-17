@@ -7,11 +7,15 @@
 foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOCreateView',
+  extends: 'foam.u2.View',
+  
   documentation: `
     A configurable view to create an instance of a specified model
   `,
 
-  extends: 'foam.u2.View',
+  axioms: [
+    foam.pattern.Faceted.create()
+  ],
 
   css:`
     ^ {
