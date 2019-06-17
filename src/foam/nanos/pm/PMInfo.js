@@ -52,6 +52,16 @@ foam.CLASS({
       name: 'totalTime',
       label: 'Total',
       tableCellFormatter: { class: 'foam.nanos.pm.PMTemperatureCellFormatter' }
+    },
+    {
+      class: 'Boolean',
+      name: 'capture'
+    },
+    {
+      class: 'String',
+      name: 'captureTrace',
+      view: { class: 'io.c9.ace.Editor' },
+      permissionRequired: true
     }
   ]
 });

@@ -64,6 +64,16 @@ foam.CLASS({
     if ( x == null ) return;
     PMLogger pmLogger = (PMLogger) x.get(DAOPMLogger.SERVICE_NAME);
     if ( pmLogger != null ) {
+
+      // Temporary loop to find object to be replaced with query when issues are resolved
+      for ( PMInfo i : x.get("pmInfoDAO").select().getArray() ) {
+        if (i.getName().equals(name) && i.getCapture()) {
+          i.setCapture(false);
+          i.setCaptureTrace(Thread.currentThread().getStackTrace());
+        }
+      }
+
+      
       pmLogger.log(this);
     }
 `
