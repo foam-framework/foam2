@@ -24,21 +24,13 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'periodLengthMs',
-      documentation: 'Convenience property for setting openTimeExpr and closeTimeExpr',
+      documentation: 'Convenience property for setting closeTimeExpr',
       javaSetter: `
-setOpenTimeExpr(new foam.glang.StartOfTimeSpan.Builder(getX())
-  .setDelegate(new foam.mlang.IdentityExpr.Builder(getX()).build())
-  .setTimeSpanMs(val)
-  .build());
 setCloseTimeExpr(new foam.glang.EndOfTimeSpan.Builder(getX())
   .setDelegate(new foam.mlang.IdentityExpr.Builder(getX()).build())
   .setTimeSpanMs(val)
   .build());
       `
-    },
-    {
-      class: 'foam.mlang.ExprProperty',
-      name: 'openTimeExpr'
     },
     {
       class: 'foam.mlang.ExprProperty',
@@ -53,11 +45,11 @@ setCloseTimeExpr(new foam.glang.EndOfTimeSpan.Builder(getX())
 foam.core.X x = getX();
 
 foam.mlang.sink.Max lastReduceSink = (foam.mlang.sink.Max) getDestDAO()
-  .select(MAX(Candlestick.OPEN_TIME));
+  .select(MAX(Candlestick.OPEN_VALUE_TIME));
 Date lastReduce = (Date) lastReduceSink.getValue();
 
 foam.mlang.sink.GroupBy dataToReduce = (foam.mlang.sink.GroupBy) getSourceDAO()
-  .where(GTE(Candlestick.OPEN_TIME, lastReduce))
+  .where(GTE(Candlestick.OPEN_VALUE_TIME, lastReduce))
   .select(GROUP_BY(Candlestick.KEY, new foam.dao.ArraySink.Builder(x).build()));
 
 for ( Object key : dataToReduce.getGroups().keySet() ) {
@@ -67,7 +59,6 @@ for ( Object key : dataToReduce.getGroups().keySet() ) {
     Date rCloseTime = (Date) getCloseTimeExpr().f(c.getCloseTime());
     if ( ! reducedData.containsKey(rCloseTime) ) {
       reducedData.put(rCloseTime, new Candlestick.Builder(x)
-        .setOpenTime((Date) getOpenTimeExpr().f(rCloseTime))
         .setCloseTime(rCloseTime)
         .setKey(key)
         .build());
