@@ -37,6 +37,7 @@ setCloseTimeExpr(new foam.glang.EndOfTimeSpan.Builder(getX())
   methods: [
     {
       name: 'foldForState',
+      // TODO: use a more efficient key based lock
       synchronized: true,
       javaCode: `
 foam.core.X x = getX();
