@@ -223,8 +223,9 @@ if ( obj instanceof RulerProbe ) {
     default :
       throw new RuntimeException("Unsupported operation type " + probe.getOperation() + " on dao.cmd(RulerProbe)");
   }
+  return probe;
 }
-return probe;`
+return getDelegate().cmd(obj);`
     },
     {
       name: 'probeRules',
