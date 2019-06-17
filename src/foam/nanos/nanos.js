@@ -83,6 +83,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/UserAndGroupAuthService" },
   { name: "foam/nanos/bench/Benchmark" },
   { name: "foam/nanos/boot/NSpec" },
+  { name: "foam/nanos/boot/NSpecAware" },
   { name: "foam/nanos/boot/DAOConfigSummaryView", flags: ['web'] },
   { name: "foam/nanos/session/Session" },
   { name: "foam/nanos/session/SessionTimer" },
