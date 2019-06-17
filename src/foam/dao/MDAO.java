@@ -190,8 +190,4 @@ public class MDAO
       super.removeAll_(x, skip, limit, order, predicate);
     }
   }
-
-  public Object cmd_(foam.core.X x, Object obj) {
-    return obj;      
-  }
 }

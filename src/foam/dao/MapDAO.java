@@ -102,8 +102,4 @@ public class MapDAO
   public void pipe_(X x, Sink s) {
     // TODO
   }
-
-  public Object cmd_(foam.core.X x, Object obj) {
-    return obj;
-  }
 }
