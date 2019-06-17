@@ -35,7 +35,8 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Group',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
+    'foam.nanos.om.OMLogger'
   ],
 
   axioms: [
@@ -192,8 +193,10 @@ foam.CLASS({
       name: 'sendEmail',
       javaCode:
       `
+      OMLogger omLogger = (OMLogger) x.get("OMLogger");
       Logger logger = (Logger) getX().get("logger");
         try {
+          omLogger.log("Pre send email request");
           MimeMessage message = createMimeMessage(emailMessage);
           Transport transport = getSession_().getTransport("smtp");
           transport.connect();
@@ -202,6 +205,7 @@ foam.CLASS({
           logger.info("SMTPEmailService sent MimeMessage.");
           transport.close();
           logger.info("SMTPEmailService finish.");
+          omLogger.log("Post send email request");
         } catch (Exception e) {
           logger.error("SMTPEmailService failed to finish. " + e);
         }

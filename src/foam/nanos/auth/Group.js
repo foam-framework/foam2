@@ -181,7 +181,10 @@ foam.CLASS({
         DAO groupDAO              = (DAO) x.get("groupDAO");
 
         while ( group != null ) {
-          configUrl          = urlFound ? configUrl : group.getUrl();
+          if ( ! urlFound &&
+               ! SafetyUtil.isEmpty(group.getUrl()) ) {
+            configUrl = group.getUrl();
+          }
           configSupportEmail = supportEmailFound ? configSupportEmail : group.getSupportEmail();
       
           // Once true, stay true
