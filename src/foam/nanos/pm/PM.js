@@ -60,22 +60,22 @@ foam.CLASS({
         }
       ],
       javaCode: `
-    setEndTime(new java.util.Date());
-    if ( x == null ) return;
-    PMLogger pmLogger = (PMLogger) x.get(DAOPMLogger.SERVICE_NAME);
-    if ( pmLogger != null ) {
-
-      // Temporary loop to find object to be replaced with query when issues are resolved
-      for ( PMInfo i : x.get("pmInfoDAO").select().getArray() ) {
-        if (i.getName().equals(name) && i.getCapture()) {
-          i.setCapture(false);
-          i.setCaptureTrace(Thread.currentThread().getStackTrace());
+      setEndTime(new java.util.Date());
+      if ( x == null ) return;
+      PMLogger pmLogger = (PMLogger) x.get(DAOPMLogger.SERVICE_NAME);
+      if ( pmLogger != null ) {
+        PMInfo pminfo = (PMInfo) ( (ArraySink) ( (DAO) x.get("pmInfoDAO")).where(foam.mlang.MLang.EQ(PMInfo.NAME, this.getName())).select(new ArraySink())).getArray().get(0);
+        if (pminfo.getCapture()) {
+          StringBuffer trace = new StringBuffer();
+          for ( StackTraceElement j : Thread.currentThread().getStackTrace() ) {
+            trace.append(j.toString());
+            trace.append(System.getProperty("line.separator"));
+          }
+          pminfo.setCapture(false);
+          pminfo.setCaptureTrace(trace.toString());
         }
+        pmLogger.log(this);
       }
-
-      
-      pmLogger.log(this);
-    }
 `
     },
     {
