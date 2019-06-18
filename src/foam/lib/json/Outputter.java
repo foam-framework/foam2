@@ -421,6 +421,11 @@ public class Outputter
     return this;
   }
 
+  public Outputter setPropertyPredicate(PropertyPredicate p) {
+    propertyPredicate_ = p;
+    return this;
+  }
+
   @Override
   public void close() throws IOException {
     IOUtils.closeQuietly(stringWriter_);

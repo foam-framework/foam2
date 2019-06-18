@@ -8,6 +8,10 @@ package foam.nanos.dig;
 
 import foam.core.PropertyInfo;
 import foam.core.X;
+import foam.lib.AndPropertyPredicate;
+import foam.lib.NetworkPropertyPredicate;
+import foam.lib.PermissionedPropertyPredicate;
+import foam.lib.PropertyPredicate;
 import foam.lib.json.JSONParser;
 import foam.lib.json.Outputter;
 import foam.nanos.dig.exception.*;
@@ -134,7 +138,7 @@ public class SugarWebAgent
       jsonParser.setX(x);
       resp.setContentType("application/json");
 
-      Outputter outputterJson = new foam.lib.json.PermissionedNetworkOutputter(x);
+      Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate()}));
       outputterJson.setOutputDefaultValues(true);
       outputterJson.setOutputClassNames(true);
 
@@ -165,7 +169,7 @@ public class SugarWebAgent
       JSONParser jsonParser = new JSONParser();
       jsonParser.setX(x);
 
-      Outputter outputterJson = new foam.lib.json.PermissionedNetworkOutputter(x);
+      Outputter outputterJson = new foam.lib.json.Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate()}));
       outputterJson.setOutputDefaultValues(true);
       outputterJson.setOutputClassNames(true);
       outputterJson.output(error);

@@ -124,9 +124,10 @@ try {
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-protected class Outputter extends foam.lib.json.PermissionedNetworkOutputter {
+protected class Outputter extends foam.lib.json.Outputter {
   public Outputter(foam.core.X x) {
     super(x);
+    setPropertyPredicate(new foam.lib.AndPropertyPredicate(x, new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));
   }
 
   protected void outputFObject(foam.core.FObject o) {
