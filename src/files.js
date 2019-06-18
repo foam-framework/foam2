@@ -90,6 +90,7 @@ FOAM_FILES([
   { name: "foam/core/Detachable" },
   { name: "foam/core/AbstractFObject" },
   { name: "foam/core/ContextAgent" },
+  { name: "foam/core/CompoundContextAgency" },
   { name: "foam/core/Validatable" },
   { name: "foam/core/AxiomCloner" },
   { name: "foam/java/Authorizable" },
