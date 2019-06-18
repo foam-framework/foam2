@@ -56,7 +56,7 @@ foam.CLASS({
       name: 'check',
       args: [
         {
-          type: 'foam.core.X',
+          type: 'Context',
           name: 'x'
         }
       ],
