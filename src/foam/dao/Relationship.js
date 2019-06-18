@@ -551,15 +551,14 @@ return junction`
         var controller = foam.comics.DAOController.create({
           createEnabled: false,
           editEnabled: false,
-          selectEnabled: true,
-          addEnabled: false,
+          selectEnabled: false,
+          addEnabled: true,
+          exportEnabled: false,
           relationship: this,
-          data: dao
+          data: dao,
+          title: `Add a ${dao.of.name}`,
+          subtitle: `Select a ${dao.of.name} from the table and click "Add" to add it.`
         }, x);
-
-        controller.sub('select', function(s, _, id) {
-          dao.find(id).then(function(obj) { self.add(obj); });
-        });
 
         x.stack.push({
           class: 'foam.comics.DAOControllerView',
@@ -580,7 +579,9 @@ return junction`
           selectEnabled: true,
           addEnabled: false,
           relationship: this,
-          data: dao
+          data: dao,
+          title: `Remove a ${dao.of.name}`,
+          subtitle: `Select a ${dao.of.name} from the table and click "Select" to add it.`
         }, x);
 
         controller.sub('select', function(s, _, id) {

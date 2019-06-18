@@ -31,7 +31,8 @@ foam.CLASS({
         'removeAll_',
         'select_',
         'listen_',
-        'find_'
+        'find_',
+        'cmd_'
       ]
     }
   ]
