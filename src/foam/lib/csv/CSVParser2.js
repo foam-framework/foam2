@@ -178,7 +178,7 @@ foam.CLASS({
       class: 'String',
       name: 'cls',
       label: 'class',
-      value: 'net.nanopay.tx.gs.GsTxCsvRow',
+      value: 'foam.nanos.auth.User',
       validateObj: function(cls) {
         return foam.lookup(cls, true) ? null : 'Invalid class';
       }
