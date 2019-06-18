@@ -6,13 +6,13 @@
 
 package foam.nanos.ruler;
 
-import foam.core.*;
+import foam.core.ContextAgent;
+import foam.core.ContextAwareSupport;
+import foam.core.FObject;
+import foam.core.X;
 import foam.dao.DAO;
-import foam.nanos.logger.Logger;
-import foam.nanos.pm.PM;
 import foam.nanos.pool.FixedThreadPool;
 
-import java.lang.Exception;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -25,13 +25,11 @@ public class RuleEngine extends ContextAwareSupport {
   private Map<Long, Object> results_ = new HashMap<>();
   private Map<Long, RuleHistory> savedRuleHistory_ = new HashMap<>();
   private Rule currentRule_ = null;
-  private X userX_;
 
-  public RuleEngine(X x, X systemX, DAO delegate) {
-    setX(systemX);
+  public RuleEngine(X x, DAO delegate) {
+    setX(x);
     setDelegate(delegate);
     ruleHistoryDAO_ = (DAO) x.get("ruleHistoryDAO");
-    userX_ = x;
   }
 
   public DAO getDelegate() {
@@ -53,74 +51,8 @@ public class RuleEngine extends ContextAwareSupport {
    * @param oldObj - Old FObject supplied to rules for execution
    */
   public void execute(List<Rule> rules, FObject obj, FObject oldObj) {
-    CompoundContextAgency compoundAgency = new CompoundContextAgency();
-    ContextualizingAgency agency = new ContextualizingAgency(compoundAgency, userX_, getX());
-    for (Rule rule : rules) {
-      if ( stops_.get() ) break;
-      if ( ! isRuleApplicable(rule, obj, oldObj)) continue;
-      PM pm = new PM();
-      pm.setClassType(RulerDAO.getOwnClassInfo());
-      pm.setName(rule.getDaoKey() + ": " + rule.getName());
-      pm.init_();
-      applyRule(rule, obj, oldObj, agency);
-      pm.log(x_);
-      agency.submit(x_, x -> saveHistory(rule, obj));
-    }
-    compoundAgency.execute(x_);
-    try {
-      //compoundAgency.execute(x_);
-    } catch (Exception e) {
-      Logger logger = (Logger) x_.get("logger");
-      logger.error(e.getMessage());
-    }
-
+    applyRules(rules, obj, oldObj);
     asyncApplyRules(rules, obj, oldObj);
-  }
-
-  /**
-   * Probes rules execution by applying actions and skipping
-   * execution of agents that contain code that effects the system
-   *
-   * @param rules - Rules to be considered applying
-   * @param obj - FObject supplied to rules for execution
-   * @param rulerProbe -
-   * @param oldObj - Old FObject supplied to rules for execution
-   */
-  public void probe(List<Rule> rules, RulerProbe rulerProbe, FObject obj, FObject oldObj) {
-    PM pm = new PM();
-      pm.setClassType(RulerProbe.getOwnClassInfo());
-      pm.setName("Probe:" + obj.getClassInfo());
-      pm.init_();
-    for (Rule rule : rules) {
-      if ( ! isRuleApplicable(rule, obj, oldObj) ) {
-        continue;
-      }
-      TestedRule agent = new TestedRule();
-      agent.setRule(rule.getId());
-      if ( stops_.get() ) {
-        agent.setMessage("Not executed because was overridden and forced to stop.");
-        agent.setPassed(false);
-        rulerProbe.getAppliedRules().add(agent);
-        continue;
-      }
-      try {
-        applyRule(rule, obj, oldObj, agent);
-        agent.setMessage("Successfully applied");
-      } catch (Exception e ) {
-        agent.setPassed(false);
-        agent.setMessage(e.getMessage());
-      }
-      rulerProbe.getAppliedRules().add(agent);
-    }
-    for (Rule rule : rules) {
-      if ( rule.getAsyncAction() != null && rule.f(x_, obj, oldObj) ) {
-        TestedRule asyncAgent = new TestedRule();
-        asyncAgent.setRule(rule.getId());
-        asyncAgent.setMessage("AsyncAction.");
-        rulerProbe.appliedRules_.add(asyncAgent);
-      }
-    }
-    pm.log(x_);
   }
 
   /**
@@ -142,31 +74,49 @@ public class RuleEngine extends ContextAwareSupport {
     return results_.get(ruleId);
   }
 
-  private void applyRule(Rule rule, FObject obj, FObject oldObj, Agency agency) {
-    ProxyX readOnlyX = new ReadOnlyDAOContext(userX_);
-    rule.apply(readOnlyX, obj, oldObj, this, agency);
-  }
+  private void applyRules(List<Rule> rules, FObject obj, FObject oldObj) {
+    List<Rule> completedRules = null;
+    for (Rule rule : rules) {
+      if ( stops_.get() ) return;
 
-  private boolean isRuleApplicable(Rule rule, FObject obj, FObject oldObj) {
-    currentRule_ = rule;
-    return rule.getAction() != null
-      && rule.f(x_, obj, oldObj);
+      currentRule_ = rule;
+      if ( rule.getAction() != null
+        && rule.f(getX(), obj, oldObj)
+      ) {
+        if ( completedRules == null ) {
+          completedRules = new ArrayList<>();
+        }
+        try {
+          rule.apply(getX(), obj, oldObj, this);
+          completedRules.add(rule);
+          saveHistory(rule, obj);
+        } catch (Exception e ) {
+          for (Rule completedRule : completedRules ) {
+            completedRule.applyReverse(getX(), obj, oldObj, this);
+          }
+          throw e;
+        }
+      }
+    }
   }
 
   private void asyncApplyRules(List<Rule> rules, FObject obj, FObject oldObj) {
-    ((FixedThreadPool) getX().get("threadPool")).submit(getX(), x -> {
-      for (Rule rule : rules) {
-        if ( stops_.get() ) return;
+    ((FixedThreadPool) getX().get("threadPool")).submit(getX(), new ContextAgent() {
+      @Override
+      public void execute(X x) {
+        for (Rule rule : rules) {
+          if ( stops_.get() ) return;
 
-        currentRule_ = rule;
-        if ( rule.getAsyncAction() != null
-          && rule.f(getX(), obj, oldObj)
-        ) {
-          try {
-            rule.asyncApply(x, obj, oldObj, RuleEngine.this);
-            saveHistory(rule, obj);
-          } catch (Exception ex) {
-            retryAsyncApply(x, rule, obj, oldObj);
+          currentRule_ = rule;
+          if ( rule.getAsyncAction() != null
+            && rule.f(getX(), obj, oldObj)
+          ) {
+            try {
+              rule.asyncApply(x, obj, oldObj, RuleEngine.this);
+              saveHistory(rule, obj);
+            } catch (Exception ex) {
+              retryAsyncApply(x, rule, obj, oldObj);
+            }
           }
         }
       }
@@ -174,9 +124,12 @@ public class RuleEngine extends ContextAwareSupport {
   }
 
   private void retryAsyncApply(X x, Rule rule, FObject obj, FObject oldObj) {
-    new RetryManager().submit(x, x1 -> {
-      rule.asyncApply(getX(), obj, oldObj, RuleEngine.this);
-      saveHistory(rule, obj);
+    new RetryManager().submit(x, new ContextAgent() {
+      @Override
+      public void execute(X x) {
+        rule.asyncApply(getX(), obj, oldObj, RuleEngine.this);
+        saveHistory(rule, obj);
+      }
     });
   }
 
