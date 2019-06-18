@@ -13,6 +13,11 @@ foam.CLASS({
     A configurable summary view for a specific instance
   `,
 
+  topics: [
+    'finished',
+    'throwError'
+  ],
+
   axioms: [
     foam.pattern.Faceted.create()
   ],
@@ -94,7 +99,14 @@ foam.CLASS({
     {
       name: 'delete',
       code: function() {
-        alert('TODO');
+        var self = this;
+        this.config.dao.remove(this.data).then(function() {
+          self.finished.pub();
+          self.stack.back();
+        }, function(e) {
+          self.exception = e;
+          self.throwError.pub();
+        });
       }
     }
   ],

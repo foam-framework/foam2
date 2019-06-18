@@ -91,7 +91,6 @@ foam.CLASS({
       code: function() {
         var self = this;
         this.data.copyFrom(this.workingData);
-        debugger;
         this.config.dao.put(this.data).then(function() {
           self.finished.pub();
           self.stack.back();

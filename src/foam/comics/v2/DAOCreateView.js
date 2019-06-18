@@ -89,10 +89,9 @@ foam.CLASS({
       name: 'save',
       code: function() {
         var self = this;
-        this.data.copyFrom(this.workingData);
+        this.data = this.workingData;
         this.data.createdBy = this.__subContext__.user.id;
         this.data.owner = this.__subContext__.user.id;
-        debugger;
         this.config.dao.put(this.data).then(function() {
           self.finished.pub();
           self.stack.back();
