@@ -15,7 +15,10 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.X'
+    'foam.core.X',
+    'foam.dao.DAO',
+    'foam.dao.ArraySink',
+    'foam.nanos.pm.PMInfo'
   ],
 
   ids: [ 'classType', 'name', 'startTime' ],
@@ -63,9 +66,13 @@ foam.CLASS({
       setEndTime(new java.util.Date());
       if ( x == null ) return;
       PMLogger pmLogger = (PMLogger) x.get(DAOPMLogger.SERVICE_NAME);
-      if ( pmLogger != null ) {
-        PMInfo pminfo = (PMInfo) ( (ArraySink) ( (DAO) x.get("pmInfoDAO")).where(foam.mlang.MLang.EQ(PMInfo.NAME, this.getName())).select(new ArraySink())).getArray().get(0);
-        if (pminfo.getCapture()) {
+      DAO pmInfoDAO = (DAO) x.get("pmInfoDAO");
+      if ( pmLogger != null && x != null) {
+        java.util.List pmInfoList = ( (ArraySink) ( pmInfoDAO.where(foam.mlang.MLang.EQ(PMInfo.NAME, this.getName())).select(new ArraySink()))).getArray();
+        PMInfo pminfo = null;
+        if (pmInfoList.size() > 0)
+          pminfo = (PMInfo) pmInfoList.get(0);
+        if (pminfo != null && pminfo.getCapture()) {
           StringBuffer trace = new StringBuffer();
           for ( StackTraceElement j : Thread.currentThread().getStackTrace() ) {
             trace.append(j.toString());
@@ -74,8 +81,9 @@ foam.CLASS({
           pminfo.setCapture(false);
           pminfo.setCaptureTrace(trace.toString());
         }
-        pmLogger.log(this);
       }
+      if ( pmLogger != null )
+        pmLogger.log(this);
 `
     },
     {
