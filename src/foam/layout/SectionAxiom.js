@@ -16,6 +16,7 @@ foam.CLASS({
       class: 'String',
       name: 'title',
       expression: function(name) {
+        if (name === '_defaultSection') return '';
         return foam.String.capitalize(name);
       }
     },
@@ -69,7 +70,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'section'
+      name: 'section',
+      value: '_defaultSection'
     }
   ]
 });
@@ -81,7 +83,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'section'
+      name: 'section',
+      value: '_defaultSection'
     }
   ]
 });

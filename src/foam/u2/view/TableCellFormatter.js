@@ -121,7 +121,17 @@ foam.CLASS({
   name: 'FObjectPropertyTableCellFormatterRefinement',
   refines: 'foam.core.FObjectProperty',
 
-  properties: [ [ 'tableCellFormatter', null ] ]
+  properties: [
+    {
+      class: 'foam.u2.view.TableCellFormatter',
+      name: 'tableCellFormatter',
+      value: function(obj) {
+        this.start()
+          .add(obj.toSummary())
+        .end();
+      }
+    }
+  ]
 });
 
 

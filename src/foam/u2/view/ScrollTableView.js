@@ -217,6 +217,11 @@
       expression: function(tablesRemoved_, pageSize, rowHeight) {
         return tablesRemoved_ * pageSize * rowHeight + 'px';
       }
+    },
+    {
+      type: 'Boolean',
+      name: 'enableDynamicTableHeight',
+      value: true,
     }
   ],
 
@@ -254,11 +259,18 @@
 
       this.onDetach(this.onload.sub(this.addTbodies));
 
-      this.onDetach(this.onload.sub(this.updateTableHeight));
-      window.addEventListener('resize', this.updateTableHeight);
-      this.onDetach(() => {
-        window.removeEventListener('resize', this.updateTableHeight);
-      });
+      /*
+        to be used in cases where we don't want the whole table to
+        take the whole page (i.e. we need multiple tables)
+        and enableDynamicTableHeight can be switched off
+      */
+      if (this.enableDynamicTableHeight) {
+        this.onDetach(this.onload.sub(this.updateTableHeight));
+        window.addEventListener('resize', this.updateTableHeight);
+        this.onDetach(() => {
+          window.removeEventListener('resize', this.updateTableHeight);
+        });
+      }
     },
     {
       name: 'refresh',
