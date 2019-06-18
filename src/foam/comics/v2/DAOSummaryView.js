@@ -85,7 +85,7 @@ foam.CLASS({
         if ( ! this.stack ) return;
         this.stack.push({
           class: 'foam.comics.v2.DAOUpdateView',
-          data: this.data,
+          data: this.data.clone(this.__subContext__),
           config: this.config,
           of: this.config.of
         });
@@ -139,7 +139,7 @@ foam.CLASS({
               .end()
 
               .start(config$viewBorder)
-                .start(foam.u2.detail.SectionedDetailView, { data: data })
+                .start(foam.u2.detail.SectionedDetailView, { data: data.clone(self.__subContext__) })
                   .addClass(this.myClass('view-container'))
                 .end()
               .end()

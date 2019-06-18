@@ -77,6 +77,7 @@ foam.CLASS({
       name: 'save',
       code: function() {
         var self = this;
+        debugger;
         this.config.dao.put(this.data.clone()).then(function() {
           self.finished.pub();
           self.stack.back();

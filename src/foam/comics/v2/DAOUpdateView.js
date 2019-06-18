@@ -61,6 +61,13 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
+      name: 'workingData',
+      expression: function(data) {
+        return data.clone(this.__subContext__)
+      }
+    },
+    {
+      class: 'FObjectProperty',
       of: 'foam.comics.v2.DAOControllerConfig',
       name: 'config'
     },
@@ -83,11 +90,11 @@ foam.CLASS({
       name: 'save',
       code: function() {
         var self = this;
-        this.config.dao.put(this.data.clone()).then(function() {
+        this.data.copyFrom(this.workingData);
+        this.config.dao.put(this.data).then(function() {
           self.finished.pub();
           self.stack.back();
         }, function() {
-
           self.throwError.pub();
         });
       }
@@ -102,7 +109,7 @@ foam.CLASS({
 
       this
         .addClass(this.myClass())
-        .add(self.slot(function(data, config$viewBorder) {
+        .add(self.slot(function(data, config$viewBorder, workingData) {
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -127,7 +134,7 @@ foam.CLASS({
                 .start().addClass(this.myClass('view-container'))
                   .add(self.slot(function(viewView) {
                     return self.E().tag(viewView, {
-                      data: data
+                      data: workingData
                     });
                   }))
                 .end()
