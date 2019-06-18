@@ -52,10 +52,8 @@ foam.CLASS({
           console.warn('Unknown label', h, 'for class', cls.id);
         }
       });
-
-      ps = ps.tail;
-      while ( ps.valid ) {
-        ps = ps.apply(this.csvRow.getSymbol('START'), this.csvRow);
+      while ( ps.tail.valid ) {
+        ps = ps.tail.apply(this.csvRow.getSymbol('START'), this.csvRow);
         var obj = cls.create();
         ps.value.forEach((v, i) => {
           var prop = propMap[headers[i]];
@@ -180,7 +178,7 @@ foam.CLASS({
       class: 'String',
       name: 'cls',
       label: 'class',
-      value: 'foam.nanos.auth.User',
+      value: 'net.nanopay.tx.gs.GsTxCsvRow',
       validateObj: function(cls) {
         return foam.lookup(cls, true) ? null : 'Invalid class';
       }
@@ -221,7 +219,6 @@ id,legalName,email,phone.number,address.city,address.postalCode,lastLogin,birthd
       code: function() {
         var a = this.CSVSink.create();
         var sinks = [
-          a,
           this.DAOSink.create({ dao: this.dao })
         ];
         var sink = {
