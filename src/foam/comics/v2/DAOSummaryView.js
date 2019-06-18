@@ -85,7 +85,7 @@ foam.CLASS({
         if ( ! this.stack ) return;
         this.stack.push({
           class: 'foam.comics.v2.DAOUpdateView',
-          data: this.data.clone(this.__subContext__),
+          data: this.data,
           config: this.config,
           of: this.config.of
         });

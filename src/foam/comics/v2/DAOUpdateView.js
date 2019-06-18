@@ -91,6 +91,7 @@ foam.CLASS({
       code: function() {
         var self = this;
         this.data.copyFrom(this.workingData);
+        debugger;
         this.config.dao.put(this.data).then(function() {
           self.finished.pub();
           self.stack.back();
@@ -109,7 +110,7 @@ foam.CLASS({
 
       this
         .addClass(this.myClass())
-        .add(self.slot(function(data, config$viewBorder, workingData) {
+        .add(self.slot(function(data, config$viewBorder) {
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -134,7 +135,7 @@ foam.CLASS({
                 .start().addClass(this.myClass('view-container'))
                   .add(self.slot(function(viewView) {
                     return self.E().tag(viewView, {
-                      data: workingData
+                      data$: self.workingData$
                     });
                   }))
                 .end()

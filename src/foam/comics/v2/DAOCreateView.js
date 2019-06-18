@@ -8,6 +8,11 @@ foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOCreateView',
   extends: 'foam.u2.View',
+
+  topics: [
+    'finished',
+    'throwError'
+  ],
   
   documentation: `
     A configurable view to create an instance of a specified model
@@ -55,6 +60,13 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
+      name: 'workingData',
+      expression: function(data) {
+        return data.clone(this.__subContext__)
+      }
+    },
+    {
+      class: 'FObjectProperty',
       of: 'foam.comics.v2.DAOControllerConfig',
       name: 'config'
     },
@@ -77,12 +89,14 @@ foam.CLASS({
       name: 'save',
       code: function() {
         var self = this;
+        this.data.copyFrom(this.workingData);
+        this.data.createdBy = this.__subContext__.user.id;
+        this.data.owner = this.__subContext__.user.id;
         debugger;
-        this.config.dao.put(this.data.clone()).then(function() {
+        this.config.dao.put(this.data).then(function() {
           self.finished.pub();
           self.stack.back();
         }, function() {
-
           self.throwError.pub();
         });
       }
@@ -94,7 +108,7 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(config$viewBorder, config$browseTitle, data) {
+        .add(self.slot(function(config$viewBorder, config$browseTitle) {
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -115,7 +129,7 @@ foam.CLASS({
               .end()
               .start(config$viewBorder)
                 .start().addClass(this.myClass('create-view-container'))
-                  .tag(this.viewView, { data: data })
+                  .tag(this.viewView, { data$: self.workingData$ })
                 .end()
               .end()
         }));
