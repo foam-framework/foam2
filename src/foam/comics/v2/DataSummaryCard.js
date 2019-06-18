@@ -10,6 +10,7 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   documentation: `
+    TODO: WORK IN PROGRESS:
     A configurable view to to render a card with 
     configurable contents and rich choice view dropdowns
   `,
@@ -41,9 +42,6 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'Reference',
       name: 'choices',
-      factory: function() {
-        return [];
-      }
     },
     {
       class: 'foam.u2.ViewSpec',
@@ -63,7 +61,7 @@ foam.CLASS({
               .forEach()
             .end()
           .end()
-        .end()
+        .end();
     }
   ]
 });
