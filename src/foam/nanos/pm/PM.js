@@ -67,12 +67,12 @@ foam.CLASS({
       if ( x == null ) return;
       PMLogger pmLogger = (PMLogger) x.get(DAOPMLogger.SERVICE_NAME);
       DAO pmInfoDAO = (DAO) x.get("pmInfoDAO");
-      if ( pmLogger != null && x != null) {
-        java.util.List pmInfoList = ( (ArraySink) ( pmInfoDAO.where(foam.mlang.MLang.EQ(PMInfo.NAME, this.getName())).select(new ArraySink()))).getArray();
+      if ( pmInfoDAO != null ) {
+        java.util.List pmInfoList = ( (ArraySink) (pmInfoDAO.where(foam.mlang.MLang.EQ(PMInfo.NAME, this.getName())).select(new ArraySink())) ).getArray();
         PMInfo pminfo = null;
-        if (pmInfoList.size() > 0 && (pminfo = (PMInfo) pmInfoList.get(0)) != null)
+        if ( pmInfoList.size() > 0 && (pminfo = (PMInfo) pmInfoList.get(0)) != null )
           pminfo = (PMInfo) pminfo.fclone();
-        if (pminfo != null && pminfo.getCapture()) {
+        if ( pminfo != null && pminfo.getCapture() ) {
           StringBuffer trace = new StringBuffer();
           for ( StackTraceElement j : Thread.currentThread().getStackTrace() ) {
             trace.append(j.toString());
