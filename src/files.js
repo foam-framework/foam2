@@ -578,7 +578,9 @@ FOAM_FILES([
 
   { name: "org/chartjs/Lib" },
   { name: "org/chartjs/AbstractChartCView" },
+  { name: "org/chartjs/AbstractChartView" },
   { name: "org/chartjs/CandlestickDAOChartView" },
+  { name: "org/chartjs/PieDAOChartView" },
   { name: "org/chartjs/Pie" },
   { name: "org/chartjs/Bar" },
   { name: "org/chartjs/Line" },
