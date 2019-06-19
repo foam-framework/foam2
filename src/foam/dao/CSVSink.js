@@ -96,11 +96,7 @@ foam.CLASS({
       }
 
       this.columns.forEach((element) => {
-        if ( element.cls_.name == 'Currency' ) {
-          this.output(obj[element.name]/100);
-        } else {
-          element.toCSV(obj, this, element);
-        }
+        element.toCSV(obj, this, element);
       });
       this.newLine_();
     },
@@ -180,6 +176,34 @@ foam.CLASS({
           .forEach((axiom) => {
             axiom.toCSVLabel(prefixedOutputter, axiom);
           });
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'CurrencyPropertyCSVRefinement',
+
+  documentation: 'Refinement on FObjects to override toCSV() and toCSVLabel().',
+
+  refines: 'foam.core.Currency',
+
+  imports: [
+    'ctrl',
+    'currencyDAO'
+  ],
+
+  properties: [
+    {
+      name: 'toCSV',
+      class: 'Function',
+      value: function(obj, outputter, prop, currencyDAO) {
+        debugger;
+        outputter.output(prop.format(obj[prop.name]));
+        // this.currencyDAO.find(prop).then((currency) => {
+        //   outputter.output(currency.format(obj[prop.name]));
+        // });
       }
     }
   ]
