@@ -154,12 +154,16 @@ foam.CLASS({
     },
     {
       name: 'idsOfObjectsTheUserHasInteractedWith_',
-      value: new Set()
+      factory: function() {
+        return {};
+      }
     },
     {
       name: 'checkboxes_',
       documentation: 'The checkbox elements when multi-select support is enabled. Used internally to implement the select all feature.',
-      value: new Map()
+      factory: function() {
+        return {};
+      }
     },
     {
       class: 'Boolean',
@@ -223,11 +227,9 @@ foam.CLASS({
                   view.allCheckBoxesEnabled_ = checked;
 
                   if ( checked ) {
-                    view.data.select().then(function(arraySink) {
-                      view.selectedObjects = arraySink.array.reduce(function(acc, obj) {
-                        acc[obj.id] = obj;
-                        return acc;
-                      }, {});
+                    view.selectedObjects = {};
+                    view.data.select(function(obj) {
+                      view.selectedObjects[obj.id] = obj;
                     });
                   } else {
                     view.selectedObjects = {};
@@ -235,8 +237,8 @@ foam.CLASS({
 
                   // Update the existing CheckBox views.
                   view.togglingCheckBoxes_ = true;
-                  view.checkboxes_.forEach(function(checkbox) {
-                    checkbox.data = checked;
+                  Object.keys(view.checkboxes_).forEach(function(key) {
+                    view.checkboxes_[key].data = checked;
                   });
                   view.togglingCheckBoxes_ = false;
                 }));
@@ -350,7 +352,7 @@ foam.CLASS({
                   var slot = view.SimpleSlot.create();
                   this
                     .start('td')
-                      .tag(view.CheckBox, { data: view.idsOfObjectsTheUserHasInteractedWith_.has(obj.id) ? !!view.selectedObjects[obj.id] : view.allCheckBoxesEnabled_ }, slot)
+                      .tag(view.CheckBox, { data: view.idsOfObjectsTheUserHasInteractedWith_[obj.id] ? !!view.selectedObjects[obj.id] : view.allCheckBoxesEnabled_ }, slot)
                     .end();
 
                   // Set up a listener so that when the user checks or unchecks
@@ -380,7 +382,7 @@ foam.CLASS({
                     // use a separate set to remember which checkboxes the user
                     // has interacted with, then we don't need to clutter up
                     // `selectedObjects`.
-                    view.idsOfObjectsTheUserHasInteractedWith_.add(obj.id);
+                    view.idsOfObjectsTheUserHasInteractedWith_[obj.id] = true;
 
                     var checked = newValueSlot.get();
 
@@ -399,9 +401,9 @@ foam.CLASS({
                   // to them so we can set the `data` property of them when the
                   // user checks the box to enable or disable all checkboxes.
                   var checkbox = slot.get();
-                  view.checkboxes_.set(obj.id, checkbox);
+                  view.checkboxes_[obj.id] = checkbox;
                   checkbox.onDetach(function() {
-                    view.checkboxes_.delete(obj.id);
+                    delete view.checkboxes_[obj.id];
                   });
                 }).
 
