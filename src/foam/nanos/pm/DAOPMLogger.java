@@ -79,7 +79,7 @@ public class DAOPMLogger
         dpmi.setCount(dpmi.getCount() + 1);
         dpmi.setTotalTime(dpmi.getTotalTime() + pm.getTime());
 
-        if( dpmi.getCapture() == true ) {
+        if ( dpmi.getCapture() == true ) {
           StringBuilder trace = new StringBuilder();
           for ( StackTraceElement j : Thread.currentThread().getStackTrace() ) {
             trace.append(j.toString());
