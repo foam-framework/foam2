@@ -104,8 +104,7 @@ foam.CLASS({
           self.finished.pub();
           self.stack.back();
         }, function(e) {
-          self.exception = e;
-          self.throwError.pub();
+          self.throwError.pub(e);
         });
       }
     }

@@ -94,8 +94,8 @@ foam.CLASS({
         this.config.dao.put(this.data).then(function() {
           self.finished.pub();
           self.stack.back();
-        }, function() {
-          self.throwError.pub();
+        }, function(e) {
+          self.throwError.pub(e);
         });
       }
     },
