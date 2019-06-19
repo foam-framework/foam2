@@ -23,10 +23,15 @@ foam.CLASS({
       visibility: 'HIDDEN'
     },
     {
-      name: 'props',
+      name: 'columns',
       expression: function(of) {
-        return of.getAxiomsByClass(foam.core.Property)
-          .filter( (p) => ! p.networkTransient );
+        if ( this.columns_.length == 0 ) {
+          return of.getAxiomsByClass(foam.core.Property)
+            .filter( (p) => ! p.networkTransient );
+        }
+        return this.columns_.map((tableCol) => {
+          return of.getAxiomByName(tableCol);
+        });
       },
       visibility: 'HIDDEN'
     },
@@ -40,6 +45,12 @@ foam.CLASS({
       name: 'isNewLine',
       value: true,
       visibility: 'HIDDEN'
+    },
+    {
+      name: 'columns_',
+      factory: function() {
+        return this.of.getAxiomByName('tableColumns').columns;
+      }
     }
   ],
 
@@ -72,6 +83,9 @@ foam.CLASS({
             Array: function(value) {
               this.output_(foam.json.Pretty.stringify(value));
             },
+            AbstractEnum: function(value) {
+              this.output_(value.label);
+            },
             Undefined: function(value) {},
             Null: function(value) {}
           }, function(value) {
@@ -88,14 +102,14 @@ foam.CLASS({
       if ( ! this.of ) this.of = obj.cls_;
 
       if ( ! this.isHeadersOutput ) {
-        this.props.forEach((element) => {
+        this.columns.forEach((element) => {
           element.toCSVLabel(this, element);
         });
         this.newLine_();
         this.isHeadersOutput = true;
       }
 
-      this.props.forEach((element) => {
+      this.columns.forEach((element) => {
         element.toCSV(obj, this, element);
       });
       this.newLine_();
