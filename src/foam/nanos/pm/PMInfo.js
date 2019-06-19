@@ -12,6 +12,8 @@ foam.CLASS({
 
   ids: [ 'clsName', 'name' ],
 
+  tableColumns: [ 'clsName', 'name', 'count', 'minTime', 'maxTime', 'average', 'totalTime' ],
+
   searchColumns: [ ],
 
   properties: [
