@@ -78,6 +78,16 @@ public class DAOPMLogger
 
         dpmi.setCount(dpmi.getCount() + 1);
         dpmi.setTotalTime(dpmi.getTotalTime() + pm.getTime());
+
+        if( dpmi.getCapture() == true ) {
+          StringBuilder trace = new StringBuilder();
+          for ( StackTraceElement j : Thread.currentThread().getStackTrace() ) {
+            trace.append(j.toString());
+            trace.append(System.getProperty("line.separator"));
+          }
+          dpmi.setCapture(false);
+          dpmi.setCaptureTrace(trace.toString());
+        }
         pmd.put(dpmi);
       }
     }
