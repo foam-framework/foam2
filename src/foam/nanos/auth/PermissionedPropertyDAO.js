@@ -195,42 +195,7 @@ foam.CLASS({
     }
   }
       `,
-    },
-    {
-      name: 'maybeRemove',
-      args: [
-        {
-          name: 'axiom',
-          javaType: 'PropertyInfo'
-        },
-        {
-          name: 'of',
-          type: 'String'
-        },
-        {
-          name: 'auth',
-          type: 'AuthService'
-        },
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'obj',
-          type: 'foam.core.FObject'
-        },
-        {
-          name: 'oldObj',
-          type: 'foam.core.FObject'
-        }
-      ],
-      javaCode: `
-  String axiomName =  axiom.toString();
-  axiomName = axiomName.substring(axiomName.lastIndexOf(".") + 1);
-
-  if ( ! auth.check(x, of + ".rw." + axiomName.toLowerCase()) && ! auth.check(x, of + ".ro." + axiomName.toLowerCase()) ) axiom.clear(obj);
-      `,
-    },
+    }
   ],
 
   axioms: [
