@@ -11,10 +11,10 @@
   documentation: 'Rule model represents rules(actions) that need to be applied in case passed object satisfies provided predicate.',
 
   javaImports: [
-    'foam.core.AsyncAgency',
     'foam.core.ContextAware',
     'foam.core.FObject',
     'foam.core.X',
+    'foam.nanos.ruler.AsyncAgency',
     'foam.nanos.logger.Logger',
     'java.util.Collection'
   ],
