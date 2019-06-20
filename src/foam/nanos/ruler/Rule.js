@@ -28,6 +28,18 @@
     'documentation'
   ],
 
+  searchColumns: [
+    'id',
+    'name',
+    'ruleGroup',
+    'enabled',
+    'priority',
+    'daoKey',
+    'operation',
+    'after',
+    'validity'
+  ],
+
   properties: [
     {
       class: 'Long',
