@@ -42,6 +42,3 @@ p({"class":"foam.nanos.menu.Menu","id":"dashboard-demo","handler":{"class":"foam
 p({"class":"foam.nanos.menu.Menu","id":"sugar","label":"SUGAR","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"sugarDAO"},"order":2000,"parent":"integration"})
 
 p({"class":"foam.nanos.menu.Menu","id":"admin.countries","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"countryDAO","browseViews":[{"class":"foam.comics.v2.BrowseView","name":"Table","view":{"class":"foam.u2.view.ScrollTableView"}}]}}})
-
-p({"class":"foam.nanos.menu.Menu","id":"csv","label":"CSV","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"1560547302072":""}}})
-p({"class":"foam.nanos.menu.Menu","id":"csv","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.u2.DetailView","of":"foam.lib.csv.UploadDemo"}}})
