@@ -37,15 +37,24 @@ foam.CLASS({
   
   properties: [
     {
+      documentation: `true when createPipeline has been called.
+both enabled.postSet and Builder.init_() can call createPipeline.`,
+      name: 'initialized',
+      class: 'Boolean',
+      value: false
+    },
+    {
       name: 'enabled',
       class: 'Boolean',
-      value: false,
+      value: true,
       javaPostSet: `
-      if ( ! val ) {
+      if ( enabled_ != val ) {
+        boolean toggled = false;
         DAO d = getDelegate();
         while ( d != null ) {
           if ( d instanceof PipelinePMDAO ) {
             ((EnabledAware) d).setEnabled(val);
+            toggled = true;
             break;
           }
           if ( d instanceof ProxyDAO ) {
@@ -53,6 +62,11 @@ foam.CLASS({
           } else {
             break;
           }
+        }
+        if ( val &&
+             ! toggled ) {
+          // createPipeline has yet to be called. 
+          createPipeline();
         }
       }
       `
@@ -135,7 +149,7 @@ foam.CLASS({
     if ( getEnabled() ) {
       createPipeline();
     }
-`
+    `
     },
     {
       documentation: `
@@ -172,6 +186,14 @@ If the delegate of that is also a ProxyDAO, creates a new PipelinedPMDAO in the 
 `,
       name: 'createPipeline',
       javaCode: `
+    synchronized (this) {
+      if ( getInitialized() ) {
+        return;
+      } else {
+        setInitialized(true);
+      }
+    }
+((foam.nanos.logger.Logger) getX().get("logger")).debug("PipelinePMDAO createPipeline INITIALIZED");
     DAO delegate = getDelegate();
     DAO secondaryDelegate;
     secondaryDelegate = ((ProxyDAO) delegate).getDelegate();
