@@ -22,6 +22,7 @@ foam.CLASS({
     'foam.core.X',
     'foam.mlang.order.Comparator',
     'foam.mlang.predicate.Predicate',
+    'foam.nanos.auth.EnabledAware',
     'foam.nanos.pm.PM',
   ],
 
@@ -38,7 +39,23 @@ foam.CLASS({
     {
       name: 'enabled',
       class: 'Boolean',
-      value: false
+      value: false,
+      javaPostSet: `
+      if ( ! val ) {
+        DAO d = getDelegate();
+        while ( d != null ) {
+          if ( d instanceof PipelinePMDAO ) {
+            ((EnabledAware) d).setEnabled(val);
+            break;
+          }
+          if ( d instanceof ProxyDAO ) {
+            d = ((ProxyDAO) d).getDelegate();
+          } else {
+            break;
+          }
+        }
+      }
+      `
     },
     {
       name: 'nSpec',
