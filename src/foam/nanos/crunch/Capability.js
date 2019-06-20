@@ -18,8 +18,8 @@ foam.CLASS({
   ids: [
     'name'
   ],
-
   properties: [
+    
     {
       name: 'name',
       class: 'String',
@@ -68,6 +68,20 @@ foam.CLASS({
       name: 'capabilitiesRequired',
       class: 'StringArray',
       documentation: `prerequisite capabilities required to unlock this capability`
+    },
+    {
+      name: 'permissionsGranted',
+      class: 'StringArray',
+      documentation: `list of permissions granted by this capability`
+    },
+    {
+      name: 'permissionsIntercepted',
+      class: 'StringArray'
+    },
+    {
+      name: 'daoKey',
+      class: 'String',
+      visibility: 'RO'
     }
   ],
 
@@ -82,6 +96,9 @@ foam.CLASS({
       ],
       documentation: `checks if passed permission is in the list of this.capability.capabilitiesRequired.`,
       code: function implies(x, permission) {
+        this.permissionsGranted.forEach(function(permissionName) {
+          if(permission.getId() === permissionName) return true;
+        });
         this.capabilitiesRequired.forEach(function(capabilityName) {
           capabilityDAO.find(capabilityName).then((capability) => {
             if(capability.implies(x, permission)) return true;
@@ -90,6 +107,10 @@ foam.CLASS({
         return false;
       },
       javaCode: `
+        String[] permissionsGranted = this.getPermissionsGranted();
+        for(String permissionName : permissionsGranted) {
+          if(permission.getId().equals(permissionName)) return true;
+        }
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         String[] prereqs = this.getCapabilitiesRequired();
         for(String capabilityName : prereqs) {
@@ -110,4 +131,5 @@ foam.RELATIONSHIP({
   forwardName: 'capabilities',
   inverseName: 'user'
 });
+
 
