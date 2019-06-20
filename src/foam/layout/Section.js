@@ -33,7 +33,7 @@ foam.CLASS({
     {
       class: 'Function',
       name: 'createIsAvailableFor',
-      value: function(data$) {
+      value: function(x, data$) {
         return foam.core.ConstantSlot.create({value: true});
       }
     }

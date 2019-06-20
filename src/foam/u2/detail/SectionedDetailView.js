@@ -42,7 +42,7 @@ foam.CLASS({
                 this
                   .start()
                     .style({ padding: '16px 0' })
-                    .show(s.createIsAvailableFor(self.data$))
+                    .show(s.createIsAvailableFor(self.__subSubContext__, self.data$))
                     .start('h2').add(s.title$).end()
                     .start(self.CardBorder)
                       .addClass('inner-card')

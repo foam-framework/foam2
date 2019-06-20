@@ -44,7 +44,7 @@ foam.CLASS({
         .add(self.slot(function(section, showTitle, section$title) {
           if ( ! section ) return;
           return self.Rows.create()
-            .show(section.createIsAvailableFor(self.data$))
+            .show(section.createIsAvailableFor(self.__subSubContext__, self.data$))
             .callIf(showTitle && section$title, function () {
               this.start('h2').add(section$title).end();
             })

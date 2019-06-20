@@ -420,7 +420,12 @@ foam.CLASS({
 
         var args = foam.Function.argNames(this.code);
         for ( var i = 0 ; i < args.length ; i++ ) {
-          args[i] = obj.slot(args[i]);
+          try {
+            args[i] = obj.slot(args[i]);
+          } catch {
+            args[i] = this.__context__[args[i]+'$'] ||
+              foam.core.ConstantSlot.create();
+          }
         }
 
         // this.invalidate(); // ???: Is this needed?

@@ -40,11 +40,11 @@ foam.CLASS({
     }
   ],
   methods: [
-    function createIsAvailableFor(data$) {
+    function createIsAvailableFor(x, data$) {
       var slot = foam.core.ExpressionSlot.create({
         obj$: data$,
         code: this.isAvailable
-      });
+      }, x);
 
       if ( this.permissionRequired ) {
         var permSlot = data$.map(data => {
