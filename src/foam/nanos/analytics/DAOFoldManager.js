@@ -7,12 +7,20 @@
 foam.CLASS({
   package: 'foam.nanos.analytics',
   name: 'DAOFoldManager',
+
   implements: [
     'foam.nanos.analytics.FoldManager'
   ],
+
   requires: [
     'foam.nanos.analytics.Candlestick'
   ],
+
+  javaImports: [
+    'foam.core.X',
+    'java.util.Date'
+  ],
+
   properties: [
     {
       class: 'foam.dao.DAOProperty',
@@ -23,37 +31,36 @@ foam.CLASS({
       name: 'periodLengthMs'
     }
   ],
+
   methods: [
     {
       name: 'foldForState',
-      // TODO: use a more efficient key based lock
-      synchronized: true,
       javaCode: `
-foam.core.X x = getX();
+        X    x         = getX();
+        long periodMs  = getPeriodLengthMs();
+        Date closeTime = new java.util.Date();
 
-long periodMs = getPeriodLengthMs();
-java.util.Date closeTime = new java.util.Date();
-closeTime.setTime((time.getTime() / periodMs) * periodMs + periodMs);
+        closeTime.setTime((time.getTime() / periodMs) * periodMs + periodMs);
 
-foam.nanos.analytics.CandlestickId id = new foam.nanos.analytics.CandlestickId.Builder(x)
-  .setCloseTime(closeTime)
-  .setKey(key)
-  .build();
+        CandlestickId id = new CandlestickId();
+        id.setCloseTime(closeTime);
+        id.setKey(key);
+        id.init_();
 
-foam.nanos.analytics.Candlestick c = (foam.nanos.analytics.Candlestick) getDao().find(id);
-if ( c == null ) {
-  java.util.Date openTime = new java.util.Date();
-  openTime.setTime(closeTime.getTime() - getPeriodLengthMs());
+        Candlestick c = (Candlestick) getDao().find(id);
+        if ( c == null ) {
+          Date openTime = new Date();
+          openTime.setTime(closeTime.getTime() - getPeriodLengthMs());
 
-  c = new foam.nanos.analytics.Candlestick.Builder(x)
-    .setCloseTime(closeTime)
-    .setOpenTime(openTime)
-    .setKey(key)
-    .build();
-}
-c.add(value, time);
+          c = new Candlestick(x);
+          c.setCloseTime(closeTime);
+          c.setOpenTime(openTime);
+          c.setKey(key);
+          c.init_();
+        }
+        c.add(value, time);
 
-getDao().put(c);
+        getDao().put(c);
       `
     }
   ]
