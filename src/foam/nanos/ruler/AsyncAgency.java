@@ -6,7 +6,7 @@ import foam.core.X;
 
 /**
  * AsyncAgency is passed to async rule.action
- * for immidiate execution of agent.
+ * for immediate execution of agent.
  */
 public class AsyncAgency implements Agency {
 
