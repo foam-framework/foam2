@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'RulerProbe',
   documentation: `A helper model used to test dao operation for provided "obj".
   Returned with populated appliedRules(Map<Rule, boolean>) property that describes what rules will be applied successfully/unsuccessfully.
+  Does not probe async actions. 
   Usage example:
       user = new User();
       rulerProbe = new RulerProbe();
@@ -19,7 +20,7 @@ foam.CLASS({
   properties: [
     {
       class: 'List',
-      //javaType: 'java.util.ArrayList<TestedRule>',
+      javaType: 'java.util.ArrayList<TestedRule>',
       name: 'appliedRules',
       factory: function() {
         return [];
@@ -39,8 +40,8 @@ foam.CLASS({
       name: 'passed',
       class: 'Boolean',
       javaGetter: `
-      for ( Object rule : getAppliedRules() ) {
-        if ( ! ((TestedRule)rule).getPassed() ) return false;
+      for ( TestedRule rule : getAppliedRules() ) {
+        if ( ! rule.getPassed() ) return false;
       }
         return true;
       `,
