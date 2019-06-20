@@ -397,7 +397,8 @@ var classes = [
   // Crunch
   'foam.nanos.crunch.Capability',
   'foam.nanos.crunch.CapabilityJunctionStatus',
-  'foam.nanos.crunch.UserCapabilityJunction'
+  'foam.nanos.crunch.UserCapabilityJunction',
+  'foam.nanos.crunch.CapabilityCapabilityJunction'
   
 ];
 

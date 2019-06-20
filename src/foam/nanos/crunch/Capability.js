@@ -18,6 +18,17 @@ foam.CLASS({
   ids: [
     'name'
   ],
+
+  tableColumns: [
+    'name',
+    'description',
+    'version',
+    'enabled',
+    'visible',
+    'expiry',
+    'daoKey'
+  ],
+
   properties: [
     
     {
@@ -132,4 +143,11 @@ foam.RELATIONSHIP({
   inverseName: 'user'
 });
 
+foam.RELATIONSHIP({
+  sourceModel: 'foam.nanos.crunch.Capability',
+  targetModel: 'foam.nanos.crunch.Capability',
+  cardinality: '*:*',
+  forwardName: 'deprecatedBy',
+  inverseName: 'deprecates'
+});
 
