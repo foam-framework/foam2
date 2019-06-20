@@ -127,25 +127,27 @@ foam.CLASS({
   FObject obj = oldObj.fclone();
   AuthService auth = (AuthService) x.get("auth");
 
-  if ( propertyMap_.containsKey(of) ) {
-    List properties = propertyMap_.get(of);
-    Iterator e = properties.iterator();
-    while ( e.hasNext() ) {
-      PropertyInfo axiom = (PropertyInfo) e.next();
-      maybeRemove(axiom, of, auth, x, obj, oldObj);
-    }
-  } else {
+  if ( ! propertyMap_.containsKey(of) ) {
     List<PropertyInfo> properties = new ArrayList<>();
     List list = oldObj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
     Iterator e = list.iterator();
     while ( e.hasNext() ) {
       PropertyInfo axiom = (PropertyInfo) e.next();
       if ( axiom.getPermissionRequired() ) {
-        properties.add(axiom);
-        maybeRemove(axiom, of,auth, x, obj, oldObj);
+        boolean authCheck = auth.check(x, of + ".rw." + axiom.getName().toLowerCase()) || auth.check(x, of + ".ro." + axiom.getName().toLowerCase());
+        if ( ! authCheck ) {
+          properties.add(axiom);
+        }
       }
     }
     propertyMap_.put(of, properties);
+  }
+    
+  List properties = propertyMap_.get(of);
+  Iterator e = properties.iterator();
+  while ( e.hasNext() ) {
+    PropertyInfo axiom = (PropertyInfo) e.next();
+    axiom.clear(obj);
   }
 
   return obj;
@@ -260,8 +262,12 @@ foam.CLASS({
     {
       name: 'put',
       javaCode: `
-        FObject fo = ((FObject) obj).fclone();
-        getDelegate().put(dao.maybeRemoveProperties(getX(), fo), sub);
+  FObject oldObj = dao.getDelegate().find(((FObject) obj).getProperty("id"));
+  if (oldObj != null) {
+    getDelegate().put(dao.maybeRemoveProperties(getX(), oldObj), sub);
+  } else {
+    getDelegate().put(obj, sub);
+  }
       `
     }
   ],
