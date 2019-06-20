@@ -14,8 +14,8 @@ public class DAOPMLogger
   extends    ContextAwareSupport
   implements PMLogger
 {
-  public final static String SERVICE_NAME = "pmLogger";
-  public final static String PM_DAO_NAME  = "pmDAO";
+  public final static String SERVICE_NAME      = "pmLogger";
+  public final static String PM_DAO_NAME       = "pmDAO";
   public final static String PM_INFO_DAO_NAME  = "pmInfoDAO";
 
   protected X x_;
