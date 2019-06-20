@@ -12,7 +12,6 @@ foam.CLASS({
       javaCode: `
 if ( prop.getPermissionRequired() ) {
   String propName = prop.getName().toLowerCase();
-  String of = fo.getClass().getSimpleName().toLowerCase();
   AuthService auth = (AuthService) x.get("auth");
   return ( auth != null ) ? (auth.check(x,  of + ".ro." + propName) || auth.check(x,  of + ".rw." + propName)) : false;
 }

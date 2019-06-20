@@ -12,8 +12,8 @@ foam.INTERFACE({
           type: 'Context'
         },
         {
-          name: 'fo',
-          type: 'FObject'
+          name: 'of',
+          type: 'String'
         },
         {
           name: 'prop',

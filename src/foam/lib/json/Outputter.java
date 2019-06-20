@@ -19,6 +19,8 @@ import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
+import java.util.*;
+
 import org.apache.commons.io.IOUtils;
 
 public class Outputter
@@ -42,6 +44,7 @@ public class Outputter
   protected boolean       outputClassNames_    = true;
   protected boolean       outputReadableDates_ = true;
   protected PropertyPredicate propertyPredicate_;
+  protected Map<String, List<PropertyInfo>> propertyMap_ = new HashMap<>();
 
 
   public Outputter(foam.core.X x) {
@@ -260,11 +263,29 @@ public class Outputter
     writer_.append("}");
   }
 
-  protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
+  protected synchronized List getProperties(ClassInfo info) {
+    String of = info.getObjClass().getSimpleName();
 
-    if ( propertyPredicate_ != null && ! propertyPredicate_.propertyPredicateCheck(this.x_, fo, prop) ) {
-      return false;
+    if ( propertyMap_.containsKey(of) && propertyMap_.get(of).isEmpty() ) {
+      propertyMap_.remove(of);
     }
+
+    if ( ! propertyMap_.containsKey(of) ) {
+      List<PropertyInfo> filteredAxioms = new ArrayList<>();
+      Iterator e = info.getAxiomsByClass(PropertyInfo.class).iterator();
+      while ( e.hasNext() ) {
+        PropertyInfo prop = (PropertyInfo) e.next();
+        if ( propertyPredicate_ == null || propertyPredicate_.propertyPredicateCheck(this.x_, of.toLowerCase(), prop) ) {
+          filteredAxioms.add(prop);
+        }
+      }
+      propertyMap_.put(of, filteredAxioms);
+      return filteredAxioms;
+    }
+    return propertyMap_.get(of);
+  }
+
+  protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
 
     if ( ! outputDefaultValues_ && ! prop.isSet(fo) ) return false;
 
@@ -285,7 +306,7 @@ public class Outputter
     boolean   isPropertyDiff = false;
 
     if ( ! oldFObject.equals(newFObject) ) {
-      List     axioms = info.getAxiomsByClass(PropertyInfo.class);
+      List     axioms = getProperties(info);
       Iterator i      = axioms.iterator();
 
       while ( i.hasNext() ) {
@@ -318,9 +339,6 @@ public class Outputter
   }
 
   protected boolean maybeOutputPropertyDelta(FObject oldFObject, FObject newFObject, PropertyInfo prop) {
-    if ( propertyPredicate_ != null && ! propertyPredicate_.propertyPredicateCheck(this.x_, newFObject, prop) ) {
-      return false;
-    }
 
     return prop.compare(oldFObject, newFObject) != 0;
   }
@@ -343,7 +361,7 @@ public class Outputter
       outputString(info.getId());
     }
 
-    List     axioms      = info.getAxiomsByClass(PropertyInfo.class);
+    List     axioms      = getProperties(info);
     Iterator i           = axioms.iterator();
     boolean  outputComma = outputClassNames_;
     while ( i.hasNext() ) {
