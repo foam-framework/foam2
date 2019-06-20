@@ -43,13 +43,6 @@ public class DAOPMLogger
     foam.dao.DAO dao = (foam.dao.DAO) getX().get(PM_DAO_NAME);
     if ( dao != null ) {
       dao.put(pm);
-    } else {
-      foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
-      if ( logger != null ) {
-        logger.warning(this.getClass().getName(), "pmDAO not found in context for", pm.getId());
-      } else {
-        System.out.println(this.getClass().getName()+": pmDAO and logger not found in context for "+pm.getId());
-      }
     }
 
     // Regular PMInfo
@@ -78,7 +71,16 @@ public class DAOPMLogger
 
         dpmi.setCount(dpmi.getCount() + 1);
         dpmi.setTotalTime(dpmi.getTotalTime() + pm.getTime());
-        pmd.put(dpmi);
+
+        if ( dpmi.getCapture() ) {
+          StringBuilder trace = new StringBuilder();
+          for ( StackTraceElement j : Thread.currentThread().getStackTrace() ) {
+            trace.append(j.toString());
+            trace.append(System.getProperty("line.separator"));
+          }
+          dpmi.setCapture(false);
+          dpmi.setCaptureTrace(trace.toString());
+        }
       }
     }
   }

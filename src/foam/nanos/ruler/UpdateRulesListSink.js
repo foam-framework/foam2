@@ -36,6 +36,7 @@ foam.CLASS({
         String ruleGroup = rule.getRuleGroup();
         for ( Object key : rulesList.keySet() ) {
           if ( ((Predicate) key).f(obj) ) {
+            rule.setX(getX());
             GroupBy group = (GroupBy) rulesList.get(key);
             if ( group.getGroupKeys().contains(ruleGroup) ) {
               List<Rule> rules = ((ArraySink) group.getGroups().get(ruleGroup)).getArray();
@@ -46,7 +47,9 @@ foam.CLASS({
                   rules.add(foundRule.updateRule(rule));
                 }
               } else {
-                rules.add(rule);
+                if ( rule.getEnabled() ) {
+                  rules.add(rule);
+                }
               }
               Collections.sort(rules, new Desc(Rule.PRIORITY));
             } else {
