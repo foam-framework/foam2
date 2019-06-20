@@ -20,15 +20,10 @@ foam.CLASS({
   ],
 
   properties: [
-    // {
-    //   name: 'id',
-    //   class: 'Long',
-    //   documentation: `handled by the SequenceNumberDAO`
-    // },
     {
       name: 'name',
       class: 'String',
-      documentation: `name of the capability`
+      documentation: `name/id of the capability`
     }, 
     {
       name: 'icon',
