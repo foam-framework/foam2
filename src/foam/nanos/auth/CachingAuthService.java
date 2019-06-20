@@ -10,6 +10,7 @@ import foam.nanos.session.Session;
 import java.security.Permission;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
+import javax.security.auth.AuthPermission;
 
 /**
  * Decorator to add Caching to AuthService.
@@ -56,5 +57,10 @@ public class CachingAuthService
     map.put(permission.getName(), permissionCheck);
 
     return permissionCheck;
+  }
+
+  @Override
+  public boolean check(foam.core.X x, String permission) {
+    return checkPermission(x, new AuthPermission(permission));
   }
 }
