@@ -632,7 +632,6 @@ FOAM_FILES([
   { name: "foam/comics/v2/DAOUpdateView" },
   { name: "foam/comics/v2/NamedViews" },
   { name: "foam/comics/v2/ViewSpecWithJava" },
-  { name: "foam/comics/v2/DataSummaryCard" },
 
   { name: "foam/layout/Section" },
   { name: "foam/layout/SectionAxiom" },
