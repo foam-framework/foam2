@@ -23,6 +23,8 @@ foam.CLASS({
     },
     {
       name: 'data',
+      class: 'FObjectProperty',
+      documentation: `data for capability.of`
     },
     {
       name: 'status',
@@ -30,10 +32,5 @@ foam.CLASS({
       of: 'foam.nanos.crunch.CapabilityJunctionStatus',
       value: foam.nanos.crunch.CapabilityJunctionStatus.PENDING
     }
-  ],
-
-
-  methods: [
-
   ]
 });

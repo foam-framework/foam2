@@ -4,19 +4,11 @@ foam.ENUM({
   values: [
     {
       name: 'PENDING',
-      label: 'Pending'
+      label: 'pending'
     },
     {
-      name: 'EXPIRED',
-      label: 'Expired'
-    },
-    {
-      name: 'DEPRECATED',
-      label: 'deprecated'
-    },
-    {
-      name: 'APPROVED',
-      label: 'approved'
+      name: 'GRANTED',
+      label: 'granted'
     }
   ]
 });
