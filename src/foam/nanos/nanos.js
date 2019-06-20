@@ -202,5 +202,12 @@ FOAM_FILES([
   { name: "foam/nanos/test/SerializationTestEchoService" },
   { name: "foam/nanos/analytics/Foldable" },
   { name: "foam/nanos/analytics/Candlestick" },
-  { name: "foam/nanos/test/ClientEchoService" }
+  { name: "foam/nanos/test/ClientEchoService" },
+
+  // foam/nanos/crunch
+  { name: "foam/nanos/crunch/Capability" },
+  { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
+  { name: "foam/nanos/crunch/UserCapabilityJunctionRefine" },
+
+
 ]);

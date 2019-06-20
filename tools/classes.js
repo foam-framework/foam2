@@ -392,7 +392,13 @@ var classes = [
   'io.c9.ace.Theme',
 
   // Themes
-  'foam.nanos.theme.Theme'
+  'foam.nanos.theme.Theme',
+
+  // Crunch
+  'foam.nanos.crunch.Capability',
+  'foam.nanos.crunch.CapabilityJunctionStatus',
+  'foam.nanos.crunch.UserCapabilityJunction'
+  
 ];
 
 var abstractClasses = [
