@@ -33,11 +33,13 @@ foam.CLASS({
   methods: [
     function initE() {
       this.SUPER();
-      this.tag({
-        class: 'foam.u2.detail.SectionedDetailPropertyView',
-        data: this,
-        prop: this.SEARCH
-      });
+      this.startContext({ controllerMode: foam.u2.ControllerMode.EDIT })
+        .tag({
+          class: 'foam.u2.detail.SectionedDetailPropertyView',
+          data: this,
+          prop: this.SEARCH
+        })
+      .endContext()
     }
   ]
 });
