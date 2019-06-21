@@ -38,7 +38,7 @@ for ( Runnable agent : getAgents() ) {
   try {
     agent.run();
   } catch (Throwable t) {
-    logger.info(t.getMessage());
+    logger.warning(t.getMessage());
     e.add(t);
   }
 }
