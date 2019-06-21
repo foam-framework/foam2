@@ -4,7 +4,7 @@
  *     http://www.apache.org/licenses/LICENSE-2.0
  */
 
- package foam.nanos.ruler;
+package foam.core;
 
 import foam.core.Agency;
 import foam.core.ContextAgent;
