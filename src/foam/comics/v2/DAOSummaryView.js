@@ -99,12 +99,11 @@ foam.CLASS({
     {
       name: 'delete',
       code: function() {
-        var self = this;
-        this.config.dao.remove(this.data).then(function() {
-          self.finished.pub();
-          self.stack.back();
-        }, function(e) {
-          self.throwError.pub(e);
+        this.config.dao.remove(this.data).then(o => {
+          this.finished.pub();
+          this.stack.back();
+        }, e => {
+          this.throwError.pub(e);
         });
       }
     }
@@ -150,7 +149,7 @@ foam.CLASS({
               .end()
 
               .start(config$viewBorder)
-                .start(foam.u2.detail.SectionedDetailView, { data: data.clone(self.__subContext__) })
+                .start(foam.u2.detail.SectionedDetailView, { data: data })
                   .addClass(this.myClass('view-container'))
                 .end()
               .end()
