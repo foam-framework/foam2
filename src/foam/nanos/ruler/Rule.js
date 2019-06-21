@@ -11,7 +11,6 @@
   documentation: 'Rule model represents rules(actions) that need to be applied in case passed object satisfies provided predicate.',
 
   javaImports: [
-    'foam.core.AsyncAgency',
     'foam.core.ContextAware',
     'foam.core.FObject',
     'foam.core.X',
@@ -233,7 +232,7 @@
         }
       ],
       javaCode: `
-        getAsyncAction().applyAction(x, obj, oldObj, ruler, new AsyncAgency());
+        getAsyncAction().applyAction(x, obj, oldObj, ruler, null);
         if ( ! getAfter() ) {
           ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }
