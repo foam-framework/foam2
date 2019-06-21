@@ -15,4 +15,3 @@ return ! prop.getStorageTransient();
     }
   ]
 });
-  
