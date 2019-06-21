@@ -260,12 +260,8 @@ foam.CLASS({
     {
       name: 'put',
       javaCode: `
-  FObject oldObj = this.dao.getDelegate().find(((FObject) obj).getProperty("id"));
-  if (oldObj != null) {
-    getDelegate().put(this.dao.maybeRemoveProperties(getX(), oldObj), sub);
-  } else {
-    getDelegate().put(obj, sub);
-  }
+        FObject fo = ((FObject) obj).fclone();
+        getDelegate().put(dao.maybeRemoveProperties(getX(), fo), sub);
       `
     }
   ],

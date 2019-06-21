@@ -76,7 +76,6 @@ return getDelegate().put_(x, obj);
       buildJavaClass: function(cls) {
         cls.extras.push(`
 public GUIDDAO(DAO delegate) {
-  System.err.println("Direct constructor use is deprecated. Use Builder instead.");
   setDelegate(delegate);
 }
         `);
