@@ -25,9 +25,9 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'checkPermission',
+      name: 'check',
       documentation: `
-      check a permission of a user by checking whether the capabilities of the user implies the permission
+      check a permission of current by checking whether the capabilities of the user implies the permission
       `,
       javaCode: `
       if ( x == null || permission == null ) return false;
@@ -37,12 +37,19 @@ foam.CLASS({
       User user = (User) x.get("user");
       if(user == null || !user.getEnabled()) return false;
 
+      return checkUser(x, user, permission);
+      `
+    }, 
+    {
+      name: 'checkUser',
+      javaCode: `
+      if ( x == null || user == null || permission == null) return false;
+
       try {
         DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-        //TODO RUBY Change SOURCE_ID to USER_ID
         List<UserCapabilityJunction> userCapabilityJunctions = (List<UserCapabilityJunction>) ((ArraySink) userCapabilityJunctionDAO
           .where(AND(
-            EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
+            EQ(UserCapabilityJunction.USER_ID, user.getId()),
             EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
           )) 
           .select(new ArraySink()))
@@ -60,6 +67,19 @@ foam.CLASS({
       } catch (Throwable t) {
       } 
       return false;
+      
+      `
+    },
+    {
+      name: 'checkPermission',
+      javaCode: `
+      return check(x, permission.getName());
+      `
+    },
+    {
+      name: 'checkUserPermission',
+      javaCode: `
+      return checkUser(x, user, permission.getName());
       `
     },
   ]

@@ -8,8 +8,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.X',
-    'foam.dao.DAO',
-    'java.security.Permission'
+    'foam.dao.DAO'
   ],
 
   ids: [
@@ -100,12 +99,12 @@ foam.CLASS({
       type: 'Boolean',
       args: [
         { name: 'x', type: 'Context' },
-        { name: 'permission', type: 'java.security.Permission' }
+        { name: 'permission', type: 'String' }
       ],
       documentation: `checks if passed permission is in the list of this.capability.capabilitiesRequired.`,
       code: function implies(x, permission) {
         this.permissionsGranted.forEach(function(permissionName) {
-          if(permission.getId() === permissionName) return true;
+          if(permission === permissionName) return true;
         });
         this.capabilitiesRequired.forEach(function(capabilityName) {
           capabilityDAO.find(capabilityName).then((capability) => {
@@ -117,7 +116,7 @@ foam.CLASS({
       javaCode: `
         String[] permissionsGranted = this.getPermissionsGranted();
         for(String permissionName : permissionsGranted) {
-          if((permission.toString()).equals(permissionName)) return true; // TODO RUBY change permission.toString()
+          if(permission.equals(permissionName)) return true; 
         }
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         String[] prereqs = this.getCapabilitiesRequired();
