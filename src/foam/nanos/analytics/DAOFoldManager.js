@@ -40,6 +40,7 @@ setCloseTimeExpr(new foam.glang.EndOfTimeSpan.Builder(getX())
     {
       class: 'foam.mlang.ExprProperty',
       name: 'closeTimeExpr'
+    },
     {
       class: 'Object',
       javaType: 'Object[]',
@@ -81,7 +82,7 @@ setCloseTimeExpr(new foam.glang.EndOfTimeSpan.Builder(getX())
           Candlestick c = (Candlestick) getDao().find(id);
           if ( c == null ) {
             c = new Candlestick(x);
-            c.setCloseTime(closeTime);
+            c.setCloseTime(id.getCloseTime());
             c.setKey(key);
             c.init_();
           }
