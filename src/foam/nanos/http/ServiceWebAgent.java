@@ -74,7 +74,6 @@ public class ServiceWebAgent
       HttpServletRequest  req            = x.get(HttpServletRequest.class);
       HttpServletResponse resp           = x.get(HttpServletResponse.class);
       PrintWriter         out            = x.get(PrintWriter.class);
-      //BufferedReader      reader         = req.getReader();
       BufferedReader reader  = new BufferedReader(new InputStreamReader(req.getInputStream()));
       X                   requestContext = x.put("httpRequest", req).put("httpResponse", resp);
       Logger              logger         = (Logger) x.get("logger");
