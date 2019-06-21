@@ -204,7 +204,10 @@ addRuleList(ruleDAO, getRemoveAfter());`
     },
     {
       name: 'cmd_',
-      javaCode: `
+      javaCode: `if ( PUT_CMD == obj ) {
+  getDelegate().put((FObject) x.get("OBJ"));
+  return true;
+}
 if ( ! ( obj instanceof RulerProbe ) ) return getDelegate().cmd_(x, obj);
   RulerProbe probe = (RulerProbe) obj;
   switch ( probe.getOperation() ) {

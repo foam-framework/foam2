@@ -53,10 +53,10 @@ public class MapDAO
     }
     obj = obj.fclone();
     obj.freeze();
-
+    
     getData().put(key, obj);
     onPut(obj);
-
+    
     return obj;
   }
 

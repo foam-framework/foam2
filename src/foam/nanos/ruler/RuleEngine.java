@@ -66,9 +66,8 @@ public class RuleEngine extends ContextAwareSupport {
       pm.log(x_);
       agency.submit(x_, x -> saveHistory(rule, obj));
     }
-    compoundAgency.execute(x_);
     try {
-      //compoundAgency.execute(x_);
+      compoundAgency.execute(x_);
     } catch (Exception e) {
       Logger logger = (Logger) x_.get("logger");
       logger.error(e.getMessage());
