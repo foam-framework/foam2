@@ -29,16 +29,40 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'periodLengthMs'
+    },
+    {
+      class: 'Object',
+      javaType: 'Object[]',
+      name: 'locks',
+      transient: true,
+      javaFactory: `
+        Object[] locks = new Object[128];
+        for ( int i = 0 ; i < locks.length ; i++ )
+          locks[i] = new Object();
+        return locks;
+      `
     }
   ],
 
   methods: [
     {
+      name: 'getLock',
+      type: 'Object',
+      args: [
+        { name: 'key', type: 'Object' }
+      ],
+      javaCode: `
+        int hash = key.hashCode();
+        Object[] locks = getLocks();
+        return locks[(int) (Math.abs(hash) % locks.length)];
+      `
+    },
+    {
       name: 'foldForState',
       javaCode: `
         X    x         = getX();
         long periodMs  = getPeriodLengthMs();
-        Date closeTime = new java.util.Date();
+        Date closeTime = new Date();
 
         closeTime.setTime((time.getTime() / periodMs) * periodMs + periodMs);
 
@@ -47,20 +71,22 @@ foam.CLASS({
         id.setKey(key);
         id.init_();
 
-        Candlestick c = (Candlestick) getDao().find(id);
-        if ( c == null ) {
-          Date openTime = new Date();
-          openTime.setTime(closeTime.getTime() - getPeriodLengthMs());
+        synchronized ( getLock(key) ) {
+          Candlestick c = (Candlestick) getDao().find(id);
+          if ( c == null ) {
+            Date openTime = new Date();
+            openTime.setTime(closeTime.getTime() - getPeriodLengthMs());
 
-          c = new Candlestick(x);
-          c.setCloseTime(closeTime);
-          c.setOpenTime(openTime);
-          c.setKey(key);
-          c.init_();
+            c = new Candlestick(x);
+            c.setCloseTime(closeTime);
+            c.setOpenTime(openTime);
+            c.setKey(key);
+            c.init_();
+          }
+          c.add(value, time);
+
+          getDao().put(c);
         }
-        c.add(value, time);
-
-        getDao().put(c);
       `
     }
   ]
