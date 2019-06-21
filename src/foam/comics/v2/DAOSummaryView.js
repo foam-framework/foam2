@@ -81,6 +81,13 @@ foam.CLASS({
         var defaultAction = allActions.filter(a => a.isDefault);
         return defaultAction.length >= 1 ? defaultAction[0] : allActions[0];
       }
+    },
+    {
+      class: 'foam.u2.ViewSpecWithJava',
+      name: 'viewView',
+      expression: function() {
+        return foam.u2.detail.SectionedDetailView;
+      }
     }
   ],
   actions: [
@@ -114,7 +121,7 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(data, config, config$viewBorder) {
+        .add(self.slot(function(data, config, config$viewBorder, viewView) {
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -131,7 +138,7 @@ foam.CLASS({
                     .add(data.toSummary())
                       .addClass(this.myClass('account-name'))
                   .end()
-                  .startContext({data: data}).add(self.primary).endContext()
+                  .startContext({ data }).add(self.primary).endContext()
                 .end()
               .end()
 
@@ -149,9 +156,7 @@ foam.CLASS({
               .end()
 
               .start(config$viewBorder)
-                .start(foam.u2.detail.SectionedDetailView, { data: data })
-                  .addClass(this.myClass('view-container'))
-                .end()
+                .start(viewView, { data }).addClass(this.myClass('view-container')).end()
               .end()
             .end();
         }));
