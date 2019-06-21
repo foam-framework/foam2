@@ -9,12 +9,9 @@ foam.CLASS({
       'foam.nanos.crunch.Capability',
       'foam.nanos.crunch.UserCapabilityJunction',
       'foam.nanos.crunch.CapabilityJunctionStatus',
-      'foam.core.FObject',
       'foam.dao.ArraySink',
-      'foam.dao.Sink',
       'foam.dao.DAO',
       'java.util.List',
-      'java.util.Map',
       'static foam.mlang.MLang.*'
     ],
   
@@ -39,8 +36,6 @@ foam.CLASS({
         `,
         javaCode: `
         CapabilityCapabilityJunction junction = (CapabilityCapabilityJunction) getDelegate().put_(x, obj);
-        System.out.println("ih3iorhewoimfapofjpmdsokfposadpoi");
-        System.out.println(obj);
 
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
 

@@ -399,7 +399,8 @@ var classes = [
   'foam.nanos.crunch.CapabilityJunctionStatus',
   'foam.nanos.crunch.UserCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
-  'foam.nanos.crunch.CapabilityCapabilityJunctionDAO'
+  'foam.nanos.crunch.CapabilityCapabilityJunctionDAO',
+  'foam.nanos.auth.CapabilityAuthService'
   
 ];
 
