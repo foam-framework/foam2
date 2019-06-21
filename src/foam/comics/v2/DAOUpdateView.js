@@ -89,13 +89,13 @@ foam.CLASS({
     {
       name: 'save',
       code: function() {
-        var self = this;
         this.data.copyFrom(this.workingData);
-        this.config.dao.put(this.data).then(function() {
-          self.finished.pub();
-          self.stack.back();
-        }, function(e) {
-          self.throwError.pub(e);
+        this.config.dao.put(this.data).then(o => {
+          this.data = o;
+          this.finished.pub();
+          this.stack.back();
+        }, e => {
+          this.throwError.pub(e);
         });
       }
     },

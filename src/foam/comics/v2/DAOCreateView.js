@@ -88,14 +88,14 @@ foam.CLASS({
     {
       name: 'save',
       code: function() {
-        var self = this;
         this.data = this.workingData;
         this.data.owner = this.__subContext__.user.id;
-        this.config.dao.put(this.data).then(function() {
-          self.finished.pub();
-          self.stack.back();
-        }, function(e) {
-          self.throwError.pub(e);
+        this.config.dao.put(this.data).then(o => {
+          this.data = o;
+          this.finished.pub();
+          this.stack.back();
+        }, e => {
+          this.throwError.pub(e);
         });
       }
     },
