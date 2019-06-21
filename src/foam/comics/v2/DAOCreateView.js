@@ -90,7 +90,6 @@ foam.CLASS({
       code: function() {
         var self = this;
         this.data = this.workingData;
-        this.data.createdBy = this.__subContext__.user.id;
         this.data.owner = this.__subContext__.user.id;
         this.config.dao.put(this.data).then(function() {
           self.finished.pub();
