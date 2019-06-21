@@ -217,30 +217,16 @@ foam.CLASS({
       name: 'javaValidateObj',
       expression: function(validationPredicates) {
         return validationPredicates
-          .map(vp => {
+          .map((vp) => {
             return `
-if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
-  throw new IllegalStateException(${foam.java.asJavaValue(vp.errorString)});
-}
+              if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
+                throw new IllegalStateException(${foam.java.asJavaValue(vp.errorString)});
+              }
             `;
           })
           .join('');
       }
-    },
-    {
-      class: 'String',
-      name: 'javaToCSV',
-      expression: function() {
-        return this.javaValue;
-      }
-    },
-    {
-      class: 'String',
-      name: 'javaToCSVLabel',
-      expression: function() {
-        return this.name;
-      }
-    },
+    }
   ],
 
   methods: [
@@ -278,9 +264,7 @@ if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
         includeInSignature:      this.includeInSignature,
         containsPII:             this.containsPII,
         containsDeletablePII:    this.containsDeletablePII,
-        validateObj:             this.javaValidateObj,
-        toCSV:                   this.javaToCSV,
-        toCSVLabel:              this.javaToCSVLabel
+        validateObj:             this.javaValidateObj
       });
     },
 
@@ -1133,22 +1117,26 @@ foam.CLASS({
         body: `outputter.output(getOrdinal(value));`
       });
 
-      info.method({
-        name: 'toCSV',
-        visibility: 'public',
-        type: 'void',
-        args: [
-          {
-            name: 'outputter',
-            type: 'foam.lib.csv.Outputter'
-          },
-          {
-            name: 'value',
-            type: 'Object'
-          }
-        ],
-        body: `outputter.output(getOrdinal(value));`
-      });
+      // info.method({
+      //   name: 'toCSV',
+      //   visibility: 'public',
+      //   type: 'void',
+      //   args: [
+      //     {
+      //       name: 'obj',
+      //       type: 'Object'
+      //     },
+      //     {
+      //       name: 'outputter',
+      //       type: 'foam.lib.csv.Outputter'
+      //     },
+      //     {
+      //       name: 'value',
+      //       type: 'Object'
+      //     }
+      //   ],
+      //   body: `outputter.output(getOrdinal(value));`
+      // });
 
       var cast = info.getMethod('cast');
       cast.body = `if ( o instanceof Integer ) {

@@ -176,7 +176,7 @@ public class Outputter
 
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
-      prop.toCSV(this, prop.f(obj));
+      // prop.toCSV(this, prop.f(obj));
       if ( i.hasNext() )
         writer_.append(",");
     }
