@@ -56,9 +56,6 @@ foam.CLASS({
           x.get("user")) ;
         DAO userDAO = (DAO) x.get("localUserDAO");
 
-        // fetch from user dao to get secret key
-        user = (User) userDAO.find(user.getId());
-
         // generate secret key, encode as base32 and store
         String key = BaseEncoding.base32().encode(generateSecret(KEY_SIZE));
         key = key.replaceFirst("[=]*$", "");
