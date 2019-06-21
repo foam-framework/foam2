@@ -7,12 +7,20 @@
 foam.CLASS({
   package: 'foam.nanos.analytics',
   name: 'DAOFoldManager',
+
   implements: [
     'foam.nanos.analytics.FoldManager'
   ],
+
   requires: [
     'foam.nanos.analytics.Candlestick'
   ],
+
+  javaImports: [
+    'foam.core.X',
+    'java.util.Date'
+  ],
+
   properties: [
     {
       class: 'foam.dao.DAOProperty',
@@ -21,39 +29,64 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'periodLengthMs'
+    },
+    {
+      class: 'Object',
+      javaType: 'Object[]',
+      name: 'locks',
+      transient: true,
+      javaFactory: `
+        Object[] locks = new Object[128];
+        for ( int i = 0 ; i < locks.length ; i++ )
+          locks[i] = new Object();
+        return locks;
+      `
     }
   ],
+
   methods: [
     {
-      name: 'foldForState',
-      // TODO: use a more efficient key based lock
-      synchronized: true,
+      name: 'getLock',
+      type: 'Object',
+      args: [
+        { name: 'key', type: 'Object' }
+      ],
       javaCode: `
-foam.core.X x = getX();
+        int hash = key.hashCode();
+        Object[] locks = getLocks();
+        return locks[(int) (Math.abs(hash) % locks.length)];
+      `
+    },
+    {
+      name: 'foldForState',
+      javaCode: `
+        X    x         = getX();
+        long periodMs  = getPeriodLengthMs();
+        Date closeTime = new Date();
 
-long periodMs = getPeriodLengthMs();
-java.util.Date closeTime = new java.util.Date();
-closeTime.setTime((time.getTime() / periodMs) * periodMs + periodMs);
+        closeTime.setTime((time.getTime() / periodMs) * periodMs + periodMs);
 
-foam.nanos.analytics.CandlestickId id = new foam.nanos.analytics.CandlestickId.Builder(x)
-  .setCloseTime(closeTime)
-  .setKey(key)
-  .build();
+        CandlestickId id = new CandlestickId();
+        id.setCloseTime(closeTime);
+        id.setKey(key);
+        id.init_();
 
-foam.nanos.analytics.Candlestick c = (foam.nanos.analytics.Candlestick) getDao().find(id);
-if ( c == null ) {
-  java.util.Date openTime = new java.util.Date();
-  openTime.setTime(closeTime.getTime() - getPeriodLengthMs());
+        synchronized ( getLock(key) ) {
+          Candlestick c = (Candlestick) getDao().find(id);
+          if ( c == null ) {
+            Date openTime = new Date();
+            openTime.setTime(closeTime.getTime() - getPeriodLengthMs());
 
-  c = new foam.nanos.analytics.Candlestick.Builder(x)
-    .setCloseTime(closeTime)
-    .setOpenTime(openTime)
-    .setKey(key)
-    .build();
-}
-c.add(value, time);
+            c = new Candlestick(x);
+            c.setCloseTime(closeTime);
+            c.setOpenTime(openTime);
+            c.setKey(key);
+            c.init_();
+          }
+          c.add(value, time);
 
-getDao().put(c);
+          getDao().put(c);
+        }
       `
     }
   ]
