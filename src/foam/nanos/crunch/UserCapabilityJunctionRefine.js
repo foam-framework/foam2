@@ -7,12 +7,14 @@ foam.CLASS({
   properties: [
     {
       name: 'userId',
-      class: 'Long',
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
       expression: function() { return this.sourceId; }
     },
     {
       name: 'capabilityId',
-      class: 'String',
+      class: 'Reference',
+      of: 'foam.nanos.crunch.Capability',
       expression: function() { return this.targetId; }
     },
     {
