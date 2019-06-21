@@ -60,13 +60,6 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      name: 'workingData',
-      expression: function(data) {
-        return data.clone(this.__subContext__)
-      }
-    },
-    {
-      class: 'FObjectProperty',
       of: 'foam.comics.v2.DAOControllerConfig',
       name: 'config'
     },
@@ -88,7 +81,6 @@ foam.CLASS({
     {
       name: 'save',
       code: function() {
-        this.data = this.workingData;
         this.config.dao.put(this.data).then(o => {
           this.data = o;
           this.finished.pub();
@@ -126,7 +118,7 @@ foam.CLASS({
               .end()
               .start(config$viewBorder)
                 .start().addClass(this.myClass('create-view-container'))
-                  .tag(this.viewView, { data$: self.workingData$ })
+                  .tag(this.viewView, { data$: self.data$ })
                 .end()
               .end()
         }));
