@@ -43,7 +43,7 @@ foam.CLASS({
   FObject oldObj = getDelegate().find_(x, id);
 
   if ( oldObj != null ) {
-    return maybeRemoveProperties(x, oldObj, propertyMap_);
+    return maybeRemoveProperties(x, oldObj, new HashMap());
   }
 
   return null;
