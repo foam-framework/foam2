@@ -41,6 +41,7 @@ foam.CLASS({
     ^query-bar {
       padding: 24px 16px;
       align-items: center;
+      display: none;
     }
 
     ^toolbar {
