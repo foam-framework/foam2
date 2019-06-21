@@ -30,6 +30,7 @@ foam.CLASS({
     ^ .foam-u2-ActionView-back {
       display: flex;
       align-items: center;
+      width: 30%;
     }
 
     ^account-name {
