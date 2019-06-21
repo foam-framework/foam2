@@ -58,7 +58,14 @@ public class SessionServerBox
         // newly created sessions. If we don't do this, then a user has admin
         // privileges before they log in, which is obviously a big security
         // issue.
-        session.setContext(getX().put("user", null).put("group", null).put(Session.class, session));
+        // We also need to null out the AuthService cache, otherwise the system
+        // context's cache will be reused across every session.
+        X sessionContext = getX()
+          .put("user", null)
+          .put("group", null)
+          .put(CachingAuthService.CACHE_KEY, null)
+          .put(Session.class, session);
+        session.setContext(sessionContext);
         if ( sessionID != null ) sessionDAO.put(session);
       } else if ( req != null ) {
         // if req == null it means that we're being accessed via webSockets

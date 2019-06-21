@@ -28,7 +28,7 @@ public class ProxyX
   }
 
   public Object get(Object name) {
-    return getX().get(this, name);
+    return get(this, name);
   }
 
   public Object get(X x, Object name) {

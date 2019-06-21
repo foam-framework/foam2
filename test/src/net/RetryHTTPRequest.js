@@ -50,7 +50,7 @@ describe('RetryHTTPRequest', function() {
   }
 
   it('should fail when number of tries is too low', function(done) {
-    mkRequest({ numTries: 2 }).send().then(done.fail, done);
+    mkRequest({ numTries: 2 }).send().then(done.fail, () => done());
   });
   it('should succeed when number of tries is sufficiently high', function(done) {
     mkRequest({ numTries: 3 }).send().then(done, done.fail);

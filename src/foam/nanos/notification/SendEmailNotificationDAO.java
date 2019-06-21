@@ -30,17 +30,15 @@ public class SendEmailNotificationDAO extends ProxyDAO {
   }
   @Override
   public FObject put_(X x, FObject obj) {
-    DAO userDAO = (DAO) x.get("localUserDAO");
-    AppConfig config     = (AppConfig) x.get("appConfig");
-    Notification notif = (Notification) obj;
-    User user = (User) userDAO.find(notif.getUserId());
+    DAO          userDAO  = (DAO) x.get("localUserDAO");
+    AppConfig    config   = (AppConfig) x.get("appConfig");
+    Notification notif    = (Notification) obj;
+    User         user     = (User) userDAO.find(notif.getUserId());
     Notification oldNotif = (Notification) getDelegate().find(obj);
 
-    if ( oldNotif != null )
-      return super.put_(x, obj);
+    if ( oldNotif != null ) return super.put_(x, obj);
 
-    if ( ! notif.getEmailIsEnabled() || user == null )
-      return super.put_(x, obj);
+    if ( ! notif.getEmailIsEnabled() || user == null ) return super.put_(x, obj);
 
     if ( user.getDisabledTopicsEmail() != null ) {
       List disabledTopics = Arrays.asList(user.getDisabledTopicsEmail());
@@ -69,6 +67,6 @@ public class SendEmailNotificationDAO extends ProxyDAO {
       System.err.println("Error sending notification email message: "+message+". Error: " + t);
     }
 
-    return super.put_(x,notif);
+    return super.put_(x, notif);
   }
 }
