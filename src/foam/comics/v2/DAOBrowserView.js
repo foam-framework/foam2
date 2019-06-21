@@ -129,9 +129,10 @@ foam.CLASS({
     function dblclick(obj) {
       if ( ! this.stack ) return;
       this.stack.push({
-        class: 'foam.comics.v2.DAOUpdateView',
+        class: 'foam.comics.v2.DAOSummaryView',
         data: obj,
-        config: this.config
+        config: this.config,
+        of: this.config.of
       });
     },
     function initE() {
