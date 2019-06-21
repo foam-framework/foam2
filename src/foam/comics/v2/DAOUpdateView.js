@@ -63,7 +63,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       name: 'workingData',
       expression: function(data) {
-        return data.clone(this.__subContext__)
+        return data.clone(this)
       }
     },
     {
