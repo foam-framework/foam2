@@ -3,7 +3,7 @@ foam.CLASS({
     name: 'UserCapabilityJunctionDAO',
     extends: 'foam.dao.ProxyDAO',
   
-    documentation: `TODO On the junctionDAO put should set all deprecated capabilities' enabled to false and update UserCapabilityJunction.`,
+    documentation: `TODO UserCapabilityJunctionDAO requires a custom authenticated DAO decorator to only show capabilities owned by a user. Updates can only be performed by system.`,
   
     javaImports: [
       'foam.nanos.crunch.Capability',
