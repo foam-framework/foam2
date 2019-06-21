@@ -7,11 +7,13 @@ foam.CLASS({
   properties: [
     {
       name: 'userId',
-      class: 'Long'
+      class: 'Long',
+      expression: function() { return this.sourceId; }
     },
     {
       name: 'capabilityId',
-      class: 'String'
+      class: 'String',
+      expression: function() { return this.targetId; }
     },
     {
       name: 'created',
