@@ -8,12 +8,14 @@ foam.CLASS({
         name: 'deprecated',
         class: 'Reference',
         of: 'foam.nanos.crunch.Capability',
+        visibility: 'RO',
         expression: function() { return this.sourceId; }
       },
       {
         name: 'deprecating',
         class: 'Reference',
         of: 'foam.nanos.crunch.Capability',
+        visibility: 'RO',
         expression: function() { return this.targetId; }
       }
     ]

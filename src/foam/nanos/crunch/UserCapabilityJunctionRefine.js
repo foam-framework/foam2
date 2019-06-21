@@ -9,17 +9,22 @@ foam.CLASS({
       name: 'userId',
       class: 'Reference',
       of: 'foam.nanos.auth.User',
+      visibility: 'RO',
       expression: function() { return this.sourceId; }
     },
     {
       name: 'capabilityId',
       class: 'Reference',
       of: 'foam.nanos.crunch.Capability',
+      visibility: 'RO',
       expression: function() { return this.targetId; }
     },
     {
       name: 'created',
       class: 'DateTime',
+      factory: function() {
+        return new Date();
+      }
     },
     {
       name: 'expiry',
