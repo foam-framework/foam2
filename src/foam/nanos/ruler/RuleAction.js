@@ -42,7 +42,7 @@
           User user = (User) userDAO.find(888).fclone();
           user.setFirstName("Jimmy");
           
-          // using lambada makes it shorter but doesn't provide system context
+          // using lambda makes it shorter but doesn't provide system context
           agency.submit(x, x1 -> {
             DAO crudUserDAO = x1.get("userDAO); // CRUD DAO
             crudUserDAO.put(user); }, "Updating user's first name"
@@ -60,8 +60,7 @@
         };
 
   Rule.AsyncAction
-    When implementing applyAction for Rule.asyncAction, do not use agent.
-    The passed agency is null. All the DAOs inside applyAction of AsyncAction are CRUDable.
+    Async specific rule action can be implemented without use of agency. The passed agency is AsyncAgency and executes agents immediately.
   `,
 
   methods: [

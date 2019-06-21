@@ -14,32 +14,59 @@
     'foam.core.ContextAware',
     'foam.core.FObject',
     'foam.core.X',
+    'foam.core.DirectAgency',
     'foam.nanos.logger.Logger',
     'java.util.Collection'
+  ],
+
+  tableColumns: [
+    'id',
+    'name',
+    'ruleGroup',
+    'enabled',
+    'priority',
+    'daoKey',
+    'documentation'
+  ],
+
+  searchColumns: [
+    'id',
+    'name',
+    'ruleGroup',
+    'enabled',
+    'priority',
+    'daoKey',
+    'operation',
+    'after',
+    'validity'
   ],
 
   properties: [
     {
       class: 'Long',
       name: 'id',
-      documentation: 'Sequence number.'
+      documentation: 'Sequence number.',
+      tableWidth: 50
     },
     {
       class: 'String',
       name: 'name',
-      documentation: 'Rule name for human readability.'
+      documentation: 'Rule name for human readability.',
+      tableWidth: 200
     },
     {
       class: 'Int',
       name: 'priority',
       documentation: 'Priority defines the order in which rules are to be applied.'+
       'Rules with a higher priority are to be applied first.'+
-      'The convention for values is ints that are multiple of 10.'
+      'The convention for values is ints that are multiple of 10.',
+      tableWidth: 50
     },
     {
       class: 'String',
       name: 'ruleGroup',
-      documentation: 'ruleGroup defines sets of rules related to the same action.'
+      documentation: 'ruleGroup defines sets of rules related to the same action.',
+      tableWidth: 100
     },
     {
       class: 'String',
@@ -65,6 +92,7 @@
           ]
         };
       },
+      tableWidth: 125
     },
     {
       class: 'Enum',
@@ -107,7 +135,8 @@
       class: 'Boolean',
       name: 'enabled',
       value: true,
-      documentation: 'Enables the rule.'
+      documentation: 'Enables the rule.',
+      tableWidth: 50
     },
     {
       class: 'Boolean',
@@ -232,7 +261,7 @@
         }
       ],
       javaCode: `
-        getAsyncAction().applyAction(x, obj, oldObj, ruler, null);
+        getAsyncAction().applyAction(x, obj, oldObj, ruler, new DirectAgency());
         if ( ! getAfter() ) {
           ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }

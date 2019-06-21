@@ -43,7 +43,7 @@ public class CachingAuthService
   extends ProxyAuthService
 {
 
-  protected static String CACHE_KEY = "CachingAuthService.PermissionCache";
+  public static String CACHE_KEY = "CachingAuthService.PermissionCache";
 
   protected static Map getPermissionMap(X x) {
     Session session = (Session) x.get(Session.class);
