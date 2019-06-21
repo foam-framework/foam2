@@ -65,17 +65,17 @@ foam.CLASS({
         user.setTwoFactorSecret(key);
         userDAO.put_(x, user);
 
-        if ( ! generateQrCode ) {
-          return key;
-        }
-
         try {
           EmailConfig service = (EmailConfig) x.get("emailConfig");
           String name = service == null ? "FOAM" : service.getDisplayName();
           String path = String.format("/%s:%s", name, user.getEmail());
           String query = String.format("secret=%s&issuer=%s&algorithm=%s", key, name, getAlgorithm());
           URI uri = new URI("otpauth", "totp", path, query, null);
-          return "data:image/svg+xml;charset=UTF-8," + QrCode.encodeText(uri.toASCIIString(), QrCode.Ecc.MEDIUM).toSvgString(0);
+          String[] arr = new String[2];
+          arr[0] = key;
+          arr[1] = "data:image/svg+xml;charset=UTF-8,"
+            + QrCode.encodeText(uri.toASCIIString(), QrCode.Ecc.MEDIUM).toSvgString(0);
+          return arr; 
         } catch ( Throwable t ) {
           throw new RuntimeException(t);
         }

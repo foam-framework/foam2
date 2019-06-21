@@ -14,7 +14,7 @@ foam.INTERFACE({
     {
       name: 'generateKey',
       async: true,
-      type: 'String',
+      type: 'String[]',
       javaThrows: [ 'foam.nanos.auth.AuthenticationException' ],
       args: [
         {
