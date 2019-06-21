@@ -16,6 +16,7 @@ import foam.lib.json.JSONParser;
 import foam.lib.parse.*;
 import foam.nanos.logger.Logger;
 import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.CharBuffer;
 import java.util.Arrays;
@@ -73,7 +74,8 @@ public class ServiceWebAgent
       HttpServletRequest  req            = x.get(HttpServletRequest.class);
       HttpServletResponse resp           = x.get(HttpServletResponse.class);
       PrintWriter         out            = x.get(PrintWriter.class);
-      BufferedReader      reader         = req.getReader();
+      //BufferedReader      reader         = req.getReader();
+      BufferedReader reader  = new BufferedReader(new InputStreamReader(req.getInputStream()));
       X                   requestContext = x.put("httpRequest", req).put("httpResponse", resp);
       Logger              logger         = (Logger) x.get("logger");
 
