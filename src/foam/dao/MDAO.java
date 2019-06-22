@@ -80,11 +80,15 @@ public class MDAO
   }
 
   public FObject objIn(FObject obj) {
-    return obj.fclone().freeze();
+    FObject o = obj.fclone();
+    o.setX(obj.getX());
+    return o.freeze();
   }
 
   public FObject objOut(FObject obj) {
-    return AbstractFObject.maybeClone(obj);
+    FObject o = AbstractFObject.maybeClone(obj);
+    if ( o != null ) o.setX(obj.getX());
+    return o;
   }
 
   public FObject put_(X x, FObject obj) {
