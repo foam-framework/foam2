@@ -648,5 +648,6 @@ FOAM_FILES([
   { name: "foam/u2/detail/SectionedDetailView" },
   { name: "foam/u2/detail/VerticalDetailView" },
   { name: "foam/u2/detail/WizardSectionsView" },
+  { name: "foam/demos/virtualprop/Person" },
   { name: "foam/u2/detail/SectionedDetailPropertyView" }
 ]);

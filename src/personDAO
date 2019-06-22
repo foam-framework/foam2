@@ -1,0 +1,6 @@
+
+p({"class":"foam.demos.virtualprop.Person","name":"Mike","country":"CA"})
+p({"class":"foam.demos.virtualprop.Person","name":"Dave","country":"US"})
+p({"class":"foam.demos.virtualprop.Person","name":"Jose","country":"MX"})
+
+p({"class":"foam.demos.virtualprop.Person","name":"Kristina","country":"RS"})
