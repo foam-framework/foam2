@@ -57,7 +57,7 @@ foam.CLASS({
         return foam.u2.view.FnFormatter.create({
           class: 'foam.u2.view.FnFormatter',
           f: function(value, obj, axiom) {
-            this.add(value);
+            this.add(obj[axiom.name + '$']);
           }
         })
       }
