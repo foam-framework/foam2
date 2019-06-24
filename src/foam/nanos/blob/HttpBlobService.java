@@ -9,7 +9,7 @@ package foam.nanos.blob;
 import foam.blob.*;
 import foam.core.X;
 import foam.lib.json.Outputter;
-import foam.lib.json.OutputterMode;
+import foam.lib.NetworkPropertyPredicate;
 import foam.nanos.boot.NSpec;
 import foam.nanos.boot.NSpecAware;
 import foam.nanos.http.WebAgent;
@@ -101,7 +101,7 @@ public class HttpBlobService
     try {
       int size = req.getContentLength();
       blob = new InputStreamBlob(req.getInputStream(), size);
-      new Outputter(resp.getWriter(), OutputterMode.NETWORK).output(getDelegate().put(blob));
+      new Outputter(x, resp.getWriter()).setPropertyPredicate(new NetworkPropertyPredicate()).output(getDelegate().put(blob));
     } catch (Throwable t) {
       t.printStackTrace();
       throw new RuntimeException(t);
