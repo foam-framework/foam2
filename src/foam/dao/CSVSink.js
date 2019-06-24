@@ -17,7 +17,9 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.PropertyInfo',
-    'java.lang.StringBuilder'
+    'java.lang.StringBuilder',
+    'java.util.Arrays',
+    'java.util.stream.Stream'
   ],
 
   properties: [
@@ -45,6 +47,23 @@ foam.CLASS({
           return of.getAxiomByName(tableCol);
         });
       },
+      javaGetter: `
+        if ( isPropertySet("columns") ) return getColumns();
+        if ( isPropertySet("columns_") ) {
+          PropertyInfo[] tableColumnsList = getColumns_();
+          PropertyInfo[] tablePropertyList = new PropertyInfo[tableColumnsList.length];
+          int i = 0;
+          for(PropertyInfo tableCol : tableColumnsList) {
+            tablePropertyList[i] = (PropertyInfo) getOf().getAxiomByName(tableCol.toString());
+            i++;
+          }
+          return tablePropertyList;
+        }
+        if ( isPropertySet("of") ) {
+          return Arrays.stream(getOf().getAxiomsByClass(PropertyInfo.class)).filter( (p) -> ! p.getNetworkTransient() ).toArray();
+        }
+        return null;
+      `,
       visibility: 'HIDDEN'
     },
     {
@@ -65,7 +84,14 @@ foam.CLASS({
       expression: function(of) {
         if ( this.columns_ ) return this.columns_;
         return of ? of.getAxiomByName('tableColumns').columns : [];
-      }
+      },
+      javaGetter: `
+        if ( isPropertySet("columns_") ) return getColumns_();
+        if ( isPropertySet("of") ) {
+          return getOf().getAxiomByName("tableColumns");
+        }
+        return null;
+      `
     }
   ],
 
