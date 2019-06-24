@@ -93,8 +93,7 @@ foam.CLASS({
     var self = this;
 
       this.addClass(this.myClass())
-      .add(this.slot(function(data, config, config$browseBorder, config$browseViews,
-        config$browseTitle) {
+      .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle) {
         return self.E()
           .start(self.Rows)
             .addClass(self.myClass('container'))
