@@ -28,34 +28,12 @@ foam.CLASS({
     function exportFObject(X, obj) {
       return this.outputter.toCSV(obj);
     },
-    // function exportDAO(X, dao) {
-    //   debugger;
-    //   var sink = this.CSVSink.create();
-    //   sink.reset();
-    //   debugger;
-    //   // passing in our CSVSink runs our CSV outputter and
-    //   // s.csv is accessing our csv property string.
-    //   return dao.select(sink).then( (s) => s.csv);
-    // }
-    {
-      name: 'exportDAO',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'dao',
-          class: 'foam.dao.DAO'
-        }
-      ],
-      type: 'String',
-      javaCode: `
-        foam.dao.CSVSink sink = foam.dao.CSVSink.Builder(x).build();
-        sink.reset();
-        sink = dao.select(sink);
-        return sink.getCsv();
-      `
+    function exportDAO(X, dao) {
+      var sink = this.CSVSink.create();
+      sink.reset();
+      // passing in our CSVSink runs our CSV outputter and
+      // s.csv is accessing our csv property string.
+      return dao.select(sink).then( (s) => s.csv);
     }
   ]
 });

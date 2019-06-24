@@ -20,10 +20,6 @@ foam.CLASS({
     'java.lang.StringBuilder'
   ],
 
-  requiers: [
-    'foam.core.Property'
-  ],
-
   properties: [
     {
       class: 'String',
@@ -42,8 +38,8 @@ foam.CLASS({
       expression: function(of) {
         if ( this.columns ) return this.columns;
         if ( this.columns_.length == 0 ) {
-          return of.getAxiomsByClass(foam.core.Property)
-            .filter( (p) => ! p.networkTransient );
+          return of ? of.getAxiomsByClass(foam.core.Property)
+          .filter( (p) => ! p.networkTransient ) : [];
         }
         return this.columns_.map((tableCol) => {
           return of.getAxiomByName(tableCol);
@@ -68,7 +64,7 @@ foam.CLASS({
       name: 'columns_',
       expression: function(of) {
         if ( this.columns_ ) return this.columns_;
-        return of.getAxiomByName('tableColumns').columns;
+        return of ? of.getAxiomByName('tableColumns').columns : [];
       }
     }
   ],
