@@ -7,10 +7,12 @@
 foam.CLASS({
   package: 'foam.layout',
   name: 'Section',
+
   requires: [
     'foam.core.Action',
     'foam.core.Property'
   ],
+
   properties: [
     {
       class: 'String',
@@ -38,6 +40,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function createErrorSlotFor(data$) {
       var errorSlots = data$.map(d => {
@@ -55,6 +58,7 @@ foam.CLASS({
 
       return retSlot;
     },
+
     function fromSectionAxiom(a, cls) {
       this.copyFrom(a);
       this.copyFrom({
@@ -65,7 +69,8 @@ foam.CLASS({
         actions: cls.getAxiomsByClass(this.Action)
           .filter(action => action.section == a.name)
       });
+
       return this;
     }
   ]
-}); 
+});
