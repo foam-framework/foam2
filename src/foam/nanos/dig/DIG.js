@@ -76,7 +76,7 @@ foam.CLASS({
       name: 'email'
     },
     {
-      class: 'EMail',
+      class: 'String',
       displayWidth: 100,
       name: 'subject'
     },
