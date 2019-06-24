@@ -30,8 +30,10 @@ foam.CLASS({
     },
 
     function start(spec, args, slot) {
-      /* Create a new Element and add it as a child. Return the child. */
+
       var c = this.createChild_(spec, args);
+
+      // added in order to create automatic spacing between cards
       if ( foam.u2.layout.Card.isInstance(c) ) c.style({ margin: this.defaultMargin });
 
       this.add(c);

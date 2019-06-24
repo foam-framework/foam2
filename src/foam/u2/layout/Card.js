@@ -9,10 +9,6 @@ foam.CLASS({
   name: 'Card',
   extends: 'foam.u2.borders.CardBorder',
 
-  css: `
-
-  `,
-
   properties: [
     {
       class: 'Int',
