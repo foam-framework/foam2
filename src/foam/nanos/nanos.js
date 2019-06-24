@@ -211,6 +211,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/CapabilityCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/CapabilityCapabilityJunctionDAO" },
   { name: "foam/nanos/crunch/UserCapabilityJunctionDAO" },
+  { name: "foam/nanos/crunch/CapabilityDAO" },
   { name: "foam/nanos/auth/CapabilityAuthService"}
 
 
