@@ -13,6 +13,11 @@ foam.CLASS({
     A configurable summary view for a specific instance
   `,
 
+  topics: [
+    'finished',
+    'throwError'
+  ],
+
   axioms: [
     foam.pattern.Faceted.create()
   ],
@@ -25,6 +30,7 @@ foam.CLASS({
     ^ .foam-u2-ActionView-back {
       display: flex;
       align-items: center;
+      width: 30%;
     }
 
     ^account-name {
@@ -76,6 +82,13 @@ foam.CLASS({
         var defaultAction = allActions.filter(a => a.isDefault);
         return defaultAction.length >= 1 ? defaultAction[0] : allActions[0];
       }
+    },
+    {
+      class: 'foam.u2.ViewSpecWithJava',
+      name: 'viewView',
+      expression: function() {
+        return foam.u2.detail.SectionedDetailView;
+      }
     }
   ],
   actions: [
@@ -94,7 +107,12 @@ foam.CLASS({
     {
       name: 'delete',
       code: function() {
-        alert('TODO');
+        this.config.dao.remove(this.data).then(o => {
+          this.finished.pub();
+          this.stack.back();
+        }, e => {
+          this.throwError.pub(e);
+        });
       }
     }
   ],
@@ -104,7 +122,7 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(data, config, config$viewBorder) {
+        .add(self.slot(function(data, config, config$viewBorder, viewView) {
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -121,7 +139,7 @@ foam.CLASS({
                     .add(data.toSummary())
                       .addClass(this.myClass('account-name'))
                   .end()
-                  .startContext({data: data}).add(self.primary).endContext()
+                  .startContext({ data }).add(self.primary).endContext()
                 .end()
               .end()
 
@@ -139,9 +157,7 @@ foam.CLASS({
               .end()
 
               .start(config$viewBorder)
-                .start(foam.u2.detail.SectionedDetailView, { data: data })
-                  .addClass(this.myClass('view-container'))
-                .end()
+                .start(viewView, { data }).addClass(this.myClass('view-container')).end()
               .end()
             .end();
         }));

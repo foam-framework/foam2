@@ -80,7 +80,8 @@ foam.CLASS({
         this.stack.push({
           class: 'foam.comics.v2.DAOCreateView',
           data: this.data.of.create({}, this),
-          config$: this.config$
+          config$: this.config$,
+          of: this.data.of
         });
       }
     }
