@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'Card',
   extends: 'foam.u2.borders.CardBorder',
 
+  css: `
+
+  `,
+
   properties: [
     {
       class: 'Int',
@@ -43,10 +47,10 @@ foam.CLASS({
       this.SUPER();
       this.addClass(this.myClass());
 
-      // TODO: find the display mode and adjust accordingly, for now just use md
+      // TODO: find the display mode and adjust accordingly (e.g. for sm divide by 8), for now just use md
       var flex = this.md / 12;
 
-      this.style({ 'flex-basis': flex })
+      this.style({ 'flex-grow': flex })
     }
   ]
 });

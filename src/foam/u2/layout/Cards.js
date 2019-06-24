@@ -11,10 +11,18 @@ foam.CLASS({
   css: `
     ^ {
       display: flex;
-      flex-flow: row wrap;
       justify-content: flex-start;
     }
   `,
+
+  properties: [
+    {
+      class: 'String',
+      name: 'height',
+      value: '504px'
+    }
+  ],
+
   methods: [
     function initE() {
       this.SUPER();
