@@ -6,9 +6,44 @@
 
 foam.CLASS({
   package: 'foam.glang',
-  name: 'EndOfDay',
+  name: 'EndOfTimeSpan',
+  extends: 'foam.mlang.AbstractExpr',
+  implements: [ 'foam.core.Serializable' ],
   properties: [
     {
+      class: 'foam.mlang.ExprProperty',
+      name: 'delegate'
+    },
+    {
+      class: 'Long',
+      name: 'timeSpanMs'
+    }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        var ms = this.timeSpanMs;
+        return new Date(Math.floor(ts.getTime() / ms) * ms + ms - 1);
+      },
+      javaCode: `
+        java.util.Date ts = (java.util.Date) getDelegate().f(obj);
+        long ms = getTimeSpanMs();
+        return new java.util.Date((ts.getTime() / ms) * ms + ms - 1);
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'EndOfDay',
+  extends: 'foam.mlang.AbstractExpr',
+  implements: [ 'foam.core.Serializable' ],
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
       name: 'delegate'
     }
   ],
@@ -20,7 +55,16 @@ foam.CLASS({
         ts.setHours(23, 59, 59);
         ts.setMilliseconds(999);
         return ts;
-      }
+      },
+      javaCode: `
+java.util.Calendar c = java.util.Calendar.getInstance();
+c.setTimeInMillis(((java.util.Date) getDelegate().f(obj)).getTime());
+c.set(java.util.Calendar.HOUR_OF_DAY, 23);
+c.set(java.util.Calendar.MINUTE, 59);
+c.set(java.util.Calendar.SECOND, 59);
+c.set(java.util.Calendar.MILLISECOND, 999);
+return c.getTime();
+      `
     }
   ]
 });
