@@ -83,7 +83,8 @@ foam.CLASS({
     },
     {
       name: 'permissionsIntercepted',
-      class: 'StringArray'
+      class: 'StringArray',
+      documentation: `when applying for a capability a user must have all the permissions listed, otherwise an AuthException is thrown and caught by another service.`
     },
     {
       name: 'daoKey',
@@ -127,6 +128,13 @@ foam.CLASS({
         return false;
       `
     },
+    {
+      name: 'validateInfo',
+      type: 'Boolean',
+      documentation: `validate userCapabilityJunction.data.`,
+      code: {},
+      javaCode: ``
+    }
   ]
 });
 
