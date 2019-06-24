@@ -35,6 +35,7 @@ foam.CLASS({
               .setDao(delegate)
               .setFilename(filename)
               .setCreateFile(true)
+              .setMultiLine(this.getMultiLine())
               .build());
 
             /* Create a composite journal of repo journal and runtime journal

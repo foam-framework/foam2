@@ -177,6 +177,11 @@ foam.CLASS({
           throw new RuntimeException(t);
         }
       `
+    },
+    {
+      class: 'Boolean',
+      documentation: 'Enables multi-lined processing of journals',
+      name: 'multiline'
     }
   ],
 
