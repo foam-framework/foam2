@@ -71,7 +71,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       documentation: 'Enables multi-lined processing of journals',
-      name: 'multiline'
+      name: 'multiLine'
     }
   ],
 

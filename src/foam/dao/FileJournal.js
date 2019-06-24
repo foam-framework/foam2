@@ -181,7 +181,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       documentation: 'Enables multi-lined processing of journals',
-      name: 'multiline'
+      name: 'multiLine'
     }
   ],
 
@@ -300,9 +300,21 @@ foam.CLASS({
             if ( COMMENT.matcher(line).matches() ) continue;
 
             try {
-              char operation = line.charAt(0);
-              int length = line.trim().length();
-              line = line.trim().substring(2, length - 1);
+              operation = line.charAt(0);
+              line = line.trim();
+              if ( getMultiLine() ) {
+                StringBuilder sb = new StringBuilder();
+                while ( line.charAt(line.length()) != ')' && line.charAt(line.length()) != '}' ) {
+                  sb.append(line);
+                  sb.append(System.lineSeparator());
+                  line = reader.readLine();
+                  if ( line == null )
+                    return;
+                }
+                sb.append(line);
+                line = sb.toString();
+              }
+              line = line.substring(2, line.length() - 1);
 
               FObject obj = parser.parseString(line);
               if ( obj == null ) {
