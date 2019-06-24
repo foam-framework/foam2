@@ -93,8 +93,8 @@ foam.CLASS({
     var self = this;
 
       this.addClass(this.myClass())
-      .add(this.slot(function(data, data$of$name, config, config$browseBorder, config$browseViews,
-         config$browseTitle) {
+      .add(this.slot(function(data, config, config$browseBorder, config$browseViews,
+        config$browseTitle) {
         return self.E()
           .start(self.Rows)
             .addClass(self.myClass('container'))
@@ -104,7 +104,7 @@ foam.CLASS({
                 .addClass(self.myClass('browse-title'))
                 .add(config$browseTitle)
               .end()
-              .startContext({data: self}).tag(self.CREATE, { label: `New ${data$of$name.toLowerCase()}` }).endContext()
+              .startContext({data: self}).add(self.CREATE).endContext()
             .end()
             .start(self.CardBorder)
               .style({ position: 'relative' })
