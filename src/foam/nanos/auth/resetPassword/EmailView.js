@@ -45,7 +45,7 @@ foam.CLASS({
       line-height: 1;
       letter-spacing: 0.5px;
       text-align: left;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
       margin-top: 20px;
       margin-bottom: 30px;
     }
@@ -68,7 +68,7 @@ foam.CLASS({
       font-weight: 300;
       letter-spacing: 0.2px;
       text-align: left;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
       margin-top: 15px;
       margin-left: 20px;
       margin-right: 194px;
@@ -82,7 +82,7 @@ foam.CLASS({
       font-weight: 300;
       letter-spacing: 0.2px;
       text-align: left;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
       margin-top: 30px;
       margin-bottom: 8px;
       margin-left: 20px;
@@ -102,7 +102,7 @@ foam.CLASS({
       font-family: Roboto;
       font-size: 12px;
       text-align: left;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
       font-weight: 300;
       letter-spacing: 0.2px;
     }
@@ -111,7 +111,7 @@ foam.CLASS({
       width: 450px;
       height: 40px;
       border-radius: 2px;
-      background-color: %SECONDARYCOLOR%;
+      background-color: /*%PRIMARY3%*/ #406dea;
       margin-left: 20px;
       margin-right: 20px;
       margin-bottom: 20px;
