@@ -36,7 +36,7 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.core.PropertyInfo',
       name: 'columns',
-      expression: function(of) {
+      factory: function(of) {
         if ( this.columns ) return this.columns;
         if ( this.columns_.length == 0 ) {
           return of ? of.getAxiomsByClass(foam.core.Property)
@@ -47,22 +47,23 @@ foam.CLASS({
         });
       },
       javaGetter: `
-        if ( isPropertySet("columns") ) return getColumns();
-        if ( isPropertySet("columns_") ) {
-          PropertyInfo[] tableColumnsList  = getColumns_();
-          PropertyInfo[] tablePropertyList = new PropertyInfo[tableColumnsList.length];
-          int i = 0;
-          for(PropertyInfo tableCol : tableColumnsList) {
-            // tablePropertyList[i] = (PropertyInfo)((foam.u2.TableColumns) getOf().getAxiomByName(tableCol.toString())).getColumns();
-            // i++;
-          }
-         // return tablePropertyList;
-        }
-        if ( isPropertySet("of") ) {
-          List<PropertyInfo> bob = getOf().getAxiomsByClass(PropertyInfo.class);
-          PropertyInfo[] bobet = new PropertyInfo[bob.size()];
-          // return bob.stream().filter((p) -> ! p.getNetworkTransient()).toArray(bobet);
-        }
+      System.out.println("csvSink");
+        // if ( isPropertySet("columns") ) return getColumns();
+        // if ( isPropertySet("columns_") ) {
+        //   PropertyInfo[] tableColumnsList  = getColumns_();
+        //   PropertyInfo[] tablePropertyList = new PropertyInfo[tableColumnsList.length];
+        //   int i = 0;
+        //   for(PropertyInfo tableCol : tableColumnsList) {
+        //     // tablePropertyList[i] = (PropertyInfo)((foam.u2.TableColumns) getOf().getAxiomByName(tableCol.toString())).getColumns();
+        //     // i++;
+        //   }
+        //  // return tablePropertyList;
+        // }
+        // if ( isPropertySet("of") ) {
+        //   List<PropertyInfo> bob = getOf().getAxiomsByClass(PropertyInfo.class);
+        //   PropertyInfo[] bobet = new PropertyInfo[bob.size()];
+        //   // return bob.stream().filter((p) -> ! p.getNetworkTransient()).toArray(bobet);
+        // }
         return null;
       `,
       visibility: 'HIDDEN'
@@ -82,15 +83,16 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.core.PropertyInfo',
       name: 'columns_',
-      expression: function(of) {
+      factory: function(of) {
         if ( this.columns_ ) return this.columns_;
         return of ? of.getAxiomByName('tableColumns').columns : [];
       },
       javaGetter: `
-        if ( isPropertySet("columns_") ) return getColumns_();
-        if ( isPropertySet("of") ) {
-          // return ((foam.u2.TableColumns) getOf().getAxiomByName("tableColumns")).getColumns();
-        }
+      System.out.println("csvSink 2");
+        // if ( isPropertySet("columns_") ) return getColumns_();
+        // if ( isPropertySet("of") ) {
+        //   // return ((foam.u2.TableColumns) getOf().getAxiomByName("tableColumns")).getColumns();
+        // }
         return null;
       `
     }
@@ -112,14 +114,14 @@ foam.CLASS({
       javaCode: `
       System.out.println("in output @csvSink");
       System.out.println("in output @csvSink csv = " + getCsv());
-        StringBuilder sb = new StringBuilder();
-        if ( ! getIsNewLine() ) {
-          sb.append(getCsv());
-          sb.append(",");
-          setCsv(sb.toString());
-        }
-        setIsNewLine(false);
-        output_(value);
+        // StringBuilder sb = new StringBuilder();
+        // if ( ! getIsNewLine() ) {
+        //   sb.append(getCsv());
+        //   sb.append(",");
+        //   setCsv(sb.toString());
+        // }
+        // setIsNewLine(false);
+        // output_(value);
       `
     },
     {
@@ -155,17 +157,17 @@ foam.CLASS({
         }),
       javaCode: `
         System.out.println("in output_ @csvSink");
-        StringBuilder sb = new StringBuilder();
-        String s = value.toString();
-        if (s.indexOf("\\"") != -1) {
-          sb.append("\\"");
-          sb.append(s);
-          sb.append("\\"");
-        }
-        else {
-          sb.append(s);
-        }
-        setCsv(sb.toString());
+        // StringBuilder sb = new StringBuilder();
+        // String s = value.toString();
+        // if (s.indexOf("\\"") != -1) {
+        //   sb.append("\\"");
+        //   sb.append(s);
+        //   sb.append("\\"");
+        // }
+        // else {
+        //   sb.append(s);
+        // }
+        // setCsv(sb.toString());
       `
     },
     {
@@ -175,12 +177,13 @@ foam.CLASS({
         this.isNewLine = true;
       },
       javaCode: `
-        StringBuilder sb = new StringBuilder();
-        sb.append(getCsv());
-        sb.append("\\n");
-        setCsv(sb.toString());
-        sb.setLength(0);
-        setIsNewLine(true);
+      System.out.println("in newLine_ @csvSink");
+        // StringBuilder sb = new StringBuilder();
+        // sb.append(getCsv());
+        // sb.append("\\n");
+        // setCsv(sb.toString());
+        // sb.setLength(0);
+        // setIsNewLine(true);
       `
     },
     {
@@ -207,20 +210,20 @@ foam.CLASS({
       },
       javaCode: `
         System.out.println("in the put of the CSvsink");
-        if ( ! isPropertySet("of") ) setOf(obj.getClassInfo());
-        PropertyInfo[] columns = getColumns();
-        if ( ! getIsHeadersOutput() ) {
-          for (PropertyInfo element : columns) {
-            element.toCSVLabel(this, element);
-          }
-          newLine_();
-          setIsHeadersOutput(true);
-        }
+        // if ( ! isPropertySet("of") ) setOf(obj.getClassInfo());
+        // PropertyInfo[] columns = getColumns();
+        // if ( ! getIsHeadersOutput() ) {
+        //   for (PropertyInfo element : columns) {
+        //     element.toCSVLabel(this, element);
+        //   }
+        //   newLine_();
+        //   setIsHeadersOutput(true);
+        // }
 
-        for (PropertyInfo element : columns) {
-          element.toCSV(obj, this, element);
-        }
-        newLine_();
+        // for (PropertyInfo element : columns) {
+        //   element.toCSV(obj, this, element);
+        // }
+        // newLine_();
       `
     },
     {
@@ -230,9 +233,10 @@ foam.CLASS({
           .forEach( (s) => this.clearProperty(s) );
       },
       javaCode: `
-        clearCsv();
-        clearIsNewLine();
-        clearIsHeadersOutput();
+      System.out.println("in reset of the CSvsink");
+        // clearCsv();
+        // clearIsNewLine();
+        // clearIsHeadersOutput();
       `
     }
   ]
