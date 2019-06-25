@@ -296,7 +296,27 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        return reader.readLine();
+        try {
+          String line = reader.readLine();
+          if ( getMultiLine() ) {
+            StringBuilder sb = new StringBuilder();
+            line = line.trim();
+            while ( ! ( line.charAt( line.length() ) == ')' && line.charAt( line.length() - 1 ) == '}' ) ) {
+              sb.append(line);
+              line = reader.readLine();
+              line = line.trim();
+              if ( line == null ) {
+                return null;
+              }
+            }
+            sb.append(line);
+            line = sb.toString();
+          }
+          return line;
+        } catch ( Throwable t ) {
+          getLogger().error("Failed to read from journal", t);
+          return null;
+        }
       `
     },
     {
@@ -313,9 +333,9 @@ foam.CLASS({
             if ( COMMENT.matcher(line).matches() ) continue;
 
             try {
+              line = line.trim();
               char operation = line.charAt(0);
-              int length = line.trim().length();
-              line = line.trim().substring(2, length - 1);
+              line = line.substring(2, line.length() - 1);
 
               FObject obj = parser.parseString(line);
               if ( obj == null ) {
