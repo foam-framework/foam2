@@ -17,14 +17,14 @@ foam.CLASS({
   requires: [
     'foam.nanos.pm.PM'
   ],
-  
+
   javaImports: [
     'foam.core.X',
     'foam.mlang.order.Comparator',
     'foam.mlang.predicate.Predicate',
-    'foam.nanos.pm.PM',
+    'foam.nanos.pm.PM'
   ],
-  
+
   properties: [
     {
       name: 'enabled',
@@ -52,39 +52,39 @@ foam.CLASS({
     {
       name: 'putName',
       class: 'String',
-      javaFactory: 'return getNSpec().getName()+":put";',
+      javaFactory: 'return getNSpec().getName() + ":put";',
       visibility: 'RO'
     },
     {
       name: 'findName',
       class: 'String',
-      javaFactory: 'return getNSpec().getName()+":find";',
+      javaFactory: 'return getNSpec().getName() + ":find";',
       visibility: 'RO'
     },
     {
       name: 'selectName',
       class: 'String',
-      javaFactory: 'return getNSpec().getName()+":select";',
+      javaFactory: 'return getNSpec().getName() + ":select";',
       visibility: 'RO'
     },
     {
       name: 'removeName',
       class: 'String',
-      javaFactory: 'return getNSpec().getName()+":remove";',
+      javaFactory: 'return getNSpec().getName() + ":remove";',
       visibility: 'RO'
     },
     {
       name: 'removeAllName',
       class: 'String',
-      javaFactory: 'return getNSpec().getName()+":removeAll";',
+      javaFactory: 'return getNSpec().getName() + ":removeAll";',
       visibility: 'RO'
     },
     {
       name: 'cmdName',
       class: 'String',
-      javaFactory: 'return getNSpec().getName()+":cmd";',
+      javaFactory: 'return getNSpec().getName() + ":cmd";',
       visibility: 'RO'
-    },
+    }
   ],
 
   axioms: [
@@ -92,10 +92,10 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
-          data:
-    `public PMDAO(X x, DAO delegate) {
-       super(x, delegate);
-     }
+          data: `
+            public PMDAO(X x, DAO delegate) {
+              super(x, delegate);
+            }
           `
         }));
       }
@@ -181,7 +181,7 @@ foam.CLASS({
     PM pm = createPM(getRemoveAllName());
     try {
       super.removeAll_(x, skip, limit, order, predicate);
-   } finally {
+    } finally {
       log(x, pm);
     }
      `
@@ -192,7 +192,7 @@ foam.CLASS({
     PM pm = createPM(getCmdName());
     try {
       return super.cmd_(x, obj);
-   } finally {
+    } finally {
       log(x, pm);
     }
      `
