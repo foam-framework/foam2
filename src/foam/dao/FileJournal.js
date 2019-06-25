@@ -287,6 +287,38 @@ foam.CLASS({
       `
     },
     {
+      name: 'getCommand',
+      documentation: 'reads a syntatically meaningful bluck from the service file',
+      type: 'String',
+      args: [
+        {
+          name: 'reader',
+          type: 'BufferedReader'
+        }
+      ],
+      javaCode: `
+        try {
+          String line = reader.readLine();
+          line = line.trim();
+          if ( getMultiLine() ) {
+            StringBuilder sb = new StringBuilder();
+            while ( line.charAt(line.length()) != ')' && line.charAt(line.length()) != '}' ) {
+              sb.append(line);
+              sb.append(System.lineSeparator());
+              line = reader.readLine();
+              if ( line == null )
+                return null;
+            }
+            sb.append(line);
+            return sb.toString();
+          }
+          return line;
+        } catch ( Throwable t ) {
+          return null;
+        }
+      `
+    },
+    {
       name: 'replay',
       documentation: 'Replays the journal file',
       javaCode: `
@@ -295,27 +327,13 @@ foam.CLASS({
         JSONParser parser = getParser();
 
         try ( BufferedReader reader = getReader() ) {
-          for ( String line ; ( line = reader.readLine() ) != null ; ) {
+          for ( String line ; ( line = getCommand(reader) ) != null ; ) {
             if ( SafetyUtil.isEmpty(line)        ) continue;
             if ( COMMENT.matcher(line).matches() ) continue;
 
             try {
               char operation = line.charAt(0);
-              line = line.trim();
-              if ( getMultiLine() ) {
-                StringBuilder sb = new StringBuilder();
-                while ( line.charAt(line.length()) != ')' && line.charAt(line.length()) != '}' ) {
-                  sb.append(line);
-                  sb.append(System.lineSeparator());
-                  line = reader.readLine();
-                  if ( line == null )
-                    return;
-                }
-                sb.append(line);
-                line = sb.toString();
-              }
               line = line.substring(2, line.length() - 1);
-
               FObject obj = parser.parseString(line);
               if ( obj == null ) {
                 getLogger().error("Parse error", getParsingErrorMessage(line), "line:", line);
