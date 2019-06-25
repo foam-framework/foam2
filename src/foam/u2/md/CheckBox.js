@@ -29,8 +29,8 @@ foam.CLASS({
     }
 
     ^:checked {
-      background-color: %BLACK%;
-      border-color: %BLACK%;
+      background-color: /*%BLACK%*/ #1e1f21;
+      border-color: /*%BLACK%*/ #1e1f21;
       fill: white;
     }
 

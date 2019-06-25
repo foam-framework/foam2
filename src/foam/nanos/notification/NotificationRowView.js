@@ -51,7 +51,7 @@
         text-overflow: ellipsis;
         margin-right: 16px;
         overflow: hidden;
-        color: %BLACK%;
+        color: /*%BLACK%*/ #1e1f21;
       }
       ^ .msg.fully-visible {
         display: block;

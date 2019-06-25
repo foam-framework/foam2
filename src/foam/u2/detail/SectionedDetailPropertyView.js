@@ -21,7 +21,7 @@ foam.CLASS({
 
     ^validation-container {
       margin-top: 6px;
-      color: %DESTRUCTIVE3%;
+      color: /*%DESTRUCTIVE3%*/ #d9170e;
     }
 
     ^helper-icon {
@@ -89,9 +89,9 @@ foam.CLASS({
     ^error .foam-u2-DateView,
     ^error .foam-u2-view-date-DateTimePicker .date-display-box
     {
-      color: %DESTRUCTIVE3% !important;
-      background-color: %DESTRUCTIVE5% !important;
-      border-color: %DESTRUCTIVE3% !important;
+      color: /*%DESTRUCTIVE3%*/ #d9170e !important;
+      background-color: /*%DESTRUCTIVE5%*/ #fbedec !important;
+      border-color: /*%DESTRUCTIVE3%*/ #d9170e !important;
     }
 
     /*

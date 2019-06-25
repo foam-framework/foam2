@@ -487,7 +487,7 @@ foam.CLASS({
         ^ {
           border: 0;
           border-top: 1px solid #f4f4f9;
-          color: %PRIMARY3%;
+          color: /*%PRIMARY3%*/ #406dea;
           display: flex;
           font-size: 12px;
           text-align: left;
@@ -496,7 +496,7 @@ foam.CLASS({
 
         ^:hover {
           cursor: pointer;
-          color: %PRIMARY2%;
+          color: /*%PRIMARY2%*/ #144794;
         }
 
         ^ img + span {

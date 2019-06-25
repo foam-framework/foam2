@@ -60,17 +60,17 @@ foam.CLASS({
       font-size: 12px;
       font-weight: 300;
       text-align: left;
-      color: %BLACK%;
+      color: /*%BLACK%*/ #1e1f21;
       margin-bottom: 8px;
     }
     ^ .link {
       margin-left: 2px;
-      color: %PRIMARY3%;
+      color: /*%PRIMARY3%*/ #406dea;
       cursor: pointer;
     }
     ^ .forgot-link {
       margin-left: 2px;
-      color: %PRIMARY3%;
+      color: /*%PRIMARY3%*/ #406dea;
       cursor: pointer;
       float: right;
     }

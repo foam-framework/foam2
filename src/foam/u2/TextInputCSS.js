@@ -22,36 +22,36 @@ foam.CLASS({
           padding-right: %INPUTHORIZONTALPADDING%;
           border: 1px solid;
           border-radius: 3px;
-          color: %BLACK%;
+          color: /*%BLACK%*/ #1e1f21;
           background-color: white;
-          border-color: %GREY3%;
+          border-color: /*%GREY3%*/ #cbcfd4;
         }
 
         ^:hover {
-          border-color: %GREY2%;
+          border-color: /*%GREY2%*/ #9ba1a6;
         }
 
         ^:hover::placeholder,
         ^:hover:-ms-input-placeholder,
         ^:hover::-ms-input-placeholder {
-          color: %GREY2%;
+          color: /*%GREY2%*/ #9ba1a6;
         }
 
         ^:focus {
           outline: none;
-          border-color: %PRIMARY3%;
+          border-color: /*%PRIMARY3%*/ #406dea;
         }
 
         ^:disabled {
-          color: %GREY2%;
-          background-color: %GREY5%;
-          border-color: %GREY3%;
+          color: /*%GREY2%*/ #9ba1a6;
+          background-color: /*%GREY5%*/ #f5f7fa;
+          border-color: /*%GREY3%*/ #cbcfd4;
         }
 
         ^.error {
-          color: %DESTRUCTIVE3%;
-          background-color: %DESTRUCTIVE5%;
-          border-color: %DESTRUCTIVE3%;
+          color: /*%DESTRUCTIVE3%*/ #d9170e;
+          background-color: /*%DESTRUCTIVE5%*/ #fbedec;
+          border-color: /*%DESTRUCTIVE3%*/ #d9170e;
         }
       `,
     },

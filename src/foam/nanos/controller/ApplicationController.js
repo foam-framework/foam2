@@ -123,7 +123,7 @@ foam.CLASS({
       font-size: 14px;
       letter-spacing: 0.2px;
       color: #373a3c;
-      background: %GREY5%;
+      background: /*%GREY5%*/ #f5f7fa;
       margin: 0;
     }
     .stack-wrapper {
@@ -296,8 +296,17 @@ foam.CLASS({
       /* A short-form macros is of the form %PRIMARY_COLOR%. */
       var M = m.toUpperCase();
 
+      // NOTE: We add a negative lookahead for */, which is used to close a
+      // comment in CSS. We do this because if we don't, then when a developer
+      // chooses to include a long form CSS macro directly in their CSS such as
+      //
+      //                       /*%EXAMPLE%*/ #abc123
+      //
+      // then we don't want this method to expand the commented portion of that
+      // CSS because it's already in long form. By checking if */ follows the
+      // macro, we can tell if it's already in long form and skip it.
       return css.replace(
-        new RegExp('%' + M + '%', 'g'),
+        new RegExp('%' + M + '%(?!\\*/)', 'g'),
         '/*%' + M + '%*/ ' + this.theme[m]);
     },
 

@@ -77,17 +77,17 @@ foam.CLASS({
       font-size: 14px;
       font-weight: 300;
       letter-spacing: 0.2px;
-      color: %PRIMARY3%;
+      color: /*%PRIMARY3%*/ #406dea;
     }
     ^ .uploadRestriction {
       margin-top: 9px;
       font-size: 10px;
       font-weight: 300;
       letter-spacing: 0.2px;
-      color: %BLACK%;
+      color: /*%BLACK%*/ #1e1f21;
     }
     ^ .box-for-drag-drop {
-      border: dashed 4px %GREY5%;
+      border: dashed 4px /*%GREY5%*/ #f5f7fa;
       background:white;
       height: 100px;
       padding: 10px 10px;
