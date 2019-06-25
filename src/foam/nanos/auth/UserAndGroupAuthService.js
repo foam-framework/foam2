@@ -226,11 +226,13 @@ foam.CLASS({
       `
     },
     {
-      name: 'checkPermission',
+      name: 'check',
       documentation: `Check if the user in the context supplied has the right
         permission.`,
       javaCode: `
         if ( x == null || permission == null ) return false;
+
+        java.security.Permission p = new AuthPermission(permission);
 
         Session session = x.get(Session.class);
         if ( session == null || session.getUserId() == 0 ) return false;
@@ -249,24 +251,18 @@ foam.CLASS({
             if ( ! group.getEnabled() ) return false;
 
             // check permission
-            if ( group.implies(x, permission) ) return true;
+            if ( group.implies(x, p) ) return true;
 
             // check parent group
             group = (Group) ((DAO) getLocalGroupDAO()).find(group.getParent());
           }
         } catch (IllegalArgumentException e) {
           Logger logger = (Logger) x.get("logger");
-          logger.error("check", permission, e);
+          logger.error("check", p, e);
         } catch (Throwable t) {
         }
 
         return false;
-      `
-    },
-    {
-      name: 'check',
-      javaCode: `
-        return checkPermission(x, new AuthPermission(permission));
       `
     },
     {
