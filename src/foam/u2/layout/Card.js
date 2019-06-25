@@ -16,6 +16,12 @@ foam.CLASS({
     'displayWidth?'
   ],
 
+  css: `
+    ^ {
+      margin: 8px;
+    }
+  `,
+
   properties: [
     {
       class: 'Int',
@@ -103,29 +109,29 @@ foam.CLASS({
 
       if ( this.displayWidth ) {
         if ( this.displayWidth <= foam.u2.layout.DisplayWidth.XXS ) {
-          flex = this.xxsCols / foam.u2.layout.DisplayWidth.XXS.size;
+          flex = this.xxsCols / foam.u2.layout.DisplayWidth.XXS.cols;
           
         } else if ( this.displayWidth <= foam.u2.layout.DisplayWidth.XS ) {
-          flex = this.xsCols / foam.u2.layout.DisplayWidth.XS.size;
+          flex = this.xsCols / foam.u2.layout.DisplayWidth.XS.cols;
 
         } else if ( this.displayWidth <= foam.u2.layout.DisplayWidth.SM ) {
-          flex = this.smCols / foam.u2.layout.DisplayWidth.SM.size;
+          flex = this.smCols / foam.u2.layout.DisplayWidth.SM.cols;
 
         } else if ( this.displayWidth <= foam.u2.layout.DisplayWidth.MD ) {
-          flex = this.mdCols / foam.u2.layout.DisplayWidth.MD.size;
+          flex = this.mdCols / foam.u2.layout.DisplayWidth.MD.cols;
 
         } else if ( this.displayWidth <= foam.u2.layout.DisplayWidth.LG ) {
-          flex = this.lgCols / foam.u2.layout.DisplayWidth.LG.size;
+          flex = this.lgCols / foam.u2.layout.DisplayWidth.LG.cols;
           
         } else if ( this.displayWidth <= foam.u2.layout.DisplayWidth.XL ) {
-          flex = this.xlCols / foam.u2.layout.DisplayWidth.XL.size;
+          flex = this.xlCols / foam.u2.layout.DisplayWidth.XL.cols;
 
         } else {
-          flex = this.xlCols / foam.u2.layout.DisplayWidth.XL.size;
+          flex = this.xlCols / foam.u2.layout.DisplayWidth.XL.cols;
         }
         
       } else {
-        flex = this.xlCols / 12;
+        flex = this.xlCols / foam.u2.layout.DisplayWidth.XL.cols;
       }
 
       this.style({ 'flex-grow': flex })
