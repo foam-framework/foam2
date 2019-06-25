@@ -28,7 +28,12 @@ foam.CLASS({
     'foam.nanos.u2.navigation.UserView'
   ],
 
-  imports: [ 'menuDAO', 'user', 'loginSuccess' ],
+  imports: [
+    'group',
+    'loginSuccess',
+    'menuDAO',
+    'user'
+  ],
 
   css: `
     ^ {
@@ -132,7 +137,7 @@ foam.CLASS({
         .start()
           .addClass('logged-in-container')
           .tag({ class: 'foam.nanos.u2.navigation.BusinessLogoView' })
-          .start({ class: 'foam.nanos.menu.MenuBar' })
+          .start(this.MenuBar, { menuName$: this.group$.dot('rootMenu') })
             .addClass('menuBar')
           .end()
           .tag({ class: 'foam.nanos.u2.navigation.UserView' })
