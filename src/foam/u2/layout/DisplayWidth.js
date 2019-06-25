@@ -6,12 +6,12 @@ foam.ENUM({
   `,
 
   values: [
-      { name: 'XXS', label: 1440, cols: 8 },
-      { name: 'XS', label: 1280, cols: 8 },
-      { name: 'SM', label: 960, cols: 12 },
-      { name: 'MD', label: 768, cols: 12 },
-      { name: 'LG', label: 576, cols: 12 },
-      { name: 'XL', label: 320, cols: 12 },
+      { name: 'XXS', label: 320, cols: 8 },
+      { name: 'XS', label: 576, cols: 8 },
+      { name: 'SM', label: 768, cols: 12 },
+      { name: 'MD', label: 960, cols: 12 },
+      { name: 'LG', label: 1280, cols: 12 },
+      { name: 'XL', label: 1440, cols: 12 },
   ],
 
   properties: [
