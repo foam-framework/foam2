@@ -286,6 +286,13 @@ foam.CLASS({
       `
     },
     {
+      name: 'getUnit',
+      documentation: 'Reads a syntatically meaningful unit from the journal',
+      javacode: `
+      
+      `
+    },
+    {
       name: 'replay',
       documentation: 'Replays the journal file',
       javaCode: `
@@ -327,9 +334,8 @@ foam.CLASS({
           }
         } catch ( Throwable t) {
           getLogger().error("Failed to read from journal", t);
-        } finally {
-          getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename());
         }
+        getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename());
       `
     },
     {
