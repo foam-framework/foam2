@@ -300,7 +300,7 @@ foam.CLASS({
             if ( COMMENT.matcher(line).matches() ) continue;
 
             try {
-              operation = line.charAt(0);
+              char operation = line.charAt(0);
               line = line.trim();
               if ( getMultiLine() ) {
                 StringBuilder sb = new StringBuilder();
