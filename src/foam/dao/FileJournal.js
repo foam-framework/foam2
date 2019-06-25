@@ -290,32 +290,26 @@ foam.CLASS({
       name: 'getCommand',
       documentation: 'reads a syntatically meaningful bluck from the service file',
       type: 'String',
-      args: [
-        {
-          name: 'reader',
-          type: 'BufferedReader'
-        }
-      ],
       javaCode: `
-        try {
-          String line = reader.readLine();
-          line = line.trim();
+        try ( BufferedReader reader = getReader() ) {
+          String line = reader.readLine().trim();
+          if ( line == null )
+            return null;
           if ( getMultiLine() ) {
             StringBuilder sb = new StringBuilder();
-            while ( line.charAt(line.length()) != ')' && line.charAt(line.length()) != '}' ) {
+            while ( line.charAt(line.length()) != ')' && line.charAt(line.length() - 1) != '}' ) {
               sb.append(line);
               sb.append(System.lineSeparator());
-              line = reader.readLine();
-              if ( line == null )
-                return null;
+              line = reader.readLine().trim();
             }
             sb.append(line);
             return sb.toString();
           }
           return line;
-        } catch ( Throwable t ) {
+        } catch ( Throwable t) {
+          getLogger().error("Failed to read from journal", t);
           return null;
-        }
+        } 
       `
     },
     {
@@ -326,41 +320,35 @@ foam.CLASS({
         int successReading = 0;
         JSONParser parser = getParser();
 
-        try ( BufferedReader reader = getReader() ) {
-          for ( String line ; ( line = getCommand(reader) ) != null ; ) {
-            if ( SafetyUtil.isEmpty(line)        ) continue;
-            if ( COMMENT.matcher(line).matches() ) continue;
+        for ( String line ; ( line = getCommand() ) != null ; ) {
+          if ( SafetyUtil.isEmpty(line)        ) continue;
+          if ( COMMENT.matcher(line).matches() ) continue;
 
-            try {
-              char operation = line.charAt(0);
-              line = line.substring(2, line.length() - 1);
-              FObject obj = parser.parseString(line);
-              if ( obj == null ) {
-                getLogger().error("Parse error", getParsingErrorMessage(line), "line:", line);
-                continue;
-              }
-
-              switch ( operation ) {
-                case 'p':
-                  foam.core.FObject old = dao.find(obj.getProperty("id"));
-                  dao.put(old != null ? mergeFObject(old, obj) : obj);
-                  break;
-
-                case 'r':
-                  dao.remove(obj);
-                  break;
-              }
-
-              successReading++;
-            } catch ( Throwable t ) {
-              getLogger().error("Error replaying journal line:", line, t);
+          try {
+            char operation = line.charAt(0);
+            line = line.trim().substring(2, line.length() - 1);
+            FObject obj = parser.parseString(line);
+            if ( obj == null ) {
+              getLogger().error("Parse error", getParsingErrorMessage(line), "line:", line);
+              continue;
             }
+
+            switch ( operation ) {
+              case 'p':
+                foam.core.FObject old = dao.find(obj.getProperty("id"));
+                dao.put(old != null ? mergeFObject(old, obj) : obj);
+                break;
+
+              case 'r':
+                dao.remove(obj);
+                break;
+            }
+            successReading++;
+          } catch ( Throwable t ) {
+            getLogger().error("Error replaying journal line:", line, t);
           }
-        } catch ( Throwable t) {
-          getLogger().error("Failed to read from journal", t);
-        } finally {
-          getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename());
         }
+        getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename());
       `
     },
     {
