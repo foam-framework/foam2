@@ -65,9 +65,7 @@ java.time.LocalDate localDate = java.time.Instant.ofEpochMilli(date.getTime()).a
 java.time.LocalDateTime localDateTime = localDate.atTime(java.time.LocalTime.MAX);
 
 // Convert to Date using LocalDateTime
-java.util.date eod = java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant());
-
-return eod;
+return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant());
       `
     }
   ]
@@ -113,9 +111,7 @@ localDate = localDate.plusDays(6 - localDate.getDayOfWeek().getValue());
 java.time.LocalDateTime localDateTime = localDate.atTime(java.time.LocalTime.MAX);
 
 // Convert to Date using LocalDateTime
-java.util.date eod = java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant());
-
-return eod;
+return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant());
       `
     }
   ]
@@ -153,9 +149,7 @@ localDate = localDate.plusDays(localDate.lengthOfMonth() - localDate.getDayOfMon
 java.time.LocalDateTime localDateTime = localDate.atTime(java.time.LocalTime.MAX);
 
 // Convert to Date using LocalDateTime
-java.util.date eod = java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant());
-
-return eod;
+return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant());
       `
     }
   ]
@@ -201,9 +195,7 @@ localDate = localDate.plusDays(localDate.lengthOfMonth() - localDate.getDayOfMon
 java.time.LocalDateTime localDateTime = localDate.atTime(java.time.LocalTime.MAX);
 
 // Convert to Date using LocalDateTime
-java.util.date eod = java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant());
-
-return eod;
+return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant());
       `
     }
   ]
