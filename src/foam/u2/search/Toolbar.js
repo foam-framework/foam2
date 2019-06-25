@@ -9,6 +9,12 @@ foam.CLASS({
   name: 'Toolbar',
   extends: 'foam.u2.View',
 
+  css: `
+    ^ {
+      display: none;
+    }
+  `,
+
   documentation: `
     TODO:
     A toolbar which features filtering, searching and exporting
