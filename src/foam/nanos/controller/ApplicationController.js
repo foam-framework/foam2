@@ -56,6 +56,7 @@ foam.CLASS({
   ],
 
   exports: [
+    'displayWidth',
     'appConfig',
     'as ctrl',
     'currentMenu',
@@ -138,6 +139,13 @@ foam.CLASS({
   `,
 
   properties: [
+    {
+      class: 'Int',
+      name: 'displayWidth',
+      factory: function() {
+        return window.innerWidth;
+      }
+    },
     {
       name: 'clientPromise',
       factory: function() {
@@ -241,6 +249,8 @@ foam.CLASS({
     },
 
     function initE() {
+      window.addEventListener('resize', () => this.displayWidth = window.innerWidth);
+
       this.clientPromise.then(() => {
         this.fetchTheme().then(() => {
           this

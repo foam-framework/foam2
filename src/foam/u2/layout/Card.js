@@ -8,32 +8,87 @@ foam.CLASS({
   package: 'foam.u2.layout',
   name: 'Card',
   extends: 'foam.u2.borders.CardBorder',
+  documentation: `
+    A card based on a responsive grid system
+  `,
+
+  imports: [
+    'displayWidth?'
+  ],
 
   properties: [
     {
       class: 'Int',
-      name: 'def',
+      name: 'cols',
+      documentation: `
+        Sets up a standard default column width across all display types
+      `,
       value: 12
     },
     {
       class: 'Int',
-      name: 'md',
-      expression: function(def) {
-        return def;
+      name: 'xxsCols',
+      documentation: `
+        The column width for the smaller end of smartphone devices and smartphone portrait screens:
+        Max-width @ 320px and an 8 column grid
+      `,
+      expression: function(cols) {
+        return cols > 8 ? 8 : cols;
       }
     },
     {
       class: 'Int',
-      name: 'lg',
-      expression: function(def) {
-        return def;
+      name: 'xsCols',
+      documentation: `
+        The column width for the regular end of smartphone devices
+        Max-width @ 576px, min-width @ 320px and an 8 column grid
+      `,
+      expression: function(cols) {
+        return cols > 8 ? 8 : cols;
       }
     },
     {
       class: 'Int',
-      name: 'sm',
-      expression: function(def) {
-        return def;
+      name: 'smCols',
+      documentation: `
+        The column width for the larger end of smartphone devices and landscape smartphone screens:
+        Max-width @ 768px, min-width @ 576px and a 12 column grid
+      `,
+      expression: function(cols) {
+        return cols;
+      }
+    },
+    {
+      class: 'Int',
+      name: 'mdCols',
+      documentation: `
+        The column width for most tablet screens and portrait tablet screens:
+        Max-width @ 960px, min-width @ 768px and a 12 column grid
+      `,
+      expression: function(cols) {
+        return cols;
+      }
+    },
+    {
+      class: 'Int',
+      name: 'lgCols',
+      documentation: `
+        The column width for the smaller end of desktop screens:
+        Max-width @ 1280px, min-width @ 960px and a 12 column grid
+      `,
+      expression: function(cols) {
+        return cols;
+      }
+    },
+    {
+      class: 'Int',
+      name: 'xlCols',
+      documentation: `
+        The column width for the majority of desktop screens:
+        Max-width @ 1440px, min-width @ 1280px and a 12 column grid
+      `,
+      expression: function(cols) {
+        return cols;
       }
     }
   ],
@@ -43,8 +98,35 @@ foam.CLASS({
       this.SUPER();
       this.addClass(this.myClass());
 
-      // TODO: find the display mode and adjust accordingly (e.g. for sm divide by 8), for now just use md
-      var flex = this.md / 12;
+      // set the default value the xl if display width doesn't exist
+      let flex;
+
+      if ( this.displayWidth ) {
+        if ( this.displayWidth <= foam.u2.layout.DisplayWidth.XXS ) {
+          flex = this.xxsCols / foam.u2.layout.DisplayWidth.XXS.size;
+          
+        } else if ( this.displayWidth <= foam.u2.layout.DisplayWidth.XS ) {
+          flex = this.xsCols / foam.u2.layout.DisplayWidth.XS.size;
+
+        } else if ( this.displayWidth <= foam.u2.layout.DisplayWidth.SM ) {
+          flex = this.smCols / foam.u2.layout.DisplayWidth.SM.size;
+
+        } else if ( this.displayWidth <= foam.u2.layout.DisplayWidth.MD ) {
+          flex = this.mdCols / foam.u2.layout.DisplayWidth.MD.size;
+
+        } else if ( this.displayWidth <= foam.u2.layout.DisplayWidth.LG ) {
+          flex = this.lgCols / foam.u2.layout.DisplayWidth.LG.size;
+          
+        } else if ( this.displayWidth <= foam.u2.layout.DisplayWidth.XL ) {
+          flex = this.xlCols / foam.u2.layout.DisplayWidth.XL.size;
+
+        } else {
+          flex = this.xlCols / foam.u2.layout.DisplayWidth.XL.size;
+        }
+        
+      } else {
+        flex = this.xlCols / 12;
+      }
 
       this.style({ 'flex-grow': flex })
     }

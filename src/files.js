@@ -633,6 +633,7 @@ FOAM_FILES([
   { name: "foam/u2/view/date/Month" },
   { name: "foam/u2/view/date/Weekday" },
 
+  { name: "foam/u2/layout/DisplayWidth" },
   { name: "foam/u2/layout/Layouts" },
   { name: "foam/u2/layout/Cards" },
   { name: "foam/u2/layout/Card" },
