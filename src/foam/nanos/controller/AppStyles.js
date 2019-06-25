@@ -17,7 +17,7 @@ foam.CLASS({
       font-size: 14px;
       letter-spacing: 0.2px;
       color: #373a3c;
-      background: %BACKGROUNDCOLOR%;
+      background: /*%GREY5%*/ #f5f7fa;
       margin: 0;
     }
     table.foam-u2-view-TableView {
@@ -42,7 +42,7 @@ foam.CLASS({
       font-size: 12px;
       letter-spacing: 0.2px;
       text-align: left;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
       padding-left: 15px;
       height: 60px;
     }
@@ -52,7 +52,7 @@ foam.CLASS({
       font-size: 14px;
       line-height: 1;
       letter-spacing: 0.4px;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
     }
     .foam-u2-view-TableView td {
       font-family: Roboto, 'Helvetica Neue', helvetica, sans-serif;
@@ -61,7 +61,7 @@ foam.CLASS({
       letter-spacing: 0.2px;
       padding-left: 15px;
       font-size: 12px;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
     }
     .foam-u2-view-TableView-row {
       height: 60px;
@@ -77,7 +77,7 @@ foam.CLASS({
       width: 60px;
       height: 20px;
       border-radius: 100px;
-      background-color: #093649;
+      background-color: /*%BLACK%*/ #1e1f21;
     }
     .Open {
       width: 49px;
