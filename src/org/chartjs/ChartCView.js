@@ -17,11 +17,7 @@ foam.CLASS({
     {
       class: 'Map',
       name: 'config'
-    },
-    // These actual values appear to be ignored but they need to be non-zero.
-    // It's up to the parent to enforce height/width constraints.
-    ['width', 1],
-    ['height', 1]
+    }
   ],
 
   reactions: [

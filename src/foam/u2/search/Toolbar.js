@@ -10,6 +10,7 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   documentation: `
+    TODO:
     A toolbar which features filtering, searching and exporting
   `,
 
@@ -33,11 +34,14 @@ foam.CLASS({
   methods: [
     function initE() {
       this.SUPER();
-      this.tag({
-        class: 'foam.u2.detail.SectionedDetailPropertyView',
-        data: this,
-        prop: this.SEARCH
-      });
+      this.addClass(this.myClass())
+        .startContext({ controllerMode: foam.u2.ControllerMode.EDIT })
+          .tag({
+            class: 'foam.u2.detail.SectionedDetailPropertyView',
+            data: this,
+            prop: this.SEARCH
+          })
+        .endContext()
     }
   ]
 });

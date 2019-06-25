@@ -74,7 +74,7 @@ public class AltIndex
 
       // only return the smallest cost plan
       if ( plan.cost() < bestPlan.cost() ) {
-        bestPlan = plan;
+        bestPlan  = plan;
         bestState = s[i];
         if ( bestPlan.cost() <= GOOD_ENOUGH_PLAN_COST ) break;
       }

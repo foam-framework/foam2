@@ -581,7 +581,10 @@ return delegate;
       }
 
       if ( this.logging ) {
-        dao = this.LoggingDAO.Builder(x).setNSpec(getNSpec()).setDelegate(dao).build();
+        dao = this.LoggingDAO.create({
+          nSpec: this.nSpec,
+          delegate: dao
+        });
       }
 
       var self = this;

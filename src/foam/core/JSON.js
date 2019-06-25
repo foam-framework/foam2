@@ -355,14 +355,10 @@ foam.CLASS({
       if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) )
         return false;
 
-      // Access property before checking o.hasOwnProperty.
-      var v = o[p.name];
       if ( this.outputOwnPropertiesOnly && ! o.hasOwnProperty(p.name) )
         return false;
 
-      // empty array should be included in the json in case it's being updated to be empty
-      // if ( foam.Array.isInstance(v) && v.length == 0 )
-      //   return false;
+      var v = o[p.name];
 
       if ( includeComma ) this.out(',');
 
