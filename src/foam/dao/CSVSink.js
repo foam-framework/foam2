@@ -8,6 +8,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'CSVSink',
   extends: 'foam.dao.AbstractSink',
+  implements: [ 'foam.core.Serializable' ],
 
   documentation: 'Sink runs the csv outputter, and contains the resulting string in this.csv',
 
@@ -25,8 +26,8 @@ foam.CLASS({
     {
       name: 'props',
       expression: function(of) {
-        return of.getAxiomsByClass(foam.core.Property)
-          .filter( (p) => ! p.networkTransient );
+        return of ? of.getAxiomsByClass(foam.core.Property)
+          .filter( (p) => ! p.networkTransient ) : [];
       },
       visibility: 'HIDDEN'
     },
@@ -84,21 +85,27 @@ foam.CLASS({
       this.isNewLine = true;
     },
 
-    function put(obj) {
-      if ( ! this.of ) this.of = obj.cls_;
+    {
+      name: 'put',
+      code: function(obj) {
+        if ( ! this.of ) this.of = obj.cls_;
 
-      if ( ! this.isHeadersOutput ) {
+        if ( ! this.isHeadersOutput ) {
+          this.props.forEach((element) => {
+            element.toCSVLabel(this, element);
+          });
+          this.newLine_();
+          this.isHeadersOutput = true;
+        }
+
         this.props.forEach((element) => {
-          element.toCSVLabel(this, element);
+          element.toCSV(obj, this, element);
         });
         this.newLine_();
-        this.isHeadersOutput = true;
-      }
-
-      this.props.forEach((element) => {
-        element.toCSV(obj, this, element);
-      });
-      this.newLine_();
+      },
+      javaCode: `
+        System.out.println("yoo");
+      `,
     },
 
     function reset() {
