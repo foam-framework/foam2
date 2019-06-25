@@ -305,9 +305,8 @@ foam.CLASS({
               sb.append(line);
               line = reader.readLine();
               line = line.trim();
-              if ( line == null ) {
+              if ( line == null )
                 return null;
-              }
             }
             sb.append(line);
             line = sb.toString();
