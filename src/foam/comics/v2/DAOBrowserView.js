@@ -15,7 +15,8 @@ foam.CLASS({
     'foam.u2.layout.Rows',
     'foam.u2.search.Toolbar',
     'foam.u2.view.ScrollTableView',
-    'foam.u2.view.TabChoiceView'
+    'foam.u2.view.TabChoiceView',
+    'foam.comics.v2.DAOControllerConfig'
   ],
 
   documentation: `
@@ -40,6 +41,7 @@ foam.CLASS({
     ^query-bar {
       padding: 24px 16px;
       align-items: center;
+      display: none;
     }
 
     ^toolbar {
@@ -92,7 +94,7 @@ foam.CLASS({
       of: 'foam.comics.v2.DAOControllerConfig',
       name: 'config',
       factory: function() {
-        return foam.comics.v2.DAOControllerConfig.create({ dao: this.data });
+        return this.DAOControllerConfig.create({ dao: this.data });
       }
     },
     {

@@ -28,7 +28,18 @@ foam.CLASS({
     },
     {
       class: 'Long',
-      name: 'periodLengthMs'
+      name: 'periodLengthMs',
+      documentation: 'Convenience property for setting closeTimeExpr',
+      javaSetter: `
+setCloseTimeExpr(new foam.glang.EndOfTimeSpan.Builder(getX())
+  .setDelegate(new foam.mlang.IdentityExpr.Builder(getX()).build())
+  .setTimeSpanMs(val)
+  .build());
+      `
+    },
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'closeTimeExpr'
     },
     {
       class: 'Object',
@@ -60,26 +71,18 @@ foam.CLASS({
     {
       name: 'foldForState',
       javaCode: `
-        X    x         = getX();
-        long periodMs  = getPeriodLengthMs();
-        Date closeTime = new Date();
-
-        closeTime.setTime((time.getTime() / periodMs) * periodMs + periodMs);
+        X x = getX();
 
         CandlestickId id = new CandlestickId();
-        id.setCloseTime(closeTime);
+        id.setCloseTime((java.util.Date) getCloseTimeExpr().f(time));
         id.setKey(key);
         id.init_();
 
         synchronized ( getLock(key) ) {
           Candlestick c = (Candlestick) getDao().find(id);
           if ( c == null ) {
-            Date openTime = new Date();
-            openTime.setTime(closeTime.getTime() - getPeriodLengthMs());
-
             c = new Candlestick(x);
-            c.setCloseTime(closeTime);
-            c.setOpenTime(openTime);
+            c.setCloseTime(id.getCloseTime());
             c.setKey(key);
             c.init_();
           }
