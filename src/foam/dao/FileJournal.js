@@ -288,8 +288,15 @@ foam.CLASS({
     {
       name: 'getUnit',
       documentation: 'Reads a syntatically meaningful unit from the journal',
-      javacode: `
-      
+      type: 'String',
+      args: [
+        {
+          name: 'reader',
+          type: 'BufferedReader'
+        }
+      ],
+      javaCode: `
+        return reader.readLine();
       `
     },
     {
@@ -301,7 +308,7 @@ foam.CLASS({
         JSONParser parser = getParser();
 
         try ( BufferedReader reader = getReader() ) {
-          for ( String line ; ( line = reader.readLine() ) != null ; ) {
+          for ( String line ; ( line = getUnit(reader) ) != null ; ) {
             if ( SafetyUtil.isEmpty(line)        ) continue;
             if ( COMMENT.matcher(line).matches() ) continue;
 
@@ -334,8 +341,9 @@ foam.CLASS({
           }
         } catch ( Throwable t) {
           getLogger().error("Failed to read from journal", t);
+        } finally {
+          getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename());
         }
-        getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename());
       `
     },
     {
