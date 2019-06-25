@@ -24,7 +24,7 @@ foam.CLASS({
     ^ {
       height: 40.8px;
       width: 448px;
-      background-color: /*%BLACK%*/ #1e1f21;
+      background-color: /*%PRIMARY1%*/ #202341;
       border-radius: 2px 2px 0 0;
       margin: auto;
     }

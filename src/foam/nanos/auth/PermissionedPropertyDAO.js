@@ -43,7 +43,7 @@ foam.CLASS({
   FObject oldObj = getDelegate().find_(x, id);
 
   if ( oldObj != null ) {
-    return maybeRemoveProperties(x, oldObj);
+    return maybeRemoveProperties(x, oldObj, new HashMap());
   }
 
   return null;
@@ -120,35 +120,39 @@ foam.CLASS({
         {
           name: 'oldObj',
           type: 'foam.core.FObject'
+        },
+        {
+          name: 'propMap',
+          type: 'Map'
         }
       ],
       javaCode: `
-  String of = oldObj.getClass().getSimpleName().toLowerCase();
-  FObject obj = oldObj.fclone();
-  AuthService auth = (AuthService) x.get("auth");
-
-  if ( propertyMap_.containsKey(of) ) {
-    List properties = propertyMap_.get(of);
-    Iterator e = properties.iterator();
-    while ( e.hasNext() ) {
-      PropertyInfo axiom = (PropertyInfo) e.next();
-      maybeRemove(axiom, of, auth, x, obj, oldObj);
-    }
-  } else {
-    List<PropertyInfo> properties = new ArrayList<>();
-    List list = oldObj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
-    Iterator e = list.iterator();
-    while ( e.hasNext() ) {
-      PropertyInfo axiom = (PropertyInfo) e.next();
-      if ( axiom.getPermissionRequired() ) {
-        properties.add(axiom);
-        maybeRemove(axiom, of,auth, x, obj, oldObj);
+      String of = oldObj.getClass().getSimpleName().toLowerCase();
+      FObject obj = oldObj.fclone();
+      AuthService auth = (AuthService) x.get("auth");
+      if ( ! propMap.containsKey(of) ) {
+        List<PropertyInfo> properties = new ArrayList<>();
+        List list = oldObj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+        Iterator e = list.iterator();
+        while ( e.hasNext() ) {
+          PropertyInfo axiom = (PropertyInfo) e.next();
+          if ( axiom.getPermissionRequired() ) {
+            boolean authCheck = auth.check(x, of + ".rw." + axiom.getName().toLowerCase()) || auth.check(x, of + ".ro." + axiom.getName().toLowerCase());
+            if ( ! authCheck ) {
+              properties.add(axiom);
+            }
+          }
+        }
+        propMap.put(of, properties);
       }
-    }
-    propertyMap_.put(of, properties);
-  }
-
-  return obj;
+        
+      List properties = (List) propMap.get(of);
+      Iterator e = properties.iterator();
+      while ( e.hasNext() ) {
+        PropertyInfo axiom = (PropertyInfo) e.next();
+        axiom.clear(obj);
+      }
+      return obj;
       `,
     },
 
@@ -193,42 +197,7 @@ foam.CLASS({
     }
   }
       `,
-    },
-    {
-      name: 'maybeRemove',
-      args: [
-        {
-          name: 'axiom',
-          javaType: 'PropertyInfo'
-        },
-        {
-          name: 'of',
-          type: 'String'
-        },
-        {
-          name: 'auth',
-          type: 'AuthService'
-        },
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'obj',
-          type: 'foam.core.FObject'
-        },
-        {
-          name: 'oldObj',
-          type: 'foam.core.FObject'
-        }
-      ],
-      javaCode: `
-  String axiomName =  axiom.toString();
-  axiomName = axiomName.substring(axiomName.lastIndexOf(".") + 1);
-
-  if ( ! auth.check(x, of + ".rw." + axiomName.toLowerCase()) && ! auth.check(x, of + ".ro." + axiomName.toLowerCase()) ) axiom.clear(obj);
-      `,
-    },
+    }
   ],
 
   axioms: [
@@ -252,7 +221,11 @@ foam.CLASS({
   name: 'HidePropertiesSink',
 
   javaImports: [
-    'foam.core.FObject'
+    'foam.core.FObject',
+    'foam.core.PropertyInfo',
+    'java.util.HashMap',
+    'java.util.List',
+    'java.util.Map'
   ],
 
   extends: 'foam.dao.ProxySink',
@@ -260,12 +233,8 @@ foam.CLASS({
     {
       name: 'put',
       javaCode: `
-  FObject oldObj = this.dao.getDelegate().find(((FObject) obj).getProperty("id"));
-  if (oldObj != null) {
-    getDelegate().put(this.dao.maybeRemoveProperties(getX(), oldObj), sub);
-  } else {
-    getDelegate().put(obj, sub);
-  }
+        FObject fo = ((FObject) obj).fclone();
+        getDelegate().put(dao.maybeRemoveProperties(getX(), fo, propertyMap_), sub);
       `
     }
   ],
@@ -275,6 +244,9 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(`
   private PermissionedPropertyDAO dao;
+  
+  /** map of properties of a model that require model.permission.property for read / write operations **/
+  protected Map<String, List<PropertyInfo>> propertyMap_ = new HashMap<>();
   public HidePropertiesSink(foam.core.X x, foam.dao.Sink delegate, PermissionedPropertyDAO dao) {
     setX(x);
     setDelegate(delegate);

@@ -17,7 +17,7 @@ foam.CLASS({
     'foam.lib.json.ExprParser',
     'foam.lib.json.JSONParser',
     'foam.lib.json.Outputter',
-    'foam.lib.json.OutputterMode',
+    'foam.lib.StoragePropertyPredicate',
     'foam.lib.parse.*',
     'foam.nanos.auth.LastModifiedByAware',
     'foam.nanos.auth.User',
@@ -78,10 +78,7 @@ foam.CLASS({
       class: 'Object',
       name: 'outputter',
       javaType: 'foam.lib.json.Outputter',
-      javaFactory: `
-      Outputter out = new Outputter(OutputterMode.STORAGE);
-      out.setX(getX());
-      return out;`
+      javaFactory: `return new Outputter(getX()).setPropertyPredicate(new StoragePropertyPredicate());`
     },
     {
       class: 'Object',
