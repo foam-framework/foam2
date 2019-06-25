@@ -11,14 +11,13 @@ foam.CLASS({
 
   documentation: 'Sink runs the csv outputter, and contains the resulting string in this.csv',
 
-  implements: [
-    'foam.core.Serializable'
-  ],
+  implements: [ 'foam.core.Serializable' ],
 
   javaImports: [
     'foam.core.PropertyInfo',
     'java.lang.StringBuilder',
     'java.util.Arrays',
+    'java.util.List',
     'java.util.stream.Stream'
   ],
 
@@ -50,17 +49,19 @@ foam.CLASS({
       javaGetter: `
         if ( isPropertySet("columns") ) return getColumns();
         if ( isPropertySet("columns_") ) {
-          PropertyInfo[] tableColumnsList = getColumns_();
+          PropertyInfo[] tableColumnsList  = getColumns_();
           PropertyInfo[] tablePropertyList = new PropertyInfo[tableColumnsList.length];
           int i = 0;
           for(PropertyInfo tableCol : tableColumnsList) {
-            tablePropertyList[i] = (PropertyInfo) getOf().getAxiomByName(tableCol.toString());
-            i++;
+            // tablePropertyList[i] = (PropertyInfo)((foam.u2.TableColumns) getOf().getAxiomByName(tableCol.toString())).getColumns();
+            // i++;
           }
-          return tablePropertyList;
+         // return tablePropertyList;
         }
         if ( isPropertySet("of") ) {
-          return Arrays.stream(getOf().getAxiomsByClass(PropertyInfo.class)).filter( (p) -> ! p.getNetworkTransient() ).toArray();
+          List<PropertyInfo> bob = getOf().getAxiomsByClass(PropertyInfo.class);
+          PropertyInfo[] bobet = new PropertyInfo[bob.size()];
+          // return bob.stream().filter((p) -> ! p.getNetworkTransient()).toArray(bobet);
         }
         return null;
       `,
@@ -88,7 +89,7 @@ foam.CLASS({
       javaGetter: `
         if ( isPropertySet("columns_") ) return getColumns_();
         if ( isPropertySet("of") ) {
-          return getOf().getAxiomByName("tableColumns");
+          // return ((foam.u2.TableColumns) getOf().getAxiomByName("tableColumns")).getColumns();
         }
         return null;
       `
