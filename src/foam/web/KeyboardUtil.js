@@ -156,18 +156,23 @@ foam.LIB({
       /**
        * Returns a string that represents the key pressed.
        *
-       * WARNING: Only works for `keydown` or `keyup` events if the browser does
-       * not support `KeyboardEvent.key`. All major browsers at the time of
-       * writing do support that property. For the older browsers that don't,
-       * we fall back to `KeyboardEvent.which` and `KeyboardEvent.keyCode`. In
-       * those cases we use a lookup table to return what `KeyboardEvent.key`
-       * would have returned. We also handle a few browser quirks where browsers
-       * do support `KeyboardEvent.key` but return a non-standard value. The
-       * reason we don't support `keypress` though is because that event sets
-       * different values for `KeyboardEvent.which` and `KeyboardEvent.keyCode`
-       * than `keydown` and `keyup` do. So in it's current state, this method
-       * doesn't support `keypress` events on browsers that don't support
+       * WARNING: Doesn't support `keypress` events if the browser doesn't
+       * support `KeyboardEvent.key`. All major browsers at the time of writing
+       * do support that property. For the older browsers that don't, we fall
+       * back to `KeyboardEvent.which` and `KeyboardEvent.keyCode`. In those
+       * cases we use a lookup table to return what `KeyboardEvent.key` would
+       * have returned. We also handle a few browser quirks where browsers do
+       * support `KeyboardEvent.key` but return a non-standard value. The reason
+       * we don't support `keypress` though is because that event sets different
+       * values for `KeyboardEvent.which` and `KeyboardEvent.keyCode` than
+       * `keydown` and `keyup` do. So in it's current state, this method doesn't
+       * support `keypress` events on browsers that don't support
        * `KeyboardEvent.key`.
+       *
+       * TODO: Add the event type (eg: "keypress" vs "keydown") as a parameter
+       * of the method and add another lookup table to convert from the other
+       * set of which codes for keypress events. Then we can support keypress
+       * events on browsers that don't support `KeyboardEvent.key`.
        */
 
       var key = keyboardEvent.key;
