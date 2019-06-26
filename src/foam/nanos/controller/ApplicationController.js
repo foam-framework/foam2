@@ -142,28 +142,7 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.u2.layout.DisplayWidth',
       name: 'displayWidth',
-      factory: function() {
-        debugger;
-        const innerWidth = window.innerWidth;
-
-        if ( innerWidth >= foam.u2.layout.DisplayWidth.XL.minWidth ) {
-          return foam.u2.layout.DisplayWidth.XL;
-          
-        } else if ( innerWidth >= foam.u2.layout.DisplayWidth.LG.minWidth ) {
-          return foam.u2.layout.DisplayWidth.LG;
-
-        } else if ( innerWidth >= foam.u2.layout.DisplayWidth.MD.minWidth ) {
-          return foam.u2.layout.DisplayWidth.MD;
-
-        } else if ( innerWidth >= foam.u2.layout.DisplayWidth.SM.minWidth ) {
-          return foam.u2.layout.DisplayWidth.SM;
-
-        } else if ( innerWidth >= foam.u2.layout.DisplayWidth.XS.minWidth ) {
-          return foam.u2.layout.DisplayWidth.XS;
-          
-        }
-        return foam.u2.layout.DisplayWidth.XXS;
-      }
+      value: foam.u2.layout.DisplayWidth.XL
     },
     {
       name: 'clientPromise',
@@ -268,7 +247,8 @@ foam.CLASS({
     },
 
     function initE() {
-      window.addEventListener('resize', () => this.displayWidth = undefined);
+      window.addEventListener('resize', this.updateDisplayWidth);
+      this.updateDisplayWidth();
 
       this.clientPromise.then(() => {
         this.fetchTheme().then(() => {
@@ -503,6 +483,17 @@ foam.CLASS({
         this.footerView_.removeAllChildren();
         this.footerView_.tag({ class: this.theme.footerView });
       }
-    }
+    },
+    {
+      name: 'updateDisplayWidth',
+      isMerged: true,
+      mergeDelay: 5000,
+      code: function() {
+        this.displayWidth = foam.u2.layout.DisplayWidth.VALUES
+          .concat()
+          .sort((a, b) => a.minWidth - b.minWidth)
+          .find(o => o.minWidth <= window.innerWidth);
+      }
+    } 
   ]
 });
