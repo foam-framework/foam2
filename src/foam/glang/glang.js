@@ -74,8 +74,11 @@ return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()
 foam.CLASS({
   package: 'foam.glang',
   name: 'EndOfWeek',
+  extends: 'foam.mlang.AbstractExpr',
+  implements: [ 'foam.core.Serializable' ],
   properties: [
     {
+      class: 'foam.mlang.ExprProperty',
       name: 'delegate'
     },
     {
@@ -120,8 +123,11 @@ return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()
 foam.CLASS({
   package: 'foam.glang',
   name: 'EndOfMonth',
+  extends: 'foam.mlang.AbstractExpr',
+  implements: [ 'foam.core.Serializable' ],
   properties: [
     {
+      class: 'foam.mlang.ExprProperty',
       name: 'delegate'
     }
   ],
@@ -158,9 +164,12 @@ return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()
 foam.CLASS({
   package: 'foam.glang',
   name: 'EndOfQuarter',
+  extends: 'foam.mlang.AbstractExpr',
+  implements: [ 'foam.core.Serializable' ],
   properties: [
     {
-      name: 'delegate',
+      class: 'foam.mlang.ExprProperty',
+      name: 'delegate'
     }
   ],
   methods: [
