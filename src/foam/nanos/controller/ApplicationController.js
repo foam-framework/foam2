@@ -248,7 +248,7 @@ foam.CLASS({
     },
 
     function initE() {
-      window.addEventListener('resize', () => this.displayWidth = window.innerWidth);
+      window.addEventListener('resize', () => this.displayWidth = undefined);
 
       this.clientPromise.then(() => {
         this.fetchTheme().then(() => {
