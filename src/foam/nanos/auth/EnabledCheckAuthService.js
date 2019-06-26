@@ -23,7 +23,9 @@ foam.CLASS({
         User user = (User) x.get("user");
         if ( user == null || ! user.getEnabled() ) return false;
 
-        // Check if agent exists and is enabled.
+        // Check if agent exists and is enabled. Note that it isn't mandatory
+        // that an agent always be there, so it's fine if the agent is null.
+        // However, if the agent _is_ there, then it needs to be enabled.
         User agent = (User) x.get("agent");
         if ( agent != null && ! agent.getEnabled() ) return false;
 
