@@ -29,8 +29,8 @@ foam.CLASS({
       visibility: 'HIDDEN'
     },
     {
-      class: 'FObjectArray',
-      of: 'foam.core.PropertyInfo',
+      class: 'Array',
+      javaType: 'foam.core.PropertyInfo[]',
       name: 'props',
       getter: function(of) {
         if ( !! this.props ) return this.props;
