@@ -207,6 +207,7 @@ var classes = [
   'foam.nanos.auth.DeletedAwareDummy',
   'foam.nanos.auth.DeletedAwareDAOTest',
   'foam.nanos.auth.UserAndGroupAuthService',
+  'foam.nanos.auth.EnabledCheckAuthService',
   'foam.nanos.http.HttpParameters',
   'foam.nanos.http.DefaultHttpParameters',
   'foam.nanos.session.Session',
