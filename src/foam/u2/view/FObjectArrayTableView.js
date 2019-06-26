@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'FObjectArrayTableView',
@@ -27,7 +33,6 @@ foam.CLASS({
           of: self.of
         });
         data.forEach(d => dao.put(d));
-        console.log(dao.select());
         return self.DAOBrowserView.create({
           data: dao
         });
