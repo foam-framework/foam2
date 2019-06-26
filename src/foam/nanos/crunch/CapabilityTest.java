@@ -204,7 +204,6 @@ public class CapabilityTest extends Test {
           ))
           .select(new ArraySink()))
           .getArray()).get(0);
-          System.out.println(ucJunction.getStatus());
     test(ucJunction.getStatus() == CapabilityJunctionStatus.DEPRECATED, "15. ucjunctions where target is deprecated gets status DEPRECATED");
 
     // 16. check if user still has permission p4 (shouldn't)
