@@ -301,7 +301,7 @@ foam.CLASS({
           if ( getMultiLine() ) {
             StringBuilder sb = new StringBuilder();
             line = line.trim();
-            while ( ! ( line.charAt( line.length() ) == ')' && line.charAt( line.length() - 1 ) == '}' ) ) {
+            while ( ! line.endsWith("})") ) {
               sb.append(line);
               line = reader.readLine();
               line = line.trim();
@@ -322,23 +322,23 @@ foam.CLASS({
       name: 'replay',
       documentation: 'Replays the journal file',
       javaCode: `
-        // count number of lines successfully read
+        // count number of entries successfully read
         int successReading = 0;
         JSONParser parser = getParser();
 
         try ( BufferedReader reader = getReader() ) {
-          for ( String line ; ( line = getUnit(reader) ) != null ; ) {
-            if ( SafetyUtil.isEmpty(line)        ) continue;
-            if ( COMMENT.matcher(line).matches() ) continue;
+          for ( String entry ; ( entry = getUnit(reader) ) != null ; ) {
+            if ( SafetyUtil.isEmpty(entry)        ) continue;
+            if ( COMMENT.matcher(entry).matches() ) continue;
 
             try {
-              line = line.trim();
-              char operation = line.charAt(0);
-              line = line.substring(2, line.length() - 1);
+              entry = entry.trim();
+              char operation = entry.charAt(0);
+              entry = entry.substring(2, entry.length() - 1);
 
-              FObject obj = parser.parseString(line);
+              FObject obj = parser.parseString(entry);
               if ( obj == null ) {
-                getLogger().error("Parse error", getParsingErrorMessage(line), "line:", line);
+                getLogger().error("Parse error", getParsingErrorMessage(entry), "entry:", entry);
                 continue;
               }
 
@@ -355,7 +355,7 @@ foam.CLASS({
 
               successReading++;
             } catch ( Throwable t ) {
-              getLogger().error("Error replaying journal line:", line, t);
+              getLogger().error("Error replaying journal entry:", entry, t);
             }
           }
         } catch ( Throwable t) {
