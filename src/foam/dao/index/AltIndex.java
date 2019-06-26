@@ -30,9 +30,17 @@ public class AltIndex
   }
 
   protected Object[] toObjectArray(Object state) {
-    if ( state == null ) return new Object[delegates_.size()];
+    Object[] s2 = new Object[delegates_.size()];
 
-    return (Object[]) state;
+    if ( state != null ) {
+      Object[] s1 = (Object[]) state;
+
+      for ( int i = 0 ; i < s2.length ; i++ ) {
+        s2[i] = s1[i];
+      }
+    }
+
+    return s2;
   }
 
   public Object put(Object state, FObject value) {
