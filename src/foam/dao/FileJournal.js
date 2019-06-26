@@ -286,7 +286,7 @@ foam.CLASS({
       `
     },
     {
-      name: 'getUnit',
+      name: 'getEntry',
       documentation: 'Reads a syntatically meaningful unit from the journal',
       type: 'String',
       args: [
@@ -327,7 +327,7 @@ foam.CLASS({
         JSONParser parser = getParser();
 
         try ( BufferedReader reader = getReader() ) {
-          for ( String entry ; ( entry = getUnit(reader) ) != null ; ) {
+          for ( String entry ; ( entry = getEntry(reader) ) != null ; ) {
             if ( SafetyUtil.isEmpty(entry)        ) continue;
             if ( COMMENT.matcher(entry).matches() ) continue;
 
