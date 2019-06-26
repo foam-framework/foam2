@@ -234,21 +234,10 @@ foam.CLASS({
 
         java.security.Permission p = new AuthPermission(permission);
 
-        Session session = x.get(Session.class);
-        if ( session == null || session.getUserId() == 0 ) return false;
-
-        User user = (User) x.get("user");
-
-        // check if user exists and is enabled
-        if ( user == null || ! user.getEnabled() ) return false;
-
         try {
           Group group = getCurrentGroup(x);
 
           while ( group != null ) {
-
-            // check if group is enabled
-            if ( ! group.getEnabled() ) return false;
 
             // check permission
             if ( group.implies(x, p) ) return true;
