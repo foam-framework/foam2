@@ -171,7 +171,8 @@ foam.CLASS({
       class: 'String',
       name: 'detailView',
       value: 'foam.u2.DetailView'
-    }
+    },
+    'selectedObjects'
   ],
 
   actions: [
@@ -198,9 +199,11 @@ foam.CLASS({
     {
       name: 'select',
       isAvailable: function(selectEnabled) { return selectEnabled; },
-      isEnabled: function(selection) { return !! selection; },
+      isEnabled: function(selection, selectedObjects) {
+        return this.relationship ? !! selectedObjects : !! selection;
+      },
       code: function() {
-        this.pub('select', this.selection.id);
+        this.pub('select', this.relationship ? this.selectedObjects : this.selection.id);
         this.finished.pub();
       }
     },

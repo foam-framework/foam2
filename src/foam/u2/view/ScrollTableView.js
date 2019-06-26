@@ -227,7 +227,8 @@
       class: 'Boolean',
       name: 'multiSelectEnabled',
       documentation: 'Pass through to UnstyledTableView.'
-    }
+    },
+    'selectedObjects'
   ],
 
   methods: [
@@ -256,7 +257,8 @@
               contextMenuActions: this.contextMenuActions,
               selection$: this.selection$,
               editColumnsEnabled: this.editColumnsEnabled,
-              multiSelectEnabled: this.multiSelectEnabled
+              multiSelectEnabled: this.multiSelectEnabled,
+              selectedObjects$: this.selectedObjects$
             }, this.table_$).
               addClass(this.myClass('table')).
             end().

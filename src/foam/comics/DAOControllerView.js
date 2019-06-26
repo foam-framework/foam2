@@ -194,7 +194,11 @@ foam.CLASS({
               .end()
               .start()
                 .style({ 'overflow-x': 'auto' })
-                .tag(this.summaryView, { data$: this.data.filteredDAO$ })
+                .tag(this.summaryView, {
+                  data$: this.data.filteredDAO$,
+                  multiSelectEnabled: !! this.data.relationship,
+                  selectedObjects$: this.data.selectedObjects$
+                })
               .end()
             .end()
           .end());

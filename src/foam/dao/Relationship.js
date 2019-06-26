@@ -559,6 +559,12 @@ return junction`
           subtitle: `Select a ${dao.of.name} from the table and click "Add" to add it.`
         }, x);
 
+        controller.sub('select', function(s, _, selectedObjects) {
+          Object.values(selectedObjects).forEach((obj) => {
+            self.add(obj);
+          });
+        });
+
         x.stack.push({
           class: 'foam.comics.DAOControllerView',
           data: controller
@@ -576,15 +582,16 @@ return junction`
           createEnabled: false,
           editEnabled: false,
           selectEnabled: true,
-          addEnabled: false,
           relationship: this,
           data: dao,
           title: `Remove a ${dao.of.name}`,
           subtitle: `Select a ${dao.of.name} from the table and click "Select" to add it.`
         }, x);
 
-        controller.sub('select', function(s, _, id) {
-          dao.find(id).then(function(obj) { self.remove(obj); });
+        controller.sub('select', function(s, _, selectedObjects) {
+          Object.values(selectedObjects).forEach((obj) => {
+            self.remove(obj);
+          });
         });
 
         x.stack.push({
