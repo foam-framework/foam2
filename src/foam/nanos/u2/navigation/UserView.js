@@ -172,8 +172,10 @@ foam.CLASS({
   methods: [
     function initE() {
       this.notificationDAO.on.sub(this.onDAOUpdate);
-      this.user.id$.sub(this.onDAOUpdate);
+      this.user$.dot('id').sub(this.onDAOUpdate);
+      this.group$.dot('id').sub(this.onDAOUpdate);
       this.onDAOUpdate();
+
       this
         .addClass(this.myClass())
         this.otherViews();  //currency menu
@@ -237,6 +239,7 @@ foam.CLASS({
       name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
+        if ( ! this.group || ! this.user ) return;
         var group = this.group.id;
         var id    = this.user.id;
         if ( id != 0 ) {
