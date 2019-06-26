@@ -222,6 +222,11 @@
       type: 'Boolean',
       name: 'enableDynamicTableHeight',
       value: true,
+    },
+    {
+      class: 'Boolean',
+      name: 'multiSelectEnabled',
+      documentation: 'Pass through to UnstyledTableView.'
     }
   ],
 
@@ -250,7 +255,8 @@
               columns: this.columns,
               contextMenuActions: this.contextMenuActions,
               selection$: this.selection$,
-              editColumnsEnabled: this.editColumnsEnabled
+              editColumnsEnabled: this.editColumnsEnabled,
+              multiSelectEnabled: this.multiSelectEnabled
             }, this.table_$).
               addClass(this.myClass('table')).
             end().
