@@ -143,6 +143,7 @@ foam.CLASS({
       of: 'foam.u2.layout.DisplayWidth',
       name: 'displayWidth',
       factory: function() {
+        debugger;
         const innerWidth = window.innerWidth;
 
         if ( innerWidth >= foam.u2.layout.DisplayWidth.XL.minWidth ) {
