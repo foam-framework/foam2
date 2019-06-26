@@ -102,7 +102,7 @@ foam.CLASS({
       this.style({
         'flex-grow': this.displayWidth$.map(dw => {
           dw = dw || foam.u2.layout.DisplayWidth.XL;
-          return this[`${dw.name.toLowerCase()}Columns`] / dw.columns;
+          return this[`${dw.name.toLowerCase()}Columns`] / dw.cols;
         })
       })
     }

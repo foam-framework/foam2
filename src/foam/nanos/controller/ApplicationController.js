@@ -491,7 +491,7 @@ foam.CLASS({
       code: function() {
         this.displayWidth = foam.u2.layout.DisplayWidth.VALUES
           .concat()
-          .sort((a, b) => a.minWidth - b.minWidth)
+          .sort((a, b) => b.minWidth - a.minWidth)
           .find(o => o.minWidth <= window.innerWidth);
       }
     } 
