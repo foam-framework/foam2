@@ -122,7 +122,6 @@ foam.CLASS({
   reactions: [
     ['data', 'action.create', 'onCreate'],
     ['data', 'edit', 'onEdit'],
-    ['data', 'action.findRelatedObject', 'onFindRelated'],
     ['data', 'finished', 'onFinished'],
     ['data', 'export', 'onExport']
   ],
@@ -225,19 +224,6 @@ foam.CLASS({
         class: this.updateView.class,
         detailView: this.data.detailView,
         key: id
-      }, this);
-    },
-
-    function onFindRelated() {
-      var data = this.DAOController.create({
-        data: this.data.relationship.targetDAO,
-        addEnabled: true,
-        relationship: this.data.relationship
-      });
-
-      this.stack.push({
-        class: 'foam.comics.DAOControllerView',
-        data: data
       }, this);
     },
 

@@ -78,12 +78,6 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'addEnabled',
-      documentation: 'True to enable the Add button for adding to a relationship',
-      value: false
-    },
-    {
-      class: 'Boolean',
       name: 'exportEnabled',
       documentation: 'True to enable the export button.',
       value: true
@@ -154,9 +148,7 @@ foam.CLASS({
       `,
       factory: function() {
         return this.relationship
-          ? this.addEnabled
-            ? this.ADD_SELECTION
-            : this.SELECT
+          ? this.SELECT
           : this.cls_.CREATE;
       }
     },
@@ -201,27 +193,6 @@ foam.CLASS({
       isAvailable: function(editEnabled) { return editEnabled; },
       code: function() {
         this.pub('edit', this.selection.id);
-      }
-    },
-    {
-      name: 'findRelatedObject',
-      label: 'Add',
-      isAvailable: function(relationship, addEnabled) {
-        // Only enable the Add button if we're not already trying to choose a selected item for a relationship.
-        return !! ( relationship && relationship.junctionDAO ) && ! addEnabled;
-      },
-      code: function() { }
-    },
-    {
-      name: 'addSelection',
-      label: 'Add',
-      isAvailable: function(addEnabled) { return addEnabled; },
-      isEnabled: function(selection) { return !! selection },
-      code: function() {
-        var self = this;
-        this.relationship.add(this.selection).then(function() {
-          self.finished.pub();
-        });
       }
     },
     {

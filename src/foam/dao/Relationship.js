@@ -551,8 +551,7 @@ return junction`
         var controller = foam.comics.DAOController.create({
           createEnabled: false,
           editEnabled: false,
-          selectEnabled: false,
-          addEnabled: true,
+          selectEnabled: true,
           exportEnabled: false,
           relationship: this,
           data: dao,
