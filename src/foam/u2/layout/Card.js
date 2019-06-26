@@ -39,7 +39,7 @@ foam.CLASS({
         Max-width @ 320px and an 8 column grid
       `,
       expression: function(cols) {
-        return cols > 8 ? 8 : cols;
+        return Math.min(8, cols);
       }
     },
     {
@@ -50,7 +50,7 @@ foam.CLASS({
         Max-width @ 576px, min-width @ 320px and an 8 column grid
       `,
       expression: function(cols) {
-        return cols > 8 ? 8 : cols;
+        return Math.min(8, cols);
       }
     },
     {

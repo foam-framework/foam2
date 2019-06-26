@@ -139,10 +139,29 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Int',
+      class: 'Enum',
+      of: 'foam.u2.layout.DisplayWidth',
       name: 'displayWidth',
       factory: function() {
-        return window.innerWidth;
+        const innerWidth = window.innerWidth;
+
+        if ( innerWidth >= foam.u2.layout.DisplayWidth.XL.minWidth ) {
+          return foam.u2.layout.DisplayWidth.XL;
+          
+        } else if ( innerWidth >= foam.u2.layout.DisplayWidth.LG.minWidth ) {
+          return foam.u2.layout.DisplayWidth.LG;
+
+        } else if ( innerWidth >= foam.u2.layout.DisplayWidth.MD.minWidth ) {
+          return foam.u2.layout.DisplayWidth.MD;
+
+        } else if ( innerWidth >= foam.u2.layout.DisplayWidth.SM.minWidth ) {
+          return foam.u2.layout.DisplayWidth.SM;
+
+        } else if ( innerWidth >= foam.u2.layout.DisplayWidth.XS.minWidth ) {
+          return foam.u2.layout.DisplayWidth.XS;
+          
+        }
+        return foam.u2.layout.DisplayWidth.XXS;
       }
     },
     {
