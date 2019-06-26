@@ -54,7 +54,8 @@ foam.CLASS({
       name: 'enabled',
       class: 'Boolean',
       value: true,
-      documentation: `capability is ignored by system when enabled is false`
+      documentation: `capability is ignored by system when enabled is false.
+      user will lose permissions implied by this capability and upper level capabilities will ignore this prerequisite?`
     },
     {
       name: 'visible',
@@ -104,6 +105,7 @@ foam.CLASS({
       ],
       documentation: `checks if passed permission is in the list of this.capability.capabilitiesRequired.`,
       code: function implies(x, permission) {
+        if(!this.enabled) return false;
         this.permissionsGranted.forEach(function(permissionName) {
           if(permission === permissionName) return true;
         });
@@ -115,6 +117,7 @@ foam.CLASS({
         return false;
       },
       javaCode: `
+        if(!this.getEnabled()) return false;
         String[] permissionsGranted = this.getPermissionsGranted();
         for(String permissionName : permissionsGranted) {
           if(permission.equals(permissionName)) return true; 

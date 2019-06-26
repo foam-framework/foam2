@@ -16,6 +16,7 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'java.util.List',
+    'javax.security.auth.AuthPermission',
     'static foam.mlang.MLang.*'
   ],
 
@@ -44,12 +45,13 @@ foam.CLASS({
       name: 'checkUser',
       javaCode: `
       if ( x == null || user == null || permission == null) return false;
+      if ( ! super.checkPermission(x, new AuthPermission("service.auth.checkUser")) ) throw new AuthorizationException("permission denied");
 
       try {
         DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
         List<UserCapabilityJunction> userCapabilityJunctions = (List<UserCapabilityJunction>) ((ArraySink) userCapabilityJunctionDAO
           .where(AND(
-            EQ(UserCapabilityJunction.USER_ID, user.getId()),
+            EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
             EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
           )) 
           .select(new ArraySink()))
@@ -58,7 +60,7 @@ foam.CLASS({
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
 
         for(UserCapabilityJunction ucJunction : userCapabilityJunctions) {
-          Capability capability = (Capability) capabilityDAO.find(ucJunction.getCapabilityId());
+          Capability capability = (Capability) capabilityDAO.find(ucJunction.getTargetId());
           if(capability.implies(x, permission)) return true;
         }
       } catch (Exception e) {

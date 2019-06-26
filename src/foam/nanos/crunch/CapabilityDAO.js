@@ -61,14 +61,13 @@ foam.CLASS({
     {
       name: 'select_',
       javaCode: `
-      //TODO RUBY
+      // TODO RUBY what capabilities can users see, TODO 'find_' also
       return getDelegate().select_(x, sink, skip, limit, order, predicate);
       `
     },
     {
       name: 'find_',
       javaCode:`
-      //TODO RUBY
       return super.find_(x, id);
       `
     },

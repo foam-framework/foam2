@@ -5,7 +5,7 @@ foam.CLASS({
 
   documentation: `UserCapabilityJunctionDAO requires a custom authenticated DAO decorator to only show capabilities owned by a user. Updates can only be performed by system.`,
 
-  // TODO RUBY checkownership and getfiltereddao
+  // TODO RUBY checkownership and getfiltereddao auth.check(x, "something else")?
 
   javaImports: [
     'foam.core.FObject',
@@ -32,7 +32,7 @@ foam.CLASS({
       type: 'foam.nanos.auth.User',
       javaCode: `
       User user = (User) x.get("user");
-      if(user == null) throw new AuthenticationException();
+      if(user == null) throw new AuthenticationException("user not found");
       return user;
       `
     },
@@ -53,7 +53,7 @@ foam.CLASS({
         AuthService auth = (AuthService) x.get("auth");
         boolean isOwner = ((UserCapabilityJunction) obj).getSourceId() == user.getId();
         boolean hasPermission = auth.check(x, "service.*");
-        if(!isOwner && !hasPermission) throw new AuthorizationException();
+        if(!isOwner && !hasPermission) throw new AuthorizationException("permission denied");
       `
     },
     {
@@ -91,7 +91,41 @@ foam.CLASS({
       `,
       javaCode: `
       checkOwnership(x, obj);
+      checkPrereqs(x, obj);
       return getDelegate().put_(x, obj);
+      `
+    },
+    {
+      name: 'checkPrereqs',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'foam.core.FObject'
+        }
+      ],
+      documentation: `if status set to granted check prereqs before put`,
+      javaCode: `
+      if(((UserCapabilityJunction) obj).getStatus() == CapabilityJunctionStatus.GRANTED) {
+        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+        DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+        Capability capability = (Capability) capabilityDAO.find(((UserCapabilityJunction) obj).getTargetId());
+        for(String prereq : (String[]) capability.getCapabilitiesRequired()) {
+          Capability cap = (Capability) ((DAO) x.get("capabilityDAO")).find(prereq);
+          if(!cap.getEnabled()) continue;
+          List<UserCapabilityJunction> ucJunctions = (List<UserCapabilityJunction>) ((ArraySink) getDelegate()
+          .where(AND(
+            EQ(UserCapabilityJunction.SOURCE_ID, ((UserCapabilityJunction) obj).getSourceId()),
+            EQ(UserCapabilityJunction.TARGET_ID, prereq)
+          )) 
+          .select(new ArraySink()))
+          .getArray();
+          if(ucJunctions.size() == 0 || ucJunctions.get(0).getStatus() != CapabilityJunctionStatus.GRANTED) throw new AuthorizationException("One or more prerequisite capabilities not fulfilled");
+        }
+      }
       `
     },
     {
