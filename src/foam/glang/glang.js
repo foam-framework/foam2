@@ -57,13 +57,15 @@ foam.CLASS({
         return ts;
       },
       javaCode: `
-java.util.Calendar c = java.util.Calendar.getInstance();
-c.setTimeInMillis(((java.util.Date) getDelegate().f(obj)).getTime());
-c.set(java.util.Calendar.HOUR_OF_DAY, 23);
-c.set(java.util.Calendar.MINUTE, 59);
-c.set(java.util.Calendar.SECOND, 59);
-c.set(java.util.Calendar.MILLISECOND, 999);
-return c.getTime();
+// Convert to LocalDate
+java.util.Date date = (java.util.Date) getDelegate().f(obj);
+java.time.LocalDate localDate = java.time.Instant.ofEpochMilli(date.getTime()).atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+
+// Convert to LocalDateTime set to End of Day
+java.time.LocalDateTime localDateTime = localDate.atTime(java.time.LocalTime.MAX);
+
+// Convert to Date using LocalDateTime
+return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant());
       `
     }
   ]
@@ -96,7 +98,21 @@ foam.CLASS({
 
         return ts;
         return ts.getTime() > Date.now() ? new Date() : ts;
-      }
+      },
+      javaCode: `
+// Convert to LocalDate
+java.util.Date date = (java.util.Date) getDelegate().f(obj);
+java.time.LocalDate localDate = java.time.Instant.ofEpochMilli(date.getTime()).atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+
+// Set to end of week
+localDate = localDate.plusDays(6 - localDate.getDayOfWeek().getValue());
+
+// Convert to LocalDateTime set to End of Day
+java.time.LocalDateTime localDateTime = localDate.atTime(java.time.LocalTime.MAX);
+
+// Convert to Date using LocalDateTime
+return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant());
+      `
     }
   ]
 });
@@ -120,7 +136,21 @@ foam.CLASS({
         ts.setMilliseconds(999);
         return ts;
         return ts.getTime() > Date.now() ? new Date() : ts;
-      }
+      },
+      javaCode: `
+// Convert to LocalDate
+java.util.Date date = (java.util.Date) getDelegate().f(obj);
+java.time.LocalDate localDate = java.time.Instant.ofEpochMilli(date.getTime()).atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+
+// Set to end of month
+localDate = localDate.plusDays(localDate.lengthOfMonth() - localDate.getDayOfMonth());
+
+// Convert to LocalDateTime set to End of Day
+java.time.LocalDateTime localDateTime = localDate.atTime(java.time.LocalTime.MAX);
+
+// Convert to Date using LocalDateTime
+return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant());
+      `
     }
   ]
 });
@@ -149,7 +179,24 @@ foam.CLASS({
         ts.setMilliseconds(999);
         return ts;
         return ts.getTime() > Date.now() ? new Date() : ts;
-      }
+      },
+      javaCode: `
+// Convert to LocalDate
+java.util.Date date = (java.util.Date) getDelegate().f(obj);
+java.time.LocalDate localDate = java.time.Instant.ofEpochMilli(date.getTime()).atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+
+// Set month to end of quarter
+localDate = localDate.plusMonths(2 - (localDate.getMonthValue() - 1) % 3);
+
+// Set to end of month
+localDate = localDate.plusDays(localDate.lengthOfMonth() - localDate.getDayOfMonth());
+
+// Convert to LocalDateTime set to End of Day
+java.time.LocalDateTime localDateTime = localDate.atTime(java.time.LocalTime.MAX);
+
+// Convert to Date using LocalDateTime
+return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant());
+      `
     }
   ]
 });
