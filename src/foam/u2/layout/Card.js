@@ -25,7 +25,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Int',
-      name: 'cols',
+      name: 'columns',
       documentation: `
         Sets up a standard default column width across all display types
       `,
@@ -33,62 +33,62 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'xxsCols',
+      name: 'xxsColumns',
       documentation: `
         The column width for the smaller end of smartphone devices and smartphone portrait screens using an 8 column grid
       `,
-      expression: function(cols) {
-        return Math.min(8, cols);
+      expression: function(columns) {
+        return Math.min(8, columns);
       }
     },
     {
       class: 'Int',
-      name: 'xsCols',
+      name: 'xsColumns',
       documentation: `
         The column width for the regular end of smartphone devices using an 8 column grid
       `,
-      expression: function(cols) {
-        return Math.min(8, cols);
+      expression: function(columns) {
+        return Math.min(8, columns);
       }
     },
     {
       class: 'Int',
-      name: 'smCols',
+      name: 'smColumns',
       documentation: `
         The column width for the larger end of smartphone devices and landscape smartphone screens using a 12 column grid
       `,
-      expression: function(cols) {
-        return cols;
+      expression: function(columns) {
+        return columns;
       }
     },
     {
       class: 'Int',
-      name: 'mdCols',
+      name: 'mdColumns',
       documentation: `
         The column width for most tablet screens and portrait tablet screens using a 12 column grid
       `,
-      expression: function(cols) {
-        return cols;
+      expression: function(columns) {
+        return columns;
       }
     },
     {
       class: 'Int',
-      name: 'lgCols',
+      name: 'lgColumns',
       documentation: `
         The column width for the smaller end of desktop screens using a 12 column grid
       `,
-      expression: function(cols) {
-        return cols;
+      expression: function(columns) {
+        return columns;
       }
     },
     {
       class: 'Int',
-      name: 'xlCols',
+      name: 'xlColumns',
       documentation: `
         The column width for the majority of desktop screens using a 12 column grid
       `,
-      expression: function(cols) {
-        return cols;
+      expression: function(columns) {
+        return columns;
       }
     }
   ],
@@ -102,7 +102,7 @@ foam.CLASS({
       this.style({
         'flex-grow': this.displayWidth$.map(dw => {
           dw = dw || foam.u2.layout.DisplayWidth.XL;
-          return this[`${dw.name.toLowerCase()}Cols`] / dw.cols;
+          return this[`${dw.name.toLowerCase()}Columns`] / dw.columns;
         })
       })
     }
