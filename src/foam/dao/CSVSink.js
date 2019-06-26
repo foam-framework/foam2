@@ -31,37 +31,17 @@ foam.CLASS({
     {
       class: 'FObjectArray',
       of: 'foam.core.PropertyInfo',
-      name: 'columns',
+      name: 'props',
       getter: function(of) {
-        if ( this.columns ) return this.columns;
-        if ( this.columns_.length == 0 ) {
+        if ( !! this.props ) return this.props;
+        if ( this.axioms.length == 0 ) {
           return of ? of.getAxiomsByClass(foam.core.Property)
           .filter( (p) => ! p.networkTransient ) : [];
         }
-        return this.columns_.map((tableCol) => {
+        return this.axioms.map((tableCol) => {
           return of.getAxiomByName(tableCol);
         });
       },
-      javaGetter: `
-      System.out.println("csvSink");
-        if ( isPropertySet("columns") ) return getColumns();
-        if ( isPropertySet("columns_") ) {
-          String[] tableColumnsList  = getColumns_();
-          PropertyInfo[] tablePropertyList = new PropertyInfo[tableColumnsList.length];
-          int i = 0;
-          for(String tableCol : tableColumnsList) {
-            tablePropertyList[i] = (PropertyInfo)((Object) getOf().getAxiomByName(tableCol)).getColumns();
-            i++;
-          }
-          return tablePropertyList;
-        }
-        if ( isPropertySet("of") ) {
-          List<PropertyInfo> bob = getOf().getAxiomsByClass(PropertyInfo.class);
-          PropertyInfo[] bobet = new PropertyInfo[bob.size()];
-          // return bob.stream().filter((p) -> ! p.getNetworkTransient()).toArray(bobet);
-        }
-        return null;
-      `,
       visibility: 'HIDDEN'
     },
     {
@@ -77,19 +57,11 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
-      name: 'columns_',
+      name: 'axioms',
       getter: function(of) {
-        if ( this.columns_ ) return this.columns_;
+        if ( !! this.axioms ) return this.axioms;
         return of ? of.getAxiomByName('tableColumns').columns : [];
-      },
-      javaGetter: `
-      System.out.println("csvSink 2");
-        if ( isPropertySet("columns_") ) return getColumns_();
-        if ( isPropertySet("of") ) {
-          return ((Object) getOf().getAxiomByName("tableColumns")).getColumns();
-        }
-        return null;
-      `
+      }
     }
   ],
 
@@ -188,14 +160,14 @@ foam.CLASS({
         if ( ! this.of ) this.of = obj.cls_;
 
         if ( ! this.isHeadersOutput ) {
-          this.columns.forEach((element) => {
+          this.props.forEach((element) => {
             element.toCSVLabel(this, element);
           });
           this.newLine_();
           this.isHeadersOutput = true;
         }
 
-        this.columns.forEach((element) => {
+        this.props.forEach((element) => {
           element.toCSV(obj, this, element);
         });
         this.newLine_();
@@ -203,7 +175,7 @@ foam.CLASS({
       javaCode: `
         System.out.println("in the put of the CSvsink");
         if ( ! isPropertySet("of") ) setOf(((foam.core.FObject)obj).getClassInfo());
-        PropertyInfo[] columns = getColumns();
+        PropertyInfo[] columns = getProps();
         if ( ! getIsHeadersOutput() ) {
           for (PropertyInfo element : columns) {
             // element.toCSVLabel(this, element);
