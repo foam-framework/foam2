@@ -1773,15 +1773,28 @@ foam.CLASS({
   properties: [
     {
       name: 'referencedProperty',
+      documentation: `
+        foam.core.Reference should have the type of its this.of.ID
+        so it has the correct type when generating statically typed
+        languages. Since foam.core.Reference might not have all of
+        the override-able properties on it (e.g. foam.core.String has
+        a "width" property that isn't present in foam.core.Reference)
+        we need to use a map to store any native specific overrides.
+        referencedProperty is installed on java classes instead of this.
+      `,
       transient: true,
-      factory: function() {
+      adapt: function(_, n) {
+        if ( foam.core.Property.isInstance(n) ) return n;
+
         var idProp = this.of.ID.cls_ == foam.core.IDAlias ? this.of.ID.targetProperty : this.of.ID;
 
         idProp = idProp.clone();
+        idProp.copyFrom(n);
         idProp.name = this.name;
 
         return idProp;
-      }
+      },
+      factory: function() { return {}; }
     },
     { name: 'type',            factory: function() { return this.referencedProperty.type; } },
     { name: 'javaType',        factory: function() { return this.referencedProperty.javaType; } },
@@ -1792,12 +1805,7 @@ foam.CLASS({
 
   methods: [
     function buildJavaClass(cls) {
-      // Disable super behaviour on purpose.
-      // this.SUPER(cls);
-
-      // Install a renamed copy of the refernced model's id property instead
       this.referencedProperty.buildJavaClass(cls);
-
       cls.method({
         name: `find${foam.String.capitalize(this.name)}`,
         visibility: 'public',
