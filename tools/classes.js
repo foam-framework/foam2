@@ -395,11 +395,13 @@ var classes = [
   'foam.nanos.theme.Theme',
 
   // Crunch
+  'foam.nanos.crunch.FakeDataObject',
   'foam.nanos.crunch.Capability',
   'foam.nanos.crunch.CapabilityJunctionStatus',
   'foam.nanos.crunch.UserCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
-  'foam.nanos.crunch.CapabilityCapabilityJunctionDAO',
+  'foam.nanos.crunch.DeprecatedCapabilityJunctionDAO',
+  'foam.nanos.crunch.PrerequisiteCapabilityJunctionDAO',
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
   'foam.nanos.crunch.CapabilityDAO',
   'foam.nanos.auth.CapabilityAuthService'

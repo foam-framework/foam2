@@ -3,12 +3,25 @@ foam.CLASS({
   name: 'Capability',
 
   imports: [
-    'capabilityDAO'
+    'capabilityDAO',
+    'prerequisiteCapabilityJunctionDAO'
   ],
 
   javaImports: [
     'foam.core.X',
-    'foam.dao.DAO'
+    'foam.core.FObject',
+    'foam.dao.ArraySink',
+    'foam.dao.DAO',
+    'foam.nanos.auth.*',
+    'foam.nanos.crunch.Capability',
+    'java.util.List',
+    'static foam.mlang.MLang.*',
+    'foam.nanos.crunch.CapabilityCapabilityJunction',
+    
+  ],
+
+  implements: [
+    'foam.mlang.Expressions',
   ],
 
   ids: [
@@ -73,11 +86,6 @@ foam.CLASS({
       documentation: `model used to store information required by this credential`
     },
     {
-      name: 'capabilitiesRequired',
-      class: 'StringArray',
-      documentation: `prerequisite capabilities required to unlock this capability`
-    },
-    {
       name: 'permissionsGranted',
       class: 'StringArray',
       documentation: `list of permissions granted by this capability`
@@ -85,7 +93,7 @@ foam.CLASS({
     {
       name: 'permissionsIntercepted',
       class: 'StringArray',
-      documentation: `when applying for a capability a user must have all the permissions listed, otherwise an AuthException is thrown and caught by another service.`
+      documentation: `(permissions needed to apply) when applying for a capability a user must have all the permissions listed, otherwise an AuthException is thrown and caught by another service.`
     },
     {
       name: 'daoKey',
@@ -109,11 +117,15 @@ foam.CLASS({
         this.permissionsGranted.forEach(function(permissionName) {
           if(permission === permissionName) return true;
         });
-        this.capabilitiesRequired.forEach(function(capabilityName) {
-          capabilityDAO.find(capabilityName).then((capability) => {
-            if(capability.implies(x, permission)) return true;
+        this.prerequisiteCapabilityJunctionDAO.where(this.EQ(this.CapabilityCapabilityJunction.TARGET_ID, this.id))
+          .select().then(function(sink) {
+            var prerequisites = sink.array
+            prerequisites.forEach(function(prereq) {
+              this.capabilityDAO.find(prereq.sourceId).then(function(cap) {
+                if(cap.implies(x, permission)) return true;
+              });
+            })
           });
-        });
         return false;
       },
       javaCode: `
@@ -122,21 +134,19 @@ foam.CLASS({
         for(String permissionName : permissionsGranted) {
           if(permission.equals(permissionName)) return true; 
         }
+        DAO prerequisiteCapabilityJunctionDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
+        List<CapabilityCapabilityJunction> prereqs = (List<CapabilityCapabilityJunction>) ((ArraySink) prerequisiteCapabilityJunctionDAO
+        .where(EQ(CapabilityCapabilityJunction.TARGET_ID, (String) this.getId()))
+        .select(new ArraySink()))
+        .getArray();
+
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-        String[] prereqs = this.getCapabilitiesRequired();
-        for(String capabilityName : prereqs) {
-          Capability capability = (Capability) capabilityDAO.find(capabilityName);
+        for(CapabilityCapabilityJunction prereqJunction : prereqs) {
+          Capability capability = (Capability) capabilityDAO.find(prereqJunction.getSourceId());
           if(capability.implies(x, permission)) return true;
         }
         return false;
       `
-    },
-    {
-      name: 'validateInfo',
-      type: 'Boolean',
-      documentation: `validate userCapabilityJunction.data.`,
-      code: {},
-      javaCode: ``
     }
   ]
 });
@@ -153,8 +163,12 @@ foam.RELATIONSHIP({
 foam.RELATIONSHIP({
   sourceModel: 'foam.nanos.crunch.Capability',
   targetModel: 'foam.nanos.crunch.Capability',
-  cardinality: '*:*',
-  forwardName: 'deprecatedBy',
-  inverseName: 'deprecates'
+  cardinality: '*:*'
 });
+
+// source is deprecated
+// target is deprecating
+
+// source is prerequisite
+// target is one requiring prerequisite
 

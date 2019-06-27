@@ -91,8 +91,14 @@ foam.CLASS({
       `,
       javaCode: `
       checkOwnership(x, obj);
-      checkPrereqs(x, obj);
-      return getDelegate().put_(x, obj);
+
+      boolean prereq = checkPrereqs(x, obj);
+      boolean data = validateData(x, obj);
+
+      if(prereq && data) ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.GRANTED);
+      FObject ret =  getDelegate().put_(x, obj);
+      if(prereq && data) setDependencies(x, obj);
+      return ret;
       `
     },
     {
@@ -107,25 +113,94 @@ foam.CLASS({
           type: 'foam.core.FObject'
         }
       ],
-      documentation: `if status set to granted check prereqs before put`,
+      type: 'Boolean',
+      documentation: `check prerequisites`,
       javaCode: `
-      if(((UserCapabilityJunction) obj).getStatus() == CapabilityJunctionStatus.GRANTED) {
-        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-        DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-        Capability capability = (Capability) capabilityDAO.find(((UserCapabilityJunction) obj).getTargetId());
-        for(String prereq : (String[]) capability.getCapabilitiesRequired()) {
-          Capability cap = (Capability) ((DAO) x.get("capabilityDAO")).find(prereq);
-          if(!cap.getEnabled()) continue;
-          List<UserCapabilityJunction> ucJunctions = (List<UserCapabilityJunction>) ((ArraySink) getDelegate()
-          .where(AND(
-            EQ(UserCapabilityJunction.SOURCE_ID, ((UserCapabilityJunction) obj).getSourceId()),
-            EQ(UserCapabilityJunction.TARGET_ID, prereq)
-          )) 
-          .select(new ArraySink()))
-          .getArray();
-          if(ucJunctions.size() == 0 || ucJunctions.get(0).getStatus() != CapabilityJunctionStatus.GRANTED) throw new AuthorizationException("One or more prerequisite capabilities not fulfilled");
-        }
+      DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+      DAO prerequisiteCapabilityJunctionDAO = (DAO) (x.get("prerequisiteCapabilityJunctionDAO"));
+      Capability capability = (Capability) capabilityDAO.find(((UserCapabilityJunction) obj).getTargetId());
+
+      List<CapabilityCapabilityJunction> ccJunctions = (List<CapabilityCapabilityJunction>) ((ArraySink) prerequisiteCapabilityJunctionDAO
+      .where(EQ(CapabilityCapabilityJunction.TARGET_ID, (String) capability.getId()))
+      .select(new ArraySink()))
+      .getArray();
+      for(CapabilityCapabilityJunction ccJunction : ccJunctions) {
+        Capability cap = (Capability) ((DAO) x.get("capabilityDAO")).find((String) ccJunction.getSourceId());
+        if(!cap.getEnabled()) continue;
+        UserCapabilityJunction ucJunction = (UserCapabilityJunction) getDelegate().find(AND(
+          EQ(UserCapabilityJunction.SOURCE_ID, ((UserCapabilityJunction) obj).getSourceId()),
+          EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getSourceId())
+        ));
+        if(ucJunction == null || ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED) return false;
       }
+      return true;
+      `
+    },
+    {
+      name: 'setDependencies',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'foam.core.FObject'
+        }
+      ],
+      documentation: `if a ucjunction gets granted, check if there are any existing dependents and re-put them into the dao`,
+      javaCode: `
+      //  DAO ucJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+        String capabilityId = (String) ((UserCapabilityJunction) obj).getTargetId();
+        Long userId = ((UserCapabilityJunction) obj).getSourceId();
+        DAO prerequisiteCapabilityJunctionDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
+        
+        // get the users pending capabilities
+        List<UserCapabilityJunction> ucJunctions = (List<UserCapabilityJunction>) ((ArraySink) getDelegate()
+        .where(AND(
+          EQ(UserCapabilityJunction.SOURCE_ID, userId),
+          EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.PENDING)
+        ))
+        .select(new ArraySink()))
+        .getArray();
+        // see if any pending capability forms a junction with the granted capability
+        for(UserCapabilityJunction ucJunction : ucJunctions) {
+          CapabilityCapabilityJunction dependency = (CapabilityCapabilityJunction) prerequisiteCapabilityJunctionDAO.find(
+            AND(
+              EQ(CapabilityCapabilityJunction.SOURCE_ID, capabilityId),
+              EQ(CapabilityCapabilityJunction.TARGET_ID, (String) ucJunction.getTargetId())
+            )
+          );
+          if(dependency != null) {
+            ucJunction = (UserCapabilityJunction) ucJunction.fclone();
+            this.put_(x, ucJunction);
+          }
+
+        }
+      `
+    },
+    {
+      name: 'validateData',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'foam.core.FObject'
+        }
+      ],
+      type: 'Boolean',
+      documentation: `call the validate method on data and if not "return true" then set the junction status to pending`,
+      javaCode: `
+        try {
+          FObject data = ((UserCapabilityJunction) obj).getData();
+          data.validate(x);
+        } catch(Exception e) {
+          return false;
+        }
+        return true;
       `
     },
     {
