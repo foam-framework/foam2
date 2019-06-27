@@ -150,7 +150,7 @@ foam.CLASS({
         }
 
         this.props.forEach((element) => {
-          element.toCSV(obj, this, element);
+          element.toCSV(x, obj, this, element);
         });
         this.newLine_();
       },
@@ -179,7 +179,7 @@ foam.CLASS({
         j = 0;
         for (String element : bob) {
           bb = ((foam.core.FObject)obj).getProperty(element);
-          columns[j].toCSV(obj, this, bb);
+          columns[j].toCSV(getX(), obj, this, bb);
           j++;
         }
         newLine_();
@@ -239,14 +239,14 @@ foam.CLASS({
     {
       name: 'toCSV',
       class: 'Function',
-      value: function(obj, outputter, prop) {
+      value: function(x, obj, outputter, prop) {
         if ( ! prop.of ) {
           outputter.output(obj ? obj[prop.name] : null);
           return;
         }
         prop.of.getAxiomsByClass(foam.core.Property)
           .forEach((axiom) => {
-            axiom.toCSV(obj ? obj[prop.name] : null, outputter, axiom);
+            axiom.toCSV(x, obj ? obj[prop.name] : null, outputter, axiom);
           });
       }
     },
