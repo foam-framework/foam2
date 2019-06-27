@@ -56,6 +56,13 @@ foam.CLASS({
       of: 'foam.nanos.menu.Menu'
     },
     {
+      class: 'Reference',
+      targetDAOKey: 'menuDAO',
+      of: 'foam.nanos.menu.Menu',
+      name: 'rootMenu',
+      value: ''
+    },
+    {
       class: 'String',
       name: 'url',
       value: null

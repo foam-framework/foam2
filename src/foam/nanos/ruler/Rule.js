@@ -14,6 +14,7 @@
     'foam.core.ContextAware',
     'foam.core.FObject',
     'foam.core.X',
+    'foam.core.DirectAgency',
     'foam.nanos.logger.Logger',
     'java.util.Collection'
   ],
@@ -260,7 +261,7 @@
         }
       ],
       javaCode: `
-        getAsyncAction().applyAction(x, obj, oldObj, ruler, null);
+        getAsyncAction().applyAction(x, obj, oldObj, ruler, new DirectAgency());
         if ( ! getAfter() ) {
           ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }
