@@ -13,8 +13,7 @@ foam.CLASS({
   documentation: 'Sink runs the csv outputter, and contains the resulting string in this.csv',
 
   javaImports: [
-    'foam.core.PropertyInfo',
-    'java.util.List'
+    'foam.core.PropertyInfo'
   ],
 
   properties: [
@@ -30,7 +29,6 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
-      // javaType: 'foam.core.PropertyInfo[]',
       name: 'props',
       factory: function() {
         return this.of.getAxiomByName('tableColumns').columns;
@@ -57,20 +55,17 @@ foam.CLASS({
         { name: 'value' }
       ],
       code: function(value) {
-        console.log('in output @csvSink - js');
-        console.log(`this.CSV ${this.csv} - js`);
         if ( ! this.isNewLine ) this.csv += ',';
         this.isNewLine = false;
         this.output_(value);
       },
       javaCode: `
-      System.out.println("in output @csvSink");
-      System.out.println("in output @csvSink csv = " + getCsv());
         StringBuilder sb = new StringBuilder();
         if ( ! getIsNewLine() ) {
           sb.append(getCsv());
           sb.append(",");
           setCsv(sb.toString());
+          sb.setLength(0);
         }
         setIsNewLine(false);
         output_(value);
@@ -108,9 +103,10 @@ foam.CLASS({
             this.output_(value.toString());
         }),
       javaCode: `
-        System.out.println("in output_ @csvSink");
         StringBuilder sb = new StringBuilder();
+        sb.append(getCsv());
         String s = value.toString();
+
         if (s.indexOf("\\"") != -1) {
           sb.append("\\"");
           sb.append(s);
@@ -119,7 +115,10 @@ foam.CLASS({
         else {
           sb.append(s);
         }
+
         setCsv(sb.toString());
+
+        sb.setLength(0);
       `
     },
     {
@@ -129,7 +128,6 @@ foam.CLASS({
         this.isNewLine = true;
       },
       javaCode: `
-      System.out.println("in newLine_ @csvSink");
         StringBuilder sb = new StringBuilder();
         sb.append(getCsv());
         sb.append("\\n");
@@ -141,7 +139,6 @@ foam.CLASS({
     {
       name: 'put',
       code: function(obj) {
-        console.log('in the put of the CSvsink - js');
         if ( ! this.of ) this.of = obj.cls_;
 
         if ( ! this.isHeadersOutput ) {
@@ -158,8 +155,8 @@ foam.CLASS({
         this.newLine_();
       },
       javaCode: `
-        System.out.println("in the put of the CSvsink");
         if ( ! isPropertySet("of") ) setOf(((foam.core.FObject)obj).getClassInfo());
+
         // TODO simplify below block
         String[] bob = getProps();
         PropertyInfo[] columns = new PropertyInfo[bob.length];
@@ -168,18 +165,22 @@ foam.CLASS({
           columns[j] = (PropertyInfo) getOf().getAxiomByName(b);
           j++;
         }
-
+        Object bb;
         if ( ! getIsHeadersOutput() ) {
+          j = 0;
           for (String element : bob) {
-            PropertyInfo bb = (PropertyInfo)((foam.core.FObject)obj).getProperty(element);
-            // bb.toCSVLabel(this, element);
+            bb = ((foam.core.FObject)obj).getProperty(element);
+            columns[j].toCSVLabel(this, bb);
+            j++;
           }
           newLine_();
           setIsHeadersOutput(true);
         }
-
-        for (PropertyInfo element : columns) {
-          // element.toCSV(obj, this, element);
+        j = 0;
+        for (String element : bob) {
+          bb = ((foam.core.FObject)obj).getProperty(element);
+          columns[j].toCSV(obj, this, bb);
+          j++;
         }
         newLine_();
       `
@@ -191,7 +192,6 @@ foam.CLASS({
           .forEach( (s) => this.clearProperty(s) );
       },
       javaCode: `
-      System.out.println("in reset of the CSvsink");
         clearCsv();
         clearIsNewLine();
         clearIsHeadersOutput();

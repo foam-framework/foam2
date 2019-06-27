@@ -285,6 +285,20 @@ foam.CLASS({
               { name: 'obj', type: 'foam.core.FObject' }
             ],
             body: this.validateObj
+          },
+          {
+            name: 'toCSV',
+            visibility: 'public',
+            type: 'void',
+            args: [{ name: 'obj', type: 'Object' }, { name: 'outputter', type: 'foam.dao.CSVSink' }, { name: 'prop', type: 'Object' }],
+            body: ( this.toCSV ? this.toCSV : 'outputter.output(get(obj))' ) + ';'
+          },
+          {
+            name: 'toCSVLabel',
+            visibility: 'public',
+            type: 'void',
+            args: [{ name: 'outputter', type: 'foam.dao.CSVSink' }, { name: 'prop', type: 'Object' }],
+            body: (this.toCSVLabel ? this.toCSVLabel : 'outputter.output(getName())') + ';'
           }
         ];
 

@@ -217,11 +217,11 @@ foam.CLASS({
       name: 'javaValidateObj',
       expression: function(validationPredicates) {
         return validationPredicates
-          .map(vp => {
+          .map((vp) => {
             return `
-if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
-  throw new IllegalStateException(${foam.java.asJavaValue(vp.errorString)});
-}
+              if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
+                throw new IllegalStateException(${foam.java.asJavaValue(vp.errorString)});
+              }
             `;
           })
           .join('');
@@ -1108,23 +1108,6 @@ foam.CLASS({
           {
             name: 'outputter',
             type: 'foam.lib.json.Outputter'
-          },
-          {
-            name: 'value',
-            type: 'Object'
-          }
-        ],
-        body: `outputter.output(getOrdinal(value));`
-      });
-
-      info.method({
-        name: 'toCSV',
-        visibility: 'public',
-        type: 'void',
-        args: [
-          {
-            name: 'outputter',
-            type: 'foam.lib.csv.Outputter'
           },
           {
             name: 'value',
