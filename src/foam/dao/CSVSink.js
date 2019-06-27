@@ -96,7 +96,11 @@ foam.CLASS({
       }
 
       this.columns.forEach((element) => {
-        element.toCSV(obj, this, element);
+        if ( element.cls_.name == 'Currency' ) {
+          this.output(obj[element.name]/100);
+        } else {
+          element.toCSV(obj, this, element);
+        }
       });
       this.newLine_();
     },
