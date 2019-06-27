@@ -26,12 +26,10 @@ foam.CLASS({
     {
       class: 'foam.mlang.ExprProperty',
       name: 'keyExpr',
-      factory: function() { return this.Candlestick.KEY; }
     },
     {
       class: 'foam.mlang.ExprProperty',
       name: 'valueExpr',
-      factory: function() { return this.Candlestick.AVERAGE; }
     },
   ],
 
