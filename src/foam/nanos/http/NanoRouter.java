@@ -18,6 +18,7 @@ import foam.nanos.boot.NSpecAware;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 import foam.nanos.pm.PMWebAgent;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +27,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import foam.box.RequestWrapper;
 
 /**
  * Top-Level Router Servlet.
@@ -50,9 +53,12 @@ public class NanoRouter
   }
 
   @Override
-  protected void service(final HttpServletRequest req, final HttpServletResponse resp)
+  protected void service(HttpServletRequest req, final HttpServletResponse resp)
     throws ServletException, IOException
   {
+
+    req = (HttpServletRequest) new RequestWrapper(req);
+
     String   path       = req.getRequestURI();
     String[] urlParams  = path.split("/");
     String   serviceKey = urlParams[2];

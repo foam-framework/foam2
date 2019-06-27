@@ -186,7 +186,7 @@ foam.CLASS({
             configUrl = group.getUrl();
           }
           configSupportEmail = supportEmailFound ? configSupportEmail : group.getSupportEmail();
-      
+
           // Once true, stay true
           urlFound          = urlFound   ? urlFound   : ! SafetyUtil.isEmpty(configUrl);
           supportEmailFound = supportEmailFound ? supportEmailFound : ! SafetyUtil.isEmpty(configSupportEmail);
@@ -202,7 +202,7 @@ foam.CLASS({
           // populate AppConfig url with request's RootUrl
           HttpServletRequest req = x.get(HttpServletRequest.class);
           if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
-            configUrl = ((Request) req).getRootURL().toString();
+            configUrl = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort();
           }
         }
 
