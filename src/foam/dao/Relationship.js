@@ -555,8 +555,9 @@ return junction`
           exportEnabled: false,
           relationship: this,
           data: dao,
-          title: `Add a ${dao.of.name}`,
-          subtitle: `Select a ${dao.of.name} from the table and click "Add" to add it.`
+          createLabel: 'Add',
+          title: `Add ${dao.of.model_.plural}`,
+          subtitle: `Select ${dao.of.model_.plural} from the table and click "Add" to add them.`
         }, x);
 
         controller.sub('select', function(s, _, selectedObjects) {
@@ -584,8 +585,9 @@ return junction`
           selectEnabled: true,
           relationship: this,
           data: dao,
-          title: `Remove a ${dao.of.name}`,
-          subtitle: `Select a ${dao.of.name} from the table and click "Select" to add it.`
+          createLabel: 'Remove',
+          title: `Remove ${dao.of.model_.plural}`,
+          subtitle: `Select ${dao.of.model_.plural} from the table and click "Remove" to remove them.`
         }, x);
 
         controller.sub('select', function(s, _, selectedObjects) {
