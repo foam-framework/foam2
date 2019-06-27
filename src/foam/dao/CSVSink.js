@@ -29,18 +29,11 @@ foam.CLASS({
       visibility: 'HIDDEN'
     },
     {
-      class: 'Array',
-      javaType: 'foam.core.PropertyInfo[]',
+      class: 'StringArray',
+      // javaType: 'foam.core.PropertyInfo[]',
       name: 'props',
-      getter: function(of) {
-        if ( !! this.props ) return this.props;
-        if ( this.axioms.length == 0 ) {
-          return of ? of.getAxiomsByClass(foam.core.Property)
-          .filter( (p) => ! p.networkTransient ) : [];
-        }
-        return this.axioms.map((tableCol) => {
-          return of.getAxiomByName(tableCol);
-        });
+      factory: function() {
+        return this.of.getAxiomByName('tableColumns').columns;
       },
       visibility: 'HIDDEN'
     },
@@ -54,14 +47,6 @@ foam.CLASS({
       name: 'isNewLine',
       value: true,
       visibility: 'HIDDEN'
-    },
-    {
-      class: 'StringArray',
-      name: 'axioms',
-      getter: function(of) {
-        if ( !! this.axioms ) return this.axioms;
-        return of ? of.getAxiomByName('tableColumns').columns : [];
-      }
     }
   ],
 
@@ -175,10 +160,19 @@ foam.CLASS({
       javaCode: `
         System.out.println("in the put of the CSvsink");
         if ( ! isPropertySet("of") ) setOf(((foam.core.FObject)obj).getClassInfo());
-        PropertyInfo[] columns = getProps();
+        // TODO simplify below block
+        String[] bob = getProps();
+        PropertyInfo[] columns = new PropertyInfo[bob.length];
+        int j = 0;
+        for(String b : bob) {
+          columns[j] = (PropertyInfo) getOf().getAxiomByName(b);
+          j++;
+        }
+
         if ( ! getIsHeadersOutput() ) {
-          for (PropertyInfo element : columns) {
-            // element.toCSVLabel(this, element);
+          for (String element : bob) {
+            PropertyInfo bb = (PropertyInfo)((foam.core.FObject)obj).getProperty(element);
+            // bb.toCSVLabel(this, element);
           }
           newLine_();
           setIsHeadersOutput(true);

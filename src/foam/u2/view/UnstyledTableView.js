@@ -33,7 +33,8 @@ foam.CLASS({
     'ctrl',
     'dblclick?',
     'editRecord?',
-    'selection? as importSelection'
+    'selection? as importSelection',
+    'filteredTableColumns'
   ],
 
   properties: [
@@ -56,18 +57,25 @@ foam.CLASS({
       expression: function(columns, of) {
         var of = this.of;
         if ( ! of ) return [];
-
-        return columns.map(function(p) {
-          var c = typeof p == 'string' ?
-            of.getAxiomByName(p) :
-            p;
-
+        var bob = [];
+        var i = 0;
+        var bobet = columns.map(function(p) {
+          let c;
+          if ( typeof p == 'string' ) {
+            c = of.getAxiomByName(p);
+            bob[i] = p;
+          } else {
+            c = p;
+            bob[i] = p.name;
+          }
+          i++;
            if ( ! c ) {
              console.error('Unknown table column: ', p);
            }
-
           return c;
         }).filter(function(c) { return c; });
+        this.filteredTableColumns = bob;
+        return bobet;
       }
     },
     {
@@ -78,8 +86,12 @@ foam.CLASS({
 
         var tableColumns = of.getAxiomByName('tableColumns');
 
-        if ( tableColumns ) return tableColumns.columns;
-
+        if ( tableColumns ) {
+          var tc = tableColumns.columns;
+          debugger;
+          this.filteredTableColumns = tc;
+          return tc;
+        }
         return of.getAxiomsByClass(foam.core.Property).
             filter(function(p) { return p.tableCellFormatter && ! p.hidden; }).
             map(foam.core.Property.NAME.f);
