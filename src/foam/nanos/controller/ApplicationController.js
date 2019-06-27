@@ -59,6 +59,7 @@ foam.CLASS({
     'appConfig',
     'as ctrl',
     'currentMenu',
+    'filteredTableColumns',
     'group',
     'lastMenuLaunched',
     'lastMenuLaunchedListener',
@@ -137,6 +138,10 @@ foam.CLASS({
   `,
 
   properties: [
+    {
+      class: 'StringArray',
+      name: 'filteredTableColumns'
+    },
     {
       name: 'clientPromise',
       factory: function() {
