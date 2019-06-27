@@ -10,8 +10,8 @@ foam.CLASS({
   ids: ['closeTime', 'key'],
   tableColumns: [
     'key',
-    'openTime',
-    'closeTime',
+    'openValueTime',
+    'closeValueTime',
     'open',
     'close',
     'min',
@@ -36,12 +36,6 @@ foam.CLASS({
       visibility: 'RO'
     },
     {
-      class: 'DateTime',
-      name: 'openTime',
-      visibility: 'RO',
-      tableWidth: 150
-    },
-    {
       class: 'Float',
       name: 'open',
       visibility: 'RO'
@@ -49,7 +43,8 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'openValueTime',
-      hidden: true
+      visibility: 'RO',
+      tableWidth: 150
     },
     {
       class: 'DateTime',
@@ -60,13 +55,13 @@ foam.CLASS({
     {
       class: 'Float',
       name: 'close',
-      visibility: 'RO'
+      hidden: true
     },
     {
       class: 'DateTime',
       name: 'closeValueTime',
-      hidden: true,
-      visibility: 'RO'
+      visibility: 'RO',
+      tableWidth: 150
     },
     {
       class: 'Float',

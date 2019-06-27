@@ -28,9 +28,13 @@ foam.CLASS({
       transition: background-color 140ms, border-color 140ms;
     }
 
+    ^:hover {
+      cursor: pointer;
+    }
+
     ^:checked {
-      background-color: #093649;
-      border-color: #093649;
+      background-color: /*%BLACK%*/ #1e1f21;
+      border-color: /*%BLACK%*/ #1e1f21;
       fill: white;
     }
 

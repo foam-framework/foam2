@@ -80,7 +80,8 @@ foam.CLASS({
         this.stack.push({
           class: 'foam.comics.v2.DAOCreateView',
           data: this.data.of.create({}, this),
-          config$: this.config$
+          config$: this.config$,
+          of: this.data.of
         });
       }
     }
@@ -92,8 +93,7 @@ foam.CLASS({
     var self = this;
 
       this.addClass(this.myClass())
-      .add(this.slot(function(data, config, config$browseBorder, config$browseViews,
-         config$browseTitle) {
+      .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle) {
         return self.E()
           .start(self.Rows)
             .addClass(self.myClass('container'))

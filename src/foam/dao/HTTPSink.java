@@ -10,6 +10,7 @@ import foam.core.Detachable;
 import foam.core.FObject;
 import foam.lib.Outputter;
 import foam.lib.json.OutputterMode;
+import foam.lib.NetworkPropertyPredicate;
 import foam.nanos.http.Format;
 import org.apache.commons.io.IOUtils;
 
@@ -43,7 +44,7 @@ public class HTTPSink
       conn.setDoInput(true);
       conn.setDoOutput(true);
       if ( format_ == Format.JSON ) {
-        outputter = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+        outputter = new foam.lib.json.Outputter(getX()).setPropertyPredicate(new NetworkPropertyPredicate());
         conn.addRequestProperty("Accept", "application/json");
         conn.addRequestProperty("Content-Type", "application/json");
       } else if ( format_ == Format.XML ) {

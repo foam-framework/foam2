@@ -23,6 +23,10 @@ foam.CLASS({
 
   sections: [
     {
+      name: 'colours',
+      title: 'Colour Scheme'
+    },
+    {
       name: 'inputs',
       title: 'Inputs'
     }
@@ -97,82 +101,133 @@ foam.CLASS({
     },
     {
       class: 'Color',
-      name: 'primaryColor',
-      documentation: 'The following color properties can determine the color scheme of the GUI.'
-    },
-    { class: 'Color', name: 'secondaryColor' },
-    { class: 'Color', name: 'secondaryHoverColor' },
-    { class: 'Color', name: 'secondaryDisabledColor' },
-    { class: 'Color', name: 'backgroundColor' },
-    { class: 'Color', name: 'headerColor' },
-    { class: 'Color', name: 'destructiveColor' },
-    { class: 'Color', name: 'destructiveHoverColor' },
-    { class: 'Color', name: 'destructiveDisabledColor' },
-    { class: 'Color', name: 'tableColor' },
-    { class: 'Color', name: 'tableHoverColor' },
-    { class: 'Color', name: 'accentColor' },
-    { class: 'Color', name: 'tertiaryColor'},
-    { class: 'Color', name: 'tertiaryHoverColor' },
-    { class: 'Color', name: 'tertiaryDisabledColor' },
-    {
-      class: 'Color',
-      name: 'inputBorderColor',
-      section: 'inputs'
+      name: 'primary1',
+      section: 'colours'
     },
     {
       class: 'Color',
-      name: 'inputTextColor',
-      section: 'inputs'
+      name: 'primary2',
+      section: 'colours'
     },
     {
       class: 'Color',
-      name: 'inputBackgroundColor',
-      section: 'inputs'
+      name: 'primary3',
+      section: 'colours'
     },
     {
       class: 'Color',
-      name: 'inputHoverBorderColor',
-      section: 'inputs'
+      name: 'primary4',
+      section: 'colours'
     },
     {
       class: 'Color',
-      name: 'inputHoverTextColor',
-      section: 'inputs'
+      name: 'primary5',
+      section: 'colours'
     },
     {
       class: 'Color',
-      name: 'inputHoverBackgroundColor',
-      section: 'inputs'
+      name: 'approval1',
+      section: 'colours'
     },
     {
       class: 'Color',
-      name: 'inputErrorBorderColor',
-      section: 'inputs'
+      name: 'approval2',
+      section: 'colours'
     },
     {
       class: 'Color',
-      name: 'inputErrorTextColor',
-      section: 'inputs'
+      name: 'approval3',
+      section: 'colours'
     },
     {
       class: 'Color',
-      name: 'inputErrorBackgroundColor',
-      section: 'inputs'
+      name: 'approval4',
+      section: 'colours'
     },
     {
       class: 'Color',
-      name: 'inputDisabledBorderColor',
-      section: 'inputs'
+      name: 'approval5',
+      section: 'colours'
     },
     {
       class: 'Color',
-      name: 'inputDisabledTextColor',
-      section: 'inputs'
+      name: 'warning1',
+      section: 'colours'
     },
     {
       class: 'Color',
-      name: 'inputDisabledBackgroundColor',
-      section: 'inputs'
+      name: 'warning2',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'warning3',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'warning4',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'warning5',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'destructive1',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'destructive2',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'destructive3',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'destructive4',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'destructive5',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'grey1',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'grey2',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'grey3',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'grey4',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'grey5',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'black',
+      section: 'colours'
     },
     {
       class: 'String',

@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.layout',
   name: 'SectionAxiom',
+
   properties: [
     {
       class: 'String',
@@ -39,6 +40,7 @@ foam.CLASS({
       value: function() { return true; }
     }
   ],
+
   methods: [
     function createIsAvailableFor(data$) {
       var slot = foam.core.ExpressionSlot.create({
@@ -63,10 +65,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.layout',
   name: 'PropertySectionRefine',
   refines: 'foam.core.Property',
+
   properties: [
     {
       class: 'String',
@@ -75,11 +79,13 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.layout',
   name: 'ActionSectionRefine',
   refines: 'foam.core.Action',
+
   properties: [
     {
       class: 'String',
@@ -89,10 +95,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.layout',
   name: 'ModelSectionRefine',
   refines: 'foam.core.Model',
+
   properties: [
     {
       class: 'AxiomArray',

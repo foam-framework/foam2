@@ -109,7 +109,7 @@ foam.CLASS({
       background-color: white;
       border-radius: 2px;
       border: 1px solid #dce0e7;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
       height: 40px;
       padding: 0 8px;
     }
