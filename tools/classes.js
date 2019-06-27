@@ -21,6 +21,7 @@ var classes = [
   'foam.glang.EndOfWeek',
   'foam.glang.EndOfMonth',
   'foam.glang.EndOfQuarter',
+  'foam.glang.EndOfYear',
   'foam.mlang.predicate.Predicate',
   'foam.mlang.predicate.True',
   'foam.mlang.predicate.False',
