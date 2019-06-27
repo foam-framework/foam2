@@ -180,31 +180,3 @@ foam.CLASS({
     }
   ]
 });
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'CurrencyPropertyCSVRefinement',
-
-  documentation: 'Refinement on FObjects to override toCSV() and toCSVLabel().',
-
-  refines: 'foam.core.Currency',
-
-  imports: [
-    'ctrl',
-    'currencyDAO'
-  ],
-
-  properties: [
-    {
-      name: 'toCSV',
-      class: 'Function',
-      value: function(obj, outputter, prop, currencyDAO) {
-        debugger;
-        outputter.output(prop.format(obj[prop.name]));
-        // this.currencyDAO.find(prop).then((currency) => {
-        //   outputter.output(currency.format(obj[prop.name]));
-        // });
-      }
-    }
-  ]
-});
