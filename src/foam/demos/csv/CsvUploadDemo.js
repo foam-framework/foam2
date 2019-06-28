@@ -11,7 +11,7 @@ foam.CLASS({
     'foam.dao.CSVSink',
     'foam.dao.DAOSink',
     'foam.dao.EasyDAO',
-    'foam.lib.csv.CSVParser2'
+    'foam.lib.csv.DynamicHeaderCSVParser'
   ],
   properties: [
     {
@@ -66,7 +66,7 @@ id,legalName,email,phone.number,address.city,address.postalCode,lastLogin,birthd
             sinks.forEach(s => s.put(o));
           }
         };
-        this.CSVParser2.create().fromCSV(this.dao.of, this.csv.trim(), sink);
+        this.DynamicHeaderCSVParser.create().fromCSV(this.dao.of, this.csv.trim(), sink);
         this.csvOut = a.csv;
       }
     },
