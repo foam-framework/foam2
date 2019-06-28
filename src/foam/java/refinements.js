@@ -1780,7 +1780,7 @@ foam.CLASS({
         the override-able properties on it (e.g. foam.core.String has
         a "width" property that isn't present in foam.core.Reference)
         we need to use a map to store any native specific overrides.
-        referencedProperty is installed on java classes instead of this.
+        referencedProperty is installed on java classes instead of "this".
       `,
       transient: true,
       adapt: function(_, n) {
