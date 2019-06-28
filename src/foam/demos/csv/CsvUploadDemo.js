@@ -28,8 +28,8 @@ foam.CLASS({
       name: 'csv',
       view: { class: 'foam.u2.tag.TextArea' },
       value: `
-id,legalName,email,phone.number,address.city,address.postalCode,lastLogin,birthday,passwordLastModified,passwordExpiry,created,lastModified
-1,Mike C,mike@c.com,416-123-1234,sauga,l4w2l2,0,1,2,3,4,5
+id,firstName,lastName,email,phone.number,address.city,address.postalCode,lastLogin,birthday,passwordLastModified,passwordExpiry,created,lastModified
+1,Mike,C,mike@c.com,416-123-1234,sauga,l4w2l2,0,1,2,3,4,5
       `
     },
     {
@@ -57,8 +57,9 @@ id,legalName,email,phone.number,address.city,address.postalCode,lastLogin,birthd
     {
       name: 'parse',
       code: function() {
-        var a = this.CSVSink.create();
+        // A bit of a hack around the fact that we don't have a MultiSink.
         var sinks = [
+          this.CSVSink.create(),
           this.DAOSink.create({ dao: this.dao })
         ];
         var sink = {
@@ -67,7 +68,7 @@ id,legalName,email,phone.number,address.city,address.postalCode,lastLogin,birthd
           }
         };
         this.DynamicHeaderCSVParser.create().fromCSV(this.dao.of, this.csv.trim(), sink);
-        this.csvOut = a.csv;
+        this.csvOut = sinks[0].csv;
       }
     },
     {
@@ -82,4 +83,3 @@ id,legalName,email,phone.number,address.city,address.postalCode,lastLogin,birthd
     }
   ]
 });
-
