@@ -1401,14 +1401,6 @@ foam.CLASS({
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
-
-      info.method({
-        name: 'getWidth',
-        visibility: 'public',
-        type: 'int',
-        body: 'return ' + this.width + ';'
-      });
-
       // cast numbers to strings
       var cast = info.getMethod('cast');
       cast.body = `return ( o instanceof Number ) ?
@@ -1774,27 +1766,13 @@ foam.CLASS({
     {
       name: 'referencedProperty',
       documentation: `
-        foam.core.Reference should have the type of its this.of.ID
-        so it has the correct type when generating statically typed
-        languages. Since foam.core.Reference might not have all of
-        the override-able properties on it (e.g. foam.core.String has
-        a "width" property that isn't present in foam.core.Reference)
-        we need to use a map to store any native specific overrides.
-        referencedProperty is installed on java classes instead of "this".
+        Used to ensure we use the right types for this
+        value in statically typed languages.
       `,
       transient: true,
-      adapt: function(_, n) {
-        if ( foam.core.Property.isInstance(n) ) return n;
-
-        var idProp = this.of.ID.cls_ == foam.core.IDAlias ? this.of.ID.targetProperty : this.of.ID;
-
-        idProp = idProp.clone();
-        idProp.copyFrom(n);
-        idProp.name = this.name;
-
-        return idProp;
-      },
-      factory: function() { return {}; }
+      expression: function(of) {
+        return of.ID.cls_ == foam.core.IDAlias ? of.ID.targetProperty : of.ID;
+      }
     },
     { name: 'type',            factory: function() { return this.referencedProperty.type; } },
     { name: 'javaType',        factory: function() { return this.referencedProperty.javaType; } },
@@ -1805,7 +1783,7 @@ foam.CLASS({
 
   methods: [
     function buildJavaClass(cls) {
-      this.referencedProperty.buildJavaClass(cls);
+      this.SUPER(cls);
       cls.method({
         name: `find${foam.String.capitalize(this.name)}`,
         visibility: 'public',
