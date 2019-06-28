@@ -10,7 +10,9 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
+    'foam.core.SimpleSlot',
     'foam.u2.search.SearchManager',
+    'foam.u2.search.TextSearchView',
     'foam.u2.view.SearchViewWrapper'
   ],
 
@@ -133,9 +135,10 @@ foam.CLASS({
 
           e.onDetach(this.searchManager);
 
-          var generalQueryView = foam.u2.ViewSpec.createView(
-              { class: 'foam.u2.search.TextSearchView' },
-              {
+          var slot = self.SimpleSlot.create();
+
+          e
+            .start(self.TextSearchView, {
                 richSearch: true,
                 of: self.dao.of.id,
                 onKey: true,
@@ -143,11 +146,11 @@ foam.CLASS({
                   class: 'foam.u2.tag.Input',
                   focused: true
                 }
-              },
-              this,
-              this.__subSubContext__);
-          this.searchManager.add(generalQueryView);
-          e.start(generalQueryView).addClass('general-query').end();
+            }, slot)
+              .addClass('general-query')
+            .end();
+
+          this.searchManager.add(slot.value);
 
           e.forEach(filters, function(f) {
             var axiom = self.dao.of.getAxiomByName(f);
