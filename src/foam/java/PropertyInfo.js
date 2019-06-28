@@ -109,6 +109,8 @@ foam.CLASS({
     'queryParser',
     'diffProperty',
     'validateObj',
+    'toCSV',
+    'toCSVLabel',
     {
       name: 'methods',
       factory: function() {
@@ -291,14 +293,14 @@ foam.CLASS({
             visibility: 'public',
             type: 'void',
             args: [{ name: 'x', type: 'foam.core.X' }, { name: 'obj', type: 'Object' }, { name: 'outputter', type: 'foam.dao.CSVSink' }, { name: 'prop', type: 'Object' }],
-            body: ( this.toCSV ? this.toCSV : 'outputter.output(get(obj))' ) + ';'
+            body: this.toCSV
           },
           {
             name: 'toCSVLabel',
             visibility: 'public',
             type: 'void',
             args: [{ name: 'outputter', type: 'foam.dao.CSVSink' }, { name: 'prop', type: 'Object' }],
-            body: (this.toCSVLabel ? this.toCSVLabel : 'outputter.output(getName())') + ';'
+            body: this.toCSVLabel
           }
         ];
 

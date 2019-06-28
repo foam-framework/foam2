@@ -226,7 +226,17 @@ foam.CLASS({
           })
           .join('');
       }
-    }
+    },
+    {
+      class: 'String',
+      name: 'javaToCSV',
+      value: 'outputter.output(get(obj));'
+    },
+    {
+      class: 'String',
+      name: 'javaToCSVLabel',
+      value: 'outputter.output(getName());'
+    },
   ],
 
   methods: [
@@ -264,7 +274,9 @@ foam.CLASS({
         includeInSignature:      this.includeInSignature,
         containsPII:             this.containsPII,
         containsDeletablePII:    this.containsDeletablePII,
-        validateObj:             this.javaValidateObj
+        validateObj:             this.javaValidateObj,
+        toCSV:                   this.javaToCSV,
+        toCSVLabel:              this.javaToCSVLabel
       });
     },
 
