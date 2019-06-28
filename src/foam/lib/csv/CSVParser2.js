@@ -6,7 +6,15 @@
 
 foam.CLASS({
   package: 'foam.lib.csv',
-  name: 'CSVParser2',
+  name: 'DynamicHeaderCSVParser',
+  documentation: `
+    A CSV parser that doesn't care about the order of the header. You would
+    use this parser when you have a CSV that contains a header and want the
+    parser to figure out which column maps to which property.
+
+    This parser makes use of the foam.core.Property's fromCSVLabelMapping
+    which allows one property to map to multiple columns.
+  `,
   requires: [
     'foam.parse.StringPStream'
   ],
