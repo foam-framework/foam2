@@ -1401,14 +1401,6 @@ foam.CLASS({
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
-
-      info.method({
-        name: 'getWidth',
-        visibility: 'public',
-        type: 'int',
-        body: 'return ' + this.width + ';'
-      });
-
       // cast numbers to strings
       var cast = info.getMethod('cast');
       cast.body = `return ( o instanceof Number ) ?
@@ -1773,14 +1765,13 @@ foam.CLASS({
   properties: [
     {
       name: 'referencedProperty',
+      documentation: `
+        Used to ensure we use the right types for this
+        value in statically typed languages.
+      `,
       transient: true,
-      factory: function() {
-        var idProp = this.of.ID.cls_ == foam.core.IDAlias ? this.of.ID.targetProperty : this.of.ID;
-
-        idProp = idProp.clone();
-        idProp.name = this.name;
-
-        return idProp;
+      expression: function(of) {
+        return of.ID.cls_ == foam.core.IDAlias ? of.ID.targetProperty : of.ID;
       }
     },
     { name: 'type',            factory: function() { return this.referencedProperty.type; } },
@@ -1792,12 +1783,7 @@ foam.CLASS({
 
   methods: [
     function buildJavaClass(cls) {
-      // Disable super behaviour on purpose.
-      // this.SUPER(cls);
-
-      // Install a renamed copy of the refernced model's id property instead
-      this.referencedProperty.buildJavaClass(cls);
-
+      this.SUPER(cls);
       cls.method({
         name: `find${foam.String.capitalize(this.name)}`,
         visibility: 'public',
