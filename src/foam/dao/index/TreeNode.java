@@ -16,7 +16,6 @@ import foam.mlang.predicate.True;
 import foam.mlang.sink.GroupBy;
 
 public class TreeNode {
-
   protected Object   key;
   protected Object   value;
   protected long     size;
@@ -177,7 +176,6 @@ public class TreeNode {
     if ( state.right != null ) {
       state.right = skew(maybeClone(state.right), tail);
       if ( state.right.right != null ) {
-        state.right = state.right.cloneNode();
         state.right.right = skew(maybeClone(state.right.right), tail);
       }
     }

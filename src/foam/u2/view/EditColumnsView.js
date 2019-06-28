@@ -10,6 +10,7 @@ foam.CLASS({
   extends: 'foam.u2.Element',
 
   requires: [
+    'foam.core.SimpleSlot',
     'foam.u2.md.CheckBox'
   ],
 
@@ -47,14 +48,17 @@ foam.CLASS({
             : columnName;
           var localStorageKey = this.table.id + '.' + columnName;
 
-          var checkBox = this.CheckBox.create({
-            label: axiom.label,
-            data: localStorage.getItem(localStorageKey) === null
-          });
+          var slot = this.SimpleSlot.create();
 
-          checkBox.data$.sub(this.updateCols(axiom, index++, localStorageKey));
+          this
+            .start()
+              .tag(this.CheckBox, {
+                label: axiom.label,
+                data: localStorage.getItem(localStorageKey) === null
+              }, slot)
+            .end();
 
-          this.start().tag(checkBox).end();
+          this.onDetach(slot.value.data$.sub(this.updateCols(axiom, index++, localStorageKey)));
         });
     }
   ],

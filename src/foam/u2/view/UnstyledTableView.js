@@ -203,7 +203,7 @@ foam.CLASS({
         table: this.of
       });
 
-      return this.OverlayDropdown.create().add(editor);
+      return this.OverlayDropdown.create({}, this.ctrl).add(editor);
     },
 
     function initE() {

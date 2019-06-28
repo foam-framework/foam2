@@ -57,7 +57,7 @@ public class MDAO
     index_.addIndex(index);
   }
 
-  /** Add an Index which is for a unique value. **/
+  /** Add an Index which is for a unique value. Use addIndex() if the index is not unique. **/
   public void addUniqueIndex(PropertyInfo... props) {
     Index i = ValueIndex.instance();
     for ( PropertyInfo prop : props ) i = new TreeIndex(prop, i);
