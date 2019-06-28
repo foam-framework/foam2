@@ -56,6 +56,7 @@ foam.CLASS({
   ],
 
   exports: [
+    'displayWidth',
     'appConfig',
     'as ctrl',
     'currentMenu',
@@ -141,6 +142,12 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'filteredTableColumns'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.layout.DisplayWidth',
+      name: 'displayWidth',
+      value: foam.u2.layout.DisplayWidth.XL
     },
     {
       name: 'clientPromise',
@@ -245,6 +252,9 @@ foam.CLASS({
     },
 
     function initE() {
+      window.addEventListener('resize', this.updateDisplayWidth);
+      this.updateDisplayWidth();
+
       this.clientPromise.then(() => {
         this.fetchTheme().then(() => {
           this
@@ -478,6 +488,17 @@ foam.CLASS({
         this.footerView_.removeAllChildren();
         this.footerView_.tag({ class: this.theme.footerView });
       }
-    }
+    },
+    {
+      name: 'updateDisplayWidth',
+      isMerged: true,
+      mergeDelay: 5000,
+      code: function() {
+        this.displayWidth = foam.u2.layout.DisplayWidth.VALUES
+          .concat()
+          .sort((a, b) => b.minWidth - a.minWidth)
+          .find(o => o.minWidth <= window.innerWidth);
+      }
+    } 
   ]
 });
