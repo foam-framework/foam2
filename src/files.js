@@ -248,6 +248,11 @@ FOAM_FILES([
   { name: "foam/dao/VersionNoDAO" },
   { name: "foam/dao/sync/SyncRecord" },
   { name: "foam/dao/SyncDAO" },
+  { name: "foam/nanos/boot/NSpec" },
+  { name: "foam/nanos/boot/NSpecAware" },
+  { name: "foam/nanos/auth/EnabledAware" },
+  { name: "foam/nanos/logger/Logger" },
+  { name: "foam/nanos/logger/LoggingDAO" },
   { name: "foam/dao/EasyDAO" },
   { name: "foam/dao/NoSelectAllDAO" },
   { name: "foam/dao/NullDAO" },
@@ -506,6 +511,7 @@ FOAM_FILES([
   { name: "foam/net/auth/AuthAwareHTTPRequest" },
   { name: "foam/net/auth/TokenBearerHTTPRequest" },
   { name: "foam/net/auth/AuthAgent" },
+  { name: "foam/u2/view/FObjectArrayTableView", flags: ['web'] },
 
   // Doc
   { name: "foam/doc/ClassLink", flags: ['debug', 'web'] },
@@ -557,6 +563,11 @@ FOAM_FILES([
   { name: "foam/mop/MOP" },
   { name: "foam/dao/pg/ConnectionPool" },
   { name: "foam/lib/Outputter" },
+  { name: "foam/lib/PropertyPredicate" },
+  { name: "foam/lib/PermissionedPropertyPredicate" },
+  { name: "foam/lib/NetworkPropertyPredicate" },
+  { name: "foam/lib/StoragePropertyPredicate" },
+  { name: "foam/lib/AndPropertyPredicate" },
   { name: "foam/lib/json/OutputterMode" },
   { name: "foam/lib/json/ClassReferenceParserTest" },
   { name: "foam/lib/parse/Parser" },
@@ -580,7 +591,9 @@ FOAM_FILES([
 
   { name: "org/chartjs/Lib" },
   { name: "org/chartjs/AbstractChartCView" },
+  { name: "org/chartjs/AbstractChartView" },
   { name: "org/chartjs/CandlestickDAOChartView" },
+  { name: "org/chartjs/PieDAOChartView" },
   { name: "org/chartjs/Pie" },
   { name: "org/chartjs/Bar" },
   { name: "org/chartjs/Line" },
@@ -622,7 +635,10 @@ FOAM_FILES([
   { name: "foam/u2/view/date/Month" },
   { name: "foam/u2/view/date/Weekday" },
 
+  { name: "foam/u2/layout/DisplayWidth" },
   { name: "foam/u2/layout/Layouts" },
+  { name: "foam/u2/layout/Cards" },
+  { name: "foam/u2/layout/Card" },
 
   { name: "foam/comics/v2/CannedQuery" },
   { name: "foam/comics/v2/DAOBrowseControllerView" },

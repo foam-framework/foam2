@@ -57,7 +57,7 @@ foam.CLASS({
     }
     ^ p {
       font-size: 10px;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
       font-weight: 300;
       display: inline-block;
       position: relative;
@@ -69,7 +69,7 @@ foam.CLASS({
     ^ label{
       font-weight: 300;
       font-size: 14px;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
     }
   `,
 

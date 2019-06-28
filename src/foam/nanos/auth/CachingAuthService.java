@@ -6,11 +6,34 @@
 package foam.nanos.auth;
 
 import foam.core.X;
+import foam.core.XFactory;
 import foam.nanos.session.Session;
 import java.security.Permission;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import javax.security.auth.AuthPermission;
+
+
+/** Only return value if the session context hasn't changed. **/
+class SessionContextCacheFactory
+  implements XFactory
+{
+  protected X      sessionX_;
+  protected Object value_;
+
+  public SessionContextCacheFactory(Object value) {
+    value_ = value;
+  }
+
+  public Object create(X x) {
+    Session session = (Session) x.get(Session.class);
+    if ( session == null ) return null;
+    if ( sessionX_ == null ) sessionX_ = session.getContext();
+    if ( sessionX_ != session.getContext() ) return null;
+    return value_;
+  }
+}
+
 
 /**
  * Decorator to add Caching to AuthService.
@@ -22,13 +45,15 @@ public class CachingAuthService
 
   public static String CACHE_KEY = "CachingAuthService.PermissionCache";
 
-  protected static Map getPermissionMap(X x) {
-    Map map = (Map) x.get(CACHE_KEY);
+  protected static Map<String,Boolean> getPermissionMap(X x) {
+    Session session = (Session) x.get(Session.class);
+    Map<String,Boolean> map = (Map) session.getContext().get(CACHE_KEY);
 
     if ( map == null ) {
-      Session session = (Session) x.get(Session.class);
-      map = new ConcurrentHashMap();
-      session.setContext(session.getContext().put(CACHE_KEY, map));
+      map = new ConcurrentHashMap<String,Boolean>();
+      session.setContext(session.getContext().putFactory(
+        CACHE_KEY,
+        new SessionContextCacheFactory(map)));
     }
 
     return map;
@@ -43,24 +68,21 @@ public class CachingAuthService
   }
 
   @Override
-  public boolean checkPermission(foam.core.X x, java.security.Permission permission) {
+  public boolean check(foam.core.X x, String permission) {
     if ( x == null || permission == null ) return false;
 
-    Map map = getPermissionMap(x);
+    Permission p = new AuthPermission(permission);
 
-    if ( map.containsKey(permission.getName()) ) {
-      return ((Boolean) map.get(permission.getName())).booleanValue();
+    Map<String,Boolean> map = getPermissionMap(x);
+
+    if ( map.containsKey(p.getName()) ) {
+      return map.get(p.getName());
     }
 
-    boolean permissionCheck = getDelegate().checkPermission(x, permission);
+    boolean permissionCheck = getDelegate().check(x, permission);
 
-    map.put(permission.getName(), permissionCheck);
+    map.put(p.getName(), permissionCheck);
 
     return permissionCheck;
-  }
-
-  @Override
-  public boolean check(foam.core.X x, String permission) {
-    return checkPermission(x, new AuthPermission(permission));
   }
 }

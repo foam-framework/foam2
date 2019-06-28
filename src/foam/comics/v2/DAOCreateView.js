@@ -7,11 +7,20 @@
 foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOCreateView',
+  extends: 'foam.u2.View',
+
+  topics: [
+    'finished',
+    'throwError'
+  ],
+  
   documentation: `
     A configurable view to create an instance of a specified model
   `,
 
-  extends: 'foam.u2.View',
+  axioms: [
+    foam.pattern.Faceted.create()
+  ],
 
   css:`
     ^ {
@@ -68,13 +77,27 @@ foam.CLASS({
       }
     }
   ],
+  actions: [
+    {
+      name: 'save',
+      code: function() {
+        this.config.dao.put(this.data).then(o => {
+          this.data = o;
+          this.finished.pub();
+          this.stack.back();
+        }, e => {
+          this.throwError.pub(e);
+        });
+      }
+    },
+  ],
   methods: [
     function initE() {
       var self = this;
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(config$viewBorder, config$browseTitle, data) {
+        .add(self.slot(function(config$viewBorder, config$browseTitle) {
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -90,11 +113,12 @@ foam.CLASS({
                     .add(`Create your ${config$browseTitle}`)
                       .addClass(this.myClass('account-name'))
                   .end()
+                  .startContext({data: self}).add(self.SAVE).endContext()
                 .end()
               .end()
               .start(config$viewBorder)
                 .start().addClass(this.myClass('create-view-container'))
-                  .tag(this.viewView, { data: data })
+                  .tag(this.viewView, { data$: self.data$ })
                 .end()
               .end()
         }));

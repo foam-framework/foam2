@@ -56,6 +56,7 @@ foam.CLASS({
   ],
 
   exports: [
+    'displayWidth',
     'appConfig',
     'as ctrl',
     'currentMenu',
@@ -78,37 +79,36 @@ foam.CLASS({
 
   constants: {
     MACROS: [
-      'primaryColor',
-      'secondaryColor',
-      'tableColor',
-      'tableHoverColor',
-      'accentColor',
-      'secondaryHoverColor',
-      'secondaryDisabledColor',
-      'destructiveColor',
-      'destructiveHoverColor',
-      'destructiveDisabledColor',
       'customCSS',
-      'backgroundColor',
-      'headerColor',
-      'tertiaryColor',
-      'tertiaryHoverColor',
-      'tertiaryDisabledColor',
-      'inputBorderColor',
-      'inputTextColor',
-      'inputBackgroundColor',
-      'inputHoverBorderColor',
-      'inputHoverTextColor',
-      'inputHoverBackgroundColor',
-      'inputErrorBorderColor',
-      'inputErrorTextColor',
-      'inputErrorBackgroundColor',
-      'inputDisabledBorderColor',
-      'inputDisabledTextColor',
-      'inputDisabledBackgroundColor',
+      'primary1',
+      'primary2',
+      'primary3',
+      'primary4',
+      'primary5',
+      'approval1',
+      'approval2',
+      'approval3',
+      'approval4',
+      'approval5',
+      'warning1',
+      'warning2',
+      'warning3',
+      'warning4',
+      'warning5',
+      'destructive1',
+      'destructive2',
+      'destructive3',
+      'destructive4',
+      'destructive5',
+      'grey1',
+      'grey2',
+      'grey3',
+      'grey4',
+      'grey5',
+      'black',
       'inputHeight',
       'inputVerticalPadding',
-      'inputHorizontalPadding',
+      'inputHorizontalPadding'
     ]
   },
 
@@ -124,7 +124,7 @@ foam.CLASS({
       font-size: 14px;
       letter-spacing: 0.2px;
       color: #373a3c;
-      background: %BACKGROUNDCOLOR%;
+      background: /*%GREY5%*/ #f5f7fa;
       margin: 0;
     }
     .stack-wrapper {
@@ -138,6 +138,12 @@ foam.CLASS({
   `,
 
   properties: [
+    {
+      class: 'Enum',
+      of: 'foam.u2.layout.DisplayWidth',
+      name: 'displayWidth',
+      value: foam.u2.layout.DisplayWidth.XL
+    },
     {
       name: 'clientPromise',
       factory: function() {
@@ -241,6 +247,9 @@ foam.CLASS({
     },
 
     function initE() {
+      window.addEventListener('resize', this.updateDisplayWidth);
+      this.updateDisplayWidth();
+
       this.clientPromise.then(() => {
         this.fetchTheme().then(() => {
           this
@@ -297,8 +306,17 @@ foam.CLASS({
       /* A short-form macros is of the form %PRIMARY_COLOR%. */
       var M = m.toUpperCase();
 
+      // NOTE: We add a negative lookahead for */, which is used to close a
+      // comment in CSS. We do this because if we don't, then when a developer
+      // chooses to include a long form CSS macro directly in their CSS such as
+      //
+      //                       /*%EXAMPLE%*/ #abc123
+      //
+      // then we don't want this method to expand the commented portion of that
+      // CSS because it's already in long form. By checking if */ follows the
+      // macro, we can tell if it's already in long form and skip it.
       return css.replace(
-        new RegExp('%' + M + '%', 'g'),
+        new RegExp('%' + M + '%(?!\\*/)', 'g'),
         '/*%' + M + '%*/ ' + this.theme[m]);
     },
 
@@ -465,6 +483,17 @@ foam.CLASS({
         this.footerView_.removeAllChildren();
         this.footerView_.tag({ class: this.theme.footerView });
       }
-    }
+    },
+    {
+      name: 'updateDisplayWidth',
+      isMerged: true,
+      mergeDelay: 5000,
+      code: function() {
+        this.displayWidth = foam.u2.layout.DisplayWidth.VALUES
+          .concat()
+          .sort((a, b) => b.minWidth - a.minWidth)
+          .find(o => o.minWidth <= window.innerWidth);
+      }
+    } 
   ]
 });
