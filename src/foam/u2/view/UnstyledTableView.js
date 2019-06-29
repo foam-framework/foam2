@@ -54,28 +54,28 @@ foam.CLASS({
     },
     {
       name: 'columns_',
+      documentation: `Note: filteredTableColumns was a property set in ApplicationController
+      for the original purpose of having the filtered DAO list available for CSV outputting.`,
       expression: function(columns, of) {
         var of = this.of;
-        if ( ! of ) return [];
-        var bob = [];
-        var i = 0;
-        var bobet = columns.map(function(p) {
-          let c;
-          if ( typeof p == 'string' ) {
-            c = of.getAxiomByName(p);
-            bob[i] = p;
+        this.filteredTableColumns = [];
+
+        if ( ! of ) return propNameList;
+
+        var prop;
+        return columns.map((propName) => {
+          if ( typeof propName == 'string' ) {
+            prop = of.getAxiomByName(propName);
+            this.filteredTableColumns.push(propName);
           } else {
-            c = p;
-            bob[i] = p.name;
+            prop = propName;
+            this.filteredTableColumns.push(propName.name);
           }
-          i++;
-           if ( ! c ) {
-             console.error('Unknown table column: ', p);
-           }
-          return c;
-        }).filter(function(c) { return c; });
-        this.filteredTableColumns = bob;
-        return bobet;
+          if ( ! prop ) {
+            console.error('Unknown table column: ', propName);
+          }
+          return prop;
+        });
       }
     },
     {
@@ -86,12 +86,8 @@ foam.CLASS({
 
         var tableColumns = of.getAxiomByName('tableColumns');
 
-        if ( tableColumns ) {
-          var tc = tableColumns.columns;
-          debugger;
-          this.filteredTableColumns = tc;
-          return tc;
-        }
+        if ( tableColumns ) return tableColumns.columns;
+
         return of.getAxiomsByClass(foam.core.Property).
             filter(function(p) { return p.tableCellFormatter && ! p.hidden; }).
             map(foam.core.Property.NAME.f);

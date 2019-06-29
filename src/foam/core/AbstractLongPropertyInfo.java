@@ -56,21 +56,4 @@ public abstract class AbstractLongPropertyInfo
     long val = (long) get(obj);
     sig.update((ByteBuffer) bb.get().putLong(val).flip());
   }
-
-  @Override
-  public void toCSV(X x, Object obj, foam.dao.CSVSink outputter, Object prop) {
-    if ( obj instanceof net.nanopay.invoice.model.Invoice ) {
-      if ( getName() == "payeeId" ) {
-        foam.nanos.auth.User payee = ((net.nanopay.invoice.model.Invoice)obj).findPayeeId(x);
-        outputter.output(payee.label());
-        return;
-      }
-      if ( getName() == "payerId" ) {
-        foam.nanos.auth.User payer = ((net.nanopay.invoice.model.Invoice)obj).findPayerId(x);
-        outputter.output(payer.label());
-        return;
-      }
-    }
-    outputter.output(get(obj));
-  }
 }
