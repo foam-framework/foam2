@@ -20,8 +20,6 @@ public abstract class AbstractStringPropertyInfo
     return o1.compareTo(o2);
   }
 
-  public abstract int getWidth();
-
   // public void setFromString(Object obj, String value) {
   //   this.set(obj, value);
   // }
