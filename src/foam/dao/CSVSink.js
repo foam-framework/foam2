@@ -107,7 +107,7 @@ foam.CLASS({
         sb.append(getCsv());
         String s = value.toString();
 
-        if (s.indexOf("\\"") != -1) {
+        if (s.indexOf("\\"") != -1 || s.indexOf(",") != -1) {
           sb.append("\\"");
           sb.append(s);
           sb.append("\\"");
@@ -129,9 +129,12 @@ foam.CLASS({
       },
       javaCode: `
         StringBuilder sb = new StringBuilder();
+
         sb.append(getCsv());
         sb.append("\\n");
+
         setCsv(sb.toString());
+
         sb.setLength(0);
         setIsNewLine(true);
       `
@@ -156,31 +159,24 @@ foam.CLASS({
       },
       javaCode: `
         if ( ! isPropertySet("of") ) setOf(((foam.core.FObject)obj).getClassInfo());
+        Object propObj;
+        PropertyInfo columnProp;
+        String[] tableColumnNames = getProps();
 
-        // TODO simplify below block
-        String[] bob = getProps();
-        PropertyInfo[] columns = new PropertyInfo[bob.length];
-        int j = 0;
-        for(String b : bob) {
-          columns[j] = (PropertyInfo) getOf().getAxiomByName(b);
-          j++;
-        }
-        Object bb;
         if ( ! getIsHeadersOutput() ) {
-          j = 0;
-          for (String element : bob) {
-            bb = ((foam.core.FObject)obj).getProperty(element);
-            columns[j].toCSVLabel(this, bb);
-            j++;
+          for (String propName: tableColumnNames) {
+            propObj = ((foam.core.FObject)obj).getProperty(propName);
+            columnProp = (PropertyInfo) getOf().getAxiomByName(propName);
+            columnProp.toCSVLabel(this, propObj);
           }
           newLine_();
           setIsHeadersOutput(true);
         }
-        j = 0;
-        for (String element : bob) {
-          bb = ((foam.core.FObject)obj).getProperty(element);
-          columns[j].toCSV(getX(), obj, this, bb);
-          j++;
+
+        for (String propName : tableColumnNames) {
+          propObj = ((foam.core.FObject)obj).getProperty(propName);
+          columnProp = (PropertyInfo) getOf().getAxiomByName(propName);
+          columnProp.toCSV(getX(), obj, this, propObj);
         }
         newLine_();
       `
