@@ -2096,3 +2096,18 @@ try {
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'DAOPropertyJavaRefinement',
+  refines: 'foam.dao.DAOProperty',
+  flags: ['java'],
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var compare = info.getMethod('compare');
+      compare.body = 'return 0;';
+      return info;
+    }
+  ]
+});
