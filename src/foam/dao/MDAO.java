@@ -136,10 +136,11 @@ public class MDAO
 
     if ( o == null ) return null;
 
+    // TODO: PM unindexed plans
     return objOut(
-        getOf().isInstance(o)
-          ? (FObject) index_.planFind(state, getPrimaryKey().get(o)).find(state, getPrimaryKey().get(o))
-          : (FObject) index_.planFind(state, o).find(state,o)
+      getOf().isInstance(o)
+        ? (FObject) index_.planFind(state, getPrimaryKey().get(o)).find(state, getPrimaryKey().get(o))
+        : (FObject) index_.planFind(state, o).find(state, o)
     );
   }
 
