@@ -14,6 +14,16 @@ foam.CLASS({
     here.
   `,
 
+  imports: [
+    'ctrl?',
+    'getElementById',
+    'installCSS',
+  ],
+
+  exports: [
+    'wrapCSS as installCSS',
+  ],
+
   tableColumns: [
     'id',
     'priority',
@@ -102,148 +112,177 @@ foam.CLASS({
     {
       class: 'Color',
       name: 'primary1',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'primary2',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'primary3',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'primary4',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'primary5',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'approval1',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'approval2',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'approval3',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'approval4',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'approval5',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'warning1',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'warning2',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'warning3',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'warning4',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'warning5',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'destructive1',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'destructive2',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'destructive3',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'destructive4',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'destructive5',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'grey1',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'grey2',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'grey3',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'grey4',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'grey5',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'black',
-      section: 'colours'
+      section: 'colours',
+      value: 'black'
     },
     {
       class: 'String',
       name: 'inputHeight',
       documentation: 'Used to enforce consistent height across text-based inputs.',
-      section: 'inputs'
+      section: 'inputs',
+      value: 'unset'
     },
     {
       class: 'String',
       name: 'inputVerticalPadding',
-      section: 'inputs'
+      section: 'inputs',
+      value: 'unset'
     },
     {
       class: 'String',
       name: 'inputHorizontalPadding',
-      section: 'inputs'
+      section: 'inputs',
+      value: 'unset'
     }
   ],
 
@@ -251,8 +290,66 @@ foam.CLASS({
     {
       name: 'preview',
       tableWidth: 100,
-      code: function(X) {
-        X.ctrl.theme = this;
+      isAvailable: function() {
+        return this.ctrl;
+      },
+      code: function() {
+        this.ctrl.theme = this;
+      }
+    }
+  ],
+
+  methods: [
+    function expandShortFormMacro(css, m) {
+      /* A short-form macros is of the form %PRIMARY_COLOR%. */
+      var M = m.toUpperCase();
+
+      // NOTE: We add a negative lookahead for */, which is used to close a
+      // comment in CSS. We do this because if we don't, then when a developer
+      // chooses to include a long form CSS macro directly in their CSS such as
+      //
+      //                       /*%EXAMPLE%*/ #abc123
+      //
+      // then we don't want this method to expand the commented portion of that
+      // CSS because it's already in long form. By checking if */ follows the
+      // macro, we can tell if it's already in long form and skip it.
+      return css.replace(
+        new RegExp('%' + M + '%(?!\\*/)', 'g'),
+        '/*%' + M + '%*/ ' + this[m]);
+    },
+
+    function expandLongFormMacro(css, m) {
+      // A long-form macros is of the form "/*%PRIMARY_COLOR%*/ blue".
+      var M = m.toUpperCase();
+
+      return css.replace(
+        new RegExp('/\\*%' + M + '%\\*/[^;]*', 'g'),
+        '/*%' + M + '%*/ ' + this[m]);
+    },
+
+    function wrapCSS(text, id) {
+      /** CSS preprocessor, works on classes instantiated in subContext. */
+      if ( text ) {
+        var eid = foam.u2.Element.NEXT_ID();
+
+        var MACROS = this.cls_.getAxiomsByClass(foam.core.Property)
+          .map(p => p.name);
+        for ( var i = 0 ; i < MACROS.length ; i++ ) {
+          let m     = MACROS[i];
+          var text2 = this.expandShortFormMacro(this.expandLongFormMacro(text, m), m);
+
+            // If the macro was found, then listen for changes to the property
+            // and update the CSS if it changes.
+            if ( text != text2 ) {
+              text = text2;
+              this.onDetach(this.slot(m).sub(() => {
+                var el = this.getElementById(eid);
+                el.innerText = this.expandLongFormMacro(el.innerText, m);
+              }));
+            }
+        }
+
+        this.installCSS(text, id, eid);
       }
     }
   ]
