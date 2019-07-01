@@ -178,6 +178,38 @@ foam.CLASS({
 
   methods: [
     {
+      documentation: `Simple be effective filtering of known vulnerabilities.`,
+      name: 'validate',
+      code: function(script) {
+        return script;
+      },
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'script',
+          type: 'String'
+        }
+      ],
+      javaType: 'String',
+      javaThrows: [
+        'java.security.GeneralSecurityException'
+      ],
+      javaCode: `
+      if ( script.contains("Runtime.getRuntime") ||
+           script.contains("exec(") ||
+           script.contains("System.setProperty") ||
+           script.contains("exit(") ) {
+       ((foam.nanos.logger.Logger) x.get("logger")).warning("Illegal method call in script: ", script);
+       // TODO: Notification
+       throw new java.security.GeneralSecurityException("Illegal method call in script.");
+      }
+      return script;
+      `
+    },
+    {
       name: 'createInterpreter',
       args: [
         { name: 'x', type: 'Context' }
@@ -192,7 +224,9 @@ foam.CLASS({
           shell.eval("runScript(String name) { script = x.get(\\"scriptDAO\\").find(name); if ( script != null ) eval(script.code); }");
           shell.eval("foam.core.X sudo(String user) { foam.util.Auth.sudo(x, (String) user); }");
           shell.eval("foam.core.X sudo(Object id) { foam.util.Auth.sudo(x, id); }");
-        } catch (EvalError e) {}
+        } catch (EvalError e) {
+          ((foam.nanos.logger.Logger) x.get("logger")).warning(e.getMessage());
+        }
 
         return shell;
       `
@@ -205,7 +239,7 @@ foam.CLASS({
         }.bind(this);
         try {
           with ({ log: log, print: log, x: this.__context__ })
-          return Promise.resolve(eval(this.code));
+            return Promise.resolve(eval(this.validate(this.code)));
         } catch (err) {
           this.output += err;
           return Promise.reject(err);
@@ -226,7 +260,7 @@ foam.CLASS({
         try {
           setOutput("");
           shell.setOut(ps);
-          shell.eval(getCode());
+          shell.eval(validate(x, getCode()));
         } catch (Throwable e) {
           ps.println();
           e.printStackTrace(ps);
