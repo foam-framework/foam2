@@ -70,6 +70,7 @@ foam.CLASS({
       name: 'session_',
       javaType: 'Session',
       class: 'Object',
+      hidden: true,
       javaFactory:
       `
         Properties props = new Properties();
@@ -82,6 +83,13 @@ foam.CLASS({
         }
         return Session.getInstance(props);
       `
+    },
+    {
+      name: 'transport',
+      javaType: 'Transport',
+      class: 'Object',
+      transient: true,
+      hidden: true
     },
     {
       class: 'String',
@@ -181,35 +189,69 @@ foam.CLASS({
           }
           
           message.setSentDate(new Date());
-          logger.info("SMTPEmailService Created MimeMessage.");
+          //logger.info("SMTPEmailService.createMimeMessage created.");
           return message;
         } catch (Throwable t) {
-          logger.error("SMTPEmailService failed to created MimeMessage. " + t);
+          logger.error("SMTPEmailService.createMimeMessage failed.",t);
           return null;
         }
       `
     },
     {
+      // TODO: thread pool and queing
+      documentation: 'This is not designed for high load. ',
+      name: 'connect',
+      javaType: 'Transport', 
+      javaCode: `
+      Transport t = getTransport();
+      if ( t != null &&
+           t.isConnected() ) {
+        return t;
+      }
+      synchronized( this ) {
+        if ( t != null &&
+             t.isConnected() ) {
+          return t;
+        }
+        Logger logger = (Logger) getX().get("logger");
+        try {
+          logger.info("SMTPEmailService connecting...");
+          t = getSession_().getTransport("smtp");
+          t.connect(getUsername(), getPassword());
+          setTransport(t);
+          logger.info("SMTPEmailService connected.");
+        } catch (Exception e) {
+          logger.error("SMTPEmailService connection failed.", e);
+          setTransport(null);
+        }
+      }
+      return getTransport();
+      `
+    },
+    {
+      documentation: 'Presently no retry',
       name: 'sendEmail',
       javaCode:
       `
       OMLogger omLogger = (OMLogger) x.get("OMLogger");
       Logger logger = (Logger) getX().get("logger");
+      boolean sent = false;
         try {
           omLogger.log("Pre send email request");
           MimeMessage message = createMimeMessage(emailMessage);
-          Transport transport = getSession_().getTransport("smtp");
-          transport.connect();
-          logger.info("SMTPEmailService connected.");
-          transport.send(message, getUsername(), getPassword());
-          logger.info("SMTPEmailService sent MimeMessage.");
-          transport.close();
-          logger.info("SMTPEmailService finish.");
-          omLogger.log("Post send email request");
+          Transport transport = connect();
+          if ( transport != null ) {
+            transport.send(message);
+            omLogger.log("Post send email request");
+            sent = true;
+          }
         } catch (Exception e) {
-          logger.error("SMTPEmailService failed to finish. " + e);
+          logger.error("SMTPEmailService.sendEmail failed", e);
+        } finally {
+          if ( ! sent ) {
+           logger.warning("SMTPEmailService.sendEmail message not sent: "+emailMessage);
+          }
         }
-        
       `
     }
   ]
