@@ -300,11 +300,9 @@ foam.CLASS({
           String line = reader.readLine();
           if ( getMultiLine() ) {
             StringBuilder sb = new StringBuilder();
-            line = line.trim();
             while ( ! line.endsWith("})") ) {
               sb.append(line);
               line = reader.readLine();
-              line = line.trim();
               if ( line == null )
                 return null;
             }
