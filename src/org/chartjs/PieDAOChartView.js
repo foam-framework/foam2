@@ -50,6 +50,9 @@ foam.CLASS({
             config.data = {
               datasets: [{
                 data: Object.keys(sink.groups).map(key => sink.groups[key].value),
+                backgroundColor: [
+                  '#a7beff'
+                ]
               }],
               labels: Object.keys(sink.groups)
             };
