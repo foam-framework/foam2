@@ -91,8 +91,8 @@ foam.CLASS({
     }
 
     ^primary:disabled {
-      border-color: /*%PRIMARY5%*/ #e5f1fc;
-      background-color: /*%PRIMARY5%*/ #e5f1fc;
+      border-color: /*%PRIMARY4%*/ #a7beff;
+      background-color: /*%PRIMARY4%*/ #a7beff;
     }
 
     ^primary-destructive {
