@@ -67,8 +67,8 @@ public class MultiStringParser
 
           c = (Character) escapePS.value();
         }
-      } else {
-        builder.append(c);
+      } else if ( c != '\n' ){
+          builder.append(c);
       }
 
       ps = tail;
