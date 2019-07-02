@@ -27,12 +27,14 @@ public class FreezingDAO
 
   @Override
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    return getDelegate().select(new AbstractSink() {
+    getDelegate().select(new AbstractSink() {
       @Override
       public void put(Object obj, Detachable sub) {
         obj = ((FObject)obj).fclone();
         ((FObject) obj).freeze();
+        sink.put(obj, sub);
       }
     });
+    return sink;
   }
 }
