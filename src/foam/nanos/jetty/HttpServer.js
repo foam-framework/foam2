@@ -21,7 +21,12 @@ foam.CLASS({
     'foam.nanos.jetty.WhitelistedForwardedRequestCustomizer',
     'java.util.Set',
     'java.util.HashSet',
-    'java.util.Arrays'
+    'java.util.Arrays',
+    'org.eclipse.jetty.server.*',
+    'org.eclipse.jetty.util.ssl.SslContextFactory',
+    'javax.net.ssl.KeyManager',
+    'javax.net.ssl.KeyManagerFactory',
+    'javax.net.ssl.SSLContext'
   ],
 
   properties: [
@@ -29,6 +34,22 @@ foam.CLASS({
       class: 'Int',
       name: 'port',
       value: 8080
+    },
+    {
+      class: 'Boolean',
+      name: 'enableHttps'
+    },
+    {
+      class: 'Int',
+      name: 'httpsPort'
+    },
+    {
+      class: 'String',
+      name: 'keystorePath'
+    },
+    {
+      class: 'String',
+      name: 'keystorePassword'
     },
     {
       class: 'StringArray',
@@ -184,6 +205,24 @@ foam.CLASS({
 
         addJettyShutdownHook(server);
         server.setHandler(handler);
+                
+        // enable https
+        if ( this.getEnableHttps() ) {
+
+          HttpConfiguration https = new HttpConfiguration();
+          https.addCustomizer(new SecureRequestCustomizer());
+          SslContextFactory sslContextFactory = new SslContextFactory();
+          sslContextFactory.setKeyStorePath(this.getKeystorePath());
+          sslContextFactory.setKeyStorePassword(this.getKeystorePassword());
+
+          ServerConnector sslConnector = new ServerConnector(server,
+            new SslConnectionFactory(sslContextFactory, "http/1.1"),
+            new HttpConnectionFactory(https));
+          sslConnector.setPort(this.getHttpsPort());
+
+          server.addConnector(sslConnector);
+        }
+                
         server.start();
       } catch(Exception e) {
         e.printStackTrace();
