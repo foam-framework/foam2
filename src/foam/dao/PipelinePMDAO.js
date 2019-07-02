@@ -17,13 +17,13 @@ foam.CLASS({
   requires: [
     'foam.nanos.pm.PM'
   ],
-  
+
   javaImports: [
     'foam.core.X',
     'foam.mlang.order.Comparator',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.EnabledAware',
-    'foam.nanos.pm.PM',
+    'foam.nanos.pm.PM'
   ],
 
   constants: [
@@ -34,7 +34,7 @@ foam.CLASS({
       value: 'pipePmStart'
     }
   ],
-  
+
   properties: [
     {
       documentation: `true when createPipeline has been called.
@@ -65,7 +65,7 @@ both enabled.postSet and Builder.init_() can call createPipeline.`,
         }
         if ( val &&
              ! toggled ) {
-          // createPipeline has yet to be called. 
+          // createPipeline has yet to be called.
           createPipeline();
         }
       }
@@ -77,14 +77,6 @@ both enabled.postSet and Builder.init_() can call createPipeline.`,
       type: 'foam.nanos.boot.NSpec'
     },
     {
-      name: 'classType',
-      class: 'Class',
-      javaFactory: `
-        return PMDAO.getOwnClassInfo();
-      `,
-      hidden: true
-    },
-    {
       documentation: 'Enable PMs on DAO.find operations',
       name: 'pmFind',
       class: 'Boolean'
@@ -92,39 +84,39 @@ both enabled.postSet and Builder.init_() can call createPipeline.`,
     {
       name: 'putName',
       class: 'String',
-      javaFactory: 'return getNSpec().getName()+":pipePut";',
+      javaFactory: 'return createName_("put");',
       visibility: 'RO'
     },
     {
       name: 'findName',
       class: 'String',
-      javaFactory: 'return getNSpec().getName()+":pipeFind";',
+      javaFactory: 'return createName_("find");',
       visibility: 'RO'
     },
     {
       name: 'selectName',
       class: 'String',
-      javaFactory: 'return getNSpec().getName()+":pipeSelect";',
+      javaFactory: 'return createName_("select");',
       visibility: 'RO'
     },
     {
       name: 'removeName',
       class: 'String',
-      javaFactory: 'return getNSpec().getName()+":pipeRemove";',
+      javaFactory: 'return createName_("remove");',
       visibility: 'RO'
     },
     {
       name: 'removeAllName',
       class: 'String',
-      javaFactory: 'return getNSpec().getName()+":pipeRemoveAll";',
+      javaFactory: 'return createName_("removeAll");',
       visibility: 'RO'
     },
     {
       name: 'cmdName',
       class: 'String',
-      javaFactory: 'return getNSpec().getName()+":pipeCmd";',
+      javaFactory: 'return createName_("cmd");',
       visibility: 'RO'
-    },
+    }
   ],
 
   axioms: [
@@ -152,6 +144,15 @@ both enabled.postSet and Builder.init_() can call createPipeline.`,
     `
     },
     {
+      name: 'createName_',
+      args: [ {name: 'name', type: 'String '} ],
+      javaType: 'String',
+      javaCode: `
+        String spec = ( getNSpec() == null ) ? "NOSPEC" : getNSpec().getName();
+        return spec + "/" + getDelegate().getClass().getSimpleName() + ":" + name;
+      `
+    },
+    {
       documentation: `
 Creates the PM that will measure the performance of each operation and creates a new context with it as a variable which the EndPipelinePMDAO
    *  will use to access the pm after it is passed onto it through the arguments of the DAO operations
@@ -171,7 +172,7 @@ Creates the PM that will measure the performance of each operation and creates a
       javaCode: `
     if ( getEnabled() ) {
       PM pm = new PM();
-      pm.setClassType(this.getClassType());
+      pm.setClassType(this.getOwnClassInfo());
       pm.setName(op);
       pm.init_();
       return x.put(PIPE_PM_START, pm);
@@ -181,7 +182,7 @@ Creates the PM that will measure the performance of each operation and creates a
     },
     {
       documentation: `
-Creates the PM pipeline by adding an EndPipelinePMDAO after of this class only if it is a ProxyDAO. 
+Creates the PM pipeline by adding an EndPipelinePMDAO after of this class only if it is a ProxyDAO.
 If the delegate of that is also a ProxyDAO, creates a new PipelinedPMDAO in the chain beofre it which repeats this procedure recursively.
 `,
       name: 'createPipeline',
@@ -200,7 +201,9 @@ If the delegate of that is also a ProxyDAO, creates a new PipelinedPMDAO in the 
     ((ProxyDAO) delegate).setDelegate(new EndPipelinePMDAO(getX(), secondaryDelegate));
     delegate = ((ProxyDAO) delegate).getDelegate();
     if ( ( secondaryDelegate instanceof ProxyDAO ) && ! ( secondaryDelegate instanceof PipelinePMDAO ) ) {
-      ((ProxyDAO) delegate).setDelegate(new PipelinePMDAO(getX(), secondaryDelegate));
+      PipelinePMDAO pmd = new PipelinePMDAO(getX(), secondaryDelegate);
+      pmd.setNSpec(getNSpec());
+      ((ProxyDAO) delegate).setDelegate(pmd);
     }
       `
     },
@@ -273,7 +276,7 @@ If the delegate of that is also a ProxyDAO, creates a new PipelinedPMDAO in the 
      `
     }
   ],
-  
+
   classes: [
     {
 //      package: 'foam.dao',
@@ -288,7 +291,7 @@ If the delegate of that is also a ProxyDAO, creates a new PipelinedPMDAO in the 
         'foam.core.X',
         'foam.mlang.order.Comparator',
         'foam.mlang.predicate.Predicate',
-        'foam.nanos.pm.PM',
+        'foam.nanos.pm.PM'
       ],
 
       axioms: [

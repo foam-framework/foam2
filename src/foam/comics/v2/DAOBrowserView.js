@@ -20,7 +20,7 @@ foam.CLASS({
   ],
 
   documentation: `
-    A scrolling table view customized for the inline DAOController 
+    A scrolling table view customized for the inline DAOController
     with canned queries and a searchbar
   `,
 
@@ -41,7 +41,6 @@ foam.CLASS({
     ^query-bar {
       padding: 24px 16px;
       align-items: center;
-      display: none;
     }
 
     ^toolbar {
@@ -101,7 +100,7 @@ foam.CLASS({
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'predicate',
       expression: function(config$cannedQueries) {
-        return config$cannedQueries && config$cannedQueries.length 
+        return config$cannedQueries && config$cannedQueries.length
           ? config$cannedQueries[0].predicate
           : foam.mlang.predicate.True.create();
       }
@@ -152,7 +151,7 @@ foam.CLASS({
                     .start(self.Cols)
                       .callIf(config$cannedQueries.length > 1, function() {
                         this
-                          .start(self.TabChoiceView, { 
+                          .start(self.TabChoiceView, {
                             choices: config$cannedQueries.map(o => [o.predicate, o.label]),
                             data$: self.predicate$
                           })
@@ -184,4 +183,4 @@ foam.CLASS({
         }));
     }
   ]
-}); 
+});

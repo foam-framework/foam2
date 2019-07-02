@@ -174,7 +174,7 @@ if ( getLogging() ) {
 }
 
 if ( getPipelinePm() && ( delegate instanceof ProxyDAO ) ) {
-  delegate = new foam.dao.PipelinePMDAO.Builder(getX()).setDelegate(delegate).build();;
+  delegate = new foam.dao.PipelinePMDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(delegate).build();;
 }
 
 if ( getPm() ) {

@@ -510,6 +510,7 @@ FOAM_FILES([
   { name: "foam/net/auth/AuthAwareHTTPRequest" },
   { name: "foam/net/auth/TokenBearerHTTPRequest" },
   { name: "foam/net/auth/AuthAgent" },
+  { name: "foam/u2/view/FObjectArrayTableView", flags: ['web'] },
 
   // Doc
   { name: "foam/doc/ClassLink", flags: ['debug', 'web'] },
@@ -633,7 +634,10 @@ FOAM_FILES([
   { name: "foam/u2/view/date/Month" },
   { name: "foam/u2/view/date/Weekday" },
 
+  { name: "foam/u2/layout/DisplayWidth" },
   { name: "foam/u2/layout/Layouts" },
+  { name: "foam/u2/layout/Cards" },
+  { name: "foam/u2/layout/Card" },
 
   { name: "foam/comics/v2/CannedQuery" },
   { name: "foam/comics/v2/DAOBrowseControllerView" },

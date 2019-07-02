@@ -6,24 +6,16 @@
 package foam.nanos.pm;
 
 import foam.core.*;
-import foam.dao.MDAO;
+import foam.dao.MutableMDAO;
 
 /**
  * MDAO specifically for PMInfo's which doesn't freeze() or clone() values
  * so they can be updated in-place without doing a DAO.put().
  **/
 public class PMInfoMDAO
-  extends MDAO
+  extends MutableMDAO
 {
   public PMInfoMDAO() {
     super(PMInfo.getOwnClassInfo());
-  }
-
-  public FObject objIn(FObject obj) {
-    return obj;
-  }
-
-  public FObject objOut(FObject obj) {
-    return obj;
   }
 }
