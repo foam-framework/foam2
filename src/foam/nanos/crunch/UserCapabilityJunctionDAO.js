@@ -48,6 +48,7 @@ foam.CLASS({
           type: 'foam.core.FObject'
         }
       ],
+      documentation: `check if current user has permission to add this junction`,
       javaCode: `
         User user = getUser(x);
         AuthService auth = (AuthService) x.get("auth");
@@ -65,6 +66,7 @@ foam.CLASS({
         }
       ],
       type: 'foam.dao.DAO',
+      documentation: `return list of junctions the current user has read access to`,
       javaCode: `
       User user = getUser(x);
       AuthService auth = (AuthService) x.get("auth");
@@ -88,6 +90,8 @@ foam.CLASS({
       ],
       type: 'foam.core.FObject',
       documentation: `
+      set the status of the junction before putting by checking if prerequisites are fulfilled and data required is validated.
+      If status is set to GRANTED, check if junctions depending on current can be granted
       `,
       javaCode: `
       checkOwnership(x, obj);
@@ -114,7 +118,7 @@ foam.CLASS({
         }
       ],
       type: 'Boolean',
-      documentation: `check prerequisites`,
+      documentation: `check if prerequisites of a capability is fulfilled`,
       javaCode: `
       DAO capabilityDAO = (DAO) x.get("capabilityDAO");
       DAO prerequisiteCapabilityJunctionDAO = (DAO) (x.get("prerequisiteCapabilityJunctionDAO"));
@@ -150,7 +154,6 @@ foam.CLASS({
       ],
       documentation: `if a ucjunction gets granted, check if there are any existing dependents and re-put them into the dao`,
       javaCode: `
-      //  DAO ucJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
         String capabilityId = (String) ((UserCapabilityJunction) obj).getTargetId();
         Long userId = ((UserCapabilityJunction) obj).getSourceId();
         DAO prerequisiteCapabilityJunctionDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
@@ -231,7 +234,7 @@ foam.CLASS({
       if(result != null) checkOwnership(x, result);
       return super.find_(x, id);
       `
-    },
+    }
   ]
 });
   

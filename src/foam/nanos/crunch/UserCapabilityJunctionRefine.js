@@ -3,6 +3,10 @@ foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'UserCapabilityJunctionRefine',
   refines: 'foam.nanos.crunch.UserCapabilityJunction',
+  documentation: `
+  model for UserCapabilityJunction, contains the data needed to grant the capability to user. 
+  right now userId and capabilityId are not updated property with the source/target Ids.
+  `,
 
   properties: [
     {

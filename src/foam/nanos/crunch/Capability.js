@@ -161,14 +161,16 @@ foam.RELATIONSHIP({
 });
 
 foam.RELATIONSHIP({
-  sourceModel: 'foam.nanos.crunch.Capability',
+  sourceModel: 'foam.nanos.crunch.Capability',  
   targetModel: 'foam.nanos.crunch.Capability',
   cardinality: '*:*'
 });
 
+// deprecatedCapabilityJunction
 // source is deprecated
 // target is deprecating
 
+// prerequisiteCapabilityJunction
 // source is prerequisite
 // target is one requiring prerequisite
 

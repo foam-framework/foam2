@@ -3,7 +3,7 @@ foam.CLASS({
     name: 'PrerequisiteCapabilityJunctionDAO',
     extends: 'foam.dao.ProxyDAO',
   
-    documentation: `TODO On the junctionDAO put should set all deprecated capabilities' enabled to false and update UserCapabilityJunction.`,
+    documentation: `TODO`,
   
     javaImports: [
       'foam.nanos.crunch.Capability',
