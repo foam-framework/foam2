@@ -298,6 +298,8 @@ foam.CLASS({
       javaCode: `
         try {
           String line = reader.readLine();
+          if ( line == null )
+            return null;
           if ( getMultiLine() ) {
             StringBuilder sb = new StringBuilder();
             while ( ! line.equals("})") ) {
