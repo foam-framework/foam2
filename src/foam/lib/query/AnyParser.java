@@ -20,7 +20,7 @@ public class AnyParser
       instance_ = new AnyParser();
       Alt delegate = new Alt(
           new LongParser(),
-          new StringParser(),
+          new Alt(new StringParser, new MultiStringParser),
           new NullParser());
       instance_.setDelegate(delegate);
     }

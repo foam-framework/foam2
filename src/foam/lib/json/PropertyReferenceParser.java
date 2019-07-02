@@ -29,7 +29,7 @@ public class PropertyReferenceParser
       new Literal(":"),
       new Whitespace(),
       new Parser() {
-        private Parser delegate = new StringParser();
+        private Parser delegate = new Alt(new StringParser, new MultiStringParser);
 
         public PStream parse(PStream ps, ParserContext x) {
           ps = ps.apply(delegate, x);
@@ -45,7 +45,7 @@ public class PropertyReferenceParser
       new Whitespace(),
       new Literal(":"),
       new Parser() {
-        private Parser delegate = new StringParser();
+        private Parser delegate = new Alt(new StringParser, new MultiStringParser);
 
         public PStream parse(PStream ps, ParserContext x) {
           ps = ps.apply(delegate, x);

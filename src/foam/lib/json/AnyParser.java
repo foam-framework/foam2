@@ -18,7 +18,7 @@ public class AnyParser
       instance_ = new AnyParser();
       Alt delegate = new Alt(
           new NullParser(),
-          new StringParser(),
+          new Alt(new StringParser, new MultiStringParser),
           new BooleanParser(),
           // parse long but fail if decimal is found
           new Seq1(0,

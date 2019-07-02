@@ -31,10 +31,10 @@ public class ClassReferenceParser
         new Whitespace(),
         new Literal(":"),
         new Whitespace(),
-        new StringParser(),
+        new Alt(new StringParser, new MultiStringParser),
         new Whitespace(),
         new Literal("}")),
-      new StringParser()
+      new Alt(new StringParser, new MultiStringParser)
     ));
   }
 

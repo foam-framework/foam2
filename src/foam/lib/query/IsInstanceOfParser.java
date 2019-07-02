@@ -18,7 +18,7 @@ public class IsInstanceOfParser extends foam.lib.parse.ProxyParser {
   public IsInstanceOfParser() {
       setDelegate(new Seq(new Literal("instance"),
                           new Literal(":"),
-                          new StringParser()));
+                          new Alt(new StringParser, new MultiStringParser)));
   }
 
   @Override

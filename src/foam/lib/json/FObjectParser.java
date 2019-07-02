@@ -24,7 +24,7 @@ public class FObjectParser
             new Whitespace(),
             new Literal(":"),
             new Whitespace(),
-            new StringParser(),
+            new Alt(new StringParser, new MultiStringParser),
             new Optional(new Literal(",")));
 
         public PStream parse(PStream ps, ParserContext x) {
