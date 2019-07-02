@@ -26,7 +26,9 @@ foam.CLASS({
     'org.eclipse.jetty.util.ssl.SslContextFactory',
     'javax.net.ssl.KeyManager',
     'javax.net.ssl.KeyManagerFactory',
-    'javax.net.ssl.SSLContext'
+    'javax.net.ssl.SSLContext',
+    'java.io.FileInputStream',
+    'java.security.KeyStore'
   ],
 
   properties: [
@@ -41,7 +43,8 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'httpsPort'
+      name: 'httpsPort',
+      value: 443
     },
     {
       class: 'String',
@@ -206,22 +209,7 @@ foam.CLASS({
         addJettyShutdownHook(server);
         server.setHandler(handler);
                 
-        // enable https
-        if ( this.getEnableHttps() ) {
-
-          HttpConfiguration https = new HttpConfiguration();
-          https.addCustomizer(new SecureRequestCustomizer());
-          SslContextFactory sslContextFactory = new SslContextFactory();
-          sslContextFactory.setKeyStorePath(this.getKeystorePath());
-          sslContextFactory.setKeyStorePassword(this.getKeystorePassword());
-
-          ServerConnector sslConnector = new ServerConnector(server,
-            new SslConnectionFactory(sslContextFactory, "http/1.1"),
-            new HttpConnectionFactory(https));
-          sslConnector.setPort(this.getHttpsPort());
-
-          server.addConnector(sslConnector);
-        }
+        this.configHttps(server);
                 
         server.start();
       } catch(Exception e) {
@@ -252,6 +240,50 @@ foam.CLASS({
             }
           }
         });
+      `
+    },
+    {
+      name: 'configHttps',
+      documentation: 'https://docs.google.com/document/d/1hXVdHjL8eASG2AG2F7lPwpO1VmcW2PHnAW7LuDC5xgA/edit?usp=sharing',
+      args: [
+        {
+          name: 'server',
+          javaType: 'final org.eclipse.jetty.server.Server'
+        }
+      ],
+      javaCode: `
+      if ( this.getEnableHttps() ) {
+  
+        try {
+          // 1. load the keystore to verify the keystore path and password.
+          KeyStore keyStore = KeyStore.getInstance("JKS");
+          keyStore.load(new FileInputStream(this.getKeystorePath()), this.getKeystorePassword().toCharArray());
+  
+          // 2. enable https
+          HttpConfiguration https = new HttpConfiguration();
+          https.addCustomizer(new SecureRequestCustomizer());
+          SslContextFactory sslContextFactory = new SslContextFactory();
+          sslContextFactory.setKeyStorePath(this.getKeystorePath());
+          sslContextFactory.setKeyStorePassword(this.getKeystorePassword());
+  
+          ServerConnector sslConnector = new ServerConnector(server,
+            new SslConnectionFactory(sslContextFactory, "http/1.1"),
+            new HttpConnectionFactory(https));
+          sslConnector.setPort(this.getHttpsPort());
+  
+          server.addConnector(sslConnector);
+  
+        } catch ( java.io.FileNotFoundException e ) {
+          System.err.println("No KeyStore file found at path: " + this.getKeystorePath() + e);
+          System.err.println("Please see: https://docs.google.com/document/d/1hXVdHjL8eASG2AG2F7lPwpO1VmcW2PHnAW7LuDC5xgA/edit?usp=sharing");
+        } catch ( java.io.IOException e ) {
+          System.err.println("Invalid KeyStore file password, please make sure you have set the correct password." + e);
+          System.err.println("Please see: https://docs.google.com/document/d/1hXVdHjL8eASG2AG2F7lPwpO1VmcW2PHnAW7LuDC5xgA/edit?usp=sharing");
+        } catch ( Exception e ) {
+          System.err.println("Error when enable the https.");
+        }
+  
+      }
       `
     }
   ]
