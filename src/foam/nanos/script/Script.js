@@ -8,7 +8,10 @@ foam.CLASS({
   package: 'foam.nanos.script',
   name: 'Script',
 
-  implements: ['foam.nanos.auth.EnabledAware'],
+  implements: [
+    'foam.nanos.auth.EnabledAware',
+    'foam.core.Validatable'
+  ],
 
   requires: [
     'foam.nanos.script.ScriptStatus',
@@ -30,10 +33,12 @@ foam.CLASS({
     'foam.nanos.auth.*',
     'foam.nanos.pm.PM',
     'foam.nanos.session.Session',
+    'foam.util.SafetyUtil',
     'java.io.ByteArrayOutputStream',
     'java.io.PrintStream',
     'java.util.Date',
     'java.util.List',
+    'java.util.regex.Pattern',
     'static foam.mlang.MLang.*',
   ],
 
@@ -176,37 +181,44 @@ foam.CLASS({
     }
   ],
 
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+          data: `
+            protected static final Pattern ILLEGAL_PATTERN;
+            static {
+              ILLEGAL_PATTERN = Pattern.compile("getRuntime|exec\\\\(|exit\\\\(|System\\\\.setProperty");
+            }
+          `
+        }));
+      }
+    }
+  ],
+
   methods: [
     {
-      documentation: `Simple be effective filtering of known vulnerabilities.`,
       name: 'validate',
-      code: function(script) {
-        return script;
-      },
+      documentation: `
+        This method should check if any of the property values on a model are
+        considered invalid and if so throw an IllegalStateException.
+      `,
       args: [
         {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'script',
-          type: 'String'
+          name: 'x', type: 'Context'
         }
       ],
-      javaType: 'String',
-      javaThrows: [
-        'java.security.GeneralSecurityException'
-      ],
+      javaThrows: ['IllegalStateException'],
       javaCode: `
-      if ( script.contains("Runtime.getRuntime") ||
-           script.contains("exec(") ||
-           script.contains("System.setProperty") ||
-           script.contains("exit(") ) {
+      String script = getCode();
+      // test for known beanshell vulnerabilities.
+      if ( ! SafetyUtil.isEmpty(script) &&
+           ILLEGAL_PATTERN.matcher(script).find() ) {
        ((foam.nanos.logger.Logger) x.get("logger")).warning("Illegal method call in script: ", script);
        // TODO: Notification
-       throw new java.security.GeneralSecurityException("Illegal method call in script.");
+       throw new IllegalStateException("Illegal method call in script.");
       }
-      return script;
       `
     },
     {
@@ -237,7 +249,8 @@ foam.CLASS({
         }.bind(this);
         try {
           with ({ log: log, print: log, x: this.__context__ })
-            return Promise.resolve(eval(this.validate(this.code)));
+            this.validate();
+            return Promise.resolve(eval(this.code));
         } catch (err) {
           this.output += err;
           return Promise.reject(err);
@@ -256,9 +269,10 @@ foam.CLASS({
 
         // TODO: import common packages like foam.core.*, foam.dao.*, etc.
         try {
+          validate(x); // explicitly validate to protect against walking the delegates and bypassing the ValidatingDAO on put().
           setOutput("");
           shell.setOut(ps);
-          shell.eval(validate(x, getCode()));
+          shell.eval(getCode());
         } catch (Throwable e) {
           ps.println();
           e.printStackTrace(ps);
