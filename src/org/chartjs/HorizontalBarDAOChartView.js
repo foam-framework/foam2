@@ -15,7 +15,7 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'timeFrame'
+      name: 'dateRange'
     },
     {
       class: 'Reference',
@@ -23,8 +23,9 @@ foam.CLASS({
       name: 'account',
     },
     {
-      class: 'String',
-      name: 'timeFrequency',
+      class: 'Enum',
+      of: 'net.nanopay.liquidity.ui.dashboard.DateFrequency',
+      name: 'dateFrequency',
     },
     {
       class: 'Map',
@@ -51,6 +52,13 @@ foam.CLASS({
       name: 'yExpr',
     }
   ],
+
+  reactions: [
+    ['', 'propertyChange.account', 'dataUpdate'],
+    ['', 'propertyChange.dateFrequency', 'dataUpdate'],
+    ['', 'propertyChange.dateRange', 'dataUpdate'],
+  ],
+
   listeners: [
     {
       name: 'dataUpdate',
@@ -58,9 +66,15 @@ foam.CLASS({
       code: function() {
         var self = this;
         self.data
-          .orderBy(this.xExpr)
-          .select(this.GROUP_BY(this.keyExpr, this.PLOT(this.xExpr, this.yExpr)))
+          .where(
+            this.AND(
+              this.GTE(net.nanopay.tx.model.Transaction.COMPLETION_DATE, this.dateRange.min),
+              this.LTE(net.nanopay.tx.model.Transaction.COMPLETION_DATE, this.dateRange.max)
+            )
+          )
+          .select(this.GROUP_BY(this.dateFrequency.glang, this.SUM()))
           .then(function(sink) {
+            console.log(sink);
             var config = {};
             config = foam.Object.clone(self.config);
             config.data = {
@@ -77,7 +91,7 @@ foam.CLASS({
               })
             };
             self.config = config;
-          });
+          })
       }
     }
   ]
