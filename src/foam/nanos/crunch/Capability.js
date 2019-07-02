@@ -163,7 +163,9 @@ foam.RELATIONSHIP({
 foam.RELATIONSHIP({
   sourceModel: 'foam.nanos.crunch.Capability',  
   targetModel: 'foam.nanos.crunch.Capability',
-  cardinality: '*:*'
+  cardinality: '*:*',
+  forwardName: 'cap1',
+  inverseName: 'cap2'
 });
 
 // deprecatedCapabilityJunction

@@ -424,7 +424,8 @@ var classes = [
   'foam.nanos.crunch.PrerequisiteCapabilityJunctionDAO',
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
   'foam.nanos.crunch.CapabilityDAO',
-  'foam.nanos.auth.CapabilityAuthService'
+  'foam.nanos.auth.CapabilityAuthService',
+  'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
   
 ];
 

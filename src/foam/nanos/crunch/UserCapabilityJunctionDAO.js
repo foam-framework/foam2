@@ -232,7 +232,7 @@ foam.CLASS({
       javaCode:`
       FObject result = super.find_(x, id);
       if(result != null) checkOwnership(x, result);
-      return super.find_(x, id);
+      return result;
       `
     }
   ]
