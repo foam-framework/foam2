@@ -45,8 +45,8 @@ foam.INTERFACE({
         {
           name: 'sub',
           type: 'foam.core.Detachable',
-        },
-      ],
+        }
+      ]
     },
     {
       name: 'eof',
@@ -57,8 +57,8 @@ foam.INTERFACE({
         {
           name: 'sub',
           type: 'foam.core.Detachable',
-        },
-      ],
+        }
+      ]
     }
   ]
 });

@@ -313,7 +313,7 @@ foam.CLASS({
           {
             args: [this.name],
             predicateFactory: function(e) {
-              return e.REG_EXP(self, /.+@.+\..+/);
+              return e.REG_EXP(self, /^$|.+@.+\..+/);
             },
             errorString: `${this.label} is not an email address`
           }

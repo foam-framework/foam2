@@ -2374,13 +2374,6 @@ foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Map',
   extends: 'foam.dao.ProxySink',
-  axioms: [
-    {
-      // TODO: Remove this when MAP works properly on java.  github issue #1020
-      class: 'foam.box.Remote',
-      clientClass: 'foam.dao.ClientSink'
-    }
-  ],
 
   documentation: 'Sink Decorator which applies a map function to put() values before passing to delegate.',
 
@@ -3439,6 +3432,22 @@ foam.CLASS({
       name: 'f',
       code: function(o) { return this.arg1.f(o).length; },
       javaCode: 'return ((String) getArg1().f(obj)).length();'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'IdentityExpr',
+  extends: 'foam.mlang.AbstractExpr',
+  axioms: [
+    { class: 'foam.pattern.Singleton' }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(o) { return o; },
+      javaCode: 'return obj;'
     }
   ]
 });

@@ -136,8 +136,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'title',
-      expression: function(data$data$of) {
-        return 'Browse ' + data$data$of.model_.plural;
+      expression: function(data$of) {
+        return 'Browse ' + data$of.model_.plural;
       }
     },
     {
@@ -151,7 +151,14 @@ foam.CLASS({
       documentation: `
         The most important action on the page. The view for this controller may
         choose to display this action prominently.
-      `
+      `,
+      factory: function() {
+        return this.relationship
+          ? this.addEnabled
+            ? this.ADD_SELECTION
+            : this.SELECT
+          : this.cls_.CREATE;
+      }
     },
     {
       class: 'foam.u2.ViewSpec',
@@ -209,6 +216,7 @@ foam.CLASS({
       name: 'addSelection',
       label: 'Add',
       isAvailable: function(addEnabled) { return addEnabled; },
+      isEnabled: function(selection) { return !! selection },
       code: function() {
         var self = this;
         this.relationship.add(this.selection).then(function() {

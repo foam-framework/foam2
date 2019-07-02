@@ -15,11 +15,12 @@ foam.CLASS({
     'foam.u2.layout.Rows',
     'foam.u2.search.Toolbar',
     'foam.u2.view.ScrollTableView',
-    'foam.u2.view.TabChoiceView'
+    'foam.u2.view.TabChoiceView',
+    'foam.comics.v2.DAOControllerConfig'
   ],
 
   documentation: `
-    A scrolling table view customized for the inline DAOController 
+    A scrolling table view customized for the inline DAOController
     with canned queries and a searchbar
   `,
 
@@ -92,14 +93,14 @@ foam.CLASS({
       of: 'foam.comics.v2.DAOControllerConfig',
       name: 'config',
       factory: function() {
-        return foam.comics.v2.DAOControllerConfig.create({ dao: this.data });
+        return this.DAOControllerConfig.create({ dao: this.data });
       }
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'predicate',
       expression: function(config$cannedQueries) {
-        return config$cannedQueries && config$cannedQueries.length 
+        return config$cannedQueries && config$cannedQueries.length
           ? config$cannedQueries[0].predicate
           : foam.mlang.predicate.True.create();
       }
@@ -129,9 +130,10 @@ foam.CLASS({
     function dblclick(obj) {
       if ( ! this.stack ) return;
       this.stack.push({
-        class: 'foam.comics.v2.DAOUpdateView',
+        class: 'foam.comics.v2.DAOSummaryView',
         data: obj,
-        config: this.config
+        config: this.config,
+        of: this.config.of
       });
     },
     function initE() {
@@ -149,7 +151,7 @@ foam.CLASS({
                     .start(self.Cols)
                       .callIf(config$cannedQueries.length > 1, function() {
                         this
-                          .start(self.TabChoiceView, { 
+                          .start(self.TabChoiceView, {
                             choices: config$cannedQueries.map(o => [o.predicate, o.label]),
                             data$: self.predicate$
                           })
@@ -181,4 +183,4 @@ foam.CLASS({
         }));
     }
   ]
-}); 
+});

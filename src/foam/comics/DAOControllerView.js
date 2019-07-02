@@ -53,7 +53,7 @@ foam.CLASS({
     }
 
     ^title-container > * {
-      color: %PRIMARYCOLOR%;
+      color: /*%BLACK%*/ #1e1f21;
       margin: 0;
     }
 
@@ -146,21 +146,13 @@ foam.CLASS({
                 .add(this.data.subtitle$)
               .end()
             .end()
-            .callIfElse(this.data.primaryAction, function() {
-              this.startContext({ data: self })
-                .start()
-                  .tag(self.data.primaryAction, { size: 'LARGE' })
-                .end()
-              .endContext();
+            .callIfElse(self.data.createLabel, function() {
+              this.tag(self.data.primaryAction, {
+                label$: self.data.createLabel$,
+                size: 'LARGE'
+              });
             }, function() {
-              if ( self.data.createLabel ) {
-                this.tag(self.cls.CREATE, {
-                  label$: self.data.createLabel$,
-                  size: 'LARGE'
-                });
-              } else {
-                this.start().tag(self.cls.CREATE, { size: 'LARGE' }).end();
-              }
+              this.start().tag(self.data.primaryAction, { size: 'LARGE' }).end();
             })
           .end()
           .start()
@@ -189,10 +181,7 @@ foam.CLASS({
                   .show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW))
                   .start()
                     .forEach(self.cls.getAxiomsByClass(foam.core.Action).filter((action) => {
-                      var rtn = true;
-                      if ( ! self.primaryAction ) {
-                        rtn = rtn && action.name !== 'create';
-                      }
+                      var rtn = action.name !== self.data.primaryAction.name;
                       if ( self.data.searchMode !== self.SearchMode.FULL ) {
                         rtn = rtn && action.name !== 'toggleFilters';
                       }

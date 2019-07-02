@@ -16,7 +16,8 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.u2.ModalHeader'
+    'foam.u2.ModalHeader',
+    'foam.u2.layout.Cols',
   ],
 
   properties: [
@@ -62,12 +63,19 @@ foam.CLASS({
       border: solid 1px #59A5D5;
     }
     ^ .label{
-      margin-top: 10px;
+      margin: 10px 0px 0px 25px;
     }
     ^ .note {
       height: 150px;
       width: 398px;
       margin-left: 25px;
+    }
+    ^buttons {
+      padding: 12px;
+    }
+
+    ^ .foam-u2-ActionView-primary {
+      margin: 12px;
     }
   `,
 
@@ -86,8 +94,10 @@ foam.CLASS({
           .start(this.DATA_TYPE).end()
           .start().addClass('label').add('Response').end()
           .start(this.NOTE).addClass('input-box').addClass('note').end()
-          .start(this.DOWNLOAD_CSV).addClass('blue-button').addClass('btn').end()
-          .start(this.CONVERT).addClass('blue-button').addClass('btn').end()
+          .start(this.Cols).style({ 'justify-content': 'flex-start' }).addClass(this.myClass('buttons'))
+            .start(this.DOWNLOAD_CSV).end()
+            .start(this.CONVERT).end()
+          .end()
         .end()
       .endContext();
     }
