@@ -45,7 +45,7 @@ foam.CLASS({
             // Clear data before cloning because we'll be clobbering
             // it below anyway and cloning it can sometimes result in
             // a stack overflow.
-            self.config.data = {};
+            self.config.data = { datasets: [] };
             var config = foam.Object.clone(self.config);
             config.data = {
               datasets: [{
