@@ -64,6 +64,9 @@ foam.CLASS({
       factory: function() { return this.Candlestick.AVERAGE; }
     }
   ],
+  reactions: [
+    ['', 'propertyChange.customDatasetStyling', 'dataUpdate']
+  ],
   listeners: [
     {
       name: 'dataUpdate',
@@ -74,6 +77,8 @@ foam.CLASS({
           .orderBy(this.xExpr)
           .select(this.GROUP_BY(this.keyExpr, this.PLOT(this.xExpr, this.yExpr)))
           .then(function(sink) {
+            // Clear data before cloning because it gets clobbered anyway.
+            self.config.data = { datasets: [] };
             var config = foam.Object.clone(self.config);
             config.data = {
               datasets: Object.keys(sink.groups).map(key => {

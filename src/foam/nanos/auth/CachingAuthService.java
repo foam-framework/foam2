@@ -5,14 +5,17 @@
  */
 package foam.nanos.auth;
 
+import foam.core.Detachable;
 import foam.core.X;
 import foam.core.XFactory;
+import foam.dao.DAO;
+import foam.dao.Sink;
 import foam.nanos.session.Session;
 import java.security.Permission;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import javax.security.auth.AuthPermission;
-
+import static foam.mlang.MLang.TRUE;
 
 /** Only return value if the session context hasn't changed. **/
 class SessionContextCacheFactory
@@ -45,11 +48,25 @@ public class CachingAuthService
 
   public static String CACHE_KEY = "CachingAuthService.PermissionCache";
 
-  protected static Map<String,Boolean> getPermissionMap(X x) {
-    Session session = (Session) x.get(Session.class);
-    Map<String,Boolean> map = (Map) session.getContext().get(CACHE_KEY);
+  protected static Map<String,Boolean> getPermissionMap(final X x) {
+    Session             session = (Session) x.get(Session.class);
+    Map<String,Boolean> map     = (Map) session.getContext().get(CACHE_KEY);
 
     if ( map == null ) {
+      DAO dao = (DAO) x.get("groupDAO");
+      dao.listen(new Sink() {
+        public void put(Object obj, Detachable sub) {
+          purgeCache(x);
+        }
+        public void remove(Object obj, Detachable sub) {
+          purgeCache(x);
+        }
+        public void eof() {
+        }
+        public void reset(Detachable sub) {
+          purgeCache(x);
+        }
+      }, TRUE);
       map = new ConcurrentHashMap<String,Boolean>();
       session.setContext(session.getContext().putFactory(
         CACHE_KEY,
