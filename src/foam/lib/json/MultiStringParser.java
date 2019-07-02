@@ -40,17 +40,19 @@ public class MultiStringParser
     char lastc = delim;
 
     for(int i = 0; i < 3; i++) {
-      if ( delim != '"' && delim != '\'' ) return null;
+      if ( delim != '"' ) return null;
       ps = ps.tail();
       delim = ps.head();
     }
+
+    delim = lastc;
 
     StringBuilder builder = sb.get();
 
     while ( ps.valid() ) {
       char c = ps.head();
 
-      if ( c == delim && lastc != ESCAPE ) break;
+      if ( c == delim && lastc != ESCAPE && ps.tail().head() == delim && ps.tail().head().tail().head() == delim ) break;
 
       PStream tail = ps.tail();
 
