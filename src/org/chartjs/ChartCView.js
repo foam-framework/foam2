@@ -17,6 +17,10 @@ foam.CLASS({
     {
       class: 'Map',
       name: 'config'
+    },
+    {
+      class: 'Simple',
+      name: 'chart_'
     }
   ],
 
@@ -26,7 +30,9 @@ foam.CLASS({
 
   methods: [
     function paintSelf(x) {
-      new this.Lib.CHART(x, this.config).render();
+      if ( this.chart_ ) this.chart_.destroy();
+      this.chart_ = new this.Lib.CHART(x, this.config);
+      this.chart_.render();
     }
   ]
 });

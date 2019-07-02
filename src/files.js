@@ -510,6 +510,7 @@ FOAM_FILES([
   { name: "foam/net/auth/AuthAwareHTTPRequest" },
   { name: "foam/net/auth/TokenBearerHTTPRequest" },
   { name: "foam/net/auth/AuthAgent" },
+  { name: "foam/u2/view/FObjectArrayTableView", flags: ['web'] },
 
   // Doc
   { name: "foam/doc/ClassLink", flags: ['debug', 'web'] },

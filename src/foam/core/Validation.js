@@ -313,8 +313,6 @@ foam.CLASS({
           {
             args: [this.name],
             predicateFactory: function(e) {
-              debugger;
-              // All empty strings or email addresses of the pattern *@*.*
               return e.REG_EXP(self, /^$|.+@.+\..+/);
             },
             errorString: `${this.label} is not an email address`
