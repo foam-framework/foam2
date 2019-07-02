@@ -252,6 +252,8 @@ foam.CLASS({
         }
       ],
       javaCode: `
+      foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+
       if ( this.getEnableHttps() ) {
   
         try {
@@ -274,13 +276,13 @@ foam.CLASS({
           server.addConnector(sslConnector);
   
         } catch ( java.io.FileNotFoundException e ) {
-          System.err.println("No KeyStore file found at path: " + this.getKeystorePath() + e);
-          System.err.println("Please see: https://docs.google.com/document/d/1hXVdHjL8eASG2AG2F7lPwpO1VmcW2PHnAW7LuDC5xgA/edit?usp=sharing");
+          logger.error("No KeyStore file found at path: " + this.getKeystorePath(), 
+                       "Please see: https://docs.google.com/document/d/1hXVdHjL8eASG2AG2F7lPwpO1VmcW2PHnAW7LuDC5xgA/edit?usp=sharing", e);
         } catch ( java.io.IOException e ) {
-          System.err.println("Invalid KeyStore file password, please make sure you have set the correct password." + e);
-          System.err.println("Please see: https://docs.google.com/document/d/1hXVdHjL8eASG2AG2F7lPwpO1VmcW2PHnAW7LuDC5xgA/edit?usp=sharing");
+          logger.error("Invalid KeyStore file password, please make sure you have set the correct password.",
+                       "Please see: https://docs.google.com/document/d/1hXVdHjL8eASG2AG2F7lPwpO1VmcW2PHnAW7LuDC5xgA/edit?usp=sharing", e);
         } catch ( Exception e ) {
-          System.err.println("Error when enable the https.");
+          logger.error("Error when enable the https.");
         }
   
       }
