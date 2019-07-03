@@ -15,11 +15,11 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'DateTime',
+      class: 'Date',
       name: 'startDate'
     },
     {
-      class: 'DateTime',
+      class: 'Date',
       name: 'endDate'
     },
     {
@@ -42,6 +42,9 @@ foam.CLASS({
         return {
           type: 'horizontalBar',
           options: {
+            legend: {
+              display: false
+            },
             elements: {
               rectangle: {
                 borderWidth: 2,
@@ -57,7 +60,7 @@ foam.CLASS({
                   offsetGridLines: true
               }
             }]
-          } 
+          }
         };
       }
     },
@@ -87,7 +90,6 @@ foam.CLASS({
       name: 'dataUpdate',
       isFramed: true,
       code: function() {
-        debugger;
         var self = this;
         var glang = {};
         glang = this.dateFrequency.glang.clone().copyFrom({
@@ -97,16 +99,14 @@ foam.CLASS({
         self.data
           .where(
             this.AND(
-              this.GTE(net.nanopay.tx.model.Transaction.COMPLETION_DATE, self.startDate),
-              this.LTE(net.nanopay.tx.model.Transaction.COMPLETION_DATE, self.endDate)
+              this.GTE(self.yExpr, self.startDate),
+              this.LTE(self.yExpr, self.endDate)
             )
           )
-          .select(this.GROUP_BY(glang, this.GROUP_BY(net.nanopay.tx.model.Transaction.TYPE, this.SUM(net.nanopay.tx.model.Transaction.AMOUNT))))
+          .select(this.GROUP_BY(glang, this.GROUP_BY(self.labelExpr, this.SUM(self.xExpr))))
           .then(function(sink) {
-            console.log(sink);
-            var config = {};
-            config = foam.Object.clone(self.config);
-            debugger;
+            self.config.data = { datasets: [] };
+            var config = foam.Object.clone(self.config);
             config.data = {
               labels: sink.groupKeys.map(key => {
                 return key.toLocaleDateString();
@@ -115,12 +115,20 @@ foam.CLASS({
                 {
                   label: 'Cash In',
                   backgroundColor: '#b8e5b3',
-                  data: Object.keys(sink.groups).map(key => sink.group[key]["AlternaCITransaction"].value)
+                  data: Object.keys(sink.groups).map(key => {
+                    return sink.groups[key].groups["AlternaCITransaction"] 
+                      ? sink.groups[key].groups["AlternaCITransaction"].value 
+                      : 0;
+                  })
                 },
                 {
                   label: 'Cash Out',
                   backgroundColor: '#f79393',
-                  data: Object.keys(sink.groups).map(key => sink.group[key]["AlternaCOTransaction"].value)
+                  data: Object.keys(sink.groups).map(key => {
+                    return sink.groups[key].groups["AlternaCOTransaction"] 
+                      ? sink.groups[key].groups["AlternaCOTransaction"].value 
+                      : 0;
+                  })
                 }
               ]
             };
