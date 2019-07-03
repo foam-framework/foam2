@@ -21,8 +21,9 @@ foam.CLASS({
   extends: 'foam.box.ProxyBox',
 
   requires: [
+    'foam.box.AnonymousBox',
     'foam.box.ClientBoxRegistry',
-    'foam.box.AnonymousBox'
+    'foam.box.ReplyBox'
   ],
 
   properties: [
@@ -61,6 +62,9 @@ return ClientBoxRegistry_create([
   methods: [
     function send(msg) {
       var self = this;
+      if ( ! msg.attributes.replyBox ) {
+        msg.attributes.replyBox = this.ReplyBox.create();
+      }
       var replyBox = msg.attributes.replyBox.localBox;
 
       msg.attributes.replyBox.localBox = this.AnonymousBox.create({
