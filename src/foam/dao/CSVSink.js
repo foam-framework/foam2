@@ -136,16 +136,18 @@ foam.CLASS({
       name: 'put',
       code: function(obj) {
         if ( ! this.of ) this.of = obj.cls_;
-
+        var element = undefined;
         if ( ! this.isHeadersOutput ) {
-          this.props.forEach((element) => {
+          this.props.forEach((name) => {
+            element = this.of.getAxiomByName(name);
             element.toCSVLabel(this, element);
           });
           this.newLine_();
           this.isHeadersOutput = true;
         }
 
-        this.props.forEach((element) => {
+        this.props.forEach((name) => {
+          element = this.of.getAxiomByName(name);
           element.toCSV(x, obj, this, element);
         });
         this.newLine_();
