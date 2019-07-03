@@ -304,6 +304,7 @@ foam.CLASS({
             StringBuilder sb = new StringBuilder();
             while ( ! line.equals("})") ) {
               sb.append(line);
+              sb.append(\'\\n\');
               line = reader.readLine();
               if ( line == null )
                 return null;

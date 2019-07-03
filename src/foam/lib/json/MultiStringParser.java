@@ -74,7 +74,7 @@ public class MultiStringParser
       ps = tail;
       lastc = c;
     }
-
+    ps = ps.tail().tail();
     return ps.tail().setValue(builder.toString());
   }
 }
