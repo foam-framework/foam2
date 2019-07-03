@@ -292,14 +292,22 @@ foam.CLASS({
             name: 'toCSV',
             visibility: 'public',
             type: 'void',
-            args: [{ name: 'x', type: 'foam.core.X' }, { name: 'obj', type: 'Object' }, { name: 'outputter', type: 'foam.dao.CSVSink' }, { name: 'prop', type: 'Object' }],
+            args: [
+              { name: 'x',          type: 'foam.core.X' },
+              { name: 'obj',        type: 'Object' },
+              { name: 'outputter',  type: 'foam.dao.CSVSink' },
+              { name: 'prop',       type: 'Object' }
+            ],
             body: this.toCSV
           },
           {
             name: 'toCSVLabel',
             visibility: 'public',
             type: 'void',
-            args: [{ name: 'outputter', type: 'foam.dao.CSVSink' }, { name: 'prop', type: 'Object' }],
+            args: [
+              { name: 'outputter',  type: 'foam.dao.CSVSink' },
+              { name: 'prop',       type: 'Object' }
+            ],
             body: this.toCSVLabel
           }
         ];
