@@ -13,7 +13,10 @@ foam.CLASS({
   documentation: 'Sink runs the csv outputter, and contains the resulting string in this.csv',
 
   javaImports: [
-    'foam.core.PropertyInfo'
+    'foam.core.*',
+    'java.util.List',
+    'java.lang.String',
+    'java.util.Date'
   ],
 
   properties: [
@@ -105,16 +108,26 @@ foam.CLASS({
             this.output_(value.toString());
         }),
       javaCode: `
-        String s = value.toString();
+        if ( value instanceof String ) {
+          String s = value.replace("\\"", "\\"\\"");
+          getSb().append("\\"");
+          getSb().append(s);
+          getSb().append("\\"");
+        } else if ( value instanceof Number ) {
+          getSb().append(value.toString());
+        } else if ( value instanceof Boolean ) {
+          getSb().append(value.toString());
+        } else if ( value instanceof Date ) {
+          getSb().append(value.toDateString());
+        } else if ( value instanceof FObject ) {
+          output_(value.toString());
+        } else if ( value instanceof List ) {
+          output_(value.toString());
+        } else {
+          getSb().append(value.toString());
+        }
 
-        if (s.indexOf("\\"") != -1 || s.indexOf(",") != -1) {
-          getSb().append("\\"");
-          getSb().append(s);
-          getSb().append("\\"");
-        }
-        else {
-          getSb().append(s);
-        }
+
       `
     },
     {
