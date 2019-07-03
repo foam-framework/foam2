@@ -29,11 +29,13 @@ foam.CLASS({
       return this.outputter.toCSV(obj);
     },
     function exportDAO(X, dao, filteredTableColumns) {
-      var sink = filteredTableColumns ? this.CSVSink.create({ props: filteredTableColumns }) : this.CSVSink.create();
+      var sink = filteredTableColumns ?
+        this.CSVSink.create({ props: filteredTableColumns }) :
+        this.CSVSink.create();
       sink.reset();
       // passing in our CSVSink runs our CSV outputter and
       // s.csv is accessing our csv property string.
-      return dao.select(sink).then( (s) => s.csv);
+      return dao.select(sink).then( (s) => s.csv );
     }
   ]
 });

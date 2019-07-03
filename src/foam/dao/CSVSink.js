@@ -109,16 +109,15 @@ foam.CLASS({
         }),
       javaCode: `
         if ( value instanceof String ) {
-          String s = value.replace("\\"", "\\"\\"");
           getSb().append("\\"");
-          getSb().append(s);
+          getSb().append(((String)value).replace("\\"", "\\"\\""));
           getSb().append("\\"");
         } else if ( value instanceof Number ) {
           getSb().append(value.toString());
         } else if ( value instanceof Boolean ) {
           getSb().append(value.toString());
         } else if ( value instanceof Date ) {
-          getSb().append(value.toDateString());
+          getSb().append(value.toString());
         } else if ( value instanceof FObject ) {
           output_(value.toString());
         } else if ( value instanceof List ) {
@@ -126,8 +125,6 @@ foam.CLASS({
         } else {
           getSb().append(value.toString());
         }
-
-
       `
     },
     {
@@ -140,10 +137,6 @@ foam.CLASS({
         getSb().append("\\n");
         setIsNewLine(true);
       `
-    },
-    {
-      name: 'eof',
-      javaCode: 'setCsv(getSb().toString());'
     },
     {
       name: 'put',
@@ -167,6 +160,7 @@ foam.CLASS({
       },
       javaCode: `
         if ( ! isPropertySet("of") ) setOf(((foam.core.FObject)obj).getClassInfo());
+
         Object propObj;
         PropertyInfo columnProp;
         String[] tableColumnNames = getProps();
@@ -187,6 +181,7 @@ foam.CLASS({
           columnProp.toCSV(getX(), obj, this, propObj);
         }
         newLine_();
+        setCsv(getSb().toString());
       `
     },
     {
@@ -196,6 +191,7 @@ foam.CLASS({
           .forEach( (s) => this.clearProperty(s) );
       },
       javaCode: `
+        getSb().setLength(0);
         clearCsv();
         clearIsNewLine();
         clearIsHeadersOutput();
