@@ -8,7 +8,8 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.box.Box',
       networkTransient: true,
-      name: 'localBox'
+      name: 'localBox',
+      javaType: 'foam.box.Box'
     },
     {
       class: 'FObjectProperty',
