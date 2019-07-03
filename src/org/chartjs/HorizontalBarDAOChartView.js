@@ -39,6 +39,7 @@ foam.CLASS({
         The config map that is expected by chartjs. Structure and information can be found in chartjs.org's documentation.
       `,
       factory: function () {
+        var self = this;
         return {
           type: 'horizontalBar',
           options: {
@@ -50,17 +51,44 @@ foam.CLASS({
                 borderWidth: 2,
               }
             },
+            scales: {
+              yAxes: [{
+                ticks: {
+                  // convert to millions
+                  callback: function(value, index, values) {
+                    const dateArray = value.split('/');
+                    const monthNames = [
+                      "January", "February", "March", "April", "May", "June",
+                      "July", "August", "September", "October", "November", "December"
+                    ];
+                    const quarterNames = ['Q1', 'Q2', 'Q3', 'Q4'];
+
+                    switch(self.dateFrequency){
+                      case net.nanopay.liquidity.ui.dashboard.DateFrequency.MONTHLY:
+                        return `${monthNames[Number.parseInt(dateArray[0])]} ${dateArray[2]}`
+                         
+                      case net.nanopay.liquidity.ui.dashboard.DateFrequency.QUARTERLY:
+                        return `${quarterNames[Number.parseInt(dateArray[0]) / 3 - 1]} ${dateArray[2]}`
+
+                      case net.nanopay.liquidity.ui.dashboard.DateFrequency.ANNUALLY:
+                        return dateArray[2];
+
+                      default:
+                        return value;
+                    }
+                  }
+                }
+              }],
+              xAxes: [{
+                ticks: {
+                  // convert to millions
+                  callback: function(value, index, values) {
+                      return `$${value}`;
+                  }
+                }
+              }]
+            }
           },
-          scales: {
-            xAxes: [{
-              barPercentage: 0.5,
-              barThickness: 6,
-              maxBarThickness: 8,
-              gridLines: {
-                  offsetGridLines: true
-              }
-            }]
-          }
         };
       }
     },
