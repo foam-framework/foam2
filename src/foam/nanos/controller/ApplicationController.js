@@ -60,7 +60,6 @@ foam.CLASS({
     'appConfig',
     'as ctrl',
     'currentMenu',
-    'filteredTableColumns',
     'group',
     'lastMenuLaunched',
     'lastMenuLaunchedListener',
@@ -139,10 +138,6 @@ foam.CLASS({
   `,
 
   properties: [
-    {
-      class: 'StringArray',
-      name: 'filteredTableColumns'
-    },
     {
       class: 'Enum',
       of: 'foam.u2.layout.DisplayWidth',

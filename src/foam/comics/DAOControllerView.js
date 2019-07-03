@@ -30,6 +30,7 @@ foam.CLASS({
     'as controllerView',
     'data.selection as selection',
     'data.data as dao',
+    'data.filteredTableColumns as filteredTableColumns',
     'data.searchColumns as searchColumns',
     'dblclick'
   ],

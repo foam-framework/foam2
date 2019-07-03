@@ -30,11 +30,15 @@ foam.CLASS({
     'finished'
   ],
 
-  imports: [
-    'filteredTableColumns'
+  exports: [
+    'filteredTableColumns',
   ],
 
   properties: [
+    {
+      class: 'StringArray',
+      name: 'filteredTableColumns'
+    },
     {
       name: 'data',
       hidden: true
