@@ -20,6 +20,10 @@ foam.CLASS({
     .inner-card {
       padding: 24px 16px
     }
+
+    ^ .foam-u2-view-ScrollTableView table {
+      width: 100%;
+    }
   `,
 
   methods: [
@@ -54,4 +58,4 @@ foam.CLASS({
         }));
     }
   ]
-}); 
+});

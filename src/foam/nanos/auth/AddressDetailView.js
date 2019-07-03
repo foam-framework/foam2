@@ -17,7 +17,6 @@ foam.CLASS({
     ^ {
       height: auto;
     }
-
     ^ .address-container{
       background: white;
       padding: 4px 25px;
@@ -41,36 +40,12 @@ foam.CLASS({
       margin-bottom: 20px;
       margin-right: 15px;
     }
-    ^ .foam-u2-Textfield{
-      height: 40px;
-      width: 100%;
-      background: white;
-      border: 1px solid lightgrey;
-      margin-top: 5px;
-    }
     ^ .foam-u2-tag-Select{
       height: 40px;
       width: 100%;
       background: white;
       border: 1px solid lightgrey;
       margin-top: 5px;
-    }
-    ^ .foam-u2-ActionView {
-      opacity: 0.6;
-      font-family: Roboto;
-      font-size: 14px;
-      font-weight: bold;
-      letter-spacing: 0.3px;
-      color: #093649;
-      padding: 0;
-      padding-left: 30px;
-      display: inline-block;
-      cursor: pointer;
-      margin: 0;
-      border: none;
-      background: transparent;
-      outline: none;
-      line-height: 40px;
     }
     ^ .frequency-div {
       display: inline-block;
@@ -80,10 +55,9 @@ foam.CLASS({
       display: inline;
       margin-top: 10px;
     }
-
     ^ p {
       font-size: 10px;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
       font-weight: 300;
       display: inline-block;
       position: relative;
@@ -91,13 +65,11 @@ foam.CLASS({
     }
     ^ input{
       width: 100%;
-      height: 40px;
-      margin-top: 7px;
     }
     ^ label{
       font-weight: 300;
       font-size: 14px;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
     }
   `,
 

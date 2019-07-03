@@ -16,7 +16,7 @@ foam.CLASS({
     // TODO: When these defaults are no longer necessary, move these args into
     // their own class and add them as a trait to this model so any new args
     // used by PieGraph are automatically picked up by this model.
-    [ 'graphColors', [ '#d81e05', '#093649', '#59a5d5', '#2cab70' ] ],
+    [ 'graphColors', [ '#d81e05', '/*%BLACK%*/ #1e1f21', '#59a5d5', '#2cab70' ] ],
     [ 'height', 150 ],
     [ 'margin', 1.5 ],
     [ 'radius', 50 ],

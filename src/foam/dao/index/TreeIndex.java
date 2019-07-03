@@ -104,7 +104,7 @@ public class TreeIndex
     Object key;
     try {
       key = prop_.f(value);
-    } catch ( ClassCastException exp ) {
+    } catch (ClassCastException e) {
       return state;
     }
 
@@ -113,7 +113,11 @@ public class TreeIndex
   }
 
   public Object remove(Object state, FObject value) {
-    return ((TreeNode) state).removeKeyValue((TreeNode) state, prop_, prop_.f(value), value, tail_);
+    try {
+      return ((TreeNode) state).removeKeyValue((TreeNode) state, prop_, prop_.f(value), value, tail_);
+    } catch (ClassCastException e) {
+      return state;
+    }
   }
 
   public Object removeAll() {
@@ -158,8 +162,4 @@ public class TreeIndex
   public long size(Object state) {
     return ((TreeNode) state).size;
   }
-
-  public void onAdd(Sink sink) {
-  }
-
 }

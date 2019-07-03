@@ -102,7 +102,7 @@ public class TraceWebAgent
       out.println("</BODY></HTML>");
 
       StringWriter stringWriter = new StringWriter();
-      Outputter outputter = new Outputter(new PrintWriter(stringWriter), OutputterMode.FULL);
+      Outputter outputter = new Outputter(x, new PrintWriter(stringWriter));
       outputter.output(kv);
       logger.info("TraceWebAgent", stringWriter);
 

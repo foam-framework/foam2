@@ -16,7 +16,7 @@ public class AuthorizationSink
   extends ProxySink
 {
   public Authorizer authorizer_;
-  public Boolean checkDelete_;
+  public Boolean    checkDelete_;
 
   public AuthorizationSink(X x, Authorizer authorizer, Sink delegate) {
     this(x, authorizer, delegate, false);
@@ -24,7 +24,7 @@ public class AuthorizationSink
 
   public AuthorizationSink(X x, Authorizer authorizer, Sink delegate, Boolean checkDelete) {
     super(x, delegate);
-    authorizer_ = authorizer;
+    authorizer_  = authorizer;
     checkDelete_ = checkDelete;
   }
 

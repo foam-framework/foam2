@@ -7,6 +7,7 @@
 package foam.nanos.boot;
 
 import foam.core.*;
+import foam.dao.ProxyDAO;
 import foam.nanos.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
@@ -46,10 +47,18 @@ public class NSpecFactory
       try {
         if (logger != null) logger.info("Creating Service", spec_.getName());
         ns_ = spec_.createService(x_.getX().put(NSpec.class, spec_));
-        if (logger != null) logger.info("Created Service", spec_.getName());
-
-        if (ns_ instanceof ContextAware) ((ContextAware) ns_).setX(x_.getX());
-        if (ns_ instanceof NanoService) ((NanoService) ns_).start();
+        Object ns = ns_;
+        while ( ns != null ) {
+          if (ns instanceof ContextAware) ((ContextAware) ns).setX(x_.getX());
+          if (ns instanceof NSpecAware) ((NSpecAware) ns).setNSpec(spec_);
+          if (ns instanceof NanoService) ((NanoService) ns).start();
+          if (ns instanceof ProxyDAO) {
+            ns = ((ProxyDAO) ns).getDelegate();
+          } else {
+            ns = null;
+          }
+        }
+        if (logger != null) logger.info("Created Service", spec_.getName(), ( ns_ != null ) ? ns_.getClass().getSimpleName() : ns_);
       } catch (Throwable t) {
         if (logger != null) logger.error("Error Creating Service", spec_.getName(), t);
       } finally {

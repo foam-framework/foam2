@@ -35,7 +35,8 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Group',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
+    'foam.nanos.om.OMLogger'
   ],
 
   axioms: [
@@ -131,12 +132,21 @@ foam.CLASS({
         try {
           MimeMessage message = new MimeMessage(getSession_());
 
-          if ( emailMessage.isPropertySet("displayName") ) {
-            message.setFrom( new InternetAddress(emailMessage.getFrom(), emailMessage.getDisplayName()) );
-          } else {
-            message.setFrom(new InternetAddress(emailMessage.getFrom()));
+          // the From Property is mainly to hide our smtp user credetials.
+          if ( emailMessage.isPropertySet("from") ) {
+            if ( emailMessage.isPropertySet("displayName") ) {
+              message.setFrom( new InternetAddress(emailMessage.getFrom(), emailMessage.getDisplayName()) );
+            } else {
+              message.setFrom(new InternetAddress(emailMessage.getFrom()));
+            }
+          } else if ( emailMessage.isPropertySet("replyTo") ) {
+              if ( emailMessage.isPropertySet("displayName") ) {
+                message.setFrom( new InternetAddress(emailMessage.getReplyTo(), emailMessage.getDisplayName()) );
+              } else {
+                message.setFrom(new InternetAddress(emailMessage.getReplyTo()));
+              }
           }
-
+          
           if ( emailMessage.isPropertySet("replyTo") )
             message.setReplyTo(InternetAddress.parse(emailMessage.getReplyTo()));
 
@@ -183,8 +193,10 @@ foam.CLASS({
       name: 'sendEmail',
       javaCode:
       `
+      OMLogger omLogger = (OMLogger) x.get("OMLogger");
       Logger logger = (Logger) getX().get("logger");
         try {
+          omLogger.log("Pre send email request");
           MimeMessage message = createMimeMessage(emailMessage);
           Transport transport = getSession_().getTransport("smtp");
           transport.connect();
@@ -193,6 +205,7 @@ foam.CLASS({
           logger.info("SMTPEmailService sent MimeMessage.");
           transport.close();
           logger.info("SMTPEmailService finish.");
+          omLogger.log("Post send email request");
         } catch (Exception e) {
           logger.error("SMTPEmailService failed to finish. " + e);
         }

@@ -21,6 +21,17 @@ foam.CLASS({
     'preview'
   ],
 
+  sections: [
+    {
+      name: 'colours',
+      title: 'Colour Scheme'
+    },
+    {
+      name: 'inputs',
+      title: 'Inputs'
+    }
+  ],
+
   properties: [
     {
       class: 'Long',
@@ -90,20 +101,150 @@ foam.CLASS({
     },
     {
       class: 'Color',
-      name: 'primaryColor',
-      documentation: 'The following color properties can determine the color scheme of the GUI.'
+      name: 'primary1',
+      section: 'colours'
     },
-    { class: 'Color', name: 'secondaryColor' },
-    { class: 'Color', name: 'secondaryHoverColor' },
-    { class: 'Color', name: 'secondaryDisabledColor' },
-    { class: 'Color', name: 'backgroundColor' },
-    { class: 'Color', name: 'headerColor' },
-    { class: 'Color', name: 'destructiveColor' },
-    { class: 'Color', name: 'destructiveHoverColor' },
-    { class: 'Color', name: 'destructiveDisabledColor' },
-    { class: 'Color', name: 'tableColor' },
-    { class: 'Color', name: 'tableHoverColor' },
-    { class: 'Color', name: 'accentColor' },
+    {
+      class: 'Color',
+      name: 'primary2',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'primary3',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'primary4',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'primary5',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'approval1',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'approval2',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'approval3',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'approval4',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'approval5',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'warning1',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'warning2',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'warning3',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'warning4',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'warning5',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'destructive1',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'destructive2',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'destructive3',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'destructive4',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'destructive5',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'grey1',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'grey2',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'grey3',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'grey4',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'grey5',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'black',
+      section: 'colours'
+    },
+    {
+      class: 'String',
+      name: 'inputHeight',
+      documentation: 'Used to enforce consistent height across text-based inputs.',
+      section: 'inputs'
+    },
+    {
+      class: 'String',
+      name: 'inputVerticalPadding',
+      section: 'inputs'
+    },
+    {
+      class: 'String',
+      name: 'inputHorizontalPadding',
+      section: 'inputs'
+    }
   ],
 
   actions: [

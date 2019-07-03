@@ -18,6 +18,7 @@ import foam.nanos.logger.*;
 import foam.nanos.logger.PrefixLogger;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
+import java.util.Date;
 import javax.naming.NoPermissionException;
 import javax.servlet.http.HttpServletRequest;
 import org.eclipse.jetty.server.Request;
@@ -53,12 +54,20 @@ public class SessionServerBox
         session = new Session();
         session.setId(sessionID == null ? "anonymous" : sessionID);
         session.setRemoteHost(req.getRemoteHost());
+        session.setCreated(new Date());
 
         // Set the user to null to avoid the system user from leaking into
         // newly created sessions. If we don't do this, then a user has admin
         // privileges before they log in, which is obviously a big security
         // issue.
-        session.setContext(getX().put("user", null).put("group", null).put(Session.class, session));
+        // We also need to null out the AuthService cache, otherwise the system
+        // context's cache will be reused across every session.
+        X sessionContext = getX()
+          .put("user", null)
+          .put("group", null)
+          .put(CachingAuthService.CACHE_KEY, null)
+          .put(Session.class, session);
+        session.setContext(sessionContext);
         if ( sessionID != null ) sessionDAO.put(session);
       } else if ( req != null ) {
         // if req == null it means that we're being accessed via webSockets
