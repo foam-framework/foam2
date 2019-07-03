@@ -72,16 +72,6 @@ foam.CLASS({
       name: 'send',
       code: function send(msg) {
         var replyBox = msg.attributes.replyBox;
-        if ( replyBox ) {
-          // TODO: Should replyBox just be a property on message with
-          // custom serialization?
-
-          // TODO: Add one-time service policy
-
-          msg.attributes.replyBox =
-            this.__context__.registry.register(null, null, msg.attributes.replyBox);
-        }
-
         var payload = this.JSONOutputter.create().copyFrom(foam.json.Network).stringify(msg);
 
         try {
