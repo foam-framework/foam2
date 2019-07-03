@@ -65,7 +65,7 @@ foam.CLASS({
       left: 0;
       transform: translateY(100%);
       background: white;
-      border: 1px solid #bdbdbd;
+      border: 1px solid /*%GREY3%*/ #cbcfd4;
       max-height: 378px;
       overflow-y: scroll;
       box-sizing: border-box;
@@ -91,8 +91,20 @@ foam.CLASS({
       -webkit-appearance: textfield;
       padding: 1px 2px;
       cursor: default;
-      border: 1px solid;
+      border: 1px solid /*%GREY3%*/ #cbcfd4;
       min-width: 94px;
+    }
+
+    ^selection-view:hover {
+      border-color: /*%GREY2%*/ #9ba1a6;
+    }
+
+    ^:focus {
+      outline: none;
+    }
+
+    ^:focus ^selection-view {
+      border-color: /*%PRIMARY3%*/ #406dea;
     }
 
     ^chevron::before {
@@ -267,7 +279,10 @@ foam.CLASS({
       this.onDataUpdate();
 
       this
-        .attrs({ name: this.name })
+        .attrs({
+          name: this.name,
+          tabindex: 0
+        })
         .addClass(this.myClass())
         .start()
           .addClass(this.myClass('selection-view'))

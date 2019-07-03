@@ -35,9 +35,6 @@ foam.CLASS({
       bottom: 8px;
       right: 6px;
     }
-    ^ .input-field {
-      padding-right: 30px;
-    }
   `,
 
   constants: [
@@ -88,7 +85,7 @@ foam.CLASS({
           data$: this.data$,
           onKey: true
         }, this.inputElement$).
-        addClass('input-field').addClass('full-width-input-password').end().
+        addClass('full-width-input-password').end().
         start('img').show(this.passwordIcon$).addClass('input-image').
         attr('src', this.visibilityIcon$).on('click', this.visible).
         end().
