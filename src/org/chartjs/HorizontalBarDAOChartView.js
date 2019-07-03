@@ -15,7 +15,12 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'dateRange'
+      class: 'DateTime',
+      name: 'startDate'
+    },
+    {
+      class: 'DateTime',
+      name: 'endDate'
     },
     {
       class: 'Reference',
@@ -35,7 +40,24 @@ foam.CLASS({
       `,
       factory: function () {
         return {
-          type: 'horizontalBar'
+          type: 'horizontalBar',
+          options: {
+            elements: {
+              rectangle: {
+                borderWidth: 2,
+              }
+            },
+          },
+          scales: {
+            xAxes: [{
+              barPercentage: 0.5,
+              barThickness: 6,
+              maxBarThickness: 8,
+              gridLines: {
+                  offsetGridLines: true
+              }
+            }]
+          } 
         };
       }
     },
@@ -56,7 +78,8 @@ foam.CLASS({
   reactions: [
     ['', 'propertyChange.account', 'dataUpdate'],
     ['', 'propertyChange.dateFrequency', 'dataUpdate'],
-    ['', 'propertyChange.dateRange', 'dataUpdate'],
+    ['', 'propertyChange.startDate', 'dataUpdate'],
+    ['', 'propertyChange.endDate', 'dataUpdate'],
   ],
 
   listeners: [
@@ -64,31 +87,42 @@ foam.CLASS({
       name: 'dataUpdate',
       isFramed: true,
       code: function() {
+        debugger;
         var self = this;
+        var glang = {};
+        glang = this.dateFrequency.glang.clone().copyFrom({
+          delegate: net.nanopay.tx.model.Transaction.COMPLETION_DATE
+        });
+
         self.data
           .where(
             this.AND(
-              this.GTE(net.nanopay.tx.model.Transaction.COMPLETION_DATE, this.dateRange.min),
-              this.LTE(net.nanopay.tx.model.Transaction.COMPLETION_DATE, this.dateRange.max)
+              this.GTE(net.nanopay.tx.model.Transaction.COMPLETION_DATE, self.startDate),
+              this.LTE(net.nanopay.tx.model.Transaction.COMPLETION_DATE, self.endDate)
             )
           )
-          .select(this.GROUP_BY(this.dateFrequency.glang, this.SUM()))
+          .select(this.GROUP_BY(glang, this.GROUP_BY(net.nanopay.tx.model.Transaction.TYPE, this.SUM(net.nanopay.tx.model.Transaction.AMOUNT))))
           .then(function(sink) {
             console.log(sink);
             var config = {};
             config = foam.Object.clone(self.config);
+            debugger;
             config.data = {
-              datasets: Object.keys(sink.groups).map(key => {
-                var data = {
-                  label: key,
-                  data: sink.groups[key].data.map(arr => ({ x: arr[0], y: arr[1] }))
-                };
-                var style = self.customDatasetStyling[key] || {};
-                Object.keys(style).forEach(function(k) {
-                  data[k] = style[k];
-                });
-                return data;
-              })
+              labels: sink.groupKeys.map(key => {
+                return key.toLocaleDateString();
+              }),
+              datasets: [
+                {
+                  label: 'Cash In',
+                  backgroundColor: '#b8e5b3',
+                  data: Object.keys(sink.groups).map(key => sink.group[key]["AlternaCITransaction"].value)
+                },
+                {
+                  label: 'Cash Out',
+                  backgroundColor: '#f79393',
+                  data: Object.keys(sink.groups).map(key => sink.group[key]["AlternaCOTransaction"].value)
+                }
+              ]
             };
             self.config = config;
           })
