@@ -139,6 +139,10 @@ foam.CLASS({
       `
     },
     {
+      name: 'eof',
+      javaCode: 'setCsv(getSb().toString());'
+    },
+    {
       name: 'put',
       code: function(obj) {
         if ( ! this.of ) this.of = obj.cls_;
@@ -181,7 +185,6 @@ foam.CLASS({
           columnProp.toCSV(getX(), obj, this, propObj);
         }
         newLine_();
-        setCsv(getSb().toString());
       `
     },
     {
