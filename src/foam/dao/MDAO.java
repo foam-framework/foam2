@@ -186,6 +186,7 @@ public class MDAO
 
     if ( pm != null ) pm.log(x);
 
+    sink.eof(); // Quick fix for eof() in CSVSink - which otherwise was not getting called - Mike looking into 
     return sink;
   }
 
