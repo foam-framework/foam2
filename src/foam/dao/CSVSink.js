@@ -13,7 +13,10 @@ foam.CLASS({
   documentation: 'Sink runs the csv outputter, and contains the resulting string in this.csv',
 
   javaImports: [
-    'foam.core.PropertyInfo'
+    'foam.core.*',
+    'java.util.List',
+    'java.lang.String',
+    'java.util.Date'
   ],
 
   properties: [
@@ -45,6 +48,14 @@ foam.CLASS({
       name: 'isNewLine',
       value: true,
       visibility: 'HIDDEN'
+    },
+    {
+      class: 'Object',
+      name: 'sb',
+      flags: ['java'],
+      javaType: 'java.lang.StringBuilder',
+      javaFactory: 'return new StringBuilder();',
+      visibility: 'HIDDEN'
     }
   ],
 
@@ -60,13 +71,7 @@ foam.CLASS({
         this.output_(value);
       },
       javaCode: `
-        StringBuilder sb = new StringBuilder();
-        if ( ! getIsNewLine() ) {
-          sb.append(getCsv());
-          sb.append(",");
-          setCsv(sb.toString());
-          sb.setLength(0);
-        }
+        if ( ! getIsNewLine() ) getSb().append(",");
         setIsNewLine(false);
         output_(value);
       `
@@ -103,22 +108,26 @@ foam.CLASS({
             this.output_(value.toString());
         }),
       javaCode: `
-        StringBuilder sb = new StringBuilder();
-        sb.append(getCsv());
-        String s = value.toString();
-
-        if (s.indexOf("\\"") != -1 || s.indexOf(",") != -1) {
-          sb.append("\\"");
-          sb.append(s);
-          sb.append("\\"");
+        if ( value instanceof String ) {
+          String s = value.replace("\\"", "\\"\\"");
+          getSb().append("\\"");
+          getSb().append(s);
+          getSb().append("\\"");
+        } else if ( value instanceof Number ) {
+          getSb().append(value.toString());
+        } else if ( value instanceof Boolean ) {
+          getSb().append(value.toString());
+        } else if ( value instanceof Date ) {
+          getSb().append(value.toDateString());
+        } else if ( value instanceof FObject ) {
+          output_(value.toString());
+        } else if ( value instanceof List ) {
+          output_(value.toString());
+        } else {
+          getSb().append(value.toString());
         }
-        else {
-          sb.append(s);
-        }
 
-        setCsv(sb.toString());
 
-        sb.setLength(0);
       `
     },
     {
@@ -128,31 +137,30 @@ foam.CLASS({
         this.isNewLine = true;
       },
       javaCode: `
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(getCsv());
-        sb.append("\\n");
-
-        setCsv(sb.toString());
-
-        sb.setLength(0);
+        getSb().append("\\n");
         setIsNewLine(true);
       `
+    },
+    {
+      name: 'eof',
+      javaCode: 'setCsv(getSb().toString());'
     },
     {
       name: 'put',
       code: function(obj) {
         if ( ! this.of ) this.of = obj.cls_;
-
+        var element = undefined;
         if ( ! this.isHeadersOutput ) {
-          this.props.forEach((element) => {
+          this.props.forEach((name) => {
+            element = this.of.getAxiomByName(name);
             element.toCSVLabel(this, element);
           });
           this.newLine_();
           this.isHeadersOutput = true;
         }
 
-        this.props.forEach((element) => {
+        this.props.forEach((name) => {
+          element = this.of.getAxiomByName(name);
           element.toCSV(x, obj, this, element);
         });
         this.newLine_();
