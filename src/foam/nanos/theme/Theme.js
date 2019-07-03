@@ -263,7 +263,7 @@ foam.CLASS({
       class: 'Color',
       name: 'black',
       section: 'colours',
-      value: 'black'
+      value: 'unset'
     },
     {
       class: 'String',
