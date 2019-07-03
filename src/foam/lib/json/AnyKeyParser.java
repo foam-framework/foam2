@@ -12,7 +12,7 @@ public class AnyKeyParser
   extends ProxyParser
 {
   public AnyKeyParser() {
-    super(new Alt(new Alt(new StringParser, new MultiStringParser),
+    super(new Alt(new foam.lib.parse.Alt(new foam.lib.json.StringParser(), new foam.lib.json.MultiStringParser()),
       new Substring(
         new Seq0(
           // TODO: Implement Java Grammar support (so separate files aren't needed)

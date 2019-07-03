@@ -31,7 +31,7 @@ public class MultiStringParser
     }
   };
 
-  public StringParser() {
+  public MultiStringParser() {
   }
 
   public PStream parse(PStream ps, ParserContext x) {
@@ -52,7 +52,7 @@ public class MultiStringParser
     while ( ps.valid() ) {
       char c = ps.head();
 
-      if ( c == delim && lastc != ESCAPE && ps.tail().head() == delim && ps.tail().head().tail().head() == delim ) break;
+      if ( c == delim && lastc != ESCAPE && ps.tail().head() == delim && ps.tail().tail().head() == delim ) break;
 
       PStream tail = ps.tail();
 

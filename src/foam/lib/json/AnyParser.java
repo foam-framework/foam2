@@ -18,7 +18,7 @@ public class AnyParser
       instance_ = new AnyParser();
       Alt delegate = new Alt(
           new NullParser(),
-          new Alt(new StringParser, new MultiStringParser),
+          new foam.lib.parse.Alt(new foam.lib.json.StringParser(), new foam.lib.json.MultiStringParser()),
           new BooleanParser(),
           // parse long but fail if decimal is found
           new Seq1(0,

@@ -29,7 +29,7 @@ public class PropertyReferenceParser
       new Literal(":"),
       new Whitespace(),
       new Parser() {
-        private Parser delegate = new Alt(new StringParser, new MultiStringParser);
+        private Parser delegate = new foam.lib.parse.Alt(new foam.lib.json.StringParser(), new foam.lib.json.MultiStringParser());
 
         public PStream parse(PStream ps, ParserContext x) {
           ps = ps.apply(delegate, x);
@@ -45,7 +45,7 @@ public class PropertyReferenceParser
       new Whitespace(),
       new Literal(":"),
       new Parser() {
-        private Parser delegate = new Alt(new StringParser, new MultiStringParser);
+        private Parser delegate = new foam.lib.parse.Alt(new foam.lib.json.StringParser(), new foam.lib.json.MultiStringParser());
 
         public PStream parse(PStream ps, ParserContext x) {
           ps = ps.apply(delegate, x);

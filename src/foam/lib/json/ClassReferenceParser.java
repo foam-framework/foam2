@@ -31,10 +31,10 @@ public class ClassReferenceParser
         new Whitespace(),
         new Literal(":"),
         new Whitespace(),
-        new Alt(new StringParser, new MultiStringParser),
+        new foam.lib.parse.Alt(new foam.lib.json.StringParser(), new foam.lib.json.MultiStringParser()),
         new Whitespace(),
         new Literal("}")),
-      new Alt(new StringParser, new MultiStringParser)
+      new foam.lib.parse.Alt(new foam.lib.json.StringParser(), new foam.lib.json.MultiStringParser())
     ));
   }
 

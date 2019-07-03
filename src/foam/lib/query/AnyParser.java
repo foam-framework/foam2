@@ -20,7 +20,7 @@ public class AnyParser
       instance_ = new AnyParser();
       Alt delegate = new Alt(
           new LongParser(),
-          new Alt(new StringParser, new MultiStringParser),
+          new foam.lib.parse.Alt(new foam.lib.json.StringParser(), new foam.lib.json.MultiStringParser()),
           new NullParser());
       instance_.setDelegate(delegate);
     }
