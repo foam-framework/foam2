@@ -14,9 +14,6 @@ import foam.mlang.predicate.Predicate;
 import java.io.IOException;
 
 public interface Index {
-  // Called when an Index is added
-  public void onAdd(Sink sink);
-
   // Add or update an object
   public Object put(Object state, FObject value);
 
