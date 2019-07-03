@@ -23,7 +23,21 @@ foam.CLASS({
       name: 'config',
       documentation: `
         The config map that is expected by chartjs. Structure and information can be found in chartjs.org's documentation.
-      `
+      `,
+      factory: function () {
+        return {
+          type: 'line',
+          data: { datasets: [] },
+          options: {
+            scales: {
+              xAxes: [{
+                type: 'time',
+                distribution: 'linear'
+              }]
+            }
+          }
+        };
+      }
     },
     {
       class: 'Map',
