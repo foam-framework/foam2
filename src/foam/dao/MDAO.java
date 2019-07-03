@@ -55,7 +55,9 @@ public class MDAO
   }
 
   public void addIndex(Index index) {
-    index_.addIndex(index);
+    synchronized ( writeLock_ ) {
+      state_ = index_.addIndex(state_, index);
+    }
   }
 
   /** Add an Index which is for a unique value. Use addIndex() if the index is not unique. **/
@@ -136,10 +138,11 @@ public class MDAO
 
     if ( o == null ) return null;
 
+    // TODO: PM unindexed plans
     return objOut(
-        getOf().isInstance(o)
-          ? (FObject) index_.planFind(state, getPrimaryKey().get(o)).find(state, getPrimaryKey().get(o))
-          : (FObject) index_.planFind(state, o).find(state,o)
+      getOf().isInstance(o)
+        ? (FObject) index_.planFind(state, getPrimaryKey().get(o)).find(state, getPrimaryKey().get(o))
+        : (FObject) index_.planFind(state, o).find(state, o)
     );
   }
 

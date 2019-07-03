@@ -25,6 +25,14 @@ foam.CLASS({
           var replyBox = this.RPCReturnBox.create();
           var ret      = replyBox.promise;
 
+          var replyBox = this.OneTimeBox.create({
+            delegate: replyBox
+          });
+
+          var exportBox = this.registry.register(null, null, replyBox);
+
+          replyBox.onDetach(exportBox);
+
           // Automatically wrap RPCs that return a "PromisedAbc" or similar
           // TODO: Move this into RPCReturnBox ?
           var cls = this.__context__.lookup(type, true);
@@ -48,7 +56,7 @@ foam.CLASS({
             })
           });
 
-          msg.attributes.replyBox = replyBox;
+          msg.attributes.replyBox = exportBox;
 
           this[boxPropName].send(msg);
 
