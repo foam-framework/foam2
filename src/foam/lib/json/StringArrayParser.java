@@ -20,7 +20,7 @@ public class StringArrayParser
           new Literal("["),
           new Whitespace(),
           new Repeat(
-            new foam.lib.parse.Alt(new foam.lib.json.StringParser(), new foam.lib.json.MultiStringParser()),
+            new foam.lib.parse.Alt(new foam.lib.json.MultiStringParser(), new foam.lib.json.StringParser()),
             new Seq0(new Whitespace(), new Literal(","), new Whitespace())),
           new Whitespace(),
           new Literal("]"))

@@ -24,7 +24,7 @@ public class FObjectParser
             new Whitespace(),
             new Literal(":"),
             new Whitespace(),
-            new foam.lib.parse.Alt(new foam.lib.json.StringParser(), new foam.lib.json.MultiStringParser()),
+            new foam.lib.parse.Alt(new foam.lib.json.MultiStringParser(), new foam.lib.json.StringParser()),
             new Optional(new Literal(",")));
 
         public PStream parse(PStream ps, ParserContext x) {

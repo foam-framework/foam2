@@ -14,7 +14,7 @@ public class UnknownStringParser
   public UnknownStringParser() {
     super(new Parser() {
 
-      private Parser delegate = new foam.lib.parse.Alt(new foam.lib.json.StringParser(), new foam.lib.json.MultiStringParser());
+      private Parser delegate = new foam.lib.parse.Alt(new foam.lib.json.MultiStringParser(), new foam.lib.json.StringParser());
       
       public PStream parse(PStream ps, ParserContext x) {
         PStream ps1 = ps.apply(delegate, x);
