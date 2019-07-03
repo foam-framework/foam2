@@ -105,7 +105,8 @@ public class SessionServerBox
       if ( req != null && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
         AppConfig appConfig = (AppConfig) x.get("appConfig");
         appConfig = (AppConfig) appConfig.fclone();
-        String configUrl = ((Request) req).getRootURL().toString();
+
+        String configUrl = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort();
 
         if ( appConfig.getForceHttps() ) {
           if ( configUrl.startsWith("https://") ) {

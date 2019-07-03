@@ -18,7 +18,7 @@ foam.CLASS({
       name: 'title',
       expression: function(name) {
         if (name === '_defaultSection') return '';
-        return foam.String.capitalize(name);
+        return foam.String.labelize(name);
       }
     },
     {
