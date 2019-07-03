@@ -162,8 +162,4 @@ public class TreeIndex
   public long size(Object state) {
     return ((TreeNode) state).size;
   }
-
-  public void onAdd(Sink sink) {
-  }
-
 }
