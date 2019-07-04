@@ -22,7 +22,10 @@ public class FreezingDAO
 
   @Override
   public FObject find_(X x, Object id) {
-    return getDelegate().find_(x, id).fclone();
+    FObject ret = getDelegate().find_(x, id);
+    if ( ret != null )
+      ret = ret.fclone();
+    return ret;
   }
 
   @Override
