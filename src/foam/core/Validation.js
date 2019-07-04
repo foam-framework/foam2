@@ -309,7 +309,7 @@ foam.CLASS({
       name: 'validationPredicates',
       factory: function() {
         var self = this;
-        return [
+        var ret = [
           {
             args: [this.name],
             predicateFactory: function(e) {
@@ -318,6 +318,18 @@ foam.CLASS({
             errorString: `${this.label} is not an email address`
           }
         ];
+        if ( this.required ) {
+          ret.push(
+            {
+              args: [this.name],
+              predicateFactory: function(e) {
+                return e.NEQ(self, '');
+              },
+              errorString: `${this.label} is required`
+            }
+          )
+        }
+        return ret;
       }
     }
   ]
