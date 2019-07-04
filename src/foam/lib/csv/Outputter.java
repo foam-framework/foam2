@@ -176,6 +176,7 @@ public class Outputter
 
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
+      output(prop.f(obj));
       if ( i.hasNext() )
         writer_.append(",");
     }
