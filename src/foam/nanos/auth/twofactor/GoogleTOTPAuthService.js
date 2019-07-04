@@ -16,10 +16,12 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.app.EmailConfig',
     'foam.nanos.auth.User',
+    'foam.nanos.logger.Logger',
     'foam.nanos.session.Session',
     'foam.util.SafetyUtil',
     'io.nayuki.qrcodegen.QrCode',
-    'java.net.URI'
+    'java.net.URI',
+    // 'foam.nanos.auth.twofactor.OTPKey'
   ],
 
   constants: [
@@ -46,14 +48,17 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'generateKey',
+      name: 'generateKeyAndQR',
       javaCode: `
+        OTPKey otpKey = new OTPKey();
+        Logger logger = (Logger) x.get("logger");
+
         User user = (User) (x.get("agent") != null ?
           x.get("agent") :
           x.get("user")) ;
         DAO userDAO = (DAO) x.get("localUserDAO");
 
-        // fetch from user dao to get secret key
+        // fetch from localUserDAO to get updated user before setting TwoFactorSecret
         user = (User) userDAO.find(user.getId());
 
         // generate secret key, encode as base32 and store
@@ -65,20 +70,23 @@ foam.CLASS({
         user.setTwoFactorSecret(key);
         userDAO.put_(x, user);
 
-        if ( ! generateQrCode ) {
-          return key;
-        }
-
         try {
           EmailConfig service = (EmailConfig) x.get("emailConfig");
           String name = service == null ? "FOAM" : service.getDisplayName();
           String path = String.format("/%s:%s", name, user.getEmail());
           String query = String.format("secret=%s&issuer=%s&algorithm=%s", key, name, getAlgorithm());
           URI uri = new URI("otpauth", "totp", path, query, null);
-          return "data:image/svg+xml;charset=UTF-8," + QrCode.encodeText(uri.toASCIIString(), QrCode.Ecc.MEDIUM).toSvgString(0);
+
+          otpKey.setKey(key);
+          otpKey.setQrCode("data:image/svg+xml;charset=UTF-8,"
+            + QrCode.encodeText(uri.toASCIIString(), QrCode.Ecc.MEDIUM).toSvgString(0));
+          return otpKey;
         } catch ( Throwable t ) {
-          throw new RuntimeException(t);
+          logger.error("Error when generating QR code: " + t);
         }
+
+        otpKey.setKey(key);
+        return otpKey;
       `
     },
     {
