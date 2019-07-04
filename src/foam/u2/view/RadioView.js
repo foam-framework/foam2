@@ -70,7 +70,7 @@ foam.CLASS({
           start('input').
             attrs({
               type: 'radio',
-              name: c[0] + '',
+              name: self.attributeMap ? self.attributeMap.name.value : c[0] + '',
               value: c[0],
               checked: self.slot(function (data) { return data === c[0]; })
             }).
