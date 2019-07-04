@@ -426,6 +426,8 @@ var classes = [
   'foam.nanos.crunch.CapabilityDAO',
   'foam.nanos.auth.CapabilityAuthService',
   'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
+  'foam.nanos.crunch.CheckDependenciesOnGrantedCapabilityPut',
+  'foam.nanos.crunch.IsGrantedCapability',
   
 ];
 

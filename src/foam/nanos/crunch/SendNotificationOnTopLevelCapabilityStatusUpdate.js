@@ -25,8 +25,11 @@ foam.CLASS({
       agency.submit(x, new ContextAgent() {
         @Override
         public void execute(X x) {
-          DAO notificationDAO = (DAO) x.get("notificationDAO");
           UserCapabilityJunction junction = (UserCapabilityJunction) obj;
+          Capability cap = (Capability) ((DAO) x.get("capabilityDAO")).find(((String)junction.getTargetId()));
+          if(!cap.getVisible()) return;
+
+          DAO notificationDAO = (DAO) x.get("notificationDAO");
 
           StringBuilder sb = new StringBuilder("The Capability '")
           .append(((String)junction.getTargetId()))

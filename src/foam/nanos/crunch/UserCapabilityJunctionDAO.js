@@ -100,9 +100,10 @@ foam.CLASS({
       boolean data = validateData(x, obj);
 
       if(prereq && data) ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.GRANTED);
-      FObject ret =  getDelegate().put_(x, obj);
-      if(prereq && data) setDependencies(x, obj);
-      return ret;
+      else if(((UserCapabilityJunction) obj).getStatus() != CapabilityJunctionStatus.DEPRECATED) ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.PENDING);
+
+      return getDelegate().put_(x, obj);
+      
       `
     },
     {
@@ -138,48 +139,6 @@ foam.CLASS({
         if(ucJunction == null || ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED) return false;
       }
       return true;
-      `
-    },
-    {
-      name: 'setDependencies',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'obj',
-          type: 'foam.core.FObject'
-        }
-      ],
-      documentation: `if a ucjunction gets granted, check if there are any existing dependents and re-put them into the dao`,
-      javaCode: `
-        String capabilityId = (String) ((UserCapabilityJunction) obj).getTargetId();
-        Long userId = ((UserCapabilityJunction) obj).getSourceId();
-        DAO prerequisiteCapabilityJunctionDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
-        
-        // get the users pending capabilities
-        List<UserCapabilityJunction> ucJunctions = (List<UserCapabilityJunction>) ((ArraySink) getDelegate()
-        .where(AND(
-          EQ(UserCapabilityJunction.SOURCE_ID, userId),
-          EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.PENDING)
-        ))
-        .select(new ArraySink()))
-        .getArray();
-        // see if any pending capability forms a junction with the granted capability
-        for(UserCapabilityJunction ucJunction : ucJunctions) {
-          CapabilityCapabilityJunction dependency = (CapabilityCapabilityJunction) prerequisiteCapabilityJunctionDAO.find(
-            AND(
-              EQ(CapabilityCapabilityJunction.SOURCE_ID, capabilityId),
-              EQ(CapabilityCapabilityJunction.TARGET_ID, (String) ucJunction.getTargetId())
-            )
-          );
-          if(dependency != null) {
-            ucJunction = (UserCapabilityJunction) ucJunction.fclone();
-            this.put_(x, ucJunction);
-          }
-
-        }
       `
     },
     {

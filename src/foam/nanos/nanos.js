@@ -213,7 +213,9 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/UserCapabilityJunctionDAO" },
   { name: "foam/nanos/crunch/CapabilityDAO" },
   { name: "foam/nanos/auth/CapabilityAuthService" },
-  { name: "foam/nanos/crunch/SendNotificationOnTopLevelCapabilityStatusUpdate" }
+  { name: "foam/nanos/crunch/SendNotificationOnTopLevelCapabilityStatusUpdate" },
+  { name: "foam/nanos/crunch/CheckDependenciesOnGrantedCapabilityPut" },
+  { name: "foam/nanos/crunch/IsGrantedCapability" },
 
 
 ]);
