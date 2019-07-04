@@ -20,8 +20,7 @@ foam.CLASS({
     'foam.nanos.session.Session',
     'foam.util.SafetyUtil',
     'io.nayuki.qrcodegen.QrCode',
-    'java.net.URI',
-    // 'foam.nanos.auth.twofactor.OTPKey'
+    'java.net.URI'
   ],
 
   constants: [
