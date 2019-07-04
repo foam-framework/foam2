@@ -1,9 +1,3 @@
-/**
-* @license
-* Copyright 2019 The FOAM Authors. All Rights Reserved.
-* http://www.apache.org/licenses/LICENSE-2.0
-*/
-
 foam.CLASS({
   package: 'org.chartjs',
   name: 'HorizontalBarDAOChartView',
@@ -81,7 +75,6 @@ foam.CLASS({
               }],
               xAxes: [{
                 ticks: {
-                  // convert to millions
                   callback: function(value, index, values) {
                       return `$${value}`;
                   }
@@ -121,7 +114,7 @@ foam.CLASS({
         var self = this;
         var glang = {};
         glang = this.dateFrequency.glang.clone().copyFrom({
-          delegate: net.nanopay.tx.model.Transaction.COMPLETION_DATE
+          delegate: self.yExpr
         });
 
         self.data
@@ -139,13 +132,14 @@ foam.CLASS({
               labels: sink.groupKeys.map(key => {
                 return key.toLocaleDateString();
               }),
+              
               datasets: [
                 {
                   label: 'Cash In',
                   backgroundColor: '#b8e5b3',
                   data: Object.keys(sink.groups).map(key => {
-                    return sink.groups[key].groups["AlternaCITransaction"] 
-                      ? sink.groups[key].groups["AlternaCITransaction"].value 
+                    return sink.groups[key].groups["CITransaction"] 
+                      ? sink.groups[key].groups["CITransaction"].value 
                       : 0;
                   })
                 },
@@ -153,8 +147,8 @@ foam.CLASS({
                   label: 'Cash Out',
                   backgroundColor: '#f79393',
                   data: Object.keys(sink.groups).map(key => {
-                    return sink.groups[key].groups["AlternaCOTransaction"] 
-                      ? sink.groups[key].groups["AlternaCOTransaction"].value 
+                    return sink.groups[key].groups["COTransaction"] 
+                      ? sink.groups[key].groups["COTransaction"].value 
                       : 0;
                   })
                 }
