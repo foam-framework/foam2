@@ -87,6 +87,11 @@ foam.CLASS({
       javaFactory: `return getX().create(JSONParser.class);`
     },
     {
+      class: 'Boolean',
+      name: 'multiLine',
+      value: true
+    },
+    {
       class: 'foam.dao.DAOProperty',
       name: 'dao'
     },
@@ -106,11 +111,6 @@ foam.CLASS({
       class: 'String',
       name: 'filename',
       required: true
-    },
-    {
-      class: 'Boolean',
-      name: 'multiLine',
-      value: true
     },
     {
       class: 'Boolean',
@@ -288,7 +288,7 @@ foam.CLASS({
     },
     {
       name: 'getEntry',
-      documentation: 'Reads a syntatically meaningful unit from the journal',
+      documentation: 'retrieves ameaningful unit of text from the journal',
       type: 'String',
       args: [
         {
@@ -299,21 +299,17 @@ foam.CLASS({
       javaCode: `
         try {
           String line = reader.readLine();
-          if ( line == null )
-            return null;
+          if ( line == null ) return null;
+          StringBuilder sb = new StringBuilder();
+          sb.append(line);
           if ( getMultiLine() ) {
-            StringBuilder sb = new StringBuilder();
-            while ( ! line.trim().endsWith("})") ) {
+            while( ! line.trim().endsWith("})") && ! line.trim().startsWith("//") ) {
+              if ( (line = reader.readLine()) == null ) break;
               sb.append(line);
-              line = reader.readLine();
-              if ( line == null )
-                return null;
             }
-            sb.append(line);
-            line = sb.toString();
           }
-          return line;
-        } catch ( Throwable t ) {
+          return sb.toString().trim();
+        } catch (Throwable t) {
           getLogger().error("Failed to read from journal", t);
           return null;
         }
@@ -323,22 +319,23 @@ foam.CLASS({
       name: 'replay',
       documentation: 'Replays the journal file',
       javaCode: `
-        // count number of entries successfully read
+        // count number of lines successfully read
         int successReading = 0;
         JSONParser parser = getParser();
 
         try ( BufferedReader reader = getReader() ) {
-          for ( String entry ; ( entry = getEntry(reader) ) != null ; ) {
-            if ( SafetyUtil.isEmpty(entry)        ) continue;
-            if ( COMMENT.matcher(entry).matches() ) continue;
+          for ( String line ; ( line = getEntry(reader) ) != null ; ) {
+            if ( SafetyUtil.isEmpty(line)        ) continue;
+            if ( COMMENT.matcher(line).matches() ) continue;
 
             try {
-              entry = entry.trim();
-              char operation = entry.charAt(0);
-              entry = entry.substring(2, entry.length() - 1);
-              FObject obj = parser.parseString(entry);
+              char operation = line.charAt(0);
+              int length = line.length();
+              line = line.substring(2, length - 1);
+
+              FObject obj = parser.parseString(line);
               if ( obj == null ) {
-                getLogger().error("Parse error", getParsingErrorMessage(entry), "entry:", entry);
+                getLogger().error("Parse error", getParsingErrorMessage(line), "line:", line);
                 continue;
               }
 
@@ -355,7 +352,7 @@ foam.CLASS({
 
               successReading++;
             } catch ( Throwable t ) {
-              getLogger().error("Error replaying journal entry:", entry, t);
+              getLogger().error("Error replaying journal line:", line, t);
             }
           }
         } catch ( Throwable t) {
