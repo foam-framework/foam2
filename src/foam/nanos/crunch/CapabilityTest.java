@@ -19,6 +19,9 @@ import java.util.Date;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import foam.nanos.crunch.FakeDataObject;
+import foam.core.ContextAwareAgent;
+import foam.mlang.predicate.Predicate;
+import foam.nanos.ruler.*;
 
 import java.util.List;
 
@@ -38,6 +41,7 @@ public class CapabilityTest extends Test {
     DAO dao = new CapabilityDAO.Builder(x).setDelegate(new MDAO(Capability.getOwnClassInfo())).build();
     x = x.put("capabilityDAO", dao);
     dao = new UserCapabilityJunctionDAO.Builder(x).setDelegate(new MDAO(UserCapabilityJunction.getOwnClassInfo())).build();
+    dao = new RulerDAO(x, dao, "userCapabilityJunctionDAO");
     x = x.put("userCapabilityJunctionDAO", dao);
     dao = new DeprecatedCapabilityJunctionDAO.Builder(x).setDelegate(new MDAO(CapabilityCapabilityJunction.getOwnClassInfo())).build();
     x = x.put("deprecatedCapabilityJunctionDAO", dao);
