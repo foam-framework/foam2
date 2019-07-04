@@ -309,17 +309,27 @@ foam.CLASS({
       name: 'validationPredicates',
       factory: function() {
         var self = this;
-        return [
+        var ret = [
           {
             args: [this.name],
             predicateFactory: function(e) {
-              debugger;
-              // All empty strings or email addresses of the pattern *@*.*
               return e.REG_EXP(self, /^$|.+@.+\..+/);
             },
             errorString: `${this.label} is not an email address`
           }
         ];
+        if ( this.required ) {
+          ret.push(
+            {
+              args: [this.name],
+              predicateFactory: function(e) {
+                return e.NEQ(self, '');
+              },
+              errorString: `${this.label} is required`
+            }
+          )
+        }
+        return ret;
       }
     }
   ]
