@@ -55,7 +55,9 @@ public class MDAO
   }
 
   public void addIndex(Index index) {
-    index_.addIndex(index);
+    synchronized ( writeLock_ ) {
+      state_ = index_.addIndex(state_, index);
+    }
   }
 
   /** Add an Index which is for a unique value. Use addIndex() if the index is not unique. **/
@@ -185,7 +187,8 @@ public class MDAO
     plan.select(state, sink, skip, limit, order, simplePredicate);
 
     if ( pm != null ) pm.log(x);
-    
+
+    sink.eof();
     return sink;
   }
 
