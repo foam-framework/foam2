@@ -109,7 +109,8 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'multiLine'
+      name: 'multiLine',
+      value: true
     },
     {
       class: 'Boolean',
@@ -302,7 +303,7 @@ foam.CLASS({
             return null;
           if ( getMultiLine() ) {
             StringBuilder sb = new StringBuilder();
-            while ( ! line.equals("})") ) {
+            while ( ! line.trim().endsWith("})") ) {
               sb.append(line);
               line = reader.readLine();
               if ( line == null )
@@ -335,7 +336,6 @@ foam.CLASS({
               entry = entry.trim();
               char operation = entry.charAt(0);
               entry = entry.substring(2, entry.length() - 1);
-
               FObject obj = parser.parseString(entry);
               if ( obj == null ) {
                 getLogger().error("Parse error", getParsingErrorMessage(entry), "entry:", entry);
