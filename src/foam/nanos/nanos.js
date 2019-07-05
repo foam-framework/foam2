@@ -205,17 +205,22 @@ FOAM_FILES([
 
   // foam/nanos/crunch
   { name: "foam/nanos/crunch/FakeDataObject" },
+  // models
   { name: "foam/nanos/crunch/Capability" },
   { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
   { name: "foam/nanos/crunch/UserCapabilityJunctionRefine" },
+  //daos
   { name: "foam/nanos/crunch/DeprecatedCapabilityJunctionDAO" },
   { name: "foam/nanos/crunch/PrerequisiteCapabilityJunctionDAO" },
   { name: "foam/nanos/crunch/UserCapabilityJunctionDAO" },
   { name: "foam/nanos/crunch/CapabilityDAO" },
   { name: "foam/nanos/auth/CapabilityAuthService" },
+  //rules
   { name: "foam/nanos/crunch/SendNotificationOnTopLevelCapabilityStatusUpdate" },
   { name: "foam/nanos/crunch/CheckDependenciesOnGrantedCapabilityPut" },
   { name: "foam/nanos/crunch/IsGrantedCapability" },
+  { name: "foam/nanos/crunch/DisableDeprecatedCapabilityOnPut" },
+  { name: "foam/nanos/crunch/UpdateJunctionStatusOnDeprecatedCapabilityPut" },
 
 
 ]);

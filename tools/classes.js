@@ -416,18 +416,23 @@ var classes = [
 
   // Crunch
   'foam.nanos.crunch.FakeDataObject',
+  //models
   'foam.nanos.crunch.Capability',
   'foam.nanos.crunch.CapabilityJunctionStatus',
   'foam.nanos.crunch.UserCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
+  //daos
   'foam.nanos.crunch.DeprecatedCapabilityJunctionDAO',
   'foam.nanos.crunch.PrerequisiteCapabilityJunctionDAO',
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
   'foam.nanos.crunch.CapabilityDAO',
   'foam.nanos.auth.CapabilityAuthService',
+  //rules
   'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
   'foam.nanos.crunch.CheckDependenciesOnGrantedCapabilityPut',
   'foam.nanos.crunch.IsGrantedCapability',
+  'foam.nanos.crunch.DisableDeprecatedCapabilityOnPut',
+  'foam.nanos.crunch.UpdateJunctionStatusOnDeprecatedCapabilityPut',
   
 ];
 
