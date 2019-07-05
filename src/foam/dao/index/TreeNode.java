@@ -496,6 +496,7 @@ public class TreeNode {
       } else {
         sink = decorateSink(null, sink, skip, limit, order, predicate);
         select_(currentNode, sink, skip, limit, size, tail);
+        sink.eof();
       }
     } else if ( ! reverseSort ) {
       skipLimitTreeNode(currentNode, sink, skip, limit, size, tail);

@@ -207,7 +207,10 @@ describe('selector registry', function() {
     var foo = MockBox.create();
     var registeredFoo = ctx.registry.register('foo', null, foo);
     var message = Message.create({
-      object: 'Hello world'
+      object: 'Hello world',
+      attributes: {
+        replyBox: foam.box.ReplyBox.create(null, ctx)
+      }
     });
 
     NamedBox.create({ name: `${ctx.myname}/foo` }, ctx).send(message);

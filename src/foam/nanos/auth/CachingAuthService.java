@@ -15,6 +15,8 @@ import java.security.Permission;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import javax.security.auth.AuthPermission;
+
+import static foam.mlang.MLang.EQ;
 import static foam.mlang.MLang.TRUE;
 
 /** Only return value if the session context hasn't changed. **/
@@ -49,24 +51,36 @@ public class CachingAuthService
   public static String CACHE_KEY = "CachingAuthService.PermissionCache";
 
   protected static Map<String,Boolean> getPermissionMap(final X x) {
-    Session             session = (Session) x.get(Session.class);
+    Session             session = x.get(Session.class);
     Map<String,Boolean> map     = (Map) session.getContext().get(CACHE_KEY);
 
     if ( map == null ) {
-      DAO dao = (DAO) x.get("groupDAO");
-      dao.listen(new Sink() {
+      Sink purgeSink = new Sink() {
         public void put(Object obj, Detachable sub) {
           purgeCache(x);
+          sub.detach();
         }
         public void remove(Object obj, Detachable sub) {
           purgeCache(x);
+          sub.detach();
         }
         public void eof() {
         }
         public void reset(Detachable sub) {
           purgeCache(x);
+          sub.detach();
         }
-      }, TRUE);
+      };
+
+      DAO userDAO       = (DAO) x.get("localUserDAO");
+      DAO groupDAO      = (DAO) x.get("localGroupDAO");
+      DAO groupPermissionJunctionDAO = (DAO) x.get("groupPermissionJunctionDAO");
+      User user         = (User) x.get("user");
+
+      groupDAO.listen(purgeSink, TRUE);
+      userDAO.listen(purgeSink, EQ(User.ID, user.getId()));
+      groupPermissionJunctionDAO.listen(purgeSink, TRUE);
+
       map = new ConcurrentHashMap<String,Boolean>();
       session.setContext(session.getContext().putFactory(
         CACHE_KEY,
@@ -77,7 +91,8 @@ public class CachingAuthService
   }
 
   public static void purgeCache(X x) {
-    getPermissionMap(x).clear();
+    Session session = x.get(Session.class);
+    session.getContext().put(CACHE_KEY, null);
   }
 
   public CachingAuthService(AuthService delegate) {
@@ -87,7 +102,7 @@ public class CachingAuthService
   @Override
   public boolean check(foam.core.X x, String permission) {
     if ( x == null || permission == null ) return false;
-
+    if ( ((User)x.get("user")).getId() == 1 ) return true;
     Permission p = new AuthPermission(permission);
 
     Map<String,Boolean> map = getPermissionMap(x);
