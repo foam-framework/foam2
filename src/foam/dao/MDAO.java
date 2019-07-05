@@ -188,6 +188,7 @@ public class MDAO
 
     if ( pm != null ) pm.log(x);
 
+    sink.eof();
     return sink;
   }
 
