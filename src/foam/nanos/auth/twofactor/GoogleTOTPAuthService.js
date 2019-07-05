@@ -81,11 +81,8 @@ foam.CLASS({
             + QrCode.encodeText(uri.toASCIIString(), QrCode.Ecc.MEDIUM).toSvgString(0));
           return otpKey;
         } catch ( Throwable t ) {
-          logger.error("Error when generating QR code: " + t);
+          throw new RuntimeException(t);	
         }
-
-        otpKey.setKey(key);
-        return otpKey;
       `
     },
     {
