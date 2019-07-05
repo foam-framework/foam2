@@ -49,7 +49,6 @@ foam.CLASS({
     {
       name: 'generateKeyAndQR',
       javaCode: `
-        OTPKey otpKey = new OTPKey();
         Logger logger = (Logger) x.get("logger");
 
         User user = (User) (x.get("agent") != null ?
