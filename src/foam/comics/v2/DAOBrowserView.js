@@ -141,7 +141,7 @@ foam.CLASS({
       this.addClass(this.myClass());
       this.SUPER();
       this
-        .add(self.slot(function(config$cannedQueries) {
+        .add(self.slot(function(data, config$cannedQueries) {
           return self.E()
             .start(self.Rows)
               .callIf(config$cannedQueries.length >= 1, function() {

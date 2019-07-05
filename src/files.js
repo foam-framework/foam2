@@ -73,6 +73,7 @@ FOAM_FILES([
   { name: "foam/core/XML" },
   { name: "foam/lib/csv/CSV" },
   { name: "foam/lib/csv/CSVParser" },
+  { name: "foam/lib/csv/DynamicHeaderCSVParser" },
   { name: "foam/parse/StringPStream" },
   { name: "foam/parse/ErrorReportingPStream" },
   { name: "foam/parse/TrapPStream" },
@@ -370,6 +371,8 @@ FOAM_FILES([
   { name: "foam/box/ForwardingBox" },
   { name: "foam/box/SessionClientBox" },
   { name: "foam/box/AuthServiceClientBox" },
+  { name: "foam/box/OneTimeBox" },
+  { name: "foam/box/ExportBox" },
 
   { name: "foam/swift/refines/Stub", flags: ['swift'] },
   { name: "foam/swift/refines/Promised", flags: ['swift'] },
