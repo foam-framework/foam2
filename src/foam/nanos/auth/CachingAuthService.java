@@ -51,28 +51,31 @@ public class CachingAuthService
   public static String CACHE_KEY = "CachingAuthService.PermissionCache";
 
   protected static Map<String,Boolean> getPermissionMap(final X x) {
-    Session             session = (Session) x.get(Session.class);
+    Session             session = x.get(Session.class);
     Map<String,Boolean> map     = (Map) session.getContext().get(CACHE_KEY);
-    User                user    = (User) x.get("user");
 
     if ( map == null ) {
       Sink purgeSink = new Sink() {
         public void put(Object obj, Detachable sub) {
           purgeCache(x);
+          sub.detach();
         }
         public void remove(Object obj, Detachable sub) {
           purgeCache(x);
+          sub.detach();
         }
         public void eof() {
         }
         public void reset(Detachable sub) {
           purgeCache(x);
+          sub.detach();
         }
       };
 
-      DAO userDAO       = (DAO) x.get("userDAO");
-      DAO groupDAO      = (DAO) x.get("groupDAO");
+      DAO userDAO       = (DAO) x.get("localUserDAO");
+      DAO groupDAO      = (DAO) x.get("localGroupDAO");
       DAO groupPermissionJunctionDAO = (DAO) x.get("groupPermissionJunctionDAO");
+      User user         = (User) x.get("user");
 
       groupDAO.listen(purgeSink, TRUE);
       userDAO.listen(purgeSink, EQ(User.ID, user.getId()));
@@ -88,7 +91,8 @@ public class CachingAuthService
   }
 
   public static void purgeCache(X x) {
-    getPermissionMap(x).clear();
+    Session session = x.get(Session.class);
+    session.getContext().put(CACHE_KEY, null);
   }
 
   public CachingAuthService(AuthService delegate) {
