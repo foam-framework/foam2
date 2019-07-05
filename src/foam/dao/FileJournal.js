@@ -305,6 +305,7 @@ foam.CLASS({
           if ( getMultiLine() ) {
             while( ! line.trim().endsWith("})") && ! line.trim().startsWith("//") ) {
               if ( (line = reader.readLine()) == null ) break;
+              sb.append("\\n");
               sb.append(line);
             }
           }
