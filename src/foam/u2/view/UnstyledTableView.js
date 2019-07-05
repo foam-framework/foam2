@@ -54,8 +54,8 @@ foam.CLASS({
     },
     {
       name: 'columns_',
-      documentation: `Note: filteredTableColumns was a property set in ApplicationController
-      for the original purpose of having the filtered DAO list available for CSV outputting.`,
+      documentation: `Note: filteredTableColumns was a property set in DAOController
+      for the purpose of having the filtered DAO list available for CSV outputting.`,
       expression: function(columns, of) {
         var of = this.of;
         this.filteredTableColumns = [];

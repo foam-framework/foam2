@@ -19,6 +19,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.lib.csv.Outputter',
+      documentation: 'Outputter is legacy code - current csv outputter is by using CSVSink',
       name: 'outputter',
       factory: function() { return foam.lib.csv.Standard; }
     }
