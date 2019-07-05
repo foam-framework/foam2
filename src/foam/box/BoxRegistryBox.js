@@ -110,7 +110,7 @@ if ( obj instanceof foam.box.SubBoxMessage ) {
   foam.box.SubBoxMessage sbm = (foam.box.SubBoxMessage)obj;
   String name = sbm.getName();
 
-  foam.box.Box dest = (foam.box.Box)getRegistry_().get(name);
+  foam.box.Box dest = (foam.box.Box)(getRegistry_().get(name));
 
   if ( dest != null ) {
     msg.setObject(sbm.getObject());
