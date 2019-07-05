@@ -76,10 +76,11 @@ foam.CLASS({
           String query = String.format("secret=%s&issuer=%s&algorithm=%s", key, name, getAlgorithm());
           URI uri = new URI("otpauth", "totp", path, query, null);
 
-          otpKey.setKey(key);
-          otpKey.setQrCode("data:image/svg+xml;charset=UTF-8,"
-            + QrCode.encodeText(uri.toASCIIString(), QrCode.Ecc.MEDIUM).toSvgString(0));
-          return otpKey;
+          return new OTPKey.Builder(x)
+            .setKey(key)
+            .setQrCode("data:image/svg+xml;charset=UTF-8,"+
+              QrCode.encodeText(uri.toASCIIString(), QrCode.Ecc.MEDIUM).toSvgString(0))
+            .build();
         } catch ( Throwable t ) {
           throw new RuntimeException(t);	
         }
