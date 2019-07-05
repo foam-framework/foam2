@@ -67,7 +67,7 @@ public class MultiStringParser
 
           c = (Character) escapePS.value();
         }
-      } else if ( c != '\n' ){
+      } else if ( c != '\n' && c != '\r' ){
           builder.append(c);
       }
 
