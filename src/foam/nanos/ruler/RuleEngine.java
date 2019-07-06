@@ -149,17 +149,17 @@ public class RuleEngine extends ContextAwareSupport {
   private boolean isRuleApplicable(Rule rule, FObject obj, FObject oldObj) {
     currentRule_ = rule;
     return rule.getAction() != null
-      && rule.f(x_, obj, oldObj);
+      && rule.f(userX_, obj, oldObj);
   }
 
   private void asyncApplyRules(List<Rule> rules, FObject obj, FObject oldObj) {
-    ((FixedThreadPool) getX().get("threadPool")).submit(getX(), x -> {
+    ((FixedThreadPool) getX().get("threadPool")).submit(userX_, x -> {
       for (Rule rule : rules) {
         if ( stops_.get() ) return;
 
         currentRule_ = rule;
         if ( rule.getAsyncAction() != null
-          && rule.f(getX(), obj, oldObj)
+          && rule.f(x, obj, oldObj)
         ) {
           try {
             rule.asyncApply(x, obj, oldObj, RuleEngine.this);
