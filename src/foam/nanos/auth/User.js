@@ -228,7 +228,6 @@ foam.CLASS({
       name: 'timeZone',
       documentation: 'The preferred time zone of the User.',
       width: 5
-      // TODO: create custom view or DAO
     },
     {
       class: 'Password',
@@ -239,8 +238,8 @@ foam.CLASS({
       displayWidth: 30,
       width: 100,
       storageTransient: true,
-      minLength: 8
-        },
+      minLength: 7
+    },
     {
       class: 'Password',
       name: 'password',
