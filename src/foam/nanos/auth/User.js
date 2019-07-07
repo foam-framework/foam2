@@ -100,15 +100,7 @@ foam.CLASS({
       class: 'String',
       name: 'firstName',
       documentation: 'The first name of the User.',
-      validateObj: function(firstName) {
-        if ( ! firstName.trim() ){
-          return 'First Name Required.'
-        } if ( firstName.length > 70 ) {
-          return 'First name cannot exceed 70 characters.';
-        } if( /\d/.test(this.firstName) ) {
-          return 'First name cannot contain numbers';
-        }
-      }
+      required: true
     },
     {
       class: 'String',
@@ -119,15 +111,7 @@ foam.CLASS({
       class: 'String',
       name: 'lastName',
       documentation: 'The last name of the User.',
-      validateObj: function(lastName) {
-        if ( ! lastName.trim() ){
-          return 'Last Name Required.'
-        } if ( lastName.length > 70 ) {
-          return 'Last name cannot exceed 70 characters.';
-        } if( /\d/.test(this.lastName) ) {
-          return 'Last name cannot contain numbers';
-        }
-      }
+      required: true
     },
     'legalName',
     {
@@ -137,13 +121,7 @@ foam.CLASS({
       displayWidth: 80,
       width: 100,
       tableWidth: 160,
-      validateObj: function(organization) {
-        if ( organization.length > 70 ) {
-          return 'Company name cannot exceed 70 characters.';
-        } if (!(organization.trim())) {
-          return 'Company Name Required.';
-        }
-      }
+      required: true
     },
     {
       class: 'String',
@@ -165,16 +143,7 @@ foam.CLASS({
       javaSetter:
       `email_ = val.toLowerCase();
        emailIsSet_ = true;`,
-      validateObj: function (email) {
-        var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-        if (!(email.trim())) {
-          return 'Email Required.';
-        }
-        if ( ! emailRegex.test(email.trim()) ) {
-          return 'Invalid email address.';
-        }
-      }
+      required: true
     },
     {
       class: 'Boolean',
@@ -270,14 +239,8 @@ foam.CLASS({
       displayWidth: 30,
       width: 100,
       storageTransient: true,
-      validateObj: function (password) {
-        var re = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{7,32}$/;
-
-        if ( password.length > 0 && ! re.test(password) ) {
-          return 'Password must contain one lowercase letter, one uppercase letter, one digit, and be between 7 and 32 characters in length.';
-        }
-      }
-    },
+      minLength: 8
+        },
     {
       class: 'Password',
       name: 'password',
@@ -303,8 +266,6 @@ foam.CLASS({
       documentation: `The date and time that the current password of the User
         will expire.`,
     },
-    // TODO: startDate, endDate,
-    // TODO: do we want to replace 'note' with a simple ticket system?
     {
       class: 'String',
       name: 'note',
@@ -312,17 +273,11 @@ foam.CLASS({
       displayWidth: 70,
       view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 }
     },
-    // TODO: remove after demo
     {
       class: 'String',
       name: 'businessName',
       documentation: 'The name of the business associated with the User.',
-      width: 50,
-      validateObj: function(businessName) {
-        if ( businessName.length > 35 ) {
-          return 'Business name cannot be greater than 35 characters.';
-        }
-      }
+      width: 50
     },
     {
       class: 'String',
