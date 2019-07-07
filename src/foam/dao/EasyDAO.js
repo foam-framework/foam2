@@ -58,6 +58,7 @@ foam.CLASS({
       path: 'foam.dao.java.JDAO',
       flags: ['java'],
     },
+    'foam.nanos.logger.Logger',
     'foam.nanos.logger.LoggingDAO',
     'foam.dao.MDAO',
     'foam.dao.PromisedDAO',
@@ -69,6 +70,10 @@ foam.CLASS({
   ],
 
   imports: [ 'document' ],
+
+  javaImports: [
+    'foam.nanos.logger.Logger'
+  ],
 
   constants: [
     {
@@ -102,7 +107,7 @@ foam.CLASS({
         @private */
       name: 'delegate',
       javaFactory: `
-//foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+//Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
 //logger.info(this.getClass().getSimpleName(), "delegate", "NSpec.name", getNSpec().getName(), "of_", of_); //Thread.currentThread().getName());
 foam.dao.DAO delegate = getInnerDAO() == null ?
   new foam.dao.MDAO(getOf()) :
@@ -110,10 +115,31 @@ foam.dao.DAO delegate = getInnerDAO() == null ?
 
 if ( delegate instanceof foam.dao.MDAO ) {
   setMdao((foam.dao.MDAO)delegate);
+  if ( getIndex() != null &&
+       getIndex().length > 0 ) {
+    // IMPORTANT: Indexes must be added before JDAO replay occurs.
+    getMdao().addIndex(getIndex());
+  }
 }
 
 if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
   delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
+}
+
+if ( getDecorator() != null ) {
+  if ( ! ( getDecorator() instanceof ProxyDAO ) ) {
+    ((Logger) getX().get("logger")).error(this.getClass().getSimpleName(), "delegate", "NSpec.name", getNSpec().getName(), "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
+    System.exit(1);
+  }
+  ProxyDAO proxy = (ProxyDAO) getDecorator();
+  if ( proxy.getX() == null ) {
+    proxy.setX(getX());
+  }
+  proxy.setDelegate(delegate);
+  delegate = proxy;
+
+  // ((ProxyDAO) getDecorator()).setDelegate(delegate);
+  // delegate = (ProxyDAO) getDecorator();
 }
 
 if ( getDeletedAware() ||
@@ -162,6 +188,13 @@ if ( getContextualize() ) {
     build();
 }
 
+if ( getOrder() != null &&
+     getOrder().length > 0 ) {
+  for ( foam.core.PropertyInfo prop : getOrder() ) {
+    delegate = delegate.orderBy(prop);
+  }
+}
+
 if ( getAuthenticate() ) {
   delegate = new foam.dao.AuthenticatedDAO(
     getName(),
@@ -188,6 +221,11 @@ return delegate;
       class: 'Object',
       type: 'foam.dao.DAO',
       name: 'innerDAO'
+    },
+    {
+      class: 'Object',
+      type: 'foam.dao.DAO',
+      name: 'decorator'
     },
     {
       class: 'Boolean',
@@ -389,6 +427,16 @@ return delegate;
       name: 'decorators'
     },
     {
+      class: 'FObjectArray',
+      of: 'foam.core.PropertyInfo',
+      name: 'order'
+    },
+    {
+      class: 'FObjectArray',
+      of: 'foam.core.PropertyInfo',
+      name: 'index'
+    },
+    {
       name: 'testData',
       generateJava: false
     },
@@ -576,6 +624,12 @@ return delegate;
         dao = decorated;
       }
 
+      if ( this.order ) {
+        for ( var i = 0; i <  this.order.length; i++ ) {
+          dao = dao.orderBy(this.order[i]);
+        }
+      }
+
       if ( this.timing ) {
         dao = this.TimingDAO.create({ name: this.name + 'DAO', delegate: dao });
       }
@@ -659,6 +713,6 @@ if ( getMdao() != null ) {
 }
 return this;
 `
-    }
+    },
   ]
 });
