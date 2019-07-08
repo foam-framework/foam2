@@ -131,15 +131,13 @@ if ( getDecorator() != null ) {
     ((Logger) getX().get("logger")).error(this.getClass().getSimpleName(), "delegate", "NSpec.name", getNSpec().getName(), "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
     System.exit(1);
   }
+  // The decorator dao may be a proxy chain
   ProxyDAO proxy = (ProxyDAO) getDecorator();
-  if ( proxy.getX() == null ) {
-    proxy.setX(getX());
+  while ( proxy.getDelegate() != null ) {
+    proxy = (ProxyDAO) proxy.getDelegate();
   }
   proxy.setDelegate(delegate);
-  delegate = proxy;
-
-  // ((ProxyDAO) getDecorator()).setDelegate(delegate);
-  // delegate = (ProxyDAO) getDecorator();
+  delegate = (ProxyDAO) getDecorator();
 }
 
 if ( getDeletedAware() ||
@@ -190,8 +188,8 @@ if ( getContextualize() ) {
 
 if ( getOrder() != null &&
      getOrder().length > 0 ) {
-  for ( foam.core.PropertyInfo prop : getOrder() ) {
-    delegate = delegate.orderBy(prop);
+  for ( foam.mlang.order.Comparator comp : getOrder() ) {
+    delegate = delegate.orderBy(comp);
   }
 }
 
@@ -428,7 +426,7 @@ return delegate;
     },
     {
       class: 'FObjectArray',
-      of: 'foam.core.PropertyInfo',
+      of: 'foam.mlang.order.Comparator',
       name: 'order'
     },
     {
