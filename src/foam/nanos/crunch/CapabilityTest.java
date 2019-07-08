@@ -24,6 +24,7 @@ import foam.core.ContextAwareAgent;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.ruler.*;
 
+
 import java.util.List;
 
 import static foam.mlang.MLang.*;
@@ -50,7 +51,9 @@ public class CapabilityTest extends Test {
     dao = new PrerequisiteCapabilityJunctionDAO.Builder(x).setDelegate(new MDAO(CapabilityCapabilityJunction.getOwnClassInfo())).build();
     x = x.put("prerequisiteCapabilityJunctionDAO", dao);
 
-    userDAO = (DAO) x.get("localUserDAO");
+    
+    userDAO = new RulerDAO(x, (DAO) x.get("localUserDAO"), "localUserDAO");
+    // userDAO = (DAO) x.get("localUserDAO");
     capabilityDAO = (DAO) x.get("capabilityDAO");
     userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
     deprecatedCapabilityJunctionDAO = (DAO) x.get("deprecatedCapabilityJunctionDAO");
@@ -69,7 +72,52 @@ public class CapabilityTest extends Test {
 
     // testCapabilityData(x);
     // testCapabilityAuthService(x);
-    testDeprecatedCapabiltiyJunctionRules(x);
+    testUserRemovalRule(x);
+  }
+
+  public void testUserRemovalRule(X x) {
+    // make a localuser with 2 capability and remove it from localuserdao 
+    // check both junctions r removed
+    User user = new User();
+    user.setFirstName("TestRemoveUser");
+    user.setId(808);
+    user = (User) userDAO.put_(x, user);
+
+    Capability inner = new Capability();
+    inner.setName("inner");
+    inner.setOf(FakeDataObject.getOwnClassInfo());
+
+    Capability outer = new Capability();
+    outer.setName("outer");
+    outer.setOf(FakeDataObject.getOwnClassInfo());
+
+    inner = (Capability) capabilityDAO.put_(x, inner);
+    outer = (Capability) capabilityDAO.put_(x, outer);
+
+    FakeDataObject data = new FakeDataObject();
+    data.setUsername("RUBY");
+    data.setPassword("PASS");
+
+    UserCapabilityJunction j1 = new UserCapabilityJunction();
+    j1.setSourceId(user.getId());
+    j1.setTargetId((String) inner.getId());
+    j1.setData((FObject) data);
+    j1 = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, j1);
+
+    UserCapabilityJunction j2 = new UserCapabilityJunction();
+    j2.setSourceId(user.getId());
+    j2.setTargetId((String) outer.getId());
+    j2.setData((FObject) data);
+    j2 = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, j2);
+
+    userDAO.remove(user);
+
+    List<UserCapabilityJunction> userCapabilityJunctions = (List<UserCapabilityJunction>) ((ArraySink) userCapabilityJunctionDAO
+        .where(EQ(UserCapabilityJunction.SOURCE_ID, user.getId()))
+        .select(new ArraySink()))
+        .getArray();
+    
+    test(userCapabilityJunctions.size() == 0, "userCapabilityJunctions removed on user removal");
   }
 
   public void testCapabilityAuthService(X x) {

@@ -432,6 +432,7 @@ var classes = [
   'foam.nanos.crunch.IsGrantedCapability',
   'foam.nanos.crunch.DisableDeprecatedCapabilityOnPut',
   'foam.nanos.crunch.UpdateJunctionStatusOnDeprecatedCapabilityPut',
+  'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
   

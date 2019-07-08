@@ -220,6 +220,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/IsGrantedCapability" },
   { name: "foam/nanos/crunch/DisableDeprecatedCapabilityOnPut" },
   { name: "foam/nanos/crunch/UpdateJunctionStatusOnDeprecatedCapabilityPut" },
+  { name: "foam/nanos/crunch/RemoveJunctionsOnUserRemoval" },
   //authservice
   { name: "foam/nanos/auth/CapabilityAuthService" },
 
