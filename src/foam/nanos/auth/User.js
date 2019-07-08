@@ -99,8 +99,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'firstName',
-      documentation: 'The first name of the User.',
-      required: true
+      documentation: 'The first name of the User.'
     },
     {
       class: 'String',
@@ -110,8 +109,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'lastName',
-      documentation: 'The last name of the User.',
-      required: true
+      documentation: 'The last name of the User.'
     },
     'legalName',
     {
@@ -120,8 +118,7 @@ foam.CLASS({
       documentation: 'The organization/business associated with the User.',
       displayWidth: 80,
       width: 100,
-      tableWidth: 160,
-      required: true
+      tableWidth: 160
     },
     {
       class: 'String',
@@ -142,8 +139,7 @@ foam.CLASS({
       },
       javaSetter:
       `email_ = val.toLowerCase();
-       emailIsSet_ = true;`,
-      required: true
+       emailIsSet_ = true;`
     },
     {
       class: 'Boolean',
