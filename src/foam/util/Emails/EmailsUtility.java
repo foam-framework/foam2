@@ -64,7 +64,7 @@ public class EmailsUtility {
     }
 
     // SERVICE CALL: passing emailMessage through to actual email service.
-    DAO email = (DAO) x.get("emailMessageDAO");
+    DAO email = (DAO) x.get("localEmailMessageDAO");
     email.put(emailMessage);
   }
 
