@@ -55,7 +55,9 @@ public class MDAO
   }
 
   public void addIndex(Index index) {
-    index_.addIndex(index);
+    synchronized ( writeLock_ ) {
+      state_ = index_.addIndex(state_, index);
+    }
   }
 
   /** Add an Index which is for a unique value. Use addIndex() if the index is not unique. **/
@@ -160,10 +162,10 @@ public class MDAO
       Sink dependSink = new ArraySink();
       // When we have groupBy, order, skip, limit such requirement, we can't do it separately so I replace a array sink to temporarily holde the whole data
       //Then after the plan wa slelect we change it to the origin sink
-      int length = ( (Or) simplePredicate ).getArgs().length;
+      int length = ((Or) simplePredicate).getArgs().length;
       List<Plan> planList = new ArrayList<>();
-      for ( int i = 0; i < length; i++ ) {
-        Predicate arg = ( (Or) simplePredicate ).getArgs()[i];
+      for ( int i = 0 ; i < length ; i++ ) {
+        Predicate arg = ((Or) simplePredicate).getArgs()[i];
         planList.add(index_.planSelect(state, dependSink, 0, AbstractDAO.MAX_SAFE_INTEGER, null, arg));
       }
       plan = new OrPlan(simplePredicate, planList);
@@ -186,6 +188,7 @@ public class MDAO
 
     if ( pm != null ) pm.log(x);
 
+    sink.eof();
     return sink;
   }
 

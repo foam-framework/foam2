@@ -88,7 +88,10 @@ foam.CLASS({
               this
                 .startContext({ data: row })
                   .start(self.Cols)
-                    .add(self.KeyValueRow.KEY)
+                    .start()
+                      .style({'flex-grow': 1 })
+                      .add(self.KeyValueRow.KEY)
+                    .end()
                     .start()
                       .style({ 'flex-grow': 1 })
                       .add(self.KeyValueRow.VALUE)
