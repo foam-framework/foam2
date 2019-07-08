@@ -132,7 +132,7 @@ foam.CLASS({
                 dir.mkdirs();
               }
 
-              getLogger().log("Create file: " + getFilename());
+              getLogger().log("Create file: " + file.getAbsoluteFile());
               file.getAbsoluteFile().createNewFile();
             }
           }
