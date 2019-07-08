@@ -296,7 +296,7 @@ foam.CLASS({
           is: function(v) {
             return self.Eq.create({
               arg1: v[1],
-              arg2: self.True.create()
+              arg2: true
             });
           },
 
