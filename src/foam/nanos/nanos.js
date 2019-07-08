@@ -214,13 +214,14 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/PrerequisiteCapabilityJunctionDAO" },
   { name: "foam/nanos/crunch/UserCapabilityJunctionDAO" },
   { name: "foam/nanos/crunch/CapabilityDAO" },
-  { name: "foam/nanos/auth/CapabilityAuthService" },
   //rules
   { name: "foam/nanos/crunch/SendNotificationOnTopLevelCapabilityStatusUpdate" },
   { name: "foam/nanos/crunch/CheckDependenciesOnGrantedCapabilityPut" },
   { name: "foam/nanos/crunch/IsGrantedCapability" },
   { name: "foam/nanos/crunch/DisableDeprecatedCapabilityOnPut" },
   { name: "foam/nanos/crunch/UpdateJunctionStatusOnDeprecatedCapabilityPut" },
+  //authservice
+  { name: "foam/nanos/auth/CapabilityAuthService" },
 
 
 ]);

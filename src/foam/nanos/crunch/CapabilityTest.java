@@ -8,6 +8,7 @@ import foam.dao.MDAO;
 import foam.nanos.auth.User;
 import foam.nanos.auth.*;
 import foam.nanos.auth.CapabilityAuthService;
+import foam.nanos.auth.AuthService;
 import foam.nanos.crunch.Capability;
 import foam.nanos.crunch.CapabilityCapabilityJunction;
 import foam.nanos.crunch.UserCapabilityJunction;
@@ -44,6 +45,7 @@ public class CapabilityTest extends Test {
     dao = new RulerDAO(x, dao, "userCapabilityJunctionDAO");
     x = x.put("userCapabilityJunctionDAO", dao);
     dao = new DeprecatedCapabilityJunctionDAO.Builder(x).setDelegate(new MDAO(CapabilityCapabilityJunction.getOwnClassInfo())).build();
+    dao = new RulerDAO(x, dao, "deprecatedCapabilityJunctionDAO");
     x = x.put("deprecatedCapabilityJunctionDAO", dao);
     dao = new PrerequisiteCapabilityJunctionDAO.Builder(x).setDelegate(new MDAO(CapabilityCapabilityJunction.getOwnClassInfo())).build();
     x = x.put("prerequisiteCapabilityJunctionDAO", dao);
@@ -65,7 +67,86 @@ public class CapabilityTest extends Test {
     p4 = new String("p4");
     p5 = new String("p5");
 
-    testCapabilityData(x);
+    // testCapabilityData(x);
+    testCapabilityAuthService(x);
+  }
+
+  public void testCapabilityAuthService(X x) {
+
+
+    AuthService auth = (AuthService) x.get("auth");
+
+    String permission1 = "permission.crunch.*";
+    String permission2 = "permission.other.*";
+    String permission3 = "permission.crunch.read";
+    String permission4 = "permission.other.read.*";
+
+    cas = new CapabilityAuthService();
+
+    FakeDataObject data = new FakeDataObject();
+    data.setUsername("RUBY");
+    data.setPassword("PASS");
+
+    Capability readCrunch = new Capability();
+    Capability readOther = new Capability();
+    Capability other = new Capability();
+    Capability crunch = new Capability();
+
+    crunch.setName("crunch.*");
+    crunch.setPermissionsGranted(new String[] {permission1});
+    crunch.setOf(FakeDataObject.getOwnClassInfo());
+    crunch = (Capability) capabilityDAO.put_(x, crunch);
+
+    other.setName("other.*");
+    other.setPermissionsGranted(new String[] {permission2});
+    other.setOf(FakeDataObject.getOwnClassInfo());
+    other = (Capability) capabilityDAO.put_(x, other);
+
+    readCrunch.setName("crunch.read");
+    readCrunch.setPermissionsGranted(new String[] {permission3});
+    readCrunch.setOf(FakeDataObject.getOwnClassInfo());
+    readCrunch = (Capability) capabilityDAO.put_(x, readCrunch);    
+
+    readOther.setName("other.read.*");
+    readOther.setPermissionsGranted(new String[] {permission4});
+    readOther.setOf(FakeDataObject.getOwnClassInfo());
+    readOther = (Capability) capabilityDAO.put_(x, readOther);
+
+    UserCapabilityJunction grantReadOther = new UserCapabilityJunction();
+    grantReadOther.setSourceId(u1.getId());
+    grantReadOther.setTargetId((String) readOther.getId());
+    grantReadOther.setData((FObject) data);
+    grantReadOther = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, grantReadOther);
+
+    UserCapabilityJunction grantCrunch = new UserCapabilityJunction();
+    grantCrunch.setSourceId(u1.getId());
+    grantCrunch.setTargetId((String) crunch.getId());
+    grantCrunch.setData((FObject) data);
+    grantCrunch = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, grantCrunch);
+
+    test(crunch.implies(x, "crunch.read"), "crunch.* implies crunch.read");
+    test(!readCrunch.implies(x, "crunch.write"), "crunch.read does not imply crunch.write");
+    test(readOther.implies(x, "other.read.all"), "other.read.* implies other.read.all");
+    test(!readCrunch.implies(x, "crunch.*"), "crunch.read does not imply crunch.*");
+    test(auth.checkUser(x, u1, "crunch.*"), "user has capability crunch.*");
+    test(auth.checkUser(x, u1, "crunch.read"), "user has capability crunch.read");
+    test(!auth.checkUser(x, u1, "other.*"), "user does not have capability other.*");
+    test(auth.checkUser(x, u1, "other.read"), "user has capability other.read");
+    test(auth.checkUser(x, u1, "other.read.all"), "user does have capability other.read.all");
+    test(!auth.checkUser(x, u1, "other.write"), "user does not have capability other.write");
+    test(!auth.checkUser(x, u1, "cruch"), "user does not have permission or capability named cruch");
+    test(crunch.implies(x, "permission.crunch.*"), "capability crunch.* implies permission permission.crunch.*");
+    test(crunch.implies(x, "permission.crunch.read"), "capability crunch.* implies permission.crunch.read");
+    test(!readCrunch.implies(x, "permission.crunch.write"), "capability crunch.read does not imply permission.crunch.write");
+    test(readOther.implies(x, "permission.other.read.all"), "permission.other.read.* implies permissionother.read.all");
+    test(!readCrunch.implies(x, "permission.crunch.*"), "permission.crunch.read does not imply permission.crunch.*");
+    test(auth.checkUser(x, u1, "permission.crunch.*"), "user has permission permission.crunch.*");
+    test(auth.checkUser(x, u1, "permission.crunch.read"), "user has permission permission.crunch.read");
+    test(!auth.checkUser(x, u1, "permission.other.*"), "user does not have permission permission.other.*");
+    test(auth.checkUser(x, u1, "permission.other.read"), "user has permission permission.other.read");
+    test(auth.checkUser(x, u1, "permission.other.read.all"), "user does have permission permission.other.read.all");
+    test(!auth.checkUser(x, u1, "permission.other.write"), "user does not have permission permission.other.write");
+
   }
 
   public void testCapabilityData(X x) {
@@ -198,39 +279,6 @@ public class CapabilityTest extends Test {
     test(ucj1 != null, "8. junction with prereqs fulfilled added successfully");
   }
 
-  public void testCapabilityAuthService(X x) {
-    cas = new CapabilityAuthService();
-
-    //9. test checkUser for permission implied by capability
-    test(cas.checkUser(x, u1, p1), "9. u1 has permission p1 implied by c1");
-
-    //10. test checkUser for permission not implied by capability
-    test(!cas.checkUser(x, u1, p3), "10. u1 does not have permission p3");
-
-    //11. test checkUser for permission implied by capability not yet granted
-    c3 = new Capability();
-    c3.setName("c3");
-    c3.setPermissionsGranted(new String[]{p1, p3});
-    c3 = (Capability) capabilityDAO.put(c3);
-    UserCapabilityJunction ucJunction3 = new UserCapabilityJunction();
-    ucJunction3.setSourceId(u1.getId());
-    ucJunction3.setTargetId((String) c3.getId());
-    test(!cas.checkUser(x, u1, p3), "11. u1 does not have permission p3 implied by capability c3 not yet granted");
-
-    // 12. set c3 to granted and checkuser
-    ucJunction3 = (UserCapabilityJunction) ucJunction3.fclone();
-    ucJunction3.setStatus(CapabilityJunctionStatus.GRANTED);
-    ucJunction3 = (UserCapabilityJunction) userCapabilityJunctionDAO.put(ucJunction3);
-    test(cas.checkUser(x, u1, p3), "12. u1 has permission p3 implied by granted capability c3");
-
-    // 13. set c1 to to grant permission "p4" and check if user has the permission
-    c1 = (Capability) c1.fclone();
-    c1.setPermissionsGranted(new String[] {p1, p4});
-    c1 = (Capability) capabilityDAO.put(c1);
-    test(cas.checkUser(x, u1, p4), "13. u1 has permission p4");
-
-
-  }
 
   public void testCapabilityCapabilityJunction(X x) {
 

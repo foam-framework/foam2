@@ -426,13 +426,14 @@ var classes = [
   'foam.nanos.crunch.PrerequisiteCapabilityJunctionDAO',
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
   'foam.nanos.crunch.CapabilityDAO',
-  'foam.nanos.auth.CapabilityAuthService',
   //rules
   'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
   'foam.nanos.crunch.CheckDependenciesOnGrantedCapabilityPut',
   'foam.nanos.crunch.IsGrantedCapability',
   'foam.nanos.crunch.DisableDeprecatedCapabilityOnPut',
   'foam.nanos.crunch.UpdateJunctionStatusOnDeprecatedCapabilityPut',
+  //authservice
+  'foam.nanos.auth.CapabilityAuthService',
   
 ];
 

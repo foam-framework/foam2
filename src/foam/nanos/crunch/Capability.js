@@ -91,11 +91,6 @@ foam.CLASS({
       documentation: `list of permissions granted by this capability`
     },
     {
-      name: 'permissionsIntercepted',
-      class: 'StringArray',
-      documentation: `(permissions needed to apply) when applying for a capability a user must have all the permissions listed, otherwise an AuthException is thrown and caught by another service.`
-    },
-    {
       name: 'daoKey',
       class: 'String',
       visibility: 'RO'
@@ -111,11 +106,14 @@ foam.CLASS({
         { name: 'x', type: 'Context' },
         { name: 'permission', type: 'String' }
       ],
-      documentation: `checks if passed permission is in the list of this.capability.capabilitiesRequired.`,
+      documentation: `checks if a permission or capability string is implied by the current capability`,
       code: function implies(x, permission) {
         if(!this.enabled) return false;
+
+        if(this.stringImplies(this.name, permission)) return true;
+
         this.permissionsGranted.forEach(function(permissionName) {
-          if(permission === permissionName) return true;
+          if(permission === permissionName || this.stringImplies(permissionName, permission)) return true;
         });
         this.prerequisiteCapabilityJunctionDAO.where(this.EQ(this.CapabilityCapabilityJunction.TARGET_ID, this.id))
           .select().then(function(sink) {
@@ -130,9 +128,13 @@ foam.CLASS({
       },
       javaCode: `
         if(!this.getEnabled()) return false;
+
+        // check if permission is a capability string implied by this permission
+        if(this.stringImplies(this.getName(), permission)) return true;
+
         String[] permissionsGranted = this.getPermissionsGranted();
         for(String permissionName : permissionsGranted) {
-          if(permission.equals(permissionName)) return true; 
+          if(permission.equals(permissionName) || this.stringImplies(permissionName, permission)) return true; 
         }
         DAO prerequisiteCapabilityJunctionDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
         List<CapabilityCapabilityJunction> prereqs = (List<CapabilityCapabilityJunction>) ((ArraySink) prerequisiteCapabilityJunctionDAO
@@ -146,6 +148,26 @@ foam.CLASS({
           if(capability.implies(x, permission)) return true;
         }
         return false;
+      `
+    },
+    {
+      name: 'stringImplies',
+      type: 'Boolean',
+      args: [
+        {name: 's1', type: 'String'},
+        {name: 's2', type: 'String'}
+      ],
+      documentation: `check if s1 implies s2 where s1 and s2 are permission or capability strings`,
+      code: function stringImplies(s1, s2) {
+        if(s1[s1.length - 1] !== '*' || ( s1.length - 2 > s2.length )) return false;
+        if(s2.length <= s1.length - 2) return s1.substring(0, s1.length - 2) === s2.substring(0, s1.length -2);
+        else return s1.substring(0, s1.length - 1) === s2.substring(0, s1.length - 1);
+      },
+      javaCode: `
+      if(s1.charAt(s1.length() - 1) != '*' || (s1.length() - 2 > s2.length())) return false;
+
+      if(s2.length() <= s1.length() - 2) return s1.substring(0, s1.length() -2).equals(s2.substring(0, s1.length() - 2));
+      else return s1.substring(0, s1.length() - 1).equals(s2.substring(0, s1.length() -1));
       `
     }
   ]

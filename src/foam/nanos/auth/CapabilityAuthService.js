@@ -1,7 +1,10 @@
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'CapabilityAuthService',
-  extends: 'foam.nanos.auth.UserAndGroupAuthService', // change to proxyauthservice
+  extends: 'foam.nanos.auth.ProxyAuthService',
+  documentation: `
+  this decorator checks for either a capability or permission string. If the check returns false, delegate to next authservice. Return true otherwise.
+  `,
 
   implements: [
     'foam.nanos.auth.AuthService',
@@ -25,68 +28,109 @@ foam.CLASS({
   ],
 
   methods: [
-    // dont need these
-    // {
-    //   name: 'check',
-    //   documentation: `
-    //   check a permission of current by checking whether the capabilities of the user implies the permission
-    //   `,
-    //   javaCode: `
-    //   if ( x == null || permission == null ) return false;
+    {
+      name: 'check',
+      documentation: `
+      check a permission of current by checking whether the capabilities of the user implies the permission
+      `,
+      javaCode: `
+      if ( x == null || permission == null ) return false;
+      Session session = x.get(Session.class);
+      if(session == null || session.getUserId() == 0) return false;
+      User user = (User) x.get("user");
+      if(user == null || !user.getEnabled()) return false;
 
-    //   Session session = x.get(Session.class);
-    //   if(session == null || session.getUserId() == 0) return false;
-    //   User user = (User) x.get("user");
-    //   if(user == null || !user.getEnabled()) return false;
+      if ( user.getId() == 1 ) return true;  
 
-    //   return checkUser(x, user, permission);
-    //   `
-    // }, 
+      if ( ! getDelegate().check(x, "service.auth.checkUser") ) throw new AuthorizationException();
 
-    // throw exception instead of return false or getDelegate() if no exceptions need to be thrown
-    // permission string is actually string for capability name    
-    // {
-    //   name: 'checkUser',
-    //   javaCode: `
-    //   if ( x == null || user == null || permission == null) return false;
-    //   if ( ! super.checkPermission(x, new AuthPermission("service.auth.checkUser")) ) throw new AuthorizationException("permission denied");
+      try {
+        DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
-    //   try {
-    //     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-    //     List<UserCapabilityJunction> userCapabilityJunctions = (List<UserCapabilityJunction>) ((ArraySink) userCapabilityJunctionDAO
-    //       .where(AND(
-    //         EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
-    //         EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
-    //       )) 
-    //       .select(new ArraySink()))
-    //       .getArray();
+        // if the capability string is found in userCapabilityJunctions
+        if(userCapabilityJunctionDAO.find(AND(
+          EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
+          EQ(UserCapabilityJunction.TARGET_ID, permission),
+          EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
+        )) != null) return true;
         
-    //     DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+        // if the capability is implied by a capability found in userCapabilityJunctions
+        List<UserCapabilityJunction> userCapabilityJunctions = (List<UserCapabilityJunction>) ((ArraySink) userCapabilityJunctionDAO
+          .where(AND(
+            EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
+            EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
+          )) 
+          .select(new ArraySink()))
+          .getArray();
+        
+        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
 
-    //     for(UserCapabilityJunction ucJunction : userCapabilityJunctions) {
-    //       Capability capability = (Capability) capabilityDAO.find(ucJunction.getTargetId());
-    //       if(capability.implies(x, permission)) return true;
-    //     }
-    //   } catch (Exception e) {
-    //     Logger logger = (Logger) x.get("logger");
-    //     logger.error("check", permission, e);
-    //   } catch (Throwable t) {
-    //   } 
-    //   return false;
-      
-    //   `
-    // },
-    // {
-    //   name: 'checkPermission',
-    //   javaCode: `
-    //   return check(x, permission.getName());
-    //   `
-    // },
-    // {
-    //   name: 'checkUserPermission',
-    //   javaCode: `
-    //   return checkUser(x, user, permission.getName());
-    //   `
-    // },
+        for(UserCapabilityJunction ucJunction : userCapabilityJunctions) {
+          Capability capability = (Capability) capabilityDAO.find(ucJunction.getTargetId());
+          if(capability.implies(x, permission)) return true;
+        }
+      } catch (Exception e) {
+        Logger logger = (Logger) x.get("logger");
+        logger.error("check", permission, e);
+      } catch (Throwable t) {
+      } 
+
+      return getDelegate().check(x, permission);
+      `
+    },     
+    {
+      name: 'checkUser',
+      documentation: `
+      check if the given input string is in the userCapabilityJunctions or implied by a capability in userCapabilityJunctions
+      `,
+      javaCode: `
+ 
+      if(x == null || permission == null) return false;
+      Session session = x.get(Session.class);
+      if(session == null || session.getUserId() == 0) return false;
+      if(user == null || ! user.getEnabled()) return false;
+
+      if ( user.getId() == 1 ) return true;  
+      if ( ! getDelegate().check(x, "service.auth.checkUser") ) throw new AuthorizationException();
+
+      try {
+        DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+
+        // if the capability string is found in userCapabilityJunctions
+        if(userCapabilityJunctionDAO.find(AND(
+          EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
+          EQ(UserCapabilityJunction.TARGET_ID, permission),
+          EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
+        )) != null) return true;
+        
+        // if the capability is implied by a capability found in userCapabilityJunctions
+        List<UserCapabilityJunction> userCapabilityJunctions = (List<UserCapabilityJunction>) ((ArraySink) userCapabilityJunctionDAO
+          .where(AND(
+            EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
+            EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
+          )) 
+          .select(new ArraySink()))
+          .getArray();
+        
+        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+
+        for(UserCapabilityJunction ucJunction : userCapabilityJunctions) {
+          Capability capability = (Capability) capabilityDAO.find(ucJunction.getTargetId());
+          if(capability.implies(x, permission)) return true;
+        }
+      } catch (Exception e) {
+        Logger logger = (Logger) x.get("logger");
+        logger.error("check", permission, e);
+      } catch (Throwable t) {
+      } 
+      return getDelegate().checkUser(x, user, permission);
+      `
+    },
+    {
+      name: 'checkUserPermission',
+      javaCode: `
+      return checkUser(x, user, permission.getName());
+      `
+    },
   ]
 });
