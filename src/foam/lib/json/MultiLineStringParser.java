@@ -10,7 +10,7 @@ import foam.lib.parse.PStream;
 import foam.lib.parse.Parser;
 import foam.lib.parse.ParserContext;
 
-public class MultiStringParser
+public class MultiLineStringParser
   implements Parser
 {
   protected final static char ESCAPE = '\\';
@@ -31,7 +31,7 @@ public class MultiStringParser
     }
   };
 
-  public MultiStringParser() {
+  public MultiLineStringParser() {
   }
 
   public PStream parse(PStream ps, ParserContext x) {
@@ -67,7 +67,7 @@ public class MultiStringParser
 
           c = (Character) escapePS.value();
         }
-      } else if ( c != '\n' && c != '\r' ){
+      } else {
           builder.append(c);
       }
 
