@@ -49,10 +49,7 @@ foam.CLASS({
             var config = foam.Object.clone(self.config);
             config.data = {
               datasets: [{
-                data: Object.keys(sink.groups).map(key => sink.groups[key].value),
-                backgroundColor: [
-                  '#a7beff'
-                ]
+                data: Object.keys(sink.groups).map(key => sink.groups[key].value)
               }],
               labels: Object.keys(sink.groups)
             };
