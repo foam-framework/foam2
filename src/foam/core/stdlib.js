@@ -818,6 +818,29 @@ foam.LIB({
 });
 
 
+foam.LIB({
+  name: 'foam.Blob',
+  methods: [
+    function isInstance(o) { return o instanceof Blob; },
+    // Blobs are immutable
+    function clone(o) { return o; },
+    function is(a, b) { return a === b },
+    function equals(a, b) { return a === b },
+    function compare(a, b) {
+      if ( a === b ) return 0;
+      // Not a complete ordering, but better than nothing.
+      return foam.Number.compare(a.size, b.size);
+    },
+    function hashCode(o) {
+      return foam.Object.hashCode({
+        size: o.size,
+        type: o.type
+      });
+    }
+  ]
+});
+
+
 // AN Object is a Javascript Object which is neither an FObject nor an Array.
 foam.LIB({
   name: 'foam.Object',
@@ -898,6 +921,7 @@ foam.typeOf = (function() {
   var tFunction  = foam.Function;
   var tObject    = foam.Object;
   var tRegExp    = foam.RegExp;
+  var tBlob      = foam.Blob;
 
   return function typeOf(o) {
     if ( tNumber.isInstance(o) )    return tNumber;
@@ -909,7 +933,8 @@ foam.typeOf = (function() {
     if ( tDate.isInstance(o) )      return tDate;
     if ( tFunction.isInstance(o) )  return tFunction;
     if ( tFObject.isInstance(o) )   return tFObject;
-    if ( tRegExp.isInstance(o) )   return tRegExp;
+    if ( tRegExp.isInstance(o) )    return tRegExp;
+    if ( tBlob.isInstance(o) )      return tBlob;
     return tObject;
   };
 })();
@@ -931,6 +956,7 @@ foam.Number.ordinal = 7;
 foam.Boolean.ordinal = 8;
 foam.Null.ordinal = 9;
 foam.Undefined.ordinal = 10;
+foam.Blob.ordinal = 11;
 
 foam.LIB({
   name: 'foam',
