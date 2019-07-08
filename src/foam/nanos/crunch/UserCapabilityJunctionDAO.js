@@ -99,9 +99,10 @@ foam.CLASS({
       boolean prereq = checkPrereqs(x, obj);
       boolean data = validateData(x, obj);
 
-      if(prereq && data) ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.GRANTED);
-      else if(((UserCapabilityJunction) obj).getStatus() != CapabilityJunctionStatus.DEPRECATED) ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.PENDING);
-
+      if(((UserCapabilityJunction) obj).getStatus() != CapabilityJunctionStatus.DEPRECATED) {
+        if(prereq && data) ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.GRANTED);
+        else ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.PENDING);
+      }
       return getDelegate().put_(x, obj);
       
       `

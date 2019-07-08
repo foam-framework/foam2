@@ -68,7 +68,8 @@ public class CapabilityTest extends Test {
     p5 = new String("p5");
 
     // testCapabilityData(x);
-    testCapabilityAuthService(x);
+    // testCapabilityAuthService(x);
+    testDeprecatedCapabiltiyJunctionRules(x);
   }
 
   public void testCapabilityAuthService(X x) {
@@ -146,6 +147,71 @@ public class CapabilityTest extends Test {
     test(auth.checkUser(x, u1, "permission.other.read"), "user has permission permission.other.read");
     test(auth.checkUser(x, u1, "permission.other.read.all"), "user does have permission permission.other.read.all");
     test(!auth.checkUser(x, u1, "permission.other.write"), "user does not have permission permission.other.write");
+
+  }
+
+  public void testDeprecatedCapabiltiyJunctionRules(X x) {
+    Capability c0 = new Capability();
+    Capability c1 = new Capability();
+    Capability c2 = new Capability();
+
+    FakeDataObject data = new FakeDataObject();
+    data.setUsername("RUBY");
+    data.setPassword("PASS");
+    
+    c0.setName("c0"); 
+    c0.setOf(FakeDataObject.getOwnClassInfo());
+    c0 = (Capability) capabilityDAO.put_(x, c0);
+    c1.setName("c1");
+    c1.setOf(FakeDataObject.getOwnClassInfo());
+    c1 = (Capability) capabilityDAO.put_(x, c1);
+    c2.setName("c2");
+    c2.setOf(FakeDataObject.getOwnClassInfo());
+    c2 = (Capability) capabilityDAO.put_(x, c2);
+
+    CapabilityCapabilityJunction j1 = new CapabilityCapabilityJunction();
+    j1.setSourceId((String) c0.getId());
+    j1.setTargetId((String) c1.getId());
+    j1 = (CapabilityCapabilityJunction) prerequisiteCapabilityJunctionDAO.put_(x, j1);
+
+    UserCapabilityJunction uj1 = new UserCapabilityJunction();
+    uj1.setSourceId(u1.getId());
+    uj1.setTargetId((String) c0.getId());
+    uj1.setData((FObject) data);
+    uj1 = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, uj1);
+
+    UserCapabilityJunction uj2 = new UserCapabilityJunction();
+    uj2.setSourceId(u1.getId());
+    uj2.setTargetId((String) c1.getId());
+    uj2.setData((FObject) data);
+    uj2 = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, uj2);
+
+    UserCapabilityJunction uj3 = new UserCapabilityJunction();
+    uj3.setSourceId(u1.getId());
+    uj3.setTargetId((String) c2.getId());
+    uj3.setData((FObject) data);
+    uj3 = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, uj3);
+
+
+    CapabilityCapabilityJunction j2 = new CapabilityCapabilityJunction();
+    j2.setSourceId((String) c0.getId());
+    j2.setTargetId((String) c2.getId());
+    j2 = (CapabilityCapabilityJunction) deprecatedCapabilityJunctionDAO.put_(x, j2);
+
+    uj1 = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
+      EQ(UserCapabilityJunction.SOURCE_ID, uj1.getSourceId()),
+      EQ(UserCapabilityJunction.TARGET_ID, (String) uj1.getTargetId())
+    ));
+    uj2 = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
+      EQ(UserCapabilityJunction.SOURCE_ID, uj2.getSourceId()),
+      EQ(UserCapabilityJunction.TARGET_ID, (String) uj2.getTargetId())
+    ));
+    c0 = (Capability) capabilityDAO.find("c0");
+    c1 = (Capability) capabilityDAO.find("c1");
+    test(uj1.getStatus() == CapabilityJunctionStatus.DEPRECATED, "UserCapabilityJunction Status between user and c0 is set to deprecated");
+    test(!c0.getEnabled(), "c0 is set to disabled");
+    test(uj2.getStatus() == CapabilityJunctionStatus.GRANTED, "UserCapabilityJunction Status between user and c1 is still granted");
+    test(c1.getEnabled(), "c1 is still enabled");
 
   }
 
