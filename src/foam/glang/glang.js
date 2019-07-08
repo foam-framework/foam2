@@ -137,25 +137,6 @@ java.time.LocalDateTime localDateTime = localDate.atTime(java.time.LocalTime.MAX
 // Convert to Date using LocalDateTime
 return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant());
       `
-    },
-    {
-      name: 'compare',
-      code: function(o1, o2) {
-        return foam.Date.compare(this.delegate.f(o1), this.delegate.f(o2));
-      },
-      javaCode: `
-        java.util.Date date1 = (java.util.Date) getDelegate().f(o1);
-        java.util.Date date2 = (java.util.Date) getDelegate().f(o2);
-        return date1.compareTo(date2);
-      `
-    },
-    {
-      name: 'createStatement',
-      javaCode: 'return "";'
-    },
-    {
-      name: 'prepareStatement',
-      javaCode: '//no-op'
     }
   ]
 });
@@ -264,25 +245,6 @@ java.time.Instant t = java.time.Instant.ofEpochMilli(date.getTime())
 
 return java.util.Date.from(t);
       `
-    },
-    {
-      name: 'compare',
-      code: function(o1, o2) {
-        return foam.Date.compare(this.delegate.f(o1), this.delegate.f(o2));
-      },
-      javaCode: `
-        java.util.Date date1 = (java.util.Date) getDelegate().f(o1);
-        java.util.Date date2 = (java.util.Date) getDelegate().f(o2);
-        return date1.compareTo(date2);
-      `
-    },
-    {
-      name: 'createStatement',
-      javaCode: 'return "";'
-    },
-    {
-      name: 'prepareStatement',
-      javaCode: '//no-op'
     }
   ]
 });
