@@ -16,7 +16,6 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.app.EmailConfig',
     'foam.nanos.auth.User',
-    'foam.nanos.logger.Logger',
     'foam.nanos.session.Session',
     'foam.util.SafetyUtil',
     'io.nayuki.qrcodegen.QrCode',
@@ -49,8 +48,6 @@ foam.CLASS({
     {
       name: 'generateKeyAndQR',
       javaCode: `
-        Logger logger = (Logger) x.get("logger");
-
         User user = (User) (x.get("agent") != null ?
           x.get("agent") :
           x.get("user")) ;
@@ -81,7 +78,7 @@ foam.CLASS({
               QrCode.encodeText(uri.toASCIIString(), QrCode.Ecc.MEDIUM).toSvgString(0))
             .build();
         } catch ( Throwable t ) {
-          throw new RuntimeException(t);	
+          throw new RuntimeException("Error when generating QR code.", t);
         }
       `
     },
