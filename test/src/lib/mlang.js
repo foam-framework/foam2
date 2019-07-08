@@ -486,7 +486,8 @@ describe('MLang', function() {
     });
   });
 
-  describe('CONTAINS()', function() {
+  describe('CONTA
+  ()', function() {
     var CONTAINS;
     beforeEach(function() {
       var expr = foam.mlang.Expressions.create();

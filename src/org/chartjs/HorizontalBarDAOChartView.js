@@ -28,33 +28,35 @@ foam.CLASS({
               }
             },
             scales: {
-              yAxes: [{
-                ticks: {
-                  // convert to millions
-                  callback: function (value, index, values) {
-                    const dateArray = value.split('/');
-                    const monthNames = [
-                      "January", "February", "March", "April", "May", "June",
-                      "July", "August", "September", "October", "November", "December"
-                    ];
-                    const quarterNames = ['Q1', 'Q2', 'Q3', 'Q4'];
+              yAxes: [
+                // {
+                // ticks: {
+                //   // convert to millions
+                //   callback: function (value, index, values) {
+                //     const dateArray = value.split('/');
+                //     const monthNames = [
+                //       "January", "February", "March", "April", "May", "June",
+                //       "July", "August", "September", "October", "November", "December"
+                //     ];
+                //     const quarterNames = ['Q1', 'Q2', 'Q3', 'Q4'];
 
-                    switch (self.dateFrequency) {
-                      case net.nanopay.liquidity.ui.dashboard.DateFrequency.MONTHLY:
-                        return `${monthNames[Number.parseInt(dateArray[0])]} ${dateArray[2]}`
+                //     switch (self.dateFrequency) {
+                //       case net.nanopay.liquidity.ui.dashboard.DateFrequency.MONTHLY:
+                //         return `${monthNames[Number.parseInt(dateArray[0])]} ${dateArray[2]}`
 
-                      case net.nanopay.liquidity.ui.dashboard.DateFrequency.QUARTERLY:
-                        return `${quarterNames[Number.parseInt(dateArray[0]) / 3 - 1]} ${dateArray[2]}`
+                //       case net.nanopay.liquidity.ui.dashboard.DateFrequency.QUARTERLY:
+                //         return `${quarterNames[Number.parseInt(dateArray[0]) / 3 - 1]} ${dateArray[2]}`
 
-                      case net.nanopay.liquidity.ui.dashboard.DateFrequency.ANNUALLY:
-                        return dateArray[2];
+                //       case net.nanopay.liquidity.ui.dashboard.DateFrequency.ANNUALLY:
+                //         return dateArray[2];
 
-                      default:
-                        return value;
-                    }
-                  }
-                }
-              }],
+                //       default:
+                //         return value;
+                //     }
+                //   }
+                // }
+              // }
+            ],
               xAxes: [{
                 ticks: {
                   callback: function (value, index, values) {
@@ -66,6 +68,15 @@ foam.CLASS({
           },
         };
       }
+    },
+    {
+      class: 'Map',
+      name: 'customDatasetStyling',
+      documentation: `
+        Property map that would hold the customization for each key type in the candlestickDAO.
+        1. Key must equal the candlestick's key.
+        2. Value mapped with key must be a 1:1 mapping defined in chartjs.org's documentation.
+      `
     },
     {
       class: 'foam.mlang.ExprProperty',
@@ -100,14 +111,14 @@ foam.CLASS({
             self.config.data = { datasets: [] };
             var config = foam.Object.clone(self.config);
 
-            var dataMap = sink.groupKeys.reduce((map, y) => {
+            var dataMap = Object.keys(sink.groups).reduce((map, y) => {
               return sink.groups[y].groupKeys.reduce((map, k) => {
                 map[k] = [];
                 return map;
               }, map);
             }, {});
 
-            sink.groupKeys.forEach((y, yi) => {
+            Object.keys(sink.groups).forEach((y, yi) => {
               Object.keys(dataMap).forEach(k => {
                 dataMap[k][yi] = 0;
               });
@@ -123,10 +134,10 @@ foam.CLASS({
                   label: k,
                   data: dataMap[k]
                 };
-                // var style = self.customDatasetStyling[k] || {};
-                // Object.keys(style).forEach(function (k) {
-                //   data[k] = style[k];
-                // });
+                var style = self.customDatasetStyling[k] || {};
+                Object.keys(style).forEach(function (k) {
+                  data[k] = style[k];
+                });
                 return data;
               })
             };
