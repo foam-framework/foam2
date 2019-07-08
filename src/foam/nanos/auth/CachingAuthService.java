@@ -92,7 +92,7 @@ public class CachingAuthService
 
   public static void purgeCache(X x) {
     Session session = x.get(Session.class);
-    session.getContext().put(CACHE_KEY, null);
+    session.setContext(session.getContext().put(CACHE_KEY, null));
   }
 
   public CachingAuthService(AuthService delegate) {
