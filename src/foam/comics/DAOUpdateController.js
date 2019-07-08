@@ -52,7 +52,7 @@ foam.CLASS({
       isEnabled: function(obj) { return !! obj; },
       code: function() {
         var self = this;
-        this.dao.put(this.obj.clone()).then(function() {
+        this.dao.put(this.obj).then(function() {
           self.finished.pub();
         }, function(e) {
           self.exception = e;
