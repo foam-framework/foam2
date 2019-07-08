@@ -18,6 +18,10 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'of'
+    },
+    {
+      class: 'String',
       name: 'title'
     },
     {
@@ -28,6 +32,11 @@ foam.CLASS({
       class: 'String',
       name: 'customDAOController',
       displayWidth: 80
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'predicate'
     },
     {
       class: 'foam.u2.ViewSpec',
@@ -133,9 +142,14 @@ foam.CLASS({
         throw new Error('No DAO found for ' + this.daoKey);
       }
 
+      var dao = X[this.daoKey];
+      dao.of = this.of ? this.of : dao.of;
+
+      var predicatedDAO = dao.where(this.predicate);
+
       var view = {
         class: 'foam.comics.BrowserView',
-        data: X[this.daoKey],
+        data: predicatedDAO,
         addEnabled: this.addEnabled,
         createEnabled: this.createEnabled,
         detailView: this.detailView,
