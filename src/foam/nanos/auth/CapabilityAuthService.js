@@ -11,13 +11,13 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.nanos.logger.Logger',
-    'foam.nanos.session.Session',
-    'foam.nanos.crunch.Capability',
-    'foam.nanos.crunch.UserCapabilityJunction',
-    'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.nanos.logger.Logger',
+    'foam.nanos.session.Session',
     'java.util.List',
     'javax.security.auth.AuthPermission',
     'static foam.mlang.MLang.*'
@@ -36,9 +36,9 @@ foam.CLASS({
       javaCode: `
       if ( x == null || permission == null ) return false;
       Session session = x.get(Session.class);
-      if(session == null || session.getUserId() == 0) return false;
+      if ( session == null || session.getUserId() == 0 ) return false;
       User user = (User) x.get("user");
-      if(user == null || !user.getEnabled()) return false;
+      if( user == null || ! user.getEnabled() ) return false;
 
       if ( user.getId() == 1 ) return true;  
 
@@ -47,14 +47,13 @@ foam.CLASS({
       try {
         DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
-        // if the capability string is found in userCapabilityJunctions
-        if(userCapabilityJunctionDAO.find(AND(
-          EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
-          EQ(UserCapabilityJunction.TARGET_ID, permission),
-          EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
-        )) != null) return true;
+        if(userCapabilityJunctionDAO.find(
+          AND(
+            EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
+            EQ(UserCapabilityJunction.TARGET_ID, permission),
+            EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
+          )) != null) return true;
         
-        // if the capability is implied by a capability found in userCapabilityJunctions
         List<UserCapabilityJunction> userCapabilityJunctions = (List<UserCapabilityJunction>) ((ArraySink) userCapabilityJunctionDAO
           .where(AND(
             EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
@@ -65,14 +64,13 @@ foam.CLASS({
         
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
 
-        for(UserCapabilityJunction ucJunction : userCapabilityJunctions) {
+        for( UserCapabilityJunction ucJunction : userCapabilityJunctions ) {
           Capability capability = (Capability) capabilityDAO.find(ucJunction.getTargetId());
-          if(capability.implies(x, permission)) return true;
+          if( capability.implies(x, permission) ) return true;
         }
       } catch (Exception e) {
         Logger logger = (Logger) x.get("logger");
         logger.error("check", permission, e);
-      } catch (Throwable t) {
       } 
 
       return getDelegate().check(x, permission);
@@ -85,10 +83,10 @@ foam.CLASS({
       `,
       javaCode: `
  
-      if(x == null || permission == null) return false;
+      if( x == null || permission == null ) return false;
       Session session = x.get(Session.class);
-      if(session == null || session.getUserId() == 0) return false;
-      if(user == null || ! user.getEnabled()) return false;
+      if( session == null || session.getUserId() == 0 ) return false;
+      if( user == null || ! user.getEnabled() ) return false;
 
       if ( user.getId() == 1 ) return true;  
       if ( ! getDelegate().check(x, "service.auth.checkUser") ) throw new AuthorizationException();
@@ -96,14 +94,13 @@ foam.CLASS({
       try {
         DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
-        // if the capability string is found in userCapabilityJunctions
-        if(userCapabilityJunctionDAO.find(AND(
-          EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
-          EQ(UserCapabilityJunction.TARGET_ID, permission),
-          EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
-        )) != null) return true;
+        if(userCapabilityJunctionDAO.find(
+          AND(
+            EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
+            EQ(UserCapabilityJunction.TARGET_ID, permission),
+            EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
+          )) != null) return true;
         
-        // if the capability is implied by a capability found in userCapabilityJunctions
         List<UserCapabilityJunction> userCapabilityJunctions = (List<UserCapabilityJunction>) ((ArraySink) userCapabilityJunctionDAO
           .where(AND(
             EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
@@ -114,22 +111,22 @@ foam.CLASS({
         
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
 
-        for(UserCapabilityJunction ucJunction : userCapabilityJunctions) {
+        for( UserCapabilityJunction ucJunction : userCapabilityJunctions ) {
           Capability capability = (Capability) capabilityDAO.find(ucJunction.getTargetId());
-          if(capability.implies(x, permission)) return true;
+          if( capability.implies(x, permission) ) return true;
         }
       } catch (Exception e) {
         Logger logger = (Logger) x.get("logger");
         logger.error("check", permission, e);
-      } catch (Throwable t) {
       } 
+
       return getDelegate().checkUser(x, user, permission);
       `
     },
     {
       name: 'checkUserPermission',
       javaCode: `
-      return checkUser(x, user, permission.getName());
+      return checkUser( x, user, permission.getName() );
       `
     },
   ]

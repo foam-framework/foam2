@@ -8,16 +8,15 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.X',
     'foam.core.FObject',
+    'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.nanos.auth.*',
     'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CapabilityCapabilityJunction',
     'java.util.List',
     'static foam.mlang.MLang.*',
-    'foam.nanos.crunch.CapabilityCapabilityJunction',
-    
   ],
 
   implements: [
@@ -108,33 +107,33 @@ foam.CLASS({
       ],
       documentation: `checks if a permission or capability string is implied by the current capability`,
       code: function implies(x, permission) {
-        if(!this.enabled) return false;
+        if( ! this.enabled ) return false;
 
-        if(this.stringImplies(this.name, permission)) return true;
+        if( this.stringImplies(this.name, permission) ) return true;
 
         this.permissionsGranted.forEach(function(permissionName) {
-          if(permission === permissionName || this.stringImplies(permissionName, permission)) return true;
+          if( permission === permissionName || this.stringImplies(permissionName, permission) ) return true;
         });
         this.prerequisiteCapabilityJunctionDAO.where(this.EQ(this.CapabilityCapabilityJunction.TARGET_ID, this.id))
           .select().then(function(sink) {
             var prerequisites = sink.array
             prerequisites.forEach(function(prereq) {
               this.capabilityDAO.find(prereq.sourceId).then(function(cap) {
-                if(cap.implies(x, permission)) return true;
+                if( cap.implies(x, permission) ) return true;
               });
             })
           });
         return false;
       },
       javaCode: `
-        if(!this.getEnabled()) return false;
+        if( ! this.getEnabled() ) return false;
 
         // check if permission is a capability string implied by this permission
-        if(this.stringImplies(this.getName(), permission)) return true;
+        if( this.stringImplies(this.getName(), permission) ) return true;
 
         String[] permissionsGranted = this.getPermissionsGranted();
-        for(String permissionName : permissionsGranted) {
-          if(permission.equals(permissionName) || this.stringImplies(permissionName, permission)) return true; 
+        for( String permissionName : permissionsGranted ) {
+          if( permission.equals(permissionName) || this.stringImplies(permissionName, permission) ) return true; 
         }
         DAO prerequisiteCapabilityJunctionDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
         List<CapabilityCapabilityJunction> prereqs = (List<CapabilityCapabilityJunction>) ((ArraySink) prerequisiteCapabilityJunctionDAO
@@ -143,9 +142,9 @@ foam.CLASS({
         .getArray();
 
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-        for(CapabilityCapabilityJunction prereqJunction : prereqs) {
+        for( CapabilityCapabilityJunction prereqJunction : prereqs ) {
           Capability capability = (Capability) capabilityDAO.find(prereqJunction.getSourceId());
-          if(capability.implies(x, permission)) return true;
+          if( capability.implies(x, permission) ) return true;
         }
         return false;
       `
@@ -159,14 +158,14 @@ foam.CLASS({
       ],
       documentation: `check if s1 implies s2 where s1 and s2 are permission or capability strings`,
       code: function stringImplies(s1, s2) {
-        if(s1[s1.length - 1] !== '*' || ( s1.length - 2 > s2.length )) return false;
-        if(s2.length <= s1.length - 2) return s1.substring(0, s1.length - 2) === s2.substring(0, s1.length -2);
+        if( s1[ s1.length - 1 ] !== '*' || ( s1.length - 2 > s2.length ) ) return false;
+        if( s2.length <= s1.length - 2 ) return s1.substring(0, s1.length - 2) === s2.substring(0, s1.length -2);
         else return s1.substring(0, s1.length - 1) === s2.substring(0, s1.length - 1);
       },
       javaCode: `
-      if(s1.charAt(s1.length() - 1) != '*' || (s1.length() - 2 > s2.length())) return false;
+      if( s1.charAt(s1.length() - 1) != '*' || ( s1.length() - 2 > s2.length() ) ) return false;
 
-      if(s2.length() <= s1.length() - 2) return s1.substring(0, s1.length() -2).equals(s2.substring(0, s1.length() - 2));
+      if( s2.length() <= s1.length() - 2 ) return s1.substring(0, s1.length() -2).equals(s2.substring(0, s1.length() - 2));
       else return s1.substring(0, s1.length() - 1).equals(s2.substring(0, s1.length() -1));
       `
     }

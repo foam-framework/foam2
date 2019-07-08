@@ -12,11 +12,11 @@ foam.CLASS({
     'foam.core.ContextAgent',
     'foam.core.X',
     'foam.dao.DAO',
-    'foam.nanos.notification.Notification',
-    'foam.nanos.crunch.UserCapabilityJunction',
-    'java.util.Date',
-    'java.lang.StringBuilder',
     'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.nanos.notification.Notification',
+    'java.lang.StringBuilder',
+    'java.util.Date',
   ],
 
   methods: [
@@ -28,7 +28,7 @@ foam.CLASS({
         public void execute(X x) {
           UserCapabilityJunction junction = (UserCapabilityJunction) obj;
           Capability cap = (Capability) ((DAO) x.get("capabilityDAO")).find(((String)junction.getTargetId()));
-          if(!cap.getVisible() || junction.getStatus() == CapabilityJunctionStatus.DEPRECATED) return;
+          if( ! cap.getVisible() || junction.getStatus() == CapabilityJunctionStatus.DEPRECATED ) return;
 
           DAO notificationDAO = (DAO) x.get("notificationDAO");
 

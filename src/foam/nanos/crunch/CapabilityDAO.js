@@ -31,10 +31,10 @@ foam.CLASS({
       ],
       javaCode: `
       User user = (User) x.get("user");
-      if(user == null) throw new AuthorizationException();
+      if( user == null ) throw new AuthorizationException();
       AuthService auth = (AuthService) x.get("auth");
       boolean hasPermission = auth.check(x, "service.*");
-      if(!hasPermission) throw new AuthorizationException();
+      if( ! hasPermission ) throw new AuthorizationException();
       `
     },
     {
@@ -61,7 +61,6 @@ foam.CLASS({
     {
       name: 'select_',
       javaCode: `
-      // TODO RUBY what capabilities can users see, TODO 'find_' also
       return getDelegate().select_(x, sink, skip, limit, order, predicate);
       `
     },

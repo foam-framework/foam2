@@ -13,10 +13,10 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
-    'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.crunch.Capability',
-    'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.CapabilityCapabilityJunction',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.nanos.crunch.UserCapabilityJunction',
     'java.util.List',
     'static foam.mlang.MLang.*',
     
@@ -36,7 +36,7 @@ foam.CLASS({
         .select(new ArraySink()))
         .getArray();
 
-      for(UserCapabilityJunction ucJunction : userCapabilityJunctions) {
+      for( UserCapabilityJunction ucJunction : userCapabilityJunctions ) {
         final UserCapabilityJunction j = (UserCapabilityJunction) ucJunction.fclone();
         j.setStatus(CapabilityJunctionStatus.DEPRECATED);
         agency.submit(x, new ContextAgent() {

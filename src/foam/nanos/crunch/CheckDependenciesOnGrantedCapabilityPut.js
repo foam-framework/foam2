@@ -13,16 +13,14 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
-    'foam.nanos.crunch.UserCapabilityJunction',
-    'foam.nanos.crunch.Capability',
-    'foam.nanos.crunch.CapabilityJunctionStatus',
-    'foam.nanos.crunch.CapabilityCapabilityJunction',
-    'java.util.List',
-    'foam.mlang.predicate.Predicate',
     'foam.mlang.MLang',
+    'foam.mlang.predicate.Predicate',
+    'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CapabilityCapabilityJunction',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.nanos.crunch.UserCapabilityJunction',
+    'java.util.List',
     'static foam.mlang.MLang.*',
-    
-    
   ],
 
   methods: [
@@ -44,14 +42,15 @@ foam.CLASS({
       ))
       .select(new ArraySink()))
       .getArray();
-      for(UserCapabilityJunction pendingJunction : pendingJunctions) {
+
+      for( UserCapabilityJunction pendingJunction : pendingJunctions ) {
         final CapabilityCapabilityJunction prereqJunction = (CapabilityCapabilityJunction) prerequisiteCapabilityJunctionDAO.find(
           AND(
             EQ(CapabilityCapabilityJunction.SOURCE_ID, capId),
             EQ(CapabilityCapabilityJunction.TARGET_ID, (String) pendingJunction.getTargetId())
           )
         );
-        if(prereqJunction != null) {
+        if( prereqJunction != null ) {
           agency.submit(x, new ContextAgent() {
             @Override
             public void execute(X x) {

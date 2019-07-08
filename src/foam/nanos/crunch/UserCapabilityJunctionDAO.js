@@ -5,7 +5,6 @@ foam.CLASS({
 
   documentation: `UserCapabilityJunctionDAO requires a custom authenticated DAO decorator to only show capabilities owned by a user. Updates can only be performed by system.`,
 
-  // TODO RUBY checkownership and getfiltereddao auth.check(x, "something else")?
 
   javaImports: [
     'foam.core.FObject',
@@ -32,7 +31,7 @@ foam.CLASS({
       type: 'foam.nanos.auth.User',
       javaCode: `
       User user = (User) x.get("user");
-      if(user == null) throw new AuthenticationException("user not found");
+      if( user == null ) throw new AuthenticationException("user not found");
       return user;
       `
     },
@@ -54,7 +53,7 @@ foam.CLASS({
         AuthService auth = (AuthService) x.get("auth");
         boolean isOwner = ((UserCapabilityJunction) obj).getSourceId() == user.getId();
         boolean hasPermission = auth.check(x, "service.*");
-        if(!isOwner && !hasPermission) throw new AuthorizationException("permission denied");
+        if( ! isOwner && ! hasPermission ) throw new AuthorizationException("permission denied");
       `
     },
     {
@@ -99,8 +98,8 @@ foam.CLASS({
       boolean prereq = checkPrereqs(x, obj);
       boolean data = validateData(x, obj);
 
-      if(((UserCapabilityJunction) obj).getStatus() != CapabilityJunctionStatus.DEPRECATED) {
-        if(prereq && data) ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.GRANTED);
+      if( ((UserCapabilityJunction) obj).getStatus() != CapabilityJunctionStatus.DEPRECATED ) {
+        if( prereq && data ) ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.GRANTED);
         else ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.PENDING);
       }
       return getDelegate().put_(x, obj);
@@ -130,14 +129,15 @@ foam.CLASS({
       .where(EQ(CapabilityCapabilityJunction.TARGET_ID, (String) capability.getId()))
       .select(new ArraySink()))
       .getArray();
-      for(CapabilityCapabilityJunction ccJunction : ccJunctions) {
+
+      for( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
         Capability cap = (Capability) ((DAO) x.get("capabilityDAO")).find((String) ccJunction.getSourceId());
         if(!cap.getEnabled()) continue;
         UserCapabilityJunction ucJunction = (UserCapabilityJunction) getDelegate().find(AND(
           EQ(UserCapabilityJunction.SOURCE_ID, ((UserCapabilityJunction) obj).getSourceId()),
           EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getSourceId())
         ));
-        if(ucJunction == null || ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED) return false;
+        if( ucJunction == null || ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED ) return false;
       }
       return true;
       `

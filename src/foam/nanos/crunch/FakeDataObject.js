@@ -44,8 +44,8 @@ foam.CLASS({
         if ( SafetyUtil.isEmpty(this.getPassword()) ) {
           throw new IllegalStateException("password is required.");
         }
-        if(!this.getUsername().equals("RUBY")) throw new RuntimeException("incorrect username");
-        if(!this.getPassword().equals("PASS")) throw new RuntimeException("incorrect password");
+        if( ! this.getUsername().equals("RUBY") ) throw new RuntimeException("incorrect username");
+        if( ! this.getPassword().equals("PASS") ) throw new RuntimeException("incorrect password");
             
         `
       }

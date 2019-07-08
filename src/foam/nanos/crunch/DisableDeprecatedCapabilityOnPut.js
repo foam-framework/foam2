@@ -14,8 +14,6 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCapabilityJunction',
-    
-    
   ],
 
   methods: [

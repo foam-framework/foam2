@@ -12,11 +12,9 @@ foam.CLASS({
     'foam.core.ContextAgent',
     'foam.core.X',
     'foam.dao.DAO',
-    'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.auth.User',
+    'foam.nanos.crunch.UserCapabilityJunction',
     'static foam.mlang.MLang.*',
-    
-    
   ],
 
   methods: [
