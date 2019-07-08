@@ -24,7 +24,7 @@ foam.CLASS({
       class: 'Map',
       name: 'customDatasetStyling',
       documentation: `
-        Property map that would hold the customization for each key type in the candlestickDAO.
+        Property map that would hold the customization for each key type
         1. Key must equal the candlestick's key.
         2. Value mapped with key must be a 1:1 mapping defined in chartjs.org's documentation.
       `
