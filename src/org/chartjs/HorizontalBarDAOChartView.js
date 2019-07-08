@@ -58,7 +58,9 @@ foam.CLASS({
           .orderBy(this.yExpr)
           .select(this.GROUP_BY(this.yExpr, this.GROUP_BY(this.keyExpr, this.SUM(this.xExpr))))
           .then(function (sink) {
-            // Clear data before cloning because it gets clobbered anyway.
+            // Clear data before cloning because we'll be clobbering
+            // it below anyway and cloning it can sometimes result in
+            // a stack overflow.
             self.config.data = { datasets: [] };
             var config = foam.Object.clone(self.config);
 
