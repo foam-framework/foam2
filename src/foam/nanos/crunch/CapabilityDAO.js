@@ -4,16 +4,7 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   javaImports: [
-    'foam.core.FObject',
-    'foam.dao.ArraySink',
-    'foam.dao.DAO',
     'foam.nanos.auth.*',
-    'foam.nanos.auth.User',
-    'foam.nanos.crunch.Capability',
-    'foam.nanos.crunch.CapabilityJunctionStatus',
-    'foam.nanos.crunch.UserCapabilityJunction',
-    'java.util.List',
-    'static foam.mlang.MLang.*',
   ],
 
   documentation: `
@@ -29,6 +20,7 @@ foam.CLASS({
           type: 'Context'
         }
       ],
+      documentation: `checks if a user is amin`,
       javaCode: `
       User user = (User) x.get("user");
       if( user == null ) throw new AuthorizationException();

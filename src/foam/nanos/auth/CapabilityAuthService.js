@@ -31,15 +31,15 @@ foam.CLASS({
     {
       name: 'check',
       documentation: `
-      check a permission of current by checking whether the capabilities of the user implies the permission
+      check if the given input string is in the userCapabilityJunctions or implied by a capability in userCapabilityJunctions for the current context user
       `,
       javaCode: `
       if ( x == null || permission == null ) return false;
-      Session session = x.get(Session.class);
-      if ( session == null || session.getUserId() == 0 ) return false;
+      if ( x.get(Session.class) == null ) return false;
       User user = (User) x.get("user");
       if( user == null || ! user.getEnabled() ) return false;
 
+      // temporary fix to get around authservice being called on build before some services (userCapabilityJunctionDAO) are available
       if ( user.getId() == 1 ) return true;  
 
       if ( ! getDelegate().check(x, "service.auth.checkUser") ) throw new AuthorizationException();
@@ -79,16 +79,17 @@ foam.CLASS({
     {
       name: 'checkUser',
       documentation: `
-      check if the given input string is in the userCapabilityJunctions or implied by a capability in userCapabilityJunctions
+      check if the given input string is in the userCapabilityJunctions or implied by a capability in userCapabilityJunctions for a given user
       `,
       javaCode: `
  
       if( x == null || permission == null ) return false;
-      Session session = x.get(Session.class);
-      if( session == null || session.getUserId() == 0 ) return false;
+      if( x.get(Session.class) == null ) return false;
       if( user == null || ! user.getEnabled() ) return false;
 
+      // temporary fix to get around authservice being called on build before some services (userCapabilityJunctionDAO) are available
       if ( user.getId() == 1 ) return true;  
+      
       if ( ! getDelegate().check(x, "service.auth.checkUser") ) throw new AuthorizationException();
 
       try {

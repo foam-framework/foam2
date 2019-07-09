@@ -6,14 +6,7 @@ foam.CLASS({
     documentation: `TODO`,
   
     javaImports: [
-      'foam.dao.ArraySink',
-      'foam.dao.DAO',
       'foam.nanos.auth.*',
-      'foam.nanos.crunch.Capability',
-      'foam.nanos.crunch.CapabilityJunctionStatus',
-      'foam.nanos.crunch.UserCapabilityJunction',
-      'java.util.List',
-      'static foam.mlang.MLang.*'
     ],
   
     methods: [

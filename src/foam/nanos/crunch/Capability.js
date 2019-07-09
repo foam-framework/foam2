@@ -12,7 +12,6 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
-    'foam.nanos.auth.*',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCapabilityJunction',
     'java.util.List',
@@ -67,7 +66,7 @@ foam.CLASS({
       class: 'Boolean',
       value: true,
       documentation: `capability is ignored by system when enabled is false.
-      user will lose permissions implied by this capability and upper level capabilities will ignore this prerequisite?`
+      user will lose permissions implied by this capability and upper level capabilities will ignore this prerequisite`
     },
     {
       name: 'visible',
@@ -114,6 +113,7 @@ foam.CLASS({
         this.permissionsGranted.forEach(function(permissionName) {
           if( permission === permissionName || this.stringImplies(permissionName, permission) ) return true;
         });
+
         this.prerequisiteCapabilityJunctionDAO.where(this.EQ(this.CapabilityCapabilityJunction.TARGET_ID, this.id))
           .select().then(function(sink) {
             var prerequisites = sink.array
@@ -135,6 +135,7 @@ foam.CLASS({
         for( String permissionName : permissionsGranted ) {
           if( permission.equals(permissionName) || this.stringImplies(permissionName, permission) ) return true; 
         }
+
         DAO prerequisiteCapabilityJunctionDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
         List<CapabilityCapabilityJunction> prereqs = (List<CapabilityCapabilityJunction>) ((ArraySink) prerequisiteCapabilityJunctionDAO
         .where(EQ(CapabilityCapabilityJunction.TARGET_ID, (String) this.getId()))
