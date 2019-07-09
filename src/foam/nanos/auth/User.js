@@ -224,6 +224,7 @@ foam.CLASS({
       name: 'timeZone',
       documentation: 'The preferred time zone of the User.',
       width: 5
+      // TODO: create custom view or DAO
     },
     {
       class: 'Password',
@@ -260,6 +261,8 @@ foam.CLASS({
       documentation: `The date and time that the current password of the User
         will expire.`,
     },
+    // TODO: startDate, endDate,
+    // TODO: do we want to replace 'note' with a simple ticket system?
     {
       class: 'String',
       name: 'note',
