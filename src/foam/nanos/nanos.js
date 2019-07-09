@@ -219,6 +219,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/SendNotificationOnTopLevelCapabilityStatusUpdate" },
   { name: "foam/nanos/crunch/CheckDependenciesOnGrantedCapabilityPut" },
   { name: "foam/nanos/crunch/IsGrantedCapability" },
+  { name: "foam/nanos/crunch/IsUserCapabilityJunctionStatusUpdate" },
   { name: "foam/nanos/crunch/DisableDeprecatedCapabilityOnPut" },
   { name: "foam/nanos/crunch/UpdateJunctionStatusOnDeprecatedCapabilityPut" },
   { name: "foam/nanos/crunch/RemoveJunctionsOnUserRemoval" },
