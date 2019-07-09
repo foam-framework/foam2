@@ -26,12 +26,10 @@ foam.CLASS({
     {
       class: 'foam.mlang.ExprProperty',
       name: 'keyExpr',
-      factory: function() { return this.Candlestick.KEY; }
     },
     {
       class: 'foam.mlang.ExprProperty',
       name: 'valueExpr',
-      factory: function() { return this.Candlestick.AVERAGE; }
     },
   ],
 
@@ -51,7 +49,7 @@ foam.CLASS({
             var config = foam.Object.clone(self.config);
             config.data = {
               datasets: [{
-                data: Object.keys(sink.groups).map(key => sink.groups[key].value),
+                data: Object.keys(sink.groups).map(key => sink.groups[key].value)
               }],
               labels: Object.keys(sink.groups)
             };
