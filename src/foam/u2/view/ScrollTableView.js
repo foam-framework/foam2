@@ -222,6 +222,20 @@
       type: 'Boolean',
       name: 'enableDynamicTableHeight',
       value: true,
+    },
+    {
+      class: 'Boolean',
+      name: 'multiSelectEnabled',
+      documentation: 'Pass through to UnstyledTableView.'
+    },
+    {
+      class: 'Map',
+      name: 'selectedObjects',
+      documentation: `
+        The objects selected by the user when multi-select support is enabled.
+        It's a map where the key is the object id and the value is the object.
+        Here we simply bind it to the selectedObjects property on TableView.
+      `
     }
   ],
 
@@ -250,7 +264,9 @@
               columns: this.columns,
               contextMenuActions: this.contextMenuActions,
               selection$: this.selection$,
-              editColumnsEnabled: this.editColumnsEnabled
+              editColumnsEnabled: this.editColumnsEnabled,
+              multiSelectEnabled: this.multiSelectEnabled,
+              selectedObjects$: this.selectedObjects$
             }, this.table_$).
               addClass(this.myClass('table')).
             end().
