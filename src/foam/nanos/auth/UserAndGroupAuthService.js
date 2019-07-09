@@ -49,16 +49,6 @@ foam.CLASS({
 
   constants: [
     {
-      name: 'PASSWORD_VALIDATE_REGEX',
-      type: 'String',
-      value: '^.{6,}$'
-    },
-    {
-      name: 'PASSWORD_VALIDATION_ERROR_MESSAGE',
-      type: 'String',
-      value: 'Password must be at least 6 characters long.'
-    },
-    {
       name: 'CHECK_USER_PERMISSION',
       type: 'String',
       value: 'service.auth.checkUser'
@@ -257,8 +247,8 @@ foam.CLASS({
     {
       name: 'validatePassword',
       javaCode: `
-        if ( SafetyUtil.isEmpty(potentialPassword) || ! (Pattern.compile(PASSWORD_VALIDATE_REGEX)).matcher(potentialPassword).matches() ) {
-          throw new RuntimeException(PASSWORD_VALIDATION_ERROR_MESSAGE);
+        if ( potentialPassword.length() < 6 ) {
+          throw new RuntimeException("PASSWORD_VALIDATION_ERROR");
         }
       `
     },

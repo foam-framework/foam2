@@ -35,7 +35,6 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'foam.nanos.notification.email.EmailMessage',
     'foam.util.Emails.EmailsUtility',
-    'foam.util.Password',
     'foam.util.SafetyUtil',
     'java.util.Calendar',
     'java.util.HashMap',

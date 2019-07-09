@@ -233,8 +233,7 @@ foam.CLASS({
         chooses to be used as a password but may or may not pass as valid.`,
       displayWidth: 30,
       width: 100,
-      storageTransient: true,
-      minLength: 7
+      storageTransient: true
     },
     {
       class: 'Password',

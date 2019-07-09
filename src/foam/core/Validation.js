@@ -327,10 +327,36 @@ foam.CLASS({
               },
               errorString: `${this.label} is required`
             }
-          )
+          );
         }
         return ret;
       }
     }
   ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'ValidationPasswordRefinement',
+  refines: 'foam.core.Password',
+
+  properties: [
+    {
+      name: 'minLength',
+      value: 6
+    },
+    {
+      class: 'FObjectArray',
+      of: 'foam.core.ValidationPredicate',
+      name: 'validationPredicates',
+      factory: function() {
+        if ( this.required ) {
+          var superFactory = foam.core.String.VALIDATION_PREDICATES.FACTORY;
+          return superFactory();
+        }
+        return [];
+      }
+    }
+  ]
+
 });
