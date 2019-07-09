@@ -87,6 +87,11 @@ foam.CLASS({
       javaFactory: `return getX().create(JSONParser.class);`
     },
     {
+      class: 'Boolean',
+      name: 'multiLine',
+      value: true
+    },
+    {
       class: 'foam.dao.DAOProperty',
       name: 'dao'
     },
@@ -282,6 +287,36 @@ foam.CLASS({
       `
     },
     {
+      name: 'getEntry',
+      documentation: 'retrieves ameaningful unit of text from the journal',
+      type: 'String',
+      args: [
+        {
+          name: 'reader',
+          type: 'BufferedReader'
+        }
+      ],
+      javaCode: `
+        try {
+          String line = reader.readLine();
+          if ( line == null ) return null;
+          StringBuilder sb = new StringBuilder();
+          sb.append(line);
+          if ( getMultiLine() ) {
+            while( ! line.trim().endsWith("})") && ! line.trim().startsWith("//") ) {
+              if ( (line = reader.readLine()) == null ) break;
+              sb.append("\\n");
+              sb.append(line);
+            }
+          }
+          return sb.toString().trim();
+        } catch (Throwable t) {
+          getLogger().error("Failed to read from journal", t);
+          return null;
+        }
+      `
+    },
+    {
       name: 'replay',
       documentation: 'Replays the journal file',
       javaCode: `
@@ -290,14 +325,14 @@ foam.CLASS({
         JSONParser parser = getParser();
 
         try ( BufferedReader reader = getReader() ) {
-          for ( String line ; ( line = reader.readLine() ) != null ; ) {
+          for ( String line ; ( line = getEntry(reader) ) != null ; ) {
             if ( SafetyUtil.isEmpty(line)        ) continue;
             if ( COMMENT.matcher(line).matches() ) continue;
 
             try {
               char operation = line.charAt(0);
-              int length = line.trim().length();
-              line = line.trim().substring(2, length - 1);
+              int length = line.length();
+              line = line.substring(2, length - 1);
 
               FObject obj = parser.parseString(line);
               if ( obj == null ) {
