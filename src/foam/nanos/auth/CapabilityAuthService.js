@@ -8,11 +8,11 @@ foam.CLASS({
   name: 'CapabilityAuthService',
   extends: 'foam.nanos.auth.ProxyAuthService',
   documentation: `
-  this decorator checks for either a capability or permission string. If the check returns false, delegate to next authservice. Return true otherwise.
+  This decorator checks for either a capability or permission string. If the check returns false, delegate to next authservice. Return true otherwise.
   `,
 
   implements: [
-    'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.AuthService'
   ],
 
   javaImports: [
@@ -28,15 +28,11 @@ foam.CLASS({
     'static foam.mlang.MLang.*'
   ],
 
-  imports: [
-
-  ],
-
   methods: [
     {
       name: 'check',
       documentation: `
-      check if the given input string is in the userCapabilityJunctions or implied by a capability in userCapabilityJunctions for the current context user
+      Check if the given input string is in the userCapabilityJunctions or implied by a capability in userCapabilityJunctions for the current context user
       `,
       javaCode: `
       if ( x == null || permission == null ) return false;
@@ -85,10 +81,9 @@ foam.CLASS({
     {
       name: 'checkUser',
       documentation: `
-      check if the given input string is in the userCapabilityJunctions or implied by a capability in userCapabilityJunctions for a given user
+      Check if the given input string is in the userCapabilityJunctions or implied by a capability in userCapabilityJunctions for a given user
       `,
       javaCode: `
- 
       if ( x == null || permission == null ) return false;
       if ( x.get(Session.class) == null ) return false;
       if ( user == null || ! user.getEnabled() ) return false;
@@ -136,6 +131,6 @@ foam.CLASS({
       javaCode: `
       return checkUser( x, user, permission.getName() );
       `
-    },
+    }
   ]
 });
