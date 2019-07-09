@@ -12,6 +12,7 @@ import foam.mlang.predicate.Or;
 import foam.mlang.predicate.Predicate;
 import foam.mlang.sink.GroupBy;
 import foam.nanos.logger.Logger;
+import foam.nanos.pm.PM;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashSet;
@@ -54,13 +55,16 @@ public class MDAO
   }
 
   public void addIndex(Index index) {
-    index_.addIndex(index);
+    synchronized ( writeLock_ ) {
+      state_ = index_.addIndex(state_, index);
+    }
   }
 
-  /** Add an Index which is for a unique value. **/
+  /** Add an Index which is for a unique value. Use addIndex() if the index is not unique. **/
   public void addUniqueIndex(PropertyInfo... props) {
     Index i = ValueIndex.instance();
     for ( PropertyInfo prop : props ) i = new TreeIndex(prop, i);
+    addIndex(i);
   }
 
   /** Add an Index which is for a non-unique value. The 'id' property is
@@ -69,6 +73,7 @@ public class MDAO
   public void addIndex(PropertyInfo... props) {
     Index i = new TreeIndex((PropertyInfo) this.of_.getAxiomByName("id"));
     for ( PropertyInfo prop : props ) i = new TreeIndex(prop, i);
+    addIndex(i);
   }
 
   synchronized Object getState() {
@@ -133,17 +138,19 @@ public class MDAO
 
     if ( o == null ) return null;
 
+    // TODO: PM unindexed plans
     return objOut(
-        getOf().isInstance(o)
-          ? (FObject) index_.planFind(state, getPrimaryKey().get(o)).find(state, getPrimaryKey().get(o))
-          : (FObject) index_.planFind(state, o).find(state,o)
+      getOf().isInstance(o)
+        ? (FObject) index_.planFind(state, getPrimaryKey().get(o)).find(state, getPrimaryKey().get(o))
+        : (FObject) index_.planFind(state, o).find(state, o)
     );
   }
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    Logger logger = (Logger) x.get("logger");
+    Logger     logger = (Logger) x.get("logger");
     SelectPlan plan;
     Predicate  simplePredicate = null;
+    PM         pm = null;
 
     // use partialEval to wipe out such useless predicate such as: And(EQ()) ==> EQ(), And(And(EQ()),GT()) ==> And(EQ(),GT())
     if ( predicate != null ) simplePredicate = predicate.partialEval();
@@ -155,10 +162,10 @@ public class MDAO
       Sink dependSink = new ArraySink();
       // When we have groupBy, order, skip, limit such requirement, we can't do it separately so I replace a array sink to temporarily holde the whole data
       //Then after the plan wa slelect we change it to the origin sink
-      int length = ( (Or) simplePredicate ).getArgs().length;
+      int length = ((Or) simplePredicate).getArgs().length;
       List<Plan> planList = new ArrayList<>();
-      for ( int i = 0; i < length; i++ ) {
-        Predicate arg = ( (Or) simplePredicate ).getArgs()[i];
+      for ( int i = 0 ; i < length ; i++ ) {
+        Predicate arg = ((Or) simplePredicate).getArgs()[i];
         planList.add(index_.planSelect(state, dependSink, 0, AbstractDAO.MAX_SAFE_INTEGER, null, arg));
       }
       plan = new OrPlan(simplePredicate, planList);
@@ -166,7 +173,8 @@ public class MDAO
       plan = index_.planSelect(state, sink, skip, limit, order, simplePredicate);
     }
 
-    if ( state != null && predicate != null && plan.cost() > 1000 && plan.cost() >= index_.size(state) ) {
+    if ( state != null && predicate != null && plan.cost() > 10 && plan.cost() >= index_.size(state) ) {
+      pm = new PM(this.getClass(), "MDAO:UnindexedSelect:" + getOf().getId());
       if ( ! unindexed_.contains(getOf().getId())) {
         if ( ! predicate.equals(simplePredicate) ) {
           logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
@@ -178,6 +186,9 @@ public class MDAO
 
     plan.select(state, sink, skip, limit, order, simplePredicate);
 
+    if ( pm != null ) pm.log(x);
+
+    sink.eof();
     return sink;
   }
 
