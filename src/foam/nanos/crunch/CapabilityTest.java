@@ -322,7 +322,7 @@ public class CapabilityTest extends Test {
   }
 
   public void testCapability(X x) {
-    // 1. test creating a capability
+    // test creating a capability
     c1 = new Capability();
     c1.setId("c1");
     c1.setIcon("icon.path");
@@ -334,9 +334,9 @@ public class CapabilityTest extends Test {
     c1.setPermissionsGranted( new String[] {p1} );
     c1.setExpiry((Date) ((new GregorianCalendar(2867, Calendar.JULY, 1)).getTime()));
     c1 = (Capability) capabilityDAO.put(c1);
-    test(c1 instanceof Capability, "1. Capability created");
+    test(c1 instanceof Capability, "Capability created");
 
-    // 2. test the capability.implies method where implies should return true
+    // test the capability.implies method where implies should return true
     c2 = new Capability();
     c2.setId("c2");
     c2.setPermissionsGranted( new String[] {p2});
@@ -347,22 +347,22 @@ public class CapabilityTest extends Test {
     prereqJunction = (CapabilityCapabilityJunction) prerequisiteCapabilityJunctionDAO.put(prereqJunction);
 
     c2 = (Capability) capabilityDAO.put(c2);
-    test(c2.implies(x, p1), "2. c2 implies p1");
+    test(c2.implies(x, p1), "c2 implies p1");
 
-    // 3. test the capability.implies method where implies should return false;
-    test(!c1.implies(x, p2), "3. c1 does not imply p2");
+    // test the capability.implies method where implies should return false;
+    test(!c1.implies(x, p2), "c1 does not imply p2");
 
-    // 4. test disabled capability does not imply their permissions granted
+    // test disabled capability does not imply their permissions granted
     c2 = ((Capability) c2.fclone());
     c2.setEnabled(false);
     c2 = (Capability) capabilityDAO.put(c2);
-    test((!c2.implies(x, p1)) && (!c2.implies(x, p2)), "4. c2 disabled and does not imply p1 and p2");
+    test((!c2.implies(x, p1)) && (!c2.implies(x, p2)), "c2 disabled and does not imply p1 and p2");
 
-    // 5. test re-enabled capability imply their permissions granted
+    // test re-enabled capability imply their permissions granted
     c2 = ((Capability) c2.fclone());
     c2.setEnabled(true);
     c2 = (Capability) capabilityDAO.put(c2);
-    test(c2.implies(x, p1) && c2.implies(x, p2), "5. c2 re-enabled implies p1 and p2");
+    test(c2.implies(x, p1) && c2.implies(x, p2), "c2 re-enabled implies p1 and p2");
   }
  
 }

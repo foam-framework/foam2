@@ -67,13 +67,7 @@ foam.CLASS({
             EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
           )) != null ) return true;
         
-        List<UserCapabilityJunction> userCapabilityJunctions = (List<UserCapabilityJunction>) ((ArraySink) userCapabilityJunctionDAO
-          .where(AND(
-            EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
-            EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
-          )) 
-          .select(new ArraySink()))
-          .getArray();
+        List<UserCapabilityJunction> userCapabilityJunctions = ((ArraySink) user.getCapabilities(x).getJunctionDAO().where(EQ(UserCapabilityJunction.SOURCE_ID, user.getId())).select(new ArraySink())).getArray();
         
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
 

@@ -121,11 +121,7 @@ foam.CLASS({
           if ( this.stringImplies(permissionName, permission) ) return true; 
         }
 
-        DAO prerequisiteCapabilityJunctionDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
-        List<CapabilityCapabilityJunction> prereqs = (List<CapabilityCapabilityJunction>) ((ArraySink) prerequisiteCapabilityJunctionDAO
-        .where( EQ(CapabilityCapabilityJunction.TARGET_ID, (String) this.getId()) )
-        .select( new ArraySink() ))
-        .getArray();
+        List<CapabilityCapabilityJunction> prereqs = ((ArraySink) this.getPrerequisites(x).getJunctionDAO().where(EQ(CapabilityCapabilityJunction.TARGET_ID, (String) this.getId())).select(new ArraySink())).getArray();
 
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         for ( CapabilityCapabilityJunction prereqJunction : prereqs ) {
@@ -160,22 +156,23 @@ foam.RELATIONSHIP({
   targetModel: 'foam.nanos.crunch.Capability',
   cardinality: '*:*',
   forwardName: 'capabilities',
-  inverseName: 'user'
+  inverseName: 'users'
 });
 
 foam.RELATIONSHIP({
   sourceModel: 'foam.nanos.crunch.Capability',  
   targetModel: 'foam.nanos.crunch.Capability',
   cardinality: '*:*',
-  forwardName: 'cap1',
-  inverseName: 'cap2'
+  forwardName: 'deprecated',
+  inverseName: 'deprecating',
+  junctionDAOKey: 'deprecatedCapabilityJunctionDAO'
 });
 
-// deprecatedCapabilityJunction
-// source is deprecated
-// target is deprecating
-
-// prerequisiteCapabilityJunction
-// source is prerequisite
-// target is one requiring prerequisite
-
+foam.RELATIONSHIP({
+  sourceModel: 'foam.nanos.crunch.Capability',  
+  targetModel: 'foam.nanos.crunch.Capability',
+  cardinality: '*:*',
+  forwardName: 'prerequisites',
+  inverseName: 'dependents',
+  junctionDAOKey: 'prerequisiteCapabilityJunctionDAO'
+});
