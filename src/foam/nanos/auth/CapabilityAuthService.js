@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'CapabilityAuthService',
@@ -42,17 +47,18 @@ foam.CLASS({
       // temporary fix to get around authservice being called on build before some services (userCapabilityJunctionDAO) are available
       if ( user.getId() == 1 ) return true;  
 
+      // check whether user has permission to check user permissions
       if ( ! getDelegate().check(x, "service.auth.checkUser") ) throw new AuthorizationException();
 
       try {
         DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
-        if(userCapabilityJunctionDAO.find(
+        if( userCapabilityJunctionDAO.find(
           AND(
             EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
             EQ(UserCapabilityJunction.TARGET_ID, permission),
             EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
-          )) != null) return true;
+          )) != null ) return true;
         
         List<UserCapabilityJunction> userCapabilityJunctions = (List<UserCapabilityJunction>) ((ArraySink) userCapabilityJunctionDAO
           .where(AND(
@@ -90,6 +96,7 @@ foam.CLASS({
       // temporary fix to get around authservice being called on build before some services (userCapabilityJunctionDAO) are available
       if ( user.getId() == 1 ) return true;  
       
+      // check whether user has permission to check user permissions
       if ( ! getDelegate().check(x, "service.auth.checkUser") ) throw new AuthorizationException();
 
       try {
