@@ -7,7 +7,7 @@ foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'UpdateJunctionStatusOnDeprecatedCapabilityPut',
 
-  documentation: 'set the status of usercapabilityjunctions to DEPRECATED when a capability is deprecated by another',
+  documentation: 'Set the status of usercapabilityjunctions to DEPRECATED when a capability is deprecated by another',
 
   implements: [
     'foam.nanos.ruler.RuleAction'
@@ -23,9 +23,7 @@ foam.CLASS({
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
     'java.util.List',
-    'static foam.mlang.MLang.*',
-    
-    
+    'static foam.mlang.MLang.*'
   ],
 
   methods: [
@@ -41,7 +39,7 @@ foam.CLASS({
         .select(new ArraySink()))
         .getArray();
 
-      for( UserCapabilityJunction ucJunction : userCapabilityJunctions ) {
+      for ( UserCapabilityJunction ucJunction : userCapabilityJunctions ) {
         final UserCapabilityJunction j = (UserCapabilityJunction) ucJunction.fclone();
         j.setStatus(CapabilityJunctionStatus.DEPRECATED);
         agency.submit(x, new ContextAgent() {

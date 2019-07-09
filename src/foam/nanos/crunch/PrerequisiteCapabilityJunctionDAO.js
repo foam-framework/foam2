@@ -8,10 +8,10 @@ foam.CLASS({
     name: 'PrerequisiteCapabilityJunctionDAO',
     extends: 'foam.dao.ProxyDAO',
   
-    documentation: `TODO`,
+    documentation: `Authenticated dao decorator`,
   
     javaImports: [
-      'foam.nanos.auth.*',
+      'foam.nanos.auth.*'
     ],
   
     methods: [
@@ -25,10 +25,10 @@ foam.CLASS({
         ],
         javaCode: `
         User user = (User) x.get("user");
-        if( user == null ) throw new AuthorizationException();
+        if ( user == null ) throw new AuthorizationException();
         AuthService auth = (AuthService) x.get("auth");
         boolean hasPermission = auth.check(x, "service.*");
-        if( ! hasPermission ) throw new AuthorizationException();
+        if ( ! hasPermission ) throw new AuthorizationException();
         `
       },
       {
@@ -63,7 +63,7 @@ foam.CLASS({
         javaCode:`
         return super.find_(x, id);
         `
-      },
+      }
     ]
   });
   

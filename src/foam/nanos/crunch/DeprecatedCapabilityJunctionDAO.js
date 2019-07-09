@@ -8,10 +8,10 @@ foam.CLASS({
   name: 'DeprecatedCapabilityJunctionDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: `only admin users have write access to this DAO, non-admin users have read access depending on their permissions.`,
+  documentation: `Only admin users have write access to this DAO, non-admin users have read access depending on their permissions.`,
 
   javaImports: [
-    'foam.nanos.auth.*',
+    'foam.nanos.auth.*'
   ],
 
   methods: [
@@ -63,7 +63,7 @@ foam.CLASS({
       javaCode:`
       return super.find_(x, id);
       `
-    },
+    }
   ]
 });
   

@@ -7,7 +7,7 @@ foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'SendNotificationOnTopLevelCapabilityStatusUpdate',
 
-  documentation: 'rule to notify user on every visible Capability status update.',
+  documentation: 'Rule to notify user on every visible Capability status update.',
 
   implements: [
     'foam.nanos.ruler.RuleAction'
@@ -21,7 +21,7 @@ foam.CLASS({
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.notification.Notification',
     'java.lang.StringBuilder',
-    'java.util.Date',
+    'java.util.Date'
   ],
 
   methods: [
@@ -33,7 +33,7 @@ foam.CLASS({
         public void execute(X x) {
           UserCapabilityJunction junction = (UserCapabilityJunction) obj;
           Capability cap = (Capability) ((DAO) x.get("capabilityDAO")).find(((String)junction.getTargetId()));
-          if( ! cap.getVisible() || junction.getStatus() == CapabilityJunctionStatus.DEPRECATED ) return;
+          if ( ! cap.getVisible() || junction.getStatus() == CapabilityJunctionStatus.DEPRECATED ) return;
 
           DAO notificationDAO = (DAO) x.get("notificationDAO");
 

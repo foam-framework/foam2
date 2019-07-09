@@ -7,7 +7,7 @@ foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'DisableDeprecatedCapabilityOnPut',
 
-  documentation: 'set enabled to false on deprecated capabilities',
+  documentation: 'Set enabled to false on deprecated capabilities',
 
   implements: [
     'foam.nanos.ruler.RuleAction'
@@ -18,7 +18,7 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.crunch.Capability',
-    'foam.nanos.crunch.CapabilityCapabilityJunction',
+    'foam.nanos.crunch.CapabilityCapabilityJunction'
   ],
 
   methods: [

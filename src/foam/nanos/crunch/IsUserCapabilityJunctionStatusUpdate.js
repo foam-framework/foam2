@@ -15,7 +15,7 @@ foam.CLASS({
   javaImports: [
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
-    'static foam.mlang.MLang.*',
+    'static foam.mlang.MLang.*'
   ],
 
   methods: [

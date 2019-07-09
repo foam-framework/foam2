@@ -8,8 +8,7 @@ foam.CLASS({
   name: 'UserCapabilityJunctionDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: `UserCapabilityJunctionDAO requires a custom authenticated DAO decorator to only show capabilities owned by a user. Updates can only be performed by system.`,
-
+  documentation: `Authenticated DAO decorator to only show capabilities owned by a user. Updates can only be performed by system.`,
 
   javaImports: [
     'foam.core.FObject',
@@ -21,7 +20,7 @@ foam.CLASS({
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
     'java.util.List',
-    'static foam.mlang.MLang.*',
+    'static foam.mlang.MLang.*'
   ],
 
   methods: [
@@ -36,7 +35,7 @@ foam.CLASS({
       type: 'foam.nanos.auth.User',
       javaCode: `
       User user = (User) x.get("user");
-      if( user == null ) throw new AuthenticationException("user not found");
+      if ( user == null ) throw new AuthenticationException("user not found");
       return user;
       `
     },
@@ -52,13 +51,13 @@ foam.CLASS({
           type: 'foam.core.FObject'
         }
       ],
-      documentation: `check if current user has permission to add this junction`,
+      documentation: `Check if current user has permission to add this junction`,
       javaCode: `
         User user = getUser(x);
         AuthService auth = (AuthService) x.get("auth");
         boolean isOwner = ((UserCapabilityJunction) obj).getSourceId() == user.getId();
         boolean hasPermission = auth.check(x, "service.*");
-        if( ! isOwner && ! hasPermission ) throw new AuthorizationException("permission denied");
+        if ( ! isOwner && ! hasPermission ) throw new AuthorizationException("permission denied");
       `
     },
     {
@@ -70,11 +69,11 @@ foam.CLASS({
         }
       ],
       type: 'foam.dao.DAO',
-      documentation: `return list of junctions the current user has read access to`,
+      documentation: `Return list of junctions the current user has read access to`,
       javaCode: `
       User user = getUser(x);
       AuthService auth = (AuthService) x.get("auth");
-      if( auth.check(x, "service.*") ) return getDelegate();
+      if ( auth.check(x, "service.*") ) return getDelegate();
       return getDelegate().where(
         EQ(UserCapabilityJunction.SOURCE_ID, user.getId())
       ); 
@@ -94,7 +93,7 @@ foam.CLASS({
       ],
       type: 'foam.core.FObject',
       documentation: `
-      set the status of the junction before putting by checking if prerequisites are fulfilled and data required is validated.
+      Set the status of the junction before putting by checking if prerequisites are fulfilled and data required is validated.
       If status is set to GRANTED, check if junctions depending on current can be granted
       `,
       javaCode: `
@@ -103,8 +102,8 @@ foam.CLASS({
       boolean prereq = checkPrereqs(x, obj);
       boolean data = validateData(x, obj);
 
-      if( ((UserCapabilityJunction) obj).getStatus() != CapabilityJunctionStatus.DEPRECATED ) {
-        if( prereq && data ) ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.GRANTED);
+      if ( ((UserCapabilityJunction) obj).getStatus() != CapabilityJunctionStatus.DEPRECATED ) {
+        if ( prereq && data ) ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.GRANTED);
         else ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.PENDING);
       }
       return getDelegate().put_(x, obj);
@@ -124,7 +123,7 @@ foam.CLASS({
         }
       ],
       type: 'Boolean',
-      documentation: `check if prerequisites of a capability is fulfilled`,
+      documentation: `Check if prerequisites of a capability is fulfilled`,
       javaCode: `
       DAO capabilityDAO = (DAO) x.get("capabilityDAO");
       DAO prerequisiteCapabilityJunctionDAO = (DAO) (x.get("prerequisiteCapabilityJunctionDAO"));
@@ -135,15 +134,15 @@ foam.CLASS({
       .select(new ArraySink()))
       .getArray();
 
-      for( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
+      for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
         Capability cap = (Capability) ((DAO) x.get("capabilityDAO")).find((String) ccJunction.getSourceId());
-        if(!cap.getEnabled()) continue;
+        if (!cap.getEnabled()) continue;
         UserCapabilityJunction ucJunction = (UserCapabilityJunction) getDelegate().find(AND(
           EQ(UserCapabilityJunction.SOURCE_ID, ((UserCapabilityJunction) obj).getSourceId()),
           EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getSourceId())
         ));
         // at this point there shouldn't be a junction with status deprecated because the cap should have enabled set to false
-        if( ucJunction == null || ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED ) return false;
+        if ( ucJunction == null || ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED ) return false;
       }
       return true;
       `

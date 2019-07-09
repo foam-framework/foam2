@@ -7,7 +7,7 @@ foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'CheckDependenciesOnGrantedCapabilityPut',
 
-  documentation: 'rule to update any capabilities depending on current capability as prerequisite if the current capability is set to GRANTED',
+  documentation: 'Rule to update any capabilities depending on current capability as prerequisite if the current capability is set to GRANTED',
 
   implements: [
     'foam.nanos.ruler.RuleAction'
@@ -23,7 +23,7 @@ foam.CLASS({
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
     'java.util.List',
-    'static foam.mlang.MLang.*',
+    'static foam.mlang.MLang.*'
   ],
 
   methods: [
@@ -46,14 +46,14 @@ foam.CLASS({
       .select(new ArraySink()))
       .getArray();
 
-      for( UserCapabilityJunction pendingJunction : pendingJunctions ) {
+      for ( UserCapabilityJunction pendingJunction : pendingJunctions ) {
         final CapabilityCapabilityJunction prereqJunction = (CapabilityCapabilityJunction) prerequisiteCapabilityJunctionDAO.find(
           AND(
             EQ(CapabilityCapabilityJunction.SOURCE_ID, capId),
             EQ(CapabilityCapabilityJunction.TARGET_ID, (String) pendingJunction.getTargetId())
           )
         );
-        if( prereqJunction != null ) {
+        if ( prereqJunction != null ) {
           agency.submit(x, new ContextAgent() {
             @Override
             public void execute(X x) {

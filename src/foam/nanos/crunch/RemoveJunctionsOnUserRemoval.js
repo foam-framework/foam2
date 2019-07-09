@@ -7,7 +7,7 @@ foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'RemoveJunctionsOnUserRemoval',
 
-  documentation: 'rule to remove any user-capability relationships when a user is removed',
+  documentation: 'Rule to remove any user-capability relationships when a user is removed',
 
   implements: [
     'foam.nanos.ruler.RuleAction'
@@ -19,7 +19,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.auth.User',
     'foam.nanos.crunch.UserCapabilityJunction',
-    'static foam.mlang.MLang.*',
+    'static foam.mlang.MLang.*'
   ],
 
   methods: [
