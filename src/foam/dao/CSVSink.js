@@ -45,7 +45,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'isNewLine',
+      name: 'isFirstRow',
       value: true,
       visibility: 'HIDDEN'
     },
@@ -66,13 +66,13 @@ foam.CLASS({
         { name: 'value' }
       ],
       code: function(value) {
-        if ( ! this.isNewLine ) this.csv += ',';
-        this.isNewLine = false;
+        if ( ! this.isFirstRow ) this.csv += ',';
+        this.isFirstRow = false;
         this.output_(value);
       },
       javaCode: `
-        if ( ! getIsNewLine() ) getSb().append(",");
-        setIsNewLine(false);
+        if ( ! getIsFirstRow() ) getSb().append(",");
+        setIsFirstRow(false);
         output_(value);
       `
     },
@@ -131,11 +131,11 @@ foam.CLASS({
       name: 'newLine_',
       code: function() {
         this.csv += '\n';
-        this.isNewLine = true;
+        this.isFirstRow = true;
       },
       javaCode: `
         getSb().append("\\n");
-        setIsNewLine(true);
+        setIsFirstRow(true);
       `
     },
     {
@@ -190,13 +190,13 @@ foam.CLASS({
     {
       name: 'reset',
       code: function() {
-        ['csv', 'isNewLine', 'isHeadersOutput']
+        ['csv', 'isFirstRow', 'isHeadersOutput']
           .forEach( (s) => this.clearProperty(s) );
       },
       javaCode: `
         getSb().setLength(0);
         clearCsv();
-        clearIsNewLine();
+        clearIsFirstRow();
         clearIsHeadersOutput();
       `
     }
