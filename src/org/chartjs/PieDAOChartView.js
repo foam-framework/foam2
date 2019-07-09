@@ -25,12 +25,23 @@ foam.CLASS({
     },
     {
       class: 'foam.mlang.ExprProperty',
-      name: 'keyExpr',
+      name: 'keyExpr'
     },
     {
       class: 'foam.mlang.ExprProperty',
-      name: 'valueExpr',
+      name: 'valueExpr'
     },
+    {
+      name: 'backgroundColor',
+      factory: function() {
+        // You can also return an array of colors. But bear in mind that the length of the array
+        // must match the number of data being displayed as it will match the index of the data.
+        return function(context) {
+          const palette = ['#E3170D', '#AF4035', '#CC1100', '#FFE4E1', '#FF6347', '#FF6600'];
+          return palette[context.dataIndex % palette.length];
+        }
+      }
+    }
   ],
 
   listeners: [
@@ -49,7 +60,8 @@ foam.CLASS({
             var config = foam.Object.clone(self.config);
             config.data = {
               datasets: [{
-                data: Object.keys(sink.groups).map(key => sink.groups[key].value)
+                data: Object.keys(sink.groups).map(key => sink.groups[key].value),
+                backgroundColor: self.backgroundColor
               }],
               labels: Object.keys(sink.groups)
             };
