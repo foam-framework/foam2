@@ -42,10 +42,8 @@ public class StringParser
     if ( ! ps.valid() ) return null;
     char delim = ps.head();
 
-    if ( delim != '"' && delim != '\'' ) return null;
-
-    ps = ps.tail();
-    char lastc = delim;
+    ps = ps.apply(delimiterParser, x);
+    if ( ! ps ) return null;
 
     StringBuilder builder = sb.get();
 
