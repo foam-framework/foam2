@@ -214,16 +214,19 @@ foam.CLASS({
       this.
         addClass(this.myClass()).
         addClass(this.myClass(this.of.id.replace(/\./g, '-'))).
-        setNodeName('table').
-        start('thead').
+        start().
+          addClass(this.myClass('thead')).
           show(this.showHeader$).
           add(this.slot(function(columns_) {
-            return this.E('tr').
+            return this.E().
+              addClass(view.myClass('tr')).
+
               // If multi-select is enabled, then we show a checkbox in the
               // header that allows you to select all or select none.
               callIf(view.multiSelectEnabled, function() {
                 var slot = view.SimpleSlot.create();
-                this.start('th').
+                this.start().
+                  addClass(view.myClass('th')).
                   tag(view.CheckBox, {}, slot).
                   style({ width: '42px' }).
                 end();
@@ -254,10 +257,15 @@ foam.CLASS({
 
               // Render the table headers for the property columns.
               forEach(columns_, function(column) {
-                this.start('th').
+                this.start().
+                  addClass(view.myClass('th')).
                   addClass(view.myClass('th-' + column.name)).
-                  callIf(column.tableWidth, function() {
-                    this.style({ width: column.tableWidth + 'px' });
+                  call(function() {
+                    if ( column.tableWidth ) {
+                      this.style({ flex: `0 0 ${column.tableWidth}px` });
+                    } else {
+                      this.style({ flex: '1 0 0' });
+                    }
                   }).
                   on('click', function(e) {
                     view.sortBy(column);
@@ -277,7 +285,9 @@ foam.CLASS({
               // menu. If the column-editing feature is enabled, add that to the
               // th we create here.
               call(function() {
-                this.start('th').
+                this.start().
+                  addClass(view.myClass('th')).
+                  style({ flex: '0 0 60px' }).
                   callIf(view.editColumnsEnabled, function() {
                     this.addClass(view.myClass('th-editColumns')).
                     on('click', function(e) {
@@ -287,7 +297,6 @@ foam.CLASS({
                     addClass(view.myClass('vertDots')).
                     addClass(view.myClass('noselect'));
                   }).
-                  style({ width: '60px' }).
                   tag('div', null, view.dropdownOrigin$).
                 end();
               });
@@ -325,9 +334,11 @@ foam.CLASS({
             : modelActions;
 
           return this.
-            E('tbody').
+            E().
+            addClass(this.myClass('tbody')).
             select(proxy, function(obj) {
-              return this.E('tr').
+              return this.E().
+                addClass(view.myClass('tr')).
                 on('mouseover', function() { view.hoverSelection = obj; }).
                 callIf(view.dblclick && ! view.disableUserSelection, function() {
                   this.on('dblclick', function() {
@@ -359,7 +370,8 @@ foam.CLASS({
                 callIf(view.multiSelectEnabled, function() {
                   var slot = view.SimpleSlot.create();
                   this
-                    .start('td')
+                    .start()
+                      .addClass(view.myClass('td'))
                       .tag(view.CheckBox, { data: view.idsOfObjectsTheUserHasInteractedWith_[obj.id] ? !!view.selectedObjects[obj.id] : view.allCheckBoxesEnabled_ }, slot)
                     .end();
 
@@ -417,7 +429,8 @@ foam.CLASS({
 
                 forEach(columns_, function(column) {
                   this.
-                    start('td').
+                    start().
+                      addClass(view.myClass('td')).
                       callOn(column.tableCellFormatter, 'format', [
                         column.f ? column.f(obj) : null, obj, column
                       ]).
@@ -429,11 +442,19 @@ foam.CLASS({
                           }
                         } catch (err) {}
                       }).
+                      call(function() {
+                        if ( column.tableWidth ) {
+                          this.style({ flex: `0 0 ${column.tableWidth}px` });
+                        } else {
+                          this.style({ flex: '1 0 0' });
+                        }
+                      }).
                     end();
                 }).
-                start('td').
+                start().
+                  addClass(view.myClass('td')).
                   attrs({ name: 'contextMenuCell' }).
-                  addClass(view.myClass('context-menu-cell')).
+                  style({ flex: '0 0 60px' }).
                   tag(view.OverlayActionListView, {
                     data: actions,
                     obj: obj

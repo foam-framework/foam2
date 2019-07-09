@@ -61,11 +61,8 @@ foam.CLASS({
     ^container {
       display: grid;
       grid-template-columns: fit-content(100%) auto;
+      grid-gap: 10px;
       overflow-x: scroll;
-    }
-
-    ^container > * + * {
-      margin-left: 10px;
     }
 
     ^ .actions {
@@ -123,7 +120,6 @@ foam.CLASS({
   reactions: [
     ['data', 'action.create', 'onCreate'],
     ['data', 'edit', 'onEdit'],
-    ['data', 'action.findRelatedObject', 'onFindRelated'],
     ['data', 'finished', 'onFinished'],
     ['data', 'export', 'onExport']
   ],
@@ -196,7 +192,11 @@ foam.CLASS({
               .end()
               .start()
                 .style({ 'overflow-x': 'auto' })
-                .tag(this.summaryView, { data$: this.data.filteredDAO$ })
+                .tag(this.summaryView, {
+                  data$: this.data.filteredDAO$,
+                  multiSelectEnabled: !! this.data.relationship,
+                  selectedObjects$: this.data.selectedObjects$
+                })
               .end()
             .end()
           .end());
@@ -226,19 +226,6 @@ foam.CLASS({
         class: this.updateView.class,
         detailView: this.data.detailView,
         key: id
-      }, this);
-    },
-
-    function onFindRelated() {
-      var data = this.DAOController.create({
-        data: this.data.relationship.targetDAO,
-        addEnabled: true,
-        relationship: this.data.relationship
-      });
-
-      this.stack.push({
-        class: 'foam.comics.DAOControllerView',
-        data: data
       }, this);
     },
 
