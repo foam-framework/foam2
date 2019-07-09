@@ -201,6 +201,7 @@ var classes = [
   'foam.nanos.auth.PermissionedPropertyDAO',
   'foam.nanos.auth.HidePropertiesSink',
   'foam.nanos.auth.ServiceProvider',
+  'foam.nanos.auth.twofactor.OTPKey',
   'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.auth.twofactor.AbstractOTPAuthService',
   'foam.nanos.auth.twofactor.AbstractTOTPAuthService',
