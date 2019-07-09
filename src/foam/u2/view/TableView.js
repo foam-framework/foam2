@@ -10,12 +10,6 @@ foam.CLASS({
   extends: 'foam.u2.view.UnstyledTableView',
 
   css: `
-    ^ {
-      width: 1450px;
-      border-spacing: 14px 8px;
-      border-collapse: collapse;
-    }
-
     ^tr {
       background: white;
       border-bottom: 1px solid /*%GREY4%*/ #e7eaec;
@@ -49,7 +43,9 @@ foam.CLASS({
       overflow: hidden;
       padding-left: 16px;
       text-align: left;
+      text-overflow: ellipsis;
       white-space: nowrap;
+      min-width: 40px; /* So when the table's width decreases, columns aren't hidden completely */
     }
 
     ^th {
