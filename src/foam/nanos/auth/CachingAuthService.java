@@ -74,7 +74,7 @@ public class CachingAuthService
 
       DAO userDAO       = (DAO) x.get("localUserDAO");
       DAO groupDAO      = (DAO) x.get("localGroupDAO");
-      DAO groupPermissionJunctionDAO = (DAO) x.get("groupPermissionJunctionDAO");
+      DAO groupPermissionJunctionDAO = (DAO) x.get("localGroupPermissionJunctionDAO");
       User user         = (User) x.get("user");
 
       groupDAO.listen(purgeSink, TRUE);
