@@ -60,11 +60,8 @@ foam.CLASS({
     ^container {
       display: grid;
       grid-template-columns: fit-content(100%) auto;
+      grid-gap: 10px;
       overflow-x: scroll;
-    }
-
-    ^container > * + * {
-      margin-left: 10px;
     }
 
     ^ .actions {
