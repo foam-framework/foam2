@@ -36,9 +36,8 @@ foam.CLASS({
       `,
       javaCode: `
       User user = (User) x.get("user");
-      if ( user != null ) return checkUser(x, user, permission);
-
-      return false;
+      if ( user != null && checkUser(x, user, permission) ) return true;
+      return getDelegate().check(x, permission);
       `
     },     
     {
@@ -55,7 +54,7 @@ foam.CLASS({
       if ( user.getId() == 1 ) return true;  
       
       // check whether user has permission to check user permissions
-      if ( ! getDelegate().check(x, "service.auth.checkUser") ) throw new AuthorizationException();
+      if ( ! getDelegate().check(x, "service.auth.checkUser") ) return false;
 
       try {
         DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
