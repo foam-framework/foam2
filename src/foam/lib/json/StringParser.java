@@ -16,6 +16,10 @@ public class StringParser
   protected final static char ESCAPE = '\\';
   protected final static ThreadLocal<Parser> unicodeParser = ThreadLocal.withInitial(UnicodeParser::new);
   protected final static ThreadLocal<Parser> asciiEscapeParser = ThreadLocal.withInitial(ASCIIEscapeParser::new);
+  private Parser delimiterParser = new Alt(new Literal("\"\"\""), 
+    new Literal("\""),
+    new Literal("'")
+    );
   protected final static ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
 
     @Override
