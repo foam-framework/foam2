@@ -90,11 +90,11 @@ public class CapabilityTest extends Test {
     user = (User) userDAO.put_(x, user);
 
     Capability inner = new Capability();
-    inner.setName("inner");
+    inner.setId("inner");
     inner.setOf(FakeDataObject.getOwnClassInfo());
 
     Capability outer = new Capability();
-    outer.setName("outer");
+    outer.setId("outer");
     outer.setOf(FakeDataObject.getOwnClassInfo());
 
     inner = (Capability) capabilityDAO.put_(x, inner);
@@ -147,22 +147,22 @@ public class CapabilityTest extends Test {
     Capability other = new Capability();
     Capability crunch = new Capability();
 
-    crunch.setName("crunch.*");
+    crunch.setId("crunch.*");
     crunch.setPermissionsGranted(new String[] {permission1});
     crunch.setOf(FakeDataObject.getOwnClassInfo());
     crunch = (Capability) capabilityDAO.put_(x, crunch);
 
-    other.setName("other.*");
+    other.setId("other.*");
     other.setPermissionsGranted(new String[] {permission2});
     other.setOf(FakeDataObject.getOwnClassInfo());
     other = (Capability) capabilityDAO.put_(x, other);
 
-    readCrunch.setName("crunch.read");
+    readCrunch.setId("crunch.read");
     readCrunch.setPermissionsGranted(new String[] {permission3});
     readCrunch.setOf(FakeDataObject.getOwnClassInfo());
     readCrunch = (Capability) capabilityDAO.put_(x, readCrunch);    
 
-    readOther.setName("other.read.*");
+    readOther.setId("other.read.*");
     readOther.setPermissionsGranted(new String[] {permission4});
     readOther.setOf(FakeDataObject.getOwnClassInfo());
     readOther = (Capability) capabilityDAO.put_(x, readOther);
@@ -213,13 +213,13 @@ public class CapabilityTest extends Test {
     data.setUsername("RUBY");
     data.setPassword("PASS");
     
-    c0.setName("c0"); 
+    c0.setId("c0"); 
     c0.setOf(FakeDataObject.getOwnClassInfo());
     c0 = (Capability) capabilityDAO.put_(x, c0);
-    c1.setName("c1");
+    c1.setId("c1");
     c1.setOf(FakeDataObject.getOwnClassInfo());
     c1 = (Capability) capabilityDAO.put_(x, c1);
-    c2.setName("c2");
+    c2.setId("c2");
     c2.setOf(FakeDataObject.getOwnClassInfo());
     c2 = (Capability) capabilityDAO.put_(x, c2);
 
@@ -275,12 +275,12 @@ public class CapabilityTest extends Test {
     String permission3 = "outerPermission";
 
     Capability inner = new Capability();
-    inner.setName("inner");
+    inner.setId("inner");
     inner.setPermissionsGranted(new String[]{permission1, permission2});
     inner.setOf(FakeDataObject.getOwnClassInfo());
 
     Capability outer = new Capability();
-    outer.setName("outer");
+    outer.setId("outer");
     outer.setPermissionsGranted(new String[]{permission3});
     outer.setOf(FakeDataObject.getOwnClassInfo());
 
@@ -324,7 +324,7 @@ public class CapabilityTest extends Test {
   public void testCapability(X x) {
     // 1. test creating a capability
     c1 = new Capability();
-    c1.setName("c1");
+    c1.setId("c1");
     c1.setIcon("icon.path");
     c1.setDescription("The first ever capability!");
     c1.setNotes("noted");
@@ -338,12 +338,12 @@ public class CapabilityTest extends Test {
 
     // 2. test the capability.implies method where implies should return true
     c2 = new Capability();
-    c2.setName("c2");
+    c2.setId("c2");
     c2.setPermissionsGranted( new String[] {p2});
 
     prereqJunction = new CapabilityCapabilityJunction();
-    prereqJunction.setSourceId((String) c1.getName());
-    prereqJunction.setTargetId((String) c2.getName());
+    prereqJunction.setSourceId((String) c1.getId());
+    prereqJunction.setTargetId((String) c2.getId());
     prereqJunction = (CapabilityCapabilityJunction) prerequisiteCapabilityJunctionDAO.put(prereqJunction);
 
     c2 = (Capability) capabilityDAO.put(c2);
