@@ -427,7 +427,7 @@ var classes = [
   'foam.nanos.crunch.DeprecatedCapabilityJunctionDAO',
   'foam.nanos.crunch.PrerequisiteCapabilityJunctionDAO',
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
-  'foam.nanos.crunch.CapabilityDAO',
+  'foam.nanos.crunch.AuthenticatedCapabilityDAO',
   //rules
   'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
   'foam.nanos.crunch.CheckDependenciesOnGrantedCapabilityPut',

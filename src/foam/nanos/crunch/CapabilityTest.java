@@ -44,7 +44,7 @@ public class CapabilityTest extends Test {
 
   public void runTest(X x) {
     x = TestUtils.mockDAO(x, "localUserDAO");
-    DAO dao = new CapabilityDAO.Builder(x).setDelegate(new MDAO(Capability.getOwnClassInfo())).build();
+    DAO dao = new AuthenticatedCapabilityDAO.Builder(x).setDelegate(new MDAO(Capability.getOwnClassInfo())).build();
     x = x.put("capabilityDAO", dao);
     dao = new UserCapabilityJunctionDAO.Builder(x).setDelegate(new MDAO(UserCapabilityJunction.getOwnClassInfo())).build();
     dao = new RulerDAO(x, dao, "userCapabilityJunctionDAO");

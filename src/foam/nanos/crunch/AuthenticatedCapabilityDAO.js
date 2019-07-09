@@ -5,15 +5,15 @@
  */
 foam.CLASS({
   package: 'foam.nanos.crunch',
-  name: 'CapabilityDAO',
+  name: 'AuthenticatedCapabilityDAO',
   extends: 'foam.dao.ProxyDAO',
 
   javaImports: [
-    'foam.nanos.auth.*',
+    'foam.nanos.auth.*'
   ],
 
   documentation: `
-  only admin users have write access to capabilityDAO, non-admin users have read access depending on their permissions
+  Only admin users have write access to capabilityDAO, non-admin users have read access depending on their permissions.
   `,
 
   methods: [
@@ -25,13 +25,13 @@ foam.CLASS({
           type: 'Context'
         }
       ],
-      documentation: `checks if a user is amin`,
+      documentation: `Checks if a user is admin`,
       javaCode: `
       User user = (User) x.get("user");
-      if( user == null ) throw new AuthorizationException();
+      if ( user == null ) throw new AuthorizationException();
       AuthService auth = (AuthService) x.get("auth");
       boolean hasPermission = auth.check(x, "service.*");
-      if( ! hasPermission ) throw new AuthorizationException();
+      if ( ! hasPermission ) throw new AuthorizationException();
       `
     },
     {
@@ -66,7 +66,7 @@ foam.CLASS({
       javaCode:`
       return super.find_(x, id);
       `
-    },
+    }
   ]
 });
     
