@@ -34,7 +34,7 @@ foam.CLASS({
     'dblclick?',
     'editRecord?',
     'selection? as importSelection',
-    'filteredTableColumns'
+    'filteredTableColumns?'
   ],
 
   properties: [
@@ -58,22 +58,22 @@ foam.CLASS({
       for the purpose of having the filtered DAO list available for CSV outputting.`,
       expression: function(columns, of) {
         var of = this.of;
-        this.filteredTableColumns = [];
-
         if ( ! of ) return propNameList;
-
         var prop;
+        var filteredTableColumns = [];
+
         return columns.map((propName) => {
           if ( typeof propName == 'string' ) {
             prop = of.getAxiomByName(propName);
-            this.filteredTableColumns.push(propName);
+            filteredTableColumns.push(propName);
           } else {
             prop = propName;
-            this.filteredTableColumns.push(propName.name);
+            filteredTableColumns.push(propName.name);
           }
           if ( ! prop ) {
             console.error('Unknown table column: ', propName);
           }
+          this.filteredTableColumns = filteredTableColumns;
           return prop;
         });
       }
