@@ -351,8 +351,8 @@ foam.CLASS({
       name: 'validationPredicates',
       factory: function() {
         if ( this.required ) {
-          var superFactory = foam.core.String.VALIDATION_PREDICATES.FACTORY;
-          return superFactory();
+          var superFactory = foam.core.String.VALIDATION_PREDICATES.factory;
+          return superFactory.call(this);
         }
         return [];
       }
