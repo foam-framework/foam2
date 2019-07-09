@@ -16,7 +16,7 @@ public class StringParser
   protected final static char ESCAPE = '\\';
   protected final static ThreadLocal<Parser> unicodeParser = ThreadLocal.withInitial(UnicodeParser::new);
   protected final static ThreadLocal<Parser> asciiEscapeParser = ThreadLocal.withInitial(ASCIIEscapeParser::new);
-  private Parser delimiterParser = new Alt(new Literal("\"\"\""), 
+  protected Parser delimiterParser = new Alt(new Literal("\"\"\""), 
     new Literal("\""),
     new Literal("'")
     );
@@ -44,13 +44,19 @@ public class StringParser
 
     ps = ps.apply(delimiterParser, x);
     if ( ! ps ) return null;
+    delimiter = new Literal((String)ps.getValue());
 
     StringBuilder builder = sb.get();
+    PStream temps;
 
     while ( ps.valid() ) {
       char c = ps.head();
 
-      if ( c == delim && lastc != ESCAPE ) break;
+      temps = ps.apply(delimiter, x);
+      if ( temps != null ) {
+        ps = temps;
+        break;
+      }
 
       PStream tail = ps.tail();
 
