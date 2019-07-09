@@ -12,16 +12,16 @@ import foam.lib.parse.ParserContext;
 import foam.lib.parse.Alt;
 
 public class StringParser
-  implements Parser
+  implements Parser 
 {
   MultiLineStringParser mp = new MultiLineStringParser();
   SingleLineStringParser sp = new SingleLineStringParser();
+  Alt altp = new Alt(new MultiLineStringParser(), new SingleLineStringParser());
 
   public StringParser() {
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    Alt altp = new Alt(new MultiLineStringParser(), new SingleLineStringParser());
     return altp.parse(ps, x);
   }
 }
