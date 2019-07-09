@@ -9,6 +9,8 @@ package foam.lib.json;
 import foam.lib.parse.PStream;
 import foam.lib.parse.Parser;
 import foam.lib.parse.ParserContext;
+import foam.lib.parse.Alt;
+import foam.lib.parse.Literal;
 
 public class StringParser
   implements Parser
@@ -40,23 +42,19 @@ public class StringParser
 
   public PStream parse(PStream ps, ParserContext x) {
     if ( ! ps.valid() ) return null;
-    char delim = ps.head();
 
     ps = ps.apply(delimiterParser, x);
-    if ( ! ps ) return null;
-    delimiter = new Literal((String)ps.getValue());
+    if ( ps == null ) return null;
+    Parser delimiter = new Literal((String)ps.value());
 
     StringBuilder builder = sb.get();
-    PStream temps;
+    PStream result;
 
     while ( ps.valid() ) {
       char c = ps.head();
 
-      temps = ps.apply(delimiter, x);
-      if ( temps != null ) {
-        ps = temps;
-        break;
-      }
+      result = ps.apply(delimiter, x);
+      if ( result != null ) break;
 
       PStream tail = ps.tail();
 
@@ -76,7 +74,6 @@ public class StringParser
       }
 
       ps = tail;
-      lastc = c;
     }
 
     return ps.tail().setValue(builder.toString());
