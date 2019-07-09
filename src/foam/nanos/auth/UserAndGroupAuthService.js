@@ -49,6 +49,11 @@ foam.CLASS({
 
   constants: [
     {
+      name: 'PASSWORD_VALIDATION_ERROR_MESSAGE',
+      type: 'String',
+      value: 'Password must be at least 6 characters long.'
+    },
+    {
       name: 'CHECK_USER_PERMISSION',
       type: 'String',
       value: 'service.auth.checkUser'
@@ -247,8 +252,8 @@ foam.CLASS({
     {
       name: 'validatePassword',
       javaCode: `
-        if ( potentialPassword.length() < 6 ) {
-          throw new RuntimeException("PASSWORD_VALIDATION_ERROR");
+        if ( SafetyUtil.isEmpty(potentialPassword) || potentialPassword.length() < 6 ) {
+          throw new RuntimeException(PASSWORD_VALIDATION_ERROR_MESSAGE);
         }
       `
     },
