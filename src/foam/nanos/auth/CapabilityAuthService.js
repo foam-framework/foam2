@@ -42,7 +42,7 @@ foam.CLASS({
       if ( x == null || permission == null ) return false;
       if ( x.get(Session.class) == null ) return false;
       User user = (User) x.get("user");
-      if( user == null || ! user.getEnabled() ) return false;
+      if ( user == null || ! user.getEnabled() ) return false;
 
       // temporary fix to get around authservice being called on build before some services (userCapabilityJunctionDAO) are available
       if ( user.getId() == 1 ) return true;  
@@ -53,7 +53,7 @@ foam.CLASS({
       try {
         DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
-        if( userCapabilityJunctionDAO.find(
+        if ( userCapabilityJunctionDAO.find(
           AND(
             EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
             EQ(UserCapabilityJunction.TARGET_ID, permission),
@@ -70,9 +70,9 @@ foam.CLASS({
         
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
 
-        for( UserCapabilityJunction ucJunction : userCapabilityJunctions ) {
+        for ( UserCapabilityJunction ucJunction : userCapabilityJunctions ) {
           Capability capability = (Capability) capabilityDAO.find(ucJunction.getTargetId());
-          if( capability.implies(x, permission) ) return true;
+          if ( capability.implies(x, permission) ) return true;
         }
       } catch (Exception e) {
         Logger logger = (Logger) x.get("logger");
@@ -89,9 +89,9 @@ foam.CLASS({
       `,
       javaCode: `
  
-      if( x == null || permission == null ) return false;
-      if( x.get(Session.class) == null ) return false;
-      if( user == null || ! user.getEnabled() ) return false;
+      if ( x == null || permission == null ) return false;
+      if ( x.get(Session.class) == null ) return false;
+      if ( user == null || ! user.getEnabled() ) return false;
 
       // temporary fix to get around authservice being called on build before some services (userCapabilityJunctionDAO) are available
       if ( user.getId() == 1 ) return true;  
@@ -102,7 +102,7 @@ foam.CLASS({
       try {
         DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
-        if( userCapabilityJunctionDAO.find(
+        if ( userCapabilityJunctionDAO.find(
           AND(
             EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
             EQ(UserCapabilityJunction.TARGET_ID, permission),
@@ -119,9 +119,9 @@ foam.CLASS({
         
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
 
-        for( UserCapabilityJunction ucJunction : userCapabilityJunctions ) {
+        for ( UserCapabilityJunction ucJunction : userCapabilityJunctions ) {
           Capability capability = (Capability) capabilityDAO.find(ucJunction.getTargetId());
-          if( capability.implies(x, permission) ) return true;
+          if ( capability.implies(x, permission) ) return true;
         }
       } catch (Exception e) {
         Logger logger = (Logger) x.get("logger");
