@@ -26,11 +26,16 @@ foam.CLASS({
     {
       class: 'foam.mlang.ExprProperty',
       name: 'keyExpr',
+      factory: function() { return this.Candlestick.KEY; }
     },
     {
       class: 'foam.mlang.ExprProperty',
       name: 'valueExpr',
+      factory: function() { return this.Candlestick.AVERAGE; }
     },
+    {
+      name: 'backgroundColor'
+    }
   ],
 
   listeners: [
@@ -47,10 +52,14 @@ foam.CLASS({
             // a stack overflow.
             self.config.data = { datasets: [] };
             var config = foam.Object.clone(self.config);
+            var dataset = {
+              data: Object.keys(sink.groups).map(key => sink.groups[key].value)
+            };
+            if ( self.backgroundColor ) {
+              dataset.backgroundColor = self.backgroundColor;
+            }
             config.data = {
-              datasets: [{
-                data: Object.keys(sink.groups).map(key => sink.groups[key].value)
-              }],
+              datasets: [dataset],
               labels: Object.keys(sink.groups)
             };
             self.config = config;
