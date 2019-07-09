@@ -39,7 +39,7 @@ public class MultiLineStringParser
     char delim = ps.head();
     char lastc = delim;
 
-    for(int i = 0; i < 3; i++) {
+    for( int i = 0; i < 3; i++ ) {
       if ( delim != '"' ) return null;
       ps = ps.tail();
       delim = ps.head();
@@ -68,7 +68,7 @@ public class MultiLineStringParser
           c = (Character) escapePS.value();
         }
       } else {
-          builder.append(c);
+        builder.append(c);
       }
 
       ps = tail;
