@@ -31,24 +31,6 @@
       display: grid;
       grid-template-columns: 1px 1fr;
     }
-
-    ^ th {
-      position: -webkit-sticky;
-      position: sticky;
-      top: 0;
-    }
-
-    ^ table {
-      table-layout: fixed;
-      width: 1024px;
-    }
-
-    ^ td,
-    ^ th {
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
   `,
 
   constants: [
