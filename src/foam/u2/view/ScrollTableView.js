@@ -228,7 +228,15 @@
       name: 'multiSelectEnabled',
       documentation: 'Pass through to UnstyledTableView.'
     },
-    'selectedObjects'
+    {
+      class: 'Map',
+      name: 'selectedObjects',
+      documentation: `
+        The objects selected by the user when multi-select support is enabled.
+        It's a map where the key is the object id and the value is the object.
+        Here we simply bind it to the selectedObjects property on TableView.
+      `
+    }
   ],
 
   methods: [
