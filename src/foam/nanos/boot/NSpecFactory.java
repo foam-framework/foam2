@@ -64,7 +64,7 @@ public class NSpecFactory
           logger.error("Error Creating Service", spec_.getName(), t);
         } else {
           System.err.println("Error Creating Service: "+spec_.getName());
-          e.printStackTrace();
+          t.printStackTrace();
         }
       } finally {
         pm.log(x_.getX());
