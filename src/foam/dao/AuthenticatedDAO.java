@@ -61,7 +61,7 @@ public class AuthenticatedDAO
     } else {
       permission = createPermission("update", id);
     }
-
+    ((foam.nanos.logger.Logger)x.get("logger")).debug("check put permission", permission);
     if ( ! authService.check(x, permission) ) {
       throw new AuthorizationException();
     }
