@@ -95,7 +95,15 @@ foam.CLASS({
       /** The developer-friendly name for this EasyDAO. */
       class: 'String',
       name: 'name',
-      factory: function() { return this.of.id; }
+      factory: function() {
+        return this.nSpec && this.nSpec.name || this.of.id;
+      },
+      javaFactory: `
+      if ( getNSpec() != null ) {
+        return getNSpec().getName();
+      }
+      return this.getOf().getId();
+     `
     },
     {
       name: 'nSpec',
@@ -107,8 +115,6 @@ foam.CLASS({
         @private */
       name: 'delegate',
       javaFactory: `
-//Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
-//logger.info(this.getClass().getSimpleName(), "delegate", "NSpec.name", getNSpec().getName(), "of_", of_); //Thread.currentThread().getName());
 foam.dao.DAO delegate = getInnerDAO() == null ?
   new foam.dao.MDAO(getOf()) :
   getInnerDAO();
@@ -471,7 +477,11 @@ return delegate;
       javaCode: `
        if ( of_ == null ) {
          foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
-         logger.error("EasyDAO", getNSpec().getName(), "of not set", new Exception("of not set"));
+         if ( logger != null ) {
+           logger.error("EasyDAO", getName(), "'of' not set.", new Exception("of not set"));
+         } else {
+           System.err.println("EasyDAO "+getName()+" 'of' not set.");
+         }
          System.exit(1);
        }
      `
