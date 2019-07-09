@@ -102,12 +102,12 @@ foam.CLASS({
       try {
         DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
-        if(userCapabilityJunctionDAO.find(
+        if( userCapabilityJunctionDAO.find(
           AND(
             EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
             EQ(UserCapabilityJunction.TARGET_ID, permission),
             EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
-          )) != null) return true;
+          )) != null ) return true;
         
         List<UserCapabilityJunction> userCapabilityJunctions = (List<UserCapabilityJunction>) ((ArraySink) userCapabilityJunctionDAO
           .where(AND(
