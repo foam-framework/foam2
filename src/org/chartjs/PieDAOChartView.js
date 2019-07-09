@@ -58,12 +58,11 @@ foam.CLASS({
             // a stack overflow.
             self.config.data = { datasets: [] };
             var config = foam.Object.clone(self.config);
-            var dataset = {
-              data: Object.keys(sink.groups).map(key => sink.groups[key].value),
-              backgroundColor: self.backgroundColor
-            };
             config.data = {
-              datasets: [dataset],
+              datasets: [{
+                data: Object.keys(sink.groups).map(key => sink.groups[key].value),
+                backgroundColor: self.backgroundColor
+              }],
               labels: Object.keys(sink.groups)
             };
             self.config = config;
