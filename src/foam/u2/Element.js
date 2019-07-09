@@ -1245,17 +1245,14 @@ foam.CLASS({
 
     function removeAttribute(name) {
       /* Remove attribute named 'name'. */
-
-      // NOTE: This call might throw an exception if it happens to be called on
-      // an element that's in the OUTPUT state. If that's the case, we don't
-      // want to remove the entry in `this.attributes` or `this.attributeMap`,
-      // otherwise when the element is in the LOADED state later and we try to
-      // remove the attribute, the attribute will have been removed from the
-      // array and map, but the attribute will still be set on the DOM element.
-      this.onRemoveAttr(name);
-
-      delete this.attributeMap[name];
-      this.attributes = this.attributes.filter((x) => x.name !== name);
+      for ( var i = 0 ; i < this.attributes.length ; i++ ) {
+        if ( this.attributes[i].name === name ) {
+          this.attributes.splice(i, 1);
+          delete this.attributeMap[name];
+          this.onRemoveAttr(name);
+          return;
+        }
+      }
     },
 
     function getAttributeNode(name) {
