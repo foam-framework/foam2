@@ -101,6 +101,7 @@ var classes = [
   'foam.box.SessionClientBox',
   'foam.dao.DAO',
   'foam.dao.CSVSink',
+  'foam.lib.csv.CSVOutputter',
   'foam.dao.java.JDAO',
   'foam.dao.FilteredDAO',
   'foam.dao.Journal',

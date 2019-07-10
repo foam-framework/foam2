@@ -230,12 +230,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'javaToCSV',
-      value: 'outputter.output(get(obj));'
+      value: 'outputter.outputValue(get(obj));'
     },
     {
       class: 'String',
       name: 'javaToCSVLabel',
-      value: 'outputter.output(getName());'
+      value: 'outputter.outputValue(getName());'
     },
   ],
 

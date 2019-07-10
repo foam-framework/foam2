@@ -30,15 +30,17 @@ foam.CLASS({
     },
     {
       name: 'outputter',
+      class: 'FObjectProperty',
+      of: 'foam.lib.csv.CSVOutputter',
       transient: true,
-      factory: function(of, props) {
+      factory: function() {
         return this.CSVOutputter.create({
-          of: of,
-          props: props
+          of: this.of,
+          props: this.props
         });
       },
       javaFactory: `
-        return new foam.lib.csv.CSVOutputter.Builder(x).setOf(of).setProps(props).build();
+        return new foam.lib.csv.CSVOutputter.Builder(getX()).setOf(getOf()).setProps(getProps()).build();
       `
     }
   ],
@@ -47,13 +49,13 @@ foam.CLASS({
     {
       name: 'put',
       args: [
-        { type: 'Any', name: 'obj' }
+        { type: 'FObject', name: 'obj' }
       ],
       code: function(obj) {
         this.outputter.outputFObject(obj);
       },
       javaCode: `
-        outputter.outputFObject(obj);
+        getOutputter().outputFObject(obj);
       `
     },
 
