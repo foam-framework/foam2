@@ -267,12 +267,19 @@ foam.CLASS({
 
   properties: [
     'prop',
+    {
+      class: 'Boolean',
+      name: 'hasDescendants'
+    }
   ],
 
   methods: [
     function initE() {
       var self = this;
       this.SUPER();
+
+      this.sub('onload', this.loaded);
+
       this
         .show(this.prop.createVisibilityFor(this.data$)
           .map(m => m != foam.u2.Visibility.HIDDEN))
@@ -283,7 +290,7 @@ foam.CLASS({
             foam.core.ConstantSlot.create({ value: null });
 
           return self.E()
-            .style({ padding: '8px 0' })
+            .style({ padding: this.hasDescendants$.map((hasThem) => hasThem ? '0' : '8px 0') })
             .start(self.Rows)
               .callIf(prop$label, function() {
                 this.start('m3')
@@ -354,6 +361,14 @@ foam.CLASS({
               })
             .end();
         }));
+    }
+  ],
+
+  listeners: [
+    function loaded() {
+      // Mark that we have descendant elements of the same class. If this is
+      // true, we don't want to add any padding to this element.
+      this.hasDescendants = this.el().querySelector('.foam-u2-detail-SectionedDetailPropertyView') !== null;
     }
   ]
 });
