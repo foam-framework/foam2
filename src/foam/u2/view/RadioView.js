@@ -20,6 +20,10 @@ foam.CLASS({
   name: 'RadioView',
   extends: 'foam.u2.view.ChoiceView',
 
+  requires: [
+    'foam.u2.DisplayMode'
+  ],
+
   css: `
     ^ label {
       position: relative;
@@ -35,6 +39,10 @@ foam.CLASS({
       class: 'Boolean',
       name: 'isHorizontal',
       value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'isDisabled'
     }
   ],
 
@@ -54,6 +62,11 @@ foam.CLASS({
       if ( this.dao ) this.onDAOUpdate();
       this.choices$.sub(this.onChoicesUpdate);
       this.onChoicesUpdate();
+    },
+
+    function updateMode_(mode) {
+      this.isDisabled = mode === this.DisplayMode.RO ||
+                        mode === this.DisplayMode.DISABLED;
     }
   ],
 
@@ -73,7 +86,8 @@ foam.CLASS({
               type: 'radio',
               name: self.getAttribute('name') + '-' + c[0],
               value: c[0],
-              checked: self.slot(function (data) { return data === c[0]; })
+              checked: self.slot(function (data) { return data === c[0]; }),
+              disabled: self.isDisabled$
             }).
             setID(id = self.NEXT_ID()).
             on('change', function(evt) {
