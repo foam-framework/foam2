@@ -103,6 +103,9 @@ foam.CLASS({
       }
       this.addContentHeaders();
 
+      this.headers['Pragma'] = 'no-cache';
+      this.headers['Cache-Control'] = 'no-cache, no-store';
+
       var self = this;
 
       var headers = new Headers();
