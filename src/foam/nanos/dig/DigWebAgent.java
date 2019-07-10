@@ -7,7 +7,7 @@
 package foam.nanos.dig;
 
 import foam.core.*;
-import foam.dao.Sink;
+import foam.dao.CSVSink;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.lib.csv.CSVSupport;
@@ -189,7 +189,6 @@ public class DigWebAgent
             obj = daoPut(dao, obj);
           }
 
-          //returnMessage = "<objects>" + success + "</objects>";
         } else if ( Format.CSV == format ) {
           if ( SafetyUtil.isEmpty(data) && SafetyUtil.isEmpty(fileAddress) ) {
             DigErrorMessage error = new EmptyDataException.Builder(x)
@@ -348,8 +347,8 @@ public class DigWebAgent
               out.println("<" + simpleName + "s>"+ outputterXml.toString() + "</" + simpleName + "s>");
             }
           } else if ( Format.CSV == format ) {
-            foam.dao.CSVSink csvSink = new foam.dao.CSVSink.Builder(x).build();
-            Sink cs = ( ! SafetyUtil.isEmpty(id) ? 
+            CSVSink csvSink = new CSVSink.Builder(x).build();
+            CSVSink cs = (CSVSink)( ! SafetyUtil.isEmpty(id) ? 
                       dao.where(MLang.EQ(idProp, id)).select(csvSink) :
                       dao.select(csvSink));
             String resultCsv = cs.getCsv();
@@ -535,7 +534,7 @@ public class DigWebAgent
 
     } else if ( format == Format.CSV )  {
       //output error in csv format
-      foam.lib.csv.CSVOutputter outputterCsv = new foam.lib.csv.CSVOutputter.Build(x).build();
+      foam.lib.csv.CSVOutputter outputterCsv = new foam.lib.csv.CSVOutputter.Builder(x).build();
       outputterCsv.outputFObject(error);
       out.println(outputterCsv.toString());
 
