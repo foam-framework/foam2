@@ -114,6 +114,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'multiLine'
+    },
+    {
+      class: 'Boolean',
       name: 'createFile',
       documentation: 'Flag to create file if not present',
       value: true,
