@@ -10,30 +10,34 @@ foam.CLASS({
   implements: [ 'foam.nanos.export.ExportDriver' ],
 
   requires: [
-    'foam.dao.CSVSink'
+    'foam.dao.CSVSink',
+    'foam.lib.csv.CSVOutputter'
   ],
 
-  documentation: 'Class for exporting data from a DAO to CSV',
+  documentation: 'Class for exporting data from a FObject or DAO, to CSV.',
 
   properties: [
     {
       class: 'FObjectProperty',
-      of: 'foam.lib.csv.Outputter',
-      documentation: 'Outputter is legacy code - current csv outputter is by using CSVSink',
+      of: 'foam.lib.csv.CSVOutputter',
       name: 'outputter',
-      factory: function() { return foam.lib.csv.Standard; }
+      factory: function() {
+        return this.CSVOutputter.create();
+      }
     }
   ],
 
   methods: [
     function exportFObject(X, obj) {
-      return this.outputter.toCSV(obj);
+      // if obj coming in is not from a model with tableColumns,
+      // the outputter will not recognize any columns.
+      this.outputter.outputFObject(obj);
+      return this.outputter.toString();
     },
-    function exportDAO(X, dao, filteredTableColumns) {
-      var sink = filteredTableColumns ?
-        this.CSVSink.create({ props: filteredTableColumns }) :
+    function exportDAO(X, dao) {
+      var sink = X.filteredTableColumns ?
+        this.CSVSink.create({ props: X.filteredTableColumns }) :
         this.CSVSink.create();
-      sink.reset();
       // passing in our CSVSink runs our CSV outputter and
       // s.csv is accessing our csv property string.
       return dao.select(sink).then( (s) => s.csv );
