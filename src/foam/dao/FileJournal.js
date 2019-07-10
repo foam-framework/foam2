@@ -109,6 +109,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'multiLine'
+    },
+    {
+      class: 'Boolean',
       name: 'createFile',
       documentation: 'Flag to create file if not present',
       value: true,
@@ -282,26 +286,59 @@ foam.CLASS({
       `
     },
     {
+      name: 'getEntry',
+      documentation: 'Reads a syntatically meaningful unit from the journal',
+      type: 'String',
+      args: [
+        {
+          name: 'reader',
+          type: 'BufferedReader'
+        }
+      ],
+      javaCode: `
+        try {
+          String line = reader.readLine();
+          if ( line == null )
+            return null;
+          if ( getMultiLine() ) {
+            StringBuilder sb = new StringBuilder();
+            while ( ! line.equals("})") ) {
+              sb.append(line);
+              line = reader.readLine();
+              if ( line == null )
+                return null;
+            }
+            sb.append(line);
+            line = sb.toString();
+          }
+          return line;
+        } catch ( Throwable t ) {
+          getLogger().error("Failed to read from journal", t);
+          return null;
+        }
+      `
+    },
+    {
       name: 'replay',
       documentation: 'Replays the journal file',
       javaCode: `
-        // count number of lines successfully read
+        // count number of entries successfully read
         int successReading = 0;
         JSONParser parser = getParser();
 
         try ( BufferedReader reader = getReader() ) {
-          for ( String line ; ( line = reader.readLine() ) != null ; ) {
-            if ( SafetyUtil.isEmpty(line)        ) continue;
-            if ( COMMENT.matcher(line).matches() ) continue;
+          for ( String entry ; ( entry = getEntry(reader) ) != null ; ) {
+            if ( SafetyUtil.isEmpty(entry)        ) continue;
+            if ( COMMENT.matcher(entry).matches() ) continue;
 
             try {
-              char operation = line.charAt(0);
-              int length = line.trim().length();
-              line = line.trim().substring(2, length - 1);
+              entry = entry.trim();
+              char operation = entry.charAt(0);
+              entry = entry.substring(2, entry.length() - 1);
 
-              FObject obj = parser.parseString(line);
+              FObject obj = parser.parseString(entry);
               if ( obj == null ) {
-                getLogger().error("Parse error", getParsingErrorMessage(line), "line:", line);
+                getLogger().error("Parse error", getParsingErrorMessage(entry), "entry:", entry);
                 continue;
               }
 
@@ -318,7 +355,7 @@ foam.CLASS({
 
               successReading++;
             } catch ( Throwable t ) {
-              getLogger().error("Error replaying journal line:", line, t);
+              getLogger().error("Error replaying journal entry:", entry, t);
             }
           }
         } catch ( Throwable t) {

@@ -31,24 +31,6 @@
       display: grid;
       grid-template-columns: 1px 1fr;
     }
-
-    ^ th {
-      position: -webkit-sticky;
-      position: sticky;
-      top: 0;
-    }
-
-    ^ table {
-      table-layout: fixed;
-      width: 1024px;
-    }
-
-    ^ td,
-    ^ th {
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
   `,
 
   constants: [
@@ -222,6 +204,20 @@
       type: 'Boolean',
       name: 'enableDynamicTableHeight',
       value: true,
+    },
+    {
+      class: 'Boolean',
+      name: 'multiSelectEnabled',
+      documentation: 'Pass through to UnstyledTableView.'
+    },
+    {
+      class: 'Map',
+      name: 'selectedObjects',
+      documentation: `
+        The objects selected by the user when multi-select support is enabled.
+        It's a map where the key is the object id and the value is the object.
+        Here we simply bind it to the selectedObjects property on TableView.
+      `
     }
   ],
 
@@ -250,7 +246,9 @@
               columns: this.columns,
               contextMenuActions: this.contextMenuActions,
               selection$: this.selection$,
-              editColumnsEnabled: this.editColumnsEnabled
+              editColumnsEnabled: this.editColumnsEnabled,
+              multiSelectEnabled: this.multiSelectEnabled,
+              selectedObjects$: this.selectedObjects$
             }, this.table_$).
               addClass(this.myClass('table')).
             end().
@@ -284,7 +282,7 @@
         this.page2DAO_ = this.initialPage2DAO_;
         this.page3DAO_ = this.initialPage3DAO_;
         this.table_.childNodes
-          .filter((x) => x.nodeName === 'TBODY')
+          .slice(1)
           .forEach((x) => x.remove());
         this.table_.add(this.table_.rowsFrom(this.page1DAO_$proxy));
         this.addTbodies();
@@ -315,7 +313,7 @@
         this[daoName] = this.data.skip(this.currentUpperBound - this.pageSize).limit(this.pageSize);
         var rows = this.table_.rowsFrom(this[daoName + '$proxy']);
         this.table_.add(rows);
-        var x = this.table_.childNodes.filter((x) => x.nodeName === 'TBODY');
+        var x = this.table_.childNodes.slice(1);
         this.bottomBufferTable_ = x[x.length - 1];
       }
     },
@@ -341,7 +339,7 @@
         this[daoName] = this.data.skip(this.currentLowerBound).limit(this.pageSize);
         var rows = this.table_.rowsFrom(this[daoName + '$proxy']);
         this.table_.insertBefore(this.table_.slotE_(rows), this.visibleTable_);
-        var x = this.table_.childNodes.filter((x) => x.nodeName === 'TBODY');
+        var x = this.table_.childNodes.slice(1);
         this.topBufferTable_ = x[0];
       }
     },
@@ -415,7 +413,7 @@
       code: function() {
         this.table_.add(this.table_.rowsFrom(this.page2DAO_$proxy));
         this.table_.add(this.table_.rowsFrom(this.page3DAO_$proxy));
-        var tbodies = this.table_.childNodes.filter((x) => x.nodeName === 'TBODY');
+        var tbodies = this.table_.childNodes.slice(1);
         this.topBufferTable_ = tbodies[0];
         this.visibleTable_ = tbodies[1];
         this.bottomBufferTable_ = tbodies[2];
