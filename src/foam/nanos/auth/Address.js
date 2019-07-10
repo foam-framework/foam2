@@ -89,7 +89,7 @@ foam.CLASS({
       required: true,
       validateObj: function(countryId) {
         if ( typeof countryId !== 'string' || countryId.length === 0 ) {
-          return 'Country required';
+          return 'Country required.';
         }
       },
       postSet: function(oldValue, newValue) {
