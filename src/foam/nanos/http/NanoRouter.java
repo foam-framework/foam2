@@ -63,10 +63,16 @@ public class NanoRouter
     PM       pm         = new PM(this.getClass(), serviceKey);
 
     resp.setContentType("text/html");
+    
+    // prevent browsers from changing content-type in response  
     resp.setHeader("X-Content-Type-Options", "nosniff");
+    // do not allow browser to cache response data
     resp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    // same as cache-control, used for backwards compatibility with HTTP/1.0
     resp.setHeader("Pragma", "no-cache");
+    // enable xss filtering to allow browser to sanitize page if xss attack is detected
     resp.setHeader("X-XSS-Protection", "1");
+    // protect against clickjacking attacks
     resp.setHeader("X-Frame-Options", "deny");
     
     try {
