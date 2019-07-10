@@ -46,6 +46,7 @@ public class StringParser
     ps = ps.apply(delimiterParser, x);
     if ( ps == null ) return null;
     Parser delimiter = new Literal((String)ps.value());
+    boolean isMultiLine = (ps.value().equals("\"\"\"")) ? true : false;
 
     StringBuilder builder = sb.get();
     PStream result;
@@ -55,7 +56,7 @@ public class StringParser
       char c = ps.head();
 
       result = ps.apply(delimiter, x);
-      if ( result != null && lastc != ESCAPE ) break;
+      if ( result != null && lastc != ESCAPE )  break;
 
       PStream tail = ps.tail();
 
@@ -70,13 +71,14 @@ public class StringParser
 
           c = (Character) escapePS.value();
         }
-      } else {
+      } else if ( c != '\n' ) {
         builder.append(c);
       }
 
       ps = tail;
       lastc = c;
     }
+    if ( isMultiLine ) ps = ps.tail().tail();
 
     return ps.tail().setValue(builder.toString());
   }
