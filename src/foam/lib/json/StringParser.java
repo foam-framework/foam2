@@ -71,7 +71,7 @@ public class StringParser
 
           c = (Character) escapePS.value();
         }
-      } else if ( c != '\n' ) {
+      } else {
         builder.append(c);
       }
 
