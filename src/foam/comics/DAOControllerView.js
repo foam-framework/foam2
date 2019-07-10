@@ -38,9 +38,7 @@ foam.CLASS({
   css: `
     ^ {
       width: fit-content;
-      max-width: 100vw;
       margin: 24px auto 0 auto;
-      max-width: calc(100vw - 80px);
     }
 
     ^top-row {
@@ -59,10 +57,7 @@ foam.CLASS({
     }
 
     ^container {
-      display: grid;
-      grid-template-columns: fit-content(100%) auto;
-      grid-gap: 10px;
-      overflow-x: scroll;
+      display: flex;
     }
 
     ^ .actions {
@@ -72,6 +67,15 @@ foam.CLASS({
 
     ^ .actions button + button {
       margin-left: 8px;
+    }
+
+    ^full-search-container {
+      flex: 0 0 250px;
+      margin-right: 10px;
+    }
+
+    ^ .foam-u2-view-TableView {
+      width: 1024px;
     }
   `,
 
@@ -157,6 +161,7 @@ foam.CLASS({
             .callIf(this.data.searchMode === this.SearchMode.FULL, function() {
               this.start()
                 .hide(self.data.searchHidden$)
+                .addClass(self.myClass('full-search-container'))
                 .add(self.cls.PREDICATE.clone().copyFrom({
                   view: { class: 'foam.u2.view.ReciprocalSearch' }
                 }))

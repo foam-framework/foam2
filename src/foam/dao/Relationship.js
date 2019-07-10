@@ -677,6 +677,12 @@ foam.CLASS({
   extends: 'foam.dao.DAOProperty',
   properties: [
     {
+      name: 'visibilityExpression',
+      value: function(id) {
+        return !! id ? foam.u2.Visibility.RW : foam.u2.Visibility.HIDDEN;
+      }
+    },
+    {
       name: 'flags',
       value: ['swift', 'js'],
     },
