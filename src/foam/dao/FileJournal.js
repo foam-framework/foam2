@@ -299,15 +299,14 @@ foam.CLASS({
       javaCode: `
         try {
           String line = reader.readLine();
+          if ( ! getMultiLine() ) return line;
           if ( line == null ) return null;
           StringBuilder sb = new StringBuilder();
           sb.append(line);
-          if ( getMultiLine() ) {
-            while( ! line.trim().endsWith("})") && ! line.trim().startsWith("//") ) {
-              if ( (line = reader.readLine()) == null ) break;
-              sb.append("\\n");
-              sb.append(line);
-            }
+          while( ! line.trim().endsWith("})") ) {
+            if ( (line = reader.readLine()) == null ) break;
+            sb.append("\\n");
+            sb.append(line);
           }
           return sb.toString().trim();
         } catch (Throwable t) {
