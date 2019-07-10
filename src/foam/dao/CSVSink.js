@@ -48,14 +48,11 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      args: [
-        { type: 'FObject', name: 'obj' }
-      ],
       code: function(obj) {
         this.outputter.outputFObject(obj);
       },
       javaCode: `
-        getOutputter().outputFObject(obj);
+        getOutputter().outputFObject((foam.core.FObject)obj);
       `
     },
 

@@ -71,7 +71,7 @@ foam.CLASS({
         this.outputValue_(value);
       },
       javaCode: `
-        if ( getIsFirstColumn() ) getSb().append(",");
+        if ( ! getIsFirstColumn() ) getSb().append(",");
         setIsFirstColumn(false);
         outputValue_(value);
       `
@@ -197,7 +197,7 @@ foam.CLASS({
         PropertyInfo columnProp;
         String[] tableColumnNames = getProps();
 
-        if ( ! isPropertySet("of") ) setOf(obj.getClassInfo());
+        if ( ! isPropertySet("of") || getOf() == null ) setOf(obj.getClassInfo());
 
         if ( getIsFirstRow() ) headerOutput(obj);
 
