@@ -35,8 +35,8 @@ foam.CLASS({
       return this.outputter.toString();
     },
     function exportDAO(X, dao) {
-      var sink = X.filteredTableColumns ?
-        this.CSVSink.create({ props: X.filteredTableColumns }) :
+      var sink = X.data.filteredTableColumns ?
+        this.CSVSink.create({ props: X.data.filteredTableColumns }) :
         this.CSVSink.create();
       // passing in our CSVSink runs our CSV outputter and
       // s.csv is accessing our csv property string.

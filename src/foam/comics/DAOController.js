@@ -235,7 +235,7 @@ foam.CLASS({
 
   listeners: [
     function downloadCSV(data) {
-      this.csvDriver.exportDAO(this.__context__, data, this.filteredTableColumns)
+      this.csvDriver.exportDAO(this.__context__, data)
         .then(function(result) {
           result = 'data:text/csv;charset=utf-8,' + result;
           var encodedUri = encodeURI(result);
