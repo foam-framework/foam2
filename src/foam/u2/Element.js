@@ -352,20 +352,17 @@ foam.CLASS({
       this.visitChildren('unload');
       this.detach();
     },
-    function error() {
-      throw new Error('Mutations not allowed in OUTPUT state.');
-    },
-    function onSetClass(cls, enabled) { this.error(); },
-    function onFocus(cls, enabled) { this.error(); },
-    function onAddListener(topic, listener) { this.error(); },
-    function onRemoveListener(topic, listener) { this.error(); },
-    function onSetStyle(key, value) { this.error(); },
-    function onSetAttr(key, value) { this.error(); },
-    function onRemoveAttr(key) { this.error(); },
-    function onAddChildren(c) { this.error(); },
-    function onInsertChildren() { this.error(); },
-    function onReplaceChild() { this.error(); },
-    function onRemoveChild() { this.error(); },
+    function onSetClass(cls, enabled) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onFocus(cls, enabled) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onAddListener(topic, listener) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onRemoveListener(topic, listener) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onSetStyle(key, value) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onSetAttr(key, value) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onRemoveAttr(key) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onAddChildren(c) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onInsertChildren() { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onReplaceChild() { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onRemoveChild() { throw new Error('Mutations not allowed in OUTPUT state.'); },
     function toString() { return 'OUTPUT'; }
   ]
 });

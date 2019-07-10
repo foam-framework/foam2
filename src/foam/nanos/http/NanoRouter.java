@@ -63,7 +63,12 @@ public class NanoRouter
     PM       pm         = new PM(this.getClass(), serviceKey);
 
     resp.setContentType("text/html");
-
+    resp.setHeader("X-Content-Type-Options", "nosniff");
+    resp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    resp.setHeader("Pragma", "no-cache");
+    resp.setHeader("X-XSS-Protection", "1");
+    resp.setHeader("X-Frame-Options", "deny");
+    
     try {
       if ( serv == null ) {
         System.err.println("No service found for: " + serviceKey);
