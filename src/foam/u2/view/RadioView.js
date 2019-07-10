@@ -81,7 +81,7 @@ foam.CLASS({
         return this.E('div').
           // TODO: why is the radio item getting assigned the same class as the radio whole
           addClass(this.myClass()).
-          start('input', null, ).
+          start('input').
             attrs({
               type: 'radio',
               name: self.getAttribute('name') + '-' + c[0],
