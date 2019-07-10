@@ -34,7 +34,7 @@ foam.CLASS({
       of: 'foam.lib.csv.CSVOutputter',
       transient: true,
       factory: function() {
-        return this.CSVOutputter.create({
+        return foam.lib.csv.CSVOutputter.create({
           of: this.of,
           props: this.props
         });
