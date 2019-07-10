@@ -114,6 +114,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'multiLine'
+    },
+    {
+      class: 'Boolean',
       name: 'createFile',
       documentation: 'Flag to create file if not present',
       value: true,
@@ -320,7 +324,7 @@ foam.CLASS({
       name: 'replay',
       documentation: 'Replays the journal file',
       javaCode: `
-        // count number of lines successfully read
+        // count number of entries successfully read
         int successReading = 0;
         JSONParser parser = getParser();
 
@@ -334,9 +338,9 @@ foam.CLASS({
               int length = line.length();
               line = line.substring(2, length - 1);
 
-              FObject obj = parser.parseString(line);
+              FObject obj = parser.parseString(entry);
               if ( obj == null ) {
-                getLogger().error("Parse error", getParsingErrorMessage(line), "line:", line);
+                getLogger().error("Parse error", getParsingErrorMessage(entry), "entry:", entry);
                 continue;
               }
 
@@ -353,7 +357,7 @@ foam.CLASS({
 
               successReading++;
             } catch ( Throwable t ) {
-              getLogger().error("Error replaying journal line:", line, t);
+              getLogger().error("Error replaying journal entry:", entry, t);
             }
           }
         } catch ( Throwable t) {

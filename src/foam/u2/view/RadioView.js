@@ -40,6 +40,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      this.SUPER();
       // If no item is selected, and data has not been provided, select the 0th
       // entry.
       this
@@ -70,7 +71,7 @@ foam.CLASS({
           start('input').
             attrs({
               type: 'radio',
-              name: self.getAttribute('name'),
+              name: self.getAttribute('name') + '-' + c[0],
               value: c[0],
               checked: self.slot(function (data) { return data === c[0]; })
             }).
