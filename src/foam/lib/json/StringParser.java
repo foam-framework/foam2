@@ -49,12 +49,13 @@ public class StringParser
 
     StringBuilder builder = sb.get();
     PStream result;
+    char lastc = ps.head();
 
     while ( ps.valid() ) {
       char c = ps.head();
 
       result = ps.apply(delimiter, x);
-      if ( result != null ) break;
+      if ( result != null && lastc != ESCAPE ) break;
 
       PStream tail = ps.tail();
 
@@ -74,6 +75,7 @@ public class StringParser
       }
 
       ps = tail;
+      lastc = c;
     }
 
     return ps.tail().setValue(builder.toString());
