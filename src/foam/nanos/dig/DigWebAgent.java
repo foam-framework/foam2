@@ -7,6 +7,7 @@
 package foam.nanos.dig;
 
 import foam.core.*;
+import foam.dao.Sink;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.lib.csv.CSVSupport;
@@ -347,20 +348,16 @@ public class DigWebAgent
               out.println("<" + simpleName + "s>"+ outputterXml.toString() + "</" + simpleName + "s>");
             }
           } else if ( Format.CSV == format ) {
-            foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);
-            outputterCsv.output(sink.getArray().toArray());
+            foam.dao.CSVSink csvSink = new foam.dao.CSVSink.Builder(x).build();
+            Sink cs = ( ! SafetyUtil.isEmpty(id) ? 
+                      dao.where(MLang.EQ(idProp, id)).select(csvSink) :
+                      dao.select(csvSink));
+            String resultCsv = cs.getCsv();
 
-            List a = sink.getArray();
-            for ( int i = 0; i < a.size(); i++ ) {
-              outputterCsv.put((FObject) a.get(i), null);
-            }
-
-            //resp.setContentType("text/plain");
-            //if ( email.length != 0 && ! email[0].equals("")  && email[0] != null ) {
             if ( emailSet ) {
-              output(x, outputterCsv.toString());
+              output(x, resultCsv);
             } else {
-              out.println(outputterCsv.toString());
+              out.println(resultCsv);
             }
           } else if ( Format.HTML == format ) {
             foam.lib.html.Outputter outputterHtml = new foam.lib.html.Outputter(OutputterMode.NETWORK);
@@ -538,9 +535,8 @@ public class DigWebAgent
 
     } else if ( format == Format.CSV )  {
       //output error in csv format
-
-      foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);
-      outputterCsv.put(error, null);
+      foam.lib.csv.CSVOutputter outputterCsv = new foam.lib.csv.CSVOutputter.Build(x).build();
+      outputterCsv.outputFObject(error);
       out.println(outputterCsv.toString());
 
     } else if ( format == Format.HTML ) {
