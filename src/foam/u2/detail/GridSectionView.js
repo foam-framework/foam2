@@ -5,8 +5,8 @@ foam.CLASS({
   requires: [
     'foam.layout.Section',
     'foam.u2.detail.SectionedDetailPropertyView',
-    'foam.u2.layout.Cols',
-    'foam.u2.layout.Rows'
+    'foam.u2.layout.Grid',
+    'foam.u2.layout.GUnit',
   ],
 
   css: `
@@ -30,7 +30,7 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'gridUnitWidth',
+      name: 'unitWidth',
       value: 4
     }
   ],
@@ -40,16 +40,20 @@ foam.CLASS({
       this.SUPER();
       this
       .addClass(this.myClass())
-        .add(self.slot(function(section, showTitle, section$title) {
+        .add(self.slot(function(section, showTitle, section$title, unitWidth) {
           if ( ! section ) return;
           return self.Rows.create()
             .show(section.createIsAvailableFor(self.data$))
             .callIf(showTitle && section$title, function () {
-              this.start('h2').add(section$title).end();
+              this.start(this.myClass('card-header')).add(section$title).end();
             })
-            .forEach(section.properties, function (p) {
-              this.tag(self.SectionedDetailPropertyView, { prop: p, data$: self.data$ });
-            })
+            .start(self.Grid)
+              .forEach(section.properties, function (p) {
+                this.start(self.GUnit, { columns: unitWidth })
+                  .tag(self.SectionedDetailPropertyView, { prop: p, data$: self.data$ })
+                .end()
+              })
+            .end();
         }));
     }
   ]
