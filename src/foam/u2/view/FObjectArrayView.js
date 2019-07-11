@@ -17,7 +17,7 @@ foam.CLASS({
       name: 'valueView',
       expression: function(of) {
         return {
-          class: 'foam.u2.DetailView',
+          class: 'foam.u2.view.FObjectView',
           of: of
         };
       }
