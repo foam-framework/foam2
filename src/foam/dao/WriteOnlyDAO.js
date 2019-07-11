@@ -8,7 +8,7 @@ foam.CLASS({
     package: 'foam.dao',
     name: 'WriteOnlyDAO',
     extends: 'foam.dao.ProxyDAO',
-    documentation: 'DAO decorator that throws errors on find, select, remove.',
+    documentation: 'DAO decorator that throws errors on find, select, remove, and cmd',
     methods: [
       {
         name: 'find_',
