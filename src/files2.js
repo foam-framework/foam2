@@ -251,7 +251,7 @@ FOAM_FILES([
   { name: "foam/dao/NoDisjunctionDAO" },
   { name: "foam/dao/NoNeqDAO" },
   { name: "foam/dao/FixedSizeDAO" },
-  { name: "foam/dao/WriteOnlyDAO" },
+  { name: "foam/dao/PutOnlyDAO" },
   { name: "foam/parse/QueryParser" },
   { name: "foam/parse/QueryParserUserTest" },
   { name: "foam/physics/Physical" },
