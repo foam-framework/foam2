@@ -10,7 +10,7 @@ foam.RELATIONSHIP({
   targetModel: 'foam.nanos.auth.Permission',
   forwardName: 'permissions',
   inverseName: 'groups',
-  junctionDAOKey: 'localGroupPermissionJunctionDAO'
+  junctionDAOKey: 'groupPermissionJunctionDAO'
 });
 
 /*
