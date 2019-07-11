@@ -298,7 +298,7 @@ foam.CLASS({
       javaCode: `
         try {
           String line = reader.readLine();
-          if ( ! line.equals("p({") ) return line;
+          if ( ! line.equals("p({") && ! line.equals("r({") ) return line;
           if ( line == null ) return null;
           StringBuilder sb = new StringBuilder();
           sb.append(line);
