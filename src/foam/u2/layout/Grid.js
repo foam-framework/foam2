@@ -6,10 +6,10 @@
 
 foam.CLASS({
   package: 'foam.u2.layout',
-  name: 'Cards',
+  name: 'Grid',
   extends: 'foam.u2.Element',
   documentation: `
-    A row of responsive cards
+    A grid of responsive elements
   `,
 
   css: `
