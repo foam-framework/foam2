@@ -51,6 +51,7 @@ foam.CLASS({
     {
       name: 'choices',
       expression: function(of) {
+        if ( ! of ) return [];
         var models = Object.keys(foam.USED)
           .map(id => foam.lookup(id, true))
           .filter(cls => cls)
