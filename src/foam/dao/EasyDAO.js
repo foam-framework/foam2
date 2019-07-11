@@ -106,6 +106,16 @@ foam.CLASS({
      `
     },
     {
+      class: 'String',
+      name: 'permissionPrefix',
+      factory: function() {
+        return this.of.name.toLowerCase();
+      },
+      javaFactory: `
+      return this.getOf().getObjClass().getSimpleName().toLowerCase();
+     `
+    },
+    {
       name: 'nSpec',
       class: 'FObjectProperty',
       type: 'foam.nanos.boot.NSpec'
@@ -201,9 +211,18 @@ if ( getOrder() != null &&
 
 if ( getAuthenticate() ) {
   delegate = new foam.dao.AuthenticatedDAO(
-    getName(),
+    getPermissionPrefix(),
     getAuthenticateRead(),
     delegate);
+} else if ( getNSpec().getServe() ) {
+  // Served DAOs must be Authenticated or ReadOnly
+  //setReadOnly(true);
+  foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+  logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authenticated or ReadOnly");
+}
+
+if ( getReadOnly() ) {
+  delegate = new foam.dao.ReadOnlyDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
 if ( getLogging() ) {
@@ -280,6 +299,11 @@ return delegate;
       class: 'Boolean',
       name: 'authenticateRead',
       value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'readOnly',
+      value: false
     },
     {
       /** Enable value de-duplication to save memory when caching. */
