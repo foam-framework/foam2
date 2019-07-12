@@ -7,10 +7,10 @@
 foam.CLASS({
   package: 'foam.lib.csv',
   name: 'CSVOutputter',
-  implements: [ 'foam.core.Serializable' ],
 
   javaImports: [
     'foam.core.*',
+    'java.util.ArrayList',
     'java.util.List',
     'java.lang.String',
     'java.util.Date'
@@ -37,13 +37,13 @@ foam.CLASS({
       javaFactory: `
         List<PropertyInfo> propInfoList = getOf().getAxioms();
         int listSize = propInfoList.size();
-        String[] propNameList = new String[listSize];
+        List<String> propNameList = new ArrayList<String>();
 
         for( int i = 0; i < listSize; i++ ) {
           PropertyInfo propI = propInfoList.get(i);
-          if ( ! propI.getNetorkTransient() ) propNameList[i] = propI.getName();
+          if ( ! propI.getNetworkTransient() ) propNameList.add(propI.getName());
         }
-        return propNameList;
+        return propNameList.toArray( new String[propNameList.size()] );
       `,
       visibility: 'HIDDEN'
     },
@@ -134,7 +134,7 @@ foam.CLASS({
         } else if ( value instanceof List ) {
           outputValue_(value.toString());
         }  else if ( value == null ) {
-          outputValue_("-");
+          // Do nothing
         } else {
           outputValue_(value.toString());
         }

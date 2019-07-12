@@ -29,12 +29,10 @@ foam.CLASS({
       of: 'foam.lib.csv.CSVOutputter',
       transient: true,
       factory: function(of) {
-        return foam.lib.csv.CSVOutputter.create({
-          of: of
-        });
+        return foam.lib.csv.CSVOutputter.create({ of: of });
       },
       javaFactory: `
-        return new foam.lib.csv.CSVOutputter.Builder(getX()).setOf(getOf()).setProps(getProps()).build();
+        return new foam.lib.csv.CSVOutputter.Builder(getX()).setOf(getOf()).build();
       `
     }
   ],
