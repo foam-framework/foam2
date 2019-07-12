@@ -34,6 +34,17 @@ foam.CLASS({
       factory: function() {
         return this.of.getAxiomByName('tableColumns').columns;
       },
+      javaFactory: `
+        List<PropertyInfo> propInfoList = getOf().getAxioms();
+        int listSize = propInfoList.size();
+        String[] propNameList = new String[listSize];
+
+        for( int i = 0; i < listSize; i++ ) {
+          PropertyInfo propI = propInfoList.get(i);
+          if ( ! propI.getNetorkTransient() ) propNameList[i] = propI.getName();
+        }
+        return propNameList;
+      `,
       visibility: 'HIDDEN'
     },
     {
@@ -122,6 +133,8 @@ foam.CLASS({
           outputValue_(value.toString());
         } else if ( value instanceof List ) {
           outputValue_(value.toString());
+        }  else if ( value == null ) {
+          outputValue_("-");
         } else {
           outputValue_(value.toString());
         }
@@ -193,11 +206,11 @@ foam.CLASS({
         this.newLine_();
       },
       javaCode: `
+        if ( ! isPropertySet("of") || getOf() == null ) setOf(obj.getClassInfo());
+
         Object propObj;
         PropertyInfo columnProp;
         String[] tableColumnNames = getProps();
-
-        if ( ! isPropertySet("of") || getOf() == null ) setOf(obj.getClassInfo());
 
         if ( getIsFirstRow() ) headerOutput(obj);
 

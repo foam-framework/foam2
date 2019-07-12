@@ -24,19 +24,13 @@ foam.CLASS({
       visibility: 'HIDDEN'
     },
     {
-      class: 'StringArray',
-      name: 'props',
-      visibility: 'HIDDEN'
-    },
-    {
       name: 'outputter',
       class: 'FObjectProperty',
       of: 'foam.lib.csv.CSVOutputter',
       transient: true,
-      factory: function() {
+      factory: function(of) {
         return foam.lib.csv.CSVOutputter.create({
-          of: this.of,
-          props: this.props
+          of: of
         });
       },
       javaFactory: `
