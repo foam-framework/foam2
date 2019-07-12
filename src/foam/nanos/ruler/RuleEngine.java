@@ -8,6 +8,8 @@ package foam.nanos.ruler;
 
 import foam.core.*;
 import foam.dao.DAO;
+import foam.nanos.auth.LastModifiedAware;
+import foam.nanos.auth.LastModifiedByAware;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 import foam.nanos.pool.FixedThreadPool;
@@ -161,11 +163,16 @@ public class RuleEngine extends ContextAwareSupport {
         if ( rule.getAsyncAction() != null
           && rule.f(x, obj, oldObj)
         ) {
+          // We assume `obj` staleness on after rules. For that, greedy algorithm
+          // is used when reloading object for the after rules. On the other hand,
+          // non-greedy algorithm is used for before rules hence changes on obj
+          // will be carried over to the reloaded object.
+          FObject nu = reloadObject(x, obj, oldObj, rule.getAfter());
           try {
-            rule.asyncApply(x, obj, oldObj, RuleEngine.this);
-            saveHistory(rule, obj);
+            rule.asyncApply(x, nu, oldObj, RuleEngine.this);
+            saveHistory(rule, nu);
           } catch (Exception ex) {
-            retryAsyncApply(x, rule, obj, oldObj);
+            retryAsyncApply(x, rule, nu, oldObj);
           }
         }
       }
@@ -202,5 +209,48 @@ public class RuleEngine extends ContextAwareSupport {
 
     savedRuleHistory_.put(rule.getId(),
       (RuleHistory) ruleHistoryDAO_.put(record).fclone());
+  }
+
+  private FObject reloadObject(X x, FObject obj, FObject oldObj, boolean greedy) {
+    FObject nu = getDelegate().find_(x, obj);
+    if ( nu == null ) {
+      return obj;
+    }
+
+    FObject old = oldObj;
+    if ( old == null ) {
+      try {
+        old = obj.getClass().newInstance();
+      } catch (Exception e) {
+        // Object instantiation should not fail but if it does fail
+        // return obj without reloading.
+        return obj;
+      }
+    }
+
+    old = old.fclone();
+    FObject cloned = obj.fclone();
+
+    // Update lastModified and lastModifiedBy of old and cloned objects so that
+    // equality comparisons would not be skewed by these properties.
+    if ( obj instanceof LastModifiedAware ) {
+      Date lastModified = ((LastModifiedAware) nu).getLastModified();
+      ((LastModifiedAware) cloned).setLastModified(lastModified);
+      ((LastModifiedAware) old).setLastModified(lastModified);
+    }
+    if ( obj instanceof LastModifiedByAware ) {
+      long lastModifiedBy = ((LastModifiedByAware) nu).getLastModifiedBy();
+      ((LastModifiedByAware) cloned).setLastModifiedBy(lastModifiedBy);
+      ((LastModifiedByAware) old).setLastModifiedBy(lastModifiedBy);
+    }
+
+    // Return obj if nu == old or nu == obj.
+    if ( nu.equals(old) || nu.equals(cloned) ) {
+      return obj;
+    }
+
+    // For greedy algorithm, return the reloaded object (nu) as is. Otherwise,
+    // override the reloaded object with the changes from the original object (obj).
+    return greedy ? nu : nu.copyFrom(obj);
   }
 }
