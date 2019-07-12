@@ -133,7 +133,6 @@ if ( delegate instanceof foam.dao.MDAO ) {
   setMdao((foam.dao.MDAO)delegate);
   if ( getIndex() != null &&
        getIndex().length > 0 ) {
-    // IMPORTANT: Indexes must be added before JDAO replay occurs.
     getMdao().addIndex(getIndex());
   }
 }
@@ -209,16 +208,28 @@ if ( getOrder() != null &&
   }
 }
 
+if ( getAuthorize() ) {
+  if ( getOf() instanceof foam.nanos.auth.Authorizable ) {
+    setAuthenticate(false);
+    delegate = new foam.nanos.auth.AuthorizationDAO(getX()\, delegate);
+  }
+}
+
 if ( getAuthenticate() ) {
   delegate = new foam.dao.AuthenticatedDAO(
     getPermissionPrefix(),
     getAuthenticateRead(),
     delegate);
-} else if ( getNSpec().getServe() ) {
+}
+
+if ( getNSpec().getServe() &&
+     ! getAuthorize() &&
+     ! getAuthenticate() &&
+     ! getReadOnly() ) {
   // Served DAOs must be Authenticated or ReadOnly
   //setReadOnly(true);
   foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
-  logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authenticated or ReadOnly");
+  logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authenticated, Authorized, or ReadOnly");
 }
 
 if ( getReadOnly() ) {
@@ -286,6 +297,12 @@ return delegate;
       class: 'Boolean',
       name: 'cache',
       generateJava: false,
+      value: false
+    },
+    {
+      /** Enable standard authorization. */
+      class: 'Boolean',
+      name: 'authorize',
       value: false
     },
     {
