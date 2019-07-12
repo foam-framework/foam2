@@ -2159,6 +2159,14 @@ foam.CLASS({
       name: 'validationStyleEnabled',
       documentation: 'If true, inputs will be styled when they are in an invalid state.',
       value: true
+    },
+    {
+      class: 'Int',
+      name: 'order',
+      documentation: `
+        The order to render the property in if rendering multiple properties.
+      `,
+      value: Number.MAX_VALUE
     }
   ],
 
