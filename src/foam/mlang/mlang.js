@@ -3498,7 +3498,7 @@ foam.CLASS({
     {
       name: 'f',
       code: function() {
-        // Authorization on the client is futile since the user has full contol
+        // Authorization on the client is futile since the user has full control
         // over the code that executes on their machine.
         // A client-side implementation of this predicate would also have to be
         // async in this case because we would need to access the auth service,
