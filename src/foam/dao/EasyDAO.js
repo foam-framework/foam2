@@ -222,11 +222,11 @@ if ( getAuthenticate() ) {
     delegate);
 }
 
-if ( getNSpec().getServe() &&
+if ( getNSpec() != null &&
+     getNSpec().getServe() &&
      ! getAuthorize() &&
      ! getAuthenticate() &&
      ! getReadOnly() ) {
-  // Served DAOs must be Authenticated or ReadOnly
   //setReadOnly(true);
   foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
   logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authenticated, Authorized, or ReadOnly");
