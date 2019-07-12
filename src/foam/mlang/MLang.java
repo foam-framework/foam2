@@ -192,4 +192,11 @@ public class MLang
       .setArg1(MLang.prepare(o))
       .build();
   }
+
+  public static Predicate HAS_PERMISSION(Object o1, Object o2) {
+    return new HasPermission.Builder(null)
+      .setArg1(MLang.prepare(o1))
+      .setArg2(MLang.prepare(o2))
+      .build();
+  }
 }
