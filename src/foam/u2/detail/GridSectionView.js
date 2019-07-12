@@ -7,6 +7,7 @@ foam.CLASS({
     'foam.u2.detail.SectionedDetailPropertyView',
     'foam.u2.layout.Grid',
     'foam.u2.layout.GUnit',
+    'foam.u2.layout.Rows',
   ],
 
   css: `
