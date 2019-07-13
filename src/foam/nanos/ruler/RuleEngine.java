@@ -168,7 +168,7 @@ public class RuleEngine extends ContextAwareSupport {
           // object reload uses non-greedy mode so that changes on the original
           // object will be copied over to the reloaded object.
           FObject nu = getDelegate().find_(x, obj);
-          reloadObject(obj, oldObj, nu, rule.getAfter());
+          nu = reloadObject(obj, oldObj, nu, rule.getAfter());
           try {
             rule.asyncApply(x, nu, oldObj, RuleEngine.this);
             saveHistory(rule, nu);
@@ -229,16 +229,17 @@ public class RuleEngine extends ContextAwareSupport {
    * @param oldObj - Old object
    * @param nu - Reloaded object
    * @param greedy - Flag to set greedy mode
+   * @return Reloaded object
    */
-  private void reloadObject(FObject obj, FObject oldObj, FObject nu, boolean greedy) {
+  private FObject reloadObject(FObject obj, FObject oldObj, FObject nu, boolean greedy) {
     FObject old = oldObj;
     if ( old == null ) {
       try {
         old = obj.getClass().newInstance();
       } catch (Exception e) {
-        // Object instantiation should not fail but if it does fail then use the
-        // original object as the reloaded object.
-        nu = obj;
+        // Object instantiation should not fail but if it does fail then return
+        // the original object as the reloaded object.
+        return obj;
       }
     }
 
@@ -258,15 +259,13 @@ public class RuleEngine extends ContextAwareSupport {
       ((LastModifiedByAware) old).setLastModifiedBy(lastModifiedBy);
     }
 
-    // Use the original object as the reloaded object if nu == old or nu == obj.
+    // Return the original object as the reloaded object if nu == old or nu == obj.
     if ( nu.equals(old) || nu.equals(cloned) ) {
-      nu = obj;
+      return obj;
     }
 
-    // For greedy mode, use the reloaded object (nu) as is. Otherwise, override
-    // the reloaded object with the changes from the original object.
-    if ( greedy ) {
-      nu.copyFrom(obj);
-    }
+    // For greedy mode, return the reloaded object `nu` as is. Otherwise,
+    // override the reloaded object with the changes from the original object.
+    return greedy ? nu : nu.copyFrom(obj);
   }
 }
