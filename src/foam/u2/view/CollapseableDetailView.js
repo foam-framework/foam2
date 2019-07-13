@@ -28,21 +28,13 @@ foam.CLASS({
       value: { class: 'foam.u2.DetailView' }
     },
     {
-      class: 'String',
-      name: 'summary',
-      visibility: 'RO'
-    }
-  ],
-  reactions: [
-    ['', 'propertyChange.data', 'updateSummary'],
-    ['data', 'propertyChange', 'updateSummary'],
-  ],
-  listeners: [
-    {
-      name: 'updateSummary',
-      isFramed: true,
-      code: function() {
-        this.summary = this.data.toSummary();
+      class: 'foam.u2.ViewSpec',
+      name: 'citationView',
+      expression: function(data) {
+        return {
+          class: 'foam.u2.CitationView',
+          of: data && data.cls_
+        }
       }
     }
   ],
@@ -67,7 +59,11 @@ foam.CLASS({
       self
         .startContext({ data: self })
           .start(self.Cols)
-            .add(self.SUMMARY)
+            .add(self.slot(function(citationView) {
+              return self.E().tag(citationView, {
+                data$: self.data$
+              });
+            }))
             .add(self.SHOW_ACTION)
             .add(self.HIDE_ACTION)
           .end()
@@ -81,4 +77,3 @@ foam.CLASS({
     }
   ]
 });
-
