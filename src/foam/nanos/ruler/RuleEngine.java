@@ -163,11 +163,12 @@ public class RuleEngine extends ContextAwareSupport {
         if ( rule.getAsyncAction() != null
           && rule.f(x, obj, oldObj)
         ) {
-          // We assume `obj` staleness on after rules. For that, greedy algorithm
-          // is used when reloading object for the after rules. On the other hand,
-          // non-greedy algorithm is used for before rules hence changes on obj
-          // will be carried over to the reloaded object.
-          FObject nu = reloadObject(x, obj, oldObj, rule.getAfter());
+          // We assume the original object `obj` is stale when running after rules.
+          // For that, greedy mode is used for object reload. For before rules,
+          // object reload uses non-greedy mode so that changes on the original
+          // object will be copied over to the reloaded object.
+          FObject nu = getDelegate().find_(x, obj);
+          reloadObject(obj, oldObj, nu, rule.getAfter());
           try {
             rule.asyncApply(x, nu, oldObj, RuleEngine.this);
             saveHistory(rule, nu);
@@ -211,20 +212,33 @@ public class RuleEngine extends ContextAwareSupport {
       (RuleHistory) ruleHistoryDAO_.put(record).fclone());
   }
 
-  private FObject reloadObject(X x, FObject obj, FObject oldObj, boolean greedy) {
-    FObject nu = getDelegate().find_(x, obj);
-    if ( nu == null ) {
-      return obj;
-    }
-
+  /**
+   * Reloads object when running async action since the original object `obj`
+   * might be stale at the time of execution.
+   *
+   * If reloaded object `nu` hasn't changed (reloaded object equals to old
+   * object) then return the original object as the reloaded object.
+   *
+   * If reloaded object has changed and already saved to DAO (reloaded object
+   * equals to original object) then return the original object.
+   *
+   * Otherwise, return the reloaded object. If greedy flag is set to true then
+   * also copy changes from the original object to the reloaded object.
+   *
+   * @param obj - Original object
+   * @param oldObj - Old object
+   * @param nu - Reloaded object
+   * @param greedy - Flag to set greedy mode
+   */
+  private void reloadObject(FObject obj, FObject oldObj, FObject nu, boolean greedy) {
     FObject old = oldObj;
     if ( old == null ) {
       try {
         old = obj.getClass().newInstance();
       } catch (Exception e) {
-        // Object instantiation should not fail but if it does fail
-        // return obj without reloading.
-        return obj;
+        // Object instantiation should not fail but if it does fail then use the
+        // original object as the reloaded object.
+        nu = obj;
       }
     }
 
@@ -244,13 +258,15 @@ public class RuleEngine extends ContextAwareSupport {
       ((LastModifiedByAware) old).setLastModifiedBy(lastModifiedBy);
     }
 
-    // Return obj if nu == old or nu == obj.
+    // Use the original object as the reloaded object if nu == old or nu == obj.
     if ( nu.equals(old) || nu.equals(cloned) ) {
-      return obj;
+      nu = obj;
     }
 
-    // For greedy algorithm, return the reloaded object (nu) as is. Otherwise,
-    // override the reloaded object with the changes from the original object (obj).
-    return greedy ? nu : nu.copyFrom(obj);
+    // For greedy mode, use the reloaded object (nu) as is. Otherwise, override
+    // the reloaded object with the changes from the original object.
+    if ( greedy ) {
+      nu.copyFrom(obj);
+    }
   }
 }
