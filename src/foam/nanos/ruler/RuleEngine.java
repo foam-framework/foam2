@@ -241,9 +241,9 @@ public class RuleEngine extends ContextAwareSupport {
         // the original object as the reloaded object.
         return obj;
       }
+    } else {
+      old = old.fclone();
     }
-
-    old = old.fclone();
     FObject cloned = obj.fclone();
 
     // Update lastModified and lastModifiedBy of old and cloned objects so that
