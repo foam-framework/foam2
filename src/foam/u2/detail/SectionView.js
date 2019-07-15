@@ -48,6 +48,11 @@ foam.CLASS({
             .callIf(showTitle && section$title, function () {
               this.start('h2').add(section$title).end();
             })
+            /**
+             * TODO:
+             * 1. Give foam.core.Property columns
+             * 2. Wrap all in a GUnit and use the property.columns as the GUnit's columns
+             */
             .forEach(section.properties, function (p) {
               this.tag(self.SectionedDetailPropertyView, { prop: p, data$: self.data$ });
             })

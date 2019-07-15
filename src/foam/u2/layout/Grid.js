@@ -12,6 +12,10 @@ foam.CLASS({
     A grid of responsive elements
   `,
 
+  imports: [
+    'displayWidth?'
+  ],
+
   requires: [
     'foam.u2.layout.GUnit'
   ],
@@ -35,17 +39,23 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.addClass(this.myClass());
+      this.style({ 'grid-template-columns': this.displayWidth$.map(dw => {
+        dw = dw || foam.u2.layout.DisplayWidth.XL;
+        return `repeat(${dw.cols}, 1fr)`;
+      }) })
     },
 
     function createChild_(spec, args){
       var ret = this.SUPER(spec, args);
 
-      var width = this.GUnit.isInstance(ret) ? ret.columns : 12;
+      var width = this.GUnit.isInstance(ret) 
+        ? ret.columns 
+        : this.displayWidth.cols;
 
       var startCol = this.currentWidth + 1;
       this.currentWidth += width;
 
-      if ( this.currentWidth > 12 ) {
+      if ( this.currentWidth > this.displayWidth.cols ) {
         startCol = 1;
         this.currentWidth = width;
       }
@@ -53,7 +63,6 @@ foam.CLASS({
       var endCol = startCol + width;
 
       ret.style({
-        'background-color': 'pink',
         'grid-column-start': startCol,
         'grid-column-end': endCol,
       });

@@ -1,3 +1,5 @@
+// TODO: Migrate this to SectionView and then delete this file
+
 foam.CLASS({
   package: 'foam.u2.detail',
   name: 'GridSectionView',
