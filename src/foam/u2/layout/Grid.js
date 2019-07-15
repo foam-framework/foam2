@@ -28,11 +28,39 @@ foam.CLASS({
     }
   `,
 
-  properties: [
+  reactions: [
+    ['', 'propertyChange.displayWidth', 'resizeChildren']
+  ],
+
+  listeners: [
     {
-      class: 'Int',
-      name: 'currentWidth',
-      value: 0
+      name: 'resizeChildren',
+      isFramed: true,
+      code: function() {
+        this.shown = false;
+        var currentWidth = 0;
+        this.childNodes.forEach(ret => {
+          var width = this.GUnit.isInstance(ret) 
+            ? ret.columns[`${this.displayWidth.name.toLowerCase()}Columns`] 
+            : this.displayWidth.cols;
+
+          var startCol = currentWidth + 1;
+          currentWidth += width;
+
+          if ( currentWidth > this.displayWidth.cols ) {
+            startCol = 1;
+            currentWidth = width;
+          }
+
+          var endCol = startCol + width;
+
+          ret.style({
+            'grid-column-start': startCol,
+            'grid-column-end': endCol
+          });
+        });
+        this.shown = true;
+      }
     }
   ],
 
@@ -47,32 +75,11 @@ foam.CLASS({
           })
         }
       )
+      this.shown = false;
     },
 
-    // TODO: need to add a listener to displayWidth so createChild refires
-    function createChild_(spec, args){
-      var ret = this.SUPER(spec, args);
-
-      var width = this.GUnit.isInstance(ret) 
-        ? ret.columns[`${this.displayWidth.name.toLowerCase()}Columns`] 
-        : this.displayWidth.cols;
-
-      var startCol = this.currentWidth + 1;
-      this.currentWidth += width;
-
-      if ( this.currentWidth > this.displayWidth.cols ) {
-        startCol = 1;
-        this.currentWidth = width;
-      }
-
-      var endCol = startCol + width;
-
-      ret.style({
-        'grid-column-start': startCol,
-        'grid-column-end': endCol
-      });
-
-      return ret;
+    function onAddChildren() {
+      this.resizeChildren();
     }
   ]
 });
