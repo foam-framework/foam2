@@ -262,14 +262,19 @@ foam.CLASS({
 
   requires: [
     'foam.u2.layout.Cols',
-    'foam.u2.layout.Rows'
+    'foam.u2.layout.Rows',
+    'foam.u2.Visibility'
   ],
 
   properties: [
     'prop',
     {
-      class: 'Boolean',
-      name: 'hasDescendants'
+      class: 'FObjectProperty',
+      of: 'foam.core.Slot',
+      name: 'visibilitySlot',
+      expression: function(prop) {
+        return prop.createVisibilityFor(this.data$).map((m) => m !== this.Visibility.HIDDEN);
+      }
     }
   ],
 
@@ -278,11 +283,8 @@ foam.CLASS({
       var self = this;
       this.SUPER();
 
-      this.sub('onload', this.loaded);
-
       this
-        .show(this.prop.createVisibilityFor(this.data$)
-          .map(m => m != foam.u2.Visibility.HIDDEN))
+        .show(this.visibilitySlot)
         .addClass(this.myClass())
         .add(this.slot(function(data, prop, prop$label) {
           var errorSlot = prop.validateObj && prop.validationTextVisible ?
@@ -290,7 +292,6 @@ foam.CLASS({
             foam.core.ConstantSlot.create({ value: null });
 
           return self.E()
-            .style({ padding: this.hasDescendants$.map((hasThem) => hasThem ? '0' : '8px 0') })
             .start(self.Rows)
               .callIf(prop$label, function() {
                 this.start('m3')
@@ -361,14 +362,6 @@ foam.CLASS({
               })
             .end();
         }));
-    }
-  ],
-
-  listeners: [
-    function loaded() {
-      // Mark that we have descendant elements of the same class. If this is
-      // true, we don't want to add any padding to this element.
-      this.hasDescendants = this.el().querySelector('.foam-u2-detail-SectionedDetailPropertyView') !== null;
     }
   ]
 });
