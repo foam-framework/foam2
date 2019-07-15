@@ -274,7 +274,7 @@ foam.CLASS({
     },
     {
       name: 'type',
-    },
+    }
   ],
 
   methods: [

@@ -644,8 +644,10 @@ FOAM_FILES([
 
   { name: "foam/u2/layout/DisplayWidth" },
   { name: "foam/u2/layout/Layouts" },
-  { name: "foam/u2/layout/Cards" },
+  { name: "foam/u2/layout/Grid" },
   { name: "foam/u2/layout/Card" },
+  { name: "foam/u2/layout/GUnit" },
+  { name: "foam/u2/layout/GridColumns" },
 
   { name: "foam/comics/v2/CannedQuery" },
   { name: "foam/comics/v2/DAOBrowseControllerView" },
