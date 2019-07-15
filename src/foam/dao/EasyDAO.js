@@ -125,6 +125,8 @@ foam.CLASS({
         @private */
       name: 'delegate',
       javaFactory: `
+Logger logger = (Logger) getX().get("logger");
+
 foam.dao.DAO delegate = getInnerDAO() == null ?
   new foam.dao.MDAO(getOf()) :
   getInnerDAO();
@@ -143,7 +145,7 @@ if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
 
 if ( getDecorator() != null ) {
   if ( ! ( getDecorator() instanceof ProxyDAO ) ) {
-    ((Logger) getX().get("logger")).error(this.getClass().getSimpleName(), "delegate", "NSpec.name", getNSpec().getName(), "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
+    logger.error(this.getClass().getSimpleName(), "delegate", "NSpec.name", getNSpec().getName(), "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
     System.exit(1);
   }
   // The decorator dao may be a proxy chain
@@ -203,15 +205,18 @@ if ( getContextualize() ) {
 
 if ( getOrder() != null &&
      getOrder().length > 0 ) {
+  // TODO: CompositeDAO or thenBy
   for ( foam.mlang.order.Comparator comp : getOrder() ) {
     delegate = delegate.orderBy(comp);
   }
 }
 
 if ( getAuthorize() ) {
-  if ( getOf() instanceof foam.nanos.auth.Authorizable ) {
-    setAuthenticate(false);
-    delegate = new foam.nanos.auth.AuthorizationDAO(getX()\, delegate);
+  setAuthenticate(false);
+  if ( foam.nanos.auth.Authorizable.class.isAssignableFrom(getOf().getObjClass()) ) {
+    delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate);
+  } else {
+    logger.warning("EasyDAO", "authorize=true but 'of' ",getOf().getId(), "not Authorizable");
   }
 }
 
@@ -228,7 +233,6 @@ if ( getNSpec() != null &&
      ! getAuthenticate() &&
      ! getReadOnly() ) {
   //setReadOnly(true);
-  foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
   logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authenticated, Authorized, or ReadOnly");
 }
 
