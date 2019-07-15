@@ -78,7 +78,7 @@ foam.CLASS({
               // Pass keys and data in their correct order to method passed to be
               // processed
               backgroundColors = self.palette(keys, data);
-            } else {
+            } else if ( backgroundColors.length === 0 ) {
               // Fallback if all else fails. Should never be the case.
               data.forEach(function(_, index) {
                 backgroundColors.push('lightgray');
