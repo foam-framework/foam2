@@ -33,7 +33,11 @@ foam.CLASS({
     },
     {
       name: 'palette',
-      value: ['#E3170D', '#AF4035', '#CC1100', '#FFE4E1', '#FF6347', '#FF6600']
+      value: ['#E3170D', '#AF4035', '#CC1100', '#FFE4E1', '#FF6347', '#FF6600'],
+      documentation: `
+        Takes array/map/function. Function must take two params (keys, data) and
+        returns an array of colors.
+      `
     }
   ],
 
