@@ -10,6 +10,9 @@ foam.CLASS({
   extends: 'foam.u2.View',
   documentation: `
     A detail view that holds off on updating the given object until the user clicks save.
+    TODO: Nested property change events. Without this, this view does not know if nested
+    properties have changed so modifying a property on an FObjectProperty won't change the
+    action's state.
   `,
   properties: [
     {
