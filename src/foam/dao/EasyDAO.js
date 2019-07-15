@@ -313,6 +313,7 @@ return delegate;
       class: 'Boolean',
       generateJava: false,
       name: 'autoIndex',
+      documentation: 'not currently supported',
       value: false
     },
     {
