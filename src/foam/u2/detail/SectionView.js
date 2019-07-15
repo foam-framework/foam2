@@ -45,18 +45,21 @@ foam.CLASS({
           if ( ! section ) return;
           return self.Rows.create()
             .show(section.createIsAvailableFor(self.data$))
-            .callIf(showTitle && section$title, function () {
+            .callIf(showTitle && section$title, function() {
               this.start('h2').add(section$title).end();
             })
-            .forEach(section.properties, function (p) {
-              this.tag(self.SectionedDetailPropertyView, { prop: p, data$: self.data$ });
+            .forEach(section.properties, function(p) {
+              this.tag(self.SectionedDetailPropertyView, {
+                prop: p,
+                data$: self.data$
+              });
             })
             .start(self.Cols)
-              .forEach(section.actions, function (a) {
+              .forEach(section.actions, function(a) {
                 this.add(a);
               })
             .end();
         }));
     }
   ]
-}); 
+});
