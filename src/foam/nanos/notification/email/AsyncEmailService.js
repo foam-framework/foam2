@@ -33,6 +33,7 @@ foam.CLASS({
             }
           }
         });
+        return emailMessage;
       `
     }
   ]

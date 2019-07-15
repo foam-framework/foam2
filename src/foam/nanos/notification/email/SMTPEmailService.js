@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'SMTPEmailService',
 
   implements: [
-    'foam.nanos.notification.email.EmailService'
+    'foam.core.ContextAgent'
   ],
 
   documentation: 'Implementation of Email Service using SMTP',
@@ -26,17 +26,20 @@ foam.CLASS({
     'java.nio.charset.StandardCharsets',
     'java.util.Date',
     'java.util.Properties',
+    'java.util.List',
     'javax.mail.*',
     'javax.mail.internet.InternetAddress',
     'javax.mail.internet.MimeMessage',
     'org.apache.commons.lang3.StringUtils',
     'org.jtwig.JtwigTemplate',
     'org.jtwig.resource.loader.TypedResourceLoader',
+    'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Group',
     'foam.nanos.logger.Logger',
-    'foam.nanos.om.OMLogger'
+    'foam.nanos.om.OMLogger',
+    'static foam.mlang.MLang.EQ'
   ],
 
   axioms: [
@@ -190,27 +193,45 @@ foam.CLASS({
       `
     },
     {
-      name: 'sendEmail',
+      name: 'execute',
       javaCode:
       `
-      OMLogger omLogger = (OMLogger) x.get("OMLogger");
-      Logger logger = (Logger) getX().get("logger");
-        try {
-          omLogger.log("Pre send email request");
-          MimeMessage message = createMimeMessage(emailMessage);
-          Transport transport = getSession_().getTransport("smtp");
-          transport.connect();
-          logger.info("SMTPEmailService connected.");
-          transport.send(message, getUsername(), getPassword());
-          logger.info("SMTPEmailService sent MimeMessage.");
-          transport.close();
-          logger.info("SMTPEmailService finish.");
-          omLogger.log("Post send email request");
-        } catch (Exception e) {
-          logger.error("SMTPEmailService failed to finish. " + e);
-        }
+        DAO emailMessageDAO = (DAO) x.get("emailMessageDAO");
+        List<EmailMessage> emailMessages = ((foam.dao.ArraySink)
+          emailMessageDAO
+            .where(EQ(EmailMessage.STATUS, Status.UNSENT))
+            .select(new ArraySink()))
+            .getArray();
         
-      `
+            OMLogger omLogger = (OMLogger) x.get("OMLogger");
+            Logger logger = (Logger) getX().get("logger");
+        
+            try {
+              omLogger.log("Pre send email request");
+              Transport transport = getSession_().getTransport("smtp");
+              transport.connect();
+              logger.info("SMTPEmailService connected.");
+              for (EmailMessage emailMessage : emailMessages) {
+                MimeMessage message = createMimeMessage(emailMessage);
+                try {
+                  transport.send(message, getUsername(), getPassword());
+                  emailMessage.setStatus(Status.SENT);
+                  logger.info("SMTPEmailService sent MimeMessage.");
+                } catch ( MessagingException e ) {
+                  emailMessage.setStatus(Status.FAILED);
+                  logger.error("SMTPEmailService sending MimeMessage failed. " + e);
+                } finally {
+                  emailMessageDAO.put(emailMessage);
+                }
+              }
+              transport.close();
+              logger.info("SMTPEmailService finish.");
+              omLogger.log("Post send email request");
+            } catch (Exception e) {
+              logger.error("SMTPEmailService failed to finish. " + e);
+            }
+
+            `
     }
   ]
 });
