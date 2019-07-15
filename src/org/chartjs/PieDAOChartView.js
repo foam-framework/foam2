@@ -61,7 +61,7 @@ foam.CLASS({
             var backgroundColors = [];
             keys.forEach(key => {
               data.push(sink.groups[key].value);
-              if ( ! Array.isArray(self.palette) && typeof self.palette === 'object' ) {
+              if ( foam.Object.isInstance(self.palette) ) {
                 // Color has a key associated with it
                 var color = self.palette[key];
                 var unsupportedKeyColor = self.palette['default'] ? self.palette['default'] : 'lightgray';
