@@ -31,6 +31,16 @@ foam.CLASS({
       class: 'Int',
       name: 'currentWidth',
       value: 0
+    },
+    {
+      class: 'String',
+      name: 'columnGap',
+      value: '16px'
+    },
+    {
+      class: 'String',
+      name: 'rowGap',
+      value: '32px'
     }
   ],
 
@@ -38,10 +48,15 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.addClass(this.myClass());
-      this.style({ 'grid-template-columns': this.displayWidth$.map(dw => {
-        dw = dw || foam.u2.layout.DisplayWidth.XL;
-        return `repeat(${dw.cols}, 1fr)`;
-      }) })
+      this.style(
+        { 'grid-template-columns': this.displayWidth$.map(dw => {
+            dw = dw || foam.u2.layout.DisplayWidth.XL;
+            return `repeat(${dw.cols}, 1fr)`;
+          }),
+          'grid-row-gap': this.rowGap,
+          'grid-column-gap': this.columnGap
+        }
+      )
     },
 
     function createChild_(spec, args){
