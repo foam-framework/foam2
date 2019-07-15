@@ -46,7 +46,7 @@
       class: 'Long',
       name: 'id',
       documentation: 'Sequence number.',
-      permissionRequired: true,
+      visibility: 'RO',
       tableWidth: 50
     },
     {
