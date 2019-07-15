@@ -23,7 +23,6 @@ foam.CLASS({
   css: `
     ^ {
       display: grid;
-      grid-template-columns: repeat(12, 1fr);
     }
   `,
 
@@ -49,7 +48,7 @@ foam.CLASS({
       var ret = this.SUPER(spec, args);
 
       var width = this.GUnit.isInstance(ret) 
-        ? ret.columns 
+        ? ret[`${this.displayWidth.name.toLowerCase()}Columns`] 
         : this.displayWidth.cols;
 
       var startCol = this.currentWidth + 1;
