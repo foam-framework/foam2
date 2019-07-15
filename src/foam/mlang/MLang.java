@@ -7,6 +7,7 @@
 package foam.mlang;
 
 import foam.core.ClassInfo;
+import foam.core.X;
 import foam.dao.Sink;
 import foam.mlang.expr.Dot;
 import foam.mlang.order.Comparator;
@@ -190,6 +191,13 @@ public class MLang
   public static Predicate HAS(Object o) {
     return new Has.Builder(null)
       .setArg1(MLang.prepare(o))
+      .build();
+  }
+
+  public static Predicate HAS_PERMISSION(X userContext, String permissionPrefix) {
+    return new HasPermission.Builder(null)
+      .setUserContext(userContext)
+      .setPermissionPrefix(permissionPrefix)
       .build();
   }
 }

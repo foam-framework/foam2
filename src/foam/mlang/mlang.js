@@ -3480,6 +3480,55 @@ return true;
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'HasPermission',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: 'Expression which returns true if the user has a given permission.',
+
+  javaImports: [
+    'foam.core.FObject',
+    'foam.core.X',
+    'foam.nanos.auth.AuthService'
+  ],
+
+  properties: [
+    {
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
+      javaType: 'foam.core.X',
+      flags: ['java'],
+      name: 'userContext'
+    },
+    {
+      class: 'String',
+      name: 'permissionPrefix'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      code: function() {
+        // Authorization on the client is futile since the user has full control
+        // over the code that executes on their machine.
+        // A client-side implementation of this predicate would also have to be
+        // async in this case because we would need to access the auth service,
+        // but we don't support async predicate execution on the client as far
+        // as I'm aware.
+        return true;
+      },
+      javaCode: `
+        X x = (X) getUserContext();
+        String permission = getPermissionPrefix() + "." + ((FObject) obj).getProperty("id");
+        AuthService auth = (AuthService) x.get("auth");
+        return auth.check(x, permission);
+      `
+    },
+  ]
+});
+
 
 // TODO(braden): We removed Expr.pipe(). That may still be useful to bring back,
 // probably with a different name. It doesn't mean the same as DAO.pipe().
