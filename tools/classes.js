@@ -146,6 +146,7 @@ var classes = [
   'foam.dao.SequenceNumberDAOTest',
   'foam.dao.PipelinePMDAO',
   'foam.dao.PMDAO',
+  'foam.dao.PutOnlyDAO',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
