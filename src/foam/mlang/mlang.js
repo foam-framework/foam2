@@ -3483,7 +3483,7 @@ return true;
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'HasPermission',
-  extends: 'foam.mlang.predicate.Binary',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: [ 'foam.core.Serializable' ],
 
   documentation: 'Expression which returns true if the user has a given permission.',
@@ -3492,6 +3492,19 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.X',
     'foam.nanos.auth.AuthService'
+  ],
+
+  properties: [
+    {
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
+      javaType: 'foam.core.X',
+      flags: ['java'],
+      name: 'userContext'
+    },
+    {
+      class: 'String',
+      name: 'permissionPrefix'
+    }
   ],
 
   methods: [
@@ -3507,9 +3520,8 @@ foam.CLASS({
         return true;
       },
       javaCode: `
-        X x = (X) getArg1().f(obj);
-        String prefix = (String) getArg2().f(obj);
-        String permission = prefix + "." + ((FObject) obj).getProperty("id");
+        X x = (X) getUserContext();
+        String permission = getPermissionPrefix() + "." + ((FObject) obj).getProperty("id");
         AuthService auth = (AuthService) x.get("auth");
         return auth.check(x, permission);
       `
