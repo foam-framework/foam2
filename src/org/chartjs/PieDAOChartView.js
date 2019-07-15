@@ -77,7 +77,6 @@ foam.CLASS({
 
             config.data = {
               datasets: [{
-                label: 'Colors',
                 data: data,
                 backgroundColor: backgroundColors
               }],
