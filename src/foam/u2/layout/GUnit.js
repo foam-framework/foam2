@@ -16,12 +16,6 @@ foam.CLASS({
     'displayWidth?'
   ],
 
-  css: `
-    ^ {
-      margin: 8px;
-    }
-  `,
-
   properties: [
     {
       class: 'Int',
@@ -100,9 +94,10 @@ foam.CLASS({
 
       // need to bind the flex value to displayWidth because it can change
       this.style({
-        'flex': this.displayWidth$.map(dw => {
+        'box-sizing': 'border-box',
+        'width': this.displayWidth$.map(dw => {
           dw = dw || foam.u2.layout.DisplayWidth.XL;
-          return this[`${dw.name.toLowerCase()}Columns`] / dw.cols;
+          return 100 * this[`${dw.name.toLowerCase()}Columns`] / dw.cols + '%';
         })
       })
     }
