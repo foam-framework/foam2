@@ -7,9 +7,11 @@
 package foam.nanos.dig;
 
 import foam.core.*;
+import foam.dao.CSVSink;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.lib.csv.CSVSupport;
+import foam.lib.csv.CSVOutputter;
 import foam.lib.json.JSONParser;
 import foam.lib.json.OutputterMode;
 import foam.lib.json.Outputter;
@@ -188,7 +190,6 @@ public class DigWebAgent
             obj = daoPut(dao, obj);
           }
 
-          //returnMessage = "<objects>" + success + "</objects>";
         } else if ( Format.CSV == format ) {
           if ( SafetyUtil.isEmpty(data) && SafetyUtil.isEmpty(fileAddress) ) {
             DigErrorMessage error = new EmptyDataException.Builder(x)
@@ -347,16 +348,14 @@ public class DigWebAgent
               out.println("<" + simpleName + "s>"+ outputterXml.toString() + "</" + simpleName + "s>");
             }
           } else if ( Format.CSV == format ) {
-            foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);
-            outputterCsv.output(sink.getArray().toArray());
+            CSVOutputter outputterCsv = new CSVOutputter.Builder(x)
+             .setOf(cInfo)
+             .build();
 
-            List a = sink.getArray();
-            for ( int i = 0; i < a.size(); i++ ) {
-              outputterCsv.put((FObject) a.get(i), null);
+            for ( Object o : sink.getArray() ) {
+              outputterCsv.outputFObject((FObject)o);
             }
 
-            //resp.setContentType("text/plain");
-            //if ( email.length != 0 && ! email[0].equals("")  && email[0] != null ) {
             if ( emailSet ) {
               output(x, outputterCsv.toString());
             } else {
@@ -538,9 +537,8 @@ public class DigWebAgent
 
     } else if ( format == Format.CSV )  {
       //output error in csv format
-
-      foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);
-      outputterCsv.put(error, null);
+      CSVOutputter outputterCsv = new CSVOutputter.Builder(x).build();
+      outputterCsv.outputFObject(error);
       out.println(outputterCsv.toString());
 
     } else if ( format == Format.HTML ) {

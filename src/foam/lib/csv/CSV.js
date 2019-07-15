@@ -268,22 +268,3 @@ foam.CLASS({
     }
   ]
 });
-
-foam.LIB({
-  name: 'foam.lib.csv',
-
-  constants: {
-    Standard: foam.lib.csv.Outputter.create(),
-  },
-
-  methods: [
-    function toCSV(o) {
-      return foam.lib.csv.Standard.toCSV(o);
-    },
-
-    function fromCSV(cls, csvString, sink) {
-      return foam.lib.csv.Standard.fromCSV(cls, csvString, sink);
-    }
-  ]
-});
-

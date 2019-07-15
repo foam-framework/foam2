@@ -7,13 +7,14 @@
 foam.CLASS({
   package: 'foam.lib.csv',
   name: 'CSVOutputter',
-  implements: [ 'foam.core.Serializable' ],
 
   javaImports: [
     'foam.core.*',
+    'foam.nanos.logger.Logger',
+    'java.util.ArrayList',
     'java.util.List',
-    'java.lang.String',
-    'java.util.Date'
+    'java.util.Date',
+    'java.util.stream.Collectors'
   ],
 
   properties: [
@@ -31,9 +32,23 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'props',
-      factory: function() {
-        return this.of.getAxiomByName('tableColumns').columns;
+      factory: function(of) {
+        if ( ! of ) console.error('csvOutputter does not know the \'of\' of an object');
+        if ( of.getAxiomByName('tableColumns') ) return of.getAxiomByName('tableColumns').columns;
+        return of.getAxiomsByClass().map((p) => p.name ).filter((p) => ! p.networkTransient).flat();
       },
+      javaFactory: `
+        if ( ! isPropertySet("of") ) {
+          ((Logger)getX().get("logger"))
+            .error("csvOutputter does not know the 'of' of an object");
+        }
+
+        ArrayList<String> propInfoArrayList =((List<PropertyInfo>)getOf().getAxioms()).stream()
+          .filter((propI) -> ! propI.getNetworkTransient())
+          .map((propI) -> propI.getName())
+          .collect(Collectors.toCollection(ArrayList::new));
+        return propInfoArrayList.toArray(new String[propInfoArrayList.size()]);
+      `,
       visibility: 'HIDDEN'
     },
     {
@@ -85,7 +100,7 @@ foam.CLASS({
         foam.mmethod(
           {
             String: function(value) {
-              this.csv += `"${value.replace(/\"/g, '""')}"`;
+              this.csv += `${value.replace(/\"/g, '""')}`;
             },
             Number: function(value) {
               this.csv += value.toString();
@@ -109,9 +124,7 @@ foam.CLASS({
         }),
       javaCode: `
         if ( value instanceof String ) {
-          getSb().append("\\"");
           getSb().append(((String)value).replace("\\"", "\\"\\""));
-          getSb().append("\\"");
         } else if ( value instanceof Number ) {
           getSb().append(value.toString());
         } else if ( value instanceof Boolean ) {
@@ -122,6 +135,8 @@ foam.CLASS({
           outputValue_(value.toString());
         } else if ( value instanceof List ) {
           outputValue_(value.toString());
+        }  else if ( value == null ) {
+          // Do nothing
         } else {
           outputValue_(value.toString());
         }
@@ -146,15 +161,14 @@ foam.CLASS({
       javaCode: 'return getSb().toString();'
     },
     {
-      name: 'headerOutput',
+      name: 'outputHeader',
       args: [
         { type: 'FObject', name: 'obj' }
       ],
       code: function() {
-        var element;
         this.props.forEach((name) => {
-          element = this.of.getAxiomByName(name);
-          element.toCSVLabel(this, element);
+          let prop = this.of.getAxiomByName(name);
+          prop.toCSVLabel(this, prop);
         });
         this.newLine_();
         this.isFirstRow = false;
@@ -179,32 +193,27 @@ foam.CLASS({
         { type: 'FObject', name: 'obj' }
       ],
       code: function(obj) {
-        var element;
-
         if ( ! this.of ) this.of = obj.cls_;
 
-        if ( this.isFirstRow ) this.headerOutput();
+        if ( this.isFirstRow ) this.outputHeader();
 
         this.props.forEach((name) => {
-          element = this.of.getAxiomByName(name);
-          element.toCSV(x, obj, this, element);
+          let prop = this.of.getAxiomByName(name);
+          prop.toCSV(x, obj, this, prop);
         });
 
         this.newLine_();
       },
       javaCode: `
-        Object propObj;
-        PropertyInfo columnProp;
-        String[] tableColumnNames = getProps();
-
         if ( ! isPropertySet("of") || getOf() == null ) setOf(obj.getClassInfo());
 
-        if ( getIsFirstRow() ) headerOutput(obj);
+        PropertyInfo prop;
 
-        for (String propName : tableColumnNames) {
-          propObj = obj.getProperty(propName);
-          columnProp = (PropertyInfo) getOf().getAxiomByName(propName);
-          columnProp.toCSV(getX(), obj, this, propObj);
+        if ( getIsFirstRow() ) outputHeader(obj);
+
+        for (String name : getProps()) {
+          prop = (PropertyInfo) getOf().getAxiomByName(name);
+          prop.toCSV(getX(), obj, this, null);
         }
 
         newLine_();
