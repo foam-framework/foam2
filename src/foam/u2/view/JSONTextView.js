@@ -9,12 +9,20 @@ foam.CLASS({
   name: 'JSONTextView',
   extends: 'foam.u2.View',
   requires: [
-    'foam.u2.tag.TextArea'
+    'foam.u2.detail.SectionedDetailPropertyView',
+    'foam.u2.tag.TextArea',
   ],
   properties: [
     {
       class: 'String',
+      label: '',
       name: 'data_',
+      view: function(_, x) {
+        return x.data.TextArea.create({
+          rows: x.data.rows,
+          cols: x.data.cols,
+        });
+      },
       expression: function(data) {
         return foam.json.Pretty.stringify(data);
       },
@@ -26,6 +34,9 @@ foam.CLASS({
         } catch ( e ) {
           this.error = e;
         }
+      },
+      validateObj: function(error) {
+        return error || null;
       }
     },
     {
@@ -33,18 +44,14 @@ foam.CLASS({
       name: 'error'
     },
     'rows',
-    'columns'
+    'cols'
   ],
   methods: [
     function initE() {
-      this
-        .start(this.TextArea, {
-          data$: this.data_$,
-          mode$: this.mode$,
-          rows: this.rows,
-          cols: this.cols
-        }).end()
-        .start('div').add(this.error$).end();
+      this.tag(this.SectionedDetailPropertyView, {
+        prop: this.DATA_,
+        data: this
+      });
     }
   ]
 });

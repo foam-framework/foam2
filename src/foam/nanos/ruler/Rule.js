@@ -117,7 +117,8 @@
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'predicate',
-      hidden: true,
+      // TODO make a friendlier view.
+      view: { class: 'foam.u2.view.JSONTextView' },
       javaFactory: `
       return foam.mlang.MLang.TRUE;
       `,
