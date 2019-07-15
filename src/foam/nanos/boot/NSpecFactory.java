@@ -45,7 +45,7 @@ public class NSpecFactory
       Logger logger = (Logger) x.get("logger");
 
       try {
-        if (logger != null) logger.info("Creating Service", spec_.getName());
+        if ( logger != null ) logger.info("Creating Service", spec_.getName());
         ns_ = spec_.createService(x_.getX().put(NSpec.class, spec_));
         Object ns = ns_;
         while ( ns != null ) {
@@ -58,9 +58,14 @@ public class NSpecFactory
             ns = null;
           }
         }
-        if (logger != null) logger.info("Created Service", spec_.getName(), ( ns_ != null ) ? ns_.getClass().getSimpleName() : ns_);
+        if ( logger != null ) logger.info("Created Service", spec_.getName(), ( ns_ != null ) ? ns_.getClass().getSimpleName() : ns_);
       } catch (Throwable t) {
-        if (logger != null) logger.error("Error Creating Service", spec_.getName(), t);
+        if ( logger != null ) {
+          logger.error("Error Creating Service", spec_.getName(), t);
+        } else {
+          System.err.println("Error Creating Service: "+spec_.getName());
+          t.printStackTrace();
+        }
       } finally {
         pm.log(x_.getX());
         creatingThread_ = null;
