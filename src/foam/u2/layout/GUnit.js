@@ -16,7 +16,7 @@ foam.CLASS({
     'foam.u2.layout.GridColumns'
   ],
   
-  properties: [gr
+  properties: [
     {
       class: 'FObjectProperty',
       of: 'foam.u2.layout.GridColumns',
