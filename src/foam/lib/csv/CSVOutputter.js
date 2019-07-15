@@ -100,7 +100,11 @@ foam.CLASS({
         foam.mmethod(
           {
             String: function(value) {
-              this.csv += `${value.replace(/\"/g, '""')}`;
+              if ( value.includes(',') ) {
+                this.csv += `"${value.replace(/\"/g, '""')}"`;
+              } else {
+                this.csv += value;
+              }
             },
             Number: function(value) {
               this.csv += value.toString();
@@ -124,7 +128,13 @@ foam.CLASS({
         }),
       javaCode: `
         if ( value instanceof String ) {
-          getSb().append(((String)value).replace("\\"", "\\"\\""));
+          if ( ((String)value).contains(",") ) {
+            getSb().append("\\"");
+            getSb().append(((String)value).replace("\\"", "\\"\\""));
+            getSb().append("\\"");
+          } else {
+            getSb().append(value);
+          }
         } else if ( value instanceof Number ) {
           getSb().append(value.toString());
         } else if ( value instanceof Boolean ) {
@@ -174,14 +184,10 @@ foam.CLASS({
         this.isFirstRow = false;
       },
       javaCode: `
-        Object propObj;
-        PropertyInfo columnProp;
-        String[] tableColumnNames = getProps();
-
-        for (String propName: tableColumnNames) {
-          propObj = obj.getProperty(propName);
-          columnProp = (PropertyInfo) getOf().getAxiomByName(propName);
-          columnProp.toCSVLabel(this, propObj);
+        PropertyInfo prop;
+        for (String name: getProps()) {
+          prop = (PropertyInfo) getOf().getAxiomByName(name);
+          prop.toCSVLabel(this, obj.getProperty(name));
         }
         newLine_();
         setIsFirstRow(false);
@@ -199,21 +205,19 @@ foam.CLASS({
 
         this.props.forEach((name) => {
           let prop = this.of.getAxiomByName(name);
-          prop.toCSV(x, obj, this, prop);
+          prop.toCSV(x, obj, this);
         });
 
         this.newLine_();
       },
       javaCode: `
         if ( ! isPropertySet("of") || getOf() == null ) setOf(obj.getClassInfo());
-
-        PropertyInfo prop;
-
         if ( getIsFirstRow() ) outputHeader(obj);
 
+        PropertyInfo prop;
         for (String name : getProps()) {
           prop = (PropertyInfo) getOf().getAxiomByName(name);
-          prop.toCSV(getX(), obj, this, null);
+          prop.toCSV(getX(), obj, this);
         }
 
         newLine_();

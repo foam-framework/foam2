@@ -126,8 +126,8 @@ foam.CLASS({
     {
       name: 'toCSV',
       class: 'Function',
-      value: function(obj, outputter, prop) {
-        outputter.outputValue(obj ? obj[prop.name] : null);
+      value: function(obj, outputter) {
+        outputter.outputValue(obj ? obj[this.name] : null);
       }
     },
     {
@@ -153,14 +153,14 @@ foam.CLASS({
     {
       name: 'toCSV',
       class: 'Function',
-      value: function(x, obj, outputter, prop) {
-        if ( ! prop.of ) {
-          outputter.outputValue(obj ? obj[prop.name] : null);
+      value: function(x, obj, outputter) {
+        if ( ! this.of ) {
+          outputter.outputValue(obj ? obj[this.name] : null);
           return;
         }
-        prop.of.getAxiomsByClass(foam.core.Property)
+        this.of.getAxiomsByClass(foam.core.Property)
           .forEach((axiom) => {
-            axiom.toCSV(x, obj ? obj[prop.name] : null, outputter, axiom);
+            axiom.toCSV(x, obj ? obj[this.name] : null, outputter, axiom);
           });
       }
     },
@@ -174,7 +174,7 @@ foam.CLASS({
         }
         // mini decorator
         var prefixedOutputter = {
-          output: function(value) {
+          outputValue: function(value) {
             outputter.outputValue(prop.name + '.' + value);
           }
         };
@@ -182,7 +182,23 @@ foam.CLASS({
           .forEach((axiom) => {
             axiom.toCSVLabel(prefixedOutputter, axiom);
           });
-      }
+      },
+      // javaToCSVLabel: `
+      //   if ( prop.of == null || ! prop.isPropertySet("of") ) {
+      //     outputter.outputValue(prop.getName());
+      //     return;
+      //   }
+      //   // // mini decorator
+      //   // var prefixedOutputter = {
+      //   //   outputValue: function(value) {
+      //   //     outputter.outputValue(prop.name + '.' + value);
+      //   //   }
+      //   // };
+      //   prop.of.getAxiomsByClass(foam.core.Property)
+      //     .forEach((axiom) => {
+      //       axiom.toCSVLabel(prefixedOutputter, axiom);
+      //     });
+      // `
     }
   ]
 });
