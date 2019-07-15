@@ -646,6 +646,8 @@ FOAM_FILES([
   { name: "foam/u2/layout/Layouts" },
   { name: "foam/u2/layout/Grid" },
   { name: "foam/u2/layout/Card" },
+  { name: "foam/u2/layout/GUnit" },
+  { name: "foam/u2/layout/GridColumns" },
 
   { name: "foam/comics/v2/CannedQuery" },
   { name: "foam/comics/v2/DAOBrowseControllerView" },
@@ -662,7 +664,6 @@ FOAM_FILES([
 
   { name: "foam/u2/detail/AbstractSectionedDetailView" },
   { name: "foam/u2/detail/SectionView" },
-  { name: "foam/u2/detail/GridSectionView" },
   { name: "foam/u2/detail/SectionedDetailView" },
   { name: "foam/u2/detail/VerticalDetailView" },
   { name: "foam/u2/detail/WizardSectionsView" },

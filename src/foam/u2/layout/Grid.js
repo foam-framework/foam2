@@ -49,11 +49,12 @@ foam.CLASS({
       )
     },
 
+    // TODO: need to add a listener to displayWidth so createChild refires
     function createChild_(spec, args){
       var ret = this.SUPER(spec, args);
 
       var width = this.GUnit.isInstance(ret) 
-        ? ret[`${this.displayWidth.name.toLowerCase()}Columns`] 
+        ? ret.columns[`${this.displayWidth.name.toLowerCase()}Columns`] 
         : this.displayWidth.cols;
 
       var startCol = this.currentWidth + 1;

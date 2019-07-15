@@ -11,74 +11,26 @@ foam.CLASS({
   documentation: `
     A Grid Unit based on a responsive grid system
   `,
+
+  requires: [
+    'foam.u2.layout.GridColumns'
+  ],
   
-  properties: [
+  properties: [gr
     {
-      class: 'Int',
+      class: 'FObjectProperty',
+      of: 'foam.u2.layout.GridColumns',
       name: 'columns',
       documentation: `
         Sets up a standard default column width across all display types
       `,
-      value: 12
-    },
-    {
-      class: 'Int',
-      name: 'xxsColumns',
-      documentation: `
-        The column width for the smaller end of smartphone devices and smartphone portrait screens using an 8 column grid
-      `,
-      expression: function(columns) {
-        return Math.min(8, columns);
-      }
-    },
-    {
-      class: 'Int',
-      name: 'xsColumns',
-      documentation: `
-        The column width for the regular end of smartphone devices using an 8 column grid
-      `,
-      expression: function(columns) {
-        return Math.min(8, columns);
-      }
-    },
-    {
-      class: 'Int',
-      name: 'smColumns',
-      documentation: `
-        The column width for the larger end of smartphone devices and landscape smartphone screens using a 12 column grid
-      `,
-      expression: function(columns) {
-        return columns;
-      }
-    },
-    {
-      class: 'Int',
-      name: 'mdColumns',
-      documentation: `
-        The column width for most tablet screens and portrait tablet screens using a 12 column grid
-      `,
-      expression: function(columns) {
-        return columns;
-      }
-    },
-    {
-      class: 'Int',
-      name: 'lgColumns',
-      documentation: `
-        The column width for the smaller end of desktop screens using a 12 column grid
-      `,
-      expression: function(columns) {
-        return columns;
-      }
-    },
-    {
-      class: 'Int',
-      name: 'xlColumns',
-      documentation: `
-        The column width for the majority of desktop screens using a 12 column grid
-      `,
-      expression: function(columns) {
-        return columns;
+      adapt: function(_, n){
+        if ( foam.Number.isInstance(n) ) {
+          return this.GridColumns.create({
+            columns: n
+          })
+        }
+        return n;
       }
     }
   ],
