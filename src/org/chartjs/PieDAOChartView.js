@@ -41,7 +41,14 @@ foam.CLASS({
           return palette[context.dataIndex % palette.length];
         }
       }
+    },
+    // Note: This is a workaround for a chartjs issue. Once it is resolved,
+    //       revert back to previous implementation
+    {
+      name: 'palette',
+      value: ['#E3170D', '#AF4035', '#CC1100', '#FFE4E1', '#FF6347', '#FF6600']
     }
+    // END WORKAROUND
   ],
 
   listeners: [
@@ -58,10 +65,21 @@ foam.CLASS({
             // a stack overflow.
             self.config.data = { datasets: [] };
             var config = foam.Object.clone(self.config);
+
+            // Note: this is a workaround for a chartjs issue. Once it is resolved,
+            //       revert back to previous implementation
+            var data = Object.keys(sink.groups).map(key => sink.groups[key].value);
+            var backgroundColors = [];
+            data.forEach(function(_ ,index) {
+              backgroundColors.push(self.palette[index % self.palette.length]);
+            });
+            // END WORKAROUND
+
             config.data = {
               datasets: [{
-                data: Object.keys(sink.groups).map(key => sink.groups[key].value),
-                backgroundColor: self.backgroundColor
+                label: 'Colors',
+                data: data,
+                backgroundColor: backgroundColors
               }],
               labels: Object.keys(sink.groups)
             };
