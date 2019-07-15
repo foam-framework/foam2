@@ -32,23 +32,9 @@ foam.CLASS({
       name: 'valueExpr'
     },
     {
-      name: 'backgroundColor',
-      factory: function() {
-        // You can also return an array of colors. But bear in mind that the length of the array
-        // must match the number of data being displayed as it will match the index of the data.
-        return function(context) {
-          const palette = ['#E3170D', '#AF4035', '#CC1100', '#FFE4E1', '#FF6347', '#FF6600'];
-          return palette[context.dataIndex % palette.length];
-        }
-      }
-    },
-    // Note: This is a workaround for a chartjs issue. Once it is resolved,
-    //       revert back to previous implementation
-    {
       name: 'palette',
       value: ['#E3170D', '#AF4035', '#CC1100', '#FFE4E1', '#FF6347', '#FF6600']
     }
-    // END WORKAROUND
   ],
 
   listeners: [
@@ -66,21 +52,41 @@ foam.CLASS({
             self.config.data = { datasets: [] };
             var config = foam.Object.clone(self.config);
 
-            // Note: this is a workaround for a chartjs issue. Once it is resolved,
-            //       revert back to previous implementation
-            var data = Object.keys(sink.groups).map(key => sink.groups[key].value);
+            var keys = Object.keys(sink.groups);
+            var data = [];
             var backgroundColors = [];
-            data.forEach(function(_ ,index) {
-              backgroundColors.push(self.palette[index % self.palette.length]);
+            keys.forEach(key => {
+              data.push(sink.groups[key].value);
+              if ( ! Array.isArray(self.palette) && typeof self.palette === 'object' ) {
+                // Color has a key associated with it
+                var color = self.palette[key];
+                var unsupportedKeyColor = self.palette['default'] ? self.palette['default'] : 'lightgray';
+                color ? backgroundColors.push(color) : backgroundColors.push(unsupportedKeyColor);
+              }
             });
-            // END WORKAROUND
+
+            if ( Array.isArray(self.palette) && self.palette.length > 0 ) {
+              // Cycle through palette
+              data.forEach(function(_, index) {
+                backgroundColors.push(self.palette[index % self.palette.length]);
+              });
+            } else if (typeof self.palette === 'function' ) {
+              // Pass keys and data in their correct order to method passed to be
+              // processed
+              backgroundColors = self.palette(keys, data);
+            } else {
+              // Fallback if all else fails. Should never be the case.
+              data.forEach(function(_, index) {
+                backgroundColors.push('lightgray');
+              });
+            }
 
             config.data = {
               datasets: [{
                 data: data,
                 backgroundColor: backgroundColors
               }],
-              labels: Object.keys(sink.groups)
+              labels: keys
             };
             self.config = config;
           });
