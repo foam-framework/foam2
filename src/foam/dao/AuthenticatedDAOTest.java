@@ -69,8 +69,8 @@ public class AuthenticatedDAOTest
     x = x.put("groupDAO", groupDAO);
 
     // Mock the groupPermissionJunctionDAO.
-    x = TestUtils.mockDAO(x, "localGroupPermissionJunctionDAO");
-    DAO groupPermissionJunctionDAO = (DAO) x.get("localGroupPermissionJunctionDAO");
+    x = TestUtils.mockDAO(x, "groupPermissionJunctionDAO");
+    DAO groupPermissionJunctionDAO = (DAO) x.get("groupPermissionJunctionDAO");
 
     // Mock the permissionDAO.
     x = TestUtils.mockDAO(x, "localPermissionDAO");
