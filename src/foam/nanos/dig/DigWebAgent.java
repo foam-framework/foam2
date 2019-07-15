@@ -21,6 +21,7 @@ import foam.lib.PropertyPredicate;
 import foam.lib.StoragePropertyPredicate;
 import foam.mlang.MLang;
 import foam.mlang.predicate.Predicate;
+import foam.nanos.boot.NSpec;
 import foam.nanos.dig.exception.*;
 import foam.nanos.http.*;
 import foam.nanos.logger.Logger;
@@ -79,6 +80,16 @@ public class DigWebAgent
         //   } catch ( java.io.IOException e ) {
         //     logger.error("Failed to redirect to", url, e);
         //   }
+        return;
+      }
+
+      NSpec nspec = (NSpec) nSpecDAO.find(daoName);
+      if ( nspec == null ||
+           ! nspec.getServe() ) {
+         DigErrorMessage error = new DAONotFoundException.Builder(x)
+                                      .setMessage("DAO not found: " + daoName)
+                                      .build();
+        outputException(x, resp, format, out, error);
         return;
       }
 

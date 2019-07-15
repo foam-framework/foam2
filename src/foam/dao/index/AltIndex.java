@@ -37,7 +37,7 @@ public class AltIndex
 
     // Copy all data from first index into new index, updating state
     final Object[] sa   = toObjectArray(state);
-          Sink     sink = new AbstractSink() {
+    Sink     sink = new AbstractSink() {
       public void put(Object obj, foam.core.Detachable sub) {
         sa[sa.length-1] = i.put(sa[sa.length-1], (FObject) obj);
       }
