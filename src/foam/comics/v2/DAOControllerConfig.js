@@ -22,11 +22,27 @@ foam.CLASS({
       name: 'daoKey'
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'predicate',
+      view: { class: 'foam.u2.view.JSONTextView' }
+    },
+    {
       class: 'foam.dao.DAOProperty',
       name: 'dao',
       hidden: true,
-      expression: function(daoKey) {
-        return this.__context__[daoKey] || foam.dao.NullDAO.create({of: foam.core.FObject});
+      expression: function(daoKey, predicate) {
+        var dao = this.__context__[daoKey] || foam.dao.NullDAO.create({of: foam.core.FObject});
+        if ( this.hasOwnProperty('of') ) {
+          dao = foam.dao.ProxyDAO.create({
+            of: this.of,
+            delegate: dao
+          });
+        }
+        if ( predicate ) {
+          dao = dao.where(predicate);
+        }
+        return dao;
       }
     },
     {
@@ -37,7 +53,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'browseTitle',
-      expression: function(of) { return of.name; }
+      expression: function(of) { return of.model_.label; }
     },
     {
       class: 'foam.u2.ViewSpecWithJava',
