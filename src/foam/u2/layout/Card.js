@@ -12,15 +12,9 @@ foam.CLASS({
     A card based on a responsive grid system
   `,
 
-  requires: [
-    'foam.u2.borders.CardBorder'
-  ],
-
   css: `
     ^ {
       padding: 8px;
-    }
-    ^ > * {
       border-radius: 3px;
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
       border: solid 1px #e7eaec;

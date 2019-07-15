@@ -87,19 +87,19 @@ foam.CLASS({
     }
   ],
 
-  methods: [
-    function initE() {
-      this.SUPER();
-      this.addClass(this.myClass());
+  // methods: [
+  //   function initE() {
+  //     this.SUPER();
+  //     this.addClass(this.myClass());
 
-      // need to bind the flex value to displayWidth because it can change
-      this.style({
-        'box-sizing': 'border-box',
-        'width': this.displayWidth$.map(dw => {
-          dw = dw || foam.u2.layout.DisplayWidth.XL;
-          return 100 * this[`${dw.name.toLowerCase()}Columns`] / dw.cols + '%';
-        })
-      })
-    }
-  ]
+  //     // need to bind the flex value to displayWidth because it can change
+  //     this.style({
+  //       'box-sizing': 'border-box',
+  //       'width': this.displayWidth$.map(dw => {
+  //         dw = dw || foam.u2.layout.DisplayWidth.XL;
+  //         return 100 * this[`${dw.name.toLowerCase()}Columns`] / dw.cols + '%';
+  //       })
+  //     })
+  //   }
+  // ]
 });
