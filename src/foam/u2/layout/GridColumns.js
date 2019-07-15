@@ -83,3 +83,14 @@ foam.CLASS({
     }
   ],
 });
+
+foam.CLASS({
+  package: 'foam.u2.layout',
+  name: 'PropertyGridRefinement',
+  refines: 'foam.core.Property',
+  properties: [
+    {
+      name: 'gridColumns'
+    }
+  ]
+})
