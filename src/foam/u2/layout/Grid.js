@@ -68,7 +68,7 @@ foam.CLASS({
 
       ret.style({
         'grid-column-start': startCol,
-        'grid-column-end': endCol,
+        'grid-column-end': endCol
       });
 
       return ret;
