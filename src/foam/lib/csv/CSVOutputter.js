@@ -26,7 +26,7 @@ foam.CLASS({
       class: 'String',
       name: 'csv',
       view: 'foam.u2.tag.TextArea',
-      documentation: 'Used for js version of this outputter.'
+      flags: ['js']
     },
     {
       class: 'Class',
@@ -182,9 +182,8 @@ foam.CLASS({
         this.isFirstRow = false;
       },
       javaCode: `
-        PropertyInfo prop;
         for (String name: getProps()) {
-          prop = (PropertyInfo) getOf().getAxiomByName(name);
+          PropertyInfo prop = (PropertyInfo) getOf().getAxiomByName(name);
           prop.toCSVLabel(getX(), this, obj);
         }
         newLine_();
@@ -209,12 +208,11 @@ foam.CLASS({
         this.newLine_();
       },
       javaCode: `
-        if ( ! isPropertySet("of") || getOf() == null ) setOf(obj.getClassInfo());
+        if ( getOf() == null ) setOf(obj.getClassInfo());
         if ( getIsFirstRow() ) outputHeader(obj);
 
-        PropertyInfo prop;
         for (String name : getProps()) {
-          prop = (PropertyInfo) getOf().getAxiomByName(name);
+          PropertyInfo prop = (PropertyInfo) getOf().getAxiomByName(name);
           prop.toCSV(getX(), obj, this);
         }
 
