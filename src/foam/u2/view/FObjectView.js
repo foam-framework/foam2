@@ -52,26 +52,32 @@ foam.CLASS({
       name: 'choices',
       expression: function(of) {
         if ( ! of ) return [];
-        var models = Object.keys(foam.USED)
-          .map(id => foam.lookup(id, true))
-          .filter(cls => cls)
-          .map(cls => cls.model_);
+        var modelIdToDeps = Object.values(foam.USED)
+          .concat(Object.values(foam.UNUSED))
+          .reduce((map, m) => {
+            var deps = m.implements ? m.implements.map(imp => {
+              return foam.String.isInstance(imp) ? imp : imp.path;
+            }) : [];
+            if ( m.extends ) deps.push(m.extends);
+            var id = m.id || m.package + '.' + m.name;
+            map[id] = deps;
+            return map;
+          }, {});
         
         var choices = {};
-        choices[of.id] = of.model_;
+        choices[of.id] = true;
         while ( true ) {
           var prev = Object.keys(choices).length;
-          models.forEach(m => {
-            if ( choices[m.extends] || ( m.implements && m.implements.find(i => choices[i.path] ) ) ) {
-              choices[m.id] = m;
-            }
-          })
+          for ( var [id, deps] of Object.entries(modelIdToDeps) ) {
+            if ( deps.filter(d => choices[d]).length ) choices[id] = true;
+          }
           if ( prev == Object.keys(choices).length ) break;
         }
-        models = Object.values(choices);
 
-        return models
+        return Object.keys(choices)
+          .map(id => foam.lookup(id).model_)
           .filter(m => ! foam.core.InterfaceModel.isInstance(m))
+          .filter(m => ! m.abstract )
           .map(m => [ m.id, m.label ]);
       }
     }

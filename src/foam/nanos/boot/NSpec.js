@@ -193,8 +193,13 @@ foam.CLASS({
           saveService(x, service);
           return service;
         } catch (EvalError e) {
-          System.err.println("NSpec serviceScript error: " + getServiceScript());
-          e.printStackTrace();
+          foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
+          if ( logger != null ) {
+            logger.error("NSpec serviceScript error", getServiceScript(), e);
+          } else {
+            System.err.println("NSpec serviceScript error: " + getServiceScript());
+            e.printStackTrace();
+          }
         }
 
         return null;
