@@ -24,13 +24,9 @@ foam.CLASS({
       documentation: `
         Sets up a standard default column width across all display types
       `,
-      adapt: function(_, n){
-        if ( foam.Number.isInstance(n) ) {
-          return this.GridColumns.create({
-            columns: n
-          })
-        }
-        return n;
+      adapt: function(o, n, p){
+        n = foam.Number.isInstance(n) ? { columns: n } : n;
+        return foam.core.FObjectProperty.ADAPT.value.call(this, o, n, p);
       }
     }
   ],

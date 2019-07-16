@@ -23,14 +23,8 @@ foam.CLASS({
   css: `
     ^ {
       display: grid;
-      grid-column-gap: 16px;
-      grid-row-gap: 32px;
     }
   `,
-
-  reactions: [
-    ['', 'propertyChange.displayWidth', 'resizeChildren']
-  ],
 
   listeners: [
     {
@@ -40,9 +34,9 @@ foam.CLASS({
         this.shown = false;
         var currentWidth = 0;
         this.childNodes.forEach(ret => {
-          var width = this.GUnit.isInstance(ret) 
-            ? ret.columns[`${this.displayWidth.name.toLowerCase()}Columns`] 
-            : this.displayWidth.cols;
+          var width = this.GUnit.isInstance(ret) && ret.columns &&
+            ret.columns[`${this.displayWidth.name.toLowerCase()}Columns`] ||
+            this.displayWidth.cols;
 
           var startCol = currentWidth + 1;
           currentWidth += width;
@@ -68,6 +62,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.addClass(this.myClass());
+      this.onDetach(this.displayWidth$.sub(this.resizeChildren));
       this.style(
         { 'grid-template-columns': this.displayWidth$.map(dw => {
             dw = dw || foam.u2.layout.DisplayWidth.XL;
