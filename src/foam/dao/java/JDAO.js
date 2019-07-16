@@ -90,7 +90,9 @@ foam.CLASS({
       synchronized: true,
       javaCode: `
         foam.core.FObject result = super.remove_(x, obj);
-        getJournal().remove(x, result);
+        if ( result != null ) {
+          getJournal().remove(x, result);
+        }
         return result;
       `
     },

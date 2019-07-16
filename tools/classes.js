@@ -64,6 +64,7 @@ var classes = [
   'foam.mlang.ContextObject',
   'foam.mlang.predicate.RegExp',
   'foam.mlang.predicate.OlderThan',
+  'foam.mlang.predicate.HasPermission',
   'foam.box.Box',
   'foam.box.Skeleton',
   'foam.box.AbstractSkeleton',

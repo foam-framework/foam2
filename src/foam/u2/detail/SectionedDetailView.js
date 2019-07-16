@@ -11,8 +11,8 @@ foam.CLASS({
 
   requires: [
     'foam.u2.detail.SectionView',
-    'foam.u2.layout.Cols',
-    'foam.u2.layout.Rows',
+    'foam.u2.layout.Grid',
+    'foam.u2.layout.GUnit',
     'foam.u2.borders.CardBorder'
   ],
 
@@ -37,10 +37,10 @@ foam.CLASS({
           if ( ! data ) return;
 
           return self.E()
-            .start(self.Rows)
+            .start(self.Grid)
               .forEach(sections, function(s) {
                 this
-                  .start()
+                  .start(self.GUnit, { columns: s.gridColumns })
                     .style({ padding: '16px 0' })
                     .show(s.createIsAvailableFor(self.data$))
                     .start('h2').add(s.title$).end()
