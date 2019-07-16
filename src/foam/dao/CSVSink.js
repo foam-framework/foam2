@@ -169,6 +169,21 @@ foam.CLASS({
       }
     },
     {
+      name: 'javaToCSV',
+      class: 'String',
+      value: `
+        if ( get(obj) == null && ! (get(obj) instanceof foam.core.FObject) ) {
+          outputter.outputValue(getName());
+          return;
+        }
+
+        java.util.List<foam.core.PropertyInfo> nestPropList = ((foam.core.FObject)get(obj)).getClassInfo().getAxiomsByClass(foam.core.PropertyInfo.class);
+        for ( foam.core.PropertyInfo axiom : nestPropList ) {
+          axiom.toCSV(x, get(obj), outputter);
+        }
+      `
+    },
+    {
       name: 'toCSVLabel',
       class: 'Function',
       value: function(x, outputter, obj) {
@@ -191,18 +206,19 @@ foam.CLASS({
       name: 'javaToCSVLabel',
       class: 'String',
       value: `
-        if ( ((foam.core.PropertyInfo)obj).getValueClass() == null ) {
-          outputter.outputValue(((foam.core.PropertyInfo)obj).getName());
+        if ( get(obj) == null && ! (get(obj) instanceof foam.core.FObject) ) {
+          outputter.outputValue(getName());
           return;
         }
 
         foam.lib.csv.CSVOutputterInterface prefixedOutputter = new foam.lib.csv.FObjectCSVOutputterDecorator.Builder(x)
           .setOutputter(outputter)
-          .setPreLabelString(((foam.core.PropertyInfo)obj).getName() + ".")
+          .setPreLabelString(getName() + ".")
           .build();
-        java.util.List<foam.core.PropertyInfo> nestPropList = ((foam.core.FObject)get(obj)).getClassInfo().getAxiomsByClass(foam.core.PropertyInfo.class);
+        foam.core.ClassInfo ofOFObj = ((foam.core.FObject)get(obj)).getClassInfo();
+        java.util.List<foam.core.PropertyInfo> nestPropList = ofOFObj.getAxiomsByClass(foam.core.PropertyInfo.class);
         for ( foam.core.PropertyInfo axiom : nestPropList ) {
-          axiom.toCSVLabel(x, prefixedOutputter, axiom);
+          axiom.toCSVLabel(x, prefixedOutputter, cast(get(obj)) );
         }
       `
     }

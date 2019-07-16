@@ -227,7 +227,6 @@ foam.CLASS({
       },
       javaCode: `
         getSb().setLength(0);
-        clearCsv();
         clearIsFirstRow();
         clearIsFirstColumn();
       `
