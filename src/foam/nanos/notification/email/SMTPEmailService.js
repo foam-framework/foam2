@@ -9,7 +9,8 @@ foam.CLASS({
   name: 'SMTPEmailService',
 
   implements: [
-    'foam.core.ContextAgent'
+    'foam.core.ContextAgent',
+    'foam.nanos.notification.email.EmailService',
   ],
 
   documentation: 'Implementation of Email Service using SMTP',
@@ -84,6 +85,24 @@ foam.CLASS({
           return Session.getInstance(props, new SMTPAuthenticator(getUsername(), getPassword()));
         }
         return Session.getInstance(props);
+      `
+    },
+    {
+      class: 'Object',
+      javaType: 'Transport',
+      name: 'transport_',
+      javaFactory:
+      `
+        Logger logger = (Logger) getX().get("logger");
+        Transport transport = null;
+        try {
+          transport = getSession_().getTransport("smtp");
+          transport.connect(getUsername(), getPassword());
+          logger.info("SMTPEmailService connected.");
+        } catch ( Exception e ) {
+          logger.error("Transport failed to initialize: " + e);
+        }
+        return transport;
       `
     },
     {
@@ -193,46 +212,44 @@ foam.CLASS({
       `
     },
     {
-      name: 'execute',
-      javaCode:
+      name: 'sendEmail',
+      javaCode: `
+        emailMessage = (EmailMessage) emailMessage.fclone();
+        MimeMessage message = createMimeMessage(emailMessage);
+        Logger logger = (Logger) getX().get("logger");
+        try {
+          getTransport_().send(message);
+          emailMessage.setStatus(Status.SENT);
+          logger.info("SMTPEmailService sent MimeMessage.");
+        } catch ( SendFailedException e ) {
+          emailMessage.setStatus(Status.FAILED);
+          logger.error("SMTPEmailService sending MimeMessage failed. " + e);
+        } catch ( MessagingException e ) {
+          try {
+            getTransport_().close();
+          } catch ( Exception e2 ) {
+            logger.error("Failed to close transport");
+          }
+          clearTransport_();
+          logger.error("SMTPEmailService sending MimeMessage failed. " + e);
+        }
+        return emailMessage;
       `
+    },
+    {
+      name: 'execute',
+      javaCode: `
+        // TODO: This should be a cron job.
         DAO emailMessageDAO = (DAO) x.get("emailMessageDAO");
         List<EmailMessage> emailMessages = ((foam.dao.ArraySink)
           emailMessageDAO
             .where(EQ(EmailMessage.STATUS, Status.UNSENT))
             .select(new ArraySink()))
             .getArray();
-        
-            OMLogger omLogger = (OMLogger) x.get("OMLogger");
-            Logger logger = (Logger) getX().get("logger");
-
-            try {
-              omLogger.log("Pre send email request");
-              Transport transport = getSession_().getTransport("smtp");
-              transport.connect(getUsername(), getPassword());
-              logger.info("SMTPEmailService connected.");
-              for (EmailMessage emailMessage : emailMessages) {
-                MimeMessage message = createMimeMessage(emailMessage);
-                try {
-                  transport.send(message);
-                  emailMessage.setStatus(Status.SENT);
-                  logger.info("SMTPEmailService sent MimeMessage.");
-                } catch ( MessagingException e ) {
-                  emailMessage.setStatus(Status.FAILED);
-                  logger.error("SMTPEmailService sending MimeMessage failed. " + e);
-                } finally {
-                  emailMessageDAO.put(emailMessage);
-                  break;
-                }
-              }
-              transport.close();
-              logger.info("SMTPEmailService finish.");
-              omLogger.log("Post send email request");
-            } catch (Exception e) {
-              logger.error("SMTPEmailService failed to finish. " + e);
-            }
-
-            `
+        for ( EmailMessage emailMessage : emailMessages ) {
+          emailMessageDAO.put(sendEmail(x, emailMessage));
+        }
+      `
     }
   ]
 });
