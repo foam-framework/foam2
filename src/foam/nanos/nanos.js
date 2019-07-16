@@ -130,6 +130,7 @@ FOAM_FILES([
   { name: "foam/nanos/export/CSVDriver"},
   { name: "foam/nanos/auth/Relationships" },
   { name: "foam/nanos/NanoService" },
+  { name: "foam/nanos/auth/twofactor/OTPKey" },
   { name: "foam/nanos/auth/AuthService" },
   { name: "foam/nanos/auth/ProxyAuthService" },
   { name: "foam/nanos/auth/CachedAuthServiceProxy" },

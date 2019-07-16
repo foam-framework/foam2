@@ -33,6 +33,9 @@ foam.CLASS({
       name: 'actions'
     },
     {
+      name: 'gridColumns'
+    },
+    {
       class: 'Function',
       name: 'createIsAvailableFor',
       value: function(data$) {
@@ -65,7 +68,8 @@ foam.CLASS({
         createIsAvailableFor: a.createIsAvailableFor.bind(a),
         properties: cls.getAxiomsByClass(this.Property)
           .filter(p => p.section == a.name)
-          .filter(p => ! p.hidden),
+          .filter(p => ! p.hidden)
+          .sort((p1, p2) => p1.order - p2.order),
         actions: cls.getAxiomsByClass(this.Action)
           .filter(action => action.section == a.name)
       });

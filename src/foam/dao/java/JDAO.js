@@ -35,6 +35,7 @@ foam.CLASS({
               .setDao(delegate)
               .setFilename(filename)
               .setCreateFile(true)
+              .setMultiLine(getMultiLine())
               .build());
 
             /* Create a composite journal of repo journal and runtime journal
@@ -66,6 +67,10 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.dao.Journal',
       name: 'journal'
+    },
+    {
+      class: 'Boolean',
+      name: 'multiLine'
     }
   ],
 
@@ -85,7 +90,9 @@ foam.CLASS({
       synchronized: true,
       javaCode: `
         foam.core.FObject result = super.remove_(x, obj);
-        getJournal().remove(x, result);
+        if ( result != null ) {
+          getJournal().remove(x, result);
+        }
         return result;
       `
     },

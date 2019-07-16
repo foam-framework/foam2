@@ -50,7 +50,8 @@ foam.CLASS({
     ^browse-view-container {
       margin: auto;
       border-bottom: solid 1px #e7eaec;
-      margin: 20px 0px 72px 0px;
+      margin: 0px 0px 72px 0px;
+      box-sizing: border-box;
     }
 
     ^canned-queries {

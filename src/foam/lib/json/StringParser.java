@@ -9,68 +9,66 @@ package foam.lib.json;
 import foam.lib.parse.PStream;
 import foam.lib.parse.Parser;
 import foam.lib.parse.ParserContext;
+import foam.lib.parse.Alt;
+import foam.lib.parse.Literal;
+import foam.lib.parse.AnyChar;
+import foam.lib.parse.Seq1;
 
 public class StringParser
-  implements Parser
-{
-  protected final static char ESCAPE = '\\';
-  protected final static ThreadLocal<Parser> unicodeParser = ThreadLocal.withInitial(UnicodeParser::new);
-  protected final static ThreadLocal<Parser> asciiEscapeParser = ThreadLocal.withInitial(ASCIIEscapeParser::new);
-  protected final static ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
+  implements Parser {
+  private Parser delimiterParser = new Alt(new Literal("\"\"\""),
+                                           new Literal("\""),
+                                           new Literal("'"));
+  private final char ESCAPE = '\\';
 
-    @Override
-    protected StringBuilder initialValue() {
-      return new StringBuilder();
-    }
-
-    @Override
-    public StringBuilder get() {
-      StringBuilder b = super.get();
-      b.setLength(0);
-      return b;
-    }
-  };
-
-  public StringParser() {
-  }
-
+  // An escape is either a Unicode code like \u001a, an ASCII escape like \n or
+  // just a literal escape next character.
+  
+  private Parser escapeParser = new Alt(new UnicodeParser(),
+                                        new ASCIIEscapeParser(),
+                                        new Seq1(1, new Literal(Character.toString(ESCAPE)), new AnyChar()));
+  
   public PStream parse(PStream ps, ParserContext x) {
-    if ( ! ps.valid() ) return null;
-    char delim = ps.head();
+    ps = ps.apply(delimiterParser, x);
+    if ( ps == null ) return null;
+    
+    Parser delimiter = new Literal((String)ps.value());
 
-    if ( delim != '"' && delim != '\'' ) return null;
-
-    ps = ps.tail();
-    char lastc = delim;
-
-    StringBuilder builder = sb.get();
-
+    StringBuilder sb = new StringBuilder();
+    
+    PStream result;
+    boolean escaping = false;
+    
     while ( ps.valid() ) {
-      char c = ps.head();
-
-      if ( c == delim && lastc != ESCAPE ) break;
-
-      PStream tail = ps.tail();
-
-      if ( c == ESCAPE ) {
-        char   nextChar        = ps.tail().head();
-        Parser escapeSeqParser = nextChar == 'u' ?
-          unicodeParser.get() : asciiEscapeParser.get();
-        PStream escapePS = ps.apply(escapeSeqParser, x);
-        if ( escapePS != null ) {
-          builder.append(escapePS.value());
-          tail = escapePS;
-
-          c = (Character) escapePS.value();
-        }
-      } else {
-        builder.append(c);
+      char c;
+      
+      if ( escaping ) {
+        ps = ps.apply(escapeParser, x);
+        if ( ps == null ) return null;
+        
+        sb.append((Character)ps.value());
+        escaping = false;
+        
+        continue;
+      }
+      
+      result = ps.apply(delimiter, x);
+      if ( result != null ) {
+        ps = result;
+        break;
       }
 
-      ps = tail;
-      lastc = c;
+      c = ps.head();
+
+      if ( c == ESCAPE ) {
+        escaping = true;
+        continue;
+      }
+
+      sb.append(c);
+      ps = ps.tail();
     }
 
-    return ps.tail().setValue(builder.toString());
+    return ps.setValue(sb.toString());
   }
 }

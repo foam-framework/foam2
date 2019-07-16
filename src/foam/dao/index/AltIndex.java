@@ -37,13 +37,13 @@ public class AltIndex
 
     // Copy all data from first index into new index, updating state
     final Object[] sa   = toObjectArray(state);
-          Sink     sink = new AbstractSink() {
+    Sink     sink = new AbstractSink() {
       public void put(Object obj, foam.core.Detachable sub) {
         sa[sa.length-1] = i.put(sa[sa.length-1], (FObject) obj);
       }
     };
 
-    planSelect(sa[0], sink, 0, Long.MAX_VALUE, null, null).select(sa[0], sink, 0, Long.MAX_VALUE, null, null);
+    delegates_.get(0).planSelect(sa[0], sink, 0, Long.MAX_VALUE, null, null).select(sa[0], sink, 0, Long.MAX_VALUE, null, null);
 
     return sa;
   }
@@ -92,7 +92,9 @@ public class AltIndex
 
 
   public FindPlan planFind(Object state, Object key) {
-    Object[] s         = toObjectArray(state);
+    if ( state == null ) return NotFoundPlan.instance();
+
+    Object[] s         = (Object[]) state;
     FindPlan bestPlan  = NoPlan.instance();
     Object   bestState = null;
 
@@ -111,12 +113,14 @@ public class AltIndex
   }
 
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    Object[]   s                 = toObjectArray(state);
+    if ( state == null ) return NotFoundPlan.instance();
+
+    Object[]   s                 = (Object[]) state;
     SelectPlan bestPlan          = NoPlan.instance();
     Object     bestState         = null;
     Predicate  originalPredicate = null;
 
-    for ( int i = 0; i < delegates_.size(); i++ ) {
+    for ( int i = 0 ; i < delegates_.size() ; i++ ) {
       // ???: Why is this?
       // To keep the original predicate, because in our next operate the predicate will be changed
       if ( predicate != null ) {
@@ -137,7 +141,8 @@ public class AltIndex
   }
 
   public long size(Object state) {
-    Object[] s = toObjectArray(state);
+    if ( state == null ) return 0;
+    Object[] s = (Object[]) state;
     return s.length > 0 ? delegates_.get(0).size(s[0]) : 0;
   }
 }

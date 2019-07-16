@@ -46,6 +46,7 @@
       class: 'Long',
       name: 'id',
       documentation: 'Sequence number.',
+      visibility: 'RO',
       tableWidth: 50
     },
     {
@@ -60,17 +61,20 @@
       documentation: 'Priority defines the order in which rules are to be applied.'+
       'Rules with a higher priority are to be applied first.'+
       'The convention for values is ints that are multiple of 10.',
+      permissionRequired: true,
       tableWidth: 50
     },
     {
       class: 'String',
       name: 'ruleGroup',
       documentation: 'ruleGroup defines sets of rules related to the same action.',
+      permissionRequired: true,
       tableWidth: 100
     },
     {
       class: 'String',
       name: 'documentation',
+      permissionRequired: true,
       view: {
         class: 'foam.u2.tag.TextArea',
         rows: 12, cols: 80
@@ -80,6 +84,7 @@
       class: 'String',
       name: 'daoKey',
       documentation: 'dao name that the rule is applied on.',
+      permissionRequired: true,
       view: function(_, X) {
         var E = foam.mlang.Expressions.create();
         return {
@@ -98,11 +103,13 @@
       class: 'Enum',
       of: 'foam.nanos.ruler.Operations',
       name: 'operation',
+      permissionRequired: true,
       documentation: 'Defines when the rules is to be applied: put/removed'
     },
     {
       class: 'Boolean',
       name: 'after',
+      permissionRequired: true,
       documentation: 'Defines if the rule needs to be applied before or after operation is completed'+
       'E.g. on dao.put: before object was stored in a dao or after.'
     },
@@ -110,7 +117,8 @@
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'predicate',
-      hidden: true,
+      // TODO make a friendlier view.
+      view: { class: 'foam.u2.view.JSONTextView' },
       javaFactory: `
       return foam.mlang.MLang.TRUE;
       `,
@@ -136,12 +144,14 @@
       name: 'enabled',
       value: true,
       documentation: 'Enables the rule.',
+      permissionRequired: true,
       tableWidth: 50
     },
     {
       class: 'Boolean',
       name: 'saveHistory',
       value: false,
+      permissionRequired: true,
       documentation: 'Determines if history of rule execution should be saved.',
       help: 'Automatically sets to true when validity is greater than zero.',
       adapt: function(_, nu) {
@@ -152,6 +162,7 @@
       class: 'Int',
       name: 'validity',
       documentation: 'Validity of the rule (in days) for automatic rescheduling.',
+      permissionRequired: true,
       postSet: function(_, nu) {
         if ( nu > 0
           && ! this.saveHistory
