@@ -315,11 +315,7 @@ public class Outputter
         isPropertyDiff = maybeOutputPropertyDelta(oldFObject, newFObject, prop);
         if ( isPropertyDiff) {
           if ( ! isDiff ) {
-            writer_.append("{");
-            if ( multiLineOutput_ ) {
-              writer_.append('\n');
-              writer_.append("  ");
-            }
+            addInnerNewline();
             if ( outputClassNames_ ) {
               //output Class name
               writer_.append(beforeKey_());
@@ -329,20 +325,14 @@ public class Outputter
               outputString(info.getId());
             }
             if ( outputClassNames_ ) writer_.append(",");
-            if ( multiLineOutput_ ) {
-              writer_.append('\n');
-              writer_.append("  ");
-            }
+            addInnerNewline();
             PropertyInfo id = (PropertyInfo) info.getAxiomByName("id");
             outputProperty(newFObject, id);
             isDiff = true;
           }
 
           writer_.append(",");
-          if ( multiLineOutput_ ) {
-            writer_.append('\n');
-            writer_.append("  ");
-          }
+          addInnerNewline();
           outputProperty(newFObject, prop);
         }
       }
@@ -351,6 +341,13 @@ public class Outputter
         if ( multiLineOutput_ )  writer_.append('\n');
         writer_.append("}"); 
       }
+    }
+  }
+
+  protected void addInnerNewline() {
+    if ( multiLineOutput_ ) {
+      writer_.append('\n');
+      writer_.append("  ");
     }
   }
 
