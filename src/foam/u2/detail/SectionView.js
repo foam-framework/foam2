@@ -17,9 +17,6 @@ foam.CLASS({
     'foam.u2.layout.GUnit',
     'foam.u2.layout.Grid'
   ],
-  imports: [
-    'displayWidth?'
-  ],
 
   properties: [
     {
@@ -50,7 +47,7 @@ foam.CLASS({
       self.SUPER();
       
       self
-        .add(self.slot(function(section, showTitle, section$title, displayWidth) {
+        .add(self.slot(function(section, showTitle, section$title) {
           if ( ! section ) return;
           return self.Rows.create()
             .show(section.createIsAvailableFor(self.data$))
@@ -61,8 +58,6 @@ foam.CLASS({
               .forEach(section.properties, function (p) {
                 this.start(self.GUnit, { 
                   columns: p.gridColumns 
-                              ? p.gridColumns 
-                              : displayWidth.cols
                 })
                   .tag(self.SectionedDetailPropertyView, { prop: p, data$: self.data$ })
                 .end()
