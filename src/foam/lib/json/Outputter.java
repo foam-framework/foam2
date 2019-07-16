@@ -41,6 +41,7 @@ public class Outputter
   protected StringWriter  stringWriter_        = null;
   protected boolean       outputShortNames_    = false;
   protected boolean       outputDefaultValues_ = false;
+  protected boolean       multiLineOutput_     = false;
   protected boolean       outputClassNames_    = true;
   protected boolean       outputReadableDates_ = true;
   protected PropertyPredicate propertyPredicate_;
@@ -315,6 +316,7 @@ public class Outputter
         if ( isPropertyDiff) {
           if ( ! isDiff ) {
             writer_.append("{");
+            if ( multiLineOutput_ ) writer_.append('\n');
             if ( outputClassNames_ ) {
               //output Class name
               writer_.append(beforeKey_());
@@ -324,17 +326,22 @@ public class Outputter
               outputString(info.getId());
             }
             if ( outputClassNames_ ) writer_.append(",");
+            if ( multiLineOutput_ ) writer_.append('\n');
             PropertyInfo id = (PropertyInfo) info.getAxiomByName("id");
             outputProperty(newFObject, id);
             isDiff = true;
           }
 
           writer_.append(",");
+          if ( multiLineOutput_ ) writer_.append('\n');
           outputProperty(newFObject, prop);
         }
       }
-
-      if ( isDiff ) writer_.append("}");
+      
+      if ( isDiff ) { 
+        if ( multiLineOutput_ )  writer_.append('\n');
+        writer_.append("}"); 
+      }
     }
   }
 
@@ -353,12 +360,14 @@ public class Outputter
     ClassInfo info = o.getClassInfo();
 
     writer_.append("{");
+    if ( multiLineOutput_ ) writer_.append('\n');
     if ( outputClassNames_ ) {
       writer_.append(beforeKey_());
       writer_.append("class");
       writer_.append(afterKey_());
       writer_.append(":");
       outputString(info.getId());
+      if ( multiLineOutput_ ) writer_.append('\n');
     }
 
     List     axioms      = getProperties(info);
@@ -367,8 +376,9 @@ public class Outputter
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
       outputComma = maybeOutputProperty(o, prop, outputComma) || outputComma;
+      if ( multiLineOutput_ && outputComma ) writer_.append('\n');
     }
-
+    if ( multiLineOutput_ ) writer_.append('\n');
     writer_.append("}");
   }
 
@@ -455,4 +465,13 @@ public class Outputter
     if ( stringWriter_ != null ) stringWriter_.flush();
     if ( writer_ != null ) writer_.flush();
   }
+
+  public void makeMultiLine() {
+    multiLineOutput_ = true;
+  }
+
+  public void makeSingleLine() {
+    multiLineOutput_ = false;
+  }
 }
+

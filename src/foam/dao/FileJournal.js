@@ -113,6 +113,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'multiLinePut',
+      value: true
+    },
+    {
+      class: 'Boolean',
       name: 'createFile',
       documentation: 'Flag to create file if not present',
       value: true,
@@ -190,6 +195,12 @@ foam.CLASS({
       synchronized: true,
       javaCode: `
         try {
+          String c = "";
+          if ( getMultiLinePut() ) {
+            c = "\\n";
+            getOutputter().makeMultiLine();
+          }
+
           String record = ( old != null ) ?
             getOutputter().stringifyDelta(old, nu) :
             getOutputter().stringify(nu);
@@ -197,11 +208,16 @@ foam.CLASS({
           if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
             writeComment_(x, nu);
             write_(sb.get()
+              .append(c)
               .append("p(")
               .append(record)
               .append(")")
+              .append(c)
               .toString());
           }
+
+          if ( getMultiLinePut() ) getOutputter().makeSingleLine();
+
         } catch ( Throwable t ) {
           getLogger().error("Failed to write put entry to journal", t);
           throw new RuntimeException(t);
