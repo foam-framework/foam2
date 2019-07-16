@@ -21,7 +21,7 @@ import foam.nanos.auth.User;
 import foam.nanos.crunch.Capability;
 import foam.nanos.crunch.CapabilityCapabilityJunction;
 import foam.nanos.crunch.CapabilityJunctionStatus;
-import foam.nanos.crunch.FakeDataObject;
+import foam.nanos.crunch.FakeTestObject;
 import foam.nanos.crunch.UserCapabilityJunction;
 import foam.nanos.ruler.*;
 import foam.nanos.test.Test;
@@ -91,16 +91,16 @@ public class CapabilityTest extends Test {
 
     Capability inner = new Capability();
     inner.setId("inner");
-    inner.setOf(FakeDataObject.getOwnClassInfo());
+    inner.setOf(FakeTestObject.getOwnClassInfo());
 
     Capability outer = new Capability();
     outer.setId("outer");
-    outer.setOf(FakeDataObject.getOwnClassInfo());
+    outer.setOf(FakeTestObject.getOwnClassInfo());
 
     inner = (Capability) capabilityDAO.put_(x, inner);
     outer = (Capability) capabilityDAO.put_(x, outer);
 
-    FakeDataObject data = new FakeDataObject();
+    FakeTestObject data = new FakeTestObject();
     data.setUsername("RUBY");
     data.setPassword("PASS");
 
@@ -138,7 +138,7 @@ public class CapabilityTest extends Test {
 
     cas = new CapabilityAuthService();
 
-    FakeDataObject data = new FakeDataObject();
+    FakeTestObject data = new FakeTestObject();
     data.setUsername("RUBY");
     data.setPassword("PASS");
 
@@ -149,22 +149,22 @@ public class CapabilityTest extends Test {
 
     crunch.setId("crunch.*");
     crunch.setPermissionsGranted(new String[] {permission1});
-    crunch.setOf(FakeDataObject.getOwnClassInfo());
+    crunch.setOf(FakeTestObject.getOwnClassInfo());
     crunch = (Capability) capabilityDAO.put_(x, crunch);
 
     other.setId("other.*");
     other.setPermissionsGranted(new String[] {permission2});
-    other.setOf(FakeDataObject.getOwnClassInfo());
+    other.setOf(FakeTestObject.getOwnClassInfo());
     other = (Capability) capabilityDAO.put_(x, other);
 
     readCrunch.setId("crunch.read");
     readCrunch.setPermissionsGranted(new String[] {permission3});
-    readCrunch.setOf(FakeDataObject.getOwnClassInfo());
+    readCrunch.setOf(FakeTestObject.getOwnClassInfo());
     readCrunch = (Capability) capabilityDAO.put_(x, readCrunch);    
 
     readOther.setId("other.read.*");
     readOther.setPermissionsGranted(new String[] {permission4});
-    readOther.setOf(FakeDataObject.getOwnClassInfo());
+    readOther.setOf(FakeTestObject.getOwnClassInfo());
     readOther = (Capability) capabilityDAO.put_(x, readOther);
 
     UserCapabilityJunction grantReadOther = new UserCapabilityJunction();
@@ -209,18 +209,18 @@ public class CapabilityTest extends Test {
     Capability c1 = new Capability();
     Capability c2 = new Capability();
 
-    FakeDataObject data = new FakeDataObject();
+    FakeTestObject data = new FakeTestObject();
     data.setUsername("RUBY");
     data.setPassword("PASS");
     
     c0.setId("c0"); 
-    c0.setOf(FakeDataObject.getOwnClassInfo());
+    c0.setOf(FakeTestObject.getOwnClassInfo());
     c0 = (Capability) capabilityDAO.put_(x, c0);
     c1.setId("c1");
-    c1.setOf(FakeDataObject.getOwnClassInfo());
+    c1.setOf(FakeTestObject.getOwnClassInfo());
     c1 = (Capability) capabilityDAO.put_(x, c1);
     c2.setId("c2");
-    c2.setOf(FakeDataObject.getOwnClassInfo());
+    c2.setOf(FakeTestObject.getOwnClassInfo());
     c2 = (Capability) capabilityDAO.put_(x, c2);
 
     CapabilityCapabilityJunction j1 = new CapabilityCapabilityJunction();
@@ -277,12 +277,12 @@ public class CapabilityTest extends Test {
     Capability inner = new Capability();
     inner.setId("inner");
     inner.setPermissionsGranted(new String[]{permission1, permission2});
-    inner.setOf(FakeDataObject.getOwnClassInfo());
+    inner.setOf(FakeTestObject.getOwnClassInfo());
 
     Capability outer = new Capability();
     outer.setId("outer");
     outer.setPermissionsGranted(new String[]{permission3});
-    outer.setOf(FakeDataObject.getOwnClassInfo());
+    outer.setOf(FakeTestObject.getOwnClassInfo());
 
     inner = (Capability) capabilityDAO.put_(x, inner);
     outer = (Capability) capabilityDAO.put_(x, outer);
@@ -292,7 +292,7 @@ public class CapabilityTest extends Test {
     prereqJunction.setTargetId((String) outer.getId());
     prereqJunction = (CapabilityCapabilityJunction) prerequisiteCapabilityJunctionDAO.put_(x, prereqJunction);
 
-    FakeDataObject data = new FakeDataObject();
+    FakeTestObject data = new FakeTestObject();
     data.setUsername("RUBY");
     data.setPassword("SPSA");
 

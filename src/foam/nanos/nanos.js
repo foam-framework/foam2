@@ -205,7 +205,7 @@ FOAM_FILES([
   { name: "foam/nanos/test/ClientEchoService" },
 
   // foam/nanos/crunch
-  { name: "foam/nanos/crunch/FakeDataObject" },
+  { name: "foam/nanos/crunch/FakeTestObject" },
   // models
   { name: "foam/nanos/crunch/Capability" },
   { name: "foam/nanos/crunch/CapabilityJunctionStatus" },

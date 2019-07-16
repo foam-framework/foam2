@@ -5,7 +5,7 @@
  */
 foam.CLASS({
     package: 'foam.nanos.crunch',
-    name: 'FakeDataObject',
+    name: 'FakeTestObject',
   
     documentation: `
     Fake dataobject to test capability

@@ -417,7 +417,7 @@ var classes = [
   'foam.nanos.theme.Theme',
 
   // Crunch
-  'foam.nanos.crunch.FakeDataObject',
+  'foam.nanos.crunch.FakeTestObject',
   //models
   'foam.nanos.crunch.Capability',
   'foam.nanos.crunch.CapabilityJunctionStatus',
