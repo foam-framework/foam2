@@ -30,6 +30,7 @@
       overflow: scroll;
       display: grid;
       grid-template-columns: 1px 1fr;
+      max-height: 500px;
     }
   `,
 
@@ -392,22 +393,22 @@
         this.updateCount().then(() => this.refresh());
       }
     },
-    {
-      name: 'updateTableHeight',
-      code: function() {
-        // Find the distance from the top of the table to the top of the screen.
-        var distanceFromTop = this.scrollbarContainer_.el().getBoundingClientRect().y;
+    // {
+    //   name: 'updateTableHeight',
+    //   code: function() {
+    //     // Find the distance from the top of the table to the top of the screen.
+    //     var distanceFromTop = this.scrollbarContainer_.el().getBoundingClientRect().y;
 
-        // Calculate the remaining space we have to make use of.
-        var remainingSpace = window.innerHeight - distanceFromTop;
+    //     // Calculate the remaining space we have to make use of.
+    //     var remainingSpace = window.innerHeight - distanceFromTop;
 
-        // TODO: Do we want to do this?
-        // Leave space for the footer.
-        remainingSpace -= 44;
+    //     // TODO: Do we want to do this?
+    //     // Leave space for the footer.
+    //     remainingSpace -= 44;
 
-        this.scrollbarContainer_.style({ height: `${remainingSpace}px` });
-      }
-    },
+    //     this.scrollbarContainer_.style({ height: `${remainingSpace}px` });
+    //   }
+    // },
     {
       name: 'addTbodies',
       code: function() {
