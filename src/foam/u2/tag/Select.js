@@ -84,9 +84,24 @@ foam.CLASS({
     },
 
     function updateMode_(mode) {
-      var disabled = mode === foam.u2.DisplayMode.DISABLED ||
-          mode === foam.u2.DisplayMode.RO;
-      this.setAttribute('disabled', disabled);
+      var isReadOnly = mode === foam.u2.DisplayMode.RO;
+
+      /**
+       * For read-only, we need to make it disabled since it is a SELECT element,
+       * otherwise it will still act like a dropdown
+       */
+      var isDisabled = mode === foam.u2.DisplayMode.DISABLED || isReadOnly;
+      this.setAttribute('disabled', isDisabled);
+
+      if ( isReadOnly ) {
+        var readOnlyStylings = {
+          cursor: 'default;',
+          color: 'black;',
+          background: 'none;'
+        }
+
+        this.style(readOnlyStylings);
+      }
     }
   ]
 });
