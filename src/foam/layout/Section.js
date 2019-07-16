@@ -33,6 +33,9 @@ foam.CLASS({
       name: 'actions'
     },
     {
+      name: 'gridColumns'
+    },
+    {
       class: 'Function',
       name: 'createIsAvailableFor',
       value: function(data$) {
