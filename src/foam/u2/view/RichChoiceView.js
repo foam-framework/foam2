@@ -285,8 +285,8 @@ foam.CLASS({
         })
         .addClass(this.myClass())
         .start()
-          .addClass(this.myClass('selection-view'))
-          .enableClass('disabled', this.mode$.map((mode) => mode === foam.u2.DisplayMode.DISABLED))
+          .enableClass(this.myClass('selection-view'), this.mode$.map(mode => mode !== foam.u2.DisplayMode.RO))
+          .enableClass('disabled', this.mode$.map(mode => mode === foam.u2.DisplayMode.DISABLED))
           .on('click', function() {
             if ( self.mode === foam.u2.DisplayMode.RW ) {
               self.isOpen_ = ! self.isOpen_;
@@ -303,7 +303,7 @@ foam.CLASS({
             }))
           .end()
           .start()
-            .addClass(this.myClass('chevron'))
+          .enableClass(this.myClass('chevron'), this.mode$.map(mode => mode !== foam.u2.DisplayMode.RO))
           .end()
         .end()
         .start()
