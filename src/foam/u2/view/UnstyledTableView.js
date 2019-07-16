@@ -58,23 +58,18 @@ foam.CLASS({
       for the purpose of having the filtered DAO list available for CSV outputting.`,
       expression: function(columns, of) {
         var of = this.of;
-        if ( ! of ) return propNameList;
-        var prop;
-        var filteredTableColumns = [];
+        if ( ! of ) return [];
 
-        return columns.map((propName) => {
-          if ( typeof propName == 'string' ) {
-            prop = of.getAxiomByName(propName);
-            filteredTableColumns.push(propName);
-          } else {
-            prop = propName;
-            filteredTableColumns.push(propName.name);
-          }
-          if ( ! prop ) {
-            console.error('Unknown table column: ', propName);
-          }
-          this.filteredTableColumns = filteredTableColumns;
-          return prop;
+        return columns.map(function(p) {
+          var c = typeof p == 'string' ?
+            of.getAxiomByName(p) :
+            p;
+
+           if ( ! c ) {
+             console.error('Unknown table column: ', p);
+           }
+
+          return c;
         });
       }
     },
@@ -464,5 +459,19 @@ foam.CLASS({
         });
       }
     }
+  ],
+
+  reactions: [
+    ['', 'propertyChange.columns_', 'updateFilteredTableColumns']
+  ],
+
+  listeners: [
+    {
+      name: 'updateFilteredTableColumns',
+      code: function() {
+        this.filteredTableColumns = this.columns_.map( (a) => a.name);
+      }
+    }
   ]
+
 });
