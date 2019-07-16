@@ -201,6 +201,9 @@ foam.CLASS({
       var view = this;
       var columnSelectionE;
 
+      this.onDetach(this.filteredTableColumns$.follow(
+        this.columns_$.map((cols) => cols.map((a) => a.name))));
+
       if ( this.editColumnsEnabled ) {
         columnSelectionE = this.createColumnSelection();
         this.ctrl.add(columnSelectionE);
@@ -460,18 +463,5 @@ foam.CLASS({
       }
     }
   ],
-
-  reactions: [
-    ['', 'propertyChange.columns_', 'updateFilteredTableColumns']
-  ],
-
-  listeners: [
-    {
-      name: 'updateFilteredTableColumns',
-      code: function() {
-        this.filteredTableColumns = this.columns_.map( (a) => a.name);
-      }
-    }
-  ]
 
 });
