@@ -29,7 +29,6 @@ foam.CLASS({
 
   methods: [
     function exportFObject(X, obj) {
-      this.outputter.of = obj.cls_;
       this.outputter.outputFObject(obj);
       return this.outputter.toString();
     },
@@ -42,7 +41,7 @@ foam.CLASS({
         this.CSVSink.create({
           of: dao.cls_
         });
-        
+
       return dao.select(sink).then( (s) => s.csv );
     }
   ]
