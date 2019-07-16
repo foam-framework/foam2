@@ -8,6 +8,8 @@ package foam.nanos.ruler;
 
 import foam.core.*;
 import foam.dao.DAO;
+import foam.nanos.auth.LastModifiedAware;
+import foam.nanos.auth.LastModifiedByAware;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 import foam.nanos.pool.FixedThreadPool;
@@ -161,11 +163,17 @@ public class RuleEngine extends ContextAwareSupport {
         if ( rule.getAsyncAction() != null
           && rule.f(x, obj, oldObj)
         ) {
+          // We assume the original object `obj` is stale when running after rules.
+          // For that, greedy mode is used for object reload. For before rules,
+          // object reload uses non-greedy mode so that changes on the original
+          // object will be copied over to the reloaded object.
+          FObject nu = getDelegate().find_(x, obj);
+          nu = reloadObject(obj, oldObj, nu, rule.getAfter());
           try {
-            rule.asyncApply(x, obj, oldObj, RuleEngine.this);
-            saveHistory(rule, obj);
+            rule.asyncApply(x, nu, oldObj, RuleEngine.this);
+            saveHistory(rule, nu);
           } catch (Exception ex) {
-            retryAsyncApply(x, rule, obj, oldObj);
+            retryAsyncApply(x, rule, nu, oldObj);
           }
         }
       }
@@ -174,7 +182,7 @@ public class RuleEngine extends ContextAwareSupport {
 
   private void retryAsyncApply(X x, Rule rule, FObject obj, FObject oldObj) {
     new RetryManager().submit(x, x1 -> {
-      rule.asyncApply(getX(), obj, oldObj, RuleEngine.this);
+      rule.asyncApply(x, obj, oldObj, RuleEngine.this);
       saveHistory(rule, obj);
     });
   }
@@ -202,5 +210,60 @@ public class RuleEngine extends ContextAwareSupport {
 
     savedRuleHistory_.put(rule.getId(),
       (RuleHistory) ruleHistoryDAO_.put(record).fclone());
+  }
+
+  /**
+   * Reloads object when running async action since the original object `obj`
+   * might be stale at the time of execution.
+   *
+   * If reloaded object `nu` hasn't changed (reloaded object equals to old
+   * object) then return the original object as the reloaded object.
+   *
+   * If reloaded object has changed and already saved to DAO (reloaded object
+   * equals to original object) then return the original object.
+   *
+   * Otherwise, return the reloaded object. If greedy flag is set to true then
+   * also copy changes from the original object to the reloaded object.
+   *
+   * @param obj - Original object
+   * @param oldObj - Old object
+   * @param nu - Reloaded object
+   * @param greedy - Flag to set greedy mode
+   * @return Reloaded object
+   */
+  private FObject reloadObject(FObject obj, FObject oldObj, FObject nu, boolean greedy) {
+    FObject old = oldObj;
+    if ( old == null ) {
+      try {
+        old = obj.getClass().newInstance();
+      } catch (Exception e) {
+        // Object instantiation should not fail but if it does fail then return
+        // the original object as the reloaded object.
+        return obj;
+      }
+    }
+    FObject cloned = obj.fclone();
+
+    // Update lastModified and lastModifiedBy of old and cloned objects so that
+    // equality comparisons would not be skewed by these properties.
+    if ( obj instanceof LastModifiedAware ) {
+      Date lastModified = ((LastModifiedAware) nu).getLastModified();
+      ((LastModifiedAware) cloned).setLastModified(lastModified);
+      ((LastModifiedAware) old).setLastModified(lastModified);
+    }
+    if ( obj instanceof LastModifiedByAware ) {
+      long lastModifiedBy = ((LastModifiedByAware) nu).getLastModifiedBy();
+      ((LastModifiedByAware) cloned).setLastModifiedBy(lastModifiedBy);
+      ((LastModifiedByAware) old).setLastModifiedBy(lastModifiedBy);
+    }
+
+    // Return the original object as the reloaded object if nu == old or nu == obj.
+    if ( nu.equals(old) || nu.equals(cloned) ) {
+      return obj;
+    }
+
+    // For greedy mode, return the reloaded object `nu` as is. Otherwise,
+    // override the reloaded object with the changes from the original object.
+    return greedy ? nu : nu.copyFrom(obj);
   }
 }

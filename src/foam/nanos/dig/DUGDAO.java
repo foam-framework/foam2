@@ -22,16 +22,25 @@ public class DUGDAO
   extends ProxyDAO
 {
   public DUGDAO(X x) {
-    this(x, new JDAO(x, DUG.getOwnClassInfo(), "dugs"));
+    setX(x);
   }
 
+  // public DUGDAO(X x) {
+  //   this(x, new JDAO(x, DUG.getOwnClassInfo(), "dugs"));
+  // }
+
   public DUGDAO(X x, DAO delegate) {
-    super(x, delegate);
+    setX(x);
+    setDelegate(delegate);
+  }
+
+  public void setDelegate(DAO delegate) {
+    super.setDelegate(delegate);
 
     delegate.select(new AbstractSink() {
       @Override
       public void put(Object obj, Detachable sub) {
-        executeDUG(x, (DUG) obj);
+        executeDUG(getX(), (DUG) obj);
       }
     });
   }
