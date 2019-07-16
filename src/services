@@ -37,12 +37,49 @@ p({"class":"foam.nanos.boot.NSpec", "name":"classes",                          "
 p({"class":"foam.nanos.boot.NSpec", "name":"threads",                          "lazy":true,  "serve":false, "serviceClass":"foam.nanos.http.ThreadsWebAgent"})
 p({"class":"foam.nanos.boot.NSpec", "name":"login",                            "lazy":true,  "serve":false, "serviceClass":"foam.nanos.http.ShowSessionWebAgent"})
 p({"class":"foam.nanos.boot.NSpec", "name":"memory",                           "lazy":true,  "serve":false, "serviceScript":"return new foam.nanos.http.RefreshWebAgent(new foam.nanos.http.MemoryWebAgent());"})
-p({"class":"foam.nanos.boot.NSpec","name":"countryDAO","description":"A DAO which contains information about countries.","serve":true,"authenticate":false,"serviceScript":"return new foam.dao.EasyDAO.Builder(x)\u000a  .setPm(true)\u000a  .setAuthenticateRead(false)\u000a  .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)\u000a  .setJournalName(\"countries\")\u000a  .setOf(foam.nanos.auth.Country.getOwnClassInfo())\u000a  .setOrder(new foam.core.PropertyInfo[] {foam.nanos.auth.Country.NAME})\u000a  .build();","client":"{\"of\":\"foam.nanos.auth.Country\"}","authNotes":"The \"authenticate\" flag is explicitly set to false because we want to be able to use the countryDAO to populate a dropdown in the sign up form."})
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "countryDAO",
+  "description": "A DAO which contains information about countries.",
+  "serve": true,
+  "authenticate": false,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setAuthenticateRead(false)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName(\"countries\")
+      .setOf(foam.nanos.auth.Country.getOwnClassInfo())
+      .setOrder(new foam.core.PropertyInfo[] {foam.nanos.auth.Country.NAME})
+      .build();
+  """,
+  "client": "{\"of\":\"foam.nanos.auth.Country\"}",
+  "authNotes": "The \"authenticate\" flag is explicitly set to false because we want to be able to use the countryDAO to populate a dropdown in the sign up form. The DAO is decorated with an AuthenticatedDAO decorator with \"authenticateRead\" set to false so that anyone can read from countryDAO but only those with permission can write to or remove from it."
+})
 p({"class":"foam.nanos.boot.NSpec", "name":"countryService",                   "lazy":true,  "serve":true, "serviceClass":"foam.nanos.auth.CountryService"})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"languageDAO",                      "lazy":true,  "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setAuthenticateRead(false).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"languages\").setOf(foam.nanos.auth.Language.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.auth.Language\"}"})
 
-p({"class":"foam.nanos.boot.NSpec", "name":"regionDAO",                        "lazy":true,  "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setAuthenticateRead(false).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"regions\").setOf(foam.nanos.auth.Region.getOwnClassInfo()).setOrder(new foam.core.PropertyInfo[] {foam.nanos.auth.Region.NAME}).build();","client":"{\"of\":\"foam.nanos.auth.Region\"}"})
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "regionDAO",
+  "description": "A DAO which contains information about regions in countries. A region is a province or a state, for example.",
+  "serve": true,
+  "authenticate": false,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setAuthenticateRead(false)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName(\"regions\")
+      .setOf(foam.nanos.auth.Region.getOwnClassInfo())
+      .setOrder(new foam.core.PropertyInfo[] {foam.nanos.auth.Region.NAME})
+      .build();
+  """,
+  "client": "{\"of\":\"foam.nanos.auth.Region\"}",
+  "documentation": "A DAO which contains information about regions in countries. A region is a province or a state, for example.",
+  "authNotes": "The \"authenticate\" flag is explicitly set to false because we want to be able to use the regionDAO to populate a dropdown in the sign up form. The DAO is decorated with an AuthenticatedDAO decorator with \"authenticateRead\" set to false so that anyone can read from regionDAO but only those with permission can write to or remove from it."
+})
 p({"class":"foam.nanos.boot.NSpec", "name":"regionService",                    "lazy":true,  "serve":true, "serviceClass":"foam.nanos.auth.RegionService"})
 
 //p({"class":"foam.nanos.boot.NSpec", "name":"exportDriverRegistryDAO",          "lazy":true,  "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"exportDriverRegistrys\").setOf(foam.nanos.export.ExportDriverRegistry.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.export.ExportDriverRegistry\"}"})
