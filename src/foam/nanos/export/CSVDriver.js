@@ -29,17 +29,20 @@ foam.CLASS({
 
   methods: [
     function exportFObject(X, obj) {
-      // if obj coming in is not from a model with tableColumns,
-      // the outputter will not recognize any columns.
+      this.outputter.of = obj.cls_;
       this.outputter.outputFObject(obj);
       return this.outputter.toString();
     },
     function exportDAO(X, dao) {
       var sink = X.data.filteredTableColumns ?
-        this.CSVSink.create({ props: X.data.filteredTableColumns }) :
-        this.CSVSink.create();
-      // passing in our CSVSink runs our CSV outputter and
-      // s.csv is accessing our csv property string.
+        this.CSVSink.create({
+          of: dao.of,
+          props: X.data.filteredTableColumns
+        }) :
+        this.CSVSink.create({
+          of: dao.cls_
+        });
+        
       return dao.select(sink).then( (s) => s.csv );
     }
   ]

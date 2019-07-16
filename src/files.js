@@ -73,6 +73,8 @@ FOAM_FILES([
   { name: "foam/core/XML" },
   { name: "foam/lib/csv/CSVParser" },
   { name: "foam/lib/csv/CSVOutputter" },
+  { name: "foam/lib/csv/CSVOutputterInterface" },
+  { name: "foam/lib/csv/FObjectCSVOutputterDecorator" },
   { name: "foam/lib/csv/DynamicHeaderCSVParser" },
   { name: "foam/parse/StringPStream" },
   { name: "foam/parse/ErrorReportingPStream" },

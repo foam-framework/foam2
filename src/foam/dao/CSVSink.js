@@ -64,6 +64,8 @@ foam.CLASS({
         var csvOutputter = foam.lib.csv.CSVOutputter.create();
         if ( of ) {
           csvOutputter.of = of;
+        }
+        if ( props ) {
           csvOutputter.props = props;
         }
         return csvOutputter;
@@ -72,6 +74,8 @@ foam.CLASS({
       foam.lib.csv.CSVOutputter csvOutputter = new foam.lib.csv.CSVOutputter.Builder(getX()).build();
       if ( isPropertySet("of") ) {
         csvOutputter.setOf(getOf());
+      }
+      if ( getProps() != null && isPropertySet("props") ) {
         csvOutputter.setProps(getProps());
       }
       return csvOutputter;
@@ -133,8 +137,8 @@ foam.CLASS({
     {
       name: 'toCSVLabel',
       class: 'Function',
-      value: function(outputter, prop) {
-        outputter.outputValue(prop.name);
+      value: function(x, outputter, obj) {
+        outputter.outputValue(obj ? obj[this.name].name : null);
       }
     }
   ]
@@ -167,38 +171,40 @@ foam.CLASS({
     {
       name: 'toCSVLabel',
       class: 'Function',
-      value: function(outputter, prop) {
+      value: function(x, outputter, obj) {
         if ( ! prop.of ) {
-          outputter.outputValue(prop.name);
+          outputter.outputValue(obj ? obj[this.name].name : null);
           return;
         }
-        // mini decorator
-        var prefixedOutputter = {
-          outputValue: function(value) {
-            outputter.outputValue(prop.name + '.' + value);
-          }
-        };
+
+        var prefixedOutputter = foam.lib.csv.FObjectCSVOutputterDecorator.create({
+          outputter: outputter,
+          preLabelString: prop.name + '.'
+        });
         prop.of.getAxiomsByClass(foam.core.Property)
           .forEach((axiom) => {
-            axiom.toCSVLabel(prefixedOutputter, axiom);
+            axiom.toCSVLabel(x, prefixedOutputter, axiom);
           });
       },
-      // javaToCSVLabel: `
-      //   if ( prop.of == null || ! prop.isPropertySet("of") ) {
-      //     outputter.outputValue(prop.getName());
-      //     return;
-      //   }
-      //   // // mini decorator
-      //   // var prefixedOutputter = {
-      //   //   outputValue: function(value) {
-      //   //     outputter.outputValue(prop.name + '.' + value);
-      //   //   }
-      //   // };
-      //   prop.of.getAxiomsByClass(foam.core.Property)
-      //     .forEach((axiom) => {
-      //       axiom.toCSVLabel(prefixedOutputter, axiom);
-      //     });
-      // `
+    },
+    {
+      name: 'javaToCSVLabel',
+      class: 'String',
+      value: `
+        if ( ((foam.core.PropertyInfo)obj).getValueClass() == null ) {
+          outputter.outputValue(((foam.core.PropertyInfo)obj).getName());
+          return;
+        }
+
+        foam.lib.csv.CSVOutputterInterface prefixedOutputter = new foam.lib.csv.FObjectCSVOutputterDecorator.Builder(x)
+          .setOutputter(outputter)
+          .setPreLabelString(((foam.core.PropertyInfo)obj).getName() + ".")
+          .build();
+        java.util.List<foam.core.PropertyInfo> nestPropList = ((foam.core.FObject)get(obj)).getClassInfo().getAxiomsByClass(foam.core.PropertyInfo.class);
+        for ( foam.core.PropertyInfo axiom : nestPropList ) {
+          axiom.toCSVLabel(x, prefixedOutputter, axiom);
+        }
+      `
     }
   ]
 });

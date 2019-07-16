@@ -102,6 +102,8 @@ var classes = [
   'foam.dao.DAO',
   'foam.dao.CSVSink',
   'foam.lib.csv.CSVOutputter',
+  'foam.lib.csv.CSVOutputterInterface',
+  'foam.lib.csv.FObjectCSVOutputterDecorator',
   'foam.dao.java.JDAO',
   'foam.dao.FilteredDAO',
   'foam.dao.Journal',

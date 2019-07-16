@@ -8,6 +8,10 @@ foam.CLASS({
   package: 'foam.lib.csv',
   name: 'CSVOutputter',
 
+  implements: [
+    'foam.lib.csv.CSVOutputterInterface'
+  ],
+
   javaImports: [
     'foam.core.*',
     'foam.nanos.logger.Logger',
@@ -26,8 +30,7 @@ foam.CLASS({
     },
     {
       class: 'Class',
-      name: 'of',
-      visibility: 'HIDDEN'
+      name: 'of'
     },
     {
       class: 'StringArray',
@@ -48,20 +51,17 @@ foam.CLASS({
           .map((propI) -> propI.getName())
           .collect(Collectors.toCollection(ArrayList::new));
         return propInfoArrayList.toArray(new String[propInfoArrayList.size()]);
-      `,
-      visibility: 'HIDDEN'
+      `
     },
     {
       class: 'Boolean',
       name: 'isFirstRow',
-      value: true,
-      visibility: 'HIDDEN'
+      value: true
     },
     {
       class: 'Boolean',
       name: 'isFirstColumn',
-      value: true,
-      visibility: 'HIDDEN'
+      value: true
     },
     {
       class: 'Object',
@@ -77,9 +77,7 @@ foam.CLASS({
   methods: [
     {
       name: 'outputValue',
-      args: [
-        { name: 'value' }
-      ],
+      documentation: 'override CSVOutputterInterface',
       code: function(value) {
         if ( ! this.isFirstColumn ) this.csv += ',';
         this.isFirstColumn = false;
@@ -178,7 +176,7 @@ foam.CLASS({
       code: function() {
         this.props.forEach((name) => {
           let prop = this.of.getAxiomByName(name);
-          prop.toCSVLabel(this, prop);
+          prop.toCSVLabel(x, this, prop);
         });
         this.newLine_();
         this.isFirstRow = false;
@@ -187,7 +185,7 @@ foam.CLASS({
         PropertyInfo prop;
         for (String name: getProps()) {
           prop = (PropertyInfo) getOf().getAxiomByName(name);
-          prop.toCSVLabel(this, obj.getProperty(name));
+          prop.toCSVLabel(getX(), this, obj);
         }
         newLine_();
         setIsFirstRow(false);

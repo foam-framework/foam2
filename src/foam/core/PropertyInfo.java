@@ -14,7 +14,6 @@ import foam.mlang.Expr;
 import foam.mlang.order.Comparator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import foam.lib.csv.CSVOutputter;
 
 import javax.xml.stream.XMLStreamReader;
 import java.util.Map;
@@ -44,8 +43,8 @@ public interface PropertyInfo
   public Parser queryParser();
   public Parser csvParser();
   public void toJSON(foam.lib.json.Outputter outputter, Object value);
-  public void toCSV(X x, Object obj, foam.lib.csv.CSVOutputter outputter);
-  public void toCSVLabel(foam.lib.csv.CSVOutputter outputter, Object value);
+  public void toCSV(X x, Object obj, foam.lib.csv.CSVOutputterInterface outputter);
+  public void toCSVLabel(X x, foam.lib.csv.CSVOutputterInterface outputter, Object obj);
   public void toXML(foam.lib.xml.Outputter outputter, Object value);
   public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop);
   //return true if there are difference, then the property value from o2 will set to diff
