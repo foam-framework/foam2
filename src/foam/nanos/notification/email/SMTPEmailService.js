@@ -205,16 +205,16 @@ foam.CLASS({
         
             OMLogger omLogger = (OMLogger) x.get("OMLogger");
             Logger logger = (Logger) getX().get("logger");
-        
+
             try {
               omLogger.log("Pre send email request");
               Transport transport = getSession_().getTransport("smtp");
-              transport.connect();
+              transport.connect(getUsername(), getPassword());
               logger.info("SMTPEmailService connected.");
               for (EmailMessage emailMessage : emailMessages) {
                 MimeMessage message = createMimeMessage(emailMessage);
                 try {
-                  transport.send(message, getUsername(), getPassword());
+                  transport.send(message);
                   emailMessage.setStatus(Status.SENT);
                   logger.info("SMTPEmailService sent MimeMessage.");
                 } catch ( MessagingException e ) {
@@ -222,6 +222,7 @@ foam.CLASS({
                   logger.error("SMTPEmailService sending MimeMessage failed. " + e);
                 } finally {
                   emailMessageDAO.put(emailMessage);
+                  break;
                 }
               }
               transport.close();
