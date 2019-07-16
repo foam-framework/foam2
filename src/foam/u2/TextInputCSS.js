@@ -42,7 +42,10 @@ foam.CLASS({
           border-color: /*%PRIMARY3%*/ #406dea;
         }
 
-        ^:disabled {
+        /*
+          Using the not(^read-only) case to account for the <Select> tag for now
+        */
+        ^:disabled:not(^read-only) {
           color: /*%GREY2%*/ #9ba1a6;
           background-color: /*%GREY5%*/ #f5f7fa;
           border-color: /*%GREY3%*/ #cbcfd4;
