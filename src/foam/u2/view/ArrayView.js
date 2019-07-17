@@ -82,6 +82,7 @@ foam.CLASS({
   ],
   methods: [
     function initE() {
+      this.SUPER();
       var self = this;
       this
         .add(this.slot(function(data, valueView) {

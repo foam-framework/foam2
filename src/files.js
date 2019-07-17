@@ -425,6 +425,7 @@ FOAM_FILES([
   { name: "foam/u2/history/HistoryView", flags: ['web'] },
   { name: "foam/u2/view/FObjectView", flags: ['web'] },
   { name: "foam/u2/view/CollapseableDetailView", flags: ['web'] },
+  { name: "foam/u2/view/ReferenceArrayView", flags: ['web'] },
   { name: "foam/u2/view/DraftDetailView", flags: ['web'] },
   { name: "foam/u2/view/FObjectArrayView", flags: ['web'] },
   { name: "foam/u2/view/ChoiceView", flags: ['web'] },
@@ -644,8 +645,10 @@ FOAM_FILES([
 
   { name: "foam/u2/layout/DisplayWidth" },
   { name: "foam/u2/layout/Layouts" },
-  { name: "foam/u2/layout/Cards" },
+  { name: "foam/u2/layout/Grid" },
   { name: "foam/u2/layout/Card" },
+  { name: "foam/u2/layout/GUnit" },
+  { name: "foam/u2/layout/GridColumns" },
 
   { name: "foam/comics/v2/CannedQuery" },
   { name: "foam/comics/v2/DAOBrowseControllerView" },

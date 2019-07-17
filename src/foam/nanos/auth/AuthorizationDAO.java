@@ -16,10 +16,15 @@ import foam.mlang.predicate.Predicate;
  * A DAO decorator to run authorization checks.
  */
 public class AuthorizationDAO extends ProxyDAO {
-  public Authorizer authorizer_;
+  public Authorizer authorizer_ = AuthorizableAuthorizer.instance();
+
+  public AuthorizationDAO(X x) {
+    setX(x);
+  }
 
   public AuthorizationDAO(X x, DAO delegate) {
-    this(x, delegate, AuthorizableAuthorizer.instance());
+    setX(x);
+    setDelegate(delegate);
   }
 
   public AuthorizationDAO(X x, DAO delegate, Authorizer authorizer) {
