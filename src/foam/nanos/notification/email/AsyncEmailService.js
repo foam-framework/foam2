@@ -13,7 +13,7 @@ foam.CLASS({
     'foam.core.ContextAgent',
     'foam.core.X',
     'foam.nanos.logger.Logger',
-    'foam.nanos.pool.FixedThreadPool'
+    'foam.nanos.pool.ThreadPool'
   ],
 
   methods: [
@@ -21,7 +21,7 @@ foam.CLASS({
       name: 'sendEmail',
       javaCode:
       `
-        ( (FixedThreadPool) x.get("threadPool") ).submit(x, new ContextAgent() {
+        ( (ThreadPool) x.get("threadPool") ).submit(x, new ContextAgent() {
           @Override
           public void execute(X x) {
             Logger logger = (Logger) x.get("logger");

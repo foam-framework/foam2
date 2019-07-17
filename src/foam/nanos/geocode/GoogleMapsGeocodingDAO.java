@@ -14,7 +14,7 @@ import foam.dao.DAO;
 import foam.dao.ProxyDAO;
 import foam.lib.json.JSONParser;
 import foam.nanos.auth.Address;
-import foam.nanos.pool.FixedThreadPool;
+import foam.nanos.pool.ThreadPool;
 import foam.util.SafetyUtil;
 import org.apache.commons.io.IOUtils;
 
@@ -55,7 +55,7 @@ public class GoogleMapsGeocodingDAO
   public FObject put_(X x, FObject obj) {
     final FObject result = super.put_(x, obj);
 
-    ((FixedThreadPool) x.get("threadPool")).submit(x, new ContextAgent() {
+    ((ThreadPool) x.get("threadPool")).submit(x, new ContextAgent() {
       @Override
       public void execute(X x) {
         if ( result == null ) {

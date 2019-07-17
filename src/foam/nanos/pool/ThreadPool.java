@@ -10,5 +10,5 @@ import foam.core.ContextAgent;
 import foam.core.X;
 
 public interface ThreadPool {
-  public void submit(X x, ContextAgent agent);
+  void submit(X x, ContextAgent agent);
 }

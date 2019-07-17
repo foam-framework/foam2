@@ -12,7 +12,7 @@ import foam.nanos.auth.LastModifiedAware;
 import foam.nanos.auth.LastModifiedByAware;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
-import foam.nanos.pool.FixedThreadPool;
+import foam.nanos.pool.ThreadPool;
 
 import java.lang.Exception;
 import java.time.Duration;
@@ -155,7 +155,7 @@ public class RuleEngine extends ContextAwareSupport {
   }
 
   private void asyncApplyRules(List<Rule> rules, FObject obj, FObject oldObj) {
-    ((FixedThreadPool) getX().get("threadPool")).submit(userX_, x -> {
+    ((ThreadPool) getX().get("threadPool")).submit(userX_, x -> {
       for (Rule rule : rules) {
         if ( stops_.get() ) return;
 
