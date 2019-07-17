@@ -41,6 +41,17 @@
     'validity'
   ],
 
+  sections: [
+    {
+      name: 'basicInfo',
+      order: 100
+    },
+    {
+      name: '_defaultSection',
+      permissionRequired: true
+    }
+  ],
+
   properties: [
     {
       class: 'Long',
@@ -52,6 +63,7 @@
     {
       class: 'String',
       name: 'name',
+      section: 'basicInfo',
       documentation: 'Rule name for human readability.',
       tableWidth: 200
     },
