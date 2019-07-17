@@ -14,7 +14,6 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.*',
-    'foam.nanos.logger.Logger',
     'java.util.ArrayList',
     'java.util.List',
     'java.util.Date',
@@ -33,8 +32,8 @@ foam.CLASS({
       factory: function(of) {
         if ( of.getAxiomByName('tableColumns') ) return of.getAxiomByName('tableColumns').columns;
         return of.getAxiomsByClass()
-          .filter(p => ! p.networkTransient)
-          .map(p => p.name);
+          .filter((p) => ! p.networkTransient)
+          .map((p) => p.name);
       },
       javaFactory: `
         // TODO: Add tableColumns to java to give an opportunity for a better default.
@@ -139,19 +138,17 @@ foam.CLASS({
       ],
       code: function(x) {
         this.props
-          .map(name => this.of.getAxiomByName(name))
-          .forEach(p => p.toCSVLabel.call(p, x, this));
+          .map((name) => this.of.getAxiomByName(name))
+          .forEach((p) => {
+            if ( foam.core.Property.isInstance(p) ) p.toCSVLabel.call(p, x, this);
+          });
         this.newLine_();
         this.isFirstRow = false;
       },
       javaCode: `
         for (String name: getProps()) {
-          PropertyInfo p = (PropertyInfo) getOf().getAxiomByName(name);
-          if ( p == null ) {
-            ((Logger) x.get("logger")).warning("Attempt to output unknown header: " + name);
-            continue;
-          }
-          p.toCSVLabel(x, this);
+          Object p = getOf().getAxiomByName(name);
+          if ( p != null && p instanceof PropertyInfo ) ((PropertyInfo)p).toCSVLabel(x, this);
         }
         newLine_();
         setIsFirstRow(false);
@@ -163,20 +160,18 @@ foam.CLASS({
         if ( ! this.of ) this.of = obj.cls_;
         if ( this.isFirstRow ) this.outputHeader(x);
         this.props
-          .map(name => this.of.getAxiomByName(name))
-          .forEach(p => p.toCSV.call(p, x, obj, this));
+          .map((name) => this.of.getAxiomByName(name))
+          .forEach((p) => {
+            if ( foam.core.Property.isInstance(p) ) p.toCSV.call(p, x, obj, this);
+          });
         this.newLine_();
       },
       javaCode: `
         if ( getOf() == null ) setOf(obj.getClassInfo());
         if ( getIsFirstRow() ) outputHeader(x);
         for (String name : getProps()) {
-          PropertyInfo p = (PropertyInfo) getOf().getAxiomByName(name);
-          if ( p == null ) {
-            ((Logger) x.get("logger")).warning("Attempt to output unknown property: " + name);
-            continue;
-          }
-          p.toCSV(x, obj, this);
+          Object p = getOf().getAxiomByName(name);
+          if ( p != null && p instanceof PropertyInfo ) ((PropertyInfo)p).toCSV(x, obj, this);
         }
         newLine_();
       `
