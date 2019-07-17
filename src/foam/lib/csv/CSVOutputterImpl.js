@@ -23,34 +23,25 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'String',
-      name: 'csv',
-      view: 'foam.u2.tag.TextArea',
-      flags: ['js']
-    },
-    {
       class: 'Class',
-      name: 'of'
+      name: 'of',
+      required: true
     },
     {
       class: 'StringArray',
       name: 'props',
       factory: function(of) {
-        if ( ! of ) console.error('csvOutputter does not know the \'of\' of an object');
         if ( of.getAxiomByName('tableColumns') ) return of.getAxiomByName('tableColumns').columns;
-        return of.getAxiomsByClass().map((p) => p.name ).filter((p) => ! p.networkTransient).flat();
+        return of.getAxiomsByClass()
+          .filter(p => ! p.networkTransient)
+          .map(p => p.name);
       },
       javaFactory: `
-        if ( ! isPropertySet("of") ) {
-          ((Logger)getX().get("logger"))
-            .error("csvOutputter does not know the 'of' of an object");
-        }
-
-        ArrayList<String> propInfoArrayList =((List<PropertyInfo>)getOf().getAxioms()).stream()
-          .filter((propI) -> ! propI.getNetworkTransient())
-          .map((propI) -> propI.getName())
-          .collect(Collectors.toCollection(ArrayList::new));
-        return propInfoArrayList.toArray(new String[propInfoArrayList.size()]);
+        // TODO: Add tableColumns to java to give an opportunity for a better default.
+        return ((List<PropertyInfo>)getOf().getAxiomsByClass(PropertyInfo.class)).stream()
+          .filter(propI -> ! propI.getNetworkTransient())
+          .map(propI -> propI.getName())
+          .toArray(String[]::new);
       `
     },
     {
@@ -64,13 +55,17 @@ foam.CLASS({
       value: true
     },
     {
+      class: 'String',
+      name: 'csv',
+      view: 'foam.u2.tag.TextArea',
+      flags: ['js']
+    },
+    {
       class: 'Object',
       name: 'sb',
       flags: ['java'],
       javaType: 'java.lang.StringBuilder',
-      javaFactory: 'return new StringBuilder();',
-      documentation: 'Used for java version of this outputter.',
-      visibility: 'HIDDEN'
+      javaFactory: 'return new StringBuilder();'
     }
   ],
 
@@ -97,26 +92,11 @@ foam.CLASS({
         foam.mmethod(
           {
             String: function(value) {
-              if ( value.includes(',') ) {
-                this.csv += `"${value.replace(/\"/g, '""')}"`;
-              } else {
-                this.csv += value;
-              }
-            },
-            Number: function(value) {
-              this.csv += value.toString();
-            },
-            Boolean: function(value) {
-              this.csv += value.toString();
+              if ( value.includes(',') ) value = `"${value.replace(/\"/g, '""')}"`;
+              this.csv += value;
             },
             Date: function(value) {
               this.outputValue_(value.toDateString());
-            },
-            FObject: function(value) {
-              this.outputValue_(foam.json.Pretty.stringify(value));
-            },
-            Array: function(value) {
-              this.outputValue_(foam.json.Pretty.stringify(value));
             },
             Undefined: function(value) {},
             Null: function(value) {}
@@ -125,25 +105,12 @@ foam.CLASS({
         }),
       javaCode: `
         if ( value instanceof String ) {
-          if ( ((String)value).contains(",") ) {
-            getSb().append("\\"");
-            getSb().append(((String)value).replace("\\"", "\\"\\""));
-            getSb().append("\\"");
-          } else {
-            getSb().append(value);
-          }
-        } else if ( value instanceof Number ) {
-          getSb().append(value.toString());
-        } else if ( value instanceof Boolean ) {
-          getSb().append(value.toString());
+          if ( ((String)value).contains(",") )
+            value = '"' + ((String)value).replace("\\"", "\\"\\"") + '"';
+          getSb().append(value);
         } else if ( value instanceof Date ) {
           getSb().append(value.toString());
-        } else if ( value instanceof FObject ) {
-          outputValue_(value.toString());
-        } else if ( value instanceof List ) {
-          outputValue_(value.toString());
-        }  else if ( value == null ) {
-          // Do nothing
+        } else if ( value == null ) {
         } else {
           outputValue_(value.toString());
         }
@@ -162,28 +129,25 @@ foam.CLASS({
     },
     {
       name: 'toString',
-      code: function() {
-        return this.csv;
-      },
+      code: function() { return this.csv; },
       javaCode: 'return getSb().toString();'
     },
     {
       name: 'outputHeader',
       args: [
-        { type: 'FObject', name: 'obj' }
+        { type: 'Context', name: 'x' }
       ],
-      code: function() {
-        this.props.forEach((name) => {
-          let prop = this.of.getAxiomByName(name);
-          prop.toCSVLabel.call(prop, this.__subContext__, this);
-        });
+      code: function(x) {
+        this.props
+          .map(name => this.of.getAxiomByName(name))
+          .forEach(p => p.toCSVLabel.call(p, x, this));
         this.newLine_();
         this.isFirstRow = false;
       },
       javaCode: `
         for (String name: getProps()) {
-          PropertyInfo prop = (PropertyInfo) getOf().getAxiomByName(name);
-          prop.toCSVLabel(getX(), this);
+          PropertyInfo p = (PropertyInfo) getOf().getAxiomByName(name);
+          p.toCSVLabel(x, this);
         }
         newLine_();
         setIsFirstRow(false);
@@ -191,35 +155,30 @@ foam.CLASS({
     },
     {
       name: 'outputFObject',
-      code: function(obj) {
+      code: function(x, obj) {
         if ( ! this.of ) this.of = obj.cls_;
-
-        if ( this.isFirstRow ) this.outputHeader();
-
-        this.props.forEach((name) => {
-          let prop = this.of.getAxiomByName(name);
-          prop.toCSV(this.__subContext__, obj, this);
-        });
-
+        if ( this.isFirstRow ) this.outputHeader(x);
+        this.props
+          .map(name => this.of.getAxiomByName(name))
+          .forEach(p => p.toCSV.call(p, x, obj, this));
         this.newLine_();
       },
       javaCode: `
         if ( getOf() == null ) setOf(obj.getClassInfo());
-        if ( getIsFirstRow() ) outputHeader(obj);
-
+        if ( getIsFirstRow() ) outputHeader(x);
         for (String name : getProps()) {
-          PropertyInfo prop = (PropertyInfo) getOf().getAxiomByName(name);
-          prop.toCSV(getX(), obj, this);
+          PropertyInfo p = (PropertyInfo) getOf().getAxiomByName(name);
+          p.toCSV(x, obj, this);
         }
-
         newLine_();
       `
     },
     {
       name: 'flush',
       code: function() {
-        ['csv', 'isFirstColumn', 'isFirstRow']
-          .forEach( (s) => this.clearProperty(s) );
+        this.csv = '';
+        this.isFirstColumn = undefined;
+        this.isFirstRow = undefined;
       },
       javaCode: `
         getSb().setLength(0);

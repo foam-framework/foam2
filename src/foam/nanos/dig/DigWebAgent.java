@@ -364,7 +364,7 @@ public class DigWebAgent
              .build();
 
             for ( Object o : sink.getArray() ) {
-              outputterCsv.outputFObject((FObject)o);
+              outputterCsv.outputFObject(x, (FObject)o);
             }
 
             if ( emailSet ) {
@@ -549,7 +549,7 @@ public class DigWebAgent
     } else if ( format == Format.CSV )  {
       //output error in csv format
       CSVOutputter outputterCsv = new foam.lib.csv.CSVOutputterImpl.Builder(x).build();
-      outputterCsv.outputFObject(error);
+      outputterCsv.outputFObject(x, error);
       out.println(outputterCsv.toString());
 
     } else if ( format == Format.HTML ) {

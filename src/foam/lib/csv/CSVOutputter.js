@@ -18,6 +18,7 @@ foam.INTERFACE({
     {
       name: 'outputFObject',
       args: [
+        { type: 'Context', name: 'x' },
         { type: 'FObject', name: 'obj' }
       ]
     },

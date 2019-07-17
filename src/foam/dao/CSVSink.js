@@ -34,10 +34,10 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'props',
-      factory: function(of) {
-        if ( ! of ) return [];
-        if ( tc = of.getAxiomByName('tableColumns') ) return tc.columns;
-        return of.getAxiomsByClass(foam.core.Property)
+      factory: function() {
+        if ( ! this.of ) return [];
+        if ( tc = this.of.getAxiomByName('tableColumns') ) return tc.columns;
+        return this.of.getAxiomsByClass(foam.core.Property)
           .filter(p => ! p.networkTransient)
           .map(p => p.name);
       },
@@ -75,10 +75,10 @@ foam.CLASS({
     {
       name: 'put',
       code: function(obj) {
-        this.outputter.outputFObject(obj);
+        this.outputter.outputFObject(this.__context__, obj);
       },
       javaCode: `
-        getOutputter().outputFObject((foam.core.FObject)obj);
+        getOutputter().outputFObject(getX(), (foam.core.FObject)obj);
       `
     },
 
@@ -180,7 +180,7 @@ foam.CLASS({
         });
         this.of.getAxiomsByClass(foam.core.Property)
           .forEach(p => {
-            p.toCSVLabel.call(p, x, prefixedOutputter);
+            p.toCSVLabel.call(p, x, outputter);
           });
       },
     },
