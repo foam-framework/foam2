@@ -14,9 +14,8 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.ContextAgent',
-    'foam.core.X',
-    'foam.dao.ArraySink',
+    'foam.core.*',
+    'foam.dao.AbstractSink',
     'foam.dao.DAO',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.crunch.CapabilityCapabilityJunction',
@@ -30,38 +29,35 @@ foam.CLASS({
     {
       name: 'applyAction',
       javaCode: `
-      DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-      DAO prerequisiteCapabilityJunctionDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
-      DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+      agency.submit(x, new ContextAgent() {
+        @Override
+        public void execute(X x) {
+          DAO prerequisiteCapabilityJunctionDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
+          DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
-      String capId = (String) ((UserCapabilityJunction) obj).getTargetId();
-      Long userId = ((UserCapabilityJunction) obj).getSourceId();
+          String capId = (String) ((UserCapabilityJunction) obj).getTargetId();
+          Long userId = ((UserCapabilityJunction) obj).getSourceId();
 
-      List<UserCapabilityJunction> pendingJunctions = (List<UserCapabilityJunction>) ((ArraySink) userCapabilityJunctionDAO
-      .where(AND(
-        EQ(UserCapabilityJunction.SOURCE_ID, userId),
-        EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.PENDING),
-        NEQ(UserCapabilityJunction.TARGET_ID, capId)
-      ))
-      .select(new ArraySink()))
-      .getArray();
-
-      for ( UserCapabilityJunction pendingJunction : pendingJunctions ) {
-        final CapabilityCapabilityJunction prereqJunction = (CapabilityCapabilityJunction) prerequisiteCapabilityJunctionDAO.find(
-          AND(
-            EQ(CapabilityCapabilityJunction.SOURCE_ID, capId),
-            EQ(CapabilityCapabilityJunction.TARGET_ID, (String) pendingJunction.getTargetId())
-          )
-        );
-        if ( prereqJunction != null ) {
-          agency.submit(x, new ContextAgent() {
+          userCapabilityJunctionDAO.where(
+            AND(
+              EQ(UserCapabilityJunction.SOURCE_ID, userId),
+              EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.PENDING),
+              NEQ(UserCapabilityJunction.TARGET_ID, capId)
+            )
+          ).select(new AbstractSink() {
             @Override
-            public void execute(X x) {
-              ((DAO) x.get("userCapabilityJunctionDAO")).put((UserCapabilityJunction) pendingJunction.fclone());
+            public void put(Object obj, Detachable sub) {
+              CapabilityCapabilityJunction j = (CapabilityCapabilityJunction) prerequisiteCapabilityJunctionDAO.find(
+                AND(
+                  EQ(CapabilityCapabilityJunction.SOURCE_ID, capId),
+                  EQ(CapabilityCapabilityJunction.TARGET_ID, (String) ((UserCapabilityJunction) obj).getTargetId())
+                )
+              );
+              if ( j != null ) userCapabilityJunctionDAO.put(((UserCapabilityJunction) obj).fclone());
             }
           });
         }
-      }
+      });
       `
     }
   ]
