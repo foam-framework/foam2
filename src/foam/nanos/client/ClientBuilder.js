@@ -30,7 +30,6 @@ foam.CLASS({
         // requests to nSpecDAO.
         return this.RequestResponseClientDAO.create({
           of: this.NSpec,
-          cache: true,
           delegate: this.SessionClientBox.create({
             delegate: this.RetryBox.create({
               maxAttempts: -1,
@@ -100,10 +99,17 @@ foam.CLASS({
                 client.properties.push({
                   name: spec.name,
                   factory: function() {
-                    if ( ! json.serviceName ) json.serviceName = 'service/' + spec.name;
                     if ( ! json.class       ) json.class       = 'foam.dao.EasyDAO';
-                    if ( ! json.daoType     ) json.daoType     = 'CLIENT';
-                    if ( ! json.retryBoxMaxAttempts ) json.retryBoxMaxAttempts = 0;
+                    var cls = foam.lookup(json.class);
+                    var defaults = {
+                      serviceName: 'service/' + spec.name,
+                      daoType: 'CLIENT',
+                      retryBoxMaxAttempts: 0
+                    };
+                    for ( var k in defaults ) {
+                      if ( cls.getAxiomByName(k) && ! json[k] )
+                        json[k] = defaults[k];
+                    }
                     return foam.json.parse(json, null, this.__subContext__);
                   }
                 });

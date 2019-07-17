@@ -6,31 +6,18 @@
 
 foam.CLASS({
   package: 'org.chartjs',
+  // TODO: Rename this to LineDAOChartView because the DAO
+  // doesn't NEED to be of Candlesticks. The defaults for this
+  // view are just for candlesticks.
   name: 'CandlestickDAOChartView',
-  extends: 'foam.u2.View',
-
-  documentation: `
-    A view that would generate a chart using chartjs and a supplied CandlestickDAO.
-  `,
-
+  extends: 'org.chartjs.AbstractChartView',
+  requires: [
+    'foam.nanos.analytics.Candlestick',
+  ],
   implements: [
     'foam.mlang.Expressions'
   ],
-
-  requires: [
-    'foam.dao.FnSink',
-    'foam.nanos.analytics.Candlestick',
-    'org.chartjs.ChartCView'
-  ],
-
   properties: [
-    {
-      class: 'foam.dao.DAOProperty',
-      name: 'data',
-      documentation: `
-        The supplied CandlestickDAO.
-      `
-    },
     {
       class: 'Map',
       name: 'config',
@@ -77,14 +64,9 @@ foam.CLASS({
       factory: function() { return this.Candlestick.AVERAGE; }
     }
   ],
-
-  methods: [
-    function initE() {
-      this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.dataUpdate })));
-      this.add(this.ChartCView.create({ config$: this.config$ }));
-    }
+  reactions: [
+    ['', 'propertyChange.customDatasetStyling', 'dataUpdate']
   ],
-
   listeners: [
     {
       name: 'dataUpdate',
@@ -95,6 +77,8 @@ foam.CLASS({
           .orderBy(this.xExpr)
           .select(this.GROUP_BY(this.keyExpr, this.PLOT(this.xExpr, this.yExpr)))
           .then(function(sink) {
+            // Clear data before cloning because it gets clobbered anyway.
+            self.config.data = { datasets: [] };
             var config = foam.Object.clone(self.config);
             config.data = {
               datasets: Object.keys(sink.groups).map(key => {

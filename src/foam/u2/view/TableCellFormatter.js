@@ -121,7 +121,17 @@ foam.CLASS({
   name: 'FObjectPropertyTableCellFormatterRefinement',
   refines: 'foam.core.FObjectProperty',
 
-  properties: [ [ 'tableCellFormatter', null ] ]
+  properties: [
+    {
+      class: 'foam.u2.view.TableCellFormatter',
+      name: 'tableCellFormatter',
+      value: function(obj) {
+        this.start()
+          .add(obj.toSummary())
+        .end();
+      }
+    }
+  ]
 });
 
 
@@ -144,6 +154,35 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'StringArrayTableCellFormatterRefinement',
+  refines: 'foam.core.StringArray',
+  properties: [
+    {
+      class: 'foam.u2.view.TableCellFormatter',
+      name: 'tableCellFormatter',
+      value: function(value) {
+        this.add(value.join(', '));
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'FObjectArrayTableCellFormatterRefinement',
+  refines: 'foam.core.FObjectArray',
+  properties: [
+    {
+      class: 'foam.u2.view.TableCellFormatter',
+      name: 'tableCellFormatter',
+      value: function(value) {
+        this.add(value.map(o => o.toSummary()).join(', '));
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.u2.view',

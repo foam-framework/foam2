@@ -50,10 +50,6 @@ foam.CLASS({
     ^ input {
       width: 100%;
       margin-bottom: 16px;
-      padding: 8px;
-      border-radius: 3px;
-      border: 1px solid #cbcfd4;
-      font-size: 14px;
     }
     ^ button {
       margin-top: 8px;
@@ -64,17 +60,17 @@ foam.CLASS({
       font-size: 12px;
       font-weight: 300;
       text-align: left;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
       margin-bottom: 8px;
     }
     ^ .link {
       margin-left: 2px;
-      color: %SECONDARYCOLOR%;
+      color: /*%PRIMARY3%*/ #406dea;
       cursor: pointer;
     }
     ^ .forgot-link {
       margin-left: 2px;
-      color: %SECONDARYCOLOR%;
+      color: /*%PRIMARY3%*/ #406dea;
       cursor: pointer;
       float: right;
     }

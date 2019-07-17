@@ -11,15 +11,18 @@ foam.CLASS({
 
   requires: [
     'foam.u2.detail.SectionView',
-    'foam.u2.layout.Cols',
-    'foam.u2.layout.Rows',
-    'foam.u2.layout.Item',
+    'foam.u2.layout.Grid',
+    'foam.u2.layout.GUnit',
     'foam.u2.borders.CardBorder'
   ],
 
   css: `
     .inner-card {
       padding: 24px 16px
+    }
+
+    ^ .foam-u2-view-ScrollTableView table {
+      width: 100%;
     }
   `,
 
@@ -34,10 +37,11 @@ foam.CLASS({
           if ( ! data ) return;
 
           return self.E()
-            .start(self.Rows, { defaultChildStyle: { padding: '16px 0' } })
+            .start(self.Grid)
               .forEach(sections, function(s) {
                 this
-                  .start(self.Item)
+                  .start(self.GUnit, { columns: s.gridColumns })
+                    .style({ padding: '16px 0' })
                     .show(s.createIsAvailableFor(self.data$))
                     .start('h2').add(s.title$).end()
                     .start(self.CardBorder)
@@ -54,4 +58,4 @@ foam.CLASS({
         }));
     }
   ]
-}); 
+});

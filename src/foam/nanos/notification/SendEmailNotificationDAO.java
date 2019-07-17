@@ -13,7 +13,7 @@ import foam.dao.ProxyDAO;
 import foam.nanos.app.AppConfig;
 import foam.nanos.auth.User;
 import foam.nanos.notification.email.EmailMessage;
-import foam.nanos.notification.email.EmailService;
+import foam.util.Emails.EmailsUtility;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,18 +30,15 @@ public class SendEmailNotificationDAO extends ProxyDAO {
   }
   @Override
   public FObject put_(X x, FObject obj) {
-    DAO userDAO = (DAO) x.get("localUserDAO");
-    AppConfig config     = (AppConfig) x.get("appConfig");
-    EmailService email      = (EmailService) x.get("email");
-    Notification notif = (Notification) obj;
-    User user = (User) userDAO.find(notif.getUserId());
+    DAO          userDAO  = (DAO) x.get("localUserDAO");
+    AppConfig    config   = (AppConfig) x.get("appConfig");
+    Notification notif    = (Notification) obj;
+    User         user     = (User) userDAO.find(notif.getUserId());
     Notification oldNotif = (Notification) getDelegate().find(obj);
 
-    if ( oldNotif != null )
-      return super.put_(x, obj);
+    if ( oldNotif != null ) return super.put_(x, obj);
 
-    if ( ! notif.getEmailIsEnabled() )
-      return super.put_(x, obj);
+    if ( ! notif.getEmailIsEnabled() || user == null ) return super.put_(x, obj);
 
     if ( user.getDisabledTopicsEmail() != null ) {
       List disabledTopics = Arrays.asList(user.getDisabledTopicsEmail());
@@ -62,14 +59,14 @@ public class SendEmailNotificationDAO extends ProxyDAO {
       if ( foam.util.SafetyUtil.isEmpty(notif.getEmailName()) ) {
         message.setSubject(notif.getTemplate());
         message.setBody(notif.getBody());
-        email.sendEmail(x, message);
+        EmailsUtility.sendEmailFromTemplate(x, null, message, null, null);
       } else {
-        email.sendEmailFromTemplate(x, user, message, notif.getEmailName(), notif.getEmailArgs());
+        EmailsUtility.sendEmailFromTemplate(x, user, message, notif.getEmailName(), notif.getEmailArgs());
       }
     } catch(Throwable t) {
       System.err.println("Error sending notification email message: "+message+". Error: " + t);
     }
 
-    return super.put_(x,notif);
+    return super.put_(x, notif);
   }
 }

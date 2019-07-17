@@ -10,7 +10,9 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
+    'foam.core.SimpleSlot',
     'foam.u2.search.SearchManager',
+    'foam.u2.search.TextSearchView',
     'foam.u2.view.SearchViewWrapper'
   ],
 
@@ -21,7 +23,8 @@ foam.CLASS({
 
   exports: [
     'as filterController',
-    'as data'
+    'as data',
+    'searchManager'
   ],
 
   css: `
@@ -43,7 +46,7 @@ foam.CLASS({
     ^ input:not([type="checkbox"]):focus,
     ^ select:focus {
       outline: none;
-      border: 1px solid %SECONDARYCOLOR%;
+      border: 1px solid /*%PRIMARY3%*/ #406dea;
     }
 
     ^ .general-query {
@@ -102,6 +105,15 @@ foam.CLASS({
       class: 'Int',
       name: 'totalCount'
     },
+    {
+      name: 'searchManager',
+      factory: function() {
+        return this.SearchManager.create({
+          dao$: this.dao$,
+          predicate$: this.data$
+        });
+      }
+    }
   ],
 
   methods: [
@@ -116,21 +128,17 @@ foam.CLASS({
         add(this.slot(function(filters) {
           self.show(filters.length);
 
-          var searchManager = self.SearchManager.create({
-            dao$: self.dao$,
-            predicate$: self.data$
-          });
-
-          searchManager.filteredDAO$.sub(self.updateSelectedCount);
-          self.updateSelectedCount(0, 0, 0, searchManager.filteredDAO$);
+          this.searchManager.filteredDAO$.sub(self.updateSelectedCount);
+          self.updateSelectedCount(0, 0, 0, this.searchManager.filteredDAO$);
 
           var e = this.E('div');
 
-          e.onDetach(searchManager);
+          e.onDetach(this.searchManager);
 
-          var generalQueryView = foam.u2.ViewSpec.createView(
-              { class: 'foam.u2.search.TextSearchView' },
-              {
+          var slot = self.SimpleSlot.create();
+
+          e
+            .start(self.TextSearchView, {
                 richSearch: true,
                 of: self.dao.of.id,
                 onKey: true,
@@ -138,26 +146,21 @@ foam.CLASS({
                   class: 'foam.u2.tag.Input',
                   focused: true
                 }
-              },
-              this,
-              this.__subSubContext__);
-          searchManager.add(generalQueryView);
-          e.start(generalQueryView).addClass('general-query').end();
+            }, slot)
+              .addClass('general-query')
+            .end();
+
+          this.searchManager.add(slot.value);
 
           e.forEach(filters, function(f) {
-            // TODO: See if this can be cleaned up somehow, if searchView didn't
-            // require the proprety explicitly, or could find the search manager
-            // via the context and add itself to that.
             var axiom = self.dao.of.getAxiomByName(f);
-            var spec = axiom.searchView;
-            var view = foam.u2.ViewSpec.createView(spec, {
-              property: axiom,
-              dao: self.dao
-            }, this, this.__subSubContext__);
 
-            searchManager.add(view);
             this
-              .start(self.SearchViewWrapper, { searchView: view })
+              .start(self.SearchViewWrapper, {
+                searchView: axiom.searchView,
+                property: axiom,
+                dao: self.dao
+              })
                 .addClass(self.myClass('filter'))
               .end();
           });

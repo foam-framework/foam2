@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-foam.locale = foam.locale || 'en';
+foam.SCRIPT({
+  package: 'foam.i18n',
+  name: 'LocaleScript',
+  code: function() {
+    foam.locale = foam.locale || 'en';
+  }
+});
 
 foam.CLASS({
   package: 'foam.i18n',

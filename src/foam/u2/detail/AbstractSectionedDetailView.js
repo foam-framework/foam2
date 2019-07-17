@@ -22,6 +22,16 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'FObjectProperty',
+      name: 'data',
+      factory: function() {
+        return this.hasOwnProperty('of') ? this.of.create(null, this) : null;
+      },
+      postSet: function() {
+        this.of = undefined;
+      }
+    },
+    {
       class: 'Class',
       name: 'of',
       expression: function(data) {
@@ -54,7 +64,6 @@ foam.CLASS({
             .filter(a => ! usedAxioms[a.name]);
         if ( unusedProperties.length || unusedActions.length ) {
           sections.push(this.Section.create({
-            title: 'Unsectioned Axioms',
             properties: unusedProperties,
             actions: unusedActions
           }));

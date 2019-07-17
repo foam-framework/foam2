@@ -35,12 +35,22 @@ foam.CLASS({
       class: 'Int',
       name: 'timeout',
       // TODO: change this back to 5s once we have the cacheDAO.
-      value: 60000
+      value: 60000,
+      preSet: function(old, nu) {
+        // TODO: Try to detect CPF-1625
+        if ( nu < 5000 ) {
+          debugger;
+          console.warn("Setting timeout to low value", nu);
+          return 5000;
+        }
+        return nu;
+      }
     }
   ],
   methods: [
     function send(msg) {
       var replyBox = msg.attributes.replyBox;
+      var localReplyBox = replyBox.localBox;
 
       if ( ! replyBox ) {
         this.delegate.send(msg);
@@ -50,18 +60,18 @@ foam.CLASS({
       var tooLate = false;
       var timer = setTimeout(function() {
         tooLate = true;
-        replyBox.send(this.Message.create({
+        localReplyBox.send(this.Message.create({
           object: this.TimeoutException.create()
         }));
       }.bind(this), this.timeout);
 
       var self = this;
 
-      msg.attributes.replyBox = {
-        send: function(msg) {
+      replyBox.localBox = foam.box.AnonymousBox.create({
+        f: function(msg) {
           if ( ! tooLate ) {
             clearTimeout(timer);
-            replyBox.send(msg);
+            localReplyBox.send(msg);
             return;
           }
 
@@ -72,7 +82,7 @@ foam.CLASS({
           // still processing our old ones.
           self.timeout *= 2;
         }
-      };
+      });
 
       this.delegate.send(msg);
     }

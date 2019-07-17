@@ -36,15 +36,20 @@ foam.CLASS({
         String ruleGroup = rule.getRuleGroup();
         for ( Object key : rulesList.keySet() ) {
           if ( ((Predicate) key).f(obj) ) {
+            rule.setX(getX());
             GroupBy group = (GroupBy) rulesList.get(key);
             if ( group.getGroupKeys().contains(ruleGroup) ) {
               List<Rule> rules = ((ArraySink) group.getGroups().get(ruleGroup)).getArray();
               Rule foundRule = Rule.findById(rules, rule.getId());
               if ( foundRule != null ) {
                 rules.remove(foundRule);
-                rules.add(foundRule.updateRule(rule));
+                if ( rule.getEnabled() ) {
+                  rules.add(foundRule.updateRule(rule));
+                }
               } else {
-                rules.add(rule);
+                if ( rule.getEnabled() ) {
+                  rules.add(rule);
+                }
               }
               Collections.sort(rules, new Desc(Rule.PRIORITY));
             } else {

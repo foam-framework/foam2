@@ -624,7 +624,7 @@ foam.CLASS({
     {
       name: 'value',
       expression: function(of) {
-        if ( of ) return of.ID.value;
+        return of ? of.ID.value : null;
       }
     }
   ],
@@ -642,7 +642,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 foam.CLASS({
   package: 'foam.core',

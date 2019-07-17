@@ -104,7 +104,7 @@ public class TreeIndex
     Object key;
     try {
       key = prop_.f(value);
-    } catch ( ClassCastException exp ) {
+    } catch (ClassCastException e) {
       return state;
     }
 
@@ -113,7 +113,11 @@ public class TreeIndex
   }
 
   public Object remove(Object state, FObject value) {
-    return ((TreeNode) state).removeKeyValue((TreeNode) state, prop_, prop_.f(value), value, tail_);
+    try {
+      return ((TreeNode) state).removeKeyValue((TreeNode) state, prop_, prop_.f(value), value, tail_);
+    } catch (ClassCastException e) {
+      return state;
+    }
   }
 
   public Object removeAll() {
@@ -141,16 +145,20 @@ public class TreeIndex
     state     = statePredicate[0];
     predicate = (Predicate) statePredicate[1];
 
-    // To see if there have some possible to do count or groubBy select efficiently
-    if ( predicate == null && sink instanceof Count && state != null ) {
-      return new CountPlan(( (TreeNode) state ).size);
-    }
+    if ( predicate == null ) {
+      // To see if there have some possible to do count or groubBy select efficiently
+      if ( sink instanceof Count && state != null ) {
+        return new CountPlan(((TreeNode) state).size);
+      }
 
-    // We return a groupByPlan only if no order, no limit, no skip, no predicate
-    if ( predicate == null && sink instanceof GroupBy
-        && ( (GroupBy) sink ).getArg1().toString().equals(prop_.toString())
-        && order == null && skip == 0 && limit == AbstractDAO.MAX_SAFE_INTEGER )
-      return new GroupByPlan(state, sink, predicate, prop_, tail_);
+      // We return a groupByPlan only if no order, no limit, no skip, no predicate
+      if ( sink instanceof GroupBy
+          && ( (GroupBy) sink ).getArg1().toString().equals(prop_.toString())
+          && order == null && skip == 0 && limit == AbstractDAO.MAX_SAFE_INTEGER )
+      {
+        return new GroupByPlan(state, sink, predicate, prop_, tail_);
+      }
+    }
 
     return new ScanPlan(state, sink, skip, limit, order, predicate, prop_, tail_);
   }
@@ -158,8 +166,4 @@ public class TreeIndex
   public long size(Object state) {
     return ((TreeNode) state).size;
   }
-
-  public void onAdd(Sink sink) {
-  }
-
 }

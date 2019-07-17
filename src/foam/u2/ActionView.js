@@ -77,13 +77,13 @@ foam.CLASS({
 
     ^primary {
       border-color: #355bc4;
-      background-color: %SECONDARYCOLOR%;
+      background-color: /*%PRIMARY3%*/ #406dea;
       color: white;
     }
 
     ^primary:hover:not(:disabled) {
-      border-color: #294798;
-      background-color: %SECONDARYHOVERCOLOR%;
+      border-color: /*%PRIMARY1%*/ #202341;
+      background-color: /*%PRIMARY2%*/ #144794;
     }
 
     ^primary:focus {
@@ -91,29 +91,29 @@ foam.CLASS({
     }
 
     ^primary:disabled {
-      border-color: %SECONDARYDISABLEDCOLOR%;
-      background-color: %SECONDARYDISABLEDCOLOR%;
+      border-color: /*%PRIMARY4%*/ #a7beff;
+      background-color: /*%PRIMARY4%*/ #a7beff;
     }
 
     ^primary-destructive {
-      border-color: %DESTRUCTIVECOLOR%;
-      background-color: %DESTRUCTIVECOLOR%;
+      border-color: /*%DESTRUCTIVE3%*/ #d9170e;
+      background-color: /*%DESTRUCTIVE3%*/ #d9170e;
       color: white;
     }
 
     ^primary-destructive:hover:not(:disabled) {
-      border-color: #a61414;
-      background-color: %DESTRUCTIVEHOVERCOLOR%;
+      border-color: /*%DESTRUCTIVE1%*/ #631414;
+      background-color: /*%DESTRUCTIVE2%*/ #a61414;
     }
 
     ^primary-destructive:focus {
-      border-color: #a61414;
+      border-color: /*%DESTRUCTIVE1%*/ #631414;
       box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
     }
 
     ^primary-destructive:disabled {
-      border-color: #ed8e8d;
-      background-color: %DESTRUCTIVEDISABLEDCOLOR%;
+      border-color: /*%DESTRUCTIVE4%*/ #f79393;
+      background-color: /*%DESTRUCTIVE5%*/ #fbedec;
     }
 
 
@@ -124,40 +124,39 @@ foam.CLASS({
     ^secondary {
       border-color: #cbcfd4;
       background-image: linear-gradient(to bottom, #ffffff, #e7eaec);
-      color: %PRIMARYCOLOR%;
+      color: /*%BLACK%*/ #1e1f21;
     }
 
     ^secondary:hover {
       border-color: #cbcfd4;
       background-image: linear-gradient(to bottom, #ffffff, #d3d6d8);
-      color: %PRIMARYHOVERCOLOR%;
     }
 
     ^secondary:focus {
       background-image: linear-gradient(to bottom, #ffffff, #d3d6d8);
-      border-color: %SECONDARYCOLOR%;
+      border-color: /*%PRIMARY3%*/ #406dea;
     }
 
     ^secondary:disabled {
       border-color: #e7eaec;
-      color: %PRIMARYDISABLEDCOLOR%;
+      color: /*%GREY3%*/ #cbcfd4;
     }
 
     ^secondary-destructive {
-      border-color: %DESTRUCTIVECOLOR%;
+      border-color: /*%DESTRUCTIVE3%*/ #d9170e;
       background-color: white;
-      color: %DESTRUCTIVECOLOR%;
+      color: /*%DESTRUCTIVE3%*/ #d9170e;
     }
 
     ^secondary-destructive:hover {
-      border-color: %DESTRUCTIVEHOVERCOLOR%;
+      border-color: /*%DESTRUCTIVE2%*/ #a61414;
       background-color: white;
-      color: %DESTRUCTIVEHOVERCOLOR%;
+      color: /*%DESTRUCTIVE2%*/ #a61414;
     }
 
     ^secondary-destructive:disabled {
-      border-color: %DESTRUCTIVEDISABLEDCOLOR%;
-      color: %DESTRUCTIVEDISABLEDCOLOR%;
+      border-color: /*%DESTRUCTIVE5%*/ #fbedec;
+      color: /*%DESTRUCTIVE5%*/ #fbedec;
     }
 
 
@@ -166,34 +165,34 @@ foam.CLASS({
      */
 
     ^tertiary {
-      border-color: #355bc4;
-      background-color: %SECONDARYCOLOR%;
-      color: white;
+      border: 2px solid;
+      border-color: transparent;
+      background-color: transparent;
+      color: /*%BLACK%*/ #1e1f21;
     }
 
     ^tertiary:hover:not(:disabled) {
-      border-color: #294798;
-      background-color: %SECONDARYHOVERCOLOR%;
+      border-color: transparent;
+      background-color: transparent;
     }
 
-    ^tertiary:focus {
-      box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
+    ^tertiary:focus:not(:hover) {
+      border-bottom-color: /*%PRIMARY3%*/ #406dea;
     }
 
     ^tertiary:disabled {
-      border-color: %SECONDARYDISABLEDCOLOR%;
-      background-color: %SECONDARYDISABLEDCOLOR%;
+      color: /*%GREY3%*/ #cbcfd4;
     }
 
     ^tertiary-destructive {
-      border-color: %DESTRUCTIVECOLOR%;
-      background-color: %DESTRUCTIVECOLOR%;
+      border-color: /*%DESTRUCTIVE3%*/ #d9170e;
+      background-color: /*%DESTRUCTIVE3%*/ #d9170e;
       color: white;
     }
 
     ^tertiary-destructive:hover:not(:disabled) {
       border-color: #a61414;
-      background-color: %DESTRUCTIVEHOVERCOLOR%;
+      background-color: /*%DESTRUCTIVE2%*/ #a61414;
     }
 
     ^tertiary-destructive:focus {
@@ -202,8 +201,8 @@ foam.CLASS({
     }
 
     ^tertiary-destructive:disabled {
-      border-color: #ed8e8d;
-      background-color: %DESTRUCTIVEDISABLEDCOLOR%;
+      border-color: /*%DESTRUCTIVE5%*/ #fbedec;
+      background-color: /*%DESTRUCTIVE5%*/ #fbedec;
     }
 
 
@@ -220,6 +219,11 @@ foam.CLASS({
       padding: 7px 15px;
     }
 
+    ^tertiary^small {
+      font-size: 12px;
+      padding: 8px 0px;
+    }
+
     ^medium {
       font-size: 14px;
       padding: 9px 16px;
@@ -229,6 +233,10 @@ foam.CLASS({
       padding: 8px 15px;
     }
 
+    ^tertiary^medium {
+      padding: 8px 0px;
+    }
+
     ^large {
       font-size: 16px;
       padding: 10px 16px;
@@ -236,6 +244,10 @@ foam.CLASS({
 
     ^large:focus {
       padding: 9px 15px;
+    }
+
+    ^tertiary^large {
+      padding: 10px 0px;
     }
   `,
 
@@ -333,24 +345,22 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      
+      this.tooltip = this.action.toolTip;
+
+      this.SUPER();
+      
       this.initCls();
 
       this.on('click', this.click);
 
       this.addContent();
 
-      this.setAttribute('title', this.action.toolTip); // hover text
-
       if ( this.action ) {
         this.attrs({ name: this.action.name });
 
-        if ( this.action.isAvailable || this.action.permissionConfig != null ) {
-          this.enableClass(this.myClass('unavailable'), this.action.createIsAvailable$(this.data$), true);
-        }
-
-        if ( this.action.isEnabled || this.action.permissionConfig != null ) {
-          this.attrs({ disabled: this.action.createIsEnabled$(this.data$).map((e) => e ? false : 'disabled') });
-        }
+        this.enableClass(this.myClass('unavailable'), this.action.createIsAvailable$(this.__context__, this.data), true);
+        this.attrs({ disabled: this.action.createIsEnabled$(this.__context__, this.data).map((e) => e ? false : 'disabled') });
 
         this.addClass(this.myClass(this.styleClass_));
         this.addClass(this.myClass(this.size.label.toLowerCase()));

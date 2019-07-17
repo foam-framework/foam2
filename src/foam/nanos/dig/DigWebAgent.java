@@ -12,15 +12,22 @@ import foam.dao.DAO;
 import foam.lib.csv.CSVSupport;
 import foam.lib.json.JSONParser;
 import foam.lib.json.OutputterMode;
+import foam.lib.json.Outputter;
+import foam.lib.AndPropertyPredicate;
+import foam.lib.NetworkPropertyPredicate;
 import foam.lib.parse.*;
+import foam.lib.PermissionedPropertyPredicate;
+import foam.lib.PropertyPredicate;
+import foam.lib.StoragePropertyPredicate;
 import foam.mlang.MLang;
 import foam.mlang.predicate.Predicate;
+import foam.nanos.boot.NSpec;
 import foam.nanos.dig.exception.*;
 import foam.nanos.http.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.PrefixLogger;
 import foam.nanos.notification.email.EmailMessage;
-import foam.nanos.notification.email.EmailService;
+import foam.util.Emails.EmailsUtility;
 import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
 import javax.servlet.http.HttpServletResponse;
@@ -76,6 +83,16 @@ public class DigWebAgent
         return;
       }
 
+      NSpec nspec = (NSpec) nSpecDAO.find(daoName);
+      if ( nspec == null ||
+           ! nspec.getServe() ) {
+         DigErrorMessage error = new DAONotFoundException.Builder(x)
+                                      .setMessage("DAO not found: " + daoName)
+                                      .build();
+        outputException(x, resp, format, out, error);
+        return;
+      }
+
       DAO dao = (DAO) x.get(daoName);
 
       if ( dao == null ) {
@@ -102,7 +119,7 @@ public class DigWebAgent
         if ( Format.JSON == format ) {
           JSONParser jsonParser = new JSONParser();
           jsonParser.setX(x);
-          foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+          Outputter outputterJson = new Outputter(x).setPropertyPredicate(new foam.lib.AndPropertyPredicate(x, new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));;
           outputterJson.setOutputDefaultValues(true);
           outputterJson.setOutputClassNames(true);
           // let FObjectArray parse first
@@ -251,7 +268,7 @@ public class DigWebAgent
           // JSON part from above
           JSONParser jsonParser = new JSONParser();
           jsonParser.setX(x);
-          foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+          Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate()}));
           outputterJson.setOutputDefaultValues(true);
           outputterJson.setOutputClassNames(true);
           // let FObjectArray parse first
@@ -318,7 +335,7 @@ public class DigWebAgent
           logger.debug(this.getClass().getSimpleName(), "objects selected: " + sink.getArray().size());
 
           if ( Format.JSON == format ) {
-            foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+            Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate()}));
             outputterJson.setOutputDefaultValues(true);
             outputterJson.setOutputClassNames(true);
             outputterJson.output(sink.getArray().toArray());
@@ -378,7 +395,7 @@ public class DigWebAgent
               out.println(outputterHtml.toString());
             }
           } else if ( Format.JSONJ == format ) {
-            foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.STORAGE);
+            Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(new PropertyPredicate[] {new StoragePropertyPredicate(), new PermissionedPropertyPredicate()}));
             List a = sink.getArray();
             String dataToString = "";
 
@@ -463,8 +480,7 @@ public class DigWebAgent
 
       out.print(data);
     } else {
-      EmailService emailService = (EmailService) x.get("email");
-      EmailMessage message      = new EmailMessage();
+      EmailMessage message = new EmailMessage();
 
       // For multiple receiver
       String[]  email = emailParam.split(",");
@@ -477,7 +493,7 @@ public class DigWebAgent
 
       message.setBody(newData);
 
-      emailService.sendEmail(x, message);
+      EmailsUtility.sendEmailFromTemplate(x, null, message, null, null);
     }
   }
 
@@ -518,7 +534,7 @@ public class DigWebAgent
 
       JSONParser jsonParser = new JSONParser();
       jsonParser.setX(x);
-      foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+      Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate()}));
       outputterJson.setOutputDefaultValues(true);
       outputterJson.setOutputClassNames(true);
       outputterJson.output(error);
@@ -553,7 +569,7 @@ public class DigWebAgent
 
       JSONParser jsonParser = new JSONParser();
       jsonParser.setX(x);
-      foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.STORAGE);
+      Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(new PropertyPredicate[] {new StoragePropertyPredicate(), new PermissionedPropertyPredicate()}));
       outputterJson.setOutputDefaultValues(true);
       outputterJson.setOutputClassNames(true);
       outputterJson.outputJSONJFObject(error);

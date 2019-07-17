@@ -61,9 +61,9 @@ return ClientBoxRegistry_create([
   methods: [
     function send(msg) {
       var self = this;
-      var replyBox = msg.attributes.replyBox;
+      var replyBox = msg.attributes.replyBox.localBox;
 
-      msg.attributes.replyBox = this.AnonymousBox.create({
+      msg.attributes.replyBox.localBox = this.AnonymousBox.create({
         f: function(m) {
           if ( foam.core.Exception.isInstance(m.object) ) {
             self.delegate = undefined;

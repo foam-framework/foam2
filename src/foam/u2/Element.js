@@ -133,15 +133,18 @@ foam.CLASS({
 
         if ( ! lastClassToInstallCSSFor || lastClassToInstallCSSFor == cls ) {
           // Install CSS if not already installed in this document for this cls
-          var key = axiom.asKey(X.document, cls);
+          var key = axiom.asKey(X.document, this);
           if ( X.document && ! axiom.installedDocuments_[key] ) {
-            X.installCSS(axiom.expandCSS(this, axiom.code), cls.id);
+            X.installCSS(axiom.expandCSS(this, axiom.code), this.id);
             axiom.installedDocuments_[key] = true;
           }
         }
 
-        if ( ! lastClassToInstallCSSFor && ! cls.model_.inheritCSS ) {
-          X = X.createSubContext({lastClassToInstallCSSFor: cls, originalX: X});
+        if ( ! lastClassToInstallCSSFor && ! this.model_.inheritCSS ) {
+          X = X.createSubContext({
+            lastClassToInstallCSSFor: this,
+            originalX: X
+          });
         }
 
         if ( lastClassToInstallCSSFor && isFirstCSS ) X = X.originalX;
@@ -349,20 +352,17 @@ foam.CLASS({
       this.visitChildren('unload');
       this.detach();
     },
-    function error() {
-      throw new Error('Mutations not allowed in OUTPUT state.');
-    },
-    function onSetClass(cls, enabled) { this.error(); },
-    function onFocus(cls, enabled) { this.error(); },
-    function onAddListener(topic, listener) { this.error(); },
-    function onRemoveListener(topic, listener) { this.error(); },
-    function onSetStyle(key, value) { this.error(); },
-    function onSetAttr(key, value) { this.error(); },
-    function onRemoveAttr(key) { this.error(); },
-    function onAddChildren(c) { this.error(); },
-    function onInsertChildren() { this.error(); },
-    function onReplaceChild() { this.error(); },
-    function onRemoveChild() { this.error(); },
+    function onSetClass(cls, enabled) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onFocus(cls, enabled) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onAddListener(topic, listener) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onRemoveListener(topic, listener) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onSetStyle(key, value) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onSetAttr(key, value) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onRemoveAttr(key) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onAddChildren(c) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onInsertChildren() { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onReplaceChild() { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onRemoveChild() { throw new Error('Mutations not allowed in OUTPUT state.'); },
     function toString() { return 'OUTPUT'; }
   ]
 });
@@ -631,6 +631,7 @@ foam.CLASS({
     'foam.u2.AttrSlot',
     'foam.u2.Entity',
     'foam.u2.RenderSink',
+    'foam.u2.Tooltip'
   ],
 
   imports: [
@@ -848,6 +849,10 @@ foam.CLASS({
       }
     },
     {
+      class: 'String',
+      name: 'tooltip'
+    },
+    {
       name: 'parentNode',
       transient: true
     },
@@ -977,6 +982,7 @@ foam.CLASS({
         Template method for adding addtion element initialization
         just before Element is output().
       */
+      this.initTooltip();
       this.initKeyboardShortcuts();
     },
 
@@ -1041,6 +1047,10 @@ foam.CLASS({
       }
 
       return count;
+    },
+
+    function initTooltip() {
+      if ( this.tooltip ) this.Tooltip.create({target: this, text:this.tooltip});
     },
 
     function initKeyboardShortcuts() {
@@ -2119,6 +2129,10 @@ foam.CLASS({
       value: false
     },
     {
+      class: 'String',
+      name: 'placeholder'
+    },
+    {
       class: 'foam.u2.ViewSpec',
       name: 'view',
       value: { class: 'foam.u2.TextField' }
@@ -2133,6 +2147,26 @@ foam.CLASS({
       class: 'Function',
       name: 'visibilityExpression',
       value: null
+    },
+    {
+      class: 'Boolean',
+      name: 'validationTextVisible',
+      documentation: "If true, validation text will be displayed below the input when it's in an invalid state.",
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'validationStyleEnabled',
+      documentation: 'If true, inputs will be styled when they are in an invalid state.',
+      value: true
+    },
+    {
+      class: 'Int',
+      name: 'order',
+      documentation: `
+        The order to render the property in if rendering multiple properties.
+      `,
+      value: Number.MAX_VALUE
     }
   ],
 
@@ -2224,9 +2258,8 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'DateViewRefinement',
   refines: 'foam.core.Date',
-  requires: [ 'foam.u2.view.date.DateTimePicker' ],
   properties: [
-    [ 'view', { class: 'foam.u2.view.date.DateTimePicker' } ]
+    [ 'view', { class: 'foam.u2.DateView' } ]
   ]
 });
 
@@ -2235,9 +2268,8 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'DateTimeViewRefinement',
   refines: 'foam.core.DateTime',
-  requires: [ 'foam.u2.view.date.DateTimePicker' ],
   properties: [
-    [ 'view', { class: 'foam.u2.view.date.DateTimePicker', showTimeOfDay: true } ]
+    [ 'view', { class: 'foam.u2.DateTimeView' } ]
   ]
 });
 
@@ -2297,16 +2329,20 @@ foam.CLASS({
   properties: [
     {
       name: 'view',
-      expression: function(label2) {
+      expression: function(label2, label2Formatter) {
         return {
           class: 'foam.u2.CheckBox',
-          label: label2
+          label: label2,
+          labelFormatter: label2Formatter
         };
       }
     },
     {
       class: 'String',
       name: 'label2'
+    },
+    {
+      name: 'label2Formatter'
     }
   ]
 });
@@ -2337,6 +2373,19 @@ foam.CLASS({
     {
       name: 'view',
       value: { class: 'foam.u2.DetailView' },
+    },
+    {
+      name: 'validationTextVisible',
+      documentation: `
+        Hide FObjectProperty validation because their inner view should provide its
+        own validation so having it on the outer view and the inner view is redundant
+        and jarring.
+      `,
+      value: false
+    },
+    {
+      name: 'validationStyleEnabled',
+      value: false
     }
   ]
 });
@@ -2349,7 +2398,12 @@ foam.CLASS({
   properties: [
     {
       name: 'view',
-      value: { class: 'foam.u2.view.FObjectArrayView' },
+      expression: function(of) {
+        return {
+          class: 'foam.u2.view.FObjectArrayView',
+          of: of
+        };
+      }
     }
   ]
 });
@@ -2520,13 +2574,16 @@ foam.CLASS({
 
       this.attr('name', p.name);
 
-      // if ( p.validateObj ) {
-      //   var s = foam.core.ExpressionSlot.create({
-      //     obj$: this.__context__.data$,
-      //     code: p.validateObj
-      //   });
-      //   this.error_$.follow(s);
-      // }
+      if ( p.validateObj ) {
+        /*
+        var s = foam.core.ExpressionSlot.create({
+          obj$: this.__context__.data$,
+          code: p.validateObj
+        });
+        this.error_$.follow(s);
+        */
+//        this.error_$.follow(this.__context__.data.slot(p.validateObj));
+      }
     }
   ]
 });
@@ -2633,6 +2690,18 @@ foam.CLASS({
       postSet: function(_, cs) {
         this.axioms_.push(foam.u2.SearchColumns.create({columns: cs}));
       }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'PredicatePropertyRefine',
+  refines: 'foam.mlang.predicate.PredicateProperty',
+  properties: [
+    {
+      name: 'view',
+      value: { class: 'foam.u2.view.JSONTextView' }
     }
   ]
 });

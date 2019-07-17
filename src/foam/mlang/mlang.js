@@ -202,6 +202,9 @@ foam.CLASS({
         if ( ! foam.Function.isInstance(o.f) )      return foam.mlang.Constant.create({ value: o });
         return o;
       }
+      if ( o.class && this.__context__.lookup(o.class, true) ) {
+        return this.adaptValue(this.__context__.lookup(o.class).create(o, this));
+      }
 
       console.error('Invalid expression value: ', o);
     }
@@ -352,6 +355,9 @@ foam.CLASS({
         if ( o === true ) return foam.mlang.predicate.True.create();
         if ( o === false ) return foam.mlang.predicate.False.create();
         if ( foam.core.FObject.isInstance(o) ) return o;
+        if ( o.class && this.__context__.lookup(o.class, true) ) {
+          return this.adaptArrayElement(this.__context__.lookup(o.class).create(o, this));
+        }
         console.error('Invalid expression value: ', o);
       }
     }
@@ -697,11 +703,16 @@ foam.CLASS({
     function toIndex(tail) {
       return this.arg1 && this.arg1.toIndex(tail);
     },
-
-    function toString() {
-      return foam.String.constantize(this.cls_.name) + '(' +
-          this.arg1.toString() + ', ' +
-          this.arg2.toString() + ')';
+    {
+      name: 'toString',
+      code: function() {
+        return foam.String.constantize(this.cls_.name) + '(' +
+            this.arg1.toString() + ', ' +
+            this.arg2.toString() + ')';
+      },
+      javaCode: `
+        return String.format("%s(%s, %s)", getClass().getSimpleName(), getArg1().toString(), getArg2().toString());
+      `
     },
     {
       name: 'prepareStatement',
@@ -1443,6 +1454,13 @@ foam.CLASS({
 
   requires: [ 'foam.mlang.Constant' ],
 
+  javaImports: [
+    'java.util.List',
+    'foam.mlang.ArrayConstant',
+    'foam.mlang.Constant',
+    'foam.mlang.predicate.False'
+  ],
+
   properties: [
     {
       name: 'arg1',
@@ -1521,7 +1539,14 @@ return false
   // boolean uppercase = lhs.getClass().isEnum(); TODO: Account for ENUMs? (See js)
   Object rhs = getArg2().f(obj);
 
-  if ( rhs instanceof Object[] ) {
+  if ( rhs instanceof List ) {
+    List list = (List) rhs;
+    for ( Object o : list ) {
+      if ( ( ( (Comparable) lhs ).compareTo( (Comparable) o ) ) == 0 ) {
+        return true;
+      }
+    }
+  } else if ( rhs instanceof Object[] ) {
     // Checks if rhs array contains the lhs object
     Object[] values = (Object[])rhs;
 
@@ -1545,12 +1570,30 @@ return false
       type: 'String',
       javaCode: 'return " " + getArg1().createStatement() + " in " + getArg2().createStatement();'
     },
+    {
+      name: 'partialEval',
+      code: function partialEval() {
+        if ( ! this.Constant.isInstance(this.arg2) ) return this;
 
-    function partialEval() {
-      if ( ! this.Constant.isInstance(this.arg2) ) return this;
+        return ( ! this.arg2.value ) || this.arg2.value.length === 0 ?
+            this.FALSE : this;
+      },
+      javaCode: `
+        if ( ! (getArg2() instanceof ArrayConstant) ) return this;
 
-      return ( ! this.arg2.value ) || this.arg2.value.length === 0 ?
-          this.FALSE : this;
+        Object[] arr = ((ArrayConstant) getArg2()).getValue();
+
+        if ( arr.length == 0 ) {
+          return new False();
+        } else if ( arr.length == 1 ) {
+          return new Eq.Builder(getX())
+            .setArg1(getArg1())
+            .setArg2(new Constant(arr[0]))
+            .build();
+        }
+
+        return this;
+      `
     }
   ]
 });
@@ -1652,6 +1695,8 @@ foam.CLASS({
     }
   ],
 
+  javaImports: [ 'java.util.Arrays' ],
+
   axioms: [
     {
       name: 'javaExtras',
@@ -1734,14 +1779,17 @@ s = s.replace(",", "\\\\,");
 builder.append(s);
 `
     },
-
-    function toString_(x) {
-      return Array.isArray(x) ? '[' + x.map(this.toString_.bind(this)).join(', ') + ']' :
-        x.toString ? x.toString :
-        x;
-    },
-
-    function toString() { return this.toString_(this.value); }
+    {
+      name: 'toString',
+      code: function() {
+        return Array.isArray(this.value) ? '[' + this.value.map(this.toString_.bind(this)).join(', ') + ']' :
+          this.value.toString ? this.value.toString :
+          x;
+      },
+      javaCode: `
+        return Arrays.toString(getValue());
+      `
+    }
   ]
 });
 
@@ -2216,46 +2264,7 @@ foam.CLASS({
     {
       name: 'f',
       code: function f(obj) {
-        var arg = this.arg1.f(obj);
-        if ( ! arg || typeof arg !== 'string' ) return false;
-
-        arg = arg.toLowerCase();
-
-        try {
-          var props = obj.cls_.getAxiomsByClass(this.String);
-          for ( var i = 0; i < props.length; i++ ) {
-            s = props[i].f(obj);
-            if ( ! s || typeof s !== 'string' ) continue;
-            if ( s.toLowerCase().includes(arg) ) return true;
-          }
-
-          var objectProps = obj.cls_.getAxiomsByClass(this.FObjectProperty);
-          for ( var i = 0; i < objectProps.length; i++ ) {
-            var prop = objectProps[i];
-            var subObject = prop.f(obj);
-            if ( this.f(subObject) ) return true;
-          }
-
-          var longProps = obj.cls_.getAxiomsByClass(this.Long);
-          for ( var i = 0; i < longProps.length; i++ ) {
-            var s = (longProps[i]).toString();
-            if ( s.toLowerCase().includes(arg) ) return true;
-          }
-
-          var enumProps = obj.cls_.getAxiomsByClass(this.Enum);
-          for ( var i = 0; i < enumProps.length; i++ ) {
-            var s = (enumProps[i]).label;
-            if ( s.toLowerCase().includes(arg) ) return true;
-          }
-
-          var dateProps = obj.cls_.getAxiomsByClass(this.Date);
-          for ( var i = 0; i < dateProps.length; i++ ) {
-            var s = (dateProps[i]).toISOString();
-            if ( s.toLowerCase().includes(arg) ) return true;
-          }
-        } catch (err) {}
-
-        return false;
+        return this.fInner_(obj, true);
       },
       javaCode: `
 if ( ! ( getArg1().f(obj) instanceof String ) ) return false;
@@ -2303,6 +2312,58 @@ while ( i.hasNext() ) {
 }
 
 return false;`
+    },
+    {
+      name: 'fInner_',
+      documentation: `
+        A private convenience method so we don't break the interface for the 'f'
+        method. The second argument determines whether the MLang should
+        recursively apply to nested FObjects or not.
+      `,
+      code: function(obj, checkSubObjects) {
+        var arg = this.arg1.f(obj);
+        if ( ! arg || typeof arg !== 'string' ) return false;
+
+        arg = arg.toLowerCase();
+
+        try {
+          var props = obj.cls_.getAxiomsByClass(this.String);
+          for ( var i = 0; i < props.length; i++ ) {
+            s = props[i].f(obj);
+            if ( ! s || typeof s !== 'string' ) continue;
+            if ( s.toLowerCase().includes(arg) ) return true;
+          }
+
+          if ( checkSubObjects ) {
+            var objectProps = obj.cls_.getAxiomsByClass(this.FObjectProperty);
+            for ( var i = 0; i < objectProps.length; i++ ) {
+              var prop = objectProps[i];
+              var subObject = prop.f(obj);
+              if ( this.fInner_(subObject, false) ) return true;
+            }
+          }
+
+          var longProps = obj.cls_.getAxiomsByClass(this.Long);
+          for ( var i = 0; i < longProps.length; i++ ) {
+            var s = (longProps[i]).toString();
+            if ( s.toLowerCase().includes(arg) ) return true;
+          }
+
+          var enumProps = obj.cls_.getAxiomsByClass(this.Enum);
+          for ( var i = 0; i < enumProps.length; i++ ) {
+            var s = (enumProps[i]).label;
+            if ( s.toLowerCase().includes(arg) ) return true;
+          }
+
+          var dateProps = obj.cls_.getAxiomsByClass(this.Date);
+          for ( var i = 0; i < dateProps.length; i++ ) {
+            var s = (dateProps[i]).toISOString();
+            if ( s.toLowerCase().includes(arg) ) return true;
+          }
+        } catch (err) {}
+
+        return false;
+      }
     }
   ]
 });
@@ -2313,13 +2374,6 @@ foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Map',
   extends: 'foam.dao.ProxySink',
-  axioms: [
-    {
-      // TODO: Remove this when MAP works properly on java.  github issue #1020
-      class: 'foam.box.Remote',
-      clientClass: 'foam.dao.ClientSink'
-    }
-  ],
 
   documentation: 'Sink Decorator which applies a map function to put() values before passing to delegate.',
 
@@ -2561,7 +2615,7 @@ foam.CLASS({
       name: 'args'
     },
     {
-      class: 'Array',
+      class: 'List',
       name: 'data',
       factory: function() { return []; }
     }
@@ -2571,7 +2625,14 @@ foam.CLASS({
       name: 'put',
       code: function put(obj) {
         this.data.push(this.args.map(a => a.f(obj)));
-      }
+      },
+      javaCode: `
+        Object[] args = new Object[getArgs().length];
+        for ( int i = 0; i < getArgs().length ; i++ ) {
+          args[i] = getArgs()[i].f(obj);
+        }
+        getData().add(args);
+      `
     }
   ]
 });
@@ -3192,6 +3253,7 @@ foam.CLASS({
     'foam.mlang.predicate.Neq',
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
+    'foam.mlang.predicate.RegExp',
     'foam.mlang.predicate.IsInstanceOf',
     'foam.mlang.predicate.StartsWith',
     'foam.mlang.predicate.StartsWithIC',
@@ -3272,7 +3334,7 @@ foam.CLASS({
     function MUX(cond, a, b) { return this.Mux.create({ cond: cond, a: a, b: b }); },
     function PARTITION_BY(arg1, delegate) { return this.Partition.create({ arg1: arg1, delegate: delegate }); },
     function SEQ() { return this._nary_("Sequence", arguments); },
-
+    function REG_EXP(arg1, regExp) { return this.RegExp.create({ arg1: arg1, regExp: regExp }); },
     {
       name: 'DESC',
       args: [ { name: 'a', type: 'foam.mlang.order.Comparator' } ],
@@ -3297,6 +3359,173 @@ foam.CLASS({
 
   axioms: [
     foam.pattern.Singleton.create()
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'RegExp',
+  extends: 'foam.mlang.predicate.Unary',
+  implements: [ 'foam.core.Serializable' ],
+  properties: [
+    {
+      type: 'Regex',
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
+      name: 'regExp'
+    }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(o) {
+        var v1 = this.arg1.f(o);
+        return v1.toString().match(this.regExp);
+      },
+      javaCode: `
+        return getRegExp().matcher(getArg1().f(obj).toString()).matches();
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'OlderThan',
+  extends: 'foam.mlang.predicate.Unary',
+  implements: [ 'foam.core.Serializable' ],
+  properties: [
+    {
+      class: 'Long',
+      name: 'timeMs'
+    }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(o) {
+        var v1 = this.arg1.f(o);
+        return v1 && Date.now() - v1.getTime() > this.timeMs;
+      },
+      javaCode: `
+        Object v1 = getArg1().f(obj);
+        if ( v1 instanceof java.util.Date ) {
+          return new java.util.Date().getTime() - ((java.util.Date)v1).getTime() > getTimeMs();
+        }
+        return false;
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'StringLength',
+  extends: 'foam.mlang.AbstractExpr',
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg1'
+    }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(o) { return this.arg1.f(o).length; },
+      javaCode: 'return ((String) getArg1().f(obj)).length();'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'IdentityExpr',
+  extends: 'foam.mlang.AbstractExpr',
+  axioms: [
+    { class: 'foam.pattern.Singleton' }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(o) { return o; },
+      javaCode: 'return obj;'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'IsValid',
+  extends: 'foam.mlang.AbstractExpr',
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg1'
+    }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(o) {
+        return this.arg1.f(o).errors_ ? false : true;
+      },
+      javaCode: `
+try {
+  ((foam.core.FObject) getArg1().f(obj)).validate(getX());
+} catch(Exception e) {
+  return false;
+}
+return true;
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'HasPermission',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: 'Expression which returns true if the user has a given permission.',
+
+  javaImports: [
+    'foam.core.FObject',
+    'foam.core.X',
+    'foam.nanos.auth.AuthService'
+  ],
+
+  properties: [
+    {
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
+      javaType: 'foam.core.X',
+      flags: ['java'],
+      name: 'userContext'
+    },
+    {
+      class: 'String',
+      name: 'permissionPrefix'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      code: function() {
+        // Authorization on the client is futile since the user has full control
+        // over the code that executes on their machine.
+        // A client-side implementation of this predicate would also have to be
+        // async in this case because we would need to access the auth service,
+        // but we don't support async predicate execution on the client as far
+        // as I'm aware.
+        return true;
+      },
+      javaCode: `
+        X x = (X) getUserContext();
+        String permission = getPermissionPrefix() + "." + ((FObject) obj).getProperty("id");
+        AuthService auth = (AuthService) x.get("auth");
+        return auth.check(x, permission);
+      `
+    },
   ]
 });
 

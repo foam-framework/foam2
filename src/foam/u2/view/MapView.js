@@ -31,7 +31,7 @@ foam.CLASS({
     {
       name: 'KeyValueRow',
       imports: [
-        'controllerMode',
+        'controllerMode?',
         'data',
         'updateData'
       ],
@@ -87,12 +87,15 @@ foam.CLASS({
               var row = self.KeyValueRow.create({ key: e[0], value: e[1] });
               this
                 .startContext({ data: row })
-                  .start(self.Cols, {
-                    contentJustification: 'START',
-                    itemAlignment: 'CENTER'
-                  })
-                    .add(self.KeyValueRow.KEY)
-                    .add(self.KeyValueRow.VALUE)
+                  .start(self.Cols)
+                    .start()
+                      .style({'flex-grow': 1 })
+                      .add(self.KeyValueRow.KEY)
+                    .end()
+                    .start()
+                      .style({ 'flex-grow': 1 })
+                      .add(self.KeyValueRow.VALUE)
+                    .end()
                     .add(self.KeyValueRow.REMOVE)
                   .end()
                 .endContext();

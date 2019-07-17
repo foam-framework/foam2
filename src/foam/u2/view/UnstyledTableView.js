@@ -14,7 +14,9 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.core.SimpleSlot',
     'foam.dao.ProxyDAO',
+    'foam.u2.md.CheckBox',
     'foam.u2.md.OverlayDropdown',
     'foam.u2.view.OverlayActionListView',
     'foam.u2.view.EditColumnsView',
@@ -136,6 +138,42 @@ foam.CLASS({
       name: 'showHeader',
       value: true,
       documentation: 'Set to false to not render the header.'
+    },
+    {
+      class: 'Boolean',
+      name: 'multiSelectEnabled',
+      documentation: 'Set to true to support selecting multiple table rows.'
+    },
+    {
+      class: 'Map',
+      name: 'selectedObjects',
+      documentation: `
+        The objects selected by the user when multi-select support is enabled.
+        It's a map where the key is the object id and the value is the object.
+      `
+    },
+    {
+      name: 'idsOfObjectsTheUserHasInteractedWith_',
+      factory: function() {
+        return {};
+      }
+    },
+    {
+      name: 'checkboxes_',
+      documentation: 'The checkbox elements when multi-select support is enabled. Used internally to implement the select all feature.',
+      factory: function() {
+        return {};
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'togglingCheckBoxes_',
+      documentation: 'Used internally to improve performance when toggling all checkboxes on or off.'
+    },
+    {
+      class: 'Boolean',
+      name: 'allCheckBoxesEnabled_',
+      documentation: 'Used internally to denote when the user has pressed the checkbox in the header to enable all checkboxes.'
     }
   ],
 
@@ -153,7 +191,7 @@ foam.CLASS({
         table: this.of
       });
 
-      return this.OverlayDropdown.create().add(editor);
+      return this.OverlayDropdown.create({}, this.ctrl).add(editor);
     },
 
     function initE() {
@@ -168,16 +206,58 @@ foam.CLASS({
       this.
         addClass(this.myClass()).
         addClass(this.myClass(this.of.id.replace(/\./g, '-'))).
-        setNodeName('table').
-        start('thead').
+        start().
+          addClass(this.myClass('thead')).
           show(this.showHeader$).
           add(this.slot(function(columns_) {
-            return this.E('tr').
+            return this.E().
+              addClass(view.myClass('tr')).
+
+              // If multi-select is enabled, then we show a checkbox in the
+              // header that allows you to select all or select none.
+              callIf(view.multiSelectEnabled, function() {
+                var slot = view.SimpleSlot.create();
+                this.start().
+                  addClass(view.myClass('th')).
+                  tag(view.CheckBox, {}, slot).
+                  style({ width: '42px' }).
+                end();
+
+                // Set up a listener so we can update the existing CheckBox
+                // views when a user wants to select all or select none.
+                view.onDetach(slot.value.dot('data').sub(function(_, __, ___, newValueSlot) {
+                  var checked = newValueSlot.get();
+                  view.allCheckBoxesEnabled_ = checked;
+
+                  if ( checked ) {
+                    view.selectedObjects = {};
+                    view.data.select(function(obj) {
+                      view.selectedObjects[obj.id] = obj;
+                    });
+                  } else {
+                    view.selectedObjects = {};
+                  }
+
+                  // Update the existing CheckBox views.
+                  view.togglingCheckBoxes_ = true;
+                  Object.keys(view.checkboxes_).forEach(function(key) {
+                    view.checkboxes_[key].data = checked;
+                  });
+                  view.togglingCheckBoxes_ = false;
+                }));
+              }).
+
+              // Render the table headers for the property columns.
               forEach(columns_, function(column) {
-                this.start('th').
+                this.start().
+                  addClass(view.myClass('th')).
                   addClass(view.myClass('th-' + column.name)).
-                  callIf(column.tableWidth, function() {
-                    this.style({ width: column.tableWidth + 'px' });
+                  call(function() {
+                    if ( column.tableWidth ) {
+                      this.style({ flex: `0 0 ${column.tableWidth}px` });
+                    } else {
+                      this.style({ flex: '1 0 0' });
+                    }
                   }).
                   on('click', function(e) {
                     view.sortBy(column);
@@ -192,8 +272,14 @@ foam.CLASS({
                   }).
                 end();
               }).
+
+              // Render a th at the end for the column that contains the context
+              // menu. If the column-editing feature is enabled, add that to the
+              // th we create here.
               call(function() {
-                this.start('th').
+                this.start().
+                  addClass(view.myClass('th')).
+                  style({ flex: '0 0 60px' }).
                   callIf(view.editColumnsEnabled, function() {
                     this.addClass(view.myClass('th-editColumns')).
                     on('click', function(e) {
@@ -203,7 +289,6 @@ foam.CLASS({
                     addClass(view.myClass('vertDots')).
                     addClass(view.myClass('noselect'));
                   }).
-                  style({ width: '60px' }).
                   tag('div', null, view.dropdownOrigin$).
                 end();
               });
@@ -214,6 +299,17 @@ foam.CLASS({
     {
       name: 'rowsFrom',
       code: function(dao) {
+        /**
+         * Given a DAO, add a tbody containing the data from the DAO to the
+         * table and return a reference to the tbody.
+         *
+         * NOTE: This exists so that ScrollTableView can create and manage
+         * several different tbody elements inside the TableView it uses. It
+         * needs to manage several tbody elements so it can provide performant
+         * infinite scroll on tables of any size. So this method exists solely
+         * as an implementation detail of ScrollTableView at the time of
+         * writing.
+         */
         var view = this;
         return this.slot(function(columns_) {
           // Make sure the DAO set here responds to ordering when a user clicks
@@ -230,9 +326,11 @@ foam.CLASS({
             : modelActions;
 
           return this.
-            E('tbody').
+            E().
+            addClass(this.myClass('tbody')).
             select(proxy, function(obj) {
-              return this.E('tr').
+              return this.E().
+                addClass(view.myClass('tr')).
                 on('mouseover', function() { view.hoverSelection = obj; }).
                 callIf(view.dblclick && ! view.disableUserSelection, function() {
                   this.on('dblclick', function() {
@@ -258,9 +356,73 @@ foam.CLASS({
                       view.myClass('selected') : '';
                 })).
                 addClass(view.myClass('row')).
+
+                // If the multi-select feature is enabled, then we render a
+                // Checkbox in the first cell of each row.
+                callIf(view.multiSelectEnabled, function() {
+                  var slot = view.SimpleSlot.create();
+                  this
+                    .start()
+                      .addClass(view.myClass('td'))
+                      .tag(view.CheckBox, { data: view.idsOfObjectsTheUserHasInteractedWith_[obj.id] ? !!view.selectedObjects[obj.id] : view.allCheckBoxesEnabled_ }, slot)
+                    .end();
+
+                  // Set up a listener so that when the user checks or unchecks
+                  // a box, we update the `selectedObjects` property.
+                  view.onDetach(slot.value$.dot('data').sub(function(_, __, ___, newValueSlot) {
+                    // If the user is checking or unchecking all boxes at once,
+                    // we only want to publish one propertyChange event, so we
+                    // trigger it from the listener in the table header instead
+                    // of here. This way we prevent a propertyChange being fired
+                    // for every single CheckBox's data changing.
+                    if ( view.togglingCheckBoxes_ ) return;
+
+                    // Remember that the user has interacted with this checkbox
+                    // directly. We need this because the ScrollTableView loads
+                    // tbody's in and out while the user scrolls, so we need to
+                    // handle the case when a user selects all, then unselects
+                    // a particular row, then scrolls far enough that the tbody
+                    // the selection was in unloads, then scrolls back into the
+                    // range where it reloads. We need to know if they've set
+                    // it to something already and we can't simply look at the
+                    // value on `selectedObjects` because then we won't know if
+                    // `selectedObjects[obj.id] === undefined` means they
+                    // haven't interacted with that checkbox or if it means they
+                    // explicitly set it to false. We could keep the key but set
+                    // the value to null, but that clutters up `selectedObjects`
+                    // because some values are objects and some are null. If we
+                    // use a separate set to remember which checkboxes the user
+                    // has interacted with, then we don't need to clutter up
+                    // `selectedObjects`.
+                    view.idsOfObjectsTheUserHasInteractedWith_[obj.id] = true;
+
+                    var checked = newValueSlot.get();
+
+                    if ( checked ) {
+                      var modification = {};
+                      modification[obj.id] = checked ? obj : null;
+                      view.selectedObjects = Object.assign({}, view.selectedObjects, modification);
+                    } else {
+                      var temp = Object.assign({}, view.selectedObjects);
+                      delete temp[obj.id];
+                      view.selectedObjects = temp;
+                    }
+                  }));
+
+                  // Store each CheckBox Element in a map so we have a reference
+                  // to them so we can set the `data` property of them when the
+                  // user checks the box to enable or disable all checkboxes.
+                  var checkbox = slot.get();
+                  view.checkboxes_[obj.id] = checkbox;
+                  checkbox.onDetach(function() {
+                    delete view.checkboxes_[obj.id];
+                  });
+                }).
+
                 forEach(columns_, function(column) {
                   this.
-                    start('td').
+                    start().
+                      addClass(view.myClass('td')).
                       callOn(column.tableCellFormatter, 'format', [
                         column.f ? column.f(obj) : null, obj, column
                       ]).
@@ -272,11 +434,19 @@ foam.CLASS({
                           }
                         } catch (err) {}
                       }).
+                      call(function() {
+                        if ( column.tableWidth ) {
+                          this.style({ flex: `0 0 ${column.tableWidth}px` });
+                        } else {
+                          this.style({ flex: '1 0 0' });
+                        }
+                      }).
                     end();
                 }).
-                start('td')
-                  .attrs({ name:'contextMenuCell' }).
-                  addClass(view.myClass('context-menu-cell')).
+                start().
+                  addClass(view.myClass('td')).
+                  attrs({ name: 'contextMenuCell' }).
+                  style({ flex: '0 0 60px' }).
                   tag(view.OverlayActionListView, {
                     data: actions,
                     obj: obj

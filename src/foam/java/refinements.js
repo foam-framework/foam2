@@ -20,7 +20,9 @@ foam.LIB({
         Boolean: function(b) {
           return b ? "true" : "false";
         },
-        Number: function(n) { return '' + n; },
+        Number: function(n) {
+          return '' + n + (n > Math.pow(2, 31) ? 'L' : '');
+        },
         FObject: function(o) {
           return o.asJavaValue();
         },
@@ -29,8 +31,8 @@ foam.LIB({
           // a number of places.
           return null;
         },
-        Array: function(a) {
-          return "new Object[] {" +
+        Array: function(a, prop) {
+          return "new " + (prop ? prop.javaType : 'Object[]') + " {" +
             a.map(foam.java.asJavaValue).join(',') +
             '}';
         },
@@ -212,11 +214,28 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'javaValidateObj'
+      name: 'javaValidateObj',
+      expression: function(validationPredicates) {
+        return validationPredicates
+          .map(vp => {
+            return `
+if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
+  throw new IllegalStateException(${foam.java.asJavaValue(vp.errorString)});
+}
+            `;
+          })
+          .join('');
+      }
     }
   ],
 
   methods: [
+    {
+      name: 'asJavaValue',
+      code: function() {
+        return `${this.forClass_}.${foam.String.constantize(this.name)}`;
+      }
+    },
     function createJavaPropertyInfo_(cls) {
       return foam.java.PropertyInfo.create({
         sourceCls:               cls,
@@ -591,7 +610,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'abstract',
-      value: true
+      value: false
     },
     {
       class: 'StringArray',
@@ -616,6 +635,7 @@ foam.CLASS({
         type: this.javaType || 'void',
         visibility: 'public',
         static: this.isStatic(),
+        abstract: this.abstract,
         final: this.final,
         synchronized: this.synchronized,
         throws: this.javaThrows,
@@ -808,10 +828,10 @@ foam.CLASS({
             return self.hasOwnProperty(a.name);
           })
           .map(function(p) {
-            return `.set${foam.String.capitalize(p.name)}(${foam.java.asJavaValue(self[p.name])})`
+            return `.set${foam.String.capitalize(p.name)}(${foam.java.asJavaValue(self[p.name], p)})`
           })
         return `
-new ${self.cls_.id}.Builder(EmptyX.instance())
+new ${self.cls_.id}.Builder(foam.core.EmptyX.instance())
   ${props.join('\n')}
   .build()
         `
@@ -1381,14 +1401,6 @@ foam.CLASS({
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
-
-      info.method({
-        name: 'getWidth',
-        visibility: 'public',
-        type: 'int',
-        body: 'return ' + this.width + ';'
-      });
-
       // cast numbers to strings
       var cast = info.getMethod('cast');
       cast.body = `return ( o instanceof Number ) ?
@@ -1753,14 +1765,13 @@ foam.CLASS({
   properties: [
     {
       name: 'referencedProperty',
+      documentation: `
+        Used to ensure we use the right types for this
+        value in statically typed languages.
+      `,
       transient: true,
-      factory: function() {
-        var idProp = this.of.ID.cls_ == foam.core.IDAlias ? this.of.ID.targetProperty : this.of.ID;
-
-        idProp = idProp.clone();
-        idProp.name = this.name;
-
-        return idProp;
+      expression: function(of) {
+        return of.ID.cls_ == foam.core.IDAlias ? of.ID.targetProperty : of.ID;
       }
     },
     { name: 'type',            factory: function() { return this.referencedProperty.type; } },
@@ -1772,12 +1783,7 @@ foam.CLASS({
 
   methods: [
     function buildJavaClass(cls) {
-      // Disable super behaviour on purpose.
-      // this.SUPER(cls);
-
-      // Install a renamed copy of the refernced model's id property instead
-      this.referencedProperty.buildJavaClass(cls);
-
+      this.SUPER(cls);
       cls.method({
         name: `find${foam.String.capitalize(this.name)}`,
         visibility: 'public',
@@ -2087,6 +2093,21 @@ try {
 }
         `;
       }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'DAOPropertyJavaRefinement',
+  refines: 'foam.dao.DAOProperty',
+  flags: ['java'],
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var compare = info.getMethod('compare');
+      compare.body = 'return 0;';
+      return info;
     }
   ]
 });

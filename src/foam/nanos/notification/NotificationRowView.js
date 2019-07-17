@@ -51,7 +51,7 @@
         text-overflow: ellipsis;
         margin-right: 16px;
         overflow: hidden;
-        color: %PRIMARYCOLOR%;
+        color: /*%BLACK%*/ #1e1f21;
       }
       ^ .msg.fully-visible {
         display: block;
@@ -91,10 +91,7 @@
           var self = X.rowView;
           self.notificationDAO.remove(self.data);
         },
-        view: {
-          class: 'foam.u2.ActionView',
-          isDestructive: true
-        }
+        confirmationRequired: true
       },
 
       function hideNotificationType(X) {
