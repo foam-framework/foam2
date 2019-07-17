@@ -147,6 +147,10 @@ foam.CLASS({
       javaCode: `
         for (String name: getProps()) {
           PropertyInfo p = (PropertyInfo) getOf().getAxiomByName(name);
+          if ( p == null ) {
+            ((Logger) x.get("logger")).warning("Attempt to output unknown header: " + name);
+            continue;
+          }
           p.toCSVLabel(x, this);
         }
         newLine_();
@@ -168,6 +172,10 @@ foam.CLASS({
         if ( getIsFirstRow() ) outputHeader(x);
         for (String name : getProps()) {
           PropertyInfo p = (PropertyInfo) getOf().getAxiomByName(name);
+          if ( p == null ) {
+            ((Logger) x.get("logger")).warning("Attempt to output unknown property: " + name);
+            continue;
+          }
           p.toCSV(x, obj, this);
         }
         newLine_();
