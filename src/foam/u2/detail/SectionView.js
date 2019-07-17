@@ -11,7 +11,6 @@ foam.CLASS({
 
   requires: [
     'foam.core.ArraySlot',
-    'foam.core.SimpleSlot',
     'foam.layout.Section',
     'foam.u2.detail.SectionedDetailPropertyView',
     'foam.u2.layout.Cols',
@@ -89,31 +88,30 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-      var slots = [];
       self.SUPER();
       
       self
         .addClass(self.myClass())
         .add(self.slot(function(section, showTitle, section$title) {
           if ( ! section ) return;
-          return self.Rows.create()
+          var slots = [];
+          var elm = self.Rows.create()
             .show(section.createIsAvailableFor(self.data$))
             .callIf(showTitle && section$title, function() {
               this.start('h2').add(section$title).end();
             })
             .start(self.Grid)
               .forEach(section.properties, function(p, index) {
-                var slot = self.SimpleSlot.create({}, self);
                 this.start(self.GUnit, { columns: p.gridColumns })
                   .start(self.SectionedDetailPropertyView, {
                     prop: p,
                     data$: self.data$
-                  }, slot)
+                  })
+                    .call(function() { slots.push(this.visibilitySlot); })
                     .enableClass('first', self.firstVisibleIndex_$.map((value) => value === index))
                     .enableClass('last', self.lastVisibleIndex_$.map((value) => value === index))
                   .end()
                 .end();
-                slots.push(slot.get().visibilitySlot);
               })
             .end()
             .start(self.Cols)
@@ -121,8 +119,9 @@ foam.CLASS({
                 this.add(a);
               })
             .end();
+          this.visibilitySlots_ = self.ArraySlot.create({ slots: slots });
+          return elm;
         }));
-      this.visibilitySlots_ = self.ArraySlot.create({ slots: slots });
     }
   ]
 });
