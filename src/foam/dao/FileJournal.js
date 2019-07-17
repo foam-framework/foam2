@@ -197,7 +197,7 @@ foam.CLASS({
       javaCode: `
         try {
           String c = "";
-          if ( getMultiLinePut() && getFile().toPath().toString().equals("/opt/nanopay/journals/scripts") ) {
+          if ( getMultiLinePut() ) {
             c = "\\n";
             getOutputter().makeMultiLine();
           }
