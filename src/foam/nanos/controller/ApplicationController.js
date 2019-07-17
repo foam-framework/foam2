@@ -487,7 +487,7 @@ foam.CLASS({
     {
       name: 'updateDisplayWidth',
       isMerged: true,
-      mergeDelay: 5000,
+      mergeDelay: 1000,
       code: function() {
         this.displayWidth = foam.u2.layout.DisplayWidth.VALUES
           .concat()

@@ -136,7 +136,7 @@ foam.CLASS({
                 dir.mkdirs();
               }
 
-              getLogger().log("Create file: " + getFilename());
+              getLogger().log("Create file: " + file.getAbsoluteFile());
               file.getAbsoluteFile().createNewFile();
             }
           }
@@ -287,7 +287,7 @@ foam.CLASS({
     },
     {
       name: 'getEntry',
-      documentation: 'Reads a syntatically meaningful unit from the journal',
+      documentation: 'retrieves ameaningful unit of text from the journal',
       type: 'String',
       args: [
         {
@@ -298,21 +298,17 @@ foam.CLASS({
       javaCode: `
         try {
           String line = reader.readLine();
-          if ( line == null )
-            return null;
-          if ( getMultiLine() ) {
-            StringBuilder sb = new StringBuilder();
-            while ( ! line.equals("})") ) {
-              sb.append(line);
-              line = reader.readLine();
-              if ( line == null )
-                return null;
-            }
+          if ( ! line.equals("p({") && ! line.equals("r({") ) return line;
+          if ( line == null ) return null;
+          StringBuilder sb = new StringBuilder();
+          sb.append(line);
+          while( ! line.equals("})") ) {
+            if ( (line = reader.readLine()) == null ) break;
+            sb.append("\\n");
             sb.append(line);
-            line = sb.toString();
           }
-          return line;
-        } catch ( Throwable t ) {
+          return sb.toString().trim();
+        } catch (Throwable t) {
           getLogger().error("Failed to read from journal", t);
           return null;
         }
@@ -332,9 +328,9 @@ foam.CLASS({
             if ( COMMENT.matcher(entry).matches() ) continue;
 
             try {
-              entry = entry.trim();
               char operation = entry.charAt(0);
-              entry = entry.substring(2, entry.length() - 1);
+              int length = entry.length();
+              entry = entry.substring(2, length - 1);
 
               FObject obj = parser.parseString(entry);
               if ( obj == null ) {

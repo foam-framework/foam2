@@ -14,7 +14,7 @@ import foam.mlang.predicate.Predicate;
 
 public class AltSelectPlan implements SelectPlan {
   protected Object state_;
-  protected SelectPlan bestPlan_ = new NotFoundPlan();
+  protected SelectPlan bestPlan_ = NotFoundPlan.instance();
 
   public AltSelectPlan(Object state, SelectPlan bestPlan){
     state_ = state;
