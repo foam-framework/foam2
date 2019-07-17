@@ -96,7 +96,9 @@ foam.CLASS({
                       .start(valueView, { data$: row.value$ })
                         .style({ flex: 1 })
                       .end()
-                      .add(self.Row.REMOVE)
+                      .tag(self.Row.REMOVE, {
+                        isDestructive: true
+                      })
                     .end()
                   .endContext();
                 row.onDetach(row.sub(self.updateData));
