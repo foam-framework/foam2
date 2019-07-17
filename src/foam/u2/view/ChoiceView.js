@@ -220,10 +220,7 @@ foam.CLASS({
             .end();
       
         } else {
-          return self.E()
-            .start()
-              .add(self.text$)
-            .end();
+          return self.E().add(self.text$)
         }
       }))
 
