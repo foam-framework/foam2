@@ -11,6 +11,7 @@ foam.CLASS({
 
   requires: [
     'foam.core.ArraySlot',
+    'foam.core.SimpleSlot',
     'foam.layout.Section',
     'foam.u2.detail.SectionedDetailPropertyView',
     'foam.u2.layout.Cols',
@@ -72,26 +73,21 @@ foam.CLASS({
       class: 'Int',
       name: 'firstVisibleIndex_',
       expression: function(visibilitySlots_) {
-        for ( var i = 0 ; i < visibilitySlots_.slots.length ; i++ ) {
-          if ( visibilitySlots_.slots[i].get() ) return i;
-        }
-        return -1;
+        return visibilitySlots_.get().indexOf(true);
       }
     },
     {
       class: 'Int',
       name: 'lastVisibleIndex_',
       expression: function(visibilitySlots_) {
-        for ( var i = visibilitySlots_.slots.length - 1 ; i >= 0 ; i-- ) {
-          if ( visibilitySlots_.slots[i].get() ) return i;
-        }
-        return -1;
+        return visibilitySlots_.get().lastIndexOf(true);
       }
     }
   ],
   methods: [
     function initE() {
       var self = this;
+      var slots = [];
       self.SUPER();
       self
         .addClass(self.myClass())
@@ -103,16 +99,15 @@ foam.CLASS({
               this.start('h2').add(section$title).end();
             })
             .forEach(section.properties, function(p, index) {
-              var visibilitySlot = p.createVisibilityFor(self.data$).map((m) => m !== self.Visibility.HIDDEN);
-              self.visibilitySlots_ = self.ArraySlot.create({ slots: self.visibilitySlots_.slots.concat([visibilitySlot]) });
+              var slot = self.SimpleSlot.create({}, self);
               this.start(self.SectionedDetailPropertyView, {
                 prop: p,
-                data$: self.data$,
-                visibilitySlot: visibilitySlot
-              })
+                data$: self.data$
+              }, slot)
                 .enableClass('first', self.firstVisibleIndex_$.map((value) => value === index))
                 .enableClass('last', self.lastVisibleIndex_$.map((value) => value === index))
               .end();
+              slots.push(slot.get().visibilitySlot);
             })
             .start(self.Cols)
               .forEach(section.actions, function(a) {
@@ -120,6 +115,7 @@ foam.CLASS({
               })
             .end();
         }));
+      this.visibilitySlots_ = self.ArraySlot.create({ slots: slots });
     }
   ]
 });
