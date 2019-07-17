@@ -295,7 +295,7 @@ foam.CLASS({
             args: [
               { name: 'x',          type: 'foam.core.X' },
               { name: 'obj',        type: 'Object' },
-              { name: 'outputter',  type: 'foam.lib.csv.CSVOutputterInterface' }
+              { name: 'outputter',  type: 'foam.lib.csv.CSVOutputter' }
             ],
             body: this.toCSV
           },
@@ -305,8 +305,7 @@ foam.CLASS({
             type: 'void',
             args: [
               { name: 'x',          type: 'foam.core.X' },
-              { name: 'outputter',  type: 'foam.lib.csv.CSVOutputterInterface' },
-              { name: 'obj',        type: 'Object' }
+              { name: 'outputter',  type: 'foam.lib.csv.CSVOutputter' }
             ],
             body: this.toCSVLabel
           }

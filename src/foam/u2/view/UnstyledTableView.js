@@ -201,8 +201,10 @@ foam.CLASS({
       var view = this;
       var columnSelectionE;
 
-      this.onDetach(this.filteredTableColumns$.follow(
-        this.columns_$.map((cols) => cols.map((a) => a.name))));
+      if ( this.filteredTableColumns$ ) {
+        this.onDetach(this.filteredTableColumns$.follow(
+          this.columns_$.map((cols) => cols.map((a) => a.name))));
+      }
 
       if ( this.editColumnsEnabled ) {
         columnSelectionE = this.createColumnSelection();

@@ -359,12 +359,12 @@ public class DigWebAgent
               out.println("<" + simpleName + "s>"+ outputterXml.toString() + "</" + simpleName + "s>");
             }
           } else if ( Format.CSV == format ) {
-            CSVOutputter outputterCsv = new CSVOutputter.Builder(x)
+            CSVOutputter outputterCsv = new foam.lib.csv.CSVOutputterImpl.Builder(x)
              .setOf(cInfo)
              .build();
 
             for ( Object o : sink.getArray() ) {
-              outputterCsv.outputFObject((FObject)o);
+              outputterCsv.outputFObject(x, (FObject)o);
             }
 
             if ( emailSet ) {
@@ -548,8 +548,8 @@ public class DigWebAgent
 
     } else if ( format == Format.CSV )  {
       //output error in csv format
-      CSVOutputter outputterCsv = new CSVOutputter.Builder(x).build();
-      outputterCsv.outputFObject(error);
+      CSVOutputter outputterCsv = new foam.lib.csv.CSVOutputterImpl.Builder(x).build();
+      outputterCsv.outputFObject(x, error);
       out.println(outputterCsv.toString());
 
     } else if ( format == Format.HTML ) {

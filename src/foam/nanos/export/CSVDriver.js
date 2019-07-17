@@ -33,16 +33,10 @@ foam.CLASS({
       return this.outputter.toString();
     },
     function exportDAO(X, dao) {
-      var sink = X.data.filteredTableColumns ?
-        this.CSVSink.create({
+      return dao.select(this.CSVSink.create({
           of: dao.of,
-          props: X.data.filteredTableColumns
-        }) :
-        this.CSVSink.create({
-          of: dao.cls_
-        });
-
-      return dao.select(sink).then( (s) => s.csv );
+          props: X.data.filteredTableColumns || undefined
+        })).then( (s) => s.csv );
     }
   ]
 });
