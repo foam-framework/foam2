@@ -26,6 +26,7 @@ foam.CLASS({
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.StdoutLogger',
     'foam.util.SafetyUtil',
+    'java.nio.file.Path',
     'java.io.BufferedReader',
     'java.io.BufferedWriter',
     'java.io.InputStreamReader',
@@ -196,7 +197,7 @@ foam.CLASS({
       javaCode: `
         try {
           String c = "";
-          if ( getMultiLinePut() ) {
+          if ( getMultiLinePut() && getFile().toPath().toString().equals("/opt/nanopay/journals/scripts") ) {
             c = "\\n";
             getOutputter().makeMultiLine();
           }

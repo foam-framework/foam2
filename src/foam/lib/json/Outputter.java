@@ -103,11 +103,12 @@ public class Outputter
   }
 
   public String escape(String s) {
-    return s
-      .replace("\\", "\\\\")
+    s = s.replace("\\", "\\\\")
       .replace("\"", "\\\"")
       .replace("\t", "\\t")
       .replace("\n","\\n");
+    if ( multiLineOutput_ ) s = s.replace("\\n", "\n");
+    return s;
   }
 
   protected void outputNumber(Number value) {
