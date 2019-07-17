@@ -359,7 +359,7 @@ public class DigWebAgent
               out.println("<" + simpleName + "s>"+ outputterXml.toString() + "</" + simpleName + "s>");
             }
           } else if ( Format.CSV == format ) {
-            CSVOutputter outputterCsv = new CSVOutputter.Builder(x)
+            CSVOutputter outputterCsv = new foam.lib.csv.CSVOutputterImpl.Builder(x)
              .setOf(cInfo)
              .build();
 
@@ -548,7 +548,7 @@ public class DigWebAgent
 
     } else if ( format == Format.CSV )  {
       //output error in csv format
-      CSVOutputter outputterCsv = new CSVOutputter.Builder(x).build();
+      CSVOutputter outputterCsv = new foam.lib.csv.CSVOutputterImpl.Builder(x).build();
       outputterCsv.outputFObject(error);
       out.println(outputterCsv.toString());
 

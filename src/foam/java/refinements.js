@@ -1420,7 +1420,23 @@ foam.CLASS({
           + (of ? of.id + '.class' : '') + ')';
       }
     }
-  ]
+  ],
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      if ( this.of &&
+           this.of !== foam.core.FObject &&
+           ! foam.core.InterfaceModel.isInstance(this.of.model_) ) {
+        info.method({
+          name: 'of',
+          visibility: 'public',
+          type: 'foam.core.ClassInfo',
+          body: `return ${this.of.id}.getOwnClassInfo();`
+        });
+      }
+      return info;
+    }
+  ],
 });
 
 foam.CLASS({

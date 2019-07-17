@@ -35,24 +35,20 @@ foam.CLASS({
       class: 'StringArray',
       name: 'props',
       factory: function(of) {
-        if ( ! of ) return;
-        if ( of.getAxiomByName('tableColumns') ) return of.getAxiomByName('tableColumns').columns;
-        return of.getAxiomsByClass()
-          .map((p) => p.name )
-          .filter((p) => ! p.networkTransient)
-          .flat();
+        if ( ! of ) return [];
+        if ( tc = of.getAxiomByName('tableColumns') ) return tc.columns;
+        return of.getAxiomsByClass(foam.core.Property)
+          .filter(p => ! p.networkTransient)
+          .map(p => p.name);
       },
       javaFactory: `
-        if ( ! isPropertySet("of") ) {
-          propsIsSet_ = false;
-          return null;
-        }
+        if ( getOf() == null ) return new String[]{};
 
-        ArrayList<String> propInfoArrayList = ((List<PropertyInfo>)getOf().getAxioms()).stream()
-          .filter((propI) -> ! ((PropertyInfo)propI).getNetworkTransient())
-          .map((propI) -> ((PropertyInfo)propI).getName())
-          .collect(Collectors.toCollection(ArrayList::new));
-        return propInfoArrayList.toArray(new String[propInfoArrayList.size()]);
+        return ((List<PropertyInfo>)getOf().getAxiomsByClass(PropertyInfo.class))
+          .stream()
+          .filter(propI -> ! propI.getNetworkTransient())
+          .map(propI -> propI.getName())
+          .toArray(String[]::new);
       `
     },
     {
@@ -60,25 +56,17 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.lib.csv.CSVOutputter',
       transient: true,
-      factory: function(of, props) {
-        var csvOutputter = foam.lib.csv.CSVOutputter.create();
-        if ( of ) {
-          csvOutputter.of = of;
-        }
-        if ( props ) {
-          csvOutputter.props = props;
-        }
-        return csvOutputter;
+      factory: function() {
+        return foam.lib.csv.CSVOutputterImpl.create({
+          of: this.of,
+          props: this.props,
+        });
       },
       javaFactory: `
-      foam.lib.csv.CSVOutputter csvOutputter = new foam.lib.csv.CSVOutputter.Builder(getX()).build();
-      if ( isPropertySet("of") ) {
-        csvOutputter.setOf(getOf());
-      }
-      if ( getProps() != null && isPropertySet("props") ) {
-        csvOutputter.setProps(getProps());
-      }
-      return csvOutputter;
+        return new foam.lib.csv.CSVOutputterImpl.Builder(getX())
+          .setOf(getOf())
+          .setProps(getProps())
+          .build();
       `
     }
   ],
@@ -121,24 +109,20 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'PropertyCSVRefinement',
-
-  documentation: `Refinement on Properties to handle toCSV() and toCSVLabel().`,
-
   refines: 'foam.core.Property',
-
   properties: [
     {
-      name: 'toCSV',
       class: 'Function',
-      value: function(obj, outputter) {
-        outputter.outputValue(obj ? obj[this.name] : null);
+      name: 'toCSV',
+      value: function(x, obj, outputter) {
+        outputter.outputValue(obj ? this.f(obj) : null);
       }
     },
     {
-      name: 'toCSVLabel',
       class: 'Function',
-      value: function(x, outputter, obj) {
-        outputter.outputValue(obj ? obj[this.name].name : null);
+      name: 'toCSVLabel',
+      value: function(x, outputter) {
+        outputter.outputValue(this.name);
       }
     }
   ]
@@ -147,24 +131,25 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'FObjectPropertyCSVRefinement',
-
-  documentation: `Refinement on FObjects to override toCSV() and toCSVLabel().
-  Purpose is to output a dot annotated format, to handle the nested properties on the FObject.`,
-
+  documentation: `
+    Provides FObjectProperties with the behavior to output to multiple columns
+    with the property name as a prefix.
+  `,
+  requires: [
+    'foam.lib.csv.PrefixedCSVOutputter'
+  ],
   refines: 'foam.core.FObjectProperty',
-
   properties: [
     {
       name: 'toCSV',
-      class: 'Function',
       value: function(x, obj, outputter) {
         if ( ! this.of ) {
-          outputter.outputValue(obj ? obj[this.name] : null);
+          outputter.outputValue(obj ? this.f(obj) : null);
           return;
         }
         this.of.getAxiomsByClass(foam.core.Property)
-          .forEach((axiom) => {
-            axiom.toCSV(x, obj ? obj[this.name] : null, outputter, axiom);
+          .forEach((p) => {
+            p.toCSV.call(p, x, obj ? this.f(obj) : null, outputter);
           });
       }
     },
@@ -172,33 +157,30 @@ foam.CLASS({
       name: 'javaToCSV',
       class: 'String',
       value: `
-        if ( get(obj) == null && ! (get(obj) instanceof foam.core.FObject) ) {
-          outputter.outputValue(getName());
+        if ( of() instanceof foam.core.EmptyClassInfo ) {
+          outputter.outputValue(obj != null ? f(obj) : null);
           return;
         }
-
-        java.util.List<foam.core.PropertyInfo> nestPropList = ((foam.core.FObject)get(obj)).getClassInfo().getAxiomsByClass(foam.core.PropertyInfo.class);
-        for ( foam.core.PropertyInfo axiom : nestPropList ) {
-          axiom.toCSV(x, get(obj), outputter);
+        for ( foam.core.PropertyInfo p : (java.util.List<foam.core.PropertyInfo>) of().getAxiomsByClass(foam.core.PropertyInfo.class) ) {
+          p.toCSV(x, obj != null ? f(obj) : null, outputter);
         }
       `
     },
     {
       name: 'toCSVLabel',
       class: 'Function',
-      value: function(x, outputter, obj) {
-        if ( ! prop.of ) {
-          outputter.outputValue(obj ? obj[this.name].name : null);
+      value: function(x, outputter) {
+        if ( ! this.of ) {
+          outputter.outputValue(this.name);
           return;
         }
-
-        var prefixedOutputter = foam.lib.csv.FObjectCSVOutputterDecorator.create({
-          outputter: outputter,
-          preLabelString: prop.name + '.'
+        outputter = this.PrefixedCSVOutputter.create({
+          prefix: this.name + '.',
+          delegate: outputter
         });
-        prop.of.getAxiomsByClass(foam.core.Property)
-          .forEach((axiom) => {
-            axiom.toCSVLabel(x, prefixedOutputter, axiom);
+        this.of.getAxiomsByClass(foam.core.Property)
+          .forEach(p => {
+            p.toCSVLabel.call(p, x, prefixedOutputter);
           });
       },
     },
@@ -206,19 +188,16 @@ foam.CLASS({
       name: 'javaToCSVLabel',
       class: 'String',
       value: `
-        if ( get(obj) == null && ! (get(obj) instanceof foam.core.FObject) ) {
+        if ( of() instanceof foam.core.EmptyClassInfo ) {
           outputter.outputValue(getName());
           return;
         }
-
-        foam.lib.csv.CSVOutputterInterface prefixedOutputter = new foam.lib.csv.FObjectCSVOutputterDecorator.Builder(x)
-          .setOutputter(outputter)
-          .setPreLabelString(getName() + ".")
+        outputter = new foam.lib.csv.PrefixedCSVOutputter.Builder(x)
+          .setPrefix(getName() + ".")
+          .setDelegate(outputter)
           .build();
-        foam.core.ClassInfo ofOFObj = ((foam.core.FObject)get(obj)).getClassInfo();
-        java.util.List<foam.core.PropertyInfo> nestPropList = ofOFObj.getAxiomsByClass(foam.core.PropertyInfo.class);
-        for ( foam.core.PropertyInfo axiom : nestPropList ) {
-          axiom.toCSVLabel(x, prefixedOutputter, cast(get(obj)) );
+        for ( foam.core.PropertyInfo p : (java.util.List<foam.core.PropertyInfo>) of().getAxiomsByClass(foam.core.PropertyInfo.class) ) {
+          p.toCSVLabel(x, outputter);
         }
       `
     }
