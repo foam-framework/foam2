@@ -97,17 +97,25 @@ public class Outputter
   }
 
   public void outputString(String s) {
+    boolean hasNewLine = s.indexOf('\n') >= 0;
+    if ( multiLineOutput_ && hasNewLine ) writer_.append("\r\n  ");
     writer_.append("\"");
+    if ( multiLineOutput_ && hasNewLine ) writer_.append("\"\"\r\n    ");
     writer_.append(escape(s));
+    if ( multiLineOutput_ && hasNewLine ) writer_.append("\r\n  \"\"");
     writer_.append("\"");
   }
 
   public String escape(String s) {
+    boolean hasNewLine = s.indexOf('\n') >= 0;
     s = s.replace("\\", "\\\\")
       .replace("\"", "\\\"")
       .replace("\t", "\\t")
       .replace("\n","\\n");
-    if ( multiLineOutput_ ) s = s.replace("\\n", "\n");
+    if ( multiLineOutput_ ) {
+      s = s.replace("\\n", "\r\n    ");
+      if ( hasNewLine ) s = s.replace("\\\"", "\"");
+    }
     return s;
   }
 
@@ -297,6 +305,7 @@ public class Outputter
     }
 
     if ( includeComma ) writer_.append(",");
+    if ( multiLineOutput_ ) addInnerNewline();
     outputProperty(fo, prop);
     return true;
   }
@@ -315,8 +324,9 @@ public class Outputter
         PropertyInfo prop = (PropertyInfo) i.next();
         isPropertyDiff = maybeOutputPropertyDelta(oldFObject, newFObject, prop);
         if ( isPropertyDiff) {
+          writer_.append("{");
+          addInnerNewline();
           if ( ! isDiff ) {
-            addInnerNewline();
             if ( outputClassNames_ ) {
               //output Class name
               writer_.append(beforeKey_());
@@ -339,7 +349,7 @@ public class Outputter
       }
       
       if ( isDiff ) { 
-        if ( multiLineOutput_ )  writer_.append('\n');
+        if ( multiLineOutput_ )  writer_.append("\r\n");
         writer_.append("}"); 
       }
     }
@@ -347,7 +357,7 @@ public class Outputter
 
   protected void addInnerNewline() {
     if ( multiLineOutput_ ) {
-      writer_.append('\n');
+      writer_.append("\r\n");
       writer_.append("  ");
     }
   }
@@ -367,14 +377,13 @@ public class Outputter
     ClassInfo info = o.getClassInfo();
 
     writer_.append("{");
-    if ( multiLineOutput_ ) writer_.append('\n');
+    if ( multiLineOutput_ ) addInnerNewline();
     if ( outputClassNames_ ) {
       writer_.append(beforeKey_());
       writer_.append("class");
       writer_.append(afterKey_());
       writer_.append(":");
       outputString(info.getId());
-      if ( multiLineOutput_ ) writer_.append('\n');
     }
 
     List     axioms      = getProperties(info);
@@ -383,9 +392,8 @@ public class Outputter
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
       outputComma = maybeOutputProperty(o, prop, outputComma) || outputComma;
-      if ( multiLineOutput_ && outputComma ) writer_.append('\n');
     }
-    if ( multiLineOutput_ ) writer_.append('\n');
+    if ( multiLineOutput_ ) writer_.append("\r\n");
     writer_.append("}");
   }
 
