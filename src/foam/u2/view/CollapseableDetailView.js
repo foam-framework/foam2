@@ -60,9 +60,9 @@ foam.CLASS({
         .startContext({ data: self })
           .start(self.Cols)
             .add(self.slot(function(citationView) {
-              return self.E().tag(citationView, {
+              return citationView ? self.E().tag(citationView, {
                 data$: self.data$
-              });
+              }) : null;
             }))
             .add(self.SHOW_ACTION)
             .add(self.HIDE_ACTION)
