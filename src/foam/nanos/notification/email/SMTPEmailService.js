@@ -220,7 +220,7 @@ foam.CLASS({
         try {
           getTransport_().send(message);
           emailMessage.setStatus(Status.SENT);
-          logger.info("SMTPEmailService sent MimeMessage.");
+          logger.debug("SMTPEmailService sent MimeMessage.");
         } catch ( SendFailedException e ) {
           emailMessage.setStatus(Status.FAILED);
           logger.error("SMTPEmailService sending MimeMessage failed. " + e);
