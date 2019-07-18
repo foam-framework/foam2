@@ -215,6 +215,7 @@ if ( getAuthorize() ) {
   if ( foam.nanos.auth.Authorizable.class.isAssignableFrom(getOf().getObjClass()) ) {
     delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, new foam.nanos.auth.AuthorizableAuthorizer(getPermissionPrefix()));
   } else {
+    logger.warning("EasyDAO", "authorize=true but 'of' ",getOf().getId(), "not Authorizable");
     delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, new foam.nanos.auth.StandardAuthorizer(getPermissionPrefix()));
   }
 }
