@@ -11,6 +11,7 @@ foam.CLASS({
 
   requires: [
     'foam.core.ArraySlot',
+    'foam.core.ProxySlot',
     'foam.layout.Section',
     'foam.u2.detail.SectionedDetailPropertyView',
     'foam.u2.layout.Cols',
@@ -72,24 +73,21 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'firstVisibleIndex_',
-      expression: function(visibilitySlots_) {
-        return visibilitySlots_.get().indexOf(true);
-      }
+      name: 'firstVisibleIndex_'
     },
     {
       class: 'Int',
-      name: 'lastVisibleIndex_',
-      expression: function(visibilitySlots_) {
-        return visibilitySlots_.get().lastIndexOf(true);
-      }
+      name: 'lastVisibleIndex_'
     }
   ],
   methods: [
     function initE() {
       var self = this;
       self.SUPER();
-      
+      var proxySlot = self.ProxySlot.create({ delegate$: self.visibilitySlots_$ });
+      self.onDetach(self.firstVisibleIndex_$.follow(proxySlot.map((arr) => arr.indexOf(true))));
+      self.onDetach(self.lastVisibleIndex_$.follow(proxySlot.map((arr) => arr.lastIndexOf(true))));
+
       self
         .addClass(self.myClass())
         .add(self.slot(function(section, showTitle, section$title) {
