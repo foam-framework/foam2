@@ -201,11 +201,6 @@ if ( getOrder() != null &&
   }
 }
 
-if ( getPermissioned() &&
-     ( getNSpec() != null && getNSpec().getServe() ) ) {
-  delegate = new foam.nanos.auth.PermissionedPropertyDAO.Builder(getX()).setDelegate(delegate).build();
-}
-
 if ( getAuthorize() ) {
   if ( foam.nanos.auth.Authorizable.class.isAssignableFrom(getOf().getObjClass()) ) {
     delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate);
@@ -229,6 +224,11 @@ if ( getNSpec() != null &&
      ! getReadOnly() ) {
   //setReadOnly(true);
   logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authenticated, Authorized, or ReadOnly");
+}
+
+if ( getPermissioned() &&
+     ( getNSpec() != null && getNSpec().getServe() ) ) {
+  delegate = new foam.nanos.auth.PermissionedPropertyDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
 if ( getReadOnly() ) {
