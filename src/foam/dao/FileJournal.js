@@ -26,7 +26,6 @@ foam.CLASS({
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.StdoutLogger',
     'foam.util.SafetyUtil',
-    'java.nio.file.Path',
     'java.io.BufferedReader',
     'java.io.BufferedWriter',
     'java.io.InputStreamReader',
@@ -110,11 +109,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'multiLine'
-    },
-    {
-      class: 'Boolean',
-      name: 'multiLinePut',
+      name: 'multiLineOutput',
       value: true
     },
     {
@@ -197,7 +192,7 @@ foam.CLASS({
       javaCode: `
         try {
           String c = "";
-          if ( getMultiLinePut() ) {
+          if ( getMultiLineOutput() ) {
             c = "\\n";
             getOutputter().makeMultiLine();
           }
@@ -217,7 +212,7 @@ foam.CLASS({
               .toString());
           }
 
-          if ( getMultiLinePut() ) getOutputter().makeSingleLine();
+          if ( getMultiLineOutput() ) getOutputter().makeSingleLine();
 
         } catch ( Throwable t ) {
           getLogger().error("Failed to write put entry to journal", t);
