@@ -125,7 +125,7 @@ foam.CLASS({
         .add(self.slot(function(data, config, config$browseTitle, config$viewBorder, viewView) {
           var backLabel = config$browseTitle.slice(-1) === 's' 
               ? config$browseTitle 
-              : `${config$browseTitle}s` 
+              : foam.String.pluralize(config$browseTitle)
 
           return self.E()
             .start(self.Rows)
