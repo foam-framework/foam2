@@ -330,11 +330,11 @@ public class Outputter
       List     axioms = getProperties(info);
       Iterator i      = axioms.iterator();
 
+      writer_.append("{");
       while ( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
         isPropertyDiff = maybeOutputPropertyDelta(oldFObject, newFObject, prop);
         if ( isPropertyDiff) {
-          writer_.append("{");
           addInnerNewline();
           if ( ! isDiff ) {
             if ( outputClassNames_ ) {
@@ -351,7 +351,6 @@ public class Outputter
             outputProperty(newFObject, id);
             isDiff = true;
           }
-
           writer_.append(",");
           addInnerNewline();
           outputProperty(newFObject, prop);
