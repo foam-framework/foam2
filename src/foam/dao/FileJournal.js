@@ -325,11 +325,10 @@ foam.CLASS({
         // count number of entries successfully read
         int successReading = 0;
         JSONParser parser = getParser();
-        BufferedReader reader = getReader();
-        if ( reader == null ) {
-          return;
-        }
-        try {
+        try ( BufferedReader reader = getReader() ) {
+          if ( reader == null ) {
+            return;
+          }
           for ( String entry ; ( entry = getEntry(reader) ) != null ; ) {
             if ( SafetyUtil.isEmpty(entry)        ) continue;
             if ( COMMENT.matcher(entry).matches() ) continue;
