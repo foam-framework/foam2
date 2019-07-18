@@ -123,6 +123,7 @@ public class Outputter
   public String escapeMultiline(String s) {
     s = s.replace("\\", "\\\\")
     .replace("\\\"", "\"")
+    .replace("\n","\\n")
     .replace("\t", "\\t");
     s = ltrim(s, 4);
     return s.replace("\\n", "\n    ");
@@ -366,7 +367,7 @@ public class Outputter
 
   protected static String ltrim(String s, int offset) {
     int i = 0;
-    while (i < offset && Character.isWhitespace(s.charAt(i))) {
+    while (i < offset && s.charAt(i) == ' ' ) {
         i++;
     }
     return s.substring(i);
