@@ -3491,7 +3491,6 @@ foam.CLASS({
   javaImports: [
     'foam.core.FObject',
     'foam.core.X',
-    'foam.nanos.auth.AuthService'
   ],
 
   properties: [
@@ -3502,8 +3501,14 @@ foam.CLASS({
       name: 'userContext'
     },
     {
-      class: 'String',
-      name: 'permissionPrefix'
+      class: 'Boolean',
+      name: 'remove'
+    },
+    {
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
+      javaType: 'foam.nanos.auth.Authorizer',
+      flags: ['java'],
+      name: 'authorizer'
     }
   ],
 
@@ -3521,9 +3526,14 @@ foam.CLASS({
       },
       javaCode: `
         X x = (X) getUserContext();
-        String permission = getPermissionPrefix() + "." + ((FObject) obj).getProperty("id");
-        AuthService auth = (AuthService) x.get("auth");
-        return auth.check(x, permission);
+        foam.nanos.auth.Authorizer authorizer = getAuthorizer();
+        try {
+          if ( getRemove() ) authorizer.authorizeOnDelete(x, (FObject) obj);
+          else authorizer.authorizeOnRead(x, (FObject) obj);
+        } catch ( Exception e ) {
+          return false;
+        }
+        return true;
       `
     },
   ]

@@ -123,11 +123,12 @@ public class AuthenticatedDAO
   }
 
   public Predicate augmentPredicate(X x, Predicate existingPredicate, String operation) {
-      return existingPredicate != null ?
-        AND(
-          HAS_PERMISSION(x, createPermission(operation)),
-          existingPredicate
-        ) :
-        HAS_PERMISSION(x, createPermission(operation));
+    boolean remove = operation.equals("delete");
+    return existingPredicate != null ?
+      AND(
+        HAS_PERMISSION(x, remove, name_),
+        existingPredicate
+      ) :
+      HAS_PERMISSION(x, remove, name_);
   }
 }

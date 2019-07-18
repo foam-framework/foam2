@@ -14,6 +14,7 @@ import foam.mlang.order.Comparator;
 import foam.mlang.order.Desc;
 import foam.mlang.predicate.*;
 import foam.mlang.sink.*;
+import foam.nanos.auth.Authorizer;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -194,10 +195,17 @@ public class MLang
       .build();
   }
 
-  public static Predicate HAS_PERMISSION(X userContext, String permissionPrefix) {
+  // used by AuthenticatedDAO
+  public static Predicate HAS_PERMISSION(X userContext, Boolean remove, String permissionPrefix) {
+    return HAS_PERMISSION(userContext, remove, new foam.nanos.auth.StandardAuthorizer(permissionPrefix));
+  }
+
+  // used by AuthorizationDAO
+  public static Predicate HAS_PERMISSION(X userContext, Boolean remove, Authorizer authorizer) {
     return new HasPermission.Builder(null)
       .setUserContext(userContext)
-      .setPermissionPrefix(permissionPrefix)
+      .setRemove(remove)
+      .setAuthorizer(authorizer)
       .build();
   }
 }

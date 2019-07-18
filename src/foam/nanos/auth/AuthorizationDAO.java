@@ -77,32 +77,23 @@ public class AuthorizationDAO extends ProxyDAO {
   }
 
   @Override
-  public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) { // TODO augmentPredicate
-    if ( ! authorizeRead_ || authorizer_.checkGlobalRead(x) ) super.select_(x, sink, skip, limit, order, predicate);
-    else super.select_(x, new AuthorizationSink(x, authorizer_, sink), skip, limit, order, predicate);
-
-    return sink;
+  public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) { 
+    if ( authorizeRead_ && ! authorizer_.checkGlobalRead(x) ) predicate = augmentPredicate(x, false, predicate);
+    return super.select_(x, sink, skip, limit, order, predicate);
   }
 
   @Override
-  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) { // TODO augmentPredicate
-    Sink sink;
-    if ( ! authorizer_.checkGlobalRemove(x) ) sink = new AuthorizationSink(x, authorizer_, new RemoveSink(x, getDelegate()), true);
-    else sink = new RemoveSink(x, getDelegate());
-    getDelegate().select_(x, sink, skip, limit, order, predicate);
+  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) { 
+    if ( ! authorizer_.checkGlobalRemove(x) ) predicate = augmentPredicate(x, true, predicate);
+    this.select_(x, new RemoveSink(x, this), skip, limit, order, predicate);
   }
 
-  public String createPermission(String op) {
-    return authorizer_.getPermissionPrefix() + "." + op;
-  }
-
-  // TODO this needs to be change to take authorizer since the permissions for custom authorizables are not checked correctly
-  public Predicate augmentPredicate(X x, Predicate existingPredicate, String operation) {
+  public Predicate augmentPredicate(X x, boolean remove, Predicate existingPredicate) {
     return existingPredicate != null ?
       AND(
-        HAS_PERMISSION(x, createPermission(operation)),
+        HAS_PERMISSION(x, remove, authorizer_),
         existingPredicate
       ) :
-      HAS_PERMISSION(x, createPermission(operation));
+      HAS_PERMISSION(x, remove, authorizer_);
   }
 }
