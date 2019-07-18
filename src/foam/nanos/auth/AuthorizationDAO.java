@@ -43,31 +43,32 @@ public class AuthorizationDAO extends ProxyDAO {
 
   @Override
   public FObject put_(X x, FObject obj) throws AuthorizationException {
-
     if ( obj == null ) throw new RuntimeException("Cannot put null.");
 
     Object id = obj.getProperty("id");
-    FObject oldObj = getDelegate().find(id);
+    FObject oldObj = getDelegate().inX(x).find(id);
     boolean isCreate = id == null || oldObj == null;
 
     if ( isCreate ) {
       authorizer_.authorizeOnCreate(x, obj);
     } else {
       authorizer_.authorizeOnUpdate(x, oldObj, obj);
-    } 
+    }
 
     return super.put_(x, obj);
   }
 
   @Override
   public FObject remove_(X x, FObject obj) {
-    authorizer_.authorizeOnDelete(x, obj);
+    Object id = obj.getProperty("id");
+    FObject oldObj = getDelegate().inX(x).find(id);	
+    if ( id == null || oldObj == null ) return null;	
+    authorizer_.authorizeOnDelete(x, oldObj);
     return super.remove_(x, obj);
   }
 
   @Override
   public FObject find_(X x, Object id) {
-
     if ( ! authorizeRead_ ) return super.find_(x, id);
 
     FObject obj = super.find_(x, id);
