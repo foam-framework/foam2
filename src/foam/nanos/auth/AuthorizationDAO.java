@@ -43,7 +43,6 @@ public class AuthorizationDAO extends ProxyDAO {
 
   @Override
   public FObject put_(X x, FObject obj) throws AuthorizationException {
-    if(((foam.nanos.auth.User) x.get("user")).getId() == 1) return super.put_(x, obj);
 
     if ( obj == null ) throw new RuntimeException("Cannot put null.");
 
@@ -81,9 +80,6 @@ public class AuthorizationDAO extends ProxyDAO {
 
   @Override
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) { 
-
-    // workaround for stackoverflow on boot
-    if(((foam.nanos.auth.User) x.get("user")).getId() == 1) return super.select_(x, sink, skip, limit, order, predicate);
 
     if ( authorizeRead_ && ! authorizer_.checkGlobalRead(x) ) predicate = augmentPredicate(x, false, predicate);
     return super.select_(x, sink, skip, limit, order, predicate);
