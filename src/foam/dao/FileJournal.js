@@ -329,6 +329,7 @@ foam.CLASS({
       ],
       javaCode: `
         try {
+          boolean fromOpt = getMultiLineOutputFiles().contains( getFile().getPath() );
           String line = reader.readLine();
           if ( ! line.equals("p({") && ! line.equals("r({") ) return line;
           if ( line == null ) return null;
@@ -336,6 +337,7 @@ foam.CLASS({
           sb.append(line);
           while( ! line.equals("})") ) {
             if ( (line = reader.readLine()) == null ) break;
+            if ( fromOpt ) line = line.trim();
             sb.append("\\n");
             sb.append(line);
           }
