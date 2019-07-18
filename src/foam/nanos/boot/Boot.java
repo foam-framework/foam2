@@ -13,7 +13,6 @@ import foam.dao.DAO;
 import foam.dao.java.JDAO;
 import foam.dao.ProxyDAO;
 import foam.nanos.auth.Group;
-import foam.nanos.auth.Permission;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.ProxyLogger;
@@ -21,7 +20,10 @@ import foam.nanos.logger.StdoutLogger;
 import foam.nanos.script.Script;
 import foam.nanos.session.Session;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import static foam.mlang.MLang.EQ;
 
 public class Boot {
@@ -30,6 +32,7 @@ public class Boot {
 
   protected DAO serviceDAO_;
   protected X   root_ = new ProxyX();
+  protected Map factories_ = new HashMap();
 
   public Boot() {
     this("");
@@ -58,25 +61,21 @@ public class Boot {
 
     for ( int i = 0 ; i < l.size() ; i++ ) {
       NSpec sp = (NSpec) l.get(i);
+      XFactory factory = new SingletonFactory(new NSpecFactory((ProxyX) root_, sp));
+      factories_.put(sp.getName(), factory);
       logger.info("Registering:", sp.getName());
-      root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory((ProxyX) root_, sp)));
+      root_.putFactory(sp.getName(), factory);
     }
 
+    X rootX = root_;
     serviceDAO_.listen(new AbstractSink() {
       @Override
       public void put(Object obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
-        FObject newService = sp.getService();
 
-        if ( newService != null ) {
-          logger.info("Updating service configuration: ", sp.getName());
-
-          FObject service = (FObject) root_.get(sp.getName());
-          List<PropertyInfo> props = service.getClassInfo().getAxioms();
-          for (PropertyInfo prop : props) {
-            prop.set(service, prop.get(newService));
-          }
-        }
+        logger.info("Reload service factory:", sp.getName());
+        ((SingletonFactory) factories_.get(sp.getName()))
+          .setDelegate(new NSpecFactory((ProxyX) rootX, sp));
       }
     }, null);
 
