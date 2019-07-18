@@ -31,9 +31,9 @@ public class AuthorizationDAO extends ProxyDAO {
 
   public AuthorizationDAO(X x, DAO delegate, Authorizer authorizer, boolean authorizeRead) {
     AuthorizationException exception = new AuthorizationException("When " +
-        "using a DAO decorated by AuthenticatedDAO, you may only call the " +
+        "using a DAO decorated by AuthorizationDAO, you may only call the " +
         "context-oriented methods: put_(), find_(), select_(), remove_(), " +
-        "removeAll_(), pipe_(), and listen_(). Alternatively, you can also " +
+        "removeAll_(). Alternatively, you can also " +
         "use .inX() to set the context on the DAO.");
     setX(new InvalidX(exception));
     setDelegate(delegate);
