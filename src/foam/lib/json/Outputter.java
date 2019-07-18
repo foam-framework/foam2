@@ -97,26 +97,33 @@ public class Outputter
   }
 
   public void outputString(String s) {
-    boolean hasNewLine = s.indexOf('\n') >= 0;
-    if ( multiLineOutput_ && hasNewLine ) writer_.append("\r\n  ");
-    writer_.append("\"");
-    if ( multiLineOutput_ && hasNewLine ) writer_.append("\"\"\r\n    ");
-    writer_.append(escape(s));
-    if ( multiLineOutput_ && hasNewLine ) writer_.append("\r\n  \"\"");
-    writer_.append("\"");
+    if ( multiLineOutput_ && s.indexOf('\n') >= 0 ) {
+      writer_.append("\n  ");
+      writer_.append("\"");
+      writer_.append("\"\"\n    ");
+      writer_.append(escapeMultiline(s));
+      writer_.append("\n  \"\"");
+      writer_.append("\"");
+    }
+    else {
+      writer_.append("\"");
+      writer_.append(escape(s));
+      writer_.append("\"");
+    }
   }
 
   public String escape(String s) {
-    boolean hasNewLine = s.indexOf('\n') >= 0;
-    s = s.replace("\\", "\\\\")
+    return s.replace("\\", "\\\\")
       .replace("\"", "\\\"")
       .replace("\t", "\\t")
       .replace("\n","\\n");
-    if ( multiLineOutput_ ) {
-      s = s.replace("\\n", "\r\n    ");
-      if ( hasNewLine ) s = s.replace("\\\"", "\"");
-    }
-    return s;
+  }
+
+  public String escapeMultiline(String s) {
+    return s.replace("\\", "\\\\")
+    .replace("\\\"", "\"")
+    .replace("\t", "\\t")
+    .replace("\\n", "\n    ");
   }
 
   protected void outputNumber(Number value) {
@@ -349,7 +356,7 @@ public class Outputter
       }
       
       if ( isDiff ) { 
-        if ( multiLineOutput_ )  writer_.append("\r\n");
+        if ( multiLineOutput_ )  writer_.append("\n");
         writer_.append("}"); 
       }
     }
@@ -357,7 +364,7 @@ public class Outputter
 
   protected void addInnerNewline() {
     if ( multiLineOutput_ ) {
-      writer_.append("\r\n");
+      writer_.append("\n");
       writer_.append("  ");
     }
   }
@@ -393,7 +400,7 @@ public class Outputter
       PropertyInfo prop = (PropertyInfo) i.next();
       outputComma = maybeOutputProperty(o, prop, outputComma) || outputComma;
     }
-    if ( multiLineOutput_ ) writer_.append("\r\n");
+    if ( multiLineOutput_ ) writer_.append("\n");
     writer_.append("}");
   }
 
