@@ -32,6 +32,7 @@ foam.CLASS({
     'java.io.File',
     'java.io.FileReader',
     'java.io.FileWriter',
+    'java.io.FileNotFoundException',
     'java.text.SimpleDateFormat',
     'java.util.Calendar',
     'java.util.Iterator',
@@ -160,6 +161,9 @@ foam.CLASS({
         } else {
           return new BufferedReader(new FileReader(getFile()));
         }
+      } catch ( FileNotFoundException t) {
+        getLogger().error("Failed to read from journal: " + getFilename(), t.getLocalizedMessage());
+        return null;
       } catch ( Throwable t ) {
         getLogger().error("Failed to read from journal", t);
         throw new RuntimeException(t);
@@ -298,8 +302,8 @@ foam.CLASS({
       javaCode: `
         try {
           String line = reader.readLine();
-          if ( ! line.equals("p({") && ! line.equals("r({") ) return line;
           if ( line == null ) return null;
+          if ( ! line.equals("p({") && ! line.equals("r({") ) return line;
           StringBuilder sb = new StringBuilder();
           sb.append(line);
           while( ! line.equals("})") ) {
@@ -321,8 +325,11 @@ foam.CLASS({
         // count number of entries successfully read
         int successReading = 0;
         JSONParser parser = getParser();
-
-        try ( BufferedReader reader = getReader() ) {
+        BufferedReader reader = getReader();
+        if ( reader == null ) {
+          return;
+        }
+        try {
           for ( String entry ; ( entry = getEntry(reader) ) != null ; ) {
             if ( SafetyUtil.isEmpty(entry)        ) continue;
             if ( COMMENT.matcher(entry).matches() ) continue;
