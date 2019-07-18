@@ -316,7 +316,7 @@ public class Outputter
 
     if ( includeComma ) writer_.append(",");
     if ( multiLineOutput_ ) addInnerNewline();
-    outputProperty(fo, prop);
+    outputProperty(fo, prop); 
     return true;
   }
 
@@ -335,7 +335,6 @@ public class Outputter
         PropertyInfo prop = (PropertyInfo) i.next();
         isPropertyDiff = maybeOutputPropertyDelta(oldFObject, newFObject, prop);
         if ( isPropertyDiff) {
-          addInnerNewline();
           if ( ! isDiff ) {
             if ( outputClassNames_ ) {
               //output Class name
