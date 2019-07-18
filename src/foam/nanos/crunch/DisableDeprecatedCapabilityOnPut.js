@@ -27,7 +27,7 @@ foam.CLASS({
       javaCode: `
       DAO capabilityDAO = (DAO) x.get("capabilityDAO");
       String deprecatedId = ((CapabilityCapabilityJunction) obj).getSourceId();
-      final Capability deprecated = (Capability) ((capabilityDAO.find(deprecatedId)).fclone());
+      final Capability deprecated = (Capability) (capabilityDAO.find(deprecatedId));
       deprecated.setEnabled(false);
 
       agency.submit(x, new ContextAgent() {
