@@ -33,7 +33,8 @@ foam.CLASS({
     'ctrl',
     'dblclick?',
     'editRecord?',
-    'selection? as importSelection'
+    'selection? as importSelection',
+    'filteredTableColumns?'
   ],
 
   properties: [
@@ -53,6 +54,8 @@ foam.CLASS({
     },
     {
       name: 'columns_',
+      documentation: `Note: filteredTableColumns was a property set in DAOController
+      for the purpose of having the filtered DAO list available for CSV outputting.`,
       expression: function(columns, of) {
         var of = this.of;
         if ( ! of ) return [];
@@ -67,7 +70,7 @@ foam.CLASS({
            }
 
           return c;
-        }).filter(function(c) { return c; });
+        });
       }
     },
     {
@@ -197,6 +200,11 @@ foam.CLASS({
     function initE() {
       var view = this;
       var columnSelectionE;
+
+      if ( this.filteredTableColumns$ ) {
+        this.onDetach(this.filteredTableColumns$.follow(
+          this.columns_$.map((cols) => cols.map((a) => a.name))));
+      }
 
       if ( this.editColumnsEnabled ) {
         columnSelectionE = this.createColumnSelection();
@@ -456,5 +464,6 @@ foam.CLASS({
         });
       }
     }
-  ]
+  ],
+
 });

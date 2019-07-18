@@ -28,7 +28,7 @@ foam.CLASS({
       },
       postSet: function(_, n) {
         try {
-          this.data = foam.json.parseString(n);
+          this.data = foam.json.parseString(n, this.__context__);
           this.clearProperty('data_');
           this.error = '';
         } catch ( e ) {

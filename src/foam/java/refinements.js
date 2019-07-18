@@ -217,16 +217,26 @@ foam.CLASS({
       name: 'javaValidateObj',
       expression: function(validationPredicates) {
         return validationPredicates
-          .map(vp => {
+          .map((vp) => {
             return `
-if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
-  throw new IllegalStateException(${foam.java.asJavaValue(vp.errorString)});
-}
+              if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
+                throw new IllegalStateException(${foam.java.asJavaValue(vp.errorString)});
+              }
             `;
           })
           .join('');
       }
-    }
+    },
+    {
+      class: 'String',
+      name: 'javaToCSV',
+      value: 'outputter.outputValue(obj != null ? get(obj) : null);'
+    },
+    {
+      class: 'String',
+      name: 'javaToCSVLabel',
+      value: 'outputter.outputValue(getName());'
+    },
   ],
 
   methods: [
@@ -264,7 +274,9 @@ if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
         includeInSignature:      this.includeInSignature,
         containsPII:             this.containsPII,
         containsDeletablePII:    this.containsDeletablePII,
-        validateObj:             this.javaValidateObj
+        validateObj:             this.javaValidateObj,
+        toCSV:                   this.javaToCSV,
+        toCSVLabel:              this.javaToCSVLabel
       });
     },
 
@@ -1117,23 +1129,6 @@ foam.CLASS({
         body: `outputter.output(getOrdinal(value));`
       });
 
-      info.method({
-        name: 'toCSV',
-        visibility: 'public',
-        type: 'void',
-        args: [
-          {
-            name: 'outputter',
-            type: 'foam.lib.csv.Outputter'
-          },
-          {
-            name: 'value',
-            type: 'Object'
-          }
-        ],
-        body: `outputter.output(getOrdinal(value));`
-      });
-
       var cast = info.getMethod('cast');
       cast.body = `if ( o instanceof Integer ) {
   return forOrdinal((int) o);
@@ -1425,7 +1420,23 @@ foam.CLASS({
           + (of ? of.id + '.class' : '') + ')';
       }
     }
-  ]
+  ],
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      if ( this.of &&
+           this.of !== foam.core.FObject &&
+           ! foam.core.InterfaceModel.isInstance(this.of.model_) ) {
+        info.method({
+          name: 'of',
+          visibility: 'public',
+          type: 'foam.core.ClassInfo',
+          body: `return ${this.of.id}.getOwnClassInfo();`
+        });
+      }
+      return info;
+    }
+  ],
 });
 
 foam.CLASS({
