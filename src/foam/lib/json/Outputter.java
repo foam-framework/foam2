@@ -101,6 +101,7 @@ public class Outputter
       writer_.append("\n  ");
       writer_.append("\"");
       writer_.append("\"\"\n    ");
+      s = ltrim(s, 4);
       writer_.append(escapeMultiline(s));
       writer_.append("\n  \"\"");
       writer_.append("\"");
@@ -120,10 +121,11 @@ public class Outputter
   }
 
   public String escapeMultiline(String s) {
-    return s.replace("\\", "\\\\")
+    s = s.replace("\\", "\\\\")
     .replace("\\\"", "\"")
-    .replace("\t", "\\t")
-    .replace("\\n", "\n    ");
+    .replace("\t", "\\t");
+    s = ltrim(s, 4);
+    return s.replace("\\n", "\n    ");
   }
 
   protected void outputNumber(Number value) {
@@ -361,6 +363,14 @@ public class Outputter
       }
     }
   }
+
+  protected static String ltrim(String s, int offset) {
+    int i = 0;
+    while (i < offset && Character.isWhitespace(s.charAt(i))) {
+        i++;
+    }
+    return s.substring(i);
+}
 
   protected void addInnerNewline() {
     if ( multiLineOutput_ ) {
