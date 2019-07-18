@@ -325,6 +325,7 @@ foam.CLASS({
         // count number of entries successfully read
         int successReading = 0;
         JSONParser parser = getParser();
+
         try ( BufferedReader reader = getReader() ) {
           if ( reader == null ) {
             return;
