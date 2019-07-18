@@ -106,6 +106,7 @@ foam.CLASS({
     },
     {
       name: 'delete',
+      confirmationRequired: true,
       code: function() {
         this.config.dao.remove(this.data).then(o => {
           this.finished.pub();
