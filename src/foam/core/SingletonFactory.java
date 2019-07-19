@@ -26,7 +26,7 @@ public class SingletonFactory
     return instance_;
   }
 
-  public void setDelegate(XFactory delegate) {
+  public synchronized void setDelegate(XFactory delegate) {
     delegate_ = delegate;
   }
 }
