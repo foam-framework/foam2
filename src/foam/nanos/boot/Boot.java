@@ -32,7 +32,7 @@ public class Boot {
 
   protected DAO serviceDAO_;
   protected X   root_ = new ProxyX();
-  protected Map factories_ = new HashMap();
+  protected Map<String, NSpecFactory> factories_ = new HashMap<>();
 
   public Boot() {
     this("");
@@ -61,21 +61,19 @@ public class Boot {
 
     for ( int i = 0 ; i < l.size() ; i++ ) {
       NSpec sp = (NSpec) l.get(i);
-      XFactory factory = new SingletonFactory(new NSpecFactory((ProxyX) root_, sp));
+      NSpecFactory factory = new NSpecFactory((ProxyX) root_, sp);
       factories_.put(sp.getName(), factory);
       logger.info("Registering:", sp.getName());
       root_.putFactory(sp.getName(), factory);
     }
 
-    X rootX = root_;
     serviceDAO_.listen(new AbstractSink() {
       @Override
       public void put(Object obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
 
         logger.info("Reload service factory:", sp.getName());
-        ((SingletonFactory) factories_.get(sp.getName()))
-          .setDelegate(new NSpecFactory((ProxyX) rootX, sp));
+        factories_.get(sp.getName()).invalidate(sp);
       }
     }, null);
 
