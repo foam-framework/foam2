@@ -19,16 +19,15 @@ import foam.nanos.logger.ProxyLogger;
 import foam.nanos.logger.StdoutLogger;
 import foam.nanos.script.Script;
 import foam.nanos.session.Session;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 import static foam.mlang.MLang.EQ;
 
 public class Boot {
   // Context key used to store the top-level root context in the context.
   public final static String ROOT = "_ROOT_";
+  private final static Set<String> RELOADED_SERVICES = new HashSet<>();
 
   protected DAO serviceDAO_;
   protected X   root_ = new ProxyX();
@@ -74,6 +73,7 @@ public class Boot {
 
         logger.info("Reload service factory:", sp.getName());
         factories_.get(sp.getName()).invalidate(sp);
+        RELOADED_SERVICES.add(sp.getName());
       }
     }, null);
 
@@ -112,6 +112,10 @@ public class Boot {
         script.runScript(root_);
       }
     }
+  }
+
+  public static boolean reloadService(String specName) {
+    return RELOADED_SERVICES.remove(specName);
   }
 
   protected List perfectList(List src) {

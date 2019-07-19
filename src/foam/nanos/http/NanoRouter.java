@@ -13,6 +13,7 @@ import foam.core.XFactory;
 import foam.dao.DAO;
 import foam.dao.SessionDAOSkeleton;
 import foam.nanos.NanoService;
+import foam.nanos.boot.Boot;
 import foam.nanos.boot.NSpec;
 import foam.nanos.boot.NSpecAware;
 import foam.nanos.logger.Logger;
@@ -106,7 +107,9 @@ public class NanoRouter
   protected WebAgent getWebAgent(NSpec spec, Object service) {
     if ( spec == null ) return null;
 
-    if ( ! handlerMap_.containsKey(spec.getName()) ) {
+    if ( ! handlerMap_.containsKey(spec.getName())
+      || Boot.reloadService(spec.getName())
+    ) {
       handlerMap_.put(spec.getName(), createWebAgent(spec, service));
     }
 

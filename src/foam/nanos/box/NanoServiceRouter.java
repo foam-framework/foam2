@@ -11,18 +11,15 @@ import foam.core.ContextAware;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.DAOSkeleton;
+import foam.nanos.NanoService;
+import foam.nanos.boot.Boot;
 import foam.nanos.boot.NSpec;
 import foam.nanos.boot.NSpecAware;
 import foam.nanos.logger.Logger;
-import foam.nanos.NanoService;
 import foam.nanos.pm.PM;
-import java.io.IOException;
+import javax.servlet.http.HttpServlet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
 
 public class NanoServiceRouter
   extends HttpServlet
@@ -59,7 +56,9 @@ public class NanoServiceRouter
   protected foam.box.Box getServiceBox(NSpec spec, Object service) {
     if ( spec == null ) return null;
 
-    if ( ! serviceMap_.containsKey(spec.getName()) ) {
+    if ( ! serviceMap_.containsKey(spec.getName())
+      || Boot.reloadService(spec.getName())
+    ) {
       serviceMap_.put(spec.getName(), createServiceBox(spec, service));
     }
 
