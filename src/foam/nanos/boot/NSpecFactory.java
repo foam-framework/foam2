@@ -11,6 +11,7 @@ import foam.dao.ProxyDAO;
 import foam.nanos.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
+import foam.util.SafetyUtil;
 
 public class NSpecFactory
   implements XFactory
@@ -73,7 +74,12 @@ public class NSpecFactory
   }
 
   public synchronized void invalidate(NSpec spec) {
-    spec_ = spec;
-    ns_ = null;
+    if ( ! SafetyUtil.equals(spec.getService(), spec_.getService())
+      || ! SafetyUtil.equals(spec.getServiceClass(), spec_.getServiceClass())
+      || ! SafetyUtil.equals(spec.getServiceScript(), spec_.getServiceScript())
+    ) {
+      spec_ = spec;
+      ns_ = null;
+    }
   }
 }
