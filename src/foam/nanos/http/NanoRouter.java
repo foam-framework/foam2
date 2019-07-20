@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -108,7 +109,7 @@ public class NanoRouter
     if ( spec == null ) return null;
 
     if ( ! handlerMap_.containsKey(spec.getName())
-      || Boot.reloadService(spec.getName())
+      || reloadService(spec.getName())
     ) {
       handlerMap_.put(spec.getName(), createWebAgent(spec, service));
     }
@@ -176,6 +177,11 @@ public class NanoRouter
   protected void informService(Object service, NSpec spec) {
     if ( service instanceof ContextAware ) ((ContextAware) service).setX(getX());
     if ( service instanceof NSpecAware   ) ((NSpecAware) service).setNSpec(spec);
+  }
+
+  protected boolean reloadService(String serviceName) {
+    Set reloadedServices = (Set) getX().get(Boot.RELOADED_SERVICES);
+    return reloadedServices.remove(serviceName);
   }
 
   @Override

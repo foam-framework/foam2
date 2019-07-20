@@ -73,13 +73,15 @@ public class NSpecFactory
     return ns_;
   }
 
-  public synchronized void invalidate(NSpec spec) {
+  public synchronized boolean invalidate(NSpec spec) {
     if ( ! SafetyUtil.equals(spec.getService(), spec_.getService())
       || ! SafetyUtil.equals(spec.getServiceClass(), spec_.getServiceClass())
       || ! SafetyUtil.equals(spec.getServiceScript(), spec_.getServiceScript())
     ) {
       spec_ = spec;
       ns_ = null;
+      return true;
     }
+    return false;
   }
 }

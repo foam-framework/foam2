@@ -19,6 +19,7 @@ import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 import javax.servlet.http.HttpServlet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class NanoServiceRouter
@@ -57,7 +58,7 @@ public class NanoServiceRouter
     if ( spec == null ) return null;
 
     if ( ! serviceMap_.containsKey(spec.getName())
-      || Boot.reloadService(spec.getName())
+      || reloadService(spec.getName())
     ) {
       serviceMap_.put(spec.getName(), createServiceBox(spec, service));
     }
@@ -100,6 +101,11 @@ public class NanoServiceRouter
   protected void informService(Object service, NSpec spec) {
     if ( service instanceof ContextAware ) ((ContextAware) service).setX(getX());
     if ( service instanceof NSpecAware   ) ((NSpecAware) service).setNSpec(spec);
+  }
+
+  protected boolean reloadService(String serviceName) {
+    Set reloadedServices = (Set) getX().get(Boot.RELOADED_SERVICES);
+    return reloadedServices.remove(serviceName);
   }
 
   @Override
