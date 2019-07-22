@@ -261,6 +261,7 @@ foam.CLASS({
   `,
 
   requires: [
+    'foam.core.ProxySlot',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.Visibility'
@@ -284,7 +285,7 @@ foam.CLASS({
       this.SUPER();
 
       this
-        .show(this.visibilitySlot)
+        .show(this.ProxySlot.create({ delegate$: this.visibilitySlot$ }))
         .addClass(this.myClass())
         .add(this.slot(function(data, prop, prop$label) {
           var errorSlot = prop.validateObj && prop.validationTextVisible ?
