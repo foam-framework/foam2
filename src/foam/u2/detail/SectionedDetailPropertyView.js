@@ -261,21 +261,31 @@ foam.CLASS({
   `,
 
   requires: [
+    'foam.core.ProxySlot',
     'foam.u2.layout.Cols',
-    'foam.u2.layout.Rows'
+    'foam.u2.layout.Rows',
+    'foam.u2.Visibility'
   ],
 
   properties: [
     'prop',
+    {
+      class: 'FObjectProperty',
+      of: 'foam.core.Slot',
+      name: 'visibilitySlot',
+      expression: function(prop) {
+        return prop.createVisibilityFor(this.data$).map((m) => m !== this.Visibility.HIDDEN);
+      }
+    }
   ],
 
   methods: [
     function initE() {
       var self = this;
       this.SUPER();
+
       this
-        .show(this.prop.createVisibilityFor(this.data$)
-          .map(m => m != foam.u2.Visibility.HIDDEN))
+        .show(this.ProxySlot.create({ delegate$: this.visibilitySlot$ }))
         .addClass(this.myClass())
         .add(this.slot(function(data, prop, prop$label) {
           var errorSlot = prop.validateObj && prop.validationTextVisible ?
@@ -283,7 +293,6 @@ foam.CLASS({
             foam.core.ConstantSlot.create({ value: null });
 
           return self.E()
-            .style({ padding: '8px 0' })
             .start(self.Rows)
               .callIf(prop$label, function() {
                 this.start('m3')
