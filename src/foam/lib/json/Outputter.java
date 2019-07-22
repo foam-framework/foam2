@@ -98,13 +98,10 @@ public class Outputter
 
   public void outputString(String s) {
     if ( multiLineOutput_ && s.indexOf('\n') >= 0 ) {
-      writer_.append("\n  ");
-      writer_.append("\"");
-      writer_.append("\"\"\n    ");
+      writer_.append("\n  \"\"\"\n    ");
       s = ltrim(s, 4);
       writer_.append(escapeMultiline(s));
-      writer_.append("\n  \"\"");
-      writer_.append("\"");
+      writer_.append("\n  \"\"\"");
     }
     else {
       writer_.append("\"");
@@ -115,16 +112,16 @@ public class Outputter
 
   public String escape(String s) {
     return s.replace("\\", "\\\\")
-      .replace("\"", "\\\"")
-      .replace("\t", "\\t")
-      .replace("\n","\\n");
+            .replace("\"", "\\\"")
+            .replace("\t", "\\t")
+            .replace("\n","\\n");
   }
 
   public String escapeMultiline(String s) {
     s = s.replace("\\", "\\\\")
-    .replace("\\\"", "\"")
-    .replace("\n","\\n")
-    .replace("\t", "\\t");
+         .replace("\\\"", "\"")
+         .replace("\n","\\n")
+         .replace("\t", "\\t");
     s = ltrim(s, 4);
     return s.replace("\\n", "\n    ");
   }
