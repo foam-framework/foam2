@@ -89,7 +89,6 @@ foam.CLASS({
     ^error .foam-u2-DateView,
     ^error .foam-u2-view-date-DateTimePicker .date-display-box
     {
-      color: /*%DESTRUCTIVE3%*/ #d9170e !important;
       border-color: /*%DESTRUCTIVE3%*/ #d9170e !important;
     }
 
@@ -331,6 +330,7 @@ foam.CLASS({
                     .start(self.Cols)
                       .addClass(self.myClass('validation-container'))
                       .show(errorSlot)
+                      /*j
                       .start({
                         class: 'foam.u2.tag.Image',
                         data: 'images/inline-error-icon.svg',
@@ -342,6 +342,7 @@ foam.CLASS({
                           'margin': '0 8px 0 0'
                         })
                       .end()
+                      */
                       .start()
                         .style({ 'flex-grow': 1 })
                         .add(errorSlot.map((s) => {
