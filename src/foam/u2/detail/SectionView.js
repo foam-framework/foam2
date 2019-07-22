@@ -11,6 +11,7 @@ foam.CLASS({
 
   requires: [
     'foam.core.ArraySlot',
+    'foam.core.ConstantSlot',
     'foam.core.ProxySlot',
     'foam.layout.Section',
     'foam.u2.detail.SectionedDetailPropertyView',
@@ -55,38 +56,15 @@ foam.CLASS({
       class: 'Boolean',
       name: 'showTitle',
       value: true
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.core.ArraySlot',
-      name: 'visibilitySlots_',
-      documentation: `
-        An array of slots used to control the visibility of the child
-        SectionedDetailPropertyViews of this view. Used internally to figure out
-        which children are the first and last ones visible so we can adjust the
-        padding on those elements to make sure nested
-        SectionedDetailPropertyViews don't cause unnecessary padding.
-      `,
-      factory: function() {
-        return this.ArraySlot.create();
-      }
-    },
-    {
-      class: 'Int',
-      name: 'firstVisibleIndex_'
-    },
-    {
-      class: 'Int',
-      name: 'lastVisibleIndex_'
     }
   ],
   methods: [
     function initE() {
       var self = this;
       self.SUPER();
-      var proxySlot = self.ProxySlot.create({ delegate$: self.visibilitySlots_$ });
-      self.onDetach(self.firstVisibleIndex_$.follow(proxySlot.map((arr) => arr.indexOf(true))));
-      self.onDetach(self.lastVisibleIndex_$.follow(proxySlot.map((arr) => arr.lastIndexOf(true))));
+      var proxySlot = self.ProxySlot.create({ delegate: self.ConstantSlot.create({ value: [] }) });
+      var firstVisibleIndexSlot = proxySlot.map((arr) => arr.indexOf(true));
+      var lastVisibleIndexSlot  = proxySlot.map((arr) => arr.lastIndexOf(true));
 
       self
         .addClass(self.myClass())
@@ -106,8 +84,8 @@ foam.CLASS({
                     data$: self.data$
                   })
                     .call(function() { slots.push(this.visibilitySlot); })
-                    .enableClass('first', self.firstVisibleIndex_$.map((value) => value === index))
-                    .enableClass('last', self.lastVisibleIndex_$.map((value) => value === index))
+                    .enableClass('first', firstVisibleIndexSlot.map((value) => value === index))
+                    .enableClass('last',   lastVisibleIndexSlot.map((value) => value === index))
                   .end()
                 .end();
               })
@@ -117,7 +95,7 @@ foam.CLASS({
                 this.add(a);
               })
             .end();
-          this.visibilitySlots_ = self.ArraySlot.create({ slots: slots });
+          proxySlot.delegate = self.ArraySlot.create({ slots: slots });
           return elm;
         }));
     }
