@@ -421,7 +421,10 @@ var classes = [
   'io.c9.ace.Theme',
 
   // Themes
-  'foam.nanos.theme.Theme'
+  'foam.nanos.theme.Theme',
+
+  //SQL JBDC Support
+  'foam.dao.JDBCConnectionSpec'
 ];
 
 var abstractClasses = [
