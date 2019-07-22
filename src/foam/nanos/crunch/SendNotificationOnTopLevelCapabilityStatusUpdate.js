@@ -33,7 +33,7 @@ foam.CLASS({
         public void execute(X x) {
           UserCapabilityJunction junction = (UserCapabilityJunction) obj;
           Capability cap = (Capability) ((DAO) x.get("capabilityDAO")).find(((String)junction.getTargetId()));
-          if ( ! cap.getVisible() || junction.getStatus() == CapabilityJunctionStatus.DEPRECATED ) return;
+          if ( ! cap.getVisible() ) return;
 
           DAO notificationDAO = (DAO) x.get("notificationDAO");
 

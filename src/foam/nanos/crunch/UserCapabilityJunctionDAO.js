@@ -102,10 +102,9 @@ foam.CLASS({
       boolean prereq = checkPrereqs(x, obj);
       boolean data = validateData(x, obj);
 
-      if ( ((UserCapabilityJunction) obj).getStatus() != CapabilityJunctionStatus.DEPRECATED ) {
-        if ( prereq && data ) ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.GRANTED);
-        else ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.PENDING);
-      }
+      if ( prereq && data ) ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.GRANTED);
+      else ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.PENDING);
+
       return getDelegate().put_(x, obj);
       
       `
@@ -141,7 +140,7 @@ foam.CLASS({
           EQ(UserCapabilityJunction.SOURCE_ID, ((UserCapabilityJunction) obj).getSourceId()),
           EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getSourceId())
         ));
-        // at this point there shouldn't be a junction with status deprecated because the cap should have enabled set to false
+        
         if ( ucJunction == null || ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED ) return false;
       }
       return true;

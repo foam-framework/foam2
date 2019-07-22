@@ -7,10 +7,10 @@ foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'IsUserCapabilityJunctionStatusUpdate',
 
-  documentation: `Returns true if the status of the usercapabilityjunction has been updated`,
-
   extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: ['foam.core.Serializable'],
+
+  documentation: `Returns true if the status of the usercapabilityjunction has been updated`,
 
   javaImports: [
     'foam.nanos.crunch.UserCapabilityJunction',

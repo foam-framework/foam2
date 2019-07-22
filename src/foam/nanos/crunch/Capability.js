@@ -17,6 +17,8 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.dao.Sink',
+    'foam.mlang.sink.Count',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCapabilityJunction',
     'java.util.List',
@@ -146,7 +148,24 @@ foam.CLASS({
       if ( s2.length() <= s1.length() - 2 ) return s1.substring( 0, s1.length() -2 ).equals( s2.substring( 0, s1.length() - 2 ) );
       else return s1.substring( 0, s1.length() - 1 ).equals( s2.substring( 0, s1.length() -1 ) );
       `
-    }
+    },
+    {
+      name: 'isDeprecated',
+      type: 'Boolean',
+      args: [
+        {name: 'x', type: 'Context'}
+      ],
+      documentation: 'check if a given capability is deprecated',
+      javaCode: `
+      Sink count = new Count();
+      count = this.getDeprecating(x).getJunctionDAO()
+        .where(
+          EQ(Capability.ID, (String) this.getId())
+        ).select(count);
+
+      return ((Count) count).getValue() > 0;
+      `
+    },
   ]
 });
 

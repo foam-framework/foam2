@@ -57,6 +57,11 @@ foam.CLASS({
       if ( ! getDelegate().check(x, "service.auth.checkUser") ) return false;
 
       try {
+        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+
+        Capability cap = (Capability) capabilityDAO.find(permission);
+        if ( cap != null && cap.isDeprecated(x) ) return getDelegate().checkUser(x, user, permission);
+
         DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
         if ( userCapabilityJunctionDAO.find(
@@ -67,12 +72,10 @@ foam.CLASS({
           )) != null ) return true;
         
         List<UserCapabilityJunction> userCapabilityJunctions = ((ArraySink) user.getCapabilities(x).getJunctionDAO().where(EQ(UserCapabilityJunction.SOURCE_ID, user.getId())).select(new ArraySink())).getArray();
-        
-        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
 
         for ( UserCapabilityJunction ucJunction : userCapabilityJunctions ) {
           Capability capability = (Capability) capabilityDAO.find(ucJunction.getTargetId());
-          if ( capability.implies(x, permission) ) return true;
+          if ( capability.implies(x, permission) && ! capability.isDeprecated(x) ) return true;
         }
       } catch (Exception e) {
         Logger logger = (Logger) x.get("logger");

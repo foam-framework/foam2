@@ -14,10 +14,6 @@ foam.ENUM({
     {
       name: 'GRANTED',
       label: 'granted'
-    },
-    {
-      name: 'DEPRECATED',
-      label: 'deprecated'
     }
   ]
 });

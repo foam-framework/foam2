@@ -18,7 +18,6 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.auth.User',
-    'foam.nanos.crunch.UserCapabilityJunction',
     'static foam.mlang.MLang.*'
   ],
 
@@ -26,14 +25,10 @@ foam.CLASS({
     {
       name: 'applyAction',
       javaCode: `
-      final Long userId = ((User) obj).getId();
-
       agency.submit(x, new ContextAgent() {
         @Override
         public void execute(X x) {
-          ((DAO) x.get("userCapabilityJunctionDAO"))
-            .where(EQ(UserCapabilityJunction.SOURCE_ID, userId))
-            .removeAll();
+          ((User) obj).getCapabilities(x).getJunctionDAO().removeAll();
         }
       });
       `
