@@ -90,7 +90,6 @@ foam.CLASS({
     ^error .foam-u2-view-date-DateTimePicker .date-display-box
     {
       color: /*%DESTRUCTIVE3%*/ #d9170e !important;
-      background-color: /*%DESTRUCTIVE5%*/ #fbedec !important;
       border-color: /*%DESTRUCTIVE3%*/ #d9170e !important;
     }
 
