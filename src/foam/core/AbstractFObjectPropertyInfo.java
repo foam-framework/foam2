@@ -27,6 +27,10 @@ public abstract class AbstractFObjectPropertyInfo
   //    return o1.compareTo(o2);
   //  }
 
+  public foam.core.ClassInfo of() {
+    return new foam.core.EmptyClassInfo();
+  }
+
   @Override
   public Object fromXML(X x, XMLStreamReader reader) {
     FObject obj = null;
