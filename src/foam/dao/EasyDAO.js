@@ -106,16 +106,6 @@ foam.CLASS({
      `
     },
     {
-      class: 'String',
-      name: 'permissionPrefix',
-      factory: function() {
-        return this.of.name.toLowerCase();
-      },
-      javaFactory: `
-      return this.getOf().getObjClass().getSimpleName().toLowerCase();
-     `
-    },
-    {
       name: 'nSpec',
       class: 'FObjectProperty',
       type: 'foam.nanos.boot.NSpec'
@@ -145,7 +135,7 @@ if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
 
 if ( getDecorator() != null ) {
   if ( ! ( getDecorator() instanceof ProxyDAO ) ) {
-    logger.error(this.getClass().getSimpleName(), "delegate", "NSpec.name", getNSpec().getName(), "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
+    logger.error(this.getClass().getSimpleName(), "delegate", "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
     System.exit(1);
   }
   // The decorator dao may be a proxy chain
@@ -236,6 +226,11 @@ if ( getNSpec() != null &&
   logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authenticated, Authorized, or ReadOnly");
 }
 
+if ( getPermissioned() &&
+     ( getNSpec() != null && getNSpec().getServe() ) ) {
+  delegate = new foam.nanos.auth.PermissionedPropertyDAO.Builder(getX()).setDelegate(delegate).build();
+}
+
 if ( getReadOnly() ) {
   delegate = new foam.dao.ReadOnlyDAO.Builder(getX()).setDelegate(delegate).build();
 }
@@ -316,6 +311,16 @@ return delegate;
       value: true
     },
     {
+      class: 'String',
+      name: 'permissionPrefix',
+      factory: function() {
+        return this.of.name.toLowerCase();
+      },
+      javaFactory: `
+      return this.getOf().getObjClass().getSimpleName().toLowerCase();
+     `
+    },
+    {
       /** Enable standard read authentication. */
       class: 'Boolean',
       name: 'authenticateRead',
@@ -325,6 +330,12 @@ return delegate;
       class: 'Boolean',
       name: 'readOnly',
       value: false
+    },
+    {
+      documentation: 'Wrap in PermissionedPropertiesDAO',
+      class: 'Boolean',
+      name: 'permissioned',
+      value: true
     },
     {
       /** Enable value de-duplication to save memory when caching. */

@@ -43,7 +43,8 @@ public interface PropertyInfo
   public Parser queryParser();
   public Parser csvParser();
   public void toJSON(foam.lib.json.Outputter outputter, Object value);
-  public void toCSV(foam.lib.csv.Outputter outputter, Object value);
+  public void toCSV(X x, Object obj, foam.lib.csv.CSVOutputter outputter);
+  public void toCSVLabel(X x, foam.lib.csv.CSVOutputter outputter);
   public void toXML(foam.lib.xml.Outputter outputter, Object value);
   public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop);
   //return true if there are difference, then the property value from o2 will set to diff

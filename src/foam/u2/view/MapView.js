@@ -96,7 +96,9 @@ foam.CLASS({
                       .style({ 'flex-grow': 1 })
                       .add(self.KeyValueRow.VALUE)
                     .end()
-                    .add(self.KeyValueRow.REMOVE)
+                    .tag(self.KeyValueRow.REMOVE, {
+                      isDestructive: true
+                    })
                   .end()
                 .endContext();
               row.onDetach(row.sub(self.updateData));
