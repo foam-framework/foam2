@@ -23,7 +23,7 @@ import static foam.mlang.MLang.HAS_PERMISSION;
  */
 public class AuthorizationDAO extends ProxyDAO {
   protected Authorizer authorizer_;
-  protected boolean authorizeRead_ = false;
+  protected boolean authorizeRead_;
 
   public AuthorizationDAO(X x, DAO delegate, Authorizer authorizer) {
     this(x, delegate, authorizer, true);
