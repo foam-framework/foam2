@@ -228,7 +228,7 @@ foam.CLASS({
           try {
             getTransport_().close();
           } catch ( Exception e2 ) {
-            logger.error("Failed to close transport");
+            logger.error("Failed to close transport. " + e2);
           }
           clearTransport_();
           logger.error("SMTPEmailService sending MimeMessage failed. " + e);
