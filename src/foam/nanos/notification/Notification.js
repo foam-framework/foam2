@@ -8,9 +8,15 @@ foam.CLASS({
   package: 'foam.nanos.notification',
   name: 'Notification',
 
+  implements: [
+    'foam.nanos.auth.Authorizable'
+  ],
+
   documentation: 'Notification model responsible for system and integrated messaging notifications.',
 
   javaImports: [
+    'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.AuthorizationException',
     'java.util.Date'
   ],
 
@@ -113,6 +119,53 @@ foam.CLASS({
       class: 'String',
       name: 'slackMessage',
       documentation: 'Message to be sent to Slack if sendSlackMessage is enabled.'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'checkOwnership',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      type: 'Boolean',
+      javaCode: `
+        foam.nanos.auth.User user = (foam.nanos.auth.User) x.get("user");
+        if( user == null ) return false;
+
+        Long userId = user.getId();
+        String groupId = user.getGroup();
+        
+        return getUserId() != userId && getGroupId() != groupId;
+      `
+    },
+    {
+      name: 'authorizeOnCreate',
+      javaCode: `
+      AuthService auth = (AuthService) x.get("auth");
+      if ( ! checkOwnership(x) && ! auth.check(x, "*") ) throw new AuthorizationException("You don't have permission to create this notification.");
+      `
+    },
+    {
+      name: 'authorizeOnUpdate',
+      javaCode: `
+      AuthService auth = (AuthService) x.get("auth");
+      if ( ! checkOwnership(x) && ! auth.check(x, "*") ) throw new AuthorizationException("You don't have permission to update notifications you do not own.");
+      `
+    },
+    {
+      name: 'authorizeOnDelete',
+      javaCode: `
+      AuthService auth = (AuthService) x.get("auth");
+      if ( ! checkOwnership(x) && ! auth.check(x, "*") ) throw new AuthorizationException("You don't have permission to delete notifications you do not own.");
+      `
+    },
+    {
+      name: 'authorizeOnRead',
+      javaCode: `
+      AuthService auth = (AuthService) x.get("auth");
+      if ( ! checkOwnership(x) && ! auth.check(x, "*") ) throw new AuthorizationException("You don't have permission to read notifications you do not own.");
+      `
     }
   ]
 });
