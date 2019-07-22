@@ -95,7 +95,7 @@ foam.CLASS({
         }
         return !required ? null : [[name],
           function() {
-            return !this.hasOwnProperty(name) && (label + ' is required.');
+            return !this.hasOwnProperty(name) && (`Please enter a ${label}`);
           }]
       },
     },
@@ -122,7 +122,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.GTE(foam.mlang.StringLength.create({ arg1: self }), self.minLength);
             },
-            errorString: `${this.label} must be at least ${this.minLength} character${this.minLength>1?'s':''}`
+            errorString: `Please enter a ${this.label} with least ${this.minLength} character${this.minLength>1?'s':''}`
           });
         }
         if ( foam.Number.isInstance(this.maxLength) ) {
@@ -131,7 +131,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.LTE(foam.mlang.StringLength.create({ arg1: self }), self.maxLength);
             },
-            errorString: `${this.label} must be at most ${this.maxLength} character${this.maxLength>1?'s':''}`
+            errorString: `Please enter a ${this.label} with at most ${this.maxLength} character${this.maxLength>1?'s':''}`
           });
         }
         return a;
@@ -156,7 +156,7 @@ foam.CLASS({
           return [
             [`${name}$errors_`],
             function(errs) {
-              return errs ? label + ' is invalid.' : null;
+              return errs ? `Please enter a valid ${label}` : null;
             }
           ];
         }
@@ -187,7 +187,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.GTE(self, self.min);
             },
-            errorString: `${self.label} must be at least ${self.min}.`
+            errorString: `Please enter a number greater than or equal to ${self.min}.`
           });
         }
         if ( foam.Number.isInstance(self.max) ) {
@@ -196,7 +196,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.LTE(self, self.max);
             },
-            errorString: `${self.label} must be at most ${self.max}`
+            errorString: `Please enter a number less than or equal to ${self.max}`
           });
         }
         return a;
@@ -315,7 +315,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.REG_EXP(self, /^$|.+@.+\..+/);
             },
-            errorString: `${this.label} is not an email address`
+            errorString: 'Please enter a valid email address'
           }
         ];
         if ( this.required ) {
@@ -325,7 +325,7 @@ foam.CLASS({
               predicateFactory: function(e) {
                 return e.NEQ(self, '');
               },
-              errorString: `${this.label} is required`
+              errorString: 'Please enter an email address'
             }
           )
         }
