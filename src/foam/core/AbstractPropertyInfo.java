@@ -44,11 +44,6 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public void toCSV(foam.lib.csv.Outputter outputter, Object value) {
-    outputter.output(value);
-  }
-
-  @Override
   public void toXML(foam.lib.xml.Outputter outputter, Object value) {
     outputter.output(value);
   }

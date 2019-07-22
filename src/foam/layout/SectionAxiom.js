@@ -35,6 +35,9 @@ foam.CLASS({
       name: 'permissionRequired'
     },
     {
+      name: 'gridColumns'
+    },
+    {
       class: 'Function',
       name: 'isAvailable',
       value: function() { return true; }
