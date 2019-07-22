@@ -135,7 +135,7 @@ foam.CLASS({
 
         Long userId = user.getId();
         String groupId = user.getGroup();
-        
+
         return getUserId() != userId && getGroupId() != groupId;
       `
     },
@@ -143,21 +143,21 @@ foam.CLASS({
       name: 'authorizeOnCreate',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, "*") ) throw new AuthorizationException("You don't have permission to create this notification.");
+      if ( ! auth.check(x, "*") ) throw new AuthorizationException("You don't have permission to create this notification.");
       `
     },
     {
       name: 'authorizeOnUpdate',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, "*") ) throw new AuthorizationException("You don't have permission to update notifications you do not own.");
+      if ( ! auth.check(x, "*") ) throw new AuthorizationException("You don't have permission to update notifications you do not own.");
       `
     },
     {
       name: 'authorizeOnDelete',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, "*") ) throw new AuthorizationException("You don't have permission to delete notifications you do not own.");
+      if ( ! auth.check(x, "*") ) throw new AuthorizationException("You don't have permission to delete notifications you do not own.");
       `
     },
     {
