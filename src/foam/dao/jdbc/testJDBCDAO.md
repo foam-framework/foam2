@@ -50,3 +50,13 @@ jdbcDAO = new foam.dao.jdbc.JDBCDAO(x, foam.dao.jdbc.TestDataForJDBC.getOwnClass
 print(jdbcDAO);
 foam.dao.Sink sink = jdbcDAO.select();
 print(sink);
+
+8- To test find() and remove():
+
+jdbcDAO = new foam.dao.jdbc.MySQLJDBCDAO(x, foam.dao.jdbc.TestDataForJDBC.getOwnClassInfo(), "PoolA");
+print(jdbcDAO);
+
+obj = jdbcDAO.find_(x, "34");
+print(obj);
+
+jdbcDAO.remove(obj);

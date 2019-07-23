@@ -13,7 +13,6 @@ import foam.core.X;
 
 import foam.dao.Sink;
 
-import foam.dao.jdbc.ConnectionPool;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 

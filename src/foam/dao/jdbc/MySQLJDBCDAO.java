@@ -78,8 +78,7 @@ public class MySQLJDBCDAO extends AbstractJDBCDAO{
       closeAllQuietly(resultSet, stmt);
     }
   }
-
-  //TODO
+  
   @Override
   public FObject remove_(X x, FObject obj) {
     Connection c = null;
@@ -106,17 +105,47 @@ public class MySQLJDBCDAO extends AbstractJDBCDAO{
 
       return obj;
     } catch (Throwable e) {
-      e.printStackTrace();
+      Logger logger = (Logger) x.get("logger");
+      logger.error(e);
       return null;
     } finally {
       closeAllQuietly(null, stmt);
     }
   }
 
-  //TODO
   @Override
   public FObject find_(X x, Object id) {
-    return null;
+    Connection c = null;
+    IndexedPreparedStatement stmt = null;
+    ResultSet resultSet = null;
+
+    try {
+      c = dataSource_.getConnection();
+      StringBuilder builder = threadLocalBuilder_.get()
+        .append("select * from ")
+        .append(tableName_)
+        .append(" where ")
+        .append(getPrimaryKey().createStatement())
+        .append(" = ?");
+
+      stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
+      // TODO: add support for non-numbers
+      //stmt.setLong(((Number) o).longValue());
+      stmt.setObject(id);
+      resultSet = stmt.executeQuery();
+      if ( ! resultSet.next() ) {
+        // no rows
+        return null;
+      }
+
+      return createFObject(resultSet);
+    } catch (Throwable e) {
+      Logger logger = (Logger) x.get("logger");
+      logger.error(e);
+      return null;
+    } finally {
+      closeAllQuietly(resultSet, stmt);
+    }
   }
 
   @Override
