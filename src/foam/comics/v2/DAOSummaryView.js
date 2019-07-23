@@ -123,7 +123,8 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(data, config, config$viewBorder, viewView) {
+        .add(self.slot(function(data, config, config$browseTitle, config$viewBorder, viewView) {
+
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -132,7 +133,7 @@ foam.CLASS({
                     .tag(self.stack.BACK, {
                       buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                       icon: 'images/back-icon.svg',
-                      label: `All ${config.of.name}s`
+                      label: `All ${config$browseTitle}`
                     })
                 .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })

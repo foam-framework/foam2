@@ -53,7 +53,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'browseTitle',
-      expression: function(of) { return of.model_.label; }
+      expression: function(of) { return foam.String.pluralize(of.model_.label); }
     },
     {
       class: 'foam.u2.ViewSpecWithJava',
