@@ -89,7 +89,6 @@ public class AuthenticatedDAO
     if ( authenticateRead_ ) {
       String permission = createPermission("read", id);
       AuthService authService = (AuthService) x.get("auth");
-      
       if ( ! authService.check(x, permission) ) {
         throw new AuthorizationException();
       }
