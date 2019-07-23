@@ -145,7 +145,8 @@ foam.CLASS({
           this.forwards.map(resolveName) :
           // TODO(adamvy): This isn't the right check.  Once we have modeled interfaces
           // we can proxy only that which is defined in the interface.
-          delegate.getOwnAxiomsByClass(foam.core.Method);
+          delegate.getOwnAxiomsByClass(foam.core.Method)
+            .filter(m => ! delegates.find(d => d.name == m.name));
 
       var axioms = [];
       for ( var i = 0 ; i < forwards.length ; i++ ) {
@@ -159,9 +160,7 @@ foam.CLASS({
           args: method.args
         }));
       }
-      cls.installAxioms(axioms);
 
-      axioms = [];
       for ( var i = 0 ; i < delegates.length ; i++ ) {
         var method = delegates[i];
         axioms.push(this.ProxiedMethod.create({
@@ -174,9 +173,7 @@ foam.CLASS({
           delegate: true
         }));
       }
-      cls.installAxioms(axioms);
 
-      axioms = [];
       if ( ! this.topics || this.topics.length ) {
         axioms.push(this.ProxySub.create({
           topics: this.topics,

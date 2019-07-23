@@ -162,7 +162,7 @@ foam.LIB({
         var p2 = foam.Number.isInstance(b.priority) ? b.priority : 100;
 
         // compare p2 vs p1, as we want higher priority values first.
-        return foam.Number.compare(p2, p1) || axs.indexOf(a) - axs.indexOf(b);
+        return foam.Number.compare(p2, p1);
       });
 
       for ( var i = 0 ; i < axs.length ; i++ ) {
