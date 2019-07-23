@@ -70,8 +70,11 @@ public class Boot {
       public void put(Object obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
 
-        logger.info("Reload service factory:", sp.getName());
+        logger.info("Reload service:", sp.getName());
         factories_.get(sp.getName()).invalidate(sp);
+        if ( ! sp.getLazy() ) {
+          root_.get(sp.getName());
+        }
       }
     }, null);
 
