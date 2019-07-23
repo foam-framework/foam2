@@ -29,6 +29,7 @@ foam.CLASS({
     'java.io.BufferedReader',
     'java.io.BufferedWriter',
     'java.io.InputStreamReader',
+    'java.io.InputStream',
     'java.io.File',
     'java.io.FileReader',
     'java.io.FileWriter',
@@ -157,7 +158,11 @@ foam.CLASS({
       try {
         Storage storage = (Storage) getX().get(Storage.class);
         if ( storage.isResource() ) {
-          return new BufferedReader(new InputStreamReader(storage.getResourceAsStream(getFilename())));
+          InputStream file = storage.getResourceAsStream(getFilename());
+          if ( file == null ) {
+            getLogger().error("Failed to read from resource journal: " + getFilename());
+          }
+          return (file == null) ? null : new BufferedReader(new InputStreamReader(file));
         } else {
           return new BufferedReader(new FileReader(getFile()));
         }
