@@ -3525,7 +3525,7 @@ foam.CLASS({
         foam.nanos.auth.Authorizer authorizer = getAuthorizer();
         try {
           authorizer.authorizeOnRead(x, (FObject) obj);
-        } catch ( Exception e ) {
+        } catch ( Throwable t ) {
           return false;
         }
         return true;
@@ -3579,7 +3579,7 @@ foam.CLASS({
         foam.nanos.auth.Authorizer authorizer = getAuthorizer();
         try {
           authorizer.authorizeOnDelete(x, (FObject) obj);
-        } catch ( Exception e ) {
+        } catch ( Throwable t ) {
           return false;
         }
         return true;

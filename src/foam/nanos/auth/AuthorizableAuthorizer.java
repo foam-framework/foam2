@@ -54,7 +54,7 @@ public class AuthorizableAuthorizer implements Authorizer {
     AuthService authService = (AuthService) x.get("auth");
     try {
       return authService.check(x, permission);
-    } catch ( Exception e ) {
+    } catch ( Throwable t ) {
       return false;
     }
   }
@@ -64,7 +64,7 @@ public class AuthorizableAuthorizer implements Authorizer {
     AuthService authService = (AuthService) x.get("auth");
     try {
       return authService.check(x, permission);
-    } catch ( Exception e ) {
+    } catch ( Throwable t ) {
       return false;
     }
   }
