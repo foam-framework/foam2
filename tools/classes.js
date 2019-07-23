@@ -424,7 +424,7 @@ var classes = [
   'foam.nanos.theme.Theme',
 
   // Crunch
-  'foam.nanos.crunch.FakeTestObject',
+  'foam.nanos.crunch.crunchtest.FakeTestObject',
   //models
   'foam.nanos.crunch.Capability',
   'foam.nanos.crunch.CapabilityJunctionStatus',
@@ -435,7 +435,6 @@ var classes = [
   //rules
   'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
   'foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate',
-  'foam.nanos.crunch.DisableDeprecatedCapabilityOnPut',
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',

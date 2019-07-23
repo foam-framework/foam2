@@ -205,7 +205,7 @@ FOAM_FILES([
   { name: "foam/nanos/test/ClientEchoService" },
 
   // foam/nanos/crunch
-  { name: "foam/nanos/crunch/FakeTestObject" },
+  { name: "foam/nanos/crunch/crunchtest/FakeTestObject" },
   // models
   { name: "foam/nanos/crunch/Capability" },
   { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
@@ -215,7 +215,6 @@ FOAM_FILES([
   //rules
   { name: "foam/nanos/crunch/SendNotificationOnTopLevelCapabilityStatusUpdate" },
   { name: "foam/nanos/crunch/IsUserCapabilityJunctionStatusUpdate" },
-  { name: "foam/nanos/crunch/DisableDeprecatedCapabilityOnPut" },
   { name: "foam/nanos/crunch/RemoveJunctionsOnUserRemoval" },
   //authservice
   { name: "foam/nanos/auth/CapabilityAuthService" },

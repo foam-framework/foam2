@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 foam.CLASS({
-    package: 'foam.nanos.crunch',
+    package: 'foam.nanos.crunch.crunchtest',
     name: 'FakeTestObject',
   
     documentation: `
