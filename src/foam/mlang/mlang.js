@@ -3482,7 +3482,7 @@ return true;
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
-  name: 'HasReadPermission',
+  name: 'isAuthorizedToRead',
   extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: [ 'foam.core.Serializable' ],
 
@@ -3536,7 +3536,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
-  name: 'HasRemovePermission',
+  name: 'isAuthorizedToDelete',
   extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: [ 'foam.core.Serializable' ],
 

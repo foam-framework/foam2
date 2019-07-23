@@ -16,8 +16,8 @@ import foam.nanos.auth.AuthorizationException;
 import foam.nanos.auth.User;
 
 import static foam.mlang.MLang.AND;
-import static foam.mlang.MLang.HAS_READ_PERMISSION;
-import static foam.mlang.MLang.HAS_REMOVE_PERMISSION;
+import static foam.mlang.MLang.IS_AUTHORIZED_TO_READ;
+import static foam.mlang.MLang.IS_AUTHORIZED_TO_DELETE;
 
 /**
  * A DAO decorator to run authorization checks.
@@ -94,7 +94,7 @@ public class AuthorizationDAO extends ProxyDAO {
   }
 
   public Predicate augmentPredicate(X x, boolean remove, Predicate existingPredicate) {
-    Predicate newPredicate = remove ? HAS_REMOVE_PERMISSION(x, authorizer_) : HAS_READ_PERMISSION(x, authorizer_);
+    Predicate newPredicate = remove ? IS_AUTHORIZED_TO_DELETE(x, authorizer_) : IS_AUTHORIZED_TO_READ(x, authorizer_);
     return existingPredicate != null ?
       AND(
         newPredicate,
