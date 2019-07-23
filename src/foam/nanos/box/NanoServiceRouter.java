@@ -12,14 +12,13 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.DAOSkeleton;
 import foam.nanos.NanoService;
-import foam.nanos.boot.Boot;
 import foam.nanos.boot.NSpec;
 import foam.nanos.boot.NSpecAware;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
+
 import javax.servlet.http.HttpServlet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class NanoServiceRouter
