@@ -57,9 +57,7 @@ public class NanoServiceRouter
   protected foam.box.Box getServiceBox(NSpec spec, Object service) {
     if ( spec == null ) return null;
 
-    if ( ! serviceMap_.containsKey(spec.getName())
-      || reloadService(spec.getName())
-    ) {
+    if ( ! serviceMap_.containsKey(spec.getName()) ) {
       serviceMap_.put(spec.getName(), createServiceBox(spec, service));
     }
 
@@ -101,11 +99,6 @@ public class NanoServiceRouter
   protected void informService(Object service, NSpec spec) {
     if ( service instanceof ContextAware ) ((ContextAware) service).setX(getX());
     if ( service instanceof NSpecAware   ) ((NSpecAware) service).setNSpec(spec);
-  }
-
-  protected boolean reloadService(String serviceName) {
-    Set reloadedServices = (Set) getX().get(Boot.RELOADED_SERVICES);
-    return reloadedServices.remove(serviceName);
   }
 
   @Override

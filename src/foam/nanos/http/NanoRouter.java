@@ -8,17 +8,19 @@ package foam.nanos.http;
 
 import foam.box.Skeleton;
 import foam.core.ContextAware;
+import foam.core.Detachable;
 import foam.core.X;
 import foam.core.XFactory;
+import foam.dao.AbstractSink;
 import foam.dao.DAO;
 import foam.dao.SessionDAOSkeleton;
 import foam.nanos.NanoService;
-import foam.nanos.boot.Boot;
 import foam.nanos.boot.NSpec;
 import foam.nanos.boot.NSpecAware;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 import foam.nanos.pm.PMWebAgent;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -42,11 +43,21 @@ public class NanoRouter
   protected X x_;
 
   protected Map<String, WebAgent> handlerMap_ = new ConcurrentHashMap<>();
+  protected DAO nSpecDAO_;
 
   @Override
   public void init(javax.servlet.ServletConfig config) throws javax.servlet.ServletException {
     Object x = config.getServletContext().getAttribute("X");
     if ( x != null && x instanceof foam.core.X ) x_ = (foam.core.X) x;
+
+    nSpecDAO_ = (DAO) x_.get("nSpecDAO");
+    nSpecDAO_.listen(new AbstractSink() {
+      @Override
+      public void put(Object obj, Detachable sub) {
+        NSpec sp = (NSpec) obj;
+        handlerMap_.remove(sp.getName());
+      }
+    }, null);
 
     super.init(config);
   }
@@ -59,8 +70,7 @@ public class NanoRouter
     String[] urlParams  = path.split("/");
     String   serviceKey = urlParams[2];
     Object   service    = getX().get(serviceKey);
-    DAO      nSpecDAO   = (DAO) getX().get("nSpecDAO");
-    NSpec    spec       = (NSpec) nSpecDAO.find(serviceKey);
+    NSpec    spec       = (NSpec) nSpecDAO_.find(serviceKey);
     WebAgent serv       = getWebAgent(spec, service);
     PM       pm         = new PM(this.getClass(), serviceKey);
 
@@ -108,9 +118,7 @@ public class NanoRouter
   protected WebAgent getWebAgent(NSpec spec, Object service) {
     if ( spec == null ) return null;
 
-    if ( ! handlerMap_.containsKey(spec.getName())
-      || reloadService(spec.getName())
-    ) {
+    if ( ! handlerMap_.containsKey(spec.getName()) ) {
       handlerMap_.put(spec.getName(), createWebAgent(spec, service));
     }
 
@@ -177,11 +185,6 @@ public class NanoRouter
   protected void informService(Object service, NSpec spec) {
     if ( service instanceof ContextAware ) ((ContextAware) service).setX(getX());
     if ( service instanceof NSpecAware   ) ((NSpecAware) service).setNSpec(spec);
-  }
-
-  protected boolean reloadService(String serviceName) {
-    Set reloadedServices = (Set) getX().get(Boot.RELOADED_SERVICES);
-    return reloadedServices.remove(serviceName);
   }
 
   @Override

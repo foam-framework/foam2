@@ -10,8 +10,8 @@ import foam.core.*;
 import foam.dao.AbstractSink;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
-import foam.dao.java.JDAO;
 import foam.dao.ProxyDAO;
+import foam.dao.java.JDAO;
 import foam.nanos.auth.Group;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
@@ -27,12 +27,10 @@ import static foam.mlang.MLang.EQ;
 public class Boot {
   // Context key used to store the top-level root context in the context.
   public final static String ROOT = "_ROOT_";
-  public final static String RELOADED_SERVICES = "_RELOADED_SERVICES_";
 
   protected DAO serviceDAO_;
   protected X   root_ = new ProxyX();
   protected Map<String, NSpecFactory> factories_ = new HashMap<>();
-  protected Set<String> reloadedServices_ = new HashSet<>();
 
   public Boot() {
     this("");
@@ -67,16 +65,13 @@ public class Boot {
       root_.putFactory(sp.getName(), factory);
     }
 
-    root_.put(RELOADED_SERVICES, reloadedServices_);
     serviceDAO_.listen(new AbstractSink() {
       @Override
       public void put(Object obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
 
         logger.info("Reload service factory:", sp.getName());
-        if ( factories_.get(sp.getName()).invalidate(sp) ) {
-          reloadedServices_.add(sp.getName());
-        }
+        factories_.get(sp.getName()).invalidate(sp);
       }
     }, null);
 
