@@ -347,28 +347,26 @@ foam.CLASS({
       name: 'validationPredicates',
       factory: function() {
         var self = this;
-        var ret = [];
+        var ret = [
+            {
+              args: [this.name],
+              predicateFactory: function(e) {
+                return e.OR(
+                  e.GTE(foam.mlang.StringLength.create({ arg1: self }), 7),
+                  e.EQ(self, '')
+                );
+              },
+              errorString: `${this.label} must be 7 or more chars`
+            }
+        ];
         if ( this.required ) {
           ret.push(
             {
               args: [this.name],
               predicateFactory: function(e) {
-                return e.GTE(foam.mlang.StringLength.create({ arg1: self }), 7);
+                return e.NEQ(self, '');
               },
-              errorString: `${this.label} must be 7 or more chars`
-            }
-          );
-        } else {
-          ret.push(
-            {
-              args: [this.name],
-              predicateFactory: function(e) {
-                return e.OR(
-                        e.EQ(self, ''),
-                        e.GTE(foam.mlang.StringLength.create({ arg1: self }), 7)
-                );
-              },
-              errorString: `${this.label} must be 7 or more chars`
+              errorString: `${this.label} is required`
             }
           );
         }
