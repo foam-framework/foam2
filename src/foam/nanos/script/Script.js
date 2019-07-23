@@ -276,6 +276,7 @@ foam.CLASS({
     {
       name: 'run',
       tableWidth: 70,
+      confirmationRequired: true,
       code: function() {
         var self = this;
         this.output = '';
