@@ -133,24 +133,21 @@ foam.CLASS({
         foam.nanos.auth.User user = (foam.nanos.auth.User) x.get("user");
         if( user == null ) return false;
 
-        Long userId = user.getId();
-        String groupId = user.getGroup();
-
-        return getUserId() != userId && getGroupId() != groupId;
+        return getUserId() == user.getId();
       `
     },
     {
       name: 'authorizeOnCreate',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! auth.check(x, "*") ) throw new AuthorizationException("You don't have permission to create this notification.");
+      if ( ! auth.check(x, "notificationDAO.read.*") ) throw new AuthorizationException("You don't have permission to create this notification.");
       `
     },
     {
       name: 'authorizeOnUpdate',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! auth.check(x, "*") ) throw new AuthorizationException("You don't have permission to update notifications you do not own.");
+      if ( ! auth.check(x, "notificationDAO.update.*") ) throw new AuthorizationException("You don't have permission to update notifications you do not own.");
       `
     },
     {
@@ -164,7 +161,7 @@ foam.CLASS({
       name: 'authorizeOnRead',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, "*") ) throw new AuthorizationException("You don't have permission to read notifications you do not own.");
+      if ( ! checkOwnership(x) && ! auth.check(x, "notificationDAO.read.*") ) throw new AuthorizationException("You don't have permission to read notifications you do not own.");
       `
     }
   ]
