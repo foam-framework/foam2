@@ -10,8 +10,6 @@ import foam.dao.AbstractDAO;
 
 import foam.core.*;
 
-import foam.nanos.logger.Logger;
-
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.sql.*;
@@ -44,6 +42,12 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
 
   /** Holds a reference to the connection pool ( .getConnection() ) */
   protected static DataSource dataSource_;
+
+  /**
+   * Create the table in the database and return true if it doesn't already exist otherwise it does nothing and returns false
+   * @param of ClassInfo
+   */
+  public abstract boolean createTable(X x, ClassInfo of);
 
   public AbstractJDBCDAO(X x, ClassInfo of, String poolName) throws java.sql.SQLException, ClassNotFoundException {
     setX(x);
@@ -111,11 +115,31 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
     return obj;
   }
 
+  /**
+   * Sets the value of the PrepareStatement
+   * @param stmt statement to set values
+   * @param obj object to get values from
+   * @return the updated index
+   * @throws SQLException
+   */
+  public void setStatementValues(IndexedPreparedStatement stmt, FObject obj) throws SQLException {
+    Iterator i = properties_.iterator();
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+      prop.setStatementValue(stmt, obj);
+    }
+  }
 
   /**
-   * Create the table in the database and return true if it doesn't already exist otherwise it does nothing and returns false
-   * @param of ClassInfo
+   * Closes resources without throwing exceptions
+   * @param resultSet ResultSet
+   * @param stmt IndexedPreparedStatement
    */
-  public abstract boolean createTable(X x, ClassInfo of);
+  public void closeAllQuietly(ResultSet resultSet, IndexedPreparedStatement stmt) {
+    if ( resultSet != null )
+      try { resultSet.close(); } catch (Throwable ignored) {}
+    if ( stmt != null )
+      try { stmt.close(); } catch (Throwable ignored) {}
+  }
 
 }

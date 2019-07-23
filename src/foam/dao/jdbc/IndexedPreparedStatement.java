@@ -1,4 +1,4 @@
-package foam.dao.pg;
+package foam.dao.jdbc;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

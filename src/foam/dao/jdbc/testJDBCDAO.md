@@ -31,18 +31,22 @@ foam.CLASS({
 4- Add model declaration to foam's classes.js:
 
   'foam.dao.jdbc.TestDataForJDBC'
-
-5- Recompile and execute the following code:
+  
+5- To verify that the JDBCConnectionSpec service is installed correctly in the context, Recompile and execute the following code:
 
 jdbcSpec = x.get("JDBCConnectionSpec");
 print(jdbcSpec);
 
-jdbcDAO = new foam.dao.jdbc.JDBCDAO(x, foam.dao.jdbc.TestDataForJDBC.getOwnClassInfo(), "PoolA");
+6- To test the put() method:
+
+jdbcDAO = new foam.dao.jdbc.MySQLJDBCDAO(x, foam.dao.jdbc.TestDataForJDBC.getOwnClassInfo(), "PoolA");
 print(jdbcDAO);
-
 testObject = new foam.dao.jdbc.TestDataForJDBC(23,"Sam");
-
 jdbcDAO.put(testObject);
 
+7- To test the sellect() method:
 
-
+jdbcDAO = new foam.dao.jdbc.JDBCDAO(x, foam.dao.jdbc.TestDataForJDBC.getOwnClassInfo(), "PoolA");
+print(jdbcDAO);
+foam.dao.Sink sink = jdbcDAO.select();
+print(sink);

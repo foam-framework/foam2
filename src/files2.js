@@ -510,7 +510,7 @@ FOAM_FILES([
   { name: "foam/dao/history/PropertyUpdate" },
   { name: "foam/dao/history/HistoryRecord" },
   { name: "foam/mop/MOP" },
-  { name: "foam/dao/pg/ConnectionPool" },
+  { name: "foam/dao/jdbc/ConnectionPool" },
   { name: "foam/lib/Outputter" },
   { name: "foam/lib/json/OutputterMode" },
   { name: "foam/lib/json/ClassReferenceParserTest" },

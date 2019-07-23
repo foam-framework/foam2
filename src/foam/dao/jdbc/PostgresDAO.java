@@ -4,25 +4,30 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package foam.dao.pg;
+package foam.dao.jdbc;
 
 import foam.core.ClassInfo;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
-import foam.dao.AbstractDAO;
-import foam.dao.ArraySink;
+
 import foam.dao.Sink;
+
+import foam.dao.jdbc.ConnectionPool;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
+
+import foam.nanos.logger.Logger;
+
 import java.sql.*;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 // TODO: Create AbstractJDBCDAO baseclass
 public class PostgresDAO
-  extends AbstractDAO
+  extends AbstractJDBCDAO
 {
   protected ConnectionPool connectionPool = new ConnectionPool();
   protected ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
@@ -42,27 +47,8 @@ public class PostgresDAO
   protected String table_;
   protected List<PropertyInfo> props_ = new ArrayList<>();
 
-  public PostgresDAO(X x, ClassInfo of) throws SQLException {
-    setX(x);
-    setOf(of);
-
-    // fetch connection pool from context
-    connectionPool = (ConnectionPool) getX().get("connectionPool");
-
-    // load columns and sql types
-    List<PropertyInfo> props = of.getAxiomsByClass(PropertyInfo.class);
-    for ( PropertyInfo prop : props ) {
-      if ( prop.getStorageTransient() )
-        continue;
-      if ( "".equals(prop.getSQLType()) )
-        continue;
-      props_.add(prop);
-    }
-
-    table_ = of.getObjClass().getSimpleName().toLowerCase();
-    if ( ! createTable() ) {
-      //throw new SQLException("Error creating table");
-    }
+  public PostgresDAO(X x, ClassInfo of, String poolName) throws java.sql.SQLException, ClassNotFoundException {
+    super(x, of, poolName);
   }
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
@@ -110,10 +96,11 @@ public class PostgresDAO
 
       return sink;
     } catch (Throwable e) {
-      e.printStackTrace();
+      Logger logger = (Logger) x.get("logger");
+      logger.error(e);
       return null;
     } finally {
-      closeAllQuietly(resultSet, stmt, c);
+      closeAllQuietly(resultSet, stmt);
     }
   }
 
@@ -146,7 +133,7 @@ public class PostgresDAO
       e.printStackTrace();
       return null;
     } finally {
-      closeAllQuietly(null, stmt, c);
+      closeAllQuietly(null, stmt);
     }
   }
 
@@ -180,7 +167,7 @@ public class PostgresDAO
       e.printStackTrace();
       return null;
     } finally {
-      closeAllQuietly(resultSet, stmt, c);
+      closeAllQuietly(resultSet, stmt);
     }
   }
 
@@ -233,7 +220,7 @@ public class PostgresDAO
       e.printStackTrace();
       return null;
     } finally {
-      closeAllQuietly(resultSet, stmt, c);
+      closeAllQuietly(resultSet, stmt);
     }
   }
 
@@ -241,7 +228,8 @@ public class PostgresDAO
    * Creates a table if one does not exist already
    * @throws SQLException
    */
-  public boolean createTable() {
+  @Override
+  public boolean createTable(X x, ClassInfo of) {
     Connection c = null;
     IndexedPreparedStatement stmt = null;
     ResultSet resultSet = null;
@@ -285,41 +273,12 @@ public class PostgresDAO
       stmt.executeUpdate();
       return true;
     } catch (Throwable e) {
-      e.printStackTrace();
+      Logger logger = (Logger) x.get("logger");
+      logger.error(e);
       return false;
     } finally {
-      closeAllQuietly(resultSet, stmt, c);
+      closeAllQuietly(resultSet, stmt);
     }
-  }
-
-  /**
-   * maps a database result row to an FObject
-   *
-   * @param resultSet
-   * @return FObject
-   * @throws SQLException
-   */
-  private FObject createFObject(ResultSet resultSet) throws Exception {
-    if ( getOf() == null ) {
-      throw new Exception("`Of` is not set");
-    }
-
-    FObject obj = (FObject) getOf().getObjClass().newInstance();
-    ResultSetMetaData metaData = resultSet.getMetaData();
-
-    int index = 1;
-    Iterator i = props_.iterator();
-    while ( i.hasNext() ) {
-      // prevent reading out of bounds of result set
-      if ( index > metaData.getColumnCount() )
-        break;
-      // get the property and set the value
-      PropertyInfo prop = (PropertyInfo) i.next();
-      prop.setFromResultSet(resultSet, index++, obj);
-//      prop.set(obj, resultSet.getObject(index++));
-    }
-
-    return obj;
   }
 
   /**
@@ -364,33 +323,4 @@ public class PostgresDAO
     builder.append(")");
   }
 
-  /**
-   * Sets the value of the PrepareStatement
-   * @param stmt statement to set values
-   * @param obj object to get values from
-   * @return the updated index
-   * @throws SQLException
-   */
-  public void setStatementValues(IndexedPreparedStatement stmt, FObject obj) throws SQLException {
-    Iterator i = props_.iterator();
-    while ( i.hasNext() ) {
-      PropertyInfo prop = (PropertyInfo) i.next();
-      prop.setStatementValue(stmt, obj);
-    }
-  }
-
-  /**
-   * Closes resources without throwing exceptions
-   * @param resultSet ResultSet
-   * @param stmt IndexedPreparedStatement
-   * @param c Connection
-   */
-  public void closeAllQuietly(ResultSet resultSet, IndexedPreparedStatement stmt, Connection c) {
-    if ( resultSet != null )
-      try { resultSet.close(); } catch (Throwable ignored) {}
-    if ( stmt != null )
-      try { stmt.close(); } catch (Throwable ignored) {}
-    if ( c != null )
-      try { c.close(); } catch (Throwable ignored) {}
-  }
 }

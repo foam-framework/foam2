@@ -300,7 +300,7 @@ var classes = [
   'foam.u2.DisplayMode',
   'foam.u2.Visibility',
   'foam.nanos.export.ExportDriverRegistry',
-  'foam.dao.pg.ConnectionPool',
+  'foam.dao.jdbc.ConnectionPool',
   'foam.lib.Outputter',
   'foam.lib.PropertyPredicate',
   'foam.lib.PermissionedPropertyPredicate',

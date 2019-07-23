@@ -9,11 +9,10 @@ package foam.core;
 import foam.crypto.hash.Hasher;
 import foam.crypto.sign.Signer;
 import foam.dao.SQLStatement;
+import foam.dao.jdbc.IndexedPreparedStatement;
 import foam.lib.parse.Parser;
 import foam.mlang.Expr;
 import foam.mlang.order.Comparator;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import javax.xml.stream.XMLStreamReader;
 import java.util.Map;
@@ -58,7 +57,7 @@ public interface PropertyInfo
   public String getSQLType();
   public boolean isSet(Object obj);
   public boolean isDefaultValue(Object obj);
-  public void setStatementValue(foam.dao.pg.IndexedPreparedStatement stmt, FObject o) throws java.sql.SQLException;
+  public void setStatementValue(IndexedPreparedStatement stmt, FObject o) throws java.sql.SQLException;
   public void setFromResultSet(java.sql.ResultSet resultSet, int index, FObject o) throws java.sql.SQLException;
   public void cloneProperty(FObject source, FObject dest);
   public boolean containsPII();
