@@ -72,9 +72,6 @@ public class Boot {
 
         logger.info("Reload service:", sp.getName());
         factories_.get(sp.getName()).invalidate(sp);
-        if ( ! sp.getLazy() ) {
-          root_.get(sp.getName());
-        }
       }
     }, null);
 

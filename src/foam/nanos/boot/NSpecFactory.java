@@ -78,8 +78,12 @@ public class NSpecFactory
       || ! SafetyUtil.equals(spec.getServiceClass(), spec_.getServiceClass())
       || ! SafetyUtil.equals(spec.getServiceScript(), spec_.getServiceScript())
     ) {
-      spec_ = spec;
       ns_ = null;
+    }
+
+    spec_ = spec;
+    if ( ! spec_.getLazy() ) {
+      create(x_);
     }
   }
 }
