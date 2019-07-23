@@ -159,7 +159,9 @@ foam.CLASS({
           args: method.args
         }));
       }
+      cls.installAxioms(axioms);
 
+      axioms = [];
       for ( var i = 0 ; i < delegates.length ; i++ ) {
         var method = delegates[i];
         axioms.push(this.ProxiedMethod.create({
@@ -172,7 +174,9 @@ foam.CLASS({
           delegate: true
         }));
       }
+      cls.installAxioms(axioms);
 
+      axioms = [];
       if ( ! this.topics || this.topics.length ) {
         axioms.push(this.ProxySub.create({
           topics: this.topics,
