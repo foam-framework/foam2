@@ -10,10 +10,10 @@ foam.CLASS({
   extends: 'foam.nanos.notification.email.ProxyEmailService',
 
   javaImports: [
+    'foam.core.Agency',
     'foam.core.ContextAgent',
     'foam.core.X',
-    'foam.nanos.logger.Logger',
-    'foam.nanos.pool.ThreadPool'
+    'foam.nanos.logger.Logger'
   ],
 
   methods: [
@@ -21,7 +21,7 @@ foam.CLASS({
       name: 'sendEmail',
       javaCode:
       `
-        ( (ThreadPool) x.get("threadPool") ).submit(x, new ContextAgent() {
+        ( (Agency) x.get("threadPool") ).submit(x, new ContextAgent() {
           @Override
           public void execute(X x) {
             Logger logger = (Logger) x.get("logger");
@@ -32,7 +32,7 @@ foam.CLASS({
               logger.error("@AsyncEmailService: " + e);
             }
           }
-        });
+        }, "Async Email Service");
       `
     }
   ]
