@@ -1262,46 +1262,48 @@ foam.CLASS({
       if ( cls.model_.requires !== undefined ) {
         for ( var key in cls.model_.requires ) {
           var a = cls.model_.requires[key];
-          var requiresByName = this.Box.create({
-            x: x + d,
-            y: y + triangleSize * (key + 0),
-            width: w || this.widthRequiredBox,
-            height: h || 30,
-            color: '#ffffff', //this.UNSELECTED_COLOR
-            border: 'black'
-          });
+          if ( typeof a === 'object' ) {
+            var requiresByName = this.Box.create({
+              x: x + d,
+              y: y + triangleSize * (key + 0),
+              width: w || this.widthRequiredBox,
+              height: h || 30,
+              color: '#ffffff', //this.UNSELECTED_COLOR
+              border: 'black'
+            });
 
-          this.setData(requiresByName.x, requiresByName.y,  a.path);
+            this.setData(requiresByName.x, requiresByName.y,  a.path);
 
-          var requiresByNameLabel = foam.graphics.Label.create({
-            align: 'center',
-            x: x + d,
-            y: y + triangleSize * (key + 0) - marge,
-            color: 'black',
-            font: '20px Arial',
-            width: w || this.widthRequiredBox,
-            height: h || 30,
-            text: a.name
-          });
+            var requiresByNameLabel = foam.graphics.Label.create({
+              align: 'center',
+              x: x + d,
+              y: y + triangleSize * (key + 0) - marge,
+              color: 'black',
+              font: '20px Arial',
+              width: w || this.widthRequiredBox,
+              height: h || 30,
+              text: a.name
+            });
 
-          var requiresByLine = foam.graphics.Line.create({
-            startX: x + this.widthCenterModel-( this.widthCenterModel - requiresByName.width ) / 2 || 0,
-            startY: y + requiresByName.height / 2 || 0,
-            endX: x + d || 0,
-            endY: y + triangleSize * (key + 0) + requiresByName.height / 2 || 0,
-            color: 'black',
-            lineWidth: 2
-          });
+            var requiresByLine = foam.graphics.Line.create({
+              startX: x + this.widthCenterModel-( this.widthCenterModel - requiresByName.width ) / 2 || 0,
+              startY: y + requiresByName.height / 2 || 0,
+              endX: x + d || 0,
+              endY: y + triangleSize * (key + 0) + requiresByName.height / 2 || 0,
+              color: 'black',
+              lineWidth: 2
+            });
 
-          var requiresByConnectorCircle = foam.graphics.Circle.create({
-            x: x + d,
-            y: y + triangleSize * (key + 0) + requiresByName.height / 2,
-            radius: marge,
-            border: 'black',
-            color: 'white'
-          });
-          this.selected = this.canvas.addChildren(requiresByLine, requiresByConnectorCircle, requiresByName, requiresByNameLabel);
-          this.lastRelatedToY = this.lastRequiredByY = requiresByName.y + ( h || 30 );
+            var requiresByConnectorCircle = foam.graphics.Circle.create({
+              x: x + d,
+              y: y + triangleSize * (key + 0) + requiresByName.height / 2,
+              radius: marge,
+              border: 'black',
+              color: 'white'
+            });
+            this.selected = this.canvas.addChildren(requiresByLine, requiresByConnectorCircle, requiresByName, requiresByNameLabel);
+            this.lastRelatedToY = this.lastRequiredByY = requiresByName.y + ( h || 30 );
+          }
         }
       }
     },
@@ -1323,45 +1325,47 @@ foam.CLASS({
 
         for ( var key in req ) {
           var a = req[key];
-          var requiresName = this.Box.create({
-            x: x - d,
-            y: y + triangleSize * (key + 0),
-            width: w || this.widthRequiredBox,
-            height: h || 30,
-            color: '#ffffff', //this.UNSELECTED_COLOR
-            border: 'black'
-          });
+          if ( typeof a === 'object' ) {
+            var requiresName = this.Box.create({
+              x: x - d,
+              y: y + triangleSize * (key + 0),
+              width: w || this.widthRequiredBox,
+              height: h || 30,
+              color: '#ffffff', //this.UNSELECTED_COLOR
+              border: 'black'
+            });
 
-          this.setData( requiresName.x, requiresName.y, a.id );
+            this.setData( requiresName.x, requiresName.y, a.id );
 
-          var requiresNameLabel = foam.graphics.Label.create({
-            align: 'center',
-            x: x - d,
-            y: y + triangleSize * (key + 0) - marge,
-            color: 'black',
-            font: '20px Arial',
-            width: w || this.widthRequiredBox,
-            height: h || 30,
-            text: a.name
-          });
+            var requiresNameLabel = foam.graphics.Label.create({
+              align: 'center',
+              x: x - d,
+              y: y + triangleSize * (key + 0) - marge,
+              color: 'black',
+              font: '20px Arial',
+              width: w || this.widthRequiredBox,
+              height: h || 30,
+              text: a.name
+            });
 
-          var requiresLine = foam.graphics.Line.create({
-            startX: + x - ( this.widthCenterModel - requiresName.width ) / 2  ,
-            startY: y + requiresName.height / 2 || 0,
-            endX: x - d + requiresName.width + marge || 0,
-            endY: y + triangleSize * (key + 0) + requiresName.height / 2 || 0,
-            color: 'black',
-            lineWidth: 2
-          });
-          var requiresConnector = foam.graphics.Circle.create({
-            x: x - d + requiresName.width,
-            y: y + triangleSize * (key + 0) + requiresName.height / 2,
-            radius: marge,
-            border: 'black',
-            color: 'white'
-          });
-          this.selected = this.canvas.addChildren( requiresName, requiresNameLabel, requiresLine, requiresConnector );
+            var requiresLine = foam.graphics.Line.create({
+              startX: + x - ( this.widthCenterModel - requiresName.width ) / 2  ,
+              startY: y + requiresName.height / 2 || 0,
+              endX: x - d + requiresName.width + marge || 0,
+              endY: y + triangleSize * (key + 0) + requiresName.height / 2 || 0,
+              color: 'black',
+              lineWidth: 2
+            });
+            var requiresConnector = foam.graphics.Circle.create({
+              x: x - d + requiresName.width,
+              y: y + triangleSize * (key + 0) + requiresName.height / 2,
+              radius: marge,
+              border: 'black',
+              color: 'white'
+            });
+            this.selected = this.canvas.addChildren( requiresName, requiresNameLabel, requiresLine, requiresConnector );
           this.lastRelatedFromY = this.lastRequireY = requiresName.y + ( h || 30 );
+          }
         }
       }
     },
@@ -1505,7 +1509,7 @@ foam.CLASS({
       if ( cls.getAxioms( foam.dao.Relationship ) !== undefined ) {
         for ( var key in cls.getAxiomsByClass( foam.dao.Relationship ) ) {
           var a = cls.getAxiomsByClass( foam.dao.Relationship )[ key ];
-          if ( a.targetModel === cls.id ) {
+          if ( a && a.targetModel === cls.id ) {
             if ( a.targetModel === a.sourceModel ) {
               recursiveM = a;
             } else {
@@ -1539,7 +1543,7 @@ foam.CLASS({
             this.selected = this.canvas.addChildren( relatedtoline, arrowRelatedto );
           }
         }
-        if ( targetM !== undefined ) {
+        if ( targetM.length != 0 ) { //targetM !== undefined
           for ( var key in targetM ) {//cls.getAxiomsByClass( foam.dao.Relationship )
             a = targetM[key];
             var relatedtoName = this.Box.create( {
@@ -1620,8 +1624,8 @@ foam.CLASS({
 
       if ( cls.getAxioms( foam.dao.Relationship ) !== undefined ) {
         for ( var key in cls.getAxiomsByClass( foam.dao.Relationship ) ) {
-          var a = cls.getAxiomsByClass( foam.dao.Relationship )[ key ];
-          if ( a.sourceModel === cls.id ) {
+          var a = cls.getAxiomsByClass( foam.dao.Relationship )[ key ]();
+          if ( a && a.sourceModel === cls.id ) {
             if ( a.targetModel === a.sourceModel ) {
               recursiveM = a;
             } else {
@@ -1655,7 +1659,7 @@ foam.CLASS({
           }
         }
 
-        if ( targetM !== undefined ) {
+        if ( targetM.length != 0 ) { //targetM !== undefined
           for ( var key in targetM ) {
             a = targetM[key];
             axeY = axeY + marge;
