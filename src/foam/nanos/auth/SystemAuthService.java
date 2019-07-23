@@ -11,6 +11,10 @@ import foam.nanos.auth.User;
 public class SystemAuthService
   extends ProxyAuthService
 {
+
+  // Auth service decorator put at beginning of chain to always return true for system user
+  // Prevent stackoverflows caused by auth checks done during build
+
   public SystemAuthService(AuthService delegate) {
     setDelegate(delegate);
   }
@@ -18,6 +22,6 @@ public class SystemAuthService
   @Override
   public boolean check(foam.core.X x, String permission) {
     User user = (User) x.get("user");
-    return ( user != null && user.getId() == 1 ) ? true :  getDelegate().check(x, permission);
+    return ( user != null && user.getId() == 1 ) || getDelegate().check(x, permission);
   }
 }

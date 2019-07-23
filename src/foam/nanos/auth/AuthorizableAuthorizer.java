@@ -11,14 +11,14 @@ import foam.core.X;
 
 public class AuthorizableAuthorizer implements Authorizer {
 
-  private String name;
+  protected String permissionPrefix_;
 
-  public AuthorizableAuthorizer(String name) {  
-    this.name = name;
+  public AuthorizableAuthorizer(String permissionPrefix) {  
+    permissionPrefix_ = permissionPrefix;
   }
 
   public String getPermissionPrefix() {
-    return this.name;
+    return permissionPrefix_;
   }
 
   public void authorizeOnCreate(X x, FObject obj) throws AuthorizationException {
@@ -46,7 +46,7 @@ public class AuthorizableAuthorizer implements Authorizer {
   }
 
   public String createPermission(String op) {
-    return name + "." + op;
+    return permissionPrefix_ + "." + op;
   }
 
   public boolean checkGlobalRead(X x) {

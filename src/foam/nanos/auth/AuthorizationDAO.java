@@ -16,7 +16,8 @@ import foam.nanos.auth.AuthorizationException;
 import foam.nanos.auth.User;
 
 import static foam.mlang.MLang.AND;
-import static foam.mlang.MLang.HAS_PERMISSION;
+import static foam.mlang.MLang.HAS_READ_PERMISSION;
+import static foam.mlang.MLang.HAS_REMOVE_PERMISSION;
 
 /**
  * A DAO decorator to run authorization checks.
@@ -62,18 +63,19 @@ public class AuthorizationDAO extends ProxyDAO {
   @Override
   public FObject remove_(X x, FObject obj) {
     Object id = obj.getProperty("id");
-    FObject oldObj = getDelegate().inX(x).find(id);	
-    if ( id == null || oldObj == null ) return null;	
+    FObject oldObj = getDelegate().inX(x).find(id);
+    if ( id == null || oldObj == null ) return null;
     authorizer_.authorizeOnDelete(x, oldObj);
     return super.remove_(x, obj);
   }
 
   @Override
   public FObject find_(X x, Object id) {
+    if ( id == null ) return null;
     if ( ! authorizeRead_ ) return super.find_(x, id);
 
     FObject obj = super.find_(x, id);
-    if ( id == null || obj == null ) return null;
+    if ( obj == null ) return null;
     authorizer_.authorizeOnRead(x, obj);
     return obj;
   }
@@ -92,11 +94,12 @@ public class AuthorizationDAO extends ProxyDAO {
   }
 
   public Predicate augmentPredicate(X x, boolean remove, Predicate existingPredicate) {
+    Predicate newPredicate = remove ? HAS_REMOVE_PERMISSION(x, authorizer_) : HAS_READ_PERMISSION(x, authorizer_);
     return existingPredicate != null ?
       AND(
-        HAS_PERMISSION(x, remove, authorizer_),
+        newPredicate,
         existingPredicate
       ) :
-      HAS_PERMISSION(x, remove, authorizer_);
+      newPredicate;
   }
 }

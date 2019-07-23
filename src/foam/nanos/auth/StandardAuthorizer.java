@@ -13,22 +13,25 @@ import foam.nanos.auth.AuthorizationException;
 
 public class StandardAuthorizer implements Authorizer {
 
-  private String name;
+  // Standard authorizer to be used for authorization on object not implementing the authorizable interface
+  // Performs authorization by checking permission generated from permissionPrefix passed in
 
-  public StandardAuthorizer(String name) {
-    this.name = name;
+  protected String permissionPrefix_;
+
+  public StandardAuthorizer(String permissionPrefix) {
+    permissionPrefix_ = permissionPrefix;
   }
 
   public String createPermission(String op) {
-    return name + "." + op;
+    return permissionPrefix_ + "." + op;
   }
 
   public String createPermission(String op, Object id) {
-    return name + "." + op + "." + id;
+    return permissionPrefix_ + "." + op + "." + id;
   }
 
   public String getPermissionPrefix() {
-    return this.name;
+    return permissionPrefix_;
   }
 
   public void authorizeOnCreate(X x, FObject obj) throws AuthorizationException {

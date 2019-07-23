@@ -197,14 +197,20 @@ public class MLang
 
   // used by AuthenticatedDAO
   public static Predicate HAS_PERMISSION(X userContext, Boolean remove, String permissionPrefix) {
-    return HAS_PERMISSION(userContext, remove, new foam.nanos.auth.StandardAuthorizer(permissionPrefix));
+    return remove? HAS_REMOVE_PERMISSION(userContext, new foam.nanos.auth.StandardAuthorizer(permissionPrefix))
+      : HAS_READ_PERMISSION(userContext, new foam.nanos.auth.StandardAuthorizer(permissionPrefix));
   }
 
   // used by AuthorizationDAO
-  public static Predicate HAS_PERMISSION(X userContext, Boolean remove, Authorizer authorizer) {
-    return new HasPermission.Builder(null)
+  public static Predicate HAS_READ_PERMISSION(X userContext, Authorizer authorizer) {
+    return new HasReadPermission.Builder(null)
       .setUserContext(userContext)
-      .setRemove(remove)
+      .setAuthorizer(authorizer)
+      .build();
+  }
+  public static Predicate HAS_REMOVE_PERMISSION(X userContext, Authorizer authorizer) {
+    return new HasRemovePermission.Builder(null)
+      .setUserContext(userContext)
       .setAuthorizer(authorizer)
       .build();
   }
