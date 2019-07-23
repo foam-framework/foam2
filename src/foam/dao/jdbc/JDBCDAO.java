@@ -9,7 +9,6 @@ package foam.dao.jdbc;
 import foam.core.*;
 
 import foam.dao.pg.IndexedPreparedStatement;
-import foam.dao.AbstractDAO;
 import foam.dao.Sink;
 
 import foam.nanos.logger.Logger;
@@ -31,49 +30,10 @@ import java.util.*;
   Any other database objects (tables) will be created on the fly by the application (when methods of this class are called).
 
  */
-public class JDBCDAO extends AbstractDAO{
-
-
-  /** Holds the relevant properties (column names) of the table */
-  protected List<PropertyInfo> properties_;
-
-  private ThreadLocal<StringBuilder> threadLocalBuilder_ = new ThreadLocal<StringBuilder>(){
-
-    @Override
-    protected StringBuilder initialValue() {
-      return new StringBuilder();
-    }
-
-    @Override
-    public StringBuilder get() {
-      StringBuilder builder = super.get();
-      builder.setLength(0);
-      return builder;
-    }
-
-  };
-
-  protected String tableName_;
-
-  /** Holds a reference to the connection pool ( .getConnection() ) */
-  protected static DataSource dataSource_;
+public class JDBCDAO extends AbstractJDBCDAO{
 
   public JDBCDAO(X x, ClassInfo of, String poolName) throws java.sql.SQLException, ClassNotFoundException {
-    setX(x);
-    setOf(of);
-
-    // Get the system global dataSource with its system global pool
-    JDBCPooledDataSource jp = new JDBCPooledDataSource(x, poolName);
-    dataSource_ = jp.getDataSource(x, poolName);
-
-    tableName_ = of.getObjClass().getSimpleName().toLowerCase();
-
-    getObjectProperties(of);
-
-    if ( ! createTable(x, of) ) {
-      // Table already created (may happen after a system restart).
-    }
-
+    super(x, of, poolName);
   }
 
   @Override
@@ -271,58 +231,13 @@ public class JDBCDAO extends AbstractDAO{
     }
   }
 
-  /**
-   * Creates an FObject with the appropriate meta-properties.
-   * @param resultSet
-   * @return
-   * @throws Exception
-   */
-  private FObject createFObject(ResultSet resultSet) throws Exception {
-    if ( getOf() == null ) {
-      throw new Exception("`Of` is not set");
-    }
 
-    FObject obj = (FObject) getOf().getObjClass().newInstance();
-    ResultSetMetaData metaData = resultSet.getMetaData();
-
-    int index = 1;
-    Iterator i = properties_.iterator();
-    while ( i.hasNext() ) {
-      // prevent reading out of bounds of result set
-      if ( index > metaData.getColumnCount() )
-        break;
-      // get the property and set the value
-      PropertyInfo prop = (PropertyInfo) i.next();
-      prop.setFromResultSet(resultSet, index++, obj);
-//      prop.set(obj, resultSet.getObject(index++));
-    }
-
-    return obj;
-  }
-
-  /**
-   * Returns list of properties of a metaclass
-   * @param of ClassInfo
-   */
-  protected void getObjectProperties(ClassInfo of){
-
-    if(properties_ == null) {
-      List<PropertyInfo> allProperties = of.getAxiomsByClass(PropertyInfo.class);
-      properties_ = new ArrayList<PropertyInfo>();
-      for (PropertyInfo prop : allProperties) {
-        if (prop.getStorageTransient())
-          continue;
-        if ("".equals(prop.getSQLType()))
-          continue;
-        properties_.add(prop);
-      }
-    }
-  }
 
   /**
    * Create the table in the database and return true if it doesn't already exist otherwise it does nothing and returns false
    * @param of ClassInfo
    */
+  @Override
   public boolean createTable(X x, ClassInfo of) {
     Connection c = null;
     IndexedPreparedStatement stmt = null;
