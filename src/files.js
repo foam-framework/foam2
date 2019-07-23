@@ -600,6 +600,7 @@ FOAM_FILES([
   { name: "foam/flow/DocumentationFolderDAO" },
 
   { name: "org/chartjs/Lib" },
+  { name: "org/chartjs/ChartCView" },
   { name: "org/chartjs/AbstractChartCView" },
   { name: "org/chartjs/AbstractChartView" },
   { name: "org/chartjs/HorizontalBarDAOChartView" },
