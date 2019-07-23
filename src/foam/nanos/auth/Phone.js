@@ -13,7 +13,7 @@ foam.CLASS({
     {
       class: 'PhoneNumber',
       name: 'number',
-      label: '',
+      label: 'Phone #',
       validationPredicates: [
         {
           args: ['number'],
