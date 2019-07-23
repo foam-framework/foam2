@@ -203,5 +203,5 @@ FOAM_FILES([
   { name: "foam/nanos/analytics/Foldable" },
   { name: "foam/nanos/analytics/Candlestick" },
   { name: "foam/nanos/test/ClientEchoService" },
-  { name: "foam/dao/JDBCConnectionSpec" }
+  { name: "foam/dao/jdbc/JDBCConnectionSpec" }
 ]);

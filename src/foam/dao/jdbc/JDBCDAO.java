@@ -1,15 +1,20 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package foam.dao;
+package foam.dao.jdbc;
 
 import foam.core.*;
-import foam.dao.pg.IndexedPreparedStatement;
-import foam.mlang.order.Comparator;
 
+import foam.dao.pg.IndexedPreparedStatement;
+import foam.dao.AbstractDAO;
+import foam.dao.Sink;
+
+import foam.nanos.logger.Logger;
+
+import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
 import javax.sql.DataSource;
@@ -19,17 +24,17 @@ import java.sql.*;
 import java.sql.SQLException;
 import java.util.*;
 
-/*
+/**
   We assume that the database is created by a script when the system starts the first time.
   When the system restarts at any point in time it should verify that the database is already created otherwise it should create it.
   When creating the database, we only do a CREATE SCHEMA sql instruction, then we create the app user and password and grant him full privileges on this database.
   Any other database objects (tables) will be created on the fly by the application (when methods of this class are called).
 
  */
-public class JdbcDAO extends AbstractDAO{
+public class JDBCDAO extends AbstractDAO{
 
 
-  // Holds the relevant properties (column names) of the table
+  /** Holds the relevant properties (column names) of the table */
   protected List<PropertyInfo> properties_;
 
   private ThreadLocal<StringBuilder> threadLocalBuilder_ = new ThreadLocal<StringBuilder>(){
@@ -50,21 +55,22 @@ public class JdbcDAO extends AbstractDAO{
 
   protected String tableName_;
 
-  // Holds a reference to the connection pool ( .getConnection() )
+  /** Holds a reference to the connection pool ( .getConnection() ) */
   protected static DataSource dataSource_;
 
-  public JdbcDAO(X x, ClassInfo of) throws java.sql.SQLException, ClassNotFoundException {
+  public JDBCDAO(X x, ClassInfo of, String poolName) throws java.sql.SQLException, ClassNotFoundException {
     setX(x);
     setOf(of);
 
     // Get the system global dataSource with its system global pool
-    dataSource_ = JDBCPooledDataSource.getDataSource(x);
+    JDBCPooledDataSource jp = new JDBCPooledDataSource(x, poolName);
+    dataSource_ = jp.getDataSource(x, poolName);
 
     tableName_ = of.getObjClass().getSimpleName().toLowerCase();
 
     getObjectProperties(of);
 
-    if ( ! createTable(of) ) {
+    if ( ! createTable(x, of) ) {
       // Table already created (may happen after a system restart).
     }
 
@@ -108,7 +114,8 @@ public class JdbcDAO extends AbstractDAO{
 
       return obj;
     } catch (Throwable e) {
-      e.printStackTrace();
+      Logger logger = (Logger) x.get("logger");
+      logger.error(e);
       return null;
     } finally {
       closeAllQuietly(resultSet, stmt);
@@ -256,7 +263,8 @@ public class JdbcDAO extends AbstractDAO{
 
       return sink;
     } catch (Throwable e) {
-      e.printStackTrace();
+      Logger logger = (Logger) x.get("logger");
+      logger.error(e);
       return null;
     } finally {
       closeAllQuietly(resultSet, stmt);
@@ -296,7 +304,7 @@ public class JdbcDAO extends AbstractDAO{
    * Returns list of properties of a metaclass
    * @param of ClassInfo
    */
-  private void getObjectProperties(ClassInfo of){
+  protected void getObjectProperties(ClassInfo of){
 
     if(properties_ == null) {
       List<PropertyInfo> allProperties = of.getAxiomsByClass(PropertyInfo.class);
@@ -315,7 +323,7 @@ public class JdbcDAO extends AbstractDAO{
    * Create the table in the database and return true if it doesn't already exist otherwise it does nothing and returns false
    * @param of ClassInfo
    */
-  public boolean createTable(ClassInfo of) {
+  public boolean createTable(X x, ClassInfo of) {
     Connection c = null;
     IndexedPreparedStatement stmt = null;
     ResultSet resultSet = null;
@@ -361,7 +369,8 @@ public class JdbcDAO extends AbstractDAO{
       stmt.executeUpdate();
       return true;
     } catch (Throwable e) {
-      e.printStackTrace();
+      Logger logger = (Logger) x.get("logger");
+      logger.error(e);
       return false;
     } finally {
       closeAllQuietly(resultSet, stmt);

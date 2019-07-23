@@ -1,13 +1,13 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-/* A JDBC Connection Specification to add to the system context */
 foam.CLASS({
-  package: 'foam.dao',
+  package: 'foam.dao.jdbc',
   name: 'JDBCConnectionSpec',
+  documentation: 'A JDBC Connection Specification to add to the system context.',
   constants: [
     {
       class: 'String',
@@ -26,7 +26,7 @@ foam.CLASS({
       name: 'userName'
     },
     {
-      class: 'String',
+      class: 'Password',
       name: 'userPassword'
     }
   ]

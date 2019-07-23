@@ -424,7 +424,8 @@ var classes = [
   'foam.nanos.theme.Theme',
 
   //SQL JBDC Support
-  'foam.dao.JDBCConnectionSpec'
+  'foam.dao.jdbc.JDBCConnectionSpec',
+  'foam.dao.jdbc.TestDataForJDBC'
 ];
 
 var abstractClasses = [
