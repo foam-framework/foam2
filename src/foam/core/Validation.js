@@ -342,21 +342,39 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'minLength',
-      value: 6
-    },
-    {
       class: 'FObjectArray',
       of: 'foam.core.ValidationPredicate',
       name: 'validationPredicates',
       factory: function() {
+        var self = this;
+        var ret = [];
         if ( this.required ) {
-          var superFactory = foam.core.String.VALIDATION_PREDICATES.factory;
-          return superFactory.call(this);
+          ret.push(
+            {
+              args: [this.name],
+              predicateFactory: function(e) {
+                return e.GTE(foam.mlang.StringLength.create({ arg1: self }), 7);
+              },
+              errorString: `${this.label} must be 7 or more chars`
+            }
+          );
+        } else {
+          ret.push(
+            {
+              args: [this.name],
+              predicateFactory: function(e) {
+                return e.OR(
+                        e.EQ(self, ''),
+                        e.GTE(foam.mlang.StringLength.create({ arg1: self }), 7)
+                );
+              },
+              errorString: `${this.label} must be 7 or more chars`
+            }
+          );
         }
-        return [];
+        
+        return ret;
       }
     }
   ]
-
 });
