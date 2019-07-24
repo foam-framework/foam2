@@ -9,7 +9,8 @@ foam.CLASS({
   name: 'SMTPEmailService',
 
   implements: [
-    'foam.nanos.notification.email.EmailService'
+    'foam.core.ContextAgent',
+    'foam.nanos.notification.email.EmailService',
   ],
 
   documentation: 'Implementation of Email Service using SMTP',
@@ -25,17 +26,20 @@ foam.CLASS({
     'java.nio.charset.StandardCharsets',
     'java.util.Date',
     'java.util.Properties',
+    'java.util.List',
     'javax.mail.*',
     'javax.mail.internet.InternetAddress',
     'javax.mail.internet.MimeMessage',
     'org.apache.commons.lang3.StringUtils',
     'org.jtwig.JtwigTemplate',
     'org.jtwig.resource.loader.TypedResourceLoader',
+    'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Group',
     'foam.nanos.logger.Logger',
-    'foam.nanos.om.OMLogger'
+    'foam.nanos.om.OMLogger',
+    'static foam.mlang.MLang.EQ'
   ],
 
   axioms: [
@@ -80,6 +84,24 @@ foam.CLASS({
           return Session.getInstance(props, new SMTPAuthenticator(getUsername(), getPassword()));
         }
         return Session.getInstance(props);
+      `
+    },
+    {
+      class: 'Object',
+      javaType: 'Transport',
+      name: 'transport_',
+      javaFactory:
+      `
+        Logger logger = (Logger) getX().get("logger");
+        Transport transport = null;
+        try {
+          transport = getSession_().getTransport("smtp");
+          transport.connect(getUsername(), getPassword());
+          logger.info("SMTPEmailService connected.");
+        } catch ( Exception e ) {
+          logger.error("Transport failed to initialize: " + e);
+        }
+        return transport;
       `
     },
     {
@@ -190,25 +212,42 @@ foam.CLASS({
     },
     {
       name: 'sendEmail',
-      javaCode:
-      `
-      OMLogger omLogger = (OMLogger) x.get("OMLogger");
-      Logger logger = (Logger) getX().get("logger");
+      javaCode: `
+        emailMessage = (EmailMessage) emailMessage.fclone();
+        MimeMessage message = createMimeMessage(emailMessage);
+        Logger logger = (Logger) getX().get("logger");
         try {
-          omLogger.log("Pre send email request");
-          MimeMessage message = createMimeMessage(emailMessage);
-          Transport transport = getSession_().getTransport("smtp");
-          transport.connect();
-          logger.info("SMTPEmailService connected.");
-          transport.send(message, getUsername(), getPassword());
-          logger.info("SMTPEmailService sent MimeMessage.");
-          transport.close();
-          logger.info("SMTPEmailService finish.");
-          omLogger.log("Post send email request");
-        } catch (Exception e) {
-          logger.error("SMTPEmailService failed to finish. " + e);
+          getTransport_().send(message);
+          emailMessage.setStatus(Status.SENT);
+          logger.debug("SMTPEmailService sent MimeMessage.");
+        } catch ( SendFailedException e ) {
+          emailMessage.setStatus(Status.FAILED);
+          logger.error("SMTPEmailService sending MimeMessage failed. " + e);
+        } catch ( MessagingException e ) {
+          try {
+            getTransport_().close();
+          } catch ( Exception e2 ) {
+            logger.error("Failed to close transport. " + e2);
+          }
+          clearTransport_();
+          logger.error("SMTPEmailService sending MimeMessage failed. " + e);
         }
-        
+        return emailMessage;
+      `
+    },
+    {
+      name: 'execute',
+      javaCode: `
+        // TODO: This should be a cron job.
+        DAO emailMessageDAO = (DAO) x.get("emailMessageDAO");
+        List<EmailMessage> emailMessages = ((foam.dao.ArraySink)
+          emailMessageDAO
+            .where(EQ(EmailMessage.STATUS, Status.UNSENT))
+            .select(new ArraySink()))
+            .getArray();
+        for ( EmailMessage emailMessage : emailMessages ) {
+          emailMessageDAO.put(sendEmail(x, emailMessage));
+        }
       `
     }
   ]

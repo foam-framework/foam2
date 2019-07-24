@@ -82,6 +82,11 @@ foam.CLASS({
       hidden: true,
       documentation: 'Added to suppress journal comments regarding "modified by". Also, a non-null value is required.',
       javaFactory: 'return 1L;'
-    }
+    },
+    {
+      class: 'Enum',
+      of: 'foam.nanos.notification.email.Status',
+      name: 'status'
+    },
   ]
 });
