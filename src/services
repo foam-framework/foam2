@@ -29,7 +29,24 @@ p({"class":"foam.nanos.boot.NSpec", "name":"scriptDAO",                         
 p({"class":"foam.nanos.boot.NSpec", "name":"cronDAO",                          "lazy":true,  "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setGuid(true).setOf(foam.nanos.cron.Cron.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"cronjobs\").setDecorator(new foam.nanos.script.ScriptRunnerDAO(null)).build();","client":"{\"of\":\"foam.nanos.cron.Cron\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"cronScheduler",                    "lazy":false, "serve":false, "serviceClass":"foam.nanos.cron.CronScheduler" })
 p({"class":"foam.nanos.boot.NSpec", "name":"localUserDAO",                     "lazy":true,  "serve":false, "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.SequenceNumberDAO (1000, new foam.nanos.auth.PreventDuplicateEmailDAO.Builder(x).setDelegate(new foam.dao.java.JDAO(x, foam.nanos.auth.User.getOwnClassInfo(), \"users\")).build()));"})
-p({"class":"foam.nanos.boot.NSpec", "name":"userDAO",                          "lazy":true,  "serve":true,  "authenticate": false, "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.ValidatingDAO(x, new foam.nanos.auth.AuthorizationDAO(x, new foam.nanos.auth.UserPasswordHashingDAO(x, x.get(\"localUserDAO\"))), new foam.nanos.auth.validators.UserGroupAndSpidValidator()));","client":"{\"of\":\"foam.nanos.auth.User\",\"cache\":false,\"decorators\": [{\"class\":\"foam.nanos.fs.FileDAODecorator\"}]}"})
+p({
+  "class":"foam.nanos.boot.NSpec", "name":"userDAO",                          "lazy":true,  "serve":true,  "authenticate": false, 
+  "serviceScript":"""
+    innerdao = new foam.dao.ValidatingDAO(x, new foam.nanos.auth.AuthorizationDAO(x, new foam.nanos.auth.UserPasswordHashingDAO(x, x.get(\"localUserDAO\"));
+    ed = new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setAuthenticate(false)
+      .setAuthorize(true)
+      .setSeqNo(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName(\"users\")
+      .setOf(foam.nanos.auth.User.getOwnClassInfo())
+      .setInnerDAO(innerdao).build();
+
+    return new foam.dao.PMDAO(x, new foam.dao.ValidatingDAO(x, new foam.nanos.auth.AuthorizationDAO(x, new foam.nanos.auth.UserPasswordHashingDAO(x, x.get(\"localUserDAO\"))), new foam.nanos.auth.validators.UserGroupAndSpidValidator()));
+  """,
+  "client":"{\"of\":\"foam.nanos.auth.User\",\"cache\":false,\"decorators\": [{\"class\":\"foam.nanos.fs.FileDAODecorator\"}]}"
+})
 p({"class":"foam.nanos.boot.NSpec", "name":"localGroupDAO",                    "lazy":true,  "serve":false, "serviceScript":"return new foam.dao.PMDAO.Builder(x).setPmFind(false).setDelegate(new foam.dao.java.JDAO(x, foam.nanos.auth.Group.getOwnClassInfo(), \"groups\")).build();","client":"{\"of\":\"foam.nanos.auth.Group\"}" })
 p({"class":"foam.nanos.boot.NSpec", "name":"groupDAO",                         "lazy":true,  "serve":true,  "serviceScript":"return new foam.dao.PMDAO.Builder(x).setPmFind(false).setDelegate(new foam.nanos.auth.AuthorizationDAO(x, x.get(\"localGroupDAO\"))).build();","client":"{\"of\":\"foam.nanos.auth.Group\"}" })
 
