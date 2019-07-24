@@ -425,7 +425,9 @@ var classes = [
 
   //SQL JBDC Support
   'foam.dao.jdbc.JDBCConnectionSpec',
-  'foam.dao.jdbc.TestDataForJDBC'
+  'foam.dao.jdbc.TestDataForJDBC',
+  'foam.dao.jdbc.TestCompany',
+  'foam.dao.jdbc.TestEmployee'
 ];
 
 var abstractClasses = [

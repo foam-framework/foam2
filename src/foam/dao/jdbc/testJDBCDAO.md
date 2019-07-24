@@ -60,3 +60,27 @@ obj = jdbcDAO.find_(x, "34");
 print(obj);
 
 jdbcDAO.remove(obj);
+
+
+Another example using foreign keys:
+
+
+jdbcSpec = x.get("JDBCConnectionSpec");
+print(jdbcSpec);
+
+companyJDBCDAO = new foam.dao.jdbc.MySQLJDBCDAO(x, foam.dao.jdbc.TestCompany.getOwnClassInfo(), "PoolA");
+employeeJDBCDAO = new foam.dao.jdbc.MySQLJDBCDAO(x, foam.dao.jdbc.TestEmployee.getOwnClassInfo(), "PoolA");
+
+company1 = new foam.dao.jdbc.TestCompany(3,"KarlToro");
+company2 = new foam.dao.jdbc.TestCompany(4,"LocaRola");
+
+companyJDBCDAO.put(company1);
+companyJDBCDAO.put(company2);
+
+employee1 = new foam.dao.jdbc.TestEmployee(2,"John", "Smith", 3);
+employee2 = new foam.dao.jdbc.TestEmployee(3,"Samuel", "Lee", 4);
+employee3 = new foam.dao.jdbc.TestEmployee(6,"Hamlet", "Picard", 3);
+
+employeeJDBCDAO.put(employee1);
+employeeJDBCDAO.put(employee2);
+employeeJDBCDAO.put(employee3);

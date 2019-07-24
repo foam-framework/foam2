@@ -651,6 +651,7 @@ foam.CLASS({
         final: this.final,
         synchronized: this.synchronized,
         throws: this.javaThrows,
+        documentation: this.documentation,
         args: this.args && this.args.map(function(a) {
           return {
             name: a.name,
@@ -680,6 +681,7 @@ foam.CLASS({
       cls.constant({
         name: this.name,
         type: 'String',
+        documentation: this.documentation,
         value: foam.java.asJavaValue(this.message)
       });
     }
@@ -744,6 +746,7 @@ foam.CLASS({
         visibility: 'public',
         name: this.name,
         type: 'void',
+        documentation: this.documentation,
         body: this.javaCode
       });
     }
@@ -870,6 +873,7 @@ foam.CLASS({
 
           cls.name = this.model_.name;
           cls.package = this.model_.package;
+          cls.documentation = this.model_.documentation;
           cls.implements = (this.implements || [])
             .concat(this.model_.javaExtends || []);
 

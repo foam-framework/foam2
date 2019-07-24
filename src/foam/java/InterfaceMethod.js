@@ -28,6 +28,10 @@ foam.CLASS({
       class: 'String',
       name: 'visibility'
     },
+    {
+      class: 'String',
+      name: 'documentation'
+    },
     'type',
     {
       class: 'FObjectArray',
@@ -71,6 +75,7 @@ foam.CLASS({
   methods: [
     function outputJava(o) {
       o.indent();
+      o.out(this.documentation? '/** ' + this.documentation + '*/\n' : '');
       o.out(this.visibility, this.visibility ? ' ' : '',
         this.type, ' ', this.name, '(');
 

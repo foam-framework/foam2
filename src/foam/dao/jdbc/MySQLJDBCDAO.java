@@ -78,7 +78,7 @@ public class MySQLJDBCDAO extends AbstractJDBCDAO{
       closeAllQuietly(resultSet, stmt);
     }
   }
-  
+
   @Override
   public FObject remove_(X x, FObject obj) {
     Connection c = null;
@@ -100,7 +100,9 @@ public class MySQLJDBCDAO extends AbstractJDBCDAO{
 
       int removed = stmt.executeUpdate();
       if ( removed == 0 ) {
-        throw new SQLException("Error while removing.");
+        // throw new SQLException("Error while removing.");
+        // According to doc, no error when removing doesn't remove anything
+        return null;
       }
 
       return obj;
@@ -136,6 +138,7 @@ public class MySQLJDBCDAO extends AbstractJDBCDAO{
       if ( ! resultSet.next() ) {
         // no rows
         return null;
+        // In the doc, should be: throw new foam.dao.ObjectNotFoundException();
       }
 
       return createFObject(resultSet);

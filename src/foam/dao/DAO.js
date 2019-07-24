@@ -27,6 +27,7 @@ foam.INTERFACE({
       async: true,
       type: 'FObject',
       swiftThrows: true,
+      documentation: '',
       args: [
         {
           name: 'obj',
@@ -38,6 +39,7 @@ foam.INTERFACE({
       name: 'put_',
       async: true,
       type: 'FObject',
+      documentation: '',
       swiftThrows: true,
       args: [
         {
@@ -55,6 +57,7 @@ foam.INTERFACE({
       async: true,
       type: 'FObject',
       swiftThrows: true,
+      documentation: '',
       args: [
         {
           name: 'obj',
@@ -67,6 +70,7 @@ foam.INTERFACE({
       async: true,
       type: 'FObject',
       swiftThrows: true,
+      documentation: '',
       args: [
         {
           name: 'x',
@@ -83,6 +87,7 @@ foam.INTERFACE({
       async: true,
       type: 'FObject',
       swiftThrows: true,
+      documentation: 'Retrieves a single object from the DAO, whose id is equal to the parameter id. If the object is found, the promise resolves with the object. If the object is not found, it rejects with a foam.dao.ObjectNotFoundException.',
       args: [
         {
           name: 'id',
@@ -95,6 +100,7 @@ foam.INTERFACE({
       async: true,
       type: 'FObject',
       swiftThrows: true,
+      documentation: 'Retrieves a single object from the DAO, whose id is equal to the parameter id. If the object is found, the promise resolves with the object. If the object is not found, it rejects with a foam.dao.ObjectNotFoundException.',
       args: [
         {
           name: 'x',
@@ -111,6 +117,7 @@ foam.INTERFACE({
       async: true,
       type: 'foam.dao.Sink',
       swiftThrows: true,
+      documentation: '',
       args: [
         {
           name: 'sink',
@@ -122,6 +129,7 @@ foam.INTERFACE({
       name: 'select_',
       async: true,
       type: 'foam.dao.Sink',
+      documentation: '',
       swiftThrows: true,
       args: [
         {
@@ -159,12 +167,14 @@ foam.INTERFACE({
       name: 'removeAll',
       async: true,
       swiftThrows: true,
+      documentation: '',
       args: [ ]
     },
     {
       name: 'removeAll_',
       swiftThrows: true,
       async: true,
+      documentation: '',
       args: [
         {
           name: 'x',
