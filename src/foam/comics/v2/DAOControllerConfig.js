@@ -56,6 +56,16 @@ foam.CLASS({
       expression: function(of) { return foam.String.pluralize(of.model_.label); }
     },
     {
+      class: 'StringArray',
+      name: 'defaultColumns',
+      factory: null,
+      expression: function(of) { 
+        return of.model_.tableColumns.length 
+                ? of.model_.tableColumns
+                : of.model_.properties;
+      }
+    },
+    {
       class: 'foam.u2.ViewSpecWithJava',
       name: 'browseBorder',
       expression: function() {
