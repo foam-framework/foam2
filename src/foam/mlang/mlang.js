@@ -3491,6 +3491,7 @@ foam.CLASS({
   javaImports: [
     'foam.core.FObject',
     'foam.core.X',
+    'foam.nanos.auth.AuthorizationException'
   ],
 
   properties: [
@@ -3525,7 +3526,7 @@ foam.CLASS({
         foam.nanos.auth.Authorizer authorizer = getAuthorizer();
         try {
           authorizer.authorizeOnRead(x, (FObject) obj);
-        } catch ( Throwable t ) {
+        } catch ( AuthorizationException e ) {
           return false;
         }
         return true;
@@ -3545,6 +3546,7 @@ foam.CLASS({
   javaImports: [
     'foam.core.FObject',
     'foam.core.X',
+    'foam.nanos.auth.AuthorizationException'
   ],
 
   properties: [
@@ -3579,7 +3581,7 @@ foam.CLASS({
         foam.nanos.auth.Authorizer authorizer = getAuthorizer();
         try {
           authorizer.authorizeOnDelete(x, (FObject) obj);
-        } catch ( Throwable t ) {
+        } catch ( AuthorizationException e ) {
           return false;
         }
         return true;

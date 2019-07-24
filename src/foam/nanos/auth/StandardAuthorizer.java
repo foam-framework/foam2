@@ -79,7 +79,7 @@ public class StandardAuthorizer implements Authorizer {
     AuthService authService = (AuthService) x.get("auth");
     try {
       return authService.check(x, permission);
-    } catch ( Throwable t ) {
+    } catch ( AuthorizationException e ) {
       return false;
     }
   }
@@ -89,7 +89,7 @@ public class StandardAuthorizer implements Authorizer {
     AuthService authService = (AuthService) x.get("auth");
     try {
       return authService.check(x, permission);
-    } catch ( Throwable t ) {
+    } catch ( AuthorizationException e ) {
       return false;
     }
 

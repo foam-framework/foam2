@@ -8,6 +8,7 @@ package foam.nanos.auth;
 
 import foam.core.FObject;
 import foam.core.X;
+import foam.nanos.auth.AuthorizationException;
 
 public class AuthorizableAuthorizer implements Authorizer {
 
@@ -54,7 +55,7 @@ public class AuthorizableAuthorizer implements Authorizer {
     AuthService authService = (AuthService) x.get("auth");
     try {
       return authService.check(x, permission);
-    } catch ( Throwable t ) {
+    } catch ( AuthorizationException e ) {
       return false;
     }
   }
@@ -64,7 +65,7 @@ public class AuthorizableAuthorizer implements Authorizer {
     AuthService authService = (AuthService) x.get("auth");
     try {
       return authService.check(x, permission);
-    } catch ( Throwable t ) {
+    } catch ( AuthorizationException e ) {
       return false;
     }
   }
