@@ -201,12 +201,13 @@ if ( getOrder() != null &&
   }
 }
 
-if ( getAuthorize() ) {
+if ( getAuthorize() || getAuthorizer() != null ) {
+  if ( getAuthorizer() != null ) delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, getAuthorizer(), getAuthorizeReads());
   if ( foam.nanos.auth.Authorizable.class.isAssignableFrom(getOf().getObjClass()) ) {
-    delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate);
-    setAuthenticate(false);
+    delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, new foam.nanos.auth.AuthorizableAuthorizer(getPermissionPrefix()), getAuthorizeReads());
   } else {
     logger.warning("EasyDAO", "authorize=true but 'of' ",getOf().getId(), "not Authorizable");
+    delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, new foam.nanos.auth.StandardAuthorizer(getPermissionPrefix()), getAuthorizeReads());
   }
 }
 
@@ -303,6 +304,16 @@ return delegate;
       class: 'Boolean',
       name: 'authorize',
       value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'authorizeReads',
+      value: true
+    },
+    {
+      class: 'Object',
+      type: 'foam.nanos.auth.Authorizer',
+      name: 'authorizer'
     },
     {
       /** Enable standard authentication. */
