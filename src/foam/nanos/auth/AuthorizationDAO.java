@@ -72,7 +72,7 @@ public class AuthorizationDAO extends ProxyDAO {
   @Override
   public FObject find_(X x, Object id) {
     if ( id == null ) return null;
-    if ( ! authorizeRead_ ) return super.find_(x, id);
+    if ( ! authorizeRead_ || authorizer_.checkGlobalRead(x) ) return super.find_(x, id);
 
     FObject obj = super.find_(x, id);
     if ( obj != null ) authorizer_.authorizeOnRead(x, obj);
