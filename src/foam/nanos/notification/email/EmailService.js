@@ -12,7 +12,7 @@ foam.INTERFACE({
     {
       name: 'sendEmail',
       async: true,
-      type: 'Void',
+      type: 'foam.nanos.notification.email.EmailMessage',
       args: [
         {
           name: 'x',
