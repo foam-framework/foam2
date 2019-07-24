@@ -140,14 +140,14 @@ foam.CLASS({
       name: 'authorizeOnCreate',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! auth.check(x, "notificationDAO.read.*") ) throw new AuthorizationException("You don't have permission to create this notification.");
+      if ( ! auth.check(x, createPermission("create")) ) throw new AuthorizationException("You don't have permission to create this notification.");
       `
     },
     {
       name: 'authorizeOnUpdate',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! auth.check(x, "notificationDAO.update.*") ) throw new AuthorizationException("You don't have permission to update notifications you do not own.");
+      if ( ! auth.check(x, createPermission("update")) ) throw new AuthorizationException("You don't have permission to update notifications you do not own.");
       `
     },
     {
@@ -161,7 +161,17 @@ foam.CLASS({
       name: 'authorizeOnRead',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, "notificationDAO.read.*") ) throw new AuthorizationException("You don't have permission to read notifications you do not own.");
+      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("read")) ) throw new AuthorizationException("You don't have permission to read notifications you do not own.");
+      `
+    },
+    {
+      name: 'createPermission',
+      args: [
+        { name: 'operation', type: 'String' }
+      ],
+      type: 'String',
+      javaCode: `
+        return "notification." + operation + "." + getId();
       `
     }
   ]
