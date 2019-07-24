@@ -8,18 +8,19 @@ package foam.nanos.auth;
 
 import foam.core.FObject;
 import foam.core.X;
+import foam.nanos.auth.AuthorizationException;
 
 public class AuthorizableAuthorizer implements Authorizer {
-  private static AuthorizableAuthorizer instance_ = null;
 
-  public static AuthorizableAuthorizer instance() {
-    if ( instance_ == null ) {
-      instance_ = new AuthorizableAuthorizer();
-    }
-    return instance_;
+  protected String permissionPrefix_;
+
+  public AuthorizableAuthorizer(String permissionPrefix) {  
+    permissionPrefix_ = permissionPrefix;
   }
 
-  private AuthorizableAuthorizer() {}
+  public String getPermissionPrefix() {
+    return permissionPrefix_;
+  }
 
   public void authorizeOnCreate(X x, FObject obj) throws AuthorizationException {
     if ( obj instanceof Authorizable ) {
@@ -42,6 +43,30 @@ public class AuthorizableAuthorizer implements Authorizer {
   public void authorizeOnDelete(X x, FObject obj) throws AuthorizationException {
     if ( obj instanceof Authorizable ) {
       ((Authorizable) obj).authorizeOnDelete(x);
+    }
+  }
+
+  public String createPermission(String op) {
+    return permissionPrefix_ + "." + op;
+  }
+
+  public boolean checkGlobalRead(X x) {
+    String permission = createPermission("read");
+    AuthService authService = (AuthService) x.get("auth");
+    try {
+      return authService.check(x, permission);
+    } catch ( AuthorizationException e ) {
+      return false;
+    }
+  }
+
+  public boolean checkGlobalRemove(X x) {
+    String permission = createPermission("remove");
+    AuthService authService = (AuthService) x.get("auth");
+    try {
+      return authService.check(x, permission);
+    } catch ( AuthorizationException e ) {
+      return false;
     }
   }
 }
