@@ -75,8 +75,7 @@ public class AuthorizationDAO extends ProxyDAO {
     if ( ! authorizeRead_ ) return super.find_(x, id);
 
     FObject obj = super.find_(x, id);
-    if ( obj == null ) return null;
-    authorizer_.authorizeOnRead(x, obj);
+    if ( obj != null ) authorizer_.authorizeOnRead(x, obj);
     return obj;
   }
 
