@@ -102,6 +102,7 @@ foam.CLASS({
         return this.DAOControllerConfig.create({ dao: this.data });
       }
     },
+    'columns',
     {
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'predicate',
@@ -147,7 +148,7 @@ foam.CLASS({
       this.addClass(this.myClass());
       this.SUPER();
       this
-        .add(self.slot(function(data, config$cannedQueries) {
+        .add(this.slot(function(data, config$cannedQueries, columns) {
           return self.E()
             .start(self.Rows)
               .callIf(config$cannedQueries.length >= 1, function() {
@@ -181,7 +182,8 @@ foam.CLASS({
               .end()
               .start(self.ScrollTableView, {
                 data: self.predicatedDAO$proxy,
-                enableDynamicTableHeight: false
+                enableDynamicTableHeight: false,
+                columns
               })
                 .addClass(self.myClass('browse-view-container'))
               .end()
