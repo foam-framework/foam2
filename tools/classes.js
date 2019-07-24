@@ -421,7 +421,24 @@ var classes = [
   'io.c9.ace.Theme',
 
   // Themes
-  'foam.nanos.theme.Theme'
+  'foam.nanos.theme.Theme',
+
+  // Crunch
+  'foam.nanos.crunch.crunchtest.FakeTestObject',
+  //models
+  'foam.nanos.crunch.Capability',
+  'foam.nanos.crunch.CapabilityJunctionStatus',
+  'foam.nanos.crunch.UserCapabilityJunction',
+  'foam.nanos.crunch.CapabilityCapabilityJunction',
+  //daos
+  'foam.nanos.crunch.UserCapabilityJunctionDAO',
+  //rules
+  'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
+  'foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate',
+  'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
+  //authservice
+  'foam.nanos.auth.CapabilityAuthService',
+  
 ];
 
 var abstractClasses = [
