@@ -82,9 +82,14 @@ foam.CLASS({
     'stack?'
   ],
   exports: [
-    'dblclick'
+    'dblclick',
+    'filteredTableColumns',
   ],
   properties: [
+    {
+      class: 'StringArray',
+      name: 'filteredTableColumns'
+    },
     {
       class: 'foam.dao.DAOProperty',
       name: 'data'
