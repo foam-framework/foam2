@@ -220,7 +220,7 @@ foam.CLASS({
           boolean multiLineOutput = getMultiLineOutputFiles().contains( getFile().getPath() );
           if ( multiLineOutput ) {
             c = "\\n";
-            getOutputter().makeMultiLine();
+            getOutputter().setMultiLine(true);
           }
 
           String record = ( old != null ) ?
@@ -239,7 +239,7 @@ foam.CLASS({
           }
 
           if ( multiLineOutput ) {
-            getOutputter().makeSingleLine();
+            getOutputter().setMultiLine(false);
             multiLineOutput = false;
           }
 

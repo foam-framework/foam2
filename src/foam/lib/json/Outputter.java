@@ -494,11 +494,7 @@ public class Outputter
     if ( writer_ != null ) writer_.flush();
   }
 
-  public void makeMultiLine() {
-    multiLineOutput_ = true;
-  }
-
-  public void makeSingleLine() {
-    multiLineOutput_ = false;
+  public void setMultiLine(boolean ml) {
+    multiLineOutput_ = ml;
   }
 }
