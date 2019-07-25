@@ -26,8 +26,10 @@ p({
       .setDelegate(new foam.nanos.auth.twofactor.TwoFactorAuthService.Builder(x)
       .setDelegate(new foam.nanos.auth.PasswordExpiryAuthService.Builder(x)
       .setDelegate(new foam.nanos.auth.EnabledCheckAuthService.Builder(x)
-      .setDelegate(new foam.nanos.auth.CachingAuthService(new foam.nanos.auth.UserAndGroupAuthService(x)))
-      .build()).build()).build()).build();
+      .setDelegate(new foam.nanos.auth.CachingAuthService(
+      new foam.nanos.auth.CapabilityAuthService.Builder(x)
+      .setDelegate(new foam.nanos.auth.UserAndGroupAuthService(x)))
+      .build()).build()).build()).build()).build();
   """,
   "client":"{\"class\":\"foam.nanos.auth.CachedAuthServiceProxy\",\"delegate\":{\"class\":\"foam.nanos.auth.ClientLoginAuthService\"}}"
 })
