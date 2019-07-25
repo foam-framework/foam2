@@ -55,9 +55,11 @@ foam.CLASS({
           .callIfElse(this.labelFormatter,
                       this.labelFormatter,
                       function() { this.add(self.label$); })
-          .on('click', function() {
-            this.data = ! this.data;
-          }.bind(this))
+          .start()
+            .on('click', function() {
+              this.data = ! this.data;
+            }.bind(this))
+          .end()
         .end();
       }
     },
