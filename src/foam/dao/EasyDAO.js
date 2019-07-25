@@ -201,8 +201,8 @@ if ( getOrder() != null &&
   }
 }
 
-if ( getAuthorize() || getAuthorizer() != null ) {
-  if ( getAuthorizer() != null ) delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, getAuthorizer());
+if ( getAuthorizer != null ) delegate = new foam.nanos.auth.AuthorizationdAO(getX(), delegate, getAuthorizer());
+else if ( getAuthorize() ) {
   if ( foam.nanos.auth.Authorizable.class.isAssignableFrom(getOf().getObjClass()) ) {
     delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, new foam.nanos.auth.AuthorizableAuthorizer(getPermissionPrefix()));
   } else {
