@@ -18,7 +18,7 @@ public class AgentAgency implements Agency {
 
   public void execute() {
     while ( ! agents.isEmpty() ) {
-      agents.poll().run();
+      agents.remove().run();
     }
   }
 }
