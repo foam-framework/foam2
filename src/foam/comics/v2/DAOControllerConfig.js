@@ -60,9 +60,11 @@ foam.CLASS({
       name: 'defaultColumns',
       factory: null,
       expression: function(of) { 
-        return of.model_.tableColumns.length 
-                ? of.model_.tableColumns
-                : of.model_.properties;
+        var tableColumns = of.getAxiomByName('tableColumns');
+
+        return tableColumns 
+                ? tableColumns.columns
+                : of.getAxiomsByClass(foam.core.Property).map(p => p.name);
       }
     },
     {
