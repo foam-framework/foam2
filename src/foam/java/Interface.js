@@ -99,6 +99,8 @@ foam.CLASS({
 
       o.out('\n');
 
+      o.out(this.documentation? '/** ' + this.documentation + '*/\n' : '');
+
       o.out(this.visibility, this.visibility ? ' ' : '',
         'interface ', this.name);
 

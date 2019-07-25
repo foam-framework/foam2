@@ -183,6 +183,8 @@ foam.CLASS({
         o.indent();
       }
 
+      o.out(this.documentation? '/** ' + this.documentation + '*/\n' : '');
+
       if ( ! this.anonymous ) {
         o.out(this.visibility, ' ', this.static ? 'static ' : '');
 
