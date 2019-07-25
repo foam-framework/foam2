@@ -77,7 +77,10 @@ foam.CLASS({
       o.indent();
 
       if( this.documentation ){
-        o.out('/** ' + this.documentation.replace(/\n/g, "\n * ") + ' \n */\n');
+        str = limitSplit(o, this.documentation.replace(/\n/g, ' '), 25);
+        o.out('/** ' + str.replace(/\n/g, "\n * "));
+        o.indent();
+        o.out('*/\n');
         o.increaseIndent();
         o.indent();
       }
@@ -108,3 +111,16 @@ foam.CLASS({
     }
   ]
 });
+
+function limitSplit(o, str, maxWords){
+    var res = '';
+    var arr = str.split(' ', 150);
+    for( i = 0 ; i < arr.length ; i++){
+      res += arr[i] + ' ';
+      if( i % maxWords == 0 && i > 0 ){
+        res += '\n';
+        o.indent();
+      }
+    }
+    return res;
+}
