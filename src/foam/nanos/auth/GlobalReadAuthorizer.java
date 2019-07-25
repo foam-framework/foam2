@@ -19,11 +19,6 @@ public class GlobalReadAuthorizer extends StandardAuthorizer {
     super(permissionPrefix);
   }
 
-  @Override 
-  public void authorizeOnRead(X x, FObject obj) throws AuthorizationException {
-    // do not do anything because we don't need authorization on read
-  }
-
   @Override
   public boolean checkGlobalRead(X x) {
     // return true in checkGlobalRead to save time checking each object
