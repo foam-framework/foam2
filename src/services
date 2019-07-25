@@ -37,7 +37,13 @@ p({"class":"foam.nanos.boot.NSpec", "name":"static",                           "
 p({"class":"foam.nanos.boot.NSpec", "name":"export",                           "lazy":true,  "serve":false, "serviceClass":"foam.nanos.export.ExportService"})
 p({"class":"foam.nanos.boot.NSpec", "name":"trace",                            "lazy":true,  "serve":false, "authenticate": false, "parameters":true, "serviceClass":"foam.nanos.http.TraceWebAgent"})
 p({"class":"foam.nanos.boot.NSpec", "name":"services",                         "lazy":true,  "serve":false, "serviceClass":"foam.nanos.http.ServicesWebAgent"})
-p({"class":"foam.nanos.boot.NSpec", "name":"threadPool",                       "lazy":false, "serve":false, "serviceClass":"foam.nanos.pool.FixedThreadPool"})
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "threadPool",
+  "lazy": false,
+  "serve": false,
+  "serviceClass": "foam.nanos.pool.ThreadPoolAgency"
+})
 p({"class":"foam.nanos.boot.NSpec", "name":"testDAO",                          "lazy":true,  "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setGuid(true).setOf(foam.nanos.test.Test.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"tests\").setDecorator(new foam.nanos.script.ScriptRunnerDAO(null)).build();","client":"{\"of\":\"foam.nanos.test.Test\"}"})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"pmInfoDAO",                        "lazy":true,  "serve":true,  "serviceScript":"return new foam.dao.MDAO(foam.nanos.pm.PMInfo.getOwnClassInfo());","client":"{\"of\":\"foam.nanos.pm.PMInfo\", \"remoteListenerSupport\": false}" })

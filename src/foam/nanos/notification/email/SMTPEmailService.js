@@ -21,7 +21,6 @@ foam.CLASS({
   javaImports: [
     'foam.core.ContextAgent',
     'foam.core.X',
-    'foam.nanos.pool.FixedThreadPool',
     'foam.util.SafetyUtil',
     'java.nio.charset.StandardCharsets',
     'java.util.Date',
