@@ -52,6 +52,8 @@ public class Storage {
         } catch (URISyntaxException | IOException e) {
           throw new RuntimeException(e);
         }
+      } else {
+        throw new RuntimeException("Couldn't open resource FS, missing jar " + resourceJar);
       }
     } else {
       fs = FileSystems.getDefault();
