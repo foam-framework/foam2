@@ -221,7 +221,7 @@ foam.CLASS({
                     addClass(this.showPackage ? null : self.myClass('indent')).
                   end().
                   call(function(f) {
-                    if ( self.showSummary ) {
+                    if ( d.model_ && self.showSummary ) {
                       this.add(' ', self.summarize(d.model_.documentation));
                     }
                   }).
@@ -269,7 +269,7 @@ foam.CLASS({
 
       var cls = data;
       for ( var i = 0 ; cls ; i++ ) {
-        cls = this.lookup(cls.model_.extends, true);
+        cls = foam.lookup(cls.model_.extends, true);
         if ( i ) this.add(' : ');
         this.start(this.ClassLink, {data: cls}).end();
         if ( cls === foam.core.FObject ) break;
@@ -331,7 +331,7 @@ foam.CLASS({
 
       var cls = data;
       for ( var i = 0 ; cls ; i++ ) {
-        cls = this.lookup(cls.model_.extends, true);
+        cls = foam.lookup(cls.model_.extends, true);
         if ( i ) this.add(' : ');
         this.start(this.ClassLink, {data: cls}).end();
         if ( cls === foam.core.FObject ) break;
@@ -476,7 +476,7 @@ foam.CLASS({
     {
       name: 'selectedClass',
       expression: function (path) {
-        return this.lookup(path, true);
+        return foam.lookup(path, true);
       }
     },
     {
@@ -493,7 +493,10 @@ foam.CLASS({
       name: 'subClasses',
       expression: function (path) {
         return Object.values(foam.USED).
-            filter(function(cls) { return cls.model_.extends == path || 'foam.core.' + cls.model_.extends == path; }).
+            filter(function(cls) {
+              if ( ! cls.model_ ) return false;
+              return cls.model_.extends == path || 'foam.core.' + cls.model_.extends == path;
+            }).
           sort(this.MODEL_COMPARATOR);
       }
     },
@@ -502,6 +505,7 @@ foam.CLASS({
       expression: function (path) {
         return Object.values(foam.USED).
             filter(function(cls) {
+              if ( ! cls.model_ ) return false;
               return cls.model_.requires && cls.model_.requires.map(
                   function(r) { return r.path; }).includes(path);
             }).
@@ -531,6 +535,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      for ( var key in foam.UNUSED ) foam.lookup(key);
       this.SUPER();
 
       this.
@@ -643,7 +648,7 @@ foam.debug.doc = function(opt_obj, showUnused) {
     for ( var key in foam.UNUSED ) foam.lookup(key);
   }
 
-  foam.doc.DocBrowserWindow.create({
+  return foam.doc.DocBrowserWindow.create({
     initialClass: foam.core.FObject.isSubClass(opt_obj) ?
       opt_obj.id :
       ( opt_obj && opt_obj.cls_ ) ? opt_obj.cls_.id :
@@ -782,7 +787,7 @@ foam.CLASS({
       name: 'lastRelatedFromY',
       value: 0,
       documentation: 'the y of the last required from element draw in the canvas.',
-    },    
+    },
     {
       name: 'lastRelatedToY',
       value: 0,
@@ -1061,7 +1066,7 @@ foam.CLASS({
 
       this.selected = this.canvas.addChildren( modelBox, modelNameLabel, propertyBox );
       var propertyPadding = - this.widthCenterModel +10;
-      
+
       if ( ! this.conventionalUML ){
          var propertyNameLabel = foam.graphics.Label.create({
           align: 'left',
@@ -1161,7 +1166,7 @@ foam.CLASS({
       var cls   = this.data;
 
       for ( var i = 0; cls; i++ ) {
-        cls = this.lookup( cls.model_.extends, true );
+        cls = foam.lookup( cls.model_.extends, true );
         if ( cls === foam.core.FObject ) break;
         var extendsBox = this.Box.create({
           x: x,
@@ -1315,7 +1320,7 @@ foam.CLASS({
         var path = cls.id;
         var req = Object.values(foam.USED).
         filter( function ( cls ) {
-          return cls.model_.requires && cls.model_.requires.map(
+          return cls.model_ && cls.model_.requires && cls.model_.requires.map(
             function ( r ) {
               return r.path;
             }).includes(path);
@@ -1367,12 +1372,12 @@ foam.CLASS({
     },
 
     function addSubClasses(x, y, w, h) {
-      var marge = 4;                  
+      var marge = 4;
       var dDefualt = 300 + this.properties.length * 30;
-      var d = this.conventionalUML && dDefualt+y > this.lastRelatedFromY && dDefualt+y > this.lastRelatedToY ? dDefualt : 
+      var d = this.conventionalUML && dDefualt+y > this.lastRelatedFromY && dDefualt+y > this.lastRelatedToY ? dDefualt :
           this.lastRelatedFromY > this.lastRelatedToY ?
             this.lastRelatedFromY > this.height ? this.lastRelatedFromY - 300: 500 :
-            this.lastRelatedToY > this.height ? this.lastRelatedToY - 300: 500 ;    
+            this.lastRelatedToY > this.height ? this.lastRelatedToY - 300: 500 ;
 
       var boxLarge = 35;
       var endPtD = this.conventionalUML ? 30 + this.properties.length * 30 : 180;
@@ -1383,7 +1388,8 @@ foam.CLASS({
       if ( cls !== undefined ) {
         var path = cls.id;
         var req = Object.values(foam.USED).
-        filter( function ( cls ) {
+        filter(function (cls) {
+          if ( ! cls.model_ ) return false;
           return cls.model_.extends == path || 'foam.core.' + cls.model_.extends == path;
         }).sort(this.MODEL_COMPARATOR);
       };
@@ -1491,7 +1497,7 @@ foam.CLASS({
       var path = cls.id;
       var req  = Object.values(foam.USED).
       filter( function ( cls ) {
-        return cls.model_.requires && cls.model_.requires.map(
+        return cls.model_ && cls.model_.requires && cls.model_.requires.map(
           function ( r ) {
             return r.path;
           }).includes(path);
@@ -1604,7 +1610,7 @@ foam.CLASS({
       var path  = cls.id;
       var req   = Object.values(foam.USED).
       filter( function ( cls ) {
-        return cls.model_.requires && cls.model_.requires.map(
+        return cls.model_ && cls.model_.requires && cls.model_.requires.map(
           function ( r ) {
             return r.path;
           }).includes(path);

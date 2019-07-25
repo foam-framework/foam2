@@ -28,11 +28,16 @@ foam.CLASS({
     'foam.nanos.u2.navigation.UserView'
   ],
 
-  imports: [ 'menuDAO', 'user', 'loginSuccess' ],
+  imports: [
+    'group',
+    'loginSuccess',
+    'menuDAO',
+    'user'
+  ],
 
   css: `
     ^ {
-      background: %HEADERCOLOR%;
+      background: /*%PRIMARY1%*/ #202341;
       width: 100%;
       min-width: 992px;
       height: 60px;
@@ -75,7 +80,7 @@ foam.CLASS({
       border-bottom: 1px solid white;
     }
     ^ .selected {
-      border-bottom: 4px solid %ACCENTCOLOR% !important;
+      border-bottom: 4px solid /*%PRIMARY5%*/ #e5f1fc !important;
       padding-bottom: 5px;
       text-shadow: 0 0 0px white, 0 0 0px white;
     }
@@ -132,7 +137,7 @@ foam.CLASS({
         .start()
           .addClass('logged-in-container')
           .tag({ class: 'foam.nanos.u2.navigation.BusinessLogoView' })
-          .start({ class: 'foam.nanos.menu.MenuBar' })
+          .start(this.MenuBar, { menuName: this.group ? this.group.rootMenu : '' })
             .addClass('menuBar')
           .end()
           .tag({ class: 'foam.nanos.u2.navigation.UserView' })

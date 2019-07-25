@@ -19,14 +19,8 @@ foam.CLASS({
   "Ex. views: [[ { class: 'foam.u2.view.TableView' }, 'Table' ]]",
 
   css: `
-    ^ {
-      margin: auto;
-    }
-    ^ .foam-u2-tag-Select {
-      float: right;
-      width: 100px;
-      height: 28px;
-    }
+    ^ { margin: auto; }
+    ^ select { height: 26px }
   `,
 
   properties: [

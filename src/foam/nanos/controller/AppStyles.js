@@ -17,55 +17,8 @@ foam.CLASS({
       font-size: 14px;
       letter-spacing: 0.2px;
       color: #373a3c;
-      background: %BACKGROUNDCOLOR%;
+      background: /*%GREY5%*/ #f5f7fa;
       margin: 0;
-    }
-    table.foam-u2-view-TableView {
-      border-collapse: collapse;
-      border-style: hidden;
-    }
-    .foam-u2-view-TableView thead > tr > th {
-      color: #2b2b2b;
-      border-spacing: 0;
-      text-align: left;
-      padding-left: 15px;
-      height: 40px;
-      font-family: Roboto, 'Helvetica Neue', helvetica, sans-serif;
-      font-size: 14px;
-      font-style: normal;
-      font-stretch: normal;
-      font-weight: 900;
-      line-height: 1.5;
-      letter-spacing: 0.4px;
-    }
-    .foam-u2-view-TableView-row > th > td {
-      font-size: 12px;
-      letter-spacing: 0.2px;
-      text-align: left;
-      color: #093649;
-      padding-left: 15px;
-      height: 60px;
-    }
-    .foam-u2-view-TableView th {
-      font-family: Roboto, 'Helvetica Neue', helvetica, sans-serif;
-      padding-left: 15px;
-      font-size: 14px;
-      line-height: 1;
-      letter-spacing: 0.4px;
-      color: #093649;
-    }
-    .foam-u2-view-TableView td {
-      font-family: Roboto, 'Helvetica Neue', helvetica, sans-serif;
-      font-size: 12px;
-      line-height: 1.33;
-      letter-spacing: 0.2px;
-      padding-left: 15px;
-      font-size: 12px;
-      color: #093649;
-    }
-    .foam-u2-view-TableView-row {
-      height: 60px;
-      background: white;
     }
     .New {
       width: 35px;
@@ -77,7 +30,7 @@ foam.CLASS({
       width: 60px;
       height: 20px;
       border-radius: 100px;
-      background-color: #093649;
+      background-color: /*%BLACK%*/ #1e1f21;
     }
     .Open {
       width: 49px;

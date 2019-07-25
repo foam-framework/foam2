@@ -305,7 +305,12 @@ foam.CLASS({
   flags: ['web'],
 
   properties: [
-    'blob',
+    {
+      name: 'blob',
+      cloneProperty: function(value, map) {
+        map[this.name] = value;
+      }
+    },
     {
       name: 'size',
       factory: function() {

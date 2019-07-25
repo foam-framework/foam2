@@ -12,6 +12,23 @@ foam.CLASS({
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows'
   ],
+
+  css: `
+    ^wizard-body {
+      height: 90%;
+      background-color: white;
+    }
+
+    ^footer {
+      padding: 0px 128px;
+    }
+
+    ^next-button {
+      width: 156px;
+      height: 48px;
+    }
+  `,
+
   properties: [
     {
       class: 'DateTime',
@@ -74,14 +91,16 @@ foam.CLASS({
   actions: [
     {
       name: 'prev',
+      label: 'Go back',
       code: function() { this.currentIndex = this.prevIndex; },
       isAvailable: function(prevIndex) { return prevIndex != -1; }
     },
     {
       name: 'next',
+      label: 'Continue',
       code: function() { this.currentIndex = this.nextIndex; },
       isAvailable: function(nextIndex) { return nextIndex != -1; },
-      isEnabled: function(lastUpdate, data, sections, currentIndex) {
+      isEnabled: function(lastUpdate, data$errors_, sections, currentIndex) {
         return sections[currentIndex]
           .createErrorSlotFor(this.data$).get()
           .filter(e => e).length == 0;
@@ -91,6 +110,9 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
+
+      this.addClass(this.myClass());
+
       self.SUPER();
       self
         .start(self.Rows)
@@ -100,9 +122,9 @@ foam.CLASS({
                 section: sections[currentIndex],
                 data$: self.data$
               });
-          }))
+          })).addClass(this.myClass('wizard-body'))
           .startContext({ data: this })
-            .start(self.Cols)
+            .start(self.Cols).addClass(this.myClass('footer'))
               .add(this.PREV)
               .add(this.NEXT)
             .end()

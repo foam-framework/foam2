@@ -8,7 +8,10 @@ foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'Group',
 
-  implements: [ 'foam.nanos.auth.EnabledAware' ],
+  implements: [
+    'foam.nanos.auth.Authorizable',
+    'foam.nanos.auth.EnabledAware'
+  ],
 
   requires: [ 'foam.nanos.app.AppConfig' ],
 
@@ -46,20 +49,6 @@ foam.CLASS({
       documentation: 'Parent group to inherit permissions from.'
     },
     {
-      class: 'FObjectArray',
-      of: 'foam.nanos.auth.Permission',
-      name: 'permissions',
-      documentation: 'Permissions set on group.'
-    },
-    // {
-    //   class: 'StringArray',
-    //   of: 'foam.nanos.auth.Permission',
-    //   name: 'permissions2',
-    //   hidden: true,
-    //   view: 'foam.u2.view.StringArrayRowView',
-    //   documentation: 'Permissions set on group.'
-    // },
-    {
       class: 'Reference',
       targetDAOKey: 'menuDAO',
       name: 'defaultMenu',
@@ -67,37 +56,12 @@ foam.CLASS({
       of: 'foam.nanos.menu.Menu'
     },
     {
-      class: 'Image',
-      name: 'logo',
-      documentation: 'Group logo.',
-      displayWidth: 60
+      class: 'Reference',
+      targetDAOKey: 'menuDAO',
+      of: 'foam.nanos.menu.Menu',
+      name: 'rootMenu',
+      value: ''
     },
-    {
-      class: 'String',
-      name: 'topNavigation',
-      value: 'foam.nanos.u2.navigation.TopNavigation',
-      displayWidth: 45
-    },
-    {
-      class: 'String',
-      name: 'footerView',
-      value: 'foam.nanos.u2.navigation.FooterView',
-      displayWidth: 45
-    },
-    {
-      class: 'String',
-      name: 'groupCSS',
-      view: { class: 'foam.u2.tag.TextArea', rows: 16, cols: 60 },
-    },
-    {
-      class: 'Color',
-      name: 'primaryColor',
-      documentation: 'The following color properties can determine the color scheme of the GUI.'
-    },
-    { class: 'Color', name: 'secondaryColor' },
-    { class: 'Color', name: 'accentColor' },
-    { class: 'Color', name: 'tableColor' },
-    { class: 'Color', name: 'tableHoverColor' },
     {
       class: 'String',
       name: 'url',
@@ -146,19 +110,22 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.X',
+    'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.nanos.app.AppConfig',
-    'foam.nanos.session.Session',
     'foam.util.SafetyUtil',
     'org.eclipse.jetty.server.Request',
-    'javax.servlet.http.HttpServletRequest'
+    'javax.security.auth.AuthPermission',
+    'javax.servlet.http.HttpServletRequest',
+    'java.util.List',
+    'static foam.mlang.MLang.EQ'
   ],
 
   methods: [
     {
       name: 'implies',
       type: 'Boolean',
+      async: true,
       args: [
         {
           name: 'x',
@@ -170,35 +137,34 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        if ( getPermissions() == null ) return false;
+        List<GroupPermissionJunction> junctions = ((ArraySink) getPermissions(x).getJunctionDAO().where(EQ(GroupPermissionJunction.SOURCE_ID, getId())).select(new ArraySink())).getArray();
 
-        for ( int i = 0 ; i < permissions_.length ; i++ ) {
-          foam.nanos.auth.Permission p = permissions_[i];
-
-          if ( p.getId().startsWith("@") ) {
+        for ( GroupPermissionJunction j : junctions ) {
+          if ( j.getTargetId().startsWith("@") ) {
             DAO   dao   = (DAO) x.get("groupDAO");
-            Group group = (Group) dao.find(p.getId().substring(1));
+            Group group = (Group) dao.find(j.getTargetId().substring(1));
 
             if ( group != null && group.implies(x, permission) ) {
               return true;
             }
           } else {
-            if ( new javax.security.auth.AuthPermission(p.getId()).implies(permission) ) {
+            if ( new AuthPermission(j.getTargetId()).implies(permission) ) {
               return true;
             }
           }
         }
-        return false;`
-      ,
-      code: function(x, permissionId) {
-        if ( arguments.length != 2 ) debugger;
-
-        if ( this.permissions == null ) return false;
-
-        for ( var i = 0 ; i < this.permissions.length ; i++ )
-          if ( this.permissions[i].implies(permissionId) ) return true;
 
         return false;
+      `,
+      code: async function(x, permissionId) {
+        // TODO: Support inheritance via @
+        var arraySink = await this.permissions.junctionDAO
+          .where(foam.mlang.Expressions.EQ(foam.nanos.auth.GroupPermissionJunction.SOURCE_ID, this.id))
+          .select();
+        var junctions = arraySink != null && Array.isArray(arraySink.array)
+          ? arraySink.array
+          : [];
+        return junctions.some((j) => foam.nanos.auth.Permission.create({ id: j.targetId }).implies(permissionId));
       }
     },
     {
@@ -211,39 +177,62 @@ foam.CLASS({
         }
       ],
       javaCode: `
-AppConfig config = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
+        // Find Group details, by iterating up through group.parent
+        AppConfig config          = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
+        String configUrl          = "";
+        String configSupportEmail = "";
+        Boolean urlFound          = false;
+        Boolean supportEmailFound = false;
+        Group group               = this;
+        String grp                = "";
+        DAO groupDAO              = (DAO) x.get("groupDAO");
 
-String configUrl = config.getUrl();
+        while ( group != null ) {
+          if ( ! urlFound &&
+               ! SafetyUtil.isEmpty(group.getUrl()) ) {
+            configUrl = group.getUrl();
+          }
+          configSupportEmail = supportEmailFound ? configSupportEmail : group.getSupportEmail();
+      
+          // Once true, stay true
+          urlFound          = urlFound   ? urlFound   : ! SafetyUtil.isEmpty(configUrl);
+          supportEmailFound = supportEmailFound ? supportEmailFound : ! SafetyUtil.isEmpty(configSupportEmail);
 
-HttpServletRequest req = x.get(HttpServletRequest.class);
-if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
-  // populate AppConfig url with request's RootUrl
-  configUrl = ((Request) req).getRootURL().toString();
-} else {
-  // populate AppConfig url with group url
-  Group group = (Group) x.get("group");
-  if ( ! SafetyUtil.isEmpty(group.getUrl()) ) {
-    configUrl = group.getUrl();
-  }
-  if ( ! SafetyUtil.isEmpty(group.getSupportEmail()) ) {
-    config.setSupportEmail(group.getSupportEmail());
-  }
-}
+          if ( urlFound && supportEmailFound ) break;
 
-if ( config.getForceHttps() ) {
-  if ( configUrl.startsWith("https://") ) {
-    config.setUrl(configUrl);
-    return config;
-  } else if ( configUrl.startsWith("http://") ) {
-    configUrl = "https" + configUrl.substring(4);
-  } else {
-    configUrl = "https://" + configUrl;
-  }
-}
+          grp   = group.getParent();
+          group = (Group)groupDAO.find(grp);
+        }
 
-config.setUrl(configUrl);
+        // FIND URL
+        if ( ! urlFound ) {
+          // populate AppConfig url with request's RootUrl
+          HttpServletRequest req = x.get(HttpServletRequest.class);
+          if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
+            configUrl = ((Request) req).getRootURL().toString();
+          }
+        }
 
-return config;
+        // FORCE HTTPS IN URL?
+        if ( config.getForceHttps() ) {
+          if ( ! configUrl.startsWith("https://") ) {
+            if ( configUrl.startsWith("http://") ) {
+              configUrl = "https" + configUrl.substring(4);
+            } else {
+              configUrl = "https://" + configUrl;
+            }
+          }
+        }
+
+        // SET URL
+        config.setUrl(configUrl);
+
+        // SET SupportEmail
+        if ( supportEmailFound ) {
+          config.setSupportEmail(configSupportEmail);
+        }
+
+        return config;
         `
     },
     {
@@ -273,6 +262,145 @@ return config;
         Group parent = (Group) groupDAO.find(this.getParent());
         if ( parent == null ) return false;
         return parent.isDescendantOf(groupId, groupDAO);
+      `
+    },
+    {
+      name: 'authorizeOnCreate',
+      javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
+        String permissionId = String.format("group.create.%s", getId());
+
+        if ( ! auth.check(x, permissionId) ) {
+          throw new AuthorizationException("You do not have permission to create this group.");
+        }
+
+        // Prevents privilege escalation via setting a group's parent.
+        checkUserHasAllPermissionsInGroupAndAncestors(x, this);
+      `
+    },
+    {
+      name: 'authorizeOnRead',
+      javaCode: '// NOOP'
+    },
+    {
+      name: 'authorizeOnUpdate',
+      javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
+        String permissionId = String.format("group.update.%s", getId());
+
+        if ( ! auth.check(x, permissionId) ) {
+          throw new AuthorizationException("You don't have permission to update that group.");
+        }
+
+        // Prevents privilege escalation via setting a group's parent.
+        if ( getParent() != null &&
+             ! getParent().equals(((Group) oldObj).getParent()) ) {
+          checkUserHasAllPermissionsInGroupAndAncestors(x, this);
+        }
+      `
+    },
+    {
+      name: 'authorizeOnDelete',
+      javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
+        String permissionId = String.format("group.remove.%s", getId());
+
+        if ( ! auth.check(x, permissionId) ) {
+          throw new AuthorizationException("You don't have permission to delete that group.");
+        }
+      `
+    },
+    {
+      name: 'checkUserHasAllPermissionsInGroupAndAncestors',
+      type: 'Void',
+      args: [
+        { name: 'x', type: 'foam.core.X' },
+        { name: 'group', type: 'foam.nanos.auth.Group' }
+      ],
+      javaCode: `
+        do {
+          checkUserHasAllPermissionsInGroup(x, group);
+          group = getAncestor(x, group);
+        } while ( group != null );
+      `
+    },
+    {
+      name: 'checkUserHasAllPermissionsInGroup',
+      type: 'Void',
+      args: [
+        { name: 'x', type: 'foam.core.X' },
+        { name: 'group', type: 'foam.nanos.auth.Group' }
+      ],
+      javaCode: `
+        group.getPermissions(x).getJunctionDAO().where(EQ(GroupPermissionJunction.SOURCE_ID, group.getId())).select(new CheckPermissionsSink(x));
+      `
+    },
+    {
+      name: 'getAncestor',
+      type: 'Group',
+      args: [
+        { name: 'x', type: 'foam.core.X' },
+        { name: 'group', type: 'foam.nanos.auth.Group' }
+      ],
+      javaCode: `
+        String ancestorGroupId = group.getParent();
+
+        if ( SafetyUtil.isEmpty(ancestorGroupId) ) return null;
+
+        DAO localGroupDAO = ((DAO) x.get("localGroupDAO")).inX(x);
+        Group ancestor = (Group) localGroupDAO.inX(x).find(ancestorGroupId);
+
+        if ( ancestor == null ) {
+          throw new RuntimeException("The '" + group.getId() + "' group has a null ancestor named '" + ancestorGroupId + "'.");
+        }
+
+        return ancestor;
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.nanos.auth',
+  name: 'CheckPermissionsSink',
+  extends: 'foam.dao.AbstractSink',
+
+  documentation: `
+    This sink will make sure that the user in the context it's initialized in
+    has the permission referenced by each GroupPermissionJunction passed into
+    it.
+  `,
+
+  imports: ['auth'],
+
+  javaImports: ['foam.dao.DAO'],
+
+  messages: [
+    {
+      name: 'ERROR_MESSAGE',
+      message: 'Permission denied. You cannot change the parent of a group if doing so grants that group permissions that you do not have.',
+    }
+  ],
+
+  methods: [
+    {
+      name: 'put',
+      javaCode: `
+        DAO groupDAO = (DAO) getX().get("groupDAO");
+        AuthService auth = (AuthService) getAuth();
+        GroupPermissionJunction junction = (GroupPermissionJunction) obj;
+        String permissionId = junction.getTargetId();
+
+        // If a permission starts with the @ symbol, then it inherits from
+        // another group. For example, a permission with the id "@admin" will
+        // inherit all of the permissions of the group with id "admin".
+        if ( permissionId.startsWith("@") ) {
+          String groupId = permissionId.substring(1);
+          Group group = (Group) groupDAO.inX(getX()).find(groupId);
+          group.checkUserHasAllPermissionsInGroupAndAncestors(getX(), group);
+        } else if ( ! auth.check(getX(), permissionId) ) {
+          throw new AuthorizationException(ERROR_MESSAGE);
+        }
       `
     }
   ]

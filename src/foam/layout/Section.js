@@ -7,10 +7,12 @@
 foam.CLASS({
   package: 'foam.layout',
   name: 'Section',
+
   requires: [
     'foam.core.Action',
     'foam.core.Property'
   ],
+
   properties: [
     {
       class: 'String',
@@ -31,6 +33,9 @@ foam.CLASS({
       name: 'actions'
     },
     {
+      name: 'gridColumns'
+    },
+    {
       class: 'Function',
       name: 'createIsAvailableFor',
       value: function(data$) {
@@ -38,6 +43,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function createErrorSlotFor(data$) {
       var errorSlots = data$.map(d => {
@@ -55,17 +61,20 @@ foam.CLASS({
 
       return retSlot;
     },
+
     function fromSectionAxiom(a, cls) {
       this.copyFrom(a);
       this.copyFrom({
         createIsAvailableFor: a.createIsAvailableFor.bind(a),
         properties: cls.getAxiomsByClass(this.Property)
           .filter(p => p.section == a.name)
-          .filter(p => ! p.hidden),
+          .filter(p => ! p.hidden)
+          .sort((p1, p2) => p1.order - p2.order),
         actions: cls.getAxiomsByClass(this.Action)
-          .filter(a => a.section == a.name)
+          .filter(action => action.section == a.name)
       });
+
       return this;
     }
   ]
-}); 
+});

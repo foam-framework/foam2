@@ -30,7 +30,7 @@
        display: inline-grid;
      }
      ^header {
-       background: %PRIMARYCOLOR%;
+       background: /*%BLACK%*/ #1e1f21;
        color: white;
        font-weight: 800;
      }
@@ -78,7 +78,12 @@
 
          if ( l != currentLetter ) {
            currentLetter = l;
-           section = self.start('span').addClass(self.myClass('section')).start('span').addClass(self.myClass('header')).add(l).end();
+           section = self.start('span')
+             .addClass(self.myClass('section'))
+             .start('span')
+               .addClass(self.myClass('header'))
+               .add(l)
+             .end();
          }
 
          section.start('span')

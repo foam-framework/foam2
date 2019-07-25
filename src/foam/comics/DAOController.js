@@ -30,7 +30,15 @@ foam.CLASS({
     'finished'
   ],
 
+  exports: [
+    'filteredTableColumns',
+  ],
+
   properties: [
+    {
+      class: 'StringArray',
+      name: 'filteredTableColumns'
+    },
     {
       name: 'data',
       hidden: true
@@ -74,12 +82,6 @@ foam.CLASS({
       class: 'Boolean',
       name: 'selectEnabled',
       documentation: 'True to enable the select button.',
-      value: false
-    },
-    {
-      class: 'Boolean',
-      name: 'addEnabled',
-      documentation: 'True to enable the Add button for adding to a relationship',
       value: false
     },
     {
@@ -136,8 +138,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'title',
-      expression: function(data$data$of) {
-        return 'Browse ' + data$data$of.model_.plural;
+      expression: function(data$of) {
+        return 'Browse ' + data$of.model_.plural;
       }
     },
     {
@@ -151,7 +153,12 @@ foam.CLASS({
       documentation: `
         The most important action on the page. The view for this controller may
         choose to display this action prominently.
-      `
+      `,
+      factory: function() {
+        return this.relationship
+          ? this.SELECT
+          : this.cls_.CREATE;
+      }
     },
     {
       class: 'foam.u2.ViewSpec',
@@ -172,7 +179,8 @@ foam.CLASS({
       class: 'String',
       name: 'detailView',
       value: 'foam.u2.DetailView'
-    }
+    },
+    'selectedObjects'
   ],
 
   actions: [
@@ -197,31 +205,13 @@ foam.CLASS({
       }
     },
     {
-      name: 'findRelatedObject',
-      label: 'Add',
-      isAvailable: function(relationship, addEnabled) {
-        // Only enable the Add button if we're not already trying to choose a selected item for a relationship.
-        return !! ( relationship && relationship.junctionDAO ) && ! addEnabled;
-      },
-      code: function() { }
-    },
-    {
-      name: 'addSelection',
-      label: 'Add',
-      isAvailable: function(addEnabled) { return addEnabled; },
-      code: function() {
-        var self = this;
-        this.relationship.add(this.selection).then(function() {
-          self.finished.pub();
-        });
-      }
-    },
-    {
       name: 'select',
       isAvailable: function(selectEnabled) { return selectEnabled; },
-      isEnabled: function(selection) { return !! selection; },
+      isEnabled: function(selection, selectedObjects) {
+        return this.relationship ? !! selectedObjects : !! selection;
+      },
       code: function() {
-        this.pub('select', this.selection.id);
+        this.pub('select', this.relationship ? this.selectedObjects : this.selection.id);
         this.finished.pub();
       }
     },
@@ -246,15 +236,16 @@ foam.CLASS({
   listeners: [
     function downloadCSV(data) {
       this.csvDriver.exportDAO(this.__context__, data)
-      .then(function(result) {
-        result = 'data:text/csv;charset=utf-8,' + result;
-        var encodedUri = encodeURI(result);
-        var link = document.createElement('a');
-        link.setAttribute('href', encodedUri);
-        link.setAttribute('download', 'data.csv');
-        document.body.appendChild(link);
-        link.click();
-      });
+        .then(function(result) {
+          result = 'data:text/csv;charset=utf-8,' + result;
+          var encodedUri = encodeURI(result);
+          var link = document.createElement('a');
+          link.setAttribute('href', encodedUri);
+          link.setAttribute('download', 'data.csv');
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
     }
   ]
 });

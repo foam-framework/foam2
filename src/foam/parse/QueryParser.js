@@ -296,7 +296,7 @@ foam.CLASS({
           is: function(v) {
             return self.Eq.create({
               arg1: v[1],
-              arg2: self.True.create()
+              arg2: true
             });
           },
 
@@ -398,7 +398,7 @@ foam.CLASS({
               expr = self.In.create({ arg1: prop, arg2: newValues });
             } else {
               expr = (v[1] === '=') ?
-                  self.InIC.create({ arg1: prop, arg2: values }) :
+                  self.Eq.create({ arg1: prop, arg2: values[0] }) :
                   self.Or.create({
                     args: values.map(function(v) {
                       return self.ContainsIC.create({ arg1: prop, arg2: v });

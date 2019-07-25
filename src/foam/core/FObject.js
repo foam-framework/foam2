@@ -155,6 +155,16 @@ foam.LIB({
         this.axiomMap_[a.name] = a;
       }
 
+      // Sort axioms by priority, higher priority gets installed first.
+      // Default to 100.
+      axs = axs.sort(function(a, b) {
+        var p1 = foam.Number.isInstance(a.priority) ? a.priority : 100;
+        var p2 = foam.Number.isInstance(b.priority) ? b.priority : 100;
+
+        // compare p2 vs p1, as we want higher priority values first.
+        return foam.Number.compare(p2, p1);
+      });
+
       for ( var i = 0 ; i < axs.length ; i++ ) {
         var a = axs[i];
 
@@ -763,10 +773,13 @@ foam.CLASS({
       var names = obj.split('$');
       var axiom = this.cls_.getAxiomByName(names.shift());
 
-      foam.assert(axiom, 'slot() called with unknown axiom name:', obj);
-      foam.assert(axiom.toSlot, 'Called slot() on unslottable axiom:', obj);
+      if ( axiom == null ) {
+        throw new Error(`slot() called with unknown axiom: '${obj}' on model '${this.cls_.id}'.`);
+      } else if ( ! axiom.toSlot ) {
+        throw new Error(`Called slot() on unslottable axiom: '${obj}' on model '${this.cls_.id}'.`);
+      }
 
-      var slot = axiom.toSlot(this)
+      var slot = axiom.toSlot(this);
       names.forEach(function(n) {
         slot = slot.dot(n);
       });

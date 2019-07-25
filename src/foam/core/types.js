@@ -624,7 +624,7 @@ foam.CLASS({
     {
       name: 'value',
       expression: function(of) {
-        if ( of ) return of.ID.value;
+        return of ? of.ID.value : null;
       }
     }
   ],
@@ -635,14 +635,13 @@ foam.CLASS({
       var self = this;
       Object.defineProperty(proto, self.name + '$find', {
         get: function classGetter() {
-          return this.__context__[self.targetDAOKey].find(this[self.name]);
+          return this.__subContext__[self.targetDAOKey].find(this[self.name]);
         },
         configurable: true
       });
     }
   ]
 });
-
 
 foam.CLASS({
   package: 'foam.core',

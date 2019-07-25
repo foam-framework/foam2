@@ -14,6 +14,9 @@ import foam.mlang.predicate.Predicate;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.AuthorizationException;
 
+import static foam.mlang.MLang.AND;
+import static foam.mlang.MLang.HAS_PERMISSION;
+
 /** Authenticate access to a DAO. **/
 public class AuthenticatedDAO
   extends ProxyDAO
@@ -86,7 +89,6 @@ public class AuthenticatedDAO
     if ( authenticateRead_ ) {
       String permission = createPermission("read", id);
       AuthService authService = (AuthService) x.get("auth");
-
       if ( ! authService.check(x, permission) ) {
         throw new AuthorizationException();
       }
@@ -97,9 +99,8 @@ public class AuthenticatedDAO
 
   @Override
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    // x.get("auth") != null added so that system user can act during booting when the auth service is not loaded yet.
-    if ( authenticateRead_ && x.get("auth") != null ) {
-      super.select_(x, new AuthenticatedSink(x, createPermission("read"), sink), skip, limit, order, predicate);
+    if ( authenticateRead_ ) {
+      super.select_(x, sink, skip, limit, order, augmentPredicate(x, predicate, "read"));
       return sink;
     }
     return super.select_(x, sink, skip, limit, order, predicate);
@@ -107,19 +108,26 @@ public class AuthenticatedDAO
 
   @Override
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    Sink sink = new AuthenticatedSink(x, createPermission("delete"), new RemoveSink(x, this));
-    this.select_(x, sink, skip, limit, order, predicate);
+    this.select_(x, new RemoveSink(x, this), skip, limit, order, augmentPredicate(x, predicate, "delete"));
   }
 
   @Override
   public void listen_(X x, Sink sink, Predicate predicate) {
-    sink = new AuthenticatedSink(x, createPermission("listen"), sink);
-    super.listen_(x, sink, predicate);
+    super.listen_(x, sink, augmentPredicate(x, predicate, "listen"));
   }
 
   @Override
   public void pipe_(foam.core.X x, foam.dao.Sink sink, foam.mlang.predicate.Predicate predicate) {
-    sink = new AuthenticatedSink(x, createPermission("pipe"), sink);
-    super.pipe_(x, sink, null);
+    super.pipe_(x, sink, augmentPredicate(x, null, "pipe"));
+  }
+
+  public Predicate augmentPredicate(X x, Predicate existingPredicate, String operation) {
+    boolean remove = operation.equals("delete");
+    return existingPredicate != null ?
+      AND(
+        HAS_PERMISSION(x, remove, name_),
+        existingPredicate
+      ) :
+      HAS_PERMISSION(x, remove, name_);
   }
 }

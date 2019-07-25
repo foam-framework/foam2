@@ -32,18 +32,18 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'verified',
-      documentation: 'Verifies that the address exists.'
+      documentation: 'Determines whether the address exists.'
     },
     {
       class: 'Boolean',
       name: 'deleted',
-      documentation: 'Verifies that the address is deleted.'
+      documentation: 'Determines whether the address is deleted.'
     },
     {
       class: 'Boolean',
       name: 'structured',
       value: true,
-      documentation: `Verifies that the address is shown in the following structure: 
+      documentation: `Determines whether the address is shown in the following structure: 
         Street Number, Street Name, Suite Number. For an unstructured address field, 
         use address1 and/or address2.
       `
@@ -51,42 +51,45 @@ foam.CLASS({
     {
       class: 'String',
       name: 'address1',
-      // required: true
       width: 70,
       displayWidth: 50,
       documentation: 'An unstructured field for the main postal address.',
-      validateObj: function(address1) {
-        var address1Regex = /^[a-zA-Z0-9 ]{1,70}$/;
-
-        if ( address1.length > 0 && ! address1Regex.test(address1) ) {
-          return 'Invalid address line.';
+      expression: function(structured, streetNumber, streetName) {
+        return structured ? streetNumber + ' ' + streetName : '';
+      },
+      validationPredicates: [
+        {
+          args: ['structured', 'address1'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.EQ(foam.nanos.auth.Address.STRUCTURED, true),
+              e.GTE(foam.mlang.StringLength.create({
+                arg1: foam.nanos.auth.Address.ADDRESS1
+              }), 1)
+            );
+          },
+          errorString: 'Invalid value for address 1.'
         }
-      }
+      ]
     },
     {
       class: 'String',
       name: 'address2',
       width: 70,
       displayWidth: 50,
-      documentation: 'An unstructured field for the sub postal address.',
-      validateObj: function(address2) {
-        var address2Regex = /^[a-zA-Z0-9 ]{1,70}$/;
-
-        if ( address2.length > 0 && ! address2Regex.test(address2) ) {
-          return 'Invalid address line.';
-        }
-      }
+      documentation: 'An unstructured field for the sub postal address.'
     },
     {
       class: 'Reference',
       targetDAOKey: 'countryDAO',
       name: 'countryId',
+      label: 'Country',
       of: 'foam.nanos.auth.Country',
       documentation: `A foreign key into the CountryDAO which represents the country.`,
       required: true,
       validateObj: function(countryId) {
         if ( typeof countryId !== 'string' || countryId.length === 0 ) {
-          return 'Country required';
+          return 'Country required.';
         }
       },
       postSet: function(oldValue, newValue) {
@@ -99,6 +102,7 @@ foam.CLASS({
       class: 'Reference',
       targetDAOKey: 'regionDAO',
       name: 'regionId',
+      label: 'Region',
       of: 'foam.nanos.auth.Region',
       documentation: `A foreign key into the RegionDAO which represents
         the region of the country.`,
@@ -130,61 +134,57 @@ foam.CLASS({
       }
     },
     {
+      // TODO: Remove structured, street number, and street name. This should be a view concern
+      // and not baked into the model.
       class: 'String',
       name: 'streetNumber',
       width: 16,
       documentation: 'The structured field for the street number of the postal address.',
-      validateObj: function(streetNumber) {
-        if ( streetNumber.trim() === '' ) {
-          return 'Street number required.';
+      validationPredicates: [
+        {
+          args: ['structured', 'streetNumber'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.EQ(foam.nanos.auth.Address.STRUCTURED, false),
+              e.GTE(foam.mlang.StringLength.create({
+                arg1: foam.nanos.auth.Address.STREET_NUMBER
+              }), 1)
+            );
+          },
+          errorString: 'Invalid street number.'
         }
-        var streetNumberRegex = /^[0-9]{1,16}$/;
-        if ( ! streetNumberRegex.test(streetNumber) ) {
-          return 'Invalid street number.';
-        }
-      }
+      ]
     },
     {
       class: 'String',
       name: 'streetName',
       width: 70,
       documentation: 'The structured field for the street name of the postal address.',
-      validateObj: function(streetName) {
-        if ( streetName.trim() === '' ) {
-          return 'Street name required.';
+      validationPredicates: [
+        {
+          args: ['structured', 'streetName'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.EQ(foam.nanos.auth.Address.STRUCTURED, false),
+              e.REG_EXP(foam.nanos.auth.Address.STREET_NAME, /^\s*.+\s*$/)
+            );
+          },
+          errorString: 'Invalid street name.'
         }
-        var streetNameRegex = /^[a-zA-Z0-9 ]{1,70}$/;
-        if ( ! streetNameRegex.test(streetName) ) {
-          return 'Invalid street name.';
-        }
-      }
+      ]
     },
     {
       class: 'String',
       name: 'suite',
       documentation: 'The structured field for the suite number of the postal address.',
-      width: 16,
-      validateObj: function(suite) {
-        var suiteRegex = /^[a-zA-Z0-9 ]{1,70}$/;
-        if ( suite.length > 0 && ! suiteRegex.test(suite) ) {
-          return 'Invalid address line 2.';
-        }
-      }
+      width: 16
     },
     {
       class: 'String',
       name: 'city',
       documentation: 'The city of the postal address.',
       required: true,
-      validateObj: function(city) {
-        if ( city.trim().length === 0 ) {
-          return 'City required.';
-        }
-        var cityRegex = /^[a-zA-Z ]{1,35}$/;
-        if ( ! cityRegex.test(city) ) {
-          return 'Invalid city name.';
-        }
-      }
+      minLength: 1
     },
     {
       class: 'String',
@@ -193,31 +193,32 @@ foam.CLASS({
       preSet: function(oldValue, newValue) {
         return newValue.toUpperCase();
       },
-      required: true,
-      validateObj: function(postalCode, countryId) {
-        if ( postalCode.trim().length === 0 ) {
-          switch ( countryId ) {
-            case 'CA':
-              return 'Postal code required.';
-            case 'US':
-              return 'Zip code required.';
-          }
+      validationPredicates: [
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'CA'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i)
+            );
+          },
+          errorString: 'Invalid postal code'
+        },
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'US'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^^\d{5}(?:[-\s]\d{4})?$/i)
+            );
+          },
+          errorString: 'Invalid zip code'
         }
-        var caRe = /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i; // Canadian Format
-        var usRe = /^^\d{5}(?:[-\s]\d{4})?$/i; // US Format
-        switch ( countryId ) {
-          case 'CA':
-            if ( ! caRe.test(postalCode) ) {
-              return 'Invalid postal code.';
-            }
-            break;
-          case 'US':
-            if ( ! usRe.test(postalCode) ) {
-              return 'Invalid zip code.';
-            }
-            break;
-        }
-      },
+      ],
       javaSetter:
         `postalCode_ = val.toUpperCase();
         postalCodeIsSet_ = true;`
@@ -225,7 +226,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'encrypted',
-      documentation: 'Verifies that the address is encrypted.'
+      documentation: 'Determines whether the address is encrypted.'
     },
     {
       class: 'Double',

@@ -17,7 +17,7 @@ foam.CLASS({
     'foam.lib.json.ExprParser',
     'foam.lib.json.JSONParser',
     'foam.lib.json.Outputter',
-    'foam.lib.json.OutputterMode',
+    'foam.lib.StoragePropertyPredicate',
     'foam.lib.parse.*',
     'foam.nanos.auth.LastModifiedByAware',
     'foam.nanos.auth.User',
@@ -29,9 +29,11 @@ foam.CLASS({
     'java.io.BufferedReader',
     'java.io.BufferedWriter',
     'java.io.InputStreamReader',
+    'java.io.InputStream',
     'java.io.File',
     'java.io.FileReader',
     'java.io.FileWriter',
+    'java.io.FileNotFoundException',
     'java.text.SimpleDateFormat',
     'java.util.Calendar',
     'java.util.Iterator',
@@ -78,10 +80,7 @@ foam.CLASS({
       class: 'Object',
       name: 'outputter',
       javaType: 'foam.lib.json.Outputter',
-      javaFactory: `
-      Outputter out = new Outputter(OutputterMode.STORAGE);
-      out.setX(getX());
-      return out;`
+      javaFactory: `return new Outputter(getX()).setPropertyPredicate(new StoragePropertyPredicate());`
     },
     {
       class: 'Object',
@@ -112,6 +111,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'multiLine'
+    },
+    {
+      class: 'Boolean',
       name: 'createFile',
       documentation: 'Flag to create file if not present',
       value: true,
@@ -135,7 +138,7 @@ foam.CLASS({
                 dir.mkdirs();
               }
 
-              getLogger().log("Create file: " + getFilename());
+              getLogger().log("Create file: " + file.getAbsoluteFile());
               file.getAbsoluteFile().createNewFile();
             }
           }
@@ -155,10 +158,17 @@ foam.CLASS({
       try {
         Storage storage = (Storage) getX().get(Storage.class);
         if ( storage.isResource() ) {
-          return new BufferedReader(new InputStreamReader(storage.getResourceAsStream(getFilename())));
+          InputStream file = storage.getResourceAsStream(getFilename());
+          if ( file == null ) {
+            getLogger().error("Failed to read from resource journal: " + getFilename());
+          }
+          return (file == null) ? null : new BufferedReader(new InputStreamReader(file));
         } else {
           return new BufferedReader(new FileReader(getFile()));
         }
+      } catch ( FileNotFoundException t) {
+        getLogger().error("Failed to read from journal: " + getFilename(), t.getLocalizedMessage());
+        return null;
       } catch ( Throwable t ) {
         getLogger().error("Failed to read from journal", t);
         throw new RuntimeException(t);
@@ -285,26 +295,58 @@ foam.CLASS({
       `
     },
     {
+      name: 'getEntry',
+      documentation: 'retrieves ameaningful unit of text from the journal',
+      type: 'String',
+      args: [
+        {
+          name: 'reader',
+          type: 'BufferedReader'
+        }
+      ],
+      javaCode: `
+        try {
+          String line = reader.readLine();
+          if ( line == null ) return null;
+          if ( ! line.equals("p({") && ! line.equals("r({") ) return line;
+          StringBuilder sb = new StringBuilder();
+          sb.append(line);
+          while( ! line.equals("})") ) {
+            if ( (line = reader.readLine()) == null ) break;
+            sb.append("\\n");
+            sb.append(line);
+          }
+          return sb.toString().trim();
+        } catch (Throwable t) {
+          getLogger().error("Failed to read from journal", t);
+          return null;
+        }
+      `
+    },
+    {
       name: 'replay',
       documentation: 'Replays the journal file',
       javaCode: `
-        // count number of lines successfully read
+        // count number of entries successfully read
         int successReading = 0;
         JSONParser parser = getParser();
 
         try ( BufferedReader reader = getReader() ) {
-          for ( String line ; ( line = reader.readLine() ) != null ; ) {
-            if ( SafetyUtil.isEmpty(line)        ) continue;
-            if ( COMMENT.matcher(line).matches() ) continue;
+          if ( reader == null ) {
+            return;
+          }
+          for ( String entry ; ( entry = getEntry(reader) ) != null ; ) {
+            if ( SafetyUtil.isEmpty(entry)        ) continue;
+            if ( COMMENT.matcher(entry).matches() ) continue;
 
             try {
-              char operation = line.charAt(0);
-              int length = line.trim().length();
-              line = line.trim().substring(2, length - 1);
+              char operation = entry.charAt(0);
+              int length = entry.length();
+              entry = entry.substring(2, length - 1);
 
-              FObject obj = parser.parseString(line);
+              FObject obj = parser.parseString(entry);
               if ( obj == null ) {
-                getLogger().error("Parse error", getParsingErrorMessage(line), "line:", line);
+                getLogger().error("Parse error", getParsingErrorMessage(entry), "entry:", entry);
                 continue;
               }
 
@@ -321,7 +363,7 @@ foam.CLASS({
 
               successReading++;
             } catch ( Throwable t ) {
-              getLogger().error("Error replaying journal line:", line, t);
+              getLogger().error("Error replaying journal entry:", entry, t);
             }
           }
         } catch ( Throwable t) {

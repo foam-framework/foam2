@@ -8,9 +8,10 @@ package foam.nanos.boot;
 
 import foam.core.*;
 import foam.dao.AbstractSink;
+import foam.dao.ArraySink;
 import foam.dao.DAO;
-import foam.dao.ProxyDAO;
 import foam.dao.java.JDAO;
+import foam.dao.ProxyDAO;
 import foam.nanos.auth.Group;
 import foam.nanos.auth.Permission;
 import foam.nanos.auth.User;
@@ -19,9 +20,8 @@ import foam.nanos.logger.ProxyLogger;
 import foam.nanos.logger.StdoutLogger;
 import foam.nanos.script.Script;
 import foam.nanos.session.Session;
-
+import java.util.ArrayList;
 import java.util.List;
-
 import static foam.mlang.MLang.EQ;
 
 public class Boot {
@@ -51,14 +51,16 @@ public class Boot {
 
     installSystemUser();
 
-    serviceDAO_.select(new AbstractSink() {
-      @Override
-      public void put(Object obj, Detachable sub) {
-        NSpec sp = (NSpec) obj;
-        logger.info("Registering:", sp.getName());
-        root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory((ProxyX) root_, sp)));
-      }
-    });
+    // Just adding services in order will create an un-ordered tree,
+    // so add so that we get a balanced Context tree.
+    ArraySink arr = (ArraySink) serviceDAO_.select(new ArraySink());
+    List      l   = perfectList(arr.getArray());
+
+    for ( int i = 0 ; i < l.size() ; i++ ) {
+      NSpec sp = (NSpec) l.get(i);
+      logger.info("Registering:", sp.getName());
+      root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory((ProxyX) root_, sp)));
+    }
 
     serviceDAO_.listen(new AbstractSink() {
       @Override
@@ -115,6 +117,23 @@ public class Boot {
     }
   }
 
+  protected List perfectList(List src) {
+    List dst = new ArrayList(src.size());
+    perfectList(src, dst, 0, src.size()-1);
+    return dst;
+  }
+
+  protected void perfectList(List src, List dst, int start, int end) {
+    if ( start == end ) {
+      dst.add(src.get(start));
+    } else if ( end > start ) {
+      int pivot = ( start + end ) / 2;
+      perfectList(src, dst, pivot, pivot);
+      perfectList(src, dst, start, pivot-1);
+      perfectList(src, dst, pivot+1, end);
+    }
+  }
+
   protected void installSystemUser() {
     User user = new User();
     user.setId(1);
@@ -130,9 +149,6 @@ public class Boot {
 
     Group group = new Group();
     group.setId("system");
-    Permission[] permissions = {new Permission("*", "All access")};
-    group.setPermissions(permissions);
-    group.setDefaultMenu("set-personal");
     root_.put("group", group);
   }
 
