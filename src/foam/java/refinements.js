@@ -42,7 +42,7 @@ foam.LIB({
 new java.util.HashMap() {
   {
 ${Object.keys(o).map(function(k) {
-  return `put(${foam.java.asJavaValue(k)}, ${foam.java.asJavaValue(o[k])});`
+  return `  put(${foam.java.asJavaValue(k)}, ${foam.java.asJavaValue(o[k])});`
 }).join('\n')}
   }
 }
@@ -455,6 +455,7 @@ foam.LIB({
       cls.name = this.model_.name;
       cls.package = this.model_.package;
       cls.abstract = this.model_.abstract;
+      cls.documentation = this.model_.documentation;
 
       if ( this.model_.name !== 'AbstractFObject' ) {
         // if not AbstractFObject either extend AbstractFObject or use provided extends property
@@ -1166,7 +1167,7 @@ foam.CLASS({
             name: '__frozen__',
             visibility: 'protected',
             type: 'boolean',
-            initializer: 'false'
+            initializer: 'false;'
           });
 
           var flagFilter = foam.util.flagFilter(['java']);

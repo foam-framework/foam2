@@ -598,8 +598,8 @@ foam.CLASS({
     <foam class="com.acme.mypackage.MyView"></foam>
 
     // TODO: Decide if we want this or not:
-    // function XXXE(opt_nodeName /* | DIV */) {
-    //   /* Create a new Element */
+    // function XXXE(opt_nodeName // | DIV //) {
+    //   // Create a new Element
     //   var Y = this.__subContext__;
     //
     //   // ???: Is this needed / a good idea?
@@ -2484,7 +2484,7 @@ foam.CLASS({
   documentation: `
     A View is an Element used to display data.
     // TODO: Should the following be properties?
-    /*
+
     {
       type: 'Boolean',
       name: 'showValidation',
@@ -2498,7 +2498,7 @@ foam.CLASS({
       documentation: 'The actual error message. Null or the empty string ' +
           'when there is no error.',
     }
-    */
+
   `,
 
   exports: [ 'data' ],

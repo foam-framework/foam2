@@ -75,7 +75,13 @@ foam.CLASS({
   methods: [
     function outputJava(o) {
       o.indent();
-      o.out(this.documentation? '/** ' + this.documentation + '*/\n' : '');
+
+      if( this.documentation ){
+        o.out('/** ' + this.documentation.replace(/\n/g, "\n * ") + ' \n */\n');
+        o.increaseIndent();
+        o.indent();
+      }
+
       o.out(this.visibility, this.visibility ? ' ' : '',
         this.type, ' ', this.name, '(');
 
@@ -95,6 +101,10 @@ foam.CLASS({
       }
 
       o.out(';\n');
+
+      if( this.documentation ){
+        o.decreaseIndent();
+      }
     }
   ]
 });

@@ -99,7 +99,9 @@ foam.CLASS({
 
       o.out('\n');
 
-      o.out(this.documentation? '/** ' + this.documentation + '*/\n' : '');
+      if( this.documentation ){
+        o.out('/** ' + this.documentation.replace(/\n/g, "\n * ") + ' \n */\n');
+      }
 
       o.out(this.visibility, this.visibility ? ' ' : '',
         'interface ', this.name);
@@ -112,7 +114,7 @@ foam.CLASS({
         }
       }
 
-      o.out(' {\n');
+      o.out(' {\n\n');
 
       o.increaseIndent();
 
@@ -130,6 +132,7 @@ foam.CLASS({
 
       o.decreaseIndent();
       o.out('}');
+
     }
   ]
 });

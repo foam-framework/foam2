@@ -179,11 +179,14 @@ foam.CLASS({
         });
 
         o.out('\n');
+
       } else {
         o.indent();
       }
 
-      o.out(this.documentation? '/** ' + this.documentation + '*/\n' : '');
+      if( this.documentation ){
+        o.out('/** ' + this.documentation.replace(/\n/g, "\n * ") + ' \n */\n');
+      }
 
       if ( ! this.anonymous ) {
         o.out(this.visibility, ' ', this.static ? 'static ' : '');
@@ -205,7 +208,7 @@ foam.CLASS({
         }
       }
 
-      o.out(' {\n');
+      o.out(' {\n\n');
 
       o.increaseIndent();
 
@@ -223,6 +226,7 @@ foam.CLASS({
       o.decreaseIndent();
       o.indent();
       o.out('}');
+
     },
 
     function toJavaSource() {
