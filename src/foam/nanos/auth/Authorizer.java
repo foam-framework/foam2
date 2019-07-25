@@ -18,4 +18,7 @@ public interface Authorizer {
   void authorizeOnRead(X x, FObject obj) throws AuthorizationException;
   void authorizeOnUpdate(X x, FObject oldObj, FObject newObj) throws AuthorizationException;
   void authorizeOnDelete(X x, FObject obj) throws AuthorizationException;
+  boolean checkGlobalRead(X x);
+  boolean checkGlobalRemove(X x);
+  String getPermissionPrefix();
 }

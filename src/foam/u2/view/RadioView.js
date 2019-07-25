@@ -74,6 +74,7 @@ foam.CLASS({
     function onChoicesUpdate() {
       var self = this;
       var id;
+      var index = 0;
 
       this.removeAllChildren();
 
@@ -84,7 +85,7 @@ foam.CLASS({
           start('input').
             attrs({
               type: 'radio',
-              name: self.getAttribute('name') + '-' + c[0],
+              name: self.getAttribute('name') + 'Choice' + String.fromCharCode("A".charCodeAt(0) + (index++)),
               value: c[0],
               checked: self.slot(function (data) { return data === c[0]; }),
               disabled: self.isDisabled$

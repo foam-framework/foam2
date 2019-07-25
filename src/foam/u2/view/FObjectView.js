@@ -47,7 +47,10 @@ foam.CLASS({
         }
       }
     },
-    'of',
+    {
+      class: 'Class',
+      name: 'of'
+    },
     {
       name: 'choices',
       expression: function(of) {

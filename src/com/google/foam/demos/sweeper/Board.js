@@ -37,7 +37,7 @@ foam.CLASS({
           cells[row] = [];
           for ( var col = 0 ; col < this.width ; col++ ) {
             var cell = cells[row][col] = this.Cell.create({x: col, y: row});
-            cell.covered$.sub(this.cellUncovered);
+            cell.covered$.sub(this.cellUncovered.bind(this, cell));
           }
         }
         return cells;
@@ -63,7 +63,7 @@ foam.CLASS({
 
     function forEachNeighbour(cell, f) {
       var maxRow = Math.min(this.height, cell.y+2);
-      var maxCol = Math.min(this.width, cell.x+2);
+      var maxCol = Math.min(this.width,  cell.x+2);
 
       for ( var row = Math.max(0, cell.y-1) ; row < maxRow ; row++ ) {
         for ( var col = Math.max(0, cell.x-1) ; col < maxCol ; col++ ) {
@@ -80,14 +80,11 @@ foam.CLASS({
   ],
 
   listeners: [
-    function cellUncovered(e) {
-      var cell = e.src;
-
+    function cellUncovered(cell) {
       if ( cell.mineCount ) return;
 
       this.setTimeout(
-        this.forEachNeighbour.bind(
-          this,
+        this.forEachNeighbour(
           cell,
           function(c) { if ( ! c.mined ) c.covered = false; }),
         32);

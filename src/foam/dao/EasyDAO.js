@@ -106,16 +106,6 @@ foam.CLASS({
      `
     },
     {
-      class: 'String',
-      name: 'permissionPrefix',
-      factory: function() {
-        return this.of.name.toLowerCase();
-      },
-      javaFactory: `
-      return this.getOf().getObjClass().getSimpleName().toLowerCase();
-     `
-    },
-    {
       name: 'nSpec',
       class: 'FObjectProperty',
       type: 'foam.nanos.boot.NSpec'
@@ -145,7 +135,7 @@ if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
 
 if ( getDecorator() != null ) {
   if ( ! ( getDecorator() instanceof ProxyDAO ) ) {
-    logger.error(this.getClass().getSimpleName(), "delegate", "NSpec.name", getNSpec().getName(), "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
+    logger.error(this.getClass().getSimpleName(), "delegate", "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
     System.exit(1);
   }
   // The decorator dao may be a proxy chain
@@ -211,12 +201,13 @@ if ( getOrder() != null &&
   }
 }
 
-if ( getAuthorize() ) {
+if ( getAuthorize() || getAuthorizer() != null ) {
+  if ( getAuthorizer() != null ) delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, getAuthorizer(), getAuthorizeReads());
   if ( foam.nanos.auth.Authorizable.class.isAssignableFrom(getOf().getObjClass()) ) {
-    delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate);
-    setAuthenticate(false);
+    delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, new foam.nanos.auth.AuthorizableAuthorizer(getPermissionPrefix()), getAuthorizeReads());
   } else {
     logger.warning("EasyDAO", "authorize=true but 'of' ",getOf().getId(), "not Authorizable");
+    delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, new foam.nanos.auth.StandardAuthorizer(getPermissionPrefix()), getAuthorizeReads());
   }
 }
 
@@ -234,6 +225,11 @@ if ( getNSpec() != null &&
      ! getReadOnly() ) {
   //setReadOnly(true);
   logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authenticated, Authorized, or ReadOnly");
+}
+
+if ( getPermissioned() &&
+     ( getNSpec() != null && getNSpec().getServe() ) ) {
+  delegate = new foam.nanos.auth.PermissionedPropertyDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
 if ( getReadOnly() ) {
@@ -310,10 +306,30 @@ return delegate;
       value: false
     },
     {
+      class: 'Boolean',
+      name: 'authorizeReads',
+      value: true
+    },
+    {
+      class: 'Object',
+      type: 'foam.nanos.auth.Authorizer',
+      name: 'authorizer'
+    },
+    {
       /** Enable standard authentication. */
       class: 'Boolean',
       name: 'authenticate',
       value: true
+    },
+    {
+      class: 'String',
+      name: 'permissionPrefix',
+      factory: function() {
+        return this.of.name.toLowerCase();
+      },
+      javaFactory: `
+      return this.getOf().getObjClass().getSimpleName().toLowerCase();
+     `
     },
     {
       /** Enable standard read authentication. */
@@ -325,6 +341,12 @@ return delegate;
       class: 'Boolean',
       name: 'readOnly',
       value: false
+    },
+    {
+      documentation: 'Wrap in PermissionedPropertiesDAO',
+      class: 'Boolean',
+      name: 'permissioned',
+      value: true
     },
     {
       /** Enable value de-duplication to save memory when caching. */

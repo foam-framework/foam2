@@ -64,7 +64,8 @@ var classes = [
   'foam.mlang.ContextObject',
   'foam.mlang.predicate.RegExp',
   'foam.mlang.predicate.OlderThan',
-  'foam.mlang.predicate.HasPermission',
+  'foam.mlang.predicate.isAuthorizedToRead',
+  'foam.mlang.predicate.isAuthorizedToDelete',
   'foam.box.Box',
   'foam.box.Skeleton',
   'foam.box.AbstractSkeleton',
@@ -101,6 +102,11 @@ var classes = [
   'foam.box.SessionReplyBox',
   'foam.box.SessionClientBox',
   'foam.dao.DAO',
+  'foam.dao.CSVSink',
+  'foam.lib.csv.CSVOutputter',
+  'foam.lib.csv.PrefixedCSVOutputter',
+  'foam.lib.csv.CSVOutputterImpl',
+  'foam.lib.csv.ProxyCSVOutputter',
   'foam.dao.java.JDAO',
   'foam.dao.FilteredDAO',
   'foam.dao.Journal',
@@ -258,10 +264,10 @@ var classes = [
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.EmailTemplate',
   'foam.nanos.notification.email.EmailPropertyService',
+  'foam.nanos.notification.email.Status',
   // Email service Files
   'foam.nanos.notification.email.SMTPEmailService',
   'foam.nanos.notification.email.NullEmailService',
-  'foam.nanos.notification.email.AsyncEmailService',
   'foam.nanos.notification.email.ProxyEmailService',
   // Property set on Emails
   'foam.nanos.notification.email.ChainedPropertyService',
@@ -416,7 +422,24 @@ var classes = [
   'io.c9.ace.Theme',
 
   // Themes
-  'foam.nanos.theme.Theme'
+  'foam.nanos.theme.Theme',
+
+  // Crunch
+  'foam.nanos.crunch.crunchtest.FakeTestObject',
+  //models
+  'foam.nanos.crunch.Capability',
+  'foam.nanos.crunch.CapabilityJunctionStatus',
+  'foam.nanos.crunch.UserCapabilityJunction',
+  'foam.nanos.crunch.CapabilityCapabilityJunction',
+  //daos
+  'foam.nanos.crunch.UserCapabilityJunctionDAO',
+  //rules
+  'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
+  'foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate',
+  'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
+  //authservice
+  'foam.nanos.auth.CapabilityAuthService',
+  
 ];
 
 var abstractClasses = [

@@ -12,7 +12,10 @@ foam.CLASS({
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows'
   ],
-  exports: [ 'updateData' ],
+  exports: [
+    'mode',
+    'updateData'
+  ],
   properties: [
     {
       class: 'foam.u2.ViewSpec',
@@ -24,8 +27,8 @@ foam.CLASS({
     {
       name: 'addRow',
       label: 'Add',
-      isAvailable: function(controllerMode) {
-        return controllerMode !== foam.u2.ControllerMode.VIEW;
+      isAvailable: function(mode) {
+        return mode === foam.u2.DisplayMode.RW;
       },
       code: function() {
         this.data[this.data.length] = '';
@@ -37,8 +40,8 @@ foam.CLASS({
     {
       name: 'Row',
       imports: [ 
-        'controllerMode?',
         'data',
+        'mode',
         'updateData'
       ],
       properties: [
@@ -58,8 +61,8 @@ foam.CLASS({
         {
           name: 'remove',
           label: 'X',
-          isAvailable: function(controllerMode) {
-            return controllerMode !== foam.u2.ControllerMode.VIEW;
+          isAvailable: function(mode) {
+            return mode === foam.u2.DisplayMode.RW;
           },
           code: function() {
             this.data.splice(this.index, 1);
@@ -96,7 +99,9 @@ foam.CLASS({
                       .start(valueView, { data$: row.value$ })
                         .style({ flex: 1 })
                       .end()
-                      .add(self.Row.REMOVE)
+                      .tag(self.Row.REMOVE, {
+                        isDestructive: true
+                      })
                     .end()
                   .endContext();
                 row.onDetach(row.sub(self.updateData));

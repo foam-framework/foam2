@@ -16,6 +16,13 @@ foam.CLASS({
   requires: [
     'foam.u2.layout.Cols',
   ],
+
+  css: `
+    ^citation-view {
+      width: 100%;
+    }
+  `,
+
   properties: [
     {
       class: 'Boolean',
@@ -56,13 +63,16 @@ foam.CLASS({
     function initE() {
       var self = this;
       self.SUPER();
+
+      this.addClass(this.myClass());
+      
       self
         .startContext({ data: self })
           .start(self.Cols)
             .add(self.slot(function(citationView) {
-              return self.E().tag(citationView, {
+              return citationView ? self.E().tag(citationView, {
                 data$: self.data$
-              });
+              }).addClass(this.myClass('citation-view')) : null;
             }))
             .add(self.SHOW_ACTION)
             .add(self.HIDE_ACTION)

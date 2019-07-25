@@ -29,9 +29,11 @@ foam.CLASS({
     'java.io.BufferedReader',
     'java.io.BufferedWriter',
     'java.io.InputStreamReader',
+    'java.io.InputStream',
     'java.io.File',
     'java.io.FileReader',
     'java.io.FileWriter',
+    'java.io.FileNotFoundException',
     'java.text.SimpleDateFormat',
     'java.util.Calendar',
     'java.util.Iterator',
@@ -173,10 +175,17 @@ foam.CLASS({
       try {
         Storage storage = (Storage) getX().get(Storage.class);
         if ( storage.isResource() ) {
-          return new BufferedReader(new InputStreamReader(storage.getResourceAsStream(getFilename())));
+          InputStream file = storage.getResourceAsStream(getFilename());
+          if ( file == null ) {
+            getLogger().error("Failed to read from resource journal: " + getFilename());
+          }
+          return (file == null) ? null : new BufferedReader(new InputStreamReader(file));
         } else {
           return new BufferedReader(new FileReader(getFile()));
         }
+      } catch ( FileNotFoundException t) {
+        getLogger().error("Failed to read from journal: " + getFilename(), t.getLocalizedMessage());
+        return null;
       } catch ( Throwable t ) {
         getLogger().error("Failed to read from journal", t);
         throw new RuntimeException(t);
@@ -330,8 +339,8 @@ foam.CLASS({
       javaCode: `
         try {
           String line = reader.readLine();
-          if ( ! line.equals("p({") && ! line.equals("r({") ) return line;
           if ( line == null ) return null;
+          if ( ! line.equals("p({") && ! line.equals("r({") ) return line;
           StringBuilder sb = new StringBuilder();
           sb.append(line);
           while( ! line.equals("})") ) {
@@ -355,6 +364,9 @@ foam.CLASS({
         JSONParser parser = getParser();
 
         try ( BufferedReader reader = getReader() ) {
+          if ( reader == null ) {
+            return;
+          }
           for ( String entry ; ( entry = getEntry(reader) ) != null ; ) {
             if ( SafetyUtil.isEmpty(entry)        ) continue;
             if ( COMMENT.matcher(entry).matches() ) continue;
