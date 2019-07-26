@@ -187,6 +187,4 @@ public class MySQLJDBCDAO extends AbstractJDBCDAO{
     }
   }
 
-
-
 }

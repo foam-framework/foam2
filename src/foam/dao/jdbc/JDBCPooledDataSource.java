@@ -18,10 +18,8 @@ public class JDBCPooledDataSource {
 
   // Holds a reference to the connection pool ( .getConnection() )
   protected DataSource dataSource_;
-  protected String poolName_;
 
   public JDBCPooledDataSource(X x, String poolName) {
-    poolName_ = poolName;
 
     try {
       Object spec = x.get("JDBCConnectionSpec");
@@ -41,7 +39,7 @@ public class JDBCPooledDataSource {
 
   }
 
-  public DataSource getDataSource(X x, String poolName) {
+  public DataSource getDataSource() {
     return dataSource_;
   }
 

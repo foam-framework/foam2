@@ -127,9 +127,8 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
     setX(x);
     setOf(of);
 
-    // Get the system global dataSource with its system global pool
     JDBCPooledDataSource jp = new JDBCPooledDataSource(x, poolName);
-    dataSource_ = jp.getDataSource(x, poolName);
+    dataSource_ = jp.getDataSource();
 
     tableName_ = of.getObjClass().getSimpleName().toLowerCase();
 
