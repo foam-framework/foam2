@@ -193,7 +193,19 @@ p({"class":"foam.nanos.boot.NSpec","name":"themeDAO","description":"Stores Theme
 
 p({"class":"foam.nanos.boot.NSpec","name":"localGroupPermissionJunctionDAO","description":"The junction DAO for the many-to-many relationship between groups and permissions","serviceScript":"return new foam.dao.EasyDAO.Builder(x).setOf(foam.nanos.auth.GroupPermissionJunction.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"groupPermissionJunctions\").setPm(true).build()"})
 
-p({"class":"foam.nanos.boot.NSpec","name":"groupPermissionJunctionDAO","description":"The junction DAO for the many-to-many relationship between groups and permissions. NOTE: authorization is setup on local dao.","serve":true,"serviceScript":"return new foam.dao.EasyDAO.Builder(x).setOf(foam.nanos.auth.GroupPermissionJunction.getOwnClassInfo()).setAuthorize(false).setInnerDAO((foam.dao.DAO) x.get(\"localGroupPermissionJunctionDAO\")).build();","client":"{\"of\": \"foam.nanos.auth.GroupPermissionJunction\"}"})
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"groupPermissionJunctionDAO",
+  "description":"The junction DAO for the many-to-many relationship between groups and permissions. NOTE: authorization is setup on local dao.",
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.auth.GroupPermissionJunction.getOwnClassInfo())
+      .setAuthorize(false)
+      .setInnerDAO((foam.dao.DAO) x.get("localGroupPermissionJunctionDAO"))
+    .build();""",
+  "client":"{\"of\": \"foam.nanos.auth.GroupPermissionJunction\"}"
+})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"pmLogger","serviceClass":"foam.nanos.pm.DAOPMLogger"})
 p({"class":"foam.nanos.boot.NSpec", "name":"pmInfoDAO","serve":true,"serviceScript":"return new foam.dao.ProxyDAO.Builder(x).setDelegate(new foam.nanos.pm.PMInfoMDAO()).build();","client":"{\"of\":\"foam.nanos.pm.PMInfo\", \"remoteListenerSupport\": false}" })
