@@ -117,9 +117,7 @@ foam.CLASS({
       javaFactory: `
 Logger logger = (Logger) getX().get("logger");
 
-foam.dao.DAO delegate = getInnerDAO() == null ?
-  new foam.dao.MDAO(getOf()) :
-  getInnerDAO();
+foam.dao.DAO delegate = getInnerDAO();
 
 if ( delegate instanceof foam.dao.MDAO ) {
   setMdao((foam.dao.MDAO)delegate);
@@ -127,13 +125,6 @@ if ( delegate instanceof foam.dao.MDAO ) {
        getIndex().length > 0 ) {
     getMdao().addIndex(getIndex());
   }
-}
-
-if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
-  if ( getClassType() != null )
-    delegate = new foam.dao.java.JDAO(getX(), getClassType(), getJournalName());
-  else
-    delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
 }
 
 if ( getDecorator() != null ) {
@@ -249,7 +240,12 @@ return delegate;
     {
       class: 'Object',
       type: 'foam.dao.DAO',
-      name: 'innerDAO'
+      name: 'innerDAO',
+      javaFactory: `
+      if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) )
+        return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
+      return new foam.dao.MDAO(getOf());
+      `
     },
     {
       class: 'Object',
@@ -380,12 +376,6 @@ return delegate;
       class: 'Boolean',
       name: 'timing',
       value: false
-    },
-    {
-      class: 'Object',
-      javaType: 'foam.core.ClassInfo',
-      name: 'classType',
-      value: null
     },
     {
       class: 'Boolean',
