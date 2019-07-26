@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+//import limitSplit from 'foam.java.util.js';
+
 foam.CLASS({
   package: 'foam.java',
   name: 'InterfaceMethod',
@@ -78,7 +80,7 @@ foam.CLASS({
 
       if( this.documentation ){
         str = this.documentation.replace(/ +(?= )/g, ' ');
-        str = limitSplit(o, str.replace(/\n/g, ' '), 25);
+        str = foam.java.Util.limitSplit(o, str.replace(/\n/g, ' '), 25);
         o.out('/** ' + str);
         o.indent();
         o.out('*/\n');
@@ -112,17 +114,3 @@ foam.CLASS({
     }
   ]
 });
-
-function limitSplit(o, str, maxWords){
-    var res = '';
-    var arr = str.split(' ', 150);
-    o.indent();
-    for( i = 0 ; i < arr.length ; i++){
-      res += arr[i] + ' ';
-      if( i % maxWords == 0 && i > 0 ){
-        res += '\n';
-        o.indent();
-      }
-    }
-    return res;
-}

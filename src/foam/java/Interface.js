@@ -100,7 +100,7 @@ foam.CLASS({
       o.out('\n');
 
       if( this.documentation ){
-        str = limitSplit(o, this.documentation.replace(/\n/g, ' '), 25);
+        str = foam.java.Util.limitSplit(o, this.documentation.replace(/\n/g, ' '), 25);
         o.out('/** ' + str.replace(/\n/g, "\n * ") + ' \n */\n');
       }
 
@@ -137,17 +137,3 @@ foam.CLASS({
     }
   ]
 });
-
-// Splits strings when they are too long, used to split documentation in multiple lines
-function limitSplit(o, str, maxWords){
-    var res = '';
-    var arr = str.split(' ', 150);
-    for( i = 0 ; i < arr.length ; i++ ){
-      res += arr[i] + ' ';
-      if( i % maxWords == 0 && i > 0 ){
-        res += '\n';
-        o.indent();
-      }
-    }
-    return res;
-}
