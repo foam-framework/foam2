@@ -5,3 +5,6 @@ p({"class":"foam.nanos.cron.Cron","id":"PMInfoRollup","scheduledTime":"2019-04-2
 p({"class":"foam.nanos.cron.Cron","minute":0,"id":"PMHourlyReduce","enabled":false,"code":"rm = x.get(\"pmHourlyReduceManager\");\nrm.doReduce();"})
 p({"class":"foam.nanos.cron.Cron","hour":0,"id":"PMDailyReduce","enabled":false,"code":"rm = x.get(\"pmDailyReduceManager\");\nrm.doReduce();"})
 p({"class":"foam.nanos.cron.Cron","enabled":true,"id":"PmReduceManager","code":"import foam.nanos.logger.Logger;\n\nscriptName = \"PMReduceManager\";\nlogger = x.get(\"logger\");\ndailyRM = x.get(\"pmDailyReduceManager\");\nhourlyRM = x.get(\"pmHourlyReduceManager\");\nnow = java.time.LocalDateTime.now();\n\nif (now.getHour() == 0) {\n  hourlyRM.doReduce();\n  dailyRM.doReduce();\n  logger.info(new String[] {scriptName, \"Daily PM Reduce Complete\"});\n} else if (now.getMinute() == 0){\n  hourlyRM.doReduce();\n  logger.info(new String[] {scriptName, \"Hourly PM Reduce Complete\"});\n}\n"})
+
+p({"class":"foam.nanos.cron.Cron","id":"sessionExpiry","scheduledTime":"2019-07-26T21:01:00.000Z","lastRun":"2019-07-26T20:10:11.182Z","lastDuration":18})
+p({"class":"foam.nanos.cron.Cron","id":"PmReduceManager","scheduledTime":"2019-07-26T20:12:00.000Z","lastRun":"2019-07-26T20:11:00.729Z","lastDuration":336})
