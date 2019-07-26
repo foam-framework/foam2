@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 
 // TODO: Create AbstractJDBCDAO baseclass
-public class PostgresDAO
+public class PostgresJDBCDAO
   extends AbstractJDBCDAO
 {
   protected ConnectionPool connectionPool = new ConnectionPool();
@@ -46,7 +46,7 @@ public class PostgresDAO
   protected String table_;
   protected List<PropertyInfo> props_ = new ArrayList<>();
 
-  public PostgresDAO(X x, ClassInfo of, String poolName) throws java.sql.SQLException, ClassNotFoundException {
+  public PostgresJDBCDAO(X x, ClassInfo of, String poolName) throws java.sql.SQLException, ClassNotFoundException {
     super(x, of, poolName);
   }
 
