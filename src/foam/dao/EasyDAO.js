@@ -73,6 +73,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.nanos.logger.Logger'
+
   ],
 
   constants: [
@@ -130,7 +131,10 @@ if ( delegate instanceof foam.dao.MDAO ) {
 }
 
 if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
-  delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
+  if ( getClassType() != null )
+    delegate = new foam.dao.java.JDAO(getX(), getClassType(), getJournalName());
+  else
+    delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
 }
 
 if ( getDecorator() != null ) {
@@ -201,7 +205,15 @@ if ( getOrder() != null &&
   }
 }
 
-if( getAuthorize() ) delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, getAuthorizer());
+if ( getAuthorize() || getAuthorizer() != null ) {
+  if ( getAuthorizer() != null ) delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, getAuthorizer(), getAuthorizeReads());
+  if ( foam.nanos.auth.Authorizable.class.isAssignableFrom(getOf().getObjClass()) ) {
+    delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, new foam.nanos.auth.AuthorizableAuthorizer(getPermissionPrefix()), getAuthorizeReads());
+  } else {
+    logger.warning("EasyDAO", "authorize=true but 'of' ",getOf().getId(), "not Authorizable");
+    delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, new foam.nanos.auth.StandardAuthorizer(getPermissionPrefix()), getAuthorizeReads());
+  }
+}
 
 if ( getAuthenticate() ) {
   delegate = new foam.dao.AuthenticatedDAO(
@@ -298,16 +310,14 @@ return delegate;
       value: false
     },
     {
+      class: 'Boolean',
+      name: 'authorizeReads',
+      value: true
+    },
+    {
       class: 'Object',
       type: 'foam.nanos.auth.Authorizer',
-      name: 'authorizer',
-      javaFactory: `
-      if ( foam.nanos.auth.Authorizable.class.isAssignableFrom(getOf().getObjClass()) ) {
-        return new foam.nanos.auth.AuthorizableAuthorizer(getPermissionPrefix());
-      } else {
-        return new foam.nanos.auth.StandardAuthorizer(getPermissionPrefix());
-      }
-      `
+      name: 'authorizer'
     },
     {
       /** Enable standard authentication. */
@@ -359,6 +369,12 @@ return delegate;
     {
       class: 'String',
       name: 'journalName'
+    },
+    {
+      class: 'Object',
+      javaType: 'foam.core.ClassInfo',
+      name: 'classType',
+      value: null
     },
     {
       class: 'FObjectProperty',
