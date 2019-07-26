@@ -30,7 +30,12 @@ foam.CLASS({
   `,
 
   properties: [
-    ['type', 'number'],
+    {
+      name: 'type',
+      expression: function(mode) {
+        return mode === foam.u2.DisplayMode.RO ? 'text' : 'number';
+      }
+    },
     { class: 'Float', name: 'data' },
     'precision',
     'min',

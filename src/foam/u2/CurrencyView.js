@@ -19,7 +19,10 @@ foam.CLASS({
 
   methods: [
     function dataToText(val) {
-      return this.SUPER(val / 100);
+      val = Math.floor(val / 100);
+      return this.mode === foam.u2.DisplayMode.RO ?
+        val.toLocaleString(undefined, {minimumFractionDigits: 2}) :
+        this.SUPER(val);
     },
 
     function textToData(text) {
