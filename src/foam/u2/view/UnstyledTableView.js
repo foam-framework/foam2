@@ -321,7 +321,6 @@ foam.CLASS({
                         class: 'foam.u2.DetailView',
                         data: view.EditColumnsView.create({
                           of: view.of,
-                          displayColumns$: view.columns$,
                           allColumns: view.allColumns
                         })
                       });
