@@ -10,9 +10,7 @@ import foam.core.X;
 import org.apache.commons.dbcp2.*;
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPool;
-
 import foam.nanos.logger.Logger;
-
 import javax.sql.DataSource;
 import java.sql.DriverManager;
 
@@ -26,24 +24,11 @@ public class JDBCPooledDataSource {
     poolName_ = poolName;
 
     try {
-      //Add code to get JDBCConnectionSpec properties
       Object spec = x.get("JDBCConnectionSpec");
-
-      if( spec == null ) {
-        throw new java.sql.SQLException("JDBC connection information not found");
-      }
-
-      if ( !(spec instanceof JDBCConnectionSpec) ) {
-        throw new ClassCastException("Expecting a JDBCConnectionSpec but obtained instead: " + spec.toString());
-      }
 
       JDBCConnectionSpec jdbcSpec = (JDBCConnectionSpec) spec;
 
-      //jdbc:mysql://localhost/db?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
-      String connectionURI = "jdbc:" + jdbcSpec.getDatabaseServer() + "://" + jdbcSpec.getHostName() +
-        "/" + jdbcSpec.getDatabaseName() + "?useUnicode=true&useJDBCCompliantTimezoneShift=true" +
-        "&useLegacyDatetimeCode=false&serverTimezone=UTC" +
-        "&user=" + jdbcSpec.getUserName() + "&password=" + jdbcSpec.getUserPassword();
+      String connectionURI = jdbcSpec.buildConnectionURI();
 
       dataSource_ = setupPoolingDataSource(connectionURI, poolName);
     } catch (ClassNotFoundException e) {

@@ -77,8 +77,9 @@ foam.CLASS({
       o.indent();
 
       if( this.documentation ){
-        str = limitSplit(o, this.documentation.replace(/\n/g, ' '), 25);
-        o.out('/** ' + str.replace(/\n/g, "\n * "));
+        str = this.documentation.replace(/ +(?= )/g, ' ');
+        str = limitSplit(o, str.replace(/\n/g, ' '), 25);
+        o.out('/** ' + str);
         o.indent();
         o.out('*/\n');
         o.increaseIndent();
@@ -115,6 +116,7 @@ foam.CLASS({
 function limitSplit(o, str, maxWords){
     var res = '';
     var arr = str.split(' ', 150);
+    o.indent();
     for( i = 0 ; i < arr.length ; i++){
       res += arr[i] + ' ';
       if( i % maxWords == 0 && i > 0 ){

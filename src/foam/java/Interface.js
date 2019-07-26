@@ -138,11 +138,11 @@ foam.CLASS({
   ]
 });
 
-
+// Splits strings when they are too long, used to split documentation in multiple lines
 function limitSplit(o, str, maxWords){
     var res = '';
     var arr = str.split(' ', 150);
-    for( i = 0 ; i < arr.length ; i++){
+    for( i = 0 ; i < arr.length ; i++ ){
       res += arr[i] + ' ';
       if( i % maxWords == 0 && i > 0 ){
         res += '\n';

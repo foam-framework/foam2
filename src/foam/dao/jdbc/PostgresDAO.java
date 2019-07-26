@@ -10,22 +10,17 @@ import foam.core.ClassInfo;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
-
 import foam.dao.Sink;
-
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
-
 import foam.nanos.logger.Logger;
-
 import java.sql.*;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 // TODO: Create AbstractJDBCDAO baseclass
-public class PostgresJDBCDAO
+public class PostgresDAO
   extends AbstractJDBCDAO
 {
   protected ConnectionPool connectionPool = new ConnectionPool();
@@ -46,7 +41,7 @@ public class PostgresJDBCDAO
   protected String table_;
   protected List<PropertyInfo> props_ = new ArrayList<>();
 
-  public PostgresJDBCDAO(X x, ClassInfo of, String poolName) throws java.sql.SQLException, ClassNotFoundException {
+  public PostgresDAO(X x, ClassInfo of, String poolName) throws java.sql.SQLException, ClassNotFoundException {
     super(x, of, poolName);
   }
 
@@ -228,7 +223,7 @@ public class PostgresJDBCDAO
    * @throws SQLException
    */
   @Override
-  public boolean createTable(X x, ClassInfo of) {
+  public boolean maybeCreateTable(X x, ClassInfo of) {
     Connection c = null;
     IndexedPreparedStatement stmt = null;
     ResultSet resultSet = null;

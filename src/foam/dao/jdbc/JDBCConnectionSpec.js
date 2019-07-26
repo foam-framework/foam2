@@ -29,5 +29,16 @@ foam.CLASS({
       class: 'Password',
       name: 'userPassword'
     }
+  ],
+  methods: [
+    {
+        name: 'buildConnectionURI',
+        type: 'String',
+        javaCode: `return "jdbc:" + getDatabaseServer() + "://" + getHostName() +
+                               "/" + getDatabaseName() + "?useUnicode=true&useJDBCCompliantTimezoneShift=true" +
+                               "&useLegacyDatetimeCode=false&serverTimezone=UTC" +
+                               "&user=" + getUserName() + "&password=" + getUserPassword();
+                  `
+    }
   ]
 });

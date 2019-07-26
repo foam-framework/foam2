@@ -7,16 +7,18 @@
 package foam.dao.jdbc;
 
 import foam.dao.AbstractDAO;
-
 import foam.core.*;
+import foam.nanos.logger.Logger;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.sql.*;
-
 import java.lang.Exception;
 import java.util.*;
 
+/**
+ * Abstract class for implementing JDBC-based DAOs.
+ */
 public abstract class AbstractJDBCDAO extends AbstractDAO{
 
   /** Holds the relevant properties (column names) of the table */
@@ -43,11 +45,83 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
   /** Holds a reference to the connection pool ( .getConnection() ) */
   protected static DataSource dataSource_;
 
+  @Override
+  public FObject find_(X x, Object id) {
+    Connection c = null;
+    IndexedPreparedStatement stmt = null;
+    ResultSet resultSet = null;
+
+    try {
+      c = dataSource_.getConnection();
+      StringBuilder builder = threadLocalBuilder_.get()
+        .append("select * from ")
+        .append(tableName_)
+        .append(" where ")
+        .append(getPrimaryKey().createStatement())
+        .append(" = ?");
+
+      stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
+      // TODO: add support for non-numbers
+      //stmt.setLong(((Number) o).longValue());
+      stmt.setObject(id);
+      resultSet = stmt.executeQuery();
+      if ( ! resultSet.next() ) {
+        // no rows
+        return null;
+        // In the doc, should be: throw new foam.dao.ObjectNotFoundException();
+      }
+
+      return createFObject(resultSet);
+    } catch (Throwable e) {
+      Logger logger = (Logger) x.get("logger");
+      logger.error(e);
+      return null;
+    } finally {
+      closeAllQuietly(resultSet, stmt);
+    }
+  }
+
+  @Override
+  public FObject remove_(X x, FObject obj) {
+    Connection c = null;
+    IndexedPreparedStatement stmt = null;
+
+    try {
+      c = dataSource_.getConnection();
+      StringBuilder builder = threadLocalBuilder_.get()
+        .append("delete from ")
+        .append(tableName_)
+        .append(" where ")
+        .append(getPrimaryKey().createStatement())
+        .append(" = ?");
+
+      stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
+      // TODO: add support for non-numbers
+      //stmt.setLong(((Number) o.getProperty("id")).longValue());
+      stmt.setObject(obj.getProperty(getPrimaryKey().getName()));
+
+      int removed = stmt.executeUpdate();
+      if ( removed == 0 ) {
+        // throw new SQLException("Error while removing.");
+        // According to doc, no error when removing doesn't remove anything
+        return null;
+      }
+
+      return obj;
+    } catch (Throwable e) {
+      Logger logger = (Logger) x.get("logger");
+      logger.error(e);
+      return null;
+    } finally {
+      closeAllQuietly(null, stmt);
+    }
+  }
+
   /**
    * Create the table in the database and return true if it doesn't already exist otherwise it does nothing and returns false
    * @param of ClassInfo
    */
-  public abstract boolean createTable(X x, ClassInfo of);
+  public abstract boolean maybeCreateTable(X x, ClassInfo of);
 
   public AbstractJDBCDAO(X x, ClassInfo of, String poolName) throws java.sql.SQLException, ClassNotFoundException {
     setX(x);
@@ -61,9 +135,7 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
 
     getObjectProperties(of);
 
-    if ( ! createTable(x, of) ) {
-      // Table already created (may happen after a system restart).
-    }
+    maybeCreateTable(x, of);
 
   }
 
@@ -73,13 +145,13 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
    */
   protected void getObjectProperties(ClassInfo of){
 
-    if(properties_ == null) {
+    if( properties_ == null ) {
       List<PropertyInfo> allProperties = of.getAxiomsByClass(PropertyInfo.class);
       properties_ = new ArrayList<PropertyInfo>();
-      for (PropertyInfo prop : allProperties) {
-        if (prop.getStorageTransient())
+      for ( PropertyInfo prop : allProperties ) {
+        if ( prop.getStorageTransient() )
           continue;
-        if ("".equals(prop.getSQLType()))
+        if ( "".equals(prop.getSQLType()) )
           continue;
         properties_.add(prop);
       }
@@ -140,6 +212,72 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
       try { resultSet.close(); } catch (Throwable ignored) {}
     if ( stmt != null )
       try { stmt.close(); } catch (Throwable ignored) {}
+  }
+
+  /**
+   * Prepare the formatted column names. Appends column names like: (c1,c2,c3)
+   * @param builder builder to append to
+   */
+  public void buildFormattedColumnNames(FObject obj, StringBuilder builder) {
+    // collect columns list into comma delimited string
+    builder.append("(");
+    Iterator i = properties_.iterator();
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+/*       if ( "id".equals(prop.getName()) )
+        continue; */
+
+      builder.append(prop.createStatement());
+      if ( i.hasNext() ) {
+        builder.append(",");
+      }
+    }
+    builder.append(")");
+  }
+
+  /**
+   * Prepare the formatted value placeholders. Appends value placeholders like: (?,?,?)
+   * @param builder builder to append to
+   */
+  public void buildFormattedColumnPlaceholders(FObject obj, StringBuilder builder) {
+    // map columns into ? and collect into comma delimited string
+    builder.append("(");
+    Iterator i = properties_.iterator();
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+/*       if ( "id".equals(prop.getName()) )
+        continue; */
+
+      builder.append("?");
+      if ( i.hasNext() ) {
+        builder.append(",");
+      }
+    }
+    builder.append(")");
+  }
+
+  /**
+   * Prepare the formatted UPDATE string like :  description='etc', name='etc'
+   * @param builder builder to append to
+   */
+  public void buildUpdateFormattedColumnNames(FObject obj, StringBuilder builder) {
+    // collect columns list into comma delimited string
+    Iterator i = properties_.iterator();
+    while ( i.hasNext() ) {
+
+      PropertyInfo prop = (PropertyInfo) i.next();
+      if ( "id".equals(prop.getName()) )
+        continue;
+
+      builder.append(prop.createStatement());
+      builder.append("='");
+      builder.append(prop.get(obj));  //add the new property value
+      builder.append("'");
+      if ( i.hasNext() ) {
+        builder.append(",");
+      }
+    }
+
   }
 
 }

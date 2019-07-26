@@ -7,16 +7,11 @@
 package foam.dao.jdbc;
 
 import foam.core.*;
-
 import foam.dao.Sink;
-
 import foam.nanos.logger.Logger;
-
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
-
 import java.sql.*;
-
 import java.sql.SQLException;
 import java.util.*;
 
@@ -70,78 +65,6 @@ public class MySQLJDBCDAO extends AbstractJDBCDAO{
       } */
 
       return obj;
-    } catch (Throwable e) {
-      Logger logger = (Logger) x.get("logger");
-      logger.error(e);
-      return null;
-    } finally {
-      closeAllQuietly(resultSet, stmt);
-    }
-  }
-
-  @Override
-  public FObject remove_(X x, FObject obj) {
-    Connection c = null;
-    IndexedPreparedStatement stmt = null;
-
-    try {
-      c = dataSource_.getConnection();
-      StringBuilder builder = threadLocalBuilder_.get()
-        .append("delete from ")
-        .append(tableName_)
-        .append(" where ")
-        .append(getPrimaryKey().createStatement())
-        .append(" = ?");
-
-      stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
-      // TODO: add support for non-numbers
-      //stmt.setLong(((Number) o.getProperty("id")).longValue());
-      stmt.setObject(obj.getProperty(getPrimaryKey().getName()));
-
-      int removed = stmt.executeUpdate();
-      if ( removed == 0 ) {
-        // throw new SQLException("Error while removing.");
-        // According to doc, no error when removing doesn't remove anything
-        return null;
-      }
-
-      return obj;
-    } catch (Throwable e) {
-      Logger logger = (Logger) x.get("logger");
-      logger.error(e);
-      return null;
-    } finally {
-      closeAllQuietly(null, stmt);
-    }
-  }
-
-  @Override
-  public FObject find_(X x, Object id) {
-    Connection c = null;
-    IndexedPreparedStatement stmt = null;
-    ResultSet resultSet = null;
-
-    try {
-      c = dataSource_.getConnection();
-      StringBuilder builder = threadLocalBuilder_.get()
-        .append("select * from ")
-        .append(tableName_)
-        .append(" where ")
-        .append(getPrimaryKey().createStatement())
-        .append(" = ?");
-
-      stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
-      // TODO: add support for non-numbers
-      //stmt.setLong(((Number) o).longValue());
-      stmt.setObject(id);
-      resultSet = stmt.executeQuery();
-      if ( ! resultSet.next() ) {
-        // no rows
-        return null;
-        // In the doc, should be: throw new foam.dao.ObjectNotFoundException();
-      }
-
-      return createFObject(resultSet);
     } catch (Throwable e) {
       Logger logger = (Logger) x.get("logger");
       logger.error(e);
@@ -210,7 +133,7 @@ public class MySQLJDBCDAO extends AbstractJDBCDAO{
    * @param of ClassInfo
    */
   @Override
-  public boolean createTable(X x, ClassInfo of) {
+  public boolean maybeCreateTable(X x, ClassInfo of) {
     Connection c = null;
     IndexedPreparedStatement stmt = null;
     ResultSet resultSet = null;
@@ -264,70 +187,6 @@ public class MySQLJDBCDAO extends AbstractJDBCDAO{
     }
   }
 
-  /**
-   * Prepare the formatted column names. Appends column names like: (c1,c2,c3)
-   * @param builder builder to append to
-   */
-  public void buildFormattedColumnNames(FObject obj, StringBuilder builder) {
-    // collect columns list into comma delimited string
-    builder.append("(");
-    Iterator i = properties_.iterator();
-    while ( i.hasNext() ) {
-      PropertyInfo prop = (PropertyInfo) i.next();
-/*       if ( "id".equals(prop.getName()) )
-        continue; */
 
-      builder.append(prop.createStatement());
-      if ( i.hasNext() ) {
-        builder.append(",");
-      }
-    }
-    builder.append(")");
-  }
-
-  /**
-   * Prepare the formatted UPDATE string like :  description='etc', name='etc'
-   * @param builder builder to append to
-   */
-  public void buildUpdateFormattedColumnNames(FObject obj, StringBuilder builder) {
-    // collect columns list into comma delimited string
-    Iterator i = properties_.iterator();
-    while ( i.hasNext() ) {
-
-      PropertyInfo prop = (PropertyInfo) i.next();
-      if ( "id".equals(prop.getName()) )
-        continue;
-
-      builder.append(prop.createStatement());
-      builder.append("='");
-      builder.append(prop.get(obj));  //add the new property value
-      builder.append("'");
-      if ( i.hasNext() ) {
-        builder.append(",");
-      }
-    }
-
-  }
-
-  /**
-   * Prepare the formatted value placeholders. Appends value placeholders like: (?,?,?)
-   * @param builder builder to append to
-   */
-  public void buildFormattedColumnPlaceholders(FObject obj, StringBuilder builder) {
-    // map columns into ? and collect into comma delimited string
-    builder.append("(");
-    Iterator i = properties_.iterator();
-    while ( i.hasNext() ) {
-      PropertyInfo prop = (PropertyInfo) i.next();
-/*       if ( "id".equals(prop.getName()) )
-        continue; */
-
-      builder.append("?");
-      if ( i.hasNext() ) {
-        builder.append(",");
-      }
-    }
-    builder.append(")");
-  }
 
 }
