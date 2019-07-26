@@ -79,7 +79,20 @@ p({
   "client":"{\"of\":\"foam.nanos.auth.User\",\"cache\":false,\"decorators\": [{\"class\":\"foam.nanos.fs.FileDAODecorator\"}]}"
 })
 p({"class":"foam.nanos.boot.NSpec", "name":"localGroupDAO",                      "serviceScript":"return new foam.dao.PMDAO.Builder(x).setPmFind(false).setDelegate(new foam.dao.java.JDAO(x, foam.nanos.auth.Group.getOwnClassInfo(), \"groups\")).build();","client":"{\"of\":\"foam.nanos.auth.Group\"}" })
-p({"class":"foam.nanos.boot.NSpec", "name":"groupDAO",                           "serve":true,  "serviceScript":"return new foam.dao.PMDAO.Builder(x).setPmFind(false).setDelegate(new foam.nanos.auth.AuthorizationDAO(x, x.get(\"localGroupDAO\"), new foam.nanos.auth.AuthorizableAuthorizer(\"group\"))).build();","client":"{\"of\":\"foam.nanos.auth.Group\"}" })
+
+p({
+  "class":"foam.nanos.boot.NSpec", 
+  "name":"groupDAO",                           
+  "serve":true,  
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setInnerDAO(x.get("localGroupDAO"))
+      .setOf(foam.nanos.auth.Group.getOwnClassInfo())
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.auth.Group\"}" 
+})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"localSessionDAO",                          "serviceScript":"return new foam.dao.MDAO(foam.nanos.session.Session.getOwnClassInfo());"})
 p({"class":"foam.nanos.boot.NSpec", "name":"sessionDAO",                           "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setOf(foam.nanos.session.Session.getOwnClassInfo()).setPm(true).setInnerDAO(((foam.dao.DAO) x.get(\"localSessionDAO\"))).build();","client":"{\"of\":\"foam.nanos.session.Session\"}" })
