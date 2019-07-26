@@ -35,8 +35,9 @@ foam.CLASS({
     'ctrl',
     'dblclick?',
     'editRecord?',
+    'filteredTableColumns?',
     'selection? as importSelection',
-    'filteredTableColumns?'
+    'stack?'
   ],
 
   properties: [
@@ -74,17 +75,22 @@ foam.CLASS({
       },
     },
     {
-      name: 'columns',
-      expression: function(of, editColumnsEnabled) {
-        if ( ! of ) return [];
-
-        var allColumns = [].concat(
+      class: 'StringArray',
+      name: 'allColumns',
+      factory: function() {
+        return [].concat(
           of.getAxiomsByClass(foam.core.Property)
             .filter(p => p.tableCellFormatter && ! p.hidden)
             .map(p => p.name),
           of.getAxiomsByClass(foam.core.Action)
             .map(a => a.name)
         );
+      }
+    },
+    {
+      name: 'columns',
+      expression: function(of, editColumnsEnabled, allColumns) {
+        if ( ! of ) return [];
 
         var tableColumns = of.getAxiomByName('tableColumns');
         if ( tableColumns ) {
@@ -221,17 +227,6 @@ foam.CLASS({
         column;
     },
 
-    function createColumnSelection() {
-      this.__context__.stack.push({
-        class: 'foam.u2.DetailView',
-        data: this.EditColumnsView.create({
-          of: this.of,
-          displayColumns$: this.columns$,
-          allColumns: this.allColumns
-        })
-      });
-    },
-
     function initE() {
       var view = this;
       var columnSelectionE;
@@ -321,7 +316,15 @@ foam.CLASS({
                   callIf(view.editColumnsEnabled, function() {
                     this.addClass(view.myClass('th-editColumns')).
                     on('click', function(e) {
-                      view.createColumnSelection();
+                      if ( ! view.stack ) return;
+                      view.stack.push({
+                        class: 'foam.u2.DetailView',
+                        data: view.EditColumnsView.create({
+                          of: view.of,
+                          displayColumns$: view.columns$,
+                          allColumns: view.allColumns
+                        })
+                      });
                     }).
                     tag(view.Image, { data: '/images/Icon_More_Resting.svg' }).
                     addClass(view.myClass('vertDots')).

@@ -10,12 +10,15 @@ foam.ENUM({
   values: [
     {
       name: 'DEFAULT',
+      label: 'Default'
     },
     {
       name: 'ALWAYS_SHOW',
+      label: 'Always Show'
     },
     {
       name: 'ALWAYS_HIDE',
+      label: 'Always Hide'
     },
   ]
 });
@@ -76,8 +79,7 @@ foam.CLASS({
         return this.allColumns
           .map(c => {
             var a = this.of.getAxiomByName(c);
-            var v = localStorage.getItem(this.of.id + '.' + a.name);
-            v = this.ColumnVisibility.VALUES.find(e => e.name == v);
+            var v = this.ColumnVisibility[localStorage.getItem(this.of.id + '.' + a.name)];
             return this.ColumnConfig.create({
               name: a.name,
               label: a.label || foam.String.labelize(a.name),
@@ -89,14 +91,6 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'allColumns',
-      factory: function() {
-        var props = this.of.getAxiomsByClass(foam.core.Property)
-          .filter(p => p.tableCellFormatter && ! p.hidden)
-          .map(p => p.name);
-        var actions = this.of.getAxiomsByClass(foam.core.Action)
-          .map(a => a.name);
-        return props.concat(actions);
-      },
       hidden: true
     }
   ],
@@ -105,6 +99,18 @@ foam.CLASS({
     'stack'
   ],
   actions: [
+    {
+      name: 'resetAll',
+      code: function() {
+        this.columns.forEach(c => c.visibility = 'DEFAULT');
+      }
+    },
+    {
+      name: 'cancel',
+      code: function() {
+        this.stack.back();
+      }
+    },
     {
       name: 'save',
       code: function() {
