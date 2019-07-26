@@ -24,13 +24,8 @@ import static foam.mlang.MLang.IS_AUTHORIZED_TO_DELETE;
  */
 public class AuthorizationDAO extends ProxyDAO {
   protected Authorizer authorizer_;
-  protected boolean authorizeRead_;
-
+  
   public AuthorizationDAO(X x, DAO delegate, Authorizer authorizer) {
-    this(x, delegate, authorizer, true);
-  }
-
-  public AuthorizationDAO(X x, DAO delegate, Authorizer authorizer, boolean authorizeRead) {
     AuthorizationException exception = new AuthorizationException("When " +
         "using a DAO decorated by AuthorizationDAO, you may only call the " +
         "context-oriented methods: put_(), find_(), select_(), remove_(), " +
@@ -39,7 +34,6 @@ public class AuthorizationDAO extends ProxyDAO {
     setX(new InvalidX(exception));
     setDelegate(delegate);
     authorizer_ = authorizer;
-    authorizeRead_ = authorizeRead;
   }
 
   @Override
@@ -72,7 +66,7 @@ public class AuthorizationDAO extends ProxyDAO {
   @Override
   public FObject find_(X x, Object id) {
     if ( id == null ) return null;
-    if ( ! authorizeRead_ || authorizer_.checkGlobalRead(x) ) return super.find_(x, id);
+    if ( authorizer_.checkGlobalRead(x) ) return super.find_(x, id);
 
     FObject obj = super.find_(x, id);
     if ( obj != null ) authorizer_.authorizeOnRead(x, obj);
@@ -82,7 +76,7 @@ public class AuthorizationDAO extends ProxyDAO {
   @Override
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) { 
 
-    if ( authorizeRead_ && ! authorizer_.checkGlobalRead(x) ) predicate = augmentPredicate(x, false, predicate);
+    if ( ! authorizer_.checkGlobalRead(x) ) predicate = augmentPredicate(x, false, predicate);
     return super.select_(x, sink, skip, limit, order, predicate);
   }
 
