@@ -1,4 +1,4 @@
-p({"class":"foam.nanos.boot.NSpec", "name":"OMLogger",                          "lazy":true,  "serve":false, "serviceClass":"foam.nanos.om.OMLogger"})
+p({"class":"foam.nanos.boot.NSpec", "name":"OMLogger",                          "lazy":true,  "serviceClass":"foam.nanos.om.OMLogger"})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"om1minDAO", "lazy":true,  "serve":true, "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setPipelinePm(true).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"OMMinutely\").setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo()).build();","client":"{\"of\":\"foam.nanos.analytics.Candlestick\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"omHourlyDAO", "lazy":true,  "serve":true, "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setPipelinePm(true).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"OMHourly\").setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo()).build();","client":"{\"of\":\"foam.nanos.analytics.Candlestick\"}"})
