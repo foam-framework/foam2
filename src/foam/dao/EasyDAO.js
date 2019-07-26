@@ -73,7 +73,6 @@ foam.CLASS({
 
   javaImports: [
     'foam.nanos.logger.Logger'
-
   ],
 
   constants: [
@@ -188,7 +187,6 @@ if ( getSeqNo() ) {
   delegate = new foam.dao.SequenceNumberDAO.Builder(getX()).
     setDelegate(delegate).
     setProperty(getSeqPropertyName()).
-    setStartingValue(getSeqStartingValue()).
     build();
 }
 
@@ -206,15 +204,7 @@ if ( getOrder() != null &&
   }
 }
 
-if ( getAuthorize() || getAuthorizer() != null ) {
-  if ( getAuthorizer() != null ) delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, getAuthorizer(), getAuthorizeReads());
-  if ( foam.nanos.auth.Authorizable.class.isAssignableFrom(getOf().getObjClass()) ) {
-    delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, new foam.nanos.auth.AuthorizableAuthorizer(getPermissionPrefix()), getAuthorizeReads());
-  } else {
-    logger.warning("EasyDAO", "authorize=true but 'of' ",getOf().getId(), "not Authorizable");
-    delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, new foam.nanos.auth.StandardAuthorizer(getPermissionPrefix()), getAuthorizeReads());
-  }
-}
+if( getAuthorize() ) delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, getAuthorizer());
 
 if ( getAuthenticate() ) {
   delegate = new foam.dao.AuthenticatedDAO(
@@ -280,11 +270,6 @@ return delegate;
       value: false
     },
     {
-      class: 'Long',
-      name: 'seqStartingValue',
-      value: 1
-    },
-    {
       /** Have EasyDAO generate guids to index items. Note that .seqNo and .guid features are mutually exclusive. */
       class: 'Boolean',
       name: 'guid',
@@ -316,14 +301,16 @@ return delegate;
       value: false
     },
     {
-      class: 'Boolean',
-      name: 'authorizeReads',
-      value: true
-    },
-    {
       class: 'Object',
       type: 'foam.nanos.auth.Authorizer',
-      name: 'authorizer'
+      name: 'authorizer',
+      javaFactory: `
+      if ( foam.nanos.auth.Authorizable.class.isAssignableFrom(getOf().getObjClass()) ) {
+        return new foam.nanos.auth.AuthorizableAuthorizer(getPermissionPrefix());
+      } else {
+        return new foam.nanos.auth.StandardAuthorizer(getPermissionPrefix());
+      }
+      `
     },
     {
       /** Enable standard authentication. */
@@ -377,12 +364,6 @@ return delegate;
       name: 'journalName'
     },
     {
-      class: 'Object',
-      javaType: 'foam.core.ClassInfo',
-      name: 'classType',
-      value: null
-    },
-    {
       class: 'FObjectProperty',
       of: 'foam.dao.Journal',
       generateJava: false,
@@ -399,6 +380,12 @@ return delegate;
       class: 'Boolean',
       name: 'timing',
       value: false
+    },
+    {
+      class: 'Object',
+      javaType: 'foam.core.ClassInfo',
+      name: 'classType',
+      value: null
     },
     {
       class: 'Boolean',
@@ -652,7 +639,6 @@ return delegate;
       if ( this.seqNo ) {
         var args = {__proto__: params, delegate: dao, of: this.of};
         if ( this.seqProperty ) args.property = this.seqProperty;
-        args.startingValue = this.seqStartingValue;
         dao = this.SequenceNumberDAO.create(args);
       }
 
