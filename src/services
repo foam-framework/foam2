@@ -42,7 +42,24 @@ p({"class":"foam.nanos.boot.NSpec", "name":"testDAO",                           
 
 p({"class":"foam.nanos.boot.NSpec", "name":"pmInfoDAO",                          "serve":true,  "serviceScript":"return new foam.dao.MDAO(foam.nanos.pm.PMInfo.getOwnClassInfo());","client":"{\"of\":\"foam.nanos.pm.PMInfo\", \"remoteListenerSupport\": false}" })
 p({"class":"foam.nanos.boot.NSpec", "name":"scriptDAO",                            "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setGuid(true).setOf(foam.nanos.script.Script.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"scripts\").setDecorator(new foam.nanos.script.ScriptRunnerDAO(null)).setOrder(new foam.core.PropertyInfo[] {foam.nanos.script.Script.ID}).setIndex(new foam.core.PropertyInfo[] {foam.nanos.script.Script.ID}).build();","client":"{\"of\":\"foam.nanos.script.Script\"}"})
-p({"class":"foam.nanos.boot.NSpec", "name":"cronDAO",                            "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setGuid(true).setOf(foam.nanos.cron.Cron.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"cronjobs\").setDecorator(new foam.nanos.script.ScriptRunnerDAO(null)).build();","client":"{\"of\":\"foam.nanos.cron.Cron\"}"})
+
+p({
+  "class":"foam.nanos.boot.NSpec", 
+  "name":"cronDAO",                            
+  "serve":true,  
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setGuid(true)
+      .setOf(foam.nanos.cron.Cron.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName(\"cronjobs\")
+      .setDecorator(new foam.nanos.script.ScriptRunnerDAO(null))
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.cron.Cron\"}"
+})
+
 p({"class":"foam.nanos.boot.NSpec", "name":"cronScheduler",                    "lazy":false, "serviceClass":"foam.nanos.cron.CronScheduler" })
 p({"class":"foam.nanos.boot.NSpec", "name":"localUserDAO",                       "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.SequenceNumberDAO (1000, new foam.nanos.auth.PreventDuplicateEmailDAO.Builder(x).setDelegate(new foam.dao.java.JDAO(x, foam.nanos.auth.User.getOwnClassInfo(), \"users\")).build()));"})
 p({
