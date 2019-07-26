@@ -16,6 +16,7 @@ var classes = [
   'foam.core.Identifiable',
   'foam.core.AbstractFObject',
   'foam.core.Validatable',
+  'foam.core.Agency',
   'foam.glang.EndOfTimeSpan',
   'foam.glang.EndOfDay',
   'foam.glang.EndOfWeek',
