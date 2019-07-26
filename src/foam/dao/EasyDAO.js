@@ -204,20 +204,12 @@ if ( getOrder() != null &&
 
 if( getAuthorize() ) delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, getAuthorizer());
 
-if ( getAuthenticate() ) {
-  delegate = new foam.dao.AuthenticatedDAO(
-    getPermissionPrefix(),
-    getAuthenticateRead(),
-    delegate);
-}
-
 if ( getNSpec() != null &&
      getNSpec().getServe() &&
      ! getAuthorize() &&
-     ! getAuthenticate() &&
      ! getReadOnly() ) {
   //setReadOnly(true);
-  logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authenticated, Authorized, or ReadOnly");
+  logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authorized, or ReadOnly");
 }
 
 if ( getPermissioned() &&
@@ -301,7 +293,7 @@ return delegate;
       /** Enable standard authorization. */
       class: 'Boolean',
       name: 'authorize',
-      value: false
+      value: true
     },
     {
       class: 'Object',
@@ -316,12 +308,6 @@ return delegate;
       `
     },
     {
-      /** Enable standard authentication. */
-      class: 'Boolean',
-      name: 'authenticate',
-      value: true
-    },
-    {
       class: 'String',
       name: 'permissionPrefix',
       factory: function() {
@@ -330,12 +316,6 @@ return delegate;
       javaFactory: `
       return this.getOf().getObjClass().getSimpleName().toLowerCase();
      `
-    },
-    {
-      /** Enable standard read authentication. */
-      class: 'Boolean',
-      name: 'authenticateRead',
-      value: true
     },
     {
       class: 'Boolean',
