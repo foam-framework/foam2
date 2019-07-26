@@ -118,7 +118,7 @@ foam.CLASS({
           var id = this.of.id + '.' + c.name;
           localStorage.removeItem(id);
           if ( c.visibility === foam.u2.view.ColumnVisibility.DEFAULT ) return;
-          localStorage.setItem(id, c.visibility.label);
+          localStorage.setItem(id, c.visibility.name);
         });
         this.stack.back();
       }
