@@ -77,7 +77,8 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'allColumns',
-      factory: function() {
+      factory: null,
+      expression: function(of) {
         return [].concat(
           of.getAxiomsByClass(foam.core.Property)
             .filter(p => p.tableCellFormatter && ! p.hidden)
