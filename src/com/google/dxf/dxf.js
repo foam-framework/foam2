@@ -43,10 +43,10 @@ foam.CLASS({
   name: 'Entity',
 
   imports: [
-    'layerColors',
-    'layers',
+    'doTransform',
     'dxfScale',
-    'doTransform'
+    'layerColors',
+    'layers'
   ],
 
   ids: [ 'handle' ],
@@ -304,20 +304,20 @@ foam.CLASS({
 
   constants: {
     ENTITY_TYPES: {
-      ARC: 'com.google.dxf.model.Arc',
-      INSERT: 'com.google.dxf.model.Insert',
-      LINE: 'com.google.dxf.model.Line',
+      ARC:        'com.google.dxf.model.Arc',
+      INSERT:     'com.google.dxf.model.Insert',
+      LINE:       'com.google.dxf.model.Line',
       LWPOLYLINE: 'com.google.dxf.model.Polygon'
     }
   },
 
   css: `
-        ^layers {
-          display: inline-block;
-        }
-        ^ canvas {
-        }
-`,
+    ^layers {
+      display: inline-block;
+    }
+    ^ canvas {
+    }
+  `,
 
   properties: [
     {
@@ -348,15 +348,13 @@ foam.CLASS({
             colors[k] = '#' + o.color.toString(16);
           });
           self.layerColors = colors;
-          self.layers = tree.tables.layer.layers;
-          self.dxfBlocks = tree.blocks;
+          self.layers      = tree.tables.layer.layers;
+          self.dxfBlocks   = tree.blocks;
 
-          var topRight = tree.header.$EXTMAX;
-          var bottomLeft = tree.header.$EXTMIN;
-          self.translateX = -bottomLeft.x;
-          self.translateY = -topRight.y;
-          console.log('Translation: ' + self.translateX + ' by ' +
-              self.translateY);
+          var topRight     = tree.header.$EXTMAX;
+          var bottomLeft   = tree.header.$EXTMIN;
+          self.translateX  = -bottomLeft.x;
+          self.translateY  = -topRight.y;
 
           return tree;
         });
@@ -429,9 +427,9 @@ foam.CLASS({
         this.sideCanvas = this.document.createElement('canvas');
         var self = this;
         this.dxfPromise.then(function(tree) {
-          var topRight = tree.header.$EXTMAX;
+          var topRight   = tree.header.$EXTMAX;
           var bottomLeft = tree.header.$EXTMIN;
-          self.sideCanvas.width = self.width = topRight.x - bottomLeft.x;
+          self.sideCanvas.width  = self.width  = topRight.x - bottomLeft.x;
           self.sideCanvas.height = self.height = topRight.y - bottomLeft.y;
           self.renderDiagram();
         });
@@ -508,7 +506,6 @@ foam.CLASS({
             if ( e ) cview.add(e);
           }
           cview.paint(self.sideCanvas.getContext('2d'));
-          console.log('Rendering complete');
           self.renderEnd();
         });
       }
@@ -517,7 +514,6 @@ foam.CLASS({
       name: 'renderEnd',
       isFramed: true,
       code: function() {
-        console.timeEnd('render');
         this.invalidate();
       }
     }
