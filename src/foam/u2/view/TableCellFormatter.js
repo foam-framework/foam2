@@ -47,7 +47,7 @@ foam.CLASS({
     {
       name: 'tableHeaderFormatter',
       value: function(axiom) {
-        this.add(axiom.label);
+        this.add(axiom.label || foam.String.labelize(axiom.name));
       }
     },
     {

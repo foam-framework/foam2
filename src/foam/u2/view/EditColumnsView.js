@@ -4,84 +4,124 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+foam.ENUM({
+  package: 'foam.u2.view',
+  name: 'ColumnVisibility',
+  values: [
+    {
+      name: 'DEFAULT',
+      label: 'Default'
+    },
+    {
+      name: 'ALWAYS_SHOW',
+      label: 'Always Show'
+    },
+    {
+      name: 'ALWAYS_HIDE',
+      label: 'Always Hide'
+    },
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'ColumnConfig',
+  sections: [{ name: '_defaultSection' }],
+  properties: [
+    {
+      class: 'String',
+      name: 'name',
+      hidden: true
+    },
+    {
+      class: 'String',
+      name: 'label',
+      label: '',
+      visibility: 'RO',
+      gridColumns: 6
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.view.ColumnVisibility',
+      name: 'visibility',
+      label: '',
+      gridColumns: 6
+    }
+  ]
+});
+
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'EditColumnsView',
-  extends: 'foam.u2.Element',
-
   requires: [
-    'foam.core.SimpleSlot',
-    'foam.u2.md.CheckBox'
+    'foam.u2.view.ColumnVisibility',
+    'foam.u2.view.ColumnConfig'
   ],
-
   properties: [
     {
-      name: 'columns'
+      class: 'Class',
+      name: 'of',
+      hidden: true
     },
     {
-      name: 'table'
+      class: 'FObjectArray',
+      of: 'foam.u2.view.ColumnConfig',
+      name: 'columns',
+      view: {
+        class: 'foam.u2.view.FObjectArrayView',
+        valueView: {
+          class: 'foam.u2.detail.SectionView',
+          sectionName: '_defaultSection'
+        },
+        mode: 'RO'
+      },
+      factory: function() {
+        return this.allColumns
+          .map(c => {
+            var a = this.of.getAxiomByName(c);
+            var v = this.ColumnVisibility[localStorage.getItem(this.of.id + '.' + a.name)];
+            return this.ColumnConfig.create({
+              name: a.name,
+              label: a.label || foam.String.labelize(a.name),
+              visibility: v || 'DEFAULT'
+            })
+          })
+      }
     },
     {
-      name: 'columns_'
+      class: 'StringArray',
+      name: 'allColumns',
+      hidden: true
     }
   ],
-
-  css: `
-    ^ {
-      text-align: left;
-      padding: 10px;
-      width: 125px;
-    }
-    ^ label {
-      margin-top: 5px;
-    }
-  `,
-
-  methods: [
-    function initE() {
-      var index = 0;
-      this
-        .addClass(this.myClass())
-        .forEach(this.columns, function(columnName) {
-          var axiom = typeof columnName === 'string'
-            ? this.table.getAxiomByName(columnName)
-            : columnName;
-          var localStorageKey = this.table.id + '.' + columnName;
-
-          var slot = this.SimpleSlot.create();
-
-          this
-            .start()
-              .tag(this.CheckBox, {
-                label: axiom.label,
-                data: localStorage.getItem(localStorageKey) === null
-              }, slot)
-            .end();
-
-          this.onDetach(slot.value.data$.sub(this.updateCols(axiom, index++, localStorageKey)));
+  // This shouldn't be needed.
+  imports: [
+    'stack'
+  ],
+  actions: [
+    {
+      name: 'resetAll',
+      code: function() {
+        this.columns.forEach(c => c.visibility = 'DEFAULT');
+      }
+    },
+    {
+      name: 'cancel',
+      code: function() {
+        this.stack.back();
+      }
+    },
+    {
+      name: 'save',
+      code: function() {
+        this.columns.forEach(c => {
+          var id = this.of.id + '.' + c.name;
+          localStorage.removeItem(id);
+          if ( c.visibility === foam.u2.view.ColumnVisibility.DEFAULT ) return;
+          localStorage.setItem(id, c.visibility.name);
         });
-    }
-  ],
-
-  listeners: [
-    function updateCols(axiom, index, localStorageKey) {
-      return (_, __, ___, propSlot) => {
-        var checked = propSlot.get();
-        if ( checked ) {
-          localStorage.removeItem(localStorageKey);
-
-          // Put the column back in the correct position.
-          this.columns_.splice(index, 0, axiom);
-
-          // Force the view to update.
-          this.columns_ = this.columns_.slice();
-        } else {
-          // The string isn't important, all that matters is that there's some
-          // value for this key.
-          localStorage.setItem(localStorageKey, 'Y');
-          this.columns_ = this.columns_.filter((col) => col.name !== axiom.name);
-        }
-      };
+        this.stack.back();
+      }
     }
   ]
 });

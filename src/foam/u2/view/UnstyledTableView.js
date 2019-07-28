@@ -20,6 +20,8 @@ foam.CLASS({
     'foam.u2.md.OverlayDropdown',
     'foam.u2.view.OverlayActionListView',
     'foam.u2.view.EditColumnsView',
+    'foam.u2.view.ColumnConfig',
+    'foam.u2.view.ColumnVisibility',
     'foam.u2.tag.Image'
   ],
 
@@ -33,8 +35,9 @@ foam.CLASS({
     'ctrl',
     'dblclick?',
     'editRecord?',
+    'filteredTableColumns?',
     'selection? as importSelection',
-    'filteredTableColumns?'
+    'stack?'
   ],
 
   properties: [
@@ -54,39 +57,61 @@ foam.CLASS({
     },
     {
       name: 'columns_',
-      documentation: `Note: filteredTableColumns was a property set in DAOController
-      for the purpose of having the filtered DAO list available for CSV outputting.`,
-      expression: function(columns, of) {
-        var of = this.of;
+      expression: function(columns, of, allColumns, editColumnsEnabled) {
         if ( ! of ) return [];
+        if ( ! editColumnsEnabled ) return columns.map(c => of.getAxiomByName(c));
 
-        return columns.map(function(p) {
-          var c = typeof p == 'string' ?
-            of.getAxiomByName(p) :
-            p;
+        // The following respects the ordering of columns before appending the
+        // rest of the columns that the user may want to always see.
+        allColumns = columns.concat(allColumns);
+        allColumns = allColumns.filter((c, i) => allColumns.indexOf(c) == i);
 
-           if ( ! c ) {
-             console.error('Unknown table column: ', p);
-           }
+        // Put together the columns to show by using the user's preferences for
+        // columns to always show or hide.
+        var columnsToShow = columns
+          .reduce((map, c) => {
+            map[c] = true;
+            return map;
+          }, {});
+        allColumns
+          .map(c => this.ColumnConfig.create({
+            name: c,
+            visibility: this.ColumnVisibility[localStorage.getItem(of.id + '.' + c)] || 'DEFAULT'
+          }))
+          .forEach(o => {
+            if ( o.visibility == this.ColumnVisibility.ALWAYS_HIDE ) {
+              columnsToShow[o.name] = false;
+            } else if ( o.visibility == this.ColumnVisibility.ALWAYS_SHOW ) {
+              columnsToShow[o.name] = true;
+            }
+          });
 
-          return c;
-        });
+        return allColumns
+          .filter(c => columnsToShow[c])
+          .map(c => of.getAxiomByName(c));
+      },
+    },
+    {
+      class: 'StringArray',
+      name: 'allColumns',
+      factory: null,
+      expression: function(of) {
+        return [].concat(
+          of.getAxiomsByClass(foam.core.Property)
+            .filter(p => p.tableCellFormatter && ! p.hidden)
+            .map(p => p.name),
+          of.getAxiomsByClass(foam.core.Action)
+            .map(a => a.name)
+        );
       }
     },
     {
       name: 'columns',
-      expression: function(of) {
-        var of = this.of;
+      expression: function(of, allColumns) {
         if ( ! of ) return [];
-
         var tableColumns = of.getAxiomByName('tableColumns');
-
-        if ( tableColumns ) return tableColumns.columns;
-
-        return of.getAxiomsByClass(foam.core.Property).
-            filter(function(p) { return p.tableCellFormatter && ! p.hidden; }).
-            map(foam.core.Property.NAME.f);
-      }
+        return tableColumns ? tableColumns.columns : allColumns;
+      },
     },
     {
       class: 'FObjectArray',
@@ -187,16 +212,6 @@ foam.CLASS({
         column;
     },
 
-    function createColumnSelection() {
-      var editor = this.EditColumnsView.create({
-        columns: this.columns,
-        columns_$: this.columns_$,
-        table: this.of
-      });
-
-      return this.OverlayDropdown.create({}, this.ctrl).add(editor);
-    },
-
     function initE() {
       var view = this;
       var columnSelectionE;
@@ -204,11 +219,6 @@ foam.CLASS({
       if ( this.filteredTableColumns$ ) {
         this.onDetach(this.filteredTableColumns$.follow(
           this.columns_$.map((cols) => cols.map((a) => a.name))));
-      }
-
-      if ( this.editColumnsEnabled ) {
-        columnSelectionE = this.createColumnSelection();
-        this.ctrl.add(columnSelectionE);
       }
 
       this.
@@ -291,7 +301,14 @@ foam.CLASS({
                   callIf(view.editColumnsEnabled, function() {
                     this.addClass(view.myClass('th-editColumns')).
                     on('click', function(e) {
-                      columnSelectionE.open(e.clientX, e.clientY);
+                      if ( ! view.stack ) return;
+                      view.stack.push({
+                        class: 'foam.u2.DetailView',
+                        data: view.EditColumnsView.create({
+                          of: view.of,
+                          allColumns: view.allColumns
+                        })
+                      });
                     }).
                     tag(view.Image, { data: '/images/Icon_More_Resting.svg' }).
                     addClass(view.myClass('vertDots')).

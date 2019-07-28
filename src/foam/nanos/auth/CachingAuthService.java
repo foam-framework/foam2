@@ -102,7 +102,6 @@ public class CachingAuthService
   @Override
   public boolean check(foam.core.X x, String permission) {
     if ( x == null || permission == null ) return false;
-    if ( ((User)x.get("user")).getId() == 1 ) return true;
     Permission p = new AuthPermission(permission);
 
     Map<String,Boolean> map = getPermissionMap(x);

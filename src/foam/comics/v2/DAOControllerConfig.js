@@ -53,7 +53,19 @@ foam.CLASS({
     {
       class: 'String',
       name: 'browseTitle',
-      expression: function(of) { return of.model_.label; }
+      expression: function(of) { return foam.String.pluralize(of.model_.label); }
+    },
+    {
+      class: 'StringArray',
+      name: 'defaultColumns',
+      factory: null,
+      expression: function(of) { 
+        var tableColumns = of.getAxiomByName('tableColumns');
+
+        return tableColumns 
+                ? tableColumns.columns
+                : of.getAxiomsByClass(foam.core.Property).map(p => p.name);
+      }
     },
     {
       class: 'foam.u2.ViewSpecWithJava',

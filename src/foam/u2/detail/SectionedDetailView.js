@@ -41,7 +41,7 @@ foam.CLASS({
               .forEach(sections, function(s) {
                 this
                   .start(self.GUnit, { columns: s.gridColumns })
-                    .style({ padding: '16px 0' })
+                    .style({ 'padding': '16px 0', 'grid-column-gap': '4px' })
                     .show(s.createIsAvailableFor(self.data$))
                     .start('h2').add(s.title$).end()
                     .start(self.CardBorder)
