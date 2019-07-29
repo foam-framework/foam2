@@ -11,6 +11,7 @@ import foam.dao.Sink;
 import foam.nanos.logger.Logger;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
+
 import java.sql.*;
 import java.sql.SQLException;
 import java.util.*;
@@ -101,6 +102,8 @@ public class MySQLDAO extends AbstractJDBCDAO{
 
       if ( limit > 0 && limit < this.MAX_SAFE_INTEGER ) {
         builder.append(" limit ").append(limit);
+      } else {
+        builder.append(" limit 18446744073709551610 "); //MySQL specific, offset can only be set if lim it is also set.
       }
 
       if ( skip > 0 && skip < this.MAX_SAFE_INTEGER ) {

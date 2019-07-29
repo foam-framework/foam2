@@ -78,15 +78,34 @@ foam.core.X xcopy = x.put("JDBCDataSource", source);
  foam.dao.Sink sink = employeeJDBCDAO.select();
  print(sink);
 
-11- To test find() and remove():
+ 
+11- A select() with a where() clause:
+
+ obj1 = employeeJDBCDAO.where(foam.mlang.MLang.EQ(foam.dao.jdbc.TestEmployee.ID, 2)).select();
+
+
+12- A selec() with an orderBy() clause:
+
+ obj2 = employeeJDBCDAO.orderBy(foam.mlang.MLang.DESC(foam.dao.jdbc.TestEmployee.ID)).select();
+
+
+13- A select with limit() and skip():
+
+ obj3 = employeeJDBCDAO.orderBy(foam.mlang.MLang.DESC(foam.dao.jdbc.TestEmployee.ID)).skip(1).select_(xcopy, new foam.dao.ArraySink(), 1, -1, null, null);
+ print(obj3);
+
+ obj4 = employeeJDBCDAO.orderBy(foam.mlang.MLang.DESC(foam.dao.jdbc.TestEmployee.ID)).limit(1).skip(1).select_(xcopy, new foam.dao.ArraySink(), 1, -1, null, null);
+ print(obj4);
+
+
+12- To test find() and remove():
 
  obj = employeeJDBCDAO.find_(x, "23");
  print(obj);
-
  employeeJDBCDAO.remove(obj);
 
 
-12- Another example using foreign keys:
+13- Another example using foreign keys:
 
 
  foam.dao.jdbc.JDBCPooledDataSource source = new foam.dao.jdbc.JDBCPooledDataSource(x);
