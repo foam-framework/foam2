@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -27,17 +27,33 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'ColumnConfig',
   sections: [{ name: '_defaultSection' }],
+  requires: [
+    'foam.u2.view.ColumnVisibility'
+  ],
   properties: [
     {
-      class: 'String',
-      name: 'name',
+      class: 'Class',
+      name: 'of',
       hidden: true
+    },
+    {
+      name: 'axiom',
+      hidden: true
+    },
+    {
+      class: 'String',
+      name: 'key',
+      hidden: true,
+      expression: function(of, axiom) { return of.id + '.' + axiom.name; }
     },
     {
       class: 'String',
       name: 'label',
       label: '',
       visibility: 'RO',
+      expression: function(of, axiom) {
+        return axiom.label || foam.String.labelize(axiom.name);
+      },
       gridColumns: 6
     },
     {
@@ -45,7 +61,21 @@ foam.CLASS({
       of: 'foam.u2.view.ColumnVisibility',
       name: 'visibility',
       label: '',
-      gridColumns: 6
+      gridColumns: 6,
+      factory: function() {
+        return this.ColumnVisibility[localStorage.getItem(this.key)] ||
+               this.ColumnVisibility.DEFAULT;
+      }
+    }
+  ],
+  actions: [
+    {
+      name: 'save',
+      code: function() {
+        localStorage.removeItem(this.key);
+        if ( this.visibility === this.ColumnVisibility.DEFAULT ) return;
+        localStorage.setItem(this.key, this.visibility.name);
+      }
     }
   ]
 });
@@ -54,6 +84,7 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'EditColumnsView',
   requires: [
+    'foam.u2.DetailView',
     'foam.u2.view.ColumnVisibility',
     'foam.u2.view.ColumnConfig'
   ],
@@ -78,18 +109,15 @@ foam.CLASS({
       factory: function() {
         return this.allColumns
           .map(c => {
-            var a = this.of.getAxiomByName(c);
-            var v = this.ColumnVisibility[localStorage.getItem(this.of.id + '.' + a.name)];
             return this.ColumnConfig.create({
-              name: a.name,
-              label: a.label || foam.String.labelize(a.name),
-              visibility: v || 'DEFAULT'
+              of: this.of,
+              axiom: c
             })
           })
       }
     },
     {
-      class: 'StringArray',
+      class: 'Array',
       name: 'allColumns',
       hidden: true
     }
@@ -114,14 +142,14 @@ foam.CLASS({
     {
       name: 'save',
       code: function() {
-        this.columns.forEach(c => {
-          var id = this.of.id + '.' + c.name;
-          localStorage.removeItem(id);
-          if ( c.visibility === foam.u2.view.ColumnVisibility.DEFAULT ) return;
-          localStorage.setItem(id, c.visibility.name);
-        });
+        this.columns.forEach(c => { c.save() });
         this.stack.back();
       }
+    }
+  ],
+  methods: [
+    function toE() {
+      return this.DetailView.create({ data: this });
     }
   ]
 });
