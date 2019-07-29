@@ -26,6 +26,12 @@ foam.CLASS({
       return Math.round(this.SUPER(text) * 100);
     },
 
+    function formatNumber(val) {
+      if ( ! val ) val = 0;
+      val = Math.floor(val);
+      return this.SUPER(val);
+    },
+
     function link() {
       this.SUPER();
 

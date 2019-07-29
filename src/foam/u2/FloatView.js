@@ -108,11 +108,10 @@ foam.CLASS({
 
     function formatNumber(val) {
       if ( ! val ) val = 0;
-      val = Math.floor(val);
       var decimal = this.precision ? this.precision : 0;
       return this.mode === foam.u2.DisplayMode.RO ?
         val.toLocaleString(undefined, {minimumFractionDigits: decimal}) :
-        val.toFixed(this.precision);
+        val.toFixed(decimal);
     },
 
     function dataToText(val) {
