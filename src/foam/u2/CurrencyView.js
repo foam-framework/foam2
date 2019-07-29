@@ -19,18 +19,11 @@ foam.CLASS({
 
   methods: [
     function dataToText(val) {
-      val = Math.floor(val / 100);
-      return this.mode === foam.u2.DisplayMode.RO ?
-        val.toLocaleString(undefined, {minimumFractionDigits: 2}) :
-        this.SUPER(val);
+      return this.SUPER(val / 100);
     },
 
     function textToData(text) {
       return Math.round(this.SUPER(text) * 100);
-    },
-
-    function formatNumber(val) {
-      return val.toFixed(2);
     },
 
     function link() {
