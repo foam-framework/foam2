@@ -21,20 +21,18 @@ foam.LIB({
     {
       /** Splits strings when they are too long, used to split documentation in multiple lines */
       name: 'limitSplit',
-      code: function(o, str, maxWords){
-          var res = '';
+      code: function(str, maxWords){
+          res = [];
           var arr = str.split(' ', 150);
-          o.indent();
           for( i = 0 ; i < arr.length ; i++){
-            res += arr[i] + ' ';
+            line = arr[i] + ' ';
             if( i % maxWords == 0 && i > 0 ){
-              res += '\n';
-              o.indent();
+              line += '\n';
             }
+            res.push(line);
           }
           return res;
       }
     }
   ]
 });
-
