@@ -26,7 +26,7 @@ import org.apache.commons.io.IOUtils;
 public class Outputter
   extends AbstractSink
   implements foam.lib.Outputter {
-  
+
   protected static ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
     protected SimpleDateFormat initialValue() {
@@ -45,6 +45,8 @@ public class Outputter
   protected boolean       outputReadableDates_ = true;
   protected PropertyPredicate propertyPredicate_;
   protected Map<String, List<PropertyInfo>> propertyMap_ = new HashMap<>();
+  protected String[]      digColumns_ = null;
+  protected String        strDigColumns = null;
 
 
   public Outputter(foam.core.X x) {
@@ -276,7 +278,8 @@ public class Outputter
       while ( e.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) e.next();
         if ( propertyPredicate_ == null || propertyPredicate_.propertyPredicateCheck(this.x_, of.toLowerCase(), prop) ) {
-          filteredAxioms.add(prop);
+          if ( propertyPredicate_.propertyPredicateCheckForDig(this.x_, of.toLowerCase(), prop, strDigColumns) )
+            filteredAxioms.add(prop);
         }
       }
       propertyMap_.put(of, filteredAxioms);
@@ -441,6 +444,12 @@ public class Outputter
 
   public Outputter setPropertyPredicate(PropertyPredicate p) {
     propertyPredicate_ = p;
+    return this;
+  }
+
+  public Outputter setDigColumns(String digColumns) {
+    digColumns_ = digColumns.split(",");
+    strDigColumns = digColumns;
     return this;
   }
 

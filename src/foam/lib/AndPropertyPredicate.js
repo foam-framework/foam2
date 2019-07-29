@@ -12,7 +12,7 @@ foam.CLASS({
       name: 'delegates'
     }
   ],
-    
+
   methods: [
     {
       name: 'propertyPredicateCheck',
@@ -25,7 +25,18 @@ foam.CLASS({
 
   return true;
 `
+    },
+    {
+      name: 'propertyPredicateCheckForDig',
+      javaCode: `
+  for ( foam.lib.PropertyPredicate p : getDelegates() ) {
+    if ( ! p.propertyPredicateCheckForDig(x, of, prop, digColumns) ) {
+      return false;
+    }
+  }
+
+  return true;
+`
     }
   ]
 });
-    

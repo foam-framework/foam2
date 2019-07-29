@@ -5,14 +5,19 @@
     javaImports: [
       'foam.nanos.auth.AuthService'
     ],
-    
+
     methods: [
       {
         name: 'propertyPredicateCheck',
         javaCode: `
   return ! prop.getNetworkTransient();
   `
+      },
+      {
+        name: 'propertyPredicateCheckForDig',
+        javaCode: `
+  return ! prop.getNetworkTransient();
+  `
       }
     ]
   });
-    

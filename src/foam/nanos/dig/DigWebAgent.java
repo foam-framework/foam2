@@ -18,6 +18,7 @@ import foam.lib.json.Outputter;
 import foam.lib.AndPropertyPredicate;
 import foam.lib.NetworkPropertyPredicate;
 import foam.lib.parse.*;
+import foam.lib.DigColumnsPropertyPredicate;
 import foam.lib.PermissionedPropertyPredicate;
 import foam.lib.PropertyPredicate;
 import foam.lib.StoragePropertyPredicate;
@@ -29,6 +30,7 @@ import foam.nanos.http.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.PrefixLogger;
 import foam.nanos.notification.email.EmailMessage;
+import foam.parse.SinkParser;
 import foam.util.Emails.EmailsUtility;
 import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
@@ -64,6 +66,7 @@ public class DigWebAgent
     boolean             emailSet = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
     String              subject  = p.getParameter("subject");
     String              fileAddress = p.getParameter("fileaddress");
+    String              digColumns = p.getParameter("digColumns");
 
     //
     // FIXME/TODO: ensuring XML and CSV flows return proper response objects and codes has not been completed since the switch to HttpParameters.
@@ -320,9 +323,15 @@ public class DigWebAgent
         out.println(returnMessage);
       } else if ( Command.select == command ) {
         PropertyInfo idProp = (PropertyInfo) cInfo.getAxiomByName("id");
+//        ArraySink sink = (ArraySink) ( ! SafetyUtil.isEmpty(id) ?
+//          dao.where(MLang.EQ(idProp, id)).select(new ArraySink()) :
+//          dao.select(new ArraySink()));
+
         ArraySink sink = (ArraySink) ( ! SafetyUtil.isEmpty(id) ?
           dao.where(MLang.EQ(idProp, id)).select(new ArraySink()) :
           dao.select(new ArraySink()));
+        //foam.parse.SinkParser sp = new foam.parse.SinkParser()
+
 
         if ( sink != null ) {
           if ( sink.getArray().size() == 0 ) {
@@ -336,10 +345,16 @@ public class DigWebAgent
           logger.debug(this.getClass().getSimpleName(), "objects selected: " + sink.getArray().size());
 
           if ( Format.JSON == format ) {
-            Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate()}));
+            Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate(), new DigColumnsPropertyPredicate()}));
             outputterJson.setOutputDefaultValues(true);
             outputterJson.setOutputClassNames(true);
+            outputterJson.setDigColumns(digColumns);
             outputterJson.output(sink.getArray().toArray());
+
+//            Parser sinkParser = new SinkParser(cInfo, digColumns);
+//            Parser parser = ((SinkParser) sinkParser).selectedPropsParser();
+//            PStream ps = parser.apply(parser, x);
+//            sinkParser.parse(parser, x);
 
             //resp.setContentType("application/json");
             if ( emailSet ) {

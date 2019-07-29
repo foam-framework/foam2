@@ -2648,6 +2648,17 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'digColumns',
+
+  documentation: 'Axiom for returning columns information in Class for DIG. Unlike most Axioms, doesn\'t modify the Class, but is just used to store information.',
+
+  properties: [
+    [ 'name', 'digColumns' ],
+    'columns'
+  ]
+});
 
 foam.CLASS({
   package: 'foam.u2',
@@ -2689,6 +2700,12 @@ foam.CLASS({
       name: 'searchColumns',
       postSet: function(_, cs) {
         this.axioms_.push(foam.u2.SearchColumns.create({columns: cs}));
+      }
+    },
+    {
+      name: 'digColumns',
+      postSet: function(_, cs) {
+        this.axioms_.push(foam.u2.digColumns.create({columns: cs}));
       }
     }
   ]

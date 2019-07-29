@@ -578,6 +578,7 @@ FOAM_FILES([
   { name: "foam/lib/NetworkPropertyPredicate" },
   { name: "foam/lib/StoragePropertyPredicate" },
   { name: "foam/lib/AndPropertyPredicate" },
+  { name: "foam/lib/DigColumnsPropertyPredicate" },
   { name: "foam/lib/json/OutputterMode" },
   { name: "foam/lib/json/ClassReferenceParserTest" },
   { name: "foam/lib/parse/Parser" },

@@ -310,6 +310,7 @@ var classes = [
   'foam.lib.NetworkPropertyPredicate',
   'foam.lib.StoragePropertyPredicate',
   'foam.lib.AndPropertyPredicate',
+  'foam.lib.DigColumnsPropertyPredicate',
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
   'foam.lib.json.OutputJSON',
