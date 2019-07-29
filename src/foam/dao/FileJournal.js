@@ -30,6 +30,8 @@ foam.CLASS({
     'java.io.BufferedWriter',
     'java.io.InputStreamReader',
     'java.io.InputStream',
+    'java.io.OutputStream',
+    'java.io.OutputStreamWriter',
     'java.io.File',
     'java.io.FileReader',
     'java.io.FileWriter',
@@ -119,48 +121,18 @@ foam.CLASS({
       documentation: 'Flag to create file if not present',
       value: true,
     },
-    {
-      class: 'Object',
-      name: 'file',
-      javaType: 'java.io.File',
-      javaFactory: `
-        try {
-          getLogger().log("Loading file: " + getFilename());
-          File file = getX().get(Storage.class).get(getFilename());
-          if ( ! file.exists() ) {
-            getLogger().warning("Journal not found:" + getFilename());
-
-            if ( getCreateFile() ) {
-              // if output journal does not exist, create one
-              File dir = file.getAbsoluteFile().getParentFile();
-              if ( ! dir.exists() ) {
-                getLogger().log("Create dir: " + dir.getAbsolutePath());
-                dir.mkdirs();
-              }
-
-              getLogger().log("Create file: " + file.getAbsoluteFile());
-              file.getAbsoluteFile().createNewFile();
-            }
-          }
-          return file;
-        } catch ( Throwable t ) {
-          getLogger().error("Failed to read from journal", t);
-          throw new RuntimeException(t);
-        }
-      `
-    },
     // reader uses a getter because we want a new reader on file replay
     {
       class: 'Object',
       name: 'reader',
       javaType: 'java.io.BufferedReader',
-      javaGetter: `
+      javaFactory: `
 try {
-  File file = getFile();
-  if ( file == null ) {
+  InputStream is = getX().get(foam.nanos.fs.Storage.class).getInputStream(getFilename());
+  if ( is == null ) {
     getLogger().error("Failed to read from resource journal: " + getFilename());
   }
-  return (file == null) ? null : new BufferedReader(new FileReader(file));
+  return (is == null) ? null : new BufferedReader(new InputStreamReader(is));
 } catch ( Throwable t ) {
   getLogger().error("Failed to read from journal: " + getFilename(), t);
   throw new RuntimeException(t);
@@ -173,14 +145,16 @@ try {
       name: 'writer',
       javaType: 'java.io.BufferedWriter',
       javaFactory: `
-      try {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(getFile(), true), 16 * 1024);
-        writer.newLine();
-        return writer;
-      } catch ( Throwable t ) {
-        getLogger().error("Failed to create writer", t);
-        throw new RuntimeException(t);
-      }
+try {
+  OutputStream os = getX().get(foam.nanos.fs.Storage.class).getOutputStream(getFilename());
+  if ( os == null ) {
+    getLogger().error("Failed to read from resource journal: " + getFilename());
+  }
+  return (os == null) ? null : new BufferedWriter(new OutputStreamWriter(os));
+} catch ( Throwable t ) {
+  getLogger().error("Failed to read from journal: " + getFilename(), t);
+  throw new RuntimeException(t);
+}
       `
     }
   ],
