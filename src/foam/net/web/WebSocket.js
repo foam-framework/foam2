@@ -17,7 +17,8 @@ foam.CLASS({
   topics: [
     'message',
     'connected',
-    'disconnected'
+    'disconnected',
+    'error',
   ],
 
   properties: [
@@ -56,6 +57,7 @@ foam.CLASS({
         function onConnectError(e) {
           socket.removeEventListener('error', onConnectError);
           reject(self.ConnectionFailedException.create());
+          self.error.pub();
         }
 
         socket.addEventListener('open', onConnect);
