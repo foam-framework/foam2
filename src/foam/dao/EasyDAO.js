@@ -178,6 +178,7 @@ if ( getSeqNo() ) {
   delegate = new foam.dao.SequenceNumberDAO.Builder(getX()).
     setDelegate(delegate).
     setProperty(getSeqPropertyName()).
+    setStartingValue(getSeqStartingValue()).
     build();
 }
 
@@ -256,6 +257,11 @@ return delegate;
       class: 'Boolean',
       name: 'seqNo',
       value: false
+    },
+    {
+      class: 'Long',
+      name: 'seqStartingValue',
+      value: 1
     },
     {
       /** Have EasyDAO generate guids to index items. Note that .seqNo and .guid features are mutually exclusive. */
@@ -609,6 +615,7 @@ return delegate;
       if ( this.seqNo ) {
         var args = {__proto__: params, delegate: dao, of: this.of};
         if ( this.seqProperty ) args.property = this.seqProperty;
+        args.startingValue = this.seqStartingValue;
         dao = this.SequenceNumberDAO.create(args);
       }
 
