@@ -8,7 +8,29 @@ foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'AuthService',
 
+  documentation: `
+    An AuthService is a service that handles authentication (who are you?) as
+    well as authorization (do you have the right to access this?). The methods
+    relating to authentication are:
+
+      * getCurrentUser
+      * getCurrentGroup
+      * login
+      * loginByEmail
+      * logout
+      * validatePassword
+      * updatePassword
+      * validateUser
+
+    and the methods relating to authorization are:
+
+      * check
+      * checkUserPermission
+      * checkUser
+  `,
+
   methods: [
+    // TODO: Decide if we want to keep this method and if we do, document it.
     {
       name: 'getCurrentUser',
       async: true,
@@ -24,6 +46,14 @@ foam.INTERFACE({
     },
     {
       name: 'getCurrentGroup',
+      documentation: `
+        Returns the effective group from the given context. You might have
+        situations where the user's group isn't the "effective" group (the one
+        being used for permissions checks), in which case it needs to be pulled
+        from somewhere else. This method should always return the effective
+        group and is more appropriate to call than checking the user's group
+        directly in almost all cases.
+      `,
       async: true,
       type: 'foam.nanos.auth.Group',
       args: [
@@ -35,6 +65,9 @@ foam.INTERFACE({
     },
     {
       name: 'login',
+      documentation: `
+        Log the user in using their system id and password to authenticate them.
+      `,
       async: true,
       type: 'foam.nanos.auth.User',
       javaThrows: ['foam.nanos.auth.AuthenticationException'],
@@ -56,6 +89,9 @@ foam.INTERFACE({
     },
     {
       name: 'loginByEmail',
+      documentation: `
+        Log the user in using their email and password to authenticate them.
+      `,
       async: true,
       type: 'foam.nanos.auth.User',
       javaThrows: ['foam.nanos.auth.AuthenticationException'],
@@ -75,6 +111,8 @@ foam.INTERFACE({
         }
       ]
     },
+    // TODO: This should be removed. We have more appropriate places to perform
+    // validation checks now. See the 'Validatable' interface and ValidatingDAO.
     {
       name: 'validatePassword',
       async: true,
@@ -87,8 +125,27 @@ foam.INTERFACE({
         }
       ]
     },
+    // NOTE: Could we combine `checkUser` and `check` into an overloaded method
+    // where one simply calls the other with the user from the context as a
+    // parameter? Something like:
+    //
+    //   Boolean check(X x, String permission) {
+    //     User user = (User) x.get("user"); // Or use `getCurrentUser`
+    //     return check(x, user, permission);
+    //   }
+    //
+    //   Boolean check(X x, User user, String permission) {
+    //     // Logic...
+    //   }
+    //
+    // That seems a bit strange for an interface though. Might work better as
+    // part of a base AbstractAuthService.
     {
       name: 'checkUser',
+      documentation: `
+        Like the 'check' method, but allows you to provide the user to check as
+        an argument instead of depending on the right user to be in the context.
+      `,
       type: 'Boolean',
       async: true,
       swiftThrows: true,
@@ -107,8 +164,15 @@ foam.INTERFACE({
         }
       ]
     },
+    // TODO: Remove this. We just need one method that checks a permission
+    // string. We don't need a second method that works for
+    // java.security.Permissions specifically.
     {
       name: 'checkUserPermission',
+      documentation: `
+        Like the 'checkUser' method, but with a different type for the third
+        method.
+      `,
       type: 'Boolean',
       async: true,
       swiftThrows: true,
@@ -129,6 +193,9 @@ foam.INTERFACE({
     },
     {
       name: 'check',
+      documentation: `
+        Check if a user in the given context has the given permission.
+      `,
       async: true,
       type: 'Boolean',
       swiftThrows: true,
@@ -145,6 +212,7 @@ foam.INTERFACE({
     },
     {
       name: 'updatePassword',
+      documentation: `Updates a user's password.`,
       async: true,
       type: 'foam.nanos.auth.User',
       javaThrows: ['foam.nanos.auth.AuthenticationException'],
@@ -164,6 +232,8 @@ foam.INTERFACE({
         }
       ]
     },
+    // TODO: This should be removed. We have more appropriate places to perform
+    // validation checks now. See the 'Validatable' interface and ValidatingDAO.
     {
       name: 'validateUser',
       async: true,
@@ -183,6 +253,7 @@ foam.INTERFACE({
     },
     {
       name: 'logout',
+      documentation: 'Logs the user out.',
       async: true,
       type: 'Void',
       swiftThrows: true,
