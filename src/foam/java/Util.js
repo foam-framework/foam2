@@ -23,15 +23,26 @@ foam.LIB({
       name: 'limitSplit',
       code: function(str, maxWords){
           res = [];
-          var arr = str.split(' ', 150);
-          for( i = 0 ; i < arr.length ; i++){
-            line = arr[i] + ' ';
+          var arr = str.split(' ');
+          var line = '';
+          for( i = 0 ; i < arr.length ; i++ ){
+            line += arr[i] + ' ';
             if( i % maxWords == 0 && i > 0 ){
-              line += '\n';
+              res.push(line);
+              line = '';
             }
-            res.push(line);
           }
+          res.push(line); // pushes what's remaining
           return res;
+      }
+    },
+    {
+      /** removes spacing included in js files (included only to beautify js files but not useful in javadoc) */
+      name: 'removeSpacing',
+      code: function(str){
+        var res = str.replace(/\s+(?= )/g, ' ');
+        //res = res.replace(/\n/g, ' '), 25);
+        return res;
       }
     }
   ]

@@ -100,10 +100,20 @@ foam.CLASS({
       o.out('\n');
 
       if( this.documentation ){
-        str = foam.java.Util.limitSplit(o, this.documentation.replace(/\n/g, ' '), 25);
-        o.out('/** ' + str.replace(/\n/g, "\n * ") + ' \n */\n');
+        str = foam.java.Util.removeSpacing(this.documentation);
+        lines = foam.java.Util.limitSplit(str, 25);
+        o.indent();
+        o.out('/**\n');
+        for( i = 0 ; i < lines.length ; i++ ){
+          o.indent();
+          o.out('* ' + lines[i]);
+          o.out('\n');
+        }
+        o.indent();
+        o.out('*/\n');
       }
 
+      o.indent();
       o.out(this.visibility, this.visibility ? ' ' : '',
         'interface ', this.name);
 
@@ -126,12 +136,10 @@ foam.CLASS({
       }
 
       for ( var i = 0 ; i < this.methods.length ; i++ ) {
-        o.indent();
         o.out(this.methods[i]);
         o.out('\n');
       }
 
-      o.decreaseIndent();
       o.out('}');
 
     }

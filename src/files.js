@@ -159,7 +159,7 @@ FOAM_FILES([
   { name: "foam/json2/Outputter" },
   { name: "foam/json2/Serializer" },
   { name: "foam/json2/Deserializer" },
-  { name: "foam/java/Util" },
+  { name: "foam/java/Util", flags:['java'] },
 
   { name: "foam/util/Timer" },
   { name: "foam/util/EmailTest" },

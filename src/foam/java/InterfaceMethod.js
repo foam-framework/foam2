@@ -76,18 +76,22 @@ foam.CLASS({
 
   methods: [
     function outputJava(o) {
-      o.indent();
 
       if( this.documentation ){
-        str = this.documentation.replace(/ +(?= )/g, ' ');
-        str = foam.java.Util.limitSplit(o, str.replace(/\n/g, ' '), 25);
-        o.out('/** ' + str);
-        o.indent();
-        o.out('*/\n');
-        o.increaseIndent();
-        o.indent();
+       str = foam.java.Util.removeSpacing(this.documentation);
+       lines = foam.java.Util.limitSplit(str, 25);
+       o.indent();
+       o.out('/**\n');
+       for( i = 0 ; i < lines.length ; i++ ){
+         o.indent();
+         o.out('* ' + lines[i]);
+         o.out('\n');
+       }
+       o.indent();
+       o.out('*/\n');
       }
 
+      o.indent();
       o.out(this.visibility, this.visibility ? ' ' : '',
         this.type, ' ', this.name, '(');
 
@@ -107,10 +111,6 @@ foam.CLASS({
       }
 
       o.out(';\n');
-
-      if( this.documentation ){
-        o.decreaseIndent();
-      }
     }
   ]
 });

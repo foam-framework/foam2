@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-//import limitSplit from 'foam.java.util.js';
-
 foam.CLASS({
   package: 'foam.java',
   name: 'Method',
@@ -42,16 +40,22 @@ foam.CLASS({
   methods: [
     function outputJava(o) {
       o.out('\n');
-      o.indent();
 
       if( this.documentation ){
-        doc = this.documentation.replace(/\n/g, ' ');
-        str = foam.java.Util.limitSplit(o, doc, 25);
-        o.out('/** ' + str.replace(/\n/g, "\n * ") + ' \n */\n');
-        o.increaseIndent();
+        str = foam.java.Util.removeSpacing(this.documentation);
+        lines = foam.java.Util.limitSplit(str, 25);
         o.indent();
+        o.out('/**\n');
+        for( i = 0 ; i < lines.length ; i++ ){
+          o.indent();
+          o.out('* ' + lines[i]);
+          o.out('\n');
+        }
+        o.indent();
+        o.out('*/\n');
       }
 
+      o.indent();
       o.out(this.visibility, this.visibility ? ' ' : '',
         this.abstract     ? 'abstract ' : '',
         this.static       ? 'static ' : '',
@@ -85,10 +89,6 @@ foam.CLASS({
         o.decreaseIndent();
         o.indent();
         o.out('}');
-      }
-
-      if( this.documentation ){
-        o.decreaseIndent();
       }
 
     }
