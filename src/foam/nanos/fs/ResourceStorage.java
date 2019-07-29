@@ -3,7 +3,7 @@ package foam.nanos.fs;
 import foam.util.SafetyUtil;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.*;
@@ -12,17 +12,16 @@ import java.util.Map;
 
 public class ResourceStorage extends AbstractStorage {
 
-  private String resourceDir_;
-  private String resourceJar_;
+  protected String resourceJar_;
 
-  public ResourceStorage(String resourceJar) {
-    resourceJar_ = resourceJar;
-    resourceDir_ = null;
+  public ResourceStorage() {
+    super();
+    resourceJar_ = System.getenv("RES_JAR_HOME");;
   }
 
-  public ResourceStorage (String resourceJar, String root) {
-    resourceJar_ = resourceJar;
-    resourceDir_ = root;
+  public ResourceStorage (String root) {
+    super(root);
+    resourceJar_ = System.getenv("RES_JAR_HOME");;
   }
 
   @Override
@@ -62,7 +61,12 @@ public class ResourceStorage extends AbstractStorage {
   }
 
   @Override
-  public InputStream getInputStream(String name) {
+  public java.io.File get(String name) {
+    throw new UnsupportedOperationException("Can't open file to JAR resource");
+  }
+
+  @Override
+  public OutputStream getOutputStream(String name) {
     throw new UnsupportedOperationException("Can't open input stream to JAR resource");
   }
 }

@@ -6,14 +6,12 @@ import java.nio.file.*;
 
 public class FileSystemStorage extends AbstractStorage {
 
-  String resourceDir_;
-
   public FileSystemStorage() {
-    resourceDir_ = null;
+    super();
   }
 
   public FileSystemStorage (String root) {
-    resourceDir_ = root;
+    super(root);
   }
 
   @Override

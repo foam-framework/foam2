@@ -156,21 +156,14 @@ foam.CLASS({
       javaType: 'java.io.BufferedReader',
       javaGetter: `
       try {
-        Storage storage = (Storage) getX().get(Storage.class);
-        if ( storage.isResource() ) {
-          InputStream file = storage.getResourceAsStream(getFilename());
-          if ( file == null ) {
-            getLogger().error("Failed to read from resource journal: " + getFilename());
-          }
-          return (file == null) ? null : new BufferedReader(new InputStreamReader(file));
-        } else {
-          return new BufferedReader(new FileReader(getFile()));
+        Storage storage = getX().get(Storage.class);
+        InputStream file = storage.getInputStream(getFilename());
+        if ( file == null ) {
+          getLogger().error("Failed to read from resource journal: " + getFilename());
         }
-      } catch ( FileNotFoundException t) {
-        getLogger().error("Failed to read from journal: " + getFilename(), t.getLocalizedMessage());
-        return null;
+        return (file == null) ? null : new BufferedReader(new InputStreamReader(file));
       } catch ( Throwable t ) {
-        getLogger().error("Failed to read from journal", t);
+        getLogger().error("Failed to read from journal: " + getFilename(), t);
         throw new RuntimeException(t);
       }
       `
@@ -181,14 +174,14 @@ foam.CLASS({
       name: 'writer',
       javaType: 'java.io.BufferedWriter',
       javaFactory: `
-        try {
-          BufferedWriter writer = new BufferedWriter(new FileWriter(getFile(), true), 16 * 1024);
-          writer.newLine();
-          return writer;
-        } catch ( Throwable t ) {
-          getLogger().error("Failed to create writer", t);
-          throw new RuntimeException(t);
-        }
+      try {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(getFile(), true), 16 * 1024);
+        writer.newLine();
+        return writer;
+      } catch ( Throwable t ) {
+        getLogger().error("Failed to create writer", t);
+        throw new RuntimeException(t);
+      }
       `
     }
   ],

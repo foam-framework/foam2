@@ -35,7 +35,7 @@ sink = prepareSink(sink);
 foam.dao.Sink         decorated = decorateSink_(sink, skip, limit, order, predicate);
 foam.dao.Subscription sub       = new foam.dao.Subscription();
 
-java.nio.file.DirectoryStream<java.nio.file.Path> paths = new foam.nanos.fs.Storage(getDir(), true).getDirectoryStream("", "*.flow");
+java.nio.file.DirectoryStream<java.nio.file.Path> paths = new foam.nanos.fs.ResourceStorage(getDir()).getDirectoryStream("", "*.flow");
 
 for ( java.nio.file.Path p : paths ) {
   foam.flow.Document obj = new foam.flow.Document();
@@ -72,7 +72,7 @@ if ( ! id.matches("^[a-zA-Z0-9_-]+$") ) {
 String id = (String)getPK(obj);
 verifyId(id);
 
-java.nio.file.Path path = new foam.nanos.fs.Storage(getDir(), false).getPath(id + ".flow");
+java.nio.file.Path path = new foam.nanos.fs.FileSystemStorage(getDir()).getPath(id + ".flow");
 if ( ! java.nio.file.Files.exists(path) ) {
   try {
     if ( ! java.nio.file.Files.isDirectory(path.getParent()) ) {
@@ -84,7 +84,7 @@ if ( ! java.nio.file.Files.exists(path) ) {
   }
 }
 
-java.io.OutputStream oStream = new foam.nanos.fs.Storage(getDir(), false).getResourceOutputStream(id + ".flow");
+java.io.OutputStream oStream = new foam.nanos.fs.FileSystemStorage(getDir()).getOutputStream(id + ".flow");
 
 if ( oStream == null ) {
   return obj;
@@ -116,10 +116,10 @@ return obj;`
 // TODO: Escape/sanitize file name
 verifyId((String)id);
 
-java.io.InputStream iStream = new foam.nanos.fs.Storage(getDir(), false).getResourceInputStream(id + ".flow");
+java.io.InputStream iStream = new foam.nanos.fs.FileSystemStorage(getDir()).getInputStream(id + ".flow");
 
 if ( iStream == null ) {
-  iStream = new foam.nanos.fs.Storage(getDir(), true).getResourceInputStream(id + ".flow");
+  iStream = new foam.nanos.fs.ResourceStorage(getDir()).getInputStream(id + ".flow");
   if ( iStream == null ) return null;
 }
 

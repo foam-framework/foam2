@@ -13,7 +13,22 @@ public abstract class AbstractStorage implements Storage {
 
   protected abstract FileSystem getFS();
 
-  public abstract Path getPath(String name);
+  protected abstract Path getPath(String name);
+
+  protected String resourceDir_;
+
+  public AbstractStorage() {
+    resourceDir_ = null;
+  }
+
+  public AbstractStorage (String root) {
+    resourceDir_ = root;
+  }
+
+  @Override
+  public java.io.File get(String name) {
+    return new java.io.File(resourceDir_, name).getAbsoluteFile();
+  }
 
   @Override
   public OutputStream getOutputStream(String name) {

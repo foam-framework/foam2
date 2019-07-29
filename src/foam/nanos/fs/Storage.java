@@ -7,6 +7,8 @@ import java.nio.file.Path;
 
 public interface Storage {
 
+  java.io.File get(String name);
+
   OutputStream getOutputStream(String name);
 
   InputStream getInputStream(String name);
