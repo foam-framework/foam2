@@ -68,7 +68,7 @@ foam.CLASS({
       }
     }
   ],
-  actions: [
+  methods: [
     {
       name: 'save',
       code: function() {
