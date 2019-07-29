@@ -41,8 +41,8 @@ public class PostgresDAO
   protected String table_;
   protected List<PropertyInfo> props_ = new ArrayList<>();
 
-  public PostgresDAO(X x, ClassInfo of, String poolName) throws java.sql.SQLException, ClassNotFoundException {
-    super(x, of, poolName);
+  public PostgresDAO(X x, ClassInfo of) throws java.sql.SQLException, ClassNotFoundException {
+    super(x, of);
   }
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {

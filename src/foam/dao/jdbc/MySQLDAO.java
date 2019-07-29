@@ -22,10 +22,10 @@ import java.util.*;
   Any other database objects (tables) will be created on the fly by the application (when methods of this class are called).
 
  */
-public class MySQLJDBCDAO extends AbstractJDBCDAO{
+public class MySQLDAO extends AbstractJDBCDAO{
 
-  public MySQLJDBCDAO(X x, ClassInfo of, String poolName) throws java.sql.SQLException, ClassNotFoundException {
-    super(x, of, poolName);
+  public MySQLDAO(X x, ClassInfo of) throws java.sql.SQLException, ClassNotFoundException {
+    super(x, of);
   }
 
   @Override

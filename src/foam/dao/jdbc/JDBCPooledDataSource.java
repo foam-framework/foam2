@@ -19,8 +19,9 @@ public class JDBCPooledDataSource {
   // Holds a reference to the connection pool ( .getConnection() )
   protected DataSource dataSource_;
 
-  public JDBCPooledDataSource(X x, String poolName) {
+  private static String DEFAULT_POOL_NAME = "DefaultPoolName";
 
+  public JDBCPooledDataSource(X x, String poolName) {
     try {
       Object spec = x.get("JDBCConnectionSpec");
 
@@ -36,7 +37,24 @@ public class JDBCPooledDataSource {
       Logger logger = (Logger) x.get("logger");
       logger.error(e);
     }
+ }
 
+  public JDBCPooledDataSource(X x) {
+    try {
+      Object spec = x.get("JDBCConnectionSpec");
+
+      JDBCConnectionSpec jdbcSpec = (JDBCConnectionSpec) spec;
+
+      String connectionURI = jdbcSpec.buildConnectionURI();
+
+      dataSource_ = setupPoolingDataSource(connectionURI, DEFAULT_POOL_NAME);
+    } catch (ClassNotFoundException e) {
+      Logger logger = (Logger) x.get("logger");
+      logger.error(e);
+    } catch (java.sql.SQLException e) {
+      Logger logger = (Logger) x.get("logger");
+      logger.error(e);
+    }
   }
 
   public DataSource getDataSource() {

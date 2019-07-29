@@ -123,11 +123,12 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
    */
   public abstract boolean maybeCreateTable(X x, ClassInfo of);
 
-  public AbstractJDBCDAO(X x, ClassInfo of, String poolName) throws java.sql.SQLException, ClassNotFoundException {
+  public AbstractJDBCDAO(X x, ClassInfo of) throws java.sql.SQLException, ClassNotFoundException {
     setX(x);
     setOf(of);
 
-    JDBCPooledDataSource jp = new JDBCPooledDataSource(x, poolName);
+    JDBCPooledDataSource jp = (JDBCPooledDataSource) x.get("JDBCDataSource");
+
     dataSource_ = jp.getDataSource();
 
     tableName_ = of.getObjClass().getSimpleName().toLowerCase();
