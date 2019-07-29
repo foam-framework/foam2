@@ -117,9 +117,7 @@ foam.CLASS({
       javaFactory: `
 Logger logger = (Logger) getX().get("logger");
 
-foam.dao.DAO delegate = getInnerDAO() == null ?
-  new foam.dao.MDAO(getOf()) :
-  getInnerDAO();
+foam.dao.DAO delegate = getInnerDAO();
 
 if ( delegate instanceof foam.dao.MDAO ) {
   setMdao((foam.dao.MDAO)delegate);
@@ -127,10 +125,6 @@ if ( delegate instanceof foam.dao.MDAO ) {
        getIndex().length > 0 ) {
     getMdao().addIndex(getIndex());
   }
-}
-
-if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
-  delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
 }
 
 if ( getDecorator() != null ) {
@@ -184,7 +178,6 @@ if ( getSeqNo() ) {
   delegate = new foam.dao.SequenceNumberDAO.Builder(getX()).
     setDelegate(delegate).
     setProperty(getSeqPropertyName()).
-    setStartingValue(getSeqStartingValue()).
     build();
 }
 
@@ -239,7 +232,12 @@ return delegate;
     {
       class: 'Object',
       type: 'foam.dao.DAO',
-      name: 'innerDAO'
+      name: 'innerDAO',
+      javaFactory: `
+      if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) )
+        return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
+      return new foam.dao.MDAO(getOf());
+      `
     },
     {
       class: 'Object',
@@ -258,11 +256,6 @@ return delegate;
       class: 'Boolean',
       name: 'seqNo',
       value: false
-    },
-    {
-      class: 'Long',
-      name: 'seqStartingValue',
-      value: 1
     },
     {
       /** Have EasyDAO generate guids to index items. Note that .seqNo and .guid features are mutually exclusive. */
@@ -616,7 +609,6 @@ return delegate;
       if ( this.seqNo ) {
         var args = {__proto__: params, delegate: dao, of: this.of};
         if ( this.seqProperty ) args.property = this.seqProperty;
-        args.startingValue = this.seqStartingValue;
         dao = this.SequenceNumberDAO.create(args);
       }
 
