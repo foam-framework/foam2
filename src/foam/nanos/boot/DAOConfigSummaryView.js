@@ -50,6 +50,9 @@
        }
      },
      {
+       name: 'memento'
+     }
+     {
        name: 'filteredDAO',
        factory: function() {
          return this.data.where(
@@ -91,6 +94,7 @@
            .add(label)
            .attrs({title: spec.description})
            .on('click', function() {
+             self.memento = spec.id;
              self.stack.push(self.BrowserView.create({
                data: self.__context__[spec.id]
              }));
