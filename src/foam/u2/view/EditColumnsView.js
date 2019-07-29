@@ -107,13 +107,9 @@ foam.CLASS({
         mode: 'RO'
       },
       factory: function() {
-        return this.allColumns
-          .map(c => {
-            return this.ColumnConfig.create({
-              of: this.of,
-              axiom: c
-            })
-          })
+        return this.allColumns.map(c => {
+          return this.ColumnConfig.create({ of: this.of, axiom: c });
+        });
       }
     },
     {

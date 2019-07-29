@@ -68,20 +68,18 @@ foam.CLASS({
           return allColumns.findIndex(a => a.name == c.name) == i;
         });
 
-        return allColumns
-          .filter(c => {
-            var v = this.ColumnConfig.create({ of: of, axiom : c }).visibility;
-            return v == this.ColumnVisibility.ALWAYS_HIDE ? false :
-                   v == this.ColumnVisibility.ALWAYS_SHOW ? true :
-                   columns.find(c2 => c.name == c2.name)  ? true : false;
-          });
+        return allColumns.filter(c => {
+          var v = this.ColumnConfig.create({ of: of, axiom : c }).visibility;
+          return v == this.ColumnVisibility.ALWAYS_HIDE ? false :
+                 v == this.ColumnVisibility.ALWAYS_SHOW ? true :
+                 columns.find(c2 => c.name == c2.name)  ? true : false;
+        });
       },
     },
     {
       name: 'allColumns',
-      factory: null,
       expression: function(of) {
-        return [].concat(
+        return ! of ? [] : [].concat(
           of.getAxiomsByClass(foam.core.Property)
             .filter(p => p.tableCellFormatter && ! p.hidden),
           of.getAxiomsByClass(foam.core.Action)
@@ -95,9 +93,8 @@ foam.CLASS({
       },
       expression: function(of, allColumns) {
         if ( ! of ) return [];
-        var tableColumns = of.getAxiomByName('tableColumns');
-        return (tableColumns ? tableColumns.columns : allColumns)
-          .map(c => foam.String.isInstance(c) ? of.getAxiomByName(c) : c);
+        var tc = of.getAxiomByName('tableColumns');
+        return tc ? tc.columns.map(c => of.getAxiomByName(c)) : allColumns;
       },
     },
     {
