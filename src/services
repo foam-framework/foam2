@@ -1,7 +1,20 @@
 p({"class":"foam.nanos.boot.NSpec", "name":"nSpecDAO",                           "serve":true,  "authenticate": false, "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"localLogMessageDAO", "lazy":false, "serviceScript":"new foam.dao.EasyDAO.Builder(x).setOf(foam.nanos.logger.LogMessage.getOwnClassInfo()).setAuthorize(false).setPm(true).setSeqNo(true).setCreatedAware(true).setCreatedByAware(true).setOrder(new foam.mlang.order.Comparator[] {foam.mlang.MLang.DESC(foam.nanos.logger.LogMessage.CREATED)}).setDecorator(new foam.nanos.logger.RepeatLogMessageDAO.Builder(x).setDelegate(new foam.dao.FixedSizeDAO.Builder(x).setDelegate(new foam.nanos.logger.NotificationLogMessageDAO.Builder(x).build()).build()).build()).setInnerDAO(new foam.dao.WriteOnlyJDAO(x, foam.nanos.logger.LogMessage.getOwnClassInfo(), \"../logs/logs\" /*TODO System.getProperty(\"LOG_HOME\")+\"/logs\"*/)).build();"})
-p({"class":"foam.nanos.boot.NSpec", "name":"logMessageDAO",  "serve":true, "serviceScript":"new foam.dao.EasyDAO.Builder(x).setOf(foam.nanos.logger.LogMessage.getOwnClassInfo()).setInnerDAO(((foam.dao.DAO) x.get(\"localLogMessageDAO\"))).build();", "client":"{\"of\":\"foam.nanos.logger.LogMessage\"}"})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"logMessageDAO",
+  "serve":true,
+  "serviceScript":"""
+    new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.logger.LogMessage.getOwnClassInfo())
+      .setInnerDAO(((foam.dao.DAO) x.get(\"localLogMessageDAO\")))
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.logger.LogMessage\"}"
+})
+
 p({"class":"foam.nanos.boot.NSpec", "name":"logLevelFilterLogger",             "lazy":false, "service":{"class":"foam.nanos.logger.LogLevelFilterLogger"}})
 p({"class":"foam.nanos.boot.NSpec", "name":"logger",                           "lazy":false, "serviceScript":"import foam.nanos.logger.CompositeLogger; import foam.nanos.logger.StdoutLogger; import foam.nanos.logger.FileLogger; import foam.nanos.logger.ProxyLogger; import foam.nanos.logger.LogLevelFilterLogger; import foam.nanos.logger.DAOLogger; CompositeLogger log = new CompositeLogger(); StdoutLogger stdOut = new StdoutLogger(); ProxyLogger logLevelFilterLogger = (ProxyLogger) x.get(\"logLevelFilterLogger\"); logLevelFilterLogger.setX(x); logLevelFilterLogger.setDelegate(log); DAOLogger daoLogger = new DAOLogger(x); log.add(stdOut).add(daoLogger); return logLevelFilterLogger;"})
 
@@ -50,10 +63,41 @@ p({"class":"foam.nanos.boot.NSpec", "name":"export",                            
 p({"class":"foam.nanos.boot.NSpec", "name":"trace",                              "authenticate": false, "parameters":true, "serviceClass":"foam.nanos.http.TraceWebAgent"})
 p({"class":"foam.nanos.boot.NSpec", "name":"services",                           "serviceClass":"foam.nanos.http.ServicesWebAgent"})
 p({"class":"foam.nanos.boot.NSpec", "name":"threadPool",                       "lazy":false, "serviceClass":"foam.nanos.pool.FixedThreadPool"})
-p({"class":"foam.nanos.boot.NSpec", "name":"testDAO",                            "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setGuid(true).setOf(foam.nanos.test.Test.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"tests\").setDecorator(new foam.nanos.script.ScriptRunnerDAO(null)).build();","client":"{\"of\":\"foam.nanos.test.Test\"}"})
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"testDAO","serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setGuid(true)
+      .setOf(foam.nanos.test.Test.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName(\"tests\")
+      .setDecorator(new foam.nanos.script.ScriptRunnerDAO(null))
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.test.Test\"}"
+})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"pmInfoDAO",                          "serve":true,  "serviceScript":"return new foam.dao.MDAO(foam.nanos.pm.PMInfo.getOwnClassInfo());","client":"{\"of\":\"foam.nanos.pm.PMInfo\", \"remoteListenerSupport\": false}" })
-p({"class":"foam.nanos.boot.NSpec", "name":"scriptDAO",                            "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setGuid(true).setOf(foam.nanos.script.Script.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"scripts\").setDecorator(new foam.nanos.script.ScriptRunnerDAO(null)).setOrder(new foam.core.PropertyInfo[] {foam.nanos.script.Script.ID}).setIndex(new foam.core.PropertyInfo[] {foam.nanos.script.Script.ID}).build();","client":"{\"of\":\"foam.nanos.script.Script\"}"})
+p({
+  "class":"foam.nanos.boot.NSpec", 
+  "name":"scriptDAO",
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setGuid(true)
+      .setOf(foam.nanos.script.Script.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName(\"scripts\")
+      .setDecorator(new foam.nanos.script.ScriptRunnerDAO(null))
+      .setOrder(new foam.core.PropertyInfo[] {foam.nanos.script.Script.ID})
+      .setIndex(new foam.core.PropertyInfo[] {foam.nanos.script.Script.ID})
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.script.Script\"}"
+})
 
 p({
   "class":"foam.nanos.boot.NSpec", 
@@ -170,7 +214,18 @@ p({"class":"foam.nanos.boot.NSpec", "name":"exportDriverRegistryDAO",           
 
 p({"class":"foam.nanos.boot.NSpec", "name":"localPermissionDAO",                       "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setAuthorize(false).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"permissions\").setOf(foam.nanos.auth.Permission.getOwnClassInfo()).build();"})
 
-p({"class":"foam.nanos.boot.NSpec", "name":"permissionDAO",   "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setOf(foam.nanos.auth.Permission.getOwnClassInfo()).setInnerDAO((foam.dao.DAO) x.get(\"localPermissionDAO\")).build();", "client":"{\"of\":\"foam.nanos.auth.Permission\"}"})
+p({
+  "class":"foam.nanos.boot.NSpec", 
+  "name":"permissionDAO",
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.auth.Permission.getOwnClassInfo())
+      .setInnerDAO((foam.dao.DAO) x.get(\"localPermissionDAO\"))
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.auth.Permission\"}"
+})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"historyDAO",                         "serve":true,  "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.java.JDAO(x, foam.dao.history.HistoryRecord.getOwnClassInfo(), \"historyRecords\"));","client":"{\"of\":\"foam.dao.history.HistoryRecord\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"menuDAO",                            "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setName(\"menu\").setPm(true).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"menus\").setOf(foam.nanos.menu.Menu.getOwnClassInfo()).setOrder(new foam.core.PropertyInfo[] {foam.nanos.menu.Menu.ORDER, foam.nanos.menu.Menu.LABEL}).build().orderBy(foam.nanos.menu.Menu.ORDER);", "client":"{\"of\":\"foam.nanos.menu.Menu\",\"cache\":true}"})
@@ -203,7 +258,23 @@ p({"class":"foam.nanos.boot.NSpec", "name":"supportEmailDAO",                   
 p({"class":"foam.nanos.boot.NSpec", "name":"ticketDAO",                         "serve":true, "serviceScript":"return new foam.dao.PMDAO(new foam.dao.SequenceNumberDAO(new foam.dao.java.JDAO(x, foam.support.model.Ticket.getOwnClassInfo(), \"tickets\")));","client":"{\"of\":\"foam.support.model.Ticket\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"pop3",                              "serve":true, "boxClass":"foam.nanos.notification.email.POP3EmailSkeleton", "serviceClass":"foam.nanos.notification.email.POP3EmailService","client":"{ \"class\":\"foam.nanos.notification.email.ClientPOP3EmailService\", \"delegate\": { \"class\":\"foam.box.HTTPBox\", \"url\":\"service/pop3\" } }"})
 p({"class":"foam.nanos.boot.NSpec", "name":"sugar",                              "parameters":true, "serviceScript":"return new foam.nanos.dig.SugarWebAgent()"})
-p({"class":"foam.nanos.boot.NSpec", "name":"sugarDAO",                            "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setGuid(true).setOf(foam.nanos.dig.SUGAR.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"sugars\").build();","client":"{\"of\":\"foam.nanos.dig.SUGAR\"}"})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"sugarDAO",
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setGuid(true)
+      .setOf(foam.nanos.dig.SUGAR.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName(\"sugars\")
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.dig.SUGAR\"}"
+})
+
 p({"class":"foam.nanos.boot.NSpec", "name":"argumentDAO",                        "serve":true,  "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.java.JDAO(x, foam.nanos.dig.Argument.getOwnClassInfo(), \"arguments\"));","client":"{\"of\":\"foam.nanos.dig.Argument\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"ruleDAO",                            "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setSeqNo(true).setOf(foam.nanos.ruler.Rule.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"rules\").build();", "client":"{\"of\":\"foam.nanos.ruler.Rule\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"ruleHistoryDAO",                     "serve":true,  "serviceScript":"dao = new foam.dao.EasyDAO.Builder(x).setPm(true).setSeqNo(true).setOf(foam.nanos.ruler.RuleHistory.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"ruleHistory\").build(); ca = new foam.nanos.auth.CreatedAwareDAO.Builder(x).setDelegate(dao).build(); lma = new foam.nanos.auth.LastModifiedAwareDAO.Builder(x).setDelegate(ca).build(); return lma;", "client":"{\"of\":\"foam.nanos.ruler.RuleHistory\"}"})
