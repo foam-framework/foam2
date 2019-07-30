@@ -91,6 +91,7 @@ foam.CLASS({
               })
             .end()
             .start(self.Cols)
+              .style({ 'padding-top': '25px', 'justify-content': 'end' })
               .forEach(section.actions, function(a) {
                 this.add(a);
               })

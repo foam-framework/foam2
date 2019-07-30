@@ -48,6 +48,7 @@ foam.CLASS({
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.ControllerMode',
+    'foam.u2.dialog.NotificationMessage'
   ],
   imports: [
     'stack'
@@ -97,6 +98,10 @@ foam.CLASS({
           this.stack.back();
         }, e => {
           this.throwError.pub(e);
+          this.add(this.NotificationMessage.create({
+            message: e.message,
+            type: 'error'
+          }));
         });
       }
     },

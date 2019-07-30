@@ -9,8 +9,7 @@ foam.CLASS({
   name: 'SMTPEmailService',
 
   implements: [
-    'foam.core.ContextAgent',
-    'foam.nanos.notification.email.EmailService',
+    'foam.nanos.notification.email.EmailService'
   ],
 
   documentation: 'Implementation of Email Service using SMTP',
@@ -22,7 +21,6 @@ foam.CLASS({
   javaImports: [
     'foam.core.ContextAgent',
     'foam.core.X',
-    'foam.nanos.pool.FixedThreadPool',
     'foam.util.SafetyUtil',
     'java.nio.charset.StandardCharsets',
     'java.util.Date',
@@ -234,21 +232,6 @@ foam.CLASS({
           logger.error("SMTPEmailService sending MimeMessage failed. " + e);
         }
         return emailMessage;
-      `
-    },
-    {
-      name: 'execute',
-      javaCode: `
-        // TODO: This should be a cron job.
-        DAO emailMessageDAO = (DAO) x.get("emailMessageDAO");
-        List<EmailMessage> emailMessages = ((foam.dao.ArraySink)
-          emailMessageDAO
-            .where(EQ(EmailMessage.STATUS, Status.UNSENT))
-            .select(new ArraySink()))
-            .getArray();
-        for ( EmailMessage emailMessage : emailMessages ) {
-          emailMessageDAO.put(sendEmail(x, emailMessage));
-        }
       `
     }
   ]

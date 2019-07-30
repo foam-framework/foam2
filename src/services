@@ -62,7 +62,15 @@ p({"class":"foam.nanos.boot.NSpec", "name":"static",                            
 p({"class":"foam.nanos.boot.NSpec", "name":"export",                             "serviceClass":"foam.nanos.export.ExportService"})
 p({"class":"foam.nanos.boot.NSpec", "name":"trace",                              "authenticate": false, "parameters":true, "serviceClass":"foam.nanos.http.TraceWebAgent"})
 p({"class":"foam.nanos.boot.NSpec", "name":"services",                           "serviceClass":"foam.nanos.http.ServicesWebAgent"})
-p({"class":"foam.nanos.boot.NSpec", "name":"threadPool",                       "lazy":false, "serviceClass":"foam.nanos.pool.FixedThreadPool"})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "threadPool",
+  "lazy": false,
+  "serve": false,
+  "serviceClass": "foam.nanos.pool.ThreadPoolAgency"
+})
+
 p({
   "class":"foam.nanos.boot.NSpec",
   "name":"testDAO","serve":true,
@@ -80,6 +88,7 @@ p({
 })
 
 p({"class":"foam.nanos.boot.NSpec", "name":"pmInfoDAO",                          "serve":true,  "serviceScript":"return new foam.dao.MDAO(foam.nanos.pm.PMInfo.getOwnClassInfo());","client":"{\"of\":\"foam.nanos.pm.PMInfo\", \"remoteListenerSupport\": false}" })
+
 p({
   "class":"foam.nanos.boot.NSpec", 
   "name":"scriptDAO",
@@ -118,6 +127,7 @@ p({
 
 p({"class":"foam.nanos.boot.NSpec", "name":"cronScheduler",                    "lazy":false, "serviceClass":"foam.nanos.cron.CronScheduler" })
 p({"class":"foam.nanos.boot.NSpec", "name":"localUserDAO",                       "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.SequenceNumberDAO (1000, new foam.nanos.auth.PreventDuplicateEmailDAO.Builder(x).setDelegate(new foam.dao.java.JDAO(x, foam.nanos.auth.User.getOwnClassInfo(), \"users\")).build()));"})
+
 p({
   "class":"foam.nanos.boot.NSpec", "name":"userDAO",                            "serve":true,  "authenticate": false, 
   "serviceScript":"""

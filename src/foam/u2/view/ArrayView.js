@@ -96,6 +96,7 @@ foam.CLASS({
                 this
                   .startContext({ data: row })
                     .start(self.Cols)
+                      .style({ 'padding-top': '10px', 'padding-bottom': '10px' })
                       .start(valueView, { data$: row.value$ })
                         .style({ flex: 1 })
                       .end()
