@@ -29,11 +29,13 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'props',
-      factory: function() {
-        if ( this.of.getAxiomByName('tableColumns') ) return this.of.getAxiomByName('tableColumns').columns;
-        return this.of.getAxiomsByClass()
-          .filter((p) => ! p.networkTransient)
-          .map((p) => p.name);
+      factory: null,
+      expression: function(of) {
+        return of.getAxiomByName('tableColumns') 
+          ? of.getAxiomByName('tableColumns').columns
+          : of.getAxiomsByClass()
+            .filter((p) => ! p.networkTransient)
+            .map((p) => p.name);
       },
       javaFactory: `
         // TODO: Add tableColumns to java to give an opportunity for a better default.
