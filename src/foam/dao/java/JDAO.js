@@ -11,7 +11,6 @@ foam.CLASS({
   flags: ['java'],
 
   javaImports: [
-    'foam.nanos.fs.Storage',
     'foam.nanos.fs.ResourceStorage',
     'foam.core.X'
   ],
