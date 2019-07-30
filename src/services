@@ -8,7 +8,7 @@ p({
   "lazy": true,
   "serve": true,
   "serviceScript": """
-    new foam.dao.EasyDAO.Builder(x)
+    return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.logger.LogMessage.getOwnClassInfo())
       .setInnerDAO(((foam.dao.DAO) x.get("localLogMessageDAO")))
       .build();
