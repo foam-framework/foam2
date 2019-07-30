@@ -16,6 +16,18 @@ foam.CLASS({
     'foam.u2.view.SearchViewWrapper'
   ],
 
+  constants: [
+    {
+      name: 'FORMAT_REGEX',
+      value: /\B(?=(\d{3})+(?!\d))/g,
+      type: 'Regex',
+      documentation: `
+        Used to add commas to separate groups of three digits when formatting
+        numbers. Eg: "12900500" becomes "12,900,500"
+      `
+    }
+  ],
+
   imports: [
     'dao',
     'searchColumns'
@@ -99,11 +111,17 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'selectedCount'
+      name: 'selectedCount',
+      postSet: function() {
+        this.isLoading = false;
+      }
     },
     {
       class: 'Int',
-      name: 'totalCount'
+      name: 'totalCount',
+      postSet: function() {
+        this.isLoading = false;
+      }
     },
     {
       name: 'searchManager',
@@ -112,6 +130,31 @@ foam.CLASS({
           dao$: this.dao$,
           predicate$: this.data$
         });
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'isLoading',
+      documentation: `
+        Indicates that the view hasn't gotten the count of objects in the DAO
+        back yet and is therefore still loading.
+      `,
+      value: true
+    },
+    {
+      class: 'String',
+      name: 'countText',
+      documentation: `
+        The formatted text that shows how many items have been selected from the
+        DAO. Shows "Loading..." while waiting for the total count to avoid
+        "0 of 0 selected" being shown while loading.
+      `,
+      expression: function(selectedCount, totalCount, isLoading) {
+        if ( isLoading ) {
+          return 'Loading...';
+        }
+        const fmt = (num) => num.toString().replace(this.FORMAT_REGEX, ',');
+        return `${fmt(selectedCount)} of ${fmt(totalCount)} selected`;
       }
     }
   ],
@@ -169,18 +212,7 @@ foam.CLASS({
         }, this.filters$))
         .start()
           .addClass(self.myClass('count'))
-          // TODO: move formatting function to stdlib
-          .add(self.selectedCount$.map(function(a) {
-            return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-          }))
-          .entity('nbsp')
-          .add('of')
-          .entity('nbsp')
-          .add(self.totalCount$.map(function(a) {
-            return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-          }))
-          .entity('nbsp')
-          .add('selected')
+          .add(self.countText$)
         .end()
         .tag(this.CLEAR, { buttonStyle: 'SECONDARY' });
     },
