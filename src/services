@@ -106,7 +106,15 @@ p({
   "client":"{\"of\":\"foam.nanos.auth.Group\"}" 
 })
 
-p({"class":"foam.nanos.boot.NSpec", "name":"localSessionDAO",                          "serviceScript":"return new foam.dao.MDAO(foam.nanos.session.Session.getOwnClassInfo());"})
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"localSessionDAO",
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.session.Session.getOwnClassInfo())
+      .build();
+  """
+})
 p({"class":"foam.nanos.boot.NSpec", "name":"sessionDAO",                           "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setOf(foam.nanos.session.Session.getOwnClassInfo()).setPm(true).setInnerDAO(((foam.dao.DAO) x.get(\"localSessionDAO\"))).build();","client":"{\"of\":\"foam.nanos.session.Session\"}" })
 p({"class":"foam.nanos.boot.NSpec", "name":"classes",                            "serviceClass":"foam.nanos.http.ClassesWebAgent"})
 p({"class":"foam.nanos.boot.NSpec", "name":"threads",                            "serviceClass":"foam.nanos.http.ThreadsWebAgent"})
