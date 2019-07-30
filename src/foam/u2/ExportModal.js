@@ -105,6 +105,11 @@ foam.CLASS({
 
   actions: [
     async function convert() {
+      if ( ! this.exportData && ! this.exportObj ) {
+        console.log('Neither exportData nor exportObj exist');
+        return;
+      }
+
       var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
       exportDriver = foam.lookup(exportDriver.driverName).create();
 
@@ -114,6 +119,11 @@ foam.CLASS({
     },
 
     async function downloadCSV() {
+      if ( ! this.exportData && ! this.exportObj ) {
+        console.log('Neither exportData nor exportObj exist');
+        return;
+      }
+
       var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
       exportDriver = foam.lookup(exportDriver.driverName).create();
 
