@@ -126,7 +126,7 @@ foam.CLASS({
       class: 'Object',
       name: 'reader',
       javaType: 'java.io.BufferedReader',
-      javaFactory: `
+      javaGetter: `
 try {
   InputStream is = getX().get(foam.nanos.fs.Storage.class).getInputStream(getFilename());
   if ( is == null ) {
