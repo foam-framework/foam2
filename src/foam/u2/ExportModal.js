@@ -105,31 +105,40 @@ foam.CLASS({
 
   actions: [
     async function convert() {
+      if ( ! this.exportData && ! this.exportObj ) {
+        console.log('Neither exportData nor exportObj exist');
+        return;
+      }
+
       var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
       exportDriver = foam.lookup(exportDriver.driverName).create();
 
-      if ( this.exportData ) {
-        this.note = await exportDriver
-          .exportDAO(this.__context__, this.exportData);
-      } else {
-        this.note = await exportDriver
-          .exportFObject(this.__context__, this.exportObj);
-      }
+      this.note = this.exportData 
+                    ? await exportDriver.exportDAO(this.__context__, this.exportData)
+                    : await exportDriver.exportFObject(this.__context__, this.exportObj);
     },
 
     async function downloadCSV() {
+      if ( ! this.exportData && ! this.exportObj ) {
+        console.log('Neither exportData nor exportObj exist');
+        return;
+      }
+
       var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
       exportDriver = foam.lookup(exportDriver.driverName).create();
 
-      exportDriver.exportDAO(this.__context__, this.exportData)
-        .then(function(result) {
-          result = 'data:text/csv;charset=utf-8,' + result;
-          var link = document.createElement('a');
-          link.setAttribute('href', encodeURI(result));
-          link.setAttribute('download', 'data.csv');
-          document.body.appendChild(link);
-          link.click();
-        });
+      var p = this.exportData 
+                ? exportDriver.exportDAO(this.__context__, this.exportData)
+                : Promise.resolve(exportDriver.exportFObject(this.__context__, this.exportObj));
+
+      p.then(result => {
+        result = 'data:text/csv;charset=utf-8,' + result;
+        var link = document.createElement('a');
+        link.setAttribute('href', encodeURI(result));
+        link.setAttribute('download', 'data.csv');
+        document.body.appendChild(link);
+        link.click();
+      })
     }
   ]
 
