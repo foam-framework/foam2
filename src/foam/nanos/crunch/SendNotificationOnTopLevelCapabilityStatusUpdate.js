@@ -50,7 +50,7 @@ foam.CLASS({
           notification.setBody(sb.toString());
           notificationDAO.put(notification);
         }
-      }); 
+      }, "Send Notification On Top Level Capability Status Update");
       `
     }
   ]
