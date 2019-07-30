@@ -2,7 +2,9 @@ package foam.nanos.fs;
 
 import foam.util.SafetyUtil;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystem;
@@ -31,6 +33,25 @@ public abstract class AbstractStorage implements Storage {
   }
 
   @Override
+  public byte[] getBytes(String name) {
+    InputStream is = getInputStream(name);
+    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+    int nRead;
+    byte[] data = new byte[1024];
+
+    try {
+      while ((nRead = is.read(data, 0, data.length)) != -1) {
+        buffer.write(data, 0, nRead);
+      }
+    } catch (IOException e) {
+      return null;
+    }
+
+    return buffer.toByteArray();
+  }
+
+  @Override
   public OutputStream getOutputStream(String name) {
     Path path = getPath(name);
     if ( path == null ) return null;
@@ -43,7 +64,7 @@ public abstract class AbstractStorage implements Storage {
   }
 
   @Override
-  public java.io.InputStream getInputStream(String name) {
+  public InputStream getInputStream(String name) {
     Path path = getPath(name);
     if ( path == null ) return null;
 
