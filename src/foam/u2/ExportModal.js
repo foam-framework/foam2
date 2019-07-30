@@ -108,38 +108,27 @@ foam.CLASS({
       var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
       exportDriver = foam.lookup(exportDriver.driverName).create();
 
-      if ( this.exportData ) {
-        this.note = await exportDriver
-          .exportDAO(this.__context__, this.exportData);
-      } else if ( this.exportObj ) {
-        this.note = await exportDriver
-          .exportFObject(this.__context__, this.exportObj);
-      }
+      this.note = this.exportData 
+                    ? await exportDriver.exportDAO(this.__context__, this.exportData)
+                    : await exportDriver.exportFObject(this.__context__, this.exportObj);
     },
 
     async function downloadCSV() {
       var exportDriver = await this.exportDriverRegistryDAO.find(this.dataType);
       exportDriver = foam.lookup(exportDriver.driverName).create();
 
-      if ( this.exportData ) {
-        exportDriver.exportDAO(this.__context__, this.exportData)
-          .then(function(result) {
-            result = 'data:text/csv;charset=utf-8,' + result;
-            var link = document.createElement('a');
-            link.setAttribute('href', encodeURI(result));
-            link.setAttribute('download', 'data.csv');
-            document.body.appendChild(link);
-            link.click();
-          });
-      } else if ( this.exportObj ) {
-        var result = exportDriver.exportFObject(this.__context__, this.exportObj);
+      var p = this.exportData 
+                ? exportDriver.exportDAO(this.__context__, this.exportData)
+                : Promise.resolve(exportDriver.exportFObject(this.__context__, this.exportObj));
+
+      p.then(result => {
         result = 'data:text/csv;charset=utf-8,' + result;
         var link = document.createElement('a');
         link.setAttribute('href', encodeURI(result));
         link.setAttribute('download', 'data.csv');
         document.body.appendChild(link);
         link.click();
-      }
+      })
     }
   ]
 
