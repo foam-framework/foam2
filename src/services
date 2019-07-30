@@ -1,7 +1,25 @@
 p({"class":"foam.nanos.boot.NSpec", "name":"nSpecDAO",                         "lazy":true,  "serve":true,  "authenticate": false, "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"localLogMessageDAO", "lazy":false, "serve":false, "serviceScript":"new foam.dao.EasyDAO.Builder(x).setOf(foam.nanos.logger.LogMessage.getOwnClassInfo()).setAuthenticate(false).setPm(true).setSeqNo(true).setCreatedAware(true).setCreatedByAware(true).setOrder(new foam.mlang.order.Comparator[] {foam.mlang.MLang.DESC(foam.nanos.logger.LogMessage.CREATED)}).setDecorator(new foam.nanos.logger.RepeatLogMessageDAO.Builder(x).setDelegate(new foam.dao.FixedSizeDAO.Builder(x).setDelegate(new foam.nanos.logger.NotificationLogMessageDAO.Builder(x).build()).build()).build()).setInnerDAO(new foam.dao.WriteOnlyJDAO(x, foam.nanos.logger.LogMessage.getOwnClassInfo(), \"../logs/logs\" /*TODO System.getProperty(\"LOG_HOME\")+\"/logs\"*/)).build();"})
-p({"class":"foam.nanos.boot.NSpec", "name":"logMessageDAO", "lazy":true, "serve":true, "serviceScript":"new foam.dao.EasyDAO.Builder(x).setOf(foam.nanos.logger.LogMessage.getOwnClassInfo()).setInnerDAO(((foam.dao.DAO) x.get(\"localLogMessageDAO\"))).build();", "client":"{\"of\":\"foam.nanos.logger.LogMessage\"}"})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "logMessageDAO",
+  "lazy": true,
+  "serve": true,
+  "serviceScript": """
+    new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.logger.LogMessage.getOwnClassInfo())
+      .setInnerDAO(((foam.dao.DAO) x.get("localLogMessageDAO")))
+      .build();
+  """,
+  "client": """
+    {
+      "of": "foam.nanos.logger.LogMessage"
+    }
+  """
+})
+
 p({"class":"foam.nanos.boot.NSpec", "name":"logLevelFilterLogger",             "lazy":false, "serve":false, "service":{"class":"foam.nanos.logger.LogLevelFilterLogger"}})
 p({"class":"foam.nanos.boot.NSpec", "name":"logger",                           "lazy":false, "serve":false, "serviceScript":"import foam.nanos.logger.CompositeLogger; import foam.nanos.logger.StdoutLogger; import foam.nanos.logger.FileLogger; import foam.nanos.logger.ProxyLogger; import foam.nanos.logger.LogLevelFilterLogger; import foam.nanos.logger.DAOLogger; CompositeLogger log = new CompositeLogger(); StdoutLogger stdOut = new StdoutLogger(); ProxyLogger logLevelFilterLogger = (ProxyLogger) x.get(\"logLevelFilterLogger\"); logLevelFilterLogger.setX(x); logLevelFilterLogger.setDelegate(log); DAOLogger daoLogger = new DAOLogger(x); log.add(stdOut).add(daoLogger); return logLevelFilterLogger;"})
 
@@ -15,13 +33,13 @@ p({"class":"foam.nanos.boot.NSpec", "name":"httprouter",                       "
 p({"class":"foam.nanos.boot.NSpec", "name":"websockets",                       "lazy":false, "serve":false, "serviceClass":"foam.nanos.ws.NanoWebSocketServer"})
 p({"class":"foam.nanos.boot.NSpec", "name":"pmLogger",                         "lazy":true,  "serve":false, "serviceClass":"foam.nanos.pm.DAOPMLogger"})
 p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"auth",
-  "lazy":true,  
-  "serve":true,  
+  "class": "foam.nanos.boot.NSpec",
+  "name": "auth",
+  "lazy": true,
+  "serve": true,
   "authenticate": false, 
-  "boxClass":"foam.nanos.auth.AuthServiceSkeleton", 
-  "serviceScript":"""
+  "boxClass": "foam.nanos.auth.AuthServiceSkeleton",
+  "serviceScript": """
     return new foam.nanos.auth.SystemAuthService.Builder(x)
       .setDelegate(new foam.nanos.auth.twofactor.TwoFactorAuthService.Builder(x)
       .setDelegate(new foam.nanos.auth.PasswordExpiryAuthService.Builder(x)
@@ -29,7 +47,7 @@ p({
       .setDelegate(new foam.nanos.auth.CachingAuthService(new foam.nanos.auth.UserAndGroupAuthService(x)))
       .build()).build()).build()).build();
   """,
-  "client":"{\"class\":\"foam.nanos.auth.CachedAuthServiceProxy\",\"delegate\":{\"class\":\"foam.nanos.auth.ClientLoginAuthService\"}}"
+  "client": "{\"class\":\"foam.nanos.auth.CachedAuthServiceProxy\",\"delegate\":{\"class\":\"foam.nanos.auth.ClientLoginAuthService\"}}"
 })
 p({"class":"foam.nanos.boot.NSpec", "name":"ping",                             "lazy":true,  "serve":false, "authenticate": false, "serviceClass":"foam.nanos.http.PingService"})
 p({"class":"foam.nanos.boot.NSpec", "name":"uptime",                           "lazy":false, "serve":false, "authenticate": false, "serviceClass":"foam.nanos.http.UptimeWebAgent"})
@@ -169,8 +187,22 @@ p({"class":"foam.nanos.boot.NSpec","name":"emailConfig",                       "
 p({"class":"foam.nanos.boot.NSpec", "name":"serializationTestEchoService", "boxClass": "foam.nanos.test.EchoServiceSkeleton", "lazy":true, "serve":true, "authenticate": true, "serviceClass":"foam.nanos.test.SerializationTestEchoService", "client":"{\"class\":\"foam.nanos.test.ClientEchoService\",\"delegate\":{\"class\":\"foam.box.SessionClientBox\",\"delegate\":{\"class\":\"foam.box.HTTPBox\",\"method\":\"POST\",\"url\":\"service/serializationTestEchoService\"}}}"})
 p({"class":"foam.nanos.boot.NSpec","name":"themeDAO","description":"Stores Themes, which are used to style the application.","serve":true,"authenticate":false,"serviceScript":"return new foam.dao.EasyDAO.Builder(x)\u000a  .setAuthenticateRead(false)\u000a  .setAuthenticate(true)\u000a  .setPm(true)\u000a  .setSeqNo(true)\u000a  .setOf(foam.nanos.theme.Theme.getOwnClassInfo())\u000a  .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)\u000a  .setJournalName(\"themes\")\u000a  .build();","client":"{\"of\":\"foam.nanos.theme.Theme\"}","authNotes":"Needs to be unauthenticated because we need to be able to theme apps before the user has logged in. However, we still need to restrict write access, which we do via an AuthorizationDAO."})
 
-p({"class":"foam.nanos.boot.NSpec","name":"localGroupPermissionJunctionDAO","description":"The junction DAO for the many-to-many relationship between groups and permissions","serve":false,"serviceScript":"return new foam.dao.EasyDAO.Builder(x).setOf(foam.nanos.auth.GroupPermissionJunction.getOwnClassInfo()).setAuthenticate(false).setAuthorize(true).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"groupPermissionJunctions\").setPm(true).build()"})
-
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "localGroupPermissionJunctionDAO",
+  "description": "The junction DAO for the many-to-many relationship between groups and permissions",
+  "serve": false,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.auth.GroupPermissionJunction.getOwnClassInfo())
+      .setAuthenticate(false)
+      .setAuthorize(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("groupPermissionJunctions")
+      .setPm(true)
+      .build()
+  """
+})
 p({"class":"foam.nanos.boot.NSpec","name":"groupPermissionJunctionDAO","description":"The junction DAO for the many-to-many relationship between groups and permissions. NOTE: authorization is setup on local dao.","serve":true,"serviceScript":"return new foam.dao.EasyDAO.Builder(x).setOf(foam.nanos.auth.GroupPermissionJunction.getOwnClassInfo()).setAuthenticate(false).setInnerDAO((foam.dao.DAO) x.get(\"localGroupPermissionJunctionDAO\")).build();","client":"{\"of\": \"foam.nanos.auth.GroupPermissionJunction\"}"})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"pmLogger","lazy":true,"serve":false,"serviceClass":"foam.nanos.pm.DAOPMLogger"})
