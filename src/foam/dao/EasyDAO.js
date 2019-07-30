@@ -119,8 +119,12 @@ Logger logger = (Logger) getX().get("logger");
 
 foam.dao.DAO delegate = getInnerDAO();
 
-if ( delegate instanceof foam.dao.MDAO ) {
-  setMdao((foam.dao.MDAO)delegate);
+foam.dao.DAO head = delegate;
+while( head instanceof foam.dao.ProxyDAO ) {
+  head = ( (ProxyDAO) head).getDelegate();
+}
+if ( head instanceof foam.dao.MDAO ) {
+  setMdao((foam.dao.MDAO)head);
   if ( getIndex() != null &&
        getIndex().length > 0 ) {
     getMdao().addIndex(getIndex());
