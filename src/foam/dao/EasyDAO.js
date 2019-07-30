@@ -119,13 +119,19 @@ Logger logger = (Logger) getX().get("logger");
 
 foam.dao.DAO delegate = getInnerDAO();
 
-if ( delegate instanceof foam.dao.MDAO ) {
-  setMdao((foam.dao.MDAO)delegate);
+foam.dao.DAO head = delegate;
+while( head instanceof foam.dao.ProxyDAO ) {
+  head = ( (ProxyDAO) head).getDelegate();
+}
+if ( head instanceof foam.dao.MDAO ) {
+  setMdao((foam.dao.MDAO)head);
   if ( getIndex() != null &&
        getIndex().length > 0 ) {
     getMdao().addIndex(getIndex());
   }
 }
+
+delegate = getOuterDAO(delegate);
 
 if ( getDecorator() != null ) {
   if ( ! ( getDecorator() instanceof ProxyDAO ) ) {
@@ -178,6 +184,7 @@ if ( getSeqNo() ) {
   delegate = new foam.dao.SequenceNumberDAO.Builder(getX()).
     setDelegate(delegate).
     setProperty(getSeqPropertyName()).
+    setStartingValue(getSeqStartingValue()).
     build();
 }
 
@@ -197,20 +204,12 @@ if ( getOrder() != null &&
 
 if( getAuthorize() ) delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, getAuthorizer());
 
-if ( getAuthenticate() ) {
-  delegate = new foam.dao.AuthenticatedDAO(
-    getPermissionPrefix(),
-    getAuthenticateRead(),
-    delegate);
-}
-
 if ( getNSpec() != null &&
      getNSpec().getServe() &&
      ! getAuthorize() &&
-     ! getAuthenticate() &&
      ! getReadOnly() ) {
   //setReadOnly(true);
-  logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authenticated, Authorized, or ReadOnly");
+  logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authorized, or ReadOnly");
 }
 
 if ( getPermissioned() &&
@@ -266,6 +265,11 @@ return delegate;
       value: false
     },
     {
+      class: 'Long',
+      name: 'seqStartingValue',
+      value: 1
+    },
+    {
       /** Have EasyDAO generate guids to index items. Note that .seqNo and .guid features are mutually exclusive. */
       class: 'Boolean',
       name: 'guid',
@@ -294,7 +298,7 @@ return delegate;
       /** Enable standard authorization. */
       class: 'Boolean',
       name: 'authorize',
-      value: false
+      value: true
     },
     {
       class: 'Object',
@@ -309,12 +313,6 @@ return delegate;
       `
     },
     {
-      /** Enable standard authentication. */
-      class: 'Boolean',
-      name: 'authenticate',
-      value: true
-    },
-    {
       class: 'String',
       name: 'permissionPrefix',
       factory: function() {
@@ -323,12 +321,6 @@ return delegate;
       javaFactory: `
       return this.getOf().getObjClass().getSimpleName().toLowerCase();
      `
-    },
-    {
-      /** Enable standard read authentication. */
-      class: 'Boolean',
-      name: 'authenticateRead',
-      value: true
     },
     {
       class: 'Boolean',
@@ -547,6 +539,20 @@ return delegate;
        }
      `
     },
+    {
+      name: 'getOuterDAO',
+      documentation: 'Method to be overidden on the user end to add framework user specific DAO decorators to EasyDAO',
+      type: 'foam.dao.DAO',
+      args: [
+        {
+          type: 'foam.dao.DAO',
+          name: 'innerDAO'
+        }
+      ],
+      javaCode: `
+        return innerDAO;
+      `
+    },
     function init() {
       /**
         <p>On initialization, the EasyDAO creates an appropriate chain of
@@ -629,6 +635,7 @@ return delegate;
       if ( this.seqNo ) {
         var args = {__proto__: params, delegate: dao, of: this.of};
         if ( this.seqProperty ) args.property = this.seqProperty;
+        args.startingValue = this.seqStartingValue;
         dao = this.SequenceNumberDAO.create(args);
       }
 
