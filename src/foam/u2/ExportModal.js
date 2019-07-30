@@ -111,7 +111,7 @@ foam.CLASS({
       if ( this.exportData ) {
         this.note = await exportDriver
           .exportDAO(this.__context__, this.exportData);
-      } else {
+      } else if ( this.exportObj ) {
         this.note = await exportDriver
           .exportFObject(this.__context__, this.exportObj);
       }
@@ -131,16 +131,14 @@ foam.CLASS({
             document.body.appendChild(link);
             link.click();
           });
-      } else {
-        exportDriver.exportDAO(this.__context__, this.exportObj)
-          .then(function(result) {
-            result = 'data:text/csv;charset=utf-8,' + result;
-            var link = document.createElement('a');
-            link.setAttribute('href', encodeURI(result));
-            link.setAttribute('download', 'data.csv');
-            document.body.appendChild(link);
-            link.click();
-          });
+      } else if ( this.exportObj ) {
+        var result = exportDriver.exportFObject(this.__context__, this.exportObj);
+        result = 'data:text/csv;charset=utf-8,' + result;
+        var link = document.createElement('a');
+        link.setAttribute('href', encodeURI(result));
+        link.setAttribute('download', 'data.csv');
+        document.body.appendChild(link);
+        link.click();
       }
     }
   ]
