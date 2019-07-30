@@ -33,9 +33,4 @@ public class FileSystemStorage extends AbstractStorage {
 
     return path;
   }
-
-  @Deprecated
-  public java.io.InputStream getResourceAsStream(String name) {
-    return getInputStream(name);
-  }
 }
