@@ -287,11 +287,9 @@ foam.CLASS({
                     on('click', function(e) {
                       if ( ! view.stack ) return;
                       view.stack.push({
-                        class: 'foam.u2.DetailView',
-                        data: view.EditColumnsView.create({
-                          of: view.of,
-                          allColumns: view.allColumns
-                        })
+                        class: 'foam.u2.view.EditColumnsView',
+                        of: view.of,
+                        allColumns: view.allColumns
                       });
                     }).
                     tag(view.Image, { data: '/images/Icon_More_Resting.svg' }).
