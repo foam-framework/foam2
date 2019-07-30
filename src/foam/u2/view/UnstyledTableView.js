@@ -62,7 +62,7 @@ foam.CLASS({
         if ( ! editColumnsEnabled ) return columns;
 
         // Reorder allColumns to respect the order of columns first followed by
-        // the order of columns.
+        // the order of allColumns.
         allColumns = columns.concat(allColumns);
         allColumns = allColumns.filter((c, i) => {
           return allColumns.findIndex(a => a.name == c.name) == i;
