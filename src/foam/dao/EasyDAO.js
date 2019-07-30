@@ -131,6 +131,8 @@ if ( head instanceof foam.dao.MDAO ) {
   }
 }
 
+delegate = getOuterDAO(delegate);
+
 if ( getDecorator() != null ) {
   if ( ! ( getDecorator() instanceof ProxyDAO ) ) {
     logger.error(this.getClass().getSimpleName(), "delegate", "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
@@ -536,6 +538,20 @@ return delegate;
          System.exit(1);
        }
      `
+    },
+    {
+      name: 'getOuterDAO',
+      documentation: 'Method to be overidden on the user end to add framework user specific DAO decorators to EasyDAO',
+      type: 'foam.dao.DAO',
+      args: [
+        {
+          type: 'foam.dao.DAO',
+          name: 'innerDAO'
+        }
+      ],
+      javaCode: `
+        return innerDAO;
+      `
     },
     function init() {
       /**
