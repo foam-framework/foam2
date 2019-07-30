@@ -134,7 +134,20 @@ p({
   """,
   "client":"{\"of\":\"foam.nanos.auth.User\",\"cache\":false,\"decorators\": [{\"class\":\"foam.nanos.fs.FileDAODecorator\"}]}"
 })
-p({"class":"foam.nanos.boot.NSpec", "name":"localGroupDAO",                      "serviceScript":"return new foam.dao.PMDAO.Builder(x).setPmFind(false).setDelegate(new foam.dao.java.JDAO(x, foam.nanos.auth.Group.getOwnClassInfo(), \"groups\")).build();","client":"{\"of\":\"foam.nanos.auth.Group\"}" })
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"localGroupDAO",
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("groups")
+      .setOf(foam.nanos.auth.Group.getOwnClassInfo())
+      .setAuthorize(false)
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.auth.Group\"}"
+})
 
 p({
   "class":"foam.nanos.boot.NSpec", 
