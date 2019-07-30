@@ -13,7 +13,6 @@ foam.CLASS({
   javaImports: [
     'foam.nanos.fs.Storage',
     'foam.nanos.fs.ResourceStorage',
-    'foam.nanos.fs.FileSystemStorage',
     'foam.core.X'
   ],
 
@@ -47,8 +46,6 @@ foam.CLASS({
               resourceStorageX = x.put(foam.nanos.fs.ResourceStorage.class,
                   new ResourceStorage(System.getProperty("resource.journals.dir")));
             }
-
-//            X fsStorageX = x.put(Storage.class, new FileSystemStorage(System.getProperty("resource.journals.dir")));
 
             new foam.dao.CompositeJournal.Builder(x)
               .setDelegates(new foam.dao.Journal[]{
