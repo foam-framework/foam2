@@ -59,58 +59,42 @@ foam.CLASS({
       name: 'columns_',
       expression: function(columns, of, allColumns, editColumnsEnabled) {
         if ( ! of ) return [];
-        if ( ! editColumnsEnabled ) return columns.map(c => of.getAxiomByName(c));
+        if ( ! editColumnsEnabled ) return columns;
 
-        // The following respects the ordering of columns before appending the
-        // rest of the columns that the user may want to always see.
+        // Reorder allColumns to respect the order of columns first followed by
+        // the order of allColumns.
         allColumns = columns.concat(allColumns);
-        allColumns = allColumns.filter((c, i) => allColumns.indexOf(c) == i);
+        allColumns = allColumns.filter((c, i) => {
+          return allColumns.findIndex(a => a.name == c.name) == i;
+        });
 
-        // Put together the columns to show by using the user's preferences for
-        // columns to always show or hide.
-        var columnsToShow = columns
-          .reduce((map, c) => {
-            map[c] = true;
-            return map;
-          }, {});
-        allColumns
-          .map(c => this.ColumnConfig.create({
-            name: c,
-            visibility: this.ColumnVisibility[localStorage.getItem(of.id + '.' + c)] || 'DEFAULT'
-          }))
-          .forEach(o => {
-            if ( o.visibility == this.ColumnVisibility.ALWAYS_HIDE ) {
-              columnsToShow[o.name] = false;
-            } else if ( o.visibility == this.ColumnVisibility.ALWAYS_SHOW ) {
-              columnsToShow[o.name] = true;
-            }
-          });
-
-        return allColumns
-          .filter(c => columnsToShow[c])
-          .map(c => of.getAxiomByName(c));
+        return allColumns.filter(c => {
+          var v = this.ColumnConfig.create({ of: of, axiom : c }).visibility;
+          return v == this.ColumnVisibility.ALWAYS_HIDE ? false :
+                 v == this.ColumnVisibility.ALWAYS_SHOW ? true :
+                 columns.find(c2 => c.name == c2.name)  ? true : false;
+        });
       },
     },
     {
-      class: 'StringArray',
       name: 'allColumns',
-      factory: null,
       expression: function(of) {
-        return [].concat(
+        return ! of ? [] : [].concat(
           of.getAxiomsByClass(foam.core.Property)
-            .filter(p => p.tableCellFormatter && ! p.hidden)
-            .map(p => p.name),
+            .filter(p => p.tableCellFormatter && ! p.hidden),
           of.getAxiomsByClass(foam.core.Action)
-            .map(a => a.name)
         );
       }
     },
     {
       name: 'columns',
+      adapt: function(_, n) {
+        return n.map(c => foam.String.isInstance(c) ? this.of.getAxiomByName(c) : c);
+      },
       expression: function(of, allColumns) {
         if ( ! of ) return [];
-        var tableColumns = of.getAxiomByName('tableColumns');
-        return tableColumns ? tableColumns.columns : allColumns;
+        var tc = of.getAxiomByName('tableColumns');
+        return tc ? tc.columns.map(c => of.getAxiomByName(c)) : allColumns;
       },
     },
     {
@@ -303,11 +287,9 @@ foam.CLASS({
                     on('click', function(e) {
                       if ( ! view.stack ) return;
                       view.stack.push({
-                        class: 'foam.u2.DetailView',
-                        data: view.EditColumnsView.create({
-                          of: view.of,
-                          allColumns: view.allColumns
-                        })
+                        class: 'foam.u2.view.EditColumnsView',
+                        of: view.of,
+                        allColumns: view.allColumns
                       });
                     }).
                     tag(view.Image, { data: '/images/Icon_More_Resting.svg' }).
