@@ -29,9 +29,9 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'props',
-      factory: function(of) {
-        if ( of.getAxiomByName('tableColumns') ) return of.getAxiomByName('tableColumns').columns;
-        return of.getAxiomsByClass()
+      factory: function() {
+        if ( this.of.getAxiomByName('tableColumns') ) return this.of.getAxiomByName('tableColumns').columns;
+        return this.of.getAxiomsByClass()
           .filter((p) => ! p.networkTransient)
           .map((p) => p.name);
       },
