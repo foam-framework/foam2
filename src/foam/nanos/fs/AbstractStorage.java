@@ -19,11 +19,11 @@ public abstract class AbstractStorage implements Storage {
 
   protected String resourceDir_;
 
-  public AbstractStorage() {
+  protected AbstractStorage() {
     resourceDir_ = null;
   }
 
-  public AbstractStorage (String root) {
+  protected AbstractStorage (String root) {
     resourceDir_ = root;
   }
 
