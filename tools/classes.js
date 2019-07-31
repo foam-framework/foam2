@@ -16,6 +16,7 @@ var classes = [
   'foam.core.Identifiable',
   'foam.core.AbstractFObject',
   'foam.core.Validatable',
+  'foam.core.Agency',
   'foam.glang.EndOfTimeSpan',
   'foam.glang.EndOfDay',
   'foam.glang.EndOfWeek',
@@ -64,7 +65,8 @@ var classes = [
   'foam.mlang.ContextObject',
   'foam.mlang.predicate.RegExp',
   'foam.mlang.predicate.OlderThan',
-  'foam.mlang.predicate.HasPermission',
+  'foam.mlang.predicate.isAuthorizedToRead',
+  'foam.mlang.predicate.isAuthorizedToDelete',
   'foam.box.Box',
   'foam.box.Skeleton',
   'foam.box.AbstractSkeleton',
@@ -206,6 +208,7 @@ var classes = [
   'foam.nanos.auth.resetPassword.ResetPasswordTokenService',
   'foam.nanos.auth.PreventDuplicateEmailDAO',
   'foam.nanos.auth.PermissionedPropertyDAO',
+  'foam.nanos.auth.SystemAuthService',
   'foam.nanos.auth.HidePropertiesSink',
   'foam.nanos.auth.ServiceProvider',
   'foam.nanos.auth.twofactor.OTPKey',
@@ -263,10 +266,10 @@ var classes = [
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.EmailTemplate',
   'foam.nanos.notification.email.EmailPropertyService',
+  'foam.nanos.notification.email.Status',
   // Email service Files
   'foam.nanos.notification.email.SMTPEmailService',
   'foam.nanos.notification.email.NullEmailService',
-  'foam.nanos.notification.email.AsyncEmailService',
   'foam.nanos.notification.email.ProxyEmailService',
   // Property set on Emails
   'foam.nanos.notification.email.ChainedPropertyService',
@@ -428,6 +431,23 @@ var classes = [
   'foam.dao.jdbc.TestDataForJDBC',
   'foam.dao.jdbc.TestCompany',
   'foam.dao.jdbc.TestEmployee'
+
+  // Crunch
+  'foam.nanos.crunch.crunchtest.FakeTestObject',
+  //models
+  'foam.nanos.crunch.Capability',
+  'foam.nanos.crunch.CapabilityJunctionStatus',
+  'foam.nanos.crunch.UserCapabilityJunction',
+  'foam.nanos.crunch.CapabilityCapabilityJunction',
+  //daos
+  'foam.nanos.crunch.UserCapabilityJunctionDAO',
+  //rules
+  'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
+  'foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate',
+  'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
+  //authservice
+  'foam.nanos.auth.CapabilityAuthService',
+  
 ];
 
 var abstractClasses = [
