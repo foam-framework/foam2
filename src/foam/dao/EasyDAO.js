@@ -133,6 +133,10 @@ if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
   delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
 }
 
+if ( getFilter() != null ) {
+  delegate = new foam.dao.FilteredDAO(getX(), getFilter(), delegate, getOf(), getPrimaryKey());
+}
+
 if ( getDecorator() != null ) {
   if ( ! ( getDecorator() instanceof ProxyDAO ) ) {
     logger.error(this.getClass().getSimpleName(), "delegate", "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
@@ -536,6 +540,11 @@ return delegate;
       name: 'lastModifiedByAware',
       class: 'Boolean',
       value: false
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'filter'
     }
  ],
 
