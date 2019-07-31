@@ -99,17 +99,11 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'selectedCount',
-      postSet: function() {
-        this.isLoading = false;
-      }
+      name: 'selectedCount'
     },
     {
       class: 'Int',
-      name: 'totalCount',
-      postSet: function() {
-        this.isLoading = false;
-      }
+      name: 'totalCount'
     },
     {
       name: 'searchManager',
