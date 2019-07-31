@@ -59,6 +59,7 @@ foam.CLASS({
       name: 'columns_',
       expression: function(columns, of, allColumns, editColumnsEnabled) {
         if ( ! of ) return [];
+        columns = columns.map(c => foam.String.isInstance(c) ? this.of.getAxiomByName(c) : c);
         if ( ! editColumnsEnabled ) return columns;
 
         // Reorder allColumns to respect the order of columns first followed by
@@ -88,9 +89,6 @@ foam.CLASS({
     },
     {
       name: 'columns',
-      adapt: function(_, n) {
-        return n.map(c => foam.String.isInstance(c) ? this.of.getAxiomByName(c) : c);
-      },
       expression: function(of, allColumns) {
         if ( ! of ) return [];
         var tc = of.getAxiomByName('tableColumns');
