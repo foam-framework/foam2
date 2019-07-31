@@ -50,6 +50,9 @@
        }
      },
      {
+       name: 'memento'
+     },
+     {
        name: 'filteredDAO',
        factory: function() {
          return this.data.where(
@@ -72,6 +75,12 @@
 
        this.addClass(this.myClass());
 
+       this.memento$.sub(function() {
+         self.stack.push(self.BrowserView.create({
+           data: self.__context__[self.memento]
+         }));
+       });
+
        this.filteredDAO.select(function(spec) {
          var label = foam.String.capitalize(spec.id.substring(0, spec.id.length-3));
          var l     = label.charAt(0);
@@ -91,9 +100,7 @@
            .add(label)
            .attrs({title: spec.description})
            .on('click', function() {
-             self.stack.push(self.BrowserView.create({
-               data: self.__context__[spec.id]
-             }));
+             self.memento = spec.id;
            });
        });
      }
