@@ -16,18 +16,6 @@ foam.CLASS({
     'foam.u2.view.SearchViewWrapper'
   ],
 
-  constants: [
-    {
-      name: 'FORMAT_REGEX',
-      value: /\B(?=(\d{3})+(?!\d))/g,
-      type: 'Regex',
-      documentation: `
-        Used to add commas to separate groups of three digits when formatting
-        numbers. Eg: "12900500" becomes "12,900,500"
-      `
-    }
-  ],
-
   imports: [
     'dao',
     'searchColumns'
@@ -153,8 +141,7 @@ foam.CLASS({
         if ( isLoading ) {
           return 'Loading...';
         }
-        const fmt = (num) => num.toString().replace(this.FORMAT_REGEX, ',');
-        return `${fmt(selectedCount)} of ${fmt(totalCount)} selected`;
+        return `${selectedCount.toLocaleString()} of ${totalCount.toLocaleString()} selected`;
       }
     }
   ],
