@@ -15,7 +15,7 @@ foam.CLASS({
   methods: [
     {
       name: 'sendEmail',
-      javaCode: 'return;',
+      javaCode: 'return emailMessage;',
       code: function() { return; }
     }
   ]

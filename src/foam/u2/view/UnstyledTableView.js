@@ -20,6 +20,8 @@ foam.CLASS({
     'foam.u2.md.OverlayDropdown',
     'foam.u2.view.OverlayActionListView',
     'foam.u2.view.EditColumnsView',
+    'foam.u2.view.ColumnConfig',
+    'foam.u2.view.ColumnVisibility',
     'foam.u2.tag.Image'
   ],
 
@@ -33,8 +35,9 @@ foam.CLASS({
     'ctrl',
     'dblclick?',
     'editRecord?',
+    'filteredTableColumns?',
     'selection? as importSelection',
-    'filteredTableColumns?'
+    'stack?'
   ],
 
   properties: [
@@ -54,39 +57,43 @@ foam.CLASS({
     },
     {
       name: 'columns_',
-      documentation: `Note: filteredTableColumns was a property set in DAOController
-      for the purpose of having the filtered DAO list available for CSV outputting.`,
-      expression: function(columns, of) {
-        var of = this.of;
+      expression: function(columns, of, allColumns, editColumnsEnabled) {
         if ( ! of ) return [];
+        columns = columns.map(c => foam.String.isInstance(c) ? this.of.getAxiomByName(c) : c);
+        if ( ! editColumnsEnabled ) return columns;
 
-        return columns.map(function(p) {
-          var c = typeof p == 'string' ?
-            of.getAxiomByName(p) :
-            p;
-
-           if ( ! c ) {
-             console.error('Unknown table column: ', p);
-           }
-
-          return c;
+        // Reorder allColumns to respect the order of columns first followed by
+        // the order of allColumns.
+        allColumns = columns.concat(allColumns);
+        allColumns = allColumns.filter((c, i) => {
+          return allColumns.findIndex(a => a.name == c.name) == i;
         });
+
+        return allColumns.filter(c => {
+          var v = this.ColumnConfig.create({ of: of, axiom : c }).visibility;
+          return v == this.ColumnVisibility.ALWAYS_HIDE ? false :
+                 v == this.ColumnVisibility.ALWAYS_SHOW ? true :
+                 columns.find(c2 => c.name == c2.name)  ? true : false;
+        });
+      },
+    },
+    {
+      name: 'allColumns',
+      expression: function(of) {
+        return ! of ? [] : [].concat(
+          of.getAxiomsByClass(foam.core.Property)
+            .filter(p => p.tableCellFormatter && ! p.hidden),
+          of.getAxiomsByClass(foam.core.Action)
+        );
       }
     },
     {
       name: 'columns',
-      expression: function(of) {
-        var of = this.of;
+      expression: function(of, allColumns) {
         if ( ! of ) return [];
-
-        var tableColumns = of.getAxiomByName('tableColumns');
-
-        if ( tableColumns ) return tableColumns.columns;
-
-        return of.getAxiomsByClass(foam.core.Property).
-            filter(function(p) { return p.tableCellFormatter && ! p.hidden; }).
-            map(foam.core.Property.NAME.f);
-      }
+        var tc = of.getAxiomByName('tableColumns');
+        return tc ? tc.columns.map(c => of.getAxiomByName(c)) : allColumns;
+      },
     },
     {
       class: 'FObjectArray',
@@ -187,16 +194,6 @@ foam.CLASS({
         column;
     },
 
-    function createColumnSelection() {
-      var editor = this.EditColumnsView.create({
-        columns: this.columns,
-        columns_$: this.columns_$,
-        table: this.of
-      });
-
-      return this.OverlayDropdown.create({}, this.ctrl).add(editor);
-    },
-
     function initE() {
       var view = this;
       var columnSelectionE;
@@ -204,11 +201,6 @@ foam.CLASS({
       if ( this.filteredTableColumns$ ) {
         this.onDetach(this.filteredTableColumns$.follow(
           this.columns_$.map((cols) => cols.map((a) => a.name))));
-      }
-
-      if ( this.editColumnsEnabled ) {
-        columnSelectionE = this.createColumnSelection();
-        this.ctrl.add(columnSelectionE);
       }
 
       this.
@@ -291,7 +283,12 @@ foam.CLASS({
                   callIf(view.editColumnsEnabled, function() {
                     this.addClass(view.myClass('th-editColumns')).
                     on('click', function(e) {
-                      columnSelectionE.open(e.clientX, e.clientY);
+                      if ( ! view.stack ) return;
+                      view.stack.push({
+                        class: 'foam.u2.view.EditColumnsView',
+                        of: view.of,
+                        allColumns: view.allColumns
+                      });
                     }).
                     tag(view.Image, { data: '/images/Icon_More_Resting.svg' }).
                     addClass(view.myClass('vertDots')).
