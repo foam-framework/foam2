@@ -21,9 +21,6 @@ import java.util.Map;
 public interface PropertyInfo
     extends Axiom, Comparator, Expr, SQLStatement, Validator, Hasher, Signer, Comparable
 {
-  public PropertyInfo setClassInfo(ClassInfo p);
-  public ClassInfo getClassInfo();
-
   public boolean getNetworkTransient();
   public boolean getPermissionRequired();
   public boolean getStorageTransient();
@@ -31,7 +28,6 @@ public interface PropertyInfo
   public boolean getXMLTextNode();
   public boolean getRequired();
   public Class getValueClass();
-  public String getName();
   public String[] getAliases();
   public String getShortName();
   public byte[] getNameAsByteArray();

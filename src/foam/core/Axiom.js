@@ -14,6 +14,19 @@ foam.INTERFACE({
     {
       name: 'getName',
       type: 'String',
+    },
+    {
+      name: 'setClassInfo',
+      type: 'Axiom',
+      args: [ { name: 'p', type: 'ClassInfo' } ],
+    },
+    {
+      name: 'getClassInfo',
+      type: 'ClassInfo',
+    },
+    {
+      name: 'toString',
+      type: 'String',
     }
   ]
 });

@@ -17,7 +17,8 @@ foam.CLASS({
     'java.util.HashMap',
     'java.util.Iterator',
     'java.util.List',
-    'java.util.Map'
+    'java.util.Map',
+    'foam.core.methods.MethodInfo'
   ],
 
   axioms: [
@@ -241,11 +242,20 @@ foam.CLASS({
       `
     },
     {
+      name: 'getMethod',
+      type: 'Any',
+      args: [ { name: 'method', type: 'String' } ],
+      javaCode: `
+         MethodInfo meth = (MethodInfo) getClassInfo().getAxiomByName(method);
+         return meth;
+         `
+    },
+    {
       name: 'getProperty',
       type: 'Any',
       args: [ { name: 'prop', type: 'String' } ],
       javaCode: `
-        PropertyInfo property = ((PropertyInfo) getClassInfo().getAxiomByName(prop));
+        PropertyInfo property = (PropertyInfo) getClassInfo().getAxiomByName(prop);
         return property == null ? null : property.get(this);
       `
     },
@@ -255,7 +265,7 @@ foam.CLASS({
       args: [ { name: 'prop', type: 'String' },
               { name: 'value', type: 'Any' } ],
       javaCode: `
-        PropertyInfo property = ((PropertyInfo) getClassInfo().getAxiomByName(prop));
+        PropertyInfo property = (PropertyInfo) getClassInfo().getAxiomByName(prop);
         if ( property != null ) property.set(this, value);
         return this;
       `

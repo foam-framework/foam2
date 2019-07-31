@@ -168,6 +168,10 @@ foam.CLASS({
       }
 
       cls.axiomMap_[method.name] = method;
+    },
+
+    function getMethodArguments() {
+      return this.args;
     }
   ]
 });

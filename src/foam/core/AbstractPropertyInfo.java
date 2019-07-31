@@ -20,20 +20,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 public abstract class AbstractPropertyInfo
-  implements PropertyInfo
+  extends AbstractAxiom implements PropertyInfo
 {
-  protected ClassInfo parent;
-
-  @Override
-  public PropertyInfo setClassInfo(ClassInfo p) {
-    parent = p;
-    return this;
-  }
-
-  @Override
-  public ClassInfo getClassInfo() {
-    return parent;
-  }
 
   @Override
   public void toJSON(foam.lib.json.Outputter outputter, Object value) {
@@ -111,11 +99,6 @@ public abstract class AbstractPropertyInfo
   @Override
   public void setFromResultSet(java.sql.ResultSet resultSet, int index, FObject o) throws java.sql.SQLException{
     this.set(o, resultSet.getObject(index));
-  }
-
-  public String toString() {
-    // TODO: generate static string in generated instances instead to avoid creating garbage.
-    return parent.getId() + "." + getName();
   }
 
   @Override
