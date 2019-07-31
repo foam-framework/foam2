@@ -117,21 +117,21 @@ foam.CLASS({
       javaFactory: `
 Logger logger = (Logger) getX().get("logger");
 
-foam.dao.DAO delegate = getInnerDAO() == null ?
-  new foam.dao.MDAO(getOf()) :
-  getInnerDAO();
+foam.dao.DAO delegate = getInnerDAO();
 
-if ( delegate instanceof foam.dao.MDAO ) {
-  setMdao((foam.dao.MDAO)delegate);
+foam.dao.DAO head = delegate;
+while( head instanceof foam.dao.ProxyDAO ) {
+  head = ( (ProxyDAO) head).getDelegate();
+}
+if ( head instanceof foam.dao.MDAO ) {
+  setMdao((foam.dao.MDAO)head);
   if ( getIndex() != null &&
        getIndex().length > 0 ) {
     getMdao().addIndex(getIndex());
   }
 }
 
-if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
-  delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
-}
+delegate = getOuterDAO(delegate);
 
 if ( getDecorator() != null ) {
   if ( ! ( getDecorator() instanceof ProxyDAO ) ) {
@@ -239,7 +239,12 @@ return delegate;
     {
       class: 'Object',
       type: 'foam.dao.DAO',
-      name: 'innerDAO'
+      name: 'innerDAO',
+      javaFactory: `
+      if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) )
+        return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
+      return new foam.dao.MDAO(getOf());
+      `
     },
     {
       class: 'Object',
@@ -533,6 +538,20 @@ return delegate;
          System.exit(1);
        }
      `
+    },
+    {
+      name: 'getOuterDAO',
+      documentation: 'Method to be overidden on the user end to add framework user specific DAO decorators to EasyDAO',
+      type: 'foam.dao.DAO',
+      args: [
+        {
+          type: 'foam.dao.DAO',
+          name: 'innerDAO'
+        }
+      ],
+      javaCode: `
+        return innerDAO;
+      `
     },
     function init() {
       /**
