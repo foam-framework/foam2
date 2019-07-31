@@ -34,21 +34,14 @@ public abstract class AbstractStorage implements Storage {
 
   @Override
   public byte[] getBytes(String name) {
-    InputStream is = getInputStream(name);
-    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-
-    int nRead;
-    byte[] data = new byte[1024];
+    Path path = getPath(name);
+    if ( path == null ) return null;
 
     try {
-      while ((nRead = is.read(data, 0, data.length)) != -1) {
-        buffer.write(data, 0, nRead);
-      }
+      return Files.readAllBytes(path);
     } catch (IOException e) {
       return null;
     }
-
-    return buffer.toByteArray();
   }
 
   @Override
