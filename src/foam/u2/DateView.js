@@ -34,23 +34,39 @@ foam.CLASS({
     [ 'placeholder', 'yyyy-mm-dd' ]
   ],
 
+  listeners: [
+    {
+      name: 'onBlur',
+      isFramed: true,
+      code: function() {
+        if ( ! this.el() ) return;
+        this.el().value = this.dataToInput(this.data);
+      }
+    }
+  ],
+
   methods: [
     function initE() {
       this.SUPER();
       this.setAttribute('type', 'date');
       this.setAttribute('placeholder', 'yyyy/mm/dd');
+      this.on('blur', this.onBlur);
     },
 
     function link() {
       this.data$.relateTo(
           this.attrSlot(null, this.onKey ? 'input' : null),
-          function(date) {
-            return date ? date.toISOString().substring(0,10) : date;
-          },
-          function(value) {
-            return new Date(value);
-          }
+          d => this.dataToInput(d),
+          d => this.inputToData(d)
       );
+    },
+
+    function inputToData(input) {
+      return new Date(input);
+    },
+
+    function dataToInput(data) {
+      return data ? data.toISOString().substring(0,10) : data;
     }
   ]
 });
