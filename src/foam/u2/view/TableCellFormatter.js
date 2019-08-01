@@ -47,7 +47,7 @@ foam.CLASS({
     {
       name: 'tableHeaderFormatter',
       value: function(axiom) {
-        this.add(axiom.label);
+        this.add(axiom.label || foam.String.labelize(axiom.name));
       }
     },
     {
@@ -194,7 +194,8 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(date) {
-        if ( date ) this.add(date.toISOString().substring(0,10));
+        // allow the browser to deal with this since we are technically using the user's preference
+        if ( date ) this.add(date.toLocaleDateString());
       }
     }
   ]
@@ -211,8 +212,8 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(date) {
-        // Output as yyyy-mm-dd hh:mm[a/p]
-        if ( date ) this.add(date.toISOString().substring(0,10) + " " + date.toLocaleString().substr(-11,5) + date.toLocaleString().substr(-2,1).toLowerCase());
+        // allow the browser to deal with this since we are technically using the user's preference
+        if ( date ) this.add(date.toLocaleString());
       }
     }
   ]

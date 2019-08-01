@@ -113,6 +113,30 @@ foam.CLASS({
           predicate$: this.data$
         });
       }
+    },
+    {
+      class: 'Int',
+      name: 'loadingRequests',
+      documentation: `
+        Incremented every time an async call is made to the DAO and decremented
+        every time a call finishes. A non-zero value indicates that this view is
+        loading.
+      `
+    },
+    {
+      class: 'String',
+      name: 'countText',
+      documentation: `
+        The formatted text that shows how many items have been selected from the
+        DAO. Shows "Loading..." while waiting for the total count to avoid
+        "0 of 0 selected" being shown while loading.
+      `,
+      expression: function(selectedCount, totalCount, loadingRequests) {
+        if ( loadingRequests > 0 ) {
+          return 'Loading...';
+        }
+        return `${selectedCount.toLocaleString()} of ${totalCount.toLocaleString()} selected`;
+      }
     }
   ],
 
@@ -169,18 +193,7 @@ foam.CLASS({
         }, this.filters$))
         .start()
           .addClass(self.myClass('count'))
-          // TODO: move formatting function to stdlib
-          .add(self.selectedCount$.map(function(a) {
-            return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-          }))
-          .entity('nbsp')
-          .add('of')
-          .entity('nbsp')
-          .add(self.totalCount$.map(function(a) {
-            return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-          }))
-          .entity('nbsp')
-          .add('selected')
+          .add(self.countText$)
         .end()
         .tag(this.CLEAR, { buttonStyle: 'SECONDARY' });
     },
@@ -211,18 +224,31 @@ foam.CLASS({
       name: 'updateTotalCount',
       isFramed: true,
       code: function() {
-        this.dao.select(foam.mlang.sink.Count.create()).then(function(c) {
-          this.totalCount = c.value;
-        }.bind(this));
+        this.loadingRequests++;
+        this.dao
+          .select(foam.mlang.sink.Count.create())
+          .then((c) => {
+            this.totalCount = c.value;
+          })
+          .finally(() => {
+            this.loadingRequests--;
+          });
       }
     },
     {
       name: 'updateSelectedCount',
       isFramed: true,
-      code: function(_, __, ___, dao) {
-        dao.get().select(foam.mlang.sink.Count.create()).then(function(c) {
-          this.selectedCount = c.value;
-        }.bind(this));
+      code: function(_, __, ___, sink) {
+        this.loadingRequests++;
+        sink
+          .get()
+          .select(foam.mlang.sink.Count.create())
+          .then((c) => {
+            this.selectedCount = c.value;
+          })
+          .finally(() => {
+            this.loadingRequests--;
+          });
       }
     }
   ]

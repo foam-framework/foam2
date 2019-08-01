@@ -30,7 +30,7 @@ foam.CLASS({
         public void execute(X x) {
           ((User) obj).getCapabilities(x).getJunctionDAO().removeAll();
         }
-      });
+      }, "Remove Junctions On User Removal");
       `
     }
   ]
