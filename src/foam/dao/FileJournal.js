@@ -38,7 +38,6 @@ foam.CLASS({
     'java.util.Calendar',
     'java.util.Iterator',
     'java.util.List',
-    'java.util.HashSet',
     'java.util.TimeZone',
     'java.util.regex.Pattern'
   ],
@@ -113,22 +112,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'multiLineOutput',
-      value: true
-    },
-    {
-      class: 'Object',
-      name:  'multiLineOutputFiles',
-      javaType: 'java.util.HashSet',
-      javaFactory: `
-        HashSet<String> outputFiles = new HashSet<String>();
-        String path = "/opt/nanopay/journals/";
-
-        outputFiles.add(path + "services");
-        outputFiles.add(path + "scripts");
-        outputFiles.add(path + "cronjobs");
-        
-        return outputFiles;
-      `
+      value: false
     },
     {
       class: 'Boolean',
@@ -217,7 +201,6 @@ foam.CLASS({
       javaCode: `
         try {
           String c = "";
-          boolean multiLineOutput = getMultiLineOutputFiles().contains( getFile().getPath() );
           if ( multiLineOutput ) {
             c = "\\n";
             getOutputter().setMultiLine(true);
