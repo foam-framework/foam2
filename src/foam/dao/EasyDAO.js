@@ -42,6 +42,7 @@ foam.CLASS({
     'foam.box.TimeoutBox',
     'foam.box.WebSocketBox',
     'foam.dao.CachingDAO',
+    'foam.dao.CacheType',
     'foam.dao.ClientDAO',
     'foam.dao.CompoundDAODecorator',
     'foam.dao.ContextualizingDAO',
@@ -49,6 +50,7 @@ foam.CLASS({
     'foam.dao.DecoratedDAO',
     'foam.dao.GUIDDAO',
     'foam.dao.IDBDAO',
+    'foam.dao.LRUCachingDAO',
     {
       path: 'foam.dao.JDAO',
       flags: ['js'],
@@ -290,12 +292,19 @@ return delegate;
       generateJava: false,
       class: 'Property'
     },
+//    {
+//      /** Enable local in-memory caching of the DAO. */
+//      class: 'Boolean',
+//      name: 'cache',
+//      generateJava: false,
+//      value: false
+//    },
     {
       /** Enable local in-memory caching of the DAO. */
-      class: 'Boolean',
-      name: 'cache',
-      generateJava: false,
-      value: false
+      class: 'foam.core.Enum',
+      of: 'foam.dao.CacheType',
+      name: 'cacheType',
+      value: 'NONE' /* 'None'*/
     },
     {
       /** Enable standard authorization. */
@@ -613,7 +622,7 @@ return delegate;
 //             name: this.model.id + "_" + daoModel.id + "_" + this.name
 //           });
 //         }
-        if ( this.cache ) {
+        if ( this.cacheType == foam.dao.CacheType.FULL ) {
           this.mdao = this.MDAO.create({of: params.of});
           dao = this.CachingDAO.create({
             cache: this.dedup ?
@@ -621,6 +630,12 @@ return delegate;
               this.DeDupDAO.create({delegate: this.mdao}),
             src: dao,
             of: this.model});
+        }
+
+        if ( this.cacheType == foam.dao.CacheType.LRU ) {
+          dao = this.LRUCachingDAO.create({
+            delegate: dao
+          });
         }
       }
 
@@ -673,6 +688,7 @@ return delegate;
         });
         dao.syncRecordDAO = foam.dao.EasyDAO.create({
           of: dao.SyncRecord,
+          cacheType: foam.dao.CacheType.FULL,
           cache: true,
           daoType: this.daoType,
           name: this.name + '_SyncRecords'

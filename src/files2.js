@@ -228,6 +228,7 @@ FOAM_FILES([
   { name: "foam/dao/grid/ManyToManyGridDAO" },
   { name: "foam/dao/LazyCacheDAO" },
   { name: "foam/dao/CachingDAO" },
+  { name: "foam/dao/LRUCachingDAO" },
   { name: "foam/dao/DeDupDAO" },
   { name: "foam/dao/LRUDAOManager" },
   { name: "foam/dao/SequenceNumberDAO" },
@@ -552,5 +553,6 @@ FOAM_FILES([
   { name: "foam/build/ClassLoader" },
   { name: "foam/build/ClassLoaderImpl" },
   { name: "foam/build/PromisedClassLoader" },
-  { name: "foam/build/ClassLoaderContext" }
+  { name: "foam/build/ClassLoaderContext" },
+  { name: "foam/dao/CacheType" },
 ]);

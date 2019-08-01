@@ -243,6 +243,7 @@ FOAM_FILES([
   { name: "foam/dao/grid/ManyToManyGridDAO" },
   { name: "foam/dao/LazyCacheDAO" },
   { name: "foam/dao/CachingDAO" },
+  { name: "foam/dao/LRUCachingDAO" },
   { name: "foam/dao/DeDupDAO" },
   { name: "foam/dao/LRUDAOManager" },
   { name: "foam/dao/SequenceNumberDAO" },
@@ -672,5 +673,6 @@ FOAM_FILES([
   { name: "foam/u2/detail/SectionedDetailView" },
   { name: "foam/u2/detail/VerticalDetailView" },
   { name: "foam/u2/detail/WizardSectionsView" },
-  { name: "foam/u2/detail/SectionedDetailPropertyView" }
+  { name: "foam/u2/detail/SectionedDetailPropertyView" },
+  { name: "foam/dao/CacheType" },
 ]);
