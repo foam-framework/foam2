@@ -161,7 +161,6 @@ foam.CLASS({
         ts.setHours(23, 59, 59);
         ts.setMilliseconds(999);
         return ts;
-        return ts.getTime() > Date.now() ? new Date() : ts;
       },
       javaCode: `
 // Convert to LocalDate
@@ -200,7 +199,6 @@ foam.CLASS({
         ts.setHours(23, 59, 59);
         ts.setMilliseconds(999);
         return ts;
-        return ts.getTime() > Date.now() ? new Date() : ts;
       },
       javaCode: `
 // Convert to LocalDate
