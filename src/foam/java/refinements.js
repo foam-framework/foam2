@@ -300,6 +300,7 @@ foam.CLASS({
       };
 
       // set value
+      setter += `Object oldVal = ${this.name}_;\n`;
       setter += `${this.name}_ = val;\n`;
       setter += `${this.name}IsSet_ = true;\n`;
 
