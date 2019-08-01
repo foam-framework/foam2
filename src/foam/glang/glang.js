@@ -120,10 +120,9 @@ foam.CLASS({
         var date = ts.getDate();
         var endOfWeek = (this.startOfWeek + 6) % 7;
         var day = ts.getDay();
-        var daysToEnd = endOfWeek - day;
-        if ( daysToEnd < 0 ) distanceToEnd += 7;
+        var daysToEndOfWeek = (endOfWeek - day + 7) % 7;
         
-        ts.setDate(date + distanceToEnd);
+        ts.setDate(date + daysToEndOfWeek);
 
         ts.setHours(23, 59, 59);
         ts.setMilliseconds(999);
