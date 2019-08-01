@@ -68,9 +68,9 @@ foam.CLASS({
     function dataToInput(data) {
       // Using our own formatter to keep the date in the format (yyyy-mm-dd) while maintaining the locale date
       const year = data.getFullYear();
-      const month = data.getMonth() + 1 > 9 ? data.getMonth() + 1 : `0${data.getMonth() + 1}`;
-      const day = data.getDate() > 9 ? data.getDate() : `0${data.getDate()}`;
-
+      const month = (data.getMonth() + 1).toString().padStart(2, '0');
+      const day = data.getDate().toString().padStart(2, '0');
+      
       return `${year}-${month}-${day}`;
     }
   ]
