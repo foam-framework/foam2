@@ -27,6 +27,7 @@ import static foam.mlang.MLang.EQ;
 public class Boot {
   // Context key used to store the top-level root context in the context.
   public final static String ROOT = "_ROOT_";
+  public final static long SYSTEM_USER_ID = 1;
 
   protected DAO serviceDAO_;
   protected X   root_ = new ProxyX();
@@ -49,6 +50,8 @@ public class Boot {
 
     // Used for all the services that will be required when Booting
     serviceDAO_ = new foam.nanos.auth.PermissionedPropertyDAO(root_, new JDAO(((foam.core.ProxyX) root_).getX(), NSpec.getOwnClassInfo(), "services"));
+
+    root_.put("systemUserId", SYSTEM_USER_ID);
 
     installSystemUser();
 
@@ -131,7 +134,7 @@ public class Boot {
 
   protected void installSystemUser() {
     User user = new User();
-    user.setId(1);
+    user.setId(SYSTEM_USER_ID);
     user.setFirstName("system");
     user.setGroup("system");
 

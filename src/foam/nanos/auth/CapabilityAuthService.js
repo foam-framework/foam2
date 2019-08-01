@@ -51,7 +51,7 @@ foam.CLASS({
       if ( user == null || ! user.getEnabled() ) return false;
 
       // temporary fix to get around authservice being called on build before some services (userCapabilityJunctionDAO) are available
-      if ( user.getId() == 1 ) return true;  
+      if ( user.getId() == (long) x.get("systemUserId") ) return true;  
       
       // check whether user has permission to check user permissions
       if ( ! getDelegate().check(x, "service.auth.checkUser") ) return false;
