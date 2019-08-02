@@ -72,7 +72,6 @@ p({"class":"foam.nanos.boot.NSpec", "name":"localUserDAO",                     "
 p({
   "class":"foam.nanos.boot.NSpec", "name":"userDAO",                          "lazy":true,  "serve":true,  "authenticate": false, 
   "serviceScript":"""
-    innerdao = new foam.dao.ValidatingDAO(x, new foam.nanos.auth.AuthorizationDAO(x, new foam.nanos.auth.UserPasswordHashingDAO(x, x.get(\"localUserDAO\"))));
     ed = new foam.dao.EasyDAO.Builder(x)
       .setPm(true)
       .setAuthenticate(false)
@@ -81,9 +80,14 @@ p({
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName(\"users\")
       .setOf(foam.nanos.auth.User.getOwnClassInfo())
-      .setInnerDAO(innerdao).build();
+      .build();
 
-    return new foam.dao.PMDAO(x, new foam.dao.ValidatingDAO(x, new foam.nanos.auth.AuthorizationDAO(x, new foam.nanos.auth.UserPasswordHashingDAO(x, x.get(\"localUserDAO\"))), new foam.nanos.auth.validators.UserGroupAndSpidValidator()));
+    return new foam.dao.PMDAO(x,
+      new foam.dao.ValidatingDAO(x,
+        new foam.nanos.auth.AuthorizationDAO(x,
+          new foam.nanos.auth.UserPasswordHashingDAO(x, x.get(\"localUserDAO\")),
+          new foam.nanos.auth.AuthorizableAuthorizer(\"user\")),
+        new foam.nanos.auth.validators.UserGroupAndSpidValidator()));
   """,
   "client":"{\"of\":\"foam.nanos.auth.User\",\"cache\":false,\"decorators\": [{\"class\":\"foam.nanos.fs.FileDAODecorator\"}]}"
 })
