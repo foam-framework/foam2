@@ -72,16 +72,6 @@ p({"class":"foam.nanos.boot.NSpec", "name":"localUserDAO",                     "
 p({
   "class":"foam.nanos.boot.NSpec", "name":"userDAO",                          "lazy":true,  "serve":true,  "authenticate": false, 
   "serviceScript":"""
-    ed = new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setAuthenticate(false)
-      .setAuthorize(true)
-      .setSeqNo(true)
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"users\")
-      .setOf(foam.nanos.auth.User.getOwnClassInfo())
-      .build();
-
     return new foam.dao.PMDAO(x,
       new foam.dao.ValidatingDAO(x,
         new foam.nanos.auth.AuthorizationDAO(x,
