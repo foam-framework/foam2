@@ -11,7 +11,7 @@ p({
 rm = x.get("pmHourlyReduceManager");
 rm.doReduce();
 x.get("pm1MinuteDAO").removeAll();
-x.get("logger").info(new String[] {scriptName, "Hourly PM Reduce Complete"});
+x.get("logger").info(new String[] {"Hourly PM Reduce Complete"});
   """
 })
 p({
@@ -23,6 +23,6 @@ p({
 rm = x.get("pmDailyReduceManager");
 rm.doReduce();
 x.get("pmHourlyDAO").removeAll();
-x.get("logger").info(new String[] {scriptName, "Daily PM Reduce Complete"});
+x.get("logger").info(new String[] {"Daily PM Reduce Complete"});
   """
 })
