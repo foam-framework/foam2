@@ -45,9 +45,12 @@ foam.CLASS({
 return this;`
       });
 
-      var buildBody = `${cls.name} obj = new ${cls.name}();
-obj.setX(x_);
-`;
+      var buildBody = `
+// TODO: Consider returning something more generic so the facet manager can
+// replace the object with anything it wants.
+// TODO: Consider throwing an exception if x_ is null.
+${cls.name} obj = x_ == null ? new ${cls.name}() : (${cls.name}) x_.create(${cls.name}.class);
+obj.setX(x_);`;
 
       for ( var i = 0 ; i < this.properties.length ; i++ ) {
         var prop = this.properties[i];
@@ -79,7 +82,7 @@ ${isSet} = true;
 return this;`
         });
 
-        buildBody += `if ( ${isSet} ) obj.set${capitalized}(${privateName});
+        buildBody += `if ( ${isSet} ) obj.setProperty("${prop.name}", ${privateName});
 `;
       }
 
