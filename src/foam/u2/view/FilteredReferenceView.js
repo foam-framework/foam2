@@ -16,35 +16,31 @@ foam.CLASS({
     'foam.mlang.Expressions'
   ],
 
-  exports: [
-    'filteredDAO'
-  ],
-
   properties: [
     {
       class: 'String',
-      name: 'firstDAOKey',
+      name: 'filteringDAOKey',
       documentation: 'The key of the DAO that the user makes the first selection from.'
     },
     {
       class: 'foam.dao.DAOProperty',
-      name: 'firstDAO',
+      name: 'filteringDAO',
       documentation: 'The DAO that the user makes the first selection from.',
-      expression: function(firstDAOKey) {
-        return this.__subContext__[firstDAOKey];
+      expression: function(filteringDAOKey) {
+        return this.__subContext__[filteringDAOKey];
       }
     },
     {
       class: 'String',
-      name: 'secondDAOKey',
+      name: 'daoKey',
       documentation: 'The key of the DAO that the user makes the second selection from. This DAO will be filtered based on the first selection.'
     },
     {
       class: 'foam.dao.DAOProperty',
-      name: 'secondDAO',
+      name: 'dao',
       documentation: 'The DAO that the user makes the second selection from. This DAO will be filtered based on the first selection.',
-      expression: function(secondDAOKey) {
-        return this.__subContext__[secondDAOKey];
+      expression: function(daoKey) {
+        return this.__subContext__[daoKey];
       }
     },
     {
@@ -54,17 +50,19 @@ foam.CLASS({
       documentation: 'The property used to filter the second DAO.'
     },
     {
-      name: 'firstView',
-      expression: function(firstDAO) {
+      class: 'foam.u2.ViewSpec',
+      name: 'filteringView',
+      factory: function() {
         return {
           class: 'foam.u2.view.ReferenceView',
-          dao: firstDAO
+          dao: this.filteringDAO
         }
       }
     },
     {
-      name: 'secondView',
-      expression: function() {
+      class: 'foam.u2.ViewSpec',
+      name: 'filteredView',
+      factory: function() {
         return {
           class: 'foam.u2.view.ReferenceView',
           dao$: this.filteredDAO$
@@ -77,9 +75,9 @@ foam.CLASS({
     },
     {
       name: 'filteredDAO',
-      documentation: 'Filtered version of secondDAO',
-      expression: function(selection_, secondDAO, filteredProperty) {
-        return secondDAO.where(selection_ ?
+      documentation: 'Filtered version of dao',
+      expression: function(selection_, dao, filteredProperty) {
+        return dao.where(selection_ ?
           this.EQ(filteredProperty, selection_) :
           this.FALSE);
       }
@@ -89,10 +87,10 @@ foam.CLASS({
   methods: [
     function initE() {
       this
-        .tag(this.firstView, {
+        .tag(this.filteringView, {
           data$: this.selection_$,
         })
-        .tag(this.secondView, {
+        .tag(this.filteredView, {
           data$: this.data$,
         });
     }
