@@ -62,14 +62,6 @@ foam.CLASS({
     'email'
   ],
 
-  digColumns: [
-    'id',
-    'type',
-    'group',
-    'legalName',
-    'email'
-  ],
-
   // TODO: The following properties don't have to be defined here anymore once
   // https://github.com/foam-framework/foam2/issues/1529 is fixed:
   //   1. enabled
