@@ -56,11 +56,11 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'fields',
+      factory: null,
       expression: function(daoKey) {
          var dao = this.__context__[daoKey];
 
-         if ( dao != null )
-          return dao ? dao.of.getAxiomsByClass(foam.core.Property).map(p => p.name) : [];
+         return dao ? dao.of.getAxiomsByClass(foam.core.Property).map(p => p.name) : [];
       }
     },
     {
@@ -148,10 +148,14 @@ foam.CLASS({
           query = true;
           url += "q=" + encodeURIComponent(q);
         }
-        if ( fields ) {
+        if ( fields.length > 0 ) {
           url += query ? "&" : "?";
           query = true;
-          url += "fields=" + encodeURIComponent(fields);
+          url += "fields=";
+
+          for ( var i = 0; i < fields.length; i++ ) {
+            url+= encodeURIComponent(fields[i]) + encodeURIComponent(",");
+          }
         }
         this.postURL = url;
 
