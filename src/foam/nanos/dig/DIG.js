@@ -153,9 +153,8 @@ foam.CLASS({
           query = true;
           url += "fields=";
 
-          for ( var i = 0; i < fields.length; i++ ) {
+          for ( var i = 0; i < fields.length; i++ )
             url+= encodeURIComponent(fields[i]) + encodeURIComponent(",");
-          }
         }
         this.postURL = url;
 
