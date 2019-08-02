@@ -2648,6 +2648,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'ModelU2Refinements',

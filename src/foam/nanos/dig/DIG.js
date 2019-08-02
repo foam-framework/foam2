@@ -54,15 +54,13 @@ foam.CLASS({
     'cmd',
     'format',
     {
-      name: 'digColumns',
+      class: 'StringArray',
+      name: 'fields',
       expression: function(daoKey) {
          var dao = this.__context__[daoKey];
 
-         if ( dao.of.getAxiomByName('digColumns') ) {
-          return dao.of.getAxiomByName('digColumns').columns.toString();
-        } else {
-          return dao.of.getAxiomsByClass(foam.core.Property).toString();
-        }
+         if ( dao != null )
+          return dao.of.getAxiomsByClass(foam.core.Property).map(p => p.name);
       }
     },
     {
@@ -111,7 +109,7 @@ foam.CLASS({
       label: 'Snippet',
       documentation: 'show a specific type of request would look like in a given language.',
       view: { class: 'foam.nanos.dig.DigSnippetView' },
-      expression: function(key, data, email, subject, daoKey, cmd, format, q, dataFile, digColumns) {
+      expression: function(key, data, email, subject, daoKey, cmd, format, q, dataFile, fields) {
         var query = false;
         var url = "/service/dig";
 
@@ -150,10 +148,10 @@ foam.CLASS({
           query = true;
           url += "q=" + encodeURIComponent(q);
         }
-        if ( digColumns ) {
+        if ( fields ) {
           url += query ? "&" : "?";
           query = true;
-          url += "digColumns=" + encodeURIComponent(digColumns);
+          url += "fields=" + encodeURIComponent(fields);
         }
         this.postURL = url;
 
