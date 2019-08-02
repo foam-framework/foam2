@@ -72,7 +72,7 @@ p({"class":"foam.nanos.boot.NSpec", "name":"localUserDAO",                     "
 p({
   "class":"foam.nanos.boot.NSpec", "name":"userDAO",                          "lazy":true,  "serve":true,  "authenticate": false, 
   "serviceScript":"""
-    innerdao = new foam.dao.ValidatingDAO(x, new foam.nanos.auth.AuthorizationDAO(x, new foam.nanos.auth.UserPasswordHashingDAO(x, x.get(\"localUserDAO\"));
+    innerdao = new foam.dao.ValidatingDAO(x, new foam.nanos.auth.AuthorizationDAO(x, new foam.nanos.auth.UserPasswordHashingDAO(x, x.get(\"localUserDAO\"))));
     ed = new foam.dao.EasyDAO.Builder(x)
       .setPm(true)
       .setAuthenticate(false)
