@@ -59,10 +59,10 @@ foam.CLASS({
       class: 'StringArray',
       name: 'defaultColumns',
       factory: null,
-      expression: function(of) { 
+      expression: function(of) {
         var tableColumns = of.getAxiomByName('tableColumns');
 
-        return tableColumns 
+        return tableColumns
                 ? tableColumns.columns
                 : of.getAxiomsByClass(foam.core.Property).map(p => p.name);
       }
