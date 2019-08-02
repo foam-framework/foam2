@@ -2,6 +2,11 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'FilteredReferenceView',
   extends: 'foam.u2.View',
+  documentation: `
+    FilteredReferenceView is basically two reference views, 
+    the content of the second one is filtered by the choice of
+    the first reference view. 
+  `,
 
   requires: [
     'foam.u2.ReferenceView',
@@ -19,11 +24,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'firstDAOKey',
-      documentation: 'The key of the DAO that the user makes the second selection from. This DAO will be filtered based on the first selection.'
+      documentation: 'The key of the DAO that the user makes the first selection from.'
     },
     {
       class: 'foam.dao.DAOProperty',
       name: 'firstDAO',
+      documentation: 'The DAO that the user makes the first selection from.',
       expression: function(firstDAOKey) {
         return this.__subContext__[firstDAOKey];
       }
@@ -31,11 +37,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'secondDAOKey',
-      documentation: 'The key of the DAO that the user makes the first selection from.'
+      documentation: 'The key of the DAO that the user makes the second selection from. This DAO will be filtered based on the first selection.'
     },
     {
       class: 'foam.dao.DAOProperty',
       name: 'secondDAO',
+      documentation: 'The DAO that the user makes the second selection from. This DAO will be filtered based on the first selection.',
       expression: function(secondDAOKey) {
         return this.__subContext__[secondDAOKey];
       }
@@ -66,7 +73,7 @@ foam.CLASS({
     },
     {
       name: 'selection_',
-      documentation: 'This is the filtered choice.'
+      documentation: 'This is the choice from the first view.'
     },
     {
       name: 'filteredDAO',
