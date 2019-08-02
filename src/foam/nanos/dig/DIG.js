@@ -60,7 +60,7 @@ foam.CLASS({
          var dao = this.__context__[daoKey];
 
          if ( dao != null )
-          return dao.of.getAxiomsByClass(foam.core.Property).map(p => p.name);
+          return dao ? dao.of.getAxiomsByClass(foam.core.Property).map(p => p.name) : [];
       }
     },
     {
