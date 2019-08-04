@@ -131,7 +131,7 @@ public class Boot {
 
   protected void installSystemUser() {
     User user = new User();
-    user.setId(1);
+    user.setId(User.SYSTEM_USER_ID);
     user.setFirstName("system");
     user.setGroup("system");
 
