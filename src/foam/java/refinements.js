@@ -635,6 +635,10 @@ foam.CLASS({
       expression: function(flags) {
         return foam.util.flagFilter(['java'])(this);
       }
+    },
+    {
+     class: 'Boolean',
+     name: 'remote'
     }
   ],
 
@@ -651,6 +655,7 @@ foam.CLASS({
         abstract: this.abstract,
         final: this.final,
         synchronized: this.synchronized,
+        remote: this.remote,
         throws: this.javaThrows,
         documentation: this.documentation,
         args: this.args && this.args.map(function(a) {

@@ -75,6 +75,10 @@ foam.CLASS({
       name: 'synchronized'
     },
     {
+     class: 'Boolean',
+     name: 'remote'
+    },
+    {
       name: 'args',
       factory: function() {
         if ( this.code )

@@ -222,6 +222,19 @@ foam.CLASS({
 
       o.increaseIndent();
 
+      // Look if the class has a method tagged 'remote' : see CPF-278
+      var isORBitalDAOed = false;
+      for( m : this.methods ){
+        if( m.remote ){
+          isORBitalDAOed = true;
+          break;
+        }
+      }
+      if( isORBitalDAOed ){
+        //TODO: add necessary constructs to generated java class that needs to be an ORBitalDAO'able
+
+      }
+
       if ( this.isEnum ) this.writeDeclarations(o);
 
       this.constants.forEach(function(c) { o.out(c, '\n'); });
