@@ -26,12 +26,12 @@ public class SinkParser
   protected ClassInfo info_;
 
   public SinkParser(ClassInfo info) {
+    info_ = info;
+
     parsers_ = new Parser[] {
       starParser(),
       expressionListParser()
     };
-
-    info_ = info;
   }
 
   public Parser starParser() {
@@ -55,7 +55,6 @@ public class SinkParser
     return new Alt(parsers);
   }
 
-  /*
   @Override
   public PStream parse(PStream ps, ParserContext x) {
     x = x.sub();
@@ -63,5 +62,4 @@ public class SinkParser
 
     return super.parse(ps, x);
   }
-  */
 }

@@ -29,6 +29,7 @@ import foam.nanos.http.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.PrefixLogger;
 import foam.nanos.notification.email.EmailMessage;
+import foam.parse.SinkParser;
 import foam.util.Emails.EmailsUtility;
 import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
@@ -116,6 +117,16 @@ public class DigWebAgent
       Predicate pred = new WebAgentQueryParser(cInfo).parse(x, q);
       logger.debug("predicate", pred.getClass(), pred.toString());
       dao = dao.where(pred);
+
+      SinkParser sinkParser = new SinkParser(cInfo);
+
+      for ( int i = 0; i < fieldList.length; i++ ) {
+        StringPStream ps = new StringPStream(fieldList[i]);
+        ParserContextImpl x_ = new ParserContextImpl();
+        ps = (StringPStream) sinkParser.parse(ps, x_);
+
+        //System.out.println("ps.value() : " + ps.value());
+      }
 
       if ( Command.put == command ) {
         String returnMessage = "success";
