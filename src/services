@@ -355,7 +355,7 @@ p({"class":"foam.nanos.boot.NSpec", "name":"pmFoldManager","serve":true,"service
 
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"pmDAO",\
+  "name":"pmDAO",
   "serve":true,
   "serviceScript":"""
     return new foam.nanos.analytics.FoldManagerDAODecorator.Builder(x)
