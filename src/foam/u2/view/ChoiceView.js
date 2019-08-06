@@ -281,6 +281,14 @@ foam.CLASS({
         this.dao.select().then(function(s) {
           this.choices = s.array.map(this.objToChoice);
           if ( this.data == null && this.index === -1 ) this.index = this.placeholder ? -1 : 0;
+
+          // When the DAO changes, the data we had selected before might not be
+          // relevant anymore. In that case, we need to find out if the
+          // previously selected data is still in the new choices list. If it
+          // is, keep the selection the same, otherwise reset the state so that
+          // there's no selection since the previous selection doesn't exist in
+          // the new DAO.
+          this.choice = this.findChoiceByData(this.data);
         }.bind(this));
       }
     }

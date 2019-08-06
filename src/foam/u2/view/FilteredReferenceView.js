@@ -64,8 +64,7 @@ foam.CLASS({
       name: 'filteredView',
       factory: function() {
         return {
-          class: 'foam.u2.view.ReferenceView',
-          dao$: this.filteredDAO$
+          class: 'foam.u2.view.ReferenceView'
         }
       }
     },
@@ -92,6 +91,7 @@ foam.CLASS({
         })
         .tag(this.filteredView, {
           data$: this.data$,
+          dao$: this.filteredDAO$
         });
     }
   ]
