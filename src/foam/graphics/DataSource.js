@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-foam.CLASS( {
+foam.CLASS({
   package: 'foam.graphics',
   name: 'DataSource',
   extends: 'foam.core.Property',
@@ -25,10 +25,10 @@ foam.CLASS( {
       name: 'max',
       factory: function () {
         var max = 0;
-        for ( var key = 0; key < this.LegendEntries.length; key++ ) {
-          maxSet = this.LegendEntries[ key ].seriesValues.reduce( function ( a, b ) {
+        for ( var key = 0 ; key < this.LegendEntries.length ; key++ ) {
+          maxSet = this.LegendEntries[ key ].seriesValues.reduce(function (a, b ) {
             return Math.max( a, b );
-          } );
+          });
           if ( max < maxSet )
             max = maxSet;
         }
@@ -49,6 +49,6 @@ foam.CLASS( {
         }
       }
       return dataSourceNormalized
-    },
+    }
   ]
-} );
+});

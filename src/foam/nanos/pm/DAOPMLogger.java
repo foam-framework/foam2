@@ -32,18 +32,6 @@ public class DAOPMLogger
 
   @Override
   public void log(PM pm) {
-    /*
-     * Performance monitoring is disabled for now since it's causing significant
-     * memory usage. The underlying issue is that since we store everything in
-     * MDAOs, which are in-memory databases, eventually we run out of memory.
-     * pmDAO just happens to be one that gets put to relatively often, so the
-     * space it takes up is highly visible when profiling the application.
-     *
-     * This is only a temporary solution to the performance problems.
-     */
-    return;
-
-    /*
     if ( ! pm.getClassType().getId().equals("foam.dao.PMDAO") ) {
       if ( pm.getClassType().getId().indexOf("PM") != -1 ) return;
       if ( pm.getName().indexOf("PM")              != -1 ) return;
@@ -95,6 +83,5 @@ public class DAOPMLogger
         }
       }
     }
-    */
   }
 }
