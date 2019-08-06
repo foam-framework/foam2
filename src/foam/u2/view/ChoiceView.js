@@ -54,7 +54,7 @@ foam.CLASS({
       // of those properties calls back to updating 'choice'.
       documentation: 'The current choice. (That is, a [value, text] pair.)',
       postSet: function(o, n) {
-        if ( o === n || this.feedback_ ) return;
+        if ( this.feedback_ ) return;
 
         this.feedback_ = true;
 
@@ -259,7 +259,7 @@ foam.CLASS({
 
     function fromProperty(p) {
       this.SUPER(p);
-      this.defaultValue = p.value;
+      this.defaultValue = p.value && this.findChoiceByData(p.value);
     }
   ],
 
@@ -269,9 +269,13 @@ foam.CLASS({
       isFramed: true,
       code: function() {
         var d = this.data;
-        if ( this.choices.length ) {
-          this.choice = ( d != null && this.findChoiceByData(d) ) || this.defaultValue;
+        var newChoice = this.choices.length && d != null &&
+          this.findChoiceByData(d);
+        if ( newChoice == this.choice ) {
+          // We do this to handle the index not changing. 
+          this.choice = null;
         }
+        this.choice = newChoice;
       }
     },
     {
@@ -281,14 +285,6 @@ foam.CLASS({
         this.dao.select().then(function(s) {
           this.choices = s.array.map(this.objToChoice);
           if ( this.data == null && this.index === -1 ) this.index = this.placeholder ? -1 : 0;
-
-          // When the DAO changes, the data we had selected before might not be
-          // relevant anymore. In that case, we need to find out if the
-          // previously selected data is still in the new choices list. If it
-          // is, keep the selection the same, otherwise reset the state so that
-          // there's no selection since the previous selection doesn't exist in
-          // the new DAO.
-          this.choice = this.findChoiceByData(this.data);
         }.bind(this));
       }
     }
