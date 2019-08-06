@@ -134,15 +134,25 @@ p({"class":"foam.nanos.boot.NSpec", "name":"localUserDAO",                      
 p({
   "class":"foam.nanos.boot.NSpec", "name":"userDAO",                            "serve":true,  "authenticate": false, 
   "serviceScript":"""
-    inner = new foam.nanos.auth.UserPasswordHashingDAO(x, x.get("localUserDAO"));
-    ed = new foam.dao.EasyDAO.Builder(x)
+    return new foam.dao.EasyDAO.Builder(x)
       .setPm(true)
-      .setInnerDAO(inner)
+      .setInnerDAO(x.get("localUserDAO"))
       .setOf(foam.nanos.auth.User.getOwnClassInfo())
+      .setDecorator(
+        new foam.dao.ValidatingDAO(x, 
+          new foam.nanos.auth.UserPasswordHashingDAO(x, null), 
+          new foam.nanos.auth.validators.UserGroupAndSpidValidator() 
+        )
+      )
       .build();
-    return new foam.dao.ValidatingDAO(x, ed, new foam.nanos.auth.validators.UserGroupAndSpidValidator());
   """,
-  "client":"{\"of\":\"foam.nanos.auth.User\",\"cache\":false,\"decorators\": [{\"class\":\"foam.nanos.fs.FileDAODecorator\"}]}"
+  "client":"""
+    { 
+      "of":"foam.nanos.auth.User",
+      "cache":false,
+      "decorators": [{"class":"foam.nanos.fs.FileDAODecorator"}]
+    }
+  """
 })
 p({
   "class":"foam.nanos.boot.NSpec",
