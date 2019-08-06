@@ -64,6 +64,8 @@ public class DigWebAgent
     boolean             emailSet = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
     String              subject  = p.getParameter("subject");
     String              fileAddress = p.getParameter("fileaddress");
+    String              fields   = p.getParameter("fields");
+    String[]            fieldList = fields.split(",");
 
     //
     // FIXME/TODO: ensuring XML and CSV flows return proper response objects and codes has not been completed since the switch to HttpParameters.
