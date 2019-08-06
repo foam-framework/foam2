@@ -134,9 +134,10 @@ p({"class":"foam.nanos.boot.NSpec", "name":"localUserDAO",                      
 p({
   "class":"foam.nanos.boot.NSpec", "name":"userDAO",                            "serve":true,  "authenticate": false, 
   "serviceScript":"""
+    inner = new foam.nanos.auth.UserPasswordHashingDAO(x, x.get("localUserDAO"));
     ed = new foam.dao.EasyDAO.Builder(x)
       .setPm(true)
-      .setInnerDAO(x.get("localUserDAO"))
+      .setInnerDAO(inner)
       .setOf(foam.nanos.auth.User.getOwnClassInfo())
       .build();
     return new foam.dao.ValidatingDAO(x, ed, new foam.nanos.auth.validators.UserGroupAndSpidValidator());
