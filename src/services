@@ -1,6 +1,6 @@
 p({"class":"foam.nanos.boot.NSpec", "name":"nSpecDAO",                           "serve":true,  "authenticate": false, "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
 
-p({"class":"foam.nanos.boot.NSpec", "name":"localLogMessageDAO", "lazy":false, "serviceScript":"new foam.dao.EasyDAO.Builder(x).setOf(foam.nanos.logger.LogMessage.getOwnClassInfo()).setAuthenticate(false).setPm(true).setSeqNo(true).setCreatedAware(true).setCreatedByAware(true).setOrder(new foam.mlang.order.Comparator[] {foam.mlang.MLang.DESC(foam.nanos.logger.LogMessage.CREATED)}).setDecorator(new foam.nanos.logger.RepeatLogMessageDAO.Builder(x).setDelegate(new foam.dao.FixedSizeDAO.Builder(x).setDelegate(new foam.nanos.logger.NotificationLogMessageDAO.Builder(x).build()).build()).build()).setInnerDAO(new foam.dao.WriteOnlyJDAO(x, foam.nanos.logger.LogMessage.getOwnClassInfo(), \"../logs/logs\" /*TODO System.getProperty(\"LOG_HOME\")+\"/logs\"*/)).build();"})
+p({"class":"foam.nanos.boot.NSpec", "name":"localLogMessageDAO", "lazy":false, "serviceScript":"new foam.dao.EasyDAO.Builder(x).setOf(foam.nanos.logger.LogMessage.getOwnClassInfo()).setAuthorize(false).setPm(true).setSeqNo(true).setCreatedAware(true).setCreatedByAware(true).setOrder(new foam.mlang.order.Comparator[] {foam.mlang.MLang.DESC(foam.nanos.logger.LogMessage.CREATED)}).setDecorator(new foam.nanos.logger.RepeatLogMessageDAO.Builder(x).setDelegate(new foam.dao.FixedSizeDAO.Builder(x).setDelegate(new foam.nanos.logger.NotificationLogMessageDAO.Builder(x).build()).build()).build()).setInnerDAO(new foam.dao.WriteOnlyJDAO(x, foam.nanos.logger.LogMessage.getOwnClassInfo(), \"../logs/logs\" /*TODO System.getProperty(\"LOG_HOME\")+\"/logs\"*/)).build();"})
 
 p({
   "class": "foam.nanos.boot.NSpec",
@@ -20,7 +20,7 @@ p({
 })
 
 p({"class":"foam.nanos.boot.NSpec", "name":"logLevelFilterLogger",             "lazy":false, "service":{"class":"foam.nanos.logger.LogLevelFilterLogger"}})
-p({"class":"foam.nanos.boot.NSpec", "name":"logger",                           "lazy":false, ""serviceScript":"import foam.nanos.logger.CompositeLogger; import foam.nanos.logger.StdoutLogger; import foam.nanos.logger.FileLogger; import foam.nanos.logger.ProxyLogger; import foam.nanos.logger.LogLevelFilterLogger; import foam.nanos.logger.DAOLogger; CompositeLogger log = new CompositeLogger(); StdoutLogger stdOut = new StdoutLogger(); ProxyLogger logLevelFilterLogger = (ProxyLogger) x.get(\"logLevelFilterLogger\"); logLevelFilterLogger.setX(x); logLevelFilterLogger.setDelegate(log); DAOLogger daoLogger = new DAOLogger(x); log.add(stdOut).add(daoLogger); return logLevelFilterLogger;"})
+p({"class":"foam.nanos.boot.NSpec", "name":"logger",                           "lazy":false, "serviceScript":"import foam.nanos.logger.CompositeLogger; import foam.nanos.logger.StdoutLogger; import foam.nanos.logger.FileLogger; import foam.nanos.logger.ProxyLogger; import foam.nanos.logger.LogLevelFilterLogger; import foam.nanos.logger.DAOLogger; CompositeLogger log = new CompositeLogger(); StdoutLogger stdOut = new StdoutLogger(); ProxyLogger logLevelFilterLogger = (ProxyLogger) x.get(\"logLevelFilterLogger\"); logLevelFilterLogger.setX(x); logLevelFilterLogger.setDelegate(log); DAOLogger daoLogger = new DAOLogger(x); log.add(stdOut).add(daoLogger); return logLevelFilterLogger;"})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"localNotificationDAO", "lazy":false, "serviceScript":"return  new foam.dao.EasyDAO.Builder(x).setOf(foam.nanos.notification.Notification.getOwnClassInfo()).setIndex(new foam.core.PropertyInfo[] {foam.nanos.notification.Notification.GROUP_ID}).setAuthorize(false).setPm(true).setSeqNo(true).setDecorator(new foam.nanos.notification.NotificationTemplateDAO.Builder(x).setDelegate(new foam.nanos.notification.SendNotificationDAO(x, new foam.nanos.notification.SendEmailNotificationDAO(new foam.nanos.notification.SendSlackNotificationDAO(x)))).build()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"notifications\").build();"})
 
@@ -134,12 +134,12 @@ p({"class":"foam.nanos.boot.NSpec", "name":"localUserDAO",                      
 p({
   "class":"foam.nanos.boot.NSpec", "name":"userDAO",                            "serve":true,  "authenticate": false, 
   "serviceScript":"""
-    return new foam.dao.PMDAO(x,
-      new foam.dao.ValidatingDAO(x,
-        new foam.nanos.auth.AuthorizationDAO(x,
-          new foam.nanos.auth.UserPasswordHashingDAO(x, x.get(\"localUserDAO\")),
-          new foam.nanos.auth.AuthorizableAuthorizer(\"user\")),
-        new foam.nanos.auth.validators.UserGroupAndSpidValidator()));
+    ed = new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setInnerDAO(x.get("localUserDAO"))
+      .setOf(foam.nanos.auth.User.getOwnClassInfo())
+      .build();
+    return new foam.dao.ValidatingDAO(x, ed, new foam.nanos.auth.validators.UserGroupAndSpidValidator());
   """,
   "client":"{\"of\":\"foam.nanos.auth.User\",\"cache\":false,\"decorators\": [{\"class\":\"foam.nanos.fs.FileDAODecorator\"}]}"
 })
