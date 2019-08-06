@@ -637,8 +637,8 @@ foam.CLASS({
       }
     },
     {
-     class: 'Boolean',
-     name: 'remote'
+      class: 'Boolean',
+      name: 'remote'
     }
   ],
 

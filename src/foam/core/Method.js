@@ -75,8 +75,8 @@ foam.CLASS({
       name: 'synchronized'
     },
     {
-     class: 'Boolean',
-     name: 'remote'
+      class: 'Boolean',
+      name: 'remote'
     },
     {
       name: 'args',

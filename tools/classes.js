@@ -430,7 +430,7 @@ var classes = [
   'foam.dao.jdbc.JDBCConnectionSpec',
   'foam.dao.jdbc.TestDataForJDBC',
   'foam.dao.jdbc.TestCompany',
-  'foam.dao.jdbc.TestEmployee'
+  'foam.dao.jdbc.TestEmployee',
 
   // Crunch
   'foam.nanos.crunch.crunchtest.FakeTestObject',
@@ -447,7 +447,7 @@ var classes = [
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
-  
+
 ];
 
 var abstractClasses = [

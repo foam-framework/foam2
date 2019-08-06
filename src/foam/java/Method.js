@@ -29,6 +29,10 @@ foam.CLASS({
     'type',
     'synchronized',
     {
+      class: 'Boolean',
+      name: 'remote'
+    },
+    {
       class: 'FObjectArray',
       of: 'foam.java.Argument',
       name: 'args'

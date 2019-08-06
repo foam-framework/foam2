@@ -224,7 +224,7 @@ foam.CLASS({
 
       // Look if the class has a method tagged 'remote' : see CPF-278
       var isORBitalDAOed = false;
-      for( m : this.methods ){
+      for( m in this.methods ){
         if( m.remote ){
           isORBitalDAOed = true;
           break;
