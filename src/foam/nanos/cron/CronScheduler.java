@@ -57,7 +57,12 @@ public class CronScheduler
       while ( true ) {
         Date now = new Date();
 
-        cronDAO_.where(MLang.AND(MLang.LTE(Cron.SCHEDULED_TIME, now), MLang.EQ(Cron.ENABLED, true))).select(new AbstractSink() {
+        cronDAO_.where(
+          MLang.AND(
+            MLang.LTE(Cron.SCHEDULED_TIME, now),
+            MLang.EQ(Cron.ENABLED, true)
+          )
+        ).select(new AbstractSink() {
           @Override
           public void put(Object obj, Detachable sub) {
             Cron cron = (Cron) ((FObject) obj).fclone();

@@ -90,8 +90,8 @@ public class AuthorizationDAO extends ProxyDAO {
     Predicate newPredicate = remove ? IS_AUTHORIZED_TO_DELETE(x, authorizer_) : IS_AUTHORIZED_TO_READ(x, authorizer_);
     return existingPredicate != null ?
       AND(
-        newPredicate,
-        existingPredicate
+        existingPredicate,
+        newPredicate
       ) :
       newPredicate;
   }
