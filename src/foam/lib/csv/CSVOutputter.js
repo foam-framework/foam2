@@ -8,11 +8,24 @@ foam.INTERFACE({
   package: 'foam.lib.csv',
   name: 'CSVOutputter',
 
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'isFirstRow'
+    }
+  ],
+
   methods: [
     {
       name: 'outputValue',
       args: [
         { name: 'value' }
+      ]
+    },
+    {
+      name: 'outputHeader',
+      args: [
+        { type: 'Context', name: 'x' }
       ]
     },
     {

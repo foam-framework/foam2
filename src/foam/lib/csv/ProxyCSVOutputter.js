@@ -12,6 +12,11 @@ foam.CLASS({
   ],
   properties: [
     {
+      class: 'Boolean',
+      name: 'isFirstRow',
+      value: true
+    },
+    {
       class: 'Proxy',
       of: 'foam.lib.csv.CSVOutputter',
       name: 'delegate'

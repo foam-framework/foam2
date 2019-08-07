@@ -135,9 +135,6 @@ foam.CLASS({
     },
     {
       name: 'outputHeader',
-      args: [
-        { type: 'Context', name: 'x' }
-      ],
       code: function(x) {
         this.props
           .map((name) => this.of.getAxiomByName(name))

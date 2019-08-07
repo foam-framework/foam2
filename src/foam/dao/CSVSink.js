@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'CSVSink',
   extends: 'foam.dao.AbstractSink',
-  implements: [ 
+  implements: [
     'foam.core.Serializable'
   ],
   javaImports: [
@@ -85,9 +85,11 @@ foam.CLASS({
     {
       name: 'eof',
       code: function() {
+        if ( this.outputter.isFirstRow ) this.outputter.outputHeader(this.__context__);
         this.csv = this.outputter.toString();
       },
       javaCode: `
+        if ( getOutputter().getIsFirstRow() ) getOutputter().outputHeader(getX());
         setCsv(getOutputter().toString());
       `
     },
