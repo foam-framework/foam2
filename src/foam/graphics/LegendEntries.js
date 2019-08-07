@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-foam.CLASS( {
+foam.CLASS({
   package: 'foam.graphics',
   name: 'LegendEntries',
   extends: 'foam.core.Property',
@@ -26,5 +26,5 @@ foam.CLASS( {
         return this.seriesValues.reduce( ( prev, curr ) => prev + curr );
       }
     }
-  ],
-} );
+  ]
+});
