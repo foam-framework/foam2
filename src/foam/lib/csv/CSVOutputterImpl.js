@@ -131,7 +131,7 @@ foam.CLASS({
     {
       name: 'toString',
       code: function() {
-        if ( this.isFirstRow ) outputHeader(this.__context__);
+        if ( this.isFirstRow ) this.outputHeader(this.__context__);
         return this.csv;
       },
       javaCode: `
