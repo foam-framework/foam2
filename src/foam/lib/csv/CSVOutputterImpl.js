@@ -131,10 +131,16 @@ foam.CLASS({
     {
       name: 'toString',
       code: function() { return this.csv; },
-      javaCode: 'return getSb().toString();'
+      javaCode: `
+      if ( getIsFirstRow() ) outputHeader(getX());
+      return getSb().toString();
+      `
     },
     {
       name: 'outputHeader',
+      args: [
+        { type: 'Context', name: 'x' }
+      ],
       code: function(x) {
         this.props
           .map((name) => this.of.getAxiomByName(name))

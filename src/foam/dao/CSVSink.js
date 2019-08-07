@@ -89,7 +89,6 @@ foam.CLASS({
         this.csv = this.outputter.toString();
       },
       javaCode: `
-        if ( getOutputter().getIsFirstRow() ) getOutputter().outputHeader(getX());
         setCsv(getOutputter().toString());
       `
     },
