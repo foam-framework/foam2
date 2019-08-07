@@ -201,7 +201,7 @@ foam.CLASS({
       javaCode: `
         try {
           String c = "";
-          if ( multiLineOutput ) {
+          if ( getMultiLineOutput() ) {
             c = "\\n";
             getOutputter().setMultiLine(true);
           }
@@ -221,9 +221,9 @@ foam.CLASS({
               .toString());
           }
 
-          if ( multiLineOutput ) {
+          if ( getMultiLineOutput() ) {
             getOutputter().setMultiLine(false);
-            multiLineOutput = false;
+            setMultiLineOutput(false);
           }
 
         } catch ( Throwable t ) {
