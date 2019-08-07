@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-foam.CLASS( {
+foam.CLASS({
   package: 'foam.graphics',
   name: 'PlotGraph',
   extends: 'foam.graphics.GraphV',
@@ -25,28 +25,28 @@ foam.CLASS( {
     [ 'lineWidth', 2 ],
     [ 'dataToHighlight' ],
     [ 'pointGap', 0 ],
-    [ 'radius', 0 ],
+    [ 'radius', 0 ]
   ],
 
   methods: [
-    function initCView( x, y, dataSource, radius, pointGap, w, h, columnMaxLength, lengthX, lengthY, dataToHighlight, axisUnit, color, lineColor, lineWidth ) { 
+    function initCView( x, y, dataSource, radius, pointGap, w, h, columnMaxLength, lengthX, lengthY, dataToHighlight, axisUnit, color, lineColor, lineWidth ) {
       var legendBox, legendLabel;
       var legendBoxUnit, legendLabelUnit;
       var simpleMargin = this.pointGap;
-      var dataSourceN = this.dataSource.normalized();
+      var dataSourceN  = this.dataSource.normalized();
 
       this.elementMap = new Map();
-      this.pointGap = this.pointGap * 2;
+      this.pointGap   = this.pointGap * 2;
 
       for ( var i in this.dataSource.Horizontal ) {
-        legendBoxUnit = foam.graphics.Box.create( {
+        legendBoxUnit = foam.graphics.Box.create({
           x: this.x + ( this.pointGap * i ),
           y: this.y + simpleMargin,
           width: this.w || this.dataSource.Horizontal[ i ].length * 8,
           height: this.h || 16,
           color: this.bgTextColor || '#ffffff',
           border: this.borderTextColor
-        } );
+        });
 
         //TODO add properties
         //line-height: 1.33;
@@ -65,14 +65,14 @@ foam.CLASS( {
       }
 
       for ( var key in this.dataSource.LegendEntries ) {
-        legendBox = foam.graphics.Box.create( {
+        legendBox = foam.graphics.Box.create({
           x: ( this.x - simpleMargin ) + ( this.pointGap * key ),
           y: this.y - this.columnMaxLength - 30,
           width: this.w || this.dataSource.LegendEntries[ key ].seriesName.length * 8,
           height: this.h || 16,
           color: this.bgTextColor,
           border: this.borderTextColor
-        } );
+        });
 
         //TODO add properties
         //font-weight: bold;
@@ -86,7 +86,7 @@ foam.CLASS( {
           color: this.color,
           text: this.dataSource.LegendEntries[ key ].seriesName
         } );
-        this.selected = this.add( legendBox, legendLabel );
+        this.selected = this.add(legendBox, legendLabel);
         this.invalidate();
 
         var lineP1P2;
@@ -120,12 +120,12 @@ foam.CLASS( {
       this.axisLabels( this.x, this.y, this.w, this.h, this.columnMaxLength, this.symbol, this.dataSource.max, simpleMargin, this.axisUnit );
       this.dashedLinesIndicator( this.x, this.y, this.w, this.h, this.columnMaxLength, this.lengthX, this.dataToHighlight, this.lineDash );
     },
-    function setData( mapDataX, mapDataY, info ) { 
+    function setData( mapDataX, mapDataY, info ) {
       this.elementMap.set( {
         x: mapDataX,
         y: mapDataY
       }, info );
-    },
-  ],
+    }
+  ]
 
-} );
+});
