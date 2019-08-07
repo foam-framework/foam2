@@ -98,7 +98,9 @@ public class Outputter
 
   public void outputString(String s) {
     if ( multiLineOutput_ && s.indexOf('\n') >= 0 ) {
+      writer_.append("\n");
       writer_.append("\"\"\"");
+      writer_.append("\n");
       writer_.append(escapeMultiline(s));
       writer_.append("\"\"\"");
     }
@@ -322,6 +324,7 @@ public class Outputter
       Iterator i      = axioms.iterator();
 
       writer_.append("{");
+      if ( multiLineOutput_ ) addInnerNewline();
       while ( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
         isPropertyDiff = maybeOutputPropertyDelta(oldFObject, newFObject, prop);

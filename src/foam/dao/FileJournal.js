@@ -80,7 +80,11 @@ foam.CLASS({
       class: 'Object',
       name: 'outputter',
       javaType: 'foam.lib.json.Outputter',
-      javaFactory: `return new Outputter(getX()).setPropertyPredicate(new StoragePropertyPredicate());`
+      javaFactory: `
+        foam.lib.json.Outputter outputter = new Outputter(getX()).setPropertyPredicate(new StoragePropertyPredicate()); 
+        outputter.setMultiLine(getMultiLineOutput()); 
+        return outputter;
+        `
     },
     {
       class: 'Object',
@@ -112,7 +116,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'multiLineOutput',
-      value: false
+      value: true
     },
     {
       class: 'Boolean',
@@ -201,10 +205,8 @@ foam.CLASS({
       javaCode: `
         try {
           String c = "";
-          if ( getMultiLineOutput() ) {
+          if ( getMultiLineOutput() )
             c = "\\n";
-            getOutputter().setMultiLine(true);
-          }
 
           String record = ( old != null ) ?
             getOutputter().stringifyDelta(old, nu) :
@@ -213,17 +215,11 @@ foam.CLASS({
           if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
             writeComment_(x, nu);
             write_(sb.get()
-              .append(c)
               .append("p(")
               .append(record)
               .append(")")
               .append(c)
               .toString());
-          }
-
-          if ( getMultiLineOutput() ) {
-            getOutputter().setMultiLine(false);
-            setMultiLineOutput(false);
           }
 
         } catch ( Throwable t ) {
