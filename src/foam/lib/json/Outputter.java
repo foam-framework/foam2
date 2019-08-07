@@ -120,7 +120,6 @@ public class Outputter
   public String escapeMultiline(String s) {
     s = s.replace("\\", "\\\\")
          .replace("\n","\\n")
-         .replace("\t", "\\t");
     s = ltrim(s, 4);
     return s.replace("\\n", "\n    ");
   }
