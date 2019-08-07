@@ -7,11 +7,9 @@
 foam.CLASS({
   package: 'foam.lib.csv',
   name: 'ProxyCSVOutputter',
-
   implements: [
     'foam.lib.csv.CSVOutputter'
   ],
-
   properties: [
     {
       class: 'Proxy',
