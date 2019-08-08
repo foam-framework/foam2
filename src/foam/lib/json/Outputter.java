@@ -37,7 +37,7 @@ public class Outputter
   };
 
   protected foam.core.X x_;
-  protected PrintWriter   writer_;
+  public PrintWriter   writer_;
   protected StringWriter  stringWriter_        = null;
   protected boolean       outputShortNames_    = false;
   protected boolean       outputDefaultValues_ = false;
@@ -100,7 +100,6 @@ public class Outputter
     if ( multiLineOutput_ && s.indexOf('\n') >= 0 ) {
       writer_.append("\n");
       writer_.append("\"\"\"");
-      writer_.append("\n");
       writer_.append(escapeMultiline(s));
       writer_.append("\"\"\"");
     }
