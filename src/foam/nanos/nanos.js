@@ -139,6 +139,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/AgentAuthService" },
   { name: "foam/nanos/auth/ClientAgentAuthService" },
   { name: "foam/nanos/pm/PMTemperatureCellFormatter" },
+  { name: "foam/nanos/pm/NullPM" },
   { name: "foam/nanos/pm/PM" },
   { name: "foam/nanos/pm/TemperatureCView" },
   { name: 'foam/nanos/notification/email/EmailMessage' },

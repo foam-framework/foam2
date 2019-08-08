@@ -17,10 +17,13 @@ import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.ProxyLogger;
 import foam.nanos.logger.StdoutLogger;
+import foam.nanos.pm.NullPM;
+import foam.nanos.pm.PM;
 import foam.nanos.script.Script;
 import foam.nanos.session.Session;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static foam.mlang.MLang.EQ;
 
@@ -74,6 +77,18 @@ public class Boot {
         factories_.get(sp.getName()).invalidate(sp);
       }
     }, null);
+
+    // PM factory
+    root_ = root_.putFactory("PM", new XFactory() {
+      public Object create(X x) {
+        int rand = ThreadLocalRandom.current().nextInt(0, 100);
+        if ( rand == 0 ) {
+          return new PM();
+        } else {
+          return new NullPM();
+        }
+      }
+    });
 
     // Use an XFactory so that the root context can contain itself.
     root_ = root_.putFactory(ROOT, new XFactory() {
