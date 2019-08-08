@@ -1,8 +1,5 @@
 package foam.nanos.fs;
 
-import foam.util.SafetyUtil;
-
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -10,6 +7,8 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
 
 public abstract class AbstractStorage implements Storage {
 
@@ -73,28 +72,28 @@ public abstract class AbstractStorage implements Storage {
   // TODO Return a list of files names as a List<String> instead of a DirectoryStream<Path>
 
   @Override
-  public DirectoryStream<Path> getDirectoryStream(String name) {
-    return getDirectoryStream(name, "");
+  public Set<String> getAvailableFiles(String name) {
+    return getAvailableFiles(name, "");
   }
 
   @Override
-  public DirectoryStream<Path> getDirectoryStream(String name, String glob) {
+  public Set<String> getAvailableFiles(String name, String glob) {
     Path path = getPath(name);
     if ( path == null ) return null;
+    Path root = getRootPath();
+    if ( root == null ) return null;
 
-    DirectoryStream<Path> contents;
+    Set<String> paths = new HashSet<>();
 
-    try {
-      if ( ! SafetyUtil.isEmpty(glob) ) {
-        contents = java.nio.file.Files.newDirectoryStream(path);
-      } else {
-        contents = java.nio.file.Files.newDirectoryStream(path, glob);
+    try (DirectoryStream<Path> contents = java.nio.file.Files.newDirectoryStream(path, glob)) {
+      for ( Path p : contents ) {
+        paths.add(p.relativize(root).toString());
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
 
-    return contents;
+    return paths;
   }
 
 }

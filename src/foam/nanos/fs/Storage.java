@@ -2,8 +2,7 @@ package foam.nanos.fs;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Path;
+import java.util.Set;
 
 public interface Storage {
 
@@ -15,8 +14,8 @@ public interface Storage {
 
   InputStream getInputStream(String name);
 
-  DirectoryStream<Path> getDirectoryStream(String name);
+  Set<String> getAvailableFiles(String name);
 
-  DirectoryStream<Path> getDirectoryStream(String name, String glob);
+  Set<String> getAvailableFiles(String name, String glob);
 
 }
