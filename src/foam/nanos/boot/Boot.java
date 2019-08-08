@@ -30,6 +30,7 @@ import static foam.mlang.MLang.EQ;
 public class Boot {
   // Context key used to store the top-level root context in the context.
   public final static String ROOT = "_ROOT_";
+  public static PM nullPM_ = new NullPM();
 
   protected DAO serviceDAO_;
   protected X   root_ = new ProxyX();
@@ -85,7 +86,7 @@ public class Boot {
         if ( rand == 0 ) {
           return new PM();
         } else {
-          return new NullPM();
+          return nullPM_;
         }
       }
     });
