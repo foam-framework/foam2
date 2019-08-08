@@ -15,6 +15,8 @@ public abstract class AbstractStorage implements Storage {
 
   protected abstract FileSystem getFS();
 
+  protected abstract Path getRootPath();
+
   protected abstract Path getPath(String name);
 
   protected String resourceDir_;

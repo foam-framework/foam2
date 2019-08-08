@@ -46,18 +46,17 @@ public class ResourceStorage extends AbstractStorage {
   }
 
   @Override
-  public Path getPath(String name) {
+  protected Path getRootPath() {
     FileSystem fs = getFS();
     if ( fs == null ) return null;
+    return SafetyUtil.isEmpty(resourceDir_) ? fs.getPath("/") : fs.getPath("/", resourceDir_);
+  }
 
-    Path path;
-    if ( ! SafetyUtil.isEmpty(resourceDir_) ) {
-      path = fs.getPath("/", resourceDir_, name);
-    } else {
-      path = fs.getPath("/", name);
-    }
-
-    return path;
+  @Override
+  protected Path getPath(String name) {
+    FileSystem fs = getFS();
+    if ( fs == null ) return null;
+    return SafetyUtil.isEmpty(resourceDir_) ? fs.getPath("/", name) : fs.getPath("/", resourceDir_, name);
   }
 
   @Override
