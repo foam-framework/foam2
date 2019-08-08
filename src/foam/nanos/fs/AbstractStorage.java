@@ -68,6 +68,8 @@ public abstract class AbstractStorage implements Storage {
     }
   }
 
+  // TODO Return a list of files names as a List<String> instead of a DirectoryStream<Path>
+
   @Override
   public DirectoryStream<Path> getDirectoryStream(String name) {
     return getDirectoryStream(name, "");
