@@ -123,6 +123,11 @@ public class DigWebAgent
       ParserContextImpl x_ = new ParserContextImpl();
       ps = (StringPStream) sinkParser.parse(ps, x_);
 
+      Object[] psArray = (Object[]) ps.value();
+      for (Object objPs : psArray) {
+        logger.debug("ps.value(): ", objPs);
+      }
+
       if ( Command.put == command ) {
         String returnMessage = "success";
 

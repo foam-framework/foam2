@@ -29,8 +29,7 @@ public class SinkParser
       new Repeat(expressionParser(info), ",", 1)));
   }
 
-  public static Parser expressionParser(ClassInfo info) {
-    ClassInfo    cInfo = info;
+  public static Parser expressionParser(ClassInfo cInfo) {
     List         properties = cInfo.getAxiomsByClass(PropertyInfo.class);
     List<Parser> parsers    = new ArrayList<Parser>();
 
