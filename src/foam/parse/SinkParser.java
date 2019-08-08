@@ -23,37 +23,23 @@ import java.util.List;
 public class SinkParser
   extends ProxyParser
 {
-  static ClassInfo info_;
-
-  public SinkParser() {
-    this(null);
-  }
-
   public SinkParser(final ClassInfo info) {
     super(new Alt(
       new Literal("*"),
       new Repeat(expressionParser(info), ",", 1)));
   }
 
-  public static Parser expressionParser(ClassInfo cInfo) {
-    info_ = cInfo;
-    List         properties = info_.getAxiomsByClass(PropertyInfo.class);
+  public static Parser expressionParser(ClassInfo info) {
+    ClassInfo    cInfo = info;
+    List         properties = cInfo.getAxiomsByClass(PropertyInfo.class);
     List<Parser> parsers    = new ArrayList<Parser>();
 
     for ( Object prop : properties ) {
-      PropertyInfo info = (PropertyInfo) prop;
+      PropertyInfo pInfo = (PropertyInfo) prop;
 
-      parsers.add(new LiteralIC(info.getName()));
+      parsers.add(new LiteralIC(pInfo.getName()));
     }
 
     return new Alt(parsers);
-  }
-
-  @Override
-  public PStream parse(PStream ps, ParserContext x) {
-    x = x.sub();
-    x.set("classInfo", info_);
-
-    return super.parse(ps, x);
   }
 }
