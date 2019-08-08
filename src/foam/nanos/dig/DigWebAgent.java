@@ -66,7 +66,6 @@ public class DigWebAgent
     String              subject  = p.getParameter("subject");
     String              fileAddress = p.getParameter("fileaddress");
     String              fields   = p.getParameter("fields");
-    String[]            fieldList = fields.split(",");
 
     //
     // FIXME/TODO: ensuring XML and CSV flows return proper response objects and codes has not been completed since the switch to HttpParameters.
@@ -120,13 +119,9 @@ public class DigWebAgent
 
       SinkParser sinkParser = new SinkParser(cInfo);
 
-      for ( int i = 0; i < fieldList.length; i++ ) {
-        StringPStream ps = new StringPStream(fieldList[i]);
-        ParserContextImpl x_ = new ParserContextImpl();
-        ps = (StringPStream) sinkParser.parse(ps, x_);
-
-        //System.out.println("ps.value() : " + ps.value());
-      }
+      StringPStream ps = new StringPStream(fields);
+      ParserContextImpl x_ = new ParserContextImpl();
+      ps = (StringPStream) sinkParser.parse(ps, x_);
 
       if ( Command.put == command ) {
         String returnMessage = "success";

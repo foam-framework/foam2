@@ -21,28 +21,22 @@ import java.util.List;
  *   ???: GROUP BY
  **/
 public class SinkParser
-  extends Alt
+  extends ProxyParser
 {
-  protected ClassInfo info_;
+  static ClassInfo info_;
 
-  public SinkParser(ClassInfo info) {
-    info_ = info;
-
-    parsers_ = new Parser[] {
-      starParser(),
-      expressionListParser()
-    };
+  public SinkParser() {
+    this(null);
   }
 
-  public Parser starParser() {
-    return new Literal("*");
+  public SinkParser(final ClassInfo info) {
+    super(new Alt(
+      new Literal("*"),
+      new Repeat(expressionParser(info), ",", 1)));
   }
 
-  public Parser expressionListParser() {
-    return new Repeat(expressionParser(), ",", 1);
-  }
-
-  public Parser expressionParser() {
+  public static Parser expressionParser(ClassInfo cInfo) {
+    info_ = cInfo;
     List         properties = info_.getAxiomsByClass(PropertyInfo.class);
     List<Parser> parsers    = new ArrayList<Parser>();
 
