@@ -25,5 +25,3 @@ x.get("pmHourlyDAO").removeAll();
 x.get("logger").info(new String[] {"Daily PM Reduce Complete"});
   """
 })
-
-p({"class":"foam.nanos.cron.Cron","id":"sessionExpiry","scheduledTime":"2019-08-08T13:01:00.000Z","lastRun":"2019-08-08T12:16:08.236Z","lastDuration":22})
