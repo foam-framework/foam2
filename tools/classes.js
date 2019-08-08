@@ -231,7 +231,6 @@ var classes = [
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.om.OMLogger',
   'foam.nanos.pm.PM',
-  'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',
