@@ -116,7 +116,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'multiLineOutput',
-      value: true
+      value: false
     },
     {
       class: 'Boolean',
