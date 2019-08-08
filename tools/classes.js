@@ -441,7 +441,12 @@ var classes = [
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
-  
+
+  // Strategy
+  'foam.strategy.StrategyReference',
+  'foam.strategy.StrategizerService',
+  'foam.strategy.BasicStrategizer',
+  'foam.strategy.ClientStrategizerService'
 ];
 
 var abstractClasses = [
@@ -462,7 +467,8 @@ var skeletons = [
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.push.PushService',
-  'foam.nanos.test.EchoService'
+  'foam.nanos.test.EchoService',
+  'foam.strategy.StrategizerService'
 ];
 
 var proxies = [
@@ -478,7 +484,8 @@ var proxies = [
   'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.http.WebAgent',
   'foam.nanos.notification.email.EmailService',
-  'foam.nanos.notification.push.PushService'
+  'foam.nanos.notification.push.PushService',
+  'foam.strategy.StrategizerService'
 ];
 
 var blacklist = [
