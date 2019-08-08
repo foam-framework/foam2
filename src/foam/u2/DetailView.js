@@ -215,12 +215,26 @@ foam.CLASS({
                 hasTabs = true;
                 var label = p.label;
                 let tab = self.Tab.create({ label: label });
-                var dao = p.cls_ == foam.dao.ManyToManyRelationshipProperty
-                  ? p.get(self.data).getJunctionDAO()
-                  : p.get(self.data);
-                dao.select(expr.COUNT()).then(function(c) {
-                  tab.label = label + ' (' + c.value + ')';
-                });
+
+                var dao = p.get(self.data);
+
+                if (p.cls_ == foam.dao.ManyToManyRelationshipProperty) {
+                  var many2many = dao;
+                  dao = dao.getJunctionDAO();
+
+                  var matchCondition = foam.mlang.predicate.Eq.create();
+                  matchCondition.arg1 = many2many.sourceProperty;
+                  matchCondition.arg2 = many2many.sourceId;
+
+                  dao.where(matchCondition).select(expr.COUNT()).then(function(c) {
+                    tab.label = label + ' (' + c.value + ')';
+                  });
+                } else {
+                  dao.select(expr.COUNT()).then(function(c) {
+                    tab.label = label + ' (' + c.value + ')';
+                  });
+                }
+
                 p = p.clone();
                 p.label = '';
                 tab.start('table').tag(self.DetailPropertyView, { prop: p });
