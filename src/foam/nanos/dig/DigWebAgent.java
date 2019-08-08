@@ -125,7 +125,7 @@ public class DigWebAgent
 
       Object[] psArray = (Object[]) ps.value();
       for (Object objPs : psArray) {
-        logger.debug("ps.value(): ", objPs);
+        logger.debug("ps.value(): " + objPs);
       }
 
       if ( Command.put == command ) {
