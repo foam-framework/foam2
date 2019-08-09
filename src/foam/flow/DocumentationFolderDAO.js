@@ -10,6 +10,12 @@ foam.CLASS({
   requires: [
     'foam.flow.Document'
   ],
+  javaImports: [
+    'foam.nanos.fs.Storage',
+    'java.nio.charset.StandardCharsets',
+    'java.util.Set',
+    'java.io.OutputStream'
+  ],
   documentation: 'Loads/stores documentation models from a directory of HTML markup.  Useful for saving and editing documentation in a version control repository.',
   extends: 'foam.dao.AbstractDAO',
   properties: [
@@ -30,25 +36,27 @@ foam.CLASS({
     {
       name: 'select_',
       javaCode: `
+Storage storage = x.get(Storage.class);
+
 sink = prepareSink(sink);
 
 foam.dao.Sink         decorated = decorateSink_(sink, skip, limit, order, predicate);
 foam.dao.Subscription sub       = new foam.dao.Subscription();
 
-java.nio.file.DirectoryStream<java.nio.file.Path> paths = new foam.nanos.fs.ResourceStorage(getDir()).getDirectoryStream("", "*.flow");
+Set<String> paths = storage.getAvailableFiles("", "*.flow");
 
-for ( java.nio.file.Path p : paths ) {
+for ( String path : paths ) {
+  if ( sub.getDetached() ) break;
+
   foam.flow.Document obj = new foam.flow.Document();
-  String id = p.getFileName().toString().substring(0, p.getFileName().toString().lastIndexOf(".flow"));
+  String id = path.substring(0, path.lastIndexOf(".flow"));
+
   obj.setId(id);
 
-  try {
-    byte[] bytes = java.nio.file.Files.readAllBytes(p);
-    obj.setMarkup(new String(bytes, java.nio.charset.Charset.forName("UTF-8")));
-    decorated.put(obj, sub);
-  } catch (java.io.IOException e) {
-    e.printStackTrace();
-  }
+  // TODO: We could parse the markup on the server to get the embedded title.
+
+  obj.setMarkup(new String(storage.getBytes(path), StandardCharsets.UTF_8));
+  decorated.put(obj, sub);
 }
 
 decorated.eof();
@@ -69,29 +77,19 @@ if ( ! id.matches("^[a-zA-Z0-9_-]+$") ) {
     {
       name: 'put_',
       javaCode: `
+Storage storage = x.get(Storage.class);
+
 String id = (String)getPK(obj);
 verifyId(id);
 
-java.nio.file.Path path = new foam.nanos.fs.FileSystemStorage(getDir()).getPath(id + ".flow");
-if ( ! java.nio.file.Files.exists(path) ) {
-  try {
-    if ( ! java.nio.file.Files.isDirectory(path.getParent()) ) {
-      java.nio.file.Files.createDirectories(path.getParent());
-    }
-    java.nio.file.Files.createFile(path);
-  } catch (java.io.IOException e) {
-    throw new RuntimeException(e);
-  }
-}
-
-java.io.OutputStream oStream = new foam.nanos.fs.FileSystemStorage(getDir()).getOutputStream(id + ".flow");
+OutputStream oStream = storage.getOutputStream(id + ".flow");
 
 if ( oStream == null ) {
   return obj;
 }
 
 try {
-  oStream.write(((foam.flow.Document)obj).getMarkup().getBytes(java.nio.charset.Charset.forName("UTF-8")));
+  oStream.write(((foam.flow.Document)obj).getMarkup().getBytes(StandardCharsets.UTF_8));
 } catch ( java.io.IOException e ) {
   throw new RuntimeException(e);
 }
@@ -116,27 +114,15 @@ return obj;`
 // TODO: Escape/sanitize file name
 verifyId((String)id);
 
-java.io.InputStream iStream = new foam.nanos.fs.FileSystemStorage(getDir()).getInputStream(id + ".flow");
-
-if ( iStream == null ) {
-  iStream = new foam.nanos.fs.ResourceStorage(getDir()).getInputStream(id + ".flow");
-  if ( iStream == null ) return null;
-}
+Storage storage = x.get(Storage.class);
+String path = (String)id + ".flow";
 
 foam.flow.Document obj = new foam.flow.Document();
 obj.setId((String)id);
 
 // TODO: We could parse the markup on the server to get the embedded title.
 
-try {
-  byte[] data = new byte[iStream.available()];
-  iStream.read(data);
-  obj.setMarkup(new String(data, java.nio.charset.Charset.forName("UTF-8")));
-} catch(java.io.IOException e) {
-  e.printStackTrace();
-  return null;
-}
-
+obj.setMarkup(new String(storage.getBytes(path), StandardCharsets.UTF_8));
 
 return obj;`
     }
