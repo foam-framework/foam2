@@ -107,6 +107,10 @@ foam.CLASS({
       name: 'createPM',
       args: [
         {
+          name: 'x',
+          type: 'X'
+        },
+        {
           name: 'op',
           type: 'String'
         }
@@ -115,7 +119,7 @@ foam.CLASS({
       javaCode: `
     PM pm = null;
     if ( getEnabled() ) {
-      pm = new PM();
+      pm =  (PM) x.get("PM");
       pm.setClassType(this.getClassType());
       pm.setName(op);
       pm.init_();
@@ -144,7 +148,7 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-    PM pm = createPM(getPutName());
+    PM pm = createPM(x, getPutName());
     try {
       return super.put_(x, obj);
     } finally {
@@ -156,7 +160,7 @@ foam.CLASS({
       name: 'find_',
       javaCode: `
     PM pm = null;
-    if ( getPmFind() ) pm = createPM(getFindName());
+    if ( getPmFind() ) pm = createPM(x, getFindName());
     try {
       return super.find_(x, id);
     } finally {
@@ -167,7 +171,7 @@ foam.CLASS({
     {
       name: 'select_',
       javaCode: `
-    PM pm = createPM(getSelectName());
+    PM pm = createPM(x, getSelectName());
     try {
       return super.select_(x, sink, skip, limit, order, predicate);
     } finally {
@@ -178,7 +182,7 @@ foam.CLASS({
     {
       name: 'removeAll_',
       javaCode: `
-    PM pm = createPM(getRemoveAllName());
+    PM pm = createPM(x, getRemoveAllName());
     try {
       super.removeAll_(x, skip, limit, order, predicate);
     } finally {
@@ -189,7 +193,7 @@ foam.CLASS({
     {
       name: 'cmd_',
       javaCode: `
-    PM pm = createPM(getCmdName());
+    PM pm = createPM(x, getCmdName());
     try {
       return super.cmd_(x, obj);
     } finally {
