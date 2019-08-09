@@ -127,11 +127,8 @@
       'E.g. on dao.put: before object was stored in a dao or after.'
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.mlang.predicate.Predicate',
+      class: 'foam.mlang.predicate.PredicateProperty',
       name: 'predicate',
-      // TODO make a friendlier view.
-      view: { class: 'foam.u2.view.JSONTextView' },
       javaFactory: `
       return foam.mlang.MLang.TRUE;
       `,

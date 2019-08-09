@@ -183,7 +183,10 @@ foam.CLASS({
     ['javaJSONParser', 'new foam.lib.json.ExprParser()'],
     {
       name: 'view',
-      value: { class: 'foam.u2.view.ExprView' }
+      value: {
+        class: 'foam.u2.view.FObjectView',
+        of: 'foam.mlang.Expr'
+      }
     }
   ],
 
