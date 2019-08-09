@@ -2764,7 +2764,10 @@ foam.CLASS({
   properties: [
     {
       name: 'view',
-      value: { class: 'foam.u2.view.JSONTextView' }
+      value: {
+        class: 'foam.u2.view.FObjectView',
+        of: 'foam.mlang.predicate.Predicate'
+      }
     }
   ]
 });
