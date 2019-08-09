@@ -99,6 +99,7 @@
         var E = foam.mlang.Expressions.create();
         return {
           class: 'foam.u2.view.RichChoiceView',
+          search: true,
           sections: [
             {
               heading: 'Services',
