@@ -38,7 +38,30 @@
 
    methods: [
      function initCView() {
-       this.SUPER();
+      this.SUPER();
+
+      this.onDetach(this.canvas.pointer.touch.sub(this.onTouch));
+
+      var self = this;
+
+      var mouseInput = this.canvas.pointer.mouseInput;
+      this.onDetach(mouseInput.down.sub(function() {
+        currentX = self.originX;
+        currentY = self.originY;
+        var downX = mouseInput.x;
+        var downY = mouseInput.y;
+        var moveSub = mouseInput.move.sub(function() {
+          nextX = mouseInput.x;
+          nextY = mouseInput.y;
+
+          self.originX = currentX + 2 * (downX - nextX);
+          self.originY = currentY + 2 * (downY - nextY);
+        });
+        mouseInput.up.sub(function(s) {
+          moveSub.detach();
+          s.detach();
+        });
+       }));
 
        if ( this.data ) {
         this.root = this.Node.create({x:500, y: 50, data: this.data});
