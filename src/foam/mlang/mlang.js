@@ -329,7 +329,7 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(_, o) {
-        if ( ! o.f && typeof o === "function" ) return foam.mlang.predicate.Func.create({ fn: o });
+        if ( typeof o === 'function' && ! o.f ) return foam.mlang.predicate.Func.create({ fn: o });
         return o;
       }
     }
