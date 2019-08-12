@@ -278,3 +278,46 @@ p({"class":"foam.nanos.boot.NSpec", "name":"capabilityDAO",                     
 p({"class":"foam.nanos.boot.NSpec","name":"userCapabilityJunctionDAO","lazy":false,"serve":true,"authenticate":false,"serviceScript":"dao = new foam.dao.EasyDAO.Builder(x).setAuthenticateRead(false).setAuthenticate(false).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"userCapabilityJunctions\").setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo()).build(); userCap =  new foam.nanos.crunch.UserCapabilityJunctionDAO.Builder(x).setDelegate(dao).build(); ruler = new foam.nanos.ruler.RulerDAO(x,userCap, \"userCapabilityJunctionDAO\"); return ruler;","client":"{\"of\":\"foam.nanos.crunch.UserCapabilityJunction\", \"remoteListenerSupport\": false}"})
 p({"class":"foam.nanos.boot.NSpec","name":"deprecatedCapabilityJunctionDAO","lazy":false,"serve":true,"authenticate":false,"serviceScript":"dao = new foam.dao.EasyDAO.Builder(x).setAuthenticateRead(false).setAuthenticate(false).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"deprecatedCapabilityJunctions\").setOf(foam.nanos.crunch.CapabilityCapabilityJunction.getOwnClassInfo()).build(); return new foam.nanos.auth.AuthorizationDAO(x, dao, new foam.nanos.auth.GlobalReadAuthorizer(\"deprecatedCapabilityJunction\"));","client":"{\"of\":\"foam.nanos.crunch.CapabilityCapabilityJunction\", \"remoteListenerSupport\": false}"})
 p({"class":"foam.nanos.boot.NSpec","name":"prerequisiteCapabilityJunctionDAO","lazy":false,"serve":true,"authenticate":false,"serviceScript":"dao = new foam.dao.EasyDAO.Builder(x).setAuthenticateRead(false).setAuthenticate(false).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"prerequisiteCapabilityJunctions\").setOf(foam.nanos.crunch.CapabilityCapabilityJunction.getOwnClassInfo()).build(); return new foam.nanos.auth.AuthorizationDAO(x, dao, new foam.nanos.auth.GlobalReadAuthorizer(\"prerequisiteCapabilityJunction\"));","client":"{\"of\":\"foam.nanos.crunch.CapabilityCapabilityJunction\", \"remoteListenerSupport\": false}"})
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "strategyDAO",
+  "description": "A DAO that knows which objects in the system implement the various interfaces present in the system. It is used on the server by the Strategizer service.",
+  "serve": true,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setGuid(true)
+      .setOf(foam.strategy.StrategyReference.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("strategyReferences")
+      .build();
+  """,
+  "client": """
+    {
+      "of": "foam.strategy.StrategyReference",
+      "remoteListenerSupport": false
+    }
+  """,
+  "documentation": "A DAO that knows which objects in the system implement the various interfaces present in the system. It is used on the server by the Strategizer service.",
+  "authNotes": "This DAO is decorated with a standard AuthenticatedDAO via EasyDAO."
+})
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "strategizer",
+  "description": "A service that can give you a list of all models in the system that implement a given interface.",
+  "serve": true,
+  "serviceClass": "foam.strategy.BasicStrategizer",
+  "boxClass": "foam.strategy.StrategizerServiceSkeleton",
+  "documentation": "A service that can give you a list of all models in the system that implement a given interface.",
+  "client": """
+    {
+      "class": "foam.strategy.ClientStrategizerService",
+      "delegate": {
+        "class": "foam.box.SessionClientBox",
+        "delegate": {
+          "class": "foam.box.HTTPBox",
+          "url": "service/strategizer"
+        }
+      }
+    }
+  """
+})
