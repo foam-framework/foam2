@@ -16,12 +16,12 @@ public class ResourceStorage extends AbstractStorage {
 
   public ResourceStorage() {
     super();
-    resourceJar_ = System.getenv("RES_JAR_HOME");;
+    resourceJar_ = System.getenv("RES_JAR_HOME");
   }
 
   public ResourceStorage (String root) {
     super(root);
-    resourceJar_ = System.getenv("RES_JAR_HOME");;
+    resourceJar_ = System.getenv("RES_JAR_HOME");
   }
 
   @Override
