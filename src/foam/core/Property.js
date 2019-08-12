@@ -434,7 +434,7 @@ foam.CLASS({
           return prop.toSlot(this);
         },
         set: function propertySlotSetter(slot2) {
-          prop.toSlot(this).linkFrom(slot2);
+          this.onDetach(prop.toSlot(this).linkFrom(slot2));
         },
         configurable: true,
         enumerable: false
