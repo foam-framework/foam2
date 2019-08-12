@@ -20,10 +20,6 @@ foam.CLASS({
   extends: 'foam.dao.AbstractDAO',
   properties: [
     {
-      class: 'String',
-      name: 'dir'
-    },
-    {
       name: 'of',
       javaFactory: 'return foam.flow.Document.getOwnClassInfo();'
     },
@@ -98,15 +94,7 @@ return obj;`
     },
     {
       name: 'remove_',
-      javaCode: `java.nio.file.FileSystem fs = java.nio.file.FileSystems.getDefault();
-java.nio.file.Path path = fs.getPath(getDir(), ((String)getPK(obj)) + ".flow");
-try {
-  java.nio.file.Files.deleteIfExists(path);
-} catch ( java.io.IOException e ) {
-  throw new RuntimeException(e);
-}
-
-return obj;`
+      javaCode: `throw new UnsupportedOperationException("Can't remove on DocumentationFolderDAO");`
     },
     {
       name: 'find_',
