@@ -420,6 +420,27 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.parse',
+  name: 'Implied',
+
+  documentation: `Returns a value without affecting the
+    parser state.`,
+
+  properties: [
+    {
+      name: 'value',
+    }
+  ],
+
+  methods: [
+    function parse(ps) {
+      return ps.setValue(this.value);
+    },
+
+    function toString() { return 'implied(' + this.SUPER() + ')'; }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.parse',
@@ -471,6 +492,38 @@ foam.CLASS({
     function parse(ps) {
       return ps.valid && this.string.indexOf(ps.head) !== -1 ?
         ps.tail : undefined;
+    },
+
+    function toString() {
+      var str = this.string;
+      var chars = new Array(str.length);
+      for ( var i = 0; i < str.length; i++ ) {
+        chars[i] = str.charAt(i);
+      }
+      return 'chars("' + chars.join('", "') + '")';
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse',
+  name: 'Chars1',
+
+  documentation: `Matches against any of the chars specified
+    in the argument string and returns the matched char.`,
+
+  properties: [
+    {
+      name: 'string',
+      final: true
+    }
+  ],
+
+  methods: [
+    function parse(ps) {
+      if (!ps.valid) return undefined;
+      var ind = this.string.indexOf(ps.head);
+      return ind !== -1 ? ps.tail.setValue(this.string.charAt(ind)) : undefined;
     },
 
     function toString() {
@@ -598,6 +651,59 @@ foam.CLASS({
 
     function toString() {
       return 'until(' + this.SUPER() + ')';
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse',
+  name: 'UntilEscaped',
+  extends: 'foam.parse.ParserDecorator',
+
+  documentation: `Matches any characters until the terminating pattern,
+    unless terminating pattern has a leading escape pattern.
+    Consumes and discards the terminating pattern when found.  Fails if termination was never found.`,
+
+  properties: [
+    {
+      name: 'esc',
+      class: 'foam.parse.ParserProperty',
+      final: true
+    },
+    {
+      name: 'term',
+      class: 'foam.parse.ParserProperty',
+      final: true
+    }
+  ],
+
+  methods: [
+    function parse(ps, obj) {
+      var ret = [];
+      var esc = this.esc;
+      var term = this.term;
+
+      while ( ps.valid ) {
+        var res;
+
+        if ( res = ps.apply(esc, obj) ) {
+          ret.push(res.value);
+          ps = res;
+          continue;
+        }
+
+        if ( res = ps.apply(term, obj) ) {
+          return res.setValue(ret);
+        }
+
+        ret.push(ps.head);
+        ps = ps.tail;
+      }
+      return undefined;
+    },
+
+    function toString() {
+      return 'untilEscaped(' + this.SUPER() + ')';
     }
   ]
 });
@@ -775,6 +881,7 @@ foam.CLASS({
     'foam.parse.Alternate',
     'foam.parse.AnyChar',
     'foam.parse.Chars',
+    'foam.parse.Chars1',
     'foam.parse.Literal',
     'foam.parse.LiteralIC',
     'foam.parse.EOF',
@@ -792,7 +899,9 @@ foam.CLASS({
     'foam.parse.Substring',
     'foam.parse.Symbol',
     'foam.parse.Until',
+    'foam.parse.UntilEscaped',
     'foam.parse.Join',
+    'foam.parse.Implied',
   ],
 
   axioms: [ foam.pattern.Singleton.create() ],
@@ -855,6 +964,13 @@ foam.CLASS({
       });
     },
 
+    function untilEscaped(esc, term) {
+      return this.UntilEscaped.create({
+        esc: esc,
+        term: term,
+      });
+    },
+
     function join(p) {
       return this.Join.create({
         p: p
@@ -899,6 +1015,12 @@ foam.CLASS({
       });
     },
 
+    function chars1(s) {
+      return this.Chars1.create({
+        string: s
+      });
+    },
+
     function not(p, opt_else) {
       return this.Not.create({
         p: p,
@@ -932,6 +1054,12 @@ foam.CLASS({
 
     function anyChar() {
       return this.AnyChar.create();
+    },
+
+    function implied(value) {
+      return this.Implied.create({
+        value: value,
+      });
     }
   ]
 });
