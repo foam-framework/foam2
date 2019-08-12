@@ -391,7 +391,7 @@ foam.CLASS({
       }
 
       var name        = prop.name;
-      var adapt       = prop.adapt
+      var adapt       = prop.adapt;
       var assertValue = prop.assertValue;
       var preSet      = prop.preSet;
       var postSet     = prop.postSet;
