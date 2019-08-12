@@ -577,8 +577,11 @@ foam.CLASS({
     {
       name: 'delegate',
       postSet: function(_, n) {
-        this.sub_ && this.sub_.detach();
-        this.sub_ = n && this.linkFrom(n);
+        if ( this.sub_ ) this.sub_.detach();
+
+        if ( foam.core.Slot.isInstance(n) ) {
+          this.sub_ = this.linkFrom(n);
+        }
       }
     }
   ]
