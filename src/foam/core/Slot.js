@@ -329,9 +329,16 @@ foam.CLASS({
       this.prevSub && this.prevSub.detach();
       var o = this.parent.get();
 
+      // Record the 'of' of the parent so we can tell when it changes.
+      if ( ! this.of && o ) this.of = o.cls_.id;
+
       // If the parent object changes class, then don't update
       // because a new class will have different sub-slots.
-      if ( ! this.of && o ) this.of = o.cls_;
+      if ( o && ( this.of !== o.cls_.id || o.cls_.getAxiomByName(this.name) == null ) ) {
+        this.prevSub = null;
+        this.detach();
+        return;
+      }
 
       this.prevSub = o && o.slot && o.slot(this.name).sub(this.valueChange);
       this.valueChange();
