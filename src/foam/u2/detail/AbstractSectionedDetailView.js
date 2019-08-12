@@ -27,8 +27,8 @@ foam.CLASS({
       factory: function() {
         return this.hasOwnProperty('of') ? this.of.create(null, this) : null;
       },
-      postSet: function() {
-        this.of = undefined;
+      postSet: function(oldValue, newValue) {
+        this.of = newValue ? newValue.cls_ : undefined;
       }
     },
     {
