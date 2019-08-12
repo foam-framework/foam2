@@ -288,6 +288,7 @@ var classes = [
   'foam.nanos.notification.NotificationTemplateDAO',
   'foam.nanos.notification.notifications.ScriptRunNotification',
   'foam.nanos.script.Script',
+  'foam.nanos.script.CsvUploadScript',
 //  'foam.nanos.script.ScriptCompiler',
 //  'foam.nanos.script.JavaShellScriptCompiler',
   'foam.nanos.script.TestRunnerScript',
