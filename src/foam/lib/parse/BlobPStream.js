@@ -25,8 +25,6 @@ foam.CLASS({
       javaFactory: `
         java.io.OutputStream os = new java.io.ByteArrayOutputStream(1);
         getBlob().read(os, getPos_(), 1);
-        System.out.println("HEAD: " + os.toString());
-        System.out.println("HEAD2: " + getPos_());
         return os.toString();
       `
     },
@@ -35,7 +33,6 @@ foam.CLASS({
       of: 'foam.lib.parse.BlobPStream',
       name: 'tail_',
       javaFactory: `
-        System.out.println("TAIL: " + getPos_());
         return new BlobPStream.Builder(getX())
           .setPos_(getPos_() + 1)
           .setBlob(getBlob())
