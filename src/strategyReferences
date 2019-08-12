@@ -1,0 +1,4 @@
+p({"class":"foam.strategy.StrategyReference","id":"1af7d5c6-5236-4165-8444-6d378574bc15","desiredModelId":"foam.mlang.predicate.Predicate","strategy":"foam.mlang.predicate.Eq"})
+p({"class":"foam.strategy.StrategyReference","id":"35fa57a1-2189-fab3-bf8b-90176446e33c","desiredModelId":"foam.mlang.predicate.Predicate","strategy":"foam.mlang.predicate.Neq"})
+p({"class":"foam.strategy.StrategyReference","id":"fa044742-f7eb-ed3b-62a2-4b5ba276e246","desiredModelId":"foam.mlang.predicate.Predicate","strategy":"foam.mlang.predicate.And"})
+p({"class":"foam.strategy.StrategyReference","id":"2c1799d7-afa3-4768-92a0-8245b3cd5180","desiredModelId":"foam.mlang.Expr","strategy":"foam.mlang.Constant"})
