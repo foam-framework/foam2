@@ -42,7 +42,7 @@ foam.CLASS({
               and load them all.*/
             X resourceStorageX = x;
             if ( System.getProperty("resource.journals.dir") != null ) {
-              resourceStorageX = x.put(foam.nanos.fs.ResourceStorage.class,
+              resourceStorageX = x.put(foam.nanos.fs.Storage.class,
                   new ResourceStorage(System.getProperty("resource.journals.dir")));
             }
 
