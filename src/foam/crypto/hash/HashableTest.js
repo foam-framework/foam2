@@ -23,7 +23,7 @@ foam.CLASS({
           .setId(1000)
           .setFirstName("Kirk")
           .setLastName("Eaton")
-          .setEmail("kirk@nanopay.net")
+          .setEmail("kirk@kirkopay.net")
           .build();
 
         // non-chained hash with correct digest
