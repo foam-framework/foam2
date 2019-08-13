@@ -56,22 +56,7 @@ foam.CLASS({
     },
     {
       class: 'Class',
-      name: 'of',
-      postSet: function(oldValue, newValue) {
-        if ( ! newValue ) return;
-
-        // If this view is being used in a nanos application, then use the
-        // strategizer service to populate the list of choices. Otherwise
-        // populate the list of choices using models related to 'of' via the
-        // implements and extends relations.
-        if ( this.strategizer != null ) {
-          this.strategizer.query(null, newValue).then((strategyReferences) => {
-            this.choices = strategyReferences.map((sr) => [sr.strategy.id, sr.strategy.id]);
-          });
-        } else {
-          this.choices = this.choicesFallback(newValue);
-        }
-      }
+      name: 'of'
     },
     {
       class: 'Array',
@@ -85,6 +70,30 @@ foam.CLASS({
   ],
 
   methods: [
+    function init() {
+      this.of$.sub(this.updateChoices);
+      this.updateChoices();
+    },
+
+    function updateChoices() {
+      if ( this.of == null ) {
+        this.choices = [];
+        return;
+      }
+
+      // If this view is being used in a nanos application, then use the
+      // strategizer service to populate the list of choices. Otherwise
+      // populate the list of choices using models related to 'of' via the
+      // implements and extends relations.
+      if ( this.strategizer != null ) {
+        this.strategizer.query(null, this.of.id).then((strategyReferences) => {
+          this.choices = strategyReferences.map((sr) => [sr.strategy.id, sr.strategy.id]);
+        });
+      } else {
+        this.choices = this.choicesFallback(this.of);
+      }
+    },
+
     function initE() {
       this.SUPER();
       this
