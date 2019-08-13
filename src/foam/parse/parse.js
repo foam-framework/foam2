@@ -507,39 +507,6 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.parse',
-  name: 'Chars1',
-
-  documentation: `Matches against any of the chars specified
-    in the argument string and returns the matched char.`,
-
-  properties: [
-    {
-      name: 'string',
-      final: true
-    }
-  ],
-
-  methods: [
-    function parse(ps) {
-      if (!ps.valid) return undefined;
-      var ind = this.string.indexOf(ps.head);
-      return ind !== -1 ? ps.tail.setValue(this.string.charAt(ind)) : undefined;
-    },
-
-    function toString() {
-      var str = this.string;
-      var chars = new Array(str.length);
-      for ( var i = 0; i < str.length; i++ ) {
-        chars[i] = str.charAt(i);
-      }
-      return 'chars("' + chars.join('", "') + '")';
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.parse',
   name: 'Range',
 
   documentation: `Matches against a range of chars specified
@@ -881,7 +848,6 @@ foam.CLASS({
     'foam.parse.Alternate',
     'foam.parse.AnyChar',
     'foam.parse.Chars',
-    'foam.parse.Chars1',
     'foam.parse.Literal',
     'foam.parse.LiteralIC',
     'foam.parse.EOF',
@@ -1011,12 +977,6 @@ foam.CLASS({
 
     function chars(s) {
       return this.Chars.create({
-        string: s
-      });
-    },
-
-    function chars1(s) {
-      return this.Chars1.create({
         string: s
       });
     },
