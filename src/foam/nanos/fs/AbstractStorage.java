@@ -1,5 +1,7 @@
 package foam.nanos.fs;
 
+import foam.util.SafetyUtil;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -78,16 +80,16 @@ public abstract class AbstractStorage implements Storage {
 
   @Override
   public Set<String> getAvailableFiles(String name, String glob) {
-    Path path = getPath(name);
+    Path path = getPath(SafetyUtil.isEmpty(name) ? "." : name);
     if ( path == null ) return null;
     Path root = getRootPath();
     if ( root == null ) return null;
 
     Set<String> paths = new HashSet<>();
 
-    try (DirectoryStream<Path> contents = java.nio.file.Files.newDirectoryStream(path, glob)) {
+    try (DirectoryStream<Path> contents = java.nio.file.Files.newDirectoryStream(path, SafetyUtil.isEmpty(glob) ? "*" : glob)) {
       for ( Path p : contents ) {
-        paths.add(p.relativize(root).toString());
+        paths.add(root.relativize(p).toString());
       }
     } catch (IOException e) {
       throw new RuntimeException(e);

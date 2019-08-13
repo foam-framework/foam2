@@ -13,7 +13,7 @@ public class FallbackStorage implements Storage {
   protected Storage storage_;
   protected Storage fallback_;
 
-  FallbackStorage(Storage storage, Storage fallback) {
+  public FallbackStorage(Storage storage, Storage fallback) {
     storage_ = storage;
     fallback_ = fallback;
   }

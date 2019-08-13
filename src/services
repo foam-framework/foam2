@@ -208,11 +208,7 @@ p({
   "serve": true,
   "serviceScript":
   """
-  X storageX = x.put(foam.nanos.fs.Storage.class, new foam.nanos.fs.FallbackStorage(
-    new foam.nanos.fs.FileSystemStorage(System.getProperty("DOCUMENT_HOME")),
-    new foam.nanos.fs.ResourceStorage("documents")
-  ));
-  return new foam.dao.ReadOnlyDAO.Builder(x).setDelegate(new foam.flow.DocumentationFolderDAO.Builder(storageX).build()).build();
+  return new foam.dao.ReadOnlyDAO.Builder(x).setDelegate(new foam.flow.DocumentationFolderDAO.Builder(x).build()).build();
   """,
   "client":
   """

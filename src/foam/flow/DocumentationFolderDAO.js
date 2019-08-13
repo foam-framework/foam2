@@ -26,13 +26,23 @@ foam.CLASS({
     {
       name: 'delegate',
       javaFactory: 'return new foam.dao.MDAO.Builder(getX()).build();'
+    },
+    {
+      class: 'Object',
+      name: 'storage',
+      javaType: 'foam.nanos.fs.Storage',
+      javaFactory: `
+return new foam.nanos.fs.FallbackStorage(
+  new foam.nanos.fs.FileSystemStorage(System.getProperty("DOCUMENT_HOME")),
+  new foam.nanos.fs.ResourceStorage("documents")
+);`
     }
   ],
   methods: [
     {
       name: 'select_',
       javaCode: `
-Storage storage = x.get(Storage.class);
+Storage storage = getStorage();
 
 sink = prepareSink(sink);
 
@@ -73,7 +83,7 @@ if ( ! id.matches("^[a-zA-Z0-9_-]+$") ) {
     {
       name: 'put_',
       javaCode: `
-Storage storage = x.get(Storage.class);
+Storage storage = getStorage();
 
 String id = (String)getPK(obj);
 verifyId(id);
@@ -102,7 +112,7 @@ return obj;`
 // TODO: Escape/sanitize file name
 verifyId((String)id);
 
-Storage storage = x.get(Storage.class);
+Storage storage = getStorage();
 String path = (String)id + ".flow";
 
 foam.flow.Document obj = new foam.flow.Document();
