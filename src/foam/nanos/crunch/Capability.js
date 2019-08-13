@@ -36,6 +36,8 @@ foam.CLASS({
     'enabled',
     'visible',
     'expiry',
+    'price',
+    'featured',
     'daoKey'
   ],
 
@@ -94,6 +96,14 @@ foam.CLASS({
       name: 'permissionsGranted',
       class: 'StringArray',
       documentation: `List of permissions granted by this capability`
+    },
+    {
+      name: 'price',
+      class: 'Int'
+    },
+    {
+      name: 'featured',
+      class: 'Boolean'
     },
     {
       name: 'daoKey',
