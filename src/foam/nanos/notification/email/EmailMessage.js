@@ -14,7 +14,15 @@ foam.CLASS({
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.LastModifiedByAware'
- ],
+  ],
+
+  tableColumns: [
+    'created',
+    'subject',
+    'to',
+    'from',
+    'status'
+  ],
 
   properties: [
     {
@@ -24,6 +32,7 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'created',
+      tableWidth: 170
     },
     {
       class: 'Reference',
@@ -86,7 +95,8 @@ foam.CLASS({
     {
       class: 'Enum',
       of: 'foam.nanos.notification.email.Status',
-      name: 'status'
+      name: 'status',
+      tableWidth: 100
     },
   ]
 });
