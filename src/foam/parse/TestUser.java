@@ -30,9 +30,9 @@ public class TestUser {
     // add some data test
     User u1 = new User();
     u1.setId(6);
-    u1.setFirstName("Simon");
-    u1.setLastName("Keogh");
-    u1.setOrganization("nanopay");
+    u1.setFirstName("Michael");
+    u1.setLastName("Connor");
+    u1.setOrganization("Foam");
     u1.setBusinessName("programmer");
     u1.setLanguage("en");
     Date date = new GregorianCalendar(2010, 8, 10).getTime();//September
