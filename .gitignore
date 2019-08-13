@@ -28,8 +28,3 @@ src/cronjobs
 src/notifications
 src/ruleHistory
 src/agentJunctions
-src/deprecatedCapabilityJunctions
-src/PMDaily
-src/PMHourly
-src/userCapabilityJunctions
-src/prerequisiteCapabilityJunctions
