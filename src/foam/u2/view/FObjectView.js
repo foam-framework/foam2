@@ -87,7 +87,7 @@ foam.CLASS({
       // implements and extends relations.
       if ( this.strategizer != null ) {
         this.strategizer.query(null, this.of.id).then((strategyReferences) => {
-          this.choices = strategyReferences.map((sr) => [sr.strategy.id, sr.strategy.id]);
+          this.choices = strategyReferences.map((sr) => [sr.strategy.id, sr.strategy.name]);
         });
       } else {
         this.choices = this.choicesFallback(this.of);
