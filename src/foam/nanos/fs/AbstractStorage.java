@@ -80,7 +80,7 @@ public abstract class AbstractStorage implements Storage {
 
   @Override
   public Set<String> getAvailableFiles(String name, String glob) {
-    Path path = getPath(SafetyUtil.isEmpty(name) ? "." : name);
+    Path path = getPath(name);
     if ( path == null ) return null;
     Path root = getRootPath();
     if ( root == null ) return null;
