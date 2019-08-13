@@ -75,6 +75,12 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaCode: 'return getProperty().getName();'
+    },
+    {
+      name: 'toString',
+      code: function() {
+        return foam.String.constantize(this.property.name);
+      }
     }
   ]
 });
