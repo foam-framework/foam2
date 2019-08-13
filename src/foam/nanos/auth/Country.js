@@ -35,6 +35,16 @@ foam.CLASS({
       class: 'StringArray',
       name: 'alternativeNames',
       documentation: `A list of known alternative country names.`,
+    },
+    {
+      class: 'Date',
+      name: 'date',
+      factory: function() {
+        return null;
+      },
+      postSet: function(_, n) {
+        console.log(n);
+      }
     }
   ],
   methods: [{
