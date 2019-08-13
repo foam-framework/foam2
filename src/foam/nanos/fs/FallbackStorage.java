@@ -3,9 +3,6 @@ package foam.nanos.fs;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Path;
-import java.util.List;
 import java.util.Set;
 
 public class FallbackStorage implements Storage {
