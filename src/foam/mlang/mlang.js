@@ -706,6 +706,9 @@ foam.CLASS({
     function toIndex(tail) {
       return this.arg1 && this.arg1.toIndex(tail);
     },
+    function toSummary() {
+      return this.toString();
+    },
     {
       name: 'toString',
       code: function() {
@@ -748,6 +751,9 @@ foam.CLASS({
   ],
 
   methods: [
+    function toSummary() {
+      return this.toString();
+    },
     function toString() {
       var s = foam.String.constantize(this.cls_.name) + '(';
       for ( var i = 0 ; i < this.args.length ; i++ ) {
