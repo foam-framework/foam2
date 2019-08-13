@@ -84,6 +84,16 @@ foam.CLASS({
   ],
 
   methods: [
+    function init() {
+      if ( this.data ) {
+        this.dao.find(this.data).then((obj) => {
+          this.selection_ = this.filteredProperty.f(obj);
+        }).catch((err) => {
+          console.error(err);
+        })
+      }
+    },
+
     function initE() {
       this
         .tag(this.filteringView, {
