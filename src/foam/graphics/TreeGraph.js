@@ -40,29 +40,6 @@
      function initCView() {
       this.SUPER();
 
-      this.onDetach(this.canvas.pointer.touch.sub(this.onTouch));
-
-      var self = this;
-
-      var mouseInput = this.canvas.pointer.mouseInput;
-      this.onDetach(mouseInput.down.sub(function() {
-        currentX = self.originX;
-        currentY = self.originY;
-        var downX = mouseInput.x;
-        var downY = mouseInput.y;
-        var moveSub = mouseInput.move.sub(function() {
-          nextX = mouseInput.x;
-          nextY = mouseInput.y;
-
-          self.originX = currentX + 2 * (downX - nextX);
-          self.originY = currentY + 2 * (downY - nextY);
-        });
-        mouseInput.up.sub(function(s) {
-          moveSub.detach();
-          s.detach();
-        });
-       }));
-
        if ( this.data ) {
         this.root = this.Node.create({x:500, y: 50, data: this.data});
         this.add(this.root);
@@ -82,13 +59,21 @@
              c.childNodes[i].x = 0;
            }
            c.maxLeft = c.maxRight = 0;
+
+           
          }
          this.doLayout();
        }.bind(this));
      },
 
      function doLayout() {
-       if ( this.root ) { this.root.layout(); this.root.doLayout(); }
+       if ( this.root ) { 
+        
+        this.root.layout();
+
+        this.root.doLayout();
+      }
+
        this.invalidate();
      }
    ],
@@ -292,27 +277,64 @@
        ],
 
        listeners: [
-         {
-           name: 'doLayout',
-           isFramed: true,
-           documentation: 'Animate layout until positions stabilize',
-           code: function() {
-             var needsLayout = false;
-             // Scale and translate the view to fit in the available window
-             var gw = this.graph.width-110;
-             var w  = this.maxRight - this.maxLeft + 55;
-             if ( w > gw ) {
-               var scaleX = Math.min(1, gw / w);
-               needsLayout = this.convergeTo(this.scaleX$, scaleX) || needsLayout;
-             }
+        {
+          name: 'doLayout',
+          isFramed: true,
+          documentation: 'Animate layout until positions stabilize',
+          code: function() {
+            var needsLayout = false;
+            // Scale and translate the view to fit in the available window
+            var gw = this.graph.width-110;
+            var w  = this.maxRight - this.maxLeft + 55;
+            // if ( w > gw ) {
+            //   var scaleX = Math.min(1, gw / w);
+            //   needsLayout = this.convergeTo(this.scaleX$, scaleX) || needsLayout;
+            // }
 
-             var x = (-this.maxLeft+25)/w * gw + 55;
-             needsLayout = this.convergeTo(this.x$, x) || needsLayout;
-             if ( this.layout() || needsLayout ) this.doLayout();
-             this.graph.invalidate();
-           }
-         }
+            var x = (-this.maxLeft+25)/w * gw + 55;
+            needsLayout = this.convergeTo(this.x$, x) || needsLayout;
+            if ( this.layout() || needsLayout ) this.doLayout();
+            else {
+              this.graph.updateCWidth();
+            }
+            this.graph.invalidate();
+          }
+        }
        ]
+     }
+   ],
+
+   listeners: [
+     {
+       name: 'updateCWidth',
+       isFramed: true,
+       code: function() {
+        const maxes = {
+          maxLeft: 0,
+          maxRight: 1000
+        };
+          
+        const traverseAndCompare = root  => {
+          if ( root.x < maxes.maxLeft ) maxes.maxLeft = root.x;
+          if ( root.x > maxes.maxRight ) maxes.maxRight = root.x;
+
+          for ( var i = 0; i < root.children.length; i++ ){
+            traverseAndCompare(root.children[i]);
+          }
+          return;
+        }
+
+        traverseAndCompare(this.root);
+
+        var width = Math.abs(maxes.maxLeft - maxes.maxRight) + 1000;
+        var delta = Math.abs(this.width - width) / width;
+
+        if ( delta > 0.01 ) {
+          this.width = width;
+          this.doLayout();
+          console.log(this.width);
+        }
+       }
      }
    ]
  });
