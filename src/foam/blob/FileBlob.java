@@ -41,6 +41,6 @@ public class FileBlob extends AbstractBlob {
 
   @Override
   public long getSize() {
-    return file_.getTotalSpace();
+    return file_.length();
   }
 }
