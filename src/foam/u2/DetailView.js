@@ -215,15 +215,9 @@ foam.CLASS({
                 hasTabs = true;
                 var label = p.label;
                 let tab = self.Tab.create({ label: label });
-
-                var dao = p.get(self.data);
-
-                if (p.cls_ == foam.dao.ManyToManyRelationshipProperty) {
-                  var many2many = dao;
-                  dao = dao.getDAO();
-
-                }
-
+                var dao = p.cls_ == foam.dao.ManyToManyRelationshipProperty
+                  ? p.get(self.data).getDAO()
+                  : p.get(self.data);
                 dao.select(expr.COUNT()).then(function(c) {
                   tab.label = label + ' (' + c.value + ')';
                 });
