@@ -3154,7 +3154,7 @@ foam.CLASS({
   implements: [ 'foam.core.Serializable' ],
 
   documentation: `A binary predicate that evaluates arg1 as a predicate with
-    arg2 as its argument.',
+    arg2 as its argument.`,
 
   properties: [
     {
