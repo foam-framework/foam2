@@ -309,13 +309,12 @@
        name: 'updateCWidth',
        isFramed: true,
        code: function() {
-         console.log('hit')
         const maxes = {
           maxLeft: 0,
           maxRight: 0
         };
           
-        const traverseAndCompare = (root)  => {
+        const traverseAndCompare = root  => {
           if ( root.maxLeft < maxes.maxLeft ) maxes.maxLeft = root.maxLeft;
           if ( root.maxRight > maxes.maxRight ) maxes.maxRight = root.maxRight;
 
@@ -334,7 +333,6 @@
         if ( delta > 0.01 ) {
           this.width = width;
           this.doLayout();
-          console.log(this.width);
         }
        }
      }
