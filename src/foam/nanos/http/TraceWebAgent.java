@@ -89,9 +89,9 @@ public class TraceWebAgent
       out.println("<BR>\n" +
                   "<TABLE BORDER=1 ALIGN=\"CENTER\">\n" +
                   "<TR BGCOLOR=\"#FFAD00\">\n" +
-                  "<TH>Nanopay Parameter Name<TH>Parameter Value");
+                  "<TH>Parameter Name<TH>Parameter Value");
 
-      // Nanopay parameters
+      // Parameters
       if ( params != null ) {
         out.println("<TR><TD>WebAgent Parameters");
         out.println("    <TD>" + params);
