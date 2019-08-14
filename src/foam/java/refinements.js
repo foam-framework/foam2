@@ -1464,7 +1464,7 @@ foam.CLASS({
               try {
                 if ( prop.get(obj) == null ) prop.set(obj, prop.of().newInstance());
                 map2.get(key).set((foam.core.FObject) prop.get(obj), str);
-              } catch(Exception e) {
+              } catch ( Throwable t ) {
                 // ???
               }
             }
