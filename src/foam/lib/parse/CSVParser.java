@@ -34,7 +34,10 @@ public class CSVParser
         unquotedText
       )
     );
-    Parser csvRow = new Repeat(field, new Chars(","));
+    Parser csvRow = new Seq1(0,
+        new Repeat(field, new Chars(",")),
+        new Repeat(new Chars("\n\r"))
+    );
 
     foam.core.Detachable detach = this;
 
@@ -51,7 +54,6 @@ public class CSVParser
         if ( ps == null ) return null;
 
         Object[] headers = (Object[]) ps.value();
-        ps = ps.tail();
 
         while ( ! detached && ps.valid() ) {
           ps = csvRow.parse(ps, px);
@@ -66,7 +68,6 @@ public class CSVParser
           } catch ( Exception e ) {
             return null;
           }
-          ps = ps.tail();
         }
 
         return ps;
