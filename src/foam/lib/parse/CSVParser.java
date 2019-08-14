@@ -40,6 +40,13 @@ public class CSVParser
 
     setDelegate(new Parser() {
       public PStream parse(PStream ps, ParserContext px) {
+
+        java.util.Map<String, foam.lib.csv.FromCSVSetter> propMap =
+          new java.util.HashMap<>();
+        info.getAxiomsByClass(foam.core.PropertyInfo.class)
+          .forEach(p -> ((foam.core.PropertyInfo) p)
+              .fromCSVLabelMapping(propMap));
+
         ps = csvRow.parse(ps, px);
         if ( ps == null ) return null;
 
@@ -53,7 +60,7 @@ public class CSVParser
           try {
             foam.core.FObject obj = (foam.core.FObject) info.newInstance();
             for ( int i = 0 ; i < Math.min(values.length, headers.length) ; i++ ) {
-              obj.setProperty((String)headers[i], values[i]);
+              propMap.get((String)headers[i]).set(obj, (String) values[i]);
             }
             sink.put(obj, detach);
           } catch ( Exception e ) {
