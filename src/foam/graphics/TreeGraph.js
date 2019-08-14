@@ -271,7 +271,7 @@
              slot.set(newValue);
              return false;
            }
-           slot.set((14*slot.get() + newValue)/15);
+           slot.set((2*slot.get() + newValue)/3);
            return true;
          }
        ],
@@ -309,24 +309,26 @@
        name: 'updateCWidth',
        isFramed: true,
        code: function() {
+         console.log('hit')
         const maxes = {
           maxLeft: 0,
-          maxRight: 1000
+          maxRight: 0
         };
           
-        const traverseAndCompare = root  => {
-          if ( root.x < maxes.maxLeft ) maxes.maxLeft = root.x;
-          if ( root.x > maxes.maxRight ) maxes.maxRight = root.x;
+        const traverseAndCompare = (root)  => {
+          if ( root.maxLeft < maxes.maxLeft ) maxes.maxLeft = root.maxLeft;
+          if ( root.maxRight > maxes.maxRight ) maxes.maxRight = root.maxRight;
 
           for ( var i = 0; i < root.children.length; i++ ){
-            traverseAndCompare(root.children[i]);
+            traverseAndCompare(root.children[i], root.x);
           }
           return;
         }
 
         traverseAndCompare(this.root);
 
-        var width = Math.abs(maxes.maxLeft - maxes.maxRight) + 1000;
+        // 300 gives a clear view of the spacing
+        var width = Math.abs(maxes.maxLeft - maxes.maxRight) + 400;
         var delta = Math.abs(this.width - width) / width;
 
         if ( delta > 0.01 ) {
