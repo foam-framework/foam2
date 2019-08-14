@@ -3,7 +3,7 @@ foam.CLASS({
   name: 'FilteredReferenceView',
   extends: 'foam.u2.View',
   documentation: `
-    FilteredReferenceView is basically two reference views, 
+    FilteredReferenceView includes two reference views, 
     the content of the second one is filtered by the choice of
     the first reference view. 
   `,
