@@ -38,9 +38,6 @@ public class PostgresDAO
     }
   };
 
-  protected String table_;
-  protected List<PropertyInfo> props_ = new ArrayList<>();
-
   public PostgresDAO(X x, ClassInfo of) throws java.sql.SQLException, ClassNotFoundException {
     super(x, of);
   }
@@ -57,7 +54,7 @@ public class PostgresDAO
 
       StringBuilder builder = sb.get()
           .append("select * from ")
-          .append(table_);
+          .append(tableName_);
 
       if ( predicate != null ) {
         builder.append(" where ")
@@ -89,76 +86,9 @@ public class PostgresDAO
       }
 
       return sink;
-    } catch (Throwable e) {
+    } catch ( Throwable e ) {
       Logger logger = (Logger) x.get("logger");
       logger.error(e);
-      return null;
-    } finally {
-      closeAllQuietly(resultSet, stmt);
-    }
-  }
-
-  @Override
-  public FObject remove_(X x, FObject o) {
-    Connection c = null;
-    IndexedPreparedStatement stmt = null;
-
-    try {
-      c = connectionPool.getConnection();
-      StringBuilder builder = sb.get()
-          .append("delete from ")
-          .append(table_)
-          .append(" where ")
-          .append(getPrimaryKey().createStatement())
-          .append(" = ?");
-
-      stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
-      // TODO: add support for non-numbers
-      //stmt.setLong(((Number) o.getProperty("id")).longValue());
-      stmt.setObject(o.getProperty(getPrimaryKey().getName()));
-
-      int removed = stmt.executeUpdate();
-      if ( removed == 0 ) {
-        throw new SQLException("Error while removing.");
-      }
-
-      return o;
-    } catch (Throwable e) {
-      e.printStackTrace();
-      return null;
-    } finally {
-      closeAllQuietly(null, stmt);
-    }
-  }
-
-  @Override
-  public FObject find_(X x, Object o) {
-    Connection c = null;
-    IndexedPreparedStatement stmt = null;
-    ResultSet resultSet = null;
-
-    try {
-      c = connectionPool.getConnection();
-      StringBuilder builder = sb.get()
-          .append("select * from ")
-          .append(table_)
-          .append(" where ")
-          .append(getPrimaryKey().createStatement())
-          .append(" = ?");
-
-      stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
-      // TODO: add support for non-numbers
-      //stmt.setLong(((Number) o).longValue());
-      stmt.setObject(o);
-      resultSet = stmt.executeQuery();
-      if ( ! resultSet.next() ) {
-        // no rows
-        return null;
-      }
-
-      return createFObject(resultSet);
-    } catch (Throwable e) {
-      e.printStackTrace();
       return null;
     } finally {
       closeAllQuietly(resultSet, stmt);
@@ -173,32 +103,34 @@ public class PostgresDAO
   @Override
   public FObject put_(X x, FObject obj) {
     Connection c = null;
-    IndexedPreparedStatement stmt = null;
     ResultSet resultSet = null;
 
     try {
-      c = connectionPool.getConnection();
-      StringBuilder builder = sb.get()
-          .append("insert into ")
-          .append(table_);
+      if ( insertStmt == null ) {
+        c = connectionPool.getConnection();
+        StringBuilder builder = sb.get()
+                .append("insert into ")
+                .append(tableName_);
 
-      buildFormattedColumnNames(obj, builder);
-      builder.append(" values");
-      buildFormattedColumnPlaceholders(obj, builder);
-      builder.append(" on conflict (")
-             .append(getPrimaryKey().createStatement())
-             .append(") do update set");
-      buildFormattedColumnNames(obj, builder);
-      builder.append(" = ");
-      buildFormattedColumnPlaceholders(obj, builder);
+        buildFormattedColumnNames(obj, builder);
+        builder.append(" values");
+        buildFormattedColumnPlaceholders(obj, builder);
+        builder.append(" on conflict (")
+                .append(getPrimaryKey().createStatement())
+                .append(") do update set");
+        buildFormattedColumnNames(obj, builder);
+        builder.append(" = ");
+        buildFormattedColumnPlaceholders(obj, builder);
 
-      stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString(),
-          Statement.RETURN_GENERATED_KEYS));
+        insertStmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString(),
+                Statement.RETURN_GENERATED_KEYS));
+      }
+
       // set statement values twice: once for the insert and once for the update on conflict
-      setStatementValues(stmt, obj);
-      setStatementValues(stmt, obj);
+      setStatementValues(insertStmt, obj);
+      setStatementValues(insertStmt, obj);
 
-      int inserted = stmt.executeUpdate();
+      int inserted = insertStmt.executeUpdate();
       if ( inserted == 0 ) {
         throw new SQLException("Error performing put_ command");
       }
@@ -210,111 +142,13 @@ public class PostgresDAO
       } */
 
       return obj;
-    } catch (Throwable e) {
+    } catch ( Throwable e ) {
       e.printStackTrace();
       return null;
     } finally {
-      closeAllQuietly(resultSet, stmt);
+      setStatementValues(insertStmt, null);
+      closeAllQuietly(resultSet, insertStmt);
     }
-  }
-
-  /**
-   * Creates a table if one does not exist already
-   * @throws SQLException
-   */
-  @Override
-  public boolean maybeCreateTable(X x, ClassInfo of) {
-    Connection c = null;
-    IndexedPreparedStatement stmt = null;
-    ResultSet resultSet = null;
-
-    try {
-      c = connectionPool.getConnection();
-      DatabaseMetaData meta = c.getMetaData();
-      resultSet = meta.getTables(null, null, table_, new String[]{"TABLE"});
-      if ( resultSet.isBeforeFirst() ) {
-        // found a table, don't create
-        return false;
-      }
-
-      StringBuilder builder = sb.get()
-          .append("CREATE TABLE ")
-          .append(table_)
-          .append("(")
-          .append(getPrimaryKey().createStatement())
-          .append(" ")
-          .append(getPrimaryKey().getSQLType())
-          .append(" primary key,");
-
-      Iterator i = props_.iterator();
-      while ( i.hasNext() ) {
-        PropertyInfo prop = (PropertyInfo) i.next();
-        if ( getPrimaryKey().getName().equals(prop.getName()) )
-          continue;
-
-        builder.append(prop.createStatement())
-            .append(" ")
-            .append(prop.getSQLType());
-
-        if ( i.hasNext() ) {
-          builder.append(",");
-        }
-      }
-      builder.append(")");
-
-      // execute statement
-      stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
-      stmt.executeUpdate();
-      return true;
-    } catch (Throwable e) {
-      Logger logger = (Logger) x.get("logger");
-      logger.error(e);
-      return false;
-    } finally {
-      closeAllQuietly(resultSet, stmt);
-    }
-  }
-
-  /**
-   * Prepare the formatted column names. Appends column names like: (c1,c2,c3)
-   * @param builder builder to append to
-   */
-  public void buildFormattedColumnNames(FObject obj, StringBuilder builder) {
-    // collect columns list into comma delimited string
-    builder.append("(");
-    Iterator i = props_.iterator();
-    while ( i.hasNext() ) {
-      PropertyInfo prop = (PropertyInfo) i.next();
-/*       if ( "id".equals(prop.getName()) )
-        continue; */
-
-      builder.append(prop.createStatement());
-      if ( i.hasNext() ) {
-        builder.append(",");
-      }
-    }
-    builder.append(")");
-  }
-
-  /**
-   * Prepare the formatted value placeholders. Appends value placeholders like: (?,?,?)
-   * @param builder builder to append to
-   */
-  public void buildFormattedColumnPlaceholders(FObject obj, StringBuilder builder) {
-    // map columns into ? and collect into comma delimited string
-    builder.append("(");
-    Iterator i = props_.iterator();
-    while ( i.hasNext() ) {
-      PropertyInfo prop = (PropertyInfo) i.next();
-/*       if ( "id".equals(prop.getName()) )
-        continue; */
-
-      builder.append("?");
-      if ( i.hasNext() ) {
-        builder.append(",");
-      }
-    }
-    builder.append(")");
   }
 
 }

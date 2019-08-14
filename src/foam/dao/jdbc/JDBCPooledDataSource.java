@@ -30,10 +30,10 @@ public class JDBCPooledDataSource {
       String connectionURI = jdbcSpec.buildConnectionURI();
 
       dataSource_ = setupPoolingDataSource(connectionURI, poolName);
-    } catch (ClassNotFoundException e) {
+    } catch ( ClassNotFoundException e ) {
       Logger logger = (Logger) x.get("logger");
       logger.error(e);
-    } catch (java.sql.SQLException e) {
+    } catch ( java.sql.SQLException e ) {
       Logger logger = (Logger) x.get("logger");
       logger.error(e);
     }
@@ -48,10 +48,10 @@ public class JDBCPooledDataSource {
       String connectionURI = jdbcSpec.buildConnectionURI();
 
       dataSource_ = setupPoolingDataSource(connectionURI, DEFAULT_POOL_NAME);
-    } catch (ClassNotFoundException e) {
+    } catch ( ClassNotFoundException e ) {
       Logger logger = (Logger) x.get("logger");
       logger.error(e);
-    } catch (java.sql.SQLException e) {
+    } catch ( java.sql.SQLException e ) {
       Logger logger = (Logger) x.get("logger");
       logger.error(e);
     }
@@ -83,7 +83,6 @@ public class JDBCPooledDataSource {
     PoolingDataSource<PoolableConnection> dataSource = new PoolingDataSource<>(connectionPool);
 
     return dataSource;
-
   }
 
   /**
@@ -94,7 +93,7 @@ public class JDBCPooledDataSource {
     try {
       PoolingDriver driver = (PoolingDriver) DriverManager.getDriver("jdbc:apache:commons:dbcp:");
       driver.closePool(poolName);
-    } catch (java.sql.SQLException e) {
+    } catch ( java.sql.SQLException e ) {
       //Do Nothing
     }
   }

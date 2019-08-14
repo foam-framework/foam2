@@ -184,12 +184,12 @@ foam.CLASS({
         o.indent();
       }
 
-      if( this.documentation ){
+      if ( this.documentation ) {
         str = foam.java.Util.removeSpacing(this.documentation);
         lines = foam.java.Util.limitSplit(str, 25);
         o.indent();
         o.out('/**\n');
-        for( i = 0 ; i < lines.length ; i++ ){
+        for ( i = 0 ; i < lines.length ; i++ ) {
           o.indent();
           o.out('* ' + lines[i]);
           o.out('\n');
@@ -224,8 +224,8 @@ foam.CLASS({
 
       // Look if the class has a method tagged 'remote' : see CPF-278
       var isORBitalDAOed = false;
-      for( m in this.methods ){
-        if( m.remote ){
+      for ( m in this.methods ) {
+        if ( m.remote ) {
           isORBitalDAOed = true;
           break;
         }

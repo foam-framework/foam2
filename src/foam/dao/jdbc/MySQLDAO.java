@@ -32,35 +32,36 @@ public class MySQLDAO extends AbstractJDBCDAO{
   @Override
   public FObject put_(X x, FObject obj) {
     Connection c = null;
-    IndexedPreparedStatement stmt = null;
     ResultSet resultSet = null;
 
     try {
-      c = dataSource_.getConnection();
-      StringBuilder builder = threadLocalBuilder_.get()
-        .append("insert into ")
-        .append(tableName_);
+      if ( insertStmt == null ) {
+        c = dataSource_.getConnection();
+        StringBuilder builder = threadLocalBuilder_.get()
+                .append("insert into ")
+                .append(tableName_);
 
-      buildFormattedColumnNames(obj, builder);
-      builder.append(" values");
-      buildFormattedColumnPlaceholders(obj, builder);
-      builder.append(" on duplicate key ")
-        // .append(getPrimaryKey().createStatement()) ... Not in MySQL
-        .append(" update ");
-      buildUpdateFormattedColumnNames(obj, builder);   // Specific to MySQL
+        buildFormattedColumnNames(obj, builder);
+        builder.append(" values");
+        buildFormattedColumnPlaceholders(obj, builder);
+        builder.append(" on duplicate key ")
+                // .append(getPrimaryKey().createStatement()) ... Not in MySQL
+                .append(" update ");
+        buildUpdateFormattedColumnNames(obj, builder);   // Specific to MySQL
 
-      stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString(),
-        Statement.RETURN_GENERATED_KEYS));
+        insertStmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString(),
+                Statement.RETURN_GENERATED_KEYS));
+      }
 
-      setStatementValues(stmt, obj);
+      setStatementValues(insertStmt, obj);
 
-      int inserted = stmt.executeUpdate();
+      int inserted = insertStmt.executeUpdate();
       if ( inserted == 0 ) {
         throw new SQLException("Error performing put_ command");
       }
 
       // get auto-generated postgres keys
-/*       resultSet = stmt.getGeneratedKeys();
+/*       resultSet = insertStmt.getGeneratedKeys();
       if ( resultSet.next() ) {
         obj.setProperty(getPrimaryKey().getName(), resultSet.getObject(1));
       } */
@@ -71,7 +72,8 @@ public class MySQLDAO extends AbstractJDBCDAO{
       logger.error(e);
       return null;
     } finally {
-      closeAllQuietly(resultSet, stmt);
+      setStatementValues(insertStmt, null);
+      closeAllQuietly(resultSet, insertStmt);
     }
   }
 
@@ -131,63 +133,5 @@ public class MySQLDAO extends AbstractJDBCDAO{
     }
   }
 
-  /**
-   * Create the table in the database and return true if it doesn't already exist otherwise it does nothing and returns false
-   * @param of ClassInfo
-   */
-  @Override
-  public boolean maybeCreateTable(X x, ClassInfo of) {
-    Connection c = null;
-    IndexedPreparedStatement stmt = null;
-    ResultSet resultSet = null;
-
-    try {
-      c = dataSource_.getConnection();
-      DatabaseMetaData meta = c.getMetaData();
-      resultSet = meta.getTables(null, null, tableName_, new String[]{"TABLE"});
-      if ( resultSet.isBeforeFirst() ) {
-        // found a table, don't create
-        return false;
-      }
-
-      StringBuilder builder =threadLocalBuilder_.get()
-        .append("CREATE TABLE ")
-        .append(tableName_)
-        .append("(")
-        .append(getPrimaryKey().createStatement())
-        .append(" ")
-        .append(getPrimaryKey().getSQLType())
-        .append(" primary key,");
-
-      Iterator i = properties_.iterator();
-      while ( i.hasNext() ) {
-        PropertyInfo prop = (PropertyInfo) i.next();
-
-        // Why you skip the primary key? (Ask Kevin)
-        if ( getPrimaryKey().getName().equals(prop.getName()) )
-          continue;
-
-        builder.append(prop.createStatement())
-          .append(" ")
-          .append(prop.getSQLType()); // TODO: is getSQLType guaranteed to return something?
-
-        if ( i.hasNext() ) {
-          builder.append(",");
-        }
-      }
-      builder.append(")");
-
-      // execute statement
-      stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
-      stmt.executeUpdate();
-      return true;
-    } catch (Throwable e) {
-      Logger logger = (Logger) x.get("logger");
-      logger.error(e);
-      return false;
-    } finally {
-      closeAllQuietly(resultSet, stmt);
-    }
-  }
 
 }

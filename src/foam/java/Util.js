@@ -25,9 +25,9 @@ foam.LIB({
           res = [];
           var arr = str.split(' ');
           var line = '';
-          for( i = 0 ; i < arr.length ; i++ ){
+          for ( i = 0 ; i < arr.length ; i++ ) {
             line += arr[i] + ' ';
-            if( i % maxWords == 0 && i > 0 ){
+            if ( i % maxWords == 0 && i > 0 ) {
               res.push(line);
               line = '';
             }

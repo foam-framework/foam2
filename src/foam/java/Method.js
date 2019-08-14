@@ -45,12 +45,12 @@ foam.CLASS({
     function outputJava(o) {
       o.out('\n');
 
-      if( this.documentation ){
+      if ( this.documentation ) {
         str = foam.java.Util.removeSpacing(this.documentation);
         lines = foam.java.Util.limitSplit(str, 25);
         o.indent();
         o.out('/**\n');
-        for( i = 0 ; i < lines.length ; i++ ){
+        for ( i = 0 ; i < lines.length ; i++ ) {
           o.indent();
           o.out('* ' + lines[i]);
           o.out('\n');

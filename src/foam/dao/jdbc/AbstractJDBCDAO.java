@@ -45,26 +45,32 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
   /** Holds a reference to the connection pool ( .getConnection() ) */
   protected static DataSource dataSource_;
 
+  protected IndexedPreparedStatement findStmt;
+  protected IndexedPreparedStatement removeStmt;
+  protected IndexedPreparedStatement insertStmt;
+
   @Override
   public FObject find_(X x, Object id) {
     Connection c = null;
-    IndexedPreparedStatement stmt = null;
     ResultSet resultSet = null;
 
     try {
-      c = dataSource_.getConnection();
-      StringBuilder builder = threadLocalBuilder_.get()
-        .append("select * from ")
-        .append(tableName_)
-        .append(" where ")
-        .append(getPrimaryKey().createStatement())
-        .append(" = ?");
+      if ( findStmt == null ) {
+        c = dataSource_.getConnection();
+        StringBuilder builder = threadLocalBuilder_.get()
+                .append("select * from ")
+                .append(tableName_)
+                .append(" where ")
+                .append(getPrimaryKey().createStatement())
+                .append(" = ?");
 
-      stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
+        findStmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
+      }
+
       // TODO: add support for non-numbers
       //stmt.setLong(((Number) o).longValue());
-      stmt.setObject(id);
-      resultSet = stmt.executeQuery();
+      findStmt.setObject(id);
+      resultSet = findStmt.executeQuery();
       if ( ! resultSet.next() ) {
         // no rows
         return null;
@@ -72,35 +78,38 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
       }
 
       return createFObject(resultSet);
-    } catch (Throwable e) {
+    } catch ( Throwable e ) {
       Logger logger = (Logger) x.get("logger");
       logger.error(e);
       return null;
     } finally {
-      closeAllQuietly(resultSet, stmt);
+      findStmt.setObject(null);
+      closeAllQuietly(resultSet, findStmt);
     }
   }
 
   @Override
   public FObject remove_(X x, FObject obj) {
     Connection c = null;
-    IndexedPreparedStatement stmt = null;
 
     try {
-      c = dataSource_.getConnection();
-      StringBuilder builder = threadLocalBuilder_.get()
-        .append("delete from ")
-        .append(tableName_)
-        .append(" where ")
-        .append(getPrimaryKey().createStatement())
-        .append(" = ?");
+      if ( removeStmt == null ) {
+        c = dataSource_.getConnection();
+        StringBuilder builder = threadLocalBuilder_.get()
+                .append("delete from ")
+                .append(tableName_)
+                .append(" where ")
+                .append(getPrimaryKey().createStatement())
+                .append(" = ?");
 
-      stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
+        removeStmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
+      }
+
       // TODO: add support for non-numbers
-      //stmt.setLong(((Number) o.getProperty("id")).longValue());
-      stmt.setObject(obj.getProperty(getPrimaryKey().getName()));
+      //removeStmt.setLong(((Number) o.getProperty("id")).longValue());
+      removeStmt.setObject(obj.getProperty(getPrimaryKey().getName()));
 
-      int removed = stmt.executeUpdate();
+      int removed = removeStmt.executeUpdate();
       if ( removed == 0 ) {
         // throw new SQLException("Error while removing.");
         // According to doc, no error when removing doesn't remove anything
@@ -108,12 +117,13 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
       }
 
       return obj;
-    } catch (Throwable e) {
+    } catch ( Throwable e ) {
       Logger logger = (Logger) x.get("logger");
       logger.error(e);
       return null;
     } finally {
-      closeAllQuietly(null, stmt);
+      removeStmt.setObject(null);
+      closeAllQuietly(null, removeStmt);
     }
   }
 
@@ -133,19 +143,19 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
 
     tableName_ = of.getObjClass().getSimpleName().toLowerCase();
 
-    getObjectProperties(of);
+    buildPropertyList(of);
 
     maybeCreateTable(x, of);
 
   }
 
   /**
-   * Returns list of properties of a metaclass
+   * Builds list of properties of a metaclass
    * @param of ClassInfo
    */
-  protected void getObjectProperties(ClassInfo of){
+  protected void buildPropertyList(ClassInfo of){
 
-    if( properties_ == null ) {
+    if ( properties_ == null ) {
       List<PropertyInfo> allProperties = of.getAxiomsByClass(PropertyInfo.class);
       properties_ = new ArrayList<PropertyInfo>();
       for ( PropertyInfo prop : allProperties ) {
@@ -209,9 +219,9 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
    */
   public void closeAllQuietly(ResultSet resultSet, IndexedPreparedStatement stmt) {
     if ( resultSet != null )
-      try { resultSet.close(); } catch (Throwable ignored) {}
+      try { resultSet.close(); } catch ( Throwable ignored ) {}
     if ( stmt != null )
-      try { stmt.close(); } catch (Throwable ignored) {}
+      try { stmt.close(); } catch ( Throwable ignored ) {}
   }
 
   /**
@@ -278,6 +288,65 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
       }
     }
 
+  }
+
+  /**
+   * Create the table in the database and return true if it doesn't already exist otherwise it does nothing and returns false
+   * @param of ClassInfo
+   */
+  @Override
+  public boolean maybeCreateTable(X x, ClassInfo of) {
+    Connection c = null;
+    IndexedPreparedStatement stmt = null;
+    ResultSet resultSet = null;
+
+    try {
+      c = dataSource_.getConnection();
+      DatabaseMetaData meta = c.getMetaData();
+      resultSet = meta.getTables(null, null, tableName_, new String[]{"TABLE"});
+      if ( resultSet.isBeforeFirst() ) {
+        // found a table, don't create
+        return false;
+      }
+
+      StringBuilder builder = threadLocalBuilder_.get()
+              .append("CREATE TABLE ")
+              .append(tableName_)
+              .append("(")
+              .append(getPrimaryKey().createStatement())
+              .append(" ")
+              .append(getPrimaryKey().getSQLType())
+              .append(" primary key,");
+
+      Iterator i = properties_.iterator();
+      while ( i.hasNext() ) {
+        PropertyInfo prop = (PropertyInfo) i.next();
+
+        // Why you skip the primary key? (Ask Kevin)
+        if ( getPrimaryKey().getName().equals(prop.getName()) )
+          continue;
+
+        builder.append(prop.createStatement())
+                .append(" ")
+                .append(prop.getSQLType()); // TODO: is getSQLType guaranteed to return something?
+
+        if ( i.hasNext() ) {
+          builder.append(",");
+        }
+      }
+      builder.append(")");
+
+      // execute statement
+      stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
+      stmt.executeUpdate();
+      return true;
+    } catch ( Throwable e ) {
+      Logger logger = (Logger) x.get("logger");
+      logger.error(e);
+      return false;
+    } finally {
+      closeAllQuietly(resultSet, stmt);
+    }
   }
 
 }
