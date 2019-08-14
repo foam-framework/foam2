@@ -220,20 +220,13 @@ foam.CLASS({
 
                 if (p.cls_ == foam.dao.ManyToManyRelationshipProperty) {
                   var many2many = dao;
-                  dao = dao.getJunctionDAO();
+                  dao = dao.getDAO();
 
-                  var matchCondition = foam.mlang.predicate.Eq.create();
-                  matchCondition.arg1 = many2many.sourceProperty;
-                  matchCondition.arg2 = many2many.sourceId;
-
-                  dao.where(matchCondition).select(expr.COUNT()).then(function(c) {
-                    tab.label = label + ' (' + c.value + ')';
-                  });
-                } else {
-                  dao.select(expr.COUNT()).then(function(c) {
-                    tab.label = label + ' (' + c.value + ')';
-                  });
                 }
+
+                dao.select(expr.COUNT()).then(function(c) {
+                  tab.label = label + ' (' + c.value + ')';
+                });
 
                 p = p.clone();
                 p.label = '';
