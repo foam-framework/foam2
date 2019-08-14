@@ -163,7 +163,6 @@ foam.CLASS({
       name: 'view_'
     },
     'feedback_',
-    'defaultValue',
     {
       class: 'Int',
       name: 'size',
@@ -224,7 +223,7 @@ foam.CLASS({
         }
       }))
 
-      this.dao$proxy.on.sub(this.onDAOUpdate);
+      this.onDetach(this.dao$proxy.on.sub(this.onDAOUpdate));
     },
 
     function findIndexOfChoice(choice) {
@@ -255,11 +254,6 @@ foam.CLASS({
         if ( choices[i][1] === text ) return choices[i];
       }
       return null;
-    },
-
-    function fromProperty(p) {
-      this.SUPER(p);
-      this.defaultValue = p.value && this.findChoiceByData(p.value);
     }
   ],
 
@@ -268,14 +262,7 @@ foam.CLASS({
       name: 'onChoicesUpdate',
       isFramed: true,
       code: function() {
-        var d = this.data;
-        var newChoice = this.choices.length && d != null &&
-          this.findChoiceByData(d);
-        if ( newChoice == this.choice ) {
-          // We do this to handle the index not changing. 
-          this.choice = null;
-        }
-        this.choice = newChoice;
+        this.choice = this.findChoiceByData(this.data);
       }
     },
     {
