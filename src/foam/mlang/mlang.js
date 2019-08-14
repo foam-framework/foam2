@@ -3148,6 +3148,41 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'DotF',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: `A binary predicate that evaluates arg1 as a predicate with
+    arg2 as its argument.',
+
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg1'
+    },
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg2'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: `
+        Object predicate = getArg1().f(obj);
+        if ( predicate instanceof Predicate ) {
+          return ((Predicate) predicate).f(getArg2().f(obj));
+        }
+        return false;
+      `
+    }
+  ]
+});
+
+
+foam.CLASS({
   package: 'foam.mlang',
   name: 'PredicatedExpr',
   extends: 'foam.mlang.AbstractExpr',
