@@ -2,7 +2,6 @@
 
 # Attempted to setup environment variables but was unsuccesful passing them to curl
 #USER="admin@nanopay:adminAb1"
-#HOST="http://localhost:8080/"
 #PATH="service/dig"
 DAO="regionDAO"
 #URL="$HOST$PATH?dao=$DAO&q=$QUERY"
@@ -10,6 +9,8 @@ PASS=0
 FAIL=1
 STATUS_CODE=
 QUERY=
+PORT=8080
+CREDENTIALS='admin@nanopay:adminAb1'
 #                      --silent \
 function send_quiet {
     STATUS_CODE=$(/usr/bin/curl --write-out %{http_code} \
