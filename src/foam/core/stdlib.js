@@ -461,9 +461,9 @@ foam.LIB({
       var args = [];
       for ( var i = 0 ; i < argNames.length ; i++ ) {
         var a = foam.core.FObject.isInstance(source) &&
-                argNames[i].indexOf('$') == -1 ?
-          source[argNames[i]] :
-          source.slot(argNames[i]).get();
+                argNames[i].indexOf('$') != -1 ?
+          source.slot(argNames[i]).get() :
+          source[argNames[i]];
         if ( typeof a === 'function' ) a = a.bind(source);
         args.push(a);
       }
