@@ -74,7 +74,11 @@ foam.CLASS({
           var elm = self.Rows.create()
             .show(section.createIsAvailableFor(self.data$))
             .callIf(showTitle && section$title, function() {
-              this.start('h2').add(section$title).end();
+              this
+                .start('h2')
+                  .add(section$title)
+                  .show(section$title.map((title) => title !== ''))
+                .end();
             })
             .start(self.Grid)
               .forEach(section.properties, function(p, index) {
@@ -91,7 +95,7 @@ foam.CLASS({
               })
             .end()
             .start(self.Cols)
-              .style({ 'padding-top': '25px', 'justify-content': 'end' })
+              .style({ 'justify-content': 'end' })
               .forEach(section.actions, function(a) {
                 this.add(a);
               })

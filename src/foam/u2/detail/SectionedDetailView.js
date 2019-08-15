@@ -24,6 +24,10 @@ foam.CLASS({
     ^ .foam-u2-view-ScrollTableView table {
       width: 100%;
     }
+
+    ^ ^card-container + ^card-container {
+      margin-top: 16px;
+    }
   `,
 
   methods: [
@@ -41,9 +45,12 @@ foam.CLASS({
               .forEach(sections, function(s) {
                 this
                   .start(self.GUnit, { columns: s.gridColumns })
-                    .style({ 'padding': '16px 0', 'grid-column-gap': '4px' })
+                    .addClass(self.myClass('card-container'))
                     .show(s.createIsAvailableFor(self.data$))
-                    .start('h2').add(s.title$).end()
+                    .start('h2')
+                      .add(s.title$)
+                      .show(s.title$)
+                    .end()
                     .start(self.CardBorder)
                       .addClass('inner-card')
                       .tag(self.SectionView, {

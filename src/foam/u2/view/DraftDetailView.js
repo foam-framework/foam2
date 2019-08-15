@@ -8,12 +8,20 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'DraftDetailView',
   extends: 'foam.u2.View',
+
   documentation: `
     A detail view that holds off on updating the given object until the user clicks save.
     TODO: Nested property change events. Without this, this view does not know if nested
     properties have changed so modifying a property on an FObjectProperty won't change the
     action's state.
   `,
+
+  css: `
+    ^ .foam-u2-ActionView-save {
+      margin-top: 8px;
+    }
+  `,
+
   properties: [
     {
       class: 'foam.u2.ViewSpec',
@@ -67,8 +75,11 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this
+        .addClass(this.myClass())
         .tag(this.view, { data$: this.workingData$ })
-        .startContext({ data: this }).add(this.SAVE).endContext();
+        .startContext({ data: this })
+          .tag(this.SAVE, { buttonStyle: 'SECONDARY' })
+        .endContext();
     }
   ]
 });
