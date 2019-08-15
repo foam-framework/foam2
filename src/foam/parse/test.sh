@@ -10,7 +10,9 @@ FAIL=1
 STATUS_CODE=
 QUERY=
 PORT=8080
-CREDENTIALS='admin@nanopay:adminAb1'
+USERNAME=''
+PASSWORD=''
+ADDRESS='localhost'
 #                      --silent \
 function send_quiet {
     STATUS_CODE=$(/usr/bin/curl --write-out %{http_code} \
@@ -18,7 +20,7 @@ function send_quiet {
                                 --output out.html \
                                 -X GET \
                                 -u 'admin@nanopay.net:adminAb1' \
-                                'http://localhost:8080/service/dig?dao='$DAO'&q='$QUERY \
+                                'http://'"$ADDRESS"':'"$PORT"'/service/dig?dao='$DAO'&q='$QUERY \
                                 -H 'accept: application/json' \
                                 -H 'cache-control: no-cache' \
                                 -H 'content-type: application/json')
@@ -28,11 +30,22 @@ function send_verbose {
     /usr/bin/curl --write-out %{http_code} \
                   --silent \
                   -X GET \
-                  -u 'admin@nanopay.net:adminAb1' \
-                  'http://localhost:8080/service/dig?dao='$DAO'&q='$QUERY \
+                  -u "$USERNAME"':'"$PASSWORD" \
+                     'http://'"$ADDRESS"':'"$PORT"'/service/dig?dao='$DAO'&q='$QUERY \
                   -H 'accept: application/json' \
                   -H 'cache-control: no-cache' \
                   -H 'content-type: application/json'
+}
+
+function usage {
+    echo "Usage: $0 [OPTIONS]"
+    echo ""
+    echo "Options are:"
+    echo "  -u : Login username"
+    echo "  -p : Login password"
+    echo "  -h : Port on the host the server is running on: defaults to 8080"
+    echo "  -a : Address of the host server: defaults to localhost"
+    echo ""
 }
 
 function test () {
@@ -40,6 +53,12 @@ function test () {
     QUERY=$2
 
     printf "\n"
+    if [ "$USERNAME" = '' ]
+        echo "WARNING: Username is blank"
+    fi
+    if [ "$PASSWORD" = '' ]
+        echo "WARNING: Password is blank"
+    fi
     send_verbose
     send_quiet
     #printf "EXPECTATION=$EXPECTATION"
