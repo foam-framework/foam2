@@ -7,7 +7,6 @@
 package foam.nanos.dig;
 
 import foam.core.*;
-import foam.dao.CSVSink;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.lib.csv.CSVSupport;

@@ -3419,6 +3419,26 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.mlang',
+  name: 'CurrentTime',
+  extends: 'foam.mlang.AbstractExpr',
+  axioms: [
+    { class: 'foam.pattern.Singleton' }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(_) {
+        return new Date();
+      },
+      javaCode: `
+        return new java.util.Date();
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang',
   name: 'StringLength',
   extends: 'foam.mlang.AbstractExpr',
   properties: [
