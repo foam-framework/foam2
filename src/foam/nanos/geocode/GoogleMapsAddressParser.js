@@ -6,6 +6,8 @@ foam.CLASS({
     Responsible for converting an address string to the FOAM address data structure.
     Returns a FOAM address taken from google maps best matching result.
 
+    Providing a FOAM address will attempt to further populate the address object.
+
     Google maps autocomplete api has a hard time finding secondary units (Suite, Apt, Flr etc..).
     Some addresses return a response or a list of predictions but it's a rare occurance.
     We're handling this situation by parsing the address string to remove secondary units and their value,
@@ -36,8 +38,7 @@ foam.CLASS({
       class: 'String',
       name: 'apiKey',
       documentation: `
-        Google API Key.
-        API key owner: Patrick Zanowski
+        Google Maps API Key.
       `
     }
   ],
@@ -149,7 +150,7 @@ foam.CLASS({
         List<String> addressList = null;
         String addressRequest = "";
 
-        // FIX ME: This string parser can probably be improved.
+        // FIX ME: This string parser can probably be improved to include use cases where suite value has characters included.
         for ( String separator : affix ) {
           String[] splitAddress = address.replace("#", "").split("(?<=" + separator + " [0-9]{0,9}+)|(?=" + separator + " [0-9]{0,9}+)");
           if ( splitAddress.length > 1 ) {
