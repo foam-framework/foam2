@@ -324,6 +324,14 @@ p({
   "serve":false,
   "service":{
     "class":foam.nanos.geocode.GoogleMapsAddressParser",
-    "apiKey":"AIzaSyBHdOZNO5sXIkBdalrHYfH2pMA1087Omh8"
+  }
+})
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"googleMapsCredentials",
+  "lazy":false,
+  "serve":false,
+  "service":{
+    "class": "foam.nanos.geocode.GoogleMapsCredentials"
   }
 })

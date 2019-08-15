@@ -337,6 +337,7 @@ var classes = [
   'foam.nanos.geocode.GoogleMapsAddressParser',
   'foam.nanos.geocode.GoogleMapsPlacesPredictions',
   'foam.nanos.geocode.GoogleMapsPlacesResponse',
+  'foam.nanos.geocode.GoogleMapsCredentials',
 
   'foam.nanos.demo.DemoObject',
   'foam.nanos.demo.relationship.Student',

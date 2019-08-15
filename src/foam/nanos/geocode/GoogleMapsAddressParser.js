@@ -24,10 +24,11 @@ foam.CLASS({
     'foam.lib.json.JSONParser',
     'foam.nanos.auth.Address',
     'foam.nanos.geocode.GoogleMapsAddressComponent',
+    'foam.nanos.geocode.GoogleMapsCredentials',
     'foam.nanos.geocode.GoogleMapsGeocodeResponse',
     'foam.nanos.geocode.GoogleMapsGeocodeResult',
     'foam.nanos.geocode.GoogleMapsPlacesPredictions',
-    'foam.nanos.geocode.auth.GoogleMapsPlacesResponse',
+    'foam.nanos.geocode.GoogleMapsPlacesResponse',
     'foam.util.SafetyUtil',
     'java.io.BufferedReader',
     'java.io.InputStreamReader',
@@ -37,16 +38,6 @@ foam.CLASS({
     'java.util.LinkedList',
     'java.util.List',
     'org.apache.commons.io.IOUtils'
-  ],
-
-  properties: [
-    {
-      class: 'String',
-      name: 'apiKey',
-      documentation: `
-        Google Maps API Key.
-      `
-    }
   ],
 
   constants: {
@@ -277,6 +268,19 @@ foam.CLASS({
           }
         }
         return null;
+      `
+    },
+    {
+      name: 'getApiKey',
+      type: 'String',
+      javaCode: `
+        GoogleMapsCredentials credentials = (GoogleMapsCredentials) getX().get("googleMapsCredentials");
+        if ( credentials == null || SafetyUtil.isEmpty(credentials.getApiKey()) ) {
+          Logger logger = (Logger) getX().get("logger");
+          logger.error(this.getClass().getSimpleName(), "invalid credentials");
+          throw new RuntimeException("Google maps invalid credentials");
+        }
+        return credentials.getApiKey();
       `
     }
   ]
