@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Attempted to setup environment variables but was unsuccesful passing them to curl
-#USER="admin@nanopay:adminAb1"
 #PATH="service/dig"
 DAO="regionDAO"
 #URL="$HOST$PATH?dao=$DAO&q=$QUERY"
