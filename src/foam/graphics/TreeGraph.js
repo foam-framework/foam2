@@ -286,9 +286,8 @@
             var x = (-this.maxLeft+25)/w * gw + 55;
             needsLayout = this.convergeTo(this.x$, x) || needsLayout;
             if ( this.layout() || needsLayout ) this.doLayout();
-            else {
-              this.graph.updateCWidth();
-            }
+            else this.graph.updateCWidth();
+          
             this.graph.invalidate();
           }
         }
