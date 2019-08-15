@@ -197,6 +197,7 @@ FOAM_FILES([
   { name: "foam/nanos/ruler/UpdateRulesListSink" },
   { name: "foam/nanos/ruler/TestedRule" },
   { name: "foam/nanos/ruler/RulerProbe" },
+  { name: "foam/nanos/ruler/UserRefines" },
   
   { name: "foam/nanos/test/EchoService" },
   { name: "foam/nanos/test/SerializationTestEchoService" },
