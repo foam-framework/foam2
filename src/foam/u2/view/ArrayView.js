@@ -8,14 +8,17 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'ArrayView',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows'
   ],
+
   exports: [
     'mode',
     'updateData'
   ],
+
   properties: [
     {
       class: 'foam.u2.ViewSpec',
@@ -23,6 +26,7 @@ foam.CLASS({
       value: { class: 'foam.u2.view.AnyView' }
     }
   ],
+
   actions: [
     {
       name: 'addRow',
@@ -36,6 +40,7 @@ foam.CLASS({
       }
     }
   ],
+
   classes: [
     {
       name: 'Row',
@@ -60,7 +65,7 @@ foam.CLASS({
       actions: [
         {
           name: 'remove',
-          label: 'X',
+          label: '',
           isAvailable: function(mode) {
             return mode === foam.u2.DisplayMode.RW;
           },
@@ -72,6 +77,7 @@ foam.CLASS({
       ]
     }
   ],
+
   listeners: [
     {
       name: 'updateData',
@@ -83,32 +89,62 @@ foam.CLASS({
       }
     }
   ],
+
+  css: `
+    ^value-view-container {
+      border-top: 1px solid /*%GREY4%*/ #e7eaec;
+    }
+
+    ^ .foam-u2-ActionView-addRow {
+      margin: 8px 0;
+    }
+
+    ^ .foam-u2-ActionView-remove {
+      align-self: flex-start;
+    }
+
+    ^value-view-container:last-child {
+      border-bottom: 1px solid /*%GREY4%*/ #e7eaec;
+    }
+
+    ^value-view {
+      flex: 1;
+    }
+  `,
+
   methods: [
     function initE() {
       this.SUPER();
       var self = this;
+
+      this.addClass(this.myClass());
+
       this
         .add(this.slot(function(data, valueView) {
           return self.E()
             .start(self.Rows)
-              .forEach(data, function (e, i) {
+              .forEach(data, function(e, i) {
                 var row = self.Row.create({ index: i, value: e });
                 this
                   .startContext({ data: row })
                     .start(self.Cols)
-                      .style({ 'padding-top': '10px', 'padding-bottom': '10px' })
+                      .addClass(self.myClass('value-view-container'))
                       .start(valueView, { data$: row.value$ })
-                        .style({ flex: 1 })
+                        .addClass(self.myClass('value-view'))
                       .end()
                       .tag(self.Row.REMOVE, {
-                        isDestructive: true
+                        isDestructive: true,
+                        icon: 'images/remove-circle.svg',
+                        buttonStyle: 'UNSTYLED'
                       })
                     .end()
                   .endContext();
                 row.onDetach(row.sub(self.updateData));
               });
         }))
-        .startContext({ data: this }).add(this.ADD_ROW).endContext();
+        .startContext({ data: this })
+          .tag(this.ADD_ROW, { buttonStyle: 'SECONDARY' })
+        .endContext();
     }
   ]
 });
