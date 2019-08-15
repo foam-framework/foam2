@@ -73,9 +73,9 @@ foam.CLASS({
       javaCode: `
         User input = new User.Builder(x)
           .setId(1000)
-          .setFirstName("Kirk")
-          .setLastName("Eaton")
-          .setEmail("kirk@nanopay.net")
+          .setFirstName("Test")
+          .setLastName("Foam")
+          .setEmail("test@foam.net")
           .build();
 
         // sign with invalid algorithm
