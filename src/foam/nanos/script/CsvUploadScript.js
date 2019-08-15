@@ -1,0 +1,18 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+foam.CLASS({
+  package: 'foam.nanos.script',
+  name: 'CsvUploadScript',
+  extends: 'foam.nanos.script.Script',
+  imports: [ 'csvUploadScriptDAO as scriptDAO' ],
+  properties: [
+    {
+      class: 'foam.nanos.fs.FileProperty',
+      name: 'csv'
+    },
+  ],
+});
