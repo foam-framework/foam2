@@ -1,6 +1,6 @@
 foam.CLASS({
   package: 'foam.nanos.geocode',
-  name: 'GoogleMapsAddressParser',
+  name: 'GoogleMapsParser',
 
   documentation: `
     Responsible for converting an address string to the FOAM address data structure.
@@ -19,7 +19,7 @@ foam.CLASS({
     'foam.nanos.geocode.GoogleMapsGeocodeResponse',
     'foam.nanos.geocode.GoogleMapsGeocodeResult',
     'foam.nanos.geocode.GoogleMapsPlacesPredictions',
-    'foam.nanos.geocode.GoogleMapsPlacesResponse',
+    'foam.nanos.geocode.auth.GoogleMapsPlacesResponse',
     'foam.util.SafetyUtil',
     'java.io.BufferedReader',
     'java.io.InputStreamReader',
@@ -124,7 +124,14 @@ foam.CLASS({
       type: 'foam.nanos.auth.Address',
       javaCode: `
         if ( foamAddress != null ) {
-          address = foamAddress.getAddress() + foamAddress.getCity() + foamAddress.getRegionId() + foamAddress.getCountryId();
+          address = String.format( "%s %s %s %s %s %s",
+              foamAddress.getSuite(),
+              foamAddress.getAddress(),
+              foamAddress.getCity(),
+              foamAddress.getRegionId(),
+              foamAddress.getCountryId(),
+              foamAddress.getPostalCode()
+          );
         }
 
         String[] affix = { "apt", "unit", "suite", "#", "bsmt", "fl", "frnt", "key", "lowr", "dept", "lbby", "rm", "room", "ste", "dept", "space", "spc", "lot" };
@@ -195,7 +202,7 @@ foam.CLASS({
 
         GoogleMapsGeocodeResult[] mapResults = result.getResults();
         GoogleMapsAddressComponent[] addressComponents = mapResults[0].getAddress_components();
-        Address completeAddress = constructAddress(addressComponents, suite);
+        Address completeAddress = constructAddress(addressComponents, suite, foamAddress);
 
         return completeAddress;
       `
@@ -210,6 +217,10 @@ foam.CLASS({
         {
           class: 'String',
           name: 'suite'
+        },
+        {
+          name: 'initialAddress',
+          type: 'foam.nanos.auth.Address'
         }
       ],
       type: 'foam.nanos.auth.Address',
@@ -224,6 +235,12 @@ foam.CLASS({
         String formattedSuite = ! SafetyUtil.isEmpty(suite) ? suite.substring(0, 1).toUpperCase() + suite.substring(1)
             .replaceAll("([^\\\\d-]?)(-?[\\\\d\\\\.]+)([^\\\\d]?)", "$1 $2 $3").replaceAll(" +", " ").trim() : null;
         newAddress.setSuite(formattedSuite);
+
+        if ( initialAddress != null ) {
+          newAddress.setAddress1(initialAddress.getAddress1());
+          newAddress.setAddress2(initialAddress.getAddress2());
+        }
+
         return newAddress;
       `
     },
@@ -231,6 +248,7 @@ foam.CLASS({
       name: 'getAddressComponent',
       args: [
         {
+
           class: 'String',
           name: 'type'
         },
