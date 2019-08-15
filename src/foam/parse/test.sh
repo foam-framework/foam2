@@ -9,8 +9,6 @@ PASS=0
 FAIL=1
 STATUS_CODE=
 QUERY=
-PORT=8080
-CREDENTIALS='admin@nanopay:adminAb1'
 #                      --silent \
 function send_quiet {
     STATUS_CODE=$(/usr/bin/curl --write-out %{http_code} \
