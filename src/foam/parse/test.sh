@@ -9,7 +9,7 @@ PASS=0
 FAIL=1
 STATUS_CODE=
 QUERY=
-PORT=8080
+PORT='8080'
 USERNAME=''
 PASSWORD=''
 ADDRESS='localhost'
@@ -38,7 +38,7 @@ function send_verbose {
 }
 
 function usage {
-    echo "Usage: $0 [OPTIONS]"
+    echo "Usage: $0 EXPECTATION QUERY [OPTIONS]"
     echo ""
     echo "Options are:"
     echo "  -u : Login username"
@@ -51,7 +51,18 @@ function usage {
 function test () {
     EXPECTATION=$1
     QUERY=$2
-
+    while getopts "upha" opt ; do
+        case $opt in
+            u) USERNAME=$OPTARG
+               ;;
+            p) PASSWORD=$OPTARG
+               ;;
+            h) PORT=$OPTARG
+               ;;
+            a) ADDRESS=$OPTARG
+               ;;
+        esac
+    done
     printf "\n"
     if [ "$USERNAME" = '' ]
         echo "WARNING: Username is blank"
