@@ -67,12 +67,9 @@
 
      function doLayout() {
        if ( this.root ) { 
-        
         this.root.layout();
-
         this.root.doLayout();
       }
-
        this.invalidate();
      }
    ],
@@ -285,10 +282,6 @@
             // Scale and translate the view to fit in the available window
             var gw = this.graph.width-110;
             var w  = this.maxRight - this.maxLeft + 55;
-            // if ( w > gw ) {
-            //   var scaleX = Math.min(1, gw / w);
-            //   needsLayout = this.convergeTo(this.scaleX$, scaleX) || needsLayout;
-            // }
 
             var x = (-this.maxLeft+25)/w * gw + 55;
             needsLayout = this.convergeTo(this.x$, x) || needsLayout;
@@ -325,7 +318,8 @@
 
         traverseAndCompare(this.root);
 
-        // 300 gives a clear view of the spacing
+        // needed to add the constant value to the width because then otherwise 
+        // both the leftmost and rightmost nodes are slightly cutoff
         var width = Math.abs(maxes.maxLeft - maxes.maxRight) + 400;
         var delta = Math.abs(this.width - width) / width;
 
