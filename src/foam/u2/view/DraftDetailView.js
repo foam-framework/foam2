@@ -29,6 +29,7 @@ foam.CLASS({
       name: 'hasDiff'
     }
   ],
+
   actions: [
     {
       name: 'save',
@@ -39,6 +40,7 @@ foam.CLASS({
       code: function() { this.data = this.workingData; }
     },
   ],
+
   reactions: [
     ['', 'propertyChange.workingData', 'updateHasDiff'],
     ['workingData', 'propertyChange', 'updateHasDiff'],
@@ -57,7 +59,7 @@ foam.CLASS({
       name: 'updateHasDiff',
       isFramed: true,
       code: function() {
-        this.hasDiff = !this.data.equals(this.workingData);
+        this.hasDiff = ! this.data.equals(this.workingData);
       }
     }
   ],

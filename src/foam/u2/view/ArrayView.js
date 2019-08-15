@@ -8,14 +8,17 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'ArrayView',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows'
   ],
+
   exports: [
     'mode',
     'updateData'
   ],
+
   properties: [
     {
       class: 'foam.u2.ViewSpec',
@@ -23,6 +26,7 @@ foam.CLASS({
       value: { class: 'foam.u2.view.AnyView' }
     }
   ],
+
   actions: [
     {
       name: 'addRow',
@@ -36,6 +40,7 @@ foam.CLASS({
       }
     }
   ],
+
   classes: [
     {
       name: 'Row',
@@ -72,6 +77,7 @@ foam.CLASS({
       ]
     }
   ],
+
   listeners: [
     {
       name: 'updateData',
@@ -91,7 +97,7 @@ foam.CLASS({
         .add(this.slot(function(data, valueView) {
           return self.E()
             .start(self.Rows)
-              .forEach(data, function (e, i) {
+              .forEach(data, function(e, i) {
                 var row = self.Row.create({ index: i, value: e });
                 this
                   .startContext({ data: row })
