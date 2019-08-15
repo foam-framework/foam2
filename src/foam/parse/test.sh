@@ -19,7 +19,7 @@ function send_quiet {
                                 --silent \
                                 --output out.html \
                                 -X GET \
-                                -u 'admin@nanopay.net:adminAb1' \
+                                -u "$USERNAME"':'"$PASSWORD" \
                                 'http://'"$ADDRESS"':'"$PORT"'/service/dig?dao='$DAO'&q='$QUERY \
                                 -H 'accept: application/json' \
                                 -H 'cache-control: no-cache' \
