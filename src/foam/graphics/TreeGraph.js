@@ -321,9 +321,11 @@
 
         traverseAndCompare(this.root);
 
-        // needed to add the constant value to the width because then otherwise 
-        // both the leftmost and rightmost nodes are slightly cutoff
-        var width = Math.abs(maxes.maxLeft - maxes.maxRight) + 400;
+        // needed to use the adjustments to width in order to account for proper fitting on the screen
+        // since by default with out it, the leftmost node and right most node get cutoff by half
+        // padding adjustments are there to proper spacing and also for the edge connectors to 
+        // fully render
+        var width = Math.abs(maxes.maxLeft - maxes.maxRight) + this.nodeWidth + this.padding * 4;
         var delta = Math.abs(this.width - width) / width;
 
         if ( delta > 0.01 ) {
