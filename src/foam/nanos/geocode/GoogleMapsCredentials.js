@@ -1,6 +1,6 @@
 foam.CLASS({
   package: 'foam.nanos.geocode',
-  name: 'GoogleMapsCredientials',
+  name: 'GoogleMapsCredentials',
 
   axioms: [ foam.pattern.Singleton.create() ],
 
