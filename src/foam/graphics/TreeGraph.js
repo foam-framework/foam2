@@ -285,8 +285,13 @@
 
             var x = (-this.maxLeft+25)/w * gw + 55;
             needsLayout = this.convergeTo(this.x$, x) || needsLayout;
-            if ( this.layout() || needsLayout ) this.doLayout();
-            else this.graph.updateCWidth();
+            
+            if ( this.layout() || needsLayout ) {
+              this.doLayout();
+            }
+            else {
+              this.graph.updateCWidth();
+            }
           
             this.graph.invalidate();
           }
@@ -305,14 +310,13 @@
           maxRight: 0
         };
           
-        const traverseAndCompare = root  => {
+        function traverseAndCompare(root) {
           if ( root.maxLeft < maxes.maxLeft ) maxes.maxLeft = root.maxLeft;
           if ( root.maxRight > maxes.maxRight ) maxes.maxRight = root.maxRight;
 
           for ( var i = 0; i < root.children.length; i++ ){
             traverseAndCompare(root.children[i], root.x);
           }
-          return;
         }
 
         traverseAndCompare(this.root);
