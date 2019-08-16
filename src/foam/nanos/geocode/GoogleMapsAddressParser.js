@@ -29,6 +29,7 @@ foam.CLASS({
     'foam.nanos.geocode.GoogleMapsGeocodeResult',
     'foam.nanos.geocode.GoogleMapsPlacesPredictions',
     'foam.nanos.geocode.GoogleMapsPlacesResponse',
+    'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil',
     'java.io.BufferedReader',
     'java.io.InputStreamReader',
