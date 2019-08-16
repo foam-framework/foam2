@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.geocode',
-  name: 'GoogleMapsParser',
+  name: 'GoogleMapsAddressParser',
 
   documentation: `
     Responsible for converting an address string to the FOAM address data structure.
@@ -29,6 +29,7 @@ foam.CLASS({
     'foam.nanos.geocode.GoogleMapsGeocodeResult',
     'foam.nanos.geocode.GoogleMapsPlacesPredictions',
     'foam.nanos.geocode.GoogleMapsPlacesResponse',
+    'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil',
     'java.io.BufferedReader',
     'java.io.InputStreamReader',
