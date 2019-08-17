@@ -37,7 +37,11 @@ foam.CLASS({
 
   css: `
     ^ {
-      width: fit-content;
+      /* The following three lines are a cross-browser
+         equivalent to width: fit-content; in Chrome */
+      width: intrinsic;
+      width: -moz-max-content;
+      width: -webkit-max-content;
       margin: 24px auto 0 auto;
     }
 
