@@ -3397,6 +3397,14 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'timeMs'
+    },
+    {
+      class: 'Long',
+      name: 'years'
+    },
+    {
+      class: 'Boolean',
+      name: 'calculateOnce'
     }
   ],
   methods: [
@@ -3404,10 +3412,24 @@ foam.CLASS({
       name: 'f',
       code: function(o) {
         var v1 = this.arg1.f(o);
+        if ( this.years && ! this.calculateOnce ) {
+          this.timeMs = (this.years * 365 * 24 * 60 * 60 * 1000) + this.timeMs;
+          this.calculateOnce = true;
+        }
+        if ( net.nanopay.model.DateOnly.isInstance(v1) ) {
+          v1 = new Date(v1.toString());
+        }
         return v1 && Date.now() - v1.getTime() > this.timeMs;
       },
       javaCode: `
         Object v1 = getArg1().f(obj);
+        if ( getYears() > 0 && ! getCalculateOnce() ) {
+          setTimeMs((getYears() * 365 * 24 * 60 * 60 * 1000) + getTimeMs());
+          setCalculateOnce(true);
+        }
+        if ( v1 instanceof net.nanopay.model.DateOnly ) {
+          v1 = new java.util.Date(v1.toString());
+        }
         if ( v1 instanceof java.util.Date ) {
           return new java.util.Date().getTime() - ((java.util.Date)v1).getTime() > getTimeMs();
         }
