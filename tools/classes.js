@@ -313,6 +313,7 @@ var classes = [
   'foam.lib.AndPropertyPredicate',
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
+  'foam.lib.parse.BlobPStream',
   'foam.lib.json.OutputJSON',
   'foam.lib.json.OutputterMode',
   'foam.lib.json.UnknownFObject',
@@ -333,6 +334,10 @@ var classes = [
   'foam.nanos.geocode.GoogleMapsGeocodeResult',
   'foam.nanos.geocode.GoogleMapsGeometry',
   'foam.nanos.geocode.GoogleMapsBoundary',
+  'foam.nanos.geocode.GoogleMapsAddressParser',
+  'foam.nanos.geocode.GoogleMapsPlacesPredictions',
+  'foam.nanos.geocode.GoogleMapsPlacesResponse',
+  'foam.nanos.geocode.GoogleMapsCredentials',
 
   'foam.nanos.demo.DemoObject',
   'foam.nanos.demo.relationship.Student',
