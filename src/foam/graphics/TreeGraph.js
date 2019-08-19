@@ -38,18 +38,18 @@
 
    methods: [
      function initCView() {
-      this.SUPER();
+       this.SUPER();
 
        if ( this.data ) {
         this.root = this.Node.create({x:500, y: 50, data: this.data});
         this.add(this.root);
         this.doLayout();
-      }
+       }
 
        // List for 'click' events to expand/collapse Nodes.
        this.canvas.on('click', function(e) {
          var x = e.layerX+this.nodeWidth/2, y = e.layerY;
-         
+
          var c = this.root.findFirstChildAt(x,y);
          if ( ! c ) return;
          c.expanded = ! c.expanded;
