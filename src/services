@@ -323,7 +323,7 @@ p({
   "lazy":false,
   "serve":false,
   "service":{
-    "class":foam.nanos.geocode.GoogleMapsAddressParser",
+    "class":"foam.nanos.geocode.GoogleMapsAddressParser",
   }
 })
 p({
