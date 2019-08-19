@@ -588,8 +588,8 @@ foam.CLASS({
     function findFirstChildAt(p) {
       if ( arguments.length > 1 ) {
         var tmp = foam.graphics.Point.create();
-        tmp.x = arguments[0];
-        tmp.y = arguments[1];
+        tmp.x = arguments[0] / this.canvas.cview.scaleX;
+        tmp.y = arguments[1] / this.canvas.cview.scaleY;
         tmp.w = 1;
         p = tmp;
       }
