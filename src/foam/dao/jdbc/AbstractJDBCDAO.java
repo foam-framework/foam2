@@ -230,7 +230,7 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
    */
   public void buildFormattedColumnNames(FObject obj, StringBuilder builder) {
     // collect columns list into comma delimited string
-    builder.append("(");
+    builder.append('(');
     Iterator i = properties_.iterator();
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
@@ -239,10 +239,10 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
 
       builder.append(prop.createStatement());
       if ( i.hasNext() ) {
-        builder.append(",");
+        builder.append(',');
       }
     }
-    builder.append(")");
+    builder.append(')');
   }
 
   /**
@@ -251,19 +251,19 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
    */
   public void buildFormattedColumnPlaceholders(FObject obj, StringBuilder builder) {
     // map columns into ? and collect into comma delimited string
-    builder.append("(");
+    builder.append('(');
     Iterator i = properties_.iterator();
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
 /*       if ( "id".equals(prop.getName()) )
         continue; */
 
-      builder.append("?");
+      builder.append('?');
       if ( i.hasNext() ) {
-        builder.append(",");
+        builder.append(',');
       }
     }
-    builder.append(")");
+    builder.append(')');
   }
 
   /**
@@ -282,9 +282,9 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
       builder.append(prop.createStatement());
       builder.append("='");
       builder.append(prop.get(obj));  //add the new property value
-      builder.append("'");
+      builder.append('\'');
       if ( i.hasNext() ) {
-        builder.append(",");
+        builder.append(',');
       }
     }
 
@@ -312,9 +312,9 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
       StringBuilder builder = threadLocalBuilder_.get()
               .append("CREATE TABLE ")
               .append(tableName_)
-              .append("(")
+              .append('(')
               .append(getPrimaryKey().createStatement())
-              .append(" ")
+              .append(' ')
               .append(getPrimaryKey().getSQLType())
               .append(" primary key,");
 
@@ -327,14 +327,14 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
           continue;
 
         builder.append(prop.createStatement())
-                .append(" ")
+                .append(' ')
                 .append(prop.getSQLType()); // TODO: is getSQLType guaranteed to return something?
 
         if ( i.hasNext() ) {
-          builder.append(",");
+          builder.append(',');
         }
       }
-      builder.append(")");
+      builder.append(')');
 
       // execute statement
       stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
