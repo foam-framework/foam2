@@ -108,7 +108,7 @@ foam.CLASS({
       documentation: 'Value between 0 - Sunday and 6 - Saturday inclusive.  Indicates which day is considered the first day of a new week.',
       min: 0,
       max: 6,
-      value: 6
+      value: 0
     }
   ],
   methods: [
@@ -116,12 +116,18 @@ foam.CLASS({
       name: 'f',
       code: function(obj) {
         var ts = new Date(this.delegate.f(obj));
-        ts.setDate(ts.getDate() + 5 + this.startOfWeek - ts.getDay());
+
+        var date = ts.getDate();
+        var endOfWeek = (this.startOfWeek + 6) % 7;
+        var day = ts.getDay();
+        var daysToEndOfWeek = (endOfWeek - day + 7) % 7;
+        
+        ts.setDate(date + daysToEndOfWeek);
+
         ts.setHours(23, 59, 59);
         ts.setMilliseconds(999);
 
         return ts;
-        return ts.getTime() > Date.now() ? new Date() : ts;
       },
       javaCode: `
 // Convert to LocalDate
@@ -155,7 +161,6 @@ foam.CLASS({
         ts.setHours(23, 59, 59);
         ts.setMilliseconds(999);
         return ts;
-        return ts.getTime() > Date.now() ? new Date() : ts;
       },
       javaCode: `
 // Convert to LocalDate
@@ -194,7 +199,6 @@ foam.CLASS({
         ts.setHours(23, 59, 59);
         ts.setMilliseconds(999);
         return ts;
-        return ts.getTime() > Date.now() ? new Date() : ts;
       },
       javaCode: `
 // Convert to LocalDate

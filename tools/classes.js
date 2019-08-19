@@ -63,6 +63,7 @@ var classes = [
   'foam.mlang.expr.Dot',
   'foam.mlang.PredicatedExpr',
   'foam.mlang.ContextObject',
+  'foam.mlang.CurrentTime',
   'foam.mlang.predicate.RegExp',
   'foam.mlang.predicate.OlderThan',
   'foam.mlang.predicate.isAuthorizedToRead',
@@ -229,8 +230,8 @@ var classes = [
   'foam.nanos.session.Session',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.om.OMLogger',
+  'foam.nanos.pm.NullPM',
   'foam.nanos.pm.PM',
-  'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',
@@ -312,6 +313,7 @@ var classes = [
   'foam.lib.AndPropertyPredicate',
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
+  'foam.lib.parse.BlobPStream',
   'foam.lib.json.OutputJSON',
   'foam.lib.json.OutputterMode',
   'foam.lib.json.UnknownFObject',
@@ -448,6 +450,12 @@ var classes = [
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
 
+  // Strategy
+  'foam.strategy.StrategyReference',
+  'foam.strategy.StrategizerService',
+  'foam.strategy.BasicStrategizer',
+  'foam.strategy.ClientStrategizerService'
+
 ];
 
 var abstractClasses = [
@@ -468,7 +476,8 @@ var skeletons = [
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.push.PushService',
-  'foam.nanos.test.EchoService'
+  'foam.nanos.test.EchoService',
+  'foam.strategy.StrategizerService'
 ];
 
 var proxies = [
@@ -484,7 +493,8 @@ var proxies = [
   'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.http.WebAgent',
   'foam.nanos.notification.email.EmailService',
-  'foam.nanos.notification.push.PushService'
+  'foam.nanos.notification.push.PushService',
+  'foam.strategy.StrategizerService'
 ];
 
 var blacklist = [

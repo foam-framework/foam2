@@ -73,11 +73,19 @@ public class SessionServerBox
         // if req == null it means that we're being accessed via webSockets
         if ( ! SafetyUtil.equals(session.getRemoteHost(), req.getRemoteHost()) ) {
           // If an existing session is reused with a different remote host then
-          // logout the session and force a re-login.
-//          logger.warning("Attempt to use session create for ", session.getRemoteHost(), " from ", req.getRemoteHost());
-         session.setContext(getX().put(Session.class, session));
-         session.setRemoteHost(req.getRemoteHost());
-         sessionDAO.put(session);
+          // delete the session and force a re-login.
+          // This is done as a security measure to reduce the likelihood of
+          // session hijacking. If an attacker were to get ahold of another
+          // user's session id, they could start using that session id in the
+          // requests they send to the server and gain access to the real user's
+          // session and therefore their privileges and data. By forcing users
+          // to sign back in when the remote host changes, we reduce the attack
+          // surface for session hijacking. Session hijacking is still possible,
+          // but only if the user is on the same remote host.
+          logger.warning("Remote host for session ", sessionID, " changed from ", session.getRemoteHost(), " to ", req.getRemoteHost(), ". Deleting session and forcing the user to sign in again.");
+          sessionDAO.remove(session);
+          msg.replyWithException(new AuthenticationException("IP address changed. Your session was deleted to keep your account secure. Please sign in again to verify your identity."));
+          return;
         }
       }
 

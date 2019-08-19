@@ -583,6 +583,7 @@ FOAM_FILES([
   { name: "foam/lib/json/ClassReferenceParserTest" },
   { name: "foam/lib/parse/Parser" },
   { name: "foam/lib/parse/PStream" },
+  { name: "foam/lib/parse/BlobPStream" },
   { name: "foam/crypto/hash/Hasher" },
   { name: "foam/crypto/hash/Hashable" },
   { name: "foam/crypto/hash/HashableTest" },
@@ -673,5 +674,11 @@ FOAM_FILES([
   { name: "foam/u2/detail/SectionedDetailView" },
   { name: "foam/u2/detail/VerticalDetailView" },
   { name: "foam/u2/detail/WizardSectionsView" },
-  { name: "foam/u2/detail/SectionedDetailPropertyView" }
+  { name: "foam/u2/detail/SectionedDetailPropertyView" },
+
+  // Strategy
+  { name: "foam/strategy/StrategyReference" },
+  { name: "foam/strategy/StrategizerService" },
+  { name: "foam/strategy/BasicStrategizer" },
+  { name: "foam/strategy/ClientStrategizerService" }
 ]);
