@@ -12,6 +12,7 @@ foam.CLASS({
   `,
 
   requires: [
+    'foam.comics.SearchMode',
     'foam.comics.v2.CannedQuery',
     'foam.comics.v2.namedViews.NamedViewCollection'
   ],
@@ -59,12 +60,31 @@ foam.CLASS({
       class: 'StringArray',
       name: 'defaultColumns',
       factory: null,
-      expression: function(of) { 
+      expression: function(of) {
         var tableColumns = of.getAxiomByName('tableColumns');
 
-        return tableColumns 
+        return tableColumns
                 ? tableColumns.columns
                 : of.getAxiomsByClass(foam.core.Property).map(p => p.name);
+      }
+    },
+    {
+      name: 'searchColumns',
+      documentation: `
+        Lets you pick which properties on the model should be used as the default
+        search filters. You should set the search columns on the model itself and
+        only set this property when you want to override the ones set on the model.
+      `
+    },
+    {
+      class: 'Enum',
+      of: 'foam.comics.SearchMode',
+      name: 'searchMode',
+      documentation: `
+        The level of search capabilities that the controller should have.
+      `,
+      factory: function() {
+        return this.SearchMode.SIMPLE;
       }
     },
     {

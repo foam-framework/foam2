@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'DAOBrowserView',
   extends: 'foam.u2.View',
   requires: [
+    'foam.comics.SearchMode',
     'foam.u2.ActionView',
     'foam.u2.dialog.Popup',
     'foam.u2.layout.Cols',
@@ -41,6 +42,7 @@ foam.CLASS({
     ^query-bar {
       padding: 24px 16px;
       align-items: center;
+      justify-content: flex-end;
     }
 
     ^toolbar {
@@ -76,6 +78,14 @@ foam.CLASS({
     ^ .foam-u2-view-TableView td {
       padding-left: 16px;
     }
+
+    ^ .foam-u2-view-SimpleSearch {
+      flex-grow: 1;
+    }
+
+    ^ .foam-u2-view-SimpleSearch .foam-u2-search-TextSearchView .foam-u2-tag-Input {
+      width: 100%;
+    }
   `,
 
   imports: [
@@ -84,6 +94,8 @@ foam.CLASS({
   exports: [
     'dblclick',
     'filteredTableColumns',
+    'config.dao as dao',
+    'config.searchColumns as searchColumns'
   ],
   properties: [
     {
@@ -103,8 +115,23 @@ foam.CLASS({
       }
     },
     {
+      name: 'cls',
+      expression: function(config) {
+        return config.cls_;
+      }
+    },
+    {
       class: 'foam.mlang.predicate.PredicateProperty',
-      name: 'predicate',
+      name: 'cannedPredicate',
+      expression: function(config$cannedQueries) {
+        return config$cannedQueries && config$cannedQueries.length
+          ? config$cannedQueries[0].predicate
+          : foam.mlang.predicate.True.create();
+      }
+    },
+    {
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'predicates',
       expression: function(config$cannedQueries) {
         return config$cannedQueries && config$cannedQueries.length
           ? config$cannedQueries[0].predicate
@@ -114,8 +141,8 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'predicatedDAO',
-      expression: function(config, predicate) {
-        return config.dao$proxy.where(predicate);
+      expression: function(config, predicates) {
+        return config.dao$proxy.where(predicates);
       }
     }
   ],
@@ -159,7 +186,7 @@ foam.CLASS({
                         this
                           .start(self.TabChoiceView, {
                             choices: config$cannedQueries.map(o => [o.predicate, o.label]),
-                            data$: self.predicate$
+                            data$: self.predicates$
                           })
                             .addClass(self.myClass('canned-queries'))
                           .end();
@@ -168,9 +195,16 @@ foam.CLASS({
                   .end();
               })
               .start(self.Cols).addClass(self.myClass('query-bar'))
-                .start().addClass(self.myClass('toolbar'))
-                  .tag(self.Toolbar, { /* data$: self.predicate$ */ })
-                .end()
+                .startContext({ data: self.config })
+                  .callIf(self.config.searchMode === self.SearchMode.SIMPLE, function() {
+                    // Clears predicate when returning to view
+                    self.config.predicate = undefined;
+                    this
+                      .add(self.config.cls_.PREDICATE.clone().copyFrom({
+                        view: { class: 'foam.u2.view.SimpleSearch', showCount: false }
+                      }));
+                  })
+                .endContext()
                 .startContext({data: self})
                   .start(self.EXPORT, {
                     buttonStyle: foam.u2.ButtonStyle.SECONDARY
