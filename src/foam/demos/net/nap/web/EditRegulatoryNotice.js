@@ -41,12 +41,6 @@
       margin: auto;
       background-color: #edf0f5;
     }
-    ^ .net-nanopay-ui-ActionView-backAction {
-      border-radius: 2px;
-      // background-color: rgba(164, 179, 184, 0.1);
-      box-shadow: 0 0 1px 0 rgba(9, 54, 73, 0.8);
-      margin-right: 10px;
-    }
     ^ .actions {
       width: 1240px;
       height: 40px;
@@ -55,37 +49,6 @@
     ^ .left-actions {
       display: inline-block;
       float: left;
-    }
-    ^ .net-nanopay-ui-ActionView-saveAction {
-      float: right;
-      border-radius: 2px;
-      background-color: %SECONDARYCOLOR%;
-      margin-bottom: 10px;
-      width: 140px;
-      height: 40px;
-      background-color: #59a5d5;
-      font-family: Roboto;
-      font-size: 14px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 2.86;
-      letter-spacing: 0.2px;
-      text-align: center;
-      color: #ffffff;
-    }
-    ^ .net-nanopay-ui-ActionView-backAction {
-      border-radius: 2px;
-      // background-color: rgba(164, 179, 184, 0.1);
-      box-shadow: 0 0 1px 0 rgba(9, 54, 73, 0.8);
-    }
-    ^ .net-nanopay-ui-ActionView-backAction:hover {
-      background: lightgray;
-    }
-    ^ .attachment-btn {
-      margin-left: 5px;
-      margin-bottom: 10px;
-      margin-top: 10px;
     }
     ^ .attachment-input {
       width: 0.1px;
@@ -128,14 +91,6 @@
     }
     ^ .foam-u2-PropertyView {
       padding: 2px 8px 2px 6px;
-    }
-    ^ .net-nanopay-ui-ActionView-delete {
-      float: right;
-      margin-left: 10px;
-    }
-    ^ .net-nanopay-ui-ActionView-delete {
-      background: #d55;
-      color: white;
     }
     ^ .uploadButtonContainer {
       height: 80px;

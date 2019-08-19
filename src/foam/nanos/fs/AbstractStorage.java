@@ -12,6 +12,9 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
+
 public abstract class AbstractStorage implements Storage {
 
   protected abstract FileSystem getFS();
@@ -53,7 +56,7 @@ public abstract class AbstractStorage implements Storage {
     if ( path == null ) return null;
 
     try {
-      return Files.newOutputStream(path);
+      return Files.newOutputStream(path, CREATE, APPEND);
     } catch (IOException e) {
       return null;
     }
