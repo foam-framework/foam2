@@ -143,10 +143,16 @@ public class PostgresDAO
 
       return obj;
     } catch ( Throwable e ) {
-      e.printStackTrace();
+      Logger logger = (Logger) x.get("logger");
+      logger.error(e);
       return null;
     } finally {
-      setStatementValues(insertStmt, null);
+      try {
+        setStatementValues(insertStmt, null);
+      } catch (SQLException e) {
+        Logger logger = (Logger) x.get("logger");
+        logger.error(e);
+      }
       closeAllQuietly(resultSet, insertStmt);
     }
   }

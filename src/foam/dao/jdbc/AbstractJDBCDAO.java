@@ -83,7 +83,12 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
       logger.error(e);
       return null;
     } finally {
-      findStmt.setObject(null);
+      try {
+        findStmt.setObject(null);
+      } catch (SQLException e) {
+        Logger logger = (Logger) x.get("logger");
+        logger.error(e);
+      }
       closeAllQuietly(resultSet, findStmt);
     }
   }
@@ -122,16 +127,15 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
       logger.error(e);
       return null;
     } finally {
-      removeStmt.setObject(null);
+      try {
+        removeStmt.setObject(null);
+      } catch (SQLException e) {
+        Logger logger = (Logger) x.get("logger");
+        logger.error(e);
+      }
       closeAllQuietly(null, removeStmt);
     }
   }
-
-  /**
-   * Create the table in the database and return true if it doesn't already exist otherwise it does nothing and returns false
-   * @param of ClassInfo
-   */
-  public abstract boolean maybeCreateTable(X x, ClassInfo of);
 
   public AbstractJDBCDAO(X x, ClassInfo of) throws java.sql.SQLException, ClassNotFoundException {
     setX(x);
@@ -294,7 +298,6 @@ public abstract class AbstractJDBCDAO extends AbstractDAO{
    * Create the table in the database and return true if it doesn't already exist otherwise it does nothing and returns false
    * @param of ClassInfo
    */
-  @Override
   public boolean maybeCreateTable(X x, ClassInfo of) {
     Connection c = null;
     IndexedPreparedStatement stmt = null;

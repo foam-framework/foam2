@@ -12,6 +12,7 @@ import foam.nanos.logger.Logger;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
+import java.lang.Exception;
 import java.sql.*;
 import java.sql.SQLException;
 import java.util.*;
@@ -72,7 +73,12 @@ public class MySQLDAO extends AbstractJDBCDAO{
       logger.error(e);
       return null;
     } finally {
-      setStatementValues(insertStmt, null);
+      try {
+        setStatementValues(insertStmt, null);
+      } catch (SQLException e) {
+        Logger logger = (Logger) x.get("logger");
+        logger.error(e);
+      }
       closeAllQuietly(resultSet, insertStmt);
     }
   }
