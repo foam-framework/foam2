@@ -218,6 +218,6 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/RemoveJunctionsOnUserRemoval" },
   //authservice
   { name: "foam/nanos/auth/CapabilityAuthService" },
-
-
+  // google
+  { name: "foam/nanos/geocode/GoogleMapsCredentials" }
 ]);

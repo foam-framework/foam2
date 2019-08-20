@@ -18,8 +18,14 @@ foam.CLASS({
   ],
 
   css: `
+    ^.expanded ^view {
+      margin: 8px 0;
+    }
+
     ^citation-view {
       width: 100%;
+      display: flex;
+      align-items: center;
     }
   `,
 
@@ -41,20 +47,22 @@ foam.CLASS({
         return {
           class: 'foam.u2.CitationView',
           of: data && data.cls_
-        }
+        };
       }
     }
   ],
   actions: [
     {
       name: 'showAction',
-      label: 'Show',
+      label: '',
+      icon: 'images/expand-more.svg',
       isAvailable: function(isCollapsed) { return isCollapsed; },
       code: function() { this.isCollapsed = false; }
     },
     {
       name: 'hideAction',
-      label: 'Hide',
+      label: '',
+      icon: 'images/expand-less.svg',
       isAvailable: function(isCollapsed) { return ! isCollapsed; },
       code: function() { this.isCollapsed = true; }
     }
@@ -65,7 +73,8 @@ foam.CLASS({
       self.SUPER();
 
       this.addClass(this.myClass());
-      
+      this.enableClass('expanded', this.isCollapsed$, true);
+
       self
         .startContext({ data: self })
           .start(self.Cols)
@@ -74,15 +83,16 @@ foam.CLASS({
                 data$: self.data$
               }).addClass(this.myClass('citation-view')) : null;
             }))
-            .add(self.SHOW_ACTION)
-            .add(self.HIDE_ACTION)
+            .tag(self.SHOW_ACTION, { buttonStyle: 'UNSTYLED' })
+            .tag(self.HIDE_ACTION, { buttonStyle: 'UNSTYLED' })
           .end()
         .endContext()
         .add(self.slot(function(view, isCollapsed) {
           if ( isCollapsed ) return null;
-          return self.E().tag(view, {
-            data$: self.data$
-          });
+          return self.E()
+            .start(view, { data$: self.data$ })
+              .addClass(self.myClass('view'))
+            .end();
         }));
     }
   ]
