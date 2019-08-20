@@ -3150,22 +3150,11 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'DotF',
-  extends: 'foam.mlang.predicate.AbstractPredicate',
+  extends: 'foam.mlang.predicate.Binary',
   implements: [ 'foam.core.Serializable' ],
 
   documentation: `A binary predicate that evaluates arg1 as a predicate with
     arg2 as its argument.`,
-
-  properties: [
-    {
-      class: 'foam.mlang.ExprProperty',
-      name: 'arg1'
-    },
-    {
-      class: 'foam.mlang.ExprProperty',
-      name: 'arg2'
-    }
-  ],
 
   methods: [
     {
