@@ -3416,7 +3416,7 @@ foam.CLASS({
           this.timeMs = (this.years * 365 * 24 * 60 * 60 * 1000) + this.timeMs;
           this.calculateOnce = true;
         }
-        if ( net.nanopay.model.DateOnly.isInstance(v1) ) {
+        if ( foam.core.DateOnly.isInstance(v1) ) {
           v1 = new Date(v1.toString());
         }
         return v1 && Date.now() - v1.getTime() > this.timeMs;
@@ -3427,7 +3427,7 @@ foam.CLASS({
           setTimeMs((getYears() * 365 * 24 * 60 * 60 * 1000) + getTimeMs());
           setCalculateOnce(true);
         }
-        if ( v1 instanceof net.nanopay.model.DateOnly ) {
+        if ( v1 instanceof foam.core.DateOnly ) {
           v1 = new java.util.Date(v1.toString());
         }
         if ( v1 instanceof java.util.Date ) {

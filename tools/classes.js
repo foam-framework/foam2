@@ -5,6 +5,7 @@
  */
 
 var classes = [
+  'foam.core.DateOnly',
   'foam.core.Axiom',
   'foam.core.Detachable',
   'foam.core.Serializable',
