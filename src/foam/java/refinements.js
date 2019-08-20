@@ -42,7 +42,7 @@ foam.LIB({
 new java.util.HashMap() {
   {
 ${Object.keys(o).map(function(k) {
-  return `  put(${foam.java.asJavaValue(k)}, ${foam.java.asJavaValue(o[k])});`
+  return `put(${foam.java.asJavaValue(k)}, ${foam.java.asJavaValue(o[k])});`
 }).join('\n')}
   }
 }
@@ -455,7 +455,6 @@ foam.LIB({
       cls.name = this.model_.name;
       cls.package = this.model_.package;
       cls.abstract = this.model_.abstract;
-      cls.documentation = this.model_.documentation;
 
       if ( this.model_.name !== 'AbstractFObject' ) {
         // if not AbstractFObject either extend AbstractFObject or use provided extends property
@@ -635,10 +634,6 @@ foam.CLASS({
       expression: function(flags) {
         return foam.util.flagFilter(['java'])(this);
       }
-    },
-    {
-      class: 'Boolean',
-      name: 'remote'
     }
   ],
 
@@ -655,9 +650,7 @@ foam.CLASS({
         abstract: this.abstract,
         final: this.final,
         synchronized: this.synchronized,
-        remote: this.remote,
         throws: this.javaThrows,
-        documentation: this.documentation,
         args: this.args && this.args.map(function(a) {
           return {
             name: a.name,
@@ -687,7 +680,6 @@ foam.CLASS({
       cls.constant({
         name: this.name,
         type: 'String',
-        documentation: this.documentation,
         value: foam.java.asJavaValue(this.message)
       });
     }
@@ -752,7 +744,6 @@ foam.CLASS({
         visibility: 'public',
         name: this.name,
         type: 'void',
-        documentation: this.documentation,
         body: this.javaCode
       });
     }
@@ -879,7 +870,6 @@ foam.CLASS({
 
           cls.name = this.model_.name;
           cls.package = this.model_.package;
-          cls.documentation = this.model_.documentation;
           cls.implements = (this.implements || [])
             .concat(this.model_.javaExtends || []);
 
@@ -1172,7 +1162,7 @@ foam.CLASS({
             name: '__frozen__',
             visibility: 'protected',
             type: 'boolean',
-            initializer: 'false;'
+            initializer: 'false'
           });
 
           var flagFilter = foam.util.flagFilter(['java']);

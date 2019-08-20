@@ -159,7 +159,6 @@ FOAM_FILES([
   { name: "foam/json2/Outputter" },
   { name: "foam/json2/Serializer" },
   { name: "foam/json2/Deserializer" },
-  { name: "foam/java/Util", flags:['java'] },
 
   { name: "foam/util/Timer" },
   { name: "foam/util/EmailTest" },
@@ -572,7 +571,7 @@ FOAM_FILES([
   { name: "foam/dao/history/PropertyUpdate" },
   { name: "foam/dao/history/HistoryRecord" },
   { name: "foam/mop/MOP" },
-  { name: "foam/dao/jdbc/ConnectionPool" },
+  { name: "foam/dao/pg/ConnectionPool" },
   { name: "foam/lib/Outputter" },
   { name: "foam/lib/PropertyPredicate" },
   { name: "foam/lib/PermissionedPropertyPredicate" },

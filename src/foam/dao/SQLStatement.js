@@ -20,7 +20,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'stmt',
-          javaType: 'foam.dao.jdbc.IndexedPreparedStatement'
+          javaType: 'foam.dao.pg.IndexedPreparedStatement'
         }
       ]
     }

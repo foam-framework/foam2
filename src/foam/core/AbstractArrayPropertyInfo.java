@@ -6,14 +6,17 @@
 
 package foam.core;
 
-import foam.dao.jdbc.IndexedPreparedStatement;
+import foam.dao.pg.IndexedPreparedStatement;
 import foam.nanos.logger.Logger;
 import java.lang.UnsupportedOperationException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public abstract class AbstractArrayPropertyInfo
   extends AbstractPropertyInfo

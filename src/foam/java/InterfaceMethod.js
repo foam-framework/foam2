@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-//import limitSplit from 'foam.java.util.js';
-
 foam.CLASS({
   package: 'foam.java',
   name: 'InterfaceMethod',
@@ -29,10 +27,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'visibility'
-    },
-    {
-      class: 'String',
-      name: 'documentation'
     },
     'type',
     {
@@ -71,30 +65,11 @@ foam.CLASS({
     {
       name: 'abstract',
       getter: function() { return false; }
-    },
-    {
-      class: 'Boolean',
-      name: 'remote'
     }
   ],
 
   methods: [
     function outputJava(o) {
-
-      if ( this.documentation ) {
-       str = foam.java.Util.removeSpacing(this.documentation);
-       lines = foam.java.Util.limitSplit(str, 25);
-       o.indent();
-       o.out('/**\n');
-       for ( i = 0 ; i < lines.length ; i++ ) {
-         o.indent();
-         o.out('* ' + lines[i]);
-         o.out('\n');
-       }
-       o.indent();
-       o.out('*/\n');
-      }
-
       o.indent();
       o.out(this.visibility, this.visibility ? ' ' : '',
         this.type, ' ', this.name, '(');

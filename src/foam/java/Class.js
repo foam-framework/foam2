@@ -179,23 +179,8 @@ foam.CLASS({
         });
 
         o.out('\n');
-
       } else {
         o.indent();
-      }
-
-      if ( this.documentation ) {
-        str = foam.java.Util.removeSpacing(this.documentation);
-        lines = foam.java.Util.limitSplit(str, 25);
-        o.indent();
-        o.out('/**\n');
-        for ( i = 0 ; i < lines.length ; i++ ) {
-          o.indent();
-          o.out('* ' + lines[i]);
-          o.out('\n');
-        }
-        o.indent();
-        o.out('*/\n');
       }
 
       if ( ! this.anonymous ) {
@@ -218,22 +203,9 @@ foam.CLASS({
         }
       }
 
-      o.out(' {\n\n');
+      o.out(' {\n');
 
       o.increaseIndent();
-
-      // Look if the class has a method tagged 'remote' : see CPF-278
-      var isORBitalDAOed = false;
-      for ( m in this.methods ) {
-        if ( m.remote ) {
-          isORBitalDAOed = true;
-          break;
-        }
-      }
-      if( isORBitalDAOed ){
-        //TODO: add necessary constructs to generated java class that needs to be an ORBitalDAO'able
-
-      }
 
       if ( this.isEnum ) this.writeDeclarations(o);
 
@@ -249,7 +221,6 @@ foam.CLASS({
       o.decreaseIndent();
       o.indent();
       o.out('}');
-
     },
 
     function toJavaSource() {
