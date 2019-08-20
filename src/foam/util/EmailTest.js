@@ -16,7 +16,7 @@ foam.CLASS({
         test(! Email.isValid(null), "null email returns false");
         test(! Email.isValid(""), "empty string email returns false");
         test(! Email.isValid("kjc93ubef203e"), "garbage data returns false");
-        test(Email.isValid("kirk@nanopay.net"), "valid email returns true");
+        test(Email.isValid("test@foam.net"), "valid email returns true");
       `
     }
   ]

@@ -120,9 +120,21 @@ foam.CLASS({
       }
     },
     {
-      name: 'cls',
-      expression: function(config) {
-        return config.cls_;
+      class: 'foam.u2.ViewSpec',
+      name: 'summaryView',
+      factory: function() {
+        return {
+          class: 'foam.u2.view.ScrollTableView'
+        };
+      }
+    },
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'cannedQueriesView',
+      factory: function() {
+        return {
+          class: 'foam.u2.view.TabChoiceView'
+        };
       }
     },
     {
@@ -187,7 +199,7 @@ foam.CLASS({
                     .start(self.Cols)
                       .callIf(config$cannedQueries.length > 1, function() {
                         this
-                          .start(self.TabChoiceView, {
+                          .start(self.cannedQueriesView, {
                             choices: config$cannedQueries.map(o => [o.predicate, o.label]),
                             data$: self.cannedPredicate$
                           })
@@ -217,7 +229,7 @@ foam.CLASS({
                   .end()
                 .endContext()
               .end()
-              .start(self.ScrollTableView, {
+              .start(self.summaryView, {
                 data: self.predicatedDAO$proxy,
                 enableDynamicTableHeight: false,
                 columns: config$defaultColumns
