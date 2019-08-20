@@ -10,14 +10,19 @@ foam.CLASS({
   extends: 'foam.u2.View',
   requires: [
     'foam.comics.SearchMode',
+    'foam.comics.v2.DAOControllerConfig',
     'foam.u2.ActionView',
     'foam.u2.dialog.Popup',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.search.Toolbar',
     'foam.u2.view.ScrollTableView',
+    'foam.u2.view.SimpleSearch',
     'foam.u2.view.TabChoiceView',
-    'foam.comics.v2.DAOControllerConfig'
+  ],
+
+  implements: [
+    'foam.mlang.Expressions'
   ],
 
   documentation: `
@@ -131,18 +136,16 @@ foam.CLASS({
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
-      name: 'predicates',
-      expression: function(config$cannedQueries) {
-        return config$cannedQueries && config$cannedQueries.length
-          ? config$cannedQueries[0].predicate
-          : foam.mlang.predicate.True.create();
+      name: 'searchPredicate',
+      expression: function() {
+        return foam.mlang.predicate.True.create();
       }
     },
     {
       class: 'foam.dao.DAOProperty',
       name: 'predicatedDAO',
-      expression: function(config, predicates) {
-        return config.dao$proxy.where(predicates);
+      expression: function(config, cannedPredicate, searchPredicate) {
+        return config.dao$proxy.where(this.AND(cannedPredicate, searchPredicate));
       }
     }
   ],
@@ -186,7 +189,7 @@ foam.CLASS({
                         this
                           .start(self.TabChoiceView, {
                             choices: config$cannedQueries.map(o => [o.predicate, o.label]),
-                            data$: self.predicates$
+                            data$: self.cannedPredicate$
                           })
                             .addClass(self.myClass('canned-queries'))
                           .end();
@@ -195,14 +198,15 @@ foam.CLASS({
                   .end();
               })
               .start(self.Cols).addClass(self.myClass('query-bar'))
-                .startContext({ data: self.config })
+                .startContext({
+                  data: self.config,
+                  controllerMode: foam.u2.ControllerMode.EDIT
+                })
                   .callIf(self.config.searchMode === self.SearchMode.SIMPLE, function() {
-                    // Clears predicate when returning to view
-                    self.config.predicate = undefined;
-                    this
-                      .add(self.config.cls_.PREDICATE.clone().copyFrom({
-                        view: { class: 'foam.u2.view.SimpleSearch', showCount: false }
-                      }));
+                    this.tag(self.SimpleSearch, {
+                      showCount: false,
+                      data$: self.searchPredicate$
+                    });
                   })
                 .endContext()
                 .startContext({data: self})
