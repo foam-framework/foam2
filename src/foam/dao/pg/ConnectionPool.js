@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.dao.jdbc',
+  package: 'foam.dao.pg',
   name: 'ConnectionPool',
 
   documentation: 'Represents a database connection pool',

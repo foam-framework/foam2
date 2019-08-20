@@ -6,7 +6,8 @@
 
 package foam.core;
 
-import foam.dao.jdbc.IndexedPreparedStatement;
+import foam.dao.pg.IndexedPreparedStatement;
+import foam.lib.xml.Outputter;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.AuthorizationException;
 import foam.nanos.logger.Logger;
@@ -18,6 +19,8 @@ import java.sql.SQLException;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public abstract class AbstractPropertyInfo
   implements PropertyInfo
