@@ -386,6 +386,7 @@ var classes = [
   'foam.nanos.dig.exception.UnsupportException',
   'foam.nanos.dig.exception.UnknownIdException',
   'foam.nanos.dig.exception.DigSuccessMessage',
+  'foam.nanos.dig.exception.AuthorizationException',
   'foam.flow.Document',
   'foam.flow.DocumentationFolderDAO',
 
