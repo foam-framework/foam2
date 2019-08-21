@@ -6,6 +6,7 @@
 
 package foam.nanos.dig;
 
+import foam.dao.DAO;
 import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.lib.AndPropertyPredicate;
@@ -14,6 +15,7 @@ import foam.lib.PermissionedPropertyPredicate;
 import foam.lib.PropertyPredicate;
 import foam.lib.json.JSONParser;
 import foam.lib.json.Outputter;
+import foam.nanos.boot.NSpec;
 import foam.nanos.dig.exception.*;
 import foam.nanos.http.HttpParameters;
 import foam.nanos.logger.Logger;
@@ -66,6 +68,20 @@ public class SugarWebAgent
             .setMessage("Can not find out service interface")
             .build();
           outputException(x, resp, "JSON", out, error);
+      }
+
+      // Check if the user is authorized to access the DAO.
+      DAO nSpecDAO = (DAO) x.get("nSpecDAO");
+      NSpec nspec = (NSpec) nSpecDAO.find(serviceName);
+      try {
+        if ( nspec != null ) {
+          nspec.checkAuthorization(x);
+        }
+      } catch (foam.nanos.auth.AuthorizationException e) {
+        outputException(x, resp, "JSON", out, new foam.nanos.dig.exception.AuthorizationException.Builder(x)
+          .setMessage(e.getMessage())
+          .build());
+        return;
       }
 
       Class[] paramTypes = null; // for picked Method's parameters' types
