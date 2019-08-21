@@ -51,6 +51,7 @@ public class SugarWebAgent
           .setMessage("Empty Service Key")
           .build();
         outputException(x, resp, "JSON", out, error);
+        return;
       }
 
       if ( SafetyUtil.isEmpty(methodName) ) {
@@ -58,6 +59,7 @@ public class SugarWebAgent
           .setMessage("Empty Method Name")
           .build();
         outputException(x, resp, "JSON", out, error);
+        return;
       }
 
       Class class_ = null;
@@ -68,6 +70,7 @@ public class SugarWebAgent
             .setMessage("Can not find out service interface")
             .build();
           outputException(x, resp, "JSON", out, error);
+          return;
       }
 
       // Check if the user is authorized to access the DAO.
@@ -108,6 +111,7 @@ public class SugarWebAgent
                   .setMessage("IllegalArgumentException : Add a compiler argument")
                   .build();
                 outputException(x, resp, "JSON", out, error);
+                return;
               }
 
               paramTypes[j] = pArray[j].getType();
@@ -129,6 +133,7 @@ public class SugarWebAgent
                   .setMessage("Empty Parameter values : " + pArray[j].getName())
                   .build();
                 outputException(x, resp, "JSON", out, error);
+                return;
               }
             }
             executeMethod(x, resp, out, class_, serviceName, methodName, paramTypes, arglist);
