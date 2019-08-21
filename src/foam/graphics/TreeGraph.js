@@ -49,18 +49,17 @@
        // List for 'click' events to expand/collapse Nodes.
        this.canvas.on('click', function(e) {
          var x = e.layerX+this.nodeWidth/2, y = e.layerY;
-
          var c = this.canvas.cview.findFirstChildAt(x,y);
+
          if ( ! c ) return;
          c.expanded = ! c.expanded;
+         
          if ( ! c.expanded ) {
            for ( var i = 0 ; i < c.childNodes.length ; i++ ) {
              c.childNodes[i].y = this.nodeHeight;
              c.childNodes[i].x = 0;
            }
            c.maxLeft = c.maxRight = 0;
-
-           
          }
          this.doLayout();
        }.bind(this));
