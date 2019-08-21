@@ -49,7 +49,11 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.setAttribute('type', 'date');
-      this.setAttribute('max', '9999-12-31');
+      // this.setAttribute('max', '9999-12-31'); 
+      // Possible cause of Invalid Date Exceptions 
+      // for old journal entries before this was added to the DateView
+      // commenting out until the old journal entries can be migrated to 
+      // 4-digit years or there is a better solution
       this.setAttribute('placeholder', 'yyyy/mm/dd');
       this.on('blur', this.onBlur);
     },
