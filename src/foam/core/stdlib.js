@@ -460,7 +460,6 @@ foam.LIB({
       var argNames = foam.Function.argNames(fn);
       var args = [];
       for ( var i = 0 ; i < argNames.length ; i++ ) {
-
         var a = foam.core.FObject.isInstance(source) &&
                 argNames[i].indexOf('$') != -1 ?
           source.slot(argNames[i]).get() :
