@@ -86,8 +86,8 @@ public class DigWebAgent
       }
 
       NSpec nspec = (NSpec) nSpecDAO.find(daoName);
-      if ( nspec == null ||
-           ! nspec.getServe() ) {
+
+      if ( nspec == null || ! nspec.getServe() ) {
          DigErrorMessage error = new DAONotFoundException.Builder(x)
                                       .setMessage("DAO not found: " + daoName)
                                       .build();
