@@ -98,6 +98,14 @@ foam.CLASS({
       value: function (_, d) {
         if ( typeof d === 'number' ) return new Date(d);
         if ( typeof d === 'string' ) {
+          
+          // TODO: Currently some DateViews are allowing users to enter 6-digit years 
+          // which needs to be fixed via setAttribute('max', '9999-12-31') on DateViews
+          // However, there are already existing journal entries that contain Dates
+          // with 6-digit years and they are not showing up in tables because the invalid
+          // date error below is being thrown. 
+          // This is a temporary fix to migrate journal entries with bad dates to use proper date format
+          if ( d.indexOf('-') > 4 ) d = '9999' + d.substring(d.indexOf('-'));
           var ret = new Date(d);
 
           if ( isNaN(ret.getTime()) ) throw 'Invalid Date: ' + d;
