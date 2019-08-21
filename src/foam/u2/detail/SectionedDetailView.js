@@ -30,6 +30,13 @@ foam.CLASS({
     }
   `,
 
+  properties: [
+    {
+      name: 'border',
+      value: 'foam.u2.borders.CardBorder'
+    }
+  ],
+
   methods: [
     function initE() {
       var self = this;
@@ -51,7 +58,7 @@ foam.CLASS({
                       .add(s.title$)
                       .show(s.title$)
                     .end()
-                    .start(self.CardBorder)
+                    .start({ class: self.border })
                       .addClass('inner-card')
                       .tag(self.SectionView, {
                         data$: self.data$,
