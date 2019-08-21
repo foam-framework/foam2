@@ -76,10 +76,18 @@ public class SugarWebAgent
       // Check if the user is authorized to access the DAO.
       DAO nSpecDAO = (DAO) x.get("nSpecDAO");
       NSpec nspec = (NSpec) nSpecDAO.find(serviceName);
+
+      // Check if service exists and is served.
+      if ( nspec == null || ! nspec.getServe() ) {
+        DigErrorMessage error = new GeneralException.Builder(x)
+          .setMessage(String.format("Could not find service named '%s'", serviceName))
+          .build();
+        outputException(x, resp, "JSON", out, error);
+        return;
+      }
+
       try {
-        if ( nspec != null ) {
-          nspec.checkAuthorization(x);
-        }
+        nspec.checkAuthorization(x);
       } catch (foam.nanos.auth.AuthorizationException e) {
         outputException(x, resp, "JSON", out, new foam.nanos.dig.exception.AuthorizationException.Builder(x)
           .setMessage(e.getMessage())
