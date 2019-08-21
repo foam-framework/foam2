@@ -99,9 +99,7 @@ foam.CLASS({
   ],
   exports: [
     'dblclick',
-    'filteredTableColumns',
-    'config.dao as dao',
-    'config.searchColumns as searchColumns'
+    'filteredTableColumns'
   ],
   properties: [
     {
@@ -212,7 +210,7 @@ foam.CLASS({
               })
               .start(self.Cols).addClass(self.myClass('query-bar'))
                 .startContext({
-                  data: self.config,
+                  dao: self.config.dao,
                   controllerMode: foam.u2.ControllerMode.EDIT
                 })
                   .callIf(self.config.searchMode === self.SearchMode.SIMPLE, function() {

@@ -69,23 +69,13 @@ foam.CLASS({
       }
     },
     {
-      name: 'searchColumns',
-      documentation: `
-        Lets you pick which properties on the model should be used as the default
-        search filters. You should set the search columns on the model itself and
-        only set this property when you want to override the ones set on the model.
-      `
-    },
-    {
       class: 'Enum',
       of: 'foam.comics.SearchMode',
       name: 'searchMode',
-      documentation: `
+      help: `
         The level of search capabilities that the controller should have.
       `,
-      factory: function() {
-        return this.SearchMode.SIMPLE;
-      }
+      value: 'SIMPLE'
     },
     {
       class: 'foam.u2.ViewSpecWithJava',
