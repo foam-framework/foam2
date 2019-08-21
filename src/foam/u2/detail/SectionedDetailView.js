@@ -30,6 +30,16 @@ foam.CLASS({
     }
   `,
 
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'border',
+      factory: function() {
+        return this.CardBorder;
+      }
+    }
+  ],
+
   methods: [
     function initE() {
       var self = this;
@@ -51,7 +61,7 @@ foam.CLASS({
                       .add(s.title$)
                       .show(s.title$)
                     .end()
-                    .start(self.CardBorder)
+                    .start(self.border)
                       .addClass('inner-card')
                       .tag(self.SectionView, {
                         data$: self.data$,
