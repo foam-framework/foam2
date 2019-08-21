@@ -22,7 +22,6 @@ import foam.lib.PropertyPredicate;
 import foam.lib.StoragePropertyPredicate;
 import foam.mlang.MLang;
 import foam.mlang.predicate.Predicate;
-import foam.nanos.auth.AuthService;
 import foam.nanos.boot.NSpec;
 import foam.nanos.dig.exception.*;
 import foam.nanos.http.*;
@@ -96,13 +95,11 @@ public class DigWebAgent
       }
 
       // Check if the user is authorized to access the DAO.
-      AuthService auth = (AuthService) x.get("auth");
-      if (
-        nspec.getAuthenticate() &&
-        ! auth.check(x, "service." + nspec.getName())
-      ) {
-        outputException(x, resp, format, out, new AuthorizationException.Builder(x)
-          .setMessage(String.format("You do not have permission to access the service named '%s'.", nspec.getName()))
+      try {
+        nspec.checkAuthorization(x);
+      } catch (foam.nanos.auth.AuthorizationException e) {
+        outputException(x, resp, format, out, new foam.nanos.dig.exception.AuthorizationException.Builder(x)
+          .setMessage(e.getMessage())
           .build());
         return;
       }
