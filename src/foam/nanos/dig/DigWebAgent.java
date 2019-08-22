@@ -85,12 +85,22 @@ public class DigWebAgent
       }
 
       NSpec nspec = (NSpec) nSpecDAO.find(daoName);
-      if ( nspec == null ||
-           ! nspec.getServe() ) {
+
+      if ( nspec == null || ! nspec.getServe() ) {
          DigErrorMessage error = new DAONotFoundException.Builder(x)
                                       .setMessage("DAO not found: " + daoName)
                                       .build();
         outputException(x, resp, format, out, error);
+        return;
+      }
+
+      // Check if the user is authorized to access the DAO.
+      try {
+        nspec.checkAuthorization(x);
+      } catch (foam.nanos.auth.AuthorizationException e) {
+        outputException(x, resp, format, out, new foam.nanos.dig.exception.AuthorizationException.Builder(x)
+          .setMessage(e.getMessage())
+          .build());
         return;
       }
 
