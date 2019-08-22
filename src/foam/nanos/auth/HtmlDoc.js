@@ -30,9 +30,6 @@ foam.CLASS({
       class: 'Date',
       name: 'issuedDate',
       label: 'Effective Date',
-      tableCellFormatter: function(date) {
-        this.add(date ? date.toISOString().substring(0, 10) : '');
-      }
     },
     {
       class: 'String',

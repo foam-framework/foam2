@@ -194,8 +194,11 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(date) {
-        // allow the browser to deal with this since we are technically using the user's preference
-        if ( date ) this.add(date.toLocaleDateString());
+        if ( date ) {
+          date = ((date.toISOString()).split('T')[0]).replace(/^\+/, '').replace(/^0+/, '');
+          date = date.split('-');
+          this.add(date[0] + '-' + date[1] + '-' + date[2]).style({ 'align' : 'right'});
+        }
       }
     }
   ]
@@ -212,8 +215,11 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(date) {
-        // allow the browser to deal with this since we are technically using the user's preference
-        if ( date ) this.add(date.toLocaleString());
+        if ( date ) {
+          date = ((date.toISOString()).split('T')[0]).replace(/^\+/, '').replace(/^0+/, '');
+          date = date.split('-');
+          this.add(date[0] + '-' + date[1] + '-' + date[2]).style({ 'align' : 'right'});
+        }
       }
     }
   ]
