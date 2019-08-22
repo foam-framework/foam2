@@ -4,23 +4,23 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-foam.CLASS( {
+foam.CLASS({
   package: 'foam.graphics',
   name: 'ColumnGraph',
   extends: 'foam.graphics.GraphV',
 
   requires: [
-    'foam.graphics.Box', 
-	'foam.graphics.CView'    
+    'foam.graphics.Box',
+	  'foam.graphics.CView'
   ],
-  
+
   properties: [
-    [ 'axisUnit' ],
+    'axisUnit',
     [ 'columnGap', 0 ],
     [ 'columnMaxLength', 1 ],
-    [ 'columnWidth' ],
-    [ 'dataToHighlight' ],
-    [ 'graphColors' ],
+    'columnWidth',
+    'dataToHighlight',
+    'graphColors'
   ],
 
   methods: [
@@ -38,19 +38,19 @@ foam.CLASS( {
           y: this.y + this.columnWidth,
           width: this.w || this.dataSource.Horizontal[ i ].length * 8,
           height: this.h || 16,
-          color: this.bgTextColor, 
-          border: this.borderTextColor 
+          color: this.bgTextColor,
+          border: this.borderTextColor
         } );
 
         //TODO add properties
         //line-height: 1.33;
         //letter-spacing: 0.2px;
         legendLabelUnit = foam.graphics.Label.create( {
-          align: this.align, 
+          align: this.align,
           x: legendBoxUnit.x,
           y: legendBoxUnit.y,
-          font: this.fontLabel, 
-          color: this.textColor, 
+          font: this.fontLabel,
+          color: this.textColor,
           text: this.dataSource.Horizontal[ i ]
         } );
 
@@ -60,12 +60,12 @@ foam.CLASS( {
 
       for ( var key in this.dataSource.LegendEntries ) {
         legendBox = foam.graphics.Box.create( {
-          x: ( this.x - this.columnWidth ) + ( this.columnGap * key ) , 
-          y: this.y - this.columnMaxLength - 30 , 
+          x: ( this.x - this.columnWidth ) + ( this.columnGap * key ) ,
+          y: this.y - this.columnMaxLength - 30 ,
           width: this.w || this.dataSource.LegendEntries[ key ].seriesName.length * 8,
           height: this.h || 16,
           color: this.bgTextColor,
-          border: this.borderTextColor 
+          border: this.borderTextColor
         } );
 
         //TODO add properties
@@ -75,8 +75,8 @@ foam.CLASS( {
           align: this.align,
           x: legendBox.x,
           y: legendBox.y,
-          font: this.fontValue, 
-          color: this.textColor, 
+          font: this.fontValue,
+          color: this.textColor,
           text: this.dataSource.LegendEntries[ key ].seriesName
         } );
         this.selected = this.add( legendBox, legendLabel );
@@ -88,8 +88,8 @@ foam.CLASS( {
             y: this.y,
             width: this.w || 30,
             height: this.h || -this.columnMaxLength * dataSourceN.LegendEntries[ key ].seriesValues[ i ],
-            color: this.graphColors[ i ] || '#ffffff', 
-            border: this.borderColor 
+            color: this.graphColors[ i ] || '#ffffff',
+            border: this.borderColor
           } );
           this.selected = this.add( presentationBox );
           this.invalidate();
@@ -98,6 +98,6 @@ foam.CLASS( {
       this.createAxis( this.x, this.y, this.lengthX, this.lengthY );
       this.axisLabels( this.x, this.y, this.w, this.h, this.columnMaxLength, this.symbol, this.dataSource.max, simpleMargin, this.axisUnit ,this.textColor, this.bgTextColor,this.borderTextColor ,this.fontLabel);
       this.dashedLinesIndicator( this.x, this.y, this.w, this.h, this.columnMaxLength, this.lengthX, this.dataToHighlight, this.align, this.fontLabel,this.lineDash );
-    },
+    }
   ]
-} );
+});

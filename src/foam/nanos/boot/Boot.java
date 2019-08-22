@@ -17,16 +17,20 @@ import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.ProxyLogger;
 import foam.nanos.logger.StdoutLogger;
+import foam.nanos.pm.NullPM;
+import foam.nanos.pm.PM;
 import foam.nanos.script.Script;
 import foam.nanos.session.Session;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static foam.mlang.MLang.EQ;
 
 public class Boot {
   // Context key used to store the top-level root context in the context.
   public final static String ROOT = "_ROOT_";
+  public static PM nullPM_ = new NullPM();
 
   protected DAO serviceDAO_;
   protected X   root_ = new ProxyX();
@@ -45,7 +49,7 @@ public class Boot {
     }
 
     root_.put(foam.nanos.fs.Storage.class,
-        new foam.nanos.fs.Storage(datadir));
+        new foam.nanos.fs.FileSystemStorage(datadir));
 
     // Used for all the services that will be required when Booting
     serviceDAO_ = new foam.nanos.auth.PermissionedPropertyDAO(root_, new JDAO(((foam.core.ProxyX) root_).getX(), NSpec.getOwnClassInfo(), "services"));
@@ -74,6 +78,18 @@ public class Boot {
         factories_.get(sp.getName()).invalidate(sp);
       }
     }, null);
+
+    // PM factory
+    root_ = root_.putFactory("PM", new XFactory() {
+      public Object create(X x) {
+        int rand = ThreadLocalRandom.current().nextInt(0, 100);
+        if ( rand == 0 ) {
+          return new PM();
+        } else {
+          return nullPM_;
+        }
+      }
+    });
 
     // Use an XFactory so that the root context can contain itself.
     root_ = root_.putFactory(ROOT, new XFactory() {

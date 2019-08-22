@@ -438,7 +438,7 @@ foam.CLASS({
       args: [
         {
           name: 'stmt',
-          javaType: 'foam.dao.pg.IndexedPreparedStatement'
+          javaType: 'foam.dao.jdbc.IndexedPreparedStatement'
         }
       ],
       javaCode: '//noop',
@@ -477,7 +477,7 @@ foam.CLASS({
       args: [
         {
           name: 'stmt',
-          javaType: 'foam.dao.pg.IndexedPreparedStatement'
+          javaType: 'foam.dao.jdbc.IndexedPreparedStatement'
         }
       ],
       javaCode: ' '
@@ -3421,6 +3421,26 @@ foam.CLASS({
           return new java.util.Date().getTime() - ((java.util.Date)v1).getTime() > getTimeMs();
         }
         return false;
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'CurrentTime',
+  extends: 'foam.mlang.AbstractExpr',
+  axioms: [
+    { class: 'foam.pattern.Singleton' }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(_) {
+        return new Date();
+      },
+      javaCode: `
+        return new java.util.Date();
       `
     }
   ]

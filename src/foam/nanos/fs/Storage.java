@@ -1,50 +1,21 @@
 package foam.nanos.fs;
 
-import foam.util.SafetyUtil;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Set;
 
-import java.io.*;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.*;
-import java.util.zip.*;
-import java.util.regex.*;
+public interface Storage {
 
-public class Storage {
-  private java.io.File root_;
+  java.io.File get(String name);
 
-  private boolean isResource_ = false;
-  private String resourceDir_;
+  byte[] getBytes(String name);
 
-  public Storage() {
-    this(new java.io.File(""));
-  }
+  OutputStream getOutputStream(String name);
 
-  public Storage(String root) {
-    this(new java.io.File(root));
-  }
+  InputStream getInputStream(String name);
 
-  public Storage(java.io.File root) {
-    root_ = root.getAbsoluteFile();
-  }
+  Set<String> getAvailableFiles(String name);
 
-  public Storage (String root, boolean isResource) {
-    isResource_ = isResource;
-    resourceDir_ = root;
-  }
+  Set<String> getAvailableFiles(String name, String glob);
 
-  public boolean isResource() {
-    return isResource_;
-  }
-  
-  public java.io.File get(String name) {
-    return new java.io.File(root_, name).getAbsoluteFile();
-  }
-
-  public java.io.InputStream getResourceAsStream(String name) {
-    String path = "/" + name;
-    if ( ! SafetyUtil.isEmpty(resourceDir_) ) {
-      path = "/" + resourceDir_ + path;
-    }
-    return getClass().getResourceAsStream(path);
-  }
 }
