@@ -15,6 +15,7 @@ foam2_MAVEN_DEPS = \
 	jstl:jstl:1.2 \
 	org.apache.commons:commons-text:1.1 \
 	org.apache.commons:commons-dbcp2:2.0.1 \
+	org.apache.commons:commons-pool2:2.6.2 \
 	org.apache.commons:commons-lang3:3.6 \
 	commons-collections:commons-collections:3.2.2 \
 	org.apache.httpcomponents:httpcore:4.4.10 \
