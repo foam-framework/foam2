@@ -66,6 +66,7 @@ var classes = [
   'foam.mlang.CurrentTime',
   'foam.mlang.predicate.RegExp',
   'foam.mlang.predicate.OlderThan',
+  'foam.mlang.predicate.YoungerThan',
   'foam.mlang.predicate.isAuthorizedToRead',
   'foam.mlang.predicate.isAuthorizedToDelete',
   'foam.box.Box',
