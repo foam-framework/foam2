@@ -104,16 +104,25 @@ p({"class":"foam.nanos.boot.NSpec", "name":"cronDAO",                          "
 p({"class":"foam.nanos.boot.NSpec", "name":"cronScheduler",                    "lazy":false, "serve":false, "serviceClass":"foam.nanos.cron.CronScheduler" })
 p({"class":"foam.nanos.boot.NSpec", "name":"localUserDAO",                     "lazy":true,  "serve":false, "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.SequenceNumberDAO (1000, new foam.nanos.auth.PreventDuplicateEmailDAO.Builder(x).setDelegate(new foam.dao.java.JDAO(x, foam.nanos.auth.User.getOwnClassInfo(), \"users\")).build()));"})
 p({
-  "class":"foam.nanos.boot.NSpec", "name":"userDAO",                          "lazy":true,  "serve":true,  "authenticate": false, 
-  "serviceScript":"""
-    return new foam.dao.PMDAO(x,
-      new foam.dao.ValidatingDAO(x,
-        new foam.nanos.auth.AuthorizationDAO(x,
-          new foam.nanos.auth.UserPasswordHashingDAO(x, x.get(\"localUserDAO\")),
-          new foam.nanos.auth.AuthorizableAuthorizer(\"user\")),
-        new foam.nanos.auth.validators.UserGroupAndSpidValidator()));
+  "class": "foam.nanos.boot.NSpec",
+  "name": "userDAO",
+  "serve": true,
+  "authenticate": false,
+  "serviceScript": """
+    userPasswordHashingDAO = new foam.nanos.auth.UserPasswordHashingDAO(x, x.get("localUserDAO"));
+    authorizationDAO = new foam.nanos.auth.AuthorizationDAO(x, userPasswordHashingDAO, new foam.nanos.auth.AuthorizableAuthorizer("user"));
+    validatingDAO = new foam.dao.ValidatingDAO(x, authorizationDAO, new foam.nanos.auth.validators.UserGroupAndSpidValidator());
+    return new foam.dao.PMDAO(x, validatingDAO);
   """,
-  "client":"{\"of\":\"foam.nanos.auth.User\",\"cache\":false,\"decorators\": [{\"class\":\"foam.nanos.fs.FileDAODecorator\"}]}"
+  "client": """
+    {
+      "of": "foam.nanos.auth.User",
+      "cache": false,
+      "decorators": [
+        { "class": "foam.nanos.fs.FileDAODecorator" }
+      ]
+    }
+  """
 })
 p({"class":"foam.nanos.boot.NSpec", "name":"localGroupDAO",                    "lazy":true,  "serve":false, "serviceScript":"return new foam.dao.PMDAO.Builder(x).setPmFind(false).setDelegate(new foam.dao.java.JDAO(x, foam.nanos.auth.Group.getOwnClassInfo(), \"groups\")).build();","client":"{\"of\":\"foam.nanos.auth.Group\"}" })
 p({"class":"foam.nanos.boot.NSpec", "name":"groupDAO",                         "lazy":true,  "serve":true,  "serviceScript":"return new foam.dao.PMDAO.Builder(x).setPmFind(false).setDelegate(new foam.nanos.auth.AuthorizationDAO(x, x.get(\"localGroupDAO\"), new foam.nanos.auth.AuthorizableAuthorizer(\"group\"))).build();","client":"{\"of\":\"foam.nanos.auth.Group\"}" })
@@ -323,7 +332,7 @@ p({
   "lazy":false,
   "serve":false,
   "service":{
-    "class":foam.nanos.geocode.GoogleMapsAddressParser",
+    "class":"foam.nanos.geocode.GoogleMapsAddressParser",
   }
 })
 p({

@@ -29,4 +29,4 @@ foam.CLASS({
       value: 'Success'
     }
   ]
-})
+});
