@@ -197,7 +197,7 @@ foam.CLASS({
         if ( date ) {
           date = ((date.toISOString()).split('T')[0]).replace(/^\+/, '').replace(/^0+/, '');
           date = date.split('-');
-          this.add(date[0] + '-' + date[1] + '-' + date[2]).style({ 'align' : 'right'});
+          this.add(date[0] + '-' + date[1] + '-' + date[2]);
         }
       }
     }
@@ -218,7 +218,7 @@ foam.CLASS({
         if ( date ) {
           date = ((date.toISOString()).split('T')[0]).replace(/^\+/, '').replace(/^0+/, '');
           date = date.split('-');
-          this.add(date[0] + '-' + date[1] + '-' + date[2]).style({ 'align' : 'right'});
+          this.add(date[0] + '-' + date[1] + '-' + date[2]);
         }
       }
     }
