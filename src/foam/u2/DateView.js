@@ -49,7 +49,6 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.setAttribute('type', 'date');
-      this.setAttribute('max', '9999-12-31');
       this.setAttribute('placeholder', 'yyyy/mm/dd');
       this.on('blur', this.onBlur);
     },

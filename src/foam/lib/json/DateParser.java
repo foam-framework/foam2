@@ -36,6 +36,7 @@ public class DateParser
       new LongParser(),
       new Seq(
         new Literal("\""),
+        new Optional(new Chars("+-")),
         new IntParser(),
         new Literal("-"),
         new IntParser(),
@@ -78,16 +79,16 @@ public class DateParser
     c.clear();
 
     c.set(
-      (Integer) result[1],
-      (Integer) result[3] - 1, // Java calendar uses zero-indexed months
-      (Integer) result[5],
-      (Integer) result[7],
-      (Integer) result[9],
-      (Integer) result[11]);
+      (Integer) result[2],
+      (Integer) result[4] - 1, // Java calendar uses zero-indexed months
+      (Integer) result[6],
+      (Integer) result[8],
+      (Integer) result[10],
+      (Integer) result[12]);
 
     boolean zeroPrefixed = true;
     StringBuilder milliseconds = sb.get();
-    Object[] millis = (Object[]) result[13];
+    Object[] millis = (Object[]) result[14];
 
     for ( int i = 0 ; i < millis.length ; i++ ) {
       // do not prefix with zeros
