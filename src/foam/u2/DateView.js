@@ -63,12 +63,12 @@ foam.CLASS({
     },
 
     function inputToData(input) {
-      return new Date(input);
+      return new Date(input+' (UTC)');
     },
 
     function dataToInput(data) {
       if ( ! data ) return data;
-
+    
       // Using our own formatter to keep the date in the format (yyyy-mm-dd) while maintaining the locale date
       const year = data.getUTCFullYear();
       const month = (data.getUTCMonth() + 1).toString().padStart(2, '0');
