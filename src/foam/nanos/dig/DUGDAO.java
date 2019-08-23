@@ -12,7 +12,6 @@ import foam.core.X;
 import foam.dao.AbstractSink;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
-import foam.dao.java.JDAO;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.util.Auth;
@@ -24,10 +23,6 @@ public class DUGDAO
   public DUGDAO(X x) {
     setX(x);
   }
-
-  // public DUGDAO(X x) {
-  //   this(x, new JDAO(x, DUG.getOwnClassInfo(), "dugs"));
-  // }
 
   public DUGDAO(X x, DAO delegate) {
     setX(x);
