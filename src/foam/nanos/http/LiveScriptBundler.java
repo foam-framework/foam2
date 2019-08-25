@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.http;
 
 import com.sun.nio.file.SensitivityWatchEventModifier;
@@ -57,9 +63,9 @@ public class LiveScriptBundler implements WebAgent
         } catch (InterruptedException x) {
           return;
         }
-        for (WatchEvent<?> event : key.pollEvents()) {
+        for ( WatchEvent<?> event : key.pollEvents() ) {
           WatchEvent.Kind<?> kind = event.kind();
-          if (kind == OVERFLOW) {
+          if ( kind == OVERFLOW ) {
             log_("ERROR", "File watch buffer overflowed!");
             continue;
           }
@@ -81,7 +87,7 @@ public class LiveScriptBundler implements WebAgent
             log_("IGNORE", foamPath);
           }
 
-          if (!key.reset()) break;
+          if ( ! key.reset() ) break;
         }
       }
     }
@@ -105,7 +111,7 @@ public class LiveScriptBundler implements WebAgent
           path = Paths.get(path_).relativize(path);
           Path sourcePath = null;
 
-          if ( !attr.isRegularFile() ) {
+          if ( ! attr.isRegularFile() ) {
             return CONTINUE;
           }
 
@@ -144,7 +150,7 @@ public class LiveScriptBundler implements WebAgent
         );
         List<String> paths = parseFilesjs(filesJsReader);
         Set<Path> directories = new LinkedHashSet<>();
-        for (String foamName : paths) {
+        for ( String foamName : paths ) {
           Path f = Paths.get(path_, currentFilesPath.getKey(), foamName);
 
           // Add containing folder to a set for registering watchers
@@ -155,7 +161,7 @@ public class LiveScriptBundler implements WebAgent
 
         // Register a separate thread to watch each directory.
         // (this is necessary with WatchService)
-        for (Path d : directories) {
+        for ( Path d : directories ) {
           WatchService watcher = FileSystems.getDefault().newWatchService();
           d.register(watcher,
             new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY},
@@ -174,7 +180,7 @@ public class LiveScriptBundler implements WebAgent
           watcherThread.start();
         }
       }
-    } catch (Throwable t) {
+    } catch ( Throwable t ) {
       t.printStackTrace();
       System.err.println("Failed to initialize filesystem watcher! :(");
       System.exit(1);
@@ -226,12 +232,14 @@ public class LiveScriptBundler implements WebAgent
       line = reader.readLine()
     ) {
       line = line.trim();
-      if (line.length() < 1) continue;
+      if ( line.length() < 1 ) continue;
       if ( lineException ) {
         line = "{" + line + "}";
         lineException = false;
       }
-      else if (line.charAt(0) != '{') continue;
+      else if ( line.charAt(0) != '{' ) {
+        continue;
+      }
       if ( line.length() < 3 ) {
         lineException = true;
         continue;
@@ -252,7 +260,7 @@ public class LiveScriptBundler implements WebAgent
       int stateStack[] = {0, 0, 0}; // nested control flow makes it fun
       int stateStackPtr = 0;
 
-      for (boolean done = false; !done;) {
+      for ( boolean done = false; !done; ) {
         switch (state) {
           case STATE_SKIP_WS:
             if (
@@ -272,10 +280,10 @@ public class LiveScriptBundler implements WebAgent
             System.out.println("AAA");
             System.out.println(line);
             System.out.println(pos);
-            if (line.substring(pos).startsWith("name:")) {
+            if ( line.substring(pos).startsWith("name:") ) {
               pos += 5;
               state = STATE_EAT_NAME;
-            } else if (line.substring(pos).startsWith("\"name\":")) {
+            } else if ( line.substring(pos).startsWith("\"name\":") ) {
               pos += 7;
               state = STATE_EAT_NAME;
             } else {
@@ -294,10 +302,10 @@ public class LiveScriptBundler implements WebAgent
             boolean inEscape = false;
             for ( ;;pos++ ) {
               char thisChar = line.charAt(pos);
-              if (inEscape) {
+              if ( inEscape ) {
                 inEscape = false;
               } else {
-                if (thisChar == '\\') {
+                if ( thisChar == '\\' ) {
                   inEscape = true;
                 } else if (thisChar == term) {
                   break;
