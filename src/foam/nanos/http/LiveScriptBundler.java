@@ -7,7 +7,9 @@
 package foam.nanos.http;
 
 import com.sun.nio.file.SensitivityWatchEventModifier;
+import foam.core.ContextAware;
 import foam.core.X;
+import foam.nanos.logger.Logger;
 import javafx.util.Pair;
 
 import javax.servlet.http.HttpServletResponse;
@@ -20,8 +22,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.StandardWatchEventKinds.*;
 
-public class LiveScriptBundler implements WebAgent
+public class LiveScriptBundler implements WebAgent, ContextAware
 {
+  protected X x_;
+
   // Filesystem
   protected String path_;
   protected WatchService watcher_;
@@ -36,6 +40,14 @@ public class LiveScriptBundler implements WebAgent
 
   private interface FileUpdateListener {
     public void onFileUpdate(String foamName, Path realPath);
+  }
+
+  public void setX(X x) {
+    x_ = x;
+  }
+
+  public X getX() {
+    return x_;
   }
 
   private class WatcherThread implements Runnable {
@@ -189,19 +201,19 @@ public class LiveScriptBundler implements WebAgent
 
   private void doRebuildJavascript(String foamName, Path realPath) {
     try {
-      System.out.println("Building javascript... (js)");
+      log_("START", "Building javascript... (JS)");
 
       Process p = new ProcessBuilder(JS_BUILD_PATH).start();
 
       BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
       String line;
       while ( (line=br.readLine()) != null ) {
-        System.out.println("js> " + line);
+        log_("JS", "js> " + line);
       }
 
       String contents = new String(Files.readAllBytes(Paths.get(FOAM_BIN_PATH)));
       javascriptBuffer_  = contents;
-      System.out.println("[DONE] (js)");
+      log_("DONE","JS");
     } catch (IOException e) {
       log_("ERROR", e.getMessage());
     }
@@ -346,16 +358,30 @@ public class LiveScriptBundler implements WebAgent
   }
 
   private void log_(String evt, String msg) {
-    System.out.println(
-      "LiveScriptBundler " +
+    String eventStr =
         ( (evt.equals("UPDATE") ) ? "\033[32m" : "" ) +
         ( (evt.equals("IGNORE") ) ? "\033[36m" : "" ) +
         ( (evt.equals("ERROR") ) ? "\033[31m" : "" ) +
         "[" + evt + "]" +
         ( (evt.equals("UPDATE") || evt.equals("IGNORE") || evt.equals("ERROR") )
           ? "\033[0m"
-          : "" ) +
-        " " + msg
-    );
+          : "" );
+
+    // Fallback in case setX has not been called yet
+    if ( x_ == null ) {
+      System.err.printf(
+        "NO_LOGGER,%s,%s,%s,%s\n",
+        ( evt.equals("ERROR") ) ? "ERROR" : "INFO",
+        this.getClass().getSimpleName(), eventStr, msg);
+      return;
+    }
+
+    Logger logger = (Logger) x_.get("logger");
+    if ( evt.equals("ERROR") ) {
+      logger.error(this.getClass().getSimpleName(), eventStr, msg);
+    }
+    else {
+      logger.info(this.getClass().getSimpleName(), eventStr, msg);
+    }
   }
 }
