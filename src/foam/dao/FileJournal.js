@@ -134,7 +134,7 @@ try {
 }
       `
     },
-    // writer uses a factory because we want to use one writer for the lifetime of this journal object
+    // Writer uses a factory because we want to use one writer for the lifetime of this journal object
     {
       class: 'Object',
       name: 'writer',
