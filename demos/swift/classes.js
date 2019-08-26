@@ -43,6 +43,7 @@ var classes = [
   'foam.nanos.auth.Permission',
   'foam.nanos.auth.ServiceProvider',
   'foam.nanos.auth.User',
+  'foam.nanos.theme.Theme',
   'foam.nanos.auth.UserUserJunction',
   'foam.nanos.demo.relationship.Course',
   'foam.nanos.demo.relationship.CourseType',
