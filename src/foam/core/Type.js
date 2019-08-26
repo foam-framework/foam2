@@ -355,6 +355,6 @@ foam.CLASS({
   axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'java.util.regex.Pattern'],
-    // TODO: Swift
+    ['swift', 'String']
   ]
 });
