@@ -214,6 +214,8 @@ p({
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.session.Session.getOwnClassInfo())
+      .setJournalName("sessions")
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setAuthorize(false)
       .build();
   """
