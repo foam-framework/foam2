@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.dao.jdbc',
   name: 'JDBCConnectionSpec',
   documentation: 'A JDBC Connection Specification to add to the system context.',
-  constants: [
+  properties: [
     {
       class: 'String',
       name: 'databaseServer'
