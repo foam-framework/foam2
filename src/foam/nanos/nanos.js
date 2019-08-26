@@ -198,12 +198,13 @@ FOAM_FILES([
   { name: "foam/nanos/ruler/TestedRule" },
   { name: "foam/nanos/ruler/RulerProbe" },
   { name: "foam/nanos/ruler/UserRefines" },
-  
   { name: "foam/nanos/test/EchoService" },
   { name: "foam/nanos/test/SerializationTestEchoService" },
   { name: "foam/nanos/analytics/Foldable" },
   { name: "foam/nanos/analytics/Candlestick" },
   { name: "foam/nanos/test/ClientEchoService" },
+
+  { name: "foam/dao/jdbc/JDBCConnectionSpec" },
 
   // foam/nanos/crunch
   { name: "foam/nanos/crunch/crunchtest/FakeTestObject" },
@@ -219,6 +220,6 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/RemoveJunctionsOnUserRemoval" },
   //authservice
   { name: "foam/nanos/auth/CapabilityAuthService" },
-
-
+  // google
+  { name: "foam/nanos/geocode/GoogleMapsCredentials" }
 ]);

@@ -12,6 +12,7 @@ foam.CLASS({
   `,
 
   requires: [
+    'foam.comics.SearchMode',
     'foam.comics.v2.CannedQuery',
     'foam.comics.v2.namedViews.NamedViewCollection'
   ],
@@ -59,13 +60,22 @@ foam.CLASS({
       class: 'StringArray',
       name: 'defaultColumns',
       factory: null,
-      expression: function(of) { 
+      expression: function(of) {
         var tableColumns = of.getAxiomByName('tableColumns');
 
-        return tableColumns 
+        return tableColumns
                 ? tableColumns.columns
                 : of.getAxiomsByClass(foam.core.Property).map(p => p.name);
       }
+    },
+    {
+      class: 'Enum',
+      of: 'foam.comics.SearchMode',
+      name: 'searchMode',
+      help: `
+        The level of search capabilities that the controller should have.
+      `,
+      value: 'SIMPLE'
     },
     {
       class: 'foam.u2.ViewSpecWithJava',

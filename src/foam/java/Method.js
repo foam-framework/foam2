@@ -22,11 +22,16 @@ foam.CLASS({
   properties: [
     'name',
     { class: 'String', name: 'visibility' },
+    { class: 'String', name: 'documentation' },
     'static',
     'abstract',
     'final',
     'type',
     'synchronized',
+    {
+      class: 'Boolean',
+      name: 'remote'
+    },
     {
       class: 'FObjectArray',
       of: 'foam.java.Argument',
@@ -38,6 +43,22 @@ foam.CLASS({
 
   methods: [
     function outputJava(o) {
+      o.out('\n');
+
+      if ( this.documentation ) {
+        str = foam.java.Util.removeSpacing(this.documentation);
+        lines = foam.java.Util.limitSplit(str, 25);
+        o.indent();
+        o.out('/**\n');
+        for ( i = 0 ; i < lines.length ; i++ ) {
+          o.indent();
+          o.out('* ' + lines[i]);
+          o.out('\n');
+        }
+        o.indent();
+        o.out('*/\n');
+      }
+
       o.indent();
       o.out(this.visibility, this.visibility ? ' ' : '',
         this.abstract     ? 'abstract ' : '',
@@ -73,6 +94,7 @@ foam.CLASS({
         o.indent();
         o.out('}');
       }
+
     }
   ]
 });

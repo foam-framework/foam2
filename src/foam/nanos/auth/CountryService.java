@@ -46,10 +46,6 @@ public class CountryService extends ContextAwareSupport implements NanoService {
     // 4. by alternative names
     country = findCountry(MLang.IN(query, Country.ALTERNATIVE_NAMES));
 
-    if ( country == null ) {
-      notifySupport(query);
-    }
-
     return country;
   }
 
@@ -63,14 +59,6 @@ public class CountryService extends ContextAwareSupport implements NanoService {
     }
 
     return country;
-  }
-
-  protected void notifySupport(String query) {
-    EmailMessage emailMessage = new EmailMessage();
-    emailMessage.setSubject ("Unknown Country");
-    emailMessage.setBody    ("User just added an unknown country " + query);
-    emailMessage.setTo(new String[]{"ops@nanopay.net"});
-    EmailsUtility.sendEmailFromTemplate(getX(), null, emailMessage, null, null);
   }
 
   protected String formatName(String query) {

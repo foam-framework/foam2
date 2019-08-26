@@ -435,7 +435,7 @@ foam.CLASS({
       args: [
         {
           name: 'stmt',
-          javaType: 'foam.dao.pg.IndexedPreparedStatement'
+          javaType: 'foam.dao.jdbc.IndexedPreparedStatement'
         }
       ],
       javaCode: '//noop',
@@ -474,7 +474,7 @@ foam.CLASS({
       args: [
         {
           name: 'stmt',
-          javaType: 'foam.dao.pg.IndexedPreparedStatement'
+          javaType: 'foam.dao.jdbc.IndexedPreparedStatement'
         }
       ],
       javaCode: ' '
@@ -3142,6 +3142,30 @@ foam.CLASS({
          Used by GroupBy
       **/
       return this.arg2.comparePropertyValues(o1, o2);
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'DotF',
+  extends: 'foam.mlang.predicate.Binary',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: `A binary predicate that evaluates arg1 as a predicate with
+    arg2 as its argument.`,
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: `
+        Object predicate = getArg1().f(obj);
+        if ( predicate instanceof Predicate ) {
+          return ((Predicate) predicate).f(getArg2().f(obj));
+        }
+        return false;
+      `
     }
   ]
 });

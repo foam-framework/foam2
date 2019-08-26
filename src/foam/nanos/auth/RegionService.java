@@ -40,10 +40,6 @@ public class RegionService extends ContextAwareSupport implements NanoService {
     // 3. by alternative names
     region = findRegion(MLang.IN(query, Region.ALTERNATIVE_NAMES));
 
-    if ( region == null ) {
-      notifySupport(query);
-    }
-
     return region;
   }
 
@@ -57,14 +53,6 @@ public class RegionService extends ContextAwareSupport implements NanoService {
     }
 
     return region;
-  }
-
-  protected void notifySupport(String query) {
-    EmailMessage emailMessage = new EmailMessage();
-    emailMessage.setSubject ("Unknown Region");
-    emailMessage.setBody    ("User just added an unknown region " + query);
-    emailMessage.setTo(new String[]{"ops@nanopay.net"});
-    EmailsUtility.sendEmailFromTemplate(getX(), null, emailMessage, null, null);
   }
 
   protected String formatName(String query) {

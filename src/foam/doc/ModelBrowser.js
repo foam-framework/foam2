@@ -72,7 +72,7 @@ foam.CLASS({
       ^ .foam-u2-ActionView-printPage{
         display: none;
       }
-      .net-nanopay-ui-topNavigation-TopNav{
+      .foam-nanos-u2-navigation-TopNavigation{
         display: none;
       }
     }
