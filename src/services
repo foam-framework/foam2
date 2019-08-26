@@ -96,10 +96,6 @@ p({
   "serviceClass": "foam.nanos.pool.ThreadPoolAgency"
 })
 
-p({"class":"foam.nanos.boot.NSpec", "name":"scriptDAO",                          "lazy":true,  "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setGuid(true).setOf(foam.nanos.script.Script.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"scripts\").setDecorator(new foam.nanos.script.ScriptRunnerDAO(null)).setOrder(new foam.core.PropertyInfo[] {foam.nanos.script.Script.ID}).setIndex(new foam.core.PropertyInfo[] {foam.nanos.script.Script.ID}).build();","client":"{\"of\":\"foam.nanos.script.Script\"}"})
-p({"class":"foam.nanos.boot.NSpec", "name":"cronDAO",                          "lazy":true,  "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setGuid(true).setOf(foam.nanos.cron.Cron.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"cronjobs\").setDecorator(new foam.nanos.script.ScriptRunnerDAO(null)).build();","client":"{\"of\":\"foam.nanos.cron.Cron\"}"})
-p({"class":"foam.nanos.boot.NSpec", "name":"cronScheduler",                    "lazy":false, "serve":false, "serviceClass":"foam.nanos.cron.CronScheduler" })
-p({"class":"foam.nanos.boot.NSpec", "name":"localUserDAO",                     "lazy":true,  "serve":false, "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.SequenceNumberDAO (1000, new foam.nanos.auth.PreventDuplicateEmailDAO.Builder(x).setDelegate(new foam.dao.java.JDAO(x, foam.nanos.auth.User.getOwnClassInfo(), \"users\")).build()));"})
 p({
   "class":"foam.nanos.boot.NSpec",
   "name":"testDAO","serve":true,
@@ -158,7 +154,10 @@ p({"class":"foam.nanos.boot.NSpec", "name":"cronScheduler",                    "
 p({"class":"foam.nanos.boot.NSpec", "name":"localUserDAO",                       "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.SequenceNumberDAO (1000, new foam.nanos.auth.PreventDuplicateEmailDAO.Builder(x).setDelegate(new foam.dao.java.JDAO(x, foam.nanos.auth.User.getOwnClassInfo(), \"users\")).build()));"})
 
 p({
-  "class":"foam.nanos.boot.NSpec", "name":"userDAO",                            "serve":true,  "authenticate": false, 
+  "class":"foam.nanos.boot.NSpec",
+  "name":"userDAO",
+  "serve":true,
+  "authenticate": false, 
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
       .setPm(true)
@@ -476,7 +475,7 @@ p({
   "lazy":false,
   "serve":false,
   "service":{
-    "class":foam.nanos.geocode.GoogleMapsAddressParser",
+    "class":"foam.nanos.geocode.GoogleMapsAddressParser",
   }
 })
 p({

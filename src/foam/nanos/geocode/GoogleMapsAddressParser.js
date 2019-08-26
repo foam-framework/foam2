@@ -133,7 +133,7 @@ foam.CLASS({
           );
         }
 
-        String[] affix = { "apt", "unit", "suite", "#", "bsmt", "fl", "frnt", "key", "lowr", "dept", "lbby", "rm", "room", "ste", "dept", "space", "spc", "lot" };
+        String[] affix = { "apt", "unit", "suite", "bsmt", "floor", "fl", "frnt", "key", "lowr", "dept", "lbby", "rm", "room", "ste", "dept", "space", "spc", "lot" };
 
         if ( SafetyUtil.isEmpty(address) ) {
           throw new RuntimeException("No address provided.");
@@ -150,7 +150,7 @@ foam.CLASS({
 
         // FIX ME: This string parser can probably be improved to include use cases where suite value has characters included.
         for ( String separator : affix ) {
-          String[] splitAddress = address.replace("#", "").split("(?<=" + separator + " [0-9]{0,9}+)|(?=" + separator + " [0-9]{0,9}+)");
+          String[] splitAddress = ((String) address).replace("#", "").toLowerCase().split("(?<=" + separator + "[ ]{0,9}+[0-9]{0,9}+)|(?=" + separator + "[0-9]{0,9}+)");
           if ( splitAddress.length > 1 ) {
             int suiteIndex = splitAddress[0].length() <= splitAddress[1].length() ? 0 : 1;
             suite = splitAddress[suiteIndex];
