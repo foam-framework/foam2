@@ -344,7 +344,7 @@ foam.CLASS({
   axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'double'],
-      ['swift', 'Double'],
+    ['swift', 'Double'],
   ],
 });
 
