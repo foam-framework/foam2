@@ -39,6 +39,7 @@ var classes = [
   'foam.nanos.app.Mode',
   'foam.nanos.auth.Country',
   'foam.nanos.auth.Group',
+  'foam.nanos.auth.GroupPermissionJunction',
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Permission',
   'foam.nanos.auth.ServiceProvider',
