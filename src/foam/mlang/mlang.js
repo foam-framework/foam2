@@ -3371,7 +3371,6 @@ foam.CLASS({
     {
       type: 'Regex',
       javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
-      swiftType: 'String',
       name: 'regExp'
     }
   ],
