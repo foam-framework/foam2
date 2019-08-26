@@ -205,6 +205,9 @@ foam.CLASS({
       if ( o.class && this.__context__.lookup(o.class, true) ) {
         return this.adaptValue(this.__context__.lookup(o.class).create(o, this));
       }
+      if ( typeof o.id === 'string' && foam.isRegistered(o.id) ) {
+        return foam.mlang.Constant.create({ value: o });
+      }
 
       console.error('Invalid expression value: ', o);
     }
