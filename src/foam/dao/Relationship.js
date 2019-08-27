@@ -103,7 +103,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'String',
+      class: 'String',
       name: 'unauthorizedTargetDAOKey',
     },
     {
