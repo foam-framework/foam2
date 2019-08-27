@@ -160,7 +160,7 @@
           }, this.table_$).
             style({
               height: this.scrollHeight$.map(h => h + 'px'),
-              position: 'relative',
+              position: 'relative'
             }).
           end().
         end();
@@ -177,9 +177,13 @@
           window.removeEventListener('resize', this.updateTableHeight);
         });
       }
-    },
+    }
+  ],
+
+  listeners: [
     {
       name: 'refresh',
+      isFramed: true,
       code: function() {
         Object.keys(this.renderedPages_).forEach(i => {
           this.renderedPages_[i].remove();
@@ -190,10 +194,7 @@
           this.scrollbarContainer_.el().scrollTop = 0;
         }
       }
-    }
-  ],
-
-  listeners: [
+    },
     {
       name: 'updateCount',
       isFramed: true,
@@ -221,6 +222,7 @@
           var tbody = this.table_.slotE_(this.table_.rowsFrom(dao));
           tbody.style({
             position: 'absolute',
+            'z-index': -1, // To ensure the rows stay behind the header.
             top: this.TABLE_HEAD_HEIGHT + page * this.pageSize * this.rowHeight + 'px'
           });
           this.table_.add(tbody);
