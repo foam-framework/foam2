@@ -310,6 +310,7 @@ var classes = [
   'foam.lib.NetworkPropertyPredicate',
   'foam.lib.StoragePropertyPredicate',
   'foam.lib.AndPropertyPredicate',
+  'foam.lib.FieldsPropertyPredicate',
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
   'foam.lib.json.OutputJSON',
@@ -441,7 +442,7 @@ var classes = [
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
-  
+
 ];
 
 var abstractClasses = [

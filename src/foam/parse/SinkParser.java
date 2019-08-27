@@ -10,6 +10,7 @@ import foam.core.*;
 import foam.lib.parse.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.*;
 
 /**
  * SQL-syntax-like parser for defining Sink's.
@@ -37,8 +38,31 @@ public class SinkParser
       PropertyInfo pInfo = (PropertyInfo) prop;
 
       parsers.add(new LiteralIC(pInfo.getName()));
+//      parsers.add(new LiteralIC("min(" + pInfo.getName() + ")"));
+//      parsers.add(new LiteralIC("avg(" + pInfo.getName() + ")"));
+//      parsers.add(new LiteralIC("sum(" + pInfo.getName() + ")"));
+//      parsers.add(new LiteralIC("max(" + pInfo.getName() + ")"));
+//      parsers.add(new LiteralIC("count(" + pInfo.getName() + ")"));
     }
 
     return new Alt(parsers);
   }
+
+//  @Override
+//  public PStream parse(PStream ps, ParserContext x) {
+//    ps = super.parse(ps, x);
+//
+//    if ( ps == null ) {
+//      return null;
+//    }
+//
+//    if ( ps.value() == null ) {
+//      return ps;
+//    }
+//
+//    x = x.sub();
+//    //x.set("classInfo", info_);
+//
+//    //return super.parse(ps, x);
+//  }
 }

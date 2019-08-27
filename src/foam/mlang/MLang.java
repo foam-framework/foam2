@@ -214,4 +214,16 @@ public class MLang
       .setAuthorizer(authorizer)
       .build();
   }
+
+  public static Sink SEQ(foam.dao.Sink[] args) {
+    return new Sequence.Builder(null)
+      .setArgs(args)
+      .build();
+  }
+
+  public static Sink AVG(Object o1) {
+    return new Average.Builder(null)
+      .setArg1(MLang.prepare(o1))
+      .build();
+  }
 }

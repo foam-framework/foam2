@@ -16,6 +16,7 @@ import foam.lib.json.JSONParser;
 import foam.lib.json.OutputterMode;
 import foam.lib.json.Outputter;
 import foam.lib.AndPropertyPredicate;
+import foam.lib.FieldsPropertyPredicate;
 import foam.lib.NetworkPropertyPredicate;
 import foam.lib.parse.*;
 import foam.lib.PermissionedPropertyPredicate;
@@ -117,17 +118,6 @@ public class DigWebAgent
       logger.debug("predicate", pred.getClass(), pred.toString());
       dao = dao.where(pred);
 
-      SinkParser sinkParser = new SinkParser(cInfo);
-
-      StringPStream ps = new StringPStream(fields);
-      ParserContextImpl x_ = new ParserContextImpl();
-      ps = (StringPStream) sinkParser.parse(ps, x_);
-
-      Object[] psArray = (Object[]) ps.value();
-      for (Object objPs : psArray) {
-        logger.debug("ps.value(): " + objPs);
-      }
-
       if ( Command.put == command ) {
         String returnMessage = "success";
 
@@ -137,6 +127,7 @@ public class DigWebAgent
           Outputter outputterJson = new Outputter(x).setPropertyPredicate(new foam.lib.AndPropertyPredicate(x, new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));;
           outputterJson.setOutputDefaultValues(true);
           outputterJson.setOutputClassNames(true);
+
           // let FObjectArray parse first
           if ( SafetyUtil.isEmpty(data) ) {
               DigErrorMessage error = new EmptyDataException.Builder(x).build();
@@ -337,6 +328,27 @@ public class DigWebAgent
           dao.where(MLang.EQ(idProp, id)).select(new ArraySink()) :
           dao.select(new ArraySink()));
 
+        SinkParser sinkParser = new SinkParser(cInfo);
+
+        StringPStream ps = new StringPStream(fields);
+        ParserContextImpl x_ = new ParserContextImpl();
+        ps = (StringPStream) sinkParser.parse(ps, x_);
+
+        Object[] psArray = (Object[]) ps.value();
+        for (Object objPs : psArray) {
+          logger.debug("ps.value(): " + objPs);
+        }
+
+        String[] fieldsArray = fields.split(",");
+
+        PropertyInfo pInfo = (PropertyInfo)cInfo.getAxiomByName(fields);
+        foam.mlang.sink.GroupBy groupBy = (foam.mlang.sink.GroupBy) dao.select(MLang.GROUP_BY(pInfo, new foam.mlang.sink.Count()));
+
+        foam.dao.Sink[] seqSinkArray = { MLang.MIN(pInfo), MLang.MAX(pInfo), MLang.AVG(pInfo) };
+        foam.mlang.sink.Sequence seq = (foam.mlang.sink.Sequence) dao.select(MLang.SEQ(seqSinkArray));
+        foam.mlang.sink.Sum sum = (foam.mlang.sink.Sum) dao.select(MLang.SUM(pInfo));
+
+
         if ( sink != null ) {
           if ( sink.getArray().size() == 0 ) {
             if (Format.XML == format) {
@@ -349,9 +361,10 @@ public class DigWebAgent
           logger.debug(this.getClass().getSimpleName(), "objects selected: " + sink.getArray().size());
 
           if ( Format.JSON == format ) {
-            Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate()}));
+            Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate(), new FieldsPropertyPredicate()}));
             outputterJson.setOutputDefaultValues(true);
             outputterJson.setOutputClassNames(true);
+            outputterJson.setFields(fields);
             outputterJson.output(sink.getArray().toArray());
 
             //resp.setContentType("application/json");

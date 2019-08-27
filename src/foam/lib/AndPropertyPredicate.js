@@ -12,7 +12,7 @@ foam.CLASS({
       name: 'delegates'
     }
   ],
-    
+
   methods: [
     {
       name: 'propertyPredicateCheck',
@@ -25,7 +25,17 @@ foam.CLASS({
 
   return true;
 `
+    },
+    {
+      name: 'propertyPredicateCheckForFields',
+      javaCode: `
+  for ( foam.lib.PropertyPredicate p : getDelegates() ) {
+    if ( ! p.propertyPredicateCheckForFields(x, of, prop, fields) )
+          return false;
+  }
+
+  return true;
+  `
     }
   ]
 });
-    

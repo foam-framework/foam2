@@ -148,7 +148,7 @@ foam.CLASS({
           query = true;
           url += "q=" + encodeURIComponent(q);
         }
-        if ( fields.length > 0 ) {
+        if ( fields ) {
           url += query ? "&" : "?";
           query = true;
           url += "fields=";
