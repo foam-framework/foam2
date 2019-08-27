@@ -13,6 +13,7 @@ foam.CLASS({
   javaImports: [
     'foam.core.FObject',
     'foam.core.PropertyInfo',
+    'foam.core.MethodInfo',
     'foam.core.ProxyX',
     'foam.lib.json.ExprParser',
     'foam.lib.json.JSONParser',

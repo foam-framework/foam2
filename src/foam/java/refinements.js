@@ -635,14 +635,49 @@ foam.CLASS({
       expression: function(flags) {
         return foam.util.flagFilter(['java'])(this);
       }
-    },
-    {
-      class: 'Boolean',
-      name: 'remote'
     }
   ],
 
   methods: [
+    function buildMethodInfoInitializer(cls) {
+      // Add MethodInfo field for each method
+      initializerString = 'new foam.core.SimpleMethodInfo(){\n';
+      // Implement getName
+      initializerString += '@Override\npublic String getName(){ return \"' + this.name + '\";}\n\n';
+
+      // Implement call method
+      initializerString += '@Override\npublic Object call(foam.core.X x, Object receiver, Object[] args){\n';
+      // See if call needs try catch block
+      var exceptions = this.javaThrows.length > 0;
+      if ( exceptions ) initializerString += 'try{\n';
+
+      if( this.javaType != 'void' ) initializerString += 'return ';
+      // Use ((typeCast)receiver).methodName() to call method because of rare collisions between inner and outer class method names
+      initializerString += '((' + cls.name + ')receiver).' + this.name + '(';
+      argsString = '';
+      for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
+        if ( this.args[i].javaType )
+          argsString += '(' + this.args[i].javaType.replace('...', '[]').replace('final ', '') + ')(' + 'args[' + i + '])';
+        else if ( this.args[i].type )
+          argsString += '(' + this.args[i].type.replace('...', '[]').replace('final ', '') + ')(' + 'args[' + i + '])';
+        else if ( this.args[i].class )
+          argsString += '(' + this.args[i].class.replace('...', '[]').replace('final ', '') + ')(' + 'args[' + i + '])';
+        else
+          continue;
+        if ( i != this.args.length - 1 ) argsString += ', ';
+      }
+      initializerString += argsString + ');\n';
+      if( this.javaType == 'void' ) initializerString += 'return null;\n';
+
+      // Close try block
+      if ( exceptions ) { initializerString += `}\ncatch (java.lang.Exception e)
+        {\n foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get(\"logger\");
+        \n logger.error(e.getMessage());\n return null;}` }
+
+      initializerString += '}\n}\n';
+      return initializerString;
+    },
+
     function buildJavaClass(cls) {
       if ( ! this.javaSupport ) return;
       if ( ! this.javaCode && ! this.abstract ) return;
@@ -655,9 +690,7 @@ foam.CLASS({
         abstract: this.abstract,
         final: this.final,
         synchronized: this.synchronized,
-        remote: this.remote,
         throws: this.javaThrows,
-        documentation: this.documentation,
         args: this.args && this.args.map(function(a) {
           return {
             name: a.name,
@@ -666,6 +699,23 @@ foam.CLASS({
         }),
         body: this.javaCode ? this.javaCode : ''
       });
+
+      var initializerString = this.buildMethodInfoInitializer(cls);
+
+      // Create MethodInfo field
+      methodInfoName = this.name;
+      field = cls.field({
+        name: methodInfoName,
+        visibility: 'public',
+        static: true,
+        type: 'foam.core.SimpleMethodInfo',
+        initializer: initializerString,
+        order: 0,
+      });
+
+      var info = cls.getField('classInfo_');
+      if ( info ) info.addAxiom(cls.name + '.' + methodInfoName);
+
     },
     function isStatic() {
       return false;

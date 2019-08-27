@@ -32,7 +32,7 @@ public class ClassInfoImpl
     return this;
   }
 
-      public int compareTo(Object obj) {
+  public int compareTo(Object obj) {
     return getId().compareTo(((ClassInfo)obj).getId());
   }
 
@@ -71,6 +71,9 @@ public class ClassInfoImpl
     // that has setClassInfo and make PropertyInfo implement it.
     if ( a instanceof PropertyInfo ) {
       ((PropertyInfo)a).setClassInfo(this);
+    }
+    if ( a instanceof MethodInfo) {
+      ((MethodInfo)a).setClassInfo(this);
     }
     axioms.add(a);
     axiomsByName_.put(a.getName(), a);

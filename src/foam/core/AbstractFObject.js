@@ -280,6 +280,26 @@ foam.CLASS({
       `
     },
     {
+      name: 'getMethod',
+      type: 'Any',
+      args: [ { name: 'meth', type: 'String' } ],
+      javaCode: `
+        MethodInfo method = ((MethodInfo) getClassInfo().getAxiomByName(meth));
+        return method == null ? null : method.get(this);
+      `
+    },
+    {
+      name: 'setMethod',
+      type: 'FObject',
+      args: [ { name: 'meth', type: 'String' },
+              { name: 'value', type: 'Any' } ],
+      javaCode: `
+        MethodInfo method = ((MethodInfo) getClassInfo().getAxiomByName(meth));
+        if ( method != null ) method.set(this, value);
+        return this;
+      `
+    },
+    {
       name: 'toJSON',
       type: 'String',
       javaCode: `
