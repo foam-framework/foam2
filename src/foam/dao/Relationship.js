@@ -228,6 +228,7 @@ foam.CLASS({
       source.installAxiom(prop);
     },
     function initTarget(x) {
+      if ( this.oneWay ) return;
       if ( this.targetInitialized ) return;
       this.targetInitialized = true;
       if ( ! this.enabled ) return;

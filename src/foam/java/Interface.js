@@ -91,7 +91,7 @@ foam.CLASS({
     function outputJava(o) {
       o.out('// WARNING: GENERATED CODE, DO NOT MODIFY BY HAND!\n');
 
-      if ( this.package ) { o.out('package ', this.package, ';\n\n'); }
+      if ( this.package ) o.out('package ', this.package, ';\n\n');
 
       this.imports.forEach(function(i) {
         o.out('import ' + i, ';\n');
@@ -99,6 +99,21 @@ foam.CLASS({
 
       o.out('\n');
 
+      if ( this.documentation ) {
+        str = foam.java.Util.removeSpacing(this.documentation);
+        lines = foam.java.Util.limitSplit(str, 25);
+        o.indent();
+        o.out('/**\n');
+        for ( i = 0 ; i < lines.length ; i++ ) {
+          o.indent();
+          o.out('* ' + lines[i]);
+          o.out('\n');
+        }
+        o.indent();
+        o.out('*/\n');
+      }
+
+      o.indent();
       o.out(this.visibility, this.visibility ? ' ' : '',
         'interface ', this.name);
 
@@ -110,7 +125,7 @@ foam.CLASS({
         }
       }
 
-      o.out(' {\n');
+      o.out(' {\n\n');
 
       o.increaseIndent();
 
@@ -121,13 +136,12 @@ foam.CLASS({
       }
 
       for ( var i = 0 ; i < this.methods.length ; i++ ) {
-        o.indent();
         o.out(this.methods[i]);
         o.out('\n');
       }
 
-      o.decreaseIndent();
       o.out('}');
+
     }
   ]
 });

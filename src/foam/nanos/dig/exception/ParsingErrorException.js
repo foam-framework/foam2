@@ -25,4 +25,4 @@ foam.CLASS({
       value: 'Parse'
     }
   ]
-})
+});

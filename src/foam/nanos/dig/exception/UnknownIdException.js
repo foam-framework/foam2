@@ -30,4 +30,4 @@ foam.CLASS({
       value: 'Unknown ID'
     }
   ]
-})
+});
