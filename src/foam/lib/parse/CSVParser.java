@@ -66,7 +66,7 @@ public class CSVParser
             }
             sink.put(obj, detach);
           } catch ( Exception e ) {
-            return null;
+           // return null;
           }
         }
 
