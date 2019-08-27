@@ -34,6 +34,14 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.dao.ManyToManyRelationshipImpl',
       name: 'relationship'
+    },
+    {
+      class: 'String',
+      name: 'targetDAOKey'
+    },
+    {
+      class: 'String',
+      name: 'unauthorizedTargetDAOKey'
     }
   ],
 
@@ -66,6 +74,11 @@ foam.CLASS({
         foam.mlang.sink.Map junction = (foam.mlang.sink.Map) getRelationship().getJunctionDAO()
           .where(foam.mlang.MLang.EQ(getRelationship().getSourceProperty(), getRelationship().getSourceId()))
           .select(foam.mlang.MLang.MAP(getRelationship().getTargetProperty(), new foam.dao.ArraySink()));
+
+        foam.nanos.auth.User user = (foam.nanos.auth.User) getX().get("user");
+        if ( user != null && user.getId() == foam.nanos.auth.User.SYSTEM_USER_ID && getUnauthorizedTargetDAOKey().length() != 0 ) {
+          setDelegate(((foam.dao.DAO) getX().get(getUnauthorizedTargetDAOKey())).inX(getX()));
+        }
 
         return getDelegate()
           .where(foam.mlang.MLang.IN(getPrimaryKey(), ((foam.dao.ArraySink) (junction.getDelegate())).getArray().toArray()))
