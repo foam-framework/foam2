@@ -26,7 +26,7 @@ foam.CLASS({
         this.__context__.userDAO.find(value).then(function(user) {
           this.add(' ', user && user.label());
         }.bind(this));
-      },
+      }
     },
     {
       class: 'Long',
@@ -37,7 +37,7 @@ foam.CLASS({
         this.__context__.userDAO.find(value).then(function(user) {
           this.add(' ', user.label());
         }.bind(this));
-      },
+      }
     },
     {
       class: 'DateTime',
@@ -56,7 +56,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'remoteHost',
+      name: 'remoteHost'
     },
     {
       class: 'Object',
