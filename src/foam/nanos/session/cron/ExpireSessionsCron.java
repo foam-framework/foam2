@@ -11,12 +11,12 @@ import foam.nanos.session.Session;
 import static foam.mlang.MLang.*;
 
 public class ExpireSessionsCron implements ContextAgent {
-  private Logger logger;
+  
   private DAO localSessionDAO;
 
   @Override
   public void execute(X x) {
-    
+
     localSessionDAO = (DAO) x.get("localSessionDAO");
 
     List<Session> expiredSessions = ((ArraySink) localSessionDAO.where(GT(Session.TTL, 0)).select(new ArraySink())).getArray();
