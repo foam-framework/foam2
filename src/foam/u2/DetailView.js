@@ -216,11 +216,12 @@ foam.CLASS({
                 var label = p.label;
                 let tab = self.Tab.create({ label: label });
                 var dao = p.cls_ == foam.dao.ManyToManyRelationshipProperty
-                  ? p.get(self.data).getJunctionDAO()
+                  ? p.get(self.data).getDAO()
                   : p.get(self.data);
                 dao.select(expr.COUNT()).then(function(c) {
                   tab.label = label + ' (' + c.value + ')';
                 });
+
                 p = p.clone();
                 p.label = '';
                 tab.start('table').tag(self.DetailPropertyView, { prop: p });
