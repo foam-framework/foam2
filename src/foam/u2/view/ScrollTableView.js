@@ -222,6 +222,7 @@
           var tbody = this.table_.slotE_(this.table_.rowsFrom(dao));
           tbody.style({
             position: 'absolute',
+            width: '100%',
             'z-index': -1, // To ensure the rows stay behind the header.
             top: this.TABLE_HEAD_HEIGHT + page * this.pageSize * this.rowHeight + 'px'
           });
