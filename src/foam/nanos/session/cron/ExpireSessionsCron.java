@@ -11,7 +11,7 @@ import foam.nanos.session.Session;
 import static foam.mlang.MLang.*;
 
 public class ExpireSessionsCron implements ContextAgent {
-  
+
   private DAO localSessionDAO;
 
   @Override
