@@ -5,18 +5,19 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.cron',
-  name: 'Cron',
-  extends: 'foam.nanos.script.Script',
-
-  imports: [ 'cronDAO as scriptDAO' ],
+  package: 'foam.datetime',
+  name: 'CronSchedule',
+  extends: 'foam.datetime.Schedule',
 
   javaImports: [
     'foam.dao.DAO',
-    'foam.util.SafetyUtil',
     'foam.nanos.notification.Notification',
-    'java.util.Date',
-    'java.util.Calendar'
+    'foam.lib.parse.*',
+    'foam.parsers.unix.CronUnitParser',
+    'foam.util.SafetyUtil',
+    'java.util.Calendar',
+    'java.util.concurrent.atomic.AtomicBoolean',
+    'java.util.Date'
   ],
 
   documentation: 'FOAM class that models a Cron script',
@@ -28,11 +29,6 @@ foam.CLASS({
   searchColumns: ['id', 'description'],
 
   properties: [
-    {
-      class: 'FObjectProperty',
-      of: 'foam.datetime.Schedule',
-      name: 'schedule'
-    },
     {
       class: 'Int',
       name: 'minute',
@@ -75,54 +71,14 @@ foam.CLASS({
       documentation: `Second to execute the script.
            Ranges from 0 - 59. -1 for wildcard`
     },
-    {
-      class: 'DateTime',
-      name: 'scheduledTime',
-      documentation: `Scheduled time to run Cron script.`,
-      javaFactory: 'return getNextScheduledTime();'
-    },
-    {
-      class: 'Boolean',
-      name: 'enabled',
-      value: false
-    }
   ],
 
   methods: [
     {
-      name: 'runScript',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      type: 'Void',
-      javaCode:
-`DAO notification = (DAO) x.get("notificationDAO");
-
-Notification cronStartNotify = new Notification();
-cronStartNotify.setBody("Cron STARTED - " + this.getId() + " " + this.getDescription());
-notification.put(cronStartNotify);
-
-super.runScript(x);
-
-Notification cronEndNotify = new Notification();
-cronEndNotify.setBody("Cron ENDED - " + this.getId() + " " + this.getDescription());
-notification.put(cronEndNotify);
-
-setScheduledTime(getNextScheduledTime());`
-    },
-    {
       name: 'getNextScheduledTime',
       type: 'Date',
       javaCode:
-`
-if ( getSchedule() != null ) {
-  return getSchedule().getNextScheduledTime();
-}
-
-Calendar next = Calendar.getInstance();
+`Calendar next = Calendar.getInstance();
 next.add(Calendar.SECOND, 1);
 next.set(Calendar.MILLISECOND, 0);
 
@@ -170,3 +126,4 @@ return next.getTime();`
     }
   ]
 });
+
