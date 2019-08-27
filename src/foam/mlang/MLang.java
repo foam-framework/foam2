@@ -214,4 +214,11 @@ public class MLang
       .setAuthorizer(authorizer)
       .build();
   }
+
+  public static Predicate DOT_F(Object o1, Object o2) {
+    return new DotF.Builder(null)
+      .setArg1(MLang.prepare(o1))
+      .setArg2(MLang.prepare(o2))
+      .build();
+  }
 }

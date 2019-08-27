@@ -7,7 +7,6 @@
 foam.CLASS({
   package: 'foam.dao.jdbc',
   name: 'TestDataForJDBC',
-  ids: ['id'],
   properties: [
     {
       class: 'Int',
@@ -25,7 +24,6 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao.jdbc',
   name: 'TestCompany',
-  ids: ['id'],
   properties: [
     {
       name: 'id',
@@ -43,7 +41,6 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao.jdbc',
   name: 'TestEmployee',
-  ids: ['id'],
   properties: [
     {
       name: 'id',
