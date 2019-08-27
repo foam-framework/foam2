@@ -52,7 +52,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'uses',
-      storageTransiant: true
+      storageTransient: true
     },
     {
       class: 'String',
