@@ -329,7 +329,7 @@
         var delta = Math.abs(this.width - width) / width;
 
         if ( delta > 0.01 ) {
-          this.width = width;
+          this.width = width > 1600 ? width : 1600;
           this.doLayout();
         }
        }
