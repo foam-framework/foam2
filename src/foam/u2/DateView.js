@@ -49,6 +49,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.setAttribute('type', 'date');
+      this.setAttribute('max', '9999-12-31');
       this.setAttribute('placeholder', 'yyyy/mm/dd');
       this.on('blur', this.onBlur);
     },
@@ -66,10 +67,12 @@ foam.CLASS({
     },
 
     function dataToInput(data) {
+      if ( ! data ) return data;
+
       // Using our own formatter to keep the date in the format (yyyy-mm-dd) while maintaining the locale date
-      const year = data.getFullYear();
-      const month = (data.getMonth() + 1).toString().padStart(2, '0');
-      const day = data.getDate().toString().padStart(2, '0');
+      const year = data.getUTCFullYear();
+      const month = (data.getUTCMonth() + 1).toString().padStart(2, '0');
+      const day = data.getUTCDate().toString().padStart(2, '0');
       
       return `${year}-${month}-${day}`;
     }

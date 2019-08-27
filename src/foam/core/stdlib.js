@@ -427,13 +427,43 @@ foam.LIB({
      * Outputs:
      * Name is adam
      * Hello adam
+     * 
+     * This also supports nested properties for FObjects using the $ syntax.
+     * 
+     * Ex.
+     * foam.CLASS({
+     *   name: 'Foo',
+     *   properties: ['str']
+     * });
+     * foam.CLASS({
+     *   name: 'Bar',
+     *   properties: [
+     *     {
+     *       class: 'FObjectProperty',
+     *       of: 'Foo',
+     *       name: 'foo'
+     *     }
+     *   ]
+     * });
+     * 
+     * var bar = Bar.create({
+     *   foo: Foo.create({str: 'Hello!'})
+     * });
+     * foam.Function.withArgs(function(foo$str) {
+     *   console.log(foo$str);
+     * }, bar);
      *
+     * Outputs:
+     * Hello!
      **/
     function withArgs(fn, source, opt_self) {
       var argNames = foam.Function.argNames(fn);
       var args = [];
       for ( var i = 0 ; i < argNames.length ; i++ ) {
-        var a = source[argNames[i]];
+        var a = foam.core.FObject.isInstance(source) &&
+                argNames[i].indexOf('$') != -1 ?
+          source.slot(argNames[i]).get() :
+          source[argNames[i]];
         if ( typeof a === 'function' ) a = a.bind(source);
         args.push(a);
       }

@@ -130,8 +130,14 @@ foam.CLASS({
     },
     {
       name: 'toString',
-      code: function() { return this.csv; },
-      javaCode: 'return getSb().toString();'
+      code: function() {
+        if ( this.isFirstRow ) this.outputHeader(this.__context__);
+        return this.csv;
+      },
+      javaCode: `
+        if ( getIsFirstRow() ) outputHeader(getX());
+        return getSb().toString();
+      `
     },
     {
       name: 'outputHeader',
