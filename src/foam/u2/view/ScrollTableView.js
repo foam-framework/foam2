@@ -16,8 +16,14 @@
   ],
 
   css: `
-    ^scrollbarContainer {
+    ^ {
       overflow: scroll;
+    }
+    ^table {
+      position: relative;
+    }
+    ^table  .foam-u2-view-TableView-thead {
+      z-index: 1;
     }
   `,
 
@@ -63,13 +69,6 @@
       name: 'table_',
       documentation: `
         A reference to the table element we use in various calculations.
-      `
-    },
-    {
-      name: 'scrollbarContainer_',
-      documentation: `
-        A reference to the scrollbar's container element so we can update the
-        height after the view has loaded.
       `
     },
     {
@@ -146,23 +145,21 @@
 
     function initE() {
       this.
-        start('div', undefined, this.scrollbarContainer_$).
-          addClass(this.myClass('scrollbarContainer')).
-          on('scroll', this.onScroll).
-          start(this.TableView, {
-            data: foam.dao.NullDAO.create({of: this.data.of}),
-            columns: this.columns,
-            contextMenuActions: this.contextMenuActions,
-            selection$: this.selection$,
-            editColumnsEnabled: this.editColumnsEnabled,
-            multiSelectEnabled: this.multiSelectEnabled,
-            selectedObjects$: this.selectedObjects$
-          }, this.table_$).
-            style({
-              height: this.scrollHeight$.map(h => h + 'px'),
-              position: 'relative'
-            }).
-          end().
+        addClass(this.myClass()).
+        on('scroll', this.onScroll).
+        start(this.TableView, {
+          data: foam.dao.NullDAO.create({of: this.data.of}),
+          columns: this.columns,
+          contextMenuActions: this.contextMenuActions,
+          selection$: this.selection$,
+          editColumnsEnabled: this.editColumnsEnabled,
+          multiSelectEnabled: this.multiSelectEnabled,
+          selectedObjects$: this.selectedObjects$
+        }, this.table_$).
+          addClass(this.myClass('table')).
+          style({
+            height: this.scrollHeight$.map(h => h + 'px')
+          }).
         end();
 
       /*
@@ -190,9 +187,7 @@
           delete this.renderedPages_[i];
         });
         this.updateRenderedPages_();
-        if ( this.scrollbarContainer_ && this.scrollbarContainer_.el() ) {
-          this.scrollbarContainer_.el().scrollTop = 0;
-        }
+        if ( this.el() ) this.el().scrollTop = 0;
       }
     },
     {
@@ -223,7 +218,6 @@
           tbody.style({
             position: 'absolute',
             width: '100%',
-            'z-index': -1, // To ensure the rows stay behind the header.
             top: this.TABLE_HEAD_HEIGHT + page * this.pageSize * this.rowHeight + 'px'
           });
           this.table_.add(tbody);
@@ -243,7 +237,7 @@
       name: 'updateTableHeight',
       code: function() {
         // Find the distance from the top of the table to the top of the screen.
-        var distanceFromTop = this.scrollbarContainer_.el().getBoundingClientRect().y;
+        var distanceFromTop = this.el().getBoundingClientRect().y;
 
         // Calculate the remaining space we have to make use of.
         var remainingSpace = window.innerHeight - distanceFromTop;
@@ -252,7 +246,7 @@
         // Leave space for the footer.
         remainingSpace -= 44;
 
-        this.scrollbarContainer_.style({ height: `${remainingSpace}px` });
+        this.style({ height: `${remainingSpace}px` });
       }
     }
   ]
