@@ -30,6 +30,24 @@
 
   constants: [
     {
+      type: 'Float',
+      name: 'MIN_TOP_PAGE_PROGRESS',
+      documentation: `
+        If the "top" page isn't scrolled by at least this amount, make
+        the top page the previous page.
+        i.e. If the page that's currently in view is only scrolled 10% of the way,
+        we consider the page that's above it to be the "top" page. If the page
+        that's on screen is scrolled 51% of the way, then it is considered the top
+        page.
+      `,
+      value: 0.5
+    },
+    {
+      type: 'Integer',
+      name: 'NUM_PAGES_TO_RENDER',
+      value: 3
+    },
+    {
       type: 'Integer',
       name: 'TABLE_HEAD_HEIGHT',
       value: 51
@@ -122,8 +140,8 @@
         var scrollPercent = scrollPos_ / scrollHeight;
         var topPage = Math.floor(scrollPercent * numPages_);
         var topPageProgress = (scrollPercent * numPages_) % 1;
-        if ( topPageProgress < 0.5 ) topPage = topPage - 1;
-        return Math.min(Math.max(0, numPages_ - 3), Math.max(0, topPage));
+        if ( topPageProgress < this.MIN_TOP_PAGE_PROGRESS ) topPage = topPage - 1;
+        return Math.min(Math.max(0, numPages_ - this.NUM_PAGES_TO_RENDER), Math.max(0, topPage));
       }
     },
     {
@@ -211,7 +229,7 @@
           delete this.renderedPages_[i];
         });
 
-        for ( var i = 0; i < Math.min(this.numPages_, 3) ; i++) {
+        for ( var i = 0; i < Math.min(this.numPages_, this.NUM_PAGES_TO_RENDER) ; i++) {
           var page = this.currentTopPage_ + i;
           if ( this.renderedPages_[page] ) continue;
           var dao = this.data$proxy.limit(this.pageSize).skip(page * this.pageSize);
