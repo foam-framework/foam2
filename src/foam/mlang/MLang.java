@@ -215,6 +215,13 @@ public class MLang
       .build();
   }
 
+  public static Predicate DOT_F(Object o1, Object o2) {
+    return new DotF.Builder(null)
+      .setArg1(MLang.prepare(o1))
+      .setArg2(MLang.prepare(o2))
+      .build();
+  }
+
   public static Sink SEQ(foam.dao.Sink[] args) {
     return new Sequence.Builder(null)
       .setArgs(args)

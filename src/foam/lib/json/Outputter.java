@@ -107,6 +107,7 @@ public class Outputter
       .replace("\\", "\\\\")
       .replace("\"", "\\\"")
       .replace("\t", "\\t")
+      .replace("\r","\\r")
       .replace("\n","\\n");
   }
 

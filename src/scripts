@@ -1,8 +1,28 @@
 p({"class":"foam.nanos.script.Script","id":"279885d4-28ad-4af8-b1d9-69e6105970e1","description":"test","server":true,"scheduled":false,"code":"return \"hello World\"","output":"","notes":""})
 p({"class":"foam.nanos.script.Script","id":"279885d4-28ad-4af8-b1d9-69e6105970e1","description":"test","lastRun":"2017-09-29T16:23:47.978Z","server":true,"scheduled":false,"code":"return \"hello World\"","output":"","notes":""})
 p({"class":"foam.nanos.script.Script","id":"createPermissions","description":"Create missing Permissions","server":false,"code":"x.groupDAO.select(function(g) {\nfor ( var i = 0 ; i < g.permissions.length ; i++ ) {\nx.permissionDAO.put(g.permissions[i]);\n}\nperm = g.id + '.*';\np = foam.nanos.auth.Permission.create({id: perm});\nx.permissionDAO.put(p);\n});\n\nx.serviceProviderDAO.select(function(s) {\nperm = 'spid.read.' + s.id;\np = foam.nanos.auth.Permission.create({id: perm});\nx.permissionDAO.put(p);\nperm = 'spid.update.' + s.id;\np = foam.nanos.auth.Permission.create({id: perm});\nx.permissionDAO.put(p);\nperm = 'spid.delete.' + s.id;\np = foam.nanos.auth.Permission.create({id: perm});\nx.permissionDAO.put(p);\n});\n\nx.menuDAO.select(function(m) {\nperm = 'menu.read.' + m.id;\np = foam.nanos.auth.Permission.create({id: perm});\nx.permissionDAO.put(p);\nperm = 'menu.read.' + m.id;\np = foam.nanos.auth.Permission.create({id: perm});\nx.permissionDAO.put(p);\n});\n\nx.nSpecDAO.select(function(s) {\nperm = 'service.run.' + s.id;\np = foam.nanos.auth.Permission.create({id: perm});\nx.permissionDAO.put(p);\nperm = 'service.read.' + s.id;\np = foam.nanos.auth.Permission.create({id: perm});\nx.permissionDAO.put(p);\n});\n\n"})
-p({"class":"foam.nanos.script.Script","id":"showJDAODirectory","description":"Discover where JDAO files are being saved.","lastRun":"2018-01-10T17:09:54.779Z","server":true,"scheduled":false,"code":"import foam.dao.*;\n\nsetAccessibility(true);\n\nDAO dao = x.get(\"userDAO\");\n\nwhile ( ! ( dao instanceof JDAO ) ) dao = dao.getDelegate();\n\nprint(dao.file_);","output":"/Users/kgr/NANOPAY/users\n","notes":""})
-p({"class":"foam.nanos.script.Script","id":"benchmarkHashing","description":"Concurrent Hashing Benchmark","code":"import foam.nanos.bench.*;\nimport net.nanopay.bench.*;\n\nx = x.put(\"pmLogger\", null);\nb = new HashingBenchmark();\nbuilder = new BenchmarkRunner.Builder(x).setThreadCount(2).setInvocationCount(10000).setBenchmark(b);\nrunner = builder.build();\nrunner.execute(x);"})
+
+p({
+  "class":"foam.nanos.script.Script",
+  "id":"showJDAODirectory",
+  "description":"Discover where JDAO files are being saved.",
+  "lastRun":"2018-01-10T17:09:54.779Z",
+  "server":true,
+  "scheduled":false,
+  "code":
+  """
+    import foam.dao.*;
+    
+    setAccessibility(true);
+    DAO dao = x.get("userDAO");
+    while ( ! ( dao instanceof JDAO ) ) 
+      dao = dao.getDelegate();
+    print(dao.file_);
+  """,
+  "output":"",
+  "notes":""
+})
+
 p({"class": "foam.nanos.script.TestRunnerScript", "id":"testRunnerScript"})
 p({"class":"foam.nanos.script.Script","id":"Migrate permissions","code":"import foam.dao.ArraySink;\u000aimport foam.nanos.auth.*;\u000a\u000alocalGroupDAO = x.get(\"localGroupDAO\");\u000apermissionDAO = x.get(\"localPermissionDAO\");\u000agroupPermissionJunctionDAO = x.get(\"localGroupPermissionJunctionDAO\");\u000a\u000agroups = ((ArraySink) localGroupDAO.select(new ArraySink())).getArray();\u000a\u000afor ( Group group : groups ) {\u000a  Permission[] permissions = group.getPermissions();\u000a\u000a  for ( Permission permission : permissions ) {\u000a\u000a    // Add to permissionDAO if not already there.\u000a    Permission existing = permissionDAO.find(permission.getId());\u000a\u000a    if ( existing == null ) {\u000a      permissionDAO.put(permission);\u000a      print(\"Added permission \" + permission.getId() + \" to permissionDAO.\");\u000a    }\u000a\u000a    // Add to groupPermissionJunctionDAO if not already there.\u000a    GroupPermissionJunction junction = group.getPermissions2(x).createJunction(permission.getId());\u000a    GroupPermissionJunction existing2 = groupPermissionJunctionDAO.find(junction);\u000a\u000a    if ( existing2 == null ) {\u000a      group.getPermissions2(x).add(permission);\u000a      print(\"Added \" + permission.getId() + \" to group \" + group.getId() + \".\");\u000a    } else {\u000a      print(permission.getId() + \" is already in group \" + group.getId() + \".\");\u000a    }\u000a  }\u000a}\u000a"})
 p({"class":"foam.nanos.script.Script","id":"Sample Threads","description":"Perform statistical thread sampling to discover code hot spots.","lastRun":"2019-06-24T17:30:02.660Z","lastDuration":12626,"status":1,"code":"map     = new HashMap();\n\nfor ( j = 0 ; j < 1000 ; j++ ) {\n\nthreads = Thread.getAllStackTraces().values();\n\nfor ( i = threads.iterator() ; i.hasNext() ; ) {\n  t = i.next();\n  try {\n    l = t[0].toString().trim();\n    if ( l.equals(\"java.lang.Thread.dumpThreads(Native Method)\") ) continue;\n    if ( l.equals(\"sun.misc.Unsafe.park(Native Method)\") ) continue;\n    if ( l.equals(\"java.lang.Thread.sleep(Native Method)\") ) continue;\n    if ( l.equals(\"java.lang.Object.wait(Native Method)\") ) continue;\n    if ( l.equals(\"sun.nio.ch.KQueueArrayWrapper.kevent0(Native Method)\") ) continue;\n    if ( l.equals(\"sun.nio.ch.KQueueArrayWrapper.register0(Native Method)\") ) continue;\n    if ( l.equals(\"sun.nio.ch.ServerSocketChannelImpl.accept0(Native Method)\") ) continue;\n\n    if ( map.containsKey(l) ) {\n      map.put(l, map.get(l) + 1);\n    } else {\n      map.put(l, 1);\n    }\n  } catch (Throwable t) {\n  }\n}\n\nThread.sleep(10);\n}\n\nfor ( i = map.keySet().iterator() ; i.hasNext() ; ) {\n  key = i.next();\n  value = map.get(key);\n  if ( ! String.valueOf(value).equals(\"1\") ) \n    print(String.format(\"%-100s %s\", new Object[] {key, value}));\n}\n\nprint(\"done\");","output":"foam.core.AbstractFObject.compareTo(AbstractFObject.java:31)                                         2\ndone\n"})

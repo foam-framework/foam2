@@ -7,7 +7,6 @@
 package foam.nanos.dig;
 
 import foam.core.*;
-import foam.dao.CSVSink;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.lib.csv.CSVSupport;
@@ -89,12 +88,22 @@ public class DigWebAgent
       }
 
       NSpec nspec = (NSpec) nSpecDAO.find(daoName);
-      if ( nspec == null ||
-           ! nspec.getServe() ) {
+
+      if ( nspec == null || ! nspec.getServe() ) {
          DigErrorMessage error = new DAONotFoundException.Builder(x)
                                       .setMessage("DAO not found: " + daoName)
                                       .build();
         outputException(x, resp, format, out, error);
+        return;
+      }
+
+      // Check if the user is authorized to access the DAO.
+      try {
+        nspec.checkAuthorization(x);
+      } catch (foam.nanos.auth.AuthorizationException e) {
+        outputException(x, resp, format, out, new foam.nanos.dig.exception.AuthorizationException.Builder(x)
+          .setMessage(e.getMessage())
+          .build());
         return;
       }
 
@@ -347,7 +356,6 @@ public class DigWebAgent
         foam.dao.Sink[] seqSinkArray = { MLang.MIN(pInfo), MLang.MAX(pInfo), MLang.AVG(pInfo) };
         foam.mlang.sink.Sequence seq = (foam.mlang.sink.Sequence) dao.select(MLang.SEQ(seqSinkArray));
         foam.mlang.sink.Sum sum = (foam.mlang.sink.Sum) dao.select(MLang.SUM(pInfo));
-
 
         if ( sink != null ) {
           if ( sink.getArray().size() == 0 ) {
