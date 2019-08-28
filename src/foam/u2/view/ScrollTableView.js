@@ -223,12 +223,16 @@
       isFramed: true,
       code: function() {
         if ( ! this.table_ ) return;
+
+        // Remove any pages that are no longer on screen to save on
+        // the amount of DOM we add to the page.
         Object.keys(this.renderedPages_).forEach(i => {
-          if ( i >= this.currentTopPage_ && i <= this.currentTopPage_ + 2 ) return;
+          if ( i >= this.currentTopPage_ && i < this.currentTopPage_ + this.NUM_PAGES_TO_RENDER ) return;
           this.renderedPages_[i].remove();
           delete this.renderedPages_[i];
         });
 
+        // Add any pages that are not already rendered.
         for ( var i = 0; i < Math.min(this.numPages_, this.NUM_PAGES_TO_RENDER) ; i++) {
           var page = this.currentTopPage_ + i;
           if ( this.renderedPages_[page] ) continue;
