@@ -81,12 +81,48 @@ p({
   """,
   "client": "{\"class\":\"foam.nanos.auth.CachedAuthServiceProxy\",\"delegate\":{\"class\":\"foam.nanos.auth.ClientLoginAuthService\"}}"
 })
-p({"class":"foam.nanos.boot.NSpec", "name":"ping",                               "authenticate": false, "serviceClass":"foam.nanos.http.PingService"})
-p({"class":"foam.nanos.boot.NSpec", "name":"uptime",                           "lazy":false, "authenticate": false, "serviceClass":"foam.nanos.http.UptimeWebAgent"})
-p({"class":"foam.nanos.boot.NSpec", "name":"static",                             "authenticate": false, "serviceClass":"foam.nanos.http.FileWebAgent"})
-p({"class":"foam.nanos.boot.NSpec", "name":"export",                             "serviceClass":"foam.nanos.export.ExportService"})
-p({"class":"foam.nanos.boot.NSpec", "name":"trace",                              "authenticate": false, "parameters":true, "serviceClass":"foam.nanos.http.TraceWebAgent"})
-p({"class":"foam.nanos.boot.NSpec", "name":"services",                           "serviceClass":"foam.nanos.http.ServicesWebAgent"})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "ping",
+  "authenticate": false,
+  "serviceClass": "foam.nanos.http.PingService"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "uptime",
+  "lazy": false,
+  "authenticate": false,
+  "serviceClass": "foam.nanos.http.UptimeWebAgent"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "static",
+  "authenticate": false,
+  "serviceClass": "foam.nanos.http.FileWebAgent"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "export",
+  "serviceClass": "foam.nanos.export.ExportService"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "trace",
+  "authenticate": false,
+  "parameters": true,
+  "serviceClass": "foam.nanos.http.TraceWebAgent"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "services",
+  "serviceClass": "foam.nanos.http.ServicesWebAgent"
+})
 
 p({
   "class": "foam.nanos.boot.NSpec",
@@ -97,9 +133,10 @@ p({
 })
 
 p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"testDAO","serve":true,
-  "serviceScript":"""
+  "class": "foam.nanos.boot.NSpec",
+  "name": "testDAO",
+  "serve": true,
+  "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setPm(true)
       .setGuid(true)
@@ -109,7 +146,7 @@ p({
       .setDecorator(new foam.nanos.script.ScriptRunnerDAO(null))
       .build();
   """,
-  "client":"{\"of\":\"foam.nanos.test.Test\"}"
+  "client": "{\"of\":\"foam.nanos.test.Test\"}"
 })
 
 p({"class":"foam.nanos.boot.NSpec", "name":"pmInfoDAO",                          "serve":true,  "serviceScript":"return new foam.dao.MDAO(foam.nanos.pm.PMInfo.getOwnClassInfo());","client":"{\"of\":\"foam.nanos.pm.PMInfo\", \"remoteListenerSupport\": false}" })
@@ -218,11 +255,48 @@ p({
       .build();
   """
 })
-p({"class":"foam.nanos.boot.NSpec", "name":"sessionDAO",                           "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setOf(foam.nanos.session.Session.getOwnClassInfo()).setPm(true).setInnerDAO(((foam.dao.DAO) x.get(\"localSessionDAO\"))).build();","client":"{\"of\":\"foam.nanos.session.Session\"}" })
-p({"class":"foam.nanos.boot.NSpec", "name":"classes",                            "serviceClass":"foam.nanos.http.ClassesWebAgent"})
-p({"class":"foam.nanos.boot.NSpec", "name":"threads",                            "serviceClass":"foam.nanos.http.ThreadsWebAgent"})
-p({"class":"foam.nanos.boot.NSpec", "name":"login",                              "serviceClass":"foam.nanos.http.ShowSessionWebAgent"})
-p({"class":"foam.nanos.boot.NSpec", "name":"memory",                             "serviceScript":"return new foam.nanos.http.RefreshWebAgent(new foam.nanos.http.MemoryWebAgent());"})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "sessionDAO",
+  "serve": true,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.session.Session.getOwnClassInfo())
+      .setPm(true)
+      .setInnerDAO(((foam.dao.DAO) x.get(\"localSessionDAO\")))
+      .build();
+  """,
+  "client": "{\"of\":\"foam.nanos.session.Session\"}"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "classes",
+  "serviceClass": "foam.nanos.http.ClassesWebAgent"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "threads",
+  "serviceClass": "foam.nanos.http.ThreadsWebAgent"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "login",
+  "serviceClass": "foam.nanos.http.ShowSessionWebAgent"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "memory",
+  "serviceScript": """
+    memoryWebAgent = new foam.nanos.http.MemoryWebAgent();
+    return new foam.nanos.http.RefreshWebAgent(memoryWebAgent);
+  """
+})
+
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "countryDAO",
@@ -290,11 +364,37 @@ p({"class":"foam.nanos.boot.NSpec", "name":"historyDAO",                        
 p({"class":"foam.nanos.boot.NSpec", "name":"menuDAO",                            "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setName(\"menu\").setPm(true).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"menus\").setOf(foam.nanos.menu.Menu.getOwnClassInfo()).setOrder(new foam.core.PropertyInfo[] {foam.nanos.menu.Menu.ORDER, foam.nanos.menu.Menu.LABEL}).build().orderBy(foam.nanos.menu.Menu.ORDER);", "client":"{\"of\":\"foam.nanos.menu.Menu\",\"cache\":true}"})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"blobStore",                          "serviceClass":"foam.blob.BlobStore"})
-p({"class":"foam.nanos.boot.NSpec", "name":"httpBlobService",                    "authenticate": false, "serviceScript":"return new foam.nanos.http.SessionWebAgent(\"service.run.httpBlobService\", new foam.nanos.blob.HttpBlobService(x, x.get(\"blobStore\")));"})
-p({"class":"foam.nanos.boot.NSpec", "name":"httpFileService",                    "authenticate": false, "serviceScript":"return new foam.nanos.http.SessionWebAgent(\"service.run.httpFileService\", new foam.nanos.blob.FileService(x, x.get(\"blobStore\")));"})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "httpBlobService",
+  "authenticate": false,
+  "serviceScript": """
+    httpBlobService = new foam.nanos.blob.HttpBlobService(x, x.get("blobStore"));
+    return new foam.nanos.http.SessionWebAgent("service.run.httpBlobService", httpBlobService);
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "httpFileService",
+  "authenticate": false,
+  "serviceScript": """
+    fileService = new foam.nanos.blob.FileService(x, x.get("blobStore"));
+    return new foam.nanos.http.SessionWebAgent("service.run.httpFileService", fileService);
+  """
+})
+
 p({"class":"foam.nanos.boot.NSpec", "name":"blobService",                        "serve":true,  "client": "{ \"class\":\"foam.blob.RestBlobService\", \"serviceName\":\"service/httpBlobService\" }"})
 p({"class":"foam.nanos.boot.NSpec", "name":"resetPasswordToken",                 "serve":true,  "authenticate": false, "serviceClass":"foam.nanos.auth.resetPassword.ResetPasswordTokenService","boxClass":"foam.nanos.auth.token.TokenServiceSkeleton","client":"{\"class\":\"foam.nanos.auth.token.ClientTokenService\"}"})
-p({"class":"foam.nanos.boot.NSpec", "name":"dig",                                "parameters":true, "serviceScript":"return new foam.nanos.dig.DigWebAgent()"})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "dig",
+  "parameters": true,
+  "serviceScript": "return new foam.nanos.dig.DigWebAgent()"
+})
+
 p({"class":"foam.nanos.boot.NSpec", "name":"dugDAO",                            "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setGuid(true).setOf(foam.nanos.dig.DUG.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"dugs\").setDecorator(new foam.nanos.dig.DUGDAO(x)).build();","client":"{\"of\":\"foam.nanos.dig.DUG\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"digDAO",                            "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setGuid(true).setOf(foam.nanos.dig.DIG.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"digs\").build();","client":"{\"of\":\"foam.nanos.dig.DIG\",\"decorators\": [{\"class\":\"foam.nanos.fs.FileDAODecorator\"},{\"class\":\"foam.nanos.fs.FileArrayDAODecorator\"}]}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"demoObjectDAO",                      "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"demoObjects\").setGuid(true).setOf(foam.nanos.demo.DemoObject.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.demo.DemoObject\", \"remoteListenerSupport\": false}"})
@@ -303,14 +403,22 @@ p({"class":"foam.nanos.boot.NSpec", "name":"fileDAO",                           
 p({"class":"foam.nanos.boot.NSpec", "name":"serviceProviderDAO",                 "serve":true,  "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.java.JDAO(x, foam.nanos.auth.ServiceProvider.getOwnClassInfo(), \"spids\"));","client":"{\"of\":\"foam.nanos.auth.ServiceProvider\"}"})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"emailToken",                         "serve":true,  "serviceClass":"foam.nanos.auth.email.EmailTokenService","boxClass":"foam.nanos.auth.token.TokenServiceSkeleton","client":"{\"class\":\"foam.nanos.auth.token.ClientTokenService\"}"})
-p({"class":"foam.nanos.boot.NSpec", "name":"verifyEmail",                      "lazy":false,  "authenticate": false, "serviceClass":"foam.nanos.auth.email.EmailVerificationWebAgent"})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "verifyEmail",
+  "lazy": false,
+  "authenticate": false,
+  "serviceClass": "foam.nanos.auth.email.EmailVerificationWebAgent"
+})
+
 p({"class":"foam.nanos.boot.NSpec", "name":"twofactor",                          "serve":true,  "authenticate": false, "boxClass":"foam.nanos.auth.twofactor.OTPAuthServiceSkeleton", "serviceClass":"foam.nanos.auth.twofactor.GoogleTOTPAuthService", "client":"{\"class\":\"foam.nanos.auth.twofactor.ClientOTPAuthService\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"htmlDocDAO",                         "serve":true,  "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.SequenceNumberDAO (new foam.dao.java.JDAO(x, foam.nanos.auth.HtmlDoc.getOwnClassInfo(), \"htmlDoc\")));", "client":"{\"of\":\"foam.nanos.auth.HtmlDoc\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"emailDocService",                  "lazy":false, "serve":true,  "boxClass":"foam.nanos.auth.email.EmailDocInterfaceSkeleton", "serviceClass":"foam.nanos.auth.email.EmailDocService","client":"{\"class\":\"foam.nanos.auth.email.ClientEmailDocService\", \"delegate\": { \"class\":\"foam.box.HTTPBox\", \"url\":\"service/emailDocService\" } }"})
 p({"class":"foam.nanos.boot.NSpec","name":"appConfig",                         "lazy":false, "service":{"class":"foam.nanos.app.AppConfig"}})
 p({"class":"foam.nanos.boot.NSpec","name":"appConfigService",                   "serve":true, "authenticate": false, "boxClass":"foam.nanos.app.AppConfigServiceSkeleton", "service":{"class":"foam.nanos.app.ContextLookupAppConfigService"}, "client":"{\"class\":\"foam.nanos.app.ClientAppConfigService\",\"delegate\":{\"class\":\"foam.box.HTTPBox\",\"url\":\"service/appConfigService\"}}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"agentAuth",                        "lazy":false, "serve":true, "authenticate": false, "description":"Permits users to act as others if permitted. Places user as an agent of the system.", "boxClass":"foam.nanos.auth.AgentAuthServiceSkeleton", "serviceScript":"return new foam.nanos.auth.AgentUserAuthService(x);","client":"{\"class\":\"foam.nanos.auth.ClientAgentAuthService\"}"})
-p({"class":"foam.nanos.boot.NSpec", "name":"agentJunctionDAO",                 "lazy":false, "serve":true, "authenticate": false, "description":"DAO responsible for storing agent authentication permission information.","serviceScript": "return new foam.dao.EasyDAO.Builder(x).setAuthorize(false).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"agentJunctions\").setOf(foam.nanos.auth.UserUserJunction.getOwnClassInfo()).build();","client":"{\"of\":\"foam.nanos.auth.UserUserJunction\", \"remoteListenerSupport\": false}"})
+p({"class":"foam.nanos.boot.NSpec", "name":"agentJunctionDAO",                 "lazy":false, "serve":true, "description":"DAO responsible for storing agent authentication permission information.","serviceScript": "return new foam.dao.EasyDAO.Builder(x).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"agentJunctions\").setOf(foam.nanos.auth.UserUserJunction.getOwnClassInfo()).build();","client":"{\"of\":\"foam.nanos.auth.UserUserJunction\", \"remoteListenerSupport\": false}"})
 p({
   "class":"foam.nanos.boot.NSpec",
   "name":"documentDAO",
@@ -331,7 +439,15 @@ p({"class":"foam.nanos.boot.NSpec", "name":"ticketMessageDAO",                 "
 p({"class":"foam.nanos.boot.NSpec", "name":"supportEmailDAO",                  "lazy":true, "serve":true, "serviceScript":"return new foam.dao.PMDAO(new foam.dao.SequenceNumberDAO(new foam.dao.java.JDAO(x, foam.support.model.SupportEmail.getOwnClassInfo(), \"supportEmails\")));","client":"{\"of\":\"foam.support.model.SupportEmail\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"ticketDAO",                        "lazy":true, "serve":true, "serviceScript":"return new foam.dao.PMDAO(new foam.dao.SequenceNumberDAO(new foam.dao.java.JDAO(x, foam.support.model.Ticket.getOwnClassInfo(), \"tickets\")));","client":"{\"of\":\"foam.support.model.Ticket\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"pop3",                             "lazy":true, "serve":true, "boxClass":"foam.nanos.notification.email.POP3EmailSkeleton", "serviceClass":"foam.nanos.notification.email.POP3EmailService","client":"{ \"class\":\"foam.nanos.notification.email.ClientPOP3EmailService\", \"delegate\": { \"class\":\"foam.box.HTTPBox\", \"url\":\"service/pop3\" } }"})
-p({"class":"foam.nanos.boot.NSpec", "name":"sugar",                            "lazy":true,  "serve":false, "parameters":true, "serviceScript":"return new foam.nanos.dig.SugarWebAgent()"})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "sugar",
+  "lazy": true,
+  "serve": false,
+  "parameters": true,
+  "serviceScript": "return new foam.nanos.dig.SugarWebAgent()"
+})
 
 p({
   "class":"foam.nanos.boot.NSpec",
@@ -350,7 +466,26 @@ p({
 })
 
 p({"class":"foam.nanos.boot.NSpec", "name":"argumentDAO",                        "serve":true,  "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.java.JDAO(x, foam.nanos.dig.Argument.getOwnClassInfo(), \"arguments\"));","client":"{\"of\":\"foam.nanos.dig.Argument\"}"})
-p({"class":"foam.nanos.boot.NSpec", "name":"ruleDAO",                            "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setSeqNo(true).setOf(foam.nanos.ruler.Rule.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"rules\").build();", "client":"{\"of\":\"foam.nanos.ruler.Rule\"}"})
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "ruleDAO",
+  "serve": true,
+  "serviceScript": """
+    ed = new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setSeqNo(true)
+      .setOf(foam.nanos.ruler.Rule.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("rules")
+      .build();
+    return new foam.dao.ValidatingDAO(x, ed);
+  """,
+  "client": """
+    {
+      "of": "foam.nanos.ruler.Rule"
+    }
+  """
+})
 p({"class":"foam.nanos.boot.NSpec", "name":"ruleHistoryDAO",                     "serve":true,  "serviceScript":"dao = new foam.dao.EasyDAO.Builder(x).setPm(true).setSeqNo(true).setOf(foam.nanos.ruler.RuleHistory.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"ruleHistory\").build(); ca = new foam.nanos.auth.CreatedAwareDAO.Builder(x).setDelegate(dao).build(); lma = new foam.nanos.auth.LastModifiedAwareDAO.Builder(x).setDelegate(ca).build(); return lma;", "client":"{\"of\":\"foam.nanos.ruler.RuleHistory\"}"})
 p({"class":"foam.nanos.boot.NSpec","name":"emailConfig",                       "lazy":false, "service":{"class":"foam.nanos.app.EmailConfig"}})
 p({"class":"foam.nanos.boot.NSpec", "name":"serializationTestEchoService", "boxClass": "foam.nanos.test.EchoServiceSkeleton",  "serve":true, "serviceClass":"foam.nanos.test.SerializationTestEchoService", "client":"{\"class\":\"foam.nanos.test.ClientEchoService\",\"delegate\":{\"class\":\"foam.box.SessionClientBox\",\"delegate\":{\"class\":\"foam.box.HTTPBox\",\"method\":\"POST\",\"url\":\"service/serializationTestEchoService\"}}}"})
