@@ -305,7 +305,12 @@ foam.CLASS({
   flags: ['web'],
 
   properties: [
-    'blob',
+    {
+      name: 'blob',
+      cloneProperty: function(value, map) {
+        map[this.name] = value;
+      }
+    },
     {
       name: 'size',
       factory: function() {
@@ -315,15 +320,14 @@ foam.CLASS({
   ],
 
   methods: [
-    function read(out, offset, loength) {
-      var self = this;
+    function read(out, offset, length) {
       var reader = new FileReader();
 
-      var b = this.blob.slice(offset, offset + buffer.length);
+      var b = this.blob.slice(offset, offset + length);
 
       return new Promise(function(resolve, reject) {
         reader.onload = function(e) {
-          out(e.result);
+          out(reader.result);
           resolve();
         };
 

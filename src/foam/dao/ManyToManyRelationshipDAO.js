@@ -34,6 +34,14 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.dao.ManyToManyRelationshipImpl',
       name: 'relationship'
+    },
+    {
+      class: 'String',
+      name: 'targetDAOKey'
+    },
+    {
+      class: 'String',
+      name: 'unauthorizedTargetDAOKey'
     }
   ],
 
@@ -62,13 +70,20 @@ foam.CLASS({
               self.IN(self.of.ID, map.delegate.array)));
           });
       },
-      javaCode: `foam.mlang.sink.Map junction = (foam.mlang.sink.Map)getRelationship().getJunctionDAO().where(
-    foam.mlang.MLang.EQ(getRelationship().getSourceProperty(), getRelationship().getSourceId())).
-  select(foam.mlang.MLang.MAP(getRelationship().getTargetProperty(), new foam.dao.ArraySink()));
+      javaCode: `
+        foam.mlang.sink.Map junction = (foam.mlang.sink.Map) getRelationship().getJunctionDAO()
+          .where(foam.mlang.MLang.EQ(getRelationship().getSourceProperty(), getRelationship().getSourceId()))
+          .select(foam.mlang.MLang.MAP(getRelationship().getTargetProperty(), new foam.dao.ArraySink()));
 
-  return getDelegate().where(foam.mlang.MLang.IN(getPrimaryKey(), ((foam.dao.ArraySink)(junction.getDelegate())).getArray().toArray())).select_(
-    x, sink, skip, limit, order, predicate);`,
+        foam.nanos.auth.User user = (foam.nanos.auth.User) getX().get("user");
+        if ( user != null && user.getId() == foam.nanos.auth.User.SYSTEM_USER_ID && getUnauthorizedTargetDAOKey().length() != 0 ) {
+          setDelegate(((foam.dao.DAO) getX().get(getUnauthorizedTargetDAOKey())).inX(getX()));
+        }
 
+        return getDelegate()
+          .where(foam.mlang.MLang.IN(getPrimaryKey(), ((foam.dao.ArraySink) (junction.getDelegate())).getArray().toArray()))
+          .select_(x, sink, skip, limit, order, predicate);
+      `,
       swiftCode: `
         let pred = __context__.create(foam_mlang_predicate_Eq.self, args: [
           "arg1": relationship?.sourceProperty,

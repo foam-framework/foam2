@@ -47,9 +47,6 @@ foam.CLASS({
   ],
 
   actions: [
-    function cancel() {
-      this.finished.pub();
-    },
     {
       name: 'save',
       isEnabled: function(obj) { return !! obj; },

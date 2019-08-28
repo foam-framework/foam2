@@ -157,7 +157,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'filterAreaSpec',
-      value: 'div'
+      value: 'DIV'
     },
     {
       class: 'Boolean',
@@ -633,6 +633,22 @@ foam.CLASS({
       class: 'foam.u2.ViewSpec',
       name: 'searchView',
       value: null
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2.search',
+  name: 'ReferenceRefinement',
+  refines: 'foam.core.Reference',
+
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'searchView',
+      expression: function(of) {
+        return of.ID.searchView;
+      }
     }
   ]
 });

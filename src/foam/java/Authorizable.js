@@ -20,14 +20,14 @@ foam.INTERFACE({
       args: [
         { name: 'x', type: 'Context' }
       ],
-      javaThrows: ['AuthorizationException'],
+      javaThrows: ['foam.nanos.auth.AuthorizationException']
     },
     {
       name: 'authorizeOnRead',
       args: [
         { name: 'x', type: 'Context' }
       ],
-      javaThrows: ['AuthorizationException'],
+      javaThrows: ['foam.nanos.auth.AuthorizationException']
     },
     {
       name: 'authorizeOnUpdate',
@@ -35,14 +35,14 @@ foam.INTERFACE({
         { name: 'x', type: 'Context' },
         { name: 'oldObj', type: 'foam.core.FObject' }
       ],
-      javaThrows: ['AuthorizationException'],
+      javaThrows: ['foam.nanos.auth.AuthorizationException']
     },
     {
       name: 'authorizeOnDelete',
       args: [
         { name: 'x', type: 'Context' }
       ],
-      javaThrows: ['AuthorizationException'],
+      javaThrows: ['foam.nanos.auth.AuthorizationException']
     }
   ]
 });

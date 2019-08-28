@@ -24,7 +24,7 @@ foam.CLASS({
       tableCellFormatter: function(value, obj) {
         this.add(value);
         this.__context__.userDAO.find(value).then(function(user) {
-          this.add(' ', user.label());
+          this.add(' ', user && user.label());
         }.bind(this));
       }
     },

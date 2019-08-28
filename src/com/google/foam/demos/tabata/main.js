@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 var d = Tabata.create();
 foam.u2.DetailView.create({ data: d, showActions: true }).write();
 //      TabataBarCView.create({ data: d }).write();

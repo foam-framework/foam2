@@ -92,35 +92,71 @@ foam.CLASS({
     },
     {
       name: 'installedDocuments_',
-      factory: function() { return new WeakMap(); },
+      factory: function() { return {}; },
       transient: true
+    },
+    {
+      class: 'Boolean',
+      name: 'expands_',
+      documentation: 'True iff the CSS contains a ^ which needs to be expanded.',
+      expression: function(code) {
+        return code.includes('^');
+      }
     }
   ],
 
   methods: [
+    function asKey(document, cls) {
+      return this.expands_ ? document.$UID + "." + cls.id : document.$UID;
+    },
+
     function installInClass(cls) {
       // Install myself in this Window, if not already there.
-      var oldCreate = cls.create;
-      var axiom     = this;
+      var oldCreate    = cls.create;
+      var axiom        = this;
+      var isFirstCSS   = ! cls.private_.hasCSS;
+
+      if ( isFirstCSS ) cls.private_.hasCSS = true;
 
       cls.create = function(args, opt_parent) {
-        // TODO: move this functionality somewhere reusable
         var X = opt_parent ?
           ( opt_parent.__subContext__ || opt_parent.__context__ || opt_parent ) :
           foam.__context__;
 
-        // Install our own CSS, and then all parent models as well.
-        if ( X.document && ! axiom.installedDocuments_.has(X.document) ) {
-          X.installCSS(axiom.expandCSS(this, axiom.code), cls.id);
-          axiom.installedDocuments_.set(X.document, true);
+        // if a class has inheritCSS: false then finish installing its other
+        // CSS axioms, but prevent any parent classes from installing theirs
+        // We put this in the context to communicate to other CSSAxioms
+        // down the chain. The last/first one will revert back to the original
+        // X so that objects aren't created with lastClassToInstallCSSFor
+        // in their contexts.
+        var lastClassToInstallCSSFor = X.lastClassToInstallCSSFor;
+
+        if ( ! lastClassToInstallCSSFor || lastClassToInstallCSSFor == cls ) {
+          // Install CSS if not already installed in this document for this cls
+          var key = axiom.asKey(X.document, this);
+          if ( X.document && ! axiom.installedDocuments_[key] ) {
+            X.installCSS(axiom.expandCSS(this, axiom.code), this.id);
+            axiom.installedDocuments_[key] = true;
+          }
         }
 
-        // Now call through to the original create.
+        if ( ! lastClassToInstallCSSFor && ! this.model_.inheritCSS ) {
+          X = X.createSubContext({
+            lastClassToInstallCSSFor: this,
+            originalX: X
+          });
+        }
+
+        if ( lastClassToInstallCSSFor && isFirstCSS ) X = X.originalX;
+
+        // Now call through to the original create
         return oldCreate.call(this, args, X);
       };
     },
 
     function expandCSS(cls, text) {
+      if ( ! this.expands_ ) return text;
+
       /* Performs expansion of the ^ shorthand on the CSS. */
       // TODO(braden): Parse and validate the CSS.
       // TODO(braden): Add the automatic prefixing once we have the parser.
@@ -316,20 +352,17 @@ foam.CLASS({
       this.visitChildren('unload');
       this.detach();
     },
-    function error() {
-      throw new Error('Mutations not allowed in OUTPUT state.');
-    },
-    function onSetClass(cls, enabled) { this.error(); },
-    function onFocus(cls, enabled) { this.error(); },
-    function onAddListener(topic, listener) { this.error(); },
-    function onRemoveListener(topic, listener) { this.error(); },
-    function onSetStyle(key, value) { this.error(); },
-    function onSetAttr(key, value) { this.error(); },
-    function onRemoveAttr(key) { this.error(); },
-    function onAddChildren(c) { this.error(); },
-    function onInsertChildren() { this.error(); },
-    function onReplaceChild() { this.error(); },
-    function onRemoveChild() { this.error(); },
+    function onSetClass(cls, enabled) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onFocus(cls, enabled) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onAddListener(topic, listener) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onRemoveListener(topic, listener) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onSetStyle(key, value) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onSetAttr(key, value) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onRemoveAttr(key) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onAddChildren(c) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onInsertChildren() { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onReplaceChild() { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onRemoveChild() { throw new Error('Mutations not allowed in OUTPUT state.'); },
     function toString() { return 'OUTPUT'; }
   ]
 });
@@ -565,8 +598,8 @@ foam.CLASS({
     <foam class="com.acme.mypackage.MyView"></foam>
 
     // TODO: Decide if we want this or not:
-    // function XXXE(opt_nodeName /* | DIV */) {
-    //   /* Create a new Element */
+    // function XXXE(opt_nodeName // | DIV //) {
+    //   // Create a new Element
     //   var Y = this.__subContext__;
     //
     //   // ???: Is this needed / a good idea?
@@ -598,6 +631,7 @@ foam.CLASS({
     'foam.u2.AttrSlot',
     'foam.u2.Entity',
     'foam.u2.RenderSink',
+    'foam.u2.Tooltip'
   ],
 
   imports: [
@@ -815,6 +849,10 @@ foam.CLASS({
       }
     },
     {
+      class: 'String',
+      name: 'tooltip'
+    },
+    {
       name: 'parentNode',
       transient: true
     },
@@ -944,6 +982,7 @@ foam.CLASS({
         Template method for adding addtion element initialization
         just before Element is output().
       */
+      this.initTooltip();
       this.initKeyboardShortcuts();
     },
 
@@ -1008,6 +1047,10 @@ foam.CLASS({
       }
 
       return count;
+    },
+
+    function initTooltip() {
+      if ( this.tooltip ) this.Tooltip.create({target: this, text:this.tooltip});
     },
 
     function initKeyboardShortcuts() {
@@ -1522,16 +1565,6 @@ foam.CLASS({
             var v = c[j];
             es.push(v.toE ? v.toE(null, Y) : v);
           }
-        } else if ( c.toE ) {
-          var e = c.toE(null, Y);
-          if ( foam.core.Slot.isInstance(e) ) {
-            e = this.slotE_(e);
-          }
-          es.push(e);
-        } else if ( c.then ) {
-          this.add(this.PromiseSlot.create({ promise: c }));
-        } else if ( typeof c === 'function' ) {
-          throw new Error('Unsupported');
         } else if ( foam.core.Slot.isInstance(c) ) {
           var v = this.slotE_(c);
           if ( Array.isArray(v) ) {
@@ -1542,6 +1575,16 @@ foam.CLASS({
           } else {
             es.push(v.toE ? v.toE(null, Y) : v);
           }
+        } else if ( c.toE ) {
+          var e = c.toE(null, Y);
+          if ( foam.core.Slot.isInstance(e) ) {
+            e = this.slotE_(e);
+          }
+          es.push(e);
+        } else if ( c.then ) {
+          this.add(this.PromiseSlot.create({ promise: c }));
+        } else if ( typeof c === 'function' ) {
+          throw new Error('Unsupported');
         } else {
           es.push(c);
         }
@@ -1796,8 +1839,7 @@ foam.CLASS({
       }.bind(this));
 
       var index = before ? i : (i + 1);
-      this.childNodes.splice.apply(this.childNodes,
-          [ index, 0 ].concat(children));
+      this.childNodes.splice.apply(this.childNodes, [index, 0].concat(children));
 
       this.state.onInsertChildren.call(
         this,
@@ -2023,10 +2065,9 @@ foam.CLASS({
       class: 'foam.core.ContextMethod',
       name: 'E',
       code: function E(ctx, opt_nodeName) {
-        var nodeName = (opt_nodeName || 'div').toUpperCase();
+        var nodeName = (opt_nodeName || 'DIV').toUpperCase();
 
-        return (
-          ctx.elementForName(nodeName) || foam.u2.Element).
+        return (ctx.elementForName(nodeName) || foam.u2.Element).
           create({nodeName: nodeName}, ctx);
       }
     },
@@ -2074,26 +2115,6 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
-  name: 'SlotToERefinement',
-  refines: 'foam.core.Slot',
-  methods: [
-    function toE() { return this; }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.u2',
-  name: 'ExpressionSlotToERefinement',
-  refines: 'foam.core.ExpressionSlot',
-  methods: [
-    function toE() { return this; }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.u2',
   name: 'PropertyViewRefinements',
   refines: 'foam.core.Property',
 
@@ -2108,6 +2129,10 @@ foam.CLASS({
       value: false
     },
     {
+      class: 'String',
+      name: 'placeholder'
+    },
+    {
       class: 'foam.u2.ViewSpec',
       name: 'view',
       value: { class: 'foam.u2.TextField' }
@@ -2117,6 +2142,31 @@ foam.CLASS({
       of: 'foam.u2.Visibility',
       name: 'visibility',
       value: 'RW'
+    },
+    {
+      class: 'Function',
+      name: 'visibilityExpression',
+      value: null
+    },
+    {
+      class: 'Boolean',
+      name: 'validationTextVisible',
+      documentation: "If true, validation text will be displayed below the input when it's in an invalid state.",
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'validationStyleEnabled',
+      documentation: 'If true, inputs will be styled when they are in an invalid state.',
+      value: true
+    },
+    {
+      class: 'Int',
+      name: 'order',
+      documentation: `
+        The order to render the property in if rendering multiple properties.
+      `,
+      value: Number.MAX_VALUE
     }
   ],
 
@@ -2124,16 +2174,57 @@ foam.CLASS({
     function toE(args, X) {
       var e = foam.u2.ViewSpec.createView(this.view, args, this, X);
 
-      e.fromProperty && e.fromProperty(this);
-
       if ( X.data$ && ! ( args && ( args.data || args.data$ ) ) ) {
         e.data$ = X.data$.dot(this.name);
       }
+
+      e.fromProperty && e.fromProperty(this);
 
       // e could be a Slot, so check if addClass exists
       e.addClass && e.addClass('property-' + this.name);
 
       return e;
+    },
+
+    function createVisibilityFor(data$) {
+      var Visibility = foam.u2.Visibility;
+
+      var slot = this.visibilityExpression ?
+        foam.core.ExpressionSlot.create({
+          obj$: data$,
+          code: this.visibilityExpression
+        }) :
+        foam.core.ConstantSlot.create({value: this.visibility});
+
+      if ( this.permissionRequired ) {
+        var visSlot  = slot;
+        var permSlot = data$.map(data => {
+          if ( ! data || ! data.__subContext__.auth ) return Visibility.HIDDEN;
+          var auth = data.__subContext__.auth;
+
+          var propName = this.name.toLowerCase();
+          var clsName  = this.forClass_.substring(this.forClass_.lastIndexOf('.') + 1).toLowerCase();
+
+          return auth.check(null, `${clsName}.rw.${propName}`)
+              .then(function(rw) {
+                if ( rw ) return Visibility.RW;
+                return auth.check(null, `${clsName}.ro.${propName}`)
+                  .then(ro => ro ? Visibility.RO : Visibility.HIDDEN);
+              });
+        });
+
+        slot = foam.core.ArraySlot.create({slots: [visSlot, permSlot]}).map(arr => {
+          var vis  = arr[0];
+          var perm = arr[1] || Visibility.HIDDEN;
+
+          return perm === Visibility.HIDDEN ? perm :
+            vis  === Visibility.HIDDEN ? vis :
+            perm === Visibility.RO ? perm :
+            vis;
+        });
+      }
+
+      return slot;
     }
   ]
 });
@@ -2167,7 +2258,6 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'DateViewRefinement',
   refines: 'foam.core.Date',
-  requires: [ 'foam.u2.DateView' ],
   properties: [
     [ 'view', { class: 'foam.u2.DateView' } ]
   ]
@@ -2178,7 +2268,6 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'DateTimeViewRefinement',
   refines: 'foam.core.DateTime',
-  requires: [ 'foam.u2.DateTimeView' ],
   properties: [
     [ 'view', { class: 'foam.u2.DateTimeView' } ]
   ]
@@ -2238,7 +2327,23 @@ foam.CLASS({
   refines: 'foam.core.Boolean',
   requires: [ 'foam.u2.CheckBox' ],
   properties: [
-    [ 'view', { class: 'foam.u2.CheckBox' } ],
+    {
+      name: 'view',
+      expression: function(label2, label2Formatter) {
+        return {
+          class: 'foam.u2.CheckBox',
+          label: label2,
+          labelFormatter: label2Formatter
+        };
+      }
+    },
+    {
+      class: 'String',
+      name: 'label2'
+    },
+    {
+      name: 'label2Formatter'
+    }
   ]
 });
 
@@ -2268,6 +2373,19 @@ foam.CLASS({
     {
       name: 'view',
       value: { class: 'foam.u2.DetailView' },
+    },
+    {
+      name: 'validationTextVisible',
+      documentation: `
+        Hide FObjectProperty validation because their inner view should provide its
+        own validation so having it on the outer view and the inner view is redundant
+        and jarring.
+      `,
+      value: false
+    },
+    {
+      name: 'validationStyleEnabled',
+      value: false
     }
   ]
 });
@@ -2280,7 +2398,12 @@ foam.CLASS({
   properties: [
     {
       name: 'view',
-      value: { class: 'foam.u2.view.FObjectArrayView' },
+      expression: function(of) {
+        return {
+          class: 'foam.u2.view.FObjectArrayView',
+          of: of
+        };
+      }
     }
   ]
 });
@@ -2361,7 +2484,7 @@ foam.CLASS({
   documentation: `
     A View is an Element used to display data.
     // TODO: Should the following be properties?
-    /*
+
     {
       type: 'Boolean',
       name: 'showValidation',
@@ -2375,7 +2498,7 @@ foam.CLASS({
       documentation: 'The actual error message. Null or the empty string ' +
           'when there is no error.',
     }
-    */
+
   `,
 
   exports: [ 'data' ],
@@ -2391,6 +2514,10 @@ foam.CLASS({
       name: 'data',
       attribute: true
     },
+    // {
+    //   class: 'String',
+    //   name: 'error_'
+    // },
     {
       class: 'Enum',
       of: 'foam.u2.Visibility',
@@ -2406,6 +2533,10 @@ foam.CLASS({
       attribute: true,
       postSet: function(_, mode) { this.updateMode_(mode); },
       expression: function(visibility, controllerMode) {
+        if ( visibility === foam.u2.Visibility.HIDDEN ) {
+          return foam.u2.DisplayMode.HIDDEN;
+        }
+
         if ( visibility === foam.u2.Visibility.RO ) {
           return foam.u2.DisplayMode.RO;
         }
@@ -2414,8 +2545,7 @@ foam.CLASS({
           return foam.u2.DisplayMode.DISABLED;
         }
 
-        if ( visibility === foam.u2.Visibility.FINAL &&
-             controllerMode !== foam.u2.ControllerMode.CREATE ) {
+        if ( visibility === foam.u2.Visibility.FINAL && controllerMode !== foam.u2.ControllerMode.CREATE ) {
           return foam.u2.DisplayMode.RO;
         }
 
@@ -2431,6 +2561,8 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.updateMode_(this.mode);
+      // this.enableClass('error', this.error_$);
+      this.setAttribute('title', this.error_$);
     },
 
     function updateMode_() {
@@ -2439,6 +2571,19 @@ foam.CLASS({
 
     function fromProperty(p) {
       this.visibility = p.visibility;
+
+      this.attr('name', p.name);
+
+      if ( p.validateObj ) {
+        /*
+        var s = foam.core.ExpressionSlot.create({
+          obj$: this.__context__.data$,
+          code: p.validateObj
+        });
+        this.error_$.follow(s);
+        */
+//        this.error_$.follow(this.__context__.data.slot(p.validateObj));
+      }
     }
   ]
 });
@@ -2514,8 +2659,15 @@ foam.CLASS({
       class: 'String',
       name: 'css',
       postSet: function(_, code) {
-        this.axioms_.push(foam.u2.CSS.create({code: code}));
+        var css = foam.u2.CSS.create({code: code});
+        css.name = css.name + '-' + this.id;
+        this.axioms_.push(css);
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'inheritCSS',
+      value: true
     },
     {
       documentation: `
@@ -2538,6 +2690,18 @@ foam.CLASS({
       postSet: function(_, cs) {
         this.axioms_.push(foam.u2.SearchColumns.create({columns: cs}));
       }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'PredicatePropertyRefine',
+  refines: 'foam.mlang.predicate.PredicateProperty',
+  properties: [
+    {
+      name: 'view',
+      value: { class: 'foam.u2.view.JSONTextView' }
     }
   ]
 });

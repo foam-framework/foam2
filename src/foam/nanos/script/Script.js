@@ -71,6 +71,7 @@ foam.CLASS({
           .add(value ? 'Y' : 'N')
         .end();
       },
+      tableWidth: 90,
       value: true
     },
     {
@@ -82,7 +83,8 @@ foam.CLASS({
       class: 'DateTime',
       name: 'lastRun',
       documentation: 'Date and time the script ran last.',
-      visibility: 'RO'
+      visibility: 'RO',
+      tableWidth: 140
     },
     {
       class: 'Long',
@@ -218,7 +220,7 @@ foam.CLASS({
         ByteArrayOutputStream baos  = new ByteArrayOutputStream();
         PrintStream           ps    = new PrintStream(baos);
         Interpreter           shell = createInterpreter(x);
-        PM                    pm    = new PM(this.getClass(), getId());
+        PM                    pm    = new PM.Builder(x).setClassType(Script.getOwnClassInfo()).setName(getId()).build();
 
         // TODO: import common packages like foam.core.*, foam.dao.*, etc.
         try {
@@ -273,7 +275,8 @@ foam.CLASS({
   actions: [
     {
       name: 'run',
-      tableWidth: 60,
+      tableWidth: 70,
+      confirmationRequired: true,
       code: function() {
         var self = this;
         this.output = '';

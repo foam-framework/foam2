@@ -55,6 +55,11 @@ foam.CLASS({
     },
     {
       name: 'searchManager'
+    },
+    {
+      class: 'Boolean',
+      name: 'showCount',
+      value: true
     }
   ],
 
@@ -77,7 +82,11 @@ foam.CLASS({
         {
           richSearch: true,
           of: this.dao.of.id,
-          onKey: true
+          onKey: true,
+          viewSpec: {
+            class: 'foam.u2.tag.Input',
+            focused: true
+          }
         },
         this,
         this.__subSubContext__
@@ -90,9 +99,12 @@ foam.CLASS({
         .start()
           .tag(generalQueryView)
         .end()
-        .start('p')
-          .add(self.countText$)
-        .end();
+        .callIf(this.showCount, function() {
+          this.start('p')
+            .add(self.countText$)
+          .end();
+        });
+
     }
   ],
 

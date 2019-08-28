@@ -42,56 +42,62 @@ foam.CLASS({
     'type',
     'placeholder',
     'autocompleter',
-    'autocompleteList_'
+    'autocompleteList_',
+    'elm_'
   ],
 
   methods: [
     function initE() {
-      var e = this.start(this.view, {
+      this.start(this.view, {
         data$:            this.data$,
         label$:           this.label$,
         alwaysFloatLabel: this.alwaysFloatLabel,
         type:             this.type,
         onKey:            this.onKey
-      });
-      e.attrs({
-        placeholder: this.placeholder$,
-      });
-      e.end();
+      }, this.elm_$)
+        .attrs({
+          placeholder: this.placeholder$,
+        })
+      .end();
 
       if ( this.autocompleter ) {
-        this.onload.sub(function() {
-          var list = foam.u2.Element.create({ nodeName: 'datalist' });
-          this.autocompleteList_ = list;
-          this.autocompleter.dao.on.sub(this.updateAutocompleteList);
-          this.updateAutocompleteList();
-          this.document.body.insertAdjacentHTML('beforeend', list.outerHTML);
-          list.load();
-
-          // Actually set the list attribute on our input field.
-          e.attrs({ list: list.id });
-        }.bind(this));
-
-        this.onunload.sub(function() {
-          this.autocompleteList_.remove();
-        }.bind(this));
+        this.onDetach(this.onload.sub(this.loaded));
+        this.onDetach(this.onunload.sub(this.removeList));
       }
+    },
+
+    function createList(objects) {
+      this.autocompleteList_ = foam.u2.Element.create({ nodeName: 'datalist' });
+      this.document.body.insertAdjacentHTML('beforeend', this.autocompleteList_.outerHTML);
+      this.autocompleteList_.load();
+      objects.forEach((obj) => {
+        this.autocompleteList_.start('option').attrs({ value: obj.label }).end();
+      });
+
+      // Actually set the list attribute on our input field.
+      this.elm_ && this.elm_.attrs({ list: this.autocompleteList_.id });
     }
   ],
 
   listeners: [
+    function loaded() {
+      this.autocompleter.dao.on.sub(this.updateAutocompleteList);
+      this.updateAutocompleteList();
+    },
+
+    function removeList() {
+      if ( this.autocompleteList_ ) this.autocompleteList_.remove();
+    },
+
     {
       name: 'updateAutocompleteList',
       isFramed: true,
       code: function() {
-        var list = this.autocompleteList_;
-        this.autocompleteList_.removeAllChildren();
-        this.autocompleter.dao.select(foam.dao.ArraySink.create())
-            .then(function(sink) {
-              sink.array.forEach(function(x) {
-                list.start('option').attrs({ value: x.label }).end();
-              });
-            });
+        this.autocompleter.dao.select()
+          .then((sink) => {
+            this.removeList();
+            this.createList(sink.array);
+          });
       }
     }
   ]

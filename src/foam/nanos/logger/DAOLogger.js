@@ -24,8 +24,7 @@ foam.CLASS({
       class: 'foam.dao.DAOProperty',
       javaFactory: `
 initializing.set(true);
-String daoName = "logMessageDAO";
-System.out.println("DAOLogger initializing "+daoName);
+String daoName = "localLogMessageDAO";
 DAO dao = (DAO) getX().put("logger", new foam.nanos.logger.StdoutLogger()).get(daoName);
 if ( dao == null ) {
   System.err.println("DAOLogger DAO not found: "+daoName);

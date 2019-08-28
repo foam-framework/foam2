@@ -27,7 +27,7 @@ foam.CLASS({
     ^ .foam-support-view-SummaryCard{
       width: 15.8%;
     }
-    ^ .foam-u2-UnstyledActionView-create {
+    ^ .foam-u2-ActionView-create {
       float: right;
       width: 135px;
       height: 40px;
@@ -38,7 +38,7 @@ foam.CLASS({
     }
     ^ .foam-u2-view-TableView-row:hover {
       cursor: pointer;
-      background: %TABLEHOVERCOLOR%;
+      background: /*%GREY4%*/ #e7eaec;
     }
     ^ .foam-u2-view-TableView-row {
       height: 40px;

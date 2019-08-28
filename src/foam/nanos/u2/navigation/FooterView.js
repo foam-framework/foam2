@@ -29,12 +29,14 @@ foam.CLASS({
   css: `
     ^ {
       width: 85%;
-      
       min-width: 992px;
       margin: auto;
       position: relative;
       overflow: hidden;
       zoom: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
     ^ div {
       font-size:14px;
@@ -51,9 +53,9 @@ foam.CLASS({
       vertical-align: middle;
     }
     ^ .copyright-label,
-    ^ .net-nanopay-ui-ActionView-goToTerm,
-    ^ .net-nanopay-ui-ActionView-goToPrivacy,
-    ^ .net-nanopay-ui-ActionView-goTo, 
+    ^ .foam-u2-ActionView-goToTerm,
+    ^ .foam-u2-ActionView-goToPrivacy,
+    ^ .foam-u2-ActionView-goTo,
     ^ .mode {
       background: transparent;
       opacity: 0.6;
@@ -68,12 +70,12 @@ foam.CLASS({
       width: auto !important;
       padding: 0 10px !important;
     }
-    ^ .net-nanopay-ui-ActionView-goToTerm:hover,
-    ^ .net-nanopay-ui-ActionView-goToPrivacy:hover,
-    ^ .net-nanopay-ui-ActionView-goTo:hover {
+    ^ .foam-u2-ActionView-goToTerm:hover,
+    ^ .foam-u2-ActionView-goToPrivacy:hover,
+    ^ .foam-u2-ActionView-goTo:hover {
       text-decoration: underline;
     }
-    ^ .net-nanopay-ui-ActionView-goTo {
+    ^ .foam-u2-ActionView-goTo {
       margin-left: 50px;
     }
     ^ .copyright-label{
@@ -91,11 +93,20 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start('div').addClass('col').addClass('mini-links')
-          .start(this.GO_TO, { label$: this.appConfig.urlLabel$ }).end()
+          .tag(this.GO_TO, {
+            label$: this.appConfig.urlLabel$,
+            buttonStyle: 'UNSTYLED'
+          })
           .add('|')
-          .start(this.GO_TO_TERM, { label$: this.appConfig.termsAndCondLabel$ }).end()
+          .tag(this.GO_TO_TERM, {
+            label$: this.appConfig.termsAndCondLabel$,
+            buttonStyle: 'UNSTYLED'
+          })
           .add('|')
-          .start(this.GO_TO_PRIVACY, { label$: this.appConfig.privacy$ }).end()
+          .tag(this.GO_TO_PRIVACY, {
+            label$: this.appConfig.privacy$,
+            buttonStyle: 'UNSTYLED'
+          })
           .add('|')
           .start().addClass('mode').add(this.appConfig.mode$.map(function(m) { return m.label; }), ' version: ', this.appConfig.version$).end()
         .end()

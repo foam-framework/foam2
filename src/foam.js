@@ -43,8 +43,7 @@
         }
       }
     }
-
-    path = path.substring(0, path.lastIndexOf('src/')+4);
+    path = path && path.length > 3 && path.substring(0, path.lastIndexOf('src/')+4) || '';
 
     if ( typeof global !== 'undefined' && ! global.FOAM_ROOT ) global.FOAM_ROOT = path;
     if ( typeof window !== 'undefined' && ! window.FOAM_ROOT ) window.FOAM_ROOT = path;

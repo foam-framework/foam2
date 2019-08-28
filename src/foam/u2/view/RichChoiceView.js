@@ -54,8 +54,9 @@ foam.CLASS({
 
   css: `
     ^ {
-      position: relative;
       display: inline-block;
+      position: relative;
+      z-index: 1;
     }
 
     ^container {
@@ -64,7 +65,7 @@ foam.CLASS({
       left: 0;
       transform: translateY(100%);
       background: white;
-      border: 1px solid #bdbdbd;
+      border: 1px solid /*%GREY3%*/ #cbcfd4;
       max-height: 378px;
       overflow-y: scroll;
       box-sizing: border-box;
@@ -90,8 +91,20 @@ foam.CLASS({
       -webkit-appearance: textfield;
       padding: 1px 2px;
       cursor: default;
-      border: 1px solid;
+      border: 1px solid /*%GREY3%*/ #cbcfd4;
       min-width: 94px;
+    }
+
+    ^selection-view:hover {
+      border-color: /*%GREY2%*/ #9ba1a6;
+    }
+
+    ^:focus {
+      outline: none;
+    }
+
+    ^:focus ^selection-view {
+      border-color: /*%PRIMARY3%*/ #406dea;
     }
 
     ^chevron::before {
@@ -106,10 +119,26 @@ foam.CLASS({
     ^ .search input {
       width: 100%;
       border: none;
+      border-bottom: 1px solid #f4f4f9;
     }
 
     ^ .search input:focus {
       border: none;
+    }
+
+    ^ .search img {
+      width: 15px;
+      position: absolute;
+      left: 10px;
+      top: 13px;
+    }
+
+    ^ .search {
+      border-bottom: 1px solid #f4f4f9;
+    }
+
+    ^ .property-filter_ {
+      padding-left: 25px;
     }
 
     ^ .disabled {
@@ -122,6 +151,11 @@ foam.CLASS({
   `,
 
   properties: [
+    {
+      class: 'String',
+      name: 'name',
+      factory: function() { return "select"; }
+    },
     {
       class: 'foam.u2.ViewSpec',
       name: 'rowView',
@@ -207,6 +241,17 @@ foam.CLASS({
       }
     },
     {
+      class: 'String',
+      name: 'searchPlaceholder',
+      documentation: 'Replaces search box placeholder with passed in string.',
+      value: 'Search...'
+    },
+    {
+      class: 'String',
+      name: 'choosePlaceholder',
+      documentation: 'Replaces choose from placeholder with passed in string.'
+    },
+    {
       type: 'Action',
       name: 'action',
       documentation: `
@@ -230,99 +275,124 @@ foam.CLASS({
       // Custom views might need the full object to render though, not just the
       // id, so we do a lookup here for the full object here. This then gets
       // passed to the selectionView to use it if it wants to.
-      if ( this.data ) {
-        this.sections[0].dao.find(this.data).then((result) => {
-          this.fullObject_ = result;
-        });
-      }
+      this.onDetach(this.data$.sub(this.onDataUpdate));
+      this.onDataUpdate();
 
       this
-        .addClass(this.myClass())
-        .start()
-          .addClass(this.myClass('selection-view'))
-          .enableClass('disabled', this.mode$.map((mode) => mode === foam.u2.DisplayMode.DISABLED))
-          .on('click', function() {
-            if ( self.mode === foam.u2.DisplayMode.RW ) {
-              self.isOpen_ = ! self.isOpen_;
-            }
-          })
-          .start()
-            .addClass(this.myClass('custom-selection-view'))
-            .add(this.slot((data) => {
-              return this.E().tag(self.selectionView, {
-                data: data,
-                fullObject$: this.fullObject_$
-              });
-            }))
-          .end()
-          .start()
-            .addClass(this.myClass('chevron'))
-          .end()
-        .end()
-        .start()
-          .addClass(this.myClass('container'))
-          .show(self.isOpen_$)
-          .add(self.search$.map((searchEnabled) => {
-            if ( ! searchEnabled ) return null;
-            return this.E()
+        .add(this.slot(function(mode, fullObject_) {
+          if ( mode !== foam.u2.DisplayMode.RO ) {
+            return self.E()
+              .attrs({
+                name: this.name,
+                tabindex: 0
+              })
+              .addClass(this.myClass())
               .start()
-                .startContext({ data: self })
-                  .addClass('search')
-                  .add(self.FILTER_.clone().copyFrom({ view: {
-                    class: 'foam.u2.view.TextField',
-                    placeholder: 'Search...',
-                    onKey: true
-                  } }))
-                .endContext()
-              .end();
-          }))
-          .add(this.slot(function(sections) {
-            var promiseArray = [];
-            sections.forEach(function(section) {
-              promiseArray.push(section.dao.select(self.COUNT()));
-            });
-
-            return Promise.all(promiseArray).then((resp) => {
-              var index = 0;
-              return this.E().forEach(sections, function(section) {
-                this
-                  .start().hide(!! section.hideIfEmpty && resp[index].value <= 0)
-                    .addClass(self.myClass('heading'))
-                    .add(section.heading)
-                  .end()
-                  .start()
-                    .select(section.filtered || section.dao, (obj) => {
-                      return this.E()
-                        .start(self.rowView, { data: obj })
-                          .enableClass('disabled', section.disabled)
-                          .callIf(! section.disabled, function() {
-                            this.on('click', () => {
-                              self.fullObject_ = obj;
-                              self.data = obj;
-                              self.isOpen_ = false;
-                            });
+                .addClass(this.myClass('selection-view'))
+                .enableClass('disabled', this.mode$.map((mode) => mode === foam.u2.DisplayMode.DISABLED))
+                .on('click', function() {
+                  if ( self.mode === foam.u2.DisplayMode.RW ) {
+                    self.isOpen_ = ! self.isOpen_;
+                  }
+                })
+                .start()
+                  .addClass(this.myClass('custom-selection-view'))
+                  .add(this.slot((data) => {
+                    return this.E().tag(self.selectionView, {
+                      data: data,
+                      fullObject$: this.fullObject_$,
+                      defaultSelectionPrompt$: this.choosePlaceholder$
+                    });
+                  }))
+                .end()
+                .start()
+                  .addClass(this.myClass('chevron'))
+                .end()
+              .end()
+              .start()
+                .addClass(this.myClass('container'))
+                .show(self.isOpen_$)
+                .add(self.search$.map((searchEnabled) => {
+                  if ( ! searchEnabled ) return null;
+                  return this.E()
+                    .start()
+                      .start('img')
+                        .attrs({ src: 'images/ic-search.svg' })
+                      .end()
+                      .startContext({ data: self })
+                        .addClass('search')
+                        .add(self.FILTER_.clone().copyFrom({ view: {
+                          class: 'foam.u2.view.TextField',
+                          placeholder: this.searchPlaceholder,
+                          onKey: true
+                        } }))
+                      .endContext()
+                    .end();
+                }))
+                .add(this.slot(function(sections) {
+                  var promiseArray = [];
+                  sections.forEach(function(section) {
+                    promiseArray.push(section.dao.select(self.COUNT()));
+                  });
+      
+                  return Promise.all(promiseArray).then((resp) => {
+                    var index = 0;
+                    return this.E().forEach(sections, function(section) {
+                      this
+                        .start().hide(!! section.hideIfEmpty && resp[index].value <= 0 || ! section.heading)
+                          .addClass(self.myClass('heading'))
+                          .add(section.heading)
+                        .end()
+                        .start()
+                          .select(section.filtered || section.dao, (obj) => {
+                            return this.E()
+                              .start(self.rowView, { data: obj })
+                                .enableClass('disabled', section.disabled)
+                                .callIf(! section.disabled, function() {
+                                  this.on('click', () => {
+                                    self.fullObject_ = obj;
+                                    self.data = obj.id;
+                                    self.isOpen_ = false;
+                                  });
+                                })
+                              .end();
                           })
                         .end();
-                    })
-                  .end();
-                  index++;
-              });
-            });
-          }))
-          .add(this.slot(function(action) {
-            if ( action ) {
-              return this.E()
-                .start(self.DefaultActionView, { action: action })
-                  .addClass(self.myClass('action'))
-                .end();
-            }
-          }))
-        .end();
+                        index++;
+                    });
+                  });
+                }))
+                .add(this.slot(function(action) {
+                  if ( action ) {
+                    return this.E()
+                      .start(self.DefaultActionView, { action: action })
+                        .addClass(self.myClass('action'))
+                      .end();
+                  }
+                }))
+              .end();
+          } else {
+            return self.E().add(fullObject_ ? fullObject_.toSummary() : '');
+          }
+        }))
     },
 
     function updateMode_(mode) {
       if ( mode !== foam.u2.DisplayMode.RW ) {
         this.isOpen_ = false;
+      }
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'onDataUpdate',
+      code: function() {
+        if ( this.data ) {
+          this.sections[0].dao.find(this.data).then((result) => {
+            this.fullObject_ = result;
+          });
+        }
       }
     }
   ],
@@ -361,7 +431,7 @@ foam.CLASS({
           return this
             .start()
               .addClass(this.myClass('row'))
-              .add(this.data.id)
+              .add(this.data.toSummary())
             .end();
         }
       ]
@@ -397,7 +467,14 @@ foam.CLASS({
       properties: [
         {
           name: 'data',
-          documentation: 'The id of the selected object.'
+          documentation: 'The id of the selected object.',
+        },
+        {
+          name: 'defaultSelectionPrompt',
+          expression: function(of) {
+            var plural = of.model_.plural.toLowerCase();
+            return this.CHOOSE_FROM + plural;
+          }
         },
         {
           name: 'fullObject',
@@ -412,25 +489,27 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          var plural = this.of.model_.plural.toLowerCase();
-          return this.add(this.data || this.CHOOSE_FROM + plural);
+          return this.add(this.fullObject$.map(o => {
+            return o ? o.toSummary() : this.defaultSelectionPrompt;
+          }));
         }
       ]
     },
     {
       name: 'DefaultActionView',
-      extends: 'foam.u2.UnstyledActionView',
+      extends: 'foam.u2.ActionView',
 
       documentation: `
         This is the view that gets rendered at the bottom of the dropdown if an
         action is provided.
       `,
 
+      inheritCSS: false,
       css: `
         ^ {
           border: 0;
           border-top: 1px solid #f4f4f9;
-          color: %SECONDARYCOLOR%;
+          color: /*%PRIMARY3%*/ #406dea;
           display: flex;
           font-size: 12px;
           text-align: left;
@@ -439,7 +518,7 @@ foam.CLASS({
 
         ^:hover {
           cursor: pointer;
-          color: %SECONDARYHOVERCOLOR%;
+          color: /*%PRIMARY2%*/ #144794;
         }
 
         ^ img + span {

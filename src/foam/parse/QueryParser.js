@@ -24,7 +24,7 @@ foam.CLASS({
 
   axioms: [
     // Reuse parsers if created for same 'of' class.
-    foam.pattern.Multiton.create({ property: 'of' })
+    foam.pattern.Multiton.create({property: 'of'})
   ],
 
   // TODO(braden): Support KEYWORD predicates and queries on them.
@@ -296,7 +296,7 @@ foam.CLASS({
           is: function(v) {
             return self.Eq.create({
               arg1: v[1],
-              arg2: self.True.create()
+              arg2: true
             });
           },
 
@@ -383,10 +383,22 @@ foam.CLASS({
 
               expr = self.In.create({ arg1: prop, arg2: values });
             } else if ( foam.core.Enum.isInstance(prop) ) {
-              expr = self.In.create({ arg1: prop, arg2: values });
+              // Convert string values into enum values, checking if either the
+              // enum name or label starts with the supplied value.
+              var newValues = [];
+              var e = prop.of;
+              for ( var i = 0 ; i < values.length ; i++ ) {
+                var value = values[i]
+                for ( var j = 0 ; j < e.VALUES.length ; j++ ) {
+                  var eValue = e.VALUES[j];
+                  if ( foam.String.startsWithIC(eValue.name, value) || foam.String.startsWithIC(eValue.label, value) )
+                    newValues.push(eValue);
+                }
+              }
+              expr = self.In.create({ arg1: prop, arg2: newValues });
             } else {
               expr = (v[1] === '=') ?
-                  self.InIC.create({ arg1: prop, arg2: values }) :
+                  self.Eq.create({ arg1: prop, arg2: values[0] }) :
                   self.Or.create({
                     args: values.map(function(v) {
                       return self.ContainsIC.create({ arg1: prop, arg2: v });

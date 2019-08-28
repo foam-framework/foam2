@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.LIB({
   name: 'foam.core.type',
   methods: [
@@ -349,6 +355,6 @@ foam.CLASS({
   axioms: [ { class: 'foam.pattern.Singleton' } ],
   properties: [
     ['java', 'java.util.regex.Pattern'],
-    // TODO: Swift
+    ['swift', 'String']
   ]
 });

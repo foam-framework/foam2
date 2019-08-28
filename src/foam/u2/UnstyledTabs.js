@@ -42,7 +42,7 @@ foam.CLASS({
           addClass(this.myClass('tab')).
           enableClass('selected', tab.selected$).
           on('click', function() { this.selected = tab; }.bind(this)).
-          add(tab.label).
+          add(tab.label$).
         end();
 
         tab.shown$ = tab.selected$;

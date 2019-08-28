@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'Country',
 
-  documentation: 'Country information.',
+  documentation: 'The base model for country information.',
 
   ids: ['code'],
 
@@ -16,30 +16,25 @@ foam.CLASS({
     {
       class: 'String',
       name: 'code',
-      documentation: 'ISO 3166-1 alpha-2 Country codes.',
-      view: {
-        class: 'foam.u2.MultiView',
-        views: [
-          { class: 'foam.u2.TextField' },
-          { class: 'foam.u2.Element', nodeName: 'br' },
-          { class: 'foam.u2.tag.TextArea' }
-        ]
-      }
+      documentation: `[ISO 3166](https://www.iso.org/iso-3166-country-codes.html)
+        -1 alpha-2 Country codes.`,
     },
     {
       class: 'String',
       name: 'iso31661Code',
       label: 'ISO Code',
-      documentation: 'ISO 3166-1 alpha-3 country codes.'
+      documentation: `[ISO 3166](https://www.iso.org/iso-3166-country-codes.html)
+        -1 alpha-3 country codes.`,
     },
     {
       class: 'String',
       name: 'name',
-      documentation: 'Country name.'
+      documentation: 'The name of the country.'
     },
     {
       class: 'StringArray',
-      name: 'alternativeNames'
+      name: 'alternativeNames',
+      documentation: `A list of known alternative country names.`,
     }
   ],
   methods: [{

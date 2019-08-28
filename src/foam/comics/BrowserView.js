@@ -80,13 +80,6 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'addEnabled',
-      documentation: `
-        True to enable the Add button for adding to a relationship.
-      `
-    },
-    {
-      class: 'Boolean',
       name: 'exportEnabled',
       documentation: 'True to enable the export button.'
     },
@@ -112,7 +105,6 @@ foam.CLASS({
         createEnabled,
         editEnabled,
         selectEnabled,
-        addEnabled,
         exportEnabled,
         exportCSVEnabled,
         toggleEnabled,
@@ -124,7 +116,6 @@ foam.CLASS({
         if ( searchMode )  config.searchMode  = searchMode;
         if ( subtitle )    config.subtitle    = subtitle;
         if ( title )       config.title       = title;
-        config.addEnabled    = addEnabled;
         config.createEnabled = createEnabled;
         config.detailView    = detailView;
         config.editEnabled   = editEnabled;

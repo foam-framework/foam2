@@ -21,24 +21,24 @@ foam.CLASS({
   properties: [
     {
       class: 'foam.core.Int',
-      name: 'int'
+      name: 'intProp'
     },
     {
       class: 'foam.core.String',
-      name: 'string'
+      name: 'stringProp'
     },
     {
       class: 'foam.core.FObjectArray',
       of: 'foam.test.TestObj',
-      name: 'fObjectArray'
+      name: 'fObjectArrayProp'
     },
     {
       class: 'foam.core.Object',
-      name: 'object'
+      name: 'objectProp'
     },
     {
       class: 'foam.core.Function',
-      name: 'function'
+      name: 'functionProp'
     },
     {
       class: 'foam.core.StringArray',
@@ -46,49 +46,49 @@ foam.CLASS({
     },
     {
       class: 'foam.core.Class',
-      name: 'class'
+      name: 'classProp'
     },
     {
       class: 'foam.core.FObjectProperty',
       of: 'foam.test.TestObj',
-      name: 'fObjectProperty'
+      name: 'fObjectPropertyProp'
     },
     {
       class: 'foam.core.EMail',
-      name: 'eMail'
+      name: 'emailProp'
     },
     {
       class: 'foam.u2.ViewSpec',
-      name: 'viewSpec'
+      name: 'viewSpecProp'
     },
     {
       class: 'foam.core.Enum',
       of: 'foam.test.TestEnum',
-      name: 'enum'
+      name: 'enumProp'
     },
     {
       class: 'foam.core.Date',
-      name: 'date'
+      name: 'dateProp'
     },
     {
       class: 'foam.core.DateTime',
-      name: 'dateTime'
+      name: 'dateTimeProp'
     },
     {
       class: 'foam.core.Float',
-      name: 'float'
+      name: 'floatProp'
     },
     {
       class: 'foam.core.Long',
-      name: 'long'
+      name: 'longProp'
     },
     {
       class: 'foam.core.Currency',
-      name: 'currency'
+      name: 'currencyProp'
     },
     {
       class: 'foam.core.Color',
-      name: 'color'
+      name: 'colorProp'
     },
     // {
     //   class: 'foam.core.Reference',
@@ -96,47 +96,47 @@ foam.CLASS({
     // },
     {
       class: 'foam.core.Array',
-      name: 'array'
+      name: 'arrayProp'
     },
     {
       class: 'foam.core.Map',
-      name: 'map'
+      name: 'mapProp'
     },
     {
       class: 'foam.u2.view.TableCellFormatter',
-      name: 'tableCellFormatter'
+      name: 'tableCellFormatterProp'
     },
     {
       class: 'foam.core.Byte',
-      name: 'byte'
+      name: 'byteProp'
     },
     {
       class: 'foam.core.Short',
-      name: 'short'
+      name: 'shortProp'
     },
     {
       class: 'foam.core.Double',
-      name: 'double'
+      name: 'doubleProp'
     },
     {
       class: 'foam.core.List',
-      name: 'list'
+      name: 'listProp'
     },
     {
       class: 'foam.core.Image',
-      name: 'image'
+      name: 'imageProp'
     },
     {
       class: 'foam.core.URL',
-      name: 'uRL'
+      name: 'urlProp'
     },
     {
       class: 'foam.core.Password',
-      name: 'password'
+      name: 'passwordProp'
     },
     {
       class: 'foam.core.PhoneNumber',
-      name: 'phoneNumber'
+      name: 'phoneNumberProp'
     },
     // {
     //   class: 'foam.core.MultiPartID',
@@ -144,27 +144,27 @@ foam.CLASS({
     // },
     {
       class: 'foam.parse.ParserArray',
-      name: 'parserArray'
+      name: 'parserArrayProp'
     },
     {
       class: 'foam.parse.ParserProperty',
-      name: 'parserProperty'
+      name: 'parserPropertyProp'
     },
     {
       class: 'foam.mlang.ExprProperty',
-      name: 'exprProperty'
+      name: 'exprPropertyProp'
     },
     {
       class: 'foam.mlang.SinkProperty',
-      name: 'sinkProperty'
+      name: 'sinkPropertyProp'
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
-      name: 'predicateProperty'
+      name: 'predicatePropertyProp'
     },
     {
       class: 'foam.mlang.predicate.PredicateArray',
-      name: 'predicateArray'
+      name: 'predicateArrayProp'
     },
     // {
     //   class: 'foam.dao.RelationshipProperty',
@@ -172,7 +172,7 @@ foam.CLASS({
     // },
     {
       class: 'foam.core.Blob',
-      name: 'blob'
+      name: 'blobProp'
     },
     // {
     //   class: 'foam.core.Stub',
@@ -180,7 +180,7 @@ foam.CLASS({
     // },
     {
       class: 'foam.u2.ViewFactory',
-      name: 'viewFactory'
+      name: 'viewFactoryProp'
     },
     {
       class: 'foam.core.Int',
@@ -390,6 +390,35 @@ foam.CLASS({
           name: 'name'
         }
       ]
+    }
+  ],
+  static: [
+    function createPopulated() {
+      return foam.test.AllProperties.create({
+        intProp: 12,
+        stringProp: "asdf",
+        fObjectArrayProp: [foam.test.TestObj.create({ description: 'An object in an array!' }),
+                           foam.test.TestObj.create({ description: 'Another object in an array!' })],
+        objectProp: [1, 2, 3],
+//        function: null,
+        stringArrayProp: ['Hello', 'World'],
+        classProp: foam.test.AllProperties,
+        fObjectPropertyProp: foam.test.TestObj.create({ description: 'some object' }),
+        emailProp: 'test@example.com',
+//        viewSpec: null
+        enumProp: foam.test.TestEnum.BAR,
+        dateProp: new Date("1995-12-17T03:24:00"),
+        dateTimeProp: new Date("1995-12-18T04:23:44"),
+        floatProp: 1.2345,
+        longProp: 12341234,
+        currencyProp: 342342,
+        colorProp: 'rgba(0, 0, 255, 0)',
+//        list: null
+        imageProp: '/favicon/favicon-32x32.png',
+        urlProp: 'https://google.com/',
+        passwordProp: 'superSecret111!',
+        phoneNumberProp: '555-3455'
+      });
     }
   ]
 });

@@ -20,6 +20,19 @@ foam.CLASS({
   name: 'TextArea',
   extends: 'foam.u2.View',
 
+  css: `
+    /* Override a few of the styles in foam.u2.TextInputCSS */
+    ^ {
+      height: auto;
+      padding-top: %INPUTVERTICALPADDING%;
+      padding-bottom: %INPUTVERTICALPADDING%;
+    }
+  `,
+
+  axioms: [
+    { class: 'foam.u2.TextInputCSS' }
+  ],
+
   properties: [
     [ 'nodeName', 'textarea' ],
     {
@@ -39,6 +52,7 @@ foam.CLASS({
       documentation: 'When true, $$DOC{ref:".data"} is updated on every ' +
           'keystroke, rather than on blur.',
     },
+    'placeholder',
   ],
 
   methods: [
@@ -46,7 +60,7 @@ foam.CLASS({
       this.SUPER();
       this.addClass(this.myClass());
       this.style({'white-space': 'pre'});
-      this.attrs({rows: this.rows, cols: this.cols});
+      this.attrs({rows: this.rows, cols: this.cols, placeholder: this.placeholder$});
 
       // This is required because textarea accepts setting the 'value'
       // after it's output, but before requires output to be between

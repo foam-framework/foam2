@@ -1,1 +1,35 @@
-p({"class":"foam.nanos.script.Script","id":"Test Email","enabled":true,"description":"","lastRun":"2018-07-24T19:09:31.798Z","lastDuration":1063,"server":true,"status":1,"code":"email = x.get(\"email\");\nprint(\"email: \"+email.getClass());\nuser = x.get(\"user\");\nprint(\"user: \"+user.getId());\nmessage = new foam.nanos.notification.email.EmailMessage();\nmessage.setTo(new String[] { \"joel@nanopay.net\" });\nmessage.setSubject(\"test\");\nmessage.setBody(\"test\");\nprint(\"message: \"+message);\nemail.sendEmail(message);\n\nmessage = new foam.nanos.notification.email.EmailMessage();\nmessage.setTo(new String[] { \"joel@nanopay.net\" });\nmap = new java.util.HashMap();\nmap.put(\"content\", user.getFirstName());\nemail.sendEmailFromTemplate(user, message, \"testEmail\", map);\nprint(\"DONE\");","output":"email: class foam.nanos.notification.email.DAOEmailService\nuser: 1348\nmessage: id: 0, created: null, createdBy: null, to: [Ljava.lang.String;@3beb6300, cc: null, bcc: null, subject: test, body: test\nDONE\n","notes":""})
+p({
+  "class":"foam.nanos.script.Script",
+  "id":"Test Email",
+  "enabled":true,
+  "description":"",
+  "lastRun":"2018-07-24T19:09:31.798Z",
+  "lastDuration":1063,
+  "server":true,
+  "status":1,
+  "code":
+  """
+    // DO BEFORE RUNNING: Modify this global variable in script to send email to the particular test account you are using
+    EMAIL_DESTINATION = "testemail@domain.com";
+
+    import foam.util.Emails.EmailsUtility;
+    email = x.get("email");
+    print("email: " + email.getClass());
+    user = x.get("user");
+    print("user: " + user.getId());
+    message = new foam.nanos.notification.email.EmailMessage();
+    message.setTo(new String[] { EMAIL_DESTINATION });
+    message.setSubject("test");
+    message.setBody("test");
+    print("message: " + message);
+    EmailsUtility.sendEmailFromTemplate(x, null, message, null, null);
+    message = new foam.nanos.notification.email.EmailMessage();
+    message.setTo(new String[] { EMAIL_DESTINATION });
+    map = new java.util.HashMap();
+    map.put("content", user.getFirstName());
+    EmailsUtility.sendEmailFromTemplate(x, user, message, "testEmail", map);
+    print("DONE");
+  """,
+  "output":"",
+  "notes":""
+})

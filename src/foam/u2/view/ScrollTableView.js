@@ -31,24 +31,6 @@
       display: grid;
       grid-template-columns: 1px 1fr;
     }
-
-    ^ th {
-      position: -webkit-sticky;
-      position: sticky;
-      top: 0;
-    }
-
-    ^ table {
-      table-layout: fixed;
-      width: 1024px;
-    }
-
-    ^ td,
-    ^ th {
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
   `,
 
   constants: [
@@ -122,9 +104,8 @@
     {
       type: 'String',
       name: 'scrollHeight',
-      expression: function(daoCount, limit, rowHeight) {
-        this.refresh();
-        return rowHeight * Math.max(0, daoCount - limit) + this.TABLE_HEAD_HEIGHT + 'px';
+      expression: function(daoCount, rowHeight) {
+        return rowHeight * daoCount + this.TABLE_HEAD_HEIGHT + 'px';
       }
     },
     {
@@ -218,13 +199,32 @@
       expression: function(tablesRemoved_, pageSize, rowHeight) {
         return tablesRemoved_ * pageSize * rowHeight + 'px';
       }
+    },
+    {
+      type: 'Boolean',
+      name: 'enableDynamicTableHeight',
+      value: true,
+    },
+    {
+      class: 'Boolean',
+      name: 'multiSelectEnabled',
+      documentation: 'Pass through to UnstyledTableView.'
+    },
+    {
+      class: 'Map',
+      name: 'selectedObjects',
+      documentation: `
+        The objects selected by the user when multi-select support is enabled.
+        It's a map where the key is the object id and the value is the object.
+        Here we simply bind it to the selectedObjects property on TableView.
+      `
     }
   ],
 
   methods: [
     function init() {
       this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.onDAOUpdate })));
-      this.onDAOUpdate();
+      this.updateCount();
     },
 
     function initE() {
@@ -246,7 +246,9 @@
               columns: this.columns,
               contextMenuActions: this.contextMenuActions,
               selection$: this.selection$,
-              editColumnsEnabled: this.editColumnsEnabled
+              editColumnsEnabled: this.editColumnsEnabled,
+              multiSelectEnabled: this.multiSelectEnabled,
+              selectedObjects$: this.selectedObjects$
             }, this.table_$).
               addClass(this.myClass('table')).
             end().
@@ -255,11 +257,18 @@
 
       this.onDetach(this.onload.sub(this.addTbodies));
 
-      this.onDetach(this.onload.sub(this.updateTableHeight));
-      window.addEventListener('resize', this.updateTableHeight);
-      this.onDetach(() => {
-        window.removeEventListener('resize', this.updateTableHeight);
-      });
+      /*
+        to be used in cases where we don't want the whole table to
+        take the whole page (i.e. we need multiple tables)
+        and enableDynamicTableHeight can be switched off
+      */
+      if (this.enableDynamicTableHeight) {
+        this.onDetach(this.onload.sub(this.updateTableHeight));
+        window.addEventListener('resize', this.updateTableHeight);
+        this.onDetach(() => {
+          window.removeEventListener('resize', this.updateTableHeight);
+        });
+      }
     },
     {
       name: 'refresh',
@@ -272,6 +281,14 @@
         this.page1DAO_ = this.initialPage1DAO_;
         this.page2DAO_ = this.initialPage2DAO_;
         this.page3DAO_ = this.initialPage3DAO_;
+        this.table_.childNodes
+          .slice(1)
+          .forEach((x) => x.remove());
+        this.table_.add(this.table_.rowsFrom(this.page1DAO_$proxy));
+        this.addTbodies();
+        if ( this.scrollbarContainer_ && this.scrollbarContainer_.el() ) {
+          this.scrollbarContainer_.el().scrollTop = 0;
+        }
       }
     },
     {
@@ -285,7 +302,6 @@
 
         // Remove the top buffer table.
         this.topBufferTable_.remove();
-        this.tablesRemoved_ += 1;
 
         // Update the table references.
         this.topBufferTable_ = this.visibleTable_;
@@ -293,12 +309,12 @@
 
         // Add a new bottom buffer table.
         var daoName = ['page1DAO_', 'page2DAO_', 'page3DAO_'][this.tablesRemoved_ % 3];
+        this.tablesRemoved_ += 1;
         this[daoName] = this.data.skip(this.currentUpperBound - this.pageSize).limit(this.pageSize);
         var rows = this.table_.rowsFrom(this[daoName + '$proxy']);
         this.table_.add(rows);
-        this.bottomBufferTable_ = this.table_.childNodes
-          .filter((x) => x.nodeName === 'TBODY')
-          .pop();
+        var x = this.table_.childNodes.slice(1);
+        this.bottomBufferTable_ = x[x.length - 1];
       }
     },
     {
@@ -323,9 +339,16 @@
         this[daoName] = this.data.skip(this.currentLowerBound).limit(this.pageSize);
         var rows = this.table_.rowsFrom(this[daoName + '$proxy']);
         this.table_.insertBefore(this.table_.slotE_(rows), this.visibleTable_);
-        this.topBufferTable_ = this.table_.childNodes
-          .filter((x) => x.nodeName === 'TBODY')
-          .shift();
+        var x = this.table_.childNodes.slice(1);
+        this.topBufferTable_ = x[0];
+      }
+    },
+    {
+      name: 'updateCount',
+      code: function() {
+        return this.data$proxy.select(this.Count.create()).then((s) => {
+          this.daoCount = s.value;
+        });
       }
     }
   ],
@@ -366,11 +389,7 @@
       name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
-        var self = this;
-        this.data$proxy.select(this.Count.create()).then(function(s) {
-          self.daoCount = s.value;
-          self.refresh();
-        });
+        this.updateCount().then(() => this.refresh());
       }
     },
     {
@@ -394,7 +413,7 @@
       code: function() {
         this.table_.add(this.table_.rowsFrom(this.page2DAO_$proxy));
         this.table_.add(this.table_.rowsFrom(this.page3DAO_$proxy));
-        var tbodies = this.table_.childNodes.filter((x) => x.nodeName === 'TBODY');
+        var tbodies = this.table_.childNodes.slice(1);
         this.topBufferTable_ = tbodies[0];
         this.visibleTable_ = tbodies[1];
         this.bottomBufferTable_ = tbodies[2];

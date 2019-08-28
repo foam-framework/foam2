@@ -18,9 +18,11 @@
 foam.SCRIPT({
   package: 'foam.core',
   name: 'ContextScript',
+
   requires: [
-    'foam.core.ConstantSlot',
+    'foam.core.ConstantSlot'
   ],
+
   code: function() {
 
 /**

@@ -17,11 +17,10 @@ foam.CLASS({
     'foam.lib.json.ExprParser',
     'foam.lib.json.JSONParser',
     'foam.lib.json.Outputter',
-    'foam.lib.json.OutputterMode',
+    'foam.lib.StoragePropertyPredicate',
     'foam.lib.parse.*',
     'foam.nanos.auth.LastModifiedByAware',
     'foam.nanos.auth.User',
-    'foam.nanos.fs.Storage',
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.StdoutLogger',
@@ -29,9 +28,9 @@ foam.CLASS({
     'java.io.BufferedReader',
     'java.io.BufferedWriter',
     'java.io.InputStreamReader',
-    'java.io.File',
-    'java.io.FileReader',
-    'java.io.FileWriter',
+    'java.io.InputStream',
+    'java.io.OutputStream',
+    'java.io.OutputStreamWriter',
     'java.text.SimpleDateFormat',
     'java.util.Calendar',
     'java.util.Iterator',
@@ -78,7 +77,7 @@ foam.CLASS({
       class: 'Object',
       name: 'outputter',
       javaType: 'foam.lib.json.Outputter',
-      javaFactory: `return new Outputter(OutputterMode.STORAGE);`
+      javaFactory: `return new Outputter(getX()).setPropertyPredicate(new StoragePropertyPredicate());`
     },
     {
       class: 'Object',
@@ -109,39 +108,13 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'multiLine'
+    },
+    {
+      class: 'Boolean',
       name: 'createFile',
       documentation: 'Flag to create file if not present',
       value: true,
-    },
-    {
-      class: 'Object',
-      name: 'file',
-      javaType: 'java.io.File',
-      javaFactory: `
-        try {
-          getLogger().log("Loading file: " + getFilename());
-          File file = getX().get(Storage.class).get(getFilename());
-          if ( ! file.exists() ) {
-            getLogger().warning("Journal not found:" + getFilename());
-
-            if ( getCreateFile() ) {
-              // if output journal does not exist, create one
-              File dir = file.getAbsoluteFile().getParentFile();
-              if ( ! dir.exists() ) {
-                getLogger().log("Create dir: " + dir.getAbsolutePath());
-                dir.mkdirs();
-              }
-
-              getLogger().log("Create file: " + getFilename());
-              file.getAbsoluteFile().createNewFile();
-            }
-          }
-          return file;
-        } catch ( Throwable t ) {
-          getLogger().error("Failed to read from journal", t);
-          throw new RuntimeException(t);
-        }
-      `
     },
     // reader uses a getter because we want a new reader on file replay
     {
@@ -149,33 +122,34 @@ foam.CLASS({
       name: 'reader',
       javaType: 'java.io.BufferedReader',
       javaGetter: `
-      try {
-        Storage storage = (Storage) getX().get(Storage.class);
-        if ( storage.isResource() ) {
-          return new BufferedReader(new InputStreamReader(storage.getResourceAsStream(getFilename())));
-        } else {
-          return new BufferedReader(new FileReader(getFile()));
-        }
-      } catch ( Throwable t ) {
-        getLogger().error("Failed to read from journal", t);
-        throw new RuntimeException(t);
-      }
+try {
+  InputStream is = getX().get(foam.nanos.fs.Storage.class).getInputStream(getFilename());
+  if ( is == null ) {
+    getLogger().error("Failed to read from resource journal: " + getFilename());
+  }
+  return (is == null) ? null : new BufferedReader(new InputStreamReader(is));
+} catch ( Throwable t ) {
+  getLogger().error("Failed to read from journal: " + getFilename(), t);
+  throw new RuntimeException(t);
+}
       `
     },
-    // writer uses a factory because we want to use one writer for the lifetime of this journal object
+    // Writer uses a factory because we want to use one writer for the lifetime of this journal object
     {
       class: 'Object',
       name: 'writer',
       javaType: 'java.io.BufferedWriter',
       javaFactory: `
-        try {
-          BufferedWriter writer = new BufferedWriter(new FileWriter(getFile(), true), 16 * 1024);
-          writer.newLine();
-          return writer;
-        } catch ( Throwable t ) {
-          getLogger().error("Failed to create writer", t);
-          throw new RuntimeException(t);
-        }
+try {
+  OutputStream os = getX().get(foam.nanos.fs.Storage.class).getOutputStream(getFilename());
+  if ( os == null ) {
+    getLogger().error("Failed to read from resource journal: " + getFilename());
+  }
+  return (os == null) ? null : new BufferedWriter(new OutputStreamWriter(os));
+} catch ( Throwable t ) {
+  getLogger().error("Failed to read from journal: " + getFilename(), t);
+  throw new RuntimeException(t);
+}
       `
     }
   ],
@@ -282,26 +256,58 @@ foam.CLASS({
       `
     },
     {
+      name: 'getEntry',
+      documentation: 'retrieves ameaningful unit of text from the journal',
+      type: 'String',
+      args: [
+        {
+          name: 'reader',
+          type: 'BufferedReader'
+        }
+      ],
+      javaCode: `
+        try {
+          String line = reader.readLine();
+          if ( line == null ) return null;
+          if ( ! line.equals("p({") && ! line.equals("r({") ) return line;
+          StringBuilder sb = new StringBuilder();
+          sb.append(line);
+          while( ! line.equals("})") ) {
+            if ( (line = reader.readLine()) == null ) break;
+            sb.append("\\n");
+            sb.append(line);
+          }
+          return sb.toString().trim();
+        } catch (Throwable t) {
+          getLogger().error("Failed to read from journal", t);
+          return null;
+        }
+      `
+    },
+    {
       name: 'replay',
       documentation: 'Replays the journal file',
       javaCode: `
-        // count number of lines successfully read
+        // count number of entries successfully read
         int successReading = 0;
         JSONParser parser = getParser();
 
         try ( BufferedReader reader = getReader() ) {
-          for ( String line ; ( line = reader.readLine() ) != null ; ) {
-            if ( SafetyUtil.isEmpty(line)        ) continue;
-            if ( COMMENT.matcher(line).matches() ) continue;
+          if ( reader == null ) {
+            return;
+          }
+          for ( String entry ; ( entry = getEntry(reader) ) != null ; ) {
+            if ( SafetyUtil.isEmpty(entry)        ) continue;
+            if ( COMMENT.matcher(entry).matches() ) continue;
 
             try {
-              char operation = line.charAt(0);
-              int length = line.trim().length();
-              line = line.trim().substring(2, length - 1);
+              char operation = entry.charAt(0);
+              int length = entry.length();
+              entry = entry.substring(2, length - 1);
 
-              FObject obj = parser.parseString(line);
+              FObject obj = parser.parseString(entry);
               if ( obj == null ) {
-                getLogger().error("Parse error", getParsingErrorMessage(line), "line:", line);
+                getLogger().error("Parse error", getParsingErrorMessage(entry), "entry:", entry);
                 continue;
               }
 
@@ -318,7 +324,7 @@ foam.CLASS({
 
               successReading++;
             } catch ( Throwable t ) {
-              getLogger().error("Error replaying journal line:", line, t);
+              getLogger().error("Error replaying journal entry:", entry, t);
             }
           }
         } catch ( Throwable t) {

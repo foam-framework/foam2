@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.menu',
   name: 'TreeGraphAltView',
@@ -28,7 +34,7 @@ foam.CLASS({
         [{
             class: 'foam.graphics.TreeGraph',
             width: 1000,
-            heigh: 1000
+            height: 1000
           }, 'Graph']];
         }
       ]

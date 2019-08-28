@@ -33,6 +33,8 @@ foam.CLASS({
       name: 'editor'
     },
     {
+      class: 'FObjectProperty',
+      of: 'io.c9.ace.Config',
       name: 'config',
       factory: function() {
         return this.Config.create();

@@ -9,14 +9,22 @@ foam.CLASS({
   name: 'MapView',
   extends: 'foam.u2.View',
   requires: [
-    'foam.u2.DetailView'
+    'foam.u2.layout.Cols',
+    'foam.u2.layout.Rows'
   ],
-  exports: [ 'updateData' ],
+  exports: [
+    'mode',
+    'updateData'
+  ],
   actions: [
     {
       name: 'addRow',
       label: 'Add',
+      isAvailable: function(mode) {
+        return mode === foam.u2.DisplayMode.RW;
+      },
       code: function() {
+        this.data = this.data || {};
         this.data[Date.now()] = '';
         this.updateData();
       }
@@ -25,7 +33,11 @@ foam.CLASS({
   classes: [
     {
       name: 'KeyValueRow',
-      imports: [ 'data', 'updateData' ],
+      imports: [
+        'data',
+        'mode',
+        'updateData'
+      ],
       properties: [
         {
           class: 'String',
@@ -46,6 +58,9 @@ foam.CLASS({
       actions: [
         {
           name: 'remove',
+          isAvailable: function(mode) {
+            return mode === foam.u2.DisplayMode.RW;
+          },
           code: function() {
             delete this.data[this.key];
             this.updateData();
@@ -60,7 +75,7 @@ foam.CLASS({
       isFramed: true,
       code: function() {
         var d = this.data;
-        this.data = {};
+        this.data = null;
         this.data = d;
       }
     }
@@ -70,11 +85,27 @@ foam.CLASS({
       var self = this;
       this
         .add(this.slot(function(data) {
-          return self.E().forEach(Object.entries(data), function(e) {
-            var row = self.KeyValueRow.create({ key: e[0], value: e[1] });
-            this.start(self.DetailView, { data: row, showActions: true }).end();
-            row.onDetach(row.sub(self.updateData));
-          });
+          return self.Rows.create()
+            .forEach(Object.entries(data || {}), function(e) {
+              var row = self.KeyValueRow.create({ key: e[0], value: e[1] });
+              this
+                .startContext({ data: row })
+                  .start(self.Cols)
+                    .start()
+                      .style({'flex-grow': 1 })
+                      .add(self.KeyValueRow.KEY)
+                    .end()
+                    .start()
+                      .style({ 'flex-grow': 1 })
+                      .add(self.KeyValueRow.VALUE)
+                    .end()
+                    .tag(self.KeyValueRow.REMOVE, {
+                      isDestructive: true
+                    })
+                  .end()
+                .endContext();
+              row.onDetach(row.sub(self.updateData));
+            });
         }))
         .startContext({ data: this }).add(this.ADD_ROW).endContext();
     }

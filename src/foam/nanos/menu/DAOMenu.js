@@ -18,15 +18,16 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'customDAOController'
-    },
-    {
-      class: 'String',
       name: 'title'
     },
     {
       class: 'String',
       name: 'subtitle'
+    },
+    {
+      class: 'String',
+      name: 'customDAOController',
+      displayWidth: 80
     },
     {
       class: 'foam.u2.ViewSpec',
@@ -63,6 +64,12 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'detailView',
+      value: 'foam.u2.DetailView',
+      displayWidth: 80
+    },
+    {
+      class: 'String',
       name: 'createLabel',
       documentation: 'Set this to override the create button label.'
     },
@@ -94,14 +101,6 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'addEnabled',
-      documentation: `
-        True to enable the Add button for adding to a relationship.
-      `,
-      value: false
-    },
-    {
-      class: 'Boolean',
       name: 'exportEnabled',
       documentation: 'True to enable the export button.',
       value: true
@@ -117,11 +116,6 @@ foam.CLASS({
       name: 'toggleEnabled',
       documentation: 'True to enable the toggle filters button.',
       value: true
-    },
-    {
-      class: 'String',
-      name: 'detailView',
-      value: 'foam.u2.DetailView'
     }
   ],
 
@@ -134,7 +128,6 @@ foam.CLASS({
       var view = {
         class: 'foam.comics.BrowserView',
         data: X[this.daoKey],
-        addEnabled: this.addEnabled,
         createEnabled: this.createEnabled,
         detailView: this.detailView,
         editEnabled: this.editEnabled,

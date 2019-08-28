@@ -16,7 +16,6 @@ import foam.mlang.predicate.True;
 import foam.mlang.sink.GroupBy;
 
 public class TreeNode {
-
   protected Object   key;
   protected Object   value;
   protected long     size;
@@ -163,7 +162,7 @@ public class TreeNode {
     } else {
       if ( compareValue < 0 ) {
         state.size -= size(state.left);
-        state.left = removeKeyValue(state.left, prop, key, value, tail);
+        state.left  = removeKeyValue(state.left, prop, key, value, tail);
         state.size += size(state.left);
       } else {
         state.size -= size(state.right);
@@ -197,7 +196,7 @@ public class TreeNode {
 
     if ( compareValue > 0 ) {
       state.size -= size(state.left);
-      state.left = removeNode(state.left, key, prop);
+      state.left  = removeNode(state.left, key, prop);
       state.size += size(state.left);
     } else {
       state.size -= size(state.right);
@@ -229,7 +228,7 @@ public class TreeNode {
 
   private TreeNode decreaseLevel(TreeNode node) {
     long expectedLevel = 1 + Math.min(
-      node.left != null ? node.left.level : 0 ,
+      node.left  != null ? node.left.level : 0 ,
       node.right != null ? node.right.level : 0);
 
     if ( expectedLevel < node.level ) {
@@ -239,6 +238,7 @@ public class TreeNode {
         node.right.level = expectedLevel;
       }
     }
+
     return node;
   }
 

@@ -58,7 +58,7 @@ foam.CLASS({
       vertical-align: top;
       margin-top: 5px;
     }
-    ^ .net-nanopay-ui-ActionView-uploadImage {
+    ^ .foam-u2-ActionView-uploadImage {
       width: 136px;
       height: 40px;
       background: transparent;
@@ -77,17 +77,17 @@ foam.CLASS({
       font-size: 14px;
       font-weight: 300;
       letter-spacing: 0.2px;
-      color: %SECONDARYCOLOR%;
+      color: /*%PRIMARY3%*/ #406dea;
     }
     ^ .uploadRestriction {
       margin-top: 9px;
       font-size: 10px;
       font-weight: 300;
       letter-spacing: 0.2px;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
     }
     ^ .box-for-drag-drop {
-      border: dashed 4px #edf0f5;
+      border: dashed 4px /*%GREY5%*/ #f5f7fa;
       background:white;
       height: 100px;
       padding: 10px 10px;

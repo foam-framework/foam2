@@ -19,7 +19,7 @@ foam.CLASS({
       name: 'PARSE_JSON',
       flags: [ 'js' ],
       value: function(json, opt_cls, opt_ctx) {
-        var cls = json.of && json.of.forClass_ || opt_cls;
+        var cls = json.of || opt_cls;
         var array = json.array;
         if ( ! array ) return foam.dao.ArraySink.create({ of: cls }, opt_ctx);
         if ( foam.typeOf(cls) === foam.String )

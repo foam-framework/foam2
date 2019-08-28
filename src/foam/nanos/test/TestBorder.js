@@ -14,7 +14,7 @@ foam.CLASS({
   requires: ['foam.nanos.test.Test'],
 
   css: `
-    ^ > span, ^ .buttons .net-nanopay-ui-ActionView {
+    ^ > span, ^ .buttons .foam-u2-ActionView {
       margin: 0 10px 10px 0;
     }
   `,

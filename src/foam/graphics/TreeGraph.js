@@ -1,3 +1,4 @@
+
 /**
  * @license
  * Copyright 2018 The FOAM Authors. All Rights Reserved.
@@ -36,26 +37,23 @@
    ],
 
    methods: [
-     function init() {
-       this.SUPER();
-
-       if ( this.data ) {
-         this.root = this.Node.create({x:500, y: 50, data: this.data});
-         this.children.push(this.root);
-         this.doLayout();
-       }
-     },
-
      function initCView() {
        this.SUPER();
 
+       if ( this.data ) {
+        this.root = this.Node.create({x:500, y: 50, data: this.data});
+        this.add(this.root);
+        this.doLayout();
+       }
+
        // List for 'click' events to expand/collapse Nodes.
        this.canvas.on('click', function(e) {
-
          var x = e.layerX+this.nodeWidth/2, y = e.layerY;
-         var c = this.root.findFirstChildAt(x, y);
+         var c = this.canvas.cview.findFirstChildAt(x,y);
+
          if ( ! c ) return;
          c.expanded = ! c.expanded;
+         
          if ( ! c.expanded ) {
            for ( var i = 0 ; i < c.childNodes.length ; i++ ) {
              c.childNodes[i].y = this.nodeHeight;
@@ -68,7 +66,10 @@
      },
 
      function doLayout() {
-       if ( this.root ) { this.root.layout(); this.root.doLayout(); }
+       if ( this.root ) { 
+        this.root.layout();
+        this.root.doLayout();
+      }
        this.invalidate();
      }
    ],
@@ -266,33 +267,72 @@
              slot.set(newValue);
              return false;
            }
-           slot.set((14*slot.get() + newValue)/15);
+           slot.set((2*slot.get() + newValue)/3);
            return true;
          }
        ],
 
        listeners: [
-         {
-           name: 'doLayout',
-           isFramed: true,
-           documentation: 'Animate layout until positions stabilize',
-           code: function() {
-             var needsLayout = false;
-             // Scale and translate the view to fit in the available window
-             var gw = this.graph.width-110;
-             var w  = this.maxRight - this.maxLeft + 55;
-             if ( w > gw ) {
-               var scaleX = Math.min(1, gw / w);
-               needsLayout = this.convergeTo(this.scaleX$, scaleX) || needsLayout;
-             }
+        {
+          name: 'doLayout',
+          isFramed: true,
+          documentation: 'Animate layout until positions stabilize',
+          code: function() {
+            var needsLayout = false;
+            // Scale and translate the view to fit in the available window
+            var gw = this.graph.width-110;
+            var w  = this.maxRight - this.maxLeft + 55;
 
-             var x = (-this.maxLeft+25)/w * gw + 55;
-             needsLayout = this.convergeTo(this.x$, x) || needsLayout;
-             if ( this.layout() || needsLayout ) this.doLayout();
-             this.graph.invalidate();
-           }
-         }
+            var x = (-this.maxLeft+25)/w * gw + 55;
+            needsLayout = this.convergeTo(this.x$, x) || needsLayout;
+            
+            if ( this.layout() || needsLayout ) {
+              this.doLayout();
+            }
+            else {
+              this.graph.updateCWidth();
+            }
+          
+            this.graph.invalidate();
+          }
+        }
        ]
+     }
+   ],
+
+   listeners: [
+     {
+       name: 'updateCWidth',
+       isFramed: true,
+       code: function() {
+        const maxes = {
+          maxLeft: 0,
+          maxRight: 0
+        };
+          
+        function traverseAndCompare(root) {
+          if ( root.maxLeft < maxes.maxLeft ) maxes.maxLeft = root.maxLeft;
+          if ( root.maxRight > maxes.maxRight ) maxes.maxRight = root.maxRight;
+
+          for ( var i = 0; i < root.children.length; i++ ){
+            traverseAndCompare(root.children[i]);
+          }
+        }
+
+        traverseAndCompare(this.root);
+
+        // needed to use the adjustments to width in order to account for proper fitting on the screen
+        // since by default with out it, the leftmost node and right most node get cutoff by half
+        // padding adjustments are there to proper spacing and also for the edge connectors to 
+        // fully render
+        var width = Math.abs(maxes.maxLeft - maxes.maxRight) + this.nodeWidth + this.padding * 4;
+        var delta = Math.abs(this.width - width) / width;
+
+        if ( delta > 0.01 ) {
+          this.width = width;
+          this.doLayout();
+        }
+       }
      }
    ]
  });

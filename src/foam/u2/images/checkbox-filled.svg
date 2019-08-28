@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <rect id="path-1" x="0" y="0" width="16" height="16" rx="2"></rect>
+        <filter x="-6.2%" y="-6.2%" width="112.5%" height="112.5%" filterUnits="objectBoundingBox" id="filter-2">
+            <feGaussianBlur stdDeviation="0.5" in="SourceAlpha" result="shadowBlurInner1"></feGaussianBlur>
+            <feOffset dx="0" dy="1" in="shadowBlurInner1" result="shadowOffsetInner1"></feOffset>
+            <feComposite in="shadowOffsetInner1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0.125490196   0 0 0 0 0.180392157   0 0 0 0 0.470588235  0 0 0 0.539034194 0" type="matrix" in="shadowInnerInner1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon/checkbox/active">
+            <g id="Group">
+                <g id="Form/input/checkbox/resting">
+                    <use fill="#604AFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+                    <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+                    <rect stroke="#604AFF" stroke-width="1" stroke-linejoin="square" x="0.5" y="0.5" width="15" height="15" rx="2"></rect>
+                </g>
+                <path d="M6.31475766,11.8585 L3.13295394,8.4415 C2.95568202,8.2535 2.95568202,7.9475 3.13295394,7.7575 L3.77567829,7.0745 C3.95295021,6.8865 4.24113072,6.8865 4.41840264,7.0745 L6.63657438,9.4665 L11.5810974,4.1415 C11.7583693,3.9535 12.0465498,3.9535 12.2238217,4.1415 L12.8665461,4.8255 C13.043818,5.0135 13.043818,5.3205 12.8665461,5.5075 L6.95748201,11.8585 C6.78021009,12.0465 6.49202958,12.0465 6.31475766,11.8585" id="check" fill="#FFFFFF"></path>
+            </g>
+        </g>
+    </g>
+</svg>

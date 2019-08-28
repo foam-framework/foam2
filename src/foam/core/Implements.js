@@ -49,7 +49,8 @@ foam.CLASS({
       getter: function() { return 'implements_' + this.path; }
     },
     'flags',
-    'path'
+    'path',
+    ['priority', 200]
   ],
 
   methods: [

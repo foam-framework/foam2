@@ -55,7 +55,28 @@ foam.CLASS({
     'window'
   ],
 
+  constants: [
+    {
+      name: 'SESSION_KEY',
+      value: 'sessionId',
+      type: 'String'
+    }
+  ],
+
   properties: [
+    {
+      class: 'String',
+      name: 'sessionName',
+      value: 'defaultSession'
+    },
+    {
+      class: 'String',
+      name: 'sessionID',
+      factory: function() {
+        return localStorage[this.sessionName] ||
+          ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
+      }
+    },
     {
       class: 'String',
       name: 'url'
@@ -103,8 +124,9 @@ foam.CLASS({
         cls.extras.push(foam.java.Code.create({
           data: `
 protected class Outputter extends foam.lib.json.Outputter {
-  public Outputter() {
-    super(foam.lib.json.OutputterMode.NETWORK);
+  public Outputter(foam.core.X x) {
+    super(x);
+    setPropertyPredicate(new foam.lib.AndPropertyPredicate(x, new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));
   }
 
   protected void outputFObject(foam.core.FObject o) {
@@ -142,6 +164,8 @@ protected class ResponseThread implements Runnable {
     {
       name: 'send',
       code: function(msg) {
+        msg.attributes[this.SESSION_KEY] = this.sessionID;
+
         // TODO: We should probably clone here, but often the message
         // contains RPC arguments that don't clone properly.  So
         // instead we will mutate replyBox and put it back after.
@@ -220,8 +244,7 @@ try {
   msg.getAttributes().put("replyBox", getX().create(foam.box.HTTPReplyBox.class));
 
 
-  foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(foam.lib.json.OutputterMode.NETWORK);
-  outputter.setX(getX());
+  foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(getX()).setPropertyPredicate(new foam.lib.NetworkPropertyPredicate());
   output.write(outputter.stringify(msg));
 
   msg.getAttributes().put("replyBox", replyBox);

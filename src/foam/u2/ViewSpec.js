@@ -51,13 +51,19 @@ foam.CLASS({
             return foam.u2.ViewSpec.createView(spec.call(self, args, ctx, true), args, self, ctx, true);
 
           if ( foam.Object.isInstance(spec) ) {
-            var ret = spec.create ?
-                spec.create(args, ctx) :
-                ctx.lookup(spec.class).create(spec, ctx).copyFrom(args || {});
+            var ret;
+
+            if ( spec.create ) {
+              ret = spec.create(args, ctx);
+            } else {
+              var cls = ctx.lookup(spec.class);
+              if ( ! cls ) foam.assert(false, 'ViewSpec specifies unknown class: ', spec.class);
+              ret = cls.create(spec, ctx).copyFrom(args || {});
+            }
 
             foam.assert(
-                foam.u2.Element.isInstance(ret) || ret.toE,
-                'ViewSpec result must extend foam.u2.Element or be toE()-able.');
+              foam.u2.Element.isInstance(ret) || ret.toE,
+              'ViewSpec result must extend foam.u2.Element or be toE()-able.');
 
             return ret;
           }
@@ -88,9 +94,11 @@ foam.CLASS({
       }
     ],
     */
+    ['view', { class: 'foam.u2.view.MapView' }],
     [ 'adapt', function(_, spec, prop) {
       return foam.String.isInstance(spec) ? { class: spec } : spec ;
-    } ]
+    } ],
+    [ 'displayWidth', 80 ]
     /*
     [ 'toJSON', function(value) {
       Output as string if 'class' is only defined value.

@@ -33,6 +33,7 @@ foam.CLASS({
         class: 'foam.u2.view.FObjectView',
         choices: [
           [ 'foam.nanos.menu.DAOMenu',      'DAO' ],
+          [ 'foam.nanos.menu.DAOMenu2',      'DAO2' ],
           [ 'foam.nanos.menu.DocumentMenu', 'Document' ],
           [ 'foam.nanos.menu.DocumentFileMenu', 'External Document' ],
           [ 'foam.nanos.menu.LinkMenu',     'Link' ],
@@ -52,12 +53,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'description',
-      documentation: 'Menu item explaination.'
+      documentation: 'Menu item explaination.',
+      displayWidth: 80
     },
     {
       class: 'String',
       name: 'icon',
-      documentation: 'Icon associated to the menu item.'
+      documentation: 'Icon associated to the menu item.',
+      displayWidth: 80
     }
   ],
 

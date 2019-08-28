@@ -7,16 +7,19 @@
 foam.CLASS({
   package: 'io.c9.ace',
   name: 'Config',
+  imports: [
+    'controllerMode?'
+  ],
   properties: [
     {
       class: 'Int',
       name: 'height',
-      value: 500
+      value: 800
     },
     {
       class: 'Int',
       name: 'width',
-      value: 700
+      value: 800
     },
     {
       class: 'Enum',
@@ -37,7 +40,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'isReadOnly'
+      name: 'isReadOnly',
+      expression: function(controllerMode) {
+        return controllerMode === foam.u2.ControllerMode.VIEW;
+      }
     }
   ]
 });

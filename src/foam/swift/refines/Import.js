@@ -42,8 +42,9 @@ foam.CLASS({
       class: 'String',
       name: 'swiftPrivateAxiomName',
       expression: function(swiftName) { return '_' + foam.String.constantize(swiftName) + '_'; },
-    },
+    }
   ],
+
   methods: [
     function writeToSwiftClass(cls, parentCls) {
       if ( ! parentCls.hasOwnAxiom(this.name) ) return;
@@ -70,27 +71,28 @@ foam.CLASS({
       }));
     },
   ],
+
   templates: [
     {
       name: 'slotGetter',
       args: [],
       template: function() {/*
 return __context__["<%=this.key%>$"] as? <%=foam.swift.core.Slot.model_.swiftName%> ?? nil
-      */},
+      */}
     },
     {
       name: 'valueGetter',
       args: [],
       template: function() {/*
 return __context__["<%=this.key%>"]<%= this.swiftCast %>
-      */},
+      */}
     },
     {
       name: 'valueSetter',
       args: [],
       template: function() {/*
 self.<%=this.name%>$?.swiftSet(value)
-      */},
+      */}
     },
     {
       name: 'swiftPropertyInfoInit',
@@ -101,7 +103,7 @@ class PInfo: Axiom {
   init(_ ci: ClassInfo) { classInfo = ci }
 }
 return PInfo(classInfo())
-      */},
+      */}
     }
-  ],
+  ]
 });

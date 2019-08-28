@@ -427,13 +427,43 @@ foam.LIB({
      * Outputs:
      * Name is adam
      * Hello adam
+     * 
+     * This also supports nested properties for FObjects using the $ syntax.
+     * 
+     * Ex.
+     * foam.CLASS({
+     *   name: 'Foo',
+     *   properties: ['str']
+     * });
+     * foam.CLASS({
+     *   name: 'Bar',
+     *   properties: [
+     *     {
+     *       class: 'FObjectProperty',
+     *       of: 'Foo',
+     *       name: 'foo'
+     *     }
+     *   ]
+     * });
+     * 
+     * var bar = Bar.create({
+     *   foo: Foo.create({str: 'Hello!'})
+     * });
+     * foam.Function.withArgs(function(foo$str) {
+     *   console.log(foo$str);
+     * }, bar);
      *
+     * Outputs:
+     * Hello!
      **/
     function withArgs(fn, source, opt_self) {
       var argNames = foam.Function.argNames(fn);
       var args = [];
       for ( var i = 0 ; i < argNames.length ; i++ ) {
-        var a = source[argNames[i]];
+        var a = foam.core.FObject.isInstance(source) &&
+                argNames[i].indexOf('$') != -1 ?
+          source.slot(argNames[i]).get() :
+          source[argNames[i]];
         if ( typeof a === 'function' ) a = a.bind(source);
         args.push(a);
       }
@@ -704,6 +734,22 @@ foam.LIB({
           a.splice(i, 1);
         }
       }
+    },
+    function unique(a, comparator) {
+      // Returns a sorted array with all duplicate values removed.
+      // Sorting and comparison is done by the "comparator" parameter.
+      // If "comparator" is not specified then foam.util.compare will
+      // be used.
+
+      var comparator = comparator || foam.util.compare;
+      var sorted =  a.sort(comparator);
+      return sorted.reduce(function(acc, value) {
+        if ( ! acc.length ||
+             comparator(acc[acc.length - 1], value) != 0 )
+          acc.push(value);
+
+        return acc;
+      }, []);
     }
   ]
 });
@@ -827,7 +873,23 @@ foam.LIB({
 
       return newObj;
     },
-    function equals(a, b) { return a === b; },
+    function keys(o) { return Object.keys(o); },
+    function equals(a, b) {
+      if ( foam.Object.is(a, b) ) return true;
+      if ( ! foam.Object.isInstance(a)
+        || ! foam.Object.isInstance(b) ) return false;
+      if ( this.keys(a).length !== this.keys(b).length ) return false;
+
+      for ( var key in a ) {
+        if ( ! a.hasOwnProperty(key)
+          || ! b.hasOwnProperty(key)
+          || ! foam.util.equals(a[key], b[key])
+        ) {
+          return false;
+        }
+      }
+      return true;
+    },
     function compare(a, b) {
       if ( ! foam.Object.isInstance(b) ) return 1;
       return foam.Number.compare(a.$UID, b ? b.$UID : -1);

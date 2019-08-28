@@ -20,6 +20,10 @@ foam.CLASS({
   name: 'PasswordView',
   extends: 'foam.u2.View',
 
+  requires: [
+    'foam.u2.TextField'
+  ],
+
   css: `
     ^ .input-field-container {
       position: relative;
@@ -30,9 +34,6 @@ foam.CLASS({
       height: 24px;
       bottom: 8px;
       right: 6px;
-    }
-    ^ .input-field {
-      padding-right: 30px;
     }
   `,
 
@@ -79,12 +80,12 @@ foam.CLASS({
 
       this.addClass(this.myClass()).start().
         addClass('input-field-container').
-        start(foam.u2.tag.Input, {
+        start(this.TextField, {
           type: this.type,
           data$: this.data$,
           onKey: true
         }, this.inputElement$).
-        addClass('input-field').addClass('full-width-input-password').end().
+        addClass('full-width-input-password').end().
         start('img').show(this.passwordIcon$).addClass('input-image').
         attr('src', this.visibilityIcon$).on('click', this.visible).
         end().

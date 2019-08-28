@@ -12,8 +12,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
-      expression: function(package, name) {
-        return package ? package + '.' + name : name;
+      getter: function() {
+        return this.package ? this.package + '.' + this.name : this.name;
       },
     },
     {

@@ -24,12 +24,14 @@ foam.CLASS({
   package: 'foam.core',
   name: 'IDAlias',
   extends: 'foam.core.Object',
+
   properties: [
     ['name', 'id'],
     {
       class: 'String',
       name: 'propName'
     },
+    ['hidden', true],
     {
       name: 'targetProperty',
       transient: true
@@ -42,6 +44,7 @@ foam.CLASS({
     }],
     'value'
   ],
+
   methods: [
     function installInClass(c) {
       var prop = c.getAxiomByName(this.propName);
@@ -52,6 +55,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',

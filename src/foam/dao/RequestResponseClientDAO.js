@@ -82,6 +82,11 @@ Suitable for usage against backends that don't support listen(), such as plain H
 
     function removeAll_(x, skip, limit, order, predicate) {
       var self = this;
+
+      if ( predicate === foam.mlang.predicate.True.create() ) predicate = null;
+      if ( ! skip ) skip = 0;
+      if ( foam.Undefined.isInstance(limit) ) limit = Number.MAX_SAFE_INTEGER;
+
       return this.SUPER(null, skip, limit, order, predicate).then(function() {
         self.on.reset.pub();
         return;

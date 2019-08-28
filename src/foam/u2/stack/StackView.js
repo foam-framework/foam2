@@ -38,7 +38,7 @@ foam.CLASS({
     }
   ],
 
-  css: '%GROUPCSS%',
+  css: '%CUSTOMCSS%',
 
   methods: [
     // TODO: Why is this init() instead of initE()? Investigate and maybe fix.
@@ -49,7 +49,7 @@ foam.CLASS({
       if ( this.showActions ) {
         this.start('actions')
           .add(this.data.cls_.getAxiomsByClass(foam.core.Action))
-          .end();
+        .end();
       }
 
       this.add(this.slot(function(s) {

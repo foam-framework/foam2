@@ -85,6 +85,7 @@ foam.CLASS({
         this.start().addClass(this.myClass('validation-error')).add(this.validationError_$).end();
       }
     },
+
     function inputE() {
       var self = this;
       var input = this.start('span')
@@ -99,6 +100,7 @@ foam.CLASS({
 
       input.end();
     },
+
     function fromProperty(prop) {
       this.label = this.label || prop.label;
       return this.SUPER(prop);

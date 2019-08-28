@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.u2.navigation',
   name: 'SideNavigation',
@@ -26,7 +32,7 @@ foam.CLASS({
     top: 0;
     left: 0;
     overflow-x: hidden;
-    background: %PRIMARYCOLOR%;
+    background: /*%BLACK%*/ #1e1f21;
     display: inline-block;
   }
   ^side-nav div a {

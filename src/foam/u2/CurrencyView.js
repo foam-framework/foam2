@@ -23,11 +23,24 @@ foam.CLASS({
     },
 
     function textToData(text) {
-      return this.SUPER(text) * 100;
+      return Math.round(this.SUPER(text) * 100);
     },
 
     function formatNumber(val) {
       return val.toFixed(2);
+    },
+
+    function link() {
+      this.SUPER();
+
+      // If the values is currently displaying 0.00, then when
+      // you select focus the screen changes its value to '',
+      // so that you don't have to delete the 0.00 to enter your
+      // value.
+      this.on('focus', function() {
+        var view = this.attrSlot(null, this.onKey ? 'input' : null);
+       if ( ! this.data ) { view.set(''); }
+      }.bind(this));
     }
   ]
 });

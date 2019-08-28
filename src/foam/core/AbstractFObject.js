@@ -175,7 +175,7 @@ foam.CLASS({
         try {
           FObject ret = getClass().newInstance();
           List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
-          for( PropertyInfo prop : props ) {
+          for ( PropertyInfo prop : props ) {
             if ( ! prop.isSet(this) ) continue;
             prop.cloneProperty(this, ret);
           }
@@ -190,6 +190,21 @@ foam.CLASS({
       type: 'FObject',
       javaCode: `
         return fclone();
+      `
+    },
+    {
+      name: 'validate',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+        List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+        for ( PropertyInfo prop : props ) {
+          prop.validateObj(x, this);
+        }
       `
     },
     {
@@ -268,7 +283,7 @@ foam.CLASS({
       name: 'toJSON',
       type: 'String',
       javaCode: `
-        Outputter out = new Outputter();
+        Outputter out = new Outputter(getX());
         return out.stringify(this);
       `
     },

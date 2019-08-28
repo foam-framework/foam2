@@ -10,7 +10,9 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
+    'foam.core.SimpleSlot',
     'foam.u2.search.SearchManager',
+    'foam.u2.search.TextSearchView',
     'foam.u2.view.SearchViewWrapper'
   ],
 
@@ -21,10 +23,10 @@ foam.CLASS({
 
   exports: [
     'as filterController',
-    'as data'
+    'as data',
+    'searchManager'
   ],
 
-  // TODO: CSS classname shouldn't be .net-nanopay-ui-ActionView, fix.
   css: `
     ^ {
       background-color: white;
@@ -41,9 +43,10 @@ foam.CLASS({
       width: 100%;
     }
 
-    ^ input:not([type="checkbox"]):focus, ^ select:focus {
+    ^ input:not([type="checkbox"]):focus,
+    ^ select:focus {
       outline: none;
-      border: 1px solid #59a5d5;
+      border: 1px solid /*%PRIMARY3%*/ #406dea;
     }
 
     ^ .general-query {
@@ -56,21 +59,7 @@ foam.CLASS({
       margin: 20px 20px 0 20px;
     }
 
-    ^ .net-nanopay-ui-ActionView-clear {
-      // background-color: rgba(164, 179, 184, 0.1);
-      border: solid 1px rgba(164, 179, 184, 0.5);
-      border-radius: 2px;
-      color: #093649;
-      font-family: Roboto;
-      font-size: 14px;
-      font-stretch: normal;
-      font-style: normal;
-      font-weight: normal;
-      height: 30px;
-      letter-spacing: 0.2px;
-      text-align: center;
-      width: 60px;
-      height: 32px;
+    ^ .foam-u2-ActionView-clear {
       margin: 20px;
     }
   `,
@@ -116,6 +105,39 @@ foam.CLASS({
       class: 'Int',
       name: 'totalCount'
     },
+    {
+      name: 'searchManager',
+      factory: function() {
+        return this.SearchManager.create({
+          dao$: this.dao$,
+          predicate$: this.data$
+        });
+      }
+    },
+    {
+      class: 'Int',
+      name: 'loadingRequests',
+      documentation: `
+        Incremented every time an async call is made to the DAO and decremented
+        every time a call finishes. A non-zero value indicates that this view is
+        loading.
+      `
+    },
+    {
+      class: 'String',
+      name: 'countText',
+      documentation: `
+        The formatted text that shows how many items have been selected from the
+        DAO. Shows "Loading..." while waiting for the total count to avoid
+        "0 of 0 selected" being shown while loading.
+      `,
+      expression: function(selectedCount, totalCount, loadingRequests) {
+        if ( loadingRequests > 0 ) {
+          return 'Loading...';
+        }
+        return `${selectedCount.toLocaleString()} of ${totalCount.toLocaleString()} selected`;
+      }
+    }
   ],
 
   methods: [
@@ -130,44 +152,39 @@ foam.CLASS({
         add(this.slot(function(filters) {
           self.show(filters.length);
 
-          var searchManager = self.SearchManager.create({
-            dao$: self.dao$,
-            predicate$: self.data$
-          });
-
-          searchManager.filteredDAO$.sub(self.updateSelectedCount);
-          self.updateSelectedCount(0, 0, 0, searchManager.filteredDAO$);
+          this.searchManager.filteredDAO$.sub(self.updateSelectedCount);
+          self.updateSelectedCount(0, 0, 0, this.searchManager.filteredDAO$);
 
           var e = this.E('div');
 
-          e.onDetach(searchManager);
+          e.onDetach(this.searchManager);
 
-          var generalQueryView = foam.u2.ViewSpec.createView(
-              { class: 'foam.u2.search.TextSearchView' },
-              {
+          var slot = self.SimpleSlot.create();
+
+          e
+            .start(self.TextSearchView, {
                 richSearch: true,
                 of: self.dao.of.id,
-                onKey: true
-              },
-              this,
-              this.__subSubContext__);
-          searchManager.add(generalQueryView);
-          e.start(generalQueryView).addClass('general-query').end();
+                onKey: true,
+                viewSpec: {
+                  class: 'foam.u2.tag.Input',
+                  focused: true
+                }
+            }, slot)
+              .addClass('general-query')
+            .end();
+
+          this.searchManager.add(slot.value);
 
           e.forEach(filters, function(f) {
-            // TODO: See if this can be cleaned up somehow, if searchView didn't
-            // require the proprety explicitly, or could find the search manager
-            // via the context and add itself to that.
             var axiom = self.dao.of.getAxiomByName(f);
-            var spec = axiom.searchView;
-            var view = foam.u2.ViewSpec.createView(spec, {
-              property: axiom,
-              dao: self.dao
-            }, this, this.__subSubContext__);
 
-            searchManager.add(view);
             this
-              .start(self.SearchViewWrapper, { searchView: view })
+              .start(self.SearchViewWrapper, {
+                searchView: axiom.searchView,
+                property: axiom,
+                dao: self.dao
+              })
                 .addClass(self.myClass('filter'))
               .end();
           });
@@ -176,20 +193,9 @@ foam.CLASS({
         }, this.filters$))
         .start()
           .addClass(self.myClass('count'))
-          // TODO: move formatting function to stdlib
-          .add(self.selectedCount$.map(function(a) {
-            return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-          }))
-          .entity('nbsp')
-          .add('of')
-          .entity('nbsp')
-          .add(self.totalCount$.map(function(a) {
-            return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-          }))
-          .entity('nbsp')
-          .add('selected')
+          .add(self.countText$)
         .end()
-        .tag(this.CLEAR);
+        .tag(this.CLEAR, { buttonStyle: 'SECONDARY' });
     },
 
     function addFilter(key) {
@@ -218,18 +224,31 @@ foam.CLASS({
       name: 'updateTotalCount',
       isFramed: true,
       code: function() {
-        this.dao.select(foam.mlang.sink.Count.create()).then(function(c) {
-          this.totalCount = c.value;
-        }.bind(this));
+        this.loadingRequests++;
+        this.dao
+          .select(foam.mlang.sink.Count.create())
+          .then((c) => {
+            this.totalCount = c.value;
+          })
+          .finally(() => {
+            this.loadingRequests--;
+          });
       }
     },
     {
       name: 'updateSelectedCount',
       isFramed: true,
-      code: function(_, __, ___, dao) {
-        dao.get().select(foam.mlang.sink.Count.create()).then(function(c) {
-          this.selectedCount = c.value;
-        }.bind(this));
+      code: function(_, __, ___, sink) {
+        this.loadingRequests++;
+        sink
+          .get()
+          .select(foam.mlang.sink.Count.create())
+          .then((c) => {
+            this.selectedCount = c.value;
+          })
+          .finally(() => {
+            this.loadingRequests--;
+          });
       }
     }
   ]

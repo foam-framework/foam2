@@ -6,11 +6,16 @@
 
 package foam.nanos.dig;
 
+import foam.dao.DAO;
 import foam.core.PropertyInfo;
 import foam.core.X;
+import foam.lib.AndPropertyPredicate;
+import foam.lib.NetworkPropertyPredicate;
+import foam.lib.PermissionedPropertyPredicate;
+import foam.lib.PropertyPredicate;
 import foam.lib.json.JSONParser;
 import foam.lib.json.Outputter;
-import foam.lib.json.OutputterMode;
+import foam.nanos.boot.NSpec;
 import foam.nanos.dig.exception.*;
 import foam.nanos.http.HttpParameters;
 import foam.nanos.logger.Logger;
@@ -46,6 +51,7 @@ public class SugarWebAgent
           .setMessage("Empty Service Key")
           .build();
         outputException(x, resp, "JSON", out, error);
+        return;
       }
 
       if ( SafetyUtil.isEmpty(methodName) ) {
@@ -53,6 +59,7 @@ public class SugarWebAgent
           .setMessage("Empty Method Name")
           .build();
         outputException(x, resp, "JSON", out, error);
+        return;
       }
 
       Class class_ = null;
@@ -63,6 +70,29 @@ public class SugarWebAgent
             .setMessage("Can not find out service interface")
             .build();
           outputException(x, resp, "JSON", out, error);
+          return;
+      }
+
+      // Check if the user is authorized to access the DAO.
+      DAO nSpecDAO = (DAO) x.get("nSpecDAO");
+      NSpec nspec = (NSpec) nSpecDAO.find(serviceName);
+
+      // Check if service exists and is served.
+      if ( nspec == null || ! nspec.getServe() ) {
+        DigErrorMessage error = new GeneralException.Builder(x)
+          .setMessage(String.format("Could not find service named '%s'", serviceName))
+          .build();
+        outputException(x, resp, "JSON", out, error);
+        return;
+      }
+
+      try {
+        nspec.checkAuthorization(x);
+      } catch (foam.nanos.auth.AuthorizationException e) {
+        outputException(x, resp, "JSON", out, new foam.nanos.dig.exception.AuthorizationException.Builder(x)
+          .setMessage(e.getMessage())
+          .build());
+        return;
       }
 
       Class[] paramTypes = null; // for picked Method's parameters' types
@@ -89,6 +119,7 @@ public class SugarWebAgent
                   .setMessage("IllegalArgumentException : Add a compiler argument")
                   .build();
                 outputException(x, resp, "JSON", out, error);
+                return;
               }
 
               paramTypes[j] = pArray[j].getType();
@@ -110,6 +141,7 @@ public class SugarWebAgent
                   .setMessage("Empty Parameter values : " + pArray[j].getName())
                   .build();
                 outputException(x, resp, "JSON", out, error);
+                return;
               }
             }
             executeMethod(x, resp, out, class_, serviceName, methodName, paramTypes, arglist);
@@ -135,7 +167,7 @@ public class SugarWebAgent
       jsonParser.setX(x);
       resp.setContentType("application/json");
 
-      Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+      Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate()}));
       outputterJson.setOutputDefaultValues(true);
       outputterJson.setOutputClassNames(true);
 
@@ -166,7 +198,7 @@ public class SugarWebAgent
       JSONParser jsonParser = new JSONParser();
       jsonParser.setX(x);
 
-      Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+      Outputter outputterJson = new foam.lib.json.Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate()}));
       outputterJson.setOutputDefaultValues(true);
       outputterJson.setOutputClassNames(true);
       outputterJson.output(error);

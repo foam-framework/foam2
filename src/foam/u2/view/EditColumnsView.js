@@ -1,116 +1,151 @@
-/** 
+/**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
+foam.ENUM({
+  package: 'foam.u2.view',
+  name: 'ColumnVisibility',
+  values: [
+    {
+      name: 'DEFAULT',
+      label: 'Default'
+    },
+    {
+      name: 'ALWAYS_SHOW',
+      label: 'Always Show'
+    },
+    {
+      name: 'ALWAYS_HIDE',
+      label: 'Always Hide'
+    },
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'ColumnConfig',
+  sections: [{ name: '_defaultSection' }],
+  requires: [
+    'foam.u2.view.ColumnVisibility'
+  ],
+  properties: [
+    {
+      class: 'Class',
+      name: 'of',
+      hidden: true
+    },
+    {
+      name: 'axiom',
+      hidden: true
+    },
+    {
+      class: 'String',
+      name: 'key',
+      hidden: true,
+      expression: function(of, axiom) { return of.id + '.' + axiom.name; }
+    },
+    {
+      class: 'String',
+      name: 'label',
+      label: '',
+      visibility: 'RO',
+      expression: function(of, axiom) {
+        return axiom.label || foam.String.labelize(axiom.name);
+      },
+      gridColumns: 6
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.view.ColumnVisibility',
+      name: 'visibility',
+      label: '',
+      gridColumns: 6,
+      factory: function() {
+        return this.ColumnVisibility[localStorage.getItem(this.key)] ||
+               this.ColumnVisibility.DEFAULT;
+      }
+    }
+  ],
+  methods: [
+    {
+      name: 'save',
+      code: function() {
+        localStorage.removeItem(this.key);
+        if ( this.visibility === this.ColumnVisibility.DEFAULT ) return;
+        localStorage.setItem(this.key, this.visibility.name);
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'EditColumnsView',
-  extends: 'foam.u2.Element',
-
   requires: [
-    'foam.u2.md.CheckBox'
+    'foam.u2.DetailView',
+    'foam.u2.view.ColumnVisibility',
+    'foam.u2.view.ColumnConfig'
   ],
-
   properties: [
     {
-      name: 'columns'
+      class: 'Class',
+      name: 'of',
+      hidden: true
     },
     {
-      name: 'table'
-    },
-    {
-      name: 'columns_'
-    },
-    {
-      name: 'selected'
-    },
-    {
-      class: 'Boolean',
-      name: 'displaySorted',
-      value: false
-    }
-  ],
-
-  css: `
-    ^ {
-      text-align: left;
-      padding: 10px;
-      width: 125px;
-    }
-    ^ label {
-      margin-top: 5px;
-    }
-  `,
-  
-  methods: [
-    function initE() {
-      // if ( this.displaySorted ) {
-      //   // TODO: How should this block be tested?
-      //   var props = this.properties;
-      //   props = this.properties.slice();
-      //   props.sort(function(a, b) {
-      //     return a.label.toLowerCase().compareTo(b.label.toLowerCase());
-      //   });
-      // } else { ...
-
-      this.addClass(this.myClass());
-
-      this.selected = []
-
-      for ( var i = 0 ; i < this.columns_.length ; i++ ) {
-        var cb = this.CheckBox.create({
-          label: this.columns_[i].label,
-          data: true
+      class: 'FObjectArray',
+      of: 'foam.u2.view.ColumnConfig',
+      name: 'columns',
+      view: {
+        class: 'foam.u2.view.FObjectArrayView',
+        valueView: {
+          class: 'foam.u2.detail.SectionView',
+          sectionName: '_defaultSection'
+        },
+        mode: 'RO'
+      },
+      factory: function() {
+        return this.allColumns.map(c => {
+          return this.ColumnConfig.create({ of: this.of, axiom: c });
         });
-
-        this.selected.push(cb.data$);
-        var name = this.columns_[i].name;
-
-        // Subscribes updateTable listener to checkbox data
-        cb.data$.sub(this.updateTable.bind(this, name));
-
-        this.add(cb);
-
-        // Ensures each selection is on a new line
-        if ( i != this.columns_.length - 1 ) this.start('br').end();
+      }
+    },
+    {
+      class: 'Array',
+      name: 'allColumns',
+      hidden: true
+    }
+  ],
+  // This shouldn't be needed.
+  imports: [
+    'stack'
+  ],
+  actions: [
+    {
+      name: 'resetAll',
+      code: function() {
+        this.columns.forEach(c => c.visibility = 'DEFAULT');
+      }
+    },
+    {
+      name: 'cancel',
+      code: function() {
+        this.stack.back();
+      }
+    },
+    {
+      name: 'save',
+      code: function() {
+        this.columns.forEach(c => { c.save() });
+        this.stack.back();
       }
     }
   ],
-
-  listeners: [
-    function updateTable(changedProp) {
-      var cols = [];
-
-      // if ( this.displaySorted ) {
-      //   // TODO: How should this block be tested?
-      //   out = this.selectedProperties.slice();
-      //   if ( nu && !selected[changedProp.name] ) {
-      //     out.push(changedProp);
-      //   }
-      //   if ( !nu && selected[changedProp.name] ) {
-      //     out.splice(out.indexOf(changedProp), 1);
-      //   }
-      // }
-      // else { ...
-
-      for ( var i = 0 ; i < this.columns.length ; i++ ) {
-        var cbData = this.selected[i].obj.data;
-        var isColShown = this.columns_.some(c => c.name === this.columns[i]);
-        var curProp = this.columns[i];
-
-        // Determines if the curProp is the one which has changed,
-        // if so adds col if cb is checked. Otherwise if curProp hasn't
-        // changed, then checks if it was previously shown, if so, keeps in view.
-        if ( ((changedProp == curProp) && cbData) ||
-             ((changedProp != curProp) && isColShown) ) {
-          // Gets the table column from the column name, and pushes to cols array
-          cols.push(this.table.getAxiomByName(curProp))
-        }
-      }
-
-      this.columns_ = cols;
+  methods: [
+    function toE() {
+      return this.DetailView.create({ data: this });
     }
   ]
 });

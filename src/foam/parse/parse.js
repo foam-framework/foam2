@@ -52,7 +52,7 @@ foam.CLASS({
   extends: 'FObjectArray',
 
   properties: [
-    ['of', 'foam.parse.Parser'],
+    ['of', 'foam.lib.parse.Parser'],
     ['adapt', function(_, a) {
         if ( ! a ) return [];
         var b = new Array(a.length);

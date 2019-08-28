@@ -18,7 +18,17 @@ foam.CLASS({
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest',
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse',
     'org.eclipse.jetty.websocket.servlet.WebSocketCreator',
-    'org.eclipse.jetty.server.ForwardedRequestCustomizer'
+    'foam.nanos.jetty.WhitelistedForwardedRequestCustomizer',
+    'java.util.Set',
+    'java.util.HashSet',
+    'java.util.Arrays',
+    'org.eclipse.jetty.server.*',
+    'org.eclipse.jetty.util.ssl.SslContextFactory',
+    'javax.net.ssl.KeyManager',
+    'javax.net.ssl.KeyManagerFactory',
+    'javax.net.ssl.SSLContext',
+    'java.io.FileInputStream',
+    'java.security.KeyStore'
   ],
 
   properties: [
@@ -28,6 +38,23 @@ foam.CLASS({
       value: 8080
     },
     {
+      class: 'Boolean',
+      name: 'enableHttps'
+    },
+    {
+      class: 'Int',
+      name: 'httpsPort',
+      value: 443
+    },
+    {
+      class: 'String',
+      name: 'keystorePath'
+    },
+    {
+      class: 'String',
+      name: 'keystorePassword'
+    },
+    {
       class: 'StringArray',
       name: 'welcomeFiles',
       factory: function() {
@@ -35,6 +62,10 @@ foam.CLASS({
           '/src/foam/nanos/controller/index.html'
         ];
       }
+    },
+    {
+      class: 'StringArray',
+      name: 'forwardedForProxyWhitelist',
     },
     {
       class: 'FObjectArray',
@@ -82,6 +113,11 @@ foam.CLASS({
           response headers.
           2. Configure Jetty server to interpret the X-Fowarded-for header
         */
+        
+        // we are converting the ForwardedForProxyWhitelist array into a set here
+        // so that it makes more sense algorithmically to check against IPs
+        Set<String> forwardedForProxyWhitelist = new HashSet<>(Arrays.asList(getForwardedForProxyWhitelist()));
+
         for ( org.eclipse.jetty.server.Connector conn : server.getConnectors() ) {
           for ( org.eclipse.jetty.server.ConnectionFactory f : conn.getConnectionFactories() ) {
             if ( f instanceof org.eclipse.jetty.server.HttpConnectionFactory ) {
@@ -89,8 +125,9 @@ foam.CLASS({
               // 1. hiding the version number in response headers
               ((org.eclipse.jetty.server.HttpConnectionFactory) f).getHttpConfiguration().setSendServerVersion(false);
 
-              // 2. interpret X-Forwarded-for headers
-              ((org.eclipse.jetty.server.HttpConnectionFactory) f).getHttpConfiguration().addCustomizer(new ForwardedRequestCustomizer());
+              // 2. handle the X-Forwarded-For headers depending on whether a whitelist is set up or not
+              // we need to pass the context into this customizer so that we can effectively log unauthorized proxies
+              ((org.eclipse.jetty.server.HttpConnectionFactory) f).getHttpConfiguration().addCustomizer(new WhitelistedForwardedRequestCustomizer(getX(), forwardedForProxyWhitelist));
             }
           }
         }
@@ -171,6 +208,9 @@ foam.CLASS({
 
         addJettyShutdownHook(server);
         server.setHandler(handler);
+                
+        this.configHttps(server);
+                
         server.start();
       } catch(Exception e) {
         e.printStackTrace();
@@ -200,6 +240,52 @@ foam.CLASS({
             }
           }
         });
+      `
+    },
+    {
+      name: 'configHttps',
+      documentation: 'https://docs.google.com/document/d/1hXVdHjL8eASG2AG2F7lPwpO1VmcW2PHnAW7LuDC5xgA/edit?usp=sharing',
+      args: [
+        {
+          name: 'server',
+          javaType: 'final org.eclipse.jetty.server.Server'
+        }
+      ],
+      javaCode: `
+      foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+
+      if ( this.getEnableHttps() ) {
+  
+        try {
+          // 1. load the keystore to verify the keystore path and password.
+          KeyStore keyStore = KeyStore.getInstance("JKS");
+          keyStore.load(new FileInputStream(this.getKeystorePath()), this.getKeystorePassword().toCharArray());
+  
+          // 2. enable https
+          HttpConfiguration https = new HttpConfiguration();
+          https.addCustomizer(new SecureRequestCustomizer());
+          SslContextFactory sslContextFactory = new SslContextFactory();
+          sslContextFactory.setKeyStorePath(this.getKeystorePath());
+          sslContextFactory.setKeyStorePassword(this.getKeystorePassword());
+  
+          ServerConnector sslConnector = new ServerConnector(server,
+            new SslConnectionFactory(sslContextFactory, "http/1.1"),
+            new HttpConnectionFactory(https));
+          sslConnector.setPort(this.getHttpsPort());
+  
+          server.addConnector(sslConnector);
+  
+        } catch ( java.io.FileNotFoundException e ) {
+          logger.error("No KeyStore file found at path: " + this.getKeystorePath(), 
+                       "Please see: https://docs.google.com/document/d/1hXVdHjL8eASG2AG2F7lPwpO1VmcW2PHnAW7LuDC5xgA/edit?usp=sharing", e);
+        } catch ( java.io.IOException e ) {
+          logger.error("Invalid KeyStore file password, please make sure you have set the correct password.",
+                       "Please see: https://docs.google.com/document/d/1hXVdHjL8eASG2AG2F7lPwpO1VmcW2PHnAW7LuDC5xgA/edit?usp=sharing", e);
+        } catch ( Exception e ) {
+          logger.error("Error when enable the https.");
+        }
+  
+      }
       `
     }
   ]

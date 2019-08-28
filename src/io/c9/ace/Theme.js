@@ -18,7 +18,7 @@ foam.ENUM({
     },
     {
       path: 'ace/theme/crimson_editor',
-      name: 'Crimson Editor'
+      name: 'CrimsonEditor'
     },
     {
       path: 'ace/theme/dawn',
@@ -42,7 +42,7 @@ foam.ENUM({
     },
     {
       path: 'ace/theme/solarized_light',
-      name: 'Solarized Light'
+      name: 'SolarizedLight'
     },
     {
       path: 'ace/theme/textmate',
@@ -66,7 +66,7 @@ foam.ENUM({
     },
     {
       path: 'ace/theme/sqlserver',
-      name: 'SQL Server'
+      name: 'SQLServer'
     },
     {
       path: 'ace/theme/ambiance',
@@ -78,7 +78,7 @@ foam.ENUM({
     },
     {
       path: 'ace/theme/clouds_midnight',
-      name: 'Clouds Midnight'
+      name: 'CloudsMidnight'
     },
     {
       path: 'ace/theme/dracula',
@@ -94,11 +94,11 @@ foam.ENUM({
     },
     {
       path: 'ace/theme/gob',
-      name: 'Green on Black'
+      name: 'GreenOnBlack'
     },
     {
       path: 'ace/theme/idle_fingers',
-      name: 'idle Fingers'
+      name: 'idleFingers'
     },
     {
       path: 'ace/theme/kr_theme',
@@ -110,11 +110,11 @@ foam.ENUM({
     },
     {
       path: 'ace/theme/merbivore_soft',
-      name: 'Merbivore Soft'
+      name: 'MerbivoreSoft'
     },
     {
       path: 'ace/theme/mono_industrial',
-      name: 'Mono Industrial'
+      name: 'MonoIndustrial'
     },
     {
       path: 'ace/theme/monokai',
@@ -122,11 +122,11 @@ foam.ENUM({
     },
     {
       path: 'ace/theme/pastel_on_dark',
-      name: 'Pastel on dark'
+      name: 'PastelOnDark'
     },
     {
       path: 'ace/theme/solarized_dark',
-      name: 'Solarized Dark'
+      name: 'SolarizedDark'
     },
     {
       path: 'ace/theme/terminal',
@@ -134,19 +134,19 @@ foam.ENUM({
     },
     {
       path: 'ace/theme/tomorrow_night',
-      name: 'Tomorrow Night'
+      name: 'TomorrowNight'
     },
     {
       path: 'ace/theme/tomorrow_night_blue',
-      name: 'Tomorrow Night Blue'
+      name: 'TomorrowNightBlue'
     },
     {
       path: 'ace/theme/tomorrow_night_bright',
-      name: 'Tomorrow Night Bright'
+      name: 'TomorrowNightBright'
     },
     {
       path: 'ace/theme/tomorrow_night_eighties',
-      name: 'Tomorrow Night 80s'
+      name: 'TomorrowNight80s'
     },
     {
       path: 'ace/theme/twilight',
@@ -154,7 +154,7 @@ foam.ENUM({
     },
     {
       path: 'ace/theme/vibrant_ink',
-      name: 'Vibrant Ink'
+      name: 'VibrantInk'
     }
   ],
   properties: [

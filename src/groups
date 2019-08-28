@@ -1,1 +1,1 @@
-p({"class":"foam.nanos.auth.Group","id":"system","description":"System Internal","parent":"","permissions":[{"class":"foam.nanos.auth.Permission","id":"*","description":"All Access"}]})
+p({"class":"foam.nanos.auth.Group","id":"system","description":"System Internal","parent":""})

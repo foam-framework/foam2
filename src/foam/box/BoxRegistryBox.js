@@ -86,10 +86,10 @@ if let object = msg.object as? foam_box_SubBoxMessage {
         if ( this.SubBoxMessage.isInstance(msg.object) ) {
           var name = msg.object.name;
 
-          if ( this.registry_[name] && this.registry_[name].localBox ) {
+          if ( this.registry_[name] ) {
             // Unpack sub box object... is this right?
             msg.object = msg.object.object;
-            this.registry_[name].localBox.send(msg);
+            this.registry_[name].send(msg);
           } else {
             if ( msg.attributes.replyBox ) {
               msg.attributes.replyBox.send(
@@ -110,11 +110,11 @@ if ( obj instanceof foam.box.SubBoxMessage ) {
   foam.box.SubBoxMessage sbm = (foam.box.SubBoxMessage)obj;
   String name = sbm.getName();
 
-  Registration dest = (Registration)getRegistry_().get(name);
+  foam.box.Box dest = (foam.box.Box)(getRegistry_().get(name));
 
   if ( dest != null ) {
     msg.setObject(sbm.getObject());
-    dest.getLocalBox().send(msg);
+    dest.send(msg);
   } else if ( msg.getAttributes().containsKey("replyBox") ) {
     foam.box.Box replyBox = (foam.box.Box)msg.getAttributes().get("replyBox");
     foam.box.Message errorMessage = getX().create(foam.box.Message.class);

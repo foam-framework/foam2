@@ -13,45 +13,18 @@ foam.INTERFACE({
       class: 'String',
       name: 'firstName',
       tableWidth: 160,
-      documentation: 'First name of user.',
-      validateObj: function(firstName) {
-        if ( firstName.length > 70 ) {
-          return 'First name cannot exceed 70 characters.';
-        }
-
-        if ( /\d/.test(firstName) ) {
-          return 'First name cannot contain numbers.';
-        }
-      }
+      documentation: 'First name of user.'
     },
     {
       class: 'String',
       name: 'middleName',
-      documentation: 'Middle name of user.',
-      validateObj: function(middleName) {
-        if ( middleName.length > 70 ) {
-          return 'Middle name cannot exceed 70 characters.';
-        }
-
-        if ( /\d/.test(middleName) ) {
-          return 'Middle name cannot contain numbers.';
-        }
-      }
+      documentation: 'Middle name of user.'
     },
     {
       class: 'String',
       name: 'lastName',
       documentation: 'Last name of user.',
-      tableWidth: 160,
-      validateObj: function(lastName) {
-        if ( lastName.length > 70 ) {
-          return 'Last name cannot exceed 70 characters.';
-        }
-
-        if ( /\d/.test(lastName) ) {
-          return 'Last name cannot contain numbers.';
-        }
-      }
+      tableWidth: 160
     },
     {
       class: 'String',

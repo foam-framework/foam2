@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-fdescribe('EnabledAwareDAO', function() {
+describe('EnabledAwareDAO', function() {
   var Entity;
   var dao_;
 

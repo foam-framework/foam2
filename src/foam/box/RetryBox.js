@@ -114,8 +114,8 @@ foam.CLASS({
       if ( replyBox ) {
         var clone = msg.cls_.create(msg);
 
-        msg.attributes.replyBox = this.RetryReplyBox.create({
-          delegate: replyBox,
+        replyBox.localBox = this.RetryReplyBox.create({
+          delegate: replyBox.localBox,
           maxAttempts: this.maxAttempts,
           message: clone,
           destination: this.BackoffBox.create({

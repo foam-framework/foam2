@@ -11,18 +11,22 @@ import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
+import foam.lib.PropertyPredicate;
+import foam.lib.PermissionedPropertyPredicate;
 import foam.util.SafetyUtil;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
+import java.util.*;
+
 import org.apache.commons.io.IOUtils;
 
 public class Outputter
   extends AbstractSink
-  implements foam.lib.Outputter
-{
+  implements foam.lib.Outputter {
+  
   protected static ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
     protected SimpleDateFormat initialValue() {
@@ -32,32 +36,32 @@ public class Outputter
     }
   };
 
+  protected foam.core.X x_;
   protected PrintWriter   writer_;
-  protected OutputterMode mode_;
   protected StringWriter  stringWriter_        = null;
   protected boolean       outputShortNames_    = false;
   protected boolean       outputDefaultValues_ = false;
   protected boolean       outputClassNames_    = true;
+  protected boolean       outputReadableDates_ = true;
+  protected PropertyPredicate propertyPredicate_;
+  protected Map<String, List<PropertyInfo>> propertyMap_ = new HashMap<>();
 
-  public Outputter() {
-    this(OutputterMode.FULL);
+
+  public Outputter(foam.core.X x) {
+    this(x, (PrintWriter) null);
   }
 
-  public Outputter(OutputterMode mode) {
-    this((PrintWriter) null, mode);
+  public Outputter(foam.core.X x, File file) throws FileNotFoundException {
+    this(x, new PrintWriter(file));
   }
 
-  public Outputter(File file, OutputterMode mode) throws FileNotFoundException {
-    this(new PrintWriter(file), mode);
-  }
-
-  public Outputter(PrintWriter writer, OutputterMode mode) {
+  public Outputter(foam.core.X x, PrintWriter writer) {
     if ( writer == null ) {
       stringWriter_ = new StringWriter();
       writer        = new PrintWriter(stringWriter_);
     }
 
-    this.mode_   = mode;
+    this.x_ = x;
     this.writer_ = writer;
   }
 
@@ -91,7 +95,7 @@ public class Outputter
   protected void outputNull() {
   }
 
-  protected void outputString(String s) {
+  public void outputString(String s) {
     writer_.append("\"");
     writer_.append(escape(s));
     writer_.append("\"");
@@ -102,6 +106,7 @@ public class Outputter
       .replace("\\", "\\\\")
       .replace("\"", "\\\"")
       .replace("\t", "\\t")
+      .replace("\r","\\r")
       .replace("\n","\\n");
   }
 
@@ -246,13 +251,43 @@ public class Outputter
         value.getClass().isArray();
   }
 
+  public void outputDateValue(java.util.Date date) {
+    if ( outputReadableDates_ )
+      outputString(sdf.get().format(date));
+    else
+      outputNumber(date.getTime());
+  }
+
   protected void outputDate(java.util.Date date) {
-    outputString(sdf.get().format(date));
+    writer_.append("{\"class\":\"__Timestamp__\",\"value\":");
+    outputDateValue(date);
+    writer_.append("}");
+  }
+
+  protected synchronized List getProperties(ClassInfo info) {
+    String of = info.getObjClass().getSimpleName();
+
+    if ( propertyMap_.containsKey(of) && propertyMap_.get(of).isEmpty() ) {
+      propertyMap_.remove(of);
+    }
+
+    if ( ! propertyMap_.containsKey(of) ) {
+      List<PropertyInfo> filteredAxioms = new ArrayList<>();
+      Iterator e = info.getAxiomsByClass(PropertyInfo.class).iterator();
+      while ( e.hasNext() ) {
+        PropertyInfo prop = (PropertyInfo) e.next();
+        if ( propertyPredicate_ == null || propertyPredicate_.propertyPredicateCheck(this.x_, of.toLowerCase(), prop) ) {
+          filteredAxioms.add(prop);
+        }
+      }
+      propertyMap_.put(of, filteredAxioms);
+      return filteredAxioms;
+    }
+    return propertyMap_.get(of);
   }
 
   protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
-    if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
-    if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
+
     if ( ! outputDefaultValues_ && ! prop.isSet(fo) ) return false;
 
     Object value = prop.get(fo);
@@ -272,7 +307,7 @@ public class Outputter
     boolean   isPropertyDiff = false;
 
     if ( ! oldFObject.equals(newFObject) ) {
-      List     axioms = info.getAxiomsByClass(PropertyInfo.class);
+      List     axioms = getProperties(info);
       Iterator i      = axioms.iterator();
 
       while ( i.hasNext() ) {
@@ -305,8 +340,6 @@ public class Outputter
   }
 
   protected boolean maybeOutputPropertyDelta(FObject oldFObject, FObject newFObject, PropertyInfo prop) {
-    if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
-    if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
 
     return prop.compare(oldFObject, newFObject) != 0;
   }
@@ -329,7 +362,7 @@ public class Outputter
       outputString(info.getId());
     }
 
-    List     axioms      = info.getAxiomsByClass(PropertyInfo.class);
+    List     axioms      = getProperties(info);
     Iterator i           = axioms.iterator();
     boolean  outputComma = outputClassNames_;
     while ( i.hasNext() ) {
@@ -357,13 +390,7 @@ public class Outputter
   }
 
   protected void outputClassInfo(ClassInfo info) {
-    writer_.append("{");
-    outputString("class");
-    writer_.append(":");
-    outputString("__Class__");
-    writer_.append(",");
-    outputString("forClass_");
-    writer_.append(":");
+    writer_.append("{\"class\":\"__Class__\",\"forClass_\":");
     outputString(info.getId());
     writer_.append("}");
   }
@@ -410,6 +437,11 @@ public class Outputter
 
   public Outputter setOutputClassNames(boolean outputClassNames) {
     outputClassNames_ = outputClassNames;
+    return this;
+  }
+
+  public Outputter setPropertyPredicate(PropertyPredicate p) {
+    propertyPredicate_ = p;
     return this;
   }
 

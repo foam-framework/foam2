@@ -12,7 +12,7 @@ foam.INTERFACE({
     {
       name: 'sendEmail',
       async: true,
-      type: 'Void',
+      type: 'foam.nanos.notification.email.EmailMessage',
       args: [
         {
           name: 'x',
@@ -21,38 +21,6 @@ foam.INTERFACE({
         {
           name: 'emailMessage',
           type: 'foam.nanos.notification.email.EmailMessage'
-        }
-      ]
-    },
-    {
-      name: 'sendEmailFromTemplate',
-      async: true,
-      type: 'Void',
-      args: [
-        {
-          name: 'x',
-          type: 'Context',
-        },
-        {
-          name: 'user',
-          type: 'foam.nanos.auth.User',
-          documentation: 'User sending the email'
-        },
-        {
-          name: 'emailMessage',
-          type: 'foam.nanos.notification.email.EmailMessage',
-          documentation: 'Email message'
-        },
-        {
-          name: 'name',
-          type: 'String',
-          documentation: 'Template name'
-        },
-        {
-          name: 'templateArgs',
-          type: 'Map',
-          javaType: 'java.util.Map<String, Object>',
-          documentation: 'Template arguments'
         }
       ]
     }

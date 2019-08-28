@@ -74,7 +74,7 @@ foam.ENUM({
     {
       path: 'ace/mode/c_cpp',
       label: 'C and C++',
-      name: 'CandC'
+      name: 'CandCpp'
     },
     {
       path: 'ace/mode/c9search',
@@ -479,7 +479,7 @@ foam.ENUM({
     {
       path: 'ace/mode/objectivec',
       label: 'Objective-C',
-      name: 'Objective-C'
+      name: 'ObjectiveC'
     },
     {
       path: 'ace/mode/ocaml',
@@ -780,6 +780,6 @@ foam.ENUM({
       path: 'ace/mode/django',
       label: 'Django',
       name: 'Django'
-    },
+    }
   ]
 });

@@ -71,7 +71,7 @@ foam.CLASS({
       line-height: 1.33;
       letter-spacing: 0.2px;
       text-align: left;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
     }
     ^ .popUpDropDown > div > div:hover {
       background-color: rgba(89, 165, 213, 0.3);
@@ -90,7 +90,7 @@ foam.CLASS({
     }
     ^ .header {
       text-align: left;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
       margin: 30px 0 20px 0;
     }
     ^ .title {
@@ -104,7 +104,7 @@ foam.CLASS({
       line-height: 1;
       letter-spacing: 0.3px;
       text-align: left;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
       float:left;
       display: inline-block;
       padding-right: 20px;
@@ -123,7 +123,7 @@ foam.CLASS({
       line-height: 1.33;
       letter-spacing: 0.2px;
       text-align: left;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
       padding-top: 10px;
     }
   `,

@@ -30,6 +30,16 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'value'
+    },
+    {
+      class: 'Boolean',
+      name: 'isValid',
+      value: true,
+      javaValidateObj: `
+        boolean isValid = (boolean) obj.getProperty("isValid");
+        if ( ! isValid )
+          throw new IllegalStateException("isValid should be true!");
+      `
     }
   ]
 });

@@ -22,6 +22,7 @@ foam.CLASS({
 
   requires: [
     'foam.box.NoSuchNameException',
+    'foam.box.ExportBox',
     'foam.box.SubBox'
   ],
 
@@ -42,33 +43,12 @@ foam.CLASS({
     }
   ],
 
-  classes: [
-    {
-      name: 'Registration',
-      properties: [
-        {
-          class: 'FObjectProperty',
-          of: 'foam.box.Box',
-          required: true,
-          name: 'exportBox'
-        },
-        {
-          class: 'FObjectProperty',
-          of: 'foam.box.Box',
-          required: true,
-          name: 'localBox'
-        }
-      ]
-    }
-  ],
-
   methods: [
     {
       name: 'doLookup',
       code: function doLookup(name) {
-        if ( this.registry_[name] &&
-             this.registry_[name].exportBox )
-          return this.registry_[name].exportBox;
+        if ( this.registry_[name] )
+          return this.registry_[name];
 
         throw this.NoSuchNameException.create({ name: name });
       },
@@ -84,7 +64,7 @@ Object registration = getRegistry_().get(name);
 if ( registration == null ) {
   throw new RuntimeException("No such name");
 }
-return ((Registration)registration).getExportBox();
+return (foam.box.ExportBox)registration;
 `
     },
     {
@@ -92,15 +72,22 @@ return ((Registration)registration).getExportBox();
       code: function(name, service, localBox) {
         name = name || foam.next$UID();
 
-        var exportBox = this.SubBox.create({ name: name, delegate: this.me });
-        exportBox = service ? service.clientBox(exportBox) : exportBox;
+        var box = this.ExportBox.create({
+          localBox: localBox,
+          messengerBox: this.SubBox.create({
+            name: name,
+            delegate: this.me
+          })
+        });
 
-        this.registry_[name] = {
-          exportBox: exportBox,
-          localBox: service ? service.serverBox(localBox) : localBox
-        };
+        this.registry_[name] = box;
 
-        return this.registry_[name].exportBox;
+        box.onDetach(function() {
+          if ( this.registry_[name] === box )
+            this.unregister(name);
+        }.bind(this));
+
+        return box;
       },
       swiftSynchronized: true,
       swiftCode: function() {/*
@@ -122,35 +109,21 @@ return registration.exportBox
       javaCode: `
 if ( name == null ) name = Integer.toString(foam.box.IdGenerator.nextId());
 
-foam.box.SubBox exportBox = getX().create(foam.box.SubBox.class);
-exportBox.setName(name);
-exportBox.setDelegate(getMe());
-Registration registration = new Registration();
-registration.setX(getX());
-registration.setExportBox(exportBox);
-registration.setLocalBox(box);
-// TODO(adamvy): Apply service policy
+foam.box.ExportBox exportBox = getX().create(foam.box.ExportBox.class);
+foam.box.SubBox subBox = getX().create(foam.box.SubBox.class);
+subBox.setName(name);
+subBox.setDelegate(getMe());
+exportBox.setMessengerBox(subBox);
+exportBox.setLocalBox(box);
 
-getRegistry_().put(name, registration);
+getRegistry_().put(name, exportBox);
+
 return exportBox;
 `
     },
     {
       name: 'unregister',
       code: function(name) {
-        if ( foam.box.Box.isInstance(name) ) {
-          for ( var key in this.registry_ ) {
-            // TODO(markdittmer): Should there be a specialized compare() should
-            // be implemented by NamedBox (to cut out delegate) and
-            // foam.util.compare()?
-            if ( this.registry_[key].exportBox === name ) {
-              delete this.registry_[key];
-              return;
-            }
-          }
-          return;
-        }
-
         delete this.registry_[name];
       },
       swiftSynchronized: true,

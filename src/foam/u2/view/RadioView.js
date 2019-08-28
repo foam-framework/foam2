@@ -20,17 +20,41 @@ foam.CLASS({
   name: 'RadioView',
   extends: 'foam.u2.view.ChoiceView',
 
+  requires: [
+    'foam.u2.DisplayMode'
+  ],
+
   css: `
     ^ label {
       position: relative;
     }
+
+    ^horizontal-radio {
+      display: flex;
+    }
   `,
+
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'isHorizontal',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'isDisabled'
+    }
+  ],
 
   methods: [
     function initE() {
+      this.SUPER();
       // If no item is selected, and data has not been provided, select the 0th
       // entry.
-      this.addClass(this.myClass());
+      this
+        .addClass(this.myClass())
+        .enableClass(this.myClass('horizontal-radio'), this.isHorizontal);
+
       if ( ! this.data && ! this.index ) {
         this.index = 0;
       }
@@ -38,6 +62,11 @@ foam.CLASS({
       if ( this.dao ) this.onDAOUpdate();
       this.choices$.sub(this.onChoicesUpdate);
       this.onChoicesUpdate();
+    },
+
+    function updateMode_(mode) {
+      this.isDisabled = mode === this.DisplayMode.RO ||
+                        mode === this.DisplayMode.DISABLED;
     }
   ],
 
@@ -45,22 +74,25 @@ foam.CLASS({
     function onChoicesUpdate() {
       var self = this;
       var id;
+      var index = 0;
 
       this.removeAllChildren();
 
       this.add(this.choices.map(function(c) {
         return this.E('div').
+          // TODO: why is the radio item getting assigned the same class as the radio whole
           addClass(this.myClass()).
           start('input').
             attrs({
               type: 'radio',
-              name: this.id,
+              name: self.getAttribute('name') + 'Choice' + String.fromCharCode("A".charCodeAt(0) + (index++)),
               value: c[0],
-              checked: self.slot(function (data) { return data === c[0]; })
+              checked: self.slot(function (data) { return data === c[0]; }),
+              disabled: self.isDisabled$
             }).
             setID(id = self.NEXT_ID()).
             on('change', function(evt) {
-              self.data = evt.srcElement.value;
+              self.data = c[0];
             }).
           end().
           start('label').

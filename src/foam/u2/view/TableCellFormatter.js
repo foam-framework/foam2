@@ -47,7 +47,7 @@ foam.CLASS({
     {
       name: 'tableHeaderFormatter',
       value: function(axiom) {
-        this.add(axiom.label);
+        this.add(axiom.label || foam.String.labelize(axiom.name));
       }
     },
     {
@@ -82,7 +82,10 @@ foam.CLASS({
       value: function(_, obj, axiom) {
         this.
           startContext({ data: obj }).
-          add(axiom).
+          tag(axiom, {
+            size: 'SMALL',
+            buttonStyle: 'SECONDARY'
+          }).
           endContext();
       }
     },
@@ -118,7 +121,17 @@ foam.CLASS({
   name: 'FObjectPropertyTableCellFormatterRefinement',
   refines: 'foam.core.FObjectProperty',
 
-  properties: [ [ 'tableCellFormatter', null ] ]
+  properties: [
+    {
+      class: 'foam.u2.view.TableCellFormatter',
+      name: 'tableCellFormatter',
+      value: function(obj) {
+        this.start()
+          .add(obj.toSummary())
+        .end();
+      }
+    }
+  ]
 });
 
 
@@ -141,6 +154,35 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'StringArrayTableCellFormatterRefinement',
+  refines: 'foam.core.StringArray',
+  properties: [
+    {
+      class: 'foam.u2.view.TableCellFormatter',
+      name: 'tableCellFormatter',
+      value: function(value) {
+        this.add(value.join(', '));
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'FObjectArrayTableCellFormatterRefinement',
+  refines: 'foam.core.FObjectArray',
+  properties: [
+    {
+      class: 'foam.u2.view.TableCellFormatter',
+      name: 'tableCellFormatter',
+      value: function(value) {
+        this.add(value.map(o => o.toSummary()).join(', '));
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.u2.view',
@@ -152,7 +194,8 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(date) {
-        if ( date ) this.add(date.toISOString().substring(0,10));
+        // allow the browser to deal with this since we are technically using the user's preference
+        if ( date ) this.add(date.toLocaleDateString());
       }
     }
   ]
@@ -169,8 +212,8 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(date) {
-        // Output as yyyy-mm-dd hh:mm[a/p]
-        if ( date ) this.add(date.toISOString().substring(0,10) + " " + date.toLocaleString().substr(-11,5) + date.toLocaleString().substr(-2,1).toLowerCase());
+        // allow the browser to deal with this since we are technically using the user's preference
+        if ( date ) this.add(date.toLocaleString());
       }
     }
   ]

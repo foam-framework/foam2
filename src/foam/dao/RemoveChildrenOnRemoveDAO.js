@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'RemoveChildrenOnRemoveDAO',
@@ -21,8 +27,9 @@ foam.CLASS({
     {
       class: 'String',
       name: 'targetDAOKey',
-    },
+    }
   ],
+
   methods: [
     {
       name: 'remove_',
@@ -52,7 +59,7 @@ foam.CLASS({
       setDelegate(delegate);
 }
         `);
-      },
-    },
+      }
+    }
   ]
 });

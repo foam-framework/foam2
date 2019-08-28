@@ -28,7 +28,6 @@ foam.CLASS({
       name: 'type'
     },
     'message',
-    'data'
   ],
 
   css: `
@@ -61,15 +60,6 @@ foam.CLASS({
     ^ .close-x{
       right: 5px;
       top: 10px;
-    }
-    ^ .foam-u2-UnstyledActionView-close{
-      width: 30px;
-      height: 30px;
-      position: absolute;
-      left: 0px;
-      top: -5px;
-      z-index: 101;
-      opacity: 0.01;
     }
     ^ .foam-u2-ActionView-close{
       width: 30px;
@@ -105,20 +95,26 @@ foam.CLASS({
   `,
 
   methods: [
-    function initE(){
+    function initE() {
       var self = this;
 
       this
         .addClass(this.myClass())
         .enableClass(this.myClass('error-background'), this.type === 'error')
         .start()
-          .add(this.message)
+          .callIfElse(foam.String.isInstance(this.message), function() {
+            this.add(self.message);
+          }, function() {
+            this.tag(self.message);
+          })
         .end()
-        .startContext({ data: this})
+        .startContext({ data: this })
           .start().addClass('close-x').add(this.CLOSE).end()
         .endContext();
 
-        setTimeout(function() { self.remove(); }, 3900);
+        setTimeout(function() {
+          self.remove();
+        }, 3900);
     }
   ],
 

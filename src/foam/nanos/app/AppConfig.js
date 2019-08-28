@@ -41,7 +41,7 @@ foam.CLASS({
       value: 'FOAM Powered'
     },
     {
-      class:'String',
+      class: 'String',
       name: 'termsAndCondLabel',
       value: 'Terms and Conditions'
     },
