@@ -7,7 +7,9 @@
 foam.CLASS({
   package: 'foam.datetime',
   name: 'CronSchedule',
-  extends: 'foam.datetime.Schedule',
+  implements: [
+    'foam.datetime.Schedule'
+  ],
 
   javaImports: [
     'foam.dao.DAO',
