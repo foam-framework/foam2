@@ -47,7 +47,8 @@ foam.CLASS({
     },
     {
       class: 'DateTime',
-      name: 'lastUsed'
+      name: 'lastUsed',
+      storageTransient: true
     },
     {
       class: 'Long',
