@@ -27,6 +27,10 @@ public class SafetyUtil {
       if ( d1  < d2 ) return -1;
     }
 
+    if ( ! (o1 instanceof Comparable && o2 instanceof Comparable) ) return 0;
+    if ( ! (o2 instanceof Comparable) ) return 1;
+    if ( ! (o1 instanceof Comparable) ) return -1;
+
     return ((Comparable) o1).compareTo(o2);
   }
 
