@@ -459,7 +459,14 @@ var classes = [
   'foam.strategy.StrategyReference',
   'foam.strategy.StrategizerService',
   'foam.strategy.BasicStrategizer',
-  'foam.strategy.ClientStrategizerService'
+  'foam.strategy.ClientStrategizerService',
+
+  //foam.datetime
+  'foam.datetime.TimeHMS',
+  'foam.datetime.Schedule',
+  'foam.datetime.CronSchedule',
+  'foam.datetime.IntervalSchedule',
+  'foam.datetime.TimeOfDaySchedule'
 
 ];
 
