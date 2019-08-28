@@ -614,6 +614,13 @@ foam.CLASS({
       }
     },
     {
+      class: 'String',
+      name: 'unauthorizedTargetDAOKey',
+      documentation: `
+        Can be provided to use unauthorized local DAOs when the context user is the SYSTEM USER.
+      `
+    },
+    {
       name: 'adapt',
       value: function(oldValue, newValue, prop) {
         return prop.of.isInstance(newValue) ?

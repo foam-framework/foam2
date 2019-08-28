@@ -168,13 +168,6 @@ public class NanoRouter
       }
     }
 
-/*
-    if ( service instanceof WebAgent ) {
-      service = new WebAgentServlet((WebAgent) service);
-      informService(service, spec);
-    }
-    */
-
     if ( service instanceof WebAgent ) return (WebAgent) service;
 
     Logger logger = (Logger) getX().get("logger");
