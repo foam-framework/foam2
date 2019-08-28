@@ -93,18 +93,16 @@ return (foam.box.ExportBox)registration;
       swiftCode: function() {/*
 let name: String = name ?? UUID().uuidString
 
-var exportBox: foam_box_Box = SubBox_create([
-  "name": name,
-  "delegate": me
-])
-exportBox = service?.clientBox(exportBox) ?? exportBox
+var exportBox: foam_box_Box = foam_box_ExportBox()
+var subBox: foam_box_Box = foam_box_SubBox()
+(subBox as! foam_box_SubBox).name = name
+(subBox as! foam_box_SubBox).delegate = me as! foam_box_Box
 
-let registration = Registration_create([
-  "exportBox": exportBox,
-  "localBox": service?.serverBox(box) ?? box
-])
-registry_[name] = registration
-return registration.exportBox
+(exportBox as! foam_box_ExportBox).messengerBox = subBox
+(exportBox as! foam_box_ExportBox).localBox = box
+
+registry_[name] = exportBox
+return exportBox
       */},
       javaCode: `
 if ( name == null ) name = Integer.toString(foam.box.IdGenerator.nextId());
