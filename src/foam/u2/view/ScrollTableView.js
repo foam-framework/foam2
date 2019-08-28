@@ -24,6 +24,7 @@
     }
     ^table  .foam-u2-view-TableView-thead {
       z-index: 1;
+      overflow: visible;
     }
   `,
 
