@@ -58,6 +58,12 @@ foam.CLASS({
     },
     {
       class: 'Long',
+      name: 'ttl',
+      documentation: 'The "time to live" of the session. The amount of time in milliseconds that the session should be kept alive after its last use before being destroyed. A value of 0 or less signifies that the session should never be destroyed unless the user explicitly logs out.',
+      value: 28800000 // 1000 * 60 * 60 * 8 = number of milliseconds in 8 hours
+    },
+    {
+      class: 'Long',
       name: 'uses'
     },
     {
