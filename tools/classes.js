@@ -86,8 +86,6 @@ var classes = [
   'foam.nanos.app.AppConfig',
   'foam.nanos.app.ContextLookupAppConfigService',
   'foam.nanos.http.WebAgent',
-  'foam.nanos.hello.HelloService',
-  'foam.nanos.hello.ClientHelloService',
   'com.google.foam.demos.heroes.Hero',
   'com.google.auth.TokenVerifier',
   'foam.box.RemoteException',
@@ -492,7 +490,6 @@ var skeletons = [
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.push.PushService',
-  'foam.nanos.hello.HelloService',
   'foam.nanos.test.EchoService',
   'foam.strategy.StrategizerService'
 ];
