@@ -47,12 +47,6 @@ if ( nextTOD.getTimeInMillis() < now.getTimeInMillis() ) {
   nextTOD.add(Calendar.DATE, 1);
 }
 
-System.out.println("TIME OF DAY");
-System.out.println(nextTOD.getTimeInMillis());
-System.out.println(now.getTimeInMillis());
-// System.exit(1);
-try { Thread.sleep(7000); } catch (Throwable t) {}
-
 return nextTOD.getTime();
 `
     }
