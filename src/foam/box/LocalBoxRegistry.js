@@ -54,7 +54,7 @@ foam.CLASS({
       },
       swiftCode: function() {/*
 let name = name!
-if let exportBox = (registry_[name] as? Registration)?.exportBox {
+if let exportBox = registry_[name] as? foam_box_ExportBox {
   return exportBox
 }
 throw NoSuchNameException_create(["name": name])
