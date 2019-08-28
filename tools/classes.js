@@ -464,6 +464,7 @@ var classes = [
   //foam.datetime
   'foam.datetime.TimeHMS',
   'foam.datetime.Schedule',
+  'foam.datetime.OrSchedule',
   'foam.datetime.CronSchedule',
   'foam.datetime.IntervalSchedule',
   'foam.datetime.TimeOfDaySchedule'
