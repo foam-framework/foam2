@@ -8,7 +8,14 @@ foam.CLASS({
   package: 'foam.nanos.session',
   name: 'Session',
 
+  implements: [
+    'foam.nanos.auth.Authorizable'
+  ],
+
   javaImports: [
+    'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.User',
     'java.util.Date'
   ],
 
@@ -89,6 +96,55 @@ foam.CLASS({
           setLastUsed(new Date());
           setUses(getUses()+1);
         }
+      `
+    },
+    {
+      name: 'checkOwnership',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      type: 'Boolean',
+      javaCode: `
+        User user = (User) x.get("user");
+        return user != null && this.getUserId() == user.getId();
+      `
+    },
+    {
+      name: 'authorizeOnCreate',
+      javaCode: `
+      AuthService auth = (AuthService) x.get("auth");
+      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("create")) ) throw new AuthorizationException("You don't have permission to create this session.");
+      `
+    },
+    {
+      name: 'authorizeOnUpdate',
+      javaCode: `
+      AuthService auth = (AuthService) x.get("auth");
+      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("update")) ) throw new AuthorizationException("You don't have permission to update sessions other than your own.");
+      `
+    },
+    {
+      name: 'authorizeOnDelete',
+      javaCode: `
+      AuthService auth = (AuthService) x.get("auth");
+      if ( ! checkOwnership(x) && ! auth.check(x, "*") ) throw new AuthorizationException("You don't have permission to delete sessions other than your own.");
+      `
+    },
+    {
+      name: 'authorizeOnRead',
+      javaCode: `
+      AuthService auth = (AuthService) x.get("auth");
+      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("read")) ) throw new AuthorizationException("You don't have permission to view sessions other than your own.");
+      `
+    },
+    {
+      name: 'createPermission',
+      args: [
+        { name: 'operation', type: 'String' }
+      ],
+      type: 'String',
+      javaCode: `
+        return "session." + operation + "." + getId();
       `
     }
   ]
