@@ -10,7 +10,6 @@ import com.sun.nio.file.SensitivityWatchEventModifier;
 import foam.core.ContextAware;
 import foam.core.X;
 import foam.nanos.logger.Logger;
-import javafx.util.Pair;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -141,7 +140,7 @@ public class LiveScriptBundler implements WebAgent, ContextAware
 
             // Add this file if it was found inside a `src` folder
             if ( sourcePath != null ) {
-              filesPaths.add(new Pair<String, String>(
+              filesPaths.add(new Pair<>(
                 sourcePath.toString(), path.toString()
               ));
             }
@@ -380,5 +379,18 @@ public class LiveScriptBundler implements WebAgent, ContextAware
     else {
       logger.info(this.getClass().getSimpleName(), eventStr, msg);
     }
+  }
+
+  private class Pair<K,V> {
+    private K k;
+    private V v;
+
+    public Pair(K k, V v) {
+      this.k = k;
+      this.v = v;
+    }
+
+    public K getKey() { return k; }
+    public V getValue() { return v; }
   }
 }
