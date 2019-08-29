@@ -349,13 +349,15 @@ public class DigWebAgent
         }
 
         String[] fieldsArray = fields.split(",");
+//
+//        PropertyInfo pInfo = (PropertyInfo)cInfo.getAxiomByName(fields);
+//        foam.mlang.sink.GroupBy groupBy = (foam.mlang.sink.GroupBy) dao.select(MLang.GROUP_BY(pInfo, new foam.mlang.sink.Count()));
+//
+//        foam.dao.Sink[] seqSinkArray = { MLang.MIN(pInfo), MLang.MAX(pInfo), MLang.AVG(pInfo) };
+//        foam.mlang.sink.Sequence seq = (foam.mlang.sink.Sequence) dao.select(MLang.SEQ(seqSinkArray));
+//        foam.mlang.sink.Sum sum = (foam.mlang.sink.Sum) dao.select(MLang.SUM(pInfo));
 
-        PropertyInfo pInfo = (PropertyInfo)cInfo.getAxiomByName(fields);
-        foam.mlang.sink.GroupBy groupBy = (foam.mlang.sink.GroupBy) dao.select(MLang.GROUP_BY(pInfo, new foam.mlang.sink.Count()));
 
-        foam.dao.Sink[] seqSinkArray = { MLang.MIN(pInfo), MLang.MAX(pInfo), MLang.AVG(pInfo) };
-        foam.mlang.sink.Sequence seq = (foam.mlang.sink.Sequence) dao.select(MLang.SEQ(seqSinkArray));
-        foam.mlang.sink.Sum sum = (foam.mlang.sink.Sum) dao.select(MLang.SUM(pInfo));
 
         if ( sink != null ) {
           if ( sink.getArray().size() == 0 ) {
@@ -395,6 +397,7 @@ public class DigWebAgent
           } else if ( Format.CSV == format ) {
             CSVOutputter outputterCsv = new foam.lib.csv.CSVOutputterImpl.Builder(x)
              .setOf(cInfo)
+             .setFields(fieldsArray)
              .build();
 
             for ( Object o : sink.getArray() ) {

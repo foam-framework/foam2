@@ -38,11 +38,11 @@ public class SinkParser
       PropertyInfo pInfo = (PropertyInfo) prop;
 
       parsers.add(new LiteralIC(pInfo.getName()));
-//      parsers.add(new LiteralIC("min(" + pInfo.getName() + ")"));
-//      parsers.add(new LiteralIC("avg(" + pInfo.getName() + ")"));
-//      parsers.add(new LiteralIC("sum(" + pInfo.getName() + ")"));
-//      parsers.add(new LiteralIC("max(" + pInfo.getName() + ")"));
-//      parsers.add(new LiteralIC("count(" + pInfo.getName() + ")"));
+      parsers.add(new LiteralIC("min(" + pInfo.getName() + ")"));
+      parsers.add(new LiteralIC("avg(" + pInfo.getName() + ")"));
+      parsers.add(new LiteralIC("sum(" + pInfo.getName() + ")"));
+      parsers.add(new LiteralIC("max(" + pInfo.getName() + ")"));
+      parsers.add(new LiteralIC("count(" + pInfo.getName() + ")"));
     }
 
     return new Alt(parsers);
@@ -57,12 +57,13 @@ public class SinkParser
 //    }
 //
 //    if ( ps.value() == null ) {
-//      return ps;
+//      return ps.setValue(null);
 //    }
 //
 //    x = x.sub();
 //    //x.set("classInfo", info_);
 //
 //    //return super.parse(ps, x);
+//    return ps;
 //  }
 }
