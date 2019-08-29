@@ -93,16 +93,13 @@ return (foam.box.ExportBox)registration;
       swiftCode: function() {/*
 let name: String = name ?? UUID().uuidString
 
-var exportBox: foam_box_Box = foam_box_ExportBox()
-var subBox: foam_box_Box = foam_box_SubBox()
-(subBox as! foam_box_SubBox).name = name
-(subBox as! foam_box_SubBox).delegate = me as! foam_box_Box
-
-(exportBox as! foam_box_ExportBox).messengerBox = subBox
-(exportBox as! foam_box_ExportBox).localBox = box
-
-registry_[name] = exportBox
-return exportBox
+return foam_box_ExportBox([
+  "localBox": box,
+  "messengerBox": foam_box_SubBox([
+    "name": name,
+    "delegate": me
+  ], __context__)
+], __context__)
       */},
       javaCode: `
 if ( name == null ) name = Integer.toString(foam.box.IdGenerator.nextId());
@@ -111,13 +108,8 @@ foam.box.ExportBox exportBox = getX().create(foam.box.ExportBox.class);
 foam.box.SubBox subBox = getX().create(foam.box.SubBox.class);
 subBox.setName(name);
 subBox.setDelegate(getMe());
-ExportBox_create(args: [
-  "localBox": box,
-  "messengerBox": SubBox_create(args: [
-    "name": name,
-    "delegate": me
-  ])
-])
+exportBox.setMessengerBox(subBox);
+exportBox.setLocalBox(box);
 
 getRegistry_().put(name, exportBox);
 
