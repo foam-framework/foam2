@@ -289,9 +289,6 @@ public class LiveScriptBundler implements WebAgent, ContextAware
             }
             break;
           case STATE_FIND_NAME:
-            System.out.println("AAA");
-            System.out.println(line);
-            System.out.println(pos);
             if ( line.substring(pos).startsWith("name:") ) {
               pos += 5;
               state = STATE_EAT_NAME;
