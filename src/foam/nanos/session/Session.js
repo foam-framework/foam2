@@ -54,7 +54,8 @@ foam.CLASS({
     },
     {
       class: 'DateTime',
-      name: 'lastUsed'
+      name: 'lastUsed',
+      storageTransient: true
     },
     {
       class: 'Long',
@@ -64,7 +65,8 @@ foam.CLASS({
     },
     {
       class: 'Long',
-      name: 'uses'
+      name: 'uses',
+      storageTransient: true
     },
     {
       class: 'String',
