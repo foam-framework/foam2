@@ -65,7 +65,7 @@ foam.CLASS({
     },
     {
       class: 'Long',
-      name: 'uses'
+      name: 'uses',
       storageTransient: true
     },
     {
