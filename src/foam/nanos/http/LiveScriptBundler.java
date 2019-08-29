@@ -10,7 +10,6 @@ import com.sun.nio.file.SensitivityWatchEventModifier;
 import foam.core.ContextAware;
 import foam.core.X;
 import foam.nanos.logger.Logger;
-import javafx.util.Pair;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -114,7 +113,7 @@ public class LiveScriptBundler implements WebAgent, ContextAware
 
     try {
       // Create list of files.js locations
-      ArrayList<Pair<String, String>> filesPaths = new ArrayList<>();
+      ArrayList<PairSansJavafx<String, String>> filesPaths = new ArrayList<>();
 
       // Walk through the project directory to find files.js files
       Files.walkFileTree(Paths.get(path_), new SimpleFileVisitor<Path>() {
@@ -141,7 +140,7 @@ public class LiveScriptBundler implements WebAgent, ContextAware
 
             // Add this file if it was found inside a `src` folder
             if ( sourcePath != null ) {
-              filesPaths.add(new Pair<String, String>(
+              filesPaths.add(new PairSansJavafx<>(
                 sourcePath.toString(), path.toString()
               ));
             }
@@ -155,7 +154,7 @@ public class LiveScriptBundler implements WebAgent, ContextAware
       watcher_ = FileSystems.getDefault().newWatchService();
 
       // Read each files.js file
-      for ( Pair<String,String> currentFilesPath : filesPaths ) {
+      for ( PairSansJavafx<String,String> currentFilesPath : filesPaths ) {
         BufferedReader filesJsReader = new BufferedReader(
           new FileReader(
             Paths.get(currentFilesPath.getValue()).toString())
@@ -383,5 +382,18 @@ public class LiveScriptBundler implements WebAgent, ContextAware
     else {
       logger.info(this.getClass().getSimpleName(), eventStr, msg);
     }
+  }
+
+  private class PairSansJavafx<K,V> {
+    private K k;
+    private V v;
+
+    public PairSansJavafx(K k, V v) {
+      this.k = k;
+      this.v = v;
+    }
+
+    public K getKey() { return k; }
+    public V getValue() { return v; }
   }
 }
