@@ -111,8 +111,13 @@ foam.box.ExportBox exportBox = getX().create(foam.box.ExportBox.class);
 foam.box.SubBox subBox = getX().create(foam.box.SubBox.class);
 subBox.setName(name);
 subBox.setDelegate(getMe());
-exportBox.setMessengerBox(subBox);
-exportBox.setLocalBox(box);
+ExportBox_create(args: [
+  "localBox": box,
+  "messengerBox": SubBox_create(args: [
+    "name": name,
+    "delegate": me
+  ])
+])
 
 getRegistry_().put(name, exportBox);
 
