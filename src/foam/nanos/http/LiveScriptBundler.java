@@ -113,7 +113,7 @@ public class LiveScriptBundler implements WebAgent, ContextAware
 
     try {
       // Create list of files.js locations
-      ArrayList<PairSansJavafx<String, String>> filesPaths = new ArrayList<>();
+      ArrayList<Pair<String, String>> filesPaths = new ArrayList<>();
 
       // Walk through the project directory to find files.js files
       Files.walkFileTree(Paths.get(path_), new SimpleFileVisitor<Path>() {
@@ -140,7 +140,7 @@ public class LiveScriptBundler implements WebAgent, ContextAware
 
             // Add this file if it was found inside a `src` folder
             if ( sourcePath != null ) {
-              filesPaths.add(new PairSansJavafx<>(
+              filesPaths.add(new Pair<>(
                 sourcePath.toString(), path.toString()
               ));
             }
@@ -154,7 +154,7 @@ public class LiveScriptBundler implements WebAgent, ContextAware
       watcher_ = FileSystems.getDefault().newWatchService();
 
       // Read each files.js file
-      for ( PairSansJavafx<String,String> currentFilesPath : filesPaths ) {
+      for ( Pair<String,String> currentFilesPath : filesPaths ) {
         BufferedReader filesJsReader = new BufferedReader(
           new FileReader(
             Paths.get(currentFilesPath.getValue()).toString())
@@ -384,11 +384,11 @@ public class LiveScriptBundler implements WebAgent, ContextAware
     }
   }
 
-  private class PairSansJavafx<K,V> {
+  private class Pair<K,V> {
     private K k;
     private V v;
 
-    public PairSansJavafx(K k, V v) {
+    public Pair(K k, V v) {
       this.k = k;
       this.v = v;
     }
