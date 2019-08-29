@@ -331,7 +331,7 @@
         if ( delta > 0.01 ) {
           var canvasContainer = (document.getElementsByClassName('net-nanopay-account-ui-AccountTreeView-canvas-container'))[0];
 
-          this.width = Math.min(width, canvasContainer.clientWidth);
+          this.width = Math.max(width, canvasContainer.clientWidth);
           this.doLayout();
         }
        }
