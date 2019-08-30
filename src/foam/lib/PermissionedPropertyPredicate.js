@@ -5,7 +5,7 @@ foam.CLASS({
   javaImports: [
     'foam.nanos.auth.AuthService'
   ],
-
+  
   methods: [
     {
       name: 'propertyPredicateCheck',
@@ -18,17 +18,7 @@ if ( prop.getPermissionRequired() ) {
 
 return true;
 `
-    },
-    {
-      name: 'propertyPredicateCheckForFields',
-      javaCode: `
-String[] fields_ = fields.split(",");
-      for ( int i = 0; i < fields_.length; i++ ) {
-         if ( fields_[i].equals(prop.getName()) )
-          return true;
-      }
-      return false;
-`
     }
   ]
 });
+  

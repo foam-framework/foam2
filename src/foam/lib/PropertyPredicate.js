@@ -20,28 +20,7 @@ foam.INTERFACE({
           javaType: 'foam.core.PropertyInfo'
         }
       ]
-    },
-    {
-      name: 'propertyPredicateCheckForFields',
-      type: 'Boolean',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'of',
-          type: 'String'
-        },
-        {
-          name: 'prop',
-          javaType: 'foam.core.PropertyInfo'
-        },
-        {
-          name: 'fields',
-          javaType: 'String'
-        }
-      ]
     }
   ]
 });
+  

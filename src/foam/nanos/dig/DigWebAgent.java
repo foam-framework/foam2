@@ -15,7 +15,6 @@ import foam.lib.json.JSONParser;
 import foam.lib.json.OutputterMode;
 import foam.lib.json.Outputter;
 import foam.lib.AndPropertyPredicate;
-import foam.lib.FieldsPropertyPredicate;
 import foam.lib.NetworkPropertyPredicate;
 import foam.lib.parse.*;
 import foam.lib.PermissionedPropertyPredicate;
@@ -371,10 +370,10 @@ public class DigWebAgent
           logger.debug(this.getClass().getSimpleName(), "objects selected: " + sink.getArray().size());
 
           if ( Format.JSON == format ) {
-            Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate(), new FieldsPropertyPredicate()}));
+            Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate()}));
             outputterJson.setOutputDefaultValues(true);
             outputterJson.setOutputClassNames(true);
-            outputterJson.setFields(fields);
+            outputterJson.setFields(fieldsArray);
             outputterJson.output(sink.getArray().toArray());
 
             //resp.setContentType("application/json");
@@ -385,6 +384,7 @@ public class DigWebAgent
             }
           } else if ( Format.XML == format ) {
             foam.lib.xml.Outputter outputterXml = new foam.lib.xml.Outputter(OutputterMode.NETWORK);
+            outputterXml.setFields(fieldsArray);
             outputterXml.output(sink.getArray().toArray());
 
             resp.setContentType("application/xml");
@@ -412,6 +412,7 @@ public class DigWebAgent
           } else if ( Format.HTML == format ) {
             foam.lib.html.Outputter outputterHtml = new foam.lib.html.Outputter(OutputterMode.NETWORK);
 
+            outputterHtml.setFields(fieldsArray);
             outputterHtml.outputStartHtml();
             outputterHtml.outputStartTable();
             List a = sink.getArray();

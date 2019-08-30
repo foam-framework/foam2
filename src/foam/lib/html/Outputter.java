@@ -43,6 +43,7 @@ public class Outputter
   protected OutputterMode      mode_;
   protected boolean            outputHeaders_;
   protected boolean            isHeadersOutput_ = false;
+  protected String[]           fields_       = null;
 
   public Outputter() {
     this(OutputterMode.FULL);
@@ -127,13 +128,14 @@ public class Outputter
       if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
 
       //outputHead(prop);
+      if ( fields_ != null && checkFieldsProperty(prop) ) {
+        Object value = prop.get(obj);
+        if (value == null) continue;
 
-      Object value = prop.get(obj);
-      if ( value == null ) continue;
-
-      writer_.append("<td>");
-      writer_.append(prop.get((Object)obj).toString());
-      writer_.append("</td>");
+        writer_.append("<td>");
+        writer_.append(prop.get((Object) obj).toString());
+        writer_.append("</td>");
+      }
     }
     writer_.append("</tr>");
 
@@ -161,9 +163,11 @@ public class Outputter
     writer_.append("<thead><tr>");
     List<PropertyInfo> prop = info.getAxiomsByClass(PropertyInfo.class);
     for( PropertyInfo pi : prop ) {
-      writer_.append("<th>");
-      writer_.append(pi.getName());
-      writer_.append("</th>");
+      if ( checkFieldsProperty(pi) ) {
+        writer_.append("<th>");
+        writer_.append(pi.getName());
+        writer_.append("</th>");
+      }
     }
     writer_.append("</tr></thead>");
   }
@@ -202,5 +206,19 @@ public class Outputter
   public void flush() throws IOException {
     if ( stringWriter_ != null ) stringWriter_.flush();
     if ( writer_ != null ) writer_.flush();
+  }
+
+  public Outputter setFields(String[] fields) {
+    fields_ = fields;
+
+    return this;
+  }
+
+  public boolean checkFieldsProperty(PropertyInfo prop) {
+    for ( int i = 0; i < fields_.length; i++ ) {
+      if ( fields_[i].equals(prop.getName()) )
+        return true;
+    }
+    return false;
   }
 }

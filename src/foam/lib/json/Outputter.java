@@ -45,7 +45,7 @@ public class Outputter
   protected boolean       outputReadableDates_ = true;
   protected PropertyPredicate propertyPredicate_;
   protected Map<String, List<PropertyInfo>> propertyMap_ = new HashMap<>();
-  protected String      fields_ = null;
+  protected String[]      fields_ = null;
 
 
   public Outputter(foam.core.X x) {
@@ -278,7 +278,7 @@ public class Outputter
       while ( e.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) e.next();
         if ( propertyPredicate_ == null || propertyPredicate_.propertyPredicateCheck(this.x_, of.toLowerCase(), prop) ) {
-          if ( propertyPredicate_.propertyPredicateCheckForFields(this.x_, of.toLowerCase(), prop, fields_) )
+          if ( fields_ != null && checkFieldsProperty(prop) )
             filteredAxioms.add(prop);
         }
       }
@@ -459,9 +459,18 @@ public class Outputter
     if ( writer_ != null ) writer_.flush();
   }
 
-  public Outputter setFields(String fields) {
+  public Outputter setFields(String[] fields) {
     fields_ = fields;
 
     return this;
+  }
+
+  public boolean checkFieldsProperty(foam.core.PropertyInfo prop) {
+    for ( int i = 0; i < fields_.length; i++ ) {
+      if ( fields_[i].equals(prop.getName()) )
+        return true;
+    }
+    return false;
+
   }
 }
