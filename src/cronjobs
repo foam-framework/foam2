@@ -24,3 +24,4 @@ x.get("pmHourlyDAO").removeAll();
 x.get("logger").info(new String[] {"Daily PM Reduce Complete"});
   """
 })
+p({"class":"foam.nanos.cron.Cron","enabled":true,"id":"expireSessionsCron","description":"Expire sessions every minute based on ttl","scheduled":false,"code":"import foam.nanos.session.cron.ExpireSessionsCron;\ncron = new ExpireSessionsCron();\ncron.execute(x);\nprint(\"done\");"})
