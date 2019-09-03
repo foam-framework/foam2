@@ -40,6 +40,7 @@ foam.CLASS({
 Calendar now = Calendar.getInstance();
 now.setTime(from);
 Calendar nextTOD = Calendar.getInstance();
+nextTOD.setTime(from);
 
 // Zero milliseconds
 nextTOD.set(Calendar.MILLISECOND, 0);
