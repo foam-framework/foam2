@@ -641,40 +641,51 @@ foam.CLASS({
   methods: [
     function buildMethodInfoInitializer(cls) {
       // Add MethodInfo field for each method
-      initializerString = 'new foam.core.SimpleMethodInfo(){\n';
-      // Implement getName
-      initializerString += '@Override\npublic String getName(){ return \"' + this.name + '\";}\n\n';
+      initializerString = `new foam.core.SimpleMethodInfo(){
+        @Override
+        public String getName(){
+          return \"${this.name}\";
+        }
 
-      // Implement call method
-      initializerString += '@Override\npublic Object call(foam.core.X x, Object receiver, Object[] args){\n';
+        @Override
+        public Object call(foam.core.X x, Object receiver, Object[] args){
+      `;
       // See if call needs try catch block
       var exceptions = this.javaThrows.length > 0;
-      if ( exceptions ) initializerString += 'try{\n';
+      if ( exceptions ) initializerString += `    try {
+        `;
 
-      if( this.javaType != 'void' ) initializerString += 'return ';
+      if ( this.javaType != 'void' ) initializerString += '    return ';
       // Use ((typeCast)receiver).methodName() to call method because of rare collisions between inner and outer class method names
-      initializerString += '((' + cls.name + ')receiver).' + this.name + '(';
+      initializerString += `    ((${cls.name})receiver).${this.name}(`;
       argsString = '';
       for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
         if ( this.args[i].javaType )
-          argsString += '(' + this.args[i].javaType.replace('...', '[]').replace('final ', '') + ')(' + 'args[' + i + '])';
+          argsString += '(' + this.args[i].javaType.replace('...', '[]').replace('final ', '') + `)(args[${ i }])`;
         else if ( this.args[i].type )
-          argsString += '(' + this.args[i].type.replace('...', '[]').replace('final ', '') + ')(' + 'args[' + i + '])';
+          argsString += '(' + this.args[i].type.replace('...', '[]').replace('final ', '') + `)(args[${ i }])`;
         else if ( this.args[i].class )
-          argsString += '(' + this.args[i].class.replace('...', '[]').replace('final ', '') + ')(' + 'args[' + i + '])';
+          argsString += '(' + this.args[i].class.replace('...', '[]').replace('final ', '') + `)(args[${ i }])`;
         else
           continue;
         if ( i != this.args.length - 1 ) argsString += ', ';
       }
       initializerString += argsString + ');\n';
-      if( this.javaType == 'void' ) initializerString += 'return null;\n';
+      if( this.javaType == 'void' ) initializerString += '            return null;\n';
 
       // Close try block
-      if ( exceptions ) { initializerString += `}\ncatch (java.lang.Exception e)
-        {\n foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get(\"logger\");
-        \n logger.error(e.getMessage());\n return null;}` }
+      if ( exceptions ) { initializerString += `          }
+         catch (java.lang.Exception e) {
+           foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get(\"logger\");
+           logger.error(e.getMessage());
+           return null;
+         }
+        `
+      }
 
-      initializerString += '}\n}\n';
+      initializerString += `}
+      }
+      `;
       return initializerString;
     },
 
