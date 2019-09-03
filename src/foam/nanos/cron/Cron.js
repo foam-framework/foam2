@@ -30,7 +30,7 @@ foam.CLASS({
   properties: [
     {
       class: 'FObjectProperty',
-      of: 'foam.datetime.Schedule',
+      of: 'foam.nanos.cron.Schedule',
       name: 'schedule'
     },
     {
