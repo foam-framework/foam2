@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -113,7 +113,7 @@ while ( next.get(Calendar.YEAR) < 3000 ) {
     next.set(Calendar.SECOND, 0);
     continue;
   }
-  if( getSecond() >= 0 && next.get(Calendar.SECOND) != getSecond()) {
+  if( getSecond() >= 0 && next.get(Calendar.SECOND) != getSecond() ) {
     next.add(Calendar.SECOND, 1);
     continue;
   }
