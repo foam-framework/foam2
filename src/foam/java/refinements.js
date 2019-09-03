@@ -641,7 +641,7 @@ foam.CLASS({
   methods: [
     function buildMethodInfoInitializer(cls) {
       // Add MethodInfo field for each method
-      initializerString = `new foam.core.SimpleMethodInfo(){
+      initializerString = `new foam.core.MethodInfo(){
         @Override
         public String getName(){
           return \"${this.name}\";
@@ -719,7 +719,7 @@ foam.CLASS({
         name: methodInfoName,
         visibility: 'public',
         static: true,
-        type: 'foam.core.SimpleMethodInfo',
+        type: 'foam.core.MethodInfo',
         initializer: initializerString,
         order: 0,
       });
