@@ -294,6 +294,12 @@ var classes = [
   'foam.nanos.script.TestRunnerScript',
   'foam.nanos.test.Test',
   'foam.nanos.cron.Cron',
+  'foam.nanos.cron.TimeHMS',
+  'foam.nanos.cron.Schedule',
+  'foam.nanos.cron.OrSchedule',
+  'foam.nanos.cron.CronSchedule',
+  'foam.nanos.cron.IntervalSchedule',
+  'foam.nanos.cron.TimeOfDaySchedule',
   'foam.dao.history.PropertyUpdate',
   'foam.dao.history.HistoryRecord',
   'foam.dao.FixedSizeDAO',
@@ -460,16 +466,7 @@ var classes = [
   'foam.strategy.StrategyReference',
   'foam.strategy.StrategizerService',
   'foam.strategy.BasicStrategizer',
-  'foam.strategy.ClientStrategizerService',
-
-  //foam.datetime
-  'foam.datetime.TimeHMS',
-  'foam.datetime.Schedule',
-  'foam.datetime.OrSchedule',
-  'foam.datetime.CronSchedule',
-  'foam.datetime.IntervalSchedule',
-  'foam.datetime.TimeOfDaySchedule'
-
+  'foam.strategy.ClientStrategizerService'
 ];
 
 var abstractClasses = [

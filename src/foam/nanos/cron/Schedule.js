@@ -5,7 +5,7 @@
  */
 
 foam.INTERFACE({
-  package: 'foam.datetime',
+  package: 'foam.nanos.cron',
   name: 'Schedule',
   abstract: true,
 

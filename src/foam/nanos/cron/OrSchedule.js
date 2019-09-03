@@ -5,11 +5,11 @@
  */
 
 foam.CLASS({
-  package: 'foam.datetime',
+  package: 'foam.nanos.cron',
   name: 'OrSchedule',
 
   implements: [
-    'foam.datetime.Schedule'
+    'foam.nanos.cron.Schedule'
   ],
 
   javaImports: [
@@ -20,7 +20,7 @@ foam.CLASS({
     {
       name: 'delegates',
       class: 'FObjectArray',
-      of: 'foam.datetime.Schedule'
+      of: 'foam.nanos.cron.Schedule'
     }
   ],
 

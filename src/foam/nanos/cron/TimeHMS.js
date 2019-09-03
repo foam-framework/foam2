@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.datetime',
+  package: 'foam.nanos.cron',
   name: 'TimeHMS',
 
   properties: [

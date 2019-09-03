@@ -5,10 +5,10 @@
  */
 
 foam.CLASS({
-  package: 'foam.datetime',
+  package: 'foam.nanos.cron',
   name: 'IntervalSchedule',
   implements: [
-    'foam.datetime.Schedule'
+    'foam.nanos.cron.Schedule'
   ],
 
   javaImports: [
@@ -19,7 +19,7 @@ foam.CLASS({
   properties: [
     {
       class: 'FObjectProperty',
-      of: 'foam.datetime.TimeHMS',
+      of: 'foam.nanos.cron.TimeHMS',
       name: 'duration'
     },
     {

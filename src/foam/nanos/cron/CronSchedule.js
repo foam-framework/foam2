@@ -5,10 +5,10 @@
  */
 
 foam.CLASS({
-  package: 'foam.datetime',
+  package: 'foam.nanos.cron',
   name: 'CronSchedule',
   implements: [
-    'foam.datetime.Schedule'
+    'foam.nanos.cron.Schedule'
   ],
 
   javaImports: [
