@@ -11,16 +11,9 @@ public interface MethodInfo extends Axiom {
   public ClassInfo getClassInfo();
   public MethodInfo setClassInfo(ClassInfo p);
 
-  public String getName();
-  public void setName(String name);
-
-  public Object get(Object obj);
-  public void set(Object obj, Object value);
-
-  public boolean getPermissionRequired();
-  public void authorize(foam.core.X x);
+//  public boolean getPermissionRequired();
+//  public void authorize(foam.core.X x);
 
   public Object call(foam.core.X x, Object receiver, Object[] args);
 
-  public String toString();
 }
