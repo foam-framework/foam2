@@ -300,6 +300,7 @@ var classes = [
   'foam.nanos.cron.CronSchedule',
   'foam.nanos.cron.IntervalSchedule',
   'foam.nanos.cron.TimeOfDaySchedule',
+  'foam.nanos.cron.test.IntervalScheduleTest',
   'foam.dao.history.PropertyUpdate',
   'foam.dao.history.HistoryRecord',
   'foam.dao.FixedSizeDAO',
