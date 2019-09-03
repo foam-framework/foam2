@@ -119,7 +119,9 @@ setScheduledTime(getNextScheduledTime());`
       javaCode:
 `
 if ( getSchedule() != null ) {
-  return getSchedule().getNextScheduledTime();
+  return getSchedule().getNextScheduledTime(
+    new Date(System.currentTimeMillis())
+  );
 }
 
 Calendar next = Calendar.getInstance();

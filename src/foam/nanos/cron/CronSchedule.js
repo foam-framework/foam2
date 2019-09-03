@@ -76,9 +76,16 @@ foam.CLASS({
   methods: [
     {
       name: 'getNextScheduledTime',
+      args: [
+        {
+          name: 'from',
+          type: 'java.util.Date'
+        }
+      ],
       type: 'Date',
       javaCode:
 `Calendar next = Calendar.getInstance();
+next.setTime(from);
 next.add(Calendar.SECOND, 1);
 next.set(Calendar.MILLISECOND, 0);
 

@@ -16,6 +16,16 @@ foam.INTERFACE({
   methods: [
     {
       name: 'getNextScheduledTime',
+      args: [
+        {
+          name: 'from',
+          type: 'java.util.Date',
+          documentation: `
+            Date to calculate next scheduled time from.
+            This is typically the current date and time.
+          `
+        }
+      ],
       type: 'DateTime'
     }
   ]
