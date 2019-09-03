@@ -32,7 +32,7 @@ foam.CLASS({
       name: 'generateTokenWithParameters',
       javaCode:
 `try {
-DAO tokenDAO = (DAO) getX().get("tokenDAO");
+DAO tokenDAO = (DAO) getX().get("localTokenDAO");
 DAO userDAO  = (DAO) getX().get("localUserDAO");
 AppConfig appConfig = (AppConfig) getX().get("appConfig");
 String url = appConfig.getUrl()
@@ -62,7 +62,7 @@ return true;
       name: 'processToken',
       javaCode:
 `DAO userDAO = (DAO) getX().get("localUserDAO");
-DAO tokenDAO = (DAO) getX().get("tokenDAO");
+DAO tokenDAO = (DAO) getX().get("localTokenDAO");
 Calendar calendar = Calendar.getInstance();
 
 Sink sink = new ArraySink();
