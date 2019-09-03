@@ -14,8 +14,6 @@ foam.CLASS({
   javaImports: [
     'foam.dao.DAO',
     'foam.nanos.notification.Notification',
-    'foam.lib.parse.*',
-    'foam.parsers.unix.CronUnitParser',
     'foam.util.SafetyUtil',
     'java.util.Calendar',
     'java.util.concurrent.atomic.AtomicBoolean',
