@@ -55,7 +55,7 @@
          if ( ! c ) return;
          c.expanded = ! c.expanded;
          
-         if ( ! c.expanded ) {
+         if ( ! c.expanded && c.childNodes ) {
            for ( var i = 0 ; i < c.childNodes.length ; i++ ) {
              c.childNodes[i].y = this.nodeHeight * 2;
              c.childNodes[i].x = 0;
