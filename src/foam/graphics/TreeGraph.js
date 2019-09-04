@@ -56,7 +56,7 @@
          
          if ( ! c.expanded ) {
            for ( var i = 0 ; i < c.childNodes.length ; i++ ) {
-             c.childNodes[i].y = this.nodeHeight;
+             c.childNodes[i].y = this.nodeHeight * 2;
              c.childNodes[i].x = 0;
            }
            c.maxLeft = c.maxRight = 0;
@@ -66,11 +66,7 @@
      },
 
      function doLayout() {
-       if ( this.root ) { 
-        this.root.layout();
-        this.root.doLayout();
-      }
-       this.invalidate();
+       if ( this.root && this.root.layout() ) this.invalidate();
      }
    ],
 
@@ -302,39 +298,43 @@
 
    listeners: [
      {
+       name: 'doLayout',
+       isMerged: true,
+       mergeDelay: 1,
+       code: function() {
+          if ( this.root && this.root.layout() ) {
+            this.invalidate();
+            this.doLayout();
+          } else {
+            this.updateCWidth();
+          }
+        }
+     },
+     {
        name: 'updateCWidth',
        isFramed: true,
        code: function() {
-        const maxes = {
-          maxLeft: 0,
-          maxRight: 0
-        };
-          
-        function traverseAndCompare(root) {
-          if ( root.maxLeft < maxes.maxLeft ) maxes.maxLeft = root.maxLeft;
-          if ( root.maxRight > maxes.maxRight ) maxes.maxRight = root.maxRight;
+         const maxes  = {
+           maxLeft: Number.MAX_SAFE_INTEGER,
+           maxRight: Number.MIN_SAFE_INTEGER
+         }
+        
+         this.root.outline.forEach(level => {
+           maxes.maxLeft = Math.min(level.left, maxes.maxLeft);
+           maxes.maxRight = Math.max(level.right, maxes.maxRight);
+         })
 
-          for ( var i = 0; i < root.children.length; i++ ){
-            traverseAndCompare(root.children[i]);
-          }
-        }
+         debugger;
 
-        traverseAndCompare(this.root);
+         var width = Math.abs(maxes.maxLeft - maxes.maxRight);
+         var delta = Math.abs(this.width - width) / width;
 
-        // needed to use the adjustments to width in order to account for proper fitting on the screen
-        // since by default with out it, the leftmost node and right most node get cutoff by half
-        // padding adjustments are there to proper spacing and also for the edge connectors to 
-        // fully render
-        var width = Math.abs(maxes.maxLeft - maxes.maxRight) + this.nodeWidth + this.padding * 4;
-        var delta = Math.abs(this.width - width) / width;
-
-        if ( delta > 0.01 ) {
-          var canvasContainer = (document.getElementsByClassName('net-nanopay-account-ui-AccountTreeView-canvas-container'))[0];
-
-          this.width = Math.max(width, canvasContainer ? canvasContainer.clientWidth : width);
-          this.doLayout();
-        }
-       }
+         if ( delta > 0.01 ) {
+           var canvasContainer = (document.getElementsByClassName('net-nanopay-account-ui-AccountTreeView-canvas-container'))[0];
+ 
+           this.width = Math.max(width, canvasContainer ? canvasContainer.clientWidth : width);
+         }
+      }   
      }
    ]
  });
