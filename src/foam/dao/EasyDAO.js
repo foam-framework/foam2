@@ -54,6 +54,10 @@ foam.CLASS({
       flags: ['js'],
     },
     {
+      path: 'foam.dao.RequestResponseCachingDAO',
+      flags: ['js'],
+    },
+    {
       name: 'JDAOJava',
       path: 'foam.dao.java.JDAO',
       flags: ['java'],
@@ -235,6 +239,11 @@ if ( getPm() ) {
 
 return delegate;
 `
+    },
+    {
+      class: 'Boolean',
+      name: 'requestResponseCaching',
+      flags: ['js']
     },
     {
       class: 'Object',
@@ -743,6 +752,10 @@ return delegate;
             });
           })
         });
+      }
+
+      if ( this.requestResponseCaching ) {
+        dao = this.RequestResponseCachingDAO.create({delegate: dao});
       }
 
       this.delegate = dao;
