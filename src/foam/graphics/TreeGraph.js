@@ -310,7 +310,7 @@
             this.invalidate();
             this.doLayout();
           } else {
-            console.log(Date.now() - this.time)
+            // console.log(Date.now() - this.time)
             this.time = null;
             this.updateCWidth();
           }
