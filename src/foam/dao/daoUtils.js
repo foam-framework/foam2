@@ -119,7 +119,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'ttl',
-      value: 1000
+      value: 60000
     }
   ]
 });

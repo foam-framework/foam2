@@ -42,7 +42,7 @@
        this.SUPER();
 
        if ( this.data ) {
-        this.root = this.Node.create({y: this.nodeHeight, data: this.data});
+        this.root = this.Node.create({x: 0, y: this.nodeHeight, data: this.data});
         this.add(this.root);
         this.doLayout();
        }
@@ -333,20 +333,20 @@
          var width = Math.abs(maxes.maxLeft - maxes.maxRight);
          var delta = Math.abs(this.width - width) / width;
 
-         debugger;
          if ( delta > 0.01 ) {
            var canvasContainer = (document.getElementsByClassName('net-nanopay-account-ui-AccountTreeView-canvas-container'))[0];
  
            this.width = Math.max(width, canvasContainer ? canvasContainer.clientWidth : width);
 
-           this.root.outline.forEach(level => {
-            if ( level.left < 0 ) {
-              this.root.x -= level.left;
-            }
-            // if ( level.right > this.width ) {
-            //   this.root.x -= (level.right - this.width);
-            // }
-          })
+           var rootOutline = this.root.outline;
+
+           for ( var i = 0; i < rootOutline.length; i++ ){
+             var currLevel = rootOutline[i];
+             if ( currLevel.left < 0 ){
+               this.root.x -= currLevel.left;
+               break;
+             }
+           }
          }
       }   
      }

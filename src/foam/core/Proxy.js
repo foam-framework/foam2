@@ -571,7 +571,7 @@ foam.CLASS({
             if ( ! cache[key] ) {
               cache[key] = delegate[m.name].apply(delegate, arguments);
               prop.setTimeout(() => {
-                console.log('purge', key);
+                //console.log('purge', key);
                 delete cache[key]
               }, this[prop.ttlProp]);
             } else {
