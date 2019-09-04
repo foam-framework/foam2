@@ -326,7 +326,7 @@ class SwiftTestsTests: XCTestCase {
 
     var dispatched = false
     DispatchQueue(label: "TestDispatch").async {
-      let msg = try? rpcBox.promise.get() as! String
+      let msg = try? rpcBox.promise.get() as? String
       dispatched = true
       XCTAssertEqual(msg, "Hello there")
       sem.signal()

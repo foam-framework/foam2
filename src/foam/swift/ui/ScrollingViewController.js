@@ -70,7 +70,7 @@ class VC_: UIViewController {
       metrics: nil,
       views: views))
     view.addConstraint(NSLayoutConstraint(
-      item: innerView,
+      item: innerView!,
       attribute: .width,
       relatedBy: .equal,
       toItem: view,
@@ -78,7 +78,7 @@ class VC_: UIViewController {
       multiplier: 1,
       constant: 0))
     view.addConstraint(NSLayoutConstraint(
-      item: innerView,
+      item: innerView!,
       attribute: .left,
       relatedBy: .equal,
       toItem: view,

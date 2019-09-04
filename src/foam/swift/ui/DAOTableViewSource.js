@@ -135,7 +135,7 @@ class SimpleRowView: UITableViewCell {
     self.view = view
     super.init(style: style, reuseIdentifier: reuseIdentifier)
 
-    var viewMap: [String:UIView] = ["v":view]
+    let viewMap: [String:UIView] = ["v":view]
     for v in viewMap.values {
       v.translatesAutoresizingMaskIntoConstraints = false
       addSubview(v)
