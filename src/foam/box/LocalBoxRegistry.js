@@ -90,17 +90,18 @@ return (foam.box.ExportBox)registration;
         return box;
       },
       swiftSynchronized: true,
-      swiftCode: function() {/*
+      swiftCode: `
 let name: String = name ?? UUID().uuidString
-
-return ExportBox_create([
+let box = ExportBox_create([
   "localBox": box,
   "messengerBox": SubBox_create([
     "name": name,
     "delegate": me
   ])
 ])
-      */},
+registry_[name] = box
+return box
+      `,
       javaCode: `
 if ( name == null ) name = Integer.toString(foam.box.IdGenerator.nextId());
 
