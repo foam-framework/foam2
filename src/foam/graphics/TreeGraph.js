@@ -33,7 +33,8 @@
      {
        name: 'formatNode',
        value: function() {}
-     }
+     },
+     'time'
    ],
 
    methods: [
@@ -41,7 +42,7 @@
        this.SUPER();
 
        if ( this.data ) {
-        this.root = this.Node.create({x:500, y: 50, data: this.data});
+        this.root = this.Node.create({y: this.nodeHeight, data: this.data});
         this.add(this.root);
         this.doLayout();
        }
@@ -302,10 +303,15 @@
        isMerged: true,
        mergeDelay: 1,
        code: function() {
+         if ( ! this.time ) {
+           this.time = Date.now();
+         }
           if ( this.root && this.root.layout() ) {
             this.invalidate();
             this.doLayout();
           } else {
+            console.log(Date.now() - this.time)
+            this.time = null;
             this.updateCWidth();
           }
         }
@@ -324,15 +330,23 @@
            maxes.maxRight = Math.max(level.right, maxes.maxRight);
          })
 
-         debugger;
-
          var width = Math.abs(maxes.maxLeft - maxes.maxRight);
          var delta = Math.abs(this.width - width) / width;
 
+         debugger;
          if ( delta > 0.01 ) {
            var canvasContainer = (document.getElementsByClassName('net-nanopay-account-ui-AccountTreeView-canvas-container'))[0];
  
            this.width = Math.max(width, canvasContainer ? canvasContainer.clientWidth : width);
+
+           this.root.outline.forEach(level => {
+            if ( level.left < 0 ) {
+              this.root.x -= level.left;
+            }
+            // if ( level.right > this.width ) {
+            //   this.root.x -= (level.right - this.width);
+            // }
+          })
          }
       }   
      }
