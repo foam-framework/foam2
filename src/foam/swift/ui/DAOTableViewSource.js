@@ -110,7 +110,7 @@ onDAOUpdate()
       name: 'onDAOUpdate',
       isMerged: true,
       swiftCode: function() {/*
-let sink = ((try? dao!.select(ArraySink_create()) as? foam_dao_ArraySink) as foam_dao_ArraySink??)
+let sink = try? dao!.select(ArraySink_create()) as? foam_dao_ArraySink
 daoContents = sink??.array ?? []
 tableView?.reloadData()
       */},

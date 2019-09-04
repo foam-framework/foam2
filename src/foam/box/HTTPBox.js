@@ -218,7 +218,7 @@ let task = URLSession.shared.dataTask(with: request) { data, response, error in
     }
     try replyBox?.send(obj)
   } catch let e {
-    ((try? replyBox?.send(self.__context__.create(foam_box_Message.self, args: ["object": e])!)) as ()??)
+    try? replyBox?.send(self.__context__.create(foam_box_Message.self, args: ["object": e])!)
   }
 }
 task.resume()
