@@ -7,10 +7,10 @@
 foam.INTERFACE({
   package: 'foam.nanos.cron',
   name: 'Schedule',
-  abstract: true,
 
   documentation: `
-    Schedule for tasks which have a start time and no specified end time.
+    Schedule models a time-based trigger;
+    for example: the schedule for a periodic task.
   `,
 
   methods: [
