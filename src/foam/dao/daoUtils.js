@@ -105,6 +105,25 @@ public ProxyDAO(foam.core.X x, foam.dao.DAO delegate) {
   ],
 });
 
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'RequestResponseCachingDAO',
+  extends: 'foam.dao.ProxyDAO',
+  properties: [
+    {
+      class: 'RequestResponseCache',
+      of: 'foam.dao.DAO',
+      name: 'cache',
+      methods: [ 'find_', 'select_' ],
+    },
+    {
+      class: 'Int',
+      name: 'ttl',
+      value: 1000
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.dao',

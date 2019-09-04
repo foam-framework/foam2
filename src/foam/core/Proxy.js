@@ -510,3 +510,78 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'RequestResponseCache',
+  extends: 'foam.core.Map',
+  imports: [
+    'setTimeout'
+  ],
+  requires: [
+    'foam.core.Method',
+  ],
+  properties: [
+    {
+      class: 'Class',
+      name: 'of',
+      required: true
+    },
+    {
+      class: 'String',
+      name: 'ttlProp',
+      value: 'ttl'
+    },
+    {
+      class: 'String',
+      name: 'delegateProp',
+      value: 'delegate'
+    },
+    {
+      class: 'StringArray',
+      name: 'methods',
+      factory: null,
+      expression: function(of) {
+        return of.getAxiomsByClass(this.Method).map(m => m.name);
+      }
+    }
+  ],
+  methods: [
+    function installInClass(cls) {
+      this.SUPER(cls);
+
+      var prop = this;
+
+      var axioms = this.methods
+        .map(m => this.of.getAxiomByName(m))
+        .map(m => this.Method.create(m))
+        .map(m => m.copyFrom({
+          code: function() {
+            var key = foam.json.stringify({
+              method: m.name,
+              args: m.args.reduce((array, value, index) => {
+                if ( value.type != 'Context' ) {
+                  array.push(arguments[index])
+                }
+                return array;
+              }, [])
+            });
+            var cache = this[prop.name];
+            var delegate = this[prop.delegateProp];
+            if ( ! cache[key] ) {
+              cache[key] = delegate[m.name].apply(delegate, arguments);
+              prop.setTimeout(() => {
+                console.log('purge', key);
+                delete cache[key]
+              }, this[prop.ttlProp]);
+            } else {
+              console.log('hit', key);
+            }
+            return cache[key];
+          }
+        }));
+
+      cls.installAxioms(axioms);
+    }
+  ]
+});
