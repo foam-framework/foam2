@@ -57,17 +57,17 @@ let pDao = self.PromisedDAO_create(["of": self.of])
 DispatchQueue.global(qos: .background).async {
   try? cache.removeAll()
   let sink = self.DAOSink_create(["dao": cache])
-  _ = try? src.select(sink)
+  _ = ((try? src.select(sink)) as foam_dao_Sink??)
   let listenSub = try! src.listen(sink, nil)
 
-  _ = try? src.listen(self.FnSink_create([
+  _ = ((try? src.listen(self.FnSink_create([
     "fn": { [weak self] str, obj, sub in
       if str != "reset" { return }
       listenSub?.detach()
       sub?.detach()
       self?.clearProperty("delegate")
     } as (String?, Any?, ${foam.core.Detachable.model_.swiftName}?) -> Void,
-  ]), nil)
+  ]), nil)) as foam_core_Detachable??)
 
   pDao.promise = cache
 }

@@ -42,7 +42,7 @@ newValue.setTitle(self.action?.label, for: .normal)
 if dismissKeyboardOnTap {
   UIApplication.shared.keyWindow?.rootViewController?.view.endEditing(true)
 }
-if fobj != nil { _ = try? action?.call(fobj!) }
+if fobj != nil { _ = ((try? action?.call(fobj!)) as Any??) }
       */},
       swiftAnnotations: ['@objc'],
     },

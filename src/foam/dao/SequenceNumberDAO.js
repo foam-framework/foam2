@@ -43,7 +43,7 @@ foam.CLASS({
       swiftExpressionArgs: ['delegate', 'property_', 'startingValue'],
       swiftExpression: `
         let max = self.Max_create(["arg1": property_])
-        _ = try? delegate.select(max)
+        _ = ((try? delegate.select(max)) as foam_dao_Sink??)
         let v = max.value is Int ? (max.value as! Int) + 1 : 1
         return v >= startingValue ? v : startingValue
       `,

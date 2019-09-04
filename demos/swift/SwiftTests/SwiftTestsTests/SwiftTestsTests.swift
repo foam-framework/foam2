@@ -198,7 +198,7 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertEqual(sink.value, 1)
 
     detach?.detach()
-    _ = (try? dao.put(somepackage_Test(["firstName": "C"])))
+    _ = (((try? dao.put(somepackage_Test(["firstName": "C"]))) as foam_core_FObject??))
     XCTAssertEqual(sink.value, 1)
   }
 
@@ -208,7 +208,7 @@ class SwiftTestsTests: XCTestCase {
     ])
 
     for i in 1...10 {
-      _ = (try? dao.put(somepackage_Test(["firstName": i])))
+      _ = (((try? dao.put(somepackage_Test(["firstName": i]))) as foam_core_FObject??))
     }
 
     let sink = (try? dao.skip(2)!.limit(5)!.select())!
@@ -413,7 +413,7 @@ class SwiftTestsTests: XCTestCase {
       let box = try clientBoxRegistry.doLookup("TestBox")
       XCTAssertNotNil(box)
       XCTAssertTrue(registeredBox === box)
-      try? box?.send(foam_box_Message(["object": "HELLO"]))
+      ((try? box?.send(foam_box_Message(["object": "HELLO"]))) as ()??)
       XCTAssertEqual(testBox.o as? String, "HELLO")
     } catch {
       fatalError()
@@ -525,8 +525,8 @@ class SwiftTestsTests: XCTestCase {
     let pDao = x.create(foam_dao_PromisedDAO.self)!
 
     DispatchQueue.global(qos: .background).async {
-      _ = try? dao.put(self.x.create(somepackage_Test.self, args: ["firstName": "A"])!)
-      _ = try? dao.put(self.x.create(somepackage_Test.self, args: ["firstName": "B"])!)
+      _ = ((try? dao.put(self.x.create(somepackage_Test.self, args: ["firstName": "A"])!)) as foam_core_FObject??)
+      _ = ((try? dao.put(self.x.create(somepackage_Test.self, args: ["firstName": "B"])!)) as foam_core_FObject??)
       pDao.promise = dao
     }
 
@@ -571,19 +571,19 @@ class SwiftTestsTests: XCTestCase {
       "src": src,
     ])!
 
-    _ = try? dao.put(x.create(somepackage_Test.self, args: ["firstName": "1"])!)
+    _ = ((try? dao.put(x.create(somepackage_Test.self, args: ["firstName": "1"])!)) as foam_core_FObject??)
 
     try XCTAssertEqual((dao.select(x.create(foam_mlang_sink_Count.self)!) as? foam_mlang_sink_Count)?.value, 1)
     try XCTAssertEqual((src.select(x.create(foam_mlang_sink_Count.self)!) as? foam_mlang_sink_Count)?.value, 1)
     try XCTAssertEqual((cache.select(x.create(foam_mlang_sink_Count.self)!) as? foam_mlang_sink_Count)?.value, 1)
 
-    _ = try? src.put(x.create(somepackage_Test.self, args: ["firstName": "2"])!)
+    _ = ((try? src.put(x.create(somepackage_Test.self, args: ["firstName": "2"])!)) as foam_core_FObject??)
 
     try XCTAssertEqual((dao.select(x.create(foam_mlang_sink_Count.self)!) as? foam_mlang_sink_Count)?.value, 2)
     try XCTAssertEqual((src.select(x.create(foam_mlang_sink_Count.self)!) as? foam_mlang_sink_Count)?.value, 2)
     try XCTAssertEqual((cache.select(x.create(foam_mlang_sink_Count.self)!) as? foam_mlang_sink_Count)?.value, 2)
 
-    _ = try? cache.put(x.create(somepackage_Test.self, args: ["firstName": "3"])!)
+    _ = ((try? cache.put(x.create(somepackage_Test.self, args: ["firstName": "3"])!)) as foam_core_FObject??)
 
     try XCTAssertEqual((dao.select(x.create(foam_mlang_sink_Count.self)!) as? foam_mlang_sink_Count)?.value, 3)
     try XCTAssertEqual((src.select(x.create(foam_mlang_sink_Count.self)!) as? foam_mlang_sink_Count)?.value, 2)
@@ -794,18 +794,18 @@ class SwiftTestsTests: XCTestCase {
     let dao = x.create(foam_swift_dao_ArrayDAO.self, args: [
       "of": somepackage_Test.classInfo(),
     ])!
-    _ = try? dao.put(somepackage_Test([
+    _ = ((try? dao.put(somepackage_Test([
       "firstName": "Joe1",
       "lastName": "Bob",
-    ]))
-    _ = try? dao.put(somepackage_Test([
+    ]))) as foam_core_FObject??)
+    _ = ((try? dao.put(somepackage_Test([
       "firstName": "Joe3",
       "lastName": "Bob",
-    ]))
-    _ = try? dao.put(somepackage_Test([
+    ]))) as foam_core_FObject??)
+    _ = ((try? dao.put(somepackage_Test([
       "firstName": "Joe2",
       "lastName": "Bob",
-    ]))
+    ]))) as foam_core_FObject??)
 
     var a = try! dao.orderBy(somepackage_Test.FIRST_NAME())!.select()
     XCTAssertEqual((a.array[0] as! somepackage_Test).firstName, "Joe1")

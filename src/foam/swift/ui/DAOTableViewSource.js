@@ -38,7 +38,7 @@ if newValue == nil { return }
 
 let findIndex = { (o: foam_core_FObject) -> Int? in
   let id = o.get(key: "id")
-  return self.daoContents.index(where: { (o) -> Bool in
+  return self.daoContents.firstIndex(where: { (o) -> Bool in
     let o = o as! foam_core_FObject
     return FOAM_utils.equals(id, o.get(key: "id"))
   })
@@ -110,7 +110,7 @@ onDAOUpdate()
       name: 'onDAOUpdate',
       isMerged: true,
       swiftCode: function() {/*
-let sink = try? dao!.select(ArraySink_create()) as? foam_dao_ArraySink
+let sink = ((try? dao!.select(ArraySink_create()) as? foam_dao_ArraySink) as foam_dao_ArraySink??)
 daoContents = sink??.array ?? []
 tableView?.reloadData()
       */},
@@ -131,7 +131,7 @@ public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPat
 
 class SimpleRowView: UITableViewCell {
   let view: UIView
-  init(view: UIView, style: UITableViewCellStyle, reuseIdentifier: String?) {
+  init(view: UIView, style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     self.view = view
     super.init(style: style, reuseIdentifier: reuseIdentifier)
 

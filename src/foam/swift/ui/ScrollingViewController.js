@@ -66,7 +66,7 @@ class VC_: UIViewController {
 
     view.addConstraints(NSLayoutConstraint.constraints(
       withVisualFormat: "V:|-[v]-|",
-      options: NSLayoutFormatOptions.init(rawValue: 0),
+      options: NSLayoutConstraint.FormatOptions.init(rawValue: 0),
       metrics: nil,
       views: views))
     view.addConstraint(NSLayoutConstraint(
@@ -88,12 +88,12 @@ class VC_: UIViewController {
 
     view.addConstraints(NSLayoutConstraint.constraints(
       withVisualFormat: "H:|[sv]|",
-      options: NSLayoutFormatOptions.init(rawValue: 0),
+      options: NSLayoutConstraint.FormatOptions.init(rawValue: 0),
       metrics: nil,
       views: views))
     view.addConstraints(NSLayoutConstraint.constraints(
       withVisualFormat: "V:|[sv]|",
-      options: NSLayoutFormatOptions.init(rawValue: 0),
+      options: NSLayoutConstraint.FormatOptions.init(rawValue: 0),
       metrics: nil,
       views: views))
   }
@@ -111,22 +111,22 @@ class VC_: UIViewController {
   override func viewDidAppear(_ animated: Bool) {
     view.addGestureRecognizer(tap)
     onKeyboardFrameChangeObserver = NotificationCenter.default.addObserver(
-      forName: NSNotification.Name.UIKeyboardDidChangeFrame,
+      forName: UIResponder.keyboardDidChangeFrameNotification,
       object: nil,
       queue: nil) { (n) in
         if !self.keyboardShown { return }
-        let kbSize: CGSize = (n.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? CGRect)?.size ?? CGSize()
+        let kbSize: CGSize = (n.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? CGRect)?.size ?? CGSize()
         self.scrollView.contentInset.bottom = kbSize.height
         self.scrollView.scrollIndicatorInsets.bottom = kbSize.height
     }
     onKeyboardShownObserver = NotificationCenter.default.addObserver(
-      forName: NSNotification.Name.UIKeyboardWillShow,
+      forName: UIResponder.keyboardWillShowNotification,
       object: nil,
       queue: nil) { (n) in
         self.keyboardShown = true
     }
     onKeyboardHiddenObserver = NotificationCenter.default.addObserver(
-      forName: NSNotification.Name.UIKeyboardDidHide,
+      forName: UIResponder.keyboardDidHideNotification,
       object: nil,
       queue: nil) { (n) in
         self.keyboardShown = false
