@@ -8,6 +8,13 @@ foam.CLASS({
   package: 'foam.nanos.cron',
   name: 'TimeOfDaySchedule',
 
+  documentation: `
+    Schedule every day at a specific time.
+
+    For example, to run a task at midnight:
+    { time: { hour: 0, minute: 0, second: 0 } }
+  `,
+
   implements: [
     'foam.nanos.cron.Schedule'
   ],

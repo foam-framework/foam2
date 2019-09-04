@@ -8,6 +8,11 @@ foam.CLASS({
   package: 'foam.nanos.cron',
   name: 'TimeHMS',
 
+  documentation: `
+    Models a a time or duration in 24-hour notation.
+    Does not model a date.
+  `,
+
   properties: [
     { name: 'hour',   class: 'Int' },
     { name: 'minute', class: 'Int' },

@@ -8,6 +8,10 @@ foam.CLASS({
   package: 'foam.nanos.cron',
   name: 'OrSchedule',
 
+  documentation: `
+    Schedule to pick the nearest time from a number of delegate schedules.
+  `,
+
   implements: [
     'foam.nanos.cron.Schedule'
   ],

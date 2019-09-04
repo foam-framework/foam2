@@ -7,6 +7,15 @@
 foam.CLASS({
   package: 'foam.nanos.cron',
   name: 'IntervalSchedule',
+
+  documentation: `
+    Schedule periodically with a time duration (hours, minutes, seconds).
+
+    For example, to run a task every 90 minutes:
+    { start: "1970-01-01",
+      duration: { hour: 1, minute: 30 , second: 0 } }
+  `,
+
   implements: [
     'foam.nanos.cron.Schedule'
   ],

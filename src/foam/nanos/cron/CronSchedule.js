@@ -20,13 +20,9 @@ foam.CLASS({
     'java.util.concurrent.atomic.AtomicBoolean'
   ],
 
-  documentation: 'FOAM class that models a Cron script',
-
-  tableColumns: [
-    'id', 'enabled', 'server', 'description', 'lastDuration', 'status', 'run'
-  ],
-
-  searchColumns: ['id', 'description'],
+  documentation: `
+    Schedule for periodic tasks. Prefer IntervalSchedule unless dayOfWeek is required.
+  `,
 
   properties: [
     {
