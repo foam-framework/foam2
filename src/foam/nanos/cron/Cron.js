@@ -13,10 +13,9 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
-    'foam.util.SafetyUtil',
     'foam.nanos.notification.Notification',
-    'java.util.Date',
-    'java.util.Calendar'
+    'foam.util.SafetyUtil',
+    'java.util.Date'
   ],
 
   documentation: 'FOAM class that models a Cron script',
