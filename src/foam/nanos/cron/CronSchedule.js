@@ -16,8 +16,8 @@ foam.CLASS({
     'foam.nanos.notification.Notification',
     'foam.util.SafetyUtil',
     'java.util.Calendar',
-    'java.util.concurrent.atomic.AtomicBoolean',
-    'java.util.Date'
+    'java.util.Date',
+    'java.util.concurrent.atomic.AtomicBoolean'
   ],
 
   documentation: 'FOAM class that models a Cron script',

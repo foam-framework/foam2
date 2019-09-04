@@ -13,8 +13,8 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'java.util.Date',
-    'java.util.Calendar'
+    'java.util.Calendar',
+    'java.util.Date'
   ],
 
   properties: [
