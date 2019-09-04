@@ -661,15 +661,15 @@ public class BasicTopic: Topic {
   var map_: [String:Topic] = [:]
 
   public func hasListeners(_ args: [Any] = []) -> Bool {
-    return parent_.hasListeners([name_] + args)
+    return parent_.hasListeners([name_!] + args)
   }
 
   public func sub(topics: [String] = [], listener l: @escaping Listener) -> Subscription {
-    return parent_.sub(topics: [name_] + topics, listener: l)
+    return parent_.sub(topics: [name_!] + topics, listener: l)
   }
 
   public func pub(_ args: [Any?]) -> Int {
-    return parent_.pub([name_] + args)
+    return parent_.pub([name_!] + args)
   }
 
   subscript(key: String) -> Topic {
