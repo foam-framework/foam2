@@ -27,9 +27,12 @@ foam.CLASS({
   ],
 
   css: `
-  ^ {
-
-  }
+    ^container-filter {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
   `,
 
   properties: [
@@ -85,7 +88,7 @@ foam.CLASS({
         .add(this.slot(function(filters) {
           self.show(filters.length);
 
-          var e = this.E();
+          var e = this.E().addClass(self.myClass('container-filter'));
           e.onDetach(this.searchManager);
           e.forEach(filters, function(f) {
             var axiom = self.dao.of.getAxiomByName(f);

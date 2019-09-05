@@ -26,10 +26,12 @@ foam.CLASS({
 
   css: `
     ^ {
-      position: relative;
-
-      display: inline-block;
+      margin: 8px 0;
       margin-left: 32px;
+    }
+
+    ^:first-child {
+      margin-left: 0;
     }
 
     ^container-property {

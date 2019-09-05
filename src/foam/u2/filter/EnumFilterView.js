@@ -54,12 +54,27 @@ foam.CLASS({
 
     ^container-option {
       display: flex;
+      align-items: center;
       padding: 4px 16px;
     }
 
     ^container-option:hover {
       cursor: pointer;
       background-color: #f5f7fa;
+    }
+
+    ^container-option .foam-u2-md-CheckBox-label {
+      position: relative;
+      margin-top: 0;
+    }
+
+    ^container-option .foam-u2-md-CheckBox {
+      border-color: #9ba1a6;
+    }
+
+    ^container-option .foam-u2-md-CheckBox:checked {
+      background-color: #406dea;
+      border-color: #406dea;
     }
   `,
 
@@ -171,7 +186,7 @@ foam.CLASS({
                     .start().addClass(self.myClass('container-option'))
                       .on('click', () => self.deselectOption(index))
                       .start({
-                        class: 'foam.u2.CheckBox',
+                        class: 'foam.u2.md.CheckBox',
                         data: true,
                         showLabel: true,
                         label: label
@@ -193,7 +208,7 @@ foam.CLASS({
                     .start().addClass(self.myClass('container-option'))
                       .on('click', () => self.selectOption(index))
                       .start({
-                        class: 'foam.u2.CheckBox',
+                        class: 'foam.u2.md.CheckBox',
                         data: false,
                         showLabel: true,
                         label: label
