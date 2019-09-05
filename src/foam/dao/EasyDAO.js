@@ -118,9 +118,10 @@ foam.CLASS({
 Logger logger = (Logger) getX().get("logger");
 
 foam.dao.DAO delegate = getInnerDAO();
-
+foam.dao.DAO pxy = delegate;
 foam.dao.DAO head = delegate;
 while( head instanceof foam.dao.ProxyDAO ) {
+  pxy = head;
   head = ( (ProxyDAO) head).getDelegate();
 }
 if ( head instanceof foam.dao.MDAO ) {
@@ -128,6 +129,11 @@ if ( head instanceof foam.dao.MDAO ) {
   if ( getIndex() != null &&
        getIndex().length > 0 ) {
     getMdao().addIndex(getIndex());
+  }
+  if ( getFixedSizeDAO() &&
+       pxy instanceof foam.dao.ProxyDAO ) {
+    foam.dao.DAO fixedSizeDAO = new foam.dao.FixedSizeDAO.Builder(getX()).setFixedDAOSize(getFixedSizeDAOSize()).setDelegate(head).build();
+    ((foam.dao.ProxyDAO)pxy).setDelegate(fixedSizeDAO);
   }
 }
 
@@ -521,6 +527,16 @@ return delegate;
       name: 'lastModifiedByAware',
       class: 'Boolean',
       value: false
+    },
+    {
+      name: 'fixedSizeDAO',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'fixedSizeDAOSize',
+      class: 'Int',
+      value: 10000
     }
  ],
 

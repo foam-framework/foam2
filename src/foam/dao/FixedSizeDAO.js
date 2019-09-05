@@ -82,7 +82,11 @@ foam.CLASS({
   } finally {
     getLock().unlock();
   }
+  foam.core.FObject discard = getFixedSizeArray()[insertAt];
   getFixedSizeArray()[insertAt] = delegatedObject;
+  if ( discard != null ) {
+    getDelegate().remove_(x, discard);
+  }
   return delegatedObject;
   `
     },
