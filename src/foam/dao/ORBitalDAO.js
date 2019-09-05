@@ -29,7 +29,7 @@ foam.CLASS({
       type: 'Object',
 
       args: [
-        { name: 'x' , type: 'foam.core.X'}, { name: 'obj' , type: 'Object' }
+        { name: 'x' , type: 'foam.core.X'}, { name: 'obj' , type: 'FObject' }
       ],
 
       javaCode: `
@@ -44,8 +44,7 @@ foam.CLASS({
             String receiverID = request.getReceiverObjectID();
 
             // Get the receiving object
-            Object robj = request.getReceiverObject();
-            FObject receiverFObj = ( robj != null && robj instanceof FObject )? (FObject) robj : null;
+            FObject receiverFObj = request.getReceiverObject();
             receiverFObj =  ( receiverFObj == null && receiverID != null )? (FObject) x.get(receiverID) : null;
 
             if ( receiverFObj != null ) {

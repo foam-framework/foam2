@@ -17,7 +17,7 @@ foam.CLASS({
   properties: [
     {
       name: 'receiverObject',
-      class: 'Object',  // Note: It is better to set it to FObject but When set to FObject, the property is not generated
+      class: 'FObjectProperty',
       documentation: 'receiverObject can be the ID of the Object or a direct reference to it.'
     },
     {
