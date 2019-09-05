@@ -30,7 +30,10 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.cron.Schedule',
-      name: 'schedule'
+      name: 'schedule',
+      factory: `
+        return new NeverSchedule.Builder().build();
+      `
     },
     {
       class: 'DateTime',
