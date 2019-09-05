@@ -132,7 +132,29 @@ foam.CLASS({
       class: 'String',
       name: 'password',
       value: null
-    }
+    },
+    {
+      class: 'DateTime',
+      name: 'startTime'
+    },
+    {
+      class: 'Int',
+      name: 'emailsSent',
+      value: 0
+    }    
+  ],
+
+  constants: [
+    {
+      name: 'WINDOW',
+      value: 1000,
+      type: 'Integer'
+    },
+    {
+      name: 'MAXIMUM_PER_WINDOW',
+      value: 10,
+      type: 'Integer'
+    },
   ],
 
   methods: [
@@ -210,12 +232,36 @@ foam.CLASS({
       `
     },
     {
+      name: 'passedWindow',
+      javaType: 'Boolean',
+      javaCode: `
+        return (new Date()).getTime() - getStartTime().getTime() > WINDOW;
+      `
+    },
+    {
+      name: 'windowMaximumReached',
+      javaType: 'Boolean',
+      javaCode: `
+        return getEmailsSent() < MAXIMUM_PER_WINDOW;
+      `
+    },
+    {
       name: 'sendEmail',
       javaCode: `
         emailMessage = (EmailMessage) emailMessage.fclone();
         MimeMessage message = createMimeMessage(emailMessage);
         Logger logger = (Logger) getX().get("logger");
         try {
+          if ( ! isPropertySet("startTime") ) {
+            setStartTime(new Date());
+            logger.log("SMTP start timer");
+          }
+          if ( windowMaximumReached() ) {
+            while ( ! passedWindow() ) {}
+            setStartTime(new Date());
+            logger.log("SMTP start timer");
+          }
+          setEmailsSent(getEmailsSent() + 1);
           getTransport_().send(message);
           emailMessage.setStatus(Status.SENT);
           logger.debug("SMTPEmailService sent MimeMessage.");
