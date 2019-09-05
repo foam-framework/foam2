@@ -29,6 +29,11 @@ foam.CLASS({
       value: 20
     },
     {
+      class: 'Map',
+      name: 'viewPortPosition',
+      value: { x: 0, y: 0 }
+    },
+    {
       class: 'Float',
       name: 'navSize',
       value: 0.2
@@ -52,19 +57,6 @@ foam.CLASS({
         return navSize * Math.min(width / view$width, height / view$height);
       });
 
-      var viewPort = this.Box.create({
-        clip: true,
-        height$: this.slot(function(view$height, scale) {
-          return view$height * scale;
-        }),
-        width$: this.slot(function(view$width, scale) {
-          return view$width * scale;
-        }),
-        scaleX$: this.scale$,
-        scaleY$: this.scale$,
-      });
-      viewPort.add(this.view);
-
       var navContainer = this.Box.create({
         borderWidth$: this.viewBorderWidth$,
         border$: this.navBorder$,
@@ -80,7 +72,30 @@ foam.CLASS({
         border$: this.viewBorder$,
         height$: this.slot(function(height, scale) { return height / scale }),
         width$: this.slot(function(width, scale) { return width / scale }),
-      })
+      });
+      navViewPort.x$ = this.slot(function(pos, viewScale, navViewPortWidth, viewWidth) {
+        return Math.min(
+          Math.max(0, pos.x / viewScale - navViewPortWidth / 2),
+          viewWidth - navViewPortWidth
+        )
+      }, this.viewPortPosition$, viewScale$, navViewPort.width$, this.view$.dot('width'));
+      navViewPort.y$ = this.slot(function(pos, viewScale, navViewPortHeight, viewHeight) {
+        return Math.min(
+          Math.max(0, pos.y / viewScale - navViewPortHeight / 2),
+          viewHeight - navViewPortHeight
+        )
+      }, this.viewPortPosition$, viewScale$, navViewPort.height$, this.view$.dot('height'));
+
+      var viewPort = this.Box.create({
+        clip: true,
+        height$: this.view$.dot('height'),
+        width$: this.view$.dot('width'),
+        scaleX$: this.scale$,
+        scaleY$: this.scale$,
+        x$: this.slot((x, s) => -x * s, navViewPort.x$, this.scale$),
+        y$: this.slot((y, s) => -y * s, navViewPort.y$, this.scale$)
+      });
+      viewPort.add(this.view);
       
       navContainer.add(this.view);
       navContainer.add(navViewPort);
@@ -88,17 +103,7 @@ foam.CLASS({
       var drag = false;
       var moveViewPort = e => {
         if ( ! drag ) return;
-        navViewPort.x = Math.min(
-          Math.max(0, e.offsetX / viewScale$.get() - navViewPort.width / 2),
-          this.view.width - navViewPort.width
-        );
-        navViewPort.y = Math.min(
-          Math.max(0, e.offsetY / viewScale$.get() - navViewPort.height / 2),
-          this.view.height - navViewPort.height
-        );
-
-        viewPort.x = - navViewPort.x * this.scale;
-        viewPort.y = - navViewPort.y * this.scale;
+        this.viewPortPosition = { x: e.offsetX, y: e.offsetY };
       };
       this.canvas.on('mousedown', e => {
         var p = {
@@ -150,8 +155,8 @@ foam.CLASS({
         var hex = Math.floor(Math.random() * parseInt('FFFFFF', 16)).toString(16).padStart(6, '0')
         return '#' + hex;
       }
-      var width = 500;
-      var height = 1000;
+      var width = 10000;
+      var height = 10000;
       var scale = 0.2;
       var view = this.Box.create({
         x: 0,
@@ -179,7 +184,7 @@ foam.CLASS({
         view: view,
         height: 1000,
         width: 1500,
-        scale: 10,
+        scale: 1,
       });
       this
         .add(cview)
