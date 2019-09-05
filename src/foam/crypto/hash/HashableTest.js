@@ -21,22 +21,22 @@ foam.CLASS({
       javaCode: `
         User input = new User.Builder(x)
           .setId(1000)
-          .setFirstName("Kirk")
-          .setLastName("Eaton")
-          .setEmail("kirk@nanopay.net")
+          .setFirstName("Foam")
+          .setLastName("Test")
+          .setEmail("test@foam.net")
           .build();
 
         // non-chained hash with correct digest
         Hashable_HashWithValidAlgorithm(input, "MD5",
-            "182c7575cbf3066c4cb3a6dcc85c730d");
+            "6a6e70ca62d7e0afbde550202cf27bae");
         Hashable_HashWithValidAlgorithm(input, "SHA-1",
-            "86a6073caf28fa9d825f63aa25796329cc078c6a");
+            "8ff96b7d123909fe97ecbdfc40059f43d06cb52a");
         Hashable_HashWithValidAlgorithm(input, "SHA-256",
-            "52f96255f38ea9f675b24bf9def2be4d0cafde0708a69d80ffbe4729ba8d7bb9");
+            "9d4aa9f2ed968ba8a1b16bfbc4242a4d9f64df358ca11be051fd80c322c2ffff");
         Hashable_HashWithValidAlgorithm(input, "SHA-384",
-            "3bff0582ca5bb5a02744af846616d4d077e016eb5d247577277c2b1f7dd23458091ee8109cabc3df945515f1c510ecf9");
+            "fd6d5cbb17477742f4b4680d0d5f17940d7c180d56313d6570947f1674e2f0f04c9721e5af0383192d9e6dde7690e0b4");
         Hashable_HashWithValidAlgorithm(input, "SHA-512",
-            "f66eb6c7a08da83c3ab86f79e2a01958b4d07f6fe82251dfef8b0100e570781ae50a21146cc1a1d58116959d1620dfa1d0f6b5fcf4b8fc230c810f548d145db4");
+            "1d033a412e9db056510d5a5421bcb576e4feb9a9b7dba88e5c90ab396cb2e4f31028d7e00a8c0422b683de7ba2f309b7a898e9b761817f7e674670710f8ea5b6");
 
         // hashing same objects produces same digest
         Hashable_HashingSameObjects_ProducesSameDigest(input, input,

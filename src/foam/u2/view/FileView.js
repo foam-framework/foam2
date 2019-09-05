@@ -23,7 +23,14 @@ foam.CLASS({
       this.setNodeName('span')
         .start('input').attrs({ type: 'file' }).on('change', this.onChange).end()
         .add(this.slot(function(data) {
-          return ! data ? this.E('span') : this.E('a').attrs({ href: data.address }).add('Download');
+          return ! data ? this.E('span') : this.E('a')
+            .attrs({
+              href: data.data && data.data.blob ?
+                URL.createObjectURL(data.data.blob) :
+                data.address,
+              target: '_blank'
+            })
+            .add('Download');
         }, this.data$));
     }
   ],

@@ -49,6 +49,7 @@ var classes = [
   'foam.mlang.predicate.Keyword',
   'foam.mlang.predicate.IsInstanceOf',
   'foam.mlang.predicate.IsClassOf',
+  'foam.mlang.predicate.DotF',
   'foam.mlang.sink.Count',
   'foam.mlang.sink.GroupBy',
   'foam.mlang.F',
@@ -230,8 +231,8 @@ var classes = [
   'foam.nanos.session.Session',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.om.OMLogger',
+  'foam.nanos.pm.NullPM',
   'foam.nanos.pm.PM',
-  'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',
@@ -304,7 +305,7 @@ var classes = [
   'foam.u2.DisplayMode',
   'foam.u2.Visibility',
   'foam.nanos.export.ExportDriverRegistry',
-  'foam.dao.pg.ConnectionPool',
+  'foam.dao.jdbc.ConnectionPool',
   'foam.lib.Outputter',
   'foam.lib.PropertyPredicate',
   'foam.lib.PermissionedPropertyPredicate',
@@ -313,6 +314,7 @@ var classes = [
   'foam.lib.AndPropertyPredicate',
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
+  'foam.lib.parse.BlobPStream',
   'foam.lib.json.OutputJSON',
   'foam.lib.json.OutputterMode',
   'foam.lib.json.UnknownFObject',
@@ -333,6 +335,10 @@ var classes = [
   'foam.nanos.geocode.GoogleMapsGeocodeResult',
   'foam.nanos.geocode.GoogleMapsGeometry',
   'foam.nanos.geocode.GoogleMapsBoundary',
+  'foam.nanos.geocode.GoogleMapsAddressParser',
+  'foam.nanos.geocode.GoogleMapsPlacesPredictions',
+  'foam.nanos.geocode.GoogleMapsPlacesResponse',
+  'foam.nanos.geocode.GoogleMapsCredentials',
 
   'foam.nanos.demo.DemoObject',
   'foam.nanos.demo.relationship.Student',
@@ -381,6 +387,7 @@ var classes = [
   'foam.nanos.dig.exception.UnsupportException',
   'foam.nanos.dig.exception.UnknownIdException',
   'foam.nanos.dig.exception.DigSuccessMessage',
+  'foam.nanos.dig.exception.AuthorizationException',
   'foam.flow.Document',
   'foam.flow.DocumentationFolderDAO',
 
@@ -427,6 +434,12 @@ var classes = [
   // Themes
   'foam.nanos.theme.Theme',
 
+  //SQL JBDC Support
+  'foam.dao.jdbc.JDBCConnectionSpec',
+  'foam.dao.jdbc.TestDataForJDBC',
+  'foam.dao.jdbc.TestCompany',
+  'foam.dao.jdbc.TestEmployee',
+
   // Crunch
   'foam.nanos.crunch.crunchtest.FakeTestObject',
   //models
@@ -442,7 +455,13 @@ var classes = [
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
-  
+
+  // Strategy
+  'foam.strategy.StrategyReference',
+  'foam.strategy.StrategizerService',
+  'foam.strategy.BasicStrategizer',
+  'foam.strategy.ClientStrategizerService'
+
 ];
 
 var abstractClasses = [
@@ -463,7 +482,8 @@ var skeletons = [
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.push.PushService',
-  'foam.nanos.test.EchoService'
+  'foam.nanos.test.EchoService',
+  'foam.strategy.StrategizerService'
 ];
 
 var proxies = [
@@ -479,7 +499,8 @@ var proxies = [
   'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.http.WebAgent',
   'foam.nanos.notification.email.EmailService',
-  'foam.nanos.notification.push.PushService'
+  'foam.nanos.notification.push.PushService',
+  'foam.strategy.StrategizerService'
 ];
 
 var blacklist = [

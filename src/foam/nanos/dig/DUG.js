@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.dig',
   name: 'DUG',
 
-  documentation: 'Data Update Gateway - DAO subscription notifcation service',
+  documentation: 'Data Update Gateway - DAO subscription notification service',
 
   javaImports: [
     'foam.dao.DAO',

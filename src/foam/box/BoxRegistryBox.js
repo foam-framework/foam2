@@ -66,9 +66,9 @@ let msg = msg!
 if let object = msg.object as? foam_box_SubBoxMessage {
   let name = object.name
 
-  if let reg = registry_[name] as? Registration {
+  if let reg = registry_[name] as? foam_box_ExportBox {
     msg.object = object.object;
-    try reg.localBox.send(msg);
+    try reg.send(msg);
   } else {
     if let errorBox = msg.attributes["errorBox"] as? foam_box_Box {
       try errorBox.send(

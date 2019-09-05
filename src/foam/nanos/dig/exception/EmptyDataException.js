@@ -30,4 +30,4 @@ foam.CLASS({
       value: 'PUT|POST expecting data, non received.'
     }
   ]
-})
+});
