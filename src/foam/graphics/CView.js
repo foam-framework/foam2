@@ -843,6 +843,10 @@ foam.CLASS({
     {
       name: 'border',
       value: '#000000'
+    },
+    {
+      class: 'Boolean',
+      name: 'clip'
     }
   ],
 
@@ -854,7 +858,8 @@ foam.CLASS({
         x.lineWidth = this.borderWidth;
         x.stroke();
       }
-      if ( this.color  ) x.fill();
+      if ( this.color ) x.fill();
+      if ( this.clip ) x.clip();
     }
   ]
 });
