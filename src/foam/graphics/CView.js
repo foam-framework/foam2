@@ -701,7 +701,7 @@ foam.CLASS({
 
     function addChild_(c) {
       c.parent = this;
-      c.canvas = this.canvas;
+      c.canvas$ = this.canvas$;
       return c;
     },
 

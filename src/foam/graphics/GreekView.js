@@ -52,7 +52,7 @@ foam.CLASS({
         return navSize * Math.min(width / view$width, height / view$height);
       });
 
-      var viewPort = this.Box.create({
+      var viewPort = this.CView.create({
         clip: true,
         height$: this.slot(function(view$height, scale) {
           return view$height * scale;

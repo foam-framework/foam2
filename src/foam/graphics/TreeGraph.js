@@ -8,7 +8,7 @@
  foam.CLASS({
    package: 'foam.graphics',
    name: 'TreeGraph',
-   extends: 'foam.graphics.CView',
+   extends: 'foam.graphics.Box',
 
    exports: [
      'as graph',
@@ -41,6 +41,8 @@
      function initCView() {
        this.SUPER();
 
+       this.color = 'white';
+
        if ( this.data ) {
         this.root = this.Node.create({x: 0, y: this.nodeHeight, data: this.data});
         this.add(this.root);
@@ -65,10 +67,6 @@
          this.doLayout();
        }.bind(this));
      },
-
-     function doLayout() {
-       if ( this.root && this.root.layout() ) this.invalidate();
-     }
    ],
 
    classes: [
@@ -337,7 +335,7 @@
            var canvasContainer = (document.getElementsByClassName('net-nanopay-account-ui-AccountTreeView-canvas-container'))[0];
  
            this.width = width;//Math.max(width, canvasContainer ? canvasContainer.clientWidth : width);
-           this.height = this.root.outline.length * this.nodeHeight * 2;
+           this.height = this.root.outline.length * this.nodeHeight * 2 + this.nodeHeight;
            
            var rootOutline = this.root.outline;
 

@@ -575,7 +575,7 @@ foam.CLASS({
                 delete cache[key]
               }, this[prop.ttlProp]);
             } else {
-              console.log('hit', key);
+              // console.log('hit', key);
             }
             return cache[key];
           }
