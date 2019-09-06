@@ -110,6 +110,7 @@ var classes = [
   'foam.lib.csv.PrefixedCSVOutputter',
   'foam.lib.csv.CSVOutputterImpl',
   'foam.lib.csv.ProxyCSVOutputter',
+  'foam.lib.csv.FromCSVSetter',
   'foam.dao.java.JDAO',
   'foam.dao.FilteredDAO',
   'foam.dao.Journal',
@@ -289,6 +290,7 @@ var classes = [
   'foam.nanos.notification.NotificationTemplateDAO',
   'foam.nanos.notification.notifications.ScriptRunNotification',
   'foam.nanos.script.Script',
+  'foam.nanos.script.CsvUploadScript',
 //  'foam.nanos.script.ScriptCompiler',
 //  'foam.nanos.script.JavaShellScriptCompiler',
   'foam.nanos.script.TestRunnerScript',
@@ -335,10 +337,9 @@ var classes = [
   'foam.nanos.geocode.GoogleMapsGeocodeResult',
   'foam.nanos.geocode.GoogleMapsGeometry',
   'foam.nanos.geocode.GoogleMapsBoundary',
-  'foam.nanos.geocode.GoogleMapsAddressParser',
   'foam.nanos.geocode.GoogleMapsPlacesPredictions',
   'foam.nanos.geocode.GoogleMapsPlacesResponse',
-  'foam.nanos.geocode.GoogleMapsCredentials',
+
 
   'foam.nanos.demo.DemoObject',
   'foam.nanos.demo.relationship.Student',
