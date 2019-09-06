@@ -334,18 +334,13 @@
          var deltaX = Math.abs(this.width - width) / width;
          var deltaY = Math.abs(this.height - height) / height;
 
-         if ( deltaX > 0.01 || deltaY > 0.01 ) { 
+         if ( deltaX > 0.01 || deltaY > 0.01 ) {
+          //  debugger;
            this.width = width;
            this.height = height;
-           var rootOutline = this.root.outline;
 
-           for ( var i = 0; i < rootOutline.length; i++ ){
-             var currLevel = rootOutline[i];
-             if ( currLevel.left < 0 ){
-               this.root.x -= currLevel.left;
-               break;
-             }
-           }
+           this.root.centerX = 0;
+           this.root.centerX = - Math.min.apply(Math, this.root.outline.map(o => o.left));
          }
       }   
      }
