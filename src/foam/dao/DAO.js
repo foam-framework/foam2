@@ -27,6 +27,7 @@ foam.INTERFACE({
       async: true,
       type: 'FObject',
       swiftThrows: true,
+      documentation: 'Inserts a new object or updates an existing one. When the object is stored successfully, the promise resolves with the newly added object.',
       args: [
         {
           name: 'obj',
@@ -55,6 +56,9 @@ foam.INTERFACE({
       async: true,
       type: 'FObject',
       swiftThrows: true,
+      documentation: `Deletes a single object from the DAO.
+                      NB: Trying to remove an object which does not exist is not an error. remove() only rejects if it fails to communicate with the backend.
+      `,
       args: [
         {
           name: 'obj',
@@ -83,6 +87,10 @@ foam.INTERFACE({
       async: true,
       type: 'FObject',
       swiftThrows: true,
+      documentation: `Retrieves a single object from the DAO, whose id is equal to the parameter id or if the given predicate evaluates to true.
+      If the object is found, the promise resolves with the object.
+      If the object is not found, it returns null.
+      `,
       args: [
         {
           name: 'id',
@@ -111,7 +119,9 @@ foam.INTERFACE({
       async: true,
       type: 'foam.dao.Sink',
       swiftThrows: true,
-      args: [
+      documentation: `The primary way to read objects from a DAO is select(sink) that will retrieve a collection of results and will send them (callback) to the sink. A simple select(sink) returns all record in the DAO.
+        If you don\'t specify a Sink when calling select(), a foam.dao.ArraySink will be created by default and passed to the resolved Promise:
+      `,      args: [
         {
           name: 'sink',
           type: 'foam.dao.Sink',
@@ -159,6 +169,9 @@ foam.INTERFACE({
       name: 'removeAll',
       async: true,
       swiftThrows: true,
+      documentation: `removeAll() is very similar to select(), with the obvious exception that it removes all matching entries from the DAO instead of returning them.
+                      Be careful! myDAO.removeAll() without any filtering will delete every entry.
+      `,
       args: [ ]
     },
     {
@@ -335,6 +348,7 @@ foam.INTERFACE({
       name: 'cmd_',
       async: true,
       type: 'Any',
+      swiftThrows: true,
       args: [
         {
           name: 'x',

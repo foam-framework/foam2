@@ -29,11 +29,13 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'props',
-      factory: function(of) {
-        if ( of.getAxiomByName('tableColumns') ) return of.getAxiomByName('tableColumns').columns;
-        return of.getAxiomsByClass()
-          .filter((p) => ! p.networkTransient)
-          .map((p) => p.name);
+      factory: null,
+      expression: function(of) {
+        return of.getAxiomByName('tableColumns') 
+          ? of.getAxiomByName('tableColumns').columns
+          : of.getAxiomsByClass()
+            .filter((p) => ! p.networkTransient)
+            .map((p) => p.name);
       },
       javaFactory: `
         // TODO: Add tableColumns to java to give an opportunity for a better default.
@@ -128,8 +130,14 @@ foam.CLASS({
     },
     {
       name: 'toString',
-      code: function() { return this.csv; },
-      javaCode: 'return getSb().toString();'
+      code: function() {
+        if ( this.isFirstRow ) this.outputHeader(this.__context__);
+        return this.csv;
+      },
+      javaCode: `
+        if ( getIsFirstRow() ) outputHeader(getX());
+        return getSb().toString();
+      `
     },
     {
       name: 'outputHeader',

@@ -198,7 +198,7 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertEqual(sink.value, 1)
 
     detach?.detach()
-    _ = (try? dao.put(somepackage_Test(["firstName": "C"])))
+    _ = try? dao.put(somepackage_Test(["firstName": "C"]))
     XCTAssertEqual(sink.value, 1)
   }
 
@@ -208,7 +208,7 @@ class SwiftTestsTests: XCTestCase {
     ])
 
     for i in 1...10 {
-      _ = (try? dao.put(somepackage_Test(["firstName": i])))
+      _ = try? dao.put(somepackage_Test(["firstName": i]))
     }
 
     let sink = (try? dao.skip(2)!.limit(5)!.select())!
@@ -326,7 +326,7 @@ class SwiftTestsTests: XCTestCase {
 
     var dispatched = false
     DispatchQueue(label: "TestDispatch").async {
-      let msg = try? rpcBox.promise.get() as! String
+      let msg = try? rpcBox.promise.get() as? String
       dispatched = true
       XCTAssertEqual(msg, "Hello there")
       sem.signal()
@@ -377,17 +377,19 @@ class SwiftTestsTests: XCTestCase {
       }
     }
     let testBox = somepackage_TestBox()
-    let registeredBox =
-        (boxContext.registry as! foam_box_BoxRegistryBox).register("TestBox", nil, testBox) as? foam_box_SubBox
+    let boxRegBox = boxContext.registry as! foam_box_BoxRegistryBox
+    let registeredBox = boxRegBox.register("TestBox", nil, testBox)
+    _ = boxRegBox.register("", nil, boxRegBox) as? foam_box_SubBox
 
-    _ = (boxContext.registry as! foam_box_BoxRegistryBox).register("", nil, boxContext.registry as! foam_box_BoxRegistryBox) as? foam_box_SubBox
     boxContext.root = boxContext.registry
 
     class RegistryDelegate: foam_box_Box {
       var outputter: foam_swift_parse_json_output_Outputter
       var parser: foam_swift_parse_json_FObjectParser
       var registry: foam_box_Box
-      init(registry: foam_box_Box, outputter: foam_swift_parse_json_output_Outputter, parser: foam_swift_parse_json_FObjectParser) {
+      init(registry: foam_box_Box,
+           outputter: foam_swift_parse_json_output_Outputter,
+           parser: foam_swift_parse_json_FObjectParser) {
         self.registry = registry
         self.outputter = outputter
         self.parser = parser
@@ -404,10 +406,11 @@ class SwiftTestsTests: XCTestCase {
     }
 
     let clientBoxRegistry = foam_box_ClientBoxRegistry(X: X)
-    clientBoxRegistry.delegate =
-        RegistryDelegate(registry: boxContext.registry!, outputter: outputter, parser: parser)
+    clientBoxRegistry.delegate = RegistryDelegate(
+      registry: boxContext.registry!, outputter: outputter, parser: parser)
+
     do {
-      let box = try clientBoxRegistry.doLookup("TestBox") as? foam_box_SubBox
+      let box = try clientBoxRegistry.doLookup("TestBox")
       XCTAssertNotNil(box)
       XCTAssertTrue(registeredBox === box)
       try? box?.send(foam_box_Message(["object": "HELLO"]))
@@ -416,6 +419,7 @@ class SwiftTestsTests: XCTestCase {
       fatalError()
     }
   }
+
   func testAPar() {
     let complete = Future<Any?>()
 

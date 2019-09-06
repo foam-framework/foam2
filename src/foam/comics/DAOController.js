@@ -227,15 +227,15 @@ foam.CLASS({
       label: 'Export as CSV',
       icon: 'images/export-icon-resting.svg',
       isAvailable: function(exportCSVEnabled) { return exportCSVEnabled; },
-      code: function() {
-        this.downloadCSV(this.filteredDAO);
+      code: function(x) {
+        this.downloadCSV(x, this.filteredDAO);
       }
     }
   ],
 
   listeners: [
-    function downloadCSV(data) {
-      this.csvDriver.exportDAO(this.__context__, data)
+    function downloadCSV(x, data) {
+      this.csvDriver.exportDAO(x, data)
         .then(function(result) {
           result = 'data:text/csv;charset=utf-8,' + result;
           var encodedUri = encodeURI(result);
