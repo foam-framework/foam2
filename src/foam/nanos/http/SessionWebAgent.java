@@ -52,6 +52,7 @@ public class SessionWebAgent
       for ( Cookie c : cookies ) {
         if ( c.getName().equals("sessionId") ) {
           sessionId = c.getValue();
+          break;
         }
       }
 
