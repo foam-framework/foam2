@@ -43,6 +43,7 @@ public class SinkParser
       parsers.add(new LiteralIC("sum(" + pInfo.getName() + ")"));
       parsers.add(new LiteralIC("max(" + pInfo.getName() + ")"));
       parsers.add(new LiteralIC("count(" + pInfo.getName() + ")"));
+      parsers.add(new LiteralIC("groupBy(" + pInfo.getName() + ")"));
     }
 
     return new Alt(parsers);
@@ -60,10 +61,6 @@ public class SinkParser
 //      return ps.setValue(null);
 //    }
 //
-//    x = x.sub();
-//    //x.set("classInfo", info_);
-//
-//    //return super.parse(ps, x);
 //    return ps;
 //  }
 }

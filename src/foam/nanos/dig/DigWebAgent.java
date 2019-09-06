@@ -336,6 +336,7 @@ public class DigWebAgent
           dao.where(MLang.EQ(idProp, id)).select(new ArraySink()) :
           dao.select(new ArraySink()));
 
+        String[] fieldsArray = fields.split(",");
         SinkParser sinkParser = new SinkParser(cInfo);
 
         StringPStream ps = new StringPStream(fields);
@@ -343,20 +344,45 @@ public class DigWebAgent
         ps = (StringPStream) sinkParser.parse(ps, x_);
 
         Object[] psArray = (Object[]) ps.value();
+        logger.debug("ps.value.length: " + psArray.length);
+
         for (Object objPs : psArray) {
-          logger.debug("ps.value(): " + objPs);
+          logger.debug("ps.value() : " + objPs);
+          String pName = getPropertyName(objPs.toString());
+          PropertyInfo pInfo = (PropertyInfo)cInfo.getAxiomByName(pName);
+
+          if ( pInfo != null ) {
+            if (objPs.toString().startsWith("groupBy")) {
+              foam.mlang.sink.GroupBy groupBy = (foam.mlang.sink.GroupBy) dao.select(MLang.GROUP_BY(pInfo, new foam.mlang.sink.Count()));
+
+              for (Object key : groupBy.getGroups().keySet()) {
+                foam.mlang.sink.Count count = ((foam.mlang.sink.Count) groupBy.getGroups().get(key));
+                out.println(key + " : " + count.getValue());
+              }
+            } else if (objPs.toString().startsWith("min") || objPs.toString().startsWith("max") || objPs.toString().startsWith("avg")) {
+              foam.dao.Sink[] seqSinkArray = {MLang.MIN(pInfo), MLang.MAX(pInfo), MLang.AVG(pInfo), MLang.SUM(pInfo)};
+              foam.mlang.sink.Sequence seq = (foam.mlang.sink.Sequence) dao.select(MLang.SEQ(seqSinkArray));
+
+              for (Object o : seq.getArgs()) {
+                if (o instanceof foam.mlang.sink.Min)
+                  out.println("MIN : " + ((foam.mlang.sink.Min) o).getValue());
+                else if (o instanceof foam.mlang.sink.Max)
+                  out.println("MAX : " + ((foam.mlang.sink.Max) o).getValue());
+                else if (o instanceof foam.mlang.sink.Average)
+                  out.println("AVG : " + ((foam.mlang.sink.Average) o).getValue());
+                else if (o instanceof foam.mlang.sink.Sum)
+                  out.println("SUM : " + ((foam.mlang.sink.Sum) o).getValue());
+              }
+            }
+          } else {
+            DigErrorMessage error = new GeneralException.Builder(x)
+              .setMessage("Invalid Filed Name : " + pName)
+              .build();
+            outputException(x, resp, format, out, error);
+
+            return;
+          }
         }
-
-        String[] fieldsArray = fields.split(",");
-//
-//        PropertyInfo pInfo = (PropertyInfo)cInfo.getAxiomByName(fields);
-//        foam.mlang.sink.GroupBy groupBy = (foam.mlang.sink.GroupBy) dao.select(MLang.GROUP_BY(pInfo, new foam.mlang.sink.Count()));
-//
-//        foam.dao.Sink[] seqSinkArray = { MLang.MIN(pInfo), MLang.MAX(pInfo), MLang.AVG(pInfo) };
-//        foam.mlang.sink.Sequence seq = (foam.mlang.sink.Sequence) dao.select(MLang.SEQ(seqSinkArray));
-//        foam.mlang.sink.Sum sum = (foam.mlang.sink.Sum) dao.select(MLang.SUM(pInfo));
-
-
 
         if ( sink != null ) {
           if ( sink.getArray().size() == 0 ) {
@@ -614,5 +640,14 @@ public class DigWebAgent
     } else {
       // TODO
     }
+  }
+
+  public String getPropertyName(String field) {
+    int start = field.indexOf("(");
+    int end = field.indexOf(")");
+
+    String pName = field.substring(start+1, end);
+
+    return pName;
   }
 }
