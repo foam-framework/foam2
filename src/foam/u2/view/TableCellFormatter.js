@@ -218,3 +218,32 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'DurationTableCellFormatterRefinement',
+  refines: 'foam.core.Duration',
+
+  properties: [
+    {
+      class: 'foam.u2.view.TableCellFormatter',
+      name: 'tableCellFormatter',
+      value: function(value) {
+        var hours = Math.floor(value / 3600000);
+        value -= hours * 3600000;
+        var minutes = Math.floor(value / 60000);
+        value -= minutes * 60000;
+        var seconds = Math.floor(value / 1000);
+        value -= seconds * 1000;
+        var milliseconds = value % 1000;
+
+        var formatted = [[hours, 'h'], [minutes, 'm'], [seconds, 's'], [milliseconds, 'ms']].reduce((acc, cur) => {
+          return cur[0] > 0 ? acc.concat([cur[0] + cur[1]]) : acc;
+        }, []).join(' ');
+
+        this.add(formatted || '0ms');
+      }
+    }
+  ]
+});
