@@ -52,7 +52,7 @@ public class Boot {
         new foam.nanos.fs.FileSystemStorage(datadir));
 
     // Used for all the services that will be required when Booting
-    serviceDAO_ = new foam.nanos.auth.PermissionedPropertyDAO(root_, new JDAO(((foam.core.ProxyX) root_).getX(), NSpec.getOwnClassInfo(), "services"));
+    serviceDAO_ = new JDAO(((foam.core.ProxyX) root_).getX(), NSpec.getOwnClassInfo(), "services");
 
     installSystemUser();
 
