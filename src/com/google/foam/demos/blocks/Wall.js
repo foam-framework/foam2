@@ -22,25 +22,20 @@ foam.CLASS({
   `,
 
   properties: [
-    [ 'width',  6 ],
-    [ 'height', 5 ],
+    [ 'width',  20 ],
+    [ 'height', 20 ],
     {
-      name: 'bricks',
+      name: 'cells',
       factory: function() {
-        var bricks = [];
-        for ( var col = 0 ; col < this.width ; col++ ) {
-          bricks[col] = [];
-          for ( var row = 0 ; row < this.height ; row++ ) {
-            var cell = bricks[col][row] = this.Brick.create({x: col, y: row});
-            if ( row ) cell.topWeight$  = bricks[col][row-1].weight$;
-            if ( col ) {
-              cell.leftWeight$ = bricks[col-1][row].weight$;
-              bricks[col-1][row].rightWeight$ = cell.weight$;
-            }
-            // cell.removed$.sub(this.brickUpdated.bind(this, cell));
+        var cells = [];
+        for ( var row = 0 ; row < this.height ; row++ ) {
+          cells[row] = [];
+          for ( var col = 0 ; col < this.width ; col++ ) {
+            var cell = cells[row][col] = this.Brick.create({x: col, y: row});
+            cell.removed$.sub(this.brickUpdated.bind(this, cell));
           }
         }
-        return bricks;
+        return cells;
       }
     }
   ],
@@ -55,7 +50,7 @@ foam.CLASS({
           this.start('div').
             addClass(this.myClass('row')).
             repeat(0, this.width-1, function(col) {
-              this.add(self.bricks[col][row]);
+              this.add(self.cells[row][col]);
             }).
           end();
         });
@@ -64,34 +59,23 @@ foam.CLASS({
     function forNeighbour(cell, f, dx, dy) {
       var x = cell.x + dx;
       var y = cell.y + dy;
-      if ( x >= 0 && y >= 0 && x < this.width && y < this.height ) {
-        var n = this.bricks[x][y];
-        if ( ! n.removed ) f(n);
-      }
+      if ( x > 0 && y > 0 && x < this.width && y < this.height )
+        f(cell);
     },
 
     function forEachNeighbour(cell, f) {
-      this.forNeighbour(cell, f,  0,  1);
-      //this.forNeighbour(cell, f, -1,  0);
-      //this.forNeighbour(cell, f,  1, -1);
+      this.forNeighbour(cell, f,  0, -1);
+      this.forNeighbour(cell, f, -1,  0);
+      this.forNeighbour(cell, f, +1, -1);
     },
 
-    function balanceBrick(brick) {
-      this.forEachNeighbour(brick, function(n) {
-        var w = Math.floor(brick. weight/10);
-        //brick.force -= w;
-        n.force   += w;
+    function getWeight(cell) {
+      var weight = 1;
+      this.forEachNeighbour(cell, function(c) {
+        weight += c.weight/10;
+        c.weight *= 0.9;
       });
-    },
-
-    function balance() {
-      return;
-      for ( var i = 0 ; i < 1 ; i++ )
-      for ( var x = 0 ; x < this.width ; x++ ) {
-        for ( var y = 0 ; y < this.height ; y++ ) {
-          this.balanceBrick(this.bricks[x][y]);
-        }
-      }
+      return weight;
     }
   ],
 

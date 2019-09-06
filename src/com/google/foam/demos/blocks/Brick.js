@@ -34,7 +34,6 @@ foam.CLASS({
       display: block;
       color: #BD1616;
     }
-    ^removed { color: white; }
     ^covered font { visibility: hidden; }
     ^marked font { display: none; }
     ^flag { display: none; }
@@ -45,32 +44,9 @@ foam.CLASS({
     'x',
     'y',
     {
-      class: 'Int',
-      name: 'myWeight',
-      expression: function(removed) { return removed ? 0 : 100; }
-    },
-    {
+      class: 'Double',
       name: 'weight',
-      expression: function(myWeight, topWeight, leftWeight, rightWeight, removed) {
-        if ( removed ) return 0;
-        return myWeight + topWeight;
-//        return (myWeight + leftWeight + rightWeight)/3 + topWeight;
-      }
-    },
-    {
-      class: 'Int',
-      name: 'topWeight',
-      value: 0
-    },
-    {
-      class: 'Int',
-      name: 'leftWeight',
-      value: 0
-    },
-    {
-      class: 'Int',
-      name: 'rightWeight',
-      value: 0
+      value: 1
     },
     {
       class: 'Boolean',
@@ -83,7 +59,7 @@ foam.CLASS({
       this.
         setNodeName('span').
         addClass(this.myClass()).
-        enableClass(this.myClass('removed'), this.removed$).
+//        addClass(this.stateClass$).
         on('click',       this.click).
 //        on('contextmenu', this.mark).
         start('span').add(this.weight$).end();
@@ -92,6 +68,6 @@ foam.CLASS({
   ],
 
   listeners: [
-    function click(e) { this.removed = ! this.removed; }
+    function click(e)  { this.removed = ! this.removed; }
   ]
 });
