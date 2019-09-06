@@ -16,6 +16,7 @@ foam.CLASS({
     prohibitively large. Instead, this DAO will store some of that data in
     memory, but it will start to replace old data after a certain point to
     prevent infinite growth.
+    NOTE: Install via EasyDAO. It is important that when removeFromDelegate is true (the default) that this DAO is placed between the JDAO and it's delegate which is typically a MDOA or NullDAO.
   `,
 
   javaImports: [
@@ -25,8 +26,10 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Int',
-      name: 'nextIndex'
+      documentation: 'when removing from internal circular buffer also remove from delegate DAO.',
+      class: 'Boolean',
+      name: 'removeFromDelegate',
+      value: true
     },
     {
       class: 'Int',
@@ -36,23 +39,31 @@ foam.CLASS({
     },
     {
       class: 'Int',
+      name: 'nextIndex',
+      hidden: true,
+    },
+    {
+      class: 'Int',
       name: 'internalArraySize',
       javaFactory: `return ((int)  (1.1 *  (double) getFixedDAOSize() )); `,
       documentation: `array larger than FixedDAOSize, to allow for a point in
                       time view without blocking write access.
-      `
+      `,
+      hidden: true
     },
     {
       class: 'Array',
       of: 'foam.core.FObject',
       name: 'fixedSizeArray',
-      javaFactory: `return new foam.core.FObject[ getInternalArraySize() ];`
+      javaFactory: `return new foam.core.FObject[ getInternalArraySize() ];`,
+      hidden: true
     },
     {
       class: 'Object',
       name: 'lock',
       javaType: 'java.util.concurrent.locks.ReentrantLock',
-      javaFactory: `return new java.util.concurrent.locks.ReentrantLock();`
+      javaFactory: `return new java.util.concurrent.locks.ReentrantLock();`,
+      hidden: true
     }
   ],
 
@@ -84,7 +95,8 @@ foam.CLASS({
   }
   foam.core.FObject discard = getFixedSizeArray()[insertAt];
   getFixedSizeArray()[insertAt] = delegatedObject;
-  if ( discard != null ) {
+  if ( getRemoveFromDelegate() &&
+       discard != null ) {
     getDelegate().remove_(x, discard);
   }
   return delegatedObject;
