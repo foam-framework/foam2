@@ -348,6 +348,7 @@ foam.INTERFACE({
       name: 'cmd_',
       async: true,
       type: 'Any',
+      swiftThrows: true,
       args: [
         {
           name: 'x',
