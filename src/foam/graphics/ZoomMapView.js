@@ -52,10 +52,10 @@ foam.CLASS({
       class: 'Float',
       name: 'navSize',
       value: 0.2,
-      postSet: function() {
+      postSet: function(o, n) {
         this.viewPortPosition = {
-          x: this.viewPortPosition.x,
-          y: this.viewPortPosition.y,
+          x: this.viewPortPosition.x * (n / o),
+          y: this.viewPortPosition.y * (n / o),
         }
       }
     },
