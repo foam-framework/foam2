@@ -204,6 +204,7 @@ FOAM_FILES([
   { name: "foam/dao/DAOProperty" },
   { name: "foam/dao/SQLStatement" },
   { name: "foam/dao/CSVSink" },
+  { name: "foam/nanos/script/CsvUploadScript" },
   { name: "foam/mlang/order/Comparator" },
 //  { name: "foam/mlang/order/ComparatorJava", flags: ['java'] },
   { name: "foam/mlang/mlang" },
