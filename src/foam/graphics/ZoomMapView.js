@@ -228,10 +228,11 @@ foam.CLASS({
         };
       };
       this.onDetach(this.canvas.on('mousedown', e => {
-        drag = this.innerNavView_.hitTest({
-            x: (e.offsetX - this.navView_.x) / this.innerNavView_.scaleX,
-            y: (e.offsetY - this.navView_.y) / this.innerNavView_.scaleY,
-        });
+        drag = this.innerNavView_.hitTest(this.innerNavView_.globalToLocalCoordinates({
+          w: 1,
+          x: e.offsetX,
+          y: e.offsetY
+        }));
         moveViewPort(e);
       }));
       this.onDetach(this.canvas.on('mouseup', _ => drag = false));
@@ -240,11 +241,11 @@ foam.CLASS({
     function attachNavScalerListener() {
       var drag = null;
       var doHitTest = e => {
-        var p = {
-          x: e.offsetX - this.navScaler_.x,
-          y: e.offsetY - this.navScaler_.y,
-        };
-        return this.navScaler_.hitTest(p);
+        return this.navScaler_.hitTest(this.navScaler_.globalToLocalCoordinates({
+          w: 1,
+          x: e.offsetX,
+          y: e.offsetY
+        }));
       };
       var scaleNavView = e => {
         if ( ! drag ) return;
@@ -280,10 +281,11 @@ foam.CLASS({
     function attachHandleListener() {
       var drag = null;
       var doHitTest = e => {
-        var p = {
-          x: e.offsetX - this.navViewHandle_.x,
-          y: e.offsetY - this.navViewHandle_.y,
-        };
+        var p = this.navViewHandle_.globalToLocalCoordinates({
+          w: 1,
+          x: e.offsetX,
+          y: e.offsetY
+        });
         return this.navViewHandle_.hitTest(p) ? p : null;
       };
       var moveNavView = e => {

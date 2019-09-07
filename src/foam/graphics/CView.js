@@ -578,11 +578,12 @@ foam.CLASS({
       p.x /= p.w;
       p.y /= p.w;
       p.w = 1;
+      return p;
     },
 
     function globalToLocalCoordinates(p) {
-      if ( this.parent ) this.parent.globalToLocalCoordinates(p);
-      this.parentToLocalCoordinates(p);
+      if ( this.parent ) p = this.parent.globalToLocalCoordinates(p);
+      return this.parentToLocalCoordinates(p);
     },
 
     function findFirstChildAt(p) {
