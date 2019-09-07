@@ -187,7 +187,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.GTE(self, self.min);
             },
-            errorString: `Please enter a number greater than or equal to ${self.min}.`
+            errorString: `Please enter a ${self.label} greater than or equal to ${self.min}.`
           });
         }
         if ( foam.Number.isInstance(self.max) ) {
@@ -196,7 +196,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.LTE(self, self.max);
             },
-            errorString: `Please enter a number less than or equal to ${self.max}`
+            errorString: `Please enter a ${self.label} less than or equal to ${self.max}`
           });
         }
         return a;
@@ -315,7 +315,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.REG_EXP(self, /^$|.+@.+\..+/);
             },
-            errorString: 'Please enter a valid email address'
+            errorString: 'Please enter an email address'
           }
         ];
         if ( this.required ) {
