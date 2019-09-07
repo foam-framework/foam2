@@ -139,14 +139,14 @@ FOAM_FILES([
   { name: "foam/nanos/auth/AgentAuthService" },
   { name: "foam/nanos/auth/ClientAgentAuthService" },
   { name: "foam/nanos/pm/PMTemperatureCellFormatter" },
+  { name: "foam/nanos/pm/NullPM" },
   { name: "foam/nanos/pm/PM" },
-  { name: "foam/nanos/pm/PMInfo" },
-  { name: "foam/nanos/pm/PMTableView", flags:['web'] },
   { name: "foam/nanos/pm/TemperatureCView" },
   { name: 'foam/nanos/notification/email/EmailMessage' },
   { name: 'foam/nanos/notification/email/EmailService' },
   { name: 'foam/nanos/notification/email/EmailTemplate' },
   { name: 'foam/nanos/notification/email/SMTPEmailService' },
+  { name: 'foam/nanos/notification/email/Status' },
   { name: 'foam/nanos/notification/push/PushService' },
   { name: 'foam/nanos/notification/push/FirebasePushService' },
   { name: 'foam/nanos/demo/DemoObject' },
@@ -197,10 +197,29 @@ FOAM_FILES([
   { name: "foam/nanos/ruler/UpdateRulesListSink" },
   { name: "foam/nanos/ruler/TestedRule" },
   { name: "foam/nanos/ruler/RulerProbe" },
-  
+  { name: "foam/nanos/ruler/UserRefines" },
   { name: "foam/nanos/test/EchoService" },
   { name: "foam/nanos/test/SerializationTestEchoService" },
   { name: "foam/nanos/analytics/Foldable" },
   { name: "foam/nanos/analytics/Candlestick" },
-  { name: "foam/nanos/test/ClientEchoService" }
+  { name: "foam/nanos/test/ClientEchoService" },
+
+  { name: "foam/dao/jdbc/JDBCConnectionSpec" },
+
+  // foam/nanos/crunch
+  { name: "foam/nanos/crunch/crunchtest/FakeTestObject" },
+  // models
+  { name: "foam/nanos/crunch/Capability" },
+  { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
+  { name: "foam/nanos/crunch/UserCapabilityJunctionRefine" },
+  //daos
+  { name: "foam/nanos/crunch/UserCapabilityJunctionDAO" },
+  //rules
+  { name: "foam/nanos/crunch/SendNotificationOnTopLevelCapabilityStatusUpdate" },
+  { name: "foam/nanos/crunch/IsUserCapabilityJunctionStatusUpdate" },
+  { name: "foam/nanos/crunch/RemoveJunctionsOnUserRemoval" },
+  //authservice
+  { name: "foam/nanos/auth/CapabilityAuthService" },
+  // google
+  { name: "foam/nanos/geocode/GoogleMapsCredentials" }
 ]);

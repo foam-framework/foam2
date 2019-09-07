@@ -40,7 +40,7 @@ return obj
     {
       name: 'remove_',
       swiftCode: function() {/*
-let i = array.index { (o) -> Bool in
+let i = array.firstIndex { (o) -> Bool in
   return self.primaryKey.compare(obj, o) == 0
 }
 if i == nil { return nil }
@@ -52,7 +52,7 @@ return o
     {
       name: 'find_',
       swiftCode: function() {/*
-let i = array.index { (o) -> Bool in
+let i = array.firstIndex { (o) -> Bool in
   return FOAM_utils.compare(id, self.primaryKey.get(o)) == 0
 }
 if i == nil { return nil }

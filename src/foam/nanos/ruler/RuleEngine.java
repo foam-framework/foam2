@@ -12,7 +12,6 @@ import foam.nanos.auth.LastModifiedAware;
 import foam.nanos.auth.LastModifiedByAware;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
-import foam.nanos.pool.FixedThreadPool;
 
 import java.lang.Exception;
 import java.time.Duration;
@@ -60,13 +59,13 @@ public class RuleEngine extends ContextAwareSupport {
     for (Rule rule : rules) {
       if ( stops_.get() ) break;
       if ( ! isRuleApplicable(rule, obj, oldObj)) continue;
-      PM pm = new PM();
+      PM pm = (PM) x_.get("PM");
       pm.setClassType(RulerDAO.getOwnClassInfo());
       pm.setName(rule.getDaoKey() + ": " + rule.getName());
       pm.init_();
       applyRule(rule, obj, oldObj, agency);
       pm.log(x_);
-      agency.submit(x_, x -> saveHistory(rule, obj));
+      agency.submit(x_, x -> saveHistory(rule, obj), "Save history. Rule id:" + rule.getId());
     }
     try {
       compoundAgency.execute(x_);
@@ -88,7 +87,7 @@ public class RuleEngine extends ContextAwareSupport {
    * @param oldObj - Old FObject supplied to rules for execution
    */
   public void probe(List<Rule> rules, RulerProbe rulerProbe, FObject obj, FObject oldObj) {
-    PM pm = new PM();
+      PM pm = (PM) x_.get("PM");
       pm.setClassType(RulerProbe.getOwnClassInfo());
       pm.setName("Probe:" + obj.getClassInfo());
       pm.init_();
@@ -155,7 +154,7 @@ public class RuleEngine extends ContextAwareSupport {
   }
 
   private void asyncApplyRules(List<Rule> rules, FObject obj, FObject oldObj) {
-    ((FixedThreadPool) getX().get("threadPool")).submit(userX_, x -> {
+    ((Agency) getX().get("threadPool")).submit(userX_, x -> {
       for (Rule rule : rules) {
         if ( stops_.get() ) return;
 
@@ -177,7 +176,7 @@ public class RuleEngine extends ContextAwareSupport {
           }
         }
       }
-    });
+    }, "Async apply rules. Rule group: " + rules.get(0).getRuleGroup());
   }
 
   private void retryAsyncApply(X x, Rule rule, FObject obj, FObject oldObj) {

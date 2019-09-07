@@ -221,7 +221,7 @@ foam.CLASS({
                     addClass(this.showPackage ? null : self.myClass('indent')).
                   end().
                   call(function(f) {
-                    if ( self.showSummary ) {
+                    if ( d.model_ && self.showSummary ) {
                       this.add(' ', self.summarize(d.model_.documentation));
                     }
                   }).
@@ -493,7 +493,10 @@ foam.CLASS({
       name: 'subClasses',
       expression: function (path) {
         return Object.values(foam.USED).
-            filter(function(cls) { return cls.model_.extends == path || 'foam.core.' + cls.model_.extends == path; }).
+            filter(function(cls) {
+              if ( ! cls.model_ ) return false;
+              return cls.model_.extends == path || 'foam.core.' + cls.model_.extends == path;
+            }).
           sort(this.MODEL_COMPARATOR);
       }
     },
@@ -502,6 +505,7 @@ foam.CLASS({
       expression: function (path) {
         return Object.values(foam.USED).
             filter(function(cls) {
+              if ( ! cls.model_ ) return false;
               return cls.model_.requires && cls.model_.requires.map(
                   function(r) { return r.path; }).includes(path);
             }).
@@ -531,6 +535,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      for ( var key in foam.UNUSED ) foam.lookup(key);
       this.SUPER();
 
       this.
@@ -643,7 +648,7 @@ foam.debug.doc = function(opt_obj, showUnused) {
     for ( var key in foam.UNUSED ) foam.lookup(key);
   }
 
-  foam.doc.DocBrowserWindow.create({
+  return foam.doc.DocBrowserWindow.create({
     initialClass: foam.core.FObject.isSubClass(opt_obj) ?
       opt_obj.id :
       ( opt_obj && opt_obj.cls_ ) ? opt_obj.cls_.id :

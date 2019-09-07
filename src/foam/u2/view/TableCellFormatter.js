@@ -47,7 +47,7 @@ foam.CLASS({
     {
       name: 'tableHeaderFormatter',
       value: function(axiom) {
-        this.add(axiom.label);
+        this.add(axiom.label || foam.String.labelize(axiom.name));
       }
     },
     {
@@ -194,7 +194,8 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(date) {
-        if ( date ) this.add(date.toISOString().substring(0,10));
+        // allow the browser to deal with this since we are technically using the user's preference
+        if ( date ) this.add(date.toLocaleDateString());
       }
     }
   ]
@@ -211,8 +212,37 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(date) {
-        // Output as yyyy-mm-dd hh:mm[a/p]
-        if ( date ) this.add(date.toISOString().substring(0,10) + " " + date.toLocaleString().substr(-11,5) + date.toLocaleString().substr(-2,1).toLowerCase());
+        // allow the browser to deal with this since we are technically using the user's preference
+        if ( date ) this.add(date.toLocaleString());
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'DurationTableCellFormatterRefinement',
+  refines: 'foam.core.Duration',
+
+  properties: [
+    {
+      class: 'foam.u2.view.TableCellFormatter',
+      name: 'tableCellFormatter',
+      value: function(value) {
+        var hours = Math.floor(value / 3600000);
+        value -= hours * 3600000;
+        var minutes = Math.floor(value / 60000);
+        value -= minutes * 60000;
+        var seconds = Math.floor(value / 1000);
+        value -= seconds * 1000;
+        var milliseconds = value % 1000;
+
+        var formatted = [[hours, 'h'], [minutes, 'm'], [seconds, 's'], [milliseconds, 'ms']].reduce((acc, cur) => {
+          return cur[0] > 0 ? acc.concat([cur[0] + cur[1]]) : acc;
+        }, []).join(' ');
+
+        this.add(formatted || '0ms');
       }
     }
   ]

@@ -11,31 +11,21 @@ foam.CLASS({
 
   requires: [
     'foam.dao.CSVSink',
-    'foam.lib.csv.CSVOutputter'
+    'foam.lib.csv.CSVOutputterImpl'
   ],
 
   documentation: 'Class for exporting data from a FObject or DAO, to CSV.',
 
-  properties: [
-    {
-      class: 'FObjectProperty',
-      of: 'foam.lib.csv.CSVOutputter',
-      name: 'outputter',
-      factory: function() {
-        return this.CSVOutputter.create();
-      }
-    }
-  ],
-
   methods: [
     function exportFObject(X, obj) {
-      this.outputter.outputFObject(obj);
-      return this.outputter.toString();
+      var outputter = this.CSVOutputterImpl.create();
+      outputter.outputFObject(X, obj);
+      return outputter.toString();
     },
     function exportDAO(X, dao) {
       return dao.select(this.CSVSink.create({
           of: dao.of,
-          props: X.data.filteredTableColumns || undefined
+          props: X.filteredTableColumns || undefined
         })).then( (s) => s.csv );
     }
   ]

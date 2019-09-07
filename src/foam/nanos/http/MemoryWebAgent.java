@@ -40,8 +40,11 @@ public class MemoryWebAgent
 
     long memory = runtime.totalMemory() - runtime.freeMemory();
 
-    out.println("Max memory in bytes: " + runtime.totalMemory());
-    out.println("Max memory in megabytes: " + bytesToMegabytes(runtime.totalMemory()));
+    out.println("Total memory in bytes: " + runtime.totalMemory());
+    out.println("Total memory in megabytes: " + bytesToMegabytes(runtime.totalMemory()));
+    out.println("</br>");
+    out.println("Max memory in bytes: " + runtime.maxMemory());
+    out.println("Max memory in megabytes: " + bytesToMegabytes(runtime.maxMemory()));
     out.println("</br>");
     out.println("Used memory in bytes: " + memory);
     out.println("Used memory in megabytes: " + bytesToMegabytes(memory));

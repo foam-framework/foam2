@@ -8,13 +8,16 @@ package foam.nanos.pool;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+
+import foam.core.Agency;
 import foam.core.ContextAgent;
 import foam.core.X;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 
-public class FixedThreadPool
+public class ThreadPoolAgency
   extends AbstractFixedThreadPool
+  implements Agency
 {
   protected ExecutorService pool_          = null;
   protected Object          queuedLock_    = new Object();
@@ -50,7 +53,7 @@ public class FixedThreadPool
     }
   }
 
-  public FixedThreadPool() {
+  public ThreadPoolAgency() {
   }
 
   public void incrExecuting(int d) {
@@ -78,7 +81,7 @@ public class FixedThreadPool
     return pool_;
   }
 
-  public void submit(X x, ContextAgent agent) {
+  public void submit(X x, ContextAgent agent, String description) {
     incrQueued();
     getPool().submit(new ContextAgentRunnable(x, agent));
   }

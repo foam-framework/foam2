@@ -49,7 +49,7 @@ foam.CLASS({
       if ( this.showActions ) {
         this.start('actions')
           .add(this.data.cls_.getAxiomsByClass(foam.core.Action))
-          .end();
+        .end();
       }
 
       this.add(this.slot(function(s) {

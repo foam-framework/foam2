@@ -106,16 +106,6 @@ foam.CLASS({
      `
     },
     {
-      class: 'String',
-      name: 'permissionPrefix',
-      factory: function() {
-        return this.of.name.toLowerCase();
-      },
-      javaFactory: `
-      return this.getOf().getObjClass().getSimpleName().toLowerCase();
-     `
-    },
-    {
       name: 'nSpec',
       class: 'FObjectProperty',
       type: 'foam.nanos.boot.NSpec'
@@ -127,25 +117,25 @@ foam.CLASS({
       javaFactory: `
 Logger logger = (Logger) getX().get("logger");
 
-foam.dao.DAO delegate = getInnerDAO() == null ?
-  new foam.dao.MDAO(getOf()) :
-  getInnerDAO();
+foam.dao.DAO delegate = getInnerDAO();
 
-if ( delegate instanceof foam.dao.MDAO ) {
-  setMdao((foam.dao.MDAO)delegate);
+foam.dao.DAO head = delegate;
+while( head instanceof foam.dao.ProxyDAO ) {
+  head = ( (ProxyDAO) head).getDelegate();
+}
+if ( head instanceof foam.dao.MDAO ) {
+  setMdao((foam.dao.MDAO)head);
   if ( getIndex() != null &&
        getIndex().length > 0 ) {
     getMdao().addIndex(getIndex());
   }
 }
 
-if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
-  delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName());
-}
+delegate = getOuterDAO(delegate);
 
 if ( getDecorator() != null ) {
   if ( ! ( getDecorator() instanceof ProxyDAO ) ) {
-    logger.error(this.getClass().getSimpleName(), "delegate", "NSpec.name", getNSpec().getName(), "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
+    logger.error(this.getClass().getSimpleName(), "delegate", "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
     System.exit(1);
   }
   // The decorator dao may be a proxy chain
@@ -194,6 +184,7 @@ if ( getSeqNo() ) {
   delegate = new foam.dao.SequenceNumberDAO.Builder(getX()).
     setDelegate(delegate).
     setProperty(getSeqPropertyName()).
+    setStartingValue(getSeqStartingValue()).
     build();
 }
 
@@ -211,29 +202,19 @@ if ( getOrder() != null &&
   }
 }
 
-if ( getAuthorize() ) {
-  if ( foam.nanos.auth.Authorizable.class.isAssignableFrom(getOf().getObjClass()) ) {
-    delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate);
-    setAuthenticate(false);
-  } else {
-    logger.warning("EasyDAO", "authorize=true but 'of' ",getOf().getId(), "not Authorizable");
-  }
-}
-
-if ( getAuthenticate() ) {
-  delegate = new foam.dao.AuthenticatedDAO(
-    getPermissionPrefix(),
-    getAuthenticateRead(),
-    delegate);
-}
+if( getAuthorize() ) delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, getAuthorizer());
 
 if ( getNSpec() != null &&
      getNSpec().getServe() &&
      ! getAuthorize() &&
-     ! getAuthenticate() &&
      ! getReadOnly() ) {
   //setReadOnly(true);
-  logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authenticated, Authorized, or ReadOnly");
+  logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authorized, or ReadOnly");
+}
+
+if ( getPermissioned() &&
+     ( getNSpec() != null && getNSpec().getServe() ) ) {
+  delegate = new foam.nanos.auth.PermissionedPropertyDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
 if ( getReadOnly() ) {
@@ -258,7 +239,12 @@ return delegate;
     {
       class: 'Object',
       type: 'foam.dao.DAO',
-      name: 'innerDAO'
+      name: 'innerDAO',
+      javaFactory: `
+      if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) )
+        return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
+      return new foam.dao.MDAO(getOf());
+      `
     },
     {
       class: 'Object',
@@ -277,6 +263,11 @@ return delegate;
       class: 'Boolean',
       name: 'seqNo',
       value: false
+    },
+    {
+      class: 'Long',
+      name: 'seqStartingValue',
+      value: 1
     },
     {
       /** Have EasyDAO generate guids to index items. Note that .seqNo and .guid features are mutually exclusive. */
@@ -307,24 +298,40 @@ return delegate;
       /** Enable standard authorization. */
       class: 'Boolean',
       name: 'authorize',
-      value: false
-    },
-    {
-      /** Enable standard authentication. */
-      class: 'Boolean',
-      name: 'authenticate',
       value: true
     },
     {
-      /** Enable standard read authentication. */
-      class: 'Boolean',
-      name: 'authenticateRead',
-      value: true
+      class: 'Object',
+      type: 'foam.nanos.auth.Authorizer',
+      name: 'authorizer',
+      javaFactory: `
+      if ( foam.nanos.auth.Authorizable.class.isAssignableFrom(getOf().getObjClass()) ) {
+        return new foam.nanos.auth.AuthorizableAuthorizer(getPermissionPrefix());
+      } else {
+        return new foam.nanos.auth.StandardAuthorizer(getPermissionPrefix());
+      }
+      `
+    },
+    {
+      class: 'String',
+      name: 'permissionPrefix',
+      factory: function() {
+        return this.of.name.toLowerCase();
+      },
+      javaFactory: `
+      return this.getOf().getObjClass().getSimpleName().toLowerCase();
+     `
     },
     {
       class: 'Boolean',
       name: 'readOnly',
       value: false
+    },
+    {
+      documentation: 'Wrap in PermissionedPropertiesDAO',
+      class: 'Boolean',
+      name: 'permissioned',
+      value: true
     },
     {
       /** Enable value de-duplication to save memory when caching. */
@@ -532,6 +539,20 @@ return delegate;
        }
      `
     },
+    {
+      name: 'getOuterDAO',
+      documentation: 'Method to be overidden on the user end to add framework user specific DAO decorators to EasyDAO',
+      type: 'foam.dao.DAO',
+      args: [
+        {
+          type: 'foam.dao.DAO',
+          name: 'innerDAO'
+        }
+      ],
+      javaCode: `
+        return innerDAO;
+      `
+    },
     function init() {
       /**
         <p>On initialization, the EasyDAO creates an appropriate chain of
@@ -614,6 +635,7 @@ return delegate;
       if ( this.seqNo ) {
         var args = {__proto__: params, delegate: dao, of: this.of};
         if ( this.seqProperty ) args.property = this.seqProperty;
+        args.startingValue = this.seqStartingValue;
         dao = this.SequenceNumberDAO.create(args);
       }
 
