@@ -16,22 +16,30 @@ foam.CLASS({
     {
       class: 'Color',
       name: 'viewBorder',
-      value: 'white'
+      value: 'red'
     },
     {
       class: 'Int',
       name: 'viewBorderWidth',
-      value: 20
+      value: 5 
     },
     {
       class: 'Int',
       name: 'navBorderWidth',
-      value: 20
+      value: 10
     },
     {
       class: 'Map',
       name: 'viewPortPosition',
-      value: { x: 0, y: 0 }
+      preSet: function(_, n) {
+        if ( ! this.hasOwnProperty('navView_') || ! this.hasOwnProperty('viewPortView_') ) {
+          return { x: 0, y: 0 }
+        }
+        return {
+          x: Math.max(0, Math.min(n.x || 0, this.navView_.width - this.viewPortView_.width)),
+          y: Math.max(0, Math.min(n.y || 0, this.navView_.height - this.viewPortView_.height)),
+        }
+      }
     },
     {
       class: 'Float',
@@ -47,78 +55,113 @@ foam.CLASS({
       name: 'view',
       hidden: true,
       required: true
+    },
+
+    {
+      name: 'navView_',
+      hidden: true,
+      factory: function() {
+        var v = this.Box.create({
+          borderWidth$: this.navBorderWidth$,
+          border$: this.navBorder$,
+          clip: true,
+          width$: this.innerNavView_.slot(function(scaleX, width) {
+            return scaleX * width;
+          }),
+          height$: this.innerNavView_.slot(function(scaleY, height) {
+            return scaleY * height;
+          }),
+        })
+
+        v.add(this.innerNavView_);
+        v.add(this.viewPortView_);
+
+        var drag = false;
+        var moveViewPort = e => {
+          if ( ! drag ) return;
+          this.viewPortPosition = {
+            x: e.offsetX - this.viewPortView_.width / 2,
+            y: e.offsetY - this.viewPortView_.height / 2,
+          };
+        };
+        this.canvas.on('mousedown', e => {
+          drag = v.hitTest({ x: e.offsetX, y: e.offsetY });
+          moveViewPort(e);
+        });
+        this.canvas.on('mouseup', _ => drag = false);
+        this.canvas.on('mousemove', moveViewPort);
+
+
+        return v;
+      }
+    },
+    {
+      name: 'viewPortView_',
+      hidden: true,
+      factory: function() {
+        var v = this.Box.create({
+          borderWidth$: this.viewBorderWidth$,
+          border$: this.viewBorder$,
+          height$: this.slot(function(scale, height, innerNavView_$scaleY) {
+            return height * innerNavView_$scaleY / scale;
+          }),
+          width$: this.slot(function(scale, width, innerNavView_$scaleX) {
+            return width * innerNavView_$scaleX / scale;
+          }),
+          x$: this.slot(function (viewPortPosition) {
+            return viewPortPosition.x;
+          }),
+          y$: this.slot(function (viewPortPosition) {
+            return viewPortPosition.y;
+          })
+        });
+        return v;
+      }
+    },
+    {
+      name: 'innerNavView_',
+      hidden: true,
+      factory: function() {
+        var viewScale$ = this.slot(function(navSize, width, view$width, height, view$height) {
+          return navSize * Math.min(width / view$width, height / view$height);
+        });
+        var v = this.CView.create({
+          width$: this.view$.dot('width'),
+          height$: this.view$.dot('height'),
+          scaleX$: viewScale$,
+          scaleY$: viewScale$,
+        });
+        v.add(this.view);
+        return v;
+      }
+    },
+    {
+      name: 'scaledView_',
+      hidden: true,
+      factory: function() {
+        var v = this.Box.create({
+          clip: true,
+          height$: this.view$.dot('height'),
+          width$: this.view$.dot('width'),
+          scaleX$: this.scale$,
+          scaleY$: this.scale$,
+          x$: this.slot(function(scale, viewPortView_$x, navView_$width, view$width) {
+            return - scale * view$width * viewPortView_$x / navView_$width;
+          }),
+          y$: this.slot(function(scale, viewPortView_$y, navView_$height, view$height) {
+            return - scale * view$height * viewPortView_$y / navView_$height;
+          }),
+        });
+        v.add(this.view);
+        return v;
+      }
     }
   ],
   methods: [
     function initCView() {
       this.SUPER();
-
-      var viewScale$ = this.slot(function(navSize, width, view$width, height, view$height) {
-        return navSize * Math.min(width / view$width, height / view$height);
-      });
-
-      var navContainer = this.Box.create({
-        borderWidth$: this.viewBorderWidth$,
-        border$: this.navBorder$,
-        clip: true,
-        width$: this.view$.dot('width'),
-        height$: this.view$.dot('height'),
-        scaleX$: viewScale$,
-        scaleY$: viewScale$,
-      });
-
-      var navViewPort = this.Box.create({
-        borderWidth$: this.viewBorderWidth$,
-        border$: this.viewBorder$,
-        height$: this.slot(function(height, scale) { return height / scale }),
-        width$: this.slot(function(width, scale) { return width / scale }),
-      });
-      navViewPort.x$ = this.slot(function(pos, viewScale, navViewPortWidth, viewWidth) {
-        return Math.min(
-          Math.max(0, pos.x / viewScale - navViewPortWidth / 2),
-          viewWidth - navViewPortWidth
-        )
-      }, this.viewPortPosition$, viewScale$, navViewPort.width$, this.view$.dot('width'));
-      navViewPort.y$ = this.slot(function(pos, viewScale, navViewPortHeight, viewHeight) {
-        return Math.min(
-          Math.max(0, pos.y / viewScale - navViewPortHeight / 2),
-          viewHeight - navViewPortHeight
-        )
-      }, this.viewPortPosition$, viewScale$, navViewPort.height$, this.view$.dot('height'));
-
-      var viewPort = this.Box.create({
-        clip: true,
-        height$: this.view$.dot('height'),
-        width$: this.view$.dot('width'),
-        scaleX$: this.scale$,
-        scaleY$: this.scale$,
-        x$: this.slot((x, s) => -x * s, navViewPort.x$, this.scale$),
-        y$: this.slot((y, s) => -y * s, navViewPort.y$, this.scale$)
-      });
-      viewPort.add(this.view);
-      
-      navContainer.add(this.view);
-      navContainer.add(navViewPort);
-
-      var drag = false;
-      var moveViewPort = e => {
-        if ( ! drag ) return;
-        this.viewPortPosition = { x: e.offsetX, y: e.offsetY };
-      };
-      this.canvas.on('mousedown', e => {
-        var p = {
-          x: e.offsetX / viewScale$.get(),
-          y: e.offsetY / viewScale$.get()
-        };
-        drag = navContainer.hitTest(p);
-        moveViewPort(e);
-      });
-      this.canvas.on('mouseup', _ => drag = false);
-      this.canvas.on('mousemove', moveViewPort);
-      
-      this.add(viewPort);
-      this.add(navContainer);
-      
+      this.add(this.scaledView_);
+      this.add(this.navView_);
     }
   ]
 });
