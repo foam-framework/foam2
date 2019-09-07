@@ -66,7 +66,7 @@ foam.CLASS({
     {
       name: 'SYSTEM_USER_ID',
       value: 1,
-      type: 'long'
+      type: 'Long'
     }
   ],
 

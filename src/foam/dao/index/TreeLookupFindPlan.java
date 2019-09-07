@@ -20,16 +20,20 @@ public class TreeLookupFindPlan implements FindPlan {
   }
 
   /**
-   * The cost will claculate by the node size
+   * The cost is calculated based on the size of the tree.
    */
   public long cost() {
     return ((Double) Math.log(Long.valueOf(size_).doubleValue())).longValue();
   }
 
   public FObject find(Object state, Object key) {
-    if ( state != null && state instanceof TreeNode ) {
-      // Sometimes the object is not exist, it will return a null value.
-      return ( (TreeNode) state ).get(( (TreeNode) state ), key, prop_) == null ? null : (FObject) ( (TreeNode) state ).get(( (TreeNode) state ), key, prop_).value;
+    if ( state instanceof TreeNode ) {
+      TreeNode stateNode = (TreeNode) state;
+      TreeNode valueNode = stateNode.get(stateNode, key, prop_);
+
+      // If the object being searched for isn't in the tree, then valueNode will
+      // be null.
+      return valueNode == null ? null : (FObject) valueNode.value;
     }
 
     return null;

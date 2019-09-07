@@ -9,14 +9,20 @@ foam.CLASS({
   name: 'DAOBrowserView',
   extends: 'foam.u2.View',
   requires: [
+    'foam.comics.SearchMode',
+    'foam.comics.v2.DAOControllerConfig',
     'foam.u2.ActionView',
     'foam.u2.dialog.Popup',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.search.Toolbar',
     'foam.u2.view.ScrollTableView',
+    'foam.u2.view.SimpleSearch',
     'foam.u2.view.TabChoiceView',
-    'foam.comics.v2.DAOControllerConfig'
+  ],
+
+  implements: [
+    'foam.mlang.Expressions'
   ],
 
   documentation: `
@@ -41,6 +47,7 @@ foam.CLASS({
     ^query-bar {
       padding: 24px 16px;
       align-items: center;
+      justify-content: flex-end;
     }
 
     ^toolbar {
@@ -52,21 +59,11 @@ foam.CLASS({
       border-bottom: solid 1px #e7eaec;
       margin: 0px 0px 72px 0px;
       box-sizing: border-box;
+      padding: 0 16px;
     }
 
     ^canned-queries {
       padding: 0 16px;
-    }
-
-    /*
-      TODO: Don't manually target these classes like this.
-     */
-    ^ .foam-u2-view-ScrollTableView-table {
-      width: 100%;
-    }
-
-    ^ .foam-u2-view-ScrollTableView-scrollbarContainer {
-      height: 424px;
     }
 
     ^ .foam-u2-view-TableView th {
@@ -76,6 +73,14 @@ foam.CLASS({
     ^ .foam-u2-view-TableView td {
       padding-left: 16px;
     }
+
+    ^ .foam-u2-view-SimpleSearch {
+      flex-grow: 1;
+    }
+
+    ^ .foam-u2-view-SimpleSearch .foam-u2-search-TextSearchView .foam-u2-tag-Input {
+      width: 100%;
+    }
   `,
 
   imports: [
@@ -83,7 +88,7 @@ foam.CLASS({
   ],
   exports: [
     'dblclick',
-    'filteredTableColumns',
+    'filteredTableColumns'
   ],
   properties: [
     {
@@ -107,7 +112,12 @@ foam.CLASS({
       name: 'summaryView',
       factory: function() {
         return {
-          class: 'foam.u2.view.ScrollTableView'
+          class: 'foam.u2.view.ScrollTableView',
+          enableDynamicTableHeight: false,
+          css: {
+            width: '100%',
+            height: '424px'
+          }
         };
       }
     },
@@ -122,7 +132,7 @@ foam.CLASS({
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
-      name: 'predicate',
+      name: 'cannedPredicate',
       expression: function(config$cannedQueries) {
         return config$cannedQueries && config$cannedQueries.length
           ? config$cannedQueries[0].predicate
@@ -130,10 +140,17 @@ foam.CLASS({
       }
     },
     {
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'searchPredicate',
+      expression: function() {
+        return foam.mlang.predicate.True.create();
+      }
+    },
+    {
       class: 'foam.dao.DAOProperty',
       name: 'predicatedDAO',
-      expression: function(config, predicate) {
-        return config.dao$proxy.where(predicate);
+      expression: function(config, cannedPredicate, searchPredicate) {
+        return config.dao$proxy.where(this.AND(cannedPredicate, searchPredicate));
       }
     }
   ],
@@ -177,7 +194,7 @@ foam.CLASS({
                         this
                           .start(self.cannedQueriesView, {
                             choices: config$cannedQueries.map(o => [o.predicate, o.label]),
-                            data$: self.predicate$
+                            data$: self.cannedPredicate$
                           })
                             .addClass(self.myClass('canned-queries'))
                           .end();
@@ -186,9 +203,17 @@ foam.CLASS({
                   .end();
               })
               .start(self.Cols).addClass(self.myClass('query-bar'))
-                .start().addClass(self.myClass('toolbar'))
-                  .tag(self.Toolbar, { /* data$: self.predicate$ */ })
-                .end()
+                .startContext({
+                  dao: self.config.dao,
+                  controllerMode: foam.u2.ControllerMode.EDIT
+                })
+                  .callIf(self.config.searchMode === self.SearchMode.SIMPLE, function() {
+                    this.tag(self.SimpleSearch, {
+                      showCount: false,
+                      data$: self.searchPredicate$
+                    });
+                  })
+                .endContext()
                 .startContext({data: self})
                   .start(self.EXPORT, {
                     buttonStyle: foam.u2.ButtonStyle.SECONDARY

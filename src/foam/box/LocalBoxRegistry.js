@@ -54,7 +54,7 @@ foam.CLASS({
       },
       swiftCode: function() {/*
 let name = name!
-if let exportBox = (registry_[name] as? Registration)?.exportBox {
+if let exportBox = registry_[name] as? foam_box_ExportBox {
   return exportBox
 }
 throw NoSuchNameException_create(["name": name])
@@ -90,22 +90,18 @@ return (foam.box.ExportBox)registration;
         return box;
       },
       swiftSynchronized: true,
-      swiftCode: function() {/*
+      swiftCode: `
 let name: String = name ?? UUID().uuidString
-
-var exportBox: foam_box_Box = SubBox_create([
-  "name": name,
-  "delegate": me
+let box = ExportBox_create([
+  "localBox": box,
+  "messengerBox": SubBox_create([
+    "name": name,
+    "delegate": me
+  ])
 ])
-exportBox = service?.clientBox(exportBox) ?? exportBox
-
-let registration = Registration_create([
-  "exportBox": exportBox,
-  "localBox": service?.serverBox(box) ?? box
-])
-registry_[name] = registration
-return registration.exportBox
-      */},
+registry_[name] = box
+return box
+      `,
       javaCode: `
 if ( name == null ) name = Integer.toString(foam.box.IdGenerator.nextId());
 

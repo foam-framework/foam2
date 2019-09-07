@@ -49,6 +49,7 @@ var classes = [
   'foam.mlang.predicate.Keyword',
   'foam.mlang.predicate.IsInstanceOf',
   'foam.mlang.predicate.IsClassOf',
+  'foam.mlang.predicate.DotF',
   'foam.mlang.sink.Count',
   'foam.mlang.sink.GroupBy',
   'foam.mlang.F',
@@ -305,7 +306,7 @@ var classes = [
   'foam.u2.DisplayMode',
   'foam.u2.Visibility',
   'foam.nanos.export.ExportDriverRegistry',
-  'foam.dao.pg.ConnectionPool',
+  'foam.dao.jdbc.ConnectionPool',
   'foam.lib.Outputter',
   'foam.lib.PropertyPredicate',
   'foam.lib.PermissionedPropertyPredicate',
@@ -387,6 +388,7 @@ var classes = [
   'foam.nanos.dig.exception.UnsupportException',
   'foam.nanos.dig.exception.UnknownIdException',
   'foam.nanos.dig.exception.DigSuccessMessage',
+  'foam.nanos.dig.exception.AuthorizationException',
   'foam.flow.Document',
   'foam.flow.DocumentationFolderDAO',
 
@@ -433,6 +435,12 @@ var classes = [
   // Themes
   'foam.nanos.theme.Theme',
 
+  //SQL JBDC Support
+  'foam.dao.jdbc.JDBCConnectionSpec',
+  'foam.dao.jdbc.TestDataForJDBC',
+  'foam.dao.jdbc.TestCompany',
+  'foam.dao.jdbc.TestEmployee',
+
   // Crunch
   'foam.nanos.crunch.crunchtest.FakeTestObject',
   //models
@@ -454,6 +462,7 @@ var classes = [
   'foam.strategy.StrategizerService',
   'foam.strategy.BasicStrategizer',
   'foam.strategy.ClientStrategizerService'
+
 ];
 
 var abstractClasses = [
