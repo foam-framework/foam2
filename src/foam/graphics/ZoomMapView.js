@@ -9,9 +9,9 @@ foam.CLASS({
   name: 'ZoomMapView',
   extends: 'foam.graphics.CView',
   requires: [
-    'foam.graphics.CView',
     'foam.graphics.Box',
-    'foam.graphics.Circle',
+    'foam.graphics.CView',
+    'foam.graphics.Circle'
   ],
   properties: [
     {
