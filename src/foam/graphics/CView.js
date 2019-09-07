@@ -514,7 +514,10 @@ foam.CLASS({
     {
       name: 'canvas',
       hidden: 'true',
-      transient: true
+      transient: true,
+      expression: function(parent$canvas) {
+        return parent$canvas;
+      }
     },
     {
       name: 'transform_',
@@ -702,7 +705,6 @@ foam.CLASS({
 
     function addChild_(c) {
       c.parent = this;
-      c.canvas = this.canvas;
       return c;
     },
 
