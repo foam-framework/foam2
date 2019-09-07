@@ -76,11 +76,7 @@ foam.CLASS({
     {
       class: 'Float',
       name: 'navScalerSize',
-      value: 10
-    },
-    {
-      class: 'Color',
-      name: 'navScalerColor'
+      value: 20
     },
 
     {
@@ -153,17 +149,15 @@ foam.CLASS({
       name: 'navScaler_',
       hidden: true,
       factory: function() {
-        return this.Box.create({
+        return this.CView.create({
           height$: this.navScalerSize$,
           width$: this.navScalerSize$,
-          x$: this.slot(function(navView_$x, navView_$width, navBorderWidth) {
-            return navView_$x + navView_$width + navBorderWidth / 2;
+          x$: this.slot(function(navScalerSize, navView_$x, navView_$width, navBorderWidth) {
+            return navView_$x + navView_$width + navBorderWidth / 2 - navScalerSize / 2;
           }),
-          y$: this.slot(function(navView_$y, navView_$height, navBorderWidth) {
-            return navView_$y + navView_$height + navBorderWidth / 2;
+          y$: this.slot(function(navScalerSize, navView_$y, navView_$height, navBorderWidth) {
+            return navView_$y + navView_$height + navBorderWidth / 2 - navScalerSize / 2;
           }),
-          color$: this.navScalerColor$,
-          borderWidth: 0
         });
       }
     },
