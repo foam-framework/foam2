@@ -56,12 +56,24 @@ foam.CLASS({
       hidden: true,
       required: true
     },
+    {
+      class: 'Color',
+      name: 'handleColor',
+      value: 'green'
+    },
+    {
+      class: 'Float',
+      name: 'handleHeight',
+      value: 20
+    },
 
     {
       name: 'navView_',
       hidden: true,
       factory: function() {
         var v = this.Box.create({
+          x: this.navBorderWidth / 2,
+          y: this.handleHeight + this.navBorderWidth / 2,
           borderWidth$: this.navBorderWidth$,
           border$: this.navBorder$,
           clip: true,
@@ -75,22 +87,6 @@ foam.CLASS({
 
         v.add(this.innerNavView_);
         v.add(this.viewPortView_);
-
-        var drag = false;
-        var moveViewPort = e => {
-          if ( ! drag ) return;
-          this.viewPortPosition = {
-            x: e.offsetX - this.viewPortView_.width / 2,
-            y: e.offsetY - this.viewPortView_.height / 2,
-          };
-        };
-        this.canvas.on('mousedown', e => {
-          drag = v.hitTest({ x: e.offsetX, y: e.offsetY });
-          moveViewPort(e);
-        });
-        this.canvas.on('mouseup', _ => drag = false);
-        this.canvas.on('mousemove', moveViewPort);
-
 
         return v;
       }
@@ -116,6 +112,25 @@ foam.CLASS({
           })
         });
         return v;
+      }
+    },
+    {
+      name: 'navViewHandle_',
+      hidden: true,
+      factory: function() {
+        return this.Box.create({
+          width$: this.slot(function(navView_$width, navBorderWidth) {
+            return navView_$width + navBorderWidth;
+          }),
+          height$: this.handleHeight$,
+          color$: this.handleColor$,
+          x$: this.slot(function(navView_$x, navBorderWidth) {
+            return navView_$x - navBorderWidth / 2;
+          }),
+          y$: this.slot(function(navView_$y, navBorderWidth, handleHeight) {
+            return navView_$y - handleHeight - navBorderWidth / 2;
+          })
+        });
       }
     },
     {
@@ -162,6 +177,53 @@ foam.CLASS({
       this.SUPER();
       this.add(this.scaledView_);
       this.add(this.navView_);
+      this.add(this.navViewHandle_);
+
+      this.attachViewPortListener();
+      this.attachHandleListener();
+    },
+    function attachViewPortListener() {
+      var drag = false;
+      var moveViewPort = e => {
+        if ( ! drag ) return;
+        this.viewPortPosition = {
+          x: e.offsetX - this.navView_.x - this.viewPortView_.width / 2,
+          y: e.offsetY - this.navView_.y - this.viewPortView_.height / 2,
+        };
+      };
+      this.onDetach(this.canvas.on('mousedown', e => {
+        drag = this.innerNavView_.hitTest({
+            x: (e.offsetX - this.navView_.x) / this.innerNavView_.scaleX,
+            y: (e.offsetY - this.navView_.y) / this.innerNavView_.scaleY,
+        });
+        moveViewPort(e);
+      }));
+      this.onDetach(this.canvas.on('mouseup', _ => drag = false));
+      this.onDetach(this.canvas.on('mousemove', moveViewPort));
+    },
+    function attachHandleListener() {
+      var drag = null;
+      var moveNavView_ = e => {
+        if ( ! drag ) return;
+        this.navView_.x = Math.max(
+          this.navBorderWidth / 2,
+          Math.min(e.offsetX - drag.x, this.width - this.navView_.width)
+        );
+        this.navView_.y = Math.max(
+          this.handleHeight + this.navBorderWidth / 2,
+          Math.min(e.offsetY - drag.y + this.handleHeight, this.height - this.navView_.height)
+        );
+      };
+      this.onDetach(this.canvas.on('mousedown', e => {
+        var p = {
+          x: e.offsetX - this.navViewHandle_.x,
+          y: e.offsetY - this.navViewHandle_.y,
+        };
+        drag = this.navViewHandle_.hitTest(p) ? p : null;
+        moveNavView_(e);
+      }));
+      this.onDetach(this.canvas.on('mouseup', _ => drag = null));
+      this.onDetach(this.canvas.on('mousemove', moveNavView_));
     }
   ]
 });
