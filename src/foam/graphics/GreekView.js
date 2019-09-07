@@ -30,6 +30,7 @@ foam.CLASS({
     },
     {
       class: 'Map',
+      visibility: 'RO',
       name: 'viewPortPosition',
       preSet: function(_, n) {
         if ( ! this.hasOwnProperty('navView_') || ! this.hasOwnProperty('viewPortView_') ) {
@@ -44,7 +45,13 @@ foam.CLASS({
     {
       class: 'Float',
       name: 'navSize',
-      value: 0.2
+      value: 0.2,
+      postSet: function() {
+        this.viewPortPosition = {
+          x: this.viewPortPosition.x,
+          y: this.viewPortPosition.y,
+        }
+      }
     },
     {
       class: 'Float',
@@ -65,6 +72,16 @@ foam.CLASS({
       class: 'Float',
       name: 'handleHeight',
       value: 20
+    },
+    {
+      class: 'Float',
+      name: 'navScalerSize',
+      value: 10
+    },
+    {
+      class: 'Color',
+      name: 'navScalerColor',
+      value: 'purple'
     },
 
     {
@@ -134,6 +151,23 @@ foam.CLASS({
       }
     },
     {
+      name: 'navScaler_',
+      hidden: true,
+      factory: function() {
+        return this.Box.create({
+          height$: this.navScalerSize$,
+          width$: this.navScalerSize$,
+          x$: this.slot(function(navView_$x, navView_$width, navBorderWidth) {
+            return navView_$x + navView_$width + navBorderWidth / 2;
+          }),
+          y$: this.slot(function(navView_$y, navView_$height, navBorderWidth) {
+            return navView_$y + navView_$height + navBorderWidth / 2;
+          }),
+          color$: this.navScalerColor$,
+        });
+      }
+    },
+    {
       name: 'innerNavView_',
       hidden: true,
       factory: function() {
@@ -178,9 +212,11 @@ foam.CLASS({
       this.add(this.scaledView_);
       this.add(this.navView_);
       this.add(this.navViewHandle_);
+      this.add(this.navScaler_);
 
       this.attachViewPortListener();
       this.attachHandleListener();
+      this.attachNavScalerListener();
     },
     function attachViewPortListener() {
       var drag = false;
@@ -201,9 +237,39 @@ foam.CLASS({
       this.onDetach(this.canvas.on('mouseup', _ => drag = false));
       this.onDetach(this.canvas.on('mousemove', moveViewPort));
     },
+    function attachNavScalerListener() {
+      var drag = null;
+      var scaleNavView = e => {
+        if ( ! drag ) return;
+
+        var desiredWidth = drag.width + e.offsetX - drag.x;
+        var desiredHeight = drag.height + e.offsetY - drag.y;
+        this.navSize = Math.max(
+          drag.navSize * desiredWidth / drag.width,
+          drag.navSize * desiredHeight / drag.height
+        );
+
+      };
+      this.onDetach(this.canvas.on('mousedown', e => {
+        var p = {
+          x: e.offsetX - this.navScaler_.x,
+          y: e.offsetY - this.navScaler_.y,
+        };
+        drag = this.navScaler_.hitTest(p) ? {
+          x: e.offsetX,
+          y: e.offsetY,
+          width: this.navView_.width,
+          height: this.navView_.height,
+          navSize: this.navSize
+        } : null;
+        scaleNavView(e);
+      }));
+      this.onDetach(this.canvas.on('mouseup', _ => drag = null));
+      this.onDetach(this.canvas.on('mousemove', scaleNavView));
+    },
     function attachHandleListener() {
       var drag = null;
-      var moveNavView_ = e => {
+      var moveNavView = e => {
         if ( ! drag ) return;
         this.navView_.x = Math.max(
           this.navBorderWidth / 2,
@@ -220,10 +286,10 @@ foam.CLASS({
           y: e.offsetY - this.navViewHandle_.y,
         };
         drag = this.navViewHandle_.hitTest(p) ? p : null;
-        moveNavView_(e);
+        moveNavView(e);
       }));
       this.onDetach(this.canvas.on('mouseup', _ => drag = null));
-      this.onDetach(this.canvas.on('mousemove', moveNavView_));
+      this.onDetach(this.canvas.on('mousemove', moveNavView));
     }
   ]
 });
