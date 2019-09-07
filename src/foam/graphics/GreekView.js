@@ -80,8 +80,7 @@ foam.CLASS({
     },
     {
       class: 'Color',
-      name: 'navScalerColor',
-      value: 'purple'
+      name: 'navScalerColor'
     },
 
     {
@@ -164,6 +163,7 @@ foam.CLASS({
             return navView_$y + navView_$height + navBorderWidth / 2;
           }),
           color$: this.navScalerColor$,
+          borderWidth: 0
         });
       }
     },
@@ -239,23 +239,28 @@ foam.CLASS({
     },
     function attachNavScalerListener() {
       var drag = null;
+      var doHitTest = e => {
+        var p = {
+          x: e.offsetX - this.navScaler_.x,
+          y: e.offsetY - this.navScaler_.y,
+        };
+        return this.navScaler_.hitTest(p);
+      };
       var scaleNavView = e => {
         if ( ! drag ) return;
-
         var desiredWidth = drag.width + e.offsetX - drag.x;
         var desiredHeight = drag.height + e.offsetY - drag.y;
         this.navSize = Math.max(
           drag.navSize * desiredWidth / drag.width,
           drag.navSize * desiredHeight / drag.height
         );
-
       };
       this.onDetach(this.canvas.on('mousedown', e => {
         var p = {
           x: e.offsetX - this.navScaler_.x,
           y: e.offsetY - this.navScaler_.y,
         };
-        drag = this.navScaler_.hitTest(p) ? {
+        drag = doHitTest(e) ? {
           x: e.offsetX,
           y: e.offsetY,
           width: this.navView_.width,
@@ -265,10 +270,22 @@ foam.CLASS({
         scaleNavView(e);
       }));
       this.onDetach(this.canvas.on('mouseup', _ => drag = null));
-      this.onDetach(this.canvas.on('mousemove', scaleNavView));
+      this.onDetach(this.canvas.on('mousemove', e => {
+        if ( drag || doHitTest(e) ) {
+          this.canvas.style({cursor: 'se-resize'})
+        }
+        scaleNavView(e);
+      }));
     },
     function attachHandleListener() {
       var drag = null;
+      var doHitTest = e => {
+        var p = {
+          x: e.offsetX - this.navViewHandle_.x,
+          y: e.offsetY - this.navViewHandle_.y,
+        };
+        return this.navViewHandle_.hitTest(p) ? p : null;
+      };
       var moveNavView = e => {
         if ( ! drag ) return;
         this.navView_.x = Math.max(
@@ -281,15 +298,18 @@ foam.CLASS({
         );
       };
       this.onDetach(this.canvas.on('mousedown', e => {
-        var p = {
-          x: e.offsetX - this.navViewHandle_.x,
-          y: e.offsetY - this.navViewHandle_.y,
-        };
-        drag = this.navViewHandle_.hitTest(p) ? p : null;
+        drag = doHitTest(e);
         moveNavView(e);
       }));
       this.onDetach(this.canvas.on('mouseup', _ => drag = null));
-      this.onDetach(this.canvas.on('mousemove', moveNavView));
+      this.onDetach(this.canvas.on('mousemove', e => {
+        if ( drag || doHitTest(e) ) {
+          this.canvas.style({cursor: 'move'})
+        } else {
+          this.canvas.style({cursor: 'default'})
+        }
+        moveNavView(e);
+      }));
     }
   ]
 });
