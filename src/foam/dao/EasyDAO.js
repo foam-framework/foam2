@@ -243,7 +243,6 @@ return delegate;
     {
       class: 'Boolean',
       name: 'requestResponseCaching',
-      value: true,
       flags: ['js']
     },
     {
