@@ -45,5 +45,3 @@ p({"class":"foam.nanos.menu.Menu","id":"admin.countries","handler":{"class":"foa
 p({"class":"foam.nanos.menu.Menu","id":"admin.p.1minute","label":"Performance - 1 Minute","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pm1MinuteDAO","createEnabled":false,"editEnabled":false},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.p.hourly","label":"Performance - Hourly","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pmHourlyDAO","createEnabled":false,"editEnabled":false},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.p.daily","label":"Performance - Daily","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pmDailyDAO","createEnabled":false,"editEnabled":false},"order":1000,"parent":"admin"})
-
-p({"class":"foam.nanos.menu.Menu","id":"admin.csvUploadScriptDAO","label":"CSV UploadScripts","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"csvUploadScriptDAO"}},"order":1000,"parent":"admin"})
