@@ -214,6 +214,11 @@ foam.CLASS({
       this.add(this.navViewHandle_);
       this.add(this.navScaler_);
 
+      // Ensure the parent of view is scaledView_ to ensure that its
+      // globalToLocalCoordinates uses that as the parent rather than the
+      // navView_
+      this.view.parent = this.scaledView_;
+
       this.attachViewPortListener();
       this.attachHandleListener();
       this.attachNavScalerListener();
