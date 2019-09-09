@@ -91,7 +91,7 @@ public class AuthWebAgent
     String              email        = req.getParameter("user");
     String              password     = req.getParameter("password");
     String              actAs        = req.getParameter("actAs");
-    String              authHeader  = req.getHeader("Authorization");
+    String              authHeader   = req.getHeader("Authorization");
 
     // instance parameters
     Session             session      = null;
