@@ -57,7 +57,11 @@ foam.CLASS({
       class: 'Boolean',
       name: 'showOther_',
       expression: function(choiceData_, otherKey) {
-        return foam.util.equals(choiceData_, otherKey);
+        if ( foam.util.equals(choiceData_, otherKey) ) {
+          return true;
+        }
+        this.otherData_ = this.otherDefault;
+        return false;
       }
     },
     'preventFeedback_'

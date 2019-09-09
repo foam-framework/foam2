@@ -36,6 +36,12 @@ foam.CLASS({
   `,
 
   properties: [
+    'savedData',
+    {
+      class: 'Boolean',
+      name: 'savedDataSet',
+      value: false
+    },
     {
       class: 'String',
       name: 'name',
@@ -246,6 +252,10 @@ foam.CLASS({
       for ( var i = 0 ; i < choices.length ; i++ ) {
         if ( foam.util.equals(choices[i][0], data) ) return choices[i];
       }
+      if ( this.dao && ! this.savedDataSet ) {
+        this.savedData = data;
+        this.savedDataSet = true;
+      }
       return null;
     },
 
@@ -284,6 +294,7 @@ foam.CLASS({
 
         p.then(function(a) {
           this.choices = a.map(this.objToChoice);
+          if ( this.savedData !== undefined ) this.choice = this.findChoiceByData(this.savedData);
           if ( this.data == null && this.index === -1 ) this.index = this.placeholder ? -1 : 0;
         }.bind(this));
       }
