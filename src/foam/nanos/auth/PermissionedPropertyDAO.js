@@ -51,13 +51,6 @@ foam.CLASS({
     },
 
     {
-      name: 'select_',
-      javaCode: `
-      return super.select_(x, sink, skip, limit, order, predicate);
-      `,
-    },
-
-    {
       name: 'maybeResetProperties',
       type: 'foam.core.FObject',
       args: [
