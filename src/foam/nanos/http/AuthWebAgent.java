@@ -83,7 +83,7 @@ public class AuthWebAgent
     // context parameters
     HttpServletRequest  req          = x.get(HttpServletRequest.class);
     HttpServletResponse resp         = x.get(HttpServletResponse.class);
-    AuthService         auth          = (AuthService) x.get("auth");
+    AuthService         auth         = (AuthService) x.get("auth");
     DAO                 sessionDAO   = (DAO) x.get("localSessionDAO");
     DAO                 userDAO      = (DAO) x.get("localUserDAO");
 
