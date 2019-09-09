@@ -146,11 +146,8 @@ foam.CLASS({
                             return URL.createObjectURL(blob.blob);
                           } else {
                             var url = '/service/httpFileService/' + data.id;
-                            // attach session id if available
-                            if ( sessionId )
-                              url += '?sessionId=' + sessionId;
+                            return url;
                           }
-                          return url;
                         }
                       }),
                       target: '_self'
