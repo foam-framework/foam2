@@ -89,9 +89,9 @@ public class AuthWebAgent
 
     // query parameters
     String              email        = req.getParameter("user");
-    String              password     = req.getParameter("password");
+    String              password    = req.getParameter("password");
     String              actAs        = req.getParameter("actAs");
-    String              authHeader   = req.getHeader("Authorization");
+    String              authHeader  = req.getHeader("Authorization");
 
     // instance parameters
     Session             session      = null;
@@ -169,7 +169,7 @@ public class AuthWebAgent
             // wget --header="Authorization: Bearer 8b4529d8-636f-a880-d0f2-637650397a71" \
             //     http://localhost:8080/service/memory
             //
-           String token = st.nextToken();
+            String token = st.nextToken();
             Session tmp = (Session) sessionDAO.find(token);
             if ( tmp != null ) {
               if ( tmp.validRemoteHost(req.getRemoteHost()) ) {
@@ -192,11 +192,10 @@ public class AuthWebAgent
                   }
                   session.setContext(session.getContext().put("user", user).put("group", group));
                   session = (Session) sessionDAO.put(session);
-                  logger.debug("AuthWebAgent.authenticate token login.");
                   return session;
                 } catch ( AuthenticationException e ) {
-                  logger.debug("Invalid authorization token. User,Group of Session not found.", e.getMessage());
-                  resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid authorization token.");
+                  logger.debug("Invalid authentication token. User,Group of Session not found.", e.getMessage());
+                  resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid authentication token.");
                   return null;
                 }
               } else {
@@ -205,8 +204,8 @@ public class AuthWebAgent
                 return null;
               }
             } else {
-              logger.debug("Invalid authorization token.");
-              resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid authorization token.");
+              logger.debug("Invalid authentication token.");
+              resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid authentication token.");
               return null;
             }
           } else {
