@@ -8,10 +8,13 @@ package foam.nanos.http;
 
 import foam.core.X;
 import foam.dao.DAO;
+import static foam.mlang.MLang.AND;
+import static foam.mlang.MLang.EQ;
 import foam.nanos.auth.AgentAuthService;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.AuthenticationException;
 import foam.nanos.auth.User;
+import foam.nanos.auth.Group;
 import foam.nanos.boot.Boot;
 import foam.nanos.logger.Logger;
 import foam.nanos.session.Session;
@@ -80,8 +83,9 @@ public class AuthWebAgent
     // context parameters
     HttpServletRequest  req          = x.get(HttpServletRequest.class);
     HttpServletResponse resp         = x.get(HttpServletResponse.class);
-    AuthService         auth         = (AuthService) x.get("auth");
+    AuthService         auth          = (AuthService) x.get("auth");
     DAO                 sessionDAO   = (DAO) x.get("localSessionDAO");
+    DAO                 userDAO      = (DAO) x.get("localUserDAO");
 
     // query parameters
     String              email        = req.getParameter("user");
@@ -104,7 +108,7 @@ public class AuthWebAgent
       if ( session == null ) {
         session = createSession(x);
         session.setId(sessionId);
-        sessionDAO.put(session);
+        session = (Session) sessionDAO.put(session);
       }
 
       // save cookie
@@ -115,25 +119,26 @@ public class AuthWebAgent
     } else {
       // create new cookie
       session = createSession(x);
+      session = (Session) sessionDAO.put(session);
       createCookie(x, session);
-      sessionDAO.put(session);
     }
 
+    // why are we updating here? Joel
     session.touch();
 
     if ( ! attemptLogin ) return null;
 
-    //
-    // Support for Basic HTTP Authentication
-    // Redimentary testing: curl --user username:password http://localhost:8080/service/dig
-    //   visually inspect results, on failure you'll see the dig login page.
-    //
     try {
       if ( ! SafetyUtil.isEmpty(authHeader) ) {
         StringTokenizer st = new StringTokenizer(authHeader);
         if ( st.hasMoreTokens() ) {
-          String basic = st.nextToken();
-          if ( basic.equalsIgnoreCase("basic") ) {
+          String authType = st.nextToken();
+          if ( authType.equalsIgnoreCase("basic") ) {
+            //
+            // Support for Basic HTTP Authentication
+            // Redimentary testing: curl --user username:password http://localhost:8080/service/dig
+            //   visually inspect results, on failure you'll see the dig login page.
+            //
             try {
               String credentials = new String(Base64.decode(st.nextToken()), "UTF-8");
               int index = credentials.indexOf(":");
@@ -147,7 +152,9 @@ public class AuthWebAgent
                   password = passwd;
                 }
               } else {
-                logger.debug("Invalid authorization token.");
+                logger.debug("Invalid authorization credentials. Unable to parse username:password");
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid authorization credentials.");
+                return null;
               }
             } catch (UnsupportedEncodingException e) {
               logger.warning(e, "Unsupported authentication encoding, expecting Base64.");
@@ -156,10 +163,56 @@ public class AuthWebAgent
                 return null;
               }
             }
+          } else if ( authType.equalsIgnoreCase("bearer") ) {
+            //
+            // Support for Bearer token
+            // wget --header="Authorization: Bearer 8b4529d8-636f-a880-d0f2-637650397a71" \
+            //     http://localhost:8080/service/memory
+            //
+           String token = st.nextToken();
+            Session tmp = (Session) sessionDAO.find(token);
+            if ( tmp != null ) {
+              if ( tmp.validRemoteHost(req.getRemoteHost()) ) {
+                session = tmp;
+                session.setRemoteHost(req.getRemoteHost());
+                User user = (User) userDAO.find(
+                                                AND(
+                                                    EQ(User.ID, session.getUserId()),
+                                                    EQ(User.LOGIN_ENABLED, true)
+                                                    )
+                                                );
+                // TODO: replace with AuthService.loginWithSession()
+                try {
+                  if ( user == null ) {
+                    throw new AuthenticationException("User not found");
+                  }
+                  Group group = user.findGroup(x);
+                  if ( group != null && ! group.getEnabled() ) {
+                    throw new AuthenticationException("Group disabled");
+                  }
+                  session.setContext(session.getContext().put("user", user).put("group", group));
+                  session = (Session) sessionDAO.put(session);
+                  logger.debug("AuthWebAgent.authenticate token login.");
+                  return session;
+                } catch ( AuthenticationException e ) {
+                  logger.debug("Invalid authorization token. User,Group of Session not found.", e.getMessage());
+                  resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid authorization token.");
+                  return null;
+                }
+              } else {
+                logger.debug("Invalid Source Address.");
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Source Address.");
+                return null;
+              }
+            } else {
+              logger.debug("Invalid authorization token.");
+              resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid authorization token.");
+              return null;
+            }
           } else {
-            logger.warning("Unsupported authorization type, expecting Basic, received: "+basic);
+            logger.warning("Unsupported authorization type, expecting Basic or Bearer, received: "+authType);
             if ( ! SafetyUtil.isEmpty(authHeader) ) {
-              resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Supported Authorizations: Basic");
+              resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Supported Authorizations: Basic, Bearer");
               return null;
             }
           }
