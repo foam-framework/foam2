@@ -89,7 +89,7 @@ public class AuthWebAgent
 
     // query parameters
     String              email        = req.getParameter("user");
-    String              password    = req.getParameter("password");
+    String              password     = req.getParameter("password");
     String              actAs        = req.getParameter("actAs");
     String              authHeader  = req.getHeader("Authorization");
 
