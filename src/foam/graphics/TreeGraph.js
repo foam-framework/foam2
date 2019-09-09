@@ -8,7 +8,7 @@
  foam.CLASS({
    package: 'foam.graphics',
    name: 'TreeGraph',
-   extends: 'foam.graphics.CView',
+   extends: 'foam.graphics.Box',
 
    exports: [
      'as graph',
@@ -33,45 +33,26 @@
      {
        name: 'formatNode',
        value: function() {}
-     }
+     },
+     'time'
+   ],
+
+   topics: [
+    'layoutComplete'
    ],
 
    methods: [
      function initCView() {
        this.SUPER();
 
+       this.color = 'white';
+
        if ( this.data ) {
-        this.root = this.Node.create({x:500, y: 50, data: this.data});
+        this.root = this.Node.create({y: this.nodeHeight * 2, data: this.data});
         this.add(this.root);
         this.doLayout();
        }
-
-       // List for 'click' events to expand/collapse Nodes.
-       this.canvas.on('click', function(e) {
-         var x = e.layerX+this.nodeWidth/2, y = e.layerY;
-         var c = this.canvas.cview.findFirstChildAt(x,y);
-
-         if ( ! c ) return;
-         c.expanded = ! c.expanded;
-         
-         if ( ! c.expanded ) {
-           for ( var i = 0 ; i < c.childNodes.length ; i++ ) {
-             c.childNodes[i].y = this.nodeHeight;
-             c.childNodes[i].x = 0;
-           }
-           c.maxLeft = c.maxRight = 0;
-         }
-         this.doLayout();
-       }.bind(this));
      },
-
-     function doLayout() {
-       if ( this.root ) { 
-        this.root.layout();
-        this.root.doLayout();
-      }
-       this.invalidate();
-     }
    ],
 
    classes: [
@@ -290,7 +271,7 @@
               this.doLayout();
             }
             else {
-              this.graph.updateCWidth();
+              this.graph.updateCSize();
             }
           
             this.graph.invalidate();
@@ -302,37 +283,53 @@
 
    listeners: [
      {
-       name: 'updateCWidth',
-       isFramed: true,
+       name: 'doLayout',
+       isMerged: true,
+       mergeDelay: 1,
        code: function() {
-        const maxes = {
-          maxLeft: 0,
-          maxRight: 0
-        };
-          
-        function traverseAndCompare(root) {
-          if ( root.maxLeft < maxes.maxLeft ) maxes.maxLeft = root.maxLeft;
-          if ( root.maxRight > maxes.maxRight ) maxes.maxRight = root.maxRight;
-
-          for ( var i = 0; i < root.children.length; i++ ){
-            traverseAndCompare(root.children[i]);
+         if ( ! this.time ) {
+           this.time = Date.now();
+         }
+          if ( this.root && this.root.layout() ) {
+            this.invalidate();
+            this.doLayout();
+          } else {
+            // console.log(Date.now() - this.time)
+            this.time = null;
+            this.updateCSize();
+            this.layoutComplete.pub();
           }
         }
+     },
+     {
+       name: 'updateCSize',
+       isFramed: true,
+       code: function() {
+         const maxes  = {
+           maxLeft: Number.MAX_SAFE_INTEGER,
+           maxRight: Number.MIN_SAFE_INTEGER
+         }
+        
+         this.root.outline.forEach(level => {
+           maxes.maxLeft = Math.min(level.left, maxes.maxLeft);
+           maxes.maxRight = Math.max(level.right, maxes.maxRight);
+         })
 
-        traverseAndCompare(this.root);
+         var width = Math.abs(maxes.maxLeft - maxes.maxRight);
+         var height = (this.nodeHeight * 2) * (this.root.outline.length + 1);
 
-        // needed to use the adjustments to width in order to account for proper fitting on the screen
-        // since by default with out it, the leftmost node and right most node get cutoff by half
-        // padding adjustments are there to proper spacing and also for the edge connectors to 
-        // fully render
-        var width = Math.abs(maxes.maxLeft - maxes.maxRight) + this.nodeWidth + this.padding * 4;
-        var delta = Math.abs(this.width - width) / width;
+         var deltaX = Math.abs(this.width - width) / width;
+         var deltaY = Math.abs(this.height - height) / height;
 
-        if ( delta > 0.01 ) {
-          this.width = width;
-          this.doLayout();
-        }
-       }
+         if ( deltaX > 0.01 || deltaY > 0.01 ) {
+          //  debugger;
+           this.width = width;
+           this.height = height;
+
+           this.root.centerX = 0;
+           this.root.centerX = - Math.min.apply(Math, this.root.outline.map(o => o.left));
+         }
+      }   
      }
    ]
  });
