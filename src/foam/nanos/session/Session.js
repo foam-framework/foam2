@@ -55,8 +55,6 @@ foam.CLASS({
       class: 'DateTime',
       name: 'created',
       visibility: 'RO'
-      //factory: function() { return new Date(); },
-      //javaFactory: 'return new Date();'
     },
     {
       class: 'DateTime',
