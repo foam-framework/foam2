@@ -10,7 +10,8 @@ foam.CLASS({
 
   implements: [
     'foam.nanos.auth.Authorizable',
-    'foam.nanos.auth.CreatedAware'
+    'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.CreatedByAware'
   ],
 
   javaImports: [
@@ -54,6 +55,12 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'created',
+      visibility: 'RO'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdBy',
       visibility: 'RO'
     },
     {

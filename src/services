@@ -253,6 +253,7 @@ p({
       .setOf(foam.nanos.session.Session.getOwnClassInfo())
       .setGuid(true)
       .setCreatedAware(true)
+      .setCreatedByAware(true)
       .setJournalName("sessions")
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setAuthorize(false)
