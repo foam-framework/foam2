@@ -140,7 +140,6 @@ foam.CLASS({
                       href: this.data$.map(function(data) {
                         if ( data ) {
                           var blob = data.data;
-                          var sessionId = localStorage['defaultSession'];
 
                           if ( self.BlobBlob.isInstance(blob) ) {
                             return URL.createObjectURL(blob.blob);
