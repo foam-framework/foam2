@@ -137,6 +137,10 @@ foam.CLASS({
           return true;
         }
       }
+      //
+      // For long lived sessions (tokens) we expect clients to share the token in a cluster,
+      // and therefore support
+      // When no whitelist is specified we allow a chaning IP.
       if ( getTtl() == 0 &&
            getRemoteHostWhiteList().length == 0 ) {
         return true;
