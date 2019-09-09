@@ -149,9 +149,6 @@ foam.CLASS({
                     return URL.createObjectURL(blob.blob);
 
                   var url = '/service/httpFileService/' + ProfilePictureImage.id;
-                  // attach session id if available
-                  if ( sessionId )
-                    url += '?sessionId=' + sessionId;
                   return url;
                 }
 
