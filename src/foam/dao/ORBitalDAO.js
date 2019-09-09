@@ -29,31 +29,27 @@ foam.CLASS({
       type: 'Object',
 
       args: [
-        { name: 'x' , type: 'foam.core.X'}, { name: 'obj' , type: 'FObject' }
+        { name: 'x' , type: 'foam.core.X'}, { name: 'obj' , type: 'Object' }
       ],
 
       javaCode: `
         ORBRequest request = null;
-            try {
-              request = (ORBRequest) obj;
-            } catch (Exception e) {
-              Logger logger = (Logger) x.get("logger");
-              logger.error(e);
-            }
+        if ( obj instanceof ORBRequest) request = (ORBRequest) obj;
+        else return getDelegate().cmd_(x, obj);
 
-            String receiverID = request.getReceiverObjectID();
+        String receiverID = request.getReceiverObjectID();
 
-            // Get the receiving object
-            FObject receiverFObj = request.getReceiverObject();
-            receiverFObj =  ( receiverFObj == null && receiverID != null )? (FObject) x.get(receiverID) : null;
+        // Get the receiving object
+        FObject receiverFObj = request.getReceiverObject();
+        receiverFObj =  ( receiverFObj == null && receiverID != null )? (FObject) x.get(receiverID) : receiverFObj;
 
-            if ( receiverFObj != null ) {
-              ClassInfo classInfo = receiverFObj.getClassInfo();
-              MethodInfo methodInfo = (MethodInfo) classInfo.getAxiomByName(request.getMethodName());
-              return methodInfo.call(x, receiverFObj, request.getArgs());
-            } else {
-              return null;
-            }
+        if ( receiverFObj != null ) {
+          ClassInfo classInfo = receiverFObj.getClassInfo();
+          MethodInfo methodInfo = (MethodInfo) classInfo.getAxiomByName(request.getMethodName());
+          return methodInfo.call(x, receiverFObj, request.getArgs());
+        } else {
+          return null;
+        }
       `
     }
   ]
