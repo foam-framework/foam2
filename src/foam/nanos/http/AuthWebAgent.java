@@ -152,7 +152,7 @@ public class AuthWebAgent
                   password = passwd;
                 }
               } else {
-                logger.debug("Invalid authorization credentials. Unable to parse username:password");
+                logger.debug("Invalid authentication credentials. Unable to parse username:password");
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid authorization credentials.");
                 return null;
               }
