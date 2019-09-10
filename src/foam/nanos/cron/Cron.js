@@ -32,7 +32,7 @@ foam.CLASS({
       of: 'foam.nanos.cron.Schedule',
       name: 'schedule',
       factory: `
-        return new NeverSchedule.Builder().build();
+        return new CronSchedule.Builder().build();
       `
     },
     {
