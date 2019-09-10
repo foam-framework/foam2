@@ -73,7 +73,7 @@ foam.CLASS({
       class: 'Duration',
       name: 'ttl',
       label: 'TTL',
-      documentation: 'The "time to live" of the session. The amount of time in milliseconds that the session should be kept alive after its last use before being destroyed. A value of 0 or less signifies that the session should never be destroyed unless the user explicitly logs out.',
+      documentation: 'The "time to live" of the session. The amount of time in milliseconds that the session should be kept alive after its last use before being destroyed. A value of less than zero signifies that the session should never be destroyed unless the user explicitly logs out.',
       value: 28800000 // 1000 * 60 * 60 * 8 = number of milliseconds in 8 hours
     },
     {
@@ -134,23 +134,21 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      if ( SafetyUtil.equals(getRemoteHost(), remoteHost) ) {
-        return true;
-      }
-      for ( String host : getRemoteHostWhiteList() ) {
-        if ( SafetyUtil.equals(host, remoteHost) ) {
+        if ( SafetyUtil.equals(getRemoteHost(), remoteHost) ) {
           return true;
         }
-      }
-      //
-      // For long lived sessions (tokens) we expect clients to share the token in a cluster,
-      // and therefore support
-      // When no whitelist is specified we allow a chaning IP.
-      if ( getTtl() == 0 &&
-           getRemoteHostWhiteList().length == 0 ) {
-        return true;
-      }
-      return false;
+
+        for ( String host : getRemoteHostWhiteList() ) {
+          if ( SafetyUtil.equals(host, remoteHost) ) {
+            return true;
+          }
+        }
+
+        // For long lived sessions (tokens) we expect clients to share the token
+        // in a cluster. When the token is shared in a cluster, the IP address
+        // will change often. We support that use case by checking that no
+        // whitelist is specified and TTL is explicitly set to a negative value.
+        return getTtl() < 0 && getRemoteHostWhiteList().length == 0;
       `
     },
     {
