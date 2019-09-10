@@ -7,28 +7,13 @@
 foam.CLASS({
   package: 'foam.nanos.cron',
   name: 'NeverSchedule',
-
   documentation: `
     Schedule that always reports the date corresponding to the
     timestamp represented by the maximum long integer.
   `,
-
   implements: [
     'foam.nanos.cron.Schedule'
   ],
-
-  javaImports: [
-    'java.util.Date'
-  ],
-
-  properties: [
-    {
-      name: 'delegates',
-      class: 'FObjectArray',
-      of: 'foam.nanos.cron.Schedule'
-    }
-  ],
-
   methods: [
     {
       name: 'getNextScheduledTime',
@@ -38,9 +23,7 @@ foam.CLASS({
           type: 'java.util.Date'
         }
       ],
-      javaCode: `
-        return new Date(Long.MAX_VALUE);
-      `
+      javaCode: `return new java.util.Date(Long.MAX_VALUE);`
     }
   ]
 });
