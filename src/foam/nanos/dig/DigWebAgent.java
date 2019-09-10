@@ -344,37 +344,37 @@ public class DigWebAgent
         Object[] psArray = (Object[]) ps.value();
         logger.debug("ps.value.length: " + psArray.length);
 
-        for (Object objPs : psArray) {
+        for ( Object objPs : psArray ) {
           logger.debug("ps.value() : " + objPs);
 
-          if ( ! objPs.toString().equals("*") ) {
+          if ( objPs.toString().startsWith("groupBy") || objPs.toString().startsWith("min") || objPs.toString().startsWith("max") || objPs.toString().startsWith("avg") ) {
             String pName = getPropertyName(objPs.toString());
             PropertyInfo pInfo = (PropertyInfo) cInfo.getAxiomByName(pName);
 
-            if (pInfo != null) {
-              if (objPs.toString().startsWith("groupBy")) {
+            if ( pInfo != null) {
+              if ( objPs.toString().startsWith("groupBy") ) {
                 foam.mlang.sink.GroupBy groupBy = (foam.mlang.sink.GroupBy) dao.select(MLang.GROUP_BY(pInfo, new foam.mlang.sink.Count()));
 
-                for (Object key : groupBy.getGroups().keySet()) {
+                for ( Object key : groupBy.getGroups().keySet() ) {
                   foam.mlang.sink.Count count = ((foam.mlang.sink.Count) groupBy.getGroups().get(key));
                   out.println(key + " : " + count.getValue());
                 }
-              } else if (objPs.toString().startsWith("min") || objPs.toString().startsWith("max") || objPs.toString().startsWith("avg")) {
+              } else if ( objPs.toString().startsWith("min") || objPs.toString().startsWith("max") || objPs.toString().startsWith("avg") ) {
                 foam.dao.Sink[] seqSinkArray = {MLang.MIN(pInfo), MLang.MAX(pInfo), MLang.AVG(pInfo), MLang.SUM(pInfo)};
                 foam.mlang.sink.Sequence seq = (foam.mlang.sink.Sequence) dao.select(MLang.SEQ(seqSinkArray));
 
-                for (Object o : seq.getArgs()) {
-                  if (o instanceof foam.mlang.sink.Min)
+                for ( Object o : seq.getArgs() ) {
+                  if ( o instanceof foam.mlang.sink.Min )
                     out.println("MIN : " + ((foam.mlang.sink.Min) o).getValue());
-                  else if (o instanceof foam.mlang.sink.Max)
+                  else if ( o instanceof foam.mlang.sink.Max )
                     out.println("MAX : " + ((foam.mlang.sink.Max) o).getValue());
-                  else if (o instanceof foam.mlang.sink.Average)
+                  else if ( o instanceof foam.mlang.sink.Average )
                     out.println("AVG : " + ((foam.mlang.sink.Average) o).getValue());
-                  else if (o instanceof foam.mlang.sink.Sum)
+                  else if ( o instanceof foam.mlang.sink.Sum )
                     out.println("SUM : " + ((foam.mlang.sink.Sum) o).getValue());
                 }
               }
-            } else if (pInfo == null) {
+            } else if ( pInfo == null ) {
               DigErrorMessage error = new GeneralException.Builder(x)
                 .setMessage("Invalid Filed Name : " + pName)
                 .build();
