@@ -596,6 +596,7 @@ FOAM_FILES([
   { name: "foam/test/TestObj" },
   { name: "foam/core/FObjectTest" },
   { name: "com/google/foam/demos/bubbles/Bubbles" },
+  { name: "com/google/foam/demos/u2/AllViews" },
 
   { name: "foam/flow/Document" },
   { name: "foam/flow/MarkupEditor" },
