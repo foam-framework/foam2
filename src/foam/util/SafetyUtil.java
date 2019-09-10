@@ -9,6 +9,10 @@ package foam.util;
 /** Convenience methods for performing standard operations with null checks. **/
 public class SafetyUtil {
 
+  // The largest date we can safely pass to JS so this is the largest date we
+  // should use in java unless we have a good reason to surpass it.
+  public static java.util.Date MAX_DATE = new java.util.Date(8640000000000000L);
+
   public static boolean equals(Object o1, Object o2) {
     return compare(o1, o2) == 0;
   }
