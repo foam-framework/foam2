@@ -677,12 +677,12 @@ FOAM_FILES([
   { name: "foam/u2/detail/WizardSectionsView" },
   { name: "foam/u2/detail/SectionedDetailPropertyView" },
 
-  { name: "foam/graphics/GreekView" },
+  { name: "foam/graphics/ZoomMapView" },
 
   // Strategy
   { name: "foam/strategy/StrategyReference" },
   { name: "foam/strategy/StrategizerService" },
   { name: "foam/strategy/BasicStrategizer" },
   { name: "foam/strategy/ClientStrategizerService" },
-  { name: "foam/u2/view/PagedTableView" }
+  { name: "foam/u2/view/PagedTableView" },
 ]);
