@@ -278,7 +278,7 @@ public class Outputter
       while ( e.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) e.next();
         if ( propertyPredicate_ == null || propertyPredicate_.propertyPredicateCheck(this.x_, of.toLowerCase(), prop) ) {
-          if ( fields_ != null && checkFieldsProperty(prop) )
+          if ( fields_ != null && checkFieldsProperty(prop) || fields_ == null )
             filteredAxioms.add(prop);
         }
       }

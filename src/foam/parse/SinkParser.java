@@ -26,13 +26,14 @@ public class SinkParser
 {
   public SinkParser(final ClassInfo info) {
     super(new Alt(
-      new Literal("*"),
       new Repeat(expressionParser(info), ",", 1)));
   }
 
   public static Parser expressionParser(ClassInfo cInfo) {
     List         properties = cInfo.getAxiomsByClass(PropertyInfo.class);
     List<Parser> parsers    = new ArrayList<Parser>();
+
+    parsers.add(new Literal("*"));
 
     for ( Object prop : properties ) {
       PropertyInfo pInfo = (PropertyInfo) prop;

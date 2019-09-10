@@ -128,7 +128,7 @@ public class Outputter
       if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
 
       //outputHead(prop);
-      if ( fields_ != null && checkFieldsProperty(prop) ) {
+      if ( fields_ != null && checkFieldsProperty(prop) || fields_ == null ) {
         Object value = prop.get(obj);
         if (value == null) continue;
 
@@ -162,13 +162,15 @@ public class Outputter
 
     writer_.append("<thead><tr>");
     List<PropertyInfo> prop = info.getAxiomsByClass(PropertyInfo.class);
-    for( PropertyInfo pi : prop ) {
-      if ( checkFieldsProperty(pi) ) {
+
+    for (PropertyInfo pi : prop) {
+      if ( fields_ != null && checkFieldsProperty(pi) || fields_ == null ) {
         writer_.append("<th>");
         writer_.append(pi.getName());
         writer_.append("</th>");
       }
     }
+
     writer_.append("</tr></thead>");
   }
 
