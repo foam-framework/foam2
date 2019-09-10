@@ -32,7 +32,7 @@ foam.CLASS({
       of: 'foam.nanos.cron.Schedule',
       name: 'schedule',
       hidden: true,
-      javaFactory: `return new NeverSchedule.Builder(getX()).build();`
+      javaFactory: `return new CronSchedule.Builder(getX()).build();`
     },
     {
       class: 'DateTime',
