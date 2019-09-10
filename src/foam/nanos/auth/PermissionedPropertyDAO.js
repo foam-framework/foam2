@@ -51,19 +51,6 @@ foam.CLASS({
     },
 
     {
-      name: 'select_',
-      javaCode: `
-      if ( x.get("auth") != null ) {
-        if ( predicate != null ) predicate.authorize(x);
-        foam.dao.Sink sink2 = ( sink != null ) ? new HidePropertiesSink(x, sink, this) : sink;
-        super.select_(x, sink2, skip, limit, order, predicate);
-        return sink;
-      }
-      return super.select_(x, sink, skip, limit, order, predicate);
-      `,
-    },
-
-    {
       name: 'maybeResetProperties',
       type: 'foam.core.FObject',
       args: [
