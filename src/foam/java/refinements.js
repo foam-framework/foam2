@@ -248,7 +248,10 @@ foam.CLASS({
         foam.core.PropertyInfo prop = this;
         map.put(getName(), new foam.lib.csv.FromCSVSetter() {
           public void set(foam.core.FObject obj, String str) {
+          try{
             prop.set(obj, fromString(str));
+            }
+            catch (RuntimeException E) {}
           }
         });
       `
