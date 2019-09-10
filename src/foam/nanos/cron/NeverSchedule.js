@@ -23,7 +23,7 @@ foam.CLASS({
           type: 'java.util.Date'
         }
       ],
-      javaCode: `return new java.util.Date(Long.MAX_VALUE);`
+      javaCode: `return new java.util.Date(${Number.MAX_SAFE_INTEGER}L);`
     }
   ]
 });
