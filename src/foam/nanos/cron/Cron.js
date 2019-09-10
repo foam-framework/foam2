@@ -31,14 +31,14 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.cron.Schedule',
       name: 'schedule',
-      javaFactory: `
-        return new NeverSchedule.Builder().build();
-      `
+      hidden: true,
+      javaFactory: `return new NeverSchedule.Builder().build();`
     },
     {
       class: 'DateTime',
       name: 'scheduledTime',
       documentation: `Scheduled time to run Cron script.`,
+      hidden: true,
       javaFactory: 'return getNextScheduledTime();'
     },
     {
