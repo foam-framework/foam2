@@ -297,6 +297,7 @@ var classes = [
   'foam.nanos.cron.Cron',
   'foam.nanos.cron.TimeHMS',
   'foam.nanos.cron.Schedule',
+  'foam.nanos.cron.NeverSchedule',
   'foam.nanos.cron.OrSchedule',
   'foam.nanos.cron.CronSchedule',
   'foam.nanos.cron.IntervalSchedule',
