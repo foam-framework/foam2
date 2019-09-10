@@ -73,8 +73,17 @@ foam.CLASS({
       class: 'Duration',
       name: 'ttl',
       label: 'TTL',
-      documentation: 'The "time to live" of the session. The amount of time in milliseconds that the session should be kept alive after its last use before being destroyed. A value of less than zero signifies that the session should never be destroyed unless the user explicitly logs out.',
-      value: 28800000 // 1000 * 60 * 60 * 8 = number of milliseconds in 8 hours
+      documentation: 'The "time to live" of the session. The amount of time in milliseconds that the session should be kept alive after its last use before being destroyed. Must be a positive value or zero.',
+      value: 28800000, // 1000 * 60 * 60 * 8 = number of milliseconds in 8 hours
+      validationPredicates: [
+        {
+          args: ['ttl'],
+          predicateFactory: function(e) {
+            return e.GTE(foam.nanos.session.Session.TTL, 0);
+          },
+          errorString: 'TTL must be 0 or greater.'
+        }
+      ]
     },
     {
       class: 'Long',

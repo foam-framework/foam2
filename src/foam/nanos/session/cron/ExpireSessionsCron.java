@@ -37,7 +37,7 @@ public class ExpireSessionsCron implements ContextAgent {
         session.setLastUsed(now);
       }
 
-      if ( session.getLastUsed().getTime() + Math.max(session.getTtl(), 0L) <= now.getTime() ) {
+      if ( session.getLastUsed().getTime() + session.getTtl() <= now.getTime() ) {
         logger.debug("Destroyed expired session : " + (String) session.getId());
         localSessionDAO.remove(session);
       }
