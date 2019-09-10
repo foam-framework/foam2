@@ -9,13 +9,16 @@ foam.CLASS({
   name: 'Session',
 
   implements: [
-    'foam.nanos.auth.Authorizable'
+    'foam.nanos.auth.Authorizable',
+    'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.CreatedByAware'
   ],
 
   javaImports: [
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.AuthorizationException',
     'foam.nanos.auth.User',
+    'foam.util.SafetyUtil',
     'java.util.Date'
   ],
 
@@ -23,7 +26,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
-      javaFactory: 'return java.util.UUID.randomUUID().toString();',
+      visibility: 'RO'
     },
     {
       class: 'Long',
@@ -33,7 +36,9 @@ foam.CLASS({
         this.__context__.userDAO.find(value).then(function(user) {
           this.add(' ', user && user.label());
         }.bind(this));
-      }
+      },
+      required: true,
+      visibility: 'FINAL',
     },
     {
       class: 'Long',
@@ -44,17 +49,24 @@ foam.CLASS({
         this.__context__.userDAO.find(value).then(function(user) {
           this.add(' ', user.label());
         }.bind(this));
-      }
+      },
+      visibility: 'RO',
     },
     {
       class: 'DateTime',
       name: 'created',
-      factory: function() { return new Date(); },
-      javaFactory: 'return new Date();'
+      visibility: 'RO'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdBy',
+      visibility: 'RO'
     },
     {
       class: 'DateTime',
       name: 'lastUsed',
+      visibility: 'RO',
       storageTransient: true
     },
     {
@@ -71,7 +83,13 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'remoteHost'
+      name: 'remoteHost',
+      visibility: 'RO'
+    },
+    {
+      documentation: 'Intended to be used with long TTL sessions, further restricting to a known set of IPs.',
+      class: 'StringArray',
+      name: 'remoteHostWhiteList'
     },
     {
       class: 'Object',
@@ -105,6 +123,34 @@ foam.CLASS({
           setLastUsed(new Date());
           setUses(getUses()+1);
         }
+      `
+    },
+    {
+      name: 'validRemoteHost',
+      type: 'Boolean',
+      args: [
+        {
+          name: 'remoteHost', type: 'String'
+        }
+      ],
+      javaCode: `
+      if ( SafetyUtil.equals(getRemoteHost(), remoteHost) ) {
+        return true;
+      }
+      for ( String host : getRemoteHostWhiteList() ) {
+        if ( SafetyUtil.equals(host, remoteHost) ) {
+          return true;
+        }
+      }
+      //
+      // For long lived sessions (tokens) we expect clients to share the token in a cluster,
+      // and therefore support
+      // When no whitelist is specified we allow a chaning IP.
+      if ( getTtl() == 0 &&
+           getRemoteHostWhiteList().length == 0 ) {
+        return true;
+      }
+      return false;
       `
     },
     {
