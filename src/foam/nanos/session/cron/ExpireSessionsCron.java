@@ -18,14 +18,26 @@ public class ExpireSessionsCron implements ContextAgent {
 
   @Override
   public void execute(X x) {
-
     logger = (Logger) x.get("logger");
     localSessionDAO = (DAO) x.get("localSessionDAO");
+    Date now = new Date();
 
-    List<Session> expiredSessions = ((ArraySink) localSessionDAO.where(GT(Session.TTL, 0)).select(new ArraySink())).getArray();
+    List<Session> expiredSessions = ((ArraySink) localSessionDAO.select(new ArraySink())).getArray();
 
     for ( Session session : expiredSessions ) {
-      if ( session.getLastUsed() != null && session.getLastUsed().getTime() + Math.max(session.getTtl(), 0L) <= (new Date()).getTime() ) {
+      // This happens when the server is restarted. We don't journal the
+      // 'lastUsed' property since it would take up an unacceptable amount of
+      // space. That means that our session expiry calculations can't be fully
+      // correct since we lose the 'lastUsed' info when a restart happens.
+      if ( session.getLastUsed() == null ) {
+        // Mark the session as last used now so the session won't sit around in
+        // sessionDAO forever if it doesn't get used again. This will lead to
+        // sessions lasting longer than intended if a server restart happens,
+        // but this is a known trade-off to save space.
+        session.setLastUsed(now);
+      }
+
+      if ( session.getLastUsed().getTime() + Math.max(session.getTtl(), 0L) <= now.getTime() ) {
         logger.debug("Destroyed expired session : " + (String) session.getId());
         localSessionDAO.remove(session);
       }
