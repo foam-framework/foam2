@@ -31,7 +31,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.cron.Schedule',
       name: 'schedule',
-      factory: `
+      javaFactory: `
         return new NeverSchedule.Builder().build();
       `
     },
