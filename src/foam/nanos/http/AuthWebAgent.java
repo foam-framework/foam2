@@ -10,6 +10,8 @@ import foam.core.X;
 import foam.dao.DAO;
 import static foam.mlang.MLang.AND;
 import static foam.mlang.MLang.EQ;
+
+import foam.nanos.app.AppConfig;
 import foam.nanos.auth.AgentAuthService;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.AuthenticationException;
@@ -56,7 +58,29 @@ public class AuthWebAgent
 
   public void createCookie(X x, Session session) {
     HttpServletResponse resp = x.get(HttpServletResponse.class);
-    resp.addCookie(new Cookie(SESSION_ID, session.getId()));
+    Cookie sessionCookie = new Cookie(SESSION_ID, session.getId());
+
+    // Specify that the cookie should not be accessible by client-side scripts.
+    sessionCookie.setHttpOnly(true);
+
+    // Specify that the cookie should only be sent over secure connections if
+    // the app is configured that way.
+    AppConfig appConfig = (AppConfig) x.get("appConfig");
+    sessionCookie.setSecure(appConfig.getForceHttps());
+
+    int ttlInSeconds = session.getTtl() < 0
+      // Session should last forever. Since cookies don't support lasting
+      // forever, the best we can do is set a max age that's significantly
+      // long-lasting. Here we use the greatest possible representable integer,
+      // which is equivalent to just over 68 years.
+      ? Integer.MAX_VALUE
+
+      // If the time to live is zero or positive, then convert to seconds,
+      // rounding up to the nearest second.
+      : (int) Math.ceil(session.getTtl() / 1000.0);
+
+    sessionCookie.setMaxAge(ttlInSeconds);
+    resp.addCookie(sessionCookie);
   }
 
   public void templateLogin(X x) {
