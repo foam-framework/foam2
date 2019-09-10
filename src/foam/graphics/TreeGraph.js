@@ -297,7 +297,6 @@
             // console.log(Date.now() - this.time)
             this.time = null;
             this.updateCSize();
-            this.layoutComplete.pub();
           }
         }
      },
@@ -328,6 +327,7 @@
 
            this.root.centerX = 0;
            this.root.centerX = - Math.min.apply(Math, this.root.outline.map(o => o.left));
+           this.layoutComplete.pub();
          }
       }   
      }
