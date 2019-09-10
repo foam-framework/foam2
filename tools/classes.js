@@ -110,6 +110,7 @@ var classes = [
   'foam.lib.csv.PrefixedCSVOutputter',
   'foam.lib.csv.CSVOutputterImpl',
   'foam.lib.csv.ProxyCSVOutputter',
+  'foam.lib.csv.FromCSVSetter',
   'foam.dao.java.JDAO',
   'foam.dao.FilteredDAO',
   'foam.dao.Journal',
@@ -293,6 +294,14 @@ var classes = [
   'foam.nanos.script.TestRunnerScript',
   'foam.nanos.test.Test',
   'foam.nanos.cron.Cron',
+  'foam.nanos.cron.TimeHMS',
+  'foam.nanos.cron.Schedule',
+  'foam.nanos.cron.OrSchedule',
+  'foam.nanos.cron.CronSchedule',
+  'foam.nanos.cron.IntervalSchedule',
+  'foam.nanos.cron.TimeOfDaySchedule',
+  'foam.nanos.cron.test.IntervalScheduleTest',
+  'foam.nanos.cron.test.TimeOfDayScheduleTest',
   'foam.dao.history.PropertyUpdate',
   'foam.dao.history.HistoryRecord',
   'foam.dao.FixedSizeDAO',
@@ -460,7 +469,6 @@ var classes = [
   'foam.strategy.StrategizerService',
   'foam.strategy.BasicStrategizer',
   'foam.strategy.ClientStrategizerService'
-
 ];
 
 var abstractClasses = [

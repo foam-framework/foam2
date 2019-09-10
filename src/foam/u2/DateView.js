@@ -63,7 +63,8 @@ foam.CLASS({
     },
 
     function inputToData(input) {
-      return new Date(input);
+      var d = new Date(input);
+      return isNaN(d.getTime()) ? null : d;
     },
 
     function dataToInput(data) {
