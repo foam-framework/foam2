@@ -73,8 +73,17 @@ foam.CLASS({
       class: 'Duration',
       name: 'ttl',
       label: 'TTL',
-      documentation: 'The "time to live" of the session. The amount of time in milliseconds that the session should be kept alive after its last use before being destroyed. A value of 0 or less signifies that the session should never be destroyed unless the user explicitly logs out.',
-      value: 28800000 // 1000 * 60 * 60 * 8 = number of milliseconds in 8 hours
+      documentation: 'The "time to live" of the session. The amount of time in milliseconds that the session should be kept alive after its last use before being destroyed. Must be a positive value or zero.',
+      value: 28800000, // 1000 * 60 * 60 * 8 = number of milliseconds in 8 hours
+      validationPredicates: [
+        {
+          args: ['ttl'],
+          predicateFactory: function(e) {
+            return e.GTE(foam.nanos.session.Session.TTL, 0);
+          },
+          errorString: 'TTL must be 0 or greater.'
+        }
+      ]
     },
     {
       class: 'Long',
@@ -99,6 +108,18 @@ foam.CLASS({
       javaFactory: 'return getX().put("user", null).put("group", null).put(Session.class, this);',
       hidden: true,
       transient: true
+    },
+    {
+      class: 'Boolean',
+      name: 'ignoreRemoteHostChanges',
+      documentation: `
+        Set to true if this session should not be deleted when the remote host
+        changes. The intended use case for this flag is to allow customers that
+        will be accessing the server via a cluster to use the same session.
+        We turn this off by default since we want to delete users' sessions when
+        they're accessed from a new remote host to prevent session hijacking
+        attacks.
+      `
     }
   ],
 
@@ -134,23 +155,21 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      if ( SafetyUtil.equals(getRemoteHost(), remoteHost) ) {
-        return true;
-      }
-      for ( String host : getRemoteHostWhiteList() ) {
-        if ( SafetyUtil.equals(host, remoteHost) ) {
+        if ( getIgnoreRemoteHostChanges() ) {
           return true;
         }
-      }
-      //
-      // For long lived sessions (tokens) we expect clients to share the token in a cluster,
-      // and therefore support
-      // When no whitelist is specified we allow a chaning IP.
-      if ( getTtl() == 0 &&
-           getRemoteHostWhiteList().length == 0 ) {
-        return true;
-      }
-      return false;
+
+        if ( SafetyUtil.equals(getRemoteHost(), remoteHost) ) {
+          return true;
+        }
+
+        for ( String host : getRemoteHostWhiteList() ) {
+          if ( SafetyUtil.equals(host, remoteHost) ) {
+            return true;
+          }
+        }
+
+        return false;
       `
     },
     {
