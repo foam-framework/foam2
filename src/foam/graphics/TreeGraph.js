@@ -33,12 +33,11 @@
      {
        name: 'formatNode',
        value: function() {}
-     },
-     'time'
+     }
    ],
 
    topics: [
-    'layoutComplete'
+    'resizeComplete'
    ],
 
    methods: [
@@ -287,14 +286,10 @@
        isMerged: true,
        mergeDelay: 1,
        code: function() {
-         if ( ! this.time ) {
-           this.time = Date.now();
-         }
           if ( this.root && this.root.layout() ) {
             this.invalidate();
             this.doLayout();
           } else {
-            // console.log(Date.now() - this.time)
             this.time = null;
             this.updateCSize();
           }
@@ -321,13 +316,12 @@
          var deltaY = Math.abs(this.height - height) / height;
 
          if ( deltaX > 0.01 || deltaY > 0.01 ) {
-          //  debugger;
            this.width = width;
            this.height = height;
 
            this.root.centerX = 0;
            this.root.centerX = - Math.min.apply(Math, this.root.outline.map(o => o.left));
-           this.layoutComplete.pub();
+           this.resizeComplete.pub();
          }
       }   
      }
