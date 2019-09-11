@@ -193,7 +193,7 @@ public class MDAO
   }
 
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( predicate == null ) {
+    if ( predicate == null && skip == 0 && limit == MAX_SAFE_INTEGER ) {
       synchronized ( writeLock_ ) {
         setState(null);
       }
