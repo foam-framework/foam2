@@ -58,7 +58,8 @@ p({
   "status":2,
   "code":
   """
-    file = java.io.File.createTempFile(\"temp\", null);
+    home = System.getProperty("JOURNAL_HOME");
+    file = java.io.File.createTempFile(\"temp\", null, new java.io.File(home));
     file.deleteOnExit();
     outputter = new foam.lib.json.Outputter(x, file);
     string = \"\\\\\\t line1 \\n   \\\\n  \\n line2 \\n line3 \\\" \\\\ \";
@@ -71,7 +72,7 @@ p({
     outputter.flush();
     filejournal = new foam.dao.FileJournal(x);
     filejournal.setMultiLineOutput(true);
-    filejournal.setFile(file);
+    filejournal.setFilename(file.getName());
     firstread = filejournal.getEntry(filejournal.getReader());
     firstread = firstread.substring(2, firstread.length() - 1);
     parser = new foam.lib.json.JSONParser();
