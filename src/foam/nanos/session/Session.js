@@ -186,29 +186,53 @@ foam.CLASS({
     {
       name: 'authorizeOnCreate',
       javaCode: `
-      AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("create")) ) throw new AuthorizationException("You don't have permission to create this session.");
+        AuthService auth = (AuthService) x.get("auth");
+
+        if (
+          ! checkOwnership(x) &&
+          ! auth.check(x, createPermission("create"))
+        ) {
+          throw new AuthorizationException("You don't have permission to create sessions other than your own.");
+        }
       `
     },
     {
       name: 'authorizeOnUpdate',
       javaCode: `
-      AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("update")) ) throw new AuthorizationException("You don't have permission to update sessions other than your own.");
+        AuthService auth = (AuthService) x.get("auth");
+
+        if (
+          ! checkOwnership(x) &&
+          ! auth.check(x, createPermission("update"))
+        ) {
+          throw new AuthorizationException("You don't have permission to update sessions other than your own.");
+        }
       `
     },
     {
       name: 'authorizeOnDelete',
       javaCode: `
-      AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, "*") ) throw new AuthorizationException("You don't have permission to delete sessions other than your own.");
+        AuthService auth = (AuthService) x.get("auth");
+
+        if (
+          ! checkOwnership(x) &&
+          ! auth.check(x, "*")
+        ) {
+          throw new AuthorizationException("You don't have permission to delete sessions other than your own.");
+        }
       `
     },
     {
       name: 'authorizeOnRead',
       javaCode: `
-      AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("read")) ) throw new AuthorizationException("You don't have permission to view sessions other than your own.");
+        AuthService auth = (AuthService) x.get("auth");
+
+        if (
+          ! checkOwnership(x) &&
+          ! auth.check(x, createPermission("read"))
+        ) {
+          throw new AuthorizationException("You don't have permission to view sessions other than your own.");
+        }
       `
     },
     {
