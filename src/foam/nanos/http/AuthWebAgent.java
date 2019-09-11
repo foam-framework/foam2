@@ -10,6 +10,8 @@ import foam.core.X;
 import foam.dao.DAO;
 import static foam.mlang.MLang.AND;
 import static foam.mlang.MLang.EQ;
+
+import foam.nanos.app.AppConfig;
 import foam.nanos.auth.AgentAuthService;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.AuthenticationException;
@@ -56,7 +58,18 @@ public class AuthWebAgent
 
   public void createCookie(X x, Session session) {
     HttpServletResponse resp = x.get(HttpServletResponse.class);
-    resp.addCookie(new Cookie(SESSION_ID, session.getId()));
+    Cookie sessionCookie = new Cookie(SESSION_ID, session.getId());
+
+    // Specify that the cookie should not be accessible by client-side scripts.
+    sessionCookie.setHttpOnly(true);
+
+    // Specify that the cookie should only be sent over secure connections if
+    // the app is configured that way.
+    AppConfig appConfig = (AppConfig) x.get("appConfig");
+    sessionCookie.setSecure(appConfig.getForceHttps());
+    int ttlInSeconds = (int) Math.ceil(session.getTtl() / 1000.0);
+    sessionCookie.setMaxAge(ttlInSeconds);
+    resp.addCookie(sessionCookie);
   }
 
   public void templateLogin(X x) {

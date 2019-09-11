@@ -144,14 +144,10 @@ foam.CLASS({
               src: this.ProfilePictureImage$.map(function(ProfilePictureImage) {
                 if ( ProfilePictureImage && ProfilePictureImage.data ) {
                   var blob = ProfilePictureImage.data;
-                  var sessionId = localStorage['defaultSession'];
                   if ( self.BlobBlob.isInstance(blob) )
                     return URL.createObjectURL(blob.blob);
 
                   var url = '/service/httpFileService/' + ProfilePictureImage.id;
-                  // attach session id if available
-                  if ( sessionId )
-                    url += '?sessionId=' + sessionId;
                   return url;
                 }
 
