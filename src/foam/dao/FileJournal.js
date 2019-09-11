@@ -77,11 +77,7 @@ foam.CLASS({
       class: 'Object',
       name: 'outputter',
       javaType: 'foam.lib.json.Outputter',
-      javaFactory: `
-        foam.lib.json.Outputter outputter = new Outputter(getX()).setPropertyPredicate(new StoragePropertyPredicate()); 
-        outputter.setMultiLine(getMultiLineOutput()); 
-        return outputter;
-        `
+      javaFactory: `return new Outputter(getX()).setPropertyPredicate(new StoragePropertyPredicate());`
     },
     {
       class: 'Object',
@@ -112,8 +108,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'multiLineOutput',
-      value: false
+      name: 'multiLine'
     },
     {
       class: 'Boolean',
@@ -165,10 +160,6 @@ try {
       synchronized: true,
       javaCode: `
         try {
-          String c = "";
-          if ( getMultiLineOutput() )
-            c = "\\n";
-
           String record = ( old != null ) ?
             getOutputter().stringifyDelta(old, nu) :
             getOutputter().stringify(nu);
@@ -179,10 +170,8 @@ try {
               .append("p(")
               .append(record)
               .append(")")
-              .append(c)
               .toString());
           }
-
         } catch ( Throwable t ) {
           getLogger().error("Failed to write put entry to journal", t);
           throw new RuntimeException(t);

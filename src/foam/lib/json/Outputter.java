@@ -37,11 +37,10 @@ public class Outputter
   };
 
   protected foam.core.X x_;
-  public PrintWriter   writer_;
+  protected PrintWriter   writer_;
   protected StringWriter  stringWriter_        = null;
   protected boolean       outputShortNames_    = false;
   protected boolean       outputDefaultValues_ = false;
-  protected boolean       multiLineOutput_     = false;
   protected boolean       outputClassNames_    = true;
   protected boolean       outputReadableDates_ = true;
   protected PropertyPredicate propertyPredicate_;
@@ -97,29 +96,18 @@ public class Outputter
   }
 
   public void outputString(String s) {
-    if ( multiLineOutput_ && s.indexOf('\n') >= 0 ) {
-      writer_.append("\n");
-      writer_.append("\"\"\"");
-      writer_.append(escapeMultiline(s));
-      writer_.append("\"\"\"");
-    }
-    else {
-      writer_.append("\"");
-      writer_.append(escape(s));
-      writer_.append("\"");
-    }
+    writer_.append("\"");
+    writer_.append(escape(s));
+    writer_.append("\"");
   }
 
   public String escape(String s) {
-    return s.replace("\\", "\\\\")
-            .replace("\"", "\\\"")
-            .replace("\t", "\\t")
-            .replace("\r","\\r")
-            .replace("\n","\\n");
-  }
-
-  public String escapeMultiline(String s) {
-    return s.replace("\\", "\\\\");
+    return s
+      .replace("\\", "\\\\")
+      .replace("\"", "\\\"")
+      .replace("\t", "\\t")
+      .replace("\r","\\r")
+      .replace("\n","\\n");
   }
 
   protected void outputNumber(Number value) {
@@ -308,8 +296,7 @@ public class Outputter
     }
 
     if ( includeComma ) writer_.append(",");
-    if ( multiLineOutput_ ) addInnerNewline();
-    outputProperty(fo, prop); 
+    outputProperty(fo, prop);
     return true;
   }
 
@@ -323,13 +310,12 @@ public class Outputter
       List     axioms = getProperties(info);
       Iterator i      = axioms.iterator();
 
-      writer_.append("{");
-      if ( multiLineOutput_ ) addInnerNewline();
       while ( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
         isPropertyDiff = maybeOutputPropertyDelta(oldFObject, newFObject, prop);
         if ( isPropertyDiff) {
           if ( ! isDiff ) {
+            writer_.append("{");
             if ( outputClassNames_ ) {
               //output Class name
               writer_.append(beforeKey_());
@@ -339,27 +325,17 @@ public class Outputter
               outputString(info.getId());
             }
             if ( outputClassNames_ ) writer_.append(",");
-            addInnerNewline();
             PropertyInfo id = (PropertyInfo) info.getAxiomByName("id");
             outputProperty(newFObject, id);
             isDiff = true;
           }
+
           writer_.append(",");
-          addInnerNewline();
           outputProperty(newFObject, prop);
         }
       }
-      
-      if ( isDiff ) { 
-        if ( multiLineOutput_ )  writer_.append("\n");
-        writer_.append("}"); 
-      }
-    }
-  }
 
-  protected void addInnerNewline() {
-    if ( multiLineOutput_ ) {
-      writer_.append("\n");
+      if ( isDiff ) writer_.append("}");
     }
   }
 
@@ -378,7 +354,6 @@ public class Outputter
     ClassInfo info = o.getClassInfo();
 
     writer_.append("{");
-    if ( multiLineOutput_ ) addInnerNewline();
     if ( outputClassNames_ ) {
       writer_.append(beforeKey_());
       writer_.append("class");
@@ -394,7 +369,7 @@ public class Outputter
       PropertyInfo prop = (PropertyInfo) i.next();
       outputComma = maybeOutputProperty(o, prop, outputComma) || outputComma;
     }
-    if ( multiLineOutput_ ) writer_.append("\n");
+
     writer_.append("}");
   }
 
@@ -480,9 +455,5 @@ public class Outputter
   public void flush() throws IOException {
     if ( stringWriter_ != null ) stringWriter_.flush();
     if ( writer_ != null ) writer_.flush();
-  }
-
-  public void setMultiLine(boolean ml) {
-    multiLineOutput_ = ml;
   }
 }
