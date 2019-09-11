@@ -54,6 +54,19 @@ foam.CLASS({
     'cmd',
     'format',
     {
+      class: 'StringArray',
+      name: 'fields',
+      factory: null,
+      expression: function(daoKey) {
+         var dao = this.__context__[daoKey];
+         var apiColumns;
+
+         if ( dao ) apiColumns = dao.of.getAxiomByName('apiColumns');
+
+         return apiColumns ? apiColumns.columns : ( dao ? dao.of.getAxiomsByClass(foam.core.Property).map(p => p.name) : [] );
+      }
+    },
+    {
       class: 'String',
       name: 'dao',
       hidden: true,

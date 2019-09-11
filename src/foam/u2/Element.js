@@ -2648,6 +2648,18 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'ApiColumns',
+
+  documentation: 'Axiom for storing certain Columns information for Api in Class. Unlike most Axioms, doesn\'t modify the Class, but is just used to store information.',
+
+  properties: [
+    [ 'name', 'apiColumns' ],
+    'columns'
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.u2',
@@ -2689,6 +2701,12 @@ foam.CLASS({
       name: 'searchColumns',
       postSet: function(_, cs) {
         this.axioms_.push(foam.u2.SearchColumns.create({columns: cs}));
+      }
+    },
+    {
+      name: 'apiColumns',
+      postSet: function(_, cs) {
+        this.axioms_.push(foam.u2.ApiColumns.create({columns: cs}));
       }
     }
   ]
