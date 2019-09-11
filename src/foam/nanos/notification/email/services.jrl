@@ -27,7 +27,6 @@ p({
       .setSeqNo(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName(\"emailMessages\")
-      .setFixedSizeDAO(true)
       .build();
   """
 })
