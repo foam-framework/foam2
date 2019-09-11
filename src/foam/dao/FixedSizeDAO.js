@@ -134,3 +134,39 @@ foam.CLASS({
 
   ]
 });
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'FixedSizeDAO2',
+  extends: 'foam.dao.ProxyDAO',
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.order.Comparator',
+      name: 'comparator'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'predicate'
+    },
+    {
+      class: 'Int',
+      name: 'size'
+    }
+  ],
+  methods: [
+    {
+      name: 'put_',
+      javaCode: `
+        obj = getDelegate().put_(x, obj);
+        this.getDelegate()
+          .where(getPredicate)
+          .orderBy(getComparator())
+          .skip(getSize())
+          .removeAll();
+        return obj;
+      `
+    },
+  ]
+});
