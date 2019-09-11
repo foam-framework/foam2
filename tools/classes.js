@@ -306,6 +306,7 @@ var classes = [
   'foam.dao.history.PropertyUpdate',
   'foam.dao.history.HistoryRecord',
   'foam.dao.FixedSizeDAO',
+  'foam.dao.FixedSizeDAO2',
   'foam.mop.MOP',
   'foam.u2.Element',
   'foam.u2.ControllerMode',

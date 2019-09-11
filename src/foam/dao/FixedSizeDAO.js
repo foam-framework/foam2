@@ -161,7 +161,7 @@ foam.CLASS({
       javaCode: `
         obj = getDelegate().put_(x, obj);
         this.getDelegate()
-          .where(getPredicate)
+          .where(getPredicate())
           .orderBy(getComparator())
           .skip(getSize())
           .removeAll();
