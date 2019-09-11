@@ -108,18 +108,6 @@ foam.CLASS({
       javaFactory: 'return getX().put("user", null).put("group", null).put(Session.class, this);',
       hidden: true,
       transient: true
-    },
-    {
-      class: 'Boolean',
-      name: 'ignoreRemoteHostChanges',
-      documentation: `
-        Set to true if this session should not be deleted when the remote host
-        changes. The intended use case for this flag is to allow customers that
-        will be accessing the server via a cluster to use the same session.
-        We turn this off by default since we want to delete users' sessions when
-        they're accessed from a new remote host to prevent session hijacking
-        attacks.
-      `
     }
   ],
 
@@ -155,10 +143,6 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        if ( getIgnoreRemoteHostChanges() ) {
-          return true;
-        }
-
         if ( SafetyUtil.equals(getRemoteHost(), remoteHost) ) {
           return true;
         }
