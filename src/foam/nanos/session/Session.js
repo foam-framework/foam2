@@ -190,6 +190,13 @@ foam.CLASS({
 
         if (
           ! checkOwnership(x) &&
+
+          // TODO: This permission scheme doesn't make sense for create. We're
+          // not going to assign permissions like
+          // 'session.create.0b2ac741-010e-4af9-bc43-dd86c88bbe6a' to people. It
+          // would make more sense to allow certain users or groups to create
+          // sessions for other users in a limited scope. For example, within
+          // the same spid.
           ! auth.check(x, createPermission("create"))
         ) {
           throw new AuthorizationException("You don't have permission to create sessions other than your own.");
