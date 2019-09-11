@@ -11,7 +11,15 @@ p({
       .setSeqNo(true)
       .setCreatedAware(true)
       .setCreatedByAware(true)
-      .setOrder(new foam.mlang.order.Comparator[] {foam.mlang.MLang.DESC(foam.nanos.logger.LogMessage.CREATED)}).setDecorator(new foam.nanos.logger.RepeatLogMessageDAO.Builder(x).setDelegate(new foam.nanos.logger.NotificationLogMessageDAO.Builder(x).build()).build())
+      .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
+        .setComparator(foam.mlang.MLang.DESC(foam.nanos.logger.LogMessage.CREATED))
+        .setSize(5000)
+        .build())
+      .setIndex(new foam.core.PropertyInfo[] {foam.nanos.logger.LogMessage.CREATED})
+      .setOrder(new foam.mlang.order.Comparator[] {foam.mlang.MLang.DESC(foam.nanos.logger.LogMessage.CREATED)})
+      .setDecorator(new foam.nanos.logger.RepeatLogMessageDAO.Builder(x)
+        .setDelegate(new foam.nanos.logger.NotificationLogMessageDAO.Builder(x).build())
+        .build())
       .setInnerDAO(new foam.dao.WriteOnlyJDAO(x, new foam.dao.MDAO(foam.nanos.logger.LogMessage.getOwnClassInfo()), foam.nanos.logger.LogMessage.getOwnClassInfo(), \"../logs/logs\" /*TODO System.getProperty(\"LOG_HOME\")+\"/logs\"*/))
       .build();
   """
