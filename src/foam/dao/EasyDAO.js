@@ -121,13 +121,13 @@ foam.dao.DAO delegate = getInnerDAO();
 foam.dao.DAO head = delegate;
 while( head instanceof foam.dao.ProxyDAO ) {
   head = ( (ProxyDAO) head).getDelegate();
-  if ( head instanceof foam.dao.MDAO ) {
-    setMdao((foam.dao.MDAO)head);
-    if ( getIndex() != null &&
-         getIndex().length > 0 ) {
-      getMdao().addIndex(getIndex());
-    }
-    break;
+}
+
+if ( head instanceof foam.dao.MDAO ) {
+  setMdao((foam.dao.MDAO)head);
+  if ( getIndex() != null &&
+       getIndex().length > 0 ) {
+    getMdao().addIndex(getIndex());
   }
 }
 
