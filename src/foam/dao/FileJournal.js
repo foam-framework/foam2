@@ -175,18 +175,41 @@ try {
 
           if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
             writeComment_(x, nu);
-            write_(sb.get()
-              .append("p(")
-              .append(record)
-              .append(")")
-              .append(c)
-              .toString());
+            writePut_(x, record, c);
           }
 
         } catch ( Throwable t ) {
           getLogger().error("Failed to write put entry to journal", t);
           throw new RuntimeException(t);
         }
+      `
+    },
+    {
+      name: 'writePut_',
+      javaThrows: [
+        'java.io.IOException'
+      ],
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'record',
+          type: 'String'
+        },
+        {
+          name: 'c',
+          type: 'String'
+        }
+      ],
+      javaCode: `
+        write_(sb.get()
+          .append("p(")
+          .append(record)
+          .append(")")
+          .append(c)
+          .toString());
       `
     },
     {
@@ -203,16 +226,35 @@ try {
 
           if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
             writeComment_(x, obj);
-            write_(sb.get()
-              .append("r(")
-              .append(record)
-              .append(")")
-              .toString());
+            writeRemove_(x, record);
           }
         } catch ( Throwable t ) {
           getLogger().error("Failed to write remove entry to journal", t);
           throw new RuntimeException(t);
         }
+      `
+    },
+    {
+      name: 'writeRemove_',
+      javaThrows: [
+        'java.io.IOException'
+      ],
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'record',
+          type: 'String'
+        }
+      ],
+      javaCode: `
+        write_(sb.get()
+          .append("r(")
+          .append(record)
+          .append(")")
+          .toString());
       `
     },
     {
