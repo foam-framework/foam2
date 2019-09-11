@@ -199,10 +199,12 @@ foam.CLASS({
     {
       name: 'authorizeOnUpdate',
       javaCode: `
-        AuthService auth = (AuthService) x.get("auth");
+        AuthService auth       = (AuthService) x.get("auth");
+        Session     oldSession = (Session) oldObj;
 
         if (
           ! checkOwnership(x) &&
+          ! oldSession.checkOwnership(x) &&
           ! auth.check(x, createPermission("update"))
         ) {
           throw new AuthorizationException("You don't have permission to update sessions other than your own.");
