@@ -600,3 +600,20 @@ p({
     "class": "foam.nanos.geocode.GoogleMapsCredentials"
   }
 })
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"ropeDAO",
+  "serve":true,
+  "lazy":false,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.rope.ROPECell.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("ropes")
+      .setAuthorize(false)
+      .setPermissioned(false)
+      .build();
+  """,
+  "client":"{\"of\": \"foam.nanos.rope.ROPECell\"}"
+})

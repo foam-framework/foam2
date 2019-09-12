@@ -221,5 +221,8 @@ FOAM_FILES([
   //authservice
   { name: "foam/nanos/auth/CapabilityAuthService" },
   // google
-  { name: "foam/nanos/geocode/GoogleMapsCredentials" }
+  { name: "foam/nanos/geocode/GoogleMapsCredentials" },
+
+  // foam/nanos/rope
+  { name: "foam/nanos/rope/ROPECell" }
 ]);

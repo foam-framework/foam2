@@ -469,7 +469,10 @@ var classes = [
   'foam.strategy.StrategyReference',
   'foam.strategy.StrategizerService',
   'foam.strategy.BasicStrategizer',
-  'foam.strategy.ClientStrategizerService'
+  'foam.strategy.ClientStrategizerService',
+
+  //ROPE
+  'foam.nanos.rope.ROPECell'
 ];
 
 var abstractClasses = [
