@@ -128,7 +128,11 @@ public class LiveScriptBundler implements WebAgent, ContextAware
 
           // Find any file named files.js
           String filename = path.getFileName().toString();
-          if ( filename.equals("files.js") ) {
+          if (
+            filename.equals("files.js") ||
+            filename.equals("nanos.js") ||
+            filename.equals("support.js")
+          ) {
             // Locate the closest `src` folder if one exists
             for ( int i = path.getNameCount()-1; i >= 0; i-- ) {
               String dirname = path.getName(i).getFileName().toString();

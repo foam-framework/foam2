@@ -16,6 +16,7 @@ import foam.nanos.logger.Logger;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,10 +45,33 @@ public class SessionWebAgent
     HttpServletResponse resp       = x.get(HttpServletResponse.class);
 
     try {
-      // check session id
-      String sessionId = req.getParameter("sessionId");
+      String sessionId = "";
+
+      // check for session id in cookie
+      Cookie[] cookies = req.getCookies();
+      for ( Cookie c : cookies ) {
+        if ( c.getName().equals("sessionId") ) {
+          sessionId = c.getValue();
+          break;
+        }
+      }
+
+      // fallback: check for session id as request param
+      if ( sessionId.equals("") ) {
+        sessionId = req.getParameter("sessionId");
+      }
+
       if ( SafetyUtil.isEmpty(sessionId) ) {
         throw new AuthenticationException("Invalid session id");
+      }
+
+      // display a warning if querystring contains sessionId
+      if ( req.getQueryString().contains("sessionId") ) {
+        logger.warning(
+          "\033[31;1m" +
+          "Querystring contains 'sessionId'! Please inform the security team!" +
+          "\033[0m"
+        );
       }
 
       // find session

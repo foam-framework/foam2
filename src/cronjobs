@@ -1,27 +1,162 @@
-p({"class":"foam.nanos.cron.Cron","minute":0,"hour":1,"dayOfMonth":-1,"month":-1,"dayOfWeek":-1,"scheduledTime":"2018-06-01T05:00:00.0Z","enabled":false,"id":"expired notification","description":"remove expired notifications","lastRun":null,"lastDuration":0,"server":true,"status":1,"code":"import foam.nanos.cron.RemoveExpiredNotificationCronjob;\ncron = new RemoveExpiredNotificationCronjob();\ncron.execute(x);\nprint(\"s\");","output":"","notes":""})
-p({"class":"foam.nanos.cron.Cron","minute":0,"enabled":true,"id":"Renew rule history cron","description":"Cron for renewing rule history - run every hour.","scheduled":false,"code":"import foam.nanos.ruler.cron.RenewRuleHistoryCron; \ncron = new RenewRuleHistoryCron();\ncron.execute(x);\nprint(\"done\");"})
 p({
-  "class":"foam.nanos.cron.Cron",
-  "minute":0,
-  "id":"PMHourlyReduce",
-  "enabled":true,
-  "code":"""
-rm = x.get("pmHourlyReduceManager");
-rm.doReduce();
-x.get("pm1MinuteDAO").removeAll();
-x.get("logger").info(new String[] {"Hourly PM Reduce Complete"});
+  "class": "foam.nanos.cron.Cron",
+  "schedule": {
+    "class": "foam.nanos.cron.CronSchedule",
+    "minute": 0,
+    "hour": 1,
+    "dayOfMonth": -1,
+    "month": -1,
+    "dayOfWeek": -1,
+    "second": 0
+  },
+  "scheduledTime": "2019-09-10T05:00:00.000Z",
+  "id": "expired notification",
+  "description": "remove expired notifications",
+  "code": 
+  """
+    import foam.nanos.cron.RemoveExpiredNotificationCronjob;
+    cron = new RemoveExpiredNotificationCronjob();
+    cron.execute(x);
+    print("s");
   """
 })
 p({
-  "class":"foam.nanos.cron.Cron",
-  "hour":0,
-  "id":"PMDailyReduce",
-  "enabled":true,
-  "code":"""
-rm = x.get("pmDailyReduceManager");
-rm.doReduce();
-x.get("pmHourlyDAO").removeAll();
-x.get("logger").info(new String[] {"Daily PM Reduce Complete"});
+  "class": "foam.nanos.cron.Cron",
+  "schedule": {
+    "class": "foam.nanos.cron.CronSchedule",
+    "minute": 0,
+    "hour": -1,
+    "dayOfMonth": -1,
+    "month": -1,
+    "dayOfWeek": -1,
+    "second": 0
+  },
+  "scheduledTime": "2019-09-09T17:00:00.000Z",
+  "id": "Renew rule history cron",
+  "description": "Cron for renewing rule history - run every hour.",
+  "code": 
+  """
+    import foam.nanos.ruler.cron.RenewRuleHistoryCron; 
+    cron = new RenewRuleHistoryCron();
+    cron.execute(x);
+    print("done");
   """
 })
-p({"class":"foam.nanos.cron.Cron","enabled":true,"id":"expireSessionsCron","description":"Expire sessions every minute based on ttl","scheduled":false,"code":"import foam.nanos.session.cron.ExpireSessionsCron;\ncron = new ExpireSessionsCron();\ncron.execute(x);\nprint(\"done\");"})
+p({
+  "class": "foam.nanos.cron.Cron",
+  "schedule": {
+    "class": "foam.nanos.cron.CronSchedule",
+    "minute": 0,
+    "hour": -1,
+    "dayOfMonth": -1,
+    "month": -1,
+    "dayOfWeek": -1,
+    "second": 0
+  },
+  "scheduledTime": "2019-09-09T17:00:00.000Z",
+  "id": "PMHourlyReduce",
+  "description": "",
+  "code": 
+  """
+    rm = x.get("pmHourlyReduceManager");
+    rm.doReduce();
+    x.get("pm1MinuteDAO").removeAll();
+    x.get("logger").info(new String[] {"Hourly PM Reduce Complete"});
+  """
+})
+p({
+  "class": "foam.nanos.cron.Cron",
+  "schedule": {
+    "class": "foam.nanos.cron.CronSchedule",
+    "minute": -1,
+    "hour": 0,
+    "dayOfMonth": -1,
+    "month": -1,
+    "dayOfWeek": -1,
+    "second": 0
+  },
+  "scheduledTime": "2019-09-10T04:00:00.000Z",
+  "id": "PMDailyReduce",
+  "description": "",
+  "code": 
+  """
+    rm = x.get("pmDailyReduceManager");
+    rm.doReduce();
+    x.get("pmHourlyDAO").removeAll();
+    x.get("logger").info(new String[] {"Daily PM Reduce Complete"});
+  """
+})
+p({
+  "class": "foam.nanos.cron.Cron",
+  "schedule": {
+    "class": "foam.nanos.cron.CronSchedule",
+    "minute": -1,
+    "hour": -1,
+    "dayOfMonth": -1,
+    "month": -1,
+    "dayOfWeek": -1,
+    "second": 0
+  },
+  "scheduledTime": "2019-09-09T16:56:00.000Z",
+  "id": "expireSessionsCron",
+  "description": "Expire sessions every minute based on ttl",
+  "code": 
+  """
+    import foam.nanos.session.cron.ExpireSessionsCron;
+    cron = new ExpireSessionsCron();
+    cron.execute(x);
+    print("done");
+  """
+})
+p({
+  "class": "foam.nanos.cron.Cron",
+  "enabled": false,
+  "schedule": {
+    "class": "foam.nanos.cron.CronSchedule",
+    "minute": -1,
+    "hour": -1,
+    "dayOfMonth": -1,
+    "month": -1,
+    "dayOfWeek": -1,
+    "second": 30
+  },
+  "scheduledTime": "2019-09-09T16:56:30.000Z",
+  "id": "SMTP Email Service",
+  "description": "Re-send UNSENT emails in emailMessageDAO",
+  "code": 
+  """
+    import foam.dao.DAO;
+    import foam.dao.ArraySink;
+    import foam.nanos.notification.email.EmailMessage;
+    import foam.nanos.notification.email.SMTPEmailService;
+    import foam.nanos.notification.email.Status;
+    import static foam.mlang.MLang.*;
+    
+    DAO emailMessageDAO = (DAO) x.get("emailMessageDAO");
+    emailMessages = ((ArraySink)
+      emailMessageDAO
+        .where(EQ(EmailMessage.STATUS, Status.UNSENT))
+        .select(new ArraySink()))
+        .getArray();
+    emailService = x.get("email");
+    
+    // SES limit - 10 tps
+    second = 1000;
+    tps = 10;
+    
+    endtime = System.currentTimeMillis() + second;
+    count = 0;
+    for ( EmailMessage emailMessage : emailMessages ) {
+      emailMessageDAO.put(emailService.sendEmail(x, emailMessage));
+      count++;
+      if ( count > tps ) {
+        remaining = endTime - System.currentTimeMillis;
+        if ( remaining > 0 ) {
+          Thread.sleep(remaining);
+        }
+        count = 0;
+        endTime = System.currentTimeMillis() + second;
+      }
+    }
+  """
+})
