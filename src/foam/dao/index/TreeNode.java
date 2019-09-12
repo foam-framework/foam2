@@ -47,7 +47,6 @@ public class TreeNode {
       this.level,
       this.left,
       this.right);
-
   }
 
   TreeNode maybeClone(TreeNode s) {
@@ -96,6 +95,7 @@ public class TreeNode {
         state.size += state.right.size;
       }
     }
+
     return split(skew(state, tail), tail);
   }
 
@@ -128,6 +128,7 @@ public class TreeNode {
 
       return r;
     }
+
     return node;
   }
 
@@ -409,7 +410,7 @@ public class TreeNode {
    * @return a long[] which contains update skip and limit number.
    */
   protected long[] skipLimitTreeNode(TreeNode currentNode, Sink sink, long skip, long limit, long size, Index tail) {
-    if ( currentNode == null || size <= skip || limit <= 0 ) return new long[]{- 1, - 1};
+    if ( currentNode == null || size <= skip || limit <= 0 ) return new long[] {-1, -1};
     long currentSize = currentNode.size;
     TreeNode left = currentNode.getLeft();
     long leftSize = 0;
@@ -446,20 +447,23 @@ public class TreeNode {
    * Post-order traversal with efficient skip and limit. Similar implement with 'skipLimitTreeNode()' method
    */
   protected long[] reverseSortSkipLimitTreeNode(TreeNode currentNode, Sink sink, long skip, long limit, long size, Index tail) {
-    if ( currentNode == null || size <= skip || limit <= 0 ) return new long[]{- 1, - 1};
-    long currentSize = currentNode.size;
-    TreeNode right = currentNode.getRight();
-    long rightSize = 0;
-    long[] skip_limit = new long[]{skip, limit};
+    if ( currentNode == null || size <= skip || limit <= 0 ) return new long[] {-1, -1};
+    long     currentSize = currentNode.size;
+    TreeNode right       = currentNode.getRight();
+    long     rightSize   = 0;
+    long[]   skip_limit  = new long[] {skip, limit};
+
     if ( right != null ) {
       rightSize = right.size;
       if ( rightSize > skip ) {
         skip_limit = reverseSortSkipLimitTreeNode(right, sink, skip_limit[0], skip_limit[1], size, tail);
-      } else if ( rightSize == skip ) skip_limit[0] = 0;
-      else {
+      } else if ( rightSize == skip ) {
+        skip_limit[0] = 0;
+      } else {
         skip_limit[0] = skip_limit[0] - rightSize;
       }
     }
+
     Object value = currentNode.getValue();
     if ( tail.size(currentNode) > skip_limit[0] && skip_limit[1] > 0 ) {
       tail.planSelect(value, sink, skip_limit[0], skip_limit[1], null, null).select(value, sink, skip_limit[0], skip_limit[1], null, null);
@@ -470,6 +474,7 @@ public class TreeNode {
     } else {
       skip_limit[0] = skip_limit[0] - tail.size(currentNode);
     }
+
     TreeNode left = currentNode.getLeft();
     if ( left != null ) {
       skip_limit = reverseSortSkipLimitTreeNode(left, sink, skip_limit[0], skip_limit[1], size, tail);
@@ -486,12 +491,12 @@ public class TreeNode {
       // predicate == null means we already deal with predicate or predicate is origin null
       if ( order == null ) {
         if ( reverseSort ) {
-          // decorateSink if it have some predicate or order can't be deal with index.
+          // decorateSink if it have some predicate or order can't deal with index.
           sink = decorateSink(null, sink, skip, limit, null, predicate);
           reverseSortSkipLimitTreeNode(currentNode, sink, 0, AbstractDAO.MAX_SAFE_INTEGER, size, tail);
         } else {
           sink = decorateSink(null, sink, skip, limit, null, predicate);
-          select_(currentNode, sink, skip, limit, size, tail);
+          select_(currentNode, sink, 0, AbstractDAO.MAX_SAFE_INTEGER, size, tail);
         }
       } else {
         sink = decorateSink(null, sink, skip, limit, order, predicate);
