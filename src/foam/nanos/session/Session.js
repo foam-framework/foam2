@@ -108,18 +108,6 @@ foam.CLASS({
       javaFactory: 'return getX().put("user", null).put("group", null).put(Session.class, this);',
       hidden: true,
       transient: true
-    },
-    {
-      class: 'Boolean',
-      name: 'ignoreRemoteHostChanges',
-      documentation: `
-        Set to true if this session should not be deleted when the remote host
-        changes. The intended use case for this flag is to allow customers that
-        will be accessing the server via a cluster to use the same session.
-        We turn this off by default since we want to delete users' sessions when
-        they're accessed from a new remote host to prevent session hijacking
-        attacks.
-      `
     }
   ],
 
@@ -155,10 +143,6 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        if ( getIgnoreRemoteHostChanges() ) {
-          return true;
-        }
-
         if ( SafetyUtil.equals(getRemoteHost(), remoteHost) ) {
           return true;
         }
@@ -186,29 +170,62 @@ foam.CLASS({
     {
       name: 'authorizeOnCreate',
       javaCode: `
-      AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("create")) ) throw new AuthorizationException("You don't have permission to create this session.");
+        AuthService auth = (AuthService) x.get("auth");
+
+        if (
+          ! checkOwnership(x) &&
+
+          // TODO: This permission scheme doesn't make sense for create. We're
+          // not going to assign permissions like
+          // 'session.create.0b2ac741-010e-4af9-bc43-dd86c88bbe6a' to people. It
+          // would make more sense to allow certain users or groups to create
+          // sessions for other users in a limited scope. For example, within
+          // the same spid.
+          ! auth.check(x, createPermission("create"))
+        ) {
+          throw new AuthorizationException("You don't have permission to create sessions other than your own.");
+        }
       `
     },
     {
       name: 'authorizeOnUpdate',
       javaCode: `
-      AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("update")) ) throw new AuthorizationException("You don't have permission to update sessions other than your own.");
+        AuthService auth       = (AuthService) x.get("auth");
+        Session     oldSession = (Session) oldObj;
+
+        if (
+          ! checkOwnership(x) &&
+          ! oldSession.checkOwnership(x) &&
+          ! auth.check(x, createPermission("update"))
+        ) {
+          throw new AuthorizationException("You don't have permission to update sessions other than your own.");
+        }
       `
     },
     {
       name: 'authorizeOnDelete',
       javaCode: `
-      AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, "*") ) throw new AuthorizationException("You don't have permission to delete sessions other than your own.");
+        AuthService auth = (AuthService) x.get("auth");
+
+        if (
+          ! checkOwnership(x) &&
+          ! auth.check(x, "*")
+        ) {
+          throw new AuthorizationException("You don't have permission to delete sessions other than your own.");
+        }
       `
     },
     {
       name: 'authorizeOnRead',
       javaCode: `
-      AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("read")) ) throw new AuthorizationException("You don't have permission to view sessions other than your own.");
+        AuthService auth = (AuthService) x.get("auth");
+
+        if (
+          ! checkOwnership(x) &&
+          ! auth.check(x, createPermission("read"))
+        ) {
+          throw new AuthorizationException("You don't have permission to view sessions other than your own.");
+        }
       `
     },
     {
