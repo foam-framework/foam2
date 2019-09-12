@@ -41,7 +41,9 @@ public class ScanPlan
 
   public long calculateCost(PropertyInfo propertyInfo) {
     long cost;
+
     if ( state_ == null ) return 0;
+
     cost = ((TreeNode) state_).size;
     boolean sortRequired = false;
     if ( order_ != null ) {
@@ -61,9 +63,7 @@ public class ScanPlan
       }
     }
 
-    if ( ! sortRequired ) {
-      if ( skip_ != 0 ) cost = Math.max(cost - skip_, 0);
-    }
+    if ( ! sortRequired && skip_ != 0 ) cost = Math.max(cost - skip_, 0);
 
     return cost;
   }
