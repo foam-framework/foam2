@@ -597,7 +597,7 @@ if ( order != null ) {
   sink = new OrderedSink(order, null, sink);
 }
 
-if ( predicate != null ) {
+if ( predicate != null && predicate.partialEval() != null && ! ( predicate instanceof foam.mlang.predicate.True) ) {
   sink = new PredicatedSink(predicate, sink);
 }
 
