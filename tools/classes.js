@@ -472,7 +472,12 @@ var classes = [
   'foam.strategy.ClientStrategizerService',
 
   //ROPE
-  'foam.nanos.rope.ROPECell'
+  'foam.nanos.rope.ROPECell',
+  'foam.nanos.rope.test.TestObjectA',
+  'foam.nanos.rope.test.TestObjectB',
+  'foam.nanos.rope.test.TestObjectC',
+  'foam.nanos.rope.test.TestObjectATestObjectBJunction',
+  'foam.nanos.rope.test.TestObjectBTestObjectCJunction'
 ];
 
 var abstractClasses = [

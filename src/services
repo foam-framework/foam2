@@ -617,3 +617,88 @@ p({
   """,
   "client":"{\"of\": \"foam.nanos.rope.ROPECell\"}"
 })
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"aDAO",
+  "serve":true,
+  "lazy":false,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.rope.test.TestObjectA.getOwnClassInfo())
+      .setSeqNo(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("as")
+      .setAuthorize(false)
+      .setPermissioned(false)
+      .build();
+  """,
+  "client":"{\"of\": \"foam.nanos.rope.test.TestObjectA\"}"
+})
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"bDAO",
+  "serve":true,
+  "lazy":false,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.rope.test.TestObjectB.getOwnClassInfo())
+      .setSeqNo(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("bs")
+      .setAuthorize(false)
+      .setPermissioned(false)
+      .build();
+  """,
+  "client":"{\"of\": \"foam.nanos.rope.test.TestObjectB\"}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"cDAO",
+  "serve":true,
+  "lazy":false,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.rope.test.TestObjectC.getOwnClassInfo())
+      .setSeqNo(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("cs")
+      .setAuthorize(false)
+      .setPermissioned(false)
+      .build();
+  """,
+  "client":"{\"of\": \"foam.nanos.rope.test.TestObjectC\"}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"abJunctionDAO",
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.rope.test.TestObjectATestObjectBJunction.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("abJunctions")
+      .setAuthorize(false)
+      .setPermissioned(false)
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.rope.test.TestObjectATestObjectBJunction\", \"remoteListenerSupport\": false}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"bcJunctionDAO",
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.rope.test.TestObjectBTestObjectCJunction.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("bcJunctions")
+      .setAuthorize(false)
+      .setPermissioned(false)
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.rope.test.TestObjectBTestObjectCJunction\", \"remoteListenerSupport\": false}"
+})
