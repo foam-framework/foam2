@@ -25,7 +25,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
-      documentation: 'Unique name of the Group.'
+      documentation: 'Unique name of the Group.',
+      visibility: 'FINAL',
     },
     {
       class: 'Boolean',
