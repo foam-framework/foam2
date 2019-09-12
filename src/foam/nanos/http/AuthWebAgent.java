@@ -29,6 +29,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.bouncycastle.util.encoders.Base64;
 
+/**
+ * A WebAgent decorator that adds session and authentication support.
+ */
 public class AuthWebAgent
   extends ProxyWebAgent
 {
@@ -41,52 +44,31 @@ public class AuthWebAgent
     permission_ = permission;
   }
 
-  public Cookie getCookie(HttpServletRequest req) {
-    Cookie[] cookies = req.getCookies();
-    if ( cookies == null ) {
-      return null;
+  @Override
+  public void execute(X x) {
+    AuthService auth    = (AuthService) x.get("auth");
+    Session     session = authenticate(x);
+
+    if ( session == null ) {
+      templateLogin(x);
+      return;
     }
 
-    for ( Cookie cookie : cookies ) {
-      if ( SESSION_ID.equals(cookie.getName()) ) {
-        return cookie;
-      }
+    if ( ! auth.check(session.getContext(), permission_) ) {
+      PrintWriter out = x.get(PrintWriter.class);
+      out.println("Access denied. Need permission: " + permission_);
+      ((foam.nanos.logger.Logger) x.get("logger")).debug("Access denied, requires permission:", permission_);
+      return;
     }
 
-    return null;
-  }
+    // Create a per-request sub-context of the session context which
+    // contains necessary Servlet request/response objects.
+    X requestX = session.getContext()
+      .put(HttpServletRequest.class,  x.get(HttpServletRequest.class))
+      .put(HttpServletResponse.class, x.get(HttpServletResponse.class))
+      .put(PrintWriter.class,         x.get(PrintWriter.class));
 
-  public void createCookie(X x, Session session) {
-    HttpServletResponse resp = x.get(HttpServletResponse.class);
-    Cookie sessionCookie = new Cookie(SESSION_ID, session.getId());
-
-    // Specify that the cookie should not be accessible by client-side scripts.
-    sessionCookie.setHttpOnly(true);
-
-    // Specify that the cookie should only be sent over secure connections if
-    // the app is configured that way.
-    AppConfig appConfig = (AppConfig) x.get("appConfig");
-    sessionCookie.setSecure(appConfig.getForceHttps());
-    int ttlInSeconds = (int) Math.ceil(session.getTtl() / 1000.0);
-    sessionCookie.setMaxAge(ttlInSeconds);
-    resp.addCookie(sessionCookie);
-  }
-
-  public void templateLogin(X x) {
-    PrintWriter out = x.get(PrintWriter.class);
-
-    out.println("<form method=post>");
-    out.println("<h1>Login</h1>");
-    out.println("<br>");
-    out.println("<label style=\"display:inline-block;width:70px;\">Email:</label>");
-    out.println("<input name=\"user\" id=\"user\" type=\"string\" size=\"30\" style=\"display:inline-block;\"></input>");
-    out.println("<br>");
-    out.println("<label style=\"display:inline-block;width:70px;\">Password:</label>");
-    out.println("<input name=\"password\" id=\"password\" type=\"password\" size=\"30\" style=\"display:inline-block;\"></input>");
-    out.println("<br>");
-    out.println("<button id=\"login\" type=submit style=\"display:inline-block;margin-top:10px;\";>Log In</button>");
-    out.println("</form>");
-    out.println("<script>document.getElementById('login').addEventListener('click', checkEmpty); function checkEmpty() { if ( document.getElementById('user').value == '') { alert('Email Required'); } else if ( document.getElementById('password').value == '') { alert('Password Required'); } }</script>");
+    super.execute(requestX);
   }
 
   /** If provided, use user and password parameters to login and create session and cookie. **/
@@ -275,33 +257,58 @@ public class AuthWebAgent
     return null;
   }
 
+  public Cookie getCookie(HttpServletRequest req) {
+    Cookie[] cookies = req.getCookies();
+    if ( cookies == null ) {
+      return null;
+    }
+
+    for ( Cookie cookie : cookies ) {
+      if ( SESSION_ID.equals(cookie.getName()) ) {
+        return cookie;
+      }
+    }
+
+    return null;
+  }
+
   public Session createSession(X x) {
     HttpServletRequest req     = x.get(HttpServletRequest.class);
-    Session            session = new Session((X) x.get(Boot.ROOT)); 
+    Session            session = new Session((X) x.get(Boot.ROOT));
     session.setRemoteHost(req.getRemoteHost());
     return session;
   }
 
-  public void execute(X x) {
-    AuthService auth    = (AuthService) x.get("auth");
-    Session     session = authenticate(x);
+  public void createCookie(X x, Session session) {
+    HttpServletResponse resp = x.get(HttpServletResponse.class);
+    Cookie sessionCookie = new Cookie(SESSION_ID, session.getId());
 
-    if ( session != null ) {
-      if ( auth.check(session.getContext(), permission_) ) {
-        // Create a per-request sub-context of the session context which
-        // contains necessary Servlet request/response objects.
-        X requestX = session.getContext()
-          .put(HttpServletRequest.class,  x.get(HttpServletRequest.class))
-          .put(HttpServletResponse.class, x.get(HttpServletResponse.class))
-          .put(PrintWriter.class,         x.get(PrintWriter.class));
-        getDelegate().execute(requestX);
-      } else {
-        PrintWriter out = x.get(PrintWriter.class);
-        out.println("Access denied. Need permission: " + permission_);
-        ((foam.nanos.logger.Logger) x.get("logger")).debug("Access denied, requires permission:", permission_);
-      }
-    } else {
-      templateLogin(x);
-    }
+    // Specify that the cookie should not be accessible by client-side scripts.
+    sessionCookie.setHttpOnly(true);
+
+    // Specify that the cookie should only be sent over secure connections if
+    // the app is configured that way.
+    AppConfig appConfig = (AppConfig) x.get("appConfig");
+    sessionCookie.setSecure(appConfig.getForceHttps());
+    int ttlInSeconds = (int) Math.ceil(session.getTtl() / 1000.0);
+    sessionCookie.setMaxAge(ttlInSeconds);
+    resp.addCookie(sessionCookie);
+  }
+
+  public void templateLogin(X x) {
+    PrintWriter out = x.get(PrintWriter.class);
+
+    out.println("<form method=post>");
+    out.println("<h1>Login</h1>");
+    out.println("<br>");
+    out.println("<label style=\"display:inline-block;width:70px;\">Email:</label>");
+    out.println("<input name=\"user\" id=\"user\" type=\"string\" size=\"30\" style=\"display:inline-block;\"></input>");
+    out.println("<br>");
+    out.println("<label style=\"display:inline-block;width:70px;\">Password:</label>");
+    out.println("<input name=\"password\" id=\"password\" type=\"password\" size=\"30\" style=\"display:inline-block;\"></input>");
+    out.println("<br>");
+    out.println("<button id=\"login\" type=submit style=\"display:inline-block;margin-top:10px;\";>Log In</button>");
+    out.println("</form>");
+    out.println("<script>document.getElementById('login').addEventListener('click', checkEmpty); function checkEmpty() { if ( document.getElementById('user').value == '') { alert('Email Required'); } else if ( document.getElementById('password').value == '') { alert('Password Required'); } }</script>");
   }
 }
