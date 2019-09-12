@@ -350,8 +350,7 @@ public class TreeNode {
       return lte(s.left, key, prop);
     }
 
-    return new TreeNode(s.key, s.value, size(s) - size(s.right),
-      s.level, s.left, null);
+    return new TreeNode(s.key, s.value, size(s) - size(s.right), s.level, s.left, null);
   }
 
   /**
@@ -487,8 +486,9 @@ public class TreeNode {
    */
   public void select(TreeNode currentNode, Sink sink, long skip, long limit, Comparator order, Predicate predicate, Index tail, boolean reverseSort) {
     if ( skip >= currentNode.size || limit <= 0 ) return;
-    if ( ( predicate != null && predicate.partialEval() != null && ! ( predicate instanceof True ) ) || order != null ) {
-      // predicate == null means we already deal with predicate or predicate is origin null
+
+    if ( hasPredicate(predicate) || order != null ) {
+      // predicate == null means we already deal with predicate or original predicate is null
       if ( order == null ) {
         if ( reverseSort ) {
           // decorateSink if it have some predicate or order can't deal with index.
@@ -500,14 +500,18 @@ public class TreeNode {
         }
       } else {
         sink = decorateSink(null, sink, skip, limit, order, predicate);
-        select_(currentNode, sink, skip, limit, size, tail);
+        select_(currentNode, sink, 0, AbstractDAO.MAX_SAFE_INTEGER, size, tail);
         sink.eof();
       }
-    } else if ( ! reverseSort ) {
-      skipLimitTreeNode(currentNode, sink, skip, limit, size, tail);
-    } else {
+    } else if ( reverseSort ) {
       reverseSortSkipLimitTreeNode(currentNode, sink, skip, limit, size, tail);
+    } else {
+      skipLimitTreeNode(currentNode, sink, skip, limit, size, tail);
     }
+  }
+
+  public boolean hasPredicate(Predicate predicate) {
+    return predicate != null && predicate.partialEval() != null && ! ( predicate instanceof True );
   }
 
 }
