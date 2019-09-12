@@ -118,9 +118,13 @@ foam.CLASS({
 Logger logger = (Logger) getX().get("logger");
 
 foam.dao.DAO delegate = getInnerDAO();
-
 foam.dao.DAO head = delegate;
+foam.dao.ProxyDAO pxy = null;
 while( head instanceof foam.dao.ProxyDAO ) {
+  pxy = (foam.dao.ProxyDAO) head;
+  if ( head instanceof foam.dao.MDAO ) {
+    break;
+  }
   head = ( (ProxyDAO) head).getDelegate();
 }
 if ( head instanceof foam.dao.MDAO ) {
@@ -130,6 +134,19 @@ if ( head instanceof foam.dao.MDAO ) {
     getMdao().addIndex(getIndex());
   }
 }
+
+if ( getFixedSize() != null ) {
+  if ( head instanceof foam.dao.MDAO &&
+       pxy != null ) {
+    foam.dao.ProxyDAO fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
+    fixedSizeDAO.setDelegate(head);
+    pxy.setDelegate(fixedSizeDAO);
+  } else {
+    logger.error(this.getClass().getSimpleName(), "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_, "FixedSizeDAO did not find instanceof MDAO");
+    System.exit(1);
+  }
+}
+
 
 delegate = getOuterDAO(delegate);
 
@@ -510,7 +527,12 @@ return delegate;
       name: 'lastModifiedByAware',
       class: 'Boolean',
       value: false
-    }
+    },
+    {
+      name: 'fixedSize',
+      class: 'FObjectProperty',
+      of: 'foam.dao.FixedSizeDAO'
+    },
  ],
 
   methods: [

@@ -1227,6 +1227,12 @@ foam.CLASS({
             }).join('\n')
           });
 
+          this.VALUES.sort( function (a, b) {
+            return (a.ordinal < b.ordinal)
+              ? -1
+              : 1;
+          });
+
           cls.declarations = this.VALUES.map(function(v) {
             return `${v.name}(${properties.map(p => foam.java.asJavaValue(v[p])).join(', ')})`;
           }).join(', ');
