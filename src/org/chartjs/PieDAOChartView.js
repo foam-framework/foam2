@@ -46,7 +46,6 @@ foam.CLASS({
       name: 'dataUpdate',
       isFramed: true,
       code: function() {
-        console.log('hit data update');
         var self = this;
         self.data
           .select(this.GROUP_BY(this.keyExpr, this.SUM(this.valueExpr)))
