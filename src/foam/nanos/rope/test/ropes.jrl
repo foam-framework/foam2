@@ -1,0 +1,8 @@
+p({"class":"foam.nanos.rope.ROPECell","sourceModel":"foam.nanos.rope.test.TestObjectA","targetModel":"foam.nanos.rope.test.TestObjectB","junctionDAOKey":"abJunctionDAO","checked":true,"column":"C","row":"C"})
+p({"class":"foam.nanos.rope.ROPECell","sourceModel":"foam.nanos.rope.test.TestObjectA","targetModel":"foam.nanos.rope.test.TestObjectB","junctionDAOKey":"abJunctionDAO","checked":true,"column":"R","row":"R"})
+p({"class":"foam.nanos.rope.ROPECell","sourceModel":"foam.nanos.rope.test.TestObjectA","targetModel":"foam.nanos.rope.test.TestObjectB","junctionDAOKey":"abJunctionDAO","checked":true,"column":"U","row":"U"})
+p({"class":"foam.nanos.rope.ROPECell","sourceModel":"foam.nanos.rope.test.TestObjectA","targetModel":"foam.nanos.rope.test.TestObjectB","junctionDAOKey":"abJunctionDAO","checked":true,"column":"D","row":"D"})
+p({"class":"foam.nanos.rope.ROPECell","sourceModel":"foam.nanos.rope.test.TestObjectB","targetModel":"foam.nanos.rope.test.TestObjectC","junctionDAOKey":"bcJunctionDAO","checked":true,"column":"C","row":"C"})
+p({"class":"foam.nanos.rope.ROPECell","sourceModel":"foam.nanos.rope.test.TestObjectB","targetModel":"foam.nanos.rope.test.TestObjectC","junctionDAOKey":"bcJunctionDAO","checked":true,"column":"R","row":"R"})
+p({"class":"foam.nanos.rope.ROPECell","sourceModel":"foam.nanos.rope.test.TestObjectB","targetModel":"foam.nanos.rope.test.TestObjectC","junctionDAOKey":"bcJunctionDAO","checked":true,"column":"U","row":"U"})
+p({"class":"foam.nanos.rope.ROPECell","sourceModel":"foam.nanos.rope.test.TestObjectB","targetModel":"foam.nanos.rope.test.TestObjectC","junctionDAOKey":"bcJunctionDAO","checked":true,"column":"D","row":"D"})
