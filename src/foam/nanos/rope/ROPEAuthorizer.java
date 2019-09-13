@@ -15,28 +15,28 @@ import foam.nanos.auth.User;
 
 public class ROPEAuthorizer implements Authorizer {
 
-  public ROPEAuthorizer() {}
+  protected User user_;
+
+  public ROPEAuthorizer() {
+    user_ = (User) x.get("user");
+  }
 
   public void authorizeOnCreate(X x, FObject obj) throws AuthorizationException {
-    User user = (User) x.get("user");
     String targetModel = obj.getClassInfo().getId();
     if ( ! relationshipTreeSearch(targetModel, "C") ) throw new AuthorizationException("You don't have permission to create this object");
   }
 
   public void authorizeOnRead(X x, FObject obj) throws AuthorizationException {
-    User user = (User) x.get("user");
     String targetModel = obj.getClassInfo().getId();
     if ( ! relationshipTreeSearch(targetModel, "R") ) throw new AuthorizationException("You don't have permission to create this object");
   }
 
   public void authorizeOnUpdate(X x, FObject oldObj, FObject obj) throws AuthorizationException {
-    User user = (User) x.get("user");
     String targetModel = obj.getClassInfo().getId();
     if ( ! relationshipTreeSearch(targetModel, "U") ) throw new AuthorizationException("You don't have permission to create this object");
   }
 
   public void authorizeOnDelete(X x, FObject obj) throws AuthorizationException {
-    User user = (User) x.get("user");
     String targetModel = obj.getClassInfo().getId();
     if ( ! relationshipTreeSearch(targetModel, "D") ) throw new AuthorizationException("You don't have permission to create this object");
   }
