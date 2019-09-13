@@ -54,7 +54,6 @@ public class SessionServerBox
         session = new Session();
         session.setId(sessionID == null ? "anonymous" : sessionID);
         session.setRemoteHost(req.getRemoteHost());
-        session.setCreated(new Date());
 
         // Set the user to null to avoid the system user from leaking into
         // newly created sessions. If we don't do this, then a user has admin
@@ -68,10 +67,12 @@ public class SessionServerBox
           .put(CachingAuthService.CACHE_KEY, null)
           .put(Session.class, session);
         session.setContext(sessionContext);
-        if ( sessionID != null ) sessionDAO.put(session);
+        if ( sessionID != null ) {
+          session = (Session) sessionDAO.put(session);
+        }
       } else if ( req != null ) {
         // if req == null it means that we're being accessed via webSockets
-        if ( ! SafetyUtil.equals(session.getRemoteHost(), req.getRemoteHost()) ) {
+        if ( ! session.validRemoteHost(req.getRemoteHost()) ) {
           // If an existing session is reused with a different remote host then
           // delete the session and force a re-login.
           // This is done as a security measure to reduce the likelihood of

@@ -23,6 +23,7 @@ nano.log*
 /cronjobs
 .vscode/
 android/nanos_example_client/.settings/
+android/nanos_example_client/src/main/gen/
 logs/logs
 src/cronjobs
 src/notifications

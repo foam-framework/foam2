@@ -330,6 +330,8 @@ foam.CLASS({
       };
 
       // set value
+      setter += `boolean oldIsSet = ${this.name}IsSet_;\n`;
+      setter += `${this.javaType} oldVal = ${this.name}_;\n`;
       setter += `${this.name}_ = val;\n`;
       setter += `${this.name}IsSet_ = true;\n`;
 
@@ -1226,6 +1228,12 @@ foam.CLASS({
             body: properties.map(function(p) {
               return `set${foam.String.capitalize(p.name)}(${p.name});`;
             }).join('\n')
+          });
+
+          this.VALUES.sort( function (a, b) {
+            return (a.ordinal < b.ordinal)
+              ? -1
+              : 1;
           });
 
           cls.declarations = this.VALUES.map(function(v) {
