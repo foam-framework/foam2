@@ -16,6 +16,14 @@ foam.CLASS({
     'row'
   ],
 
+  columns: [
+    'sourceModel',
+    'targetModel',
+    'column',
+    'row',
+    'checked'
+  ],
+
   properties: [
     {
       name: 'sourceModel',
