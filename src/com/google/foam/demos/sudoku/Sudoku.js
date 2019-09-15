@@ -14,17 +14,14 @@ foam.CLASS({
   classes: [
     {
       name: 'Cell',
-      extends: 'foam.u2.TextField'
+      extends: 'foam.u2.TextField',
 
-/*
       properties: [
         {
           name: 'data',
-          adapt: function(_, v) { return v || ''; },
-          displayWidth: 1
+          adapt: function(_, v) { return ! v || v == '0' || v.toString().trim() == '' ? '' : v; }
         }
       ]
-      */
     }
   ],
 
@@ -45,7 +42,7 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.SUPER();
+      //this.SUPER();
       this.cells = [
         [[[0,0,0],[0,7,1],[0,0,5]], [[5,0,0],[0,6,9],[0,7,1]], [[0,7,1],[8,5,3],[4,2,0]]],
         [[[0,1,0],[0,0,2],[0,0,0]], [[7,8,0],[1,5,4],[0,9,2]], [[0,4,0],[3,6,0],[1,8,0]]],
@@ -75,9 +72,7 @@ foam.CLASS({
       this.add(this.SOLVE);
     },
 
-    function get(a, b, c, d) {
-      return this.cells[a][b][c][d].data;
-    },
+    function get(a, b, c, d) { return this.cells[a][b][c][d].data; },
 
     function set(a, b, c, d, n) {
       for ( var x = 0 ; x < 3 ; x++ )
@@ -100,7 +95,5 @@ foam.CLASS({
     }
   ],
 
-  actions: [
-    function solve() { this.s(0,0,0,0); }
-  ]
+  actions: [ function solve() { this.s(0,0,0,0); } ]
 });
