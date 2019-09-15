@@ -67,7 +67,7 @@ foam.CLASS({
           }
         });
       }
-      this.add(this.SOLVE);
+      this.br().add(this.SOLVE);
     },
 
     function get(a, b, c, d) { return this.cells[a][b][c][d].data; },
