@@ -17,6 +17,7 @@ foam.CLASS({
       extends: 'foam.u2.TextField',
 
       properties: [
+        [ 'size', 1 ],
         {
           name: 'data',
           adapt: function(_, v) { return ! v || v == '0' || v.toString().trim() == '' ? '' : v; }
@@ -29,7 +30,6 @@ foam.CLASS({
     {
       name: 'cells',
       adapt: function(_, cs) {
-        cs = foam.Array.clone(cs);
         for ( var a = 0 ; a < 3 ; a++ )
           for ( var b = 0 ; b < 3 ; b++ )
             for ( var c = 0 ; c < 3 ; c++ )
@@ -52,7 +52,6 @@ foam.CLASS({
 
     function initE(X) {
       var cells = this.cells;
-
       for ( var a = 0 ; a < 3 ; a++ ) {
         this.start().style({display: 'block'}).call(function() {
           for ( var b = 0 ; b < 3 ; b++ ) {
@@ -68,7 +67,6 @@ foam.CLASS({
           }
         });
       }
-
       this.add(this.SOLVE);
     },
 
