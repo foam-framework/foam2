@@ -92,20 +92,21 @@ public class NanoRouter
         System.err.println("No service found for: " + serviceKey);
         resp.sendError(resp.SC_NOT_FOUND, "No service found for: "+serviceKey);
       } else {
-        X y = getX().put(HttpServletRequest.class, req)
-            .put(HttpServletResponse.class, resp)
-            .putFactory(PrintWriter.class, new XFactory() {
-              @Override
-              public Object create(X x) {
-                try {
-                  return resp.getWriter();
-                } catch (IOException e) {
-                  return null;
-                }
+        X requestContext = getX()
+          .put(HttpServletRequest.class, req)
+          .put(HttpServletResponse.class, resp)
+          .putFactory(PrintWriter.class, new XFactory() {
+            @Override
+            public Object create(X x) {
+              try {
+                return resp.getWriter();
+              } catch (IOException e) {
+                return null;
               }
-            })
-            .put(NSpec.class, spec);
-        serv.execute(y);
+            }
+          })
+          .put(NSpec.class, spec);
+        serv.execute(requestContext);
       }
     } catch (Throwable t) {
       System.err.println("Error serving " + serviceKey + " " + path);
