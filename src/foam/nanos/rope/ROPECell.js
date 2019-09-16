@@ -13,7 +13,7 @@ foam.CLASS({
     'sourceModel',
     'targetModel',
     'column',
-    'row'
+    'row', 
   ],
 
   columns: [
@@ -23,7 +23,7 @@ foam.CLASS({
     'row',
     'checked'
   ],
-
+  // sourceModel and targetModel here should be the same as in the relationship
   properties: [
     {
       name: 'sourceModel',
@@ -51,6 +51,21 @@ foam.CLASS({
     },
     {
       name: 'row',
+      class: 'String'
+    },
+    {
+      name: 'inverse',
+      class: 'Boolean',
+      description: `
+        if imverse is set to true, the targetModel in this model is the sourceModel of the relationship
+      `
+    },
+    {
+      name: 'inverseName',
+      class: 'String' // stores the name where name of the sourceModel in pov of targetModel, i.e., can be used as targetObj.getInverseName() to get sourceObjs
+    },
+    {
+      name: 'junctionModel',
       class: 'String'
     }
   ]
