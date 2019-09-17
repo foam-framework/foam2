@@ -18,6 +18,7 @@ import foam.nanos.NanoService;
 import foam.nanos.boot.NSpec;
 import foam.nanos.boot.NSpecAware;
 import foam.nanos.logger.Logger;
+import foam.nanos.logger.PrefixLogger;
 import foam.nanos.pm.PM;
 import foam.nanos.pm.PMWebAgent;
 
@@ -105,6 +106,7 @@ public class NanoRouter
               }
             }
           })
+          .put("logger", new PrefixLogger(new Object[] { "[Service]", spec.getName() }, (Logger) getX().get("logger")))
           .put(NSpec.class, spec);
         serv.execute(requestContext);
       }

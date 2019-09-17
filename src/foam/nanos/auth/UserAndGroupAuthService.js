@@ -160,8 +160,8 @@ foam.CLASS({
 
         Session session = x.get(Session.class);
         session.setUserId(user.getId());
-        session.setContext(session.getContext().put("user", user).put("group", group));
         ((DAO) getLocalSessionDAO()).put(session);
+        session.setContext(session.applyTo(session.getContext()));
 
         return user;
       `

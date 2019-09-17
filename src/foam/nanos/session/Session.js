@@ -15,9 +15,12 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.nanos.auth.AuthService',
-    'foam.nanos.auth.AuthorizationException',
-    'foam.nanos.auth.User',
+    'foam.core.X',
+    'foam.dao.DAO',
+    'foam.nanos.auth.*',
+    'foam.nanos.boot.NSpec',
+    'foam.nanos.logger.Logger',
+    'foam.nanos.logger.PrefixLogger',
     'foam.util.SafetyUtil',
     'java.util.Date'
   ],
@@ -104,8 +107,7 @@ foam.CLASS({
       class: 'Object',
       name: 'context',
       type: 'Context',
-      // Put a null user to prevent sytem user from leaking into subcontexts
-      javaFactory: 'return getX().put("user", null).put("group", null).put(Session.class, this);',
+      javaFactory: 'return applyTo(getX());',
       hidden: true,
       transient: true
     }
@@ -236,6 +238,66 @@ foam.CLASS({
       type: 'String',
       javaCode: `
         return "session." + operation + "." + getId();
+      `
+    },
+    {
+      name: 'applyTo',
+      type: 'Context',
+      args: [
+        { type: 'Context', name: 'x' }
+      ],
+      documentation: `
+        Returns a subcontext of the given context with the user, group, and
+        other information relevant to this session filled in if it's appropriate
+        to do so.
+      `,
+      javaCode: `
+        X rtn = x
+          // We null out the security-relevant entries in the context since we
+          // don't want whatever was there before to leak through, especially
+          // since the system context (which has full admin privileges) is often
+          // used as the argument to this method.
+          .put(Session.class, this)
+          .put("user", null)
+          .put("agent", null)
+          .put("group", null)
+          .put("twoFactorSuccess", false)
+          .put(CachingAuthService.CACHE_KEY, null)
+          .put(
+            "logger",
+            new PrefixLogger(
+              new Object[] { "Unauthenticated session" },
+              (Logger) x.get("logger")
+            )
+          );
+
+        if ( getUserId() == 0 ) return rtn;
+
+        DAO localUserDAO  = (DAO) x.get("localUserDAO");
+        DAO localGroupDAO = (DAO) x.get("localGroupDAO");
+        AuthService auth  = (AuthService) x.get("auth");
+        User user         = (User) localUserDAO.find(getUserId());
+        User agent        = (User) localUserDAO.find(getAgentId());
+        Object[] prefix   = agent == null
+          ? new Object[] { String.format("%s (%d)", user.label(), user.getId()) }
+          : new Object[] { String.format("%s (%d) acting as %s (%d)", agent.label(), agent.getId(), user.label(), user.getId()) };
+
+        rtn = rtn
+          .put("user", user)
+          .put("agent", agent)
+          .put("logger", new PrefixLogger(prefix, (Logger) x.get("logger")))
+          .put("twoFactorSuccess", getContext().get("twoFactorSuccess"))
+
+          // TODO: I'm not sure if this is necessary.
+          .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));
+
+        // We need to do this after the user and agent have been put since
+        // 'getCurrentGroup' depends on them being in the context.
+        Group group = auth.getCurrentGroup(rtn);
+
+        return rtn
+          .put("group", group)
+          .put("appConfig", group.getAppConfig(rtn));
       `
     }
   ]

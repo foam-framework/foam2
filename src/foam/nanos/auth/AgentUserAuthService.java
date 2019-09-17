@@ -61,18 +61,6 @@ public class AgentUserAuthService
       return null;
     }
 
-    /*
-      Finds the UserUserJunction object to see if user can act as the passed in user.
-      Source (agent) users are permitted to act as target (entity) users, not vice versa.
-    */
-    UserUserJunction permissionJunction = (UserUserJunction) agentJunctionDAO_.find(AND(
-      EQ(UserUserJunction.SOURCE_ID, agent.getId()),
-      EQ(UserUserJunction.TARGET_ID, user.getId())
-    ));
-
-    // Junction object contains a group which has a unique set of permissions specific to the relationship.
-    Group actingWithinGroup = (Group) groupDAO_.find(permissionJunction.getGroup());
-
     // Clone and freeze both user and agent.
     user = (User) user.fclone();
     user.freeze();
@@ -84,9 +72,8 @@ public class AgentUserAuthService
     Session session = x.get(Session.class);
     session.setUserId(user.getId());
     session.setAgentId(agent.getId());
-    session.setContext(session.getContext().put("user", user));
-    session.setContext(session.getContext().put("agent", agent));
-    session.setContext(session.getContext().put("group", actingWithinGroup));
+    session = (Session) sessionDAO_.put(session);
+    session.setContext(session.applyTo(session.getContext()));
     return user;
   }
 
