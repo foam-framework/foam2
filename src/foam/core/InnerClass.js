@@ -65,7 +65,7 @@ foam.CLASS({
       return foam.core.Model.isInstance(m) ? m :
           foam.core.EnumModel.isInstance(m) ? m :
           foam.core.InnerClass.isInstance(m) ? this.modelAdapt_(m.model) :
-          m.class ? this.modelAdapt_(foam.json.parse(m)) :
+          m.class ? foam.lookup(m.class).create(m) :
           foam.core.Model.create(m);
     },
 
