@@ -464,7 +464,7 @@ console.log("Done.");
             if ( typeof s.source !== 'undefined' ) {
               dataTmp += `\n//# sourceURL=/`+s.source;
             }
-            // NB: eval() is necessary for `//# sourceURL` to work
+            // eval() is necessary for `//# sourceURL` to work
             data += 'eval(' + JSON.stringify(dataTmp) + ');\n';
           },
           eof: function() { then(data); }
