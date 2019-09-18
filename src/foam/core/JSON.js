@@ -729,10 +729,9 @@ foam.LIB({
             var c = typeof cls === 'string' ? ( opt_ctx || foam ).lookup(cls) : cls;
             if ( c === undefined ) {
               console.warn(
-                "In foam.core.JSON.parse(Object): class lookup result undefined! Returning empty object." +
-                " (" + cls + ")"
+                "In foam.core.JSON.parse(Object): JSON parser tried to deserialize class '"
+                  + cls + "' and failed. Is this class available to the client?"
               );
-              return {};
             }
             // TODO(markdittmer): Turn into static method: "parseJSON" once
             // https://github.com/foam-framework/foam2/issues/613 is fixed.
