@@ -122,6 +122,8 @@ FOAM_FILES([
   { name: "foam/nanos/test/Test" },
   { name: "foam/nanos/test/TestBorder" },
   { name: "foam/nanos/cron/Cron" },
+  { name: "foam/nanos/cron/test/IntervalScheduleTest" },
+  { name: "foam/nanos/cron/test/TimeOfDayScheduleTest" },
   { name: "foam/nanos/export/ExportDriverRegistry"},
   { name: "foam/nanos/export/ExportDriver" },
   { name: "foam/nanos/export/JSONDriver"},
