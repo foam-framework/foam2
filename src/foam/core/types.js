@@ -100,7 +100,9 @@ foam.CLASS({
         if ( typeof d === 'string' ) {
           var ret = new Date(d);
 
-          if ( isNaN(ret.getTime()) ) throw 'Invalid Date: ' + d;
+          if ( isNaN(ret.getTime()) ) {
+            ret = new Date(Number.MAX_SAFE_INTEGER || Number.MAX_VALUE);
+          }
 
           return ret;
         }
