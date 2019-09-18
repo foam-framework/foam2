@@ -10,18 +10,17 @@ import com.sun.nio.file.SensitivityWatchEventModifier;
 import foam.core.ContextAware;
 import foam.core.X;
 import foam.nanos.logger.Logger;
-
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
-
+import javax.servlet.http.HttpServletResponse;
 import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.StandardWatchEventKinds.*;
 
-public class LiveScriptBundler implements WebAgent, ContextAware
+public class LiveScriptBundler
+  implements WebAgent, ContextAware
 {
   protected X x_;
 
@@ -41,33 +40,33 @@ public class LiveScriptBundler implements WebAgent, ContextAware
     public void onFileUpdate(String foamName, Path realPath);
   }
 
-  public void setX(X x) {
-    x_ = x;
-  }
-
   public X getX() {
     return x_;
   }
 
+  public void setX(X x) {
+    x_ = x;
+  }
+
   private class WatcherThread implements Runnable {
-    protected Path realDir_;
-    protected String foamDir_;
-    protected WatchService watcher_;
+    protected Path               realDir_;
+    protected String             foamDir_;
+    protected WatchService       watcher_;
     protected FileUpdateListener listener_;
 
     public WatcherThread(
       WatchService watcher, Path realDir, String foamDir,
       FileUpdateListener listener
     ) {
-      watcher_ = watcher;
-      realDir_ = realDir;
-      foamDir_ = foamDir;
+      watcher_  = watcher;
+      realDir_  = realDir;
+      foamDir_  = foamDir;
       listener_ = listener;
     }
 
     // Standard WatchService loop
     public void run() {
-      for ( ;; ) {
+      for ( ; ; ) {
         WatchKey key;
         try {
           key = watcher_.take();
@@ -83,7 +82,6 @@ public class LiveScriptBundler implements WebAgent, ContextAware
 
           WatchEvent<Path> ev = (WatchEvent<Path>) event;
           Path filename = ev.context();
-
 
           // Ex: foamPath="foam/core/Property.js"
           String foamPath = foamDir_ + "/" + filename.toString();
@@ -107,6 +105,7 @@ public class LiveScriptBundler implements WebAgent, ContextAware
   public LiveScriptBundler() {
     this(System.getProperty("user.dir"));
   }
+
   public LiveScriptBundler(String path) {
     fileNames_ = new LinkedBlockingQueue<>();
     path_ = path;
@@ -210,13 +209,13 @@ public class LiveScriptBundler implements WebAgent, ContextAware
 
       BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
       String line;
-      while ( (line=br.readLine()) != null ) {
+      while ( (line = br.readLine()) != null ) {
         log_("JS", "js> " + line);
       }
 
       String contents = new String(Files.readAllBytes(Paths.get(FOAM_BIN_PATH)));
-      javascriptBuffer_  = contents;
-      log_("DONE","JS");
+      javascriptBuffer_ = contents;
+      log_("DONE", "JS");
     } catch (IOException e) {
       log_("ERROR", e.getMessage());
     }
@@ -241,18 +240,13 @@ public class LiveScriptBundler implements WebAgent, ContextAware
     // For one specific line in iso20022 files.js
     boolean lineException = false;
 
-    for (
-      String line = reader.readLine() ;
-      line != null                    ;
-      line = reader.readLine()
-    ) {
+    for ( String line = reader.readLine() ; line != null ; line = reader.readLine() ) {
       line = line.trim();
       if ( line.length() < 1 ) continue;
       if ( lineException ) {
         line = "{" + line + "}";
         lineException = false;
-      }
-      else if ( line.charAt(0) != '{' ) {
+      } else if ( line.charAt(0) != '{' ) {
         continue;
       }
       if ( line.length() < 3 ) {
@@ -260,7 +254,7 @@ public class LiveScriptBundler implements WebAgent, ContextAware
         continue;
       }
 
-      String name = "";
+      String name  = "";
       String flags = "";
 
       int pos = 1;
@@ -361,7 +355,7 @@ public class LiveScriptBundler implements WebAgent, ContextAware
     String eventStr =
         ( (evt.equals("UPDATE") ) ? "\033[32m" : "" ) +
         ( (evt.equals("IGNORE") ) ? "\033[36m" : "" ) +
-        ( (evt.equals("ERROR") ) ? "\033[31m" : "" ) +
+        ( (evt.equals("ERROR")  ) ? "\033[31m" : "" ) +
         "[" + evt + "]" +
         ( (evt.equals("UPDATE") || evt.equals("IGNORE") || evt.equals("ERROR") )
           ? "\033[0m"
