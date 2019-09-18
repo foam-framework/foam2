@@ -588,7 +588,7 @@ p({
   "lazy":false,
   "serve":false,
   "serviceScript": """
-    new foam.nanos.geocode.GoogleMapsAddressParser.Builder().build();
+    return new foam.nanos.geocode.GoogleMapsAddressParser.Builder(x).build();
   """,
 })
 p({
