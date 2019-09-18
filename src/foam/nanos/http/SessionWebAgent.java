@@ -49,10 +49,13 @@ public class SessionWebAgent
 
       // check for session id in cookie
       Cookie[] cookies = req.getCookies();
-      for ( Cookie c : cookies ) {
-        if ( c.getName().equals("sessionId") ) {
-          sessionId = c.getValue();
-          break;
+      
+      if ( cookies != null){
+        for ( Cookie c : cookies ) {
+          if ( c.getName().equals("sessionId") ) {
+            sessionId = c.getValue();
+            break;
+          }
         }
       }
 
