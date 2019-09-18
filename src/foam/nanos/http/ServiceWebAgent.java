@@ -15,12 +15,11 @@ import foam.lib.json.ExprParser;
 import foam.lib.json.JSONParser;
 import foam.lib.parse.*;
 import foam.nanos.logger.Logger;
-import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.nio.CharBuffer;
-import java.util.Arrays;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
 
 @SuppressWarnings("serial")
 public class ServiceWebAgent
