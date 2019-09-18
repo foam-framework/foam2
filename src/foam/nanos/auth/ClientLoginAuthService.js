@@ -29,10 +29,12 @@ foam.CLASS({
       name: 'delegate',
       of: 'foam.nanos.auth.AuthService',
       factory: function() {
-        return this.AuthServiceClientBox.create({ delegate: this.HTTPBox.create({
-          method: 'POST',
-          url: this.serviceName
-        })});
+        return this.AuthServiceClientBox.create({
+          delegate: this.HTTPBox.create({
+            method: 'POST',
+            url: this.serviceName
+          })
+        });
       }
     }
   ]

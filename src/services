@@ -57,7 +57,14 @@ p({
       .setDelegate(new foam.nanos.auth.CachingAuthService(new foam.nanos.auth.UserAndGroupAuthService(x)))
       .build()).build()).build()).build();
   """,
-  "client": "{\"class\":\"foam.nanos.auth.CachedAuthServiceProxy\",\"delegate\":{\"class\":\"foam.nanos.auth.ClientLoginAuthService\"}}"
+  "client": """
+    {
+      "class": "foam.nanos.auth.CachedAuthServiceProxy",
+      "delegate": {
+        "class": "foam.nanos.auth.ClientLoginAuthService"
+      }
+    }
+  """
 })
 
 p({
