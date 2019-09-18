@@ -159,11 +159,10 @@ public class LiveScriptBundler
       // Read each files.js file
       for ( Pair<String,String> currentFilesPath : filesPaths ) {
         BufferedReader filesJsReader = new BufferedReader(
-          new FileReader(
-            Paths.get(currentFilesPath.getValue()).toString())
-        );
-        List<String> paths = parseFilesjs(filesJsReader);
-        Set<Path> directories = new LinkedHashSet<>();
+          new FileReader(Paths.get(currentFilesPath.getValue()).toString()));
+        List<String>   paths         = parseFilesjs(filesJsReader);
+        Set<Path>      directories   = new LinkedHashSet<>();
+
         for ( String foamName : paths ) {
           Path f = Paths.get(path_, currentFilesPath.getKey(), foamName);
 
@@ -183,7 +182,8 @@ public class LiveScriptBundler
           );
 
           // Find relative path from `src` folder to get foam path
-          Path relative = Paths.get(path_, currentFilesPath.getKey()).relativize(d.toAbsolutePath()).normalize();
+          Path relative = Paths.get(path_, currentFilesPath.getKey())
+            .relativize(d.toAbsolutePath()).normalize();
 
           Thread watcherThread = new Thread(new WatcherThread(
             watcher,
@@ -205,10 +205,9 @@ public class LiveScriptBundler
     try {
       log_("START", "Building javascript... (JS)");
 
-      Process p = new ProcessBuilder(JS_BUILD_PATH).start();
-
+      Process        p  = new ProcessBuilder(JS_BUILD_PATH).start();
       BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-      String line;
+      String         line;
       while ( (line = br.readLine()) != null ) {
         log_("JS", "js> " + line);
       }
@@ -223,17 +222,16 @@ public class LiveScriptBundler
 
   @Override
   public void execute(X x) {
-    PrintWriter pw = x.get(PrintWriter.class);
-    HttpServletResponse r = x.get(HttpServletResponse.class);
+    PrintWriter         pw = x.get(PrintWriter.class);
+    HttpServletResponse r  = x.get(HttpServletResponse.class);
     r.setHeader("Content-Type", "application/javascript");
     pw.println(javascriptBuffer_);
-    return;
   }
 
   // Proof-of-concept parser, to be replaced with a foam.lib.parse.Parser soon
-  private List<String> parseFilesjs(
-    BufferedReader reader
-  ) throws java.io.IOException {
+  private List<String> parseFilesjs(BufferedReader reader)
+    throws IOException
+  {
     // This is what we want to get
     List<String> paths = new ArrayList<>();
 
@@ -256,17 +254,18 @@ public class LiveScriptBundler
 
       String name  = "";
       String flags = "";
+      int    pos   = 1;
 
-      int pos = 1;
       final int STATE_FIND_NAME          = 1;
       final int STATE_EAT_NAME           = 2;
       final int STATE_EAT_NAME_2         = 0x12;
       final int STATE_SKIP_COMMA         = 3;
       final int STATE_SKIP_COMMA_2       = 0x13;
       final int STATE_FIND_FLAGS_OR_TERM = 4;
-      final int STATE_SKIP_WS = 5;
-      int state = STATE_FIND_NAME;
-      int stateStack[] = {0, 0, 0}; // nested control flow makes it fun
+      final int STATE_SKIP_WS            = 5;
+
+      int state         = STATE_FIND_NAME;
+      int stateStack[]  = {0, 0, 0}; // nested control flow makes it fun
       int stateStackPtr = 0;
 
       for ( boolean done = false; !done; ) {
