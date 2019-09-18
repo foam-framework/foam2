@@ -215,7 +215,6 @@ foam.CLASS({
 
       // done to start using SectionedDetailViews instead of DetailViews
       this.__subContext__.register(foam.u2.detail.SectionedDetailView, 'foam.u2.DetailView');
-      // this.__subContext__.register(foam.u2.view.PagedTableView, 'foam.u2.view.ScrollTableView');
 
       var self = this;
 

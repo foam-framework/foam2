@@ -24,6 +24,7 @@ foam.CLASS({
     'foam.lib.json.JSONParser',
     'foam.nanos.auth.Address',
     'foam.nanos.geocode.GoogleMapsAddressComponent',
+    'foam.nanos.geocode.GoogleMapsCredentials',
     'foam.nanos.geocode.GoogleMapsGeocodeResponse',
     'foam.nanos.geocode.GoogleMapsGeocodeResult',
     'foam.nanos.geocode.GoogleMapsPlacesPredictions',
