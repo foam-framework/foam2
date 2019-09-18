@@ -177,10 +177,14 @@ public class MDAO
       pm = new PM(this.getClass(), "MDAO:UnindexedSelect:" + getOf().getId());
       if ( ! unindexed_.contains(getOf().getId())) {
         if ( ! predicate.equals(simplePredicate) ) {
-          logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
+          if ( logger != null ) {
+            logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
+          }
         }
         unindexed_.add(getOf().getId());
-        logger.warning("Unindexed search on MDAO", getOf().getId(), simplePredicate.toString());
+        if ( logger != null ) {
+          logger.warning("Unindexed search on MDAO", getOf().getId(), simplePredicate.toString());
+        }
       }
     }
 

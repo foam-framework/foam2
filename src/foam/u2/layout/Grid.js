@@ -62,15 +62,18 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.addClass(this.myClass());
-      this.onDetach(this.displayWidth$.sub(this.resizeChildren));
-      this.style(
-        { 'grid-template-columns': this.displayWidth$.map(dw => {
-            dw = dw || foam.u2.layout.DisplayWidth.XL;
-            return `repeat(${dw.cols}, 1fr)`;
-          })
-        }
-      )
-      this.shown = false;
+      
+      if ( this.displayWidth ){
+        this.onDetach(this.displayWidth$.sub(this.resizeChildren));
+        this.style(
+          { 'grid-template-columns': this.displayWidth$.map(dw => {
+              dw = dw || foam.u2.layout.DisplayWidth.XL;
+              return `repeat(${dw.cols}, 1fr)`;
+            })
+          }
+        )
+        this.shown = false;
+      }
     },
 
     function onAddChildren() {
