@@ -683,5 +683,4 @@ FOAM_FILES([
   { name: "foam/strategy/StrategizerService" },
   { name: "foam/strategy/BasicStrategizer" },
   { name: "foam/strategy/ClientStrategizerService" },
-  { name: "foam/u2/view/PagedTableView" },
 ]);
