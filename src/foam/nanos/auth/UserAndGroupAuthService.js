@@ -160,7 +160,8 @@ foam.CLASS({
 
         Session session = x.get(Session.class);
         session.setUserId(user.getId());
-        session.setContext(session.getContext().put("user", user).put("group", group));
+        ((DAO) getLocalSessionDAO()).put(session);
+        session.setContext(session.applyTo(session.getContext()));
 
         return user;
       `
@@ -390,7 +391,7 @@ foam.CLASS({
         if ( user != null ) {
           if ( agent != null ) {
             DAO agentJunctionDAO = (DAO) x.get("agentJunctionDAO");
-            UserUserJunction junction = (UserUserJunction) agentJunctionDAO.inX(x).find(
+            UserUserJunction junction = (UserUserJunction) agentJunctionDAO.find(
               AND(
                 EQ(UserUserJunction.SOURCE_ID, agent.getId()),
                 EQ(UserUserJunction.TARGET_ID, user.getId())
@@ -406,7 +407,7 @@ foam.CLASS({
 
           // Third highest precedence: If a user is logged in but not acting as
           // another user, return their group.
-          return user.findGroup(x);
+          return (Group) ((DAO) getLocalGroupDAO()).inX(x).find(user.getGroup());
         }
 
         // If none of the cases above match, return null.
