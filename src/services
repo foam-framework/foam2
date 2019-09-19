@@ -172,7 +172,6 @@ p({
   "class":"foam.nanos.boot.NSpec",
   "name":"userDAO",
   "serve":true,
-  "authenticate": false, 
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
       .setPm(true)

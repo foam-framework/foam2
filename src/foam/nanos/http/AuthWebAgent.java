@@ -276,6 +276,7 @@ public class AuthWebAgent
     HttpServletRequest req     = x.get(HttpServletRequest.class);
     Session            session = new Session((X) x.get(Boot.ROOT));
     session.setRemoteHost(req.getRemoteHost());
+    session.setContext(session.applyTo(x));
     return session;
   }
 

@@ -20,6 +20,11 @@
   var isWorker = typeof importScripts !== 'undefined';
   var isServer = ( ! isWorker ) && typeof window === 'undefined';
 
+  // Imports used by the loadServer() loader
+  if ( isServer && typeof global !== 'undefined' ) {
+    global.imports = {}; global.imports.path = require('path');
+  }
+
   var flags    = this.FOAM_FLAGS = this.FOAM_FLAGS || {};
   flags.web    = ! isServer,
   flags.node   = isServer;
@@ -61,6 +66,12 @@
     if ( typeof global !== 'undefined' && ! global.FOAM_ROOT ) global.FOAM_ROOT = path;
 
     return function (filename) {
+      if ( typeof global !== 'undefined' ) {
+        // Set document.currentScript.src, as expected by EndBoot.js
+        let normalPath = global.imports.path.relative(
+          '.', global.imports.path.normalize(path + filename + '.js'));
+        global.document = { currentScript: { src: normalPath } };
+      }
       require(path + filename + '.js');
     }
   }
