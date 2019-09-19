@@ -84,7 +84,6 @@ var classes = [
   'foam.box.NamedBox',
   'foam.box.HTTPBox',
   'foam.box.HTTPReplyBox',
-  'foam.box.AuthServiceClientBox',
   'foam.box.ExportBox',
   'foam.nanos.app.AppConfig',
   'foam.nanos.app.ContextLookupAppConfigService',

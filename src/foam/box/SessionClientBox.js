@@ -33,6 +33,11 @@ foam.CLASS({
       class: 'FObjectProperty',
       name: 'clientBox',
       type: 'foam.box.Box'
+    },
+    {
+      class: 'Boolean',
+      name: 'promptUserToAuthenticate',
+      value: true
     }
   ],
 
@@ -40,20 +45,24 @@ foam.CLASS({
     {
       name: 'send',
       code: function send(msg) {
-        var self = this;
-        if ( this.RPCErrorMessage.isInstance(msg.object) && msg.object.data.id === 'foam.nanos.auth.AuthenticationException' ) {
-          this.requestLogin().then(function() {
-            self.clientBox.send(self.msg);
+        if (
+          this.promptUserToAuthenticate &&
+          this.RPCErrorMessage.isInstance(msg.object) &&
+          msg.object.data.id === 'foam.nanos.auth.AuthenticationException'
+        ) {
+          this.requestLogin().then(() => {
+            this.clientBox.send(this.msg);
           });
-        } else {
-
-          // fetch the soft session limit from group, and then start the timer
-          if ( this.group && this.group.id !== '' && this.group.softSessionLimit !== 0 ) {
-            this.sessionTimer.startTimer(this.group.softSessionLimit);
-          }
-
-          this.delegate.send(msg);
+          return;
         }
+
+        // fetch the soft session limit from group, and then start the timer
+        if ( this.group && this.group.id !== '' && this.group.softSessionLimit !== 0 ) {
+          this.sessionTimer.startTimer(this.group.softSessionLimit);
+        }
+
+
+        this.delegate.send(msg);
       },
       javaCode: `Object object = msg.getObject();
 if ( object instanceof RPCErrorMessage && ((RPCErrorMessage) object).getData() instanceof RemoteException &&
@@ -81,6 +90,11 @@ foam.CLASS({
       name: 'SESSION_KEY',
       value: 'sessionId',
       type: 'String'
+    },
+    {
+      class: 'Boolean',
+      name: 'promptUserToAuthenticate',
+      value: true
     }
   ],
 
@@ -128,7 +142,8 @@ return uuid;`
         msg.attributes.replyBox.localBox = this.SessionReplyBox.create({
           msg:       msg,
           clientBox: this,
-          delegate:  msg.attributes.replyBox.localBox
+          delegate:  msg.attributes.replyBox.localBox,
+          promptUserToAuthenticate: this.promptUserToAuthenticate
         });
 
         this.delegate.send(msg);

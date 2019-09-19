@@ -12,11 +12,9 @@ foam.CLASS({
     'foam.nanos.auth.AuthService'
   ],
 
-  documentation: 'ClientAuthService which uses custom AuthServiceClientBox as delegate',
-
   requires: [
     'foam.box.HTTPBox',
-    'foam.box.AuthServiceClientBox',
+    'foam.box.SessionClientBox'
   ],
 
   properties: [
@@ -29,7 +27,10 @@ foam.CLASS({
       name: 'delegate',
       of: 'foam.nanos.auth.AuthService',
       factory: function() {
-        return this.AuthServiceClientBox.create({
+        return this.SessionClientBox.create({
+          // Set this to false for calls to the auth service because we actually
+          // want to know what the error was so we can display it to the user.
+          promptUserToAuthenticate: false,
           delegate: this.HTTPBox.create({
             method: 'POST',
             url: this.serviceName
