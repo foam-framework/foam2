@@ -215,14 +215,14 @@ foam.CLASS({
       var outlineB = node.outline;
       minLevels = Math.min(outlineA.length, outlineB.length);
 
-      var champion = Number.MAX_SAFE_INTEGER;
+      var minDistance = Number.MAX_SAFE_INTEGER;
       for (var i = 0; i < minLevels; i++) {
         // we only need to check if the right of outlineA overlaps with the left of outlineB
         var overlapDistance = outlineB[i].left - outlineA[i].right;
 
-        champion = Math.min(champion, overlapDistance);
+        minDistance = Math.min(champion, overlapDistance);
       }
-      return champion;
+      return minDistance;
     },
 
     function layout() {
