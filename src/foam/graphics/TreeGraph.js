@@ -26,6 +26,7 @@
      [ 'nodeWidth',  155 ],
      [ 'nodeHeight',  60 ],
      [ 'padding',     30 ],
+     [ 'color', 'white'],
      {
        name: 'data'
      },
@@ -46,8 +47,6 @@
    methods: [
      function initCView() {
        this.SUPER();
-
-       this.color = 'white';
 
        if ( this.data ) {
         this.root = this.TreeNode.create({y: this.nodeHeight * 2, data: this.data});
