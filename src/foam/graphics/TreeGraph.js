@@ -36,8 +36,7 @@
      {
        name: 'formatNode',
        value: function() {}
-     },
-     'time'
+     }
    ],
 
    topics: [
@@ -64,15 +63,10 @@
        isMerged: true,
        mergeDelay: 1,
        code: function() {
-         if ( ! this.time ) {
-           this.time = Date.now();
-         }
           if ( this.root && this.root.layout() ) {
             this.invalidate();
             this.doLayout();
           } else {
-            // console.log(Date.now() - this.time)
-            this.time = null;
             this.updateCSize();
           }
         }
