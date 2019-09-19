@@ -43,7 +43,7 @@ public class ROPEAuthorizer implements Authorizer {
   }
 
   public void authorizeOnDelete(X x, FObject obj) throws AuthorizationException {
-    // String targetModel = obj.getClassInfo().getId();
+    String targetModel = obj.getClassInfo().getId();
     if ( ! ropeSearch(targetModel, ROPEActions.D, obj, x) ) throw new AuthorizationException("You don't have permission to create this object");
   }
 
@@ -77,7 +77,7 @@ public class ROPEAuthorizer implements Authorizer {
           )
           .select(new ArraySink()))
           .getArray();
-        // there is a problem with this line : how do we know if its sourceObj or targetObj
+
         for ( junctionClass junctionObj : junctionObjs ) {
           sourceClass sourceObj = rope.getIsInverse() ? (sourceClass) sourceDAO.find(junctionObj.getTargetId()) : (sourceClass) sourceDAO.find(junctionObj.getSourceId());
           sourceObjs.add(sourceObj);
