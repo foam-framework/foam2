@@ -158,7 +158,6 @@ foam.CLASS({
       x.translate(-this.width / 2, 0);
       this.SUPER(x);
 
-      // reset translate and shadow settings
       x.restore();
 
       this.paintConnectors(x);
