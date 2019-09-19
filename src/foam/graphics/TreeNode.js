@@ -149,7 +149,7 @@ foam.CLASS({
     },
 
     function paint(x) {
-      if (!this.parentNode || this.parentNode.expanded) this.SUPER(x);
+      if ( ! this.parentNode || this.parentNode.expanded ) this.SUPER(x);
     },
 
     function paintSelf(x) {
@@ -211,15 +211,13 @@ foam.CLASS({
     },
 
     function distanceTo(node) {
-      var outlineA = this.outline;
-      var outlineB = node.outline;
-      minLevels = Math.min(outlineA.length, outlineB.length);
+      minLevels = Math.min(this.outline.length, node.outline.length);
 
       var minDistance = Number.MAX_SAFE_INTEGER;
       for (var i = 0; i < minLevels; i++) {
-        var overlapDistance = outlineB[i].left - outlineA[i].right;
+        var overlapDistance = node.outline[i].left - this.outline[i].right;
 
-        minDistance = Math.min(champion, overlapDistance);
+        minDistance = Math.min(minDistance, overlapDistance);
       }
       return minDistance;
     },
