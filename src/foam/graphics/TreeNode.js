@@ -226,14 +226,13 @@ foam.CLASS({
     },
 
     function layout() {
-      const { childNodes } = this;
       var moved = false;
 
-      for ( var i = 0; i < childNodes.length; i++ ) {
-        var n1 = childNodes[i];
+      for ( var i = 0; i < this.childNodes.length; i++ ) {
+        var n1 = this.childNodes[i];
 
-        for ( var j = i + 1; j < childNodes.length; j++ ){
-          var n2 = childNodes[j];
+        for ( var j = i + 1; j < this.childNodes.length; j++ ){
+          var n2 = this.childNodes[j];
 
           var distance = n1.distanceTo(n2);
 
@@ -244,15 +243,15 @@ foam.CLASS({
         }
       }
 
-      for ( var i = 0; i < childNodes.length - 1; i++ ) {
-        var n1 = childNodes[i];
-        var n2 = childNodes[i + 1];
+      for ( var i = 0; i < this.childNodes.length - 1; i++ ) {
+        var n1 = this.childNodes[i];
+        var n2 = this.childNodes[i + 1];
 
         var distance = n1.distanceTo(n2);
 
         if ( distance > 0 ) {
           for ( var j = 0; j < i; j++ ) {
-            var n3 = childNodes[j];
+            var n3 = this.childNodes[j];
             distance = Math.min(distance, n3.distanceTo(n2));
           }
           if ( distance ) {
@@ -262,15 +261,15 @@ foam.CLASS({
         }
       }
 
-      for ( var i = 0; i < childNodes.length; i++ ){
-        if ( childNodes[i].layout() ) moved = true;
+      for ( var i = 0; i < this.childNodes.length; i++ ){
+        if ( this.childNodes[i].layout() ) moved = true;
       }
 
       if ( this.outline[1] ) {
         var rw = this.outline[0].right - this.outline[0].left;
         var cw = this.outline[1].right - this.outline[1].left;
         var d = - (cw - rw) / 2;
-        childNodes.forEach(c => {
+        this.childNodes.forEach(c => {
           if ( c.centerX != d ) {
             c.centerX = d;
             moved = true;
@@ -285,9 +284,8 @@ foam.CLASS({
         return this;
       }
 
-      var childNodes = this.childNodes;
-      for (var i = 0; i < childNodes.length; i++) {
-        var foundNode = childNodes[i].findNode(id);
+      for (var i = 0; i < this.childNodes.length; i++) {
+        var foundNode = this.childNodes[i].findNode(id);
         if (foundNode) {
           return foundNode;
         }
