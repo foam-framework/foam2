@@ -47,7 +47,20 @@ public class ROPEAuthorizer implements Authorizer {
     if ( ! ropeSearch(ROPEActions.D, obj, x) ) throw new AuthorizationException("You don't have permission to create this object");
   }
 
-  public boolean ropeSearch( ROPEActions operation, FObject obj, X x) {
+  public long retrieveId(FObject obj) {
+    Method method;
+    try {
+        method = obj.getClass().getDeclaredMethod("getId");
+        method.setAccessible(true);
+        return ((Long) method.invoke(f)).longValue();
+    } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+            | InvocationTargetException e) {
+        // Should never occur
+        System.err.println("Incompatible argument type retrieved from junctiondao");
+    } 
+  }
+
+  public boolean ropeSearch(ROPEActions operation, FObject obj, X x) {
 
     // TODO targetModel is no longer passed in and ROPE.targetModel is now of type CLASS
     String targetClassName = obj.getClassInfo().getId();
@@ -70,8 +83,8 @@ public class ROPEAuthorizer implements Authorizer {
         List<FObject> junctionObjs = ((ArraySink) junctionDAO
           .where(
             OR(
-              AND(!rope.getIsInverse(), EQ(rope.getJunctionModel().getAxiomByName("targetId"), (targetClass.cast(obj)).getId())),
-              AND(rope.getIsInverse(), EQ(rope.getJunctionModel().getAxiomByName("sourceId"), (targetClass.cast(obj)).getId()))
+              AND(!rope.getIsInverse(), EQ(rope.getJunctionModel().getAxiomByName("targetId"), retrieveId(obj))),
+              AND(rope.getIsInverse(), EQ(rope.getJunctionModel().getAxiomByName("sourceId"), retrieveId(obj)))
             )
           )
           .select(new ArraySink()))
