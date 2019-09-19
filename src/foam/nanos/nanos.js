@@ -224,7 +224,8 @@ FOAM_FILES([
   { name: "foam/nanos/geocode/GoogleMapsCredentials" },
 
   // foam/nanos/rope
-  { name: "foam/nanos/rope/ROPECell" },
+  { name: "foam/nanos/rope/ROPE" },
+  { name: "foam/nanos/rope/ROPEActions" },
   { name: "foam/nanos/rope/test/TestObjectA" },
   { name: "foam/nanos/rope/test/TestObjectB" },
   { name: "foam/nanos/rope/test/TestObjectC" }

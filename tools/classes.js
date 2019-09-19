@@ -472,7 +472,8 @@ var classes = [
   'foam.strategy.ClientStrategizerService',
 
   //ROPE
-  'foam.nanos.rope.ROPECell',
+  'foam.nanos.rope.ROPE',
+  'foam.nanos.rope.ROPEActions',
   'foam.nanos.rope.test.TestObjectA',
   'foam.nanos.rope.test.TestObjectB',
   'foam.nanos.rope.test.TestObjectC',

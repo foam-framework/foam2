@@ -608,14 +608,14 @@ p({
   "lazy":false,
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
-      .setOf(foam.nanos.rope.ROPECell.getOwnClassInfo())
+      .setOf(foam.nanos.rope.ROPE.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("ropes")
       .setAuthorize(false)
       .setPermissioned(false)
       .build();
   """,
-  "client":"{\"of\": \"foam.nanos.rope.ROPECell\"}"
+  "client":"{\"of\": \"foam.nanos.rope.ROPE\"}"
 })
 
 p({
