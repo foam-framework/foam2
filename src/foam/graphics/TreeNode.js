@@ -32,12 +32,10 @@ foam.CLASS({
     {
       name: 'outline',
       expression: function (x, nodeWidth, expanded, childNodes, padding) {
-        var nodeLeftEdgePadded = x - nodeWidth / 2 - padding / 2;
-        var nodeRightEdgePadded = x + nodeWidth / 2 + padding / 2;
         var rootLevelOutline = [
           {
-            left: nodeLeftEdgePadded,
-            right: nodeRightEdgePadded
+            left: x - nodeWidth / 2 - padding / 2,
+            right: x + nodeWidth / 2 + padding / 2
           }
         ];
 
