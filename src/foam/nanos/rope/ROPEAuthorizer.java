@@ -68,6 +68,20 @@ public class ROPEAuthorizer implements Authorizer {
       .getArray();
   }
 
+  public List<FObject> getJunctionObjects(ROPE rope, DAO junctionDAO, FObject obj) {
+    return rope.getIsInverse() ? 
+    ((ArraySink) junctionDAO.where(
+        EQ(rope.getJunctionModel().getAxiomByName("sourceId"), ((Long) retrieveProperty(obj, "Id")).longValue())
+      )
+      .select(new ArraySink()))
+      .getArray() :
+    ((ArraySink) junctionDAO.where(
+        EQ(rope.getJunctionModel().getAxiomByName("targetId"), ((Long) retrieveProperty(obj, "Id")).longValue())
+      )
+      .select(new ArraySink()))
+      .getArray();
+  }
+
   public boolean ropeSearch(ROPEActions operation, FObject obj, X x) {
 
     // TODO targetModel is no longer passed in and ROPE.targetModel is now of type CLASS
@@ -85,19 +99,7 @@ public class ROPEAuthorizer implements Authorizer {
       List<FObject> sourceObjs; 
 
       if ( rope.getCardinality().equals("*:*") ) {
-        List<FObject> junctionObjs = rope.getIsInverse() ? 
-        ((ArraySink) junctionDAO
-          .where(
-            EQ(rope.getJunctionModel().getAxiomByName("sourceId"), ((Long) retrieveProperty(obj, "Id")).longValue())
-          )
-          .select(new ArraySink()))
-          .getArray() :
-        ((ArraySink) junctionDAO
-          .where(
-            EQ(rope.getJunctionModel().getAxiomByName("targetId"), ((Long) retrieveProperty(obj, "Id")).longValue())
-          )
-          .select(new ArraySink()))
-          .getArray();
+        List<FObject> junctionObjs = getJunctionObjects(rope, junctionDAO, obj);
 
         for ( FObject junctionObj : junctionObjs ) {
           FObject sourceObj = rope.getIsInverse() ? (FObject) sourceDAO.find(((Long)retrieveProperty(junctionObj, "TargetId")).longValue()) : (FObject) sourceDAO.find(((Long)retrieveProperty(junctionObj, "SourceId")).longValue());
