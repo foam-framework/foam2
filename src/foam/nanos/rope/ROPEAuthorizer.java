@@ -19,6 +19,7 @@ import java.lang.*;
 import java.lang.reflect.*;
 import foam.dao.ArraySink;
 import java.util.List;
+import java.util.ArrayList;
 import static foam.mlang.MLang.*;
 
 public class ROPEAuthorizer implements Authorizer {
@@ -48,17 +49,18 @@ public class ROPEAuthorizer implements Authorizer {
     if ( ! ropeSearch(ROPEActions.D, obj, x) ) throw new AuthorizationException("You don't have permission to create this object");
   }
 
-  public Object retrieveProperty(FObject obj, String propertyName) {
+  public <T> T retrieveProperty(FObject obj, String prefix, String propertyName) {
     Method method;
     try {
-        method = obj.getClass().getDeclaredMethod("get" + propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1));
+        method = obj.getClass().getDeclaredMethod(prefix + propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1));
         method.setAccessible(true);
-        return method.invoke((FObject) obj);
+        return (T) method.invoke((FObject) obj);
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
             | InvocationTargetException e) {
         // Should never occur
         System.err.println("ROPE ERROR: Attempted access on non-existant property");
     } 
+    return null;
   }
 
   public List<ROPE> getTargetRopes(FObject obj) {
@@ -72,7 +74,6 @@ public class ROPEAuthorizer implements Authorizer {
 
     // TODO targetModel is no longer passed in and ROPE.targetModel is now of type CLASS
     String targetClassName = obj.getClassInfo().getId();
-    Class targetClass = Class.forName(targetClassName);
 
     // if the object is the context user itself return true for now TODO
     if ( targetClassName == "foam.nanos.auth.User" && ((User) obj).getId() == this.user_.getId() ) return true;
@@ -82,37 +83,26 @@ public class ROPEAuthorizer implements Authorizer {
     for ( ROPE rope : ropes ) {
       DAO junctionDAO = (DAO) x.get(rope.getJunctionDAOKey());
       DAO sourceDAO = (DAO) x.get(rope.getSourceDAOKey());
-      List<FObject> sourceObjs; 
+      List<FObject> sourceObjs = new ArrayList(); 
 
       if ( rope.getCardinality().equals("*:*") ) {
-        List<FObject> junctionObjs = rope.getIsInverse() ? 
-        ((ArraySink) junctionDAO
+        Object predicateProperty = rope.getIsInverse() ? rope.getJunctionModel().getAxiomByName("sourceId") : rope.getJunctionModel().getAxiomByName("targetId");
+        List<FObject> junctionObjs = ((ArraySink) junctionDAO
           .where(
-            EQ(rope.getJunctionModel().getAxiomByName("sourceId"), ((Long) retrieveProperty(obj, "Id")).longValue())
-          )
-          .select(new ArraySink()))
-          .getArray() :
-        ((ArraySink) junctionDAO
-          .where(
-            EQ(rope.getJunctionModel().getAxiomByName("targetId"), ((Long) retrieveProperty(obj, "Id")).longValue())
+            EQ(predicateProperty, (Long) retrieveProperty(obj, "get", "id"))
           )
           .select(new ArraySink()))
           .getArray();
 
         for ( FObject junctionObj : junctionObjs ) {
-          FObject sourceObj = rope.getIsInverse() ? (FObject) sourceDAO.find(((Long)retrieveProperty(junctionObj, "TargetId")).longValue()) : (FObject) sourceDAO.find(((Long)retrieveProperty(junctionObj, "SourceId")).longValue());
+          FObject sourceObj = rope.getIsInverse() ? (FObject) sourceDAO.find(((Long)retrieveProperty(junctionObj, "get", "targetId")).longValue()) : (FObject) sourceDAO.find(((Long)retrieveProperty(junctionObj, "get", "sourceId")).longValue());
           sourceObjs.add(sourceObj);
         }
       } else if ( rope.getCardinality().equals("*:1") ) {
-        String methodName = "get" + rope.getInverseName().substring(0, 1).toUpperCase() + rope.getInverseName().substring(1);
-        Method searchFunction = strToFun(methodName, rope.getTargetModel().getId(), foam.core.X.class);
-        DAO rDAO = (DAO) searchFunction.invoke(obj, x);
+        DAO rDAO = retrieveProperty(obj, "get", rope.getInverseName());
         sourceObjs = ((ArraySink) rDAO.where(INSTANCE_OF(rope.getSourceModel().getObjClass())).select(new ArraySink())).getArray();
       } else if (rope.getCardinality().equals("1:*") ) {
-        String methodName = "find" + rope.getInverseName().substring(0, 1).toUpperCase() + rope.getInverseName().substring(1);
-        Method searchFunction = strToFun(methodName, rope.getTargetModel().getId());
-        searchFunction.setAccessible(true);
-        FObject sourceObj = searchFunction.invoke((Fbject) obj);
+        FObject sourceObj = retrieveProperty(obj, "find", rope.getInverseName());
         sourceObjs.add(sourceObj);
       } else return false;
         
@@ -132,9 +122,9 @@ public class ROPEAuthorizer implements Authorizer {
           }
         }
       }
-
-      return false;
     }
+
+    return false; 
   }
 
 
@@ -144,11 +134,6 @@ public class ROPEAuthorizer implements Authorizer {
 
   public boolean checkGlobalRemove(X x) {
     return false;
-  }
-
-  public Method strToFun(String methodName, String className, Class... params) {
-    Class cls = Class.forName(className);
-    return cls.getMethod(methodName, params);
   }
 
 }
