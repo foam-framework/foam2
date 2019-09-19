@@ -16,6 +16,7 @@ import foam.nanos.auth.User;
 import foam.nanos.rope.ROPEActions;
 import foam.nanos.rope.ROPE;
 import java.lang.*;
+import java.lang.reflect.*;
 import foam.dao.ArraySink;
 import java.util.List;
 import static foam.mlang.MLang.*;
@@ -52,7 +53,7 @@ public class ROPEAuthorizer implements Authorizer {
     try {
         method = obj.getClass().getDeclaredMethod("getId");
         method.setAccessible(true);
-        return ((Long) method.invoke(f)).longValue();
+        return ((Long) method.invoke((FObject) obj)).longValue();
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
             | InvocationTargetException e) {
         // Should never occur
@@ -80,12 +81,16 @@ public class ROPEAuthorizer implements Authorizer {
       List<FObject> sourceObjs; 
 
       if ( rope.getCardinality().equals("*:*") ) {
-        List<FObject> junctionObjs = ((ArraySink) junctionDAO
+        List<FObject> junctionObjs = rope.getIsInverse() ? 
+        ((ArraySink) junctionDAO
           .where(
-            OR(
-              AND(!rope.getIsInverse(), EQ(rope.getJunctionModel().getAxiomByName("targetId"), retrieveId(obj))),
-              AND(rope.getIsInverse(), EQ(rope.getJunctionModel().getAxiomByName("sourceId"), retrieveId(obj)))
-            )
+            EQ(rope.getJunctionModel().getAxiomByName("sourceId"), retrieveId(obj))
+          )
+          .select(new ArraySink()))
+          .getArray() :
+        ((ArraySink) junctionDAO
+          .where(
+            EQ(rope.getJunctionModel().getAxiomByName("targetId"), retrieveId(obj))
           )
           .select(new ArraySink()))
           .getArray();
