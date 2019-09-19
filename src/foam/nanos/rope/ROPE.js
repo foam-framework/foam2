@@ -47,8 +47,8 @@ foam.CLASS({
       },
       {
         name: 'relationshipImplies',
-        class: 'Array',
-        of: 'foam.nanos.rope.ROPEActions'
+        class: 'List',
+        javaType: 'java.util.List<foam.nanos.rope.ROPEActions>'
       },
       // The Key is the action user would like to perform on tgtObj, and the value is a list of actions on the srcObj that if the user is allowed to perform, grants the permission 
       // for the action on tgtObj

@@ -106,13 +106,14 @@ public class ROPEAuthorizer implements Authorizer {
         sourceObjs = ((ArraySink) rDAO.where(INSTANCE_OF(rope.getSourceModel().getObjClass())).select(new ArraySink())).getArray();
       } else if (rope.getCardinality().equals("1:*") ) {
         String methodName = "find" + rope.getInverseName().substring(0, 1).toUpperCase() + rope.getInverseName().substring(1);
-        Method searchFunction = strToFun(methodName, rope.getTargetModel().getId(), foam.core.X.class);
-        FObject sourceObj = searchFunction.invoke((FObject) obj, x);
+        Method searchFunction = strToFun(methodName, rope.getTargetModel().getId());
+        searchFunction.setAccessible(true);
+        FObject sourceObj = searchFunction.invoke((Fbject) obj);
         sourceObjs.add(sourceObj);
       } else return false;
         
       // if the relationship between the src and target is sufficient to permit the operation
-      if ( ((List<ROPEActions>) rope.getRelationshipImplies()).contains(operation) && sourceObjs.size() > 0 ) {
+      if ( ( rope.getRelationshipImplies()).contains(operation) && sourceObjs.size() > 0 ) {
        // NOT RETURN TRUE!!!!!!!!!!
        // should recurse on srcObj or return true depending 
        // 
