@@ -64,6 +64,13 @@ public class ROPEAuthorizer implements Authorizer {
     return null;
   }
 
+  /**
+    * TODO
+    * refactor the getTargetRopes function or overload the function so that we can 
+    * check if the targetObj passed in to the ropeSearch is an instance of foam.nanos.auth.User 
+    * (i.e., User, Business, Contact, etc) and if so, select only the rope objects where the 
+    * sourceModel is foam.nanos.auth.User and return 
+    */ 
   public List<ROPE> getTargetRopes(FObject obj) {
     return (List<ROPE>) ((ArraySink) this.ropeDAO_
       .where(EQ(ROPE.TARGET_MODEL, obj.getClassInfo())) // need a search for source_model as well
@@ -71,24 +78,7 @@ public class ROPEAuthorizer implements Authorizer {
       .getArray();
   }
 
-  public boolean terminatingSearch(X x, FObject obj) {
-    if ( ((User) obj).getId() == user_.getId() ) return true;
-    /**
-     * TODO
-     * look in the ropedao where sourceModel is either user-business 
-     * and check if the context user is the admin of the business related to user obj
-     * if so, grant the appropriate permissions
-     * else don't
-     */ 
-    return false;
-  }
-
   public boolean ropeSearch(ROPEActions operation, FObject obj, X x) {
-
-    // if the object is the context user itself return true for now TODO
-    if ( obj.getClassInfo().getId() == User.getOwnClassInfo().getId() ) {
-      return terminatingSearch(x, obj);
-    }
 
     List<ROPE> ropes = getTargetRopes(obj);
 
@@ -118,13 +108,14 @@ public class ROPEAuthorizer implements Authorizer {
         sourceObjs.add(sourceObj);
       } else return false;
         
-      // if the relationship between the src and target is sufficient to permit the operation
       if ( ( rope.getRelationshipImplies()).contains(operation) && sourceObjs.size() > 0 ) {
-        /**
-        * TODO
-        * recursively call the search function on the sourceobj, if true return
-        * if false, want to go to next step to check if crud will return true
-        */ 
+        for ( FObject sourceObj : sourceObjs ) {
+          if ( ( sourceObj instanceof User && obj instanceof User ) ) return true;
+          
+          for ( ROPEActions action : rope.getRequiredSourceAction() ) {
+            if ( ropeSearch(action, sourceObj, x) ) return true;
+          }
+        }
       }
 
       // if we need to check in the CRUD Matrix
@@ -132,7 +123,7 @@ public class ROPEAuthorizer implements Authorizer {
       if ( actions != null && actions.size() > 0 ) {
         for ( FObject sourceObj : sourceObjs ) {
           for ( ROPEActions action : actions ) {
-            if ( ropeSearch(action, sourceObj, x) ) return true;
+            if ( ( sourceObj instanceof User && obj instanceof User ) || ropeSearch(action, sourceObj, x) ) return true;
           }
         }
       }
