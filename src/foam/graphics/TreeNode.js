@@ -197,6 +197,10 @@ foam.CLASS({
       this.add(node);
       this.childNodes = this.childNodes.concat(node);
       node.outline$.sub(() => {
+        /**
+         * Here we are forcing a recalculation of the outline b/c there is no way to subscribe
+         * to all children outlines via an expression since outline is an array
+         */
         this.outline = [];
         this.outline = undefined
       });
