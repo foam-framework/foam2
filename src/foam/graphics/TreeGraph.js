@@ -60,7 +60,6 @@
      {
        name: 'doLayout',
        isMerged: true,
-       mergeDelay: 1,
        code: function() {
           if ( this.root && this.root.layout() ) {
             this.invalidate();
