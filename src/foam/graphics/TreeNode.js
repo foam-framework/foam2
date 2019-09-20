@@ -227,6 +227,14 @@ foam.CLASS({
       return minDistance;
     },
 
+    /**
+     * We need to first ensure that there are no overlaps between subtrees
+     * and then we can take care of subtrees being too far apart because
+     * otherwise they will conflict with eachother and go into an infinite loop
+     * since nodes can have be a positive distance away from each other and be properly spaced (i.e. higher levels in the tree)
+     * whereas nodes cannot be a negative distance since that means an overlap has occured
+     * once the above is done we can finally center the nodes
+     */
     function layout() {
       var moved = false;
 
@@ -268,9 +276,9 @@ foam.CLASS({
       }
 
       if ( this.outline[1] ) {
-        var rw = this.outline[0].right - this.outline[0].left;
-        var cw = this.outline[1].right - this.outline[1].left;
-        var d = - (cw - rw) / 2;
+        var rootLevelWidth = this.outline[0].right - this.outline[0].left;
+        var childLevelWidth = this.outline[1].right - this.outline[1].left;
+        var d = - (rootLevelWidth - childLevelWidth) / 2;
         this.childNodes.forEach(c => {
           if ( c.centerX != d ) {
             c.centerX = d;
