@@ -83,12 +83,6 @@ foam.CLASS({
       `,
       expression: function(neighborX, centerX) {
         return neighborX + centerX;
-      },
-      postSet: function() {
-        this.neighborX = 0;
-        this.centerX = 0;
-        // need to force the expression to fire off again
-        this.x = undefined;
       }
     },
     {
