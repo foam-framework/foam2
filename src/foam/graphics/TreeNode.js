@@ -111,12 +111,10 @@ foam.CLASS({
       this.formatNode();
 
       if (this.relationship) {
-        var data = this.data.clone(this.__subContext__);
-        try {
-          data[this.relationship.forwardName].select(data => {
-            this.addChildNode({ data: data });
-          });
-        } catch (x) { }
+        this.data[this.relationship.forwardName].select(childData => {
+          this.addChildNode({ data: childData });
+        });
+
         this.graph.doLayout();
       }
 
