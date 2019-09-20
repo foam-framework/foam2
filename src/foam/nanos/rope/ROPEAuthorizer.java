@@ -8,18 +8,19 @@ package foam.nanos.rope;
 
 import foam.core.FObject;
 import foam.core.X;
+import foam.dao.ArraySink;
 import foam.dao.DAO;
-import foam.nanos.auth.AuthService;
 import foam.nanos.auth.AuthorizationException;
 import foam.nanos.auth.Authorizer;
+import foam.nanos.auth.AuthService;
 import foam.nanos.auth.User;
-import foam.nanos.rope.ROPEActions;
 import foam.nanos.rope.ROPE;
+import foam.nanos.rope.ROPEActions;
 import java.lang.*;
 import java.lang.reflect.*;
-import foam.dao.ArraySink;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import static foam.mlang.MLang.*;
 
 public class ROPEAuthorizer implements Authorizer {
@@ -70,13 +71,24 @@ public class ROPEAuthorizer implements Authorizer {
       .getArray();
   }
 
+  public boolean terminatingSearch(X x, FObject obj) {
+    if ( ((User) obj).getId() == user_.getId() ) return true;
+    /**
+     * TODO
+     * look in the ropedao where sourceModel is either user-business 
+     * and check if the context user is the admin of the business related to user obj
+     * if so, grant the appropriate permissions
+     * else don't
+     */ 
+    return false;
+  }
+
   public boolean ropeSearch(ROPEActions operation, FObject obj, X x) {
 
-    // TODO targetModel is no longer passed in and ROPE.targetModel is now of type CLASS
-    String targetClassName = obj.getClassInfo().getId();
-
     // if the object is the context user itself return true for now TODO
-    if ( targetClassName == "foam.nanos.auth.User" && ((User) obj).getId() == this.user_.getId() ) return true;
+    if ( obj.getClassInfo().getId() == User.getOwnClassInfo().getId() ) {
+      return terminatingSearch(x, obj);
+    }
 
     List<ROPE> ropes = getTargetRopes(obj);
 
@@ -108,9 +120,11 @@ public class ROPEAuthorizer implements Authorizer {
         
       // if the relationship between the src and target is sufficient to permit the operation
       if ( ( rope.getRelationshipImplies()).contains(operation) && sourceObjs.size() > 0 ) {
-       // NOT RETURN TRUE!!!!!!!!!!
-       // should recurse on srcObj or return true depending 
-       // 
+        /**
+        * TODO
+        * recursively call the search function on the sourceobj, if true return
+        * if false, want to go to next step to check if crud will return true
+        */ 
       }
 
       // if we need to check in the CRUD Matrix
