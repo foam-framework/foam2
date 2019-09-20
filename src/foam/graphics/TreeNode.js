@@ -78,10 +78,14 @@ foam.CLASS({
     },
     {
       name: 'x',
+      documentation: `
+        The x value of a node's position relative to their parent
+      `,
       expression: function(neighborX, centerX) {
         return neighborX + centerX;
       },
       postSet: function() {
+        // 
         this.neighborX = 0;
         this.centerX = 0;
         this.x = undefined;
@@ -89,11 +93,17 @@ foam.CLASS({
     },
     {
       class: 'Float',
-      name: 'neighborX'
+      name: 'neighborX',
+      documentation: `
+        The position of the right neighbor relative to the current node
+      `
     },
     {
       class: 'Float',
-      name: 'centerX'
+      name: 'centerX',
+      documentation: `
+        The position of the center (AKA middle of the parent) relative to the current node
+      `
     },
     {
       class: 'Boolean',
