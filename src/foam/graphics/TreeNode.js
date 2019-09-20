@@ -29,6 +29,7 @@ foam.CLASS({
     [ 'height', 155 ],
     [ 'width', 60 ],
     [ 'padding', 30 ],
+    [ 'lineWidth', 0.5 ],
     [ 'border', 'gray' ],
     [ 'color', 'white' ],
     {
@@ -124,7 +125,8 @@ foam.CLASS({
             data: childData,
             width: this.width,
             height: this.height,
-            padding: this.padding
+            padding: this.padding,
+            lineWidth: this.lineWidth
           });
         });
       }
@@ -178,10 +180,10 @@ foam.CLASS({
         x.stroke();
       }
 
-      x.lineWidth = 0.5; //this.borderWidth;
+      // Paint lines to childNodes
+      x.lineWidth = this.lineWidth;
       x.strokeStyle = this.border;
 
-      // Paint lines to childNodes
       if (this.expanded && this.childNodes.length) {
         var h = this.childNodes[0].y * 3 / 4;
         var l = this.childNodes.length;
@@ -194,8 +196,9 @@ foam.CLASS({
         }
       }
 
-      x.lineWidth = this.borderWidth;
       // Paint expand/collapse arrow
+      x.lineWidth = this.borderWidth;
+      
       if (this.childNodes.length) {
         var d = this.expanded ? 5 : -5;
         var y = this.height - 8;

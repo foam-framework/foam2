@@ -22,6 +22,7 @@
    properties: [
      [ 'nodeWidth',  155 ],
      [ 'nodeHeight',  60 ],
+     [ 'lineWidth',   0.5 ],
      [ 'padding',     30 ],
      [ 'color', 'white'],
      {
@@ -50,6 +51,7 @@
           width: this.nodeWidth,
           height: this.nodeHeight,
           padding: this.padding,
+          lineWidth: this.lineWidth,
           y: this.nodeHeight * 2,
           data: this.data
         });
