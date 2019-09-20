@@ -3249,7 +3249,7 @@ foam.CLASS({
       },
       javaCode: `
         return getTargetClass().getObjClass() == obj.getClass();
-      `,
+      `
     }
   ]
 });
