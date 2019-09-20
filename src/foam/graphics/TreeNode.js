@@ -39,14 +39,7 @@ foam.CLASS({
         of the tree where index 0 is the root
       `,
       expression: function (x, width, expanded, childNodes, padding) {
-        var rootLevelOutline = [
-          {
-            left: x - width / 2 - padding / 2,
-            right: x + width / 2 + padding / 2
-          }
-        ];
-
-        var champion = [];
+        var outlineBelowRoot = [];
 
         for (let i = 0; i < childNodes.length && expanded; i++) {
           // get child outline
@@ -58,16 +51,22 @@ foam.CLASS({
           }));
 
           for (var j = 0; j < childOutline.length; j++) {
-            champion[j] = champion[j] || {
+            outlineBelowRoot[j] = outlineBelowRoot[j] || {
               left: Number.MAX_SAFE_INTEGER,
               right: Number.MIN_SAFE_INTEGER
             };
-            champion[j].left = Math.min(childOutline[j].left, champion[j].left);
-            champion[j].right = Math.max(childOutline[j].right, champion[j].right);
+            outlineBelowRoot[j].left = Math.min(childOutline[j].left, outlineBelowRoot[j].left);
+            outlineBelowRoot[j].right = Math.max(childOutline[j].right, outlineBelowRoot[j].right);
           }
         }
 
-        var totalOutline = rootLevelOutline.concat(champion);
+        var rootLevelOutline = [
+          {
+            left: x - width / 2 - padding / 2,
+            right: x + width / 2 + padding / 2
+          }
+        ]
+        var totalOutline = rootLevelOutline.concat(outlineBelowRoot);
 
         return totalOutline;
       }
