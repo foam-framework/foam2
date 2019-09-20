@@ -33,6 +33,11 @@ foam.CLASS({
     [ 'color', 'white' ],
     {
       name: 'outline',
+      documentation: `
+        An array containing the max left ( left edge plus padding of the leftmost node)
+        and max right ( right edge plus padding of the rightmost node) values per level
+        of the tree where index 0 is the root
+      `,
       expression: function (x, width, expanded, childNodes, padding) {
         var rootLevelOutline = [
           {
