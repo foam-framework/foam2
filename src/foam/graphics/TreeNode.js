@@ -72,10 +72,6 @@ foam.CLASS({
       name: 'childNodes',
       factory: function () { return []; }
     },
-    ['left', 0],
-    ['right', 0],
-    ['maxLeft', 0],
-    ['maxRight', 0],
     {
       name: 'x',
       expression: function(neighborX, centerX) {
