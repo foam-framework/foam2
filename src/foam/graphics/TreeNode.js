@@ -138,8 +138,7 @@ foam.CLASS({
         });
         point.x += this.width / 2;
 
-        var hit = this.hitTest(point)
-        if ( hit ) {
+        if ( this.hitTest(point) ) {
           this.expanded = ! this.expanded;
         }
       });
