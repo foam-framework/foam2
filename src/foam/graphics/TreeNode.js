@@ -289,7 +289,7 @@ foam.CLASS({
       if ( this.outline[1] ) {
         var rootLevelWidth = this.outline[0].right - this.outline[0].left;
         var childLevelWidth = this.outline[1].right - this.outline[1].left;
-        var d = - (rootLevelWidth - childLevelWidth) / 2;
+        var d = - (childLevelWidth - rootLevelWidth) / 2;
         this.childNodes.forEach(c => {
           if ( c.centerX != d ) {
             c.centerX = d;
