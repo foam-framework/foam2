@@ -86,10 +86,7 @@
          var width = Math.abs(maxes.maxLeft - maxes.maxRight);
          var height = (this.nodeHeight * 2) * (this.root.outline.length + 1);
 
-         var deltaX = Math.abs(this.width - width) / width;
-         var deltaY = Math.abs(this.height - height) / height;
-
-         if ( deltaX > 0.01 || deltaY > 0.01 ) {
+         if ( this.width != width || this.height != height ) {
            this.width = width;
            this.height = height;
 
