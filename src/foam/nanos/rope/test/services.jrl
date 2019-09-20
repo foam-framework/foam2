@@ -1,0 +1,89 @@
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"ropeDAO",
+  "serve":true,
+  "lazy":false,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.rope.ROPE.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("ropes")
+      .setAuthorize(false)
+      .setPermissioned(false)
+      .build();
+  """,
+  "client":"{\"of\": \"foam.nanos.rope.ROPE\"}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"ropeUserDAO",
+  "serve":true,
+  "lazy":false,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.rope.test.ROPEUser.getOwnClassInfo())
+      .setSeqNo(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("ropeUsers")
+      .setAuthorize(false)
+      .setPermissioned(false)
+      .build();
+  """,
+  "client":"{\"of\": \"foam.nanos.rope.test.ROPEUser\"}"
+})
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"ropeAccountDAO",
+  "serve":true,
+  "lazy":false,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.rope.test.ROPEBankAccount.getOwnClassInfo())
+      .setSeqNo(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("ropeAccounts")
+      .setAuthorize(false)
+      .setPermissioned(false)
+      .build();
+  """,
+  "client":"{\"of\": \"foam.nanos.rope.test.ROPEBankAccount\"}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"ropeBusinessDAO",
+  "serve":true,
+  "lazy":false,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.rope.test.ROPEBusiness.getOwnClassInfo())
+      .setSeqNo(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("ropeBusinesses")
+      .setAuthorize(false)
+      .setPermissioned(false)
+      .build();
+  """,
+  "client":"{\"of\": \"foam.nanos.rope.test.ROPEBusiness\"}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"ropeTransactionDAO",
+  "serve":true,
+  "lazy":false,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.rope.test.ROPETransaction.getOwnClassInfo())
+      .setSeqNo(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("ropeTransactions")
+      .setAuthorize(false)
+      .setPermissioned(false)
+      .build();
+  """,
+  "client":"{\"of\": \"foam.nanos.rope.test.ROPETransaction\"}"
+})
+

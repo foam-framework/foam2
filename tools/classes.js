@@ -474,11 +474,10 @@ var classes = [
   //ROPE
   'foam.nanos.rope.ROPE',
   'foam.nanos.rope.ROPEActions',
-  'foam.nanos.rope.test.TestObjectA',
-  'foam.nanos.rope.test.TestObjectB',
-  'foam.nanos.rope.test.TestObjectC',
-  'foam.nanos.rope.test.TestObjectATestObjectBJunction',
-  'foam.nanos.rope.test.TestObjectBTestObjectCJunction'
+  'foam.nanos.rope.test.ROPEUser',
+  'foam.nanos.rope.test.ROPEBankAccount',
+  'foam.nanos.rope.test.ROPEBusiness',
+  'foam.nanos.rope.test.ROPETransaction'
 ];
 
 var abstractClasses = [
