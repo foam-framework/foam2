@@ -22,6 +22,14 @@ foam.ENUM({
       {
         name: 'D',
         label: 'delete'
+      },
+      {
+        name: 'OWN',
+        label: 'own'
+      },
+      {
+        name: 'ACT_AS',
+        label: 'actAs'
       }
     ]
   });
