@@ -19,9 +19,6 @@ foam.CLASS({
   imports: [
     'formatNode',
     'graph',
-    'nodeHeight',
-    'nodeWidth',
-    'padding',
     'parentNode?',
     'relationship'
   ],
@@ -29,13 +26,18 @@ foam.CLASS({
 
   properties: [
     'data',
+    [ 'height', 155 ],
+    [ 'width', 60 ],
+    [ 'padding', 30 ],
+    [ 'border', 'gray' ],
+    [ 'color', 'white' ],
     {
       name: 'outline',
-      expression: function (x, nodeWidth, expanded, childNodes, padding) {
+      expression: function (x, width, expanded, childNodes, padding) {
         var rootLevelOutline = [
           {
-            left: x - nodeWidth / 2 - padding / 2,
-            right: x + nodeWidth / 2 + padding / 2
+            left: x - width / 2 - padding / 2,
+            right: x + width / 2 + padding / 2
           }
         ];
 
@@ -65,9 +67,6 @@ foam.CLASS({
         return totalOutline;
       }
     },
-    { name: 'height', factory: function () { return this.nodeHeight; } },
-    { name: 'width', factory: function () { return this.nodeWidth; } },
-    ['border', 'gray'],
     {
       name: 'childNodes',
       factory: function () { return []; }
@@ -100,8 +99,7 @@ foam.CLASS({
       postSet: function() {
         this.graph.doLayout();
       }
-    },
-    ['color', 'white']
+    }
   ],
 
   methods: [
@@ -112,7 +110,12 @@ foam.CLASS({
 
       if (this.relationship) {
         this.data[this.relationship.forwardName].select(childData => {
-          this.addChildNode({ data: childData });
+          this.addChildNode({ 
+            data: childData,
+            width: this.width,
+            height: this.height,
+            padding: this.padding
+          });
         });
       }
 

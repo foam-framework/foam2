@@ -16,9 +16,6 @@
    exports: [
      'as graph',
      'formatNode',
-     'nodeHeight',
-     'nodeWidth',
-     'padding',
      'relationship'
    ],
 
@@ -49,7 +46,13 @@
        this.SUPER();
 
        if ( this.data ) {
-        this.root = this.TreeNode.create({y: this.nodeHeight * 2, data: this.data});
+        this.root = this.TreeNode.create({
+          width: this.nodeWidth,
+          height: this.nodeHeight,
+          padding: this.padding,
+          y: this.nodeHeight * 2,
+          data: this.data
+        });
         this.add(this.root);
         this.doLayout();
        }
