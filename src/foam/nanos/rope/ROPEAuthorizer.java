@@ -72,10 +72,21 @@ public class ROPEAuthorizer implements Authorizer {
     * sourceModel is foam.nanos.auth.User and return 
     */ 
   public List<ROPE> getTargetRopes(FObject obj) {
-    return (List<ROPE>) ((ArraySink) this.ropeDAO_
-      .where(EQ(ROPE.TARGET_MODEL, obj.getClassInfo())) // need a search for source_model as well
-      .select(new ArraySink()))
-      .getArray();
+    if ( obj instanceof User )
+      return (List<ROPE>) ((ArraySink) this.ropeDAO_
+        .where(
+          AND(
+            EQ(ROPE.TARGET_MODEL, obj.getClassInfo()),
+            EQ(ROPE.SOURCE_MODEL, User.getOwnClassInfo())
+          )
+        ) 
+        .select(new ArraySink()))
+        .getArray();
+    else 
+      return (List<ROPE>) ((ArraySink) this.ropeDAO_
+        .where(EQ(ROPE.TARGET_MODEL, obj.getClassInfo())) 
+       .select(new ArraySink()))
+       .getArray();
   }
 
   public boolean ropeSearch(ROPEActions operation, FObject obj, X x) {
@@ -88,6 +99,7 @@ public class ROPEAuthorizer implements Authorizer {
       List<FObject> sourceObjs = new ArrayList(); 
 
       if ( rope.getCardinality().equals("*:*") ) {
+
         Object predicateProperty = rope.getIsInverse() ? rope.getJunctionModel().getAxiomByName("sourceId") : rope.getJunctionModel().getAxiomByName("targetId");
         List<FObject> junctionObjs = ((ArraySink) junctionDAO
           .where(
