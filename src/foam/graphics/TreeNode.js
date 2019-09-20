@@ -114,8 +114,6 @@ foam.CLASS({
         this.data[this.relationship.forwardName].select(childData => {
           this.addChildNode({ data: childData });
         });
-
-        this.graph.doLayout();
       }
 
       this.canvas.on('click', (e) => {
