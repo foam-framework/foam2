@@ -552,5 +552,8 @@ FOAM_FILES([
   { name: "foam/build/ClassLoader" },
   { name: "foam/build/ClassLoaderImpl" },
   { name: "foam/build/PromisedClassLoader" },
-  { name: "foam/build/ClassLoaderContext" }
+  { name: "foam/build/ClassLoaderContext" },
+
+  { name: "foam/core/CoreTypesValidationTest" },
+  { name: "foam/core/CoreTypesValidationTestModel" }
 ]);
