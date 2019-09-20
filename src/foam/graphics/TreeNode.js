@@ -41,10 +41,12 @@ foam.CLASS({
       expression: function (x, width, expanded, childNodes, padding) {
         var outlineBelowRoot = [];
 
+        /**
+         * We need to check the outlines of each child node against eachother regardless 
+         * of overlap so that we get actual max left and max right of each level,
+         * overlap and corresponding adjustments are dealt with in the @layout method
+         */
         for (let i = 0; i < childNodes.length && expanded; i++) {
-          // get child outline
-          // transform all rows
-          // merge levels into childoutlines
           var childOutline = childNodes[i].outline.map(o => ({
             left: o.left + x,
             right: o.right + x,
@@ -66,9 +68,8 @@ foam.CLASS({
             right: x + width / 2 + padding / 2
           }
         ]
-        var totalOutline = rootLevelOutline.concat(outlineBelowRoot);
 
-        return totalOutline;
+        return rootLevelOutline.concat(outlineBelowRoot);
       }
     },
     {
@@ -136,6 +137,11 @@ foam.CLASS({
           x: e.offsetX,
           y: e.offsetY,
         });
+
+        /**
+         * need to adjust the x-value to the middle of the node and not the far left edge
+         * so that the pointer click registers correctly when clicking any part of the node
+         */
         point.x += this.width / 2;
 
         if ( this.hitTest(point) ) {
