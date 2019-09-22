@@ -21,7 +21,6 @@
 
   tableColumns: [
     'id',
-    'name',
     'ruleGroup',
     'enabled',
     'priority',
@@ -31,7 +30,6 @@
 
   searchColumns: [
     'id',
-    'name',
     'ruleGroup',
     'enabled',
     'priority',
@@ -54,17 +52,9 @@
 
   properties: [
     {
-      class: 'Long',
-      name: 'id',
-      documentation: 'Sequence number.',
-      visibility: 'RO',
-      tableWidth: 50
-    },
-    {
       class: 'String',
-      name: 'name',
-      section: 'basicInfo',
-      documentation: 'Rule name for human readability.',
+      name: 'id',
+      visibility: 'RO',
       tableWidth: 200
     },
     {
@@ -311,7 +301,7 @@
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
-        public static Rule findById(Collection<Rule> listRule, Long passedId) {
+        public static Rule findById(Collection<Rule> listRule, String passedId) {
           return listRule.stream().filter(rule -> passedId.equals(rule.getId())).findFirst().orElse(null);
         }
         `);
