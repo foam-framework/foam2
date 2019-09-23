@@ -97,18 +97,14 @@ public class RulerDAOTest extends Test {
     Predicate pred10 = EQ(DOT(NEW_OBJ, foam.nanos.auth.User.EMAIL), "nanos@nanos.net");
     rule10.setPredicate(pred10);
     rule10.setOperation(Operations.CREATE_OR_UPDATE);
-    rule10.setAction(compositeAction);
-    ruleDAO.put(rule10);
-    user1.setEmail("nanos@nanos.net");
-    user1 = (User) userDAO.put_(x, user1).fclone();
-    test( user1.getEmail().equals("nanos@nanos.net"), "no rule action resulted in no operation");
 
     // test array of 1 action
-    RuleAction[] actions = new RuleAction[2];
-    actions[0] = (x12, obj, oldObj, ruler, agent) -> {
+    RuleAction[] actions = new RuleAction[1];
+    RuleAction r1 = (x12, obj, oldObj, ruler, agent) -> {
       User user = (User) obj;
       user.setEmail("action1"+user.getEmail());
     };
+    actions[0] = r1;
     compositeAction.setRuleActions(actions);
     rule10.setAction(compositeAction);
     ruleDAO.put(rule10);
@@ -117,6 +113,8 @@ public class RulerDAOTest extends Test {
     test(user1.getEmail().equals("action1nanos@nanos.net"), "one rule action changed user email as expected: "+ user1.getEmail());
 
     //test array of 2 actions
+    actions = new RuleAction[2];
+    actions[0] = r1;
     actions[1] = (x12, obj, oldObj, ruler, agent) -> {
       User user = (User) obj;
       user.setEmail("action2"+user.getEmail());

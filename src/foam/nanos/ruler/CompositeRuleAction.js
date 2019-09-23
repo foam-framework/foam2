@@ -39,11 +39,9 @@ foam.CLASS({
     {
       name: 'applyAction',
       javaCode: `
-        if ( getRuleActions() != null )
-          for ( RuleAction action : getRuleActions() ) {
-            if ( action != null )
-              action.applyAction(x,obj,oldObj,ruler,agency);
-          }
+        for ( RuleAction action : getRuleActions() ) {
+           action.applyAction(x,obj,oldObj,ruler,agency);
+        }
       `
     }
   ]
