@@ -18,19 +18,28 @@ foam.CLASS({
         name: 'sourceModel',
         class: 'Class',
         javaType: 'foam.core.ClassInfo',
+        required: true
       }, 
       {
         name: 'targetModel',
         class: 'Class',
         javaType: 'foam.core.ClassInfo',
+        required: true
       },
       {
         name: 'sourceDAOKey',
-        class: 'String'
+        class: 'String',
+        required: true
+      },
+      {
+        name: 'targetDAOKey',
+        class: 'String',
+        required: true
       },
       {
         name: 'cardinality',
-        class: 'String'
+        class: 'String',
+        required: true
       },
       {
         name: 'junctionModel',
@@ -66,7 +75,8 @@ foam.CLASS({
       // is true if the targetModel is actually sourceModel in the relationship and vice versa
       {
         name: 'isInverse',
-        class: 'Boolean'
+        class: 'Boolean',
+        value: false
       }
     ]
 });
