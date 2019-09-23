@@ -21,6 +21,8 @@ import org.eclipse.jetty.server.Request;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static foam.mlang.MLang.EQ;
+
 /**
  * This Box decorator adds session support to boxes.
  *
@@ -53,16 +55,19 @@ public class SessionServerBox
     try {
       HttpServletRequest req        = getX().get(HttpServletRequest.class);
       DAO                sessionDAO = (DAO) getX().get("localSessionDAO");
-      Session            session    = sessionID == null ? null : (Session) sessionDAO.find(sessionID);
+      Session            session    = sessionID == null ? null : (Session) sessionDAO.find(EQ(Session.ACCESS_TOKEN, sessionID));
 
       if ( session == null ) {
         session = new Session((X) getX().get(Boot.ROOT));
-        session.setId(sessionID == null ? "anonymous" : sessionID);
+
+        // It's fine to let clients choose their session access token if they're
+        // creating a new session because we'll change it when the user
+        // authenticates anyway, so there's no risk of a session fixation attack.
+        if ( ! SafetyUtil.isEmpty(sessionID) ) session.setAccessToken(sessionID);
+
         if ( req != null ) session.setRemoteHost(req.getRemoteHost());
 
-        if ( sessionID != null ) {
-          session = (Session) sessionDAO.put(session);
-        }
+        session = (Session) sessionDAO.put(session);
       } else if ( req != null ) {
         // if req == null it means that we're being accessed via webSockets
         if ( ! session.validRemoteHost(req.getRemoteHost()) ) {
@@ -121,6 +126,24 @@ public class SessionServerBox
         logger.warning("Missing permission", group != null ? group.getId() : "NO GROUP" , "service." + spec.getName());
         msg.replyWithException(e);
         return;
+      }
+
+      // Decorate the reply box to add the sessionId as an attribute to the
+      // message. This informs the client of the server-generated session id.
+      Box replyBox = (Box) msg.getAttributes().get("replyBox");
+      if ( replyBox != null ) {
+        Session finalSession = session;
+        msg.getAttributes().put("replyBox", new ProxyBox(replyBox) {
+          @Override
+          public void send(Message innerMsg) {
+            // The access token might have been updated. For example,
+            // UserAndGroupAuthService will update the session access token when
+            // a user authenticates (signs in) in order to prevent session
+            // fixation attacks.
+            innerMsg.getAttributes().put("sessionId", finalSession.getAccessToken());
+            super.send(innerMsg);
+          }
+        });
       }
 
       msg.getLocalAttributes().put("x", effectiveContext);

@@ -6,82 +6,10 @@
 
 foam.CLASS({
   package: 'foam.box',
-  name: 'SessionReplyBox',
-  extends: 'foam.box.ProxyBox',
-
-  requires: [
-    'foam.box.RPCErrorMessage'
-  ],
-
-  imports: [
-    'requestLogin',
-    'sessionTimer',
-    'group'
-  ],
-
-  javaImports: [
-    'foam.nanos.auth.AuthenticationException'
-  ],
-
-  properties: [
-    {
-      class: 'FObjectProperty',
-      name: 'msg',
-      type: 'foam.box.Message'
-    },
-    {
-      class: 'FObjectProperty',
-      name: 'clientBox',
-      type: 'foam.box.Box'
-    },
-    {
-      class: 'Boolean',
-      name: 'promptUserToAuthenticate',
-      value: true
-    }
-  ],
-
-  methods: [
-    {
-      name: 'send',
-      code: function send(msg) {
-        if (
-          this.promptUserToAuthenticate &&
-          this.RPCErrorMessage.isInstance(msg.object) &&
-          msg.object.data.id === 'foam.nanos.auth.AuthenticationException'
-        ) {
-          this.requestLogin().then(() => {
-            this.clientBox.send(this.msg);
-          });
-          return;
-        }
-
-        // fetch the soft session limit from group, and then start the timer
-        if ( this.group && this.group.id !== '' && this.group.softSessionLimit !== 0 ) {
-          this.sessionTimer.startTimer(this.group.softSessionLimit);
-        }
-
-
-        this.delegate.send(msg);
-      },
-      javaCode: `Object object = msg.getObject();
-if ( object instanceof RPCErrorMessage && ((RPCErrorMessage) object).getData() instanceof RemoteException &&
-    "foam.nanos.auth.AuthenticationException".equals(((RemoteException) ((RPCErrorMessage) object).getData()).getId()) ) {
-  // TODO: should this be wrapped in new Thread() ?
-  ((Runnable) getX().get("requestLogin")).run();
-  getClientBox().send(getMsg());
-} else {
-  getDelegate().send(msg);
-}`
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.box',
   name: 'SessionClientBox',
   extends: 'foam.box.ProxyBox',
+
+  documentation: 'Used in conjunction with SessionServerBox to add session support to boxes.',
 
   requires: [ 'foam.box.SessionReplyBox' ],
 
@@ -90,11 +18,6 @@ foam.CLASS({
       name: 'SESSION_KEY',
       value: 'sessionId',
       type: 'String'
-    },
-    {
-      class: 'Boolean',
-      name: 'promptUserToAuthenticate',
-      value: true
     }
   ],
 
@@ -108,8 +31,14 @@ foam.CLASS({
       class: 'String',
       name: 'sessionID',
       factory: function() {
-        return localStorage[this.sessionName] ||
-            ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
+        var existingSessionId = localStorage.getItem(this.sessionName);
+        if ( existingSessionId ) return existingSessionId;
+        var newSessionId = foam.uuid.randomGUID();
+        localStorage.setItem(this.sessionName, newSessionId);
+        return newSessionId;
+      },
+      postSet: function(oldValue, newValue) {
+        localStorage.setItem(this.sessionName, newValue);
       },
       swiftExpressionArgs: [ 'sessionName' ],
       swiftExpression: `
@@ -121,13 +50,22 @@ let id = UUID().uuidString
 defaults.set(id, forKey: sessionName)
 return id
       `,
-      javaFactory:
-`String uuid = (String) getX().get(getSessionName());
-if ( "".equals(uuid) ) {
-  uuid = java.util.UUID.randomUUID().toString();
-  getX().put(getSessionName(), uuid);
-}
-return uuid;`
+      javaFactory: `
+        String uuid = (String) getX().get(getSessionName());
+        if ( "".equals(uuid) ) {
+          uuid = java.util.UUID.randomUUID().toString();
+          getX().put(getSessionName(), uuid);
+        }
+        return uuid;
+      `,
+      javaPostSet: `
+        setX(getX().put(getSessionName(), getSessionID()));
+      `
+    },
+    {
+      class: 'Boolean',
+      name: 'promptUserToAuthenticate',
+      value: true
     }
   ],
 
@@ -136,8 +74,6 @@ return uuid;`
       name: 'send',
       code: function send(msg) {
         msg.attributes[this.SESSION_KEY] = this.sessionID;
-
-        // console.log('***** SEND SESSION ID: ', this.sessionID/*foam.json.stringify(msg)*/);
 
         msg.attributes.replyBox.localBox = this.SessionReplyBox.create({
           msg:       msg,
@@ -158,11 +94,17 @@ msg.attributes["replyBox"] = SessionReplyBox_create([
 ])
 try delegate.send(msg)
       `,
-      javaCode: `msg.getAttributes().put(SESSION_KEY, getSessionID());
-SessionReplyBox sessionReplyBox = new SessionReplyBox(getX(), msg,
-    this, (Box) msg.getAttributes().get("replyBox"));
-msg.getAttributes().put("replyBox", sessionReplyBox);
-getDelegate().send(msg);`
+      javaCode: `
+        msg.getAttributes().put(SESSION_KEY, getSessionID());
+        SessionReplyBox sessionReplyBox = new SessionReplyBox.Builder(getX())
+          .setMsg(msg)
+          .setClientBox(this)
+          .setPromptUserToAuthenticate(this.getPromptUserToAuthenticate())
+          .setDelegate((Box) msg.getAttributes().get("replyBox"))
+          .build();
+        msg.getAttributes().put("replyBox", sessionReplyBox);
+        getDelegate().send(msg);
+      `
     }
   ]
 });
