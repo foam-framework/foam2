@@ -65,62 +65,65 @@ foam.CLASS({
 });
 
 
-/**
- * TODO : add foam.RELATIONSHIP BETWEEN : 
- * 1. User - User
- *    sourceModel : ROPEUser
- *    targetModel : ROPEUser
- *    cardinality : *:*
- *    forwardName : entities
- *    inverseName : agents
- *    junctionDAOKey : ropeAgentJunctionDAO
- * 
- * 2. User - User
- *    sourceModel : ROPEUser
- *    targetModel : ROPEUser
- *    cardinality : *:*
- *    forwardName : partners
- *    inverseName : partnered
- *    junctionDAOKey : ropePartnerJunctionDAO
- * 
- * 3. User - User
- *    sourceModel : ROPEUser
- *    targetModel : ROPEUser
- *    cardinality : 1:*
- *    forwardName : contacts
- *    inverseName : owner
- *    junctionDAOKey : ropeContactDAO
- * 
- * 4. User - User
- *    sourceModel : ROPEBusiness
- *    targetModel : ROPEUser
- *    cardinality : *:*
- *    forwardName : signingOfficers
- *    inverseName : businessesInWhichThisUserIsASigningOfficer
- *    junctionDAOKey : ropeSigningOfficerJunctionDAO
- * 
- * 5. User - BankAccount
- *    sourceModel : ROPEUser
- *    targetModel : ROPEBankAccount
- *    cardinality : 1:*
- *    forwardName : bankaccounts
- *    inverseName : owner
- *    junctionDAOKey : ropeAccountDAO
- * 
- * 6. BankAccount - Transaction
- *    sourceModel : ROPEBankAccount
- *    targetModel : ROPETransaction
- *    cardinality : 1:*
- *    forwardName : debits
- *    inverseName : sourceAccount
- *    junctionDAOKey : ropeTransactionDAO
- * 
- * 7. BankAccount - Transaction
- *    sourceModel : ROPEBankAccount
- *    targetModel : ROPETransaction
- *    cardinality : 1:*
- *    forwardName : credits
- *    inverseName : destinationAccount
- *    junctionDAOKey : ropeTransactionDAO
- * 
- */
+foam.RELATIONSHIP({
+  cardinality: '*:*',
+  sourceModel: 'foam.nanos.rope.test.ROPEUser',
+  targetModel: 'foam.nanos.rope.test.ROPEUser',
+  forwardName: 'entities',
+  inverseName: 'agents',
+  junctionDAOKey: 'ropeAgentJunctionDAO'
+});
+
+foam.RELATIONSHIP({
+  cardinality: '*:*',
+  sourceModel: 'foam.nanos.rope.test.ROPEUser',
+  targetModel: 'foam.nanos.rope.test.ROPEUser',
+  forwardName: 'partners',
+  inverseName: 'partnered',
+  junctionDAOKey: 'ropePartnerJunctionDAO'
+});
+
+foam.RELATIONSHIP({
+  cardinality: '*:*',
+  sourceModel: 'foam.nanos.rope.test.ROPEUser',
+  targetModel: 'foam.nanos.rope.test.ROPEUser',
+  forwardName: 'contacts',
+  inverseName: 'owner',
+  junctionDAOKey: 'ropeContactDAO'
+});
+
+foam.RELATIONSHIP({
+  cardinality: '*:*',
+  sourceModel: 'foam.nanos.rope.test.ROPEBusiness',
+  targetModel: 'foam.nanos.rope.test.ROPEUser',
+  forwardName: 'signingOfficers',
+  inverseName: 'businessesInWhichThisUserIsASigningOfficer',
+  junctionDAOKey: 'ropeSigningOfficerJunctionDAO'
+});
+
+foam.RELATIONSHIP({
+  cardinality: '1:*',
+  sourceModel: 'foam.nanos.rope.test.ROPEUser',
+  targetModel: 'foam.nanos.rope.test.ROPEBankAccount',
+  forwardName: 'bankaccounts',
+  inverseName: 'owner',
+  targetDAOKey: 'ropeAccountDAO'
+});
+
+foam.RELATIONSHIP({
+  cardinality: '1:*',
+  sourceModel: 'foam.nanos.rope.test.ROPEBankAccount',
+  targetModel: 'foam.nanos.rope.test.ROPETransaction',
+  forwardName: 'debits',
+  inverseName: 'sourceAccount',
+  targetDAOKey: 'ropeTransactionDAO'
+});
+
+foam.RELATIONSHIP({
+  cardinality: '1:*',
+  sourceModel: 'foam.nanos.rope.test.ROPEBankAccount',
+  targetModel: 'foam.nanos.rope.test.ROPETransaction',
+  forwardName: 'credits',
+  inverseName: 'destinationAccount',
+  targetDAOKey: 'ropeTransactionDAO'
+});

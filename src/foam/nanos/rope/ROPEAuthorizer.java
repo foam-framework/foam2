@@ -51,7 +51,11 @@ public class ROPEAuthorizer implements Authorizer {
   public <T> T retrieveProperty(FObject obj, String prefix, String propertyName) {
     Method method;
     try {
-        method = obj.getClass().getDeclaredMethod(prefix + propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1));
+      method = obj.getClass().getDeclaredMethod(
+        prefix + 
+        propertyName.substring(0, 1).toUpperCase() + 
+        propertyName.substring(1)
+      );
         method.setAccessible(true);
         return (T) method.invoke((FObject) obj);
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException

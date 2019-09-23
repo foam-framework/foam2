@@ -477,7 +477,10 @@ var classes = [
   'foam.nanos.rope.test.ROPEUser',
   'foam.nanos.rope.test.ROPEBankAccount',
   'foam.nanos.rope.test.ROPEBusiness',
-  'foam.nanos.rope.test.ROPETransaction'
+  'foam.nanos.rope.test.ROPETransaction',
+  //ROPE Junctions
+  'foam.nanos.rope.test.ROPEUserROPEUserJunction',
+  'foam.nanos.rope.test.ROPEBusinessROPEUserJunction'
 ];
 
 var abstractClasses = [
