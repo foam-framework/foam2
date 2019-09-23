@@ -12,42 +12,40 @@ import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.nanos.auth.AuthorizationException;
 import foam.nanos.auth.Authorizer;
-import foam.nanos.auth.AuthService;
 import foam.nanos.auth.User;
 import foam.nanos.rope.ROPE;
 import foam.nanos.rope.ROPEActions;
-import java.lang.*;
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import static foam.mlang.MLang.*;
 
 public class ROPEAuthorizer implements Authorizer {
 
   protected User user_;
   protected DAO ropeDAO_;
+  protected String targetDAOKey_;
 
-  public ROPEAuthorizer(X x) {
+  public ROPEAuthorizer(X x, String targetDAOKey) {
     user_ = (User) x.get("user");
     ropeDAO_ = (DAO) x.get("ropeDAO");
+    targetDAOKey_ = targetDAOKey;
   }
 
   public void authorizeOnCreate(X x, FObject obj) throws AuthorizationException {
-    if ( ! ropeSearch(ROPEActions.C, obj, x) ) throw new AuthorizationException("You don't have permission to create this object");
+    if ( ! ropeSearch(ROPEActions.C, obj, x, targetDAOKey_) ) throw new AuthorizationException("You don't have permission to create this object");
   }
 
   public void authorizeOnRead(X x, FObject obj) throws AuthorizationException {
-    if ( ! ropeSearch(ROPEActions.R, obj, x) ) throw new AuthorizationException("You don't have permission to create this object");
+    if ( ! ropeSearch(ROPEActions.R, obj, x, targetDAOKey_) ) throw new AuthorizationException("You don't have permission to create this object");
   }
 
   public void authorizeOnUpdate(X x, FObject oldObj, FObject obj) throws AuthorizationException {
-    if ( ! ropeSearch(ROPEActions.U, obj, x) ) throw new AuthorizationException("You don't have permission to create this object");
+    if ( ! ropeSearch(ROPEActions.U, obj, x, targetDAOKey_) ) throw new AuthorizationException("You don't have permission to create this object");
   }
 
   public void authorizeOnDelete(X x, FObject obj) throws AuthorizationException {
-    String targetModel = obj.getClassInfo().getId();
-    if ( ! ropeSearch(ROPEActions.D, obj, x) ) throw new AuthorizationException("You don't have permission to create this object");
+    if ( ! ropeSearch(ROPEActions.D, obj, x, targetDAOKey_) ) throw new AuthorizationException("You don't have permission to create this object");
   }
 
   public <T> T retrieveProperty(FObject obj, String prefix, String propertyName) {
@@ -68,34 +66,29 @@ public class ROPEAuthorizer implements Authorizer {
     return null;
   }
 
-  /**
-    * TODO
-    * refactor the getTargetRopes function or overload the function so that we can 
-    * check if the targetObj passed in to the ropeSearch is an instance of foam.nanos.auth.User 
-    * (i.e., User, Business, Contact, etc) and if so, select only the rope objects where the 
-    * sourceModel is foam.nanos.auth.User and return 
-    */ 
-  public List<ROPE> getTargetRopes(FObject obj) {
+  public List<ROPE> getTargetRopes(FObject obj, String targetDAOKey) {
     if ( obj instanceof User )
       return (List<ROPE>) ((ArraySink) this.ropeDAO_
-        .where(
-          AND(
+        .where(AND(
             EQ(ROPE.TARGET_MODEL, obj.getClassInfo()),
-            EQ(ROPE.SOURCE_MODEL, User.getOwnClassInfo())
-          )
-        ) 
+            EQ(ROPE.SOURCE_MODEL, User.getOwnClassInfo()),
+            EQ(ROPE.TARGET_DAOKEY, targetDAOKey)
+        )) 
         .select(new ArraySink()))
         .getArray();
     else 
       return (List<ROPE>) ((ArraySink) this.ropeDAO_
-        .where(EQ(ROPE.TARGET_MODEL, obj.getClassInfo())) 
-       .select(new ArraySink()))
-       .getArray();
+        .where(AND(
+          EQ(ROPE.TARGET_MODEL, obj.getClassInfo()),
+          EQ(ROPE.TARGET_DAOKEY, targetDAOKey)
+        )) 
+        .select(new ArraySink()))
+        .getArray();
   }
 
 public boolean ropeSearch(ROPEActions operation, FObject obj, X x) {
 
-    List<ROPE> ropes = getTargetRopes(obj);
+    List<ROPE> ropes = getTargetRopes(obj, targetDAOKey);
 
     for ( ROPE rope : ropes ) {
       DAO junctionDAO = (DAO) x.get(rope.getJunctionDAOKey());
@@ -129,7 +122,7 @@ public boolean ropeSearch(ROPEActions operation, FObject obj, X x) {
           if ( ( sourceObj instanceof User && obj instanceof User ) ) return true;
           
           for ( ROPEActions action : rope.getRequiredSourceAction() ) {
-            if ( ropeSearch(action, sourceObj, x) ) return true;
+            if ( ropeSearch(action, sourceObj, x, rope.getSourceDAOKey()) ) return true;
           }
         }
       }
@@ -139,7 +132,7 @@ public boolean ropeSearch(ROPEActions operation, FObject obj, X x) {
       if ( actions != null && actions.size() > 0 ) {
         for ( FObject sourceObj : sourceObjs ) {
           for ( ROPEActions action : actions ) {
-            if ( ( sourceObj instanceof User && obj instanceof User ) || ropeSearch(action, sourceObj, x) ) return true;
+            if ( ( sourceObj instanceof User && obj instanceof User ) || ropeSearch(action, sourceObj, x, rope.getSourceDAOKey()) ) return true;
           }
         }
       }
