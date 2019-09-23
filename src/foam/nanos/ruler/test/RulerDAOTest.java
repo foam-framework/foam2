@@ -104,7 +104,7 @@ public class RulerDAOTest extends Test {
     ruleDAO.put(rule10);
     user1.setEmail("nanos@nanos.net");
     user1 = (User) userDAO.put_(x, user1).fclone();
-    test(SafetyUtil.equals("nanos@nanos.net", user1.getEmail()),"no rule action resulted in no operation");
+    test(user1.getEmail().equals("nanos@nanos.net"),"no rule action resulted in no operation");
 
     // test array of 1 action
     RuleAction[] actions = new RuleAction[2];
@@ -117,7 +117,7 @@ public class RulerDAOTest extends Test {
     ruleDAO.put(rule10);
     user1.setEmail("nanos@nanos.net");
     user1 = (User) userDAO.put_(x, user1).fclone();
-    test(SafetyUtil.equals("action1nanos@nanos.net", user1.getEmail()),"one rule action changed user email as expected: "+ user1.getEmail());
+    test(user1.getEmail().equals("action1nanos@nanos.net"),"one rule action changed user email as expected: "+ user1.getEmail());
 
     //test array of 2 actions
     actions[1] = (x12, obj, oldObj, ruler, agent) -> {
@@ -129,7 +129,7 @@ public class RulerDAOTest extends Test {
     ruleDAO.put(rule10);
     user1.setEmail("nanos@nanos.net");
     user1 = (User) userDAO.put_(x, user1).fclone();
-    test(SafetyUtil.equals("action2action1nanos@nanos.net", user1.getEmail()),"Both rule actions changed user email as expected: "+user1.getEmail() );
+    test(user1.getEmail().equals("action2action1nanos@nanos.net"),"Both rule actions changed user email as expected: "+user1.getEmail() );
   }
 
   public void testUpdatedRule(X x) {
@@ -336,6 +336,7 @@ public class RulerDAOTest extends Test {
     ruleDAO.remove_(x, rule7);
     ruleDAO.remove_(x, rule8);
     ruleDAO.remove_(x, rule9);
+    ruleDAO.remove_(x, rule10);
     userDAO.remove_(x, user1);
     userDAO.remove_(x, user2);
   }
