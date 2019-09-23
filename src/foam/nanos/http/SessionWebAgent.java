@@ -15,7 +15,6 @@ import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,10 +48,13 @@ public class SessionWebAgent
 
       // check for session id in cookie
       Cookie[] cookies = req.getCookies();
-      for ( Cookie c : cookies ) {
-        if ( c.getName().equals("sessionId") ) {
-          sessionId = c.getValue();
-          break;
+
+      if ( cookies != null ) {
+        for ( Cookie c : cookies ) {
+          if ( c.getName().equals("sessionId") ) {
+            sessionId = c.getValue();
+            break;
+          }
         }
       }
 
