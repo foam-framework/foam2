@@ -22,14 +22,11 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.nanos.rope.test',
   name: 'ROPEBusiness',
+  extends: 'foam.nanos.rope.test.ROPEUser',
 
   properties: [
     {
-      name: 'id',
-      class: 'Long'
-    },
-    {
-      name: 'name',
+      name: 'organizationName',
       class: 'String'
     }
   ]

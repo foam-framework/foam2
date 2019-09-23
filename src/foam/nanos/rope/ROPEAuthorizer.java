@@ -12,15 +12,12 @@ import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.nanos.auth.AuthorizationException;
 import foam.nanos.auth.Authorizer;
-import foam.nanos.auth.AuthService;
 import foam.nanos.auth.User;
 import foam.nanos.rope.ROPE;
 import foam.nanos.rope.ROPEActions;
-import java.lang.*;
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import static foam.mlang.MLang.*;
 
 public class ROPEAuthorizer implements Authorizer {
@@ -48,7 +45,6 @@ public class ROPEAuthorizer implements Authorizer {
   }
 
   public void authorizeOnDelete(X x, FObject obj) throws AuthorizationException {
-    String targetModel = obj.getClassInfo().getId();
     if ( ! ropeSearch(ROPEActions.D, obj, x, targetDAOKey_) ) throw new AuthorizationException("You don't have permission to create this object");
   }
 
