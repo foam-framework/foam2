@@ -86,7 +86,7 @@ public class ROPEAuthorizer implements Authorizer {
         .getArray();
   }
 
-public boolean ropeSearch(ROPEActions operation, FObject obj, X x) {
+  public boolean ropeSearch(ROPEActions operation, FObject obj, X x, String targetDAOKey) {
 
     List<ROPE> ropes = getTargetRopes(obj, targetDAOKey);
 
