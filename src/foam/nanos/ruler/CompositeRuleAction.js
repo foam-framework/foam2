@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'foam.nanos.ruler',
   name: 'CompositeRuleAction',
 
-  documentation: 'Runs multiple rule actions from one action.',
+  documentation: 'Runs multiple rule actions from one action. Completes actions sequentially in array, and actions stack.',
 
   implements: ['foam.nanos.ruler.RuleAction'],
 
@@ -39,9 +39,11 @@ foam.CLASS({
     {
       name: 'applyAction',
       javaCode: `
-        for ( RuleAction action : getRuleActions() ) {
-          action.applyAction(x,obj,oldObj,ruler,agency);
-        }
+        if ( getRuleActions() != null )
+          for ( RuleAction action : getRuleActions() ) {
+            if ( action != null )
+              action.applyAction(x,obj,oldObj,ruler,agency);
+          }
       `
     }
   ]
