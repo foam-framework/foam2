@@ -68,24 +68,62 @@ foam.CLASS({
 });
 
 
-// foam.RELATIONSHIP({
-//   sourceModel: 'foam.nanos.rope.test.User',
-//   targetModel: 'foam.nanos.rope.test.Business',
-//   sourceDAOKey: 'aDAO',
-//   targetDAOKey: 'bDAO',
-//   cardinality: '*:*',
-//   forwardName: 'bs',
-//   inverseName: 'as',
-//   junctionDAOKey: 'abJunctionDAO'
-// });
-
-// foam.RELATIONSHIP({
-//   sourceModel: 'foam.nanos.rope.test.User',
-//   targetModel: 'foam.nanos.rope.test.User',
-//   sourceDAOKey: 'bDAO',
-//   targetDAOKey: 'cDAO',
-//   cardinality: '*:*',
-//   forwardName: 'cs',
-//   inverseName: 'bs',
-//   junctionDAOKey: 'bcJunctionDAO'
-// });
+/**
+ * TODO : add foam.RELATIONSHIP BETWEEN : 
+ * 1. User - User
+ *    sourceModel : ROPEUser
+ *    targetModel : ROPEUser
+ *    cardinality : *:*
+ *    forwardName : entities
+ *    inverseName : agents
+ *    junctionDAOKey : ropeAgentJunctionDAO
+ * 
+ * 2. User - User
+ *    sourceModel : ROPEUser
+ *    targetModel : ROPEUser
+ *    cardinality : *:*
+ *    forwardName : partners
+ *    inverseName : partnered
+ *    junctionDAOKey : ropePartnerJunctionDAO
+ * 
+ * 3. User - User
+ *    sourceModel : ROPEUser
+ *    targetModel : ROPEUser
+ *    cardinality : 1:*
+ *    forwardName : contacts
+ *    inverseName : owner
+ *    junctionDAOKey : ropeContactDAO
+ * 
+ * 4. User - User
+ *    sourceModel : ROPEBusiness
+ *    targetModel : ROPEUser
+ *    cardinality : *:*
+ *    forwardName : signingOfficers
+ *    inverseName : businessesInWhichThisUserIsASigningOfficer
+ *    junctionDAOKey : ropeSigningOfficerJunctionDAO
+ * 
+ * 5. User - BankAccount
+ *    sourceModel : ROPEUser
+ *    targetModel : ROPEBankAccount
+ *    cardinality : 1:*
+ *    forwardName : bankaccounts
+ *    inverseName : owner
+ *    junctionDAOKey : ropeAccountDAO
+ * 
+ * 6. BankAccount - Transaction
+ *    sourceModel : ROPEBankAccount
+ *    targetModel : ROPETransaction
+ *    cardinality : 1:*
+ *    forwardName : debits
+ *    inverseName : sourceAccount
+ *    junctionDAOKey : ropeTransactionDAO
+ * 
+ * 7. BankAccount - Transaction
+ *    sourceModel : ROPEBankAccount
+ *    targetModel : ROPETransaction
+ *    cardinality : 1:*
+ *    forwardName : credits
+ *    inverseName : destinationAccount
+ *    junctionDAOKey : ropeTransactionDAO
+ * 
+ */
