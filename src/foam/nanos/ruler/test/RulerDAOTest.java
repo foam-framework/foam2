@@ -1,9 +1,7 @@
 package foam.nanos.ruler.test;
 
 
-import foam.core.Agency;
 import foam.core.ContextAwareAgent;
-import foam.core.FObject;
 import foam.core.X;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
@@ -12,7 +10,6 @@ import foam.nanos.auth.User;
 import foam.nanos.ruler.*;
 import foam.nanos.test.Test;
 import foam.test.TestUtils;
-import foam.util.SafetyUtil;
 
 import java.util.List;
 
@@ -104,7 +101,7 @@ public class RulerDAOTest extends Test {
     ruleDAO.put(rule10);
     user1.setEmail("nanos@nanos.net");
     user1 = (User) userDAO.put_(x, user1).fclone();
-    test(user1.getEmail().equals("nanos@nanos.net"),"no rule action resulted in no operation");
+    test( user1.getEmail().equals("nanos@nanos.net"), "no rule action resulted in no operation");
 
     // test array of 1 action
     RuleAction[] actions = new RuleAction[2];
@@ -117,7 +114,7 @@ public class RulerDAOTest extends Test {
     ruleDAO.put(rule10);
     user1.setEmail("nanos@nanos.net");
     user1 = (User) userDAO.put_(x, user1).fclone();
-    test(user1.getEmail().equals("action1nanos@nanos.net"),"one rule action changed user email as expected: "+ user1.getEmail());
+    test(user1.getEmail().equals("action1nanos@nanos.net"), "one rule action changed user email as expected: "+ user1.getEmail());
 
     //test array of 2 actions
     actions[1] = (x12, obj, oldObj, ruler, agent) -> {
@@ -129,7 +126,7 @@ public class RulerDAOTest extends Test {
     ruleDAO.put(rule10);
     user1.setEmail("nanos@nanos.net");
     user1 = (User) userDAO.put_(x, user1).fclone();
-    test(user1.getEmail().equals("action2action1nanos@nanos.net"),"Both rule actions changed user email as expected: "+user1.getEmail() );
+    test(user1.getEmail().equals("action2action1nanos@nanos.net"), "Both rule actions changed user email as expected: "+user1.getEmail());
   }
 
   public void testUpdatedRule(X x) {
