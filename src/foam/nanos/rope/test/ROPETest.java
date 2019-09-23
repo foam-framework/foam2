@@ -9,11 +9,11 @@ package foam.nanos.rope.test;
 // import foam.core.ContextAwareAgent;
 // import foam.core.FObject;
 import foam.core.X;
-// import foam.dao.ArraySink;
+import foam.dao.ArraySink;
 import foam.dao.DAO;
 // import foam.dao.MDAO;
 // import foam.mlang.predicate.Predicate;
-// import foam.nanos.auth.*;
+import foam.nanos.auth.*;
 // import foam.nanos.auth.AuthService;
 // import foam.nanos.rope.*;
 // import foam.nanos.ruler.*;
@@ -69,7 +69,7 @@ public class ROPETest extends Test {
 
   /**
    * get the following from their daos:
-   * 0. get a ROPEUser from the ROPEUserDAO to use as "self"
+   * DONE 0. get a ROPEUser from the ROPEUserDAO to use as "self"
    * 1. get an instance of ROPEUserROPEUserJunction obj with srcId = "self", and tgtId = some other valid ROPEUser, if none, create one
    * test the following : 
    * 0. check that "self" is NOT able to perform READ in the ropeUserDAO for this "contact" ROPEUser
@@ -82,7 +82,10 @@ public class ROPETest extends Test {
    *    perform READ in the ropeAccountDAO for this account
    */
   public void testROPEContact(X x) {
+    List<User> users = (List<User>) ( (ArraySink) ropeUserDAO.select(new ArraySink())).getArray();
+    test(users.isEmpty());
 
+    User self = users.get(0);
   }
   
   /**
