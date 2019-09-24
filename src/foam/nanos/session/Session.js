@@ -14,6 +14,11 @@ foam.CLASS({
     'foam.nanos.auth.CreatedByAware'
   ],
 
+  imports: [
+    'auth',
+    'localUserDAO'
+  ],
+
   javaImports: [
     'foam.core.X',
     'foam.dao.DAO',
@@ -159,7 +164,63 @@ foam.CLASS({
       `
     },
     {
-      name: 'checkOwnership',
+      name: 'authorizeOnCreate',
+      javaCode: `
+        AuthService auth = (AuthService) getAuth();
+
+        if (
+          ! isSessionUser(x) &&
+          ! hasSPIDPermission(x, "create") &&
+          ! ((AuthService) getAuth()).check(x, createPermission("create"))
+        ) {
+          throw new AuthorizationException("You don't have permission to create that session.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnRead',
+      javaCode: `
+        if (
+          ! isSessionUser(x) &&
+          ! hasSPIDPermission(x, "read") &&
+          ! ((AuthService) getAuth()).check(x, createPermission("read"))
+        ) {
+          throw new AuthorizationException("You don't have permission to read that session.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnUpdate',
+      javaCode: `
+        Session oldSession = (Session) oldObj;
+        AuthService auth = (AuthService) getAuth();
+
+        if (
+          ! isSessionUser(x) &&
+          ! oldSession.isSessionUser(x) &&
+          ! hasSPIDPermission(x, "update") &&
+          ! oldSession.hasSPIDPermission(x, "update") &&
+          ! auth.check(x, createPermission("update")) &&
+          ! auth.check(x, oldSession.createPermission("update"))
+        ) {
+          throw new AuthorizationException("You don't have permission to update that session.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnDelete',
+      javaCode: `
+        if (
+          ! isSessionUser(x) &&
+          ! hasSPIDPermission(x, "delete") &&
+          ! ((AuthService) getAuth()).check(x, createPermission("delete"))
+        ) {
+          throw new AuthorizationException("You don't have permission to delete that session.");
+        }
+      `
+    },
+    {
+      name: 'isSessionUser',
       args: [
         { name: 'x', type: 'Context' }
       ],
@@ -170,64 +231,23 @@ foam.CLASS({
       `
     },
     {
-      name: 'authorizeOnCreate',
+      name: 'hasSPIDPermission',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'operation', type: 'String' }
+      ],
+      type: 'Boolean',
       javaCode: `
-        AuthService auth = (AuthService) x.get("auth");
+        if ( getUserId() == 0 ) return false;
 
-        if (
-          ! checkOwnership(x) &&
+        AuthService auth         = (AuthService) getAuth();
+        DAO         localUserDAO = (DAO) getLocalUserDAO();
+        User        sessionUser  = (User) localUserDAO.inX(x).find(getUserId());
 
-          // TODO: This permission scheme doesn't make sense for create. We're
-          // not going to assign permissions like
-          // 'session.create.0b2ac741-010e-4af9-bc43-dd86c88bbe6a' to people. It
-          // would make more sense to allow certain users or groups to create
-          // sessions for other users in a limited scope. For example, within
-          // the same spid.
-          ! auth.check(x, createPermission("create"))
-        ) {
-          throw new AuthorizationException("You don't have permission to create sessions other than your own.");
-        }
-      `
-    },
-    {
-      name: 'authorizeOnUpdate',
-      javaCode: `
-        AuthService auth       = (AuthService) x.get("auth");
-        Session     oldSession = (Session) oldObj;
+        if ( sessionUser == null ) throw new RuntimeException(String.format("User with id '%d' not found.", Long.toString(getUserId())));
 
-        if (
-          ! checkOwnership(x) &&
-          ! oldSession.checkOwnership(x) &&
-          ! auth.check(x, createPermission("update"))
-        ) {
-          throw new AuthorizationException("You don't have permission to update sessions other than your own.");
-        }
-      `
-    },
-    {
-      name: 'authorizeOnDelete',
-      javaCode: `
-        AuthService auth = (AuthService) x.get("auth");
-
-        if (
-          ! checkOwnership(x) &&
-          ! auth.check(x, "*")
-        ) {
-          throw new AuthorizationException("You don't have permission to delete sessions other than your own.");
-        }
-      `
-    },
-    {
-      name: 'authorizeOnRead',
-      javaCode: `
-        AuthService auth = (AuthService) x.get("auth");
-
-        if (
-          ! checkOwnership(x) &&
-          ! auth.check(x, createPermission("read"))
-        ) {
-          throw new AuthorizationException("You don't have permission to view sessions other than your own.");
-        }
+        String spid = sessionUser.getSpid();
+        return ! SafetyUtil.isEmpty(spid) && auth.check(x, String.format("session.%s.%s", operation, spid));
       `
     },
     {
@@ -237,7 +257,9 @@ foam.CLASS({
       ],
       type: 'String',
       javaCode: `
-        return "session." + operation + "." + getId();
+        String id = getId();
+        if ( SafetyUtil.isEmpty(id) ) id = "*";
+        return "session." + operation + "." + id;
       `
     },
     {
