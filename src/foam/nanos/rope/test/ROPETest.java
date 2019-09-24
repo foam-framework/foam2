@@ -105,11 +105,13 @@ public class ROPETest extends Test {
       target = new ROPEUser();
       target.setId(self.getId() + 1990);
       target.setName("contactTest");
-      ROPEUserROPEUserJunction targetJunction = new ROPEUserROPEUserJunction().setSourceId(self.getId()).setTargetId(target.getId());
+      ROPEUserROPEUserJunction targetJunction = new ROPEUserROPEUserJunction();
+      targetJunction.setSourceId(self.getId());
+      targetJunction.setTargetId(target.getId());
       ropeContactDAO.put(targetJunction);
     }
 
-    ROPEAuthorizer ropeAuthorizer = new ROPEAuthorizer(x, null);
+    TestROPEAuthorizer ropeAuthorizer = new TestROPEAuthorizer(x, self, null);
 
     test(! ropeAuthorizer.ropeSearch(ROPEActions.R, target, x, "ropeUserDAO"), "check that \"self\" is NOT able to perform READ in the ropeUserDAO for this contact ROPEUser");
     test(ropeAuthorizer.ropeSearch(ROPEActions.C, self, x, "ropeContactDAO"), "check that \"self\" is able to perform CREATE in the ropeContactDAO for this object");
@@ -119,6 +121,22 @@ public class ROPETest extends Test {
     test(! ropeAuthorizer.ropeSearch(ROPEActions.D, target, x, "ropeUserDAO"), "check that \"self\" is NOT able to perform DELETE in the ropeUserDAO for the contact ROPEUser");
     test(ropeAuthorizer.ropeSearch(ROPEActions.U, self, x, "ropeContactDAO"), "check that \"self\" is able to perform UPDATE in the ropeContactDAO for this object");
     test(ropeAuthorizer.ropeSearch(ROPEActions.D, self, x, "ropeContactDAO"), "check that \"self\" is able to perform DELETE in the ropeContactDAO for this object");
+
+    List<ROPEBankAccount> userBankAccounts = ((ArraySink) ropeAccountDAO.where(
+      EQ(ROPEBankAccount.OWNER, target.getId())
+    )
+    .select(new ArraySink()))
+    .getArray();
+
+    if (userBankAccounts.isEmpty()) {
+      ROPEBankAccount account = new ROPEBankAccount();
+      account.setId(1990);
+      account.setName("testAccount");
+      account.setOwner(target.getId());
+      ropeAccountDAO.put(account);
+
+      test(ropeAuthorizer.ropeSearch(ROPEActions.R, self, x, "ropeAccountDAO"), "check that \"self\" is able to perform READ in the ropeAccountDAO for this account");
+    }
   }
   
   /**
