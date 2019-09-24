@@ -150,4 +150,11 @@ public class ROPEAuthorizer implements Authorizer {
     return false;
   }
 
+  public User getUser() {
+    return user_;
+  }
+
+  public void setUser(User user) {
+    user_ = user;
+  }
 }

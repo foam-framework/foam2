@@ -85,16 +85,16 @@ public class ROPETest extends Test {
    *    perform READ in the ropeAccountDAO for this account
    */
   public void testROPEContact(X x) {
-    List<User> users = (List<User>) ( (ArraySink) ropeUserDAO.select(new ArraySink())).getArray();
+    List<ROPEUser> users = (List<ROPEUser>) ( (ArraySink) ropeUserDAO.select(new ArraySink())).getArray();
     test( ! users.isEmpty(), "ropeUserDAO should not be empty at the start of tests" );
 
-    User self = users.get(0);
-    User target;
+    ROPEUser self = users.get(0);
+    ROPEUser target;
 
-    List<User> ropeUserJQuery = (List<User>) ((ArraySink) ropeContactDAO.where(
+    List<ROPEUser> ropeUserJQuery = (List<ROPEUser>) ((ArraySink) ropeContactDAO.where(
       AND(
-        EQ(ROPEUserROPEUserJunction.SOURCE_ID, self.getClassInfo().getId()),
-        NOT( EQ(ROPEUserROPEUserJunction.TARGET_ID, self.getClassInfo().getId()) )
+        EQ(ROPEUserROPEUserJunction.SOURCE_ID, self.getId()),
+        NOT( EQ(ROPEUserROPEUserJunction.TARGET_ID, self.getId()) )
       )
     )
     .select(new ArraySink()))
@@ -102,13 +102,15 @@ public class ROPETest extends Test {
     if ( ! ropeUserJQuery.isEmpty() )
       target = ropeUserJQuery.get(0);
     else {
-      target = new ROPEUser().setId(self.getId() + 1990).setName("contactTest");
-      targetJunction = new ROPEUserROPEUserJunction().setSourceId(self.getClassInfo().getId()).setTargetId(target.getClassInfo().getId());
+      target = new ROPEUser();
+      target.setId(self.getId() + 1990);
+      target.setName("contactTest");
+      ROPEUserROPEUserJunction targetJunction = new ROPEUserROPEUserJunction().setSourceId(self.getId()).setTargetId(target.getId());
       ropeContactDAO.put(targetJunction);
     }
 
-    RopeAuthorizer ropeAuthorizer = new RopeAuthorizer(x, null);
-    ropeAuthorizer.user_ = self;
+    ROPEAuthorizer ropeAuthorizer = new ROPEAuthorizer(x, null);
+    ropeAuthorizer.setUser(self);
 
     test(! ropeAuthorizer.ropeSearch(ROPEActions.R, target, x, "ropeUserDAO"), "check that \"self\" is NOT able to perform READ in the ropeUserDAO for this contact ROPEUser");
     test(ropeAuthorizer.ropeSearch(ROPEActions.C, self, x, "ropeContactDAO"), "check that \"self\" is able to perform CREATE in the ropeContactDAO for this object");
