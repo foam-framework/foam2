@@ -85,7 +85,7 @@ public class ROPETest extends Test {
    */
   public void testROPEContact(X x) {
     List<User> users = (List<User>) ( (ArraySink) ropeUserDAO.select(new ArraySink())).getArray();
-    test(users.isEmpty());
+    test( ! users.isEmpty() );
 
     User self = users.get(0);
     User target;
