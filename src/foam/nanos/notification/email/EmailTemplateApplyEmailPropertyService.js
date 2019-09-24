@@ -37,7 +37,7 @@ foam.CLASS({
       try {
         emailMessage = emailTemplateObj.apply(x, group, emailMessage, templateArgs);
       } catch (Exception e) {
-        throw new NoSuchFieldException("@EmailTemplateApplyEmailPropertyService: emailTemplate.apply has failed. emailTemplate = {id:" + templateName + ", group:" + group + "}" + e);
+        logger.error(new NoSuchFieldException("@EmailTemplateApplyEmailPropertyService: emailTemplate.apply has failed. emailTemplate = {id:" + templateName + ", group:" + group + "}" + e));
       }
 
       return emailMessage;
