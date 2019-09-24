@@ -40,7 +40,7 @@ foam.CLASS({
       name: 'applyAction',
       javaCode: `
         for ( RuleAction action : getRuleActions() ) {
-           action.applyAction(x,obj,oldObj,ruler,agency);
+          action.applyAction(x, obj, oldObj, ruler, agency);
         }
       `
     }
