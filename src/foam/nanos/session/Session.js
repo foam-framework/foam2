@@ -112,7 +112,7 @@ foam.CLASS({
       class: 'Object',
       name: 'context',
       type: 'Context',
-      javaFactory: 'return applyTo(getX());',
+      javaFactory: 'return reset(getX());',
       hidden: true,
       transient: true
     }
@@ -163,43 +163,50 @@ foam.CLASS({
         return false;
       `
     },
-    // The authorization methods always throw. This won't happen for superadmin
-    // though because SystemAuthService will return true before these methods
-    // are hit. We do this so that superadmins are the only users who are
-    // permitted to work with sessions.
     {
       name: 'authorizeOnCreate',
-      javaCode: 'throw new AuthorizationException();'
+      javaCode: `
+        if ( ! ((AuthService) getAuth()).check(x, "session.create.*") ) {
+          throw new AuthorizationException();
+        }
+      `
     },
     {
       name: 'authorizeOnRead',
-      javaCode: 'throw new AuthorizationException();'
+      javaCode: `
+        if ( ! ((AuthService) getAuth()).check(x, "session.read.*") ) {
+          throw new AuthorizationException();
+        }
+      `
     },
     {
       name: 'authorizeOnUpdate',
-      javaCode: 'throw new AuthorizationException();'
+      javaCode: `
+        if ( ! ((AuthService) getAuth()).check(x, "session.update.*") ) {
+          throw new AuthorizationException();
+        }
+      `
     },
     {
       name: 'authorizeOnDelete',
-      javaCode: 'throw new AuthorizationException();'
+      javaCode: `
+        if ( ! ((AuthService) getAuth()).check(x, "session.delete.*") ) {
+          throw new AuthorizationException();
+        }
+      `
     },
     {
-      name: 'applyTo',
+      name: 'reset',
       type: 'Context',
       args: [
         { type: 'Context', name: 'x' }
       ],
       documentation: `
-        Returns a subcontext of the given context with the user, group, and
-        other information relevant to this session filled in if it's appropriate
-        to do so.
+        Return a subcontext of the given context where the security-relevant
+        entries have been reset to their empty default values.
       `,
       javaCode: `
-        X rtn = x
-          // We null out the security-relevant entries in the context since we
-          // don't want whatever was there before to leak through, especially
-          // since the system context (which has full admin privileges) is often
-          // used as the argument to this method.
+        return x
           .put(Session.class, this)
           .put("user", null)
           .put("agent", null)
@@ -213,6 +220,25 @@ foam.CLASS({
               (Logger) x.get("logger")
             )
           );
+      `
+    },
+    {
+      name: 'applyTo',
+      type: 'Context',
+      args: [
+        { type: 'Context', name: 'x' }
+      ],
+      documentation: `
+        Returns a subcontext of the given context with the user, group, and
+        other information relevant to this session filled in if it's appropriate
+        to do so.
+      `,
+      javaCode: `
+        // We null out the security-relevant entries in the context since we
+        // don't want whatever was there before to leak through, especially
+        // since the system context (which has full admin privileges) is often
+        // used as the argument to this method.
+        X rtn = reset(x);
 
         if ( getUserId() == 0 ) return rtn;
 
