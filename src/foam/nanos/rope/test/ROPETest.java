@@ -5,9 +5,11 @@
  */
 package foam.nanos.rope.test;
 
+import java.util.List;
+
 // import foam.core.*;
 // import foam.core.ContextAwareAgent;
-// import foam.core.FObject;
+import foam.core.FObject;
 import foam.core.X;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
@@ -86,6 +88,20 @@ public class ROPETest extends Test {
     test(users.isEmpty());
 
     User self = users.get(0);
+    User target;
+    List<User> ropeUserJQuery = (List<User>) ((ArraySink) ropeContactDAO.where(
+      AND(
+        EQ(ROPEUserROPEUserJunction.srcId, self.getClassInfo().getId()),
+        NOT( EQ(ROPEUserROPEUserJunction.tgtId, self.getClassInfo().getId()) )
+      )
+    )
+    .select(new ArraySink()))
+    .getArray();
+    if ( ! ropeUserJQuery.isEmpty() )
+      target = ropeUserJQuery.get(0);
+    else {
+      
+    }
   }
   
   /**
