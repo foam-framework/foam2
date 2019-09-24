@@ -74,13 +74,13 @@ public class ROPETest extends Test {
    * DONE 0. get a ROPEUser from the ROPEUserDAO to use as "self"
    * DONE 1. get an instance of ROPEUserROPEUserJunction obj with srcId = "self", and tgtId = some other valid ROPEUser, if none, create one
    * test the following : 
-   * 0. check that "self" is NOT able to perform READ in the ropeUserDAO for this "contact" ROPEUser
-   * 1. check that "self" is able to perform CREATE in the ropeContactDAO for this object
-   * 2. check that "self" is able to perform READ in the ropeContactDAO for this object
-   * 3. check that "self" is able to perform READ in the ropeUserDAO for the contact ROPEUser
-   * 4. check that "self" is NOT able to perform UPDATE nor DELETE in the ropeUserDAO for the contact ROPEUser
-   * 5. check that "self" is able to perform UPDATE and DELETE in the ropeContactDAO for this object
-   * 6. if there are no accounts under contact user, create an account and check that "self" is NOT able to 
+   * DONE 0. check that "self" is NOT able to perform READ in the ropeUserDAO for this "contact" ROPEUser
+   * DONE 1. check that "self" is able to perform CREATE in the ropeContactDAO for this object
+   * DONE 2. check that "self" is able to perform READ in the ropeContactDAO for this object
+   * DONE 3. check that "self" is able to perform READ in the ropeUserDAO for the contact ROPEUser
+   * DONE 4. check that "self" is NOT able to perform UPDATE nor DELETE in the ropeUserDAO for the contact ROPEUser
+   * DONE 5. check that "self" is able to perform UPDATE and DELETE in the ropeContactDAO for this object
+   *  6. if there are no accounts under contact user, create an account and check that "self" is NOT able to 
    *    perform READ in the ropeAccountDAO for this account
    */
   public void testROPEContact(X x) {
@@ -89,6 +89,7 @@ public class ROPETest extends Test {
 
     User self = users.get(0);
     User target;
+
     List<User> ropeUserJQuery = (List<User>) ((ArraySink) ropeContactDAO.where(
       AND(
         EQ(ROPEUserROPEUserJunction.srcId, self.getClassInfo().getId()),
@@ -104,6 +105,18 @@ public class ROPETest extends Test {
       targetJunction = new ROPEUserROPEUserJunction().setSrcId(self.getClassInfo().getId()).setTgtId(target.getClassInfo().getId());
       ropeContactDAO.put(targetJunction);
     }
+
+    RopeAuthorizer ropeAuthorizer = new RopeAuthorizer(x, null);
+    ropeAuthorizer.user_ = self;
+
+    test(! ropeAuthorizer.ropeSearch(RopeActions.R, target, x, "ropeUserDAO"));
+    test(ropeAuthorizer.ropeSearch(RopeActions.C, self, x, "ropeContactDAO"));
+    test(ropeAuthorizer.ropeSearch(RopeActions.R, self, x, "ropeContactDAO"));
+    test(ropeAuthorizer.ropeSearch(RopeActions.R, target, x, "ropeUserDAO"));
+    test(! ropeAuthorizer.ropeSearch(RopeActions.U, target, x, "ropeUserDAO"));
+    test(! ropeAuthorizer.ropeSearch(RopeActions.D, target, x, "ropeUserDAO"));
+    test(ropeAuthorizer.ropeSearch(RopeActions.U, self, x, "ropeContactDAO"));
+    test(ropeAuthorizer.ropeSearch(RopeActions.D, self, x, "ropeContactDAO"));
   }
   
   /**
