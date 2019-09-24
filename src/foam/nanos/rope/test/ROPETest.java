@@ -6,6 +6,7 @@
 package foam.nanos.rope.test;
 
 import java.util.List;
+import foam.nanos.rope.*;
 
 // import foam.core.*;
 // import foam.core.ContextAwareAgent;
@@ -26,7 +27,7 @@ import foam.test.TestUtils;
 // import java.util.Date;
 // import java.util.GregorianCalendar;
 // import java.util.List;
-// import static foam.mlang.MLang.*;
+import static foam.mlang.MLang.*;
 
 public class ROPETest extends Test {
   DAO ropeUserDAO, ropeBusinessDAO, ropeAccountDAO, ropeTransactionDAO;
@@ -85,15 +86,15 @@ public class ROPETest extends Test {
    */
   public void testROPEContact(X x) {
     List<User> users = (List<User>) ( (ArraySink) ropeUserDAO.select(new ArraySink())).getArray();
-    test( ! users.isEmpty() );
+    test( ! users.isEmpty(), "ropeUserDAO should not be empty at the start of tests" );
 
     User self = users.get(0);
     User target;
 
     List<User> ropeUserJQuery = (List<User>) ((ArraySink) ropeContactDAO.where(
       AND(
-        EQ(ROPEUserROPEUserJunction.srcId, self.getClassInfo().getId()),
-        NOT( EQ(ROPEUserROPEUserJunction.tgtId, self.getClassInfo().getId()) )
+        EQ(ROPEUserROPEUserJunction.SOURCE_ID, self.getClassInfo().getId()),
+        NOT( EQ(ROPEUserROPEUserJunction.TARGET_ID, self.getClassInfo().getId()) )
       )
     )
     .select(new ArraySink()))
@@ -102,21 +103,21 @@ public class ROPETest extends Test {
       target = ropeUserJQuery.get(0);
     else {
       target = new ROPEUser().setId(self.getId() + 1990).setName("contactTest");
-      targetJunction = new ROPEUserROPEUserJunction().setSrcId(self.getClassInfo().getId()).setTgtId(target.getClassInfo().getId());
+      targetJunction = new ROPEUserROPEUserJunction().setSourceId(self.getClassInfo().getId()).setTargetId(target.getClassInfo().getId());
       ropeContactDAO.put(targetJunction);
     }
 
     RopeAuthorizer ropeAuthorizer = new RopeAuthorizer(x, null);
     ropeAuthorizer.user_ = self;
 
-    test(! ropeAuthorizer.ropeSearch(RopeActions.R, target, x, "ropeUserDAO"));
-    test(ropeAuthorizer.ropeSearch(RopeActions.C, self, x, "ropeContactDAO"));
-    test(ropeAuthorizer.ropeSearch(RopeActions.R, self, x, "ropeContactDAO"));
-    test(ropeAuthorizer.ropeSearch(RopeActions.R, target, x, "ropeUserDAO"));
-    test(! ropeAuthorizer.ropeSearch(RopeActions.U, target, x, "ropeUserDAO"));
-    test(! ropeAuthorizer.ropeSearch(RopeActions.D, target, x, "ropeUserDAO"));
-    test(ropeAuthorizer.ropeSearch(RopeActions.U, self, x, "ropeContactDAO"));
-    test(ropeAuthorizer.ropeSearch(RopeActions.D, self, x, "ropeContactDAO"));
+    test(! ropeAuthorizer.ropeSearch(ROPEActions.R, target, x, "ropeUserDAO"), "check that \"self\" is NOT able to perform READ in the ropeUserDAO for this contact ROPEUser");
+    test(ropeAuthorizer.ropeSearch(ROPEActions.C, self, x, "ropeContactDAO"), "check that \"self\" is able to perform CREATE in the ropeContactDAO for this object");
+    test(ropeAuthorizer.ropeSearch(ROPEActions.R, self, x, "ropeContactDAO"), "check that \"self\" is able to perform READ in the ropeContactDAO for this object");
+    test(ropeAuthorizer.ropeSearch(ROPEActions.R, target, x, "ropeUserDAO"), "check that \"self\" is able to perform READ in the ropeUserDAO for the contact ROPEUser");
+    test(! ropeAuthorizer.ropeSearch(ROPEActions.U, target, x, "ropeUserDAO"), "check that \"self\" is NOT able to perform UPDATE in the ropeUserDAO for the contact ROPEUser");
+    test(! ropeAuthorizer.ropeSearch(ROPEActions.D, target, x, "ropeUserDAO"), "check that \"self\" is NOT able to perform DELETE in the ropeUserDAO for the contact ROPEUser");
+    test(ropeAuthorizer.ropeSearch(ROPEActions.U, self, x, "ropeContactDAO"), "check that \"self\" is able to perform UPDATE in the ropeContactDAO for this object");
+    test(ropeAuthorizer.ropeSearch(ROPEActions.D, self, x, "ropeContactDAO"), "check that \"self\" is able to perform DELETE in the ropeContactDAO for this object");
   }
   
   /**
