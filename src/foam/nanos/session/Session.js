@@ -150,7 +150,7 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        if ( SafetyUtil.equals(getRemoteHost(), remoteHost) ) {
+        if ( SafetyUtil.isEmpty(getRemoteHost()) || SafetyUtil.equals(getRemoteHost(), remoteHost) ) {
           return true;
         }
 
