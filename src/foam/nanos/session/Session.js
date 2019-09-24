@@ -163,104 +163,25 @@ foam.CLASS({
         return false;
       `
     },
+    // The authorization methods always throw. This won't happen for superadmin
+    // though because SystemAuthService will return true before these methods
+    // are hit. We do this so that superadmins are the only users who are
+    // permitted to work with sessions.
     {
       name: 'authorizeOnCreate',
-      javaCode: `
-        AuthService auth = (AuthService) getAuth();
-
-        if (
-          ! isSessionUser(x) &&
-          ! hasSPIDPermission(x, "create") &&
-          ! ((AuthService) getAuth()).check(x, createPermission("create"))
-        ) {
-          throw new AuthorizationException("You don't have permission to create that session.");
-        }
-      `
+      javaCode: 'throw new AuthorizationException();'
     },
     {
       name: 'authorizeOnRead',
-      javaCode: `
-        if (
-          ! isSessionUser(x) &&
-          ! hasSPIDPermission(x, "read") &&
-          ! ((AuthService) getAuth()).check(x, createPermission("read"))
-        ) {
-          throw new AuthorizationException("You don't have permission to read that session.");
-        }
-      `
+      javaCode: 'throw new AuthorizationException();'
     },
     {
       name: 'authorizeOnUpdate',
-      javaCode: `
-        Session oldSession = (Session) oldObj;
-        AuthService auth = (AuthService) getAuth();
-
-        if (
-          ! isSessionUser(x) &&
-          ! oldSession.isSessionUser(x) &&
-          ! hasSPIDPermission(x, "update") &&
-          ! oldSession.hasSPIDPermission(x, "update") &&
-          ! auth.check(x, createPermission("update")) &&
-          ! auth.check(x, oldSession.createPermission("update"))
-        ) {
-          throw new AuthorizationException("You don't have permission to update that session.");
-        }
-      `
+      javaCode: 'throw new AuthorizationException();'
     },
     {
       name: 'authorizeOnDelete',
-      javaCode: `
-        if (
-          ! isSessionUser(x) &&
-          ! hasSPIDPermission(x, "delete") &&
-          ! ((AuthService) getAuth()).check(x, createPermission("delete"))
-        ) {
-          throw new AuthorizationException("You don't have permission to delete that session.");
-        }
-      `
-    },
-    {
-      name: 'isSessionUser',
-      args: [
-        { name: 'x', type: 'Context' }
-      ],
-      type: 'Boolean',
-      javaCode: `
-        User user = (User) x.get("user");
-        return user != null && this.getUserId() == user.getId();
-      `
-    },
-    {
-      name: 'hasSPIDPermission',
-      args: [
-        { name: 'x', type: 'Context' },
-        { name: 'operation', type: 'String' }
-      ],
-      type: 'Boolean',
-      javaCode: `
-        if ( getUserId() == 0 ) return false;
-
-        AuthService auth         = (AuthService) getAuth();
-        DAO         localUserDAO = (DAO) getLocalUserDAO();
-        User        sessionUser  = (User) localUserDAO.inX(x).find(getUserId());
-
-        if ( sessionUser == null ) throw new RuntimeException(String.format("User with id '%d' not found.", Long.toString(getUserId())));
-
-        String spid = sessionUser.getSpid();
-        return ! SafetyUtil.isEmpty(spid) && auth.check(x, String.format("session.%s.%s", operation, spid));
-      `
-    },
-    {
-      name: 'createPermission',
-      args: [
-        { name: 'operation', type: 'String' }
-      ],
-      type: 'String',
-      javaCode: `
-        String id = getId();
-        if ( SafetyUtil.isEmpty(id) ) id = "*";
-        return "session." + operation + "." + id;
-      `
+      javaCode: 'throw new AuthorizationException();'
     },
     {
       name: 'applyTo',
