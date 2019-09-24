@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package foam.nanos.rope;
+package foam.nanos.rope.test;
 
 import foam.core.FObject;
 import foam.core.X;
