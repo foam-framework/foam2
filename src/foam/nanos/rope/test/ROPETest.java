@@ -72,7 +72,7 @@ public class ROPETest extends Test {
   /**
    * get the following from their daos:
    * DONE 0. get a ROPEUser from the ROPEUserDAO to use as "self"
-   * 1. get an instance of ROPEUserROPEUserJunction obj with srcId = "self", and tgtId = some other valid ROPEUser, if none, create one
+   * DONE 1. get an instance of ROPEUserROPEUserJunction obj with srcId = "self", and tgtId = some other valid ROPEUser, if none, create one
    * test the following : 
    * 0. check that "self" is NOT able to perform READ in the ropeUserDAO for this "contact" ROPEUser
    * 1. check that "self" is able to perform CREATE in the ropeContactDAO for this object
@@ -100,7 +100,9 @@ public class ROPETest extends Test {
     if ( ! ropeUserJQuery.isEmpty() )
       target = ropeUserJQuery.get(0);
     else {
-      
+      target = new ROPEUser().setId(self.getId() + 1990).setName("contactTest");
+      targetJunction = new ROPEUserROPEUserJunction().setSrcId(self.getClassInfo().getId()).setTgtId(target.getClassInfo().getId());
+      ropeContactDAO.put(targetJunction);
     }
   }
   
