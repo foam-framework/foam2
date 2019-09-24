@@ -599,3 +599,10 @@ p({
     "class": "foam.nanos.geocode.GoogleMapsCredentials"
   }
 })
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "sessionService",
+  "serve": true,
+  "serviceClass": "foam.nanos.session.SimpleSessionService"
+})

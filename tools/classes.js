@@ -230,6 +230,8 @@ var classes = [
   'foam.nanos.http.HttpParameters',
   'foam.nanos.http.DefaultHttpParameters',
   'foam.nanos.session.Session',
+  'foam.nanos.session.SessionService',
+  'foam.nanos.session.SimpleSessionService',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.om.OMLogger',
   'foam.nanos.pm.NullPM',
@@ -490,6 +492,7 @@ var skeletons = [
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.push.PushService',
+  'foam.nanos.session.SessionService',
   'foam.nanos.test.EchoService',
   'foam.strategy.StrategizerService'
 ];
