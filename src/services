@@ -247,10 +247,12 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.session.Session.getOwnClassInfo())
       .setPm(true)
+      .setAuthorize(false)
       .setInnerDAO(((foam.dao.DAO) x.get(\"localSessionDAO\")))
       .build();
   """,
-  "client": "{\"of\":\"foam.nanos.session.Session\"}"
+  "client": "{\"of\":\"foam.nanos.session.Session\"}",
+  "authNotes": "Users must have the 'service.sessionDAO' permission to access this service. Due to the highly sensitive nature of sessions, only superadmins should have permission to access this service."
 })
 
 p({

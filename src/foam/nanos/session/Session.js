@@ -9,14 +9,8 @@ foam.CLASS({
   name: 'Session',
 
   implements: [
-    'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware'
-  ],
-
-  imports: [
-    'auth',
-    'localUserDAO'
   ],
 
   javaImports: [
@@ -161,38 +155,6 @@ foam.CLASS({
         }
 
         return false;
-      `
-    },
-    {
-      name: 'authorizeOnCreate',
-      javaCode: `
-        if ( ! ((AuthService) getAuth()).check(x, "session.create.*") ) {
-          throw new AuthorizationException();
-        }
-      `
-    },
-    {
-      name: 'authorizeOnRead',
-      javaCode: `
-        if ( ! ((AuthService) getAuth()).check(x, "session.read.*") ) {
-          throw new AuthorizationException();
-        }
-      `
-    },
-    {
-      name: 'authorizeOnUpdate',
-      javaCode: `
-        if ( ! ((AuthService) getAuth()).check(x, "session.update.*") ) {
-          throw new AuthorizationException();
-        }
-      `
-    },
-    {
-      name: 'authorizeOnDelete',
-      javaCode: `
-        if ( ! ((AuthService) getAuth()).check(x, "session.delete.*") ) {
-          throw new AuthorizationException();
-        }
       `
     },
     {
