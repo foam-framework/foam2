@@ -9,10 +9,10 @@ foam.INTERFACE({
   name: 'SessionService',
 
   documentation: `
-    A service that can be used to create and destroy sessions for users. The
-    idea behind this service was to create an alternative to letting users
-    access sessionDAO directly to manage sessions. This service has a much
-    simpler interface and reveals less information.
+    A service that can be used to create sessions for users. The idea behind
+    this service was to create an alternative to letting users access sessionDAO
+    directly to manage sessions. This service has a much simpler interface and
+    reveals less information.
   `,
 
   methods: [
@@ -33,15 +33,6 @@ foam.INTERFACE({
         { name: 'x',      type: 'Context' },
         { name: 'userId', type: 'Long' },
         { name: 'ttl',    type: 'Long' }
-      ]
-    },
-    {
-      name: 'destroySession',
-      documentation: 'Destroys the session with the given access token.',
-      type: 'Void',
-      args: [
-        { name: 'x',           type: 'Context' },
-        { name: 'accessToken', type: 'String' }
       ]
     }
   ],

@@ -10,8 +10,8 @@ foam.CLASS({
 
   documentation: `
     A simple implementation of the SessionService interface. Uses SPID-based
-    access control checks. Allows SPID administrators to create and destroy
-    sessions for users in the SPID they administrate.
+    access control checks. Allows SPID administrators to create sessions for
+    users in the SPID they administrate.
   `,
 
   implements: ['foam.nanos.session.SessionService'],
@@ -61,29 +61,6 @@ foam.CLASS({
 
         // TODO: Change to access token property when we support that.
         return session.getId();
-      `
-    },
-    {
-      name: 'destroySession',
-      javaCode: `
-        DAO localSessionDAO = (DAO) getLocalSessionDAO();
-
-        // TODO: Change to query by access token property instead of id when we
-        // support that.
-        Session session = (Session) localSessionDAO.find(accessToken);
-
-        if ( session == null ) {
-          throw new RuntimeException("Session not found.");
-        }
-
-        if (
-          session.getUserId() == 0 ||
-          ! hasSPIDPermission(x, "delete", session.getUserId())
-        ) {
-          throw new AuthorizationException("You don't have permission to destroy that session.");
-        }
-
-        localSessionDAO.remove(session);
       `
     },
     {
