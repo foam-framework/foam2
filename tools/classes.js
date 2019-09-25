@@ -118,6 +118,7 @@ var classes = [
   'foam.dao.AbstractJournal',
   'foam.dao.ProxyJournal',
   'foam.dao.CompositeJournal',
+  'foam.dao.AbstractFileJournal',
   'foam.dao.FileJournal',
   'foam.dao.RoutingJournal',
   'foam.dao.RoutingJournalTest',
