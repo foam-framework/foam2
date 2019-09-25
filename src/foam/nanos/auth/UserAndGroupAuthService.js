@@ -74,7 +74,7 @@ foam.CLASS({
       name: 'getCurrentUser',
       javaCode: `
         Session session = x.get(Session.class);
-        
+
         // fetch context and check if not null or user id is 0
         if ( session == null || session.getUserId() == 0 ) {
           throw new AuthenticationException("Not logged in");
@@ -161,7 +161,8 @@ foam.CLASS({
         Session session = x.get(Session.class);
         session.setUserId(user.getId());
         ((DAO) getLocalSessionDAO()).put(session);
-        session.setContext(session.applyTo(session.getContext()));
+        // QUESTION: can we applyTo current context instead session context as below?
+        session.setContext(session.applyTo(x));
 
         return user;
       `
