@@ -234,6 +234,7 @@ foam.CLASS({
       this.stack.push({
         class: this.updateView.class,
         detailView: this.data.detailView,
+        editEnabled: this.data.editEnabled,
         key: id
       }, this);
     },

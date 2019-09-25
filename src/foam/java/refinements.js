@@ -35,7 +35,8 @@ foam.LIB({
           return b ? "true" : "false";
         },
         Number: function(n) {
-          return '' + n + (n > Math.pow(2, 31) ? 'L' : '');
+          return '' + n +
+            (n > Math.pow(2, 31) || n < -Math.pow(2,31) ? 'L' : '');
         },
         FObject: function(o) {
           return o.asJavaValue();
