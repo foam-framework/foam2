@@ -141,7 +141,7 @@
       class: 'FObjectProperty',
       of: 'foam.nanos.ruler.RuleAction',
       name: 'action',
-      hidden: true,
+      view: { class: 'foam.u2.view.JSONTextView' },
       documentation: 'The action to be executed if predicates returns true for passed object.'
     },
     {

@@ -16,7 +16,7 @@ import java.util.List;
 import static foam.mlang.MLang.*;
 
 public class RulerDAOTest extends Test {
-  Rule rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9;
+  Rule rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9, rule10;
   User user1, user2;
   DAO ruleDAO, userDAO, ruleHistoryDAO;
   int asyncWait = 1000;
@@ -33,6 +33,8 @@ public class RulerDAOTest extends Test {
     testUsers(x);
     testRuleHistory(x);
     testUpdatedRule(x);
+    removeData(x);
+    testCompositeRuleAction(x);
     removeData(x);
   }
 
@@ -85,6 +87,44 @@ public class RulerDAOTest extends Test {
     test(ruleHistory.getResult().equals("Done"),
       "Expected: Update rule history result = Done in rule 6 async action. Actual: " + ruleHistory.getResult()
     );
+  }
+
+  public void testCompositeRuleAction(X x){
+    rule10 = (Rule) rule2.fclone();
+    rule10.setId(10);
+    //test null array of rule actions
+    CompositeRuleAction compositeAction = new CompositeRuleAction();
+    Predicate pred10 = EQ(DOT(NEW_OBJ, foam.nanos.auth.User.EMAIL), "nanos@nanos.net");
+    rule10.setPredicate(pred10);
+    rule10.setOperation(Operations.CREATE_OR_UPDATE);
+
+    // test array of 1 action
+    RuleAction[] actions = new RuleAction[1];
+    RuleAction r1 = (x12, obj, oldObj, ruler, agent) -> {
+      User user = (User) obj;
+      user.setEmail("action1"+user.getEmail());
+    };
+    actions[0] = r1;
+    compositeAction.setRuleActions(actions);
+    rule10.setAction(compositeAction);
+    ruleDAO.put(rule10);
+    user1.setEmail("nanos@nanos.net");
+    user1 = (User) userDAO.put_(x, user1).fclone();
+    test(user1.getEmail().equals("action1nanos@nanos.net"), "one rule action changed user email as expected: "+ user1.getEmail());
+
+    //test array of 2 actions
+    actions = new RuleAction[2];
+    actions[0] = r1;
+    actions[1] = (x12, obj, oldObj, ruler, agent) -> {
+      User user = (User) obj;
+      user.setEmail("action2"+user.getEmail());
+    };
+    compositeAction.setRuleActions(actions);
+    rule10.setAction(compositeAction);
+    ruleDAO.put(rule10);
+    user1.setEmail("nanos@nanos.net");
+    user1 = (User) userDAO.put_(x, user1).fclone();
+    test(user1.getEmail().equals("action2action1nanos@nanos.net"), "Both rule actions changed user email as expected: "+user1.getEmail());
   }
 
   public void testUpdatedRule(X x) {
@@ -291,6 +331,7 @@ public class RulerDAOTest extends Test {
     ruleDAO.remove_(x, rule7);
     ruleDAO.remove_(x, rule8);
     ruleDAO.remove_(x, rule9);
+    ruleDAO.remove_(x, rule10);
     userDAO.remove_(x, user1);
     userDAO.remove_(x, user2);
   }
