@@ -59,7 +59,7 @@ public class EmailsUtility {
     try {
       cts.apply(x, group, emailMessage, templateArgs);
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error(e);
       return;
     }
 
