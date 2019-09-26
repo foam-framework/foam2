@@ -484,6 +484,7 @@ foam.LIB({
 
       cls.name = this.model_.name;
       cls.package = this.model_.package;
+      cls.source = this.model_.source;
       cls.abstract = this.model_.abstract;
       cls.documentation = this.model_.documentation;
 
