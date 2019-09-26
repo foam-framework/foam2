@@ -5,6 +5,7 @@
  */
 
 var classes = [
+  'foam.core.Model',
   'foam.core.Axiom',
   'foam.core.Detachable',
   'foam.core.Serializable',
@@ -123,8 +124,11 @@ var classes = [
   'foam.dao.AbstractFileJournal',
   'foam.dao.FileJournal',
   'foam.dao.RoutingJournal',
-  'foam.dao.RoutingJournalTest',
-  'foam.dao.RoutingJDAO',
+  'foam.dao.RoutingFileJournal',
+  'foam.dao.JournalRoutingJournalAdapter',
+  'foam.dao.SharedJournalFactorySingleton',
+  // 'foam.dao.RoutingJournalTest',
+  // 'foam.dao.RoutingJDAO',
   'foam.dao.JournalType',
   'foam.dao.WriteOnlyJDAO',
   'foam.dao.WriteOnlyFileJournal',
@@ -519,7 +523,8 @@ var proxies = [
   'foam.nanos.http.WebAgent',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.push.PushService',
-  'foam.strategy.StrategizerService'
+  'foam.strategy.StrategizerService',
+  'foam.dao.RoutingJournal'
 ];
 
 var blacklist = [

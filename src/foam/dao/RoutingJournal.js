@@ -6,8 +6,19 @@
 
 foam.CLASS({
   package: 'foam.dao',
-  name: 'RoutingJournal',
-  extends: 'foam.dao.FileJournal',
+  name: 'RoutingFileJournal',
+  extends: 'foam.dao.AbstractFileJournal',
+
+  implements: [
+    'foam.dao.RoutingJournal'
+  ],
+
+  javaImports: [
+    'foam.dao.DAO',
+    'foam.lib.json.JSONParser',
+    'foam.util.SafetyUtil',
+    'java.io.BufferedReader'
+  ],
 
   documentation:
     `Journal interface that also adds the DAO name to the journal entry so that one may use
@@ -38,68 +49,33 @@ try {
       `
     },
     {
-      name: 'writePut_',
-      javaThrows: [
-        'java.io.IOException'
-      ],
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'record',
-          type: 'String'
-        },
-        {
-          name: 'c',
-          type: 'String'
-        }
-      ],
+      name: 'put',
       javaCode: `
-        String service = (String) x.get("service");
-        write_(sb.get()
-          .append(service)
-          .append(".p(")
-          .append(record)
-          .append(")")
-          .toString());
+        this.put_(x, dest, null, nu);
       `
     },
     {
-      name: 'writeRemove_',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'record',
-          type: 'String'
-        }
-      ],
+      name: 'put_',
       javaCode: `
-        String service = (String) x.get("service");
-        write_(sb.get()
-          .append(service)
-          .append(".r(")
-          .append(record)
-          .append(")")
-          .toString());
+        putWithPrefix_(x, old, nu, dest);
+      `
+    },
+    {
+      name: 'remove',
+      javaCode: `
+        removeWithPrefix_(x, obj, dest);
       `
     },
     {
       name: 'replay',
       javaCode: `
-        x = x.put("replayingJournal", this);
-
         // count number of lines successfully read
         int successReading = 0;
-        foam.lib.json.JSONParser parser = getParser();
+        JSONParser parser = getParser();
 
-        try ( java.io.BufferedReader reader = getReader() ) {
+        try ( BufferedReader reader = getReader() ) {
           for ( String line ; ( line = reader.readLine() ) != null ; ) {
-            if ( foam.util.SafetyUtil.isEmpty(line) ) continue;
+            if ( SafetyUtil.isEmpty(line) ) continue;
             if ( COMMENT.matcher(line).matches()    ) continue;
 
             try {
@@ -115,7 +91,7 @@ try {
               int length = line.trim().length();
               line = line.trim().substring(2, length - 1);
 
-              dao = (foam.dao.DAO) x.get(service);
+              DAO dao = (DAO) x.get(service);
               foam.core.FObject obj = parser.parseString(line);
               if ( obj == null ) {
                 getLogger().error("Parse error", getParsingErrorMessage(line), "line:", line);
@@ -124,12 +100,12 @@ try {
 
               switch (operation) {
                 case 'p':
-                  foam.core.FObject old = dao.inX(x).find(obj.getProperty("id"));
-                  dao.inX(x).put(old != null ? mergeFObject(old, obj) : obj);
+                  foam.core.FObject old = dao.find(obj.getProperty("id"));
+                  dao.put(old != null ? mergeFObject(old, obj) : obj);
                   break;
 
                 case 'r':
-                  dao.inX(x).remove(obj);
+                  dao.remove(obj);
                   break;
               }
 
@@ -144,6 +120,99 @@ try {
           getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename());
           setReplayed(true);
         }
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'SharedJournalFactorySingleton',
+
+  axioms: [ foam.pattern.Singleton.create() ],
+
+  properties: [
+    {
+      name: 'sharedJournalFiles',
+      class: 'Map',
+      javaType: 'java.util.Map<String, RoutingFileJournal>',
+      javaFactory: `return new java.util.HashMap<String, RoutingFileJournal>();`
+    }
+  ],
+
+  methods: [
+    {
+      name: 'get',
+      type: 'RoutingFileJournal',
+      synchronized: true,
+      args: [
+        {
+          name: 'name',
+          type: 'String'
+        }
+      ],
+      javaCode: `
+        if ( getSharedJournalFiles().containsKey(name) ) {
+          return getSharedJournalFiles().get(name);
+        }
+
+        RoutingFileJournal routingJrl = new RoutingFileJournal.Builder(getX())
+          .setFilename(name)
+          .setCreateFile(true)
+          .build();
+        getSharedJournalFiles().put(name, routingJrl);
+        return routingJrl;
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'JournalRoutingJournalAdapter',
+  implements: ['foam.dao.Journal'],
+
+  properties: [
+    {
+      class: 'String',
+      name: 'serviceName'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.dao.RoutingJournal',
+      name: 'delegate',
+    }
+  ],
+
+  methods: [
+    {
+      name: 'put',
+      javaCode: `
+        getDelegate().put_(x, getServiceName(), null, nu);
+      `
+    },
+    {
+      name: 'put_',
+      javaCode: `
+        getDelegate().put_(x, getServiceName(), old, nu);
+      `
+    },
+    {
+      name: 'remove',
+      javaCode: `
+        getDelegate().remove(x, getServiceName(), obj);
+      `
+    },
+    {
+      name: 'replay',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'dao', type: 'foam.dao.DAO' }
+      ],
+      javaCode: `
+        throw new RuntimeException(
+          "Attempt to call .replay() on adapter to RoutingJournal"
+        );
       `
     }
   ]

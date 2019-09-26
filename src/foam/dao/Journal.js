@@ -41,6 +41,45 @@ foam.INTERFACE({
   ]
 });
 
+foam.INTERFACE({
+  package: 'foam.dao',
+  name: 'RoutingJournal',
+
+  methods: [
+    {
+      name: 'put',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'dest', type: 'String' },
+        { name: 'nu', type: 'foam.core.FObject' }
+      ]
+    },
+    {
+      name: 'put_',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'dest', type: 'String' },
+        { name: 'old', type: 'foam.core.FObject' },
+        { name: 'nu', type: 'foam.core.FObject' }
+      ]
+    },
+    {
+      name: 'remove',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'dest', type: 'String' },
+        { name: 'obj', type: 'foam.core.FObject' }
+      ]
+    },
+    {
+      name: 'replay',
+      args: [
+        { name: 'x', type: 'Context' },
+      ]
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.dao',
