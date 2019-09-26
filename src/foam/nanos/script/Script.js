@@ -118,7 +118,8 @@ foam.CLASS({
       visibility: 'RO',
       value: 'UNSCHEDULED',
       javaValue: 'ScriptStatus.UNSCHEDULED',
-      tableWidth: 100
+      tableWidth: 100,
+      storageTransient: true
     },
     {
       class: 'String',
