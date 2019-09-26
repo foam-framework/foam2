@@ -55,7 +55,12 @@ foam.CLASS({
     {
       name: 'description',
       class: 'String',
-      documentation: `Description of capability`
+      documentation: `Brief description of capability`
+    },
+    {
+      name: 'longDescription',
+      class: 'String',
+      documentation: `Complete description of capability`
     },
     {
       name: 'notes',
