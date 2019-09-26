@@ -58,15 +58,17 @@ foam.CLASS({
       path: 'foam.dao.java.JDAO',
       flags: ['java'],
     },
-    'foam.nanos.logger.Logger',
-    'foam.nanos.logger.LoggingDAO',
     'foam.dao.MDAO',
     'foam.dao.PromisedDAO',
     'foam.dao.RequestResponseClientDAO',
     'foam.dao.SequenceNumberDAO',
     'foam.dao.SyncDAO',
     'foam.dao.TimingDAO',
-    'foam.dao.JournalType'
+    'foam.dao.JournalType',
+    'foam.nanos.auth.ServiceProviderAware',
+    'foam.nanos.auth.ServiceProviderAwareDAO',
+    'foam.nanos.logger.Logger',
+    'foam.nanos.logger.LoggingDAO'
   ],
 
   imports: [ 'document' ],
@@ -162,6 +164,11 @@ if ( getDecorator() != null ) {
   }
   proxy.setDelegate(delegate);
   delegate = (ProxyDAO) getDecorator();
+}
+
+if ( getServiceProviderAware() ||
+  foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+  delegate = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
 if ( getDeletedAware() ||
@@ -513,6 +520,11 @@ return delegate;
     {
       name: 'testData',
       generateJava: false
+    },
+    {
+      name: 'serviceProviderAware',
+      class: 'Boolean',
+      value: false
     },
     {
       name: 'deletedAware',
