@@ -259,8 +259,27 @@ return delegate;
       type: 'foam.dao.DAO',
       name: 'innerDAO',
       javaFactory: `
-      if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) )
+      if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
         return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
+      }
+      /*
+      else if ( getJournalType().equals(JournalType.SHARED_JOURNAL) ) {
+        foam.dao.RoutingFileJournal routingJrl =
+          new foam.dao.RoutingFileJournal.Builder(x)
+            .setFilename(getJournalName())
+            .setCreateFile(true)
+            .build();
+        foam.dao.Journal jrl =
+          new JournalRoutingJournalAdapter.Builder()
+            .setDelegate(routingJrl)
+            .build();
+        return new foam.dao.java.JDAO.Builder()
+          .setDelegate(new foam.dao.MDAO(getOf())
+          .setOf(getOf())
+          .setJournal(jrl)
+          .build()
+      }
+      */
       return new foam.dao.MDAO(getOf());
       `
     },
