@@ -161,8 +161,7 @@ foam.CLASS({
         Session session = x.get(Session.class);
         session.setUserId(user.getId());
         ((DAO) getLocalSessionDAO()).put(session);
-        // QUESTION: can we applyTo current context instead session context as below?
-        session.setContext(session.applyTo(x));
+        session.setContext(session.applyTo(session.getContext()));
 
         return user;
       `
