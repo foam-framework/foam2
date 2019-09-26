@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'AuthorizationDAO',
   extends: 'foam.dao.ProxyDAO',
 
+  documentation: 'A DAO decorator to run authorization checks.',
+  
   javaImports: [
     'foam.core.FObject',
     'foam.core.InvalidX',
