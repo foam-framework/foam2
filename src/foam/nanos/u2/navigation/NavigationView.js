@@ -33,11 +33,11 @@ foam.CLASS({
       this.addClass(this.myClass())
         .start()
           .addClass(this.myClass('top-nav'))
-          .tag({ class: 'foam.nanos.u2.navigation.TopNavigation' })
+          .tag({ class: 'foam.nanos.ui.unification.TopNavigation' })
         .end()
         .start()
           .addClass(this.myClass('side-nav'))
-          .tag({ class: 'foam.nanos.u2.navigation.SideNavigation' })
+          .tag({ class: 'foam.nanos.ui.unification.SideNavigation' })
         .end();
     }
   ]
