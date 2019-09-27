@@ -54,6 +54,7 @@ name: 'seizi one',
 price: 900
 }));
 
+(async function foo() {
 // creates a memory persistence(MDAO) layer for the Guitars class.
 var guitarDAO = foam.dao.MDAO.create({ of: Guitar });
 
@@ -71,6 +72,8 @@ var guitarDAO = foam.dao.MDAO.create({ of: Guitar });
 
 // load the array of guitars into our memory database (MDAO)
 guitarDAO.bulkLoad(guitarArray);
+//need to wait until getting all the data
+await guitarDAO.select(console);
 
 // we declare mLang here, the foam "modelled language"
 // in simple terms, mlang is foam's own "SQL syntax"
@@ -86,15 +89,17 @@ var sinkFn = function (guitar) { console.log(guitar.price) }
 
 guitarDAO.where(expr.EQ(Guitar.BRAND, 'fender'))
 .orderBy(expr.DESC(Guitar.PRICE))
-.select({ put: sinkFn })
-.then();
+.select()//{ put: sinkFn }
+.then(function(g) {
+  console.log(g.array);
+});
 
 // limit(num)
 // give me only two guitars
-guitarDAO.limit(2)
+guitarDAO.limit(1)
 .select()
-.then(function(g) {
-  console.log(g.a.length);
+.then(function(a) {
+  console.log(a.array[0].color);
 });
 
 var expr = foam.mlang.ExpressionsSingleton.create();// foam.mlang.Expressions.create();
@@ -105,8 +110,7 @@ guitarDAO
 .select(expr.COUNT())
 .then(function(count) {
   console.log('count: ', count.value);
-});     
-
+});
 
 // give me all gibsons
 guitarDAO
@@ -196,3 +200,5 @@ guitarDAO.select(expr.MIN(Guitar.PRICE))
 .then(function(g) {
   console.log(g.value);
 });
+
+})();
