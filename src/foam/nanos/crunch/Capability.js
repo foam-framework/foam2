@@ -104,7 +104,7 @@ foam.CLASS({
     },
     {
       name: 'price',
-      class: 'Int'
+      class: 'Currency'
     },
     {
       name: 'featured',
