@@ -24,6 +24,16 @@ foam.CLASS({
     'java.util.Date'
   ],
 
+  tableColumns: [
+    'userId',
+    'agentId',
+    'created',
+    'lastUsed',
+    'ttl',
+    'uses',
+    'remoteHost'
+  ],
+
   properties: [
     {
       class: 'String',
@@ -77,6 +87,7 @@ foam.CLASS({
       label: 'TTL',
       documentation: 'The "time to live" of the session. The amount of time in milliseconds that the session should be kept alive after its last use before being destroyed. Must be a positive value or zero.',
       value: 28800000, // 1000 * 60 * 60 * 8 = number of milliseconds in 8 hours
+      tableWidth: 70,
       validationPredicates: [
         {
           args: ['ttl'],
@@ -90,12 +101,14 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'uses',
+      tableWidth: 70,
       storageTransient: true
     },
     {
       class: 'String',
       name: 'remoteHost',
-      visibility: 'RO'
+      visibility: 'RO',
+      tableWidth: 120
     },
     {
       documentation: 'Intended to be used with long TTL sessions, further restricting to a known set of IPs.',

@@ -459,7 +459,7 @@ p({
   "serviceScript": """
     ed = new foam.dao.EasyDAO.Builder(x)
       .setPm(true)
-      .setSeqNo(true)
+      .setGuid(true)
       .setOf(foam.nanos.ruler.Rule.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("rules")
