@@ -23,8 +23,8 @@ public class RuleEngine extends ContextAwareSupport {
   private DAO delegate_ = null;
   private DAO ruleHistoryDAO_ = null;
   private AtomicBoolean stops_ = new AtomicBoolean(false);
-  private Map<Long, Object> results_ = new HashMap<>();
-  private Map<Long, RuleHistory> savedRuleHistory_ = new HashMap<>();
+  private Map<String, Object> results_ = new HashMap<>();
+  private Map<String, RuleHistory> savedRuleHistory_ = new HashMap<>();
   private Rule currentRule_ = null;
   private X userX_;
 
@@ -61,7 +61,7 @@ public class RuleEngine extends ContextAwareSupport {
       if ( ! isRuleApplicable(rule, obj, oldObj)) continue;
       PM pm = (PM) x_.get("PM");
       pm.setClassType(RulerDAO.getOwnClassInfo());
-      pm.setName(rule.getDaoKey() + ": " + rule.getName());
+      pm.setName(rule.getDaoKey() + ": " + rule.getId());
       pm.init_();
       applyRule(rule, obj, oldObj, agency);
       pm.log(x_);
@@ -138,7 +138,7 @@ public class RuleEngine extends ContextAwareSupport {
     results_.put(currentRule_.getId(), result);
   }
 
-  public Object getResult(long ruleId) {
+  public Object getResult(String ruleId) {
     return results_.get(ruleId);
   }
 

@@ -9,7 +9,6 @@ foam.CLASS({
   name: 'Session',
 
   implements: [
-    'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware'
   ],
@@ -23,6 +22,16 @@ foam.CLASS({
     'foam.nanos.logger.PrefixLogger',
     'foam.util.SafetyUtil',
     'java.util.Date'
+  ],
+
+  tableColumns: [
+    'userId',
+    'agentId',
+    'created',
+    'lastUsed',
+    'ttl',
+    'uses',
+    'remoteHost'
   ],
 
   properties: [
@@ -78,6 +87,7 @@ foam.CLASS({
       label: 'TTL',
       documentation: 'The "time to live" of the session. The amount of time in milliseconds that the session should be kept alive after its last use before being destroyed. Must be a positive value or zero.',
       value: 28800000, // 1000 * 60 * 60 * 8 = number of milliseconds in 8 hours
+      tableWidth: 70,
       validationPredicates: [
         {
           args: ['ttl'],
@@ -91,12 +101,14 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'uses',
+      tableWidth: 70,
       storageTransient: true
     },
     {
       class: 'String',
       name: 'remoteHost',
-      visibility: 'RO'
+      visibility: 'RO',
+      tableWidth: 120
     },
     {
       documentation: 'Intended to be used with long TTL sessions, further restricting to a known set of IPs.',
@@ -107,7 +119,7 @@ foam.CLASS({
       class: 'Object',
       name: 'context',
       type: 'Context',
-      javaFactory: 'return applyTo(getX());',
+      javaFactory: 'return reset(getX());',
       hidden: true,
       transient: true
     }
@@ -145,7 +157,7 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        if ( SafetyUtil.equals(getRemoteHost(), remoteHost) ) {
+        if ( SafetyUtil.isEmpty(getRemoteHost()) || SafetyUtil.equals(getRemoteHost(), remoteHost) ) {
           return true;
         }
 
@@ -159,85 +171,30 @@ foam.CLASS({
       `
     },
     {
-      name: 'checkOwnership',
+      name: 'reset',
+      type: 'Context',
       args: [
-        { name: 'x', type: 'Context' }
+        { type: 'Context', name: 'x' }
       ],
-      type: 'Boolean',
+      documentation: `
+        Return a subcontext of the given context where the security-relevant
+        entries have been reset to their empty default values.
+      `,
       javaCode: `
-        User user = (User) x.get("user");
-        return user != null && this.getUserId() == user.getId();
-      `
-    },
-    {
-      name: 'authorizeOnCreate',
-      javaCode: `
-        AuthService auth = (AuthService) x.get("auth");
-
-        if (
-          ! checkOwnership(x) &&
-
-          // TODO: This permission scheme doesn't make sense for create. We're
-          // not going to assign permissions like
-          // 'session.create.0b2ac741-010e-4af9-bc43-dd86c88bbe6a' to people. It
-          // would make more sense to allow certain users or groups to create
-          // sessions for other users in a limited scope. For example, within
-          // the same spid.
-          ! auth.check(x, createPermission("create"))
-        ) {
-          throw new AuthorizationException("You don't have permission to create sessions other than your own.");
-        }
-      `
-    },
-    {
-      name: 'authorizeOnUpdate',
-      javaCode: `
-        AuthService auth       = (AuthService) x.get("auth");
-        Session     oldSession = (Session) oldObj;
-
-        if (
-          ! checkOwnership(x) &&
-          ! oldSession.checkOwnership(x) &&
-          ! auth.check(x, createPermission("update"))
-        ) {
-          throw new AuthorizationException("You don't have permission to update sessions other than your own.");
-        }
-      `
-    },
-    {
-      name: 'authorizeOnDelete',
-      javaCode: `
-        AuthService auth = (AuthService) x.get("auth");
-
-        if (
-          ! checkOwnership(x) &&
-          ! auth.check(x, "*")
-        ) {
-          throw new AuthorizationException("You don't have permission to delete sessions other than your own.");
-        }
-      `
-    },
-    {
-      name: 'authorizeOnRead',
-      javaCode: `
-        AuthService auth = (AuthService) x.get("auth");
-
-        if (
-          ! checkOwnership(x) &&
-          ! auth.check(x, createPermission("read"))
-        ) {
-          throw new AuthorizationException("You don't have permission to view sessions other than your own.");
-        }
-      `
-    },
-    {
-      name: 'createPermission',
-      args: [
-        { name: 'operation', type: 'String' }
-      ],
-      type: 'String',
-      javaCode: `
-        return "session." + operation + "." + getId();
+        return x
+          .put(Session.class, this)
+          .put("user", null)
+          .put("agent", null)
+          .put("group", null)
+          .put("twoFactorSuccess", false)
+          .put(CachingAuthService.CACHE_KEY, null)
+          .put(
+            "logger",
+            new PrefixLogger(
+              new Object[] { "Unauthenticated session" },
+              (Logger) x.get("logger")
+            )
+          );
       `
     },
     {
@@ -252,24 +209,11 @@ foam.CLASS({
         to do so.
       `,
       javaCode: `
-        X rtn = x
-          // We null out the security-relevant entries in the context since we
-          // don't want whatever was there before to leak through, especially
-          // since the system context (which has full admin privileges) is often
-          // used as the argument to this method.
-          .put(Session.class, this)
-          .put("user", null)
-          .put("agent", null)
-          .put("group", null)
-          .put("twoFactorSuccess", false)
-          .put(CachingAuthService.CACHE_KEY, null)
-          .put(
-            "logger",
-            new PrefixLogger(
-              new Object[] { "Unauthenticated session" },
-              (Logger) x.get("logger")
-            )
-          );
+        // We null out the security-relevant entries in the context since we
+        // don't want whatever was there before to leak through, especially
+        // since the system context (which has full admin privileges) is often
+        // used as the argument to this method.
+        X rtn = reset(x);
 
         if ( getUserId() == 0 ) return rtn;
 
