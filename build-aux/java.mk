@@ -84,7 +84,8 @@ clean-$(1)-gensrcs:
 	-rm -rf $$($(1)_GEN_SRC_DIR)
 
 clean-$(1):
-	-rm -rf $$(BUILD_DIR)
+	-rm -f $$($(1)_JAR)
+	-rm -f $$($(1)_CLASSPATH_TXT)
 
 clean: clean-$(1) clean-$(1)-gensrcs
 
