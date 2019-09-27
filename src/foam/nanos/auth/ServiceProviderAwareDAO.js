@@ -56,7 +56,9 @@ foam.CLASS({
         sp.setSpid(getDefaultSpid());
       }
     } else if ( ! oldSp.getSpid().equals(sp.getSpid()) ) {
-      authorizer_.authorizeOnUpdate(x, (FObject) oldSp, obj);
+      if ( ! ((AuthService) getAuth()).check(x, "spid.update.*") ) {
+        throw new AuthorizationException("You do not have permission to update SPIDs.");
+      }
     }
 
     return super.put_(x, obj);
