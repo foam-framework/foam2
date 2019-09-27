@@ -27,7 +27,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'viewBorderWidth',
-      value: 5 
+      value: 5
     },
     {
       class: 'Int',
