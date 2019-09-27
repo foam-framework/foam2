@@ -212,7 +212,6 @@ public class CapabilityTest extends Test {
     AuthService auth = (AuthService) x.get("auth");
 
     String permission1 = "permission.crunch.*";
-    cas = new CapabilityAuthService();
 
     FakeTestObject data = new FakeTestObject();
     data.setUsername("RUBY");

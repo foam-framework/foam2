@@ -83,9 +83,7 @@ foam.CLASS({
           )) != null ) return true;
         
         List<UserCapabilityJunction> userCapabilityJunctions = ((ArraySink) user.getCapabilities(x).getJunctionDAO()
-          .where(
-            capabilityScope
-          )
+          .where(capabilityScope)
           .select(new ArraySink())).getArray();
 
         for ( UserCapabilityJunction ucJunction : userCapabilityJunctions ) {
