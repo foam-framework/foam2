@@ -17,6 +17,8 @@ var classes = [
   'foam.core.AbstractFObject',
   'foam.core.Validatable',
   'foam.core.Agency',
+  'foam.core.CoreTypesValidationTest',
+  'foam.core.CoreTypesValidationTestModel',
   'foam.glang.EndOfTimeSpan',
   'foam.glang.EndOfDay',
   'foam.glang.EndOfWeek',
