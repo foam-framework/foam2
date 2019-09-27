@@ -8,19 +8,11 @@ foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'ServiceProviderAware',
 
-  methods: [
+  properties: [
     {
-      name: 'getSpid',
-      type: 'String'
-    },
-    {
-      name: 'setSpid',
-      args: [
-        {
-          name: 'value',
-          type: 'String'
-        }
-      ]
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
+      name: 'spid'
     }
   ]
 });

@@ -166,33 +166,27 @@ if ( getDecorator() != null ) {
   delegate = (ProxyDAO) getDecorator();
 }
 
-if ( getServiceProviderAware() ||
-  foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+if ( getServiceProviderAware() ) {
   delegate = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
-if ( getDeletedAware() ||
-     foam.nanos.auth.DeletedAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+if ( getDeletedAware() ) {
   delegate = new foam.nanos.auth.DeletedAwareDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
-if ( getCreatedAware() ||
-  foam.nanos.auth.CreatedAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+if ( getCreatedAware() ) {
   delegate = new foam.nanos.auth.CreatedAwareDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
-if ( getCreatedByAware() ||
-  foam.nanos.auth.CreatedByAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+if ( getCreatedByAware() ) {
   delegate = new foam.nanos.auth.CreatedByAwareDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
-if ( getLastModifiedAware() ||
-  foam.nanos.auth.LastModifiedAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+if ( getLastModifiedAware() ) {
   delegate = new foam.nanos.auth.LastModifiedAwareDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
-if ( getLastModifiedByAware() ||
-  foam.nanos.auth.LastModifiedByAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+if ( getLastModifiedByAware() ) {
   delegate = new foam.nanos.auth.LastModifiedByAwareDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
@@ -524,32 +518,32 @@ return delegate;
     {
       name: 'serviceProviderAware',
       class: 'Boolean',
-      value: false
+      javaFactory: 'return foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
       name: 'deletedAware',
       class: 'Boolean',
-      value: false
+      javaFactory: 'return foam.nanos.auth.DeletedAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
       name: 'createdAware',
       class: 'Boolean',
-      value: false
+      javaFactory: 'return foam.nanos.auth.CreatedAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
       name: 'createdByAware',
       class: 'Boolean',
-      value: false
+      javaFactory: 'return foam.nanos.auth.CreatedByAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
       name: 'lastModifiedAware',
       class: 'Boolean',
-      value: false
+      javaFactory: 'return foam.nanos.auth.LastModifiedAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
       name: 'lastModifiedByAware',
       class: 'Boolean',
-      value: false
+      javaFactory: 'return foam.nanos.auth.LastModifiedByAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
       name: 'fixedSize',
