@@ -684,6 +684,8 @@ FOAM_FILES([
   { name: "foam/u2/detail/WizardSectionsView" },
   { name: "foam/u2/detail/SectionedDetailPropertyView" },
 
+  { name: "foam/graphics/ZoomMapView" },
+
   // Strategy
   { name: "foam/strategy/StrategyReference" },
   { name: "foam/strategy/StrategizerService" },

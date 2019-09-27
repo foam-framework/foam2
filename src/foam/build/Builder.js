@@ -458,8 +458,14 @@ console.log("Done.");
 
             if ( func == 'UNKNOWN' ) throw new Error("What's the right foam.FOO function for a " + s.cls_.id);
 
-
-            data += `foam.${func}(${serializer.stringify(filterAxiomsByFlags(s))});\n`;
+            // Print FOAM model definition
+            dataTmp = `foam.${func}(${serializer.stringify(filterAxiomsByFlags(s))});\n`
+            // Print sourceURL annotation for browser inpector
+            if ( typeof s.source !== 'undefined' ) {
+              dataTmp += `\n//# sourceURL=/`+s.source;
+            }
+            // eval() is necessary for `//# sourceURL` to work
+            data += 'eval(' + JSON.stringify(dataTmp) + ');\n';
           },
           eof: function() { then(data); }
         });

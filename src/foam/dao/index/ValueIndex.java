@@ -39,22 +39,22 @@ public class ValueIndex
   }
 
   public FindPlan planFind(Object state, Object key) {
-    return (FindPlan) this.plan;
+    return (FindPlan) plan;
   }
 
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    return (SelectPlan) this.plan;
+    return (SelectPlan) plan;
   }
 
   public long size(Object state) {
-    return ( state != null ) ? 1 : 0;
+    return state == null ? 0 : 1;
   }
 
   public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if( predicate != null && ! predicate.f((FObject) state) ) return;
-    if( skip-- > 0 ) return;
-    if( limit <= 0 ) return;
-    //We need to check whether we'll do with this detachable parameter inside this index
+    if ( predicate != null && ! predicate.f((FObject) state) ) return;
+    if ( skip > 0 ) return;
+    if ( limit <= 0 ) return;
+    // We need to check whether we'll do with this detachable parameter inside this index
     sink.put(state, null);
   }
 
