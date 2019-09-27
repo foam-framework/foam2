@@ -86,6 +86,12 @@ foam.CLASS({
       documentation: `Datetime of when capability is no longer valid`
     },
     {
+      name: 'duration',
+      class: 'Long',
+      documentation: `To be used in the case where expiry is duration-based.
+      The UserCapabilityJunction object will have its expiry configured to a DateTime based on the lower value of the two, expiry and duration`
+    },
+    {
       name: 'of',
       class: 'Class',
       documentation: `Model used to store information required by this credential`
