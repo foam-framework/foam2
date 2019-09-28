@@ -39,10 +39,19 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'displayWidth'
+    },
+    {
+      class: 'Boolean',
+      name: 'trimOnBlur',
+      value: true
     }
   ],
 
   methods: [
+    function initE() {
+      this.SUPER();
+      this.on('blur', this.onBlur);
+    },
     function fromProperty(prop) {
       this.SUPER(prop);
 
@@ -56,6 +65,16 @@ foam.CLASS({
 
       if ( ! this.size ) {
         this.size = this.displayWidth;
+      }
+    }
+  ],
+  listeners: [
+    {
+      name: 'onBlur',
+      isFramed: true,
+      code: function() {
+        if ( ! foam.String.isInstance(this.data) ) return;
+        if ( this.trimOnBlur ) this.data = this.data.trim();
       }
     }
   ]
