@@ -29,10 +29,8 @@ foam.CLASS({
       -webkit-appearance: textfield !important;
     }
 
-    ^:read-only {
-      border: none;
-      background: rgba(0,0,0,0);
-    }
+    ^:read-only:not(^:disabled) 
+    { border: none; background: rgba(0,0,0,0); }
   `,
 
   properties: [

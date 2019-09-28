@@ -24,7 +24,7 @@ foam.CLASS({
 
   documentation: 'View for editing Date values.',
 
-  css: '^:read-only { border: none; background: rgba(0,0,0,0); }',
+  css: '^:read-only:not(^:disabled) { border: none; background: rgba(0,0,0,0); }',
 
   axioms: [
     { class: 'foam.u2.TextInputCSS' }

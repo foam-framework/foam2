@@ -11,7 +11,7 @@ foam.CLASS({
 
   documentation: 'View for formatting cents into dollars.',
 
-  css: '^:read-only { border: none; background: rgba(0,0,0,0); }',
+  css: '^:read-only:not(^:disabled) { border: none; background: rgba(0,0,0,0); }',
 
   properties: [
     ['precision', 2]
