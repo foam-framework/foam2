@@ -29,6 +29,14 @@ for any language or platform, including Android Java and iOS Swift.
 
 cd src; ./gen.sh; cd ../build; cp ../tools/pom.xml .; mvn compile; mvn package
 
+Or you may build and run using
+
+make run
+
+And to clean the project, you may use
+
+make clean
+
 ## Installing Dependencies
 
 FOAM has no runtime dependencies, but uses a number of third party tools for

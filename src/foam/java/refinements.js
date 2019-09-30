@@ -69,6 +69,11 @@ ${Object.keys(o).map(function(k) {
           o = o.replace(/\\/g, '\\\\')
           return `java.util.regex.Pattern.compile("${o}")`
         },
+        Date: function(d) {
+          var n = d.getTime();
+          return `new java.util.Date(` + n +
+            (n > Math.pow(2, 31) || n < -Math.pow(2,31) ? 'L' : '') + `)`
+        }
       })
     },
     {
