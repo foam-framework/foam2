@@ -88,7 +88,7 @@ foam.CLASS({
     {
       name: 'duration',
       class: 'Int',
-      documentation: `To be used in the case where expiry is duration-based.
+      documentation: `To be used in the case where expiry is duration-based, represents the number of DAYS a junction is valid for before expiring.
       The UserCapabilityJunction object will have its expiry configured to a DateTime based on the lower value of the two, expiry and duration`
     },
     {
