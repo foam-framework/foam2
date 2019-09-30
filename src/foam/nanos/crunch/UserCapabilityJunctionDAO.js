@@ -106,7 +106,7 @@ foam.CLASS({
 
       // if the junction is being uppdated from GRANTED to EXPIRED, put into junctionDAO without checking prereqs and data
       UserCapabilityJunction old = (UserCapabilityJunction) getDelegate().find_(x, ((UserCapabilityJunction) obj).getId());
-      if ( old.getStatus() == CapabilityJunctionStatus.GRANTED && ((UserCapabilityJunction) obj).getStatus() == CapabilityJunctionStatus.EXPIRED ) 
+      if ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && ((UserCapabilityJunction) obj).getStatus() == CapabilityJunctionStatus.EXPIRED ) 
         return getDelegate().put_(x, obj);
 
       boolean prereq = checkPrereqs(x, obj);
@@ -177,7 +177,7 @@ foam.CLASS({
       ever one comes first`,
       javaCode: `
       // Only update the expiry for non-active junctions, i.e., non-expired, non-pending, or granted junctions whose expiry is not yet set
-      if ( ( old.getStatus() == CapabilityJunctionStatus.GRANTED && old.getExpiry() != null ) || obj.getStatus() != CapabilityJunctionStatus.GRANTED ) 
+      if ( ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && old.getExpiry() != null ) || obj.getStatus() != CapabilityJunctionStatus.GRANTED ) 
         return obj;
 
       DAO capabilityDAO = (DAO) x.get("capabilityDAO");
