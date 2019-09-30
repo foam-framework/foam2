@@ -543,8 +543,12 @@ p({
   "lazy":true,  
   "serve":true,  
   "serviceScript":"""
-    dao = new foam.dao.PMDAO(x, new foam.dao.java.JDAO(x, foam.nanos.crunch.Capability.getOwnClassInfo(), \"capabilities\")); 
-    return new foam.nanos.auth.AuthorizationDAO(x, dao, new foam.nanos.auth.StandardAuthorizer(\"capability\"));
+    return new foam.dao.EasyDAO.Builder(x)
+    .setAuthorize(true)
+    .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+    .setJournalName("capabilities")
+    .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
+    .build(); 
   """, 
   "client":"{\"of\":\"foam.nanos.crunch.Capability\"}"
 })
@@ -554,11 +558,15 @@ p({
   "name":"userCapabilityJunctionDAO",
   "lazy":false,
   "serve":true,
-  "authenticate":false,
   "serviceScript":"""
-    dao = new foam.dao.EasyDAO.Builder(x).setAuthorize(false).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"userCapabilityJunctions\").setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo()).build(); 
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(false)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("userCapabilityJunctions")
+      .setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo())
+      .build(); 
     userCap =  new foam.nanos.crunch.UserCapabilityJunctionDAO.Builder(x).setDelegate(dao).build(); 
-    ruler = new foam.nanos.ruler.RulerDAO(x,userCap, \"userCapabilityJunctionDAO\"); 
+    ruler = new foam.nanos.ruler.RulerDAO(x,userCap, "userCapabilityJunctionDAO"); 
     return ruler;
   """,
   "client":"{\"of\":\"foam.nanos.crunch.UserCapabilityJunction\", \"remoteListenerSupport\": false}"
@@ -569,10 +577,14 @@ p({
   "name":"deprecatedCapabilityJunctionDAO",
   "lazy":false,
   "serve":true,
-  "authenticate":false,
   "serviceScript":"""
-    dao = new foam.dao.EasyDAO.Builder(x).setAuthorize(false).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"deprecatedCapabilityJunctions\").setOf(foam.nanos.crunch.CapabilityCapabilityJunction.getOwnClassInfo()).build(); 
-    return new foam.nanos.auth.AuthorizationDAO(x, dao, new foam.nanos.auth.GlobalReadAuthorizer(\"deprecatedCapabilityJunction\"));
+    return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(true)
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("deprecatedCapabilityJunction"))
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("deprecatedCapabilityJunctions")
+      .setOf(foam.nanos.crunch.CapabilityCapabilityJunction.getOwnClassInfo())
+      .build(); 
   """,
   "client":"{\"of\":\"foam.nanos.crunch.CapabilityCapabilityJunction\", \"remoteListenerSupport\": false}"
 })
@@ -582,10 +594,14 @@ p({
   "name":"prerequisiteCapabilityJunctionDAO",
   "lazy":false,
   "serve":true,
-  "authenticate":false,
   "serviceScript":"""
-    dao = new foam.dao.EasyDAO.Builder(x).setAuthorize(false).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"prerequisiteCapabilityJunctions\").setOf(foam.nanos.crunch.CapabilityCapabilityJunction.getOwnClassInfo()).build(); 
-    return new foam.nanos.auth.AuthorizationDAO(x, dao, new foam.nanos.auth.GlobalReadAuthorizer(\"prerequisiteCapabilityJunction\"));
+    return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(true)
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("prerequisiteCapabilityJunction"))
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("prerequisiteCapabilityJunctions")
+      .setOf(foam.nanos.crunch.CapabilityCapabilityJunction.getOwnClassInfo())
+      .build(); 
   """,
   "client":"{\"of\":\"foam.nanos.crunch.CapabilityCapabilityJunction\", \"remoteListenerSupport\": false}"
 })
