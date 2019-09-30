@@ -573,7 +573,7 @@ p({
   "serviceScript":"""
     dao = new foam.dao.EasyDAO.Builder(x).setAuthorize(false).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"deprecatedCapabilityJunctions\").setOf(foam.nanos.crunch.CapabilityCapabilityJunction.getOwnClassInfo()).build(); 
     return new foam.nanos.auth.AuthorizationDAO(x, dao, new foam.nanos.auth.GlobalReadAuthorizer(\"deprecatedCapabilityJunction\"));
-  """",
+  """,
   "client":"{\"of\":\"foam.nanos.crunch.CapabilityCapabilityJunction\", \"remoteListenerSupport\": false}"
 })
 
