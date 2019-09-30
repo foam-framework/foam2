@@ -19,6 +19,7 @@ foam.CLASS({
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.nanos.logger.Logger',
     'java.text.DateFormat',
     'java.text.SimpleDateFormat',
     'java.util.Calendar',
@@ -113,12 +114,46 @@ foam.CLASS({
 
       if ( prereq && data ) {
         ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.GRANTED);
+        saveDataToDAO(x, ((UserCapabilityJunction) obj));
         configureJunctionExpiry(x, (UserCapabilityJunction) obj, old);
       }
       else ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.PENDING);
 
       return getDelegate().put_(x, obj);
       
+      `
+    },
+    {
+      name: 'saveDataToDAO',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'foam.nanos.crunch.UserCapabilityJunction'
+        }
+      ],
+      documentation: `save the UserCapabilityJunction data to its dao, if daoKey is provided in the Capability model`,
+      javaCode: `
+      DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+      Logger logger = (Logger) x.get("logger");
+      Capability capability = (Capability) capabilityDAO.find(obj.getTargetId());
+      
+      String daoKey = capability.getDaoKey();
+      if ( daoKey == null ) return;
+      
+      DAO dao = (DAO) x.get(daoKey);
+      if ( dao == null ) return;
+
+      if ( dao.getOf().getId() == (obj.getData()).getClassInfo().getId() ) {
+        try {
+          dao.put(obj.getData());
+        } catch (Exception e) {
+          logger.debug("Data cannot be added to " + daoKey + " for UserCapabilityJunction object : " + obj.getId() );
+        }
+      }
       `
     },
     {
