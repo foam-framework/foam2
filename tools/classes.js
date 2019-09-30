@@ -5,7 +5,6 @@
  */
 
 var classes = [
-  'foam.core.Model',
   'foam.core.Axiom',
   'foam.core.Detachable',
   'foam.core.Serializable',
@@ -505,8 +504,7 @@ var skeletons = [
   'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.push.PushService',
   'foam.nanos.session.SessionService',
-  'foam.nanos.test.EchoService',
-  'foam.strategy.StrategizerService'
+  'foam.nanos.test.EchoService'
 ];
 
 var proxies = [
