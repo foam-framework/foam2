@@ -166,7 +166,7 @@ if ( getDecorator() != null ) {
 
 if ( getDeletedAware() ||
      foam.nanos.auth.DeletedAware.class.isAssignableFrom(getOf().getObjClass()) ) {
-  delegate = new foam.nanos.auth.DeletedAwareDAO.Builder(getX()).setDelegate(delegate).build();
+  delegate = new foam.nanos.auth.DeletedAwareDAO(getX(), delegate);
 }
 
 if ( getCreatedAware() ||
