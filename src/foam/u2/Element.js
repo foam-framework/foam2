@@ -850,7 +850,11 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'tooltip'
+      name: 'tooltip',
+      postSet: function(o, n) {
+        if ( ! o && n ) this.initTooltip();
+        return n;
+      }
     },
     {
       name: 'parentNode',
@@ -1050,20 +1054,11 @@ foam.CLASS({
     },
 
     function initTooltip() {
-      if ( this.tooltip || this.getAttribute('title') != undefined ) {      
-        var prevTooltipObj_ = this.Tooltip.create({
-          target: this,
-          text: this.tooltip || this.getAttribute('title')
-        }, this);
-  
-        this.tooltip$.sub(() => {
-          prevTooltipObj_.remove();
-          prevTooltipObj_ = this.Tooltip.create({
-            target: this,
-            text: this.tooltip || this.getAttribute('title')
-          }, this);
-        });
-       }
+      if ( this.tooltip ) {
+        this.Tooltip.create({target: this, text$: this.tooltip$});
+      } else if ( this.getAttribute('title') ) {
+        this.Tooltip.create({target: this, text$: this.attrSlot('title')});
+      }
     },
 
     function initKeyboardShortcuts() {
