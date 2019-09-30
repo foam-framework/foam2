@@ -59,21 +59,6 @@ public class ROPETest extends Test {
   }
 
   /**
-   * set up ROPES for CRUD operation in the following daos 
-   * 1. ropeUserDAO
-   * 2. ropeBusinessDAO
-   * 3. ropeAccountDAO
-   * 4. ropeTransactionDAO
-   * 5. ropeContactDAO
-   */
-  public void setupROPEs(X x) {
-    ROPEUser temp = new ROPEUser();
-    temp.setId(12);
-    temp.setName("temp");
-    ropeUserDAO.put(temp);
-  }
-
-  /**
    * get the following from their daos:
    * DONE 0. get a ROPEUser from the ROPEUserDAO to use as "self"
    * DONE 1. get an instance of ROPEUserROPEUserJunction obj with srcId = "self", and tgtId = some other valid ROPEUser, if none, create one
@@ -163,6 +148,37 @@ public class ROPETest extends Test {
    */
   public void testUserReadTransaction(X x) {
 
+  }
+
+
+  /**
+   * set up ROPES for CRUD operation in the following daos 
+   * 1. ropeUserDAO
+   * 2. ropeBusinessDAO
+   * 3. ropeAccountDAO
+   * 4. ropeTransactionDAO
+   * 5. ropeContactDAO
+   */
+  public void setupROPEs(X x) {
+    ROPEUser temp = new ROPEUser();
+    temp.setId(12);
+    temp.setName("temp");
+    ropeUserDAO.put(temp);
+
+    ROPE transactionAccountROPE = new ROPE();
+    transactionAccountROPE.setSourceModel(foam.nanos.rope.test.ROPEBankAccount.getOwnClassInfo());
+    transactionAccountROPE.setTargetModel(foam.nanos.rope.test.ROPETransaction.getOwnClassInfo());
+    transactionAccountROPE.setSourceDAOKey("ropeAccountDAO");
+    transactionAccountROPE.setTargetDAOKey("ropeTransactionDAO");
+    // transactionAccountROPE.setJunctionModel();
+    // transactionAccountROPE.setJunctionDAOKey();
+    transactionAccountROPE.setCardinality("1:*");
+    transactionAccountROPE.setInverseName("sourceAccount");
+    transactionAccountROPE.setIsInverse(false);
+    transactionAccountROPE.setRelationshipImplies();
+    transactionAccountROPE.setRequiredSourceAction();
+    transactionAccountROPE.setCRUD();
+    
   }
 
 }
