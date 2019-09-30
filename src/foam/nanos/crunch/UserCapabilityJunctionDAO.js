@@ -19,6 +19,10 @@ foam.CLASS({
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
+    'java.text.DateFormat',
+    'java.text.SimpleDateFormat',
+    'java.util.Calendar',
+    'java.util.Date',
     'java.util.List',
     'static foam.mlang.MLang.*'
   ],
@@ -56,7 +60,7 @@ foam.CLASS({
         User user = getUser(x);
         AuthService auth = (AuthService) x.get("auth");
         boolean isOwner = ((UserCapabilityJunction) obj).getSourceId() == user.getId();
-        boolean hasPermission = auth.check(x, "service.*");
+        boolean hasPermission = auth.check(x, "*");
         if ( ! isOwner && ! hasPermission ) throw new AuthorizationException("permission denied");
       `
     },
@@ -99,15 +103,65 @@ foam.CLASS({
       javaCode: `
       checkOwnership(x, obj);
 
+      // if the junction is being uppdated from GRANTED to EXPIRED, put into junctionDAO without checking prereqs and data
+      UserCapabilityJunction old = (UserCapabilityJunction) getDelegate().find_(x, ((UserCapabilityJunction) obj).getId());
+      if ( old.getStatus() == CapabilityJunctionStatus.GRANTED && ((UserCapabilityJunction) obj).getStatus() == CapabilityJunctionStatus.EXPIRED ) 
+        return getDelegate().put_(x, obj);
+
       boolean prereq = checkPrereqs(x, obj);
       boolean data = validateData(x, obj);
 
-      if ( prereq && data ) ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.GRANTED);
+      if ( prereq && data ) {
+        ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.GRANTED);
+        configureJunctionExpiry(x, (UserCapabilityJunction) obj, old);
+      }
       else ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.PENDING);
 
       return getDelegate().put_(x, obj);
       
       `
+    },
+    {
+      name: 'configureJunctionExpiry',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'foam.nanos.crunch.UserCapabilityJunction'
+        },
+        {
+          name: 'old',
+          type: 'foam.nanos.crunch.UserCapabilityJunction'
+        }
+      ],
+      type: 'foam.core.FObject',
+      documentation: `Set the expiry of a userCapabilityJunction based on the duration or expiry set on the capability, which
+      ever one comes first`,
+      javaCode: `
+      // Only update the expiry for non-active junctions, i.e., non-expired, non-pending, or granted junctions whose expiry is not yet set
+      if ( ( old.getStatus() == CapabilityJunctionStatus.GRANTED && old.getExpiry() != null ) || obj.getStatus() != CapabilityJunctionStatus.GRANTED ) 
+        return obj;
+
+      DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+      Capability capability = (Capability) capabilityDAO.find((String) obj.getTargetId());
+      Date junctionExpiry = capability.getExpiry();
+      
+      if ( capability.getDuration() > 0 ) {
+        DateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+        Date today = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(today);
+        calendar.add(Calendar.DATE, capability.getDuration());
+
+        if ( junctionExpiry == null ) junctionExpiry = calendar.getTime();
+        else junctionExpiry = junctionExpiry.after(calendar.getTime()) ? calendar.getTime() : junctionExpiry;
+      }
+      obj.setExpiry(junctionExpiry);
+      return obj;
+      ` 
     },
     {
       name: 'checkPrereqs',
