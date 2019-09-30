@@ -67,7 +67,10 @@ public class ROPETest extends Test {
    * 5. ropeContactDAO
    */
   public void setupROPEs(X x) {
-
+    ROPEUser temp = new ROPEUser();
+    temp.setId(12);
+    temp.setName("temp");
+    ropeUserDAO.put(temp);
   }
 
   /**
