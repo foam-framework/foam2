@@ -1,4 +1,10 @@
-package foam.nanos.session.cron;
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+package foam.nanos.crunch;
 
 import foam.core.ContextAgent;
 import foam.core.X;
@@ -31,7 +37,7 @@ public class ExpireUserCapabilityJunctionsCron implements ContextAgent {
       .getArray();
 
     for ( UserCapabilityJunction activeJunction : activeJunctions ) {
-      if ( (activeJunction.getExpiry()).before(today) ) {
+      if ( activeJunction.getExpiry() != null && (activeJunction.getExpiry()).before(today) ) {
         activeJunction.setStatus(CapabilityJunctionStatus.EXPIRED);
         userCapabilityJunctionDAO.put(activeJunction);
         logger.debug("Expired UserCapabilityJunction : " + activeJunction.getId());

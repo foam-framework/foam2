@@ -53,16 +53,15 @@ foam.CLASS({
         },
         {
           name: 'obj',
-          type: 'foam.core.FObject'
+          type: 'foam.nanos.crunch.UserCapabilityJunction'
         }
       ],
       documentation: `Check if current user has permission to add this junction`,
       javaCode: `
         User user = getUser(x);
         AuthService auth = (AuthService) x.get("auth");
-        boolean isOwner = ((UserCapabilityJunction) obj).getSourceId() == user.getId();
-        boolean hasPermission = auth.check(x, "*");
-        if ( ! isOwner && ! hasPermission ) throw new AuthorizationException("permission denied");
+        boolean isOwner = obj.getSourceId() == user.getId();
+        if ( ! isOwner && ! auth.check(x, "*") ) throw new AuthorizationException();
       `
     },
     {
@@ -102,22 +101,21 @@ foam.CLASS({
       If status is set to GRANTED, check if junctions depending on current can be granted
       `,
       javaCode: `
-      checkOwnership(x, obj);
+      UserCapabilityJunction ucJunction = (UserCapabilityJunction) obj;
+      
+      checkOwnership(x, ucJunction);
 
-      // if the junction is being uppdated from GRANTED to EXPIRED, put into junctionDAO without checking prereqs and data
-      UserCapabilityJunction old = (UserCapabilityJunction) getDelegate().find_(x, ((UserCapabilityJunction) obj).getId());
-      if ( old.getStatus() == CapabilityJunctionStatus.GRANTED && ((UserCapabilityJunction) obj).getStatus() == CapabilityJunctionStatus.EXPIRED ) 
-        return getDelegate().put_(x, obj);
+      // if the junction is being updated from GRANTED to EXPIRED, put into junctionDAO without checking prereqs and data
+      UserCapabilityJunction old = (UserCapabilityJunction) getDelegate().find_(x, ucJunction.getId());
+      if ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && ucJunction.getStatus() == CapabilityJunctionStatus.EXPIRED ) 
+        return getDelegate().put_(x, ucJunction);
 
-      boolean prereq = checkPrereqs(x, obj);
-      boolean data = validateData(x, obj);
-
-      if ( prereq && data ) {
-        ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.GRANTED);
-        saveDataToDAO(x, ((UserCapabilityJunction) obj));
-        configureJunctionExpiry(x, (UserCapabilityJunction) obj, old);
+      if ( validateData(x, ucJunction) && checkPrereqs(x, ucJunction) ) {
+        ucJunction.setStatus(CapabilityJunctionStatus.GRANTED);
+        saveDataToDAO(x, ucJunction);
+        configureJunctionExpiry(x, ucJunction, old);
       }
-      else ((UserCapabilityJunction) obj).setStatus(CapabilityJunctionStatus.PENDING);
+      else ucJunction.setStatus(CapabilityJunctionStatus.PENDING);
 
       return getDelegate().put_(x, obj);
       
@@ -135,10 +133,14 @@ foam.CLASS({
           type: 'foam.nanos.crunch.UserCapabilityJunction'
         }
       ],
-      documentation: `save the UserCapabilityJunction data to its dao, if daoKey is provided in the Capability model`,
+      documentation: `
+      We may or may not want to store the data in its own dao, based on the nature of the data. 
+      For example, if the data for some UserCapabilityJunction is a businessOnboarding object, we may want to store this object in 
+      the businessOnboardingDAO for easier access.
+      If the data on an UserCapabilityJunction should be stored in some DAO, the daoKey should be provided on its corresponding Capability object.
+      `,
       javaCode: `
       DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-      Logger logger = (Logger) x.get("logger");
       Capability capability = (Capability) capabilityDAO.find(obj.getTargetId());
       
       String daoKey = capability.getDaoKey();
@@ -151,6 +153,7 @@ foam.CLASS({
         try {
           dao.put(obj.getData());
         } catch (Exception e) {
+          Logger logger = (Logger) x.get("logger");
           logger.debug("Data cannot be added to " + daoKey + " for UserCapabilityJunction object : " + obj.getId() );
         }
       }
@@ -177,7 +180,7 @@ foam.CLASS({
       ever one comes first`,
       javaCode: `
       // Only update the expiry for non-active junctions, i.e., non-expired, non-pending, or granted junctions whose expiry is not yet set
-      if ( ( old.getStatus() == CapabilityJunctionStatus.GRANTED && old.getExpiry() != null ) || obj.getStatus() != CapabilityJunctionStatus.GRANTED ) 
+      if ( ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && old.getExpiry() != null ) || obj.getStatus() != CapabilityJunctionStatus.GRANTED ) 
         return obj;
 
       DAO capabilityDAO = (DAO) x.get("capabilityDAO");
@@ -262,7 +265,7 @@ foam.CLASS({
     {
       name: 'remove_',
       javaCode: `
-      checkOwnership(x, obj);
+      checkOwnership(x, (UserCapabilityJunction) obj);
       return super.remove_(x, obj);
       `
     },
@@ -284,7 +287,7 @@ foam.CLASS({
       name: 'find_',
       javaCode:`
       FObject result = super.find_(x, id);
-      if(result != null) checkOwnership(x, result);
+      if(result != null) checkOwnership(x, (UserCapabilityJunction) result);
       return result;
       `
     }
