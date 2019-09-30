@@ -350,24 +350,27 @@ foam.CLASS({
           {
             args: [self.name],
             predicateFactory: function(e) {
-              return e.AND(
-                e.LTE(
-                  self,
-                  // Maximum date supported by FOAM
-                  // (bounded by JavaScript's limit)
-                  new Date(8640000000000000)
-                ),
-                e.GTE(
-                  self,
-                  // Minimum date supported by FOAM
-                  // (bounded by JavaScript's limit)
-                  new Date(-8640000000000000)
+              return e.OR(
+                e.NOT(e.HAS(self)), // Allow null dates.
+                e.AND(
+                  e.LTE(
+                    self,
+                    // Maximum date supported by FOAM
+                    // (bounded by JavaScript's limit)
+                    new Date(8640000000000000)
+                  ),
+                  e.GTE(
+                    self,
+                    // Minimum date supported by FOAM
+                    // (bounded by JavaScript's limit)
+                    new Date(-8640000000000000)
+                  )
                 )
-              )
+              );
             },
             errorString: 'Invalid date value'
           }
-        ]
+        ];
       }
     }
   ]
