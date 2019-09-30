@@ -19,13 +19,13 @@ import java.util.List;
 import static foam.mlang.MLang.*;
 
 // rope authorizer to be used for testobj such as ROPEUser
-public class TestROPEAuthorizer implements Authorizer {
+public class TestRopeAuthorizer implements Authorizer {
 
   protected ROPEUser user_;
   protected DAO ropeDAO_;
   protected String targetDAOKey_;
 
-  public TestROPEAuthorizer(X x, ROPEUser user, String targetDAOKey) {
+  public TestRopeAuthorizer(X x, ROPEUser user, String targetDAOKey) {
     user_ = user;
     ropeDAO_ = (DAO) x.get("ropeDAO");
     targetDAOKey_ = targetDAOKey;

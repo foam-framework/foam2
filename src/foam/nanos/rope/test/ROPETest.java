@@ -114,7 +114,7 @@ public class ROPETest extends Test {
       ropeContactDAO.put(targetJunction);
     }
 
-    TestROPEAuthorizer ropeAuthorizer = new TestROPEAuthorizer(x, self, null);
+    TestRopeAuthorizer ropeAuthorizer = new TestRopeAuthorizer(x, self, null);
 
     test(! ropeAuthorizer.ropeSearch(ROPEActions.R, target, x, "ropeUserDAO"), "check that \"self\" is NOT able to perform READ in the ropeUserDAO for this contact ROPEUser");
     test(ropeAuthorizer.ropeSearch(ROPEActions.C, self, x, "ropeContactDAO"), "check that \"self\" is able to perform CREATE in the ropeContactDAO for this object");
