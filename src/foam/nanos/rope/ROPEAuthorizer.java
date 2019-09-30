@@ -149,5 +149,4 @@ public class ROPEAuthorizer implements Authorizer {
   public boolean checkGlobalRemove(X x) {
     return false;
   }
-
 }
