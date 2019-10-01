@@ -100,34 +100,6 @@ public class ROPETest extends Test {
    *    perform READ in the ropeAccountDAO for this account
    */
   public void testROPEContact(X x) {
-
-    // foam.RELATIONSHIP({
-    //   cardinality: '*:*',
-    //   sourceModel: 'foam.nanos.rope.test.ROPEUser',
-    //   targetModel: 'foam.nanos.rope.test.ROPEUser',
-    //   forwardName: 'contacts',
-    //   inverseName: 'owner',
-    //   junctionDAOKey: 'ropeContactDAO'
-    // });
-    ROPE contactROPE = new ROPE();
-    contactROPE.setSourceModel(foam.nanos.rope.test.ROPEUser.getOwnClassInfo());
-    contactROPE.setTargetModel(foam.nanos.rope.test.ROPEUser.getOwnClassInfo());
-    contactROPE.setSourceDAOKey("ropeUserDAO");
-    contactROPE.setTargetDAOKey("ropeUserDAO");
-    contactROPE.setJunctionModel(foam.nanos.rope.test.ROPEUserROPEUserJunction.getOwnClassInfo());
-    contactROPE.setJunctionDAOKey("ropeContactDAO");
-    contactROPE.setCardinality("*:*");
-    contactROPE.setInverseName("owner");
-    contactROPE.setIsInverse(false);
-    List<ROPEActions> relationshipImplies = new ArrayList<ROPEActions>();
-    relationshipImplies.add(ROPEActions.R);
-    contactROPE.setRelationshipImplies(relationshipImplies);
-    contactROPE.setRequiredSourceAction(new ArrayList<ROPEActions>(Arrays.asList(ROPEActions.OWN)));
-    Map<ROPEActions, List<ROPEActions>> crud = new HashMap<ROPEActions, List<ROPEActions>>();
-    crud.put(ROPEActions.OWN, relationshipImplies);
-    contactROPE.setCRUD(crud);
-    ropeDAO.put(contactROPE);
-
     List<ROPEUser> users = (List<ROPEUser>) ( (ArraySink) ropeUserDAO.select(new ArraySink())).getArray();
     test( ! users.isEmpty(), "ropeUserDAO should not be empty at the start of tests" );
 
@@ -156,14 +128,14 @@ public class ROPETest extends Test {
 
     TestRopeAuthorizer ropeAuthorizer = new TestRopeAuthorizer(x, self, null);
 
-    test(! ropeAuthorizer.ropeSearch(ROPEActions.R, self, x, "ropeUserDAO"), "check that \"self\" is NOT able to perform READ in the ropeUserDAO for this contact ROPEUser");
-    // test(ropeAuthorizer.ropeSearch(ROPEActions.C, self, x, "ropeContactDAO"), "check that \"self\" is able to perform CREATE in the ropeContactDAO for this object");
-    // test(ropeAuthorizer.ropeSearch(ROPEActions.R, self, x, "ropeContactDAO"), "check that \"self\" is able to perform READ in the ropeContactDAO for this object");
+    test(! ropeAuthorizer.ropeSearch(ROPEActions.R, target, x, "ropeUserDAO"), "check that \"self\" is NOT able to perform READ in the ropeUserDAO for this contact ROPEUser");
+    test(ropeAuthorizer.ropeSearch(ROPEActions.C, self, x, "ropeContactDAO"), "check that \"self\" is able to perform CREATE in the ropeContactDAO for this object");
+    test(ropeAuthorizer.ropeSearch(ROPEActions.R, self, x, "ropeContactDAO"), "check that \"self\" is able to perform READ in the ropeContactDAO for this object");
     test(ropeAuthorizer.ropeSearch(ROPEActions.R, target, x, "ropeUserDAO"), "check that \"self\" is able to perform READ in the ropeUserDAO for the contact ROPEUser");
     test(! ropeAuthorizer.ropeSearch(ROPEActions.U, target, x, "ropeUserDAO"), "check that \"self\" is NOT able to perform UPDATE in the ropeUserDAO for the contact ROPEUser");
     test(! ropeAuthorizer.ropeSearch(ROPEActions.D, target, x, "ropeUserDAO"), "check that \"self\" is NOT able to perform DELETE in the ropeUserDAO for the contact ROPEUser");
-    // test(ropeAuthorizer.ropeSearch(ROPEActions.U, self, x, "ropeContactDAO"), "check that \"self\" is able to perform UPDATE in the ropeContactDAO for this object");
-    // test(ropeAuthorizer.ropeSearch(ROPEActions.D, self, x, "ropeContactDAO"), "check that \"self\" is able to perform DELETE in the ropeContactDAO for this object");
+    test(ropeAuthorizer.ropeSearch(ROPEActions.U, self, x, "ropeContactDAO"), "check that \"self\" is able to perform UPDATE in the ropeContactDAO for this object");
+    test(ropeAuthorizer.ropeSearch(ROPEActions.D, self, x, "ropeContactDAO"), "check that \"self\" is able to perform DELETE in the ropeContactDAO for this object");
 
     List<ROPEBankAccount> userBankAccounts = ((ArraySink) ropeAccountDAO.where(
       EQ(ROPEBankAccount.OWNER, target.getId())
@@ -178,7 +150,7 @@ public class ROPETest extends Test {
       account.setOwner(target.getId());
       ropeAccountDAO.put(account);
 
-      // test(ropeAuthorizer.ropeSearch(ROPEActions.R, self, x, "ropeAccountDAO"), "check that \"self\" is able to perform READ in the ropeAccountDAO for this account");
+      test(ropeAuthorizer.ropeSearch(ROPEActions.R, self, x, "ropeAccountDAO"), "check that \"self\" is able to perform READ in the ropeAccountDAO for this account");
     }
   }
   
@@ -254,26 +226,26 @@ public class ROPETest extends Test {
     //   targetDAOKey: 'ropeAccountDAO'
     // });
     ROPE accountUserROPE = new ROPE();
-    accountUserROPE.setSourceModel(foam.nanos.rope.test.ROPEUser.getOwnClassInfo());
-    accountUserROPE.setTargetModel(foam.nanos.rope.test.ROPEBankAccount.getOwnClassInfo());
-    accountUserROPE.setSourceDAOKey("ropeBusinessDAO");
-    accountUserROPE.setTargetDAOKey("ropeAccountDAO");
-    // accountUserROPE.setJunctionModel();
-    // accountUserROPE.setJunctionDAOKey();
-    accountUserROPE.setCardinality("1:*");
-    accountUserROPE.setInverseName("owner");
-    accountUserROPE.setIsInverse(false);
+    accountBusinessROPE.setSourceModel(foam.nanos.rope.test.ROPEUser.getOwnClassInfo());
+    accountBusinessROPE.setTargetModel(foam.nanos.rope.test.ROPEBankAccount.getOwnClassInfo());
+    accountBusinessROPE.setSourceDAOKey("ropeBusinessDAO");
+    accountBusinessROPE.setTargetDAOKey("ropeAccountDAO");
+    // accountBusinessROPE.setJunctionModel();
+    // accountBusinessROPE.setJunctionDAOKey();
+    accountBusinessROPE.setCardinality("1:*");
+    accountBusinessROPE.setInverseName("owner");
+    accountBusinessROPE.setIsInverse(false);
     relationshipImplies = new ArrayList<ROPEActions>();
     relationshipImplies.add(ROPEActions.C);
     relationshipImplies.add(ROPEActions.R);
     relationshipImplies.add(ROPEActions.U);
     relationshipImplies.add(ROPEActions.D);
     relationshipImplies.add(ROPEActions.OWN);
-    accountUserROPE.setRelationshipImplies(relationshipImplies);
-    accountUserROPE.setRequiredSourceAction(new ArrayList<ROPEActions>(Arrays.asList(ROPEActions.OWN)));
+    accountBusinessROPE.setRelationshipImplies(relationshipImplies);
+    accountBusinessROPE.setRequiredSourceAction(new ArrayList<ROPEActions>(Arrays.asList(ROPEActions.OWN)));
     crud = new HashMap<ROPEActions, List<ROPEActions>>();
     crud.put(ROPEActions.OWN, relationshipImplies);
-    accountUserROPE.setCRUD(crud);
+    accountBusinessROPE.setCRUD(crud);
 
     
   }
