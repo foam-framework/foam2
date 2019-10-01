@@ -613,6 +613,14 @@ foam.LIB({
       })
     },
     {
+      name: 'toNativeExceptionName',
+      code: foam.Function.memoize1(function toNativeExceptionName(val) {
+        return val.endsWith('Exception')
+          ? val.substring(0, val.length-9) + 'NativeException'
+          : val + 'NativeException'
+      })
+    },
+    {
       name: 'toUpperCase',
       code: foam.Function.memoize1(function(str) {
         foam.assert(

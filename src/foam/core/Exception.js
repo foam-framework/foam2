@@ -20,3 +20,43 @@ foam.INTERFACE({
   name: 'Exception',
   swiftImplements: ['Error'],
 });
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'ExceptionModel',
+  extends: 'Model',
+
+  documentation: `
+    Model for defining an exception, which generates both a
+    FOAM modelled exception and a language-native counterpart.
+  `,
+
+  properties: [
+    [ 'extends', 'foam.core.AbstractException' ],
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'AbstractException',
+
+  documentation: 'Abstract base class for FOAM-side Exception classes.',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'message'
+    }
+  ]
+});
+
+foam.LIB({
+  name: 'foam',
+
+  methods: [
+    function EXCEPTION(m) {
+      m.class = m.class || 'foam.core.ExceptionModel';
+      return foam.CLASS(m)
+    }
+  ]
+});
