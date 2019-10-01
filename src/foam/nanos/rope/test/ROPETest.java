@@ -63,6 +63,29 @@ public class ROPETest extends Test {
   }
 
   /**
+   * set up ROPES for CRUD operation in the following daos 
+   * 1. ropeUserDAO
+   * 2. ropeBusinessDAO
+   * 3. ropeAccountDAO
+   * 4. ropeTransactionDAO
+   * 5. ropeContactDAO
+   */
+  public void setupROPEs(X x) {
+    // Sets up ROPEUsers in ROPEUserDAO
+    final int DEPTH = 3;
+    for ( int i = 0; i < DEPTH; i++ ) {
+      for ( int j = 0; j < DEPTH; j++ ) {
+        for ( int k = 0; k < DEPTH; k++ ) {
+          ROPEUser temp = new ROPEUser();
+          temp.setId(i*9 + j*3 + k);
+          temp.setName(Integer.toString(i) + Integer.toString(j) + Integer.toString(k));
+          ropeUserDAO.put(temp);
+        }
+      }
+    }
+  }
+
+  /**
    * get the following from their daos:
    * DONE 0. get a ROPEUser from the ROPEUserDAO to use as "self"
    * DONE 1. get an instance of ROPEUserROPEUserJunction obj with srcId = "self", and tgtId = some other valid ROPEUser, if none, create one
