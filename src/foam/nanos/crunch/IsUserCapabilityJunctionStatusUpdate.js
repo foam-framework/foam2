@@ -24,10 +24,7 @@ foam.CLASS({
       javaCode: `
         return OR(
           EQ(OLD_OBJ, null),
-          AND(
-            NEQ(DOT(OLD_OBJ, UserCapabilityJunction.STATUS), DOT(NEW_OBJ, UserCapabilityJunction.STATUS)),
-            NEQ(DOT(NEW_OBJ, UserCapabilityJunction.STATUS), CapabilityJunctionStatus.GRANTED)
-          )
+          NEQ(DOT(OLD_OBJ, UserCapabilityJunction.STATUS), DOT(NEW_OBJ, UserCapabilityJunction.STATUS))
         ).f(obj);
       `
     }
