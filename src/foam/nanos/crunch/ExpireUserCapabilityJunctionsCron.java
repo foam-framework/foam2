@@ -32,16 +32,17 @@ public class ExpireUserCapabilityJunctionsCron implements ContextAgent {
 
     // Only active, i.e., GRANTED, UserCapabilityJunctions should be checked
     List<UserCapabilityJunction> activeJunctions = ((ArraySink) userCapabilityJunctionDAO
-      .where(EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED))
+      .where(AND(
+        EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED),
+        LT(UserCapabilityJunction.EXPIRY, today)
+      ))
       .select(new ArraySink()))
       .getArray();
 
     for ( UserCapabilityJunction activeJunction : activeJunctions ) {
-      if ( activeJunction.getExpiry() != null && (activeJunction.getExpiry()).before(today) ) {
-        activeJunction.setStatus(CapabilityJunctionStatus.EXPIRED);
-        userCapabilityJunctionDAO.put(activeJunction);
-        logger.debug("Expired UserCapabilityJunction : " + activeJunction.getId());
-      }
+      activeJunction.setStatus(CapabilityJunctionStatus.EXPIRED);
+      userCapabilityJunctionDAO.put(activeJunction);
+      logger.debug("Expired UserCapabilityJunction : " + activeJunction.getId());
     }
   }
 }

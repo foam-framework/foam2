@@ -20,8 +20,6 @@ foam.CLASS({
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.logger.Logger',
-    'java.text.DateFormat',
-    'java.text.SimpleDateFormat',
     'java.util.Calendar',
     'java.util.Date',
     'java.util.List',
@@ -188,14 +186,16 @@ foam.CLASS({
       Date junctionExpiry = capability.getExpiry();
       
       if ( capability.getDuration() > 0 ) {
-        DateFormat format = new SimpleDateFormat("yyyy/MM/dd");
         Date today = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(today);
         calendar.add(Calendar.DATE, capability.getDuration());
 
-        if ( junctionExpiry == null ) junctionExpiry = calendar.getTime();
-        else junctionExpiry = junctionExpiry.after(calendar.getTime()) ? calendar.getTime() : junctionExpiry;
+        if ( junctionExpiry == null ) {
+          junctionExpiry = calendar.getTime();
+        } else {
+          junctionExpiry = junctionExpiry.after(calendar.getTime()) ? calendar.getTime() : junctionExpiry;
+        }
       }
       obj.setExpiry(junctionExpiry);
       return obj;
@@ -287,7 +287,7 @@ foam.CLASS({
       name: 'find_',
       javaCode:`
       FObject result = super.find_(x, id);
-      if(result != null) checkOwnership(x, (UserCapabilityJunction) result);
+      if ( result != null ) checkOwnership(x, (UserCapabilityJunction) result);
       return result;
       `
     }
