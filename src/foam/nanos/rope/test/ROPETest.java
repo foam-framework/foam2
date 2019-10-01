@@ -67,10 +67,18 @@ public class ROPETest extends Test {
    * 5. ropeContactDAO
    */
   public void setupROPEs(X x) {
-    ROPEUser temp = new ROPEUser();
-    temp.setId(12);
-    temp.setName("temp");
-    ropeUserDAO.put(temp);
+    // Sets up ROPEUsers in ROPEUserDAO
+    final int DEPTH = 3;
+    for ( int i = 0; i < DEPTH; i++ ) {
+      for ( int j = 0; j < DEPTH; j++ ) {
+        for ( int k = 0; k < DEPTH; k++ ) {
+          ROPEUser temp = new ROPEUser();
+          temp.setId(i*9 + j*3 + k);
+          temp.setName(Integer.toString(i) + Integer.toString(j) + Integer.toString(k));
+          ropeUserDAO.put(temp);
+        }
+      }
+    }
   }
 
   /**
