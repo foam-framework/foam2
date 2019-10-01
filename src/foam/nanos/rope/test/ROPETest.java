@@ -23,18 +23,20 @@ import foam.nanos.auth.*;
 import foam.nanos.test.Test;
 import foam.test.TestUtils;
 // import java.security.Permission;
-// import java.util.Calendar;
-// import java.util.Date;
-// import java.util.GregorianCalendar;
-// import java.util.List;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Arrays;
 import static foam.mlang.MLang.*;
 
 public class ROPETest extends Test {
-  DAO ropeUserDAO, ropeBusinessDAO, ropeAccountDAO, ropeTransactionDAO;
+  DAO ropeDAO, ropeUserDAO, ropeBusinessDAO, ropeAccountDAO, ropeTransactionDAO;
   DAO ropeAgentJunctionDAO, ropePartnerJunctionDAO, ropeContactDAO, ropeSigningOfficerJunctionDAO;
 
 
   public void runTest(X x) {
+    x = TestUtils.mockDAO(x, "ropeDAO");
     x = TestUtils.mockDAO(x, "ropeUserDAO");
     x = TestUtils.mockDAO(x, "ropeBusinessDAO");
     x = TestUtils.mockDAO(x, "ropeAccountDAO");
@@ -44,6 +46,7 @@ public class ROPETest extends Test {
     x = TestUtils.mockDAO(x, "ropeContactDAO");
     x = TestUtils.mockDAO(x, "ropeSigningOfficerJunctionDAO");
 
+    ropeDAO = (DAO) x.get("ropeDAO");
     ropeUserDAO = (DAO) x.get("ropeUserDAO");
     ropeBusinessDAO = (DAO) x.get("ropeBusinessDAO");
     ropeAccountDAO = (DAO) x.get("ropeAccountDAO");
@@ -54,6 +57,7 @@ public class ROPETest extends Test {
     ropeSigningOfficerJunctionDAO = (DAO) x.get("ropeSigningOfficerJunctionDAO");
 
     setupROPEs(x);
+    setupBusinessROPEs(x);
     testROPEContact(x);
     testUserReadTransaction(x);
   }
@@ -159,12 +163,16 @@ public class ROPETest extends Test {
    * 4. ropeTransactionDAO
    * 5. ropeContactDAO
    */
-  public void setupROPEs(X x) {
-    ROPEUser temp = new ROPEUser();
-    temp.setId(12);
-    temp.setName("temp");
-    ropeUserDAO.put(temp);
+  public void setupBusinessROPEs(X x) {
 
+    // foam.RELATIONSHIP({
+    //   cardinality: '1:*',
+    //   sourceModel: 'foam.nanos.rope.test.ROPEBankAccount',
+    //   targetModel: 'foam.nanos.rope.test.ROPETransaction',
+    //   forwardName: 'debits',
+    //   inverseName: 'sourceAccount',
+    //   targetDAOKey: 'ropeTransactionDAO'
+    // });
     ROPE transactionAccountROPE = new ROPE();
     transactionAccountROPE.setSourceModel(foam.nanos.rope.test.ROPEBankAccount.getOwnClassInfo());
     transactionAccountROPE.setTargetModel(foam.nanos.rope.test.ROPETransaction.getOwnClassInfo());
@@ -175,9 +183,47 @@ public class ROPETest extends Test {
     transactionAccountROPE.setCardinality("1:*");
     transactionAccountROPE.setInverseName("sourceAccount");
     transactionAccountROPE.setIsInverse(false);
-    transactionAccountROPE.setRelationshipImplies();
-    transactionAccountROPE.setRequiredSourceAction();
-    transactionAccountROPE.setCRUD();
+    List<ROPEActions> relationshipImplies = new ArrayList<ROPEActions>();
+    relationshipImplies.add(ROPEActions.C);
+    relationshipImplies.add(ROPEActions.R);
+    relationshipImplies.add(ROPEActions.OWN);
+    transactionAccountROPE.setRelationshipImplies(relationshipImplies);
+    transactionAccountROPE.setRequiredSourceAction(new ArrayList<ROPEActions>(Arrays.asList(ROPEActions.OWN)));
+    Map<ROPEActions, List<ROPEActions>> crud = new HashMap<ROPEActions, List<ROPEActions>>();
+    crud.put(ROPEActions.OWN, relationshipImplies);
+    transactionAccountROPE.setCRUD(crud);
+    ropeDAO.put(transactionAccountROPE);
+
+    // foam.RELATIONSHIP({
+    //   cardinality: '1:*',
+    //   sourceModel: 'foam.nanos.rope.test.ROPEUser',
+    //   targetModel: 'foam.nanos.rope.test.ROPEBankAccount',
+    //   forwardName: 'bankaccounts',
+    //   inverseName: 'owner',
+    //   targetDAOKey: 'ropeAccountDAO'
+    // });
+    ROPE accountUserROPE = new ROPE();
+    accountBusinessROPE.setSourceModel(foam.nanos.rope.test.ROPEUser.getOwnClassInfo());
+    accountBusinessROPE.setTargetModel(foam.nanos.rope.test.ROPEBankAccount.getOwnClassInfo());
+    accountBusinessROPE.setSourceDAOKey("ropeBusinessDAO");
+    accountBusinessROPE.setTargetDAOKey("ropeAccountDAO");
+    // accountBusinessROPE.setJunctionModel();
+    // accountBusinessROPE.setJunctionDAOKey();
+    accountBusinessROPE.setCardinality("1:*");
+    accountBusinessROPE.setInverseName("owner");
+    accountBusinessROPE.setIsInverse(false);
+    relationshipImplies = new ArrayList<ROPEActions>();
+    relationshipImplies.add(ROPEActions.C);
+    relationshipImplies.add(ROPEActions.R);
+    relationshipImplies.add(ROPEActions.U);
+    relationshipImplies.add(ROPEActions.D);
+    relationshipImplies.add(ROPEActions.OWN);
+    accountBusinessROPE.setRelationshipImplies(relationshipImplies);
+    accountBusinessROPE.setRequiredSourceAction(new ArrayList<ROPEActions>(Arrays.asList(ROPEActions.OWN)));
+    crud = new HashMap<ROPEActions, List<ROPEActions>>();
+    crud.put(ROPEActions.OWN, relationshipImplies);
+    accountBusinessROPE.setCRUD(crud);
+
     
   }
 
