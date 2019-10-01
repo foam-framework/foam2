@@ -226,26 +226,26 @@ public class ROPETest extends Test {
     //   targetDAOKey: 'ropeAccountDAO'
     // });
     ROPE accountUserROPE = new ROPE();
-    accountBusinessROPE.setSourceModel(foam.nanos.rope.test.ROPEUser.getOwnClassInfo());
-    accountBusinessROPE.setTargetModel(foam.nanos.rope.test.ROPEBankAccount.getOwnClassInfo());
-    accountBusinessROPE.setSourceDAOKey("ropeBusinessDAO");
-    accountBusinessROPE.setTargetDAOKey("ropeAccountDAO");
-    // accountBusinessROPE.setJunctionModel();
-    // accountBusinessROPE.setJunctionDAOKey();
-    accountBusinessROPE.setCardinality("1:*");
-    accountBusinessROPE.setInverseName("owner");
-    accountBusinessROPE.setIsInverse(false);
+    accountUserROPE.setSourceModel(foam.nanos.rope.test.ROPEUser.getOwnClassInfo());
+    accountUserROPE.setTargetModel(foam.nanos.rope.test.ROPEBankAccount.getOwnClassInfo());
+    accountUserROPE.setSourceDAOKey("ropeBusinessDAO");
+    accountUserROPE.setTargetDAOKey("ropeAccountDAO");
+    // accountUserROPE.setJunctionModel();
+    // accountUserROPE.setJunctionDAOKey();
+    accountUserROPE.setCardinality("1:*");
+    accountUserROPE.setInverseName("owner");
+    accountUserROPE.setIsInverse(false);
     relationshipImplies = new ArrayList<ROPEActions>();
     relationshipImplies.add(ROPEActions.C);
     relationshipImplies.add(ROPEActions.R);
     relationshipImplies.add(ROPEActions.U);
     relationshipImplies.add(ROPEActions.D);
     relationshipImplies.add(ROPEActions.OWN);
-    accountBusinessROPE.setRelationshipImplies(relationshipImplies);
-    accountBusinessROPE.setRequiredSourceAction(new ArrayList<ROPEActions>(Arrays.asList(ROPEActions.OWN)));
+    accountUserROPE.setRelationshipImplies(relationshipImplies);
+    accountUserROPE.setRequiredSourceAction(new ArrayList<ROPEActions>(Arrays.asList(ROPEActions.OWN)));
     crud = new HashMap<ROPEActions, List<ROPEActions>>();
     crud.put(ROPEActions.OWN, relationshipImplies);
-    accountBusinessROPE.setCRUD(crud);
+    accountUserROPE.setCRUD(crud);
 
     
   }
