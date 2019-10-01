@@ -852,7 +852,7 @@ foam.CLASS({
       class: 'String',
       name: 'tooltip',
       postSet: function(o, n) {
-       this.initTooltip();
+        if ( ! o && n ) this.initTooltip();
         return n;
       }
     },
@@ -1055,9 +1055,9 @@ foam.CLASS({
 
     function initTooltip() {
       if ( this.tooltip ) {
-        this.Tooltip.create({target: this, text: this.tooltip});
+        this.Tooltip.create({target: this, text$: this.tooltip$});
       } else if ( this.getAttribute('title') ) {
-        this.Tooltip.create({target: this, text: this.getAttribute('title')});
+        this.Tooltip.create({target: this, text$: this.attrSlot('title')});
       }
     },
 
