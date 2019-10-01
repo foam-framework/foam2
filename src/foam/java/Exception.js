@@ -76,19 +76,28 @@ foam.CLASS({
       // Generate getter strings for properties
       var argGetterMap = {};
       this.of.getAxiomsByClass(foam.core.Property).forEach(p => {
-        argGetterMap[p.name] = 'get' +
+        argGetterMap[p.name] = 'foamException.get' +
           foam.String.capitalize(p.name) +
           '()';
       });
 
       // Generate calls for methods
       this.of.getAxiomsByClass(foam.core.Method).forEach(m => {
-        argGetterMap[m.name] = m.name + '()';
+        argGetterMap[m.name] = 'foamException.' + m.name + '()';
       });
 
+      // Message is a special case; use property if available, but
+      // prefer non-empty constructor argument.
+      if ( 'message' in argGetterMap ) {
+        argGetterMap["message"] =
+          'message.equals("") ? foamException.getMessage() : message';
+      } else {
+        argGetterMap["message"] = "message";
+      }
+
       var superConstructor = 'super(' +
-        superArgs.map(name => {
-          return 'foamException.' + argGetterMap[name];
+        superArgs.map(val => {
+          return argGetterMap[val] || val
         }).join(',') + ');';
 
       cls
