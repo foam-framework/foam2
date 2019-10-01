@@ -34,6 +34,8 @@ FOAM_FILES([
   { name: "foam/nanos/auth/DeletedAware" },
   { name: "foam/nanos/auth/Group" },
   { name: "foam/nanos/auth/ServiceProvider" },
+  { name: "foam/nanos/auth/ServiceProviderAware" },
+  { name: "foam/nanos/auth/ServiceProviderAwareDAO" },
   { name: "foam/nanos/auth/Language" },
   { name: "foam/nanos/auth/CreatedAware" },
   { name: "foam/nanos/auth/CreatedAwareDAO" },

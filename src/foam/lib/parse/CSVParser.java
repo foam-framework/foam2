@@ -66,7 +66,8 @@ public class CSVParser
             }
             sink.put(obj, detach);
           } catch ( Exception e ) {
-            return null;
+            // we need to allow the parser to continue to run and skip over the unparsable value
+            System.out.println(e);
           }
         }
 

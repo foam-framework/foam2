@@ -334,3 +334,44 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'DatePropertyValidationRefinement',
+  refines: 'foam.core.Date',
+  properties: [
+    {
+      class: 'FObjectArray',
+      of: 'foam.core.ValidationPredicate',
+      name: 'validationPredicates',
+      factory: function() {
+        var self = this;
+        return [
+          {
+            args: [self.name],
+            predicateFactory: function(e) {
+              return e.OR(
+                e.NOT(e.HAS(self)), // Allow null dates.
+                e.AND(
+                  e.LTE(
+                    self,
+                    // Maximum date supported by FOAM
+                    // (bounded by JavaScript's limit)
+                    new Date(8640000000000000)
+                  ),
+                  e.GTE(
+                    self,
+                    // Minimum date supported by FOAM
+                    // (bounded by JavaScript's limit)
+                    new Date(-8640000000000000)
+                  )
+                )
+              );
+            },
+            errorString: 'Invalid date value'
+          }
+        ];
+      }
+    }
+  ]
+});
