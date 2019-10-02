@@ -40,4 +40,41 @@ foam.CLASS({
     }
   ],
 
+  methods: [
+    {
+      name: 'getTargetRopes',
+      type: 'Object',
+      javaType: 'List<ROPE>',
+      args: [
+        {
+          name: 'obj',
+          class: 'FObject'
+        },
+        {
+          name: 'targetDAOKey',
+          class: 'String'
+        }
+      ],
+      javacode: `
+        if ( obj instanceof User )
+        return (List<ROPE>) ((ArraySink) this.ropeDAO_
+          .where(foam.mlang.MLANG.AND(
+              foam.mlang.MLANG.EQ(ROPE.TARGET_MODEL, obj.getClassInfo()),
+              foam.mlang.MLANG.EQ(ROPE.SOURCE_MODEL, User.getOwnClassInfo()),
+              foam.mlang.MLANG.EQ(ROPE.TARGET_DAOKEY, targetDAOKey)
+          )) 
+          .select(new ArraySink()))
+          .getArray();
+      else 
+        return (List<ROPE>) ((ArraySink) this.ropeDAO_
+          .where(foam.mlang.MLANG.AND(
+            foam.mlang.MLANG.EQ(ROPE.TARGET_MODEL, obj.getClassInfo()),
+            foam.mlang.MLANG.EQ(ROPE.TARGET_DAOKEY, targetDAOKey)
+          )) 
+          .select(new ArraySink()))
+          .getArray();
+      `
+    }
+  ]
+
 })
