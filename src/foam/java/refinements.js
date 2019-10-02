@@ -372,7 +372,7 @@ foam.CLASS({
           name: isSet,
           type: 'boolean',
           visibility: 'private',
-          initializer: 'false;'
+          initializer: 'false'
         }).
         method({
           name: 'get' + capitalized,
@@ -952,9 +952,9 @@ foam.CLASS({
 
       var m = info.getMethod('cast');
       m.body = `return ( o instanceof Number ) ?
-        ((Number)o).intValue() :
+        ( (Number) o ).intValue() :
         ( o instanceof String ) ?
-        Integer.valueOf((String) o) :
+        Integer.valueOf( (String) o ) :
         (int)o;`;
 
       return info;
@@ -982,9 +982,9 @@ foam.CLASS({
 
       var m = info.getMethod('cast');
       m.body = `return ( o instanceof Number ) ?
-        ((Number)o).byteValue() :
+        ( (Number) o).byteValue() :
         ( o instanceof String ) ?
-        Byte.valueOf((String) o) :
+        Byte.valueOf( (String) o ) :
         (byte)o;`;
 
       return info;
@@ -1208,7 +1208,7 @@ foam.CLASS({
             name: '__frozen__',
             visibility: 'protected',
             type: 'boolean',
-            initializer: 'false;'
+            initializer: 'false'
           });
 
           var flagFilter = foam.util.flagFilter(['java']);

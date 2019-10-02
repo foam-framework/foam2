@@ -148,21 +148,21 @@ foam.CLASS({
             type: this.propType,
             visibility: 'public',
             args: [{ name: 'o', type: 'Object' }],
-            body: 'return ((' + this.sourceCls.name + ') o).' + this.getterName + '();'
+            body: 'return ( (' + this.sourceCls.name + ') o ).' + this.getterName + '();'
           },
           {
             name: 'set',
             type: 'void',
             visibility: 'public',
             args: [{ name: 'o', type: 'Object' }, { name: 'value', type: 'Object' }],
-            body: '((' + this.sourceCls.name + ') o).' + this.setterName + '(cast(value));'
+            body: '( (' + this.sourceCls.name + ') o ).' + this.setterName + '(cast(value));'
           },
           {
             name: 'clear',
             type: 'void',
             visibility: 'public',
             args: [{ name: 'o', type: 'Object' }],
-            body: '((' + this.sourceCls.name + ') o).' + this.clearName + '();'
+            body: '( (' + this.sourceCls.name + ') o ).' + this.clearName + '();'
           },
           {
             name: 'cast',
