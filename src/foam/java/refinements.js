@@ -524,7 +524,8 @@ foam.LIB({
       // method's 'throws' is derived from the name of the
       // model being generated, and therefore can't be
       // defined in a refinement of AbstractException.
-      if ( foam.core.AbstractException.isSubClass(this) ) {
+      if ( foam.core.AbstractException.isSubClass(this) &&
+        !(this.model_.name == 'AbstractException' && this.model_.package == 'foam.core') ) {
         let exceptionName = foam.String.toNativeExceptionName(this.name)
         cls.method({
           visibility: 'public',
@@ -533,6 +534,14 @@ foam.LIB({
           args: [{type: 'String', name: 'message'}],
           throws: [exceptionName],
           body: 'throw new ' + exceptionName +
+            '(this, message);'
+        });
+        cls.method({
+          visibility: 'public',
+          type: exceptionName,
+          name: 'newNative',
+          args: [{type: 'String', name: 'message'}],
+          body: 'return new ' + exceptionName +
             '(this, message);'
         });
       }
