@@ -20,7 +20,8 @@ foam.CLASS({
     'foam.nanos.rope.ROPEActions',
     'java.lang.reflect.*',
     'java.util.ArrayList',
-    'java.util.List'
+    'java.util.List',
+    'static foam.mlang.MLang.*'
   ],
 
   properties: [
@@ -58,22 +59,25 @@ foam.CLASS({
       javacode: `
         if ( obj instanceof User )
         return (List<ROPE>) ((ArraySink) this.ropeDAO_
-          .where(foam.mlang.MLANG.AND(
-              foam.mlang.MLANG.EQ(ROPE.TARGET_MODEL, obj.getClassInfo()),
-              foam.mlang.MLANG.EQ(ROPE.SOURCE_MODEL, User.getOwnClassInfo()),
-              foam.mlang.MLANG.EQ(ROPE.TARGET_DAOKEY, targetDAOKey)
+          .where(AND(
+              EQ(ROPE.TARGET_MODEL, obj.getClassInfo()),
+              EQ(ROPE.SOURCE_MODEL, User.getOwnClassInfo()),
+              EQ(ROPE.TARGET_DAOKEY, targetDAOKey)
           )) 
           .select(new ArraySink()))
           .getArray();
       else 
         return (List<ROPE>) ((ArraySink) this.ropeDAO_
-          .where(foam.mlang.MLANG.AND(
-            foam.mlang.MLANG.EQ(ROPE.TARGET_MODEL, obj.getClassInfo()),
-            foam.mlang.MLANG.EQ(ROPE.TARGET_DAOKEY, targetDAOKey)
+          .where(AND(
+            EQ(ROPE.TARGET_MODEL, obj.getClassInfo()),
+            EQ(ROPE.TARGET_DAOKEY, targetDAOKey)
           )) 
           .select(new ArraySink()))
           .getArray();
       `
+    },
+    {
+
     }
   ]
 
