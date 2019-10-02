@@ -9,7 +9,7 @@ foam.CLASS({
     name: 'ROPE',
     documentation: 'model represents a single cell in a rope matrix',
 
-    ids: [ 'targetDAOKey', 'sourceDAOKey', 'junctionDAOKey' ],
+    ids: [ 'targetDAOKey', 'sourceDAOKey', 'junctionDAOKey', 'isInverse' ],
 
     // sourceModel and targetModel here are NOT Necessarily the same as in the relationship
     // a one-way ROPE relationship
