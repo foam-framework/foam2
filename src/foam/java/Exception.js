@@ -90,7 +90,7 @@ foam.CLASS({
       // prefer non-empty constructor argument.
       if ( 'message' in argGetterMap ) {
         argGetterMap["message"] =
-          '( message.equals("") || message == null ) '
+          '( message == null || message.equals("") ) '
             + '? foamException.getMessage() : message';
       } else {
         argGetterMap["message"] = "message";
