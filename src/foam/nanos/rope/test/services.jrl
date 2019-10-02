@@ -23,7 +23,7 @@ p({
   "lazy":false,
   "serviceScript":
   """
-    return new foam.dao.EasyDAO.Builder(x)
+    dao = new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.rope.test.ROPEUser.getOwnClassInfo())
       .setSeqNo(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
@@ -31,6 +31,7 @@ p({
       .setAuthorize(false)
       .setPermissioned(false)
       .build();
+    return new foam.nanos.rope.test.ROPEUserDAO.Builder(x).setDelegate(dao).build();
   """,
   "client":"{\"of\": \"foam.nanos.rope.test.ROPEUser\"}"
 })
@@ -100,7 +101,7 @@ p({
   "serviceScript":
   """
     return new foam.dao.EasyDAO.Builder(x)
-      .setOf(foam.nanos.rope.test.ROPEUserROPEUserJunction.getOwnClassInfo())
+      .setOf(foam.nanos.rope.test.ROPEUserROPEBusinessJunction.getOwnClassInfo())
       .setSeqNo(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("ropeAgentJunctions")
@@ -111,7 +112,7 @@ p({
   "client":
   """
     {
-      "of": "foam.nanos.rope.test.ROPEUserROPEUserJunction"
+      "of": "foam.nanos.rope.test.ROPEUserROPEBusinessJunction"
     }
   """
 })
@@ -147,19 +148,20 @@ p({
   "lazy":false,
   "serviceScript":
   """
-    return new foam.dao.EasyDAO.Builder(x)
-      .setOf(foam.nanos.rope.test.ROPEUserROPEUserJunction.getOwnClassInfo())
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.rope.test.ROPEBusinessROPEBusinessJunction.getOwnClassInfo())
       .setSeqNo(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("ropeContacts")
       .setAuthorize(false)
       .setPermissioned(false)
       .build();
+    return new foam.nanos.rope.test.ROPEContactDAO.Builder(x).setDelegate(dao).build();
   """,
   "client":
   """
     {
-      "of": "foam.nanos.rope.test.ROPEUserROPEUserJunction"
+      "of": "foam.nanos.rope.test.ROPEBusinessROPEBusinessJunction"
     }
   """
 })
