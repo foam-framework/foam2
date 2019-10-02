@@ -952,9 +952,9 @@ foam.CLASS({
 
       var m = info.getMethod('cast');
       m.body = `return ( o instanceof Number ) ?
-        ( (Number) o ).intValue() :
+        ((Number) o).intValue() :
         ( o instanceof String ) ?
-        Integer.valueOf( (String) o ) :
+        Integer.valueOf((String) o) :
         (int)o;`;
 
       return info;
@@ -982,9 +982,9 @@ foam.CLASS({
 
       var m = info.getMethod('cast');
       m.body = `return ( o instanceof Number ) ?
-        ( (Number) o).byteValue() :
+        ((Number) o).byteValue() :
         ( o instanceof String ) ?
-        Byte.valueOf( (String) o ) :
+        Byte.valueOf((String) o) :
         (byte)o;`;
 
       return info;
@@ -1012,7 +1012,7 @@ foam.CLASS({
 
       var m = info.getMethod('cast');
       m.body = `return ( o instanceof Number ) ?
-        ((Number)o).shortValue() :
+        ((Number) o).shortValue() :
         ( o instanceof String ) ?
         Short.valueOf((String) o) :
         (short)o;`;
@@ -1074,7 +1074,7 @@ foam.CLASS({
 
       var m = info.getMethod('cast');
       m.body = `return ( o instanceof Number ) ?
-        ((Number)o).doubleValue() :
+        ((Number) o).doubleValue() :
         ( o instanceof String ) ?
         Double.parseDouble((String) o) :
         (double)o;`;
@@ -1104,7 +1104,7 @@ foam.CLASS({
 
       var m = info.getMethod('cast');
       m.body = `return ( o instanceof Number ) ?
-        ((Number)o).floatValue() :
+        ((Number) o).floatValue() :
         ( o instanceof String ) ?
         Float.parseFloat((String) o) :
         (float)o;`;
