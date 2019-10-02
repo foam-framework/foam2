@@ -137,7 +137,7 @@ foam.CLASS({
       name: 'goToTerm',
       label: '',
       code: function(X) {
-        this.window.location.assign(X.appConfig.termsAndCondLink);
+        X.window.location.assign(X.appConfig.termsAndCondLink);
       }
     },
     {
