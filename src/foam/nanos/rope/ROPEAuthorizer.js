@@ -26,17 +26,17 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'user_',
+      name: 'user',
       class: 'Object',
       javaType: 'User'
     },
     {
-      name: 'ropeDAO_',
+      name: 'ropeDAO',
       class: 'Object',
       javaType: 'DAO'
     },
     {
-      name: 'targetDAOKey_',
+      name: 'targetDAOKey',
       class: 'String'
     }
   ],
@@ -49,16 +49,17 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          class: 'FObject'
+          class: 'Object',
+          javaType: 'FObject'
         },
         {
           name: 'targetDAOKey',
           class: 'String'
         }
       ],
-      javacode: `
+      javaCode: `
         if ( obj instanceof User )
-        return (List<ROPE>) ((ArraySink) this.ropeDAO_
+        return (List<ROPE>) ((ArraySink) getRopeDAO()
           .where(AND(
               EQ(ROPE.TARGET_MODEL, obj.getClassInfo()),
               EQ(ROPE.SOURCE_MODEL, User.getOwnClassInfo()),
@@ -67,7 +68,7 @@ foam.CLASS({
           .select(new ArraySink()))
           .getArray();
       else 
-        return (List<ROPE>) ((ArraySink) this.ropeDAO_
+        return (List<ROPE>) ((ArraySink) getRopeDAO()
           .where(AND(
             EQ(ROPE.TARGET_MODEL, obj.getClassInfo()),
             EQ(ROPE.TARGET_DAOKEY, targetDAOKey)
@@ -77,8 +78,158 @@ foam.CLASS({
       `
     },
     {
-
+      name: 'retrieveProperty',
+      type: 'Object',
+      javaType: '<T> T',
+      args: [
+        {
+          name: 'obj',
+          class: 'Object',
+          javaType: 'FObject'
+        },
+        {
+          name: 'prefix',
+          class: 'String'
+        },
+        {
+          name: 'propertyName',
+          class: 'String'
+        }
+      ],
+      javaCode: `
+        Method method;
+        try {
+          method = obj.getClass().getDeclaredMethod(
+            prefix + 
+            propertyName.substring(0, 1).toUpperCase() + 
+            propertyName.substring(1)
+          );
+            method.setAccessible(true);
+            return (T) method.invoke((FObject) obj);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+            // Should never occur
+            System.err.println("ROPE ERROR: Attempted access on non-existant property");
+        } 
+        return null;
+      `
+    },
+    {
+      name: 'authorizeOnCreate',
+      type: 'Void',
+      javaThrows: [
+        'AuthorizationException'
+      ],
+      args: [
+        {
+          name: 'x',
+          type: 'Object',
+          javaType: 'X'
+        },
+        {
+          name: 'obj',
+          type: 'Object',
+          javaType: 'FObject'
+        }
+      ],
+      javaCode: `
+        if ( ! ropeSearch(ROPEActions.C, obj, x, this.getTargetDAOKey()) ) throw new AuthorizationException("You don't have permission to create this object");
+      `
+    },
+    {
+      name: 'authorizeOnReads',
+      type: 'Void',
+      javaThrows: [
+        'AuthorizationException'
+      ],
+      args: [
+        {
+          name: 'x',
+          type: 'Object',
+          javaType: 'X'
+        },
+        {
+          name: 'obj',
+          type: 'Object',
+          javaType: 'FObject'
+        }
+      ],
+      javaCode: `
+        if ( ! ropeSearch(ROPEActions.R, obj, x, this.getTargetDAOKey()) ) throw new AuthorizationException("You don't have permission to create this object");
+      `
+    },
+    {
+      name: 'authorizeOnUpdate',
+      type: 'Void',
+      javaThrows: [
+        'AuthorizationException'
+      ],
+      args: [
+        {
+          name: 'x',
+          type: 'Object',
+          javaType: 'X'
+        },
+        {
+          name: 'obj',
+          type: 'Object',
+          javaType: 'FObject'
+        }
+      ],
+      javaCode: `
+        if ( ! ropeSearch(ROPEActions.U, obj, x, this.getTargetDAOKey()) ) throw new AuthorizationException("You don't have permission to create this object");
+      `
+    },
+    {
+      name: 'authorizeOnDelete',
+      type: 'Void',
+      javaThrows: [
+        'AuthorizationException'
+      ],
+      args: [
+        {
+          name: 'x',
+          type: 'Object',
+          javaType: 'X'
+        },
+        {
+          name: 'obj',
+          type: 'Object',
+          javaType: 'FObject'
+        }
+      ],
+      javaCode: `
+        if ( ! ropeSearch(ROPEActions.D, obj, x, this.getTargetDAOKey()) ) throw new AuthorizationException("You don't have permission to create this object");
+      `
+    },
+    {
+      name: 'ropeSearch',
+      type: 'Boolean',
+      args: [
+        {
+          name: 'operation',
+          class: 'Object',
+          javaType: 'ROPEActions'
+        },
+        {
+          name: 'obj',
+          class: 'Object',
+          javaType: 'FObject'
+        },
+        {
+          name: 'x',
+          class: 'Object',
+          javaType: 'X'
+        },
+        {
+          name: 'targetDAOKey',
+          class: 'String'
+        }
+      ],
+      javaCode: `
+        //TODO fill in once rope is done
+        return false;
+      `
     }
   ]
-
 })
