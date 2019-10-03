@@ -161,7 +161,8 @@ foam.CLASS({
       class: 'String',
       name: 'result',
       value: 'No Request Sent Yet.',
-      view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 120 },
+      view: { class: 'foam.nanos.dig.ResultView' },
+//       view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 120 },
       visibility: 'RO'
     }
   ],
