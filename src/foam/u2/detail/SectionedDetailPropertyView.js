@@ -261,6 +261,8 @@ foam.CLASS({
     'foam.core.ProxySlot',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
+    'foam.u2.ControllerMode',
+    'foam.u2.DisplayMode',
     'foam.u2.Visibility'
   ],
 
@@ -273,6 +275,19 @@ foam.CLASS({
       expression: function(prop) {
         return prop.createVisibilityFor(this.data$).map((m) => m !== this.Visibility.HIDDEN);
       }
+    },
+    {
+      name: 'mode',
+      expression: function(prop) {
+        switch ( this.controllerMode ) {
+          case this.ControllerMode.CREATE:
+            return prop.createMode;
+          case this.ControllerMode.VIEW:
+            return prop.readMode;
+          case this.ControllerMode.EDIT:
+            return prop.updateMode;
+        }
+      }
     }
   ],
 
@@ -280,6 +295,8 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.SUPER();
+
+      if ( this.mode === this.DisplayMode.HIDDEN ) return;
 
       this
         .show(this.ProxySlot.create({ delegate$: this.visibilitySlot$ }))
