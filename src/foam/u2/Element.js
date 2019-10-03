@@ -2146,9 +2146,37 @@ foam.CLASS({
       value: { class: 'foam.u2.TextField' }
     },
     {
+      // DEPRECATED: Use 'createMode', 'readMode', and 'updateMode' instead.
       class: 'Enum',
       of: 'foam.u2.Visibility',
       name: 'visibility',
+      value: 'RW'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
+      name: 'createMode',
+      documentation: 'The display mode for this property when the controller mode is CREATE.',
+      assertValue: function(newValue) {
+        foam.assert(newValue === foam.u2.DisplayMode.RW || newValue === foam.u2.DisplayMode.HIDDEN, `Create mode must be RW or HIDDEN. Property '${this.of ? this.of.id + '.' : ''}${this.name}' was '${newValue.label}' and must be fixed.`);
+      },
+      value: 'RW'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
+      name: 'readMode',
+      documentation: 'The display mode for this property when the controller mode is VIEW.',
+      assertValue: function(newValue) {
+        foam.assert(newValue === foam.u2.DisplayMode.RO || newValue === foam.u2.DisplayMode.HIDDEN, `Read mode must be RO or HIDDEN. Property '${this.of ? this.of.id + '.' : ''}${this.name}' was '${newValue.label}' and must be fixed.`);
+      },
+      value: 'RO'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
+      name: 'updateMode',
+      documentation: 'The display mode for this property when the controller mode is EDIT.',
       value: 'RW'
     },
     {

@@ -71,6 +71,22 @@ foam.CLASS({
     }
   ],
 
+  sections: [
+    {
+      name: 'business',
+      title: 'Business Information'
+    },
+    {
+      name: 'personal',
+      title: 'Personal Information'
+    },
+    {
+      name: 'administrative',
+      help: 'Properties that are used internally by the system.',
+      permissionRequired: true
+    },
+  ],
+
   // TODO: The following properties don't have to be defined here anymore once
   // https://github.com/foam-framework/foam2/issues/1529 is fixed:
   //   1. enabled
@@ -86,25 +102,33 @@ foam.CLASS({
       name: 'id',
       documentation: 'The ID for the User.',
       final: true,
-      tableWidth: 50
+      tableWidth: 50,
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
+      section: 'administrative'
     },
     {
       class: 'Boolean',
       name: 'enabled',
       documentation: 'Determines whether the User is permitted certain actions.',
-      value: true
+      value: true,
+      section: 'administrative'
     },
     {
       class: 'Boolean',
       name: 'loginEnabled',
       documentation: 'Determines whether the User can login to the platform.',
       permissionRequired: true,
-      value: true
+      value: true,
+      section: 'administrative'
     },
     {
       class: 'DateTime',
       name: 'lastLogin',
-      documentation: 'The date and time of last login by User.'
+      documentation: 'The date and time of last login by User.',
+      section: 'administrative',
+      createMode: 'HIDDEN',
+      updateMode: 'RO'
     },
     {
       class: 'String',
@@ -118,12 +142,14 @@ foam.CLASS({
         } if( /\d/.test(this.firstName) ) {
           return 'First name cannot contain numbers';
         }
-      }
+      },
+      section: 'personal'
     },
     {
       class: 'String',
       name: 'middleName',
-      documentation: 'The middle name of the User.'
+      documentation: 'The middle name of the User.',
+      section: 'personal'
     },
     {
       class: 'String',
@@ -137,9 +163,15 @@ foam.CLASS({
         } if( /\d/.test(this.lastName) ) {
           return 'Last name cannot contain numbers';
         }
-      }
+      },
+      section: 'personal'
     },
-    'legalName',
+    {
+      name: 'legalName',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
+      section: 'personal'
+    },
     {
       class: 'String',
       name: 'organization',
@@ -153,14 +185,16 @@ foam.CLASS({
         } if (!(organization.trim())) {
           return 'Company Name Required.';
         }
-      }
+      },
+      section: 'business'
     },
     {
       class: 'String',
       name: 'department',
       documentation: `The department associated with the organization/business
         of the User.`,
-      width: 50
+      width: 50,
+      section: 'business'
     },
     {
       class: 'EMail',
@@ -184,23 +218,26 @@ foam.CLASS({
         if ( ! emailRegex.test(email.trim()) ) {
           return 'Invalid email address.';
         }
-      }
+      },
+      section: 'personal'
     },
     {
       class: 'Boolean',
       name: 'emailVerified',
       documentation: 'Determines whether the email address of the User is valid.',
-      permissionRequired: true
+      permissionRequired: true,
+      section: 'administrative'
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'phone',
-      documentation: 'Returns the personal phone number of the User from the Phone model.',
+      documentation: 'Personal phone number.',
       factory: function() {
         return this.Phone.create();
       },
-      view: { class: 'foam.u2.detail.VerticalDetailView' }
+      view: { class: 'foam.u2.detail.VerticalDetailView' },
+      section: 'personal'
     },
     {
       class: 'String',
@@ -210,7 +247,8 @@ foam.CLASS({
         the phone number.`,
       expression: function(phone) {
         return phone.number;
-      }
+      },
+      section: 'personal'
     },
     {
       class: 'FObjectProperty',
@@ -220,22 +258,31 @@ foam.CLASS({
       factory: function() {
         return this.Phone.create();
       },
-      view: { class: 'foam.u2.detail.VerticalDetailView' }
+      view: { class: 'foam.u2.detail.VerticalDetailView' },
+      section: 'personal'
     },
     {
       class: 'String',
       name: 'type',
+      visibility: 'RO',
+      storageTransient: true,
       documentation: 'The type of the User.',
-      tableWidth: 91,
-      view: {
-        class: 'foam.u2.view.ChoiceView',
-        choices: [ 'Personal', 'Business', 'Merchant', 'Broker', 'Bank', 'Processor' ]
-      }
+      tableWidth: 75,
+      getter: function() {
+        return this.cls_.name;
+      },
+      javaGetter: `
+        return getClass().getSimpleName();
+      `,
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
+      section: 'administrative'
     },
     {
       class: 'Date',
       name: 'birthday',
-      documentation: 'The date of birth of the individual person, or real user.'
+      documentation: 'The date of birth of the individual person, or real user.',
+      section: 'personal'
     },
     {
       class: 'foam.nanos.fs.FileProperty',
@@ -245,7 +292,8 @@ foam.CLASS({
       view: {
         class: 'foam.nanos.auth.ProfilePictureView',
         placeholderImage: 'images/ic-placeholder.png'
-      }
+      },
+      section: 'personal'
     },
     {
       class: 'FObjectProperty',
@@ -255,20 +303,23 @@ foam.CLASS({
       factory: function() {
         return this.Address.create();
       },
-      view: { class: 'foam.nanos.auth.AddressDetailView' }
+      view: { class: 'foam.nanos.auth.AddressDetailView' },
+      section: 'personal'
     },
     {
       class: 'Reference',
       name: 'language',
       documentation: 'The default language preferred by the User.',
       of: 'foam.nanos.auth.Language',
-      value: 'en'
+      value: 'en',
+      section: 'personal'
     },
     {
       class: 'String',
       name: 'timeZone',
       documentation: 'The preferred time zone of the User.',
-      width: 5
+      width: 5,
+      section: 'personal'
       // TODO: create custom view or DAO
     },
     {
@@ -286,32 +337,39 @@ foam.CLASS({
         if ( password.length > 0 && ! re.test(password) ) {
           return 'Password must contain one lowercase letter, one uppercase letter, one digit, and be between 7 and 32 characters in length.';
         }
-      }
+      },
+      section: 'administrative'
     },
     {
       class: 'Password',
       name: 'password',
       documentation: 'The password that is currently active with the User.',
       hidden: true,
-      networkTransient: true
+      networkTransient: true,
+      section: 'administrative'
     },
     {
       class: 'Password',
       name: 'previousPassword',
       documentation: 'The password that was previously active with the User.',
       hidden: true,
-      networkTransient: true
+      networkTransient: true,
+      section: 'administrative'
     },
     {
       class: 'DateTime',
       name: 'passwordLastModified',
-      documentation: 'The date and time that the password was last modified.'
+      documentation: 'The date and time that the password was last modified.',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
+      section: 'administrative'
     },
     {
       class: 'DateTime',
       name: 'passwordExpiry',
       documentation: `The date and time that the current password of the User
         will expire.`,
+      section: 'administrative'
     },
     // TODO: startDate, endDate,
     // TODO: do we want to replace 'note' with a simple ticket system?
@@ -320,7 +378,8 @@ foam.CLASS({
       name: 'note',
       documentation: 'A field for a note that can be added and appended to the User.',
       displayWidth: 70,
-      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 }
+      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 },
+      section: 'administrative'
     },
     // TODO: remove after demo
     {
@@ -332,7 +391,8 @@ foam.CLASS({
         if ( businessName.length > 35 ) {
           return 'Business name cannot be greater than 35 characters.';
         }
-      }
+      },
+      section: 'business'
     },
     {
       class: 'String',
@@ -341,22 +401,28 @@ foam.CLASS({
       documentation: `The Bank Identification Code (BIC): an international bank code that
       identifies particular banks worldwide.
       `,
+      section: 'business'
     },
     {
       class: 'Boolean',
       name: 'businessHoursEnabled',
       documentation: 'Determines whether business hours are enabled for the User to set.',
-      value: false
+      value: false,
+      section: 'business'
     },
     {
       class: 'StringArray',
       name: 'disabledTopics',
-      documentation: 'Disables types for notifications.'
+      documentation: 'Disables types for notifications.',
+      createMode: 'HIDDEN',
+      section: 'administrative'
     },
     {
       class: 'StringArray',
       name: 'disabledTopicsEmail',
-      documentation: 'Disables types for email notifications.'
+      documentation: 'Disables types for email notifications.',
+      createMode: 'HIDDEN',
+      section: 'administrative'
     },
     {
       class: 'URL',
@@ -370,17 +436,24 @@ foam.CLASS({
         if ( website.length > 0 && ! websiteRegex.test(website) ) {
           return 'Invalid website';
         }
-      }
+      },
+      section: 'personal'
     },
     {
       class: 'DateTime',
       name: 'created',
-      documentation: 'The date and time of when the User was created in the system.'
+      documentation: 'The date and time of when the User was created in the system.',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
+      section: 'administrative'
     },
     {
       class: 'DateTime',
       name: 'lastModified',
-      documentation: 'The date and time the User was last modified.'
+      documentation: 'The date and time the User was last modified.',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
+      section: 'administrative'
     }
   ],
 
@@ -522,7 +595,8 @@ foam.RELATIONSHIP({
     hidden: true
   },
   targetProperty: {
-    hidden: false
+    hidden: false,
+    section: 'administrative'
   }
 });
 
@@ -549,7 +623,8 @@ foam.RELATIONSHIP({
   },
   targetProperty: {
     hidden: false,
-    tableWidth: 120
+    tableWidth: 120,
+    section: 'administrative'
   }
 });
 
@@ -561,6 +636,14 @@ foam.RELATIONSHIP({
   forwardName: 'entities',
   inverseName: 'agents',
   junctionDAOKey: 'agentJunctionDAO',
+  sourceProperty: {
+    createMode: 'HIDDEN',
+    section: 'business'
+  },
+  targetProperty: {
+    createMode: 'HIDDEN',
+    section: 'business'
+  }
 });
 
 foam.CLASS({

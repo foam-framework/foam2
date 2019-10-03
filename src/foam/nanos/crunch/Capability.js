@@ -181,7 +181,11 @@ foam.RELATIONSHIP({
   targetModel: 'foam.nanos.crunch.Capability',
   cardinality: '*:*',
   forwardName: 'capabilities',
-  inverseName: 'users'
+  inverseName: 'users',
+  sourceProperty: {
+    createMode: 'HIDDEN',
+    section: 'administrative'
+  }
 });
 
 foam.RELATIONSHIP({
