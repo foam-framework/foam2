@@ -311,7 +311,7 @@ foam.CLASS({
                 .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                 .start()
                   .style({ 'flex-grow': 1 })
-                  .add(prop)
+                  .tag(prop, { mode: this.mode })
                   .callIf(prop.validationStyleEnabled, function() {
                     this.enableClass(self.myClass('error'), errorSlot);
                   })
