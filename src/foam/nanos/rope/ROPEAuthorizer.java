@@ -116,16 +116,6 @@ public class ROPEAuthorizer implements Authorizer {
         FObject sourceObj = retrieveProperty(obj, "find", rope.getInverseName());
         sourceObjs.add(sourceObj);
       } else return false;
-        
-      if ( ( rope.getRelationshipImplies()).contains(operation) && sourceObjs.size() > 0 ) {
-        for ( FObject sourceObj : sourceObjs ) {
-          if ( ( sourceObj instanceof User && obj instanceof User ) ) return true;
-          
-          for ( ROPEActions action : rope.getRequiredSourceAction() ) {
-            if ( ropeSearch(action, sourceObj, x, rope.getSourceDAOKey()) ) return true;
-          }
-        }
-      }
 
       // if we need to check in the CRUD Matrix
       List<ROPEActions> actions = rope.getCRUD().get(operation);

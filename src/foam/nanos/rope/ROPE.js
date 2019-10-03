@@ -9,7 +9,7 @@ foam.CLASS({
     name: 'ROPE',
     documentation: 'model represents a single cell in a rope matrix',
 
-    ids: [ 'targetDAOKey', 'sourceDAOKey', 'junctionDAOKey', 'isInverse' ],
+    ids: [ 'targetDAOKey', 'sourceDAOKey', 'junctionDAOKey', 'isInverse', 'inverseName' ],
 
     // sourceModel and targetModel here are NOT Necessarily the same as in the relationship
     // a one-way ROPE relationship
@@ -53,17 +53,6 @@ foam.CLASS({
       {
         name: 'inverseName',
         class: 'String'
-      },
-      {
-        name: 'relationshipImplies',
-        class: 'List',
-        javaType: 'java.util.List<foam.nanos.rope.ROPEActions>'
-      },
-      {
-        name: 'requiredSourceAction',
-        class: 'List',
-        javaType: 'java.util.List<foam.nanos.rope.ROPEActions>',
-        documentation: `A list containing actions you need to be able to perform on srcObj, used in in recursive search`
       },
       // The Key is the action user would like to perform on tgtObj, and the value is a list of actions on the srcObj that if the user is allowed to perform, grants the permission 
       // for the action on tgtObj

@@ -228,7 +228,7 @@ foam.RELATIONSHIP({
 
 foam.RELATIONSHIP({
   cardinality: '1:*',
-  sourceModel: 'foam.nanos.rope.test.ROPEUser',
+  sourceModel: 'foam.nanos.rope.test.ROPEBusiness',
   targetModel: 'foam.nanos.rope.test.ROPEBankAccount',
   sourceDAOKey: 'ropeUserDAO',
   targetDAOKey: 'ropeAccountDAO',

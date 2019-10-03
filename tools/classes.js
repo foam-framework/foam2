@@ -484,7 +484,7 @@ var classes = [
   'foam.nanos.rope.test.ROPEUserROPEUserJunction',
   'foam.nanos.rope.test.ROPEBusinessROPEUserJunction',
   'foam.nanos.rope.test.ROPEUserROPEBusinessJunction',
-  'foam.nanos.rope.test.ROPEBusinessROPEBusinessJunction'
+  'foam.nanos.rope.test.ROPEBusinessROPEBusinessJunction',
 ];
 
 var abstractClasses = [
