@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.parse;
 
 import foam.lib.parse.Alt;
@@ -24,9 +30,8 @@ public class QueryParser
   public QueryParser(foam.core.ClassInfo classInfo) {
     info_ = classInfo;
 
-    java.util.List properties = classInfo.getAxiomsByClass(foam.core.PropertyInfo.class);
-
-    List<Parser> expressions = new ArrayList<Parser>();
+    java.util.List properties  = classInfo.getAxiomsByClass(foam.core.PropertyInfo.class);
+    List<Parser>   expressions = new ArrayList<Parser>();
 
     for ( Object prop : properties ) {
       foam.core.PropertyInfo info = (foam.core.PropertyInfo) prop;
@@ -44,8 +49,8 @@ public class QueryParser
 
     Parser[] parsers = expressions.toArray(new Parser[expressions.size()]);
     setDelegate(new Alt(
-      new ParenParser (new OrParser(new AndParser(new Alt(parsers)))),
-      new ParenParser (new OrParser(new ParenParser(new AndParser(new Alt(parsers))))),
+      new ParenParser(new OrParser(new AndParser(new Alt(parsers)))),
+      new ParenParser(new OrParser(new ParenParser(new AndParser(new Alt(parsers))))),
       new OrParser(new AndParser(new Alt(parsers)))));
   }
 
