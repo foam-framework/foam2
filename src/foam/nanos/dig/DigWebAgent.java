@@ -382,7 +382,7 @@ public class DigWebAgent
               out.println(outputterCsv.toString());
             }
           } else if ( Format.HTML == format ) {
-            foam.lib.html.Outputter outputterHtml = new foam.lib.html.Outputter(OutputterMode.NETWORK);
+            foam.lib.html.Outputter outputterHtml = new foam.lib.html.Outputter(cInfo, OutputterMode.NETWORK);
 
             outputterHtml.outputStartHtml();
             outputterHtml.outputStartTable();
