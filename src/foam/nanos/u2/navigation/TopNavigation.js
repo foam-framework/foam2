@@ -62,6 +62,8 @@ foam.CLASS({
     ^ .foam-nanos-menu-MenuBar li {
       display: inline-block;
       cursor: pointer;
+      -webkit-user-select: none;
+      user-select: none;
     }
     ^ .menuItem {
       display: inline-block;
