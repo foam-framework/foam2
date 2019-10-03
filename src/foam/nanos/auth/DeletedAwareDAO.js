@@ -87,6 +87,12 @@ foam.CLASS({
       `
     },
     {
+      name: 'removeAll_',
+      javaCode: `
+        getDelegate().select_(x, new RemoveSink(x, this), skip, limit, order, predicate);
+      `
+    },
+    {
       name: 'canReadDeleted',
       type: 'Boolean',
       args: [
