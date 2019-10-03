@@ -227,11 +227,11 @@ foam.CLASS({
           .start(self.ScrollCView.create({
             value$: self.skip$,
             extent: self.ROWS,
-            height: self.ROWS*22,
+            height: self.ROWS*21,
             width: 26,
             size$: self.filteredRows$.map(function(m){return m-1;})
           }))
-            .style({gridColumn: '2/span 1', gridRow: '2/span 2', 'margin-top':'238px'})
+            .style({gridColumn: '2/span 1', gridRow: '2/span 2', 'margin-top':'236px'})
           .end()
         .end();
     },
