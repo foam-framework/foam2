@@ -53,7 +53,7 @@ public class RulerDAOTest extends Test {
     test(user1.getEmail().equals("nanos@nanos.net"), "user's email is nanos@nanos.net: on object update 'create' rules are not executed");
     test(user1.getLastName().equals("Unknown"), "user's lastName is 'Unknown': update rule was executed");
     test(user1.getEmailVerified(), "Set emailVerified to true in rule 9");
-    Rule executeRule = (Rule) ruleDAO.find(666L);
+    Rule executeRule = (Rule) ruleDAO.find("executeRule");
     test(executeRule != null, "Test rule from executor was added successfully");
     test(executeRule.getRuleGroup().equals("fake test group"), "Test rule's group name is fake test group.");
 
@@ -91,7 +91,7 @@ public class RulerDAOTest extends Test {
 
   public void testCompositeRuleAction(X x){
     rule10 = (Rule) rule2.fclone();
-    rule10.setId(10);
+    rule10.setId("rule10. composite rule action");
     //test null array of rule actions
     CompositeRuleAction compositeAction = new CompositeRuleAction();
     Predicate pred10 = EQ(DOT(NEW_OBJ, foam.nanos.auth.User.EMAIL), "nanos@nanos.net");

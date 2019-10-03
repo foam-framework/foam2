@@ -13,7 +13,8 @@ foam.CLASS({
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.EnabledAware',
     'foam.nanos.auth.HumanNameTrait',
-    'foam.nanos.auth.LastModifiedAware'
+    'foam.nanos.auth.LastModifiedAware',
+    'foam.nanos.auth.ServiceProviderAware'
   ],
 
   requires: [
