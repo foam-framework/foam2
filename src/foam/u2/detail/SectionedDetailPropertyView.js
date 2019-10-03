@@ -279,14 +279,7 @@ foam.CLASS({
     {
       name: 'mode',
       expression: function(prop) {
-        switch ( this.controllerMode ) {
-          case this.ControllerMode.CREATE:
-            return prop.createMode;
-          case this.ControllerMode.VIEW:
-            return prop.readMode;
-          case this.ControllerMode.EDIT:
-            return prop.updateMode;
-        }
+        return this.controllerMode.getMode(prop);
       }
     }
   ],
