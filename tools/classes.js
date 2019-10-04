@@ -158,6 +158,7 @@ var classes = [
   'foam.dao.SequenceNumberDAOTest',
   'foam.dao.PipelinePMDAO',
   'foam.dao.PMDAO',
+  'foam.nanos.pm.PMInfo',
   'foam.dao.PutOnlyDAO',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
