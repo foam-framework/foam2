@@ -156,11 +156,11 @@ foam.CLASS({
       name: 'lastName',
       documentation: 'The last name of the User.',
       validateObj: function(lastName) {
-        if ( ! lastName.trim() ){
-          return 'Last Name Required.'
+        if ( ! lastName.trim() ) {
+          return 'Last Name Required.';
         } if ( lastName.length > 70 ) {
           return 'Last name cannot exceed 70 characters.';
-        } if( /\d/.test(this.lastName) ) {
+        } if ( /\d/.test(this.lastName) ) {
           return 'Last name cannot contain numbers';
         }
       },

@@ -338,7 +338,7 @@ foam.CLASS({
                         .addClass(self.myClass('arrow-right'))
                       .end()
                     .end()
-                  .end()
+                  .end();
                 })
               .end()
               .callIf(prop.validationTextVisible, function() {
