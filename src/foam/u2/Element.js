@@ -21,10 +21,26 @@ foam.ENUM({
 
   documentation: 'CRUD controller modes: CREATE/VIEW/EDIT.',
 
+  properties: [
+    {
+      class: 'String',
+      name: 'modePropertyName'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'getMode',
+      code: function(prop) {
+        return prop[this.modePropertyName];
+      }
+    }
+  ],
+
   values: [
-    { name: 'CREATE', label: 'Create' },
-    { name: 'VIEW',   label: 'View'   },
-    { name: 'EDIT',   label: 'Edit'   }
+    { name: 'CREATE', label: 'Create', modePropertyName: 'createMode' },
+    { name: 'VIEW',   label: 'View',   modePropertyName: 'readMode'   },
+    { name: 'EDIT',   label: 'Edit',   modePropertyName: 'updateMode' }
   ]
 });
 

@@ -279,14 +279,7 @@ foam.CLASS({
     {
       name: 'mode',
       expression: function(prop) {
-        switch ( this.controllerMode ) {
-          case this.ControllerMode.CREATE:
-            return prop.createMode;
-          case this.ControllerMode.VIEW:
-            return prop.readMode;
-          case this.ControllerMode.EDIT:
-            return prop.updateMode;
-        }
+        return this.controllerMode.getMode(prop);
       }
     }
   ],
@@ -318,7 +311,7 @@ foam.CLASS({
                 .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                 .start()
                   .style({ 'flex-grow': 1 })
-                  .add(prop)
+                  .tag(prop, { mode: this.mode })
                   .callIf(prop.validationStyleEnabled, function() {
                     this.enableClass(self.myClass('error'), errorSlot);
                   })
