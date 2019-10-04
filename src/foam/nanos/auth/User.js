@@ -143,12 +143,14 @@ foam.CLASS({
           return 'First name cannot contain numbers';
         }
       },
+      gridColumns: 4,
       section: 'personal'
     },
     {
       class: 'String',
       name: 'middleName',
       documentation: 'The middle name of the User.',
+      gridColumns: 4,
       section: 'personal'
     },
     {
@@ -156,14 +158,15 @@ foam.CLASS({
       name: 'lastName',
       documentation: 'The last name of the User.',
       validateObj: function(lastName) {
-        if ( ! lastName.trim() ){
-          return 'Last Name Required.'
+        if ( ! lastName.trim() ) {
+          return 'Last Name Required.';
         } if ( lastName.length > 70 ) {
           return 'Last name cannot exceed 70 characters.';
-        } if( /\d/.test(this.lastName) ) {
+        } if ( /\d/.test(this.lastName) ) {
           return 'Last name cannot contain numbers';
         }
       },
+      gridColumns: 4,
       section: 'personal'
     },
     {
@@ -303,7 +306,7 @@ foam.CLASS({
       factory: function() {
         return this.Address.create();
       },
-      view: { class: 'foam.nanos.auth.AddressDetailView' },
+      view: { class: 'foam.u2.detail.VerticalDetailView' },
       section: 'personal'
     },
     {
