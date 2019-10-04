@@ -23,6 +23,7 @@ foam.CLASS({
   css: `
     ^ {
       display: grid;
+      grid-gap: 24px 12px;
     }
   `,
 

@@ -258,6 +258,7 @@ foam.CLASS({
   `,
 
   requires: [
+    'foam.core.ConstantSlot',
     'foam.core.ProxySlot',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
@@ -272,8 +273,10 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.core.Slot',
       name: 'visibilitySlot',
-      expression: function(prop) {
-        return prop.createVisibilityFor(this.data$).map((m) => m !== this.Visibility.HIDDEN);
+      expression: function(prop, mode) {
+        return mode === this.DisplayMode.HIDDEN
+          ? this.ConstantSlot.create({ value: false })
+          : prop.createVisibilityFor(this.data$).map((m) => m !== this.Visibility.HIDDEN);
       }
     },
     {
