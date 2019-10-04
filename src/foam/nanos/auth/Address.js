@@ -18,27 +18,10 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.auth.DayOfWeek',
-    'foam.nanos.auth.Hours',
     'foam.nanos.auth.Region'
   ],
 
   properties: [
-    {
-      class: 'String',
-      name: 'type',
-      documentation: 'The type of address.'
-    },
-    {
-      class: 'Boolean',
-      name: 'verified',
-      documentation: 'Determines whether the address exists.'
-    },
-    {
-      class: 'Boolean',
-      name: 'deleted',
-      documentation: 'Determines whether the address is deleted.'
-    },
     {
       class: 'Boolean',
       name: 'structured',
@@ -224,11 +207,6 @@ foam.CLASS({
         postalCodeIsSet_ = true;`
     },
     {
-      class: 'Boolean',
-      name: 'encrypted',
-      documentation: 'Determines whether the address is encrypted.'
-    },
-    {
       class: 'Double',
       name: 'latitude',
       documentation: 'The latitude of the postal address location.'
@@ -238,17 +216,6 @@ foam.CLASS({
       name: 'longitude',
       documentation: 'The longitude of the postal address location.'
     },
-    {
-      class: 'FObjectArray',
-      of: 'foam.nanos.auth.Hours',
-      name: 'hours',
-      documentation: `
-        The opening and closing hours for this address if the address represents
-        a business.
-      `,
-      factory: function() { return []; },
-      javaFactory: 'return new Hours[] {};'
-    }
   ],
 
   methods: [
