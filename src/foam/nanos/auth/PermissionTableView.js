@@ -15,19 +15,20 @@ foam.CLASS({
   name: 'PermissionTableView',
   extends: 'foam.u2.Controller',
 
+  requires: [
+    'foam.graphics.Label',
+    'foam.graphics.ScrollCView',
+    'foam.nanos.auth.Group',
+    'foam.nanos.auth.GroupPermissionJunction',
+    'foam.nanos.auth.Permission'
+  ],
+
   imports: [
     'auth',
     'groupDAO',
     'groupPermissionJunctionDAO',
     'permissionDAO',
     'user'
-  ],
-
-  requires: [
-    'foam.graphics.Label',
-    'foam.graphics.ScrollCView',
-    'foam.nanos.auth.Group',
-    'foam.nanos.auth.Permission'
   ],
 
   constants: {
@@ -381,30 +382,15 @@ foam.CLASS({
     },
 
     function updateGroup(p_, g_, data, self) {
-      var dao = this.groupDAO;
-      var e   = foam.mlang.Expressions.create();
+      var dao = this.groupPermissionJunctionDAO;
+      var obj = this.GroupPermissionJunction.create({sourceId: g_.id, targetId: p_.id});
 
-      dao.find(g_.id).then(function(group) {
-        // Remove permission if found
-        var permissions = group.permissions.filter(function(p) {
-          return p.id != p_.id;
-        });
-
-        // parents' permissions
-        group.parent$find.then(function(groupParent) {
-          if ( groupParent != undefined ) {
-              permissions += groupParent.permissions.filter(function(gp) {
-                return gp.id == p_.id;
-              });
-          }
-        });
-
-        // Add if requested
-        if ( data.get() ) permissions.push(p_);
-
-        group.permissions = permissions;
-        dao.put(group);
-      });
+      if ( data.get() ) {
+        // Add permission
+        dao.put(obj);
+      } else {
+        // Remove permission
+        dao.remove(obj);      }
     }
   ],
 
