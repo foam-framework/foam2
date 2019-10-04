@@ -392,23 +392,8 @@ foam.CLASS({
           return 'Business name cannot be greater than 35 characters.';
         }
       },
-      section: 'business'
-    },
-    {
-      class: 'String',
-      name: 'bankIdentificationCode',
-      width: 20,
-      documentation: `The Bank Identification Code (BIC): an international bank code that
-      identifies particular banks worldwide.
-      `,
-      section: 'business'
-    },
-    {
-      class: 'Boolean',
-      name: 'businessHoursEnabled',
-      documentation: 'Determines whether business hours are enabled for the User to set.',
-      value: false,
-      section: 'business'
+      section: 'business',
+      hidden: true
     },
     {
       class: 'StringArray',
