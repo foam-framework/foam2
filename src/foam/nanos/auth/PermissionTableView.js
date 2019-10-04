@@ -18,6 +18,7 @@ foam.CLASS({
   imports: [
     'auth',
     'groupDAO',
+    'groupPermissionJunctionDAO',
     'permissionDAO',
     'user'
   ],
@@ -163,9 +164,21 @@ foam.CLASS({
   ],
 
   methods: [
-    function initMatrix() {
+    async function initMatrix() {
       var ps   = this.filteredPs, gs = this.gs;
       var self = this;
+      var perms = await this.groupPermissionJunctionDAO.select();
+      perms.array.forEach(perm => {
+        var g = perm.sourceId, p = perm.targetId;
+        var key = p + ':' + g;
+
+        var data = this.GroupPermission.create({
+          checked: true
+        });
+
+        this.gpMap[key] = data;
+      });
+
       this
         .addClass(this.myClass())
         .start()
@@ -257,7 +270,7 @@ foam.CLASS({
 
       if ( ! data ) {
         data = this.GroupPermission.create({
-          checked: this.checkPermissionForGroup(p.id, g)
+          checked: false
         });
 
         data.checked$.sub(function() {
@@ -365,14 +378,6 @@ foam.CLASS({
           self.initMatrix();
         })
       });
-    },
-
-    function checkPermissionForGroup(permissionId, group) {
-      for ( i = 0 ; i < group.permissions.length ; i++ ) {
-        if ( permissionId == group.permissions[i].id ) {
-          return true;
-        }
-      }
     },
 
     function updateGroup(p_, g_, data, self) {
