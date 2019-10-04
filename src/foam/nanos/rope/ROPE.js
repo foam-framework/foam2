@@ -11,7 +11,7 @@ foam.CLASS({
 
     ids: [ 'targetDAOKey', 'sourceDAOKey', 'junctionDAOKey', 'isInverse', 'inverseName' ],
 
-    // sourceModel and targetModel here are NOT Necessarily the same as in the relationship
+    // sourceModel and targetModel here are NOT Necessarily the same as in the relationship, may be inverse
     // a one-way ROPE relationship
     properties: [
       {

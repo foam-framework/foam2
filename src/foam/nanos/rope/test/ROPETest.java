@@ -7,29 +7,20 @@ package foam.nanos.rope.test;
 
 import java.util.List;
 import foam.nanos.rope.*;
-
-// import foam.core.*;
-// import foam.core.ContextAwareAgent;
 import foam.core.FObject;
 import foam.core.X;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.dao.MDAO;
-// import foam.mlang.predicate.Predicate;
 import foam.nanos.auth.*;
-// import foam.nanos.auth.AuthService;
-// import foam.nanos.rope.*;
-// import foam.nanos.ruler.*;
 import foam.nanos.test.Test;
 import foam.test.TestUtils;
-// import java.security.Permission;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Arrays;
 import static foam.mlang.MLang.*;
-import java.time.LocalTime;
 
 public class ROPETest extends Test {
   DAO ropeDAO, ropeUserDAO, ropeBusinessDAO, ropeAccountDAO, ropeTransactionDAO;
@@ -70,13 +61,8 @@ public class ROPETest extends Test {
     business1 = (ROPEBusiness) ropeBusinessDAO.find(2);
 
     setupROPEs(x);
-
-    LocalTime then = LocalTime.now();
     testROPEContact(x);
     testROPETransaction(x);
-    LocalTime now = LocalTime.now();
-    System.out.println("start : " + then);
-    System.out.println("end   : " + now);
   }
 
   public void testROPEContact(X x) {
