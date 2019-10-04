@@ -55,7 +55,8 @@
       class: 'String',
       name: 'id',
       visibility: 'RO',
-      tableWidth: 200
+      tableWidth: 200,
+      section: 'basicInfo'
     },
     {
       class: 'Int',
@@ -64,14 +65,16 @@
       'Rules with a higher priority are to be applied first.'+
       'The convention for values is ints that are multiple of 10.',
       permissionRequired: true,
-      tableWidth: 50
+      tableWidth: 50,
+      section: 'basicInfo'
     },
     {
       class: 'String',
       name: 'ruleGroup',
       documentation: 'ruleGroup defines sets of rules related to the same action.',
       permissionRequired: true,
-      tableWidth: 100
+      tableWidth: 100,
+      section: 'basicInfo'
     },
     {
       class: 'String',
@@ -80,7 +83,8 @@
       view: {
         class: 'foam.u2.tag.TextArea',
         rows: 12, cols: 80
-      }
+      },
+      section: 'basicInfo'
     },
     {
       class: 'String',
@@ -147,7 +151,8 @@
       value: true,
       documentation: 'Enables the rule.',
       permissionRequired: true,
-      tableWidth: 50
+      tableWidth: 70,
+      section: 'basicInfo'
     },
     {
       class: 'Boolean',
