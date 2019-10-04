@@ -143,12 +143,14 @@ foam.CLASS({
           return 'First name cannot contain numbers';
         }
       },
+      gridColumns: 4,
       section: 'personal'
     },
     {
       class: 'String',
       name: 'middleName',
       documentation: 'The middle name of the User.',
+      gridColumns: 4,
       section: 'personal'
     },
     {
@@ -164,6 +166,7 @@ foam.CLASS({
           return 'Last name cannot contain numbers';
         }
       },
+      gridColumns: 4,
       section: 'personal'
     },
     {
