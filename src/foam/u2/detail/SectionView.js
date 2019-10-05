@@ -51,6 +51,7 @@ foam.CLASS({
       value: true
     }
   ],
+
   methods: [
     function initE() {
       var self = this;
@@ -79,7 +80,7 @@ foam.CLASS({
               })
             .end()
             .start(self.Cols)
-              .style({ 'justify-content': 'end' })
+              .style({ 'justify-content': 'end', 'margin-top': '20px' })
               .forEach(section.actions, function(a) {
                 this.add(a);
               })
