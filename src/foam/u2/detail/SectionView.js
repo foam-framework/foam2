@@ -25,7 +25,7 @@ foam.CLASS({
 
   css: `
     ^ {
-      padding: 12px 0;
+      padding: 12px 0 0 0;
     }
   `,
 
