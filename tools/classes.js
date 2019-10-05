@@ -10,6 +10,7 @@ var classes = [
   'foam.core.Serializable',
   'foam.core.ContextAware',
   'foam.core.Exception',
+  'foam.core.MessageException',
   'foam.core.Freezable',
   'foam.core.ContextAgent',
   'foam.core.CompoundContextAgency',

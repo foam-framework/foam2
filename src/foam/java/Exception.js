@@ -19,11 +19,8 @@ foam.CLASS({
       cls = cls || foam.java.Exception.create();
       cls.package = this.of.package;
       cls.name = this.name;
-      cls.extends = this.of.model_.javaExceptionExtends
-        || 'java.lang.Exception';
+      cls.extends = this.getCorrectExtends_();
       cls.source = this.of.model_.source;
-      console.log("EXTENDS");
-      console.log(cls.extends);
 
       // Add property to get FOAM exception
       this.buildFoamExceptionProperty_(cls);
@@ -33,7 +30,7 @@ foam.CLASS({
     },
     function buildFoamExceptionProperty_(cls) {
       var name = "foamException";
-      var type = cls.package + '.' + this.of.name;
+      var type = 'foam.core.MessageException';
       var privateName = name + '_';
       var capitalized = foam.String.capitalize(name);
       var constantize = foam.String.constantize(name);
@@ -63,11 +60,7 @@ foam.CLASS({
         });
     },
     function buildConstructor_(cls) {
-      var superArgs = [];
-      if ( typeof this.of.model_.javaSuperArgs !== 'undefined' ) {
-        // TODO(eric): Throw FOAM exception for invalid input
-        superArgs = this.of.model_.javaSuperArgs;
-      }
+      var superArgs = this.of.model_.javaSuperArgs || [];
 
       // TODO: The two snippets below for generating
       // constructor arguments could be decoupled from
@@ -108,7 +101,7 @@ foam.CLASS({
           args: [
             {
               name: 'foamException',
-              type: this.of.name
+              type: 'foam.core.MessageException'
             },
             {
               name: 'message',
@@ -118,6 +111,21 @@ foam.CLASS({
           body: superConstructor + '\n' +
             'foamException_ = foamException;'
         })
+    },
+    function getCorrectExtends_() {
+      // The javaExceptionExtends property always overrides
+      if ( this.of.model_.javaExceptionExtends ) {
+        return this.of.model_.javaExceptionExtends
+      }
+
+      if ( this.extendsException() ) {
+        return foam.String.toNativeExceptionName(this.of.model_.extends);
+      }
+
+      return 'java.lang.Exception';
+    },
+    function extendsException() {
+      return foam.core.AbstractException.isSubClass(this.__context__.lookup(this.of.model_.extends));
     }
   ]
 });

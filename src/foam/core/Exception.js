@@ -21,6 +21,19 @@ foam.INTERFACE({
   swiftImplements: ['Error'],
 });
 
+foam.INTERFACE({
+  package: 'foam.core',
+  name: 'MessageException',
+  implements: ['foam.core.Exception'],
+
+  methods: [
+    {
+      name: 'getMessage',
+      type: 'String'
+    }
+  ]
+});
+
 foam.CLASS({
   package: 'foam.core',
   name: 'ExceptionModel',
@@ -39,6 +52,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'AbstractException',
+  implements: ['foam.core.MessageException'],
 
   documentation: 'Abstract base class for FOAM-side Exception classes.',
 

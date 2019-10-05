@@ -519,26 +519,15 @@ foam.LIB({
         body: 'return classInfo_;'
       });
 
-      // A special case is needed to add throwNative to
-      // FOAM's Exception class. This is because the
-      // method's 'throws' is derived from the name of the
-      // model being generated, and therefore can't be
-      // defined in a refinement of AbstractException.
+      // Special case to add newNative method to any instance of
+      // AbstractException. The generated code depends on the
+      // name of the exception.
       if ( foam.core.AbstractException.isSubClass(this) &&
         !(this.model_.name == 'AbstractException' && this.model_.package == 'foam.core') ) {
         let exceptionName = foam.String.toNativeExceptionName(this.name)
         cls.method({
           visibility: 'public',
-          type: 'void',
-          name: 'throwNative',
-          args: [{type: 'String', name: 'message'}],
-          throws: [exceptionName],
-          body: 'throw new ' + exceptionName +
-            '(this, message);'
-        });
-        cls.method({
-          visibility: 'public',
-          type: exceptionName,
+          type: 'java.lang.Exception',
           name: 'newNative',
           args: [{type: 'String', name: 'message'}],
           body: 'return new ' + exceptionName +
@@ -1331,7 +1320,10 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
-      name: 'javaSuperArgs'
+      name: 'javaSuperArgs',
+      factory: function() {
+        return ['foamException', 'message']
+      },
     },
   ]
 });
