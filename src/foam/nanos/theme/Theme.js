@@ -14,11 +14,53 @@ foam.CLASS({
     here.
   `,
 
+  imports: [
+    'theme',
+  ],
+
   tableColumns: [
     'id',
     'priority',
     'description',
     'preview'
+  ],
+
+  constants: [
+    {
+      name: 'MACROS',
+      value: [
+        'customCSS',
+        'primary1',
+        'primary2',
+        'primary3',
+        'primary4',
+        'primary5',
+        'approval1',
+        'approval2',
+        'approval3',
+        'approval4',
+        'approval5',
+        'warning1',
+        'warning2',
+        'warning3',
+        'warning4',
+        'warning5',
+        'destructive1',
+        'destructive2',
+        'destructive3',
+        'destructive4',
+        'destructive5',
+        'grey1',
+        'grey2',
+        'grey3',
+        'grey4',
+        'grey5',
+        'black',
+        'inputHeight',
+        'inputVerticalPadding',
+        'inputHorizontalPadding'
+      ]
+    }
   ],
 
   sections: [
@@ -102,148 +144,177 @@ foam.CLASS({
     {
       class: 'Color',
       name: 'primary1',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'primary2',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'primary3',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'primary4',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'primary5',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'approval1',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'approval2',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'approval3',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'approval4',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'approval5',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'warning1',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'warning2',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'warning3',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'warning4',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'warning5',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'destructive1',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'destructive2',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'destructive3',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'destructive4',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'destructive5',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'grey1',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'grey2',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'grey3',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'grey4',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'grey5',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'Color',
       name: 'black',
-      section: 'colours'
+      section: 'colours',
+      value: 'unset'
     },
     {
       class: 'String',
       name: 'inputHeight',
       documentation: 'Used to enforce consistent height across text-based inputs.',
-      section: 'inputs'
+      section: 'inputs',
+      value: 'unset'
     },
     {
       class: 'String',
       name: 'inputVerticalPadding',
-      section: 'inputs'
+      section: 'inputs',
+      value: 'unset'
     },
     {
       class: 'String',
       name: 'inputHorizontalPadding',
-      section: 'inputs'
+      section: 'inputs',
+      value: 'unset'
     }
   ],
 
@@ -251,8 +322,8 @@ foam.CLASS({
     {
       name: 'preview',
       tableWidth: 100,
-      code: function(X) {
-        X.ctrl.theme = this;
+      code: function() {
+        this.theme = this;
       }
     }
   ]

@@ -57,6 +57,11 @@ foam.CLASS({
         }
       }.bind(this));
 
+      socket.error.sub(function(s) {
+        s.detach();
+        sub1.detach();
+      });
+
       socket.disconnected.sub(function(s) {
         s.detach();
         sub1.detach();

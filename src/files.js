@@ -61,6 +61,7 @@ FOAM_FILES([
   { name: "foam/core/Axiom" },
   { name: "foam/core/Exception" },
   { name: "foam/core/ContextMethod" },
+  { name: "foam/nanos/theme/Theme" }, // TODO: Move this outside of nanos.
   { name: "foam/core/Window" },
   { name: "foam/core/ContextMultipleInheritence" },
   { name: "foam/core/Argument" },

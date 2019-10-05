@@ -27,7 +27,8 @@ foam.CLASS({
   topics: [
     'message',
     'connected',
-    'disconnected'
+    'disconnected',
+    'error'
   ],
 
   properties: [
@@ -37,10 +38,12 @@ foam.CLASS({
         if ( old ) {
           old.removeListener('data', this.onData);
           old.removeListener('close', this.onClose);
+          old.removeListener('error', this.onError);
         }
         if ( s ) {
           s.on('data', this.onData);
           s.on('close', this.onClose);
+          s.on('error', this.onError);
         }
       }
     },
@@ -90,6 +93,12 @@ foam.CLASS({
   ],
 
   listeners: [
+    {
+      name: 'onError',
+      code: function() {
+        this.error.pub();
+      }
+    },
     {
       name: 'onClose',
       code: function() {
