@@ -68,6 +68,11 @@ foam.CLASS({
       label: 'Query'
     },
     {
+      class: 'Long',
+      name: 'limit',
+      value: Number.MAX_SAFE_INTEGER
+    },
+    {
         class: 'String',
         name: 'key'
     },
@@ -99,7 +104,7 @@ foam.CLASS({
       label: 'Snippet',
       documentation: 'show a specific type of request would look like in a given language.',
       view: { class: 'foam.nanos.dig.DigSnippetView' },
-      expression: function(key, data, email, subject, daoKey, cmd, format, q, dataFile) {
+      expression: function(key, data, email, subject, daoKey, cmd, format, q, limit, dataFile) {
         var query = false;
         var url = "/service/dig";
 
@@ -127,19 +132,24 @@ foam.CLASS({
           url += query ? "&" : "?";
           query = true;
           url += "email=" + email;
-        }
-        if ( subject ) {
-          url += query ? "&" : "?";
-          query = true;
-          url += "subject=" + encodeURIComponent(subject);
+
+          if ( subject ) {
+            url += query ? "&" : "?";
+            query = true;
+            url += "subject=" + encodeURIComponent(subject);
+          }
         }
         if ( q ) {
           url += query ? "&" : "?";
           query = true;
           url += "q=" + encodeURIComponent(q);
         }
+        if ( limit >= 0 && limit != Number.MAX_SAFE_INTEGER ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "limit=" + limit;
+        }
         this.postURL = url;
-
 
         if ( dataFile ) {
           url += query ? "&" : "?";
