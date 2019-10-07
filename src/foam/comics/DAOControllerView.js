@@ -62,6 +62,7 @@ foam.CLASS({
 
     ^container {
       display: flex;
+      justify-content: space-between;
     }
 
     ^ .actions {
@@ -75,7 +76,6 @@ foam.CLASS({
 
     ^full-search-container {
       flex: 0 0 250px;
-      margin-right: 10px;
     }
 
     ^ .foam-u2-view-TableView {
