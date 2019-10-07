@@ -33,10 +33,12 @@ public class InputStreamBlob
         throw new RuntimeException("Offset does not match stream position");
       }
 
-      int n = 0;
       long read = 0;
       byte[] buffer = new byte[BUFFER_SIZE];
-      while ( (n = in_.read(buffer, 0, buffer.length)) != -1 && read <= length ) {
+      while ( read < length ) {
+        int n = in_.read(buffer, 0,
+          Math.min((int)(length - read), buffer.length));
+        if ( n == -1 ) break;
         out.write(buffer, 0, n);
         read += n;
       }

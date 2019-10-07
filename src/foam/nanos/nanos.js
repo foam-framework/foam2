@@ -34,6 +34,8 @@ FOAM_FILES([
   { name: "foam/nanos/auth/DeletedAware" },
   { name: "foam/nanos/auth/Group" },
   { name: "foam/nanos/auth/ServiceProvider" },
+  { name: "foam/nanos/auth/ServiceProviderAware" },
+  { name: "foam/nanos/auth/ServiceProviderAwareDAO" },
   { name: "foam/nanos/auth/Language" },
   { name: "foam/nanos/auth/CreatedAware" },
   { name: "foam/nanos/auth/CreatedAwareDAO" },
@@ -67,7 +69,6 @@ FOAM_FILES([
   { name: "foam/nanos/auth/CreatedByAwareDAO" },
   { name: "foam/nanos/auth/LastModifiedByAware" },
   { name: "foam/nanos/auth/LastModifiedByAwareDAO" },
-  { name: "foam/nanos/auth/AddressDetailView", flags: ['web'] },
   { name: "foam/nanos/auth/SignInView", flags: ['web'] },
   { name: "foam/nanos/auth/SignUpView", flags: ['web'] },
   { name: "foam/nanos/auth/PermissionedPropertyDAO" },
@@ -83,6 +84,7 @@ FOAM_FILES([
   { name: "foam/nanos/boot/DAOConfigSummaryView", flags: ['web'] },
   { name: "foam/nanos/session/Session" },
   { name: "foam/nanos/session/SessionTimer" },
+  { name: "foam/nanos/session/SessionService" },
   { name: "foam/nanos/menu/AbstractMenu" },
   { name: "foam/nanos/menu/DAOMenu" },
   { name: "foam/nanos/menu/DAOMenu2" },
@@ -122,6 +124,15 @@ FOAM_FILES([
   { name: "foam/nanos/test/Test" },
   { name: "foam/nanos/test/TestBorder" },
   { name: "foam/nanos/cron/Cron" },
+  { name: "foam/nanos/cron/CronSchedule" },
+  { name: "foam/nanos/cron/IntervalSchedule" },
+  { name: "foam/nanos/cron/NeverSchedule" },
+  { name: "foam/nanos/cron/OrSchedule" },
+  { name: "foam/nanos/cron/Schedule" },
+  { name: "foam/nanos/cron/TimeHMS" },
+  { name: "foam/nanos/cron/TimeOfDaySchedule" },
+  { name: "foam/nanos/cron/test/IntervalScheduleTest" },
+  { name: "foam/nanos/cron/test/TimeOfDayScheduleTest" },
   { name: "foam/nanos/export/ExportDriverRegistry"},
   { name: "foam/nanos/export/ExportDriver" },
   { name: "foam/nanos/export/JSONDriver"},
@@ -130,6 +141,7 @@ FOAM_FILES([
   { name: "foam/nanos/export/CSVDriver"},
   { name: "foam/nanos/auth/Relationships" },
   { name: "foam/nanos/NanoService" },
+  { name: "foam/nanos/auth/twofactor/OTPKey" },
   { name: "foam/nanos/auth/AuthService" },
   { name: "foam/nanos/auth/ProxyAuthService" },
   { name: "foam/nanos/auth/CachedAuthServiceProxy" },
@@ -138,6 +150,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/AgentAuthService" },
   { name: "foam/nanos/auth/ClientAgentAuthService" },
   { name: "foam/nanos/pm/PMTemperatureCellFormatter" },
+  { name: "foam/nanos/pm/NullPM" },
   { name: "foam/nanos/pm/PM" },
   { name: "foam/nanos/pm/PMInfo" },
   { name: "foam/nanos/pm/PMTableView", flags:['web'] },
@@ -146,6 +159,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/email/EmailService' },
   { name: 'foam/nanos/notification/email/EmailTemplate' },
   { name: 'foam/nanos/notification/email/SMTPEmailService' },
+  { name: 'foam/nanos/notification/email/Status' },
   { name: 'foam/nanos/notification/push/PushService' },
   { name: 'foam/nanos/notification/push/FirebasePushService' },
   { name: 'foam/nanos/demo/DemoObject' },
@@ -175,6 +189,7 @@ FOAM_FILES([
   // Dig
   { name: "foam/nanos/dig/exception/DigErrorMessage" },
   { name: 'foam/nanos/dig/Argument'},
+  { name: 'foam/nanos/dig/ResultView' },
   { name: 'foam/nanos/dig/DIG' },
   { name: 'foam/nanos/dig/DigFileUploadView' },
   { name: 'foam/nanos/dig/DigSnippetView' },
@@ -189,6 +204,7 @@ FOAM_FILES([
   { name: "foam/nanos/ruler/Operations" },
   { name: "foam/nanos/ruler/Rule" },
   { name: "foam/nanos/ruler/RuleAction" },
+  { name: "foam/nanos/ruler/CompositeRuleAction" },
   { name: "foam/nanos/ruler/RuleHistory" },
   { name: "foam/nanos/ruler/RuleHistoryStatus" },
   { name: "foam/nanos/ruler/RulerDAO" },
@@ -196,10 +212,29 @@ FOAM_FILES([
   { name: "foam/nanos/ruler/UpdateRulesListSink" },
   { name: "foam/nanos/ruler/TestedRule" },
   { name: "foam/nanos/ruler/RulerProbe" },
-  
+  { name: "foam/nanos/ruler/UserRefines" },
   { name: "foam/nanos/test/EchoService" },
   { name: "foam/nanos/test/SerializationTestEchoService" },
   { name: "foam/nanos/analytics/Foldable" },
   { name: "foam/nanos/analytics/Candlestick" },
-  { name: "foam/nanos/test/ClientEchoService" }
+  { name: "foam/nanos/test/ClientEchoService" },
+
+  { name: "foam/dao/jdbc/JDBCConnectionSpec" },
+
+  // foam/nanos/crunch
+  { name: "foam/nanos/crunch/crunchtest/FakeTestObject" },
+  // models
+  { name: "foam/nanos/crunch/Capability" },
+  { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
+  { name: "foam/nanos/crunch/UserCapabilityJunctionRefine" },
+  //daos
+  { name: "foam/nanos/crunch/UserCapabilityJunctionDAO" },
+  //rules
+  { name: "foam/nanos/crunch/SendNotificationOnTopLevelCapabilityStatusUpdate" },
+  { name: "foam/nanos/crunch/IsUserCapabilityJunctionStatusUpdate" },
+  { name: "foam/nanos/crunch/RemoveJunctionsOnUserRemoval" },
+  //authservice
+  { name: "foam/nanos/auth/CapabilityAuthService" },
+  // google
+  { name: "foam/nanos/geocode/GoogleMapsCredentials" }
 ]);

@@ -13,16 +13,16 @@ import foam.mlang.predicate.Not;
 import foam.mlang.predicate.Predicate;
 
 public class AltFindPlan implements FindPlan {
-  protected Object state_;
-  protected FindPlan bestPlan_ = new NotFoundPlan();
+  protected Object   state_;
+  protected FindPlan bestPlan_ = NotFoundPlan.instance();
 
   public AltFindPlan(Object state, FindPlan bestPlan){
-    state_ = state;
+    state_    = state;
     bestPlan_ = bestPlan;
   }
 
   public FObject find(Object state, Object key){
-    return bestPlan_.find(state_,key);
+    return bestPlan_.find(state_, key);
   }
 
   @Override

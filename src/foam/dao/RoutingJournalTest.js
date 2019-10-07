@@ -44,8 +44,9 @@ foam.CLASS({
 
         x = x.put("userDAO", userDAODelegate);
         x = x.put("groupDAO", groupDAODelegate);
+        x = x.put(foam.nanos.fs.Storage.class, new foam.nanos.fs.FileSystemStorage(file.getParent()));
 
-        foam.dao.RoutingJournal journal = new foam.dao.RoutingJournal.Builder(x).setFile(file).build();
+        foam.dao.RoutingJournal journal = new foam.dao.RoutingJournal.Builder(x).setFilename(file.getName()).build();
         foam.dao.DAO userDAO = new foam.dao.RoutingJDAO.Builder(x)
           .setService("userDAO")
           .setOf(foam.nanos.auth.User.getOwnClassInfo())

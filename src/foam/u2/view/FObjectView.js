@@ -7,30 +7,38 @@
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'FObjectView',
-  extends: 'foam.u2.Controller',
-
+  extends: 'foam.u2.View',
   documentation: 'View for editing FObjects.',
-
-  // css: '^:read-only { border: none; background: rgba(0,0,0,0); }'
-
   properties: [
     {
       class: 'String',
       name: 'objectClass',
-      displayWidth: 70,
-      view: { class: 'foam.u2.TextField', size: 80 },
+      label: '',
+      visibilityExpression: function(choices) {
+        return choices.length > 1 ?
+          foam.u2.Visibility.RW :
+          foam.u2.Visibility.HIDDEN;
+      },
+      view: function(_, x) {
+        return foam.u2.view.ChoiceView.create({
+          choices: x.data.choices
+        }, x);
+      },
       postSet: function(oldValue, newValue) {
         if ( newValue !== oldValue ) {
           var m = this.__context__.lookup(newValue, true);
           if ( m ) {
-            this.data = m.create(this.data, this);
+            var n = m.create(null, this);
+            n.copyFrom(this.data);
+            this.data = n;
           }
         }
       }
     },
     {
+      class: 'FObjectProperty',
       name: 'data',
-      view: { class: 'foam.u2.DetailView', showActions: false },
+      label: '',
       postSet: function(_, data) {
         if ( ! data ) {
           this.objectClass = undefined;
@@ -39,34 +47,54 @@ foam.CLASS({
         }
       }
     },
-    'choices'
-  ],
+    {
+      class: 'Class',
+      name: 'of'
+    },
+    {
+      name: 'choices',
+      expression: function(of) {
+        if ( ! of ) return [];
+        var modelIdToDeps = Object.values(foam.USED)
+          .concat(Object.values(foam.UNUSED))
+          .reduce((map, m) => {
+            var deps = m.implements ? m.implements.map(imp => {
+              return foam.String.isInstance(imp) ? imp : imp.path;
+            }) : [];
+            if ( m.extends ) deps.push(m.extends);
+            var id = m.id || m.package + '.' + m.name;
+            map[id] = deps;
+            return map;
+          }, {});
+        
+        var choices = {};
+        choices[of.id] = true;
+        while ( true ) {
+          var prev = Object.keys(choices).length;
+          for ( var [id, deps] of Object.entries(modelIdToDeps) ) {
+            if ( deps.filter(d => choices[d]).length ) choices[id] = true;
+          }
+          if ( prev == Object.keys(choices).length ) break;
+        }
 
+        return Object.keys(choices)
+          .map(id => foam.lookup(id).model_)
+          .filter(m => ! foam.core.InterfaceModel.isInstance(m))
+          .filter(m => ! m.abstract )
+          .map(m => [ m.id, m.label ]);
+      }
+    }
+  ],
   methods: [
     function initE() {
       this.SUPER();
-
-      this.addClass(this.myClass());
-
-      if ( this.choices && Array.isArray(this.choices) ) {
-        this.tag(this.OBJECT_CLASS, {choices: this.choices});
-        /*
-         * NOTE:
-         * Displays the first choice on init.
-         * Compensates for both types of choices accepted in ChoicesView.
-         */
-        if ( ! this.objectClass ) {
-          if ( Array.isArray(this.choices[0]) ) {
-            this.objectClass = this.choices[0][0];
-          } else {
-            this.objectClass = this.choices[0];
-          }
-        }
-      } else {
-        this.add(this.OBJECT_CLASS);
-      }
-
-      this.add(this.DATA);
+      this
+        .tag(foam.u2.detail.VerticalDetailView, {
+          data: this,
+          sections: [{
+            properties: [this.OBJECT_CLASS, this.DATA]
+          }]
+        })
     }
   ]
 });

@@ -17,45 +17,40 @@
 
   css: `
     ^ {
+      overflow: scroll;
+    }
+    ^table {
       position: relative;
     }
-
-    ^scrollbar {
-      box-sizing: border-box;
-      width: 1px;
-      background: rgba(0, 0, 0, 0);
-    }
-
-    ^scrollbarContainer {
-      overflow: scroll;
-      display: grid;
-      grid-template-columns: 1px 1fr;
-    }
-
-    ^ th {
-      position: -webkit-sticky;
-      position: sticky;
-      top: 0;
-    }
-
-    ^ table {
-      table-layout: fixed;
-      width: 1024px;
-    }
-
-    ^ td,
-    ^ th {
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+    ^table  .foam-u2-view-TableView-thead {
+      z-index: 1;
+      overflow: visible;
     }
   `,
 
   constants: [
     {
+      type: 'Float',
+      name: 'MIN_TOP_PAGE_PROGRESS',
+      documentation: `
+        If the "top" page isn't scrolled by at least this amount, make
+        the top page the previous page.
+        i.e. If the page that's currently in view is only scrolled 10% of the way,
+        we consider the page that's above it to be the "top" page. If the page
+        that's on screen is scrolled 51% of the way, then it is considered the top
+        page.
+      `,
+      value: 0.5
+    },
+    {
+      type: 'Integer',
+      name: 'NUM_PAGES_TO_RENDER',
+      value: 3
+    },
+    {
       type: 'Integer',
       name: 'TABLE_HEAD_HEIGHT',
-      value: 40
+      value: 51
     }
   ],
 
@@ -63,15 +58,6 @@
     {
       class: 'foam.dao.DAOProperty',
       name: 'data'
-    },
-    {
-      class: 'Int',
-      name: 'limit',
-      value: 18,
-    },
-    {
-      class: 'Int',
-      name: 'skip',
     },
     'columns',
     {
@@ -96,7 +82,7 @@
       class: 'Int',
       name: 'rowHeight',
       documentation: 'The height of one row of the table in px.',
-      value: 48
+      value: 49
     },
     {
       name: 'table_',
@@ -105,31 +91,11 @@
       `
     },
     {
-      class: 'Int',
-      name: 'accumulator',
-      documentation: 'Used internally to mimic native scrolling speed.',
-      adapt: function(_, v) {
-        return v % this.rowHeight;
-      }
-    },
-    {
-      name: 'scrollbarContainer_',
-      documentation: `
-        A reference to the scrollbar's container element so we can update the
-        height after the view has loaded.
-      `
-    },
-    {
-      type: 'String',
+      type: 'Int',
       name: 'scrollHeight',
       expression: function(daoCount, rowHeight) {
-        return rowHeight * daoCount + this.TABLE_HEAD_HEIGHT + 'px';
+        return rowHeight * daoCount + this.TABLE_HEAD_HEIGHT;
       }
-    },
-    {
-      type: 'Int',
-      name: 'lastScrollTop_',
-      value: 0
     },
     {
       type: 'Int',
@@ -138,126 +104,82 @@
       documentation: 'The number of items in each "page". There are three pages.'
     },
     {
-      class: 'foam.dao.DAOProperty',
-      name: 'initialPage1DAO_',
-      expression: function(data, pageSize) {
-        return data && data.limit(pageSize);
-      }
-    },
-    {
-      class: 'foam.dao.DAOProperty',
-      name: 'initialPage2DAO_',
-      expression: function(data, pageSize) {
-        return data && data.skip(pageSize).limit(pageSize);
-      }
-    },
-    {
-      class: 'foam.dao.DAOProperty',
-      name: 'initialPage3DAO_',
-      expression: function(data, pageSize) {
-        return data && data.skip(pageSize * 2).limit(pageSize);
-      }
-    },
-    {
-      class: 'foam.dao.DAOProperty',
-      name: 'page1DAO_',
-      factory: function() {
-        return this.initialPage1DAO_;
-      }
-    },
-    {
-      class: 'foam.dao.DAOProperty',
-      name: 'page2DAO_',
-      factory: function() {
-        return this.initialPage2DAO_;
-      }
-    },
-    {
-      class: 'foam.dao.DAOProperty',
-      name: 'page3DAO_',
-      factory: function() {
-        return this.initialPage3DAO_;
-      }
-    },
-    {
-      type: 'Int',
-      name: 'currentLowerBound',
-      value: 0
-    },
-    {
-      type: 'Int',
-      name: 'currentUpperBound',
-      expression: function(pageSize) {
-        return pageSize * 3;
-      }
-    },
-    {
-      name: 'spacer_',
-      documentation: `
-        A named reference to an element so we can update its height
-        periodically. Used to put empty space between the top of the container
-        and the tables so we create the illusion of the table always being
-        visible.
-      `
-    },
-    'topBufferTable_',
-    'visibleTable_',
-    'bottomBufferTable_',
-    {
-      type: 'Int',
-      name: 'tablesRemoved_',
-      value: 0,
-      documentation: `
-        The number of tables that have been removed due to scrolling down.
-      `
-    },
-    {
-      type: 'String',
-      name: 'spacerHeight_',
-      expression: function(tablesRemoved_, pageSize, rowHeight) {
-        return tablesRemoved_ * pageSize * rowHeight + 'px';
-      }
-    },
-    {
       type: 'Boolean',
       name: 'enableDynamicTableHeight',
       value: true,
-    }
+    },
+    {
+      class: 'Boolean',
+      name: 'multiSelectEnabled',
+      documentation: 'Pass through to UnstyledTableView.'
+    },
+    {
+      class: 'Map',
+      name: 'selectedObjects',
+      documentation: `
+        The objects selected by the user when multi-select support is enabled.
+        It's a map where the key is the object id and the value is the object.
+        Here we simply bind it to the selectedObjects property on TableView.
+      `
+    },
+    {
+      class: 'Int',
+      name: 'scrollPos_'
+    },
+    {
+      class: 'Int',
+      name: 'numPages_',
+      expression: function(daoCount, pageSize) {
+        return Math.ceil(daoCount / pageSize);
+      }
+    },
+    {
+      class: 'Int',
+      name: 'currentTopPage_',
+      expression: function(numPages_, scrollPos_, scrollHeight) {
+        var scrollPercent = scrollPos_ / scrollHeight;
+        var topPage = Math.floor(scrollPercent * numPages_);
+        var topPageProgress = (scrollPercent * numPages_) % 1;
+        if ( topPageProgress < this.MIN_TOP_PAGE_PROGRESS ) topPage = topPage - 1;
+        return Math.min(Math.max(0, numPages_ - this.NUM_PAGES_TO_RENDER), Math.max(0, topPage));
+      }
+    },
+    {
+      class: 'Map',
+      name: 'renderedPages_'
+    },
+  ],
+
+  reactions: [
+    ['', 'propertyChange.currentTopPage_', 'updateRenderedPages_'],
+    ['', 'propertyChange.table_', 'updateRenderedPages_'],
+    ['', 'propertyChange.daoCount', 'refresh'],
   ],
 
   methods: [
     function init() {
-      this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.onDAOUpdate })));
+      this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.updateCount })));
       this.updateCount();
     },
 
     function initE() {
       this.
         addClass(this.myClass()).
-        start('div', undefined, this.scrollbarContainer_$).
-          addClass(this.myClass('scrollbarContainer')).
-          on('scroll', this.onScroll).
-          start().
-            addClass(this.myClass('scrollbar')).
-            style({ height: this.scrollHeight$ }).
-          end().
-          start().
-            start('div', undefined, this.spacer_$).
-              style({ height: this.spacerHeight_$ }).
-            end().
-            start(this.TableView, {
-              data: this.page1DAO_$proxy,
-              columns: this.columns,
-              contextMenuActions: this.contextMenuActions,
-              selection$: this.selection$,
-              editColumnsEnabled: this.editColumnsEnabled
-            }, this.table_$).
-              addClass(this.myClass('table')).
-            end().
-          end().
+        on('scroll', this.onScroll).
+        start(this.TableView, {
+          data: foam.dao.NullDAO.create({of: this.data.of}),
+          columns: this.columns,
+          contextMenuActions: this.contextMenuActions,
+          selection$: this.selection$,
+          editColumnsEnabled: this.editColumnsEnabled,
+          multiSelectEnabled: this.multiSelectEnabled,
+          selectedObjects$: this.selectedObjects$
+        }, this.table_$).
+          addClass(this.myClass('table')).
+          style({
+            height: this.scrollHeight$.map(h => h + 'px')
+          }).
         end();
-
-      this.onDetach(this.onload.sub(this.addTbodies));
 
       /*
         to be used in cases where we don't want the whole table to
@@ -271,134 +193,74 @@
           window.removeEventListener('resize', this.updateTableHeight);
         });
       }
-    },
-    {
-      name: 'refresh',
-      code: function() {
-        this.lastScrollTop_ = 0;
-        this.skip = 0;
-        this.currentLowerBound = 0;
-        this.currentUpperBound = this.pageSize * 3;
-        this.tablesRemoved_ = 0;
-        this.page1DAO_ = this.initialPage1DAO_;
-        this.page2DAO_ = this.initialPage2DAO_;
-        this.page3DAO_ = this.initialPage3DAO_;
-        this.table_.childNodes
-          .filter((x) => x.nodeName === 'TBODY')
-          .forEach((x) => x.remove());
-        this.table_.add(this.table_.rowsFrom(this.page1DAO_$proxy));
-        this.addTbodies();
-        if ( this.scrollbarContainer_ && this.scrollbarContainer_.el() ) {
-          this.scrollbarContainer_.el().scrollTop = 0;
-        }
-      }
-    },
-    {
-      name: 'scrollDownOnePage',
-      code: function() {
-        // Update the bounds.
-        if ( this.currentUpperBound > this.daoCount ) return;
-
-        this.currentUpperBound += this.pageSize;
-        this.currentLowerBound += this.pageSize;
-
-        // Remove the top buffer table.
-        this.topBufferTable_.remove();
-
-        // Update the table references.
-        this.topBufferTable_ = this.visibleTable_;
-        this.visibleTable_   = this.bottomBufferTable_;
-
-        // Add a new bottom buffer table.
-        var daoName = ['page1DAO_', 'page2DAO_', 'page3DAO_'][this.tablesRemoved_ % 3];
-        this.tablesRemoved_ += 1;
-        this[daoName] = this.data.skip(this.currentUpperBound - this.pageSize).limit(this.pageSize);
-        var rows = this.table_.rowsFrom(this[daoName + '$proxy']);
-        this.table_.add(rows);
-        var x = this.table_.childNodes.filter((x) => x.nodeName === 'TBODY');
-        this.bottomBufferTable_ = x[x.length - 1];
-      }
-    },
-    {
-      name: 'scrollUpOnePage',
-      code: function() {
-        // Update the bounds.
-        if ( this.currentLowerBound <= 0 ) return;
-
-        this.currentLowerBound -= this.pageSize;
-        this.currentUpperBound -= this.pageSize;
-
-        // Remove the bottom buffer table.
-        this.bottomBufferTable_.remove();
-        this.tablesRemoved_ -= 1;
-
-        // Update the table references.
-        this.bottomBufferTable_ = this.visibleTable_;
-        this.visibleTable_      = this.topBufferTable_;
-
-        // Add a new top buffer table.
-        var daoName = ['page1DAO_', 'page2DAO_', 'page3DAO_'][this.tablesRemoved_ % 3];
-        this[daoName] = this.data.skip(this.currentLowerBound).limit(this.pageSize);
-        var rows = this.table_.rowsFrom(this[daoName + '$proxy']);
-        this.table_.insertBefore(this.table_.slotE_(rows), this.visibleTable_);
-        var x = this.table_.childNodes.filter((x) => x.nodeName === 'TBODY');
-        this.topBufferTable_ = x[0];
-      }
-    },
-    {
-      name: 'updateCount',
-      code: function() {
-        return this.data$proxy.select(this.Count.create()).then((s) => {
-          this.daoCount = s.value;
-        });
-      }
     }
   ],
 
   listeners: [
     {
-      name: 'onScroll',
-      code: function(e) {
-        var deltaY = e.target.scrollTop - this.lastScrollTop_;
-        var negative = deltaY < 0;
-        var rows = Math.floor(Math.abs(this.accumulator + deltaY) / this.rowHeight);
-        this.accumulator += deltaY;
-        var oldSkip = this.skip;
-        this.skip = Math.min(this.daoCount - this.limit, Math.max(0, this.skip + (negative ? -rows : rows)));
-        this.lastScrollTop_ = e.target.scrollTop;
-
-        var uBound = () => this.currentUpperBound - this.pageSize;
-        var lBound = () => this.currentLowerBound + this.pageSize;
-
-        if ( oldSkip <= uBound() && this.skip > uBound() ) {
-          // The user scrolled down past a page boundary.
-          while (
-            this.skip > uBound() &&
-            this.currentUpperBound < this.daoCount
-          ) {
-            this.scrollDownOnePage();
-          }
-        } else if ( oldSkip > lBound() && this.skip <= lBound() ) {
-          // The user scrolled up past a page boundary.
-          while ( this.skip <= lBound() && this.currentLowerBound > 0 ) {
-            this.scrollUpOnePage();
-          }
-        }
+      name: 'refresh',
+      isFramed: true,
+      code: function() {
+        Object.keys(this.renderedPages_).forEach(i => {
+          this.renderedPages_[i].remove();
+          delete this.renderedPages_[i];
+        });
+        this.updateRenderedPages_();
+        if ( this.el() ) this.el().scrollTop = 0;
       }
     },
     {
-      // TODO: Avoid onDAOUpdate approaches.
-      name: 'onDAOUpdate',
+      name: 'updateCount',
       isFramed: true,
       code: function() {
-        this.updateCount().then(() => this.refresh());
+        return this.data$proxy.select(this.Count.create()).then((s) => {
+          this.daoCount = s.value;
+        });
+      }
+    },
+    {
+      name: 'updateRenderedPages_',
+      isFramed: true,
+      code: function() {
+        if ( ! this.table_ ) return;
+
+        // Remove any pages that are no longer on screen to save on
+        // the amount of DOM we add to the page.
+        Object.keys(this.renderedPages_).forEach(i => {
+          if ( i >= this.currentTopPage_ && i < this.currentTopPage_ + this.NUM_PAGES_TO_RENDER ) return;
+          this.renderedPages_[i].remove();
+          delete this.renderedPages_[i];
+        });
+
+        // Add any pages that are not already rendered.
+        for ( var i = 0; i < Math.min(this.numPages_, this.NUM_PAGES_TO_RENDER) ; i++) {
+          var page = this.currentTopPage_ + i;
+          if ( this.renderedPages_[page] ) continue;
+          var dao = this.data$proxy.limit(this.pageSize).skip(page * this.pageSize);
+          var tbody = this.table_.slotE_(this.table_.rowsFrom(dao));
+          tbody.style({
+            position: 'absolute',
+            width: '100%',
+            top: this.TABLE_HEAD_HEIGHT + page * this.pageSize * this.rowHeight + 'px'
+          });
+          this.table_.add(tbody);
+          this.renderedPages_[page] = tbody;
+        }
+
+      }
+    },
+    {
+      name: 'onScroll',
+      isFramed: true,
+      code: function(e) {
+        this.scrollPos_ = e.target.scrollTop;
       }
     },
     {
       name: 'updateTableHeight',
       code: function() {
         // Find the distance from the top of the table to the top of the screen.
-        var distanceFromTop = this.scrollbarContainer_.el().getBoundingClientRect().y;
+        var distanceFromTop = this.el().getBoundingClientRect().y;
 
         // Calculate the remaining space we have to make use of.
         var remainingSpace = window.innerHeight - distanceFromTop;
@@ -407,18 +269,7 @@
         // Leave space for the footer.
         remainingSpace -= 44;
 
-        this.scrollbarContainer_.style({ height: `${remainingSpace}px` });
-      }
-    },
-    {
-      name: 'addTbodies',
-      code: function() {
-        this.table_.add(this.table_.rowsFrom(this.page2DAO_$proxy));
-        this.table_.add(this.table_.rowsFrom(this.page3DAO_$proxy));
-        var tbodies = this.table_.childNodes.filter((x) => x.nodeName === 'TBODY');
-        this.topBufferTable_ = tbodies[0];
-        this.visibleTable_ = tbodies[1];
-        this.bottomBufferTable_ = tbodies[2];
+        this.style({ height: `${remainingSpace}px` });
       }
     }
   ]

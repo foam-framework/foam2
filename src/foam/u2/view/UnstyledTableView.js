@@ -20,6 +20,8 @@ foam.CLASS({
     'foam.u2.md.OverlayDropdown',
     'foam.u2.view.OverlayActionListView',
     'foam.u2.view.EditColumnsView',
+    'foam.u2.view.ColumnConfig',
+    'foam.u2.view.ColumnVisibility',
     'foam.u2.tag.Image'
   ],
 
@@ -33,7 +35,9 @@ foam.CLASS({
     'ctrl',
     'dblclick?',
     'editRecord?',
-    'selection? as importSelection'
+    'filteredTableColumns?',
+    'selection? as importSelection',
+    'stack?'
   ],
 
   properties: [
@@ -53,37 +57,43 @@ foam.CLASS({
     },
     {
       name: 'columns_',
-      expression: function(columns, of) {
-        var of = this.of;
+      expression: function(columns, of, allColumns, editColumnsEnabled) {
         if ( ! of ) return [];
+        columns = columns.map(c => foam.String.isInstance(c) ? this.of.getAxiomByName(c) : c);
+        if ( ! editColumnsEnabled ) return columns;
 
-        return columns.map(function(p) {
-          var c = typeof p == 'string' ?
-            of.getAxiomByName(p) :
-            p;
+        // Reorder allColumns to respect the order of columns first followed by
+        // the order of allColumns.
+        allColumns = columns.concat(allColumns);
+        allColumns = allColumns.filter((c, i) => {
+          return allColumns.findIndex(a => a.name == c.name) == i;
+        });
 
-           if ( ! c ) {
-             console.error('Unknown table column: ', p);
-           }
-
-          return c;
-        }).filter(function(c) { return c; });
+        return allColumns.filter(c => {
+          var v = this.ColumnConfig.create({ of: of, axiom : c }).visibility;
+          return v == this.ColumnVisibility.ALWAYS_HIDE ? false :
+                 v == this.ColumnVisibility.ALWAYS_SHOW ? true :
+                 columns.find(c2 => c.name == c2.name)  ? true : false;
+        });
+      },
+    },
+    {
+      name: 'allColumns',
+      expression: function(of) {
+        return ! of ? [] : [].concat(
+          of.getAxiomsByClass(foam.core.Property)
+            .filter(p => p.tableCellFormatter && ! p.hidden),
+          of.getAxiomsByClass(foam.core.Action)
+        );
       }
     },
     {
       name: 'columns',
-      expression: function(of) {
-        var of = this.of;
+      expression: function(of, allColumns) {
         if ( ! of ) return [];
-
-        var tableColumns = of.getAxiomByName('tableColumns');
-
-        if ( tableColumns ) return tableColumns.columns;
-
-        return of.getAxiomsByClass(foam.core.Property).
-            filter(function(p) { return p.tableCellFormatter && ! p.hidden; }).
-            map(foam.core.Property.NAME.f);
-      }
+        var tc = of.getAxiomByName('tableColumns');
+        return tc ? tc.columns.map(c => of.getAxiomByName(c)) : allColumns;
+      },
     },
     {
       class: 'FObjectArray',
@@ -184,38 +194,31 @@ foam.CLASS({
         column;
     },
 
-    function createColumnSelection() {
-      var editor = this.EditColumnsView.create({
-        columns: this.columns,
-        columns_$: this.columns_$,
-        table: this.of
-      });
-
-      return this.OverlayDropdown.create({}, this.ctrl).add(editor);
-    },
-
     function initE() {
       var view = this;
       var columnSelectionE;
 
-      if ( this.editColumnsEnabled ) {
-        columnSelectionE = this.createColumnSelection();
-        this.ctrl.add(columnSelectionE);
+      if ( this.filteredTableColumns$ ) {
+        this.onDetach(this.filteredTableColumns$.follow(
+          this.columns_$.map((cols) => cols.map((a) => a.name))));
       }
 
       this.
         addClass(this.myClass()).
         addClass(this.myClass(this.of.id.replace(/\./g, '-'))).
-        setNodeName('table').
-        start('thead').
+        start().
+          addClass(this.myClass('thead')).
           show(this.showHeader$).
           add(this.slot(function(columns_) {
-            return this.E('tr').
+            return this.E().
+              addClass(view.myClass('tr')).
+
               // If multi-select is enabled, then we show a checkbox in the
               // header that allows you to select all or select none.
               callIf(view.multiSelectEnabled, function() {
                 var slot = view.SimpleSlot.create();
-                this.start('th').
+                this.start().
+                  addClass(view.myClass('th')).
                   tag(view.CheckBox, {}, slot).
                   style({ width: '42px' }).
                 end();
@@ -246,10 +249,15 @@ foam.CLASS({
 
               // Render the table headers for the property columns.
               forEach(columns_, function(column) {
-                this.start('th').
+                this.start().
+                  addClass(view.myClass('th')).
                   addClass(view.myClass('th-' + column.name)).
-                  callIf(column.tableWidth, function() {
-                    this.style({ width: column.tableWidth + 'px' });
+                  call(function() {
+                    if ( column.tableWidth ) {
+                      this.style({ flex: `0 0 ${column.tableWidth}px` });
+                    } else {
+                      this.style({ flex: '1 0 0' });
+                    }
                   }).
                   on('click', function(e) {
                     view.sortBy(column);
@@ -269,17 +277,23 @@ foam.CLASS({
               // menu. If the column-editing feature is enabled, add that to the
               // th we create here.
               call(function() {
-                this.start('th').
+                this.start().
+                  addClass(view.myClass('th')).
+                  style({ flex: '0 0 60px' }).
                   callIf(view.editColumnsEnabled, function() {
                     this.addClass(view.myClass('th-editColumns')).
                     on('click', function(e) {
-                      columnSelectionE.open(e.clientX, e.clientY);
+                      if ( ! view.stack ) return;
+                      view.stack.push({
+                        class: 'foam.u2.view.EditColumnsView',
+                        of: view.of,
+                        allColumns: view.allColumns
+                      });
                     }).
                     tag(view.Image, { data: '/images/Icon_More_Resting.svg' }).
                     addClass(view.myClass('vertDots')).
                     addClass(view.myClass('noselect'));
                   }).
-                  style({ width: '60px' }).
                   tag('div', null, view.dropdownOrigin$).
                 end();
               });
@@ -317,9 +331,11 @@ foam.CLASS({
             : modelActions;
 
           return this.
-            E('tbody').
+            E().
+            addClass(this.myClass('tbody')).
             select(proxy, function(obj) {
-              return this.E('tr').
+              return this.E().
+                addClass(view.myClass('tr')).
                 on('mouseover', function() { view.hoverSelection = obj; }).
                 callIf(view.dblclick && ! view.disableUserSelection, function() {
                   this.on('dblclick', function() {
@@ -351,7 +367,8 @@ foam.CLASS({
                 callIf(view.multiSelectEnabled, function() {
                   var slot = view.SimpleSlot.create();
                   this
-                    .start('td')
+                    .start()
+                      .addClass(view.myClass('td'))
                       .tag(view.CheckBox, { data: view.idsOfObjectsTheUserHasInteractedWith_[obj.id] ? !!view.selectedObjects[obj.id] : view.allCheckBoxesEnabled_ }, slot)
                     .end();
 
@@ -409,7 +426,8 @@ foam.CLASS({
 
                 forEach(columns_, function(column) {
                   this.
-                    start('td').
+                    start().
+                      addClass(view.myClass('td')).
                       callOn(column.tableCellFormatter, 'format', [
                         column.f ? column.f(obj) : null, obj, column
                       ]).
@@ -421,11 +439,19 @@ foam.CLASS({
                           }
                         } catch (err) {}
                       }).
+                      call(function() {
+                        if ( column.tableWidth ) {
+                          this.style({ flex: `0 0 ${column.tableWidth}px` });
+                        } else {
+                          this.style({ flex: '1 0 0' });
+                        }
+                      }).
                     end();
                 }).
-                start('td').
+                start().
+                  addClass(view.myClass('td')).
                   attrs({ name: 'contextMenuCell' }).
-                  addClass(view.myClass('context-menu-cell')).
+                  style({ flex: '0 0 60px' }).
                   tag(view.OverlayActionListView, {
                     data: actions,
                     obj: obj
@@ -435,5 +461,6 @@ foam.CLASS({
         });
       }
     }
-  ]
+  ],
+
 });

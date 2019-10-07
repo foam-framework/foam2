@@ -205,6 +205,9 @@ foam.CLASS({
       if ( o.class && this.__context__.lookup(o.class, true) ) {
         return this.adaptValue(this.__context__.lookup(o.class).create(o, this));
       }
+      if ( foam.core.FObject.isSubClass(o) ) {
+        return foam.mlang.Constant.create({ value: o });
+      }
 
       console.error('Invalid expression value: ', o);
     }
@@ -435,7 +438,7 @@ foam.CLASS({
       args: [
         {
           name: 'stmt',
-          javaType: 'foam.dao.pg.IndexedPreparedStatement'
+          javaType: 'foam.dao.jdbc.IndexedPreparedStatement'
         }
       ],
       javaCode: '//noop',
@@ -474,7 +477,7 @@ foam.CLASS({
       args: [
         {
           name: 'stmt',
-          javaType: 'foam.dao.pg.IndexedPreparedStatement'
+          javaType: 'foam.dao.jdbc.IndexedPreparedStatement'
         }
       ],
       javaCode: ' '
@@ -3148,6 +3151,30 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'DotF',
+  extends: 'foam.mlang.predicate.Binary',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: `A binary predicate that evaluates arg1 as a predicate with
+    arg2 as its argument.`,
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: `
+        Object predicate = getArg1().f(obj);
+        if ( predicate instanceof Predicate ) {
+          return ((Predicate) predicate).f(getArg2().f(obj));
+        }
+        return false;
+      `
+    }
+  ]
+});
+
+
+foam.CLASS({
   package: 'foam.mlang',
   name: 'PredicatedExpr',
   extends: 'foam.mlang.AbstractExpr',
@@ -3217,6 +3244,9 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
+      code: function(obj) {
+        return this.targetClass.id == obj.cls_.id;
+      },
       javaCode: `
         return getTargetClass().getObjClass() == obj.getClass();
       `
@@ -3419,6 +3449,26 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.mlang',
+  name: 'CurrentTime',
+  extends: 'foam.mlang.AbstractExpr',
+  axioms: [
+    { class: 'foam.pattern.Singleton' }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(_) {
+        return new Date();
+      },
+      javaCode: `
+        return new java.util.Date();
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang',
   name: 'StringLength',
   extends: 'foam.mlang.AbstractExpr',
   properties: [
@@ -3477,6 +3527,116 @@ try {
 return true;
       `
     }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'isAuthorizedToRead',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: 'Expression which returns true if the user has a given permission.',
+
+  javaImports: [
+    'foam.core.FObject',
+    'foam.core.X',
+    'foam.nanos.auth.AuthorizationException'
+  ],
+
+  properties: [
+    {
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
+      javaType: 'foam.core.X',
+      flags: ['java'],
+      name: 'userContext'
+    },
+    {
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
+      javaType: 'foam.nanos.auth.Authorizer',
+      flags: ['java'],
+      name: 'authorizer'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      code: function() {
+        // Authorization on the client is futile since the user has full control
+        // over the code that executes on their machine.
+        // A client-side implementation of this predicate would also have to be
+        // async in this case because we would need to access the auth service,
+        // but we don't support async predicate execution on the client as far
+        // as I'm aware.
+        return true;
+      },
+      javaCode: `
+        X x = (X) getUserContext();
+        foam.nanos.auth.Authorizer authorizer = getAuthorizer();
+        try {
+          authorizer.authorizeOnRead(x, (FObject) obj);
+        } catch ( AuthorizationException e ) {
+          return false;
+        }
+        return true;
+      `
+    },
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'isAuthorizedToDelete',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: 'Expression which returns true if the user has a given permission.',
+
+  javaImports: [
+    'foam.core.FObject',
+    'foam.core.X',
+    'foam.nanos.auth.AuthorizationException'
+  ],
+
+  properties: [
+    {
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
+      javaType: 'foam.core.X',
+      flags: ['java'],
+      name: 'userContext'
+    },
+    {
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
+      javaType: 'foam.nanos.auth.Authorizer',
+      flags: ['java'],
+      name: 'authorizer'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      code: function() {
+        // Authorization on the client is futile since the user has full control
+        // over the code that executes on their machine.
+        // A client-side implementation of this predicate would also have to be
+        // async in this case because we would need to access the auth service,
+        // but we don't support async predicate execution on the client as far
+        // as I'm aware.
+        return true;
+      },
+      javaCode: `
+        X x = (X) getUserContext();
+        foam.nanos.auth.Authorizer authorizer = getAuthorizer();
+        try {
+          authorizer.authorizeOnDelete(x, (FObject) obj);
+        } catch ( AuthorizationException e ) {
+          return false;
+        }
+        return true;
+      `
+    },
   ]
 });
 

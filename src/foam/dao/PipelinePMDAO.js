@@ -171,7 +171,7 @@ Creates the PM that will measure the performance of each operation and creates a
       javaType: 'X',
       javaCode: `
     if ( getEnabled() ) {
-      PM pm = new PM();
+      PM pm = (PM) x.get("PM");
       pm.setClassType(this.getOwnClassInfo());
       pm.setName(op);
       pm.init_();

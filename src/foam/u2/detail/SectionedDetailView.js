@@ -11,20 +11,34 @@ foam.CLASS({
 
   requires: [
     'foam.u2.detail.SectionView',
-    'foam.u2.layout.Cols',
-    'foam.u2.layout.Rows',
+    'foam.u2.layout.Grid',
+    'foam.u2.layout.GUnit',
     'foam.u2.borders.CardBorder'
   ],
 
   css: `
-    .inner-card {
-      padding: 24px 16px
+    ^ .inner-card {
+      padding: 14px 16px
     }
 
     ^ .foam-u2-view-ScrollTableView table {
       width: 100%;
     }
+
+    ^ ^card-container + ^card-container {
+      margin-top: 16px;
+    }
   `,
+
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'border',
+      factory: function() {
+        return this.CardBorder;
+      }
+    }
+  ],
 
   methods: [
     function initE() {
@@ -37,14 +51,17 @@ foam.CLASS({
           if ( ! data ) return;
 
           return self.E()
-            .start(self.Rows)
+            .start(self.Grid)
               .forEach(sections, function(s) {
                 this
-                  .start()
-                    .style({ padding: '16px 0' })
+                  .start(self.GUnit, { columns: s.gridColumns })
+                    .addClass(self.myClass('card-container'))
                     .show(s.createIsAvailableFor(self.data$))
-                    .start('h2').add(s.title$).end()
-                    .start(self.CardBorder)
+                    .start('h2')
+                      .add(s.title$)
+                      .show(s.title$)
+                    .end()
+                    .start(self.border)
                       .addClass('inner-card')
                       .tag(self.SectionView, {
                         data$: self.data$,

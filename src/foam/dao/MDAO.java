@@ -162,10 +162,10 @@ public class MDAO
       Sink dependSink = new ArraySink();
       // When we have groupBy, order, skip, limit such requirement, we can't do it separately so I replace a array sink to temporarily holde the whole data
       //Then after the plan wa slelect we change it to the origin sink
-      int length = ( (Or) simplePredicate ).getArgs().length;
+      int length = ((Or) simplePredicate).getArgs().length;
       List<Plan> planList = new ArrayList<>();
-      for ( int i = 0; i < length; i++ ) {
-        Predicate arg = ( (Or) simplePredicate ).getArgs()[i];
+      for ( int i = 0 ; i < length ; i++ ) {
+        Predicate arg = ((Or) simplePredicate).getArgs()[i];
         planList.add(index_.planSelect(state, dependSink, 0, AbstractDAO.MAX_SAFE_INTEGER, null, arg));
       }
       plan = new OrPlan(simplePredicate, planList);
@@ -177,10 +177,14 @@ public class MDAO
       pm = new PM(this.getClass(), "MDAO:UnindexedSelect:" + getOf().getId());
       if ( ! unindexed_.contains(getOf().getId())) {
         if ( ! predicate.equals(simplePredicate) ) {
-          logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
+          if ( logger != null ) {
+            logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
+          }
         }
         unindexed_.add(getOf().getId());
-        logger.warning("Unindexed search on MDAO", getOf().getId(), simplePredicate.toString());
+        if ( logger != null ) {
+          logger.warning("Unindexed search on MDAO", getOf().getId(), simplePredicate.toString());
+        }
       }
     }
 
@@ -188,11 +192,12 @@ public class MDAO
 
     if ( pm != null ) pm.log(x);
 
+    sink.eof();
     return sink;
   }
 
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( predicate == null ) {
+    if ( predicate == null && skip == 0 && limit == MAX_SAFE_INTEGER ) {
       synchronized ( writeLock_ ) {
         setState(null);
       }

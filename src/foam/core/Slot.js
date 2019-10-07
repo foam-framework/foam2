@@ -512,6 +512,8 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'FObjectArray',
+      of: 'foam.core.Slot',
       name: 'slots'
     }
   ],

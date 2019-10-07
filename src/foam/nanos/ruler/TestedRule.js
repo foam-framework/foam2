@@ -29,9 +29,17 @@ foam.CLASS({
       name: 'message'
     },
     {
+      class: 'String',
+      name: 'name'
+    },
+    {
       class: 'Boolean',
       name: 'passed',
       value: true
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'probeInfo'
     }
   ],
   methods: [

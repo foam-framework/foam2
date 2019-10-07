@@ -7,12 +7,14 @@
 package foam.mlang;
 
 import foam.core.ClassInfo;
+import foam.core.X;
 import foam.dao.Sink;
 import foam.mlang.expr.Dot;
 import foam.mlang.order.Comparator;
 import foam.mlang.order.Desc;
 import foam.mlang.predicate.*;
 import foam.mlang.sink.*;
+import foam.nanos.auth.Authorizer;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -190,6 +192,33 @@ public class MLang
   public static Predicate HAS(Object o) {
     return new Has.Builder(null)
       .setArg1(MLang.prepare(o))
+      .build();
+  }
+
+  // used by AuthenticatedDAO
+  public static Predicate HAS_PERMISSION(X userContext, Boolean remove, String permissionPrefix) {
+    return remove? IS_AUTHORIZED_TO_DELETE(userContext, new foam.nanos.auth.StandardAuthorizer(permissionPrefix))
+      : IS_AUTHORIZED_TO_READ(userContext, new foam.nanos.auth.StandardAuthorizer(permissionPrefix));
+  }
+
+  // used by AuthorizationDAO
+  public static Predicate IS_AUTHORIZED_TO_READ(X userContext, Authorizer authorizer) {
+    return new isAuthorizedToRead.Builder(null)
+      .setUserContext(userContext)
+      .setAuthorizer(authorizer)
+      .build();
+  }
+  public static Predicate IS_AUTHORIZED_TO_DELETE(X userContext, Authorizer authorizer) {
+    return new isAuthorizedToDelete.Builder(null)
+      .setUserContext(userContext)
+      .setAuthorizer(authorizer)
+      .build();
+  }
+
+  public static Predicate DOT_F(Object o1, Object o2) {
+    return new DotF.Builder(null)
+      .setArg1(MLang.prepare(o1))
+      .setArg2(MLang.prepare(o2))
       .build();
   }
 }

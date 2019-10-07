@@ -18,7 +18,9 @@ foam.CLASS({
     'bsh.EvalError',
     'bsh.Interpreter',
     'foam.dao.DAO',
-    'foam.core.FObject'
+    'foam.core.FObject',
+    'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.AuthService'
   ],
 
   ids: [ 'name' ],
@@ -193,8 +195,13 @@ foam.CLASS({
           saveService(x, service);
           return service;
         } catch (EvalError e) {
-          System.err.println("NSpec serviceScript error: " + getServiceScript());
-          e.printStackTrace();
+          foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
+          if ( logger != null ) {
+            logger.error("NSpec serviceScript error", getServiceScript(), e);
+          } else {
+            System.err.println("NSpec serviceScript error: " + getServiceScript());
+            e.printStackTrace();
+          }
         }
 
         return null;
@@ -204,6 +211,26 @@ foam.CLASS({
         'java.lang.InstantiationException',
         'java.lang.IllegalAccessException'
       ],
+    },
+    {
+      name: 'checkAuthorization',
+      type: 'Void',
+      documentation: `
+        Given a user's session context, throw an exception if the user doesn't
+        have permission to access this service.
+      `,
+      args: [
+        { type: 'Context', name: 'x' }
+      ],
+      javaCode: `
+        if ( ! getAuthenticate() ) return;
+
+        AuthService auth = (AuthService) x.get("auth");
+
+        if ( ! auth.check(x, "service." + getName()) ) {
+          throw new AuthorizationException(String.format("You do not have permission to access the service named '%s'.", getName()));
+        }
+      `
     }
   ],
 

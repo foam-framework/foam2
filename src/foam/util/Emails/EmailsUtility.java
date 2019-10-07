@@ -59,12 +59,13 @@ public class EmailsUtility {
     try {
       cts.apply(x, group, emailMessage, templateArgs);
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error(e);
       return;
     }
 
     // SERVICE CALL: passing emailMessage through to actual email service.
-    DAO email = (DAO) x.get("emailMessageDAO");
+    DAO email = (DAO) x.get("localEmailMessageDAO");
+    emailMessage.setStatus(foam.nanos.notification.email.Status.UNSENT);
     email.put(emailMessage);
   }
 

@@ -6,14 +6,51 @@
 
 foam.CLASS({
   package: 'foam.glang',
-  name: 'EndOfTimeSpan',
+  name: 'AbstractDateGlang',
   extends: 'foam.mlang.AbstractExpr',
-  implements: [ 'foam.core.Serializable' ],
+  abstract: true,
+  requires: [
+    'foam.mlang.IdentityExpr',
+  ],
+  implements: [
+    'foam.core.Serializable',
+    'foam.mlang.order.Comparator',
+  ],
   properties: [
     {
       class: 'foam.mlang.ExprProperty',
-      name: 'delegate'
+      name: 'delegate',
+      factory: function() { return this.IdentityExpr.create() }
+    }
+  ],
+  methods: [
+    {
+      name: 'createStatement',
+      javaCode: 'return "";'
     },
+    {
+      name: 'prepareStatement',
+      javaCode: '// noop'
+    },
+    {
+      name: 'compare',
+      code: function(o1, o2) {
+        return foam.Date.compare(this.f(o1), this.f(o2));
+      },
+      javaCode: `
+        java.util.Date date1 = (java.util.Date) f(o1);
+        java.util.Date date2 = (java.util.Date) f(o2);
+        return date1.compareTo(date2);
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'EndOfTimeSpan',
+  extends: 'foam.glang.AbstractDateGlang',
+  properties: [
     {
       class: 'Long',
       name: 'timeSpanMs'
@@ -38,15 +75,68 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.glang',
-  name: 'EndOfDay',
-  extends: 'foam.mlang.AbstractExpr',
-  implements: [ 'foam.core.Serializable' ],
-  properties: [
+  name: 'StartOfHour',
+  extends: 'foam.glang.AbstractDateGlang',
+  methods: [
     {
-      class: 'foam.mlang.ExprProperty',
-      name: 'delegate'
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        ts.setMinutes(0, 0);
+        return ts;
+      }
     }
-  ],
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'EndOfHour',
+  extends: 'foam.glang.AbstractDateGlang',
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        ts.setMinutes(59, 59);
+        ts.setMilliseconds(999);
+        return ts;
+      },
+      javaCode: `
+      // Convert to LocalDate
+      java.util.Date date = (java.util.Date) getDelegate().f(obj);
+      java.time.LocalDate localDate = java.time.Instant.ofEpochMilli(date.getTime()).atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+
+      // Convert to LocalDateTime set to End of Day
+      java.time.LocalDateTime localDateTime = localDate.atTime(java.time.LocalTime.MAX);
+
+      // Convert to Date using LocalDateTime
+      return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant());
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'StartOfDay',
+  extends: 'foam.glang.AbstractDateGlang',
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        ts.setHours(0, 0, 0, 0);
+        return ts;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'EndOfDay',
+  extends: 'foam.glang.AbstractDateGlang',
   methods: [
     {
       name: 'f',
@@ -73,21 +163,16 @@ return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()
 
 foam.CLASS({
   package: 'foam.glang',
-  name: 'EndOfWeek',
-  extends: 'foam.mlang.AbstractExpr',
-  implements: [ 'foam.core.Serializable' ],
+  name: 'StartOfWeek',
+  extends: 'foam.glang.AbstractDateGlang',
   properties: [
-    {
-      class: 'foam.mlang.ExprProperty',
-      name: 'delegate'
-    },
     {
       class: 'Int',
       name: 'startOfWeek',
       documentation: 'Value between 0 - Sunday and 6 - Saturday inclusive.  Indicates which day is considered the first day of a new week.',
       min: 0,
       max: 6,
-      value: 6
+      value: 0
     }
   ],
   methods: [
@@ -95,12 +180,45 @@ foam.CLASS({
       name: 'f',
       code: function(obj) {
         var ts = new Date(this.delegate.f(obj));
-        ts.setDate(ts.getDate() + 5 + this.startOfWeek - ts.getDay());
+        ts.setDate(ts.getDate() - ((ts.getDay() - this.startOfWeek + 7) % 7));
+        ts.setHours(0, 0, 0, 0);
+        return ts;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'EndOfWeek',
+  extends: 'foam.glang.AbstractDateGlang',
+  properties: [
+    {
+      class: 'Int',
+      name: 'startOfWeek',
+      documentation: 'Value between 0 - Sunday and 6 - Saturday inclusive.  Indicates which day is considered the first day of a new week.',
+      min: 0,
+      max: 6,
+      value: 0
+    }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+
+        var date = ts.getDate();
+        var endOfWeek = (this.startOfWeek + 6) % 7;
+        var day = ts.getDay();
+        var daysToEndOfWeek = (endOfWeek - day + 7) % 7;
+        
+        ts.setDate(date + daysToEndOfWeek);
+
         ts.setHours(23, 59, 59);
         ts.setMilliseconds(999);
 
         return ts;
-        return ts.getTime() > Date.now() ? new Date() : ts;
       },
       javaCode: `
 // Convert to LocalDate
@@ -122,15 +240,26 @@ return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()
 
 foam.CLASS({
   package: 'foam.glang',
-  name: 'EndOfMonth',
-  extends: 'foam.mlang.AbstractExpr',
-  implements: [ 'foam.core.Serializable' ],
-  properties: [
+  name: 'StartOfMonth',
+  extends: 'foam.glang.AbstractDateGlang',
+  methods: [
     {
-      class: 'foam.mlang.ExprProperty',
-      name: 'delegate'
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        ts.setMonth(ts.getMonth());
+        ts.setDate(1);
+        ts.setHours(0, 0, 0, 0);
+        return ts;
+      }
     }
-  ],
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'EndOfMonth',
+  extends: 'foam.glang.AbstractDateGlang',
   methods: [
     {
       name: 'f',
@@ -141,7 +270,6 @@ foam.CLASS({
         ts.setHours(23, 59, 59);
         ts.setMilliseconds(999);
         return ts;
-        return ts.getTime() > Date.now() ? new Date() : ts;
       },
       javaCode: `
 // Convert to LocalDate
@@ -163,15 +291,26 @@ return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()
 
 foam.CLASS({
   package: 'foam.glang',
-  name: 'EndOfQuarter',
-  extends: 'foam.mlang.AbstractExpr',
-  implements: [ 'foam.core.Serializable' ],
-  properties: [
+  name: 'StartOfQuarter',
+  extends: 'foam.glang.AbstractDateGlang',
+  methods: [
     {
-      class: 'foam.mlang.ExprProperty',
-      name: 'delegate'
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        ts.setMonth(Math.floor(ts.getMonth() / 3) * 3);
+        ts.setDate(0);
+        ts.setHours(0, 0, 0, 0);
+        return ts;
+      },
     }
-  ],
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'EndOfQuarter',
+  extends: 'foam.glang.AbstractDateGlang',
   methods: [
     {
       name: 'f',
@@ -187,7 +326,6 @@ foam.CLASS({
         ts.setHours(23, 59, 59);
         ts.setMilliseconds(999);
         return ts;
-        return ts.getTime() > Date.now() ? new Date() : ts;
       },
       javaCode: `
 // Convert to LocalDate
@@ -212,15 +350,26 @@ return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()
 
 foam.CLASS({
   package: 'foam.glang',
-  name: 'EndOfYear',
-  extends: 'foam.mlang.AbstractExpr',
-  implements: [ 'foam.core.Serializable' ],
-  properties: [
+  name: 'StartOfYear',
+  extends: 'foam.glang.AbstractDateGlang',
+  methods: [
     {
-      class: 'foam.mlang.ExprProperty',
-      name: 'delegate'
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        ts.setMonth(0);
+        ts.setDate(1);
+        ts.setHours(0, 0, 0, 0);
+        return ts;
+      }
     }
-  ],
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'EndOfYear',
+  extends: 'foam.glang.AbstractDateGlang',
   methods: [
     {
       name: 'f',

@@ -36,7 +36,8 @@ foam.CLASS({
       code: function(msg) {
         this.localBox.send(msg);
       },
-      javaCode: `getLocalBox().send(msg);`
+      javaCode: `getLocalBox().send(msg);`,
+      swiftCode: `try localBox!.send(msg)`
     }
   ]
 });

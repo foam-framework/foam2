@@ -6,8 +6,7 @@
 
 package foam.core;
 
-import foam.dao.pg.IndexedPreparedStatement;
-import foam.lib.xml.Outputter;
+import foam.dao.jdbc.IndexedPreparedStatement;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.AuthorizationException;
 import foam.nanos.logger.Logger;
@@ -19,8 +18,6 @@ import java.sql.SQLException;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 public abstract class AbstractPropertyInfo
   implements PropertyInfo
@@ -44,11 +41,6 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public void toCSV(foam.lib.csv.Outputter outputter, Object value) {
-    outputter.output(value);
-  }
-
-  @Override
   public void toXML(foam.lib.xml.Outputter outputter, Object value) {
     outputter.output(value);
   }
@@ -68,7 +60,7 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop) {
-    if ( prop.f(o1) == null || ! prop.f(o1).equals(prop.f(o2)) ) {
+    if ( prop.compare(o1, o2) != 0 ) {
       diff.put(prop.getName(), prop.f(o2));
     }
   }

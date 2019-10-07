@@ -21,7 +21,6 @@ foam.CLASS({
 
     ^validation-container {
       margin-top: 6px;
-      color: /*%DESTRUCTIVE3%*/ #d9170e;
     }
 
     ^helper-icon {
@@ -89,8 +88,6 @@ foam.CLASS({
     ^error .foam-u2-DateView,
     ^error .foam-u2-view-date-DateTimePicker .date-display-box
     {
-      color: /*%DESTRUCTIVE3%*/ #d9170e !important;
-      background-color: /*%DESTRUCTIVE5%*/ #fbedec !important;
       border-color: /*%DESTRUCTIVE3%*/ #d9170e !important;
     }
 
@@ -191,91 +188,50 @@ foam.CLASS({
       margin-right: auto;
     }
 
-
     ^ .foam-u2-view-RadioView label {
       margin-left: 12px;
     }
-
-    /*
-      !IMPORTANT!
-      For the following inputs below, we are planning
-      encode these changes in the actual foam files
-    */
-
-    /*
-    ^ .foam-u2-CheckBox {
-      -webkit-appearance: none;
-      border-radius: 2px;
-      border: solid 1px #8e9090;
-      box-sizing: border-box;
-      display: inline-block;
-      fill: rgba(0, 0, 0, 0);
-
-      vertical-align: middle;
-
-      height: 16px;
-      width: 16px;
-
-      opacity: 1;
-
-      transition: background-color 140ms, border-color 140ms;
-    }
-
-    ^ .foam-u2-CheckBox:checked {
-      background-color: #604aff;
-      fill: white;
-      border: solid 1px #604aff;
-    }
-
-    ^ .foam-u2-CheckBox:checked:after {
-      content: url(data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2048%2048%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2215%22%20height%3D%2215%22%20version%3D%221.1%22%3E%0A%20%20%20%3Cpath%20fill%3D%22white%22%20stroke-width%3D%223%22%20d%3D%22M18%2032.34L9.66%2024l-2.83%202.83L18%2038l24-24-2.83-2.83z%22/%3E%0A%3C/svg%3E);
-    }
-
-    ^ input[type="radio" i] {
-      -webkit-appearance: none;
-      border-radius: 8px;
-      background-color: #ffffff;
-      border: solid 1px #8e9090;
-      box-sizing: border-box;
-      display: inline-block;
-      fill: rgba(0, 0, 0, 0);
-
-      vertical-align: middle;
-
-      height: 16px;
-      width: 16px;
-
-      opacity: 1;
-
-      transition: background-color 140ms, border-color 140ms;
-    }
-
-    ^ input[type="radio" i]:checked {
-      background-color: #604aff;
-    }
-
-    ^ input[type="radio" i]:checked:after {
-      content: url('images/active-radio.svg');
-    }
-    */
   `,
 
   requires: [
+    'foam.core.ConstantSlot',
+    'foam.core.ProxySlot',
     'foam.u2.layout.Cols',
-    'foam.u2.layout.Rows'
+    'foam.u2.layout.Rows',
+    'foam.u2.ControllerMode',
+    'foam.u2.DisplayMode',
+    'foam.u2.Visibility'
   ],
 
   properties: [
     'prop',
+    {
+      class: 'FObjectProperty',
+      of: 'foam.core.Slot',
+      name: 'visibilitySlot',
+      expression: function(prop, mode) {
+        return mode === this.DisplayMode.HIDDEN
+          ? this.ConstantSlot.create({ value: false })
+          : prop.createVisibilityFor(this.data$).map((m) => m !== this.Visibility.HIDDEN);
+      }
+    },
+    {
+      name: 'mode',
+      expression: function(prop) {
+        return this.controllerMode.getMode(prop);
+      }
+    }
   ],
 
   methods: [
     function initE() {
       var self = this;
       this.SUPER();
+
+      if ( this.mode === this.DisplayMode.HIDDEN ) return;
+
       this
-        .show(this.prop.createVisibilityFor(this.data$)
-          .map(m => m != foam.u2.Visibility.HIDDEN))
+        .show(this.ProxySlot.create({ delegate$: this.visibilitySlot$ }))
         .addClass(this.myClass())
         .add(this.slot(function(data, prop, prop$label) {
           var errorSlot = prop.validateObj && prop.validationTextVisible ?
@@ -283,7 +239,6 @@ foam.CLASS({
             foam.core.ConstantSlot.create({ value: null });
 
           return self.E()
-            .style({ padding: '8px 0' })
             .start(self.Rows)
               .callIf(prop$label, function() {
                 this.start('m3')
@@ -295,7 +250,7 @@ foam.CLASS({
                 .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                 .start()
                   .style({ 'flex-grow': 1 })
-                  .add(prop)
+                  .tag(prop, { mode: this.mode })
                   .callIf(prop.validationStyleEnabled, function() {
                     this.enableClass(self.myClass('error'), errorSlot);
                   })
@@ -322,7 +277,7 @@ foam.CLASS({
                         .addClass(self.myClass('arrow-right'))
                       .end()
                     .end()
-                  .end()
+                  .end();
                 })
               .end()
               .callIf(prop.validationTextVisible, function() {

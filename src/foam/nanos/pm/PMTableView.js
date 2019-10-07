@@ -13,7 +13,7 @@ foam.CLASS({
 
   implements: [ 'foam.mlang.Expressions' ],
 
-  requires: [ 'foam.nanos.pm.PMInfo' ],
+  requires: [ 'foam.nanos.pm.PMInfo', 'foam.u2.view.TableView' ],
 
   exports: [ 'maxTotalTime' ],
 
@@ -34,6 +34,10 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      // Next line is a temporary hack to fix CSS loading, otherwise screen
+      // is broken if loaded before any tableviews
+      this.TableView.create();
+
       this.add(this.CLEAR_ALL);
       this.columns_.push(this.CLEAR);
 

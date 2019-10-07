@@ -193,6 +193,8 @@ foam.CLASS({
     },
 
     function initE() {
+      var self = this;
+
       // If no item is selected, and data has not been provided, select the 0th
       // entry.
       if ( this.data == null && ! this.index ) {
@@ -201,18 +203,26 @@ foam.CLASS({
 
       if ( this.dao ) this.onDAOUpdate();
 
-      this.start(this.selectSpec, {
-        data$: this.index$,
-        label$: this.label$,
-        alwaysFloatLabel: this.alwaysFloatLabel,
-        choices$: this.choices$,
-        placeholder$: this.placeholder$,
-        mode$: this.mode$,
-        size$: this.size$
-      })
-        .attrs({ name: this.name })
-        .enableClass('selection-made', this.index$.map((index) => index !== -1))
-      .end();
+      this.add(this.slot(function(mode){
+        if ( mode !== foam.u2.DisplayMode.RO ) {
+          return self.E()
+            .start(self.selectSpec, {
+              data$: self.index$,
+              label$: self.label$,
+              alwaysFloatLabel: self.alwaysFloatLabel,
+              choices$: self.choices$,
+              placeholder$: self.placeholder$,
+              mode$: self.mode$,
+              size$: self.size$
+            })
+              .attrs({ name: self.name })
+              .enableClass('selection-made', self.index$.map((index) => index !== -1))
+            .end();
+      
+        } else {
+          return self.E().add(self.text$)
+        }
+      }))
 
       this.dao$proxy.on.sub(this.onDAOUpdate);
     },
@@ -268,11 +278,18 @@ foam.CLASS({
       name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
-        this.dao.select().then(function(s) {
-          this.choices = s.array.map(this.objToChoice);
+        var p = this.mode === foam.u2.DisplayMode.RW ?
+          this.dao.select().then(s => s.array) :
+          this.dao.find(this.data).then(o => o ? [o] : []);
+
+        p.then(function(a) {
+          this.choices = a.map(this.objToChoice);
           if ( this.data == null && this.index === -1 ) this.index = this.placeholder ? -1 : 0;
         }.bind(this));
       }
     }
+  ],
+  reactions: [
+    ['', 'propertyChange.mode', 'onDAOUpdate']
   ]
 });

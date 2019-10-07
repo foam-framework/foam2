@@ -30,7 +30,15 @@ foam.CLASS({
     'finished'
   ],
 
+  exports: [
+    'filteredTableColumns',
+  ],
+
   properties: [
+    {
+      class: 'StringArray',
+      name: 'filteredTableColumns'
+    },
     {
       name: 'data',
       hidden: true
@@ -74,12 +82,6 @@ foam.CLASS({
       class: 'Boolean',
       name: 'selectEnabled',
       documentation: 'True to enable the select button.',
-      value: false
-    },
-    {
-      class: 'Boolean',
-      name: 'addEnabled',
-      documentation: 'True to enable the Add button for adding to a relationship',
       value: false
     },
     {
@@ -137,7 +139,7 @@ foam.CLASS({
       class: 'String',
       name: 'title',
       expression: function(data$of) {
-        return 'Browse ' + data$of.model_.plural;
+        return data$of.model_.plural;
       }
     },
     {
@@ -154,9 +156,7 @@ foam.CLASS({
       `,
       factory: function() {
         return this.relationship
-          ? this.addEnabled
-            ? this.ADD_SELECTION
-            : this.SELECT
+          ? this.SELECT
           : this.cls_.CREATE;
       }
     },
@@ -179,17 +179,11 @@ foam.CLASS({
       class: 'String',
       name: 'detailView',
       value: 'foam.u2.DetailView'
-    }
+    },
+    'selectedObjects'
   ],
 
   actions: [
-    {
-      name: 'toggleFilters',
-      isAvailable: function(toggleEnabled) { return toggleEnabled; },
-      code: function() {
-        this.searchHidden = ! this.searchHidden;
-      }
-    },
     {
       name: 'create',
       isAvailable: function(createEnabled) { return createEnabled; },
@@ -204,32 +198,13 @@ foam.CLASS({
       }
     },
     {
-      name: 'findRelatedObject',
-      label: 'Add',
-      isAvailable: function(relationship, addEnabled) {
-        // Only enable the Add button if we're not already trying to choose a selected item for a relationship.
-        return !! ( relationship && relationship.junctionDAO ) && ! addEnabled;
-      },
-      code: function() { }
-    },
-    {
-      name: 'addSelection',
-      label: 'Add',
-      isAvailable: function(addEnabled) { return addEnabled; },
-      isEnabled: function(selection) { return !! selection },
-      code: function() {
-        var self = this;
-        this.relationship.add(this.selection).then(function() {
-          self.finished.pub();
-        });
-      }
-    },
-    {
       name: 'select',
       isAvailable: function(selectEnabled) { return selectEnabled; },
-      isEnabled: function(selection) { return !! selection; },
+      isEnabled: function(selection, selectedObjects) {
+        return this.relationship ? !! selectedObjects : !! selection;
+      },
       code: function() {
-        this.pub('select', this.selection.id);
+        this.pub('select', this.relationship ? this.selectedObjects : this.selection.id);
         this.finished.pub();
       }
     },
@@ -245,24 +220,25 @@ foam.CLASS({
       label: 'Export as CSV',
       icon: 'images/export-icon-resting.svg',
       isAvailable: function(exportCSVEnabled) { return exportCSVEnabled; },
-      code: function() {
-        this.downloadCSV(this.filteredDAO);
+      code: function(x) {
+        this.downloadCSV(x, this.filteredDAO);
       }
     }
   ],
 
   listeners: [
-    function downloadCSV(data) {
-      this.csvDriver.exportDAO(this.__context__, data)
-      .then(function(result) {
-        result = 'data:text/csv;charset=utf-8,' + result;
-        var encodedUri = encodeURI(result);
-        var link = document.createElement('a');
-        link.setAttribute('href', encodedUri);
-        link.setAttribute('download', 'data.csv');
-        document.body.appendChild(link);
-        link.click();
-      });
+    function downloadCSV(x, data) {
+      this.csvDriver.exportDAO(x, data)
+        .then(function(result) {
+          result = 'data:text/csv;charset=utf-8,' + result;
+          var encodedUri = encodeURI(result);
+          var link = document.createElement('a');
+          link.setAttribute('href', encodedUri);
+          link.setAttribute('download', 'data.csv');
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
     }
   ]
 });

@@ -15,10 +15,6 @@ import foam.core.X;
  * for immediate execution of agent.
  */
 public class DirectAgency implements Agency {
-
-  public void submit(X x, ContextAgent agent) {
-    agent.execute(x);
-  }
   public void submit(X x, ContextAgent agent, String description) {
     agent.execute(x);
   }

@@ -12,13 +12,16 @@ foam.CLASS({
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows'
   ],
-  exports: [ 'updateData' ],
+  exports: [
+    'mode',
+    'updateData'
+  ],
   actions: [
     {
       name: 'addRow',
       label: 'Add',
-      isAvailable: function(controllerMode) {
-        return controllerMode !== foam.u2.ControllerMode.VIEW;
+      isAvailable: function(mode) {
+        return mode === foam.u2.DisplayMode.RW;
       },
       code: function() {
         this.data = this.data || {};
@@ -31,8 +34,8 @@ foam.CLASS({
     {
       name: 'KeyValueRow',
       imports: [
-        'controllerMode?',
         'data',
+        'mode',
         'updateData'
       ],
       properties: [
@@ -55,8 +58,8 @@ foam.CLASS({
       actions: [
         {
           name: 'remove',
-          isAvailable: function(controllerMode) {
-            return controllerMode !== foam.u2.ControllerMode.VIEW;
+          isAvailable: function(mode) {
+            return mode === foam.u2.DisplayMode.RW;
           },
           code: function() {
             delete this.data[this.key];
@@ -88,12 +91,17 @@ foam.CLASS({
               this
                 .startContext({ data: row })
                   .start(self.Cols)
-                    .add(self.KeyValueRow.KEY)
+                    .start()
+                      .style({'flex-grow': 1 })
+                      .add(self.KeyValueRow.KEY)
+                    .end()
                     .start()
                       .style({ 'flex-grow': 1 })
                       .add(self.KeyValueRow.VALUE)
                     .end()
-                    .add(self.KeyValueRow.REMOVE)
+                    .tag(self.KeyValueRow.REMOVE, {
+                      isDestructive: true
+                    })
                   .end()
                 .endContext();
               row.onDetach(row.sub(self.updateData));

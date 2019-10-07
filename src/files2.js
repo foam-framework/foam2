@@ -70,7 +70,6 @@ FOAM_FILES([
   { name: "foam/core/Enum" },
   { name: "foam/core/JSON" },
   { name: "foam/core/XML" },
-  { name: "foam/lib/csv/CSV" },
   { name: "foam/lib/csv/CSVParser" },
   { name: "foam/parse/StringPStream" },
   { name: "foam/parse/ErrorReportingPStream" },
@@ -89,6 +88,7 @@ FOAM_FILES([
   { name: "foam/core/Detachable" },
   { name: "foam/core/AbstractFObject" },
   { name: "foam/core/ContextAgent" },
+  { name: "foam/core/Agency" },
   { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
   { name: "foam/swift/SwiftLib", flags: ['swift'] },
   { name: "foam/swift/SwiftClass", flags: ['swift'] },
@@ -215,6 +215,7 @@ FOAM_FILES([
   { name: "foam/dao/StoreAndForwardDAO" },
   { name: "foam/dao/Journal" },
   { name: "foam/dao/CompositeJournal", flags: ['java'] },
+  { name: "foam/dao/AbstractFileJournal", flags: ['java'] },
   { name: "foam/dao/FileJournal", flags: ['java'] },
   { name: "foam/dao/JDAO", flags: ['web'] },
   { name: "foam/dao/java/JDAO", flags: ['java'] },
@@ -251,6 +252,7 @@ FOAM_FILES([
   { name: "foam/dao/NoDisjunctionDAO" },
   { name: "foam/dao/NoNeqDAO" },
   { name: "foam/dao/FixedSizeDAO" },
+  { name: "foam/dao/PutOnlyDAO" },
   { name: "foam/parse/QueryParser" },
   { name: "foam/parse/QueryParserUserTest" },
   { name: "foam/physics/Physical" },
@@ -510,7 +512,7 @@ FOAM_FILES([
   { name: "foam/dao/history/PropertyUpdate" },
   { name: "foam/dao/history/HistoryRecord" },
   { name: "foam/mop/MOP" },
-  { name: "foam/dao/pg/ConnectionPool" },
+  { name: "foam/dao/jdbc/ConnectionPool" },
   { name: "foam/lib/Outputter" },
   { name: "foam/lib/json/OutputterMode" },
   { name: "foam/lib/json/ClassReferenceParserTest" },
@@ -551,5 +553,8 @@ FOAM_FILES([
   { name: "foam/build/ClassLoader" },
   { name: "foam/build/ClassLoaderImpl" },
   { name: "foam/build/PromisedClassLoader" },
-  { name: "foam/build/ClassLoaderContext" }
+  { name: "foam/build/ClassLoaderContext" },
+
+  { name: "foam/core/CoreTypesValidationTest" },
+  { name: "foam/core/CoreTypesValidationTestModel" }
 ]);

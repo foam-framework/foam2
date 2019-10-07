@@ -30,9 +30,9 @@ public class TestUser {
     // add some data test
     User u1 = new User();
     u1.setId(6);
-    u1.setFirstName("Simon");
-    u1.setLastName("Keogh");
-    u1.setOrganization("nanopay");
+    u1.setFirstName("Foam");
+    u1.setLastName("Test");
+    u1.setOrganization("Foam");
     u1.setBusinessName("programmer");
     u1.setLanguage("en");
     Date date = new GregorianCalendar(2010, 8, 10).getTime();//September
@@ -48,12 +48,12 @@ public class TestUser {
 
     User u2 = new User();
     u2.setId(7);
-    u2.setFirstName("Wassim");
+    u2.setFirstName("Pdp");
     dao.put(u2);
 
     User u3 = new User();
     u3.setId(8);
-    u3.setFirstName("Hassene");
+    u3.setFirstName("Chaos");
     u3.setEmailVerified(true);
     dao.put(u3);
 
@@ -68,7 +68,7 @@ public class TestUser {
         {"id<=20"," ( ( id <=  ?  ) ) "},
         {"id-after:20"," ( ( id >=  ?  ) ) "},
         {"id-before:20"," ( ( id <=  ?  ) ) "},
-        {"firstName=Simon"," ( ( firstname =  ?  ) ) "},
+        {"firstName=Foam"," ( ( firstname =  ?  ) ) "},
         {"firstName:Sim"," ( ( 'firstname' like '% ? %' ) ) "},
 
         {"birthday=2020/09/10"," ( ( ( birthday >=  ?  )  AND  ( birthday <=  ?  ) ) ) "},
@@ -82,8 +82,8 @@ public class TestUser {
         {"lastLogin=today-2"," ( ( ( lastlogin >=  ?  )  AND  ( lastlogin <=  ?  ) ) ) "},
         {"lastLogin=2010-9-10..2020-9-10"," ( ( ( lastlogin >=  ?  )  AND  ( lastlogin <=  ?  ) ) ) "},
 
-        {"id=6 or firstName=Simon"," ( ( id =  ?  ) )  OR  ( ( firstname =  ?  ) ) "},
-        {"-id=6 | firstName=Simon"," ( ( NOT ( id =  ?  ) ) )  OR  ( ( firstname =  ?  ) ) "},
+        {"id=6 or firstName=Foam"," ( ( id =  ?  ) )  OR  ( ( firstname =  ?  ) ) "},
+        {"-id=6 | firstName=Foam"," ( ( NOT ( id =  ?  ) ) )  OR  ( ( firstname =  ?  ) ) "},
         {"firstName=abc or id=20 "," ( ( firstname =  ?  ) )  OR  ( ( id =  ?  ) ) "},
         {"firstName=abc and id=20"," ( ( firstname =  ?  )  AND  ( id =  ?  ) ) "},
         {"id=20 and firstName=adam11 OR id<5 and firstName=john"," ( ( id =  ?  )  AND  ( firstname =  ?  ) )  OR  ( ( id <  ?  )  AND  ( firstname =  ?  ) ) "},
@@ -104,7 +104,7 @@ public class TestUser {
         {"is:emailVerified"," ( ( emailverified =  ?  ) ) "},
 //        {"id=me"," ( ( id =  ?  ) ) "},
 
-        {"firstName=Simon,Wassim"," ( ( ( firstname =  ?  )  OR  ( firstname =  ?  ) ) ) "},
+        {"firstName=Foam,Pdp"," ( ( ( firstname =  ?  )  OR  ( firstname =  ?  ) ) ) "},
 //        {"id=(6|7)"," ( ( ( id =  ?  )  OR  ( id =  ?  ) ) ) "},
 //        {"id=(6|7)"," ( ( ( id =  ?  )  OR  ( id =  ?  ) ) ) "},//TODO add alises
 

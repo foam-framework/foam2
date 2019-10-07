@@ -8,12 +8,27 @@ foam.CLASS({
   package: 'foam.u2.detail',
   name: 'SectionView',
   extends: 'foam.u2.View',
+
   requires: [
+    'foam.core.ArraySlot',
+    'foam.core.ConstantSlot',
+    'foam.core.ProxySlot',
+    'foam.core.SimpleSlot',
     'foam.layout.Section',
     'foam.u2.detail.SectionedDetailPropertyView',
     'foam.u2.layout.Cols',
-    'foam.u2.layout.Rows'
+    'foam.u2.layout.Grid',
+    'foam.u2.layout.GUnit',
+    'foam.u2.layout.Rows',
+    'foam.u2.Visibility'
   ],
+
+  css: `
+    ^ {
+      padding: 12px 0 0 0;
+    }
+  `,
+
   properties: [
     {
       class: 'String',
@@ -36,27 +51,41 @@ foam.CLASS({
       value: true
     }
   ],
+
   methods: [
     function initE() {
       var self = this;
       self.SUPER();
+
       self
+        .addClass(self.myClass())
         .add(self.slot(function(section, showTitle, section$title) {
           if ( ! section ) return;
           return self.Rows.create()
             .show(section.createIsAvailableFor(self.data$))
-            .callIf(showTitle && section$title, function () {
+            .callIf(showTitle && section$title, function() {
               this.start('h2').add(section$title).end();
             })
-            .forEach(section.properties, function (p) {
-              this.tag(self.SectionedDetailPropertyView, { prop: p, data$: self.data$ });
-            })
+            .start(self.Grid)
+              .forEach(section.properties, function(p, index) {
+                var s1 = self.SimpleSlot.create();
+                var s2 = self.SimpleSlot.create();
+                this.start(self.GUnit, { columns: p.gridColumns }, s1)
+                  .tag(self.SectionedDetailPropertyView, {
+                    prop: p,
+                    data$: self.data$
+                  }, s2)
+                .end();
+                s1.get().show(self.ProxySlot.create({ delegate$: s2.get().visibilitySlot$ }));
+              })
+            .end()
             .start(self.Cols)
-              .forEach(section.actions, function (a) {
+              .style({ 'justify-content': 'end', 'margin-top': '20px' })
+              .forEach(section.actions, function(a) {
                 this.add(a);
               })
             .end();
         }));
     }
   ]
-}); 
+});

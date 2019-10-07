@@ -40,6 +40,25 @@ foam.CLASS({
     },
     {
       class: 'FObjectArray',
+      of: 'foam.core.Property',
+      name: 'propertyWhiteList',
+      documentation: `
+        If this array is not empty, only the properties listed in it will be
+        included in the detail view.
+      `,
+      preSet: function(_, ps) {
+        foam.assert(ps, 'Properties required.');
+        for ( var i = 0; i < ps.length; i++ ) {
+          foam.assert(
+              foam.core.Property.isInstance(ps[i]),
+              `Non-Property in 'properties' list:`,
+              ps);
+        }
+        return ps;
+      }
+    },
+    {
+      class: 'FObjectArray',
       of: 'foam.layout.Section',
       name: 'sections',
       factory: null,
@@ -48,25 +67,37 @@ foam.CLASS({
 
         sections = of.getAxiomsByClass(this.SectionAxiom)
           .sort((a, b) => a.order - b.order)
-          .map(a => this.Section.create().fromSectionAxiom(a, of));
+          .map((a) => this.Section.create().fromSectionAxiom(a, of));
 
         var usedAxioms = sections
-          .map(s => s.properties.concat(s.actions))
+          .map((s) => s.properties.concat(s.actions))
           .flat()
           .reduce((map, a) => {
             map[a.name] = true;
             return map;
           }, {});
         var unusedProperties = of.getAxiomsByClass(this.Property)
-            .filter(p => ! usedAxioms[p.name])
-            .filter(p => ! p.hidden);
+            .filter((p) => ! usedAxioms[p.name])
+            .filter((p) => ! p.hidden);
         var unusedActions = of.getAxiomsByClass(this.Action)
-            .filter(a => ! usedAxioms[a.name]);
-        if ( unusedProperties.length || unusedActions.length ) {
+            .filter((a) => ! usedAxioms[a.name]);
+
+            if ( unusedProperties.length || unusedActions.length ) {
           sections.push(this.Section.create({
             properties: unusedProperties,
             actions: unusedActions
           }));
+        }
+
+        if ( this.propertyWhitelist ) {
+          sections = sections
+            .map((s) => {
+              s.properties = s.properties.filter((p) => this.propertyWhitelist.includes(p));
+              return s;
+            })
+            .filter((s) => {
+              return s.properties.length > 0 || s.actions.length > 0;
+            });
         }
 
         return sections;
