@@ -501,6 +501,20 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2.search',
+  name: 'ReferenceRefinement',
+  refines: 'foam.core.Reference',
+
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'searchView',
+      value: { class: 'foam.u2.filter.ReferenceFilterView' }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2.search',
   name: 'EnumRefinement',
   refines: 'foam.core.Enum',
 
