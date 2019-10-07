@@ -185,13 +185,6 @@ foam.CLASS({
 
   actions: [
     {
-      name: 'toggleFilters',
-      isAvailable: function(toggleEnabled) { return toggleEnabled; },
-      code: function() {
-        this.searchHidden = ! this.searchHidden;
-      }
-    },
-    {
       name: 'create',
       isAvailable: function(createEnabled) { return createEnabled; },
       code: function() { }
