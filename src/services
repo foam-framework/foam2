@@ -478,18 +478,18 @@ p({"class":"foam.nanos.boot.NSpec", "name":"serializationTestEchoService", "boxC
 
 p({
   "class": "foam.nanos.boot.NSpec",
-  "name":" themeDAO",
+  "name": "themeDAO",
   "description": "Stores Themes, which are used to style the application.",
   "serve": true,
   "authenticate": false,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
-      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer(\"themeDAO\"))
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("themeDAO"))
       .setPm(true)
       .setSeqNo(true)
       .setOf(foam.nanos.theme.Theme.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"themes\")
+      .setJournalName("themes")
       .build()
       .orderBy(foam.mlang.MLang.DESC(foam.nanos.theme.Theme.PRIORITY));
   """,
