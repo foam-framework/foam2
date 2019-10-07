@@ -478,7 +478,7 @@ p({"class":"foam.nanos.boot.NSpec", "name":"serializationTestEchoService", "boxC
 
 p({
   "class": "foam.nanos.boot.NSpec",
-  "name":" themeDAO",
+  "name": "themeDAO",
   "description": "Stores Themes, which are used to style the application.",
   "serve": true,
   "authenticate": false,
