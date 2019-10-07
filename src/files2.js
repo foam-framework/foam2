@@ -215,6 +215,7 @@ FOAM_FILES([
   { name: "foam/dao/StoreAndForwardDAO" },
   { name: "foam/dao/Journal" },
   { name: "foam/dao/CompositeJournal", flags: ['java'] },
+  { name: "foam/dao/AbstractFileJournal", flags: ['java'] },
   { name: "foam/dao/FileJournal", flags: ['java'] },
   { name: "foam/dao/JDAO", flags: ['web'] },
   { name: "foam/dao/java/JDAO", flags: ['java'] },
@@ -561,5 +562,8 @@ FOAM_FILES([
   { name: "foam/build/ClassLoader" },
   { name: "foam/build/ClassLoaderImpl" },
   { name: "foam/build/PromisedClassLoader" },
-  { name: "foam/build/ClassLoaderContext" }
+  { name: "foam/build/ClassLoaderContext" },
+
+  { name: "foam/core/CoreTypesValidationTest" },
+  { name: "foam/core/CoreTypesValidationTestModel" }
 ]);

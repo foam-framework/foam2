@@ -107,6 +107,7 @@ foam.CLASS({
         // remove objects with the same strings for specified property
         var self = this;
         return n.reduce(function(accumulator, obj) {
+
           // create an identifying id
           var id = obj[self.property];
 

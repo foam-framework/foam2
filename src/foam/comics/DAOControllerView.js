@@ -62,6 +62,7 @@ foam.CLASS({
 
     ^container {
       display: flex;
+      justify-content: space-between;
     }
 
     ^ .actions {
@@ -75,7 +76,6 @@ foam.CLASS({
 
     ^full-search-container {
       flex: 0 0 250px;
-      margin-right: 10px;
     }
 
     ^ .foam-u2-view-TableView {
@@ -187,11 +187,7 @@ foam.CLASS({
                   .show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW))
                   .start()
                     .forEach(self.cls.getAxiomsByClass(foam.core.Action).filter((action) => {
-                      var rtn = action.name !== self.data.primaryAction.name;
-                      if ( self.data.searchMode !== self.SearchMode.FULL ) {
-                        rtn = rtn && action.name !== 'toggleFilters';
-                      }
-                      return rtn;
+                      return action.name !== self.data.primaryAction.name;
                     }), function(action) {
                       this.tag(action, { buttonStyle: 'TERTIARY' });
                     })

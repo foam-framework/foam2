@@ -589,6 +589,18 @@ foam.CLASS({
       return this.parentToLocalCoordinates(p);
     },
 
+    function  localToGlobalCoordinates(p){
+      var curr = this;
+      while ( curr ){
+        curr.transform.mulP(p);
+        p.x *= p.w;
+        p.y *= p.w;
+        p.w = 1;
+        curr = curr.parent;
+      }
+      return p;
+    },
+
     function findFirstChildAt(p) {
       if ( arguments.length > 1 ) {
         var tmp = foam.graphics.Point.create();

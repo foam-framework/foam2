@@ -8,6 +8,7 @@ package foam.nanos.dig;
 
 import foam.core.*;
 import foam.dao.ArraySink;
+import foam.dao.AbstractDAO;
 import foam.dao.DAO;
 import foam.lib.csv.CSVSupport;
 import foam.lib.csv.CSVOutputter;
@@ -58,6 +59,7 @@ public class DigWebAgent
     Format              format   = (Format) p.get(Format.class);
     String              id       = p.getParameter("id");
     String              q        = p.getParameter("q");
+    String              limit    = p.getParameter("limit");
     DAO                 nSpecDAO = (DAO) x.get("AuthenticatedNSpecDAO");
     String[]            email    = p.getParameterValues("email");
     boolean             emailSet = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
@@ -123,6 +125,13 @@ public class DigWebAgent
       Predicate pred = new WebAgentQueryParser(cInfo).parse(x, q);
       logger.debug("predicate", pred.getClass(), pred.toString());
       dao = dao.where(pred);
+
+      if ( ! SafetyUtil.isEmpty(limit) ) {
+        long l = Long.valueOf(limit);
+        if ( l != AbstractDAO.MAX_SAFE_INTEGER ) {
+          dao = dao.limit(l);
+        }
+      }
 
       if ( Command.put == command ) {
         String returnMessage = "success";
@@ -382,7 +391,7 @@ public class DigWebAgent
               out.println(outputterCsv.toString());
             }
           } else if ( Format.HTML == format ) {
-            foam.lib.html.Outputter outputterHtml = new foam.lib.html.Outputter(OutputterMode.NETWORK);
+            foam.lib.html.Outputter outputterHtml = new foam.lib.html.Outputter(cInfo, OutputterMode.NETWORK);
 
             outputterHtml.outputStartHtml();
             outputterHtml.outputStartTable();

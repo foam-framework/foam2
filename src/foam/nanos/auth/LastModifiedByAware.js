@@ -13,6 +13,8 @@ foam.INTERFACE({
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
       documentation: 'User who last modified entry'
     }
   ]
@@ -37,7 +39,10 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
-      documentation: 'User who last modified entry'
+      documentation: 'User who last modified entry',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
+      section: 'administrative'
     }
   ]
 });
