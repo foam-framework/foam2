@@ -18,6 +18,7 @@ import foam.nanos.NanoService;
 import foam.nanos.boot.NSpec;
 import foam.nanos.boot.NSpecAware;
 import foam.nanos.logger.Logger;
+import foam.nanos.logger.PrefixLogger;
 import foam.nanos.pm.PM;
 import foam.nanos.pm.PMWebAgent;
 
@@ -75,8 +76,8 @@ public class NanoRouter
     PM       pm         = new PM(this.getClass(), serviceKey);
 
     resp.setContentType("text/html");
-    
-    // prevent browsers from changing content-type in response  
+
+    // prevent browsers from changing content-type in response
     resp.setHeader("X-Content-Type-Options", "nosniff");
     // do not allow browser to cache response data
     resp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -86,26 +87,28 @@ public class NanoRouter
     resp.setHeader("X-XSS-Protection", "1");
     // protect against clickjacking attacks
     resp.setHeader("X-Frame-Options", "deny");
-    
+
     try {
       if ( serv == null ) {
         System.err.println("No service found for: " + serviceKey);
         resp.sendError(resp.SC_NOT_FOUND, "No service found for: "+serviceKey);
       } else {
-        X y = getX().put(HttpServletRequest.class, req)
-            .put(HttpServletResponse.class, resp)
-            .putFactory(PrintWriter.class, new XFactory() {
-              @Override
-              public Object create(X x) {
-                try {
-                  return resp.getWriter();
-                } catch (IOException e) {
-                  return null;
-                }
+        X requestContext = getX()
+          .put(HttpServletRequest.class, req)
+          .put(HttpServletResponse.class, resp)
+          .putFactory(PrintWriter.class, new XFactory() {
+            @Override
+            public Object create(X x) {
+              try {
+                return resp.getWriter();
+              } catch (IOException e) {
+                return null;
               }
-            })
-            .put(NSpec.class, spec);
-        serv.execute(y);
+            }
+          })
+          .put("logger", new PrefixLogger(new Object[] { "[Service]", spec.getName() }, (Logger) getX().get("logger")))
+          .put(NSpec.class, spec);
+        serv.execute(requestContext);
       }
     } catch (Throwable t) {
       System.err.println("Error serving " + serviceKey + " " + path);

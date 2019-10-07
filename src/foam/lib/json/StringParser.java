@@ -23,35 +23,36 @@ public class StringParser
 
   // An escape is either a Unicode code like \u001a, an ASCII escape like \n or
   // just a literal escape next character.
-  
+
   private Parser escapeParser = new Alt(new UnicodeParser(),
                                         new ASCIIEscapeParser(),
                                         new Seq1(1, new Literal(Character.toString(ESCAPE)), new AnyChar()));
-  
+
   public PStream parse(PStream ps, ParserContext x) {
     ps = ps.apply(delimiterParser, x);
     if ( ps == null ) return null;
-    
+
     Parser delimiter = new Literal((String)ps.value());
 
+    // TODO: Use thread-local StringBuilder
     StringBuilder sb = new StringBuilder();
-    
+
     PStream result;
     boolean escaping = false;
-    
+
     while ( ps.valid() ) {
       char c;
-      
+
       if ( escaping ) {
         ps = ps.apply(escapeParser, x);
         if ( ps == null ) return null;
-        
+
         sb.append((Character)ps.value());
         escaping = false;
-        
+
         continue;
       }
-      
+
       result = ps.apply(delimiter, x);
       if ( result != null ) {
         ps = result;
@@ -69,6 +70,8 @@ public class StringParser
       ps = ps.tail();
     }
 
-    return ps.setValue(sb.toString());
+    // Internalize small strings so we don't end up with millions of distinct
+    // but equivalent small strings, especially the empty string.
+    return ps.setValue(sb.length() < 6 ? sb.toString().intern() : sb.toString());
   }
 }

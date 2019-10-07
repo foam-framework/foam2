@@ -9,6 +9,9 @@ foam.CLASS({
   name: 'AbstractDateGlang',
   extends: 'foam.mlang.AbstractExpr',
   abstract: true,
+  requires: [
+    'foam.mlang.IdentityExpr',
+  ],
   implements: [
     'foam.core.Serializable',
     'foam.mlang.order.Comparator',
@@ -16,7 +19,8 @@ foam.CLASS({
   properties: [
     {
       class: 'foam.mlang.ExprProperty',
-      name: 'delegate'
+      name: 'delegate',
+      factory: function() { return this.IdentityExpr.create() }
     }
   ],
   methods: [
@@ -71,6 +75,66 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.glang',
+  name: 'StartOfHour',
+  extends: 'foam.glang.AbstractDateGlang',
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        ts.setMinutes(0, 0);
+        return ts;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'EndOfHour',
+  extends: 'foam.glang.AbstractDateGlang',
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        ts.setMinutes(59, 59);
+        ts.setMilliseconds(999);
+        return ts;
+      },
+      javaCode: `
+      // Convert to LocalDate
+      java.util.Date date = (java.util.Date) getDelegate().f(obj);
+      java.time.LocalDate localDate = java.time.Instant.ofEpochMilli(date.getTime()).atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+
+      // Convert to LocalDateTime set to End of Day
+      java.time.LocalDateTime localDateTime = localDate.atTime(java.time.LocalTime.MAX);
+
+      // Convert to Date using LocalDateTime
+      return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant());
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'StartOfDay',
+  extends: 'foam.glang.AbstractDateGlang',
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        ts.setHours(0, 0, 0, 0);
+        return ts;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
   name: 'EndOfDay',
   extends: 'foam.glang.AbstractDateGlang',
   methods: [
@@ -93,6 +157,33 @@ java.time.LocalDateTime localDateTime = localDate.atTime(java.time.LocalTime.MAX
 // Convert to Date using LocalDateTime
 return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant());
       `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'StartOfWeek',
+  extends: 'foam.glang.AbstractDateGlang',
+  properties: [
+    {
+      class: 'Int',
+      name: 'startOfWeek',
+      documentation: 'Value between 0 - Sunday and 6 - Saturday inclusive.  Indicates which day is considered the first day of a new week.',
+      min: 0,
+      max: 6,
+      value: 0
+    }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        ts.setDate(ts.getDate() - ((ts.getDay() - this.startOfWeek + 7) % 7));
+        ts.setHours(0, 0, 0, 0);
+        return ts;
+      }
     }
   ]
 });
@@ -149,6 +240,24 @@ return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()
 
 foam.CLASS({
   package: 'foam.glang',
+  name: 'StartOfMonth',
+  extends: 'foam.glang.AbstractDateGlang',
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        ts.setMonth(ts.getMonth());
+        ts.setDate(1);
+        ts.setHours(0, 0, 0, 0);
+        return ts;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
   name: 'EndOfMonth',
   extends: 'foam.glang.AbstractDateGlang',
   methods: [
@@ -176,6 +285,24 @@ java.time.LocalDateTime localDateTime = localDate.atTime(java.time.LocalTime.MAX
 // Convert to Date using LocalDateTime
 return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant());
       `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'StartOfQuarter',
+  extends: 'foam.glang.AbstractDateGlang',
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        ts.setMonth(Math.floor(ts.getMonth() / 3) * 3);
+        ts.setDate(0);
+        ts.setHours(0, 0, 0, 0);
+        return ts;
+      },
     }
   ]
 });
@@ -217,6 +344,24 @@ java.time.LocalDateTime localDateTime = localDate.atTime(java.time.LocalTime.MAX
 // Convert to Date using LocalDateTime
 return java.util.Date.from(localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant());
       `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'StartOfYear',
+  extends: 'foam.glang.AbstractDateGlang',
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        ts.setMonth(0);
+        ts.setDate(1);
+        ts.setHours(0, 0, 0, 0);
+        return ts;
+      }
     }
   ]
 });

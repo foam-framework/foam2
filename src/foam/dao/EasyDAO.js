@@ -58,15 +58,17 @@ foam.CLASS({
       path: 'foam.dao.java.JDAO',
       flags: ['java'],
     },
-    'foam.nanos.logger.Logger',
-    'foam.nanos.logger.LoggingDAO',
     'foam.dao.MDAO',
     'foam.dao.PromisedDAO',
     'foam.dao.RequestResponseClientDAO',
     'foam.dao.SequenceNumberDAO',
     'foam.dao.SyncDAO',
     'foam.dao.TimingDAO',
-    'foam.dao.JournalType'
+    'foam.dao.JournalType',
+    'foam.nanos.auth.ServiceProviderAware',
+    'foam.nanos.auth.ServiceProviderAwareDAO',
+    'foam.nanos.logger.Logger',
+    'foam.nanos.logger.LoggingDAO'
   ],
 
   imports: [ 'document' ],
@@ -118,9 +120,13 @@ foam.CLASS({
 Logger logger = (Logger) getX().get("logger");
 
 foam.dao.DAO delegate = getInnerDAO();
-
 foam.dao.DAO head = delegate;
+foam.dao.ProxyDAO pxy = null;
 while( head instanceof foam.dao.ProxyDAO ) {
+  pxy = (foam.dao.ProxyDAO) head;
+  if ( head instanceof foam.dao.MDAO ) {
+    break;
+  }
   head = ( (ProxyDAO) head).getDelegate();
 }
 if ( head instanceof foam.dao.MDAO ) {
@@ -130,6 +136,19 @@ if ( head instanceof foam.dao.MDAO ) {
     getMdao().addIndex(getIndex());
   }
 }
+
+if ( getFixedSize() != null ) {
+  if ( head instanceof foam.dao.MDAO &&
+       pxy != null ) {
+    foam.dao.ProxyDAO fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
+    fixedSizeDAO.setDelegate(head);
+    pxy.setDelegate(fixedSizeDAO);
+  } else {
+    logger.error(this.getClass().getSimpleName(), "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_, "FixedSizeDAO did not find instanceof MDAO");
+    System.exit(1);
+  }
+}
+
 
 delegate = getOuterDAO(delegate);
 
@@ -147,28 +166,27 @@ if ( getDecorator() != null ) {
   delegate = (ProxyDAO) getDecorator();
 }
 
-if ( getDeletedAware() ||
-     foam.nanos.auth.DeletedAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+if ( getServiceProviderAware() ) {
+  delegate = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX()).setDelegate(delegate).build();
+}
+
+if ( getDeletedAware() ) {
   delegate = new foam.nanos.auth.DeletedAwareDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
-if ( getCreatedAware() ||
-  foam.nanos.auth.CreatedAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+if ( getCreatedAware() ) {
   delegate = new foam.nanos.auth.CreatedAwareDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
-if ( getCreatedByAware() ||
-  foam.nanos.auth.CreatedByAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+if ( getCreatedByAware() ) {
   delegate = new foam.nanos.auth.CreatedByAwareDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
-if ( getLastModifiedAware() ||
-  foam.nanos.auth.LastModifiedAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+if ( getLastModifiedAware() ) {
   delegate = new foam.nanos.auth.LastModifiedAwareDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
-if ( getLastModifiedByAware() ||
-  foam.nanos.auth.LastModifiedByAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+if ( getLastModifiedByAware() ) {
   delegate = new foam.nanos.auth.LastModifiedByAwareDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
@@ -498,30 +516,40 @@ return delegate;
       generateJava: false
     },
     {
+      name: 'serviceProviderAware',
+      class: 'Boolean',
+      javaFactory: 'return foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass());'
+    },
+    {
       name: 'deletedAware',
       class: 'Boolean',
-      value: false
+      javaFactory: 'return foam.nanos.auth.DeletedAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
       name: 'createdAware',
       class: 'Boolean',
-      value: false
+      javaFactory: 'return foam.nanos.auth.CreatedAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
       name: 'createdByAware',
       class: 'Boolean',
-      value: false
+      javaFactory: 'return foam.nanos.auth.CreatedByAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
       name: 'lastModifiedAware',
       class: 'Boolean',
-      value: false
+      javaFactory: 'return foam.nanos.auth.LastModifiedAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
       name: 'lastModifiedByAware',
       class: 'Boolean',
-      value: false
-    }
+      javaFactory: 'return foam.nanos.auth.LastModifiedByAware.class.isAssignableFrom(getOf().getObjClass());'
+    },
+    {
+      name: 'fixedSize',
+      class: 'FObjectProperty',
+      of: 'foam.dao.FixedSizeDAO'
+    },
  ],
 
   methods: [

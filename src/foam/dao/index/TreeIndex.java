@@ -135,11 +135,9 @@ public class TreeIndex
    * @return return is a selectPlan
    */
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( ( predicate != null && predicate instanceof False ) || state == null ) {
-      return NotFoundPlan.instance();
-    }
-
     if ( state == null ) return NotFoundPlan.instance();
+
+    if ( predicate != null && predicate instanceof False ) return NotFoundPlan.instance();
 
     Object[] statePredicate = simplifyPredicate(state, predicate);
     state     = statePredicate[0];

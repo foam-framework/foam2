@@ -100,7 +100,10 @@ foam.CLASS({
         if ( typeof d === 'string' ) {
           var ret = new Date(d);
 
-          if ( isNaN(ret.getTime()) ) throw 'Invalid Date: ' + d;
+          if ( isNaN(ret.getTime()) ) {
+            ret = new Date((Number.MAX_SAFE_INTEGER || Number.MAX_VALUE) * 0.9);
+            console.warn("Invalid date: " + d + "; assuming "+ret.toISOString()+".");
+          }
 
           return ret;
         }
@@ -243,6 +246,25 @@ foam.CLASS({
         foam.assert(typeof value === 'function', prop.name, 'Cannot set to non function type.');
       }
     ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Duration',
+  extends: 'Long',
+
+  documentation: `
+    A length of time in milliseconds. Further refined in TableCellFormatter.js
+    to make values human-readable when displayed in tables.
+  `,
+
+  properties: [
+    {
+      name: 'units',
+      value: 'ms'
+    }
   ]
 });
 

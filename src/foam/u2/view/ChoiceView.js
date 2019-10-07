@@ -278,11 +278,18 @@ foam.CLASS({
       name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
-        this.dao.select().then(function(s) {
-          this.choices = s.array.map(this.objToChoice);
+        var p = this.mode === foam.u2.DisplayMode.RW ?
+          this.dao.select().then(s => s.array) :
+          this.dao.find(this.data).then(o => o ? [o] : []);
+
+        p.then(function(a) {
+          this.choices = a.map(this.objToChoice);
           if ( this.data == null && this.index === -1 ) this.index = this.placeholder ? -1 : 0;
         }.bind(this));
       }
     }
+  ],
+  reactions: [
+    ['', 'propertyChange.mode', 'onDAOUpdate']
   ]
 });

@@ -198,7 +198,7 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertEqual(sink.value, 1)
 
     detach?.detach()
-    _ = (try? dao.put(somepackage_Test(["firstName": "C"])))
+    _ = try? dao.put(somepackage_Test(["firstName": "C"]))
     XCTAssertEqual(sink.value, 1)
   }
 
@@ -208,7 +208,7 @@ class SwiftTestsTests: XCTestCase {
     ])
 
     for i in 1...10 {
-      _ = (try? dao.put(somepackage_Test(["firstName": i])))
+      _ = try? dao.put(somepackage_Test(["firstName": i]))
     }
 
     let sink = (try? dao.skip(2)!.limit(5)!.select())!
@@ -326,7 +326,7 @@ class SwiftTestsTests: XCTestCase {
 
     var dispatched = false
     DispatchQueue(label: "TestDispatch").async {
-      let msg = try? rpcBox.promise.get() as! String
+      let msg = try? rpcBox.promise.get() as? String
       dispatched = true
       XCTAssertEqual(msg, "Hello there")
       sem.signal()

@@ -6,7 +6,9 @@ import foam.core.X;
 import foam.dao.AbstractSink;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
+import foam.mlang.sink.Count;
 import foam.nanos.auth.User;
+import foam.nanos.logger.Logger;
 import foam.util.SafetyUtil;
 import static foam.mlang.MLang.EQ;
 
@@ -33,7 +35,14 @@ public class SendNotificationDAO
         }
       });
     } else if ( ! SafetyUtil.isEmpty(notif.getGroupId()) ) {
-      userDAO.where(EQ(User.GROUP, notif.getGroupId())).select(new AbstractSink() {
+      DAO receivers = userDAO.where(EQ(User.GROUP, notif.getGroupId()));
+      Count count = (Count) receivers.select(new Count());
+      Logger logger = (Logger) x.get("logger");
+      if ( count.getValue() == 0 ) {
+        logger.warning("Notification " + notif.getNotificationType() +
+          " will not be saved to notificationDAO because no users exist in the group " + notif.getGroupId());
+      }
+      receivers.select(new AbstractSink() {
         @Override
         public void put(Object o, Detachable d) {
           User user = (User) o;

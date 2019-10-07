@@ -21,10 +21,26 @@ foam.ENUM({
 
   documentation: 'CRUD controller modes: CREATE/VIEW/EDIT.',
 
+  properties: [
+    {
+      class: 'String',
+      name: 'modePropertyName'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'getMode',
+      code: function(prop) {
+        return prop[this.modePropertyName];
+      }
+    }
+  ],
+
   values: [
-    { name: 'CREATE', label: 'Create' },
-    { name: 'VIEW',   label: 'View'   },
-    { name: 'EDIT',   label: 'Edit'   }
+    { name: 'CREATE', label: 'Create', modePropertyName: 'createMode' },
+    { name: 'VIEW',   label: 'View',   modePropertyName: 'readMode'   },
+    { name: 'EDIT',   label: 'Edit',   modePropertyName: 'updateMode' }
   ]
 });
 
@@ -850,7 +866,11 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'tooltip'
+      name: 'tooltip',
+      postSet: function(o, n) {
+        if ( ! o && n ) this.initTooltip();
+        return n;
+      }
     },
     {
       name: 'parentNode',
@@ -1050,7 +1070,11 @@ foam.CLASS({
     },
 
     function initTooltip() {
-      if ( this.tooltip ) this.Tooltip.create({target: this, text:this.tooltip});
+      if ( this.tooltip ) {
+        this.Tooltip.create({target: this, text$: this.tooltip$});
+      } else if ( this.getAttribute('title') ) {
+        this.Tooltip.create({target: this, text$: this.attrSlot('title')});
+      }
     },
 
     function initKeyboardShortcuts() {
@@ -2138,9 +2162,37 @@ foam.CLASS({
       value: { class: 'foam.u2.TextField' }
     },
     {
+      // DEPRECATED: Use 'createMode', 'readMode', and 'updateMode' instead.
       class: 'Enum',
       of: 'foam.u2.Visibility',
       name: 'visibility',
+      value: 'RW'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
+      name: 'createMode',
+      documentation: 'The display mode for this property when the controller mode is CREATE.',
+      assertValue: function(newValue) {
+        foam.assert(newValue === foam.u2.DisplayMode.RW || newValue === foam.u2.DisplayMode.HIDDEN, `Create mode must be RW or HIDDEN. Property '${this.of ? this.of.id + '.' : ''}${this.name}' was '${newValue.label}' and must be fixed.`);
+      },
+      value: 'RW'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
+      name: 'readMode',
+      documentation: 'The display mode for this property when the controller mode is VIEW.',
+      assertValue: function(newValue) {
+        foam.assert(newValue === foam.u2.DisplayMode.RO || newValue === foam.u2.DisplayMode.HIDDEN, `Read mode must be RO or HIDDEN. Property '${this.of ? this.of.id + '.' : ''}${this.name}' was '${newValue.label}' and must be fixed.`);
+      },
+      value: 'RO'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
+      name: 'updateMode',
+      documentation: 'The display mode for this property when the controller mode is EDIT.',
       value: 'RW'
     },
     {
@@ -2454,6 +2506,17 @@ foam.CLASS({
   properties: [
     [ 'view',          { class: 'foam.u2.EnumView' } ],
     [ 'tableCellView', function(obj) { return this.get(obj).label; } ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'ObjectViewRefinement',
+  refines: 'foam.core.Object',
+  requires: [ 'foam.u2.view.AnyView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.view.AnyView' } ]
   ]
 });
 
