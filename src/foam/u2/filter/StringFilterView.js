@@ -106,14 +106,15 @@ foam.CLASS({
       preSet: function(_, n) {
         // remove objects with the same strings for specified property
         var self = this;
-        return n.reduce(function (accumulator, obj) {
+        return n.reduce(function(accumulator, obj) {
+
           // create an identifying id
           var id = obj[self.property];
 
           // if the id is not found in the temp array
           // add the object to the output array
           // and add the key to the temp array
-          if (accumulator.temp.indexOf(id) === -1) {
+          if ( accumulator.temp.indexOf(id) === -1 ) {
             accumulator.out.push(obj);
             accumulator.temp.push(id);
           }
@@ -137,7 +138,7 @@ foam.CLASS({
       expression: function(property, daoContents, search, selectedOptions) {
         if ( ! daoContents || daoContents.length === 0 ) return [];
 
-        var options = daoContents.map(obj => obj[this.property].trim());
+        var options = daoContents.map((obj) => obj[this.property].trim());
 
         // Filter out search
         if ( search ) {
@@ -161,9 +162,9 @@ foam.CLASS({
       name: 'predicate',
       documentation: ``,
       expression: function(selectedOptions) {
-        if ( selectedOptions.length <= 0 || this.filteredOptions.length <= 0) return this.True.create();
+        if ( selectedOptions.length <= 0 ) return this.True.create();
 
-        if ( selectedOptions.length === 1) {
+        if ( selectedOptions.length === 1 ) {
           return foam.mlang.predicate.Eq.create({
             arg1: this.property,
             arg2: selectedOptions[0]
@@ -171,13 +172,12 @@ foam.CLASS({
         }
 
         var pred = foam.mlang.predicate.Or.create({ args: [] });
-        selectedOptions.forEach(string => {
+        selectedOptions.forEach((string) => {
           pred.args.push(foam.mlang.predicate.Eq.create({
             arg1: this.property,
             arg2: string
           }));
         });
-
         return pred;
       }
     },
@@ -190,7 +190,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.dao.select().then(results => {
+      this.dao.select().then((results) => {
         this.daoContents = results.array;
       });
       var self = this;

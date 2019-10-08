@@ -437,6 +437,7 @@ FOAM_FILES([
   { name: 'foam/u2/filter/IntegerFilterView', flags: ['web'] },
   { name: 'foam/u2/filter/FloatFilterView', flags: ['web'] },
   { name: 'foam/u2/filter/BooleanFilterView', flags: ['web'] },
+  { name: 'foam/u2/filter/ReferenceFilterView', flags: ['web'] },
   { name: 'foam/u2/filter/DateFilterView', flags: ['web'] },
   { name: 'foam/u2/filter/EnumFilterView', flags: ['web'] },
   { name: "foam/u2/search/FilterController", flags: ['web'] },
