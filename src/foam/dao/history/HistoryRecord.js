@@ -10,30 +10,45 @@ foam.CLASS({
 
   documentation: 'Contains an array of property updates',
   ids: [ 'objectId', 'seqNo' ],
-  
+
+  tableColumns: [
+    'timestamp',
+    'objectId',
+    'user',
+    'updates'
+  ],
+
   properties: [
     {
       class: 'Long',
-      name: 'seqNo'
+      name: 'seqNo',
+      hidden: true
     },
     {
       class: 'Object',
       name: 'objectId',
-      documentation: 'Id of object related to history record.'
+      label: 'Updated Object',
+      documentation: 'Id of object related to history record.',
+      tableWidth: 150
     },
     {
       class: 'String',
-      name: 'user'
+      name: 'user',
+      label: 'Updated By',
+      documentation: 'User that made the update.',
+      tableWidth: 200
     },
     {
       class: 'DateTime',
       name: 'timestamp',
-      documentation: 'Date and time history record was created.'
+      documentation: 'Date and time history record was created.',
+      tableWidth: 200
     },
     {
       class: 'FObjectArray',
       of: 'foam.dao.history.PropertyUpdate',
       name: 'updates',
+      label: 'Updated Properties',
       documentation: 'Properties updated, contains new and old values.'
     }
   ]
