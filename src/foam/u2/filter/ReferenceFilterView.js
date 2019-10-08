@@ -10,7 +10,7 @@ foam.CLASS({
   extends: 'foam.u2.Controller',
 
   documentation: `
-    Enables string filtering on Reference properties of a model. 
+    Enables string filtering on Reference properties of a model.
     An example might be - enables search by name rather than id of owner on a model where owner is a reference to users.
   `,
 
@@ -104,10 +104,10 @@ foam.CLASS({
         referenceObjectsArray = referenceObjectsArray.instance_.array;
         var result = {};
         for ( i =0; i < referenceObjectsArray.length; i++ ) {
-            if ( this.setOfReferenceIds.has(referenceObjectsArray[i].instance_.id) ) {
-              result[referenceObjectsArray[i].instance_.id] = referenceObjectsArray[i].legalName;
-            }
+          if ( this.setOfReferenceIds.has(referenceObjectsArray[i].instance_.id) ) {
+            result[referenceObjectsArray[i].instance_.id] = referenceObjectsArray[i].legalName;
           }
+        }
         return result;
       }
     },
@@ -130,7 +130,7 @@ foam.CLASS({
       documentation: `Required by SearchManager.`,
       value: 'Reference filter view'
     },
-   {
+    {
       name: 'predicate',
       documentation: ``,
       expression: function(selectedOptions, idToStringDisplayMap) {
@@ -158,7 +158,7 @@ foam.CLASS({
         });
         return pred;
       }
-  }
+    }
   ],
 
 
@@ -169,17 +169,17 @@ foam.CLASS({
   ],
 
 
-    methods: [
-      async function initE() {
-        var self  = this;
-        this.daoContents = await this.dao.select(); //  gets contents from the source dao
-        if ( ! this.targetDAOName ) {
-          console.error('Please specify a targetDAOKey on the reference.');
-          return;
-        }
-        this.referenceObjectsArray = await this.__subContext__[this.targetDAOName].select();
-        this
-          .addClass(this.myClass())
+  methods: [
+    async function initE() {
+      var self  = this;
+      this.daoContents = await this.dao.select(); //  gets contents from the source dao
+      if ( ! this.targetDAOName ) {
+        console.error('Please specify a targetDAOKey on the reference.');
+        return;
+      }
+      this.referenceObjectsArray = await this.__subContext__[this.targetDAOName].select();
+      this
+        .addClass(this.myClass())
           .start().addClass(this.myClass('container-search'))
             .start({
               class: 'foam.u2.TextField',
@@ -189,78 +189,74 @@ foam.CLASS({
             })
             .end()
           .end()
-
-
-          .start().addClass(self.myClass('container-filter'))
-          .add(this.slot(function(property, selectedOptions) {
-            var element = this.E();
-            if ( selectedOptions.length <= 0 ) return element;
-            return element
-              .start('p').addClass(self.myClass('label-section'))
-                .add(self.LABEL_SELECTED)
-              .end()
-              .call(function() {
-                self.selectedOptions.forEach(function(option, index) {
-                  return element
-                    .start().addClass(self.myClass('container-option'))
-                      .on('click', () => self.deselectOption(index))
-                      .start({
-                        class: 'foam.u2.md.CheckBox',
-                        data: true,
-                        showLabel: true,
-                        label: option ? option : self.LABEL_EMPTY
-                      }).end()
-                    .end();
-                });
-              });
-          }))
-            .add(this.slot(function(property, selectedOptions, filteredOptions) {
-            var element = this.E();
-            return element
-              .start('p').addClass(self.myClass('label-section'))
-                .add(self.LABEL_FILTERED)
-              .end()
-              .call(function() {
-                self.filteredOptions.forEach(function(option, index) {
-                  return element
-                    .start().addClass(self.myClass('container-option'))
-                      .on('click', () => self.selectOption(index))
-                      .start({
-                        class: 'foam.u2.md.CheckBox',
-                        data: false,
-                        showLabel: true,
-                        label: option ? option : self.LABEL_EMPTY
-                      }).end()
-                    .end();
-                });
-              });
-          }))
-        .end();
-      },
-      /**
-       * Clears the fields to their default values.
-       * Required on all SearchViews. Called by ReciprocalSearch.
-       */
-      function clear() {
-        this.selectedOptions = [];
-      }
-    ],
-    listeners: [
-      {
-        name: 'selectOption',
-        code: function(index) {
-          this.selectedOptions = this.selectedOptions.concat([this.filteredOptions[index]]);
-        }
-      },
-      {
-        name: 'deselectOption',
-        code: function(index) {
-          this.selectedOptions = this.selectedOptions.filter(function(_, selectedIndex) {
-            return index !== selectedIndex;
+        .start().addClass(self.myClass('container-filter'))
+        .add(this.slot(function(property, selectedOptions) {
+          var element = this.E();
+          if ( selectedOptions.length <= 0 ) return element;
+          return element
+          .start('p').addClass(self.myClass('label-section'))
+            .add(self.LABEL_SELECTED)
+          .end()
+          .call(function() {
+            self.selectedOptions.forEach(function(option, index) {
+              return element
+              .start().addClass(self.myClass('container-option'))
+                .on('click', () => self.deselectOption(index))
+                .start({
+                  class: 'foam.u2.md.CheckBox',
+                  data: true,
+                  showLabel: true,
+                  label: option ? option : self.LABEL_EMPTY
+                }).end()
+              .end();
+            });
           });
-        }
+        }))
+        .add(this.slot(function(property, selectedOptions, filteredOptions) {
+          var element = this.E();
+          return element
+          .start('p').addClass(self.myClass('label-section'))
+            .add(self.LABEL_FILTERED)
+          .end()
+          .call(function() {
+            self.filteredOptions.forEach(function(option, index) {
+              return element
+              .start().addClass(self.myClass('container-option'))
+                .on('click', () => self.selectOption(index))
+                .start({
+                  class: 'foam.u2.md.CheckBox',
+                  data: false,
+                  showLabel: true,
+                  label: option ? option : self.LABEL_EMPTY
+                }).end()
+              .end();
+            });
+          });
+        }))
+      .end();
+    },
+    /**
+    * Clears the fields to their default values.
+    * Required on all SearchViews. Called by ReciprocalSearch.
+    */
+    function clear() {
+      this.selectedOptions = [];
+    }
+  ],
+  listeners: [
+    {
+      name: 'selectOption',
+      code: function(index) {
+        this.selectedOptions = this.selectedOptions.concat([this.filteredOptions[index]]);
       }
-    ]
-  
+    },
+    {
+      name: 'deselectOption',
+      code: function(index) {
+        this.selectedOptions = this.selectedOptions.filter(function(_, selectedIndex) {
+          return index !== selectedIndex;
+        });
+      }
+    }
+  ]
 });
-
