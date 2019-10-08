@@ -13,6 +13,7 @@ foam.CLASS({
     'foam.core.ArraySlot',
     'foam.core.ConstantSlot',
     'foam.core.ProxySlot',
+    'foam.core.SimpleSlot',
     'foam.layout.Section',
     'foam.u2.detail.SectionedDetailPropertyView',
     'foam.u2.layout.Cols',
@@ -23,16 +24,8 @@ foam.CLASS({
   ],
 
   css: `
-    ^ .foam-u2-detail-SectionedDetailPropertyView {
-      padding: 12px 0;
-    }
-
-    ^ .foam-u2-detail-SectionedDetailPropertyView.first {
-      padding-top: 0;
-    }
-
-    ^ .foam-u2-detail-SectionedDetailPropertyView.last {
-      padding-bottom: 0;
+    ^ {
+      padding: 12px 0 0 0;
     }
   `,
 
@@ -58,46 +51,40 @@ foam.CLASS({
       value: true
     }
   ],
+
   methods: [
     function initE() {
       var self = this;
       self.SUPER();
-      var proxySlot = self.ProxySlot.create({ delegate: self.ConstantSlot.create({ value: [] }) });
-      var firstVisibleIndexSlot = proxySlot.map((arr) => arr.indexOf(true));
-      var lastVisibleIndexSlot  = proxySlot.map((arr) => arr.lastIndexOf(true));
 
       self
         .addClass(self.myClass())
         .add(self.slot(function(section, showTitle, section$title) {
           if ( ! section ) return;
-          var slots = [];
-          var elm = self.Rows.create()
+          return self.Rows.create()
             .show(section.createIsAvailableFor(self.data$))
             .callIf(showTitle && section$title, function() {
               this.start('h2').add(section$title).end();
             })
             .start(self.Grid)
               .forEach(section.properties, function(p, index) {
-                this.start(self.GUnit, { columns: p.gridColumns })
-                  .start(self.SectionedDetailPropertyView, {
+                var s1 = self.SimpleSlot.create();
+                var s2 = self.SimpleSlot.create();
+                this.start(self.GUnit, { columns: p.gridColumns }, s1)
+                  .tag(self.SectionedDetailPropertyView, {
                     prop: p,
                     data$: self.data$
-                  })
-                    .call(function() { slots.push(this.visibilitySlot); })
-                    .enableClass('first', firstVisibleIndexSlot.map((value) => value === index))
-                    .enableClass('last',   lastVisibleIndexSlot.map((value) => value === index))
-                  .end()
+                  }, s2)
                 .end();
+                s1.get().show(self.ProxySlot.create({ delegate$: s2.get().visibilitySlot$ }));
               })
             .end()
             .start(self.Cols)
-              .style({ 'justify-content': 'end' })
+              .style({ 'justify-content': 'end', 'margin-top': '20px' })
               .forEach(section.actions, function(a) {
                 this.add(a);
               })
             .end();
-          proxySlot.delegate = self.ArraySlot.create({ slots: slots });
-          return elm;
         }));
     }
   ]

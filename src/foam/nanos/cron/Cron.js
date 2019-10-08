@@ -26,12 +26,24 @@ foam.CLASS({
 
   searchColumns: ['id', 'description'],
 
+  sections: [
+    {
+      name: 'scheduling',
+      order: 2
+    },
+    {
+      name: '_defaultSection',
+      order: 1
+    }
+  ],
+
   properties: [
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.cron.Schedule',
       name: 'schedule',
-      hidden: true,
+      view: { class: 'foam.u2.DetailView' },
+      section: 'scheduling',
       javaFactory: `return new CronSchedule.Builder(getX()).build();`
     },
     {
