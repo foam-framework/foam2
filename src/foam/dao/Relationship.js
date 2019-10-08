@@ -1038,5 +1038,10 @@ foam.CLASS({
       flags: ['swift'],
       value: '// NOOP',
     },
+    {
+      name: 'createMode',
+      value: 'HIDDEN'
+    },
+    [ 'readView', { class: 'foam.u2.view.ReadManyToManyRelationshipPropertyView' } ]
   ],
 });

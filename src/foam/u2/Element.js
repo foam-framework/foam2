@@ -2162,6 +2162,14 @@ foam.CLASS({
       value: { class: 'foam.u2.TextField' }
     },
     {
+      class: 'foam.u2.ViewSpec',
+      name: 'readView',
+      documentation: 'This view will be used when the property is being read but cannot be edited.',
+      factory: function() {
+        return this.view;
+      }
+    },
+    {
       // DEPRECATED: Use 'createMode', 'readMode', and 'updateMode' instead.
       class: 'Enum',
       of: 'foam.u2.Visibility',
@@ -2224,7 +2232,10 @@ foam.CLASS({
 
   methods: [
     function toE(args, X) {
-      var e = foam.u2.ViewSpec.createView(this.view, args, this, X);
+      var viewSpec = X.controllerMode && X.controllerMode.getMode(this) === foam.u2.DisplayMode.RO
+        ? this.readView
+        : this.view;
+      var e = foam.u2.ViewSpec.createView(viewSpec, args, this, X);
 
       if ( X.data$ && ! ( args && ( args.data || args.data$ ) ) ) {
         e.data$ = X.data$.dot(this.name);
@@ -2291,7 +2302,8 @@ foam.CLASS({
       class: 'Int',
       name: 'displayWidth',
       expression: function(width) { return width; }
-    }
+    },
+    [ 'readView', { class: 'foam.u2.view.ValueView' } ]
   ]
 });
 
@@ -2311,7 +2323,8 @@ foam.CLASS({
   name: 'DateViewRefinement',
   refines: 'foam.core.Date',
   properties: [
-    [ 'view', { class: 'foam.u2.DateView' } ]
+    [ 'view', { class: 'foam.u2.DateView' } ],
+    [ 'readView', { class: 'foam.u2.view.ValueView' } ]
   ]
 });
 
@@ -2321,7 +2334,8 @@ foam.CLASS({
   name: 'DateTimeViewRefinement',
   refines: 'foam.core.DateTime',
   properties: [
-    [ 'view', { class: 'foam.u2.DateTimeView' } ]
+    [ 'view', { class: 'foam.u2.DateTimeView' } ],
+    [ 'readView', { class: 'foam.u2.view.ValueView' } ]
   ]
 });
 
@@ -2332,7 +2346,8 @@ foam.CLASS({
   refines: 'foam.core.Time',
   requires: [ 'foam.u2.TimeView' ],
   properties: [
-    [ 'view', { class: 'foam.u2.TimeView' } ]
+    [ 'view', { class: 'foam.u2.TimeView' } ],
+    [ 'readView', { class: 'foam.u2.view.ValueView' } ]
   ]
 });
 
@@ -2344,7 +2359,8 @@ foam.CLASS({
   requires: [ 'foam.u2.FloatView' ],
   properties: [
     [ 'displayWidth', 12 ],
-    [ 'view', { class: 'foam.u2.FloatView' } ]
+    [ 'view', { class: 'foam.u2.FloatView' } ],
+    [ 'readView', { class: 'foam.u2.view.ValueView' } ]
   ]
 });
 
@@ -2356,7 +2372,8 @@ foam.CLASS({
   requires: [ 'foam.u2.IntView' ],
   properties: [
     [ 'displayWidth', 10 ],
-    [ 'view', { class: 'foam.u2.IntView' } ]
+    [ 'view', { class: 'foam.u2.IntView' } ],
+    [ 'readView', { class: 'foam.u2.view.ValueView' } ]
   ]
 });
 
@@ -2368,7 +2385,8 @@ foam.CLASS({
   requires: [ 'foam.u2.CurrencyView' ],
   properties: [
     [ 'displayWidth', 15 ],
-    [ 'view', { class: 'foam.u2.CurrencyView' } ]
+    [ 'view', { class: 'foam.u2.CurrencyView' } ],
+    [ 'readView', { class: 'foam.u2.view.ValueView' } ]
   ]
 });
 
@@ -2389,6 +2407,7 @@ foam.CLASS({
         };
       }
     },
+    [ 'readView', { class: 'foam.u2.view.ValueView' } ],
     {
       class: 'String',
       name: 'label2'
@@ -2412,7 +2431,8 @@ foam.CLASS({
         viewa: 'foam.u2.TextField',
         viewb: { class: 'foam.u2.view.ColorPicker', onKey: true }
       }
-    }
+    },
+    [ 'readView', { class: 'foam.u2.view.ValueView' } ]
   ]
 });
 
@@ -2426,6 +2446,7 @@ foam.CLASS({
       name: 'view',
       value: { class: 'foam.u2.DetailView' },
     },
+    [ 'readView', { class: 'foam.u2.CitationView' } ],
     {
       name: 'validationTextVisible',
       documentation: `
@@ -2494,7 +2515,8 @@ foam.CLASS({
       value: {
         class: 'foam.u2.view.ReferenceView'
       }
-    }
+    },
+    [ 'readView', { class: 'foam.u2.view.ReadReferenceView' } ]
   ]
 });
 
@@ -2505,6 +2527,7 @@ foam.CLASS({
   refines: 'foam.core.Enum',
   properties: [
     [ 'view',          { class: 'foam.u2.EnumView' } ],
+    [ 'readView', { class: 'foam.u2.CitationView' } ],
     [ 'tableCellView', function(obj) { return this.get(obj).label; } ]
   ]
 });
@@ -2517,6 +2540,18 @@ foam.CLASS({
   requires: [ 'foam.u2.view.AnyView' ],
   properties: [
     [ 'view', { class: 'foam.u2.view.AnyView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'CodeViewRefinement',
+  refines: 'foam.core.Code',
+  requires: [ 'foam.comics.InlineBrowserView' ],
+  properties: [
+    [ 'view', { class: 'io.c9.ace.Editor' } ],
+    [ 'readView', { class: 'foam.u2.view.PreView' } ]
   ]
 });
 
