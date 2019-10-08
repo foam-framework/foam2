@@ -20,20 +20,36 @@ foam.CLASS({
 
   css: `
     ^container {
-      width: 100%;
-      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      padding: 4px 16px;
+    }
+
+    ^container:hover {
+      cursor: pointer;
+      background-color: #f5f7fa;
     }
 
     ^container:first-child {
-      padding-top: 24px;
+      margin-top: 20px;
     }
 
     ^container:last-child {
-      padding-bottom: 24px;
+      margin-bottom: 20px;
     }
 
-    ^container .foam-u2-Checkbox:hover, ^container .foam-u2-Checkbox-label:hover {
-      cursor: pointer;
+    ^container .foam-u2-md-CheckBox-label {
+      position: relative;
+      margin-top: 0;
+    }
+
+    ^container .foam-u2-md-CheckBox {
+      border-color: #9ba1a6;
+    }
+
+    ^container .foam-u2-md-CheckBox:checked {
+      background-color: #406dea;
+      border-color: #406dea;
     }
   `,
 
@@ -88,11 +104,21 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start().addClass(this.myClass('container'))
-          .add(this.CheckBox.create({ data$: this.bool1$, label: 'True' }))
+          .start({
+            class: 'foam.u2.md.CheckBox',
+            data$: this.bool1$,
+            showLabel: true,
+            label: 'True'
+          }).end()
         .end()
         .start().addClass(this.myClass('container'))
-          .add(this.CheckBox.create({ data$: this.bool2$, label: 'False' }))
-        .end()
+          .start({
+            class: 'foam.u2.md.CheckBox',
+            data$: this.bool2$,
+            showLabel: true,
+            label: 'False'
+          }).end()
+        .end();
     },
 
     /**
