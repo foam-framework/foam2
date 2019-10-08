@@ -17,12 +17,12 @@ foam.CLASS({
     {
       class: 'Object',
       name: 'oldValue',
-      view: 'foam.u2.detail.SectionedDetailView'
+      view: 'foam.u2.view.AutomaticView'
     },
     {
       class: 'Object',
       name: 'newValue',
-      view: 'foam.u2.detail.SectionedDetailView'
+      view: 'foam.u2.view.AutomaticView'
     }
   ]
 });
