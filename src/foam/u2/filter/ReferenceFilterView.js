@@ -119,11 +119,7 @@ foam.CLASS({
         if ( ! referenceObjectsArray || ! setOfReferenceIds ) return {};
         var result = {};
         for ( i =0; i < referenceObjectsArray.length; i++ ) {
-          console.log(setOfReferenceIds);
-          console.log(referenceObjectsArray[i].id);
-          debugger;
           if ( setOfReferenceIds.has(referenceObjectsArray[i].id) ) {
-            debugger;
             result[referenceObjectsArray[i].id] = referenceObjectsArray[i].toSummary();
           }
         }
@@ -203,17 +199,21 @@ foam.CLASS({
         }
 
         if ( selectedOptions.length === 1 ) {
+          var key = getKeyByValue_(idToStringDisplayMap, selectedOptions[0]);
+          key = parseInt(key) ? parseInt(key) : key;
           return foam.mlang.predicate.Eq.create({
             arg1: this.property,
-            arg2: parseInt(getKeyByValue_(idToStringDisplayMap, selectedOptions[0]))
+            arg2: key
           });
         }
 
         var pred = foam.mlang.predicate.Or.create({ args: [] });
         selectedOptions.forEach( (string) => {
+          var key = getKeyByValue_(idToStringDisplayMap, string);
+          key = parseInt(key) ? parseInt(key) : key;
           pred.args.push(foam.mlang.predicate.Eq.create({
             arg1: this.property,
-            arg2: parseInt(getKeyByValue_(idToStringDisplayMap, string))
+            arg2: key
           }));
         });
 
@@ -222,11 +222,13 @@ foam.CLASS({
     }
   ],
 
+
   messages: [
     { name: 'LABEL_PLACEHOLDER', message: 'Search' },
     { name: 'LABEL_SELECTED', message: 'SELECTED OPTIONS' },
     { name: 'LABEL_FILTERED', message: 'OPTIONS' }
   ],
+
 
   methods: [
     function initE() {
@@ -308,7 +310,6 @@ foam.CLASS({
       this.selectedOptions = [];
     }
   ],
-
   listeners: [
     {
       name: 'selectOption',
