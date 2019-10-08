@@ -40,6 +40,12 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'property',
+      documentation: `The property that this view is filtering by. Should be of
+      type int that refers to the id of the referenced object.`,
+      required: true
+    },
+    {
       name: 'targetDAOName',
       documentation: `The property that this view is filtering by. Should be of
       type int that refers to the id of the referenced object.`,
@@ -48,16 +54,52 @@ foam.CLASS({
       }
     },
     {
-      name: 'property',
-      documentation: `The property that this view is filtering by. Should be of
-      type int that refers to the id of the referenced object.`,
+      class: 'foam.dao.DAOProperty',
+      name: 'dao',
       required: true
+    },
+    {
+      name: 'referenceObjectsArray',
+    },
+    {
+      name: 'idToStringDisplayMap',
+      documentation: 'map that contains ids as keys and names as values',
+      expression: function(referenceObjectsArray) {
+        if ( ! referenceObjectsArray ) return;
+        referenceObjectsArray = referenceObjectsArray.instance_.array;
+        var result = {};
+        for ( i =0; i < referenceObjectsArray.length; i++ ) {
+          if ( this.setOfReferenceIds.has(referenceObjectsArray[i].instance_.id) ) {
+            result[referenceObjectsArray[i].instance_.id] = referenceObjectsArray[i].toSummary();
+          }
+        }
+        return result;
+      }
+    },
+    {
+      name: 'daoContents',
+    },
+    {
+      name: 'setOfReferenceIds',
+      documentation: 'an array of unique reference ids',
+      expression: function(daoContents) {
+        var result = [];
+        daoContents.instance_.array.forEach( function(id) {
+          ( result.push(id.instance_.owner) );
+        });
+        return new Set(result);
+      }
     },
     {
       name: 'selectedOptions',
       factory: function() {
         return [];
       }
+    },
+    {
+      class: 'String',
+      name: 'search',
+      documentation: 'Property used to search for available options'
     },
     {
       name: 'filteredOptions',
@@ -83,47 +125,6 @@ foam.CLASS({
 
         return options;
       }
-    },
-    {
-      class: 'String',
-      name: 'search'
-    },
-    {
-      class: 'foam.dao.DAOProperty',
-      name: 'dao',
-      required: true
-    },
-    {
-      name: 'daoContents',
-    },
-    {
-      name: 'idToStringDisplayMap',
-      documentation: 'map that contains ids as keys and names as values',
-      expression: function(referenceObjectsArray) {
-        if ( ! referenceObjectsArray ) return;
-        referenceObjectsArray = referenceObjectsArray.instance_.array;
-        var result = {};
-        for ( i =0; i < referenceObjectsArray.length; i++ ) {
-          if ( this.setOfReferenceIds.has(referenceObjectsArray[i].instance_.id) ) {
-            result[referenceObjectsArray[i].instance_.id] = referenceObjectsArray[i].legalName;
-          }
-        }
-        return result;
-      }
-    },
-    {
-      name: 'setOfReferenceIds',
-      documentation: 'an array of unique reference ids',
-      expression: function(daoContents) {
-        var result = [];
-        daoContents.instance_.array.forEach( function(id) {
-          ( result.push(id.instance_.owner) );
-        });
-        return new Set(result);
-      }
-    },
-    {
-      name: 'referenceObjectsArray',
     },
     {
       name: 'name',
@@ -156,6 +157,7 @@ foam.CLASS({
             arg2: parseInt(getKeyByValue_(idToStringDisplayMap, string))
           }));
         });
+
         return pred;
       }
     }
