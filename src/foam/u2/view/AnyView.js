@@ -55,6 +55,14 @@ foam.CLASS({
             }
           }),
           foam.u2.view.AnyView.Choice.create({
+            label: 'FObject',
+            type: foam.core.FObject,
+            view: foam.u2.view.FObjectView,
+            toType: function(o) {
+              return foam.core.FObject.isInstance(o) ? o : {};
+            }
+          }),
+          foam.u2.view.AnyView.Choice.create({
             label: 'Array',
             type: foam.Array,
             view: foam.u2.view.ArrayView,
@@ -114,6 +122,10 @@ foam.CLASS({
       expression: function(data, types) {
         var type = foam.typeOf(data);
         var choice = types.find(t => type == t.type);
+        if ( ! choice ) {
+          console.warn("Unable to find view for type!");
+          console.log(data);
+        }
         return choice || types[0];
       }
     },
