@@ -20,21 +20,69 @@ foam.CLASS({
   ],
 
   css: `
-    ^container {
+    ^ {
+      position: relative;
+    }
+
+    ^container-search {
+      padding: 24px 16px;
+      border-bottom: solid 1px #cbcfd4;
+    }
+
+    ^ .foam-u2-TextField {
       width: 100%;
-      padding: 12px 16px;
+      height: 36px;
+
+      font-size: 14px;
+
+      border-radius: 3px;
+      border: solid 1px #cbcfd4;
+      background-color: #ffffff;
+
+      background-image: url(images/ic-search.svg);
+      background-repeat: no-repeat;
+      background-position: 8px;
+      padding: 0 21px 0 38px;
     }
 
-    ^container:first-child {
-      padding-top: 24px;
-    }
-
-    ^container:last-child {
+    ^container-filter {
+      max-height: 320px;
+      overflow: scroll;
       padding-bottom: 24px;
     }
 
-    ^container .foam-u2-Checkbox:hover, ^container .foam-u2-Checkbox-label:hover {
+    ^label-section {
+      padding: 0 16px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.33;
+      letter-spacing: normal;
+      color: #1e1f21;
+    }
+
+    ^container-option {
+      display: flex;
+      align-items: center;
+      padding: 4px 16px;
+    }
+
+    ^container-option:hover {
       cursor: pointer;
+      background-color: #f5f7fa;
+    }
+
+    ^container-option .foam-u2-md-CheckBox-label {
+      position: relative;
+      margin-top: 0;
+    }
+
+    ^container-option .foam-u2-md-CheckBox {
+      border-color: #9ba1a6;
+    }
+
+    ^container-option .foam-u2-md-CheckBox:checked {
+      background-color: #406dea;
+      border-color: #406dea;
     }
   `,
 
@@ -60,17 +108,23 @@ foam.CLASS({
     },
     {
       name: 'referenceObjectsArray',
+      factory: function() {
+        return [];
+      }
     },
     {
       name: 'idToStringDisplayMap',
       documentation: 'map that contains ids as keys and names as values',
-      expression: function(referenceObjectsArray) {
-        if ( ! referenceObjectsArray ) return;
-        referenceObjectsArray = referenceObjectsArray.instance_.array;
+      expression: function(referenceObjectsArray, setOfReferenceIds) {
+        if ( ! referenceObjectsArray || ! setOfReferenceIds ) return {};
         var result = {};
         for ( i =0; i < referenceObjectsArray.length; i++ ) {
-          if ( this.setOfReferenceIds.has(referenceObjectsArray[i].instance_.id) ) {
-            result[referenceObjectsArray[i].instance_.id] = referenceObjectsArray[i].toSummary();
+          console.log(setOfReferenceIds);
+          console.log(referenceObjectsArray[i].id);
+          debugger;
+          if ( setOfReferenceIds.has(referenceObjectsArray[i].id) ) {
+            debugger;
+            result[referenceObjectsArray[i].id] = referenceObjectsArray[i].toSummary();
           }
         }
         return result;
@@ -78,14 +132,19 @@ foam.CLASS({
     },
     {
       name: 'daoContents',
+      factory: function() {
+        return [];
+      }
     },
     {
       name: 'setOfReferenceIds',
       documentation: 'an array of unique reference ids',
       expression: function(daoContents) {
+        if ( ! daoContents ) return;
+        var self = this;
         var result = [];
-        daoContents.instance_.array.forEach( function(id) {
-          ( result.push(id.instance_.owner) );
+        daoContents.forEach( function(content) {
+          result.push(content[self.property]);
         });
         return new Set(result);
       }
@@ -104,7 +163,7 @@ foam.CLASS({
     {
       name: 'filteredOptions',
       expression: function(property, daoContents, idToStringDisplayMap, search, selectedOptions) {
-        if ( ! daoContents || daoContents.length === 0 ) return [];
+        if ( ! daoContents || daoContents.length === 0 || ! idToStringDisplayMap ) return [];
 
         var options = Object.values(idToStringDisplayMap);
 
@@ -163,23 +222,27 @@ foam.CLASS({
     }
   ],
 
-
   messages: [
     { name: 'LABEL_PLACEHOLDER', message: 'Search' },
     { name: 'LABEL_SELECTED', message: 'SELECTED OPTIONS' },
     { name: 'LABEL_FILTERED', message: 'OPTIONS' }
   ],
 
-
   methods: [
-    async function initE() {
+    function initE() {
       var self  = this;
-      this.daoContents = await this.dao.select(); //  gets contents from the source dao
       if ( ! this.targetDAOName ) {
         console.error('Please specify a targetDAOKey on the reference.');
         return;
       }
-      this.referenceObjectsArray = await this.__subContext__[this.targetDAOName].select();
+      this.dao.select().then(function(result) {
+        self.daoContents = result.array; //  gets contents from the source dao
+      });
+
+      this.__subContext__[this.targetDAOName].select().then(function(result) {
+        self.referenceObjectsArray = result.array;
+      });
+
       this
         .addClass(this.myClass())
           .start().addClass(this.myClass('container-search'))
@@ -245,6 +308,7 @@ foam.CLASS({
       this.selectedOptions = [];
     }
   ],
+
   listeners: [
     {
       name: 'selectOption',
