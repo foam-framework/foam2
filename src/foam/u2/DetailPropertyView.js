@@ -44,6 +44,9 @@ foam.CLASS({
     }
     .foam-u2-PropertyView-view {
       padding: 2px 8px 2px 6px;
+      font-size: 14px;
+      height: 45px;
+
     }
     .foam-u2-PropertyView-units  {
       color: #444;
