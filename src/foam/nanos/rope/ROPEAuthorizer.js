@@ -45,6 +45,7 @@ foam.CLASS({
     {
       name: 'getTargetRopes',
       type: 'Object',
+      documentation:'retrieves the required ropes relating the source model to the target model to be used by the algorithm',
       javaType: 'List<ROPE>',
       args: [
         {
@@ -80,6 +81,7 @@ foam.CLASS({
     {
       name: 'retrieveProperty',
       type: 'Object',
+      documentation: 'Method used for needed dynamic typing within the rope code using java reflection',
       javaType: '<T> T',
       args: [
         {
@@ -205,6 +207,7 @@ foam.CLASS({
     {
       name: 'ropeSearch',
       type: 'Boolean',
+      documentation: 'main starting point for the rope algorithm; method performs the recursive relational tree search needed for authentication',
       args: [
         {
           name: 'operation',
