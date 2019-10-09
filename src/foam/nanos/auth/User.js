@@ -137,10 +137,6 @@ foam.CLASS({
       validateObj: function(firstName) {
         if ( ! firstName.trim() ){
           return 'First Name Required.'
-        } if ( firstName.length > 70 ) {
-          return 'First name cannot exceed 70 characters.';
-        } if( /\d/.test(this.firstName) ) {
-          return 'First name cannot contain numbers';
         }
       },
       gridColumns: 4,
@@ -160,10 +156,6 @@ foam.CLASS({
       validateObj: function(lastName) {
         if ( ! lastName.trim() ) {
           return 'Last Name Required.';
-        } if ( lastName.length > 70 ) {
-          return 'Last name cannot exceed 70 characters.';
-        } if ( /\d/.test(this.lastName) ) {
-          return 'Last name cannot contain numbers';
         }
       },
       gridColumns: 4,
@@ -183,9 +175,7 @@ foam.CLASS({
       width: 100,
       tableWidth: 160,
       validateObj: function(organization) {
-        if ( organization.length > 70 ) {
-          return 'Company name cannot exceed 70 characters.';
-        } if (!(organization.trim())) {
+        if (!(organization.trim())) {
           return 'Company Name Required.';
         }
       },
@@ -390,11 +380,6 @@ foam.CLASS({
       name: 'businessName',
       documentation: 'The name of the business associated with the User.',
       width: 50,
-      validateObj: function(businessName) {
-        if ( businessName.length > 35 ) {
-          return 'Business name cannot be greater than 35 characters.';
-        }
-      },
       section: 'business',
       hidden: true
     },
