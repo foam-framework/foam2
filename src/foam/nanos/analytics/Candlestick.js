@@ -8,6 +8,19 @@ foam.CLASS({
   package: 'foam.nanos.analytics',
   name: 'Candlestick',
   ids: ['closeTime', 'key'],
+
+  documentation: `
+    Represents a single candlestick in a financial candlestick chart. See
+    https://en.wikipedia.org/wiki/Candlestick_chart.
+
+    Each candlestick represents four measurements of some variable over a fixed
+    timespan:
+      1. The value at the beginning of the timespan, called "open"
+      2. The value at the end of the timespan, called "close"
+      3. The maximum value observed during the timespan, called "max"
+      4. The minimum value observed during the timespan, called "min"
+  `,
+
   tableColumns: [
     'key',
     'openValueTime',
@@ -105,6 +118,7 @@ if ( ! isPropertySet("openValueTime") || time.compareTo(getOpenValueTime()) < 0 
   setOpenValueTime(time);
   setOpen(v);
 }
+
 if ( ! isPropertySet("closeValueTime") || time.compareTo(getCloseValueTime()) > 0 ) {
   setCloseValueTime(time);
   setClose(v);
@@ -130,6 +144,7 @@ if ( ! isPropertySet("openValueTime") || c.getOpenValueTime().compareTo(getOpenV
   setOpenValueTime(c.getOpenValueTime());
   setOpen(c.getOpen());
 }
+
 if ( ! isPropertySet("closeValueTime") || c.getCloseValueTime().compareTo(getCloseValueTime()) > 0 ) {
   setCloseValueTime(c.getCloseValueTime());
   setClose(c.getClose());

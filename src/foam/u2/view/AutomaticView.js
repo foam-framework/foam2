@@ -4,27 +4,21 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
+    'foam.core.FObject',
     'foam.u2.view.AnyView',
     'foam.u2.detail.SectionedDetailView'
   ],
 
   documentation: `
-    Automatically determins the correct view for a property
-    of type 'Object'.
+    Automatically determines the correct view for a property of type 'Object'.
   `,
 
   methods: [
     function initE() {
-      var self = this;
-
-      if ( foam.core.FObject.isInstance(self.data) ) {
-        self.start(this.SectionedDetailView, {
-          data: self.data
-        });
+      if ( this.FObject.isInstance(this.data) ) {
+        this.start(this.SectionedDetailView, { data: this.data });
       } else {
-        self.start(this.AnyView, {
-          data: self.data
-        });
+        this.tag(this.AnyView, { data: this.data });
       }
     }
   ]
