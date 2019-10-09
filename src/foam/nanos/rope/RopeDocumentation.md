@@ -9,3 +9,13 @@ Permissions based on relationships can be configured by the user by creating a R
 One of the key defining features that makes the ROPE algorithm's authentication so versitile and configurable is it's transitivity. An abstract example being some object 'A' attempting to perform an operation on some other object 'C'. Although 'A' may not be directly related to see, it may be related to some intermediate object 'B' which is itself related to object 'C'. Givin the correct configuration of the ROPEs on these two relationships; object A can be granted certain permissions toward object 'C' through its relationship to object 'B'.
 
 
+
+Technical Notes on the Proper Setup of ROPE objects:
+
+One trivial requirement of all ROPE objects is to setup the source and target models, their respective DAO keys, and the cardinality which is a string representing the type of the relationship be it one to many or many to one, the uses should specify this feild as a String of the form "1:*" or "*:*". There are also 3 additional fields that must be set up to describe the relation and the dao in which the relation's objects are held. These include junctionModel, junctionDAOKey, and inverseName.
+
+Now for the meat of the ROPE algorithm. To set up which permissions this ROPE will enable,
+
+
+
+
