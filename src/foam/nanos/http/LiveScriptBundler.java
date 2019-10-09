@@ -32,7 +32,6 @@ public class LiveScriptBundler
 
   // Caching
   protected String javascriptBuffer_;
-  protected ReentrantLock requestBlockingLock_;
 
   // Configuration
   protected static final String FOAM_BIN_PATH = "./tools/js_build/foam-bin.js";
@@ -110,7 +109,6 @@ public class LiveScriptBundler
 
   public LiveScriptBundler(String path) {
     fileNames_ = new LinkedBlockingQueue<>();
-    requestBlockingLock_ = new ReentrantLock();
     path_ = path;
 
     try {
@@ -204,8 +202,7 @@ public class LiveScriptBundler
     }
   }
 
-  private void doRebuildJavascript(String foamName, Path realPath) {
-    requestBlockingLock_.lock(); // Block javascript requests while building
+  private synchronized void doRebuildJavascript(String foamName, Path realPath) {
     try {
       log_("START", "Building javascript... (JS)");
 
@@ -221,8 +218,6 @@ public class LiveScriptBundler
       log_("DONE", "JS");
     } catch (IOException e) {
       log_("ERROR", e.getMessage());
-    } finally {
-      requestBlockingLock_.unlock();
     }
   }
 
@@ -232,8 +227,7 @@ public class LiveScriptBundler
     HttpServletResponse r  = x.get(HttpServletResponse.class);
     r.setHeader("Content-Type", "application/javascript");
 
-    requestBlockingLock_.lock(); // Wait for build to finish before serving
-    requestBlockingLock_.unlock(); // Safe to unlock before sending response
+    synchronized (this) {} // Wait for build to finish before serving
     pw.println(javascriptBuffer_);
   }
 
