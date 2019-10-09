@@ -6,3 +6,6 @@ The ROPE authentication system can be utilized by the user of the framework by a
 
 Permissions based on relationships can be configured by the user by creating a ROPE objects from the ROPE.js model and setting the properties accordingly and afterwards appending the object to the application's ropeDAO which will be utilized by the ROPE algorithm to perform authentication checks. Given a missing ROPE, the algorithm trivially assumes that all permissions are not granted on that object.
 
+One of the key defining features that makes the ROPE algorithm's authentication so versitile and configurable is it's transitivity. An abstract example being some object 'A' attempting to perform an operation on some other object 'C'. Although 'A' may not be directly related to see, it may be related to some intermediate object 'B' which is itself related to object 'C'. Givin the correct configuration of the ROPEs on these two relationships; object A can be granted certain permissions toward object 'C' through its relationship to object 'B'.
+
+
