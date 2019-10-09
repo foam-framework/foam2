@@ -95,7 +95,7 @@ foam.CLASS({
         OMLogger omLogger = (OMLogger) getX().get("OMLogger");
         Transport transport = null;
         try {
-          omLogger.log(this.getClass().getSimpleName(), "transport","connecting");
+          omLogger.log(this.getClass().getSimpleName(), "transport", "connecting");
           transport = getSession_().getTransport("smtp");
           transport.connect(getUsername(), getPassword());
           logger.info("SMTPEmailService connected.");
