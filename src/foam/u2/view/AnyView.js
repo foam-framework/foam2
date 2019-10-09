@@ -59,7 +59,7 @@ foam.CLASS({
             type: foam.core.FObject,
             view: foam.u2.view.FObjectView,
             toType: function(o) {
-              return foam.core.FObject.isInstance(o) ? o : {};
+              return foam.core.FObject.isInstance(o) ? o : foam.core.FObject.create();
             }
           }),
           foam.u2.view.AnyView.Choice.create({
