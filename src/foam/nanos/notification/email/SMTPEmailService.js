@@ -99,7 +99,7 @@ foam.CLASS({
           transport = getSession_().getTransport("smtp");
           transport.connect(getUsername(), getPassword());
           logger.info("SMTPEmailService connected.");
-          omLogger.log(this.getClass().getSimpleName(), "transport","connected");
+          omLogger.log(this.getClass().getSimpleName(), "transport", "connected");
         } catch ( Exception e ) {
           logger.error("Transport failed to initialize: " + e);
         }
