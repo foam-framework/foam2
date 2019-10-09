@@ -10,11 +10,19 @@ One of the key defining features that makes the ROPE algorithm's authentication 
 
 
 
+
+
 Technical Notes on the Proper Setup of ROPE objects:
+
+Setup of Miscellany,
 
 One trivial requirement of all ROPE objects is to setup the source and target models, their respective DAO keys, and the cardinality which is a string representing the type of the relationship be it one to many or many to one, the uses should specify this feild as a String of the form "1:*" or "*:*". There are also 3 additional fields that must be set up to describe the relation and the dao in which the relation's objects are held. These include junctionModel, junctionDAOKey, and inverseName.
 
-Now for the meat of the ROPE algorithm. To set up which permissions this ROPE will enable,
+To set up which permissions this ROPE will enable,
+
+ROPE works by checking which permissions are implied given any that a User might already have in a transitive fassion. "Permissions" in this sense are represented by an abstract ROPEActions object. ROPE contains a matrix of ROPEActions within its variable CRUD. Represented by a map of Lists for each permission, this matrix can be used to configure which ROPEAction enumerations imply each other. For example, say if you want a User having write permissions to some Object A, we want to ensure that it also has read permissions for Object B; we would then add a read ROPEAction to the List pointed to by the write ROPEAction key.
+
+
 
 
 
