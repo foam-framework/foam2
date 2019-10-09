@@ -92,11 +92,14 @@ foam.CLASS({
       javaFactory:
       `
         Logger logger = (Logger) getX().get("logger");
+        OMLogger omLogger = (OMLogger) getX().get("OMLogger");
         Transport transport = null;
         try {
+          omLogger.log(this.getClass().getSimpleName(), "transport", "connecting");
           transport = getSession_().getTransport("smtp");
           transport.connect(getUsername(), getPassword());
           logger.info("SMTPEmailService connected.");
+          omLogger.log(this.getClass().getSimpleName(), "transport", "connected");
         } catch ( Exception e ) {
           logger.error("Transport failed to initialize: " + e);
         }
@@ -212,13 +215,19 @@ foam.CLASS({
     {
       name: 'sendEmail',
       javaCode: `
+        Logger logger = (Logger) getX().get("logger");
+        OMLogger omLogger = (OMLogger) getX().get("OMLogger");
+
         emailMessage = (EmailMessage) emailMessage.fclone();
         MimeMessage message = createMimeMessage(emailMessage);
-        Logger logger = (Logger) getX().get("logger");
+        if ( message == null ) {
+          return emailMessage;
+        }
         try {
           getTransport_().send(message);
           emailMessage.setStatus(Status.SENT);
           logger.debug("SMTPEmailService sent MimeMessage.");
+          omLogger.log(this.getClass().getSimpleName(), "message", "sent");
         } catch ( SendFailedException e ) {
           emailMessage.setStatus(Status.FAILED);
           logger.error("SMTPEmailService sending MimeMessage failed. " + e);
