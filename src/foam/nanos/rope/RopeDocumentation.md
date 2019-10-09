@@ -1,0 +1,1 @@
+This file contains the complete description of the function and design of the ROPE authentication engine.
