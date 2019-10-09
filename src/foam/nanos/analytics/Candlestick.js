@@ -118,6 +118,7 @@ if ( ! isPropertySet("openValueTime") || time.compareTo(getOpenValueTime()) < 0 
   setOpenValueTime(time);
   setOpen(v);
 }
+
 if ( ! isPropertySet("closeValueTime") || time.compareTo(getCloseValueTime()) > 0 ) {
   setCloseValueTime(time);
   setClose(v);
@@ -143,6 +144,7 @@ if ( ! isPropertySet("openValueTime") || c.getOpenValueTime().compareTo(getOpenV
   setOpenValueTime(c.getOpenValueTime());
   setOpen(c.getOpen());
 }
+
 if ( ! isPropertySet("closeValueTime") || c.getCloseValueTime().compareTo(getCloseValueTime()) > 0 ) {
   setCloseValueTime(c.getCloseValueTime());
   setClose(c.getClose());

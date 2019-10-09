@@ -22,47 +22,50 @@ foam.CLASS({
     {
       name: 'log',
       javaCode: `
-      ((FoldManager) getX().get("omFoldManager")).foldForState(combine(args), new Date(), 1);
+        ((FoldManager) getX().get("omFoldManager")).foldForState(combine(args), new Date(), 1);
       `
     },
     {
       name: 'info',
       javaCode: `
-      log(args);
+        log(args);
       `
     },
     {
       name: 'warning',
       javaCode: `
-      log(args);
+        log(args);
       `
     },
     {
       name: 'error',
       javaCode: `
-      log(args);
+        log(args);
       `
     },
     {
       name: 'debug',
       javaCode: `
-      log(args);
+        log(args);
       `
     },
     {
       name: 'combine',
       javaCode:
       `
-  StringBuilder str = sb.get();
-  if ( args.length >= 1) {
-    str.append(formatArg(args[0]));
-  }
-  for ( int i = 1; i < args.length; ++i) {
-    Object n = args[i];
-    str.append('.');
-    str.append(formatArg(n));
-  }
-  return str.toString();`
+        StringBuilder str = sb.get();
+
+        if ( args.length >= 1 ) {
+          str.append(formatArg(args[0]));
+        }
+
+        for ( int i = 1 ; i < args.length ; ++i ) {
+          Object n = args[i];
+          str.append('.');
+          str.append(formatArg(n));
+        }
+
+        return str.toString();`
     }
   ]
 });
