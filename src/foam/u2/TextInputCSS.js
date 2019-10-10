@@ -18,6 +18,7 @@ foam.CLASS({
         ^ {
           height: %INPUTHEIGHT%;
           font-size: 14px;
+          padding-left: %INPUTHORIZONTALPADDING%;
           padding-right: %INPUTHORIZONTALPADDING%;
           border: 1px solid;
           border-radius: 3px;
