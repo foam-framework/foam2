@@ -31,7 +31,7 @@ There is a simpler way to add a permission that is less flexible. If the very ac
 &nbsp;
 &nbsp;
 
-## Working Example
+## Working Example with Code
 
 #### Access of a User's Bank Account
 
