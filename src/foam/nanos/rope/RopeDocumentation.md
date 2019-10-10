@@ -37,7 +37,7 @@ There is a simpler way to add a permission that is less flexible. If the very ac
     code();
   end
 ```
-> test
->   code();
+> test \n
+>   code(); \\
 > end
 
