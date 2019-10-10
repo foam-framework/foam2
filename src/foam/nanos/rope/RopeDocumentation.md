@@ -32,6 +32,11 @@ There is a simpler way to add a permission that is less flexible. If the very ac
 &nbsp;
 
 ## Working Example
+
+#### Access of a User's Bank Account
+
+Here we want to show ROPE in action in the context of being able to...
+
 ``` java
   int javacode() {
     String goes;
