@@ -435,13 +435,22 @@ foam.CLASS({
       name: 'label',
       type: 'String',
       code: function label() {
-        return this.organization || this.businessName || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
+        if ( this.lastName && this.firstName ) return this.firstName + ' ' + this.lastName;
+        if ( this.lastName && ! this.firstName ) return this.lastName;
+        if ( ! this.lastName && this.firstName ) return this.firstName;
+        if ( this.legalName ) return this.legalName;
+        if ( this.organization ) return this.organization;
+        if ( this.businessName ) return this.businessName;
+        return '';
       },
       javaCode: `
-        if ( ! SafetyUtil.isEmpty(getOrganization()) ) return getOrganization();
-        if ( ! SafetyUtil.isEmpty(getBusinessName()) ) return getBusinessName();
-        if ( SafetyUtil.isEmpty(getLastName()) ) return getFirstName();
-        return getFirstName() + " " + getLastName();
+        if ( this.lastNameIsSet_ && this.firstNameIsSet_ ) return this.getFirstName() + " " + this.getLastName();
+        if ( this.lastNameIsSet_ && ! this.firstNameIsSet_) return this.getLastName();
+        if ( ! this.lastNameIsSet_ && this.firstNameIsSet_) return this.getFirstName();
+        if ( this.legalNameIsSet_ ) return this.getLegalName();
+        if ( this.organizationIsSet_ ) return this.getOrganization();
+        if ( this.businessNameIsSet_ ) return this.getBusinessName();
+        return "";
       `
     },
     {
