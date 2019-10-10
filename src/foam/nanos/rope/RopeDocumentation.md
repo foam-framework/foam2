@@ -33,9 +33,10 @@ There is a simpler way to add a permission that is less flexible. If the very ac
 
 ## Working Example
 ``` java
-  javacode
-  goes
-  here
+  int javacode() {
+    String goes;
+    String here;
+  }
 ```
 
 
