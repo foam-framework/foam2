@@ -58,6 +58,17 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'init_',
+      javaCode: `
+      AuthorizationException exception = new AuthorizationException("When " +
+          "using a DAO decorated by AuthorizationDAO, you may only call the " +
+          "context-oriented methods: put_(), find_(), select_(), remove_(), " +
+          "removeAll_(). Alternatively, you can also " +
+          "use .inX() to set the context on the DAO.");
+      setX(new InvalidX(exception));
+      `
+    },
+    {
       name: 'put_',
       javaThrows: [
         'foam.nanos.auth.AuthorizationException'

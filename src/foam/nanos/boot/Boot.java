@@ -103,10 +103,10 @@ public class Boot {
 
     // Export the ServiceDAO
     ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(
-        new foam.nanos.auth.AuthorizationDAO(getX(), serviceDAO_, new foam.nanos.auth.GlobalReadAuthorizer("service")));
+        new foam.nanos.auth.AuthorizationDAO.Builder(getX()).setDelegate(serviceDAO_).setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("service")).build());
     // 'read' authenticated version - for dig and docs
     ((ProxyDAO) root_.get("AuthenticatedNSpecDAO")).setDelegate(
-        new foam.dao.PMDAO(root_, new foam.nanos.auth.AuthorizationDAO(getX(), (DAO) root_.get("nSpecDAO"), new foam.nanos.auth.StandardAuthorizer("service"))));
+        new foam.dao.PMDAO(root_, new foam.nanos.auth.AuthorizationDAO.Builder(getX()).setDelegate((DAO) root_.get("nSpecDAO")).setAuthorizer(new foam.nanos.auth.StandardAuthorizer("service")).build()));
 
     serviceDAO_.where(EQ(NSpec.LAZY, false)).select(new AbstractSink() {
       @Override
