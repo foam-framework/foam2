@@ -220,7 +220,7 @@ if ( getOrder() != null &&
   }
 }
 
-if( getAuthorize() ) {
+if ( getAuthorize() ) {
   delegate = new foam.nanos.auth.AuthorizationDAO.Builder(getX())
     .setDelegate(delegate)
     .setAuthorizer(getAuthorizer())
