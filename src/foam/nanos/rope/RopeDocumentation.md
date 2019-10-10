@@ -1,4 +1,6 @@
-This file contains the complete description of the function and design of the ROPE authentication engine.
+# ROPE User Guide and Documentation
+
+## Abstract Description
 
 At an abstract level, ROPE utilizes the built in FOAM relationship framework to allow the user of the FOAM framework to perform authentication checks based on previously declared relationships and the level of authorization they are configured to be granted.
 
@@ -12,18 +14,15 @@ One of the key defining features that makes the ROPE algorithm's authentication 
 
 
 
-Technical Notes on the Proper Setup of ROPE objects:
+## Technical Notes on the Proper Setup of ROPE Objects
 
-Setup of Miscellany,
+### Setup of Miscellany,
 
-One trivial requirement of all ROPE objects is to setup the source and target models, their respective DAO keys, and the cardinality which is a string representing the type of the relationship be it one to many or many to one, the uses should specify this field as a String of the form "1:*" or "*:*". There are also 3 additional fields that must be set up to describe the relation and the dao in which the relation's objects are held. These include junctionModel, junctionDAOKey, and inverseName.
+One trivial requirement of all ROPE objects is to setup the source and target models, their respective DAO keys, and the cardinality which is a string representing the type of the relationship be it one to many or many to one, the uses should specify this field as a String of the form "1:*", "*:*", or "*:1". There are also 3 additional fields that must be set up to describe the relation and the dao in which the relation's objects are held. These include junctionModel, junctionDAOKey, and inverseName.
 
-To set up which permissions this ROPE will enable,
+### To set up which permissions this ROPE will enable
 
 ROPE works by checking which permissions are implied given any that a User might already have in a transitive fashion. "Permissions" in this sense are represented by an abstract ROPEActions object. ROPE contains a matrix of ROPEActions within its variable CRUD. Represented by a map of Lists for each permission, this matrix can be used to configure which ROPEAction enumerations imply each other. For example, say if you want a User having write permissions to some Object A, we want to ensure that it also has read permissions for Object B; we would then add a read ROPEAction to the List pointed to by the write ROPEAction key.
 
 There is a simpler way to add a permission that is less flexible. If the very act of being related to an object should imply a ROPEAction should be authorized, then this action can simply be added to the relationshipImplies variable of the ROPE object which is checked before the matrix. The ROPEAction the user would need to have to be able to perform on the source object to gain this generic functionality should be stored within the requiredSourceActions List. Having any one of these grants the User any of the relationshipImplies ROPEActions.
-
-
-
 
