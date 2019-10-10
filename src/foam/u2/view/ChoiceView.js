@@ -201,7 +201,7 @@ foam.CLASS({
         this.index = 0;
       }
 
-      if ( this.dao ) this.onDAOUpdate();
+      this.onDAOUpdate();
 
       this.add(this.slot(function(mode) {
         if ( mode !== foam.u2.DisplayMode.RO ) {
@@ -277,6 +277,8 @@ foam.CLASS({
       name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
+        if ( ! foam.dao.DAO.isInstance(this.dao) ) return;
+
         var p = this.mode === foam.u2.DisplayMode.RW ?
           this.dao.select().then(s => s.array) :
           this.dao.find(this.data).then(o => o ? [o] : []);
