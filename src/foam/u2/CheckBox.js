@@ -75,7 +75,7 @@ foam.CLASS({
 
   css: `
     ^ {
-      margin: 4px;
+      margin: 0;
       padding: 8px;
     }
 

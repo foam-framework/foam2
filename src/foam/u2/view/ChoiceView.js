@@ -203,7 +203,7 @@ foam.CLASS({
 
       if ( this.dao ) this.onDAOUpdate();
 
-      this.add(this.slot(function(mode){
+      this.add(this.slot(function(mode) {
         if ( mode !== foam.u2.DisplayMode.RO ) {
           return self.E()
             .start(self.selectSpec, {
@@ -218,11 +218,10 @@ foam.CLASS({
               .attrs({ name: self.name })
               .enableClass('selection-made', self.index$.map((index) => index !== -1))
             .end();
-      
         } else {
-          return self.E().add(self.text$)
+          return self.E().add(self.text$);
         }
-      }))
+      }));
 
       this.dao$proxy.on.sub(this.onDAOUpdate);
     },
