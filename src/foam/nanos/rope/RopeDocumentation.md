@@ -1,9 +1,7 @@
 # ROPE User Guide and Documentation
 
-<pre>
-
-
-</pre>
+&nbsp;
+&nbsp;
 
 ## Abstract Description
 
@@ -15,10 +13,8 @@ Permissions based on relationships can be configured by the user by creating a R
 
 One of the key defining features that makes the ROPE algorithm's authentication so versatile and configurable is it's transitivity. An abstract example being some object 'A' attempting to perform an operation on some other object 'C'. Although 'A' may not be directly related to see, it may be related to some intermediate object 'B' which is itself related to object 'C'. Given the correct configuration of the ROPEs on these two relationships; object A can be granted certain permissions toward object 'C' through its relationship to object 'B'.
 
-<pre>
-
-
-</pre>
+&nbsp;
+&nbsp;
 
 ## Technical Notes on the Proper Setup of ROPE Objects
 
@@ -32,10 +28,8 @@ ROPE works by checking which permissions are implied given any that a User might
 
 There is a simpler way to add a permission that is less flexible. If the very act of being related to an object should imply a ROPEAction should be authorized, then this action can simply be added to the relationshipImplies variable of the ROPE object which is checked before the matrix. The ROPEAction the user would need to have to be able to perform on the source object to gain this generic functionality should be stored within the requiredSourceActions List. Having any one of these grants the User any of the relationshipImplies ROPEActions.
 
-<pre>
-
-
-</pre>
+&nbsp;
+&nbsp;
 
 ## Working Example
 
