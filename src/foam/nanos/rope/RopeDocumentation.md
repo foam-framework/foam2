@@ -37,11 +37,11 @@ There is a simpler way to add a permission that is less flexible. If the very ac
 
 Here we want to show ROPE in action in the context of being able to...
 
-`` java
+` java
   int javacode() {
     String goes;
     String here;
   }
-``
+`
 
 
