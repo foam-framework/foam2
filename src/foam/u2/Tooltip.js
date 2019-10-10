@@ -46,6 +46,13 @@ foam.CLASS({
   ],
 
   listeners: [
+    function onMouseMove(evt) {
+      this.style({
+        'left': evt.pageX + 'px',
+        'top': evt.pageY + 'px'
+      })
+    },
+    
     function close() {
       this.closed = true;
       if ( this.opened ) {
@@ -63,6 +70,7 @@ foam.CLASS({
         oldTips[i].remove();
       }
 
+      this.target.on('mousemove', this.onMouseMove);
       this.target.on('mousedown', this.close);
       this.target.on('mouseleave', this.close);
       this.target.on('touchstart', this.close);
@@ -88,18 +96,6 @@ foam.CLASS({
         'z-index': '2000',
         'max-width': (screenWidth / 4)+'px'
       })
-        .callIf(above, function () {
-          this.style({ 'bottom': (screenHeight - domRect.bottom + domRect.height + 2) + 'px' });
-        })
-        .callIf(!above, function () {
-          this.style({ 'top': (domRect.top + domRect.height + 2) + 'px' });
-        })
-        .callIf(left, function () {
-          this.style({ 'right': (screenWidth - domRect.right + domRect.width + 2) + 'px' });
-        })
-        .callIf(!left, function () {
-          this.style({ 'left': (domRect.left + domRect.width + 2) + 'px' });
-        });
     },
   ],
 });
