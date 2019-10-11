@@ -1,7 +1,5 @@
 ![ROPE Logo](rope.png)
 
-&nbsp;
-
 # ROPE User Guide and Documentation
 
 &nbsp;
