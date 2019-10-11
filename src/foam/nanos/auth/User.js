@@ -175,7 +175,7 @@ foam.CLASS({
       width: 100,
       tableWidth: 160,
       validateObj: function(organization) {
-        if (!(organization.trim())) {
+        if ( ! (organization.trim()) ) {
           return 'Company Name Required.';
         }
       },
@@ -202,10 +202,10 @@ foam.CLASS({
       javaSetter:
       `email_ = val.toLowerCase();
        emailIsSet_ = true;`,
-      validateObj: function (email) {
+      validateObj: function(email) {
         var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-        if (!(email.trim())) {
+        if ( ! (email.trim()) ) {
           return 'Email Required.';
         }
         if ( ! emailRegex.test(email.trim()) ) {
@@ -435,21 +435,17 @@ foam.CLASS({
       name: 'label',
       type: 'String',
       code: function label() {
+        if ( this.legalName ) return this.legalName;
         if ( this.lastName && this.firstName ) return this.firstName + ' ' + this.lastName;
         if ( this.lastName && ! this.firstName ) return this.lastName;
         if ( ! this.lastName && this.firstName ) return this.firstName;
-        if ( this.legalName ) return this.legalName;
-        if ( this.organization ) return this.organization;
-        if ( this.businessName ) return this.businessName;
         return '';
       },
       javaCode: `
-        if ( this.lastNameIsSet_ && this.firstNameIsSet_ ) return this.getFirstName() + " " + this.getLastName();
-        if ( this.lastNameIsSet_ && ! this.firstNameIsSet_) return this.getLastName();
-        if ( ! this.lastNameIsSet_ && this.firstNameIsSet_) return this.getFirstName();
-        if ( this.legalNameIsSet_ ) return this.getLegalName();
-        if ( this.organizationIsSet_ ) return this.getOrganization();
-        if ( this.businessNameIsSet_ ) return this.getBusinessName();
+        if ( ! SafetyUtil.isEmpty(this.getLegalName()) ) return this.getLegalName();
+        if ( SafetyUtil.isEmpty(this.getLastName()) && SafetyUtil.isEmpty(this.getFirstName()) ) return this.getFirstName() + " " + this.getLastName();
+        if ( SafetyUtil.isEmpty(this.getLastName()) && ! SafetyUtil.isEmpty(this.getFirstName()) ) return this.getLastName();
+        if ( ! SafetyUtil.isEmpty(this.getLastName()) && SafetyUtil.isEmpty(this.getFirstName()) ) return this.getFirstName();
         return "";
       `
     },
