@@ -76,7 +76,14 @@ foam.CLASS({
     {
       class: 'FObjectArray',
       of: 'foam.core.ValidationPredicate',
-      name: 'validationPredicates'
+      name: 'validationPredicates',
+      // We override 'compare' here because we need to avoid infinite recursion
+      // that occurs when a validation predicate for a given property contains a
+      // reference to the property itself.
+      // This is an incorrect implementation of compare since it will always
+      // return a match, even if the validation predicates are different. It
+      // would be preferable to find a way to deal with circular references.
+      compare: function() { return 0; }
     },
     {
       name: 'validateObj',
