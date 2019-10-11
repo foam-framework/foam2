@@ -388,7 +388,6 @@ FOAM_FILES([
   { name: "foam/u2/DateView", flags: ['web'] },
   { name: "foam/u2/DateTimeView", flags: ['web'] },
   { name: "foam/u2/RangeView", flags: ['web'] },
-  { name: "foam/u2/ReadWriteView", flags: ['web'] },
   { name: "foam/u2/HTMLElement", flags: ['web'] },
   { name: "foam/u2/tag/Select", flags: ['web'] },
   { name: "foam/u2/UnstyledTabs", flags: ['web'] },
