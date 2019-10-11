@@ -1,3 +1,5 @@
+![ROPE Logo](rope.png)
+
 # ROPE User Guide and Documentation
 
 &nbsp;
@@ -56,7 +58,8 @@ List<ROPEActions> relationshipImplies = new ArrayList<ROPEActions>();
   relationshipImplies.add(ROPEActions.R);
   relationshipImplies.add(ROPEActions.OWN);
   transactionROPE.setRelationshipImplies(relationshipImplies);
-  transactionROPE.setRequiredSourceAction(new ArrayList<ROPEActions>(Arrays.asList(ROPEActions.OWN)));
+List<ROPEActions> requiredSourceActions = new new ArrayList<ROPEActions>(Arrays.asList(ROPEActions.OWN));
+  transactionROPE.setRequiredSourceAction(requiredSourceActions);
 ```
 
 That's all! we now have a fully working ROPE that allows anyone who owns a bank account to perform the operations of create read and *own* ( a more abstract construct that will allow permissions on other ROPEs ) on a transaction. Now finally we add this to the ropeDAO and our authorization is fully set up.
