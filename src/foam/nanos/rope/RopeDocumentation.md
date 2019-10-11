@@ -1,5 +1,7 @@
 ![ROPE Logo](http://foam-framework.github.io/foam/foam/js/com/google/watlobby/img/foam_red.png)
 
+&nbsp;
+
 # ROPE User Guide and Documentation
 
 &nbsp;
