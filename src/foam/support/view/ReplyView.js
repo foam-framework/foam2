@@ -63,7 +63,7 @@ foam.CLASS({
       line-height: 1.33;
       letter-spacing: 0.2px;
       text-align: left;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
       border: none;
       background: none;
       position: relative;
@@ -78,7 +78,7 @@ foam.CLASS({
       line-height: 1.33;
       letter-spacing: 0.2px;
       text-align: left;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
       border: none;
       background: none;
       position: relative;
@@ -100,7 +100,7 @@ foam.CLASS({
       margin-top:40px;
     }
     ^ .background-color{
-      background: #093649;
+      background: /*%BLACK%*/ #1e1f21;
       color:white
     }
     ^ .border{

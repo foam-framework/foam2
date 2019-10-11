@@ -21,10 +21,26 @@ foam.ENUM({
 
   documentation: 'CRUD controller modes: CREATE/VIEW/EDIT.',
 
+  properties: [
+    {
+      class: 'String',
+      name: 'modePropertyName'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'getMode',
+      code: function(prop) {
+        return prop[this.modePropertyName];
+      }
+    }
+  ],
+
   values: [
-    { name: 'CREATE', label: 'Create' },
-    { name: 'VIEW',   label: 'View'   },
-    { name: 'EDIT',   label: 'Edit'   }
+    { name: 'CREATE', label: 'Create', modePropertyName: 'createMode' },
+    { name: 'VIEW',   label: 'View',   modePropertyName: 'readMode'   },
+    { name: 'EDIT',   label: 'Edit',   modePropertyName: 'updateMode' }
   ]
 });
 
@@ -352,20 +368,17 @@ foam.CLASS({
       this.visitChildren('unload');
       this.detach();
     },
-    function error() {
-      throw new Error('Mutations not allowed in OUTPUT state.');
-    },
-    function onSetClass(cls, enabled) { this.error(); },
-    function onFocus(cls, enabled) { this.error(); },
-    function onAddListener(topic, listener) { this.error(); },
-    function onRemoveListener(topic, listener) { this.error(); },
-    function onSetStyle(key, value) { this.error(); },
-    function onSetAttr(key, value) { this.error(); },
-    function onRemoveAttr(key) { this.error(); },
-    function onAddChildren(c) { this.error(); },
-    function onInsertChildren() { this.error(); },
-    function onReplaceChild() { this.error(); },
-    function onRemoveChild() { this.error(); },
+    function onSetClass(cls, enabled) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onFocus(cls, enabled) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onAddListener(topic, listener) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onRemoveListener(topic, listener) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onSetStyle(key, value) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onSetAttr(key, value) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onRemoveAttr(key) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onAddChildren(c) { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onInsertChildren() { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onReplaceChild() { throw new Error('Mutations not allowed in OUTPUT state.'); },
+    function onRemoveChild() { throw new Error('Mutations not allowed in OUTPUT state.'); },
     function toString() { return 'OUTPUT'; }
   ]
 });
@@ -601,8 +614,8 @@ foam.CLASS({
     <foam class="com.acme.mypackage.MyView"></foam>
 
     // TODO: Decide if we want this or not:
-    // function XXXE(opt_nodeName /* | DIV */) {
-    //   /* Create a new Element */
+    // function XXXE(opt_nodeName // | DIV //) {
+    //   // Create a new Element
     //   var Y = this.__subContext__;
     //
     //   // ???: Is this needed / a good idea?
@@ -853,7 +866,11 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'tooltip'
+      name: 'tooltip',
+      postSet: function(o, n) {
+        if ( ! o && n ) this.initTooltip();
+        return n;
+      }
     },
     {
       name: 'parentNode',
@@ -1053,7 +1070,11 @@ foam.CLASS({
     },
 
     function initTooltip() {
-      if ( this.tooltip ) this.Tooltip.create({target: this, text:this.tooltip});
+      if ( this.tooltip ) {
+        this.Tooltip.create({target: this, text$: this.tooltip$});
+      } else if ( this.getAttribute('title') ) {
+        this.Tooltip.create({target: this, text$: this.attrSlot('title')});
+      }
     },
 
     function initKeyboardShortcuts() {
@@ -2141,9 +2162,37 @@ foam.CLASS({
       value: { class: 'foam.u2.TextField' }
     },
     {
+      // DEPRECATED: Use 'createMode', 'readMode', and 'updateMode' instead.
       class: 'Enum',
       of: 'foam.u2.Visibility',
       name: 'visibility',
+      value: 'RW'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
+      name: 'createMode',
+      documentation: 'The display mode for this property when the controller mode is CREATE.',
+      assertValue: function(newValue) {
+        foam.assert(newValue === foam.u2.DisplayMode.RW || newValue === foam.u2.DisplayMode.HIDDEN, `Create mode must be RW or HIDDEN. Property '${this.of ? this.of.id + '.' : ''}${this.name}' was '${newValue.label}' and must be fixed.`);
+      },
+      value: 'RW'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
+      name: 'readMode',
+      documentation: 'The display mode for this property when the controller mode is VIEW.',
+      assertValue: function(newValue) {
+        foam.assert(newValue === foam.u2.DisplayMode.RO || newValue === foam.u2.DisplayMode.HIDDEN, `Read mode must be RO or HIDDEN. Property '${this.of ? this.of.id + '.' : ''}${this.name}' was '${newValue.label}' and must be fixed.`);
+      },
+      value: 'RO'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
+      name: 'updateMode',
+      documentation: 'The display mode for this property when the controller mode is EDIT.',
       value: 'RW'
     },
     {
@@ -2162,6 +2211,14 @@ foam.CLASS({
       name: 'validationStyleEnabled',
       documentation: 'If true, inputs will be styled when they are in an invalid state.',
       value: true
+    },
+    {
+      class: 'Int',
+      name: 'order',
+      documentation: `
+        The order to render the property in if rendering multiple properties.
+      `,
+      value: Number.MAX_VALUE
     }
   ],
 
@@ -2455,6 +2512,17 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
+  name: 'ObjectViewRefinement',
+  refines: 'foam.core.Object',
+  requires: [ 'foam.u2.view.AnyView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.view.AnyView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
   name: 'ControllerViewTrait',
 
   documentation: 'Trait for adding a ControllerMode controllerMode Property.',
@@ -2479,7 +2547,7 @@ foam.CLASS({
   documentation: `
     A View is an Element used to display data.
     // TODO: Should the following be properties?
-    /*
+
     {
       type: 'Boolean',
       name: 'showValidation',
@@ -2493,7 +2561,7 @@ foam.CLASS({
       documentation: 'The actual error message. Null or the empty string ' +
           'when there is no error.',
     }
-    */
+
   `,
 
   exports: [ 'data' ],

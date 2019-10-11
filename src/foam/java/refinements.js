@@ -4,6 +4,20 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+foam.INTERFACE({
+  package: 'foam.lib.csv',
+  name: 'FromCSVSetter',
+  methods: [
+    {
+      name: 'set',
+      args: [
+        { type: 'FObject', name: 'obj' },
+        { type: 'String', name: 'str' }
+      ]
+    }
+  ]
+});
+
 foam.LIB({
   name: 'foam.java',
   flags: ['java'],
@@ -21,7 +35,8 @@ foam.LIB({
           return b ? "true" : "false";
         },
         Number: function(n) {
-          return '' + n + (n > Math.pow(2, 31) ? 'L' : '');
+          return '' + n +
+            (n > Math.pow(2, 31) || n < -Math.pow(2,31) ? 'L' : '');
         },
         FObject: function(o) {
           return o.asJavaValue();
@@ -42,7 +57,7 @@ foam.LIB({
 new java.util.HashMap() {
   {
 ${Object.keys(o).map(function(k) {
-  return `put(${foam.java.asJavaValue(k)}, ${foam.java.asJavaValue(o[k])});`
+  return `  put(${foam.java.asJavaValue(k)}, ${foam.java.asJavaValue(o[k])});`
 }).join('\n')}
   }
 }
@@ -54,6 +69,11 @@ ${Object.keys(o).map(function(k) {
           o = o.replace(/\\/g, '\\\\')
           return `java.util.regex.Pattern.compile("${o}")`
         },
+        Date: function(d) {
+          var n = d.getTime();
+          return `new java.util.Date(` + n +
+            (n > Math.pow(2, 31) || n < -Math.pow(2,31) ? 'L' : '') + `)`
+        }
       })
     },
     {
@@ -217,16 +237,38 @@ foam.CLASS({
       name: 'javaValidateObj',
       expression: function(validationPredicates) {
         return validationPredicates
-          .map(vp => {
+          .map((vp) => {
             return `
-if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
-  throw new IllegalStateException(${foam.java.asJavaValue(vp.errorString)});
-}
+              if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
+                throw new IllegalStateException(${foam.java.asJavaValue(vp.errorString)});
+              }
             `;
           })
           .join('');
       }
-    }
+    },
+    {
+      class: 'String',
+      name: 'javaFromCSVLabelMapping',
+      value: `
+        foam.core.PropertyInfo prop = this;
+        map.put(getName(), new foam.lib.csv.FromCSVSetter() {
+          public void set(foam.core.FObject obj, String str) {
+            prop.set(obj, fromString(str));
+          }
+        });
+      `
+    },
+    {
+      class: 'String',
+      name: 'javaToCSV',
+      value: 'outputter.outputValue(obj != null ? get(obj) : null);'
+    },
+    {
+      class: 'String',
+      name: 'javaToCSVLabel',
+      value: 'outputter.outputValue(getName());'
+    },
   ],
 
   methods: [
@@ -264,7 +306,10 @@ if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
         includeInSignature:      this.includeInSignature,
         containsPII:             this.containsPII,
         containsDeletablePII:    this.containsDeletablePII,
-        validateObj:             this.javaValidateObj
+        validateObj:             this.javaValidateObj,
+        toCSV:                   this.javaToCSV,
+        toCSVLabel:              this.javaToCSVLabel,
+        fromCSVLabelMapping:     this.javaFromCSVLabelMapping
       });
     },
 
@@ -288,6 +333,8 @@ if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
       };
 
       // set value
+      setter += `boolean oldIsSet = ${this.name}IsSet_;\n`;
+      setter += `${this.javaType} oldVal = ${this.name}_;\n`;
       setter += `${this.name}_ = val;\n`;
       setter += `${this.name}IsSet_ = true;\n`;
 
@@ -442,7 +489,9 @@ foam.LIB({
 
       cls.name = this.model_.name;
       cls.package = this.model_.package;
+      cls.source = this.model_.source;
       cls.abstract = this.model_.abstract;
+      cls.documentation = this.model_.documentation;
 
       if ( this.model_.name !== 'AbstractFObject' ) {
         // if not AbstractFObject either extend AbstractFObject or use provided extends property
@@ -622,6 +671,10 @@ foam.CLASS({
       expression: function(flags) {
         return foam.util.flagFilter(['java'])(this);
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'remote'
     }
   ],
 
@@ -638,7 +691,9 @@ foam.CLASS({
         abstract: this.abstract,
         final: this.final,
         synchronized: this.synchronized,
+        remote: this.remote,
         throws: this.javaThrows,
+        documentation: this.documentation,
         args: this.args && this.args.map(function(a) {
           return {
             name: a.name,
@@ -668,6 +723,7 @@ foam.CLASS({
       cls.constant({
         name: this.name,
         type: 'String',
+        documentation: this.documentation,
         value: foam.java.asJavaValue(this.message)
       });
     }
@@ -732,6 +788,7 @@ foam.CLASS({
         visibility: 'public',
         name: this.name,
         type: 'void',
+        documentation: this.documentation,
         body: this.javaCode
       });
     }
@@ -858,6 +915,7 @@ foam.CLASS({
 
           cls.name = this.model_.name;
           cls.package = this.model_.package;
+          cls.documentation = this.model_.documentation;
           cls.implements = (this.implements || [])
             .concat(this.model_.javaExtends || []);
 
@@ -1117,23 +1175,6 @@ foam.CLASS({
         body: `outputter.output(getOrdinal(value));`
       });
 
-      info.method({
-        name: 'toCSV',
-        visibility: 'public',
-        type: 'void',
-        args: [
-          {
-            name: 'outputter',
-            type: 'foam.lib.csv.Outputter'
-          },
-          {
-            name: 'value',
-            type: 'Object'
-          }
-        ],
-        body: `outputter.output(getOrdinal(value));`
-      });
-
       var cast = info.getMethod('cast');
       cast.body = `if ( o instanceof Integer ) {
   return forOrdinal((int) o);
@@ -1167,7 +1208,7 @@ foam.CLASS({
             name: '__frozen__',
             visibility: 'protected',
             type: 'boolean',
-            initializer: 'false'
+            initializer: 'false;'
           });
 
           var flagFilter = foam.util.flagFilter(['java']);
@@ -1191,6 +1232,12 @@ foam.CLASS({
             body: properties.map(function(p) {
               return `set${foam.String.capitalize(p.name)}(${p.name});`;
             }).join('\n')
+          });
+
+          this.VALUES.sort( function (a, b) {
+            return (a.ordinal < b.ordinal)
+              ? -1
+              : 1;
           });
 
           cls.declarations = this.VALUES.map(function(v) {
@@ -1401,14 +1448,6 @@ foam.CLASS({
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
-
-      info.method({
-        name: 'getWidth',
-        visibility: 'public',
-        type: 'int',
-        body: 'return ' + this.width + ';'
-      });
-
       // cast numbers to strings
       var cast = info.getMethod('cast');
       cast.body = `return ( o instanceof Number ) ?
@@ -1432,8 +1471,49 @@ foam.CLASS({
         return 'new foam.lib.json.FObjectParser('
           + (of ? of.id + '.class' : '') + ')';
       }
+    },
+    {
+      name: 'javaFromCSVLabelMapping',
+      value: `
+        foam.core.AbstractFObjectPropertyInfo prop = this;
+
+        java.util.Map<String, foam.lib.csv.FromCSVSetter> map2 = new java.util.HashMap<>();
+        prop.of().getAxiomsByClass(foam.core.PropertyInfo.class).forEach(a -> {
+          foam.core.PropertyInfo p = (foam.core.PropertyInfo) a;
+          p.fromCSVLabelMapping(map2);
+        });
+
+        for ( String key : map2.keySet() ) {
+          map.put(getName() + "." + key, new foam.lib.csv.FromCSVSetter() {
+            public void set(foam.core.FObject obj, String str) {
+              try {
+                if ( prop.get(obj) == null ) prop.set(obj, prop.of().newInstance());
+                map2.get(key).set((foam.core.FObject) prop.get(obj), str);
+              } catch ( Throwable t ) {
+                // ???
+              }
+            }
+          });
+        }
+      `
     }
-  ]
+  ],
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      if ( this.of &&
+           this.of !== foam.core.FObject &&
+           ! foam.core.InterfaceModel.isInstance(this.of.model_) ) {
+        info.method({
+          name: 'of',
+          visibility: 'public',
+          type: 'foam.core.ClassInfo',
+          body: `return ${this.of.id}.getOwnClassInfo();`
+        });
+      }
+      return info;
+    }
+  ],
 });
 
 foam.CLASS({
@@ -1773,14 +1853,13 @@ foam.CLASS({
   properties: [
     {
       name: 'referencedProperty',
+      documentation: `
+        Used to ensure we use the right types for this
+        value in statically typed languages.
+      `,
       transient: true,
-      factory: function() {
-        var idProp = this.of.ID.cls_ == foam.core.IDAlias ? this.of.ID.targetProperty : this.of.ID;
-
-        idProp = idProp.clone();
-        idProp.name = this.name;
-
-        return idProp;
+      expression: function(of) {
+        return of.ID.cls_ == foam.core.IDAlias ? of.ID.targetProperty : of.ID;
       }
     },
     { name: 'type',            factory: function() { return this.referencedProperty.type; } },
@@ -1792,18 +1871,13 @@ foam.CLASS({
 
   methods: [
     function buildJavaClass(cls) {
-      // Disable super behaviour on purpose.
-      // this.SUPER(cls);
-
-      // Install a renamed copy of the refernced model's id property instead
-      this.referencedProperty.buildJavaClass(cls);
-
+      this.SUPER(cls);
       cls.method({
         name: `find${foam.String.capitalize(this.name)}`,
         visibility: 'public',
         type: this.of.id,
         args: [ { name: 'x', type: 'foam.core.X' } ],
-        body: `return (${this.of.id})((foam.dao.DAO) x.get("${this.targetDAOKey}")).find_(x, (Object) get${foam.String.capitalize(this.name)}());`
+        body: `return (${this.of.id})((foam.dao.DAO) x.get("${this.unauthorizedTargetDAOKey || this.targetDAOKey}")).find_(x, (Object) get${foam.String.capitalize(this.name)}());`
       });
     }
   ]
@@ -2107,6 +2181,21 @@ try {
 }
         `;
       }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'DAOPropertyJavaRefinement',
+  refines: 'foam.dao.DAOProperty',
+  flags: ['java'],
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var compare = info.getMethod('compare');
+      compare.body = 'return 0;';
+      return info;
     }
   ]
 });

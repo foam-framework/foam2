@@ -79,6 +79,7 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'RelationshipDAOToERefinement',
   refines: 'foam.dao.RelationshipDAO',
+  flags: ['web'],
 
   requires: [
     'foam.u2.CitationView',

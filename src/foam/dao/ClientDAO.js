@@ -171,6 +171,6 @@ return sink
       },
       javaCode: `super.listen_(null, sink, predicate);`,
       swiftCode: `return try super.listen_(nil, sink, predicate)`
-    }
+    },
   ]
 });

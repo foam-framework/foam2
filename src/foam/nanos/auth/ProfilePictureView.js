@@ -77,17 +77,17 @@ foam.CLASS({
       font-size: 14px;
       font-weight: 300;
       letter-spacing: 0.2px;
-      color: %SECONDARYCOLOR%;
+      color: /*%PRIMARY3%*/ #406dea;
     }
     ^ .uploadRestriction {
       margin-top: 9px;
       font-size: 10px;
       font-weight: 300;
       letter-spacing: 0.2px;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
     }
     ^ .box-for-drag-drop {
-      border: dashed 4px %BACKGROUNDCOLOR%;
+      border: dashed 4px /*%GREY5%*/ #f5f7fa;
       background:white;
       height: 100px;
       padding: 10px 10px;
@@ -144,14 +144,10 @@ foam.CLASS({
               src: this.ProfilePictureImage$.map(function(ProfilePictureImage) {
                 if ( ProfilePictureImage && ProfilePictureImage.data ) {
                   var blob = ProfilePictureImage.data;
-                  var sessionId = localStorage['defaultSession'];
                   if ( self.BlobBlob.isInstance(blob) )
                     return URL.createObjectURL(blob.blob);
 
                   var url = '/service/httpFileService/' + ProfilePictureImage.id;
-                  // attach session id if available
-                  if ( sessionId )
-                    url += '?sessionId=' + sessionId;
                   return url;
                 }
 

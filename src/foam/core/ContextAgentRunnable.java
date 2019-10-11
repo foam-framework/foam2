@@ -6,7 +6,7 @@
 
 package foam.core;
 
-class ContextAgentRunnable
+public class ContextAgentRunnable
   implements Runnable
 {
   final X            x_;

@@ -25,7 +25,7 @@ foam.CLASS({
     {
       name: 'nSpec',
       class: 'FObjectProperty',
-      type: 'foam.nanos.boot.NSpec'
+      of: 'foam.nanos.boot.NSpec'
     },
     {
       name: 'myLogger',
@@ -36,7 +36,7 @@ foam.CLASS({
     {
       name: 'consoleLogger',
       expression: function(nSpec) {
-        return console.log.bind(console, nSpec.getName());
+        return console.log.bind(console, nSpec ? nSpec.name : 'Unknown service');
       }
     },
   ],
@@ -111,7 +111,7 @@ foam.CLASS({
         if ( this.enabled ) {
           this.consoleLogger('removeAll', skip, limit, order, predicate);
         }
-        this.SUPER(x, skip, limit, order, predicate);
+        return this.SUPER(x, skip, limit, order, predicate);
       },
       javaCode: `
         if ( this.getEnabled() ) {

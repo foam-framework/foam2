@@ -133,6 +133,7 @@ foam.CLASS({
         'foam.box.RPCReturnBox',
         'foam.box.ReplyBox',
         'foam.box.RPCMessage',
+        'foam.box.OneTimeBox',
         'foam.box.Message'
       ].map(function(s) {
         var path = s.split('.');

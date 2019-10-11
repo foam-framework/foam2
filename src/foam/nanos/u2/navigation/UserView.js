@@ -126,7 +126,7 @@ foam.CLASS({
       padding-left: 50px;
       font-size: 14px;
       font-weight: 300;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
       line-height: 25px;
     }
     ^ .foam-nanos-menu-SubMenuView-inner > div:last-child {
@@ -136,7 +136,7 @@ foam.CLASS({
       color: #c82e2e;
     }
     ^ .foam-nanos-menu-SubMenuView-inner > div:hover {
-      background-color: %SECONDARYCOLOR%;
+      background-color: /*%PRIMARY3%*/ #406dea;
       cursor: pointer;
     }
     ^ .foam-nanos-menu-SubMenuView-inner::before {
@@ -172,8 +172,10 @@ foam.CLASS({
   methods: [
     function initE() {
       this.notificationDAO.on.sub(this.onDAOUpdate);
-      this.user.id$.sub(this.onDAOUpdate);
+      this.user$.dot('id').sub(this.onDAOUpdate);
+      this.group$.dot('id').sub(this.onDAOUpdate);
       this.onDAOUpdate();
+
       this
         .addClass(this.myClass())
         this.otherViews();  //currency menu
@@ -237,6 +239,7 @@ foam.CLASS({
       name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
+        if ( ! this.group || ! this.user ) return;
         var group = this.group.id;
         var id    = this.user.id;
         if ( id != 0 ) {

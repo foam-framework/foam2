@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.layout',
   name: 'SectionAxiom',
+
   properties: [
     {
       class: 'String',
@@ -16,8 +17,8 @@ foam.CLASS({
       class: 'String',
       name: 'title',
       expression: function(name) {
-        if (name === '_defaultSection') return '';
-        return foam.String.capitalize(name);
+        if ( name === '_defaultSection' ) return '';
+        return foam.String.labelize(name);
       }
     },
     {
@@ -34,11 +35,15 @@ foam.CLASS({
       name: 'permissionRequired'
     },
     {
+      name: 'gridColumns'
+    },
+    {
       class: 'Function',
       name: 'isAvailable',
       value: function() { return true; }
     }
   ],
+
   methods: [
     function createIsAvailableFor(data$) {
       var slot = foam.core.ExpressionSlot.create({
@@ -63,10 +68,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.layout',
   name: 'PropertySectionRefine',
   refines: 'foam.core.Property',
+
   properties: [
     {
       class: 'String',
@@ -75,11 +82,13 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.layout',
   name: 'ActionSectionRefine',
   refines: 'foam.core.Action',
+
   properties: [
     {
       class: 'String',
@@ -89,10 +98,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.layout',
   name: 'ModelSectionRefine',
   refines: 'foam.core.Model',
+
   properties: [
     {
       class: 'AxiomArray',

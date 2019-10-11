@@ -3,18 +3,20 @@
  * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 package foam.nanos.pm;
 
-import foam.core.*;
+import foam.core.FObject;
 import foam.dao.MDAO;
 
 /**
- * MDAO specifically for PMInfo's which doesn't freeze() or clone() values
- * so they can be updated in-place without doing a DAO.put().
+ * MDAO for storing PMInfo's which which disables cloneing and freezing
+ * so PMInfo's can be updated more quickly.
  **/
 public class PMInfoMDAO
   extends MDAO
 {
+
   public PMInfoMDAO() {
     super(PMInfo.getOwnClassInfo());
   }
@@ -26,4 +28,5 @@ public class PMInfoMDAO
   public FObject objOut(FObject obj) {
     return obj;
   }
+
 }

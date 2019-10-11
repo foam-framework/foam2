@@ -24,7 +24,7 @@ foam.CLASS({
     ^ {
       background-color: white;
       border-bottom: 1px solid #e9e9e9;
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
       padding: 0;
     }
 
@@ -66,7 +66,7 @@ foam.CLASS({
     }
 
     ^ .foam-u2-search-GroupBySearchView .foam-u2-tag-Select > option {
-      color: #093649;
+      color: /*%BLACK%*/ #1e1f21;
       font-weight: normal;
       font-style: normal;
       font-stretch: normal;

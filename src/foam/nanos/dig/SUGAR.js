@@ -65,7 +65,7 @@ foam.CLASS({
 
         if ( ! service.cls_.getAxiomByName('delegate') ) {
           this.interfaceName = '';
-          this.argumentInfo = null;
+          this.argumentInfo  = null;
           this.currentMethod = '';
 
           return;
@@ -75,14 +75,14 @@ foam.CLASS({
         if ( ! of ) return;
 
         this.interfaceName = of.id.toString();
-        var methods = of.getOwnAxiomsByClass(foam.core.Method);
+        var methods     = of.getOwnAxiomsByClass(foam.core.Method);
         var methodNames = methods.map(function(m) { return m.name; }).sort();
 
         if ( methodNames.length > 0 ) {
             methods.find((item) => {
               if ( item.name == methodNames[0] ) {
                 this.currentMethod = item.name;
-                this.argumentInfo = item.args;
+                this.argumentInfo  = item.args;
               }
             });
         } else { // if the service doesn't have a filtered method, the following should be empty
@@ -90,7 +90,7 @@ foam.CLASS({
           this.currentMethod = '';
         }
 
-        this.postData = "";
+        this.postData = '';
       }
     },
     {
@@ -142,7 +142,7 @@ foam.CLASS({
           });
        }
 
-       this.postData = "";
+       this.postData = '';
       }
     },
     {
@@ -153,7 +153,7 @@ foam.CLASS({
       postSet: function() {
         var self = this;
 
-        for ( var j = 0; j < this.argumentInfo.length; j++ ) {
+        for ( var j = 0 ; j < this.argumentInfo.length ; j++ ) {
           this.argumentInfo[j].sub(function(argInfo) {
             self.flag = ! self.flag;
           });
@@ -215,7 +215,7 @@ foam.CLASS({
       setter: function() {}, // Prevent from ever getting set
       expression: function(serviceKey, method, interfaceName, argumentInfo, flag, currentMethod, objFlag) {
         var query = false;
-        var url = '/service/sugar';
+        var url   = '/service/sugar';
 
         this.postData = null;
 
@@ -248,7 +248,7 @@ foam.CLASS({
             var prop = foam.lookup(javaType_).getAxiomsByClass(foam.core.Property);
             this.postData += '&' + argumentInfo[k].name + '=' + argumentInfo[k].name + '&';
 
-            for ( var i = 0; i < prop.length; i++ ) {
+            for ( var i = 0 ; i < prop.length ; i++ ) {
               if ( argumentInfo[k].objectType.instance_[prop[i].name] ) {
                 this.postData += query ? '&' : '?';
                 query = true;
@@ -279,7 +279,7 @@ foam.CLASS({
       name: 'postButton',
       label: 'Send POST Request',
       code: async function() {
-        if ( ! (this.postURL === '') ) {
+        if ( this.postURL !== '' ) {
           var req = this.HTTPRequest.create({
             url: window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + this.postURL + this.postData+ "&sessionId=" + localStorage.defaultSession,
             method: 'POST',

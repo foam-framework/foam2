@@ -13,7 +13,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'deviceToken'
+      name: 'deviceToken',
+      section: 'administrative'
     }
   ]
 });
@@ -28,7 +29,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.lib.json.Outputter',
-    'foam.lib.json.OutputterMode',
+    'foam.lib.NetworkPropertyPredicate',
     'foam.util.SafetyUtil',
     'java.io.OutputStreamWriter',
     'java.net.HttpURLConnection',
@@ -88,7 +89,7 @@ try {
     body.put("data", data);
   }
 
-  Outputter outputter = new Outputter(OutputterMode.NETWORK);
+  Outputter outputter = new Outputter(getX()).setPropertyPredicate(new NetworkPropertyPredicate());
   outputter.output(body);
 
   wr = new OutputStreamWriter(conn.getOutputStream());

@@ -27,8 +27,9 @@ foam.CLASS({
     {
       class: 'String',
       name: 'targetDAOKey',
-    },
+    }
   ],
+
   methods: [
     {
       name: 'remove_',
@@ -58,7 +59,7 @@ foam.CLASS({
       setDelegate(delegate);
 }
         `);
-      },
-    },
+      }
+    }
   ]
 });

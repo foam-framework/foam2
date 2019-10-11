@@ -11,12 +11,16 @@ import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
+import foam.lib.PropertyPredicate;
+import foam.lib.PermissionedPropertyPredicate;
 import foam.util.SafetyUtil;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
+import java.util.*;
+
 import org.apache.commons.io.IOUtils;
 
 public class Outputter
@@ -32,33 +36,33 @@ public class Outputter
     }
   };
 
-  protected PrintWriter   writer_;
-  protected OutputterMode mode_;
+  protected foam.core.X x_;
+  public PrintWriter   writer_;
   protected StringWriter  stringWriter_        = null;
   protected boolean       outputShortNames_    = false;
   protected boolean       outputDefaultValues_ = false;
+  protected boolean       multiLineOutput_     = false;
   protected boolean       outputClassNames_    = true;
   protected boolean       outputReadableDates_ = true;
+  protected PropertyPredicate propertyPredicate_;
+  protected Map<String, List<PropertyInfo>> propertyMap_ = new HashMap<>();
 
-  public Outputter() {
-    this(OutputterMode.FULL);
+
+  public Outputter(foam.core.X x) {
+    this(x, (PrintWriter) null);
   }
 
-  public Outputter(OutputterMode mode) {
-    this((PrintWriter) null, mode);
+  public Outputter(foam.core.X x, File file) throws FileNotFoundException {
+    this(x, new PrintWriter(file));
   }
 
-  public Outputter(File file, OutputterMode mode) throws FileNotFoundException {
-    this(new PrintWriter(file), mode);
-  }
-
-  public Outputter(PrintWriter writer, OutputterMode mode) {
+  public Outputter(foam.core.X x, PrintWriter writer) {
     if ( writer == null ) {
       stringWriter_ = new StringWriter();
       writer        = new PrintWriter(stringWriter_);
     }
 
-    this.mode_   = mode;
+    this.x_ = x;
     this.writer_ = writer;
   }
 
@@ -93,17 +97,29 @@ public class Outputter
   }
 
   public void outputString(String s) {
-    writer_.append("\"");
-    writer_.append(escape(s));
-    writer_.append("\"");
+    if ( multiLineOutput_ && s.indexOf('\n') >= 0 ) {
+      writer_.append("\n");
+      writer_.append("\"\"\"");
+      writer_.append(escapeMultiline(s));
+      writer_.append("\"\"\"");
+    }
+    else {
+      writer_.append("\"");
+      writer_.append(escape(s));
+      writer_.append("\"");
+    }
   }
 
   public String escape(String s) {
-    return s
-      .replace("\\", "\\\\")
-      .replace("\"", "\\\"")
-      .replace("\t", "\\t")
-      .replace("\n","\\n");
+    return s.replace("\\", "\\\\")
+            .replace("\"", "\\\"")
+            .replace("\t", "\\t")
+            .replace("\r","\\r")
+            .replace("\n","\\n");
+  }
+
+  public String escapeMultiline(String s) {
+    return s.replace("\\", "\\\\");
   }
 
   protected void outputNumber(Number value) {
@@ -260,9 +276,30 @@ public class Outputter
     writer_.append("}");
   }
 
+  protected synchronized List getProperties(ClassInfo info) {
+    String of = info.getObjClass().getSimpleName();
+
+    if ( propertyMap_.containsKey(of) && propertyMap_.get(of).isEmpty() ) {
+      propertyMap_.remove(of);
+    }
+
+    if ( ! propertyMap_.containsKey(of) ) {
+      List<PropertyInfo> filteredAxioms = new ArrayList<>();
+      Iterator e = info.getAxiomsByClass(PropertyInfo.class).iterator();
+      while ( e.hasNext() ) {
+        PropertyInfo prop = (PropertyInfo) e.next();
+        if ( propertyPredicate_ == null || propertyPredicate_.propertyPredicateCheck(this.x_, of.toLowerCase(), prop) ) {
+          filteredAxioms.add(prop);
+        }
+      }
+      propertyMap_.put(of, filteredAxioms);
+      return filteredAxioms;
+    }
+    return propertyMap_.get(of);
+  }
+
   protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
-    if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
-    if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
+
     if ( ! outputDefaultValues_ && ! prop.isSet(fo) ) return false;
 
     Object value = prop.get(fo);
@@ -271,7 +308,8 @@ public class Outputter
     }
 
     if ( includeComma ) writer_.append(",");
-    outputProperty(fo, prop);
+    if ( multiLineOutput_ ) addInnerNewline();
+    outputProperty(fo, prop); 
     return true;
   }
 
@@ -282,15 +320,16 @@ public class Outputter
     boolean   isPropertyDiff = false;
 
     if ( ! oldFObject.equals(newFObject) ) {
-      List     axioms = info.getAxiomsByClass(PropertyInfo.class);
+      List     axioms = getProperties(info);
       Iterator i      = axioms.iterator();
 
+      writer_.append("{");
+      if ( multiLineOutput_ ) addInnerNewline();
       while ( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
         isPropertyDiff = maybeOutputPropertyDelta(oldFObject, newFObject, prop);
         if ( isPropertyDiff) {
           if ( ! isDiff ) {
-            writer_.append("{");
             if ( outputClassNames_ ) {
               //output Class name
               writer_.append(beforeKey_());
@@ -300,23 +339,31 @@ public class Outputter
               outputString(info.getId());
             }
             if ( outputClassNames_ ) writer_.append(",");
+            addInnerNewline();
             PropertyInfo id = (PropertyInfo) info.getAxiomByName("id");
             outputProperty(newFObject, id);
             isDiff = true;
           }
-
           writer_.append(",");
+          addInnerNewline();
           outputProperty(newFObject, prop);
         }
       }
+      
+      if ( isDiff ) { 
+        if ( multiLineOutput_ )  writer_.append("\n");
+        writer_.append("}"); 
+      }
+    }
+  }
 
-      if ( isDiff ) writer_.append("}");
+  protected void addInnerNewline() {
+    if ( multiLineOutput_ ) {
+      writer_.append("\n");
     }
   }
 
   protected boolean maybeOutputPropertyDelta(FObject oldFObject, FObject newFObject, PropertyInfo prop) {
-    if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
-    if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
 
     return prop.compare(oldFObject, newFObject) != 0;
   }
@@ -331,6 +378,7 @@ public class Outputter
     ClassInfo info = o.getClassInfo();
 
     writer_.append("{");
+    if ( multiLineOutput_ ) addInnerNewline();
     if ( outputClassNames_ ) {
       writer_.append(beforeKey_());
       writer_.append("class");
@@ -339,14 +387,14 @@ public class Outputter
       outputString(info.getId());
     }
 
-    List     axioms      = info.getAxiomsByClass(PropertyInfo.class);
+    List     axioms      = getProperties(info);
     Iterator i           = axioms.iterator();
     boolean  outputComma = outputClassNames_;
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
       outputComma = maybeOutputProperty(o, prop, outputComma) || outputComma;
     }
-
+    if ( multiLineOutput_ ) writer_.append("\n");
     writer_.append("}");
   }
 
@@ -417,6 +465,11 @@ public class Outputter
     return this;
   }
 
+  public Outputter setPropertyPredicate(PropertyPredicate p) {
+    propertyPredicate_ = p;
+    return this;
+  }
+
   @Override
   public void close() throws IOException {
     IOUtils.closeQuietly(stringWriter_);
@@ -427,5 +480,9 @@ public class Outputter
   public void flush() throws IOException {
     if ( stringWriter_ != null ) stringWriter_.flush();
     if ( writer_ != null ) writer_.flush();
+  }
+
+  public void setMultiLine(boolean ml) {
+    multiLineOutput_ = ml;
   }
 }

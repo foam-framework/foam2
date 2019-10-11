@@ -35,11 +35,6 @@ public class ProxyIndex
   }
 
   @Override
-  public void onAdd(Sink sink) {
-    getDelegate().onAdd(sink);
-  }
-
-  @Override
   public Object put(Object state, FObject value) {
     return wrap(getDelegate().put(unwrap(state), value));
   }

@@ -355,14 +355,10 @@ foam.CLASS({
       if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) )
         return false;
 
-      // Access property before checking o.hasOwnProperty.
-      var v = o[p.name];
       if ( this.outputOwnPropertiesOnly && ! o.hasOwnProperty(p.name) )
         return false;
 
-      // empty array should be included in the json in case it's being updated to be empty
-      // if ( foam.Array.isInstance(v) && v.length == 0 )
-      //   return false;
+      var v = o[p.name];
 
       if ( includeComma ) this.out(',');
 
@@ -731,6 +727,12 @@ foam.LIB({
 
           if ( cls ) {
             var c = typeof cls === 'string' ? ( opt_ctx || foam ).lookup(cls) : cls;
+            if ( c === undefined ) {
+              console.warn(
+                "In foam.core.JSON.parse(Object): JSON parser tried to deserialize class '"
+                  + cls + "' and failed. Is this class available to the client?"
+              );
+            }
             // TODO(markdittmer): Turn into static method: "parseJSON" once
             // https://github.com/foam-framework/foam2/issues/613 is fixed.
             if ( c.PARSE_JSON ) return c.PARSE_JSON(json, opt_class, opt_ctx);

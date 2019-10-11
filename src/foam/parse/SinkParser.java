@@ -15,10 +15,10 @@ import java.util.List;
  * SQL-syntax-like parser for defining Sink's.
  * Examples:
  *   *
- *   firstName, lastName
- *   MIN(age), AVG(age), MAX(age)
- *   SUM(amount), COUNT(*)
- *   ???: GROUP BY
+ *   firstName, lastName           -> SEQ(FIRST_NAME, LAST_NAME)
+ *   MIN(age), AVG(age), MAX(age)  -> SEQ(MIN(AGE), AVG(AGE), MAX(age))
+ *   SUM(amount), COUNT(*)         -> SEQ(SUM(AMOUNT), COUNT())
+ *   count GROUP BY country        -> GROUP_BY(COUNTRY, COUNT())
  **/
 public class SinkParser
   extends Alt

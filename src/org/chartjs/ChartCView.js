@@ -18,10 +18,10 @@ foam.CLASS({
       class: 'Map',
       name: 'config'
     },
-    // These actual values appear to be ignored but they need to be non-zero.
-    // It's up to the parent to enforce height/width constraints.
-    ['width', 1],
-    ['height', 1]
+    {
+      class: 'Simple',
+      name: 'chart_'
+    }
   ],
 
   reactions: [
@@ -30,7 +30,9 @@ foam.CLASS({
 
   methods: [
     function paintSelf(x) {
-      new this.Lib.CHART(x, this.config).render();
+      if ( this.chart_ ) this.chart_.destroy();
+      this.chart_ = new this.Lib.CHART(x, this.config);
+      this.chart_.render();
     }
   ]
 });

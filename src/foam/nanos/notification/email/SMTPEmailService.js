@@ -21,22 +21,24 @@ foam.CLASS({
   javaImports: [
     'foam.core.ContextAgent',
     'foam.core.X',
-    'foam.nanos.pool.FixedThreadPool',
     'foam.util.SafetyUtil',
     'java.nio.charset.StandardCharsets',
     'java.util.Date',
     'java.util.Properties',
+    'java.util.List',
     'javax.mail.*',
     'javax.mail.internet.InternetAddress',
     'javax.mail.internet.MimeMessage',
     'org.apache.commons.lang3.StringUtils',
     'org.jtwig.JtwigTemplate',
     'org.jtwig.resource.loader.TypedResourceLoader',
+    'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Group',
     'foam.nanos.logger.Logger',
-    'foam.nanos.om.OMLogger'
+    'foam.nanos.om.OMLogger',
+    'static foam.mlang.MLang.EQ'
   ],
 
   axioms: [
@@ -81,6 +83,27 @@ foam.CLASS({
           return Session.getInstance(props, new SMTPAuthenticator(getUsername(), getPassword()));
         }
         return Session.getInstance(props);
+      `
+    },
+    {
+      class: 'Object',
+      javaType: 'Transport',
+      name: 'transport_',
+      javaFactory:
+      `
+        Logger logger = (Logger) getX().get("logger");
+        OMLogger omLogger = (OMLogger) getX().get("OMLogger");
+        Transport transport = null;
+        try {
+          omLogger.log(this.getClass().getSimpleName(), "transport", "connecting");
+          transport = getSession_().getTransport("smtp");
+          transport.connect(getUsername(), getPassword());
+          logger.info("SMTPEmailService connected.");
+          omLogger.log(this.getClass().getSimpleName(), "transport", "connected");
+        } catch ( Exception e ) {
+          logger.error("Transport failed to initialize: " + e);
+        }
+        return transport;
       `
     },
     {
@@ -191,25 +214,33 @@ foam.CLASS({
     },
     {
       name: 'sendEmail',
-      javaCode:
-      `
-      OMLogger omLogger = (OMLogger) x.get("OMLogger");
-      Logger logger = (Logger) getX().get("logger");
-        try {
-          omLogger.log("Pre send email request");
-          MimeMessage message = createMimeMessage(emailMessage);
-          Transport transport = getSession_().getTransport("smtp");
-          transport.connect();
-          logger.info("SMTPEmailService connected.");
-          transport.send(message, getUsername(), getPassword());
-          logger.info("SMTPEmailService sent MimeMessage.");
-          transport.close();
-          logger.info("SMTPEmailService finish.");
-          omLogger.log("Post send email request");
-        } catch (Exception e) {
-          logger.error("SMTPEmailService failed to finish. " + e);
+      javaCode: `
+        Logger logger = (Logger) getX().get("logger");
+        OMLogger omLogger = (OMLogger) getX().get("OMLogger");
+
+        emailMessage = (EmailMessage) emailMessage.fclone();
+        MimeMessage message = createMimeMessage(emailMessage);
+        if ( message == null ) {
+          return emailMessage;
         }
-        
+        try {
+          getTransport_().send(message);
+          emailMessage.setStatus(Status.SENT);
+          logger.debug("SMTPEmailService sent MimeMessage.");
+          omLogger.log(this.getClass().getSimpleName(), "message", "sent");
+        } catch ( SendFailedException e ) {
+          emailMessage.setStatus(Status.FAILED);
+          logger.error("SMTPEmailService sending MimeMessage failed. " + e);
+        } catch ( MessagingException e ) {
+          try {
+            getTransport_().close();
+          } catch ( Exception e2 ) {
+            logger.error("Failed to close transport. " + e2);
+          }
+          clearTransport_();
+          logger.error("SMTPEmailService sending MimeMessage failed. " + e);
+        }
+        return emailMessage;
       `
     }
   ]

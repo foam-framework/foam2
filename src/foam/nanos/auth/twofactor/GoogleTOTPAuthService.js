@@ -46,14 +46,14 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'generateKey',
+      name: 'generateKeyAndQR',
       javaCode: `
         User user = (User) (x.get("agent") != null ?
           x.get("agent") :
           x.get("user")) ;
         DAO userDAO = (DAO) x.get("localUserDAO");
 
-        // fetch from user dao to get secret key
+        // fetch from localUserDAO to get updated user before setting TwoFactorSecret
         user = (User) userDAO.find(user.getId());
 
         // generate secret key, encode as base32 and store
@@ -65,19 +65,20 @@ foam.CLASS({
         user.setTwoFactorSecret(key);
         userDAO.put_(x, user);
 
-        if ( ! generateQrCode ) {
-          return key;
-        }
-
         try {
           EmailConfig service = (EmailConfig) x.get("emailConfig");
           String name = service == null ? "FOAM" : service.getDisplayName();
           String path = String.format("/%s:%s", name, user.getEmail());
           String query = String.format("secret=%s&issuer=%s&algorithm=%s", key, name, getAlgorithm());
           URI uri = new URI("otpauth", "totp", path, query, null);
-          return "data:image/svg+xml;charset=UTF-8," + QrCode.encodeText(uri.toASCIIString(), QrCode.Ecc.MEDIUM).toSvgString(0);
+
+          return new OTPKey.Builder(x)
+            .setKey(key)
+            .setQrCode("data:image/svg+xml;charset=UTF-8,"+
+              QrCode.encodeText(uri.toASCIIString(), QrCode.Ecc.MEDIUM).toSvgString(0))
+            .build();
         } catch ( Throwable t ) {
-          throw new RuntimeException(t);
+          throw new RuntimeException("Error when generating QR code.", t);
         }
       `
     },

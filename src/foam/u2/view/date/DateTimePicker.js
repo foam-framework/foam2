@@ -30,6 +30,10 @@ foam.CLASS({
       margin: 1px;
       text-align: center;
       cursor: pointer;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
       user-select: none;
     }
 
@@ -62,7 +66,7 @@ foam.CLASS({
     ^ .year {
       border-radius: 5px 5px 0px 0px;
       background-color: #406dea;
-      background-color: %SECONDARYCOLOR%;
+      background-color: /*%PRIMARY3%*/ #406dea;
       color: #ffffff;
       display: inline-block;
       align-items: center;

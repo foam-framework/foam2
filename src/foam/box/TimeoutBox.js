@@ -50,6 +50,7 @@ foam.CLASS({
   methods: [
     function send(msg) {
       var replyBox = msg.attributes.replyBox;
+      var localReplyBox = replyBox.localBox;
 
       if ( ! replyBox ) {
         this.delegate.send(msg);
@@ -59,18 +60,18 @@ foam.CLASS({
       var tooLate = false;
       var timer = setTimeout(function() {
         tooLate = true;
-        replyBox.send(this.Message.create({
+        localReplyBox.send(this.Message.create({
           object: this.TimeoutException.create()
         }));
       }.bind(this), this.timeout);
 
       var self = this;
 
-      msg.attributes.replyBox = {
-        send: function(msg) {
+      replyBox.localBox = foam.box.AnonymousBox.create({
+        f: function(msg) {
           if ( ! tooLate ) {
             clearTimeout(timer);
-            replyBox.send(msg);
+            localReplyBox.send(msg);
             return;
           }
 
@@ -81,7 +82,7 @@ foam.CLASS({
           // still processing our old ones.
           self.timeout *= 2;
         }
-      };
+      });
 
       this.delegate.send(msg);
     }

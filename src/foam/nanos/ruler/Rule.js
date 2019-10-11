@@ -14,45 +14,83 @@
     'foam.core.ContextAware',
     'foam.core.FObject',
     'foam.core.X',
+    'foam.core.DirectAgency',
     'foam.nanos.logger.Logger',
     'java.util.Collection'
   ],
 
-  properties: [
+  tableColumns: [
+    'id',
+    'ruleGroup',
+    'enabled',
+    'priority',
+    'daoKey',
+    'documentation'
+  ],
+
+  searchColumns: [
+    'id',
+    'ruleGroup',
+    'enabled',
+    'priority',
+    'daoKey',
+    'operation',
+    'after',
+    'validity'
+  ],
+
+  sections: [
     {
-      class: 'Long',
-      name: 'id',
-      documentation: 'Sequence number.'
+      name: 'basicInfo',
+      order: 100
     },
     {
+      name: '_defaultSection',
+      permissionRequired: true
+    }
+  ],
+
+  properties: [
+    {
       class: 'String',
-      name: 'name',
-      documentation: 'Rule name for human readability.'
+      name: 'id',
+      visibility: 'RO',
+      tableWidth: 200,
+      section: 'basicInfo'
     },
     {
       class: 'Int',
       name: 'priority',
       documentation: 'Priority defines the order in which rules are to be applied.'+
       'Rules with a higher priority are to be applied first.'+
-      'The convention for values is ints that are multiple of 10.'
+      'The convention for values is ints that are multiple of 10.',
+      permissionRequired: true,
+      tableWidth: 50,
+      section: 'basicInfo'
     },
     {
       class: 'String',
       name: 'ruleGroup',
-      documentation: 'ruleGroup defines sets of rules related to the same action.'
+      documentation: 'ruleGroup defines sets of rules related to the same action.',
+      permissionRequired: true,
+      tableWidth: 100,
+      section: 'basicInfo'
     },
     {
       class: 'String',
       name: 'documentation',
+      permissionRequired: true,
       view: {
         class: 'foam.u2.tag.TextArea',
         rows: 12, cols: 80
-      }
+      },
+      section: 'basicInfo'
     },
     {
       class: 'String',
       name: 'daoKey',
       documentation: 'dao name that the rule is applied on.',
+      permissionRequired: true,
       view: function(_, X) {
         var E = foam.mlang.Expressions.create();
         return {
@@ -65,16 +103,19 @@
           ]
         };
       },
+      tableWidth: 125
     },
     {
       class: 'Enum',
       of: 'foam.nanos.ruler.Operations',
       name: 'operation',
+      permissionRequired: true,
       documentation: 'Defines when the rules is to be applied: put/removed'
     },
     {
       class: 'Boolean',
       name: 'after',
+      permissionRequired: true,
       documentation: 'Defines if the rule needs to be applied before or after operation is completed'+
       'E.g. on dao.put: before object was stored in a dao or after.'
     },
@@ -82,7 +123,8 @@
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'predicate',
-      hidden: true,
+      // TODO make a friendlier view.
+      view: { class: 'foam.u2.view.JSONTextView' },
       javaFactory: `
       return foam.mlang.MLang.TRUE;
       `,
@@ -93,7 +135,7 @@
       class: 'FObjectProperty',
       of: 'foam.nanos.ruler.RuleAction',
       name: 'action',
-      hidden: true,
+      view: { class: 'foam.u2.view.JSONTextView' },
       documentation: 'The action to be executed if predicates returns true for passed object.'
     },
     {
@@ -107,12 +149,16 @@
       class: 'Boolean',
       name: 'enabled',
       value: true,
-      documentation: 'Enables the rule.'
+      documentation: 'Enables the rule.',
+      permissionRequired: true,
+      tableWidth: 70,
+      section: 'basicInfo'
     },
     {
       class: 'Boolean',
       name: 'saveHistory',
       value: false,
+      permissionRequired: true,
       documentation: 'Determines if history of rule execution should be saved.',
       help: 'Automatically sets to true when validity is greater than zero.',
       adapt: function(_, nu) {
@@ -123,6 +169,7 @@
       class: 'Int',
       name: 'validity',
       documentation: 'Validity of the rule (in days) for automatic rescheduling.',
+      permissionRequired: true,
       postSet: function(_, nu) {
         if ( nu > 0
           && ! this.saveHistory
@@ -232,7 +279,7 @@
         }
       ],
       javaCode: `
-        getAsyncAction().applyAction(x, obj, oldObj, ruler, null);
+        getAsyncAction().applyAction(x, obj, oldObj, ruler, new DirectAgency());
         if ( ! getAfter() ) {
           ruler.getDelegate().cmd_(x.put("OBJ", obj), getCmd());
         }
@@ -259,18 +306,9 @@
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
-        public static Rule findById(Collection<Rule> listRule, Long passedId) {
+        public static Rule findById(Collection<Rule> listRule, String passedId) {
           return listRule.stream().filter(rule -> passedId.equals(rule.getId())).findFirst().orElse(null);
-      }
-      public void setX(X x) {
-        super.setX(x);
-        if ( getAction() instanceof ContextAware ) {
-          ((ContextAware)getAction()).setX(x);
         }
-        if ( getAsyncAction() instanceof ContextAware ) {
-          ((ContextAware)getAsyncAction()).setX(x);
-        }
-      }
         `);
       }
     }

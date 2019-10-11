@@ -12,6 +12,7 @@ foam.CLASS({
   `,
 
   requires: [
+    'foam.comics.SearchMode',
     'foam.comics.v2.CannedQuery',
     'foam.comics.v2.namedViews.NamedViewCollection'
   ],
@@ -22,11 +23,27 @@ foam.CLASS({
       name: 'daoKey'
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'predicate',
+      view: { class: 'foam.u2.view.JSONTextView' }
+    },
+    {
       class: 'foam.dao.DAOProperty',
       name: 'dao',
       hidden: true,
-      expression: function(daoKey) {
-        return this.__context__[daoKey] || foam.dao.NullDAO.create({of: foam.core.FObject});
+      expression: function(daoKey, predicate) {
+        var dao = this.__context__[daoKey] || foam.dao.NullDAO.create({of: foam.core.FObject});
+        if ( this.hasOwnProperty('of') ) {
+          dao = foam.dao.ProxyDAO.create({
+            of: this.of,
+            delegate: dao
+          });
+        }
+        if ( predicate ) {
+          dao = dao.where(predicate);
+        }
+        return dao;
       }
     },
     {
@@ -37,7 +54,28 @@ foam.CLASS({
     {
       class: 'String',
       name: 'browseTitle',
-      expression: function(of) { return of.name; }
+      expression: function(of) { return foam.String.pluralize(of.model_.label); }
+    },
+    {
+      class: 'StringArray',
+      name: 'defaultColumns',
+      factory: null,
+      expression: function(of) {
+        var tableColumns = of.getAxiomByName('tableColumns');
+
+        return tableColumns
+                ? tableColumns.columns
+                : of.getAxiomsByClass(foam.core.Property).map(p => p.name);
+      }
+    },
+    {
+      class: 'Enum',
+      of: 'foam.comics.SearchMode',
+      name: 'searchMode',
+      help: `
+        The level of search capabilities that the controller should have.
+      `,
+      value: 'SIMPLE'
     },
     {
       class: 'foam.u2.ViewSpecWithJava',

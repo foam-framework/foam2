@@ -53,7 +53,7 @@ foam.CLASS({
       min-width: 120px;
       padding: 4px;
       font-weight: 500;
-      color: #2b2b2b;
+      color: /*%BLACK%*/ #1e1f21;
     }
 
     ^selected > ^label {

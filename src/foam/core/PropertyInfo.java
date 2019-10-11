@@ -9,11 +9,10 @@ package foam.core;
 import foam.crypto.hash.Hasher;
 import foam.crypto.sign.Signer;
 import foam.dao.SQLStatement;
+import foam.dao.jdbc.IndexedPreparedStatement;
 import foam.lib.parse.Parser;
 import foam.mlang.Expr;
 import foam.mlang.order.Comparator;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import javax.xml.stream.XMLStreamReader;
 import java.util.Map;
@@ -43,7 +42,8 @@ public interface PropertyInfo
   public Parser queryParser();
   public Parser csvParser();
   public void toJSON(foam.lib.json.Outputter outputter, Object value);
-  public void toCSV(foam.lib.csv.Outputter outputter, Object value);
+  public void toCSV(X x, Object obj, foam.lib.csv.CSVOutputter outputter);
+  public void toCSVLabel(X x, foam.lib.csv.CSVOutputter outputter);
   public void toXML(foam.lib.xml.Outputter outputter, Object value);
   public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop);
   //return true if there are difference, then the property value from o2 will set to diff
@@ -57,10 +57,11 @@ public interface PropertyInfo
   public String getSQLType();
   public boolean isSet(Object obj);
   public boolean isDefaultValue(Object obj);
-  public void setStatementValue(foam.dao.pg.IndexedPreparedStatement stmt, FObject o) throws java.sql.SQLException;
+  public void setStatementValue(IndexedPreparedStatement stmt, FObject o) throws java.sql.SQLException;
   public void setFromResultSet(java.sql.ResultSet resultSet, int index, FObject o) throws java.sql.SQLException;
   public void cloneProperty(FObject source, FObject dest);
   public boolean containsPII();
   public boolean containsDeletablePII();
   public void validateObj(foam.core.X x, foam.core.FObject obj);
+  public void fromCSVLabelMapping(java.util.Map<String, foam.lib.csv.FromCSVSetter> map);
 }

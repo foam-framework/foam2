@@ -22,37 +22,36 @@ foam.CLASS({
           padding-right: %INPUTHORIZONTALPADDING%;
           border: 1px solid;
           border-radius: 3px;
-          color: %INPUTTEXTCOLOR%;
-          background-color: %INPUTBACKGROUNDCOLOR%;
-          border-color: %INPUTBORDERCOLOR%;
+          color: /*%BLACK%*/ #1e1f21;
+          background-color: white;
+          border-color: /*%GREY3%*/ #cbcfd4;
         }
 
         ^:hover {
-          background-color: %INPUTHOVERBACKGROUNDCOLOR%;
-          border-color: %INPUTHOVERBORDERCOLOR%;
+          border-color: /*%GREY2%*/ #9ba1a6;
         }
 
         ^:hover::placeholder,
         ^:hover:-ms-input-placeholder,
         ^:hover::-ms-input-placeholder {
-          color: %INPUTHOVERTEXTCOLOR%;
+          color: /*%GREY2%*/ #9ba1a6;
         }
 
         ^:focus {
           outline: none;
-          border-color: %SECONDARYCOLOR%;
+          border-color: /*%PRIMARY3%*/ #406dea;
         }
 
         ^:disabled {
-          color: %INPUTDISABLEDTEXTCOLOR%;
-          background-color: %INPUTDISABLEDBACKGROUNDCOLOR%;
-          border-color: %INPUTDISABLEDBORDERCOLOR%;
+          color: /*%GREY2%*/ #9ba1a6;
+          background-color: /*%GREY5%*/ #f5f7fa;
+          border-color: /*%GREY3%*/ #cbcfd4;
         }
 
         ^.error {
-          color: %INPUTERRORTEXTCOLOR%;
-          background-color: %INPUTERRORBACKGROUNDCOLOR%;
-          border-color: %INPUTERRORBORDERCOLOR%;
+          color: /*%DESTRUCTIVE3%*/ #d9170e;
+          background-color: /*%DESTRUCTIVE5%*/ #fbedec;
+          border-color: /*%DESTRUCTIVE3%*/ #d9170e;
         }
       `,
     },

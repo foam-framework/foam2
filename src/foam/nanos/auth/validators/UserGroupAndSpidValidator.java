@@ -25,10 +25,10 @@ public class UserGroupAndSpidValidator implements Validator
   }
 
   private void validateSpid(X x, User user) {
-    // Currently not validating existence of SPID.
     // If the SPID is not assigned, it is set to the creating user's
     // spid.
     // Not doing the assignment here cause this is just a validator.
+    // see ServiceProviderAwareDAO
     if ( ! SafetyUtil.isEmpty(user.getSpid()) ) {
       DAO serviceProviderDAO = (DAO) x.get("serviceProviderDAO");
       ServiceProvider serviceProvider = (ServiceProvider) serviceProviderDAO.find(user.getSpid());

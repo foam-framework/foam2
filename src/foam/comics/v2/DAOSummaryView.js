@@ -13,6 +13,11 @@ foam.CLASS({
     A configurable summary view for a specific instance
   `,
 
+  topics: [
+    'finished',
+    'throwError'
+  ],
+
   axioms: [
     foam.pattern.Faceted.create()
   ],
@@ -25,6 +30,7 @@ foam.CLASS({
     ^ .foam-u2-ActionView-back {
       display: flex;
       align-items: center;
+      width: 30%;
     }
 
     ^account-name {
@@ -46,6 +52,7 @@ foam.CLASS({
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.ControllerMode',
+    'foam.u2.dialog.NotificationMessage'
   ],
   imports: [
     'stack'
@@ -76,6 +83,13 @@ foam.CLASS({
         var defaultAction = allActions.filter(a => a.isDefault);
         return defaultAction.length >= 1 ? defaultAction[0] : allActions[0];
       }
+    },
+    {
+      class: 'foam.u2.ViewSpecWithJava',
+      name: 'viewView',
+      expression: function() {
+        return foam.u2.detail.SectionedDetailView;
+      }
     }
   ],
   actions: [
@@ -93,8 +107,18 @@ foam.CLASS({
     },
     {
       name: 'delete',
+      confirmationRequired: true,
       code: function() {
-        alert('TODO');
+        this.config.dao.remove(this.data).then(o => {
+          this.finished.pub();
+          this.stack.back();
+        }, e => {
+          this.throwError.pub(e);
+          this.add(this.NotificationMessage.create({
+            message: e.message,
+            type: 'error'
+          }));
+        });
       }
     }
   ],
@@ -104,7 +128,8 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(self.slot(function(data, config, config$viewBorder) {
+        .add(self.slot(function(data, config, config$browseTitle, config$viewBorder, viewView) {
+
           return self.E()
             .start(self.Rows)
               .start(self.Rows)
@@ -113,7 +138,7 @@ foam.CLASS({
                     .tag(self.stack.BACK, {
                       buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                       icon: 'images/back-icon.svg',
-                      label: `All ${config.of.name}s`
+                      label: `All ${config$browseTitle}`
                     })
                 .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })
@@ -121,7 +146,7 @@ foam.CLASS({
                     .add(data.toSummary())
                       .addClass(this.myClass('account-name'))
                   .end()
-                  .startContext({data: data}).add(self.primary).endContext()
+                  .startContext({ data }).add(self.primary).endContext()
                 .end()
               .end()
 
@@ -139,9 +164,7 @@ foam.CLASS({
               .end()
 
               .start(config$viewBorder)
-                .start(foam.u2.detail.SectionedDetailView, { data: data })
-                  .addClass(this.myClass('view-container'))
-                .end()
+                .start(viewView, { data }).addClass(this.myClass('view-container')).end()
               .end()
             .end();
         }));

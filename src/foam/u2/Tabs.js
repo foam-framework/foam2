@@ -50,7 +50,7 @@ foam.CLASS({
       cursor: pointer;
     }
     ^tab.selected {
-      border-bottom: 3px solid %SECONDARYCOLOR%;
+      border-bottom: 3px solid /*%PRIMARY3%*/ #406dea;
     }
   `,
 });

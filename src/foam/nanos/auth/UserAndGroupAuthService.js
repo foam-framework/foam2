@@ -74,7 +74,7 @@ foam.CLASS({
       name: 'getCurrentUser',
       javaCode: `
         Session session = x.get(Session.class);
-        
+
         // fetch context and check if not null or user id is 0
         if ( session == null || session.getUserId() == 0 ) {
           throw new AuthenticationException("Not logged in");
@@ -160,7 +160,8 @@ foam.CLASS({
 
         Session session = x.get(Session.class);
         session.setUserId(user.getId());
-        session.setContext(session.getContext().put("user", user).put("group", group));
+        ((DAO) getLocalSessionDAO()).put(session);
+        session.setContext(session.applyTo(session.getContext()));
 
         return user;
       `
@@ -226,47 +227,32 @@ foam.CLASS({
       `
     },
     {
-      name: 'checkPermission',
+      name: 'check',
       documentation: `Check if the user in the context supplied has the right
         permission.`,
       javaCode: `
         if ( x == null || permission == null ) return false;
 
-        Session session = x.get(Session.class);
-        if ( session == null || session.getUserId() == 0 ) return false;
-
-        User user = (User) x.get("user");
-
-        // check if user exists and is enabled
-        if ( user == null || ! user.getEnabled() ) return false;
+        java.security.Permission p = new AuthPermission(permission);
 
         try {
           Group group = getCurrentGroup(x);
 
           while ( group != null ) {
 
-            // check if group is enabled
-            if ( ! group.getEnabled() ) return false;
-
             // check permission
-            if ( group.implies(x, permission) ) return true;
+            if ( group.implies(x, p) ) return true;
 
             // check parent group
             group = (Group) ((DAO) getLocalGroupDAO()).find(group.getParent());
           }
         } catch (IllegalArgumentException e) {
           Logger logger = (Logger) x.get("logger");
-          logger.error("check", permission, e);
+          logger.error("check", p, e);
         } catch (Throwable t) {
         }
 
         return false;
-      `
-    },
-    {
-      name: 'check',
-      javaCode: `
-        return checkPermission(x, new AuthPermission(permission));
       `
     },
     {
@@ -405,7 +391,7 @@ foam.CLASS({
         if ( user != null ) {
           if ( agent != null ) {
             DAO agentJunctionDAO = (DAO) x.get("agentJunctionDAO");
-            UserUserJunction junction = (UserUserJunction) agentJunctionDAO.inX(x).find(
+            UserUserJunction junction = (UserUserJunction) agentJunctionDAO.find(
               AND(
                 EQ(UserUserJunction.SOURCE_ID, agent.getId()),
                 EQ(UserUserJunction.TARGET_ID, user.getId())
@@ -421,7 +407,7 @@ foam.CLASS({
 
           // Third highest precedence: If a user is logged in but not acting as
           // another user, return their group.
-          return user.findGroup(x);
+          return (Group) ((DAO) getLocalGroupDAO()).inX(x).find(user.getGroup());
         }
 
         // If none of the cases above match, return null.

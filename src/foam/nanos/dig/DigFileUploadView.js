@@ -76,7 +76,7 @@ foam.CLASS({
       font-size: 14px;
       font-weight: 300;
       letter-spacing: 0.2px;
-      color: %SECONDARYCOLOR%;
+      color: /*%PRIMARY3%*/ #406dea;
     }
     ^ .boxless-for-drag-drop {
       border: dashed 4px #a4b3b8;
@@ -140,17 +140,13 @@ foam.CLASS({
                       href: this.data$.map(function(data) {
                         if ( data ) {
                           var blob = data.data;
-                          var sessionId = localStorage['defaultSession'];
 
                           if ( self.BlobBlob.isInstance(blob) ) {
                             return URL.createObjectURL(blob.blob);
                           } else {
                             var url = '/service/httpFileService/' + data.id;
-                            // attach session id if available
-                            if ( sessionId )
-                              url += '?sessionId=' + sessionId;
+                            return url;
                           }
-                          return url;
                         }
                       }),
                       target: '_self'

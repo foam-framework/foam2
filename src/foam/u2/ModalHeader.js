@@ -24,7 +24,7 @@ foam.CLASS({
     ^ {
       height: 40.8px;
       width: 448px;
-      background-color: #093649;
+      background-color: /*%PRIMARY1%*/ #202341;
       border-radius: 2px 2px 0 0;
       margin: auto;
     }
@@ -35,7 +35,7 @@ foam.CLASS({
       line-height: 2.86;
       text-align: left;
       color: #ffffff;
-      margin-left: 19px;
+      margin-left: 25px;
       display: inline-block;
     }
     ^ .close{
@@ -77,7 +77,7 @@ foam.CLASS({
     {
       name: 'closeModal',
       icon: 'images/ic-cancelwhite.svg',
-      label: 'Close',
+      label: '',
       code: function(X) {
         X.closeDialog();
       }

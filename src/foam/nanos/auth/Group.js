@@ -56,6 +56,13 @@ foam.CLASS({
       of: 'foam.nanos.menu.Menu'
     },
     {
+      class: 'Reference',
+      targetDAOKey: 'menuDAO',
+      of: 'foam.nanos.menu.Menu',
+      name: 'rootMenu',
+      value: ''
+    },
+    {
       class: 'String',
       name: 'url',
       value: null
@@ -286,7 +293,8 @@ foam.CLASS({
         }
 
         // Prevents privilege escalation via setting a group's parent.
-        if ( ! getParent().equals(((Group) oldObj).getParent()) ) {
+        if ( getParent() != null &&
+             ! getParent().equals(((Group) oldObj).getParent()) ) {
           checkUserHasAllPermissionsInGroupAndAncestors(x, this);
         }
       `

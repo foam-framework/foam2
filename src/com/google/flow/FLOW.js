@@ -197,7 +197,17 @@ foam.CLASS({
   ],
 
   css: `
-      body { overflow: hidden; user-select: none; font-family: 'Roboto', sans-serif; color: #444; }
+      body {
+        overflow: hidden;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        font-family: 'Roboto', sans-serif;
+        color: #444;
+        }
+
       ^ { display: flex; }
       ^ > * { padding-left: 16px; padding-right: 16px; }
       ^tools, ^properties, ^sheet { box-shadow: 3px 3px 6px 0 gray; height: 100%; }

@@ -14,7 +14,7 @@ foam.CLASS({
 
   tableColumns: [ 'clsName', 'name', 'count', 'minTime', 'maxTime', 'average', 'totalTime' ],
 
-  searchColumns: [ ],
+  searchColumns: [ 'clsName', 'name' ],
 
   properties: [
     {
@@ -65,5 +65,7 @@ foam.CLASS({
       view: { class: 'io.c9.ace.Editor' },
       permissionRequired: true
     }
-  ]
+  ],
+
+  
 });
