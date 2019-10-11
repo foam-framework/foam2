@@ -8,7 +8,11 @@ foam.CLASS({
   package: 'foam.nanos.menu',
   name: 'Menu',
 
-  tableColumns: [ 'id', 'parent', 'label', 'order' ],
+  implements: [
+    'foam.nanos.auth.EnabledAware'
+  ],
+
+  tableColumns: [ 'enabled', 'id', 'parent', 'label', 'order' ],
 
   imports: [
     'lastMenuLaunchedListener?'
@@ -24,6 +28,11 @@ foam.CLASS({
       class: 'String',
       name: 'label',
       documentation: 'Menu label.'
+    },
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      value: true
     },
     {
       class: 'FObjectProperty',

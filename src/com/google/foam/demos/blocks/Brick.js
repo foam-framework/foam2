@@ -16,7 +16,14 @@ foam.CLASS({
   },
 
   css: `
-    body { -webkit-user-select: none; }
+    body {
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
     ^ {
       border: 1px solid gray;
       display: table-cell;

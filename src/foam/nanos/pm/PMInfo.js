@@ -65,5 +65,7 @@ foam.CLASS({
       view: { class: 'io.c9.ace.Editor' },
       permissionRequired: true
     }
-  ]
+  ],
+
+  
 });

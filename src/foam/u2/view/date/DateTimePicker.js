@@ -30,6 +30,10 @@ foam.CLASS({
       margin: 1px;
       text-align: center;
       cursor: pointer;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
       user-select: none;
     }
 

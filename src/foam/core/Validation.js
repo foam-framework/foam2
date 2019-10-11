@@ -282,7 +282,8 @@ foam.CLASS({
       return foam.core.ExpressionSlot.create({
         obj: obj,
         code: validateObject,
-        args: args});
+        args: args
+      });
     }
   ]
 });
@@ -327,7 +328,7 @@ foam.CLASS({
               },
               errorString: 'Please enter an email address'
             }
-          )
+          );
         }
         return ret;
       }
