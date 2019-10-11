@@ -33,12 +33,7 @@ foam.CLASS({
         cls.extras.push(foam.java.Code.create({
           data:`
   public AuthorizationDAO(X x, DAO delegate, Authorizer authorizer) {
-    AuthorizationException exception = new AuthorizationException("When " +
-        "using a DAO decorated by AuthorizationDAO, you may only call the " +
-        "context-oriented methods: put_(), find_(), select_(), remove_(), " +
-        "removeAll_(). Alternatively, you can also " +
-        "use .inX() to set the context on the DAO.");
-    setX(new InvalidX(exception));
+    setX(x);
     setDelegate(delegate);
     setAuthorizer(authorizer);
   }
@@ -57,17 +52,6 @@ foam.CLASS({
   ],
 
   methods: [
-    {
-      name: 'init_',
-      javaCode: `
-      AuthorizationException exception = new AuthorizationException("When " +
-          "using a DAO decorated by AuthorizationDAO, you may only call the " +
-          "context-oriented methods: put_(), find_(), select_(), remove_(), " +
-          "removeAll_(). Alternatively, you can also " +
-          "use .inX() to set the context on the DAO.");
-      setX(new InvalidX(exception));
-      `
-    },
     {
       name: 'put_',
       javaThrows: [
