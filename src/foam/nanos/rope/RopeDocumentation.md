@@ -16,7 +16,7 @@ One of the key defining features that makes the ROPE algorithm's authentication 
 
 #### Using ROPE with DAOs
 
-The ROPE autherization system can be utilized by the user of the framework by appending a ROPEAuthorizer decorator to any DAO object that requires authorization. This decorator follows the standard FOAM Authorizer interface and performs authentication checks dynamically as the dao is used using the ROPE relationship search algorithm under the hood.
+The ROPE authorization system can be utilized by the user of the framework by appending a ROPEAuthorizer decorator to any DAO object that requires authorization. This decorator follows the standard FOAM Authorizer interface and performs authentication checks dynamically as the dao is used using the ROPE relationship search algorithm under the hood.
 
 Permissions based on relationships can be configured by the user by creating a ROPE objects from the ROPE.js model and setting the properties accordingly and afterwards appending the object to the application's ropeDAO which will be utilized by the ROPE algorithm to perform authentication checks. Given a missing ROPE, the algorithm trivially assumes that all permissions are not granted on that object.
 
@@ -27,15 +27,15 @@ Permissions based on relationships can be configured by the user by creating a R
 
 #### Setup of Miscellany
 
-One trivial requirement of all ROPE objects is to setup the source and target models, their respective DAO keys, and the cardinality which is a string representing the type of the relationship be it one to many or many to one, the uses should specify this field as a String of the form ***"1:\*"***, ***"\*:\*"***, or ***"\*:1"***. There are also 3 additional fields that must be set up to describe the relation and the dao in which the relation's objects are held. These include junctionModel, junctionDAOKey, and inverseName.
+One trivial requirement of all ROPE objects is to set up the source and target models, their respective DAO keys, and the cardinality which is a string representing the type of the relationship be it one to many or many to one, the uses should specify this field as a String of the form ***"1:\*"***, ***"\*:\*"***, or ***"\*:1"***. There are also 3 additional fields that must be set up to describe the relation and the dao in which the relation's objects are held. These include junctionModel, junctionDAOKey, and inverseName.
 
 #### To set up which permissions this ROPE will enable
 
-Both of the following methods of setting up a ROPE can be used in conjunction to acheive the desired functionality and are illustrated with some practical examples in the following section.
+Both of the following methods of setting up a ROPE can be used in conjunction to achieve the desired functionality and are illustrated with some practical examples in the following section.
 
 ROPE works by checking which permissions are implied given any that a User might already have in a transitive fashion. *Permissions* in this sense are represented by an abstract ROPEActions object. ROPE contains a matrix of ROPEActions within its variable CRUD. Represented by a map of Lists for each permission, this matrix can be used to configure which ROPEAction enumerations imply each other. For example, say if you want a User having write permissions to some Object A, we want to ensure that it also has read permissions for Object B; we would then add a read ROPEAction to the List pointed to by the write ROPEAction key.
 
-There is a simpler way to add a permission that is less flexible. Suppose we simply want the act of being related to the source object to imediately enable permissions on the target object. Here we can also add which base permissions are required to allow the target object to actually gain these permissions. If one is there, the authorization for the target permissions passes. Any such ROPEActions should be stored within the requiredSourceActions List. Having any one of these grants the User any of the relationshipImplies ROPEActions.
+There is a simpler way to add a permission that is less flexible. Suppose we simply want the act of being related to the source object to immediately enable permissions on the target object. Here we can also add which base permissions are required to allow the target object to actually gain these permissions. If one is there, the authorization for the target permissions passes. Any such ROPEActions should be stored within the requiredSourceActions List. Having any one of these grants the User any of the relationshipImplies ROPEActions.
 
 &nbsp;
 &nbsp;
@@ -75,9 +75,9 @@ That's all! we now have a fully working ROPE that allows anyone who owns a bank 
 x.get("ropeDAO").put(transactionROPE);
 ```
 
-#### More Fine Grained Controll
+#### More Fine Grained Control
 
-Suppose we now want some additional, more complex functionality to add to our bank account accesses. People who are able to read a bank account should be able to read a transaction as well. We can acheive this by using the ROPE matrix. First we setup everything just as before,
+Suppose we now want some additional, more complex functionality to add to our bank account accesses. People who are able to read a bank account should be able to read a transaction as well. We can achieve this by using the ROPE matrix. First we setup everything just as before,
 
 ``` java
 ROPE transactionROPE = new ROPE();
