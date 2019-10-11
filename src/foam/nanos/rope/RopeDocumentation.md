@@ -23,6 +23,8 @@ One of the key defining features that makes the ROPE algorithm's authentication 
 
 One trivial requirement of all ROPE objects is to setup the source and target models, their respective DAO keys, and the cardinality which is a string representing the type of the relationship be it one to many or many to one, the uses should specify this field as a String of the form ***"1:\*"***, ***"\*:\*"***, or ***"\*:1"***. There are also 3 additional fields that must be set up to describe the relation and the dao in which the relation's objects are held. These include junctionModel, junctionDAOKey, and inverseName.
 
+&nbsp;
+
 #### To set up which permissions this ROPE will enable
 
 Both of the following methods of setting up a ROPE can be used in conjunction to acheive the desired functionality and are illustrated with some practical examples in the following section.
@@ -68,6 +70,8 @@ That's all! we now have a fully working ROPE that allows anyone who owns a bank 
 ``` java
 x.get("ropeDAO").put(transactionROPE);
 ```
+
+&nbsp;
 
 #### More Fine Grained Controll
 
