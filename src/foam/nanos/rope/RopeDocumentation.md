@@ -26,9 +26,11 @@ One trivial requirement of all ROPE objects is to setup the source and target mo
 
 #### To set up which permissions this ROPE will enable
 
+Both of the following methods of setting up a ROPE can be used in conjunction to acheive the desired functionality and are illustrated with some practical examples in the following section.
+
 ROPE works by checking which permissions are implied given any that a User might already have in a transitive fashion. *Permissions* in this sense are represented by an abstract ROPEActions object. ROPE contains a matrix of ROPEActions within its variable CRUD. Represented by a map of Lists for each permission, this matrix can be used to configure which ROPEAction enumerations imply each other. For example, say if you want a User having write permissions to some Object A, we want to ensure that it also has read permissions for Object B; we would then add a read ROPEAction to the List pointed to by the write ROPEAction key.
 
-There is a simpler way to add a permission that is less flexible. If the very act of being related to an object should imply a ROPEAction should be authorized, then this action can simply be added to the relationshipImplies variable of the ROPE object which is checked before the matrix. The ROPEAction the user would need to have to be able to perform on the source object to gain this generic functionality should be stored within the requiredSourceActions List. Having any one of these grants the User any of the relationshipImplies ROPEActions.
+There is a simpler way to add a permission that is less flexible. Suppose we simply want the act of being related to the source object to imediately enable permissions on the target object. Here we can also add which base permissions are required to allow the target object to actually gain these permissions. If one is there, the authorization for the target permissions passes. Any such ROPEActions should be stored within the requiredSourceActions List. Having any one of these grants the User any of the relationshipImplies ROPEActions.
 
 &nbsp;
 &nbsp;
