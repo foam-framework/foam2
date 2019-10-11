@@ -19,6 +19,8 @@ One of the key defining features that makes the ROPE algorithm's authentication 
 
 ## Technical Notes on the Proper Setup of ROPE Objects
 
+&nbsp;
+
 #### Setup of Miscellany
 
 One trivial requirement of all ROPE objects is to setup the source and target models, their respective DAO keys, and the cardinality which is a string representing the type of the relationship be it one to many or many to one, the uses should specify this field as a String of the form ***"1:\*"***, ***"\*:\*"***, or ***"\*:1"***. There are also 3 additional fields that must be set up to describe the relation and the dao in which the relation's objects are held. These include junctionModel, junctionDAOKey, and inverseName.
@@ -37,6 +39,8 @@ There is a simpler way to add a permission that is less flexible. Suppose we sim
 &nbsp;
 
 ## Working Example with Code
+
+&nbsp;
 
 #### Access of a User's Bank Account
 
