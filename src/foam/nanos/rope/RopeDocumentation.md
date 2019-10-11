@@ -3,7 +3,6 @@
 # ROPE User Guide and Documentation
 
 &nbsp;
-&nbsp;
 
 ## Abstract Description
 
