@@ -4,9 +4,9 @@
 
 &nbsp;
 
-## Abstract Overview
+## Abstract Description
 
-At an abstract level, ROPE utilizes the built in FOAM relationship functionality to allow the user of the FOAM framework to perform authentication checks based on previously declared relationships and the level of authorization they are configured to be granted.
+At an abstract level, ROPE utilizes the built in FOAM relationship framework to allow the user of the FOAM framework to perform authentication checks based on previously declared relationships and the level of authorization they are configured to be granted.
 
 The ROPE authentication system can be utilized by the user of the framework by appending a ROPEAuthorizer decorator to any DAO object that requires authorization. This decorator follows the standard FOAM Authorizer interface and performs authentication checks dynamically as the dao is used using the ROPE relationship search algorithm under the hood.
 
@@ -19,11 +19,11 @@ One of the key defining features that makes the ROPE algorithm's authentication 
 
 ## Technical Notes on the Proper Setup of ROPE Objects
 
-### Setup of Miscellany
+#### Setup of Miscellany
 
 One trivial requirement of all ROPE objects is to setup the source and target models, their respective DAO keys, and the cardinality which is a string representing the type of the relationship be it one to many or many to one, the uses should specify this field as a String of the form ***"1:\*"***, ***"\*:\*"***, or ***"\*:1"***. There are also 3 additional fields that must be set up to describe the relation and the dao in which the relation's objects are held. These include junctionModel, junctionDAOKey, and inverseName.
 
-### To set up which permissions this ROPE will enable
+#### To set up which permissions this ROPE will enable
 
 Both of the following methods of setting up a ROPE can be used in conjunction to acheive the desired functionality and are illustrated with some practical examples in the following section.
 
@@ -36,7 +36,7 @@ There is a simpler way to add a permission that is less flexible. Suppose we sim
 
 ## Working Example with Code
 
-### Access of a User's Bank Account
+#### Access of a User's Bank Account
 
 Here we want to show ROPE in action in the context of being able to access a transaction as a bank account owner. First we will set up our ROPE fields as described in the previous method,
 
@@ -69,7 +69,7 @@ That's all! we now have a fully working ROPE that allows anyone who owns a bank 
 x.get("ropeDAO").put(transactionROPE);
 ```
 
-### More Fine Grained Controll
+#### More Fine Grained Controll
 
 Suppose we now want some additional, more complex functionality to add to our bank account accesses. People who are able to read a bank account should be able to read a transaction as well. We can acheive this by using the ROPE matrix. First we setup everything just as before,
 
