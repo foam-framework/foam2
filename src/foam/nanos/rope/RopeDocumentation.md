@@ -37,26 +37,26 @@ There is a simpler way to add a permission that is less flexible. If the very ac
 
 #### Access of a User's Bank Account
 
-Here we want to show ROPE in action in the context of being able to access a transaction as a bank account. First we will set up our ROPE fields as described in the previous method,
+Here we want to show ROPE in action in the context of being able to access a transaction as a bank account owner. First we will set up our ROPE fields as described in the previous method,
 
 ``` java
 ROPE transactionROPE = new ROPE();
   transactionROPE.setSourceModel(foam.nanos.rope.test.ROPEBankAccount.getOwnClassInfo());
   transactionROPE.setTargetModel(foam.nanos.rope.test.ROPETransaction.getOwnClassInfo());
-  transactionROPE.setSourceDAOKey("ropeAccountDAO");
-  transactionROPE.setTargetDAOKey("ropeTransactionDAO");
   transactionROPE.setCardinality("1:*");
   transactionROPE.setInverseName("sourceAccount");
   transactionROPE.setIsInverse(false);
+  transactionROPE.setSourceDAOKey("ropeAccountDAO");
+  transactionROPE.setTargetDAOKey("ropeTransactionDAO");
 ```
 
 Next we will add the capabilities on the transaction which our relationship will allow to our previously created ROPE; we are here requiring that the BankAccount object be owned in order to allow the capabilities of create, read, own we wish to authorize,
 
 ``` java
-List<ROPEActions> relationshipImplies = new ArrayList<ROPEActions>();
-  relationshipImplies.add(ROPEActions.C);
-  relationshipImplies.add(ROPEActions.R);
-  relationshipImplies.add(ROPEActions.OWN);
+List<ROPEActions> ownImplies = new ArrayList<ROPEActions>();
+  ownImplies.add(ROPEActions.C);
+  ownImplies.add(ROPEActions.R);
+  ownImplies.add(ROPEActions.OWN);
   transactionROPE.setRelationshipImplies(relationshipImplies);
 List<ROPEActions> requiredSourceActions = new new ArrayList<ROPEActions>(Arrays.asList(ROPEActions.OWN));
   transactionROPE.setRequiredSourceAction(requiredSourceActions);
@@ -68,5 +68,38 @@ That's all! we now have a fully working ROPE that allows anyone who owns a bank 
 x.get("ropeDAO").put(transactionROPE);
 ```
 
+#### More Fine Grained Controll
+
+Suppose we now want some additional, more complex functionality to add to our bank account accesses. People who are able to read a bank account should be able to read a transaction as well. We can acheive this by using the ROPE matrix. First we setup everything just as before,
+
+``` java
+ROPE transactionROPE = new ROPE();
+  transactionROPE.setSourceModel(foam.nanos.rope.test.ROPEBankAccount.getOwnClassInfo());
+  transactionROPE.setTargetModel(foam.nanos.rope.test.ROPETransaction.getOwnClassInfo());
+  transactionROPE.setCardinality("1:*");
+  transactionROPE.setInverseName("sourceAccount");
+  transactionROPE.setIsInverse(false);
+  transactionROPE.setSourceDAOKey("ropeAccountDAO");
+  transactionROPE.setTargetDAOKey("ropeTransactionDAO");
+```
+
+Now we just set up our matrix and set it as the property of our transactionROPE and we are good to go,
+
+``` java
+List<ROPEActions> ownImplies = new ArrayList<ROPEActions>();
+  ownImplies.add(ROPEActions.C);
+  ownImplies.add(ROPEActions.R);
+  ownImplies.add(ROPEActions.OWN);
+
+List<ROPEActions> readImplies = new ArrayList<ROPEActions>();
+  ownImplies.add(ROPEActions.R);
+
+HashMap<ROPEActions, List<ROPEActions>> matrix = new HashMap<ROPEActions, List<ROPEActions>>();
+  matrix.put(ROPEActions.OWN, ownImplies);
+  matrix.put(ROPEActions.READ, readImplies);
+
+transactionROPE.setCRUD(matrix);
+x.get("ropeDAO").put(transactionROPE);
+```
 
 
