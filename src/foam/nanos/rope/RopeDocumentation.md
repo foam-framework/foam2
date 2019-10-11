@@ -92,7 +92,7 @@ List<ROPEActions> ownImplies = new ArrayList<ROPEActions>();
   ownImplies.add(ROPEActions.OWN);
 
 List<ROPEActions> readImplies = new ArrayList<ROPEActions>();
-  ownImplies.add(ROPEActions.R);
+  readImplies.add(ROPEActions.R);
 
 HashMap<ROPEActions, List<ROPEActions>> matrix = new HashMap<ROPEActions, List<ROPEActions>>();
   matrix.put(ROPEActions.OWN, ownImplies);
