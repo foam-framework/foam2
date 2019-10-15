@@ -7,28 +7,38 @@
 package foam.core;
 
 public class InvalidX
-  extends AbstractX
+  extends ProxyX
 {
-  private RuntimeException exception_;
+  private X delegate_;
+  private String nspecName_;
 
-  public InvalidX(RuntimeException exception) {
-    exception_ = exception;
-  }
-
-  public Object get(X x, Object key) {
-    throw exception_;
-  }
-
-  public X put(Object key, Object value) {
-    throw exception_;
-  }
-
-  public X putFactory(Object key, XFactory factory) {
-    throw exception_;
+  public InvalidX(X delegate, String nspecName) {
+    super(delegate);
+    delegate_ = delegate;
+    nspecName_ = nspecName;
   }
 
   @Override
-  public String toString() {
-    throw exception_;
+  public Object get(X x, Object key) {
+    Object ret = getX().get(x, key);
+    System.out.println("Unsafe access to " + nspecName_ + ". Please use .inX() instead.");
+
+    return ret;
+  }
+
+  @Override
+  public X put(Object key, Object value) {
+    setX(getX().put(key, value));
+    System.out.println("Unsafe access to " + nspecName_ + ". Please use .inX() instead.");
+
+    return (X) this;
+  }
+
+  @Override
+  public X putFactory(Object key, XFactory factory) {
+    System.out.println("Unsafe access to " + nspecName_ + ". Please use .inX() instead.");
+    setX(getX().putFactory(key, factory));
+
+    return this;
   }
 }
