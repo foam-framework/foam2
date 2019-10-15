@@ -45,7 +45,7 @@ public class NSpecFactory
 
     try {
       if ( logger != null ) logger.info("Creating Service", spec_.getName());
-      X serviceX = spec_.getName().endsWith("DAO") ? new InvalidX(x_.getX(), spec_.getName()) : x_.getX();
+      X serviceX = spec_.getName().endsWith("DAO") ? new InvalidX(x_.getX(), spec_.getName(), logger) : x_.getX();
       ns_ = spec_.createService(x_.getX().put(NSpec.class, spec_));
       Object ns = ns_;
       while ( ns != null ) {

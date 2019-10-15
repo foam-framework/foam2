@@ -6,22 +6,26 @@
 
 package foam.core;
 
+import foam.nanos.logger.Logger;
+
 public class InvalidX
   extends ProxyX
 {
   private X delegate_;
   private String nspecName_;
+  private Logger logger_;
 
-  public InvalidX(X delegate, String nspecName) {
+  public InvalidX(X delegate, String nspecName, Logger logger) {
     super(delegate);
     delegate_ = delegate;
     nspecName_ = nspecName;
+    logger_ = logger;
   }
 
   @Override
   public Object get(X x, Object key) {
     Object ret = getX().get(x, key);
-    System.out.println("Unsafe access to " + nspecName_ + ". Please use .inX() instead.");
+    logger_.warning("Unsafe access to " + nspecName_ + ". Please use .inX() instead.");
 
     return ret;
   }
@@ -29,14 +33,14 @@ public class InvalidX
   @Override
   public X put(Object key, Object value) {
     setX(getX().put(key, value));
-    System.out.println("Unsafe access to " + nspecName_ + ". Please use .inX() instead.");
+    logger_.warning("Unsafe access to " + nspecName_ + ". Please use .inX() instead.");
 
     return (X) this;
   }
 
   @Override
   public X putFactory(Object key, XFactory factory) {
-    System.out.println("Unsafe access to " + nspecName_ + ". Please use .inX() instead.");
+    logger_.warning("Unsafe access to " + nspecName_ + ". Please use .inX() instead.");
     setX(getX().putFactory(key, factory));
 
     return this;
