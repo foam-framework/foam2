@@ -179,7 +179,7 @@ foam.CLASS({
       // TODO: Use validatationPredicates instead.
       validateObj: function(organization) {
         if ( ! organization.trim() ) {
-          return 'Company Name Required.';
+          return 'Organization Required.';
         }
       },
       section: 'business'
@@ -440,13 +440,18 @@ foam.CLASS({
       name: 'label',
       type: 'String',
       code: function label() {
-        return this.organization || this.businessName || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
+        if ( this.legalName ) return this.legalName;
+        if ( this.lastName && this.firstName ) return this.firstName + ' ' + this.lastName;
+        if ( this.lastName && ! this.firstName ) return this.lastName;
+        if ( ! this.lastName && this.firstName ) return this.firstName;
+        return '';
       },
       javaCode: `
-        if ( ! SafetyUtil.isEmpty(getOrganization()) ) return getOrganization();
-        if ( ! SafetyUtil.isEmpty(getBusinessName()) ) return getBusinessName();
-        if ( SafetyUtil.isEmpty(getLastName()) ) return getFirstName();
-        return getFirstName() + " " + getLastName();
+        if ( ! SafetyUtil.isEmpty(this.getLegalName()) ) return this.getLegalName();
+        if ( SafetyUtil.isEmpty(this.getLastName()) && SafetyUtil.isEmpty(this.getFirstName()) ) return this.getFirstName() + " " + this.getLastName();
+        if ( SafetyUtil.isEmpty(this.getLastName()) && ! SafetyUtil.isEmpty(this.getFirstName()) ) return this.getLastName();
+        if ( ! SafetyUtil.isEmpty(this.getLastName()) && SafetyUtil.isEmpty(this.getFirstName()) ) return this.getFirstName();
+        return "";
       `
     },
     {
