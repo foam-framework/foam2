@@ -159,7 +159,9 @@ p({
       .setOf(foam.nanos.cron.Cron.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName(\"cronjobs\")
-      .setDecorator(new foam.nanos.script.ScriptRunnerDAO(null))
+      .setDecorator(new foam.nanos.cron.CronScheduleDAO.Builder(x)
+        .setDelegate(new foam.nanos.script.ScriptRunnerDAO(null))
+        .build())
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.cron.Cron\"}"
