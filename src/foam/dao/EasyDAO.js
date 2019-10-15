@@ -166,7 +166,7 @@ if ( getDecorator() != null ) {
 }
 
 if ( getValidated() ) {
-  delegate = getValidator();
+  delegate = new foam.dao.ValidationgDAO(x, delegate, getValidator());
 }
 
 if ( getServiceProviderAware() ) {
