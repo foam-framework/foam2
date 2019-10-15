@@ -42,7 +42,10 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.cron.Schedule',
       name: 'schedule',
-      view: { class: 'foam.u2.DetailView' },
+      view: {
+        class: 'foam.u2.view.FObjectView',
+        of: 'foam.nanos.cron.Schedule'
+      },
       section: 'scheduling',
       javaFactory: `return new CronSchedule.Builder(getX()).build();`
     },
