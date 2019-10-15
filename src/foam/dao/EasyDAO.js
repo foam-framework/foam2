@@ -74,7 +74,8 @@ foam.CLASS({
   imports: [ 'document' ],
 
   javaImports: [
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
+    'foam.dao.ValidatingDAO'
   ],
 
   constants: [
@@ -166,7 +167,10 @@ if ( getDecorator() != null ) {
 }
 
 if ( getValidated() ) {
-  delegate = new foam.dao.ValidationgDAO(x, delegate, getValidator());
+  if ( getValidator() != null )
+    delegate = new foam.dao.ValidatingDAO(getX(), delegate, getValidator());
+  else
+    delegate = new foam.dao.ValidatingDAO(getX(), delegate, foam.core.ValidatableValidator.instance());
 }
 
 if ( getServiceProviderAware() ) {
@@ -357,16 +361,13 @@ return delegate;
     {
       documentation: 'Add a validatingDAO decorator',
       class: 'Boolean',
-      name: 'validated',
+      name: 'validated'
     },
     {
       documentation: 'Validator for the validatingDAO decorator',
-      class: 'foam.core.Validator',
-      name: 'validator',
-      javaFactory: 'return foam.core.ValidatableValidator.instance()'
-    },
-    {
-
+      class: 'FObjectProperty',
+      of: 'foam.core.Validator',
+      name: 'validator'
     },
     {
       /** Enable value de-duplication to save memory when caching. */
