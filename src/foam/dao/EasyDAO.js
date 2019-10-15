@@ -149,7 +149,6 @@ if ( getFixedSize() != null ) {
   }
 }
 
-
 delegate = getOuterDAO(delegate);
 
 if ( getDecorator() != null ) {
@@ -164,6 +163,10 @@ if ( getDecorator() != null ) {
   }
   proxy.setDelegate(delegate);
   delegate = (ProxyDAO) getDecorator();
+}
+
+if ( getValidated() ) {
+  delegate = getValidator();
 }
 
 if ( getServiceProviderAware() ) {
@@ -350,6 +353,20 @@ return delegate;
       class: 'Boolean',
       name: 'permissioned',
       value: true
+    },
+    {
+      documentation: 'Add a validatingDAO decorator',
+      class: 'Boolean',
+      name: 'validated',
+    },
+    {
+      documentation: 'Validator for the validatingDAO decorator',
+      class: 'foam.core.Validator',
+      name: 'validator',
+      javaFactory: 'return foam.core.ValidatableValidator.instance()'
+    },
+    {
+
     },
     {
       /** Enable value de-duplication to save memory when caching. */
