@@ -198,6 +198,8 @@ public class DigWebAgent
             return;
           }
 
+          resp.setContentType("text/html");
+
           StringReader    reader     = new StringReader(data.toString());
           XMLStreamReader xmlReader  = factory.createXMLStreamReader(reader);
           List<FObject>   objList    = xmlSupport.fromXML(x, xmlReader, objClass);

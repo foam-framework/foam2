@@ -134,9 +134,10 @@ foam.CLASS({
       class: 'String',
       name: 'firstName',
       documentation: 'The first name of the User.',
+      // TODO: Use validatationPredicates instead.
       validateObj: function(firstName) {
-        if ( ! firstName.trim() ){
-          return 'First Name Required.'
+        if ( ! firstName.trim() ) {
+          return 'First Name Required.';
         }
       },
       gridColumns: 4,
@@ -153,6 +154,7 @@ foam.CLASS({
       class: 'String',
       name: 'lastName',
       documentation: 'The last name of the User.',
+      // TODO: Use validatationPredicates instead.
       validateObj: function(lastName) {
         if ( ! lastName.trim() ) {
           return 'Last Name Required.';
@@ -174,9 +176,10 @@ foam.CLASS({
       displayWidth: 80,
       width: 100,
       tableWidth: 160,
+      // TODO: Use validatationPredicates instead.
       validateObj: function(organization) {
-        if ( ! (organization.trim()) ) {
-          return 'Company Name Required.';
+        if ( ! organization.trim() ) {
+          return 'Organization Required.';
         }
       },
       section: 'business'
@@ -202,12 +205,14 @@ foam.CLASS({
       javaSetter:
       `email_ = val.toLowerCase();
        emailIsSet_ = true;`,
+      // TODO: Use validatationPredicates instead.
       validateObj: function(email) {
         var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-        if ( ! (email.trim()) ) {
+        if ( ! email.trim() ) {
           return 'Email Required.';
         }
+
         if ( ! emailRegex.test(email.trim()) ) {
           return 'Invalid email address.';
         }
