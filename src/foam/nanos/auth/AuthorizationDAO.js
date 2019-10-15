@@ -13,7 +13,6 @@ foam.CLASS({
   
   javaImports: [
     'foam.core.FObject',
-    'foam.core.InvalidX',
     'foam.core.X',
     'foam.dao.*',
     'foam.mlang.order.Comparator',
