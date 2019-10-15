@@ -18,27 +18,10 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.auth.DayOfWeek',
-    'foam.nanos.auth.Hours',
     'foam.nanos.auth.Region'
   ],
 
   properties: [
-    {
-      class: 'String',
-      name: 'type',
-      documentation: 'The type of address.'
-    },
-    {
-      class: 'Boolean',
-      name: 'verified',
-      documentation: 'Determines whether the address exists.'
-    },
-    {
-      class: 'Boolean',
-      name: 'deleted',
-      documentation: 'Determines whether the address is deleted.'
-    },
     {
       class: 'Boolean',
       name: 'structured',
@@ -46,7 +29,8 @@ foam.CLASS({
       documentation: `Determines whether the address is shown in the following structure: 
         Street Number, Street Name, Suite Number. For an unstructured address field, 
         use address1 and/or address2.
-      `
+      `,
+      hidden: true
     },
     {
       class: 'String',
@@ -70,14 +54,16 @@ foam.CLASS({
           },
           errorString: 'Invalid value for address 1.'
         }
-      ]
+      ],
+      hidden: true
     },
     {
       class: 'String',
       name: 'address2',
       width: 70,
       displayWidth: 50,
-      documentation: 'An unstructured field for the sub postal address.'
+      documentation: 'An unstructured field for the sub postal address.',
+      hidden: true
     },
     {
       class: 'Reference',
@@ -87,6 +73,7 @@ foam.CLASS({
       of: 'foam.nanos.auth.Country',
       documentation: `A foreign key into the CountryDAO which represents the country.`,
       required: true,
+      gridColumns: 6,
       validateObj: function(countryId) {
         if ( typeof countryId !== 'string' || countryId.length === 0 ) {
           return 'Country required.';
@@ -106,6 +93,7 @@ foam.CLASS({
       of: 'foam.nanos.auth.Region',
       documentation: `A foreign key into the RegionDAO which represents
         the region of the country.`,
+      gridColumns: 6,
       view: function(_, X) {
         var choices = X.data.slot(function(countryId) {
           return X.regionDAO.where(X.data.EQ(X.data.Region.COUNTRY_ID, countryId || ""));
@@ -140,6 +128,7 @@ foam.CLASS({
       name: 'streetNumber',
       width: 16,
       documentation: 'The structured field for the street number of the postal address.',
+      gridColumns: 2,
       validationPredicates: [
         {
           args: ['structured', 'streetNumber'],
@@ -157,9 +146,17 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'suite',
+      documentation: 'The structured field for the suite number of the postal address.',
+      gridColumns: 1,
+      width: 16
+    },
+    {
+      class: 'String',
       name: 'streetName',
       width: 70,
       documentation: 'The structured field for the street name of the postal address.',
+      gridColumns: 3,
       validationPredicates: [
         {
           args: ['structured', 'streetName'],
@@ -175,16 +172,11 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'suite',
-      documentation: 'The structured field for the suite number of the postal address.',
-      width: 16
-    },
-    {
-      class: 'String',
       name: 'city',
       documentation: 'The city of the postal address.',
       required: true,
-      minLength: 1
+      minLength: 1,
+      gridColumns: 3,
     },
     {
       class: 'String',
@@ -193,6 +185,7 @@ foam.CLASS({
       preSet: function(oldValue, newValue) {
         return newValue.toUpperCase();
       },
+      gridColumns: 3,
       validationPredicates: [
         {
           args: ['postalCode', 'countryId'],
@@ -224,31 +217,17 @@ foam.CLASS({
         postalCodeIsSet_ = true;`
     },
     {
-      class: 'Boolean',
-      name: 'encrypted',
-      documentation: 'Determines whether the address is encrypted.'
-    },
-    {
       class: 'Double',
       name: 'latitude',
-      documentation: 'The latitude of the postal address location.'
+      documentation: 'The latitude of the postal address location.',
+      hidden: true
     },
     {
       class: 'Double',
       name: 'longitude',
-      documentation: 'The longitude of the postal address location.'
+      documentation: 'The longitude of the postal address location.',
+      hidden: true
     },
-    {
-      class: 'FObjectArray',
-      of: 'foam.nanos.auth.Hours',
-      name: 'hours',
-      documentation: `
-        The opening and closing hours for this address if the address represents
-        a business.
-      `,
-      factory: function() { return []; },
-      javaFactory: 'return new Hours[] {};'
-    }
   ],
 
   methods: [

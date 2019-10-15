@@ -37,6 +37,9 @@ foam.RELATIONSHIP({
   inverseName: 'personalTheme',
   sourceProperty: {
     hidden: true,
-    visibility: 'HIDDEN'
+    visibility: 'HIDDEN',
+  },
+  targetProperty: {
+    section: 'administrative'
   }
 });

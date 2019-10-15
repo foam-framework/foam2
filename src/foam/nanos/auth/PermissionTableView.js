@@ -15,18 +15,20 @@ foam.CLASS({
   name: 'PermissionTableView',
   extends: 'foam.u2.Controller',
 
-  imports: [
-    'auth',
-    'groupDAO',
-    'permissionDAO',
-    'user'
-  ],
-
   requires: [
     'foam.graphics.Label',
     'foam.graphics.ScrollCView',
     'foam.nanos.auth.Group',
+    'foam.nanos.auth.GroupPermissionJunction',
     'foam.nanos.auth.Permission'
+  ],
+
+  imports: [
+    'auth',
+    'groupDAO',
+    'groupPermissionJunctionDAO',
+    'permissionDAO',
+    'user'
   ],
 
   constants: {
@@ -163,9 +165,21 @@ foam.CLASS({
   ],
 
   methods: [
-    function initMatrix() {
+    async function initMatrix() {
       var ps   = this.filteredPs, gs = this.gs;
       var self = this;
+      var perms = await this.groupPermissionJunctionDAO.select();
+      perms.array.forEach(perm => {
+        var g = perm.sourceId, p = perm.targetId;
+        var key = p + ':' + g;
+
+        var data = this.GroupPermission.create({
+          checked: true
+        });
+
+        this.gpMap[key] = data;
+      });
+
       this
         .addClass(this.myClass())
         .start()
@@ -227,11 +241,11 @@ foam.CLASS({
           .start(self.ScrollCView.create({
             value$: self.skip$,
             extent: self.ROWS,
-            height: self.ROWS*22,
+            height: self.ROWS*21,
             width: 26,
             size$: self.filteredRows$.map(function(m){return m-1;})
           }))
-            .style({gridColumn: '2/span 1', gridRow: '2/span 2', 'margin-top':'238px'})
+            .style({gridColumn: '2/span 1', gridRow: '2/span 2', 'margin-top':'236px'})
           .end()
         .end();
     },
@@ -257,7 +271,7 @@ foam.CLASS({
 
       if ( ! data ) {
         data = this.GroupPermission.create({
-          checked: this.checkPermissionForGroup(p.id, g)
+          checked: false
         });
 
         data.checked$.sub(function() {
@@ -367,39 +381,16 @@ foam.CLASS({
       });
     },
 
-    function checkPermissionForGroup(permissionId, group) {
-      for ( i = 0 ; i < group.permissions.length ; i++ ) {
-        if ( permissionId == group.permissions[i].id ) {
-          return true;
-        }
-      }
-    },
-
     function updateGroup(p_, g_, data, self) {
-      var dao = this.groupDAO;
-      var e   = foam.mlang.Expressions.create();
+      var dao = this.groupPermissionJunctionDAO;
+      var obj = this.GroupPermissionJunction.create({sourceId: g_.id, targetId: p_.id});
 
-      dao.find(g_.id).then(function(group) {
-        // Remove permission if found
-        var permissions = group.permissions.filter(function(p) {
-          return p.id != p_.id;
-        });
-
-        // parents' permissions
-        group.parent$find.then(function(groupParent) {
-          if ( groupParent != undefined ) {
-              permissions += groupParent.permissions.filter(function(gp) {
-                return gp.id == p_.id;
-              });
-          }
-        });
-
-        // Add if requested
-        if ( data.get() ) permissions.push(p_);
-
-        group.permissions = permissions;
-        dao.put(group);
-      });
+      if ( data.get() ) {
+        // Add permission
+        dao.put(obj);
+      } else {
+        // Remove permission
+        dao.remove(obj);      }
     }
   ],
 
