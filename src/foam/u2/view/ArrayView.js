@@ -24,6 +24,10 @@ foam.CLASS({
       class: 'foam.u2.ViewSpec',
       name: 'valueView',
       value: { class: 'foam.u2.view.AnyView' }
+    },
+    {
+      name: 'defaultNewItem',
+      value: ''
     }
   ],
 
@@ -35,7 +39,11 @@ foam.CLASS({
         return mode === foam.u2.DisplayMode.RW;
       },
       code: function() {
-        this.data[this.data.length] = '';
+        var newItem = this.defaultNewItem;
+        if ( foam.core.FObject.isInstance(newItem) ) {
+          newItem = newItem.clone();
+        }
+        this.data[this.data.length] = newItem;
         this.updateData();
       }
     }
