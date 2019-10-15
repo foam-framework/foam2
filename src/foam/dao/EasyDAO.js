@@ -74,7 +74,8 @@ foam.CLASS({
   imports: [ 'document' ],
 
   javaImports: [
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
+    'foam.dao.ValidatingDAO'
   ],
 
   constants: [
@@ -149,7 +150,6 @@ if ( getFixedSize() != null ) {
   }
 }
 
-
 delegate = getOuterDAO(delegate);
 
 if ( getDecorator() != null ) {
@@ -164,6 +164,13 @@ if ( getDecorator() != null ) {
   }
   proxy.setDelegate(delegate);
   delegate = (ProxyDAO) getDecorator();
+}
+
+if ( getValidated() ) {
+  if ( getValidator() != null )
+    delegate = new foam.dao.ValidatingDAO(getX(), delegate, getValidator());
+  else
+    delegate = new foam.dao.ValidatingDAO(getX(), delegate, foam.core.ValidatableValidator.instance());
 }
 
 if ( getServiceProviderAware() ) {
@@ -350,6 +357,17 @@ return delegate;
       class: 'Boolean',
       name: 'permissioned',
       value: true
+    },
+    {
+      documentation: 'Add a validatingDAO decorator',
+      class: 'Boolean',
+      name: 'validated'
+    },
+    {
+      documentation: 'Validator for the validatingDAO decorator',
+      class: 'FObjectProperty',
+      of: 'foam.core.Validator',
+      name: 'validator'
     },
     {
       /** Enable value de-duplication to save memory when caching. */
