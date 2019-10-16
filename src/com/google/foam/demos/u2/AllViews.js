@@ -6,6 +6,7 @@
 
 foam.CLASS({
   name: 'AllViews',
+  package: 'com.google.foam.demos.u2',
 
   properties: [
     {

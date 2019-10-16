@@ -17,7 +17,7 @@ foam.CLASS({
       class: 'String',
       name: 'title',
       expression: function(name) {
-        if (name === '_defaultSection') return '';
+        if ( name === '_defaultSection' ) return '';
         return foam.String.labelize(name);
       }
     },

@@ -76,7 +76,14 @@ foam.CLASS({
     {
       class: 'FObjectArray',
       of: 'foam.core.ValidationPredicate',
-      name: 'validationPredicates'
+      name: 'validationPredicates',
+      // We override 'compare' here because we need to avoid infinite recursion
+      // that occurs when a validation predicate for a given property contains a
+      // reference to the property itself.
+      // This is an incorrect implementation of compare since it will always
+      // return a match, even if the validation predicates are different. It
+      // would be preferable to find a way to deal with circular references.
+      compare: function() { return 0; }
     },
     {
       name: 'validateObj',
@@ -282,7 +289,8 @@ foam.CLASS({
       return foam.core.ExpressionSlot.create({
         obj: obj,
         code: validateObject,
-        args: args});
+        args: args
+      });
     }
   ]
 });
@@ -327,7 +335,7 @@ foam.CLASS({
               },
               errorString: 'Please enter an email address'
             }
-          )
+          );
         }
         return ret;
       }
@@ -350,24 +358,27 @@ foam.CLASS({
           {
             args: [self.name],
             predicateFactory: function(e) {
-              return e.AND(
-                e.LTE(
-                  self,
-                  // Maximum date supported by FOAM
-                  // (bounded by JavaScript's limit)
-                  new Date(8640000000000000)
-                ),
-                e.GTE(
-                  self,
-                  // Minimum date supported by FOAM
-                  // (bounded by JavaScript's limit)
-                  new Date(-8640000000000000)
+              return e.OR(
+                e.NOT(e.HAS(self)), // Allow null dates.
+                e.AND(
+                  e.LTE(
+                    self,
+                    // Maximum date supported by FOAM
+                    // (bounded by JavaScript's limit)
+                    new Date(8640000000000000)
+                  ),
+                  e.GTE(
+                    self,
+                    // Minimum date supported by FOAM
+                    // (bounded by JavaScript's limit)
+                    new Date(-8640000000000000)
+                  )
                 )
-              )
+              );
             },
             errorString: 'Invalid date value'
           }
-        ]
+        ];
       }
     }
   ]
