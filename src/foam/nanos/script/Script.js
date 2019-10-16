@@ -130,7 +130,10 @@ foam.CLASS({
       name: 'output',
       createMode: 'HIDDEN',
       updateMode: 'RO',
-      readView: { class: 'foam.u2.view.PreView' },
+      view: {
+        class: 'foam.u2.view.ModeAltView',
+        readView: { class: 'foam.u2.view.PreView' }
+      },
       preSet: function(_, newVal) {
         // for client side scripts
         if ( newVal.length > this.MAX_OUTPUT_CHARS ) {

@@ -140,15 +140,21 @@ foam.CLASS({
     {
       class: 'String',
       name: 'documentation',
-      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
-      readView: { class: 'foam.u2.view.PreView' },
+      view: {
+        class: 'foam.u2.view.ModeAltView',
+        writeView: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
+        readView: { class: 'foam.u2.view.PreView' }
+      },
       permissionRequired: true
     },
     {
       class: 'String',
       name: 'authNotes',
-      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
-      readView: { class: 'foam.u2.view.PreView' },
+      view: {
+        class: 'foam.u2.view.ModeAltView',
+        writeView: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
+        readView: { class: 'foam.u2.view.PreView' }
+      },
       permissionRequired: true
     }
     // TODO: permissions, keywords, lazy, parent
