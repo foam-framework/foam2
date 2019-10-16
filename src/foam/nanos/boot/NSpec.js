@@ -115,7 +115,8 @@ foam.CLASS({
       class: 'FObjectProperty',
       name: 'service',
       view: { class: 'foam.u2.view.FObjectView' },
-      permissionRequired: true
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'String',
@@ -130,7 +131,8 @@ foam.CLASS({
     {
       class: 'Code',
       name: 'serviceScript',
-      permissionRequired: true
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'Code',
@@ -145,7 +147,8 @@ foam.CLASS({
         writeView: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
         readView: { class: 'foam.u2.view.PreView' }
       },
-      permissionRequired: true
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'String',
@@ -155,7 +158,8 @@ foam.CLASS({
         writeView: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
         readView: { class: 'foam.u2.view.PreView' }
       },
-      permissionRequired: true
+      readPermissionRequired: true,
+      writePermissionRequired: true
     }
     // TODO: permissions, keywords, lazy, parent
   ],

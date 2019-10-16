@@ -159,7 +159,9 @@ p({
       .setOf(foam.nanos.cron.Cron.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName(\"cronjobs\")
-      .setDecorator(new foam.nanos.script.ScriptRunnerDAO(null))
+      .setDecorator(new foam.nanos.cron.CronScheduleDAO.Builder(x)
+        .setDelegate(new foam.nanos.script.ScriptRunnerDAO(null))
+        .build())
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.cron.Cron\"}"
@@ -493,7 +495,8 @@ p({
       .build()
       .orderBy(foam.mlang.MLang.DESC(foam.nanos.theme.Theme.PRIORITY));
   """,
-  "client": "{\"of\":\"foam.nanos.theme.Theme\"}","authNotes":"Needs to be unauthenticated because we need to be able to theme apps before the user has logged in. However, we still need to restrict write access, which we do via an AuthorizationDAO."
+  "client": "{\"of\":\"foam.nanos.theme.Theme\"}",
+  "authNotes": "Needs to be unauthenticated because we need to be able to theme apps before the user has logged in. However, we still need to restrict write access, which we do via an AuthorizationDAO."
 })
 
 p({
