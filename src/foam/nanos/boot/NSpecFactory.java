@@ -45,9 +45,9 @@ public class NSpecFactory
 
     try {
       if ( logger != null ) logger.info("Creating Service", spec_.getName());
-      X serviceX = spec_.getName().endsWith("DAO") ? new InvalidX(x_.getX(), spec_.getName(), logger) : x_.getX();
       ns_ = spec_.createService(x_.getX().put(NSpec.class, spec_));
       Object ns = ns_;
+      X serviceX = ns instanceof foam.dao.DAO ? new InvalidX(x_.getX(), spec_.getName(), logger) : x_.getX();
       while ( ns != null ) {
         if (ns instanceof ContextAware) ((ContextAware) ns).setX(serviceX);
         if (ns instanceof NSpecAware) ((NSpecAware) ns).setNSpec(spec_);

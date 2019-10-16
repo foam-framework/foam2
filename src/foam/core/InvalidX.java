@@ -24,25 +24,19 @@ public class InvalidX
 
   @Override
   public Object get(X x, Object key) {
-    Object ret = getX().get(x, key);
     logger_.warning("Unsafe access to " + nspecName_ + ". Please use .inX() instead.");
-
-    return ret;
+    return super.get(x, key);
   }
 
   @Override
   public X put(Object key, Object value) {
-    setX(getX().put(key, value));
     logger_.warning("Unsafe access to " + nspecName_ + ". Please use .inX() instead.");
-
-    return (X) this;
+    return super.put(key, value);
   }
 
   @Override
   public X putFactory(Object key, XFactory factory) {
     logger_.warning("Unsafe access to " + nspecName_ + ". Please use .inX() instead.");
-    setX(getX().putFactory(key, factory));
-
-    return this;
+    return super.putFactory(key, factory);
   }
 }
