@@ -251,7 +251,7 @@ foam.CLASS({
         PasswordPolicy passwordPolicy = null;
 
         // Retrieve the password policy from the user and group when available
-        if (user != null) {
+        if ( user != null ) {
           Group ancestor = user.findGroup(x);
           if ( ancestor != null ) {
             throw new AuthenticationException("Group not found");
@@ -259,17 +259,17 @@ foam.CLASS({
 
           // Check password policy
           passwordPolicy = ancestor.getPasswordPolicy();
-          while (passwordPolicy == null || !passwordPolicy.getEnabled())
+          while ( passwordPolicy == null || ! passwordPolicy.getEnabled() )
           {
             ancestor = ancestor.getAncestor(x, ancestor);
-            if (ancestor == null)
+            if ( ancestor == null )
               break;
             passwordPolicy = ancestor.getPasswordPolicy();
           }
         }
 
         // Use the default password policy if nothing is found
-        if (passwordPolicy == null || !passwordPolicy.getEnabled())
+        if ( passwordPolicy == null || ! passwordPolicy.getEnabled() )
         {
           passwordPolicy = new PasswordPolicy();
           passwordPolicy.setEnabled(true);

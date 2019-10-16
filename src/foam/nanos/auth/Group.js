@@ -112,7 +112,6 @@ foam.CLASS({
       `,
     }
     /*
-    //value: foam.nanos.auth.PasswordPolicy.create(),
       FUTURE
     {
       class: 'FObjectProperty',
