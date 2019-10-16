@@ -118,7 +118,8 @@ foam.CLASS({
       class: 'Boolean',
       name: 'loginEnabled',
       documentation: 'Determines whether the User can login to the platform.',
-      permissionRequired: true,
+      readPermissionRequired: true,
+      writePermissionRequired: true,
       value: true,
       section: 'administrative'
     },
@@ -134,9 +135,10 @@ foam.CLASS({
       class: 'String',
       name: 'firstName',
       documentation: 'The first name of the User.',
+      // TODO: Use validatationPredicates instead.
       validateObj: function(firstName) {
-        if ( ! firstName.trim() ){
-          return 'First Name Required.'
+        if ( ! firstName.trim() ) {
+          return 'First Name Required.';
         }
       },
       gridColumns: 4,
@@ -153,6 +155,7 @@ foam.CLASS({
       class: 'String',
       name: 'lastName',
       documentation: 'The last name of the User.',
+      // TODO: Use validatationPredicates instead.
       validateObj: function(lastName) {
         if ( ! lastName.trim() ) {
           return 'Last Name Required.';
@@ -174,9 +177,10 @@ foam.CLASS({
       displayWidth: 80,
       width: 100,
       tableWidth: 160,
+      // TODO: Use validatationPredicates instead.
       validateObj: function(organization) {
-        if (!(organization.trim())) {
-          return 'Company Name Required.';
+        if ( ! organization.trim() ) {
+          return 'Organization Required.';
         }
       },
       section: 'business'
@@ -202,12 +206,14 @@ foam.CLASS({
       javaSetter:
       `email_ = val.toLowerCase();
        emailIsSet_ = true;`,
-      validateObj: function (email) {
+      // TODO: Use validatationPredicates instead.
+      validateObj: function(email) {
         var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-        if (!(email.trim())) {
+        if ( ! email.trim() ) {
           return 'Email Required.';
         }
+
         if ( ! emailRegex.test(email.trim()) ) {
           return 'Invalid email address.';
         }
@@ -218,7 +224,8 @@ foam.CLASS({
       class: 'Boolean',
       name: 'emailVerified',
       documentation: 'Determines whether the email address of the User is valid.',
-      permissionRequired: true,
+      readPermissionRequired: true,
+      writePermissionRequired: true,
       section: 'administrative'
     },
     {
@@ -435,13 +442,18 @@ foam.CLASS({
       name: 'label',
       type: 'String',
       code: function label() {
-        return this.organization || this.businessName || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
+        if ( this.legalName ) return this.legalName;
+        if ( this.lastName && this.firstName ) return this.firstName + ' ' + this.lastName;
+        if ( this.lastName ) return this.lastName;
+        if ( this.firstName ) return this.firstName;
+        return '';
       },
       javaCode: `
-        if ( ! SafetyUtil.isEmpty(getOrganization()) ) return getOrganization();
-        if ( ! SafetyUtil.isEmpty(getBusinessName()) ) return getBusinessName();
-        if ( SafetyUtil.isEmpty(getLastName()) ) return getFirstName();
-        return getFirstName() + " " + getLastName();
+        if ( ! SafetyUtil.isEmpty(this.getLegalName()) ) return this.getLegalName();
+        if ( ! SafetyUtil.isEmpty(this.getLastName()) && ! SafetyUtil.isEmpty(this.getFirstName()) ) return this.getFirstName() + " " + this.getLastName();
+        if ( ! SafetyUtil.isEmpty(this.getLastName()) ) return this.getLastName();
+        if ( ! SafetyUtil.isEmpty(this.getFirstName()) ) return this.getFirstName();
+        return "";
       `
     },
     {

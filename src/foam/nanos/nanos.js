@@ -125,6 +125,7 @@ FOAM_FILES([
   { name: "foam/nanos/test/TestBorder" },
   { name: "foam/nanos/cron/Cron" },
   { name: "foam/nanos/cron/CronSchedule" },
+  { name: "foam/nanos/cron/CronScheduleDAO" },
   { name: "foam/nanos/cron/IntervalSchedule" },
   { name: "foam/nanos/cron/NeverSchedule" },
   { name: "foam/nanos/cron/OrSchedule" },
