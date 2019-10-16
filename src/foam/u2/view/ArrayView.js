@@ -10,6 +10,7 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
+    'foam.core.FObject',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows'
   ],
@@ -40,7 +41,7 @@ foam.CLASS({
       },
       code: function() {
         var newItem = this.defaultNewItem;
-        if ( foam.core.FObject.isInstance(newItem) ) {
+        if ( this.FObject.isInstance(newItem) ) {
           newItem = newItem.clone();
         }
         this.data[this.data.length] = newItem;
