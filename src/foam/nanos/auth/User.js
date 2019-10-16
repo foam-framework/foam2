@@ -19,7 +19,8 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.auth.Address',
-    'foam.nanos.auth.Phone'
+    'foam.nanos.auth.Phone',
+    'foam.nanos.auth.HistoricPassword'
   ],
 
   javaImports: [
@@ -32,7 +33,8 @@ foam.CLASS({
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.AuthService',
     'foam.util.SafetyUtil',
-    'static foam.mlang.MLang.EQ'
+    'static foam.mlang.MLang.EQ',
+    'foam.nanos.auth.HistoricPassword'
   ],
 
   documentation: `The User represents a person or entity with the ability
@@ -337,6 +339,21 @@ foam.CLASS({
       class: 'Password',
       name: 'password',
       documentation: 'The password that is currently active with the User.',
+      hidden: true,
+      networkTransient: true,
+      section: 'administrative'
+    },
+    {
+      name: 'passwordHistory',
+      class: 'FObjectArray',
+      of: 'foam.nanos.auth.HistoricPassword',
+      javaFactory: `
+        foam.nanos.auth.HistoricPassword[] historicPasswords = new foam.nanos.auth.HistoricPassword[1];
+        historicPasswords[0] = new foam.nanos.auth.HistoricPassword();
+        historicPasswords[0].setPassword(this.getPassword());
+        historicPasswords[0].setTimeStamp(new Date());
+        return historicPasswords;
+      `,
       hidden: true,
       networkTransient: true,
       section: 'administrative'

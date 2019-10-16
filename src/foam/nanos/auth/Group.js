@@ -98,8 +98,21 @@ foam.CLASS({
     {
       class: 'String',
       name: 'supportEmail'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.PasswordPolicy',
+      name: 'passwordPolicy',
+      view: { class: 'foam.u2.view.FObjectView' },
+      documentation: 'Password policy for this group.',
+      javaFactory: `
+        foam.nanos.auth.PasswordPolicy passwordPolicy = new foam.nanos.auth.PasswordPolicy();
+        passwordPolicy.setEnabled(false); // disabled by default
+        return passwordPolicy;
+      `,
     }
     /*
+    //value: foam.nanos.auth.PasswordPolicy.create(),
       FUTURE
     {
       class: 'FObjectProperty',

@@ -182,6 +182,7 @@ var classes = [
   'foam.nanos.auth.GroupPermissionJunctionRefinement',
   'foam.nanos.auth.CheckPermissionsSink',
   'foam.nanos.auth.Group',
+  'foam.nanos.auth.PasswordPolicy',
   'foam.nanos.auth.CreatedAware',
   'foam.nanos.auth.CreatedAwareDAO',
   'foam.nanos.auth.CreatedByAware',
@@ -197,6 +198,8 @@ var classes = [
   'foam.nanos.auth.Phone',
   'foam.nanos.auth.HumanNameTrait',
   'foam.nanos.auth.User',
+  'foam.nanos.auth.HistoricPassword',
+  'foam.nanos.auth.ruler.AddPasswordHistoryAction',
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.UserUserJunction',
@@ -421,6 +424,7 @@ var classes = [
   'foam.nanos.ruler.RuleHistory',
   'foam.nanos.ruler.RuleHistoryStatus',
   'foam.nanos.ruler.UpdateRulesListSink',
+  'foam.nanos.ruler.predicate.PropertyChangePredicate',
   'foam.comics.SearchMode',
 
   // Support Files
