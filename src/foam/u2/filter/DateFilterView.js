@@ -55,12 +55,12 @@ foam.CLASS({
           SearchManager. The SearchManager will read this predicate and use it
           to filter the dao being displayed in the view.`,
       expression: function(qualifier, date1, date2) {
-        if ( ! qualifier || ! date || ! isNaN(date.valueOf()) ) return this.True.create();
+        if ( ! qualifier || ! date1 || isNaN(date1.valueOf()) ) return this.True.create();
 
         if ( qualifier !== 'Bt' ) {
           return foam.mlang.predicate[qualifier].create({
             arg1: this.property,
-            arg2: new Date(date1)
+            arg2: date1
           });
         }
 
@@ -68,11 +68,11 @@ foam.CLASS({
           args: [
             foam.mlang.predicate.Gt.create({
               arg1: this.property,
-              arg2: new Date(date1)
+              arg2: date1
             }),
             foam.mlang.predicate.Lt.create({
               arg1: this.property,
-              arg2: new Date(date2)
+              arg2: date2
             })
           ]
         });

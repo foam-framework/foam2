@@ -80,14 +80,9 @@ foam.CLASS({
       expression: function(bool1, bool2) {
         if ( ( ! bool1 && ! bool2 ) || ( bool1 && bool2 )) return this.True.create();
 
-        return bool1 ?
-          foam.mlang.predicate.Eq.create({
+        return foam.mlang.predicate.Eq.create({
             arg1: this.property,
-            arg2: true
-          }) :
-          foam.mlang.predicate.Eq.create({
-            arg1: this.property,
-            arg2: false
+            arg2: bool1
           });
       }
     },
