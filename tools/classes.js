@@ -202,6 +202,7 @@ var classes = [
   'foam.nanos.auth.User',
   'foam.nanos.auth.HistoricPassword',
   'foam.nanos.auth.ruler.AddPasswordHistoryAction',
+  'foam.nanos.auth.PasswordPolicyTest',
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.UserUserJunction',

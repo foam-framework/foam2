@@ -86,7 +86,7 @@ foam.CLASS({
         }
 
         // check password history
-        if ( this.getPreventHistoricPasswordCount() > 0 )
+        if ( this.getPreventHistoricPasswordCount() > 0 && user != null)
         {
           HistoricPassword[] historicPasswords = user.getPasswordHistory();
           int maxCount = Math.min((int)this.getPreventHistoricPasswordCount(), historicPasswords.length);
