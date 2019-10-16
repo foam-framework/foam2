@@ -178,7 +178,10 @@ if ( getServiceProviderAware() ) {
 }
 
 if ( getDeletedAware() ) {
-  delegate = new foam.nanos.auth.DeletedAwareDAO.Builder(getX()).setDelegate(delegate).build();
+  delegate = new foam.nanos.auth.DeletedAwareDAO.Builder(getX())
+    .setDelegate(delegate)
+    .setName(getPermissionPrefix())
+    .build();
 }
 
 if ( getCreatedAware() ) {

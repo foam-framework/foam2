@@ -5,20 +5,23 @@ foam.CLASS({
   javaImports: [
     'foam.nanos.auth.AuthService'
   ],
-  
+
   methods: [
     {
       name: 'propertyPredicateCheck',
       javaCode: `
-if ( prop.getPermissionRequired() ) {
-  String propName = prop.getName().toLowerCase();
-  AuthService auth = (AuthService) x.get("auth");
-  return ( auth != null ) ? (auth.check(x,  of + ".ro." + propName) || auth.check(x,  of + ".rw." + propName)) : false;
-}
+        // We only need to check the read permission since this is just used by
+        // outputters.
+        if ( prop.getReadPermissionRequired() ) {
+          String propName = prop.getName().toLowerCase();
+          AuthService auth = (AuthService) x.get("auth");
+          return ( auth != null )
+            ? (auth.check(x,  of + ".ro." + propName) || auth.check(x,  of + ".rw." + propName))
+            : false;
+        }
 
-return true;
-`
+        return true;
+      `
     }
   ]
 });
-  
