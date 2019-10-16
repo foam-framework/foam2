@@ -280,7 +280,7 @@ foam.CLASS({
                   .end();
                 })
               .end()
-              .callIf(prop.validationTextVisible, function() {
+              .callIf(prop.validationTextVisible && self.mode === self.DisplayMode.RW, function() {
                 this
                   .start()
                     .style({ 'align-items': 'center' })
