@@ -59,6 +59,15 @@ foam.CLASS({
       color: #5e6061;
     }
 
+    ^overlay-dismiss {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 2;
+    }
+
     ^container-filter {
       position: absolute;
       z-index: 100;
@@ -114,7 +123,7 @@ foam.CLASS({
   methods: [
     function initE() {
       this.SUPER();
-
+      var self = this;
       this
         .addClass(this.myClass())
         .start().addClass(this.myClass('container-property'))
@@ -126,6 +135,11 @@ foam.CLASS({
           .end()
           .start({ class: 'foam.u2.tag.Image', data$: this.iconPath$}).end()
         .end()
+        .add(this.slot(function(active) {
+          return active ? self.E().start().addClass(self.myClass('overlay-dismiss'))
+              .on('click', self.switchActive)
+            .end() : self.E();
+        }))
         .start('div', null, this.container_$).addClass(this.myClass('container-filter'))
           .show(this.active$)
         .end();
@@ -144,7 +158,7 @@ foam.CLASS({
 
       this.container_.tag(this.searchView, {
         property: this.property,
-        dao: this.dao
+        dao$: this.dao$
       }, this.view_$);
 
       this.searchManager.add(this.view_);
