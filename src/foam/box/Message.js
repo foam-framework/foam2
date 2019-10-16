@@ -49,12 +49,40 @@ foam.CLASS({
 
         if ( replyBox == null ) return;
 
+        if ( t.getClass().getName() == "foam.nanos.auth.AuthorizationException" ) {
+          foam.nanos.auth.AuthorizationException ae = (foam.nanos.auth.AuthorizationException) t;
+          if ( ae.hasCapabilityRequired() ) {
+            replyWithCapabilityRequired(ae.getCapabilityRequired());
+            return;
+          }
+        }
+
         RemoteException wrapper = new RemoteException();
         wrapper.setId(t.getClass().getName());
         wrapper.setMessage(t.getMessage());
 
         RPCErrorMessage reply = new RPCErrorMessage();
         reply.setData(wrapper);
+
+        Message replyMessage = new Message();
+        replyMessage.setObject(reply);
+
+        replyBox.send(replyMessage);
+      `
+    },
+    {
+      name: 'replyWithCapabilityRequired',
+      type: 'Void',
+      args: [
+        { name: 'capabilityRequired', type: 'foam.box.CapabilityRequiredRemoteException' }
+      ],
+      javaCode: `
+        Box replyBox = (Box) getAttributes().get("replyBox");
+
+        if ( replyBox == null ) return;
+
+        RPCErrorMessage reply = new RPCErrorMessage();
+        reply.setData(capabilityRequired);
 
         Message replyMessage = new Message();
         replyMessage.setObject(reply);

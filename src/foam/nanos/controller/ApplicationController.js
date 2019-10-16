@@ -69,6 +69,7 @@ foam.CLASS({
     'notify',
     'pushMenu',
     'requestLogin',
+    'requestCapability',
     'signUpEnabled',
     'stack',
     'user',
@@ -373,6 +374,19 @@ foam.CLASS({
 
       return new Promise(function(resolve, reject) {
         self.stack.push({ class: 'foam.nanos.auth.SignInView' });
+        self.loginSuccess$.sub(resolve);
+      });
+    },
+
+    function requestCapability(capabilityInfo) {
+      var self = this;
+      console.log("CAPABILITY SCREEN REQUESTED");
+      return new Promise(function(resolve, reject) {
+        self.stack.push({
+          class: 'foam.nanos.crunch.ui.CapabilityInterceptView',
+          data: self.__subContext__["capabilityDAO"],
+          capabilityOptions: capabilityInfo.capabilityOptions
+        });
         self.loginSuccess$.sub(resolve);
       });
     },
