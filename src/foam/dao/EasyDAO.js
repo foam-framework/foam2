@@ -74,7 +74,8 @@ foam.CLASS({
   imports: [ 'document' ],
 
   javaImports: [
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
+    'foam.dao.ValidatingDAO'
   ],
 
   constants: [
@@ -149,7 +150,6 @@ if ( getFixedSize() != null ) {
   }
 }
 
-
 delegate = getOuterDAO(delegate);
 
 if ( getDecorator() != null ) {
@@ -166,12 +166,22 @@ if ( getDecorator() != null ) {
   delegate = (ProxyDAO) getDecorator();
 }
 
+if ( getValidated() ) {
+  if ( getValidator() != null )
+    delegate = new foam.dao.ValidatingDAO(getX(), delegate, getValidator());
+  else
+    delegate = new foam.dao.ValidatingDAO(getX(), delegate, foam.core.ValidatableValidator.instance());
+}
+
 if ( getServiceProviderAware() ) {
   delegate = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
 if ( getDeletedAware() ) {
-  delegate = new foam.nanos.auth.DeletedAwareDAO.Builder(getX()).setDelegate(delegate).build();
+  delegate = new foam.nanos.auth.DeletedAwareDAO.Builder(getX())
+    .setDelegate(delegate)
+    .setName(getPermissionPrefix())
+    .build();
 }
 
 if ( getCreatedAware() ) {
@@ -220,7 +230,12 @@ if ( getOrder() != null &&
   }
 }
 
-if( getAuthorize() ) delegate = new foam.nanos.auth.AuthorizationDAO(getX(), delegate, getAuthorizer());
+if ( getAuthorize() ) {
+  delegate = new foam.nanos.auth.AuthorizationDAO.Builder(getX())
+    .setDelegate(delegate)
+    .setAuthorizer(getAuthorizer())
+    .build();
+}
 
 if ( getNSpec() != null &&
      getNSpec().getServe() &&
@@ -350,6 +365,17 @@ return delegate;
       class: 'Boolean',
       name: 'permissioned',
       value: true
+    },
+    {
+      documentation: 'Add a validatingDAO decorator',
+      class: 'Boolean',
+      name: 'validated'
+    },
+    {
+      documentation: 'Validator for the validatingDAO decorator',
+      class: 'FObjectProperty',
+      of: 'foam.core.Validator',
+      name: 'validator'
     },
     {
       /** Enable value de-duplication to save memory when caching. */

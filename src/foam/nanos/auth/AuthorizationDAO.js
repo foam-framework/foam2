@@ -13,7 +13,6 @@ foam.CLASS({
   
   javaImports: [
     'foam.core.FObject',
-    'foam.core.InvalidX',
     'foam.core.X',
     'foam.dao.*',
     'foam.mlang.order.Comparator',
@@ -33,12 +32,9 @@ foam.CLASS({
         cls.extras.push(foam.java.Code.create({
           data:`
   public AuthorizationDAO(X x, DAO delegate, Authorizer authorizer) {
-    AuthorizationException exception = new AuthorizationException("When " +
-        "using a DAO decorated by AuthorizationDAO, you may only call the " +
-        "context-oriented methods: put_(), find_(), select_(), remove_(), " +
-        "removeAll_(). Alternatively, you can also " +
-        "use .inX() to set the context on the DAO.");
-    setX(new InvalidX(exception));
+    foam.nanos.logger.Logger log = (foam.nanos.logger.Logger) x.get("logger");
+    log.warning("Direct constructor use is deprecated. Use Builder instead.");
+    setX(x);
     setDelegate(delegate);
     setAuthorizer(authorizer);
   }

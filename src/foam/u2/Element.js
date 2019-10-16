@@ -2246,11 +2246,12 @@ foam.CLASS({
           obj$: data$,
           code: this.visibilityExpression
         }) :
-        foam.core.ConstantSlot.create({value: this.visibility});
+        foam.core.ConstantSlot.create({ value: this.visibility });
 
-      if ( this.permissionRequired ) {
+      // TODO: Do something smarter than this.
+      if ( this.readPermissionRequired || this.writePermissionRequired ) {
         var visSlot  = slot;
-        var permSlot = data$.map(data => {
+        var permSlot = data$.map((data) => {
           if ( ! data || ! data.__subContext__.auth ) return Visibility.HIDDEN;
           var auth = data.__subContext__.auth;
 
@@ -2261,11 +2262,11 @@ foam.CLASS({
               .then(function(rw) {
                 if ( rw ) return Visibility.RW;
                 return auth.check(null, `${clsName}.ro.${propName}`)
-                  .then(ro => ro ? Visibility.RO : Visibility.HIDDEN);
+                  .then((ro) => ro ? Visibility.RO : Visibility.HIDDEN);
               });
         });
 
-        slot = foam.core.ArraySlot.create({slots: [visSlot, permSlot]}).map(arr => {
+        slot = foam.core.ArraySlot.create({ slots: [visSlot, permSlot] }).map((arr) => {
           var vis  = arr[0];
           var perm = arr[1] || Visibility.HIDDEN;
 
