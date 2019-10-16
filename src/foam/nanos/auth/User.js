@@ -444,15 +444,15 @@ foam.CLASS({
       code: function label() {
         if ( this.legalName ) return this.legalName;
         if ( this.lastName && this.firstName ) return this.firstName + ' ' + this.lastName;
-        if ( this.lastName && ! this.firstName ) return this.lastName;
-        if ( ! this.lastName && this.firstName ) return this.firstName;
+        if ( this.lastName ) return this.lastName;
+        if ( this.firstName ) return this.firstName;
         return '';
       },
       javaCode: `
         if ( ! SafetyUtil.isEmpty(this.getLegalName()) ) return this.getLegalName();
-        if ( SafetyUtil.isEmpty(this.getLastName()) && SafetyUtil.isEmpty(this.getFirstName()) ) return this.getFirstName() + " " + this.getLastName();
-        if ( SafetyUtil.isEmpty(this.getLastName()) && ! SafetyUtil.isEmpty(this.getFirstName()) ) return this.getLastName();
-        if ( ! SafetyUtil.isEmpty(this.getLastName()) && SafetyUtil.isEmpty(this.getFirstName()) ) return this.getFirstName();
+        if ( ! SafetyUtil.isEmpty(this.getLastName()) && ! SafetyUtil.isEmpty(this.getFirstName()) ) return this.getFirstName() + " " + this.getLastName();
+        if ( ! SafetyUtil.isEmpty(this.getLastName()) ) return this.getLastName();
+        if ( ! SafetyUtil.isEmpty(this.getFirstName()) ) return this.getFirstName();
         return "";
       `
     },
