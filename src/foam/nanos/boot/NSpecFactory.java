@@ -22,7 +22,7 @@ public class NSpecFactory
   Object ns_ = null;
 
   public NSpecFactory(ProxyX x, NSpec spec) {
-    x_    = x;
+    x_ = x;
     spec_ = spec;
   }
 
@@ -47,8 +47,9 @@ public class NSpecFactory
       if ( logger != null ) logger.info("Creating Service", spec_.getName());
       ns_ = spec_.createService(x_.getX().put(NSpec.class, spec_));
       Object ns = ns_;
+      X serviceX = ns instanceof foam.dao.DAO ? new InvalidX(x_.getX(), spec_.getName(), logger) : x_.getX();
       while ( ns != null ) {
-        if (ns instanceof ContextAware) ((ContextAware) ns).setX(x_.getX());
+        if (ns instanceof ContextAware) ((ContextAware) ns).setX(serviceX);
         if (ns instanceof NSpecAware) ((NSpecAware) ns).setNSpec(spec_);
         if (ns instanceof NanoService) ((NanoService) ns).start();
         if (ns instanceof ProxyDAO) {
