@@ -18,6 +18,11 @@ foam.CLASS({
     {
       name: 'runTest',
       javaCode: `
+        // disabled password policy tests
+        PasswordPolicy_Disabled_Test(x, null, "null passwords allowed when disabled.");
+        PasswordPolicy_Disabled_Test(x, "short", "short password allowed when disabled.");
+        PasswordPolicy_Disabled_Test(x, "F0amframew0rk", "Standard password allowed when disabled.");
+      
         // default password policy tests
         PasswordPolicy_Default_Test(x, null, "null passwords not allowed.", false);
         PasswordPolicy_Default_Test(x, "short", "short password not allowed.", false);
@@ -33,7 +38,7 @@ foam.CLASS({
         PasswordPolicy_MinLength_Test(x, 10, "012345678", "Min length changed and password must be longer", false);
         PasswordPolicy_MinLength_Test(x, 6, "F0amframew0rk", "Standard password longer than min length", true);
         PasswordPolicy_MinLength_Test(x, 10, "F0amframew0rk", "Standard password longer than updated min length", true);
-        PasswordPolicy_MinLength_Test(x, 13, "F0amframew0rk", "Standard password shorter than updated min length", false);
+        PasswordPolicy_MinLength_Test(x, 14, "F0amframew0rk", "Standard password shorter than updated min length", false);
  
         // check history
         String[] history = new String[] { };
@@ -50,6 +55,29 @@ foam.CLASS({
         PasswordPolicy_History_Test(x, 0, "F0amframew0rk", history, "Password history skipped when 0 and long history kept.", true);
         PasswordPolicy_History_Test(x, 9, "F0amframew0rk", history, "Password history checked in order and ninth entry does not fail validation.", true);
         PasswordPolicy_History_Test(x, 10, "F0amframew0rk", history, "Password history catches duplicate last in history", false);
+      `
+    },
+    {
+      name: 'PasswordPolicy_Disabled_Test',
+      args: [
+        { type: 'Context', name: 'x'        },
+        { type: 'String',  name: 'password' },
+        { type: 'String',  name: 'message'  }
+      ],
+      javaCode: `
+        try {
+          // disabled password policy
+          PasswordPolicy policy = new PasswordPolicy();
+          policy.setEnabled(false);
+          policy.setMinLength(6);
+          policy.setPreventHistoricPasswordCount(0);
+
+          // validate should return immediately on a disabled policy
+          policy.validate(x, null, password);
+          test(true, message);
+        } catch ( Throwable t ) {
+          test(false, message + " - " + t.getMessage());
+        }
       `
     },
     {
@@ -98,8 +126,8 @@ foam.CLASS({
           policy.setMinLength(6);
           policy.setPreventHistoricPasswordCount(historyCount);
 
-          String hash = Password.hash(password);
-          User user = new User();
+          // setup the user
+          User user = new User.Builder(x).setPassword(Password.hash("password")).build();
           for (String historyEntry : history) {
             user.setPassword(Password.hash(historyEntry)); // , Password.decode(Password.getSalt(hash))));
             new foam.nanos.auth.ruler.AddPasswordHistoryAction().applyAction(x, user, null, null, null);
@@ -107,7 +135,7 @@ foam.CLASS({
 
           // validate
           policy.validate(x, user, password);
-          test(succeeds, succeeds ? message : "PasswordPolicy validation should throw a RuntimeException");
+          test(succeeds, succeeds ? message : "PasswordPolicy validation should throw a RuntimeException - " + message);
         } catch ( Throwable t ) {
           if ( ! succeeds ) {
             test(t instanceof RuntimeException, message);
@@ -136,7 +164,7 @@ foam.CLASS({
 
           // validate
           policy.validate(x, null, password);
-          test(succeeds, succeeds ? message : "PasswordPolicy validation should throw a RuntimeException");
+          test(succeeds, succeeds ? message : "PasswordPolicy validation should throw a RuntimeException - " + message);
         } catch ( Throwable t ) {
           if ( ! succeeds ) {
             test(t instanceof RuntimeException, message);
