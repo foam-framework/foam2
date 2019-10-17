@@ -40,13 +40,11 @@ foam.CLASS({
           case self.DisplayMode.RW:
           case self.DisplayMode.DISABLED:
             return self.E()
-              // .start(self.writeView, { data: self.data, data$: self.data$ })
               .start(self.writeView, { data$: self.data$ })
                 .call(callFromProperty)
               .end();
           case self.DisplayMode.RO:
             return self.E()
-              // .start(self.readView, { data: self.data, data$: self.data$ })
               .start(self.readView, { data$: self.data$ })
                 .call(callFromProperty)
               .end();
@@ -54,8 +52,6 @@ foam.CLASS({
             break;
           default:
             console.warn('Unrecognized mode: ' + mode);
-            // TODO: Warning
-            break;
         }
       }));
     },

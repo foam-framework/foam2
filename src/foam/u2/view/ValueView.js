@@ -12,11 +12,9 @@ foam.CLASS({
   documentation: 'Just shows the value of data as a string.',
 
   methods: [
-    {
-      name: 'initE',
-      code: function() {
-        return this.add(this.data);
-      }
+    function initE() {
+      this.SUPER();
+      return this.add(this.data);
     }
   ],
 });
