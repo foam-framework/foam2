@@ -175,15 +175,15 @@ public class ROPEAuthorizer implements Authorizer {
   }
 
   public void authorizeOnRead(X x, FObject obj) throws AuthorizationException {
-    if ( ! ropeSearch("read", obj, x, targetDAOKey_, "") ) throw new AuthorizationException("You don't have permission to create this object");
+    if ( ! ropeSearch("read", obj, x, targetDAOKey_, "") ) throw new AuthorizationException("You don't have permission to read this object");
   }
 
   public void authorizeOnUpdate(X x, FObject oldObj, FObject obj) throws AuthorizationException {
-    if ( ! ropeSearch("update", obj, x, targetDAOKey_, "") ) throw new AuthorizationException("You don't have permission to create this object");
+    if ( ! ropeSearch("update", obj, x, targetDAOKey_, "") ) throw new AuthorizationException("You don't have permission to update this object");
   }
 
   public void authorizeOnDelete(X x, FObject obj) throws AuthorizationException {
-    if ( ! ropeSearch("delete", obj, x, targetDAOKey_, "") ) throw new AuthorizationException("You don't have permission to create this object");
+    if ( ! ropeSearch("delete", obj, x, targetDAOKey_, "") ) throw new AuthorizationException("You don't have permission to delete this object");
   }
 
   public boolean checkGlobalRead(X x) {
