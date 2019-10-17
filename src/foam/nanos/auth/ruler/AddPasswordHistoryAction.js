@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.auth.ruler',
   name: 'AddPasswordHistoryAction',
-  documentation: 'Adds an entry into the status history of a transaction',
+  documentation: 'Adds an entry into the password history of a user',
 
   implements: ['foam.nanos.ruler.RuleAction'],
 
