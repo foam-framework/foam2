@@ -106,8 +106,6 @@ public class ROPEAuthorizer implements Authorizer {
   }
 
   public List<FObject> getSourceObjects(X x, ROPE rope, FObject obj) {
-    // DAO junctionDAO = (DAO) x.get(rope.getJunctionDAOKey());
-    // DAO sourceDAO = (DAO) x.get(rope.getSourceDAOKey());
     List<FObject> sourceObjs = new ArrayList(); 
 
     if ( rope.getCardinality().equals("*:*") ) {
@@ -119,25 +117,12 @@ public class ROPEAuthorizer implements Authorizer {
       .select(new ArraySink()))
       .getArray();
 
-    for ( FObject junctionObj : junctionObjs ) {
-      FObject sourceObj = (FObject) x.get(relationship.getTargetDAOKey())
-                  .find(((Long)retrieveProperty(junctionObj, "get", "sourceId")).longValue());
-      sourceObjs.add(sourceObj);
+      for ( FObject junctionObj : junctionObjs ) {
+        FObject sourceObj = (FObject) x.get(relationship.getTargetDAOKey())
+                    .find(((Long)retrieveProperty(junctionObj, "get", "sourceId")).longValue());
+        sourceObjs.add(sourceObj);
     }
 
-      // Object predicateProperty = rope.getIsInverse() ? rope.getJunctionModel().getAxiomByName("sourceId") : rope.getJunctionModel().getAxiomByName("targetId");
-      // List<FObject> junctionObjs = ((ArraySink) junctionDAO
-      //   .where(
-      //     EQ(predicateProperty, (Long) retrieveProperty(obj, "get", "id"))
-      //   )
-      //   .select(new ArraySink()))
-      //   .getArray();
-
-      // for ( FObject junctionObj : junctionObjs ) {
-      //   FObject sourceObj = rope.getIsInverse() ? (FObject) sourceDAO.find(((Long)retrieveProperty(junctionObj, "get", "targetId")).longValue()) : (FObject) sourceDAO.find(((Long)retrieveProperty(junctionObj, "get", "sourceId")).longValue());
-      //   sourceObjs.add(sourceObj);
-
-      // }
     } else if ( rope.getCardinality().equals("*:1") ) {
       DAO rDAO = retrieveProperty(obj, "get", rope.getRelationshipKey(), x);
       sourceObjs = ((ArraySink) rDAO.where(INSTANCE_OF(rope.getSourceModel().getObjClass())).select(new ArraySink())).getArray();
