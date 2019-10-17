@@ -129,29 +129,35 @@ foam.CLASS({
       displayWidth: 80
     },
     {
-      class: 'String',
+      class: 'Code',
       name: 'serviceScript',
-      view: { class: 'io.c9.ace.Editor' },
       readPermissionRequired: true,
       writePermissionRequired: true
     },
     {
-      class: 'String',
+      class: 'Code',
       name: 'client',
-      value: '{}',
-      view: { class: 'io.c9.ace.Editor' }
+      value: '{}'
     },
     {
       class: 'String',
       name: 'documentation',
-      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
+      view: {
+        class: 'foam.u2.view.ModeAltView',
+        writeView: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
+        readView: { class: 'foam.u2.view.PreView' }
+      },
       readPermissionRequired: true,
       writePermissionRequired: true
     },
     {
       class: 'String',
       name: 'authNotes',
-      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
+      view: {
+        class: 'foam.u2.view.ModeAltView',
+        writeView: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
+        readView: { class: 'foam.u2.view.PreView' }
+      },
       readPermissionRequired: true,
       writePermissionRequired: true
     }

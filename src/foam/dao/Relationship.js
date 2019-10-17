@@ -1038,5 +1038,16 @@ foam.CLASS({
       flags: ['swift'],
       value: '// NOOP',
     },
+    {
+      name: 'createMode',
+      value: foam.u2.DisplayMode.HIDDEN // NOTE: value: 'HIDDEN' doesn't work.
+    },
+    {
+      name: 'view',
+      value: {
+        class: 'foam.u2.view.FObjectPropertyView',
+        readView: { class: 'foam.u2.view.ReadManyToManyRelationshipPropertyView' }
+      }
+    }
   ],
 });

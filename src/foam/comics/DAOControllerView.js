@@ -100,11 +100,16 @@ foam.CLASS({
     },
     {
       class: 'foam.u2.ViewSpec',
+      name: 'defaultSummaryView_',
+      value: { class: 'foam.u2.view.ScrollTableView' }
+    },
+    {
+      class: 'foam.u2.ViewSpec',
       name: 'summaryView',
       factory: function() {
-        return this.data.summaryView || this.importedSummaryView || {
-          class: 'foam.u2.view.ScrollTableView'
-        };
+        return this.data.summaryView ||
+          this.importedSummaryView ||
+          this.defaultSummaryView_;
       }
     },
     {
