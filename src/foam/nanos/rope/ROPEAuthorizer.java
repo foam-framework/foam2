@@ -112,7 +112,7 @@ public class ROPEAuthorizer implements Authorizer {
 
       foam.dao.ManyToManyRelationshipImpl relationship = (foam.dao.ManyToManyRelationshipImpl) retrieveProperty(obj, "get", rope.getRelationshipKey(), x);
       List<FObject> junctionObjs = (List<FObject>) ( (ArraySink) relationship.getJunctionDAO().where(
-        EQ(relationship.getJunction().SOURCE_ID, (Long) retrieveProperty(obj, "get", "id"))
+        EQ(relationship.getJunction().getAxiomByName("sourceId"), (Long) retrieveProperty(obj, "get", "id"))
       )
       .select(new ArraySink()))
       .getArray();
