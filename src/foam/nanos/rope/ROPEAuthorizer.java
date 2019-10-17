@@ -14,7 +14,6 @@ import foam.nanos.auth.AuthorizationException;
 import foam.nanos.auth.Authorizer;
 import foam.nanos.auth.User;
 import foam.nanos.rope.ROPE;
-import foam.nanos.rope.ROPEActions;
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,69 +36,66 @@ public class ROPEAuthorizer implements Authorizer {
     seen = new HashMap<FObject, List<ROPE>>();
   }
 
-  // public List<List<ROPE>> getRopes(FObject obj, String targetDAOKey, ROPEActions operation, X x, List<List<ROPE>> ) {
 
-  // }
-
-  public boolean ropeSearch(ROPEActions operation, FObject obj, X x, String targetDAOKey) {
+  public boolean ropeSearch(String mapkey, FObject obj, X x, String targetDAOKey, String relationshipKey) {
     // Long id = (Long) retrieveProperty(obj, "get", "id");
     // System.out.println("\n\n\nropeSearch("+operation+", {"+obj.getClassInfo().getId()+", "+id+"}, "+targetDAOKey+")");
     // System.out.println("-----------------------------------------------------------------------------------------------------------------------------");
+
+    // terminating condition
     // if ( obj != null && obj instanceof User && ((User) obj).getId() == user_.getId() && operation == ROPEActions.OWN ) {
     //   System.out.println("> targetObject is SELF and targetDAOKey is OWN. Authorization Granted.");
     //   System.out.println("> End of ropeSearch.");
     //   return true;
     // }
 
-    List<ROPE> ropes = (List<ROPE>) ((ArraySink) this.ropeDAO_
-      .where(AND(
-        EQ(ROPE.TARGET_MODEL, obj.getClassInfo()),
-        EQ(ROPE.TARGET_DAOKEY, targetDAOKey)
-      )) 
-      .select(new ArraySink()))
-      .getArray();
+    DAO filteredRopeDAO = (DAO) ropeDAO_.where(AND(
+      EQ(ROPE.TARGET_MODEL, obj.getClassInfo()),
+      EQ(ROPE.TARGET_DAOKEY, targetDAOKey)
+    ));
+    if ( ! relationshipKey.isEmpty() ) {
+      filteredRopeDAO = (DAO) filteredRopeDAO.where(EQ(ROPE.RELATIONSHIP_KEY, relationshipKey));
+    }
+    List<ROPE> ropes = (List<ROPE>) ((ArraySink) filteredRopeDAO.select(new ArraySink())).getArray();
 
     // System.out.println("> "+ropes.size() + " ROPEs found.");
 
     for ( ROPE rope : ropes ) {
-      // System.out.println("------------------------------------------------- ROPE INFO -----------------------------------------------------------------\nrope = { sourceDAOKey = "+rope.getSourceDAOKey() + ", targetDAOKey = "+rope.getTargetDAOKey() + ", junctionDAOKey = "+rope.getJunctionDAOKey()+", isInverse = "+rope.getIsInverse()+", inverseName = "+rope.getInverseName()+" }");
+      System.out.println("------------------------------------------------- ROPE INFO -----------------------------------------------------------------\nrope = { sourceDAOKey = "+rope.getSourceDAOKey() + ", targetDAOKey = "+rope.getTargetDAOKey()+", relationshipKey = "+rope.getRelationshipKey()+" }");
 
-      // if (seen.containsKey(obj) && seen.get(obj).contains(rope)) {
-      //   if (seen.get(obj).contains(rope)) {
-      //     System.out.println("> ROPE has already been SEEN for target object, skipping to next rope");
-      //     continue;
-      //   }
-      //   else {
-      //     // List list = seen.get(obj);
-      //     // list.add(rope);
-      //     // seen.put(obj, list);
-      //     seen.get(obj).add(rope);
-      //   }
-      // }
-      // else seen.put(obj, new ArrayList<ROPE>(Arrays.asList(rope)));
+      if (seen.containsKey(obj) && seen.get(obj).contains(rope)) {
+        if (seen.get(obj).contains(rope)) {
+          System.out.println("> ROPE has already been SEEN for target object, skipping to next rope");
+          continue;
+        }
+        else {
+          seen.get(obj).add(rope);
+        }
+      }
+      else seen.put(obj, new ArrayList<ROPE>(Arrays.asList(rope)));
 
       // todo ruby
-      List<ROPEActions> actions = rope.getCRUD() == null ? null : rope.getCRUD().get(operation);
-      if ( rope.getCRUD() == null || actions == null || actions.size() == 0 ) {
-        // System.out.println("> ROPE does not grant desired targetAction, continue to next rope");
+      List<String> nextRelationships = rope.getCRUD() == null ? null : rope.getCRUD().get(mapkey);
+      if ( rope.getCRUD() == null || nextRelationships == null || nextRelationships.size() == 0 ) {
+        System.out.println("> ROPE does not grant desired targetAction, continue to next rope");
         continue;
       }
 
       List<FObject> sourceObjs = getSourceObjects(x, rope, obj);
 
 
-      // if(rope.getCRUD()!=null)System.out.println("> CRUD = " + rope.getCRUD());
+      if(rope.getCRUD()!=null)System.out.println("> CRUD = " + rope.getCRUD());
 
-      if ( actions != null && actions.size() > 0 ) {
+      if ( nextRelationships != null && nextRelationships.size() > 0 ) {
 
         for ( FObject sourceObj : sourceObjs ) {
-          for ( ROPEActions action : actions ) {
-            if ( ropeSearch(action, sourceObj, x, rope.getSourceDAOKey()) ) return true;
+          for ( String nextRelationship : nextRelationships ) {
+            if ( ropeSearch(rope.getRelationshipKey(), sourceObj, x, rope.getSourceDAOKey(), nextRelationship) ) return true;
           }
         }
       }
 
-      // System.out.println("-----------------------------------------------------------------------------------------------------------------------------");
+      System.out.println("-----------------------------------------------------------------------------------------------------------------------------");
     }
 
     return false; 
@@ -175,19 +171,19 @@ public class ROPEAuthorizer implements Authorizer {
 
 
   public void authorizeOnCreate(X x, FObject obj) throws AuthorizationException {
-    if ( ! ropeSearch(ROPEActions.C, obj, x, targetDAOKey_) ) throw new AuthorizationException("You don't have permission to create this object");
+    if ( ! ropeSearch("create", obj, x, targetDAOKey_, "") ) throw new AuthorizationException("You don't have permission to create this object");
   }
 
   public void authorizeOnRead(X x, FObject obj) throws AuthorizationException {
-    if ( ! ropeSearch(ROPEActions.R, obj, x, targetDAOKey_) ) throw new AuthorizationException("You don't have permission to create this object");
+    if ( ! ropeSearch("read", obj, x, targetDAOKey_, "") ) throw new AuthorizationException("You don't have permission to create this object");
   }
 
   public void authorizeOnUpdate(X x, FObject oldObj, FObject obj) throws AuthorizationException {
-    if ( ! ropeSearch(ROPEActions.U, obj, x, targetDAOKey_) ) throw new AuthorizationException("You don't have permission to create this object");
+    if ( ! ropeSearch("update", obj, x, targetDAOKey_, "") ) throw new AuthorizationException("You don't have permission to create this object");
   }
 
   public void authorizeOnDelete(X x, FObject obj) throws AuthorizationException {
-    if ( ! ropeSearch(ROPEActions.D, obj, x, targetDAOKey_) ) throw new AuthorizationException("You don't have permission to create this object");
+    if ( ! ropeSearch("delete", obj, x, targetDAOKey_, "") ) throw new AuthorizationException("You don't have permission to create this object");
   }
 
   public boolean checkGlobalRead(X x) {

@@ -47,6 +47,11 @@ foam.CLASS({
         name: 'CRUD',
         class: 'Map',
         javaType: 'java.util.Map<String, java.util.List<String>>'
+      },
+      {
+        name: 'isInverse',
+        class: 'Boolean',
+        value: false
       }
     ]
 });
