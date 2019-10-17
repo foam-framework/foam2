@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'foam.comics',
   name: 'RelationshipView',
   extends: 'foam.comics.InlineBrowserView',
-  
+
   properties: [
     {
       name: 'controller',

@@ -232,6 +232,19 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'toSummary',
+      code: function() {
+        var rtn = (this.suite ? this.suite + '-' : '') +
+          this.streetNumber + ' ' +
+          this.streetName + ', ' +
+          this.city + ', ' +
+          this.regionId + ', ' +
+          this.countryId + ', ' +
+          this.postalCode;
+        return rtn === ' , , , , ' ? '' : rtn;
+      }
+    },
+    {
       name: 'getAddress',
       type: 'String',
       code: function() { return this.structured ? this.streetNumber + ' ' + this.streetName : this.address1; },

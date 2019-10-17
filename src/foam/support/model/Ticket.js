@@ -91,7 +91,8 @@ foam.RELATIONSHIP({
   sourceModel: 'foam.nanos.auth.User',
   targetModel: 'foam.support.model.Ticket',
   forwardName: 'tickets',
-  inverseName: 'user'
+  inverseName: 'user',
+  sourceProperty: { section: 'administrative' }
 });
 
 

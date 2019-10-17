@@ -122,20 +122,17 @@ foam.CLASS({
       storageTransient: true
     },
     {
-      class: 'String',
-      name: 'code',
-      view: {
-        class: 'io.c9.ace.Editor'
-      }
+      class: 'Code',
+      name: 'code'
     },
     {
       class: 'String',
       name: 'output',
-      visibility: 'RO',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
       view: {
-        class: 'foam.u2.tag.TextArea',
-        rows: 12, cols: 120,
-        css: { 'font-family': 'monospace' }
+        class: 'foam.u2.view.ModeAltView',
+        readView: { class: 'foam.u2.view.PreView' }
       },
       preSet: function(_, newVal) {
         // for client side scripts
