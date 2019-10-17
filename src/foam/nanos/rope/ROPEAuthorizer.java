@@ -114,7 +114,7 @@ public class ROPEAuthorizer implements Authorizer {
       .getArray();
 
       for ( FObject junctionObj : junctionObjs ) {
-        FObject sourceObj = (FObject) ((DAO) x.get(relationship.getTargetDAOKey())
+        FObject sourceObj = (FObject) (((DAO) x.get(relationship.getTargetDAOKey()))
                     .find(((Long)retrieveProperty(junctionObj, "get", "sourceId")).longValue()));
         sourceObjs.add(sourceObj);
     }
