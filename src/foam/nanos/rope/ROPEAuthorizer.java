@@ -42,14 +42,14 @@ public class ROPEAuthorizer implements Authorizer {
   // }
 
   public boolean ropeSearch(ROPEActions operation, FObject obj, X x, String targetDAOKey) {
-    Long id = (Long) retrieveProperty(obj, "get", "id");
-    System.out.println("\n\n\nropeSearch("+operation+", {"+obj.getClassInfo().getId()+", "+id+"}, "+targetDAOKey+")");
-    System.out.println("-----------------------------------------------------------------------------------------------------------------------------");
-    if ( obj != null && obj instanceof User && ((User) obj).getId() == user_.getId() && operation == ROPEActions.OWN ) {
-      System.out.println("> targetObject is SELF and targetDAOKey is OWN. Authorization Granted.");
-      System.out.println("> End of ropeSearch.");
-      return true;
-    }
+    // Long id = (Long) retrieveProperty(obj, "get", "id");
+    // System.out.println("\n\n\nropeSearch("+operation+", {"+obj.getClassInfo().getId()+", "+id+"}, "+targetDAOKey+")");
+    // System.out.println("-----------------------------------------------------------------------------------------------------------------------------");
+    // if ( obj != null && obj instanceof User && ((User) obj).getId() == user_.getId() && operation == ROPEActions.OWN ) {
+    //   System.out.println("> targetObject is SELF and targetDAOKey is OWN. Authorization Granted.");
+    //   System.out.println("> End of ropeSearch.");
+    //   return true;
+    // }
 
     List<ROPE> ropes = (List<ROPE>) ((ArraySink) this.ropeDAO_
       .where(AND(
@@ -59,36 +59,36 @@ public class ROPEAuthorizer implements Authorizer {
       .select(new ArraySink()))
       .getArray();
 
-    System.out.println("> "+ropes.size() + " ROPEs found.");
+    // System.out.println("> "+ropes.size() + " ROPEs found.");
 
     for ( ROPE rope : ropes ) {
-      System.out.println("------------------------------------------------- ROPE INFO -----------------------------------------------------------------\nrope = { sourceDAOKey = "+rope.getSourceDAOKey() + ", targetDAOKey = "+rope.getTargetDAOKey() + ", junctionDAOKey = "+rope.getJunctionDAOKey()+", isInverse = "+rope.getIsInverse()+", inverseName = "+rope.getInverseName()+" }");
+      // System.out.println("------------------------------------------------- ROPE INFO -----------------------------------------------------------------\nrope = { sourceDAOKey = "+rope.getSourceDAOKey() + ", targetDAOKey = "+rope.getTargetDAOKey() + ", junctionDAOKey = "+rope.getJunctionDAOKey()+", isInverse = "+rope.getIsInverse()+", inverseName = "+rope.getInverseName()+" }");
 
-      if (seen.containsKey(obj) && seen.get(obj).contains(rope)) {
-        if (seen.get(obj).contains(rope)) {
-          System.out.println("> ROPE has already been SEEN for target object, skipping to next rope");
-          continue;
-        }
-        else {
-          // List list = seen.get(obj);
-          // list.add(rope);
-          // seen.put(obj, list);
-          seen.get(obj).add(rope);
-        }
-      }
-      else seen.put(obj, new ArrayList<ROPE>(Arrays.asList(rope)));
+      // if (seen.containsKey(obj) && seen.get(obj).contains(rope)) {
+      //   if (seen.get(obj).contains(rope)) {
+      //     System.out.println("> ROPE has already been SEEN for target object, skipping to next rope");
+      //     continue;
+      //   }
+      //   else {
+      //     // List list = seen.get(obj);
+      //     // list.add(rope);
+      //     // seen.put(obj, list);
+      //     seen.get(obj).add(rope);
+      //   }
+      // }
+      // else seen.put(obj, new ArrayList<ROPE>(Arrays.asList(rope)));
 
       // todo ruby
       List<ROPEActions> actions = rope.getCRUD() == null ? null : rope.getCRUD().get(operation);
       if ( rope.getCRUD() == null || actions == null || actions.size() == 0 ) {
-        System.out.println("> ROPE does not grant desired targetAction, continue to next rope");
+        // System.out.println("> ROPE does not grant desired targetAction, continue to next rope");
         continue;
       }
 
       List<FObject> sourceObjs = getSourceObjects(x, rope, obj);
 
 
-      if(rope.getCRUD()!=null)System.out.println("> CRUD = " + rope.getCRUD());
+      // if(rope.getCRUD()!=null)System.out.println("> CRUD = " + rope.getCRUD());
 
       if ( actions != null && actions.size() > 0 ) {
 
@@ -99,7 +99,7 @@ public class ROPEAuthorizer implements Authorizer {
         }
       }
 
-      System.out.println("-----------------------------------------------------------------------------------------------------------------------------");
+      // System.out.println("-----------------------------------------------------------------------------------------------------------------------------");
     }
 
     return false; 

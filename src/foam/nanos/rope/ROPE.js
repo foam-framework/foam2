@@ -9,10 +9,8 @@ foam.CLASS({
     name: 'ROPE',
     documentation: 'model represents a single cell in a rope matrix',
 
-    ids: [ 'targetDAOKey', 'sourceDAOKey', 'junctionDAOKey', 'isInverse', 'inverseName' ],
+    ids: [ 'targetDAOKey', 'sourceDAOKey', 'relationshipKey' ],
 
-    // sourceModel and targetModel here are NOT Necessarily the same as in the relationship, may be inverse
-    // a one-way ROPE relationship
     properties: [
       {
         name: 'sourceModel',
@@ -42,30 +40,13 @@ foam.CLASS({
         required: true
       },
       {
-        name: 'junctionModel',
-        class: 'Class',
-        javaType: 'foam.core.ClassInfo',
-      },
-      {
-        name: 'junctionDAOKey',
+        name: 'relationshipKey',
         class: 'String'
       },
-      {
-        name: 'inverseName',
-        class: 'String'
-      },
-      // The Key is the action user would like to perform on tgtObj, and the value is a list of actions on the srcObj that if the user is allowed to perform, grants the permission 
-      // for the action on tgtObj
       {
         name: 'CRUD',
         class: 'Map',
-        javaType: 'java.util.Map<foam.nanos.rope.ROPEActions, java.util.List<foam.nanos.rope.ROPEActions>>'
-      },
-      // is true if the targetModel is actually sourceModel in the relationship and vice versa
-      {
-        name: 'isInverse',
-        class: 'Boolean',
-        value: false
+        javaType: 'java.util.Map<String, java.util.List<String>>'
       }
     ]
 });
