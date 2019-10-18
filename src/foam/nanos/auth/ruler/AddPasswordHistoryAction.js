@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -12,9 +12,9 @@ foam.CLASS({
   implements: ['foam.nanos.ruler.RuleAction'],
 
   javaImports: [
-    'foam.nanos.logger.Logger',
     'foam.nanos.auth.HistoricPassword',
     'foam.nanos.auth.User',
+    'foam.nanos.logger.Logger',
     'java.util.Date'
   ],
 
@@ -39,9 +39,9 @@ foam.CLASS({
         int copyLength = historicPasswordsOld.length;
         
         // only store up to the maximum number of password history records
-        if (historicPasswordsOld.length >= MAXIMUM_HISTORIC_PASSWORDS) {
+        if ( historicPasswordsOld.length >= MAXIMUM_HISTORIC_PASSWORDS ) {
           newArrayLength = (int) MAXIMUM_HISTORIC_PASSWORDS;
-          startCopyingIndex = 1;
+          startCopyingIndex = (int) (historicPasswordsOld.length - MAXIMUM_HISTORIC_PASSWORDS);
           copyLength = (int) MAXIMUM_HISTORIC_PASSWORDS - 1;
         }
 

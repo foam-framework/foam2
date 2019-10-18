@@ -259,8 +259,7 @@ foam.CLASS({
 
           // Check password policy
           passwordPolicy = ancestor.getPasswordPolicy();
-          while ( passwordPolicy == null || ! passwordPolicy.getEnabled() )
-          {
+          while ( passwordPolicy == null || ! passwordPolicy.getEnabled() ) {
             ancestor = ancestor.getAncestor(x, ancestor);
             if ( ancestor == null )
               break;
@@ -269,15 +268,13 @@ foam.CLASS({
         }
 
         // Use the default password policy if nothing is found
-        if ( passwordPolicy == null || ! passwordPolicy.getEnabled() )
-        {
+        if ( passwordPolicy == null || ! passwordPolicy.getEnabled() ) {
           passwordPolicy = new PasswordPolicy();
           passwordPolicy.setEnabled(true);
-          passwordPolicy.setMinLength(PasswordPolicy.MIN_PASSWORD_LENGTH);
         }
 
         // Validate the password against the password policy
-        passwordPolicy.validate(x, user, potentialPassword);
+        passwordPolicy.validate(user, potentialPassword);
       `
     },
     {

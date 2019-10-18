@@ -19,8 +19,8 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.auth.Address',
-    'foam.nanos.auth.Phone',
-    'foam.nanos.auth.HistoricPassword'
+    'foam.nanos.auth.HistoricPassword',
+    'foam.nanos.auth.Phone'
   ],
 
   javaImports: [
@@ -32,9 +32,9 @@ foam.CLASS({
     'foam.mlang.order.Comparator',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.HistoricPassword',
     'foam.util.SafetyUtil',
-    'static foam.mlang.MLang.EQ',
-    'foam.nanos.auth.HistoricPassword'
+    'static foam.mlang.MLang.EQ'
   ],
 
   documentation: `The User represents a person or entity with the ability

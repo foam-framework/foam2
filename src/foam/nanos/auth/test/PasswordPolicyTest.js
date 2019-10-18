@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -73,7 +73,7 @@ foam.CLASS({
           policy.setPreventHistoricPasswordCount(0);
 
           // validate should return immediately on a disabled policy
-          policy.validate(x, null, password);
+          policy.validate(null, password);
           test(true, message);
         } catch ( Throwable t ) {
           test(false, message + " - " + t.getMessage());
@@ -97,7 +97,7 @@ foam.CLASS({
           policy.setPreventHistoricPasswordCount(0);
 
           // validate
-          policy.validate(x, null, password);
+          policy.validate(null, password);
           test(succeeds, succeeds ? message : "PasswordPolicy validation should throw a RuntimeException - " + message);
         } catch ( Throwable t ) {
           if ( ! succeeds ) {
@@ -134,7 +134,7 @@ foam.CLASS({
           }
 
           // validate
-          policy.validate(x, user, password);
+          policy.validate(user, password);
           test(succeeds, succeeds ? message : "PasswordPolicy validation should throw a RuntimeException - " + message);
         } catch ( Throwable t ) {
           if ( ! succeeds ) {
@@ -163,7 +163,7 @@ foam.CLASS({
           policy.setPreventHistoricPasswordCount(0);
 
           // validate
-          policy.validate(x, null, password);
+          policy.validate(null, password);
           test(succeeds, succeeds ? message : "PasswordPolicy validation should throw a RuntimeException - " + message);
         } catch ( Throwable t ) {
           if ( ! succeeds ) {

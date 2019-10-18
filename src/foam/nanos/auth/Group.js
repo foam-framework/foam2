@@ -106,9 +106,7 @@ foam.CLASS({
       view: { class: 'foam.u2.view.FObjectView' },
       documentation: 'Password policy for this group.',
       javaFactory: `
-        foam.nanos.auth.PasswordPolicy passwordPolicy = new foam.nanos.auth.PasswordPolicy();
-        passwordPolicy.setEnabled(false); // disabled by default
-        return passwordPolicy;
+        return new foam.nanos.auth.PasswordPolicy();
       `,
     }
     /*

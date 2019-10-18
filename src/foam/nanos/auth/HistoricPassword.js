@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -18,7 +18,7 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'timeStamp',
-      visibility: 'RO',
+      updateMode: 'RO',
       documentation: 'Time at which password entry was created'
     },
     {

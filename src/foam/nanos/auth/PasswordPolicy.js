@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -13,7 +13,7 @@ foam.CLASS({
   ],
 
   documentation: 'A Password Policy for a Group.',
-  
+
   constants: [
     {
       name: 'MIN_PASSWORD_LENGTH',
@@ -32,7 +32,12 @@ foam.CLASS({
       name: 'minLength',
       documentation: 'Minimum length of the password.',
       min: 6,
-      value: 6
+      factory: function() {
+        return MIN_PASSWORD_LENGTH;
+      },
+      javaFactory: `
+        return MIN_PASSWORD_LENGTH;
+      `
     },
     {
       class: 'Long',
@@ -60,10 +65,6 @@ foam.CLASS({
       async: true,
       args: [
         {
-          name: 'x',
-          type: 'Context'
-        },
-        {
           name: 'user',
           type: 'User'
         },
@@ -79,21 +80,19 @@ foam.CLASS({
         }
 
         // check minimum length
-        int minLength = (int)Math.max(this.getMinLength(), MIN_PASSWORD_LENGTH);
+        int minLength = (int) Math.max(this.getMinLength(), MIN_PASSWORD_LENGTH);
         String minLengthRegex = "^.{" + minLength + ",}$";
         if ( SafetyUtil.isEmpty(potentialPassword) || ! (Pattern.compile(minLengthRegex)).matcher(potentialPassword).matches() ) {
           throw new RuntimeException("Password must be at least " + minLength + " characters long.");
         }
 
         // check password history
-        if ( this.getPreventHistoricPasswordCount() > 0 && user != null)
-        {
+        if ( this.getPreventHistoricPasswordCount() > 0 && user != null ) {
           HistoricPassword[] historicPasswords = user.getPasswordHistory();
-          int maxCount = Math.min((int)this.getPreventHistoricPasswordCount(), historicPasswords.length);
-          for ( int i = 0; i < maxCount; i++ )
-          {
+          int maxCount = Math.min((int) this.getPreventHistoricPasswordCount(), historicPasswords.length);
+          for ( int i = 0; i < maxCount; i++ ) {
             if ( Password.verify(potentialPassword, historicPasswords[historicPasswords.length - (1 + i) ].getPassword()) ) {
-              throw new RuntimeException("Password must be different than previous " + this.getPreventHistoricPasswordCount() + " passwords");
+              throw new RuntimeException("Password must be different from previous " + this.getPreventHistoricPasswordCount() + " passwords");
             }
           }
         }
