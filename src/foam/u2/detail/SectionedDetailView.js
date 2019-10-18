@@ -17,8 +17,8 @@ foam.CLASS({
   ],
 
   css: `
-    .inner-card {
-      padding: 24px 16px
+    ^ .inner-card {
+      padding: 14px 16px
     }
 
     ^ .foam-u2-view-ScrollTableView table {
