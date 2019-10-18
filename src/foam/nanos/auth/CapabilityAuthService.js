@@ -66,10 +66,7 @@ foam.CLASS({
           EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
           OR(
             NOT(HAS(UserCapabilityJunction.EXPIRY)),
-            AND(
-              HAS(UserCapabilityJunction.EXPIRY),
-              GTE(UserCapabilityJunction.EXPIRY, now)
-            )
+            NOT(EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.EXPIRED))
           )
         );
 
