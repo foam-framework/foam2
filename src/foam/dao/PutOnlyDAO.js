@@ -43,7 +43,7 @@ foam.CLASS({
         }
       },
       {
-        name: 'removeAll',
+        name: 'removeAll_',
         javaCode: `throw new UnsupportedOperationException("Cannot removeAll from PutOnlyDAO");`,
         swiftCode: `throw FoamError("Cannot removeAll from PutOnlyDAO")`,
         code: function removeAll_() {
