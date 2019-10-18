@@ -120,7 +120,7 @@ foam.CLASS({
       documentation: `Checks if a permission or capability string is implied by the current capability`,
       javaCode: `
         if ( ! this.getEnabled() ) return false;
-  
+
         // check if permission is a capability string implied by this permission
         if ( this.stringImplies(this.getId(), permission) ) return true;
 
