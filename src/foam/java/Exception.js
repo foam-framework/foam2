@@ -15,101 +15,69 @@ foam.CLASS({
   ],
 
   methods: [
-    function buildJavaClass(cls) {
-      cls = cls || foam.java.Exception.create();
-      cls.package = this.of.package;
-      cls.name = this.name;
-      cls.extends = this.getCorrectExtends_();
-      cls.source = this.of.model_.source;
+    function fromFObjectClass(of) {
+      this.fromModel(of.model_);
+      this.of_ = of;
 
-      // Add property to get FOAM exception
-      this.buildFoamExceptionProperty_(cls);
-      this.buildConstructor_(cls);
+      var flagFilter = foam.util.flagFilter(['java']);
+      var axioms = of.getOwnAxioms().filter(flagFilter);
 
-      return cls;
+      for ( var i = 0 ; i < axioms.length ; i++ ) {
+        axioms[i].buildJavaClass && axioms[i].buildJavaClass(this);
+      }
+
+      this.buildConstructor_();
+
     },
-    function buildFoamExceptionProperty_(cls) {
-      var name = "foamException";
-      var type = 'foam.core.MessageException';
-      var privateName = name + '_';
-      var capitalized = foam.String.capitalize(name);
-      var constantize = foam.String.constantize(name);
-      cls
-        .field({
-          name: privateName,
-          type: type,
-          visibility: 'protected'
-        })
-        .method({
-          name: 'get' + capitalized,
-          type: type,
-          visibility: 'public',
-          body: 'return ' + privateName + ';'
-        })
-        .method({
-          name: 'set' + capitalized,
-          visibility: 'public',
-          args: [
-            {
-              type: type,
-              name: 'fObject'
-            }
-          ],
-          type: 'void',
-          body: privateName + ' = fObject;'
-        });
+    function fromModel(model) {
+      [ // List of attributes to copy from model to Exception
+        'name','package','source','abstract'
+      ].forEach((attr) => this[attr] = model[attr]);
+
+      this.extends = model.extends == 'foam.core.AbstractException'
+        ? 'java.lang.Exception' : model.extends;
+
+      // By default, extend java.lang.Exception
+      // TODO: Implementation of AbstractExceptions could be handled here
+      /*
+      cls.extends = this.model_.extends === 'FObject' ?
+        'java.lang.Exception' : this.model_.extends;
+        */
     },
-    function buildConstructor_(cls) {
-      var superArgs = this.of.model_.javaSuperArgs || [];
+    function buildConstructor_() {
+      var superArgs = this.of_.model_.javaSuperArgs || [];
+      var constructorArgs = this.of_.model_.javaConstructorArgs || [];
+
+      // TODO: error here if a superArg isn't in constructorArgs
 
       // TODO: The two snippets below for generating
       // constructor arguments could be decoupled from
       // this to be used for other similar features.
 
-      // Generate getter strings for properties
-      var argGetterMap = {};
-      this.of.getAxiomsByClass(foam.core.Property).forEach(p => {
-        argGetterMap[p.name] = 'foamException.get' +
+      // Generate setter strings for properties (used in constructor)
+      var argSetterMap = {};
+      var argObjectMap = {};
+      this.of_.getAxiomsByClass(foam.core.Property).forEach(p => {
+        argSetterMap[p.name] = 'this.set' +
           foam.String.capitalize(p.name) +
-          '()';
+          '('+p.name+'_)';
+        argObjectMap[p.name] = {
+          name: p.name+'_',
+          type: p.javaType
+        }
       });
-
-      // Generate calls for methods
-      this.of.getAxiomsByClass(foam.core.Method).forEach(m => {
-        argGetterMap[m.name] = 'foamException.' + m.name + '()';
-      });
-
-      // Message is a special case; use property if available, but
-      // prefer non-empty constructor argument.
-      if ( 'message' in argGetterMap ) {
-        argGetterMap["message"] =
-          '( message == null || message.equals("") ) '
-            + '? foamException.getMessage() : message';
-      } else {
-        argGetterMap["message"] = "message";
-      }
 
       var superConstructor = 'super(' +
-        superArgs.map(val => {
-          return argGetterMap[val] || val
-        }).join(',') + ');';
+        superArgs.map(name => name + '_').join(',') + ');';
+      var setters = constructorArgs
+        .map(name => argSetterMap[name]).join(';\n') + ';';
 
-      cls
+      this
         .method({
           visibility: 'public',
-          name: cls.name,
-          args: [
-            {
-              name: 'foamException',
-              type: 'foam.core.MessageException'
-            },
-            {
-              name: 'message',
-              type: 'String'
-            }
-          ],
-          body: superConstructor + '\n' +
-            'foamException_ = foamException;'
+          name: this.name,
+          args: constructorArgs.map(name => argObjectMap[name]),
+          body: superConstructor + '\n' + setters
         })
     },
     function getCorrectExtends_() {
@@ -119,7 +87,7 @@ foam.CLASS({
       }
 
       if ( this.extendsException() ) {
-        return foam.String.toNativeExceptionName(this.of.model_.extends);
+        return this.of.model_.extends;
       }
 
       return 'java.lang.Exception';

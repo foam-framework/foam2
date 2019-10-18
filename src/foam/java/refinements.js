@@ -313,14 +313,14 @@ foam.CLASS({
       });
     },
 
-    function generateSetter_() {
+    function generateSetter_(checkFrozen) {
       // return user defined setter
       if ( this.javaSetter ) {
         return this.javaSetter;
       }
 
       var capitalized = foam.String.capitalize(this.name);
-      var setter = `if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");\n`;
+      var setter = checkFrozen ? `if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");\n` : '';
 
       // add value assertion
       if ( this.javaAssertValue ) {
@@ -361,6 +361,7 @@ foam.CLASS({
       var constantize = foam.String.constantize(this.name);
       var isSet       = this.name + 'IsSet_';
       var factoryName = capitalized + 'Factory_';
+      var isExceptionProperty = foam.java.Exception.isInstance(cls);
 
       cls.
         field({
@@ -395,13 +396,13 @@ foam.CLASS({
             }
           ],
           type: 'void',
-          body: this.generateSetter_()
+          body: this.generateSetter_(!isExceptionProperty)
         }).
         method({
           name: 'clear' + capitalized,
           visibility: 'public',
           type: 'void',
-          body: `
+          body: isExceptionProperty ? `\n${isSet} = false;\n` : `
 if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
 ${isSet} = false;
           `
@@ -416,16 +417,18 @@ ${isSet} = false;
         });
       }
 
-      cls.field({
-        name: constantize,
-        visibility: 'public',
-        static: true,
-        type: 'foam.core.PropertyInfo',
-        initializer: this.createJavaPropertyInfo_(cls)
-      });
+      if ( !isExceptionProperty ) {
+        cls.field({
+          name: constantize,
+          visibility: 'public',
+          static: true,
+          type: 'foam.core.PropertyInfo',
+          initializer: this.createJavaPropertyInfo_(cls)
+        });
 
-      var info = cls.getField('classInfo_');
-      if ( info ) info.addAxiom(cls.name + '.' + constantize);
+        var info = cls.getField('classInfo_');
+        if ( info ) info.addAxiom(cls.name + '.' + constantize);
+      }
     }
   ]
 });
@@ -478,7 +481,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 foam.LIB({
   name: 'foam.core.FObject',
@@ -550,7 +552,7 @@ foam.LIB({
         .filter(function(p) {
           return !! p.javaType && p.javaInfoType && p.generateJava;
         })
-        .filter(flagFilter)
+        .filter(flagFilter) // why is this here twice?
         .map(function(p) {
           return foam.java.Field.create({ name: p.name, type: p.javaType });
         });
@@ -649,6 +651,19 @@ foam.LIB({
         }
       }
 
+      return cls;
+    }
+  ]
+});
+
+foam.LIB({
+  name: 'foam.core.AbstractException',
+  flags: ['java'],
+
+  methods: [
+    function buildJavaClass(cls) {
+      cls = cls || foam.java.Exception.create();
+      cls.fromFObjectClass(this);
       return cls;
     }
   ]
@@ -1321,9 +1336,12 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'javaSuperArgs',
-      factory: function() {
-        return ['foamException', 'message']
-      },
+      factory: () => [],
+    },
+    {
+      class: 'StringArray',
+      name: 'javaConstructorArgs',
+      factory: () => [],
     },
   ]
 });

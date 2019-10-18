@@ -11,6 +11,7 @@ var classes = [
   'foam.core.ContextAware',
   'foam.core.Exception',
   'foam.core.MessageException',
+  'foam.core.TestException',
   'foam.core.Freezable',
   'foam.core.ContextAgent',
   'foam.core.CompoundContextAgency',
