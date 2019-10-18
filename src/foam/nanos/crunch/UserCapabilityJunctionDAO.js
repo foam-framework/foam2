@@ -215,14 +215,17 @@ foam.CLASS({
         }
       ],
       javaType: 'java.util.List<CapabilityCapabilityJunction>',
+      documentation: `
+      check the prerequisites of the current capability in the junction. If the user does not have a junction with the 
+      prerequisite capability, set a junction between them.
+      Returns the list of prerequisiteCapabilityJunctions
+      `, 
       javaCode: `
-      DAO capabilityDAO = (DAO) x.get("capabilityDAO");
       DAO prerequisiteCapabilityJunctionDAO = (DAO) (x.get("prerequisiteCapabilityJunctionDAO"));
-      Capability capability = (Capability) capabilityDAO.find(((UserCapabilityJunction) obj).getTargetId());
 
       // get a list of the prerequisite junctions where the current capability is the dependent
       List<CapabilityCapabilityJunction> ccJunctions = (List<CapabilityCapabilityJunction>) ((ArraySink) prerequisiteCapabilityJunctionDAO
-      .where(EQ(CapabilityCapabilityJunction.SOURCE_ID, (String) capability.getId()))
+      .where(EQ(CapabilityCapabilityJunction.SOURCE_ID, ((UserCapabilityJunction) obj).getTargetId()))
       .select(new ArraySink()))
       .getArray();
 
@@ -261,8 +264,6 @@ foam.CLASS({
       type: 'Boolean',
       documentation: `Check if prerequisites of a capability is fulfilled`,
       javaCode: `
-    
-
       // for each of those junctions, check if the prerequisite is granted, if not, return false
       for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
         Capability cap = (Capability) ((DAO) x.get("capabilityDAO")).find((String) ccJunction.getSourceId());

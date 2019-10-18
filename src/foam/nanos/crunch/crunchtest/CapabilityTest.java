@@ -71,40 +71,12 @@ public class CapabilityTest extends Test {
     p4 = new String("p4");
     p5 = new String("p5");
 
-    // testUserRemovalRule(x);
-    // testCapabilityAuthService(x);
-    // testDeprecatedCapabiltiyJunctionRules(x);
-    // testCapabilityJunctions(x);
-    // testCapability(x);
-
-    User user = new User();
-    user.setFirstName("testuser");
-    user.setId(888);
-    user = (User) userDAO.put_(x, user);
-    Capability dep = new Capability();
-    dep.setId("c1");
-    Capability pre = new Capability();
-    pre.setId("c2");
-    dep = (Capability) capabilityDAO.put(dep);
-    pre = (Capability) capabilityDAO.put(pre);
-
-    CapabilityCapabilityJunction ccjunction = new CapabilityCapabilityJunction();
-    ccjunction.setSourceId(dep.getId());
-    ccjunction.setTargetId(pre.getId());
-    ccjunction = (CapabilityCapabilityJunction) prerequisiteCapabilityJunctionDAO.put_(x, ccjunction);
-
-    UserCapabilityJunction ucjunction = new UserCapabilityJunction();
-    ucjunction.setSourceId(user.getId());
-    ucjunction.setTargetId(dep.getId());
-    ucjunction = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, ucjunction);
-
-    List<UserCapabilityJunction> userCapabilityJunctions = (List<UserCapabilityJunction>) ((ArraySink) userCapabilityJunctionDAO
-        .where(EQ(UserCapabilityJunction.SOURCE_ID, user.getId()))
-        .select(new ArraySink()))
-        .getArray();
-
-    test(userCapabilityJunctions.size() > 1, "num of junctions: "+userCapabilityJunctions.size());
-    // testPrerequisiteCapability(x);
+    testPrerequisiteCapability(x);
+    testUserRemovalRule(x);
+    testCapabilityAuthService(x);
+    testDeprecatedCapabiltiyJunctionRules(x);
+    testCapabilityJunctions(x);
+    testCapability(x);
   }
 
   public void testPrerequisiteCapability(X x) {
@@ -134,7 +106,7 @@ public class CapabilityTest extends Test {
         .select(new ArraySink()))
         .getArray();
 
-    test(userCapabilityJunctions.size() > 0, "num of junctions: "+userCapabilityJunctions);
+    test(userCapabilityJunctions.size() > 0, "num of junctions: "+userCapabilityJunctions.size());
   }
 
   public void testUserRemovalRule(X x) {
