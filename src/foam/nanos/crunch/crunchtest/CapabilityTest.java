@@ -261,18 +261,21 @@ public class CapabilityTest extends Test {
     uj0.setTargetId((String) c0.getId());
     uj0.setData((FObject) data);
     uj0 = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, uj0);
+    test(uj0.getStatus() == CapabilityJunctionStatus.GRANTED, "UserCapabilityJunction Status between user and c0 is granted: " + uj0.getStatus());
 
     UserCapabilityJunction uj1 = new UserCapabilityJunction();
     uj1.setSourceId(u1.getId());
     uj1.setTargetId((String) c1.getId());
     uj1.setData((FObject) data);
     uj1 = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, uj1);
+    test(uj1.getStatus() == CapabilityJunctionStatus.GRANTED, "UserCapabilityJunction Status between user and c1 is granted: " + uj1.getStatus());
 
     UserCapabilityJunction uj2 = new UserCapabilityJunction();
     uj2.setSourceId(u1.getId());
     uj2.setTargetId((String) c2.getId());
     uj2.setData((FObject) data);
     uj2 = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, uj2);
+    test(uj2.getStatus() == CapabilityJunctionStatus.GRANTED, "UserCapabilityJunction Status between user and c2 is granted: " + uj2.getStatus());
 
 
     CapabilityCapabilityJunction j2 = new CapabilityCapabilityJunction();

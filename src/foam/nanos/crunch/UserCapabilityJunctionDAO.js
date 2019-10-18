@@ -270,9 +270,9 @@ foam.CLASS({
         if (!cap.getEnabled()) continue;
         UserCapabilityJunction ucJunction = (UserCapabilityJunction) getDelegate().find(AND(
           EQ(UserCapabilityJunction.SOURCE_ID, ((UserCapabilityJunction) obj).getSourceId()),
-          EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getSourceId())
+          EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getTargetId())
         ));
-        if ( ucJunction == null || ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED ) return false;
+        if ( ucJunction != null && ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED ) return false;
       }
       return true;
       `
