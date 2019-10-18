@@ -11,9 +11,37 @@ foam.CLASS({
 
   documentation: `A SearchView for properties of type Date.`,
 
-  requires: [
-    'foam.mlang.predicate.True',
+  implements: [
+    'foam.mlang.Expressions'
   ],
+
+  css: `
+    ^ {
+      padding: 24px 16px;
+      box-sizing: border-box;
+      min-width: 214px;
+    }
+
+    ^ .foam-u2-tag-Select {
+      width: 100%;
+      height: 36px;
+
+      border-radius: 3px;
+      border: solid 1px #cbcfd4;
+      background-color: #ffffff;
+    }
+
+    ^ .foam-u2-DateView {
+      width: 100%;
+      height: 36px;
+
+      margin-top: 16px;
+
+      border-radius: 3px;
+      border: solid 1px #cbcfd4;
+      background-color: #ffffff;
+    }
+  `,
 
   properties: [
     {
@@ -55,7 +83,7 @@ foam.CLASS({
           SearchManager. The SearchManager will read this predicate and use it
           to filter the dao being displayed in the view.`,
       expression: function(qualifier, date1, date2) {
-        if ( ! qualifier || ! date1 || isNaN(date1.valueOf()) ) return this.True.create();
+        if ( ! qualifier || ! date1 || isNaN(date1.valueOf()) ) return this.TRUE;
 
         if ( qualifier !== 'Bt' ) {
           return foam.mlang.predicate[qualifier].create({
@@ -64,18 +92,7 @@ foam.CLASS({
           });
         }
 
-        return foam.mlang.predicate.And.create({
-          args: [
-            foam.mlang.predicate.Gt.create({
-              arg1: this.property,
-              arg2: date1
-            }),
-            foam.mlang.predicate.Lt.create({
-              arg1: this.property,
-              arg2: date2
-            })
-          ]
-        });
+        return this.AND(this.GT(this.property, date1), this.LT(this.property, date2));
       }
     },
     {
@@ -108,33 +125,5 @@ foam.CLASS({
     function clear() {
       this.qualifier = 'True';
     }
-  ],
-
-  css: `
-    ^ {
-      padding: 24px 16px;
-      box-sizing: border-box;
-      min-width: 214px;
-    }
-
-    ^ .foam-u2-tag-Select {
-      width: 100%;
-      height: 36px;
-
-      border-radius: 3px;
-      border: solid 1px #cbcfd4;
-      background-color: #ffffff;
-    }
-
-    ^ .foam-u2-DateView {
-      width: 100%;
-      height: 36px;
-
-      margin-top: 16px;
-
-      border-radius: 3px;
-      border: solid 1px #cbcfd4;
-      background-color: #ffffff;
-    }
-  `
+  ]
 });

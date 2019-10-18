@@ -10,11 +10,14 @@ foam.CLASS({
   extends: 'foam.u2.Controller',
 
   documentation: `
-
+    A simple Boolean filter that allows the user to pick between true or false.
   `,
 
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
   requires: [
-    'foam.mlang.predicate.True',
     'foam.u2.CheckBox'
   ],
 
@@ -78,12 +81,9 @@ foam.CLASS({
       SearchManager. The SearchManager will read this predicate and use it
       to filter the dao being displayed in the view.`,
       expression: function(bool1, bool2) {
-        if ( ( ! bool1 && ! bool2 ) || ( bool1 && bool2 )) return this.True.create();
+        if ( ( ! bool1 && ! bool2 ) || ( bool1 && bool2 )) return this.TRUE;
 
-        return foam.mlang.predicate.Eq.create({
-            arg1: this.property,
-            arg2: bool1
-          });
+        return this.EQ(this.property, bool1);
       }
     },
     {

@@ -11,8 +11,8 @@ foam.CLASS({
 
   documentation: `A SearchView for properties of type ENUM.`,
 
-  requires: [
-    'foam.mlang.predicate.True',
+  implements: [
+    'foam.mlang.Expressions'
   ],
 
   css: `
@@ -129,25 +129,14 @@ foam.CLASS({
       name: 'predicate',
       documentation: ``,
       expression: function(selectedOptions) {
-        if ( selectedOptions.length <= 0 ) return this.True.create();
+        if ( selectedOptions.length <= 0 ) return this.TRUE;
         var ordinals = selectedOptions.map(option => option.ordinal);
 
         if ( ordinals.length === 1) {
-          return foam.mlang.predicate.Eq.create({
-            arg1: this.property,
-            arg2: ordinals[0]
-          });
+          return this.EQ(this.property, ordinals[0]);
         }
 
-        var pred = foam.mlang.predicate.Or.create({ args: [] });
-        ordinals.forEach(ordinal => {
-          pred.args.push(foam.mlang.predicate.Eq.create({
-            arg1: this.property,
-            arg2: ordinal
-          }));
-        });
-
-        return pred;
+        return this.IN(this.property, ordinals);
       }
     },
     {
@@ -203,7 +192,7 @@ foam.CLASS({
               .end()
               .call(function() {
                 self.filteredOptions.forEach(function(option, index) {
-                  const label = option.label ? option.label : option.name;
+                  const label = option.label || option.name;
                   return element
                     .start().addClass(self.myClass('container-option'))
                       .on('click', () => self.selectOption(index))

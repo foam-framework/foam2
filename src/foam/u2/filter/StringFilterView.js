@@ -11,8 +11,8 @@ foam.CLASS({
 
   documentation: `A SearchView for properties of type String.`,
 
-  requires: [
-    'foam.mlang.predicate.True',
+  implements: [
+    'foam.mlang.Expressions'
   ],
 
   css: `
@@ -162,23 +162,13 @@ foam.CLASS({
       name: 'predicate',
       documentation: ``,
       expression: function(selectedOptions) {
-        if ( selectedOptions.length <= 0 ) return this.True.create();
+        if ( selectedOptions.length <= 0 ) return this.TRUE;
 
         if ( selectedOptions.length === 1 ) {
-          return foam.mlang.predicate.Eq.create({
-            arg1: this.property,
-            arg2: selectedOptions[0]
-          });
+          return this.EQ(this.property, selectedOptions[0]);
         }
 
-        var pred = foam.mlang.predicate.Or.create({ args: [] });
-        selectedOptions.forEach((string) => {
-          pred.args.push(foam.mlang.predicate.Eq.create({
-            arg1: this.property,
-            arg2: string
-          }));
-        });
-        return pred;
+        return this.IN(this.property, selectedOptions);
       }
     },
     {

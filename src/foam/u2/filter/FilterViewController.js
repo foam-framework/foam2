@@ -9,11 +9,7 @@ foam.CLASS({
   name: 'FilterViewController',
   extends: 'foam.u2.View',
 
-  documentation: `Manages the FilterViews`,
-
-  requires: [
-    'foam.mlang.predicate.True'
-  ],
+  documentation: 'Manages the FilterViews',
 
   imports: [
     'searchManager'

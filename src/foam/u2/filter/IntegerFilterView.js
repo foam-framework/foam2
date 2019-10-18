@@ -9,13 +9,39 @@ foam.CLASS({
   name: 'IntegerFilterView',
   extends: 'foam.u2.Controller',
 
-  documentation: `
+  documentation: 'Filter view for integers.',
 
-  `,
-
-  requires: [
-    'foam.mlang.predicate.True',
+  imports: [
+    'foam.mlang.Expressions',
   ],
+
+  css: `
+    ^ {
+      padding: 24px 16px;
+      box-sizing: border-box;
+      min-width: 214px;
+    }
+
+    ^ .foam-u2-tag-Select {
+      width: 100%;
+      height: 36px;
+
+      border-radius: 3px;
+      border: solid 1px #cbcfd4;
+      background-color: #ffffff;
+    }
+
+    ^ .foam-u2-FloatView {
+      width: 100%;
+      height: 36px;
+
+      margin-top: 16px;
+
+      border-radius: 3px;
+      border: solid 1px #cbcfd4;
+      background-color: #ffffff;
+    }
+  `,
 
   properties: [
     {
@@ -70,7 +96,7 @@ foam.CLASS({
       SearchManager. The SearchManager will read this predicate and use it
       to filter the dao being displayed in the view.`,
       expression: function(qualifier, amount1, amount2) {
-        if ( ! qualifier ) return this.True.create();
+        if ( ! qualifier ) return this.TRUE;
 
         if ( qualifier !== 'Bt' && qualifier !== 'Bte' ) {
           return foam.mlang.predicate[qualifier].create({
@@ -85,8 +111,8 @@ foam.CLASS({
           pred1 = 'Gte';
           pred2 = 'Lte';
         }
-        return foam.mlang.predicate.And.create({
-          args: [
+
+        return this.AND(
             foam.mlang.predicate[pred1].create({
               arg1: this.property,
               arg2: amount1
@@ -95,8 +121,7 @@ foam.CLASS({
               arg1: this.property,
               arg2: amount2
             })
-          ]
-        });
+        );
       }
     },
     {
@@ -130,33 +155,5 @@ foam.CLASS({
       this.qualifier = 'True';
       this.value = 0;
     }
-  ],
-
-  css: `
-    ^ {
-      padding: 24px 16px;
-      box-sizing: border-box;
-      min-width: 214px;
-    }
-
-    ^ .foam-u2-tag-Select {
-      width: 100%;
-      height: 36px;
-
-      border-radius: 3px;
-      border: solid 1px #cbcfd4;
-      background-color: #ffffff;
-    }
-
-    ^ .foam-u2-FloatView {
-      width: 100%;
-      height: 36px;
-
-      margin-top: 16px;
-
-      border-radius: 3px;
-      border: solid 1px #cbcfd4;
-      background-color: #ffffff;
-    }
-  `
+  ]
 });

@@ -9,6 +9,11 @@ foam.CLASS({
   name: 'FilterSearch',
   extends: 'foam.u2.View',
 
+  documentation: `
+    Filter search takes the properties defined in 'searchColumns' and creates
+    a filter option which allows a user to filter the DAO by.
+  `,
+
   requires: [
     'foam.core.SimpleSlot',
     'foam.u2.search.SearchManager',
@@ -64,8 +69,8 @@ foam.CLASS({
         }
 
         return of.getAxiomsByClass(foam.core.Property)
-        .filter((prop) => prop.searchView && ! prop.hidden)
-        .map(foam.core.Property.NAME.f);
+          .filter((prop) => prop.searchView && ! prop.hidden)
+          .map(foam.core.Property.NAME.f);
       }
     },
     {
@@ -96,7 +101,7 @@ foam.CLASS({
             this.start(self.FilterViewController, {
               searchView: axiom.searchView,
               property: axiom,
-              dao: self.dao
+              dao$: self.dao$
             })
             .end();
           });

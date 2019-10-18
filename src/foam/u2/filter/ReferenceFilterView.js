@@ -14,8 +14,11 @@ foam.CLASS({
     An example might be - enables search by name rather than id of owner on a model where owner is a reference to users.
   `,
 
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
   requires: [
-    'foam.mlang.predicate.True',
     'foam.u2.CheckBox'
   ],
 
@@ -195,29 +198,22 @@ foam.CLASS({
         }
 
         if ( selectedOptions.length <= 0 ) {
-          return this.True.create();
+          return this.TRUE;
         }
 
         if ( selectedOptions.length === 1 ) {
           var key = getKeyByValue_(idToStringDisplayMap, selectedOptions[0]);
           key = parseInt(key) ? parseInt(key) : key;
-          return foam.mlang.predicate.Eq.create({
-            arg1: this.property,
-            arg2: key
-          });
+          return this.EQ(this.property, key);
         }
 
-        var pred = foam.mlang.predicate.Or.create({ args: [] });
-        selectedOptions.forEach( (string) => {
-          var key = getKeyByValue_(idToStringDisplayMap, string);
+        var keys = selectedOptions.map( (label) => {
+          var key = getKeyByValue_(idToStringDisplayMap, label);
           key = parseInt(key) ? parseInt(key) : key;
-          pred.args.push(foam.mlang.predicate.Eq.create({
-            arg1: this.property,
-            arg2: key
-          }));
+          return key;
         });
 
-        return pred;
+        return this.IN(this.property, keys);
       }
     }
   ],
