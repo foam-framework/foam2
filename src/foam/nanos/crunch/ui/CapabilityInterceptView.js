@@ -56,7 +56,7 @@ foam.CLASS({
         // Container for the detailview
         .start()
           .addClass(this.myClass('detail-container'))
-          // TODO: 
+          // TODO: Replace with Capability selection view appropriate for any user
           .tag(foam.comics.BrowserView.create({
             searchMode: foam.comics.SearchMode.SIMPLE,
             data: this.data.where(

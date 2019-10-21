@@ -55,14 +55,6 @@ foam.CLASS({
         implied capabilities or permissions can grant the
         requested action.
       `
-    },
-    {
-      class: 'String',
-      name: 'explanation',
-      documentation: `
-        Optional explanation for a user on why this capability
-        intercept occurred.
-      `
     }
   ]
 });

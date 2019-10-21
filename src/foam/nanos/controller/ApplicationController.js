@@ -52,7 +52,8 @@ foam.CLASS({
   imports: [
     'installCSS',
     'sessionSuccess',
-    'window'
+    'window',
+    'capabilityDAO'
   ],
 
   exports: [
@@ -380,14 +381,12 @@ foam.CLASS({
 
     function requestCapability(capabilityInfo) {
       var self = this;
-      console.log("CAPABILITY SCREEN REQUESTED");
       return new Promise(function(resolve, reject) {
         self.stack.push({
           class: 'foam.nanos.crunch.ui.CapabilityInterceptView',
-          data: self.__subContext__["capabilityDAO"],
+          data: self.capabilityDAO,
           capabilityOptions: capabilityInfo.capabilityOptions
         });
-        self.loginSuccess$.sub(resolve);
       });
     },
 
