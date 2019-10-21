@@ -46,7 +46,7 @@ foam.CLASS({
             // only store up to the maximum number of password history records
             if ( priorPasswordsOld.length >= MAXIMUM_PRIOR_PASSWORDS ) {
               newArrayLength = (int) MAXIMUM_PRIOR_PASSWORDS;
-              startCopyingIndex = (int) (priorPasswordsOld.length - MAXIMUM_PRIOR_PASSWORDS);
+              startCopyingIndex = (int) (priorPasswordsOld.length - (MAXIMUM_PRIOR_PASSWORDS - 1));
               copyLength = (int) MAXIMUM_PRIOR_PASSWORDS - 1;
             }
 
