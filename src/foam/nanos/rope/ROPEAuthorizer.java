@@ -106,29 +106,28 @@ public class ROPEAuthorizer implements Authorizer {
   }
 
   public List<FObject> getSourceObjects(X x, ROPE rope, FObject obj) {
-    DAO junctionDAO = (DAO) x.get(rope.getJunctionDAOKey());
-    DAO sourceDAO = (DAO) x.get(rope.getSourceDAOKey());
     List<FObject> sourceObjs = new ArrayList(); 
 
     if ( rope.getCardinality().equals("*:*") ) {
 
-      Object predicateProperty = rope.getIsInverse() ? rope.getJunctionModel().getAxiomByName("sourceId") : rope.getJunctionModel().getAxiomByName("targetId");
-      List<FObject> junctionObjs = ((ArraySink) junctionDAO
-        .where(
-          EQ(predicateProperty, (Long) retrieveProperty(obj, "get", "id"))
-        )
-        .select(new ArraySink()))
-        .getArray();
+      foam.dao.ManyToManyRelationshipImpl relationship = (foam.dao.ManyToManyRelationshipImpl) retrieveProperty(obj, "get", rope.getRelationshipKey(), x);
+      List<FObject> junctionObjs = (List<FObject>) ( (ArraySink) relationship.getJunctionDAO().where(
+        EQ(relationship.getJunction().getAxiomByName("sourceId"), (Long) retrieveProperty(obj, "get", "id"))
+      )
+      .select(new ArraySink()))
+      .getArray();
 
       for ( FObject junctionObj : junctionObjs ) {
-        FObject sourceObj = rope.getIsInverse() ? (FObject) sourceDAO.find(((Long)retrieveProperty(junctionObj, "get", "targetId")).longValue()) : (FObject) sourceDAO.find(((Long)retrieveProperty(junctionObj, "get", "sourceId")).longValue());
+        FObject sourceObj = (FObject) (((DAO) x.get(relationship.getTargetDAOKey()))
+                    .find(((Long)retrieveProperty(junctionObj, "get", "sourceId")).longValue()));
         sourceObjs.add(sourceObj);
-      }
+    }
+
     } else if ( rope.getCardinality().equals("*:1") ) {
-      DAO rDAO = retrieveProperty(obj, "get", rope.getInverseName(), x);
+      DAO rDAO = retrieveProperty(obj, "get", rope.getRelationshipKey(), x);
       sourceObjs = ((ArraySink) rDAO.where(INSTANCE_OF(rope.getSourceModel().getObjClass())).select(new ArraySink())).getArray();
     } else if (rope.getCardinality().equals("1:*") ) {
-      FObject sourceObj = retrieveProperty(obj, "find", rope.getInverseName(), x);
+      FObject sourceObj = retrieveProperty(obj, "find", rope.getRelationshipKey(), x);
       sourceObjs.add(sourceObj);
     } 
 
