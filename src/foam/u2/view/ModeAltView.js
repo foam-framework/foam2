@@ -15,6 +15,14 @@ foam.CLASS({
     'foam.u2.DisplayMode'
   ],
 
+  exports: [
+    // Override the behaviour of 'foam.u2.View' by exporting the __context__'s
+    // data as 'data' instead of this view's data. We do this because we don't
+    // want this view to change the context data, which child views might want to
+    // access.
+    'contextData as data'
+  ],
+
   properties: [
     {
       class: 'foam.u2.ViewSpec',
@@ -24,7 +32,14 @@ foam.CLASS({
       class: 'foam.u2.ViewSpec',
       name: 'writeView',
     },
-    'prop'
+    'prop',
+    {
+      name: 'contextData',
+      documentation: "See the comment in 'exports' above as to why this is necessary.",
+      factory: function() {
+        return this.__context__.data;
+      }
+    }
   ],
 
   methods: [
