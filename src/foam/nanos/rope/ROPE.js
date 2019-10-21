@@ -13,18 +13,6 @@ foam.CLASS({
 
     properties: [
       {
-        name: 'sourceModel',
-        class: 'Class',
-        javaType: 'foam.core.ClassInfo',
-        required: true
-      }, 
-      {
-        name: 'targetModel',
-        class: 'Class',
-        javaType: 'foam.core.ClassInfo',
-        required: true
-      },
-      {
         name: 'sourceDAOKey',
         class: 'String',
         required: true

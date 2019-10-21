@@ -118,7 +118,7 @@ public class ROPEAuthorizer implements Authorizer {
 
     } else if ( rope.getCardinality().equals("1:*") && rope.getIsInverse() ) {
       DAO rDAO = retrieveProperty(obj, "get", rope.getRelationshipKey(), x);
-      sourceObjs = ((ArraySink) rDAO.where(INSTANCE_OF(rope.getSourceModel().getObjClass())).select(new ArraySink())).getArray();
+      sourceObjs = ((ArraySink) rDAO.where(INSTANCE_OF(((DAO) x.get(rope.getSourceDAOKey())).getOf())).select(new ArraySink())).getArray();
     } else if (rope.getCardinality().equals("1:*") ) {
       FObject sourceObj = retrieveProperty(obj, "find", rope.getRelationshipKey(), x);
       sourceObjs.add(sourceObj);

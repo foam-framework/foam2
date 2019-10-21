@@ -209,40 +209,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function initForwardROPE(x) {
-      forwardROPE = foam.nanos.rope.ROPE.create({
-        sourceModel: this.sourceModel,
-        targetModel: this.targetModel,
-        sourceDAOKey: this.sourceDAOKey,
-        targetDAOKey: this.targetDAOKey,
-        cardinality: this.cardinality,
-        relationshipKey: this.forwardName,
-        crudMap: this.crudMap,
-        relationshipMap: this.relationshipMap,
-        isInverse: false
-      });
-      context = x || this.__context__;
-      ropeDAO = context['ropeDAO'];
-      ropeDAO.put(forwardROPE);
-    },
-
-    function initInverseROPE(x) {
-      inverseROPE = foam.nanos.rope.ROPE.create({
-        sourceModel: this.targetModel,
-        targetModel: this.sourceModel,
-        sourceDAOKey: this.targetDAOKey,
-        targetDAOKey: this.sourceDAOKey,
-        cardinality: this.cardinality,
-        relationshipKey: this.inverseName,
-        crudMap: this.inverseCrudMap,
-        relationshipMap: this.inverseRelationshipMap,
-        isInverse: true
-      });
-      context = x || this.__context__;
-      ropeDAO = context['ropeDAO'];
-      ropeDAO.put(inverseROPE);
-    },
-
     function initSource(x) {
       if ( this.sourceInitialized ) return;
       this.sourceInitialized = true;
@@ -286,8 +252,6 @@ foam.CLASS({
       }
 
       source.installAxiom(prop);
-      if ( this.generateRope ) this.initForwardROPE(x);
-
 
     },
     function initTarget(x) {
@@ -332,7 +296,6 @@ foam.CLASS({
       }
 
       target.installAxiom(prop);
-      if ( this.generateRope ) this.initInverseROPE(x);
     },
     function initJunction(x) {
       if ( this.junctionInitialized ) return;
@@ -1113,85 +1076,5 @@ foam.CLASS({
         readView: { class: 'foam.u2.view.ReadManyToManyRelationshipPropertyView' }
       }
     }
-  ],
-});
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'OneToManyRelationshipMethod',
-  extends: 'foam.core.Method',
-  properties: [
-    {
-      class: 'String',
-      name: 'target',
-    },
-    {
-      class: 'String',
-      name: 'targetPropertyName',
-    },
-    {
-      class: 'String',
-      name: 'targetDAOKey'
-    },
-    {
-      class: 'String',
-      name: 'unauthorizedTargetDAOKey'
-    },
-    {
-      name: 'args',
-      factory: function() {
-        return [
-          {
-            name: 'x',
-            type: 'Context'
-          }
-        ];
-      },
-    },
-    {
-      name: 'type',
-      value: 'foam.dao.DAO',
-    },
-    {
-      name: 'code',
-      expression: function(target, targetDAOKey, targetPropertyName) {
-        return function(x) {
-          return foam.dao.RelationshipDAO.create({
-            sourceId: this.id,
-            targetProperty: x.lookup(target).getAxiomByName(targetPropertyName),
-            targetDAOKey: targetDAOKey,
-            unauthorizedTargetDAOKey: this.unauthorizedTargetDAOKey
-          }, x);
-        }
-      },
-    },
-    {
-      name: 'swiftCode',
-      flags: ['swift'],
-      expression: function(target, targetPropertyName, targetDAOKey, unauthorizedTargetDAOKey) {
-        return `
-          return x?.create(foam_dao_RelationshipDAO.self, args: [
-            "sourceId": self.id,
-            "targetProperty": ${foam.swift.toSwiftName(target)}.${foam.String.constantize(targetPropertyName)}(),
-            "targetDAOKey": "${targetDAOKey}",
-            "unauthorizedTargetDAOKey": "${unauthorizedTargetDAOKey}"
-          ])!;
-        `
-      },
-    },
-    {
-      name: 'javaCode',
-      flags: ['java'],
-      expression: function(target, targetPropertyName, targetDAOKey, unauthorizedTargetDAOKey) {
-        return `
-          return new foam.dao.RelationshipDAO.Builder(x)
-              .setSourceId(getId())
-              .setTargetProperty(${target}.${foam.String.constantize(targetPropertyName)})
-              .setTargetDAOKey("${targetDAOKey}")
-              .setUnauthorizedTargetDAOKey("${unauthorizedTargetDAOKey}")
-              .build();
-        `
-      },
-    },
   ],
 });
