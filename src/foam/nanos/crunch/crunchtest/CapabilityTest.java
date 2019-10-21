@@ -71,11 +71,43 @@ public class CapabilityTest extends Test {
     p4 = new String("p4");
     p5 = new String("p5");
 
+    testPrerequisiteCapability(x);
     testUserRemovalRule(x);
     testCapabilityAuthService(x);
+    testCapabilityExpires(x);
     testDeprecatedCapabiltiyJunctionRules(x);
     testCapabilityJunctions(x);
     testCapability(x);
+  }
+
+  public void testPrerequisiteCapability(X x) {
+    User user = new User();
+    user.setFirstName("testuser");
+    user.setId(888);
+    user = (User) userDAO.put_(x, user);
+    Capability dep = new Capability();
+    dep.setId("c1");
+    Capability pre = new Capability();
+    pre.setId("c2");
+    dep = (Capability) capabilityDAO.put(dep);
+    pre = (Capability) capabilityDAO.put(pre);
+
+    CapabilityCapabilityJunction ccjunction = new CapabilityCapabilityJunction();
+    ccjunction.setSourceId(dep.getId());
+    ccjunction.setTargetId(pre.getId());
+    ccjunction = (CapabilityCapabilityJunction) prerequisiteCapabilityJunctionDAO.put_(x, ccjunction);
+
+    UserCapabilityJunction ucjunction = new UserCapabilityJunction();
+    ucjunction.setSourceId(user.getId());
+    ucjunction.setTargetId(dep.getId());
+    ucjunction = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, ucjunction);
+
+    List<UserCapabilityJunction> userCapabilityJunctions = (List<UserCapabilityJunction>) ((ArraySink) userCapabilityJunctionDAO
+        .where(EQ(UserCapabilityJunction.SOURCE_ID, user.getId()))
+        .select(new ArraySink()))
+        .getArray();
+
+    test(userCapabilityJunctions.size() > 0, "num of junctions: "+userCapabilityJunctions.size());
   }
 
   public void testUserRemovalRule(X x) {
@@ -199,6 +231,49 @@ public class CapabilityTest extends Test {
     test(auth.checkUser(x, u1, "permission.other.read.all"), "user does have permission permission.other.read.all");
     test(!auth.checkUser(x, u1, "permission.other.write"), "user does not have permission permission.other.write");
 
+  }
+
+  public void testCapabilityExpires(X x) {
+
+    User user = new User();
+    user.setFirstName("TestCapabilityExpireUser");
+    user.setId(9001);
+    user = (User) userDAO.put_(x, user);
+
+    AuthService auth = (AuthService) x.get("auth");
+
+    String permission1 = "permission.crunch.*";
+
+    FakeTestObject data = new FakeTestObject();
+    data.setUsername("RUBY");
+    data.setPassword("PASS");
+
+    Capability crunch = new Capability();
+    crunch.setId("crunch.*");
+    crunch.setPermissionsGranted(new String[] {permission1});
+    crunch.setOf(FakeTestObject.getOwnClassInfo());
+    crunch = (Capability) capabilityDAO.put_(x, crunch);
+
+    UserCapabilityJunction grantCrunch = new UserCapabilityJunction();
+    grantCrunch.setSourceId(user.getId());
+    grantCrunch.setTargetId((String) crunch.getId());
+    grantCrunch.setData((FObject) data);
+    grantCrunch.setExpiry((Date) ((new GregorianCalendar(2038, Calendar.JULY, 1)).getTime()));
+    System.out.println(grantCrunch.getExpiry().toString());
+    userCapabilityJunctionDAO.put_(x, grantCrunch);
+
+    // test that user has permissions before capability junction expires
+    test(auth.checkUser(x, user, "crunch.*"), "before expiry, user has capability crunch.*");
+    test(auth.checkUser(x, user, "permission.crunch.*"), "before expiry, user has permission permission.crunch.*");
+
+    // expire the cabability-user junction
+    grantCrunch.setExpiry((Date) ((new GregorianCalendar(1970, Calendar.JULY, 1)).getTime()));
+    System.out.println(grantCrunch.getExpiry().toString());
+    userCapabilityJunctionDAO.put_(x, grantCrunch);
+
+    // test that user loses permissions after capability expires
+    test(!auth.checkUser(x, user, "crunch.*"), "after expiry, user loses capability crunch.*");
+    test(!auth.checkUser(x, user, "permission.crunch.*"), "after expiry, user loses permission permission.crunch.*");
   }
 
   public void testDeprecatedCapabiltiyJunctionRules(X x) {
