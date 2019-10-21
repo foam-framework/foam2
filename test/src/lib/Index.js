@@ -86,7 +86,7 @@ var createData2 = function createData2(dataCount) {
   var arr = [];
   var count = dataCount || 20;
 
-  for (var i = 0; i < count; i++ ) {
+  for ( var i = 0 ; i < count ; i++ ) {
     arr.push({
       int: i,
       float: count - i,

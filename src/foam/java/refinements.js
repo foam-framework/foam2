@@ -35,7 +35,8 @@ foam.LIB({
           return b ? "true" : "false";
         },
         Number: function(n) {
-          return '' + n + (n > Math.pow(2, 31) ? 'L' : '');
+          return '' + n +
+            (n > Math.pow(2, 31) || n < -Math.pow(2,31) ? 'L' : '');
         },
         FObject: function(o) {
           return o.asJavaValue();
@@ -68,6 +69,11 @@ ${Object.keys(o).map(function(k) {
           o = o.replace(/\\/g, '\\\\')
           return `java.util.regex.Pattern.compile("${o}")`
         },
+        Date: function(d) {
+          var n = d.getTime();
+          return `new java.util.Date(` + n +
+            (n > Math.pow(2, 31) || n < -Math.pow(2,31) ? 'L' : '') + `)`
+        }
       })
     },
     {
@@ -291,7 +297,8 @@ foam.CLASS({
         csvParser:               this.javaCSVParser,
         extends:                 this.javaInfoType,
         networkTransient:        this.networkTransient,
-        permissionRequired:      this.permissionRequired,
+        readPermissionRequired:  this.readPermissionRequired,
+        writePermissionRequired: this.writePermissionRequired,
         storageTransient:        this.storageTransient,
         xmlAttribute:            this.xmlAttribute,
         xmlTextNode:             this.xmlTextNode,
@@ -483,6 +490,7 @@ foam.LIB({
 
       cls.name = this.model_.name;
       cls.package = this.model_.package;
+      cls.source = this.model_.source;
       cls.abstract = this.model_.abstract;
       cls.documentation = this.model_.documentation;
 
@@ -1870,7 +1878,7 @@ foam.CLASS({
         visibility: 'public',
         type: this.of.id,
         args: [ { name: 'x', type: 'foam.core.X' } ],
-        body: `return (${this.of.id})((foam.dao.DAO) x.get("${this.targetDAOKey}")).find_(x, (Object) get${foam.String.capitalize(this.name)}());`
+        body: `return (${this.of.id})((foam.dao.DAO) x.get("${this.unauthorizedTargetDAOKey || this.targetDAOKey}")).find_(x, (Object) get${foam.String.capitalize(this.name)}());`
       });
     }
   ]

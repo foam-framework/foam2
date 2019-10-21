@@ -21,10 +21,26 @@ foam.ENUM({
 
   documentation: 'CRUD controller modes: CREATE/VIEW/EDIT.',
 
+  properties: [
+    {
+      class: 'String',
+      name: 'modePropertyName'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'getMode',
+      code: function(prop) {
+        return prop[this.modePropertyName];
+      }
+    }
+  ],
+
   values: [
-    { name: 'CREATE', label: 'Create' },
-    { name: 'VIEW',   label: 'View'   },
-    { name: 'EDIT',   label: 'Edit'   }
+    { name: 'CREATE', label: 'Create', modePropertyName: 'createMode' },
+    { name: 'VIEW',   label: 'View',   modePropertyName: 'readMode'   },
+    { name: 'EDIT',   label: 'Edit',   modePropertyName: 'updateMode' }
   ]
 });
 
@@ -850,7 +866,11 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'tooltip'
+      name: 'tooltip',
+      postSet: function(o, n) {
+        if ( ! o && n ) this.initTooltip();
+        return n;
+      }
     },
     {
       name: 'parentNode',
@@ -1050,7 +1070,11 @@ foam.CLASS({
     },
 
     function initTooltip() {
-      if ( this.tooltip ) this.Tooltip.create({target: this, text:this.tooltip});
+      if ( this.tooltip ) {
+        this.Tooltip.create({target: this, text$: this.tooltip$});
+      } else if ( this.getAttribute('title') ) {
+        this.Tooltip.create({target: this, text$: this.attrSlot('title')});
+      }
     },
 
     function initKeyboardShortcuts() {
@@ -2138,9 +2162,37 @@ foam.CLASS({
       value: { class: 'foam.u2.TextField' }
     },
     {
+      // DEPRECATED: Use 'createMode', 'readMode', and 'updateMode' instead.
       class: 'Enum',
       of: 'foam.u2.Visibility',
       name: 'visibility',
+      value: 'RW'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
+      name: 'createMode',
+      documentation: 'The display mode for this property when the controller mode is CREATE.',
+      assertValue: function(newValue) {
+        foam.assert(newValue === foam.u2.DisplayMode.RW || newValue === foam.u2.DisplayMode.HIDDEN, `Create mode must be RW or HIDDEN. Property '${this.of ? this.of.id + '.' : ''}${this.name}' was '${newValue.label}' and must be fixed.`);
+      },
+      value: 'RW'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
+      name: 'readMode',
+      documentation: 'The display mode for this property when the controller mode is VIEW.',
+      assertValue: function(newValue) {
+        foam.assert(newValue === foam.u2.DisplayMode.RO || newValue === foam.u2.DisplayMode.HIDDEN, `Read mode must be RO or HIDDEN. Property '${this.of ? this.of.id + '.' : ''}${this.name}' was '${newValue.label}' and must be fixed.`);
+      },
+      value: 'RO'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
+      name: 'updateMode',
+      documentation: 'The display mode for this property when the controller mode is EDIT.',
       value: 'RW'
     },
     {
@@ -2194,11 +2246,12 @@ foam.CLASS({
           obj$: data$,
           code: this.visibilityExpression
         }) :
-        foam.core.ConstantSlot.create({value: this.visibility});
+        foam.core.ConstantSlot.create({ value: this.visibility });
 
-      if ( this.permissionRequired ) {
+      // TODO: Do something smarter than this.
+      if ( this.readPermissionRequired || this.writePermissionRequired ) {
         var visSlot  = slot;
-        var permSlot = data$.map(data => {
+        var permSlot = data$.map((data) => {
           if ( ! data || ! data.__subContext__.auth ) return Visibility.HIDDEN;
           var auth = data.__subContext__.auth;
 
@@ -2209,11 +2262,11 @@ foam.CLASS({
               .then(function(rw) {
                 if ( rw ) return Visibility.RW;
                 return auth.check(null, `${clsName}.ro.${propName}`)
-                  .then(ro => ro ? Visibility.RO : Visibility.HIDDEN);
+                  .then((ro) => ro ? Visibility.RO : Visibility.HIDDEN);
               });
         });
 
-        slot = foam.core.ArraySlot.create({slots: [visSlot, permSlot]}).map(arr => {
+        slot = foam.core.ArraySlot.create({ slots: [visSlot, permSlot] }).map((arr) => {
           var vis  = arr[0];
           var perm = arr[1] || Visibility.HIDDEN;
 
@@ -2234,12 +2287,14 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'StringDisplayWidthRefinement',
   refines: 'foam.core.String',
+  requires: [ 'foam.u2.view.StringView' ],
   properties: [
     {
       class: 'Int',
       name: 'displayWidth',
       expression: function(width) { return width; }
-    }
+    },
+    [ 'view', { class: 'foam.u2.view.StringView' } ]
   ]
 });
 
@@ -2248,6 +2303,7 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'StringArrayViewRefinement',
   refines: 'foam.core.StringArray',
+  requires: [ 'foam.u2.view.StringArrayView' ],
   properties: [
     [ 'view', { class: 'foam.u2.view.StringArrayView' } ]
   ]
@@ -2258,8 +2314,9 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'DateViewRefinement',
   refines: 'foam.core.Date',
+  requires: [ 'foam.u2.view.DateView' ],
   properties: [
-    [ 'view', { class: 'foam.u2.DateView' } ]
+    [ 'view', { class: 'foam.u2.view.DateView' } ]
   ]
 });
 
@@ -2268,8 +2325,9 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'DateTimeViewRefinement',
   refines: 'foam.core.DateTime',
+  requires: [ 'foam.u2.view.DateTimeView' ],
   properties: [
-    [ 'view', { class: 'foam.u2.DateTimeView' } ]
+    [ 'view', { class: 'foam.u2.view.DateTimeView' } ]
   ]
 });
 
@@ -2278,9 +2336,9 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'TimeViewRefinement',
   refines: 'foam.core.Time',
-  requires: [ 'foam.u2.TimeView' ],
+  requires: [ 'foam.u2.view.TimeView' ],
   properties: [
-    [ 'view', { class: 'foam.u2.TimeView' } ]
+    [ 'view', { class: 'foam.u2.view.TimeView' } ]
   ]
 });
 
@@ -2289,10 +2347,10 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'FloatViewRefinement',
   refines: 'foam.core.Float',
-  requires: [ 'foam.u2.FloatView' ],
+  requires: [ 'foam.u2.view.FloatView' ],
   properties: [
     [ 'displayWidth', 12 ],
-    [ 'view', { class: 'foam.u2.FloatView' } ]
+    [ 'view', { class: 'foam.u2.view.FloatView' } ]
   ]
 });
 
@@ -2301,10 +2359,10 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'IntViewRefinement',
   refines: 'foam.core.Int',
-  requires: [ 'foam.u2.IntView' ],
+  requires: [ 'foam.u2.view.IntView' ],
   properties: [
     [ 'displayWidth', 10 ],
-    [ 'view', { class: 'foam.u2.IntView' } ]
+    [ 'view', { class: 'foam.u2.view.IntView' } ]
   ]
 });
 
@@ -2313,10 +2371,10 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'CurrencyViewRefinement',
   refines: 'foam.core.Currency',
-  requires: [ 'foam.u2.CurrencyView' ],
+  requires: [ 'foam.u2.view.CurrencyView' ],
   properties: [
     [ 'displayWidth', 15 ],
-    [ 'view', { class: 'foam.u2.CurrencyView' } ]
+    [ 'view', { class: 'foam.u2.view.CurrencyView' } ]
   ]
 });
 
@@ -2352,13 +2410,27 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'ColorViewRefinement',
   refines: 'foam.core.Color',
+  requires: [
+    'foam.u2.MultiView',
+    'foam.u2.TextField',
+    'foam.u2.view.ColorPicker',
+    'foam.u2.view.ModeAltView',
+    'foam.u2.view.ReadColorView'
+  ],
   properties: [
     {
       name: 'view',
       value: {
-        class: 'foam.u2.view.DualView',
-        viewa: 'foam.u2.TextField',
-        viewb: { class: 'foam.u2.view.ColorPicker', onKey: true }
+        class: 'foam.u2.view.ModeAltView',
+        readView: { class: 'foam.u2.view.ReadColorView' },
+        writeView: {
+          class: 'foam.u2.MultiView',
+          views: [
+            { class: 'foam.u2.TextField' },
+            { class: 'foam.u2.view.ColorPicker', onKey: true },
+            { class: 'foam.u2.view.ReadColorView' }
+          ]
+        }
       }
     }
   ]
@@ -2369,10 +2441,11 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'FObjectPropertyViewRefinement',
   refines: 'foam.core.FObjectProperty',
+  requires: [ 'foam.u2.view.FObjectPropertyView' ],
   properties: [
     {
       name: 'view',
-      value: { class: 'foam.u2.DetailView' },
+      value: { class: 'foam.u2.view.FObjectPropertyView' },
     },
     {
       name: 'validationTextVisible',
@@ -2436,13 +2509,9 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'ReferenceViewRefinement',
   refines: 'foam.core.Reference',
+  requires: [ 'foam.u2.view.ReferencePropertyView' ],
   properties: [
-    {
-      name: 'view',
-      value: {
-        class: 'foam.u2.view.ReferenceView'
-      }
-    }
+    [ 'view', { class: 'foam.u2.view.ReferencePropertyView' } ]
   ]
 });
 
@@ -2451,9 +2520,32 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'EnumViewRefinement',
   refines: 'foam.core.Enum',
+  requires: [ 'foam.u2.view.EnumView' ],
   properties: [
-    [ 'view',          { class: 'foam.u2.EnumView' } ],
+    [ 'view', { class: 'foam.u2.view.EnumView' } ],
     [ 'tableCellView', function(obj) { return this.get(obj).label; } ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'ObjectViewRefinement',
+  refines: 'foam.core.Object',
+  requires: [ 'foam.u2.view.AnyView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.view.AnyView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'CodeViewRefinement',
+  refines: 'foam.core.Code',
+  requires: [ 'foam.u2.view.CodeView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.view.CodeView' } ]
   ]
 });
 

@@ -34,13 +34,13 @@ foam.CLASS({
   package: 'foam.core',
   name: 'ModelSourceRefinement',
   refines: 'foam.core.Model',
-  flags: ['debug'],
+  flags: [ 'debug' ],
 
   properties: [
     {
       name: 'source',
-      transient: true,
-    },
+      transient: true
+    }
   ],
 
   methods: [
@@ -66,7 +66,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'ListenerValidateRefinement',
   refines: 'foam.core.Listener',
-  flags: ['debug'],
+  flags: [ 'debug' ],
 
   methods: [
     function validate() {
@@ -84,13 +84,13 @@ foam.CLASS({
   package: 'foam.core',
   name: 'PropertyValidateRefinement',
   refines: 'foam.core.Property',
-  flags: ['debug'],
+  flags: [ 'debug' ],
 
   properties: [
     {
       name: 'source',
-      transient: true,
-    },
+      transient: true
+    }
   ],
 
   methods: [
@@ -153,137 +153,133 @@ foam.CLASS({
   ]
 });
 
+
 foam.SCRIPT({
   package: 'foam.core',
   name: 'DebugScript',
-  flags: ['debug'],
+  flags: [ 'debug' ],
   code: function() {
-foam.assert(
-    ! foam.core.FObject.describe,
-    'foam.core.FObject.describe already set.');
-
-/* Add describe() support to classes. */
-foam.core.FObject.describe = function(opt_name) {
-  console.log('CLASS:  ', this.name);
-  console.log('extends:', this.model_.extends);
-  console.log('Axiom Type           Source Class   Name                 Source Path');
-  console.log('-------------------------------------------------------------------------------------------------');
-  for ( var key in this.axiomMap_ ) {
-    var a = this.axiomMap_[key];
-    console.log(
-      foam.String.pad(a.cls_ ? a.cls_.name : 'anonymous', 20),
-      foam.String.pad((a.sourceCls_ && a.sourceCls_.name) || 'unknown', 14),
-      foam.String.pad(a.name, 20),
-      a.source || '');
-  }
-  console.log('\n');
-};
+  /* Add describe() support to classes. */
+  foam.core.FObject.describe = function(opt_name) {
+    console.log('CLASS:  ', this.name);
+    console.log('extends:', this.model_.extends);
+    console.log('Axiom Type           Source Class   Name                 Source Path');
+    console.log('-------------------------------------------------------------------------------------------------');
+    for ( var key in this.axiomMap_ ) {
+      var a = this.axiomMap_[key];
+      console.log(
+        foam.String.pad(a.cls_ ? a.cls_.name : 'anonymous', 20),
+        foam.String.pad((a.sourceCls_ && a.sourceCls_.name) || 'unknown', 14),
+        foam.String.pad(a.name, 20),
+        a.source || '');
+    }
+    console.log('\n');
+  };
 
 
-// Decorate installModel() to verify that axiom names aren't duplicated.
-foam.core.FObject.installModel = function() {
-  var superInstallModel = foam.core.FObject.installModel;
+  // Decorate installModel() to verify that axiom names aren't duplicated.
+  foam.core.FObject.installModel = function() {
+    var superInstallModel = foam.core.FObject.installModel;
 
-  return function(m) {
-    var names = {};
+    return function(m) {
+      var names = {};
 
-    for ( var i = 0 ; i < m.axioms_.length ; i++ ) {
-      var a = m.axioms_[i];
+      for ( var i = 0 ; i < m.axioms_.length ; i++ ) {
+        var a = m.axioms_[i];
 
-      foam.assert(
-        ! names.hasOwnProperty(a.name),
-        'Axiom name conflict in', m.id || m.refines, ':', a.name);
+        foam.assert(
+          ! names.hasOwnProperty(a.name),
+          'Axiom name conflict in', m.id || m.refines, ':', a.name);
 
-      var prevA    = this.getAxiomByName(a.name);
-      var Property = foam.core.Property;
-      // Potential failure if:
-      //    previousAxiom class does not match newAxiom class
-      // But ignore valid cases:
-      //    base Property extended by subclass of Property
-      //    subclass of Property extended without specifying class
-      if (  prevA && prevA.cls_ !== a.cls_ &&
-          ! ( prevA.cls_ === Property && Property.isSubClass(a.cls_) ) &&
-          ! ( Property.isSubClass(prevA.cls_) && a.cls_ === Property )
-      ) {
-        var prevCls = prevA.cls_ ? prevA.cls_.id : 'anonymous';
-        var aCls    = a.cls_     ? a.cls_.id     : 'anonymous';
+        var prevA    = this.getAxiomByName(a.name);
+        var Property = foam.core.Property;
+        // Potential failure if:
+        //    previousAxiom class does not match newAxiom class
+        // But ignore valid cases:
+        //    base Property extended by subclass of Property
+        //    subclass of Property extended without specifying class
+        if (  prevA && prevA.cls_ !== a.cls_ &&
+            ! ( prevA.cls_ === Property && Property.isSubClass(a.cls_) ) &&
+            ! ( Property.isSubClass(prevA.cls_) && a.cls_ === Property )
+        ) {
+          var prevCls = prevA.cls_ ? prevA.cls_.id : 'anonymous';
+          var aCls    = a.cls_     ? a.cls_.id     : 'anonymous';
 
-        if ( Property.isSubClass(prevA.cls_) && ! Property.isSubClass(a.cls_) ) {
-          throw 'Illegal to change Property to non-Property: ' +
-            this.id + '.' +
-            a.name +
-            ' changed to ' +
-            aCls;
-        } else if ( foam.core.Method.isSubClass(prevA.cls_) && foam.core.Method.isSubClass(a.cls_) ) {
-          // NOP
-        } else if ( prevA.cls_ ) {
-          // FUTURE: make error when supression supported
-          console.warn(
-              'Change of Axiom ' +
+          if ( Property.isSubClass(prevA.cls_) && ! Property.isSubClass(a.cls_) ) {
+            throw 'Illegal to change Property to non-Property: ' +
               this.id + '.' +
               a.name +
-              ' type from ' +
-              prevCls +
-              ' to ' +
-              aCls +
-              ' in model ' +
-              m.id);
+              ' changed to ' +
+              aCls;
+          } else if ( foam.core.Method.isSubClass(prevA.cls_) && foam.core.Method.isSubClass(a.cls_) ) {
+            // NOP
+          } else if ( prevA.cls_ ) {
+            // FUTURE: make error when supression supported
+            console.warn(
+                'Change of Axiom ' +
+                this.id + '.' +
+                a.name +
+                ' type from ' +
+                prevCls +
+                ' to ' +
+                aCls +
+                ' in model ' +
+                m.id);
+          }
         }
+
+        names[a.name] = a;
       }
 
-      names[a.name] = a;
+      superInstallModel.call(this, m);
+    };
+  }();
+
+  foam.core.FObject.validate = function() {
+    // TODO: Why doesn't this call super or also validateInstance?
+    for ( var key in this.axiomMap_ ) {
+      var a = this.axiomMap_[key];
+      a.validateClass && a.validateClass(this);
     }
-
-    superInstallModel.call(this, m);
-  };
-}();
-
-foam.core.FObject.validate = function() {
-  // TODO: Why doesn't this call super or also validateInstance?
-  for ( var key in this.axiomMap_ ) {
-    var a = this.axiomMap_[key];
-    a.validateClass && a.validateClass(this);
   }
-}
 
-// Change 'false' to 'true' to enable error reporting for setting
-// non-Properties on FObjects.
-// TODO: add 'Did you mean...' support.
-if ( false && global.Proxy ) {
-  (function() {
+  // Change 'false' to 'true' to enable error reporting for setting
+  // non-Properties on FObjects.
+  // TODO: add 'Did you mean...' support.
+  if ( false && global.Proxy ) {
+    (function() {
 
-    var IGNORE = {
-      oldValue: true,
-      SUPER: true,
-      obj: true,
-      private_: true,
-      prop: true,
-      slotName_: true,
-      sourceCls_: true,
-      value: true
-    };
+      var IGNORE = {
+        oldValue:   true,
+        SUPER:      true,
+        obj:        true,
+        private_:   true,
+        prop:       true,
+        slotName_:  true,
+        sourceCls_: true,
+        value:      true
+      };
 
-    var oldCreate = foam.core.FObject.create;
+      var oldCreate = foam.core.FObject.create;
 
-    foam.core.FObject.create = function(args, ctx) {
-      return new Proxy(oldCreate.call(this, args, ctx), {
-        get: function(target, prop, receiver) {
-          return Reflect.get(target, prop, receiver);
-        },
-        set: function(target, prop, value, receiver) {
-          foam.assert(
-              IGNORE[prop] || target.cls_.getAxiomByName(
-                prop.endsWith('$') ? prop.substring(0, prop.length-1) : prop),
-              'Invalid Set: ', target.cls_.id, prop, value);
-          Reflect.set(target, prop, value, receiver);
-          return true;
-        }
-      });
-    };
-  })();
-}
+      foam.core.FObject.create = function(args, ctx) {
+        return new Proxy(oldCreate.call(this, args, ctx), {
+          get: function(target, prop, receiver) {
+            return Reflect.get(target, prop, receiver);
+          },
+          set: function(target, prop, value, receiver) {
+            foam.assert(
+                IGNORE[prop] || target.cls_.getAxiomByName(
+                  prop.endsWith('$') ? prop.substring(0, prop.length-1) : prop),
+                'Invalid Set: ', target.cls_.id, prop, value);
+            Reflect.set(target, prop, value, receiver);
+            return true;
+          }
+        });
+      };
+    })();
   }
-});
+}});
 
 
 /* Add describe() support to objects. */
@@ -291,7 +287,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'FObjectDescribeRefinement',
   refines: 'foam.core.FObject',
-  flags: ['debug'],
+  flags: [ 'debug' ],
 
   methods: [
     function unknownArg(key, value) {
@@ -327,10 +323,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.SCRIPT({
   package: 'foam.core',
   name: 'DebugDescribeScript',
-  flags: ['debug'],
+  flags: [ 'debug' ],
   code: function() {
     /* Add describe support to contexts. */
     foam.__context__ = foam.__context__.createSubContext({
@@ -361,7 +358,7 @@ foam.CLASS({
   name: 'Window',
 
   documentation: 'Decorated merged() and framed() to have debug friendly ' +
-      'toString() methods.',
+    'toString() methods.',
 
   exports: [ 'merged', 'framed' ],
 
@@ -383,17 +380,17 @@ foam.CLASS({
   ]
 });
 
+
 foam.SCRIPT({
   package: 'foam.core',
   name: 'DebugContextScript',
-  requires: [
-    'foam.debug.Window',
-  ],
-  flags: ['debug'],
+  requires: [ 'foam.debug.Window' ],
+  flags: [ 'debug' ],
   code: function() {
-foam.__context__ = foam.debug.Window.create(null, foam.__context__).__subContext__;
+    foam.__context__ = foam.debug.Window.create(null, foam.__context__).__subContext__;
   }
-})
+});
+
 
 foam.SCRIPT({
   package: 'foam.core',
@@ -404,11 +401,12 @@ foam.SCRIPT({
   }
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'FObjectValidateImportsRefinement',
   refines: 'foam.core.FObject',
-  flags: ['debug'],
+  flags: [ 'debug' ],
 
   documentation: 'Assert that all required imports are provided.',
 
@@ -432,7 +430,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'ImportValidationRefinement',
   refines: 'foam.core.Import',
-  flags: ['debug'],
+  flags: [ 'debug' ],
 
   properties: [
     {
@@ -464,9 +462,9 @@ foam.CLASS({
   package: 'foam.core',
   name: 'FObjectDescribeListenersRefinement',
   refines: 'foam.core.FObject',
-  flags: ['debug'],
+  flags: [ 'debug' ],
 
-  documentation: '.',
+  documentation: 'Add describeListeners() method to FObject.',
 
   methods: [
     function describeListeners() {

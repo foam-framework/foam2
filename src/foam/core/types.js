@@ -100,7 +100,10 @@ foam.CLASS({
         if ( typeof d === 'string' ) {
           var ret = new Date(d);
 
-          if ( isNaN(ret.getTime()) ) throw 'Invalid Date: ' + d;
+          if ( isNaN(ret.getTime()) ) {
+            ret = new Date((Number.MAX_SAFE_INTEGER || Number.MAX_VALUE) * 0.9);
+            console.warn("Invalid date: " + d + "; assuming "+ret.toISOString()+".");
+          }
 
           return ret;
         }
@@ -474,6 +477,13 @@ foam.CLASS({
   name: 'PhoneNumber',
   extends: 'String',
   label: 'Phone number'
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Code',
+  extends: 'String'
 });
 
 

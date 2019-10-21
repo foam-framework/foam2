@@ -171,6 +171,11 @@ foam.CLASS({
         o.out('new ', this.extends, '()');
       } else if ( ! this.innerClass ) {
         o.out('// WARNING: GENERATED CODE, DO NOT MODIFY BY HAND!\n');
+        if ( typeof this.source === 'undefined' ) {
+          o.out('// SOURCE: <implied class>\n');
+        } else {
+          o.out('// SOURCE: ' + this.source + '\n');
+        }
 
         o.out('package ', this.package, ';\n\n');
 

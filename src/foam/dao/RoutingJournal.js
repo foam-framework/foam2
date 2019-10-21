@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -38,51 +38,54 @@ try {
       `
     },
     {
-      name: 'put_',
-      javaCode: `
-        try {
-          String service = (String) x.get("service");
-          String record = ( old != null ) ?
-            getOutputter().stringifyDelta(old, nu) :
-            getOutputter().stringify(nu);
-
-          if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
-            writeComment_(x, nu);
-            write_(sb.get()
-              .append(service)
-              .append(".p(")
-              .append(record)
-              .append(")")
-              .toString());
-          }
-        } catch ( Throwable t ) {
-          getLogger().error("Failed to write put entry to journal", t);
-          throw new RuntimeException(t);
+      name: 'writePut_',
+      javaThrows: [
+        'java.io.IOException'
+      ],
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'record',
+          type: 'String'
+        },
+        {
+          name: 'c',
+          type: 'String'
         }
+      ],
+      javaCode: `
+        String service = (String) x.get("service");
+        write_(sb.get()
+          .append(service)
+          .append(".p(")
+          .append(record)
+          .append(")")
+          .toString());
       `
     },
     {
-      name: 'remove',
-      javaCode: `
-        try {
-          String service = (String) x.get("service");
-          foam.core.FObject toWrite = (foam.core.FObject) obj.getClassInfo().newInstance();
-          toWrite.setProperty("id", obj.getProperty("id"));
-          String record = getOutputter().stringify(toWrite);
-
-          if ( ! foam.util.SafetyUtil.isEmpty(record) ) {
-            writeComment_(x, obj);
-            write_(sb.get()
-              .append(service)
-              .append(".r(")
-              .append(record)
-              .append(")")
-              .toString());
-          }
-        } catch ( Throwable t ) {
-          getLogger().error("Failed to write remove entry to journal", t);
-          throw new RuntimeException(t);
+      name: 'writeRemove_',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'record',
+          type: 'String'
         }
+      ],
+      javaCode: `
+        String service = (String) x.get("service");
+        write_(sb.get()
+          .append(service)
+          .append(".r(")
+          .append(record)
+          .append(")")
+          .toString());
       `
     },
     {

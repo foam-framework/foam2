@@ -80,12 +80,14 @@ setCloseTimeExpr(new foam.glang.EndOfTimeSpan.Builder(getX())
 
         synchronized ( getLock(key) ) {
           Candlestick c = (Candlestick) getDao().find(id);
+
           if ( c == null ) {
             c = new Candlestick(x);
             c.setCloseTime(id.getCloseTime());
             c.setKey(key);
             c.init_();
           }
+
           c.add(value, time);
 
           getDao().put(c);

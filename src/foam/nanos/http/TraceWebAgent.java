@@ -7,16 +7,15 @@
 package foam.nanos.http;
 
 import foam.core.*;
-import foam.nanos.http.HttpParameters;
-import foam.nanos.logger.Logger;
 import foam.lib.json.Outputter;
 import foam.lib.json.OutputterMode;
-
+import foam.nanos.http.HttpParameters;
+import foam.nanos.logger.Logger;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Enumeration;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

@@ -26,7 +26,7 @@ public class ScanPlan
   protected Predicate  predicate_;
   protected long       cost_;
   protected Index      tail_;
-  protected boolean    reverseSort_ = false;
+  protected boolean    reverse_ = false;
 
   // TODO: add ThenBy support for 'order'
   public ScanPlan(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate, PropertyInfo propertyInfo, Index tail) {
@@ -51,12 +51,9 @@ public class ScanPlan
       if ( order_.toString().equals(propertyInfo.toString()) ) {
         // If the index is same with the property we would like to order, the order could be set to null. Because the order is already correct in the tree set.
         order_ = null;
-      } else if ( order_ instanceof Desc ) {
-        // ???: Why do we do a toString() here?
-        if ( ((Desc) order_).getArg1().toString().equals(propertyInfo.toString()) ) {
-          reverseSort_ = true;
-          order_       = null;
-        }
+      } else if ( order_ instanceof Desc && ((Desc) order_).getArg1().toString().equals(propertyInfo.toString()) ) {
+        reverse_ = true;
+        order_   = null;
       } else {
         sortRequired = true;
         cost *= Math.log(cost) / Math.log(2);
@@ -77,6 +74,6 @@ public class ScanPlan
   public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( state_ == null ) return;
     // Use the stale_, skip_, limit_, order_, predicate_... which we have already pre-processed.
-    ( (TreeNode) state ).select((TreeNode) state_, sink, skip_, limit_, order_, predicate_, tail_, reverseSort_);
+    ((TreeNode) state).select((TreeNode) state_, sink, skip_, limit_, order_, predicate_, tail_, reverse_);
   }
 }

@@ -75,5 +75,9 @@ foam.CLASS({
     ^ .disabled {
       color: #aaa;
     }
+
+    ^td .foam-u2-ActionView {
+      padding: 4px 12px;
+    }
   `,
 });

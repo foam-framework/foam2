@@ -13,19 +13,18 @@ import static foam.mlang.MLang.INSTANCE_OF;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import foam.core.PropertyInfo;
+
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
-import foam.dao.history.PropertyUpdate;
-import foam.nanos.auth.User;
 import foam.nanos.auth.AuthorizationException;
 import foam.nanos.auth.Authorizer;
+import foam.nanos.auth.User;
 import foam.nanos.rope.ROPE;
 
 public class ROPEAuthorizer implements Authorizer {
@@ -40,7 +39,7 @@ public class ROPEAuthorizer implements Authorizer {
     targetDAOKey_ = targetDAOKey;
   }
 
-  public boolean ropeSearch(X x, FObject obj, String targetDAOKey, String crudKey, String relationshipKey, List<PropertyUpdate> diff) {
+  public boolean ropeSearch(X x, FObject obj, String targetDAOKey, String crudKey, String relationshipKey, String propertyKey) {
 
     // get all the ropes associated with the targetDAO
     DAO filteredRopeDAO = (DAO) ropeDAO_.where(AND(EQ(ROPE.TARGET_DAOKEY, targetDAOKey)));
@@ -56,7 +55,7 @@ public class ROPEAuthorizer implements Authorizer {
     for ( ROPE rope : ropes ) {
 
       // get the list of next relationships to search to pass this rope
-      List<String> nextRelationships = getNextRelationships(relationshipKey, crudKey, diff);
+      List<String> nextRelationships = getNextRelationships(rope, relationshipKey, crudKey, propertyKey);
 
       // if a there are no results, continue to the next rope
       if ( nextRelationships == null || nextRelationships.size() == 0 ) continue;
@@ -66,11 +65,11 @@ public class ROPEAuthorizer implements Authorizer {
 
       for ( FObject sourceObj : sourceObjs ) {
         if ( nextRelationships.contains("__terminates__") ) {
-          if ( sourceObj instanceof User && sourceObj.getId() == user_.getId() ) return true;
+          if ( sourceObj instanceof User && ((User) sourceObj).getId() == user_.getId() ) return true;
           else continue;
         }
         for ( String nextRelationship : nextRelationships ) {
-          if ( ropeSearch(x, sourceObj, rope.getSourceDAOKey(), "", nextRelationship) ) return true;
+          if ( ropeSearch(x, sourceObj, rope.getSourceDAOKey(), "", nextRelationship, "") ) return true;
         }
       }
     }
@@ -78,25 +77,19 @@ public class ROPEAuthorizer implements Authorizer {
     return false; 
   }
 
-  public List<String> getNextRelationships(String relationshipKey, String crudKey, List<PropertyUpdate> diff) {
+  // get the next relationship keys pointed to by a key
+  public List<String> getNextRelationships(ROPE rope, String relationshipKey, String crudKey, String propertyKey) {
     // if this is the first step in the search, check the crudMap for a list of next steps
     List<String> next = new ArrayList<String>();
     if ( crudKey != null && ! crudKey.equals("") ) {
       Map<String, List<String>> crudMap = rope.getCrudMap() == null ? null : rope.getCrudMap().get(crudKey);
-      
-      if ( diff != null && diff.size() > 0 ) {
-        for ( PropertyUpdate prop : diff ) {
-          if ( crudMap.containsKey(prop.getName()) ) {
-            next.addAll(crudMap.get(prop.getName()));
-          } 
-        } 
+      if ( propertyKey != null && ! propertyKey.equals("") && crudMap.containsKey(propertyKey) ) {
+        next = crudMap.get(propertyKey);
       }
-      next.addAll(crudMap.get("__default__"));
-      
-      // remove duplicates
-      next = next.stream().distinct().collect(Collectors.toList());
-
-    } else if (relationshipKey != null && ! relationshipKey.equals("")) {
+      else {
+        next = crudMap.get("__default__");
+      }
+    } else if ( relationshipKey != null && ! relationshipKey.equals("") ) {
       next = rope.getRelationshipMap() == null ? null : rope.getRelationshipMap().get(relationshipKey);
     } else {
       return null;
@@ -123,7 +116,7 @@ public class ROPEAuthorizer implements Authorizer {
         sourceObjs.add(sourceObj);
     }
 
-    } else if ( rope.getCardinality().equals("*:1") ) {
+    } else if ( rope.getCardinality().equals("1:*") && rope.getIsInverse() ) {
       DAO rDAO = retrieveProperty(obj, "get", rope.getRelationshipKey(), x);
       sourceObjs = ((ArraySink) rDAO.where(INSTANCE_OF(rope.getSourceModel().getObjClass())).select(new ArraySink())).getArray();
     } else if (rope.getCardinality().equals("1:*") ) {
@@ -161,16 +154,15 @@ public class ROPEAuthorizer implements Authorizer {
     return null;
   }
 
-  public List<foam.dao.history.PropertyUpdate> getPropertyUpdates(FObject oldObj, FObject obj) {
+  public List<String> getPropertyUpdates(FObject oldObj, FObject obj) {
     Map diff = oldObj.diff(obj);
     Iterator i = diff.keySet().iterator();
 
-    int i = 0;
-    List<foam.dao.history.PropertyUpdate> propertyUpdates = new ArrayList<foam.dao.history.PropertyUpdate>();
+    List<String> propertyUpdates = new ArrayList<String>();
     while ( i.hasNext() ) {
       String key = (String) i.next();
       PropertyInfo prop = (PropertyInfo) oldObj.getClassInfo().getAxiomByName(key);
-      propertyUpdates.add(new foam.dao.history.PropertyUpdate(key, prop.f(oldObj), diff.get(key)));
+      propertyUpdates.add(new foam.dao.history.PropertyUpdate(key, prop.f(oldObj), diff.get(key)).getName());
     }
     return propertyUpdates;
   }
@@ -184,7 +176,12 @@ public class ROPEAuthorizer implements Authorizer {
   }
 
   public void authorizeOnUpdate(X x, FObject oldObj, FObject obj) throws AuthorizationException {
-    if ( ! ropeSearch(x, obj, targetDAOKey_, "update", "", getPropertyUpdates(oldObj, obj)) ) throw new AuthorizationException("You don't have permission to update this object");
+    List<String> propertiesUpdated = getPropertyUpdates(oldObj, obj);
+    for ( String property : propertiesUpdated ) {
+      if ( ! ropeSearch(x, obj, targetDAOKey_, "update", "", property ) ) {
+        throw new AuthorizationException("You don't have permission to update this object");
+      }
+    }
   }
 
   public void authorizeOnDelete(X x, FObject obj) throws AuthorizationException {
@@ -197,6 +194,10 @@ public class ROPEAuthorizer implements Authorizer {
 
   public boolean checkGlobalRemove(X x) {
     return false;
+  }
+
+  public String getPermissionPrefix() {
+    return "";
   }
 
 }

@@ -15,20 +15,18 @@ public class InvalidX
     exception_ = exception;
   }
 
+  @Override
   public Object get(X x, Object key) {
     throw exception_;
   }
 
+  @Override
   public X put(Object key, Object value) {
     throw exception_;
   }
 
-  public X putFactory(Object key, XFactory factory) {
-    throw exception_;
-  }
-
   @Override
-  public String toString() {
+  public X putFactory(Object key, XFactory factory) {
     throw exception_;
   }
 }

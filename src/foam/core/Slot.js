@@ -93,10 +93,13 @@ foam.CLASS({
 
         if ( ! foam.util.is(s1.get(), s2.get()) ) {
           feedback1 = true;
-          s2.set(s1.get());
-          if ( ! foam.util.is(s1.get(), s2.get()) )
-            s1.set(s2.get());
-          feedback1 = false;
+          try {
+            s2.set(s1.get());
+            if ( ! foam.util.is(s1.get(), s2.get()) )
+              s1.set(s2.get());
+          } finally {
+            feedback1 = false;
+          }
         }
       };
 
@@ -105,10 +108,13 @@ foam.CLASS({
 
         if ( ! foam.util.is(s1.get(), s2.get()) ) {
           feedback2 = true;
-          s1.set(s2.get());
-          if ( ! foam.util.is(s1.get(), s2.get()) )
-            s2.set(s1.get());
-          feedback2 = false;
+          try {
+            s1.set(s2.get());
+            if ( ! foam.util.is(s1.get(), s2.get()) )
+              s2.set(s1.get());
+          } finally {
+            feedback2 = false;
+          }
         }
       };
 

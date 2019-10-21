@@ -31,7 +31,7 @@ class SessionContextCacheFactory
   }
 
   public Object create(X x) {
-    Session session = (Session) x.get(Session.class);
+    Session session = x.get(Session.class);
     if ( session == null ) return null;
     if ( sessionX_ == null ) sessionX_ = session.getContext();
     if ( sessionX_ != session.getContext() ) return null;

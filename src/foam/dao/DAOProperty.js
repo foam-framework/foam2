@@ -27,7 +27,18 @@ foam.CLASS({
   properties: [
     {
       name: 'view',
-      value: {class: 'foam.comics.InlineBrowserView'},
+      value: {
+        class: 'foam.u2.view.ModeAltView',
+        readView: {
+          class: 'foam.u2.view.ScrollTableView',
+          enableDynamicTableHeight: false
+        },
+        writeView: { class: 'foam.comics.InlineBrowserView' }
+      }
+    },
+    {
+      name: 'createMode',
+      value: 'HIDDEN'
     },
     ['transient', true],
     ['of', 'foam.dao.DAO'],
