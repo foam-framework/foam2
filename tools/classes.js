@@ -200,7 +200,7 @@ var classes = [
   'foam.nanos.auth.Phone',
   'foam.nanos.auth.HumanNameTrait',
   'foam.nanos.auth.User',
-  'foam.nanos.auth.HistoricPassword',
+  'foam.nanos.auth.PriorPassword',
   'foam.nanos.auth.ruler.AddPasswordHistoryAction',
   'foam.nanos.auth.PasswordPolicyTest',
   'foam.nanos.auth.Country',

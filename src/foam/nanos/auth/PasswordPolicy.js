@@ -88,10 +88,10 @@ foam.CLASS({
 
         // check password history
         if ( this.getPreventHistoricPasswordCount() > 0 && user != null ) {
-          HistoricPassword[] historicPasswords = user.getPasswordHistory();
-          int maxCount = Math.min((int) this.getPreventHistoricPasswordCount(), historicPasswords.length);
+          PriorPassword[] priorPasswords = user.getPasswordHistory();
+          int maxCount = Math.min((int) this.getPreventHistoricPasswordCount(), priorPasswords.length);
           for ( int i = 0; i < maxCount; i++ ) {
-            if ( Password.verify(potentialPassword, historicPasswords[historicPasswords.length - (1 + i) ].getPassword()) ) {
+            if ( Password.verify(potentialPassword, priorPasswords[priorPasswords.length - (1 + i) ].getPassword()) ) {
               throw new RuntimeException("Password must be different from previous " + this.getPreventHistoricPasswordCount() + " passwords");
             }
           }

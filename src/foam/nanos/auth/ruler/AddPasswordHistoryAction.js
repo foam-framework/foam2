@@ -12,7 +12,7 @@ foam.CLASS({
   implements: ['foam.nanos.ruler.RuleAction'],
 
   javaImports: [
-    'foam.nanos.auth.HistoricPassword',
+    'foam.nanos.auth.PriorPassword',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
     'java.util.Date'
@@ -20,7 +20,7 @@ foam.CLASS({
 
   constants: [
     {
-      name: 'MAXIMUM_HISTORIC_PASSWORDS',
+      name: 'MAXIMUM_PRIOR_PASSWORDS',
       type: 'Long',
       value: 10
     }
@@ -31,30 +31,30 @@ foam.CLASS({
       name: 'applyAction',
       javaCode: `
         User user = (User) obj;
-        HistoricPassword[] historicPasswordsOld = user.getPasswordHistory();
+        PriorPassword[] priorPasswordsOld = user.getPasswordHistory();
         
         // compute how large the new array should be and where it should start copying from
-        int newArrayLength = historicPasswordsOld.length + 1;
+        int newArrayLength = priorPasswordsOld.length + 1;
         int startCopyingIndex = 0;
-        int copyLength = historicPasswordsOld.length;
+        int copyLength = priorPasswordsOld.length;
         
         // only store up to the maximum number of password history records
-        if ( historicPasswordsOld.length >= MAXIMUM_HISTORIC_PASSWORDS ) {
-          newArrayLength = (int) MAXIMUM_HISTORIC_PASSWORDS;
-          startCopyingIndex = (int) (historicPasswordsOld.length - MAXIMUM_HISTORIC_PASSWORDS);
-          copyLength = (int) MAXIMUM_HISTORIC_PASSWORDS - 1;
+        if ( priorPasswordsOld.length >= MAXIMUM_PRIOR_PASSWORDS ) {
+          newArrayLength = (int) MAXIMUM_PRIOR_PASSWORDS;
+          startCopyingIndex = (int) (priorPasswordsOld.length - MAXIMUM_PRIOR_PASSWORDS);
+          copyLength = (int) MAXIMUM_PRIOR_PASSWORDS - 1;
         }
 
         // copy the old array into a new array
-        HistoricPassword[] historicPasswordNew = new HistoricPassword[newArrayLength];
-        System.arraycopy(historicPasswordsOld, startCopyingIndex, historicPasswordNew, 0, copyLength);
+        PriorPassword[] priorPasswordNew = new PriorPassword[newArrayLength];
+        System.arraycopy(priorPasswordsOld, startCopyingIndex, priorPasswordNew, 0, copyLength);
 
         // add the new entry to the end of the array
-        HistoricPassword historicPassword = new HistoricPassword();
-        historicPassword.setPassword(user.getPassword());
-        historicPassword.setTimeStamp(new Date());
-        historicPasswordNew[historicPasswordNew.length-1] = historicPassword;
-        user.setPasswordHistory(historicPasswordNew);
+        PriorPassword priorPassword = new PriorPassword();
+        priorPassword.setPassword(user.getPassword());
+        priorPassword.setTimeStamp(new Date());
+        priorPasswordNew[priorPasswordNew.length-1] = priorPassword;
+        user.setPasswordHistory(priorPasswordNew);
       `
     }
   ]

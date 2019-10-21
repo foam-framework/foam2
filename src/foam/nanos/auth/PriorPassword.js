@@ -6,9 +6,9 @@
 
 foam.CLASS({
   package: 'foam.nanos.auth',
-  name: 'HistoricPassword',
+  name: 'PriorPassword',
 
-  documentation: 'Historic hashed password value for a user.',
+  documentation: 'Prior hashed password value for a user.',
 
   javaImports: [
     'java.util.Date'

@@ -19,7 +19,7 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.auth.Address',
-    'foam.nanos.auth.HistoricPassword',
+    'foam.nanos.auth.PriorPassword',
     'foam.nanos.auth.Phone'
   ],
 
@@ -32,7 +32,7 @@ foam.CLASS({
     'foam.mlang.order.Comparator',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.AuthService',
-    'foam.nanos.auth.HistoricPassword',
+    'foam.nanos.auth.PriorPassword',
     'foam.util.SafetyUtil',
     'static foam.mlang.MLang.EQ'
   ],
@@ -352,13 +352,13 @@ foam.CLASS({
     {
       name: 'passwordHistory',
       class: 'FObjectArray',
-      of: 'foam.nanos.auth.HistoricPassword',
+      of: 'foam.nanos.auth.PriorPassword',
       javaFactory: `
-        foam.nanos.auth.HistoricPassword[] historicPasswords = new foam.nanos.auth.HistoricPassword[1];
-        historicPasswords[0] = new foam.nanos.auth.HistoricPassword();
-        historicPasswords[0].setPassword(this.getPassword());
-        historicPasswords[0].setTimeStamp(new Date());
-        return historicPasswords;
+        foam.nanos.auth.PriorPassword[] priorPasswords = new foam.nanos.auth.PriorPassword[1];
+        priorPasswords[0] = new foam.nanos.auth.PriorPassword();
+        priorPasswords[0].setPassword(this.getPassword());
+        priorPasswords[0].setTimeStamp(new Date());
+        return priorPasswords;
       `,
       hidden: true,
       networkTransient: true,
