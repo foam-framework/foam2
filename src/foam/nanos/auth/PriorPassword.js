@@ -22,7 +22,7 @@ foam.CLASS({
       documentation: 'Time at which password entry was created'
     },
     {
-      class: 'String',
+      class: 'Password',
       name: 'password',
       documentation: 'Hashed password value.'
     },

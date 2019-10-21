@@ -70,7 +70,7 @@ foam.CLASS({
           PasswordPolicy policy = new PasswordPolicy();
           policy.setEnabled(false);
           policy.setMinLength(6);
-          policy.setPreventHistoricPasswordCount(0);
+          policy.setPriorPasswordsToCheckCount(0);
 
           // validate should return immediately on a disabled policy
           policy.validate(null, password);
@@ -94,7 +94,7 @@ foam.CLASS({
           PasswordPolicy policy = new PasswordPolicy();
           policy.setEnabled(true);
           policy.setMinLength(6);
-          policy.setPreventHistoricPasswordCount(0);
+          policy.setPriorPasswordsToCheckCount(0);
 
           // validate
           policy.validate(null, password);
@@ -124,7 +124,7 @@ foam.CLASS({
           PasswordPolicy policy = new PasswordPolicy();
           policy.setEnabled(true);
           policy.setMinLength(6);
-          policy.setPreventHistoricPasswordCount(historyCount);
+          policy.setPriorPasswordsToCheckCount(historyCount);
 
           // setup the user
           User user = new User.Builder(x).setPassword(Password.hash("password")).build();
@@ -160,7 +160,7 @@ foam.CLASS({
           PasswordPolicy policy = new PasswordPolicy();
           policy.setEnabled(true);
           policy.setMinLength(minLength);
-          policy.setPreventHistoricPasswordCount(0);
+          policy.setPriorPasswordsToCheckCount(0);
 
           // validate
           policy.validate(null, password);

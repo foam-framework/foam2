@@ -41,12 +41,12 @@ foam.CLASS({
     },
     {
       class: 'Long',
-      name: 'preventHistoricPasswordCount',
+      name: 'priorPasswordsToCheckCount',
       min: 0,
       max: 10,
       documentation: `
         User passwords are hashed and the hash is kept for historical record up to a maximum of 10 previous entries per user. 
-        Setting preventHistoricalPasswordCount to a value greater than zero will enable a check on that many previous password entries
+        Setting priorPasswordsToCheckCount to a value greater than zero will enable a check on that many previous password entries
         when resetting the users passwords to prevent them from using the same password again.
         `
     },
@@ -87,12 +87,12 @@ foam.CLASS({
         }
 
         // check password history
-        if ( this.getPreventHistoricPasswordCount() > 0 && user != null ) {
+        if ( this.getPriorPasswordsToCheckCount() > 0 && user != null ) {
           PriorPassword[] priorPasswords = user.getPasswordHistory();
-          int maxCount = Math.min((int) this.getPreventHistoricPasswordCount(), priorPasswords.length);
+          int maxCount = Math.min((int) this.getPriorPasswordsToCheckCount(), priorPasswords.length);
           for ( int i = 0; i < maxCount; i++ ) {
             if ( Password.verify(potentialPassword, priorPasswords[priorPasswords.length - (1 + i) ].getPassword()) ) {
-              throw new RuntimeException("Password must be different from previous " + this.getPreventHistoricPasswordCount() + " passwords");
+              throw new RuntimeException("Password must be different from previous " + this.getPriorPasswordsToCheckCount() + " passwords");
             }
           }
         }
