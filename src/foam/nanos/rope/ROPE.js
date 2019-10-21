@@ -44,7 +44,12 @@ foam.CLASS({
         class: 'String'
       },
       {
-        name: 'CRUD',
+        name: 'crudMap',
+        class: 'Map',
+        javaType: 'java.util.Map<String, java.util.Map<String, java.util.List<String>>>'
+      },
+      {
+        name: 'relationshipMap',
         class: 'Map',
         javaType: 'java.util.Map<String, java.util.List<String>>'
       },
