@@ -29,7 +29,8 @@ foam.CLASS({
       type: 'Boolean',
       name: 'opened',
       value: false
-    }
+    },
+    'timer'
   ],
 
   methods: [
@@ -44,13 +45,12 @@ foam.CLASS({
 
   listeners: [
     function onMouseOver() {
-      var timer;
       var self = this;
       this.target.on('mousemove', function(evt) {
-        if ( timer != undefined ) {
-          clearTimeout(timer);
+        if ( self.timer !== undefined ) {
+          clearTimeout(self.timer);
         }
-        timer = setTimeout(function() {
+        self.timer = setTimeout(function() {
           if ( self.opened === false ) {
             self.document.body.insertAdjacentHTML('beforeend', self.outerHTML);
 
@@ -80,25 +80,10 @@ foam.CLASS({
         }, 500);
       });
       
-      self.target.on('mousedown', function() {
-        self.close();
-        clearTimeout(timer);
-      });
-
-      self.target.on('mouseleave', function() {
-        self.close();
-        clearTimeout(timer);
-      });
-
-      self.target.on('touchstart', function() {
-        self.close();
-        clearTimeout(timer);
-      });
-
-      self.target.on('unload', function() {
-        self.close();
-        clearTimeout(timer);
-      });
+      self.target.on('mousedown', self.close);
+      self.target.on('mouseleave', self.close);
+      self.target.on('touchstart', self.close);
+      self.target.on('unload', self.close);
     },
 
     function close() {
@@ -106,6 +91,7 @@ foam.CLASS({
         this.remove();
         this.opened = false;
       }
+      clearTimeout(this.timer);
     },
     
     function loadTooltip() {
