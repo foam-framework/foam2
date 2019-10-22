@@ -111,6 +111,8 @@ public class Outputter
   }
 
   public String escape(String s) {
+    s = removeColour(s);
+    s = removeControlCharacters(s);
     return s.replace("\\", "\\\\")
             .replace("\"", "\\\"")
             .replace("\t", "\\t")
@@ -119,7 +121,41 @@ public class Outputter
   }
 
   public String escapeMultiline(String s) {
+    s = removeColour(s);
+    s = removeControlCharacters(s);
     return s.replace("\\", "\\\\");
+  }
+
+  // TODO: This does not cover all possible ANSI escape codes yet
+  public String removeColour(String s) {
+    int lastStart = 0;
+    int exitMode = 0; // 0 -> string, 1 -> colour
+    String noColourString = "";
+    for ( int i=0; i < s.length()-2; i++ ) {
+      if ( s.charAt(i) != 033 || s.charAt(i+1) != '[' ) continue;
+      noColourString += s.substring(lastStart, i);
+      for (;;) if ( ++i == s.length() ) {
+        exitMode = 1;
+        break;
+      } else if ( s.charAt(i) == 'm' ) {
+        lastStart = i+1;
+        break;
+      }
+    }
+    if ( exitMode == 0 ) {
+      noColourString += s.substring(lastStart, s.length());
+    }
+    return noColourString;
+  }
+
+  public String removeControlCharacters(String s) {
+    char[] ca = s.toCharArray();
+    char[] caNew = new char[ca.length];
+    int j = 0;
+    for ( int i=0; i < ca.length; i++ ) {
+        if ( ca[i] >= ' ' ) caNew[j++] = ca[i];
+    }
+    return new String(caNew).substring(0,j);
   }
 
   protected void outputNumber(Number value) {
