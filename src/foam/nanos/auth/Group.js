@@ -98,6 +98,16 @@ foam.CLASS({
     {
       class: 'String',
       name: 'supportEmail'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.PasswordPolicy',
+      name: 'passwordPolicy',
+      view: { class: 'foam.u2.view.FObjectView' },
+      documentation: 'Password policy for this group.',
+      javaFactory: `
+        return new foam.nanos.auth.PasswordPolicy();
+      `,
     }
     /*
       FUTURE
