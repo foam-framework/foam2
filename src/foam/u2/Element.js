@@ -2701,10 +2701,18 @@ foam.CLASS({
     'foam.u2.ActionView'
   ],
 
+  properties: [
+    {
+      name: 'view',
+      value: function(args, X) {
+        return { class: 'foam.u2.ActionView', action: this };
+      }
+    }
+  ],
+
   methods: [
     function toE(args, X) {
-      var view = foam.u2.ViewSpec.createView(
-        { class: 'foam.u2.ActionView', action: this }, args, this, X);
+      var view = foam.u2.ViewSpec.createView(this.view, args, this, X);
 
       if ( X.data$ && ! ( args && ( args.data || args.data$ ) ) ) {
         view.data$ = X.data$;
