@@ -362,7 +362,9 @@ foam.CLASS({
       `,
       hidden: true,
       networkTransient: true,
-      section: 'administrative'
+      section: 'administrative',
+      createMode: 'HIDDEN',
+      updateMode: 'RO'
     },
     {
       class: 'Password',

@@ -55,8 +55,7 @@ foam.CLASS({
   javaImports: [
     'foam.nanos.auth.User',
     'foam.util.Password',
-    'foam.util.SafetyUtil',
-    'java.util.regex.Pattern'
+    'foam.util.SafetyUtil'
   ],
 
   methods: [
@@ -82,7 +81,7 @@ foam.CLASS({
         // check minimum length
         int minLength = (int) Math.max(this.getMinLength(), MIN_PASSWORD_LENGTH);
         String minLengthRegex = "^.{" + minLength + ",}$";
-        if ( SafetyUtil.isEmpty(potentialPassword) || ! (Pattern.compile(minLengthRegex)).matcher(potentialPassword).matches() ) {
+        if ( SafetyUtil.isEmpty(potentialPassword) || potentialPassword.length() < minLength ) {
           throw new RuntimeException("Password must be at least " + minLength + " characters long.");
         }
 

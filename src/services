@@ -167,16 +167,25 @@ p({
   "client":"{\"of\":\"foam.nanos.cron.Cron\"}"
 })
 
-p({"class":"foam.nanos.boot.NSpec", "name":"cronScheduler",                    "lazy":false, "serviceClass":"foam.nanos.cron.CronScheduler" })
 p({
-  "class":"foam.nanos.boot.NSpec", "name":"localUserDAO",
-  "serviceScript":"""
+  "class":"foam.nanos.boot.NSpec", 
+  "name":"cronScheduler",                    
+  "lazy":false, 
+  "serviceClass":"foam.nanos.cron.CronScheduler" 
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec", 
+  "name": "localUserDAO",
+  "serviceScript": """
     return 
       new foam.dao.PMDAO(x, 
-      new foam.dao.SequenceNumberDAO (1000, 
+      new foam.dao.SequenceNumberDAO(1000, 
       new foam.nanos.auth.PreventDuplicateEmailDAO.Builder(x).setDelegate(
-        new foam.dao.java.JDAO(x, foam.nanos.auth.User.getOwnClassInfo(), \"users\")).build()));
-  """})
+        new foam.dao.java.JDAO(x, foam.nanos.auth.User.getOwnClassInfo(), \"users\")
+      ).build()));
+  """
+})
 
 p({
   "class":"foam.nanos.boot.NSpec",

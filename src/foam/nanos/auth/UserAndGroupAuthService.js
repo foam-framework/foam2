@@ -248,13 +248,18 @@ foam.CLASS({
     {
       name: 'validatePassword',
       javaCode: `
+        // Password policy to validate against
         PasswordPolicy passwordPolicy = null;
+
+        // Retrieve the logger
+        Logger logger = (Logger) x.get("logger");
 
         // Retrieve the password policy from the user and group when available
         if ( user != null ) {
           Group ancestor = user.findGroup(x);
-          if ( ancestor != null ) {
-            throw new AuthenticationException("Group not found");
+          if ( ancestor == null ) {
+            logger.error("No group for user", user);
+            throw new RuntimeException("Group not found");
           }
 
           // Check password policy
