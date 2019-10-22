@@ -21,6 +21,7 @@ foam.CLASS({
   ],
 
   searchColumns: [
+    'created',
     'severity',
     'exception'
   ],
@@ -29,14 +30,16 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'created',
-      visibility: 'RO'
+      visibility: 'RO',
+      tableWidth: 180
     },
     {
       name: 'severity',
       class: 'Enum',
       of: 'foam.log.LogLevel',
       toJSON: function(value) { return value && value.label; },
-      visibility: 'RO',
+      createMode: 'RO',
+      updateMode: 'RO',
       tableCellFormatter: function(severity, obj, axiom) {
          this
           .start()
@@ -45,21 +48,21 @@ foam.CLASS({
             .style({ color: severity.color })
           .end();
       },
+      tableWidth: 90
     },
     {
       name: 'id',
       class: 'Long',
       storageTransient: 'true',
-      hidden: 'true',
-      visibility: 'RO'
+      hidden: 'true'
     },
     {
       name: 'message',
       class: 'String',
       label: 'Log Message',
-      visibility: foam.u2.Visibility.RO,
-      view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 80 },
-      visibility: 'RO'
+      view: { class: 'foam.u2.view.PreView' },
+      createMode: 'RO',
+      updateMode: 'RO'
     },
     // TODO: implement via an additional method on Logger logger.flag(x, y).log(message)
     // {
@@ -69,8 +72,9 @@ foam.CLASS({
     {
       name: 'exception',
       class: 'Object',
-      visibility: 'RO',
-      view: { class: 'foam.u2.tag.TextArea', rows: 5, col: 80 }
+      view: { class: 'foam.u2.view.PreView' },
+      createMode: 'RO',
+      updateMode: 'RO'
     }
   ]
 });
