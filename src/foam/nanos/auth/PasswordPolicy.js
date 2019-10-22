@@ -14,6 +14,12 @@ foam.CLASS({
 
   documentation: 'A Password Policy for a Group.',
 
+  javaImports: [
+    'foam.nanos.auth.User',
+    'foam.util.Password',
+    'foam.util.SafetyUtil'
+  ],
+
   constants: [
     {
       name: 'MIN_PASSWORD_LENGTH',
@@ -52,16 +58,9 @@ foam.CLASS({
     },
   ],
 
-  javaImports: [
-    'foam.nanos.auth.User',
-    'foam.util.Password',
-    'foam.util.SafetyUtil'
-  ],
-
   methods: [
     {
       name: 'validate',
-      async: true,
       args: [
         {
           name: 'user',
