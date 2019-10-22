@@ -112,18 +112,20 @@ public class Outputter
 
   public String escape(String s) {
     s = removeColour(s);
-    s = removeControlCharacters(s);
-    return s.replace("\\", "\\\\")
+    s = s.replace("\\", "\\\\")
             .replace("\"", "\\\"")
             .replace("\t", "\\t")
             .replace("\r","\\r")
             .replace("\n","\\n");
+    s = removeControlCharacters(s);
+    return s;
   }
 
   public String escapeMultiline(String s) {
     s = removeColour(s);
+    s = s.replace("\\", "\\\\");
     s = removeControlCharacters(s);
-    return s.replace("\\", "\\\\");
+    return s;
   }
 
   // TODO: This does not cover all possible ANSI escape codes yet
