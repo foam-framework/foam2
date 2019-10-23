@@ -2552,6 +2552,23 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
+  name: 'DurationViewRefinement',
+  refines: 'foam.core.Duration',
+  requires: [
+    'foam.u2.view.IntView',
+    'foam.u2.view.TableCellFormatterReadView'
+  ],
+  properties: [
+    [ 'view', {
+      class: 'foam.u2.view.IntView',
+      readView: { class: 'foam.u2.view.TableCellFormatterReadView' }
+    } ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
   name: 'ControllerViewTrait',
 
   documentation: 'Trait for adding a ControllerMode controllerMode Property.',

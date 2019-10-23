@@ -431,6 +431,7 @@ FOAM_FILES([
   { name: "foam/u2/history/HistoryView", flags: ['web'] },
   { name: "foam/u2/view/ValueView", flags: ['web'] },
   { name: "foam/u2/view/PreView", flags: ['web'] },
+  { name: "foam/u2/view/TableCellFormatterReadView", flags: ['web'] },
   { name: "foam/u2/view/FObjectView", flags: ['web'] },
   { name: "foam/u2/view/CollapseableDetailView", flags: ['web'] },
   { name: "foam/u2/view/ReadReferenceView", flags: ['web'] },
