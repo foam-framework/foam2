@@ -38,21 +38,14 @@ foam.CLASS({
   name: 'CapabilityRequiredRemoteException',
   implements: ['foam.core.Exception'],
   properties: [
-    {
-      class: 'String',
-      name: 'id',
-      // NOTE: Good candidate for a foam.script.Return
-      factory: () => { return "foam.box.CapabilityRequiredRemoteException" },
-      javaFactory: `return "foam.box.CapabilityRequiredRemoteException";`
-    },
+    [ 'id', 'foam.box.CapabilityRequiredRemoteException' ],
     {
       class: 'StringArray',
       name: 'capabilityOptions',
       documentation: `
-        List of capabilities which can be used to satisfy the
-        permission that caused this error. A capability will
-        only intercept a permission if itself and all of its
-        implied capabilities or permissions can grant the
+        List of capabilities which can be used to satisfy the permission that
+        caused this error. A capability will only intercept a permission if
+        itself and all of its implied capabilities or permissions can grant the
         requested action.
       `
     }

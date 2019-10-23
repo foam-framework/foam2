@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.crunch.ui',
   name: 'CapabilityInterceptView',
@@ -41,17 +47,9 @@ foam.CLASS({
       this
         .addClass(this.myClass())
 
-        // Container for the actions
-        .start()
-          .addClass(this.myClass('action-container'))
-
-          // Actions grouped to the left
-          .start()
-            .startContext({ data: this })
-              .tag(this.CANCEL, { buttonStyle: 'SECONDARY' })
-            .endContext()
-          .end()
-        .end()
+        .startContext({ data: this })
+          .tag(this.CANCEL, { buttonStyle: 'SECONDARY' })
+        .endContext()
 
         // Container for the detailview
         .start()

@@ -49,7 +49,7 @@ foam.CLASS({
 
         if ( replyBox == null ) return;
 
-        if ( t.getClass().getName() == "foam.nanos.auth.AuthorizationException" ) {
+        if ( t.getClass() == foam.nanos.auth.AuthorizationException.class ) {
           foam.nanos.auth.AuthorizationException ae = (foam.nanos.auth.AuthorizationException) t;
           if ( ae.hasCapabilityRequired() ) {
             replyWithCapabilityRequired(ae.getCapabilityRequired());

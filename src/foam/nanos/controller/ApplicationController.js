@@ -50,10 +50,10 @@ foam.CLASS({
   ],
 
   imports: [
+    'capabilityDAO',
     'installCSS',
     'sessionSuccess',
-    'window',
-    'capabilityDAO'
+    'window'
   ],
 
   exports: [
@@ -69,8 +69,8 @@ foam.CLASS({
     'menuListener',
     'notify',
     'pushMenu',
-    'requestLogin',
     'requestCapability',
+    'requestLogin',
     'signUpEnabled',
     'stack',
     'user',
