@@ -24,8 +24,8 @@ import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.nanos.auth.AuthorizationException;
 import foam.nanos.auth.Authorizer;
-import foam.nanos.auth.User;
 import foam.nanos.rope.ROPE;
+import foam.nanos.auth.User;
 
 public class ROPEAuthorizer implements Authorizer {
 
@@ -168,11 +168,17 @@ public class ROPEAuthorizer implements Authorizer {
   }
 
   public void authorizeOnCreate(X x, FObject obj) throws AuthorizationException {
-    if ( ! ropeSearch(x, obj, targetDAOKey_, "create", "", null) ) throw new AuthorizationException("You don't have permission to create this object");
+    List<PropertyInfo> propertyInfos = (List<PropertyInfo>) (obj.getClassInfo()).getAxiomsByClass(PropertyInfo.class);
+    // how to tell diff between set property and defaultvalue?
+    for ( PropertyInfo propertyInfo : propertyInfos ) {
+      if ( propertyInfo.isSet((Object) obj) && ! ropeSearch(x, obj, targetDAOKey_, "create", "", propertyInfo.getShortName() ) ) {
+        throw new AuthorizationException("You don't have permission to create this object");
+      } 
+    }
   }
 
   public void authorizeOnRead(X x, FObject obj) throws AuthorizationException {
-    if ( ! ropeSearch(x, obj, targetDAOKey_, "read", "", null) ) throw new AuthorizationException("You don't have permission to read this object");
+    if ( ! ropeSearch(x, obj, targetDAOKey_, "read", "", "") ) throw new AuthorizationException("You don't have permission to read this object");
   }
 
   public void authorizeOnUpdate(X x, FObject oldObj, FObject obj) throws AuthorizationException {
@@ -185,7 +191,7 @@ public class ROPEAuthorizer implements Authorizer {
   }
 
   public void authorizeOnDelete(X x, FObject obj) throws AuthorizationException {
-    if ( ! ropeSearch(x, obj, targetDAOKey_, "delete", "", null) ) throw new AuthorizationException("You don't have permission to delete this object");
+    if ( ! ropeSearch(x, obj, targetDAOKey_, "delete", "", "") ) throw new AuthorizationException("You don't have permission to delete this object");
   }
 
   public boolean checkGlobalRead(X x) {
