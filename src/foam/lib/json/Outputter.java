@@ -11,17 +11,17 @@ import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
-import foam.lib.PropertyPredicate;
 import foam.lib.PermissionedPropertyPredicate;
+import foam.lib.PropertyPredicate;
 import foam.util.SafetyUtil;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.Iterator;
 import java.util.List;
-import java.util.*;
-
 import org.apache.commons.io.IOUtils;
+
 
 public class Outputter
   extends AbstractSink
@@ -66,6 +66,7 @@ public class Outputter
     this.writer_ = writer;
   }
 
+  @Override
   public String stringify(FObject obj) {
     initWriter();
     outputFObject(obj);
@@ -111,53 +112,42 @@ public class Outputter
   }
 
   public String escape(String s) {
-    s = removeColour(s);
     s = s.replace("\\", "\\\\")
             .replace("\"", "\\\"")
             .replace("\t", "\\t")
             .replace("\r","\\r")
             .replace("\n","\\n");
-    s = removeControlCharacters(s);
+    s = escapeControlCharacters(s);
     return s;
   }
 
   public String escapeMultiline(String s) {
-    s = removeColour(s);
     s = s.replace("\\", "\\\\");
-    s = removeControlCharacters(s);
+    s = escapeControlCharacters(s);
     return s;
   }
 
-  // TODO: This does not cover all possible ANSI escape codes yet
-  public String removeColour(String s) {
+  public String escapeControlCharacters(String s) {
     int lastStart = 0;
-    int exitMode = 0; // 0 -> string, 1 -> colour
-    String noColourString = "";
-    for ( int i=0; i < s.length()-2; i++ ) {
-      if ( s.charAt(i) != 033 || s.charAt(i+1) != '[' ) continue;
-      noColourString += s.substring(lastStart, i);
-      for (;;) if ( ++i == s.length() ) {
-        exitMode = 1;
-        break;
-      } else if ( s.charAt(i) == 'm' ) {
-        lastStart = i+1;
-        break;
-      }
+    String escapedString = "";
+    for ( int i=0; i < s.length(); i++ ) {
+      if ( s.charAt(i) >= ' ' ) continue;
+      char c = s.charAt(i);
+      // Character to hex
+      char right = (char) (c & 0x0F);
+      char left = (char) ((c & 0xF0) >> 4);
+      right += '0'; if ( right > '9' ) right += 'A' - '9' - 1;
+      left += '0'; if ( left > '9' ) left += 'A' - '9' - 1;
+      char[] escape = new char[] {'\\','u','0','0',left,right};
+      // Add previous string segment
+      escapedString += s.substring(lastStart, i);
+      // Add escape sequence
+      escapedString += new String(escape);
+      lastStart = i + 1;
     }
-    if ( exitMode == 0 ) {
-      noColourString += s.substring(lastStart, s.length());
-    }
-    return noColourString;
-  }
-
-  public String removeControlCharacters(String s) {
-    char[] ca = s.toCharArray();
-    char[] caNew = new char[ca.length];
-    int j = 0;
-    for ( int i=0; i < ca.length; i++ ) {
-        if ( ca[i] >= ' ' ) caNew[j++] = ca[i];
-    }
-    return new String(caNew).substring(0,j);
+    if ( lastStart != s.length() ) escapedString +=
+      s.substring(lastStart, s.length());
+    return escapedString;
   }
 
   protected void outputNumber(Number value) {
@@ -258,6 +248,7 @@ public class Outputter
     writer_.append("}");
   }
 
+  @Override
   public void output(Object value) {
     if ( value instanceof OutputJSON ) {
       ((OutputJSON) value).outputJSON(this);
