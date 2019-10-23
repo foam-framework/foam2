@@ -1,1 +1,23 @@
 p({"class":"foam.nanos.crunch.Capability","id":"test"})
+p({
+  "class":"foam.nanos.crunch.Capability",
+  "id":"TestServiceCapabilityA",
+  "permissionsIntercepted": [
+    "test.crunch.a",
+  ]
+})
+p({
+  "class":"foam.nanos.crunch.Capability",
+  "id":"TestServiceCapabilityB",
+  "permissionsIntercepted": [
+    "test.crunch.b",
+  ]
+})
+p({
+  "class":"foam.nanos.crunch.Capability",
+  "id":"TestServiceCapabilityAB",
+  "permissionsIntercepted": [
+    "test.crunch.a",
+    "test.crunch.b",
+  ]
+})

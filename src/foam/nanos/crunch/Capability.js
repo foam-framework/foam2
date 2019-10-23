@@ -102,6 +102,11 @@ foam.CLASS({
       documentation: `List of permissions granted by this capability`
     },
     {
+      name: 'permissionsIntercepted',
+      class: 'StringArray',
+      documentation: `List of permissions intercepted by this capability`
+    },
+    {
       name: 'daoKey',
       class: 'String',
       visibility: 'RO'

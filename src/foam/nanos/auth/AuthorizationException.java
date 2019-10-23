@@ -13,24 +13,20 @@ import foam.box.CapabilityRequiredRemoteException;
 public class AuthorizationException extends SecurityException {
   // TODO: This should be decoupled from AuthorizationException after
   //       the modelled exception feature is merged.
-  private CapabilityRequiredRemoteException capabilityRequired_;
+  protected String permission_;
 
   public AuthorizationException() {
     super("Permission denied.");
   }
-  public AuthorizationException(CapabilityRequiredRemoteException r) {
-    super("Capability required.");
-    capabilityRequired_ = r;
+  public AuthorizationException(String message, String permission) {
+    super(message + " (permission: '" + permission + "')");
+    permission_ = permission;
   }
   public AuthorizationException(String message) {
     super(message);
   }
 
-  public CapabilityRequiredRemoteException getCapabilityRequired() {
-    return capabilityRequired_;
-  }
-
-  public boolean hasCapabilityRequired() {
-    return capabilityRequired_ != null;
+  public String getPermission() {
+    return permission_;
   }
 }

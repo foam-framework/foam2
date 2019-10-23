@@ -2,16 +2,12 @@ foam.INTERFACE({
   name: 'TestService',
   package: 'foam.box.testspace',
 
-  documentation: `
-    The CRUNCH TestService allows manual invocation of capability intercepts.
-  `,
-
   methods: [
     {
-      name: 'testAuthorizationException',
+      name: 'testMethod',
       args: [
         {
-          name: 'permission',
+          name: 'whatdo',
           type: 'String'
         }
       ],
@@ -27,18 +23,26 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'testAuthorizationException',
+      name: 'testMethod',
       type: 'Boolean',
       args: [
         {
-          name: 'permission',
+          name: 'whatdo',
           type: 'String'
         }
       ],
       javaCode: `
-        throw new foam.nanos.auth.AuthorizationException(
-          "Test authorization failure", permission,
-        );
+        if ( whatdo.equals("auth-error") ) {
+          throw new foam.nanos.auth.AuthorizationException(
+            new foam.box.CapabilityRequiredRemoteException.Builder(getX())
+              .setCapabilityOptions(new String[]{
+                "TestServiceCapabilityA",
+                "TestServiceCapabilityC",
+                "TestServiceCapabilityD"
+              })
+              .build()
+          );
+        }
         return true;
       `
     }

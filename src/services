@@ -374,6 +374,13 @@ p({"class":"foam.nanos.boot.NSpec", "name":"blobService",                       
 p({"class":"foam.nanos.boot.NSpec", "name":"resetPasswordToken",                 "serve":true,  "authenticate": false, "serviceClass":"foam.nanos.auth.resetPassword.ResetPasswordTokenService","boxClass":"foam.nanos.auth.token.TokenServiceSkeleton","client":"{\"class\":\"foam.nanos.auth.token.ClientTokenService\"}"})
 
 p({
+  "class":"foam.nanos.boox.NSpec", "name":"crunchTestService",
+  "serviceClass":"foam.nanos.crunch.crunchtest.TestServiceServer",
+  "boxClass":"foam.nanos.crunch.crunchtest.TestServiceSkeleton",
+  "client":"foam.nanos.crunch.crunchtest.TestServiceClient"
+})
+
+p({
   "class": "foam.nanos.boot.NSpec",
   "name": "dig",
   "parameters": true,
