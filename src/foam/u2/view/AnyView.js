@@ -123,6 +123,11 @@ foam.CLASS({
         if ( o ) o.detach();
         n.onDetach(n.data$.linkFrom(this.data$));
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'enableChoice',
+      value: true
     }
   ],
   methods: [
@@ -140,11 +145,13 @@ foam.CLASS({
                 .endContext();
             }))
           .end()
-          .start(this.ChoiceView, {
-            choices$: this.types$.map(types => types.map(t => [t, t.label])),
-            data$: this.selected$
+          .callIf(this.enableChoice, function() {
+            this.start(self.ChoiceView, {
+              choices$: self.types$.map(types => types.map(t => [t, t.label])),
+              data$: self.selected$
+              })
+            .end()
           })
-          .end()
         .end();
     }
   ]
