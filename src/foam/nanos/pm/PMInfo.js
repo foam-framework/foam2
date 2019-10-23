@@ -65,7 +65,5 @@ foam.CLASS({
       readPermissionRequired: true,
       writePermissionRequired: true
     }
-  ],
-
-  
+  ]
 });
