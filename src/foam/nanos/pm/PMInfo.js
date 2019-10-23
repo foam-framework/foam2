@@ -62,7 +62,8 @@ foam.CLASS({
     {
       class: 'Code',
       name: 'captureTrace',
-      permissionRequired: true
+      readPermissionRequired: true,
+      writePermissionRequired: true
     }
   ],
 
