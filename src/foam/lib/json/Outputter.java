@@ -12,16 +12,14 @@ import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
 import foam.lib.PermissionedPropertyPredicate;
-import foam.lib.PropertyPredicate;
 import foam.util.SafetyUtil;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.Iterator;
 import java.util.List;
+import java.util.*;
 import org.apache.commons.io.IOUtils;
-
 
 public class Outputter
   extends AbstractSink
