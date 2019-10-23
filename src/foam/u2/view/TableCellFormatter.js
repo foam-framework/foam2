@@ -144,11 +144,36 @@ foam.CLASS({
     {
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
-      value: function(value) {
-        this.start()
-          .style({'text-align': 'left', 'padding-right': '20px'})
-          .add('$' + (value/100).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,'))
-        .end();
+      value: function(value, obj, axiom) {
+        var self = this;
+        if ( ! axiom.currency ) {
+          this.add(value);
+        } else if ( axiom.homeCurrency && axiom.homeCurrency != axiom.currency ) {
+          // TODO: need to change fx service provider
+          Promise.all([
+            obj.fxService.getFXRate(axiom.currency, axiom.homeCurrency,
+              0, 1, 'BUY', null, obj.user.id, 'nanopay').then(r => r.rate),
+            obj.findBalance(self.__subContext__),
+            self.__subContext__.currencyDAO.find(axiom.homeCurrency)
+          ]).then(arr => {
+            let [r, b, c] = arr;
+            var formatted = c.format(Math.floor((b || 0) * r));
+            self.start()
+              .add(formatted)
+            .end();
+            self.tooltip = displaformattedyBalance;
+          });
+        } else {
+          this.__subContext__.currencyDAO
+          .find(axiom.currency)
+          .then((currency) => {
+            var formatted = currency.format(value);
+            this.start()
+              .add(formatted)
+            .end();
+            this.tooltip = formatted;
+          });
+        }
       }
     }
   ]

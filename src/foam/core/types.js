@@ -490,7 +490,17 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'Currency',
-  extends: 'Long'
+  extends: 'Long',
+  properties: [
+    {
+      class: 'String',
+      name: 'currency'
+    },
+    {
+      class: 'String',
+      name: 'homeCurrency'
+    }
+  ]
 });
 
 
