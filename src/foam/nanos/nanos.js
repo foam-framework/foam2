@@ -193,7 +193,6 @@ FOAM_FILES([
   { name: 'foam/nanos/dig/DIG' },
   { name: 'foam/nanos/dig/DigFileUploadView' },
   { name: 'foam/nanos/dig/DigSnippetView' },
-  { name: 'foam/nanos/dig/DUG' },
   { name: 'foam/nanos/dig/LinkView' },
   { name: 'foam/nanos/dig/SUGAR' },
 

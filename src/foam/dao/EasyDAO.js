@@ -136,11 +136,11 @@ if ( head instanceof foam.dao.MDAO ) {
     getMdao().addIndex(getIndex());
   }
 }
-
+foam.dao.ProxyDAO fixedSizeDAO = null;
 if ( getFixedSize() != null ) {
   if ( head instanceof foam.dao.MDAO &&
        pxy != null ) {
-    foam.dao.ProxyDAO fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
+     fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
     fixedSizeDAO.setDelegate(head);
     pxy.setDelegate(fixedSizeDAO);
   } else {
@@ -149,6 +149,12 @@ if ( getFixedSize() != null ) {
   }
 }
 
+
+if ( getRuler() ) {
+  foam.dao.DAO temp = getFixedSize() != null ? fixedSizeDAO : head;
+  foam.dao.DAO ruler = new foam.nanos.ruler.RulerDAO(getX(), temp, this.getName() );
+  pxy.setDelegate(ruler);
+}
 
 delegate = getOuterDAO(delegate);
 
@@ -398,6 +404,11 @@ return delegate;
       class: 'Boolean',
       name: 'contextualize',
       value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'ruler',
+      value: true
     },
     {
       /**
