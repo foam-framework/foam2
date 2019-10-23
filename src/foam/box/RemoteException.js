@@ -38,7 +38,11 @@ foam.CLASS({
   name: 'CapabilityRequiredRemoteException',
   implements: ['foam.core.Exception'],
   properties: [
-    [ 'id', 'foam.box.CapabilityRequiredRemoteException' ],
+    {
+      class: 'String',
+      name: 'id',
+      value: 'foam.box.CapabilityRequiredRemoteException'
+    },
     {
       class: 'StringArray',
       name: 'capabilityOptions',
