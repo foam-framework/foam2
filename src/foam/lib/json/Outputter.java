@@ -129,14 +129,17 @@ public class Outputter
   public String escapeControlCharacters(String s) {
     int lastStart = 0;
     String escapedString = "";
-    for ( int i=0; i < s.length(); i++ ) {
-      if ( s.charAt(i) >= ' ' ) continue;
-      char c = s.charAt(i);
+    char c;
+    for ( int i = 0; i < s.length(); i++ ) {
+      c = s.charAt(i);
+      if ( c >= ' ' ) continue;
       // Character to hex
       char right = (char) (c & 0x0F);
       char left = (char) ((c & 0xF0) >> 4);
-      right += '0'; if ( right > '9' ) right += 'A' - '9' - 1;
-      left += '0'; if ( left > '9' ) left += 'A' - '9' - 1;
+      right += '0';
+      if ( right > '9' ) right += 'A' - '9' - 1;
+      left += '0';
+      if ( left > '9' ) left += 'A' - '9' - 1;
       char[] escape = new char[] {'\\','u','0','0',left,right};
       // Add previous string segment
       escapedString += s.substring(lastStart, i);
