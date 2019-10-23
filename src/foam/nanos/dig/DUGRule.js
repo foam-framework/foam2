@@ -7,10 +7,6 @@ foam.CLASS({
     'foam.nanos.http.Format'
   ],
 
-  javaImports: [
-
-  ],
-
  tableColumns: [
     'id',
     'documentation',
