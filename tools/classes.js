@@ -463,6 +463,7 @@ var classes = [
 
   // Crunch
   'foam.nanos.crunch.crunchtest.FakeTestObject',
+  'foam.nanos.crunch.crunchtest.TestService',
   //models
   'foam.nanos.crunch.Capability',
   'foam.nanos.crunch.CapabilityJunctionStatus',
