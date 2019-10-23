@@ -155,6 +155,7 @@ public class ROPEAuthorizer implements Authorizer {
   }
 
   public List<String> getPropertyUpdates(FObject oldObj, FObject obj) {
+    if ( oldObj == null ) oldObj = (obj.getClass()).newInstance();
     Map diff = oldObj.diff(obj);
     Iterator i = diff.keySet().iterator();
 
@@ -168,12 +169,12 @@ public class ROPEAuthorizer implements Authorizer {
   }
 
   public void authorizeOnCreate(X x, FObject obj) throws AuthorizationException {
-    List<PropertyInfo> propertyInfos = (List<PropertyInfo>) (obj.getClassInfo()).getAxiomsByClass(PropertyInfo.class);
-    // how to tell diff between set property and defaultvalue?
-    for ( PropertyInfo propertyInfo : propertyInfos ) {
-      if ( propertyInfo.isSet((Object) obj) && ! ropeSearch(x, obj, targetDAOKey_, "create", "", propertyInfo.getShortName() ) ) {
+
+    List<String> propertiesUpdated = getPropertyUpdates(null, obj);
+    for ( String property : propertiesUpdated ) {
+      if ( ! ropeSearch(x, obj, targetDAOKey_, "create", "", property ) ) {
         throw new AuthorizationException("You don't have permission to create this object");
-      } 
+      }
     }
   }
 
