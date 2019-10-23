@@ -40,7 +40,6 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.log.LogLevel',
       toJSON: function(value) { return value && value.label; },
-      createMode: 'RO',
       updateMode: 'RO',
       tableCellFormatter: function(severity, obj, axiom) {
          this
@@ -63,7 +62,6 @@ foam.CLASS({
       class: 'String',
       label: 'Log Message',
       view: { class: 'foam.u2.view.PreView' },
-      createMode: 'RO',
       updateMode: 'RO'
     },
     // TODO: implement via an additional method on Logger logger.flag(x, y).log(message)
@@ -75,7 +73,6 @@ foam.CLASS({
       name: 'exception',
       class: 'Object',
       view: { class: 'foam.u2.view.PreView' },
-      createMode: 'RO',
       updateMode: 'RO'
     }
   ]
