@@ -95,9 +95,8 @@ foam.CLASS({
       displayWidth: 45
     },
     {
-      class: 'String',
-      name: 'customCSS',
-      view: { class: 'foam.u2.tag.TextArea', rows: 16, cols: 60 },
+      class: 'Code',
+      name: 'customCSS'
     },
     {
       class: 'Color',

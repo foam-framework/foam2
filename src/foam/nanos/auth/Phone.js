@@ -29,7 +29,8 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'verified',
-      permissionRequired: true
+      readPermissionRequired: true,
+      writePermissionRequired: true
     }
   ]
 });

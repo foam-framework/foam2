@@ -20,10 +20,6 @@ foam.CLASS({
   name: 'ReferenceView',
   extends: 'foam.u2.view.ChoiceView',
 
-  imports: [
-    'data as parentObj'
-  ],
-
   documentation: `
     View for editing ReferenceProperty-ies.
     Note: that if the property's value is undefined this view will set it to
@@ -47,7 +43,7 @@ foam.CLASS({
     function fromProperty(prop) {
       this.SUPER(prop);
       if ( ! this.dao ) {
-        var dao = this.parentObj.__subContext__[prop.targetDAOKey];
+        var dao = this.__context__[prop.targetDAOKey];
         this.dao = dao;
       }
     }

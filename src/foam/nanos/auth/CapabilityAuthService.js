@@ -18,11 +18,13 @@ foam.CLASS({
   javaImports: [
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.mlang.predicate.Predicate',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.logger.Logger',
     'foam.nanos.session.Session',
+    'java.util.Date',
     'java.util.List',
     'javax.security.auth.AuthPermission',
     'static foam.mlang.MLang.*'
@@ -59,16 +61,27 @@ foam.CLASS({
         Capability cap = (Capability) capabilityDAO.find(permission);
         if ( cap != null && cap.isDeprecated(x) ) return getDelegate().checkUser(x, user, permission);
 
+        Date now = new Date();
+        Predicate capabilityScope = AND(
+          EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
+          OR(
+            NOT(HAS(UserCapabilityJunction.EXPIRY)),
+            NOT(EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.EXPIRED))
+          )
+        );
+
         DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
         if ( userCapabilityJunctionDAO.find(
           AND(
-            EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
+            capabilityScope,
             EQ(UserCapabilityJunction.TARGET_ID, permission),
             EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
           )) != null ) return true;
         
-        List<UserCapabilityJunction> userCapabilityJunctions = ((ArraySink) user.getCapabilities(x).getJunctionDAO().where(EQ(UserCapabilityJunction.SOURCE_ID, user.getId())).select(new ArraySink())).getArray();
+        List<UserCapabilityJunction> userCapabilityJunctions = ((ArraySink) user.getCapabilities(x).getJunctionDAO()
+          .where(capabilityScope)
+          .select(new ArraySink())).getArray();
 
         for ( UserCapabilityJunction ucJunction : userCapabilityJunctions ) {
           Capability capability = (Capability) capabilityDAO.find(ucJunction.getTargetId());
