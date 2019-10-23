@@ -29,9 +29,7 @@ foam.CLASS({
     {
       name: 'xIsSet',
       class: 'Boolean',
-      javaFactory: ` 
-      return false; 
-      `
+      value: false
     }
   ],
 
@@ -39,8 +37,10 @@ foam.CLASS({
     {
       name: 'inX',
       javaCode: `
-      return new ProxyDAO.Builder(x).setDelegate(this.setXIsSet(true)).build();
+      this.setXIsSet(true);
+      ProxyDAO proxy = new ProxyDAO.Builder(x).setDelegate(this).build();
       this.setXIsSet(false);
+      return proxy;
       `
     },
     {
