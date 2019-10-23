@@ -124,16 +124,24 @@ foam.CLASS({
   ],
   actions: [
     {
-      name: 'resetAll',
-      code: function() {
-        this.columns.forEach(c => c.visibility = 'DEFAULT');
-      }
-    },
-    {
       name: 'cancel',
       code: function() {
         this.stack.back();
+      },
+      view: function() {
+        return {
+          class: 'foam.u2.ActionView',
+          action: this,
+          buttonStyle: 'SECONDARY'
+        };
       }
+    },
+    {
+      name: 'resetAll',
+      code: function() {
+        this.columns.forEach(c => c.visibility = 'DEFAULT');
+      },
+      confirmationRequired: true
     },
     {
       name: 'save',

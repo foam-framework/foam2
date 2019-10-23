@@ -10,7 +10,6 @@ p({
       .setPm(true)
       .setSeqNo(true)
       .setCreatedAware(true)
-      .setCreatedByAware(true)
       .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
         .setComparator(foam.mlang.MLang.DESC(foam.nanos.logger.LogMessage.CREATED))
         .setSize(5000)
