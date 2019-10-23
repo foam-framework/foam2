@@ -11,7 +11,8 @@ foam.CLASS({
   documentation: 'Modelled log output.',
 
   implements: [
-    'foam.nanos.auth.CreatedAware'
+    'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.CreatedByAware'
   ],
 
   tableColumns: [
@@ -33,6 +34,7 @@ foam.CLASS({
       visibility: 'RO',
       tableWidth: 180
     },
+    'createdBy',
     {
       name: 'severity',
       class: 'Enum',
