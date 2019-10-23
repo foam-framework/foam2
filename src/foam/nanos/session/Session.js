@@ -122,23 +122,6 @@ foam.CLASS({
       javaFactory: 'return reset(getX());',
       hidden: true,
       transient: true
-    },
-    {
-      class: 'String', // TODO: Create a GUID property type.
-      name: 'accessToken',
-      documentation: `
-        The token clients attach to requests to use this session. We use this
-        property instead of the id property because doing so allows us to change
-        the token without changing the session object. If we were to use the id
-        property as the token, then when we want to change the token we'd
-        effectively be creating a new object since putting to sessionDAO with a
-        different id would be a create, not an update. Doing such a thing would
-        cause unnecessary copying of sessions.
-        This property should be updated to a new random value when a user
-        signs in. This must be done as a measure to prevent session fixation
-        attacks.
-      `,
-      javaFactory: 'return java.util.UUID.randomUUID().toString();'
     }
   ],
 

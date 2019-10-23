@@ -158,11 +158,16 @@ foam.CLASS({
         user = (User) user.fclone();
         user.freeze();
 
+        // Set the session's user id.
+        DAO sessionDAO = (DAO) getLocalSessionDAO();
         Session session = x.get(Session.class);
         session.setUserId(user.getId());
-        // Change the session's access token to prevent session fixation attacks
-        session.setAccessToken(java.util.UUID.randomUUID().toString());
-        ((DAO) getLocalSessionDAO()).put(session);
+
+        // Change the session's id and delete the old session to prevent session
+        // fixation attacks.
+        sessionDAO.remove(session);
+        session.setId(java.util.UUID.randomUUID().toString());
+        session = (Session) sessionDAO.put(session);
         session.setContext(session.applyTo(session.getContext()));
 
         return user;

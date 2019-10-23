@@ -55,15 +55,15 @@ public class SessionServerBox
     try {
       HttpServletRequest req        = getX().get(HttpServletRequest.class);
       DAO                sessionDAO = (DAO) getX().get("localSessionDAO");
-      Session            session    = sessionID == null ? null : (Session) sessionDAO.find(EQ(Session.ACCESS_TOKEN, sessionID));
+      Session            session    = sessionID == null ? null : (Session) sessionDAO.find(sessionID);
 
       if ( session == null ) {
         session = new Session((X) getX().get(Boot.ROOT));
 
-        // It's fine to let clients choose their session access token if they're
-        // creating a new session because we'll change it when the user
-        // authenticates anyway, so there's no risk of a session fixation attack.
-        if ( ! SafetyUtil.isEmpty(sessionID) ) session.setAccessToken(sessionID);
+        // It's fine to let clients choose their session id if they're creating
+        // a new session because we'll change it when the user authenticates
+        // anyway, so there's no risk of a session fixation attack.
+        if ( ! SafetyUtil.isEmpty(sessionID) ) session.setId(sessionID);
 
         if ( req != null ) session.setRemoteHost(req.getRemoteHost());
 
@@ -136,11 +136,11 @@ public class SessionServerBox
         msg.getAttributes().put("replyBox", new ProxyBox(replyBox) {
           @Override
           public void send(Message innerMsg) {
-            // The access token might have been updated. For example,
+            // The session id might have been updated. For example,
             // UserAndGroupAuthService will update the session access token when
             // a user authenticates (signs in) in order to prevent session
             // fixation attacks.
-            innerMsg.getAttributes().put("sessionId", finalSession.getAccessToken());
+            innerMsg.getAttributes().put("sessionId", finalSession.getId());
             super.send(innerMsg);
           }
         });
