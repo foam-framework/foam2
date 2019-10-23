@@ -29,12 +29,17 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'String',
-      name: 'description'
+      name: 'id',
+      visibility: 'RW'
     },
     {
       name: 'ruleGroup',
-      value: 'DUG'
+      value: 'DUG',
+      hidden: true
+    },
+    {
+      name: 'priority',
+      hidden: true
     },
     {
       class: 'URL',
@@ -87,6 +92,11 @@ foam.CLASS({
     {
       name: 'saveHistory',
       hidden: true
+    },
+    {
+      name: 'operation',
+      hidden: true,
+      value: 'CREATE_OR_UPDATE'
     }
   ],
 
