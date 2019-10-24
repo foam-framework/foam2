@@ -39,7 +39,7 @@ foam.CLASS({
       documentation: 'Minimum length of the password.',
       min: 6,
       factory: function() {
-        return MIN_PASSWORD_LENGTH;
+        return this.MIN_PASSWORD_LENGTH;
       },
       javaFactory: `
         return MIN_PASSWORD_LENGTH;
