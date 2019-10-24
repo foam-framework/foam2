@@ -27,23 +27,30 @@ import java.lang.Exception;
 import java.lang.reflect.*;
 import java.nio.CharBuffer;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Iterator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 
 public class SugarWebAgent
   implements WebAgent
 {
+  protected Method cur_method;
+
   public SugarWebAgent() {}
 
   public void execute(X x) {
     Logger              logger         = (Logger) x.get("logger");
     PrintWriter         out            = x.get(PrintWriter.class);
     HttpServletResponse resp           = x.get(HttpServletResponse.class);
-    HttpParameters      p              = x.get(HttpParameters.class);
+    HttpServletRequest  req            = x.get(HttpServletRequest.class);
     CharBuffer          buffer_        = CharBuffer.allocate(65535);
-    String              serviceName    = p.getParameter("service");
-    String              methodName     = p.getParameter("method");
-    String              interfaceName  = p.getParameter("interfaceName");
+    String              serviceName    = req.getParameter("service");
+    String              methodName     = req.getParameter("method");
+    String              interfaceName  = req.getParameter("interfaceName");
+
+    resp.setContentType("text/html");
 
     try {
       if ( SafetyUtil.isEmpty(serviceName) ) {
@@ -106,8 +113,9 @@ public class SugarWebAgent
 
             logger.debug("service : " + serviceName);
             logger.debug("methodName : " + method_[k].getName());
+            this.cur_method = method_[k];
 
-            Parameter[] pArray = method_[k].getParameters();
+            Parameter[] pArray = method_[k].getParameters(); // to get method's parameters
             paramTypes = new Class[pArray.length];
             arglist = new Object[pArray.length];
 
@@ -123,19 +131,17 @@ public class SugarWebAgent
               }
 
               paramTypes[j] = pArray[j].getType();
-              arglist[j] = p.getParameter(pArray[j].getName());
-
-              logger.debug(pArray[j].getName() + " :   " + p.getParameter(pArray[j].getName()));
+              logger.debug(pArray[j].getName() + " :   " + req.getParameter(pArray[j].getName()));
 
               // casting and setting according to parameters type
               String typeName = pArray[j].getType().getCanonicalName();
               Class paramObj_ = null;
               Object obj_ = null;
 
-              if ( typeName.equals("foam.core.X") ) {
+              if ( typeName.equals("foam.core.X") ) { // if parameter type is X, just set the x
                 arglist[j] = x;
-              } else if ( ! SafetyUtil.isEmpty(p.getParameter(pArray[j].getName())) ) {
-                arglist[j] = setParameterValue(x, resp, out, p, typeName, pArray[j]);
+              } else if ( ! SafetyUtil.isEmpty(req.getParameter(pArray[j].getName())) ) {
+                arglist[j] = setParameterValue(x, resp, out, req, typeName, pArray[j]);
               } else {
                 DigErrorMessage error = new GeneralException.Builder(x)
                   .setMessage("Empty Parameter values : " + pArray[j].getName())
@@ -144,6 +150,7 @@ public class SugarWebAgent
                 return;
               }
             }
+            //invoke Method inside executeMethod
             executeMethod(x, resp, out, class_, serviceName, methodName, paramTypes, arglist);
           }
         }
@@ -209,7 +216,7 @@ public class SugarWebAgent
     return;
   }
 
-  protected Object getFieldInfo(X x, String className, HttpParameters p) {  // For Obj Parameters
+  protected Object getFieldInfo(X x, String className, HttpServletRequest req) {  // For Obj Parameters
     Class clsForObj = null;
     Object clsObj = null;
 
@@ -222,21 +229,21 @@ public class SugarWebAgent
       List axioms = ((foam.core.FObject) clsObj).getClassInfo().getAxiomsByClass(PropertyInfo.class);
       Iterator it = axioms.iterator();
 
-      while (it.hasNext()) {
+      while ( it.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) it.next();
 
-        for (int m = 0; m < fieldList.length; m++)
-          if (fieldList[m].getName().equals(prop.getName().toUpperCase())) {
+        for ( int m = 0; m < fieldList.length; m++ )
+          if ( fieldList[m].getName().equals(prop.getName().toUpperCase()) ) {
             fieldList[m].setAccessible(true);
             Field modifiersField = (Field.class).getDeclaredField("modifiers");
             modifiersField.setAccessible(true);
             modifiersField.set(fieldList[m], fieldList[m].getModifiers() & ~Modifier.STATIC);
 
-            if (!SafetyUtil.isEmpty(p.getParameter(prop.getName()))) {
-              if (prop.getValueClass().toString().equals("class [Ljava.lang.String;")) {  //String[]
-                prop.set(clsObj, p.getParameterValues(prop.getName()));
+            if ( ! SafetyUtil.isEmpty(req.getParameter(prop.getName())) ) {
+              if ( prop.getValueClass().toString().equals("class [Ljava.lang.String;") ) {  //String[]
+                prop.set(clsObj, req.getParameterValues(prop.getName()));
               } else {
-                prop.set(clsObj, p.getParameter(prop.getName()));
+                prop.set(clsObj, req.getParameter(prop.getName()));
               }
 
               fieldList[m].set(clsObj, prop);
@@ -253,31 +260,45 @@ public class SugarWebAgent
     return clsObj;
   }
 
-  protected Object setParameterValue(X x, HttpServletResponse resp, PrintWriter out, HttpParameters p, String typeName, Parameter pArray_) {
+  protected Object setParameterValue(X x, HttpServletResponse resp, PrintWriter out, HttpServletRequest req, String typeName, Parameter pArray_) {
     Object arg = null;
+    foam.nanos.auth.User user = null;
+    Object obj = null;
+    Type[] actualType = null;
 
     if ( ! SafetyUtil.isEmpty(typeName) ) {
       switch ( typeName ) {
         case "double":
-          arg = Double.parseDouble(p.getParameter(pArray_.getName()));
+          arg = Double.parseDouble(req.getParameter(pArray_.getName()));
           break;
         case "boolean":
-          arg = Boolean.parseBoolean(p.getParameter(pArray_.getName()));
+          arg = Boolean.parseBoolean(req.getParameter(pArray_.getName()));
           break;
         case "int":
-          arg = Integer.parseInt(p.getParameter(pArray_.getName()));
+          arg = Integer.parseInt(req.getParameter(pArray_.getName()));
           break;
         case "long":
-          arg = Long.parseLong(p.getParameter(pArray_.getName()));
+          arg = Long.parseLong(req.getParameter(pArray_.getName()));
           break;
         case "java.lang.String":
-          arg = p.getParameter(pArray_.getName());
+          arg = req.getParameter(pArray_.getName());
           break;
         case "String[]":
-          arg = p.getParameterValues(pArray_.getName());
+          arg = req.getParameterValues(pArray_.getName());
           break;
         case "foam.core.X":
           arg = x;
+          break;
+        case "java.util.Map":
+          Map map = new java.util.HashMap();
+          int i = 1;
+          Map<Object, Object> paramMap = new HashMap<Object, Object>();
+          while ( req.getParameter("key" + Integer.toString(i)) != null && req.getParameter("value" + Integer.toString(i)) != null ) {
+            paramMap.put(req.getParameter("key" + Integer.toString(i)), req.getParameter("value" + Integer.toString(i)));
+            i++;
+          }
+
+          arg = paramMap;
           break;
         default:
           Class objClass = null;
@@ -287,20 +308,18 @@ public class SugarWebAgent
 
             if ( objClass != null && objClass.isEnum() ) {  // For Enum Parameter
               for ( int t = 0 ; t < objClass.getEnumConstants().length ; t++ ) {
-                if ( objClass.getEnumConstants()[t].toString().equals(p.getParameter(pArray_.getName())) ) {
+                if ( objClass.getEnumConstants()[t].toString().equals(req.getParameter(pArray_.getName())) ) {
                   arg = objClass.getEnumConstants()[t];
                 }
               }
             } else {
-              arg = getFieldInfo(x, typeName, p);  // For Object Parameter
+              arg = getFieldInfo(x, typeName, req);
             }
           } catch (Exception e) {
             DigErrorMessage error = new GeneralException.Builder(x)
               .setMessage(e.toString())
               .build();
             outputException(x, null, "JSON", null, error);
-
-
           }
       }
     }
