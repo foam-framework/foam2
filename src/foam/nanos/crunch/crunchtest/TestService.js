@@ -1,6 +1,6 @@
 foam.INTERFACE({
   name: 'TestService',
-  package: 'foam.box.testspace',
+  package: 'foam.nanos.crunch.crunchtest',
 
   documentation: `
     The CRUNCH TestService allows manual invocation of capability intercepts.
@@ -22,8 +22,8 @@ foam.INTERFACE({
 
 foam.CLASS({
   name: 'TestServiceServer',
-  package: 'foam.box.testspace',
-  implements: ['foam.box.testspace.TestService'],
+  package: 'foam.nanos.crunch.crunchtest',
+  implements: ['foam.nanos.crunch.crunchtest.TestService'],
 
   methods: [
     {
@@ -37,9 +37,8 @@ foam.CLASS({
       ],
       javaCode: `
         throw new foam.nanos.auth.AuthorizationException(
-          "Test authorization failure", permission,
+          "Test authorization failure", permission
         );
-        return true;
       `
     }
   ]
@@ -47,7 +46,7 @@ foam.CLASS({
 
 foam.CLASS({
   name: 'TestServiceClient',
-  package: 'foam.box.testspace',
+  package: 'foam.nanos.crunch.crunchtest',
 
   requires: [
     'foam.box.SessionClientBox',
@@ -61,7 +60,7 @@ foam.CLASS({
     },
     {
       class: 'Stub',
-      of: 'foam.box.testspace.TestService',
+      of: 'foam.nanos.crunch.crunchtest.TestService',
       name: 'delegate',
       factory: function() {
         return this.SessionClientBox.create({ delegate: this.HTTPBox.create({

@@ -29,4 +29,8 @@ public class AuthorizationException extends SecurityException {
   public String getPermission() {
     return permission_;
   }
+
+  public void clearPermission() {
+    permission_ = "";
+  }
 }

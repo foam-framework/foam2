@@ -7,6 +7,7 @@
 package foam.nanos.http;
 
 import foam.box.Box;
+import foam.box.CapabilityInterceptReplyDecoratorBox;
 import foam.box.SessionServerBox;
 import foam.core.FObject;
 import foam.core.ProxyX;
@@ -114,7 +115,12 @@ public class ServiceWebAgent
       }
 
       foam.box.Message msg = (foam.box.Message) result;
-      new SessionServerBox(x, skeleton_, authenticate_).send(msg);
+      foam.box.Box srvrBox =
+        new SessionServerBox(x, skeleton_, authenticate_);
+      srvrBox = new CapabilityInterceptReplyDecoratorBox.Builder(x)
+        .setDelegate(srvrBox)
+        .build();
+      srvrBox.send(msg);
     } catch (Throwable t) {
       throw new RuntimeException(t);
     }

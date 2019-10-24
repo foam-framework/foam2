@@ -26,6 +26,7 @@ p({
 p({
   "class": "foam.nanos.script.Script",
   "id": "Invoke Capability Intercept",
+  "server":false,
   "code": """
     let result = x.crunchTestService.testAuthorizationException("test.crunch.a");
     print(result);

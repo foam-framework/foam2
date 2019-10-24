@@ -384,7 +384,7 @@ foam.CLASS({
       return new Promise(function(resolve, reject) {
         self.stack.push({
           class: 'foam.nanos.crunch.ui.CapabilityInterceptView',
-          data: self.capabilityDAO,
+          data: self.__subContext__.capabilityDAO,
           capabilityOptions: capabilityInfo.capabilityOptions
         });
       });
