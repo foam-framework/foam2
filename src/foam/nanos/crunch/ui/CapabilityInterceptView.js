@@ -21,7 +21,10 @@ foam.CLASS({
 
   properties: [
     { name: 'data' },
-    { name: 'capabilityOptions', class: 'StringArray' }
+    {
+      class: 'StringArray',
+      name: 'capabilityOptions'
+    }
   ],
 
   css: `
