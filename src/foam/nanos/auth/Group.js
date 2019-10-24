@@ -110,6 +110,10 @@ foam.CLASS({
       javaFactory: `
         return new foam.nanos.auth.PasswordPolicy();
       `,
+      view: {
+        class: 'foam.u2.view.FObjectPropertyView',
+        readView: { class: 'foam.u2.detail.VerticalDetailView' }
+      }
     }
     /*
       FUTURE
