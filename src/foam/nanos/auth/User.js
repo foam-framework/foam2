@@ -120,7 +120,6 @@ foam.CLASS({
       class: 'Boolean',
       name: 'loginEnabled',
       documentation: 'Determines whether the User can login to the platform.',
-      readPermissionRequired: true,
       writePermissionRequired: true,
       value: true,
       section: 'administrative'
@@ -226,7 +225,6 @@ foam.CLASS({
       class: 'Boolean',
       name: 'emailVerified',
       documentation: 'Determines whether the email address of the User is valid.',
-      readPermissionRequired: true,
       writePermissionRequired: true,
       section: 'administrative'
     },
