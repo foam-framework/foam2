@@ -103,11 +103,17 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.PasswordPolicy',
       name: 'passwordPolicy',
-      view: { class: 'foam.u2.view.FObjectView' },
       documentation: 'Password policy for this group.',
+      factory: function() {
+        return this.PasswordPolicy.create();
+      },
       javaFactory: `
         return new foam.nanos.auth.PasswordPolicy();
       `,
+      view: {
+        class: 'foam.u2.view.FObjectPropertyView',
+        readView: { class: 'foam.u2.detail.VerticalDetailView' }
+      }
     }
     /*
       FUTURE
