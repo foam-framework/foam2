@@ -8,24 +8,21 @@ foam.CLASS({
   package: 'foam.nanos.logger',
   name: 'LogMessage',
 
-  documentation: `Modelled log output.
-Implement LastModifiedByAware to suppress 'modified by' comment in journal output.`,
+  documentation: 'Modelled log output.',
 
   implements: [
     'foam.nanos.auth.CreatedAware',
-    'foam.nanos.auth.CreatedByAware',
-    'foam.nanos.auth.LastModifiedByAware'
+    'foam.nanos.auth.CreatedByAware'
   ],
 
   tableColumns: [
     'created',
     'severity',
-    'createdBy',
-    'lastModifiedBy',
     'message'
   ],
 
   searchColumns: [
+    'created',
     'severity',
     'exception'
   ],
@@ -34,14 +31,16 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
     {
       class: 'DateTime',
       name: 'created',
-      visibility: 'RO'
+      visibility: 'RO',
+      tableWidth: 180
     },
+    'createdBy',
     {
       name: 'severity',
       class: 'Enum',
       of: 'foam.log.LogLevel',
       toJSON: function(value) { return value && value.label; },
-      visibility: 'RO',
+      updateMode: 'RO',
       tableCellFormatter: function(severity, obj, axiom) {
          this
           .start()
@@ -50,39 +49,20 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
             .style({ color: severity.color })
           .end();
       },
+      tableWidth: 90
     },
     {
       name: 'id',
       class: 'Long',
       storageTransient: 'true',
-      hidden: 'true',
-      visibility: 'RO'
-    },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      name: 'createdBy',
-      documentation: 'User who created the entry',
-      visibility: 'RO'
-    },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      name: 'lastModifiedBy',
-      value: '1',
-      transient: true,
-      hidden: true,
-      documentation: 'Added to suppress journal comments regarding "modified by". Also, a non-null value is required.',
-      javaFactory: 'return 1L;',
-      visibility: 'RO'
+      hidden: 'true'
     },
     {
       name: 'message',
       class: 'String',
       label: 'Log Message',
-      visibility: foam.u2.Visibility.RO,
-      view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 80 },
-      visibility: 'RO'
+      view: { class: 'foam.u2.view.PreView' },
+      updateMode: 'RO'
     },
     // TODO: implement via an additional method on Logger logger.flag(x, y).log(message)
     // {
@@ -92,8 +72,8 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
     {
       name: 'exception',
       class: 'Object',
-      visibility: 'RO',
-      view: { class: 'foam.u2.tag.TextArea', rows: 5, col: 80 }
+      view: { class: 'foam.u2.view.PreView' },
+      updateMode: 'RO'
     }
   ]
 });
