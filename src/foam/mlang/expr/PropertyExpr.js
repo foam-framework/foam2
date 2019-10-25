@@ -11,7 +11,7 @@ foam.CLASS({
 
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: `  
+  documentation: `
     An Expr whose value is a property. Even though Property implements Expr
     directly, we want this so FObjectView can list this as an option for a
     concrete implementation of Expr instead of listing every property of every
@@ -29,7 +29,6 @@ foam.CLASS({
       },
       view: function(_, X) {
         var choicesSlot = foam.core.SimpleSlot.create({ value: [] });
-        // TODO: Use a better desiredModelId than 'foam.Class'.
         X.strategizer.query(null, 'foam.Class').then((strategyReferences) => {
           choicesSlot.set([[null, 'Select...']].concat(strategyReferences.map((sr) => [sr.strategy, sr.strategy.name])));
         });
