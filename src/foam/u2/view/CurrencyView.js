@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'CurrencyView',
   extends: 'foam.u2.view.ModeAltView',
 
-  documentation: 'A view for foam.core.UnitValue properties.',
+  documentation: 'A view for foam.core.Currency properties.',
 
   requires: [
     'foam.u2.CurrencyView',
