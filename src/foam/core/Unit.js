@@ -1,7 +1,7 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'Unit',
-  abstract: true,
+  //abstract: true,
 
   documentation: `The abstract model for fungible digitized assets`,
 

@@ -58,8 +58,6 @@ FOAM_FILES([
   { name: "foam/core/Promised" },
   { name: "foam/core/Interface" },
   { name: "foam/core/Type" },
-  { name: "foam/core/Unit" },
-  { name: "foam/core/Currency" },
   { name: "foam/core/Axiom" },
   { name: "foam/core/Exception" },
   { name: "foam/core/ContextMethod" },
@@ -706,5 +704,8 @@ FOAM_FILES([
   { name: "foam/strategy/StrategyReference" },
   { name: "foam/strategy/StrategizerService" },
   { name: "foam/strategy/BasicStrategizer" },
-  { name: "foam/strategy/ClientStrategizerService" }
+  { name: "foam/strategy/ClientStrategizerService" },
+
+  { name: "foam/core/Unit" },
+  { name: "foam/core/Currency" },
 ]);

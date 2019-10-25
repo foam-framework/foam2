@@ -20,8 +20,6 @@ var classes = [
   'foam.core.CoreTypesValidationTest',
   'foam.core.CoreTypesValidationTestModel',
   'foam.core.Validator',
-  'foam.core.Unit',
-  'foam.core.Currency',
   'foam.glang.EndOfTimeSpan',
   'foam.glang.EndOfDay',
   'foam.glang.EndOfWeek',
@@ -485,7 +483,8 @@ var classes = [
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
-
+    'foam.core.Unit',
+    'foam.core.Currency',
   // Strategy
   'foam.strategy.StrategyReference',
   'foam.strategy.StrategizerService',
