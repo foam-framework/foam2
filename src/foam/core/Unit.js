@@ -11,7 +11,7 @@
   documentation: `The abstract model for fungible digitized assets`,
 
   ids: [
-    'alphabeticCode'
+    'id'
   ],
 
   properties: [
@@ -23,7 +23,7 @@
     },
     {
       class: 'String',
-      name: 'alphabeticCode',
+      name: 'id',
       label: 'Code',
       documentation: 'The alphabetic code associated with the asset. Used as an ID.',
       required: true,

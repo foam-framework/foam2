@@ -12,7 +12,7 @@
   documentation: `The base model for storing, using and managing currency information.`,
 
   ids: [
-    'alphabeticCode'
+    'id'
   ],
 
   javaImports: [
@@ -21,7 +21,7 @@
 
   tableColumns: [
     'name',
-    'alphabeticCode',
+    'id',
     'country',
     'symbol',
     'emoji'
@@ -101,10 +101,10 @@
       name: 'toSummary',
       documentation: `When using a reference to the currencyDAO, the labels associated
         to it will show a chosen property rather than the first alphabetical string
-        property. In this case, we are using the alphabeticCode.
+        property. In this case, we are using the id.
       `,
       code: function(x) {
-        return this.alphabeticCode;
+        return this.id;
       }
     },
     {
