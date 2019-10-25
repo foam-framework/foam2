@@ -713,7 +713,7 @@ foam.CLASS({
     {
       documentation: `
         State of an Element after it has been removed from the DOM.
-        An unloaded Element can be readded to the DOM.
+        An unloaded Element can be re-added to the DOM.
       `,
       name: 'UNLOADED',
       type: 'foam.u2.UnloadedElementState',
@@ -1703,6 +1703,9 @@ foam.CLASS({
       var listener = this.RenderSink.create({
         dao: dao,
         addRow: function(o) {
+          // No use adding new children if the parent has already been removed
+          if ( self.state === foam.u2.Element.UNLOADED ) return;
+
           if ( update ) o = o.clone();
 
           self.startContext({data: o});
