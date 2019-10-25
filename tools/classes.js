@@ -483,8 +483,9 @@ var classes = [
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
-    'foam.core.Unit',
-    'foam.core.Currency',
+  //Unit
+  'foam.core.Unit',
+  'foam.core.Currency',
   // Strategy
   'foam.strategy.StrategyReference',
   'foam.strategy.StrategizerService',
