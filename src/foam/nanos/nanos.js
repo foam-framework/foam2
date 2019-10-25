@@ -47,7 +47,6 @@ FOAM_FILES([
   { name: "foam/nanos/auth/Country" },
   { name: "foam/nanos/auth/Region" },
   { name: 'foam/nanos/auth/ResendVerificationEmail', flags: ['web'] },
-  { name: "foam/nanos/auth/Phone" },
   { name: "foam/nanos/auth/HtmlDoc" },
   { name: "foam/nanos/auth/SignOutView" },
   { name: 'foam/nanos/auth/email/EmailTokenService'},

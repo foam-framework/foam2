@@ -19,8 +19,7 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.auth.Address',
-    'foam.nanos.auth.PriorPassword',
-    'foam.nanos.auth.Phone'
+    'foam.nanos.auth.PriorPassword'
   ],
 
   javaImports: [
@@ -229,36 +228,47 @@ foam.CLASS({
       section: 'administrative'
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Phone',
-      name: 'phone',
+      class: 'String',
+      name: 'phoneNumber',
       documentation: 'Personal phone number.',
-      factory: function() {
-        return this.Phone.create();
-      },
-      view: { class: 'foam.u2.detail.VerticalDetailView' },
+//      validationPredicates: [
+//        {
+//          args: ['this'],
+//          predicateFactory: function(e) {
+//            return e.REG_EXP(
+//              e,
+//              /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/);
+//          },
+//          errorString: 'Please enter a phone number'
+//        }
+//      ],
+      section: 'personal'
+    },
+    {
+      class: 'Boolean',
+      name: 'phoneNumberVerified',
       section: 'personal'
     },
     {
       class: 'String',
-      name: 'phoneNumber',
-      transient: true,
-      documentation: `Omits properties of the phone number object and returns
-        the phone number.`,
-      expression: function(phone) {
-        return phone.number;
-      },
+      name: 'mobile',
+      documentation: 'Returns the mobile phone number of the User from the Phone model.',
+//      validationPredicates: [
+//        {
+//          args: ['this'],
+//          predicateFactory: function(e) {
+//            return e.REG_EXP(
+//              e,
+//              /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/);
+//          },
+//          errorString: 'Please enter a phone number'
+//        }
+//      ],
       section: 'personal'
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Phone',
-      name: 'mobile',
-      documentation: 'Returns the mobile phone number of the User from the Phone model.',
-      factory: function() {
-        return this.Phone.create();
-      },
-      view: { class: 'foam.u2.detail.VerticalDetailView' },
+      class: 'Boolean',
+      name: 'mobileVerified',
       section: 'personal'
     },
     {
