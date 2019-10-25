@@ -14,10 +14,6 @@
     'alphabeticCode'
   ],
 
-  javaImports: [
-    'foam.util.SafetyUtil'
-  ],
-
   properties: [
     {
       class: 'String',
