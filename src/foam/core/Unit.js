@@ -23,7 +23,7 @@
     {
       class: 'String',
       name: 'name',
-      documentation: 'name of the asset',
+      documentation: 'Name of the asset.',
       required: true
     },
     {
