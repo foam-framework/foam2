@@ -22,7 +22,7 @@ foam.CLASS({
   ],
 
   properties: [
-    { name: 'data' },
+    'data',
     {
       class: 'StringArray',
       name: 'capabilityOptions'
@@ -33,14 +33,6 @@ foam.CLASS({
     ^ {
       width: 1024px;
       margin: auto;
-    }
-    ^action-container {
-      display: flex;
-      justify-content: space-between;
-      margin: 8px 0;
-    }
-    ^action-container > div > div > * + * {
-      margin-left: 8px;
     }
     ^detail-container {
       overflow-x: scroll;
@@ -54,6 +46,7 @@ foam.CLASS({
 
         .startContext({ data: this })
           .tag(this.CANCEL, { buttonStyle: 'SECONDARY' })
+          .tag(this.AQUIRE, { buttonStyle: 'SECONDARY' })
         .endContext()
 
         // Container for the detailview
@@ -75,6 +68,12 @@ foam.CLASS({
       code: function() {
         if ( ! this.capabilityAquired ) this.capabilityCancelled = true;
         this.stack.back();
+      }
+    },
+    {
+      name: 'aquire',
+      code: function() {
+        this.capabilityAquired = true;
       }
     }
   ]

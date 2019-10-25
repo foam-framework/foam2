@@ -384,6 +384,7 @@ FOAM_FILES([
   { name: "foam/box/OneTimeBox" },
   { name: "foam/box/ExportBox" },
   { name: "foam/box/CapabilityInterceptBox" },
+  { name: "foam/box/CapabilityInterceptReplyDecoratorBox" },
 
   { name: "foam/swift/refines/Stub", flags: ['swift'] },
   { name: "foam/swift/refines/Promised", flags: ['swift'] },
