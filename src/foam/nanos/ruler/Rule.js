@@ -54,7 +54,7 @@
     {
       class: 'String',
       name: 'id',
-      visibility: 'RO',
+      updateMode: 'RO',
       tableWidth: 200,
       section: 'basicInfo'
     },

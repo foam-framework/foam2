@@ -3,4 +3,6 @@ p({"class":"foam.strategy.StrategyReference","id":"35fa57a1-2189-fab3-bf8b-90176
 p({"class":"foam.strategy.StrategyReference","id":"fa044742-f7eb-ed3b-62a2-4b5ba276e246","desiredModelId":"foam.mlang.predicate.Predicate","strategy":"foam.mlang.predicate.And"})
 p({"class":"foam.strategy.StrategyReference","id":"40b2ae0e-7478-466f-8ded-c1fbd3a88308","desiredModelId":"foam.mlang.predicate.Predicate","strategy":"foam.mlang.predicate.Or"})
 p({"class":"foam.strategy.StrategyReference","id":"2c1799d7-afa3-4768-92a0-8245b3cd5180","desiredModelId":"foam.mlang.Expr","strategy":"foam.mlang.Constant"})
-p({"class":"foam.strategy.StrategyReference","id":"904ae35f-5c4a-4361-8f0c-7b54a71d5b79","desiredModelId":"foam.mlang.Expr","strategy":"foam.mlang.PropertyExpr"})
+p({"class":"foam.strategy.StrategyReference","id":"904ae35f-5c4a-4361-8f0c-7b54a71d5b79","desiredModelId":"foam.mlang.Expr","strategy":"foam.mlang.expr.PropertyExpr"})
+p({"class":"foam.strategy.StrategyReference","id":"b0d7bed9-a82e-478b-a0f8-a2d1d2d2d031","desiredModelId":"foam.Class","strategy":"foam.nanos.auth.User"})
+p({"class":"foam.strategy.StrategyReference","id":"20c2262d-4d0b-47a4-9389-b7e6867d894b","desiredModelId":"foam.Class","strategy":"foam.nanos.auth.Group"})

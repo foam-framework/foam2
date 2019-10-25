@@ -18,51 +18,41 @@ foam.CLASS({
     model.
   `,
 
-  // TODO: Find a better way to get this to work. I originally just had one
-  // property with an adapt method, but I couldn't get things working that way,
-  // so I added a second property that's a simple string and used that to do a
-  // foam.lookup to try and see if you typed in a real property and if so, then
-  // set the "real" property property.
   properties: [
     {
-      name: 'property',
-      visibility: 'HIDDEN',
-      // Set the view to a "null view" so we don't set up any data binding
-      // between this view and the property, which causes problems when the
-      // view overwrites this property's value.
-      view: { class: 'foam.u2.View' },
-      javaType: 'foam.core.PropertyInfo',
-      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
+      class: 'Class',
+      name: 'model',
+      gridColumns: 6,
+      factory: function() {
+        return this.property ? this.property.forClass_ : null;
+      },
+      view: function(_, X) {
+        var choicesSlot = foam.core.SimpleSlot.create({ value: [] });
+        // TODO: Use a better desiredModelId than 'foam.Class'.
+        X.strategizer.query(null, 'foam.Class').then((strategyReferences) => {
+          choicesSlot.set([[null, 'Select...']].concat(strategyReferences.map((sr) => [sr.strategy, sr.strategy.name])));
+        });
+        return {
+          class: 'foam.u2.view.ChoiceView',
+          choices$: choicesSlot
+        };
+      }
     },
     {
-      class: 'String',
-      name: 'propertyName',
-      label: 'Property',
-      documentation: 'A vanity property to make `property` editable.',
-      postSet: function(oldValue, newValue) {
-        var propertyName = newValue;
-        if ( typeof propertyName !== 'string' ) return;
-        try {
-          var lastIndex = propertyName.lastIndexOf('.');
-          var classId = propertyName.substring(0, lastIndex);
-          var cls = foam.lookup(classId, true);
-          var property = cls.getAxiomByName(propertyName.substring(lastIndex + 1));
-          this.property = property;
-        } catch (err) {}
+      name: 'property',
+      gridColumns: 6,
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.ChoiceView',
+          choices$: X.data.model$.map((model) => {
+            return model
+              ? model.getAxiomsByClass(foam.core.Property).map((axiom) => [axiom, axiom.label])
+              : [];
+          })
+        };
       },
-      view: {
-        class: 'foam.u2.TextField',
-        onKey: true
-      },
-      validationPredicates: [
-        {
-          args: ['property', 'propertyName'],
-          predicateFactory: function(e) {
-            return e.HAS(foam.mlang.expr.PropertyExpr.PROPERTY);
-          },
-          errorString: 'Invalid property.'
-        }
-      ]
+      javaType: 'foam.core.PropertyInfo',
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
     }
   ],
 

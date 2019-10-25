@@ -689,11 +689,13 @@ foam.CLASS({
   properties: [
     {
       class: 'foam.mlang.ExprProperty',
-      name: 'arg1'
+      name: 'arg1',
+      gridColumns: 6
     },
     {
       class: 'foam.mlang.ExprProperty',
       name: 'arg2',
+      gridColumns: 6,
       adapt: function(old, nu, prop) {
         var value = prop.adaptValue(nu);
         var arg1 = this.arg1;
