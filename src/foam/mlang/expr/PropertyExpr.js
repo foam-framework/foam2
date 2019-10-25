@@ -21,7 +21,8 @@ foam.CLASS({
   properties: [
     {
       class: 'Class',
-      name: 'model',
+      name: 'of',
+      label: 'Model',
       gridColumns: 6,
       factory: function() {
         return this.property ? this.property.forClass_ : null;
@@ -44,9 +45,9 @@ foam.CLASS({
       view: function(_, X) {
         return {
           class: 'foam.u2.view.ChoiceView',
-          choices$: X.data.model$.map((model) => {
-            return model
-              ? model.getAxiomsByClass(foam.core.Property).map((axiom) => [axiom, axiom.label])
+          choices$: X.data.of$.map((of) => {
+            return of
+              ? of.getAxiomsByClass(foam.core.Property).map((axiom) => [axiom, axiom.label])
               : [];
           })
         };
