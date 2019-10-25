@@ -29,7 +29,10 @@ p({
   "server":false,
   "code": """
     let result = x.crunchTestService.testAuthorizationException("test.crunch.a");
-    print(result);
+    result.then(
+      function () { console.log("Capability AQUIRED"); },
+      function () { console.log("Capability CANCELLED"); }
+    );
   """
 })
 

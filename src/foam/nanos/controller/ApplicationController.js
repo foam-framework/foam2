@@ -60,6 +60,11 @@ foam.CLASS({
     'displayWidth',
     'appConfig',
     'as ctrl',
+<<<<<<< HEAD
+=======
+    'capabilityAquired',
+    'capabilityCancelled',
+>>>>>>> 982ece068... Detach listener when capability is aquired or cancelled
     'currentMenu',
     'group',
     'lastMenuLaunched',
@@ -192,6 +197,17 @@ foam.CLASS({
       name: 'loginSuccess'
     },
     {
+<<<<<<< HEAD
+=======
+      class: 'Boolean',
+      name: 'capabilityAquired'
+    },
+    {
+      class: 'Boolean',
+      name: 'capabilityCancelled'
+    },
+    {
+>>>>>>> 982ece068... Detach listener when capability is aquired or cancelled
       class: 'FObjectProperty',
       of: 'foam.nanos.session.SessionTimer',
       name: 'sessionTimer',
@@ -381,11 +397,24 @@ foam.CLASS({
 
     function requestCapability(capabilityInfo) {
       var self = this;
+      self.capabilityAquired = false;
+      self.capabilityCancelled = false;
       return new Promise(function(resolve, reject) {
         self.stack.push({
           class: 'foam.nanos.crunch.ui.CapabilityInterceptView',
           data: self.__subContext__.capabilityDAO,
           capabilityOptions: capabilityInfo.capabilityOptions
+        });
+        var s1, s2;
+        s1 = self.capabilityAquired$.sub(() => {
+          s1.detach();
+          s2.detach();
+          resolve();
+        });
+        s2 = self.capabilityCancelled$.sub(() => {
+          s1.detach();
+          s2.detach();
+          reject();
         });
       });
     },

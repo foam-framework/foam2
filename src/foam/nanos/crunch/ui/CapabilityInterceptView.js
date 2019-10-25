@@ -16,6 +16,8 @@ foam.CLASS({
   ],
 
   imports: [
+    'capabilityAquired',
+    'capabilityCancelled',
     'stack'
   ],
 
@@ -71,6 +73,7 @@ foam.CLASS({
     {
       name: 'cancel',
       code: function() {
+        if ( ! this.capabilityAquired ) this.capabilityCancelled = true;
         this.stack.back();
       }
     }
