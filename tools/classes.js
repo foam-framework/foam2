@@ -475,7 +475,6 @@ var classes = [
   'foam.nanos.crunch.crunchtest.FakeTestObject',
   'foam.nanos.crunch.crunchtest.TestService',
   'foam.nanos.crunch.crunchtest.TestServiceServer',
-  'foam.nanos.crunch.crunchtest.TestServiceClient',
   //models
   'foam.nanos.crunch.Capability',
   'foam.nanos.crunch.CapabilityJunctionStatus',
