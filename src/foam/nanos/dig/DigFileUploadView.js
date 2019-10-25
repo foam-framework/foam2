@@ -106,6 +106,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'acceptFormat',
+      value: 'application/vnd.ms-excel, text/csv'
     },
     [ 'uploadHidden', false ],
     [ 'removeHidden', false ],
