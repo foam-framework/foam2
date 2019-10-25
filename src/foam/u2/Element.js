@@ -2304,6 +2304,17 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
+  name: 'ArrayViewRefinement',
+  refines: 'foam.core.Array',
+  requires: [ 'foam.u2.view.ArrayView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.view.ArrayView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
   name: 'StringArrayViewRefinement',
   refines: 'foam.core.StringArray',
   requires: [ 'foam.u2.view.StringArrayView' ],
@@ -2555,6 +2566,52 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
+  name: 'PredicatePropertyRefinement',
+  refines: 'foam.mlang.predicate.PredicateProperty',
+  requires: [
+    'foam.u2.view.FObjectPropertyView',
+    'foam.u2.view.FObjectView'
+  ],
+  properties: [
+    {
+      name: 'view',
+      value: {
+        class: 'foam.u2.view.FObjectPropertyView',
+        writeView: {
+          class: 'foam.u2.view.FObjectView',
+          of: 'foam.mlang.predicate.Predicate'
+        }
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'ExprPropertyRefinement',
+  refines: 'foam.mlang.ExprProperty',
+  requires: [
+    'foam.u2.view.FObjectPropertyView',
+    'foam.u2.view.FObjectView'
+  ],
+  properties: [
+    {
+      name: 'view',
+      value: {
+        class: 'foam.u2.view.FObjectPropertyView',
+        writeView: {
+          class: 'foam.u2.view.FObjectView',
+          of: 'foam.mlang.Expr'
+        }
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
   name: 'ControllerViewTrait',
 
   documentation: 'Trait for adding a ControllerMode controllerMode Property.',
@@ -2793,18 +2850,6 @@ foam.CLASS({
       postSet: function(_, cs) {
         this.axioms_.push(foam.u2.SearchColumns.create({columns: cs}));
       }
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.u2',
-  name: 'PredicatePropertyRefine',
-  refines: 'foam.mlang.predicate.PredicateProperty',
-  properties: [
-    {
-      name: 'view',
-      value: { class: 'foam.u2.view.JSONTextView' }
     }
   ]
 });

@@ -31,12 +31,14 @@ foam.CLASS({
       documentation: `
         The id of the model that the referenced strategy is a strategy for.
       `,
+      help: 'The id of the model that the referenced strategy is a strategy for.',
       required: true
     },
     {
       class: 'Class',
       name: 'strategy',
       documentation: 'The strategy for the desired model.',
+      help: 'The strategy for the desired model.',
       required: true
     },
     {
