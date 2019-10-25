@@ -60,11 +60,8 @@ foam.CLASS({
     'displayWidth',
     'appConfig',
     'as ctrl',
-<<<<<<< HEAD
-=======
     'capabilityAquired',
     'capabilityCancelled',
->>>>>>> 982ece068... Detach listener when capability is aquired or cancelled
     'currentMenu',
     'group',
     'lastMenuLaunched',
@@ -197,8 +194,6 @@ foam.CLASS({
       name: 'loginSuccess'
     },
     {
-<<<<<<< HEAD
-=======
       class: 'Boolean',
       name: 'capabilityAquired'
     },
@@ -207,7 +202,6 @@ foam.CLASS({
       name: 'capabilityCancelled'
     },
     {
->>>>>>> 982ece068... Detach listener when capability is aquired or cancelled
       class: 'FObjectProperty',
       of: 'foam.nanos.session.SessionTimer',
       name: 'sessionTimer',
