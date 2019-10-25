@@ -2223,7 +2223,11 @@ foam.CLASS({
     {
       class: 'Class',
       name: 'targetClass',
-      javaType: 'foam.core.ClassInfo'
+      javaType: 'foam.core.ClassInfo',
+      view: {
+        class: 'foam.u2.view.StrategizerChoiceView',
+        desiredModelId: 'foam.Class'
+      }
     }
   ],
 
@@ -3263,7 +3267,11 @@ foam.CLASS({
   properties: [
     {
       class: 'Class',
-      name: 'targetClass'
+      name: 'targetClass',
+      view: {
+        class: 'foam.u2.view.StrategizerChoiceView',
+        desiredModelId: 'foam.Class'
+      }
     }
   ],
 

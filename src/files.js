@@ -488,6 +488,7 @@ FOAM_FILES([
   { name: "foam/u2/ClassView", flags: ['web'] },
   { name: "foam/u2/view/ReferenceView", flags: ['web'] },
   { name: "foam/u2/view/FullReferenceView" },
+  { name: "foam/u2/view/StrategizerChoiceView" },
   { name: "foam/u2/tag/Card", flags: ['web'] },
   { name: "foam/u2/dialog/Popup", flags: ['web'] },
   { name: "foam/u2/dialog/NotificationMessage", flags: ['web'] },
