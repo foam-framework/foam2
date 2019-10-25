@@ -1449,7 +1449,8 @@ foam.CLASS({
     },
     {
       // TODO: simpler to make an expression
-      name: 'valueSet_'
+      name: 'valueSet_',
+      hidden: true
     }
   ]
 });
@@ -1484,7 +1485,8 @@ foam.CLASS({
       }
     },
     {
-      name: 'upperCase_'
+      name: 'upperCase_',
+      hidden: 'true'
     }
   ],
 
@@ -2041,6 +2043,19 @@ foam.CLASS({
   implements: [ 'foam.core.Serializable' ],
 
   documentation: 'Unary Predicate that returns true iff the given property has a value other than null, undefined, \'\', or [].',
+
+  requires: [
+    'foam.mlang.expr.PropertyExpr'
+  ],
+
+  properties: [
+    {
+      name: 'arg1',
+      factory: function() {
+        return this.PropertyExpr.create();
+      }
+    }
+  ],
 
   methods: [
     {
@@ -3410,9 +3425,14 @@ foam.CLASS({
   implements: [ 'foam.core.Serializable' ],
   properties: [
     {
+      name: 'arg1',
+      gridColumns: 6
+    },
+    {
       type: 'Regex',
       javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
-      name: 'regExp'
+      name: 'regExp',
+      gridColumns: 6
     }
   ],
   methods: [

@@ -87,7 +87,16 @@ foam.CLASS({
       // implements and extends relations.
       if ( this.strategizer != null ) {
         this.strategizer.query(null, this.of.id).then((strategyReferences) => {
-          this.choices = strategyReferences.map((sr) => [sr.strategy.id, sr.strategy.name]);
+          this.choices = strategyReferences
+            .reduce((arr, sr) => {
+              if ( ! sr.strategy ) {
+                console.warn('Invalid strategy reference: ' + sr.id);
+                return arr;
+              }
+
+              return arr.concat([[sr.strategy.id, sr.strategy.name]]);
+            }, [])
+            .filter(x => x);
         });
       } else {
         this.choices = this.choicesFallback(this.of);
