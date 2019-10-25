@@ -23,6 +23,14 @@ foam.CLASS({
       factory: function() {
         return [
           foam.u2.view.AnyView.Choice.create({
+            label: '--',
+            type: foam.Undefined,
+            view: foam.u2.View,
+            toType: function(o) {
+              return undefined;
+            }
+          }),
+          foam.u2.view.AnyView.Choice.create({
             label: 'String',
             type: foam.String,
             view: foam.u2.TextField,
