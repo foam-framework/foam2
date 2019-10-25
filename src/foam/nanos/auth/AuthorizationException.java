@@ -19,7 +19,7 @@ public class AuthorizationException extends SecurityException {
     super("Permission denied.");
   }
   public AuthorizationException(String message, String permission) {
-    super(message + " (permission: '" + permission + "')");
+    super("".equals(message) ? "Permission denied." : message);
     permission_ = permission;
   }
   public AuthorizationException(String message) {
