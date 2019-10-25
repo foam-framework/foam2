@@ -106,7 +106,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'acceptFormat',
-      value: false
     },
     [ 'uploadHidden', false ],
     [ 'removeHidden', false ],
