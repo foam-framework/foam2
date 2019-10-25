@@ -44,7 +44,7 @@ foam.CLASS({
       ],
       javaCode: `
         DAO delegate = new MDAO(DeletedAwareDummy.getOwnClassInfo());
-        DAO dao = (DAO) new DeletedAwareDAO(x, delegate);
+        DAO dao = (DAO) new DeletedAwareDAO.Builder(x).setDelegate(delegate).build();
 
         FObject object = new DeletedAwareDummy.Builder(x)
           .setId(1)
@@ -70,7 +70,7 @@ foam.CLASS({
       ],
       javaCode: `
         DAO delegate = new MDAO(Country.getOwnClassInfo());
-        DAO dao = (DAO) new DeletedAwareDAO(x, delegate);
+        DAO dao = (DAO) new DeletedAwareDAO.Builder(x).setDelegate(delegate).build();
 
         FObject object = new Country.Builder(x)
           .setCode("CA")
@@ -90,7 +90,7 @@ foam.CLASS({
       ],
       javaCode: `
         DAO delegate = new MDAO(DeletedAwareDummy.getOwnClassInfo());
-        DAO dao = (DAO) new DeletedAwareDAO(x, delegate);
+        DAO dao = (DAO) new DeletedAwareDAO.Builder(x).setDelegate(delegate).build();
 
         dao.put(
           new DeletedAwareDummy.Builder(x)
@@ -116,7 +116,7 @@ foam.CLASS({
       ],
       javaCode: `
         DAO delegate = new MDAO(DeletedAwareDummy.getOwnClassInfo());
-        DAO dao = (DAO) new DeletedAwareDAO(x, delegate);
+        DAO dao = (DAO) new DeletedAwareDAO.Builder(x).setDelegate(delegate).build();
 
         FObject object = new DeletedAwareDummy.Builder(x)
           .setId(1)
@@ -137,7 +137,7 @@ foam.CLASS({
       ],
       javaCode: `
         DAO delegate = new MDAO(DeletedAwareDummy.getOwnClassInfo());
-        DAO dao = (DAO) new DeletedAwareDAO(x, delegate);
+        DAO dao = (DAO) new DeletedAwareDAO.Builder(x).setDelegate(delegate).build();
 
         FObject object = new DeletedAwareDummy.Builder(x)
           .setId(1)

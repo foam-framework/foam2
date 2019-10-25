@@ -482,6 +482,13 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
+  name: 'Code',
+  extends: 'String'
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
   name: 'Currency',
   extends: 'Long'
 });

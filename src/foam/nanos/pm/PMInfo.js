@@ -63,7 +63,8 @@ foam.CLASS({
       class: 'String',
       name: 'captureTrace',
       view: { class: 'io.c9.ace.Editor' },
-      permissionRequired: true
+      readPermissionRequired: true,
+      writePermissionRequired: true
     }
   ],
 

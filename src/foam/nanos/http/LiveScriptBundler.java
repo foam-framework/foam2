@@ -201,7 +201,7 @@ public class LiveScriptBundler
     }
   }
 
-  private void doRebuildJavascript(String foamName, Path realPath) {
+  private synchronized void doRebuildJavascript(String foamName, Path realPath) {
     try {
       log_("START", "Building javascript... (JS)");
 
@@ -225,6 +225,8 @@ public class LiveScriptBundler
     PrintWriter         pw = x.get(PrintWriter.class);
     HttpServletResponse r  = x.get(HttpServletResponse.class);
     r.setHeader("Content-Type", "application/javascript");
+
+    synchronized (this) {} // Wait for build to finish before serving
     pw.println(javascriptBuffer_);
   }
 

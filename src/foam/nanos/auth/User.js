@@ -19,6 +19,7 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.auth.Address',
+    'foam.nanos.auth.PriorPassword',
     'foam.nanos.auth.Phone'
   ],
 
@@ -31,6 +32,7 @@ foam.CLASS({
     'foam.mlang.order.Comparator',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.PriorPassword',
     'foam.util.SafetyUtil',
     'static foam.mlang.MLang.EQ'
   ],
@@ -118,7 +120,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'loginEnabled',
       documentation: 'Determines whether the User can login to the platform.',
-      permissionRequired: true,
+      writePermissionRequired: true,
       value: true,
       section: 'administrative'
     },
@@ -179,7 +181,7 @@ foam.CLASS({
       // TODO: Use validatationPredicates instead.
       validateObj: function(organization) {
         if ( ! organization.trim() ) {
-          return 'Company Name Required.';
+          return 'Organization Required.';
         }
       },
       section: 'business'
@@ -223,7 +225,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'emailVerified',
       documentation: 'Determines whether the email address of the User is valid.',
-      permissionRequired: true,
+      writePermissionRequired: true,
       section: 'administrative'
     },
     {
@@ -301,7 +303,6 @@ foam.CLASS({
       factory: function() {
         return this.Address.create();
       },
-      view: { class: 'foam.u2.detail.VerticalDetailView' },
       section: 'personal'
     },
     {
@@ -345,6 +346,23 @@ foam.CLASS({
       hidden: true,
       networkTransient: true,
       section: 'administrative'
+    },
+    {
+      name: 'passwordHistory',
+      class: 'FObjectArray',
+      of: 'foam.nanos.auth.PriorPassword',
+      javaFactory: `
+        foam.nanos.auth.PriorPassword[] priorPasswords = new foam.nanos.auth.PriorPassword[1];
+        priorPasswords[0] = new foam.nanos.auth.PriorPassword();
+        priorPasswords[0].setPassword(this.getPassword());
+        priorPasswords[0].setTimeStamp(new Date());
+        return priorPasswords;
+      `,
+      hidden: true,
+      networkTransient: true,
+      section: 'administrative',
+      createMode: 'HIDDEN',
+      updateMode: 'RO'
     },
     {
       class: 'Password',
@@ -440,13 +458,18 @@ foam.CLASS({
       name: 'label',
       type: 'String',
       code: function label() {
-        return this.organization || this.businessName || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
+        if ( this.legalName ) return this.legalName;
+        if ( this.lastName && this.firstName ) return this.firstName + ' ' + this.lastName;
+        if ( this.lastName ) return this.lastName;
+        if ( this.firstName ) return this.firstName;
+        return '';
       },
       javaCode: `
-        if ( ! SafetyUtil.isEmpty(getOrganization()) ) return getOrganization();
-        if ( ! SafetyUtil.isEmpty(getBusinessName()) ) return getBusinessName();
-        if ( SafetyUtil.isEmpty(getLastName()) ) return getFirstName();
-        return getFirstName() + " " + getLastName();
+        if ( ! SafetyUtil.isEmpty(this.getLegalName()) ) return this.getLegalName();
+        if ( ! SafetyUtil.isEmpty(this.getLastName()) && ! SafetyUtil.isEmpty(this.getFirstName()) ) return this.getFirstName() + " " + this.getLastName();
+        if ( ! SafetyUtil.isEmpty(this.getLastName()) ) return this.getLastName();
+        if ( ! SafetyUtil.isEmpty(this.getFirstName()) ) return this.getFirstName();
+        return "";
       `
     },
     {

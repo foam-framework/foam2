@@ -49,7 +49,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'permissionRequired'
+      name: 'readPermissionRequired'
+    },
+    {
+      class: 'Boolean',
+      name: 'writePermissionRequired'
     },
     {
       class: 'Boolean',
@@ -217,10 +221,16 @@ foam.CLASS({
             body: 'return ' + this.networkTransient + ';'
           },
           {
-            name: 'getPermissionRequired',
+            name: 'getReadPermissionRequired',
             type: 'boolean',
             visibility: 'public',
-            body: 'return ' + this.permissionRequired + ';'
+            body: 'return ' + this.readPermissionRequired + ';'
+          },
+          {
+            name: 'getWritePermissionRequired',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.writePermissionRequired + ';'
           },
           {
             name: 'getStorageTransient',

@@ -22,7 +22,7 @@ public class NSpecFactory
   Object ns_ = null;
 
   public NSpecFactory(ProxyX x, NSpec spec) {
-    x_    = x;
+    x_ = x;
     spec_ = spec;
   }
 
