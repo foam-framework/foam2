@@ -2301,6 +2301,17 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
+  name: 'ArrayViewRefinement',
+  refines: 'foam.core.Array',
+  requires: [ 'foam.u2.view.ArrayView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.view.ArrayView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
   name: 'StringArrayViewRefinement',
   refines: 'foam.core.StringArray',
   requires: [ 'foam.u2.view.StringArrayView' ],
