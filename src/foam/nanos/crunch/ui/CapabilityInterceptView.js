@@ -66,13 +66,14 @@ foam.CLASS({
     {
       name: 'cancel',
       code: function() {
-        if ( ! this.capabilityAquired ) this.capabilityCancelled = true;
         this.stack.back();
+        if ( ! this.capabilityAquired ) this.capabilityCancelled = true;
       }
     },
     {
       name: 'aquire',
       code: function() {
+        this.stack.back();
         this.capabilityAquired = true;
       }
     }
