@@ -505,7 +505,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2.search',
-  name: 'CurrencyRefinement',
+  name: 'UnitValueRefinement',
   refines: 'foam.core.UnitValue',
 
   properties: [
