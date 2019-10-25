@@ -10,10 +10,6 @@
 
   documentation: `The abstract model for fungible digitized assets`,
 
-  ids: [
-    'id'
-  ],
-
   properties: [
     {
       class: 'String',

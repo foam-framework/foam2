@@ -11,10 +11,6 @@
 
   documentation: `The base model for storing, using and managing currency information.`,
 
-  ids: [
-    'id'
-  ],
-
   javaImports: [
     'foam.util.SafetyUtil'
   ],
