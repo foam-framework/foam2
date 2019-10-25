@@ -9,8 +9,7 @@
   name: 'Currency',
   extends: 'foam.core.Unit',
 
-  documentation: `The base model for storing, using and managing currency information.
-    All class properties require a return of *true* in order to pass.`,
+  documentation: `The base model for storing, using and managing currency information.`,
 
   ids: [
     'alphabeticCode'
