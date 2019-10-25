@@ -12,6 +12,8 @@ foam.CLASS({
   implements: [ 'foam.mlang.Expressions' ],
 
   requires: [
+    'foam.comics.BrowserView',
+    'foam.comics.SearchMode',
     'foam.nanos.crunch.Capability'
   ],
 
@@ -53,8 +55,8 @@ foam.CLASS({
         .start()
           .addClass(this.myClass('detail-container'))
           // TODO: Replace with Capability selection view appropriate for any user
-          .tag(foam.comics.BrowserView.create({
-            searchMode: foam.comics.SearchMode.SIMPLE,
+          .tag(this.BrowserView.create({
+            searchMode: this.SearchMode.SIMPLE,
             data: this.data.where(
               this.CONTAINS(this.capabilityOptions, this.Capability.ID))
           }))
