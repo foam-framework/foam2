@@ -30,29 +30,9 @@
 
   properties: [
     {
-      class: 'String',
-      name: 'name',
-      documentation: `This is the [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html)
-        international standard for currency codes.`,
-      required: true
-    },
-    {
-      class: 'String',
-      name: 'alphabeticCode',
-      label: 'Code',
-      documentation: 'The alphabetic code associated with a type of currency.',
-      required: true
-    },
-    {
       class: 'Long',
       name: 'numericCode',
       documentation: 'The numeric code associated with a type of currency.',
-      required: true
-    },
-    {
-      class: 'Int',
-      name: 'precision',
-      documentation: 'Defines the number of digits that come after the decimal point. ',
       required: true
     },
     {
