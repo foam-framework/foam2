@@ -65,14 +65,16 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'bool1',
-      documentation: `Lets the user pick boolean they want to filter by`,
+      name: 'boolT',
+      label: 'True',
+      documentation: `Filter property for True`,
       value: false
     },
     {
       class: 'Boolean',
-      name: 'bool2',
-      documentation: `Lets the user pick boolean they want to filter by`,
+      name: 'boolF',
+      label: 'False',
+      documentation: `Filter property for False`,
       value: false
     },
     {
@@ -80,10 +82,10 @@ foam.CLASS({
       documentation: `All SearchViews must have a predicate as required by the
       SearchManager. The SearchManager will read this predicate and use it
       to filter the dao being displayed in the view.`,
-      expression: function(bool1, bool2) {
-        if ( ( ! bool1 && ! bool2 ) || ( bool1 && bool2 )) return this.TRUE;
+      expression: function(boolT, boolF) {
+        if ( ( ! boolT && ! boolF ) || ( boolT && boolF )) return this.TRUE;
 
-        return this.EQ(this.property, bool1);
+        return this.EQ(this.property, boolT);
       }
     },
     {
@@ -101,7 +103,7 @@ foam.CLASS({
         .start().addClass(this.myClass('container'))
           .start({
             class: 'foam.u2.md.CheckBox',
-            data$: this.bool1$,
+            data$: this.boolT$,
             showLabel: true,
             label: 'True'
           }).end()
@@ -109,7 +111,7 @@ foam.CLASS({
         .start().addClass(this.myClass('container'))
           .start({
             class: 'foam.u2.md.CheckBox',
-            data$: this.bool2$,
+            data$: this.boolF$,
             showLabel: true,
             label: 'False'
           }).end()
@@ -121,8 +123,8 @@ foam.CLASS({
     * Required on all SearchViews. Called by ReciprocalSearch.
     */
     function clear() {
-      this.qualifier = 'True';
-      this.value = 0;
+      this.boolT = false;
+      this.boolF = false;
     }
   ]
 });
