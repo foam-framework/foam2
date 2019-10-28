@@ -246,5 +246,5 @@ FOAM_FILES([
 
   // foam/nanos/rope
   { name: "foam/nanos/rope/ROPE" },
-  { name: "foam/nanos/rope/test/TestObjects" },
+  { name: "foam/nanos/rope/ROPEAuthorizer" }
 ]);

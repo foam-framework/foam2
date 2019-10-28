@@ -495,17 +495,7 @@ var classes = [
   'foam.nanos.rope.ROPE',
   'foam.nanos.rope.OrROPE',
   'foam.nanos.rope.AndROPE',
-  'foam.nanos.rope.test.ROPEUser',
-  'foam.nanos.rope.test.ROPEUserDAO',
-  'foam.nanos.rope.test.ROPEContactDAO',
-  'foam.nanos.rope.test.ROPEBankAccount',
-  'foam.nanos.rope.test.ROPEBusiness',
-  'foam.nanos.rope.test.ROPETransaction',
-  //ROPE Junctions
-  'foam.nanos.rope.test.ROPEUserROPEUserJunction',
-  'foam.nanos.rope.test.ROPEBusinessROPEUserJunction',
-  'foam.nanos.rope.test.ROPEUserROPEBusinessJunction',
-  'foam.nanos.rope.test.ROPEBusinessROPEBusinessJunction',
+  'foam.nanos.rope.ROPEAuthorizer',
 ];
 
 var abstractClasses = [
