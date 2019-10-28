@@ -1,34 +1,28 @@
 /**
  * @license
- * Copyright 2018 The FOAM Authors. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'ChangePasswordView',
-  // extends: 'foam.u2.detail.AbstractSectionedDetailView',
+  extends: 'foam.u2.View',
 
   documentation: `Change Password View: managing two states.
   State one) ResetPassword:  redirect from email link, with a token to update forgotten password,
-  State two) UpdatePassword: simple change of password by a logged in user. `,
+  State two) UpdatePassword: simple change of password by a logged in user.
+  
+  Also manages two view types:
+  View one) Vertically aligned properties (this.horizontal = false),
+  View two) Horizontally aligned properties (this.horizontal = true)`,
 
   imports: [
     'auth',
+    'notify',
     'resetPasswordToken',
-    'theme',
     'stack',
+    'theme',
     'user'
   ],
 
@@ -38,14 +32,30 @@ foam.CLASS({
   ],
 
   css: `
+    ^ .centerVerticle{
+      max-width: 30vw;
+      margin: 0 auto;
+    }
+    ^ .logoCenterVerticle {
+      margin-left: 64vh
+    }
+
+    ^ .horizontal{
+      padding: 0 0 1vh 2vh;
+      max-width: 98%;
+    }
+    ^ .logoHorizontal{
+      padding-left: 2vh;
+    }
+
     ^ .top-bar {
       width: 100%;
-      height: 64px;
+      height: 8vh;
       border-bottom: solid 1px #e2e2e3
     }
     ^ .top-bar img {
-      height: 25px;
-      margin-top: 20px;
+      height: 4vh;
+      margin-top: 2vh;
     }
   `,
 
@@ -60,12 +70,23 @@ foam.CLASS({
   properties: [
     {
       class: 'Boolean',
-      name: 'verticle',
-      hidden: true
+      name: 'horizontal',
+      documentation: `This property toggles the view from a centered vertical view to a
+      horizontally property display view.`,
+      hidden: true,
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'topBarShow',
+      documentation: `This property toggles the view from having a top bar displayed.`,
+      hidden: true,
+      value: true
     },
     {
       class: 'String',
       name: 'token',
+      documentation: `This property toggles the view from updating a user password to resetting a user password.`,
       factory: function() {
         var searchParams = new URLSearchParams(location.search);
         return searchParams.get('token');
@@ -82,8 +103,7 @@ foam.CLASS({
       },
       visibilityExpression: function(token) {
         return ! token ? foam.u2.Visibility.RW : foam.u2.Visibility.HIDDEN;
-      },
-
+      }
     },
     {
       class: 'Password',
@@ -123,32 +143,52 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'makeHorizontal',
+      code: function(value) {
+        // evaluation of this gridColumns on a property does not handle an evaluation, only an int, thus function here managing this.
+        this.cls_.getAxiomByName('originalPassword').gridColumns = value ? ( this.token ? 0 : 4 ) : 12;
+        this.cls_.getAxiomByName('newPassword').gridColumns = value ? ( this.token ? 6 : 4 ) : 12;
+        this.cls_.getAxiomByName('confirmationPassword').gridColumns = value ? ( this.token ? 6 : 4 ) : 12;
+      }
+    },
+    {
       name: 'reset_',
       code: function() {
         this.clearProperty('originalPassword');
         this.clearProperty('newPassword');
-        this.clearProperty('confirmPassword');
+        this.clearProperty('confirmationPassword');
       }
     },
     function initE() {
+      this.makeHorizontal(this.horizontal);
       this.SUPER();
       this
         .addClass(this.myClass())
         .startContext({ data: this })
-          .start().addClass('top-bar')
+          .start().addClass('top-bar').show(this.topBarShow)
             .start('img')
               .attr('src', this.theme.logo)
+              .callIfElse( this.horizontal, function() {
+                this.addClass('logoHorizontal');
+              }, function() {
+                this.addClass('logoCenterVerticle');
+              })
             .end()
           .end()
-          .start(this.SectionView, {
-            data: this,
-            sectionName: 'resetPasswordSection'
-          }).end()
-          .startContext({ data: this })
+          .start()
+          .callIfElse( this.horizontal, function() {
+            this.addClass('horizontal');
+          }, function() {
+            this.addClass('centerVerticle');
+          })
+            .start(this.SectionView, {
+              data: this,
+              sectionName: 'resetPasswordSection'
+            }).end()
             .start(this.UPDATE_PASSWORD).end()
             .start(this.RESET_PASSWORD).end()
-          .endContext()
-      .end();
+          .end()
+        .endContext();
       }
   ],
 
@@ -163,7 +203,7 @@ foam.CLASS({
           desiredPassword: this.newPassword
         });
         this.resetPasswordToken.processToken(null, user, this.token)
-        .then(function(_) {
+        .then((_) => {
           this.reset_();
           this.stack.push({ class: 'foam.nanos.auth.SignInView' });
           this.notify(this.SUCCESS_MSG);
