@@ -60,7 +60,7 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop) {
-    if ( prop.f(o1) == null || ! prop.f(o1).equals(prop.f(o2)) ) {
+    if ( prop.compare(o1, o2) != 0 ) {
       diff.put(prop.getName(), prop.f(o2));
     }
   }
@@ -151,18 +151,13 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public void authorize(X x) {
-    if ( this.getPermissionRequired() ) {
+    // Since MLangs don't write values, we only need to check if the property
+    // requires a read permission here.
+    if ( this.getReadPermissionRequired() ) {
       AuthService auth = (AuthService) x.get("auth");
       String simpleName = this.getClassInfo().getObjClass().getSimpleName();
-      String permission =
-        simpleName.toLowerCase() +
-        ".%s." +
-        this.getName().toLowerCase();
 
-      if (
-        ! auth.check(x, String.format(permission, "rw")) &&
-        ! auth.check(x, String.format(permission, "ro"))
-      ) {
+      if ( ! auth.check(x, String.format("%s.ro.%s", simpleName.toLowerCase(), this.getName().toLowerCase())) ) {
         throw new AuthorizationException(String.format("Access denied. User lacks permission to access property '%s' on model '%s'.", this.getName(), simpleName));
       };
     }

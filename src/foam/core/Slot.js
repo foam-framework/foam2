@@ -84,7 +84,8 @@ foam.CLASS({
     */
     function linkFrom(s2) {
       var s1        = this;
-      var feedback1 = false, feedback2 = false;
+      var feedback1 = false;
+      var feedback2 = false;
 
       // TODO: once all slot types property set 'src', these
       // two listeneners can be merged.
@@ -93,10 +94,13 @@ foam.CLASS({
 
         if ( ! foam.util.is(s1.get(), s2.get()) ) {
           feedback1 = true;
-          s2.set(s1.get());
-          if ( ! foam.util.is(s1.get(), s2.get()) )
-            s1.set(s2.get());
-          feedback1 = false;
+          try {
+            s2.set(s1.get());
+            if ( ! foam.util.is(s1.get(), s2.get()) )
+              s1.set(s2.get());
+          } finally {
+            feedback1 = false;
+          }
         }
       };
 
@@ -105,15 +109,18 @@ foam.CLASS({
 
         if ( ! foam.util.is(s1.get(), s2.get()) ) {
           feedback2 = true;
-          s1.set(s2.get());
-          if ( ! foam.util.is(s1.get(), s2.get()) )
-            s2.set(s1.get());
-          feedback2 = false;
+          try {
+            s1.set(s2.get());
+            if ( ! foam.util.is(s1.get(), s2.get()) )
+              s2.set(s1.get());
+          } finally {
+            feedback2 = false;
+          }
         }
       };
 
       var sub1 = s1.sub(l1);
-      var sub2 = s2.sub(l2)
+      var sub2 = s2.sub(l2);
 
       l2();
 
@@ -322,9 +329,16 @@ foam.CLASS({
       this.prevSub && this.prevSub.detach();
       var o = this.parent.get();
 
+      // Record the 'of' of the parent so we can tell when it changes.
+      if ( ! this.of && o ) this.of = o.cls_.id;
+
       // If the parent object changes class, then don't update
       // because a new class will have different sub-slots.
-      if ( ( ! this.of  ) && o ) this.of = o.cls_;
+      if ( o && ( this.of !== o.cls_.id || o.cls_.getAxiomByName(this.name) == null ) ) {
+        this.prevSub = null;
+        this.detach();
+        return;
+      }
 
       this.prevSub = o && o.slot && o.slot(this.name).sub(this.valueChange);
       this.valueChange();
@@ -570,8 +584,11 @@ foam.CLASS({
     {
       name: 'delegate',
       postSet: function(_, n) {
-        this.sub_ && this.sub_.detach();
-        this.sub_ = n && this.linkFrom(n);
+        if ( this.sub_ ) this.sub_.detach();
+
+        if ( foam.core.Slot.isInstance(n) ) {
+          this.sub_ = this.linkFrom(n);
+        }
       }
     }
   ]

@@ -201,9 +201,9 @@ foam.CLASS({
         this.index = 0;
       }
 
-      if ( this.dao ) this.onDAOUpdate();
+      this.onDAOUpdate();
 
-      this.add(this.slot(function(mode){
+      this.add(this.slot(function(mode) {
         if ( mode !== foam.u2.DisplayMode.RO ) {
           return self.E()
             .start(self.selectSpec, {
@@ -218,11 +218,10 @@ foam.CLASS({
               .attrs({ name: self.name })
               .enableClass('selection-made', self.index$.map((index) => index !== -1))
             .end();
-      
         } else {
-          return self.E().add(self.text$)
+          return self.E().add(self.text$);
         }
-      }))
+      }));
 
       this.dao$proxy.on.sub(this.onDAOUpdate);
     },
@@ -278,6 +277,8 @@ foam.CLASS({
       name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
+        if ( ! foam.dao.DAO.isInstance(this.dao) ) return;
+
         var p = this.mode === foam.u2.DisplayMode.RW ?
           this.dao.select().then(s => s.array) :
           this.dao.find(this.data).then(o => o ? [o] : []);

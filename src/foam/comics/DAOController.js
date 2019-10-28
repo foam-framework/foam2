@@ -139,7 +139,7 @@ foam.CLASS({
       class: 'String',
       name: 'title',
       expression: function(data$of) {
-        return 'Browse ' + data$of.model_.plural;
+        return data$of.model_.plural;
       }
     },
     {
@@ -184,13 +184,6 @@ foam.CLASS({
   ],
 
   actions: [
-    {
-      name: 'toggleFilters',
-      isAvailable: function(toggleEnabled) { return toggleEnabled; },
-      code: function() {
-        this.searchHidden = ! this.searchHidden;
-      }
-    },
     {
       name: 'create',
       isAvailable: function(createEnabled) { return createEnabled; },

@@ -435,6 +435,8 @@ foam.CLASS({
        * Get the most appropriate Theme object from the server and use it to
        * customize the look and feel of the application.
        */
+      var lastTheme = this.theme;
+
       try {
         if ( this.user && this.user.personalTheme ) {
           // If the user has a personal theme, use that.
@@ -467,7 +469,7 @@ foam.CLASS({
         return;
       }
 
-      this.useCustomElements();
+      if ( ! lastTheme || lastTheme.id != this.theme.id ) this.useCustomElements();
     },
 
     function useCustomElements() {
@@ -494,6 +496,6 @@ foam.CLASS({
           .sort((a, b) => b.minWidth - a.minWidth)
           .find(o => o.minWidth <= window.innerWidth);
       }
-    } 
+    }
   ]
 });

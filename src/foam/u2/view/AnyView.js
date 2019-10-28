@@ -23,6 +23,14 @@ foam.CLASS({
       factory: function() {
         return [
           foam.u2.view.AnyView.Choice.create({
+            label: '--',
+            type: foam.Undefined,
+            view: foam.u2.View,
+            toType: function(o) {
+              return undefined;
+            }
+          }),
+          foam.u2.view.AnyView.Choice.create({
             label: 'String',
             type: foam.String,
             view: foam.u2.TextField,
@@ -52,6 +60,14 @@ foam.CLASS({
             view: foam.u2.view.MapView,
             toType: function(o) {
               return foam.Object.isInstance(o) ? o : {};
+            }
+          }),
+          foam.u2.view.AnyView.Choice.create({
+            label: 'FObject',
+            type: foam.core.FObject,
+            view: foam.u2.view.FObjectView,
+            toType: function(o) {
+              return foam.core.FObject.isInstance(o) ? o : foam.core.FObject.create();
             }
           }),
           foam.u2.view.AnyView.Choice.create({
@@ -114,6 +130,10 @@ foam.CLASS({
       expression: function(data, types) {
         var type = foam.typeOf(data);
         var choice = types.find(t => type == t.type);
+        if ( ! choice ) {
+          console.warn("Unable to find view for type!");
+          console.log(data);
+        }
         return choice || types[0];
       }
     },
@@ -123,6 +143,11 @@ foam.CLASS({
         if ( o ) o.detach();
         n.onDetach(n.data$.linkFrom(this.data$));
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'enableChoice',
+      value: true
     }
   ],
   methods: [
@@ -140,11 +165,13 @@ foam.CLASS({
                 .endContext();
             }))
           .end()
-          .start(this.ChoiceView, {
-            choices$: this.types$.map(types => types.map(t => [t, t.label])),
-            data$: this.selected$
+          .callIf(this.enableChoice, function() {
+            this.start(self.ChoiceView, {
+              choices$: self.types$.map(types => types.map(t => [t, t.label])),
+              data$: self.selected$
+              })
+            .end()
           })
-          .end()
         .end();
     }
   ]

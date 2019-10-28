@@ -42,7 +42,8 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'deleted'
+      name: 'deleted',
+      writePermissionRequired: true
     }
   ]
 });

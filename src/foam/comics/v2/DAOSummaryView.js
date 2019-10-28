@@ -78,9 +78,9 @@ foam.CLASS({
     },
     {
       name: 'primary',
-      expression: function(config$of){
-        var allActions = config$of.getAxiomsByClass(foam.core.Action)
-        var defaultAction = allActions.filter(a => a.isDefault);
+      expression: function(config$of) {
+        var allActions = config$of.getAxiomsByClass(foam.core.Action);
+        var defaultAction = allActions.filter((a) => a.isDefault);
         return defaultAction.length >= 1 ? defaultAction[0] : allActions[0];
       }
     },

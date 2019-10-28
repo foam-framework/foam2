@@ -92,7 +92,7 @@ foam.CLASS({
         { type: 'String',  name: 'message'  },
       ],
       javaCode: `
-        test(Password.isValid(x, input) == expected, message);
+        test(Password.isValid(x, null, input) == expected, message);
       `
     }
   ]
