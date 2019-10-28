@@ -19,6 +19,7 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.auth.Address',
+    'foam.nanos.auth.PriorPassword',
     'foam.nanos.auth.Phone'
   ],
 
@@ -31,6 +32,7 @@ foam.CLASS({
     'foam.mlang.order.Comparator',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.PriorPassword',
     'foam.util.SafetyUtil',
     'static foam.mlang.MLang.EQ'
   ],
@@ -118,7 +120,6 @@ foam.CLASS({
       class: 'Boolean',
       name: 'loginEnabled',
       documentation: 'Determines whether the User can login to the platform.',
-      readPermissionRequired: true,
       writePermissionRequired: true,
       value: true,
       section: 'administrative'
@@ -224,7 +225,6 @@ foam.CLASS({
       class: 'Boolean',
       name: 'emailVerified',
       documentation: 'Determines whether the email address of the User is valid.',
-      readPermissionRequired: true,
       writePermissionRequired: true,
       section: 'administrative'
     },
@@ -346,6 +346,23 @@ foam.CLASS({
       hidden: true,
       networkTransient: true,
       section: 'administrative'
+    },
+    {
+      name: 'passwordHistory',
+      class: 'FObjectArray',
+      of: 'foam.nanos.auth.PriorPassword',
+      javaFactory: `
+        foam.nanos.auth.PriorPassword[] priorPasswords = new foam.nanos.auth.PriorPassword[1];
+        priorPasswords[0] = new foam.nanos.auth.PriorPassword();
+        priorPasswords[0].setPassword(this.getPassword());
+        priorPasswords[0].setTimeStamp(new Date());
+        return priorPasswords;
+      `,
+      hidden: true,
+      networkTransient: true,
+      section: 'administrative',
+      createMode: 'HIDDEN',
+      updateMode: 'RO'
     },
     {
       class: 'Password',

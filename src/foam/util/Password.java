@@ -7,6 +7,7 @@
 package foam.util;
 
 import foam.nanos.auth.AuthService;
+import foam.nanos.auth.User;
 
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
@@ -98,10 +99,10 @@ public class Password {
    * @param password password to validate
    * @return true if valid, false otherwise
    */
-  public static boolean isValid(foam.core.X x, String password) {
+  public static boolean isValid(foam.core.X x, User user, String password) {
     AuthService auth = (AuthService) x.get("auth");
     try {
-      auth.validatePassword(password);
+      auth.validatePassword(x, user, password);
       return true;
     } catch (Exception e) {
       return false;

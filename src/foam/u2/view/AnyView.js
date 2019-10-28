@@ -23,6 +23,14 @@ foam.CLASS({
       factory: function() {
         return [
           foam.u2.view.AnyView.Choice.create({
+            label: '--',
+            type: foam.Undefined,
+            view: foam.u2.View,
+            toType: function(o) {
+              return undefined;
+            }
+          }),
+          foam.u2.view.AnyView.Choice.create({
             label: 'String',
             type: foam.String,
             view: foam.u2.TextField,
@@ -135,6 +143,11 @@ foam.CLASS({
         if ( o ) o.detach();
         n.onDetach(n.data$.linkFrom(this.data$));
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'enableChoice',
+      value: true
     }
   ],
   methods: [
@@ -152,11 +165,13 @@ foam.CLASS({
                 .endContext();
             }))
           .end()
-          .start(this.ChoiceView, {
-            choices$: this.types$.map(types => types.map(t => [t, t.label])),
-            data$: this.selected$
+          .callIf(this.enableChoice, function() {
+            this.start(self.ChoiceView, {
+              choices$: self.types$.map(types => types.map(t => [t, t.label])),
+              data$: self.selected$
+              })
+            .end()
           })
-          .end()
         .end();
     }
   ]

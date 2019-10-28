@@ -713,7 +713,7 @@ foam.CLASS({
     {
       documentation: `
         State of an Element after it has been removed from the DOM.
-        An unloaded Element can be readded to the DOM.
+        An unloaded Element can be re-added to the DOM.
       `,
       name: 'UNLOADED',
       type: 'foam.u2.UnloadedElementState',
@@ -1703,6 +1703,9 @@ foam.CLASS({
       var listener = this.RenderSink.create({
         dao: dao,
         addRow: function(o) {
+          // No use adding new children if the parent has already been removed
+          if ( self.state === foam.u2.Element.UNLOADED ) return;
+
           if ( update ) o = o.clone();
 
           self.startContext({data: o});
@@ -2301,6 +2304,17 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
+  name: 'ArrayViewRefinement',
+  refines: 'foam.core.Array',
+  requires: [ 'foam.u2.view.ArrayView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.view.ArrayView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
   name: 'StringArrayViewRefinement',
   refines: 'foam.core.StringArray',
   requires: [ 'foam.u2.view.StringArrayView' ],
@@ -2552,6 +2566,74 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
+  name: 'PredicatePropertyRefinement',
+  refines: 'foam.mlang.predicate.PredicateProperty',
+  requires: [
+    'foam.u2.view.FObjectPropertyView',
+    'foam.u2.view.FObjectView'
+  ],
+  properties: [
+    {
+      name: 'view',
+      value: {
+        class: 'foam.u2.view.FObjectPropertyView',
+        writeView: {
+          class: 'foam.u2.view.FObjectView',
+          of: 'foam.mlang.predicate.Predicate'
+        }
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'ExprPropertyRefinement',
+  refines: 'foam.mlang.ExprProperty',
+  requires: [
+    'foam.u2.view.FObjectPropertyView',
+    'foam.u2.view.FObjectView'
+  ],
+  properties: [
+    {
+      name: 'view',
+      value: {
+        class: 'foam.u2.view.FObjectPropertyView',
+        writeView: {
+          class: 'foam.u2.view.FObjectView',
+          of: 'foam.mlang.Expr'
+        }
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'ObjectViewRefinement',
+  refines: 'foam.core.Object',
+  requires: [ 'foam.u2.view.AnyView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.view.AnyView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'CodeViewRefinement',
+  refines: 'foam.core.Code',
+  requires: [ 'foam.u2.view.CodeView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.view.CodeView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
   name: 'ControllerViewTrait',
 
   documentation: 'Trait for adding a ControllerMode controllerMode Property.',
@@ -2701,10 +2783,18 @@ foam.CLASS({
     'foam.u2.ActionView'
   ],
 
+  properties: [
+    {
+      name: 'view',
+      value: function(args, X) {
+        return { class: 'foam.u2.ActionView', action: this };
+      }
+    }
+  ],
+
   methods: [
     function toE(args, X) {
-      var view = foam.u2.ViewSpec.createView(
-        { class: 'foam.u2.ActionView', action: this }, args, this, X);
+      var view = foam.u2.ViewSpec.createView(this.view, args, this, X);
 
       if ( X.data$ && ! ( args && ( args.data || args.data$ ) ) ) {
         view.data$ = X.data$;
@@ -2782,18 +2872,6 @@ foam.CLASS({
       postSet: function(_, cs) {
         this.axioms_.push(foam.u2.SearchColumns.create({columns: cs}));
       }
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.u2',
-  name: 'PredicatePropertyRefine',
-  refines: 'foam.mlang.predicate.PredicateProperty',
-  properties: [
-    {
-      name: 'view',
-      value: { class: 'foam.u2.view.JSONTextView' }
     }
   ]
 });

@@ -80,7 +80,10 @@ foam.CLASS({
               })
             .end()
             .start(self.Cols)
-              .style({ 'justify-content': 'end', 'margin-top': '20px' })
+              .style({
+                'justify-content': 'end',
+                'margin-top': section.actions.length ? '20px' : 'initial'
+              })
               .forEach(section.actions, function(a) {
                 this.add(a);
               })
