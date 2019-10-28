@@ -15,8 +15,7 @@ foam.CLASS({
     'foam.dao.ManyToManyRelationshipAxiom',
     'foam.dao.ManyToManyRelationshipDAO',
     'foam.dao.OneToManyRelationshipAxiom',
-    'foam.dao.RelationshipDAO',
-    'foam.nanos.rope.ROPE'
+    'foam.dao.RelationshipDAO'
   ],
 
   properties: [
@@ -174,32 +173,7 @@ foam.CLASS({
           .filter(f => global.FOAM_FLAGS[f]);
         return foam.util.flagFilter(enabledFlags)(this);
       }
-    },
-    {
-      name: 'generateRope',
-      class: 'Boolean',
-      value: 'false'
-    },
-    {
-      name: 'crudMap',
-      class: 'Map',
-      javaType: 'java.util.Map<String, java.util.Map<String, java.util.List<String>>>'
-    },
-    {
-      name: 'relationshipMap',
-      class: 'Map',
-      javaType: 'java.util.Map<String, java.util.List<String>>'
-    },
-    {
-      name: 'inverseCrudMap',
-      class: 'Map',
-      javaType: 'java.util.Map<String, java.util.Map<String, java.util.List<String>>>'
-    },
-    {
-      name: 'inverseRelationshipMap',
-      class: 'Map',
-      javaType: 'java.util.Map<String, java.util.List<String>>'
-    },
+    }
     /* FUTURE:
     {
       name: 'deleteStrategy'
@@ -252,7 +226,6 @@ foam.CLASS({
       }
 
       source.installAxiom(prop);
-
     },
     function initTarget(x) {
       if ( this.oneWay ) return;
