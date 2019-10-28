@@ -48,3 +48,32 @@ foam.CLASS({
       }
     ]
 });
+
+foam.CLASS({
+  package: 'foam.nanos.rope',
+  name: 'OrROPE',
+  extends: 'foam.nanos.rope.ROPE',
+
+  properties: [
+    {
+      name: 'compositeRopes',
+      class: 'List',
+      javaType: 'java.util.List<ROPE>'
+    }
+  ]
+
+});
+
+foam.CLASS({
+  package: 'foam.nanos.rope',
+  name: 'AndROPE',
+  extends: 'foam.nanos.rope.ROPE',
+
+  properties: [
+    {
+      name: 'compositeRopes',
+      class: 'List',
+      javaType: 'java.util.List<ROPE>'
+    }
+  ]
+});

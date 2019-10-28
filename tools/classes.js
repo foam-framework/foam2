@@ -487,6 +487,8 @@ var classes = [
 
   //ROPE
   'foam.nanos.rope.ROPE',
+  'foam.nanos.rope.OrROPE',
+  'foam.nanos.rope.AndROPE',
   'foam.nanos.rope.test.ROPEUser',
   'foam.nanos.rope.test.ROPEUserDAO',
   'foam.nanos.rope.test.ROPEContactDAO',
