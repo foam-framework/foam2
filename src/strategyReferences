@@ -38,3 +38,9 @@ p({"class":"foam.strategy.StrategyReference","id":"7cb4fa28-5ab3-42f1-8e25-ce375
 // foam.Class
 p({"class":"foam.strategy.StrategyReference","id":"b0d7bed9-a82e-478b-a0f8-a2d1d2d2d031","desiredModelId":"foam.Class","strategy":"foam.nanos.auth.User"})
 p({"class":"foam.strategy.StrategyReference","id":"20c2262d-4d0b-47a4-9389-b7e6867d894b","desiredModelId":"foam.Class","strategy":"foam.nanos.auth.Group"})
+
+// foam.nanos.cron.Schedule
+p({"class":"foam.strategy.StrategyReference","id":"a","desiredModelId":"foam.nanos.cron.Schedule","strategy":"foam.nanos.cron.TimeOfDaySchedule"})
+p({"class":"foam.strategy.StrategyReference","id":"b","desiredModelId":"foam.nanos.cron.Schedule","strategy":"foam.nanos.cron.IntervalSchedule"})
+p({"class":"foam.strategy.StrategyReference","id":"c","desiredModelId":"foam.nanos.cron.Schedule","strategy":"foam.nanos.cron.OrSchedule"})
+p({"class":"foam.strategy.StrategyReference","id":"d","desiredModelId":"foam.nanos.cron.Schedule","strategy":"foam.nanos.cron.CronSchedule"})
