@@ -89,6 +89,7 @@ foam.CLASS({
       documentation: `This property toggles the view from updating a user password to resetting a user password.`,
       factory: function() {
         var searchParams = new URLSearchParams(location.search);
+        window.history.replaceState(null, null, window.location.origin+'/#reset');
         return searchParams.get('token');
       },
       hidden: true
