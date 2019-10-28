@@ -49,16 +49,6 @@ foam.CLASS({
 
   constants: [
     {
-      name: 'PASSWORD_VALIDATE_REGEX',
-      type: 'String',
-      value: '^.{6,}$'
-    },
-    {
-      name: 'PASSWORD_VALIDATION_ERROR_MESSAGE',
-      type: 'String',
-      value: 'Password must be at least 6 characters long.'
-    },
-    {
       name: 'CHECK_USER_PERMISSION',
       type: 'String',
       value: 'service.auth.checkUser'
@@ -74,7 +64,7 @@ foam.CLASS({
       name: 'getCurrentUser',
       javaCode: `
         Session session = x.get(Session.class);
-        
+
         // fetch context and check if not null or user id is 0
         if ( session == null || session.getUserId() == 0 ) {
           throw new AuthenticationException("Not logged in");
@@ -160,7 +150,8 @@ foam.CLASS({
 
         Session session = x.get(Session.class);
         session.setUserId(user.getId());
-        session.setContext(session.getContext().put("user", user).put("group", group));
+        ((DAO) getLocalSessionDAO()).put(session);
+        session.setContext(session.applyTo(session.getContext()));
 
         return user;
       `
@@ -257,9 +248,38 @@ foam.CLASS({
     {
       name: 'validatePassword',
       javaCode: `
-        if ( SafetyUtil.isEmpty(potentialPassword) || ! (Pattern.compile(PASSWORD_VALIDATE_REGEX)).matcher(potentialPassword).matches() ) {
-          throw new RuntimeException(PASSWORD_VALIDATION_ERROR_MESSAGE);
+        // Password policy to validate against
+        PasswordPolicy passwordPolicy = null;
+
+        // Retrieve the logger
+        Logger logger = (Logger) x.get("logger");
+
+        // Retrieve the password policy from the user and group when available
+        if ( user != null ) {
+          Group ancestor = user.findGroup(x);
+          if ( ancestor == null ) {
+            logger.error("No group for user", user);
+            throw new RuntimeException("Group not found");
+          }
+
+          // Check password policy
+          passwordPolicy = ancestor.getPasswordPolicy();
+          while ( passwordPolicy == null || ! passwordPolicy.getEnabled() ) {
+            ancestor = ancestor.getAncestor(x, ancestor);
+            if ( ancestor == null )
+              break;
+            passwordPolicy = ancestor.getPasswordPolicy();
+          }
         }
+
+        // Use the default password policy if nothing is found
+        if ( passwordPolicy == null || ! passwordPolicy.getEnabled() ) {
+          passwordPolicy = new PasswordPolicy();
+          passwordPolicy.setEnabled(true);
+        }
+
+        // Validate the password against the password policy
+        passwordPolicy.validate(user, potentialPassword);
       `
     },
     {
@@ -304,7 +324,7 @@ foam.CLASS({
         }
 
         // check if password is valid per validatePassword method
-        validatePassword(newPassword);
+        validatePassword(x, user, newPassword);
 
         // old password does not match
         if ( ! Password.verify(oldPassword, user.getPassword()) ) {
@@ -358,7 +378,7 @@ foam.CLASS({
           throw new AuthenticationException("Password is required for creating a user");
         }
 
-        validatePassword(user.getPassword());
+        validatePassword(x, user, user.getPassword());
       `
     },
     {
@@ -390,7 +410,7 @@ foam.CLASS({
         if ( user != null ) {
           if ( agent != null ) {
             DAO agentJunctionDAO = (DAO) x.get("agentJunctionDAO");
-            UserUserJunction junction = (UserUserJunction) agentJunctionDAO.inX(x).find(
+            UserUserJunction junction = (UserUserJunction) agentJunctionDAO.find(
               AND(
                 EQ(UserUserJunction.SOURCE_ID, agent.getId()),
                 EQ(UserUserJunction.TARGET_ID, user.getId())
@@ -406,7 +426,7 @@ foam.CLASS({
 
           // Third highest precedence: If a user is logged in but not acting as
           // another user, return their group.
-          return user.findGroup(x);
+          return (Group) ((DAO) getLocalGroupDAO()).inX(x).find(user.getGroup());
         }
 
         // If none of the cases above match, return null.

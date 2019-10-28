@@ -52,3 +52,36 @@ p({"class":"foam.nanos.test.Test","id":"FoldAndReduceTest","status":2,"code":"im
 p({"class":"foam.nanos.test.Test","id":"FoldAndReduceTest","passed":10,"failed":0,"lastRun":"2019-06-17T19:39:02.373Z","lastDuration":80,"status":1,"output":"SUCCESS: Stock DAO has expected number of items\n\nHourly data validation\nSUCCESS: Hourly DAO has expected number of items\nSUCCESS: [] fields are set incorrectly\nSUCCESS: [] fields are set incorrectly\nSUCCESS: [] fields are set incorrectly\n\nDaily data validation\nSUCCESS: Daily DAO has expected number of items\nSUCCESS: [] fields are set incorrectly\nSUCCESS: [] fields are set incorrectly\n\nWeekly data validation\nSUCCESS: weekly DAO has expected number of items\nSUCCESS: [] fields are set incorrectly\nDone\n"})
 p({"class":"foam.nanos.test.Test","id":"FoldAndReduceTest","status":2,"output":""})
 p({"class":"foam.nanos.test.Test","id":"FoldAndReduceTest","lastRun":"2019-06-17T19:39:12.053Z","lastDuration":57,"status":1,"output":"SUCCESS: Stock DAO has expected number of items\n\nHourly data validation\nSUCCESS: Hourly DAO has expected number of items\nSUCCESS: [] fields are set incorrectly\nSUCCESS: [] fields are set incorrectly\nSUCCESS: [] fields are set incorrectly\n\nDaily data validation\nSUCCESS: Daily DAO has expected number of items\nSUCCESS: [] fields are set incorrectly\nSUCCESS: [] fields are set incorrectly\n\nWeekly data validation\nSUCCESS: weekly DAO has expected number of items\nSUCCESS: [] fields are set incorrectly\nDone\n"})
+p({
+  "class":"foam.nanos.test.Test",
+  "id":"Multi Line Output",
+  "status":2,
+  "code":
+  """
+    home = System.getProperty("JOURNAL_HOME");
+    file = java.io.File.createTempFile(\"temp\", null, new java.io.File(home));
+    file.deleteOnExit();
+    outputter = new foam.lib.json.Outputter(x, file);
+    string = \"\\\\\\t line1 \\n   \\\\n  \\n line2 \\n line3 \\\" \\\\ \";
+    user = new foam.nanos.auth.User(x);
+    user.setId(24);
+    user.setFirstName(string);
+    user.setLastName(\"Fjorenborenborkenberger\");
+    outputter.setMultiLine(true);
+    outputter.outputJSONJFObject((foam.core.FObject) user);
+    outputter.flush();
+    filejournal = new foam.dao.FileJournal(x);
+    filejournal.setMultiLineOutput(true);
+    filejournal.setFilename(file.getName());
+    firstread = filejournal.getEntry(filejournal.getReader());
+    firstread = firstread.substring(2, firstread.length() - 1);
+    parser = new foam.lib.json.JSONParser();
+    firstparse = parser.parseString(firstread);
+    outputter.outputJSONJFObject((foam.core.FObject) firstparse);
+    secondread = filejournal.getEntry(filejournal.getReader());
+    secondread = secondread.substring(2, secondread.length() - 1);
+    test(firstread.equals(secondread), \"Reparsing preserves JSON\");
+  """,
+  "output":""
+})
+p({"class":"foam.nanos.auth.DeletedAwareDAOTest","id":"DeletedAwareDAOTest"})

@@ -82,6 +82,14 @@ foam.INTERFACE({
       swiftThrows: true,
       args: [
         {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'user',
+          type: 'foam.nanos.auth.User'
+        },
+        {
           name: 'potentialPassword',
           type: 'String',
         }

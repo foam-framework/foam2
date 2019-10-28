@@ -785,7 +785,7 @@ foam.CLASS({
     {
       name: 'swiftCode',
       flags: ['swift'],
-      expression: function(target, targetPropertyName, targetDAOKey) {
+      expression: function(target, targetPropertyName, targetDAOKey, unauthorizedTargetDAOKey) {
         return `
           return x?.create(foam_dao_RelationshipDAO.self, args: [
             "sourceId": self.id,
@@ -960,7 +960,7 @@ foam.CLASS({
     {
       name: 'swiftCode',
       flags: ['swift'],
-      expression: function(junction, sourceProperty, targetProperty, targetDAOKey, junctionDAOKey) {
+      expression: function(junction, sourceProperty, targetProperty, targetDAOKey, junctionDAOKey, unauthorizedTargetDAOKey) {
         return `
           return x!.create(foam_dao_ManyToManyRelationshipImpl.self, args: [
             "sourceId": self.id,
@@ -1038,5 +1038,16 @@ foam.CLASS({
       flags: ['swift'],
       value: '// NOOP',
     },
+    {
+      name: 'createMode',
+      value: foam.u2.DisplayMode.HIDDEN // NOTE: value: 'HIDDEN' doesn't work.
+    },
+    {
+      name: 'view',
+      value: {
+        class: 'foam.u2.view.FObjectPropertyView',
+        readView: { class: 'foam.u2.view.ReadManyToManyRelationshipPropertyView' }
+      }
+    }
   ],
 });

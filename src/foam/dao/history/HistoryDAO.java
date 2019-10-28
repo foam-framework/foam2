@@ -45,7 +45,7 @@ public class HistoryDAO
         "(" + user.getId() + ")";
   }
 
-  /**git
+  /**
    * Returns an array of updated properties
    *
    * @param currentValue current value

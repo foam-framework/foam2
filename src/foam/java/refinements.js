@@ -4,6 +4,20 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+foam.INTERFACE({
+  package: 'foam.lib.csv',
+  name: 'FromCSVSetter',
+  methods: [
+    {
+      name: 'set',
+      args: [
+        { type: 'FObject', name: 'obj' },
+        { type: 'String', name: 'str' }
+      ]
+    }
+  ]
+});
+
 foam.LIB({
   name: 'foam.java',
   flags: ['java'],
@@ -21,7 +35,8 @@ foam.LIB({
           return b ? "true" : "false";
         },
         Number: function(n) {
-          return '' + n + (n > Math.pow(2, 31) ? 'L' : '');
+          return '' + n +
+            (n > Math.pow(2, 31) || n < -Math.pow(2,31) ? 'L' : '');
         },
         FObject: function(o) {
           return o.asJavaValue();
@@ -54,6 +69,11 @@ ${Object.keys(o).map(function(k) {
           o = o.replace(/\\/g, '\\\\')
           return `java.util.regex.Pattern.compile("${o}")`
         },
+        Date: function(d) {
+          var n = d.getTime();
+          return `new java.util.Date(` + n +
+            (n > Math.pow(2, 31) || n < -Math.pow(2,31) ? 'L' : '') + `)`
+        }
       })
     },
     {
@@ -229,6 +249,18 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'javaFromCSVLabelMapping',
+      value: `
+        foam.core.PropertyInfo prop = this;
+        map.put(getName(), new foam.lib.csv.FromCSVSetter() {
+          public void set(foam.core.FObject obj, String str) {
+            prop.set(obj, fromString(str));
+          }
+        });
+      `
+    },
+    {
+      class: 'String',
       name: 'javaToCSV',
       value: 'outputter.outputValue(obj != null ? get(obj) : null);'
     },
@@ -265,7 +297,8 @@ foam.CLASS({
         csvParser:               this.javaCSVParser,
         extends:                 this.javaInfoType,
         networkTransient:        this.networkTransient,
-        permissionRequired:      this.permissionRequired,
+        readPermissionRequired:  this.readPermissionRequired,
+        writePermissionRequired: this.writePermissionRequired,
         storageTransient:        this.storageTransient,
         xmlAttribute:            this.xmlAttribute,
         xmlTextNode:             this.xmlTextNode,
@@ -276,7 +309,8 @@ foam.CLASS({
         containsDeletablePII:    this.containsDeletablePII,
         validateObj:             this.javaValidateObj,
         toCSV:                   this.javaToCSV,
-        toCSVLabel:              this.javaToCSVLabel
+        toCSVLabel:              this.javaToCSVLabel,
+        fromCSVLabelMapping:     this.javaFromCSVLabelMapping
       });
     },
 
@@ -300,6 +334,8 @@ foam.CLASS({
       };
 
       // set value
+      setter += `boolean oldIsSet = ${this.name}IsSet_;\n`;
+      setter += `${this.javaType} oldVal = ${this.name}_;\n`;
       setter += `${this.name}_ = val;\n`;
       setter += `${this.name}IsSet_ = true;\n`;
 
@@ -454,6 +490,7 @@ foam.LIB({
 
       cls.name = this.model_.name;
       cls.package = this.model_.package;
+      cls.source = this.model_.source;
       cls.abstract = this.model_.abstract;
       cls.documentation = this.model_.documentation;
 
@@ -1198,6 +1235,12 @@ foam.CLASS({
             }).join('\n')
           });
 
+          this.VALUES.sort( function (a, b) {
+            return (a.ordinal < b.ordinal)
+              ? -1
+              : 1;
+          });
+
           cls.declarations = this.VALUES.map(function(v) {
             return `${v.name}(${properties.map(p => foam.java.asJavaValue(v[p])).join(', ')})`;
           }).join(', ');
@@ -1429,6 +1472,31 @@ foam.CLASS({
         return 'new foam.lib.json.FObjectParser('
           + (of ? of.id + '.class' : '') + ')';
       }
+    },
+    {
+      name: 'javaFromCSVLabelMapping',
+      value: `
+        foam.core.AbstractFObjectPropertyInfo prop = this;
+
+        java.util.Map<String, foam.lib.csv.FromCSVSetter> map2 = new java.util.HashMap<>();
+        prop.of().getAxiomsByClass(foam.core.PropertyInfo.class).forEach(a -> {
+          foam.core.PropertyInfo p = (foam.core.PropertyInfo) a;
+          p.fromCSVLabelMapping(map2);
+        });
+
+        for ( String key : map2.keySet() ) {
+          map.put(getName() + "." + key, new foam.lib.csv.FromCSVSetter() {
+            public void set(foam.core.FObject obj, String str) {
+              try {
+                if ( prop.get(obj) == null ) prop.set(obj, prop.of().newInstance());
+                map2.get(key).set((foam.core.FObject) prop.get(obj), str);
+              } catch ( Throwable t ) {
+                // ???
+              }
+            }
+          });
+        }
+      `
     }
   ],
   methods: [
@@ -1810,7 +1878,7 @@ foam.CLASS({
         visibility: 'public',
         type: this.of.id,
         args: [ { name: 'x', type: 'foam.core.X' } ],
-        body: `return (${this.of.id})((foam.dao.DAO) x.get("${this.targetDAOKey}")).find_(x, (Object) get${foam.String.capitalize(this.name)}());`
+        body: `return (${this.of.id})((foam.dao.DAO) x.get("${this.unauthorizedTargetDAOKey || this.targetDAOKey}")).find_(x, (Object) get${foam.String.capitalize(this.name)}());`
       });
     }
   ]

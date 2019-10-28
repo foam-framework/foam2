@@ -87,27 +87,10 @@ foam.CLASS({
       tableWidth: 140
     },
     {
-      class: 'Long',
+      class: 'Duration',
       name: 'lastDuration',
       documentation: 'Date and time the script took to complete.',
       visibility: 'RO',
-      units: 'ms',
-      tableCellFormatter: function(value) {
-        var hours = Math.floor(value / 3600000);
-        var minutes = Math.floor(value / 60000);
-        var seconds = Math.floor(value / 1000);
-        var milliseconds = value % 1000;
-
-        if ( hours ) {
-          this.add(`${hours}h ${minutes}m ${seconds}s ${milliseconds}ms`);
-        } else if ( minutes ) {
-          this.add(`${minutes}m ${seconds}s ${milliseconds}ms`);
-        } else if ( seconds ) {
-          this.add(`${seconds}s ${milliseconds}ms`);
-        } else {
-          this.add(`${milliseconds}ms`);
-        }
-      },
       tableWidth: 125
     },
     /*
@@ -135,23 +118,21 @@ foam.CLASS({
       visibility: 'RO',
       value: 'UNSCHEDULED',
       javaValue: 'ScriptStatus.UNSCHEDULED',
-      tableWidth: 100
+      tableWidth: 100,
+      storageTransient: true
     },
     {
-      class: 'String',
-      name: 'code',
-      view: {
-        class: 'io.c9.ace.Editor'
-      }
+      class: 'Code',
+      name: 'code'
     },
     {
       class: 'String',
       name: 'output',
-      visibility: 'RO',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
       view: {
-        class: 'foam.u2.tag.TextArea',
-        rows: 12, cols: 120,
-        css: { 'font-family': 'monospace' }
+        class: 'foam.u2.view.ModeAltView',
+        readView: { class: 'foam.u2.view.PreView' }
       },
       preSet: function(_, newVal) {
         // for client side scripts

@@ -66,17 +66,6 @@ foam.CLASS({
       padding: 0 16px;
     }
 
-    /*
-      TODO: Don't manually target these classes like this.
-     */
-    ^ .foam-u2-view-ScrollTableView-table {
-      width: 100%;
-    }
-
-    ^ .foam-u2-view-ScrollTableView-scrollbarContainer {
-      height: 424px;
-    }
-
     ^ .foam-u2-view-TableView th {
       background: #ffffff
     }
@@ -123,7 +112,12 @@ foam.CLASS({
       name: 'summaryView',
       factory: function() {
         return {
-          class: 'foam.u2.view.ScrollTableView'
+          class: 'foam.u2.view.ScrollTableView',
+          enableDynamicTableHeight: false,
+          css: {
+            width: '100%',
+            height: '424px'
+          }
         };
       }
     },

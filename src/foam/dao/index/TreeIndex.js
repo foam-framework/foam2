@@ -383,8 +383,7 @@ foam.CLASS({
 
     function plan(sink, skip, limit, order, predicate, root) {
       var index = this;
-      var m = this.index;
-
+      var m     = this.index;
 
       if ( m.False.isInstance(predicate) ) return m.NotFoundPlan.create();
 
@@ -555,13 +554,14 @@ foam.CLASS({
             reverseSort ?
               subTree.selectReverse(
                 sink,
-                skip != null ? [skip] : null,
+                skip  != null ? [skip]  : null,
                 limit != null ? [limit] : null,
-                order, predicate, {}) : subTree.select(
-                  sink,
-                  skip != null ? [skip] : null,
-                  limit != null ? [limit] : null,
-                  order, predicate, {}) ;
+                order, predicate, {}) :
+              subTree.select(
+                sink,
+                skip  != null ? [skip]  : null,
+                limit != null ? [limit] : null,
+                order, predicate, {}) ;
             index.selectCount--;
           }
         },

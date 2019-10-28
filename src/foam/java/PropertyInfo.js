@@ -49,7 +49,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'permissionRequired'
+      name: 'readPermissionRequired'
+    },
+    {
+      class: 'Boolean',
+      name: 'writePermissionRequired'
     },
     {
       class: 'Boolean',
@@ -111,6 +115,7 @@ foam.CLASS({
     'validateObj',
     'toCSV',
     'toCSVLabel',
+    'fromCSVLabelMapping',
     {
       name: 'methods',
       factory: function() {
@@ -216,10 +221,16 @@ foam.CLASS({
             body: 'return ' + this.networkTransient + ';'
           },
           {
-            name: 'getPermissionRequired',
+            name: 'getReadPermissionRequired',
             type: 'boolean',
             visibility: 'public',
-            body: 'return ' + this.permissionRequired + ';'
+            body: 'return ' + this.readPermissionRequired + ';'
+          },
+          {
+            name: 'getWritePermissionRequired',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.writePermissionRequired + ';'
           },
           {
             name: 'getStorageTransient',
@@ -308,6 +319,15 @@ foam.CLASS({
               { name: 'outputter',  type: 'foam.lib.csv.CSVOutputter' }
             ],
             body: this.toCSVLabel
+          },
+          {
+            name: 'fromCSVLabelMapping',
+            visibility: 'public',
+            type: 'void',
+            args: [
+              { name: 'map', type: 'java.util.Map<String, foam.lib.csv.FromCSVSetter>' }
+            ],
+            body: this.fromCSVLabelMapping
           }
         ];
 

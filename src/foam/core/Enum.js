@@ -310,6 +310,7 @@ foam.CLASS({
     function outputFObject(o) {
       o.out(this.ordinal);
     },
+    function toSummary() { return this.label; },
     function toString() { return this.name; }
   ]
 });

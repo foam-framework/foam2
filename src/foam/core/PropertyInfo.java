@@ -25,7 +25,8 @@ public interface PropertyInfo
   public ClassInfo getClassInfo();
 
   public boolean getNetworkTransient();
-  public boolean getPermissionRequired();
+  public boolean getReadPermissionRequired();
+  public boolean getWritePermissionRequired();
   public boolean getStorageTransient();
   public boolean getXMLAttribute();
   public boolean getXMLTextNode();
@@ -63,4 +64,5 @@ public interface PropertyInfo
   public boolean containsPII();
   public boolean containsDeletablePII();
   public void validateObj(foam.core.X x, foam.core.FObject obj);
+  public void fromCSVLabelMapping(java.util.Map<String, foam.lib.csv.FromCSVSetter> map);
 }

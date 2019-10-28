@@ -95,6 +95,10 @@ foam.CLASS({
       }
     },
     {
+      class: 'Boolean',
+      name: 'editEnabled'
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.u2.Element',
       name: 'container_'
@@ -169,8 +173,8 @@ foam.CLASS({
     },
     {
       name: 'edit',
-      isAvailable: function(controllerMode) {
-        return controllerMode === this.ControllerMode.VIEW;
+      isAvailable: function(controllerMode, editEnabled) {
+        return editEnabled && controllerMode === this.ControllerMode.VIEW;
       },
       code: function() {
         this.controllerMode = this.ControllerMode.EDIT;
