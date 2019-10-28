@@ -30,7 +30,6 @@ FOAM_FILES([
   { name: "foam/nanos/auth/DayOfWeek" },
   { name: "foam/nanos/auth/Hours" },
   { name: "foam/nanos/auth/Address" },
-  { name: "foam/nanos/auth/ChangePassword" },
   { name: "foam/nanos/auth/DeletedAware" },
   { name: "foam/nanos/auth/PasswordPolicy" },
   { name: "foam/nanos/auth/Group" },

@@ -73,8 +73,7 @@ foam.CLASS({
       name: 'horizontal',
       documentation: `This property toggles the view from a centered vertical view to a
       horizontally property display view.`,
-      hidden: true,
-      value: true
+      hidden: true
     },
     {
       class: 'Boolean',
