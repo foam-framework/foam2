@@ -18,218 +18,174 @@
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'ChangePasswordView',
-  extends: 'foam.u2.View',
+  // extends: 'foam.u2.detail.AbstractSectionedDetailView',
 
-  documentation: 'Change Password View',
+  documentation: `Change Password View: managing two states.
+  State one) ResetPassword:  redirect from email link, with a token to update forgotten password,
+  State two) UpdatePassword: simple change of password by a logged in user. `,
 
   imports: [
     'auth',
-    'user',
+    'resetPasswordToken',
+    'theme',
     'stack',
-    'userDAO'
+    'user'
   ],
-  exports: [ 'as data' ],
 
   requires: [
-    'foam.u2.dialog.NotificationMessage'
+    'foam.nanos.auth.User',
+    'foam.u2.detail.SectionView'
   ],
 
   css: `
-    ^ {
-      width: 1280px;
-      margin: auto;
+    ^ .top-bar {
+      width: 100%;
+      height: 64px;
+      border-bottom: solid 1px #e2e2e3
     }
-    ^ .Container{
-      width: 960px;
-      height: 200px;
-      border-radius: 2px;
-      background-color: #ffffff;
-      margin-left: 160px;
-      margin-top: 50px;
-    }
-    ^ input{
-      background-color: #ffffff;
-      border: solid 1px rgba(164, 179, 184, 0.5);
-      padding: 10px;
-      font-family: Roboto;
-      font-size: 12px;
-      line-height: 1.33;
-      letter-spacing: 0.2;
-      text-align: left;
-      color: /*%BLACK%*/ #1e1f21;
-    }
-    ^ .originalPass-Text{
-      width: 118px;
-      height: 16px;
-      margin-bottom: 8px;
-      margin-left: 20px;
-      margin-right: 195px;
-    }
-    ^ .newPass-Text{
-      width: 118px;
-      height: 16px;
-      margin-right: 195px;
-    }
-    ^ .confirmPass-Text{
-      width: 119px;
-      height: 16px;
-    }
-    ^ .originalPass-Input{
-      width: 293px;
-      height: 40px;
-      margin-left: 20px;
-      margin-right: 20px;
-    }
-    ^ .newPass-Input{
-      width: 293px;
-      height: 40px;
-      margin-right: 20px;
-    }
-    ^ .confirmPass-Input{
-      width: 294px;
-      height: 40px;
-    }
-    ^ .changePass-Text{
-      width: 164px;
-      height: 20px;
-      margin-left: 20px;
-      margin-right: 621px;
-    }
-    ^ .update-BTN{
-      width: 135px;
-      height: 40px;
-      border-radius: 2px;
-      font-family: Roboto;
-      font-size: 14px;
-      line-height: 2.86;
-      letter-spacing: 0.2px;
-      text-align: center;
-      color: #ffffff;
-      cursor: pointer;
-      border: 1px solid /*%PRIMARY3%*/ #406dea;
-      background-color: /*%PRIMARY3%*/ #406dea;
-      margin-left: 20px;
-      margin-top: 19px;
-    }
-    ^ .update-BTN:hover {
-      border: 1px solid /*%PRIMARY3%*/ #406dea;
-      opacity: 0.9;
-    }
-    ^ h1{
-      opacity: 0.6;
-      font-family: Roboto;
-      font-size: 20px;
-      font-weight: 300;
-      line-height: 1;
-      letter-spacing: 0.3px;
-      text-align: left;
-      color: /*%BLACK%*/ #1e1f21;
-      display: inline-block;
-    }
-    ^ h2{
-      width: 150px;
-      font-family: Roboto;
-      font-size: 14px;
-      font-weight: 300;
-      letter-spacing: 0.2px;
-      text-align: left;
-      color: /*%BLACK%*/ #1e1f21;
-      display: inline-block;
+    ^ .top-bar img {
+      height: 25px;
+      margin-top: 20px;
     }
   `,
 
-  messages: [
-    { name: 'emptyOriginal', message: 'Please enter your original password'},
-    { name: 'emptyPassword', message: 'Please enter your new password' },
-    { name: 'emptyConfirmation', message: 'Please re-enter your new password' },
-    { name: 'passwordMismatch', message: 'Passwords do not match' },
-    { name: 'passwordSuccess', message: 'Password successfully updated' }
+  sections: [
+    {
+      name: 'resetPasswordSection',
+      title: 'Reset your password',
+      help: `Create a new password for your account.`
+    }
   ],
 
   properties: [
     {
+      class: 'Boolean',
+      name: 'verticle',
+      hidden: true
+    },
+    {
       class: 'String',
+      name: 'token',
+      factory: function() {
+        var searchParams = new URLSearchParams(location.search);
+        return searchParams.get('token');
+      },
+      hidden: true
+    },
+    {
+      class: 'Password',
       name: 'originalPassword',
-      view: { class: 'foam.u2.view.PasswordView' }
+      section: 'resetPasswordSection',
+      view: {
+        class: 'foam.u2.view.PasswordView',
+        passwordIcon: true
+      },
+      visibilityExpression: function(token) {
+        return ! token ? foam.u2.Visibility.RW : foam.u2.Visibility.HIDDEN;
+      },
+
     },
     {
-      class: 'String',
+      class: 'Password',
       name: 'newPassword',
-      view: { class: 'foam.u2.view.PasswordView' }
+      section: 'resetPasswordSection',
+      view: {
+        class: 'net.nanopay.ui.NewPasswordView',
+        passwordIcon: true
+      },
+      minLength: 6
     },
     {
-      class: 'String',
-      name: 'confirmPassword',
-      view: { class: 'foam.u2.view.PasswordView' }
+      class: 'Password',
+      name: 'confirmationPassword',
+      section: 'resetPasswordSection',
+      view: {
+        class: 'foam.u2.view.PasswordView',
+        passwordIcon: true
+      },
+      validationPredicates: [
+        {
+          args: ['newPassword', 'confirmationPassword'],
+          predicateFactory: function(e) {
+            return e.EQ(
+              foam.nanos.auth.ChangePasswordView.NEW_PASSWORD,
+              foam.nanos.auth.ChangePasswordView.CONFIRMATION_PASSWORD);
+          },
+          errorString: 'Passwords do not match.'
+        }
+      ]
     }
+  ],
+
+  messages: [
+    { name: 'SUCCESS_MSG', message: 'Your password was successfully updated.' }
   ],
 
   methods: [
+    {
+      name: 'reset_',
+      code: function() {
+        this.clearProperty('originalPassword');
+        this.clearProperty('newPassword');
+        this.clearProperty('confirmPassword');
+      }
+    },
     function initE() {
       this.SUPER();
       this
-      .addClass(this.myClass())
-      .start().addClass('Container')
-        .start('div')
-          .start('h1').add('Change Password').addClass('changePass-Text').end()
-        .end()
-        .start('div')
-          .start('h2').add('Original Password').addClass('originalPass-Text').end()
-          .start('h2').add('New Password').addClass('newPass-Text').end()
-          .start('h2').add('Confirm Password').addClass('confirmPass-Text').end()
-        .end()
-        .start('div')
-          .start(this.ORIGINAL_PASSWORD).addClass('originalPass-Input').end()
-          .start(this.NEW_PASSWORD).addClass('newPass-Input').end()
-          .start(this.CONFIRM_PASSWORD).addClass('confirmPass-Input').end()
-        .end()
-        .start(this.UPDATE_PASSWORD).addClass('update-BTN').end()
-      .end()
-    }
+        .addClass(this.myClass())
+        .startContext({ data: this })
+          .start().addClass('top-bar')
+            .start('img')
+              .attr('src', this.theme.logo)
+            .end()
+          .end()
+          .start(this.SectionView, {
+            data: this,
+            sectionName: 'resetPasswordSection'
+          }).end()
+          .startContext({ data: this })
+            .start(this.UPDATE_PASSWORD).end()
+            .start(this.RESET_PASSWORD).end()
+          .endContext()
+      .end();
+      }
   ],
 
   actions: [
-   {
-      name: 'updatePassword',
-      label: 'Update',
+    {
+      name: 'resetPassword',
+      isAvailable: function() {
+        return !! this.token;
+      },
       code: function(X) {
-        var self = this;
-
-        // check if original password entered
-        if ( ! this.originalPassword ) {
-          this.add(this.NotificationMessage.create({ message: this.emptyOriginal, type: 'error' }));
-          return;
-        }
-
-        // check if new password entered
-        if ( ! this.newPassword ) {
-          this.add(this.NotificationMessage.create({ message: this.emptyPassword, type: 'error' }));
-          return;
-        }
-
-        // check if new password confirmation entered
-        if ( ! this.confirmPassword ) {
-          this.add(self.NotificationMessage.create({ message: this.emptyConfirmation, type: 'error' }));
-          return;
-        }
-
-        // check if passwords match
-        if ( ! this.confirmPassword.trim() || this.confirmPassword !== this.newPassword ) {
-          this.add(self.NotificationMessage.create({ message: this.passwordMismatch, type: 'error' }));
-          return;
-        }
-
-        // update password
-        this.auth.updatePassword(null, this.originalPassword, this.newPassword).then(function(result) {
-          // copy new user, clear password fields, show success
-          self.user.copyFrom(result);
-          self.originalPassword = null;
-          self.newPassword = null;
-          self.confirmPassword = null;
-          self.add(self.NotificationMessage.create({ message: self.passwordSuccess }));
+        var user = this.User.create({
+          desiredPassword: this.newPassword
+        });
+        this.resetPasswordToken.processToken(null, user, this.token)
+        .then(function(_) {
+          this.reset_();
+          this.stack.push({ class: 'foam.nanos.auth.SignInView' });
+          this.notify(this.SUCCESS_MSG);
+        }).catch((err) => {
+          this.notify(err.message, 'error');
+        });
+      }
+    },
+    {
+      name: 'updatePassword',
+      isAvailable: function() {
+        return ! this.token;
+      },
+      code: function(X) {
+        this.auth.updatePassword(null, this.originalPassword, this.newPassword)
+        .then((result) => {
+          this.user.copyFrom(result);
+          this.reset_();
+          this.notify(this.SUCCESS_MSG);
         })
-        .catch(function(err) {
-          self.add(self.NotificationMessage.create({ message: err.message, type: 'error' }));
+        .catch((err) => {
+          this.notify(err.message, 'error');
         });
       }
     }
