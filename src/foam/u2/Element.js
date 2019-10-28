@@ -2612,28 +2612,6 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
-  name: 'ObjectViewRefinement',
-  refines: 'foam.core.Object',
-  requires: [ 'foam.u2.view.AnyView' ],
-  properties: [
-    [ 'view', { class: 'foam.u2.view.AnyView' } ]
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.u2',
-  name: 'CodeViewRefinement',
-  refines: 'foam.core.Code',
-  requires: [ 'foam.u2.view.CodeView' ],
-  properties: [
-    [ 'view', { class: 'foam.u2.view.CodeView' } ]
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.u2',
   name: 'ControllerViewTrait',
 
   documentation: 'Trait for adding a ControllerMode controllerMode Property.',
