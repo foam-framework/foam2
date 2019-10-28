@@ -65,6 +65,7 @@ var classes = [
   'foam.mlang.Constant',
   'foam.mlang.ArrayConstant',
   'foam.mlang.expr.Dot',
+  'foam.mlang.expr.PropertyExpr',
   'foam.mlang.PredicatedExpr',
   'foam.mlang.ContextObject',
   'foam.mlang.CurrentTime',

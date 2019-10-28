@@ -99,6 +99,7 @@ return getOf() == null ? null : (foam.core.PropertyInfo) getOf().getAxiomByName(
       */
       name: 'where',
       code: function where(p) {
+        foam.assert(foam.mlang.predicate.Predicate.isInstance(p), `DAO.where() was called with an argument that isn't a predicate!`);
         return this.FilteredDAO.create({
           delegate: this,
           predicate: p

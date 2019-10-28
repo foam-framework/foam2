@@ -233,9 +233,9 @@ foam.CLASS({
       this
         .show(this.ProxySlot.create({ delegate$: this.visibilitySlot$ }))
         .addClass(this.myClass())
-        .add(this.slot(function(data, prop, prop$label) {
+        .add(this.slot(function(prop, prop$label) {
           var errorSlot = prop.validateObj && prop.validationTextVisible ?
-            data.slot(prop.validateObj) :
+            this.data.slot(prop.validateObj) :
             foam.core.ConstantSlot.create({ value: null });
 
           return self.E()
