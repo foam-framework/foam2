@@ -1,12 +1,12 @@
 /**
  * @license
- * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
   package: 'foam.nanos.auth.resetPassword',
-  name: 'ResendView', // TODO change name to ForgotEmailView
+  name: 'ForgotPasswordView',
   extends: 'foam.u2.View',
 
   documentation: 'Forgot Password Resend View',
@@ -27,6 +27,7 @@ foam.CLASS({
       text-align: center;
     }
     ^ .top-bar {
+      background: /*%PRIMARY1%*/
       width: 100%;
       height: 8vh;
       border-bottom: solid 1px #e2e2e3

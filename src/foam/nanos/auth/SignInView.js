@@ -134,7 +134,7 @@ foam.CLASS({
             .addClass('forgot-link')
             .add('Forgot Password?')
             .on('click', function() {
-              self.stack.push({ class: 'foam.nanos.auth.resetPassword.ResendView' });
+              self.stack.push({ class: 'foam.nanos.auth.resetPassword.ForgotPasswordView' });
             })
           .end()
         .end()
