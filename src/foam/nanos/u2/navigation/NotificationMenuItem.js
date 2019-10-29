@@ -14,6 +14,7 @@ foam.CLASS({
     'group',
     'menuDAO',
     'notificationDAO',
+    'pushMenu',
     'user'
   ],
 
@@ -36,6 +37,9 @@ foam.CLASS({
       transition: all .15s ease-in-out;
     }
     ^ img:hover {
+      border-bottom: 1px solid white;
+    }
+    ^ .selected-icon {
       border-bottom: 1px solid white;
     }
     ^ .dot {
@@ -67,6 +71,14 @@ foam.CLASS({
     }
   ],
 
+  constants: [
+    { name: 'BELL_IMAGE', value: 'images/bell.png' }
+  ],
+
+  messages: [
+    { name: 'INVALID_MENU', message: `No menu in menuDAO with id: "notifications".` }
+  ],
+
   methods: [
     function initE() {
       this.notificationDAO.on.sub(this.onDAOUpdate);
@@ -76,13 +88,13 @@ foam.CLASS({
 
       this.addClass(this.myClass())
         .addClass('icon-container')
-        .enableClass('selected', this.currentMenu$.map((menu) => {
-          return this.Menu.isInstance(menu) && menu.id === 'notifications';
-        }))
         .on('click', this.changeToNotificationsPage.bind(this))
 
         .start('img')
-          .attrs({ src: 'images/bell.png' })
+          .enableClass('selected-icon', this.currentMenu$.map((menu) => {
+            return this.Menu.isInstance(menu) && menu.id === 'notifications';
+          }))
+          .attrs({ src: this.BELL_IMAGE })
         .end()
         .start('span')
           .addClass('dot')
@@ -93,11 +105,11 @@ foam.CLASS({
     },
 
     function changeToNotificationsPage() {
-      this.menuDAO.find('notifications').then((queryResult) => {
-        if ( queryResult == null ) {
-          throw new Error('No menu in menuDAO with id "notifications".');
+      this.menuDAO.find('notifications').then((menu) => {
+        if ( menu == null ) {
+          throw new Error(this.INVALID_MENU);
         }
-        queryResult.launch();
+        this.pushMenu(menu.id);
       });
     }
   ],
