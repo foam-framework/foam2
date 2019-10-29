@@ -342,6 +342,8 @@ public class DigWebAgent
         }
         out.println(returnMessage);
       } else if ( Command.select == command ) {
+        resp.setContentType("text/html");
+
         PropertyInfo idProp = (PropertyInfo) cInfo.getAxiomByName("id");
         ArraySink sink = (ArraySink) ( ! SafetyUtil.isEmpty(id) ?
           dao.where(MLang.EQ(idProp, id)).select(new ArraySink()) :
@@ -491,10 +493,6 @@ public class DigWebAgent
             }
           }
         } else {
-          if ( Format.XML == format ) {
-            resp.setContentType("application/xml");
-          }
-
           DigErrorMessage error = new ParsingErrorException.Builder(x)
             .setMessage("Unsupported DAO : " + daoName)
             .build();
