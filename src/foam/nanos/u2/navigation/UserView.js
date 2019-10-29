@@ -204,21 +204,7 @@ foam.CLASS({
             .show(this.showCountUnread$)
           .end()
         .end()
-
-        // The username and settings dropdown
-        .start().addClass('profile-container')
-          .on('click', () => {
-            this.tag(this.SubMenuView.create({
-              menu: this.Menu.create({ id: 'settings' })
-            }));
-          })
-          .start('h1')
-            .add( this.user.firstName$ ).addClass(this.myClass('user-name'))
-          .end()
-          .start('div')
-            .addClass(this.myClass('carrot'))
-          .end()
-        .end();
+        .tag({ class: 'foam.nanos.u2.navigation.UserInfoNavigationView' });
     },
 
     function changeToNotificationsPage() {
