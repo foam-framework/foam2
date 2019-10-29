@@ -183,7 +183,10 @@ foam.CLASS({
     ['javaJSONParser', 'new foam.lib.json.ExprParser()'],
     {
       name: 'view',
-      value: { class: 'foam.u2.view.ExprView' }
+      value: {
+        class: 'foam.u2.view.FObjectView',
+        of: 'foam.mlang.Expr'
+      }
     }
   ],
 
@@ -326,7 +329,7 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(_, o) {
-        if ( ! o.f && typeof o === "function" ) return foam.mlang.predicate.Func.create({ fn: o });
+        if ( typeof o === 'function' && ! o.f ) return foam.mlang.predicate.Func.create({ fn: o });
         return o;
       }
     }
@@ -686,11 +689,13 @@ foam.CLASS({
   properties: [
     {
       class: 'foam.mlang.ExprProperty',
-      name: 'arg1'
+      name: 'arg1',
+      gridColumns: 6
     },
     {
       class: 'foam.mlang.ExprProperty',
       name: 'arg2',
+      gridColumns: 6,
       adapt: function(old, nu, prop) {
         var value = prop.adaptValue(nu);
         var arg1 = this.arg1;
@@ -705,6 +710,9 @@ foam.CLASS({
   methods: [
     function toIndex(tail) {
       return this.arg1 && this.arg1.toIndex(tail);
+    },
+    function toSummary() {
+      return this.toString();
     },
     {
       name: 'toString',
@@ -748,6 +756,9 @@ foam.CLASS({
   ],
 
   methods: [
+    function toSummary() {
+      return this.toString();
+    },
     function toString() {
       var s = foam.String.constantize(this.cls_.name) + '(';
       for ( var i = 0 ; i < this.args.length ; i++ ) {
@@ -1438,7 +1449,8 @@ foam.CLASS({
     },
     {
       // TODO: simpler to make an expression
-      name: 'valueSet_'
+      name: 'valueSet_',
+      hidden: true
     }
   ]
 });
@@ -1473,7 +1485,8 @@ foam.CLASS({
       }
     },
     {
-      name: 'upperCase_'
+      name: 'upperCase_',
+      hidden: 'true'
     }
   ],
 
@@ -2031,6 +2044,19 @@ foam.CLASS({
 
   documentation: 'Unary Predicate that returns true iff the given property has a value other than null, undefined, \'\', or [].',
 
+  requires: [
+    'foam.mlang.expr.PropertyExpr'
+  ],
+
+  properties: [
+    {
+      name: 'arg1',
+      factory: function() {
+        return this.PropertyExpr.create();
+      }
+    }
+  ],
+
   methods: [
     {
       name: 'f',
@@ -2197,7 +2223,11 @@ foam.CLASS({
     {
       class: 'Class',
       name: 'targetClass',
-      javaType: 'foam.core.ClassInfo'
+      javaType: 'foam.core.ClassInfo',
+      view: {
+        class: 'foam.u2.view.StrategizerChoiceView',
+        desiredModelId: 'foam.Class'
+      }
     }
   ],
 
@@ -3237,7 +3267,11 @@ foam.CLASS({
   properties: [
     {
       class: 'Class',
-      name: 'targetClass'
+      name: 'targetClass',
+      view: {
+        class: 'foam.u2.view.StrategizerChoiceView',
+        desiredModelId: 'foam.Class'
+      }
     }
   ],
 
@@ -3399,9 +3433,14 @@ foam.CLASS({
   implements: [ 'foam.core.Serializable' ],
   properties: [
     {
+      name: 'arg1',
+      gridColumns: 6
+    },
+    {
       type: 'Regex',
       javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
-      name: 'regExp'
+      name: 'regExp',
+      gridColumns: 6
     }
   ],
   methods: [
