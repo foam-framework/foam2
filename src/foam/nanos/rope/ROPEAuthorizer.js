@@ -81,8 +81,8 @@ foam.CLASS({
   
       List<String> propertyUpdates = new ArrayList<String>();
       while ( i.hasNext() ) {
-        String key = (String) i.next();
-        propertyUpdates.add(key);
+        String propName = (String) i.next();
+        propertyUpdates.add(propName);
       }
       return propertyUpdates;
       `
