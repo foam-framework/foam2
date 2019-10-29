@@ -230,6 +230,7 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(value) {
+        value = Math.round(value);
         var hours = Math.floor(value / 3600000);
         value -= hours * 3600000;
         var minutes = Math.floor(value / 60000);
