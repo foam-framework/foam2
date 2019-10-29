@@ -54,7 +54,6 @@ FOAM_FILES([
   { name: "foam/nanos/auth/email/EmailDocInterface" },
   { name: "foam/nanos/auth/email/EmailDocService" },
   { name: "foam/nanos/auth/email/ClientEmailDocService" },
-  { name: "foam/nanos/auth/resetPassword/EmailView" },
   { name: "foam/nanos/auth/resetPassword/ResendView" },
   { name: "foam/nanos/auth/resetPassword/ResetView" },
   { name: "foam/nanos/auth/resetPassword/SuccessView" },
