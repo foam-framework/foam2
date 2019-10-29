@@ -275,7 +275,7 @@ return delegate;
       name: 'innerDAO',
       javaFactory: `
       if ( getNullify() ) {
-        return new foam.dao.NullDAO.Builder(x)
+        return new foam.dao.NullDAO.Builder(getX())
         .setOf(getOf())
         .build();
       }
