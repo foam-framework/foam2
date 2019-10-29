@@ -254,8 +254,9 @@ foam.CLASS({
         this.fetchTheme().then(() => {
           this
             .addClass(this.myClass())
-            .start('div', null, this.topNavigation_$)
-              .tag(this.TopNavigation)
+            .start()
+              .tag(this.topNavigation_$.map(
+                (s) => s ? foam.u2.ViewSpec.createView(s, {}, this, this.__subContext__) : 'NULL'))
             .end()
             .start()
               .addClass('stack-wrapper')
@@ -476,9 +477,8 @@ foam.CLASS({
       /** Use custom elements if supplied by the Theme. */
       if ( ! this.theme ) throw new Error(this.LOOK_AND_FEEL_NOT_FOUND);
 
-      if ( this.theme.topNavigation && this.topNavigation_ ) {
-        this.topNavigation_.removeAllChildren();
-        this.topNavigation_.tag({ class: this.theme.topNavigation });
+      if ( this.theme.topNavigation ) {
+        this.topNavigation_ = { class: this.theme.topNavigation };
       }
 
       if ( this.theme.footerView && this.footerView_ ) {
