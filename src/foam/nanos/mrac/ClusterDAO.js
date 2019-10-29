@@ -28,7 +28,9 @@ foam.CLASS({
   `,
 
   javaImports: [
+    'foam.box.Box',
     'foam.box.HTTPBox',
+    'foam.box.SessionClientBox',
     'foam.dao.ClientDAO',
     'foam.dao.DAO',
     'foam.dao.ArraySink',
@@ -83,7 +85,17 @@ foam.CLASS({
       if ( SafetyUtil.isEmpty(hostname) ) {
         hostname = "localhost";
       }
-      return ((ClusterConfig) dao.find_(x, hostname));
+      ClusterConfig config = (ClusterConfig) dao.find_(x, hostname);
+      if ( config == null ) {
+        if ( ! hostname.equals("localhost") ) {
+          config = (ClusterConfig) dao.find_(x, hostname);
+        }
+        if ( config == null ) {
+          Logger logger = (Logger) x.get("logger");
+          logger.error(this.getClass().getSimpleName(), "ClusterConfig not found for hostname:", System.getProperty("hostname"), " or localhost");
+        }
+      }
+      return config;
       `
     },
     {
@@ -128,10 +140,10 @@ foam.CLASS({
       for ( int i = 0; i < arr.size(); i++ ) {
         ClusterConfig clientConfig = (ClusterConfig) arr.get(i);
         if ( clientConfig.getNodeType() == NodeType.PRIMARY ) {
-          DAO primary = new ClientDAO.Builder(x).setDelegate(new HTTPBox.Builder(x).setUrl(buildURL(x, clientConfig)).build()).build();
+          DAO primary = new ClientDAO.Builder(x).setDelegate(new SessionClientBox.Builder(x).setDelegate(new HTTPBox.Builder(x).setUrl(buildURL(x, clientConfig)).build()).build()).build();
           setPrimary(primary);
         } else if ( clientConfig.getNodeType() == NodeType.SECONDARY ) {
-          DAO client = new ClientDAO.Builder(x).setDelegate(new HTTPBox.Builder(x).setUrl(buildURL(x, clientConfig)).build()).build();
+          DAO client = new ClientDAO.Builder(x).setDelegate(new SessionClientBox.Builder(x).setDelegate(new HTTPBox.Builder(x).setUrl(buildURL(x, clientConfig)).build()).build()).build();
           newClients.add(client);
         } 
       }
@@ -161,7 +173,7 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      Logger logger = (Logger) getX().get("logger");
+      Logger logger = (Logger) x.get("logger");
 
       ClusterConfig config = findConfig(x);
 
@@ -197,7 +209,7 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      Logger logger = (Logger) getX().get("logger");
+      Logger logger = (Logger) x.get("logger");
 
      ClusterConfig config = findConfig(x);
 
@@ -225,7 +237,7 @@ foam.CLASS({
       javaCode: `
       if ( obj instanceof ClusterCommand ) {
         ClusterCommand request = (ClusterCommand) obj;
-        Logger logger = (Logger) getX().get("logger");
+        Logger logger = (Logger) x.get("logger");
         logger.debug(this.getClass().getSimpleName(), "cmd_", getServiceName(), request);
         if ( ClusterCommand.PUT.equals(request.getCommand()) ) {
           return getDelegate().put_(x, request.getObj());

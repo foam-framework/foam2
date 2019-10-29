@@ -21,41 +21,47 @@ public class ClusterDAOTest
 
   @Override
   public void runTest(X x) {
-    //  x_ = x;
-    //  Logger logger = (Logger) x.get("logger");
+    x_ = x;
+    Logger logger = (Logger) x.get("logger");
 
-    //  String serviceName = "countryDAO1";
-    //  addNSpec(x, serviceName);
+    String serviceName = "countryDAO1";
+    addNSpec(x, serviceName);
 
-    //  // DAO clusterDAO = new ClusterDAO.Builder(x)
-    //  //   .setDelegate(new NullDAO.Builder(x).build())
-    //  //   .setServiceName(serviceName)
-    //  //   .build();
-    //  ClusterConfig config = new ClusterConfig.Builder(x)
-    //    .setId("localhost")
-    //    .setNodeType(NodeType.PRIMARY)
-    //    .setPort(8080)
-    //    .build();
+     ClusterConfig config = new ClusterConfig.Builder(x)
+       .setId("primary")
+       .setNodeType(NodeType.PRIMARY)
+       .setPort(8080)
+       .build();
+     ((DAO) x.get("clusterConfigDAO")).put(config);
 
-    //  DAO client = new ClusterClientDAO.Builder(x).setServiceName(serviceName).setConfig(config).build();
+     config = new ClusterConfig.Builder(x)
+       .setId("secondary")
+       .setNodeType(NodeType.SECONDARY)
+       .setPort(8090)
+       .build();
+     ((DAO) x.get("clusterConfigDAO")).put(config);
 
-    //  DAO countryDAO1 = (DAO) x.get("countryDAO1");
-    //  Sink sink = countryDAO1.select(new ArraySink());
-    //  List countries = ((ArraySink) sink).getArray();
-    //  test ( countries.size() == 0, "countryDAO1 empty");
+     DAO client = new ClusterDAO.Builder(x)
+       .setServiceName(serviceName)
+       .build();
 
-    //  DAO countryDAO = (DAO) x.get("countryDAO");
-    //  sink = countryDAO.select(new ArraySink());
-    //  countries = ((ArraySink) sink).getArray();
-    //  for ( Object c : countries ) {
-    //    Country country = (Country) c;
-    //    client.put(country);
-    //  }
+     DAO countryDAO1 = (DAO) x.get("countryDAO1");
+     Sink sink = countryDAO1.select(new ArraySink());
+     List countries = ((ArraySink) sink).getArray();
+     test ( countries.size() == 0, "countryDAO1 empty");
 
-    //  int numCountries = countries.size();
-    //  sink = countryDAO1.select(new ArraySink());
-    //  countries = ((ArraySink) sink).getArray();
-    //  test ( countries.size() == numCountries, "countryDAO1 equal to countryDAO");
+     DAO countryDAO = (DAO) x.get("countryDAO");
+     sink = countryDAO.select(new ArraySink());
+     countries = ((ArraySink) sink).getArray();
+     for ( Object c : countries ) {
+       Country country = (Country) c;
+       client.put(country);
+     }
+
+     int numCountries = countries.size();
+     sink = countryDAO1.select(new ArraySink());
+     countries = ((ArraySink) sink).getArray();
+     test ( countries.size() == numCountries, "countryDAO1 equal to countryDAO");
   }
 
   public void addNSpec(X x, String serviceName) {
@@ -70,7 +76,7 @@ public class ClusterDAOTest
       .setPm(true)
       .setServe(true)
       .setLazy(false)
-      .setServiceScript("return new foam.dao.EasyDAO.Builder(x).setJournaled(true).setJournalName(\""+serviceName+"\").setOf(foam.nanos.auth.Country.getOwnClassInfo()).setCluster(true).build();\\n")
+      .setServiceScript("return new foam.dao.EasyDAO.Builder(x).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\""+serviceName+"\").setOf(foam.nanos.auth.Country.getOwnClassInfo()).setCluster(true).build();\\n")
       .build();
 
     nspec = (NSpec) dao.put(nspec);
