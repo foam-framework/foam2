@@ -496,6 +496,7 @@ var classes = [
   'foam.nanos.rope.OrROPE',
   'foam.nanos.rope.AndROPE',
   'foam.nanos.rope.ROPEAuthorizer',
+  'foam.nanos.rope.CompositeROPE'
 ];
 
 var abstractClasses = [

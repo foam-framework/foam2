@@ -7,7 +7,6 @@
 foam.CLASS({
     package: 'foam.nanos.rope',
     name: 'ROPE',
-    documentation: 'model represents a single cell in a rope matrix',
 
     ids: [ 'targetDAOKey', 'sourceDAOKey', 'relationshipKey' ],
 
@@ -66,6 +65,47 @@ foam.CLASS({
 
     methods: [
       {
+        name: 'check',
+        javaType: 'boolean',
+        args: [
+          { name: 'x', javaType: 'X' },
+          { name: 'obj', javaType: 'FObject' },
+          { name: 'relationshipKey', javaType: 'String' },
+          { name: 'crudKey', javaType: 'String' },
+          { name: 'propertyKey', javaType: 'String' }
+        ],
+        javaCode: `
+        // get the list of next relationships to search to pass this rope
+        List<String> nextRelationships = getNextRelationships(relationshipKey, crudKey, propertyKey);
+    
+        // if a there are no results, return false
+        if ( nextRelationships == null || nextRelationships.size() == 0 ) return false;
+    
+        // get the list of sourceObjs that have a relationship with the targetObj
+        List<FObject> sourceObjs = getSourceObjects(x, obj);
+    
+        DAO ropeDAO = (DAO) x.get("ropeDAO");
+        for ( FObject sourceObj : sourceObjs ) {
+          if ( sourceObj == null ) continue;
+          if ( nextRelationships.contains("__terminate__") ) {
+            if ( sourceObj instanceof User && ((User) sourceObj).getId() == ((User) x.get("user")).getId() ) return true;
+            else continue;
+          }
+          for ( String nextRelationship : nextRelationships ) {
+            List<ROPE> nextRopes = (List<ROPE>) ((ArraySink) ropeDAO.where(AND(
+              EQ(ROPE.TARGET_DAOKEY, getSourceDAOKey()),
+              EQ(ROPE.RELATIONSHIP_KEY, nextRelationship)
+            )).select(new ArraySink())).getArray();
+            for ( ROPE nextRope : nextRopes ) {
+              if ( nextRope.check(x, sourceObj, getRelationshipKey(), "", "") ) return true;
+            }
+          }
+        }
+    
+        return false;
+        `
+      },
+      {
         name: 'getSourceObjects',
         args: [
           {
@@ -78,38 +118,43 @@ foam.CLASS({
           }
         ],
         javaType: 'List<foam.core.FObject>',
+        documentation: `
+        this function returns the objects in the DAO specified by sourceDAOKey that has a relationship with the obj in arguments
+        `,
         javaCode: `
         List<FObject> sourceObjs = new ArrayList(); 
     
-        if ( getCardinality().equals("*:*") ) {
-          String targetPropertyName = getIsInverse() ? "sourceId" : "targetId";
-          String sourcePropertyName = getIsInverse() ? "targetId" : "sourceId";
-    
-          foam.dao.ManyToManyRelationshipImpl relationship = (foam.dao.ManyToManyRelationshipImpl) retrieveProperty(obj, obj.getClass(), "get", getRelationshipKey(), x);
-          List<FObject> junctionObjs = (List<FObject>) ( (ArraySink) relationship.getJunctionDAO().where(
-            EQ(relationship.getJunction().getAxiomByName(targetPropertyName), (Long) retrieveProperty(obj, obj.getClass(), "get", "id"))
-          )
-          .select(new ArraySink()))
-          .getArray();
-    
-          for ( FObject junctionObj : junctionObjs ) {
-            FObject sourceObj = (FObject) (((DAO) x.get(getSourceDAOKey()))
-                        .find(((Long)retrieveProperty(junctionObj, junctionObj.getClass(), "get", sourcePropertyName)).longValue()));
-            sourceObjs.add(sourceObj);
+        switch ( getCardinality() ) {
+          case "*:*" :
+            String targetPropertyName = getIsInverse() ? "sourceId" : "targetId";
+            String sourcePropertyName = getIsInverse() ? "targetId" : "sourceId";
+      
+            foam.dao.ManyToManyRelationshipImpl relationship = (foam.dao.ManyToManyRelationshipImpl) retrieveProperty(obj, obj.getClass(), "get", getRelationshipKey(), x);
+            List<FObject> junctionObjs = (List<FObject>) ( (ArraySink) relationship.getJunctionDAO().where(
+              EQ(relationship.getJunction().getAxiomByName(targetPropertyName), retrieveProperty(obj, obj.getClass(), "get", "id"))
+            ).select(new ArraySink())).getArray();
+      
+            for ( FObject junctionObj : junctionObjs ) {
+              FObject sourceObj = (FObject) (((DAO) x.get(getSourceDAOKey()))
+                          .find((retrieveProperty(junctionObj, junctionObj.getClass(), "get", sourcePropertyName))));
+              sourceObjs.add(sourceObj);
+            }
+            break;
+          case "1:*" :
+            if ( getIsInverse() ) {
+              DAO rDAO = retrieveProperty(obj, obj.getClass(), "get", getRelationshipKey(), x);
+              sourceObjs = ((ArraySink) rDAO.where(INSTANCE_OF(((DAO) x.get(getSourceDAOKey())).getOf())).select(new ArraySink())).getArray();
+            } else {
+              FObject sourceObj = retrieveProperty(obj, obj.getClass(), "find", getRelationshipKey(), x);
+              sourceObjs.add(sourceObj);
+            }
+            break;
+          case "1:1" :
+            DAO sourceDAO = (DAO) x.get(getSourceDAOKey());
+            sourceObjs.add(sourceDAO.find(retrieveProperty(obj, obj.getClass(), "get", getRelationshipKey())));
+            break;
+          default: 
         }
-    
-        } else if ( getCardinality().equals("1:*") && getIsInverse() ) {
-          DAO rDAO = retrieveProperty(obj, obj.getClass(), "get", getRelationshipKey(), x);
-          sourceObjs = ((ArraySink) rDAO.where(INSTANCE_OF(((DAO) x.get(getSourceDAOKey())).getOf())).select(new ArraySink())).getArray();
-        } else if (getCardinality().equals("1:*") ) {
-          FObject sourceObj = retrieveProperty(obj, obj.getClass(), "find", getRelationshipKey(), x);
-          sourceObjs.add(sourceObj);
-        } else if ( getCardinality().equals("1:1") ) {
-          String propName = getRelationshipKey().substring(getRelationshipKey().lastIndexOf(".") + 1);
-          DAO sourceDAO = (DAO) x.get(getSourceDAOKey());
-          sourceObjs.add(sourceDAO.find(retrieveProperty(obj, obj.getClass(), "get", propName)));
-        }
-    
         return sourceObjs;
         `
       },
@@ -221,7 +266,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.nanos.rope',
-  name: 'OrROPE',
+  name: 'CompositeROPE',
   extends: 'foam.nanos.rope.ROPE',
 
   properties: [
@@ -231,19 +276,56 @@ foam.CLASS({
       javaType: 'java.util.List<ROPE>'
     }
   ]
+})
 
+foam.CLASS({
+  package: 'foam.nanos.rope',
+  name: 'OrROPE',
+  extends: 'foam.nanos.rope.CompositeROPE',
+  javaImports: [
+    'foam.core.FObject',
+    'foam.core.X',
+    'java.util.List'
+  ],
+
+  methods: [
+    {
+      name: 'check',
+      javaCode: `
+        List<ROPE> compositeRopes = getCompositeRopes();
+        for ( ROPE subRope : compositeRopes ) {
+          if ( subRope.check(x, obj, relationshipKey, crudKey, propertyKey) ) return true;
+        }
+        return false;
+      `
+    }
+  ]
 });
 
 foam.CLASS({
   package: 'foam.nanos.rope',
   name: 'AndROPE',
-  extends: 'foam.nanos.rope.ROPE',
+  extends: 'foam.nanos.rope.CompositeROPE',
+  javaImports: [
+    'foam.core.FObject',
+    'foam.core.X',
+    'java.util.List'
+  ],
 
-  properties: [
+  methods: [
     {
-      name: 'compositeRopes',
-      class: 'List',
-      javaType: 'java.util.List<ROPE>'
+      name: 'check',
+      javaCode: `
+        List<ROPE> compositeRopes = getCompositeRopes();
+        boolean andRopes = ( compositeRopes != null || compositeRopes.size() > 0 ) ? true : false;
+        for ( ROPE subRope : compositeRopes ) {
+          if ( ! subRope.check(x, obj, relationshipKey, crudKey, propertyKey) ) {
+            andRopes = false;
+            break;
+          }
+        } 
+        return andRopes ? true : false;
+      `
     }
   ]
 });

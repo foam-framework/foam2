@@ -309,15 +309,16 @@ public class ROPETest extends Test {
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
-    relationshipMap.put("transactionMakerJunctionDAO.sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
-    relationshipMap.put("transactionApproverJunctionDAO.sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
-    relationshipMap.put("transactionViewerJunctionDAO.sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
-    relationshipMap.put("accountViewerJunctionDAO.sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
-    relationshipMap.put("accountMakerJunctionDAO.sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
-    relationshipMap.put("accountApproverJunctionDAO.sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
-    relationshipMap.put("roleMakerJunctionDAO.sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
-    relationshipMap.put("roleApproverJunctionDAO.sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
-    relationshipMap.put("roleViewerJunctionDAO.sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    relationshipMap.put("sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    // relationshipMap.put("transactionMakerJunctionDAO.sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    // relationshipMap.put("transactionApproverJunctionDAO.sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    // relationshipMap.put("transactionViewerJunctionDAO.sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    // relationshipMap.put("accountViewerJunctionDAO.sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    // relationshipMap.put("accountMakerJunctionDAO.sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    // relationshipMap.put("accountApproverJunctionDAO.sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    // relationshipMap.put("roleMakerJunctionDAO.sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    // relationshipMap.put("roleApproverJunctionDAO.sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    // relationshipMap.put("roleViewerJunctionDAO.sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
 
     ropeDAO.inX(x).put(new ROPE.Builder(x)
       .setSourceDAOKey("userDAO")
@@ -419,7 +420,7 @@ public class ROPETest extends Test {
       .setSourceDAOKey("accountDAO")
       .setTargetDAOKey("transactionMakerJunctionDAO")
       .setCardinality("1:1")
-      .setRelationshipKey("transactionMakerJunctionDAO.sourceId")
+      .setRelationshipKey("sourceId")//transactionMakerJunctionDAO.sourceId")
       .setCrudMap(crudMap)           
       .setRelationshipMap(relationshipMap)   
       .setIsInverse(false).build());
@@ -440,7 +441,7 @@ public class ROPETest extends Test {
       .setSourceDAOKey("accountDAO")
       .setTargetDAOKey("transactionApproverJunctionDAO")
       .setCardinality("1:1")
-      .setRelationshipKey("transactionApproverJunctionDAO.sourceId")
+      .setRelationshipKey("sourceId")//transactionApproverJunctionDAO.sourceId")
       .setCrudMap(crudMap)           
       .setRelationshipMap(relationshipMap)   
       .setIsInverse(false).build());
@@ -461,7 +462,7 @@ public class ROPETest extends Test {
       .setSourceDAOKey("accountDAO")
       .setTargetDAOKey("transactionViewerJunctionDAO")
       .setCardinality("1:1")
-      .setRelationshipKey("transactionViewerJunctionDAO.sourceId")
+      .setRelationshipKey("sourceId")//transactionViewerJunctionDAO.sourceId")
       .setCrudMap(crudMap)           
       .setRelationshipMap(relationshipMap)   
       .setIsInverse(false).build());
@@ -482,7 +483,7 @@ public class ROPETest extends Test {
       .setSourceDAOKey("accountDAO")
       .setTargetDAOKey("accountViewerJunctionDAO")
       .setCardinality("1:1")
-      .setRelationshipKey("accountViewerJunctionDAO.sourceId")
+      .setRelationshipKey("sourceId")//accountViewerJunctionDAO.sourceId")
       .setCrudMap(crudMap)           
       .setRelationshipMap(relationshipMap)   
       .setIsInverse(false).build());
@@ -502,7 +503,7 @@ public class ROPETest extends Test {
       .setSourceDAOKey("accountDAO")
       .setTargetDAOKey("accountMakerJunctionDAO")
       .setCardinality("1:1")
-      .setRelationshipKey("accountMakerJunctionDAO.sourceId")
+      .setRelationshipKey("sourceId")//accountMakerJunctionDAO.sourceId")
       .setCrudMap(crudMap)           
       .setRelationshipMap(relationshipMap)   
       .setIsInverse(false).build());
@@ -522,7 +523,7 @@ public class ROPETest extends Test {
       .setSourceDAOKey("accountDAO")
       .setTargetDAOKey("accountApproverJunctionDAO")
       .setCardinality("1:1")
-      .setRelationshipKey("accountApproverJunctionDAO.sourceId")
+      .setRelationshipKey("sourceId")//accountApproverJunctionDAO.sourceId")
       .setCrudMap(crudMap)           
       .setRelationshipMap(relationshipMap)   
       .setIsInverse(false).build());
@@ -542,7 +543,7 @@ public class ROPETest extends Test {
       .setSourceDAOKey("accountDAO")
       .setTargetDAOKey("roleViewerJunctionDAO")
       .setCardinality("1:1")
-      .setRelationshipKey("roleViewerJunctionDAO.sourceId")
+      .setRelationshipKey("sourceId")//roleViewerJunctionDAO.sourceId")
       .setCrudMap(crudMap)           
       .setRelationshipMap(relationshipMap)   
       .setIsInverse(false).build());
@@ -562,7 +563,7 @@ public class ROPETest extends Test {
       .setSourceDAOKey("accountDAO")
       .setTargetDAOKey("roleApproverJunctionDAO")
       .setCardinality("1:1")
-      .setRelationshipKey("roleApproverJunctionDAO.sourceId")
+      .setRelationshipKey("sourceId")//roleApproverJunctionDAO.sourceId")
       .setCrudMap(crudMap)           
       .setRelationshipMap(relationshipMap)   
       .setIsInverse(false).build());
@@ -582,7 +583,7 @@ public class ROPETest extends Test {
       .setSourceDAOKey("accountDAO")
       .setTargetDAOKey("roleMakerJunctionDAO")
       .setCardinality("1:1")
-      .setRelationshipKey("roleMakerJunctionDAO.sourceId")
+      .setRelationshipKey("sourceId")//roleMakerJunctionDAO.sourceId")
       .setCrudMap(crudMap)           
       .setRelationshipMap(relationshipMap)   
       .setIsInverse(false).build());
