@@ -2,7 +2,7 @@ foam.CLASS({
   package: 'foam.nanos.dig',
   name: 'DUGRuleAction',
 
-  documentation: `Rule action for DUG`,
+  documentation: 'Rule action for DUG',
 
   implements: [
     'foam.nanos.ruler.RuleAction'
@@ -32,16 +32,16 @@ foam.CLASS({
       name: 'applyAction',
       javaCode: `
         agency.submit(x, new ContextAgent() {
-        @Override
-        public void execute(X x) {
-          HTTPSink sink = null;
-          try {
-            sink = new HTTPSink(getUrl(), getFormat());
-          } catch (Exception e) {
+          @Override
+          public void execute(X x) {
+            HTTPSink sink = null;
+            try {
+              sink = new HTTPSink(getUrl(), getFormat());
+            } catch (Exception e) {
+            }
+            sink.put(obj, null);
           }
-          sink.put(obj, null);
-        }
-      }, "DUG Rule");
+        }, "DUG Rule");
       `
     }
   ]

@@ -8,29 +8,24 @@ foam.CLASS({
   ],
 
  tableColumns: [
-    'id',
-    'documentation',
-    'enabled',
-    'priority',
+    'name',
+    'format',
     'daoKey',
-    'operation',
+    'url'
   ],
 
   searchColumns: [
-    'id',
+    'name',
     'url',
     'enabled',
-    'priority',
     'daoKey',
     'operation',
-    'after',
-    'validity'
   ],
 
   properties: [
     {
-      name: 'id',
-      visibility: 'RW'
+      class: 'String',
+      name: 'name'
     },
     {
       name: 'ruleGroup',
@@ -50,13 +45,16 @@ foam.CLASS({
       class: 'foam.core.Enum',
       of: 'foam.nanos.http.Format',
       name: 'format',
+      value: foam.nanos.http.Format.JSON,
+      required: true,
       view: {
         class: 'foam.u2.view.ChoiceView',
         choices: [
           [2, 'JSON'],
           [4, 'XML'],
-        ]
-      }
+        ],
+        placeholder: '--',
+      },
     },
     {
       name: 'enabled',
@@ -83,6 +81,7 @@ foam.CLASS({
     {
       name: 'predicate',
       hidden: true,
+      // Currently the front end does not load this correctly, causing incorrect values to be saved with each update.
       networkTransient: true
     },
     {

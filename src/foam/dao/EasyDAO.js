@@ -151,12 +151,6 @@ if ( getFixedSize() != null ) {
 }
 
 
-if ( getRuler() ) {
-  foam.dao.DAO temp = getFixedSize() != null ? fixedSizeDAO : head;
-  foam.dao.DAO ruler = new foam.nanos.ruler.RulerDAO(getX(), temp, this.getName() );
-  pxy.setDelegate(ruler);
-}
-
 delegate = getOuterDAO(delegate);
 
 if ( getDecorator() != null ) {
@@ -189,6 +183,11 @@ if ( getDeletedAware() ) {
     .setDelegate(delegate)
     .setName(getPermissionPrefix())
     .build();
+}
+
+if ( getRuler() ) {
+  String name = foam.util.SafetyUtil.isEmpty(getRulerDaoKey()) ? getName() : getRulerDaoKey();
+  delegate = new foam.nanos.ruler.RulerDAO(getX(), delegate, name);
 }
 
 if ( getCreatedAware() ) {
@@ -436,6 +435,10 @@ return delegate;
       class: 'Boolean',
       name: 'ruler',
       value: true
+    },
+    {
+      class: 'String',
+      name: 'rulerDaoKey'
     },
     {
       /**
