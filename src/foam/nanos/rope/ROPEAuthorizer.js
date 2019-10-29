@@ -41,7 +41,7 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'ropeCheck',
+      name: 'authorizeByRope',
       javaType: 'boolean',
       args: [
         { name: 'x', javaType: 'X' },
@@ -108,7 +108,7 @@ foam.CLASS({
   
       List<String> propertiesUpdated = getPropertiesUpdated(null, obj);
       for ( String property : propertiesUpdated ) {
-        if ( ! ropeCheck(x, obj, getTargetDAOKey(), "create", property ) ) {
+        if ( ! authorizeByRope(x, obj, getTargetDAOKey(), "create", property ) ) {
           throw new AuthorizationException("You don't have permission to create this object");
         }
       }
@@ -132,7 +132,7 @@ foam.CLASS({
       ],
       javaCode: `
       if ( ((User) x.get("user")).getId() == User.SYSTEM_USER_ID ) return;
-      if ( ! ropeCheck(x, obj, getTargetDAOKey(), "read", "") ) throw new AuthorizationException("You don't have permission to read this object");
+      if ( ! authorizeByRope(x, obj, getTargetDAOKey(), "read", "") ) throw new AuthorizationException("You don't have permission to read this object");
       `
     },
     {
@@ -160,7 +160,7 @@ foam.CLASS({
   
       List<String> propertiesUpdated = getPropertiesUpdated(oldObj, newObj);
       for ( String property : propertiesUpdated ) {
-        if ( ! ropeCheck(x, newObj, getTargetDAOKey(), "update", property ) ) {
+        if ( ! authorizeByRope(x, newObj, getTargetDAOKey(), "update", property ) ) {
           throw new AuthorizationException("You don't have permission to update this object");
         }
       }
@@ -184,7 +184,7 @@ foam.CLASS({
       ],
       javaCode: `
       if ( ((User) x.get("user")).getId() == User.SYSTEM_USER_ID ) return;
-      if ( ! ropeCheck(x, obj, getTargetDAOKey(), "delete", "") ) throw new AuthorizationException("You don't have permission to delete this object");
+      if ( ! authorizeByRope(x, obj, getTargetDAOKey(), "delete", "") ) throw new AuthorizationException("You don't have permission to delete this object");
       `
     },
     {
