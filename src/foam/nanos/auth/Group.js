@@ -13,7 +13,10 @@ foam.CLASS({
     'foam.nanos.auth.EnabledAware'
   ],
 
-  requires: [ 'foam.nanos.app.AppConfig' ],
+  requires: [ 
+    'foam.nanos.app.AppConfig',
+    'foam.nanos.auth.PasswordPolicy'
+  ],
 
   documentation: 'A Group of Users.',
 

@@ -75,7 +75,7 @@ public class StandardAuthorizer implements Authorizer {
   }
 
   public boolean checkGlobalRead(X x) {
-    String permission = createPermission("read");
+    String permission = createPermission("read", "*");
     AuthService authService = (AuthService) x.get("auth");
     try {
       return authService.check(x, permission);
@@ -85,7 +85,7 @@ public class StandardAuthorizer implements Authorizer {
   }
 
   public boolean checkGlobalRemove(X x) {
-    String permission = createPermission("remove");
+    String permission = createPermission("remove", "*");
     AuthService authService = (AuthService) x.get("auth");
     try {
       return authService.check(x, permission);

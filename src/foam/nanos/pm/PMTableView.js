@@ -53,7 +53,8 @@ foam.CLASS({
       name: 'clear',
       code: function(X) {
         X.pmInfoDAO.remove(this);
-      }
+      },
+      tableWidth: 80
     },
     {
       name: 'clearAll',
