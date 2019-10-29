@@ -31,7 +31,7 @@ foam.CLASS({
       name: 'props',
       factory: null,
       expression: function(of) {
-        return of.getAxiomByName('tableColumns') 
+        return of.getAxiomByName('tableColumns')
           ? of.getAxiomByName('tableColumns').columns
           : of.getAxiomsByClass()
             .filter((p) => ! p.networkTransient)
@@ -39,11 +39,16 @@ foam.CLASS({
       },
       javaFactory: `
         // TODO: Add tableColumns to java to give an opportunity for a better default.
-        return ((List<PropertyInfo>)getOf().getAxiomsByClass(PropertyInfo.class)).stream()
+        return getFields() != null ? getFields() : ((List<PropertyInfo>)getOf().getAxiomsByClass(PropertyInfo.class)).stream()
           .filter(propI -> ! propI.getNetworkTransient())
           .map(propI -> propI.getName())
           .toArray(String[]::new);
       `
+    },
+    {
+      class: 'StringArray',
+      name: 'fields',
+      documentation: 'Certain props to output'
     },
     {
       class: 'Boolean',

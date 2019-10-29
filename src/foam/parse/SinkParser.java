@@ -10,6 +10,7 @@ import foam.core.*;
 import foam.lib.parse.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.*;
 
 /**
  * SQL-syntax-like parser for defining Sink's.
@@ -21,47 +22,46 @@ import java.util.List;
  *   count GROUP BY country        -> GROUP_BY(COUNTRY, COUNT())
  **/
 public class SinkParser
-  extends Alt
+  extends ProxyParser
 {
-  protected ClassInfo info_;
-
-  public SinkParser(ClassInfo info) {
-    parsers_ = new Parser[] {
-      starParser(),
-      expressionListParser()
-    };
-
-    info_ = info;
+  public SinkParser(final ClassInfo info) {
+    super(new Alt(
+      new Repeat(expressionParser(info), ",", 1)));
   }
 
-  public Parser starParser() {
-    return new Literal("*");
-  }
-
-  public Parser expressionListParser() {
-    return new Repeat(expressionParser(), ",", 1);
-  }
-
-  public Parser expressionParser() {
-    List         properties = info_.getAxiomsByClass(PropertyInfo.class);
+  public static Parser expressionParser(ClassInfo cInfo) {
+    List         properties = cInfo.getAxiomsByClass(PropertyInfo.class);
     List<Parser> parsers    = new ArrayList<Parser>();
 
-    for ( Object prop : properties ) {
-      PropertyInfo info = (PropertyInfo) prop;
+    parsers.add(new Literal("*"));
 
-      parsers.add(new LiteralIC(info.getName()));
+    for ( Object prop : properties ) {
+      PropertyInfo pInfo = (PropertyInfo) prop;
+
+      parsers.add(new LiteralIC(pInfo.getName()));
+      parsers.add(new LiteralIC("min(" + pInfo.getName() + ")"));
+      parsers.add(new LiteralIC("avg(" + pInfo.getName() + ")"));
+      parsers.add(new LiteralIC("sum(" + pInfo.getName() + ")"));
+      parsers.add(new LiteralIC("max(" + pInfo.getName() + ")"));
+      parsers.add(new LiteralIC("count(" + pInfo.getName() + ")"));
+      parsers.add(new LiteralIC("groupBy(" + pInfo.getName() + ")"));
     }
 
     return new Alt(parsers);
   }
 
-  /*
-  @Override
-  public PStream parse(PStream ps, ParserContext x) {
-    x = x.sub();
-    x.set("classInfo", info_);
-
-    return super.parse(ps, x);
-  }
-  */
+//  @Override
+//  public PStream parse(PStream ps, ParserContext x) {
+//    ps = super.parse(ps, x);
+//
+//    if ( ps == null ) {
+//      return null;
+//    }
+//
+//    if ( ps.value() == null ) {
+//      return ps.setValue(null);
+//    }
+//
+//    return ps;
+//  }
 }

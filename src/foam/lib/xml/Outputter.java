@@ -15,7 +15,9 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +38,7 @@ public class Outputter
   protected StringWriter  stringWriter_ = null;
   protected boolean       outputShortNames_ = false;
   protected boolean       outputDefaultValues_ = false;
+  protected String[]      fields_ = null;
 
   public Outputter() {
     this(OutputterMode.FULL);
@@ -134,8 +137,12 @@ public class Outputter
     // output properties
     ClassInfo info = obj.getClassInfo();
     List<PropertyInfo> properties = info.getAxiomsByClass(PropertyInfo.class).stream()
-      .filter(propertyInfo -> ! propertyInfo.getXMLAttribute())
-      .collect(Collectors.toList());
+        .filter(propertyInfo -> !propertyInfo.getXMLAttribute())
+        .collect(Collectors.toList());
+
+    if ( fields_ != null )
+      properties = checkFieldsProperty(properties);
+
     for ( PropertyInfo prop : properties ) {
       outputProperty_(obj, prop);
     }
@@ -253,5 +260,27 @@ public class Outputter
   @Override
   public String toString() {
     return ( stringWriter_ != null ) ? stringWriter_.toString() : null;
+  }
+
+  public Outputter setFields(String[] fields) {
+    fields_ = fields;
+
+    return this;
+  }
+
+  public List<PropertyInfo> checkFieldsProperty(List<PropertyInfo> properties) {
+    List<PropertyInfo> filteredAxioms = new ArrayList<>();
+    Iterator e = properties.iterator();
+
+    while ( e.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) e.next();
+
+      for ( int i = 0; i < fields_.length; i++ ) {
+        if ( fields_[i].equals(prop.getName()) )
+          filteredAxioms.add(prop);
+      }
+    }
+
+    return filteredAxioms;
   }
 }
