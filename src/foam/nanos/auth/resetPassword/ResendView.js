@@ -12,16 +12,20 @@ foam.CLASS({
   documentation: 'Forgot Password Resend View',
 
   imports: [
+    'notify',
     'resetPasswordToken',
     'stack',
     'theme'
   ],
 
   css: `
-    ^ .center {
+    ^ .sizeCenter {
+      max-width: 30vw;
       margin: 0 auto;
     }
-  
+    ^ .center {
+      text-align: center;
+    }
     ^ .top-bar {
       width: 100%;
       height: 8vh;
@@ -31,11 +35,14 @@ foam.CLASS({
     ^ .top-bar img {
       height: 4vh;
       padding-top: 2vh;
+      display: block;
+      margin: 0 auto;
     }
   `,
 
   requires: [
-    'foam.nanos.auth.User'
+    'foam.nanos.auth.User',
+    'foam.u2.detail.SectionView'
   ],
 
   sections: [
@@ -74,19 +81,22 @@ foam.CLASS({
               .attr('src', this.theme.logo)
             .end()
           .end()
-          .start().addClass('centerVerticle')
+          .start().addClass('sizeCenter')
             .start(this.SectionView, {
               data: this,
               sectionName: 'emailPasswordSection'
             }).end()
-            .start(this.RESEND_EMAIL).end()
-          .end()
-          .start('p').add(this.REDIRECTION).end()
-          .start('p').addClass('link')
-            .add(this.REDIRECTION_TO)
-            .on(this.ACTION_PRESS, () => {
-              this.stack.push({ class: 'foam.nanos.auth.SignInView' });
-            })
+            .start().addClass('center').br()
+              .start(this.SEND_EMAIL, { size: 'LARGE' }).end()
+              .br().br()
+              .start().add(this.REDIRECTION).end()
+              .start().addClass('link')
+                .add(this.REDIRECTION_TO)
+                .on(this.ACTION_PRESS, () => {
+                  this.stack.push({ class: 'foam.nanos.auth.SignInView' });
+                })
+              .end()
+            .end()
           .end()
         .endContext();
     }
@@ -94,12 +104,16 @@ foam.CLASS({
 
   actions: [
     {
-      name: 'resendEmail',
-      label: 'Resend Email',
+      name: 'sendEmail',
+      label: 'Send reset password email',
+      isEnabled: function(errors_) {
+        return ! errors_;
+      },
       code: function(X) {
         var user = this.User.create({ email: this.email });
         this.resetPasswordToken.generateToken(null, user).then((_) => {
-          this.notify(`${this.INSTRUC_ONE} ${self.email}. ${this.INSTRUC_TWO}`);
+          this.notify(`${this.INSTRUC_ONE} ${this.email}. ${this.INSTRUC_TWO}`);
+          this.stack.push({ class: 'foam.nanos.auth.SignInView' });
         })
         .catch((err) => {
           this.notify(err.message, 'error');
