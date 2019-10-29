@@ -28,8 +28,14 @@ foam.CLASS({
       width: 25px;
       cursor: pointer;
       border-bottom: 1px solid transparent;
+      padding-bottom: 10px;
+      -webkit-transition: all .15s ease-in-out;
+      -moz-transition: all .15s ease-in-out;
+      -ms-transition: all .15s ease-in-out;
+      -o-transition: all .15s ease-in-out;
+      transition: all .15s ease-in-out;
     }
-    ^ .icon-container:hover {
+    ^ img:hover {
       border-bottom: 1px solid white;
     }
     ^ .dot {
