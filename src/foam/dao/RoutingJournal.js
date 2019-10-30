@@ -17,7 +17,8 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.lib.json.JSONParser',
     'foam.util.SafetyUtil',
-    'java.io.BufferedReader'
+    'java.io.BufferedReader',
+    'java.util.concurrent.atomic.AtomicBoolean',
   ],
 
   documentation:
@@ -32,6 +33,17 @@ foam.CLASS({
 // If replayed is true, this will unblock anything waiting.
 waitForReplay();
       `
+    },
+    {
+      class: 'Map',
+      of: 'foam.dao.DAO',
+      javaType: 'java.util.Map<String, foam.dao.DAO>',
+      name: 'replayDAOs'
+    },
+    {
+      class: 'Map',
+      javaType: 'java.util.Map<String, AtomicBoolean>',
+      name: 'replayDAOWaitObjects'
     }
   ],
 
@@ -57,13 +69,89 @@ try {
     {
       name: 'put_',
       javaCode: `
+        if ( ! getReplayed() ) return;
         putWithPrefix_(x, old, nu, dest);
       `
     },
     {
       name: 'remove',
       javaCode: `
+        if ( ! getReplayed() ) return;
         removeWithPrefix_(x, obj, dest);
+      `
+    },
+    {
+      name: 'assertReplayDAORegistered_',
+      args: [ { name: 'service', type: 'String' } ],
+      javaCode: `
+        if ( ! getReplayDAOs().containsKey(service) ) {
+          throw new RuntimeException(String.format(
+            "Service '%s' completed initialization without registering a " +
+            "replay DAO", service));
+        }
+      `
+    },
+    {
+      name: 'getReplayDAO_',
+      type: 'foam.dao.DAO',
+      args: [
+        { name: 'service', type: 'String' }
+      ],
+      javaCode: `
+        if ( getReplayDAOs().containsKey(service) ) {
+          return getReplayDAOs().get(service);
+        }
+
+        AtomicBoolean waitObj = new AtomicBoolean();
+        synchronized ( waitObj ) {
+          getReplayDAOWaitObjects().put(service, waitObj);
+
+          // Since the replay DAO doesn't exist, start up the service and
+          // wait for a replay DAO to be registered by that service
+          new Thread() {
+            public void run() {
+              getX().get(service);
+              assertReplayDAORegistered_(service);
+            }
+          }.start();
+
+          while ( ! waitObj.get() ) {
+            try {
+              // Note: calling .wait() releases this synchronized block
+              waitObj.wait();
+            } catch ( InterruptedException e ) {
+              // Interrupt invokes retry
+              continue;
+            }
+          }
+        }
+
+        // If there is still no replay DAO, throw an exception
+        if ( ! getReplayDAOs().containsKey(service) ) {
+          throw new RuntimeException(String.format(
+            "Service '%s' registered a replayDAO, but the RoutingJournal " +
+            "instance for the shared journal named '%s' could not find it.",
+            service, getFilename()));
+        }
+
+        return getReplayDAOs().get(service);
+      `
+    },
+    {
+      name: 'registerReplayDAO',
+      args: [
+        { name: 'service', type: 'String' },
+        { name: 'replayDAO', type: 'foam.dao.DAO' }
+      ],
+      javaCode: `
+        getReplayDAOs().put(service, replayDAO);
+        if ( getReplayDAOWaitObjects().containsKey(service) ) {
+          AtomicBoolean waitObj = getReplayDAOWaitObjects().get(service);
+          synchronized ( waitObj ) {
+            waitObj.set(true);
+            waitObj.notifyAll();
+          }
+        }
       `
     },
     {
@@ -74,6 +162,9 @@ try {
         JSONParser parser = getParser();
 
         try ( BufferedReader reader = getReader() ) {
+          if ( reader == null ) {
+            return;
+          }
           for ( String line ; ( line = reader.readLine() ) != null ; ) {
             if ( SafetyUtil.isEmpty(line) ) continue;
             if ( COMMENT.matcher(line).matches()    ) continue;
@@ -91,7 +182,7 @@ try {
               int length = line.trim().length();
               line = line.trim().substring(2, length - 1);
 
-              DAO dao = (DAO) x.get(service);
+              DAO dao = getReplayDAO_(service);
               foam.core.FObject obj = parser.parseString(line);
               if ( obj == null ) {
                 getLogger().error("Parse error", getParsingErrorMessage(line), "line:", line);
@@ -129,7 +220,12 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'SharedJournalFactorySingleton',
 
+  // Note: this currently doesn't work on Java side; using context instead
   axioms: [ foam.pattern.Singleton.create() ],
+
+  javaImports: [
+    'foam.dao.Journal'
+  ],
 
   properties: [
     {
@@ -142,8 +238,11 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'get',
+      name: 'getRoutingJournal',
       type: 'RoutingFileJournal',
+      documentation: `
+        Returns the instance of RoutingJournal corresponding to the specified
+        journal file, creating the instance if it doesn't exist yet.`,
       synchronized: true,
       args: [
         {
@@ -160,8 +259,55 @@ foam.CLASS({
           .setFilename(name)
           .setCreateFile(true)
           .build();
+
         getSharedJournalFiles().put(name, routingJrl);
+
+        new Thread() {
+          public void run() {
+            routingJrl.replay(getX());
+          }
+        }.start();
+
         return routingJrl;
+      `
+    },
+    {
+      name: 'getJournal',
+      type: 'foam.dao.Journal',
+      documentation: `
+        This is the method all services should call to get a shared journal.`,
+      synchronized: true,
+      args: [
+        {
+          name: 'name',
+          type: 'String',
+          documentation: `specifies a shared journal file`
+        },
+        {
+          name: 'service',
+          type: 'String',
+          documentation: `
+            specifies the service which the given replayDAO and returned
+            Journal object are associated with`
+        },
+        {
+          name: 'replayDAO',
+          type: 'foam.dao.DAO',
+          documentation: `
+            specifies a DAO that will be populated during replay, allowing the
+            service to block its initialization until replay is completed.`
+        }
+      ],
+      javaCode: `
+        RoutingFileJournal routingJrl = getRoutingJournal(name);
+        routingJrl.registerReplayDAO(service, replayDAO);
+        routingJrl.waitForReplay();
+        Journal jrl =
+          new JournalRoutingJournalAdapter.Builder(getX())
+            .setDelegate(routingJrl)
+            .setServiceName(service)
+            .build();
+        return jrl;
       `
     }
   ]

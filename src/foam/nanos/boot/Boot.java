@@ -98,6 +98,11 @@ public class Boot {
       }
     });
 
+    // Add instance for managing shared journals
+    root_ = root_.put("sharedJournalFactory",
+      new foam.dao.SharedJournalFactorySingleton.Builder(root_)
+        .build());
+
     // Revert root_ to non ProxyX to avoid letting children add new bindings.
     root_ = ((ProxyX) root_).getX();
 

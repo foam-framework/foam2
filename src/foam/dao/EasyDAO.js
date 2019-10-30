@@ -74,8 +74,11 @@ foam.CLASS({
   imports: [ 'document' ],
 
   javaImports: [
-    'foam.nanos.logger.Logger',
-    'foam.dao.ValidatingDAO'
+    'foam.core.X',
+    'foam.dao.SharedJournalFactorySingleton',
+    'foam.dao.ValidatingDAO',
+    'foam.nanos.fs.ResourceStorage',
+    'foam.nanos.logger.Logger'
   ],
 
   constants: [
@@ -277,24 +280,27 @@ return delegate;
       if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
         return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
       }
-      /*
       else if ( getJournalType().equals(JournalType.SHARED_JOURNAL) ) {
-        foam.dao.RoutingFileJournal routingJrl =
-          new foam.dao.RoutingFileJournal.Builder(x)
-            .setFilename(getJournalName())
-            .setCreateFile(true)
-            .build();
+        foam.dao.MDAO myMDAO = new foam.dao.MDAO(getOf());
+        X resourceStorageX = getX();
+        if ( System.getProperty("resource.journals.dir") != null ) {
+          resourceStorageX = getX().put(foam.nanos.fs.Storage.class,
+              new ResourceStorage(System.getProperty("resource.journals.dir")));
+        }
+        new foam.dao.FileJournal.Builder(resourceStorageX)
+          .setFilename(getSourceJournalName() + ".0")
+          .build().replay(getX(), myMDAO);
+        SharedJournalFactorySingleton sharedJournalFactory =
+          (SharedJournalFactorySingleton) getX().get("sharedJournalFactory");
         foam.dao.Journal jrl =
-          new JournalRoutingJournalAdapter.Builder()
-            .setDelegate(routingJrl)
-            .build();
-        return new foam.dao.java.JDAO.Builder()
-          .setDelegate(new foam.dao.MDAO(getOf())
+          sharedJournalFactory.getJournal(
+            getJournalName(), getNSpec().getName(), myMDAO);
+        return new foam.dao.java.JDAO.Builder(getX())
+          .setDelegate(myMDAO)
           .setOf(getOf())
           .setJournal(jrl)
-          .build()
+          .build();
       }
-      */
       return new foam.dao.MDAO(getOf());
       `
     },
@@ -413,6 +419,13 @@ return delegate;
     {
       class: 'String',
       name: 'journalName'
+    },
+    {
+      class: 'String',
+      name: 'sourceJournalName',
+      documentation: `
+        This property is required for DAOs using a shared journal to indicate
+        which repository journal (.0 suffix) replay will be started with.`
     },
     {
       class: 'FObjectProperty',
