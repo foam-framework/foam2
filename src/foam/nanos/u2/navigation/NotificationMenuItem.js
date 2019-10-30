@@ -1,7 +1,15 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+*/
 foam.CLASS({
   package: 'foam.nanos.u2.navigation',
   name: 'NotificationMenuItem',
   extends: 'foam.u2.View',
+
+  documentation: `Notification bell icon displaying number of unread notifications
+      along with redirect to notification view when clicked.`,
 
   requires: [
     'foam.nanos.auth.Group',
