@@ -274,6 +274,11 @@ return delegate;
       type: 'foam.dao.DAO',
       name: 'innerDAO',
       javaFactory: `
+      if ( getNullify() ) {
+        return new foam.dao.NullDAO.Builder(getX())
+        .setOf(getOf())
+        .build();
+      }
       if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) )
         return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
       return new foam.dao.MDAO(getOf());
@@ -358,6 +363,12 @@ return delegate;
     {
       class: 'Boolean',
       name: 'readOnly',
+      value: false
+    },
+    {
+      documentation: 'Sets the inner dao to a nullDAO',
+      class: 'Boolean',
+      name: 'nullify',
       value: false
     },
     {
