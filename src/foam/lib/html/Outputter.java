@@ -155,21 +155,19 @@ public class Outputter
 
   protected void outputFObject(FObject obj) {
     ClassInfo info = obj.getClassInfo();
-    List axioms = info.getAxiomsByClass(PropertyInfo.class);
-    Iterator i = axioms.iterator();
+    List<PropertyInfo> axioms = of_.getAxiomsByClass(PropertyInfo.class);
+
     int j = 0;
     writer_.append("<tr>");
-    while ( i.hasNext() ) {
-      PropertyInfo prop = (PropertyInfo) i.next();
+    for ( PropertyInfo prop : axioms ) {
       if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
       if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
 
       if ( fields_ != null && checkFieldsProperty(prop) || fields_ == null ) {
-        if ( prop.get(obj) == null ) continue;
 
         writer_.append("<td col=" + (++j) + ">");
         try {
-          output(prop.get(obj));
+        	output(prop.get(obj));
         } catch (Throwable t) {
           output("nbsp;<!-- error -->");
         }
