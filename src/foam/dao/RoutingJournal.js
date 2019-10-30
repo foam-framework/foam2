@@ -19,6 +19,7 @@ foam.CLASS({
     'foam.util.SafetyUtil',
     'java.io.BufferedReader',
     'java.util.concurrent.atomic.AtomicBoolean',
+    'java.util.concurrent.locks.ReentrantLock'
   ],
 
   documentation:
@@ -44,6 +45,21 @@ waitForReplay();
       class: 'Map',
       javaType: 'java.util.Map<String, AtomicBoolean>',
       name: 'replayDAOWaitObjects'
+    },
+    {
+      class: 'Object',
+      javaType: 'ReentrantLock',
+      name: 'replayDAOWaitObjectsLock',
+      documentation: `
+      getReplayDAO_ must establish this lock before a conditional
+      put in replayDAOWaitObjects, and release this lock after
+      obtaining a lock for a specific replayDAOWaitObject.
+      A ReentrantLock was required because this behaviour is
+      not possible by nesting syncronized blocks.
+      `,
+      javaFactory: `
+        return new ReentrantLock();
+      `
     }
   ],
 
@@ -102,9 +118,31 @@ try {
           return getReplayDAOs().get(service);
         }
 
-        AtomicBoolean waitObj = new AtomicBoolean();
+        getReplayDAOWaitObjectsLock().lock();
+
+        AtomicBoolean waitObj = null;
+
+        if ( getReplayDAOWaitObjects().containsKey(service) ) {
+          getReplayDAOWaitObjectsLock().unlock();
+          waitObj = getReplayDAOWaitObjects().get(service);
+          synchronized ( waitObj ) {
+            while ( ! waitObj.get() ) {
+              try {
+                waitObj.wait();
+              } catch ( InterruptedException e ) {
+                // Interrupt invokes retry
+                continue;
+              }
+            }
+          }
+          return getReplayDAO_(service);
+        }
+
+        waitObj = new AtomicBoolean();
+
         synchronized ( waitObj ) {
           getReplayDAOWaitObjects().put(service, waitObj);
+          getReplayDAOWaitObjectsLock().unlock();
 
           // Since the replay DAO doesn't exist, start up the service and
           // wait for a replay DAO to be registered by that service
@@ -117,6 +155,7 @@ try {
 
           while ( ! waitObj.get() ) {
             try {
+              getLogger().log("Waiting for "+service+"'s replay DAO");
               // Note: calling .wait() releases this synchronized block
               waitObj.wait();
             } catch ( InterruptedException e ) {
@@ -144,13 +183,19 @@ try {
         { name: 'replayDAO', type: 'foam.dao.DAO' }
       ],
       javaCode: `
+        getLogger().log("Received "+service+"'s replay DAO");
         getReplayDAOs().put(service, replayDAO);
+        getReplayDAOWaitObjectsLock().lock();
         if ( getReplayDAOWaitObjects().containsKey(service) ) {
+          getReplayDAOWaitObjectsLock().unlock();
           AtomicBoolean waitObj = getReplayDAOWaitObjects().get(service);
           synchronized ( waitObj ) {
             waitObj.set(true);
             waitObj.notifyAll();
           }
+        } else {
+          getReplayDAOWaitObjects().put(service, new AtomicBoolean(true));
+          getReplayDAOWaitObjectsLock().unlock();
         }
       `
     },
@@ -243,7 +288,6 @@ foam.CLASS({
       documentation: `
         Returns the instance of RoutingJournal corresponding to the specified
         journal file, creating the instance if it doesn't exist yet.`,
-      synchronized: true,
       args: [
         {
           name: 'name',
@@ -251,16 +295,21 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        if ( getSharedJournalFiles().containsKey(name) ) {
-          return getSharedJournalFiles().get(name);
+
+        RoutingFileJournal routingJrl;
+
+        synchronized ( this ) {
+          if ( getSharedJournalFiles().containsKey(name) ) {
+            return getSharedJournalFiles().get(name);
+          }
+
+          routingJrl = new RoutingFileJournal.Builder(getX())
+            .setFilename(name)
+            .setCreateFile(true)
+            .build();
+
+          getSharedJournalFiles().put(name, routingJrl);
         }
-
-        RoutingFileJournal routingJrl = new RoutingFileJournal.Builder(getX())
-          .setFilename(name)
-          .setCreateFile(true)
-          .build();
-
-        getSharedJournalFiles().put(name, routingJrl);
 
         new Thread() {
           public void run() {
@@ -276,7 +325,6 @@ foam.CLASS({
       type: 'foam.dao.Journal',
       documentation: `
         This is the method all services should call to get a shared journal.`,
-      synchronized: true,
       args: [
         {
           name: 'name',

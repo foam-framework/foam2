@@ -281,6 +281,7 @@ return delegate;
         return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
       }
       else if ( getJournalType().equals(JournalType.SHARED_JOURNAL) ) {
+
         foam.dao.MDAO myMDAO = new foam.dao.MDAO(getOf());
         X resourceStorageX = getX();
         if ( System.getProperty("resource.journals.dir") != null ) {
