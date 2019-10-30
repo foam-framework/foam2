@@ -32,12 +32,12 @@ foam.CLASS({
       label: 'Count'
     },
     {
-      class: 'Long',
+      class: 'Duration',
       name: 'minTime',
       label: 'Min'
     },
     {
-      class: 'Long',
+      class: 'Duration',
       name: 'average',
       label: 'Avg',
       getter: function() { return (this.totalTime / this.count).toFixed(2); },
@@ -45,7 +45,7 @@ foam.CLASS({
       transient: true
     },
     {
-      class: 'Long',
+      class: 'Duration',
       name: 'maxTime',
       label: 'Max'
     },
@@ -60,12 +60,10 @@ foam.CLASS({
       name: 'capture'
     },
     {
-      class: 'String',
+      class: 'Code',
       name: 'captureTrace',
-      view: { class: 'io.c9.ace.Editor' },
-      permissionRequired: true
+      readPermissionRequired: true,
+      writePermissionRequired: true
     }
-  ],
-
-  
+  ]
 });

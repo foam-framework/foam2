@@ -391,7 +391,7 @@ foam.CLASS({
       }
 
       var name        = prop.name;
-      var adapt       = prop.adapt
+      var adapt       = prop.adapt;
       var assertValue = prop.assertValue;
       var preSet      = prop.preSet;
       var postSet     = prop.postSet;
@@ -434,7 +434,7 @@ foam.CLASS({
           return prop.toSlot(this);
         },
         set: function propertySlotSetter(slot2) {
-          prop.toSlot(this).linkFrom(slot2);
+          this.onDetach(prop.toSlot(this).linkFrom(slot2));
         },
         configurable: true,
         enumerable: false
