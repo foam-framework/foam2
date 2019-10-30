@@ -32,6 +32,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/Address" },
   { name: "foam/nanos/auth/ChangePassword" },
   { name: "foam/nanos/auth/DeletedAware" },
+  { name: "foam/nanos/auth/DeletedAwareDAOTest" },
   { name: "foam/nanos/auth/PasswordPolicy" },
   { name: "foam/nanos/auth/Group" },
   { name: "foam/nanos/auth/ServiceProvider" },

@@ -72,6 +72,10 @@ foam.CLASS({
       value: 8080
     },
     {
+      name: 'sessionId',
+      class: 'String'
+    },
+    {
       documentation: 'Creation date.',
       name: 'created',
       class: 'DateTime',
