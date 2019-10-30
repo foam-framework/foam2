@@ -27,7 +27,6 @@ foam.CLASS({
 
   requires: [
     'foam.comics.DAOCreateControllerView',
-    'foam.nanos.auth.resetPassword.EmailView',
     'foam.nanos.auth.User',
     'foam.u2.dialog.NotificationMessage'
   ],
@@ -135,7 +134,7 @@ foam.CLASS({
             .addClass('forgot-link')
             .add('Forgot Password?')
             .on('click', function() {
-              self.stack.push({ class: 'foam.nanos.auth.resetPassword.EmailView' })
+              self.stack.push({ class: 'foam.nanos.auth.resetPassword.ForgotPasswordView' });
             })
           .end()
         .end()
