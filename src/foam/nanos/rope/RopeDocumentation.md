@@ -1,5 +1,6 @@
 ![ROPE Logo](rope.png)
 
+# TODO DOC IS OUTDATED
 # ROPE User Guide and Documentation
 
 &nbsp;
