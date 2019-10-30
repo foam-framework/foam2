@@ -202,11 +202,23 @@ foam.CLASS({
       of: 'foam.nanos.theme.Theme',
       name: 'theme'
     },
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'topNavigation_',
+      factory: function() {
+        return this.TopNavigation;
+      }
+    },
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'footerView_',
+      factory: function() {
+        return this.FooterView;
+      }
+    },
     'currentMenu',
     'lastMenuLaunched',
-    'webApp',
-    'topNavigation_',
-    'footerView_'
+    'webApp'
   ],
 
   methods: [
@@ -255,11 +267,7 @@ foam.CLASS({
           this
             .addClass(this.myClass())
             .start()
-              .tag(this.topNavigation_$.map(
-                (s) => {
-                  if ( ! s ) s = { class: this.TopNavigation };
-                  return foam.u2.ViewSpec.createView(s, {}, this, this.__subContext__);
-                }))
+              .tag(this.topNavigation_)
             .end()
             .start()
               .addClass('stack-wrapper')
@@ -270,11 +278,7 @@ foam.CLASS({
               })
             .end()
             .start()
-              .tag(this.footerView_$.map(
-                (s) => {
-                  if ( ! s ) s = { class: this.FooterView };
-                  return foam.u2.ViewSpec.createView(s, {}, this, this.__subContext__);
-                }))
+              .tag(this.footerView_)
             .end();
           });
       });
@@ -485,11 +489,11 @@ foam.CLASS({
       if ( ! this.theme ) throw new Error(this.LOOK_AND_FEEL_NOT_FOUND);
 
       if ( this.theme.topNavigation ) {
-        this.topNavigation_ = { class: this.theme.topNavigation };
+        this.topNavigation_ = this.theme.topNavigation;
       }
 
       if ( this.theme.footerView ) {
-        this.footerView_ = { class: this.theme.footerView };
+        this.footerView_ = this.theme.footerView;
       }
     },
     {
