@@ -29,7 +29,11 @@ import static foam.mlang.MLang.*;
 public class ROPETest extends Test {
 
   DAO userDAO, accountDAO, transactionDAO, approvalRequestDAO, ropeDAO;
-  DAO accountMakerJunctionDAO, accountViewerJunctionDAO, transactionMakerJunctionDAO, roleMakerJunctionDAO, transactionViewerJunctionDAO;
+  DAO accountViewerJunctionDAO, accountMakerJunctionDAO, accountApproverJunctionDAO, transactionViewerJunctionDAO, transactionMakerJunctionDAO, transactionApproverJunctionDAO, roleViewerJunctionDAO, roleMakerJunctionDAO, roleApproverJunctionDAO;
+
+  User av, am, aa, tv, tm, ta, rv, rn, ra, root;
+  Account rootAccount;
+  AccountUserJunction aujunction;
 
   public void runTest(X x) {
     
@@ -38,11 +42,15 @@ public class ROPETest extends Test {
     x = x.put("transactionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(Transaction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("transactionDAO").build()).build());
     x = x.put("approvalRequestDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(ApprovalRequest.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("approvalRequestDAO").build()).build());
     x = x.put("ropeDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(ROPE.getOwnClassInfo())).setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("ropeDAO")).build());
+    x = x.put("accountViewerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("accountViewerJunctionDAO").build()).build());
     x = x.put("accountMakerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("accountMakerJunctionDAO").build()).build());
-    x = x.put("accountViewerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("accountViewerDAO").build()).build());
+    x = x.put("accountApproverJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("accountApproverJunctionDAO").build()).build());
+    x = x.put("transactionViewerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("transactionViewerJunctionDAO").build()).build());
     x = x.put("transactionMakerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("transactionMakerJunctionDAO").build()).build());
-    x = x.put("roleMakerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("roleMakerJunctionDAO").build()).build());   
-    x = x.put("transactionViewerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("transactionViewerJunctionDAO").build()).build());  
+    x = x.put("transactionApproverJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("transactionApproverJunctionDAO").build()).build());
+    x = x.put("roleViewerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("roleViewerJunctionDAO").build()).build());
+    x = x.put("roleMakerJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("roleMakerJunctionDAO").build()).build());
+    x = x.put("roleApproverJunctionDAO", new foam.nanos.auth.AuthorizationDAO.Builder(x).setDelegate(new MDAO(AccountUserJunction.getOwnClassInfo())).setAuthorizer(new foam.nanos.rope.ROPEAuthorizer.Builder(x).setTargetDAOKey("roleApproverJunctionDAO").build()).build());
     
         
     userDAO = (DAO) x.get("userDAO");
@@ -50,11 +58,15 @@ public class ROPETest extends Test {
     transactionDAO = (DAO) x.get("transactionDAO");
     approvalRequestDAO = (DAO) x.get("approvalRequestDAO");
     ropeDAO = (DAO) x.get("ropeDAO");
-    accountMakerJunctionDAO = (DAO) x.get("accountMakerJunctionDAO");
     accountViewerJunctionDAO = (DAO) x.get("accountViewerJunctionDAO");
-    transactionMakerJunctionDAO = (DAO) x.get("transactionMakerJunctionDAO");
+    accountMakerJunctionDAO = (DAO) x.get("accountMakerJunctionDAO");
+    accountApproverJunctionDAO = (DAO) x.get("accountApproverJunctionDAO");
     transactionViewerJunctionDAO = (DAO) x.get("transactionViewerJunctionDAO");
+    transactionMakerJunctionDAO = (DAO) x.get("transactionMakerJunctionDAO");
+    transactionApproverJunctionDAO = (DAO) x.get("transactionApproverJunctionDAO");
+    roleViewerJunctionDAO = (DAO) x.get("roleViewerJunctionDAO");
     roleMakerJunctionDAO = (DAO) x.get("roleMakerJunctionDAO");
+    roleApproverJunctionDAO = (DAO) x.get("roleApproverJunctionDAO");
     
     setupROPEs(x);
     setupRootUserAndAccount(x);
@@ -62,21 +74,21 @@ public class ROPETest extends Test {
 
   public void setupRootUserAndAccount(X x) {
 
-    User root = new User();
+    root = new User();
     root.setFirstName("root");
     root.setLastName("root");
     root.setId(111);
     root = (User) userDAO.put(root);
     test(root != null, "root user created");
 
-    Account rootAccount = new Account();
+    rootAccount = new Account();
     rootAccount.setName("rootAccount");
     rootAccount.setId(111);
     rootAccount.setOwner(root.getId());
     rootAccount = (Account) accountDAO.put(rootAccount);
     test(rootAccount != null, "root account created");
 
-    AccountUserJunction aujunction = new AccountUserJunction();
+    aujunction = new AccountUserJunction();
     aujunction.setSourceId(rootAccount.getId());
     aujunction.setTargetId(root.getId());
     
@@ -172,8 +184,6 @@ public class ROPETest extends Test {
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
-    // relationshipMap.put("sourceAccount", new ArrayList<String>(Arrays.asList( "transactionMakers", "transactionViewers" ))); // no cascading
-    // relationshipMap.put("destinationAccount", new ArrayList<String>(Arrays.asList( "transactionViewers" )));
 
     ropeDAO.inX(x).put(new ROPE.Builder(x)
       .setSourceDAOKey("accountDAO")
@@ -196,9 +206,6 @@ public class ROPETest extends Test {
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
-    // relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" ))); // no cascading
-    // relationshipMap.put("sourceAccount", new ArrayList<String>(Arrays.asList( "__terminate__" )));      // account viewer means literally account viewer
-    // relationshipMap.put("destinationAccount", new ArrayList<String>(Arrays.asList( "__terminate__" )));
 
     ropeDAO.inX(x).put(new ROPE.Builder(x)
       .setSourceDAOKey("userDAO")
@@ -221,7 +228,6 @@ public class ROPETest extends Test {
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
-    // relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" ))); // no cascading
 
     ropeDAO.inX(x).put(
       new ROPE.Builder(x)
@@ -245,7 +251,6 @@ public class ROPETest extends Test {
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
-    // relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" ))); // no cascading
     relationshipMap.put("accountApprovalRequest", new ArrayList<String>(Arrays.asList( " __terminate__" ))); // TODO to be implemented in approvalrequest custom auth
 
     ropeDAO.inX(x).put(
@@ -271,7 +276,6 @@ public class ROPETest extends Test {
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
-    // relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" ))); // no cascading
     relationshipMap.put("sourceAccount", new ArrayList<String>(Arrays.asList( "__terminate__" )));
     relationshipMap.put("destinationAccount", new ArrayList<String>(Arrays.asList( "__terminate__" )));
 
@@ -297,7 +301,6 @@ public class ROPETest extends Test {
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
-    // relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" ))); // no cascading
     relationshipMap.put("sourceAccount", new ArrayList<String>(Arrays.asList( "__terminate__" )));
 
     ropeDAO.inX(x).put(new ROPE.Builder(x)
@@ -322,7 +325,6 @@ public class ROPETest extends Test {
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
-    // relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" ))); // no cascading
     relationshipMap.put("transactionApprovalRequest", new ArrayList<String>(Arrays.asList( "__terminate__" ))); // TODO to be implemented in approval request custom auth
 
     ropeDAO.inX(x).put(new ROPE.Builder(x)
