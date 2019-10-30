@@ -713,26 +713,26 @@ p({
   "serviceClass": "foam.nanos.session.SimpleSessionService"
 })
 p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"currencyDAO",
-  "serve":true,
+  "class": "foam.nanos.boot.NSpec",
+  "name": "currencyDAO",
+  "serve": true,
   "serviceScript":
   """
-  return new foam.dao.EasyDAO.Builder(x)
-    .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-    .setJournalName("currencies")
-    .setPm(true)
-    .setPipelinePm(true)
-    .setOf(foam.core.Currency.getOwnClassInfo())
-    .setName("currency")
-    .setIndex(new foam.core.PropertyInfo[] {foam.core.Currency.COUNTRY})
-    .build();
+    return new foam.dao.EasyDAO.Builder(x)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("currencies")
+      .setPm(true)
+      .setPipelinePm(true)
+      .setOf(foam.core.Currency.getOwnClassInfo())
+      .setName("currency")
+      .setIndex(new foam.core.PropertyInfo[] {foam.core.Currency.COUNTRY})
+      .build();
   """,
   "client":
   """
-  {
-    "of":"foam.core.Currency",
-    "cache":true
-  }
+    {
+      "of": "foam.core.Currency",
+      "cache": true
+    }
   """
 })
