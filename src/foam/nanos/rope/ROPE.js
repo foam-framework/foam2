@@ -135,8 +135,7 @@ foam.CLASS({
             ).select(new ArraySink())).getArray();
       
             for ( FObject junctionObj : junctionObjs ) {
-              FObject sourceObj = (FObject) (((DAO) x.get(getSourceDAOKey()))
-                          .find((retrieveProperty(junctionObj, junctionObj.getClass(), "get", sourcePropertyName))));
+              FObject sourceObj = (FObject) (((DAO) x.get(getSourceDAOKey())).find((retrieveProperty(junctionObj, junctionObj.getClass(), "get", sourcePropertyName))));
               sourceObjs.add(sourceObj);
             }
             break;
@@ -202,14 +201,12 @@ foam.CLASS({
           method.setAccessible(true);
           T ret = x.length > 0 ? (T) method.invoke((FObject) obj, x[0]) : (T) method.invoke((FObject) obj);
           return ret;
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException e) {
+        } catch ( NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e ) {
             if ( ((Class) objClass).getSuperclass() != null ) return retrieveProperty(obj, ((Class) objClass).getSuperclass(), prefix, propertyName, x);
             System.err.println("ROPE ERROR: Attempted access on non-existant property ");
             e.printStackTrace();
         } 
         return null;
-
         `
       },
       {
@@ -236,7 +233,6 @@ foam.CLASS({
           relationshipKey - if the relationshipKey is specified, get list of keys in relationshipMap[relationshipKey]
           crudKey - if the crudKey is specified, get list of keys in crudMap[crudKey]["__default__"], or
           propertyKey - if the propertyKey is specified, get list of keys in crudMap[crudKey][propertyKey] or crudMap[crudKey]["__default__"], if the first returns null
-
         `,
         javaCode: `
 
@@ -251,13 +247,11 @@ foam.CLASS({
           } else {
             next = crudMap.get("__default__");
           }
-    
         } else if ( relationshipKey != null && ! relationshipKey.equals("") ) {
           next = getRelationshipMap() == null ? null : getRelationshipMap().get(relationshipKey);
         } else {
           return null;
         }
-    
         return next;
         `
       }
