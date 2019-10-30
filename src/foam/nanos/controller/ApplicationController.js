@@ -38,7 +38,6 @@ foam.CLASS({
     'foam.nanos.auth.ResendVerificationEmail',
     'foam.nanos.auth.SignInView',
     'foam.nanos.auth.User',
-    'foam.nanos.auth.resetPassword.ResetView',
     'foam.nanos.theme.Theme',
     'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.u2.navigation.FooterView',
@@ -366,7 +365,7 @@ foam.CLASS({
       // don't go to log in screen if going to reset password screen
       if ( location.hash != null && location.hash === '#reset' ) {
         return new Promise(function(resolve, reject) {
-          self.stack.push({ class: 'foam.nanos.auth.resetPassword.ResetView' });
+          self.stack.push({ class: 'foam.nanos.auth.ChangePasswordView' });
           self.loginSuccess$.sub(resolve);
         });
       }
