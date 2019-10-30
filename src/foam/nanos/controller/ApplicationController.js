@@ -256,7 +256,10 @@ foam.CLASS({
             .addClass(this.myClass())
             .start()
               .tag(this.topNavigation_$.map(
-                (s) => s ? foam.u2.ViewSpec.createView(s, {}, this, this.__subContext__) : 'NULL'))
+                (s) => {
+                  if ( ! s ) s = { class: this.TopNavigation };
+                  return foam.u2.ViewSpec.createView(s, {}, this, this.__subContext__);
+                }))
             .end()
             .start()
               .addClass('stack-wrapper')
@@ -266,8 +269,12 @@ foam.CLASS({
                 showActions: false
               })
             .end()
-            .start('div', null, this.footerView_$)
-              .tag(this.FooterView)
+            .start()
+              .tag(this.footerView_$.map(
+                (s) => {
+                  if ( ! s ) s = { class: this.FooterView };
+                  return foam.u2.ViewSpec.createView(s, {}, this, this.__subContext__);
+                }))
             .end();
           });
       });
@@ -481,9 +488,8 @@ foam.CLASS({
         this.topNavigation_ = { class: this.theme.topNavigation };
       }
 
-      if ( this.theme.footerView && this.footerView_ ) {
-        this.footerView_.removeAllChildren();
-        this.footerView_.tag({ class: this.theme.footerView });
+      if ( this.theme.footerView ) {
+        this.footerView_ = { class: this.theme.footerView };
       }
     },
     {
