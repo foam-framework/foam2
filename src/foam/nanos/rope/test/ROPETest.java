@@ -31,7 +31,7 @@ public class ROPETest extends Test {
   DAO userDAO, accountDAO, transactionDAO, approvalRequestDAO, ropeDAO;
   DAO accountViewerJunctionDAO, accountMakerJunctionDAO, accountApproverJunctionDAO, transactionViewerJunctionDAO, transactionMakerJunctionDAO, transactionApproverJunctionDAO, roleViewerJunctionDAO, roleMakerJunctionDAO, roleApproverJunctionDAO;
 
-  User av, am, aa, tv, tm, ta, rv, rn, ra, root;
+  User accountViewer, accountMaker, accountApprover, transactionViewer, transactionMaker, transactionApprover, roleViewer, roleMaker, roleApprover, root;
   Account rootAccount;
   AccountUserJunction aujunction;
 
@@ -103,6 +103,7 @@ public class ROPETest extends Test {
 
     test(((User) x.get("user")).getId() == 111, "context user is root test user. UserID = " + ((User) x.get("user")).getId());
     
+    // test root user create transaction
     Transaction t = new Transaction();
     t.setId("888");
     t.setSourceAccount(rootAccount.getId());
@@ -111,17 +112,12 @@ public class ROPETest extends Test {
     t = (Transaction) transactionDAO.inX(x).put(t);
     test(t != null, "root user can create Transaction" + t.getId());
 
-    User transactionMaker = new User();
+    // test root user can create transactionmakerjunction for root account
+    transactionMaker = new User();
     transactionMaker.setFirstName("transaction");
     transactionMaker.setLastName("maker");
     transactionMaker.setId(222);
     transactionMaker = (User) userDAO.put(transactionMaker);
-
-    User transactionViewer = new User();
-    transactionViewer.setFirstName("transaction");
-    transactionViewer.setLastName("viewer");
-    transactionViewer.setId(333);
-    transactionViewer = (User) userDAO.put(transactionViewer);
     
     AccountUserJunction accountTransactionMakerJunction = new AccountUserJunction();
     accountTransactionMakerJunction.setSourceId(rootAccount.getId());
@@ -129,12 +125,47 @@ public class ROPETest extends Test {
     accountTransactionMakerJunction = (AccountUserJunction) transactionMakerJunctionDAO.inX(x).put(accountTransactionMakerJunction);
     test(accountTransactionMakerJunction != null, "root user can create transactionmaker" + accountTransactionMakerJunction.getId());
 
+    // test root user can create transaction viewer junction for root account
+    transactionViewer = new User();
+    transactionViewer.setFirstName("transaction");
+    transactionViewer.setLastName("viewer");
+    transactionViewer.setId(333);
+    transactionViewer = (User) userDAO.put(transactionViewer);
+
     AccountUserJunction accountTransactionViewerJunction = new AccountUserJunction();
     accountTransactionViewerJunction.setSourceId(rootAccount.getId());
     accountTransactionViewerJunction.setTargetId(transactionViewer.getId());
     accountTransactionViewerJunction = (AccountUserJunction) transactionViewerJunctionDAO.inX(x).put(accountTransactionViewerJunction);
     test(accountTransactionViewerJunction != null, "root user can create transactionviewer" + accountTransactionViewerJunction.getId());
 
+    // test root user can create role maker junction for root account    
+    roleMaker = new User();
+    roleMaker.setFirstName("role");
+    roleMaker.setLastName("maker");
+    roleMaker.setId(444);
+    roleMaker = (User) userDAO.put(roleMaker);
+
+    AccountUserJunction accountRoleMakerJunction = new AccountUserJunction();
+    accountRoleMakerJunction.setSourceId(rootAccount.getId());
+    accountRoleMakerJunction.setTargetId(roleMaker.getId());
+    accountRoleMakerJunction = (AccountUserJunction) roleMakerJunctionDAO.inX(x).put(accountRoleMakerJunction);
+    test(accountRoleMakerJunction != null, "root user can create roleMaker" + accountRoleMakerJunction.getId());
+
+    // put role maker as context user, test rolemaker create accountuserjunctions
+    x.put("user", roleMaker);
+    transactionApprover = new User();
+    transactionApprover.setFirstName("transaction");
+    transactionApprover.setLastName("approver");
+    transactionApprover.setId(555);
+    transactionApprover = (User) userDAO.put(transactionApprover);
+
+    AccountUserJunction accountTransactionApproverJunction = new AccountUserJunction();
+    accountTransactionApproverJunction.setSourceId(rootAccount.getId());
+    accountTransactionApproverJunction.setTargetId(transactionApprover.getId());
+    accountTransactionApproverJunction = (AccountUserJunction) transactionApproverJunctionDAO.inX(x).put(accountTransactionApproverJunction);
+    test(accountTransactionApproverJunction != null, "rolemaker user can create transactionapprover" + accountTransactionApproverJunction.getId());
+
+    // test transaction viewer cannot create transaction 
     final Transaction t1 = new Transaction();
     t1.setId("999");
     t1.setSourceAccount(rootAccount.getId());
@@ -151,10 +182,12 @@ public class ROPETest extends Test {
       "transactionViewer cannot create transaction"
     );
 
+    // test transaction maker can create transaction
     x = x.put("user", transactionMaker);
     Transaction returnedt1 = (Transaction) transactionDAO.inX(x).put(t1);
     test(returnedt1 != null, "transactionMaker user can create Transaction" + returnedt1.getId());
 
+    // test transaction viewer can view transaction
     x = x.put("user", transactionViewer);
     Transaction viewedTransaction = (Transaction) transactionDAO.inX(x).find(returnedt1.getId());
     test(viewedTransaction != null, "transactionViewer user can view transaction");
@@ -445,6 +478,7 @@ public class ROPETest extends Test {
       .setTargetDAOKey("transactionApproverJunctionDAO")
       .setCardinality("1:1")
       .setRelationshipKey("sourceId")
+      .setCrudMap(crudMap)          
       .setRelationshipMap(relationshipMap)   
       .setIsInverse(false).build());
     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
