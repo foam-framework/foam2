@@ -83,10 +83,16 @@ foam.CLASS({
 
         if ( searchColumns ) return searchColumns;
 
-        if ( of.model_.searchColumns ) return of.model_.searchColumns;
+        var searchColumnsAxiom = of.getAxiomByName('searchColumns');
 
-        if ( of.model_.tableColumns ) {
-          return of.model_.tableColumns.filter(function(c) {
+        if ( searchColumnsAxiom != null && Array.isArray(searchColumnsAxiom.columns) ) {
+          return searchColumnsAxiom.columns;
+        }
+
+        var tableColumnsAxiom = of.getAxiomByName('tableColumns');
+
+        if ( tableColumnsAxiom != null && Array.isArray(tableColumnsAxiom.columns) ) {
+          return tableColumnsAxiom.columns.filter(function(c) {
             var axiom = of.getAxiomByName(c);
             return axiom && axiom.searchView;
           });

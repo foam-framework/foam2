@@ -104,7 +104,7 @@ foam.CLASS({
       name: 'id',
       documentation: 'The ID for the User.',
       final: true,
-      tableWidth: 50,
+      tableWidth: 100,
       createMode: 'HIDDEN',
       updateMode: 'RO',
       section: 'administrative'

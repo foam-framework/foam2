@@ -15,6 +15,12 @@ foam.CLASS({
       name: 'of'
     },
     {
+      name: 'defaultNewItem',
+      expression: function(of) {
+        return of.create();
+      }
+    },
+    {
       name: 'valueView',
       expression: function(of) {
         return {
