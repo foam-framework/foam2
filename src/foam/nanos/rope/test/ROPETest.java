@@ -70,6 +70,7 @@ public class ROPETest extends Test {
     
     setupROPEs(x);
     setupRootUserAndAccount(x);
+    testRopes(x);
   }
 
   public void setupRootUserAndAccount(X x) {
@@ -92,32 +93,49 @@ public class ROPETest extends Test {
     aujunction.setSourceId(rootAccount.getId());
     aujunction.setTargetId(root.getId());
     
-    accountMakerJunctionDAO.put(aujunction); 
     accountViewerJunctionDAO.put(aujunction); 
-    transactionMakerJunctionDAO.put(aujunction); 
+    accountMakerJunctionDAO.put(aujunction); 
+    accountApproverJunctionDAO.put(aujunction);
     transactionViewerJunctionDAO.put(aujunction);
+    transactionMakerJunctionDAO.put(aujunction); 
+    transactionApproverJunctionDAO.put(aujunction);
+    roleViewerJunctionDAO.put(aujunction);
     roleMakerJunctionDAO.put(aujunction);
+    roleApproverJunctionDAO.put(aujunction);
+  }
 
+
+  public void testRopes(X x) {
 
     x = x.put("user", root);
 
     test(((User) x.get("user")).getId() == 111, "context user is root test user. UserID = " + ((User) x.get("user")).getId());
     
-    // test root user create transaction
-    Transaction t = new Transaction();
+    // test user without transactionmaker junction cannot put into transactiondao
+    final Transaction t = new Transaction();
     t.setId("888");
     t.setSourceAccount(rootAccount.getId());
     t.setDestinationAccount(rootAccount.getId());
 
-    t = (Transaction) transactionDAO.inX(x).put(t);
-    test(t != null, "root user can create Transaction" + t.getId());
-
-    // test root user can create transactionmakerjunction for root account
     transactionMaker = new User();
     transactionMaker.setFirstName("transaction");
     transactionMaker.setLastName("maker");
     transactionMaker.setId(222);
     transactionMaker = (User) userDAO.put(transactionMaker);
+    final DAO tempTransactionDAO = (DAO) ((DAO) x.get("transactionDAO")).inX(x.put("user", transactionMaker));
+    test(
+      TestUtils.testThrows(
+        () -> tempTransactionDAO.put(t),
+        "You don't have permission to create this object",
+        foam.nanos.auth.AuthorizationException.class
+      ),
+      "user without transactionmaker junction cannot put into transactiondao"
+    );
+
+    // test root user can put into transactiondao
+    test((Transaction) transactionDAO.inX(x).put(t) != null, "root user can create Transaction" + t.getId());
+
+    // test root user can create transactionmakerjunction for root account
     
     AccountUserJunction accountTransactionMakerJunction = new AccountUserJunction();
     accountTransactionMakerJunction.setSourceId(rootAccount.getId());
@@ -165,17 +183,17 @@ public class ROPETest extends Test {
     accountTransactionApproverJunction = (AccountUserJunction) transactionApproverJunctionDAO.inX(x).put(accountTransactionApproverJunction);
     test(accountTransactionApproverJunction != null, "rolemaker user can create transactionapprover" + accountTransactionApproverJunction.getId());
 
+    //
+
     // test transaction viewer cannot create transaction 
     final Transaction t1 = new Transaction();
     t1.setId("999");
     t1.setSourceAccount(rootAccount.getId());
     t1.setDestinationAccount(rootAccount.getId());
-
-    x = x.put("user", transactionViewer);
-    final DAO tempTransactionDAO = (DAO) ((DAO) x.get("transactionDAO")).inX(x);
+    final DAO tempTransactionDAO2 = tempTransactionDAO.inX(x.put("user", transactionViewer));
     test(
       TestUtils.testThrows(
-        () -> tempTransactionDAO.put(t1),
+        () -> tempTransactionDAO2.put(t1),
         "You don't have permission to create this object",
         foam.nanos.auth.AuthorizationException.class
       ),
