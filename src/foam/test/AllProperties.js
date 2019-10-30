@@ -83,7 +83,7 @@ foam.CLASS({
       name: 'longProp'
     },
     {
-      class: 'foam.core.UnitValue',
+      class: 'foam.core.Currency',
       name: 'currencyProp'
     },
     {
@@ -261,7 +261,7 @@ foam.CLASS({
       name: 'transientLong'
     },
     {
-      class: 'foam.core.UnitValue',
+      class: 'foam.core.Currency',
       transient: true,
       name: 'transientCurrency'
     },

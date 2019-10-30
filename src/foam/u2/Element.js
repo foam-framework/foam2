@@ -2383,8 +2383,8 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
-  name: 'UnitValueViewRefinement',
-  refines: 'foam.core.UnitValue',
+  name: 'CurrencyViewRefinement',
+  refines: 'foam.core.Currency',
   requires: [ 'foam.u2.view.CurrencyView' ],
   properties: [
     [ 'displayWidth', 15 ],
