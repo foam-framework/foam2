@@ -172,8 +172,8 @@ public class ROPETest extends Test {
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
-    relationshipMap.put("sourceAccount", new ArrayList<String>(Arrays.asList( "transactionMakers", "transactionViewers" )));
-    relationshipMap.put("destinationAccount", new ArrayList<String>(Arrays.asList( "transactionViewers" )));
+    // relationshipMap.put("sourceAccount", new ArrayList<String>(Arrays.asList( "transactionMakers", "transactionViewers" ))); // no cascading
+    // relationshipMap.put("destinationAccount", new ArrayList<String>(Arrays.asList( "transactionViewers" )));
 
     ropeDAO.inX(x).put(new ROPE.Builder(x)
       .setSourceDAOKey("accountDAO")
@@ -196,9 +196,9 @@ public class ROPETest extends Test {
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
-    relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" )));
-    relationshipMap.put("sourceAccount", new ArrayList<String>(Arrays.asList( "__terminate__" )));
-    relationshipMap.put("destinationAccount", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    // relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" ))); // no cascading
+    // relationshipMap.put("sourceAccount", new ArrayList<String>(Arrays.asList( "__terminate__" )));      // account viewer means literally account viewer
+    // relationshipMap.put("destinationAccount", new ArrayList<String>(Arrays.asList( "__terminate__" )));
 
     ropeDAO.inX(x).put(new ROPE.Builder(x)
       .setSourceDAOKey("userDAO")
@@ -210,18 +210,18 @@ public class ROPETest extends Test {
       .setIsInverse(true).build());
     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
 
-    // ACCOUNT MAKER ROPE
+    // ACCOUNT MAKER ROPE 
         
-    list = new ArrayList<String>(Arrays.asList( )); // users should not cud top-level accounts, users should be able to read tho TODO
+    list = new ArrayList<String>(Arrays.asList( )); // users should not cud top-level accounts, users should be able to read
     createMap.put("__default__", list);
-    readMap.put("__default__", list);
+    readMap.put("__default__", new ArrayList<String>(Arrays.asList( "__terminate__" )));
     updateMap.put("__default__", list);
     deleteMap.put("__default__", list);
     crudMap.put("create", createMap);
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
-    relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    // relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" ))); // no cascading
 
     ropeDAO.inX(x).put(
       new ROPE.Builder(x)
@@ -238,14 +238,15 @@ public class ROPETest extends Test {
         
     list = new ArrayList<String>(Arrays.asList( )); // users should not cud top-level accounts, users should be able to read tho TODO
     createMap.put("__default__", list);
-    readMap.put("__default__", list);
+    readMap.put("__default__", new ArrayList<String>(Arrays.asList( "__terminate__" )));
     updateMap.put("__default__", list);
     deleteMap.put("__default__", list);
     crudMap.put("create", createMap);
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
-    relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    // relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" ))); // no cascading
+    relationshipMap.put("accountApprovalRequest", new ArrayList<String>(Arrays.asList( " __terminate__" ))); // TODO to be implemented in approvalrequest custom auth
 
     ropeDAO.inX(x).put(
       new ROPE.Builder(x)
@@ -270,7 +271,7 @@ public class ROPETest extends Test {
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
-    relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    // relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" ))); // no cascading
     relationshipMap.put("sourceAccount", new ArrayList<String>(Arrays.asList( "__terminate__" )));
     relationshipMap.put("destinationAccount", new ArrayList<String>(Arrays.asList( "__terminate__" )));
 
@@ -296,7 +297,7 @@ public class ROPETest extends Test {
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
-    relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    // relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" ))); // no cascading
     relationshipMap.put("sourceAccount", new ArrayList<String>(Arrays.asList( "__terminate__" )));
 
     ropeDAO.inX(x).put(new ROPE.Builder(x)
@@ -321,8 +322,8 @@ public class ROPETest extends Test {
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
-    relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" )));
-    relationshipMap.put("sourceAccount", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    // relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" ))); // no cascading
+    relationshipMap.put("transactionApprovalRequest", new ArrayList<String>(Arrays.asList( "__terminate__" ))); // TODO to be implemented in approval request custom auth
 
     ropeDAO.inX(x).put(new ROPE.Builder(x)
       .setSourceDAOKey("userDAO")
@@ -345,7 +346,7 @@ public class ROPETest extends Test {
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
-    relationshipMap.put("sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    relationshipMap.put("sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));  // sourceId is accountId in AccountUserJunction
 
     ropeDAO.inX(x).put(new ROPE.Builder(x)
       .setSourceDAOKey("userDAO")
@@ -368,7 +369,7 @@ public class ROPETest extends Test {
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
-    relationshipMap.put("sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    relationshipMap.put("sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" ))); // sourceId is accountId in AccountUserJunction
 
     ropeDAO.inX(x).put(new ROPE.Builder(x)
       .setSourceDAOKey("userDAO")
@@ -391,7 +392,7 @@ public class ROPETest extends Test {
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
-    relationshipMap.put("sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" )));
+    relationshipMap.put("sourceId", new ArrayList<String>(Arrays.asList( "__terminate__" ))); // sourceId is accountId in AccountUserJunction
 
     ropeDAO.inX(x).put(new ROPE.Builder(x)
       .setSourceDAOKey("userDAO")
@@ -401,50 +402,6 @@ public class ROPETest extends Test {
       .setCrudMap(crudMap)           
       .setRelationshipMap(relationshipMap)   
       .setIsInverse(true).build());
-    createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
-
-    // SOURCE ACCOUNT TRANSACTION ROPE
-
-    list = new ArrayList<String>(Arrays.asList( "parent", "transactionMakers", "treasurer" ));
-    createMap.put("__default__", list);
-    updateMap.put("__default__", list);
-    deleteMap.put("__default__", list);
-    readMap.put("__default__", list);
-    crudMap.put("create", createMap);
-    crudMap.put("read", readMap);
-    crudMap.put("update", updateMap);
-    crudMap.put("delete", deleteMap);
-
-    ropeDAO.inX(x).put(new ROPE.Builder(x)
-      .setSourceDAOKey("accountDAO")
-      .setTargetDAOKey("transactionDAO")
-      .setCardinality("1:*")
-      .setRelationshipKey("sourceAccount")
-      .setCrudMap(crudMap)           
-      .setRelationshipMap(relationshipMap)   
-      .setIsInverse(false).build());
-    createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
-
-    // DESTINATION ACCOUNT TRANSACTION ROPE
-    list = new ArrayList<String>(Arrays.asList( )); 
-    createMap.put("__default__", list);
-    updateMap.put("__default__", list);
-    deleteMap.put("__default__", list);
-    list = new ArrayList<String>(Arrays.asList( "parent", "transactionViewers" )); 
-    readMap.put("__default__", list);
-    crudMap.put("create", createMap);
-    crudMap.put("read", readMap);
-    crudMap.put("update", updateMap);
-    crudMap.put("delete", deleteMap);
-    
-    ropeDAO.inX(x).put(new ROPE.Builder(x)
-      .setSourceDAOKey("accountDAO")
-      .setTargetDAOKey("transactionDAO")
-      .setCardinality("1:*")
-      .setRelationshipKey("destinationAccount")
-      .setCrudMap(crudMap)           
-      .setRelationshipMap(relationshipMap)   
-      .setIsInverse(false).build());
     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
 
     // TRANSACTION MAKER JUNCTION DAO - ACCOUNT ROPE
@@ -512,8 +469,8 @@ public class ROPETest extends Test {
       .setIsInverse(false).build());
     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
 
-
     // ACCOUNT VIEWER JUNCTION DAO - ACCOUNT ROPE
+
     list = new ArrayList<String>(Arrays.asList( "roleMakers" )); 
     createMap.put("__default__", list);
     updateMap.put("__default__", list);
@@ -534,8 +491,8 @@ public class ROPETest extends Test {
       .setIsInverse(false).build());
     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
 
-
     // ACCOUNT MAKER JUNCTION DAO - ACCOUNT ROPE
+
     list = new ArrayList<String>(Arrays.asList( "roleMakers" )); 
     createMap.put("__default__", list);
     updateMap.put("__default__", list);
@@ -556,8 +513,8 @@ public class ROPETest extends Test {
       .setIsInverse(false).build());
     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
 
-
     // ACCOUNT APPROVER JUNCTION DAO - ACCOUNT ROPE
+
     list = new ArrayList<String>(Arrays.asList( "roleMakers" )); 
     createMap.put("__default__", list);
     updateMap.put("__default__", list);
@@ -578,8 +535,8 @@ public class ROPETest extends Test {
       .setIsInverse(false).build());
     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
 
-
     // ROLE VIEWER JUNCTION DAO - ACCOUNT ROPE
+
     list = new ArrayList<String>(Arrays.asList( "roleMakers" )); 
     createMap.put("__default__", list);
     updateMap.put("__default__", list);
@@ -600,8 +557,8 @@ public class ROPETest extends Test {
       .setIsInverse(false).build());
     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
 
-
     // ROLE APPROVERJUNCTION DAO - ACCOUNT ROPE
+
     list = new ArrayList<String>(Arrays.asList( "roleMakers" )); 
     createMap.put("__default__", list);
     updateMap.put("__default__", list);
@@ -622,8 +579,8 @@ public class ROPETest extends Test {
       .setIsInverse(false).build());
     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
 
-
     // ROLE MAKER JUNCTION DAO - ACCOUNT ROPE
+
     list = new ArrayList<String>(Arrays.asList( "roleMakers" )); 
     createMap.put("__default__", list);
     updateMap.put("__default__", list);
@@ -644,20 +601,60 @@ public class ROPETest extends Test {
       .setIsInverse(false).build());
     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
 
-    // ROPE transactionMakerROPE = ((List<ROPE>)((ArraySink)ropeDAO.inX(x).where(EQ(ROPE.RELATIONSHIP_KEY, "transactionMakers")).select(new ArraySink())).getArray()).get(0);
-    // ROPE transactionViewerROPE = ((List<ROPE>)((ArraySink)ropeDAO.inX(x).where(EQ(ROPE.RELATIONSHIP_KEY, "transactionViewers")).select(new ArraySink())).getArray()).get(0);
-    // ropeDAO.inX(x).put(new AndROPE.Builder(x)
-    //   .setSourceDAOKey("")
-    //   .setTargetDAOKey("accountDAO")
-    //   .setCardinality("")
-    //   .setRelationshipKey("treasurer")
-    //   .setCrudMap(null)           
-    //   .setRelationshipMap(null)   
-    //   .setIsInverse(false)
-    //   .setCompositeRopes( new ArrayList<ROPE>(Arrays.asList( transactionMakerROPE, transactionViewerROPE )))
-    //   .build());
-    // createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
+    // SOURCE ACCOUNT TRANSACTION ROPE
 
+    list = new ArrayList<String>(Arrays.asList( "transactionMakers", "treasurer" ));
+    createMap.put("__default__", list);
+    updateMap.put("__default__", list);
+    deleteMap.put("__default__", list);
+    readMap.put("__default__", list);
+    crudMap.put("create", createMap);
+    crudMap.put("read", readMap);
+    crudMap.put("update", updateMap);
+    crudMap.put("delete", deleteMap);
+
+    ropeDAO.inX(x).put(new ROPE.Builder(x)
+      .setSourceDAOKey("accountDAO")
+      .setTargetDAOKey("transactionDAO")
+      .setCardinality("1:*")
+      .setRelationshipKey("sourceAccount")
+      .setCrudMap(crudMap)           
+      .setRelationshipMap(relationshipMap)   
+      .setIsInverse(false).build());
+    createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
+
+    // DESTINATION ACCOUNT TRANSACTION ROPE
+    list = new ArrayList<String>(Arrays.asList( )); 
+    createMap.put("__default__", list);
+    updateMap.put("__default__", list);
+    deleteMap.put("__default__", list);
+    list = new ArrayList<String>(Arrays.asList( "transactionViewers" )); 
+    readMap.put("__default__", list);
+    crudMap.put("create", createMap);
+    crudMap.put("read", readMap);
+    crudMap.put("update", updateMap);
+    crudMap.put("delete", deleteMap);
+    
+    ropeDAO.inX(x).put(new ROPE.Builder(x)
+      .setSourceDAOKey("accountDAO")
+      .setTargetDAOKey("transactionDAO")
+      .setCardinality("1:*")
+      .setRelationshipKey("destinationAccount")
+      .setCrudMap(crudMap)           
+      .setRelationshipMap(relationshipMap)   
+      .setIsInverse(false).build());
+    createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
+
+    // composite rope ex.
+
+    ROPE transactionMakerROPE = ((List<ROPE>)((ArraySink)ropeDAO.inX(x).where(EQ(ROPE.RELATIONSHIP_KEY, "transactionMakers")).select(new ArraySink())).getArray()).get(0);
+    ROPE transactionViewerROPE = ((List<ROPE>)((ArraySink)ropeDAO.inX(x).where(EQ(ROPE.RELATIONSHIP_KEY, "transactionViewers")).select(new ArraySink())).getArray()).get(0);
+    ropeDAO.inX(x).put(new AndROPE.Builder(x)
+      .setTargetDAOKey("accountDAO")
+      .setRelationshipKey("treasurer")
+      .setCompositeRopes( new ArrayList<ROPE>(Arrays.asList( transactionMakerROPE, transactionViewerROPE )))
+      .build());
+    createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
 
 
 
