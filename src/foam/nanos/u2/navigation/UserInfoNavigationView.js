@@ -1,7 +1,14 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+*/
 foam.CLASS({
   package: 'foam.nanos.u2.navigation',
   name: 'UserInfoNavigationView',
   extends: 'foam.u2.View',
+
+  documentation: 'Displays user and agent label if present. Clicking view opens settings submenu.',
 
   requires: [
     'foam.nanos.menu.Menu',
