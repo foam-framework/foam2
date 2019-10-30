@@ -137,8 +137,8 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2.view',
-  name: 'UnitValueTableCellFormatterRefinement',
-  refines: 'foam.core.UnitValue',
+  name: 'CurrencyTableCellFormatterRefinement',
+  refines: 'foam.core.Currency',
 
   properties: [
     {

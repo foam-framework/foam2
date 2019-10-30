@@ -489,7 +489,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
-  name: 'UnitValue',
+  name: 'Currency',
   extends: 'Long'
 });
 

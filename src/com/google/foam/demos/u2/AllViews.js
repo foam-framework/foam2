@@ -217,7 +217,7 @@ foam.CLASS({
       name: 'defaultPhoneNumber'
     },
     {
-      class: 'UnitValue',
+      class: 'Currency',
       name: 'defaultCurrency'
     },
     {
