@@ -73,37 +73,6 @@ public class ROPETest extends Test {
     testRopes(x);
   }
 
-  public void setupRootUserAndAccount(X x) {
-
-    root = new User();
-    root.setFirstName("root");
-    root.setLastName("root");
-    root.setId(111);
-    root = (User) userDAO.put(root);
-    test(root != null, "root user created");
-
-    rootAccount = new Account();
-    rootAccount.setName("rootAccount");
-    rootAccount.setId(111);
-    rootAccount.setOwner(root.getId());
-    rootAccount = (Account) accountDAO.put(rootAccount);
-    test(rootAccount != null, "root account created");
-
-    aujunction = new AccountUserJunction();
-    aujunction.setSourceId(rootAccount.getId());
-    aujunction.setTargetId(root.getId());
-    
-    accountViewerJunctionDAO.put(aujunction); 
-    accountMakerJunctionDAO.put(aujunction); 
-    accountApproverJunctionDAO.put(aujunction);
-    transactionViewerJunctionDAO.put(aujunction);
-    transactionMakerJunctionDAO.put(aujunction); 
-    transactionApproverJunctionDAO.put(aujunction);
-    roleViewerJunctionDAO.put(aujunction);
-    roleMakerJunctionDAO.put(aujunction);
-    roleApproverJunctionDAO.put(aujunction);
-  }
-
 
   public void testRopes(X x) {
 
@@ -183,7 +152,69 @@ public class ROPETest extends Test {
     accountTransactionApproverJunction = (AccountUserJunction) transactionApproverJunctionDAO.inX(x).put(accountTransactionApproverJunction);
     test(accountTransactionApproverJunction != null, "rolemaker user can create transactionapprover" + accountTransactionApproverJunction.getId());
 
-    //
+    accountMaker = new User();
+    accountMaker.setFirstName("account");
+    accountMaker.setLastName("maker");
+    accountMaker.setId(666);
+    accountMaker = (User) userDAO.put(accountMaker);
+    AccountUserJunction accountAccountMakerJunction = new AccountUserJunction();
+    accountAccountMakerJunction.setSourceId(rootAccount.getId());
+    accountAccountMakerJunction.setTargetId(accountMaker.getId());
+    accountAccountMakerJunction = (AccountUserJunction) accountMakerJunctionDAO.inX(x).put(accountAccountMakerJunction);
+    test(accountAccountMakerJunction != null, "rolemaker user can create accountmaker" + accountAccountMakerJunction.getId());
+
+    accountViewer = new User();
+    accountViewer.setFirstName("account");
+    accountViewer.setLastName("viewer");
+    accountViewer.setId(777);
+    accountViewer = (User) userDAO.put(accountViewer);
+    AccountUserJunction accountAccountViewerJunction = new AccountUserJunction();
+    accountAccountViewerJunction.setSourceId(rootAccount.getId());
+    accountAccountViewerJunction.setTargetId(accountViewer.getId());
+    accountAccountViewerJunction = (AccountUserJunction) accountViewerJunctionDAO.inX(x).put(accountAccountViewerJunction);
+    test(accountAccountViewerJunction != null, "rolemaker user can create accountViewer" + accountAccountViewerJunction.getId());
+
+    accountApprover = new User();
+    accountApprover.setFirstName("account");
+    accountApprover.setLastName("approver");
+    accountApprover.setId(888);
+    accountApprover = (User) userDAO.put(accountApprover);
+    AccountUserJunction accountAccountApproverJunction = new AccountUserJunction();
+    accountAccountApproverJunction.setSourceId(rootAccount.getId());
+    accountAccountApproverJunction.setTargetId(accountApprover.getId());
+    accountAccountApproverJunction = (AccountUserJunction) accountApproverJunctionDAO.inX(x).put(accountAccountApproverJunction);
+    test(accountAccountApproverJunction != null, "rolemaker user can create accountApprover" + accountAccountApproverJunction.getId());
+
+    roleApprover = new User();
+    roleApprover.setFirstName("role");
+    roleApprover.setLastName("approver");
+    roleApprover.setId(999);
+    roleApprover = (User) userDAO.put(roleApprover);
+    AccountUserJunction accountRoleApproverJunction = new AccountUserJunction();
+    accountRoleApproverJunction.setSourceId(rootAccount.getId());
+    accountRoleApproverJunction.setTargetId(roleApprover.getId());
+    accountRoleApproverJunction = (AccountUserJunction) roleApproverJunctionDAO.inX(x).put(accountRoleApproverJunction);
+    test(accountRoleApproverJunction != null, "rolemaker user can create roleApprover" + accountRoleApproverJunction.getId());
+
+
+    roleViewer = new User();
+    roleViewer.setFirstName("role");
+    roleViewer.setLastName("viewer");
+    roleViewer.setId(101010);
+    roleViewer = (User) userDAO.put(roleViewer);
+    AccountUserJunction accountRoleViewerJunction = new AccountUserJunction();
+    accountRoleViewerJunction.setSourceId(rootAccount.getId());
+    accountRoleViewerJunction.setTargetId(roleViewer.getId());
+    accountRoleViewerJunction = (AccountUserJunction) roleViewerJunctionDAO.inX(x).put(accountRoleViewerJunction);
+    test(accountRoleViewerJunction != null, "rolemaker user can create roleViewer" + accountRoleViewerJunction.getId());
+
+    // test account maker create child account
+    Account childAccount1 = new Account();
+    childAccount1.setId(222);
+    childAccount1.setParent(rootAccount.getId());
+    childAccount1 = (Account) accountDAO.inX(x.put("user", accountMaker)).put(childAccount1);
+    test(childAccount1 != null, "accountmaker user can create direct child account under account in which they are accountmaker of");
+
 
     // test transaction viewer cannot create transaction 
     final Transaction t1 = new Transaction();
@@ -279,6 +310,7 @@ public class ROPETest extends Test {
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
+    relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "__terminate__" )));
 
     ropeDAO.inX(x).put(
       new ROPE.Builder(x)
@@ -302,7 +334,7 @@ public class ROPETest extends Test {
     crudMap.put("read", readMap);
     crudMap.put("update", updateMap);
     crudMap.put("delete", deleteMap);
-    relationshipMap.put("accountApprovalRequest", new ArrayList<String>(Arrays.asList( " __terminate__" ))); // TODO to be implemented in approvalrequest custom auth
+    relationshipMap.put("accountApprovalRequest", new ArrayList<String>(Arrays.asList( "__terminate__" ))); // TODO to be implemented in approvalrequest custom auth
 
     ropeDAO.inX(x).put(
       new ROPE.Builder(x)
@@ -714,6 +746,37 @@ public class ROPETest extends Test {
 
 
 
+  }
+
+  public void setupRootUserAndAccount(X x) {
+
+    root = new User();
+    root.setFirstName("root");
+    root.setLastName("root");
+    root.setId(111);
+    root = (User) userDAO.put(root);
+    test(root != null, "root user created");
+
+    rootAccount = new Account();
+    rootAccount.setName("rootAccount");
+    rootAccount.setId(111);
+    rootAccount.setOwner(root.getId());
+    rootAccount = (Account) accountDAO.put(rootAccount);
+    test(rootAccount != null, "root account created");
+
+    aujunction = new AccountUserJunction();
+    aujunction.setSourceId(rootAccount.getId());
+    aujunction.setTargetId(root.getId());
+    
+    accountViewerJunctionDAO.put(aujunction); 
+    accountMakerJunctionDAO.put(aujunction); 
+    accountApproverJunctionDAO.put(aujunction);
+    transactionViewerJunctionDAO.put(aujunction);
+    transactionMakerJunctionDAO.put(aujunction); 
+    transactionApproverJunctionDAO.put(aujunction);
+    roleViewerJunctionDAO.put(aujunction);
+    roleMakerJunctionDAO.put(aujunction);
+    roleApproverJunctionDAO.put(aujunction);
   }
 
 

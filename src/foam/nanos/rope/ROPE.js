@@ -135,14 +135,14 @@ foam.CLASS({
             ).select(new ArraySink())).getArray();
       
             for ( FObject junctionObj : junctionObjs ) {
-              FObject sourceObj = (FObject) (((DAO) x.get(getSourceDAOKey())).find((retrieveProperty(junctionObj, junctionObj.getClass(), "get", sourcePropertyName))));
+              FObject sourceObj = (FObject) (((DAO) x.get(getSourceDAOKey())).inX(x).find((retrieveProperty(junctionObj, junctionObj.getClass(), "get", sourcePropertyName))));
               sourceObjs.add(sourceObj);
             }
             break;
           case "1:*" :
             if ( getIsInverse() ) {
               DAO rDAO = retrieveProperty(obj, obj.getClass(), "get", getRelationshipKey(), x);
-              sourceObjs = ((ArraySink) rDAO.where(INSTANCE_OF(((DAO) x.get(getSourceDAOKey())).getOf())).select(new ArraySink())).getArray();
+              sourceObjs = ((ArraySink) rDAO.inX(x).where(INSTANCE_OF(((DAO) x.get(getSourceDAOKey())).getOf())).select(new ArraySink())).getArray();
             } else {
               FObject sourceObj = retrieveProperty(obj, obj.getClass(), "find", getRelationshipKey(), x);
               sourceObjs.add(sourceObj);
@@ -150,7 +150,7 @@ foam.CLASS({
             break;
           case "1:1" :
             DAO sourceDAO = (DAO) x.get(getSourceDAOKey());
-            sourceObjs.add(sourceDAO.find(retrieveProperty(obj, obj.getClass(), "get", getRelationshipKey())));
+            sourceObjs.add(sourceDAO.inX(x).find(retrieveProperty(obj, obj.getClass(), "get", getRelationshipKey())));
             break;
           default: 
         }
