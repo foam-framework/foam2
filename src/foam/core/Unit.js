@@ -21,11 +21,8 @@
       class: 'String',
       name: 'id',
       label: 'Code',
-      documentation: 'The alphabetic code associated with the asset. Used as an ID.',
-      required: true,
-      aliases: [
-        'id'
-      ]
+      documentation: 'The id of the Unit',
+      required: true
     },
     {
       class: 'Int',
