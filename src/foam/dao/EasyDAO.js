@@ -137,11 +137,10 @@ if ( head instanceof foam.dao.MDAO ) {
     getMdao().addIndex(getIndex());
   }
 }
-foam.dao.ProxyDAO fixedSizeDAO = null;
 if ( getFixedSize() != null ) {
   if ( head instanceof foam.dao.MDAO &&
        pxy != null ) {
-     fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
+    foam.dao.ProxyDAO fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
     fixedSizeDAO.setDelegate(head);
     pxy.setDelegate(fixedSizeDAO);
   } else {

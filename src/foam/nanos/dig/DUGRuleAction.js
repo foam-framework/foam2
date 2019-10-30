@@ -41,7 +41,7 @@ foam.CLASS({
             }
             sink.put(obj, null);
           }
-        }, "DUG Rule");
+        }, "DUG Rule (url: " + getUrl() + " )");
       `
     }
   ]

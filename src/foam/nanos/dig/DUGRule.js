@@ -7,7 +7,7 @@ foam.CLASS({
     'foam.nanos.http.Format'
   ],
 
- tableColumns: [
+  tableColumns: [
     'name',
     'format',
     'daoKey',
@@ -24,8 +24,17 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'id',
+      hidden: true
+    },
+    {
+      name: 'documentation',
+      hidden: true
+    },
+    {
       class: 'String',
-      name: 'name'
+      name: 'name',
+      section: 'basicInfo'
     },
     {
       name: 'ruleGroup',
@@ -40,6 +49,7 @@ foam.CLASS({
       class: 'URL',
       name: 'url',
       label: 'URL',
+      section: 'basicInfo'
     },
     {
       class: 'foam.core.Enum',
@@ -47,6 +57,7 @@ foam.CLASS({
       name: 'format',
       value: foam.nanos.http.Format.JSON,
       required: true,
+      section: 'basicInfo',
       view: {
         class: 'foam.u2.view.ChoiceView',
         choices: [
@@ -58,39 +69,45 @@ foam.CLASS({
     },
     {
       name: 'enabled',
-      value: true
+      value: true,
+      section: 'basicInfo'
     },
     {
       name: 'action',
-      hidden: true
+      hidden: true,
+      section: 'basicInfo',
+      networkTransient: true
     },
     {
       name: 'asyncAction',
+      section: 'basicInfo',
       view: { class: 'foam.u2.tag.TextArea' },
       javaGetter: `
-          DUGRuleAction action = new DUGRuleAction();
-          action.setUrl(getUrl());
-          action.setFormat(getFormat());
-          return action;
-        `
+        DUGRuleAction action = new DUGRuleAction();
+        action.setUrl(getUrl());
+        action.setFormat(getFormat());
+        return action;
+      `
     },
     {
       name: 'after',
-      value: true
+      value: true,
+      section: 'basicInfo'
     },
     {
       name: 'predicate',
       hidden: true,
-      // Currently the front end does not load this correctly, causing incorrect values to be saved with each update.
+      section: 'basicInfo',
+      // FIX ME: Currently the front end does not load this correctly, causing incorrect values to be saved with each update.
       networkTransient: true
     },
     {
       name: 'validity',
-      hidden: true
+      hidden: true,
     },
     {
       name: 'saveHistory',
-      hidden: true
+      hidden: true,
     },
     {
       name: 'operation',
