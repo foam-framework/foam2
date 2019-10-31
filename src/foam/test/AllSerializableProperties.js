@@ -83,7 +83,7 @@ foam.CLASS({
       name: 'longProp'
     },
     {
-      class: 'foam.core.Currency',
+      class: 'foam.core.UnitValue',
       name: 'currencyProp'
     },
     {
