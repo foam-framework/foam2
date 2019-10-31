@@ -37,22 +37,25 @@ foam.CLASS({
       Check if the given input string is in the userCapabilityJunctions or implied by a capability in userCapabilityJunctions for the current context user
       `,
       javaCode: `
-      User user = (User) x.get("user");
-      if ( user != null && checkUser(x, user, permission) ) return true;
-      return getDelegate().check(x, permission);
+        User user = (User) x.get("user");
+
+        if ( user != null && checkUser(x, user, permission) ) return true;
+
+        return getDelegate().check(x, permission);
       `
-    },     
+    },
     {
       name: 'checkUser',
       documentation: `
-      Check if the given input string is in the userCapabilityJunctions or implied by a capability in userCapabilityJunctions for a given user
+        Check if the given input string is in the userCapabilityJunctions or
+        implied by a capability in userCapabilityJunctions for a given user.
       `,
       javaCode: `
       if ( x == null || permission == null ) return false;
       if ( x.get(Session.class) == null ) return false;
       if ( user == null || ! user.getEnabled() ) return false;
       
-      // check whether user has permission to check user permissions
+      // Check whether user has permission to check user permissions.
       if ( ! getDelegate().check(x, "service.auth.checkUser") ) return false;
 
       try {
