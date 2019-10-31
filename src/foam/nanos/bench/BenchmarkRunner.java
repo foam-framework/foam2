@@ -20,6 +20,7 @@ public class BenchmarkRunner
   protected String    name_;
   protected int       threadCount_;
   protected Boolean  runPerThread_ = false;
+  protected Boolean  reverseThreads_ = false;
   protected int       invocationCount_;
   protected Benchmark test_;
   protected String    results_ = "";
@@ -35,6 +36,7 @@ public class BenchmarkRunner
     protected String    name_            = "foam.nanos.bench.BenchmarkRunner";
     protected int       threadCount_     = Runtime.getRuntime().availableProcessors();
     protected Boolean  runPerThread_    = false;
+    protected Boolean  reverseThreads_  = false;
     protected int       invocationCount_ = 0;
     protected Benchmark test_;
 
@@ -62,6 +64,11 @@ public class BenchmarkRunner
       return (T) this;
     }
 
+    public T setReverseThreads(Boolean val) {
+      reverseThreads_ = val;
+      return (T) this;
+    }
+
     public T setBenchmark(Benchmark val) {
       test_ = val;
       return (T) this;
@@ -77,6 +84,7 @@ public class BenchmarkRunner
     name_            = builder.name_;
     threadCount_     = builder.threadCount_;
     runPerThread_    = builder.runPerThread_;
+    reverseThreads_  = builder.reverseThreads_;
     invocationCount_ = builder.invocationCount_;
     test_            = builder.test_;
   }
@@ -108,6 +116,15 @@ public class BenchmarkRunner
   }
 
   /**
+   * GetReverseThreads
+   * Decrement threadcount from max threads down to 1 when RunPerThread is true.
+   * @return
+   */
+  public Boolean getReverseThreads() {
+    return reverseThreads_;
+  }
+
+  /**
    * GetInvocationCount
    * @return the invocation count
    */
@@ -125,15 +142,22 @@ public class BenchmarkRunner
     if ( logger != null ) {
       logger.info(this.getClass().getSimpleName(), "execute", test_.getClass().getSimpleName());
     }
+
+    int availableThreads = Runtime.getRuntime().availableProcessors();
+    int run = 1;
+    threadCount_ = availableThreads;
     if ( runPerThread_ ) {
       threadCount_ = 1;
+      if ( reverseThreads_ ) {
+        threadCount_ = availableThreads;
+      }
     }
-    int availableThreads = Runtime.getRuntime().availableProcessors();
+
     String titles = "Run, Threads, Operations per second, Operations per second per thread,Memory";
     results_ = titles + "\n";
 
     try {
-      for ( int run = 1; threadCount_ <= availableThreads; threadCount_++, run++) {
+      while ( true ) {
         // create CountDownLatch and thread group equal
         final CountDownLatch latch = new CountDownLatch(threadCount_);
         ThreadGroup group = new ThreadGroup(name_);
@@ -187,15 +211,27 @@ public class BenchmarkRunner
 
         results_ += result;
 
-        System.out.print(titles + "\n" + result);
-        if ( logger != null ) {
-          logger.info(this.getClass().getSimpleName(), "result", titles, result);
-        }
-      }
-      if ( runPerThread_ ) {
-        System.out.print(results_);
-        if ( logger != null ) {
-          logger.info(this.getClass().getSimpleName(), "results", results_);
+        if ( runPerThread_ ) {
+          System.out.print(results_);
+          if ( logger != null ) {
+            logger.info(this.getClass().getSimpleName(), "results", results_);
+          }
+          if ( reverseThreads_ ) {
+            threadCount_--;
+          } else {
+            threadCount_++;
+          }
+          if ( threadCount_ <= 0 ||
+               threadCount_ > availableThreads ) {
+            break;
+          }
+          run++;
+        } else {
+          System.out.print(titles + "\n" + result);
+          if ( logger != null ) {
+            logger.info(this.getClass().getSimpleName(), "result", titles, result);
+          }
+          break;
         }
       }
     } catch (Throwable t) {
