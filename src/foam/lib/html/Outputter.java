@@ -167,7 +167,7 @@ public class Outputter
 
         writer_.append("<td col=" + (++j) + ">");
         try {
-        	output(prop.get(obj));
+          output(prop.get(obj));
         } catch (Throwable t) {
           output("nbsp;<!-- error -->");
         }
