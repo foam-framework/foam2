@@ -714,18 +714,17 @@ p({
 })
 
 p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"ropeDAO",
-  "lazy":false,
-  "serve":true,
-  "serviceScript":"""
+  "class": "foam.nanos.boot.NSpec",
+  "name": "ropeDAO",
+  "lazy": false,
+  "serve": true,
+  "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
-      .setAuthorize(true)
       .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("rope"))
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("ropes")
       .setOf(foam.nanos.rope.ROPE.getOwnClassInfo())
       .build();
   """,
-  "client":"{\"of\":\"foam.nanos.rope.ROPE\", \"remoteListenerSupport\": false}"
+  "client": "{\"of\": \"foam.nanos.rope.ROPE\", \"remoteListenerSupport\": false}"
 })

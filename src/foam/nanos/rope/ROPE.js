@@ -5,76 +5,76 @@
  */
 
 foam.CLASS({
-    package: 'foam.nanos.rope',
-    name: 'ROPE',
+  package: 'foam.nanos.rope',
+  name: 'ROPE',
 
-    ids: [ 'targetDAOKey', 'sourceDAOKey', 'relationshipKey' ],
+  ids: [ 'targetDAOKey', 'sourceDAOKey', 'relationshipKey' ],
 
-    javaImports: [
-      'foam.core.FObject',
-      'foam.core.X',
-      'foam.dao.ArraySink',
-      'foam.dao.DAO',
-      'foam.nanos.auth.AuthorizationException',
-      'foam.nanos.auth.Authorizer',
-      'foam.nanos.auth.User',
-      'foam.nanos.rope.ROPE',
-      'java.lang.reflect.*',
-      'java.util.ArrayList',
-      'java.util.List',
-      'java.util.Map',
-      'static foam.mlang.MLang.*'
-    ],
+  javaImports: [
+    'foam.core.FObject',
+    'foam.core.X',
+    'foam.dao.ArraySink',
+    'foam.dao.DAO',
+    'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.Authorizer',
+    'foam.nanos.auth.User',
+    'foam.nanos.rope.ROPE',
+    'java.lang.reflect.*',
+    'java.util.ArrayList',
+    'java.util.List',
+    'java.util.Map',
+    'static foam.mlang.MLang.*'
+  ],
 
-    properties: [
-      {
-        name: 'sourceDAOKey',
-        class: 'String',
-        required: true
-      },
-      {
-        name: 'targetDAOKey',
-        class: 'String',
-        required: true
-      },
-      {
-        name: 'cardinality',
-        class: 'String',
-        required: true
-      },
-      {
-        name: 'relationshipKey',
-        class: 'String'
-      },
-      {
-        name: 'crudMap',
-        class: 'Map',
-        javaType: 'java.util.Map<String, java.util.Map<String, java.util.List<String>>>'
-      },
-      {
-        name: 'relationshipMap',
-        class: 'Map',
-        javaType: 'java.util.Map<String, java.util.List<String>>'
-      },
-      {
-        name: 'isInverse',
-        class: 'Boolean',
-        value: false
-      }
-    ],
+  properties: [
+    {
+      name: 'sourceDAOKey',
+      class: 'String',
+      required: true
+    },
+    {
+      name: 'targetDAOKey',
+      class: 'String',
+      required: true
+    },
+    {
+      name: 'cardinality',
+      class: 'String',
+      required: true
+    },
+    {
+      name: 'relationshipKey',
+      class: 'String'
+    },
+    {
+      name: 'crudMap',
+      class: 'Map',
+      javaType: 'java.util.Map<String, java.util.Map<String, java.util.List<String>>>'
+    },
+    {
+      name: 'relationshipMap',
+      class: 'Map',
+      javaType: 'java.util.Map<String, java.util.List<String>>'
+    },
+    {
+      name: 'isInverse',
+      class: 'Boolean',
+      value: false
+    }
+  ],
 
-    methods: [
-      {
-        name: 'check',
-        javaType: 'boolean',
-        args: [
-          { name: 'x', javaType: 'X' },
-          { name: 'obj', javaType: 'FObject' },
-          { name: 'relationshipKey', javaType: 'String' },
-          { name: 'crudKey', javaType: 'String' },
-          { name: 'propertyKey', javaType: 'String' }
-        ],
-        javaCode: `
+  methods: [
+    {
+      name: 'check',
+      javaType: 'boolean',
+      args: [
+        { name: 'x', javaType: 'X' },
+        { name: 'obj', javaType: 'FObject' },
+        { name: 'relationshipKey', javaType: 'String' },
+        { name: 'crudKey', javaType: 'String' },
+        { name: 'propertyKey', javaType: 'String' }
+      ],
+      javaCode: `
         // get the list of next relationships to search to pass this rope
         List<String> nextRelationships = getNextRelationships(relationshipKey, crudKey, propertyKey);
     
@@ -89,9 +89,9 @@ foam.CLASS({
           if ( sourceObj == null ) continue;
           if ( nextRelationships.contains("__terminate__") ) {
             if ( sourceObj instanceof User && ((User) sourceObj).getId() == ((User) x.get("user")).getId() ) return true;
-            else continue;
           }
           for ( String nextRelationship : nextRelationships ) {
+            if ( nextRelationship.equals("__terminate__") ) continue;
             List<ROPE> nextRopes = (List<ROPE>) ((ArraySink) ropeDAO.where(AND(
               EQ(ROPE.TARGET_DAOKEY, getSourceDAOKey()),
               EQ(ROPE.RELATIONSHIP_KEY, nextRelationship)
@@ -103,25 +103,25 @@ foam.CLASS({
         }
     
         return false;
-        `
-      },
-      {
-        name: 'getSourceObjects',
-        args: [
-          {
-            name: 'x',
-            javaType: 'foam.core.X'
-          },
-          {
-            name: 'obj',
-            javaType: 'foam.core.FObject'
-          }
-        ],
-        javaType: 'List<foam.core.FObject>',
-        documentation: `
-        this function returns the objects in the DAO specified by sourceDAOKey that has a relationship with the obj in arguments
-        `,
-        javaCode: `
+      `
+    },
+    {
+      name: 'getSourceObjects',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ],
+      javaType: 'List<foam.core.FObject>',
+      documentation: `
+      This function returns the objects in the DAO specified by sourceDAOKey that has a relationship with the obj in arguments
+      `,
+      javaCode: `
         List<FObject> sourceObjs = new ArrayList(); 
     
         switch ( getCardinality() ) {
@@ -142,7 +142,7 @@ foam.CLASS({
           case "1:*" :
             if ( getIsInverse() ) {
               DAO rDAO = retrieveProperty(obj, obj.getClass(), "get", getRelationshipKey(), x);
-              sourceObjs = ((ArraySink) rDAO.inX(x).where(INSTANCE_OF(((DAO) x.get(getSourceDAOKey())).getOf())).select(new ArraySink())).getArray();
+              sourceObjs = ((ArraySink) rDAO.inX(x).select(new ArraySink())).getArray();
             } else {
               FObject sourceObj = retrieveProperty(obj, obj.getClass(), "find", getRelationshipKey(), x);
               sourceObjs.add(sourceObj);
@@ -155,41 +155,41 @@ foam.CLASS({
           default: 
         }
         return sourceObjs;
-        `
-      },
-      {
-        name: 'retrieveProperty',
-        args: [
-          {
-            name: 'obj',
-            javaType: 'FObject'
-          },
-          {
-            name: 'objClass',
-            javaType: 'Class'
-          },
-          {
-            name: 'prefix',
-            javaType: 'String'
-          },
-          {
-            name: 'propertyName',
-            javaType: 'String'
-          },
-          {
-            name: 'x',
-            javaType: 'X...'
-          }
-        ],
-        javaType: '<T> T',
-        documentation: `
-        this function returns the value of a property on a object.
-        args: 
-            prefix - the prefix of the property's getter method. i.e., "get", "find"
-            propertyName - the name of the property to retrieve the value of 
-            x - optional argument, provide if the property's getter takes the context as an argument
-        `,
-        javaCode: `
+      `
+    },
+    {
+      name: 'retrieveProperty',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'FObject'
+        },
+        {
+          name: 'objClass',
+          javaType: 'Class'
+        },
+        {
+          name: 'prefix',
+          javaType: 'String'
+        },
+        {
+          name: 'propertyName',
+          javaType: 'String'
+        },
+        {
+          name: 'x',
+          javaType: 'X...'
+        }
+      ],
+      javaType: '<T> T',
+      documentation: `
+      This function returns the value of a property on a object.
+      args: 
+          prefix - the prefix of the property's getter method. i.e., "get", "find"
+          propertyName - the name of the property to retrieve the value of 
+          x - optional argument, provide if the property's getter takes the context as an argument
+      `,
+      javaCode: `
         if ( objClass == null ) objClass = obj.getClass();
         Method method;
         try {
@@ -207,35 +207,33 @@ foam.CLASS({
             e.printStackTrace();
         } 
         return null;
-        `
-      },
-      {
-        name: 'getNextRelationships',
-        args: [
-          {
-            name: 'relationshipKey',
-            javaType: 'String'
-          },
-          {
-            name: 'crudKey',
-            javaType: 'String'
-          },
-          {
-            name: 'propertyKey',
-            javaType: 'String'
-          }
-        ],
-        javaType: 'List<String>',
-        documentation: `
-        this function returns a list of relationshipKeys to filter the ropeDAO with in intermediate steps of the ropeSearch
-        args :
-          rope - the current rope
-          relationshipKey - if the relationshipKey is specified, get list of keys in relationshipMap[relationshipKey]
-          crudKey - if the crudKey is specified, get list of keys in crudMap[crudKey]["__default__"], or
-          propertyKey - if the propertyKey is specified, get list of keys in crudMap[crudKey][propertyKey] or crudMap[crudKey]["__default__"], if the first returns null
-        `,
-        javaCode: `
-
+      `
+    },
+    {
+      name: 'getNextRelationships',
+      args: [
+        {
+          name: 'relationshipKey',
+          javaType: 'String'
+        },
+        {
+          name: 'crudKey',
+          javaType: 'String'
+        },
+        {
+          name: 'propertyKey',
+          javaType: 'String'
+        }
+      ],
+      javaType: 'List<String>',
+      documentation: `
+      This function returns a list of relationshipKeys to filter the ropeDAO with in intermediate steps of the ropeSearch
+      args :
+        relationshipKey - if the relationshipKey is specified, get list of keys in relationshipMap[relationshipKey]
+        crudKey - if the crudKey is specified, get list of keys in crudMap[crudKey]["__default__"], or
+        propertyKey - if the propertyKey is specified, get list of keys in crudMap[crudKey][propertyKey] or crudMap[crudKey]["__default__"], if the first returns null
+      `,
+      javaCode: `
         List<String> next = new ArrayList<String>();
     
         if ( crudKey != null && ! crudKey.equals("") ) {
@@ -253,7 +251,7 @@ foam.CLASS({
           return null;
         }
         return next;
-        `
-      }
-    ]
+      `
+    }
+  ]
 });

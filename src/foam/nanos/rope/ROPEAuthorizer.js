@@ -25,6 +25,10 @@ foam.CLASS({
     'java.util.Map',
     'static foam.mlang.MLang.*'
   ],
+  
+  // imports: [
+  //   'ropeDAO'
+  // ],
 
   properties: [
     {
@@ -34,8 +38,7 @@ foam.CLASS({
     },
     {
       name: 'targetDAOKey',
-      class: 'String',
-      javaType: 'String'
+      class: 'String'
     }
   ],
 
@@ -54,10 +57,10 @@ foam.CLASS({
       if ( getRopeDAO() == null ) setRopeDAO((DAO) x.get("ropeDAO"));
       List<ROPE> ropes = (List<ROPE>) ((ArraySink) ((DAO) getRopeDAO().where(AND(EQ(ROPE.TARGET_DAOKEY, targetDAOKey)))).select(new ArraySink())).getArray();
 
-      for ( ROPE rope : ropes ) {
-        if ( rope.check(x, obj, "", crudKey, propertyKey) ) return true;
-      }
-      return false; 
+        for ( ROPE rope : ropes ) {
+          if ( rope.check(x, obj, "", crudKey, propertyKey) ) return true;
+        }
+        return false; 
       `
     },
     {
@@ -68,120 +71,60 @@ foam.CLASS({
         { name: 'obj', javaType: 'FObject' }
       ],
       documentation: `
-      this function returns a list of the names of properties changed on update or set on create
+        This function returns a list of the names of properties changed on update or set on create
       `,
       javaCode: `
-      try {
-        if ( oldObj == null ) oldObj = (obj.getClass()).newInstance();
-      } catch ( Exception e ) {
-        e.printStackTrace();
-      }
-      Map diff = oldObj.diff(obj);
-      Iterator i = diff.keySet().iterator();
-  
-      List<String> propertyUpdates = new ArrayList<String>();
-      while ( i.hasNext() ) {
-        String propName = (String) i.next();
-        propertyUpdates.add(propName);
-      }
-      return propertyUpdates;
+        try {
+          if ( oldObj == null ) oldObj = (obj.getClass()).newInstance();
+        } catch ( Exception e ) {
+          e.printStackTrace();
+        }
+        Map diff = oldObj.diff(obj);
+        Iterator i = diff.keySet().iterator();
+    
+        List<String> propertyUpdates = new ArrayList<String>();
+        while ( i.hasNext() ) {
+          String propName = (String) i.next();
+          propertyUpdates.add(propName);
+        }
+        return propertyUpdates;
       `
     },
     {
       name: 'authorizeOnCreate',
-      type: 'Void',
-      javaThrows: [
-        'AuthorizationException'
-      ],
-      args: [
-        {
-          name: 'x',
-          javaType: 'X'
-        },
-        {
-          name: 'obj',
-          javaType: 'FObject'
-        }
-      ],
       javaCode: `
-      if ( ((User) x.get("user")).getId() == User.SYSTEM_USER_ID ) return;
-  
-      List<String> propertiesUpdated = getPropertiesUpdated(null, obj);
-      for ( String property : propertiesUpdated ) {
-        if ( ! authorizeByRope(x, obj, getTargetDAOKey(), "create", property ) ) {
-          throw new AuthorizationException("You don't have permission to create this object");
+        if ( ((User) x.get("user")).getId() == User.SYSTEM_USER_ID ) return;
+    
+        List<String> propertiesUpdated = getPropertiesUpdated(null, obj);
+        for ( String property : propertiesUpdated ) {
+          if ( ! authorizeByRope(x, obj, getTargetDAOKey(), "create", property ) ) {
+            throw new AuthorizationException("You don't have permission to create this object");
+          }
         }
-      }
       `
     },
     {
       name: 'authorizeOnRead',
-      type: 'Void',
-      javaThrows: [
-        'AuthorizationException'
-      ],
-      args: [
-        {
-          name: 'x',
-          javaType: 'X'
-        },
-        {
-          name: 'obj',
-          javaType: 'FObject'
-        }
-      ],
       javaCode: `
-      if ( ((User) x.get("user")).getId() == User.SYSTEM_USER_ID ) return;
-      if ( ! authorizeByRope(x, obj, getTargetDAOKey(), "read", "") ) throw new AuthorizationException("You don't have permission to read this object");
+        if ( ((User) x.get("user")).getId() == User.SYSTEM_USER_ID ) return;
+        if ( ! authorizeByRope(x, obj, getTargetDAOKey(), "read", "") ) throw new AuthorizationException("You don't have permission to read this object");
       `
     },
     {
       name: 'authorizeOnUpdate',
-      type: 'Void',
-      javaThrows: [
-        'AuthorizationException'
-      ],
-      args: [
-        {
-          name: 'x',
-          type: 'foam.core.X'
-        },
-        {
-          name: 'oldObj',
-          type: 'foam.core.FObject'
-        },
-        {
-          name: 'newObj',
-          type: 'foam.core.FObject'
-        },
-      ],
       javaCode: `
-      if ( ((User) x.get("user")).getId() == User.SYSTEM_USER_ID ) return;
-  
-      List<String> propertiesUpdated = getPropertiesUpdated(oldObj, newObj);
-      for ( String property : propertiesUpdated ) {
-        if ( ! authorizeByRope(x, newObj, getTargetDAOKey(), "update", property ) ) {
-          throw new AuthorizationException("You don't have permission to update this object");
+        if ( ((User) x.get("user")).getId() == User.SYSTEM_USER_ID ) return;
+    
+        List<String> propertiesUpdated = getPropertiesUpdated(oldObj, newObj);
+        for ( String property : propertiesUpdated ) {
+          if ( ! authorizeByRope(x, newObj, getTargetDAOKey(), "update", property ) ) {
+            throw new AuthorizationException("You don't have permission to update this object");
+          }
         }
-      }
       `
     },
     {
       name: 'authorizeOnDelete',
-      type: 'Void',
-      javaThrows: [
-        'AuthorizationException'
-      ],
-      args: [
-        {
-          name: 'x',
-          javaType: 'X'
-        },
-        {
-          name: 'obj',
-          javaType: 'FObject'
-        }
-      ],
       javaCode: `
       if ( ((User) x.get("user")).getId() == User.SYSTEM_USER_ID ) return;
       if ( ! authorizeByRope(x, obj, getTargetDAOKey(), "delete", "") ) throw new AuthorizationException("You don't have permission to delete this object");
@@ -189,33 +132,18 @@ foam.CLASS({
     },
     {
       name: 'checkGlobalRead',
-      javaType: 'boolean',
-      args: [
-        {
-          name: 'x',
-          javaType: 'X'
-        }
-      ],
       javaCode: `
       return false;
       `
     },
     {
       name: 'checkGlobalRemove',
-      javaType: 'boolean',
-      args: [
-        {
-          name: 'x',
-          javaType: 'X'
-        }
-      ],
       javaCode: `
       return false;
       `
     },
     {
       name: 'getPermissionPrefix',
-      javaType: 'String',
       javaCode: `
       return "";
       `
