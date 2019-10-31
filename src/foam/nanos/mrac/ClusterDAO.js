@@ -22,15 +22,15 @@ foam.CLASS({
 
   documentation: `This DAO:
   1. registers a 'server', via NSpec, to handle cluster Client requests which write directly to the delegate (MDAO).
-  2. creates Client DAOs.
-  3. on put() write through to delegate (MDAO), then send to Clients.
-  4. recreate clients on configuration changes.
+  2. on put() write to primary if not primary, else delegate
+  3. recreate clients on configuration changes.
   `,
 
   javaImports: [
     'foam.box.Box',
     'foam.box.HTTPBox',
     'foam.box.SessionClientBox',
+    'foam.core.FObject',
     'foam.dao.ClientDAO',
     'foam.dao.DAO',
     'foam.dao.ArraySink',
@@ -59,14 +59,7 @@ foam.CLASS({
       name: 'primary',
       class: 'foam.dao.DAOProperty',
       visibility: 'HIDDEN'
-    },
-    {
-      documentation: `Array of all clients to put/remove to after a non-server operation.`,
-      name: 'clients',
-      class: 'FObjectArray',
-      of: 'foam.dao.DAO',
-      visibility: 'HIDDEN'
-    },
+    }
   ],
 
   methods: [
@@ -85,13 +78,8 @@ foam.CLASS({
       String hostname = System.getProperty("hostname", "localhost");
       ClusterConfig config = (ClusterConfig) dao.find_(x, hostname);
       if ( config == null ) {
-        if ( ! hostname.equals("localhost") ) {
-          config = (ClusterConfig) dao.find_(x, hostname);
-        }
-        if ( config == null ) {
-          Logger logger = (Logger) x.get("logger");
-          logger.error(this.getClass().getSimpleName(), "ClusterConfig not found for hostname:", hostname);
-        }
+        Logger logger = (Logger) x.get("logger");
+        logger.error(this.getClass().getSimpleName(), "ClusterConfig not found for hostname:", hostname);
       }
       return config;
       `
@@ -137,25 +125,16 @@ foam.CLASS({
         ClusterConfig clientConfig = (ClusterConfig) arr.get(i);
         if ( clientConfig.getNodeType() == NodeType.PRIMARY ) {
           DAO primary = new ClientDAO.Builder(x).setDelegate(new SessionClientBox.Builder(x).setSessionID(config.getSessionId()).setDelegate(new HTTPBox.Builder(x).setUrl(buildURL(x, clientConfig)).build()).build()).build();
-          //DAO primary = new ClientDAO.Builder(x).setDelegate(new HTTPBox.Builder(x).setUrl(buildURL(x, clientConfig)).build()).build();
           setPrimary(primary);
-          setDelegate(primary);
-        } else if ( clientConfig.getNodeType() == NodeType.SECONDARY ) {
-          DAO client = new ClientDAO.Builder(x).setDelegate(new SessionClientBox.Builder(x).setSessionID(config.getSessionId()).setDelegate(new HTTPBox.Builder(x).setUrl(buildURL(x, clientConfig)).build()).build()).build();
-          //DAO client = new ClientDAO.Builder(x).setDelegate(new HTTPBox.Builder(x).setUrl(buildURL(x, clientConfig)).build()).build();
-         newClients.add(client);
+//          setDelegate(primary);
         } 
       }
-      setClients(newClients.toArray(new DAO[newClients.size()]));
+
       if ( config == null ) {
-        logger.error(this.getClass().getSimpleName(), "reconfigure", getServiceName(), "cluster configuration for LOCALHOST not found.");
-      } else if ( ! config.getNodeType().equals(NodeType.PRIMARY) &&
+        logger.error(this.getClass().getSimpleName(), "reconfigure", getServiceName(), "cluster configuration not found.");
+      } else if ( config.getNodeType().equals(NodeType.PRIMARY) &&
         getPrimary() == null ) {
         logger.error(this.getClass().getSimpleName(), "reconfigure", getServiceName(), "cluster configuration for PRIMARY not found.");
-      } else if ( getClients().length == 0 ) {
-        logger.error(this.getClass().getSimpleName(), "reconfigure", getServiceName(), "cluster configuration for SECONDARY not found.");
-      } else {
-        logger.info(this.getClass().getSimpleName(), "reconfigure", getServiceName(), "cluster configuration for SECONDARY "+getClients().length+" found");
       }
       `
     },
@@ -168,7 +147,7 @@ foam.CLASS({
         },
         {
           name: 'obj',
-          type: 'foam.core.FObject'
+          type: 'FObject'
         }
       ],
       javaCode: `
@@ -176,23 +155,15 @@ foam.CLASS({
 
       ClusterConfig config = findConfig(x);
 
-      if ( ! config.getNodeType().equals(NodeType.PRIMARY) ) {
-        logger.debug(this.getClass().getSimpleName(), "put_", getServiceName(), "to primary", obj);
-        return getPrimary().put_(x, obj);
+      if ( config != null &&
+           ! config.getNodeType().equals(NodeType.PRIMARY) ) {
+        ClusterCommand cmd = new ClusterCommand.Builder(x).setCommand(ClusterCommand.PUT).setObj(obj).build();
+        logger.debug(this.getClass().getSimpleName(), "put_", getServiceName(), "to primary", cmd);
+        return (FObject) getPrimary().cmd_(x, cmd);
       } else {
-        foam.core.FObject o = getPrimary().put_(x, obj);
-        logger.debug(this.getClass().getSimpleName(), "put_", getServiceName(), "to secondaries("+getClients().length+")", o);
-        ClusterCommand cmd = new ClusterCommand.Builder(x).setCommand(ClusterCommand.PUT).setObj(o).build();
-        for ( DAO client : getClients() ) {
-          try {
-            Object response = client.cmd_(x, cmd);
-            logger.debug(this.getClass().getSimpleName(), "put_", getServiceName(), " to secondary, response", response);
-          } catch ( Exception e ) {
-            logger.debug(this.getClass().getSimpleName(), "put_", getServiceName(), e);
-          }
-        }
-        return o;
-      }
+        logger.debug(this.getClass().getSimpleName(), "put_", getServiceName(), "to self", obj);
+        return getDelegate().put_(x, obj);
+     }
      `
     },
     {
@@ -204,30 +175,22 @@ foam.CLASS({
         },
         {
           name: 'obj',
-          type: 'foam.core.FObject'
+          type: 'FObject'
         }
       ],
       javaCode: `
       Logger logger = (Logger) x.get("logger");
 
-     ClusterConfig config = findConfig(x);
+      ClusterConfig config = findConfig(x);
 
-      if ( ! config.getNodeType().equals(NodeType.PRIMARY) ) {
-        logger.debug(this.getClass().getSimpleName(), "remove_", getServiceName(), "to primary", obj);
-        return getPrimary().remove_(x, obj);
+      if ( config != null &&
+           ! config.getNodeType().equals(NodeType.PRIMARY) ) {
+        ClusterCommand cmd = new ClusterCommand.Builder(x).setCommand(ClusterCommand.REMOVE).setObj(obj).build();
+        logger.debug(this.getClass().getSimpleName(), "remove_", getServiceName(), "to primary", cmd);
+        return (FObject) getPrimary().cmd_(x, cmd);
       } else {
-        foam.core.FObject o = getPrimary().remove_(x, obj);
-        logger.debug(this.getClass().getSimpleName(), "remove_", getServiceName(), "to secondaries("+getClients().length+")", o);
-        ClusterCommand cmd = new ClusterCommand.Builder(x).setCommand(ClusterCommand.REMOVE).setObj(o).build();
-        for ( DAO client : getClients() ) {
-          try {
-            Object response = client.cmd_(x, cmd);
-            logger.debug(this.getClass().getSimpleName(), "remove_", getServiceName(), " to secondary, response", response);
-          } catch ( Exception e ) {
-            logger.debug(this.getClass().getSimpleName(), "remove_", getServiceName(), e);
-          }
-        }
-        return o;
+        logger.debug(this.getClass().getSimpleName(), "remove_", getServiceName(), "to self", obj);
+        return getDelegate().remove_(x, obj);
       }
      `
     },

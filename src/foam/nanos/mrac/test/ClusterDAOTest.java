@@ -89,7 +89,17 @@ public class ClusterDAOTest
     int numCountries = countries.size();
     sink = countryDAO1.select(new ArraySink());
     countries = ((ArraySink) sink).getArray();
-    test ( countries.size() == numCountries, "countryDAO1 equal to countryDAO");
+
+    DAO dao = (DAO) x.get("clusterConfigDAO");
+    String hostname = System.getProperty("hostname", "localhost");
+    config = (ClusterConfig) dao.find_(x, hostname);
+    test ( config != null, "ClusterConfig found");
+    if ( config != null &&
+         config.getNodeType().equals(NodeType.PRIMARY) ) {
+      test ( countries.size() == numCountries, "countryDAO1 equal to countryDAO");
+    } else {
+      test ( countries.size() == 0, "countryDAO1 size 0 - all puts to primary");
+    }
   }
 
   public void addNSpec(X x, String serviceName) {
