@@ -144,11 +144,25 @@ foam.CLASS({
     {
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
-      value: function(value) {
-        this.start()
-          .style({'text-align': 'left', 'padding-right': '20px'})
-          .add('$' + (value/100).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,'))
-        .end();
+      value: function(value, obj, axiom) {
+        if ( axiom.unitPropName ) {
+          var unitProp = obj.cls_.getAxiomByName(axiom.unitPropName);
+          var unitId = unitProp.f(obj);
+          obj.__context__.currencyDAO.find(unitId).then((unit) => {
+            var formatted = unit.format(value);
+            this.start()
+              .add(formatted)
+            .end();
+            this.tooltip = formatted;
+          });
+        } else {
+          var formatted = '$' + (value/100).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+          this.start()
+            .style({'text-align': 'left', 'padding-right': '20px'})
+            .add(formatted)
+          .end();
+          this.tooltip = formatted;
+        }
       }
     }
   ]

@@ -490,7 +490,13 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'UnitValue',
-  extends: 'Long'
+  extends: 'Long',
+  properties: [
+    {
+      class: 'String',
+      name: 'unitPropName'
+    }
+  ]
 });
 
 
