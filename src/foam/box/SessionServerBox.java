@@ -79,7 +79,6 @@ public class SessionServerBox
           logger.warning("Remote host for session ", sessionID, " changed from ", session.getRemoteHost(), " to ", req.getRemoteHost(), ". Deleting session and forcing the user to sign in again.");
           sessionDAO.remove(session);
           msg.replyWithException(new AuthenticationException("IP address changed. Your session was deleted to keep your account secure. Please sign in again to verify your identity."));
-          return;
         }
       }
 
