@@ -37,9 +37,10 @@ foam.CLASS({
       margin: 0 auto;
     }
     ^ .logoCenterVerticle {
-      margin-left: 64vh
+      margin: 0 auto;
+      text-align: center;
+      display: block;
     }
-
     ^ .horizontal{
       padding: 0 0 1vh 2vh;
       max-width: 98%;
@@ -49,13 +50,14 @@ foam.CLASS({
     }
 
     ^ .top-bar {
+      background: /*%PRIMARY1%*/
       width: 100%;
       height: 8vh;
       border-bottom: solid 1px #e2e2e3
     }
     ^ .top-bar img {
       height: 4vh;
-      margin-top: 2vh;
+      padding-top: 1vh;
     }
   `,
 
@@ -88,7 +90,6 @@ foam.CLASS({
       documentation: `This property toggles the view from updating a user password to resetting a user password.`,
       factory: function() {
         var searchParams = new URLSearchParams(location.search);
-        window.history.replaceState(null, null, window.location.origin+'/#reset');
         return searchParams.get('token');
       },
       hidden: true
@@ -157,6 +158,7 @@ foam.CLASS({
         this.clearProperty('originalPassword');
         this.clearProperty('newPassword');
         this.clearProperty('confirmationPassword');
+        if ( this.token ) window.history.replaceState(null, null, window.location.origin+'/#reset');
       }
     },
     function initE() {
@@ -185,6 +187,7 @@ foam.CLASS({
               data: this,
               sectionName: 'resetPasswordSection'
             }).end()
+            .br().br()
             .start(this.UPDATE_PASSWORD).end()
             .start(this.RESET_PASSWORD).end()
           .end()
@@ -197,6 +200,9 @@ foam.CLASS({
       name: 'resetPassword',
       isAvailable: function() {
         return !! this.token;
+      },
+      isEnabled: function(errors_) {
+        return ! errors_;
       },
       code: function(X) {
         var user = this.User.create({
@@ -216,6 +222,9 @@ foam.CLASS({
       name: 'updatePassword',
       isAvailable: function() {
         return ! this.token;
+      },
+      isEnabled: function(errors_) {
+        return ! errors_;
       },
       code: function(X) {
         this.auth.updatePassword(null, this.originalPassword, this.newPassword)
