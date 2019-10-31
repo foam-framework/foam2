@@ -55,12 +55,18 @@ foam.CLASS({
           case self.DisplayMode.RW:
           case self.DisplayMode.DISABLED:
             return self.E()
-              .start(self.writeView, { data$: self.data$ })
+              .start(self.writeView, {
+                data$: self.data$,
+                mode: mode
+              })
                 .call(callFromProperty)
               .end();
           case self.DisplayMode.RO:
             return self.E()
-              .start(self.readView, { data$: self.data$ })
+              .start(self.readView, {
+                data$: self.data$,
+                mode: mode
+              })
                 .call(callFromProperty)
               .end();
           case self.DisplayMode.HIDDEN:
