@@ -11,8 +11,8 @@ import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
-import foam.lib.PropertyPredicate;
 import foam.lib.PermissionedPropertyPredicate;
+import foam.lib.PropertyPredicate;
 import foam.util.SafetyUtil;
 import java.io.*;
 import java.lang.reflect.Array;
@@ -20,7 +20,6 @@ import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
 import java.util.*;
-
 import org.apache.commons.io.IOUtils;
 
 public class Outputter
@@ -66,6 +65,7 @@ public class Outputter
     this.writer_ = writer;
   }
 
+  @Override
   public String stringify(FObject obj) {
     initWriter();
     outputFObject(obj);
@@ -111,15 +111,45 @@ public class Outputter
   }
 
   public String escape(String s) {
-    return s.replace("\\", "\\\\")
+    s = s.replace("\\", "\\\\")
             .replace("\"", "\\\"")
             .replace("\t", "\\t")
             .replace("\r","\\r")
             .replace("\n","\\n");
+    s = escapeControlCharacters(s);
+    return s;
   }
 
   public String escapeMultiline(String s) {
-    return s.replace("\\", "\\\\");
+    s = s.replace("\\", "\\\\");
+    s = escapeControlCharacters(s);
+    return s;
+  }
+
+  public String escapeControlCharacters(String s) {
+    int lastStart = 0;
+    String escapedString = "";
+    char c;
+    for ( int i = 0; i < s.length(); i++ ) {
+      c = s.charAt(i);
+      if ( c >= ' ' ) continue;
+      // Character to hex
+      char right = (char) (c & 0x0F);
+      char left = (char) ((c & 0xF0) >> 4);
+      right += '0';
+      if ( right > '9' ) right += 'A' - '9' - 1;
+      left += '0';
+      if ( left > '9' ) left += 'A' - '9' - 1;
+      char[] escape = new char[] {'\\','u','0','0',left,right};
+      // Add previous string segment
+      escapedString += s.substring(lastStart, i);
+      // Add escape sequence
+      escapedString += new String(escape);
+      lastStart = i + 1;
+    }
+    if ( lastStart != s.length() ) escapedString +=
+      s.substring(lastStart, s.length());
+    return escapedString;
   }
 
   protected void outputNumber(Number value) {
@@ -220,6 +250,7 @@ public class Outputter
     writer_.append("}");
   }
 
+  @Override
   public void output(Object value) {
     if ( value instanceof OutputJSON ) {
       ((OutputJSON) value).outputJSON(this);

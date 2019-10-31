@@ -137,7 +137,6 @@ if ( head instanceof foam.dao.MDAO ) {
     getMdao().addIndex(getIndex());
   }
 }
-
 if ( getFixedSize() != null ) {
   if ( head instanceof foam.dao.MDAO &&
        pxy != null ) {
@@ -149,6 +148,7 @@ if ( getFixedSize() != null ) {
     System.exit(1);
   }
 }
+
 
 delegate = getOuterDAO(delegate);
 
@@ -182,6 +182,11 @@ if ( getDeletedAware() ) {
     .setDelegate(delegate)
     .setName(getPermissionPrefix())
     .build();
+}
+
+if ( getRuler() ) {
+  String name = foam.util.SafetyUtil.isEmpty(getRulerDaoKey()) ? getName() : getRulerDaoKey();
+  delegate = new foam.nanos.ruler.RulerDAO(getX(), delegate, name);
 }
 
 if ( getCreatedAware() ) {
@@ -274,6 +279,11 @@ return delegate;
       type: 'foam.dao.DAO',
       name: 'innerDAO',
       javaFactory: `
+      if ( getNullify() ) {
+        return new foam.dao.NullDAO.Builder(getX())
+        .setOf(getOf())
+        .build();
+      }
       if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) )
         return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
       return new foam.dao.MDAO(getOf());
@@ -361,6 +371,12 @@ return delegate;
       value: false
     },
     {
+      documentation: 'Sets the inner dao to a nullDAO',
+      class: 'Boolean',
+      name: 'nullify',
+      value: false
+    },
+    {
       documentation: 'Wrap in PermissionedPropertiesDAO',
       class: 'Boolean',
       name: 'permissioned',
@@ -424,6 +440,15 @@ return delegate;
       class: 'Boolean',
       name: 'contextualize',
       value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'ruler',
+      value: true
+    },
+    {
+      class: 'String',
+      name: 'rulerDaoKey'
     },
     {
       /**
