@@ -649,7 +649,7 @@ foam.RELATIONSHIP({
 
 foam.CLASS({
   package: 'foam.nanos.auth',
-  name: 'UserUserJunctionGroupRefinement',
+  name: 'UserUserJunctionRefinement',
   refines: 'foam.nanos.auth.UserUserJunction',
 
   properties: [
@@ -657,6 +657,11 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.Group',
       name: 'group'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.notification.NotificationConfig',
+      name: 'notificationConfig'
     }
   ]
 });

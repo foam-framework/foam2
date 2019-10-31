@@ -179,6 +179,7 @@ FOAM_FILES([
   { name: 'foam/nanos/demo/relationship/Student' },
   { name: 'foam/nanos/demo/relationship/Controller' },
   { name: 'foam/nanos/notification/Notification'},
+  { name: "foam/nanos/notification/NotificationConfig" },
   { name: 'foam/nanos/notification/notifications/ScriptRunNotification'},
   { name: 'foam/nanos/notification/NotificationListView'},
   { name: 'foam/nanos/notification/NotificationRowView'},

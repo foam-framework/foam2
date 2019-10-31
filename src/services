@@ -712,3 +712,18 @@ p({
   "serve": true,
   "serviceClass": "foam.nanos.session.SimpleSessionService"
 })
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"notificationConfigDAO",
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("notificationConfigs")
+      .setOf(foam.nanos.notification.NotificationConfig.getOwnClassInfo())
+      .setAuthorize(false)
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.notification.NotificationConfig\"}"
+})
