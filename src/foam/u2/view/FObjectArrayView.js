@@ -17,7 +17,9 @@ foam.CLASS({
     {
       name: 'defaultNewItem',
       expression: function(of) {
-        return of.create();
+        return foam.core.InterfaceModel.isInstance(of.model_)
+          ? null
+          : of.create();
       }
     },
     {
