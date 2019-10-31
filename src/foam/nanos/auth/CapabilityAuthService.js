@@ -85,7 +85,8 @@ foam.CLASS({
 
         for ( UserCapabilityJunction ucJunction : userCapabilityJunctions ) {
           Capability capability = (Capability) capabilityDAO.find(ucJunction.getTargetId());
-          if ( capability.implies(x, permission) && ! capability.isDeprecated(x) ) return true;
+          if ( capability.isDeprecated(x) ) continue;
+          if ( capability.implies(x, permission) ) return true;
         }
       } catch (Exception e) {
         Logger logger = (Logger) x.get("logger");
