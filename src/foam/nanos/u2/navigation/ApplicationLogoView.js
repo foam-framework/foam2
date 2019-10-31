@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+*/
 foam.CLASS({
   package: 'foam.nanos.u2.navigation',
   name: 'ApplicationLogoView',
@@ -40,7 +45,8 @@ foam.CLASS({
           })
             .hide(this.theme$.dot('largeIconEnabled'))
             .addClass('logo')
-            .start('span').addClass('appName').add(this.theme$.dot('appName')).end()
+          .end()
+          .start('span').addClass('appName').add(this.theme$.dot('appName')).end()
           .start({
             class: 'foam.u2.tag.Image',
             data$: this.theme$.dot('largeLogo')
