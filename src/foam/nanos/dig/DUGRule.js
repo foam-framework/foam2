@@ -37,6 +37,11 @@ foam.CLASS({
       section: 'basicInfo'
     },
     {
+      name: 'daoKey',
+      label: 'DAO',
+      section: 'basicInfo'
+    },
+    {
       name: 'ruleGroup',
       value: 'DUG',
       hidden: true
@@ -92,7 +97,8 @@ foam.CLASS({
     {
       name: 'after',
       value: true,
-      section: 'basicInfo'
+      section: 'basicInfo',
+      hidden: true
     },
     {
       name: 'predicate',
