@@ -83,14 +83,16 @@ foam.CLASS({
       class: 'DateTime',
       name: 'lastRun',
       documentation: 'Date and time the script ran last.',
-      visibility: 'RO',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
       tableWidth: 140
     },
     {
       class: 'Duration',
       name: 'lastDuration',
       documentation: 'Date and time the script took to complete.',
-      visibility: 'RO',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
       tableWidth: 125
     },
     /*
@@ -115,7 +117,8 @@ foam.CLASS({
       of: 'foam.nanos.script.ScriptStatus',
       name: 'status',
       documentation: 'Status of script.',
-      visibility: 'RO',
+      createMode: 'HIDDEN',
+      updateMode: 'RO',
       value: 'UNSCHEDULED',
       javaValue: 'ScriptStatus.UNSCHEDULED',
       tableWidth: 100,
