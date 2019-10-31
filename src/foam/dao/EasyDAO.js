@@ -137,7 +137,6 @@ if ( head instanceof foam.dao.MDAO ) {
     getMdao().addIndex(getIndex());
   }
 }
-
 if ( getFixedSize() != null ) {
   if ( head instanceof foam.dao.MDAO &&
        pxy != null ) {
@@ -149,6 +148,7 @@ if ( getFixedSize() != null ) {
     System.exit(1);
   }
 }
+
 
 delegate = getOuterDAO(delegate);
 
@@ -182,6 +182,11 @@ if ( getDeletedAware() ) {
     .setDelegate(delegate)
     .setName(getPermissionPrefix())
     .build();
+}
+
+if ( getRuler() ) {
+  String name = foam.util.SafetyUtil.isEmpty(getRulerDaoKey()) ? getName() : getRulerDaoKey();
+  delegate = new foam.nanos.ruler.RulerDAO(getX(), delegate, name);
 }
 
 if ( getCreatedAware() ) {
@@ -435,6 +440,15 @@ return delegate;
       class: 'Boolean',
       name: 'contextualize',
       value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'ruler',
+      value: true
+    },
+    {
+      class: 'String',
+      name: 'rulerDaoKey'
     },
     {
       /**

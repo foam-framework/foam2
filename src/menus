@@ -33,7 +33,6 @@ p({"class":"foam.nanos.menu.Menu","id":"admin.spids","label":"Service Providers"
 
 p({"class":"foam.nanos.menu.Menu","id":"integration","label":"Integration","handler":{"class":"foam.nanos.menu.SubMenu"},"order":110,"parent":""})
 p({"class":"foam.nanos.menu.Menu","id":"dig","label":"DIG","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"digDAO"},"order":2000,"parent":"integration"})
-p({"class":"foam.nanos.menu.Menu","id":"dug","label":"DUG","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"dugDAO"},"order":2000,"parent":"integration"})
 //p({"class":"foam.nanos.menu.Menu","id":"docs","label":"Documentation Browser","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.doc.DocBrowser"}},"order":2000,"parent":"integration"})
 p({"class":"foam.nanos.menu.Menu","id":"model-doc","label":"UML API Documentation","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.doc.ModelBrowser"}},"order":1000,"parent":"integration"})
 p({"class":"foam.nanos.menu.Menu","id":"notifications","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.notification.NotificationListView"}},"order":1000,"parent":"hidden"})
