@@ -129,7 +129,7 @@ public class BenchmarkRunner
       threadCount_ = 1;
     }
     int availableThreads = Runtime.getRuntime().availableProcessors();
-    String titles = "Run, Threads, Operations per second, Operations per second per thread";
+    String titles = "Run, Threads, Operations per second, Operations per second per thread,Memory";
     results_ = titles + "\n";
 
     try {
@@ -181,7 +181,8 @@ public class BenchmarkRunner
           run + ", " +
           threadCount_ + ", " +
           (complete / duration) +", " +
-          (complete / duration / (float) threadCount_) +
+          (complete / duration / (float) threadCount_) + ", " +
+          (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) +
           "\n";
 
         results_ += result;

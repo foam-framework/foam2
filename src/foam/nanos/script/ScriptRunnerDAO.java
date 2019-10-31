@@ -8,6 +8,7 @@ package foam.nanos.script;
 
 import foam.core.*;
 import foam.dao.*;
+import foam.nanos.logger.Logger;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -39,11 +40,12 @@ public class ScriptRunnerDAO
   Script fixScriptClass(Script script) {
     Script oldScript = (Script) find(script.getId());
     return oldScript == null ?
-      script :
+      (Script) script.fclone() :
       (Script) oldScript.fclone().copyFrom(script);
   }
 
   Script runScript(final X x, Script newScript) {
+    Logger log = (Logger) x.get("logger");
     Script script = fixScriptClass(newScript);
     long   estimatedTime = this.estimateWaitTime(script);
     final CountDownLatch latch = new CountDownLatch(1);
@@ -52,17 +54,19 @@ public class ScriptRunnerDAO
       ((Agency) x.get("threadPool")).submit(x, new ContextAgent() {
         @Override
         public void execute(X y) {
+          Script s = script;
           try {
-            script.setStatus(ScriptStatus.RUNNING);
-            getDelegate().put_(x, script);
-            script.runScript(x);
-            script.setStatus(ScriptStatus.UNSCHEDULED);
+            s.setStatus(ScriptStatus.RUNNING);
+            s = (Script) getDelegate().put_(x, s).fclone();
+            s.runScript(x);
+            s.setStatus(ScriptStatus.UNSCHEDULED);
           } catch(Throwable t) {
-            script.setStatus(ScriptStatus.ERROR);
+            s.setStatus(ScriptStatus.ERROR);
             t.printStackTrace();
+            log.error("Script.run", s.getId(), t);
           }
           // save the state
-          getDelegate().put_(x, script);
+          getDelegate().put_(x, s);
 
           latch.countDown();
         }
@@ -71,6 +75,7 @@ public class ScriptRunnerDAO
       latch.await(estimatedTime, TimeUnit.MILLISECONDS);
     } catch(InterruptedException e) {
       e.printStackTrace();
+      log.error("Script.submit", script.getId(), e);
     }
 
     return script;

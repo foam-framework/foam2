@@ -273,11 +273,11 @@ foam.CLASS({
           this.status = this.ScriptStatus.RUNNING;
           this.runScript().then(() => {
             this.status = this.ScriptStatus.UNSCHEDULED;
-            this.scriptDAO.put(this);
+            this.scriptDAO.put(this.fclone());
           }).catch((err) => {
             console.log(err);
             this.status = this.ScriptStatus.ERROR;
-            this.scriptDAO.put(this);
+            this.scriptDAO.put(this.fclone());
           });
         }
       }

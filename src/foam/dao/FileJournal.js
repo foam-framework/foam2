@@ -81,7 +81,7 @@ foam.CLASS({
               switch ( operation ) {
                 case 'p':
                   foam.core.FObject old = dao.find(obj.getProperty("id"));
-                  dao.put(old != null ? mergeFObject(old, obj) : obj);
+                  dao.put(old != null ? mergeFObject(old.fclone(), obj) : obj);
                   break;
 
                 case 'r':
