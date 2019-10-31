@@ -10,8 +10,7 @@ foam.CLASS({
 
   requires: [
     'foam.dao.CSVSink',
-    'foam.dao.EasyDAO',
-    'foam.nanos.auth.Phone'
+    'foam.dao.EasyDAO'
   ],
 
   properties: [
@@ -57,9 +56,8 @@ foam.CLASS({
           name: 'arr'
         },
         {
-          class: 'FObjectProperty',
-          name: 'fop',
-          of: 'foam.nanos.auth.Phone'
+          class: 'String',
+          name: 'fop'
         }
       ]
     }
@@ -81,8 +79,9 @@ foam.CLASS({
             str: 'Random data ' + i,
             bool: Math.random() < 0.5,
             arr: [Math.random()],
-            fop: this.Phone.create({ number: '111-111-1111' })
+            fop: '111-111-1111'
           }));
+          );
         }
       }
     }

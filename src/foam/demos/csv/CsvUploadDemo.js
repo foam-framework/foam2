@@ -28,7 +28,7 @@ foam.CLASS({
       name: 'csv',
       view: { class: 'foam.u2.tag.TextArea' },
       value: `
-id,firstName,lastName,email,phone.number,address.city,address.postalCode,lastLogin,birthday,passwordLastModified,passwordExpiry,created,lastModified
+id,firstName,lastName,email,phoneNumber,address.city,address.postalCode,lastLogin,birthday,passwordLastModified,passwordExpiry,created,lastModified
 1,Mike,C,mike@c.com,416-123-1234,sauga,l4w2l2,0,1,2,3,4,5
       `
     },
