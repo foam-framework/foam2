@@ -237,7 +237,6 @@ foam.CLASS({
             // nop - ignore - only copy common properties.
           }
         }
-        this.__frozen__ = false;
         return this;
       `
     },
