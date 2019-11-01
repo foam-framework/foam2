@@ -567,7 +567,7 @@ return delegate;
       generateJava: false
     },
     {
-      documentation: 'Enables automated adding of aware doas to qualifying decorator chains',
+      documentation: 'Enables automated adding of property-related DAO decorators to qualifying decorator chains',
       name: 'enableAware',
       class: 'Boolean',
       value: true
