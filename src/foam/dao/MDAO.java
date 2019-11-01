@@ -48,7 +48,6 @@ public class MDAO
   protected Object   state_ = null;
   protected Object   writeLock_ = new Object();
   protected Set      unindexed_ = new HashSet();
-  long count = 0;
 
   public MDAO(ClassInfo of) {
     setOf(of);
@@ -90,9 +89,7 @@ public class MDAO
   }
 
   public FObject objOut(FObject obj) {
-    //    System.err.println("objOut.maybeClone() "+getOf().getId()+" "+(count++));
     return obj;
-    //    return AbstractFObject.maybeClone(obj);
   }
 
   public FObject put_(X x, FObject obj) {
