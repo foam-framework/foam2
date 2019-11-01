@@ -250,11 +250,6 @@ if ( getNSpec() != null &&
   logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authorized, or ReadOnly");
 }
 
-if ( getPermissioned() &&
-     ( getNSpec() != null && getNSpec().getServe() ) ) {
-  delegate = new foam.nanos.auth.PermissionedPropertyDAO.Builder(getX()).setDelegate(delegate).build();
-}
-
 if ( getReadOnly() ) {
   delegate = new foam.dao.ReadOnlyDAO.Builder(getX()).setDelegate(delegate).build();
 }
@@ -371,6 +366,7 @@ return delegate;
       value: false
     },
     {
+<<<<<<< HEAD
       documentation: 'Sets the inner dao to a nullDAO',
       class: 'Boolean',
       name: 'nullify',
@@ -394,6 +390,8 @@ return delegate;
       name: 'validator'
     },
     {
+=======
+>>>>>>> 437b29bd6800a2ef4a1eadaa5beae530512450d5
       /** Enable value de-duplication to save memory when caching. */
       class: 'Boolean',
       name: 'dedup',
