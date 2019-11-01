@@ -158,7 +158,7 @@ foam.CLASS({
         this.clearProperty('originalPassword');
         this.clearProperty('newPassword');
         this.clearProperty('confirmationPassword');
-        if ( this.token ) window.history.replaceState(null, null, window.location.origin+'/#reset');
+        if ( this.token ) window.history.replaceState(null, null, window.location.origin + '/#reset');
       }
     },
     function initE() {
