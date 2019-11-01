@@ -220,6 +220,7 @@ FOAM_FILES([
   { name: "foam/nanos/ruler/RulerProbe" },
   { name: "foam/nanos/ruler/UserRefines" },
   { name: "foam/nanos/ruler/predicate/PropertyChangePredicate" },
+  { name: "foam/nanos/ruler/action/ThrowErrorAction" },
   { name: "foam/nanos/test/EchoService" },
   { name: "foam/nanos/test/SerializationTestEchoService" },
   { name: "foam/nanos/analytics/Foldable" },
