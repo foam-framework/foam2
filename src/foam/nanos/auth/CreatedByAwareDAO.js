@@ -30,7 +30,6 @@ foam.CLASS({
         // only set created by if object does not exist in DAO yet
         if ( obj instanceof CreatedByAware && getDelegate().find_(x, obj) == null ) {
           User user = (User) x.get("user");
-          if ( obj.isFrozen() ) obj = obj.fclone();
           ((CreatedByAware) obj).setCreatedBy(user.getId());
         }
         return super.put_(x, obj);

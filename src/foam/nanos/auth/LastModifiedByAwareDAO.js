@@ -22,7 +22,6 @@ foam.CLASS({
         if ( obj instanceof LastModifiedByAware ) {
           User user = (User) x.get("user");
           User agent = (User) x.get("agent");
-          if ( obj.isFrozen() ) obj = obj.fclone();
           ((LastModifiedByAware) obj).setLastModifiedBy(agent != null ? agent.getId() : user.getId());
         }
         return super.put_(x, obj);
