@@ -275,7 +275,6 @@ foam.CLASS({
         }
 
         // Validate the password against the password policy
-        
         passwordPolicy.validate(user, potentialPassword);
       `
     },
