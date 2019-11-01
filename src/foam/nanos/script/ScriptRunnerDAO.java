@@ -54,19 +54,18 @@ public class ScriptRunnerDAO
       ((Agency) x.get("threadPool")).submit(x, new ContextAgent() {
         @Override
         public void execute(X y) {
-          Script s = script;
           try {
-            s.setStatus(ScriptStatus.RUNNING);
-            s = (Script) getDelegate().put_(x, s).fclone();
-            s.runScript(x);
-            s.setStatus(ScriptStatus.UNSCHEDULED);
+            script.setStatus(ScriptStatus.RUNNING);
+            getDelegate().put_(x, script).fclone();
+            script.runScript(x);
+            script.setStatus(ScriptStatus.UNSCHEDULED);
           } catch(Throwable t) {
-            s.setStatus(ScriptStatus.ERROR);
+            script.setStatus(ScriptStatus.ERROR);
             t.printStackTrace();
-            log.error("Script.run", s.getId(), t);
+            log.error("Script.run", script.getId(), t);
           }
           // save the state
-          getDelegate().put_(x, s);
+          getDelegate().put_(x, script);
 
           latch.countDown();
         }
