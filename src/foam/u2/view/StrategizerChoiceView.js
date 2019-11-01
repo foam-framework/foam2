@@ -49,7 +49,7 @@ foam.CLASS({
               }
 
               return arr.concat([[sr.strategy.id, sr.strategy.name]]);
-            }, [])
+            }, [[null, 'Select...']])
             .filter(x => x);
         })
       }
