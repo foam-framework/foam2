@@ -231,7 +231,7 @@ public class RuleEngine extends ContextAwareSupport {
    * @return Reloaded object
    */
   private FObject reloadObject(FObject obj, FObject oldObj, FObject nu, boolean greedy) {
-    FObject old = oldObj;
+    FObject old = (FObject) oldObj.fclone();
     if ( old == null ) {
       try {
         old = obj.getClass().newInstance();
