@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'ChangePasswordView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Controller',
 
   documentation: `Change Password View: managing two states.
   State one) ResetPassword:  redirect from email link, with a token to update forgotten password,
@@ -32,23 +32,23 @@ foam.CLASS({
   ],
 
   css: `
-    ^ .centerVerticle{
+    ^ .centerVertical {
       max-width: 30vw;
       margin: 0 auto;
     }
-    ^ .logoCenterVerticle {
+
+    ^ .logoCenterVertical {
       margin: 0 auto;
       text-align: center;
       display: block;
     }
-    ^ .horizontal{
+    ^ .horizontal {
       padding: 0 0 1vh 2vh;
       max-width: 98%;
     }
-    ^ .logoHorizontal{
+    ^ .logoHorizontal {
       padding-left: 2vh;
     }
-
     ^ .top-bar {
       background: /*%PRIMARY1%*/ #202341;
       width: 100%;
@@ -166,32 +166,30 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .startContext({ data: this })
           .start().addClass('top-bar').show(this.topBarShow)
             .start('img')
               .attr('src', this.theme.logo)
               .callIfElse( this.horizontal, function() {
                 this.addClass('logoHorizontal');
               }, function() {
-                this.addClass('logoCenterVerticle');
+                this.addClass('logoCenterVertical');
               })
             .end()
           .end()
           .start()
-          .callIfElse( this.horizontal, function() {
-            this.addClass('horizontal');
-          }, function() {
-            this.addClass('centerVerticle');
-          })
+            .callIfElse( this.horizontal, function() {
+              this.addClass('horizontal');
+            }, function() {
+              this.addClass('centerVertical');
+            })
             .start(this.SectionView, {
               data: this,
               sectionName: 'resetPasswordSection'
             }).end()
             .br().br()
-            .start(this.UPDATE_PASSWORD).end()
-            .start(this.RESET_PASSWORD).end()
-          .end()
-        .endContext();
+            .tag(this.UPDATE_PASSWORD)
+            .tag(this.RESET_PASSWORD)
+          .end();
       }
   ],
 
