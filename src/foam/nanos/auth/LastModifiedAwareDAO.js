@@ -28,6 +28,7 @@ foam.CLASS({
       },
       javaCode: `
         if ( obj instanceof LastModifiedAware ) {
+          if ( obj.isFrozen() ) obj = obj.fclone();
           ((LastModifiedAware) obj).setLastModified(Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime());
         }
         return super.put_(x, obj);

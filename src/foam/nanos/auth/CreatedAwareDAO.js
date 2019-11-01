@@ -33,6 +33,7 @@ foam.CLASS({
       javaCode: `
         // only set created if object does not exist in DAO yet
         if ( obj instanceof CreatedAware && getDelegate().find_(x, obj) == null ) {
+          if ( obj.isFrozen() ) obj = obj.fclone();
           ((CreatedAware) obj).setCreated(Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime());
         }
         return super.put_(x, obj);
