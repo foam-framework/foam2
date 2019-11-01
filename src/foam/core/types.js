@@ -494,7 +494,11 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'unitPropName'
+      name: 'unitPropName',
+      value: 'denomination',
+      documentation: `
+        The name of the property of a model that contains the denomination String.
+      `
     }
   ]
 });

@@ -145,9 +145,10 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(value, obj, axiom) {
-        if ( axiom.unitPropName ) {
-          var unitProp = obj.cls_.getAxiomByName(axiom.unitPropName);
+        var unitProp = obj.cls_.getAxiomByName(axiom.unitPropName);
+        if ( unitProp ) {
           var unitId = unitProp.f(obj);
+          // TODO: replace currencyDAO with unitDAO
           obj.__context__.currencyDAO.find(unitId).then((unit) => {
             var formatted = unit.format(value);
             this.start()
@@ -156,13 +157,11 @@ foam.CLASS({
             this.tooltip = formatted;
           });
         } else {
-          var formatted = '$' + (value/100).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+          console.warn(obj.cls_.name, 'doen not have the property: ', axiom.unitPropName);
           this.start()
-            .style({'text-align': 'left', 'padding-right': '20px'})
-            .add(formatted)
+            .add(value)
           .end();
-          this.tooltip = formatted;
-        }
+        }    
       }
     }
   ]
