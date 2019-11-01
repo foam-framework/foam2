@@ -111,6 +111,8 @@ FOAM_FILES([
   { name: "foam/nanos/u2/navigation/BusinessLogoView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/UserView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/SubMenuBar", flags: ['web'] },
+  { name: "foam/nanos/u2/navigation/ApplicationLogoView", flags: ['web'] },
+  { name: "foam/nanos/u2/navigation/UserInfoNavigationView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/NotificationMenuItem", flags: ['web'] },
   { name: "foam/nanos/script/Language" },
   { name: "foam/nanos/script/ScriptStatus" },
