@@ -256,7 +256,7 @@ foam.CLASS({
 
         // Retrieve the password policy from the user and group when available
         if ( user != null ) {
-          Group ancestor = user.findGroup(x);
+          Group ancestor = (Group) x.get("group");
           if ( ancestor != null ) {
             // Check password policy
             passwordPolicy = ancestor.getPasswordPolicy();
