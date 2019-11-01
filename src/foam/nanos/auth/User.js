@@ -448,7 +448,8 @@ foam.CLASS({
       documentation: 'The date and time of when the User was created in the system.',
       createMode: 'HIDDEN',
       updateMode: 'RO',
-      section: 'administrative'
+      section: 'administrative',
+      includeInDigest: true
     },
     {
       class: 'DateTime',
