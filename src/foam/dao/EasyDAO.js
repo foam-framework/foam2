@@ -567,7 +567,7 @@ return delegate;
       generateJava: false
     },
     {
-      documentation: 'Enables automated adding of aware doas to qualifying decorator chains',
+      documentation: 'Enables automated adding of property-related DAO decorators to qualifying decorator chains',
       name: 'enableAware',
       class: 'Boolean',
       value: true
@@ -575,7 +575,7 @@ return delegate;
     {
       name: 'serviceProviderAware',
       class: 'Boolean',
-      javaFactory: 'return !getEnableAware() ? false : foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass());'
+      javaFactory: 'return getEnableAware() && foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
       name: 'deletedAware',
