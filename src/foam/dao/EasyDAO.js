@@ -575,7 +575,7 @@ return delegate;
     {
       name: 'serviceProviderAware',
       class: 'Boolean',
-      javaFactory: 'return !getEnableAware() ? false : foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass());'
+      javaFactory: 'return getEnableAware() && foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
       name: 'deletedAware',
