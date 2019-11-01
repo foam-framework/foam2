@@ -228,11 +228,6 @@ foam.CLASS({
       value: false
     },
     {
-      class: 'Boolean',
-      name: 'includeInSignature',
-      value: false
-    },
-    {
       class: 'String',
       name: 'javaValidateObj',
       expression: function(validationPredicates) {

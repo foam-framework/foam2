@@ -107,8 +107,9 @@ foam.CLASS({
       tableWidth: 50,
       createMode: 'HIDDEN',
       updateMode: 'RO',
-      section: 'administrative'
-    },
+      section: 'administrative',
+      includeInDigest: true
+   },
     {
       class: 'Boolean',
       name: 'enabled',
@@ -143,14 +144,16 @@ foam.CLASS({
         }
       },
       gridColumns: 4,
-      section: 'personal'
-    },
+      section: 'personal',
+      includeInDigest: true
+   },
     {
       class: 'String',
       name: 'middleName',
       documentation: 'The middle name of the User.',
       gridColumns: 4,
-      section: 'personal'
+      section: 'personal',
+      includeInDigest: true
     },
     {
       class: 'String',
@@ -163,7 +166,8 @@ foam.CLASS({
         }
       },
       gridColumns: 4,
-      section: 'personal'
+      section: 'personal',
+      includeInDigest: true
     },
     {
       name: 'legalName',
@@ -204,6 +208,7 @@ foam.CLASS({
       preSet: function(_, val) {
         return val.toLowerCase();
       },
+      includeInDigest: true,
       javaSetter:
       `email_ = val.toLowerCase();
        emailIsSet_ = true;`,
@@ -259,7 +264,8 @@ foam.CLASS({
         return this.Phone.create();
       },
       view: { class: 'foam.u2.detail.VerticalDetailView' },
-      section: 'personal'
+      section: 'personal',
+      includeInDigest: true
     },
     {
       class: 'String',
@@ -345,7 +351,8 @@ foam.CLASS({
       documentation: 'The password that is currently active with the User.',
       hidden: true,
       networkTransient: true,
-      section: 'administrative'
+      section: 'administrative',
+      includeInDigest: true
     },
     {
       name: 'passwordHistory',
