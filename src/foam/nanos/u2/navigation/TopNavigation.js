@@ -141,7 +141,7 @@ foam.CLASS({
       this
         .start()
           .addClass('logged-in-container')
-          .tag({ class: 'foam.nanos.u2.navigation.ApplicationLogoView' })
+          .tag({ class: 'foam.nanos.u2.navigation.BusinessLogoView' })
           .start(this.MenuBar, { menuName: this.group ? this.group.rootMenu : '' })
             .addClass('menuBar')
           .end()
