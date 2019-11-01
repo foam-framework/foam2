@@ -250,6 +250,11 @@ if ( getNSpec() != null &&
   logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authorized, or ReadOnly");
 }
 
+if ( getPermissioned() &&
+     ( getNSpec() != null && getNSpec().getServe() ) ) {
+  delegate = new foam.nanos.auth.PermissionedPropertyDAO.Builder(getX()).setDelegate(delegate).build();
+}
+
 if ( getReadOnly() ) {
   delegate = new foam.dao.ReadOnlyDAO.Builder(getX()).setDelegate(delegate).build();
 }
