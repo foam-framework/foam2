@@ -20,7 +20,6 @@ foam.CLASS({
         }
         return this.delegate.find_(x, obj).then(function(result) {
           if ( result == null ) {
-            obj = obj.fclone();
             obj.createdBy = x.user.id;
           }
           return this.delegate.put_(x, obj);
