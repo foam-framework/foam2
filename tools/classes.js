@@ -162,6 +162,7 @@ var classes = [
   'foam.dao.PMDAO',
   'foam.nanos.pm.PMInfo',
   'foam.dao.PutOnlyDAO',
+  'foam.dao.UnsafeXDAO',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',

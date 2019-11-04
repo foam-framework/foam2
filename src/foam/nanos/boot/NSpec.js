@@ -202,6 +202,14 @@ foam.CLASS({
         try {
           shell.set("x", x);
           Object service = shell.eval(getServiceScript());
+
+          if ( service instanceof foam.dao.DAO ) {
+            service = new foam.dao.UnsafeXDAO.Builder(x)
+              .setDelegate((DAO) service)
+              .setNspecName(getName())
+              .build();
+          }
+
           saveService(x, service);
           return service;
         } catch (EvalError e) {
