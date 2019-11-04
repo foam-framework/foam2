@@ -27,15 +27,9 @@ foam.CLASS({
       factory: function() {
         return this.property ? this.property.forClass_ : null;
       },
-      view: function(_, X) {
-        var choicesSlot = foam.core.SimpleSlot.create({ value: [] });
-        X.strategizer.query(null, 'foam.Class').then((strategyReferences) => {
-          choicesSlot.set([[null, 'Select...']].concat(strategyReferences.map((sr) => [sr.strategy, sr.strategy.name])));
-        });
-        return {
-          class: 'foam.u2.view.ChoiceView',
-          choices$: choicesSlot
-        };
+      view: {
+        class: 'foam.u2.view.StrategizerChoiceView',
+        desiredModelId: 'foam.Class'
       }
     },
     {

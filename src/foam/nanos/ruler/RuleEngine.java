@@ -12,6 +12,7 @@ import foam.nanos.auth.LastModifiedAware;
 import foam.nanos.auth.LastModifiedByAware;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
+import foam.util.SafetyUtil;
 
 import java.lang.Exception;
 import java.time.Duration;
@@ -231,7 +232,7 @@ public class RuleEngine extends ContextAwareSupport {
    * @return Reloaded object
    */
   private FObject reloadObject(FObject obj, FObject oldObj, FObject nu, boolean greedy) {
-    FObject old = oldObj;
+    FObject old = (FObject) SafetyUtil.deepClone(oldObj);
     if ( old == null ) {
       try {
         old = obj.getClass().newInstance();

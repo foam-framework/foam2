@@ -44,7 +44,7 @@ public class ThreadPoolAgency
       try {
         agent_.execute(x_);
       } catch (Throwable t) {
-        logger.error(this.getClass(), t.getMessage());
+        logger.error(this.getClass(), t.getMessage(), t);
       } finally {
         incrExecuting(-1);
         incrExecuted();

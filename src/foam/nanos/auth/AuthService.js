@@ -25,7 +25,6 @@ foam.INTERFACE({
     and the methods relating to authorization are:
 
       * check
-      * checkUserPermission
       * checkUser
   `,
 
@@ -169,33 +168,6 @@ foam.INTERFACE({
         {
           name: 'permission',
           type: 'String'
-        }
-      ]
-    },
-    // TODO: Remove this. We just need one method that checks a permission
-    // string. We don't need a second method that works for
-    // java.security.Permissions specifically.
-    {
-      name: 'checkUserPermission',
-      documentation: `
-        Like the 'checkUser' method, but with a different type for the third
-        method.
-      `,
-      type: 'Boolean',
-      async: true,
-      swiftThrows: true,
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'user',
-          type: 'foam.nanos.auth.User'
-        },
-        {
-          name: 'permission',
-          javaType: 'java.security.Permission'
         }
       ]
     },
