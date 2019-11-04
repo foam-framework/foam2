@@ -185,7 +185,7 @@ foam.CLASS({
       `
     },
     {
-      name: 'checkUserPermission',
+      name: 'checkUser',
       documentation: `Checks if the user passed into the method has the passed
         in permission attributed to it by checking their group. No check on User
         and group enabled flags.`,
@@ -276,12 +276,6 @@ foam.CLASS({
 
         // Validate the password against the password policy
         passwordPolicy.validate(user, potentialPassword);
-      `
-    },
-    {
-      name: 'checkUser',
-      javaCode: `
-        return checkUserPermission(x, user, new AuthPermission(permission));
       `
     },
     {
