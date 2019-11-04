@@ -135,12 +135,6 @@ foam.CLASS({
       javaCode: `
       return false;
       `
-    },
-    {
-      name: 'getPermissionPrefix',
-      javaCode: `
-      return "";
-      `
     }
   ]
 })
