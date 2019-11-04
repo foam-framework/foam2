@@ -94,16 +94,8 @@ foam.CLASS({
           Logger logger = (Logger) x.get("logger");
           logger.error("check", permission, e);
         }
-      } 
-        }
 
         return getDelegate().checkUser(x, user, permission);
-      `
-    },
-    {
-      name: 'checkUserPermission',
-      javaCode: `
-      return checkUser( x, user, permission.getName() );
       `
     }
   ]
