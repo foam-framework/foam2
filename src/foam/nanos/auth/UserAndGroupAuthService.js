@@ -206,7 +206,7 @@ foam.CLASS({
             if ( group == null ) break;
 
             // check permission
-            if ( group.implies(x, permission) ) return true;
+            if ( group.implies(x, new AuthPermission(permission)) ) return true;
 
             // check parent group
             groupId = group.getParent();
