@@ -147,7 +147,7 @@ foam.CLASS({
       value: function(value, obj, axiom) {
         var unitProp = obj.cls_.getAxiomByName(axiom.unitPropName);
         if ( unitProp ) {
-          var unitId = unitProp.f(obj);
+          var unitId = obj[unitProp.name];
           // TODO: replace currencyDAO with unitDAO
           obj.__context__.currencyDAO.find(unitId).then((unit) => {
             var slot = obj.slot(axiom.name).map((propValue) => unit.format(propValue));
