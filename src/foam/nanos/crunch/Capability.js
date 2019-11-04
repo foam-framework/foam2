@@ -129,11 +129,11 @@ foam.CLASS({
           if ( this.stringImplies(permissionName, permission) ) return true; 
         }
 
-        List<CapabilityCapabilityJunction> prereqs = ((ArraySink) this.getPrerequisites(x).getJunctionDAO().where(EQ(CapabilityCapabilityJunction.TARGET_ID, (String) this.getId())).select(new ArraySink())).getArray();
+        List<CapabilityCapabilityJunction> prereqs = ((ArraySink) this.getPrerequisites(x).getJunctionDAO().where(EQ(CapabilityCapabilityJunction.SOURCE_ID, (String) this.getId())).select(new ArraySink())).getArray();
 
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         for ( CapabilityCapabilityJunction prereqJunction : prereqs ) {
-          Capability capability = (Capability) capabilityDAO.find(prereqJunction.getSourceId());
+          Capability capability = (Capability) capabilityDAO.find(prereqJunction.getTargetId());
           if ( capability.implies(x, permission) ) return true;
         }
         return false;

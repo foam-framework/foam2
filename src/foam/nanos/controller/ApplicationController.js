@@ -201,11 +201,23 @@ foam.CLASS({
       of: 'foam.nanos.theme.Theme',
       name: 'theme'
     },
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'topNavigation_',
+      factory: function() {
+        return this.TopNavigation;
+      }
+    },
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'footerView_',
+      factory: function() {
+        return this.FooterView;
+      }
+    },
     'currentMenu',
     'lastMenuLaunched',
-    'webApp',
-    'topNavigation_',
-    'footerView_'
+    'webApp'
   ],
 
   methods: [
@@ -253,8 +265,8 @@ foam.CLASS({
         this.fetchTheme().then(() => {
           this
             .addClass(this.myClass())
-            .start('div', null, this.topNavigation_$)
-              .tag(this.TopNavigation)
+            .start()
+              .tag(this.topNavigation_)
             .end()
             .start()
               .addClass('stack-wrapper')
@@ -264,8 +276,8 @@ foam.CLASS({
                 showActions: false
               })
             .end()
-            .start('div', null, this.footerView_$)
-              .tag(this.FooterView)
+            .start()
+              .tag(this.footerView_)
             .end();
           });
       });
@@ -475,14 +487,12 @@ foam.CLASS({
       /** Use custom elements if supplied by the Theme. */
       if ( ! this.theme ) throw new Error(this.LOOK_AND_FEEL_NOT_FOUND);
 
-      if ( this.theme.topNavigation && this.topNavigation_ ) {
-        this.topNavigation_.removeAllChildren();
-        this.topNavigation_.tag({ class: this.theme.topNavigation });
+      if ( this.theme.topNavigation ) {
+        this.topNavigation_ = this.theme.topNavigation;
       }
 
-      if ( this.theme.footerView && this.footerView_ ) {
-        this.footerView_.removeAllChildren();
-        this.footerView_.tag({ class: this.theme.footerView });
+      if ( this.theme.footerView ) {
+        this.footerView_ = this.theme.footerView;
       }
     },
     {

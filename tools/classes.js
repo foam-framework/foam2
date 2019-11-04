@@ -389,8 +389,9 @@ var classes = [
   'foam.nanos.http.DefaultHttpParameters',
   'foam.nanos.http.HttpParameters',
   'foam.nanos.dig.DIG',
-  'foam.nanos.dig.DUG',
   'foam.nanos.dig.SUGAR',
+  'foam.nanos.dig.DUGRule',
+  'foam.nanos.dig.DUGRuleAction',
 
   'foam.nanos.jetty.HttpServer',
   'foam.nanos.servlet.Servlet',
@@ -487,7 +488,9 @@ var classes = [
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
-
+  //Unit
+  'foam.core.Unit',
+  'foam.core.Currency',
   // Strategy
   'foam.strategy.StrategyReference',
   'foam.strategy.StrategizerService',

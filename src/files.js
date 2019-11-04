@@ -709,5 +709,8 @@ FOAM_FILES([
   { name: "foam/strategy/StrategyReference" },
   { name: "foam/strategy/StrategizerService" },
   { name: "foam/strategy/BasicStrategizer" },
-  { name: "foam/strategy/ClientStrategizerService" }
+  { name: "foam/strategy/ClientStrategizerService" },
+
+  { name: "foam/core/Unit" },
+  { name: "foam/core/Currency" },
 ]);
