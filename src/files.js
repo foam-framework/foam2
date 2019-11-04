@@ -432,6 +432,7 @@ FOAM_FILES([
   { name: "foam/u2/history/HistoryView", flags: ['web'] },
   { name: "foam/u2/view/ValueView", flags: ['web'] },
   { name: "foam/u2/view/PreView", flags: ['web'] },
+  { name: "foam/u2/view/TableCellFormatterReadView", flags: ['web'] },
   { name: "foam/u2/view/FObjectView", flags: ['web'] },
   { name: "foam/u2/view/CollapseableDetailView", flags: ['web'] },
   { name: "foam/u2/view/ReadReferenceView", flags: ['web'] },
@@ -706,5 +707,8 @@ FOAM_FILES([
   { name: "foam/strategy/StrategyReference" },
   { name: "foam/strategy/StrategizerService" },
   { name: "foam/strategy/BasicStrategizer" },
-  { name: "foam/strategy/ClientStrategizerService" }
+  { name: "foam/strategy/ClientStrategizerService" },
+
+  { name: "foam/core/Unit" },
+  { name: "foam/core/Currency" },
 ]);

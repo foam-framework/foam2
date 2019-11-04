@@ -81,6 +81,17 @@ foam.CLASS({
       displayWidth: 60
     },
     {
+      class: 'Image',
+      name: 'largeLogo',
+      documentation: 'A large logo to display in the application.',
+      displayWidth: 60
+    },
+    {
+      class: 'Boolean',
+      name: 'largeLogoEnabled',
+      documentation: 'Uses largeLogo image on various views instead of logo.'
+    },
+    {
       class: 'String',
       name: 'topNavigation',
       documentation: 'A custom top nav view to use.',

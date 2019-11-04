@@ -233,7 +233,7 @@ foam.CLASS({
       for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
         UserCapabilityJunction ucJunction = (UserCapabilityJunction) getDelegate().find(AND(
           EQ(UserCapabilityJunction.SOURCE_ID, ((UserCapabilityJunction) obj).getSourceId()),
-          EQ(UserCapabilityJunction.TARGET_ID, ((CapabilityCapabilityJunction) ccJunction).getId())));
+          EQ(UserCapabilityJunction.TARGET_ID, ((CapabilityCapabilityJunction) ccJunction).getTargetId())));
         if ( ucJunction == null ) {
           UserCapabilityJunction junction = new UserCapabilityJunction();
           junction.setSourceId(((UserCapabilityJunction) obj).getSourceId());
@@ -270,9 +270,9 @@ foam.CLASS({
         if (!cap.getEnabled()) continue;
         UserCapabilityJunction ucJunction = (UserCapabilityJunction) getDelegate().find(AND(
           EQ(UserCapabilityJunction.SOURCE_ID, ((UserCapabilityJunction) obj).getSourceId()),
-          EQ(UserCapabilityJunction.TARGET_ID, cap.getId())
+          EQ(UserCapabilityJunction.TARGET_ID, (String) ccJunction.getTargetId())
         ));
-        if ( ucJunction == null || ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED ) return false;
+        if ( ucJunction != null && ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED ) return false;
       }
       return true;
       `

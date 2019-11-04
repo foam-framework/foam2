@@ -137,8 +137,8 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2.view',
-  name: 'CurrencyTableCellFormatterRefinement',
-  refines: 'foam.core.Currency',
+  name: 'UnitValueTableCellFormatterRefinement',
+  refines: 'foam.core.UnitValue',
 
   properties: [
     {
@@ -230,6 +230,7 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(value) {
+        value = Math.round(value);
         var hours = Math.floor(value / 3600000);
         value -= hours * 3600000;
         var minutes = Math.floor(value / 60000);

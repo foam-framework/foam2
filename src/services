@@ -399,7 +399,6 @@ p({
   "serviceScript": "return new foam.nanos.dig.DigWebAgent()"
 })
 
-p({"class":"foam.nanos.boot.NSpec", "name":"dugDAO",                            "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setGuid(true).setOf(foam.nanos.dig.DUG.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"dugs\").setDecorator(new foam.nanos.dig.DUGDAO(x)).build();","client":"{\"of\":\"foam.nanos.dig.DUG\"}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"digDAO",                            "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setGuid(true).setOf(foam.nanos.dig.DIG.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"digs\").build();","client":"{\"of\":\"foam.nanos.dig.DIG\",\"decorators\": [{\"class\":\"foam.nanos.fs.FileDAODecorator\"},{\"class\":\"foam.nanos.fs.FileArrayDAODecorator\"}]}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"demoObjectDAO",                      "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"demoObjects\").setGuid(true).setOf(foam.nanos.demo.DemoObject.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.demo.DemoObject\", \"remoteListenerSupport\": false}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"fileDAO",                            "serve":true,  "serviceScript":"return new foam.dao.PMDAO(x, new foam.dao.KeyValueDAO.Builder(x).setDelegate(new foam.dao.GUIDDAO(new foam.dao.java.JDAO(x, foam.nanos.fs.File.getOwnClassInfo(), \"files\"))).build());","client":"{\"of\":\"foam.nanos.fs.File\",\"cache\":false,\"decorators\": [{\"class\":\"foam.blob.BlobServiceDecorator\"}]}"})
@@ -482,6 +481,7 @@ p({
       .setOf(foam.nanos.ruler.Rule.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("rules")
+      .setRuler(false)
       .build();
     return new foam.dao.ValidatingDAO(x, ed);
   """,
@@ -727,4 +727,29 @@ p({
       .build();
   """,
   "client": "{\"of\": \"foam.nanos.rope.ROPE\", \"remoteListenerSupport\": false}"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "currencyDAO",
+  "serve": true,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("currencies")
+      .setPm(true)
+      .setPipelinePm(true)
+      .setOf(foam.core.Currency.getOwnClassInfo())
+      .setName("currency")
+      .setIndex(new foam.core.PropertyInfo[] {foam.core.Currency.COUNTRY})
+      .build();
+  """,
+  "client":
+  """
+    {
+      "of": "foam.core.Currency",
+      "cache": true
+    }
+  """
 })
