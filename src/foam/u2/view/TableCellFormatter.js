@@ -155,7 +155,7 @@ foam.CLASS({
             this.tooltip$.follow(slot);
           });
         } else {
-          console.warn(obj.cls_.name, 'doen not have the property: ', axiom.unitPropName);
+          console.warn(obj.cls_.name, ' does not have the property: ', axiom.unitPropName);
           this.add(value);
         }    
       }
