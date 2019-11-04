@@ -39,6 +39,7 @@ foam.CLASS({
     'foam.util.Password',
     'foam.util.SafetyUtil',
 
+    'java.security.Permission',
     'java.util.Calendar',
     'java.util.regex.Pattern',
     'javax.security.auth.AuthPermission',
@@ -223,7 +224,7 @@ foam.CLASS({
       javaCode: `
         if ( x == null || permission == null ) return false;
 
-        java.security.Permission p = new AuthPermission(permission);
+        Permission p = new AuthPermission(permission);
 
         try {
           Group group = getCurrentGroup(x);
