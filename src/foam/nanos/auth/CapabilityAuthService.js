@@ -26,7 +26,6 @@ foam.CLASS({
     'foam.nanos.session.Session',
     'java.util.Date',
     'java.util.List',
-    'javax.security.auth.AuthPermission',
     'static foam.mlang.MLang.*'
   ],
 
