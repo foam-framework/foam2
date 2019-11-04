@@ -618,6 +618,8 @@ FOAM_FILES([
   { name: "foam/test/AllSerializableProperties" },
   { name: "foam/test/TestEnum" },
   { name: "foam/test/TestObj" },
+  { name: "foam/test/testdata/TestDataPopulator" },
+  { name: "foam/test/testdata/generators" },
   { name: "foam/core/FObjectTest" },
   { name: "com/google/foam/demos/bubbles/Bubbles" },
   { name: "com/google/foam/demos/u2/AllViews" },
