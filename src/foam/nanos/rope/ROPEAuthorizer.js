@@ -87,6 +87,7 @@ foam.CLASS({
     {
       name: 'authorizeOnCreate',
       javaCode: `
+        // TODO remove after SystemAuthorizer is created
         if ( ((User) x.get("user")).getId() == User.SYSTEM_USER_ID ) return;
     
         List<String> propertiesUpdated = getPropertiesUpdated(null, obj);
@@ -100,6 +101,7 @@ foam.CLASS({
     {
       name: 'authorizeOnRead',
       javaCode: `
+        // TODO remove after SystemAuthorizer is created
         if ( ((User) x.get("user")).getId() == User.SYSTEM_USER_ID ) return;
         if ( ! authorizeByRope(x, obj, getTargetDAOKey(), "read", "") ) throw new AuthorizationException("You don't have permission to read this object");
       `
@@ -107,6 +109,7 @@ foam.CLASS({
     {
       name: 'authorizeOnUpdate',
       javaCode: `
+        // TODO remove after SystemAuthorizer is created
         if ( ((User) x.get("user")).getId() == User.SYSTEM_USER_ID ) return;
     
         List<String> propertiesUpdated = getPropertiesUpdated(oldObj, newObj);
@@ -120,6 +123,7 @@ foam.CLASS({
     {
       name: 'authorizeOnDelete',
       javaCode: `
+      // TODO remove after SystemAuthorizer is created
       if ( ((User) x.get("user")).getId() == User.SYSTEM_USER_ID ) return;
       if ( ! authorizeByRope(x, obj, getTargetDAOKey(), "delete", "") ) throw new AuthorizationException("You don't have permission to delete this object");
       `
