@@ -39,6 +39,7 @@ foam.CLASS({
     'foam.util.Password',
     'foam.util.SafetyUtil',
 
+    'java.security.Permission',
     'java.util.Calendar',
     'java.util.regex.Pattern',
     'javax.security.auth.AuthPermission',
@@ -185,7 +186,7 @@ foam.CLASS({
       `
     },
     {
-      name: 'checkUserPermission',
+      name: 'checkUser',
       documentation: `Checks if the user passed into the method has the passed
         in permission attributed to it by checking their group. No check on User
         and group enabled flags.`,
@@ -205,7 +206,7 @@ foam.CLASS({
             if ( group == null ) break;
 
             // check permission
-            if ( group.implies(x, permission) ) return true;
+            if ( group.implies(x, new AuthPermission(permission)) ) return true;
 
             // check parent group
             groupId = group.getParent();
@@ -223,7 +224,7 @@ foam.CLASS({
       javaCode: `
         if ( x == null || permission == null ) return false;
 
-        java.security.Permission p = new AuthPermission(permission);
+        Permission p = new AuthPermission(permission);
 
         try {
           Group group = getCurrentGroup(x);
@@ -276,12 +277,6 @@ foam.CLASS({
 
         // Validate the password against the password policy
         passwordPolicy.validate(user, potentialPassword);
-      `
-    },
-    {
-      name: 'checkUser',
-      javaCode: `
-        return checkUserPermission(x, user, new AuthPermission(permission));
       `
     },
     {
