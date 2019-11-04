@@ -718,6 +718,7 @@ p({
   "name":"notificationConfigDAO",
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
+      .setGuid(true)
       .setPm(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("notificationConfigs")
