@@ -152,7 +152,7 @@ foam.CLASS({
           obj.__context__.currencyDAO.find(unitId).then((unit) => {
             var slot = obj.slot(axiom.name).map((propValue) => unit.format(propValue));
             this.add(slot);
-            this.tooltip$.follow(slot);
+            this.onDetach(this.tooltip$.follow(slot));
           });
         } else {
           console.warn(obj.cls_.name, ' does not have the property: ', axiom.unitPropName);
