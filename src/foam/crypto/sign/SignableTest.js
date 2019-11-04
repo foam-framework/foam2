@@ -93,20 +93,17 @@ foam.CLASS({
           PublicKey publicKey = factory.generatePublic(publicKeySpec);
 
           // sign using RSA private key
-          Signable_SignWithValidAlgorithmAndKey(input, "SHA1withRSA", privateKey);
-          Signable_SignWithValidAlgorithmAndKey(input, "SHA256withRSA", privateKey);
-          Signable_SignWithValidAlgorithmAndKey(input, "SHA384withRSA", privateKey);
-          Signable_SignWithValidAlgorithmAndKey(input, "SHA512withRSA", privateKey);
+          String SHA1withRSA    = Signable_SignWithValidAlgorithmAndKey(input, "SHA1withRSA", privateKey);
+          String SHA256withRSA  = Signable_SignWithValidAlgorithmAndKey(input, "SHA256withRSA", privateKey);
+          String SHA384withRSA  = Signable_SignWithValidAlgorithmAndKey(input, "SHA384withRSA", privateKey);
+          String SHA512withRSA  = Signable_SignWithValidAlgorithmAndKey(input, "SHA512withRSA", privateKey);
 
           // verify using RSA public key
-          Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA1withRSA", publicKey,
-              "8e50f4f383e06a91b1c8a84b7a95d21e000c6e17a5ac9955dfc8bd0d89623eae419ab8926099d10e604132a7d7edfbe34f1d5479efb7b30167c9802bcddc27a33e48efd4d1ffc53b4cbb5ddc534f713ce1036455106c830e7aec7ddcbf1e75fb40ce6b2113aec18e9e2fd90fb80538f8ffb6605fb15e0a552fbfdb57e80aa7de85a9c1a002db30e7f68f57128fc0245511cc6ecf88d165a5748ab8739e040440fa9dfc0025917531c9cf318bc104241cd22d9ace7c94c96ee056468614452c4287b94f6e3d1edbeadda50bc8cbff3455ee8ca4ba681ef4e0d9500562e921c16cf8c41a9106340858955423e0c7cb9cb68aadb4cd7e9e49f999d82039f728b376c33b40233fdcdfeb7ef9d3509f41e610014796fdc8c29bf4ff844a90cfdc4ba647b847b5f1db9ee6f6b8c6d881195234d835d71bc4dabef792f51d5c78009577876592b31746c1f10de823f97fa7d0968007f27f153685bdb7f001b9c2ec3e69c46fb23aa8817903558498157a7051494f3e06d67d51bc4e793dc7a36bac0de119bf8c80a6a77796a297910302daee4e683ed78c8ceed18d888d5de5ba38229550d8b21095574563841e1e6cf313822b7ac09cebb4f06f9f3160048ce25e3b62de02731dfd6bac8dfa5ec0612c0daa2b5e2fa878ba6ca091c191513d8797093fe26313d5b8f55c5ce0ea11b3bba7ea304ac89ad3f4d418702f48f7a5d9005cb0");
-          Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA256withRSA", publicKey,
-              "3e3620ee1877cb6aa3d4bf4c5fbd1c7d7f81348b3efb48404e36896256ce6529a0d3f1e74f9587d405835d6b34a95b2b7ec8873e62615e5425bd17dd893cb1f3e468a1ed8f123990e62db85849c389560850c55ff1677e8f5159ce7975825c35c09c51dec481c3bbdf363af276febd264039a295532605bf8fb39369f5278ee59e16c0408116389da96ab5149305d21d6f94df678409821a502439e96cce7017bbd12e9d5d87cf3f4dc0c7e5344e474c3a1dac25a38f26294b2c83d1c76ab47ed372be61e449114e815ffa9ea14b9b3039bf194b8f9f919bf6d778748dca2daea69dd54704dc36fcd6fbb33faecdbcdeb9e1d7bf5b7c19fa45c93dacfd4207d74817fb280d3346c3fe843fac8db54ebf345a0f4d6224686c088deaa112e9cf687b3bde0fca35522167ecf6ebe53f2a6e24d00530f55ace169a7dafb956fa9ef63d83ddb9b4665dbfe5d80457b8750503ba07a0464c854249aac7b1799a8eb1074be0b05016312ea396c893efc25559dc693299bd72e2a1f7e362b69c681fc49fe78b0b3782153672b4e1fc0712ac3b4b23072c4e49b2fb2438ad742483c5474fc5e8dfa5b63e11eb87d34fb7582e702433fce2719c39e6ae42ed3d32a1919543f823c4265bd79b3b62d66aa971aff3082df7a910dba66cb3600eb5704db9321d22f94ff1623c364ab387c231e64e818d7643f1ff2ea5abafa0937789ae657784");              
-          Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA384withRSA", publicKey,
-              "02453d7bc61f10df9643d9ebf767578755ebec58cb6b0e97b59061bbe62a860efb2a89c6e040204eae938da130d579775344b4dc508c29ba8e7a673c279cec6632c857f702f01d8d2688f30066536018b85fc6f88cfb1a15c6e87939e131de1d5f0a0a91e655b6c81754c8a6b8c5d0afbe1ea8308c6f74dce0043bff0213f5d44b1c483765015f605ad1e2ce5bb3db7677b2824baa61fdbc99820412c5d09997929aa4bb749b7d2e9b211ac35872b97c49271f04e55d43b013e6eba3568a219c9dfb34f93b16519f6ec2c7758fe48674438f8f8aa6dfc20e483f73d2fd2b9fbd7af552f87f0513bed7aa54e06830f6d0b9e246dcb0d7e04aa037a8a3b5abc62ebe0136037a6e1c7b539ea5086cc5b6a1359b0724e87ee9a43f550a1d42408caad3e57ccf1cf4679163627ce0fb72e5a164ad57783b0a7dd87fbf0019f7c6a1a81ae2e1725493b4dcf27556a7d012bf0a10f64ec68da53387c6436652e3d4c2a12626f80f09942fa046c0c9f517c7e5096df97f063b04bc3a63daa9b78ce15400fbcbebd8841e813a886f39d25d4619c8501699b7746314db3680a18af27985c04ba23ea5fc5ad0857472a71d370f55643e9bb64b845253e9d9197eb1078ac5d606cb69c081b3701830a1e0f7d5458794e9841571fafe7f52b28ba561c5ad4bcd69214f3515fc538dc97a72d1fe98d06165250ea67225a0516af66a352ce7c8af");
-          Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA512withRSA", publicKey,
-              "974a38cb8da01f0b4bc521db69d2239cc931d9237296e6e3ed71ff606b2ed1accb2539849aaaa1fd723e5dc2bb3eb8a6f8597eb052287b3ef2ccbd7ea94967f719a06805ffd579bc54cba6a6fc8036611d1b928b741e39a69c4f5aa16d7b5ab30191ff9e24b66863330699b2e9de84ac414335624fd1a242655923cd23ce3dbf9c7194acb52b8f20d3df684ed2a2dd9bda1f46b077d226148099e361286f6143fd9fddbb529da1239051c768ce9e4f38669ea0b1ef6b94bacee8ea5869edabdb88a1aebf0f9a0eab82b7d12062522c46ea2bf530f9248fcbd3916c602d53eca952c676d9f49d1414128c1ec2147ff40207ba3e58b4af71f66fa6bf1c7c54a95ad454ce71c3fde657292271e1fadd97392d9d66ecc24d7ecbf7864f8fd37e0ce1852d2a54deaec7e0d08db8b82d446b430f57e50481f307cabc289b36ae9059e961a41f13b9766bdd885b2a49ef33d23d537bad83b1d9c944206fa7e239dc3aa15081d478527ba1a2c21c72ddc0c8b4e11a3c61ec8155f9ba2eef53e2725fc81741a0258e2b1f41c71ccc4a6f172a2b141f794716928910f1b8a0aad570ad4d9404d177a8b8c3a1d006f2872c7db0aae0faeb487827badc233275777eea0ecff9de3017692086265d615d0f14cc23f31fce5846e9f3e63370dbf1d9d5285c20a027c7651dc210a0d28f871b6b0f8cd9b05db864c9cc076304920fbcb41cfcb3d5");
+          System.out.println(SHA1withRSA);
+          Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA1withRSA", publicKey, SHA1withRSA);
+          Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA256withRSA", publicKey, SHA256withRSA);              
+          Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA384withRSA", publicKey, SHA384withRSA);
+          Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA512withRSA", publicKey, SHA512withRSA);
 
           // sign with algorithm and private key mismatch
           Signable_SignWithMismatchedAlgorithmAndKey_InvalidKeyException(input, "SHA256withECDSA", privateKey);
@@ -123,20 +120,16 @@ foam.CLASS({
           PublicKey publicKey = factory.generatePublic(publicKeySpec);
 
           // sign using ECDSA private key
-          Signable_SignWithValidAlgorithmAndKey(input, "SHA1withECDSA", privateKey);
-          Signable_SignWithValidAlgorithmAndKey(input, "SHA256withECDSA", privateKey);
-          Signable_SignWithValidAlgorithmAndKey(input, "SHA384withECDSA", privateKey);
-          Signable_SignWithValidAlgorithmAndKey(input, "SHA512withECDSA", privateKey);
+          String SHA1withECDSA    = Signable_SignWithValidAlgorithmAndKey(input, "SHA1withECDSA", privateKey);
+          String SHA256withECDSA  = Signable_SignWithValidAlgorithmAndKey(input, "SHA256withECDSA", privateKey);
+          String SHA384withECDSA  = Signable_SignWithValidAlgorithmAndKey(input, "SHA384withECDSA", privateKey);
+          String SHA512withECDSA  = Signable_SignWithValidAlgorithmAndKey(input, "SHA512withECDSA", privateKey);
 
           // verify using ECDSA public key
-          Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA1withECDSA", publicKey,
-              "3081870241212ea902cf9be3f5730a8158117b4f89472118b403cc01f8fc1b7fe862b4a79e7a047b65397ac5674337ea0c2bec3f7a2aa69ddb07184d4b8685bd4ddb5b040715024200ccc6e8013e2b81bb14b68baa82d66e554b5d247ee689937284b2b227b18c6d052d5516c446e10e100c54e752f8201d88fdf4526d0b81ade4bb430e95726526a01a");
-          Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA256withECDSA", publicKey,
-              "308188024201d8f5a7c88984c434d8734c39ef0dc42ebe61fda81e85bf85632ff5222604329708d49979a34939121d348151192823357c33d8560546437b1abb18b798e408c2890242012413dcd6d4df9a10bbf6d925ab4a9e3fbabd053535af7c1c8899e880fce36267bbbd0e739d6cc029afbe58ba6719d61bba7bbf8ed78d9116656e606e5b7591de18");
-          Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA384withECDSA", publicKey,
-              "308187024201143d1d19954bd02ea734d14ba263293c1c9c36f1e848894e6da74e65f9f932ee8926df2271d7db866c605412e9c684e72ab12eacf15bfdb2e3b41aa93efeb7d9aa0241290eddc9fece4df415d196eef25278c515a5d4586928f2c14dfdfeb44e7feb4257cc296233522bed208b28e53dd7e73259b47b74dce4925b6aff97257236ffde70");
-          Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA512withECDSA", publicKey,
-              "30818602415ff9c28230418dbde9c35c5a67aec3edca82037e25e706161223035433a32eeb2e9d713e7455e78c19d5623b6d4155be8408d01863619f3caaf5b87afc8237f3d802411a3622db5e803c5d5d6c7b003a4baeda370d7e0fac3524b1d4fb536a8441a3184641cb974507017520e91c3b0700db5332f9daa49939eab614f99f076b71ef106e");
+          Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA1withECDSA", publicKey, SHA1withECDSA);
+          Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA256withECDSA", publicKey, SHA256withECDSA);
+          Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA384withECDSA", publicKey, SHA384withECDSA);
+          Signable_VerifyWithValidAlgorithmSignatureAndKey(input, "SHA512withECDSA", publicKey, SHA512withECDSA);
 
           // sign with algorithm and private key mismatch
           Signable_SignWithMismatchedAlgorithmAndKey_InvalidKeyException(input, "SHA256withRSA", privateKey);
@@ -147,18 +140,23 @@ foam.CLASS({
     },
     {
       name: 'Signable_SignWithValidAlgorithmAndKey',
+      type: 'String',
       args: [
         { name: 'input', type: 'FObject' },
         { name: 'algorithm', type: 'String' },
         { name: 'key', type: 'Any' }
       ],
       javaCode: `
+        String signature = null;
         try {
-          test(! SafetyUtil.isEmpty(Hex.toHexString(input.sign(algorithm, (PrivateKey) key))),
+          signature = Hex.toHexString(input.sign(algorithm, (PrivateKey) key));
+          test(! SafetyUtil.isEmpty(signature),
               "Input signed using " + algorithm + " produces correct signature");
+          
         } catch ( Throwable t ) {
           test(false, "Input signed using " + algorithm + " should not throw an exception");
         }
+        return signature;
       `
     },
     {

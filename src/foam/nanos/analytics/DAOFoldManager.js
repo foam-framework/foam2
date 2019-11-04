@@ -86,6 +86,8 @@ setCloseTimeExpr(new foam.glang.EndOfTimeSpan.Builder(getX())
             c.setCloseTime(id.getCloseTime());
             c.setKey(key);
             c.init_();
+          } else {
+            c = (Candlestick) c.fclone();
           }
 
           c.add(value, time);
