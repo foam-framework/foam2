@@ -150,17 +150,13 @@ foam.CLASS({
           var unitId = unitProp.f(obj);
           // TODO: replace currencyDAO with unitDAO
           obj.__context__.currencyDAO.find(unitId).then((unit) => {
-            var formatted = unit.format(value);
-            this.start()
-              .add(formatted)
-            .end();
-            this.tooltip = formatted;
+            var slot = obj.slot(axiom.name).map((propValue) => unit.format(propValue));
+            this.add(slot);
+            this.tooltip$.follow(slot);
           });
         } else {
           console.warn(obj.cls_.name, 'doen not have the property: ', axiom.unitPropName);
-          this.start()
-            .add(value)
-          .end();
+          this.add(value);
         }    
       }
     }
