@@ -12,6 +12,10 @@ import foam.core.X;
 import foam.nanos.logger.Logger;
 import java.io.PrintWriter;
 import java.util.concurrent.CountDownLatch;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 public class BenchmarkRunner
   extends ContextAwareSupport
@@ -23,7 +27,14 @@ public class BenchmarkRunner
   protected Boolean  reverseThreads_ = false;
   protected int       invocationCount_;
   protected Benchmark test_;
-  protected String    results_ = "";
+  protected List<Map<String, Object>> results_ = new ArrayList<Map<String, Object>>();
+
+  public static String RUN = "Run";
+  public static String THREADCOUNT = "Threads";
+  public static String OPS = "Operations/s";
+  public static String OPSPT = "Operations/s/t";
+  public static String MEMORY = "Memory MB";
+
   // Builder pattern to avoid large constructor in the case
   // we want to add more variables to this test runner later.
   //
@@ -80,7 +91,7 @@ public class BenchmarkRunner
   }
 
   protected BenchmarkRunner(X x, Builder<?> builder) {
-    setX(x);
+    setX(x.put(BenchmarkRunner.class, this));
     name_            = builder.name_;
     threadCount_     = builder.threadCount_;
     runPerThread_    = builder.runPerThread_;
@@ -133,7 +144,7 @@ public class BenchmarkRunner
   }
 
   public String getResult() {
-    return results_;
+    return formatResults();
   }
 
   @Override
@@ -153,14 +164,14 @@ public class BenchmarkRunner
       }
     }
 
-    String titles = "Run, Threads, Operations per second, Operations per second per thread,Memory";
-    results_ = titles + "\n";
-
     try {
       while ( true ) {
         // create CountDownLatch and thread group equal
         final CountDownLatch latch = new CountDownLatch(threadCount_);
         ThreadGroup group = new ThreadGroup(name_);
+        Map stats = new HashMap<String, Object>();
+        stats.put(RUN, run);
+        stats.put(THREADCOUNT, threadCount_);
 
         // set up the test
         test_.setup(x);
@@ -200,22 +211,18 @@ public class BenchmarkRunner
         float complete = (float) (threadCount_ * invocationCount_);
         float duration = ((float) (endTime - startTime) / 1000.0f);
 
-        // output CSV for graphing.
-        String result =
-          run + ", " +
-          threadCount_ + ", " +
-          (complete / duration) +", " +
-          (complete / duration / (float) threadCount_) + ", " +
-          (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) +
-          "\n";
+        stats.put(OPS, (complete / duration));
+        stats.put(OPSPT, (complete / duration) / (float) threadCount_);
+        stats.put(MEMORY, (((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())) / 1024.0 / 1024.0));
 
-        results_ += result;
+        test_.teardown(x, stats);
+        results_.add(stats);
 
         if ( runPerThread_ ) {
-          System.out.print(results_);
-          if ( logger != null ) {
-            logger.info(this.getClass().getSimpleName(), "results", results_);
-          }
+          String results = formatResults();
+          System.out.println(results);
+          logger.info(results);
+
           if ( reverseThreads_ ) {
             threadCount_--;
           } else {
@@ -227,9 +234,10 @@ public class BenchmarkRunner
           }
           run++;
         } else {
-          System.out.print(titles + "\n" + result);
+          String results = formatResults();
+          System.out.println(results);
           if ( logger != null ) {
-            logger.info(this.getClass().getSimpleName(), "result", titles, result);
+            logger.info(results);
           }
           break;
         }
@@ -240,5 +248,33 @@ public class BenchmarkRunner
         logger.error(t);
       }
     }
+  }
+
+  public String formatResults() {
+    StringBuilder csv = new StringBuilder();
+    csv.append(test_.getClass().getSimpleName());
+    csv.append(",");
+    csv.append(new java.util.Date().toString());
+    csv.append("\n");
+
+    if ( results_.size() == 0 ) {
+      csv.append("no results\n");
+    } else {
+      Map<String, Object> r = (Map<String, Object>) results_.get(0);
+      for ( Map.Entry<String, Object> entry : r.entrySet() ) {
+        csv.append(entry.getKey());
+        csv.append(",");
+      }
+      csv.append("\n");
+
+      for ( Map<String, Object> result : results_ ) {
+        for ( Map.Entry<String, Object> entry : result.entrySet() ) {
+          csv.append(entry.getValue());
+          csv.append(",");
+        }
+        csv.append("\n");
+      }
+    }
+    return csv.toString();
   }
 }
