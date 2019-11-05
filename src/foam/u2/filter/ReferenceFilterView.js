@@ -63,6 +63,16 @@ foam.CLASS({
       color: #1e1f21;
     }
 
+    ^label-loading {
+      padding: 0 16px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.33;
+      letter-spacing: normal;
+      color: #1e1f21;
+      text-align: center;
+    }
+
     ^container-option {
       display: flex;
       align-items: center;
@@ -123,7 +133,13 @@ foam.CLASS({
         var result = {};
         for ( i =0; i < referenceObjectsArray.length; i++ ) {
           if ( setOfReferenceIds.has(referenceObjectsArray[i].id) ) {
-            result[referenceObjectsArray[i].id] = referenceObjectsArray[i].toSummary();
+            var objectId = referenceObjectsArray[i].id;
+            var summary = referenceObjectsArray[i].toSummary();
+            if ( summary ) {
+              result[objectId] = summary;
+            } else {
+              result[objectId] = `ID: ${objectId}`;
+            }
           }
         }
         return result;
@@ -181,6 +197,7 @@ foam.CLASS({
           });
         });
 
+        this.isLoading = false;
         return options;
       }
     },
@@ -215,12 +232,19 @@ foam.CLASS({
 
         return this.IN(this.property, keys);
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'isLoading',
+      documentation: 'boolean tracking we are still loading info from DAO',
+      value: true
     }
   ],
 
 
   messages: [
     { name: 'LABEL_PLACEHOLDER', message: 'Search' },
+    { name: 'LABEL_LOADING', message: '- LOADING OPTIONS -' },
     { name: 'LABEL_SELECTED', message: 'SELECTED OPTIONS' },
     { name: 'LABEL_FILTERED', message: 'OPTIONS' }
   ],
@@ -233,6 +257,7 @@ foam.CLASS({
         console.error('Please specify a targetDAOKey on the reference.');
         return;
       }
+
       this.dao.select().then(function(result) {
         self.daoContents = result.array; //  gets contents from the source dao
       });
@@ -253,9 +278,9 @@ foam.CLASS({
             .end()
           .end()
         .start().addClass(self.myClass('container-filter'))
-        .add(this.slot(function(property, selectedOptions) {
+        .add(this.slot(function(property, selectedOptions, isLoading) {
           var element = this.E();
-          if ( selectedOptions.length <= 0 ) return element;
+          if ( isLoading || selectedOptions.length <= 0 ) return element;
           return element
           .start('p').addClass(self.myClass('label-section'))
             .add(self.LABEL_SELECTED)
@@ -275,8 +300,14 @@ foam.CLASS({
             });
           });
         }))
-        .add(this.slot(function(property, selectedOptions, filteredOptions) {
+        .add(this.slot(function(property, selectedOptions, filteredOptions, isLoading) {
           var element = this.E();
+          if ( isLoading ) {
+            return element
+              .start('p').addClass(self.myClass('label-loading'))
+                .add(self.LABEL_LOADING)
+              .end();
+          }
           return element
           .start('p').addClass(self.myClass('label-section'))
             .add(self.LABEL_FILTERED)

@@ -56,6 +56,16 @@ foam.CLASS({
       color: #1e1f21;
     }
 
+    ^label-loading {
+      padding: 0 16px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.33;
+      letter-spacing: normal;
+      color: #1e1f21;
+      text-align: center;
+    }
+
     ^container-option {
       display: flex;
       align-items: center;
@@ -84,6 +94,7 @@ foam.CLASS({
 
   messages: [
     { name: 'LABEL_PLACEHOLDER', message: 'Search' },
+    { name: 'LABEL_LOADING', message: '- LOADING OPTIONS -' },
     { name: 'LABEL_SELECTED', message: 'SELECTED OPTIONS' },
     { name: 'LABEL_FILTERED', message: 'OPTIONS' },
     { name: 'LABEL_EMPTY', message: '- Not Defined -' }
@@ -155,6 +166,7 @@ foam.CLASS({
           });
         });
 
+        this.isLoading = false;
         return options;
       }
     },
@@ -175,6 +187,12 @@ foam.CLASS({
       name: 'name',
       documentation: `Required by SearchManager.`,
       value: 'String search view'
+    },
+    {
+      class: 'Boolean',
+      name: 'isLoading',
+      documentation: 'boolean tracking we are still loading info from DAO',
+      value: true
     }
   ],
 
@@ -196,9 +214,9 @@ foam.CLASS({
           .end()
         .end()
         .start().addClass(self.myClass('container-filter'))
-          .add(this.slot(function(property, selectedOptions) {
+          .add(this.slot(function(property, selectedOptions, isLoading) {
             var element = this.E();
-            if ( selectedOptions.length <= 0 ) return element;
+            if ( isLoading || selectedOptions.length <= 0 ) return element;
             return element
               .start('p').addClass(self.myClass('label-section'))
                 .add(self.LABEL_SELECTED)
@@ -218,8 +236,14 @@ foam.CLASS({
                 });
               });
           }))
-          .add(this.slot(function(property, selectedOptions, filteredOptions) {
+          .add(this.slot(function(property, selectedOptions, filteredOptions, isLoading) {
             var element = this.E();
+            if ( isLoading ) {
+              return element
+                .start('p').addClass(self.myClass('label-loading'))
+                  .add(self.LABEL_LOADING)
+                .end();
+            }
             return element
               .start('p').addClass(self.myClass('label-section'))
                 .add(self.LABEL_FILTERED)
