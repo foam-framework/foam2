@@ -89,7 +89,7 @@ public class MDAO
   }
 
   public FObject objOut(FObject obj) {
-    return AbstractFObject.maybeClone(obj);
+    return obj;
   }
 
   public FObject put_(X x, FObject obj) {

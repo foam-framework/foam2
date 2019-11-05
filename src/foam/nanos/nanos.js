@@ -112,6 +112,9 @@ FOAM_FILES([
   { name: "foam/nanos/u2/navigation/BusinessLogoView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/UserView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/SubMenuBar", flags: ['web'] },
+  { name: "foam/nanos/u2/navigation/ApplicationLogoView", flags: ['web'] },
+  { name: "foam/nanos/u2/navigation/UserInfoNavigationView", flags: ['web'] },
+  { name: "foam/nanos/u2/navigation/NotificationMenuItem", flags: ['web'] },
   { name: "foam/nanos/script/Language" },
   { name: "foam/nanos/script/ScriptStatus" },
   { name: "foam/nanos/script/Script" },
@@ -193,9 +196,10 @@ FOAM_FILES([
   { name: 'foam/nanos/dig/Argument'},
   { name: 'foam/nanos/dig/ResultView' },
   { name: 'foam/nanos/dig/DIG' },
+  { name: 'foam/nanos/dig/DUGRule' },
+  { name: 'foam/nanos/dig/DUGRuleAction' },
   { name: 'foam/nanos/dig/DigFileUploadView' },
   { name: 'foam/nanos/dig/DigSnippetView' },
-  { name: 'foam/nanos/dig/DUG' },
   { name: 'foam/nanos/dig/LinkView' },
   { name: 'foam/nanos/dig/SUGAR' },
 
@@ -203,6 +207,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/email/POP3Email'},
 
   // foam/nanos/ruler
+  { name: "foam/nanos/ruler/RuleGroup" },
   { name: "foam/nanos/ruler/Operations" },
   { name: "foam/nanos/ruler/Rule" },
   { name: "foam/nanos/ruler/RuleAction" },
@@ -216,6 +221,7 @@ FOAM_FILES([
   { name: "foam/nanos/ruler/RulerProbe" },
   { name: "foam/nanos/ruler/UserRefines" },
   { name: "foam/nanos/ruler/predicate/PropertyChangePredicate" },
+  { name: "foam/nanos/ruler/Relationships" },
   { name: "foam/nanos/test/EchoService" },
   { name: "foam/nanos/test/SerializationTestEchoService" },
   { name: "foam/nanos/analytics/Foldable" },

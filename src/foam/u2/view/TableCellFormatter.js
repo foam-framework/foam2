@@ -137,18 +137,27 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2.view',
-  name: 'CurrencyTableCellFormatterRefinement',
-  refines: 'foam.core.Currency',
+  name: 'UnitValueTableCellFormatterRefinement',
+  refines: 'foam.core.UnitValue',
 
   properties: [
     {
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
-      value: function(value) {
-        this.start()
-          .style({'text-align': 'left', 'padding-right': '20px'})
-          .add('$' + (value/100).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,'))
-        .end();
+      value: function(value, obj, axiom) {
+        var unitProp = obj.cls_.getAxiomByName(axiom.unitPropName);
+        if ( unitProp ) {
+          var unitId = obj[unitProp.name];
+          // TODO: replace currencyDAO with unitDAO
+          obj.__context__.currencyDAO.find(unitId).then((unit) => {
+            var slot = obj.slot(axiom.name).map((propValue) => unit.format(propValue));
+            this.add(slot);
+            this.onDetach(this.tooltip$.follow(slot));
+          });
+        } else {
+          console.warn(obj.cls_.name, ' does not have the property: ', axiom.unitPropName);
+          this.add(value);
+        }    
       }
     }
   ]

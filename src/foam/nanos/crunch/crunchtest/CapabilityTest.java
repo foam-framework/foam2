@@ -296,47 +296,47 @@ public class CapabilityTest extends Test {
     c2 = (Capability) capabilityDAO.put_(x, c2);
 
     CapabilityCapabilityJunction j1 = new CapabilityCapabilityJunction();
-    j1.setSourceId((String) c0.getId());
-    j1.setTargetId((String) c1.getId());
+    j1.setSourceId((String) c1.getId());
+    j1.setTargetId((String) c0.getId()); //prereq
     j1 = (CapabilityCapabilityJunction) prerequisiteCapabilityJunctionDAO.put_(x, j1);
+
+    UserCapabilityJunction uj0 = new UserCapabilityJunction();
+    uj0.setSourceId(u1.getId());
+    uj0.setTargetId((String) c0.getId());
+    uj0.setData((FObject) data);
+    uj0 = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, uj0);
+    test(uj0.getStatus() == CapabilityJunctionStatus.GRANTED, "UserCapabilityJunction Status between user and c0 is granted: " + uj0.getStatus());
 
     UserCapabilityJunction uj1 = new UserCapabilityJunction();
     uj1.setSourceId(u1.getId());
-    uj1.setTargetId((String) c0.getId());
+    uj1.setTargetId((String) c1.getId());
     uj1.setData((FObject) data);
     uj1 = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, uj1);
+    test(uj1.getStatus() == CapabilityJunctionStatus.GRANTED, "UserCapabilityJunction Status between user and c1 is granted: " + uj1.getStatus());
 
     UserCapabilityJunction uj2 = new UserCapabilityJunction();
     uj2.setSourceId(u1.getId());
-    uj2.setTargetId((String) c1.getId());
+    uj2.setTargetId((String) c2.getId());
     uj2.setData((FObject) data);
     uj2 = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, uj2);
-
-    UserCapabilityJunction uj3 = new UserCapabilityJunction();
-    uj3.setSourceId(u1.getId());
-    uj3.setTargetId((String) c2.getId());
-    uj3.setData((FObject) data);
-    uj3 = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, uj3);
+    test(uj2.getStatus() == CapabilityJunctionStatus.GRANTED, "UserCapabilityJunction Status between user and c2 is granted: " + uj2.getStatus());
 
 
     CapabilityCapabilityJunction j2 = new CapabilityCapabilityJunction();
-    j2.setSourceId((String) c0.getId());
-    j2.setTargetId((String) c2.getId());
+    j2.setSourceId((String) c2.getId()); // deprecating
+    j2.setTargetId((String) c0.getId());  // deprecated
     j2 = (CapabilityCapabilityJunction) deprecatedCapabilityJunctionDAO.put_(x, j2);
 
+    uj0 = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
+      EQ(UserCapabilityJunction.SOURCE_ID, uj0.getSourceId()),
+      EQ(UserCapabilityJunction.TARGET_ID, (String) uj0.getTargetId())
+    ));
     uj1 = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
       EQ(UserCapabilityJunction.SOURCE_ID, uj1.getSourceId()),
       EQ(UserCapabilityJunction.TARGET_ID, (String) uj1.getTargetId())
     ));
-    uj2 = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
-      EQ(UserCapabilityJunction.SOURCE_ID, uj2.getSourceId()),
-      EQ(UserCapabilityJunction.TARGET_ID, (String) uj2.getTargetId())
-    ));
-    c0 = (Capability) capabilityDAO.find("c0");
-    c1 = (Capability) capabilityDAO.find("c1");
-    // test(uj1.getStatus() == CapabilityJunctionStatus.DEPRECATED, "UserCapabilityJunction Status between user and c0 is set to deprecated");
-    // test(!c0.getEnabled(), "c0 is set to disabled");
-    test(uj2.getStatus() == CapabilityJunctionStatus.GRANTED, "UserCapabilityJunction Status between user and c1 is still granted");
+
+    test(uj1.getStatus() == CapabilityJunctionStatus.GRANTED, "UserCapabilityJunction Status between user and c1 is still granted: " + uj1.getStatus());
     test(c1.getEnabled(), "c1 is still enabled");
 
   }
@@ -360,8 +360,8 @@ public class CapabilityTest extends Test {
     outer = (Capability) capabilityDAO.put_(x, outer);
     
     CapabilityCapabilityJunction prereqJunction = new CapabilityCapabilityJunction();
-    prereqJunction.setSourceId((String) inner.getId());
-    prereqJunction.setTargetId((String) outer.getId());
+    prereqJunction.setSourceId((String) outer.getId());
+    prereqJunction.setTargetId((String) inner.getId());
     prereqJunction = (CapabilityCapabilityJunction) prerequisiteCapabilityJunctionDAO.put_(x, prereqJunction);
 
     FakeTestObject data = new FakeTestObject();
@@ -419,22 +419,24 @@ public class CapabilityTest extends Test {
     prereqJunction = (CapabilityCapabilityJunction) prerequisiteCapabilityJunctionDAO.put(prereqJunction);
 
     c2 = (Capability) capabilityDAO.put(c2);
-    test(c2.implies(x, p1), "c2 implies p1");
+    test(c1.implies(x, p2), "c1 implies p2");
+
+    
 
     // test the capability.implies method where implies should return false;
-    test(!c1.implies(x, p2), "c1 does not imply p2");
+    test(!c2.implies(x, p1), "c2 does not imply p1");
 
     // test disabled capability does not imply their permissions granted
-    c2 = ((Capability) c2.fclone());
-    c2.setEnabled(false);
-    c2 = (Capability) capabilityDAO.put(c2);
-    test((!c2.implies(x, p1)) && (!c2.implies(x, p2)), "c2 disabled and does not imply p1 and p2");
+    c1 = ((Capability) c1.fclone());
+    c1.setEnabled(false);
+    c1 = (Capability) capabilityDAO.put(c1);
+    test((!c1.implies(x, p1)) && (!c1.implies(x, p2)), "c2 disabled and does not imply p1 and p2");
 
     // test re-enabled capability imply their permissions granted
-    c2 = ((Capability) c2.fclone());
-    c2.setEnabled(true);
-    c2 = (Capability) capabilityDAO.put(c2);
-    test(c2.implies(x, p1) && c2.implies(x, p2), "c2 re-enabled implies p1 and p2");
+    c1 = ((Capability) c1.fclone());
+    c1.setEnabled(true);
+    c1 = (Capability) capabilityDAO.put(c1);
+    test(c1.implies(x, p1) && c1.implies(x, p2), "c2 re-enabled implies p1 and p2");
   }
  
 }
