@@ -108,16 +108,10 @@ foam.CLASS({
     {
       name: 'getSourceObjects',
       args: [
-        {
-          name: 'x',
-          javaType: 'foam.core.X'
-        },
-        {
-          name: 'obj',
-          javaType: 'foam.core.FObject'
-        }
+        { name: 'x', javaType: 'X' },
+        { name: 'obj', javaType: 'FObject' }
       ],
-      javaType: 'List<foam.core.FObject>',
+      javaType: 'List<FObject>',
       documentation: `
       This function returns the objects in the DAO specified by sourceDAOKey that has a relationship with the obj in arguments
       `,
@@ -160,26 +154,11 @@ foam.CLASS({
     {
       name: 'retrieveProperty',
       args: [
-        {
-          name: 'obj',
-          javaType: 'FObject'
-        },
-        {
-          name: 'objClass',
-          javaType: 'Class'
-        },
-        {
-          name: 'prefix',
-          javaType: 'String'
-        },
-        {
-          name: 'propertyName',
-          javaType: 'String'
-        },
-        {
-          name: 'x',
-          javaType: 'X...'
-        }
+        { name: 'obj', javaType: 'FObject' },
+        { name: 'objClass', javaType: 'Class' },
+        { name: 'prefix', javaType: 'String' },
+        { name: 'propertyName', javaType: 'String' },
+        { name: 'x', javaType: 'X...' }
       ],
       javaType: '<T> T',
       documentation: `
@@ -212,18 +191,9 @@ foam.CLASS({
     {
       name: 'getNextRelationships',
       args: [
-        {
-          name: 'relationshipKey',
-          javaType: 'String'
-        },
-        {
-          name: 'crudKey',
-          javaType: 'String'
-        },
-        {
-          name: 'propertyKey',
-          javaType: 'String'
-        }
+        { name: 'relationshipKey', javaType: 'String' },
+        { name: 'crudKey', javaType: 'String' },
+        { name: 'propertyKey', javaType: 'String' }
       ],
       javaType: 'List<String>',
       documentation: `
