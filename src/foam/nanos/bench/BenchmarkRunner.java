@@ -236,7 +236,9 @@ public class BenchmarkRunner
         } else {
           String results = formatResults();
           System.out.println(results);
-          logger.info(results);
+          if ( logger != null ) {
+            logger.info(results);
+          }
           break;
         }
       }
