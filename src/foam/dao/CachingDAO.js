@@ -89,7 +89,8 @@ foam.CLASS({
       var proxy = this.src$proxy;
       proxy.listen(this.QuickSink.create({
         putFn: this.onSrcPut,
-        removeFn: this.onSrcRemove,
+        // TODO: figure out if this part is important
+        // removeFn: this.onSrcRemove,
         resetFn: this.onSrcReset
       }));
     },
@@ -108,8 +109,12 @@ foam.CLASS({
       are up to date. */
     function remove_(x, o) {
       var self = this;
-      return self.src.remove(o).then(function() {
-        return self.delegate.remove_(x, o);
+      return self.src.remove(o).then(removedObj => {
+        // only remove from cache and delegate if the object was actually removed (the removed object is not null)
+        if ( removedObj ){
+          this.onSrcRemove(removedObj);
+          return self.delegate.remove_(x, o);
+        }
       });
     },
     /** removeAll is executed on the cache and the source, ensuring both
