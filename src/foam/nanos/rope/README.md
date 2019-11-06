@@ -42,7 +42,7 @@ Both of the following methods of setting up a ROPE can be used in conjunction to
 
 Setting up a ROPE can be a very complicated process; but with a little time and patience it can be done. One should not worry if they cannot get into the flow of things the first time around. Remember that you only need to write it once (usually).
 
-ROPE works by checking which permissions are implied given any that a User might already have in a transitive fashion. The first thing that is checked whenever an authorization check takes place is the crud matrix. This relates an operation; create, read, update, or delete which maps to another mapping. This second mapping relates properties with lists of properties that one of which must be authorized to grant authorization to that property as a whole. Also contained within is a ***__default__*** property which can be searched to grant authorization after all other properties have been exhausted.
+ROPE works by checking which permissions are implied given any that a User might already have in a transitive fashion. The first thing that is checked whenever an authorization check takes place is the crud matrix. This relates an operation; create, read, update, or delete which maps to another mapping. This second mapping relates properties with lists of properties that one of which must be authorized to grant authorization to that property as a whole. Also contained within is a __default__ property which can be searched to grant authorization after all other properties have been exhausted. This is always used for read and delete operations but only on a case by case basis for updates and creates.
 
 &nbsp;
 &nbsp;
@@ -79,9 +79,3 @@ Here we will demystify the above explanation with a more concrete example. In th
 ```
 
 Here, the first thing we do is set up the crud map to define which relations between the two objects should be checked to enable authorization on this ROPE. Then we also set up a mapping in the RelationshipMAP
-
-#### Setting up a Composite ROPE
-
-``` java
-
-```
