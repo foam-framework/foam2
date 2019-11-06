@@ -271,7 +271,8 @@ foam.CLASS({
       value: 'No Request Sent Yet.',
       view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 137 },
       visibility: 'RO'
-    }
+    },
+    'data'
   ],
 
   actions: [
