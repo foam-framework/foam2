@@ -83,8 +83,85 @@ public class ROPETest extends Test {
     setupROPEs(x);
     setupRootUserAndAccount(x);
     testRopes(x);
+
+    testHelperMethods(x);
   }
 
+  public void testHelperMethods(X x) {
+    // set up a mock rope
+    List<String> list = new ArrayList<String>();
+    Map<String, List<String>> createMap = new HashMap<String, List<String>>();
+    Map<String, List<String>> readMap = new HashMap<String, List<String>>();
+    Map<String, List<String>> updateMap = new HashMap<String, List<String>>();
+    Map<String, List<String>> deleteMap = new HashMap<String, List<String>>();
+    Map<String, Map<String, List<String>>> crudMap = new HashMap<String, Map<String, List<String>>>();
+    Map<String, List<String>> relationshipMap = new HashMap<String, List<String>>();
+
+    list = new ArrayList<String>(Arrays.asList( "a", "b" )); 
+    createMap.put("__default__", list);
+    list = new ArrayList<String>(Arrays.asList( "c", "d" )); 
+    createMap.put("prop1", list);
+    list = new ArrayList<String>(Arrays.asList( "e", "f" ));
+    readMap.put("__default__", list);
+    list = new ArrayList<String>(Arrays.asList( "g", "h" ));
+    updateMap.put("__default__", list);
+    list = new ArrayList<String>(Arrays.asList( "i", "j" ));
+    updateMap.put("prop2", list);
+    list = new ArrayList<String>(Arrays.asList( "k", "l" ));
+    deleteMap.put("__default__", list);
+    crudMap.put("create", createMap);
+    crudMap.put("read", readMap);
+    crudMap.put("update", updateMap);
+    crudMap.put("delete", deleteMap);
+
+    relationshipMap.put("rel1", new ArrayList<String>(Arrays.asList( "m", "n" )));
+    relationshipMap.put("rel2", new ArrayList<String>(Arrays.asList( "o", "p" )));
+
+    ROPE rope = (ROPE) ropeDAO.inX(x).put(new ROPE.Builder(x)
+      .setSourceDAOKey("aDAO")
+      .setTargetDAOKey("bDAO")
+      .setCardinality("*:*")
+      .setRelationshipKey("bs")
+      .setCrudMap(crudMap)           
+      .setRelationshipMap(relationshipMap)   
+      .build());
+    createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
+
+    // test retrieveProperty(obj, objClass, prefix, propertyName. x);
+    test(rope.retrieveProperty(rope, rope.getClass(), "get", "cardinality").equals("*:*"), "test retrieveProperty for property");
+    
+    User user = (User) userDAO.put(new User.Builder(x).setId(123).setFirstName("testuser").build());
+    test(rope.retrieveProperty(user, user.getClass(), "get", "accounts", x) instanceof DAO, "test retrieveProperty for relationship");
+
+    // test getNextRelationships(relationshipKey, crudKey, propertyKey);
+    List<String> result = rope.getNextRelationships("rel1", "create", "prop1");
+    test(result.contains("c"), "test getNextRelationships should return list for prop1 in createMap : " + result);
+    result = rope.getNextRelationships("rel1", "create", "");
+    test(result.contains("a"), "test getNextRelationships should return list for __default__ in createMap : " + result);
+    result = rope.getNextRelationships("", "", "prop1");
+    test(result == null, "test getNextRelationships should return null for wrong args : " + result);
+
+    // test getPropertiesUpdated(oldObj, obj);
+    ROPE rope2 = ((ROPE) rope.fclone());
+    rope2.setCardinality("1:1");
+    ROPEAuthorizer ra = new ROPEAuthorizer.Builder(x).setTargetDAOKey("ropeDAO").build();
+    List<String> propertiesUpdated = ra.getPropertiesUpdated(rope, rope2);
+    test(propertiesUpdated.equals(new ArrayList<String>(Arrays.asList("cardinality"))), "test getPropertiesUpdated for property update returned list of size = "+ propertiesUpdated.size() +" : " + propertiesUpdated);
+    propertiesUpdated = ra.getPropertiesUpdated(null, rope);
+    test(propertiesUpdated.size() == 7, "test getPropertiesUpdated for createObject returned list of size = " + propertiesUpdated.size() + " : " + propertiesUpdated);
+
+    Account account = (Account) accountDAO.put(new Account.Builder(x).setId(123).build());
+    AccountUserJunction j = (AccountUserJunction) transactionViewerJunctionDAO.put(
+      new AccountUserJunction.Builder(x).setSourceId(account.getId()).setTargetId(user.getId()).build()
+    );
+    ROPE transactionviewerrope = (ROPE) ropeDAO.find(AND(
+      EQ(ROPE.SOURCE_DAOKEY, "userDAO"),
+      EQ(ROPE.TARGET_DAOKEY, "accountDAO"),
+      EQ(ROPE.RELATIONSHIP_KEY, "transactionViewers")
+    ));
+    List<FObject> objs= transactionviewerrope.getSourceObjects(x, account);
+    test(objs.size() == 1 && ((User) objs.get(0)).getId() == 123, "test getSourceObjects");
+  }
 
   public void testRopes(X x) {
 
