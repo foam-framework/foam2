@@ -36,78 +36,45 @@ One trivial requirement of all ROPE objects is to set up the source and target m
 
 Both of the following methods of setting up a ROPE can be used in conjunction to achieve the desired functionality and are illustrated with some practical examples in the following section.
 
-ROPE works by checking which permissions are implied given any that a User might already have in a transitive fashion. 
+Setting up a ROPE can be a very complicated process; but with a little time and patience it can be done. One should not worry if they cannot get into the flow of things the first time around. Remember that you only need to write it once (usually).
+
+ROPE works by checking which permissions are implied given any that a User might already have in a transitive fashion. The first thing that is checked whenever an authorization check takes place is the crud matrix. This relates an operation; create, read, update, or delete which maps to another mapping. This second mapping relates properties with lists of properties that one of which must be authorized to grant authorization to that property as a whole. Also contained within is a ***__default__*** property which can be searched to grant authorization after all other properties have been exhausted.
 
 &nbsp;
 &nbsp;
 
 ## Working Example with Code
 
-#### Access of a User's Bank Account
+#### Setting up a basic Transaction ROPE
 
-Here we want to show ROPE in action in the context of being able to access a transaction as a bank account owner. First we will set up our ROPE fields as described in the previous method,
-
-``` java
-ROPE transactionROPE = new ROPE();
-  transactionROPE.setSourceModel(foam.nanos.rope.test.ROPEBankAccount.getOwnClassInfo());
-  transactionROPE.setTargetModel(foam.nanos.rope.test.ROPETransaction.getOwnClassInfo());
-  transactionROPE.setCardinality("1:*");
-  transactionROPE.setInverseName("sourceAccount");
-  transactionROPE.setIsInverse(false);
-  transactionROPE.setSourceDAOKey("ropeAccountDAO");
-  transactionROPE.setTargetDAOKey("ropeTransactionDAO");
-```
-
-Next we will add the capabilities on the transaction which our relationship will allow to our previously created ROPE; we are here requiring that the BankAccount object be owned in order to allow the capabilities of create, read, own we wish to authorize,
+Here we will demystify the above explanation with a more concrete example. In this example we will set up a simple transaction rope following the above mentioned steps. For simplicity we will do this in the form of a beanshell script.
 
 ``` java
-List<ROPEActions> ownImplies = new ArrayList<ROPEActions>();
-  ownImplies.add(ROPEActions.C);
-  ownImplies.add(ROPEActions.R);
-  ownImplies.add(ROPEActions.OWN);
-  transactionROPE.setRelationshipImplies(relationshipImplies);
-List<ROPEActions> requiredSourceActions = new new ArrayList<ROPEActions>(Arrays.asList(ROPEActions.OWN));
-  transactionROPE.setRequiredSourceAction(requiredSourceActions);
+    list = new ArrayList<String>(Arrays.asList( "owner", "parent" )); 
+    createMap.put("__default__", list);
+    list = new ArrayList<String>(Arrays.asList( "owner", "parent" ));
+    readMap.put("__default__", list);
+    list = new ArrayList<String>(Arrays.asList( ));
+    updateMap.put("__default__", list);
+    list = new ArrayList<String>(Arrays.asList( ));
+    deleteMap.put("__default__", list);
+    crudMap.put("create", createMap);
+    crudMap.put("read", readMap);
+    crudMap.put("update", updateMap);
+    crudMap.put("delete", deleteMap);
+    relationshipMap.put("parent", new ArrayList<String>(Arrays.asList( "owner", "parent" )));
+
+    ropeDAO.inX(x).put(new ROPE.Builder(x)
+      .setSourceDAOKey("accountDAO")
+      .setTargetDAOKey("transactionDAO")
+      .setCardinality("1:*")
+      .setRelationshipKey("sourceAccount")
+      .setCrudMap(crudMap)           
+      .setRelationshipMap(relationshipMap)   
+      .build());
 ```
 
-That's all! we now have a fully working ROPE that allows anyone who owns a bank account to perform the operations of create read and *own* ( a more abstract construct that will allow permissions on other ROPEs ) on a transaction. Now finally we add this to the ropeDAO and our authorization is fully set up.
+Here, the first thing we do is set up the crud map to define which relations between the two objects should be checked to enable authorization on this ROPE. Then we also set up a mapping in the RelationshipMAP
 
-``` java
-x.get("ropeDAO").put(transactionROPE);
-```
-
-#### More Fine Grained Control
-
-Suppose we now want some additional, more complex functionality to add to our bank account accesses. People who are able to read a bank account should be able to read a transaction as well. We can achieve this by using the ROPE matrix. First we setup everything just as before,
-
-``` java
-ROPE transactionROPE = new ROPE();
-  transactionROPE.setSourceModel(foam.nanos.rope.test.ROPEBankAccount.getOwnClassInfo());
-  transactionROPE.setTargetModel(foam.nanos.rope.test.ROPETransaction.getOwnClassInfo());
-  transactionROPE.setCardinality("1:*");
-  transactionROPE.setInverseName("sourceAccount");
-  transactionROPE.setIsInverse(false);
-  transactionROPE.setSourceDAOKey("ropeAccountDAO");
-  transactionROPE.setTargetDAOKey("ropeTransactionDAO");
-```
-
-Now we just set up our matrix and set it as the property of our transactionROPE and we are good to go,
-
-``` java
-List<ROPEActions> ownImplies = new ArrayList<ROPEActions>();
-  ownImplies.add(ROPEActions.C);
-  ownImplies.add(ROPEActions.R);
-  ownImplies.add(ROPEActions.OWN);
-
-List<ROPEActions> readImplies = new ArrayList<ROPEActions>();
-  readImplies.add(ROPEActions.R);
-
-HashMap<ROPEActions, List<ROPEActions>> matrix = new HashMap<ROPEActions, List<ROPEActions>>();
-  matrix.put(ROPEActions.OWN, ownImplies);
-  matrix.put(ROPEActions.READ, readImplies);
-
-transactionROPE.setCRUD(matrix);
-x.get("ropeDAO").put(transactionROPE);
-```
 
 
