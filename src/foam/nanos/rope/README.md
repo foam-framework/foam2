@@ -40,8 +40,10 @@ There are a few helper ROPEs with which can be used to combine regular ROPEs to 
 
 ##### ROPEAuthorizer
 The ROPEAuthorizer extends the Authorizer interface and implements the methods `authorizeOnCreate`, `authorizeOnRead`, `authorizeOnUpdate`, and `authorizeOnDelete`.
+
 The ROPEAuthorizer has one property called the `targetDAOKey`, and it is used to find the first ROPE and initialize the chain of ROPE searches.
 The main difference between the ROPEAuthorizer and other authorizers is that the implemented methods for authorizing CRUD operations all call a method called `authorizeByROPE`, which simply returns a list of ROPEs in the ropeDAO where the targetDAOKey of the ROPE matches the targetDAOKey of the authorizer. For each of those ropes, the `check` method implemented in the ROPE model is called until one of them returns true, or else the operation in not authorized.
+
 Furthermore, there is a difference in logic between the authorization of read/delete versus that of create/update.
 In `authorizeOnCreate` and `authorizeOnUpdate`, the properties that are set by the user are compared with either a new instance of the model, in the case of create, or the old object before the update. For each rope, a check is called for each of the properties that are set/changed, and the checks must all return true before the action can be granted.
 
