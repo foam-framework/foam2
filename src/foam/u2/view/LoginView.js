@@ -1,0 +1,1 @@
+// documentation: handles login with SignUp.js and SignIn.js. And a property with img. Will use split border
