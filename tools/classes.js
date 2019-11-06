@@ -305,7 +305,6 @@ var classes = [
   'foam.nanos.notification.push.FirebasePushService',
   'foam.nanos.notification.Notification',
   'foam.nanos.notification.NotificationConfig',
-  'foam.nanos.notification.NotificationSetting',
   'foam.nanos.notification.NotificationTemplateDAO',
   'foam.nanos.notification.notifications.ScriptRunNotification',
   'foam.nanos.notification.SendEmailSetting',

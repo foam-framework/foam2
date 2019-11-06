@@ -9,7 +9,7 @@ foam.CLASS({
     },
     {
       class: 'FObjectArray',
-      of: 'NotificationSetting',
+      of: 'SendNotificationSetting',
       name: 'notificationSettings'
     }
   ]

@@ -1,7 +1,7 @@
 foam.CLASS({
   package: 'foam.nanos.notification',
   name: 'SendEmailSetting',
-  implements: [ 'foam.nanos.notification.NotificationSetting'],
+  extends: 'foam.nanos.notification.SendNotificationSetting',
 
   javaImports: [
     'foam.dao.ArraySink',
@@ -18,29 +18,6 @@ foam.CLASS({
   ],
 
   methods: [
-    {
-      name: 'sendNotification',
-      args: [
-        { name: 'x', type: 'Context' },
-        { name: 'notification', type: 'foam.nanos.notification.Notification' },
-      ],
-      javaCode: `
-      DAO userDAO  = (DAO) x.get("localUserDAO");
-      DAO businessDAO = (DAO) x.get("localBusinessDAO");
-      Business business = (Business) businessDAO.find(notification.getUserId());
-
-      List<UserUserJunction> junctions = ((ArraySink) business.getAgents(x).getJunctionDAO()
-        .where(
-          EQ(UserUserJunction.TARGET_ID, business.getId())
-        )
-        .select(new ArraySink())).getArray();
-
-      for ( UserUserJunction junction : junctions ) {
-        User user = (User) userDAO.find(junction.getSourceId());
-        sendNotificationToUser(x, user, notification);
-      }
-      `
-    },
     {
       name: 'sendNotificationToUser',
       args: [
