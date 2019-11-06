@@ -422,6 +422,7 @@ var classes = [
   'foam.flow.Document',
   'foam.flow.DocumentationFolderDAO',
 
+  'foam.nanos.ruler.RuleGroup',
   'foam.nanos.ruler.Rule',
   'foam.nanos.ruler.RulerDAO',
   'foam.nanos.ruler.Operations',
