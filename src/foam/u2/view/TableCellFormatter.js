@@ -204,7 +204,11 @@ foam.CLASS({
       name: 'tableCellFormatter',
       value: function(date) {
         // allow the browser to deal with this since we are technically using the user's preference
-        if ( date ) this.add(date.toLocaleDateString());
+        if ( date ) {
+          var formattedDate = date.toLocaleDateString();
+          this.add(formattedDate);
+          this.tooltip = formattedDate;
+        }
       }
     }
   ]
@@ -222,7 +226,11 @@ foam.CLASS({
       name: 'tableCellFormatter',
       value: function(date) {
         // allow the browser to deal with this since we are technically using the user's preference
-        if ( date ) this.add(date.toLocaleString());
+        if ( date ) {
+          var formattedDate = date.toLocaleDateString();
+          this.add(formattedDate);
+          this.tooltip = formattedDate;
+        }
       }
     }
   ]
