@@ -197,7 +197,7 @@ foam.CLASS({
       ],
       javaType: 'List<String>',
       documentation: `
-      This function returns a list of relationshipKeys to filter the ropeDAO with in intermediate steps of the ropeSearch
+      This function returns a list of relationshipKeys to filter the ropeDAO within intermediate steps of the ropeSearch
       args :
         relationshipKey - if the relationshipKey is specified, get list of keys in relationshipMap[relationshipKey]
         crudKey - if the crudKey is specified, get list of keys in crudMap[crudKey]["__default__"], or
