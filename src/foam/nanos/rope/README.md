@@ -45,11 +45,12 @@ ROPE works by checking which permissions are implied given any that a User might
 
 ## Working Example with Code
 
-#### Setting up a basic Transaction ROPE
+#### Setting up a basic ROPE
 
-Here we will demystify the above explanation with a more concrete example. In this example we will set up a simple transaction rope following the above mentioned steps. For simplicity we will do this in the form of a beanshell script.
+Here we will demystify the above explanation with a more concrete example: set
 
 ``` java
+    //comments
     list = new ArrayList<String>(Arrays.asList( "owner", "parent" )); 
     createMap.put("__default__", list);
     list = new ArrayList<String>(Arrays.asList( "owner", "parent" ));
