@@ -435,6 +435,7 @@ var classes = [
   'foam.nanos.ruler.RuleHistoryStatus',
   'foam.nanos.ruler.UpdateRulesListSink',
   'foam.nanos.ruler.predicate.PropertyChangePredicate',
+  'foam.nanos.ruler.predicate.PropertyEQProperty',
   'foam.comics.SearchMode',
 
   // Support Files
