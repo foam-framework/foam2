@@ -42,9 +42,9 @@ foam.CLASS({
                 try {
                   notificationDAO.put(getNotification());
                 }
-                catch (Exception E) {
+                catch (Exception e) {
                   Logger logger = (Logger) x.get("logger");
-                  logger.error("Failed to put notification: "+E);
+                  logger.error("Failed to put notification: " + e);
                 };
               }
             }
