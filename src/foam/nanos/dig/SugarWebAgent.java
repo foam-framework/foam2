@@ -13,14 +13,14 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.nio.CharBuffer;
+import java.sql.ResultSetMetaData;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.gson.Gson;
-
+import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.dao.DAO;
@@ -28,8 +28,14 @@ import foam.lib.AndPropertyPredicate;
 import foam.lib.NetworkPropertyPredicate;
 import foam.lib.PermissionedPropertyPredicate;
 import foam.lib.PropertyPredicate;
+import foam.lib.json.AnyParser;
 import foam.lib.json.JSONParser;
+import foam.lib.json.MapParser;
 import foam.lib.json.Outputter;
+import foam.lib.parse.PStream;
+import foam.lib.parse.ParserContextImpl;
+import foam.lib.parse.StringPStream;
+import foam.nanos.auth.User;
 import foam.nanos.boot.NSpec;
 import foam.nanos.dig.exception.DigErrorMessage;
 import foam.nanos.dig.exception.GeneralException;
@@ -54,8 +60,10 @@ public class SugarWebAgent
     String              interfaceName  = p.getParameter("interfaceName");
 
     String data = p.getParameter("data");
-    Gson gson         = new Gson();
-    Map  mapPostParam = gson.fromJson(data, Map.class);
+    
+    PStream ps = new StringPStream(data);
+    PStream jsonP = new MapParser().parse(ps , new ParserContextImpl());
+    Map mapPostParam = (Map) jsonP.value();
 
     try {
       if ( SafetyUtil.isEmpty(serviceName) ) {
@@ -157,7 +165,38 @@ public class SugarWebAgent
                 arglist[j] = setParameterValue(x, resp, out, p, typeName, pArray[j]);
               } else if ( paramName != null ) {
                 //post method
-                arglist[j] = setValue(x, resp, out, p, typeName, mapPostParam.get(paramName));
+                //TODO array
+                if ( typeName.equals("double") || typeName.equals("boolean") || typeName.equals("int") || typeName.equals("long") || typeName.equals("long") || typeName.equals("java.lang.String") ) {
+                  arglist[j] = mapPostParam.get(paramName);
+                } else {
+                  
+                  Object arg      = null;
+                  Class  objClass = null;
+                  try {
+                    objClass = Class.forName(typeName);
+                    // For Enum Parameter
+                    if ( objClass != null && objClass.isEnum() ) { 
+                      for ( int t = 0 ; t < objClass.getEnumConstants().length ; t++ ) {
+                        if ( objClass.getEnumConstants()[t].toString().equals(mapPostParam.get(paramName)) ) {
+                          arg = objClass.getEnumConstants()[t];
+                        }
+                      }
+                    } else {
+                      FObject             obj = (FObject) objClass.newInstance();
+                      Map<String, String> mParam   = (Map) mapPostParam.get(paramName);
+
+                      for ( Map.Entry<String, String> entry : mParam.entrySet() ) {
+                        obj.setProperty(entry.getKey(), entry.getValue());
+                      }
+                      arglist[j] = obj;
+                    }
+                  } catch (Exception e) {
+                    DigErrorMessage error = new GeneralException.Builder(x)
+                      .setMessage(e.toString())
+                      .build();
+                    outputException(x, null, "JSON", null, error);
+                  }
+                }
               } else {
                 DigErrorMessage error = new GeneralException.Builder(x)
                   .setMessage("Empty Parameter values : " + pArray[j].getName())
@@ -322,39 +361,6 @@ public class SugarWebAgent
               .build();
             outputException(x, null, "JSON", null, error);
           }
-      }
-    }
-
-    return arg;
-  }
-
-  protected Object setValue(X x, HttpServletResponse resp, PrintWriter out, HttpParameters p, String typeName,
-      Object object) {
-    Object arg = null;
-
-    if ( ! SafetyUtil.isEmpty(typeName) ) {
-      switch ( typeName ) {
-        case "double":
-         arg = (Double) object;
-         break;
-        case "boolean":
-         arg = (Boolean) object;
-         break;
-        case "int":
-         arg = ( (Double) object ).intValue();
-         break;
-        case "long":
-          arg = ( (Double) object ).longValue();
-          break;
-        case "java.lang.String":
-          arg = object;
-          break;
-        //TODO add the case "String[]":
-        case "foam.core.X":
-          arg = x;
-          break;
-        default:
-          arg = object;
       }
     }
 
