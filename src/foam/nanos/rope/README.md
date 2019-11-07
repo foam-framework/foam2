@@ -69,6 +69,23 @@ However, in `authorizeOnCreate` and `authorizeOnUpdate`, the properties that are
 TODO James
 This is a description of the ROPE model.
 
+Contains the following properties: 
+- sourceDAOKey - DAO with relationship to target DAO
+- targetDAOKey - the DAO to check permission/relationship on
+- cardinality - contains `1:1`, `1:*`, and `*:*`. `1:1` is used in the case where the targetDAO is a junctionDAO.
+- relationshipKey - the name of the relationship from the target to source, is defined in the relationship between the models
+- isInverse - if the source/target is the inverse of what was defined in the relationship, used mainly to check if a 1:* rope is actually *:1 in the relationship
+- crudMap - A map containing maps for each of the crud operations, where the keys are "create", "read", "update", and "delete". 
+  - Each sub-map contains keys which are either "__default__" or some propertyName, in the case of update or create
+  - The values of each sub-map contains relationshipKeys of ropes where the targetDAOKey is the sourceDAOKey of the current rope.
+- relationshipMap - a map containing keys which are the relationshipKey of the previous ROPE in the chain of ROPE lookups, and the values are the relationshipKeys of the ropes where the targetDAOKey is the sourceDAOKey of the current rope. Think of this as a mapping from "previousStep" to "nextSteps"
+- There is a special value, "__terminate__" that can be added as an value of any map, this tells the ROPE to check if the source object in this relationship is an User and matches the User in the current context, and if so, to grant the operation into the DAO of interest.
+
+One important method to note in the ROPE model is `check`, which handles the work of looking up relevant ropes and checking them recursively to find a path to the context user. It takes as argument the context and the object of interest, but also three keys : 
+1. relationshipKey - this is used to filter the ropeDAO in the search for relevant ROPEs, this is usually provided in the intermediate steps of the rope search in the ROPEAuthorizer, but when programming with ROPE directly, this can be provided to narrow the number of ROPEs to check in subsequent steps  
+2. crudKey - this is the key used in the first step of the ROPE search, representing the action to perform in the targetDAO on the target object. This must match one of the keys in the crudMap. This key is NOT used in any step of the ROPE search except the first.
+3. propertyKey - this is the key that can be used along with the crudKey to check specifically the next steps that must be taken to update or set some property. This is only used when the operation is an update or create. If the propertyKey is not found in the "create" map or "update" map, depending on what the crudKey was, the values in the "__default__" entry are used.
+
 
 #### Setup of Miscellany
 
