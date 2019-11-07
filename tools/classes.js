@@ -435,6 +435,7 @@ var classes = [
   'foam.nanos.ruler.action.SendNotification',
   'foam.nanos.ruler.predicate.PropertyEQValue',
   'foam.nanos.ruler.predicate.PropertyNEQValue',
+  'foam.nanos.ruler.predicate.PropertyEQProperty',
   'foam.comics.SearchMode',
 
   // Support Files
