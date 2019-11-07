@@ -1,6 +1,5 @@
 ![ROPE Logo](rope.png)
 
-# TODO DOC IS OUTDATED
 # ROPE User Guide and Documentation
 
 &nbsp;
@@ -16,6 +15,8 @@ The ROPE authorization system searches the tree formed by these relationships an
 One of the key defining features that makes the ROPE algorithm's authorization so versatile and configurable is the transitivity it gains from its nature. An abstract example being some object ***A*** attempting to perform an operation on some other object ***C***. Although ***A*** may not be directly related to ***C***, it may be related to some intermediate object ***B*** which is itself related to object ***C***. Given the correct configuration of the ROPEs on these two relationships; object A can be granted certain permissions toward object ***C*** through its relationship to object ***B***.
 
 More generally this applies for properties themselves within the objects and the relationships between them. ROPE allows you to work at both the property level when it comes to authorization for much needed simplicity in acheiving fine-grained controll. 
+
+&nbsp;
 
 #### Using ROPE with DAOs
 
@@ -37,22 +38,16 @@ transactionDAO = new foam.dao.EasyDAO.Builder(x)
 
 Permissions based on relationships can be configured by the user by creating a ROPE objects from the ROPE.js model and setting the properties accordingly and afterwards appending the object to the application's ropeDAO which will be utilized by the ROPE algorithm to perform authorization checks. Given a missing ROPE, the algorithm trivially assumes that all permissions are not granted on that object.
 
+&nbsp;
+
 #### Composition of ROPES
 
 There are a few helper ROPEs with which can be used to combine regular ROPEs to form more complex logical operations. There are known more formally as composite ropes. AND and OR ROPEs can be found in the compositeROPE.js file. These act as regular ROPEs except that under the hood they delegate their checks to other ropes composed within them. The OR composite authorizes if only one of the ROPEs it is composed with authorizes and the AND requires all composed ROPEs to authorize. 
-
-// TODO James integrate this with the above paragraph
-CompositeROPEs extend the CompositeROPE class which contains a `List<ROPE>` property and extends the ROPE class
-For CompositeROPEs, only this property and the `ids` of the ROPE, which include `targetDAOKey`, `sourceDAOKey`, and `relationshipKey` should be provided.
-The `targetDAOKey` must match that of its children, but the `sourceDAOKey` and `relationshipKey` has no such requirements, and is only provided to refine lookup of ROPEs.
-The classes extending the CompositeROPE class have their own implementations of check.
 
 &nbsp;
 &nbsp;
 
 ## Technical Notes on the Proper Setup of ROPE Objects
-
-#### The ROPE Models
 
 ##### ROPEAuthorizer
 TODO James
@@ -63,33 +58,37 @@ The main difference between the ROPEAuthorizer and other authorizers is that the
 
 Furthermore, there is a difference in logic between the authorization of read/delete versus that of create/update.
 In `authorizeOnRead` and `authorizeOnDelete`, there is no need to perform authorization at the property level. In the case of read, the visibility of individual properties are not in the scope of ROPE, and in the case of delete, it is redundant.
-However, in `authorizeOnCreate` and `authorizeOnUpdate`, the properties that are set by the user are compared with either a new instance of the model, in the case of create, or the old object before the update. For each rope, a check is called for each of the properties that are set/changed, and the checks must all return true before the action can be granted.
+However, in `authorizeOnCreate` and `authorizeOnUpdate`, the properties that are set by the user are compared with either a new instance of the model (in the case of create), or the old object before the update. For each rope, a check is called for each of the properties that are set/changed, and the checks must all return true before the action can be granted.
 
-##### ROPE
-TODO James
-This is a description of the ROPE model.
+&nbsp;
+
+##### ROPE Model
 
 Contains the following properties: 
-- sourceDAOKey - DAO with relationship to target DAO
-- targetDAOKey - the DAO to check permission/relationship on
-- cardinality - contains `1:1`, `1:*`, and `*:*`. `1:1` is used in the case where the targetDAO is a junctionDAO.
-- relationshipKey - the name of the relationship from the target to source, is defined in the relationship between the models
-- isInverse - if the source/target is the inverse of what was defined in the relationship, used mainly to check if a 1:* rope is actually *:1 in the relationship
-- crudMap - A map containing maps for each of the crud operations, where the keys are "create", "read", "update", and "delete". 
-  - Each sub-map contains keys which are either "\_\_default\_\_" or some propertyName, in the case of update or create
+- sourceDAOKey - The DAO with which the target DAO is related to.
+- targetDAOKey - The DAO to check permission/relationship on.
+- cardinality - Contains `1:1`, `1:*`, and `*:*`; `1:1` is used for special cases where the targetDAO is a junctionDAO.
+- relationshipKey - The name of the relationship from the target to source, is defined in the relationship between the models.
+- isInverse - If the source/target is the inverse of what was defined in the relationship, used mainly to check if a 1:* rope is actually *:1 in the relationship.
+- crudMap - A map containing maps for each of the crud operations, where the keys are "create", "read", "update", and "delete".
+  - Each sub-map contains keys which are either "\_\_default\_\_" or some propertyName, in the case of update or create.
   - The values of each sub-map contains relationshipKeys of ropes where the targetDAOKey is the sourceDAOKey of the current rope.
-- relationshipMap - a map containing keys which are the relationshipKey of the previous ROPE in the chain of ROPE lookups, and the values are the relationshipKeys of the ropes where the targetDAOKey is the sourceDAOKey of the current rope. Think of this as a mapping from "previousStep" to "nextSteps"
-- There is a special value, "\_\_terminate\_\_" that can be added as an value of any map, this tells the ROPE to check if the source object in this relationship is an User and matches the User in the current context, and if so, to grant the operation into the DAO of interest.
+- relationshipMap - A map containing keys which are the relationshipKey of the previous ROPE in the chain of ROPE lookups, and the values are the relationshipKeys of the ropes where the targetDAOKey is the sourceDAOKey of the current rope. Think of this as a mapping from "previousStep" to "nextSteps".
+
+Additionally, there is a special value, "\_\_terminate\_\_" that can be added as an value of any map, this tells the ROPE to check if the source object in this relationship is an User and matches the User in the current context, and if so, to grant the operation into the DAO of interest.
 
 One important method to note in the ROPE model is `check`, which handles the work of looking up relevant ropes and checking them recursively to find a path to the context user. It takes as argument the context and the object of interest, but also three keys : 
-1. relationshipKey - this is used to filter the ropeDAO in the search for relevant ROPEs, this is usually provided in the intermediate steps of the rope search in the ROPEAuthorizer, but when programming with ROPE directly, this can be provided to narrow the number of ROPEs to check in subsequent steps  
-2. crudKey - this is the key used in the first step of the ROPE search, representing the action to perform in the targetDAO on the target object. This must match one of the keys in the crudMap. This key is NOT used in any step of the ROPE search except the first.
-3. propertyKey - this is the key that can be used along with the crudKey to check specifically the next steps that must be taken to update or set some property. This is only used when the operation is an update or create. If the propertyKey is not found in the "create" map or "update" map, depending on what the crudKey was, the values in the "\_\_default\_\_" entry are used.
+1. relationshipKey - This is used to filter the ropeDAO in the search for relevant ROPEs, this is usually provided in the intermediate steps of the rope search in the ROPEAuthorizer, but when programming with ROPE directly, this can be provided to narrow the number of ROPEs to check in subsequent steps  
+2. crudKey - This is the key used in the first step of the ROPE search, representing the action to perform in the targetDAO on the target object. This must match one of the keys in the crudMap. This key is NOT used in any step of the ROPE search except the first.
+3. propertyKey - This is the key that can be used along with the crudKey to check specifically the next steps that must be taken to update or set some property. This is only used when the operation is an update or create. If the propertyKey is not found in the "create" map or "update" map, depending on what the crudKey was, the values in the "\_\_default\_\_" entry are used.
 
+&nbsp;
 
 #### Setup of Miscellany
 
 One trivial requirement of all ROPE objects is to set up the source and target models, their respective DAO keys, and the cardinality which is a string representing the type of the relationship be it one to many or many to one, the uses should specify this field as a String of the form ***"1:1"***, ***"1:\*"***, ***"\*:1"***, or ***"\*:\*"***. Note here that ***"1:1"*** describes a special case which refers to relationships to the junction objects themselves. There are also 3 additional fields that must be set up to describe the relation and the dao in which the relation's objects are held. These include junctionModel, junctionDAOKey, and inverseName.
+
+&nbsp;
 
 #### To set up which permissions this ROPE will enable
 
@@ -100,32 +99,21 @@ ROPE works by checking which permissions are implied given any that a User might
 &nbsp;
 &nbsp;
 
-## Working Example with Code
+## Working Examples with Code
 
-#### Setting up a basic ROPE
-TODO James
+#### Transaction-Account ROPE
 
-Here we will demystify the above explanation with a more concrete example.
-We will setup ROPEs such that we have a chain from Transaction to User.
+Suppose that we want a basic ROPE which will grant permissions to write to transactionDAO through accountDAO and userDAO. Here we use a relationship enviroment where users of an application can own an account which can in turn have children. We use this context to create a ROPE where a transaction can be created if a user owns the sourceAccount of the transaction or the parent of the sourceAccount of a transaction.
 
-Setup of a Transaction-Account example
-
-This is example of a rope for granting permissions to write to transactionDAO through accountDAO and userDAO.
-This example is under the assumption that user can own accounts, and those accounts can form a trees of child accounts. 
-Transactions can be created if a user owns the sourceAccount of the transaction or the parent of the sourceAccount of a transaction.
+First we start by setting up the ROPE for the Account DAO to Transaction DAO in a beanshell style code snippet. Here we have that a transaction can be created or read in one of two ways, 
+1. Direct ownership of the sourceAccount
+2. Indirectly through checking the authorization on the parent account of the sourceAccount 
 
 ``` java
-    // declare and initialize maps and list
-
-    // TRANSACTIONDAO - ACCOUNTDAO (sourceAccount)
-
-    // this is the default maps for crud. 
-    // An transaction can be created or read in one of two ways:
-    //  1. Direct ownership of the sourceAccount
-    //  2. Indirectly through checking the authorization on the parent account of the sourceAccount 
     createMap.put("__default__", new ArrayList<String>(Arrays.asList( "owner", "parent" )));
     readMap.put("__default__", new ArrayList<String>(Arrays.asList( "owner", "parent" )));
-    // non-system users should not have authorization to update or delete accounts, so no path is granted for this operation
+
+    // Non-system users should not have authorization to update or delete accounts; so no path is granted for this operation
     updateMap.put("__default__", null);
     deleteMap.put("__default__", null);
     crudMap.put("create", createMap);
@@ -141,14 +129,14 @@ Transactions can be created if a user owns the sourceAccount of the transaction 
       .setCrudMap(crudMap)           
       .setRelationshipMap(relationshipMap)   
       .build());
-    
-    // clear maps    
+```
 
-    // ACCOUNTDAO - ACCOUNT DAO (parent)
+&nbsp;
+Next we setup our Account DAO to Account DAO ROPE. Here we have that an account can be created, read, updated, or deleted in one of two ways,
+  1. Direct ownership of the account
+  2. Indirectly through checking the authorization on the parent account 
 
-    // an account can be created, read, update, or deleted in one of two ways
-    //  1. Direct ownership of the account
-    //  2. Indirectly through checking the authorization on the parent account 
+``` java 
     createMap.put("__default__", new ArrayList<String>(Arrays.asList( "owner", "parent" )));
     readMap.put("__default__", new ArrayList<String>(Arrays.asList( "owner", "parent" )));
     updateMap.put("__default__", new ArrayList<String>(Arrays.asList( "owner", "parent" )));
@@ -170,13 +158,12 @@ Transactions can be created if a user owns the sourceAccount of the transaction 
       .setRelationshipMap(relationshipMap)   
       .build());
     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
+```
 
-    // clear maps
+&nbsp;
+Finally, we finish this examply by setting up the User DAO to Transaction DAO ROPE and we are done. Here an account can be created, read, updated, and deleted by any user that is the "owner" to the account.
 
-    // ACCOUNTDAO - USERDAO (owner)
-
-    // an account can be created, read, updated, and deleted by any user that has this relationship
-    // "owner", to the account
+``` java
     createMap.put("__default__", new ArrayList<String>(Arrays.asList( "__terminate__" )));
     readMap.put("__default__", new ArrayList<String>(Arrays.asList( "__terminate__" )));
     updateMap.put("__default__", new ArrayList<String>(Arrays.asList( "__terminate__" )));
@@ -198,5 +185,4 @@ Transactions can be created if a user owns the sourceAccount of the transaction 
       .setRelationshipMap(relationshipMap)   
       .build());
     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
-
 ```
