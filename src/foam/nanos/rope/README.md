@@ -76,15 +76,15 @@ Contains the following properties:
 - relationshipKey - the name of the relationship from the target to source, is defined in the relationship between the models
 - isInverse - if the source/target is the inverse of what was defined in the relationship, used mainly to check if a 1:* rope is actually *:1 in the relationship
 - crudMap - A map containing maps for each of the crud operations, where the keys are "create", "read", "update", and "delete". 
-  - Each sub-map contains keys which are either "__default__" or some propertyName, in the case of update or create
+  - Each sub-map contains keys which are either "\_\_default\_\_" or some propertyName, in the case of update or create
   - The values of each sub-map contains relationshipKeys of ropes where the targetDAOKey is the sourceDAOKey of the current rope.
 - relationshipMap - a map containing keys which are the relationshipKey of the previous ROPE in the chain of ROPE lookups, and the values are the relationshipKeys of the ropes where the targetDAOKey is the sourceDAOKey of the current rope. Think of this as a mapping from "previousStep" to "nextSteps"
-- There is a special value, "__terminate__" that can be added as an value of any map, this tells the ROPE to check if the source object in this relationship is an User and matches the User in the current context, and if so, to grant the operation into the DAO of interest.
+- There is a special value, "\_\_terminate\_\_" that can be added as an value of any map, this tells the ROPE to check if the source object in this relationship is an User and matches the User in the current context, and if so, to grant the operation into the DAO of interest.
 
 One important method to note in the ROPE model is `check`, which handles the work of looking up relevant ropes and checking them recursively to find a path to the context user. It takes as argument the context and the object of interest, but also three keys : 
 1. relationshipKey - this is used to filter the ropeDAO in the search for relevant ROPEs, this is usually provided in the intermediate steps of the rope search in the ROPEAuthorizer, but when programming with ROPE directly, this can be provided to narrow the number of ROPEs to check in subsequent steps  
 2. crudKey - this is the key used in the first step of the ROPE search, representing the action to perform in the targetDAO on the target object. This must match one of the keys in the crudMap. This key is NOT used in any step of the ROPE search except the first.
-3. propertyKey - this is the key that can be used along with the crudKey to check specifically the next steps that must be taken to update or set some property. This is only used when the operation is an update or create. If the propertyKey is not found in the "create" map or "update" map, depending on what the crudKey was, the values in the "__default__" entry are used.
+3. propertyKey - this is the key that can be used along with the crudKey to check specifically the next steps that must be taken to update or set some property. This is only used when the operation is an update or create. If the propertyKey is not found in the "create" map or "update" map, depending on what the crudKey was, the values in the "\_\_default\_\_" entry are used.
 
 
 #### Setup of Miscellany
@@ -95,7 +95,7 @@ One trivial requirement of all ROPE objects is to set up the source and target m
 
 Both of the following methods of setting up a ROPE can be used in conjunction to achieve the desired functionality and are illustrated with some practical examples in the following section.
 
-ROPE works by checking which permissions are implied given any that a User might already have in a transitive fashion. The first thing that is checked whenever an authorization check takes place is the crud matrix. This relates an operation; create, read, update, or delete which maps to another mapping. This second mapping relates properties with lists of properties that one of which must be authorized to grant authorization to that property as a whole. Also contained within is a ***__default__*** property which can be searched to grant authorization after all other properties have been exhausted.
+ROPE works by checking which permissions are implied given any that a User might already have in a transitive fashion. The first thing that is checked whenever an authorization check takes place is the crud matrix. This relates an operation; create, read, update, or delete which maps to another mapping. This second mapping relates properties with lists of properties that one of which must be authorized to grant authorization to that property as a whole. Also contained within is a ***\_\_default\_\_*** property which can be searched to grant authorization after all other properties have been exhausted.
 
 &nbsp;
 &nbsp;
