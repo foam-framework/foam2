@@ -57,7 +57,7 @@ The main difference between the ROPEAuthorizer and other authorizers is that the
 
 Furthermore, there is a difference in logic between the authorization of read/delete versus that of create/update.
 In `authorizeOnRead` and `authorizeOnDelete`, there is no need to perform authorization at the property level. In the case of read, the visibility of individual properties are not in the scope of ROPE, and in the case of delete, it is redundant.
-However, in `authorizeOnCreate` and `authorizeOnUpdate`, the properties that are set by the user are compared with either a new instance of the model, in the case of create, or the old object before the update. For each rope, a check is called for each of the properties that are set/changed, and the checks must all return true before the action can be granted.
+However, in `authorizeOnCreate` and `authorizeOnUpdate`, the properties that are set by the user are compared with either a new instance of the model (in the case of create), or the old object before the update. For each rope, a check is called for each of the properties that are set/changed, and the checks must all return true before the action can be granted.
 
 ##### ROPE Model
 
@@ -98,12 +98,11 @@ ROPE works by checking which permissions are implied given any that a User might
 
 Suppose that we want a basic ROPE which will grant permissions to write to transactionDAO through accountDAO and userDAO. Here we use a relationship enviroment where users of an application can own an account which can in turn have children. We use this context to create a ROPE where a transaction can be created if a user owns the sourceAccount of the transaction or the parent of the sourceAccount of a transaction.
 
-First we start by setting up the ROPE for the Account DAO to Transaction DAO in a beanshell style code snippet,
+First we start by setting up the ROPE for the Account DAO to Transaction DAO in a beanshell style code snippet. Here we have that a transaction can be created or read in one of two ways, 
+1. Direct ownership of the sourceAccount
+2. Indirectly through checking the authorization on the parent account of the sourceAccount 
 
 ``` java
-    // A transaction can be created or read in one of two ways:
-    //  1. Direct ownership of the sourceAccount
-    //  2. Indirectly through checking the authorization on the parent account of the sourceAccount 
     createMap.put("__default__", new ArrayList<String>(Arrays.asList( "owner", "parent" )));
     readMap.put("__default__", new ArrayList<String>(Arrays.asList( "owner", "parent" )));
 
@@ -126,14 +125,11 @@ First we start by setting up the ROPE for the Account DAO to Transaction DAO in 
 ```
 
 &nbsp;
-Next we setup our Account DAO to Account DAO ROPE,
+Next we setup our Account DAO to Account DAO ROPE. Here we have that an account can be created, read, updated, or deleted in one of two ways,
+  1. Direct ownership of the account
+  2. Indirectly through checking the authorization on the parent account 
 
 ``` java 
-    // ACCOUNTDAO - ACCOUNT DAO (parent)
-
-    // An account can be created, read, updated, or deleted in one of two ways
-    //  1. Direct ownership of the account
-    //  2. Indirectly through checking the authorization on the parent account 
     createMap.put("__default__", new ArrayList<String>(Arrays.asList( "owner", "parent" )));
     readMap.put("__default__", new ArrayList<String>(Arrays.asList( "owner", "parent" )));
     updateMap.put("__default__", new ArrayList<String>(Arrays.asList( "owner", "parent" )));
@@ -158,11 +154,9 @@ Next we setup our Account DAO to Account DAO ROPE,
 ```
 
 &nbsp;
-Finally, we finish this examply by setting up the User DAO to Transaction DAO ROPE and we are done,
+Finally, we finish this examply by setting up the User DAO to Transaction DAO ROPE and we are done. Here an account can be created, read, updated, and deleted by any user that is the "owner" to the account.
 
 ``` java
-    // An account can be created, read, updated, and deleted by any user that has this relationship
-    // 1. "owner", to the account
     createMap.put("__default__", new ArrayList<String>(Arrays.asList( "__terminate__" )));
     readMap.put("__default__", new ArrayList<String>(Arrays.asList( "__terminate__" )));
     updateMap.put("__default__", new ArrayList<String>(Arrays.asList( "__terminate__" )));
