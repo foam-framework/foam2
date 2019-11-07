@@ -51,9 +51,9 @@ There are a few helper ROPEs with which can be used to combine regular ROPEs to 
 
 ##### ROPEAuthorizer
 
-Akin to any standard foam authorizer, ROPEAuthorizer is an implementation of the corresponding interface and can be used interchangibly on any DAO. Each ropeAuthorizer has a corresponding targetDAOKey property which is utilized in finding the corresponding ROPE to perform authorization checksd with. The bulk of the algorithm is implemented within the ROPE model itself with an entrypoint in the check method to which the ROPEAuthorizer merely delegates.
+Akin to any standard foam authorizer, ROPEAuthorizer is an implementation of the corresponding interface and can be used interchangably on any DAO. Each ROPEAuthorizer has a corresponding targetDAOKey property which is utilized in finding the corresponding ROPEs to perform authorization checked with. The bulk of the algorithm is implemented within the ROPE model itself with an entrypoint in the check method to which the ROPEAuthorizer merely delegates.
 
-Though it is abstracted away from the user that utilizes such authorizers, there is a slight nuance in logic between the authorization of read/delete versus that of create/update that is worth noting in order to understand the back-end functionality of ROPE. On reads and deletes, there is no need to perform authorization at the property level as the entire object is being returned or deleted as the result of a querry. However, on creates and updates, the properties that are set by the user are compared with either a new instance of the model (in the case of create), or the old object before the update. For each rope, a check is called for each of the properties that are set/changed, and the checks must all return true before the action can be granted.
+Though it is abstracted away from the user that utilizes such authorizers, there is a slight nuance in logic between the authorization of read/delete versus that of create/update that is worth noting in order to understand the back-end functionality of ROPE. On reads and deletes, there is no need to perform authorization at the property level as the entire object is being returned or deleted as the result of a query. However, on creates and updates, the properties that are set by the user are compared with either a new instance of the model (in the case of create), or the old object before the update. For each rope, a check is called for each of the properties that are set/changed, and the checks must all return true before the action can be granted.
 
 &nbsp;
 
@@ -119,7 +119,6 @@ First we start by setting up the ROPE for the Account DAO to Transaction DAO in 
       .setRelationshipMap(relationshipMap)   
       .build());
 ```
-
 &nbsp;
 Next we setup our Account DAO to Account DAO ROPE. Here we have that an account can be created, read, updated, or deleted in one of two ways,
   1. Direct ownership of the account
@@ -148,7 +147,6 @@ Next we setup our Account DAO to Account DAO ROPE. Here we have that an account 
       .build());
     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
 ```
-
 &nbsp;
 Finally, we finish this examply by setting up the User DAO to Transaction DAO ROPE and we are done. Here an account can be created, read, updated, and deleted by any user that is the "owner" to the account.
 
