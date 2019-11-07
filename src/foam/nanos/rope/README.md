@@ -41,7 +41,6 @@ Permissions based on relationships can be configured by the user by creating a R
 
 There are a few helper ROPEs with which can be used to combine regular ROPEs to form more complex logical operations. There are known more formally as composite ropes. AND and OR ROPEs can be found in the compositeROPE.js file. These act as regular ROPEs except that under the hood they delegate their checks to other ropes composed within them. The OR composite authorizes if only one of the ROPEs it is composed with authorizes and the AND requires all composed ROPEs to authorize. 
 
-// TODO James integrate this with the above paragraph
 CompositeROPEs extend the CompositeROPE class which contains a `List<ROPE>` property and extends the ROPE class
 For CompositeROPEs, only this property and the `ids` of the ROPE, which include `targetDAOKey`, `sourceDAOKey`, and `relationshipKey` should be provided.
 The `targetDAOKey` must match that of its children, but the `sourceDAOKey` and `relationshipKey` has no such requirements, and is only provided to refine lookup of ROPEs.
@@ -100,32 +99,22 @@ ROPE works by checking which permissions are implied given any that a User might
 &nbsp;
 &nbsp;
 
-## Working Example with Code
+## Working Examples with Code
 
-#### Setting up a basic ROPE
-TODO James
+#### Transaction-Account ROPE
 
-Here we will demystify the above explanation with a more concrete example.
-We will setup ROPEs such that we have a chain from Transaction to User.
+Suppose that we want a basic ROPE which will grant permissions to write to transactionDAO through accountDAO and userDAO. Here we use a relationship enviroment where users of an application can own an account which can in turn have children. We use this context to create a ROPE where a transaction can be created if a user owns the sourceAccount of the transaction or the parent of the sourceAccount of a transaction.
 
-Setup of a Transaction-Account example
-
-This is example of a rope for granting permissions to write to transactionDAO through accountDAO and userDAO.
-This example is under the assumption that user can own accounts, and those accounts can form a trees of child accounts. 
-Transactions can be created if a user owns the sourceAccount of the transaction or the parent of the sourceAccount of a transaction.
+First we start by setting up the ROPE for the Account DAO to Transaction DAO in a beanshell style code snippet,
 
 ``` java
-    // declare and initialize maps and list
-
-    // TRANSACTIONDAO - ACCOUNTDAO (sourceAccount)
-
-    // this is the default maps for crud. 
-    // An transaction can be created or read in one of two ways:
+    // A transaction can be created or read in one of two ways:
     //  1. Direct ownership of the sourceAccount
     //  2. Indirectly through checking the authorization on the parent account of the sourceAccount 
     createMap.put("__default__", new ArrayList<String>(Arrays.asList( "owner", "parent" )));
     readMap.put("__default__", new ArrayList<String>(Arrays.asList( "owner", "parent" )));
-    // non-system users should not have authorization to update or delete accounts, so no path is granted for this operation
+
+    // Non-system users should not have authorization to update or delete accounts; so no path is granted for this operation
     updateMap.put("__default__", null);
     deleteMap.put("__default__", null);
     crudMap.put("create", createMap);
@@ -141,12 +130,14 @@ Transactions can be created if a user owns the sourceAccount of the transaction 
       .setCrudMap(crudMap)           
       .setRelationshipMap(relationshipMap)   
       .build());
-    
-    // clear maps    
+'''
 
+Next we setup our Account DAO to Account DAO ROPE,
+
+''' java 
     // ACCOUNTDAO - ACCOUNT DAO (parent)
 
-    // an account can be created, read, update, or deleted in one of two ways
+    // An account can be created, read, updated, or deleted in one of two ways
     //  1. Direct ownership of the account
     //  2. Indirectly through checking the authorization on the parent account 
     createMap.put("__default__", new ArrayList<String>(Arrays.asList( "owner", "parent" )));
@@ -170,13 +161,13 @@ Transactions can be created if a user owns the sourceAccount of the transaction 
       .setRelationshipMap(relationshipMap)   
       .build());
     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
+'''
 
-    // clear maps
+Finally, we finish this examply by setting up the User DAO to Transaction DAO ROPE and we are done,
 
-    // ACCOUNTDAO - USERDAO (owner)
-
-    // an account can be created, read, updated, and deleted by any user that has this relationship
-    // "owner", to the account
+''' java
+    // An account can be created, read, updated, and deleted by any user that has this relationship
+    // 1. "owner", to the account
     createMap.put("__default__", new ArrayList<String>(Arrays.asList( "__terminate__" )));
     readMap.put("__default__", new ArrayList<String>(Arrays.asList( "__terminate__" )));
     updateMap.put("__default__", new ArrayList<String>(Arrays.asList( "__terminate__" )));
