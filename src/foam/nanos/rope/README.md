@@ -17,6 +17,8 @@ One of the key defining features that makes the ROPE algorithm's authorization s
 
 More generally this applies for properties themselves within the objects and the relationships between them. ROPE allows you to work at both the property level when it comes to authorization for much needed simplicity in acheiving fine-grained controll. 
 
+&nbsp;
+
 #### Using ROPE with DAOs
 
 The ROPE authorization system can be utilized by the user of the framework by appending a ROPEAuthorizer decorator to any DAO object that requires authorization. This decorator follows the standard FOAM Authorizer interface and performs authorization checks dynamically as the dao is used using the ROPE relationship search algorithm under the hood.
@@ -37,6 +39,8 @@ transactionDAO = new foam.dao.EasyDAO.Builder(x)
 
 Permissions based on relationships can be configured by the user by creating a ROPE objects from the ROPE.js model and setting the properties accordingly and afterwards appending the object to the application's ropeDAO which will be utilized by the ROPE algorithm to perform authorization checks. Given a missing ROPE, the algorithm trivially assumes that all permissions are not granted on that object.
 
+&nbsp;
+
 #### Composition of ROPES
 
 There are a few helper ROPEs with which can be used to combine regular ROPEs to form more complex logical operations. There are known more formally as composite ropes. AND and OR ROPEs can be found in the compositeROPE.js file. These act as regular ROPEs except that under the hood they delegate their checks to other ropes composed within them. The OR composite authorizes if only one of the ROPEs it is composed with authorizes and the AND requires all composed ROPEs to authorize. 
@@ -45,8 +49,6 @@ There are a few helper ROPEs with which can be used to combine regular ROPEs to 
 &nbsp;
 
 ## Technical Notes on the Proper Setup of ROPE Objects
-
-#### The ROPE Models
 
 ##### ROPEAuthorizer
 TODO James
@@ -58,6 +60,8 @@ The main difference between the ROPEAuthorizer and other authorizers is that the
 Furthermore, there is a difference in logic between the authorization of read/delete versus that of create/update.
 In `authorizeOnRead` and `authorizeOnDelete`, there is no need to perform authorization at the property level. In the case of read, the visibility of individual properties are not in the scope of ROPE, and in the case of delete, it is redundant.
 However, in `authorizeOnCreate` and `authorizeOnUpdate`, the properties that are set by the user are compared with either a new instance of the model (in the case of create), or the old object before the update. For each rope, a check is called for each of the properties that are set/changed, and the checks must all return true before the action can be granted.
+
+&nbsp;
 
 ##### ROPE Model
 
@@ -79,10 +83,13 @@ One important method to note in the ROPE model is `check`, which handles the wor
 2. crudKey - This is the key used in the first step of the ROPE search, representing the action to perform in the targetDAO on the target object. This must match one of the keys in the crudMap. This key is NOT used in any step of the ROPE search except the first.
 3. propertyKey - This is the key that can be used along with the crudKey to check specifically the next steps that must be taken to update or set some property. This is only used when the operation is an update or create. If the propertyKey is not found in the "create" map or "update" map, depending on what the crudKey was, the values in the "\_\_default\_\_" entry are used.
 
+&nbsp;
 
 #### Setup of Miscellany
 
 One trivial requirement of all ROPE objects is to set up the source and target models, their respective DAO keys, and the cardinality which is a string representing the type of the relationship be it one to many or many to one, the uses should specify this field as a String of the form ***"1:1"***, ***"1:\*"***, ***"\*:1"***, or ***"\*:\*"***. Note here that ***"1:1"*** describes a special case which refers to relationships to the junction objects themselves. There are also 3 additional fields that must be set up to describe the relation and the dao in which the relation's objects are held. These include junctionModel, junctionDAOKey, and inverseName.
+
+&nbsp;
 
 #### To set up which permissions this ROPE will enable
 
