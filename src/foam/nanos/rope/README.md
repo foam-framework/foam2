@@ -119,7 +119,6 @@ First we start by setting up the ROPE for the Account DAO to Transaction DAO in 
       .setRelationshipMap(relationshipMap)   
       .build());
 ```
-
 &nbsp;
 Next we setup our Account DAO to Account DAO ROPE. Here we have that an account can be created, read, updated, or deleted in one of two ways,
   1. Direct ownership of the account
@@ -148,7 +147,6 @@ Next we setup our Account DAO to Account DAO ROPE. Here we have that an account 
       .build());
     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
 ```
-
 &nbsp;
 Finally, we finish this examply by setting up the User DAO to Transaction DAO ROPE and we are done. Here an account can be created, read, updated, and deleted by any user that is the "owner" to the account.
 
