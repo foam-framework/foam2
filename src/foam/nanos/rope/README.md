@@ -96,9 +96,9 @@ ROPE works by checking which permissions are implied given any that a User might
 
 #### Transaction-Account ROPE
 
-Suppose that we want a basic ROPE which will grant permissions to write to transactionDAO through accountDAO and userDAO. Here we use a relationship enviroment where users of an application can own an account which can in turn have children. We use this context to create a ROPE where a transaction can be created if a user owns the sourceAccount of the transaction or the parent of the sourceAccount of a transaction.
+Suppose that we want a basic ROPE which will grant permissions to write to `transactionDAO` through `accountDAO` and `userDAO`. Here we use a relationship enviroment where users of an application can own an account which can in turn have children. We use this context to create a ROPE where a transaction can be created if a user owns the sourceAccount of the transaction or the parent of the sourceAccount of a transaction.
 
-First we start by setting up the ROPE for the Account DAO to Transaction DAO in a beanshell style code snippet. Here we have that a transaction can be created or read in one of two ways, 
+First we start by setting up the ROPE for the `accountDAO` to `transactionDAO` in a beanshell style code snippet. Here we have that a transaction can be created or read in one of two ways, 
 1. Direct ownership of the sourceAccount
 2. Indirectly through checking the authorization on the parent account of the sourceAccount 
 
@@ -125,7 +125,7 @@ First we start by setting up the ROPE for the Account DAO to Transaction DAO in 
 ```
 
 &nbsp;
-Next we setup our Account DAO to Account DAO ROPE. Here we have that an account can be created, read, updated, or deleted in one of two ways,
+Next we setup our `accountDAO` to `accountDAO` ROPE. Here we have that an account can be created, read, updated, or deleted in one of two ways,
   1. Direct ownership of the account
   2. Indirectly through checking the authorization on the parent account 
 
@@ -154,7 +154,7 @@ Next we setup our Account DAO to Account DAO ROPE. Here we have that an account 
 ```
 
 &nbsp;
-Finally, we finish this examply by setting up the User DAO to Transaction DAO ROPE and we are done. Here an account can be created, read, updated, and deleted by any user that is the "owner" to the account.
+Finally, we finish this examply by setting up the `userDAO` to `transactionDAO` ROPE and we are done. Here an account can be created, read, updated, and deleted by any user that is the "owner" to the account.
 
 ``` java
     createMap.put("__default__", new ArrayList<String>(Arrays.asList( "__terminate__" )));
