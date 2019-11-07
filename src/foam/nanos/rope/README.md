@@ -50,7 +50,6 @@ There are a few helper ROPEs with which can be used to combine regular ROPEs to 
 ## Technical Notes on the Proper Setup of ROPE Objects
 
 ##### ROPEAuthorizer
-TODO James
 The ROPEAuthorizer extends the Authorizer interface and implements the methods `authorizeOnCreate`, `authorizeOnRead`, `authorizeOnUpdate`, and `authorizeOnDelete`.
 
 The ROPEAuthorizer has one property called the `targetDAOKey`, and it is used to find the first ROPE and initialize the chain of ROPE searches.
@@ -84,13 +83,7 @@ One important method to note in the ROPE model is `check`, which handles the wor
 
 &nbsp;
 
-#### Setup of Miscellany
-
-One trivial requirement of all ROPE objects is to set up the source and target models, their respective DAO keys, and the cardinality which is a string representing the type of the relationship be it one to many or many to one, the uses should specify this field as a String of the form ***"1:1"***, ***"1:\*"***, ***"\*:1"***, or ***"\*:\*"***. Note here that ***"1:1"*** describes a special case which refers to relationships to the junction objects themselves. There are also 3 additional fields that must be set up to describe the relation and the dao in which the relation's objects are held. These include junctionModel, junctionDAOKey, and inverseName.
-
-&nbsp;
-
-#### To set up which permissions this ROPE will enable
+##### To set up which permissions this ROPE will enable
 
 Both of the following methods of setting up a ROPE can be used in conjunction to achieve the desired functionality and are illustrated with some practical examples in the following section.
 
