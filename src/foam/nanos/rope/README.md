@@ -47,8 +47,6 @@ For CompositeROPEs, only this property and the `ids` of the ROPE, which include 
 The `targetDAOKey` must match that of its children, but the `sourceDAOKey` and `relationshipKey` has no such requirements, and is only provided to refine lookup of ROPEs.
 The classes extending the CompositeROPE class have their own implementations of check.
 
-```
-
 &nbsp;
 &nbsp;
 
