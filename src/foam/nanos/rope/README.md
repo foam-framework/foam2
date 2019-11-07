@@ -41,11 +41,6 @@ Permissions based on relationships can be configured by the user by creating a R
 
 There are a few helper ROPEs with which can be used to combine regular ROPEs to form more complex logical operations. There are known more formally as composite ropes. AND and OR ROPEs can be found in the compositeROPE.js file. These act as regular ROPEs except that under the hood they delegate their checks to other ropes composed within them. The OR composite authorizes if only one of the ROPEs it is composed with authorizes and the AND requires all composed ROPEs to authorize. 
 
-CompositeROPEs extend the CompositeROPE class which contains a `List<ROPE>` property and extends the ROPE class
-For CompositeROPEs, only this property and the `ids` of the ROPE, which include `targetDAOKey`, `sourceDAOKey`, and `relationshipKey` should be provided.
-The `targetDAOKey` must match that of its children, but the `sourceDAOKey` and `relationshipKey` has no such requirements, and is only provided to refine lookup of ROPEs.
-The classes extending the CompositeROPE class have their own implementations of check.
-
 &nbsp;
 &nbsp;
 
@@ -64,26 +59,24 @@ Furthermore, there is a difference in logic between the authorization of read/de
 In `authorizeOnRead` and `authorizeOnDelete`, there is no need to perform authorization at the property level. In the case of read, the visibility of individual properties are not in the scope of ROPE, and in the case of delete, it is redundant.
 However, in `authorizeOnCreate` and `authorizeOnUpdate`, the properties that are set by the user are compared with either a new instance of the model, in the case of create, or the old object before the update. For each rope, a check is called for each of the properties that are set/changed, and the checks must all return true before the action can be granted.
 
-##### ROPE
-TODO James
-This is a description of the ROPE model.
+##### ROPE Model
 
 Contains the following properties: 
-- sourceDAOKey - DAO with relationship to target DAO
-- targetDAOKey - the DAO to check permission/relationship on
-- cardinality - contains `1:1`, `1:*`, and `*:*`. `1:1` is used in the case where the targetDAO is a junctionDAO.
-- relationshipKey - the name of the relationship from the target to source, is defined in the relationship between the models
-- isInverse - if the source/target is the inverse of what was defined in the relationship, used mainly to check if a 1:* rope is actually *:1 in the relationship
-- crudMap - A map containing maps for each of the crud operations, where the keys are "create", "read", "update", and "delete". 
-  - Each sub-map contains keys which are either "\_\_default\_\_" or some propertyName, in the case of update or create
+- sourceDAOKey - The DAO with which the target DAO is related to.
+- targetDAOKey - The DAO to check permission/relationship on.
+- cardinality - Contains `1:1`, `1:*`, and `*:*`; `1:1` is used for special cases where the targetDAO is a junctionDAO.
+- relationshipKey - The name of the relationship from the target to source, is defined in the relationship between the models.
+- isInverse - If the source/target is the inverse of what was defined in the relationship, used mainly to check if a 1:* rope is actually *:1 in the relationship.
+- crudMap - A map containing maps for each of the crud operations, where the keys are "create", "read", "update", and "delete".
+  - Each sub-map contains keys which are either "\_\_default\_\_" or some propertyName, in the case of update or create.
   - The values of each sub-map contains relationshipKeys of ropes where the targetDAOKey is the sourceDAOKey of the current rope.
-- relationshipMap - a map containing keys which are the relationshipKey of the previous ROPE in the chain of ROPE lookups, and the values are the relationshipKeys of the ropes where the targetDAOKey is the sourceDAOKey of the current rope. Think of this as a mapping from "previousStep" to "nextSteps"
+- relationshipMap - A map containing keys which are the relationshipKey of the previous ROPE in the chain of ROPE lookups, and the values are the relationshipKeys of the ropes where the targetDAOKey is the sourceDAOKey of the current rope. Think of this as a mapping from "previousStep" to "nextSteps".
 - There is a special value, "\_\_terminate\_\_" that can be added as an value of any map, this tells the ROPE to check if the source object in this relationship is an User and matches the User in the current context, and if so, to grant the operation into the DAO of interest.
 
 One important method to note in the ROPE model is `check`, which handles the work of looking up relevant ropes and checking them recursively to find a path to the context user. It takes as argument the context and the object of interest, but also three keys : 
-1. relationshipKey - this is used to filter the ropeDAO in the search for relevant ROPEs, this is usually provided in the intermediate steps of the rope search in the ROPEAuthorizer, but when programming with ROPE directly, this can be provided to narrow the number of ROPEs to check in subsequent steps  
-2. crudKey - this is the key used in the first step of the ROPE search, representing the action to perform in the targetDAO on the target object. This must match one of the keys in the crudMap. This key is NOT used in any step of the ROPE search except the first.
-3. propertyKey - this is the key that can be used along with the crudKey to check specifically the next steps that must be taken to update or set some property. This is only used when the operation is an update or create. If the propertyKey is not found in the "create" map or "update" map, depending on what the crudKey was, the values in the "\_\_default\_\_" entry are used.
+1. relationshipKey - This is used to filter the ropeDAO in the search for relevant ROPEs, this is usually provided in the intermediate steps of the rope search in the ROPEAuthorizer, but when programming with ROPE directly, this can be provided to narrow the number of ROPEs to check in subsequent steps  
+2. crudKey - This is the key used in the first step of the ROPE search, representing the action to perform in the targetDAO on the target object. This must match one of the keys in the crudMap. This key is NOT used in any step of the ROPE search except the first.
+3. propertyKey - This is the key that can be used along with the crudKey to check specifically the next steps that must be taken to update or set some property. This is only used when the operation is an update or create. If the propertyKey is not found in the "create" map or "update" map, depending on what the crudKey was, the values in the "\_\_default\_\_" entry are used.
 
 
 #### Setup of Miscellany
@@ -132,6 +125,7 @@ First we start by setting up the ROPE for the Account DAO to Transaction DAO in 
       .build());
 ```
 
+&nbsp;
 Next we setup our Account DAO to Account DAO ROPE,
 
 ``` java 
@@ -163,6 +157,7 @@ Next we setup our Account DAO to Account DAO ROPE,
     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
 ```
 
+&nbsp;
 Finally, we finish this examply by setting up the User DAO to Transaction DAO ROPE and we are done,
 
 ``` java
