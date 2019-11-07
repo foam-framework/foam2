@@ -79,7 +79,8 @@ foam.CLASS({
             str: 'Random data ' + i,
             bool: Math.random() < 0.5,
             arr: [Math.random()],
-            fop: '111-111-1111' })
+            fop: '111-111-1111'
+          }));
           );
         }
       }
