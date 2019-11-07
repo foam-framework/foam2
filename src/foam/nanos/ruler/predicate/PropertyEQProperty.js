@@ -8,7 +8,12 @@ foam.CLASS({
   package: 'foam.nanos.ruler.predicate',
   name: 'PropertyEQProperty',
 
-  documentation: 'A predicate that returns true when a specific property equals the other specified property the new or old object.',
+  documentation: `A predicate that returns true when a specific property equals the value of another specified property.
+  The developer must provide the property names as a string for prop1 and prop2.
+  The developer can choose on which object this predicate is evaluated. either old or new object.
+
+  Example of usage: When a pizza object passes through the rule engine, we can check if topping1 property is equal to topping2 property.
+  when true, we can charge for the topping at a discounted double topping rate`,
 
   extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: ['foam.core.Serializable'],
