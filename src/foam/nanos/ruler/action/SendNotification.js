@@ -8,7 +8,8 @@ foam.CLASS({
   package: 'foam.nanos.ruler.action',
   name: 'SendNotification',
 
-  documentation: 'An action that just puts a notification',
+  documentation: `An action that just puts a notification to the notificationDAO. A notification object must be provided in the rule declaration,
+  An example of usage: When a pizza order comes in from a customer, send a notification to the pizza chef that an order was received.`,
 
   implements: ['foam.nanos.ruler.RuleAction'],
 

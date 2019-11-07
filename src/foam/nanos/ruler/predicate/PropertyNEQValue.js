@@ -8,7 +8,10 @@ foam.CLASS({
   package: 'foam.nanos.ruler.predicate',
   name: 'PropertyNEQValue',
 
-  documentation: 'A predicate that returns false when a specific property equals the provided value on either the new or old object.',
+  documentation: `A predicate that returns false when a specific property equals the provided value.
+   Both the property name and the desired value must be provided. user can choose the new or old object for evaluation.
+
+   An example of usage: When a pizza object is updated, and the status property is equal to pizzaStatus.COOKED evaluate false.`,
 
   extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: ['foam.core.Serializable'],
@@ -39,11 +42,11 @@ foam.CLASS({
       javaCode: `
         if ( getIsNew() ) {
           FObject nu  = (FObject) NEW_OBJ.f(obj);
-          return ! EQ(nu.getClassInfo().getAxiomByName(getPropName()), getPropValue()).f(nu);
+          return NEQ(nu.getClassInfo().getAxiomByName(getPropName()), getPropValue()).f(nu);
         }
         else {
           FObject old = (FObject) OLD_OBJ.f(obj);
-          return ! EQ(old.getClassInfo().getAxiomByName(getPropName()), getPropValue()).f(old);
+          return NEQ(old.getClassInfo().getAxiomByName(getPropName()), getPropValue()).f(old);
         }
       `
     }

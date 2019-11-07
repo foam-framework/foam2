@@ -8,7 +8,10 @@ foam.CLASS({
   package: 'foam.nanos.ruler.predicate',
   name: 'PropertyEQValue',
 
-  documentation: 'A predicate that returns true when a specific property equals the provided value on either the new or old object.',
+  documentation: `A predicate that returns true when a specific property equals the provided value.
+  Both the property name and the desired value must be provided. user can choose the new or old object for evaluation.
+
+  An example of usage: When a pizza object is updated, and the status property is equal to pizzaStatus.COOKED evaluate true`,
 
   extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: ['foam.core.Serializable'],
