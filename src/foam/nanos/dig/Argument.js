@@ -46,7 +46,7 @@ foam.CLASS({
       factory: function() {
         var model = foam.lookup(this.javaType, true);
 
-        if ( this.javaType != '' && ( this.javaType != 'String' && this.javaType != 'double' && this.javaType != 'boolean' && this.javaType != 'long' && this.javaType != 'foam.core.X' ) )
+        if ( this.javaType != '' && ( this.javaType != 'String' && this.javaType != 'double' && this.javaType != 'boolean' && this.javaType != 'long' && this.javaType != 'foam.core.X' && this.javaType != 'java.util.Map' ) )
           return model.create(null, this);
       }
     }
