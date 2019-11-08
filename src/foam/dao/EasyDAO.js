@@ -276,9 +276,7 @@ foam.CLASS({
       name: 'pipelinePm'
     },
     {
-      /** Have EasyDAO use a sequence number to index items. Note that
-        .seqNo and .guid features are mutually
-        exclusive. */
+      documentation: 'Have EasyDAO use a sequence number to index items. Note that .seqNo and .guid features are mutuallyexclusive.',
       class: 'Boolean',
       name: 'seqNo',
       value: false
@@ -314,7 +312,7 @@ foam.CLASS({
       value: false
     },
     {
-      documentation: 'Enable standard authorization',
+      documentation: 'Enable authorization',
       class: 'Boolean',
       name: 'authorize',
       value: true
@@ -370,14 +368,14 @@ foam.CLASS({
       name: 'validator'
     },
     {
-      /** Enable value de-duplication to save memory when caching. */
+      documentation: 'Enable value de-duplication to save memory when caching',
       class: 'Boolean',
       name: 'dedup',
       generateJava: false,
       value: false,
     },
     {
-      /** Keep a history of all state changes to the DAO. */
+      documentation: 'Keep a history of all state changes to the DAO',
       class: 'foam.core.Enum',
       of: 'foam.dao.JournalType',
       name: 'journalType',
@@ -394,13 +392,13 @@ foam.CLASS({
       name: 'journal'
     },
     {
-      /** Enable logging on the DAO. */
+      documentation: 'Enable logging on the DAO',
       class: 'Boolean',
       name: 'logging',
       value: false,
     },
     {
-      /** Enable time tracking for concurrent DAO operations. */
+      documentation: 'Enable time tracking for concurrent DAO operations',
       class: 'Boolean',
       name: 'timing',
       value: false
@@ -411,8 +409,7 @@ foam.CLASS({
       value: false
     },
     {
-      /** Contextualize objects on .find, re-creating them with this EasyDAO's
-        exports, as if they were children of this EasyDAO. */
+      documentation: 'Contextualize objects on .find, re-creating them with this EasyDAO\'s exports, as if they were children of this EasyDAO.',
       class: 'Boolean',
       name: 'contextualize',
       value: false
@@ -448,7 +445,7 @@ foam.CLASS({
       name: 'mdao'
     },
     {
-      /** Automatically generate indexes as necessary, if using an MDAO or cache. */
+      documentation: 'Automatically generate indexes as necessary, if using an MDAO or cache',
       class: 'Boolean',
       generateJava: false,
       name: 'autoIndex',
@@ -456,40 +453,35 @@ foam.CLASS({
       value: false
     },
     {
-      /** Turn on to activate synchronization with a server. Specify serverUri
-        and syncProperty as well. */
+      documentation: 'Turn on to activate synchronization with a server. Specify serverUri and syncProperty as well',
       class: 'Boolean',
       name: 'syncWithServer',
       generateJava: false,
       value: false
     },
     {
-      /** Turn on to enable remote listener support. Only useful with daoType = CLIENT. */
+      documentation: 'Turn on to enable remote listener support. Only useful with daoType = CLIENT',
       class: 'Boolean',
       generateJava: false,
       name: 'remoteListenerSupport',
       value: false
     },
     {
-      /** Setting to true activates polling, periodically checking in with
-        the server. If sockets are used, polling is optional as the server
-        can push changes to this client. */
+      documentation: 'Setting to true activates polling, periodically checking in with the server. If sockets are used, polling is optional as the server can push changes to this client',
       class: 'Boolean',
       generateJava: false,
       name: 'syncPolling',
       value: true
     },
     {
-      /** Set to true if you are running this on a server, and clients will
-        synchronize with this DAO. */
+      documentation: 'Set to true if you are running this on a server, and clients will synchronize with this DAO',
       class: 'Boolean',
       generateJava: false,
       name: 'isServer',
       value: false
     },
     {
-      /** The property to synchronize on. This is typically an integer value
-        indicating the version last seen on the remote. */
+      documentation: 'The property to synchronize on. This is typically an integer value indicating the version last seen on the remote',
       name: 'syncProperty',
       generateJava: false
     },
@@ -498,7 +490,7 @@ foam.CLASS({
       generateJava: false,
     },
     {
-      /** Destination address for server. */
+      documentation: 'Destination address for server',
       name: 'serverBox',
       generateJava: false,
       factory: function() {
@@ -831,9 +823,8 @@ foam.CLASS({
         return this;
       },
       javaCode: `
-          if ( getMdao() != null ) {
-            getMdao().addIndex(index);
-          }
+        if ( getMdao() != null ) 
+          getMdao().addIndex(index);
         return this;
       `
     },
