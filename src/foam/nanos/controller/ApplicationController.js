@@ -36,7 +36,6 @@ foam.CLASS({
     'foam.nanos.client.ClientBuilder',
     'foam.nanos.auth.Group',
     'foam.nanos.auth.ResendVerificationEmail',
-    'foam.nanos.auth.SignInView',
     'foam.nanos.auth.User',
     'foam.nanos.theme.Theme',
     'foam.nanos.u2.navigation.TopNavigation',
@@ -69,6 +68,7 @@ foam.CLASS({
     'pushMenu',
     'requestLogin',
     'signUpEnabled',
+    'signUpDAO',
     'stack',
     'user',
     'webApp',
@@ -137,6 +137,11 @@ foam.CLASS({
   `,
 
   properties: [
+    {
+      class: 'DAO',
+      name: 'signUpDAO',
+      factory: () => this.client.userDAO
+    },
     {
       class: 'Enum',
       of: 'foam.u2.layout.DisplayWidth',
@@ -383,7 +388,7 @@ foam.CLASS({
       }
 
       return new Promise(function(resolve, reject) {
-        self.stack.push({ class: 'foam.nanos.auth.SignInView' });
+        self.stack.push({ class: 'foam.u2.view.LoginView', model: foam.core.SignIn.create() });
         self.loginSuccess$.sub(resolve);
       });
     },
