@@ -4,26 +4,27 @@ foam.CLASS({
 
   documentation: `Model used for registering/creating an user.`,
 
-  implements: [
-    'foam.mlang.Expressions'
-  ],
-
   imports: [
-    'acceptanceDocumentService',
-    'auth',
+    'appConfig',
     'notify',
-    'smeBusinessRegistrationDAO',
+    'signUpDAO',
     'stack',
-    'user'
+    'user',
+    'userDAO'
   ],
 
   requires: [
     'foam.nanos.auth.Address',
     'foam.nanos.auth.Country',
     'foam.nanos.auth.Phone',
-    'foam.nanos.auth.User',
-    'foam.u2.Element',
-    'net.nanopay.ui.NewPasswordView'
+    'foam.nanos.auth.User'
+  ],
+
+  messages: [
+    { name: 'TITLE', message: 'Create a free account' },
+    { name: 'FOOTER_TXT', message: 'Already have an account?' },
+    { name: 'FOOTER_LINK', message: 'Sign in' },
+    { name: 'DISCLAIMER', message: '*Ablii does not currently support businesses in Quebec. We are working hard to change this! If you are based in Quebec, check back for updates.' }
   ],
 
   properties: [
@@ -32,7 +33,7 @@ foam.CLASS({
       name: 'dao_',
       documentation: `The dao that will be used to save the new user.`,
       factory: function() {
-        return userDAO;
+        return this.signUpDAO;
       },
       hidden: true
     },
@@ -41,7 +42,7 @@ foam.CLASS({
       name: 'group_',
       documentation: `Group this user is going to be apart of.`,
       factory: function() {
-        return 'system';
+        return this.appConfig.group.name;
       },
       hidden: true
     },
@@ -67,6 +68,12 @@ foam.CLASS({
       class: 'Boolean',
       name: 'disableCompanyName_',
       documentation: `Set this to true to disable the Company Name input field.`,
+      hidden: true
+    },
+    {
+      class: 'StringArray',
+      name: 'countryChoices_',
+      documentation: `Set this to the list of countries (Country.NAME) we want our signing up user to be able to select.`,
       hidden: true
     },
     {
@@ -131,9 +138,16 @@ foam.CLASS({
       of: 'foam.nanos.auth.Country',
       documentation: 'Country address.',
       view: function(_, X) {
-        var choices = X.data.slot(function() {
-          return X.countryDAO.where(X.data.EQ(X.data.Country.NAME, 'Canada'));
-        });
+        var choices;
+        if ( this.countryChoices_ ) {
+          choices = X.data.slot(function() {
+            return X.countryDAO.where(X.data.IN(X.data.Country.CODE, this.countryChoices_));
+          });
+        } else {
+          choices = X.data.slot(function() {
+            return X.countryDAO;
+          });
+        }
         return foam.u2.view.ChoiceView.create({
           placeholder: 'Select your country',
           objToChoice: function(a) {
@@ -165,45 +179,28 @@ foam.CLASS({
         class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       },
-      required: true
+      minLength: 6
     }
   ],
 
   methods: [
     {
-      name: 'updateUser',
-      documentation: 'update user ',
-      code: function(x, userId) {
-        this.isLoading_ = true;
-        this.auth
-          .loginByEmail(null, this.email, this.desiredPassword)
-          .then((user) => {
-            this.user.copyFrom(user);
-              if ( this.user.emailVerified ) {
-                // When a link was sent to user to SignUp, they will have already verified thier email,
-                // thus thier user.emailVerified should be true and they can simply login from here.
-                window.history.replaceState(null, null, window.location.origin);
-                location.reload();
-              } else {
-                // logout once we have finished updating documents.
-                this.auth.logout();
-                this.stack.push({
-                  class: 'foam.nanos.auth.ResendVerificationEmail'
-                });
-              }
-              this.isLoading_ = false;
-          })
-          .catch((err) => {
-            console.warn(err.message);
-            this.notify('There was a problem while signing you in.', 'error');
-          });
+      name: 'footerLink',
+      code: function() {
+        this.stack.push({ class: 'foam.u2.view.LoginView', model: foam.core.SignIn.create() });
       }
-    }
+    },
+    {
+      name: 'subfooterLink',
+      code: function() {
+        return;
+      }
+    },
   ],
 
   actions: [
     {
-      name: 'CreateNew',
+      name: 'login',
       label: 'Get Started',
       isEnabled: function(errors_, isLoading_) {
         return ! errors_ && ! isLoading_;
@@ -221,12 +218,21 @@ foam.CLASS({
             address: this.Address.create({ countryId: this.countryId }),
             welcomeEmailSent: true,
             department: this.department,
-            phone: this.phone,
+            phone: this.Phone.create({ number: this.phone }),
             group: this.group_
           }))
           .then((user) => {
             this.user.copyFrom(user);
-            this.updateUser(x, this.user.id);
+            if ( this.user.emailVerified ) {
+              // When a link was sent to user to SignUp, they will have already verified thier email,
+              // thus thier user.emailVerified should be true and they can simply login from here.
+              window.history.replaceState(null, null, window.location.origin);
+              location.reload();
+            } else {
+              this.stack.push({
+                class: 'foam.nanos.auth.ResendVerificationEmail'
+              });
+            }
           }).catch((err) => {
             console.warn(err.message);
             this.notify('There was a problem creating your account.', 'error');
@@ -236,6 +242,5 @@ foam.CLASS({
           });
       }
     }
-
   ]
 });
