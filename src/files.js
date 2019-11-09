@@ -24,6 +24,8 @@
 if ( typeof window !== 'undefined' ) global = window;
 
 FOAM_FILES([
+  { name: "foam/core/SignUp" },
+  { name: "foam/core/SignIn" },
   { name: "foam/core/poly" },
   { name: "foam/core/lib" },
   { name: "foam/core/stdlib" },
@@ -191,6 +193,7 @@ FOAM_FILES([
   { name: 'foam/u2/view/StringArrayRowView', flags: ['web'] },
   { name: 'foam/u2/borders/NullBorder', flags: ['web'] },
   { name: 'foam/u2/borders/CardBorder', flags: ['web'] },
+  { name: 'foam/u2/borders/SplitScreenBorder', flags: ['web'] },
   { name: "foam/version/VersionTrait" },
   { name: "foam/version/VersionedClass" },
   { name: "foam/version/VersionedClassFactory" },
@@ -430,6 +433,7 @@ FOAM_FILES([
   { name: "foam/u2/TimeView", flags: ['web'] },
   { name: "foam/u2/history/HistoryItemView", flags: ['web'] },
   { name: "foam/u2/history/HistoryView", flags: ['web'] },
+  { name: "foam/u2/view/LoginView", flags: ['web'] },
   { name: "foam/u2/view/ValueView", flags: ['web'] },
   { name: "foam/u2/view/PreView", flags: ['web'] },
   { name: "foam/u2/view/TableCellFormatterReadView", flags: ['web'] },
