@@ -1,5 +1,5 @@
 foam.CLASS({
-  package: 'foam.core',
+  package: 'foam.nanos.u2.navigation',
   name: 'SignIn',
   extends: 'foam.u2.Controller',
 
@@ -70,7 +70,7 @@ foam.CLASS({
     {
       name: 'footerLink',
       code: function() {
-        this.stack.push({ class: 'foam.u2.view.LoginView', model: foam.core.SignUp.create() });
+        this.stack.push({ class: 'foam.u2.view.LoginView', model: foam.nanos.u2.navigation.SignUp.create() });
       }
     },
     {

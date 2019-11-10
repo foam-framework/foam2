@@ -94,7 +94,7 @@ foam.CLASS({
               .start().addClass('link')
                 .add(this.REDIRECTION_TO)
                 .on(this.ACTION_PRESS, () => {
-                  this.stack.push({ class: 'foam.u2.view.LoginView', model: foam.core.SignIn.create() });
+                  this.stack.push({ class: 'foam.u2.view.LoginView', model: foam.nanos.u2.navigation.SignIn.create() });
                 })
               .end()
             .end()
@@ -114,7 +114,7 @@ foam.CLASS({
         var user = this.User.create({ email: this.email });
         this.resetPasswordToken.generateToken(null, user).then((_) => {
           this.notify(`${this.INSTRUC_ONE} ${this.email}. ${this.INSTRUC_TWO}`);
-          this.stack.push({ class: 'foam.u2.view.LoginView', model: foam.core.SignIn.create() });
+          this.stack.push({ class: 'foam.u2.view.LoginView', model: foam.nanos.u2.navigation.SignIn.create() });
         })
         .catch((err) => {
           this.notify(err.message, 'error');

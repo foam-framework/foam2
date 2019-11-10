@@ -24,8 +24,7 @@
 if ( typeof window !== 'undefined' ) global = window;
 
 FOAM_FILES([
-  { name: "foam/core/SignUp" },
-  { name: "foam/core/SignIn" },
+  
   { name: "foam/core/poly" },
   { name: "foam/core/lib" },
   { name: "foam/core/stdlib" },
@@ -257,6 +256,8 @@ FOAM_FILES([
   { name: "foam/dao/VersionNoDAO" },
   { name: "foam/dao/sync/SyncRecord" },
   { name: "foam/dao/SyncDAO" },
+  { name: "foam/nanos/u2/navigation/SignUp" },
+  { name: "foam/nanos/u2/navigation/SignIn" },
   { name: "foam/nanos/boot/NSpec" },
   { name: "foam/nanos/boot/NSpecAware" },
   { name: "foam/nanos/auth/Authorizer" },
