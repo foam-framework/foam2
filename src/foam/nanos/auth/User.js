@@ -14,7 +14,8 @@ foam.CLASS({
     'foam.nanos.auth.EnabledAware',
     'foam.nanos.auth.HumanNameTrait',
     'foam.nanos.auth.LastModifiedAware',
-    'foam.nanos.auth.ServiceProviderAware'
+    'foam.nanos.auth.ServiceProviderAware',
+    'foam.nanos.notification.Notifiable'
   ],
 
   requires: [
@@ -33,6 +34,9 @@ foam.CLASS({
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.PriorPassword',
+    'foam.nanos.notification.Notification',
+    'foam.nanos.notification.NotificationConfig',
+    'foam.nanos.notification.NotificationSetting',
     'foam.util.SafetyUtil',
     'static foam.mlang.MLang.EQ'
   ],
@@ -589,6 +593,29 @@ foam.CLASS({
       code: function() {
         return this.label();
       }
+    },
+    {
+      name: 'notify',
+      javaCode: `
+        DAO agentJunctionDAO      = (DAO) x.get("agentJunctionDAO");
+        DAO notificationConfigDAO = (DAO) x.get("notificationConfigDAO");
+        
+        UserUserJunction junction = (UserUserJunction) agentJunctionDAO
+          .find(EQ(UserUserJunction.SOURCE_ID, getId()));
+        if ( junction == null ) {
+          throw new RuntimeException("A junction between the user and its entities cannot be found.");
+        }
+
+        NotificationConfig config = (NotificationConfig) notificationConfigDAO
+          .find(junction.getNotificationConfig());
+        if ( config == null ) {
+          throw new RuntimeException("A notification configuration for the user cannot be found.");
+        }
+
+        for(NotificationSetting setting : config.getNotificationSettings()) {
+          setting.sendNotification(x, this, notification);
+        }
+      `
     }
   ]
 });
