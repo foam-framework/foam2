@@ -5,13 +5,15 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.auth',
+  package: 'foam.nanos.auth.test',
   name: 'PasswordPolicyTest',
   extends: 'foam.nanos.test.Test',
 
   javaImports: [
     'foam.core.DirectAgency',
     'foam.core.X',
+    'foam.nanos.auth.PasswordPolicy',
+    'foam.nanos.auth.User',
     'foam.util.Password'
   ],
 
