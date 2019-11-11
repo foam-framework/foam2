@@ -37,6 +37,11 @@ foam.CLASS({
   ],
 
   sections: [
+     {
+      name: 'ticketType',
+      isAvailable: function(id) { return !! id; },
+      order: 1
+    },
     {
       name: 'basicInfo',
       title: ''
@@ -61,6 +66,21 @@ foam.CLASS({
   ],
 
   properties: [
+     {
+      class: 'String',
+      name: 'type',
+      documentation: 'The type of the ticket.',
+      transient: true,
+      getter: function() {
+        return this.cls_.name;
+      },
+      javaGetter: `
+        return getClass().getSimpleName();
+      `,
+      tableWidth: 135,
+      section: 'ticketType',
+      visibility: 'RO'
+    },
     {
       class: 'Long',
       name: 'id',

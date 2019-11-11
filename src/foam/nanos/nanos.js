@@ -199,7 +199,6 @@ FOAM_FILES([
   { name: 'foam/nanos/ticket/TicketAddCommentDAO' },
   { name: 'foam/nanos/ticket/TicketOwnerDAO' },
   { name: 'foam/nanos/ticket/TicketCommentOwnerDAO' },
-  { name: 'foam/nanos/ticket/TicketDetailView' },
 
   // Dig
   { name: "foam/nanos/dig/exception/DigErrorMessage" },

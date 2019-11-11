@@ -5,8 +5,7 @@ p({
   "handler":{
     "class":"foam.nanos.menu.DAOMenu",
     "daoKey":"ticketDAO",
-    "title":"Tickets",
-    "detailView":"foam.nanos.ticket.TicketDetailView"
+    "title":"Tickets"
   },
   "parent":"admin"
 })

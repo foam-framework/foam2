@@ -463,7 +463,6 @@ var classes = [
   'foam.nanos.ticket.TicketAddCommentDAO',
   'foam.nanos.ticket.TicketOwnerDAO',
   'foam.nanos.ticket.TicketCommentOwnerDAO',
-  'foam.nanos.ticket.TicketDetailView',
 
   // Testing support
   'foam.test.TestEnum',
