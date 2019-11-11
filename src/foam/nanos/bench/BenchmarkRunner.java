@@ -10,12 +10,9 @@ import foam.core.ContextAgent;
 import foam.core.ContextAwareSupport;
 import foam.core.X;
 import foam.nanos.logger.Logger;
-import java.io.PrintWriter;
+
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 
 public class BenchmarkRunner
   extends ContextAwareSupport
@@ -23,8 +20,8 @@ public class BenchmarkRunner
 {
   protected String    name_;
   protected int       threadCount_;
-  protected Boolean  runPerThread_ = false;
-  protected Boolean  reverseThreads_ = false;
+  protected Boolean   runPerThread_;
+  protected Boolean   reverseThreads_;
   protected int       invocationCount_;
   protected Benchmark test_;
   protected List<Map<String, Object>> results_ = new ArrayList<Map<String, Object>>();
@@ -46,8 +43,8 @@ public class BenchmarkRunner
   {
     protected String    name_            = "foam.nanos.bench.BenchmarkRunner";
     protected int       threadCount_     = Runtime.getRuntime().availableProcessors();
-    protected Boolean  runPerThread_    = false;
-    protected Boolean  reverseThreads_  = false;
+    protected Boolean   runPerThread_    = false;
+    protected Boolean   reverseThreads_  = false;
     protected int       invocationCount_ = 0;
     protected Benchmark test_;
 
@@ -250,6 +247,9 @@ public class BenchmarkRunner
     }
   }
 
+  /**
+   * Format the results as a CSV.
+   */
   public String formatResults() {
     StringBuilder csv = new StringBuilder();
     csv.append(test_.getClass().getSimpleName());
@@ -259,22 +259,30 @@ public class BenchmarkRunner
 
     if ( results_.size() == 0 ) {
       csv.append("no results\n");
-    } else {
-      Map<String, Object> r = (Map<String, Object>) results_.get(0);
-      for ( Map.Entry<String, Object> entry : r.entrySet() ) {
-        csv.append(entry.getKey());
-        csv.append(",");
+      return csv.toString();
+    }
+
+    Map<String, Object> r = results_.get(0);
+
+    int index = 0;
+    for ( Map.Entry<String, Object> entry : r.entrySet() ) {
+      index++;
+      csv.append(entry.getKey());
+      if ( index < r.entrySet().size() ) csv.append(",");
+    }
+
+    csv.append("\n");
+
+    for ( Map<String, Object> result : results_ ) {
+      index = 0;
+      for ( Map.Entry<String, Object> entry : result.entrySet() ) {
+        index++;
+        csv.append(entry.getValue());
+        if ( index < result.entrySet().size() ) csv.append(",");
       }
       csv.append("\n");
-
-      for ( Map<String, Object> result : results_ ) {
-        for ( Map.Entry<String, Object> entry : result.entrySet() ) {
-          csv.append(entry.getValue());
-          csv.append(",");
-        }
-        csv.append("\n");
-      }
     }
+
     return csv.toString();
   }
 }
