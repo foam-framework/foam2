@@ -45,7 +45,7 @@ public class StdoutLogger
       str.append(prevTimestamp);
       str.append(',');
 
-      str.append(Thread.currentThread().getId());
+      str.append(Thread.currentThread().getName());
       str.append(',');
 
       // debug special case, fine level == 500

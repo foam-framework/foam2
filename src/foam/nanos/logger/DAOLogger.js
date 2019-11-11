@@ -77,7 +77,6 @@ if ( initializing.get() ) {
   return;
 }
 LogMessage lm = new LogMessage.Builder(getX())
-                    .setThreadName(String.valueOf(Thread.currentThread().getId()))
                     .setSeverity(severity)
                     .setMessage(message).build();
 getDao().put_(getX().put("logger", (Logger) getLogger()), lm);

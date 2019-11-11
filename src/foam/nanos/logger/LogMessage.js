@@ -40,7 +40,7 @@ foam.CLASS({
       class: 'String',
       label: 'Thread',
       visibility: 'RO',
-      javaFactory: `return String.valueOf(Thread.currentThread().getId());`,
+      javaFactory: `return Thread.currentThread().getName();`,
     },
     {
       name: 'severity',
