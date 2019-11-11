@@ -55,6 +55,12 @@ public class TreeIndex
         return new Object[]{state, null};
       }
 
+      // TODO: Handle NEQ
+//      if ( predicate.getClass().equals(Neq.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
+//        state = ( (TreeNode) state ).neq((TreeNode) state, expr.getArg2().f(expr), prop_);
+//        return new Object[]{state, null};
+//      }
+
       if ( predicate.getClass().equals(Gt.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
         state = ( (TreeNode) state ).gt((TreeNode) state, expr.getArg2().f(expr), prop_);
         return new Object[]{state, null};
