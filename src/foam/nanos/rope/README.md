@@ -36,7 +36,7 @@ transactionDAO = new foam.dao.EasyDAO.Builder(x)
   .build();
 ```
 
-Permissions based on relationships can be configured by the user by creating a ROPE objects from the ROPE.js model and setting the properties accordingly and afterwards appending the object to the application's ropeDAO which will be utilized by the ROPE algorithm to perform authorization checks. Given a missing ROPE, the algorithm trivially assumes that all permissions are not granted on that object.
+Access control based on relationships can be configured by the user by creating instances of the ROPE.js model, setting the properties appropriately, and putting the ROPE to `ropeDAO`, which is used by `ROPEAuthorizer` to perform authorization checks.
 
 &nbsp;
 
