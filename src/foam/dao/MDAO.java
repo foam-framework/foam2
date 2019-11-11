@@ -22,7 +22,7 @@ import java.util.Set;
  The MDAO class for an ordering, fast lookup, single value,
  index multiplexer, or any other MDAO select() assistance class.
 
- The assitance class TreeiNdex implements the
+ The assitance class TreeIndex implements the
  data nodes that hold the indexed items and plan and execute
  queries. For any particular operational Index, there may be
  many IndexNode instances:
