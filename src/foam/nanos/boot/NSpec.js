@@ -168,13 +168,6 @@ foam.CLASS({
       class: 'Boolean',
       name: 'enabled',
       value: true,
-      view: {
-        class: 'foam.u2.view.ChoiceView',
-        choices: [
-          [ false, 'disable NSpec' ],
-          [ true, 'enable NSpec']
-        ]
-      },
       readPermissionRequired: true,
       writePermissionRequired: true
     }
