@@ -207,6 +207,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/email/POP3Email'},
 
   // foam/nanos/ruler
+  { name: "foam/nanos/ruler/RuleGroup" },
   { name: "foam/nanos/ruler/Operations" },
   { name: "foam/nanos/ruler/Rule" },
   { name: "foam/nanos/ruler/RuleAction" },
@@ -220,6 +221,14 @@ FOAM_FILES([
   { name: "foam/nanos/ruler/RulerProbe" },
   { name: "foam/nanos/ruler/UserRefines" },
   { name: "foam/nanos/ruler/predicate/PropertyChangePredicate" },
+  { name: "foam/nanos/ruler/predicate/PropertyEQProperty" },
+  { name: "foam/nanos/ruler/Relationships" },
+  { name: "foam/nanos/ruler/action/SendNotification" },
+  { name: "foam/nanos/ruler/predicate/PropertyEQValue" },
+  { name: "foam/nanos/ruler/predicate/PropertyNEQValue" },
+  { name: "foam/nanos/ruler/predicate/NewEqOld" },
+  { name: "foam/nanos/ruler/predicate/IsInstancePredicate" },
+  { name: "foam/nanos/ruler/action/ChangePropertyAction" },
   { name: "foam/nanos/test/EchoService" },
   { name: "foam/nanos/test/SerializationTestEchoService" },
   { name: "foam/nanos/analytics/Foldable" },

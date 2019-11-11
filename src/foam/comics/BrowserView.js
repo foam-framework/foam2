@@ -148,9 +148,8 @@ foam.CLASS({
     // This is the DAOCreateControllerView, not the DetailView
     'createControllerView',
     {
-      class: 'String',
-      name: 'detailView',
-      value: 'foam.u2.DetailView'
+      class: 'foam.u2.ViewSpec',
+      name: 'detailView'
     }
   ],
 

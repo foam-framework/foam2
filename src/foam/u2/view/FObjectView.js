@@ -52,6 +52,10 @@ foam.CLASS({
         } else if ( data.cls_.id != this.objectClass ) {
           this.objectClass = data.cls_.id;
         }
+      },
+      view: {
+        class: 'foam.u2.view.FObjectPropertyView',
+        writeView: { class: 'foam.u2.detail.SectionedDetailView' }
       }
     },
     {

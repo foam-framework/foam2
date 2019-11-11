@@ -59,7 +59,7 @@ public class EmailVerificationWebAgent
       if ( user.getEmailVerified() ) {
         throw new Exception("Email already verified.");
       }
-
+      user = (User) user.fclone();
       emailToken.processToken(x, user, token);
     } catch (Throwable t) {
       message = "Problem verifying your email.<br>" + t.getMessage();

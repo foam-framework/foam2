@@ -361,7 +361,7 @@ foam.CLASS({
           PropertyInfo prop = (PropertyInfo) i.next();
           if ( ! prop.includeInDigest() ) continue;
           if ( ! prop.isSet(this) ) continue;
-          if ( prop.isDefaultValue(this) ) continue;
+          //if ( prop.isDefaultValue(this) ) continue;
           md.update(prop.getNameAsByteArray());
           prop.updateDigest(this, md);
         }
@@ -383,9 +383,9 @@ foam.CLASS({
         Iterator i = props.iterator();
         while ( i.hasNext() ) {
           PropertyInfo prop = (PropertyInfo) i.next();
-          if ( ! prop.includeInSignature() ) continue;
+          if ( ! prop.includeInDigest() ) continue;
           if ( ! prop.isSet(this) ) continue;
-          if ( prop.isDefaultValue(this) ) continue;
+          //if ( prop.isDefaultValue(this) ) continue;
           signer.update(prop.getNameAsByteArray());
           prop.updateSignature(this, signer);
         }
@@ -405,9 +405,9 @@ foam.CLASS({
         Iterator i = props.iterator();
         while ( i.hasNext() ) {
           PropertyInfo prop = (PropertyInfo) i.next();
-          if ( ! prop.includeInSignature() ) continue;
+          if ( ! prop.includeInDigest() ) continue;
           if ( ! prop.isSet(this) ) continue;
-          if ( prop.isDefaultValue(this) ) continue;
+          //if ( prop.isDefaultValue(this) ) continue;
           verifier.update(prop.getNameAsByteArray());
           prop.updateSignature(this, verifier);
         }

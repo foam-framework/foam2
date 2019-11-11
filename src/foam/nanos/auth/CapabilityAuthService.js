@@ -26,7 +26,6 @@ foam.CLASS({
     'foam.nanos.session.Session',
     'java.util.Date',
     'java.util.List',
-    'javax.security.auth.AuthPermission',
     'static foam.mlang.MLang.*'
   ],
 
@@ -51,58 +50,52 @@ foam.CLASS({
         implied by a capability in userCapabilityJunctions for a given user.
       `,
       javaCode: `
-      if ( x == null || permission == null ) return false;
-      if ( x.get(Session.class) == null ) return false;
-      if ( user == null || ! user.getEnabled() ) return false;
-      
-      // Check whether user has permission to check user permissions.
-      if ( ! getDelegate().check(x, "service.auth.checkUser") ) return false;
+        if ( x == null || permission == null ) return false;
+        if ( x.get(Session.class) == null ) return false;
+        if ( user == null || ! user.getEnabled() ) return false;
 
-      try {
-        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+        // Check whether user has permission to check user permissions.
+        if ( ! getDelegate().check(x, "service.auth.checkUser") ) return false;
 
-        Capability cap = (Capability) capabilityDAO.find(permission);
-        if ( cap != null && cap.isDeprecated(x) ) return getDelegate().checkUser(x, user, permission);
+        try {
+          DAO capabilityDAO = (DAO) x.get("capabilityDAO");
 
-        Date now = new Date();
-        Predicate capabilityScope = AND(
-          EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
-          OR(
-            NOT(HAS(UserCapabilityJunction.EXPIRY)),
-            NOT(EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.EXPIRED))
-          )
-        );
+          Capability cap = (Capability) capabilityDAO.find(permission);
+          if ( cap != null && cap.isDeprecated(x) ) return getDelegate().checkUser(x, user, permission);
 
-        DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+          Date now = new Date();
+          Predicate capabilityScope = AND(
+            EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
+            OR(
+              NOT(HAS(UserCapabilityJunction.EXPIRY)),
+              NOT(EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.EXPIRED))
+            )
+          );
 
-        if ( userCapabilityJunctionDAO.find(
-          AND(
-            capabilityScope,
-            EQ(UserCapabilityJunction.TARGET_ID, permission),
-            EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
-          )) != null ) return true;
-        
-        List<UserCapabilityJunction> userCapabilityJunctions = ((ArraySink) user.getCapabilities(x).getJunctionDAO()
-          .where(capabilityScope)
-          .select(new ArraySink())).getArray();
+          DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
-        for ( UserCapabilityJunction ucJunction : userCapabilityJunctions ) {
-          Capability capability = (Capability) capabilityDAO.find(ucJunction.getTargetId());
-          if ( capability.isDeprecated(x) ) continue;
-          if ( capability.implies(x, permission) ) return true;
+          if ( userCapabilityJunctionDAO.find(
+            AND(
+              capabilityScope,
+              EQ(UserCapabilityJunction.TARGET_ID, permission),
+              EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
+            )) != null ) return true;
+
+          List<UserCapabilityJunction> userCapabilityJunctions = ((ArraySink) user.getCapabilities(x).getJunctionDAO()
+            .where(capabilityScope)
+            .select(new ArraySink())).getArray();
+
+          for ( UserCapabilityJunction ucJunction : userCapabilityJunctions ) {
+            Capability capability = (Capability) capabilityDAO.find(ucJunction.getTargetId());
+            if ( capability.isDeprecated(x) ) continue;
+            if ( capability.implies(x, permission) ) return true;
+          }
+        } catch (Exception e) {
+          Logger logger = (Logger) x.get("logger");
+          logger.error("check", permission, e);
         }
-      } catch (Exception e) {
-        Logger logger = (Logger) x.get("logger");
-        logger.error("check", permission, e);
-      } 
 
-      return getDelegate().checkUser(x, user, permission);
-      `
-    },
-    {
-      name: 'checkUserPermission',
-      javaCode: `
-      return checkUser( x, user, permission.getName() );
+        return getDelegate().checkUser(x, user, permission);
       `
     }
   ]

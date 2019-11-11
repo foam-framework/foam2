@@ -16,7 +16,8 @@
     'foam.core.X',
     'foam.core.DirectAgency',
     'foam.nanos.logger.Logger',
-    'java.util.Collection'
+    'java.util.Collection',
+    'foam.nanos.ruler.RuleGroup'
   ],
 
   tableColumns: [
@@ -67,15 +68,6 @@
       readPermissionRequired: true,
       writePermissionRequired: true,
       tableWidth: 50,
-      section: 'basicInfo'
-    },
-    {
-      class: 'String',
-      name: 'ruleGroup',
-      documentation: 'ruleGroup defines sets of rules related to the same action.',
-      readPermissionRequired: true,
-      writePermissionRequired: true,
-      tableWidth: 100,
       section: 'basicInfo'
     },
     {

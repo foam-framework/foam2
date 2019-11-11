@@ -12,6 +12,7 @@ import foam.nanos.auth.LastModifiedAware;
 import foam.nanos.auth.LastModifiedByAware;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
+import foam.util.SafetyUtil;
 
 import java.lang.Exception;
 import java.time.Duration;
@@ -71,7 +72,7 @@ public class RuleEngine extends ContextAwareSupport {
       compoundAgency.execute(x_);
     } catch (Exception e) {
       Logger logger = (Logger) x_.get("logger");
-      logger.error(e.getMessage());
+      logger.error(e.getMessage(), e);
     }
 
     asyncApplyRules(rules, obj, oldObj);
@@ -166,7 +167,7 @@ public class RuleEngine extends ContextAwareSupport {
           // For that, greedy mode is used for object reload. For before rules,
           // object reload uses non-greedy mode so that changes on the original
           // object will be copied over to the reloaded object.
-          FObject nu = getDelegate().find_(x, obj);
+          FObject nu = getDelegate().find_(x, obj).fclone();
           nu = reloadObject(obj, oldObj, nu, rule.getAfter());
           try {
             rule.asyncApply(x, nu, oldObj, RuleEngine.this);
@@ -231,7 +232,7 @@ public class RuleEngine extends ContextAwareSupport {
    * @return Reloaded object
    */
   private FObject reloadObject(FObject obj, FObject oldObj, FObject nu, boolean greedy) {
-    FObject old = oldObj;
+    FObject old = (FObject) SafetyUtil.deepClone(oldObj);
     if ( old == null ) {
       try {
         old = obj.getClass().newInstance();
