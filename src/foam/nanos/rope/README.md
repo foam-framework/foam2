@@ -12,7 +12,6 @@ One of the key defining features that makes the ROPE algorithm's authorization s
 
 More generally this applies for properties themselves within the objects and the relationships between them. ROPE allows you to work at both the property level when it comes to authorization for much needed simplicity in achieving fine-grained control.
 
-&nbsp;
 
 #### Using ROPE with DAOs
 
@@ -34,14 +33,10 @@ transactionDAO = new foam.dao.EasyDAO.Builder(x)
 
 Access control based on relationships can be configured by the user by creating instances of the ROPE.js model, setting the properties appropriately, and putting the ROPE to `ropeDAO`, which is used by `ROPEAuthorizer` to perform authorization checks.
 
-&nbsp;
-
 #### Composition of ROPES
 
 There are a few higher-order ROPEs that can be used to combine regular ROPEs to form more complex logical operations. They are known more formally as composite ropes. AND and OR ROPEs can be found in the `CompositeROPE.js` file. These act as regular ROPEs except that under the hood they delegate their checks to other ropes composed within them. The OR composite authorizes if only one of the ROPEs it is composed with authorizes and the AND requires all composed ROPEs to authorize. 
 
-&nbsp;
-&nbsp;
 
 ## Technical Notes on the Proper Setup of ROPE Objects
 
@@ -50,8 +45,6 @@ There are a few higher-order ROPEs that can be used to combine regular ROPEs to 
 Akin to any standard FOAM authorizer, `ROPEAuthorizer` is an implementation of the corresponding interface and can be used interchangeably on any DAO. Each `ROPEAuthorizer` has a corresponding `targetDAOKey` property which is utilized in finding the corresponding ROPEs to perform authorization checked with. The bulk of the algorithm is implemented within the ROPE model itself with an entry point in the check method to which the `ROPEAuthorizer` merely delegates.
 
 Though it is abstracted away from the user that utilizes such authorizers, there is a slight nuance in logic between the authorization of read/delete versus that of create/update that is worth noting in order to understand the back-end functionality of ROPE. On reads and deletes, there is no need to perform authorization at the property level as the entire object is being returned or deleted as the result of a query. However, on creates and updates, the properties that are set by the user are compared with either a new instance of the model (in the case of create), or the old object before the update. For each rope, a check is called for each of the properties that are set/changed, and the checks must all return true before the action can be granted.
-
-&nbsp;
 
 ##### ROPE Model
 
@@ -73,16 +66,12 @@ One important method to note in the ROPE model is `check`, which handles the wor
 2. crudKey - This is the key used in the first step of the ROPE search, representing the action to perform in the targetDAO on the target object. This must match one of the keys in the crudMap. This key is NOT used in any step of the ROPE search except the first.
 3. propertyKey - This is the key that can be used along with the crudKey to check specifically the next steps that must be taken to update or set some property. This is only used when the operation is an update or create. If the propertyKey is not found in the "create" map or "update" map, depending on what the crudKey was, the values in the "\_\_default\_\_" entry are used.
 
-&nbsp;
-
 ##### To set up which permissions this ROPE will enable
 
 Both of the following methods of setting up a ROPE can be used in conjunction to achieve the desired functionality and are illustrated with some practical examples in the following section.
 
 ROPE works by checking which permissions are implied given any that a User might already have in a transitive fashion. The first thing that is checked whenever an authorization check takes place is the crud matrix. This relates an operation; create, read, update, or delete which maps to another mapping. This second mapping relates properties with lists of properties that one of which must be authorized to grant authorization to that property as a whole. Also contained within is a ***\_\_default\_\_*** property which can be searched to grant authorization after all other properties have been exhausted.
 
-&nbsp;
-&nbsp;
 
 ## Working Examples with Code
 
@@ -115,7 +104,7 @@ First we start by setting up the ROPE for the `accountDAO` to `transactionDAO` i
       .setRelationshipMap(relationshipMap)   
       .build());
 ```
-&nbsp;
+
 Next we setup our `accountDAO` to `accountDAO` ROPE. Here we have that an account can be created, read, updated, or deleted in one of two ways,
   1. Direct ownership of the account
   2. Indirectly through checking the authorization on the parent account 
@@ -143,7 +132,7 @@ Next we setup our `accountDAO` to `accountDAO` ROPE. Here we have that an accoun
       .build());
     createMap.clear(); readMap.clear(); updateMap.clear(); deleteMap.clear(); crudMap.clear(); relationshipMap.clear();
 ```
-&nbsp;
+
 Finally, we finish this examply by setting up the `userDAO` to `transactionDAO` ROPE and we are done. Here an account can be created, read, updated, and deleted by any user that is the "owner" to the account.
 
 ``` java
