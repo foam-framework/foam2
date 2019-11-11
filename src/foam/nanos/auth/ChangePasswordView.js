@@ -209,7 +209,7 @@ foam.CLASS({
         this.resetPasswordToken.processToken(null, user, this.token)
         .then((_) => {
           this.reset_();
-          this.stack.push({ class: 'foam.u2.view.LoginView', model: foam.nanos.u2.navigation.SignIn.create() });
+          this.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn' }, this);
           this.notify(this.SUCCESS_MSG);
         }).catch((err) => {
           this.notify(err.message, 'error');
