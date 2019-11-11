@@ -133,7 +133,7 @@ foam.CLASS({
           User user = new User.Builder(x).setPassword(Password.hash("password")).build();
           for (String historyEntry : history) {
             user.setPassword(Password.hash(historyEntry)); // , Password.decode(Password.getSalt(hash))));
-            new foam.nanos.auth.ruler.AddPasswordHistoryAction().applyAction(x, user, null, null, new DirectAgency());
+            new foam.nanos.auth.ruler.AddPasswordHistoryAction().applyAction(x, user, null, null, null, new DirectAgency());
           }
 
           // validate
