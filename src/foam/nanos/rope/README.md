@@ -2,15 +2,11 @@
 
 # ROPE User Guide and Documentation
 
-&nbsp;
-
 ## ROPE Description
-
-#### Idea behind it
 
 Developers can use ROPE to perform authorization checks based on relationships between models. The idea is that we can determine whether or not a user is authorized to access a given object by following a chain of relationships between objects from the object being accessed back to the user. If a suitable chain is found, then the user is granted access. Each link in the chain (called a "Rope") can be configured to allow certain accesses via it and disallow others.
 
-The ROPE authorization system searches the tree formed by these relationships and their implied permissions to see if the object trying to perform an operation on another object is in some way connected to it through the relationship framework in a way that would imply it being able to have some desired permissions. This allows for the formation of very complex and flexible nets of permissions to be defined without the need for any of it to be hard coded into its corresponding locations in a hard to manage and modify mess; it is all defined by ROPEs.
+The ROPE authorization system searches the graph formed by these relationships to see if the user trying to perform an operation on an object is connected to the object in a way that would imply authorization for the operation in question. ROPE can be reconfigured at runtime, which makes it more flexible than doing authorization checks in code, which can only be changed at compile time.
 
 One of the key defining features that makes the ROPE algorithm's authorization so versatile and configurable is the transitivity it gains from its nature. An abstract example being some object ***A*** attempting to perform an operation on some other object ***C***. Although ***A*** may not be directly related to ***C***, it may be related to some intermediate object ***B*** which is itself related to object ***C***. Given the correct configuration of the ROPEs on these two relationships; object A can be granted certain permissions toward object ***C*** through its relationship to object ***B***.
 
