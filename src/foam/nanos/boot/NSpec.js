@@ -6,6 +6,9 @@
 foam.CLASS({
   package: 'foam.nanos.boot',
   name: 'NSpec',
+  javaImplements: [
+    'foam.nanos.auth.EnabledAware'
+  ],
 
   requires: [
     {
@@ -157,6 +160,20 @@ foam.CLASS({
         class: 'foam.u2.view.ModeAltView',
         writeView: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
         readView: { class: 'foam.u2.view.PreView' }
+      },
+      readPermissionRequired: true,
+      writePermissionRequired: true
+    },
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      value: true,
+      view: {
+        class: 'foam.u2.view.ChoiceView',
+        choices: [
+          [ false, 'disable NSpec' ],
+          [ true, 'enable NSpec']
+        ]
       },
       readPermissionRequired: true,
       writePermissionRequired: true
