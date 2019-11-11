@@ -20,7 +20,7 @@ More generally this applies for properties themselves within the objects and the
 
 #### Using ROPE with DAOs
 
-The ROPE authorization system can be utilized by the user of the framework by appending a ROPEAuthorizer decorator to any DAO object that requires authorization. This decorator follows the standard FOAM Authorizer interface and performs authorization checks dynamically as the dao is used using the ROPE relationship search algorithm under the hood.
+You can use ROPE by adding an `AuthorizationDAO` decorator with a `ROPEAuthorizer` to any DAO.
 Here is the set up of transactionDAO if one were to use the ROPEAuthorizer.
 
 ```java
