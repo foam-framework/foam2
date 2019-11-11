@@ -1,23 +1,21 @@
 foam.CLASS({
   package: 'foam.nanos.u2.navigation',
   name: 'SignIn',
-  extends: 'foam.u2.Controller',
 
   documentation: `User Signin model to be used with LoginView.
-    group_: passes the group to SignUp
   `,
 
   imports: [
     'auth',
     'loginSuccess',
     'notify',
-    'signUpDAO',
     'stack',
     'user'
   ],
 
-  requires: [
-    'foam.nanos.auth.User',
+  implements: [
+    'foam.core.Validatable',
+    'foam.nanos.auth.Authorizable'
   ],
 
   messages: [
@@ -29,12 +27,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'DAO',
       name: 'dao_',
-      documentation: `The dao that will be used to save the new user.`,
-      factory: function() {
-        return this.signUpDAO;
-      },
       hidden: true
     },
     {
@@ -70,7 +63,7 @@ foam.CLASS({
     {
       name: 'footerLink',
       code: function() {
-        this.stack.push({ class: 'foam.u2.view.LoginView', model: foam.nanos.u2.navigation.SignUp.create() });
+        this.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignUp' }, this);
       }
     },
     {
@@ -80,7 +73,7 @@ foam.CLASS({
           class: 'foam.nanos.auth.resetPassword.ForgotPasswordView'
         });
       }
-    },
+    }
   ],
 
   actions: [
@@ -108,7 +101,6 @@ foam.CLASS({
                   });
                 } else {
                   // This is required for signin
-                  window.localStorage.setItem('setOnboardingWizardPush', true);
                   window.location.hash = '';
                   window.location.reload();
                 }

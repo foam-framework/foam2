@@ -1,6 +1,7 @@
 foam.CLASS({
   package: 'foam.u2.borders',
   name: 'SplitScreenBorder',
+  extends: 'foam.u2.Element',
 
   css: `
     ^ {
@@ -32,28 +33,28 @@ foam.CLASS({
       overflow: auto;
       height: calc(100% - 15vh);
     }
-  `,
+`,
 
-  properties: [
-    'leftPanel',
-    'rightPanel'
-  ],
+properties: [
+  'leftPanel',
+  'rightPanel'
+],
 
-  methods: [
-    function init() {
-      this.addClass(this.myClass())
-      .start().addClass('wrapper-outer')
-          .start().addClass('left-block')
-            .start('div', null, this.leftPanel$)
-                .addClass(this.myClass('content'))
-            .end()
-          .end()
-          .start().addClass('right-block')
-            .start('div', null, this.rightPanel$)
+methods: [
+  function init() {
+    this.addClass(this.myClass())
+    .start().addClass('wrapper-outer')
+        .start().addClass('left-block')
+          .start('div', null, this.leftPanel$)
               .addClass(this.myClass('content'))
-            .end()
           .end()
-      .end();
-    }
-  ]
+        .end()
+        .start().addClass('right-block')
+          .start('div', null, this.rightPanel$)
+            .addClass(this.myClass('content'))
+          .end()
+        .end()
+    .end();
+  }
+]
 });

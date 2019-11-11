@@ -7,10 +7,13 @@ foam.CLASS({
   imports: [
     'appConfig',
     'notify',
-    'signUpDAO',
     'stack',
-    'user',
-    'userDAO'
+    'user'
+  ],
+
+  implements: [
+    'foam.core.Validatable',
+    'foam.nanos.auth.Authorizable'
   ],
 
   requires: [
@@ -29,21 +32,13 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'DAO',
       name: 'dao_',
-      documentation: `The dao that will be used to save the new user.`,
-      factory: function() {
-        return this.signUpDAO;
-      },
       hidden: true
     },
     {
       class: 'String',
       name: 'group_',
       documentation: `Group this user is going to be apart of.`,
-      factory: function() {
-        return this.appConfig.group.name;
-      },
       hidden: true
     },
     {
@@ -187,7 +182,7 @@ foam.CLASS({
     {
       name: 'footerLink',
       code: function() {
-        this.stack.push({ class: 'foam.u2.view.LoginView', model: foam.nanos.u2.navigation.SignIn.create() });
+        this.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn' }, this);
       }
     },
     {
@@ -196,6 +191,29 @@ foam.CLASS({
         return;
       }
     },
+    {
+      name: 'updateUser',
+      code: function(x) {
+        this.finalRedirectionCall();
+      }
+    },
+    {
+      name: 'finalRedirectionCall',
+      code: function() {
+        if ( this.user.emailVerified ) {
+          // When a link was sent to user to SignUp, they will have already verified thier email,
+          // thus thier user.emailVerified should be true and they can simply login from here.
+          window.history.replaceState(null, null, window.location.origin);
+          location.reload();
+        } else {
+          // logout once we have finished updating documents.
+          this.auth.logout();
+          this.stack.push({
+            class: 'foam.nanos.auth.ResendVerificationEmail'
+          });
+        }
+      }
+    }
   ],
 
   actions: [
@@ -223,16 +241,7 @@ foam.CLASS({
           }))
           .then((user) => {
             this.user.copyFrom(user);
-            if ( this.user.emailVerified ) {
-              // When a link was sent to user to SignUp, they will have already verified thier email,
-              // thus thier user.emailVerified should be true and they can simply login from here.
-              window.history.replaceState(null, null, window.location.origin);
-              location.reload();
-            } else {
-              this.stack.push({
-                class: 'foam.nanos.auth.ResendVerificationEmail'
-              });
-            }
+            this.updateUser(x);
           }).catch((err) => {
             console.warn(err.message);
             this.notify('There was a problem creating your account.', 'error');

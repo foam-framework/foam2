@@ -3,7 +3,7 @@
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'LoginView',
-  extends: 'foam.u2.Controller',
+  extends: 'foam.u2.View',
 
   documentation: `User View for SignUp or SignIn.
 
@@ -30,13 +30,16 @@ foam.CLASS({
 
   imports: [
     'appConfig',
+    'loginVariables',
     'stack',
     'theme'
   ],
 
   requires: [
     'foam.u2.Element',
-    'foam.u2.borders.SplitScreenBorder'
+    'foam.u2.borders.SplitScreenBorder',
+    'foam.nanos.u2.navigation.SignIn',
+    'foam.nanos.u2.navigation.SignUp'
   ],
 
   css: `
@@ -102,6 +105,10 @@ foam.CLASS({
           this.backLinkTxt_ = this.appConfig.url.includes('www.') ?
             this.appConfig.url.substring(this.appConfig.url.indexOf('www.') + 4) :
             this.appConfig.url;
+          this.backLinkTxt_ = this.backLinkTxt_.includes('://') ?
+            this.backLinkTxt_.substring(this.appConfig.url.indexOf('://') + 3) :
+            this.backLinkTxt_;
+          
           return true;
         }
         return false;
@@ -109,13 +116,24 @@ foam.CLASS({
       hidden: true
     },
     {
-      class: 'FObjectProperty',
       name: 'model',
+      factory: () => {
+       return {};
+      },
       view: { class: 'foam.u2.detail.VerticalDetailView' }
+    },
+    'param',
+    {
+      class: 'String',
+      name: 'mode_',
+      hidden: true
     },
     {
       class: 'String',
-      name: 'imgPath'
+      name: 'imgPath',
+      expression: function(loginVariables) {
+        return loginVariables.imgPath || '';
+      }
     },
     {
       class: 'String',
@@ -124,10 +142,20 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'GO_BACK', message: 'Go to ' }
+    { name: 'GO_BACK', message: 'Go to ' },
+    { name: 'MODE1', message: 'SignUp' }
   ],
 
   methods: [
+    function init() {
+      if ( ! this.param ) {
+        this.param = {};
+      }
+      this.param.dao_ = ! this.param.dao_ ? this.loginVariables.dao_ : this.param.dao_;
+      this.param.group_ = ! this.param.group_ ? this.loginVariables.group_ : this.param.group_;
+      if ( this.mode_ === this.MODE1 ) this.model = foam.nanos.u2.navigation.SignUp.create(this.param, this);
+      else this.model = foam.nanos.u2.navigation.SignIn.create(this.param, this);
+    },
     function initE() {
       this.SUPER();
 
@@ -158,15 +186,10 @@ foam.CLASS({
           .end()
         .end();
 
-      // CREATE LEFT VIEW
-      if ( !! imgPath ) {
-        var left = this.Element.create({}, this)
-          .start('img').addClass('login-logo-img').attr('src', this.imgPath).end()
-          .start().add(this.model.DISCLAIMER).end();
-
-        var split = foam.u2.border.SplitScreenBorder.create();
+      // CREATE SPLIT VIEW
+      if ( !! this.imgPath ) {
+        var split = foam.u2.borders.SplitScreenBorder.create();
         split.rightPanel.add(right);
-        split.leftPanel.add(left);
       } else {
         right.start().add(this.model.DISCLAIMER).end();
       }

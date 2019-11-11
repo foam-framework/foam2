@@ -68,7 +68,7 @@ foam.CLASS({
     'pushMenu',
     'requestLogin',
     'signUpEnabled',
-    'signUpDAO',
+    'loginVariables',
     'stack',
     'user',
     'webApp',
@@ -138,9 +138,14 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'DAO',
-      name: 'signUpDAO',
-      factory: () => this.client.userDAO
+      name: 'loginVariables',
+      expression: function(client$userDAO) {
+        return {
+          dao_: client$userDAO || null,
+          imgPath: '',
+          group: 'system'
+        };
+      }
     },
     {
       class: 'Enum',
@@ -228,10 +233,8 @@ foam.CLASS({
   methods: [
     function init() {
       this.SUPER();
-
       // done to start using SectionedDetailViews instead of DetailViews
       this.__subContext__.register(foam.u2.detail.SectionedDetailView, 'foam.u2.DetailView');
-
       var self = this;
 
       window.onpopstate = async function(event) {
@@ -388,7 +391,7 @@ foam.CLASS({
       }
 
       return new Promise(function(resolve, reject) {
-        self.stack.push({ class: 'foam.u2.view.LoginView', model: foam.nanos.u2.navigation.SignIn.create() });
+        self.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn' }, this);
         self.loginSuccess$.sub(resolve);
       });
     },
