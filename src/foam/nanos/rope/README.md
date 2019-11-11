@@ -42,7 +42,7 @@ Permissions based on relationships can be configured by the user by creating a R
 
 #### Composition of ROPES
 
-There are a few helper ROPEs with which can be used to combine regular ROPEs to form more complex logical operations. There are known more formally as composite ropes. AND and OR ROPEs can be found in the compositeROPE.js file. These act as regular ROPEs except that under the hood they delegate their checks to other ropes composed within them. The OR composite authorizes if only one of the ROPEs it is composed with authorizes and the AND requires all composed ROPEs to authorize. 
+There are a few higher-order ROPEs that can be used to combine regular ROPEs to form more complex logical operations. They are known more formally as composite ropes. AND and OR ROPEs can be found in the `CompositeROPE.js` file. These act as regular ROPEs except that under the hood they delegate their checks to other ropes composed within them. The OR composite authorizes if only one of the ROPEs it is composed with authorizes and the AND requires all composed ROPEs to authorize. 
 
 &nbsp;
 &nbsp;
