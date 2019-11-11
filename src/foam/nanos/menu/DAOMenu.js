@@ -63,9 +63,8 @@ foam.CLASS({
       }
     },
     {
-      class: 'String',
+      class: 'foam.u2.ViewSpec',
       name: 'detailView',
-      value: 'foam.u2.DetailView',
       displayWidth: 80
     },
     {
