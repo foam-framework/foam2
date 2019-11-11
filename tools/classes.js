@@ -456,6 +456,15 @@ var classes = [
   'foam.nanos.analytics.DAOFoldManager',
   'foam.nanos.analytics.DAOReduceManager',
 
+  // Ticket
+  'foam.nanos.ticket.TicketStatus',
+  'foam.nanos.ticket.TicketComment',
+  'foam.nanos.ticket.Ticket',
+  'foam.nanos.ticket.TicketAddCommentDAO',
+  'foam.nanos.ticket.TicketOwnerDAO',
+  'foam.nanos.ticket.TicketCommentOwnerDAO',
+  'foam.nanos.ticket.TicketDetailView',
+
   // Testing support
   'foam.test.TestEnum',
   'foam.test.AllSerializableProperties',
