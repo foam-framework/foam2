@@ -46,7 +46,12 @@ public class FObjectParser
               subx.set("enum", c);
               subParser = EnumParserFactory.getInstance(c);
             } else {
-              Object obj = ((X) x.get("X")).create(c);
+              Object obj;
+              if ( x.get("X") != null ) {
+                obj = ((X) x.get("X")).create(c);
+              }else {
+                obj = c.newInstance();
+              }
               subx.set("obj", obj);
               subParser = ModelParserFactory.getInstance(c);
             }
