@@ -56,6 +56,7 @@ foam.CLASS({
                       this.labelFormatter,
                       function() { this.add(self.label$); })
           .on('click', function() {
+          if (self.mode === foam.u2.DisplayMode.RO || self.mode === foam.u2.DisplayMode.DISABLED) return;
             this.data = ! this.data;
           }.bind(this))
         .end();
