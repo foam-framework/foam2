@@ -180,7 +180,7 @@ foam.CLASS({
       name: 'detailView',
       factory: function() {
         return {
-          class: 'foam.u2.view.FObjectView',
+          class: 'foam.u2.detail.SectionedDetailView',
           of: this.data.of
         };
       }
