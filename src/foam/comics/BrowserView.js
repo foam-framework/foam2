@@ -116,8 +116,8 @@ foam.CLASS({
         if ( searchMode )  config.searchMode  = searchMode;
         if ( subtitle )    config.subtitle    = subtitle;
         if ( title )       config.title       = title;
+        if ( detailView )  config.detailView  = detailView;
         config.createEnabled = createEnabled;
-        config.detailView    = detailView;
         config.editEnabled   = editEnabled;
         config.exportEnabled = exportEnabled;
         config.exportCSVEnabled = exportCSVEnabled;

@@ -108,9 +108,11 @@ foam.CLASS({
         // Container for the detailview
         .start()
           .addClass(this.myClass('detail-container'))
-          .tag(this.detailView, {
+          .tag({
+            class: 'foam.u2.view.FObjectView',
             of: this.dao.of,
-            data$: this.data$.dot('data')
+            data$: this.data$.dot('data'),
+            dataView: this.detailView
           })
         .end();
     }
