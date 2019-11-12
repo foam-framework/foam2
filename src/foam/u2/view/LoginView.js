@@ -24,8 +24,8 @@ foam.CLASS({
   DEPENDING ON PASSED IN ARGUMENTS:
 
   Property functionality:
-  imgPath: if present view uses SplitScreenBorder **set where this view is called.
-
+  imgPath: if present view uses SplitScreenBorder (-USED to toggle splitScreen - picked up from ApplicationController)
+  backLink_: if on model uses string link from model, other wise gets appConfig.url (-USED for top-top nav- toggled by this.topBarShow_)
   `,
 
   imports: [
@@ -43,53 +43,105 @@ foam.CLASS({
   ],
 
   css: `
-  ^ .login-logo-img {
-    height: 19.4;
-    margin-bottom: 12px;
-    margin-top: 7vh;
+  /* ON RIGHT SIDE ALL **** */
+  ^ .centerVertical {
+    padding-top: 3vh; 
+    max-width: 30vw;
+    margin: 0 auto;
   }
-  
-  ^button {
-    margin-top: 56px;
+
+  /* SET ABOVE MODEL */
+  ^ .topBar-logo-Back {
+    height: 6vh;
+    background: /*%PRIMARY1%*/ #202341;
+  }
+
+  /* SET ON LOGO IMG */
+  ^ .logoCenterVertical {
+    margin: 0 auto;
+    text-align: center;
+    display: block;
+  }
+  ^ .top-bar-img {
+    height: 4vh;
+    padding-top: 1vh;
+  }
+
+  /* TITLE TXT ON MODEL */
+  ^ .title-top {
+    font-size: 2em;
+    padding-top: 2vh;
+    font-weight: bold;
+  }
+
+  /* ON MODEL */
+  ^ .content-form {
+    width: 32vw;
+    padding-top: 6.5em;
+  }
+
+  /* ON ALL FOOTER TEXT */
+  ^ .bold-text-with-pad {
+    font-weight: bold;
+    padding-right: 0.2em;
+  }
+
+  /* TOP-TOP BAR NAV to go with backLink_ */
+  ^ .top-bar-nav {
+    // background: /*%PRIMARY1%*/ #202341; // TODO create logo background theme colour
+    width: 100%;
+    height: 4vh;
+    border-bottom: solid 1px #e2e2e3
+  }
+  /* ON TXT IN TOP-TOP NAV */
+  ^ .topBar-txt-link {
     cursor: pointer;
-    font-size: 16px;
+    font-size: 2.5vh;
     font-weight: normal;
     font-style: normal;
     font-stretch: normal;
-    line-height: 1.5;
     letter-spacing: normal;
     color: #8e9090;
-    display: inline;
-    position: relative;
-    top: 20px;
-    left: 20px;
+    margin-left: 2vw;
+    margin-top: 1vw;
   }
-  /* This is required for the visibility icon of the password field */
-  ^ .input-image {
-    position: absolute !important;
-    width: 16px !important;
-    height: 16px !important;
-    bottom: 12px !important;
-    right: 12px !important;
-  }
-  ^disclaimer {
+
+  /* DISCLAIMER */
+      /* ON NO IMG SPLIT & IMG SPLIT */
+  ^ .disclaimer-login {
     width: 35vw;
     font-family: Lato;
-    font-size: 11px;
+    font-size: 0.75em;
     color: #8e9090;
-    margin-top: -12em;
     margin-left: 12vw;
     line-height: 1.5;
     background: transparent;
   }
+      /* ON IMG SPLIT */
+  ^ .disclaimer-login-img {
+    margin-top: -20vh;
+  }
+
+  /* TOP TOP NAV ARROW */
+    /* *** ON SMESTYLES ??? */
+  .horizontal-flip {
+    -moz-transform: scale(-1, 1);
+    -webkit-transform: scale(-1, 1);
+    -o-transform: scale(-1, 1);
+    -ms-transform: scale(-1, 1);
+    transform: scale(-1, 1);
+    margin-right: 10px;
+  }
+  /* *** ON SMESTYLES ??? */
+  .inline-block {
+    display: inline-block;
+  }
+
+/* ON LEFT SIDE IMG */
   ^ .cover-img-block1 {
     position: sticky;
   }
-  ^ .content-form {
-    width: 32vw;
-    margin-left: 3em;
-}
-  ^ .sme-image1 {
+  ^ .image-one {
     width: 45vw;
     margin-top: -90vh;
     margin-left: 5em;
@@ -102,13 +154,6 @@ foam.CLASS({
       name: 'topBarShow_',
       factory: function() {
         if ( this.appConfig && this.appConfig.url ) {
-          this.backLinkTxt_ = this.appConfig.url.includes('www.') ?
-            this.appConfig.url.substring(this.appConfig.url.indexOf('www.') + 4) :
-            this.appConfig.url;
-          this.backLinkTxt_ = this.backLinkTxt_.includes('://') ?
-            this.backLinkTxt_.substring(this.appConfig.url.indexOf('://') + 3) :
-            this.backLinkTxt_;
-          
           return true;
         }
         return false;
@@ -137,7 +182,23 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'backLinkTxt_'
+      name: 'backLinkTxt_',
+      factory: function() {
+        let temp = this.backLink_.includes('www.') ?
+          this.backLink_.substring(this.backLink_.indexOf('www.') + 4) :
+          this.backLink_;
+        return temp.includes('://') ?
+          temp.substring(temp.indexOf('://') + 3) :
+          temp;
+      }
+    },
+    {
+      class: 'String',
+      name: 'backLink_',
+      factory: function() {
+        return this.model.backLink_ ? this.model.backLink_ : this.appConfig.url;
+      },
+      hidden: true
     }
   ],
 
@@ -152,33 +213,43 @@ foam.CLASS({
         this.param = {};
       }
       this.param.dao_ = ! this.param.dao_ ? this.loginVariables.dao_ : this.param.dao_;
-      this.param.group_ = ! this.param.group_ ? this.loginVariables.group_ : this.param.group_;
-      if ( this.mode_ === this.MODE1 ) this.model = foam.nanos.u2.navigation.SignUp.create(this.param, this);
-      else this.model = foam.nanos.u2.navigation.SignIn.create(this.param, this);
+      if ( this.mode_ === this.MODE1 ) {
+        this.param.group_ = ! this.param.group_ ? this.loginVariables.group_ : this.param.group_;
+        this.model = this.SignUp.create(this.param, this);
+      } else {
+        this.model = this.SignIn.create(this.param, this);
+      }
     },
     function initE() {
       this.SUPER();
-
       // CREATE MODEL VIEW
       var right = this.Element.create({}, this)
-        .start('img').addClass('login-logo-img').attr('src', this.theme.logo).end()
-        .start().addClass('sme-title').add(this.TITLE).end()
+      // Header on-top of rendering model
+        .start().show(this.topBarShow)
+          .start('img')
+            .attr('src', this.theme.logo)
+            .addClass('top-bar-img')
+          .end()
+      .end()
+      // Title txt and Model
+        .start().addClass('title-top').add(this.model.TITLE).end()
         .startContext({ data: this })
-          .addClass('content-form').tag(this.MODEL)
+          .addClass('content-form').tag(this.MODEL).br()
         .endContext()
-
-        .start().addClass('sme-subTitle')
-          .start('strong').add(this.model.FOOTER_TXT).end()
-          .start('span').addClass('app-link')
+      // first footer
+        .start()
+          .start('span').addClass('bold-text-with-pad').add(this.model.FOOTER_TXT).end()
+          .start('span').addClass('link')
             .add(this.model.FOOTER_LINK)
             .on('click', () => {
-              this.model.footerLink();
+              this.model.footerLink(this.topBarShow_, this.param);
             })
           .end()
         .end()
-        .start().addClass('sme-subTitle')
-          .start('strong').add(this.model.SUB_FOOTER_TXT).end()
-          .start('span').addClass('app-link')
+      // second footer
+        .start().br()
+          .start('span').addClass('bold-text-with-pad').add(this.model.SUB_FOOTER_TXT).end()
+          .start('span').addClass('link')
             .add(this.model.SUB_FOOTER_LINK)
             .on('click', () => {
               this.model.subfooterLink();
@@ -187,41 +258,44 @@ foam.CLASS({
         .end();
 
       // CREATE SPLIT VIEW
-      if ( !! this.imgPath ) {
+      if ( this.imgPath ) {
         var split = foam.u2.borders.SplitScreenBorder.create();
         split.rightPanel.add(right);
       } else {
-        right.start().add(this.model.DISCLAIMER).end();
+        right.addClass('centerVertical').start().addClass('disclaimer-login').add(this.model.DISCLAIMER).end();
       }
 
-      // RENDER EVERYTHING
-      this.addClass(this.myClass()).addClass('full-screen')
-        .start().addClass('top-bar').show(this.topBarShow_)
-          .start().addClass('top-bar-inner')
-            .start().addClass(this.myClass('button'))
-              .start()
+      // RENDER EVERYTHING ONTO PAGE
+      this.addClass(this.myClass())
+      // full width bar with navigation to app landing page
+        .start().addClass('top-bar-nav').show(this.topBarShow_)
+          .start()
+            .start().addClass('topBar-txt-link')
+              .start('span')
                 .addClass('horizontal-flip')
                 .addClass('inline-block')
                 .add('➔')
               .end()
-              .add(this.GO_BACK).add(this.backLinkTxt_)
-              .on('click', () => {
-                window.location = this.appConfig.url;
-              })
+              .start('span').add(this.GO_BACK).add(this.backLinkTxt_)
+                .on('click', () => {
+                  window.location = this.backLink_;
+                })
+              .end()
             .end()
           .end()
         .end()
-
-        .callIfElse( !! this.imgPath && !! split, function() {
+      // deciding to render half screen with img and model or just centered model
+        .callIfElse( !! this.imgPath && !! split, () => {
           this.add(split)
           .start()
             .addClass('cover-img-block1')
               .start('img')
-                .addClass('sme-image1')
+                .addClass('image-one')
                 .attr('src', this.imgPath)
               .end()
+      // add a disclaimer under img
               .start('p')
-                .addClass(this.myClass('disclaimer'))
+                .addClass('disclaimer-login').addClass('disclaimer-login-img')
                 .add(this.model.DISCLAIMER)
               .end()
             .end();

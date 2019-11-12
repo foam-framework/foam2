@@ -16,7 +16,7 @@ foam.CLASS({
       text-align: center;
     }
     ^ .right-block {
-      width: 40vw;
+      width: 43vw;
       display: inline-block;
       background: transparent;
       height: auto;

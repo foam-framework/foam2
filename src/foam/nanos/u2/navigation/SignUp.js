@@ -2,7 +2,8 @@ foam.CLASS({
   package: 'foam.nanos.u2.navigation',
   name: 'SignUp',
 
-  documentation: `Model used for registering/creating an user.`,
+  documentation: `Model used for registering/creating an user.
+  Hidden properties create the different functionalities for this view (Ex. coming in with a signUp token)`,
 
   imports: [
     'appConfig',
@@ -17,8 +18,7 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.auth.Address',
-    'foam.nanos.auth.Country',
+  'foam.nanos.auth.Address',
     'foam.nanos.auth.Phone',
     'foam.nanos.auth.User'
   ],
@@ -26,8 +26,7 @@ foam.CLASS({
   messages: [
     { name: 'TITLE', message: 'Create a free account' },
     { name: 'FOOTER_TXT', message: 'Already have an account?' },
-    { name: 'FOOTER_LINK', message: 'Sign in' },
-    { name: 'DISCLAIMER', message: '*Ablii does not currently support businesses in Quebec. We are working hard to change this! If you are based in Quebec, check back for updates.' }
+    { name: 'FOOTER_LINK', message: 'Sign in' }
   ],
 
   properties: [
@@ -105,7 +104,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'phone',
-      label: 'Phone Number',
+      label: '',
       factory: function() {
         return this.Phone.create();
       },
@@ -133,16 +132,11 @@ foam.CLASS({
       of: 'foam.nanos.auth.Country',
       documentation: 'Country address.',
       view: function(_, X) {
-        var choices;
-        if ( this.countryChoices_ ) {
-          choices = X.data.slot(function() {
-            return X.countryDAO.where(X.data.IN(X.data.Country.CODE, this.countryChoices_));
-          });
-        } else {
-          choices = X.data.slot(function() {
-            return X.countryDAO;
-          });
-        }
+        var E = foam.mlang.Expressions.create();
+        choices = X.data.slot(function(countryChoices_) {
+          if ( ! countryChoices_ || countryChoices_.length == 0 ) return X.countryDAO;
+          return X.countryDAO.where(E.IN(X.data.Country.ID, countryChoices_));
+        });
         return foam.u2.view.ChoiceView.create({
           placeholder: 'Select your country',
           objToChoice: function(a) {
@@ -181,8 +175,8 @@ foam.CLASS({
   methods: [
     {
       name: 'footerLink',
-      code: function() {
-        this.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn' }, this);
+      code: function(topBarShow_, param) {
+        this.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn', topBarShow_: topBarShow_, param: param }, this);
       }
     },
     {

@@ -54,7 +54,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'signUpToken_',
+      name: 'token_',
       hidden: true
     }
   ],
@@ -62,8 +62,8 @@ foam.CLASS({
   methods: [
     {
       name: 'footerLink',
-      code: function() {
-        this.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignUp' }, this);
+      code: function(topBarShow_, param) {
+        this.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignUp', topBarShow_: topBarShow_, param: param }, this);
       }
     },
     {
@@ -82,11 +82,11 @@ foam.CLASS({
       label: 'Sign in',
       code: function(X) {
         this.auth.loginByEmail(X, this.email, this.password).then(
-          (usr) => {
-            if ( ! usr ) return;
-            usr.signUpToken = this.signUpToken_;
-            this.dao_.put(usr).then((ussr)=>{
-              this.user.copyFrom(ussr);
+          (logedInUser) => {
+            if ( ! logedInUser ) return;
+            logedInUser.signUpToken = this.token_;
+            this.dao_.put(logedInUser).then((updatedUser)=>{
+              this.user.copyFrom(updatedUser);
               if ( !! this.user && this.user.twoFactorEnabled ) {
                 this.loginSuccess = false;
                 window.history.replaceState({}, document.title, '/');
