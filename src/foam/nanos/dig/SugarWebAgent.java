@@ -12,14 +12,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
-import java.nio.CharBuffer;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.dao.DAO;
@@ -51,18 +49,22 @@ public class SugarWebAgent
     PrintWriter         out            = x.get(PrintWriter.class);
     HttpServletResponse resp           = x.get(HttpServletResponse.class);
     HttpParameters      p              = x.get(HttpParameters.class);
-    CharBuffer          buffer_        = CharBuffer.allocate(65535);
-    String              serviceName    = p.getParameter("service");
-    String              methodName     = p.getParameter("method");
-    String              interfaceName  = p.getParameter("interfaceName");
-
-    String data = p.getParameter("data");
-    
-    PStream ps = new StringPStream(data);
-    PStream jsonP = new MapParser().parse(ps , new ParserContextImpl());
-    Map mapPostParam = (Map) jsonP.value();
+    String              data           = p.getParameter("data");
 
     try {
+      if ( SafetyUtil.isEmpty(data) ) {
+        DigErrorMessage error = new GeneralException.Builder(x)
+          .setMessage("Empty data")
+          .build();
+        outputException(x, resp, "JSON", out, error);
+        return;
+      }
+      
+      PStream ps = new StringPStream(data);
+      PStream jsonP = new MapParser().parse(ps , new ParserContextImpl());
+      Map mapPostParam = (Map) jsonP.value();
+
+      String serviceName = (String) mapPostParam.get("service");
       if ( SafetyUtil.isEmpty(serviceName) ) {
         DigErrorMessage error = new GeneralException.Builder(x)
           .setMessage("Empty Service Key")
@@ -70,7 +72,8 @@ public class SugarWebAgent
         outputException(x, resp, "JSON", out, error);
         return;
       }
-
+      
+      String methodName = (String) mapPostParam.get("method");
       if ( SafetyUtil.isEmpty(methodName) ) {
         DigErrorMessage error = new GeneralException.Builder(x)
           .setMessage("Empty Method Name")
@@ -79,6 +82,7 @@ public class SugarWebAgent
         return;
       }
 
+      String interfaceName = (String) mapPostParam.get("interfaceName");
       Class class_ = null;
       try {
         class_ = Class.forName(interfaceName);
@@ -114,7 +118,7 @@ public class SugarWebAgent
 
       Class[] paramTypes = null; // for picked Method's parameters' types
       Object  arglist[]  = null; // to store each parameters' values
-      String paramName = null;
+      String  paramName  = null;
 
       if ( class_ != null ) {
         Method method_[] = class_.getMethods();  // get Methods' List from the class
@@ -139,61 +143,18 @@ public class SugarWebAgent
                 outputException(x, resp, "JSON", out, error);
                 return;
               }
-
-              paramTypes[j] = pArray[j].getType();
-
-              if ( p.getParameter(pArray[j].getName()) != null ) {
-                // the get method
-                arglist[j] = p.getParameter(pArray[j].getName());
-              } else {
-                // the post method
-                paramName = pArray[j].getName();
-              }
-
-              logger.debug(pArray[j].getName() + " :   " + p.getParameter(pArray[j].getName()));
+              // the post method
+              paramName = pArray[j].getName();
+              logger.debug(pArray[j].getName() + " :   " + paramName);
 
               // casting and setting according to parameters type
               String typeName = pArray[j].getType().getCanonicalName();
 
               if ( typeName.equals("foam.core.X") ) {
                 arglist[j] = x;
-              } else if ( ! SafetyUtil.isEmpty(p.getParameter(pArray[j].getName())) ) {
-                //get method
-                arglist[j] = setParameterValue(x, resp, out, p, typeName, pArray[j]);
               } else if ( paramName != null ) {
                 //post method
-                //TODO array
-                if ( typeName.equals("double") || typeName.equals("boolean") || typeName.equals("int") || typeName.equals("long") || typeName.equals("long") || typeName.equals("java.lang.String") ) {
-                  arglist[j] = mapPostParam.get(paramName);
-                } else {
-                  
-                  Object arg      = null;
-                  Class  objClass = null;
-                  try {
-                    objClass = Class.forName(typeName);
-                    // For Enum Parameter
-                    if ( objClass != null && objClass.isEnum() ) { 
-                      for ( int t = 0 ; t < objClass.getEnumConstants().length ; t++ ) {
-                        if ( objClass.getEnumConstants()[t].toString().equals(mapPostParam.get(paramName)) ) {
-                          arg = objClass.getEnumConstants()[t];
-                        }
-                      }
-                    } else {
-                      FObject             obj = (FObject) objClass.newInstance();
-                      Map<String, String> mParam   = (Map) mapPostParam.get(paramName);
-
-                      for ( Map.Entry<String, String> entry : mParam.entrySet() ) {
-                        obj.setProperty(entry.getKey(), entry.getValue());
-                      }
-                      arglist[j] = obj;
-                    }
-                  } catch (Exception e) {
-                    DigErrorMessage error = new GeneralException.Builder(x)
-                      .setMessage(e.toString())
-                      .build();
-                    outputException(x, null, "JSON", null, error);
-                  }
-                }
+                arglist[j] = mapPostParam.get(paramName);
               } else {
                 DigErrorMessage error = new GeneralException.Builder(x)
                   .setMessage("Empty Parameter values : " + pArray[j].getName())
@@ -309,58 +270,5 @@ public class SugarWebAgent
     }
 
     return clsObj;
-  }
-
-  protected Object setParameterValue(X x, HttpServletResponse resp, PrintWriter out, HttpParameters p, String typeName, Parameter pArray_) {
-    Object arg = null;
-
-    if ( ! SafetyUtil.isEmpty(typeName) ) {
-      switch ( typeName ) {
-        case "double":
-          arg = Double.parseDouble(p.getParameter(pArray_.getName()));
-          break;
-        case "boolean":
-          arg = Boolean.parseBoolean(p.getParameter(pArray_.getName()));
-          break;
-        case "int":
-          arg = Integer.parseInt(p.getParameter(pArray_.getName()));
-          break;
-        case "long":
-          arg = Long.parseLong(p.getParameter(pArray_.getName()));
-          break;
-        case "java.lang.String":
-          arg = p.getParameter(pArray_.getName());
-          break;
-        case "String[]":
-          arg = p.getParameterValues(pArray_.getName());
-          break;
-        case "foam.core.X":
-          arg = x;
-          break;
-        default:
-          Class objClass = null;
-
-          try {
-            objClass = Class.forName(typeName);
-
-            if ( objClass != null && objClass.isEnum() ) {  // For Enum Parameter
-              for ( int t = 0 ; t < objClass.getEnumConstants().length ; t++ ) {
-                if ( objClass.getEnumConstants()[t].toString().equals(p.getParameter(pArray_.getName())) ) {
-                  arg = objClass.getEnumConstants()[t];
-                }
-              }
-            } else {
-              arg = getFieldInfo(x, typeName, p);  // For Object Parameter
-            }
-          } catch (Exception e) {
-            DigErrorMessage error = new GeneralException.Builder(x)
-              .setMessage(e.toString())
-              .build();
-            outputException(x, null, "JSON", null, error);
-          }
-      }
-    }
-
-    return arg;
   }
 }
