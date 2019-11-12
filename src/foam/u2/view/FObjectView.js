@@ -53,10 +53,14 @@ foam.CLASS({
           this.objectClass = data.cls_.id;
         }
       },
-      view: {
-        class: 'foam.u2.view.FObjectPropertyView',
-        writeView: { class: 'foam.u2.detail.SectionedDetailView' }
+      view: function(args, X) {
+        return X.data.dataView || { class: 'foam.u2.view.FObjectPropertyView' }
       }
+    },
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'dataView',
+      documentation: 'Set this to change the view of the FObject being created.'
     },
     {
       class: 'Class',
