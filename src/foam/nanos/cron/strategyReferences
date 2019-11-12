@@ -1,0 +1,24 @@
+p({
+  "class":"foam.strategy.StrategyReference",
+  "id":"63fb2368-703e-8798-e2bb-0fa150817b20",
+  "desiredModelId":"foam.nanos.cron.Schedule",
+  "strategy":"foam.nanos.cron.IntervalSchedule"
+})
+p({
+  "class":"foam.strategy.StrategyReference",
+  "id":"fc9fffbd-f582-4f0f-c35c-0ee112cb9ec3",
+  "desiredModelId":"foam.nanos.cron.Schedule",
+  "strategy":"foam.nanos.cron.NeverSchedule"
+})
+p({
+  "class":"foam.strategy.StrategyReference",
+  "id":"bcaf6a74-9805-5ac5-ad6a-db7fe422f7e8",
+  "desiredModelId":"foam.nanos.cron.Schedule",
+  "strategy":"foam.nanos.cron.OrSchedule"
+})
+p({
+  "class":"foam.strategy.StrategyReference",
+  "id":"cade2e0c-8fc3-e697-dd31-cbf3c7cb1769",
+  "desiredModelId":"foam.nanos.cron.Schedule",
+  "strategy":"foam.nanos.cron.TimeOfDaySchedule"
+})
