@@ -76,7 +76,9 @@ if ( initializing.get() ) {
   System.out.println("DAOLogger initializing");
   return;
 }
-LogMessage lm = new LogMessage.Builder(getX()).setSeverity(severity).setMessage(message).build();
+LogMessage lm = new LogMessage.Builder(getX())
+                    .setSeverity(severity)
+                    .setMessage(message).build();
 getDao().put_(getX().put("logger", (Logger) getLogger()), lm);
 `
     },
