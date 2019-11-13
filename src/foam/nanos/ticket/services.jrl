@@ -29,6 +29,11 @@ p({
       .setSeqNo(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("tickets")
+      .setOrder(new foam.mlang.order.Comparator[] {
+        foam.mlang.MLang.DESC(
+          foam.nanos.ticket.Ticket.LAST_MODIFIED
+        )
+      })
       .setDecorator(
         new foam.dao.history.HistoryDAO(x, "ticketHistoryDAO",
           new foam.nanos.ticket.TicketAddCommentDAO.Builder(x).setDelegate(
@@ -85,7 +90,9 @@ p({
       .setPm(true)
       .setSeqNo(true)
       .setOrder(new foam.mlang.order.Comparator[] {
-        foam.nanos.ticket.TicketComment.CREATED
+        foam.mlang.MLang.DESC(
+          foam.nanos.ticket.TicketComment.CREATED
+        )
       })
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("ticketComments")

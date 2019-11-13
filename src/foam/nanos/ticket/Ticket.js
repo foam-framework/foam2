@@ -120,7 +120,7 @@ foam.CLASS({
         // TODO: want regular detail view in VIEW mode.
         if ( this.controllerMode == foam.u2.ControllerMode.VIEW ) {
           return {
-            class: 'foam.u2.DetailView'
+            class: 'foam.u2.DetailPropertyView'
           };
         } else {
           return {
