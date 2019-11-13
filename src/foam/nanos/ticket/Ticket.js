@@ -137,7 +137,8 @@ foam.CLASS({
         if ( this.status == this.TicketStatus.CLOSED ) {
           s.push([foam.nanos.ticket.TicketStatus.CLOSED.name, foam.nanos.ticket.TicketStatus.CLOSED.label]);
         } else {
-          s.push([foam.nanos.ticket.TicketStatus.OPEN.name, foam.nanos.ticket.TicketStatus.OPEN.label]);
+          s.push(this.status.label),
+          s.push([foam.nanos.ticket.TicketStatus.CLOSED.name, foam.nanos.ticket.TicketStatus.CLOSED.label]);
         }
         return s;
       },
