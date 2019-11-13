@@ -102,16 +102,26 @@ foam.CLASS({
       // implements and extends relations.
       if ( this.strategizer != null ) {
         this.strategizer.query(null, this.of.id).then((strategyReferences) => {
-          this.choices = strategyReferences
+          if ( ! Array.isArray(strategyReferences) || strategyReferences.length === 0 ) {
+            this.choices = [[this.of.id, this.of.model_.label]];
+            return;
+          }
+
+          var choices = strategyReferences
             .reduce((arr, sr) => {
               if ( ! sr.strategy ) {
                 console.warn('Invalid strategy reference: ' + sr.id);
                 return arr;
               }
 
-              return arr.concat([[sr.strategy.id, sr.strategy.name]]);
+              return arr.concat([[sr.strategy.id, sr.strategy.model_.label]]);
             }, [])
             .filter(x => x);
+
+          // Sort choices alphabetically by label.
+          choices.sort((a, b) => a[1] > b[1] ? 1 : -1);
+
+          this.choices = choices;
         });
       } else {
         this.choices = this.choicesFallback(this.of);
