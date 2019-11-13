@@ -11,6 +11,7 @@ foam.CLASS({
   documentation: 'Ticket Model',
 
   implements: [
+    'foam.core.Validatable',
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.LastModifiedAware',
@@ -83,7 +84,7 @@ foam.CLASS({
       `,
       tableWidth: 135,
       section: 'ticketType',
-      visibility: 'RO'
+      visibility: 'FINAL'
     },
     {
       class: 'Long',
@@ -271,6 +272,9 @@ foam.CLASS({
       name: 'close',
       tableWidth: 70,
       confirmationRequired: true,
+      isAvailable: function(status) {
+        return status != 'CLOSED';
+      },
       code: function() {
         this.status = 'CLOSED';
         this.ticketDAO.put(this).then(function(ticket) {
