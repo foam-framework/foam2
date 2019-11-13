@@ -182,8 +182,8 @@ public class RuleEngine extends ContextAwareSupport {
 
   private void retryAsyncApply(X x, Rule rule, FObject obj, FObject oldObj) {
     new RetryManager().submit(x, x1 -> {
-        rule.asyncApply(x, obj, oldObj, RuleEngine.this, rule);
-        saveHistory(rule, obj);
+      rule.asyncApply(x, obj, oldObj, RuleEngine.this, rule);
+      saveHistory(rule, obj);
     });
   }
 
