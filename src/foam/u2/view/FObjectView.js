@@ -52,7 +52,15 @@ foam.CLASS({
         } else if ( data.cls_.id != this.objectClass ) {
           this.objectClass = data.cls_.id;
         }
+      },
+      view: function(args, X) {
+        return X.data.dataView || { class: 'foam.u2.view.FObjectPropertyView' }
       }
+    },
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'dataView',
+      documentation: 'Set this to change the view of the FObject being created.'
     },
     {
       class: 'Class',

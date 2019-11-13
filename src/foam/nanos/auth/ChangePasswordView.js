@@ -111,7 +111,7 @@ foam.CLASS({
       name: 'newPassword',
       section: 'resetPasswordSection',
       view: {
-        class: 'net.nanopay.ui.NewPasswordView',
+        class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       },
       minLength: 6

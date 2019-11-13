@@ -7,6 +7,7 @@ foam.CLASS({
 
   imports: [
     'appConfig',
+    'auth',
     'notify',
     'stack',
     'user'
@@ -18,7 +19,8 @@ foam.CLASS({
   ],
 
   requires: [
-  'foam.nanos.auth.Address',
+    'foam.nanos.auth.Address',
+    'foam.nanos.auth.Country',
     'foam.nanos.auth.Phone',
     'foam.nanos.auth.User'
   ],
@@ -176,7 +178,9 @@ foam.CLASS({
     {
       name: 'footerLink',
       code: function(topBarShow_, param) {
-        this.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn', topBarShow_: topBarShow_, param: param }, this);
+        let p = { dao_: param.dao_, group_: param.group_ };
+        window.history.replaceState(null, null, window.location.origin);
+        this.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn', topBarShow_: topBarShow_, param: p }, this);
       }
     },
     {

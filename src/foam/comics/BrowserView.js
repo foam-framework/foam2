@@ -116,8 +116,8 @@ foam.CLASS({
         if ( searchMode )  config.searchMode  = searchMode;
         if ( subtitle )    config.subtitle    = subtitle;
         if ( title )       config.title       = title;
+        if ( detailView )  config.detailView  = detailView;
         config.createEnabled = createEnabled;
-        config.detailView    = detailView;
         config.editEnabled   = editEnabled;
         config.exportEnabled = exportEnabled;
         config.exportCSVEnabled = exportCSVEnabled;
@@ -148,9 +148,8 @@ foam.CLASS({
     // This is the DAOCreateControllerView, not the DetailView
     'createControllerView',
     {
-      class: 'String',
-      name: 'detailView',
-      value: 'foam.u2.DetailView'
+      class: 'foam.u2.ViewSpec',
+      name: 'detailView'
     }
   ],
 

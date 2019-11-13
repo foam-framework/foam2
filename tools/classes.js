@@ -419,6 +419,7 @@ var classes = [
   'foam.flow.Document',
   'foam.flow.DocumentationFolderDAO',
 
+  'foam.nanos.ruler.RuleGroup',
   'foam.nanos.ruler.Rule',
   'foam.nanos.ruler.RulerDAO',
   'foam.nanos.ruler.Operations',
@@ -431,6 +432,13 @@ var classes = [
   'foam.nanos.ruler.RuleHistoryStatus',
   'foam.nanos.ruler.UpdateRulesListSink',
   'foam.nanos.ruler.predicate.PropertyChangePredicate',
+  'foam.nanos.ruler.action.SendNotification',
+  'foam.nanos.ruler.predicate.PropertyEQValue',
+  'foam.nanos.ruler.predicate.PropertyNEQValue',
+  'foam.nanos.ruler.predicate.PropertyEQProperty',
+  'foam.nanos.ruler.predicate.NewEqOld',
+  'foam.nanos.ruler.predicate.IsInstancePredicate',
+  'foam.nanos.ruler.action.ChangePropertyAction',
   'foam.comics.SearchMode',
 
   // Support Files

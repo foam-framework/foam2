@@ -18,7 +18,7 @@ import static foam.mlang.MLang.*;
 public class RulerDAOTest extends Test {
   Rule rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9, rule10;
   User user1, user2;
-  DAO ruleDAO, userDAO, ruleHistoryDAO;
+  DAO ruleDAO, userDAO, ruleHistoryDAO,rgDAO;
   int asyncWait = 1000;
 
   public void runTest(X x) {
@@ -29,6 +29,13 @@ public class RulerDAOTest extends Test {
     ruleDAO = (DAO) x.get("ruleDAO");
     userDAO = new RulerDAO(x, (DAO) x.get("localUserDAO"), "localUserDAO");
     ruleHistoryDAO = (DAO) x.get("ruleHistoryDAO");
+    RuleGroup rg = new RuleGroup();
+    rg.setId("users:email filter");
+    rgDAO = ((DAO) (x.get("ruleGroupDAO")));
+    rgDAO.put(rg);
+    RuleGroup rg2 = new RuleGroup();
+    rg2.setId("users:change lastName");
+    rgDAO.put(rg2);
     createRule(x);
     testUsers(x);
     testRuleHistory(x);
@@ -243,6 +250,9 @@ public class RulerDAOTest extends Test {
       user.setLastName("Unknown");
       Rule executeRule = new Rule();
       executeRule.setId("executeRule");
+      RuleGroup rg = new RuleGroup();
+      rg.setId("fake test group");
+      rgDAO.put(rg);
       executeRule.setRuleGroup("fake test group");
       executeRule.setDaoKey("fakeDaoKey");
       agency.submit(x, new ContextAwareAgent() {
@@ -268,6 +278,9 @@ public class RulerDAOTest extends Test {
 
     //the rule only applied to user2
     rule6 = new Rule();
+    RuleGroup rg = new RuleGroup();
+    rg.setId("user2 update");
+    rgDAO.put(rg);
     rule6.setId("rule6. user2 update");
     rule6.setRuleGroup("user2 update");
     rule6.setDaoKey("localUserDAO");
@@ -290,6 +303,9 @@ public class RulerDAOTest extends Test {
     //the rule with erroneous predicate
     rule8 = new Rule();
     rule8.setId("rule8. Erroneous rule predicate");
+    RuleGroup rg2 = new RuleGroup();
+    rg2.setId("user created");
+    rgDAO.put(rg2);
     rule8.setRuleGroup("user created");
     rule8.setDaoKey("localUserDAO");
     rule8.setOperation(Operations.CREATE);
@@ -302,6 +318,9 @@ public class RulerDAOTest extends Test {
     //the rule with FObject predicate
     rule9 = new Rule();
     rule9.setId("rule9. FObject rule predicate");
+    RuleGroup rg3 = new RuleGroup();
+    rg3.setId("user updated");
+    rgDAO.put(rg3);
     rule9.setRuleGroup("user updated");
     rule9.setDaoKey("localUserDAO");
     rule9.setOperation(Operations.UPDATE);

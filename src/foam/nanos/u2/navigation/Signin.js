@@ -63,7 +63,9 @@ foam.CLASS({
     {
       name: 'footerLink',
       code: function(topBarShow_, param) {
-        this.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignUp', topBarShow_: topBarShow_, param: param }, this);
+        let p = { dao_: param.dao_, group_: param.group_ };
+        window.history.replaceState(null, null, window.location.origin);
+        this.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignUp', topBarShow_: topBarShow_, param: p }, this);
       }
     },
     {
@@ -73,6 +75,27 @@ foam.CLASS({
           class: 'foam.nanos.auth.resetPassword.ForgotPasswordView'
         });
       }
+    },
+    {
+      name: 'nextStep',
+      code: function() {
+        if ( this.user.twoFactorEnabled ) {
+          this.loginSuccess = false;
+          window.history.replaceState({}, document.title, '/');
+          this.stack.push({
+            class: 'foam.nanos.auth.twofactor.TwoFactorSignInView'
+          });
+        } else {
+          if ( ! this.user.emailVerified ) {
+            this.stack.push({
+              class: 'foam.nanos.auth.ResendVerificationEmail'
+            });
+          } else {
+            window.location.hash = '';
+          }
+          this.loginSuccess = !! this.user;
+        }
+      }
     }
   ],
 
@@ -80,37 +103,24 @@ foam.CLASS({
     {
       name: 'login',
       label: 'Sign in',
-      code: function(X) {
+      code: async function(X) {
         this.auth.loginByEmail(X, this.email, this.password).then(
           (logedInUser) => {
             if ( ! logedInUser ) return;
-            logedInUser.signUpToken = this.token_;
-            this.dao_.put(logedInUser).then((updatedUser)=>{
-              this.user.copyFrom(updatedUser);
-              if ( !! this.user && this.user.twoFactorEnabled ) {
-                this.loginSuccess = false;
-                window.history.replaceState({}, document.title, '/');
-                this.stack.push({
-                  class: 'foam.nanos.auth.twofactor.TwoFactorSignInView'
+            if ( this.token_ ) {
+              logedInUser.signUpToken = this.token_;
+              this.dao_.put(logedInUser)
+                .then((updatedUser) => {
+                  this.user.copyFrom(updatedUser);
+                  this.nextStep();
+                }).catch((err) => {
+                  console.warn(err.message);
+                  this.notify('There was an issue with logging in.', 'error');
                 });
-              } else {
-                this.loginSuccess = !! this.user;
-                if ( ! this.user.emailVerified ) {
-                  this.stack.push({
-                    class: 'foam.nanos.auth.ResendVerificationEmail'
-                  });
-                } else {
-                  // This is required for signin
-                  window.location.hash = '';
-                  window.location.reload();
-                }
-              }
-            }).catch(
-              (err) => {
-                console.warn(err.message);
-                this.notify('There was an issue with logging in.', 'error');
-              }
-            );
+            } else {
+              this.user.copyFrom(logedInUser);
+              this.nextStep();
+            }
           }
         ).catch(
           (err) => {

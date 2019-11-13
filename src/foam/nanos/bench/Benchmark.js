@@ -22,6 +22,20 @@ foam.INTERFACE({
           type: 'Context'
         }
       ]
+    },
+    {
+      name: 'teardown',
+      type: 'Void',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'stats',
+          type: 'java.util.Map'
+        }
+      ]
     }
   ]
 });

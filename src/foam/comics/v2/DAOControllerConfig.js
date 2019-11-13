@@ -75,7 +75,7 @@ foam.CLASS({
       help: `
         The level of search capabilities that the controller should have.
       `,
-      value: 'SIMPLE'
+      value: 'FULL'
     },
     {
       class: 'foam.u2.ViewSpecWithJava',
