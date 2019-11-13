@@ -25,11 +25,15 @@ foam.CLASS({
           foam.u2.Visibility.RW :
           foam.u2.Visibility.HIDDEN;
       },
-      view: function(_, x) {
-        return foam.u2.view.ChoiceView.create({
+      view: function(args, X) {
+        return {
+          class: 'foam.u2.view.ChoiceView',
           placeholder: '--',
-          choices$: x.data.choices$
-        }, x);
+          choices$: X.data.choices$,
+          defaultValue$: X.data.choices$.map((choices) => {
+            return Array.isArray(choices) && choices.length > 0 ? choices[0][0] : '';
+          })
+        };
       },
       postSet: function(oldValue, newValue) {
         if ( newValue !== oldValue ) {
