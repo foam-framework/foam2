@@ -105,8 +105,8 @@ public class Boot {
     ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(
         new foam.nanos.auth.AuthorizationDAO(getX(), serviceDAO_, new foam.nanos.auth.GlobalReadAuthorizer("service")));
     // 'read' authenticated version - for dig and docs
-    ((ProxyDAO) root_.get("AuthenticatedNSpecDAO")).setDelegate(
-        new foam.dao.PMDAO(root_, new foam.nanos.auth.AuthorizationDAO(getX(), (DAO) root_.get("nSpecDAO"), new foam.nanos.auth.StandardAuthorizer("service"))));
+    // ((ProxyDAO) root_.get("AuthenticatedNSpecDAO")).setDelegate(
+    //     new foam.dao.PMDAO(root_, new foam.nanos.auth.AuthorizationDAO(getX(), (DAO) root_.get("nSpecDAO"), new foam.nanos.auth.StandardAuthorizer("service"))));
 
     serviceDAO_.where(EQ(NSpec.LAZY, false)).select(new AbstractSink() {
       @Override
@@ -119,13 +119,13 @@ public class Boot {
     });
 
     String startScript = System.getProperty("foam.main", "main");
-    if ( startScript != null ) {
-      DAO    scriptDAO = (DAO) root_.get("scriptDAO");
-      Script script    = (Script) scriptDAO.find(startScript);
-      if ( script != null ) {
-        script.runScript(root_);
-      }
-    }
+    // if ( startScript != null ) {
+    //   DAO    scriptDAO = (DAO) root_.get("scriptDAO");
+    //   Script script    = (Script) scriptDAO.find(startScript);
+    //   if ( script != null ) {
+    //     script.runScript(root_);
+    //   }
+    // }
   }
 
   protected List perfectList(List src) {
