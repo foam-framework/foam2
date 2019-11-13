@@ -57,8 +57,11 @@ foam.CLASS({
           this.objectClass = data.cls_.id;
         }
       },
+      // We need to override the default view, otherwise we end up with a
+      // circular definition where FObjectView has an FObjectProperty which gets
+      // rendered as an FObjectView, which leads to infinite recursion.
       view: function(args, X) {
-        return X.data.dataView || { class: 'foam.u2.view.FObjectPropertyView' }
+        return X.data.dataView || { class: 'foam.u2.detail.SectionedDetailView' }
       }
     },
     {
