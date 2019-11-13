@@ -18,7 +18,7 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.ticket.TicketStatus'
+    'foam.nanos.ticket.TicketStatus',
   ],
 
   javaImports: [
@@ -27,6 +27,7 @@ foam.CLASS({
 
   imports: [
     'userDAO',
+    'ticketDAO',
     'ticketStatusDAO'
   ],
 
@@ -271,12 +272,10 @@ foam.CLASS({
       tableWidth: 70,
       confirmationRequired: true,
       code: function() {
-        var self = this;
-        this.output = '';
-        this.status = 'CLOSED'; //this.TicketStatus.CLOSED;
+        this.status = 'CLOSED';
         this.ticketDAO.put(this).then(function(ticket) {
-          self.copyFrom(ticket);
-        });
+          this.copyFrom(ticket);
+        }.bind(this));
       }
     },
   ]
