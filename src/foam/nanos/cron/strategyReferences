@@ -1,5 +1,11 @@
 p({
   "class":"foam.strategy.StrategyReference",
+  "id":"69f72b68-7afe-8999-e3cc-1ea151217b21",
+  "desiredModelId":"foam.nanos.cron.Schedule",
+  "strategy":"foam.nanos.cron.CronSchedule"
+})
+p({
+  "class":"foam.strategy.StrategyReference",
   "id":"63fb2368-703e-8798-e2bb-0fa150817b20",
   "desiredModelId":"foam.nanos.cron.Schedule",
   "strategy":"foam.nanos.cron.IntervalSchedule"
