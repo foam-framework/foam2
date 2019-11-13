@@ -26,7 +26,6 @@ foam.CLASS({
   ],
 
   imports: [
-    'controllerMode',
     'userDAO'
   ],
 
@@ -117,17 +116,17 @@ foam.CLASS({
       order: 3,
       tableWidth: 130,
       view: function(_, x) {
-        // TODO: want regular detail view in VIEW mode.
-        if ( this.controllerMode == foam.u2.ControllerMode.VIEW ) {
-          return {
-            class: 'foam.u2.DetailPropertyView'
-          };
-        } else {
-          return {
+        return {
+          class: 'foam.u2.view.ModeAltView',
+          readView: {
+            class: 'foam.u2.EnumView',
+            of: 'foam.nanos.ticket.TicketStatus'
+          },
+          writeView: {
             class: 'foam.u2.view.ChoiceView',
             choices: x.data.statusChoices
-          };
-        }
+          }
+        };
       },
     },
     {
