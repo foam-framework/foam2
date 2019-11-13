@@ -14,9 +14,7 @@ foam.CLASS({
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.LastModifiedAware',
-    'foam.nanos.auth.LastModifiedByAware',
-    //'foam.nanos.auth.EnabledAware',
-    //'foam.nanos.auth.DeletedAware',
+    'foam.nanos.auth.LastModifiedByAware'
   ],
 
   javaImports: [
@@ -30,7 +28,8 @@ foam.CLASS({
   tableColumns: [
     'id',
     'type',
-//    'owner',
+    // REVIEW: view fails to display when owner in tableColumns
+  //  'owner',
     'lastModified',
     'status',
     'summary'
@@ -44,19 +43,18 @@ foam.CLASS({
     },
     {
       name: 'basicInfo',
-      title: ''
-    },
-    {
-      name: 'commentSection',
-      title: ''
+      title: '',
+      order: 2
     },
     {
       name: 'comments',
-      title: ''
+      title: '',
+      order: 3
     },
     {
       name: 'details',
-      title: ''
+      title: '',
+      order: 4
     },
     {
       name: '_defaultSection',
@@ -66,7 +64,7 @@ foam.CLASS({
   ],
 
   properties: [
-     {
+    {
       class: 'String',
       name: 'type',
       documentation: 'The type of the ticket.',
@@ -86,6 +84,7 @@ foam.CLASS({
       name: 'id',
       visibility: 'RO',
       section: 'basicInfo',
+      order: 1
     },
     {
       name: 'type',
@@ -99,7 +98,8 @@ foam.CLASS({
       javaGetter: `
     return getClass().getSimpleName();
       `,
-      tableWidth: 160
+      tableWidth: 160,
+      order: 2
     },
     {
       class: 'foam.core.Enum',
@@ -108,7 +108,9 @@ foam.CLASS({
       value: 'OPEN',
       includeInDigest: true,
       section: 'basicInfo',
-    },
+      order: 3
+   },
+    // REVIEW: can't get this to work.
     // {
     //   name: 'watchers',
     //   class: 'List',
@@ -121,25 +123,52 @@ foam.CLASS({
     // },
     {
       class: 'String',
-      name: 'summary',
-      transient: true,
-      tableCellFormatter: function(value, obj) {
-        this.add(obj.title);
-      },
-      visibility: 'RO',
-    },
-    {
-      class: 'String',
       name: 'title',
       required: true,
       section: 'basicInfo',
+      validationPredicate: [
+        {
+          args: ['title', 'type'],
+          predicateFactory: function(e) {
+            return e.GT(
+              foam.mlang.StringLength.create({
+                arg1: foam.nanos.ticket.Ticket.TITLE
+              }), 0);
+          },
+          errorString: 'Please provide a summary of the Ticket.'
+        }
+      ],
+      order: 4
     },
     {
       class: 'String',
       name: 'comment',
-      required: true,
+      value: '',
+    // required: true,
       storageTransient: true,
-      section: 'commentSection'
+      section: 'comments',
+      validationPredicate: [
+        {
+          args: ['id', 'title', 'comment'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.AND(
+                e.EQ(foam.nanos.ticket.Ticket.ID, 0),
+                e.GT(
+                  foam.mlang.StringLength.create({
+                    arg1: foam.nanos.ticket.Ticket.TITLE
+                  }), 0)
+              ),
+              e.GT(
+              foam.mlang.StringLength.create({
+                arg1: foam.nanos.ticket.Ticket.COMMENT
+              }), 0)
+            );
+          },
+          errorString: 'Please provide a comment.'
+        }
+      ],
+      order: 1
     },
     {
       class: 'DateTime',
@@ -182,6 +211,31 @@ foam.CLASS({
         }.bind(this));
       },
       section: 'details',
+    },
+    {
+      name: 'summary',
+      class: 'String',
+      transient: true,
+      hidden: true,
+      tableCellFormatter: function(value, obj) {
+        this.add(obj.title);
+      }
+    }
+  ],
+
+  actions: [
+    {
+      name: 'close',
+      tableWidth: 70,
+      confirmationRequired: true,
+      code: function() {
+        var self = this;
+        this.output = '';
+        this.status = this.TicketStatus.CLOSED;
+        this.ticketDAO.put(this).then(function(ticket) {
+          self.copyFrom(ticket);
+        });
+      }
     },
   ]
 });

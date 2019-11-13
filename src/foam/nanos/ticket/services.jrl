@@ -6,7 +6,7 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.dao.history.HistoryRecord.getOwnClassInfo())
       .setSeqNo(true)
-      .setSeqPropertyName(\"seqNo\")
+      .setSeqPropertyName("seqNo")
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("ticketHistory")
       .build();
@@ -30,8 +30,9 @@ p({
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("tickets")
       .setDecorator(
-        new foam.nanos.ticket.TicketAddCommentDAO.Builder(x).setDelegate(
-          new foam.nanos.ticket.TicketOwnerDAO.Builder(x).build()).build()
+        new foam.dao.history.HistoryDAO(x, "ticketHistoryDAO",
+          new foam.nanos.ticket.TicketAddCommentDAO.Builder(x).setDelegate(
+            new foam.nanos.ticket.TicketOwnerDAO.Builder(x).build()).build())
       )
       .build();
   """
@@ -53,6 +54,23 @@ p({
   "client": "{\"of\":\"foam.nanos.ticket.Ticket\"}"
 })
 p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"ticketCommentHistoryDAO",
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.dao.history.HistoryRecord.getOwnClassInfo())
+      .setSeqNo(true)
+      .setSeqPropertyName("seqNo")
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("ticketCommentHistory")
+      .build();
+    """,
+  "client":"""
+    {"of":"foam.dao.history.HistoryRecord"}
+    """
+})
+p({
   "class": "foam.nanos.boot.NSpec",
   "name": "localTicketCommentDAO",
   "lazy": true,
@@ -60,14 +78,20 @@ p({
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.ticket.TicketComment.getOwnClassInfo())
-      .setIndex(new foam.core.PropertyInfo[] {foam.nanos.ticket.TicketComment.ID})
+      .setIndex(new foam.core.PropertyInfo[] {
+         foam.nanos.ticket.TicketComment.ID
+      })
       .setAuthorize(false)
       .setPm(true)
       .setSeqNo(true)
+      .setOrder(new foam.mlang.order.Comparator[] {
+        foam.nanos.ticket.TicketComment.CREATED
+      })
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("ticketComments")
       .setDecorator(
-        new foam.nanos.ticket.TicketCommentOwnerDAO.Builder(x).build()
+        new foam.dao.history.HistoryDAO(x, "ticketCommentHistoryDAO",
+          new foam.nanos.ticket.TicketCommentOwnerDAO.Builder(x).build())
       )
       .build();
   """

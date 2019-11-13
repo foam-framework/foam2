@@ -32,7 +32,8 @@ foam.RELATIONSHIP({
   targetDAOKey: 'ticketCommentDAO',
   unauthorizedTargetDAOKey: 'localTicketCommentDAO',
   targetProperty: {
-    section: 'comments'
+    section: 'comments',
+    order: 2
   },
 });
 
