@@ -17,11 +17,16 @@ foam.CLASS({
     'foam.nanos.auth.LastModifiedByAware'
   ],
 
+  requires: [
+    'foam.nanos.ticket.TicketStatus'
+  ],
+
   javaImports: [
-    'java.util.Date'
+    'java.util.Date',
   ],
 
   imports: [
+    'controllerMode',
     'userDAO'
   ],
 
@@ -106,10 +111,39 @@ foam.CLASS({
       of: 'foam.nanos.ticket.TicketStatus',
       name: 'status',
       value: 'OPEN',
+      javaFactory: 'return TicketStatus.OPEN;',
       includeInDigest: true,
       section: 'basicInfo',
-      order: 3
-   },
+      order: 3,
+      tableWidth: 130,
+      view: function(_, x) {
+        // TODO: want regular detail view in VIEW mode.
+        if ( this.controllerMode == foam.u2.ControllerMode.VIEW ) {
+          return {
+            class: 'foam.u2.DetailView'
+          };
+        } else {
+          return {
+            class: 'foam.u2.view.ChoiceView',
+            choices: x.data.statusChoices
+          };
+        }
+      },
+    },
+    {
+      name: 'statusChoices',
+      hidden: true,
+      factory: function() {
+        var s = [];
+        if ( this.status == this.TicketStatus.CLOSED ) {
+          s.push([foam.nanos.ticket.TicketStatus.CLOSED.name, foam.nanos.ticket.TicketStatus.CLOSED.label]);
+        } else {
+          s.push([foam.nanos.ticket.TicketStatus.OPEN.name, foam.nanos.ticket.TicketStatus.OPEN.label]);
+        }
+        return s;
+      },
+      documentation: 'Returns available statuses for each ticket depending on current status'
+    },
     // REVIEW: can't get this to work.
     // {
     //   name: 'watchers',
