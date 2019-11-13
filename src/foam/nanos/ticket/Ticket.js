@@ -26,7 +26,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'userDAO'
+    'userDAO',
+    'ticketStatusDAO'
   ],
 
   tableColumns: [
@@ -106,20 +107,27 @@ foam.CLASS({
       order: 2
     },
     {
-      class: 'foam.core.Enum',
+      class: 'Reference',
       of: 'foam.nanos.ticket.TicketStatus',
       name: 'status',
       value: 'OPEN',
-      javaFactory: 'return TicketStatus.OPEN;',
+      javaFactory: 'return "OPEN";',
       includeInDigest: true,
       section: 'basicInfo',
       order: 3,
       tableWidth: 130,
+      tableCellFormatter: function(value, obj) {
+        obj.ticketStatusDAO.find(value).then(function(status) {
+          if (status) {
+            this.add(status.label);
+          }
+        }.bind(this));
+      },
       view: function(_, x) {
         return {
           class: 'foam.u2.view.ModeAltView',
           readView: {
-            class: 'foam.u2.EnumView',
+            class: 'foam.u2.view.ReferenceView',
             of: 'foam.nanos.ticket.TicketStatus'
           },
           writeView: {
@@ -134,11 +142,11 @@ foam.CLASS({
       hidden: true,
       factory: function() {
         var s = [];
-        if ( this.status == this.TicketStatus.CLOSED ) {
-          s.push([foam.nanos.ticket.TicketStatus.CLOSED.name, foam.nanos.ticket.TicketStatus.CLOSED.label]);
+        if ( 'CLOSED' == this.status ) {
+          s.push(['CLOSED', 'CLOSED']);
         } else {
-          s.push(this.status.label),
-          s.push([foam.nanos.ticket.TicketStatus.CLOSED.name, foam.nanos.ticket.TicketStatus.CLOSED.label]);
+          s.push(this.status),
+          s.push(['CLOSED', 'CLOSED']);
         }
         return s;
       },
@@ -265,7 +273,7 @@ foam.CLASS({
       code: function() {
         var self = this;
         this.output = '';
-        this.status = this.TicketStatus.CLOSED;
+        this.status = 'CLOSED'; //this.TicketStatus.CLOSED;
         this.ticketDAO.put(this).then(function(ticket) {
           self.copyFrom(ticket);
         });

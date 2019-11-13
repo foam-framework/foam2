@@ -1,22 +1,30 @@
-foam.ENUM({
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+foam.CLASS({
   package: 'foam.nanos.ticket',
   name: 'TicketStatus',
 
-  documentation: `Status for tickets. Each Ticket type is
-expected to subclass TicketStatus`,
-
-  values: [
+  properties: [
     {
-      name: 'OPEN',
-      label: 'Open',
-      documentation: 'Initial status of ticket when first created.',
-      ordinal: 0
+      name: 'id',
+      class: 'String',
+      label: 'Status'
     },
     {
-      name: 'CLOSED',
-      label: 'Closed',
-      documentation: 'Final status of ticket indicating no more activity will occur.',
-      ordinal: 19
+      name: 'label',
+      class: 'String'
+    },
+    {
+      name: 'ordinal',
+      class: 'Long'
+    },
+    {
+      name: 'description',
+      class: 'String'
     }
   ]
 });
