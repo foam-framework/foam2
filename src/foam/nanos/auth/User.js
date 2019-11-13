@@ -228,7 +228,7 @@ foam.CLASS({
       section: 'administrative'
     },
     {
-      class: 'foam.nanos.auth.FormattedPhoneNumber',
+      class: 'foam.core.PhoneNumberPropertyValidationRefinement',
       name: 'phoneNumber',
       documentation: 'Personal phone number.',
       section: 'personal'
@@ -240,7 +240,7 @@ foam.CLASS({
       section: 'personal'
     },
     {
-      class: 'foam.nanos.auth.FormattedPhoneNumber',
+      class: 'foam.core.PhoneNumberPropertyValidationRefinement',
       name: 'mobile',
       documentation: 'Returns the mobile phone number of the User from the Phone model.',
       section: 'personal'
@@ -647,47 +647,6 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.Group',
       name: 'group'
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.nanos.auth',
-  name: 'FormattedPhoneNumber',
-  extends: 'foam.core.PhoneNumber',
-  label: 'Formatted Phone number',
-  properties: [
-    {
-      class: 'FObjectArray',
-      of: 'foam.core.ValidationPredicate',
-      name: 'validationPredicates',
-      factory: function() {
-        var self = this;
-        var ret = [
-          {
-            args: [this.name],
-            predicateFactory: function(e) {
-                return e.REG_EXP(
-                  self,
-                  /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/
-                 );
-              },
-              errorString: 'Please enter a valid phone number'
-            }
-        ];
-        if ( this.required ) {
-          ret.push(
-            {
-              args: [this.name],
-              predicateFactory: function(e) {
-                return e.NEQ(self, '');
-              },
-              errorString: 'Please enter a phone number'
-            }
-          );
-        }
-        return ret;
-      }
     }
   ]
 });
