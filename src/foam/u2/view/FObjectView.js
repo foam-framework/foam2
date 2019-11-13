@@ -86,7 +86,7 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.of$.sub(this.updateChoices);
+      this.onDetach(this.of$.sub(this.updateChoices));
       this.updateChoices();
     },
 
