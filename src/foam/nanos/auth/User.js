@@ -228,7 +228,7 @@ foam.CLASS({
       section: 'administrative'
     },
     {
-      class: 'foam.core.PhoneNumberPropertyValidationRefinement',
+      class: 'PhoneNumber',
       name: 'phoneNumber',
       documentation: 'Personal phone number.',
       section: 'personal'
@@ -240,7 +240,7 @@ foam.CLASS({
       section: 'personal'
     },
     {
-      class: 'foam.core.PhoneNumberPropertyValidationRefinement',
+      class: 'PhoneNumber',
       name: 'mobile',
       documentation: 'Returns the mobile phone number of the User from the Phone model.',
       section: 'personal'
