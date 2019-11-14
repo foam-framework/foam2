@@ -20,7 +20,7 @@ public class AsyncAssemblyLine
  protected Agency pool_;
 
  public AsyncAssemblyLine(X x) {
-   pool_ = (Agency) x.get("threadpool");
+   pool_ = (Agency) x.get("threadPool");
  }
 
  public void enqueue(Assembly job) {
