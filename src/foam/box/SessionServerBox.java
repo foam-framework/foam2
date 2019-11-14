@@ -124,7 +124,7 @@ public class SessionServerBox
 
       msg.getLocalAttributes().put("x", effectiveContext);
     } catch (Throwable t) {
-      logger.error("Error throw in SessionServerBox: " + t, " ,service: " + spec.getName());
+      logger.error("Error throw in SessionServerBox: " + t, " ,service: " + spec.getName(), t);
       t.printStackTrace();
       msg.replyWithException(t);
       return;

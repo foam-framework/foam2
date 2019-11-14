@@ -219,6 +219,12 @@ foam.CLASS({
         OMLogger omLogger = (OMLogger) getX().get("OMLogger");
 
         emailMessage = (EmailMessage) emailMessage.fclone();
+        if ( emailMessage.getStatus() == Status.FAILED ) {
+          // ignore
+          logger.debug("Email not sent, already FAILED.", emailMessage.getId());
+          return emailMessage;
+        }
+
         MimeMessage message = createMimeMessage(emailMessage);
         if ( message == null ) {
           return emailMessage;

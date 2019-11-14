@@ -176,9 +176,14 @@ foam.CLASS({
       `
     },
     {
-      class: 'String',
+      class: 'foam.u2.ViewSpec',
       name: 'detailView',
-      value: 'foam.u2.DetailView'
+      factory: function() {
+        return {
+          class: 'foam.u2.detail.SectionedDetailView',
+          of: this.data.of
+        };
+      }
     },
     'selectedObjects'
   ],
