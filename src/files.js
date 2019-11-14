@@ -24,7 +24,6 @@
 if ( typeof window !== 'undefined' ) global = window;
 
 FOAM_FILES([
-  
   { name: "foam/core/poly" },
   { name: "foam/core/lib" },
   { name: "foam/core/stdlib" },

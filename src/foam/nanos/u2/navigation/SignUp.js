@@ -178,7 +178,7 @@ foam.CLASS({
     {
       name: 'footerLink',
       code: function(topBarShow_, param) {
-        let p = { dao_: param.dao_, group_: param.group_ };
+        let p = { dao_: param.dao_, group_: param.group_, countryChoices_: param.countryChoices_ };
         window.history.replaceState(null, null, window.location.origin);
         this.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn', topBarShow_: topBarShow_, param: p }, this);
       }

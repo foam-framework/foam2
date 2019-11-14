@@ -52,8 +52,9 @@ foam.CLASS({
 
   /* SET ABOVE MODEL */
   ^ .topBar-logo-Back {
+    text-align: center;
     height: 6vh;
-    background: /*%PRIMARY1%*/ #202341;
+    // background: /*%logoBackgrounColour%*/ #202341;
   }
 
   /* SET ON LOGO IMG */
@@ -215,6 +216,7 @@ foam.CLASS({
       this.param.dao_ = ! this.param.dao_ ? this.loginVariables.dao_ : this.param.dao_;
       if ( this.mode_ === this.MODE1 ) {
         this.param.group_ = ! this.param.group_ ? this.loginVariables.group_ : this.param.group_;
+        this.param.countryChoices_ = this.param.countryChoices_ ? this.param.countryChoices_ : ['CA', 'US'];
         this.model = this.SignUp.create(this.param, this);
       } else {
         this.model = this.SignIn.create(this.param, this);
@@ -225,7 +227,7 @@ foam.CLASS({
       // CREATE MODEL VIEW
       var right = this.Element.create({}, this)
       // Header on-top of rendering model
-        .start().show(this.topBarShow)
+        .start().show(this.topBarShow).addClass('topBar-logo-Back')
           .start('img')
             .attr('src', this.theme.logo)
             .addClass('top-bar-img')

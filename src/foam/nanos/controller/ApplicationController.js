@@ -233,8 +233,10 @@ foam.CLASS({
   methods: [
     function init() {
       this.SUPER();
+
       // done to start using SectionedDetailViews instead of DetailViews
       this.__subContext__.register(foam.u2.detail.SectionedDetailView, 'foam.u2.DetailView');
+
       var self = this;
 
       window.onpopstate = async function(event) {
@@ -391,7 +393,7 @@ foam.CLASS({
       }
 
       return new Promise(function(resolve, reject) {
-        self.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn' }, this);
+        self.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn' }, self);
         self.loginSuccess$.sub(resolve);
       });
     },
