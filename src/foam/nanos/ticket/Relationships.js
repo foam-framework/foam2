@@ -10,7 +10,7 @@ foam.RELATIONSHIP({
   unauthorizedTargetDAOKey: 'localTicketDAO',
   targetProperty: {
     visibility: 'RO',
-    section: 'details',
+    section: 'metaSection',
     tableCellFormatter: function(value) {
       this.add(this.__subSubContext__.userDAO.find(value)
         .then((user) => user && user.legalName ? user.legalName : value));
@@ -31,10 +31,9 @@ foam.RELATIONSHIP({
   unauthorizedSourceDAOKey: 'localTicketDAO',
   targetDAOKey: 'ticketCommentDAO',
   unauthorizedTargetDAOKey: 'localTicketCommentDAO',
-  targetProperty: {
-    section: 'comments',
-    order: 2
-  },
+  // targetProperty: {
+  //   section: 'commentSection'
+  // },
 });
 
 foam.RELATIONSHIP({
@@ -48,7 +47,7 @@ foam.RELATIONSHIP({
   targetDAOKey: 'ticketCommentDAO',
   unauthorizedTargetDAOKey: 'localTicketCommentDAO',
   sourceProperty: {
-    section: 'basicInfo',
+    section: 'metaSection',
     visibility: 'RO'
   },
   targetProperty: {

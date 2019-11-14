@@ -14,8 +14,7 @@ foam.CLASS({
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.LastModifiedAware',
-    'foam.nanos.auth.LastModifiedByAware',
-//    'foam.nanos.auth.DeletedAware',
+    'foam.nanos.auth.LastModifiedByAware'
   ],
 
   imports: [
@@ -34,18 +33,13 @@ foam.CLASS({
 
   sections: [
     {
-      name: 'basicInfo',
+      name: 'infoSection',
       title: ''
     },
     {
-      name: 'commentSection',
-      title: ''
-    },
-    {
-      name: 'details',
+      name: 'metaSection',
       title: ''
     }
-
   ],
 
   properties: [
@@ -55,11 +49,27 @@ foam.CLASS({
       hidden: true,
     },
     {
+      class: 'String',
+      name: 'comment',
+      label: '',
+      view: {
+        class: 'foam.u2.tag.TextArea', rows: 5, cols: 144
+      },
+      section: 'infoSection'
+    },
+    {
+      class: 'Boolean',
+      name: 'external',
+      documentation: 'only visible to ticket non-owner (group/organization) when true',
+      value: false,
+      section: 'infoSection'
+    },
+    {
       class: 'DateTime',
       name: 'created',
       visibility: 'RO',
       includeInDigest: true,
-      section: 'basicInfo'
+      section: 'metaSection'
     },
     {
       class: 'Reference',
@@ -74,13 +84,13 @@ foam.CLASS({
           }
         }.bind(this));
       },
-      section: 'details'
+      section: 'metaSection'
     },
     {
       class: 'DateTime',
       name: 'lastModified',
       visibility: 'RO',
-      section: 'details'
+      section: 'metaSection'
     },
     {
       class: 'Reference',
@@ -94,23 +104,7 @@ foam.CLASS({
           }
         }.bind(this));
       },
-      section: 'details'
-    },
-    {
-      class: 'String',
-      name: 'comment',
-      label: '',
-      view: {
-        class: 'foam.u2.tag.TextArea', rows: 5, cols: 144
-      },
-      section: 'commentSection'
-    },
-    {
-      class: 'Boolean',
-      name: 'external',
-      documentation: 'only visible to ticket non-owner (group/organization) when true',
-      value: false,
-      section: 'details'
+      section: 'metaSection'
     }
   ]
 });

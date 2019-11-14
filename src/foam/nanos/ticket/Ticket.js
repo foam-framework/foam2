@@ -43,25 +43,16 @@ foam.CLASS({
   ],
 
   sections: [
-     {
-      name: 'ticketType',
-      isAvailable: function(id) { return !! id; },
-      order: 1
+    {
+      name: 'infoSection',
+      title: 'Ticket',
     },
     {
-      name: 'basicInfo',
+      name: 'metaSection',
+      isAvailable: function(id) {
+        return id != 0;
+      },
       title: '',
-      order: 2
-    },
-    {
-      name: 'comments',
-      title: '',
-      order: 3
-    },
-    {
-      name: 'details',
-      title: '',
-      order: 4
     },
     {
       name: '_defaultSection',
@@ -72,25 +63,10 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'String',
-      name: 'type',
-      documentation: 'The type of the ticket.',
-      transient: true,
-      getter: function() {
-        return this.cls_.name;
-      },
-      javaGetter: `
-        return getClass().getSimpleName();
-      `,
-      tableWidth: 135,
-      section: 'ticketType',
-      visibility: 'FINAL'
-    },
-    {
       class: 'Long',
       name: 'id',
       visibility: 'RO',
-      section: 'basicInfo',
+      section: 'infoSection',
       order: 1
     },
     {
@@ -98,7 +74,7 @@ foam.CLASS({
       class: 'String',
       visibility: 'RO',
       storageTransient: true,
-      section: 'basicInfo',
+      section: 'infoSection',
       getter: function() {
          return this.cls_.name;
       },
@@ -115,7 +91,7 @@ foam.CLASS({
       value: 'OPEN',
       javaFactory: 'return "OPEN";',
       includeInDigest: true,
-      section: 'basicInfo',
+      section: 'infoSection',
       order: 3,
       tableWidth: 130,
       tableCellFormatter: function(value, obj) {
@@ -163,13 +139,13 @@ foam.CLASS({
     //     class: 'foam.u2.view.ReferenceArrayView',
     //     daoKey: 'userDAO'
     //   },
-    //   section: 'details',
+    //   section: 'metaSection',
     // },
     {
       class: 'String',
       name: 'title',
       required: true,
-      section: 'basicInfo',
+      section: 'infoSection',
       validationPredicate: [
         {
           args: ['title', 'type'],
@@ -190,7 +166,7 @@ foam.CLASS({
       value: '',
     // required: true,
       storageTransient: true,
-      section: 'comments',
+      section: 'infoSection',
       validationPredicate: [
         {
           args: ['id', 'title', 'comment'],
@@ -212,14 +188,14 @@ foam.CLASS({
           errorString: 'Please provide a comment.'
         }
       ],
-      order: 1
+      order: 5
     },
     {
       class: 'DateTime',
       name: 'created',
       visibility: 'RO',
       includeInDigest: true,
-      section: 'details',
+      section: 'metaSection',
     },
     {
       class: 'Reference',
@@ -234,13 +210,13 @@ foam.CLASS({
           }
         }.bind(this));
       },
-      section: 'details',
+      section: 'metaSection',
     },
     {
       class: 'DateTime',
       name: 'lastModified',
       visibility: 'RO',
-      section: 'details',
+      section: 'metaSection',
     },
     {
       class: 'Reference',
@@ -254,7 +230,7 @@ foam.CLASS({
           }
         }.bind(this));
       },
-      section: 'details',
+      section: 'metaSection',
     },
     {
       name: 'summary',
