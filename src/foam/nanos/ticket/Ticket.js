@@ -35,11 +35,11 @@ foam.CLASS({
   tableColumns: [
     'id',
     'type',
-    // REVIEW: view fails to display when owner in tableColumns
-  //  'owner',
+    // REVIEW: view fails to display when owner in tableColumn, the 2nd entry in allColumns is undefined.
+    // 'owner',
     'lastModified',
     'status',
-    'summary'
+    'title'
   ],
 
   sections: [
@@ -67,7 +67,8 @@ foam.CLASS({
       name: 'id',
       visibility: 'RO',
       section: 'infoSection',
-      order: 1
+      order: 1,
+      tableWidth: 100
     },
     {
       name: 'type',
@@ -144,7 +145,9 @@ foam.CLASS({
     {
       class: 'String',
       name: 'title',
-      required: true,
+      // REVIEW: required causing issues for extended classes - 'Save' is never enabled.
+      // required: true,
+      tableWidth: 250,
       section: 'infoSection',
       validationPredicate: [
         {
@@ -217,6 +220,7 @@ foam.CLASS({
       name: 'lastModified',
       visibility: 'RO',
       section: 'metaSection',
+      tableWidth: 150
     },
     {
       class: 'Reference',
