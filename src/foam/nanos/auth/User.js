@@ -29,15 +29,18 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.dao.ProxyDAO',
+    'foam.dao.ArraySink',
     'foam.dao.Sink',
     'foam.mlang.order.Comparator',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.PriorPassword',
+    'foam.nanos.auth.UserNotificationSettingJunction',
+    'foam.nanos.auth.UserUserJunctionNotificationSettingJunction',
     'foam.nanos.notification.Notification',
-    'foam.nanos.notification.NotificationConfig',
     'foam.nanos.notification.NotificationSetting',
     'foam.util.SafetyUtil',
+    'java.util.List',
     'static foam.mlang.MLang.EQ'
   ],
 
@@ -597,24 +600,17 @@ foam.CLASS({
     {
       name: 'notify',
       javaCode: `
-        DAO agentJunctionDAO      = (DAO) x.get("agentJunctionDAO");
-        DAO notificationConfigDAO = (DAO) x.get("notificationConfigDAO");
-        
-        UserUserJunction junction = (UserUserJunction) agentJunctionDAO
-          .find(EQ(UserUserJunction.SOURCE_ID, getId()));
-        if ( junction == null ) {
-          throw new RuntimeException("A junction between the user and its entities cannot be found.");
-        }
+      DAO notificationSettingDAO = (DAO) x.get("notificationSettingDAO");
 
-        NotificationConfig config = (NotificationConfig) notificationConfigDAO
-          .find(junction.getNotificationConfig());
-        if ( config == null ) {
-          throw new RuntimeException("A notification configuration for the user cannot be found.");
+      List<UserNotificationSettingJunction> junctions = ((ArraySink) getNotificationSettings(x).getJunctionDAO().select(new ArraySink())).getArray();
+      for( UserNotificationSettingJunction junction : junctions ) {
+        NotificationSetting setting = (NotificationSetting) notificationSettingDAO.find(junction.getTargetId());
+        if ( setting == null ) {
+          throw new RuntimeException("A notification setting for the user cannot be found.");
         }
-
-        for(NotificationSetting setting : config.getNotificationSettings()) {
-          setting.sendNotification(x, this, notification);
-        }
+  
+        setting.sendNotification(x, this, notification);
+      }
       `
     }
   ]
@@ -682,6 +678,28 @@ foam.RELATIONSHIP({
   }
 });
 
+foam.RELATIONSHIP({
+  cardinality: '*:*',
+  sourceModel: 'foam.nanos.auth.UserUserJunction',
+  targetModel: 'foam.nanos.notification.NotificationSetting',
+  forwardName: 'notificationSettingsForBusinessUsers',
+  inverseName: 'businessUsers',
+  sourceProperty: {
+    hidden: true
+  }
+});
+
+foam.RELATIONSHIP({
+  cardinality: '*:*',
+  sourceModel: 'foam.nanos.auth.User',
+  targetModel: 'foam.nanos.notification.NotificationSetting',
+  forwardName: 'notificationSettings',
+  inverseName: 'owners',
+  sourceProperty: {
+    hidden: true
+  }
+});
+
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'UserUserJunctionRefinement',
@@ -689,14 +707,13 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Reference',
-      of: 'foam.nanos.auth.Group',
-      name: 'group'
+      class: 'Long',
+      name: 'id'
     },
     {
       class: 'Reference',
-      of: 'foam.nanos.notification.NotificationConfig',
-      name: 'notificationConfig'
+      of: 'foam.nanos.auth.Group',
+      name: 'group'
     }
   ]
 });

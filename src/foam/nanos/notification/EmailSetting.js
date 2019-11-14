@@ -1,7 +1,7 @@
 foam.CLASS({
   package: 'foam.nanos.notification',
-  name: 'SendEmailSetting',
-  implements: ['foam.nanos.notification.NotificationSetting'],
+  name: 'EmailSetting',
+  extends: 'foam.nanos.notification.NotificationSetting',
 
   javaImports: [
     'foam.dao.ArraySink',

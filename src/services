@@ -422,7 +422,7 @@ p({"class":"foam.nanos.boot.NSpec", "name":"emailDocService",                  "
 p({"class":"foam.nanos.boot.NSpec","name":"appConfig",                         "lazy":false, "service":{"class":"foam.nanos.app.AppConfig"}})
 p({"class":"foam.nanos.boot.NSpec","name":"appConfigService",                   "serve":true, "authenticate": false, "boxClass":"foam.nanos.app.AppConfigServiceSkeleton", "service":{"class":"foam.nanos.app.ContextLookupAppConfigService"}, "client":"{\"class\":\"foam.nanos.app.ClientAppConfigService\",\"delegate\":{\"class\":\"foam.box.HTTPBox\",\"url\":\"service/appConfigService\"}}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"agentAuth",                        "lazy":false, "serve":true, "authenticate": false, "description":"Permits users to act as others if permitted. Places user as an agent of the system.", "boxClass":"foam.nanos.auth.AgentAuthServiceSkeleton", "serviceScript":"return new foam.nanos.auth.AgentUserAuthService(x);","client":"{\"class\":\"foam.nanos.auth.ClientAgentAuthService\"}"})
-p({"class":"foam.nanos.boot.NSpec", "name":"agentJunctionDAO",                 "lazy":false, "serve":true, "description":"DAO responsible for storing agent authentication permission information.","serviceScript": "return new foam.dao.EasyDAO.Builder(x).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"agentJunctions\").setOf(foam.nanos.auth.UserUserJunction.getOwnClassInfo()).build();","client":"{\"of\":\"foam.nanos.auth.UserUserJunction\", \"remoteListenerSupport\": false}"})
+p({"class":"foam.nanos.boot.NSpec", "name":"agentJunctionDAO",                 "lazy":false, "serve":true, "description":"DAO responsible for storing agent authentication permission information.","serviceScript": "return new foam.dao.EasyDAO.Builder(x).setGuid(true).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"agentJunctions\").setOf(foam.nanos.auth.UserUserJunction.getOwnClassInfo()).build();","client":"{\"of\":\"foam.nanos.auth.UserUserJunction\", \"remoteListenerSupport\": false}"})
 p({
   "class":"foam.nanos.boot.NSpec",
   "name":"documentDAO",
@@ -736,18 +736,18 @@ p({
 
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"notificationConfigDAO",
+  "name":"notificationSettingDAO",
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
       .setGuid(true)
       .setPm(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("notificationConfigs")
-      .setOf(foam.nanos.notification.NotificationConfig.getOwnClassInfo())
+      .setJournalName("notificationSettings")
+      .setOf(foam.nanos.notification.NotificationSetting.getOwnClassInfo())
       .setAuthorize(false)
       .build();
   """,
-  "client":"{\"of\":\"foam.nanos.notification.NotificationConfig\"}"
+  "client":"{\"of\":\"foam.nanos.notification.NotificationSetting\"}"
 })
 
 p({
@@ -772,5 +772,33 @@ p({
       "of": "foam.core.Currency",
       "cache": true
     }
+  """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"userNotificationSettingJunctionDAO",
+  "description":"The junction DAO for the many-to-many relationship between users and notification settings",
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.auth.UserNotificationSettingJunction.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("userNotificationSettingJunctions")
+      .setPm(true)
+      .build();
+  """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"userUserJunctionNotificationSettingJunctionDAO",
+  "description":"The junction DAO for the many-to-many relationship between business user pairs and notification settings",
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.auth.UserUserJunctionNotificationSettingJunction.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("userUserJunctionNotificationSettingJunctions")
+      .setPm(true)
+      .build();
   """
 })
