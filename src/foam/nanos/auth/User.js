@@ -14,8 +14,7 @@ foam.CLASS({
     'foam.nanos.auth.EnabledAware',
     'foam.nanos.auth.HumanNameTrait',
     'foam.nanos.auth.LastModifiedAware',
-    'foam.nanos.auth.ServiceProviderAware',
-    'foam.nanos.notification.Notifiable'
+    'foam.nanos.auth.ServiceProviderAware'
   ],
 
   requires: [
@@ -29,18 +28,12 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.dao.ProxyDAO',
-    'foam.dao.ArraySink',
     'foam.dao.Sink',
     'foam.mlang.order.Comparator',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.PriorPassword',
-    'foam.nanos.auth.UserNotificationSettingJunction',
-    'foam.nanos.auth.UserUserJunctionNotificationSettingJunction',
-    'foam.nanos.notification.Notification',
-    'foam.nanos.notification.NotificationSetting',
     'foam.util.SafetyUtil',
-    'java.util.List',
     'static foam.mlang.MLang.EQ'
   ],
 
@@ -596,22 +589,6 @@ foam.CLASS({
       code: function() {
         return this.label();
       }
-    },
-    {
-      name: 'notify',
-      javaCode: `
-      DAO notificationSettingDAO = (DAO) x.get("notificationSettingDAO");
-
-      List<UserNotificationSettingJunction> junctions = ((ArraySink) getNotificationSettings(x).getJunctionDAO().select(new ArraySink())).getArray();
-      for( UserNotificationSettingJunction junction : junctions ) {
-        NotificationSetting setting = (NotificationSetting) notificationSettingDAO.find(junction.getTargetId());
-        if ( setting == null ) {
-          throw new RuntimeException("A notification setting for the user cannot be found.");
-        }
-  
-        setting.sendNotification(x, this, notification);
-      }
-      `
     }
   ]
 });
@@ -678,38 +655,12 @@ foam.RELATIONSHIP({
   }
 });
 
-foam.RELATIONSHIP({
-  cardinality: '*:*',
-  sourceModel: 'foam.nanos.auth.UserUserJunction',
-  targetModel: 'foam.nanos.notification.NotificationSetting',
-  forwardName: 'notificationSettingsForBusinessUsers',
-  inverseName: 'businessUsers',
-  sourceProperty: {
-    hidden: true
-  }
-});
-
-foam.RELATIONSHIP({
-  cardinality: '*:*',
-  sourceModel: 'foam.nanos.auth.User',
-  targetModel: 'foam.nanos.notification.NotificationSetting',
-  forwardName: 'notificationSettings',
-  inverseName: 'owners',
-  sourceProperty: {
-    hidden: true
-  }
-});
-
 foam.CLASS({
   package: 'foam.nanos.auth',
-  name: 'UserUserJunctionRefinement',
+  name: 'UserUserJunctionGroupRefinement',
   refines: 'foam.nanos.auth.UserUserJunction',
 
   properties: [
-    {
-      class: 'Long',
-      name: 'id'
-    },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.Group',
