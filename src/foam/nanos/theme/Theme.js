@@ -93,7 +93,7 @@ foam.CLASS({
     },
     {
       class: 'Color',
-      name: 'logoBackgrounColour',
+      name: 'logoBackgroundColour',
       documentation: 'The logo background colour to display in the application.',
       section: 'colours'
     },
