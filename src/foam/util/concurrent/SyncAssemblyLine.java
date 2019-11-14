@@ -4,6 +4,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+package foam.util.concurrent;
+
  /**
   * A Synchronous blocking implementation of the AssemblyLine interface.
   * Rather than using a thread pool, it uses the calling thread

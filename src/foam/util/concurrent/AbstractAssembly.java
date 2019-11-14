@@ -4,6 +4,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+package foam.util.concurrent;
+
 // TODO?: Could provide a reset() method if wanted to make reusable to avoid GC.
 
 /**
