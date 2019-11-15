@@ -1,2 +1,3 @@
 p({"class":"foam.nanos.auth.Permission","id":"service.strategyDAO","description":"Permission to access strategyDAO"})
 p({"class":"foam.nanos.auth.Permission","id":"strategyreference.read.*","description":"Permission to view strategy references."})
+p({"class":"foam.nanos.auth.Permission","id":"service.strategizer","description":"Permission to access the strategizer service."})
